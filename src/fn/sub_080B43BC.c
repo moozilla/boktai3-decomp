@@ -3,6 +3,7 @@
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_init_primitives.h"
+#include "scene_actor_state.h"
 
 struct VornResourceBlock {
     u32 w[8];
@@ -56,212 +57,8 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct VornInitBody {
-    u32 id;
-    u8 unknown54[0x5];
-    u8 direction;
-    u8 unknown5A[0x2];
-    struct ContactPosition position;
-    u8 unknown64[0x34];
-};
-struct VornInitAttacks {
-    u16 first[4];
-    u16 second[4];
-    u16 parameter[4];
-    u32 flags[4];
-};
-struct VornInitGate {
-    u16 field414;
-    u16 field416;
-    u16 field418;
-    u16 field41A;
-    void *field41C;
-};
-struct VornInitRange {
-    u32 field420 : 16;
-    u32 field422 : 16;
-    u32 field424;
-    u8 unknown428[0x2];
-    u8 field42A;
-    u8 field42B;
-};
-struct VornInitRoutePoint {
-    s16 x, z;
-};
-struct VornInitRoute {
-    u32 unknown0, unknown4;
-    struct VornInitRoutePoint *point;
-    u8 currentPoint, branches[2], activeBranch;
-    u8 routeId, parameterB, pointId, unknown13;
-};
-struct VornInitGroup {
-    u16 field3D4;
-    u8 unknown3D6[0x2];
-    u32 field3D8;
-    u8 unknown3DC[0x38];
-    struct VornInitGate gate;
-    struct VornInitRange range;
-    u8 unknown42C[0x10];
-    void *field43C;
-    u32 field440;
-    void *field444;
-    struct VornInitRoute route;
-    u8 unknown45C[0x15A];
-    s16 field5B6;
-    u8 unknown5B8[0x14];
-    u16 field5CC;
-    u8 unknown5CE[0x2];
-    u8 *field5D0;
-    u8 *field5D4;
-    u8 unknown5D8[0x4];
-    void *field5DC;
-    void *field5E0;
-    void *field5E4;
-    u32 field5E8;
-    void *field5EC;
-    void *field5F0;
-    void *field5F4;
-    void *field5F8;
-    void *field5FC;
-    void *field600;
-    u32 field604;
-    u32 field608;
-    void *field60C;
-    void *field610;
-    void *field614;
-    void *field618;
-    u32 field61C;
-    u32 field620;
-};
-struct VornInitTargeting {
-    u32 fieldDC;
-    u8 unknownE0[0xA];
-    u8 fieldEA;
-    u8 fieldEB;
-    u16 fieldEC;
-    u16 fieldEE;
-    u8 unknownF0[0x4];
-    u32 fieldF4;
-    u32 fieldF8;
-    u32 fieldFC;
-};
-struct VornInitSavedControl {
-    u32 field118;
-    u32 field11C;
-    u8 field120;
-    u8 field121;
-    u8 field122;
-    u8 field123;
-    void *field124;
-    u8 field128;
-    u8 unknown129[0x3];
-    u16 field12C;
-    u16 field12E;
-    u32 field130;
-};
-struct VornInitActor {
-    u8 unknown0[0x4];
-    u8 *drawable;
-    u8 drawableKind;
-    u8 unknown9[0x47];
-    struct VornInitBody body;
-    u8 category;
-    u8 unknown99[0x1];
-    u16 field9A;
-    s16 field9C;
-    u8 field9E;
-    u8 field9F;
-    u8 fieldA0;
-    u8 fieldA1;
-    u16 fieldA2;
-    u16 fieldA4;
-    u16 fieldA6;
-    u16 fieldA8;
-    u16 fieldAA;
-    u32 fieldAC;
-    u16 fieldB0;
-    u16 fieldB2;
-    struct VornInitAttacks attacks;
-    struct VornInitTargeting targeting;
-    u8 unknown100[0x4];
-    u32 field104;
-    u32 field108;
-    u32 field10C;
-    u32 field110;
-    u32 field114;
-    struct VornInitSavedControl saved;
-    u8 unknown134[0x6];
-    u16 field13A;
-    u8 unknown13C[0xA0];
-    u16 field1DC, field1DE;
-    u16 field1E0;
-    u16 field1E2;
-    u16 field1E4;
-    u16 field1E6;
-    u8 unknown1E8[0x4];
-    u32 field1EC;
-    u32 field1F0;
-    u8 unknown1F4[0x28];
-    void *field21C;
-    void (*field220)(void *);
-    void (*field224)(void *);
-    void (*field228)(void *);
-    void (*field22C)(void *);
-    void (*field230)(void *);
-    void (*field234)(void *);
-    void *field238;
-    void *field23C;
-    u32 field240;
-    u8 unknown244[0x4];
-    void *field248;
-    void *field24C;
-    const void *field250;
-    u8 unknown254[0x4];
-    void *field258;
-    void *field25C;
-    u16 (*field260)(void *);
-    void *field264;
-    void *field268;
-    void *field26C;
-    u8 (*field270)(void *);
-    s32 (*field274)(void *);
-    u32 (*field278)(void);
-    u8 unknown27C[0x2C];
-    u8 field2A8;
-    u8 field2A9;
-    u8 field2AA;
-    u8 unknown2AB[0x1];
-    u32 field2AC;
-    u8 field2B0;
-    u8 field2B1;
-    u8 field2B2;
-    u8 unknown2B3[0x1];
-    u8 field2B4;
-    u8 field2B5;
-    u8 unknown2B6[0x1];
-    u8 field2B7;
-    u8 unknown2B8[0x6];
-    u16 field2BE;
-    u16 field2C0;
-    u16 field2C2;
-    u8 unknown2C4[0x4];
-    u16 field2C8;
-    u8 unknown2CA[0x2];
-    u32 field2CC;
-    u32 field2D0;
-    u16 field2D4;
-    u8 unknown2D6[0x12];
-    u16 field2E8;
-    u16 field2EA;
-    u8 unknown2EC[0x8];
-    u16 field2F4;
-    u8 unknown2F6[0x4];
-    u16 field2FA;
-    u8 unknown2FC[0x8];
-    u32 field304;
-    u8 unknown308[0xC8];
-    void *context;
-    struct VornInitGroup group;
+struct VornInstanceState {
+    u8 unknown0[0x624];
     u8 unknown624[0x68];
     u8 field68C;
     u8 unknown68D[0x2C];
@@ -270,38 +67,38 @@ struct VornInitActor {
     u16 field6D4;
 };
 
-static inline u8 *VornInit_Drawable(struct VornInitActor *actor)
+static inline u8 *VornInit_Drawable(struct SceneActorRegistryResetView *actor)
 {
     return actor->drawable;
 }
-static inline u8 VornInit_GetDrawableKind(struct VornInitActor *actor)
+static inline u8 VornInit_GetDrawableKind(struct SceneActorRegistryResetView *actor)
 {
     return actor->drawableKind;
 }
 static inline void VornInit_SetCategory(void *object, u8 category)
 {
-    struct VornInitActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     actor->category = category;
 }
 static inline u8 VornInit_GetCategory(void *object)
 {
-    struct VornInitActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     return actor->category;
 }
 
-static inline u16 VornInit_GetInitialHealth(struct VornInitActor *actor)
+static inline u16 VornInit_GetInitialHealth(struct SceneActorRegistryResetView *actor)
 {
-    return actor->fieldB0;
+    return actor->defaultHealth;
 }
 
-static inline u32 VornInit_GetPaletteBase(struct VornInitActor *actor)
+static inline u32 VornInit_GetPaletteBase(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field1E0;
+    return actor->basePaletteBank;
 }
 
-static inline u32 VornInit_GetPaletteOffset(struct VornInitActor *actor)
+static inline u32 VornInit_GetPaletteOffset(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field1E6;
+    return actor->paletteOffset;
 }
 
 void SceneActorBehavior_InitializeShadow(void *);
@@ -312,80 +109,81 @@ u8 sub_080B3C1C(void *);
 void SceneActorPlacement_ResetStateThree(void);
 extern const u8 gUnk_08606038[];
 
-static inline u32 VornInit_GetMotionFlags(struct VornInitActor *actor)
+static inline u32 VornInit_GetMotionFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2C0;
+    return actor->flags2C0;
 }
-static inline u16 VornInit_GetHeightOffset(struct VornInitActor *actor)
+static inline u16 VornInit_GetHeightOffset(struct SceneActorRegistryResetView *actor)
 {
     return actor->field2EA;
 }
-static inline u32 VornInit_GetBehaviorFlags(struct VornInitActor *actor)
+static inline u32 VornInit_GetBehaviorFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2CC;
+    return actor->flags2CC;
 }
-static inline u32 VornInit_GetStatusFlags(struct VornInitActor *actor)
+static inline u32 VornInit_GetStatusFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2D0;
+    return actor->flags2D0;
 }
-static inline u8 VornInit_GetState(struct VornInitActor *actor)
+static inline u8 VornInit_GetState(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2A8;
+    return actor->state2A8;
 }
-static inline u8 VornInit_GetPhase(struct VornInitActor *actor)
+static inline u8 VornInit_GetPhase(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2A9;
+    return actor->phase2A9;
 }
-static inline u8 VornInit_GetBehavior(struct VornInitActor *actor)
+static inline u8 VornInit_GetBehavior(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2AA;
+    return actor->behavior2AA;
 }
-static inline void * VornInit_GetCurrentControl(struct VornInitActor *actor)
+static inline void *VornInit_GetCurrentControl(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field21C;
+    return actor->target;
 }
-static inline u8 VornInit_GetControlKind(struct VornInitActor *actor)
+static inline u8 VornInit_GetControlKind(struct SceneActorRegistryResetView *actor)
 {
     return actor->field2B5;
 }
-static inline u8 VornInit_GetDirection(struct VornInitActor *actor)
+static inline u8 VornInit_GetDirection(struct SceneActorRegistryResetView *actor)
 {
     return actor->body.direction;
 }
-static inline u32 VornInit_GetTerrainCell(struct VornInitActor *actor)
+static inline u32 VornInit_GetTerrainCell(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2F4;
+    return actor->terrainCell;
 }
-static inline u32 VornInit_GetTargetingFlags(struct VornInitTargeting *target)
+static inline u32 VornInit_GetTargetingFlags(struct SceneActorChaseTracking *target)
 {
-    return target->fieldEB;
+    return target->flags;
 }
-static inline struct VornInitSavedControl *VornInit_SavedControlOf(struct VornInitActor *actor)
+static inline struct SceneActorDefaultControl *
+VornInit_SavedControlOf(struct SceneActorRegistryResetView *actor)
 {
-    struct VornInitSavedControl *saved = &actor->saved;
+    struct SceneActorDefaultControl *saved = &actor->saved;
     return saved;
 }
 static inline struct ContactPosition *VornInit_BodyPosition(void *object)
 {
-    struct VornInitBody *body = object;
+    struct SceneActorBody *body = object;
     struct ContactPosition *position = &body->position;
     return position;
 }
-static inline void VornInit_SaveControl(struct VornInitSavedControl *saved, struct VornInitActor *actor)
+static inline void VornInit_SaveControl(struct SceneActorDefaultControl *saved,
+                                        struct SceneActorRegistryResetView *actor)
 {
-    saved->field12E = VornInit_GetMotionFlags(actor);
-    saved->field12C = VornInit_GetHeightOffset(actor);
-    saved->field118 = VornInit_GetBehaviorFlags(actor);
-    saved->field11C = VornInit_GetStatusFlags(actor);
-    saved->field120 = VornInit_GetDirection(actor);
-    saved->field121 = VornInit_GetState(actor);
-    saved->field122 = VornInit_GetPhase(actor);
-    saved->field123 = VornInit_GetBehavior(actor);
-    saved->field124 = VornInit_GetCurrentControl(actor);
-    saved->field128 = VornInit_GetControlKind(actor);
+    saved->motionFlags = VornInit_GetMotionFlags(actor);
+    saved->heightOffset = VornInit_GetHeightOffset(actor);
+    saved->behaviorFlags = VornInit_GetBehaviorFlags(actor);
+    saved->statusFlags = VornInit_GetStatusFlags(actor);
+    saved->direction = VornInit_GetDirection(actor);
+    saved->state = VornInit_GetState(actor);
+    saved->phase = VornInit_GetPhase(actor);
+    saved->behavior = VornInit_GetBehavior(actor);
+    saved->control = VornInit_GetCurrentControl(actor);
+    saved->kind = VornInit_GetControlKind(actor);
 }
-struct VornInitCollider { u8 header[6]; u16 flags; };
-static inline void VornInit_ClearColliderFlags(struct VornInitCollider *collider, u32 mask)
+static inline void VornInit_ClearColliderFlags(struct ContactCollider *collider, u32 mask)
 {
     collider->flags = mask & collider->flags;
 }
@@ -395,87 +193,88 @@ static inline s32 VornInit_Half(s32 value)
         return value >> 1;
     return -(-value >> 1);
 }
-static inline void VornInit_SetBehaviorFlags(struct VornInitActor *actor, u32 mask)
+static inline void VornInit_SetBehaviorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field2CC |= mask;
+    actor->flags2CC |= mask;
 }
 
-static inline void VornInit_SetStatusFlags(struct VornInitActor *actor, u32 mask)
+static inline void VornInit_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field2D0 |= mask;
+    actor->flags2D0 |= mask;
 }
 
-static inline u8 VornInit_TestMotionFlags(struct VornInitActor *actor, u32 mask)
+static inline u8 VornInit_TestMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     if (VornInit_GetMotionFlags(actor) & mask)
         return 1;
     return 0;
 }
 
-static inline u8 VornInit_TestTargetingFlags(struct VornInitTargeting *target, u32 mask)
+static inline u8 VornInit_TestTargetingFlags(struct SceneActorChaseTracking *target, u32 mask)
 {
     if (VornInit_GetTargetingFlags(target) & mask)
         return 1;
     return 0;
 }
-static inline void VornInit_SetTargetingFlags(struct VornInitTargeting *target, u8 mask)
+static inline void VornInit_SetTargetingFlags(struct SceneActorChaseTracking *target, u8 mask)
 {
-    mask |= target->fieldEB;
-    target->fieldEB = mask;
+    mask |= target->flags;
+    target->flags = mask;
 }
-static inline void VornInit_ClearControlFlags(struct VornInitActor *actor, u32 mask)
+static inline void VornInit_ClearControlFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field114 &= mask;
+    actor->flags114 &= mask;
 }
-static inline u8 VornInit_IsInCurrentRegion(struct VornInitActor *actor)
+static inline u8 VornInit_IsInCurrentRegion(struct SceneActorRegistryResetView *actor)
 {
-    if (*(u32 *)(gGameState + 0x5A0) == actor->field2FA)
+    if (*(u32 *)(gGameState + 0x5A0) == actor->regionId)
         return 1;
     return 0;
 }
-static inline void *VornInit_GetStandingControl(struct VornInitActor *actor)
+static inline void *VornInit_GetStandingControl(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field22C;
+    return actor->savedTarget;
 }
-static inline void VornInit_SetControl(struct VornInitActor *actor, void *callback, u32 behavior)
+static inline void VornInit_SetControl(struct SceneActorRegistryResetView *actor, void *callback,
+                                       u32 behavior)
 {
     actor->field2B2 = 1;
     actor->field2B0 = 0;
     actor->field2B5 = behavior;
-    actor->field21C = callback;
+    actor->target = callback;
     actor->field2C8 = 0;
     VornInit_ClearControlFlags(actor, ~1);
-    actor->field104 = 0;
+    actor->word104 = 0;
 }
-static inline void VornInit_SetState(struct VornInitActor *actor, u32 state, u32 phase, u32 behavior)
+static inline void VornInit_SetState(struct SceneActorRegistryResetView *actor, u32 state,
+                                     u32 phase, u32 behavior)
 {
-    actor->field2A8 = state;
-    actor->field2A9 = phase;
-    actor->field2AA = behavior;
-    actor->field2AC = 0;
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-static inline void VornInit_BeginBehavior(struct VornInitActor *actor, u32 behavior)
+static inline void VornInit_BeginBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
 {
     VornInit_SetState(actor, 0, 0, behavior);
 }
 static inline void VornInit_ResetFlags(void *object)
 {
-    struct VornInitActor *actor = object;
+    struct VornInstanceState *actor = object;
     actor->field6D4 = 0;
 }
 
-static inline void VornInit_InitializeGate(struct VornInitGate *gate, u16 parameter)
+static inline void VornInit_InitializeGate(struct SceneActorControlGate *gate, u16 parameter)
 {
-    gate->field414 = 0;
-    gate->field416 = parameter;
-    gate->field418 = 0;
+    gate->flags = 0;
+    gate->duration = parameter;
+    gate->counter = 0;
     gate->field41A = 0;
-    gate->field41C = 0;
-
+    gate->control = 0;
 }
 
-static inline void VornInit_ReadTargeting(struct VornInitTargeting *target)
+static inline void VornInit_ReadTargeting(struct SceneActorChaseTracking *target)
 {
     s32 nearRadius, flags, farRadius;
     if (Script_SeekToKeyword(0x65)) {
@@ -487,88 +286,90 @@ static inline void VornInit_ReadTargeting(struct VornInitTargeting *target)
         farRadius = 0x30;
         flags = 0x40;
     }
-    target->fieldDC = 0;
-    target->fieldEC = nearRadius;
-    target->fieldEE = farRadius;
-    target->fieldF8 = nearRadius *nearRadius;
-    target->fieldFC = farRadius *farRadius;
+    target->target = 0;
+    target->x = nearRadius;
+    target->z = farRadius;
+    target->limit = nearRadius * nearRadius;
+    target->zSquared = farRadius * farRadius;
     target->fieldEA = flags;
     if (VornInit_TestTargetingFlags(target, 4))
-        target->fieldF4 = target->fieldF8;
+        target->range = target->limit;
     else
-        target->fieldF4 = Div(target->fieldF8 * 8 - target->fieldF8, 10);
-
+        target->range = Div(target->limit * 8 - target->limit, 10);
 }
 
-static inline u16 VornInit_RangeRadius(struct VornInitRange *range)
+static inline u16 VornInit_RangeRadius(struct SceneActorRegistryControl *range)
 {
-    return range->field422;
+    return range->radius;
 }
-static inline void VornInit_ReadRange(struct VornInitRange *range)
+static inline void VornInit_ReadRange(struct SceneActorRegistryControl *range)
 {
     s32 radius;
     if (Script_SeekToKeyword(0x6E)) {
         radius = MonsterInit_ReadWord(0);
-        range->field420 = MonsterInit_ReadHalfword(0);
+        range->parameter = MonsterInit_ReadHalfword(0);
     } else {
         radius = 0;
-        range->field420 = radius;
+        range->parameter = radius;
     }
-    range->field422 = radius;
-    range->field424 = VornInit_RangeRadius(range) * VornInit_RangeRadius(range);
-    range->field42A = 0;
-
+    range->radius = radius;
+    range->radiusSquared = VornInit_RangeRadius(range) * VornInit_RangeRadius(range);
+    range->mode = 0;
 }
 
-static inline u32 VornInit_RoutePointX(struct VornInitRoute *route)
+static inline u32 VornInit_RoutePointX(struct SceneActorRegistryRoute *route)
 {
     return (u16)route->point->x;
 }
-static inline u32 VornInit_RoutePointZ(struct VornInitRoute *route)
+static inline u32 VornInit_RoutePointZ(struct SceneActorRegistryRoute *route)
 {
     return (u16)route->point->z;
 }
-static inline void VornInit_SnapToRoute(struct ContactPosition *position, struct VornInitRoute *route)
+static inline void VornInit_SnapToRoute(struct ContactPosition *position,
+                                        struct SceneActorRegistryRoute *route)
 {
     position->x = VornInit_RoutePointX(route);
     position->z = VornInit_RoutePointZ(route);
     position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
 }
-static inline void VornInit_DrawablePosition(struct VornInitActor *actor)
+static inline void VornInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
 {
     if (VornInit_GetDrawableKind(actor) == 0)
         *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
         *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
-static inline void VornInit_SetFirstAttack(struct VornInitActor *actor, s32 index, s32 value)
+static inline void VornInit_SetFirstAttack(struct SceneActorRegistryResetView *actor, s32 index,
+                                           s32 value)
 {
     actor->attacks.first[index] = value;
 }
 
-static inline u8 VornInit_RouteId(struct VornInitRoute *route)
+static inline u8 VornInit_RouteId(struct SceneActorRegistryRoute *route)
 {
     return route->routeId;
 }
-static inline u8 VornInit_RouteParameter(struct VornInitRoute *route)
+static inline u8 VornInit_RouteParameter(struct SceneActorRegistryRoute *route)
 {
     return route->parameterB;
 }
-static inline u8 VornInit_RoutePointId(struct VornInitRoute *route)
+static inline u8 VornInit_RoutePointId(struct SceneActorRegistryRoute *route)
 {
     return route->pointId;
 }
-static inline u8 VornInit_RouteActiveBranch(struct VornInitRoute *route)
+static inline u8 VornInit_RouteActiveBranch(struct SceneActorRegistryRoute *route)
 {
     return route->activeBranch;
 }
-static inline u32 VornInit_RouteAlternateBranch(struct VornInitRoute *route)
+static inline u32 VornInit_RouteAlternateBranch(struct SceneActorRegistryRoute *route)
 {
     return 1 ^ route->activeBranch;
 }
-static inline void VornInit_BeginRoute(struct VornInitBody *body, struct VornInitRoute *route)
+static inline void VornInit_BeginRoute(struct SceneActorBody *body,
+                                       struct SceneActorRegistryRoute *route)
 {
-    SceneBody_StartRoute(body, route, VornInit_RouteId(route), VornInit_RouteParameter(route), VornInit_RoutePointId(route));
+    SceneBody_StartRoute(body, route, VornInit_RouteId(route), VornInit_RouteParameter(route),
+                         VornInit_RoutePointId(route));
 }
 static inline s32 VornInit_ClampHealth(u16 raw)
 {
@@ -578,34 +379,35 @@ static inline s32 VornInit_ClampHealth(u16 raw)
     return health;
 }
 
-static inline void VornInit_InstallIdle(struct VornInitActor *actor, void *idle)
+static inline void VornInit_InstallIdle(struct SceneActorRegistryResetView *actor, void *idle)
 {
-    actor->field21C = idle;
+    actor->target = idle;
 }
 
-static inline void VornInit_InitializeHealth(struct VornInitActor *arg0,
-    u16 initialHealth, s32 firstLimit, s32 secondLimit)
+static inline void VornInit_InitializeHealth(struct SceneActorRegistryResetView *arg0,
+                                             u16 initialHealth, s32 firstLimit, s32 secondLimit)
 {
-    arg0->field2D4 = 0;
+    arg0->flags2D4 = 0;
     VornInit_InstallIdle(arg0, SceneActorControl_OnIdle);
     arg0->field2B2 = 1;
     arg0->field2B0 = 0;
-    arg0->field9C = VornInit_ClampHealth(initialHealth);
+    arg0->health = VornInit_ClampHealth(initialHealth);
     arg0->fieldAA = 0;
     if (secondLimit <= 0)
         secondLimit = firstLimit;
-    arg0->fieldA6 = firstLimit;
+    arg0->attachmentLimit = firstLimit;
     arg0->fieldA8 = secondLimit;
-    arg0->field2FA = 0;
-
+    arg0->regionId = 0;
 }
 
-static inline void VornInit_SetInitialHealth(struct VornInitActor *actor, u16 health)
+static inline void VornInit_SetInitialHealth(struct SceneActorRegistryResetView *actor, u16 health)
 {
-    actor->fieldB0 = health;
+    actor->defaultHealth = health;
 }
 
-static inline u32 VornInit_ReadRoute(struct VornInitActor *arg0, struct VornInitGroup *group, struct VornInitRoute *rt)
+static inline u32 VornInit_ReadRoute(struct SceneActorRegistryResetView *arg0,
+                                     struct SceneActorChaseGroup *group,
+                                     struct SceneActorRegistryRoute *rt)
 {
     struct ContactPosition point;
     s32 pointId;
@@ -618,10 +420,12 @@ static inline u32 VornInit_ReadRoute(struct VornInitActor *arg0, struct VornInit
         rt->pointId = pointId;
         rt->currentPoint = pointId;
         rt->branches[VornInit_RouteActiveBranch(rt)] = rt->routeId;
-        rt->branches[VornInit_RouteAlternateBranch(rt)] = Script_GetPc() ? Script_GetValue() : VornInit_RouteId(rt);
+        rt->branches[VornInit_RouteAlternateBranch(rt)] =
+            Script_GetPc() ? Script_GetValue() : VornInit_RouteId(rt);
         Path_GetPointPositionById((u16 *)&point, VornInit_RouteId(rt), VornInit_RoutePointId(rt));
-        arg0->field2F4 = MonsterInit_CellIndex(&point);
-        point.y = arg0->field2BE = MonsterInit_TerrainHeight(VornInit_GetTerrainCell(arg0), &point);
+        arg0->terrainCell = MonsterInit_CellIndex(&point);
+        point.y = arg0->groundHeight2BE =
+            MonsterInit_TerrainHeight(VornInit_GetTerrainCell(arg0), &point);
         VornInit_BeginRoute(&arg0->body, rt);
         return 1;
     } else {
@@ -629,25 +433,25 @@ static inline u32 VornInit_ReadRoute(struct VornInitActor *arg0, struct VornInit
         rt->parameterB = 0;
         rt->pointId = 0;
         rt->currentPoint = 0;
-        group->route.branches[VornInit_RouteActiveBranch(rt)] = 0;
-        group->route.branches[VornInit_RouteAlternateBranch(rt)] = 0;
+        group->homeRoute.branches[VornInit_RouteActiveBranch(rt)] = 0;
+        group->homeRoute.branches[VornInit_RouteAlternateBranch(rt)] = 0;
     }
 
     return 0;
 }
 static inline void VornInit_InitializeBody(void *object, u32 *fill)
 {
-    struct VornInitActor *arg0 = object;
-    struct VornInitGroup *group = &arg0->group;
-    struct VornInitBody *body = &arg0->body;
+    struct SceneActorRegistryResetView *arg0 = object;
+    struct SceneActorChaseGroup *group = &arg0->group;
+    struct SceneActorBody *body = &arg0->body;
     struct ContactPosition origin;
     s32 mode, i, secondLimit, firstLimit, gateDuration, identity;
-    struct VornInitRoute *rt;
-    arg0->field2CC = 0;
-    arg0->field2D0 = 0;
-    arg0->field2B4 = 0;
+    struct SceneActorRegistryRoute *rt;
+    arg0->flags2CC = 0;
+    arg0->flags2D0 = 0;
+    arg0->enabled = 0;
     arg0->field2E8 = 8;
-    arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
+    arg0->flags2C0 = Script_GetKeywordValue(0x4D, 0);
     arg0->field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
@@ -674,9 +478,9 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
         secondLimit = 0;
         gateDuration = 0;
     }
-    VornInit_InitializeGate(&group->gate, gateDuration);
-    VornInit_ReadRange(&group->range);
-    VornInit_ReadTargeting(&arg0->targeting);
+    VornInit_InitializeGate(&group->common.gate, gateDuration);
+    VornInit_ReadRange(&group->common.control);
+    VornInit_ReadTargeting(&arg0->tracking);
     if (Script_GetKeywordValue(0x62, 0))
         VornInit_SetStatusFlags(arg0, 0x200);
     arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
@@ -684,7 +488,7 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
 
     if (Script_SeekToKeyword(0x41)) {
         VornInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
-        group->field5B6 = VornInit_Half(VornInit_GetInitialHealth(arg0));
+        group->halfHealth = VornInit_Half(VornInit_GetInitialHealth(arg0));
         arg0->field9E = MonsterInit_ReadByte(0);
         arg0->field9F = MonsterInit_ReadByte(0);
         arg0->fieldA0 = MonsterInit_ReadByte(0);
@@ -709,7 +513,7 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
         VornInit_SetStatusFlags(arg0, 0x8000);
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
-    rt = &group->route;
+    rt = &group->homeRoute;
     if (VornInit_ReadRoute(arg0, group, rt)) {
         VornInit_SnapToRoute(&arg0->body.position, rt);
         VornInit_DrawablePosition(arg0);
@@ -724,8 +528,8 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     else
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 
-    group->field3D4 = arg0->body.id;
-    group->field3D8 = (u32)&arg0->body.position;
+    group->common.bodyId = arg0->body.id;
+    group->common.bodyPosition = &arg0->body.position;
 }
 
 struct VornInitWidget {
@@ -737,103 +541,140 @@ static inline void VornInit_SetWidgetScriptPalette(struct VornInitWidget *widget
     widget->paletteBank = palette - 0x5FFF;
 }
 
-static inline void VornInit_SetMotionControl(struct VornInitActor *actor, void *callback, u32 kind)
+static inline void VornInit_SetMotionControl(struct SceneActorRegistryResetView *actor,
+                                             void *callback, u32 kind)
 {
-    actor->field104 = (u32)callback;
-    actor->field108 = 0;
-    actor->field10C = 0;
-    actor->field110 = kind;
-    actor->field114 = 1;
+    actor->word104 = (u32)callback;
+    actor->word108 = 0;
+    actor->word10C = 0;
+    actor->word110 = kind;
+    actor->flags114 = 1;
 }
 static inline void VornInit_ClearMotion(void *object)
 {
-    struct VornInitActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     VornInit_SetMotionControl(actor, 0, 0);
-    actor->field114 = 0;
+    actor->flags114 = 0;
 }
-static inline void VornInit_ReadPalette(struct VornInitActor *actor, u32 base, u32 alternate)
+static inline void VornInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
+                                        u32 alternate)
 {
     s32 palette;
-    actor->field1E6 = Script_GetKeywordValue(0x43, 0);
-    actor->field1E0 = base;
-    actor->field1E2 = alternate;
-    actor->field1E4 = VornInit_GetPaletteOffset(actor) + base + 1;
+    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
+    actor->basePaletteBank = base;
+    actor->paletteAlternateBank = alternate;
+    actor->alternateOffset = VornInit_GetPaletteOffset(actor) + base + 1;
     palette = VornInit_GetPaletteBase(actor) + VornInit_GetPaletteOffset(actor);
     if (VornInit_GetDrawableKind(actor) == 0)
         AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
     else
         *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (VornInit_GetDrawableKind(actor) == 1)
-        VornInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20), SceneActorScript_GetManagerField62());
+        VornInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+                                        SceneActorScript_GetManagerField62());
 }
 
-static inline void VornInit_InstallPrimary(struct VornInitActor *arg0,
-    s32 (*cb0)(void *),
-    u16 (*cb1)(void *),
-    void (*cb2)(void *),
-    void (*cb3)(void *),
-    void (*cb4)(void *), void (*hidden)(void *),
-    void (*cb5)(void *),
-    void (*cb6)(void *), u32 (*defaultReaction)(void), u8 (*cb270)(void *), void *targetQuery, void *damage, void *contact)
+static inline void VornInit_InstallPrimary(struct SceneActorRegistryResetView *arg0,
+                                           s32 (*cb0)(void *), u16 (*cb1)(void *),
+                                           void (*cb2)(void *), void (*cb3)(void *),
+                                           void (*cb4)(void *), void (*hidden)(void *),
+                                           void (*cb5)(void *), void (*cb6)(void *),
+                                           u32 (*defaultReaction)(void), u8 (*cb270)(void *),
+                                           void *targetQuery, void *damage, void *contact)
 {
     VornInit_SetBehaviorFlags(arg0, 0x2000);
-    arg0->field274 = cb0;
-    arg0->field260 = cb1;
-    arg0->field224 = cb2;
-    arg0->field228 = cb3;
-    arg0->field22C = cb4;
-    arg0->field230 = cb5;
-    arg0->field234 = cb6;
-    arg0->field220 = hidden;
-    arg0->field278 = defaultReaction;
-    arg0->field270 = cb270;
-    arg0->field250 = gUnk_086108B0;
-    arg0->field248 = 0;
-    arg0->field26C = targetQuery;
+    {
+        s32 (**slot)(void *) = (void *)&arg0->contextCallback;
+        *slot = cb0;
+    }
+    {
+        u16 (**slot)(void *) = (void *)&arg0->animationQuery.sequence;
+        *slot = cb1;
+    }
+    {
+        void (**slot)(void *) = (void *)&arg0->entryTarget224;
+        *slot = cb2;
+    }
+    {
+        void (**slot)(void *) = (void *)&arg0->entryTarget228;
+        *slot = cb3;
+    }
+    {
+        void (**slot)(void *) = (void *)&arg0->savedTarget;
+        *slot = cb4;
+    }
+    {
+        void (**slot)(void *) = (void *)&arg0->reactionTarget230;
+        *slot = cb5;
+    }
+    {
+        void (**slot)(void *) = (void *)&arg0->deathControl;
+        *slot = cb6;
+    }
+    {
+        void (**slot)(void *) = (void *)&arg0->field220;
+        *slot = hidden;
+    }
+    {
+        u32 (**slot)(void) = (void *)&arg0->defaultReaction;
+        *slot = defaultReaction;
+    }
+    {
+        u8 (**slot)(void *) = (void *)&arg0->contactQuery.predicate;
+        *slot = cb270;
+    }
+    {
+        const void **slot = (void *)&arg0->commandTable.opaque;
+        *slot = gUnk_086108B0;
+    }
+    arg0->callback248 = 0;
+    arg0->update26C = targetQuery;
     arg0->field238 = SceneActorReaction_SinkAndRemove;
-    arg0->field264 = damage;
-    arg0->field268 = contact;
+    arg0->damageCallback = damage;
+    arg0->contactCallback = contact;
     arg0->field240 = 0;
     VornInit_ClearMotion(arg0);
 }
 
-static inline void VornInit_InitializeGroup(struct VornInitGroup *group, void *firstBounds,
-    void *secondBounds, void *downed, void *returnToRoute, void *recover,
-    void *animate, u8 active, struct VornInitBody *body)
+static inline void VornInit_InitializeGroup(struct SceneActorChaseGroup *group, void *firstBounds,
+                                            void *secondBounds, void *downed, void *returnToRoute,
+                                            void *recover, void *animate, u8 active,
+                                            struct SceneActorBody *body)
 {
-    group->field5D0 = firstBounds;
-    group->field5D4 = secondBounds;
-    group->field5F4 = downed;
-    group->field5F8 = recover;
+    group->route = firstBounds;
+    group->destination = secondBounds;
+    group->routePhaseCallback = downed;
+    group->fallback = recover;
     group->field5FC = SceneActorReaction_BeginFadedState;
     group->field600 = SceneActorReaction_BeginDefeatBurst;
-    group->field43C = returnToRoute;
-    group->field440 = 0;
-    group->range.field42B = active;
-    group->field618 = sub_0807DB34;
+    group->common.field43C = returnToRoute;
+    group->common.field440 = 0;
+    group->common.control.active = active;
+    group->interactionCallback = sub_0807DB34;
     group->field608 = 0;
-    group->field61C = 0;
+    group->responseCallback = 0;
     group->field620 = 0;
-    group->field5F0 = SceneActorReaction_RestoreAfterTurns;
+    group->turnControl = SceneActorReaction_RestoreAfterTurns;
     group->field60C = sub_0807FCA8;
     group->field604 = (u32)animate;
     group->field614 = SceneActorReaction_TurnBackToRoute;
-    group->field5E8 = 0;
-    group->field444 = sub_0807F130;
-    group->gate.field41C = SceneActorReaction_UpdateAnimationGate;
-    group->gate.field41A = 0x28;
-    group->field5DC = sub_0808170C;
+    group->routeChoiceControl = 0;
+    group->common.fallback = sub_0807F130;
+    group->common.gate.control = SceneActorReaction_UpdateAnimationGate;
+    group->common.gate.field41A = 0x28;
+    group->contactControl = sub_0808170C;
     group->field5E0 = SceneActorReaction_ResumeAfterAnimation;
     group->field5E4 = SceneActorReaction_TryResumeRoute;
     group->field610 = SceneActorReaction_BeginReactionSound;
     ProximityVolume_TranslateBounds(firstBounds, VornInit_BodyPosition(body));
 }
 
-static inline void VornInit_SetRouteReset(struct VornInitActor *actor, void *callback)
+static inline void VornInit_SetRouteReset(struct SceneActorRegistryResetView *actor, void *callback)
 {
-    actor->field248 = callback;
+    actor->callback248 = callback;
 }
-static inline void VornInit_SetReactionGate(struct VornInitActor *actor, void *callback)
+static inline void VornInit_SetReactionGate(struct SceneActorRegistryResetView *actor,
+                                            void *callback)
 {
     actor->field23C = callback;
 }
@@ -859,27 +700,33 @@ void Vorn_BeginTargetPursuit(void);
 void Vorn_OnRender(void);
 void Vorn_OnDestroy(void);
 
-static inline void VornInit_SetReactionTable(struct VornInitActor *actor, const void *table)
+static inline void VornInit_SetReactionTable(struct SceneActorRegistryResetView *actor,
+                                             const void *table)
 {
-    actor->field250 = table;
+    {
+        const void **slot = (void *)&actor->commandTable.opaque;
+        *slot = table;
+    }
 }
-static inline void VornInit_SetContactCallback(struct VornInitActor *actor, void *callback)
+static inline void VornInit_SetContactCallback(struct SceneActorRegistryResetView *actor,
+                                               void *callback)
 {
-    actor->field268 = callback;
+    actor->contactCallback = callback;
 }
 
-static inline void VornInit_EnableInitialFlags(struct VornInitActor *actor)
+static inline void VornInit_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
 {
-    VornInit_SetTargetingFlags(&actor->targeting, 1);
+    VornInit_SetTargetingFlags(&actor->tracking, 1);
     VornInit_SetBehaviorFlags(actor, 0x1600000);
     VornInit_SetStatusFlags(actor, 0x8000000);
 }
 
-static inline void VornInit_ReadInitialMode(struct VornInitActor *arg0, struct VornInitGroup *group)
+static inline void VornInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0,
+                                            struct SceneActorChaseGroup *group)
 {
     s32 i;
     i = Script_GetKeywordValue(0x75, 0);
-    arg0->group.field5CC = 0x21;
+    arg0->group.effect = 0x21;
     if (i != 0) {
         VornInit_SetBehaviorFlags(arg0, 0x40000);
         if (i == 2)
@@ -887,26 +734,24 @@ static inline void VornInit_ReadInitialMode(struct VornInitActor *arg0, struct V
     }
 }
 
-static inline void VornInit_InitializeRegion(struct VornInitActor *arg0)
+static inline void VornInit_InitializeRegion(struct SceneActorRegistryResetView *arg0)
 {
     if (VornInit_TestMotionFlags(arg0, 2))
-        arg0->field2FA = *(u32 *)(gGameState + 0x5A0);
+        arg0->regionId = *(u32 *)(gGameState + 0x5A0);
     else
-        arg0->field2FA = (u16)(u32)Region_FindContaining(&arg0->body.position);
-
+        arg0->regionId = (u16)(u32)Region_FindContaining(&arg0->body.position);
 }
 
-static inline void VornInit_InitializeReceiver(struct VornInitActor *actor)
+static inline void VornInit_InitializeReceiver(struct SceneActorRegistryResetView *actor)
 {
     actor->field304 = 0;
 }
 
-static inline void VornInit_InstallCompletionCallbacks(struct VornInitActor *arg0)
+static inline void VornInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
-    arg0->field24C = SceneActorScript_OnCommand;
-    arg0->field258 = Vorn_OnRender;
-    arg0->field25C = Vorn_OnDestroy;
-
+    arg0->messageCallback = SceneActorScript_OnCommand;
+    arg0->updateCallback = Vorn_OnRender;
+    arg0->destroyCallback = Vorn_OnDestroy;
 }
 
 static inline void VornInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
@@ -916,7 +761,8 @@ static inline void VornInit_InitializeSprite(u8 *drawable, u16 resource, u16 seq
     SceneActorAnimation_InitEnemySequence(drawable, sequence);
 }
 
-static inline void VornInit_InitializeWidget(u8 *drawable, u16 script, u16 resource, struct ContactPosition *position)
+static inline void VornInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
+                                             struct ContactPosition *position)
 {
     void *source = ScriptProc_Start(script, resource);
     *(struct VornResourceBlock *)drawable = *(struct VornResourceBlock *)source;
@@ -946,10 +792,10 @@ void Vorn_ResumeReactionRoute(void);
 
 s32 Vorn_Init(void *object)
 {
-    struct VornInitActor *arg0 = object;
-    struct VornInitActor *actor = object;
-    struct VornInitGroup *group = &arg0->group;
-    struct VornInitBody *body = &arg0->body;
+    struct SceneActorRegistryResetView *arg0 = object;
+    struct SceneActorRegistryResetView *actor = object;
+    struct SceneActorChaseGroup *group = &arg0->group;
+    struct SceneActorBody *body = &arg0->body;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -983,27 +829,27 @@ s32 Vorn_Init(void *object)
         heap = VornInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         VornInit_InitializeWidget(heap, 0xCB05, 0x3DB6, &tmp);
-        actor->field2B7 = 0xFF;
+        actor->animationIndex = 0xFF;
     }
     VornInit_InitializeBody(arg0, &zero);
     VornInit_ReadPalette(actor, 0x31B, 0x192);
     SceneActor_InitContextColliders(actor);
-    VornInit_InstallPrimary(actor, Vorn_OnUpdate, Vorn_GetAnimationEvent,
-        Vorn_UpdateIdleFacing, Vorn_ResetStateEntry, Vorn_BeginIdle, Vorn_UpdateHiddenRecovery,
-        sub_080AD75C, Vorn_UpdateDefeat,
-        SceneActorReaction_OnEnemyDefault, sub_080B3C1C, SceneActorTarget_ResolvePendingObject,
-        sub_081363F4, SceneActorPlacement_ResetStateThree);
-    VornInit_InitializeGroup(group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718,
-        Vorn_OnReactionNoOp, SceneActorReaction_ResumeSavedTarget, Vorn_TryRestorePatrolRoute,
-        0, 1, body);
+    VornInit_InstallPrimary(actor, Vorn_OnUpdate, Vorn_GetAnimationEvent, Vorn_UpdateIdleFacing,
+                            Vorn_ResetStateEntry, Vorn_BeginIdle, Vorn_UpdateHiddenRecovery,
+                            sub_080AD75C, Vorn_UpdateDefeat, SceneActorReaction_OnEnemyDefault,
+                            sub_080B3C1C, SceneActorTarget_ResolvePendingObject, sub_081363F4,
+                            SceneActorPlacement_ResetStateThree);
+    VornInit_InitializeGroup(group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718, Vorn_OnReactionNoOp,
+                             SceneActorReaction_ResumeSavedTarget, Vorn_TryRestorePatrolRoute, 0, 1,
+                             body);
     SceneActorMovement_ResolveRoutePosition(arg0);
     VornInit_SetRouteReset(actor, SceneActor_ResetContextAnimation);
     VornInit_SetReactionGate(actor, sub_080B197C);
     VornInit_SetContactCallback(actor, Vorn_SelectHitRecovery);
     VornInit_SetReactionTable(actor, gUnk_08606038);
-    group->field5DC = Vorn_UpdateKnockbackRecovery;
+    group->contactControl = Vorn_UpdateKnockbackRecovery;
     group->field5E0 = SceneActorReaction_ResumeOrRunScript;
-    group->field61C = (u32)Vorn_OnAnimationCleanup;
+    group->responseCallback = Vorn_OnAnimationCleanup;
     group->field5EC = Vorn_BeginTargetPursuit;
     group->field614 = Vorn_ResumeReactionRoute;
     actor->field2E8 = 3;
@@ -1039,7 +885,7 @@ s32 Vorn_Init(void *object)
     Vorn_InitActionTable(actor);
     VornInit_SaveControl(VornInit_SavedControlOf(actor), actor);
 
-    flag = arg0->field68C;
+    flag = ((struct VornInstanceState *)arg0)->field68C;
     if (flag == 1) {
         if (VornInit_GetDrawableKind(actor) == 0)
             *(u32 *)actor->drawable |= flag;
@@ -1052,11 +898,11 @@ s32 Vorn_Init(void *object)
         VornInit_SetControl(actor, actor->field220, 0xC);
     } else if ((mode = Script_GetKeywordValue(0x54, 0)) != 0) {
         if (mode == 1)
-            arg0->field6B9 = 0;
+            ((struct VornInstanceState *)arg0)->field6B9 = 0;
         else
-            arg0->field6B9 = 1;
+            ((struct VornInstanceState *)arg0)->field6B9 = 1;
         VornInit_BeginBehavior(actor, 0x12);
-        VornInit_SetControl(actor, actor->field22C, 0);
+        VornInit_SetControl(actor, actor->savedTarget, 0);
         VornInit_SetMotionControl(actor, SceneActorReaction_BeginSideStep, 0x26);
     }
     VornInit_InstallCompletionCallbacks(actor);
