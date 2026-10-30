@@ -91,3 +91,11 @@ the completed and interrupted vertical scans. A retained route-position output
 separates the later route query from the slope-position owner, reproducing the
 three spill slots and their initialization order. Shared height and cell-center
 operations remain in use; the stock check reports zero differing bytes.
+
+## Dog item contact — 080DF6EC
+
+All 540 bytes match. Typed item-context, collider and player-position fields
+replace raw accesses. The contact-cost value is reused for the subsequent zeroed
+response words; their signed-offset field operation preserves the two response
+views. This reproduces the health clamp and later collider stores without
+register hints or compiler overrides. The stock check covers the complete extent.

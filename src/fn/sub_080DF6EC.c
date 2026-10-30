@@ -1,98 +1,112 @@
-#include "global.h"
+#include "scene_actor_chase_reaction.h"
+#include "scene_actor_effects.h"
 
-#include "scene_actor_reset.h"
-#include "engine.h"
-#include "player.h"
+struct DogItemContext {
+    u8 unknown0[0x6A0];
+    s16 slot, kind, parameter;
+    u8 turnClockwise, blockedRoutes, unknown6A8, healthPercent;
+};
 
-// confidence=low: Dog step gated on engine flags and context state; picks a random slot, sets the sound variant from health, and records the target distance and heading.
-
-// confidence=low: Dog step gated on engine flags and context state; picks a random slot, sets the sound variant from health, and records the target distance and heading.
-
-// confidence=low: Dog step gated on engine flags and context state; picks a random slot, sets the sound variant from health, and records the target distance and heading.
-
-// confidence=low: Dog step gated on engine flags and context state; picks a random slot, sets the sound variant from health, and records the target distance and heading.
-
-s32 Div(s32, s32);
-s32 Math_Atan2(s32, s32);
-u8 InventorySlot_PickRandom(void *, void *, void *);
-void Inventory_ClearItemSlot(s32);
+u8 InventorySlot_PickRandom(s16 *, s16 *, s16 *);
 s32 FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
-static inline u8 F6ECTest(u32 value, u32 mask)
+void Inventory_ClearItemSlot(u32);
+s32 Math_Atan2(s32, s32);
+
+static inline u8 Dog_TracksPlayer(struct SceneActorRegistryResetView *actor)
 {
-    if (value & mask)
+    u32 mask = 2;
+    if (actor->flags2C0 & mask)
         return 1;
     return 0;
 }
-#ifdef NONMATCHING
-// fuzzy: 64.7%
-// scope shape 36 (differences once low registers are set aside)
-// confidence=low: Dog step gated on engine flags and context state; picks a random slot, sets the sound variant from health, and records the target distance and heading.
-void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
-{
-    u8 *context;
-    struct ContactPosition pos;
-    u8 *obj;
-    s32 dx, dz;
-    s32 amount;
-    s16 kind;
-    u16 mode;
-    u32 mask;
 
-    mask = 0xFFFF;
-    if (F6ECTest(gEngineFlags, 0x4800))
+static inline void Dog_ClearResponseFlags(void *object)
+{
+    struct SceneActorRegistryResetView *actor = object;
+    actor->field2D8 = 0;
+    actor->field2DC = 0;
+}
+
+static inline u32 *Dog_ResponseField(void *object, s16 offset)
+{
+    return (u32 *)((u8 *)object + offset);
+}
+static inline void Dog_WriteResponseWords(struct SceneActorRegistryResetView *actor, s32 value)
+{
+    *Dog_ResponseField(actor, (u32)&((struct SceneActorRegistryResetView *)0)->field2D8) = value;
+    *Dog_ResponseField(actor, (u32)&((struct SceneActorRegistryResetView *)0)->field2DC) = value;
+}
+
+static inline void Dog_CopyContactCost(struct ContactCollider *collider,
+                                  struct SceneActorRegistryResetView *actor)
+{
+    collider->cost = actor->reactionSoundVariant;
+}
+
+void sub_080DF6EC(void *unused, struct ContactCollider *contact,
+                  struct SceneActorRegistryResetView *actor)
+{
+    struct DogItemContext *context;
+    u32 palette;
+    struct SceneActorEffectsOffset position;
+    struct ContactPosition *actorPosition;
+    s32 responseValue, spawned, health;
+    if (SceneActorChase_Test(gEngineFlags, 0x4800))
         return;
-    if (*(u16 *)(b + 0xA) != 1)
+    if (contact->contactFlags != 1)
         return;
-    context = a->context;
-    mode = a->paletteOffset;
-    if (*(s16 *)(context + 0x6A0) >= 0)
+    context = actor->context;
+    palette = actor->paletteOffset;
+    if (context->slot >= 0)
         return;
-    if (mode != 0 && mode != 2)
+    if (palette != 0 && palette != 2)
         return;
-    pos = *(struct ContactPosition *)(((u8 **)gPlayers)[0] + 0x30);
-    pos.y += 200;
-    if (!InventorySlot_PickRandom(context + 0x6A0, context + 0x6A2, context + 0x6A4))
+    position = *(struct SceneActorEffectsOffset *)&((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target.position;
+    position.y += 200;
+    if (!InventorySlot_PickRandom(&context->slot, &context->kind, &context->parameter))
         return;
-    if (FloatingItemEffect_Spawn(0, *(s16 *)(context + 0x6A2), 3, 0, &pos, &a->body.position, 0x18, a) < 0) {
-        *(u16 *)(context + 0x6A0) |= mask;
+    spawned = FloatingItemEffect_Spawn(0, context->kind, 3, 0, &position, &actor->body.position, 24, actor);
+    actorPosition = &actor->body.position;
+    if (spawned < 0) {
+        SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&context->slot, 0xFFFF);
         return;
     }
-    Inventory_ClearItemSlot(*(s16 *)(context + 0x6A0));
-    kind = *(s16 *)(context + 0x6A2);
-    switch (kind) {
+    Inventory_ClearItemSlot(context->slot);
+    switch (context->kind) {
         case 2:
         case 5:
-        case 0xE:
+        case 14:
             break;
         default:
             return;
     }
-    amount = Div((u16)a->defaultHealth * context[0x6A9], 100);
-    if (a->health - amount > 0)
-        a->reactionSoundVariant = amount;
-    else
-        a->reactionSoundVariant = a->health;
-    *(u16 *)(context + 0x6A0) = 0xFFFF;
-    a->tracking.target = (u32)((u8 *)((u8 **)gPlayers)[0] + 0x24);
-    a->field2E0 = 1;
-    a->field2D8 = 0;
-    a->field2DC = 0;
-    a->field2D8 = 0;
-    a->field2DC = 0;
-    *(u16 *)((u8 *)a + 0x172) = a->reactionSoundVariant;
-    *(u16 *)((u8 *)a + 0x174) = 1;
-    *(u16 *)((u8 *)a + 0x178) = 0x1E;
-    a->field2E6 = 1;
-    if (F6ECTest(a->flags2C0, 2))
-        a->tracking.target = (u32)((u8 *)((u8 **)gPlayers)[0] + 0x24);
-    else if (a->tracking.target == 0)
+    responseValue = Div((u16)actor->defaultHealth * context->healthPercent, 100);
+    {
+        health = actor->health;
+        if (health - responseValue <= 0)
+            actor->reactionSoundVariant = health;
+        else
+            actor->reactionSoundVariant = responseValue;
+    }
+    context->slot = -1;
+    actor->tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+    actor->field2E0 = 1;
+    Dog_ClearResponseFlags(actor);
+    responseValue = 0;
+    Dog_WriteResponseWords(actor, responseValue);
+    Dog_CopyContactCost(&actor->colliderA, actor);
+    actor->colliderA.responseParameter = 1;
+    actor->colliderA.responseValue = 30;
+    actor->field2E6 = 1;
+    if (Dog_TracksPlayer(actor))
+        actor->tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+    else if (!actor->tracking.target)
         return;
-    obj = (u8 *)a->tracking.target;
-    dx = *(s16 *)(obj + 0xC) - a->body.position.x;
-    dz = *(s16 *)(obj + 0x10) - a->body.position.z;
-    a->tracking.heading = Math_Atan2(dx, dz);
-    a->tracking.distance = dx * dx + dz * dz;
+    {
+        struct SceneActorChaseTarget *target = actor->tracking.target;
+        s32 dx = target->position.x - actorPosition->x;
+        s32 dz = target->position.z - actor->body.position.z;
+        actor->tracking.heading = Math_Atan2(dx, dz);
+        actor->tracking.distance = dx * dx + dz * dz;
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080DF6EC);
-#endif
