@@ -99,7 +99,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ASM_OUTPUT_QC.md](../docs/ASM_OUTPUT_QC.md) | Empty-asm outputs and return-value QC |  | 9 |
 | [docs/ASSETS.md](../docs/ASSETS.md) | Resources and asset formats | *#scripts #assets #text #tooling* | 33 |
 | [docs/BACKGROUND_CONTROLLERS.md](../docs/BACKGROUND_CONTROLLERS.md) | Background controllers and scheduler report groups | *#assets #progress* | 3 |
-| [docs/BACKLOG.md](../docs/BACKLOG.md) | Research and development backlog |  | 16 |
+| [docs/BACKLOG.md](../docs/BACKLOG.md) | Research and development backlog |  | 18 |
 | [docs/BIG_FUNCTIONS.md](../docs/BIG_FUNCTIONS.md) | Matching big functions: measure, hypothesise, read the compiler | #matching #tooling | 14 |
 | [docs/BOKTAI12_COMPARISON.md](../docs/BOKTAI12_COMPARISON.md) | Boktai 1 and 2 against Boktai 3: preliminary engine comparison | #research #comparison | 21 |
 | [docs/BOUNCING_OBJECTS.md](../docs/BOUNCING_OBJECTS.md) | Twelve-slot bouncing objects (080688D0–08069964) | *#particles* | 4 |
@@ -109,7 +109,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/CLOUD.md](../docs/CLOUD.md) | Cloud workers | #tooling #matching | 6 |
 | [docs/COMPILER_REFERENCES.md](../docs/COMPILER_REFERENCES.md) | Community references and checked agbcc patterns | *#assets #matching* | 4 |
 | [docs/CUTSCENES.md](../docs/CUTSCENES.md) | Cutscenes: the SceneMessages event tables | #scripts #scene #actors | 11 |
-| [docs/DATA.md](../docs/DATA.md) | Decoded data |  | 7 |
+| [docs/DATA.md](../docs/DATA.md) | Decoded data |  | 9 |
 | [docs/DATA_TRACKING.md](../docs/DATA_TRACKING.md) | Tracking ROM data like code | #data #progress #process | 17 |
 | [docs/DEVLOG_2026-10-08.md](../docs/DEVLOG_2026-10-08.md) | Boktai 3 devlog for October 8 2026 | *#process* | 21 |
 | [docs/DRAFT_INVENTORY_2026-10-09.md](../docs/DRAFT_INVENTORY_2026-10-09.md) | Existing-draft inventory (October 9, 2026) | *#inventory #matching* | 12 |
@@ -202,7 +202,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SCRIPT_TRACING.md](../docs/SCRIPT_TRACING.md) | Script calls in a running game | *#scripts #actors #tooling* | 7 |
 | [docs/SEARCH_HOWTO-opus.md](../docs/SEARCH_HOWTO-opus.md) | seek: matching as a search, with you as the policy (worker guide) | *#matching #tooling* | 8 |
 | [docs/SEARCH_SPEC.md](../docs/SEARCH_SPEC.md) | A matching search engine: spec and brief (2026-10-28) | #tooling #matching #compiler #process | 24 |
-| [docs/SHARED_MONSTER_REACTIONS.md](../docs/SHARED_MONSTER_REACTIONS.md) | Shared monster pursuit and contact operations | #matching #scene-actor #golem #skeleton #ghoul #mummy #regalloc #080C9C04 #080C12FC #0808B3EC #080DA97C #080D2584 #08078EE8 | 6 |
+| [docs/SHARED_MONSTER_REACTIONS.md](../docs/SHARED_MONSTER_REACTIONS.md) | Shared monster pursuit and contact operations | #matching #scene-actor #golem #skeleton #ghoul #mummy #regalloc #080C9C04 #080C12FC #0808B3EC #080DA97C #080D2584 #08078EE8 | 9 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
 | [docs/SOLAR_SENSOR.md](../docs/SOLAR_SENSOR.md) | Cartridge solar sensor: code and runtime evidence | *#hardware* | 5 |
 | [docs/SPARK_PARTICLE.md](../docs/SPARK_PARTICLE.md) | Moving tile particles (tentative identity) | *#particles #assets* | 3 |
@@ -227,6 +227,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #animation #axe #bosses #camera #campaign #charge #compiler #effect-pool #effects #hresvelgr #inventory #ivy #linked-effect #map-menu #matching #monster-book #monsters #mummy #nidhoggr #nonmatching #palette #particles #player #ratatosk #reactions #register-pinning #registry-f3e4 #scene-actor #scene-actors #scene-npc #screamer #script-combat-actor #singleton-slot7 #slime #spider #sprite-effects #tentacle #terrain #vanargand #wireless | 19 |
 | [docs/history/2026-10-27.md](../docs/history/2026-10-27.md) | Work history: 2026-10-27 | #matching #ram #tooling | 1 |
 | [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29: matching search and the largest-function experiment | #compiler #ghoul #golem #matching #monsters #mummy #process #scene-actor #skeleton #tooling #vanargand | 7 |
+| [docs/history/2026-10-30.md](../docs/history/2026-10-30.md) | 2026-10-30: monster initializers and shared engine records | #compiler #data #matching #monsters #ram #structs #tooling | 2 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
@@ -313,6 +314,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/foundry-scene-actor-phases_2026-10-18.md](../notes/foundry-scene-actor-phases_2026-10-18.md) | Foundry scene-actor phase run, 2026-10-18 | #matching #scene-actor #foundry | 2 |
 | [notes/foundry-scene-hud-action-grid_2026-10-18.md](../notes/foundry-scene-hud-action-grid_2026-10-18.md) | Scene HUD action grid foundry candidates | #foundry #matching #scene-hud #input | 3 |
 | [notes/foundry-scene-npc-callbacks_2026-10-18.md](../notes/foundry-scene-npc-callbacks_2026-10-18.md) | Foundry: scene NPC callbacks, 2026-10-18 | #matching #foundry #state-actor | 2 |
+| [notes/ghost-init_2026-10-30.md](../notes/ghost-init_2026-10-30.md) | Ghost initializer: typed stores and the reload register pool | #matching #monster #ghost #compiler #ram | 5 |
 | [notes/grid_attack_actor.md](../notes/grid_attack_actor.md) | Grid attack actor unit consolidation | #grid-attack-actor #unit #matching #080297E8 #0802C678 | 5 |
 | [notes/interaction-marker_2026-10-14.md](../notes/interaction-marker_2026-10-14.md) | Interaction marker, 080537D0–08053D8C |  | 3 |
 | [notes/ivy-matching.md](../notes/ivy-matching.md) | Ivy (080ED914..080F0B8C): matching notes | #matching | 2 |
@@ -336,6 +338,10 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/modifier-menu_2026-10-14.md](../notes/modifier-menu_2026-10-14.md) | Modifier selection and stat previews (tentative) | *#menu #process* | 6 |
 | [notes/modifier-preview_2026-10-14.md](../notes/modifier-preview_2026-10-14.md) | Modifier menu preview and lifecycle (tentative) | *#actors #menu #process* | 6 |
 | [notes/modifier_selection_and_stat_previews.md](../notes/modifier_selection_and_stat_previews.md) | Modifier selection and stat previews (tentative) | #modifiers #menu #matching #unit-consolidation | 4 |
+| [notes/monster-init-sequence_2026-10-30.md](../notes/monster-init-sequence_2026-10-30.md) | Shared monster sequence stepping and four initializer matches | *#animation #text* | 6 |
+| [notes/monster-initializers_2026-10-30.md](../notes/monster-initializers_2026-10-30.md) | Monster initializer family: 17 exact matches | #matching #monster #compiler #structs #ram #data | 8 |
+| [notes/monster_init_primitives_2026-10-30.md](../notes/monster_init_primitives_2026-10-30.md) | Shared initializer script and terrain operations | *#scripts #text* | 5 |
+| [notes/monster_init_shared_groups_2026-10-30.md](../notes/monster_init_shared_groups_2026-10-30.md) | Shared monster initialization groups | *#actors* | 4 |
 | [notes/orbit-background_2026-10-14.md](../notes/orbit-background_2026-10-14.md) | Orbit-positioned background controller |  | 4 |
 | [notes/orbit-number-display_2026-10-14.md](../notes/orbit-number-display_2026-10-14.md) | Rotating contact actor and floating numbers, October 14 | *#actors* | 7 |
 | [notes/orbiting_particles_2026-10-18.md](../notes/orbiting_particles_2026-10-18.md) | Orbiting particles unit consolidation (2026-10-18) | #particles #types #matching | 3 |
@@ -378,6 +384,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/s4.md](../notes/s4.md) | s4 notes |  | 21 |
 | [notes/s5.md](../notes/s5.md) | s5 notes | *#assets* | 13 |
 | [notes/saved-position-marker_2026-10-14.md](../notes/saved-position-marker_2026-10-14.md) | Saved-position marker, 08053D8C–08054294 |  | 2 |
+| [notes/scene-actor-components_2026-10-30.md](../notes/scene-actor-components_2026-10-30.md) | Canonical scene actor components | #ram #structs #monster #matching | 6 |
+| [notes/scene-actor-groups_2026-10-30.md](../notes/scene-actor-groups_2026-10-30.md) | Canonical scene actor groups and routes | #structs #ram #monster #matching | 4 |
 | [notes/scene-actor-twenty_2026-10-12.md](../notes/scene-actor-twenty_2026-10-12.md) | Scene actors and dialogue: reaching 20% | *#actors #scene* | 3 |
 | [notes/scene-arc-effects_2026-10-13.md](../notes/scene-arc-effects_2026-10-13.md) | Scene arc slots and projected ground effects (tentative) | *#scene* | 4 |
 | [notes/scene-panel-background_2026-10-14.md](../notes/scene-panel-background_2026-10-14.md) | Scene panel background effects and overlay setup | *#scene #panel* | 2 |
@@ -387,6 +395,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-panel-states_2026-10-14.md](../notes/scene-panel-states_2026-10-14.md) | Scene panel state and background controls (tentative) | *#scene #panel* | 2 |
 | [notes/scene-pool-states_2026-10-13.md](../notes/scene-pool-states_2026-10-13.md) | Scene pool state family: second contiguous batch | *#scene* | 6 |
 | [notes/scene-pool_2026-10-13.md](../notes/scene-pool_2026-10-13.md) | Scene pool and actor controls, 0803CDF0–0803EE58 | *#actors #scene #tooling* | 5 |
+| [notes/scene_body_owner_validation_2026-10-30.md](../notes/scene_body_owner_validation_2026-10-30.md) | SceneBody owner validation | #matching #compiler #structs #ram | 4 |
 | [notes/scene_panel_control_and_lifecycle.md](../notes/scene_panel_control_and_lifecycle.md) | Scene panel control and lifecycle unit | #scene #panel #matching #types | 5 |
 | [notes/script-entry-points_2026-10-16.md](../notes/script-entry-points_2026-10-16.md) | Script entry points, batches 1-9 (2026-10-16) | #scripts #text #actors #tooling | 23 |
 | [notes/script-keyframe-pool_2026-10-14.md](../notes/script-keyframe-pool_2026-10-14.md) | Script keyframe pool | *#scripts* | 2 |

@@ -131,3 +131,4 @@ Superseded entry docs, kept verbatim when the scope workflow replaced them (2026
 | [2026-10-17.md](2026-10-17.md#L3) | October 17 (Claude): script entry points, batch 13 | scripts actors | 0 |
 | [2026-10-19.md](2026-10-19.md#L1) | Generated names for scene procedures | scripts tooling | 0 |
 | [2026-10-27.md](2026-10-27.md#L1) | October 27: EWRAM declarations and layouts | matching tooling | 0 |
+| [2026-10-30.md](2026-10-30.md) | Monster initializers and shared engine records | matching compiler monsters structs ram data tooling | 2 |

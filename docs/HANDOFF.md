@@ -40,7 +40,7 @@ progress by exact matches and removed concessions, not by fuzzy scores. Blind sp
 sweeps don't count. When an approach stops paying, change the approach or the tool,
 not just the function.
 
-## Where things stand (2026-10-29)
+## Where things stand (2026-10-30)
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -58,6 +58,17 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+* **Round 6 initializer family completed** (2026-10-30): all 17 reserved
+  initializers match in ordinary C, with one initial matching commit per function.
+  They share canonical actor/body/attack/target/group/route records and common
+  initialization, graphics and callback operations. Engine owner checks confirm
+  the recovered body and resource records; four command tables now roundtrip
+  through editable CSV and are browsable in Studio. Final reviewed unit checks,
+  the combined ROM and RAM-literal checks pass. Two older chase selectors were
+  removed; ten remain, along with several compiler-sensitive body variants.
+  The [family note](../notes/monster-initializers_2026-10-30.md) records the exact
+  extents, shared migrations and remaining work. The supplied monster queue has
+  107 functions left. Aggregate reports are left for the integrator to regenerate.
 * **Round 4 shared monster batch completed** (2026-10-29): all five reserved
   targets match in ordinary C: Mummy movement (`080DA97C`), Ghoul contact
   (`0808B3EC`), `SceneActor_UpdateStatus` (`08078EE8`), `Vanargand_Init`

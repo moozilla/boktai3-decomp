@@ -1,5 +1,7 @@
 # SceneBody owner validation
 
+Tags: #matching #compiler #structs #ram
+
 The shared `SceneActorBody` record is now used by the engine operations that
 initialize it, attach a drawable, and install its movement probe. The API is
 in `include/scene_body_api.h`. The canonical record remains in
