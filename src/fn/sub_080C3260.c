@@ -3,7 +3,7 @@
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_init_primitives.h"
-#include "scene_actor_state.h"
+#include "scene_actor_init_actor.h"
 
 struct SkeletonResourceBlock {
     u32 w[8];
@@ -633,50 +633,17 @@ static inline void SkeletonInit_InstallPrimary(struct SceneActorRegistryResetVie
                                                void *targetQuery, void *damage, void *contact)
 {
     SkeletonInit_SetBehaviorFlags(arg0, 0x2000);
-    {
-        s32 (**slot)(void *) = (void *)&arg0->contextCallback;
-        *slot = cb0;
-    }
-    {
-        u16 (**slot)(void *) = (void *)&arg0->animationQuery.sequence;
-        *slot = cb1;
-    }
-    {
-        void (**slot)(void *) = (void *)&arg0->entryTarget224;
-        *slot = cb2;
-    }
-    {
-        void (**slot)(void *) = (void *)&arg0->entryTarget228;
-        *slot = cb3;
-    }
-    {
-        void (**slot)(void *) = (void *)&arg0->savedTarget;
-        *slot = cb4;
-    }
-    {
-        void (**slot)(void *) = (void *)&arg0->reactionTarget230;
-        *slot = cb5;
-    }
-    {
-        void (**slot)(void *) = (void *)&arg0->deathControl;
-        *slot = cb6;
-    }
-    {
-        void (**slot)(void *) = (void *)&arg0->field220;
-        *slot = hidden;
-    }
-    {
-        u32 (**slot)(void) = (void *)&arg0->defaultReaction;
-        *slot = defaultReaction;
-    }
-    {
-        u8 (**slot)(void *) = (void *)&arg0->contactQuery.predicate;
-        *slot = cb270;
-    }
-    {
-        const void **slot = (void *)&arg0->commandTable.opaque;
-        *slot = gUnk_086108B0;
-    }
+    MonsterInit_WriteContextUpdate(&arg0->contextCallback, cb0);
+    MonsterInit_WriteSequenceQuery(&arg0->animationQuery.sequence, cb1);
+    MonsterInit_WriteActorAction(&arg0->entryTarget224, cb2);
+    MonsterInit_WriteActorAction(&arg0->entryTarget228, cb3);
+    MonsterInit_WriteActorAction(&arg0->savedTarget, cb4);
+    MonsterInit_WriteActorAction(&arg0->reactionTarget230, cb5);
+    MonsterInit_WriteActorAction(&arg0->deathControl, cb6);
+    MonsterInit_WriteActorAction(&arg0->field220, hidden);
+    MonsterInit_WriteDefaultReaction(&arg0->defaultReaction, defaultReaction);
+    MonsterInit_WriteContactPredicate(&arg0->contactQuery.predicate, cb270);
+    MonsterInit_WriteDataPointer(&arg0->commandTable.opaque, gUnk_086108B0);
     arg0->callback248 = 0;
     arg0->update26C = targetQuery;
     arg0->field238 = SceneActorReaction_SinkAndRemove;
@@ -733,10 +700,7 @@ static inline void SkeletonInit_SetReactionGate(struct SceneActorRegistryResetVi
 static inline void SkeletonInit_InstallContactDefaults(struct SceneActorRegistryResetView *arg0)
 {
     arg0->contactCallback = Skeleton_ReactToContact;
-    {
-        const void **slot = (void *)&arg0->commandTable.opaque;
-        *slot = gUnk_086060FC;
-    }
+    MonsterInit_WriteDataPointer(&arg0->commandTable.opaque, gUnk_086060FC);
     arg0->field238 = SceneActorReaction_SinkThenDefeat;
 }
 
