@@ -58,6 +58,15 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+* **Round 7 recovery and continued matching** (2026-10-30): the interrupted
+  run's four integrated matches and an unmerged Skeleton worker match were
+  recovered. Six further functions are exact; cumulative bundles and patches
+  contain eleven matches with complete stock checks. Turn operations are shared,
+  three initializers embed the canonical actor prefix, and all eleven installed
+  command tables are editable in Studio. The formatter interruption test now
+  handles canonicalized temporary paths. See the
+  [Round 7 note](../notes/round7-monster-recovery_2026-10-30.md) for accepted
+  extents and preserved blockers. PROGRESS files remain unchanged.
 * **Round 6 initializer family completed** (2026-10-30): all 17 reserved
   initializers match in ordinary C, with one initial matching commit per function.
   They share canonical actor/body/attack/target/group/route records and common
