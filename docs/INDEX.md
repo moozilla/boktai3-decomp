@@ -381,6 +381,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round5-sol.md](../notes/round5-sol.md) | Sol production round 5 |  | 3 |
 | [notes/round6-sol.md](../notes/round6-sol.md) | Production round 6 — Sol |  | 3 |
 | [notes/round7-actor-command-tables_2026-10-30.md](../notes/round7-actor-command-tables_2026-10-30.md) | Round 7 actor command tables | #data #studio #monsters | 1 |
+| [notes/round7-ghoul-disc_2026-10-30.md](../notes/round7-ghoul-disc_2026-10-30.md) | Round 7: Ghoul disc states | #actors #matching | 2 |
 | [notes/round7-monster-recovery_2026-10-30.md](../notes/round7-monster-recovery_2026-10-30.md) | Round 7: recovered work and continued monster matching | #matching #monsters #compiler #structs #tooling | 7 |
 | [notes/round7-monsters-early_2026-10-30.md](../notes/round7-monsters-early_2026-10-30.md) | Round 7 early monster matches | #monsters #ghoul #matching | 11 |
 | [notes/round7-tentacle-wander_2026-10-30.md](../notes/round7-tentacle-wander_2026-10-30.md) | Tentacle wander-route selection | #matching #monsters #tentacle #080A8904 | 1 |
