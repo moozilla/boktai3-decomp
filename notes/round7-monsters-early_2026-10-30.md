@@ -46,3 +46,9 @@ differing bytes after formatting.
 Tags: 08090724, Slime, reaction, random, PRE
 
 Matched 884 bytes of ordinary C using the already exact targeted burst's component interfaces. The random sample helper keeps the sample index distinct from its table address, retaining the index across the position subtraction. Its 32-bit sample result agrees with the callers' masks and gives the ROM's PRE-generated address order. Before the return-type correction, complete physical instruction offsets/opcodes/registers matched with only seven stack slots permuted; `scope frame` verified the bijection and the PRE hash model. Formatted source passes stock `tools/check.py src/fn/sub_08090724.c --target-size 884 --json`: zero differing bytes, SHA-256 `9bc9790a9edc791097afcd76b54be95098367ff27b6a61f53ba164af784fd41f`. No register pins or barriers.
+
+## Ghost curve step (08097798)
+
+Tags: 08097798, Ghost, curve
+
+Matched 436 bytes using the established Lun curve interpolation operation and canonical actor context owner. The private curve record exposes only the phase, tangent scale, output, start, and end fields. The ordered halfword math and signed truncation are unchanged from the shared behavior. Formatted stock check reports zero differing bytes, SHA-256 `963d02214ce4393aa7da50b92ab8cee08c9139b25f773dd5cef817daf8a5a3c7`.
