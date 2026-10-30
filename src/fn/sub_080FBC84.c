@@ -1,163 +1,174 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 87.0%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: sequence setup, field-access order, and register allocation.
-#include "global.h"
 #include "scene_actor_reset.h"
-#include "display_animation.h"
-struct TrailSprite {
-    u32 flags;
-    u8 unknown4[2], angle, unknown7, scaleX, scaleY;
-    u8 unknownA[6];
-    u16 frame;
-    u8 unknown12[0xA];
-    struct ContactPosition position;
+#include "contact_swarm.h"
+#include "display_sequence_inline.h"
+
+struct AxeTrailSlot {
+    union {
+        struct DisplaySequenceSprite sprite;
+        struct ContactSwarmSprite spatial;
+    } draw;
+    struct ContactSwarmGraphics graphics;
+    struct DisplaySequenceState sequence;
+    const void *resource;
+    u16 lifetime, unknown5E;
+};
+struct AxeTrailContext {
+    u8 unknown0[0x708];
+    struct AxeTrailSlot trail[4];
+    u8 unknown888[0xE44 - 0x888];
+    u16 nextTrail, spacing;
+    u8 unknownE48[0xED7 - 0xE48];
+    u8 variant;
 };
 s32 Mod(s32, s32);
 
-static inline u32 FrameWeight(u16 v)
+static inline const void *Axe_TrailResource(struct AxeTrailContext *context, u32 index)
 {
-    register u32 value asm("r1") = v;
-    u32 mask = 15;
-    return mask & value;
+    return context->trail[index].resource;
 }
-static inline void CopyScaleX(struct TrailSprite *src, u8 *dest)
+static inline void Axe_CopyTrailScaleX(struct DisplaySequenceSprite *source,
+                                       struct AxeTrailContext *row)
 {
-    typeof(src->scaleX) t1;
-    t1 = src->scaleX;
-    *((u8 *)(dest + 0x710)) = t1;
+    row->trail[0].draw.sprite.palette = source->palette;
+}
+static inline void Axe_CopyTrailScaleY(struct DisplaySequenceSprite *source,
+                                       struct AxeTrailContext *row)
+{
+    row->trail[0].draw.sprite.paletteVariant = source->paletteVariant;
 }
 
-static inline void CopyScaleY(struct TrailSprite *src, u8 *dest)
+#define AXE_CAPTURE_FRAME_COMMAND(command, table, offset)                                          \
+    do {                                                                                           \
+        (command) = (const u16 *)((u32)(table) + (offset));                                        \
+    } while (0)
+#define AXE_CAPTURE_NEXT_COMMAND(command, state)                                                   \
+    do {                                                                                           \
+        (command) = (state)->commands + (state)->index;                                            \
+    } while (0)
+static inline u32 Axe_StepSequence(struct DisplaySequenceSprite *owner,
+                                   struct DisplaySequenceState *state)
 {
-    *(u8 *)(dest + 0x711) = src->scaleY;
-}
-static inline u32 Step(struct TrailSprite *input, struct DisplaySequenceState *state)
-{
-    register struct TrailSprite *sprite asm("r6") = input;
-    const u16 *entry;
-    register u16 n asm("r0");
-    u8 done;
+    const u16 *command;
+    u32 ended;
     {
-        u32 offset = state->index << 1;
-        const u16 *table = state->commands;
-        entry = (const u16 *)(offset + (u32)table);
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        AXE_CAPTURE_FRAME_COMMAND(command, table, offset);
     }
-    sprite->frame = *entry >> 6;
+    owner->frame = *command >> 6;
     {
-        register u32 input asm("r0") = state->flags;
-        u32 mask = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            sprite->flags |= 4;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
         else
-            sprite->flags &= ~4;
+            owner->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = state->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            sprite->flags |= 8;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
         else
-            sprite->flags &= ~8;
+            owner->flags &= ~8;
     }
-    n = ++state->elapsed;
-    if (n >= state->duration) {
+    if (++state->elapsed >= state->duration) {
         state->elapsed = 0;
         if (state->flags & 4) {
             if (state->index == 0) {
-                if (state->flags & 8) {
+                if (state->flags & 8)
                     state->elapsed = state->duration;
-                } else {
+                else
                     state->index = state->frameCount - 1;
-                }
-                done = 1;
+                ended = 1;
             } else {
                 state->index--;
-                done = 0;
+                ended = 0;
             }
         } else {
             if (++state->index >= state->frameCount) {
-                if ((u8)(state->flags & 8)) {
+                if (state->flags & 8) {
                     state->elapsed = state->duration;
                     state->index = state->frameCount - 1;
-                    done = 1;
                 } else {
                     state->index = 0;
-                    done = 1;
                 }
-            } else
-                done = 0;
+                ended = 1;
+            } else {
+                ended = 0;
+            }
         }
-        {
-            u32 offset = state->index << 1;
-            const u16 *table = state->commands;
-            entry = (const u16 *)(offset + (u32)table);
-        }
-        state->frameWeight = FrameWeight(*entry);
-        state->duration = (state->frameWeight * state->speed) >> 6;
-        if (!state->duration)
+        AXE_CAPTURE_NEXT_COMMAND(command, state);
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
             state->duration = 1;
-    } else
-        done = 0;
-    return done;
+    } else {
+        ended = 0;
+    }
+    return ended;
 }
 
 void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *actor,
                                 const struct ContactPosition *position, u32 angle)
 {
-    u8 *context = actor->context;
-    struct TrailSprite *sprite;
+    struct AxeTrailContext *context = actor->context;
+    struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceState *state;
-    typeof(actor->drawable) t1;
-    typeof(context + ((*((u16 *)(context + 0xE44))) * 0x60)) t2;
-    typeof(actor->drawable) t3;
-    typeof(context + ((*((u16 *)(context + 0xE44))) * 0x60)) t4;
-    if ((*((u32 *)actor->drawable)) & 1)
+    u32 spriteOffset;
+    if (((struct DisplaySequenceSprite *)actor->drawable)->flags & 1)
         return;
     {
-        register s32 zero asm("ip") = Mod(actor->field2CA, *((u16 *)(context + 0xE46)));
+        s32 zero = Mod(actor->field2CA, context->spacing);
         if (zero)
             return;
         {
-            struct DisplaySequenceState *source = (void *)(((u8 *)actor->drawable) + 0x48);
-            u16 sequence = source->unknownA;
-            {
-                u32 k1 = 0x760;
-                Anim_SetSequence(
-                    (void *)(((context + 0x708) + ((*((u16 *)(context + 0xE44))) * 0x60)) + 0x48),
-                    *((void **)(((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)(context + k1)))),
-                    sequence, context[0xED7], zero);
-            }
+            struct DisplaySequenceState *source =
+                &((struct SceneActorControlMotionDrawable *)actor->drawable)->sequence;
+            u16 selection = source->unknownA;
+            u32 indexOffset = context->nextTrail * sizeof(struct AxeTrailSlot);
+            struct AxeTrailSlot *slot;
+            struct DisplaySequenceState *destination;
+            const void *resource;
+            spriteOffset = (u32) & ((struct AxeTrailContext *)0)->trail[0];
+            slot = (struct AxeTrailSlot *)((u8 *)context + (indexOffset + spriteOffset));
+            destination = &slot->sequence;
+            resource = Axe_TrailResource(context, context->nextTrail);
+            Anim_SetSequence(destination, resource, selection, context->variant, zero);
         }
     }
-    sprite = (void *)((((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)context)) + 0x708);
-    state = (void *)((((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)context)) + 0x750);
-    Step(sprite, state);
-    *((struct ContactPosition *)((((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)context)) +
-                                 0x724)) = *position;
+    sprite = (struct DisplaySequenceSprite *)(context->nextTrail * sizeof(struct AxeTrailSlot) +
+                                              (u32)context);
+    sprite = (struct DisplaySequenceSprite *)((u8 *)sprite + spriteOffset);
+    state = (struct DisplaySequenceState *)(context->nextTrail * sizeof(struct AxeTrailSlot) +
+                                            (u32)context);
+    state = (struct DisplaySequenceState *)((u8 *)state + (u32) &
+                                            ((struct AxeTrailContext *)0)->trail[0].sequence);
+    Axe_StepSequence(sprite, state);
+    context->trail[context->nextTrail].draw.spatial.position = *position;
+    context->trail[context->nextTrail].draw.sprite.flags &= ~1;
+    context->trail[context->nextTrail].draw.sprite.flags |= 2;
+    context->trail[context->nextTrail].lifetime = 8;
+    context->trail[context->nextTrail].draw.sprite.attribute = angle;
     {
-        u8 *slots = context + 0x708;
-        *((u32 *)(((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)slots))) &= ~1;
-        *((u32 *)(((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)slots))) |= 2;
+        struct DisplaySequenceSprite *source = actor->drawable;
+        struct AxeTrailContext *row =
+            (void *)((u8 *)context + context->nextTrail * sizeof(struct AxeTrailSlot));
+        Axe_CopyTrailScaleX(source, row);
     }
-    *((u16 *)((((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)context)) + 0x764)) = 8;
-    *((u8 *)((context + ((*((u16 *)(context + 0xE44))) * 0x60)) + 0x70E)) = angle;
-    t1 = actor->drawable;
-    t2 = context + ((*((u16 *)(context + 0xE44))) * 0x60);
-    CopyScaleX(t1, t2);
-    t3 = actor->drawable;
-    t4 = context + ((*((u16 *)(context + 0xE44))) * 0x60);
-    CopyScaleY(t3, t4);
-    if ((++(*((u16 *)(context + 0xE44)))) > 3)
-        *((u16 *)(context + 0xE44)) = 0;
+    {
+        struct DisplaySequenceSprite *source = actor->drawable;
+        struct AxeTrailContext *row =
+            (void *)((u8 *)context + context->nextTrail * sizeof(struct AxeTrailSlot));
+        Axe_CopyTrailScaleY(source, row);
+    }
+    if (++context->nextTrail > 3)
+        context->nextTrail = 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ActorPhase_EmitTrailSprite);
-#endif
