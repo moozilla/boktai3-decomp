@@ -1,0 +1,10 @@
+index,callback,name
+0,08136EB1,SceneActorControl_RestoreInactiveDefaults
+1,08136C81,SceneActorPlacement_HideActor
+2,08136DFD,SceneActorPlacement_ShowActor
+3,08136D41,sub_08136D40
+4,08136C4D,SceneActorScript_ApplyRouteStartCommand
+5,08136C75,SceneActorScript_ApplyTargetResetCommand
+6,080B5725,SceneActorControl_RestartBehavior57
+7,080B57C1,Skeleton_BeginStationaryPursuit
+8,080B5AA5,sub_080B5AA4
