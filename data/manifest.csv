@@ -1,9 +1,16 @@
 name,start,end,format,file,description
 actor_registry,08603300,08604998,keyed_callbacks,data/actor_registry.csv,Script chara registry: string-hash key to actor/controller constructor (722 entries + sentinel)
-bat_script_commands,08605C74,08605C94,callback_array,data/monster_commands/bat.csv,Bat actor script command handlers (8 entries)
-bee_script_commands,08605DB8,08605DD4,callback_array,data/monster_commands/bee.csv,Bee actor script command handlers (7 entries)
-crow_script_commands,08605EC4,08605EE0,callback_array,data/monster_commands/crow.csv,Crow actor script command handlers (7 entries)
-actor_default_commands,086108B0,086108C8,callback_array,data/monster_commands/default.csv,Default actor script command handlers (6 entries)
+bat_script_commands,08605C74,08605C94,callback_array,data/actor_commands/bat.csv,Bat actor script command handlers (8 entries)
+bee_script_commands,08605DB8,08605DD4,callback_array,data/actor_commands/bee.csv,Bee actor script command handlers (7 entries)
+ghost_script_commands,08605E14,08605E34,callback_array,data/actor_commands/ghost.csv,Ghost actor script command handlers (8 entries)
+lun_script_commands,08605E78,08605E94,callback_array,data/actor_commands/lun.csv,Lun actor script command handlers (7 entries)
+crow_script_commands,08605EC4,08605EE0,callback_array,data/actor_commands/crow.csv,Crow actor script command handlers (7 entries)
+spider_script_commands,08605F34,08605F50,callback_array,data/actor_commands/spider.csv,Spider actor script command handlers (7 entries)
+vorn_script_commands,08606038,08606058,callback_array,data/actor_commands/vorn.csv,Vorn actor script command handlers (8 entries)
+skeleton_script_commands,086060FC,08606120,callback_array,data/actor_commands/skeleton.csv,Skeleton actor script command handlers (9 entries)
+octopus_script_commands,0860635C,08606384,callback_array,data/actor_commands/octopus.csv,Octopus actor script command handlers (10 entries)
+ivy_script_commands,08606400,0860641C,callback_array,data/actor_commands/ivy.csv,Ivy actor script command handlers (7 entries)
+actor_default_commands,086108B0,086108C8,callback_array,data/actor_commands/default.csv,Default actor script command handlers (6 entries)
 text_bank,08D6B1E4,08DD6B96,text_bank,build/text/bank.tsv,"Script text: gcx section words, entry table + strings and blobs (ROM-derived source, extracted on demand; strings may change length)"
 res_anm,08614DCC,08617084,resource_archive,build/res/anm/index.txt,"Resource archive anm (ROM-derived entries, extracted on demand; entries may change size)"
 res_map,08617084,087C4C98,resource_archive,build/res/map/index.txt,"Resource archive map (ROM-derived entries, extracted on demand; entries may change size)"

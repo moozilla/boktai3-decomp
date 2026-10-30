@@ -151,17 +151,26 @@ class LocalLanding(unittest.TestCase):
 
     def test_interruption_during_formatter_also_restores_source(self):
         run = subprocess.run
+        alias = self.repo / 'repository-link'
+        alias.symlink_to(self.repo, target_is_directory=True)
 
-        def interrupted(command, **kwargs):
-            if command[0] == str(self.formatter):
-                self.assertNotEqual(self.target.read_text(), BASE)
-                raise KeyboardInterrupt()
-            return run(command, **kwargs)
+        for repo in (self.repo, alias):
+            with self.subTest(root=repo):
+                self.evaluator.repo = repo
+                self.evaluator.source_path = repo / 'src' / 'unit.c'
+                formatter = repo / 'build' / 'venv' / 'bin' / 'clang-format'
 
-        with patch.object(worker.subprocess, 'run', side_effect=interrupted):
-            with self.assertRaises(KeyboardInterrupt):
-                worker.land(self.session, self.node)
-        self.assertEqual(self.target.read_text(), BASE)
+                def interrupted(command, **kwargs):
+                    # land resolves the root, including macOS /var -> /private/var.
+                    if Path(command[0]).resolve() == formatter.resolve():
+                        self.assertNotEqual(self.target.read_text(), BASE)
+                        raise KeyboardInterrupt()
+                    return run(command, **kwargs)
+
+                with patch.object(worker.subprocess, 'run', side_effect=interrupted):
+                    with self.assertRaises(KeyboardInterrupt):
+                        worker.land(self.session, self.node)
+                self.assertEqual(self.target.read_text(), BASE)
 
     def test_failed_stock_gate_and_diagnostic_match_never_write_source(self):
         self.evaluator.verify = lambda _: {'exact': False, 'byte_mismatches': 2}

@@ -1,0 +1,8 @@
+index,callback,name
+0,08136EB1,SceneActorControl_RestoreInactiveDefaults
+1,08136C81,SceneActorPlacement_HideActor
+2,08136DFD,SceneActorPlacement_ShowActor
+3,08136D41,sub_08136D40
+4,08136C4D,SceneActorScript_ApplyRouteStartCommand
+5,08136C75,SceneActorScript_ApplyTargetResetCommand
+6,080F03DD,Ivy_ReleaseCapturedPlayer

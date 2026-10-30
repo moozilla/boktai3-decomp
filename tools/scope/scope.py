@@ -4205,6 +4205,45 @@ def ghidra_c(addr):
 SP_SLOT = re.compile(r"\[sp(?:, #(0x[0-9a-fA-F]+|\d+))?\]")
 
 
+def physical_frame_slot_pairs(rows):
+    """ROM slot -> draft slot only when the complete listings agree at each physical offset
+    except for a bijective permutation of SP displacements. Ignore heuristic row alignment."""
+    rom, draft = {}, {}
+    for row in rows:
+        for side, address, listing in (("rom", "rom_addr", rom), ("draft", "draft_off", draft)):
+            text, at = row.get(side), row.get(address)
+            if text is None:
+                if at is not None:
+                    return None
+                continue
+            if at is None:
+                return None
+            try:
+                at = int(at, 16) if side == "rom" else int(at)
+            except (TypeError, ValueError):
+                return None
+            if at in listing:
+                return None
+            listing[at] = text
+    if not rom or not draft:
+        return None
+    start = min(rom)
+    rom = {at - start: text for at, text in rom.items()}
+    if rom.keys() != draft.keys():
+        return None
+    pair, reverse = {}, {}
+    for at, a in rom.items():
+        b = draft[at]
+        if SP_SLOT.sub("[sp]", a) != SP_SLOT.sub("[sp]", b):
+            return None
+        for x, y in zip(SP_SLOT.finditer(a), SP_SLOT.finditer(b)):
+            x, y = int(x.group(1) or "0", 0), int(y.group(1) or "0", 0)
+            if (x in pair and pair[x] != y) or (y in reverse and reverse[y] != x):
+                return None
+            pair[x], reverse[y] = y, x
+    return pair
+
+
 def frame_slots(wd, func):
     """draft sp offset -> (pseudo, bytes, order given out, spilled-from register) from scope's agbcc
     S lines (reload's stack slots; order -1 for a parameter passed on the stack)."""
@@ -4681,8 +4720,9 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
 
 
 def cmd_frame(src, func, env):
-    """The stack frame side by side: each ROM stack slot, the draft slot the aligned insns use for it,
-    and the pseudo (C variable) reload put there, in the order reload gave the slots out. Reload gives
+    """The stack frame side by side: each ROM stack slot, the corresponding draft slot, and the pseudo
+    (C variable) reload put there, in the order reload gave the slots out. Use physical offsets when
+    only SP displacements differ; otherwise infer correspondence from aligned insns. Reload gives
     a slot to each pseudo global alloc left without a register, in pseudo-number order (the order the
     variables and temporaries were created), at rising offsets; pseudos it evicts later come after."""
     n, info = score(src, func, env, full=True)
@@ -4690,7 +4730,8 @@ def cmd_frame(src, func, env):
         print(f"{func}: MATCH")
         return 0
     wd = info["wd"]
-    rows = json.load(open(os.path.join(wd, "diff.json")))
+    with open(os.path.join(wd, "diff.json")) as stream:
+        rows = json.load(stream)
     slots, names = frame_slots(wd, func), pseudo_names(wd, func)
     if not slots:
         path = os.path.join(wd, "names.txt")
@@ -4712,7 +4753,8 @@ def cmd_frame(src, func, env):
         if len(a) == 1 and len(b) == 1:
             votes.setdefault(a[0], {}).setdefault(b[0], 0)
             votes[a[0]][b[0]] += 1
-    pair = {a: max(v, key=v.get) for a, v in votes.items()}
+    physical_pair = physical_frame_slot_pairs(rows)
+    pair = physical_pair if physical_pair is not None else {a: max(v, key=v.get) for a, v in votes.items()}
 
     def who(o):
         if o not in slots:
@@ -4724,6 +4766,8 @@ def cmd_frame(src, func, env):
             nm = f"[{v}]" + (f" line {ln}" if ln else "") if v else "-"
         return f"{ps}", nm + ("" if seq != -1 else " (stack parameter)") + (f" (evicted from r{frm})" if seq > 0 and frm >= 0 else "")
     print(f"{func}: frame {size('rom'):#x} in the ROM, {size('draft'):#x} in the draft (sub sp)")
+    if physical_pair is not None:
+        print("  Slot correspondence uses identical instruction offsets; only SP displacements differ.")
     print(f"  {'ROM':9} {'draft':9} {'pseudo':>6}  value (slots are given out in pseudo order)")
     for a in sorted(rom_seen):
         b = pair.get(a)
@@ -4737,8 +4781,11 @@ def cmd_frame(src, func, env):
     order = [pair[a] for a in sorted(pair) if pair[a] in slots and slots[pair[a]][2] > 0]
     want = [slots[b][0] for b in order]
     if want != sorted(want):
-        print("\nAligned slot uses suggest this pseudo creation order; confirm the slot identities"
-              " when instruction structure differs:")
+        if physical_pair is not None:
+            print("\nPhysical slot correspondence gives this pseudo order:")
+        else:
+            print("\nAligned slot uses suggest this pseudo creation order; confirm the slot identities"
+                  " when instruction structure differs:")
         print("  " + " < ".join(f"{slots[b][0]} {names.get(slots[b][0], '')}".strip() for b in order))
         print("  PRE-generated field addresses can follow hash-bucket and first-discovery order."
               " For (plus:SI reg const), this agbcc uses (13772 + pseudo + offset) % T,"

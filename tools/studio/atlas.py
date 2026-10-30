@@ -1104,10 +1104,8 @@ def rom_tree():
             kids.append({"s": ls[0]["s"], "n": sum(x["n"] for x in ls), "k": "sound", "t": title, "c": ls})
     kids.sort(key=lambda x: x["s"])
     tops.append({"s": kids[0]["s"], "n": sum(x["n"] for x in kids), "k": "sound", "t": "Sound (MP2K)", "c": kids})
-    commands = command_table_blocks()
-    if commands:
-        tops.append({"s": commands[0]["s"], "n": sum(t["n"] for t in commands), "k": "data",
-                     "t": "Actor script command tables", "c": commands})
+    # Tables are separated by other data, so each keeps its own ROM interval.
+    tops.extend(command_table_blocks())
     # the documented regions that items don't cover (sound, text, scripts, graphics, tables)
     covered = sorted((c["s"], c["s"] + c["n"]) for t in tops for c in (t.get("c") or [t]) for c in (c.get("c") or [c]))
     merged = []
@@ -1138,7 +1136,8 @@ def rom_tree():
             continue
         used += parts
         level = "free" if kind == "free" else ("decoded" if kind in DECODED else "located")
-        tops.append({"s": parts[0][0], "n": size, "k": kind, "t": label.split(" (")[0][:60], "full": label, "u": level})
+        for x, y in parts:
+            tops.append({"s": x, "n": y - x, "k": kind, "t": label.split(" (")[0][:60], "full": label, "u": level})
     # everything else: bytes nobody has mapped
     allspans = sorted([(c["s"], c["s"] + c["n"]) for c in tops if "c" not in c] + [tuple(m) for m in merged] + used)
     p, gaps = 0x08000000, []

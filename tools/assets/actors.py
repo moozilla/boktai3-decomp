@@ -8,10 +8,9 @@
 Sources (all ROM-derived or in the repository):
   * data/actor_registry.csv: the 722 `chara` keys (16-bit hashes of the
     original names, docs/DATA.md) and their callbacks.
-  * data/monster_commands/*.csv: reviewed, ordered script-handler tables
-    declared in data/manifest.csv. Literal references in a registry callback
-    or its loader link these tables to actors; a later assignment may replace
-    the referenced table.
+  * data/actor_commands/*.csv: reviewed, ordered script-handler tables
+    declared in data/manifest.csv. Tables named as literals in the callback
+    or loader; initialization may install another table later.
   * gen/code.s (the generated disassembly): a callback's calls. Most callbacks
     allocate the actor (Heap_Alloc, Memory_Clear) and then call one function
     with it: that is the *loader* (enemy families: docs/ASSETS.md). Sprite
@@ -363,7 +362,7 @@ def command_tables():
     out = {}
     for entry in load_manifest():
         source = os.path.relpath(entry.file, ROOT).replace(os.sep, "/")
-        if entry.format != "callback_array" or not source.startswith("data/monster_commands/"):
+        if entry.format != "callback_array" or not source.startswith("data/actor_commands/"):
             continue
         handlers = []
         for index, (_, callback, _) in enumerate(entry.encode()):
@@ -381,8 +380,8 @@ def command_tables():
 def command_tables_of(funcs):
     """Decoded table literals in these exact functions, with their provenance.
 
-    This is a reference index, not an assertion that the table remains active
-    after initialization. Nearby callees are deliberately not searched.
+    Tables named as literals in the callback or loader; initialization may
+    install another table later.
     """
     tables, refs = command_tables(), defaultdict(list)
     for addr in sorted(set(funcs)):

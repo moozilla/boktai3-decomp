@@ -1,103 +1,105 @@
-#include "scene_actor_reset.h"
+#include "scene_actor_chase_shared.h"
+#include "scene_actor_control_phase.h"
 #include "engine.h"
 #include "ram.h"
-void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
-void SceneActorReaction_ApplyThreshold(void);
+void SceneActorReaction_ApplyThreshold(struct SceneActorRegistryResetView *, s32);
 void Skeleton_InitializeCategoryProfile(void *);
 void Skeleton_InitVariantMotion(void *);
 void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 extern const s16 gUnk_086149C4[];
 
-static inline u8 Sub080BA268_Take(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
-static inline s32 Sub080BA268_Scale6(s32 x)
+static inline s32 Skeleton_TruncateFixed6(s32 x)
 {
     if (x >= 0)
         return x >> 6;
     return -((-x) >> 6);
 }
-static inline s32 Sub080BA268_Scale12(s32 x)
+static inline s32 Skeleton_TruncateFixed12(s32 x)
 {
     if (x >= 0)
         return x >> 12;
     return -((-x) >> 12);
 }
-static inline u8 Sub080BA268_RandByte(void)
+static inline u16 Skeleton_RandomSample(void)
 {
+    const u16 *samples = (const u16 *)RANDOM_TABLE_ADDR;
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return ((const u8 *)gRandomTable)[index * 2];
+    index *= 2;
+    return *(const u16 *)((u32)samples + index);
 }
-static inline void Sub080BA268_Polar(s32 angle, struct ContactPosition *v, s32 radius)
+static inline void Skeleton_SetPolarMotion(struct ContactPosition *v, s32 direction, s32 radius)
 {
-    v->x = Sub080BA268_Scale12(gUnk_086149C4[(angle + 64) & 255] * radius);
+    v->x = Skeleton_TruncateFixed12(gUnk_086149C4[(direction + 64) & 255] * radius);
     v->y = 0;
-    v->z = Sub080BA268_Scale12(gUnk_086149C4[angle & 255] * radius);
+    v->z = Skeleton_TruncateFixed12(gUnk_086149C4[direction & 255] * radius);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 58.1%
-// scope shape 143 (differences once low registers are set aside)
-// confidence=low: timed attack-recovery state; plays a directional entry, spawns two effect bursts, then queues the next control.
-void sub_080BA268(struct SceneActorRegistryResetView *p)
+struct SkeletonAttackContext {
+    u8 unknown0[0x678];
+    struct ContactCollider attack;
+};
+
+static inline void Skeleton_AddPosition(struct ContactPosition *position,
+                                        const struct ContactPosition *base,
+                                        const struct ContactPosition *delta)
 {
-    struct ContactPosition v1;
-    struct ContactPosition v2;
-    struct ContactPosition pos;
-    s32 angle;
-    u8 *ctx = p->context;
-
-    if (Sub080BA268_Take(&p->field2B2)) {
-        SceneActorAnimation_SelectDirectionalEntry(p, 0x16);
-        angle = Sub080BA268_Scale6((s32)((p->body.direction + 0x10) & 0xFF)) << 6;
-        Sub080BA268_Polar(angle, &v1, 20);
-        Sub080BA268_Polar(Sub080BA268_RandByte(), &v2, 10);
-        v2.y = 30;
-        pos = p->body.position;
-        *(u32 *)&pos = (*(u32 *)&pos & 0xFFFF) | ((((*(u32 *)&pos) >> 16) + 0x104) << 16);
-        pos.x += v2.x;
-        pos.y += v2.y;
-        pos.z += v2.z;
-        sub_08127590(&pos, &v2, 0xD45E, 0x1DC3, 2, 30, 2, 0, 316, 0, 0, 0, 0, 0, 0);
-        Sub080BA268_Polar(Sub080BA268_RandByte(), &v2, 10);
-        v2.y = 30;
-        pos.y += 0xDC;
-        pos.x += v2.x;
-        pos.y += v2.y;
-        pos.z += v2.z;
-        sub_08127590(&pos, &v2, 0xD45E, 0x1DC3, 3, 30, 2, 0, 316, 0, 0, 0, 0, 0, 0);
-        p->category = 5;
-        Skeleton_InitializeCategoryProfile(p);
-        Skeleton_InitVariantMotion(p);
-        Collider_SetAttackProperties(ctx + 0x678, *(u16 *)p->unknownBA, *(u16 *)p->unknownC2, 0,
-                                     *(u32 *)p->unknownD8, *(u16 *)p->unknownCA);
-    }
-    if (p->field2B3) {
-        void (*f)(void) = SceneActorReaction_ApplyThreshold;
-        u32 k = 0x3e;
-        u32 z;
-        u8 *a = &p->field2B2;
-        u32 *w;
-        s32 m;
-        z = 0;
-        *a = 1;
-        p->field2B0 = z;
-        p->field2B5 = k;
-        p->target = f;
-        p->field2C8 = z;
-        w = &p->flags114;
-        m = -2;
-        *w = m & *w;
-        p->word104 = z;
-    }
+    position->x = delta->x + base->x;
+    position->y = delta->y + base->y;
+    position->z = delta->z + base->z;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080BA268);
-#endif
+
+static inline void Skeleton_SetCategory(struct SceneActorRegistryResetView *actor, u8 category)
+{
+    actor->category = category;
+}
+
+static inline void Skeleton_EmitBone(struct ContactPosition *position,
+                                     struct ContactPosition *velocity, u32 sequence)
+{
+    sub_08127590(position, velocity, 0xD45E, 0x1DC3, sequence, 30, 2, 0, 316, 0, 0, 0, 0, 0, 0);
+}
+
+/* Emit two bone fragments and restore the threshold reaction. */
+void sub_080BA268(struct SceneActorRegistryResetView *actor)
+{
+    struct ContactPosition headingMotion;
+    struct ContactPosition velocity;
+    struct ContactPosition position;
+    s32 direction;
+    struct SkeletonAttackContext *context = actor->context;
+
+    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x16);
+        direction = Skeleton_TruncateFixed6((s32)((actor->body.direction + 0x10) & 0xFF)) << 6;
+        Skeleton_SetPolarMotion(&headingMotion, direction, 20);
+        direction = Skeleton_RandomSample();
+        direction &= 255;
+        Skeleton_SetPolarMotion(&velocity, direction, 10);
+        velocity.y = 30;
+        position = actor->body.position;
+        position.y += 0x104;
+        Skeleton_AddPosition(&position, &position, &velocity);
+        Skeleton_EmitBone(&position, &velocity, 2);
+        direction = Skeleton_RandomSample();
+        direction &= 255;
+        Skeleton_SetPolarMotion(&velocity, direction, 10);
+        velocity.y = 30;
+        position.y += 0xDC;
+        Skeleton_AddPosition(&position, &position, &velocity);
+        Skeleton_EmitBone(&position, &velocity, 3);
+        Skeleton_SetCategory(actor, 5);
+        Skeleton_InitializeCategoryProfile(actor);
+        Skeleton_InitVariantMotion(actor);
+        {
+            u16 first = actor->attacks.first[3];
+            u16 second = actor->attacks.second[3];
+            u32 flags = actor->attacks.flags[3];
+            u16 parameter = actor->attacks.parameter[3];
+            Collider_SetAttackProperties(&context->attack, first, second, 0, flags, parameter);
+        }
+    }
+    if (actor->field2B3)
+        SceneActorChase_SetControl(actor, SceneActorReaction_ApplyThreshold, 0x3E);
+}

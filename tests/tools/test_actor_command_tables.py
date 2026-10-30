@@ -36,7 +36,7 @@ class ActorCommandTableTests(unittest.TestCase):
         self.addCleanup(context.stop)
         self.add_table('first', 0x08600000)
 
-    def add_table(self, name, start, directory='monster_commands'):
+    def add_table(self, name, start, directory='actor_commands'):
         relative = f'data/{directory}/{name}.csv'
         path = self.root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -54,7 +54,7 @@ class ActorCommandTableTests(unittest.TestCase):
         self.assertEqual(list(tables), ['08600000'])
         table = tables['08600000']
         self.assertEqual((table['size'], table['end']), (12, '0860000C'))
-        self.assertEqual(table['source'], 'data/monster_commands/first.csv')
+        self.assertEqual(table['source'], 'data/actor_commands/first.csv')
         self.assertEqual(table['entries'], [
             {'index': 0, 'callback': '080837D5', 'addr': '080837D4', 'name': 'Current_080837D4'},
             {'index': 1, 'callback': '00000000', 'addr': None, 'name': None},
@@ -98,7 +98,7 @@ class ActorCommandTableTests(unittest.TestCase):
         self.assertTrue(all(b['u'] == 'decoded' and b['k'] == 'data' for b in blocks))
         self.assertEqual(blocks[1]['r'], '/actors#commands:08600100')
 
-    def test_rom_tree_does_not_double_count_tables_as_surrounding_data(self):
+    def test_rom_tree_keeps_separate_table_extents_without_double_counting(self):
         self.add_table('second', 0x08600100)
         segments = {'size': 0x1000000, 'items': [],
                     'regions': [[0x08600000, 0x08600200, 'data', 'Actor tables']]}
@@ -113,9 +113,14 @@ class ActorCommandTableTests(unittest.TestCase):
             tree = atlas.rom_tree()
         data = [block for block in tree['children'] if block['k'] == 'data']
         self.assertEqual(sum(block['n'] for block in data), 0x200)
-        commands = next(block for block in data if 'c' in block)
-        self.assertEqual(commands['n'], 24)
-        self.assertTrue(all(block.get('u') == 'located' for block in data if 'c' not in block))
+        commands = [block for block in data if block.get('u') == 'decoded']
+        self.assertEqual([(block['s'], block['n']) for block in commands],
+                         [(0x08600000, 12), (0x08600100, 12)])
+        self.assertEqual([block['r'] for block in commands],
+                         ['/actors#commands:08600000', '/actors#commands:08600100'])
+        self.assertTrue(all(block.get('u') == 'located' for block in data if block not in commands))
+        for first, second in zip(data, data[1:]):
+            self.assertLessEqual(first['s'] + first['n'], second['s'])
 
 
 if __name__ == '__main__':
