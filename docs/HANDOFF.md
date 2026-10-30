@@ -60,8 +60,8 @@ Recent:
 
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
-  recovered. Nine further functions are exact; cumulative bundles and patches
-  contain fourteen matches with complete stock checks. Turn and delayed-response operations are shared,
+  recovered. Ten further functions are exact; cumulative bundles and patches
+  contain fifteen matches with complete stock checks. Turn and delayed-response operations are shared,
   three initializers embed the canonical actor prefix, and all eleven installed
   command tables are editable in Studio. The formatter interruption test now
   handles canonicalized temporary paths. See the

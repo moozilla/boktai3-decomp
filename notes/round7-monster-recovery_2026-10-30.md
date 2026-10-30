@@ -2,8 +2,8 @@
 
 Tags: #matching #monsters #compiler #structs #tooling
 
-Fourteen functions match in ordinary C, covering 31,360 bytes of the supplied
-Round 7 queue. Five were recovered from the interrupted run; nine were completed
+Fifteen functions match in ordinary C, covering 33,332 bytes of the supplied
+Round 7 queue. Five were recovered from the interrupted run; ten were completed
 after recovery. Every accepted function has its own commit. PROGRESS files are
 unchanged.
 
@@ -23,6 +23,7 @@ unchanged.
 | 080CBF24 | 2,300 | Golem delayed route recovery; component entry handling and existing value-domain interfaces recover PRE ordering. |
 | 080CE188 | 2,364 | Golem route restoration after control; a word-flag field owner preserves its load/store lifetime. |
 | 080E4B34 | 1,976 | Dog delayed pursuit recovery; component mask order and measured cell/saved-control interfaces reproduce the PRE slot rotation. |
+| 080CF3E4 | 1,972 | Golem arrival/restoration; the shared terrain-center operation changes group/coordinate lifetimes, then the existing scalar-cell interface fixes PRE order. |
 
 The four original integrated commits retain their object IDs (`40e221b`,
 `ac405f8`, `6211771`, `2423916`). The additional Skeleton result came from the
@@ -33,9 +34,9 @@ databases. These solved matches were rechecked, not reconstructed again.
 ## Shared operations and initializer ownership
 
 `scene_actor_turn.h` now owns seven identical animation/turn operations used by
-080C5930 and 080BAE04. Both complete extents remain exact. Six functions share
-the delayed-response record and preparation operation; five share the state-entry
-component operation. All six complete extents remain exact after extraction.
+080C5930 and 080BAE04. Both complete extents remain exact. Seven functions share
+the delayed-response record and preparation operation; six share the state-entry
+component operation. All seven complete extents remain exact after extraction.
 The delayed-route functions reuse the chase leaf operations; some local arrival compositions still
 differ in their field-owner boundaries and remain candidates for later sharing.
 
@@ -67,3 +68,6 @@ and the Ghoul 08085DD0/Dog 080DEF78 scan-loop ownership problems. Golem 080C725C
 and Dog 080DF908 retain an unused RNG-table literal in the ROM; existing relatives
 use concessions to retain it, so those spellings were not adopted. Resume from
 the exported candidates and causal reports rather than their old rough drafts.
+Skeleton 080BF0E4 retains an animation selection/restart-pointer allocation and
+tail-sharing gap. Golem 080CCD7C retains context-address PRE and charge-tail
+sharing differences. Their ordinary sources and diagnostic traces are preserved.
