@@ -95,3 +95,9 @@ Matched 384 bytes with typed trail segments and canonical actor motion. The call
 Tags: 080A8280, Tentacle, motion, PRE
 
 Matched 828 bytes. Signed acceleration replaces the draft's incorrect byte cast; joined signed-truncation and wrapped-heading operations recover the original result copies. Removing the draft's redundant motion pointer and its reassignments lets PRE retain the single canonical motion address. Typed context exposes the starting cell and center, and canonical callback/drawable/body members replace actor offsets. Formatted stock check reports zero differing bytes, SHA-256 `eb738d190fea516b2caacc54a6cb1c5514055572464f361d2df65d0977ab219e`. No pins, barriers, or compiler overrides.
+
+## Bee movement curve (08093138)
+
+Tags: 08093138, Bee, curve, combine
+
+Matched 476 bytes by reusing the established curve interpolation and typed private context. Updating the halfword time directly with the signed random input preserves the original constant copy and addition; the draft step local made combine replace that addition with OR. Formatted stock check reports zero differing bytes, SHA-256 `a6ce6ee4add39168f1c2ddf0d47cc35914297b59002e1487fc5c941305d4c06b`. Named the routine `Bee_AdvanceMovementCurve` and updated its caller.

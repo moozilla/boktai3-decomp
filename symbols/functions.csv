@@ -3064,6 +3064,7 @@ addr,name,mode,confidence,source,notes
 08092E30,Bee_UpdateFlightHeight,thumb,low,src-alias,
 08093000,Bee_InitColliders,thumb,low,src-alias,Initializes the Bee body and attack colliders with their dimensions and callbacks
 08093100,Bee_SetMovementEndpoints,thumb,low,src-alias,Stores the current and destination positions in movement state and resets progress
+08093138,Bee_AdvanceMovementCurve,thumb,low,src-alias,
 08093314,Bee_InitProfile,thumb,low,src-alias,Finds or adds actor profile type 0x14 and stores its handle
 08093330,Bee_DisableMovement,thumb,low,src-alias,Tentatively disables movement by setting an actor flag and clearing movement and collider flags
 08093370,Bee_BeginMoveToPosition,thumb,low,src-alias,Initializes movement endpoints and trajectory then resets action state and faces the destination
