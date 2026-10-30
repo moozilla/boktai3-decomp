@@ -52,3 +52,9 @@ Matched 884 bytes of ordinary C using the already exact targeted burst's compone
 Tags: 08097798, Ghost, curve
 
 Matched 436 bytes using the established Lun curve interpolation operation and canonical actor context owner. The private curve record exposes only the phase, tangent scale, output, start, and end fields. The ordered halfword math and signed truncation are unchanged from the shared behavior. Formatted stock check reports zero differing bytes, SHA-256 `963d02214ce4393aa7da50b92ab8cee08c9139b25f773dd5cef817daf8a5a3c7`.
+
+## Ghost curve route points (08098344)
+
+Tags: 08098344, Ghost, curve
+
+Matched 488 bytes by reusing the exact Bee route generator with the Ghost point storage and motion scale. Canonical actor position and context access replace the opaque draft. Stock formatted check has zero differing bytes, SHA-256 `1d72275f6d28ab0474c0f38b5c51de478976079d70945148353e88837be83bc7`.

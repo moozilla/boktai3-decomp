@@ -1,71 +1,81 @@
 #include "global.h"
-#include "contact_actor.h"
+
 #include "scene_actor_reset.h"
 
-// confidence=low: fills route->points[0..8] with a curve from the actor to a target point.
-struct Route08098344 {
-    u8 pad[0x568];
-    struct ContactPosition points[9];
-    u8 pad5B0[0x5FC - 0x5B0];
+struct GhostCurveRoute {
+    u8 unknown0[0x568];
+    struct ContactPosition points[8];
+    struct ContactPosition endpoint;
+    u8 unknown5B0[0x5FC - 0x5B0];
     struct ContactPosition motion;
 };
+s32 Div(s32, s32);
 
-static inline s32 Shift08098344(s32 n)
+static inline s32 Ghost_Shift10(s32 value)
 {
-    if (n >= 0)
-        return n >> 10;
-    return -((-n) >> 10);
+    return value >= 0 ? value >> 10 : -((-value) >> 10);
 }
 
-static inline s32 Blend08098344(s32 p0, s32 p1, s32 m0, s32 m1, s32 w00, s32 w01, s32 w10, s32 w11)
+static inline void Ghost_SubtractPoints(struct ContactPosition *out, struct ContactPosition *a,
+                                        struct ContactPosition *b)
 {
-    return Shift08098344(m0 * (p0 * w00) + w01 * p1 + m1 * w10 + w11);
+    out->x = a->x - b->x;
+    out->y = a->y - b->y;
+    out->z = a->z - b->z;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 18.9%
-// scope shape 215 (differences once low registers are set aside)
-// confidence=low: fills route->points[0..8] with a curve from the actor to a target point.
-void sub_08098344(void *arg0, void *arg1)
+static inline void Ghost_InterpolatePoint(struct ContactPosition *out,
+                                          struct ContactPosition *start,
+                                          struct ContactPosition *end, s32 tx, s32 tz, s32 t)
 {
-    struct SceneActorRegistryResetView *actor = arg0;
-    const struct ContactPosition *to = arg1;
-    struct Route08098344 *route = actor->context;
-    struct ContactPosition from;
-    struct ContactPosition target;
-    struct ContactPosition delta;
-    s32 step;
-    s32 mx;
-    s32 mz;
-    s32 i;
+    struct ContactPosition offset;
+    struct ContactPosition acc;
+    s32 q, p, twiceP, thriceQ, tangent, h11;
+    s32 scaled, value;
+    Ghost_SubtractPoints(&offset, end, start);
+    ZeroFill8(&acc);
+    q = Ghost_Shift10(t * t);
+    p = Ghost_Shift10(q * t);
+    twiceP = p * 2;
+    thriceQ = q * 3;
+    tangent = (p - 2 * q + t) * tz;
+    h11 = p - q;
+    scaled = ((twiceP - thriceQ + 1) * acc.x) * tx;
+    value = (thriceQ - twiceP) * offset.x;
+    value = scaled + value + tangent + h11;
+    out->x = start->x + Ghost_Shift10(value);
+    scaled = ((twiceP - thriceQ + 1) * acc.y) * tx;
+    value = (-twiceP + thriceQ) * offset.y;
+    value = scaled + value + tangent + h11;
+    out->y = start->y + Ghost_Shift10(value);
+    scaled = ((twiceP - thriceQ + 1) * acc.z) * tx;
+    value = (-twiceP + thriceQ) * offset.z;
+    value = scaled + value + tangent + h11;
+    out->z = start->z + Ghost_Shift10(value);
+}
 
-    from = actor->body.position;
-    from.y = 0;
-    target = *to;
-    target.y = 0;
-    step = Div(0x400, 8);
-    mx = route->motion.x << 7;
-    mz = route->motion.z << 7;
-    delta.x = target.x - from.x;
-    delta.y = target.y - from.y;
-    delta.z = target.z - from.z;
-    for (i = 0; i < 8; i++) {
-        struct ContactPosition acc;
-        s32 t = i + 1;
-        s32 tt = t * step;
-        s32 a = Shift08098344(tt * tt);
-        s32 b = Shift08098344(a * tt);
-        s32 h00 = 2 * b - 3 * a + 1;
-        s32 h01 = 3 * a - 2 * b;
-        s32 h10 = b - 2 * a + tt;
-        s32 h11 = b - a;
-        ZeroFill8(&acc);
-        route->points[i].x = from.x + Blend08098344(acc.x, delta.x, mx, mz, h00, h01, h10, h11);
-        route->points[i].y = Blend08098344(acc.y, delta.y, mx, mz, h00, h01, h10, h11);
-        route->points[i].z = from.z + Blend08098344(acc.z, delta.z, mx, mz, h00, h01, h10, h11);
+void sub_08098344(struct SceneActorRegistryResetView *actor, struct ContactPosition *target)
+{
+    struct GhostCurveRoute *route = actor->context;
+    struct ContactPosition start;
+    struct ContactPosition end;
+    s32 step, tx, tz, i;
+
+    start = actor->body.position;
+    end = *target;
+    {
+        u32 mask = 0xFFFF;
+        *(u32 *)&start = mask & *(u32 *)&start;
     }
-    route->points[8] = target;
+    *(u32 *)&end &= 0xFFFF;
+    step = Div(0x400, 8);
+    tx = route->motion.x << 7;
+    tz = route->motion.z << 7;
+    for (i = 0; i < 8; i++) {
+        s32 next = i + 1;
+        struct ContactPosition *out = (struct ContactPosition *)(i * 8 + (u32)route);
+        out = (struct ContactPosition *)((u8 *)out + (u32) & ((struct GhostCurveRoute *)0)->points);
+        Ghost_InterpolatePoint(out, &start, &end, tx, tz, step * next);
+    }
+    route->endpoint = end;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08098344);
-#endif
