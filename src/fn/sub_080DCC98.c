@@ -29,11 +29,9 @@ struct MummyInitContext {
     u32 field6D8, field6DC;
 };
 
-struct MummyInstanceState {
-    u8 unknown0[0x624];
-    u8 unknown624[0xC4];
-    u16 field6E8;
-    u8 unknown6EA[8];
+struct MummyActor {
+    struct SceneActorRegistryResetView base;
+    u8 unknown6EC[6];
     u16 field6F2;
 };
 
@@ -46,7 +44,7 @@ void SceneActorReaction_BeginTargetRecovery(void);
 
 static inline void MummyInit_ResetFlags(void *object)
 {
-    struct MummyInstanceState *actor = object;
+    struct MummyActor *actor = object;
     actor->field6F2 = 0;
 }
 
@@ -108,9 +106,9 @@ void sub_080D453C(void);
 
 s32 Mummy_Init(void *object)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
-    struct SceneActorRegistryResetView *actor = object;
-    struct SceneActorChaseGroup *group = &arg0->group;
+    struct MummyActor *arg0 = object;
+    struct SceneActorRegistryResetView *actor = &arg0->base;
+    struct SceneActorChaseGroup *group = &arg0->base.group;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -137,7 +135,7 @@ s32 Mummy_Init(void *object)
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x48DE, &tmp);
         actor->animationIndex = 0xFF;
     }
-    MonsterInit_InitializePursuitBody(arg0, &zero);
+    MonsterInit_InitializePursuitBody(&arg0->base, &zero);
     MonsterInit_ReadPalette(actor, 0x23, 0x192);
     MummyInit_InitializePaletteRange(actor, MonsterInit_GetPaletteBase(actor) + 3, 4, 0);
     Mummy_InitCollision(actor);
@@ -164,7 +162,7 @@ s32 Mummy_Init(void *object)
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorEffects_InitAtActorPosition(arg0);
     SceneActorTerrain_ReadScriptParameters(actor);
-    MonsterInit_ReadInitialMode(arg0);
+    MonsterInit_ReadInitialMode(&arg0->base);
     flag = 0;
     if (MonsterInit_TestMotionFlags(actor, 4)) {
         MonsterInit_SetStatusFlags(actor, 0x2000);
@@ -190,7 +188,7 @@ s32 Mummy_Init(void *object)
     Mummy_InitActionHandlers(actor);
     Mummy_SetBehaviorTable(actor);
 
-    ((struct MummyInstanceState *)arg0)->field6E8 = actor->tracking.x;
+    arg0->base.field6E8 = actor->tracking.x;
     {
         struct MummyInitContext *context = MummyInit_Context(actor);
         if (Script_SeekToKeyword(0x42)) {

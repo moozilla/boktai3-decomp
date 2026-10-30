@@ -24,8 +24,9 @@ void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
 
 extern SceneActorCommandHandler const gUnk_086108B0[];
-struct TentacleInstanceState {
-    u8 unknown0[0x8D0];
+struct TentacleActor {
+    struct SceneActorRegistryResetView base;
+    u8 unknown6EC[0x1E4];
     u16 flags;
     u8 unknown8D2[0x14];
     u16 interval8E6;
@@ -182,8 +183,8 @@ static inline void Tentacle_EnableInitialFlags(struct SceneActorRegistryResetVie
 }
 s32 TentacleActor_Init(void *object)
 {
-    struct TentacleInstanceState *tentacle = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct TentacleActor *tentacle = object;
+    struct SceneActorRegistryResetView *actor = &tentacle->base;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;

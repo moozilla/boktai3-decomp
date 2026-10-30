@@ -58,9 +58,9 @@ void AnimData_SelectPaletteBank(void *, s32);
 void Anim_Step(void *, void *);
 u8 SceneActorRegistry_LinkActor(void *);
 
-struct AxeInstanceState {
-    u8 unknown0[0x624];
-    u8 unknown624[0x824];
+struct AxeActor {
+    struct SceneActorRegistryResetView base;
+    u8 unknown6EC[0x75C];
     s32 halfHealthE48;
     u32 savedFlagsE4C;
     u8 unknownE50[8];
@@ -124,7 +124,7 @@ static inline u8 AxeInit_BoundedVariant(s32 variant)
 
 static inline void AxeInit_SetVariant(struct SceneActorRegistryResetView *actor, u8 variant)
 {
-    ((struct AxeInstanceState *)actor)->variantED7 = variant;
+    ((struct AxeActor *)actor)->variantED7 = variant;
 }
 
 static inline void AxeInit_InitializePaletteRange(struct SceneActorRegistryResetView *actor,
@@ -136,19 +136,19 @@ static inline void AxeInit_InitializePaletteRange(struct SceneActorRegistryReset
 
 s32 Axe_Init(void *object)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
-    struct SceneActorRegistryResetView *actor = object;
-    struct SceneActorChaseGroup *group = &arg0->group;
+    struct AxeActor *arg0 = object;
+    struct SceneActorRegistryResetView *actor = &arg0->base;
+    struct SceneActorChaseGroup *group = &arg0->base.group;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
     s32 variant;
 
-    ((struct AxeInstanceState *)arg0)->savedFlagsE4C = 0;
+    arg0->savedFlagsE4C = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    ((struct AxeInstanceState *)actor)->variantED7 = Script_GetKeywordValue('t', 0);
-    variant = AxeInit_BoundedVariant(((struct AxeInstanceState *)actor)->variantED7);
-    AxeInit_SetVariant(arg0, variant);
+    ((struct AxeActor *)actor)->variantED7 = Script_GetKeywordValue('t', 0);
+    variant = AxeInit_BoundedVariant(((struct AxeActor *)actor)->variantED7);
+    AxeInit_SetVariant(&arg0->base, variant);
     if (variant == 0)
         MonsterInit_SetCategory(actor, 12);
     else
@@ -172,8 +172,8 @@ s32 Axe_Init(void *object)
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x5291, &tmp);
         actor->animationIndex = 0xFF;
     }
-    MonsterInit_InitializePursuitBody(arg0, &zero);
-    ((struct AxeInstanceState *)arg0)->halfHealthE48 = MonsterInit_GetHealth(actor) >> 1;
+    MonsterInit_InitializePursuitBody(&arg0->base, &zero);
+    arg0->halfHealthE48 = MonsterInit_GetHealth(actor) >> 1;
     Axe_InitAttackCooldowns(actor);
     if (Script_SeekToKeyword('p')) {
         u32 height;
@@ -184,13 +184,13 @@ s32 Axe_Init(void *object)
         height =
             MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), &actor->body.position);
         actor->groundHeight2BE = height;
-        ((struct AxeInstanceState *)arg0)->groundHeightE58 = height;
+        arg0->groundHeightE58 = height;
     } else {
-        ((struct AxeInstanceState *)arg0)->groundHeightE58 = actor->groundHeight2BE;
+        arg0->groundHeightE58 = actor->groundHeight2BE;
     }
-    ((struct AxeInstanceState *)arg0)->fieldEB6 = Script_GetKeywordValue('w', -1);
+    arg0->fieldEB6 = Script_GetKeywordValue('w', -1);
     ActorGroup_ReadScriptOptions(actor);
-    ((struct AxeInstanceState *)arg0)->playerPositionF1C = gPlayers[0]->position;
+    arg0->playerPositionF1C = gPlayers[0]->position;
     MonsterInit_ReadPalette(actor, 0x2BD, 0x192);
     AxeInit_InitializePaletteRange(actor, 0, 2);
     Axe_InitEffectPalettes(actor);
@@ -242,7 +242,7 @@ s32 Axe_Init(void *object)
     Axe_InitRoutePointHistory(actor);
     ActorCollision_InitThreeAuxiliaryAttacks(actor);
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
-    actor->saved.privateFlags = ((struct AxeInstanceState *)arg0)->savedFlagsE4C;
+    actor->saved.privateFlags = arg0->savedFlagsE4C;
     AxeInit_InstallCompletionCallbacks(actor);
     if (!SceneActorRegistry_LinkActor(actor))
         return -1;
