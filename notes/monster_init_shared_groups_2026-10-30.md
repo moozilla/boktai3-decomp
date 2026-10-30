@@ -30,6 +30,14 @@ function definitions. In particular, the frame-taking callbacks have their
 second argument, and `sub_0807F130` has its signed result. Old no-argument
 forward declarations were removed from these initializers.
 
+The sequence-selector callback constructor is shared separately in
+`scene_actor_init_dispatch.h`. Its result, sequence, action, contact predicate,
+and default-reaction parameters have their actual callback signatures. It
+uses the shared typed writes and the decoded `SceneActorCommandHandler` table
+at `gUnk_086108B0`. Its default sink handler is declared with its existing
+actor/frame signature. This removes the four identical primary callback
+installation bodies without introducing a runtime descriptor object.
+
 ## Integer domains and compiler evidence
 
 Targeting flags and range-radius queries return word values for bitmask and

@@ -4,6 +4,7 @@
 #include "display_sequence_inline.h"
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_group.h"
+#include "scene_actor_init_dispatch.h"
 
 struct SkeletonResourceBlock {
     u32 w[8];
@@ -19,12 +20,9 @@ void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void sub_08080BE0(void);
-void SceneActorReaction_SinkAndRemove(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
-extern const u8 gUnk_086108B0[];
-extern const u8 gUnk_08606400[];
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
@@ -48,7 +46,6 @@ struct SkeletonInstanceState {
 };
 
 void SceneActorBehavior_InitializeShadow(void *);
-extern u8 *gUnknown_02000580;
 
 void SceneActor_UpdateProfileForCategory(void *);
 void SceneActorReaction_ParseOptions(void *);
@@ -234,35 +231,6 @@ static inline void SkeletonInit_ReadPalette(struct SceneActorRegistryResetView *
                                             SceneActorScript_GetManagerField62());
 }
 
-static inline void SkeletonInit_InstallPrimary(struct SceneActorRegistryResetView *arg0,
-                                               s32 (*cb0)(void *), u16 (*cb1)(void *),
-                                               void (*cb2)(void *), void (*cb3)(void *),
-                                               void (*cb4)(void *), void (*hidden)(void *),
-                                               void (*cb5)(void *), void (*cb6)(void *),
-                                               u32 (*defaultReaction)(void), u8 (*cb270)(void *),
-                                               void *targetQuery, void *damage, void *contact)
-{
-    MonsterInit_SetBehaviorFlags(arg0, 0x2000);
-    MonsterInit_WriteResultCallback(&arg0->contextCallback, cb0);
-    MonsterInit_WriteSequenceQuery(&arg0->animationQuery.sequence, cb1);
-    MonsterInit_WriteActorAction(&arg0->entryTarget224, cb2);
-    MonsterInit_WriteActorAction(&arg0->entryTarget228, cb3);
-    MonsterInit_WriteActorAction(&arg0->savedTarget, cb4);
-    MonsterInit_WriteActorAction(&arg0->reactionTarget230, cb5);
-    MonsterInit_WriteActorAction(&arg0->deathControl, cb6);
-    MonsterInit_WriteActorAction(&arg0->field220, hidden);
-    MonsterInit_WriteDefaultReaction(&arg0->defaultReaction, defaultReaction);
-    MonsterInit_WriteContactPredicate(&arg0->contactQuery.predicate, cb270);
-    MonsterInit_WriteDataPointer(&arg0->commandTable.opaque, gUnk_086108B0);
-    arg0->callback248 = 0;
-    arg0->update26C = targetQuery;
-    arg0->field238 = SceneActorReaction_SinkAndRemove;
-    arg0->damageCallback = damage;
-    arg0->contactCallback = contact;
-    arg0->field240 = 0;
-    MonsterInit_ClearMotion(arg0);
-}
-
 static inline void SkeletonInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
                                               void *callback)
 {
@@ -375,13 +343,13 @@ s32 Skeleton_Init(void *object)
     SkeletonInit_ReadPalette(actor, 0x13C, 0x146);
     SceneActorControl_InitBehaviorColliders(actor);
 
-    SkeletonInit_InstallPrimary(actor, Skeleton_Update, SceneActorReaction_SelectTileParameter,
-                                sub_080BAE04, Skeleton_UpdateInactiveState,
-                                Skeleton_UpdateIdleState, TentacleBody_UpdateReactionTransition,
-                                Skeleton_ConvergeDisplacedPosition, Skeleton_UpdateDefeat,
-                                SceneActorReaction_OnEnemyDefault, sub_0807F81C,
-                                SceneActorTarget_ResolvePendingObjectSkeleton, sub_081363F4,
-                                SceneActorPlacement_ResetStateThree);
+    MonsterInit_InstallSequenceCallbacks(
+        actor, Skeleton_Update, SceneActorReaction_SelectTileParameter, sub_080BAE04,
+        Skeleton_UpdateInactiveState, Skeleton_UpdateIdleState,
+        TentacleBody_UpdateReactionTransition, Skeleton_ConvergeDisplacedPosition,
+        Skeleton_UpdateDefeat, SceneActorReaction_OnEnemyDefault, sub_0807F81C,
+        SceneActorTarget_ResolvePendingObjectSkeleton, sub_081363F4,
+        SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
         group, (u8 *)arg0 + 0x71C, (u8 *)arg0 + 0x740, Skeleton_UpdateDownedState,
         SceneActorReaction_ReturnToRouteEntry, SceneActorReaction_BeginTargetRecovery, 0, 1, body);

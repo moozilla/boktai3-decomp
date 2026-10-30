@@ -4,6 +4,7 @@
 #include "display_sequence_inline.h"
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_group.h"
+#include "scene_actor_init_dispatch.h"
 
 struct MummyResourceBlock {
     u32 w[8];
@@ -19,12 +20,9 @@ void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void sub_08080BE0(void);
-void SceneActorReaction_SinkAndRemove(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
-extern const u8 gUnk_086108B0[];
-extern const u8 gUnk_08606400[];
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
@@ -55,13 +53,11 @@ struct MummyInstanceState {
 };
 
 void SceneActorBehavior_InitializeShadow(void *);
-extern u8 *gUnknown_02000580;
 
 void SceneActorMovement_ResolveRoutePosition(void *);
 u8 sub_080D7568(void *);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
-extern const u8 gUnk_086060FC[];
 
 static inline void MummyInit_ClearColliderFlags(struct ContactCollider *collider, u32 mask)
 {
@@ -195,35 +191,6 @@ static inline void MummyInit_ReadPalette(struct SceneActorRegistryResetView *act
     if (MonsterInit_GetDrawableKind(actor) == 1)
         MummyInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
                                          SceneActorScript_GetManagerField62());
-}
-
-static inline void MummyInit_InstallPrimary(struct SceneActorRegistryResetView *arg0,
-                                            s32 (*cb0)(void *), u16 (*cb1)(void *),
-                                            void (*cb2)(void *), void (*cb3)(void *),
-                                            void (*cb4)(void *), void (*hidden)(void *),
-                                            void (*cb5)(void *), void (*cb6)(void *),
-                                            u32 (*defaultReaction)(void), u8 (*cb270)(void *),
-                                            void *targetQuery, void *damage, void *contact)
-{
-    MonsterInit_SetBehaviorFlags(arg0, 0x2000);
-    MonsterInit_WriteResultCallback(&arg0->contextCallback, cb0);
-    MonsterInit_WriteSequenceQuery(&arg0->animationQuery.sequence, cb1);
-    MonsterInit_WriteActorAction(&arg0->entryTarget224, cb2);
-    MonsterInit_WriteActorAction(&arg0->entryTarget228, cb3);
-    MonsterInit_WriteActorAction(&arg0->savedTarget, cb4);
-    MonsterInit_WriteActorAction(&arg0->reactionTarget230, cb5);
-    MonsterInit_WriteActorAction(&arg0->deathControl, cb6);
-    MonsterInit_WriteActorAction(&arg0->field220, hidden);
-    MonsterInit_WriteDefaultReaction(&arg0->defaultReaction, defaultReaction);
-    MonsterInit_WriteContactPredicate(&arg0->contactQuery.predicate, cb270);
-    MonsterInit_WriteDataPointer(&arg0->commandTable.opaque, gUnk_086108B0);
-    arg0->callback248 = 0;
-    arg0->update26C = targetQuery;
-    arg0->field238 = SceneActorReaction_SinkAndRemove;
-    arg0->damageCallback = damage;
-    arg0->contactCallback = contact;
-    arg0->field240 = 0;
-    MonsterInit_ClearMotion(arg0);
 }
 
 static inline void MummyInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
@@ -363,12 +330,12 @@ s32 Mummy_Init(void *object)
     MummyInit_ReadPalette(actor, 0x23, 0x192);
     MummyInit_InitializePaletteRange(actor, MonsterInit_GetPaletteBase(actor) + 3, 4, 0);
     Mummy_InitCollision(actor);
-    MummyInit_InstallPrimary(actor, Mummy_OnUpdate, Mummy_GetAnimationStepOffset,
-                             Mummy_TurnTowardRoute, Mummy_UpdateWalking, Mummy_UpdateIdle,
-                             Mummy_UpdateHiddenRecovery, Mummy_UpdateDisplacementRecovery,
-                             Mummy_UpdateDefeat, SceneActorReaction_OnEnemyDefault, sub_080D7568,
-                             SceneActorTarget_ResolvePendingObject, sub_081363F4,
-                             SceneActorPlacement_ResetStateThree);
+    MonsterInit_InstallSequenceCallbacks(
+        actor, Mummy_OnUpdate, Mummy_GetAnimationStepOffset, Mummy_TurnTowardRoute,
+        Mummy_UpdateWalking, Mummy_UpdateIdle, Mummy_UpdateHiddenRecovery,
+        Mummy_UpdateDisplacementRecovery, Mummy_UpdateDefeat, SceneActorReaction_OnEnemyDefault,
+        sub_080D7568, SceneActorTarget_ResolvePendingObject, sub_081363F4,
+        SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
         group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718, Mummy_UpdateDying, Mummy_ResumeSavedTarget,
         SceneActorReaction_BeginTargetRecovery, Mummy_OnUnusedState, 3, &actor->body);

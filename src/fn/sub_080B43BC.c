@@ -4,6 +4,7 @@
 #include "display_sequence_inline.h"
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_group.h"
+#include "scene_actor_init_dispatch.h"
 
 struct VornResourceBlock {
     u32 w[8];
@@ -19,11 +20,9 @@ void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void sub_08080BE0(void);
-void SceneActorReaction_SinkAndRemove(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
-extern const u8 gUnk_086108B0[];
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
@@ -193,35 +192,6 @@ static inline void VornInit_ReadPalette(struct SceneActorRegistryResetView *acto
                                         SceneActorScript_GetManagerField62());
 }
 
-static inline void VornInit_InstallPrimary(struct SceneActorRegistryResetView *arg0,
-                                           s32 (*cb0)(void *), u16 (*cb1)(void *),
-                                           void (*cb2)(void *), void (*cb3)(void *),
-                                           void (*cb4)(void *), void (*hidden)(void *),
-                                           void (*cb5)(void *), void (*cb6)(void *),
-                                           u32 (*defaultReaction)(void), u8 (*cb270)(void *),
-                                           void *targetQuery, void *damage, void *contact)
-{
-    MonsterInit_SetBehaviorFlags(arg0, 0x2000);
-    MonsterInit_WriteResultCallback(&arg0->contextCallback, cb0);
-    MonsterInit_WriteSequenceQuery(&arg0->animationQuery.sequence, cb1);
-    MonsterInit_WriteActorAction(&arg0->entryTarget224, cb2);
-    MonsterInit_WriteActorAction(&arg0->entryTarget228, cb3);
-    MonsterInit_WriteActorAction(&arg0->savedTarget, cb4);
-    MonsterInit_WriteActorAction(&arg0->reactionTarget230, cb5);
-    MonsterInit_WriteActorAction(&arg0->deathControl, cb6);
-    MonsterInit_WriteActorAction(&arg0->field220, hidden);
-    MonsterInit_WriteDefaultReaction(&arg0->defaultReaction, defaultReaction);
-    MonsterInit_WriteContactPredicate(&arg0->contactQuery.predicate, cb270);
-    MonsterInit_WriteDataPointer(&arg0->commandTable.opaque, gUnk_086108B0);
-    arg0->callback248 = 0;
-    arg0->update26C = targetQuery;
-    arg0->field238 = SceneActorReaction_SinkAndRemove;
-    arg0->damageCallback = damage;
-    arg0->contactCallback = contact;
-    arg0->field240 = 0;
-    MonsterInit_ClearMotion(arg0);
-}
-
 static inline void VornInit_SetRouteReset(struct SceneActorRegistryResetView *actor, void *callback)
 {
     actor->callback248 = callback;
@@ -370,11 +340,11 @@ s32 Vorn_Init(void *object)
     VornInit_InitializeBody(arg0, &zero);
     VornInit_ReadPalette(actor, 0x31B, 0x192);
     SceneActor_InitContextColliders(actor);
-    VornInit_InstallPrimary(actor, Vorn_OnUpdate, Vorn_GetAnimationEvent, Vorn_UpdateIdleFacing,
-                            Vorn_ResetStateEntry, Vorn_BeginIdle, Vorn_UpdateHiddenRecovery,
-                            sub_080AD75C, Vorn_UpdateDefeat, SceneActorReaction_OnEnemyDefault,
-                            sub_080B3C1C, SceneActorTarget_ResolvePendingObject, sub_081363F4,
-                            SceneActorPlacement_ResetStateThree);
+    MonsterInit_InstallSequenceCallbacks(
+        actor, Vorn_OnUpdate, Vorn_GetAnimationEvent, Vorn_UpdateIdleFacing, Vorn_ResetStateEntry,
+        Vorn_BeginIdle, Vorn_UpdateHiddenRecovery, sub_080AD75C, Vorn_UpdateDefeat,
+        SceneActorReaction_OnEnemyDefault, sub_080B3C1C, SceneActorTarget_ResolvePendingObject,
+        sub_081363F4, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718,
                                           Vorn_OnReactionNoOp, SceneActorReaction_ResumeSavedTarget,
                                           Vorn_TryRestorePatrolRoute, 0, 1, body);
