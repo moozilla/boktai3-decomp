@@ -10,3 +10,9 @@ Animation nine, frames one and three, and the 0x20 direction step are Ghoul-spec
 
 Validation: `tools/check.py src/fn/sub_08086400.c --target-size 1580 --json` reports
 zero differing bytes.
+
+## Ghoul_ResumeDelayedChase (080898FC)
+
+Exact 2,344 bytes using canonical chase, saved-response, and state-entry operations.
+The group owner is captured at entry; the zero result of the blocking query supplies
+the later state reset. Stock `tools/check.py` reports zero differing bytes.
