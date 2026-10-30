@@ -57,7 +57,7 @@ void Golem_BeginSlideState(struct SceneActorRegistryResetView *actor)
     if (TakeFlag(&actor->field2B1)) {
         BeginControl(actor, Golem_UpdateSlideImpact, 0x29);
         actor->field2B0 = 0;
-        body->direction = actor->fieldE9;
+        body->direction = actor->tracking.heading;
         context->pushSpeed = 0x200;
     }
     if ((s32)actor->counter2AC > 0x1E || actor->field2B0) {

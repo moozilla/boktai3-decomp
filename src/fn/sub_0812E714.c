@@ -25,5 +25,5 @@ void ActorParticles_SpawnWideBurst(struct SceneActorRegistryResetView *actor)
     spread.z = 24;
     count = (ActorParticles_NextRandom() & 3) + 4;
     sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
-                 (struct SceneExtent *)&actor->position, &velocity, &spread, 60, 63);
+                 (struct SceneExtent *)&actor->body.position, &velocity, &spread, 60, 63);
 }

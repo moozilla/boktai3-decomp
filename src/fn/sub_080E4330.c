@@ -63,8 +63,8 @@ void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
         }
         {
             void *collider = context->collider;
-            u32 damage = a->fieldB8;
-            u32 response = a->fieldC0;
+            u32 damage = a->attacks.first[2];
+            u32 response = a->attacks.second[2];
             u8 *p = (u8 *)a + 0xD4;
             u32 power = *(u32 *)p;
             u32 extra;

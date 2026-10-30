@@ -132,7 +132,7 @@ void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
                 *flags = bit | (*flags);
             }
             *((u16 *)(((u8 *)actor) + 0x9C)) = 0;
-            pos = &actor->position;
+            pos = &actor->body.position;
             SpriteParticle_SpawnBatch(pos, 1, 2, 0, 0x154);
             Sound_PlaySong(0x1D8);
             {
@@ -162,13 +162,13 @@ void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
                 if (script) {
                     struct ScriptUtilityArguments arguments;
                     values[0] = pos->x;
-                    values[1] = actor->position.y;
-                    values[2] = actor->position.z;
+                    values[1] = actor->body.position.y;
+                    values[2] = actor->body.position.z;
                     values[3] = *((u32 *)(((u8 *)actor) + 0x1FC));
                     values[4] = *((u32 *)(((u8 *)actor) + 0x200));
                     values[5] = *((u32 *)(((u8 *)actor) + 0x204));
                     values[6] = actor->field2E0;
-                    values[7] = actor->id;
+                    values[7] = actor->body.id;
                     arguments.count = 8;
                     arguments.values = values;
                     Script_Call(script, &arguments);

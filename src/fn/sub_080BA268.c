@@ -56,11 +56,11 @@ void sub_080BA268(struct SceneActorRegistryResetView *p)
 
     if (Sub080BA268_Take(&p->field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(p, 0x16);
-        angle = Sub080BA268_Scale6((s32)((p->direction + 0x10) & 0xFF)) << 6;
+        angle = Sub080BA268_Scale6((s32)((p->body.direction + 0x10) & 0xFF)) << 6;
         Sub080BA268_Polar(angle, &v1, 20);
         Sub080BA268_Polar(Sub080BA268_RandByte(), &v2, 10);
         v2.y = 30;
-        pos = p->position;
+        pos = p->body.position;
         *(u32 *)&pos = (*(u32 *)&pos & 0xFFFF) | ((((*(u32 *)&pos) >> 16) + 0x104) << 16);
         pos.x += v2.x;
         pos.y += v2.y;

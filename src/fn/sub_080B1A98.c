@@ -52,7 +52,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     ClearRouteBits(&actor->flags2D4, 0x200);
@@ -163,7 +163,7 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
     dest->z = point->point[1];
     dest->y = CellHeight(dest, CellIndex(dest));
     (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!TryRoute(actor, *(void **)(group + 0x1fc), &actor->position,
-                  (struct ContactPosition *)((u8 *)actor->fieldDC + 12)))
+    if (!TryRoute(actor, *(void **)(group + 0x1fc), &actor->body.position,
+                  &actor->tracking.target->position))
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }

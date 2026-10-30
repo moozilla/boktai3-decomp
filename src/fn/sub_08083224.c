@@ -33,7 +33,7 @@ void SceneActorControl_UpdateShadowReturnPhase(struct SceneActorRegistryResetVie
             *flags &= mask;
         }
         {
-            u8 *heading = &actor->direction;
+            u8 *heading = &actor->body.direction;
             struct ContactPosition *motion = &actor->secondaryMotion;
             u32 direction;
             register const s16 *table asm("r2");

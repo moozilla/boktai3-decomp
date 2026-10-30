@@ -147,18 +147,18 @@ void Crow_ResetGroundState(struct SceneActorRegistryResetView *actor)
     context->field3DD = 0;
     context->field3E4 = 0;
     context->flags3D4 = 0;
-    *(struct CrowPlacement *)&actor->position = *(struct CrowPlacement *)&context->storedPosition;
+    *(struct CrowPlacement *)&actor->body.position = *(struct CrowPlacement *)&context->storedPosition;
     actor->terrainCell = context->cell3E8;
     actor->groundHeight2BE =
         SceneActorTerrain_GetHeight(actor->terrainCell, &context->storedPosition);
-    actor->field2EA = actor->position.y;
-    actor->position.y = actor->groundHeight2BE;
+    actor->field2EA = actor->body.position.y;
+    actor->body.position.y = actor->groundHeight2BE;
     if (!actor->drawableKind)
         *(struct CrowPlacement *)((u8 *)actor->drawable + 0x1C) =
-            *(struct CrowPlacement *)&actor->position;
+            *(struct CrowPlacement *)&actor->body.position;
     else
         *(struct CrowPlacement *)((u8 *)actor->drawable + 0x40) =
-            *(struct CrowPlacement *)&actor->position;
+            *(struct CrowPlacement *)&actor->body.position;
     {
         void *dst = &context->vectors[0];
         void *src = &zero;

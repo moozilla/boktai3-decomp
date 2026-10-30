@@ -25,7 +25,7 @@ void SceneActorAnimation_RefreshTimedAttackCollider(struct SceneActorRegistryRes
         variant = 0;
         if (palette == 1)
             variant = 1;
-        FeatherEffectPool_CreateDirectional(&a->position, a->direction, 0, variant);
+        FeatherEffectPool_CreateDirectional(&a->body.position, a->body.direction, 0, variant);
         Sound_PlaySong(0x3A5);
     }
     if (frame - 13 <= 10)

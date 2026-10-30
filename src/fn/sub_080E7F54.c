@@ -14,7 +14,7 @@ u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *p)
     u32 excluded = 8;
     struct ContactPosition difference;
     struct ContactPosition *delta = &difference;
-    struct ContactPosition *position = &p->position;
+    struct ContactPosition *position = &p->body.position;
     struct Player **cursor = gPlayers;
     do {
         u32 indexOffset = i << 2;
@@ -32,7 +32,7 @@ u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *p)
             if (x + z <= 0x2400) {
                 struct Player *nearby = *cursor;
                 if (nearby->inputKeys[1] & 1) {
-                    struct SceneActorReactionMotion *motion = (void *)&p->fieldDC;
+                    struct SceneActorReactionMotion *motion = (void *)&p->tracking.target;
                     motion->fieldDC = (u32)&nearby->positionalEffectGroup;
                     return 1;
                 }

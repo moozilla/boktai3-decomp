@@ -78,7 +78,7 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
         struct ContactPosition delta;
         sprite->flags |= 2;
         state->angularSpeed = 2;
-        Axe_DeltaFromPlayer(&gPlayers, &delta, &a->position);
+        Axe_DeltaFromPlayer(&gPlayers, &delta, &a->body.position);
         if (a->health <= (state->healthThreshold)) {
             a->secondaryMotion.x = Div(delta.x, 44);
             a->secondaryMotion.y = 44;
@@ -98,7 +98,7 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
             flags = entryFlags;
         }
     }
-    a->position.y += a->field2EA;
+    a->body.position.y += a->field2EA;
     if (NormalizeAngle(32 - state->angle) < 0)
         sprite->angle += state->angularSpeed;
     else

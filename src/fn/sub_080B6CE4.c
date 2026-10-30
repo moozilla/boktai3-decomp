@@ -14,7 +14,7 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryRese
 void SceneActorControl_OnIdle(void);
 static inline u8 HasReaction(struct SceneActorRegistryResetView *p)
 {
-    struct SceneActorReactionMotion *motion = (void *)&p->fieldDC;
+    struct SceneActorReactionMotion *motion = (void *)&p->tracking.target;
     u32 mask = 8;
     if (mask & motion->flags)
         return 1;
@@ -90,6 +90,6 @@ void SceneActorReaction_UpdateGate(struct SceneActorRegistryResetView *p)
         p->field2C8 = active;
         And32(&p->flags114, ~1);
         p->word104 = active;
-        OrMotion((struct SceneActorReactionMotion *)&p->fieldDC, 8);
+        OrMotion((struct SceneActorReactionMotion *)&p->tracking.target, 8);
     }
 }

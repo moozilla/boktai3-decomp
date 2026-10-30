@@ -32,9 +32,9 @@ void SceneActor_InitLinkedReactionColliders(struct SceneActorRegistryResetView *
     {
         u32 flags = 0x2003;
         struct ContactCollider *collider = &actor->colliderB;
-        Collider_Init(collider, actor->id, flags, 0, 16, &size, &offset);
+        Collider_Init(collider, actor->body.id, flags, 0, 16, &size, &offset);
         Collider_SetAttackProperties(&actor->colliderB, 0, 0, 0, 0, 0);
-        Collider_SetPosition(&actor->colliderB, &actor->position, 0);
+        Collider_SetPosition(&actor->colliderB, &actor->body.position, 0);
         Collider_SetCallback(&actor->colliderB, Ghost_BeginContactReaction, actor);
     }
 }

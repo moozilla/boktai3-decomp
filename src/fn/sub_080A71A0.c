@@ -95,7 +95,7 @@ void sub_080A71A0(struct SceneActorRegistryResetView *a)
         a->behavior2AA = five;
         a->counter2AC = 0;
         a->field2B1 = one;
-        a->direction = a->fieldE9;
+        a->body.direction = a->tracking.heading;
         a->field2C2 = 0x40;
     }
 }

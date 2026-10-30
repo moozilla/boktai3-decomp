@@ -83,7 +83,7 @@ static inline u32 SceneActorChase_HeightAt(s32 cell, struct ContactPosition *pos
 
 #if SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS
 #define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  (&(a_)->flags2D4)
-#define SCENE_ACTOR_CHASE_ROUTE_MOTION(a_) (&(a_)->motion)
+#define SCENE_ACTOR_CHASE_ROUTE_MOTION(a_) (&(a_)->body.motion)
 #else
 #define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  SceneActorChase_MotionFlagsOf(a_)
 #define SCENE_ACTOR_CHASE_ROUTE_MOTION(a_) SceneActorChase_MotionOf(a_)
@@ -171,7 +171,7 @@ static inline void SceneActorChase_BeginTurn(void *obj, u32 saved, const u16 *ra
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->flags, 4)) {
         group->turn.direction =
-            SceneActorChase_RandomDirectionExcept(actor->direction, randomSamples);
+            SceneActorChase_RandomDirectionExcept(actor->body.direction, randomSamples);
         SceneActorChase_SaveControl(&group->saved, actor);
         group->turn.savedDirection = saved;
         SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
@@ -188,7 +188,7 @@ static inline u8 SceneActorChase_Arrive(void *obj)
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
-    struct SceneActorChaseTracking *tracking = (struct SceneActorChaseTracking *)&actor->fieldDC;
+    struct SceneActorChaseTracking *tracking = (struct SceneActorChaseTracking *)&actor->tracking.target;
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
     void **callback;
@@ -231,7 +231,7 @@ static inline u8 SceneActorChase_Arrive(void *obj)
         (group->destination)->pad = 0;
     }
     {
-        u8 saved = actor->direction;
+        u8 saved = actor->body.direction;
         SceneActorChase_BeginTurn(obj, saved, randomSamples);
     }
     sub_0807E334(obj);
@@ -239,7 +239,7 @@ static inline u8 SceneActorChase_Arrive(void *obj)
     return 0;
 reroute: {
     SceneActorChase_CellCenter(cell, &target);
-    if (SceneActorChase_TryRoute(obj, group->route, &actor->position, &target))
+    if (SceneActorChase_TryRoute(obj, group->route, &actor->body.position, &target))
         goto success;
 }
     callback = &group->fallback;

@@ -178,29 +178,29 @@ void TentacleBody_ReturnToCellCenter(struct SceneActorRegistryResetView *actor)
     Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x270)));
     speed = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
     Scale(actor);
-    difference = (*(((u8 *)actor) + 0x3cd)) - actor->direction;
-    direction = &actor->direction;
+    difference = (*(((u8 *)actor) + 0x3cd)) - actor->body.direction;
+    direction = &actor->body.direction;
     if (difference > 128)
         difference += -256;
     else if (difference < (-128))
         difference += 256;
     {
         s32 magnitude = (difference < 0) ? (-difference) : (difference);
-        motion = &actor->motion;
+        motion = &actor->body.motion;
         if (magnitude > 8) {
             s32 x = (u8)Shift(speed * gUnk_086149C4[((*(((u8 *)actor) + 0x59)) + 64) & 255], 12);
             s32 z = Shift(speed * gUnk_086149C4[*(((u8 *)actor) + 0x59)], 12);
             motion->x += x;
-            actor->motion.z += z;
-            motion = &actor->motion;
+            actor->body.motion.z += z;
+            motion = &actor->body.motion;
         }
     }
-    AddVectors_ReturnToCellCenter(&target, &actor->motion, &actor->position);
+    AddVectors_ReturnToCellCenter(&target, &actor->body.motion, &actor->body.position);
     index = SceneActorTerrain_GetCellIndex(&target);
     if ((*((u16 *)(body + 0x87a))) != index) {
         Delta(&target, &target, (void *)(body + 0x924));
         motion->x += Div(target.x, 10);
-        actor->motion.z += Div(target.z, 10);
+        actor->body.motion.z += Div(target.z, 10);
     }
     sub_080A9DB0(actor, 12, 0xa410);
     if (((difference < 0) ? (-difference) : (difference)) <= 7) {

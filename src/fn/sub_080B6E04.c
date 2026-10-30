@@ -92,9 +92,9 @@ done:
 static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct ApproachGroup *group,
                        u32 bits)
 {
-    u8 *target = *(u8 **)&actor->fieldDC;
+    u8 *target = *(u8 **)&actor->tracking.target;
     void *route = group->routeObject;
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     struct ContactPosition *destination = (void *)(target + 12);
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
@@ -106,7 +106,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct Approac
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             {

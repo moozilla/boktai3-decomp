@@ -30,13 +30,13 @@ u8 sub_0807F81C(struct SceneActorRegistryResetView *a)
         return 0;
     if ((u8)Callback_InvokeActor(a, a->update26C))
         return 1;
-    motion = (struct SceneActorReactionMotion *)&a->fieldDC;
+    motion = (struct SceneActorReactionMotion *)&a->tracking.target;
     if (!(motion->flags & 1))
         return 0;
     zero = a->flags2D4 & 0x100;
     if (zero)
         return 0;
-    if (!a->distanceLimitF8)
+    if (!a->tracking.limit)
         return 0;
     contact = SceneActorContacts_SelectForActor(a, 6);
     if (!contact)
@@ -55,15 +55,15 @@ u8 sub_0807F81C(struct SceneActorRegistryResetView *a)
             if (*(u16 *)((u8 *)a + 0x2F8) != cell) {
                 route = *(void **)((u8 *)a + 0x5D0);
                 pos = (u8 *)motion->fieldDC + 0xC;
-                if (!Nav_IsPositionInMesh(route, &a->position, (struct ContactPosition *)pos)) {
+                if (!Nav_IsPositionInMesh(route, &a->body.position, (struct ContactPosition *)pos)) {
                     a->flags2D4 &= ~0x200;
                 } else {
                     blocked =
-                        Terrain_ApplyBlocked(route, &a->position, (struct ContactPosition *)pos);
+                        Terrain_ApplyBlocked(route, &a->body.position, (struct ContactPosition *)pos);
                     if (blocked == 0)
                         a->flags2D4 &= ~0x200;
                     else if (blocked != 2)
-                        Memory_Clear(&a->motion, 8);
+                        Memory_Clear(&a->body.motion, 8);
                 }
                 *(u16 *)((u8 *)a + 0x2F8) = cell;
             }

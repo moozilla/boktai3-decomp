@@ -106,7 +106,7 @@ void Dog_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
         return;
     }
     if (Dog_IsActionTimerExpired(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->update270)) {
+        if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
             return;
         }
         if (sub_0812F3CC(actor)) {

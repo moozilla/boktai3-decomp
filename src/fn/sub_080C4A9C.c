@@ -53,7 +53,7 @@ void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
     }
     Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
     (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
-                        &((struct ChaseTarget *)actor->fieldDC)->position))
+    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position,
+                        &((struct ChaseTarget *)actor->tracking.target)->position))
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }

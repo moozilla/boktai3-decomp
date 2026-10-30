@@ -29,9 +29,9 @@ void SceneActor_UpdateTargetedAttack(struct SceneActorRegistryResetView *s)
     struct TargetedAttackContext *context = s->context;
     struct TargetedAttackSequence *sequence = (void *)((u8 *)s->drawable + 0x20);
     if (TakeEntryFlag(s)) {
-        s->direction = (((s->fieldE9 + 0x20) & 0xFF) >> 6) << 6;
+        s->body.direction = (((s->tracking.heading + 0x20) & 0xFF) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 5);
-        context->target = ((struct TargetedAttackTarget *)s->fieldDC)->position;
+        context->target = ((struct TargetedAttackTarget *)s->tracking.target)->position;
         Sound_PlaySong(0x1D0);
     }
     if ((u16)(sequence->frame - 3) <= 1) {

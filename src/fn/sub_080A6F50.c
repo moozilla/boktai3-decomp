@@ -58,12 +58,12 @@ void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor
     u32 variant, flags;
     if (actor->field2B2)
         actor->field2B2 = 0;
-    TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
+    TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
     Select((void *)actor, entry[0x44], variant, flags);
     TentacleBody_ResetDirectionalAnimations(actor->context, 18);
     sub_080A9DB0(actor, 20, 25600);
     if (frame > 40) {
-        TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
+        TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
         Select((void *)actor, entry[0x38], variant, flags);
         TentacleBody_RefreshDirectionalAnimations(actor->context, 15);
         actor->field2B0 = 1;

@@ -46,7 +46,7 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
     if (SceneActorReaction_TakePrepared(actor))
         return;
     Vorn_BroadcastPosition(actor);
-    if (actor->distanceF0 < 0x38400) {
+    if (actor->tracking.distance < 0x38400) {
         near = Vorn_TestNear(context, 2, &flags);
         if (near) {
             if (context->nearTimer > 40) {
@@ -62,10 +62,10 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
             } else {
                 context->nearTimer++;
                 SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-                actor->direction = actor->fieldE9;
+                actor->body.direction = actor->tracking.heading;
             }
         } else {
-            if (actor->distanceF0 < 0x19000) {
+            if (actor->tracking.distance < 0x19000) {
                 if (context->nearTimer > 30) {
                     sub_080B1FA8(actor);
                     Chase_SetBehavior(actor, 15);
@@ -82,21 +82,21 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
             }
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
         }
-    } else if (actor->distanceF0 > 0x90000) {
+    } else if (actor->tracking.distance > 0x90000) {
         near = Vorn_TestNear(context, 2, &flags);
         if (!near) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
             context->farTimer = 0;
         } else {
             if (context->farTimer <= 59) {
-                actor->direction = actor->fieldE9;
+                actor->body.direction = actor->tracking.heading;
                 SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
                 context->farTimer++;
             } else {
-                if (!actor->fieldDC)
+                if (!actor->tracking.target)
                     return;
                 {
-                    struct ChaseTarget *target = (void *)actor->fieldDC;
+                    struct ChaseTarget *target = (void *)actor->tracking.target;
                     s32 cell = Chase_CellIndex(target->position.x >> 8, target->position.z >> 8);
                     struct ContactPosition *p = &center;
                     s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
@@ -111,7 +111,7 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
                     p->y = (*data & 15) << 8;
                     p->z = (z << 8) + 128;
                 }
-                if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, &center))
+                if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, &center))
                     goto fail;
                 goto arrived;
             }
@@ -119,13 +119,13 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
     } else {
         near = Vorn_TestMiddle(context, 2, &flags);
         if (near) {
-            actor->direction = actor->fieldE9;
+            actor->body.direction = actor->tracking.heading;
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             if (context->farTimer > 60) {
-                if (!actor->fieldDC)
+                if (!actor->tracking.target)
                     return;
                 {
-                    struct ChaseTarget *target = (void *)actor->fieldDC;
+                    struct ChaseTarget *target = (void *)actor->tracking.target;
                     s32 cell = Chase_CellIndex(target->position.x >> 8, target->position.z >> 8);
                     struct ContactPosition *p = &center;
                     s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
@@ -140,7 +140,7 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
                     p->y = (*data & 15) << 8;
                     p->z = (z << 8) + 128;
                 }
-                if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, &center)) {
+                if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, &center)) {
                 fail:
                     Callback_InvokeActor(actor, *(void **)(group + 0x224));
                     return;

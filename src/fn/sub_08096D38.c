@@ -162,15 +162,15 @@ void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
         Control(actor, actor->entryTarget228, 1);
         route->index = 0;
         if (Test(*flags, 4)) {
-            u32 angle = (actor->fieldE9 + ((Random() & 63) + 128)) & 255;
+            u32 angle = (actor->tracking.heading + ((Random() & 63) + 128)) & 255;
             Polar_1(&target, angle);
-            Add(&target, &actor->position);
+            Add(&target, &actor->body.position);
         } else {
             target = (*(struct GhostPlayer **)gPlayers)->position;
         }
-        Delta(&delta, &actor->position, &target);
+        Delta(&delta, &actor->body.position, &target);
         route->distance = Quarter((delta.x * delta.x) + (delta.z * delta.z));
-        Polar(&route->motion, Facing(RandomMotion(), &actor->fieldE9) & 255, 32);
+        Polar(&route->motion, Facing(RandomMotion(), &actor->tracking.heading) & 255, 32);
         sub_08098344(actor, &target);
         route->speed = 1;
         {
@@ -179,20 +179,20 @@ void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
         }
         actor->field2C2 = 32;
     }
-    Delta(&delta, &actor->position, &route->points[route->index]);
+    Delta(&delta, &actor->body.position, &route->points[route->index]);
     if (!Test(*flags, 4))
         ClearCollider_AdvanceApproachRoute(&actor->colliderB);
     Ghost_EmitAfterimage(actor);
     if (((delta.z * delta.z) + (delta.x * delta.x)) > 1024) {
-        actor->direction = Math_Atan2(route->points[route->index].x - actor->position.x,
-                                      route->points[route->index].z - actor->position.z);
-        Polar(&delta, actor->direction, route->speed);
-        actor->motion.x += delta.x;
-        actor->motion.z += delta.z;
-        route->motion = actor->motion;
+        actor->body.direction = Math_Atan2(route->points[route->index].x - actor->body.position.x,
+                                      route->points[route->index].z - actor->body.position.z);
+        Polar(&delta, actor->body.direction, route->speed);
+        actor->body.motion.x += delta.x;
+        actor->body.motion.z += delta.z;
+        route->motion = actor->body.motion;
     } else if ((++route->index) > 8) {
-        actor->position.x = route->points[8].x;
-        actor->position.z = route->points[8].z;
+        actor->body.position.x = route->points[8].x;
+        actor->body.position.z = route->points[8].z;
         actor->flags2D4 &= ~0x100;
         SetCollider(&actor->colliderB);
         if (Test(*flags, 4)) {

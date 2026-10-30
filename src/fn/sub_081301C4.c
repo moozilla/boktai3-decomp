@@ -45,7 +45,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
     u32 *savedFlags;
     if (Chase_TakeArrived(actor)) {
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     result = sub_0812F3CC(actor);
     if (result)
@@ -78,10 +78,10 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
             }
         }
         {
-            register u32 height asm("r1") = (u16)actor->position.y;
+            register u32 height asm("r1") = (u16)actor->body.position.y;
             target.y = height;
         }
-        Chase_TryRoute(actor, *(void **)(group + 0x1fc), &actor->position, &target);
+        Chase_TryRoute(actor, *(void **)(group + 0x1fc), &actor->body.position, &target);
         (*(struct ContactPosition **)(group + 0x200))->pad = 1;
         if (!(u8)SceneActorAttachment_TestPositionWindow(actor, &target, 32, 32)) {
             {

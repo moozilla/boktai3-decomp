@@ -26,8 +26,8 @@ u32 Axe_PickAttack(struct SceneActorRegistryResetView *actor)
         Go(actor, 0, 2, 8);
         return 1;
     }
-    if (q->b[0] == 0 && actor->distanceF0 <= 0xFFFE) {
-        s32 a = actor->fieldE9;
+    if (q->b[0] == 0 && actor->tracking.distance <= 0xFFFE) {
+        s32 a = actor->tracking.heading;
         s32 d = a - 0xa0;
         s32 e;
         if (d > 0x80)

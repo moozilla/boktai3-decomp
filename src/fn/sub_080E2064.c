@@ -44,10 +44,10 @@ void SceneActorMotion_UpdateTargetTransition(struct SceneActorRegistryResetView 
         u32 value = *address & four;
         flags = address;
         if (IsActive(value)) {
-            if (a->distanceF0 > c->timeLimit) {
+            if (a->tracking.distance > c->timeLimit) {
                 SetPhase(a, 19);
                 {
-                    s32 angle = a->fieldE9;
+                    s32 angle = a->tracking.heading;
                     if (angle >= 0)
                         angle >>= 5;
                     else
@@ -58,12 +58,12 @@ void SceneActorMotion_UpdateTargetTransition(struct SceneActorRegistryResetView 
                 s32 mask = -5;
                 *flags &= mask;
                 if (c->phase <= 3) {
-                    if ((u8)sub_080DEF78(a, a->direction))
+                    if ((u8)sub_080DEF78(a, a->body.direction))
                         SetPhase(a, 17);
                 } else {
                     SetPhase(a, 19);
                     {
-                        s32 angle = a->fieldE9;
+                        s32 angle = a->tracking.heading;
                         if (angle >= 0)
                             angle >>= 5;
                         else

@@ -28,11 +28,11 @@ u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *actor)
                         return 1;
                 }
             } else {
-                if (actor->distanceF0 < context->distanceThreshold6E0 && context->timer6F0 <= 0)
+                if (actor->tracking.distance < context->distanceThreshold6E0 && context->timer6F0 <= 0)
                     return 1;
-                if (actor->distanceF0 < context->distanceThreshold6E4 && context->timer6F2 <= 0)
+                if (actor->tracking.distance < context->distanceThreshold6E4 && context->timer6F2 <= 0)
                     return 1;
-                if (actor->distanceF0 < context->distanceThreshold6E8 && context->timer6F4 <= 0)
+                if (actor->tracking.distance < context->distanceThreshold6E8 && context->timer6F4 <= 0)
                     return 1;
             }
             break;

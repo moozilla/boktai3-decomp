@@ -14,8 +14,8 @@ void SceneActorControl_ApplyDampedMotion(struct SceneActorRegistryResetView *act
     struct DampedMotionState *state = actor->context;
     if (SceneActorControl_TakeFlag(&actor->field2B1))
         RotationPhase_Change(actor, actor->entryTarget224, 2);
-    actor->motion.x += state->x;
-    actor->motion.z += state->z;
+    actor->body.motion.x += state->x;
+    actor->body.motion.z += state->z;
     if (Mod(actor->counter2AC, 4) == 0) {
         state->x >>= 1;
         state->z >>= 1;

@@ -39,7 +39,7 @@ void SceneActorRoute_UpdateDelayedEntry(struct SceneActorRegistryResetView *acto
     u8 result;
     if (SceneActorControl_TakeFlag(&actor->field2B1))
         BeginControlZero(actor, actor->savedTarget, 0);
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     result = sub_0812F3CC(actor);
     if (result)

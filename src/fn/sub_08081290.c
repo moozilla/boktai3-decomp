@@ -93,11 +93,11 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
         }
     }
     if (frame > 6) {
-        actor->position.y -= (u32)(frame - 6) * 30;
+        actor->body.position.y -= (u32)(frame - 6) * 30;
         if (!actor->drawableKind)
-            *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = actor->position;
+            *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = actor->body.position;
         else
-            *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->position;
+            *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->body.position;
         if (frame > 8) {
             u32 zeroWord = 0;
             u32 zeroByte = 0;

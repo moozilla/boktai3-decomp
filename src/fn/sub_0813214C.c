@@ -130,11 +130,11 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
             u32 max = *(u16 *)((u8 *)actor + 0xB0);
             s32 kind = *(s16 *)((u8 *)actor + 0xB2);
             s32 param = *(s16 *)((u8 *)actor + 0x9A);
-            SceneHud_SetTimedState(actor->id, health, max, kind, 0, param);
+            SceneHud_SetTimedState(actor->body.id, health, max, kind, 0, param);
             Fill(&zero, buffer);
             if (actor->reactionSoundVariant || !(actor->field2D8 & 0x20000))
                 DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
-                                         &actor->position, buffer, 1);
+                                         &actor->body.position, buffer, 1);
         }
     }
     SceneActorMovement_ProjectProbe(actor, 0, 0);
@@ -166,7 +166,7 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
         }
         actor->field2E0 = 32;
         if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
     } else {
         {
             u32 bit = 0x20;

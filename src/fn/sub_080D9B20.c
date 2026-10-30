@@ -18,7 +18,7 @@ static inline u8 Open(s32 cell, s32 level)
 static inline u8 Adjacent(struct SceneActorRegistryResetView *actor, s32 goal)
 {
     s32 cell = actor->terrainCell;
-    s32 level = actor->position.y >> 8;
+    s32 level = actor->body.position.y >> 8;
     s32 i;
     typeof(i) c1;
     if ((goal - 1) == cell) {

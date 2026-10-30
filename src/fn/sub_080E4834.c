@@ -29,12 +29,12 @@ void Dog_ResumeRoute(struct SceneActorRegistryResetView *a)
     u8 *context = a->context;
     if (Chase_TakeArrived(a))
         Chase_SetCtl(a, Dog_UpdateArrivalAnimation, 10);
-    if ((u8)Callback_InvokeActor(a, a->update270))
+    if ((u8)Callback_InvokeActor(a, a->contactQuery.opaque))
         return;
     if (sub_0812F3CC(a))
         return;
     if (a->field2B0) {
-        if (!Chase_TryRoute(a, *(void **)(group + 0x1FC), &a->position,
+        if (!Chase_TryRoute(a, *(void **)(group + 0x1FC), &a->body.position,
                             (struct ContactPosition *)(context + 0x6D8))) {
             Callback_InvokeActor(a, *(void **)(group + 0x224));
             return;

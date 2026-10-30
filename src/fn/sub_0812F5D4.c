@@ -51,7 +51,7 @@ static inline void BeginContactTurn(void *obj, u32 saved)
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
     if (!FullFlags(actor, 0x400) && !TestField((u16 *)((u8 *)actor + 0x414), 4)) {
-        register s32 prior asm("r5") = actor->direction;
+        register s32 prior asm("r5") = actor->body.direction;
         s32 tries = 0;
         s32 choice;
         const u16 *table = gRandomTable;

@@ -70,7 +70,7 @@ void Lun_ChooseDelayedDestination(struct SceneActorRegistryResetView *actor)
     } local;
     if (actor->field2B1)
         actor->field2B1 = 0;
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if ((s32)actor->counter2AC > 60) {
         struct LunRouteEntry *route;
@@ -83,7 +83,7 @@ void Lun_ChooseDelayedDestination(struct SceneActorRegistryResetView *actor)
         {
             struct ContactPosition *q;
             struct ContactPosition *p = &local.target;
-            struct ContactPosition *from = &actor->position;
+            struct ContactPosition *from = &actor->body.position;
             asm("" ::: "r7");
             q = &local.target;
             q->x = q->x - from->x;

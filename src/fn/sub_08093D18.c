@@ -6,7 +6,7 @@ void SceneActorControl_TickPendingTarget(struct SceneActorRegistryResetView *act
     void *context = *(void **)((u8 *)actor + 0x3D0);
 
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        actor->direction = *((u8 *)actor + 0xE9);
+        actor->body.direction = *((u8 *)actor + 0xE9);
         {
             void *target = *(void **)((u8 *)actor + 0x228);
             u32 one = 1;

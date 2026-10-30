@@ -13,7 +13,7 @@ s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
     struct ContactPosition target;
     struct SceneActorRegistryResetView *parent = actor->context;
     u8 *group = (void *)&actor->group;
-    s32 direction = (((actor->direction + 0x20) >> 6) + 2) & 3;
+    s32 direction = (((actor->body.direction + 0x20) >> 6) + 2) & 3;
     s32 cell = 0;
     s32 count = 0;
     struct ContactPosition *targetPointer;
@@ -40,9 +40,9 @@ s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
         terrain = gCurrentTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*terrain & 15) << 8;
     targetPointer->z = (cellZ << 8) + 0x80;
-    target.y = actor->position.y;
+    target.y = actor->body.position.y;
     route = *(void **)(group + 0x1FC);
-    position = &actor->position;
+    position = &actor->body.position;
     result = Nav_IsPositionInMesh(route, position, &target);
     if (!result) {
         u16 *flags = &actor->flags2D4;
@@ -54,7 +54,7 @@ s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
         result = Terrain_ApplyBlocked(route, position, &target);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
         } else {
             u16 *flags = &actor->flags2D4;
             u32 mask = 0xFFFFFDFF;

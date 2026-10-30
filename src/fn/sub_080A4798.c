@@ -34,14 +34,14 @@ void sub_080A4798(struct SceneActorRegistryResetView *actor)
     u8 found;
 
     t = *((struct ChaseTarget **)(((u8 *)actor) + 0xDC));
-    angle = Math_Atan2(t->position.x - actor->position.x, t->position.z - actor->position.z);
+    angle = Math_Atan2(t->position.x - actor->body.position.x, t->position.z - actor->body.position.z);
     dir.x = (gUnk_086149C4[(angle + 64) & 255] * 10) >> 12;
     dir.z = (gUnk_086149C4[angle] * 10) >> 12;
     entry = (u16 *)Path_GetPointData(route->data);
     found = 0;
     for (i = 0; i < (*route->data); i++) {
-        delta.x = entry[0] - actor->position.x;
-        delta.z = entry[1] - actor->position.z;
+        delta.x = entry[0] - actor->body.position.x;
+        delta.z = entry[1] - actor->body.position.z;
         if (Dot(&dir, &delta) < 0) {
             u32 w = *((u32 *)entry);
             if (w == **((u32 **)(group + 0x7C)))

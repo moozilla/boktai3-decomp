@@ -91,7 +91,7 @@ void Ghost_EmitAfterimage(struct SceneActorRegistryResetView *actor)
     u32 variant;
     u32 flags;
     if (Mod(actor->field2CA, ctx->interval) == 0) {
-        Ghost_GetDirectionalFrame(actor->direction, &variant, &flags);
+        Ghost_GetDirectionalFrame(actor->body.direction, &variant, &flags);
         {
             struct ActorAnim *source = (void *)(((u8 *)actor->drawable) + 0x48);
             u32 sequence = source->unused;
@@ -106,7 +106,7 @@ void Ghost_EmitAfterimage(struct SceneActorRegistryResetView *actor)
             u32 offset = ctx->index * sizeof(struct GhostVisual);
             struct ContactPosition *base = (void *)&ctx->visuals[0].sprite.x;
             struct ContactPosition *position = (void *)((u8 *)base + offset);
-            *position = actor->position;
+            *position = actor->body.position;
         }
         ctx->visuals[ctx->index].sprite.flags &= ~1;
         ctx->visuals[ctx->index].life = 8;

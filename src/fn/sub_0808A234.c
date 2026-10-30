@@ -66,7 +66,7 @@ void Ghoul_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
         SetControl(actor, Bat_UpdateProbeReaction, 0x24);
     }
     if (!*(u16 *)(control + 0x63C)) {
-        if ((u8)Callback_InvokeActor(actor, actor->update270)) {
+        if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
             ClearBit((u16 *)(control + 0x628));
             return;
         }

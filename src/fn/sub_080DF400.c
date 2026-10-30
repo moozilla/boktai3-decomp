@@ -11,10 +11,10 @@ void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *a)
     u8 *group = (u8 *)&a->group;
     SceneActorReaction_ResetResponseState(group + 0x8C, gUnk_0824E2A8, 0x2AA);
     if (FIELD(context, 0x6A7, u8) <= 3) {
-        if (a->distanceF0 < FIELD(context, 0x688, u32) || !Dog_IsActionTimerExpired(a)) {
+        if (a->tracking.distance < FIELD(context, 0x688, u32) || !Dog_IsActionTimerExpired(a)) {
             if (FIELD(context, 0x6A7, u8) <= 3) {
-                u32 saved = a->direction;
-                a->direction = a->fieldE9 + 128;
+                u32 saved = a->body.direction;
+                a->body.direction = a->tracking.heading + 128;
                 if (sub_080DEF78(a, saved)) {
                     Chase_SetCtl(a, SceneActorControl_OnIdle, 0x10);
                     Chase_SetBehavior(a, 17);
@@ -22,7 +22,7 @@ void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *a)
                 return;
             }
         }
-        if (a->distanceF0 > FIELD(context, 0x68C, u32)) {
+        if (a->tracking.distance > FIELD(context, 0x68C, u32)) {
             struct ChaseTarget *target;
             if (a->field2B5 == 0x1A)
                 return;
@@ -32,12 +32,12 @@ void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *a)
                 if (!SceneActorTarget_TrySelectNearestParticipant(a))
                     return;
             } else
-                a->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
+                a->tracking.target = (u32)((u8 *)gPlayers[0] + 0x24);
             {
                 void *route = *(void **)(group + 0x1FC);
-                struct ContactPosition *from = &a->position;
+                struct ContactPosition *from = &a->body.position;
                 struct ContactPosition *to;
-                target = (void *)a->fieldDC;
+                target = (void *)a->tracking.target;
                 to = &target->position;
                 if (!Chase_TryRoute(a, route, from, to)) {
                     Callback_InvokeActor(a, *(void **)(group + 0x224));

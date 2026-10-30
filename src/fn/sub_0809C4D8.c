@@ -61,7 +61,7 @@ void Lun_UpdateTimedRecovery(struct SceneActorRegistryResetView *actor)
     } else if (Mod(actor->counter2AC, 3) == 0)
         Blink(actor);
     if ((s32)actor->counter2AC > 60) {
-        actor->field2EA += actor->position.y - actor->groundHeight2BE;
+        actor->field2EA += actor->body.position.y - actor->groundHeight2BE;
         SceneActorControl_ResetCollisionFlags(actor);
         SetState(actor, 0, 0, 0);
     }

@@ -53,7 +53,7 @@ void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
     pos.y += 200;
     if (!InventorySlot_PickRandom(context + 0x6A0, context + 0x6A2, context + 0x6A4))
         return;
-    if (FloatingItemEffect_Spawn(0, *(s16 *)(context + 0x6A2), 3, 0, &pos, &a->position, 0x18, a) < 0) {
+    if (FloatingItemEffect_Spawn(0, *(s16 *)(context + 0x6A2), 3, 0, &pos, &a->body.position, 0x18, a) < 0) {
         *(u16 *)(context + 0x6A0) |= mask;
         return;
     }
@@ -73,7 +73,7 @@ void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
     else
         a->reactionSoundVariant = a->health;
     *(u16 *)(context + 0x6A0) = 0xFFFF;
-    a->fieldDC = (u32)((u8 *)((u8 **)gPlayers)[0] + 0x24);
+    a->tracking.target = (u32)((u8 *)((u8 **)gPlayers)[0] + 0x24);
     a->field2E0 = 1;
     a->field2D8 = 0;
     a->field2DC = 0;
@@ -84,14 +84,14 @@ void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
     *(u16 *)((u8 *)a + 0x178) = 0x1E;
     a->field2E6 = 1;
     if (F6ECTest(a->flags2C0, 2))
-        a->fieldDC = (u32)((u8 *)((u8 **)gPlayers)[0] + 0x24);
-    else if (a->fieldDC == 0)
+        a->tracking.target = (u32)((u8 *)((u8 **)gPlayers)[0] + 0x24);
+    else if (a->tracking.target == 0)
         return;
-    obj = (u8 *)a->fieldDC;
-    dx = *(s16 *)(obj + 0xC) - a->position.x;
-    dz = *(s16 *)(obj + 0x10) - a->position.z;
-    a->fieldE9 = Math_Atan2(dx, dz);
-    a->distanceF0 = dx * dx + dz * dz;
+    obj = (u8 *)a->tracking.target;
+    dx = *(s16 *)(obj + 0xC) - a->body.position.x;
+    dz = *(s16 *)(obj + 0x10) - a->body.position.z;
+    a->tracking.heading = Math_Atan2(dx, dz);
+    a->tracking.distance = dx * dx + dz * dz;
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080DF6EC);

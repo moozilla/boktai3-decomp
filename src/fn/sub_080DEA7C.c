@@ -52,8 +52,8 @@ void Dog_UpdateCollisionBounds(struct SceneActorRegistryResetView *a)
     u32 *flags;
     if (SuppressCollision(a))
         return;
-    position.position = a->position;
-    heading = Direction((a->direction + 32) & 255) << 6;
+    position.position = a->body.position;
+    heading = Direction((a->body.direction + 32) & 255) << 6;
     {
         if (TestContext(context, 2, &flags)) {
             position.packed.x += Scale(gUnk_086149C4[(heading + 64) & 255] << 9);
@@ -65,7 +65,7 @@ void Dog_UpdateCollisionBounds(struct SceneActorRegistryResetView *a)
     }
     Collider_SetPosition(context + 0x624, &position, 0);
     context[0x666] = heading;
-    position.position = a->position;
+    position.position = a->body.position;
     switch (Direction(heading)) {
         case 0:
         case 2:

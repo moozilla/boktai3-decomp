@@ -74,10 +74,10 @@ void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, 
         u8 raw = SPIN(body);
         u8 *field;
         if ((s8)SPIN(body) >= 0) {
-            field = &actor->direction;
+            field = &actor->body.direction;
             angle = *field;
         } else {
-            field = &actor->direction;
+            field = &actor->body.direction;
             angle = (*field + 128) & 255;
         }
         {

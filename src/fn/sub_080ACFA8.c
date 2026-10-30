@@ -20,8 +20,8 @@ void Vorn_UpdateIdleFacing(struct SceneActorRegistryResetView *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         s32 direction;
         s32 facing;
-        actor->direction = (((actor->direction + 0x60) >> 6) & 3) * 64 - 64;
-        direction = ((actor->direction + 0x60) >> 6) & 3;
+        actor->body.direction = (((actor->body.direction + 0x60) >> 6) & 3) * 64 - 64;
+        direction = ((actor->body.direction + 0x60) >> 6) & 3;
         if (actor->behavior2AA != 20 && actor->behavior2AA != 6 && actor->behavior2AA != 16 &&
             !Flags(actor, 0x4080)) {
             facing = (((u16)Route_GetCurrentPointFacing(route) + 0x70) >> 5) & 7;
@@ -55,12 +55,12 @@ void Vorn_UpdateIdleFacing(struct SceneActorRegistryResetView *actor)
         group[9] = (*((u8 *)actor + 0x3CD) + 5) << 5;
         actor->field2B0 = 1;
         {
-            register s32 facing asm("r1") = actor->direction + 0x60;
+            register s32 facing asm("r1") = actor->body.direction + 0x60;
             asm("" : "+r"(facing));
             facing >>= 6;
             {
                 s32 mask = 3;
-                actor->direction = (mask & facing) * 64 - 64;
+                actor->body.direction = (mask & facing) * 64 - 64;
             }
         }
         SceneActorAnimation_SelectDirectionalEntry(actor, 0);

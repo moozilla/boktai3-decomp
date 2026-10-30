@@ -55,5 +55,5 @@ void Dog_UpdateShadowlessApproach(struct SceneActorRegistryResetView *actor)
         } else
             Chase_SetBehavior(actor, 15);
     } else
-        Callback_InvokeActor(actor, actor->update270);
+        Callback_InvokeActor(actor, actor->contactQuery.opaque);
 }

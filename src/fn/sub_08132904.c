@@ -171,13 +171,13 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
         struct ContactPosition *pos;
         u16 *max;
         if (Test(gEngineFlags, 0x4800)) {
-            pos = &actor->position;
+            pos = &actor->body.position;
             max = (u16 *)&actor->defaultHealth;
             gain = AreaEffect_ScaleLinkGainAtPosition(pos, *max);
             position = pos;
             maxHealth = max;
         } else {
-            pos = &actor->position;
+            pos = &actor->body.position;
             max = (u16 *)&actor->defaultHealth;
             gain = AreaEffect_ScaleGainAtPosition(pos, *max);
             position = pos;
@@ -222,7 +222,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
                 u32 max = *maxHealth;
                 s32 kind = ((struct SceneActorDamageProperties *)actor)->hudKind;
                 s32 param = ((struct SceneActorDamageProperties *)actor)->hudParameter;
-                SceneHud_SetTimedState(actor->id, h, max, kind, 0, param);
+                SceneHud_SetTimedState(actor->body.id, h, max, kind, 0, param);
                 Fill(&zero, buffer);
                 if (actor->reactionSoundVariant || (!((*flags2D8) & 0x20000)))
                     DamageNumberDisplay_Show(displayCollider, actor->reactionSoundVariant, 0,
@@ -232,7 +232,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
     }
     SceneActorMovement_ProjectProbe(actor, dx, dz);
     SetHitFlags(8, (void *)&actor->flags2D4);
-    actor->direction = Math_Atan2(dx, dz);
+    actor->body.direction = Math_Atan2(dx, dz);
     *timer = 38;
     actor->field2DC = 0x40000;
     actor->field2D8 = 0;
@@ -255,7 +255,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
         }
         actor->field2E0 = 32;
         if ((!Test(gEngineFlags, 0x4800)) && (!Flag2D0(actor, 0x800)))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
     } else {
         SetHitFlags(0x20, (void *)&actor->flags2D4);
         {

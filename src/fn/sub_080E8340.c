@@ -8,7 +8,7 @@ static inline u32 actorFlags(struct SceneActorRegistryResetView *actor, u32 mask
 static inline u8 reactionStarted(struct SceneActorRegistryResetView *actor,
                                  struct SceneActorReactionMotion **out)
 {
-    struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+    struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
     u32 mask = 8;
     u32 flags = motion->flags & mask;
     *out = motion;

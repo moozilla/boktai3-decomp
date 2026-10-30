@@ -168,7 +168,7 @@ void Octopus_ReturnToRoutePoint(struct SceneActorRegistryResetView *actor)
         }
         Hide(actor);
         ((struct OctopusDrawable *)actor->drawable)->mode = 3;
-        SpriteParticle_SpawnBatch(&actor->position, 1, 2, 1, 0x154);
+        SpriteParticle_SpawnBatch(&actor->body.position, 1, 2, 1, 0x154);
         Sound_PlaySong(0x1D9);
         SceneActorTerrain_DisableCollision(actor);
         {
@@ -178,7 +178,7 @@ void Octopus_ReturnToRoutePoint(struct SceneActorRegistryResetView *actor)
         }
         SetCtl(actor, SceneActorControl_OnIdle, 16);
         SetState(actor, 3, 0, 0);
-        dest = &actor->position;
+        dest = &actor->body.position;
         {
             struct GolemRouteLink *link = (void *)(group + 0x74);
             dest->x = link->point->x;
@@ -186,8 +186,8 @@ void Octopus_ReturnToRoutePoint(struct SceneActorRegistryResetView *actor)
             dest->y = CellHeight(dest, CellIndex(dest));
         }
         if (actor->drawableKind == 0)
-            *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = actor->position;
+            *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = actor->body.position;
         else
-            *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->position;
+            *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->body.position;
     }
 }

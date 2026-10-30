@@ -40,7 +40,7 @@ static inline void BeginProbeTurn(void *obj, u32 saved)
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
     if (!ActorMotionFlags(actor, 0x400) && !Test16((u16 *)((u8 *)actor + 0x414), 4)) {
-        s32 prior = actor->direction;
+        s32 prior = actor->body.direction;
         s32 tries = 0;
         s32 choice;
         do {
@@ -71,7 +71,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
         mask &= value;
         *field = mask;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     speed = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
     {

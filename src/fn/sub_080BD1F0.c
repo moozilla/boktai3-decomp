@@ -128,9 +128,9 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
     do {                                                                                           \
         struct ContactPosition vec;                                                                \
         struct ContactPosition pos;                                                                \
-        u32 angle = (actor->direction + 0x80) & 0xFF;                                              \
+        u32 angle = (actor->body.direction + 0x80) & 0xFF;                                              \
         Polar(&vec, angle, 10);                                                                    \
-        pos = actor->position;                                                                     \
+        pos = actor->body.position;                                                                     \
         pos.y += 200;                                                                              \
         vec.y = 54;                                                                                \
         sub_08127590(&pos, &vec, 0xD45E, 0x1DC3, kind, 0x1A, 2, 0, 0x13C, 0, 0, 0, 0, 0, 0);       \
@@ -325,14 +325,14 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         u16 script = *(u16 *)((u8 *)actor + 0x1F8);
         if (script) {
             struct ScriptUtilityArguments arguments;
-            values[0] = actor->position.x;
-            values[1] = actor->position.y;
-            values[2] = actor->position.z;
+            values[0] = actor->body.position.x;
+            values[1] = actor->body.position.y;
+            values[2] = actor->body.position.z;
             values[3] = *(s32 *)((u8 *)actor + 0x1FC);
             values[4] = *(s32 *)((u8 *)actor + 0x200);
             values[5] = *(s32 *)((u8 *)actor + 0x204);
             values[6] = actor->field2E0;
-            values[7] = actor->id;
+            values[7] = actor->body.id;
             arguments.count = 8;
             arguments.values = values;
             Script_Call(script, &arguments);
@@ -353,17 +353,17 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             range.y = 60;
             range.z = 60;
             table = gRandomTable;
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x20,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x20,
                                 count, life, size, one = 1);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x40,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x40,
                                 count, life, size, one);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x5E,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x5E,
                                 count, life, size, one);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x80,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x80,
                                 count, life, size, one);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0xC4,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xC4,
                                 count, life, size, one);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0xF0,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xF0,
                                 count, life, size, one);
             category = *categoryp;
             if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
@@ -433,14 +433,14 @@ notHidden:
             u16 script = *(u16 *)((u8 *)actor + 0x1F8);
             if (script) {
                 struct ScriptUtilityArguments arguments;
-                values[0] = actor->position.x;
-                values[1] = actor->position.y;
-                values[2] = actor->position.z;
+                values[0] = actor->body.position.x;
+                values[1] = actor->body.position.y;
+                values[2] = actor->body.position.z;
                 values[3] = *(s32 *)((u8 *)actor + 0x1FC);
                 values[4] = *(s32 *)((u8 *)actor + 0x200);
                 values[5] = *(s32 *)((u8 *)actor + 0x204);
                 values[6] = actor->field2E0;
-                values[7] = actor->id;
+                values[7] = actor->body.id;
                 arguments.count = 8;
                 arguments.values = values;
                 Script_Call(script, &arguments);
@@ -473,14 +473,14 @@ notHidden:
             u16 script = *(u16 *)((u8 *)actor + 0x1F8);
             if (script) {
                 struct ScriptUtilityArguments arguments;
-                values[0] = actor->position.x;
-                values[1] = actor->position.y;
-                values[2] = actor->position.z;
+                values[0] = actor->body.position.x;
+                values[1] = actor->body.position.y;
+                values[2] = actor->body.position.z;
                 values[3] = *(s32 *)((u8 *)actor + 0x1FC);
                 values[4] = *(s32 *)((u8 *)actor + 0x200);
                 values[5] = *(s32 *)((u8 *)actor + 0x204);
                 values[6] = actor->field2E0;
-                values[7] = actor->id;
+                values[7] = actor->body.id;
                 arguments.count = 8;
                 arguments.values = values;
                 Script_Call(script, &arguments);
@@ -503,17 +503,17 @@ notHidden:
             range.y = 60;
             range.z = 60;
             table = gRandomTable;
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x20,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x20,
                                 count, life, size, one = 1);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x40,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x40,
                                 count, life, size, one);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x5E,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x5E,
                                 count, life, size, one);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x80,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x80,
                                 count, life, size, one);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0xC4,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xC4,
                                 count, life, size, one);
-            SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0xF0,
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xF0,
                                 count, life, size, one);
             category = *categoryp;
             if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
@@ -521,7 +521,7 @@ notHidden:
                 Sound_PlaySong(0xE5);
         }
         if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->body.id);
     }
     ActorShadow_Disable((u8 *)actor + 0x320);
 }

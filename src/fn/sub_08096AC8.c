@@ -86,7 +86,7 @@ void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
         }
         FIELD(actor, 0x2EC, s16) = Scale(gUnk_086149C4[angle] * 64);
         FIELD(actor, 0x2F0, s16) = Scale(gUnk_086149C4[(angle + 64) & 255] * 64);
-        actor->direction = Math_Atan2(FIELD(actor, 0x2EC, s16), FIELD(actor, 0x2F0, s16)) - 128;
+        actor->body.direction = Math_Atan2(FIELD(actor, 0x2EC, s16), FIELD(actor, 0x2F0, s16)) - 128;
     }
     if (actor->field2B0) {
         Bee_ClearActionFlags(actor);

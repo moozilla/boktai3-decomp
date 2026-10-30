@@ -48,7 +48,7 @@ static inline void Turn(u8 saved, void *ctx, void *g)
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
         return;
-    group[0x204] = PickTurn(actor->direction);
+    group[0x204] = PickTurn(actor->body.direction);
     {
         struct MummySavedControl *save = (struct MummySavedControl *)(group + 0x8C);
         save->target = actor->target;
@@ -114,7 +114,7 @@ static inline u8 Arrive(void *obj)
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
     }
     {
-        u8 saved = actor->direction;
+        u8 saved = actor->body.direction;
         Turn(saved, obj, (u8 *)&actor->group);
     }
     sub_0807E334(actor);
@@ -133,7 +133,7 @@ reroute: {
         data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->position, &target))
+    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->body.position, &target))
         return 1;
     Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }
@@ -160,7 +160,7 @@ struct MummyRoute {
 };
 static inline void PickRoute(struct SceneActorRegistryResetView *actor)
 {
-    struct MummyRoute *route = actor->currentRoute;
+    struct MummyRoute *route = actor->body.currentRoute;
     u8 pick = Mod((s32)Chase_RandomBits(0xffff) >> 3, route->definition[0]);
     if (pick == route->choice)
         pick = Mod(pick + 1, route->definition[0]);
@@ -181,7 +181,7 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
         actor->flags2CC &= ~0x80;
         *((u16 *)(group + 0x54)) = 0;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if (((s32)actor->counter2AC) > 60) {
         {
@@ -193,7 +193,7 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
         SaveDelay(group + 0x8c, *((void **)(group + 0x48)), 12, 30);
         Chase_SetState(actor, 3, 1, 0);
         if ((*((u16 *)(body + 0x6d2))) &&
-            (actor->terrainCell == (*((u16 *)((*((u8 **)(actor->fieldDC + 0x1c))) + 6))))) {
+            (actor->terrainCell == (*((u16 *)((*((u8 **)((u8 *)actor->tracking.target + 0x1c))) + 6))))) {
             if (Mummy_RequestStraightRoute(actor))
                 return;
             PickRoute(actor);

@@ -49,7 +49,7 @@ void Slime_EmitScatteredReactionBurst(struct SceneActorRegistryResetView *input)
     u32 *flags;
     u16 *value;
     struct ContactPosition *position;
-    Delta(&velocity, &actor->position, (void *)(actor->fieldDC + 12));
+    Delta(&velocity, &actor->body.position, &actor->tracking.target->position);
     angle = Random() & 255;
     Polar(angle + jitter, &velocity, (Random() & 7) + 12);
     velocity.y = 48;
@@ -58,15 +58,15 @@ void Slime_EmitScatteredReactionBurst(struct SceneActorRegistryResetView *input)
         palette = &actor->basePaletteBank;
         offset = &actor->paletteOffset;
         sum = *palette + *offset;
-        power = &actor->fieldB6;
+        power = &actor->attacks.first[1];
         attack = *power;
-        parameter = &actor->fieldBE;
+        parameter = &actor->attacks.second[1];
         response = *parameter;
-        flags = &actor->wordD0;
+        flags = &actor->attacks.flags[1];
         bits = *flags | variant;
-        value = &actor->fieldC6;
+        value = &actor->attacks.parameter[1];
         v = *value;
-        position = &actor->position;
+        position = &actor->body.position;
         sub_08127590(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 0, 0, attack, response,
                      bits, v);
     }

@@ -74,8 +74,8 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         sample = *(const u16 *)(RANDOM_TABLE_ADDR + index);
         sample &= 3;
         count = sample + 1;
-        SparkParticle_Spawn(&actor->position, count, (const struct ContactPosition *)&range,
-                            actor->direction + 128, 10, 6, 2, 2);
+        SparkParticle_Spawn(&actor->body.position, count, (const struct ContactPosition *)&range,
+                            actor->body.direction + 128, 10, 6, 2, 2);
     }
     dx = Mummy_ReadDisplacementAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
     dz = Mummy_ReadDisplacementAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
@@ -87,8 +87,8 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         dz = 200;
     else if (dz < -200)
         dz = -200;
-    actor->motion.x += dx;
-    actor->motion.z += dz;
+    actor->body.motion.x += dx;
+    actor->body.motion.z += dz;
     *x += dx;
     *z += dz;
     if (!Mummy_DisplacementStopped(dx, dz))
@@ -123,8 +123,8 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
             if (!SceneActorChase_TryRoute(
-                    actor, group->route, &actor->position,
-                    &((struct SceneActorChaseTracking *)&actor->fieldDC)->target->position)) {
+                    actor, group->route, &actor->body.position,
+                    &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
@@ -139,8 +139,8 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     SceneActorChase_TrackPlayer(actor);
     if (!SceneActorChase_Arrive(actor)) {
         if (!SceneActorChase_TryRoute(
-                actor, group->route, &actor->position,
-                &((struct SceneActorChaseTracking *)&actor->fieldDC)->target->position)) {
+                actor, group->route, &actor->body.position,
+                &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return;
         }

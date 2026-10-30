@@ -59,7 +59,7 @@ void sub_08072854(void)
             u16 cellFlags = *(u16 *)(SceneActorTerrain_GetCell(actor->terrainCell) + 2);
 
             if ((cellFlags & 0x40) &&
-                actor->position.y + (s16)actor->field2EA <= actor->groundHeight2BE) {
+                actor->body.position.y + (s16)actor->field2EA <= actor->groundHeight2BE) {
                 if (!Sub08072854_Blocked(actor)) {
                     void *sink = *(void **)((u8 *)actor + 0x238);
                     if (!sink)
@@ -72,7 +72,7 @@ void sub_08072854(void)
                 u8 *collider = (u8 *)actor + 0x134;
 
                 SceneActorTerrain_GetCenter(actor->terrainCell, &center);
-                SceneActorTerrain_Subtract(&delta, &center, &actor->position);
+                SceneActorTerrain_Subtract(&delta, &center, &actor->body.position);
                 actor->field2B6 = Math_Atan2(delta.x, delta.z) >> 5;
                 actor->field2E0 = 0x20;
                 *(s16 *)(collider + 0x3E) = actor->health;

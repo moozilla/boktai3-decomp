@@ -71,7 +71,7 @@ void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView 
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
         BeginControlZero(actor, actor->entryTarget224, 2);
     }
-    if (!(u8)Callback_InvokeActor(actor, actor->update270)) {
+    if (!(u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
         result = sub_0812F3CC(actor);
         if (!result) {
             if (HasFinishedControl(actor)) {

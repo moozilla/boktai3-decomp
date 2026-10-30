@@ -58,7 +58,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, s32 z
 void SceneActorReaction_WaitForAdjacentTarget(struct SceneActorRegistryResetView *a)
 {
     struct AdjacentWaitContext *ctx = a->context;
-    struct AdjacentWaitTarget *target = (void *)a->fieldDC;
+    struct AdjacentWaitTarget *target = (void *)a->tracking.target;
     s32 found;
     s32 zero;
     if (SceneActorControl_TakeFlag(&a->field2B1))
@@ -72,8 +72,8 @@ void SceneActorReaction_WaitForAdjacentTarget(struct SceneActorRegistryResetView
     } else
         ctx->missed = 0;
     if ((s32)a->counter2AC > 30 && (zero = ctx->missed) == 0) {
-        struct ContactPosition *position = &a->position;
-        a->direction =
+        struct ContactPosition *position = &a->body.position;
+        a->body.direction =
             Math_Atan2(target->position.x - position->x, target->position.z - position->z);
         BeginControl(a, zero);
     }

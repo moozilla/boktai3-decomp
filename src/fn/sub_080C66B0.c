@@ -49,7 +49,7 @@ void Golem_UpdateRouteMotion(struct SceneActorRegistryResetView *actor, u32 fram
         variantPointer = &directionVariant;
         {
             u8 *mirrorAddress = &mirror;
-            s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+            s32 quadrant = (((s32)actor->body.direction + 0x60) >> 6) & 3;
             mirrorPointer = mirrorAddress;
             flags2D4 = initialFlags;
             if (quadrant > 1) {

@@ -174,7 +174,7 @@ void Lun_RenewPlayerRoute(struct SceneActorRegistryResetView *actor)
         Lun_SetMovementEndpoints(actor, ((u8 **)gPlayers)[0] + 0x30);
         sub_0809CCF4(actor);
         State(actor, 0, 0, 1);
-        Delta(&delta, &actor->position, (void *)(((u8 **)gPlayers)[0] + 0x30));
+        Delta(&delta, &actor->body.position, (void *)(((u8 **)gPlayers)[0] + 0x30));
         *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }
     actor->counter2AC++;

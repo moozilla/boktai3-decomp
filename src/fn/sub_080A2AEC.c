@@ -106,8 +106,8 @@ static inline u8 Spider_MoveLanding(struct LandingState *s, struct SceneActorReg
         z = 200;
     else if (z < -200)
         z = -200;
-    a->motion.x += x;
-    a->motion.z += z;
+    a->body.motion.x += x;
+    a->body.motion.z += z;
     *cx += x;
     *cz += z;
     if (!x && !z)
@@ -158,7 +158,7 @@ void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame
         Spider_AddMotionFlags(a, 0x80);
         a->group.field418 = a->group.field416;
         Spider_ClearMotionFlags(a, ~0x20);
-        a->direction = a->fieldE9;
+        a->body.direction = a->tracking.heading;
         {
             u32 mask = 0x10;
             *flags |= mask;

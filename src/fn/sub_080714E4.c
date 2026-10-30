@@ -18,14 +18,14 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
     route->fieldC = route->parameterC;
     category = actor->category;
     if (category - 18 > 1 && category != 9 && category != 22) {
-        struct ContactPosition *earlyPosition = &actor->position;
+        struct ContactPosition *earlyPosition = &actor->body.position;
         Path_GetPointPositionById((u16 *)earlyPosition, route->parameterA, route->parameterC);
         Route_Start(route, route->parameterA, route->parameterB, route->parameterC);
         ProximityVolume_TranslateBounds(actor->routeObject, earlyPosition);
-        actor->currentRoute = route;
+        actor->body.currentRoute = route;
     }
     {
-        struct ContactPosition *lowPosition = &actor->position;
+        struct ContactPosition *lowPosition = &actor->body.position;
         x = lowPosition->x >> 8;
         z = lowPosition->z >> 8;
         cachedPosition = lowPosition;
@@ -60,17 +60,17 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
             height -= (u8)position->x;
             break;
     }
-    actor->position.y = height;
+    actor->body.position.y = height;
     if (!actor->drawableKind)
-        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->position;
+        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->body.position;
     else
-        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->position;
+        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->body.position;
     {
         u16 *address;
         u32 zero;
         {
-            u32 direction = actor->direction120;
-            u8 *destination = &actor->direction;
+            u32 direction = actor->saved.direction;
+            u8 *destination = &actor->body.direction;
             zero = 0;
             *destination = direction;
         }
@@ -80,7 +80,7 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
             u32 offset = 0x2EC;
             Memory_Clear((u8 *)actor + offset, 8);
         }
-        Memory_Clear(&actor->motion, 8);
+        Memory_Clear(&actor->body.motion, 8);
         control = &group->control;
         {
             u32 mask = 0x200000;

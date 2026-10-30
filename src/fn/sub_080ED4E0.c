@@ -30,7 +30,7 @@ s32 Player_BeginPositionRequest(void *, struct SceneVec *, struct SceneVec *, s3
 void sub_0807D2E0(void *, u32, struct ContactPosition *, u32, u32, u32);
 static inline void Ivy_Facing(struct SceneActorRegistryResetView *actor, u8 *quadrant, u8 *flip)
 {
-    s32 side = ((actor->direction + 0x60) >> 6) & 3;
+    s32 side = ((actor->body.direction + 0x60) >> 6) & 3;
     if (side > 1) {
         *flip = 1;
         *quadrant = 3 - side;
@@ -68,7 +68,7 @@ static inline void Ivy_DisableContact(struct SceneActorRegistryResetView *actor)
 inline static void Ivy_Facing_080ED4E0(struct SceneActorRegistryResetView *actor, u8 *quadrant,
                                        u8 *flip)
 {
-    s16 side = ((actor->direction + 0x60) >> 6) & 3;
+    s16 side = ((actor->body.direction + 0x60) >> 6) & 3;
     if (side > 1) {
         *flip = 1;
         *quadrant = 3 - side;
@@ -109,10 +109,10 @@ void Ivy_UpdateGrabAttempt(struct SceneActorRegistryResetView *actor)
             Chase_SetCtl(actor, Ivy_UpdateHold, 0x25);
             Ivy_SetState(actor, 2, 1);
             Ivy_Facing_080ED4E0(actor, &quadrant, &flip);
-            position.x = actor->position.x + gUnk_08606384[flip][sequence->index].x;
-            position.y = actor->position.y + gUnk_08606384[flip][sequence->index].y;
-            position.z = actor->position.z + gUnk_08606384[flip][sequence->index].z;
-            target = (void *)actor->fieldDC;
+            position.x = actor->body.position.x + gUnk_08606384[flip][sequence->index].x;
+            position.y = actor->body.position.y + gUnk_08606384[flip][sequence->index].y;
+            position.z = actor->body.position.z + gUnk_08606384[flip][sequence->index].z;
+            target = (void *)actor->tracking.target;
             if (target->kind <= 3) {
                 Player_BeginPositionRequest(((void **)gPlayers)[target->kind], (void *)(&position),
                                             0, 0, flip, 0, 0, 0, 0);

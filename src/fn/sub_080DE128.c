@@ -59,16 +59,16 @@ void Dog_SelectTargetAction(struct SceneActorRegistryResetView *actor)
     u8 *nav = (u8 *)&actor->group;
     if (ActorFlag(actor, 0x100))
         return;
-    if (actor->distanceF0 < actor->rangeF4) {
+    if (actor->tracking.distance < actor->tracking.range) {
         struct ContactPosition delta;
         s32 difference, angle;
         {
             struct ContactPosition *out = &delta;
-            struct ContactPosition *from = &actor->position;
-            struct ContactPosition *to = &((struct ChaseTarget *)actor->fieldDC)->position;
+            struct ContactPosition *from = &actor->body.position;
+            struct ContactPosition *to = &((struct ChaseTarget *)actor->tracking.target)->position;
             SceneActorTerrain_Subtract(out, to, from);
         }
-        difference = Math_Atan2(delta.x, delta.z) - actor->direction;
+        difference = Math_Atan2(delta.x, delta.z) - actor->body.direction;
         if (difference > 128)
             difference -= 256;
         else if (difference < -128)
@@ -77,7 +77,7 @@ void Dog_SelectTargetAction(struct SceneActorRegistryResetView *actor)
         if (angle <= 23) {
             u32 mode = FIELD(actor, 0x1E6, u16);
             if (mode == 0 || mode == 2) {
-                if (actor->distanceF0 < FIELD(context, 0x67C, u32) && !FIELD(context, 0x698, u16)) {
+                if (actor->tracking.distance < FIELD(context, 0x67C, u32) && !FIELD(context, 0x698, u16)) {
                     Response(actor, nav, 0, 0x75);
                     return;
                 }
@@ -86,11 +86,11 @@ void Dog_SelectTargetAction(struct SceneActorRegistryResetView *actor)
                     return;
                 goto move;
             } else {
-                if (actor->distanceF0 < FIELD(context, 0x67C, u32) && !FIELD(context, 0x698, u16)) {
+                if (actor->tracking.distance < FIELD(context, 0x67C, u32) && !FIELD(context, 0x698, u16)) {
                     Response(actor, nav, 0, 0x82);
                     return;
                 }
-                if (actor->distanceF0 < FIELD(context, 0x680, u32) && angle <= 5 &&
+                if (actor->tracking.distance < FIELD(context, 0x680, u32) && angle <= 5 &&
                     !FIELD(context, 0x69A, u16)) {
                     Response(actor, nav, 1, 0x87);
                     return;

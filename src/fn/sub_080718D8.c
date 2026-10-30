@@ -89,7 +89,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
         register u32 fieldOffset asm("r4");
         u32 *branchFlags = &actor->flags2CC;
         {
-            u32 sourceOffset = ACTOR_OFFSET(defaultFlags2CC);
+            u32 sourceOffset = ACTOR_OFFSET(saved.behaviorFlags);
             u32 value;
             {
                 u32 *source = (u32 *)((u8 *)actor + sourceOffset);
@@ -104,7 +104,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             u32 value;
             asm("" : "+r"(destinationOffset));
             address = (u32 *)((u8 *)actor + destinationOffset);
-            sourceOffset = ACTOR_OFFSET(defaultFlags2D0);
+            sourceOffset = ACTOR_OFFSET(saved.statusFlags);
             asm("" : "+r"(sourceOffset));
             {
                 register u32 *source asm("r0") = (u32 *)((u8 *)actor + sourceOffset);
@@ -112,15 +112,15 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             }
             *address = value;
         }
-        parameterOffset = ACTOR_OFFSET(direction120);
+        parameterOffset = ACTOR_OFFSET(saved.direction);
         {
             u32 direction = *((u8 *)actor + parameterOffset);
-            u8 *destination = &actor->direction;
+            u8 *destination = &actor->body.direction;
             wordZero = 0;
             *destination = direction;
         }
         {
-            register u32 sourceOffset asm("r1") = ACTOR_OFFSET(defaultState);
+            register u32 sourceOffset asm("r1") = ACTOR_OFFSET(saved.state);
             u8 *address;
             u32 value;
             asm("" : "+r"(sourceOffset));
@@ -144,7 +144,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
         {
             const void **address = (const void **)((u8 *)actor + parameterOffset);
             const void *value;
-            fieldOffset = ACTOR_OFFSET(defaultControl);
+            fieldOffset = ACTOR_OFFSET(saved.control);
             {
                 const void **source = (const void **)((u8 *)actor + fieldOffset);
                 value = *source;
@@ -225,7 +225,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             offset2 += 0xF0;
             address = (u8 *)actor + offset2;
             *address = byteZero;
-            actor->fieldDC = wordZero;
+            actor->tracking.target = wordZero;
         }
         SceneActorPalette_ClearCompletedTransitions();
     } else {
@@ -240,7 +240,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             branchFlags = (u32 *)((u8 *)actor + offset);
         }
         {
-            u32 sourceOffset = ACTOR_OFFSET(defaultFlags2CC);
+            u32 sourceOffset = ACTOR_OFFSET(saved.behaviorFlags);
             u32 value;
             {
                 u32 *source = (u32 *)((u8 *)actor + sourceOffset);
@@ -254,7 +254,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             register u32 sourceOffset asm("r3");
             u32 value;
             address = (u32 *)((u8 *)actor + offset);
-            sourceOffset = ACTOR_OFFSET(defaultFlags2D0);
+            sourceOffset = ACTOR_OFFSET(saved.statusFlags);
             asm("" : "+r"(sourceOffset));
             {
                 register u32 *source asm("r0") = (u32 *)((u8 *)actor + sourceOffset);
@@ -262,14 +262,14 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             }
             *address = value;
         }
-        parameterOffset = ACTOR_OFFSET(direction120);
+        parameterOffset = ACTOR_OFFSET(saved.direction);
         {
             u32 direction = *((u8 *)actor + parameterOffset);
 
-            actor->direction = direction;
+            actor->body.direction = direction;
         }
         {
-            u32 sourceOffset = ACTOR_OFFSET(defaultState);
+            u32 sourceOffset = ACTOR_OFFSET(saved.state);
             u8 *address;
             u32 value;
             address = (u8 *)actor + sourceOffset;
@@ -292,7 +292,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
         {
             const void **address = (const void **)((u8 *)actor + parameterOffset);
             const void *value;
-            fieldOffset = ACTOR_OFFSET(defaultControl);
+            fieldOffset = ACTOR_OFFSET(saved.control);
             asm("" : "+r"(fieldOffset));
             {
                 const void **source = (const void **)((u8 *)actor + fieldOffset);
@@ -379,7 +379,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             actor->field2E6 = wordZero;
             offset1 += 0xF4;
             actor->field3CC = byteZero;
-            actor->fieldDC = wordZero;
+            actor->tracking.target = wordZero;
             offset2 -= 0x24;
             address = (u8 *)actor + offset2;
             actor->field2B8 = wordZero;
@@ -475,9 +475,9 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             asm("" : "+r"(offset2));
             address = (void **)((u8 *)actor + offset2);
             attachment = *address;
-            attachment = ActorAttachment_ReleaseResource(attachment, 1, actor->id);
+            attachment = ActorAttachment_ReleaseResource(attachment, 1, actor->body.id);
             *address = attachment;
-            attachment = ActorAttachment_ReleasePartsResource(attachment, 3, actor->id);
+            attachment = ActorAttachment_ReleasePartsResource(attachment, 3, actor->body.id);
             *address = attachment;
         }
     }

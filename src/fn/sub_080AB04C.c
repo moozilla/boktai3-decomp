@@ -58,7 +58,7 @@ void TentacleActor_ResolveBlockedMovement(struct SceneActorRegistryResetView *ac
     if (IsInactive(actor))
         return;
     trail = actor->context;
-    Add(&target, &actor->position, &actor->secondaryMotion);
+    Add(&target, &actor->body.position, &actor->secondaryMotion);
     index = SceneActorTerrain_GetCellIndex(&target);
     attributes = ((u16 *)SceneActorTerrain_GetCell(index))[1];
     height = Height(index, &target);
@@ -78,9 +78,9 @@ void TentacleActor_ResolveBlockedMovement(struct SceneActorRegistryResetView *ac
             s32 difference;
             trail[0x8e9] = (trail[0x8e9] + 1) & 3;
             TentacleActor_SelectWanderRoute(actor);
-            Delta(&target, &actor->position, (void *)(trail + 0x904));
+            Delta(&target, &actor->body.position, (void *)(trail + 0x904));
             *((u8 *)actor + 0x3cd) = Math_Atan2(target.x, target.z);
-            difference = *((u8 *)actor + 0x3cd) - actor->direction;
+            difference = *((u8 *)actor + 0x3cd) - actor->body.direction;
             if (difference > 128)
                 difference += -256;
             else if (difference < -128)

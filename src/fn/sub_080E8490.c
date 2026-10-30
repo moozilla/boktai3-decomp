@@ -39,7 +39,7 @@ void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *actor
     u16 *flags;
     resetState(actor, 0x11);
     setControl(actor, SceneActorControl_OnIdle, 0x10);
-    motion = (void *)&actor->fieldDC;
+    motion = (void *)&actor->tracking.target;
     motion->fieldDC = 0;
     actor->field2C2 = 0x40;
     actor->group.flags414 = 0;

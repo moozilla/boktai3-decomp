@@ -60,8 +60,8 @@ static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct Approac
                        u32 bits)
 {
     void *route = group->routeObject;
-    struct ContactPosition *position = &actor->position;
-    u8 *target = *(u8 **)&actor->fieldDC;
+    struct ContactPosition *position = &actor->body.position;
+    u8 *target = *(u8 **)&actor->tracking.target;
     struct ContactPosition *destination = (void *)(target + 12);
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
@@ -73,7 +73,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct Approac
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             {
@@ -145,7 +145,7 @@ void Skeleton_BeginStationaryPursuit(struct SceneActorRegistryResetView *a)
     if (*(u16 *)(context + 0x6D8))
         return;
     SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
-    a->fieldDC = (u32)(((u8 **)gPlayers)[0] + 0x24);
+    a->tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
     a->field2C2 = Div(64, 3);
     if (MotionFlags(a, 0x80))
         OrFlags(&group->flags414, 4);

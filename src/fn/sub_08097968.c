@@ -154,7 +154,7 @@ void Ghost_ResetMovementState(struct SceneActorRegistryResetView *actor)
     context->speed = 0;
     context->a = 0;
     context->b = 0;
-    context->flags = actor->flags130;
+    context->flags = actor->saved.privateFlags;
     context->placement = *(struct IvyPlacement *)(((u8 **)gPlayers)[0] + 0x30);
     Fill((u8 *)context + 0x5EC, &tmp, 0);
     Fill((u8 *)context + 0x5F4, &tmp, 0);

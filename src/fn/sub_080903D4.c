@@ -40,15 +40,15 @@ static inline u16 *Offset(struct SceneActorRegistryResetView *actor)
 }
 static inline u16 *Power(struct SceneActorRegistryResetView *actor)
 {
-    return &actor->fieldB6;
+    return &actor->attacks.first[1];
 }
 static inline u16 *Parameter(struct SceneActorRegistryResetView *actor)
 {
-    return &actor->fieldBE;
+    return &actor->attacks.second[1];
 }
 static inline u32 *Flags(struct SceneActorRegistryResetView *actor)
 {
-    return &actor->wordD0;
+    return &actor->attacks.flags[1];
 }
 // confidence=low: launches three randomized reaction projectiles toward the current target.
 void Slime_EmitTargetedReactionBurst(struct SceneActorRegistryResetView *input)
@@ -58,7 +58,7 @@ void Slime_EmitTargetedReactionBurst(struct SceneActorRegistryResetView *input)
     s32 angle;
     u32 variant = Slime_GetRandomVariantFlags(actor);
     s16 jitter = Random() & 15;
-    Delta(&velocity, &actor->position, (void *)(actor->fieldDC + 12));
+    Delta(&velocity, &actor->body.position, &actor->tracking.target->position);
     angle = Math_Atan2(velocity.x, velocity.z);
     Polar(&velocity, angle + jitter, (Random() & 7) + 6);
     velocity.y = 48;
@@ -80,9 +80,9 @@ void Slime_EmitTargetedReactionBurst(struct SceneActorRegistryResetView *input)
         response = *parameter;
         flags = Flags(actor);
         bits = *flags | variant;
-        value = &actor->fieldC6;
+        value = &actor->attacks.parameter[1];
         v = *value;
-        position = &actor->position;
+        position = &actor->body.position;
         sub_08127590(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 0, 0, attack, response,
                      bits, v);
     }
@@ -107,9 +107,9 @@ void Slime_EmitTargetedReactionBurst(struct SceneActorRegistryResetView *input)
         response = *parameter;
         flags = Flags(actor);
         bits = *flags | variant;
-        value = &actor->fieldC6;
+        value = &actor->attacks.parameter[1];
         v = *value;
-        position = &actor->position;
+        position = &actor->body.position;
         sub_08127590(position, &velocity, 0xB96C, 0xA929, 7, 24, 0, 0, sum, 0, 0, attack, response,
                      bits, v);
     }
@@ -134,9 +134,9 @@ void Slime_EmitTargetedReactionBurst(struct SceneActorRegistryResetView *input)
         response = *parameter;
         flags = Flags(actor);
         bits = *flags | variant;
-        value = &actor->fieldC6;
+        value = &actor->attacks.parameter[1];
         v = *value;
-        position = &actor->position;
+        position = &actor->body.position;
         sub_08127590(position, &velocity, 0xB96C, 0xA929, 6, 24, 0, 0, sum, 1, 0, attack, response,
                      bits, v);
     }

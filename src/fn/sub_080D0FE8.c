@@ -243,7 +243,7 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
             difference = -difference;
         if (difference <= 0) {
             actor->field2B0 = 1;
-            actor->direction = ((((actor->direction + 0x60) >> 6) & 3) * 64) - 64;
+            actor->body.direction = ((((actor->body.direction + 0x60) >> 6) & 3) * 64) - 64;
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             if (TurnFlags(motionFlags, 0x400)) {
                 Chase_SetState(actor, 3, 1, 0);

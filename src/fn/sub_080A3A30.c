@@ -95,21 +95,21 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     if (ready)
         return;
     mesh = &((struct SpiderPursuitGroup *)group)->mesh;
-    if (!Nav_IsPositionInMesh(*mesh, &a->position, (*(u8 **)gPlayers) + 0x30))
+    if (!Nav_IsPositionInMesh(*mesh, &a->body.position, (*(u8 **)gPlayers) + 0x30))
         return;
     motionMask = 0x200;
     point = &((struct SpiderPursuitGroup *)group)->point;
-    *(*point) = a->position;
+    *(*point) = a->body.position;
     (*point)->pad = ready;
-    a->fieldDC = (u32)((*(u8 **)gPlayers) + 0x24);
+    a->tracking.target = (u32)((*(u8 **)gPlayers) + 0x24);
     SetState(a, 0, 0, 7);
     SetControl(a, a->entryTarget228, 1);
     terrain = *mesh;
-    dest = (void *)(a->fieldDC + 12);
-    if (Nav_IsPositionInMesh(terrain, &a->position, dest) &&
-        (result = Terrain_ApplyBlocked(terrain, &a->position, dest))) {
+    dest = &a->tracking.target->position;
+    if (Nav_IsPositionInMesh(terrain, &a->body.position, dest) &&
+        (result = Terrain_ApplyBlocked(terrain, &a->body.position, dest))) {
         if (result != 2)
-            Memory_Clear(&a->motion, 8);
+            Memory_Clear(&a->body.motion, 8);
     } else {
         ClearMotion_BeginPlayerPursuit(a, motionMask);
     }

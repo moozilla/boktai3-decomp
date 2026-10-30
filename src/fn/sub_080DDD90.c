@@ -14,7 +14,7 @@ void Dog_SelectTargetAction(struct SceneActorRegistryResetView *);
 void SceneActorControl_OnIdle(void);
 static inline u8 HasReaction(struct SceneActorRegistryResetView *p)
 {
-    struct SceneActorReactionMotion *motion = (void *)&p->fieldDC;
+    struct SceneActorReactionMotion *motion = (void *)&p->tracking.target;
     u32 mask = 8;
     if (mask & motion->flags)
         return 1;
@@ -96,5 +96,5 @@ void Dog_UpdateTargetGate(struct SceneActorRegistryResetView *p)
         And32(&p->flags114, ~1);
         p->word104 = active;
     }
-    OrMotion((struct SceneActorReactionMotion *)&p->fieldDC, 8);
+    OrMotion((struct SceneActorReactionMotion *)&p->tracking.target, 8);
 }

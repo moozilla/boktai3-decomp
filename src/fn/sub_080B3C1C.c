@@ -33,14 +33,14 @@ u8 sub_080B3C1C(struct SceneActorRegistryResetView *a)
         return 0;
     if (Callback_InvokeActor(a, a->update26C))
         return 1;
-    motion = (struct SceneActorReactionMotion *)&a->fieldDC;
+    motion = (struct SceneActorReactionMotion *)&a->tracking.target;
     if (!(motion->flags & 1))
         return 0;
     sawNode = a->flags2D4 & 0x100;
     if (sawNode)
         return 0;
     nodeSlot = (void **)((u8 *)a + 0x45C);
-    if (!a->distanceLimitF8)
+    if (!a->tracking.limit)
         return 0;
     contact = SceneActorContacts_SelectForActor(a, 6);
     if (!contact)

@@ -89,7 +89,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct SceneActorRegistryResetView *a
 
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if ((u8)sub_0812F3CC(actor))
         return;

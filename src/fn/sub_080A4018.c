@@ -61,7 +61,7 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
 {
     struct SpiderContext *ctx = input->context;
     struct SpiderGroupView *group = (void *)&input->group;
-    register struct Transform *transform asm("r5") = (void *)&input->id;
+    register struct Transform *transform asm("r5") = (void *)&input->body.id;
     struct ContactPackedVector target;
     register const u16 *table asm("r6") = gRandomTable;
     register u32 *indexAddress asm("sl") = &gRandomIndex;
@@ -77,7 +77,7 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     *(u32 *)field = index;
     {
         u16 sample = table[index];
-        field = &input->direction;
+        field = &input->body.direction;
         heading = SelectHeading(sample, field);
     }
     if (Mod(ReadCounter(input), 30) == 0) {
@@ -86,7 +86,7 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
         target.x = ((gUnk_086149C4[(heading + 64) & 255] * distance) >> 14) + transform->position.x;
         target.y = transform->position.y;
         target.z = ((gUnk_086149C4[heading] * distance) >> 14) + transform->position.z;
-        if (!Nav_IsPositionInMesh(input->routeObject, &input->position, (void *)(&target))) {
+        if (!Nav_IsPositionInMesh(input->routeObject, &input->body.position, (void *)(&target))) {
             if (!Test(ctx, 16))
                 input->field2C2 = 64;
             SceneActorMovement_ResolveRoutePosition(input);

@@ -93,7 +93,7 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct SceneActorRegistryRese
             Reaction_ClearHalf((void *)&collider->flags, 4);
             destination = *(struct ContactPosition **)(group + 0x200);
             Chase_SnapToRoute(destination, group + 0x74);
-            if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
+            if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position,
                                 *(struct ContactPosition **)(group + 0x200))) {
                 Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
                 Chase_SetState(actor, 3, 0, 0);

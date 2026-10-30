@@ -29,6 +29,6 @@ void ActorParticles_SpawnDirectionalBurst(struct SceneActorRegistryResetView *ac
         spread.z = (ActorParticles_NextRandom() & 7) + 3;
         count = (ActorParticles_NextRandom() & 1) + 2;
         sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
-                     (struct SceneExtent *)&actor->position, &velocity, &spread, 45, 31);
+                     (struct SceneExtent *)&actor->body.position, &velocity, &spread, 45, 31);
     }
 }

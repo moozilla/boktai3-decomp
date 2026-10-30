@@ -165,17 +165,17 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
             const u16 *raw = gRandomTable;
             table = raw;
         }
-        SparkParticle_Spawn(&actor->position, (FirstRandom(table) & 3) + 1, rangePointer, 32, 4,
+        SparkParticle_Spawn(&actor->body.position, (FirstRandom(table) & 3) + 1, rangePointer, 32, 4,
                             (life = 20), (mode = 2), (flag = 1));
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 64, 4,
+        SparkParticle_Spawn(&actor->body.position, (NextRandom(table) & 3) + 1, rangePointer, 64, 4,
                             life, mode, flag);
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 94, 4,
+        SparkParticle_Spawn(&actor->body.position, (NextRandom(table) & 3) + 1, rangePointer, 94, 4,
                             life, mode, flag);
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 128, 4,
+        SparkParticle_Spawn(&actor->body.position, (NextRandom(table) & 3) + 1, rangePointer, 128, 4,
                             life, mode, flag);
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 196, 4,
+        SparkParticle_Spawn(&actor->body.position, (NextRandom(table) & 3) + 1, rangePointer, 196, 4,
                             life, mode, flag);
-        SparkParticle_Spawn(&actor->position, (NextRandom(table) & 3) + 1, rangePointer, 240, 4,
+        SparkParticle_Spawn(&actor->body.position, (NextRandom(table) & 3) + 1, rangePointer, 240, 4,
                             life, mode, flag);
     }
     if (actor->category == 4 || actor->category == 1 || actor->category == 5 ||
@@ -187,14 +187,14 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         ActorParticles_SpawnWideBurst(actor);
     script = *(u16 *)((u8 *)actor + 0x1F8);
     if (script) {
-        values[0] = actor->position.x;
-        values[1] = actor->position.y;
-        values[2] = actor->position.z;
+        values[0] = actor->body.position.x;
+        values[1] = actor->body.position.y;
+        values[2] = actor->body.position.z;
         values[3] = *(s32 *)((u8 *)actor + 0x1FC);
         values[4] = *(s32 *)((u8 *)actor + 0x200);
         values[5] = *(s32 *)((u8 *)actor + 0x204);
         values[6] = actor->field2E0;
-        values[7] = actor->id;
+        values[7] = actor->body.id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);
@@ -228,7 +228,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         }
     }
     if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
-        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
     ActorShadow_Disable((u8 *)actor + 0x320);
 }
 

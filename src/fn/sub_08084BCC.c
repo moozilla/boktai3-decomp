@@ -60,7 +60,7 @@ struct WanderTriggerView {
 static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
                           s32 speed)
 {
-    struct WanderActorMotion *motion = (void *)&actor->id;
+    struct WanderActorMotion *motion = (void *)&actor->body.id;
     s32 spd = speed;
     s16 dx = saved->position.x - (u16)motion->position.x;
     s16 dz = saved->position.z - (u16)motion->position.z;

@@ -146,7 +146,7 @@ void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *actor)
     {
         u32 offset = *((u16 *)(context + 0xE44)) * 0x60;
         u8 *slot = context + offset;
-        *((struct ContactPosition *)(slot + 0x724)) = actor->position;
+        *((struct ContactPosition *)(slot + 0x724)) = actor->body.position;
     }
     {
         u32 offset = *((u16 *)(context + 0xE44)) * 0x60;

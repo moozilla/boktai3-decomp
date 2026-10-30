@@ -32,7 +32,7 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     struct SceneActorReactionMotion *savedMotion;
     struct ContactPosition *destination;
     if (((!Vorn_TestRestoreFlags(actor, 0x400000)) || (!Vorn_TestRestoreFlags(actor, 0x200000))) ||
-        (!Vorn_GetRestorableMotion((void *)(&actor->fieldDC), 1, &savedMotion)))
+        (!Vorn_GetRestorableMotion((void *)(&actor->tracking.target), 1, &savedMotion)))
         return 0;
     Vorn_SetRestoreFlags(actor, 0x100);
     actor->field2C2 = 64;

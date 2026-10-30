@@ -89,7 +89,7 @@ static inline s32 sub080D49DC_Gate(struct SceneActorRegistryResetView *actor, vo
         return 0;
     }
     if (res != 2)
-        Memory_Clear(&actor->motion, 8);
+        Memory_Clear(&actor->body.motion, 8);
     return 1;
 }
 
@@ -116,7 +116,7 @@ void sub_080D49DC(struct SceneActorRegistryResetView *actor)
     motion = (struct SceneActorReactionMotion *)((u8 *)actor + 0xDC);
     if (actor->field2B1)
         actor->field2B1 = 0;
-    if (Callback_InvokeActor(actor, actor->update270))
+    if (Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if (actor->counter2AC <= 60) {
         actor->counter2AC++;
@@ -220,14 +220,14 @@ void sub_080D49DC(struct SceneActorRegistryResetView *actor)
         sub080D49DC_Clip(state, cell);
         route = actor->routeObject;
         r = 0;
-        if (Nav_IsPositionInMesh(route, &actor->position, state)) {
+        if (Nav_IsPositionInMesh(route, &actor->body.position, state)) {
             {
-                s32 res = Terrain_ApplyBlocked(route, &actor->position, state);
+                s32 res = Terrain_ApplyBlocked(route, &actor->body.position, state);
                 if (res == 0) {
                     actor->flags2D4 &= ~0x200;
                 } else {
                     if (res != 2)
-                        Memory_Clear(&actor->motion, 8);
+                        Memory_Clear(&actor->body.motion, 8);
                     r = 1;
                 }
             }
@@ -254,7 +254,7 @@ void sub_080D49DC(struct SceneActorRegistryResetView *actor)
     }
 
 L4DA:
-    dir = actor->direction;
+    dir = actor->body.direction;
     if (actor->flags2D4 & 0x400)
         goto L640;
     if (group->flags414 & 4)
@@ -310,13 +310,13 @@ L67C:
     tmp.z = (dz << 8) + 0x80;
     route = actor->routeObject;
     r = 0;
-    if (Nav_IsPositionInMesh(route, &actor->position, &tmp)) {
-        s32 res = Terrain_ApplyBlocked(route, &actor->position, &tmp);
+    if (Nav_IsPositionInMesh(route, &actor->body.position, &tmp)) {
+        s32 res = Terrain_ApplyBlocked(route, &actor->body.position, &tmp);
         if (res == 0) {
             actor->flags2D4 &= ~0x200;
         } else {
             if (res != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             r = 1;
         }
     } else {
@@ -337,13 +337,13 @@ L74E:
         goto L7D0;
     route = actor->routeObject;
     r = 0;
-    if (Nav_IsPositionInMesh(route, &actor->position, (u8 *)motion->fieldDC + 0xC)) {
-        s32 res = Terrain_ApplyBlocked(route, &actor->position, (u8 *)motion->fieldDC + 0xC);
+    if (Nav_IsPositionInMesh(route, &actor->body.position, (u8 *)motion->fieldDC + 0xC)) {
+        s32 res = Terrain_ApplyBlocked(route, &actor->body.position, (u8 *)motion->fieldDC + 0xC);
         if (res == 0) {
             actor->flags2D4 &= ~0x200;
         } else {
             if (res != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             r = 1;
         }
     } else {

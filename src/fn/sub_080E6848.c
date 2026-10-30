@@ -47,7 +47,7 @@ void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
             mask &= *flags;
             *flags = mask;
         }
-        motion = (void *)&actor->fieldDC;
+        motion = (void *)&actor->tracking.target;
         {
             s32 mask = ~0x18;
             mask &= motion->flags;
@@ -75,5 +75,5 @@ void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
         motion->fieldDC = 0;
         setControl(actor, actor->savedTarget, 0);
     }
-    Callback_InvokeActor(actor, actor->update270);
+    Callback_InvokeActor(actor, actor->contactQuery.opaque);
 }

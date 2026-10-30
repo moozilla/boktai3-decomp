@@ -24,8 +24,8 @@ void SceneActorAnimation_EmitDirectionalTrail(struct SceneActorRegistryResetView
         sequence->elapsed = 0;
     }
     if (Mod(frame, 4) == 0) {
-        s32 direction = ((a->direction + 32) & 255) >> 6;
-        p.position = a->position;
+        s32 direction = ((a->body.direction + 32) & 255) >> 6;
+        p.position = a->body.position;
         switch (direction) {
             case 0:
                 p.packed.x += 128;

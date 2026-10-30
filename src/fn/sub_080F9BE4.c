@@ -75,7 +75,7 @@ void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         range.x = 60;
         range.y = 60;
         range.z = 40;
-        position.p = actor->position;
+        position.p = actor->body.position;
         {
             struct ContactPosition *op = &offset;
             buf.zero = 0;
@@ -123,14 +123,14 @@ void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     SceneActorBehavior_CallTerrainScript((void *)actor);
     script = *(u16 *)((u8 *)actor + 0x1F8);
     if (script) {
-        buf.values[0] = actor->position.x;
-        buf.values[1] = actor->position.y;
-        buf.values[2] = actor->position.z;
+        buf.values[0] = actor->body.position.x;
+        buf.values[1] = actor->body.position.y;
+        buf.values[2] = actor->body.position.z;
         buf.values[3] = *(s32 *)((u8 *)actor + 0x1FC);
         buf.values[4] = *(s32 *)((u8 *)actor + 0x200);
         buf.values[5] = *(s32 *)((u8 *)actor + 0x204);
         buf.values[6] = actor->field2E0;
-        buf.values[7] = actor->id;
+        buf.values[7] = actor->body.id;
         arguments.count = 8;
         arguments.values = buf.values;
         Script_Call(script, &arguments);

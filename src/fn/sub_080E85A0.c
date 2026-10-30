@@ -108,7 +108,7 @@ u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
         mask &= value;
         *flags = mask;
     }
-    if (actor->fieldDC) {
+    if (actor->tracking.target) {
         if (HasMode(actor->context)) {
             {
                 register u32 mask asm("r0") = 0x80;

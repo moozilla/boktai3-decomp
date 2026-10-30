@@ -45,8 +45,8 @@ void Ghoul_UpdateScriptedAction(struct SceneActorRegistryResetView *obj)
         *f &= mask;
         *((u32 *)(((u8 *)obj) + 0x104)) = zero;
         {
-            u32 byte = obj->fieldE9;
-            obj->direction = byte;
+            u32 byte = obj->tracking.heading;
+            obj->body.direction = byte;
         }
         SceneActorAttachment_ReplaceResponseSlot((u8 *)obj, 0, 0, obj->category);
         SceneActorBehavior_CallActionScript((u8 *)obj);

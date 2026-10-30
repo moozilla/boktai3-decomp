@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_RESET_H
 #define GUARD_SCENE_ACTOR_RESET_H
 #include "scene_actor_registry.h"
+#include "scene_actor_components.h"
 /* Extended reset-phase view; fields are offset names unless consumers establish a role. */
 struct SceneActorRegistryControl {
     u8 unknown0[8];
@@ -35,84 +36,58 @@ struct SceneActorRegistryResetView {
     void *drawable;
     u8 drawableKind;
     u8 unknown9[0x47];
-    u32 id;
-    u8 unknown54[5];
-    u8 direction;
-    u8 unknown5A[0x2];
-    struct ContactPosition position;
-    struct ContactPosition motion;
-    u8 unknown6C[0xC];
-    void *currentRoute;
-    u8 unknown7C[0x1C];
+    struct SceneActorBody body;
     u8 category;
-    u8 unknown99[0x3];
+    u8 unknown99;
+    u16 field9A;
     s16 health;
-    u8 unknown9E[8];
+    u8 field9E, field9F, fieldA0, fieldA1;
+    u16 fieldA2, fieldA4;
     s16 attachmentLimit; /* +0xA6: signed attachment restart threshold. */
     s16 fieldA8;
     u16 fieldAA;
-    u8 unknownAC[4];
+    u32 fieldAC;
     s16 defaultHealth;
-    u8 unknownB2[2];
-    u16 fieldB4;
-    u16 fieldB6;
-    u16 fieldB8;
-    u8 unknownBA[2];
-    u16 fieldBC;
-    u16 fieldBE;
-    u16 fieldC0;
-    u8 unknownC2[2];
-    u16 fieldC4, fieldC6;
-    u16 fieldC8;
-    u8 unknownCA[2];
-    u32 fieldCC;
-    u32 wordD0;
-    u32 wordD4;
-    u8 unknownD8[4];
-    u32 fieldDC;
-    struct ContactPosition destinationE0;
-    u8 unknownE8;
-    u8 fieldE9;
-    u8 unknownEA;
-    u8 flagsEB;
-    u8 unknownEC[4];
-    u32 distanceF0, rangeF4;
-    u32 distanceLimitF8; /* 080E8200: compared unsigned with distanceF0. */
-    u8 unknownFC[8];
+    u16 fieldB2;
+    struct SceneActorAttackParameters attacks;
+    struct SceneActorChaseTracking tracking;
+    u8 unknown100[4];
     u32 word104;
     u32 word108, word10C, word110;
     u32 flags114;
-    u32 defaultFlags2CC, defaultFlags2D0; /* +0x118/+0x11C: defaults for the named live fields. */
-    u8 direction120;
-    u8 defaultState, defaultPhase, defaultBehavior;
-    const void *defaultControl;
-    u8 defaultField2B5, unknown129[3];
-    u16 defaultField2EA, defaultFlags2C0;
-    u32 flags130;
+    struct SceneActorDefaultControl saved;
     struct ContactCollider colliderA;
     struct ContactCollider colliderB;
     u16 alternatePalette; /* +0x1DC: selected by status bit 0x4000. */
     u16 paletteBank;
     u16 basePaletteBank;
-    u8 unknown1E2[2];
+    u16 paletteAlternateBank;
     u16 alternateOffset; /* +0x1E4: alternate palette offset. */
     u16 paletteOffset;
     u16 field1E8;
     u16 field1EA;
-    u8 unknown1EC[0x30];
+    u32 field1EC, field1F0;
+    u8 unknown1F4[0x28];
     void *target;
-    u8 unknown220[4];
+    void *field220;
     void *entryTarget224;
     void *entryTarget228;
     void *savedTarget;
     void *reactionTarget230;
     void *deathControl; /* +0x234: controller installed by defeat dispatch. */
-    u8 unknown238[0x10];
+    void *field238, *field23C;
+    u32 field240;
+    u8 unknown244[4];
     void *callback248;
-    u8 unknown24C[0x20];
+    void *messageCallback;
+    union SceneActorCommandTable commandTable;
+    u8 unknown254[4];
+    void *updateCallback, *destroyCallback;
+    union SceneActorAnimationQuerySlot animationQuery;
+    void *damageCallback, *contactCallback;
     void *update26C;
-    void *update270;
-    u8 unknown274[8];
+    union SceneActorContactQuerySlot contactQuery;
+    void *contextCallback, *defaultReaction;
     void **callbacks27C, **callbacks280, **callbacks284;
     void **alternateBehaviorCallbacks; /* +0x288: indexed by behavior2AA. */
     void **behaviorCallbacks;          /* +0x28C: indexed by behavior2AA. */
@@ -123,7 +98,7 @@ struct SceneActorRegistryResetView {
     u8 state2A8, phase2A9, behavior2AA, unknown2AB;
     u32 counter2AC;
     u8 field2B0, field2B1, field2B2, field2B3;
-    u8 enabled, field2B5, field2B6, unknown2B7;
+    u8 enabled, field2B5, field2B6, animationIndex;
     u16 field2B8;
     u8 unknown2BA[4];
     u16 groundHeight2BE;
@@ -138,11 +113,13 @@ struct SceneActorRegistryResetView {
     u32 field2D8, field2DC, field2E0;
     u16 reactionSoundVariant;
     u16 field2E6;
-    u8 unknown2E8[2];
+    u16 field2E8;
     u16 field2EA;
     struct ContactPosition secondaryMotion;
     u16 terrainCell;
-    u8 unknown2F6[0xE];
+    u8 unknown2F6[4];
+    u16 regionId;
+    u8 unknown2FC[8];
     u32 field304;
     u32 profileId;
     u32 field30C;

@@ -163,7 +163,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                 }
                 break;
             case 1: {
-                s32 direction = actor->direction;
+                s32 direction = actor->body.direction;
                 s32 delta;
                 if (direction >= 0)
                     direction >>= 5;
@@ -187,22 +187,22 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                 break;
             }
             case 2:
-                actor->direction = ((u8)command->args[0] + 5 & 7) << 5;
+                actor->body.direction = ((u8)command->args[0] + 5 & 7) << 5;
                 SetBehavior(actor, 2);
                 break;
             case 4:
                 SetBehavior(actor, 5);
                 break;
             case 8:
-                actor->direction = ((u8)command->args[0] + 5 & 7) << 5;
+                actor->body.direction = ((u8)command->args[0] + 5 & 7) << 5;
                 SetBehavior(actor, 6);
                 break;
             case 9:
-                actor->direction = ((u8)command->args[0] + 5 & 7) << 5;
+                actor->body.direction = ((u8)command->args[0] + 5 & 7) << 5;
                 SetBehavior(actor, 7);
                 break;
             case 10:
-                actor->direction = ((u8)command->args[0] + 5 & 7) << 5;
+                actor->body.direction = ((u8)command->args[0] + 5 & 7) << 5;
                 SetBehavior(actor, 8);
                 break;
             case 11:
@@ -210,13 +210,13 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                 break;
             case 5:
                 packet[0] = 6;
-                SceneActorRegistry_SendToActorId(category, packet, actor->id);
+                SceneActorRegistry_SendToActorId(category, packet, actor->body.id);
                 break;
             case 6:
                 packet[0] = 6;
                 packet[1] = command->args[0];
                 packet[2] = command->args[1];
-                SceneActorRegistry_SendToActorId(category, packet, actor->id);
+                SceneActorRegistry_SendToActorId(category, packet, actor->body.id);
                 break;
             case 7:
                 if (category == 23 || category == 18)
@@ -224,7 +224,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                 else
                     packet[0] = 8;
                 packet[1] = command->args[0];
-                SceneActorRegistry_SendToActorId(category, packet, actor->id);
+                SceneActorRegistry_SendToActorId(category, packet, actor->body.id);
                 break;
             case 3:
                 switch ((u32)command->args[0]) {
@@ -245,8 +245,8 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                         *initial = command->args[2];
                         SceneActorAttachment_SelectOffsets(category, 1, &y, &z);
                         attachment = ActorAttachment_CreateValueSpriteSlot(
-                            0, &actor->position, actor->id, y, z, category, value, *initial, 0,
-                            actor, &actor->id);
+                            0, &actor->body.position, actor->body.id, y, z, category, value, *initial, 0,
+                            actor, &actor->body.id);
                         break;
                     }
                     case 5: {
@@ -258,28 +258,28 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                         count = command->args[3];
                         SceneActorAttachment_SelectOffsets(category, 3, &y, &z);
                         attachment = ActorAttachment_CreatePartsSlotWithCount(
-                            7, &actor->position, actor->id, z, 0, value, *initial, count,
-                            &actor->id, actor);
+                            7, &actor->body.position, actor->body.id, z, 0, value, *initial, count,
+                            &actor->body.id, actor);
                         break;
                     }
                     case 6:
                         SceneActorAttachment_SelectOffsets(category, 1, &y, &z);
-                        attachment = ActorAttachment_UpdateFromDescriptor(attachment, &actor->id, 5,
+                        attachment = ActorAttachment_UpdateFromDescriptor(attachment, &actor->body.id, 5,
                                                                           0, 0, 0, z, y);
                         break;
                     case 7:
                         SceneActorAttachment_SelectOffsets(category, 1, &y, &z);
-                        attachment = ActorAttachment_UpdateFromDescriptor(attachment, &actor->id, 4,
+                        attachment = ActorAttachment_UpdateFromDescriptor(attachment, &actor->body.id, 4,
                                                                           0, 0, 0, z, y);
                         break;
                     case 8: {
                         void **slot = (void *)(group + 0xA0);
-                        *slot = ActorAttachment_ReleaseResource(*slot, 0, actor->id);
-                        *slot = ActorAttachment_ReleaseResource(*slot, 1, actor->id);
-                        *slot = ActorAttachment_ReleaseResource(*slot, 2, actor->id);
-                        *slot = ActorAttachment_ReleaseResource(*slot, 4, actor->id);
-                        *slot = ActorAttachment_ReleaseResource(*slot, 5, actor->id);
-                        *slot = ActorAttachment_ReleasePartsResource(*slot, 3, actor->id);
+                        *slot = ActorAttachment_ReleaseResource(*slot, 0, actor->body.id);
+                        *slot = ActorAttachment_ReleaseResource(*slot, 1, actor->body.id);
+                        *slot = ActorAttachment_ReleaseResource(*slot, 2, actor->body.id);
+                        *slot = ActorAttachment_ReleaseResource(*slot, 4, actor->body.id);
+                        *slot = ActorAttachment_ReleaseResource(*slot, 5, actor->body.id);
+                        *slot = ActorAttachment_ReleasePartsResource(*slot, 3, actor->body.id);
                         break;
                     }
                 }

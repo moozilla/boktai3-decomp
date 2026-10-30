@@ -63,7 +63,7 @@ void sub_0809AE0C(void *unused, struct ContactCollider *other,
             return;
         }
     }
-    distance = actor->position.y - gUnknown_02000580->position.y;
+    distance = actor->body.position.y - gUnknown_02000580->position.y;
     {
         s32 fast = gPlayerPassageState != 0 && gPlayerInteractionMode == 5;
         if (fast || gUnknown_02000580->actionMode == 4) {

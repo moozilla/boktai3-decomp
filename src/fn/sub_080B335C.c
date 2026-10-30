@@ -17,9 +17,9 @@ s32 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *p)
         return 0;
     if (TestFlag(p, 0x100))
         return 0;
-    if (p->distanceF0 > 0xFFFF)
+    if (p->tracking.distance > 0xFFFF)
         return 0;
-    difference = p->fieldE9 - p->direction;
+    difference = p->tracking.heading - p->body.direction;
     if (difference > 0x80)
         difference -= 0x100;
     else if (difference < -0x80)

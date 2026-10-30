@@ -143,7 +143,7 @@ static inline u8 MoveTo2(struct SceneActorRegistryResetView *actor, void *route,
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             {
@@ -159,7 +159,7 @@ static inline u8 MoveTo2(struct SceneActorRegistryResetView *actor, void *route,
 }
 static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
 {
-    register u32 current asm("r5") = actor->direction;
+    register u32 current asm("r5") = actor->body.direction;
     s32 i;
     u32 direction;
     const u16 *table = gRandomTable;
@@ -205,7 +205,7 @@ static inline u8 ReturnHome(void *p)
     struct SceneActorRegistryResetView *actor = p;
     struct ApproachGroup *group = (void *)&actor->group;
     struct ContactPosition *destination;
-    u8 **target = (u8 **)&actor->fieldDC;
+    u8 **target = (u8 **)&actor->tracking.target;
     u32 cell;
     s32 slot;
     u32 mask;
@@ -266,13 +266,13 @@ static inline u8 ReturnHome(void *p)
             group->destination->y = CellHeight(group->destination, CellIndex(group->destination));
             group->destination->pad = 0;
         }
-        Resume(p, actor->direction);
+        Resume(p, actor->body.direction);
         actor->field2C2 = 0x20;
         return 0;
     } else {
         struct ContactPosition center;
         SceneActorTerrain_GetCenter(cell, &center);
-        if (!MoveTo2(p, group->routeObject, &actor->position, &center)) {
+        if (!MoveTo2(p, group->routeObject, &actor->body.position, &center)) {
         fail:
             Callback_InvokeActor(actor, group->failure);
             return 0;
@@ -297,11 +297,11 @@ void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
     struct ApproachGroup *group = (void *)&actor->group;
     SceneActorReaction_ResetResponseState((u8 *)actor + 0x460, gUnk_0824E250, 0x4F5);
     context->attempts++;
-    if (actor->distanceF0 < context->nearDistance) {
+    if (actor->tracking.distance < context->nearDistance) {
         {
-            u8 *direction = &actor->direction;
+            u8 *direction = &actor->body.direction;
             s32 prior = *direction;
-            *direction = actor->fieldE9 + 0x80;
+            *direction = actor->tracking.heading + 0x80;
             if (!(u8)Skeleton_TrySelectRetreatCell(actor, prior))
                 return;
         }
@@ -309,16 +309,16 @@ void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
             SetControl(actor, SceneActorControl_OnIdle, 0x10);
             SetState(actor, 0, 0, 15);
         }
-    } else if (actor->distanceF0 > context->farDistance) {
-        if (!actor->fieldDC)
-            actor->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
+    } else if (actor->tracking.distance > context->farDistance) {
+        if (!actor->tracking.target)
+            actor->tracking.target = (u32)((u8 *)gPlayers[0] + 0x24);
         if (ReturnHome(actor)) {
             SetControl(actor, group->entryControl41C, 0x1A);
             SetState(actor, 0, 0, 12);
         }
     } else {
-        if (!actor->fieldDC)
-            actor->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
+        if (!actor->tracking.target)
+            actor->tracking.target = (u32)((u8 *)gPlayers[0] + 0x24);
         if (ReturnHome(actor)) {
             SetControl(actor, group->entryControl41C, 0x1A);
             SetState(actor, 0, 0, 12);

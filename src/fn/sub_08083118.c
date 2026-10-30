@@ -3,7 +3,7 @@
 void SceneActorControl_BeginSavedHeadingPhase(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->field2B1))
-        actor->direction = *((u8 *)actor + 0xE9);
+        actor->body.direction = *((u8 *)actor + 0xE9);
     {
         u32 phase = 2;
         u32 offset = 0x2A8;

@@ -140,7 +140,7 @@ void Ghost_FollowRoute(struct SceneActorRegistryResetView *actor)
         s32 cell, height;
         u32 kind;
         u16 attr;
-        Polar((void *)(body + 0x5FC), actor->direction, speed);
+        Polar((void *)(body + 0x5FC), actor->body.direction, speed);
         route = (void *)(body + 0x60C);
         if (!Ghost_SelectRandomRouteEntry(route))
             goto done;

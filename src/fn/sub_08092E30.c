@@ -54,25 +54,25 @@ void Bee_UpdateFlightHeight(struct SceneActorRegistryResetView *actor)
         state->previousGround = *g;
     }
     if (!ActorFlag(actor, 0x100000, 0x2D0)) {
-        actor->position.y = *g + actor->field2EA;
+        actor->body.position.y = *g + actor->field2EA;
         return;
     }
     if ((s16)actor->field2EA <= 259) {
         {
             u32 mask = 1;
             if (Test(*(volatile u32 *)&state->flags3D4, mask)) {
-                actor->position.y = ((struct BeeFlightView *)actor)->ground;
+                actor->body.position.y = ((struct BeeFlightView *)actor)->ground;
                 return;
             }
         }
         actor->field2EA += TruncateSine(gUnk_086149C4[state->phase], 9);
         if (state->phase <= 63)
             state->phase++;
-        actor->position.y = ((struct BeeFlightView *)actor)->ground + actor->field2EA;
+        actor->body.position.y = ((struct BeeFlightView *)actor)->ground + actor->field2EA;
     }
     {
         s32 currentGround = ((struct BeeFlightView *)actor)->ground;
-        s32 raisedY = actor->position.y - 260;
+        s32 raisedY = actor->body.position.y - 260;
         delta = currentGround - raisedY;
     }
     absolute = delta >= 0 ? delta : -delta;
@@ -82,7 +82,7 @@ void Bee_UpdateFlightHeight(struct SceneActorRegistryResetView *actor)
         else
             actor->field2EA += 8;
     }
-    actor->position.y = ((struct BeeFlightView *)actor)->ground + actor->field2EA;
+    actor->body.position.y = ((struct BeeFlightView *)actor)->ground + actor->field2EA;
     {
         struct SceneActorRegistrySequenceDrawable *drawable = actor->drawable;
         drawable->position.y -= TruncateSine(gUnk_086149C4[state->phase], 5);

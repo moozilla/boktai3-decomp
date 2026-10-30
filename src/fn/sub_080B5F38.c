@@ -21,7 +21,7 @@ void Skeleton_ResetRouteReaction(struct SceneActorRegistryResetView *actor)
     u8 *ready;
     context->timer = 0;
     context->counter = 0;
-    context->savedFlags = actor->flags130;
+    context->savedFlags = actor->saved.privateFlags;
     Memory_Clear(actor->state5D4, 8);
     SceneActorReaction_ResetResponseState(&actor->word460, gUnk_0824E250, 0x120);
     actor->field2C2 = 64;
@@ -34,7 +34,7 @@ void Skeleton_ResetRouteReaction(struct SceneActorRegistryResetView *actor)
             *motionFlags = mask & *motionFlags;
         }
         {
-            u8 *flags = (u8 *)&actor->fieldDC;
+            u8 *flags = (u8 *)&actor->tracking.target;
             s32 mask = ~0x18;
             flags[15] = mask & flags[15];
         }
@@ -64,7 +64,7 @@ void Skeleton_ResetRouteReaction(struct SceneActorRegistryResetView *actor)
     actor->field5DA = 255;
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
-    if (SceneActorRoute_IsOutsidePointBounds(&actor->route, &actor->position, 32, 32)) {
+    if (SceneActorRoute_IsOutsidePointBounds(&actor->route, &actor->body.position, 32, 32)) {
         u32 behavior = 2;
         register u32 offset asm("r2") = 0x2A8;
         *((u8 *)actor + offset) = 0;

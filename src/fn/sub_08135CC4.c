@@ -46,7 +46,7 @@ u32 SceneActorReaction_ResetFlaggedState(struct SceneActorRegistryResetView *act
         SetState(actor, 3, 0, 0);
         actor->colliderA.responseValue = 38;
         if (*motionFlags & bit)
-            ActorAttachment_ReleasePartsResource(actor->attachment, 3, actor->id);
+            ActorAttachment_ReleasePartsResource(actor->attachment, 3, actor->body.id);
         return 1;
     }
 }

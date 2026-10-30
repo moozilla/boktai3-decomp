@@ -97,7 +97,7 @@ void Bee_ApproachSavedPlayerPosition(struct SceneActorRegistryResetView *actor)
     struct SavedMotion *saved;
     s16 dx, dz;
     if (Take(&actor->field2B1)) {
-        actor->direction = *((u8 *)actor + 0xE9);
+        actor->body.direction = *((u8 *)actor + 0xE9);
         Control(actor, Bee_UpdateRecoveryAnimation, 0x26);
         *(struct SavedPair *)(body + 0x450) = *(struct SavedPair *)(((u8 **)gPlayers)[0] + 0x30);
         {

@@ -47,7 +47,7 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
     s16 *priorZ;
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         SceneActorAnimation_SelectEntryFlags((void *)actor, 3,
-                                             SceneActor_GetDirectionFlags(actor->direction));
+                                             SceneActor_GetDirectionFlags(actor->body.direction));
         {
             register u32 mask asm("r0") = 0x10;
             u16 *flags = &actor->flags2D6;
@@ -80,8 +80,8 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
     }
     x = Clamp(x);
     z = Clamp(z);
-    actor->motion.x += x;
-    actor->motion.z += z;
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z) && actor->field2B3) {
@@ -110,9 +110,9 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                 return;
             }
         } else {
-            actor->fieldDC = (u32)gPlayers[0] + 0x24;
+            actor->tracking.target = (u32)gPlayers[0] + 0x24;
         }
-        p = &actor->fieldDC;
+        p = &actor->tracking.target;
         {
             u32 q = *p;
             if (q) {
@@ -124,7 +124,7 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                 u32 z4;
                 register u32 z6 asm("r9");
                 struct ContactPosition *out = &d;
-                struct ContactPosition *from = &actor->position;
+                struct ContactPosition *from = &actor->body.position;
                 target = (void *)(q + 0xC);
                 dx = target->x - from->x;
                 z4 = 0;
@@ -133,7 +133,7 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                 out->x = dx;
                 out->y = target->y - from->y;
                 out->z = target->z - from->z;
-                actor->direction = actor->fieldE9 = Math_Atan2(d.x, d.z);
+                actor->body.direction = actor->tracking.heading = Math_Atan2(d.x, d.z);
                 {
                     u16 *fl = &actor->group.flags414;
                     register u32 mask asm("r0") = 4;

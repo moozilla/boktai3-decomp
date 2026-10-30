@@ -50,7 +50,7 @@ void Crow_UpdateGroundHeight(struct SceneActorRegistryResetView *actor)
         return;
     kind = actor->field2B5;
     if (kind == 0 || kind == 0x25 || kind == 0x26) {
-        actor->position.y = actor->field2EA;
+        actor->body.position.y = actor->field2EA;
         return;
     }
     {
@@ -59,7 +59,7 @@ void Crow_UpdateGroundHeight(struct SceneActorRegistryResetView *actor)
             if (kind != 0x23)
                 goto adjust;
             {
-                s32 cell = SceneActorTerrain_GetCellIndex(&actor->position);
+                s32 cell = SceneActorTerrain_GetCellIndex(&actor->body.position);
                 s32 height = (*SceneActorTerrain_GetCell(cell) & 15) << 8;
                 if ((s16)actor->field2EA < height + 0x118) {
                     actor->field2EA += Scale12(gUnk_086149C4[state->bobPhase] * 8);
@@ -69,7 +69,7 @@ void Crow_UpdateGroundHeight(struct SceneActorRegistryResetView *actor)
             }
         }
     }
-    actor->position.y = actor->field2EA;
+    actor->body.position.y = actor->field2EA;
     return;
 adjust: {
     s32 diff;
@@ -78,7 +78,7 @@ adjust: {
     s32 bias;
     ground = actor->groundHeight2BE;
     bias = -0x118;
-    diff = ground - (actor->position.y + bias);
+    diff = ground - (actor->body.position.y + bias);
     magnitude = diff;
     if (magnitude < 0)
         magnitude = -magnitude;
@@ -89,7 +89,7 @@ adjust: {
             actor->field2EA += 2;
     }
 }
-    actor->position.y = actor->field2EA;
+    actor->body.position.y = actor->field2EA;
     if ((u8)(actor->field2B5 - 1) <= 1) {
         struct DisplaySequenceState *seq;
         struct CrowHeightDrawable *drawable;

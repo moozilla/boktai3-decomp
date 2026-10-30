@@ -50,7 +50,7 @@ void SceneActorReaction_ResumeSavedTarget(struct SceneActorRegistryResetView *ac
         if (!blocked) {
             void *target;
             SceneActor_SetPositionXZ(
-                &actor->id, (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->x,
+                &actor->body.id, (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->x,
                 (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             target = actor->entryTarget228;

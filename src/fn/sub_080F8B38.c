@@ -26,7 +26,7 @@ void SceneActorControl_TiltRotation(struct SceneActorRegistryResetView *actor, s
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         u8 saved;
         drawable->flags |= 2;
-        saved = actor->fieldE9;
+        saved = actor->tracking.heading;
         state[0xED3] = saved;
     }
     angle = FoldAngle(drawable->angle);

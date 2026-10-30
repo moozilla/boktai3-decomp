@@ -38,7 +38,7 @@ void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
         register s32 target asm("r1");
         s16 *height;
         target = playerY + offset;
-        height = &actor->position.y;
+        height = &actor->body.position.y;
         *height += Div(target - *height, 10);
     } else {
         s32 wave = gUnk_086149C4[state->angle] << 5;
@@ -50,7 +50,7 @@ void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
             sum = base + delta;
             delta = sum;
         }
-        EaseHeight(&actor->position.y, delta);
+        EaseHeight(&actor->body.position.y, delta);
         state->angle += 2;
     }
 }

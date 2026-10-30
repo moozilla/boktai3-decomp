@@ -49,13 +49,13 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group,
                           struct ContactPosition *target)
 {
     void *route = *(void **)(group + 0x1fc);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (result) {
         result = Terrain_ApplyBlocked(route, position, target);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         }
         ClearRouteBits(&actor->flags2D4, 0x200);
@@ -195,7 +195,7 @@ static inline void Resume(struct SceneActorRegistryResetView *input, u8 *group, 
         *field = value;
     }
     ClearRouteBits(&actor->flags2D6, 0x9c9);
-    SceneBody_StartRoute(&actor->id, group + 0x74, group[0x84], group[0x85], group[0x86]);
+    SceneBody_StartRoute(&actor->body.id, group + 0x74, group[0x84], group[0x85], group[0x86]);
     point = (struct RouteLink *)(group + 0x74);
     SnapTarget(&target, point->point);
     (*((struct ContactPosition **)(group + 0x200)))->pad = 1;

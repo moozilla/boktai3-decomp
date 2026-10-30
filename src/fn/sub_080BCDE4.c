@@ -20,8 +20,8 @@ static inline void ClearFlags16(u16 *p, u32 mask)
 static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
-    struct ContactPosition *position = &actor->position;
-    struct ContactPosition *destination = (void *)(actor->fieldDC + 12);
+    struct ContactPosition *position = &actor->body.position;
+    struct ContactPosition *destination = &actor->tracking.target->position;
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         ClearFlags16(&actor->flags2D4, ~0x200);
@@ -30,7 +30,7 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             ClearFlags16(&actor->flags2D4, ~0x200);
@@ -44,8 +44,8 @@ void SceneActorApproach_UpdateRange(struct SceneActorRegistryResetView *actor)
     u8 *group = (void *)&actor->group;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    else if (actor->distanceF0 > context->maximumDistance ||
-             actor->distanceF0 < context->minimumDistance) {
+    else if (actor->tracking.distance > context->maximumDistance ||
+             actor->tracking.distance < context->minimumDistance) {
         ClearFlags(&context->flags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else if (SceneActorReaction_IsRangeReady(actor)) {

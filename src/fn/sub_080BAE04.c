@@ -90,7 +90,7 @@ void sub_080BAE04(struct SceneActorRegistryResetView *a)
     u8 *dir;
 
     sl = &a->flags2D4;
-    dir = &a->direction;
+    dir = &a->body.direction;
     if (BAE04_Take(&a->field2B2)) {
         *dir = (u8)(((((*dir + 0x60) >> 6) & 3) << 6) - 0x40);
         quadrant = ((*dir + 0x60) >> 6) & 3;

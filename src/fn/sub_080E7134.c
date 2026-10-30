@@ -98,16 +98,16 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
         } else if (!Mimic_TryPursuitRoute(actor->context))
             return;
         CellCenter(&point, actor->terrainCell);
-        Delta(&point, &actor->position, &point);
+        Delta(&point, &actor->body.position, &point);
         {
-            s32 quadrant = ((actor->direction + 0x20) & 0xFF) >> 6;
+            s32 quadrant = ((actor->body.direction + 0x20) & 0xFF) >> 6;
             correcting = 0;
             switch (quadrant) {
                 case 0:
                 case 2:
                     if ((point.z < 0 ? -point.z : point.z) > 0x40) {
                         CellCenter(&point, actor->terrainCell);
-                        point.x = actor->position.x;
+                        point.x = actor->body.position.x;
                         correcting = 1;
                     }
                     break;
@@ -115,17 +115,17 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
                 case 3:
                     if ((point.x < 0 ? -point.x : point.x) > 0x40) {
                         CellCenter(&point, actor->terrainCell);
-                        point.z = actor->position.z;
+                        point.z = actor->body.position.z;
                         correcting = 1;
                     }
                     break;
             }
         }
         if (correcting) {
-            Delta(&delta, &actor->position, &point);
+            Delta(&delta, &actor->body.position, &point);
             speed = 4;
         } else {
-            RouteDelta(&delta, &actor->position, group);
+            RouteDelta(&delta, &actor->body.position, group);
             gRandomIndex = (gRandomIndex + 1) & 1023;
             {
                 u32 offset = gRandomIndex * 2;
@@ -136,7 +136,7 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
         }
         {
             s32 angle = Math_Atan2(delta.x, delta.z);
-            u8 *heading = &actor->direction;
+            u8 *heading = &actor->body.direction;
             asm("" : "+r"(heading));
             *heading = angle;
             {
@@ -147,7 +147,7 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
         }
         *(u16 *)((u8 *)actor + 0x2EE) = 24;
         SceneActorAnimation_SelectEntryFlags((void *)actor, 14,
-                                             SceneActor_GetDirectionFlags(actor->direction));
+                                             SceneActor_GetDirectionFlags(actor->body.direction));
         Sound_PlaySong(0x1B2);
         ActorShadow_Enable((u8 *)actor + 0x320);
     } else {

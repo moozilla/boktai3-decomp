@@ -16,7 +16,7 @@ void SceneActorControl_UpdateHoverHeight(struct SceneActorRegistryResetView *act
         u8 *scene = (*(u8 **)gPlayers);
         u32 y = height + 220;
         y += *(u16 *)(scene + 0x32);
-        actor->position.y = y;
+        actor->body.position.y = y;
         *(u16 *)(context + 0xA56) = y;
         context[0xEAA] += 2;
     }

@@ -76,7 +76,7 @@ static inline u8 IsBusy(struct SceneActorRegistryResetView *actor)
         if (actor->flags2D4 & mask)
             return 1;
     }
-    if (TestBit((struct SceneActorReactionMotion *)&actor->fieldDC, 0x10))
+    if (TestBit((struct SceneActorReactionMotion *)&actor->tracking.target, 0x10))
         return 1;
     return IsIdle(raw);
 }
@@ -164,7 +164,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
     result = Terrain_ApplyBlocked(shape, position, destination);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     *flags &= ~blocked;
@@ -203,21 +203,21 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView 
     bestTag = 0;
     i = 0;
     asm("" : : "r"(i));
-    position = &actor->position;
+    position = &actor->body.position;
     for (; i <= 7; i++) {
         u32 tag;
         s8 next;
-        next = SceneStimulus_FindOverlapFromIndex(actor->position.x, actor->position.z,
+        next = SceneStimulus_FindOverlapFromIndex(actor->body.position.x, actor->body.position.z,
                                                   GROUP_FIELD(group, 0x4E, u16),
-                                                  GROUP_FIELD(group, 0x57, u8), actor->id, (s8)i);
+                                                  GROUP_FIELD(group, 0x57, u8), actor->body.id, (s8)i);
         i = next;
         if (next < 0)
             break;
         tag = sub_081376B4(actor, &candidate, (s8)i);
         if (SceneActorTarget_CanReplaceByDistance(actor, &candidate, tag) &&
-            Nav_IsPositionInMesh(GROUP_FIELD(group, 0x1fc, void *), &actor->position, &candidate)) {
+            Nav_IsPositionInMesh(GROUP_FIELD(group, 0x1fc, void *), &actor->body.position, &candidate)) {
             s32 distance;
-            SceneActorTerrain_Subtract(&delta, &candidate, &actor->position);
+            SceneActorTerrain_Subtract(&delta, &candidate, &actor->body.position);
             distance = delta.x * delta.x + delta.z * delta.z;
             if (best > distance) {
                 best = distance;
@@ -263,7 +263,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView 
         dest->y = CellHeight(CellIndex(dest), dest);
     }
     bit = 0x200;
-    GROUP_FIELD(group, bit, struct ContactPosition *)->y = actor->position.y;
+    GROUP_FIELD(group, bit, struct ContactPosition *)->y = actor->body.position.y;
     GROUP_FIELD(group, bit, struct ContactPosition *)->pad = 0;
     if (!MoveTo(actor, group, position, flagsp, bit)) {
         Callback_InvokeActor(actor, GROUP_FIELD(group, 0x224, void *));

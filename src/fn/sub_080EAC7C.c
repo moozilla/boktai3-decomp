@@ -78,6 +78,6 @@ void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
         }
         SetCtl(actor, SceneActor_EndReactionAnimation, 0x23);
         SetState(actor, 1, 0, 3);
-        actor->direction = actor->fieldE9;
+        actor->body.direction = actor->tracking.heading;
     }
 }

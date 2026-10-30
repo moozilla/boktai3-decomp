@@ -25,7 +25,7 @@ void Mimic_ResetExpiredTarget(struct SceneActorRegistryResetView *actor)
     if (!*timer && !(*flags & 0x38)) {
         struct SceneActorReactionMotion *motion;
         struct SceneActorRegistryControl *control;
-        motion = (void *)&actor->fieldDC;
+        motion = (void *)&actor->tracking.target;
         motion->fieldDC = 0;
         actor->field2C2 = 0x40;
         actor->group.flags414 = 0;

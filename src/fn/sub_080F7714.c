@@ -53,9 +53,9 @@ void SceneActor_AdvanceOffsetApproach(struct SceneActorRegistryResetView *p)
     struct ContactPosition *current, *destination;
     if (SceneActor_TakeApproachEntry(p)) {
         context->stateED2 = 0;
-        context->destination = p->position;
+        context->destination = p->body.position;
         context->destination.x -= 256;
-        context->current = p->position;
+        context->current = p->body.position;
         context->motionMode = 0;
         context->remaining = context->duration;
         context->flagsCAB = 0;

@@ -61,7 +61,7 @@ void Slime_ResolveBodyContact(struct SlimeContact *contact, void *other,
     /* Keep the checked actor live through the contact flag load. */
     asm("" : : "r"(checkActor));
     if (contactFlags) {
-        Add(&next, &actor->position, &actor->motion);
+        Add(&next, &actor->body.position, &actor->body.motion);
         Subtract(&displacement, &contact->position, &next);
         SceneActorTerrain_GetCenter(actor->terrainCell, &center);
         Subtract(&fromContact, &center, &contact->position);
@@ -84,7 +84,7 @@ void Slime_ResolveBodyContact(struct SlimeContact *contact, void *other,
                 displacement.z -= 0xC0;
                 break;
         }
-        Add(&adjusted, &actor->position, &displacement);
+        Add(&adjusted, &actor->body.position, &displacement);
         {
             s32 cell = Chase_CellAt(&adjusted);
             u32 ground = actor->groundHeight2BE;
@@ -92,10 +92,10 @@ void Slime_ResolveBodyContact(struct SlimeContact *contact, void *other,
             if (ground != (*data & 15) << 8)
                 SceneActorMotion_ArmPrimaryCollider(actor);
             else {
-                actor->position.x += displacement.x;
-                actor->position.z += displacement.z;
-                actor->motion.x = 0;
-                actor->motion.z = 0;
+                actor->body.position.x += displacement.x;
+                actor->body.position.z += displacement.z;
+                actor->body.motion.x = 0;
+                actor->body.motion.z = 0;
             }
         }
     } else

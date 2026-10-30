@@ -16,7 +16,7 @@ void Vorn_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
     if (a->field2B1) {
         a->field2B1 = 0;
     }
-    Callback_InvokeActor(a, a->update270);
+    Callback_InvokeActor(a, a->contactQuery.opaque);
     motion = Callback_InvokeActor(a, *(void **)((u8 *)a + 0x260));
     {
         u16 *rate;

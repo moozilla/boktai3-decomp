@@ -52,7 +52,7 @@ void Mummy_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 fram
             return;
         }
         actor->field2B0 = 1;
-        SceneActor_SetPositionXZ(&actor->id, (*(struct BatRoutePoint **)(group + 0x1FC))->x,
+        SceneActor_SetPositionXZ(&actor->body.id, (*(struct BatRoutePoint **)(group + 0x1FC))->x,
                                  (*(struct BatRoutePoint **)(group + 0x1FC))->z);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         blocked = Bat_MaskFlags(actor, 128);

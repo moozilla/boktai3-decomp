@@ -70,9 +70,9 @@ void SceneActorControl_HideOffscreen(struct SceneActorRegistryResetView *actor)
             position = (void *)((u8 *)actor->drawable + 0x40);
         position->y = 30000;
     }
-    actor->position.x = 0;
-    actor->position.y = 30000;
-    actor->position.z = 0;
+    actor->body.position.x = 0;
+    actor->body.position.y = 30000;
+    actor->body.position.z = 0;
     {
         u32 mask = 1;
         if (actor->drawableKind == 0)

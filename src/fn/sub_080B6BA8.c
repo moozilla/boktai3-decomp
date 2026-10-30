@@ -33,21 +33,21 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryRese
     asm("" : "+r"(m));
     if (!(s->flags2D4 & m)) {
         context = s->context;
-        if (s->distanceF0 < s->rangeF4) {
+        if (s->tracking.distance < s->tracking.range) {
             struct SceneActorTargetDelta *difference = &delta;
-            struct ContactPosition *from = &s->position;
-            struct ContactPosition *to = &((struct SceneActorTargetPosition *)s->fieldDC)->position;
+            struct ContactPosition *from = &s->body.position;
+            struct ContactPosition *to = &((struct SceneActorTargetPosition *)s->tracking.target)->position;
             difference->x = to->x - from->x;
             difference->y = to->y - from->y;
             difference->z = to->z - from->z;
-            angle = Math_Atan2(delta.x, difference->z) - s->direction;
+            angle = Math_Atan2(delta.x, difference->z) - s->body.direction;
             if (angle > 128)
                 angle -= 256;
             else if (angle < -128)
                 angle += 256;
             if (angle < 0)
                 angle = -angle;
-            if (angle < s->fieldE9) {
+            if (angle < s->tracking.heading) {
                 if (s->category == 5) {
                     if (SceneActorControl_TryBeginNearbyBehavior16(s, context, angle))
                         return;

@@ -70,6 +70,6 @@ void Axe_UpdateHealthPacedMotion(struct SceneActorRegistryResetView *actor)
             return;
         }
     }
-    Polar(&actor->motion, actor->fieldE9, speed);
+    Polar(&actor->body.motion, actor->tracking.heading, speed);
     actor->counter2AC++;
 }

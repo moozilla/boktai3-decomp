@@ -14,7 +14,7 @@ static inline u8 TakeEntry(u8 *flag)
 void SceneActor_StartFlaggedAnimationPhase(struct SceneActorRegistryResetView *actor)
 {
     if (TakeEntry(&actor->field2B1)) {
-        u32 *motion = &actor->fieldDC;
+        u32 *motion = &actor->tracking.target;
         u32 zero = 0;
         struct SceneActorRegistryResetView *context;
         u32 one;
@@ -60,6 +60,6 @@ void SceneActor_StartFlaggedAnimationPhase(struct SceneActorRegistryResetView *a
         actor->counter2AC = zero;
         actor->field2B1 = 1;
     } else {
-        Callback_InvokeActor(actor, actor->update270);
+        Callback_InvokeActor(actor, actor->contactQuery.opaque);
     }
 }

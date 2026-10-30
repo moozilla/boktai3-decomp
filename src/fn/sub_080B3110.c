@@ -27,7 +27,7 @@ static inline void ResetContext(struct SceneActorRegistryResetView *a)
         s32 mask = ~0x380;
         *flags = mask & *flags;
     }
-    motion = (void *)&a->fieldDC;
+    motion = (void *)&a->tracking.target;
     {
         s32 mask = ~0x18;
         motion->flags = mask & motion->flags;
@@ -74,7 +74,7 @@ inline static void ResetContext_080B3110(struct SceneActorRegistryResetView *a)
         s32 mask = ~0x380;
         *flags = mask & (*flags);
     }
-    motion = (void *)(&a->fieldDC);
+    motion = (void *)(&a->tracking.target);
     {
         s32 mask = ~0x18;
         motion->flags = mask & motion->flags;
@@ -131,9 +131,9 @@ void Vorn_BeginResponsePursuit(struct SceneActorRegistryResetView *a, u32 reset,
     }
     t1 = *((u16 *)(((u8 *)ctx) + 0x69A));
     *((u16 *)(((u8 *)ctx) + 0x698)) = t1;
-    a->direction = a->field2B6;
+    a->body.direction = a->field2B6;
     if (reset == 1)
-        SceneBody_StartRoute(&a->id, group + 0x74, group[0x81 + (group[0x83] ^ 1)], 0, 0);
+        SceneBody_StartRoute(&a->body.id, group + 0x74, group[0x81 + (group[0x83] ^ 1)], 0, 0);
     sub_080B1FA8(a);
     {
         u32 mask = 4;
@@ -151,7 +151,7 @@ void Vorn_BeginResponsePursuit(struct SceneActorRegistryResetView *a, u32 reset,
     a->word110 = 35;
     a->flags114 = 1;
     {
-        struct SceneActorReactionMotion *m = (void *)(&a->fieldDC);
+        struct SceneActorReactionMotion *m = (void *)(&a->tracking.target);
         u32 mask = 8;
         m->flags = mask | m->flags;
     }

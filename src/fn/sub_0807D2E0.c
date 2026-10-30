@@ -77,10 +77,10 @@ static inline void F0807D2E0_ShowDamage(struct SceneActorRegistryResetView *a)
     u32 max = *(u16 *)((u8 *)a + 0xB0);
     s32 kind = *(s16 *)((u8 *)a + 0xB2);
     s32 param = *(s16 *)((u8 *)a + 0x9A);
-    SceneHud_SetTimedState(a->id, health, max, kind, 0, param);
+    SceneHud_SetTimedState(a->body.id, health, max, kind, 0, param);
     F0807D2E0_Fill(&zero, buffer);
     if (a->reactionSoundVariant || !(a->field2D8 & 0x20000))
-        DamageNumberDisplay_Show(&a->colliderA, a->reactionSoundVariant, 0, &a->position, buffer,
+        DamageNumberDisplay_Show(&a->colliderA, a->reactionSoundVariant, 0, &a->body.position, buffer,
                                  1);
 }
 
@@ -152,7 +152,7 @@ void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 
     group->flags414 = 0;
     group->field418 = 0;
     a->flags2D4 &= ~0x380;
-    a->flagsEB &= ~0x18;
+    a->tracking.flags &= ~0x18;
     if (a->flags2CC & 0x200000) {
         a->flags2D0 &= ~0x1000000;
         a->flags2D4 &= ~0x200;
@@ -160,12 +160,12 @@ void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 
     }
     a->flags2D4 &= ~0x400;
     a->field5DA = 0xFF;
-    a->position = *position;
-    a->position.y += p3;
+    a->body.position = *position;
+    a->body.position.y += p3;
     if (a->drawableKind == 0)
-        *(struct ContactPosition *)((u8 *)a->drawable + 0x1C) = a->position;
+        *(struct ContactPosition *)((u8 *)a->drawable + 0x1C) = a->body.position;
     else
-        *(struct ContactPosition *)((u8 *)a->drawable + 0x40) = a->position;
+        *(struct ContactPosition *)((u8 *)a->drawable + 0x40) = a->body.position;
     a->flags2D6 |= 0x2000;
     goto done;
 
@@ -192,15 +192,15 @@ mode2:
         if (F0807D2E0_ShouldShow(a))
             F0807D2E0_ShowDamage(a);
         if (!F0807D2E0_Test(gEngineFlags, 0x4800) && !(a->flags2D0 & 0x800))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, a->id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, a->body.id);
         if (category == 4 || category == 1) {
             hudPos[0] = (hudPos[0] & 0xFFFF0000) | 0x50;
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->position, 0, 2, 1, 0, 0x20);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->position, 0, 2, 1, 0, 0x40);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->position, 0, 2, 1, 0, 0x5E);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->position, 0, 2, 1, 0, 0x80);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->position, 0, 2, 1, 0, 0xC4);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->position, 0, 2, 1, 0, 0xF0);
+            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0x20);
+            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0x40);
+            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0x5E);
+            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0x80);
+            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0xC4);
+            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0xF0);
             Sound_PlaySong(0xE5);
         }
     } else {

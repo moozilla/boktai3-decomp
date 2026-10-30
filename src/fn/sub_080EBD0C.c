@@ -138,14 +138,14 @@ void SceneActorControl_UpdateMotionPhase_080EBD0C(struct SceneActorRegistryReset
         context->flags = 0;
         context->field634 = 0;
     }
-    actor->position.x += 0x20;
-    actor->position.z += 0x20;
+    actor->body.position.x += 0x20;
+    actor->body.position.z += 0x20;
     if (!actor->drawableKind)
         *(struct IvyPlacement *)((u8 *)actor->drawable + 0x1C) =
-            *(struct IvyPlacement *)&actor->position;
+            *(struct IvyPlacement *)&actor->body.position;
     else
         *(struct IvyPlacement *)((u8 *)actor->drawable + 0x40) =
-            *(struct IvyPlacement *)&actor->position;
+            *(struct IvyPlacement *)&actor->body.position;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
         register void *drawable asm("r0") = actor->drawable;

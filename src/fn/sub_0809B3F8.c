@@ -101,11 +101,11 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
     u8 *motion = ((u8 *)actor) + 0x50;
     u8 *sequence;
     if (Take(&actor->field2B2)) {
-        s32 current = ((((s32)actor->direction) + 0x70) >> 5) & 7;
+        s32 current = ((((s32)actor->body.direction) + 0x70) >> 5) & 7;
         u8 desired = *(((u8 *)actor) + 0x3CD);
         s32 target = ((((s32)desired) + 0x70) >> 5) & 7;
         if (current == target) {
-            actor->direction = desired;
+            actor->body.direction = desired;
             Control(actor, actor->savedTarget, 0);
             actor->field2B0 = 1;
             return;

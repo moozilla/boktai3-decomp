@@ -138,7 +138,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *shape,
     result = Terrain_ApplyBlocked(shape, position, destination);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     *flags &= ~blocked;
@@ -217,7 +217,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     u32 bit;
     if (IsUnavailable(actor))
         return 0;
-    target = (void *)actor->fieldDC;
+    target = (void *)actor->tracking.target;
     if (!target)
         return 0;
     slot = PlayerSlot(target);
@@ -246,13 +246,13 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     }
     actor->field2C2 = 0x40;
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
-    actor->fieldDC = 0;
+    actor->tracking.target = 0;
     SetState(actor, 3, 1, 0);
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     SetFlags(actor, 0x10);
     SaveControl(&group->saved, actor->entryTarget228, 7);
     ResetControl(actor, ActorFlags(actor, 0x200000), flagsp);
-    ProximityVolume_TranslateBounds(actor->routeObject, &actor->position);
+    ProximityVolume_TranslateBounds(actor->routeObject, &actor->body.position);
     dest = actor->state5D4;
     {
         struct RouteLink *link = &group->route;
@@ -262,7 +262,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     }
     bit = 0x200;
     group->destination->pad = 1;
-    if (!MoveTo(actor, group->shape, &actor->position, group->destination, flagsp, bit)) {
+    if (!MoveTo(actor, group->shape, &actor->body.position, group->destination, flagsp, bit)) {
         Callback_InvokeActor(actor, group->failureCallback);
     } else {
         register u16 *resetFlags asm("r3");
@@ -279,7 +279,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
         }
         {
             s32 mask = ~0x18;
-            struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+            struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
             motion->flags &= mask;
         }
         ResetControl(actor, ActorFlags(actor, 0x200000), resetFlags);

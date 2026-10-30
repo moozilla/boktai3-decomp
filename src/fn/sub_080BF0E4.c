@@ -130,7 +130,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
         u8 *restart;                                                                               \
         {                                                                                          \
             u8 *mirrorAddress = &mirror;                                                           \
-            s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;                              \
+            s32 quadrant = (((s32)actor->body.direction + 0x60) >> 6) & 3;                              \
             mirrorPointer = mirrorAddress;                                                         \
             if (quadrant > 1) {                                                                    \
                 *mirrorPointer = 1;                                                                \
@@ -265,7 +265,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, struct Skelet
                         struct ContactPosition *destination)
 {
     void *route = group->routeObject;
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         actor->flags2D4 &= ~0x200;
@@ -274,7 +274,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, struct Skelet
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             actor->flags2D4 &= ~0x200;
@@ -314,7 +314,7 @@ static inline void Resume(void *argument, struct SkeletonGroup *group, u8 direct
 {
     struct SceneActorRegistryResetView *actor = argument;
     if (!Flags2D4(actor, 0x400) && !TestFlag16(&actor->group.flags414, 4)) {
-        Turn(actor, group, PickDirection(actor->direction), direction);
+        Turn(actor, group, PickDirection(actor->body.direction), direction);
     }
 }
 static inline u32 Flags32(u32 *p, u32 maskInput)
@@ -350,7 +350,7 @@ static inline void ReturnHome(struct SceneActorRegistryResetView *outer)
     struct SkeletonGroup *group = (void *)&actor->group;
     struct ContactPosition *destination;
     struct SkeletonRouteLink *link;
-    u8 **target = (u8 **)&actor->fieldDC;
+    u8 **target = (u8 **)&actor->tracking.target;
     u32 cell;
     s32 slot;
     destination = group->destination;
@@ -408,7 +408,7 @@ static inline void ReturnHome(struct SceneActorRegistryResetView *outer)
                 group->destination->pad = 0;
             }
         }
-        Resume(outer, group, actor->direction);
+        Resume(outer, group, actor->body.direction);
         sub_0807E334(outer);
         actor->field2C2 = 0x20;
         return;
@@ -429,7 +429,7 @@ void sub_080BF0E4(struct SceneActorRegistryResetView *actor)
         u8 *category;
         u16 *flags;
         u32 zero;
-        actor->direction = actor->fieldE9;
+        actor->body.direction = actor->tracking.heading;
         zero = 0;
         category = &actor->category;
         if (*category == 5) {

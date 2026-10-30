@@ -49,14 +49,14 @@ void Spider_UpdateContactWindup(struct SceneActorRegistryResetView *a, s32 n)
             u32 m = ~0x4000;
             *p &= m;
         }
-        F(c, 0x624, u32) = a->fieldDC;
+        F(c, 0x624, u32) = a->tracking.target;
     }
     if (F(anim, 8, u16) == 3 && F(anim, 0xE, u16) == 0) {
         void *v;
         Sound_PlaySong(0x114);
         v = F(c, 0x624, void *);
         if (v)
-            SceneColliderEffect_SpawnAimedSprite(transform, v, a->fieldB6, a->fieldBE, a->fieldC6);
+            SceneColliderEffect_SpawnAimedSprite(transform, v, a->attacks.first[1], a->attacks.second[1], a->attacks.parameter[1]);
     }
     {
         u32 q = 0x2B3;

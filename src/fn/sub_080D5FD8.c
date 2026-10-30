@@ -15,7 +15,7 @@ void Mummy_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
     s32 event;
     if (a->field2B1)
         a->field2B1 = 0;
-    if ((u8)Callback_InvokeActor(a, a->update270))
+    if ((u8)Callback_InvokeActor(a, a->contactQuery.opaque))
         return;
     motion = Callback_InvokeActor(a, *(void **)((u8 *)a + 0x260));
     {

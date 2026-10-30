@@ -40,14 +40,14 @@ void Bee_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     actor->field2B0 = 1;
     script = *(u16 *)((u8 *)actor + 0x1F8);
     if (script) {
-        values[0] = actor->position.x;
-        values[1] = actor->position.y;
-        values[2] = actor->position.z;
+        values[0] = actor->body.position.x;
+        values[1] = actor->body.position.y;
+        values[2] = actor->body.position.z;
         values[3] = *(s32 *)((u8 *)actor + 0x1FC);
         values[4] = *(s32 *)((u8 *)actor + 0x200);
         values[5] = *(s32 *)((u8 *)actor + 0x204);
         values[6] = actor->field2E0;
-        values[7] = actor->id;
+        values[7] = actor->body.id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);

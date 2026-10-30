@@ -66,7 +66,7 @@ void Vorn_UpdateRouteApproach(struct SceneActorRegistryResetView *actor)
     u16 *scale;
     if (actor->field2B1)
         actor->field2B1 = 0;
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if (sub_0812F3CC(actor))
         return;

@@ -93,7 +93,7 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
         struct SceneActorReactionMotion *reaction;
         struct SceneActorRegistryControl *control;
         u32 *flags;
-        actor->direction = (((actor->direction + 32) >> 6) & 3) << 6;
+        actor->body.direction = (((actor->body.direction + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 6);
         original = Reaction_ActorWord(actor, ~0U);
         word = &actor->flags2D0;
@@ -184,20 +184,20 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
     z = Reaction_Quarter(follow->target.z - follow->current.z);
     x = Reaction_ClampMotion(x);
     z = Reaction_ClampMotion(z);
-    actor->motion.x += x;
-    actor->motion.z += z;
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
     follow->current.x += x;
     follow->current.z += z;
     if (Reaction_MotionStopped(x, z) && (counter <= 0)) {
         struct ContactCollider *collider;
         actor->fieldAA = 0;
-        actor->field2B6 = (Reaction_ThirtySecond(actor->direction) + 7) & 7;
+        actor->field2B6 = (Reaction_ThirtySecond(actor->body.direction) + 7) & 7;
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, *((void **)(group + 0x20C)), 8);
         Reaction_ClearWord(&actor->flags2D0, ~2);
         Reaction_ClearHalf(&actor->flags2D4, ~0x3A);
         Chase_SetState(actor, 3, 1, 0);
-        actor->direction = ((actor->direction + 32) >> 6) << 6;
+        actor->body.direction = ((actor->body.direction + 32) >> 6) << 6;
         collider = &actor->colliderA;
         if (Reaction_Test(actor->flags2C0, 0x40)) {
             collider->flags &= 0xFEFF;

@@ -124,7 +124,7 @@ static inline void UpdateHitFlags(struct SceneActorRegistryResetView *actor, u16
                 *flags2CC &= mask;
             }
             {
-                struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+                struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
                 s32 mask = ~0x10;
                 motion->flags &= mask;
             }
@@ -194,7 +194,7 @@ static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *acto
                 *flags2CC &= mask;
             }
             {
-                struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+                struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
                 s32 mask = ~0x10;
                 motion->flags &= mask;
             }
@@ -329,12 +329,12 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
                     s32 param = *((s16 *)(((u8 *)actor) + 0x9A));
                     one = 1;
                     asm("" : "+r"(one));
-                    SceneHud_SetTimedState(actor->id, h, maxh, kind, mode >> 2, param);
+                    SceneHud_SetTimedState(actor->body.id, h, maxh, kind, mode >> 2, param);
                 }
                 Fill(&zero, buffer);
                 if (actor->reactionSoundVariant || (!((*flags2D8) & 0x20000)))
                     DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
-                                             &actor->position, buffer, one);
+                                             &actor->body.position, buffer, one);
             }
         }
     }

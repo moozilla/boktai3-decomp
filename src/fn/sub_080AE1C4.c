@@ -66,7 +66,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
         struct SceneActorReactionMotion *motion;
         struct SceneActorRegistryControl *control;
         u32 *actionFlags;
-        actor->direction = (((actor->direction + 32) >> 6) & 3) << 6;
+        actor->body.direction = (((actor->body.direction + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 6);
         maskTwo = 2;
         flags = &actor->flags2D0;
@@ -87,7 +87,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
         *((u16 *)(((u8 *)actor) + 0x414)) = 0;
         *((u16 *)(((u8 *)actor) + 0x418)) = 0;
         ClearMotion(motionFlags, ~0x380);
-        motion = (void *)(&actor->fieldDC);
+        motion = (void *)(&actor->tracking.target);
         {
             s32 mask = ~0x18;
             motion->flags &= mask;
@@ -158,15 +158,15 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
     }
     x = Clamp(x);
     z = Clamp(z);
-    actor->motion.x += x;
-    actor->motion.z += z;
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
     *priorX += x;
     *priorZ += z;
     if (Rest(x, z) && (timer <= 0)) {
         struct ContactCollider *collider;
         u16 *motionFlags;
         actor->fieldAA = 0;
-        actor->field2B6 = (Divide32(actor->direction) + 7) & 7;
+        actor->field2B6 = (Divide32(actor->body.direction) + 7) & 7;
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, *((void **)(group + 0x20C)), 8);
         {
@@ -179,8 +179,8 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
             *motionFlags &= mask;
         }
         Chase_SetState(actor, 3, 1, 0);
-        actor->direction = ((actor->direction + 32) >> 6) << 6;
-        SceneBody_StartRoute(&actor->id, group + 0x74, group[0x84], group[0x85], group[0x86]);
+        actor->body.direction = ((actor->body.direction + 32) >> 6) << 6;
+        SceneBody_StartRoute(&actor->body.id, group + 0x74, group[0x84], group[0x85], group[0x86]);
         collider = &actor->colliderA;
         if (Test((u16 *)(((u8 *)actor) + 0x2C0), 64))
             collider->flags &= 0xFEFF;
@@ -194,7 +194,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
             *f &= mask;
         }
         if (Vorn_HasActiveResponse(actor->context)) {
-            SetMotion((void *)(&actor->fieldDC), 8);
+            SetMotion((void *)(&actor->tracking.target), 8);
             {
                 u32 mask = 0x80;
                 actor->flags2CC |= mask;

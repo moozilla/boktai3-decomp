@@ -47,7 +47,7 @@ void sub_080A34BC(struct SceneActorRegistryResetView *a)
         a->field2C2 = 0x40;
     }
 
-    if ((u8)Callback_InvokeActor(a, a->update270))
+    if ((u8)Callback_InvokeActor(a, a->contactQuery.opaque))
         return;
 
     if (ctx->flags & 4) {

@@ -41,7 +41,7 @@ void SceneActorControl_UpdateEntryWait(struct SceneActorRegistryResetView *s)
         ClearFlag(&s->flags114, ~1);
         s->word104 = zero;
     } else {
-        u8 result = Callback_InvokeActor(s, s->update270);
+        u8 result = Callback_InvokeActor(s, s->contactQuery.opaque);
         if (result == 0) {
             if (s->field2B0) {
                 u32 seven = 7;

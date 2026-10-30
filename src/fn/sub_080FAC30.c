@@ -28,7 +28,7 @@ void SceneActorControl_InitializeHoverState(struct SceneActorRegistryResetView *
     context->angle = 0;
     context->enabled = 1;
     context->counter = 0;
-    context->savedFlags = actor->flags130;
+    context->savedFlags = actor->saved.privateFlags;
     context->savedPosition = *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
     Fill(&context->vectorF04, &zero);
     Fill(&context->vectorF0C, &zero);

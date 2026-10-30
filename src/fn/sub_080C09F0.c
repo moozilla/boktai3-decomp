@@ -145,7 +145,7 @@ static inline u8 TryMove2(struct SceneActorRegistryResetView *actor, void *route
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             ClearFlags16(&actor->flags2D4, ~0x200);
@@ -203,7 +203,7 @@ static inline void Turn(u8 saved, void *ctx, void *g)
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
         return;
-    group[0x204] = PickTurn(actor->direction);
+    group[0x204] = PickTurn(actor->body.direction);
     {
         struct SkeletonSavedControl *save = (struct SkeletonSavedControl *)(group + 0x8C);
         save->target = actor->target;
@@ -232,7 +232,7 @@ static inline void Approach(void *ctx)
 {
     struct SceneActorRegistryResetView *actor = ctx;
     u8 *group = (u8 *)&CTX->group;
-    u8 **partnerp = (u8 **)&CTX->fieldDC;
+    u8 **partnerp = (u8 **)&CTX->tracking.target;
     u32 cell;
     s32 index;
     u8 zero;
@@ -280,7 +280,7 @@ static inline void Approach(void *ctx)
             }
             DEST->pad = 0;
         }
-        Turn(actor->direction, ctx, (u8 *)&CTX->group);
+        Turn(actor->body.direction, ctx, (u8 *)&CTX->group);
         sub_0807E334(ctx);
         actor->field2C2 = 0x20;
         return;
@@ -288,7 +288,7 @@ static inline void Approach(void *ctx)
 move: {
     struct ContactPosition center;
     SceneActorTerrain_GetCenter(cell, &center);
-    if (!TryMove2(ctx, *(void **)(group + 0x1FC), &actor->position, &center))
+    if (!TryMove2(ctx, *(void **)(group + 0x1FC), &actor->body.position, &center))
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }
 }
@@ -316,18 +316,18 @@ void sub_080C09F0(struct SceneActorRegistryResetView *actor)
         s32 speed;
         {
             struct ContactPosition *out = &diff;
-            struct ContactPosition *from = &actor->position;
+            struct ContactPosition *from = &actor->body.position;
             struct ContactPosition *to =
                 (struct ContactPosition *)(*(u8 **)((u8 *)actor + 0xDC) + 0xC);
             SceneActorTerrain_Subtract(out, to, from);
         }
         angle = Math_Atan2(diff.x, diff.z);
-        if (actor->distanceF0 < body->minimumDistance) {
+        if (actor->tracking.distance < body->minimumDistance) {
             angle = (angle + 0x80) & 0xFF;
             actor->field2C2 = 0x20;
-        } else if (actor->distanceF0 > body->maximumDistance) {
+        } else if (actor->tracking.distance > body->maximumDistance) {
             actor->field2C2 = 0x20;
-            actor->direction = angle;
+            actor->body.direction = angle;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
         speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
@@ -348,14 +348,14 @@ void sub_080C09F0(struct SceneActorRegistryResetView *actor)
             else
                 Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
         }
-        actor->motion.x += Scale(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
-        actor->motion.z += Scale(gUnk_086149C4[angle & 0xFF] * speed);
+        actor->body.motion.x += Scale(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
+        actor->body.motion.z += Scale(gUnk_086149C4[angle & 0xFF] * speed);
         {
             u32 mask = 0x2000;
             actor->flags2CC |= mask;
         }
-        if (actor->distanceF0 > body->minimumDistance &&
-            actor->distanceF0 < body->maximumDistance) {
+        if (actor->tracking.distance > body->minimumDistance &&
+            actor->tracking.distance < body->maximumDistance) {
             u16 mask = 0x80;
             actor->flags2D6 = mask | actor->flags2D6;
         } else

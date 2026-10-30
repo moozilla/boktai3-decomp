@@ -22,7 +22,7 @@ static inline void ClearFlags(u16 *field, u32 mask)
 static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     register u32 mask asm("r8") = 0x200;
     struct ContactPosition *target;
     s32 result;
@@ -35,7 +35,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     ClearFlags(&actor->flags2D4, mask);

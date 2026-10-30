@@ -142,7 +142,7 @@ void SceneActorControl_UpdateRouteApproach(struct SceneActorRegistryResetView *a
                                                              0x20, speed)) {
         BeginRouteSelection(actor, nav);
         if (!InLinkMode(gEngineFlags, 0x4800)) {
-            struct RouteSelection *route = actor->currentRoute;
+            struct RouteSelection *route = actor->body.currentRoute;
             u8 choice;
             {
                 u32 index = (gRandomIndex + 1) & 1023;

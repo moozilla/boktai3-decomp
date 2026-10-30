@@ -157,7 +157,7 @@ static inline u16 *SceneActorChase_MotionFlagsOf(struct SceneActorRegistryResetV
 static inline struct ContactPosition *
 SceneActorChase_MotionOf(struct SceneActorRegistryResetView *actor)
 {
-    return &actor->motion;
+    return &actor->body.motion;
 }
 
 static inline void *SceneActorChase_CurrentControl(void *object)
@@ -366,7 +366,7 @@ static inline u8 SceneActorChase_BeginContactAnimation(struct SceneActorRegistry
 
 static inline void SceneActorChase_TrackPlayer(struct SceneActorRegistryResetView *actor)
 {
-    ((struct SceneActorChaseTracking *)&actor->fieldDC)->target =
+    ((struct SceneActorChaseTracking *)&actor->tracking.target)->target =
         &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
 }
 
@@ -395,7 +395,7 @@ static inline u8 SceneActorChase_RouteCount(struct SceneActorChaseRouteSelection
 
 static inline void SceneActorChase_ChooseRoute(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorChaseRouteSelection *route = actor->currentRoute;
+    struct SceneActorChaseRouteSelection *route = actor->body.currentRoute;
     u8 choice;
     {
         u32 index = (gRandomIndex + 1) & 1023;

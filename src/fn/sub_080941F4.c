@@ -116,41 +116,41 @@ void sub_080941F4(struct SceneActorRegistryResetView *actor)
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
         Bee_InstallControl(actor, actor->entryTarget228, 1);
         route->index = 0;
-        Bee_SubtractPositions(&delta, &actor->position, &route->anchor->position);
-        actor->fieldE9 = Math_Atan2(delta.x, delta.z);
-        Bee_MakePolarVector(&target, Bee_OffsetHeading(Bee_NextRandom(), &actor->fieldE9) & 255,
+        Bee_SubtractPositions(&delta, &actor->body.position, &route->anchor->position);
+        actor->tracking.heading = Math_Atan2(delta.x, delta.z);
+        Bee_MakePolarVector(&target, Bee_OffsetHeading(Bee_NextRandom(), &actor->tracking.heading) & 255,
                             route->polarSpeed);
         route->timer = 0x500;
-        Bee_AddPosition(&target, &actor->position);
+        Bee_AddPosition(&target, &actor->body.position);
         sub_0809345C(actor, &target);
-        Bee_SubVector(actor, &actor->position, &target);
+        Bee_SubVector(actor, &actor->body.position, &target);
         ZeroFill8(&route->motion);
     }
-    Bee_SubtractPositions(&step, &actor->position, &route->points[route->index]);
-    Bee_SubtractPositions(&delta, &actor->position, &route->anchor->position);
+    Bee_SubtractPositions(&step, &actor->body.position, &route->points[route->index]);
+    Bee_SubtractPositions(&delta, &actor->body.position, &route->anchor->position);
     {
         u32 heading = Math_Atan2(delta.x, delta.z);
-        actor->fieldE9 = heading;
-        actor->direction = heading;
+        actor->tracking.heading = heading;
+        actor->body.direction = heading;
     }
     if ((s16)route->timer > 0 && step.x * step.x + step.z * step.z > 1024) {
         n = Bee_Max(Bee_ScaleDuration((s16)route->timer), 1);
-        actor->motion.x += Div(route->points[route->index].x - actor->position.x, n);
-        actor->motion.z += Div(route->points[route->index].z - actor->position.z, n);
-        route->motion = actor->motion;
+        actor->body.motion.x += Div(route->points[route->index].x - actor->body.position.x, n);
+        actor->body.motion.z += Div(route->points[route->index].z - actor->body.position.z, n);
+        route->motion = actor->body.motion;
         route->timer -= actor->counter2AC;
     } else {
         route->index++;
         if (route->index > 8) {
-            actor->position.x = route->points[8].x;
-            actor->position.z = route->points[8].z;
-            Bee_SubtractPositions(&delta, &actor->position, &route->anchor->position);
-            actor->fieldE9 = Math_Atan2(delta.x, delta.z);
-            Bee_MakePolarVector(&target, Bee_OffsetHeading(Bee_NextRandom(), &actor->fieldE9) & 255,
+            actor->body.position.x = route->points[8].x;
+            actor->body.position.z = route->points[8].z;
+            Bee_SubtractPositions(&delta, &actor->body.position, &route->anchor->position);
+            actor->tracking.heading = Math_Atan2(delta.x, delta.z);
+            Bee_MakePolarVector(&target, Bee_OffsetHeading(Bee_NextRandom(), &actor->tracking.heading) & 255,
                                 route->polarSpeed);
-            Bee_AddPosition(&target, &actor->position);
+            Bee_AddPosition(&target, &actor->body.position);
             sub_0809345C(actor, &target);
-            Bee_SubVector(actor, &actor->position, &target);
+            Bee_SubVector(actor, &actor->body.position, &target);
             {
                 u32 duration = route->speed << 5;
                 route->timer = duration;
@@ -159,8 +159,8 @@ void sub_080941F4(struct SceneActorRegistryResetView *actor)
             actor->counter2AC = 0;
             return;
         }
-        actor->position.x = Bee_GetPreviousX(route, route->index - 1);
-        actor->position.z = Bee_GetPreviousZ(route, route->index - 1);
+        actor->body.position.x = Bee_GetPreviousX(route, route->index - 1);
+        actor->body.position.z = Bee_GetPreviousZ(route, route->index - 1);
     }
     if ((s32)actor->counter2AC <= 19)
         actor->counter2AC++;

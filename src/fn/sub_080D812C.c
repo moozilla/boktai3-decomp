@@ -285,11 +285,11 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
                     u32 max = *(u16 *)((u8 *)actor + 0xB0);
                     s32 type = *(s16 *)((u8 *)actor + 0xB2);
                     s32 param = *(s16 *)((u8 *)actor + 0x9A);
-                    SceneHud_SetTimedState(actor->id, health, max, type, 0, param);
+                    SceneHud_SetTimedState(actor->body.id, health, max, type, 0, param);
                     Fill(&zero, buffer);
                     if (actor->reactionSoundVariant || !(*damageFlags & 0x20000))
                         DamageNumberDisplay_Show(damageCollider, actor->reactionSoundVariant, 0,
-                                                 &actor->position, buffer, 1);
+                                                 &actor->body.position, buffer, 1);
                 }
             }
         }
@@ -409,7 +409,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
 
 record:
     if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
-        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
     ((struct ContactCollider *)collider)->flags |= 4;
 done:
     burn->timer = 0;

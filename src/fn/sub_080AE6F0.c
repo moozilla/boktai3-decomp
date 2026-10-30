@@ -15,7 +15,7 @@ void Vorn_SendMessage(void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 static inline void StartRoute(struct SceneActorRegistryResetView *a, u8 *group)
 {
-    SceneBody_StartRoute(&a->id, group + 0x74, group[0x84], group[0x85], group[0x86]);
+    SceneBody_StartRoute(&a->body.id, group + 0x74, group[0x84], group[0x85], group[0x86]);
 }
 static inline void ClearMotion(u16 *flags, s32 mask)
 {
@@ -32,7 +32,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
     typeof(flags) c1;
     u32 k1;
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->direction = (((actor->direction + 128) & 255) >> 6) << 6;
+        actor->body.direction = (((actor->body.direction + 128) & 255) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     }
     flags = &actor->flags2D0;
@@ -60,7 +60,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
         *contextFlags &= mask;
     }
     if (Vorn_HasActiveResponse(context)) {
-        struct SceneActorReactionMotion *motion = (void *)(&actor->fieldDC);
+        struct SceneActorReactionMotion *motion = (void *)(&actor->tracking.target);
         u32 mask = 8;
         u8 value = motion->flags;
         value |= mask;
@@ -87,7 +87,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
         *((u16 *)(((u8 *)actor) + 0x414)) = 0;
         *((u16 *)(((u8 *)actor) + 0x418)) = 0;
         ClearMotion(motionFlags, ~0x380);
-        motion = (void *)(&actor->fieldDC);
+        motion = (void *)(&actor->tracking.target);
         {
             s32 mask = ~0x18;
             motion->flags &= mask;

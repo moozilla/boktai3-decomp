@@ -17,10 +17,10 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
         u32 offset = 0x5D0;
         void *object;
         object = *(void **)((u8 *)actor + offset);
-        position = &actor->position;
+        position = &actor->body.position;
         ProximityVolume_TranslateBounds(object, position);
     }
-    actor->currentRoute = route;
+    actor->body.currentRoute = route;
     x = position->x >> 8;
     z = position->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -36,7 +36,7 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
         *address = computedCell;
         cell = *address;
     }
-    position = &actor->position;
+    position = &actor->body.position;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
@@ -52,11 +52,11 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
             height -= (u8)position->x;
             break;
     }
-    actor->position.y = height;
+    actor->body.position.y = height;
     if (!actor->drawableKind)
-        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->position;
+        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->body.position;
     else
-        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->position;
+        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->body.position;
     {
         u16 *address = &actor->field2EA;
         register u32 zero asm("r5");
@@ -66,7 +66,7 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
             u32 offset = 0x2EC;
             Memory_Clear((u8 *)actor + offset, 8);
         }
-        Memory_Clear(&actor->motion, 8);
+        Memory_Clear(&actor->body.motion, 8);
         control = &group->control;
         {
             u32 mask = 0x200000;

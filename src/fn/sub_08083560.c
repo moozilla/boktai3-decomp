@@ -190,7 +190,7 @@ void SceneActorControl_RestoreMotion(struct SceneActorRegistryResetView *input)
         state->flags3D4 = zero;
         offset += 0x4E;
         stored = (void *)((u8 *)state + offset);
-        actor->position = *stored;
+        actor->body.position = *stored;
         {
             u32 cell = CellIndex(stored);
             {
@@ -207,7 +207,7 @@ void SceneActorControl_RestoreMotion(struct SceneActorRegistryResetView *input)
         u32 difference;
         register u32 offset asm("r4");
         *ground = height;
-        actorY = &actor->position.y;
+        actorY = &actor->body.position.y;
         previousY = (u16)*actorY;
         difference = previousY - height;
         offset = 0x2EA;
@@ -219,9 +219,9 @@ void SceneActorControl_RestoreMotion(struct SceneActorRegistryResetView *input)
         *actorY = *ground;
     }
     if (actor->drawableKind == 0)
-        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->position;
+        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->body.position;
     else
-        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->position;
+        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->body.position;
     {
         u32 zero;
         {

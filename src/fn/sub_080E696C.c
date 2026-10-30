@@ -40,6 +40,6 @@ void SceneActor_UpdateAlternateEntryPhase(struct SceneActorRegistryResetView *ac
         actor->counter2AC = zero;
         actor->field2B1 = 1;
     } else {
-        Callback_InvokeActor(actor, actor->update270);
+        Callback_InvokeActor(actor, actor->contactQuery.opaque);
     }
 }

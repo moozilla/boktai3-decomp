@@ -116,15 +116,15 @@ void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
             u32 mask = 0x2000000;
             actor->flags2CC |= mask;
         }
-        actor->direction = actor->fieldE9;
+        actor->body.direction = actor->tracking.heading;
     }
     {
         u32 scale = 64;
         actor->field1EA = scale;
         Delta(&delta, (struct ContactPosition *)(context + 0x5EC),
               (void *)((*((u8 **)gPlayers)) + 0x30));
-        actor->motion.x += delta.x;
-        actor->motion.z += delta.z;
+        actor->body.motion.x += delta.x;
+        actor->body.motion.z += delta.z;
         *((struct ContactPosition *)(context + 0x5EC)) =
             *((struct ContactPosition *)((*((u8 **)gPlayers)) + 0x30));
         Scale(actor, flags);

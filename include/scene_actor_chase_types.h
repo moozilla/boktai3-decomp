@@ -11,13 +11,6 @@ struct SceneActorChaseFlags16 {
     u16 value;
 } __attribute__((packed, aligned(2)));
 
-struct SceneActorChaseTarget {
-    u8 unknown0[8];
-    u8 playerIndex;
-    u8 unknown9[3];
-    struct ContactPosition position;
-};
-
 struct SceneActorChasePlayerCell {
     u16 unknown0[3];
     u16 index;
@@ -97,11 +90,7 @@ struct SceneActorChaseGroup {
     void *turnControl, *routePhaseCallback, *fallback;
 };
 
-struct SceneActorChaseTracking {
-    struct SceneActorChaseTarget *target;
-    struct ContactPosition destination;
-    u8 unknownC, heading, unknownE, flags;
-};
+
 
 struct SceneActorChaseTerrainCell {
     u8 attributes;

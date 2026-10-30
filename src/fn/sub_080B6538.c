@@ -20,7 +20,7 @@ u32 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetVie
         Skeleton_SelectDistanceReaction(s);
         return 1;
     }
-    if (angle <= 24 && s->distanceF0 < context->nearRange6E0) {
+    if (angle <= 24 && s->tracking.distance < context->nearRange6E0) {
         void (*fn)(void) = SceneActorControl_OnIdle;
         u8 code = 0x10;
         u32 zero;

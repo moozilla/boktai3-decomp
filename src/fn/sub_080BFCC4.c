@@ -157,7 +157,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *route,
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             {
@@ -172,7 +172,7 @@ static inline u8 MoveToDestination(struct SceneActorRegistryResetView *actor,
                                    struct SkelGroup *group)
 {
     void *route = group->routeObject;
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     u32 mask = 0x200;
     struct ContactPosition *destination = group->destination;
     s32 result;
@@ -183,7 +183,7 @@ static inline u8 MoveToDestination(struct SceneActorRegistryResetView *actor,
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             actor->flags2D4 &= ~mask;
@@ -193,7 +193,7 @@ static inline u8 MoveToDestination(struct SceneActorRegistryResetView *actor,
 }
 static inline s32 PickDirection(struct SceneActorRegistryResetView *actor)
 {
-    register u32 current asm("r7") = actor->direction;
+    register u32 current asm("r7") = actor->body.direction;
     s32 i;
     u32 direction;
     asm("" : "+r"(current));
@@ -253,7 +253,7 @@ static inline void ReturnHome(void *ctx)
     struct SkelGroup *group = (void *)&actor->group;
     struct ContactPosition *destination;
     struct SkelRouteLink *link;
-    u8 **target = (u8 **)&actor->fieldDC;
+    u8 **target = (u8 **)&actor->tracking.target;
     u32 cell;
     s32 slot;
     u32 mask;
@@ -307,13 +307,13 @@ static inline void ReturnHome(void *ctx)
                 group->destination->pad = 0;
             }
         }
-        Resume(ctx, (void *)&((struct SceneActorRegistryResetView *)ctx)->group, actor->direction);
+        Resume(ctx, (void *)&((struct SceneActorRegistryResetView *)ctx)->group, actor->body.direction);
         actor->field2C2 = 0x20;
         return;
     } else {
         struct ContactPosition center;
         SceneActorTerrain_GetCenter(cell, &center);
-        if (MoveTo(ctx, group->routeObject, &actor->position, &center))
+        if (MoveTo(ctx, group->routeObject, &actor->body.position, &center))
             return;
     }
 fail:
@@ -324,8 +324,8 @@ void sub_080BFCC4(struct SceneActorRegistryResetView *actor)
 {
     struct SkelGroup *group = (void *)&actor->group;
     if (TakeFlag2B1(actor))
-        actor->direction = actor->fieldE9;
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+        actor->body.direction = actor->tracking.heading;
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if (sub_0812F3CC(actor))
         return;

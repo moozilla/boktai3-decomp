@@ -30,7 +30,7 @@ void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor
     struct ContactPosition target;
     if (TestFlag(actor, 0x2000)) {
         struct ContactPosition *p = &target;
-        struct ContactPosition *position = &actor->position;
+        struct ContactPosition *position = &actor->body.position;
         struct ContactPosition *offset = &actor->secondaryMotion;
         s32 cell, height;
         p->x = offset->x + position->x;
@@ -49,8 +49,8 @@ void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor
             x_2 = (s16 *)(((u8 *)actor) + off);
             value = -(*x_2);
             *x_2 = value;
-            actor->motion.x = zero;
-            actor->motion.z = zero;
+            actor->body.motion.x = zero;
+            actor->body.motion.z = zero;
         }
     }
 }

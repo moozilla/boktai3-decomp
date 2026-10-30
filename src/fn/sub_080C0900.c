@@ -74,7 +74,7 @@ void SceneActorApproach_CaptureTargetAndRunAction(struct SceneActorRegistryReset
         flags |= value;
         *flagptr = flags;
         SetControl(actor, sub_080BAAF4, zero8, zero);
-        context->destination = *(struct ContactPosition *)(actor->fieldDC + 12);
+        context->destination = actor->tracking.target->position;
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 2);
     }

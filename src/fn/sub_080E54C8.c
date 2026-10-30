@@ -25,7 +25,7 @@ void Dog_UpdateActionPhase(struct SceneActorRegistryResetView *p)
         SelectControl(p, control, kind);
     }
     if (Dog_IsActionTimerExpired(p)) {
-        if ((u8)Callback_InvokeActor(p, p->update270))
+        if ((u8)Callback_InvokeActor(p, p->contactQuery.opaque))
             return;
         if (sub_0812F3CC(p))
             return;

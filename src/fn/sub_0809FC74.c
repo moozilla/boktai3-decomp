@@ -37,7 +37,7 @@ void Crow_UpdateWanderTimer(struct SceneActorRegistryResetView *actor)
     {
         u32 four = 4;
         if (!Crow_TestFlags(four, context->flags3D4)) {
-            u8 result = Callback_InvokeActor(actor, actor->update270);
+            u8 result = Callback_InvokeActor(actor, actor->contactQuery.opaque);
             if (!result) {
                 if ((s32)actor->counter2AC > context->wanderTicks && actor->field2B3) {
                     Chase_SetBehavior(actor, 2);

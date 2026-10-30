@@ -27,7 +27,7 @@ u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
         return 1;
     }
     if (SceneActorChase_QueryMotionFlags(actor, 0x2000)) {
-        actor->direction = actor->field2B6 + 0x80;
+        actor->body.direction = actor->field2B6 + 0x80;
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 0);
         SceneActorChase_ClearMotionFlags(actor, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
@@ -35,8 +35,8 @@ u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor) &&
             !SceneActorChase_TryRoute(
-                actor, group->route, &actor->position,
-                &((struct SceneActorChaseTracking *)&actor->fieldDC)->target->position)) {
+                actor, group->route, &actor->body.position,
+                &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
@@ -62,15 +62,15 @@ u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
         return 0;
     if (SceneActorChase_QueryMotionFlags(actor, 0x80)) {
         SceneActorChase_BeginContactAnimation(actor);
-        if (!actor->fieldDC)
+        if (!actor->tracking.target)
             return 0;
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_GroupSetFlags(group, 4);
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
             if (!SceneActorChase_TryRoute(
-                    actor, group->route, &actor->position,
-                    &((struct SceneActorChaseTracking *)&actor->fieldDC)->target->position)) {
+                    actor, group->route, &actor->body.position,
+                    &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
@@ -80,15 +80,15 @@ u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
         return 1;
     } else {
         SceneActorChase_BeginContactAnimation(actor);
-        if (!actor->fieldDC)
+        if (!actor->tracking.target)
             return 0;
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor) &&
             !SceneActorChase_TryRoute(
-                actor, group->route, &actor->position,
-                &((struct SceneActorChaseTracking *)&actor->fieldDC)->target->position)) {
+                actor, group->route, &actor->body.position,
+                &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }

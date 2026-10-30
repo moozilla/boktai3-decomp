@@ -137,7 +137,7 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
                 Fill(&zero, buffer);
                 if (actor->reactionSoundVariant || !(actor->field2D8 & 0x20000))
                     DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
-                                             &actor->position, buffer, 1);
+                                             &actor->body.position, buffer, 1);
             }
             SceneBody_StartRoute(
                 (u8 *)actor + 0x50, nav + 0x74,

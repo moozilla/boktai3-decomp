@@ -15,7 +15,7 @@ void SceneActorControl_ReflectTerrainProbe(struct SceneActorRegistryResetView *i
     s32 height;
     struct ContactPosition *terrainPosition;
     u8 *data;
-    position = &actor->position;
+    position = &actor->body.position;
     motion = &actor->secondaryMotion;
     {
         u32 first = (u16)position->x, second = (u16)motion->x;
@@ -91,7 +91,7 @@ compare_ground: {
         value = *component;
         *component = -value;
         {
-            s16 *output = &actor->motion.x;
+            s16 *output = &actor->body.motion.x;
             *output = zero;
             output += 2;
             *output = zero;

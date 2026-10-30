@@ -81,12 +81,12 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *owner,
                         struct ReturnResponseGroup *group, struct ContactPosition *destination)
 {
     void *shape = ReadNavigationShape(&group);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&owner->motion, 8);
+                Memory_Clear(&owner->body.motion, 8);
             return 1;
         }
     }
@@ -126,13 +126,13 @@ static inline u8 MoveToSource(struct SceneActorRegistryResetView *owner,
                               struct SceneActorPositionSource **source)
 {
     void *shape = group->shape;
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     struct ContactPosition *destination = &(*source)->position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&owner->motion, 8);
+                Memory_Clear(&owner->body.motion, 8);
             return 1;
         }
     }

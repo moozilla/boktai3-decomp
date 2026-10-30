@@ -43,10 +43,10 @@ u8 Skeleton_RerouteToTarget(void *obj)
         }
         targetPointer->z = (z << 8) + 0x80;
         route = *(void **)(group + 0x1FC);
-        if (Nav_IsPositionInMesh(route, &actor->position, &target) &&
-            (result = Terrain_ApplyBlocked(route, &actor->position, &target))) {
+        if (Nav_IsPositionInMesh(route, &actor->body.position, &target) &&
+            (result = Terrain_ApplyBlocked(route, &actor->body.position, &target))) {
             if (result != 2)
-                Memory_Clear(&alt->motion, 8);
+                Memory_Clear(&alt->body.motion, 8);
             ok = 1;
         } else {
             Chase_ClearBits(&alt->flags2D4, 0x200);

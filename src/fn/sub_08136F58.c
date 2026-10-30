@@ -55,13 +55,13 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor,
                         struct SceneActorRegistryControlGroup *group, u32 blocked)
 {
     void *shape = GROUP_FIELD(group, 0x1fc, void *);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     void *destination = GROUP_FIELD(group, blocked, void *);
     if (Nav_IsPositionInMesh(shape, position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         }
     }
@@ -80,7 +80,7 @@ void sub_08136F58(struct SceneActorRegistryResetView *actor)
         ClearHalfFlags(&actor->flags2D4, ~0x200);
         actor->field2C2 = 0x40;
     }
-    if (((u8)Callback_InvokeActor(actor, actor->update270)) == 0) {
+    if (((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) == 0) {
         u32 *counter = &actor->counter2AC;
         if ((*counter) == 30) {
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);

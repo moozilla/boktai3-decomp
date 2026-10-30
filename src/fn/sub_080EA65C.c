@@ -164,15 +164,15 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
             actor->flags2C0 = bit | actor->flags2C0;
         }
         {
-            struct ContactPosition *dest = &actor->position;
+            struct ContactPosition *dest = &actor->body.position;
             struct GolemRouteLink *link = (void *)(group + 0x74);
             dest->x = link->point->x;
             dest->z = link->point->z;
             dest->y = CellHeight(dest, CellIndex(dest));
         }
-        *(struct ContactPosition *)(drawable + 0x1C) = actor->position;
+        *(struct ContactPosition *)(drawable + 0x1C) = actor->body.position;
     }
-    target = (void *)actor->fieldDC;
+    target = (void *)actor->tracking.target;
     if (frame == 60 || frame == 90) {
         Show(actor);
         Palette(actor, *(u16 *)((u8 *)actor + 0x1E2));
@@ -189,7 +189,7 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
             player = target->player;
             request = *(u16 *)((u8 *)actor + 0xB8);
             option = *(u32 *)((u8 *)actor + 0xD4);
-            Player_BeginPositionRequest(player, (void *)&actor->position, 0, 0, 0, 0, 1, request,
+            Player_BeginPositionRequest(player, (void *)&actor->body.position, 0, 0, 0, 0, 1, request,
                                         option);
             Sound_PlaySong(0xE6);
         } else if (target->kind & 4) {
@@ -211,11 +211,11 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
         } else if (target->kind <= 3) {
             s32 turn, angle;
             player = target->player;
-            turn = (actor->direction + 0x20) & 0xFF;
+            turn = (actor->body.direction + 0x20) & 0xFF;
             angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
             CellCenter((void *)&position, actor->terrainCell);
             Player_ApplyPositionRequest(player, (void *)&position, 0x80, angle, 60, 0, 0, 0);
-            SpriteParticle_SpawnBatch(&actor->position, 1, 1, 1, 0x154);
+            SpriteParticle_SpawnBatch(&actor->body.position, 1, 1, 1, 0x154);
             Sound_PlaySong(0x1DF);
         }
         SceneActorAnimation_SelectDirectionalFlags(actor, 0x10);
@@ -237,8 +237,8 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
         }
         SetCtl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
         SetState(actor, 3, 0, 0);
-        actor->position.x += 32;
-        actor->position.z += 32;
-        *(struct ContactPosition *)(drawable + 0x1C) = actor->position;
+        actor->body.position.x += 32;
+        actor->body.position.z += 32;
+        *(struct ContactPosition *)(drawable + 0x1C) = actor->body.position;
     }
 }

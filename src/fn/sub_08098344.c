@@ -39,7 +39,7 @@ void sub_08098344(void *arg0, void *arg1)
     s32 mz;
     s32 i;
 
-    from = actor->position;
+    from = actor->body.position;
     from.y = 0;
     target = *to;
     target.y = 0;

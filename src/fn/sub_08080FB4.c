@@ -99,16 +99,16 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
     script = *(u16 *)((u8 *)actor + 0x1F8);
     if (script) {
         u32 offset = 0;
-        values[0] = *(s16 *)((u8 *)&actor->position + offset);
-        values[1] = actor->position.y;
-        values[2] = actor->position.z;
+        values[0] = *(s16 *)((u8 *)&actor->body.position + offset);
+        values[1] = actor->body.position.y;
+        values[2] = actor->body.position.z;
         offset = 0x1FC;
         values[3] = *((s32 *)(((u8 *)actor) - (-offset)));
         values[4] = *(s32 *)((u8 *)actor + 0x200);
         values[5] = *(s32 *)((u8 *)actor + 0x204);
         offset += 0xE4;
         values[6] = *(s32 *)((u8 *)actor + offset);
-        values[7] = actor->id;
+        values[7] = actor->body.id;
         arguments.count = 8;
         arguments.values = values;
         /* Keep the payload offset live through argument construction. */
@@ -122,7 +122,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);
     if ((!Test(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
-        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
     }
     ActorShadow_Disable((u8 *)actor + 0x320);
     switch (actor->category) {

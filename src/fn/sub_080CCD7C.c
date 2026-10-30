@@ -129,7 +129,7 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group,
                          struct ContactPosition *destination)
 {
     void *route = *(void **)(group + 0x1FC);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         actor->flags2D4 &= ~0x200;
@@ -138,7 +138,7 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group,
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             actor->flags2D4 &= ~0x200;
@@ -211,7 +211,7 @@ static inline void SetControlZ(struct SceneActorRegistryResetView *actor, u32 ki
     }
 static inline void Golem_Retarget(struct SceneActorRegistryResetView *actor, struct GolemBody *body)
 {
-    s32 d = Wrap(actor->fieldE9 - body->direction68E);
+    s32 d = Wrap(actor->tracking.heading - body->direction68E);
     if ((d < 0 ? -d : d) <= 15 && actor->terrainCell != U16(actor, 0x2F6)) {
         body->target69C = body->home694;
         sub_080C47DC(body);
@@ -271,7 +271,7 @@ static inline u8 TryMove4(struct SceneActorRegistryResetView *actor, void *route
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             u32 mask = ~0x200;
@@ -297,7 +297,7 @@ static inline void Golem_Wander2(struct SceneActorRegistryResetView *input, u8 d
     struct SceneActorRegistryResetView *actor = input;
     u8 *group = (u8 *)&actor->group;
     if (!Flag16(actor, 0x400, 0x2D4) && !TestBits16((u16 *)(group + 0x40), 4)) {
-        group[0x204] = RandomDirectionExcept(actor->direction);
+        group[0x204] = RandomDirectionExcept(actor->body.direction);
         ((struct GolemSavedControl *)(group + 0x8C))->target = actor->target;
         ((struct GolemSavedControl *)(group + 0x8C))->kind = actor->field2B5;
         ((struct GolemSavedControl *)(group + 0x8C))->state = actor->state2A8;
@@ -321,7 +321,7 @@ static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
     u32 *targetp;
     actor = input;
     group = (u8 *)&actor->group;
-    targetp = &actor->fieldDC;
+    targetp = &actor->tracking.target;
     {
         struct ContactPosition *dest = actor->state5D4;
         struct GolemRouteLink2 *link = (void *)&actor->route;
@@ -375,7 +375,7 @@ static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
                 (*home)->pad = 0;
             }
         }
-        Golem_Wander2(input, actor->direction);
+        Golem_Wander2(input, actor->body.direction);
         sub_0807E334(input);
         actor->field2C2 = 0x20;
         return 0;
@@ -383,7 +383,7 @@ static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
     {
         struct ContactPosition center;
         SceneActorTerrain_GetCenter(cell, &center);
-        if (!TryMove4(input, PTR(group, 0x1FC), &actor->position, &center)) {
+        if (!TryMove4(input, PTR(group, 0x1FC), &actor->body.position, &center)) {
         fail:
             Callback_InvokeActor(actor, PTR(group, 0x224));
             return 0;
@@ -420,7 +420,7 @@ void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
     }
     SceneActor_AccelerateForTerrain(actor);
     if (Test(gEngineFlags, 0x4800)) {
-        u8 *partner = (u8 *)actor->fieldDC;
+        u8 *partner = (u8 *)actor->tracking.target;
         s32 index;
         if (!partner)
             goto route;
@@ -452,12 +452,12 @@ route:
                 s32 distance;
                 s32 d;
                 body->target69C = body->home694;
-                SceneActorTerrain_Subtract(&diff, &body->target69C, &actor->position);
+                SceneActorTerrain_Subtract(&diff, &body->target69C, &actor->body.position);
                 distance = diff.x * diff.x + diff.z * diff.z;
                 {
                     u8 *facing = &body->direction68E;
                     body->flag625 = 1;
-                    d = Wrap(actor->fieldE9 - *facing);
+                    d = Wrap(actor->tracking.heading - *facing);
                 }
                 if (d < 0)
                     d = -d;
@@ -480,11 +480,11 @@ route:
                 if (Golem_TurnGap(body) > 31)
                     GOLEM_TURN(body);
                 SceneActorTerrain_Subtract(&diff,
-                                           (struct ContactPosition *)((u8 *)actor->fieldDC + 0xC),
-                                           &actor->position);
+                                           &actor->tracking.target->position,
+                                           &actor->body.position);
                 if (diff.x * diff.x + diff.z * diff.z <= 0xFFFE && body->charge682 > 199) {
                     if (Test(gEngineFlags, 0x4800)) {
-                        u8 *partner = (u8 *)actor->fieldDC;
+                        u8 *partner = (u8 *)actor->tracking.target;
                         s32 index;
                         if (!partner)
                             goto recover;
@@ -561,7 +561,7 @@ route:
             dest->y = CellHeight(dest, CellIndex(dest));
         }
         (*(struct ContactPosition **)(group + 0x200))->pad = 1;
-        if (!TryMove4(actor, PTR(group, 0x1FC), &actor->position,
+        if (!TryMove4(actor, PTR(group, 0x1FC), &actor->body.position,
                       *(struct ContactPosition **)(group + 0x200))) {
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
             return;

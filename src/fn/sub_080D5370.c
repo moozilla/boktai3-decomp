@@ -9,7 +9,7 @@ void Mummy_WaitReplaceResponse(struct SceneActorRegistryResetView *actor)
     asm("" : "+r"(group));
     if (actor->field2B1)
         actor->field2B1 = 0;
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if ((s32)actor->counter2AC >= *(u16 *)(group + 0x44)) {
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, *((u8 *)actor + 0x98));

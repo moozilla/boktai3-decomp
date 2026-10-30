@@ -40,7 +40,7 @@ u32 Slime_TryEnrage(struct SceneActorRegistryResetView *actor)
     actor->field2C2 = 0x40;
     if (!Slime_TestFlag(actor))
         return 0;
-    dy = actor->position.y - ((s16 *)gPlayers[0])[0x32 / 2];
+    dy = actor->body.position.y - ((s16 *)gPlayers[0])[0x32 / 2];
     if (dy < 0)
         dy = -dy;
     if (dy > 0x200)

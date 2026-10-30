@@ -267,7 +267,7 @@ static inline void ActorStatus_ResetReaction(struct SceneActorRegistryResetView 
     actor->group.flags414 = 0;
     actor->group.field418 = 0;
     ActorStatus_ClearMotionFlags(actor, 0x380);
-    ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 0x18);
+    ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 0x18);
     ActorStatus_ResetInteraction(actor);
     ActorStatus_ClearMotionFlags(actor, 0x400);
     ActorStatus_ResetSelection(actor);
@@ -560,10 +560,10 @@ static inline void ActorStatus_Wake(struct SceneActorRegistryResetView *actor)
         (ActorStatus_BehaviorFlags(actor, 0x1000))) {
         ActorStatus_ResetRoute(actor);
         SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x1000);
-        actor->reactionStart.x = actor->position.x;
-        actor->reactionStart.z = actor->position.z;
-        actor->reactionEnd.x = actor->position.x;
-        actor->reactionEnd.z = actor->position.z;
+        actor->reactionStart.x = actor->body.position.x;
+        actor->reactionStart.z = actor->body.position.z;
+        actor->reactionEnd.x = actor->body.position.x;
+        actor->reactionEnd.z = actor->body.position.z;
         if ((*(s16 *)&actor->fieldAA) >= actor->attachmentLimit)
             (*(s16 *)&actor->fieldAA) = ActorStatus_AttachmentRestart(actor);
         if (actor->health <= 0) {
@@ -662,14 +662,14 @@ static inline void ActorStatus_ReactionFlags(void *object)
 
         if (ActorStatus_MotionFlags(actor, 0x2000)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 8);
+            ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 8);
             ActorStatus_ClearMotionFlags(actor, 0x500);
             ActorStatus_SetPendingBits(actor, 0x400);
             actor->field2C2 = 0x40;
             SceneActorChase_ClearBits(&actor->flags2D6, 0x980);
         } else if (ActorStatus_MotionFlags(actor, 4)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 8);
+            ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 8);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
             ActorStatus_SetPendingBits(actor, 0x400);
             actor->field2C2 = 0x40;
@@ -677,7 +677,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
             ActorStatus_SetWord(&actor->flags2CC, 0x2000);
         } else if (ActorStatus_MotionFlags(actor, 2)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 8);
+            ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 8);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
             ActorStatus_SetPendingBits(actor, 0x400);
             SceneActorChase_ClearBits(&actor->flags2D6, 0x980);
@@ -708,7 +708,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
         if (ActorStatus_MotionFlags(actor, 0x803E)) {
             ActorStatus_ClearMotionFlags(actor, 0x201);
             SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x4000);
-            ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 0x10);
+            ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 0x10);
             if (!(ActorStatus_MotionFlags(actor, 0x20)))
                 SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x80);
             SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x100004);
@@ -771,11 +771,11 @@ static inline void ActorStatus_Particles(struct SceneActorRegistryResetView *act
     /* flicker spark while the hit timer runs */
     if ((*(u16 *)&actor->field30C) != 0) {
         (*(u16 *)&actor->field30C)--;
-        if (actor->position.y >= 0 && Mod((*(u16 *)&actor->field30C), 4) == 0) {
+        if (actor->body.position.y >= 0 && Mod((*(u16 *)&actor->field30C), 4) == 0) {
             u8 baseAngle = actor->field2B6;
             u32 rb;
 
-            sparkPos.position = actor->position;
+            sparkPos.position = actor->body.position;
             sparkPos.packed.y += (ActorStatus_RandomSample(gRandomTable) & 255);
             rb = ActorStatus_ParticleHeading(
                 baseAngle, (s32)(ActorStatus_RandomSample(gRandomTable) & 31) - 16);
@@ -801,7 +801,7 @@ static inline u8 ActorStatus_TryRecoveryRoute(struct SceneActorRegistryResetView
     blocked = Terrain_ApplyBlocked(route, from, to);
     if (blocked) {
         if (blocked != 2)
-            Memory_Clear(&actor->motion, sizeof(actor->motion));
+            Memory_Clear(&actor->body.motion, sizeof(actor->body.motion));
         return 1;
     }
     ActorStatus_ClearMotionFlags(actor, 0x200);
@@ -855,17 +855,17 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
 static inline void ActorStatus_FaceTarget(struct SceneActorRegistryResetView *actor)
 {
     if (ActorStatus_BodyFlags(actor, 2)) {
-        actor->fieldDC = (u32)(gUnknown_02000580[0] + 0x24);
-    } else if (actor->fieldDC == 0) {
+        actor->tracking.target = (u32)(gUnknown_02000580[0] + 0x24);
+    } else if (actor->tracking.target == 0) {
         return;
     }
     {
-        u8 *tg = (void *)actor->fieldDC;
-        s32 dx = *(s16 *)(tg + 0xC) - actor->position.x;
-        s32 dy = *(s16 *)(tg + 0x10) - actor->position.z;
+        u8 *tg = (void *)actor->tracking.target;
+        s32 dx = *(s16 *)(tg + 0xC) - actor->body.position.x;
+        s32 dy = *(s16 *)(tg + 0x10) - actor->body.position.z;
 
-        actor->fieldE9 = Math_Atan2(dx, dy);
-        actor->distanceF0 = dx * dx + dy * dy;
+        actor->tracking.heading = Math_Atan2(dx, dy);
+        actor->tracking.distance = dx * dx + dy * dy;
     }
 }
 
@@ -889,8 +889,8 @@ s32 SceneActor_UpdateStatus(struct SceneActorRegistryActor *actor)
         ActorStatus_FaceTarget((void *)arg0);
     }
     ActorStatus_StoreByte(&((struct SceneActorRegistryResetView *)arg0)->colliderB.direction,
-                          ((struct SceneActorRegistryResetView *)arg0)->direction);
+                          ((struct SceneActorRegistryResetView *)arg0)->body.direction);
     ActorStatus_StoreByte(&((struct SceneActorRegistryResetView *)arg0)->colliderA.direction,
-                          ((struct SceneActorRegistryResetView *)arg0)->direction);
+                          ((struct SceneActorRegistryResetView *)arg0)->body.direction);
     return 1;
 }

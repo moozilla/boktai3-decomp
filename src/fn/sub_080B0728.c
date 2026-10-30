@@ -25,7 +25,7 @@ void SceneActorPhase_UpdateConditionalMotion(struct SceneActorRegistryResetView 
         SelectControl(p, control, kind);
     }
     if (SceneActor_IsFacingNearbyTarget(p)) {
-        if ((u8)Callback_InvokeActor(p, p->update270))
+        if ((u8)Callback_InvokeActor(p, p->contactQuery.opaque))
             return;
         if (sub_0812F3CC(p))
             return;

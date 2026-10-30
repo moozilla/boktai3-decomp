@@ -88,8 +88,8 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
     if (prepared) {
         s32 quadrant;
         s32 facing;
-        actor->direction = ((((actor->direction + 0x60) >> 6) & 3) * 64) - 64;
-        quadrant = ((actor->direction + 0x60) >> 6) & 3;
+        actor->body.direction = ((((actor->body.direction + 0x60) >> 6) & 3) * 64) - 64;
+        quadrant = ((actor->body.direction + 0x60) >> 6) & 3;
         if (((actor->behavior2AA != 6) && (actor->behavior2AA != 17)) &&
             (!TurnFlags(motionFlags, 0x4480))) {
             facing = ((((u16)Route_GetCurrentPointFacing(route)) + 0x70) >> 5) & 7;
@@ -166,7 +166,7 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
         struct TurnSequence *sequence = (void *)(((u8 *)actor->drawable) + 0x48);
         if ((!sequence->timer) && ((sequence->frame == 1) || (sequence->frame == 3))) {
             s32 desired = ((((struct SceneActorAnimationView *)actor)->nextDirection + 5) & 7) << 5;
-            s32 difference = actor->direction - desired;
+            s32 difference = actor->body.direction - desired;
             if (difference < 0)
                 difference = -difference;
             if (difference <= 0x20)
@@ -189,13 +189,13 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
     else
         Anim_SetFrameDurationScale(((u8 *)actor->drawable) + 0x20, actor->field2C2);
     if (actor->field2B3) {
-        s32 facing = ((actor->direction + 0x70) >> 5) & 7;
+        s32 facing = ((actor->body.direction + 0x70) >> 5) & 7;
         s32 difference = ((struct SceneActorAnimationView *)actor)->nextDirection - facing;
         if (difference < 0)
             difference = -difference;
         if (difference <= 0) {
             actor->field2B0 = 1;
-            actor->direction = ((((actor->direction + 0x60) >> 6) & 3) * 64) - 64;
+            actor->body.direction = ((((actor->body.direction + 0x60) >> 6) & 3) * 64) - 64;
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             if (TurnFlags(motionFlags, 0x400)) {
                 Chase_SetState(actor, 3, 1, 0);

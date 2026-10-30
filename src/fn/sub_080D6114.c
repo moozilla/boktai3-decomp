@@ -34,7 +34,7 @@ void SceneActor_WaitForControlCompletion(struct SceneActorRegistryResetView *act
         void *control = actor->entryTarget224;
         SetControl(actor, control, 2);
     }
-    busy = Callback_InvokeActor(actor, actor->update270);
+    busy = Callback_InvokeActor(actor, actor->contactQuery.opaque);
     if (!busy) {
         if (actor->field2B0) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

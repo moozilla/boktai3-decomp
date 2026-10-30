@@ -156,7 +156,7 @@ static inline u8 Chase_TryRoute(struct SceneActorRegistryResetView *actor, void 
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     Chase_ClearBits(&actor->flags2D4, 0x200);
@@ -202,7 +202,7 @@ static inline void Chase_BeginTurn(void *obj, u8 saved)
     struct SceneActorRegistryResetView *actor = obj;
     u8 *group = (u8 *)&actor->group;
     if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
-        s32 prior = actor->direction;
+        s32 prior = actor->body.direction;
         s32 tries = 0;
         s32 choice;
         do {
@@ -269,7 +269,7 @@ static inline u8 Chase_Arrive(void *obj)
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
     }
     {
-        u8 saved = actor->direction;
+        u8 saved = actor->body.direction;
         Chase_BeginTurn(obj, saved);
     }
     sub_0807E334(actor);
@@ -288,7 +288,7 @@ reroute: {
         data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
+    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, targetPointer))
         return 1;
     Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }

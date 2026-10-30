@@ -41,7 +41,7 @@ void TentacleActor_UpdateKnockback(struct SceneActorRegistryResetView *p)
         u32 angle;
         u8 *direction;
         SetControl(p, FIELD(p, 0x22c, void *), 0);
-        direction = &p->direction;
+        direction = &p->body.direction;
         velocity = (void *)((u8 *)p + 0x2ec);
         angle = *direction;
         velocity->x = Scale(gUnk_086149C4[(angle + 64) & 255] * 4);

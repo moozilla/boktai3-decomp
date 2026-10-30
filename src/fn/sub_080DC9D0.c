@@ -44,7 +44,7 @@ void Mummy_ResumeRouteAfterCheckpoint(struct SceneActorRegistryResetView *actor)
         }
         Chase_SetCtl(actor, Mummy_UpdatePlayerRoute, 0x27);
         Chase_SetBehavior(actor, 0x10);
-        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, &actor->position)) {
+        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, &actor->body.position)) {
             Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
             Chase_SetState(actor, 3, 0, 0);
         }

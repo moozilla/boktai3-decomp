@@ -39,7 +39,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
 }
 void SceneActorControl_RefreshMotionRoute(struct SceneActorRegistryResetView *actor)
 {
-    u32 active = MotionActive((void *)&actor->fieldDC);
+    u32 active = MotionActive((void *)&actor->tracking.target);
     if (active) {
         {
             u16 *flags = &actor->group.flags414;
@@ -64,7 +64,7 @@ void SceneActorControl_RefreshMotionRoute(struct SceneActorRegistryResetView *ac
         SetControl(actor, (void *)SceneActorControl_OnIdle, 16, active);
     }
     {
-        struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+        struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
         u32 mask = 8;
         u32 value = motion->flags;
         mask |= value;

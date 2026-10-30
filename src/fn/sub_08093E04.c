@@ -14,7 +14,7 @@ static inline void ResetAnimation(struct SceneActorRegistryResetView *actor, u32
 void Bee_UpdateReactionPhase(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        actor->direction = actor->fieldE9;
+        actor->body.direction = actor->tracking.heading;
         {
             void *callback = (void *)Bee_ResetReactionAnimation;
             u32 kind = 0x25;

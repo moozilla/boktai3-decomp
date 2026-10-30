@@ -6,11 +6,11 @@ void SceneActorControl_UpdateFacingAnimation(struct SceneActorRegistryResetView 
     if (changed) {
         u8 direction;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
-        direction = actor->direction;
+        direction = actor->body.direction;
         control->savedDirection = direction;
-    } else if (control->savedDirection != actor->direction) {
+    } else if (control->savedDirection != actor->body.direction) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
-        control->savedDirection = actor->direction;
+        control->savedDirection = actor->body.direction;
     } else
         actor->field2B3 = changed;
 }

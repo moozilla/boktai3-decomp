@@ -240,7 +240,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct SceneActorRegistryResetView *act
     record:
         if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) &&
             !Flag2D0(actor, 0x800))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
         ((struct ContactCollider *)collider)->flags |= 4;
     done:
         return 1;

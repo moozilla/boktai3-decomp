@@ -152,13 +152,13 @@ void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
         }
     }
     if ((s32)actor->counter2AC > 115) {
-        s32 angle = *((u8 *)actor + 0xE9) - actor->direction;
+        s32 angle = *((u8 *)actor + 0xE9) - actor->body.direction;
         if (angle > 128)
             angle -= 256;
         else if (angle < -128)
             angle += 256;
         if (Turned(angle)) {
-            actor->direction = *((u8 *)actor + 0xE9);
+            actor->body.direction = *((u8 *)actor + 0xE9);
             State6(actor);
             return;
         }
@@ -179,9 +179,9 @@ void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
         turn = 6;
         rate = 0x4D8;
     }
-    dx = Shift(gUnk_086149C4[(actor->direction + 64) & 255] * speed, 12);
-    dz = Shift(gUnk_086149C4[actor->direction] * speed, 12);
-    actor->direction += turn;
+    dx = Shift(gUnk_086149C4[(actor->body.direction + 64) & 255] * speed, 12);
+    dz = Shift(gUnk_086149C4[actor->body.direction] * speed, 12);
+    actor->body.direction += turn;
     *(u16 *)((u8 *)actor + 0x64) += dx;
     *(u16 *)((u8 *)actor + 0x68) += dz;
     sub_080A9DB0(actor, amplitude, rate);

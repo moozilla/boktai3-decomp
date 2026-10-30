@@ -68,7 +68,7 @@ void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
             u32 mask = 0x100000;
             actor->flags2D0 |= mask;
         }
-        TentacleBody_GetDirectionFrame(actor->direction, &params.variant, &params.flags);
+        TentacleBody_GetDirectionFrame(actor->body.direction, &params.variant, &params.flags);
         TentacleBody_RestartSegmentAnimations(body, 18, params.variant, params.flags);
         SetBodyFlag(body, 2);
     }
@@ -111,9 +111,9 @@ void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
             speed = 2;
             actor->field2EA += 40;
         }
-        angle = (actor->direction + 128) & 255;
-        actor->motion.x += Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
-        actor->motion.z += Shift(gUnk_086149C4[angle] * speed, 12);
+        angle = (actor->body.direction + 128) & 255;
+        actor->body.motion.x += Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
+        actor->body.motion.z += Shift(gUnk_086149C4[angle] * speed, 12);
         sub_080A9DB0(actor, 14, 12000);
         n = 0;
         for (i = 0; i < body->segmentCount; i++) {
@@ -122,16 +122,16 @@ void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
                     case 0:
                         body->segments[i].posX =
                             *(u16 *)((u8 *)actor + 0x5C) -
-                            Shift(gUnk_086149C4[(actor->direction + 64) & 255] * 54, 12);
+                            Shift(gUnk_086149C4[(actor->body.direction + 64) & 255] * 54, 12);
                         body->segments[i].posZ = *(u16 *)((u8 *)actor + 0x60) -
-                                                 Shift(gUnk_086149C4[actor->direction] * 54, 12);
+                                                 Shift(gUnk_086149C4[actor->body.direction] * 54, 12);
                         break;
                     case 1:
                         body->segments[i].posX =
                             *(u16 *)((u8 *)actor + 0x5C) -
-                            Shift(gUnk_086149C4[(actor->direction + 64) & 255] * 20, 12);
+                            Shift(gUnk_086149C4[(actor->body.direction + 64) & 255] * 20, 12);
                         body->segments[i].posZ = *(u16 *)((u8 *)actor + 0x60) -
-                                                 Shift(gUnk_086149C4[actor->direction] * 20, 12);
+                                                 Shift(gUnk_086149C4[actor->body.direction] * 20, 12);
                         break;
                     default:
                         body->segments[i].posX = *(u16 *)((u8 *)actor + 0x5C);

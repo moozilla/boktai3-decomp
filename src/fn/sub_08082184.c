@@ -83,7 +83,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *conte
     result = Terrain_ApplyBlocked(context, source, destination);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     ClearBits(&actor->flags2D4, 0x200);
@@ -125,7 +125,7 @@ void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *actor
 {
     struct RouteResponseGroup *group = (void *)&actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->direction = (((actor->field2B6 + 3) & 7) << 5) - 64;
+        actor->body.direction = (((actor->field2B6 + 3) & 7) << 5) - 64;
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 0);
         actor->field2B3 = 0;
     }
@@ -133,7 +133,7 @@ void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *actor
         actor->field2B0 = 1;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
         SnapToRoute(group->destination, &group->route);
-        if (!TryRoute(actor, group->context, &actor->position, group->destination)) {
+        if (!TryRoute(actor, group->context, &actor->body.position, group->destination)) {
             SetControl(actor, SceneActorControl_OnIdle, 0);
             SetState(actor, 3, 0, 0);
         } else {

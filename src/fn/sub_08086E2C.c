@@ -57,7 +57,7 @@ void Bat_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
         blocked = Bat_MaskFlags(actor, 128);
         if (blocked) {
             void *target;
-            SceneActor_SetPositionXZ(&actor->id, (*(struct BatRoutePoint **)(group + 0x1FC))->x,
+            SceneActor_SetPositionXZ(&actor->body.id, (*(struct BatRoutePoint **)(group + 0x1FC))->x,
                                      (*(struct BatRoutePoint **)(group + 0x1FC))->z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             target = *(void **)(group + 0x48);
@@ -77,7 +77,7 @@ void Bat_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
             }
         } else {
             void *target;
-            SceneActor_SetPositionXZ(&actor->id, (*(struct BatRoutePoint **)(group + 0x1FC))->x,
+            SceneActor_SetPositionXZ(&actor->body.id, (*(struct BatRoutePoint **)(group + 0x1FC))->x,
                                      (*(struct BatRoutePoint **)(group + 0x1FC))->z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             target = actor->entryTarget228;

@@ -91,7 +91,7 @@ u8 Vorn_SelectHitRecovery(struct SceneActorRegistryResetView *actor)
         actor->field5CA = 65;
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }
-    if (!actor->fieldDC)
+    if (!actor->tracking.target)
         return 0;
     {
         u32 foreign = context->foreignPosition;
