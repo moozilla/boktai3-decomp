@@ -23,3 +23,12 @@ Exact 524 bytes. Canonical state-entry, controller, delayed-response, and route
 operations replace raw actor offsets. The motion-flags operation accepts its actor
 owner so its mask is prepared before the flag address. The context view exposes
 the disc targets and recovery delay. Stock check reports zero differing bytes.
+
+## Bat landing recovery (08087018)
+
+Exact 2,648 bytes. The landing-preparation operation retains the reaction flag
+component while the caller handles recovery. The earlier draft incorrectly cleared
+motion flags instead of reaction flags at 0x2D6 and fetched a group callback where
+the ROM uses `entryTarget228`. Typed group ownership resolves the final PRE
+first-discovery tie. This uses the existing typed-group interface selector; no
+new selector or compiler override. Formatted stock check reports zero differing bytes.
