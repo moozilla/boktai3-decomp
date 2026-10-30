@@ -1,11 +1,24 @@
 #include "global.h"
 #include "render.h"
 #include "engine_globals.h"
+#include "display_sequence_inline.h"
 
-#define SP_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
-#define SV(d)         (Script_GetPc() ? Script_GetValue() : (d))
+s32 Script_GetValue(void);
+u32 Script_GetPc(void);
+static inline s32 MonsterInit_Value(s32 fallback)
+{
+    if (Script_GetPc())
+        return Script_GetValue();
+    return fallback;
+}
+static inline u16 MonsterInit_ReadAttackHalfword(u16 fallback)
+{
+    if (Script_GetPc())
+        return Script_GetValue();
+    return fallback;
+}
 
-struct Sp32Block {
+struct MonsterInit32Block {
     u32 w[8];
 };
 
@@ -22,23 +35,9 @@ void CpuSet(const void *, void *, u32);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
-void SceneActorRegistry_SetObjectContext(void *, void *, s32);
-void Spider_InitProfile(void *);
-void Spider_OnUpdate(void);
-void Spider_GetAnimationEvent(void);
-void sub_080A21EC(void);
-void Spider_SelectActiveAnimation(void);
-void Spider_SelectIdleAnimation(void);
-void Spider_UpdateLandingMotion(void);
-void Spider_UpdateDefeat(void);
-void Spider_OnActionEvent(void);
-void SceneActorReaction_OnEnemyDefault(void);
-void SceneActorPlacement_BeginContactRoute(void);
+void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
+void sub_08080BE0(void);
 void SceneActorReaction_SinkAndRemove(void);
-void sub_081363F4(void);
-void SceneActorPlacement_BeginDefaultResponse(void);
-void Spider_OnSecondaryColliderContact(void);
-void SceneActorReaction_BeginTargetRecovery(void);
 void SceneActorReaction_BeginFadedState(void);
 void SceneActorReaction_BeginDefeatBurst(void);
 void sub_0807DB34(void);
@@ -51,23 +50,10 @@ void sub_0808170C(void);
 void SceneActorReaction_ResumeAfterAnimation(void);
 void SceneActorReaction_TryResumeRoute(void);
 void SceneActorReaction_BeginReactionSound(void);
-void SceneActorRoute_ResetStep(void);
-void SceneActorReaction_ResumeEntryTarget(void);
-void SceneActorPlacement_BeginNearbyPlayerContact(void);
-void SceneActorPlacement_SelectPlayerApproach(void);
-void Spider_UpdateHiddenRecovery(void);
-void SceneActorReaction_RestoreAlternateAfterDelay(void);
-void Spider_OnSecondaryUpdate(void);
-void Spider_Destroy(void);
+u32 SceneActorReaction_OnEnemyDefault(void);
+void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
 void SceneActorControl_OnIdle(void);
-void sub_08080BE0(void);
-void Spider_InitColliders(void *);
-void Spider_SetBehaviorTables(void *);
-void ProximityVolume_TranslateBounds(void *, void *);
-void SceneActorMovement_ResolveRoutePosition(void *);
-void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
-extern const u8 gUnk_08605F34[];
 extern const u8 gUnk_086108B0[];
 void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
@@ -78,144 +64,526 @@ u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
 void SceneBody_SetSprite(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
-void AnimData_SelectPaletteBank(void *);
+void AnimData_SelectPaletteBank(void *, s32);
 s32 SceneActorScript_GetManagerField62(void);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
-void Anim_Step(void *);
+void Anim_Step(void *, void *);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
-s32 SceneActorRegistry_LinkActor(void *);
+u8 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-/* terrain height probe: (x, y) world pos -> cell id -> height offset */
-static inline s32 Spider_CellHeight(u16 *pos, u16 *cellOut)
+struct MonsterInitPosition {
+    s16 x, y, z, pad;
+};
+struct MonsterInitMap {
+    u32 header;
+    u8 *cells;
+    u8 unknown8[0x1C];
+    u16 rows[1];
+};
+static inline void MonsterInit_ClearPosition(u32 *fill, void *object)
 {
-    s32 x = (s16)pos[0] >> 8;
-    s32 y = (s16)pos[2] >> 8;
-    s32 cell;
-    u8 *p;
-    s32 b, h;
-
-    if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = *(u16 *)((u8 *)((u32 *)gTerrainMap) + 0x24 + y * 2) + x;
-    if (cellOut)
-        *cellOut = cell;
-    p = TerrainModifiers_FindCellOverride(cell, 1);
+    struct MonsterInitPosition *position = object;
+    *fill = 0;
+    CpuSet(fill, position, 0x05000002);
+}
+static inline u16 MonsterInit_PositionX(const struct MonsterInitPosition *pos)
+{
+    return pos->x;
+}
+static inline u16 MonsterInit_PositionZ(const struct MonsterInitPosition *pos)
+{
+    return pos->z;
+}
+static inline u32 MonsterInit_Cell(struct MonsterInitPosition *pos)
+{
+    s32 x = (s16)MonsterInit_PositionX(pos) >> 8;
+    s32 z = (s16)MonsterInit_PositionZ(pos) >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+        return 0;
+    return ((struct MonsterInitMap *)gTerrainMap)->rows[z] + x;
+}
+static inline u32 MonsterInit_TerrainShape(const u8 *cell)
+{
+    return *cell >> 4;
+}
+static inline u32 MonsterInit_TerrainBaseHeight(const u8 *cell)
+{
+    return (*cell & 15) << 8;
+}
+static inline u32 MonsterInit_Height(s32 cell, u16 *pos)
+{
+    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
+    u32 attributes, shape;
+    s32 height;
     if (p)
         p += 4;
-    else
-        p = (u8 *)((u32 *)gTerrainMap)[1] + cell * 4 + 0xC;
-    b = *p;
-    h = (b & 0xF) << 8;
-    if ((b >> 4) == 1)
-        h -= ((u8 *)pos)[4];
-    else if ((b >> 4) == 2)
-        h -= ((u8 *)pos)[0];
-    return h;
+    else {
+        struct MonsterInitMap *map = (void *)gTerrainMap;
+        u32 offset = cell * 4 + 12;
+        p = map->cells + offset;
+    }
+    shape = MonsterInit_TerrainShape(p);
+    height = MonsterInit_TerrainBaseHeight(p);
+    switch (shape) {
+        case 1:
+            height -= ((u8 *)pos)[4];
+            break;
+        case 2:
+            height -= ((u8 *)pos)[0];
+            break;
+    }
+    return height;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 31.3%
-// scope shape 1525 (differences once low registers are set aside)
-// confidence=low: Spider enemy loader (Crow/Ivy-shaped): script params, optional patrol route, callback tables
-s32 Spider_Init(u8 *arg0)
+struct SpiderBody {
+    u32 id;
+    u8 unknown54[0x5];
+    u8 direction;
+    u8 unknown5A[0x2];
+    struct MonsterInitPosition position;
+    u8 unknown64[0x34];
+};
+struct SpiderAttacks {
+    u16 first[4];
+    u16 second[4];
+    u16 parameter[4];
+    u32 flags[4];
+};
+struct MonsterInitGate {
+    u16 field414;
+    u16 field416;
+    u16 field418;
+    u16 field41A;
+    void *field41C;
+};
+struct MonsterInitRange {
+    u32 field420 : 16;
+    u32 field422 : 16;
+    u32 field424;
+    u8 unknown428[0x2];
+    u8 field42A;
+    u8 field42B;
+};
+struct MonsterInitRoutePoint {
+    s16 x, z;
+};
+struct MonsterInitRoute {
+    u32 unknown0, unknown4;
+    struct MonsterInitRoutePoint *point;
+    u8 currentPoint, branches[2], activeBranch;
+    u8 routeId, parameterB, pointId, unknown13;
+};
+struct SpiderDeferredControl {
+    u8 unknown0[8];
+    u8 state, phase, mode, unknownB;
+    u32 counter;
+    void *callback;
+};
+struct SpiderGroup {
+    u16 field3D4;
+    u8 unknown3D6[0x2];
+    u32 field3D8;
+    u8 unknown3DC[0x38];
+    struct MonsterInitGate gate;
+    struct MonsterInitRange range;
+    u8 unknown42C[0x10];
+    void *field43C;
+    u32 field440;
+    void *field444;
+    struct MonsterInitRoute route;
+    u8 unknown45C[4];
+    struct SpiderDeferredControl deferred;
+    u8 unknown474[0x142];
+    s16 field5B6;
+    u8 unknown5B8[0x14];
+    u16 field5CC;
+    u8 unknown5CE[0x2];
+    u8 *field5D0;
+    u8 *field5D4;
+    u8 unknown5D8[0x4];
+    void *field5DC;
+    void *field5E0;
+    void *field5E4;
+    u32 field5E8;
+    void *field5EC;
+    void *field5F0;
+    void *field5F4;
+    void *field5F8;
+    void *field5FC;
+    void *field600;
+    u32 field604;
+    u32 field608;
+    void *field60C;
+    void *field610;
+    void *field614;
+    void *field618;
+    u32 field61C;
+    u32 field620;
+};
+struct MonsterInitTargeting {
+    u32 fieldDC;
+    u8 unknownE0[0xA];
+    u8 fieldEA;
+    u8 fieldEB;
+    u16 fieldEC;
+    u16 fieldEE;
+    u8 unknownF0[0x4];
+    u32 fieldF4;
+    u32 fieldF8;
+    u32 fieldFC;
+};
+struct MonsterInitSavedControl {
+    u32 field118;
+    u32 field11C;
+    u8 field120;
+    u8 field121;
+    u8 field122;
+    u8 field123;
+    void *field124;
+    u8 field128;
+    u8 unknown129[0x3];
+    u16 field12C;
+    u16 field12E;
+    u32 field130;
+};
+struct SpiderActor {
+    u8 unknown0[0x4];
+    u8 *drawable;
+    u8 drawableKind;
+    u8 unknown9[0x47];
+    struct SpiderBody body;
+    u8 category;
+    u8 unknown99[0x1];
+    u16 field9A;
+    s16 field9C;
+    u8 field9E;
+    u8 field9F;
+    u8 fieldA0;
+    u8 fieldA1;
+    u16 fieldA2;
+    u16 fieldA4;
+    u16 fieldA6;
+    u16 fieldA8;
+    u16 fieldAA;
+    u32 fieldAC;
+    u16 fieldB0;
+    u16 fieldB2;
+    struct SpiderAttacks attacks;
+    struct MonsterInitTargeting targeting;
+    u8 unknown100[0x4];
+    u32 field104;
+    u32 field108;
+    u32 field10C;
+    u32 field110;
+    u32 field114;
+    struct MonsterInitSavedControl saved;
+    u8 unknown134[0x6];
+    u16 field13A;
+    u8 unknown13C[0xA4];
+    u16 field1E0;
+    u16 field1E2;
+    u16 field1E4;
+    u16 field1E6;
+    u8 unknown1E8[0x4];
+    u32 field1EC;
+    u32 field1F0;
+    u8 unknown1F4[0x28];
+    void *field21C;
+    void *field220;
+    void *field224;
+    void *field228;
+    void *field22C;
+    void *field230;
+    void *field234;
+    void *field238;
+    void *field23C;
+    u32 field240;
+    u8 unknown244[0x4];
+    void *field248;
+    void *field24C;
+    const void *field250;
+    u8 unknown254[0x4];
+    void *field258;
+    void *field25C;
+    u32 (*field260)(void *);
+    void *field264;
+    void *field268;
+    void *field26C;
+    u8 (*field270)(void *);
+    void *field274;
+    void *field278;
+    u8 unknown27C[0x2C];
+    u8 field2A8;
+    u8 field2A9;
+    u8 field2AA;
+    u8 unknown2AB[0x1];
+    u32 field2AC;
+    u8 field2B0;
+    u8 field2B1;
+    u8 field2B2;
+    u8 unknown2B3[0x1];
+    u8 field2B4;
+    u8 field2B5;
+    u8 unknown2B6[0x1];
+    u8 field2B7;
+    u8 unknown2B8[0x6];
+    u16 field2BE;
+    u16 field2C0;
+    u16 field2C2;
+    u8 unknown2C4[0x4];
+    u16 field2C8;
+    u8 unknown2CA[0x2];
+    u32 field2CC;
+    u32 field2D0;
+    u16 field2D4;
+    u8 unknown2D6[0x12];
+    u16 field2E8;
+    u16 field2EA;
+    u8 unknown2EC[0x8];
+    u16 field2F4;
+    u8 unknown2F6[0x4];
+    u16 field2FA;
+    u8 unknown2FC[0x8];
+    u32 field304;
+    u8 unknown308[0xCC];
+    struct SpiderGroup group;
+    u8 unknown624[8];
+    u16 flags62C;
+    u16 timer62E;
+    u8 bounds630[0x24];
+    u8 bounds654[0x24];
+};
+
+void Spider_InitProfile(void *);
+u32 Spider_OnUpdate(void *);
+u32 Spider_GetAnimationEvent(void *);
+void sub_080A21EC(void *);
+void Spider_SelectActiveAnimation(void *);
+void Spider_SelectIdleAnimation(void *);
+void Spider_UpdateLandingMotion(void *);
+void Spider_OnActionEvent(void *);
+void Spider_InitColliders(void *);
+void Spider_SetBehaviorTables(void *);
+void SceneActorPlacement_BeginDefaultResponse(void);
+u8 SceneActorPlacement_BeginContactRoute(void *);
+u8 SceneActorPlacement_BeginNearbyPlayerContact(void *);
+u8 SceneActorPlacement_SelectPlayerApproach(void *);
+void SceneActorReaction_ResumeEntryTarget(void);
+void SceneActorRoute_ResetStep(void);
+void Spider_OnSecondaryColliderContact(void);
+void Spider_UpdateHiddenRecovery(void);
+void SceneActorReaction_RestoreAlternateAfterDelay(void);
+void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+static inline u8 *MonsterInit_Drawable(void *object)
 {
-    u8 *heap;
-    u32 zero;
-    u32 tmp[2];
-    u32 tmp2[2];
-    u16 pos[4];
-    void *res;
-    s32 mode;
-    s32 i;
-    u32 flag;
-    u8 *rt;
-    u8 *flagp;
-    s32 r4v, r6v, r5v, r2v, r1v;
-    s32 extra;
+    struct SpiderActor *actor = object;
+    return actor->drawable;
+}
+static inline u8 MonsterInit_GetDrawableKind(void *object)
+{
+    struct SpiderActor *actor = object;
+    return actor->drawableKind;
+}
+static inline void MonsterInit_SetCategory(struct SpiderActor *actor, u8 category)
+{
+    actor->category = category;
+}
+static inline u8 MonsterInit_GetCategory(void *object)
+{
+    struct SpiderActor *actor = object;
+    return actor->category;
+}
 
-    zero = 0;
-    SP_AT(u16, 0x62C) = 0;
-    SceneActorRegistry_SetObjectContext(arg0, arg0, 1);
-    SP_AT(u8, 0x98) = 2;
-    Spider_InitProfile(arg0);
+static inline u16 MonsterInit_GetInitialHealth(struct SpiderActor *actor)
+{
+    return actor->fieldB0;
+}
 
-    if (SP_AT(u8, 8) == 0) {
-        heap = Heap_Alloc(0x5C);
-        SP_AT(u8 *, 4) = heap;
-        Memory_Clear(heap, 0x5C);
-        heap = SP_AT(u8 *, 4);
-        AnimData_Load(heap + 0x2C, 0x528F);
-        Sprite_Init(heap, heap + 0x2C, 0);
-        SceneActorAnimation_InitEnemySequence(heap, 0xB6EE);
-        if (SP_AT(u8, 0x98) == 0x11 || SP_AT(u8, 0x98) == 0x17)
-            heap[7] = 1;
-        SP_AT(u8, 0x59) = 0;
-    } else {
-        heap = Heap_Alloc(0x80);
-        SP_AT(u8 *, 4) = heap;
-        Memory_Clear(heap, 0x80);
-        heap = SP_AT(u8 *, 4);
-        CpuSet(&zero, tmp, 0x05000002);
-        res = ScriptProc_Start(0xCB05, 0x528F);
-        *(struct Sp32Block *)heap = *(struct Sp32Block *)res;
-        ResourceHeader_Relocate(heap, res);
-        Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, tmp);
-        SP_AT(u8, 0x2B7) = 0xFF;
-    }
-    flagp = arg0 + 0x59;
+static inline u16 MonsterInit_GetPaletteBase(struct SpiderActor *actor)
+{
+    return actor->field1E0;
+}
 
-    SP_AT(u32, 0x2CC) = 0;
-    SP_AT(u32, 0x2D0) = 0;
-    SP_AT(u8, 0x2B4) = 0;
-    SP_AT(u16, 0x2E8) = 8;
-    SP_AT(u16, 0x2C0) = Script_GetKeywordValue(0x4D, 0);
-    SP_AT(u16, 0x2C2) = 0x40;
-    CpuSet(&zero, tmp2, 0x05000002);
-    mode = Script_GetKeywordValue(0x4E, 0);
+static inline u16 MonsterInit_GetPaletteOffset(struct SpiderActor *actor)
+{
+    return actor->field1E6;
+}
 
-    if (Script_SeekToKeyword(0x61)) {
-        for (i = 0; i <= 3; i++) {
-            SP_AT(u16, 0xB4 + 2 * i) = SV(0x18);
-            SP_AT(u16, 0xBC + 2 * i) = SV(0x18);
-            SP_AT(u32, 0xCC + 4 * i) = SV(0);
-            SP_AT(u16, 0xC4 + 2 * i) = SV(0);
-        }
-    }
+extern u8 *gUnknown_02000580;
 
-    if (Script_SeekToKeyword(0x6C)) {
-        r5v = SV(0x12C);
-        r6v = SV(0x12C);
-        r2v = SV(0x12C);
-    } else {
-        r5v = 0;
-        r6v = 0;
-        r2v = 0;
-    }
-    SP_AT(u16, 0x414) = 0;
-    SP_AT(u16, 0x416) = r2v;
-    SP_AT(u16, 0x418) = 0;
-    SP_AT(u16, 0x41A) = 0;
-    SP_AT(u32, 0x41C) = 0;
+void ProximityVolume_TranslateBounds(void *, void *);
+void SceneActorMovement_ResolveRoutePosition(void *);
+void Spider_UpdateDefeat(void *);
+void SceneActorReaction_BeginTargetRecovery(void);
+void Spider_OnSecondaryUpdate(void);
+void Spider_Destroy(void);
+extern const u8 gUnk_08605F34[];
 
-    if (Script_SeekToKeyword(0x6E)) {
-        r4v = SV(0);
-        SP_AT(u16, 0x420) = SV(0);
-    } else {
-        r4v = 0;
-        SP_AT(u16, 0x420) = r4v;
-    }
-    SP_AT(u16, 0x422) = r4v;
-    SP_AT(u32, 0x424) = SP_AT(u16, 0x422) * SP_AT(u16, 0x422);
-    SP_AT(u8, 0x42A) = 0;
+static inline u16 MonsterInit_GetMotionFlags(struct SpiderActor *actor)
+{
+    return actor->field2C0;
+}
+static inline u16 MonsterInit_GetHeightOffset(struct SpiderActor *actor)
+{
+    return actor->field2EA;
+}
+static inline u32 MonsterInit_GetBehaviorFlags(struct SpiderActor *actor)
+{
+    return actor->field2CC;
+}
+static inline u32 MonsterInit_GetStatusFlags(struct SpiderActor *actor)
+{
+    return actor->field2D0;
+}
+static inline u8 MonsterInit_GetState(struct SpiderActor *actor)
+{
+    return actor->field2A8;
+}
+static inline u8 MonsterInit_GetPhase(struct SpiderActor *actor)
+{
+    return actor->field2A9;
+}
+static inline u8 MonsterInit_GetBehavior(struct SpiderActor *actor)
+{
+    return actor->field2AA;
+}
+static inline void *MonsterInit_GetCurrentControl(struct SpiderActor *actor)
+{
+    return actor->field21C;
+}
+static inline u8 MonsterInit_GetControlKind(struct SpiderActor *actor)
+{
+    return actor->field2B5;
+}
+static inline u8 MonsterInit_GetDirection(struct SpiderActor *actor)
+{
+    return actor->body.direction;
+}
+static inline u32 MonsterInit_GetTerrainCell(struct SpiderActor *actor)
+{
+    return actor->field2F4;
+}
+static inline u8 MonsterInit_GetTargetingFlags(struct MonsterInitTargeting *target)
+{
+    return target->fieldEB;
+}
+static inline struct MonsterInitSavedControl *MonsterInit_SavedControlOf(struct SpiderActor *actor)
+{
+    struct MonsterInitSavedControl *saved = &actor->saved;
+    return saved;
+}
 
+static inline void MonsterInit_SaveControl(struct MonsterInitSavedControl *saved,
+                                           struct SpiderActor *actor)
+{
+    saved->field12E = MonsterInit_GetMotionFlags(actor);
+    saved->field12C = MonsterInit_GetHeightOffset(actor);
+    saved->field118 = MonsterInit_GetBehaviorFlags(actor);
+    saved->field11C = MonsterInit_GetStatusFlags(actor);
+    saved->field120 = MonsterInit_GetDirection(actor);
+    saved->field121 = MonsterInit_GetState(actor);
+    saved->field122 = MonsterInit_GetPhase(actor);
+    saved->field123 = MonsterInit_GetBehavior(actor);
+    saved->field124 = MonsterInit_GetCurrentControl(actor);
+    saved->field128 = MonsterInit_GetControlKind(actor);
+}
+struct MonsterInitCollider {
+    u8 header[6];
+    u16 flags;
+};
+static inline void MonsterInit_ClearColliderFlags(struct MonsterInitCollider *collider, u32 mask)
+{
+    collider->flags = mask & collider->flags;
+}
+static inline s32 MonsterInit_Half(s32 value)
+{
+    if (value >= 0)
+        return value >> 1;
+    return -(-value >> 1);
+}
+static inline void MonsterInit_SetBehaviorFlags(struct SpiderActor *actor, u32 mask)
+{
+    actor->field2CC |= mask;
+}
+
+static inline void MonsterInit_SetStatusFlags(struct SpiderActor *actor, u32 mask)
+{
+    actor->field2D0 |= mask;
+}
+
+static inline u8 MonsterInit_TestMotionFlags(struct SpiderActor *actor, u32 mask)
+{
+    if (MonsterInit_GetMotionFlags(actor) & mask)
+        return 1;
+    return 0;
+}
+
+static inline u8 MonsterInit_TestTargetingFlags(struct MonsterInitTargeting *target, u32 mask)
+{
+    if (MonsterInit_GetTargetingFlags(target) & mask)
+        return 1;
+    return 0;
+}
+static inline void MonsterInit_SetTargetingFlags(struct MonsterInitTargeting *target, u32 mask)
+{
+    mask |= target->fieldEB;
+    target->fieldEB = mask;
+}
+static inline void MonsterInit_ClearControlFlags(struct SpiderActor *actor, u32 mask)
+{
+    actor->field114 &= mask;
+}
+static inline u8 MonsterInit_IsInCurrentRegion(struct SpiderActor *actor)
+{
+    if (*(u32 *)(gGameState + 0x5A0) == actor->field2FA)
+        return 1;
+    return 0;
+}
+static inline void *MonsterInit_GetStandingControl(struct SpiderActor *actor)
+{
+    return actor->field22C;
+}
+static inline void MonsterInit_SetControl(struct SpiderActor *actor, void *callback, u32 behavior,
+                                          u32 reset)
+{
+    actor->field2B2 = 1;
+    actor->field2B0 = reset;
+    actor->field2B5 = behavior;
+    actor->field21C = callback;
+    actor->field2C8 = reset;
+    MonsterInit_ClearControlFlags(actor, ~1);
+    actor->field104 = reset;
+}
+
+static inline void MonsterInit_SetState(struct SpiderActor *actor, u32 state, u32 phase,
+                                        u32 behavior)
+{
+    actor->field2A8 = state;
+    actor->field2A9 = phase;
+    actor->field2AA = behavior;
+    actor->field2AC = 0;
+    actor->field2B1 = 1;
+}
+
+static inline void MonsterInit_InitializeGate(struct MonsterInitGate *gate, u32 parameter)
+{
+    gate->field414 = 0;
+    gate->field416 = parameter;
+    gate->field418 = 0;
+    gate->field41A = 0;
+    gate->field41C = 0;
+}
+
+static inline void MonsterInit_ReadTargeting(struct MonsterInitTargeting *target)
+{
+    s32 r4v, r2v, r1v;
     if (Script_SeekToKeyword(0x65)) {
-        r4v = SV(0x30);
+        r4v = MonsterInit_Value(0x30);
         r2v = Script_GetPc() ? (u8)Script_GetValue() : 0x40;
         r1v = r4v;
     } else {
@@ -223,320 +591,533 @@ s32 Spider_Init(u8 *arg0)
         r1v = 0x30;
         r2v = 0x40;
     }
-    SP_AT(u32, 0xDC) = 0;
-    SP_AT(u16, 0xEC) = r4v;
-    SP_AT(u16, 0xEE) = r1v;
-    SP_AT(u32, 0xF8) = r4v * r4v;
-    SP_AT(u32, 0xFC) = r1v * r1v;
-    SP_AT(u8, 0xEA) = r2v;
-    if (SP_AT(u8, 0xEB) & 4)
-        SP_AT(u32, 0xF4) = SP_AT(u32, 0xF8);
+    target->fieldDC = 0;
+    target->fieldEC = r4v;
+    target->fieldEE = r1v;
+    target->fieldF8 = r4v * r4v;
+    target->fieldFC = r1v * r1v;
+    target->fieldEA = r2v;
+    if (MonsterInit_TestTargetingFlags(target, 4))
+        target->fieldF4 = target->fieldF8;
     else
-        SP_AT(u32, 0xF4) = Div(SP_AT(u32, 0xF8) * 8 - SP_AT(u32, 0xF8), 10);
+        target->fieldF4 = Div(target->fieldF8 * 8 - target->fieldF8, 10);
+}
 
+static inline u16 MonsterInit_RangeRadius(struct MonsterInitRange *range)
+{
+    return range->field422;
+}
+static inline void MonsterInit_ReadRange(struct MonsterInitRange *range)
+{
+    s32 r4v;
+    if (Script_SeekToKeyword(0x6E)) {
+        r4v = MonsterInit_Value(0);
+        range->field420 = MonsterInit_Value(0);
+    } else {
+        r4v = 0;
+        range->field420 = r4v;
+    }
+    range->field422 = r4v;
+    range->field424 = MonsterInit_RangeRadius(range) * MonsterInit_RangeRadius(range);
+    range->field42A = 0;
+}
+
+static inline u32 MonsterInit_RoutePointX(struct MonsterInitRoute *route)
+{
+    return (u16)route->point->x;
+}
+static inline u32 MonsterInit_RoutePointZ(struct MonsterInitRoute *route)
+{
+    return (u16)route->point->z;
+}
+static inline void MonsterInit_SnapToRoute(struct MonsterInitPosition *position,
+                                           struct MonsterInitRoute *route)
+{
+    position->x = MonsterInit_RoutePointX(route);
+    position->z = MonsterInit_RoutePointZ(route);
+    position->y = MonsterInit_Height(MonsterInit_Cell(position), (u16 *)position);
+}
+static inline void MonsterInit_DrawablePosition(struct SpiderActor *actor)
+{
+    if (MonsterInit_GetDrawableKind(actor) == 0)
+        *(struct MonsterInitPosition *)(actor->drawable + 0x1C) = actor->body.position;
+    else
+        *(struct MonsterInitPosition *)(actor->drawable + 0x40) = actor->body.position;
+}
+static inline void MonsterInit_SetFirstAttack(struct SpiderActor *actor, s32 index, s32 value)
+{
+    actor->attacks.first[index] = value;
+}
+
+static inline u16 MonsterInit_KeywordHalfword(u32 keyword, s32 fallback)
+{
+    return Script_GetKeywordValue(keyword, fallback);
+}
+
+static inline u8 MonsterInit_RouteId(struct MonsterInitRoute *route)
+{
+    return route->routeId;
+}
+static inline u8 MonsterInit_RouteParameter(struct MonsterInitRoute *route)
+{
+    return route->parameterB;
+}
+static inline u8 MonsterInit_RoutePointId(struct MonsterInitRoute *route)
+{
+    return route->pointId;
+}
+static inline u8 MonsterInit_RouteActiveBranch(struct MonsterInitRoute *route)
+{
+    return route->activeBranch;
+}
+static inline u32 MonsterInit_RouteAlternateBranch(struct MonsterInitRoute *route)
+{
+    return 1 ^ route->activeBranch;
+}
+static inline void MonsterInit_BeginRoute(struct SpiderBody *body, struct MonsterInitRoute *route)
+{
+    SceneBody_StartRoute(body, route, MonsterInit_RouteId(route), MonsterInit_RouteParameter(route),
+                         MonsterInit_RoutePointId(route));
+}
+static inline s32 MonsterInit_ClampHealth(u16 raw)
+{
+    s32 health = (s16)raw;
+    if (health <= 0)
+        health = 0;
+    return health;
+}
+
+static inline void MonsterInit_InstallIdle(struct SpiderActor *actor, void *idle)
+{
+    actor->field21C = idle;
+}
+
+static inline void MonsterInit_InitializeHealth(struct SpiderActor *arg0, u16 initialHealth,
+                                                s32 firstLimit, s32 secondLimit)
+{
+    arg0->field2D4 = 0;
+    MonsterInit_InstallIdle(arg0, SceneActorControl_OnIdle);
+    arg0->field2B2 = 1;
+    arg0->field2B0 = 0;
+    arg0->field9C = MonsterInit_ClampHealth(initialHealth);
+    arg0->fieldAA = 0;
+    if (secondLimit <= 0)
+        secondLimit = firstLimit;
+    arg0->fieldA6 = firstLimit;
+    arg0->fieldA8 = secondLimit;
+    arg0->field2FA = 0;
+}
+
+static inline void MonsterInit_SetInitialHealth(struct SpiderActor *actor, u16 health)
+{
+    actor->fieldB0 = health;
+}
+
+static inline u32 MonsterInit_ReadRoute(struct SpiderActor *arg0, struct SpiderGroup *group,
+                                        struct MonsterInitRoute *rt)
+{
+    struct MonsterInitPosition point;
+    s32 r1v;
+    rt->activeBranch = 0;
+
+    if (Script_SeekToKeyword(0x72)) {
+        rt->routeId = MonsterInit_Value(0);
+        rt->parameterB = 0;
+        r1v = MonsterInit_Value(0);
+        rt->pointId = r1v;
+        rt->currentPoint = r1v;
+        rt->branches[MonsterInit_RouteActiveBranch(rt)] = rt->routeId;
+        rt->branches[MonsterInit_RouteAlternateBranch(rt)] =
+            Script_GetPc() ? Script_GetValue() : MonsterInit_RouteId(rt);
+        Path_GetPointPositionById((u16 *)&point, MonsterInit_RouteId(rt),
+                                  MonsterInit_RoutePointId(rt));
+        arg0->field2F4 = MonsterInit_Cell(&point);
+        point.y = arg0->field2BE =
+            MonsterInit_Height(MonsterInit_GetTerrainCell(arg0), (u16 *)&point);
+        MonsterInit_BeginRoute(&arg0->body, rt);
+        return 1;
+    } else {
+        rt->routeId = 0;
+        rt->parameterB = 0;
+        rt->pointId = 0;
+        rt->currentPoint = 0;
+        group->route.branches[MonsterInit_RouteActiveBranch(rt)] = 0;
+        group->route.branches[MonsterInit_RouteAlternateBranch(rt)] = 0;
+    }
+
+    return 0;
+}
+static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
+{
+    struct SpiderActor *arg0 = object;
+    struct SpiderGroup *group = &arg0->group;
+    struct SpiderBody *body = &arg0->body;
+    struct MonsterInitPosition origin;
+    s32 mode, i, r4v, r6v, r5v, r2v, r1v;
+    struct MonsterInitRoute *rt;
+    arg0->field2CC = 0;
+    arg0->field2D0 = 0;
+    arg0->field2B4 = 0;
+    arg0->field2E8 = 8;
+    arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
+    arg0->field2C2 = 0x40;
+    MonsterInit_ClearPosition(fill, &origin);
+    mode = Script_GetKeywordValue(0x4E, 0);
+
+    if (Script_SeekToKeyword(0x61)) {
+        i = 0;
+        while (1) {
+            MonsterInit_SetFirstAttack(arg0, i, MonsterInit_ReadAttackHalfword(0x18));
+            arg0->attacks.second[i] = MonsterInit_ReadAttackHalfword(0x18);
+            arg0->attacks.flags[i] = MonsterInit_Value(0);
+            arg0->attacks.parameter[i] = MonsterInit_ReadAttackHalfword(0);
+            i++;
+            if (i > 3)
+                break;
+        }
+    }
+
+    if (Script_SeekToKeyword(0x6C)) {
+        r5v = MonsterInit_Value(0x12C);
+        r6v = MonsterInit_Value(0x12C);
+        r2v = MonsterInit_Value(0x12C);
+    } else {
+        r5v = 0;
+        r6v = 0;
+        r2v = 0;
+    }
+    MonsterInit_InitializeGate(&group->gate, r2v);
+    MonsterInit_ReadRange(&group->range);
+    MonsterInit_ReadTargeting(&arg0->targeting);
     if (Script_GetKeywordValue(0x62, 0))
-        SP_AT(u32, 0x2D0) |= 0x200;
-    SP_AT(u32, 0x1F0) = (u16)Script_GetKeywordValue(0x46, 0);
-    SP_AT(u32, 0x1EC) = (u16)Script_GetKeywordValue(0x52, 0);
+        MonsterInit_SetStatusFlags(arg0, 0x200);
+    arg0->field1F0 = MonsterInit_KeywordHalfword(0x46, 0);
+    arg0->field1EC = MonsterInit_KeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        SP_AT(u16, 0xB0) = SV(0);
-        SP_AT(s16, 0x5B6) = SP_AT(s16, 0xB0) / 2;
-        SP_AT(u8, 0x9E) = SV(0);
-        SP_AT(u8, 0x9F) = SV(0);
-        SP_AT(u8, 0xA0) = SV(0);
-        SP_AT(u16, 0xA2) = SV(0);
-        SP_AT(u16, 0xA4) = SV(0);
+        MonsterInit_SetInitialHealth(arg0, MonsterInit_Value(0));
+        group->field5B6 = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
+        arg0->field9E = MonsterInit_Value(0);
+        arg0->field9F = MonsterInit_Value(0);
+        arg0->fieldA0 = MonsterInit_Value(0);
+        arg0->fieldA2 = MonsterInit_Value(0);
+        arg0->fieldA4 = MonsterInit_Value(0);
     }
 
-    r1v = (s16)SP_AT(u16, 0xB0);
-    SP_AT(u16, 0x2D4) = 0;
-    SP_AT(void *, 0x21C) = SceneActorControl_OnIdle;
-    SP_AT(u8, 0x2B2) = 1;
-    SP_AT(u8, 0x2B0) = 0;
-    if (r1v <= 0)
-        r1v = 0;
-    SP_AT(u16, 0x9C) = r1v;
-    SP_AT(u16, 0xAA) = 0;
-    if (r6v <= 0)
-        r6v = r5v;
-    SP_AT(u16, 0xA6) = r5v;
-    SP_AT(u16, 0xA8) = r6v;
-    SP_AT(u16, 0x2FA) = 0;
+    MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), r5v, r6v);
 
     if (Script_SeekToKeyword(0x58)) {
-        SP_AT(u32, 0xAC) = SV(0);
-        SP_AT(u8, 0xA1) = SV(0);
+        arg0->fieldAC = MonsterInit_Value(0);
+        arg0->fieldA1 = MonsterInit_Value(0);
     }
-    SP_AT(u16, 0xB2) = Script_GetKeywordValue(0x4B, 2);
+    arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
     r1v = (s16)Script_GetKeywordValue(0x56, -1);
     if (r1v < 0)
         r1v = 0xFFFF;
-    SP_AT(u16, 0x9A) = r1v;
+    arg0->field9A = r1v;
     if (Script_GetKeywordValue(0x48, 0))
-        SP_AT(u32, 0x2D0) |= 0x800;
+        MonsterInit_SetStatusFlags(arg0, 0x800);
     if (Script_GetKeywordValue(0x4C, 0))
-        SP_AT(u32, 0x2D0) |= 0x8000;
+        MonsterInit_SetStatusFlags(arg0, 0x8000);
 
-    SceneBody_Init(arg0 + 0x50, mode, tmp2, 0, 4, arg0);
-    rt = arg0 + 0x448;
-    rt[0xF] = 0;
-
-    if (Script_SeekToKeyword(0x72)) {
-        rt[0x10] = SV(0);
-        rt[0x11] = 0;
-        r1v = SV(0);
-        rt[0x12] = r1v;
-        rt[0xC] = r1v;
-        rt[0xD + rt[0xF]] = rt[0x10];
-        rt[0xD + (rt[0xF] ^ 1)] = Script_GetPc() ? Script_GetValue() : rt[0x10];
-        Path_GetPointPositionById(pos, rt[0x10], rt[0x12]);
-        SP_AT(s16, 0x2BE) = Spider_CellHeight(pos, &SP_AT(u16, 0x2F4));
-        pos[1] = SP_AT(s16, 0x2BE);
-        SceneBody_StartRoute(arg0 + 0x50, rt, rt[0x10], rt[0x11], rt[0x12]);
-        SP_AT(u16, 0x5C) = **(u16 **)(rt + 8);
-        SP_AT(u16, 0x60) = (*(u16 **)(rt + 8))[1];
-        SP_AT(s16, 0x5E) = Spider_CellHeight((u16 *)(arg0 + 0x5C), 0);
-        if (SP_AT(u8, 8) == 0) {
-            *(u32 *)(SP_AT(u8 *, 4) + 0x1C) = SP_AT(u32, 0x5C);
-            *(u32 *)(SP_AT(u8 *, 4) + 0x20) = SP_AT(u32, 0x60);
-        } else {
-            *(u32 *)(SP_AT(u8 *, 4) + 0x40) = SP_AT(u32, 0x5C);
-            *(u32 *)(SP_AT(u8 *, 4) + 0x44) = SP_AT(u32, 0x60);
-        }
-        SP_AT(u8, 0x59) = Route_GetCurrentPointFacing(rt);
-    } else {
-        rt[0x10] = 0;
-        rt[0x11] = 0;
-        rt[0x12] = 0;
-        rt[0xC] = 0;
-        arg0[0x3D4 + 0x81 + rt[0xF]] = 0;
-        arg0[0x3D4 + 0x81 + (rt[0xF] ^ 1)] = 0;
+    SceneBody_Init(body, mode, &origin, 0, 4, arg0);
+    rt = &group->route;
+    if (MonsterInit_ReadRoute(arg0, group, rt)) {
+        MonsterInit_SnapToRoute(&arg0->body.position, rt);
+        MonsterInit_DrawablePosition(arg0);
+        arg0->body.direction = Route_GetCurrentPointFacing(rt);
     }
 
-    if (SP_AT(u16, 0x2C0) & 0x200)
-        TargetRegistry_RegisterActor(arg0 + 0x404, arg0 + 0x50, sub_08080BE0);
-    SceneBody_SetSprite(arg0 + 0x50, SP_AT(u8, 8) == 0 ? SP_AT(u8 *, 4) : 0);
-    if (SP_AT(u8, 0x98) == 0x15)
-        SceneBody_SetMovementProbe(arg0 + 0x50, arg0 + 0x40, 0x3C, 0x3C);
+    if (MonsterInit_TestMotionFlags(arg0, 0x200))
+        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, sub_08080BE0);
+    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->drawable : 0);
+    if (MonsterInit_GetCategory(arg0) == 0x15)
+        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
     else
-        SceneBody_SetMovementProbe(arg0 + 0x50, arg0 + 0x40, 0x40, 0x40);
+        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 
-    SP_AT(u16, 0x3D4) = SP_AT(u32, 0x50);
-    SP_AT(u32, 0x3D8) = (u32)(arg0 + 0x5C);
+    group->field3D4 = arg0->body.id;
+    group->field3D8 = (u32)&arg0->body.position;
+}
 
-    SP_AT(u16, 0x1E6) = Script_GetKeywordValue(0x43, 0);
-    SP_AT(u16, 0x1E0) = 0xC8;
-    SP_AT(u16, 0x1E2) = 0x192;
-    SP_AT(u16, 0x1E4) = SP_AT(u16, 0x1E6) + 0xC8;
-    r1v = SP_AT(u16, 0x1E0) + SP_AT(u16, 0x1E6);
-    if (SP_AT(u8, 8) == 0)
-        AnimData_SelectPaletteBank(SP_AT(u8 *, 4) + 0x2C);
+struct MonsterInitWidget {
+    u8 unknown0[0x3A];
+    u16 paletteBank;
+};
+static inline void MonsterInit_SetWidgetScriptPalette(struct MonsterInitWidget *widget, s32 palette)
+{
+    widget->paletteBank = palette - 0x5FFF;
+}
+
+static inline void MonsterInit_SetMotionControl(struct SpiderActor *actor, void *callback, u32 kind)
+{
+    actor->field104 = (u32)callback;
+    actor->field108 = 0;
+    actor->field10C = 0;
+    actor->field110 = kind;
+    actor->field114 = 1;
+}
+static inline void MonsterInit_ClearMotion(void *object)
+{
+    struct SpiderActor *actor = object;
+    MonsterInit_SetMotionControl(actor, 0, 0);
+    actor->field114 = 0;
+}
+static inline void MonsterInit_ReadPalette(struct SpiderActor *actor, u32 base, u32 alternate)
+{
+    s32 r1v;
+    actor->field1E6 = Script_GetKeywordValue(0x43, 0);
+    actor->field1E0 = base;
+    actor->field1E2 = alternate;
+    actor->field1E4 = MonsterInit_GetPaletteOffset(actor) + base;
+    r1v = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
+    if (MonsterInit_GetDrawableKind(actor) == 0)
+        AnimData_SelectPaletteBank(actor->drawable + 0x2C, r1v);
     else
-        *(u8 **)(SP_AT(u8 *, 4) + 0x68) = gPaletteBankData + (r1v << 5);
-    if (SP_AT(u8, 8) == 1)
-        *(u16 *)(SP_AT(u8 *, 4) + 0x5A) = SceneActorScript_GetManagerField62() - 0x5FFF;
+        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (r1v << 5);
+    if (MonsterInit_GetDrawableKind(actor) == 1)
+        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+                                           SceneActorScript_GetManagerField62());
+}
 
-    Spider_InitColliders(arg0);
+static inline void MonsterInit_InstallPrimary(struct SpiderActor *arg0, void *cb0,
+                                              u32 (*cb1)(void *), void *cb2, void *cb3, void *cb4,
+                                              void *hidden, void *cb5, void *cb6,
+                                              void *defaultReaction, u8 (*cb270)(void *),
+                                              void *targetQuery, void *damage, void *contact)
+{
+    MonsterInit_SetBehaviorFlags(arg0, 0x2000);
+    arg0->field274 = cb0;
+    arg0->field260 = cb1;
+    arg0->field224 = cb2;
+    arg0->field228 = cb3;
+    arg0->field22C = cb4;
+    arg0->field230 = cb5;
+    arg0->field234 = cb6;
+    arg0->field220 = hidden;
+    arg0->field278 = defaultReaction;
+    arg0->field270 = cb270;
+    arg0->field250 = gUnk_086108B0;
+    arg0->field248 = 0;
+    arg0->field26C = targetQuery;
+    arg0->field238 = SceneActorReaction_SinkAndRemove;
+    arg0->field264 = damage;
+    arg0->field268 = contact;
+    arg0->field240 = 0;
+    MonsterInit_ClearMotion(arg0);
+}
+
+static inline void MonsterInit_InitializeGroup(struct SpiderGroup *group, void *firstBounds,
+                                               void *secondBounds, void *downed,
+                                               void *returnToRoute, void *recover, void *animate,
+                                               struct SpiderActor *actor)
+{
+    group->field5D0 = firstBounds;
+    group->field5D4 = secondBounds;
+    group->field5F4 = downed;
+    group->field5F8 = recover;
+    group->field5FC = SceneActorReaction_BeginFadedState;
+    group->field600 = SceneActorReaction_BeginDefeatBurst;
+    group->field43C = returnToRoute;
+    group->field440 = 0;
+    group->range.field42B = 1;
+    group->field618 = sub_0807DB34;
+    group->field608 = 0;
+    group->field61C = 0;
+    group->field620 = 0;
+    group->field5F0 = SceneActorReaction_RestoreAfterTurns;
+    group->field60C = sub_0807FCA8;
+    group->field604 = (u32)animate;
+    group->field614 = SceneActorReaction_TurnBackToRoute;
+    group->field5E8 = 0;
+    group->field444 = sub_0807F130;
+    group->gate.field41C = SceneActorReaction_UpdateAnimationGate;
+    group->gate.field41A = 0x28;
+    group->field5DC = sub_0808170C;
+    group->field5E0 = SceneActorReaction_ResumeAfterAnimation;
+    group->field5E4 = SceneActorReaction_TryResumeRoute;
+    group->field610 = SceneActorReaction_BeginReactionSound;
+    ProximityVolume_TranslateBounds(firstBounds, &actor->body.position);
+}
+
+static inline void MonsterInit_SetRouteReset(struct SpiderActor *actor, void *callback)
+{
+    actor->field248 = callback;
+}
+static inline void MonsterInit_SetReactionGate(struct SpiderActor *actor, void *callback)
+{
+    actor->field23C = callback;
+}
+
+static inline void MonsterInit_EnableInitialFlags(struct SpiderActor *arg0)
+{
+    MonsterInit_SetTargetingFlags(&arg0->targeting, 1);
+    MonsterInit_SetBehaviorFlags(arg0, 0x400000);
+    MonsterInit_SetStatusFlags(arg0, 8);
+}
+
+static inline void MonsterInit_ReadInitialMode(struct SpiderActor *arg0, struct SpiderGroup *group)
+{
+    s32 i;
+    i = Script_GetKeywordValue(0x75, 0);
+    arg0->group.field5CC = 0x21;
+    if (i != 0) {
+        MonsterInit_SetBehaviorFlags(arg0, 0x40000);
+        if (i == 2)
+            MonsterInit_SetBehaviorFlags(arg0, 0x80000);
+    }
+}
+
+static inline void MonsterInit_InitializeRegion(struct SpiderActor *arg0)
+{
+    if (MonsterInit_TestMotionFlags(arg0, 2))
+        arg0->field2FA = *(u32 *)(gGameState + 0x5A0);
+    else
+        arg0->field2FA = (u16)(u32)Region_FindContaining(&arg0->body.position);
+}
+
+static inline void MonsterInit_InitializeReceiver(struct SpiderActor *arg0)
+{
+    arg0->field304 = 0;
+}
+
+static inline void MonsterInit_InstallCompletionCallbacks(struct SpiderActor *arg0)
+{
+    arg0->field24C = SceneActorScript_OnCommand;
+    arg0->field258 = Spider_OnSecondaryUpdate;
+    arg0->field25C = Spider_Destroy;
+}
+
+static inline void MonsterInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
+{
+    AnimData_Load(drawable + 0x2C, resource);
+    Sprite_Init(drawable, drawable + 0x2C, 0);
+    SceneActorAnimation_InitEnemySequence(drawable, sequence);
+}
+
+static inline void Spider_SetFlags(struct SpiderActor *actor, u32 mask)
+{
+    actor->flags62C |= mask;
+}
+static inline void Spider_InitializeDeferred(struct SpiderDeferredControl *control, void *callback,
+                                             u32 mode, u32 timer)
+{
+    control->counter = timer;
+    control->callback = callback;
+    control->state = 0;
+    control->phase = 0;
+    control->mode = mode;
+}
+
+static inline void MonsterInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
+                                                struct MonsterInitPosition *position)
+{
+    void *source = ScriptProc_Start(script, resource);
+    *(struct MonsterInit32Block *)drawable = *(struct MonsterInit32Block *)source;
+    ResourceHeader_Relocate(drawable, source);
+    Widget_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
+}
+static inline void Spider_InstallContact(struct SpiderActor *actor, struct SpiderGroup *group)
+{
+    actor->field250 = gUnk_08605F34;
+    group->gate.field41C = SceneActorReaction_ResumeEntryTarget;
+    if (MonsterInit_GetPaletteOffset(actor) == 0)
+        actor->field270 = SceneActorPlacement_BeginNearbyPlayerContact;
+    else
+        actor->field270 = SceneActorPlacement_SelectPlayerApproach;
+}
+s32 Spider_Init(void *object)
+{
+    struct SpiderActor *arg0 = object;
+    struct SpiderActor *actor = object;
+    struct SpiderGroup *group = &arg0->group;
+    u32 zero;
+    struct MonsterInitPosition tmp;
+    u32 flag;
+    s32 extra;
+
+    arg0->flags62C = 0;
+    SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
+    MonsterInit_SetCategory(actor, 2);
+    Spider_InitProfile(actor);
+    if (MonsterInit_GetDrawableKind(actor) == 0) {
+        u8 *heap;
+        actor->drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->drawable, 0x5C);
+        heap = MonsterInit_Drawable(actor);
+        MonsterInit_InitializeSprite(heap, 0x528F, 0xB6EE);
+        if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
+            heap[7] = 1;
+        actor->body.direction = 0;
+    } else {
+        u8 *heap;
+        actor->drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->drawable, 0x80);
+        heap = MonsterInit_Drawable(actor);
+        MonsterInit_ClearPosition(&zero, &tmp);
+        MonsterInit_InitializeWidget(heap, 0xCB05, 0x528F, &tmp);
+        actor->field2B7 = 0xFF;
+    }
+    MonsterInit_InitializeBody(actor, &zero);
+    MonsterInit_ReadPalette(actor, 0xC8, 0x192);
+    Spider_InitColliders(actor);
     extra = Script_GetKeywordValue(0x66, 0);
     if (Script_GetKeywordValue(0x54, 0))
-        SP_AT(u16, 0x62C) |= 0x10;
-    SP_AT(u32, 0x2CC) |= 0x2000;
-    SP_AT(void *, 0x274) = Spider_OnUpdate;
-    SP_AT(void *, 0x260) = Spider_GetAnimationEvent;
-    SP_AT(void *, 0x224) = sub_080A21EC;
-    SP_AT(void *, 0x228) = Spider_SelectActiveAnimation;
-    SP_AT(void *, 0x22C) = Spider_SelectIdleAnimation;
-    SP_AT(void *, 0x230) = Spider_UpdateLandingMotion;
-    SP_AT(void *, 0x234) = Spider_UpdateDefeat;
-    SP_AT(void *, 0x220) = Spider_OnActionEvent;
-    SP_AT(void *, 0x278) = SceneActorReaction_OnEnemyDefault;
-    SP_AT(u32, 0x270) = 0;
-    SP_AT(const void *, 0x250) = gUnk_086108B0;
-    SP_AT(u32, 0x248) = 0;
-    SP_AT(void *, 0x26C) = SceneActorPlacement_BeginContactRoute;
-    SP_AT(void *, 0x238) = SceneActorReaction_SinkAndRemove;
-    SP_AT(void *, 0x264) = sub_081363F4;
-    SP_AT(void *, 0x268) = SceneActorPlacement_BeginDefaultResponse;
-    SP_AT(u32, 0x240) = 0;
-    SP_AT(u32, 0x104) = 0;
-    SP_AT(u32, 0x108) = 0;
-    SP_AT(u32, 0x10C) = 0;
-    SP_AT(u32, 0x110) = 0;
-    SP_AT(u32, 0x114) = 0;
-    SP_AT(u8 *, 0x5D0) = arg0 + 0x630;
-    SP_AT(u8 *, 0x5D4) = arg0 + 0x654;
-    SP_AT(void *, 0x5F4) = Spider_OnSecondaryColliderContact;
-    SP_AT(void *, 0x5F8) = SceneActorReaction_BeginTargetRecovery;
-    SP_AT(void *, 0x5FC) = SceneActorReaction_BeginFadedState;
-    SP_AT(void *, 0x600) = SceneActorReaction_BeginDefeatBurst;
-    SP_AT(u32, 0x43C) = 0;
-    SP_AT(u32, 0x440) = 0;
-    SP_AT(u8, 0x42B) = 1;
-    SP_AT(void *, 0x618) = sub_0807DB34;
-    SP_AT(u32, 0x608) = 0;
-    SP_AT(u32, 0x61C) = 0;
-    SP_AT(u32, 0x620) = 0;
-    SP_AT(void *, 0x5F0) = SceneActorReaction_RestoreAfterTurns;
-    SP_AT(void *, 0x60C) = sub_0807FCA8;
-    SP_AT(u32, 0x604) = 0;
-    SP_AT(void *, 0x614) = SceneActorReaction_TurnBackToRoute;
-    SP_AT(u32, 0x5E8) = 0;
-    SP_AT(void *, 0x444) = sub_0807F130;
-    SP_AT(void *, 0x41C) = SceneActorReaction_UpdateAnimationGate;
-    SP_AT(u16, 0x41A) = 0x28;
-    SP_AT(void *, 0x5DC) = sub_0808170C;
-    SP_AT(void *, 0x5E0) = SceneActorReaction_ResumeAfterAnimation;
-    SP_AT(void *, 0x5E4) = SceneActorReaction_TryResumeRoute;
-    SP_AT(void *, 0x610) = SceneActorReaction_BeginReactionSound;
-    ProximityVolume_TranslateBounds(arg0 + 0x630, arg0 + 0x5C);
-    SceneActorMovement_ResolveRoutePosition(arg0);
-    SP_AT(void *, 0x248) = SceneActorRoute_ResetStep;
-    SP_AT(u32, 0x23C) = 0;
-    SP_AT(const void *, 0x250) = gUnk_08605F34;
-    SP_AT(void *, 0x41C) = SceneActorReaction_ResumeEntryTarget;
-    if (SP_AT(u16, 0x1E6) == 0)
-        SP_AT(void *, 0x270) = SceneActorPlacement_BeginNearbyPlayerContact;
+        Spider_SetFlags(arg0, 0x10);
+    MonsterInit_InstallPrimary(actor, Spider_OnUpdate, Spider_GetAnimationEvent, sub_080A21EC,
+                               Spider_SelectActiveAnimation, Spider_SelectIdleAnimation,
+                               Spider_OnActionEvent, Spider_UpdateLandingMotion,
+                               Spider_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
+                               SceneActorPlacement_BeginContactRoute, sub_081363F4,
+                               SceneActorPlacement_BeginDefaultResponse);
+    MonsterInit_InitializeGroup(group, arg0->bounds630, arg0->bounds654,
+                                Spider_OnSecondaryColliderContact, 0,
+                                SceneActorReaction_BeginTargetRecovery, 0, actor);
+    SceneActorMovement_ResolveRoutePosition(actor);
+    MonsterInit_SetRouteReset(actor, SceneActorRoute_ResetStep);
+    MonsterInit_SetReactionGate(actor, 0);
+    Spider_InstallContact(actor, group);
+    MonsterInit_EnableInitialFlags(actor);
+    SceneActorTerrain_ReadScriptParameters(actor);
+    MonsterInit_ReadInitialMode(actor, group);
+    flag = 0;
+    if (MonsterInit_TestMotionFlags(actor, 4)) {
+        MonsterInit_SetStatusFlags(actor, 0x2000);
+        flag = 1;
+    }
+    if (flag != 1) {
+        MonsterInit_SetState(actor, 0, 0, 0);
+        MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0, 0);
+    }
+    MonsterInit_InitializeRegion(actor);
+    if (MonsterInit_TestMotionFlags(actor, 0x40))
+        MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
+    if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
+        SceneActorPlacement_HideActor(actor, 0);
+    SceneActorAnimation_SelectDirectionalEntry(actor, 0);
+    if (MonsterInit_GetDrawableKind(actor) == 0)
+        DisplaySequence_Step(actor->drawable);
     else
-        SP_AT(void *, 0x270) = SceneActorPlacement_SelectPlayerApproach;
-    SP_AT(u8, 0xEB) |= 1;
-    SP_AT(u32, 0x2CC) |= 0x400000;
-    SP_AT(u32, 0x2D0) |= 8;
-    SceneActorTerrain_ReadScriptParameters(arg0);
-    r2v = Script_GetKeywordValue(0x75, 0);
-    SP_AT(u16, 0x5CC) = 0x21;
-    if (r2v != 0) {
-        SP_AT(u32, 0x2CC) |= 0x40000;
-        if (r2v == 2)
-            SP_AT(u32, 0x2CC) |= 0x80000;
-    }
-    flag = (SP_AT(u16, 0x2C0) & 4) != 0;
-    if (flag)
-        SP_AT(u32, 0x2D0) |= 0x2000;
-
-    if (!flag) {
-        SP_AT(u8, 0x2A8) = 0;
-        SP_AT(u8, 0x2A9) = 0;
-        SP_AT(u8, 0x2AA) = 0;
-        SP_AT(u32, 0x2AC) = 0;
-        SP_AT(u8, 0x2B1) = 1;
-        SP_AT(u8, 0x2B2) = 1;
-        SP_AT(u8, 0x2B0) = 0;
-        SP_AT(u8, 0x2B5) = 0;
-        SP_AT(u32, 0x21C) = SP_AT(u32, 0x22C);
-        SP_AT(u16, 0x2C8) = 0;
-        SP_AT(u32, 0x114) &= ~1;
-        SP_AT(u32, 0x104) = 0;
-    }
-
-    if (SP_AT(u16, 0x2C0) & 2)
-        SP_AT(u16, 0x2FA) = *(u32 *)(gGameState + 0x5A0);
-    else
-        SP_AT(u16, 0x2FA) = (u16)(u32)Region_FindContaining(arg0 + 0x5C);
-
-    if (SP_AT(u16, 0x2C0) & 0x40)
-        SP_AT(u16, 0x13A) &= 0xFEFF;
-
-    if (Script_GetKeywordValue(0x53, 0) != 0 || *(u32 *)(gGameState + 0x5A0) != SP_AT(u16, 0x2FA))
-        SceneActorPlacement_HideActor(arg0, 0);
-
-    SceneActorAnimation_SelectDirectionalEntry(arg0, 0);
-    if (SP_AT(u8, 8) == 0) {
-        u8 *h = SP_AT(u8 *, 4);
-        u8 *a = h + 0x48;
-        u16 *frame = (u16 *)(*(u8 **)(h + 0x48) + (*(u16 *)(a + 8) << 1));
-        *(u16 *)(h + 0x10) = *frame >> 6;
-        if ((a[4] & 1) != ((*frame >> 4) & 1))
-            *(u32 *)h |= 4;
-        else
-            *(u32 *)h &= ~4;
-        if ((a[4] & 2) != ((*frame >> 4) & 2))
-            *(u32 *)h |= 8;
-        else
-            *(u32 *)h &= ~8;
-        *(u16 *)(a + 0xE) += 1;
-        if (*(u16 *)(a + 0xE) >= a[7]) {
-            *(u16 *)(a + 0xE) = 0;
-            if (a[4] & 4) {
-                if (*(u16 *)(a + 8) == 0) {
-                    if (a[4] & 8)
-                        *(u16 *)(a + 0xE) = a[7];
-                    else
-                        *(u16 *)(a + 8) = a[5] - 1;
-                } else {
-                    *(u16 *)(a + 8) -= 1;
-                }
-            } else {
-                *(u16 *)(a + 8) += 1;
-                if (*(u16 *)(a + 8) >= a[5]) {
-                    if (a[4] & 8)
-                        *(u16 *)(a + 0xE) = a[7];
-                    else
-                        *(u16 *)(a + 8) = a[5] - 1;
-                }
-            }
-        }
-        frame = (u16 *)(*(u8 **)(h + 0x48) + (*(u16 *)(a + 8) << 1));
-        a[6] = *frame & 0xF;
-        a[7] = (a[6] * *(u16 *)(a + 0xC)) >> 6;
-        if (a[7] == 0)
-            a[7] = 1;
-    } else {
-        Anim_Step(SP_AT(u8 *, 4) + 0x20);
-    }
-
-    SP_AT(u32, 0x304) = 0;
-    SceneActorBehavior_InstallCallbackTables(arg0);
-    Spider_SetBehaviorTables(arg0);
+        Anim_Step(actor->drawable + 0x20, actor->drawable);
+    MonsterInit_InitializeReceiver(actor);
+    SceneActorBehavior_InstallCallbackTables(actor);
+    Spider_SetBehaviorTables(actor);
     if (extra != 0) {
-        SP_AT(u16, 0x2EA) = extra;
-        SP_AT(u16, 0x2E8) = 2;
-        SP_AT(u8, 0x2B2) = 1;
-        SP_AT(u8, 0x2B0) = 0;
-        SP_AT(u8, 0x2B5) = 0x23;
-        SP_AT(void *, 0x21C) = Spider_UpdateHiddenRecovery;
-        SP_AT(u16, 0x2C8) = 0;
-        SP_AT(u32, 0x114) &= ~1;
-        SP_AT(u32, 0x104) = 0;
-        SP_AT(u8, 0x2A8) = 3;
-        SP_AT(u8, 0x2A9) = 0;
-        SP_AT(u8, 0x2AA) = 0;
-        SP_AT(u32, 0x2AC) = 0;
-        SP_AT(u8, 0x2B1) = 1;
-        ScaledShadow_Initialize(arg0 + 0x360, arg0 + 0x5C, 0x40, 0x10, 0x60, 0x64, 0xA00, 1, 5, 1,
-                                0);
-        SP_AT(u16, 0x62C) |= 1;
+        actor->field2EA = extra;
+        actor->field2E8 = 2;
+        MonsterInit_SetControl(actor, Spider_UpdateHiddenRecovery, 0x23, 0);
+        MonsterInit_SetState(actor, 3, 0, 0);
+        ScaledShadow_Initialize((u8 *)actor + 0x360, &actor->body.position, 0x40, 0x10, 0x60, 0x64,
+                                0xA00, 1, 5, 1, 0);
+        Spider_SetFlags(arg0, 1);
     } else {
-        SP_AT(u8, 0x2B1) = 1;
-        SP_AT(u8, 0x2B0) = (u8)extra;
-        SP_AT(u8, 0x2B5) = 0xE;
-        SP_AT(void *, 0x21C) = SceneActorReaction_RestoreAlternateAfterDelay;
-        SP_AT(u16, 0x2C8) = (u16)extra;
-        SP_AT(u32, 0x114) &= ~1;
-        SP_AT(u32, 0x104) = extra;
-        SP_AT(u8, 0x3D4 + 0x8C + 8) = 0;
-        SP_AT(u8, 0x3D4 + 0x8C + 9) = 0;
-        SP_AT(u8, 0x3D4 + 0x8C + 0xA) = 7;
-        SP_AT(u32, 0x3D4 + 0x8C + 0xC) = 0x3C;
-        SP_AT(u32, 0x3D4 + 0x8C + 0x10) = SP_AT(u32, 0x228);
+        MonsterInit_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 0xE, extra);
+        Spider_InitializeDeferred(&group->deferred, actor->field228, 7, 0x3C);
     }
-    SP_AT(u16, 0x62E) = 0x12C;
-    SP_AT(u16, 0x12E) = SP_AT(u16, 0x2C0);
-    SP_AT(u16, 0x12C) = SP_AT(u16, 0x2EA);
-    SP_AT(u32, 0x118) = SP_AT(u32, 0x2CC);
-    SP_AT(u32, 0x11C) = SP_AT(u32, 0x2D0);
-    SP_AT(u8, 0x120) = *flagp;
-    SP_AT(u8, 0x121) = SP_AT(u8, 0x2A8);
-    SP_AT(u8, 0x122) = SP_AT(u8, 0x2A9);
-    SP_AT(u8, 0x123) = SP_AT(u8, 0x2AA);
-    SP_AT(u32, 0x124) = SP_AT(u32, 0x21C);
-    SP_AT(u8, 0x128) = SP_AT(u8, 0x2B5);
-    SP_AT(void *, 0x24C) = SceneActorScript_OnCommand;
-    SP_AT(void *, 0x258) = Spider_OnSecondaryUpdate;
-    SP_AT(void *, 0x25C) = Spider_Destroy;
-
-    return SceneActorRegistry_LinkActor(arg0) ? 0 : -1;
+    arg0->timer62E = 0x12C;
+    MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
+    MonsterInit_InstallCompletionCallbacks(actor);
+    if (!SceneActorRegistry_LinkActor(actor))
+        return -1;
+    return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Spider_Init);
-#endif
