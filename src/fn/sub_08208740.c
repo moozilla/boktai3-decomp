@@ -1,9 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// twin.py transplant from a matched near-clone
-// Collider and sprite views, constant reuse, and the defined zero return still differ.
+#include "display_sequence_inline.h"
 #include "display_animation.h"
 #include "scene_vec.h"
 #include "engine.h"
@@ -18,9 +14,6 @@ void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void sub_082086B8(void);
 void CannonTurret_FireAimedVolley(void);
 void Anim_SetDurationScale(void *, u16);
-#define H(o) (*(s16 *)(p + (o)))
-#define U(o) (*(u16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
 static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
 {
     *out = *in;
@@ -38,443 +31,146 @@ struct ColliderView {
     u8 pad[6];
     u16 flags;
 };
+union CannonTurretSprite {
+    struct DisplaySequenceSprite display;
+    struct {
+        u8 unknown0[0x1c];
+        struct SceneVec position;
+        u8 unknown24[8];
+    } coordinates;
+};
+struct CannonTurretCombat {
+    u8 unknown0[0x18];
+    u32 age;
+    u8 unknown1C[0x8];
+    union CannonTurretSprite sprite;
+    u8 graphics[0x1c];
+    struct ColliderView collider;
+    u8 unknown74[0x4];
+    struct SceneVec damagePosition;
+    struct SceneVec damageOffset;
+    u8 unknown88[0x27];
+    u8 direction;
+    u16 invulnerability;
+    u8 unknownB2[0x56];
+    void (*update)(void);
+    struct DisplaySequenceState sequence;
+    u8 unknown11C[0xC];
+    s16 flashTimer;
+    u8 unknown12A[0x2];
+    s16 damage;
+    s16 hitReaction;
+    s16 defeated;
+    s16 health;
+    s16 activeAnimation;
+    s16 maxHealth;
+    u8 unknown138[0x4];
+    s16 hudStyle;
+    u8 unknown13E[0x6];
+    s16 hudTime;
+    u8 unknown146[0x2];
+    void *hud;
+    u32 reactionFlags;
+    u32 pendingReaction;
+    u8 unknown154[0x10];
+    void *resource;
+};
 struct EffectVector {
     s32 x : 16;
     s32 y : 16;
     s32 z : 16;
 };
-static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg, u32 flipMask)
+static inline void CannonTurret_FinishDamage(struct CannonTurretCombat *p)
 {
-    struct DisplaySequenceSprite *sprite = (struct DisplaySequenceSprite *)(owner + 0x24);
-    struct DisplaySequenceState *state = stateArg;
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, duration, flags, bit;
-    {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
-    }
-    {
-        u32 frame = *command >> 6;
-        register struct DisplaySequenceSprite *out asm("r3") = sprite;
-        out->frame = frame;
-    }
-    {
-        u32 input = state->flags;
-        register u32 first asm("r2");
-        u32 maskBit = 1;
-        bit = maskBit;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit)) {
-            u32 flags = (*(u32 *)(owner + 0x24));
-            u32 flip = flipMask;
-            (*(u32 *)(owner + 0x24)) = flags | flip;
-        } else
-            (*(u32 *)(owner + 0x24)) &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r2");
-        bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        {
-            register u32 flags asm("r1");
-            if (first != (((*command & 0x30) >> 4) & bit)) {
-                struct DisplaySequenceSprite *read = sprite;
-                flags = read->flags | 8;
-            } else {
-                struct DisplaySequenceSprite *read = sprite;
-                flags = read->flags & ~8;
-            }
-            {
-                struct DisplaySequenceSprite *out = sprite;
-                asm("" : "+r"(out));
-                out->flags = flags;
-            }
-        }
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r2");
-        register u32 savedDuration asm("r4");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                    ended = 1;
-                } else {
-                    state->index = index - 1;
-                    ended = 0;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                    ended = 1;
-                } else {
-                    ended = 0;
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
-            }
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r2") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
-        } else {
-            ended = 0;
-        }
-    }
-    return ended;
+    s16 *flash = &p->flashTimer;
+    u32 zero = 0;
+    *flash = 8;
+    p->hitReaction = 1;
+    p->damage = zero;
 }
-static inline u32 StepAnimation_UpdateCombat(u8 *owner, struct DisplaySequenceState *stateArg,
-                                             u32 flipMask)
+static inline void CannonTurret_ClearBlink(u16 *timer)
 {
-    struct DisplaySequenceSprite *sprite = (struct DisplaySequenceSprite *)(owner + 0x24);
-    struct DisplaySequenceState *state = stateArg;
-    const volatile u16 *command; /* preserve observed packed-command reads */
+    u32 zero = 0;
+    *timer = zero;
+}
+static inline u32 CannonTurret_StepSequence(struct DisplaySequenceSprite *owner,
+                                            struct DisplaySequenceState *state)
+{
+    const u16 *command;
     u32 ended;
-    u32 duration;
-    u32 flags;
-    u32 bit;
     {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
         table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
+        command = (const u16 *)((u32)table + offset);
+    }
+    owner->frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
+        else
+            owner->flags &= ~4;
     }
     {
-        u32 frame = *command >> 6;
-        register struct DisplaySequenceSprite *out asm("r3") = sprite;
-        out->frame = frame;
-    }
-    {
-        u32 input = state->flags;
-        register u32 first asm("r2");
-        u32 maskBit = 1;
-        bit = maskBit;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit)) {
-            u32 flags = (*(u32 *)(owner + 0x24));
-            u32 flip = flipMask;
-            (*(u32 *)(owner + 0x24)) = flags | flip;
-        } else
-            (*(u32 *)(owner + 0x24)) &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r2");
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
         bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        {
-            register u32 flags asm("r1");
-            if (first != (((*command & 0x30) >> 4) & bit)) {
-                struct DisplaySequenceSprite *read = sprite;
-                flags = read->flags | 8;
-            } else {
-                struct DisplaySequenceSprite *read = sprite;
-                flags = read->flags & ~8;
-            }
-            {
-                struct DisplaySequenceSprite *out = sprite;
-                asm("" : "+r"(out));
-                out->flags = flags;
-            }
-        }
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
+        else
+            owner->flags &= ~8;
     }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r2");
-        register u32 savedDuration asm("r4");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                    ended = 1;
-                } else {
-                    state->index = index - 1;
-                    ended = 0;
-                }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+                ended = 1;
             } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                    ended = 1;
-                } else {
-                    ended = 0;
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
-            }
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r2") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
+                state->index--;
+                ended = 0;
             }
         } else {
-            ended = 0;
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+                ended = 1;
+            } else {
+                ended = 0;
+            }
         }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
     }
     return ended;
 }
 
-inline static u32 RandomFrom_UpdateCombat(const u16 *table)
-{
-    gRandomIndex = (u16)((gRandomIndex + 1) & 0x3ff);
-    return table[gRandomIndex];
-}
-
-static inline u32 StepAnimation_UpdateCombat(u8 *owner, struct DisplaySequenceState *stateArg,
-                                             u32 flipMask)
-{
-    struct DisplaySequenceSprite *sprite = (struct DisplaySequenceSprite *)(owner + 0x24);
-    struct DisplaySequenceState *state = stateArg;
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended;
-    u32 duration;
-    u32 flags;
-    u32 bit;
-    {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
-    }
-    {
-        u32 frame = *command >> 6;
-        register struct DisplaySequenceSprite *out asm("r3") = sprite;
-        out->frame = frame;
-    }
-    {
-        u32 input = state->flags;
-        register u32 first asm("r2");
-        u32 maskBit = 1;
-        bit = maskBit;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit)) {
-            u32 flags = (*(u32 *)(owner + 0x24));
-            u32 flip = flipMask;
-            (*(u32 *)(owner + 0x24)) = flags | flip;
-        } else
-            (*(u32 *)(owner + 0x24)) &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r2");
-        bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        {
-            register u32 flags asm("r1");
-            if (first != (((*command & 0x30) >> 4) & bit)) {
-                struct DisplaySequenceSprite *read = sprite;
-                flags = read->flags | 8;
-            } else {
-                struct DisplaySequenceSprite *read = sprite;
-                flags = read->flags & ~8;
-            }
-            {
-                struct DisplaySequenceSprite *out = sprite;
-                asm("" : "+r"(out));
-                out->flags = flags;
-            }
-        }
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r2");
-        register u32 savedDuration asm("r4");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                    ended = 1;
-                } else {
-                    state->index = index - 1;
-                    ended = 0;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                    ended = 1;
-                } else {
-                    ended = 0;
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
-            }
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r2") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
-        } else {
-            ended = 0;
-        }
-    }
-    return ended;
-}
-
-s32 CannonTurret_UpdateCombat(u8 *p)
+s32 CannonTurret_UpdateCombat(struct CannonTurretCombat *p)
 {
     struct SceneVec position;
     struct EffectVector velocity;
     struct EffectVector size;
     struct ColliderView *collider;
     u32 ended;
-    register u32 token asm("r0");
     if (Paused(0x400))
         goto paused;
     {
@@ -484,90 +180,83 @@ s32 CannonTurret_UpdateCombat(u8 *p)
             return 0;
         }
     }
-    Callback_InvokeActor(p, *((void **)(p + 0x108)));
-    *((u32 *)(p + 0x24)) &= ~1;
-    if ((*((s16 *)(p + 0x130))) == 0) {
-        struct ColliderView *c = (void *)(p + 0x6c);
-        collider->flags &= ~4;
-        Collider_SetPosition(collider, p + 0x40, 0);
-    } else {
-        collider = (void *)(p + 0x6c);
-        collider->flags |= 4;
-    }
-    if (((*((s16 *)(p + 0x12c))) > 0) && ((*((s16 *)(p + 0x130))) == 0)) {
-        *((s16 *)(p + 0x132)) -= *((s16 *)(p + 0x12c));
-        *((u32 *)(p + 0x14c)) = *((u32 *)(p + 0x150));
-        Sound_PlaySong(0x13e);
-        if ((*((s16 *)(p + 0x12c))) > 0) {
-            DamageNumberDisplay_Show(collider, *((s16 *)(p + 0x12c)), 0, p + 0x78, p + 0x80, 1);
-            SceneHud_SetTimedState(*((void **)(p + 0x148)), *((s16 *)(p + 0x132)),
-                                   *((s16 *)(p + 0x136)), *((s16 *)(p + 0x13c)), p[0xaf] == 4,
-                                   *((s16 *)(p + 0x144)));
+    Callback_InvokeActor(p, p->update);
+    p->sprite.display.flags &= ~1;
+    {
+        struct ColliderView *c;
+        if (p->defeated == 0) {
+            c = &p->collider;
+            c->flags &= ~4;
+            Collider_SetPosition(c, &p->sprite.coordinates.position, 0);
+        } else {
+            c = &p->collider;
+            c->flags |= 4;
         }
-        if ((*((s16 *)(p + 0x132))) <= 0) {
+        collider = &p->collider;
+    }
+    if ((p->damage > 0) && (p->defeated == 0)) {
+        p->health -= p->damage;
+        p->reactionFlags = p->pendingReaction;
+        Sound_PlaySong(0x13e);
+        if (p->damage > 0) {
+            DamageNumberDisplay_Show(collider, p->damage, 0, &p->damagePosition, &p->damageOffset,
+                                     1);
+            SceneHud_SetTimedState(p->hud, p->health, p->maxHealth, p->hudStyle, p->direction == 4,
+                                   p->hudTime);
+        }
+        if (p->health <= 0) {
             const u16 *table;
             s32 count;
-            *((s16 *)(p + 0x130)) = 1;
-            *((s16 *)(p + 0xb0)) = 0;
-            CopyPosition(&position, (struct SceneVec *)(p + 0x40));
+            p->defeated = 1;
+            CannonTurret_ClearBlink(&p->invulnerability);
+            CopyPosition(&position, &p->sprite.coordinates.position);
             {
                 struct SceneVec *v = &position;
                 v->y += 200;
             }
             velocity.x = -4;
-            table = (const u16 *)0x0203B400;
-            velocity.y = RandomFrom_UpdateCombat(table) & 7;
+            table = gRandomTable;
+            velocity.y = RandomFrom(table) & 7;
             velocity.z = -4;
             size.x = 24;
-            size.y = (RandomFrom_UpdateCombat(table) & 7) + 3;
+            size.y = (RandomFrom(table) & 7) + 3;
             size.z = 24;
-            count = (RandomFrom_UpdateCombat(table) & 3) + 4;
+            count = (RandomFrom(table) & 3) + 4;
             sub_08014634(count, 2, &position, &velocity, &size, 15, 15);
-            Anim_RestartSequence(p + 0x10c, *((void **)(p + 0x164)), 10, 0, 0);
-            AnimData_SelectPaletteBank(p + 0x50, 0x1bc);
-            *((s16 *)(p + 0x128)) = 0;
-            *((void (**)(void))(p + 0x108)) = sub_082086B8;
-            *((u32 *)(p + 0x18)) = 0;
+            Anim_RestartSequence(&p->sequence, p->resource, 10, 0, 0);
+            AnimData_SelectPaletteBank(p->graphics, 0x1bc);
+            p->flashTimer = 0;
+            p->update = sub_082086B8;
+            p->age = 0;
             Sound_PlaySong(0x52c);
         }
-        *((s16 *)(p + 0x128)) = 8;
-        *((s16 *)(p + 0x12e)) = 1;
-        *((s16 *)(p + 0x12c)) = 0;
+        CannonTurret_FinishDamage(p);
     }
-    if (((Mod(*((u32 *)(p + 0x18)), 240) == 0) && ((*((s16 *)(p + 0x130))) == 0)) &&
-        ((*((void (**)(void))(p + 0x108))) != CannonTurret_FireAimedVolley)) {
-        Anim_SetSequence(p + 0x10c, *((void **)(p + 0x164)), 9, 0, 8);
-        Anim_SetDurationScale(p + 0x10c, 32);
-        *((s16 *)(p + 0x134)) = 1;
+    if (((Mod(p->age, 240) == 0) && (p->defeated == 0)) &&
+        (p->update != CannonTurret_FireAimedVolley)) {
+        Anim_SetSequence(&p->sequence, p->resource, 9, 0, 8);
+        Anim_SetDurationScale(&p->sequence, 32);
+        p->activeAnimation = 1;
     }
-    if ((*((s16 *)(p + 0x128))) > 0) {
-        AnimData_SelectPaletteBank(p + 0x50, 0x192);
-        (*((s16 *)(p + 0x128)))--;
+    if (p->flashTimer > 0) {
+        AnimData_SelectPaletteBank(p->graphics, 0x192);
+        p->flashTimer--;
     } else
-        AnimData_SelectPaletteBank(p + 0x50, 0x1bc);
-    if (*((u16 *)(p + 0xb0))) {
-        (*((u16 *)(p + 0xb0)))--;
-        if (((*((u16 *)(p + 0xb0))) >> 2) & 1)
-            *((u32 *)(p + 0x24)) |= 1;
+        AnimData_SelectPaletteBank(p->graphics, 0x1bc);
+    if (p->invulnerability) {
+        p->invulnerability--;
+        if ((p->invulnerability >> 2) & 1)
+            p->sprite.display.flags |= 1;
         else
-            *((u32 *)(p + 0x24)) &= ~1;
+            p->sprite.display.flags &= ~1;
     }
-    token = 0;
-    asm("" : "+r"(token));
-    ended = StepAnimation_UpdateCombat(p, (void *)(p + 0x10c), 4);
-    asm("" : : "r"(token));
-    if ((ended && ((*((s16 *)(p + 0x134))) != 0)) && ((*((s16 *)(p + 0x130))) == 0)) {
-        Anim_SetSequence(p + 0x10c, *((void **)(p + 0x164)), 8, 0, 0);
-        *((s16 *)(p + 0x134)) = 0;
-    }
-    (*((u32 *)(p + 0x18)))++;
-    {
-        register s32 result asm("r0") = 0;
-        asm("" : "+r"(result));
-        return result;
-    }
-}
 
-#else
-INCLUDE_ASM("asm/nonmatching", CannonTurret_UpdateCombat);
-#endif
+    ended = CannonTurret_StepSequence(&p->sprite.display, &p->sequence);
+
+    if ((ended && (p->activeAnimation != 0)) && (p->defeated == 0)) {
+        Anim_SetSequence(&p->sequence, p->resource, 8, 0, 0);
+        p->activeAnimation = 0;
+    }
+    p->age++;
+    /* The task callback has no explicit return assignment on the active path. */
+}
