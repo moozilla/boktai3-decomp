@@ -3,13 +3,11 @@
 
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_graphics.h"
+#include "scene_body_api.h"
 
 void sub_08080BE0(void);
-u32 SceneBody_Init(void *, u32, void *, u8, u8, void *);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
-u32 SceneBody_SetSprite(void *, void *);
-u32 SceneBody_SetMovementProbe(void *, void *, u16, u16);
 
 /* Shared script-driven body, health, pursuit route and movement-probe setup. */
 static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
