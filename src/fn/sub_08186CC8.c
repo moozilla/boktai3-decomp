@@ -1,74 +1,78 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.6%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// confidence=low: behavior selection aligns the actor with the player and remembers attack origins.
-// MATCHING_CONCESSION: register-pinning
-// Remaining differences: decision-pointer lifetime, merged fallback calls and register allocation.
+#include "game_state.h"
+#include "contact_position.h"
+#include "scene_actor_components.h"
 struct ArmorSelection {
-    u8 pad0[0x48];
-    s16 f48;
-    s16 f4a;
-    s16 f4c;
-    u8 pad4e[0xae4];
-    u16 fb32;
+    u8 pad0[0x3C];
+    struct SceneActorBody body;
+    u8 unknown84[0xB32 - 0x84];
+    u16 flags;
     u8 padb34[0x5];
-    u8 fb39;
+    u8 facing;
     u8 padb3a[0x2];
-    u8 fb3c;
-    u8 fb3d;
+    u8 behavior;
+    u8 phase;
     u8 padb3e[0x5e2];
-    u8 f1120;
+    u8 decision;
     u8 pad1121[0x1];
-    s16 f1122;
+    s16 attackCooldown;
 };
-extern u8 *gGameState;
 void ActorController_SetBehavior(void *, s32), ActorController_SetBehaviorIfFinished(void *, s32);
 u32 Armor_IsNearSavedPosition(void *);
 void Armor_SaveCurrentPosition(void *);
+/* The signed component is retained alongside its initialized magnitude. */
+#define ARMOR_ABSOLUTE_COMPONENT(magnitude, value)                                                 \
+    do {                                                                                           \
+        if ((value) < 0)                                                                           \
+            (magnitude) = -(value);                                                                \
+    } while (0)
+#define ARMOR_CLEAR_DECISION(field)                                                                \
+    do {                                                                                           \
+        *(field) = 0;                                                                              \
+    } while (0)
+#define ARMOR_BRANCH_OUTSIDE_GRID(magnitude, maximum, label)                                       \
+    do {                                                                                           \
+        if ((magnitude) > (maximum))                                                               \
+            goto label;                                                                            \
+    } while (0)
 void Armor_SelectAlignedAttack(struct ArmorSelection *p)
 {
     s32 x;
     s32 y;
     s32 z;
-    register s32 ax asm("r5");
+    s32 ax;
     s32 az;
     s32 playerY;
     s32 actorY;
-    u8 flags;
-    if (p->f1122 > 0)
-        p->f1122--;
-    if (((p->fb3d != 255) && (p->fb3c != 2)) && (p->fb3c != 19))
+    u8 *decision;
+    if (p->attackCooldown > 0)
+        p->attackCooldown--;
+    if (((p->phase != 255) && (p->behavior != 2)) && (p->behavior != 19))
         return;
-    x = (*((s16 *)(gGameState + 0x30))) - p->f48;
-    playerY = *((s16 *)(gGameState + 0x32));
-    actorY = p->f4a;
-    z = (*((s16 *)(gGameState + 0x34))) - p->f4c;
+    x = gGameState->positionX - p->body.position.x;
+    playerY = gGameState->positionY;
+    actorY = p->body.position.y;
+    z = gGameState->positionZ - p->body.position.z;
     x = (x + 128) >> 8;
     z = (z + 128) >> 8;
     ax = x;
     y = playerY - actorY;
     az = z;
-    if (ax < 0)
-        ax = -ax;
-    if (y < 0)
-        y = -y;
-    flags = p->fb32;
-    if (z < 0)
-        az = -z;
-    if (p->fb32 & 1) {
-        switch (p->f1120) {
+    ARMOR_ABSOLUTE_COMPONENT(ax, ax);
+    ARMOR_ABSOLUTE_COMPONENT(y, y);
+    ARMOR_ABSOLUTE_COMPONENT(az, z);
+    if (p->flags & 1) {
+        decision = &p->decision;
+        switch (*decision) {
             case 0:
-                if ((u8)(p->fb32 & 2)) {
+                if ((u8)(p->flags & 2)) {
                     ActorController_SetBehavior(p, 12);
                     break;
                 }
                 if (y > 127)
                     goto far;
                 if (x == 0) {
-                    if (az > 1)
-                        goto far;
+                    ARMOR_BRANCH_OUTSIDE_GRID(az, 1, far);
                     if (Armor_IsNearSavedPosition(p))
                         goto near;
                     goto displaced;
@@ -95,41 +99,47 @@ void Armor_SelectAlignedAttack(struct ArmorSelection *p)
                 break;
 
             case 1:
-                if ((p->f1122 <= 0) || (x && z))
-                    p->f1120 = 0;
+                if ((p->attackCooldown <= 0) || (x && z))
+                    ARMOR_CLEAR_DECISION(decision);
                 else {
-                    u32 action = p->fb3c;
+                    u32 action = p->behavior;
                     if ((((u8)(action - 10)) > 1) && (action != 13))
                         ActorController_SetBehavior(p, 10);
                 }
                 break;
         }
 
-    } else if (p->fb3c == 3) {
+    } else if (p->behavior == 3) {
         if (y <= 127) {
             if (!x) {
-                if ((z < 0) && (p->fb39 == 0xc0))
+                if ((z < 0) && (p->facing == 0xc0))
                     goto aligned;
-                if (p->fb39 == 0x40)
-                    goto aligned;
+                if (p->facing != 0x40)
+                    goto approach;
+                goto aligned;
             } else if (!z) {
-                if ((x < 0) && (p->fb39 == 0x80))
+                if ((x < 0) && (p->facing == 0x80))
                     goto aligned;
-                if (!p->fb39)
+                if (!p->facing)
                     goto aligned;
             }
         }
-        return;
-        ActorController_SetBehaviorIfFinished(p, 2);
+        goto approach;
     aligned:
         ActorController_SetBehavior(p, 22);
 
-    } else if ((y <= 127) && (((!x) && (az <= 1)) || ((!z) && (ax <= 1))))
+    } else {
+        if (y > 127)
+            goto approach;
+        if (x == 0) {
+            ARMOR_BRANCH_OUTSIDE_GRID(az, 1, approach);
+        } else {
+            if (z != 0 || ax > 1)
+                goto approach;
+        }
         ActorController_SetBehavior(p, 3);
-    else
+        return;
+    approach:
         ActorController_SetBehaviorIfFinished(p, 2);
+    }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_SelectAlignedAttack);
-#endif
