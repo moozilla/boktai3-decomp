@@ -107,3 +107,9 @@ Matched 476 bytes by reusing the established curve interpolation and typed priva
 Tags: 080A71A0, Tentacle, reaction, PRE
 
 Matched 532 bytes with typed trail health/count and canonical actor motion. Joined signed truncation preserves both shift-result copies; shared flag components retain the masks and separate zero values used by control resets. Halfword flag masks and motion-clamp bounds resolve the final PRE slot permutation, confirmed against the compiler hash model. Formatted stock check reports zero differing bytes, SHA-256 `03ebcfafb2ee382a44b0611c97079b11fb2346ffa11723d28d0190bf84445e69`.
+
+## Ghost visibility controller (08098788)
+
+Tags: 08098788, Ghost, visibility, flags, PRE
+
+Matched 628 bytes with canonical actor/player/game-state access and a typed private visibility context. The discarded engine flag query uses a boolean expression return; the early-return form had removed the ROM's dead masked read. Joined visibility-query exits retain both drawable flag tests, and separate context flag clear/set helpers let PRE keep the shared flag address. Formatted stock check reports zero differing bytes, SHA-256 `24a7bae007b90bbc9dc8f55f965931f57eb6ed7768942bed98f3a89c8ec0f484`. No pins, barriers, or compiler overrides.
