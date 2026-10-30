@@ -4,6 +4,7 @@
 #include "ram.h"
 #include "scene_actor_components.h"
 #include "contact_collider.h"
+#include "armor_decision_ops.h"
 
 struct ArmorDecisionActor {
     u8 task[0x18];
@@ -49,33 +50,6 @@ static inline u8 Armor_FacingValue(struct ArmorDecisionActor *actor)
     return actor->facing;
 }
 
-#define ARMOR_ROUND_GRID_COMPONENT(value)                                                          \
-    do {                                                                                           \
-        (value) = ((value) + 128) >> 8;                                                            \
-    } while (0)
-#define ARMOR_BRANCH_FACING_AXIS(actor, delta, negative, positive, aligned, unaligned)             \
-    do {                                                                                           \
-        if ((delta) < 0) {                                                                         \
-            if ((actor)->facing == (negative))                                                     \
-                goto aligned;                                                                      \
-        } else if ((actor)->facing == (positive))                                                  \
-            goto aligned;                                                                          \
-        goto unaligned;                                                                            \
-    } while (0)
-#define ARMOR_NORMALIZE_MAGNITUDE(magnitude, value)                                                \
-    do {                                                                                           \
-        if ((value) < 0)                                                                           \
-            (magnitude) = -(value);                                                                \
-    } while (0)
-#define ARMOR_CAPTURE_COMPONENT_DELTA(out, target, actor)                                          \
-    do {                                                                                           \
-        (out) = (target) - (actor);                                                                \
-    } while (0)
-#define ARMOR_BRANCH_AXIS_UNALIGNED(x, z, label)                                                   \
-    do {                                                                                           \
-        if ((x) != 0 && (z) != 0)                                                                  \
-            goto label;                                                                            \
-    } while (0)
 // Selects axis attacks and recovery behavior while updating the current mode timers.
 void Armor_UpdateModeAttackDecision(struct ArmorDecisionActor *p)
 {
@@ -129,8 +103,8 @@ void Armor_UpdateModeAttackDecision(struct ArmorDecisionActor *p)
     ARMOR_ROUND_GRID_COMPONENT(dz);
     absX = dx;
     absZ = dz;
-    ARMOR_NORMALIZE_MAGNITUDE(absX, dx);
-    ARMOR_NORMALIZE_MAGNITUDE(absZ, dz);
+    ARMOR_ABSOLUTE_COMPONENT(absX, dx);
+    ARMOR_ABSOLUTE_COMPONENT(absZ, dz);
     mode = p->flags & 1;
     if (mode) {
         switch (p->decision) {

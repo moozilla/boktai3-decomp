@@ -2,6 +2,7 @@
 #include "game_state.h"
 #include "contact_position.h"
 #include "scene_actor_components.h"
+#include "armor_decision_ops.h"
 struct ArmorSelection {
     u8 pad0[0x3C];
     struct SceneActorBody body;
@@ -20,21 +21,6 @@ struct ArmorSelection {
 void ActorController_SetBehavior(void *, s32), ActorController_SetBehaviorIfFinished(void *, s32);
 u32 Armor_IsNearSavedPosition(void *);
 void Armor_SaveCurrentPosition(void *);
-/* The signed component is retained alongside its initialized magnitude. */
-#define ARMOR_ABSOLUTE_COMPONENT(magnitude, value)                                                 \
-    do {                                                                                           \
-        if ((value) < 0)                                                                           \
-            (magnitude) = -(value);                                                                \
-    } while (0)
-#define ARMOR_CLEAR_DECISION(field)                                                                \
-    do {                                                                                           \
-        *(field) = 0;                                                                              \
-    } while (0)
-#define ARMOR_BRANCH_OUTSIDE_GRID(magnitude, maximum, label)                                       \
-    do {                                                                                           \
-        if ((magnitude) > (maximum))                                                               \
-            goto label;                                                                            \
-    } while (0)
 void Armor_SelectAlignedAttack(struct ArmorSelection *p)
 {
     s32 x;
