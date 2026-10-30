@@ -143,17 +143,6 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->body.position;
 }
 
-static inline void GolemInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
-                                           void *callback)
-{
-    actor->callback248 = callback;
-}
-static inline void GolemInit_SetReactionGate(struct SceneActorRegistryResetView *actor,
-                                             void *callback)
-{
-    actor->field23C = callback;
-}
-
 void Golem_InitAnimationProfile(void *);
 void Golem_InitColliders(void *);
 void Golem_InitActionHandlers(void *);
@@ -177,12 +166,6 @@ void Golem_ClearControlFlag(void);
 void Golem_RestoreRoute(void);
 void Golem_OnSharedActorUpdate(void);
 void Golem_OnDestroy(void);
-
-static inline void GolemInit_SetContactCallback(struct SceneActorRegistryResetView *actor,
-                                                void *callback)
-{
-    actor->contactCallback = callback;
-}
 
 static inline void GolemInit_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
 {
@@ -259,9 +242,9 @@ s32 Golem_Init(void *object)
         group, (u8 *)arg0 + 0x638, (u8 *)arg0 + 0x65C, Golem_UpdateDying, Golem_ResumeSavedTarget,
         SceneActorReaction_BeginTargetRecovery, Golem_OnUnusedState, 1, &actor->body);
     SceneActorMovement_ResolveRoutePosition(actor);
-    GolemInit_SetRouteReset(actor, Golem_ResetCombatState);
-    GolemInit_SetReactionGate(actor, SceneActorControl_RefreshMotionRoute);
-    GolemInit_SetContactCallback(actor, Golem_UpdateHitReaction);
+    MonsterInit_SetRouteReset(actor, Golem_ResetCombatState);
+    MonsterInit_SetReactionGate(actor, SceneActorControl_RefreshMotionRoute);
+    MonsterInit_SetContactCallback(actor, Golem_UpdateHitReaction);
     group->responseCallback = Golem_ClearControlFlag;
     group->field5EC = Golem_RestoreRoute;
     actor->field2E8 = 0;

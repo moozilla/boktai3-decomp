@@ -155,16 +155,6 @@ static inline void VornInit_ReadPalette(struct SceneActorRegistryResetView *acto
                                            SceneActorScript_GetManagerField62());
 }
 
-static inline void VornInit_SetRouteReset(struct SceneActorRegistryResetView *actor, void *callback)
-{
-    actor->callback248 = callback;
-}
-static inline void VornInit_SetReactionGate(struct SceneActorRegistryResetView *actor,
-                                            void *callback)
-{
-    actor->field23C = callback;
-}
-
 void Vorn_InitActorProfile(void *);
 void SceneActor_InitContextColliders(void *);
 s32 Vorn_OnUpdate(void *);
@@ -190,11 +180,6 @@ static inline void VornInit_SetReactionTable(struct SceneActorRegistryResetView 
                                              const void *table)
 {
     MonsterInit_WriteDataPointer(&actor->commandTable.opaque, table);
-}
-static inline void VornInit_SetContactCallback(struct SceneActorRegistryResetView *actor,
-                                               void *callback)
-{
-    actor->contactCallback = callback;
 }
 
 static inline void VornInit_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
@@ -283,9 +268,9 @@ s32 Vorn_Init(void *object)
                                           Vorn_OnReactionNoOp, SceneActorReaction_ResumeSavedTarget,
                                           Vorn_TryRestorePatrolRoute, 0, 1, body);
     SceneActorMovement_ResolveRoutePosition(arg0);
-    VornInit_SetRouteReset(actor, SceneActor_ResetContextAnimation);
-    VornInit_SetReactionGate(actor, sub_080B197C);
-    VornInit_SetContactCallback(actor, Vorn_SelectHitRecovery);
+    MonsterInit_SetRouteReset(actor, SceneActor_ResetContextAnimation);
+    MonsterInit_SetReactionGate(actor, sub_080B197C);
+    MonsterInit_SetContactCallback(actor, Vorn_SelectHitRecovery);
     VornInit_SetReactionTable(actor, gUnk_08606038);
     group->contactControl = Vorn_UpdateKnockbackRecovery;
     group->field5E0 = SceneActorReaction_ResumeOrRunScript;

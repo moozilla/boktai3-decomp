@@ -373,4 +373,22 @@ static inline void MonsterInit_ReadInitialMode(struct SceneActorRegistryResetVie
     }
 }
 
+static inline void MonsterInit_SetContactCallback(struct SceneActorRegistryResetView *actor,
+                                                  void *callback)
+{
+    actor->contactCallback = callback;
+}
+
+static inline void MonsterInit_SetReactionGate(struct SceneActorRegistryResetView *actor,
+                                               void *callback)
+{
+    actor->field23C = callback;
+}
+
+static inline void MonsterInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
+                                             void *callback)
+{
+    actor->callback248 = callback;
+}
+
 #endif

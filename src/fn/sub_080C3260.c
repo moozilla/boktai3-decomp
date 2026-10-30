@@ -90,17 +90,6 @@ static inline void SkeletonInit_ReadWidgetRelativePalette(struct DisplayKeyframe
     widget->paletteIndex = Script_GetPc() ? Script_GetValue() + 0x12B : 0x12B;
 }
 
-static inline void SkeletonInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
-                                              void *callback)
-{
-    actor->callback248 = callback;
-}
-static inline void SkeletonInit_SetReactionGate(struct SceneActorRegistryResetView *actor,
-                                                void *callback)
-{
-    actor->field23C = callback;
-}
-
 static inline void SkeletonInit_InstallContactDefaults(struct SceneActorRegistryResetView *arg0)
 {
     arg0->contactCallback = Skeleton_ReactToContact;
@@ -185,9 +174,9 @@ s32 Skeleton_Init(void *object)
         group, (u8 *)arg0 + 0x71C, (u8 *)arg0 + 0x740, Skeleton_UpdateDownedState,
         SceneActorReaction_ReturnToRouteEntry, SceneActorReaction_BeginTargetRecovery, 0, 1, body);
     SceneActorMovement_ResolveRoutePosition(arg0);
-    SkeletonInit_SetRouteReset(actor, Skeleton_ResetRouteReaction);
+    MonsterInit_SetRouteReset(actor, Skeleton_ResetRouteReaction);
     group->responseCallback = 0;
-    SkeletonInit_SetReactionGate(actor, SceneActorReaction_UpdateGate);
+    MonsterInit_SetReactionGate(actor, SceneActorReaction_UpdateGate);
     group->field5EC = Skeleton_RestorePursuitRoute;
     SkeletonInit_InstallContactDefaults(actor);
     actor->field2E8 = 0;

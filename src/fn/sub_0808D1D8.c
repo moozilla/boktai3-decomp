@@ -91,12 +91,6 @@ static inline void GhoulInit_InitializePaletteRange(struct SceneActorRegistryRes
     actor->paletteBank = MonsterInit_GetPaletteBase(actor) + current;
 }
 
-static inline void GhoulInit_SetContactCallback(struct SceneActorRegistryResetView *actor,
-                                                void *callback)
-{
-    actor->contactCallback = callback;
-}
-
 s32 Ghoul_Init(void *object)
 {
     struct SceneActorRegistryResetView *arg0 = object;
@@ -155,7 +149,7 @@ s32 Ghoul_Init(void *object)
                                           Bat_UpdateAnimationRequest, 1, body);
     SceneActorMovement_ResolveRoutePosition(arg0);
     GhoulInit_InstallRouteDefaults(actor);
-    GhoulInit_SetContactCallback(actor, Ghoul_ReactToContact);
+    MonsterInit_SetContactCallback(actor, Ghoul_ReactToContact);
     group->responseCallback = Ghoul_OnLifecycleEvent;
     group->field5EC = Ghoul_ResumeContactRoute;
     MonsterInit_SetTargetingFlags(&actor->tracking, 1);

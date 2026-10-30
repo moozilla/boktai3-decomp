@@ -69,17 +69,6 @@ void Spider_OnSecondaryUpdate(void);
 void Spider_Destroy(void);
 extern const u8 gUnk_08605F34[];
 
-static inline void MonsterInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
-                                             void *callback)
-{
-    actor->callback248 = callback;
-}
-static inline void MonsterInit_SetReactionGate(struct SceneActorRegistryResetView *actor,
-                                               void *callback)
-{
-    actor->field23C = callback;
-}
-
 static inline void MonsterInit_EnableInitialFlags(struct SceneActorRegistryResetView *arg0)
 {
     MonsterInit_SetTargetingFlags(&arg0->tracking, 1);

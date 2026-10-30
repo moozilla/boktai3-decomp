@@ -51,17 +51,6 @@ static inline void MummyInit_ResetFlags(void *object)
     actor->field6F2 = 0;
 }
 
-static inline void MummyInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
-                                           void *callback)
-{
-    actor->callback248 = callback;
-}
-static inline void MummyInit_SetReactionGate(struct SceneActorRegistryResetView *actor,
-                                             void *callback)
-{
-    actor->field23C = callback;
-}
-
 void Mummy_InitProfile(void *);
 void Mummy_InitCollision(void *);
 void Mummy_InitActionHandlers(void *);
@@ -85,12 +74,6 @@ void Mummy_OnClearActivityFlag(void);
 void Mummy_OnMovementUpdate(void);
 void Mummy_OnInteractionUpdate(void);
 void Mummy_OnReleaseResources(void);
-
-static inline void MummyInit_SetContactCallback(struct SceneActorRegistryResetView *actor,
-                                                void *callback)
-{
-    actor->contactCallback = callback;
-}
 
 static inline void MummyInit_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
 {
@@ -169,9 +152,9 @@ s32 Mummy_Init(void *object)
         group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718, Mummy_UpdateDying, Mummy_ResumeSavedTarget,
         SceneActorReaction_BeginTargetRecovery, Mummy_OnUnusedState, 3, &actor->body);
     SceneActorMovement_ResolveRoutePosition(arg0);
-    MummyInit_SetRouteReset(actor, Mummy_ResetRevivalMotion);
-    MummyInit_SetReactionGate(actor, SceneActor_EnterMotionPhase);
-    MummyInit_SetContactCallback(actor, Mummy_SelectMovementResponse);
+    MonsterInit_SetRouteReset(actor, Mummy_ResetRevivalMotion);
+    MonsterInit_SetReactionGate(actor, SceneActor_EnterMotionPhase);
+    MonsterInit_SetContactCallback(actor, Mummy_SelectMovementResponse);
     group->responseCallback = Mummy_OnClearActivityFlag;
     group->field5EC = Mummy_OnMovementUpdate;
     group->routeChoiceControl = sub_080D1644;
