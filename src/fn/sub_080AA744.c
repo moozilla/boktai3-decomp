@@ -1,98 +1,90 @@
 #include "global.h"
+#include "scene_actor_reset.h"
 #include "engine.h"
 #include "ram.h"
-
 extern const s16 gUnk_086149C4[];
 
-struct Trail080AA744Osc {
-    u8 unknown0[0xE9];
+struct TentacleImpulseSegment {
+    u8 unknown0[0x1C];
+    struct ContactPosition position;
+    u8 unknown24[0x105 - 0x24];
     u8 flags;
-    u8 unknownEA[0x16];
-    u16 offsetX;
-    u16 offsetY;
-    u16 offsetZ;
-    u8 unknown106[0x22];
+    u8 unknown106[0x11C - 0x106];
+    struct ContactPosition impulse;
+    u8 unknown124[4];
 };
-
-struct Trail080AA744 {
-    u8 unknown0[0x3F0];
-    struct Trail080AA744Osc segments[3];
-    u8 unknown768[0x168];
-    u16 flags8D0;
+struct TentacleImpulseTrail {
+    u8 unknown0[0x3D4];
+    struct TentacleImpulseSegment segments[4];
+    u8 unknown874[0x8D0 - 0x874];
+    u16 flags;
     u8 unknown8D2[8];
-    s16 segmentCount;
+    s16 count;
 };
 
-struct Actor080AA744 {
-    u8 unknown0[0x2EC];
-    s16 velocity[3];
-    u8 unknown2F2[0x3D0 - 0x2F2];
-    struct Trail080AA744 *trail;
-};
-
-static inline u8 Trail080AA744IsActive(struct Trail080AA744Osc *seg)
+static inline s32 Tentacle_LengthSquared(struct ContactPosition *motion)
 {
-    u32 value = seg->flags;
-    u32 mask = 2;
+    return motion->x * motion->x + motion->y * motion->y + motion->z * motion->z;
+}
+static inline u8 Tentacle_TestSegmentFlags(struct TentacleImpulseSegment *segment, u32 input)
+{
+    u32 value = segment->flags;
+    u32 mask = input;
     if (mask & value)
         return 1;
     return 0;
 }
-
-static inline u8 Trail080AA744IsHidden(struct Trail080AA744Osc *seg)
+static inline s32 Tentacle_TruncateFixed12(s32 value)
 {
-    u32 value = seg->flags;
-    u32 mask = 1;
-    if (mask & value)
+    if (value >= 0)
+        return value >> 12;
+    return -((-value) >> 12);
+}
+static inline void Tentacle_Polar(struct ContactPosition *out, u16 angle, s32 speed)
+{
+    out->x = Tentacle_TruncateFixed12(gUnk_086149C4[(angle + 64) & 255] * speed);
+    out->y = 0;
+    out->z = Tentacle_TruncateFixed12(gUnk_086149C4[angle & 255] * speed);
+}
+static inline u16 Tentacle_Random(void)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return gRandomTable[index];
+}
+static inline u8 Tentacle_TestTrailFlags(struct TentacleImpulseTrail *trail, u32 mask)
+{
+    if (trail->flags & mask)
         return 1;
     return 0;
 }
-
-static inline s32 Trail080AA744FixedMul(s32 a, s32 b)
+static inline void Tentacle_MaskTrailFlags(struct TentacleImpulseTrail *trail, u32 mask)
 {
-    s32 product = a * b;
-    if (product >= 0)
-        return product >> 12;
-    return -((-product) >> 12);
+    trail->flags = mask & trail->flags;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 35.4%
-// scope shape 109 (differences once low registers are set aside)
-// confidence=low: sets each active trail oscillator's X and Z offsets from a random-table angle, scaled by velocity magnitude; raises a sound flag once
-void sub_080AA744(struct Actor080AA744 *actor)
+void sub_080AA744(struct SceneActorRegistryResetView *actor)
 {
-    struct Trail080AA744 *trail = actor->trail;
-    s32 mask;
+    struct TentacleImpulseTrail *trail = actor->context;
+    s32 mask = Tentacle_LengthSquared(&actor->secondaryMotion);
     s32 i;
-    s32 magSq = actor->velocity[0] * actor->velocity[0] + actor->velocity[1] * actor->velocity[1] +
-                actor->velocity[2] * actor->velocity[2];
-
-    if (magSq > 0x400)
-        mask = 0xFF;
-    else if (magSq > 0x80)
-        mask = 0x7F;
+    u32 activeMask = 2;
+    u32 hiddenMask = 1;
+    if (mask > 1024)
+        mask = 255;
+    else if (mask > 128)
+        mask = 127;
     else
-        mask = 0x3F;
-
-    for (i = 0; i < trail->segmentCount; i++) {
-        struct Trail080AA744Osc *seg = &trail->segments[i];
-        if (Trail080AA744IsActive(seg) && !Trail080AA744IsHidden(seg)) {
-            u16 r;
-            gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-            r = gRandomTable[gRandomIndex];
-            r &= mask;
-            seg->offsetX = Trail080AA744FixedMul(gUnk_086149C4[(r + 0x40) & 0xFF], 12);
-            seg->offsetY = 0;
-            seg->offsetZ = Trail080AA744FixedMul(gUnk_086149C4[r & 0xFF], 12);
+        mask = 63;
+    for (i = 0; i < trail->count; i++) {
+        if (Tentacle_TestSegmentFlags(&trail->segments[i], activeMask) &&
+            !Tentacle_TestSegmentFlags(&trail->segments[i], hiddenMask)) {
+            u32 sample = Tentacle_Random();
+            Tentacle_Polar(&trail->segments[i].impulse, sample & mask, 12);
         }
     }
-
-    if (trail->flags8D0 & 4) {
+    if (Tentacle_TestTrailFlags(trail, 4)) {
         Sound_PlaySong(0x3D4);
-        trail->flags8D0 &= ~4;
+        Tentacle_MaskTrailFlags(trail, ~4);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080AA744);
-#endif

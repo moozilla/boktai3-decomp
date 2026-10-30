@@ -83,3 +83,9 @@ Matched 556 bytes without the old r6 pin. The entry operation owns initial contr
 Tags: 080AAA90, Tentacle, impulse, loop
 
 Matched 348 bytes with canonical actor ownership and typed position/velocity fields. The segment flag query accepts its segment and a byte mask; removing the draft's unused segment-address calculation restores the original three induction values and mask hoists. Context acquisition follows the inactive-actor gate. Formatted stock check reports zero differing bytes, SHA-256 `d4a59f7a0e661fb725d45763b4b9e23001896678df19ba457104d03920ee4ecf`. No register pins or barriers.
+
+## Tentacle random segment impulses (080AA744)
+
+Tags: 080AA744, Tentacle, impulse, random, allocation
+
+Matched 384 bytes with typed trail segments and canonical actor motion. The caller owns the active/hidden flag masks, making the segment queries share the intended word-mask interface. The random operation returns its unsigned halfword sample; this preserves the original loop-invariant selection for the sine table and angle masks. The last blocker was proved by one reload-rotation knob before the source ownership/type fix. Formatted stock check reports zero differing bytes, SHA-256 `256c2d936f7c21cb5dc2f580a0e145fa4048ed732d3593637d33defcc58eff96`. No pins, barriers, or compiler overrides.
