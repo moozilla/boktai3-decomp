@@ -107,3 +107,11 @@ three samples use the shared sample-capture operation. Reusing the data owner
 for the final actor age update preserves the bank's stack lifetime. Animation
 playback uses the canonical display-sequence record without volatile reads.
 Private actor fields begin at 0x108, preventing a full canonical actor prefix.
+
+## Screamer damage particles — 0820C9AC
+
+All 840 bytes match. Separate direct and captured sample reads preserve the
+particle direction and speed operands. The shared data owner holds the random
+bank through the loop and the actor for the final age increment. The native
+particle count and copied position reproduce the full stack layout without
+register pins, assembly barriers or compiler overrides.
