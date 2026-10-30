@@ -57,149 +57,14 @@ extern const u8 gUnk_08605E14[];
 struct GhostRoutePoint {
     s16 x, z;
 };
-struct GhostBody {
-    u32 id;
-    u8 unknown54[0x5];
-    u8 direction;
-    u8 unknown5A[0x2];
-    struct ContactPosition position;
-    u8 unknown64[0x34];
-};
-struct GhostAttacks {
-    u16 first[4];
-    u16 second[4];
-    u16 parameter[4];
-    u32 flags[4];
-};
 struct GhostRoute {
     u32 unknown0, unknown4;
     struct GhostRoutePoint *point;
     u8 currentPoint, branches[2], activeBranch;
     u8 routeId, parameter, pointId, unknown13;
 };
-struct GhostTargeting {
-    u32 target;
-    u8 unknown4[10];
-    u8 heading, flags;
-    u16 x, z;
-    u32 distance, range, limit, zSquared;
-};
-struct GhostSavedControl {
-    u32 field118;
-    u32 field11C;
-    u8 field120;
-    u8 field121;
-    u8 field122;
-    u8 field123;
-    void *field124;
-    u8 field128;
-    u8 unknown129[0x3];
-    u16 field12C;
-    u16 field12E;
-    u32 field130;
-};
-struct GhostActor {
-    u8 unknown0[0x4];
-    u8 *drawable;
-    u8 drawableKind;
-    u8 unknown9[0x47];
-    struct GhostBody body;
-    u8 category;
-    u8 unknown99[0x1];
-    u16 field9A;
-    u16 health;
-    u8 field9E;
-    u8 field9F;
-    u8 fieldA0;
-    u8 fieldA1;
-    u16 fieldA2;
-    u16 fieldA4;
-    u16 fieldA6;
-    u16 fieldA8;
-    u16 fieldAA;
-    u32 fieldAC;
-    u16 defaultHealth;
-    u16 fieldB2;
-    struct GhostAttacks attacks;
-    struct GhostTargeting targeting;
-    u8 unknown100[0x4];
-    u32 word104;
-    u32 word108;
-    u32 word10C;
-    u32 word110;
-    u32 flags114;
-    struct GhostSavedControl saved;
-    struct ContactCollider colliderA, colliderB;
-    u16 alternatePalette, paletteBank;
-    u16 basePaletteBank;
-    u16 paletteAlternateBank;
-    u16 alternateOffset;
-    u16 paletteOffset;
-    u16 field1E8, paletteFlashBank;
-    u32 field1EC;
-    u32 field1F0;
-    u8 unknown1F4[0x28];
-    void *target;
-    void *field220;
-    void *entryTarget224;
-    void *entryTarget228;
-    void *savedTarget;
-    void *reactionTarget230;
-    void *field234;
-    void *field238;
-    void *field23C;
-    u32 field240;
-    u8 unknown244[0x4];
-    void *callback248;
-    void *field24C;
-    const void *field250;
-    u8 unknown254[0x4];
-    void *field258;
-    void *field25C;
-    u32 (*field260)(void *);
-    void *field264;
-    void *field268;
-    void *update26C;
-    void *update270;
-    void *field274;
-    void *field278;
-    u8 unknown27C[0x2C];
-    u8 state2A8;
-    u8 phase2A9;
-    u8 behavior2AA;
-    u8 unknown2AB[0x1];
-    u32 counter2AC;
-    u8 field2B0;
-    u8 field2B1;
-    u8 field2B2;
-    u8 field2B3;
-    u8 enabled;
-    u8 field2B5;
-    u8 unknown2B6[0x1];
-    u8 field2B7;
-    u8 unknown2B8[0x6];
-    u16 groundHeight2BE;
-    u16 flags2C0;
-    u16 field2C2;
-    u32 profileMode;
-    u16 field2C8;
-    u8 unknown2CA[0x2];
-    u32 flags2CC;
-    u32 flags2D0;
-    u16 flags2D4;
-    u8 unknown2D6[0x12];
-    u16 field2E8;
-    u16 field2EA;
-    u8 unknown2EC[0x8];
-    u16 terrainCell;
-    u8 unknown2F6[0x4];
-    u16 field2FA;
-    u8 unknown2FC[0x8];
-    u32 field304;
-    u32 profileId;
-    u8 unknown30C[0xC4];
-    struct GhostActor *context;
-    u8 unknown3D4[0x184];
+struct GhostInstanceState {
+    u8 unknown0[0x558];
     u32 flags558;
     u8 unknown55C[4];
     u8 phase560, phase561;
@@ -222,71 +87,71 @@ struct GhostActor {
 struct ResourceCopy {
     u32 words[8];
 };
-static inline u8 Ghost_GetDrawableKind(struct GhostActor *a)
+static inline u8 Ghost_GetDrawableKind(struct SceneActorRegistryResetView *a)
 {
     return a->drawableKind;
 }
-static inline u16 Ghost_GetInitialHealth(struct GhostActor *a)
+static inline u16 Ghost_GetInitialHealth(struct SceneActorRegistryResetView *a)
 {
     return a->defaultHealth;
 }
-static inline u16 Ghost_GetMotionFlags(struct GhostActor *a)
+static inline u16 Ghost_GetMotionFlags(struct SceneActorRegistryResetView *a)
 {
     return a->flags2C0;
 }
-static inline u16 Ghost_GetHeightOffset(struct GhostActor *a)
+static inline u16 Ghost_GetHeightOffset(struct SceneActorRegistryResetView *a)
 {
     return a->field2EA;
 }
-static inline u32 Ghost_GetBehaviorFlags(struct GhostActor *a)
+static inline u32 Ghost_GetBehaviorFlags(struct SceneActorRegistryResetView *a)
 {
     return a->flags2CC;
 }
-static inline u32 Ghost_GetStatusFlags(struct GhostActor *a)
+static inline u32 Ghost_GetStatusFlags(struct SceneActorRegistryResetView *a)
 {
     return a->flags2D0;
 }
-static inline u8 Ghost_GetDirection(struct GhostActor *a)
+static inline u8 Ghost_GetDirection(struct SceneActorRegistryResetView *a)
 {
     return a->body.direction;
 }
-static inline u8 Ghost_GetState(struct GhostActor *a)
+static inline u8 Ghost_GetState(struct SceneActorRegistryResetView *a)
 {
     return a->state2A8;
 }
-static inline u8 Ghost_GetPhase(struct GhostActor *a)
+static inline u8 Ghost_GetPhase(struct SceneActorRegistryResetView *a)
 {
     return a->phase2A9;
 }
-static inline u8 Ghost_GetBehavior(struct GhostActor *a)
+static inline u8 Ghost_GetBehavior(struct SceneActorRegistryResetView *a)
 {
     return a->behavior2AA;
 }
-static inline void *Ghost_GetCurrentControl(struct GhostActor *a)
+static inline void *Ghost_GetCurrentControl(struct SceneActorRegistryResetView *a)
 {
     return a->target;
 }
-static inline u8 Ghost_GetControlKind(struct GhostActor *a)
+static inline u8 Ghost_GetControlKind(struct SceneActorRegistryResetView *a)
 {
     return a->field2B5;
 }
-static inline u32 Ghost_GetPaletteBase(struct GhostActor *a)
+static inline u32 Ghost_GetPaletteBase(struct SceneActorRegistryResetView *a)
 {
     return a->basePaletteBank;
 }
-static inline u32 Ghost_GetPaletteOffset(struct GhostActor *a)
+static inline u32 Ghost_GetPaletteOffset(struct SceneActorRegistryResetView *a)
 {
     return a->paletteOffset;
 }
-static inline u32 Ghost_GetTerrainCell(struct GhostActor *a)
+static inline u32 Ghost_GetTerrainCell(struct SceneActorRegistryResetView *a)
 {
     return a->terrainCell;
 }
-static inline void Ghost_SetInstanceFlags(struct GhostActor *a, u32 mask)
+static inline void Ghost_SetInstanceFlags(struct GhostInstanceState *a, u32 mask)
 {
     a->flags558 |= mask;
 }
-static inline u8 Ghost_TestInstanceFlags(struct GhostActor *a, u32 mask)
+static inline u8 Ghost_TestInstanceFlags(struct GhostInstanceState *a, u32 mask)
 {
     if (a->flags558 & mask)
         return 1;
@@ -298,75 +163,75 @@ static inline u8 Ghost_TestWorldFlags(u32 mask)
         return 1;
     return 0;
 }
-static inline struct GhostSavedControl *Ghost_SavedControlOf(struct GhostActor *a)
+static inline struct SceneActorDefaultControl *Ghost_SavedControlOf(struct SceneActorRegistryResetView *a)
 {
     return &a->saved;
 }
-static inline void Ghost_SetMotionFlags(struct GhostActor *a, u16 mask)
+static inline void Ghost_SetMotionFlags(struct SceneActorRegistryResetView *a, u16 mask)
 {
     a->flags2C0 |= mask;
 }
-static inline u8 Ghost_TestMotionFlags(struct GhostActor *a, u32 mask)
+static inline u8 Ghost_TestMotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     if (Ghost_GetMotionFlags(a) & mask)
         return 1;
     return 0;
 }
-static inline void Ghost_SetBehaviorFlags(struct GhostActor *a, u32 mask)
+static inline void Ghost_SetBehaviorFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     a->flags2CC |= mask;
 }
-static inline void Ghost_SetStatusFlags(struct GhostActor *a, u32 mask)
+static inline void Ghost_SetStatusFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     a->flags2D0 |= mask;
 }
-static inline u32 Ghost_GetTargetingFlags(struct GhostTargeting *target)
+static inline u32 Ghost_GetTargetingFlags(struct SceneActorChaseTracking *target)
 {
     return target->flags;
 }
-static inline void Ghost_SaveControl(struct GhostSavedControl *saved, struct GhostActor *a)
+static inline void Ghost_SaveControl(struct SceneActorDefaultControl *saved, struct SceneActorRegistryResetView *a)
 {
-    saved->field12E = Ghost_GetMotionFlags(a);
-    saved->field12C = Ghost_GetHeightOffset(a);
-    saved->field118 = Ghost_GetBehaviorFlags(a);
-    saved->field11C = Ghost_GetStatusFlags(a);
-    saved->field120 = Ghost_GetDirection(a);
-    saved->field121 = Ghost_GetState(a);
-    saved->field122 = Ghost_GetPhase(a);
-    saved->field123 = Ghost_GetBehavior(a);
-    saved->field124 = Ghost_GetCurrentControl(a);
-    saved->field128 = Ghost_GetControlKind(a);
+    saved->motionFlags = Ghost_GetMotionFlags(a);
+    saved->heightOffset = Ghost_GetHeightOffset(a);
+    saved->behaviorFlags = Ghost_GetBehaviorFlags(a);
+    saved->statusFlags = Ghost_GetStatusFlags(a);
+    saved->direction = Ghost_GetDirection(a);
+    saved->state = Ghost_GetState(a);
+    saved->phase = Ghost_GetPhase(a);
+    saved->behavior = Ghost_GetBehavior(a);
+    saved->control = Ghost_GetCurrentControl(a);
+    saved->kind = Ghost_GetControlKind(a);
 }
-static inline u8 *Ghost_GetDrawable(struct GhostActor *a)
+static inline u8 *Ghost_GetDrawable(struct SceneActorRegistryResetView *a)
 {
     return a->drawable;
 }
-static inline u8 Ghost_GetAnimationIndex(struct GhostActor *a)
+static inline u8 Ghost_GetAnimationIndex(struct SceneActorRegistryResetView *a)
 {
-    return a->field2B7;
+    return a->animationIndex;
 }
-static inline void Ghost_SetAnimationIndex(struct GhostActor *a, u32 value)
+static inline void Ghost_SetAnimationIndex(struct SceneActorRegistryResetView *a, u32 value)
 {
-    a->field2B7 = value;
+    a->animationIndex = value;
 }
-static inline u8 Ghost_GetAnimationRestart(struct GhostActor *a)
+static inline u8 Ghost_GetAnimationRestart(struct SceneActorRegistryResetView *a)
 {
     return a->field2B3;
 }
-static inline void DrawablePosition(struct GhostActor *a)
+static inline void DrawablePosition(struct SceneActorRegistryResetView *a)
 {
     if (!Ghost_GetDrawableKind(a))
         POS(a->drawable, 0x1C) = a->body.position;
     else
         POS(a->drawable, 0x40) = a->body.position;
 }
-static inline u8 Ghost_TestTargetingFlags(struct GhostTargeting *target, u32 mask)
+static inline u8 Ghost_TestTargetingFlags(struct SceneActorChaseTracking *target, u32 mask)
 {
     if (Ghost_GetTargetingFlags(target) & mask)
         return 1;
     return 0;
 }
-static inline void Ghost_ReadTargeting(struct GhostTargeting *motion)
+static inline void Ghost_ReadTargeting(struct SceneActorChaseTracking *motion)
 {
     {
         s32 x, angle, z;
@@ -384,18 +249,18 @@ static inline void Ghost_ReadTargeting(struct GhostTargeting *motion)
         motion->z = z;
         motion->limit = x * x;
         motion->zSquared = z * z;
-        motion->heading = angle;
+        motion->fieldEA = angle;
         if (Ghost_TestTargetingFlags(motion, 4))
             motion->range = motion->limit;
         else
             motion->range = Div(motion->limit * 7, 10);
     }
 }
-static inline void Ghost_SetFirstAttack(struct GhostActor *a, s32 index, s32 value)
+static inline void Ghost_SetFirstAttack(struct SceneActorRegistryResetView *a, s32 index, s32 value)
 {
     a->attacks.first[index] = value;
 }
-static inline struct GhostActor *Ghost_ReadAttacks(struct GhostActor *a)
+static inline struct SceneActorRegistryResetView *Ghost_ReadAttacks(struct SceneActorRegistryResetView *a)
 {
     s32 i;
     if (Script_SeekToKeyword('a')) {
@@ -420,15 +285,15 @@ static inline s32 Ghost_ClampHealth(u16 raw)
         health = 0;
     return health;
 }
-static inline void Ghost_InstallIdle(struct GhostActor *a, void *idle)
+static inline void Ghost_InstallIdle(struct SceneActorRegistryResetView *a, void *idle)
 {
     a->target = idle;
 }
-static inline void Ghost_SetInitialHealth(struct GhostActor *a, u16 health)
+static inline void Ghost_SetInitialHealth(struct SceneActorRegistryResetView *a, u16 health)
 {
     a->defaultHealth = health;
 }
-static inline void Ghost_InitializeHealth(struct GhostActor *a, u16 initialHealth, s32 first,
+static inline void Ghost_InitializeHealth(struct SceneActorRegistryResetView *a, u16 initialHealth, s32 first,
                                           s32 second)
 {
     a->flags2D4 = 0;
@@ -439,17 +304,17 @@ static inline void Ghost_InitializeHealth(struct GhostActor *a, u16 initialHealt
     a->fieldAA = 0;
     if (second <= 0)
         second = first;
-    a->fieldA6 = first;
+    a->attachmentLimit = first;
     a->fieldA8 = second;
-    a->field2FA = 0;
+    a->regionId = 0;
 }
 static inline void MonsterInit_WriteHalfword(u16 *slot, u32 value)
 {
     *slot = value;
 }
-static inline void InitializeScriptFields(struct GhostActor *a, u32 *fill)
+static inline void InitializeScriptFields(struct SceneActorRegistryResetView *a, u32 *fill)
 {
-    struct GhostBody *body = &a->body;
+    struct SceneActorBody *body = &a->body;
     u32 id;
     struct ContactPosition origin;
     s32 first, second;
@@ -461,7 +326,7 @@ static inline void InitializeScriptFields(struct GhostActor *a, u32 *fill)
     a->flags2C0 = MonsterInit_ReadKeywordHalfword('M', 0);
     MonsterInit_ClearPosition(fill, &origin);
     id = Script_GetKeywordValue('N', 0);
-    Ghost_ReadTargeting(&Ghost_ReadAttacks(a)->targeting);
+    Ghost_ReadTargeting(&Ghost_ReadAttacks(a)->tracking);
     if (Script_SeekToKeyword('l')) {
         first = MonsterInit_ReadWord(300);
         second = MonsterInit_ReadWord(300);
@@ -499,7 +364,7 @@ static inline void InitializeScriptFields(struct GhostActor *a, u32 *fill)
 }
 static inline void Ghost_ClearMotion(void *object)
 {
-    struct GhostActor *a = object;
+    struct SceneActorRegistryResetView *a = object;
     u32 zero = 0;
     a->word104 = zero;
     a->word108 = zero;
@@ -507,7 +372,7 @@ static inline void Ghost_ClearMotion(void *object)
     a->word110 = zero;
     a->flags114 = zero;
 }
-static inline void InstallPrimaryCallbacks(struct GhostActor *a, void *cb274, u32 (*cb260)(void *),
+static inline void InstallPrimaryCallbacks(struct SceneActorRegistryResetView *a, void *cb274, u32 (*cb260)(void *),
                                            void *cb224, void *cb228, void *cb22C, void *control,
                                            void *cb230, void *cb234, void *defaultReaction,
                                            void *targetQuery, void *damage, void *contact)
@@ -515,34 +380,43 @@ static inline void InstallPrimaryCallbacks(struct GhostActor *a, void *cb274, u3
     u32 zero = 0;
     u32 mask = 0x2000;
     Ghost_SetBehaviorFlags(a, mask);
-    a->field274 = cb274;
-    a->field260 = cb260;
+    a->contextCallback = cb274;
+    {
+        SceneActorAnimationQuery *query = &a->animationQuery.word;
+        *query = cb260;
+    }
     a->entryTarget224 = cb224;
     a->entryTarget228 = cb228;
     a->savedTarget = cb22C;
     a->reactionTarget230 = cb230;
-    a->field234 = cb234;
+    a->deathControl = cb234;
     a->field220 = control;
-    a->field278 = defaultReaction;
-    a->update270 = 0;
-    a->field250 = 0;
+    a->defaultReaction = defaultReaction;
+    {
+        void **query = &a->contactQuery.opaque;
+        *query = 0;
+    }
+    {
+        const void **commands = &a->commandTable.opaque;
+        *commands = 0;
+    }
     a->callback248 = 0;
     a->update26C = targetQuery;
     a->field238 = SceneActorReaction_SinkAndRemove;
-    a->field264 = damage;
-    a->field268 = contact;
+    a->damageCallback = damage;
+    a->contactCallback = contact;
     a->field240 = 0;
     Ghost_ClearMotion(a);
 }
-static inline void Ghost_ClearControlFlags(struct GhostActor *a, u32 mask)
+static inline void Ghost_ClearControlFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     a->flags114 &= mask;
 }
-static inline void *Ghost_GetStandingControl(struct GhostActor *a)
+static inline void *Ghost_GetStandingControl(struct SceneActorRegistryResetView *a)
 {
     return a->savedTarget;
 }
-static inline void Ghost_SetControl(struct GhostActor *a, void *callback, u32 behavior)
+static inline void Ghost_SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 behavior)
 {
     u32 zero = 0;
     u32 one = 1;
@@ -554,7 +428,7 @@ static inline void Ghost_SetControl(struct GhostActor *a, void *callback, u32 be
     Ghost_ClearControlFlags(a, ~1);
     a->word104 = zero;
 }
-static inline void Ghost_SetState(struct GhostActor *a, u32 state, u32 phase, u32 behavior)
+static inline void Ghost_SetState(struct SceneActorRegistryResetView *a, u32 state, u32 phase, u32 behavior)
 {
     a->state2A8 = state;
     a->phase2A9 = phase;
@@ -562,13 +436,13 @@ static inline void Ghost_SetState(struct GhostActor *a, u32 state, u32 phase, u3
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
-static inline u8 Ghost_IsInCurrentRegion(struct GhostActor *actor)
+static inline u8 Ghost_IsInCurrentRegion(struct SceneActorRegistryResetView *actor)
 {
-    if (gGameState->region == actor->field2FA)
+    if (gGameState->region == actor->regionId)
         return 1;
     return 0;
 }
-static inline void InitializeCallbacks(struct GhostActor *a)
+static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
 {
     SceneActor_InitLinkedReactionColliders(a);
     InstallPrimaryCallbacks(
@@ -578,8 +452,14 @@ static inline void InitializeCallbacks(struct GhostActor *a)
         SceneActorPlacement_PlayResponseAndResetState);
     a->callback248 = Ghost_ResetMovementState;
     a->field23C = Ghost_OnControlCleanup;
-    a->update270 = Ghost_GetControlStatus;
-    a->field250 = (void *)gUnk_08605E14;
+    {
+        void **query = &a->contactQuery.opaque;
+        *query = Ghost_GetControlStatus;
+    }
+    {
+        const void **commands = &a->commandTable.opaque;
+        *commands = gUnk_08605E14;
+    }
     Ghost_SetMotionFlags(a, 0x20);
     Ghost_SetBehaviorFlags(a, 0x200);
     Ghost_SetStatusFlags(a, 0x02100400);
@@ -597,9 +477,9 @@ static inline void InitializeCallbacks(struct GhostActor *a)
         }
     }
     if (Ghost_TestMotionFlags(a, 2))
-        a->field2FA = gGameState->region;
+        a->regionId = gGameState->region;
     else
-        a->field2FA = Region_FindContaining(&a->body.position);
+        a->regionId = Region_FindContaining(&a->body.position);
     if (Ghost_TestMotionFlags(a, 0x40)) {
         struct ContactCollider *collider = &a->colliderA;
         u32 mask = ~0x100;
@@ -614,7 +494,7 @@ static inline void Ghost_SetWidgetPalette(struct GhostWidgetPalette *widget, s32
 {
     widget->bank = scriptPalette - 0x5FFF;
 }
-static inline void Ghost_ReadPalette(struct GhostActor *a, u32 base, u32 alternate)
+static inline void Ghost_ReadPalette(struct SceneActorRegistryResetView *a, u32 base, u32 alternate)
 {
     s32 selected;
     a->paletteOffset = MonsterInit_ReadKeywordHalfword('C', 0);
@@ -630,20 +510,20 @@ static inline void Ghost_ReadPalette(struct GhostActor *a, u32 base, u32 alterna
         Ghost_SetWidgetPalette((void *)(a->drawable + 0x20), SceneActorScript_GetManagerField62());
     a->alternatePalette = Ghost_GetPaletteBase(a);
     a->paletteBank = Ghost_GetPaletteBase(a) + 2;
-    a->paletteFlashBank = 0x1EE;
+    a->field1EA = 0x1EE;
 }
-static inline void Ghost_InitializeReceiver(struct GhostActor *a)
+static inline void Ghost_InitializeReceiver(struct SceneActorRegistryResetView *a)
 {
     a->field304 = 0;
     SceneActorRegistry_RegisterCategoryReceiver(a);
 }
-static inline void Ghost_InstallCompletion(struct GhostActor *a)
+static inline void Ghost_InstallCompletion(struct SceneActorRegistryResetView *a)
 {
-    a->field24C = SceneActorScript_OnCommand;
-    a->field258 = Ghost_OnActorUpdate;
-    a->field25C = Ghost_Destroy;
+    a->messageCallback = SceneActorScript_OnCommand;
+    a->updateCallback = Ghost_OnActorUpdate;
+    a->destroyCallback = Ghost_Destroy;
 }
-static inline void Ghost_SelectAnimation(struct GhostActor *actor, u32 selection, u32 variant,
+static inline void Ghost_SelectAnimation(struct SceneActorRegistryResetView *actor, u32 selection, u32 variant,
                                          u32 flags)
 {
     u32 force;
@@ -654,7 +534,7 @@ static inline void Ghost_SelectAnimation(struct GhostActor *actor, u32 selection
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->field2B7 = selection;
+        actor->animationIndex = selection;
         drawable = (void *)actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -688,7 +568,7 @@ static inline void Ghost_SelectAnimation(struct GhostActor *actor, u32 selection
     actor->field2B3 = 0;
 }
 
-static inline void Ghost_InitializeDrawable(struct GhostActor *a, u32 *fill)
+static inline void Ghost_InitializeDrawable(struct SceneActorRegistryResetView *a, u32 *fill)
 {
     struct ContactPosition zero;
     if (!Ghost_GetDrawableKind(a)) {
@@ -713,10 +593,10 @@ static inline void Ghost_InitializeDrawable(struct GhostActor *a, u32 *fill)
         *(struct ResourceCopy *)d = *(struct ResourceCopy *)res;
         ResourceHeader_Relocate(d, res);
         Widget_InitLinked(d + 0x20, d, 0, 0, 2, 2, 0x3C, &zero);
-        a->field2B7 = 0xFF;
+        a->animationIndex = 0xFF;
     }
 }
-static inline void Ghost_BeginRoute(struct GhostBody *body, struct GhostRoute *route)
+static inline void Ghost_BeginRoute(struct SceneActorBody *body, struct GhostRoute *route)
 {
     SceneBody_StartRoute(body, route, route->routeId, route->parameter, route->pointId);
 }
@@ -740,7 +620,7 @@ static inline u32 Ghost_RoutePointZRaw(struct GhostRoute *route)
 {
     return (u16)route->point->z;
 }
-static inline u32 Ghost_ReadRoute(struct GhostActor *a, struct GhostRoute *route)
+static inline u32 Ghost_ReadRoute(struct SceneActorRegistryResetView *a, struct GhostRoute *route)
 {
     struct ContactPosition point;
     route->activeBranch = 0;
@@ -769,8 +649,8 @@ static inline u32 Ghost_ReadRoute(struct GhostActor *a, struct GhostRoute *route
 }
 s32 Ghost_Init(void *object)
 {
-    struct GhostActor *a = object;
-    struct GhostActor *arg0 = object;
+    struct SceneActorRegistryResetView *a = object;
+    struct GhostInstanceState *arg0 = object;
     u32 fill;
     u32 row, frameFlags;
     struct GhostRoute *route;
@@ -827,7 +707,7 @@ s32 Ghost_Init(void *object)
         Ghost_SetInstanceFlags(arg0, 0x200);
     Ghost_ReadPalette(a, 0x1EB, 0x192);
     if (!Script_GetKeywordValue('U', 0)) {
-        struct GhostActor *context = a->context;
+        struct GhostInstanceState *context = a->context;
         s32 enabled;
         if (Ghost_TestInstanceFlags(context, 0x100))
             enabled = Ghost_TestWorldFlags(0x20);
@@ -866,7 +746,7 @@ s32 Ghost_Init(void *object)
     a->field2E8 = 2;
     SceneActor_InitLinkedSprites(a);
     Ghost_SaveControl(Ghost_SavedControlOf(a), a);
-    a->saved.field130 = arg0->flags558;
+    a->saved.privateFlags = arg0->flags558;
     Ghost_InstallCompletion(a);
     if (!SceneActorRegistry_LinkActor(a))
         return -1;

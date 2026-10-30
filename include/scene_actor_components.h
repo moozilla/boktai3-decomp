@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_COMPONENTS_H
 #define GUARD_SCENE_ACTOR_COMPONENTS_H
 
-#include "contact_actor.h"
+#include "contact_position.h"
 
 struct SceneActorChaseTarget {
     u8 unknown0[8];
