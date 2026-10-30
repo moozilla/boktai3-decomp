@@ -3960,6 +3960,7 @@ addr,name,mode,confidence,source,notes
 080FB248,Axe_IsRoutePointRecent,thumb,low,src-alias,Tests whether a route point index appears in the three-entry history
 080FB27C,SceneActorControl_CanAdvanceHover,thumb,low,src-alias,
 080FB308,Axe_OnReaction,thumb,low,src-alias,Empty actor reaction callback; precise event interpretation is tentative
+080FB744,Axe_UpdatePaletteTransition,thumb,low,src-alias,Advances palette interpolation and binds the current palette when permitted by actor flags.
 080FB8E8,Axe_InitEffectPalettes,thumb,low,src-alias,
 080FB938,Axe_SetAuxiliarySpriteResource,thumb,low,src-alias,Assigns the same resource pointer to all four auxiliary sprites
 080FB958,Axe_SetAuxiliarySpriteRenderState,thumb,low,src-alias,Sets the same word and halfword rendering fields on all four auxiliary sprites
