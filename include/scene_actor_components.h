@@ -13,14 +13,19 @@ struct SceneActorChaseTarget {
 /* Body installed by SceneBody_Init at actor +0x50. */
 struct SceneActorBody {
     u32 id;
-    u8 unknown54[5];
-    u8 direction;
+    u32 flags;
+    u8 mode, direction;
     u8 unknown5A[2];
     struct ContactPosition position;
-    struct ContactPosition motion;
-    u8 unknown6C[0xC];
+    struct ContactPosition motion; /* +0x14: fourth halfword initializes to 0x10. */
+    void *movementProbe;
+    u16 probeExtentX, probeExtentZ;
+    u32 field24;
     void *currentRoute;
-    u8 unknown7C[0x1C];
+    void *sprite;
+    u8 unknown30[0xC];
+    void *owner;
+    u8 unknown40[8];
 };
 
 /* Script 'a' supplies four records in these parallel arrays. */

@@ -1,29 +1,27 @@
-#include "global.h"
+#include "scene_body_api.h"
+#include "scene_actor_components.h"
 
-struct P {
-    u32 a;
-    u32 b;
-};
-void SceneBody_AppendToRegistry(u8 *);
+void SceneBody_AppendToRegistry(void *body);
 
-u32 SceneBody_Init(u8 *p, u32 a, u32 *q, u8 b, u8 c, u32 d)
+u32 SceneBody_Init(struct SceneActorBody *body, u32 id, const struct ContactPosition *position,
+                   u8 direction, u8 mode, void *owner)
 {
-    u32 z;
-    *(u32 *)p = a;
-    z = 0;
-    *(u32 *)(p + 4) = z;
-    p[8] = c;
-    *(struct P *)(p + 0xc) = *(struct P *)q;
-    p[9] = b;
-    *(u16 *)(p + 0x14) = z;
-    *(u16 *)(p + 0x16) = z;
-    *(u16 *)(p + 0x18) = z;
-    *(u16 *)(p + 0x1a) = 0x10;
-    *(u32 *)(p + 0x1c) = z;
-    *(u32 *)(p + 0x24) = z;
-    *(u32 *)(p + 0x2c) = z;
-    *(u32 *)(p + 0x28) = z;
-    SceneBody_AppendToRegistry(p);
-    *(u32 *)(p + 0x3c) = d;
+    u32 zero;
+    body->id = id;
+    zero = 0;
+    body->flags = zero;
+    body->mode = mode;
+    body->position = *position;
+    body->direction = direction;
+    body->motion.x = zero;
+    body->motion.y = zero;
+    body->motion.z = zero;
+    body->motion.pad = 0x10;
+    body->movementProbe = 0;
+    body->field24 = zero;
+    body->sprite = 0;
+    body->currentRoute = 0;
+    SceneBody_AppendToRegistry(body);
+    body->owner = owner;
     return 1;
 }

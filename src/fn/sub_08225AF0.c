@@ -1,12 +1,13 @@
-#include "global.h"
+#include "scene_body_api.h"
+#include "scene_actor_components.h"
 
-void CellObject_Init(u32, u8 *);
+void CellObject_Init(void *object, const struct ContactPosition *position);
 
-u32 SceneBody_SetMovementProbe(u8 *p, u32 a, u16 b, u16 c)
+u32 SceneBody_SetMovementProbe(struct SceneActorBody *body, void *probe, u16 extentX, u16 extentZ)
 {
-    *(u32 *)(p + 0x1c) = a;
-    CellObject_Init(a, p + 0xc);
-    *(u16 *)(p + 0x20) = b;
-    *(u16 *)(p + 0x22) = c;
+    body->movementProbe = probe;
+    CellObject_Init(probe, &body->position);
+    body->probeExtentX = extentX;
+    body->probeExtentZ = extentZ;
     return 1;
 }
