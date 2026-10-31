@@ -115,24 +115,28 @@ const keyName = k => KEYS[k % 12] + (Math.floor(k / 12) - 1);  // MIDI 60 = C4
 const TESTWORD = { music: 'Music', effects: 'Effect', voices: 'Voice' };
 // a name from data/notes.csv, else its place in the sound test, else its number
 const titleOf = s => noteOf('song', s.n)?.label || (s.test ? `${TESTWORD[s.test.list]} ${s.test.no}` : '') || (s.empty ? 'Empty slot' : `Song ${s.n}`);
+const positionsOf = s => s.test_positions || (s.test ? [s.test] : []);
 const playerName = p => p === 10 ? 'Player 10 · music' : p === 0 ? 'Player 0 · empty slots' : `Player ${p}`;
 const used = s => s.scripts?.length || s.code?.length;
 
 // ---------- the list ----------
 function renderList() {
   const q = $('q').value.trim().toLowerCase(), g = $('grp').value, onlyUsed = $('used').checked, empties = $('empties').checked;
-  const rows = SONGS.filter(s => (empties || !s.empty) && (!onlyUsed || used(s)) && (g === '' || String(s.player) === g || (g.startsWith('test:') && s.test?.list === g.slice(5)))
+  const menu = g.startsWith('test:') ? g.slice(5) : null;
+  $('empties').disabled = Boolean(menu);
+  const choices = menu ? SONGS.flatMap(s => positionsOf(s).filter(p => p.list === menu).map(p => ({ ...s, test: p }))) : SONGS;
+  const rows = choices.filter(s => (menu || empties || !s.empty) && (!onlyUsed || used(s)) && (menu || !g || String(s.player) === g)
     && (!q || String(s.n) === q || titleOf(s).toLowerCase().includes(q) || s.addr.toLowerCase().includes(q) || (s.voicegroup || '').toLowerCase().includes(q)));
   let html = '', last = null;
-  const groupKey = s => g.startsWith('test:') ? TEST[g.slice(5)] : playerName(s.player);
-  const sorted = g.startsWith('test:') ? rows.slice().sort((a, b) => a.test.no - b.test.no) : rows.slice().sort((a, b) => (a.player === 10 ? -1 : a.player) - (b.player === 10 ? -1 : b.player) || a.n - b.n);
+  const groupKey = s => menu ? TEST[menu] : playerName(s.player);
+  const sorted = menu ? rows.slice().sort((a, b) => a.test.no - b.test.no) : rows.slice().sort((a, b) => (a.player === 10 ? -1 : a.player) - (b.player === 10 ? -1 : b.player) || a.n - b.n);
   for (const s of sorted) {
     const k = groupKey(s);
     if (k !== last) { html += `<div class="grp">${esc(k)}</div>`; last = k; }
-    html += `<div class="row${CUR?.n === s.n ? ' on' : ''}" data-n="${s.n}"><span class="id">${s.n}</span><span class="t">${esc(titleOf(s))}</span>${used(s) ? '<span class="u" title="started by a script or the code">●</span>' : ''}<span class="m">${s.empty ? '' : `${s.tracks.length}t · ${kb(s.size)}`}</span></div>`;
+    html += `<div class="row${CUR?.n === s.n ? ' on' : ''}" data-n="${s.n}"><span class="id">${s.n}</span><span class="t">${menu && noteOf('song', s.n)?.label ? `No. ${s.test.no} · ` : ''}${esc(titleOf(s))}</span>${used(s) ? '<span class="u" title="started by a script or the code">●</span>' : ''}<span class="m">${s.empty ? '' : `${s.tracks.length}t · ${kb(s.size)}`}</span></div>`;
   }
   $('list').innerHTML = html || '<div class="page empty">No songs match.</div>';
-  $('count').textContent = `${rows.length} of ${SONGS.length} song table entries`;
+  $('count').textContent = `${rows.length} of ${choices.length} ${menu ? 'menu positions' : 'song table entries'}`;
 }
 $('list').onclick = e => { const r = e.target.closest('.row'); if (r) location.hash = r.dataset.n; };
 ['q', 'grp', 'used', 'empties'].forEach(id => $(id).addEventListener('input', renderList));
@@ -163,7 +167,7 @@ async function showSong(s) {
     $('view').innerHTML = `<div class="page"><h1 class="t">Empty slot ${s.n}</h1><div class="sub">Song table entry ${s.n} points at the shared 0-track header <span class="mono">${s.addr}</span> (${s.shared} entries do).</div></div>`;
     return;
   }
-  const test = s.test ? `<span class="badge">${TEST[s.test.list]} No. ${s.test.no}</span>` : '';
+  const test = positionsOf(s).map(p => `<span class="badge">${TEST[p.list]} No. ${p.no}</span>`).join(' ');
   $('view').innerHTML = `<div class="page"><div class="full">
     <h1 class="t" id="title">${esc(titleOf(s))}</h1>
     <div class="sub">Song ${s.n} · header <span class="mono">${s.addr}</span> · ${playerName(s.player)} (${s.player_tracks} tracks) · ${s.tracks.length} track${s.tracks.length > 1 ? 's' : ''} · ${kb(s.size)} · voicegroup <a class="mono" href="#vg=${s.voicegroup}">${s.voicegroup}</a></div>

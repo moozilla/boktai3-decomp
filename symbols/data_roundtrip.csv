@@ -343,6 +343,9 @@ start,end,what,tool,level
 08606400,0860641C,ivy_script_commands,datafmt/callback_array,exact
 086108B0,086108C8,actor_default_commands,datafmt/callback_array,exact
 08610980,08610B50,player_animation_variants,datafmt/player_animations,exact
+086136F0,086137AE,sound_test_music,datafmt/sound_test,exact
+086137AE,08613BC4,sound_test_effects,datafmt/sound_test,exact
+08613BC4,08613CF2,sound_test_voices,datafmt/sound_test,exact
 086141BC,086149BC,effect_random_samples,datafmt/math_lookup,exact
 086149C4,08614C44,math_sine,datafmt/math_lookup,exact
 08614C44,08614D45,math_atan,datafmt/math_lookup,exact

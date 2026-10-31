@@ -19,3 +19,6 @@ addr,name,size,kind,confidence,source,notes
 086149C4,gUnk_086149C4,280,table,high,math_sine,320 signed Q12 samples at 256 phases per turn
 08614A84,gUnk_08614A84,,interior,high,src/fn/sub_08047068.c,Sine lookup starting at index 96 of the Q12 table
 08614C44,gUnk_08614C44,101,table,high,Math_Atan2,257 unsigned first-octant angle steps for Q8 ratios 0 through 256
+086136F0,gUnk_086136F0,BE,table,high,SoundTest_CountEntries,Sound test music menu ordered song numbers followed by -1
+086137AE,gUnk_086137AE,416,table,high,SoundTest_CountEntries,Sound test effects menu ordered song numbers followed by -1
+08613BC4,gUnk_08613BC4,12E,table,high,SoundTest_CountEntries,Sound test voices menu ordered song numbers followed by -1

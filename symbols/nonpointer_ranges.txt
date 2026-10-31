@@ -4,6 +4,7 @@
 #   mode "tables": only table-shaped runs (adjacent pointers, null entries allowed)
 0824E6D4 0824E6F8           # actor marker frame and animation byte indices
 0824E818 0824E8A8           # actor marker XYZ offsets and preserved fourth halfwords
+086136F0 08613CF2           # ordered sound-test song numbers and signed terminators
 086141BC 086149BC           # fixed random halfword samples
 086149C4 08614D45           # signed Q12 sine samples and first-octant arctangent bytes
 08D74DDC 08DD6B96           # main script text (ASCII + 2-byte codes)
