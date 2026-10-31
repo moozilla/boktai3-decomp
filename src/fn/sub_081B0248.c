@@ -9,7 +9,6 @@ struct VanargandPart {
     u32 variant;
 };
 extern const s16 gUnk_086149C4[];
-#define RANDOM_TABLE_ADDR 0x0203B400
 void *VanargandEffect_Create(s32, s32, struct SceneVec *, struct SceneVec *, u32);
 
 static inline s32 Scale(s32 value)
@@ -28,17 +27,16 @@ static inline void Add(struct SceneVec *out, struct SceneVec *base, struct Scene
     out->y = offset->y + base->y;
     out->z = offset->z + base->z;
 }
-static inline s32 RandomValue(u32 table)
+static inline s32 RandomValue(const u16 *table)
 {
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)(table + offset);
+    return *(const u16 *)(offset + (u32)table);
 }
 
 #ifdef NONMATCHING
-// fuzzy: 87.8%
-// scope shape 6 (differences once low registers are set aside)
+// fuzzy: 98.9%
 void Vanargand_SpawnPartEmergenceEffects(void *arg0)
 {
     struct VanargandPart *part = arg0;
@@ -47,7 +45,7 @@ void Vanargand_SpawnPartEmergenceEffects(void *arg0)
     s32 i;
     for (i = 0; i < 4; i++) {
         s32 angle;
-        s32 offset, radius;
+        s32 offset, value;
         if (part->variant == 0)
             angle = (i << 3) + 48;
         else
@@ -55,9 +53,16 @@ void Vanargand_SpawnPartEmergenceEffects(void *arg0)
         Vector(&position, angle, 640);
         Add(&position, part->basePosition, &position);
         position.y += 256;
-        offset = (RandomValue(RANDOM_TABLE_ADDR) >> 3) % 32;
-        radius = (RandomValue(RANDOM_TABLE_ADDR) >> 3) % 8;
-        Vector(&velocity, angle + offset, radius + 12);
+        value = (s32)gRandomTable;
+        {
+            s32 sample = RandomValue((const u16 *)value) >> 3;
+            offset = sample - sample / 32 * 32;
+        }
+        {
+            s32 remainder = (RandomValue((const u16 *)value) >> 3) % 8;
+            value = remainder;
+        }
+        Vector(&velocity, angle + offset, value + 12);
         VanargandEffect_Create(0, 0, &position, &velocity, 1 - part->variant);
     }
 }
