@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ratatosk_facing.h"
 #include "render.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
@@ -23,22 +23,6 @@ typedef struct ActorAnimation {
     u16 count;
 } ActorAnimation;
 
-static inline void setFacing(ActorAnimation *p, int angle)
-{
-    u32 value;
-    register int shifted asm("r0");
-    p->angle = angle;
-    shifted = p->angle + 0x60;
-    asm("" : "+r"(shifted));
-    shifted >>= 6;
-    value = 3 & shifted;
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    asm("" : "+r"(shifted));
-    shifted >>= 5;
-    value = 7 & shifted;
-    p->facing8 = value;
-}
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void PolarInterpolation_SetCurrentFromPoint(void *, void *);
@@ -52,7 +36,7 @@ void SceneActorAnimation_UpdateSwoopApproach(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;
-    setFacing(p, p->requestedAngle);
+    RATATOSK_SET_FACING(p, p->requestedAngle);
     if (p->changed) {
         p->changed = 0;
         {
