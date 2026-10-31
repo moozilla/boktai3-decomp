@@ -8,7 +8,7 @@ void Hud_RegisterTimer(u16 *);
 void Player_UpdateFacingSide(u8 *);
 void Player_EnterKindTwo(u8 *);
 void ActorSequence_Begin(u8 *, s32, s32);
-void sub_08155D58(u8 *);
+void PlayerCue_UpdateTimedChargePulse(u8 *);
 void Player_UpdateTimedChargeAction(u8 *);
 
 void sub_0815D5B0(void)
@@ -42,7 +42,7 @@ void sub_0815D5B0(void)
         Player_EnterKindTwo(actor);
         ActorSequence_Begin(actor, 7, 0);
         if (actor[0x418] == 6)
-            *(u32 *)(actor + 0x58c) = (u32)sub_08155D58;
+            *(u32 *)(actor + 0x58c) = (u32)PlayerCue_UpdateTimedChargePulse;
         else
             *(u32 *)(actor + 0x58c) = (u32)Player_UpdateTimedChargeAction;
     }

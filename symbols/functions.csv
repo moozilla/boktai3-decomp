@@ -5409,6 +5409,7 @@ addr,name,mode,confidence,source,notes
 08155008,PlayerCue_UpdateAlternateFade,thumb,low,src-alias,
 081556E0,Player_UpdateStateMotionCue,thumb,low,src-alias,
 081559A4,Player_UpdateTimedChargeAction,thumb,low,src-alias,
+08155D58,PlayerCue_UpdateTimedChargePulse,thumb,low,src-alias,confidence=low: timed held action with pulsing overlay and completion script
 081561A8,PlayerCue_UpdateStandDiagonalB,thumb,low,src-alias,Alternate diagonal standing callback that completes the cue after two animation completion checks
 08156BBC,Player_GetInputDirection,thumb,low,src-alias,
 08156C1C,Player_UpdateDirectionHistory,thumb,low,src-alias,Shifts ten direction samples and records the current input direction adjusted by the actor direction offset
