@@ -7,7 +7,7 @@ struct Packet {
     u16 args[8];
 };
 void SceneMessages_Send(struct Packet *);
-void sub_0815DBF4(struct Player *p, u8 command, s32 count, u16 *args)
+void Player_SendSceneMessage(struct Player *p, u8 command, s32 count, u16 *args)
 {
     struct Packet *packet = (struct Packet *)p->unkB0C;
     s32 i;
