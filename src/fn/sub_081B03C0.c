@@ -1,29 +1,21 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.5%
-// fix.py best version (reprinted C)
-// confidence=low: provisional role inferred from state transitions and player-motion calls
-// confidence=low: moves a paired half and holds/releases player position requests.
-// MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
+#include "display_sequence_inline.h"
 #include "player.h"
-// Remaining differences: Packed-animation allocation, request-call setup, and shared phase-entry tails differ.
+#include "motion_track.h"
 // confidence=low: moves a paired half toward the player, then holds and releases the position request.
-struct PairPosition {
-    s16 x, y, z, pad;
-};
 struct PairHalf {
     u32 flags;
     u8 pad4[0x10 - 4];
     u16 frame;
     u8 pad12[0x1C - 0x12];
-    struct PairPosition position;
+    struct MotionTrackVector position;
     u8 pad24[0x48 - 0x24];
     struct DisplaySequenceState sequence;
-    u8 track[0x90 - 0x58];
-    struct PairPosition *origin;
+    struct MotionTrack track;
+    struct MotionTrackVector *origin;
     u8 pad94[8];
-    struct PairPosition offset;
+    struct MotionTrackVector offset;
     u8 padA4[0x15C - 0xA4];
     u32 mode, controlFlags;
     u32 phase, timer;
@@ -37,140 +29,109 @@ struct CapturePlayer {
     u8 pad0[0x20];
     u32 flags;
 };
-void MotionTrack_Initialize(void *, void *, void *, s32, s32);
 void MotionTrack_Update(void *);
 void Player_BeginPositionRequest(void *, void *, s32, s32, s32, s32, s32, s32, s32);
 void Player_ApplyPositionRequest(void *, void *, s32, s32, s32, s32, s32, s32);
-static inline void StepSequence(void *obj)
+static inline void Pair_StepSequence(struct PairHalf *owner)
 {
-    struct PairHalf *owner = obj;
     struct DisplaySequenceState *state;
-    const volatile u16 *command;
-    u32 duration;
-    u32 flags;
-    u32 bit;
+    const u16 *command;
     state = &owner->sequence;
     {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
         table = owner->sequence.commands;
-        command = (const volatile u16 *)(((u32)table) + offset);
+        command = (const u16 *)((u32)table + offset);
     }
-    owner->frame = (*command) >> 6;
+    owner->frame = *command >> 6;
     {
-        u32 input = state->flags;
-        register u32 first asm("r1");
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
         bit = 1;
-        first = bit;
-        first &= input;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
             owner->flags |= 4;
         else
             owner->flags &= ~4;
     }
     {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r1");
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
         bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
             owner->flags |= 8;
         else
             owner->flags &= ~8;
     }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        u32 temp;
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                } else {
-                    state->index = index - 1;
-                }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
             } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
+                state->index--;
+            }
+        } else {
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
                 } else {
+                    state->index = 0;
                 }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)(((u32)table) + offset);
-            }
-            state->frameWeight = (*command) & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!((u8)speed))
-                    state->duration = 1;
             }
         }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
     }
 }
 
-static inline void initVector(struct PairPosition *v, s32 x, s32 y, s32 z)
+static inline u32 TestPlayerFlag(u32 mask, struct CapturePlayer *player)
 {
-    s16 *dst = (s16 *)v;
-    dst[0] = x;
-    dst[1] = y;
-    dst[2] = z;
+    return player->flags & mask;
 }
-static inline void copyPosition(struct PairPosition *dst, struct PairPosition *src)
+static inline u32 BeginCaptureRequest(struct CapturePlayer *player,
+                                      struct MotionTrackVector *position, u32 apply, u32 mode)
 {
-    s16 *d = (s16 *)dst;
-    s16 *s = (s16 *)src;
-    d[0] = s[0];
-    d[1] = s[1] - 128;
-    d[2] = s[2];
+    if (TestPlayerFlag(0x40000, player))
+        return 0;
+    Player_BeginPositionRequest(player, position, 0, 0, apply, 0, 0, 0, mode);
+    return 1;
+}
+static inline void ChangeCapturePhase(struct PairHalf *half, u32 phase, u8 *entered)
+{
+    half->phase = phase;
+    half->timer = 0;
+    *entered = 1;
+}
+static inline void SetCaptureAnimation(struct PairHalf *half, void *resource, u32 index, u32 zero)
+{
+    Anim_SetSequence(&half->sequence, resource, index, (u8)half->mode, zero);
+}
+static inline void initVector(struct MotionTrackVector *v, s32 x, s32 y, s32 z)
+{
+    v->x = x;
+    v->y = y;
+    v->z = z;
+}
+static inline void copyPosition(struct MotionTrackVector *dst, struct MotionTrackVector *src)
+{
+    dst->x = src->x;
+    dst->y = src->y - 128;
+    dst->z = src->z;
 }
 static inline u8 trackFinished(struct PairHalf *half)
 {
-    return *(u8 *)((u8 *)half + 0x81) == 2;
+    return half->track.active == 2;
 }
 static inline void setPhase(struct PairHalf *half, u32 phase)
 {
@@ -180,54 +141,57 @@ static inline void setPhase(struct PairHalf *half, u32 phase)
 }
 void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHalf *half)
 {
-    struct PairPosition target;
-    struct PairPosition position;
-    asm("" : "+r"(owner));
+    struct MotionTrackVector target;
+    struct MotionTrackVector position;
     {
         u32 mask = 12;
         half->controlFlags |= mask;
     }
     if (half->entered) {
         half->entered = 0;
-        Anim_SetSequence(&half->sequence, owner->resource, 12, (u8)half->mode, 0);
-        StepSequence(half);
+        {
+            void *resource = owner->resource;
+            Anim_SetSequence(&half->sequence, resource, 12, (u8)half->mode, 0);
+        }
+        Pair_StepSequence(half);
         setPhase(half, 0);
     }
     switch (half->phase) {
-        case 0:
-            if (half->phaseEntered) {
-                half->phaseEntered = 0;
-                initVector(&target, 384, 0, 384);
-                MotionTrack_Initialize(half->track, &half->offset, &target, 0, 4);
+        case 0: {
+            u32 entered = half->phaseEntered;
+            u8 *phaseEntered = &half->phaseEntered;
+            if (entered) {
+                u32 zero = 0;
+                *phaseEntered = zero;
+                initVector(&target, 384, zero, 384);
+                MotionTrack_Initialize(&half->track, &half->offset, &target, zero, 4);
             }
             copyPosition(&position, &half->position);
             if (half->mode == 0) {
-                if (!((*(struct CapturePlayer **)gPlayers)->flags & 0x40000))
-                    Player_BeginPositionRequest((*(struct CapturePlayer **)gPlayers), &position, 0,
-                                                0, 1, 0, 0, 0, 1);
-                else
+                if (!BeginCaptureRequest(*(struct CapturePlayer **)gPlayers, &position, 1, 1))
                     goto abortCapture;
-            } else if (!((*(struct CapturePlayer **)gPlayers)->flags & 0x40000))
-                Player_BeginPositionRequest((*(struct CapturePlayer **)gPlayers), &position, 0, 0,
-                                            0, 0, 0, 0, 2);
-            else
+            } else if (!BeginCaptureRequest(*(struct CapturePlayer **)gPlayers, &position, 0, 2))
                 goto abortCapture;
             goto advanceTrack;
         abortCapture:
-            setPhase(half, 3);
+            ChangeCapturePhase(half, 3, phaseEntered);
 
             break;
         advanceTrack:
-            MotionTrack_Update(half->track);
+            MotionTrack_Update(&half->track);
 
-            if (trackFinished(half))
-                setPhase(half, 1);
+            if (trackFinished(half)) {
+                ChangeCapturePhase(half, 1, phaseEntered);
+            }
             break;
-
+        }
         case 1:
             if ((++half->timer) > 120) {
-                Anim_SetSequence(&half->sequence, owner->resource, 9, (u8)half->mode, 0);
-                StepSequence(half);
+                {
+                    void *resource = owner->resource;
+                    SetCaptureAnimation(half, resource, 9, 0);
+                }
+                Pair_StepSequence(half);
                 setPhase(half, 2);
             }
             break;
@@ -235,8 +199,11 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
         case 2:
             Player_ApplyPositionRequest((*(struct CapturePlayer **)gPlayers), &half->position, 80,
                                         32, 128, 0, 0, 0);
-            Anim_SetSequence(&half->sequence, owner->resource, 9, (u8)half->mode, 0);
-            StepSequence(half);
+            {
+                void *resource = owner->resource;
+                SetCaptureAnimation(half, resource, 9, 0);
+            }
+            Pair_StepSequence(half);
             setPhase(half, 3);
             break;
 
@@ -245,6 +212,3 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PairedSceneActor_UpdatePlayerCapture);
-#endif
