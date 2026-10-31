@@ -6668,6 +6668,7 @@ addr,name,mode,confidence,source,notes
 081937F8,Nidhoggr_UnregisterTerrainCells,thumb,low,src-alias,Removes both terrain registrations when active and clears their active flag
 0819382C,Nidhoggr_SetTerrainCellFlag40,thumb,low,src-alias,Sets flag 0x40 on both terrain registrations with its gameplay meaning still tentative
 0819384C,Nidhoggr_EmitSparks,thumb,low,src-alias,Calls the spark particle emitter with a fixed spread and emission parameters
+08193874,Nidhoggr_ReceivePartContact,thumb,low,src-alias,Tentative: receive part contact and update grouped damage response
 08193D34,Nidhoggr_ApplyPartDamage,thumb,low,src-alias,
 081940F8,Nidhoggr_InitParts,thumb,low,src-alias,Initializes 26 Nidhoggr part animations; paired colliders and target records; then configures collider groups and a time-dependent palette.
 08194480,Nidhoggr_DestroyParts,thumb,low,src-alias,Removes all 26 part animations and colliders and releases their auxiliary records
