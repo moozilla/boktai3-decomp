@@ -1,7 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
-// One empty frame-use barrier preserves the ROM register allocation.
 struct DirectionalActor {
     u8 pad0[0x51];
     u8 angle;
@@ -69,13 +67,14 @@ void ActorMotion_UpdateTimedPaletteAnimation(struct DirectionalActor *p, s32 fra
         q->motionE52 = 0;
         q->motionE54 = 0;
         q->motionE58 = 0;
-    }
-    // Keep the frame value in its own register through the palette setup.
-    asm("" : : "r"(frame));
-    if (frame > 299) {
-        p->finished = 1;
-        PaletteEffect_RefreshPalette(q);
-    }
+        if (frame <= 299)
+            goto updateFlags;
+    } else if (frame <= 299)
+        goto updateFlags;
+
+    p->finished = 1;
+    PaletteEffect_RefreshPalette(q);
+updateFlags:
     if (p->active == 4) {
         u32 v;
         Player_ClearFlag740();
