@@ -1,4 +1,5 @@
 #include "directional_particles.h"
+#include "scene_actor_registry.h"
 #include "engine.h"
 #include "heap.h"
 #include "resource_registry.h"
@@ -11,14 +12,11 @@ static inline s32 scaleVelocity(s32 value)
         return value >> 12;
     return -((-value) >> 12);
 }
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// scope shape 2 (differences once low registers are set aside)
 s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 direction, u32 frame)
 {
     struct DirectionalParticle *particle = SpritePool_Allocate();
     struct DirectionalParticleMotion *motion;
-    struct ContactPosition position;
+    union SceneActorRegistryPackedPosition position;
     struct ContactPosition *point;
     s32 speed;
     u32 randomOrigin, sampleOrigin;
@@ -38,25 +36,22 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
     }
     motion->velocity.y = 0;
     motion->velocity.z = scaleVelocity(gUnk_086149C4[direction & 255] * speed);
-    point = &position;
+    point = &position.position;
     *point = *source->position;
     {
         u32 sample = ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable);
         s32 coordinate = (u16)point->x - 64;
-        sample &= 127;
-        point->x = coordinate + sample;
+        position.packed.x = coordinate + (sample & 127);
     }
     {
         u32 sample = ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable);
         s32 coordinate = (u16)point->y + 16;
-        sample &= 31;
-        point->y = coordinate + sample;
+        position.packed.y = coordinate + (sample & 31);
     }
     {
         u32 sample = ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable);
         s32 coordinate = (u16)point->z - 64;
-        sample &= 127;
-        point->z = coordinate + sample;
+        position.packed.z = coordinate + (sample & 127);
     }
     particle->visible = 1;
     SpritePool_SetResource(particle, 0x4147);
@@ -66,6 +61,3 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
     SpritePool_Activate(particle, (void *)DirectionalParticle_Update, source);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", DirectionalParticle_Spawn);
-#endif
