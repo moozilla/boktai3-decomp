@@ -1,20 +1,14 @@
-// MATCHING_CONCESSION: register-pinning
-#include "contact_swarm.h"
+#include "player_cue_sequence.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 // confidence=low: tentative cue role from callback phases.
-// Remaining scale offsets, phase tails and playback register lifetimes differ.
 
-struct P {
+struct PlayerSideFadeCue {
     u8 pad0[0x14C];
     struct ContactSwarmSprite sprite;
     u8 pad1[0x3A2 - 0x14C - sizeof(struct ContactSwarmSprite)];
-    u8 facing, flip, dir;
+    u8 heading, side, facing;
     u8 pad2[0x3FC - 0x3A5];
-    struct DisplaySequenceState seq;
+    struct DisplaySequenceState sequence;
     u32 unknown40C;
     const void *resource;
     const void *resource2;
@@ -25,257 +19,26 @@ struct P {
     u8 pad5[0x4E8 - 0x45C];
     u16 scale;
     u8 pad6[0x58C - 0x4EA];
-    void (*fn)(struct P *);
+    void (*updateCallback)(struct PlayerSideFadeCue *);
 };
-void ActorSequence_Begin(struct P *, s32, s32);
-void Player_AddControlFlags(struct P *, u32);
-void PlayerCue_UpdateHidden(struct P *);
-void PlayerCue_CompleteAction(struct P *);
-void PlayerCue_EnterStandUpdate(struct P *);
-void Player_RestartAnimationFromResource(struct P *);
-void Player_UpdateFacingSide(struct P *);
-static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
-{
-    struct ContactSwarmSprite *sprite = sp;
-    register struct DisplaySequenceState *state asm("r4") = st;
-    const volatile u16 *command;
-    u32 duration;
-    u32 flags;
-    u32 bit;
-    u32 k1;
-    {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = state->commands;
-        command = (const volatile u16 *)(((u32)table) + offset);
-    }
-    sprite->frame = (*command) >> 6;
-    {
-        u32 input = state->flags;
-        u32 first;
-        u32 maskBit = 1;
-        bit = maskBit;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != ((((*command) & (k1 = 0x30)) >> 4) & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r1");
-        bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != ((((*command) & k1) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                } else {
-                    state->index = index - 1;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                } else {
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)(((u32)table) + offset);
-            }
-            state->frameWeight = (*command) & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!((u8)speed))
-                    state->duration = 1;
-            }
-        }
-    }
-}
+void ActorSequence_Begin(struct PlayerSideFadeCue *, s32, s32);
+void Player_AddControlFlags(struct PlayerSideFadeCue *, u32);
+void PlayerCue_UpdateHidden(struct PlayerSideFadeCue *);
+void PlayerCue_CompleteAction(struct PlayerSideFadeCue *);
+void PlayerCue_EnterStandUpdate(struct PlayerSideFadeCue *);
+void Player_RestartAnimationFromResource(struct PlayerSideFadeCue *);
+void Player_UpdateFacingSide(struct PlayerSideFadeCue *);
 
-// confidence=low: motion 7 changes sprite scale and visibility over six phases.
-inline static void Step_UpdateSideFade(struct ContactSwarmSprite *sp,
-                                       struct DisplaySequenceState *st)
-{
-    struct ContactSwarmSprite *sprite = sp;
-    register struct DisplaySequenceState *state asm("r4") = st;
-    const volatile u16 *command;
-    u32 duration;
-    u32 flags;
-    u32 bit;
-    u32 k1;
-    typeof(bit) c1;
-    {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = state->commands;
-        command = (const volatile u16 *)(((u32)table) + offset);
-    }
-    sprite->frame = (*command) >> 6;
-    {
-        u32 input = state->flags;
-        u32 first;
-        s8 maskBit = 1;
-        bit = maskBit;
-        c1 = bit;
-        asm("" : "+r"(c1));
-        first = c1;
-        first &= input;
-        if (first != ((((*command) & (k1 = 0x30)) >> 4) & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r1");
-        bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != ((((*command) & k1) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                } else {
-                    state->index = index - 1;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                } else {
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)(((u32)table) + offset);
-            }
-            state->frameWeight = (*command) & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!((u8)speed))
-                    state->duration = 1;
-            }
-        }
-    }
-}
-
-void PlayerCue_UpdateSideFade(struct P *p)
+void PlayerCue_UpdateSideFade(struct PlayerSideFadeCue *p)
 {
     switch (p->phase) {
         case 0:
             if (!p->timer) {
-                p->dir = 4;
+                p->facing = 4;
                 Player_UpdateFacingSide(p);
             }
-            Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
-            Step_UpdateSideFade(&p->sprite, &p->seq);
+            Anim_SetSequence(&p->sequence, p->resource, 0, p->heading, p->side);
+            PlayerCue_StepSequence(&p->sprite, &p->sequence);
             if ((++p->timer) > 27)
                 ActorSequence_Begin(p, 7, 1);
             break;
@@ -298,18 +61,18 @@ void PlayerCue_UpdateSideFade(struct P *p)
             if ((++p->timer) > 7) {
                 Player_AddControlFlags(p, 1);
                 ActorSequence_Begin(p, 0, 0);
-                p->fn = PlayerCue_UpdateHidden;
+                p->updateCallback = PlayerCue_UpdateHidden;
                 PlayerCue_CompleteAction(p);
             }
             break;
 
         case 3:
             if (!p->timer) {
-                p->dir = 4;
+                p->facing = 4;
                 Player_UpdateFacingSide(p);
             }
-            Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
-            Step_UpdateSideFade(&p->sprite, &p->seq);
+            Anim_SetSequence(&p->sequence, p->resource, 0, p->heading, p->side);
+            PlayerCue_StepSequence(&p->sprite, &p->sequence);
             Player_AddControlFlags(p, 4);
             p->sprite.flags |= 2;
             p->sprite.unknown8[0] = 4;
@@ -320,8 +83,8 @@ void PlayerCue_UpdateSideFade(struct P *p)
             break;
 
         case 4:
-            Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
-            Step_UpdateSideFade(&p->sprite, &p->seq);
+            Anim_SetSequence(&p->sequence, p->resource, 0, p->heading, p->side);
+            PlayerCue_StepSequence(&p->sprite, &p->sequence);
             p->sprite.flags |= 2;
             p->sprite.unknown8[0] = 64 - ((15 - ((u8)p->timer)) << 2);
             if (p->timer <= 7) {
@@ -338,18 +101,14 @@ void PlayerCue_UpdateSideFade(struct P *p)
 
         case 5:
             p->sprite.flags &= ~2;
-            Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
-            Step_UpdateSideFade(&p->sprite, &p->seq);
+            Anim_SetSequence(&p->sequence, p->resource, 0, p->heading, p->side);
+            PlayerCue_StepSequence(&p->sprite, &p->sequence);
             if ((++p->timer) > 3) {
                 Player_UpdateFacingSide(p);
                 PlayerCue_EnterStandUpdate(p);
-                p->fn = Player_RestartAnimationFromResource;
+                p->updateCallback = Player_RestartAnimationFromResource;
                 PlayerCue_CompleteAction(p);
             }
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideFade);
-#endif
