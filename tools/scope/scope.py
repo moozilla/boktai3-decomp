@@ -1356,7 +1356,7 @@ def cmd_vs(src_a, src_b, func, env):
             import shutil
             keep = info["wd"] + ".A"
             if os.path.exists(keep):
-                shutil.move(keep, os.path.join(os.path.expanduser("~/.Trash"), os.path.basename(keep) + f".{int(time.time())}"))
+                os.rename(keep, f"{keep}.{time.time_ns()}")
             shutil.copytree(info["wd"], keep)
     a, b = tabs
     def fmt(d):
