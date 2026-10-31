@@ -12,6 +12,7 @@ a match. A full `tools/build.py` run is still needed before committing (it
 checks the layout of the whole ROM); this is the fast inner loop.
 """
 import argparse
+import csv
 import difflib
 import hashlib
 import json
@@ -41,6 +42,11 @@ def elf_symbols():
         p = ln.split()
         if len(p) == 8 and p[0][:-1].isdigit() and p[6] != "UND":
             syms[p[7]] = (int(p[1], 16), p[3])
+    # functions named since that build (a worktree's ELF is a clone of the base's)
+    with open(os.path.join(ROOT, "symbols", "functions.csv"), newline="") as f:
+        for r in csv.DictReader(f):
+            if r["name"] not in syms:
+                syms[r["name"]] = (int(r["addr"], 16) | (r["mode"] == "thumb"), "FUNC")
     return syms
 
 
