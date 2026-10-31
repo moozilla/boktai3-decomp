@@ -3517,6 +3517,7 @@ addr,name,mode,confidence,source,notes
 080C0750,SceneActorApproach_RunTimedAction,thumb,low,src-alias,
 080C0828,SceneActorApproach_RunAlternateTimedAction,thumb,low,src-alias,
 080C0900,SceneActorApproach_CaptureTargetAndRunAction,thumb,low,src-alias,
+080C09F0,Skeleton_UpdateTargetApproach,thumb,low,src-alias,Tentative: approaches partner cell or steers within configured distance bands
 080C12EC,Skeleton_SetReactionControlTable,thumb,low,src-alias,Installs the table at actor offset 0x28C during initialization; reaction role tentative
 080C12FC,Skeleton_ReactToContact,thumb,low,src-alias,Skeleton_Init installs this callback at +0x268; AD03 registry and GCL name identify Skeleton. ReactToContact is a descriptive reconstruction.
 080C2BE0,SceneActorControl_UpdateProbeApproach,thumb,low,src-alias,

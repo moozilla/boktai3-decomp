@@ -1,7 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_CHASE_H
 #define GUARD_SCENE_ACTOR_CHASE_H
 /* Chase-the-player step shared by the 080BBDD0..080C12FC behaviour states (inlined about nine
- * times). Helpers taken from the sub_080C09F0 draft (81%); Chase_Arrive here returns 1 when
+ * times). Helpers taken from the Skeleton_UpdateTargetApproach draft (81%); Chase_Arrive here returns 1 when
  * the reroute step moved, as 080BBDD0 tests it. Only NONMATCHING drafts include this. */
 #include "global.h"
 #include "scene_actor_terrain.h"
