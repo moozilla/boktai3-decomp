@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
@@ -57,12 +56,16 @@ static inline s32 LocalPlayer(void)
         return -1;
     return gLinkSession->localPlayer;
 }
+static inline u16 OwnershipFlagBits(u32 value, u32 mask)
+{
+    return value & mask;
+}
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
     if (Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->field2E0;
-        register u32 mask asm("r2") = *owner;
-        if (!(mask & 0x20) && mask) {
+        u32 mask = *owner;
+        if (!OwnershipFlagBits(mask, 0x20) && mask) {
             switch (LocalPlayer()) {
                 case 0:
                     if (*owner != 1)
@@ -93,9 +96,9 @@ static inline void ClearHit(struct FlagHalfword *flags, u32 mask)
 {
     flags->bits = mask & flags->bits;
 }
-static inline void SetHit(u16 *p, u32 bit)
+static inline void SetHit(s16 bit, struct FlagHalfword *p)
 {
-    *p = bit | *p;
+    p->bits = bit | p->bits;
 }
 static inline void Fill(u32 *zero, void *dst)
 {
@@ -168,11 +171,7 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
         if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
     } else {
-        {
-            u32 bit = 0x20;
-            asm("" : "+r"(bit));
-            actor->flags2D4 = bit | actor->flags2D4;
-        }
+        SetHit(0x20, (void *)&actor->flags2D4);
         {
             void *control = SceneActorReaction_PlayStaggerBurst;
             Reaction_SetControl(actor, 0x21, control);
