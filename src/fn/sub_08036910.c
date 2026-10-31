@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -60,8 +59,7 @@ struct Engine *Wireless_CreateController(void)
     size = 0x38C;
     p = Heap_Alloc(size);
     if (!p)
-        goto failed;
-    asm("" : "+r"(p));
+        return 0;
     Memory_Clear(p, size);
     random = SunClock_GetSecond();
     {
@@ -89,7 +87,11 @@ struct Engine *Wireless_CreateController(void)
         destination = (u16 *)((u8 *)p + 0x6C);
         *destination = salt;
     }
-    if (Wireless_InitControllerFromScript(p) >= 0) {
+    if (Wireless_InitControllerFromScript(p) < 0) {
+        Heap_Free(p);
+        return 0;
+    }
+    {
         int one;
         Task_SetCallbacks(p, 0, 0);
         one = 1;
@@ -101,7 +103,4 @@ struct Engine *Wireless_CreateController(void)
         *singleton = p;
         return p;
     }
-    Heap_Free(p);
-failed:
-    return 0;
 }
