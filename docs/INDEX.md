@@ -403,6 +403,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round8-player-clone-pool.md](../notes/round8-player-clone-pool.md) | PlayerClone_UpdatePool | #matching #player #compiler #round8 | 0 |
 | [notes/round8-player-target-motion.md](../notes/round8-player-target-motion.md) | Player_UpdateTargetMotion | #matching #player #compiler #round8 | 0 |
 | [notes/round8-projectile-impact-pair.md](../notes/round8-projectile-impact-pair.md) | Projectile_SpawnImpactPair | #matching #effects #compiler #round8 | 0 |
+| [notes/round8-radial-burst.md](../notes/round8-radial-burst.md) | RadialBurstEffect_StartBurst | #matching #effects #compiler #round8 | 1 |
 | [notes/round8-scene-effect-messages.md](../notes/round8-scene-effect-messages.md) | Scene effect queue messages | #effects #projection #matching #round8 | 1 |
 | [notes/round8-scene-target-begin-move.md](../notes/round8-scene-target-begin-move.md) | SceneTarget_BeginMove | #effects #projection #matching #round8 | 0 |
 | [notes/round8-spark-particle-spawn.md](../notes/round8-spark-particle-spawn.md) | SparkParticle_Spawn | #matching #effects #compiler #round8 | 0 |
