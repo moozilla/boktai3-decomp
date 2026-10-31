@@ -1,6 +1,5 @@
 #include "scene_actor_reset.h"
 #include "engine.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: selects delayed route recovery or alternate recovery after the context delay.
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void ScaledShadow_Enable(void *);
