@@ -1,8 +1,6 @@
 #include "global.h"
 #include "render.h"
 #include "display_sequence.h"
-#ifdef NONMATCHING
-// fuzzy: 95.8%
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -113,12 +111,12 @@ static inline void FragmentBurst_StepAnimation(struct FragmentSprite *owner,
             owner->flags &= ~8;
     }
     if (++state->elapsed >= state->duration) {
-        u32 flags;
+        union DisplaySequenceControl flags;
         state->elapsed = 0;
-        flags = state->flags;
-        if (flags & 4) {
+        flags = *(const union DisplaySequenceControl *)&state->flags;
+        if (flags.raw & 4) {
             if (state->index == 0) {
-                if (flags & endMask)
+                if (flags.raw & endMask)
                     state->elapsed = state->duration;
                 else
                     state->index = state->frameCount - 1;
@@ -128,7 +126,7 @@ static inline void FragmentBurst_StepAnimation(struct FragmentSprite *owner,
         } else {
             if (++state->index >= state->frameCount) {
                 u32 hold = endMask;
-                hold &= flags;
+                hold &= flags.raw;
                 if ((u8)hold) {
                     state->elapsed = state->duration;
                     state->index = state->frameCount - 1;
@@ -145,24 +143,35 @@ static inline void FragmentBurst_StepAnimation(struct FragmentSprite *owner,
     }
 }
 
+static inline struct DisplaySequenceState *FragmentBurst_BeginAnimation(struct FragmentBurst *p,
+                                                                        struct Vec **origin)
+{
+    *origin = &p->origin;
+    return p->sequences;
+}
+
 void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
 {
     s32 i;
     struct Vec *camera;
+    struct Vec *origin;
+    struct DisplaySequenceState *sequence;
     u32 endMask;
     if (p->enter) {
         Sound_PlaySong(0x3B1);
         p->enter = 0;
     }
     i = 0;
+    sequence = FragmentBurst_BeginAnimation(p, &origin);
     do {
         struct FragmentSprite *sprite = &p->sprites[i];
         endMask = 8;
         camera = &gCameraOrigin;
         sprite->flags &= ~1;
-        FragmentBurst_StepAnimation(sprite, &p->sequences[i], endMask);
-        ProjectShift(&sprite->position, &p->origin, camera);
+        FragmentBurst_StepAnimation(sprite, sequence, endMask);
+        ProjectShift(&sprite->position, origin, camera);
         sprite->position.y += i * 32;
+        sequence++;
         i++;
     } while (i < 3);
     if (p->timer > 4) {
@@ -174,7 +183,3 @@ void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
         p->timer++;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", FragmentBurst_UpdateImpactAnimation);
-#endif
