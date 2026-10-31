@@ -1,24 +1,22 @@
-#include "global.h"
-struct Pos {
-    u32 a, b;
-};
-void Player_EnterKindTwo(u8 *);
-void ActorSequence_Begin(u8 *, s32, s32);
-void PlayerCue_UpdateMoveDestination(void);
-/* Scripted actor: target position *pos (or its own, +0x30) into +0x590, with
-   c, b, a and 0x96 in +0x5A4/+0x59A/+0x59D/+0x59B; enters state 6 with update
-   PlayerCue_UpdateMoveDestination. */
-void PlayerCue_MoveTo(u8 *e, struct Pos *pos, s32 a, s32 b, u32 c)
+#include "player_cue.h"
+#include "contact_position.h"
+
+void Player_EnterKindTwo(struct Player *);
+void ActorSequence_Begin(struct Player *, s32, s32);
+void PlayerCue_UpdateMoveDestination(struct Player *);
+
+void PlayerCue_MoveTo(struct Player *p, const struct ContactPosition *position, s32 facing,
+                      s32 animated, u32 parameter)
 {
-    if (pos == 0)
-        *(struct Pos *)(e + 0x590) = *(struct Pos *)(e + 0x30);
+    if (position == 0)
+        PlayerCue_Coordinates(p)->destination = PlayerCue_Coordinates(p)->position;
     else
-        *(struct Pos *)(e + 0x590) = *pos;
-    *(u32 *)(e + 0x5A4) = c;
-    e[0x59A] = b;
-    e[0x59D] = a;
-    e[0x59B] = 0x96;
-    Player_EnterKindTwo(e);
-    ActorSequence_Begin(e, 6, 0);
-    *(void **)(e + 0x58C) = PlayerCue_UpdateMoveDestination;
+        PlayerCue_Coordinates(p)->destination = *position;
+    p->cueParameter = parameter;
+    p->animationBranchRequested = animated;
+    p->targetFacing = facing;
+    p->cuePhase = 0x96;
+    Player_EnterKindTwo(p);
+    ActorSequence_Begin(p, 6, 0);
+    p->triggerAnimationCallback = PlayerCue_UpdateMoveDestination;
 }
