@@ -120,7 +120,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 16 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 17 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -397,6 +397,14 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round7-sword-task-initializer_2026-10-30.md](../notes/round7-sword-task-initializer_2026-10-30.md) | Round 7: Sword task initialization | #matching #monsters #sword #080F67AC #scope | 2 |
 | [notes/round7-tentacle-wander_2026-10-30.md](../notes/round7-tentacle-wander_2026-10-30.md) | Tentacle wander-route selection | #matching #monsters #tentacle #080A8904 | 1 |
 | [notes/round7-vorn-defeat_2026-10-30.md](../notes/round7-vorn-defeat_2026-10-30.md) | Round 7: Vorn defeat completion | #matching #monsters #vorn #080AEE08 #scope | 3 |
+| [notes/round8-effect-group-fade.md](../notes/round8-effect-group-fade.md) | EffectGroup_FadeFirstActive | #effects #matching #round8 | 0 |
+| [notes/round8-linked-effect-variant.md](../notes/round8-linked-effect-variant.md) | LinkedEffect_SetVariant | #matching #effects #compiler #round8 | 0 |
+| [notes/round8-player-clone-pool.md](../notes/round8-player-clone-pool.md) | PlayerClone_UpdatePool | #matching #player #compiler #round8 | 0 |
+| [notes/round8-player-target-motion.md](../notes/round8-player-target-motion.md) | Player_UpdateTargetMotion | #matching #player #compiler #round8 | 0 |
+| [notes/round8-projectile-impact-pair.md](../notes/round8-projectile-impact-pair.md) | Projectile_SpawnImpactPair | #matching #effects #compiler #round8 | 0 |
+| [notes/round8-scene-effect-messages.md](../notes/round8-scene-effect-messages.md) | Scene effect queue messages | #effects #projection #matching #round8 | 1 |
+| [notes/round8-scene-target-begin-move.md](../notes/round8-scene-target-begin-move.md) | SceneTarget_BeginMove | #effects #projection #matching #round8 | 0 |
+| [notes/round8-vanargand-part-impact.md](../notes/round8-vanargand-part-impact.md) | Vanargand_UpdatePartImpact | #matching #vanargand #compiler #round8 | 0 |
 | [notes/s0.md](../notes/s0.md) | s0 notes | *#tooling* | 11 |
 | [notes/s1.md](../notes/s1.md) | s1 notes | *#tooling* | 12 |
 | [notes/s2.md](../notes/s2.md) | s2 notes (range 080C9844-0813B134) |  | 11 |

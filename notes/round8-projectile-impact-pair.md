@@ -1,5 +1,7 @@
 # Projectile_SpawnImpactPair
 
+Tags: #matching #effects #compiler #round8
+
 All 476 bytes at 081D9D3C match with stock agbcc. The RNG setup captures the
 cursor, mask and table before the two children spawn. The existing particle
 sample-read macro gives the table a reference in each of the five draws.
