@@ -1,6 +1,6 @@
-#include "global.h"
+#include "player_cue.h"
 
-void PlayerCue_OverlayOff(u8 *p)
+void PlayerCue_OverlayOff(struct Player *p)
 {
-    *(u16 *)(p + 0xAE4) = 0;
+    PlayerCue_Motion(p)->overlayMode = 0;
 }
