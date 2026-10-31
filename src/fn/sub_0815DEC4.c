@@ -1,18 +1,10 @@
-#include "global.h"
-
-struct P {
-    u8 f00[0x3A7];
-    u8 c;
-    u8 f3a8[0x3A8 - 0x3A8];
-};
-
+#include "player_cue.h"
 s32 Collider_Refresh(void *);
-
-void Player_UpdateColliderRefreshCountdown(struct P *p)
+void Player_UpdateColliderRefreshCountdown(struct Player *p)
 {
-    u8 *q = &p->c;
-    if (*q != 0) {
-        Collider_Refresh((u8 *)p + 0x3A8);
-        *q = *q - 1;
+    u8 *remaining = &p->cueColliderPhase;
+    if (*remaining != 0) {
+        Collider_Refresh(&p->cueCollider);
+        *remaining = *remaining - 1;
     }
 }
