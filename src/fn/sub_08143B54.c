@@ -1,32 +1,14 @@
 #include "global.h"
 #include "engine.h"
+#include "player.h"
+#include "scene_grid.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94.8%
-// fix.py best version
-// fix.py best version (reprinted C)
 // confidence=low: limits the tether target distance and clips its position against terrain.
 
-struct Position {
-    s16 x, y, z, pad;
-};
-struct Actor {
-    u8 pad[0x30];
-    struct Position position;
-};
-struct Map {
-    u32 pad;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
-};
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 TetherActor_GetStatusFlags(void);
-u32 Player_IsStatusBit4ActionActive(u32);
-struct Position *TetherActor_GetPosition(void);
-void Sound_PlaySong(u32);
-void ActorSequence_Begin(void *, s32, s32);
-static inline u8 *properties(struct Position *position)
+struct SceneVec *TetherActor_GetPosition(void);
+static inline u8 *properties(struct SceneVec *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8;
     s32 cell;
@@ -39,19 +21,12 @@ static inline u8 *properties(struct Position *position)
     if (p)
         p += 4;
     else {
-        struct Map *map = gTerrainMap;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
     return p;
 }
-static inline s32 absolute(s32 v)
-{
-    if (v < 0)
-        v = -v;
-    return v;
-}
-
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -61,18 +36,21 @@ u32 Player_TestTetherTarget(void *, void *);
 void TetherActor_SetInteractionTarget(void *, u32);
 static inline s32 scale(s32 v)
 {
+    s32 result;
     if (v >= 0)
-        return v >> 12;
-    return -((-v) >> 12);
+        result = v >> 12;
+    else
+        result = -((-v) >> 12);
+    return result;
 }
-static inline s32 indexAt(struct Position *position)
+static inline s32 indexAt(struct SceneVec *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return gTerrainMap->rows[z] + x;
 }
-static inline s32 heightAt(struct Position *position)
+static inline s32 heightAt(struct SceneVec *position)
 {
     u8 *p = properties(position);
     s32 surface = *p >> 4, height = (*p & 15) << 8;
@@ -86,13 +64,11 @@ static inline s32 heightAt(struct Position *position)
     }
     return height;
 }
-// MATCHING_CONCESSION: register-pinning
-void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radius)
+void Player_ConstrainTetherTarget(struct Player *actor, s32 dx, s32 dz, s32 radius)
 {
-    register s32 oz asm("r8") = scale(70 * dz);
-    register struct Actor *actor asm("r6") = input;
-    register s32 ox asm("r7") = scale(70 * dx);
-    struct Position *target = TetherActor_GetPosition();
+    s32 ox = scale(70 * dx);
+    s32 oz = scale(70 * dz);
+    struct SceneVec *target = TetherActor_GetPosition();
     s32 x = (target->x - actor->position.x) - ox;
     s32 z = (target->z - actor->position.z) - oz;
     if (((x * x) + (z * z)) > (radius * radius)) {
@@ -103,24 +79,25 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
         candidate.x = ((target->x * 3) + candidate.x) >> 2;
         candidate.z = ((target->z * 3) + candidate.z) >> 2;
         if (!Player_TestTetherTarget(actor, &candidate)) {
-            u16 ax = actor->position.x;
-            s16 cellx = ((s16)ax) >> 8;
-            s32 cellz = actor->position.z >> 8;
+            u16 rawX = actor->position.x;
+            s32 cellx = ((s16)rawX) >> 8;
+            struct SceneVec *position = &actor->position;
+            s32 cellz = position->z >> 8;
             s32 current;
             s32 next;
+            u16 ax = rawX;
             if ((((cellx < 0) || (cellz < 0)) || (((u32)cellx) >= gTerrainWidth)) ||
                 (((u32)cellz) >= gTerrainHeight))
                 current = 0;
             else
                 current = gTerrainMap->rows[cellz] + cellx;
-            asm("" : : : "memory");
             next = indexAt((void *)(&candidate));
             if (current == (next + 1))
                 candidate.x = ((((s16)ax) >> 8) << 8) + 2;
             else if (current == (next - 1))
                 candidate.x = (((((s16)ax) >> 8) + 1) << 8) - 2;
             else {
-                s32 width = *((s16 *)(gTerrainMap->cells + 4));
+                s32 width = SceneGrid_Width();
                 if (current == (next + width))
                     candidate.z = ((actor->position.z >> 8) << 8) + 2;
                 else if (current == (next - width))
@@ -140,7 +117,3 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
         TetherActor_SetInteractionTarget(&candidate, ((((u16)angle) + 0x70) >> 5) & 7);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_ConstrainTetherTarget);
-#endif

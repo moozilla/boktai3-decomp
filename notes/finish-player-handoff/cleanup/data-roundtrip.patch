@@ -1,0 +1,16 @@
+--- a/symbols/data_roundtrip.csv
++++ b/symbols/data_roundtrip.csv
+@@ -328,6 +328,13 @@
+ 0857B90C,0857C8D2,sample,m4a,exact
+ 0857C8D4,0857D8D8,sample,m4a,exact
+ 08603300,08604998,actor_registry,datafmt/keyed_callbacks,exact
++08610964,08610980,player_action_updates,datafmt/callback_array,exact
++08610B70,08610C0C,player_action_movement,datafmt/callback_array,exact
++08610C0C,08610CA8,player_interaction_movement,datafmt/callback_array,exact
++08610CA8,08610D18,player_interaction_modes,datafmt/callback_array,exact
++08610D18,08610D88,player_alternate_interaction_modes,datafmt/callback_array,exact
++08610D88,08610E24,player_link_movement,datafmt/callback_array,exact
++08610E2C,08610E44,player_attack_effect_elements,datafmt/callback_array,exact
+ 08614DCC,08614FA4,anm container,datafmt/resource_archive,exact
+ 08617084,08617754,map container,datafmt/resource_archive,exact
+ 08617754,086237C4,map,map,lz-exact

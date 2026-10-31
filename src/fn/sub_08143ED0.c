@@ -1,14 +1,16 @@
 #include "global.h"
+#include "player.h"
+#include "game_state.h"
 
 // confidence=low: updates movement and step cues while constraining the tether target.
-#ifdef NONMATCHING
-// fuzzy: 99.9%
-// rtlprobe.py canon: CSE_NOCANON=265 (FlagFour's return register) matches, as in sub_08141C40.
-#define B(n) (*(u8 *)(p + (n)))
-#define H(n) (*(u16 *)(p + (n)))
-#define S(n) (*(s16 *)(p + (n)))
-#define W(n) (*(u32 *)(p + (n)))
-extern u8 *gGameState;
+struct PlayerMovementCueFields {
+    u8 unknown0[0x292];
+    u16 normalAction;
+};
+struct PlayerLockedFacingFields {
+    u8 unknown0[0x48F];
+    u8 lockedFacing;
+};
 extern const s16 gUnk_086149C4[];
 s32 Player_ConsumeStateEntry(void *);
 void ActorSequence_Begin(void *, s32, s32);
@@ -34,11 +36,11 @@ static inline s32 scale6(s32 v)
         return v >> 6;
     return -((-v) >> 6);
 }
-static inline u8 modeFive(u8 *p)
+static inline u8 modeFive(struct Player *p)
 {
-    u16 active = H(0x538);
+    u16 active = p->active;
     u8 result = 0;
-    if (active && H(0x534) == 5)
+    if (active && p->sceneMode == 5)
         result = 1;
     return result;
 }
@@ -46,21 +48,25 @@ static inline u32 flags(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-static inline u32 FlagFour(u8 *p)
+struct PlayerRef {
+    struct Player *player;
+};
+static inline struct PlayerRef PlayerRef_FromPlayer(struct Player *p)
 {
-    if (!p)
-        return 0;
-    return flags((u32 *)(p + 0x448), 4);
+    struct PlayerRef ref;
+    ref.player = p;
+    return ref;
 }
-static inline u32 FlagMovement(u8 *p)
+static inline u32 FlagMovement(struct PlayerRef ref)
 {
+    struct Player *p = ref.player;
     if (!p)
         return 0;
-    return flags((u32 *)(p + 0x448), 0x20000);
+    return flags(&p->actionFlags, 0x20000);
 }
 static inline u32 GlobalMask(u32 mask)
 {
-    return *(u32 *)(gGameState + 0x868) & mask;
+    return gGameState->flags868 & mask;
 }
 static inline u8 HasGlobalFlag(void)
 {
@@ -68,31 +74,31 @@ static inline u8 HasGlobalFlag(void)
         return 1;
     return 0;
 }
-void Player_UpdateTetherMovement(u8 *p)
+void Player_UpdateTetherMovement(struct Player *p)
 {
     s32 animation, rate, moving, cosine, sine, angle, speed;
     if (Player_ConsumeStateEntry(p))
         ActorSequence_Begin(p, 6, 0);
-    W(0x20) &= ~1;
-    if (S(0x34C) < 0 || S(0x4B6) != 0) {
-        animation = ActorVariant_GetTableValue(B(0x418), 16);
-        if (B(0x48C))
-            angle = ((B(0x48F) + 1) & 7) << 5;
+    p->statusFlags &= ~1;
+    if ((s16)p->directionHistory[0] < 0 || p->cameraOffsetActive != 0) {
+        animation = ActorVariant_GetTableValue(p->actionMode, 16);
+        if (p->movementVelocityLocked)
+            angle = ((((struct PlayerLockedFacingFields *)p)->lockedFacing + 1) & 7) << 5;
         else
-            angle = ((B(0x3A4) + 1) & 7) << 5;
+            angle = ((p->facing + 1) & 7) << 5;
         cosine = gUnk_086149C4[(angle + 64) & 255];
         sine = gUnk_086149C4[angle & 255];
         moving = 0;
         rate = 64;
     } else {
-        animation = ActorVariant_GetTableValue(B(0x418), 17);
+        animation = ActorVariant_GetTableValue(p->actionMode, 17);
         speed = Player_CalculateMovementSpeed(p);
         moving = 1;
-        B(0x3A4) = Player_GetSmoothedDirection(p);
+        p->facing = Player_GetSmoothedDirection(p);
         Player_UpdateFacingSide(p);
-        if (B(0x48C)) {
+        if (p->movementVelocityLocked) {
             rate = 32;
-            angle = ((B(0x48F) + 1) & 7) << 5;
+            angle = ((((struct PlayerLockedFacingFields *)p)->lockedFacing + 1) & 7) << 5;
             cosine = gUnk_086149C4[(angle + 64) & 255];
             sine = gUnk_086149C4[angle & 255];
         } else {
@@ -102,68 +108,65 @@ void Player_UpdateTetherMovement(u8 *p)
                 rate = 64 + ((8 - speed) << 3);
             else
                 rate = 64 - ((speed - 8) << 2);
-            angle = ((B(0x3A4) + 1) & 7) << 5;
+            angle = ((p->facing + 1) & 7) << 5;
             cosine = gUnk_086149C4[(angle + 64) & 255];
             sine = gUnk_086149C4[angle & 255];
-            if (H(0xA0) & 3) {
-                H(0x38) = -scale12(cosine * speed);
-                H(0x3C) = -scale12(sine * speed);
-                if (B(0x28F) == 1) {
-                    if (S(0x3C) < 0)
-                        H(0x3C) = scale6(S(0x3C) * 40);
+            if (p->actionCueFlags & 3) {
+                p->velocityX = -scale12(cosine * speed);
+                p->velocityZ = -scale12(sine * speed);
+                if (p->velocityScaleAxis == 1) {
+                    if (p->velocityZ < 0)
+                        p->velocityZ = scale6(p->velocityZ * 40);
                     else
-                        H(0x3C) = scale6(S(0x3C) * 52);
-                } else if (B(0x28F) == 2) {
-                    if (S(0x38) < 0)
-                        H(0x38) = scale6(S(0x38) * 40);
+                        p->velocityZ = scale6(p->velocityZ * 52);
+                } else if (p->velocityScaleAxis == 2) {
+                    if (p->velocityX < 0)
+                        p->velocityX = scale6(p->velocityX * 40);
                     else
-                        H(0x38) = scale6(S(0x38) * 52);
+                        p->velocityX = scale6(p->velocityX * 52);
                 }
             }
         }
     }
-    if (moving && S(0x34E) >= 0 && !(H(0xA0) & 3) && !H(0x98)) {
-        if (p && H(0x538) && H(0x534) == 0)
+    if (moving && (s16)p->directionHistory[1] >= 0 && !(p->actionCueFlags & 3) &&
+        !p->actionCueCounter) {
+        if (p && ((p->active && p->sceneMode == 0) || flags(&p->actionFlags, 4)))
             goto animate;
-        if (FlagFour(p))
-            goto animate;
-        if (FlagMovement(p)) {
-            if (!H(0xA0))
-                Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, 0, 0x5AE);
+        if (FlagMovement(PlayerRef_FromPlayer(p))) {
+            if (!p->actionCueFlags)
+                Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x5AE);
             else
-                Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, 0, 0x5AD);
-        } else if (RepeatedEffect_RequestNearby(p + 0x30)) {
-            if (!H(0xA0))
-                Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, 0, 0x163);
+                Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x5AD);
+        } else if (RepeatedEffect_RequestNearby(&p->position)) {
+            if (!p->actionCueFlags)
+                Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x163);
             else
-                Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, 0, 0x162);
-        } else if (Player_IsNormalActionAllowed(H(0x292)) && !(p && modeFive(p))) {
-            if (!H(0xA0))
-                Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, 0, 0x194);
+                Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x162);
+        } else if (Player_IsNormalActionAllowed(
+                       ((struct PlayerMovementCueFields *)p)->normalAction) &&
+                   !(p && modeFive(p))) {
+            if (!p->actionCueFlags)
+                Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x194);
             else
-                Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, 0, 0x193);
+                Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x193);
         } else {
-            if (H(0x474) || !B(0x28F)) {
-                if (!H(0xA0))
+            if (p->tetherStatusFlags || !p->velocityScaleAxis) {
+                if (!p->actionCueFlags)
                     Sound_PlaySong(0xCA);
                 else
                     Sound_PlaySong(0xC9);
             } else {
-                if (!H(0xA0))
+                if (!p->actionCueFlags)
                     Sound_PlaySong(0x28E);
                 else
                     Sound_PlaySong(0x28D);
             }
             if (HasGlobalFlag())
-                Player_PlayPositionEffect(p, p + 0x30, 1, 2, 0, 0, 0);
+                Player_PlayPositionEffect(p, &p->position, 1, 2, 0, 0, 0);
         }
     }
 animate:
     Player_SetAnimation(p, animation, rate, 1);
-    if (moving || B(0x48C))
+    if (moving || p->movementVelocityLocked)
         Player_ConstrainTetherTarget(p, cosine, sine, 150);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateTetherMovement);
-#endif

@@ -5344,10 +5344,13 @@ addr,name,mode,confidence,source,notes
 0814A884,Player_AccumulateContactCost,thumb,low,src-alias,
 0814AFE4,Player_SetFacingFromAngle,thumb,low,src-alias,Converts an eight-bit angle into a directional animation index and mirror flag
 0814B1E0,Player_OnTargetMotionExit,thumb,low,src-alias,Restores the sprite position and hides the auxiliary sprite when the target interaction motion exits
+0814B1F8,Player_UpdateTargetMotion,thumb,low,src-alias,Tentative: updates target-relative player motion and animation phases
 0814C398,Player_OnGrabMotionExit,thumb,low,src-alias,Hides the auxiliary sprite when the apparent grab interaction motion exits; grab interpretation is tentative
+0814C3A4,Player_UpdateGrabMotion,thumb,low,src-alias,Tentative: updates grab-related player motion and paired animation
 0814CFC0,Player_UpdateStatThreshold,thumb,low,src-alias,
 0814D02C,Player_SelectActionVariant,thumb,low,src-alias,
 0814D104,Player_ComputeActionScale,thumb,low,src-alias,
+0814D264,Player_UpdateAttackColliderMotion,thumb,low,src-alias,Tentative: updates attack collider motion through animation phases
 0814D724,Player_InitializeActionContact,thumb,low,src-alias,
 0814D7F8,Player_SelectActionCue,thumb,low,src-alias,
 0814D8D8,Player_HasWeaponComboEntry,thumb,low,src-alias,Tests whether the current weapon table contains an entry for the selected combo stage; combo interpretation is tentative
@@ -5663,6 +5666,7 @@ addr,name,mode,confidence,source,notes
 0815FFB8,PlayerBurst_Destroy,thumb,low,src-alias,Task destruction callback that removes its animation and sixteen particle effects
 0815FFDC,PlayerTransition_LoadAnimation,thumb,low,src-alias,
 08160060,PlayerTransition_InitCollider,thumb,low,src-alias,
+08160108,PlayerBurst_InitializeParticles,thumb,low,src-alias,Initializes sixteen player burst particle records; burst interpretation tentative
 081602D0,PlayerStatEffect_Initialize,thumb,low,src-alias,
 0816033C,PlayerBurst_Create,thumb,low,src-alias,Creates the player associated animation and particle task; burst interpretation is tentative
 08160380,FrameDisplay_GetCompactFrameIndex,thumb,low,src-alias,
@@ -5682,6 +5686,7 @@ addr,name,mode,confidence,source,notes
 081616D0,PlayerAttackEffect_EmitPaletteTwoTrail,thumb,low,src-alias,Emits the same attack arc patterns using animation bank two
 08161AF4,PlayerAttackEffect_EmitPaletteThreeTrail,thumb,low,src-alias,Emits the same attack arc patterns using animation bank three
 08161F18,PlayerAttackEffect_EmitPaletteFourTrail,thumb,low,src-alias,Emits the same attack arc patterns using animation bank four
+0816233C,PlayerAttackEffect_UpdateParticles,thumb,low,src-alias,Updates player attack-effect particle movement and playback; effect interpretation tentative
 08162598,PlayerAttackEffect_Destroy,thumb,low,src-alias,Task destruction callback that removes sixteen particle sprites and clears the singleton
 081626E0,PlayerAttackEffect_Create,thumb,low,src-alias,Creates or returns the singleton task holding player attack particle animations and sprites
 08162740,PlayerAttackEffect_SetElementMode,thumb,low,src-alias,Selects the emission dispatch mode apparently corresponding to the player's active element; tentative interpretation
@@ -10016,6 +10021,7 @@ addr,name,mode,confidence,source,notes
 0823C0A4,LinkPlayer_ResetToIdleState,thumb,low,src-alias,
 0823C368,Player_SelectHistoryDirectionB,thumb,low,src-alias,
 0823C3CC,Player_EnterIdleAnimation,thumb,low,src-alias,Restores state zero and facing before selecting the idle animation; idle interpretation tentative
+0823C4B4,Player_GetLinkedSmoothedDirection,thumb,low,src-alias,Tentative linked-action twin of Player_GetSmoothedDirection
 0823C520,Player_GetMovementAnimationRate,thumb,low,src-alias,Maps a movement timing value to an animation rate centered on 0x40 at twelve
 0823C548,Player_PlayActionCueSound,thumb,low,src-alias,
 0823C930,Player_UpdateTerrainSidestep,thumb,low,src-alias,

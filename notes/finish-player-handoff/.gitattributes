@@ -1,0 +1,2 @@
+# Patch context preserves source whitespace.
+cleanup/*.patch -whitespace

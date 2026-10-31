@@ -59,6 +59,7 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 Recent:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 * **Player cue worker batch and cleanup prepared** (2026-10-30): the assigned
   callbacks match without concessions on `codex/finish-player-cue`. Existing cue
   callbacks and setup/dispatch now share canonical player, graphics, message and
@@ -87,6 +88,15 @@ Recent:
   combined validation, alias promotion and progress reports remain with the
   integrator. See the [boss worker note](../notes/finish-bosses_2026-10-30.md).
 >>>>>>> codex/finish-bosses
+=======
+* **Finish-player quota checkpoint** (2026-10-31): nine reserved functions match
+  in ordinary C on `codex/finish-player`; the two remaining guarded drafts are
+  now 99.6% and 96.1% fuzzy with specific reload/vector-copy blockers. Cleanup
+  candidates for pins, shared records, Player callback data and Studio are
+  preserved separately. Stopped at the owner's requested quota buffer; combined
+  ROM validation and progress regeneration remain for integration. See the
+  [finish-player note](../notes/finish-player_2026-10-30.md).
+>>>>>>> codex/finish-player
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches

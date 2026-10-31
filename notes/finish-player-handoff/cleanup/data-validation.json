@@ -1,0 +1,95 @@
+{
+  "unit_tests": 14,
+  "callback_tables": 18,
+  "callback_bytes": 1080,
+  "new_player_tables": 7,
+  "new_player_bytes": 744,
+  "encoder_roundtrips": [
+    {
+      "name": "bat_script_commands",
+      "bytes": 32
+    },
+    {
+      "name": "bee_script_commands",
+      "bytes": 28
+    },
+    {
+      "name": "ghost_script_commands",
+      "bytes": 32
+    },
+    {
+      "name": "lun_script_commands",
+      "bytes": 28
+    },
+    {
+      "name": "crow_script_commands",
+      "bytes": 28
+    },
+    {
+      "name": "spider_script_commands",
+      "bytes": 28
+    },
+    {
+      "name": "vorn_script_commands",
+      "bytes": 32
+    },
+    {
+      "name": "skeleton_script_commands",
+      "bytes": 36
+    },
+    {
+      "name": "octopus_script_commands",
+      "bytes": 40
+    },
+    {
+      "name": "ivy_script_commands",
+      "bytes": 28
+    },
+    {
+      "name": "actor_default_commands",
+      "bytes": 24
+    },
+    {
+      "name": "player_action_updates",
+      "bytes": 28
+    },
+    {
+      "name": "player_action_movement",
+      "bytes": 156
+    },
+    {
+      "name": "player_interaction_movement",
+      "bytes": 156
+    },
+    {
+      "name": "player_interaction_modes",
+      "bytes": 112
+    },
+    {
+      "name": "player_alternate_interaction_modes",
+      "bytes": 112
+    },
+    {
+      "name": "player_link_movement",
+      "bytes": 156
+    },
+    {
+      "name": "player_attack_effect_elements",
+      "bytes": 24
+    }
+  ],
+  "javascript_syntax": [
+    "tools/studio/actors.html",
+    "tools/studio/code.html"
+  ],
+  "python_syntax": true,
+  "dispatcher_literals": true,
+  "nonnull_callbacks_are_function_starts": true,
+  "symbolizer_pointer_and_label_checks": true,
+  "pii_added_lines": true,
+  "browser_preview": [
+    "Player table with null slots and owner/selector/dispatcher",
+    "dispatcher Code-page callback reference",
+    "legacy actor-command route"
+  ]
+}

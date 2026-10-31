@@ -1,13 +1,83 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "scene_vec.h"
 
 extern u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 
-struct CloneVec {
-    s16 x, y, z, pad;
+struct CloneParams {
+    u16 unknown0, lifetime, unknown4;
+    s8 direction;
+    u8 unknown7;
+    s32 speed;
+    void *callback;
+    u8 unknown10[0x10];
 };
+
+struct CloneCollider {
+    u8 unknown0[6];
+    s16 flags : 16;
+    u8 unknown8[0x3C];
+    u16 timer;
+    u8 unknown46[0xE];
+};
+struct CloneBlinkDrawable {
+    u32 flags;
+    u8 unknown4[2];
+    u16 resetValue;
+    u8 unknown8[0x10];
+    struct SceneVec position;
+};
+struct CloneAnim {
+    u8 unknown0[8];
+    struct CloneBlinkDrawable drawable;
+    u8 unknown28[0x12];
+    u16 paletteFlags : 16;
+    u8 unknown3C[0xC];
+    void *palette;
+    u8 unknown4C[0x74];
+};
+struct CloneState {
+    u32 flags, phase;
+    u8 unknown30C[0x10];
+    s32 animation;
+    u8 foldedFacing, facing, mirrored, particleCount;
+    s32 speed;
+    u32 index;
+    u8 unknown32C[4];
+    s16 paletteTimer, attackTimer;
+    s16 attackPending, attack, element, power;
+    u32 debris;
+    u16 blinkTimer, unknown342;
+};
+struct PlayerClone {
+    u32 frame;
+    u8 unknown4[8];
+    struct SceneVec velocity;
+    struct SceneVec particlePosition;
+    struct SceneVec origin;
+    struct SceneVec initialPosition; /* entrance vector origin, tentative */
+    struct CloneCollider contact, body, area, playerAttack;
+    u8 unknown17C[0x1C];
+    struct CloneParams params;
+    struct CloneAnim anim;
+    u8 resource[0x20];
+    u8 shadow[0x6C];
+    struct CloneState state;
+};
+struct PlayerClonePool {
+    u8 task[0x18];
+    u32 activeMask;
+    struct PlayerClone entries[3];
+    s32 activeCount;
+    s16 palette1[16], palette2[16];
+};
+
+static inline struct CloneBlinkDrawable *CloneBlinkDrawable_FromHeight(s16 *height)
+{
+    return (void *)((u8 *)height - (u32) & ((struct CloneBlinkDrawable *)0)->position.y);
+}
 
 void ScaledShadow_Enable(void *);
 void ScaledShadow_Disable(void *);
@@ -19,8 +89,8 @@ void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void Anim_SelectPaletteBank(void *, u32);
 void ActorDebris_Show(u32);
 void PlayerEffect_SetPaletteSource(u32, u32, u32);
-struct CloneVec *Player_GetEffectivePosition(s32);
-struct CloneVec *Ratatosk_GetPosition(void);
+struct SceneVec *Player_GetEffectivePosition(s32);
+struct SceneVec *Ratatosk_GetPosition(void);
 void SlotMotion_Initialize(u8 *);
 void Ratatosk_ConfigureParticle(u8 *, u32, u32, u32, u32, u32);
 int SceneParticles_SpawnAtPosition(u8 *, void *);
@@ -28,256 +98,285 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
 
-static inline s32 Scale(s32 x)
+static inline s32 Clone_ScaleCoordinate(s32 x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 
-static inline void Vec_FromAngle(struct CloneVec *v, s32 angle, s32 speed)
+static inline void Clone_CreateAngleVector(struct SceneVec *v, s32 angle, s32 speed)
 {
-    v->x = Scale(gUnk_086149C4[(angle + 0x40) & 0xff] * speed);
+    v->x = Clone_ScaleCoordinate(gUnk_086149C4[(angle + 0x40) & 0xff] * speed);
     v->y = 0;
-    v->z = Scale(gUnk_086149C4[angle & 0xff] * speed);
+    v->z = Clone_ScaleCoordinate(gUnk_086149C4[angle & 0xff] * speed);
 }
 
-static inline void Vec_Sum(struct CloneVec *d, struct CloneVec *a, struct CloneVec *b)
+static inline void Clone_AddVectors(struct SceneVec *d, struct SceneVec *a, struct SceneVec *b)
 {
     d->x = b->x + a->x;
     d->y = b->y + a->y;
     d->z = b->z + a->z;
 }
 
-static inline void Vec_Diff(struct CloneVec *d, struct CloneVec *a, struct CloneVec *b)
+static inline void Clone_SubtractVectors(struct SceneVec *d, struct SceneVec *a, struct SceneVec *b)
 {
     d->x = a->x - b->x;
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
 
-static inline s32 RandomByte(void)
+static inline s32 Clone_NextRandomByte(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     return *(u8 *)(gRandomIndex * 2 + RANDOM_TABLE_ADDR);
 }
 
-static inline u16 RandomAngle(void)
+static inline u16 Clone_NextRandomAngle(void)
 {
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
-static inline void Flags_Set(u8 *p, u32 m)
+static inline void Clone_EnableHiddenFlag(struct CloneAnim *animation)
 {
-    *(u32 *)(p + 8) |= m;
+    animation->drawable.flags |= 1;
+}
+static inline void Clone_DisableHiddenFlag(struct CloneAnim *animation)
+{
+    animation->drawable.flags &= ~1;
+}
+static inline void Clone_EnableRiseFlag(struct CloneAnim *animation)
+{
+    animation->drawable.flags |= 0x400;
+}
+static inline void Clone_DisableRiseFlag(struct CloneAnim *animation)
+{
+    animation->drawable.flags &= ~0x400;
 }
 
-static inline void Flags_Clear(u8 *p, u32 m)
+static inline void Clone_SetFlags(u32 mask, u32 *flags)
 {
-    *(u32 *)(p + 8) &= ~m;
+    *flags |= mask;
 }
 
-static inline void Bits_Set(u32 m, u8 *p)
+static inline struct CloneAnim *Clone_GetAnimation(struct PlayerClone *clone)
 {
-    *(u32 *)p |= m;
+    return &clone->anim;
 }
 
-#define W(o)         (*(u32 *)(s + (o)))
-#define H(o)         (*(s16 *)(s + (o)))
-#define UH(o)        (*(u16 *)(s + (o)))
-#define B(o)         (*(u8 *)(s + (o)))
-#define CTX_DIR(c)   (*(s8 *)((c) + 6))
-#define CTX_SPEED(c) (*(s32 *)((c) + 8))
-
-#ifdef NONMATCHING
-// fuzzy: 80.0%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: register allocation in case 0 (speed lands in r8, the
-// Vec_Sum source pointer is computed before Div), constant reuse for s + 0x278
-// in case 3, and scheduling of the zero/sb copies in case 3.
-inline static u32 Arg1(u32 k_, u8 *s)
+static inline void Clone_SetRiseHeight(struct PlayerClone *clone, s16 height)
 {
-    return s + k_;
+    clone->anim.drawable.position.y = height;
 }
-
-s32 PlayerClone_UpdateBehavior(u8 *s, s32 i)
+static inline void Clone_ClearVector(const void *value, void *destination, u32 control)
 {
-    u8 *ctx = s + 0x198;
+    CpuSet(value, destination, control);
+}
+static inline u32 Clone_UpdateBlink(struct CloneBlinkDrawable *animation, struct PlayerClone *s)
+{
+    u16 *timer = &s->state.blinkTimer;
+    if (Sprite_BlinkUntilExpired(animation, (s16)*timer, 0x2d, 0x5a))
+        return 1;
+    (*timer)++;
+    return 0;
+}
+#define CLONE_DISABLE_COLLIDER(collider)                                                           \
+    do {                                                                                           \
+        (collider)->flags |= 4;                                                                    \
+    } while (0)
+
+static inline void Clone_MaskColliderFlags(u32 mask, struct CloneCollider *collider)
+{
+    collider->flags &= mask;
+}
+s32 PlayerClone_UpdateBehavior(struct PlayerClone *clone, s32 index)
+{
+    struct CloneParams *params = &clone->params;
     vu32 zero;
-    u8 motion[0x18];
-    struct CloneVec v;
-    struct CloneVec d;
-    struct CloneVec e;
-    switch (*((u32 *)(s + 0x308))) {
+    u8 particleMotion[0x18];
+    struct SceneVec offset;
+    struct SceneVec delta;
+    struct SceneVec particlePosition;
+    switch (clone->state.phase) {
         case 0: {
-            u8 *c1 = s + 0x80;
-            s32 dir;
-            s32 speed;
-            struct CloneVec *src;
-            *((s16 *)(c1 + 6)) |= 4;
-            ScaledShadow_Enable(s + 0x298);
-            Flags_Set(s + 0x1b8, 1);
-            src = (struct CloneVec *)(s + 0x24);
-            dir = *((s8 *)(ctx + 6));
-            speed = Div((*((u32 *)(s + 0))) << 9, 30);
-            Vec_FromAngle(&v, dir + 0x80, speed);
+            struct CloneCollider *body = &clone->body;
+            s32 direction;
+            struct SceneVec *initialPosition;
+            CLONE_DISABLE_COLLIDER(body);
+            ScaledShadow_Enable(clone->shadow);
+            Clone_EnableHiddenFlag(&clone->anim);
+            direction = params->direction;
+            Clone_CreateAngleVector(&offset, direction + 0x80, Div(clone->frame << 9, 30));
             {
-                struct CloneVec *dst = (struct CloneVec *)(s + 0x1d8);
-                Vec_Sum(dst, &v, src);
+                struct SceneVec *destination = &clone->anim.drawable.position;
+                initialPosition = &clone->initialPosition;
+                Clone_AddVectors(destination, &offset, initialPosition);
             }
-            if ((*((u32 *)(s + 0))) > 30) {
-                Flags_Clear(s + 0x1b8, 1);
-                *((s16 *)(c1 + 6)) &= ~4;
-                *((u32 *)(s + 0x308)) = 1;
-                *((u32 *)(s + 0x304)) &= ~1;
+            if (clone->frame > 30) {
+                Clone_DisableHiddenFlag(&clone->anim);
+                Clone_MaskColliderFlags(~4, body);
+                clone->state.phase = 1;
+                clone->state.flags &= ~1;
                 {
-                    u8 *dst = s + 0xc;
+                    void *destination = &clone->velocity;
                     zero = 0;
-                    CpuSet((void *)(&zero), dst, 0x05000002);
+                    Clone_ClearVector((void *)(&zero), destination, 0x05000002);
                 }
             }
             break;
         }
 
-        case 1:
-            if ((*((u32 *)(s + 0))) & 1)
-                SpriteParticle_CreateDefaultVariant4384(s + 0x14, 0x28, 0x20, 0xc, 4, 0x18,
-                                                        RandomByte(), 0x20, 0x20, 3, 2, 0x200);
-            Flags_Set(Arg1(0x1b8, s), 0x400);
-            *((s16 *)(s + 0x1da)) = (*((s16 *)(s + 0x1e))) - ((60 - (*((u32 *)(s + 0)))) * 2);
-            if ((*((u32 *)(s + 0))) > 60) {
-                *((u32 *)(s + 0x308)) = 2;
-                Flags_Clear(s + 0x1b8, 0x400);
-                ScaledShadow_Disable(s + 0x298);
+        case 1: {
+            struct CloneAnim *display;
+            if (clone->frame & 1)
+                SpriteParticle_CreateDefaultVariant4384(&clone->particlePosition, 0x28, 0x20, 0xc,
+                                                        4, 0x18, Clone_NextRandomByte(), 0x20, 0x20,
+                                                        3, 2, 0x200);
+            display = Clone_GetAnimation(clone);
+            Clone_EnableRiseFlag(display);
+            {
+                s16 height = clone->origin.y - ((60 - clone->frame) * 2);
+                Clone_SetRiseHeight(clone, height);
+            }
+            if (clone->frame > 60) {
+                clone->state.phase = 2;
+                Clone_DisableRiseFlag(display);
+                ScaledShadow_Disable(clone->shadow);
             }
             break;
-
+        }
         case 2:
-            if ((*((u32 *)(s + 0))) > 0x120)
-                *((u32 *)(s + 0x308)) = 3;
+            if (clone->frame > 0x120)
+                clone->state.phase = 3;
             break;
 
         case 3:
-            if (Mod(*((u32 *)(s + 0)), 120) == 0) {
-                ctx[6] = RandomAngle();
-                Bits_Set(1, s + 0x304);
-                *((u32 *)(s + 0x31c)) = 5;
-                Anim_LoadKeyframe(s + 0x1b8, s + 0x278, 5, 1);
+            if (Mod(clone->frame, 120) == 0) {
+                params->direction = Clone_NextRandomAngle();
+                Clone_SetFlags(1, &clone->state.flags);
+                clone->state.animation = 5;
+                Anim_LoadKeyframe(&clone->anim, clone->resource, 5, 1);
             }
-            if ((*((u32 *)(s + 0))) > ((i * 30) + 0x294)) {
+            if (clone->frame > ((index * 30) + 0x294)) {
                 u32 z;
-                *((struct CloneVec *)(s + 0x1c)) = *((struct CloneVec *)(s + 0x1d8));
-                z = 0;
-                *((u16 *)(s + 0x14)) = *((u16 *)(s + 0x1d8));
-                *((u16 *)(s + 0x16)) = (*((u16 *)(s + 0x1da))) + 0x80;
-                *((u16 *)(s + 0x18)) = *((u16 *)(s + 0x1dc));
-                *((u32 *)(s + 0x308)) = 5;
-                *((s32 *)(ctx + 8)) = z;
-                Bits_Set(1, s + 0x304);
+                clone->origin = clone->anim.drawable.position;
                 {
-                    u8 *c1 = s + 0x80;
-                    *((s16 *)(c1 + 6)) |= 4;
+                    u16 x = (u16)clone->anim.drawable.position.x;
+                    z = 0;
+                    clone->particlePosition.x = x;
                 }
-                *((u16 *)(s + 0x340)) = z;
-                *((u32 *)(s + 0x31c)) = z;
-                Anim_LoadKeyframe(s + 0x1b8, s + 0x278, 0, 1);
+                clone->particlePosition.y = ((u16)clone->anim.drawable.position.y) + 0x80;
+                clone->particlePosition.z = (u16)clone->anim.drawable.position.z;
+                clone->state.phase = 5;
+                params->speed = z;
+                Clone_SetFlags(1, &clone->state.flags);
+                {
+                    struct CloneCollider *body = &clone->body;
+                    CLONE_DISABLE_COLLIDER(body);
+                }
+                clone->state.blinkTimer = z;
+                clone->state.animation = z;
+                Anim_LoadKeyframe(&clone->anim, clone->resource, 0, 1);
             } else {
-                struct CloneVec *p = Player_GetEffectivePosition(0);
-                struct CloneVec *pos = (struct CloneVec *)(s + 0x1d8);
-                s32 dx = p->x - pos->x;
-                s32 dz = p->z - pos->z;
+                struct SceneVec *playerPosition = Player_GetEffectivePosition(0);
+                struct SceneVec *pos = &clone->anim.drawable.position;
+                s32 dx = playerPosition->x - pos->x;
+                s32 dz = playerPosition->z - pos->z;
                 if (((dx * dx) + (dz * dz)) <= 0xffff) {
-                    u8 *anim;
-                    u8 *res;
-                    u8 *t;
+                    struct CloneAnim *animation;
+                    u8 *resource;
+                    struct PlayerClonePool *pool;
+                    s16 *timer = &clone->state.attackTimer;
                     s32 z = 0;
-                    *((s16 *)(s + 0x332)) = z;
-                    *((s32 *)(ctx + 8)) = z;
-                    Bits_Set(1, s + 0x304);
-                    p = Player_GetEffectivePosition(0);
-                    ctx[6] = Math_Atan2(p->x - pos->x, p->z - pos->z);
-                    *((u32 *)(s + 0x31c)) = 0x54;
-                    anim = s + 0x1b8;
-                    res = s + 0x278;
-                    Anim_LoadKeyframe(anim, res, 0x54, 2);
-                    Anim_SetKeyframes(
-                        anim, res, (u16)((*((u32 *)(s + 0x31c))) + (*((u8 *)(s + 0x320)))), 2, 4);
-                    *((u16 *)(s + 0x1c6)) = z;
-                    t = gDirectionalSpritePool;
-                    if (!t)
+                    *timer = z;
+                    params->speed = z;
+                    Clone_SetFlags(1, &clone->state.flags);
+                    {
+                        struct SceneVec *target = Player_GetEffectivePosition(0);
+                        params->direction = Math_Atan2(target->x - pos->x, target->z - pos->z);
+                    }
+                    clone->state.animation = 0x54;
+                    animation = &clone->anim;
+                    resource = clone->resource;
+                    Anim_LoadKeyframe(animation, resource, 0x54, 2);
+                    Anim_SetKeyframes(animation, resource,
+                                      (u16)(clone->state.animation + clone->state.foldedFacing), 2,
+                                      4);
+                    clone->anim.drawable.resetValue = z;
+                    pool = (void *)gDirectionalSpritePool;
+                    if (!pool) {
+                        /* Animation setup cannot finish without the drawable pool. */
                         return;
-                    Anim_SelectPaletteBank(anim, 0x1f4);
-                    *((u16 *)(s + 0x1f2)) = 0xe000;
-                    *((u8 **)(s + 0x200)) = t + 0xa0c;
-                    ActorDebris_Show(*((u32 *)(s + 0x33c)));
-                    PlayerEffect_SetPaletteSource(*((u32 *)(s + 0x33c)), 0xe001, 0);
-                    *((u32 *)(s + 0x308)) = 4;
+                    }
+                    Anim_SelectPaletteBank(animation, 0x1f4);
+                    clone->anim.paletteFlags = 0xe000;
+                    clone->anim.palette = pool->palette2;
+                    ActorDebris_Show(clone->state.debris);
+                    PlayerEffect_SetPaletteSource(clone->state.debris, 0xe001, 0);
+                    clone->state.phase = 4;
                 } else {
                     s32 r;
-                    if (RandomByte() < 4) {
-                        if ((*((u8 *)(s + 0x323))) == 0)
-                            *((u8 *)(s + 0x323)) = 10;
+                    if (Clone_NextRandomByte() < 4) {
+                        if (clone->state.particleCount == 0)
+                            clone->state.particleCount = 10;
                     }
-                    if ((*((u8 *)(s + 0x323))) == 0)
+                    if (clone->state.particleCount == 0)
                         break;
-                    r = Mod(*((u32 *)(s + 0)), 0x20);
-                    Vec_Diff(&d, Ratatosk_GetPosition(), (struct CloneVec *)(s + 0x1d8));
+                    r = Mod(clone->frame, 0x20);
+                    Clone_SubtractVectors(&delta, Ratatosk_GetPosition(),
+                                          &clone->anim.drawable.position);
                     if (r == 0) {
                         zero = r;
-                        CpuSet((void *)(&zero), &d, 0x05000002);
+                        Clone_ClearVector((void *)(&zero), &delta, 0x05000002);
                     } else {
-                        d.x = Div(d.x * r, 0x20);
-                        d.y = 0;
-                        d.z = Div(d.z * r, 0x20);
+                        delta.x = Div(delta.x * r, 0x20);
+                        delta.y = 0;
+                        delta.z = Div(delta.z * r, 0x20);
                     }
-                    Vec_Sum(&e, &d, (struct CloneVec *)(s + 0x1d8));
-                    e.y += 0x60;
-                    SlotMotion_Initialize(motion);
-                    Ratatosk_ConfigureParticle(motion, 10, 0, 0, 0, 0);
-                    SceneParticles_SpawnAtPosition(motion, &e);
-                    (*((u8 *)(s + 0x323)))--;
+                    Clone_AddVectors(&particlePosition, &delta, &clone->anim.drawable.position);
+                    particlePosition.y += 0x60;
+                    SlotMotion_Initialize(particleMotion);
+                    Ratatosk_ConfigureParticle(particleMotion, 10, 0, 0, 0, 0);
+                    SceneParticles_SpawnAtPosition(particleMotion, &particlePosition);
+                    clone->state.particleCount--;
                 }
             }
             break;
 
         case 4: {
-            s16 *p = &(*((s16 *)(s + 0x332)));
-            if ((*p) > 5) {
-                u8 *c2 = s + 0xd4;
-                *((s16 *)(c2 + 6)) &= ~4;
+            s16 *attackTimer = &clone->state.attackTimer;
+            if ((*attackTimer) > 5) {
+                struct CloneCollider *area = &clone->area;
+                Clone_MaskColliderFlags(~4, area);
             }
-            if ((*p) > 30) {
-                *((u32 *)(s + 0x308)) = 3;
-                ctx[6] = RandomAngle();
-                *((s32 *)(ctx + 8)) = *((u32 *)(s + 0x324));
-                Bits_Set(1, s + 0x304);
-                *((u32 *)(s + 0x31c)) = 5;
-                Anim_LoadKeyframe(s + 0x1b8, s + 0x278, 5, 1);
+            if ((*attackTimer) > 30) {
+                clone->state.phase = 3;
+                params->direction = Clone_NextRandomAngle();
+                params->speed = clone->state.speed;
+                Clone_SetFlags(1, &clone->state.flags);
+                clone->state.animation = 5;
+                Anim_LoadKeyframe(&clone->anim, clone->resource, 5, 1);
             }
-            (*p)++;
+            (*attackTimer)++;
             break;
         }
 
         case 5: {
-            u16 *p;
-            if ((*((u32 *)(s + 0))) & 1)
-                SpriteParticle_CreateDefaultVariant4384(s + 0x14, 0x28, 0x20, 0xc, 4, 0x18,
-                                                        RandomByte(), 0x20, 0x20, 3, 2, 0x200);
+            s16 *height;
+            if (clone->frame & 1)
+                SpriteParticle_CreateDefaultVariant4384(&clone->particlePosition, 0x28, 0x20, 0xc,
+                                                        4, 0x18, Clone_NextRandomByte(), 0x20, 0x20,
+                                                        3, 2, 0x200);
             {
-                s16 y = (*((s16 *)(s + 0x1e))) -
-                        ((30 - ((i * 30) - ((*((u32 *)(s + 0))) - 0x2b2))) * 2);
-                *((s16 *)(s + 0x1da)) = y;
+                s32 delay = index * 30;
+                s32 elapsed = clone->frame - 0x2b2;
+                s32 remaining = delay - elapsed;
+                s16 y = clone->origin.y - ((30 - remaining) * 2);
+                height = &clone->anim.drawable.position.y;
+                *height = y;
             }
-            p = &(*((u16 *)(s + 0x340)));
-            if (Sprite_BlinkUntilExpired(s + 0x1c0, (s16)(*p), 0x2d, 0x5a))
-                return 1;
-            (*p)++;
-            break;
+            return Clone_UpdateBlink(CloneBlinkDrawable_FromHeight(height), clone);
         }
     }
 
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerClone_UpdateBehavior);
-#endif

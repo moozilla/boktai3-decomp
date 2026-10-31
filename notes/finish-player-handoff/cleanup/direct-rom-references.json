@@ -1,0 +1,154 @@
+{
+  "086108F8": [
+    "src/fn/sub_0813BA88.c"
+  ],
+  "08610918": [
+    "src/player_3.c"
+  ],
+  "0861091C": [
+    "src/player_3.c"
+  ],
+  "08610940": [
+    "src/player_3.c"
+  ],
+  "08610964": [
+    "src/fn/sub_0813FC38.c"
+  ],
+  "08610980": [
+    "src/fn/sub_081419D4.c"
+  ],
+  "086109F4": [
+    "src/fn/sub_081419D4.c"
+  ],
+  "08610A68": [
+    "src/fn/sub_081419D4.c"
+  ],
+  "08610ADC": [
+    "src/fn/sub_081419D4.c"
+  ],
+  "08610B50": [
+    "src/fn/sub_08156BBC.c"
+  ],
+  "08610B70": [
+    "src/fn/sub_0815788C.c"
+  ],
+  "08610C0C": [
+    "src/fn/sub_08157CFC.c"
+  ],
+  "08610CA8": [
+    "src/fn/sub_0815849C.c"
+  ],
+  "08610D18": [
+    "src/fn/sub_08158754.c"
+  ],
+  "08610D88": [
+    "src/fn/sub_08158848.c"
+  ],
+  "08610E2C": [
+    "src/fn/sub_0816233C.c"
+  ],
+  "086141BC": [
+    "src/fn/sub_082003BC.c"
+  ],
+  "086149C4": [
+    "src/fn/sub_0813AF18.c",
+    "src/fn/sub_0813BE1C.c",
+    "src/fn/sub_08140CC4.c",
+    "src/fn/sub_081411B8.c",
+    "src/fn/sub_0814159C.c",
+    "src/fn/sub_08141738.c",
+    "src/fn/sub_08142194.c",
+    "src/fn/sub_08142AA0.c",
+    "src/fn/sub_081432DC.c",
+    "src/fn/sub_08143B54.c",
+    "src/fn/sub_08143ED0.c",
+    "src/fn/sub_08144408.c",
+    "src/fn/sub_08144624.c",
+    "src/fn/sub_081454E0.c",
+    "src/fn/sub_08145828.c",
+    "src/fn/sub_08145B18.c",
+    "src/fn/sub_08145DA0.c",
+    "src/fn/sub_08148914.c",
+    "src/fn/sub_081491E4.c",
+    "src/fn/sub_08149A14.c",
+    "src/fn/sub_0814A9D4.c",
+    "src/fn/sub_0814B1F8.c",
+    "src/fn/sub_0814C3A4.c",
+    "src/fn/sub_0814D264.c",
+    "src/fn/sub_0814E3D8.c",
+    "src/fn/sub_0814E990.c",
+    "src/fn/sub_0814EEE0.c",
+    "src/fn/sub_0814F328.c",
+    "src/fn/sub_08156DAC.c",
+    "src/fn/sub_0815788C.c",
+    "src/fn/sub_08157CFC.c",
+    "src/fn/sub_08158848.c",
+    "src/fn/sub_08159284.c",
+    "src/fn/sub_08160108.c",
+    "src/fn/sub_081608B0.c",
+    "src/fn/sub_08160EA4.c",
+    "src/fn/sub_081612C8.c",
+    "src/fn/sub_081616D0.c",
+    "src/fn/sub_08161AF4.c",
+    "src/fn/sub_08161F18.c",
+    "src/fn/sub_0816233C.c",
+    "src/fn/sub_082003BC.c",
+    "src/fn/sub_08200C94.c",
+    "src/fn/sub_08238110.c",
+    "src/fn/sub_08238300.c",
+    "src/fn/sub_08238814.c",
+    "src/fn/sub_0823B47C.c",
+    "src/fn/sub_0823B5D8.c",
+    "src/fn/sub_0823BE50.c",
+    "src/fn/sub_0823C930.c",
+    "src/fn/sub_0823D97C.c",
+    "src/fn/sub_0823DAB4.c",
+    "src/fn/sub_0823DDE4.c",
+    "src/fn/sub_0823DF20.c",
+    "src/fn/sub_0823E124.c",
+    "src/fn/sub_0823E250.c",
+    "src/fn/sub_0823E810.c",
+    "src/fn/sub_0823E998.c",
+    "src/fn/sub_0823EE80.c",
+    "src/fn/sub_0823F148.c",
+    "src/fn/sub_0823F56C.c",
+    "src/fn/sub_0823F928.c",
+    "src/fn/sub_08240200.c",
+    "src/fn/sub_08240408.c",
+    "src/fn/sub_08240708.c",
+    "src/fn/sub_08240978.c",
+    "src/fn/sub_08241504.c",
+    "src/fn/sub_08241BC4.c",
+    "src/fn/sub_08242120.c",
+    "src/fn/sub_0824261C.c",
+    "src/fn/sub_082429AC.c",
+    "src/fn/sub_08243090.c"
+  ],
+  "08E5FA6C": [
+    "src/fn/sub_0814D7F8.c",
+    "src/fn/sub_0814D8D8.c",
+    "src/fn/sub_0814D92C.c",
+    "src/fn/sub_0814D9C4.c"
+  ],
+  "08E6092C": [
+    "src/fn/sub_08159594.c",
+    "src/player_3.c"
+  ],
+  "08E60F4C": [
+    "src/fn/sub_0814A698.c",
+    "src/fn/sub_0814DCD0.c",
+    "src/player_3.c"
+  ],
+  "08E6290C": [
+    "src/fn/sub_0823C280.c"
+  ],
+  "08E87A10": [
+    "src/fn/sub_0824261C.c"
+  ],
+  "08E87A90": [
+    "src/fn/sub_082429AC.c"
+  ],
+  "08E87B0C": [
+    "src/fn/sub_08242EA4.c"
+  ]
+}

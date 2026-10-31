@@ -120,7 +120,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 15 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 16 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -228,7 +228,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-27.md](../docs/history/2026-10-27.md) | Work history: 2026-10-27 | #matching #ram #tooling | 1 |
 | [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29: matching search and the largest-function experiment | #compiler #ghoul #golem #matching #monsters #mummy #process #scene-actor #skeleton #tooling #vanargand | 7 |
 | [docs/history/2026-10-30.md](../docs/history/2026-10-30.md) | 2026-10-30: monster initializers and shared engine records | #bosses #compiler #cue #data #hresvelgr #matching #monsters #player #ram #ratatosk #scene-actors #scope-gap #structs #studio #tooling #vanargand | 8 |
-| [docs/history/2026-10-31.md](../docs/history/2026-10-31.md) | 2026-10-31 | #bosses #compiler #data #hresvelgr #matching #ratatosk #register-pinning #scene-actors #structs #studio #vanargand | 2 |
+| [docs/history/2026-10-31.md](../docs/history/2026-10-31.md) | 2026-10-31 | #bosses #cleanup #compiler #data #hresvelgr #matching #player #ratatosk #register-pinning #scene-actors #structs #studio #tooling #vanargand | 3 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
@@ -306,6 +306,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/far-branch-tails.md](../notes/far-branch-tails.md) | Far-branch tails: big functions that were split in pieces | #matching #tooling | 3 |
 | [notes/finish-bosses_2026-10-30.md](../notes/finish-bosses_2026-10-30.md) | Boss matching worker: Ratatosk, Vanargand and Hresvelgr | #matching #bosses #ratatosk #vanargand #hresvelgr #compiler | 9 |
 | [notes/finish-player-cue_2026-10-30.md](../notes/finish-player-cue_2026-10-30.md) | Player cue worker batch — 2026-10-30 | #matching #player #cue #compiler | 11 |
+| [notes/finish-player_2026-10-30.md](../notes/finish-player_2026-10-30.md) | Finish-player worker batch | #matching #player #compiler #structs #cleanup #data #studio | 12 |
 | [notes/finish-scene-actors-3_2026-10-30.md](../notes/finish-scene-actors-3_2026-10-30.md) | Finish scene actors, part 3 | #matching #scene-actors #compiler #scope-gap #register-pinning #structs #data #studio | 13 |
 | [notes/foundry-actor-route-behavior_2026-10-18.md](../notes/foundry-actor-route-behavior_2026-10-18.md) | Actor route and behavior foundry pass | #matching #foundry #scene-actor #route | 2 |
 | [notes/foundry-actor-stats-style_2026-10-18.md](../notes/foundry-actor-stats-style_2026-10-18.md) | Actor stats, preview palette and style foundry pass | #matching #foundry #actor-stats #scene-actor | 2 |

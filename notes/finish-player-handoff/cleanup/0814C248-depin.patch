@@ -1,0 +1,22 @@
+--- a/src/fn/sub_0814C248.c
++++ b/src/fn/sub_0814C248.c
+@@ -56,8 +56,8 @@
+ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
+ {
+     struct Player *p = arg;
+-    register s32 distance asm("sb") = 1960000;
+-    register struct MotionTarget *best asm("sl");
++    register s32 distance = 1960000;
++    register struct MotionTarget *best;
+     struct MotionTarget *entry;
+     if (!gSceneLinkList)
+         return 0;
+@@ -65,7 +65,7 @@
+     best = 0;
+     if (entry)
+         do {
+-            register u32 loadedFlags asm("r1") = entry->flags;
++            register u32 loadedFlags = entry->flags;
+             u32 disabled = loadedFlags & 1;
+             u32 flags = loadedFlags;
+             if (!disabled) {

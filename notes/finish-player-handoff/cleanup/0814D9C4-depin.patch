@@ -1,0 +1,11 @@
+--- a/src/fn/sub_0814D9C4.c
++++ b/src/fn/sub_0814D9C4.c
+@@ -114,7 +114,7 @@
+         }
+ 
+         case 3: {
+-            register u32 offset asm("r0") = p->comboIndex * sizeof(struct WeaponCuePhase);
++            register u32 offset = p->comboIndex * sizeof(struct WeaponCuePhase);
+             register const struct WeaponCuePhase *phase =
+                 (const struct WeaponCuePhase *)((u8 *)record->phases + offset);
+             if (!(p->timer)) {
