@@ -77,7 +77,7 @@ void SceneActors_UpdateEightDirectionTurn(ActorAnimation *p)
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;
     if (p->changed) {
-        register int sequence asm("r6");
+        int sequence;
         p->changed = 0;
         sequence = choose(p->mode, 38, 0);
         {
@@ -86,7 +86,7 @@ void SceneActors_UpdateEightDirectionTurn(ActorAnimation *p)
                                                      1, 1, 4);
         }
     } else {
-        register int sequence asm("r6") = choose(p->mode, 38, 0);
+        int sequence = choose(p->mode, 38, 0);
         {
             int offset = 0x240;
             SceneActors_StartEightDirectionAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
