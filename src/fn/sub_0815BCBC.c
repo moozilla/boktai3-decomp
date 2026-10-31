@@ -1,56 +1,39 @@
-#include "global.h"
-
-struct Vec {
-    s16 x, y, z, w;
-};
-
-struct P {
-    u8 filler[0x30];
-    struct Vec pos;
-    u8 filler1[0x3A4 - 0x38];
-    u8 dir;
-    u8 filler2[0x418 - 0x3A5];
-    u8 state;
-    u8 filler3[0x58C - 0x419];
-    void *fn;
-    u8 filler4[0x5A4 - 0x590];
-    u32 c;
-};
+#include "player.h"
 
 extern const s16 gUnk_086149C4[];
 
-void Player_EnterKindTwo(struct P *);
-void ActorSequence_Begin(struct P *, s32, s32);
+void Player_EnterKindTwo(struct Player *);
+void ActorSequence_Begin(struct Player *, s32, s32);
 void Sound_PlaySong(s32);
-void MovingSprite_Create_082375FC(struct Vec *, s32, s32, s32, s32, s32, s32);
-void Player_UpdateSixPhaseAction(void);
+void MovingSprite_Create_082375FC(struct SceneVec *, s32, s32, s32, s32, s32, s32);
+void Player_UpdateSixPhaseAction(struct Player *);
 
 static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 
-void PlayerCue_Shoot(struct P *p, s32 a, u32 c)
+void PlayerCue_Shoot(struct Player *p, s32 a, u32 c)
 {
-    struct Vec v;
+    struct SceneVec v;
     u32 angle;
     s32 id;
 
-    v = p->pos;
-    angle = ((p->dir + 5) & 7) << 5;
+    v = p->position;
+    angle = ((p->facing + 5) & 7) << 5;
     v.x += trunc12(gUnk_086149C4[(angle + 0x40) & 0xFF] * 150);
     v.y += 0xE6;
     v.z += trunc12(gUnk_086149C4[angle] * 150);
-    if (p->state == 6) {
+    if (p->actionMode == 6) {
         Sound_PlaySong(0x203);
         id = 0x51;
     } else {
         Sound_PlaySong(0xCD);
         id = 0x4B;
     }
-    MovingSprite_Create_082375FC(&v, id, 0, p->dir, 0x20, 0, a);
-    p->c = c;
+    MovingSprite_Create_082375FC(&v, id, 0, p->facing, 0x20, 0, a);
+    p->cueParameter = c;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 3, 2);
-    p->fn = Player_UpdateSixPhaseAction;
+    p->triggerAnimationCallback = Player_UpdateSixPhaseAction;
 }
