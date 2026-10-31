@@ -58,6 +58,13 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+* **Scene actor part 3 worker** (2026-10-30): eight reserved targets match in ordinary C,
+  including the recovered forward-floor neighbor inside 0812E118. Six guarded
+  drafts are improved or corrected; seven targets retain documented PRE,
+  crossjump or allocation blockers after a second pass. Per-unit stock checks
+  and renamed-caller checks pass. The worker branch awaits combined batch
+  integration and report regeneration. See the
+  [worker note](../notes/finish-scene-actors-3_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches
