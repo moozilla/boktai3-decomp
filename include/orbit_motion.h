@@ -1,3 +1,6 @@
+#ifndef GUARD_ORBIT_MOTION_H
+#define GUARD_ORBIT_MOTION_H
+
 #include "global.h"
 extern const s16 gSineTable[];
 struct OrbitVector {
@@ -48,3 +51,5 @@ static inline void add(struct OrbitVector *out, struct OrbitVector *a, struct Or
     out->y = b->y + a->y;
     out->z = b->z + a->z;
 }
+
+#endif
