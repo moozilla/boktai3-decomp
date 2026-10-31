@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 
 struct TimedEffectConfig {
@@ -28,11 +27,8 @@ struct TimedEffect {
     struct TimedEffectConfig config;
     struct ContactSwarmGraphics graphics;
     struct ContactSwarmSprite sprite;
-    struct {
-        u8 unk_00[0x5A];
-        u16 flags;
-        u8 unk_5C[0x164 - 0xB8 - 0x5C];
-    } collider;
+    struct ContactCollider colliders[2];
+    void *body;
     s32 lifetime;
     struct TimedEffectTail tail;
 };
@@ -67,9 +63,19 @@ static inline void Polar(struct ContactPosition *output, s32 direction, s32 spee
     output->y = zero;
     output->z = Scale(gUnk_086149C4[direction & 255] * speed);
 }
+static inline s32 TimedEffect_TurnSnapshot(struct TimedEffectManager *manager,
+                                           struct TimedEffect *entry, s32 index,
+                                           struct ContactPosition *velocity,
+                                           struct ContactPosition **saved)
+{
+    s32 status;
+    *saved = velocity;
+    status = TimedEffect_UpdateTerrainTurn(manager, entry, index, velocity);
+    return status;
+}
 #ifdef NONMATCHING
-// fuzzy: 88.9%
-// scope shape 10 (differences once low registers are set aside)
+// fuzzy: 86.5%
+// scope shape 16 (differences once low registers are set aside)
 s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
 {
     struct TimedEffect *entry = manager->entries;
@@ -84,9 +90,9 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
             if (manager->activeMask & (1 << i)) {
                 struct ContactSwarmSprite *sprite = &entry->sprite;
                 struct TimedEffectConfig *config = &entry->config;
-                void *collider;
+                struct ContactCollider *collider;
                 s32 status = sub_08249240(entry, (void *)i, cursor->config.callback);
-                collider = &entry->collider;
+                collider = &entry->colliders[0];
                 if (status == 2) {
                     TimedEffect_RemoveFromManager(manager, entry, i);
                     goto next;
@@ -110,7 +116,7 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
                         struct ContactPosition velocity;
                         struct ContactPosition *savedVelocity;
                         s32 type;
-                        asm("" : "+r"(tail));
+
                         tail->previous = *position;
                         sprite->position.x += cursor->velocity.x;
                         position->y += cursor->velocity.y;
@@ -119,9 +125,9 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
                         rollbackPosition = position;
                         if (type == 9 || type == 6)
                             sprite->position.y -= tail->elapsed;
-                        savedVelocity = &velocity;
-                        *savedVelocity = cursor->velocity;
-                        status = TimedEffect_UpdateTerrainTurn(manager, entry, i, savedVelocity);
+                        velocity = cursor->velocity;
+                        status =
+                            TimedEffect_TurnSnapshot(manager, entry, i, &velocity, &savedVelocity);
                         if (status <= 0) {
                             if (status == -1) {
                                 config->flags |= 0x20;
@@ -140,7 +146,7 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
                         }
                         tail->cooldown--;
                     }
-                    entry->collider.flags |= 4;
+                    entry->colliders[1].flags |= 4;
                     if (config->type != 9) {
                         u32 mask = 2;
                         if (cursor->flags & mask) {
@@ -159,7 +165,7 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
         next:
             i++;
             cursor++;
-            asm("" : "+r"(tail));
+
             tail = (void *)((u8 *)tail + sizeof(*entry));
             entry++;
         } while (i < manager->capacity);
