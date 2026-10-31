@@ -58,13 +58,14 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
-* **Boss worker batch** (2026-10-30): four of the fifteen reserved Ratatosk,
-  Vanargand and Hresvelgr functions match in ordinary C. The eleven remaining
-  guarded drafts have documented compiler blockers; all reserved units now
-  avoid register pins and assembly barriers. Per-unit checks pass on
-  `codex/finish-bosses`. The combined build, alias promotion and report
-  regeneration remain with the integrator. See the
-  [boss worker note](../notes/finish-bosses_2026-10-30.md).
+* **Boss worker continuation** (2026-10-31): ten of the fifteen reserved
+  Ratatosk, Vanargand and Hresvelgr functions match in ordinary C. Five guarded
+  drafts remain; the latest recovery draft also corrects the successful-state
+  byte. Work stopped at the owner's request to preserve the 20% quota reserve.
+  The requested broader pin-removal and struct/data/Studio cleanup remains open.
+  Per-unit checks and separate source commits are on `codex/finish-bosses`;
+  combined validation, alias promotion and progress reports remain with the
+  integrator. See the [boss worker note](../notes/finish-bosses_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches

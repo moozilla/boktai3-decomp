@@ -1,141 +1,109 @@
 # Boss matching worker: Ratatosk, Vanargand and Hresvelgr
 
-Tags: #matching #bosses #ratatosk #vanargand #hresvelgr #compiler #scope-gap
+Tags: #matching #bosses #ratatosk #vanargand #hresvelgr #compiler
 
-Four of the 15 assigned functions now match in ordinary C. Exact coverage of
-this queue increased from 0% to **20.8%, a gain of 20.8 percentage points**
-(3,956 of 19,000 bytes). Eleven functions remain guarded drafts. Every assigned
-translation unit now has ordinary C without register pins, assembly barriers,
-handwritten instructions or compiler overrides. Fuzzy scores below describe
-drafts and do not count as exact progress.
+**10 of the 15 assigned functions match in ordinary C.** Exact coverage of this
+queue is **66.5%, a gain of 66.5 percentage points** from the supplied base
+(12,640 of 19,000 bytes). The continuation added six matches and **45.7
+percentage points** beyond the first pass. Five functions remain guarded drafts;
+fuzzy similarity is not exact progress.
 
-Work is on `codex/finish-bosses`, based on `a8c44f25d`, with one source commit per
-function. All targets received an initial pass in ROM order; the closest
-blockers received independent second passes. Quota remained above the brief's
-50% stopping threshold. No combined build, push or PR was performed; integration
-and aggregate report regeneration remain with the integrator.
+Work stopped at the owner's request to preserve at least 20% weekly quota.
+The last matching-worker readings were 22% remaining. The earlier 50% floor was
+explicitly waived. The requested ordinary-C restriction remained in force:
+no new register pins, barriers, handwritten instruction bodies or compiler
+overrides were accepted. All fifteen assigned C implementations are free of
+those concessions. Broader subsection cleanup remains unfinished.
+
+Branch: `codex/finish-bosses`, based on `a8c44f25d`. Each source commit changes
+one translation unit. Exact matches remove their guards; unfinished C remains
+behind `#ifdef NONMATCHING` with the original assembly fallback.
 
 | Address | Function | ROM bytes | Result | Deciding source property |
 |---|---|---:|---|---|
-| 081A4AB4 | `Hresvelgr_EmitImpactExplosions` | 204 | Guarded, 70.0%; barriers removed | Canonical `ContactPosition` and the masked signed Z offset recover the operations. The RNG table still loses allocation priority to the position pointer. |
-| 081AA788 | `Vanargand_UpdateSweepingProjectileAttack` | 1,672 | Guarded, 87.3% (was 29.1%) | Preserve the timer snapshot before calls, signed span division, separate vector stack objects, pool-owner lifetime and field-based selected-collider arithmetic. RNG allocation and two coordinate lifetimes remain wrong. |
-| 081ABA64 | `Vanargand_UpdateChargeSequence` | 3,824 | Guarded, 75.6% (was 34.0%) | Correct phase completion gates, signed rounding and separate coordinate/workspace records restore the frame. CSE's owner-pointer takeover still changes the main register roles. |
-| 081B0248 | `Vanargand_SpawnPartEmergenceEffects` | 376 | Guarded, 98.9% (was 87.8%) | Reuse one work value for the RNG address and radius remainder. CSE then retargets the subtraction and deletes one copy that the ROM retains; two instructions still differ. |
-| 081B03C0 | `PairedSceneActor_UpdatePlayerCapture` | 1,272 | **Exact** | Shared entry values, mask-first player-flag testing, a typed motion track and a typed sequence owner preserve value lifetimes and argument evaluation. |
-| 081B18C8 | `ActorStatus_UpdateRisingStrike` | 712 | **Exact** | Inline state setting avoids a retained state-field address; one function-scope motion pointer reused across phases naturally takes the required register. |
-| 081B2F38 | `Vanargand_UpdatePartOffsetStrike` | 1,240 | **Exact** | Signed Z coordinates, a shared entry zero, typed `MotionTrack` access and named anchor/angle quantities reproduce the ROM's lifetimes. |
-| 081B4040 | `Vanargand_EmitRadialPartEffects` | 732 | **Exact** | Canonical `ZeroFill8`, one entry pointer shared by reset and phase initialization, and the vector Z operand order restore the target instructions. |
-| 081B431C | `Vanargand_UpdatePartImpact` | 1,128 | Guarded, 97.1% (was 91.3%) | Typed sequence completion, vector evaluation order and a shared completion value recover the instruction structure. A zero extended from a vector halfword changes inherited reload rotation. |
-| 081F3C68 | `Ratatosk_UpdateRadialSummonAttack` | 1,308 | Guarded, 71.4%; four pins removed | Canonical vectors and a verified 32-byte spawn config retain the behavior. The owner must spill while spawn/delta/pattern take different global register roles. The pinned baseline scored 81.3%. |
-| 081F4CF8 | `Ratatosk_UpdateDefeatSequence` | 1,064 | Guarded, 92.4% (was 90.1%) | Canonical particle position, the actual configurator signature and capturing `atan2` before the velocity address repair call order. RNG speed and byte-angle values still receive different spill treatment. |
-| 081F5290 | `Ratatosk_UpdateKnockbackRecovery` | 800 | Guarded, 63.6%; concessions removed | Canonical body/motion access and the actual particle prototype preserve the ordinary source. The owner alias and particle drift block the desired owner register; tick takes a low register instead of a high one. The constrained baseline scored 71.8%. |
-| 081F7FD0 | `Ratatosk_UpdatePlayerOrbitAttack` | 1,300 | Guarded, 93.0% (was 86.5%) | Separate vector values restore first-coordinate address materialization. Capture pointers after player-position calls, preserve signed byte comparison and canonical clear-call evaluation. RNG-table allocation and two reload rotations remain. |
-| 081FAE0C | `Ratatosk_InitializeFromScript` | 2,428 | Guarded, 84.4% (was 53.0%) | Typed actor-prefix setters/getter, whole path records and a shared palette-source variable restore the frame and pointer roles. Shared default constants still prevent the ROM's rematerialization and tail merge. |
-| 081FC26C | `Ratatosk_SpawnAnimatedParticle` | 940 | Guarded, 92.0% (was 79.2%) | Draw the particle kind before testing it, keep branch-local kind stores, use canonical velocity/sequence records and preserve the hidden halfword zero. A dead copy, RNG allocation and reload differences remain. |
+| 081A4AB4 | `Hresvelgr_EmitImpactExplosions` | 204 | **Exact** | Canonical sample-read operations, captured table/cursor, and one named minimum offset recover the table priority and invariant lifetime. |
+| 081AA788 | `Vanargand_UpdateSweepingProjectileAttack` | 1,672 | **Exact** | Separate slot, selected and alternate indices; typed body/contact records; signed span operands and explicit RNG quantities recover the real value boundaries. |
+| 081ABA64 | `Vanargand_UpdateChargeSequence` | 3,824 | **Exact** | Scoped animation inputs, typed motion/animation parts, projection operand lifetimes, branch-local palette zeros and one completion/tick path. The return flash window is correctly timer <= 6. |
+| 081B0248 | `Vanargand_SpawnPartEmergenceEffects` | 376 | **Exact** | Captured table/cursor and canonical sample reads preserve the first signed remainder and second independent draw without deleting the required copy. |
+| 081B03C0 | `PairedSceneActor_UpdatePlayerCapture` | 1,272 | **Exact** | Shared entry values, mask-first player-flag testing, typed motion and a typed sequence owner preserve lifetimes and argument evaluation. |
+| 081B18C8 | `ActorStatus_UpdateRisingStrike` | 712 | **Exact** | Inline state setting avoids a retained field address; one motion pointer is reused across phases. |
+| 081B2F38 | `Vanargand_UpdatePartOffsetStrike` | 1,240 | **Exact** | Signed Z, a shared entry zero, typed motion and named anchor/angle quantities. |
+| 081B4040 | `Vanargand_EmitRadialPartEffects` | 732 | **Exact** | Canonical ZeroFill8, one shared entry pointer and vector Z operand order. |
+| 081B431C | `Vanargand_UpdatePartImpact` | 1,128 | Guarded, **99.8%** | Canonical motion/owner fields and a captured position/count recover all registers. One MOV count remains before the signed type load instead of after it. |
+| 081F3C68 | `Ratatosk_UpdateRadialSummonAttack` | 1,308 | **Exact** | Adjacent vector workspace, an early derived cursor and late direct address, plus a confined two-word position copy, prevent the erroneous PRE/loop address merge. |
+| 081F4CF8 | `Ratatosk_UpdateDefeatSequence` | 1,064 | Guarded, **99.4%** | Shared byte angle, radius and word work values recover every register and spill. Three Y-address instructions remain different; four bytes differ. Canonical body and typed particle parameters retained. |
+| 081F5290 | `Ratatosk_UpdateKnockbackRecovery` | 800 | Guarded, **78.7%** | Entry masks/table/cursor and a two-byte ROM sample record restore RNG stores/rematerialization. Corrected successful recovery to write finished at +0xAF, rather than nextState at +0xAD. Scalar lifetimes still differ. |
+| 081F7FD0 | `Ratatosk_UpdatePlayerOrbitAttack` | 1,300 | **Exact** | The canonical fixed RAM table address in all three reads recovers the table register and both later reload rotations. Separate vector values and capture order remain essential. |
+| 081FAE0C | `Ratatosk_InitializeFromScript` | 2,428 | Guarded, **84.4%** | Typed prefix operations, whole path records and shared palette source recover most structure. Default constant reuse, tail sharing and later camera/PRE ordering still need source recovery. |
+| 081FC26C | `Ratatosk_SpawnAnimatedParticle` | 940 | Guarded, **99.6%** | Typed selected-drawable output, separate static draw pointers and captured frame index restore all other instructions/registers. One target copy is absent; draft alignment supplies a NOP. |
 
-Names newly inferred from behavior are tentative (`confidence=low`). Existing
-symbol names are retained; new descriptive spellings use the repository's
-worker-local alias convention. The integrator can promote those aliases with
-`tools/promote_names.py` before regenerating labels and building the batch.
+Names inferred from behavior remain tentative. Existing symbols are retained;
+new descriptive spellings use the repository's worker-local aliases. Alias
+promotion and report regeneration remain with batch integration.
 
-## Verification and source review
+## Verification
 
-The four exact functions passed independent stock `tools/check.py` checks with
-zero differing bytes, including their final readability cleanup. Their complete
-guards and assembly fallbacks were removed. Independent source review checked
-the sequence, motion, anchor, state, entry and timer field offsets, signedness
-and helper argument order.
+All ten exact functions passed independent stock compiler checks over their
+reviewed extents with zero differing bytes. Matchsearch landing formatted and
+verified the active ordinary definitions. Every newly retained guarded draft
+was checked with `--nonmatching --record`; default per-unit checks confirm its
+assembly fallback still matches. The initializer's retained source was not
+changed during this continuation because no reviewed improvement superseded it.
 
-Each remaining draft was checked with `--nonmatching --record`; its expected
-mismatch remains behind `#ifdef NONMATCHING`. Default per-unit checks passed for
-the fallback units. The lower scores at 081F3C68 and 081F5290 are deliberate:
-the retained alternatives remove the preexisting register concessions and obey
-the brief's ordinary-C requirement. Hresvelgr's small fuzzy decrease likewise
-removes its two empty assembly barriers. None of these changes adds exact bytes.
+Final continuation checkpoints:
 
-Only the assigned source units and work-record documents are committed. Shared
-headers, tools, generated assembly, the ROM and PROGRESS reports are unchanged.
-The integrator must run one combined build and require `build/boktai3.gba: OK`
-before merging the batch, then regenerate both aggregate progress files.
+| Function | Stock check artifacts | Commit |
+|---|---|---|
+| 081B0248 exact | `build/check/run-upnggsrj` | `f4f770723` |
+| 081A4AB4 exact | `build/check/run-60tpygnl` | `e722834d3` |
+| 081AA788 exact | `build/check/run-jto1zdhc` | `911303b09` |
+| 081F7FD0 exact | `build/check/run-dkhv9sg2` | `7ee471a59` |
+| 081ABA64 exact | `build/check/run-h8guqhxq` | `9980daeac` |
+| 081F3C68 exact | `build/check/run-1q5sfffi` | `cb3ac8cd1` |
+| 081B431C guarded | `build/check/run-ldfxawxt` | `0e3bbe312` |
+| 081FC26C guarded | `build/check/run-j8r9mniv` | `b8e7038da` |
+| 081F4CF8 guarded | `build/check/run-hxr7knib` | `a063d9c96` |
+| 081F5290 guarded | `build/check/run-_v0xxl4w` | `1ce372a67` |
 
-## Remaining work and evidence
+The requested tooling commit `02f36efc6` was cherry-picked as `3d91a28a9`.
+It fixes current-name fallback in check.py and long matchsearch socket paths.
+No ROM, generated assembly or emulator data was committed. No push, PR or full
+build was performed. Integration must run the complete combined build and require
+`build/boktai3.gba: OK`, then regenerate both PROGRESS reports. Those reports
+remain unchanged in this worker branch.
 
-Persistent candidates, compiler traces and search graphs remain under
-`build/matchsearch/<function>/` in this worktree. They are local working
-artifacts, not committed generated outputs. Each function's subtree contains a
-`REPORT.md`, at its root or under `review/` or `independent/`.
-Use the raw inventory name for matchsearch sessions where a descriptive alias
-is not yet in the registry, and `--local` when the checkout path exceeds the
-Unix-domain socket limit. All commands below use `build/venv/bin/python`.
+## Resume matching, then cleanup
 
-The nearest continuation points are:
+The five guarded functions remain work to finish. They are not closed as
+compiler blockers. Persistent candidates and traces are local ignored artifacts
+under `build/matchsearch/`; use `build/venv/bin/python` for tooling.
 
-* **081B0248:** `final-draft.c` has only two differing instructions. On the
-  clearer `typed-rem-offset.c`, `AGBCC_PRI=140:+1143` gives a diagnostic exact
-  match: table pseudo 140 has priority 2608, behind mask priority 3750, and must
-  allocate first. Reusing the work value achieves that priority in stock C but
-  lets CSE delete the required copy. `CSE_KEEP=158` restores the copy while
-  losing the allocation benefit. Two independent passes tested source
-  lifetimes, types and canonical helper forms without satisfying both.
-* **081B431C:** the retained draft has the same instruction structure and
-  length. `AGBCC_SPILL=34:1` is an exact diagnostic. A halfword zero in the
-  success-point addition becomes an SI subregister, survives the burst call
-  and is reused for the timer clear; that alters the reload stream. Field,
-  array, union, helper and narrow-value alternatives did not reproduce it.
-* **081F7FD0:** on `v10.c` (same bytes as the retained best),
-  `AGBCC_SPILL=27:3,39:1 AGBCC_FORCE=224:3` is an exact diagnostic. The
-  remaining differences are the first RNG table's local register and two
-  inherited reload rotations. These knobs are absent from the source.
-* **081A4AB4:** on `review/best.c`, `AGBCC_PRI=table:+2133` is an exact
-  diagnostic. The table's adjusted lifetime makes its priority 2222 versus
-  the position pointer's 4354. Ordinary reuse, lifetime, table qualification
-  and shared-helper alternatives did not recover the required order.
+* **081B431C:** `Vanargand_UpdatePartImpact/resume/WORKING.md` and
+  `fresh/WORKING.md`. The clean shaped baseline is exact under diagnostic
+  `AGBCC_SPILL=34:1`; the retained ordinary candidate has one count/load order
+  difference. Scalar setter and field-mode variants did not close it.
+* **081F4CF8:** `Ratatosk_UpdateDefeatSequence/resume/WORKING.md` and `NOTES.md`.
+  The remaining Y access retains a cached pointer while ROM uses a fresh SP
+  address. X originates as zero-offset ADDRESSOF of a DI object. Additional
+  workspace/copy attempts changed storage and were not selected.
+* **081F5290:** `sub_081F5290/fresh/WORKING.md`, plus `resume/WORKING.md`.
+  Owner, tick and RNG roles improved; particle speed/flags, heading scheduling,
+  decay pointer copies and the staged position pointer still need recovery.
+  The +0xAF semantic correction is committed.
+* **081FAE0C:** `sub_081FAE0C/REPORT.md` and `resume/WORKING.md`. A shared pending
+  halfword value/address recovers constant rematerialization but changes operand
+  roles. The named-camera hypothesis has a separately proved PRE slot-order
+  issue. No exact candidate emerged from the bounded targeted permuter run.
+* **081FC26C:** `sub_081FC26C/resume/WORKING.md`. The missing copy has no current
+  RTL counterpart. A consumer deleted only during late jump cleanup is a
+  plausible source; that provenance is unproved. Do not insert an instruction
+  body or artificial enforcement operation to fill it.
 
-The larger unresolved source decisions are:
+After all fifteen match, resume the requested broader pin-removal review,
+shared boss structs/headers and data/Studio unification. Existing canonical
+body, motion, position and sequence records have been reused in the functions
+worked here, but that does not complete subsection-wide cleanup.
 
-* **081AA788:** the shifted RNG sample straddles local/global allocation,
-  table and cursor assignments diverge, and the two origin halfwords take
-  opposite high/low register roles. Selected-collider arithmetic also has two
-  additions in the wrong order. No whole-function isolated proof exists.
-* **081ABA64:** `CSE_NOCANON=1060` recovers the main owner roles, but other
-  differences remain. The repaired completion gates and frame are retained;
-  a different shared draw/sequence form improved structure while regressing
-  overall correspondence and was rejected.
-* **081F3C68 / 081F5290:** neither has a complete exact counterfactual.
-  Multiple forced register choices repair some roles but leave substantial
-  instruction differences. Recover the owner/alias and polar/RNG value
-  lifetimes before investigating stack-slot permutations.
-* **081F4CF8:** the ROM's byte-angle stack word is an ordinary spill, not a
-  caller-save inserted spill. Raising the RNG speed's priority moves it to
-  the expected register but delays the angle spill and changes its slot.
-  Aggregate forcing changes frame order instead of recovering the mechanism.
-* **081FAE0C:** constant 30 (pseudo 284, priority 3846) is held in one register
-  across default halfword stores; the ROM rematerializes it and shares the
-  last store between branches. `AGBCC_FORCE=284:0` repairs the first tail
-  merge only. A separate typed-camera hypothesis is preserved in `v23.c`;
-  diagnostic `AGBCC_GCSE_T=491` restores its early PRE slots but does not
-  match the function. The interrupted bounded allocator search completed
-  depth one (3,853 compiles) without an exact result; depth two was not
-  completed, so it is not an exhaustion proof.
-* **081FC26C:** the old uninitialized kind read is repaired. The remaining
-  dead copy can be induced by returning a sprite pointer from the sequence
-  helper, but that changes other allocations. No complete exact diagnostic
-  exists. The selected canonical records avoid the invalid packed/union
-  layouts among rejected scratch experiments.
-
-## Scope gaps encountered
-
-`why` sometimes explains a register based on an alignment that loses a
-low-to-high copy or mistakes an ordinary spill for caller-save insertion.
-Trace the physical value across the call before accepting that explanation.
-The local/global obstruction of RNG values currently needs several separate
-queries; it does not yet identify a source partition that reverses allocation.
-Constant-origin mapping can report unknown, and inherited reload history needs
-to be reconstructed across earlier vector operations.
-
-Small DI-mode vector locals become stack addresses only during `addressof`,
-after PRE; putting the same coordinates inside an aggregate can therefore
-change address rematerialization without changing their source values. PRE
-hash/slot permutations should be investigated only after physical instruction
-structure and the actual value lifetimes agree. No tool changes were made in
-this worker batch.
+The most useful tooling follow-ups are tracing mixed ADDRESSOF/frame origins
+through CSE/PRE/loop, explaining copies whose consumer disappears after reload,
+and exposing constant-mode/local-allocation boundaries across inlined helpers.
