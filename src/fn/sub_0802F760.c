@@ -120,8 +120,7 @@ static inline u32 AnimFlags(u8 *p)
 }
 static inline struct Motion *MotionOf(u8 *p)
 {
-    register struct Motion *v asm("r6") = (void *)P(p, 0x5C);
-    asm("" ::"r"(v));
+    struct Motion *v = (void *)P(p, 0x5C);
     return v;
 }
 
