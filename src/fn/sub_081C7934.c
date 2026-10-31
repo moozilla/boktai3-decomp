@@ -11,6 +11,22 @@ struct S {
     u8 g[0xd4 - 0xa];
     u8 d4[1];
 };
+/* Local copy of SceneActorTerrain_GetHeight. */
+static inline s32 StateActor_GetTerrainHeight(s32 cell, const struct ContactPosition *position)
+{
+    register u32 attributes asm("r1") = *SceneActorTerrain_GetCell(cell);
+    u32 kind = attributes >> 4;
+    s32 height = (attributes & 15) << 8;
+    switch (kind) {
+        case 1:
+            height -= ((const u8 *)position)[4];
+            break;
+        case 2:
+            height -= ((const u8 *)position)[0];
+            break;
+    }
+    return height;
+}
 #define H(o)  (*(u16 *)((u8 *)p + (o)))
 #define SH(o) (*(s16 *)((u8 *)p + (o)))
 #define DW(o) (*(s32 *)((u8 *)p + (o)))
@@ -72,7 +88,7 @@ void StateActor_UpdateAnimation16State(u32 a, struct S *p)
         pos = (struct ContactPosition *)((u8 *)p + 0x68);
         {
             s32 cell = SceneActorTerrain_GetCellIndex(pos);
-            s32 height = SceneActorTerrain_GetHeight(cell, pos);
+            s32 height = StateActor_GetTerrainHeight(cell, pos);
 
             if (SH(0x6a) <= height) {
                 SH(0x6a) = height;
