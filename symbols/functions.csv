@@ -5014,6 +5014,7 @@ addr,name,mode,confidence,source,notes
 08130BA0,SceneActor_DispatchActivePhase,thumb,low,src-alias,
 08130BD4,SceneActorRoute_UpdateTimedPhase,thumb,low,src-alias,
 08130E60,SceneActorRoute_UpdateWaitPhase,thumb,low,src-alias,
+081314E8,SceneActorRoute_UpdateContactRecovery,thumb,low,src-alias,Tentative: selects contact-recovery route phases and reinstalls the entry controller
 08131820,SceneActorControl_UpdateRouteApproach,thumb,low,src-alias,
 08131BC4,SceneActorBehavior_DispatchOrEnterState2,thumb,low,src-alias,
 08131C48,SceneActorBehavior_DispatchAlternateOrEnterState2,thumb,low,src-alias,
