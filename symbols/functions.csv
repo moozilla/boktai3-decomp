@@ -6085,6 +6085,9 @@ addr,name,mode,confidence,source,notes
 081745DC,SceneHud_RefreshEquipmentPreview,thumb,low,src-alias,Refreshes the selected equipment graphic and message-window setup
 08174684,SceneHud_RefreshEquipmentValues,thumb,low,src-alias,Tentative: redraw equipment values and highlight a changed slot-zero value
 081748B8,InventoryGrid_GetSlotPosition,thumb,low,src-alias,
+08174930,SceneHud_RefreshEquipmentAvailability,thumb,low,src-alias,Tentative: refresh equipment icons and level-availability palettes
+08174A44,SceneHud_ConfigureEquipmentTransfer,thumb,low,src-alias,Tentative: configure an equipment icon transfer between grid slots
+08174AD8,SceneHud_GetEquipmentActionFlags,thumb,low,src-alias,Tentative: compute equipped-slot and action-category availability bits
 08174B8C,Presentation_DrawEntryCount,thumb,low,src-alias,
 08174BBC,Presentation_SetAmountGlyphRows,thumb,low,src-alias,Shows and positions three rows of three amount glyphs; then redraws the entry count.
 08174C2C,InventoryGrid_UpdateStatPreview,thumb,low,src-alias,
