@@ -21,33 +21,33 @@ struct PaletteFade {
 s32 Div(s32, s32);
 
 #ifdef NONMATCHING
-// fuzzy: 86.2%
-// scope shape 20 (differences once low registers are set aside)
+// fuzzy: 93.9%
 void sub_08111578(struct PaletteFade *p)
 {
-    s32 fromOffset = p->slot * 16;
-    u16 *fromBase = &((u16(*)[16])gBgPaletteBuffer)[0][0];
+    s32 fromOffset = p->slot * 32;
+    u8 *fromBase = (u8 *)gBgPaletteBuffer;
     u16 *from;
-    u16 *targets = p->targets;
-    u16 *to = targets + p->target * 16;
+    u16 *to = p->targets;
     s32 i;
+    to += p->target * 16;
     p->remainingFrames = p->duration;
     for (i = 0; i < 16; i++) {
         u32 t;
+        u32 mask;
         u32 f;
         u16 tr, fr, sr;
         p->deltaR[p->slot][i] =
-            (t = to[i], tr = 31, tr &= t, f = *(from = (u16 *)(fromBase + fromOffset)), fr = 31,
-             fr &= f, (tr - fr) << 24);
-        p->deltaG[p->slot][i] = ((((t << 16) >> 21) & 31) - (((f << 16) >> 21) & 31)) << 24;
-        p->deltaB[p->slot][i] = ((((t << 16) >> 26) & 31) - (((f << 16) >> 26) & 31)) << 24;
+            (t = to[i], tr = 31, tr &= t, f = *(from = (u16 *)(fromBase + (fromOffset + i * 2))),
+             fr = 31, fr &= f, (tr - fr) << 24);
+        mask = 31;
+        p->deltaG[p->slot][i] = ((((t << 16) >> 21) & mask) - (((f << 16) >> 21) & mask)) << 24;
+        p->deltaB[p->slot][i] = ((((t << 16) >> 26) & mask) - (((f << 16) >> 26) & mask)) << 24;
         p->deltaR[p->slot][i] = Div(p->deltaR[p->slot][i], p->duration);
         p->deltaG[p->slot][i] = Div(p->deltaG[p->slot][i], p->duration);
         p->deltaB[p->slot][i] = Div(p->deltaB[p->slot][i], p->duration);
         p->red[p->slot][i] = (f = *from, sr = 31, sr &= f, sr << 24);
-        p->green[p->slot][i] = (((f << 16) >> 21) & 31) << 24;
-        p->blue[p->slot][i] = (((f << 16) >> 26) & 31) << 24;
-        fromOffset++;
+        p->green[p->slot][i] = (((f << 16) >> 21) & mask) << 24;
+        p->blue[p->slot][i] = (((f << 16) >> 26) & mask) << 24;
     }
     if (p->remainingTargets >= 0) {
         p->remainingTargets--;
