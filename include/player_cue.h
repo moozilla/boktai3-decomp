@@ -90,11 +90,6 @@ struct PlayerCueCoordinates {
 #define PlayerCue_Messages(player)    ((struct PlayerCueMessages *)(player))
 #define PlayerCue_Coordinates(player) ((struct PlayerCueCoordinates *)(player))
 
-/* The alternate-position slot includes the following halfword of padding. */
-#define PlayerCue_AlternatePosition(player) ((struct SceneVec *)(player)->alternatePosition)
-#define PlayerCue_AlignedDestination(player)                                                       \
-    ((struct ContactPosition *)&PlayerCue_Motion(player)->destination)
-
 typedef char PlayerCueGraphicsSizeCheck[(sizeof(struct PlayerCueGraphics) == 0x4EC) ? 1 : -1];
 typedef char PlayerCueAuxiliarySizeCheck[(sizeof(struct PlayerCueAuxiliary) == 0x230) ? 1 : -1];
 typedef char PlayerCueMotionSizeCheck[(sizeof(struct PlayerCueMotion) == 0xAE8) ? 1 : -1];
