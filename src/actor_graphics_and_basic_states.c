@@ -339,18 +339,18 @@ typedef struct ActorAnimation {
 
 static inline void setFacing(ActorAnimation *p, int angle)
 {
+    int shifted;
     u32 value;
-    register int shifted asm("r0");
     p->angle = angle;
     shifted = p->angle + 0x60;
-    asm("" : "+r"(shifted));
     shifted >>= 6;
-    value = 3 & shifted;
+    value = 3;
+    value &= shifted;
     p->facing = value;
     shifted = p->angle + 0x70;
-    asm("" : "+r"(shifted));
     shifted >>= 5;
-    value = 7 & shifted;
+    value = 7;
+    value &= shifted;
     p->facing8 = value;
 }
 
