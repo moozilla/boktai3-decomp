@@ -4,9 +4,7 @@
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
 #define SceneParticle_CreateAnchoredRanges sub_08068500
 #ifdef NONMATCHING
-// fuzzy: 76.9%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining: packed velocity temporaries, loop and pointer/register lifetimes.
+// fuzzy: 82.3%
 struct SceneParticleSlot *SceneParticle_AllocateSlot(struct SceneParticlePool *);
 s32 Mod(s32, s32);
 void ParticleSprite_Initialize(void *, const void *, u32);
@@ -23,6 +21,7 @@ s32 SceneParticle_CreateAnchoredRanges(const struct ContactPosition *position,
                                        u32 priority)
 {
     struct SceneParticlePool *pool;
+    struct SceneParticleEffect *effect;
     s32 i;
     const u16 *table;
     if (!position)
@@ -31,59 +30,59 @@ s32 SceneParticle_CreateAnchoredRanges(const struct ContactPosition *position,
     if (!pool)
         return -1;
     i = 0;
-    table = gRandomTable;
-    for (; i < count; i++) {
-        struct SceneParticleSlot *p = SceneParticle_AllocateSlot(pool);
-        struct SceneParticleEffect *effect;
-        if (!p)
-            return -1;
-        effect = &pool->effects[p->index];
-        {
-            typeof(p->anchor) *q1 = &p->anchor;
-            u8 z1 = 0;
-            *q1 = position;
-            if (!offset) {
-                p->offset.x = 0;
-                p->offset.y = 0;
-                p->offset.z = 0;
-            } else
-                p->offset = *offset;
-            if (jitter) {
-                if (jitter->x)
-                    p->offset.x += Mod(Random(table), jitter->x * 2) - jitter->x;
-                if (jitter->y)
-                    p->offset.y += Mod(Random(table), jitter->y * 2) - jitter->y;
-                if (jitter->z)
-                    p->offset.z += Mod(Random(table), jitter->z * 2) - jitter->z;
+    if (i < count) {
+        table = gRandomTable;
+        do {
+            struct SceneParticleSlot *p = SceneParticle_AllocateSlot(pool);
+            if (!p)
+                return -1;
+            effect = &pool->effects[p->index];
+            {
+                typeof(p->anchor) *q1 = &p->anchor;
+                *q1 = position;
+                if (!offset) {
+                    p->offset.x = 0;
+                    p->offset.y = 0;
+                    p->offset.z = 0;
+                } else
+                    p->offset = *offset;
+                if (jitter) {
+                    if (jitter->x)
+                        p->offset.x += Mod(Random(table), jitter->x * 2) - jitter->x;
+                    if (jitter->y)
+                        p->offset.y += Mod(Random(table), jitter->y * 2) - jitter->y;
+                    if (jitter->z)
+                        p->offset.z += Mod(Random(table), jitter->z * 2) - jitter->z;
+                }
+                if (!velocity) {
+                    p->velocity.x = 0;
+                    p->velocity.y = 0;
+                    p->velocity.z = 0;
+                } else {
+                    struct ContactPosition value;
+                    if (!velocity->x)
+                        value.x = 0;
+                    else
+                        value.x = Mod(Random(table), velocity->x);
+                    if (!velocity->y)
+                        value.y = 0;
+                    else
+                        value.y = Mod(Random(table), velocity->y);
+                    if (!velocity->z)
+                        value.z = 0;
+                    else
+                        value.z = Mod(Random(table), velocity->z);
+                    p->velocity = value;
+                }
+                p->delay = 0;
+                ParticleSprite_Initialize(effect, pool->graphicsResource, 0);
+                Effect_SetOrigin(effect, -8, -8);
+                Anim_SetSequence(&pool->sequences[p->index], pool->sequenceResource, 12, 0, 0);
+                effect->flags |= 1;
+                effect->priority = priority;
+                p->state = 1;
             }
-            if (!velocity) {
-                p->velocity.x = 0;
-                p->velocity.y = 0;
-                p->velocity.z = 0;
-            } else {
-                struct ContactPackedVector value;
-                if (!velocity->x)
-                    value.x = 0;
-                else
-                    value.x = Mod(Random(table), velocity->x);
-                if (!velocity->y)
-                    value.y = 0;
-                else
-                    value.y = Mod(Random(table), velocity->y);
-                if (!velocity->z)
-                    value.z = 0;
-                else
-                    value.z = Mod(Random(table), velocity->z);
-                *((struct ContactPackedVector *)(&p->velocity)) = value;
-            }
-            p->delay = z1;
-            ParticleSprite_Initialize(effect, pool->graphicsResource, 0);
-            Effect_SetOrigin(effect, -8, -8);
-            Anim_SetSequence(&pool->sequences[p->index], pool->sequenceResource, 12, 0, 0);
-            effect->flags |= 1;
-            effect->priority = priority;
-            p->state = 1;
-        }
+        } while (++i < count);
     }
 
     return 0;
