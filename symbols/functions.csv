@@ -6082,7 +6082,8 @@ addr,name,mode,confidence,source,notes
 081744AC,Presentation_ApplyGraphicSettings,thumb,low,src-alias,
 08174578,Presentation_ApplyPackedGraphicData,thumb,low,src-alias,
 08174594,Presentation_SelectGraphicResource,thumb,low,src-alias,
-081745DC,SceneHud_RefreshEquipmentPreview,thumb,low,src-alias,Refreshes the selected equipment graphic and message-window setup; its 168-byte routine is exact; but the 732-byte inventory extent includes another routine at 08174684.
+081745DC,SceneHud_RefreshEquipmentPreview,thumb,low,src-alias,Refreshes the selected equipment graphic and message-window setup
+08174684,SceneHud_RefreshEquipmentValues,thumb,low,src-alias,Tentative: redraw equipment values and highlight a changed slot-zero value
 081748B8,InventoryGrid_GetSlotPosition,thumb,low,src-alias,
 08174B8C,Presentation_DrawEntryCount,thumb,low,src-alias,
 08174BBC,Presentation_SetAmountGlyphRows,thumb,low,src-alias,Shows and positions three rows of three amount glyphs; then redraws the entry count.
