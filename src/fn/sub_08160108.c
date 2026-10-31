@@ -2,8 +2,6 @@
 #include "engine_globals.h"
 #include "ram.h"
 #include "player.h"
-#ifdef NONMATCHING
-// fuzzy: 73.1%
 struct BurstPosition {
     u16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -33,16 +31,27 @@ void ParticleSprite_Initialize(void *, void *, s32);
 void Effect_SetOrigin(void *, s32, s32);
 void Effect_SetPalette(void *, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
+#define BURST_READ_SAMPLE(out, table, offset)                                                      \
+    do {                                                                                           \
+        (out) = *(const u16 *)((offset) + (u32)(table));                                           \
+    } while (0)
 static inline s32 RandomValue(const u16 *table, u32 *index, u32 mask)
 {
     u32 offset;
+    u32 result;
     *index = (*index + 1) & mask;
     offset = *index * 2;
-    return *(const u16 *)(offset + (u32)table);
+    BURST_READ_SAMPLE(result, table, offset);
+    return result;
 }
+struct RandomCursorBits {
+    u32 index : 10;
+};
 static inline u32 RandomByte(const u16 *table)
 {
-    gRandomIndex = (gRandomIndex + 1) & 1023;
+    struct RandomCursorBits cursor;
+    cursor.index = gRandomIndex + 1;
+    gRandomIndex = cursor.index;
     return (u8)table[gRandomIndex];
 }
 static inline s32 Truncate(s32 value)
@@ -75,7 +84,8 @@ void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
     index = &gRandomIndex;
     mask = 1023;
     for (; i <= 15; i++) {
-        const s16 *angles;
+        const s16 *cosineTable;
+        const s16 *sineTable;
         ParticleSprite_Initialize(particle, *sheet, 0);
         Effect_SetOrigin(particle, -4, -4);
         Effect_SetPalette(particle, 1);
@@ -86,26 +96,28 @@ void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
         data->speed = (RandomValue(randomTable, index, mask) & 31) + 8;
         {
             s32 radius = data->radius;
-            s32 offset;
-            angles = gUnk_086149C4;
-            offset = Truncate(radius * angles[(data->angle + 64) & 255]);
-            data->position.x = p->owner->position.x + offset;
+            cosineTable = gUnk_086149C4;
+            radius = Truncate(radius * cosineTable[(data->angle + 64) & 255]);
+            data->position.x = p->owner->position.x + radius;
         }
         data->position.y = p->owner->position.y;
         {
             s32 radius = data->radius;
-            s32 offset;
-            angles = gUnk_086149C4;
-            offset = Truncate(radius * angles[data->angle]);
-            data->position.z = p->owner->position.z + offset;
+            sineTable = gUnk_086149C4;
+            radius = Truncate(radius * sineTable[data->angle]);
+            data->position.z = p->owner->position.z + radius;
         }
         particle->priority = 2;
         data->attribute = 0xEC;
-        data->frame = RandomValue(randomTable, index, mask) & 7;
-        if (data->frame <= 3)
-            SpriteDrawable_SelectTileFrame(particle, *sheet, 4);
-        else
-            SpriteDrawable_SelectTileFrame(particle, *sheet, 5);
+        {
+            u16 sample = RandomValue(randomTable, index, mask);
+            u32 frame = sample & 7;
+            data->frame = frame;
+            if (frame <= 3)
+                SpriteDrawable_SelectTileFrame(particle, *sheet, 4);
+            else
+                SpriteDrawable_SelectTileFrame(particle, *sheet, 5);
+        }
         data->frame = 0;
         data->timer = 0;
         data->lifetime = (RandomValue(randomTable, index, mask) & 15) + 56;
@@ -113,9 +125,7 @@ void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
         phase += 16;
         data = (struct BurstData *)((u8 *)data + sizeof(*particle));
         particle++;
+        cosineTable = gUnk_086149C4;
+        sineTable = gUnk_086149C4;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08160108);
-#endif
