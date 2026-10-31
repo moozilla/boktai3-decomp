@@ -1,26 +1,19 @@
 #include "global.h"
 #include "display_sequence.h"
+#include "contact_position.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct FragmentSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unk_0A, speed, elapsed;
-};
 struct FragmentSprite {
     u32 flags;
     u8 unk_04[0xc];
     u16 frame;
     u8 unk_12[0xa];
-    struct Vec position;
+    struct ContactPosition position;
     u8 unk_24[8];
 };
 struct FragmentBurst {
     struct FragmentSprite sprites[4];
-    struct FragmentSequence sequences[4];
-    struct Vec origin, position;
+    struct DisplaySequenceState sequences[4];
+    struct ContactPosition origin, position;
     u8 collider[0x54];
     u16 age;
     u8 state;
@@ -37,27 +30,29 @@ extern const s16 gUnk_086149C4[];
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
-static inline s32 TruncateScale(s32 x)
+static inline s32 FragmentBurst_TruncateScale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void MakeVector(struct Vec *out, s32 angle, s32 scale)
+static inline void FragmentBurst_MakeRadialOffset(struct ContactPosition *out, s32 angle, s32 scale)
 {
-    out->x = TruncateScale(gUnk_086149C4[(angle + 64) & 255] * scale);
+    out->x = FragmentBurst_TruncateScale(gUnk_086149C4[(angle + 64) & 255] * scale);
     out->y = 0;
     {
         u32 masked = 255;
         masked &= angle;
-        out->z = TruncateScale(gUnk_086149C4[masked] * scale);
+        out->z = FragmentBurst_TruncateScale(gUnk_086149C4[masked] * scale);
     }
 }
-static inline void AddVector(struct Vec *dst, struct Vec *a, struct Vec *b)
+static inline void FragmentBurst_AddPosition(struct ContactPosition *dst, struct ContactPosition *a,
+                                             struct ContactPosition *b)
 {
     dst->x = b->x + a->x;
     dst->y = b->y + a->y;
     dst->z = b->z + a->z;
 }
-static inline u32 StepPlayback(struct FragmentSprite *owner, struct FragmentSequence *state)
+static inline u32 FragmentBurst_StepPlayback(struct FragmentSprite *owner,
+                                             struct DisplaySequenceState *state)
 {
     const u16 *command;
     u32 ended;
@@ -131,22 +126,31 @@ static inline u32 StepPlayback(struct FragmentSprite *owner, struct FragmentSequ
     return ended;
 }
 
+static inline struct DisplaySequenceState *
+FragmentSequence_Prepare(struct FragmentBurst *const *owner, struct FragmentBurstPool *pool,
+                         u32 flipX, u32 flipY, void **resource, u32 *mirrors)
+{
+    struct DisplaySequenceState *base = (*owner)->sequences;
+    *resource = pool->sequences;
+    *mirrors = flipX | flipY;
+    return base;
+}
+
 /* Tentative: animate four radial burst sprites and advance after the last sequence ends. */
-#ifdef NONMATCHING
-// fuzzy: 99.7%
 void FragmentBurst_UpdateRadialAnimation(struct FragmentBurstPool *pool, struct FragmentBurst *p)
 {
     s32 i;
     u32 ended;
     if (p->enter) {
-        struct Vec offset;
+        struct ContactPosition offset;
         struct FragmentSprite *sprite = p->sprites;
+        struct FragmentBurst *sequenceOwner = p;
         for (i = 0; i < 4; i++) {
             u32 flipX, flipY;
             sprite->flags &= ~0x10;
             sprite->position = p->position;
-            MakeVector(&offset, i << 6, 128);
-            AddVector(&sprite->position, &sprite->position, &offset);
+            FragmentBurst_MakeRadialOffset(&offset, i << 6, 128);
+            FragmentBurst_AddPosition(&sprite->position, &sprite->position, &offset);
             switch (i) {
                 case 0:
                     flipX = 2;
@@ -165,7 +169,13 @@ void FragmentBurst_UpdateRadialAnimation(struct FragmentBurstPool *pool, struct 
                     flipY = 0;
                     break;
             }
-            Anim_SetSequence(&p->sequences[i], pool->sequences, 16, 0, flipX | flipY);
+            {
+                void *resource;
+                u32 mirrors;
+                struct DisplaySequenceState *base = FragmentSequence_Prepare(
+                    &sequenceOwner, pool, flipX, flipY, &resource, &mirrors);
+                Anim_SetSequence(&base[i], resource, 16, 0, mirrors);
+            }
             sprite->flags &= ~1;
             sprite++;
         }
@@ -173,7 +183,7 @@ void FragmentBurst_UpdateRadialAnimation(struct FragmentBurstPool *pool, struct 
         p->enter = 0;
     }
     for (i = 0; i < 4; i++)
-        ended = StepPlayback(&p->sprites[i], &p->sequences[i]);
+        ended = FragmentBurst_StepPlayback(&p->sprites[i], &p->sequences[i]);
     Collider_SetPosition(p->collider, &p->position, 0);
     Collider_Refresh(p->collider);
     if (ended) {
@@ -183,6 +193,3 @@ void FragmentBurst_UpdateRadialAnimation(struct FragmentBurstPool *pool, struct 
         p->timer++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", FragmentBurst_UpdateRadialAnimation);
-#endif
