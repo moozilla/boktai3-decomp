@@ -1,23 +1,23 @@
-#include "global.h"
-void Player_EnterKindTwo(u8 *);
-void ActorSequence_Begin(u8 *, u32, u32);
-void Player_UpdateTransitionAnimation(void);
-void PlayerCue_Windblown(u8 *p, s32 a, u32 b)
+#include "player.h"
+void Player_EnterKindTwo(struct Player *);
+void ActorSequence_Begin(struct Player *, u32, u32);
+void Player_UpdateTransitionAnimation(struct Player *);
+void PlayerCue_Windblown(struct Player *p, s32 a, u32 b)
 {
     if (a != 0) {
-        u8 *q = p + 0x3a4;
+        u8 *q = &p->facing;
         u8 z;
         z = 0;
         *q = 5;
-        p[0x3a2] = z;
-        p[0x3a3] = 1;
+        p->heading = z;
+        p->side = 1;
     } else {
-        p[0x3a4] = 3;
-        p[0x3a2] = a;
-        p[0x3a3] = a;
+        p->facing = 3;
+        p->heading = a;
+        p->side = a;
     }
-    *(u32 *)(p + 0x5a4) = b;
+    p->cueParameter = b;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0, 0);
-    *(u32 *)(p + 0x58c) = (u32)Player_UpdateTransitionAnimation;
+    p->triggerAnimationCallback = Player_UpdateTransitionAnimation;
 }
