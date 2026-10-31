@@ -747,9 +747,8 @@ refresh: {
     }
     sub_0821DE30((void *)cache.group);
     {
-        register u32 offset asm("r6") = (u8 *)&actor->previousPosition - (u8 *)actor;
-        register struct ContactPosition *previous asm("r2");
-        asm("" : "+r"(offset));
+        u32 offset = (u8 *)&actor->previousPosition - (u8 *)actor;
+        struct ContactPosition *previous;
         previous = (void *)((u8 *)actor + offset);
         *previous = actor->position;
     }
