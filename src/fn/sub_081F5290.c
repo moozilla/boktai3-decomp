@@ -1,22 +1,15 @@
 #include "global.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_components.h"
 
 #ifdef NONMATCHING
-// fuzzy: 71.8%
-// fix.py best (sweep after the inlined-insn fix)
+// fuzzy: 63.6%
 // Remaining differences: owner and random-source allocation, scale decay and state setup.
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
 struct Actor {
     u8 pad0[0x51];
     u8 angle;
     u8 pad52[2];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 pad64[0x2c];
     u32 timer;
     s16 health;
@@ -39,9 +32,9 @@ struct Actor {
     u8 pad180[0x1ac];
     u8 animation[0x20];
     u8 animationData[0x20];
-    struct Vec anchor;
+    struct ContactPosition anchor;
     u8 pad374[0x58];
-    struct Vec home;
+    struct ContactPosition home;
     u8 pad3D4[0xa78];
     s16 selectedPoint, selectedTarget;
     u16 padE50;
@@ -51,10 +44,6 @@ struct Actor {
     u8 motionFlag, padE71, targetAngle, phaseTimer;
     s16 hitTimer, terrainTimer;
 };
-#define H(o) (*(s16 *)((u8 *)p2 + (o)))
-#define U(o) (*(u16 *)((u8 *)p2 + (o)))
-#define B(o) (*(u8 *)((u8 *)p2 + (o)))
-#define W(o) (*(u32 *)((u8 *)p2 + (o)))
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
@@ -87,7 +76,7 @@ static inline s32 trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct Vec *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
     s32 zero = 0;
@@ -95,15 +84,16 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
     v->y = zero;
     v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
+static inline void sum(struct ContactPosition *d, struct ContactPosition *a,
+                       struct ContactPosition *b)
 {
     d->x = a->x + b->x;
     d->y = a->y + b->y;
     d->z = a->z + b->z;
 }
 void Ratatosk_InitAnimatedParticleParams(void *);
-void Ratatosk_ConfigureAnimatedParticle(void *, s32, s32, u8, s32, s32, s32);
-void sub_081FC26C(void *, struct Vec *);
+void Ratatosk_ConfigureAnimatedParticle(void *, u16, u32, u8, u32, u32, u32);
+void sub_081FC26C(void *, struct ContactPosition *);
 void Ratatosk_UpdateDirectionalAnimation(void);
 void Ratatosk_UpdateDefeatSequence(void);
 static inline void decay(u16 *v)
@@ -129,12 +119,12 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
 {
     s32 tick = elapsed;
     u8 params[0x1c];
-    struct Vec spawn;
+    struct ContactPosition spawn;
     struct Actor *p2 = p;
-    u8 *sprite = ((u8 *)p) + 0x48;
+    struct SceneActorBody *body = (struct SceneActorBody *)((u8 *)p + 0x48);
     u16 *scaleX;
     u16 *scaleZ;
-    register u32 *flags asm("r9");
+    u32 *flags;
     if (p->changed) {
         s32 angle;
         p->changed = 0;
@@ -152,14 +142,14 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
         if (!p->locked) {
             u8 *angleAddress = &p2->targetAngle;
             s32 duration = 16;
-            struct Vec *v = (struct Vec *)(sprite + 20);
+            struct ContactPosition *v = &body->motion;
             u32 angle = *angleAddress;
             s32 speed = duration - tick;
             polar(v, angle, speed);
         } else {
             s32 angle = p->savedAngle;
             s32 duration = 16;
-            struct Vec *v = (struct Vec *)(sprite + 20);
+            struct ContactPosition *v = &body->motion;
             polar(v, angle + 128, duration - tick);
         }
     }
@@ -188,14 +178,13 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
                 p->nextState = 1;
             }
         } else {
-            register u32 one asm("r12") = 1;
-            asm("" : "+r"(one));
+            u32 one = 1;
             if (tick & one) {
-                register u32 speed asm("r7") = randomA() & 7;
-                register u32 variant asm("r6") = randomA() & one;
-                register u32 angle asm("r8") = (u8)randomA();
-                register u32 drift asm("r4") = randomA() & 15;
-                struct Vec *position = &spawn;
+                u32 speed = randomA() & 7;
+                u32 variant = randomA() & one;
+                u32 angle = (u8)randomA();
+                u32 drift = randomA() & 15;
+                struct ContactPosition *position = &spawn;
                 spawn = p->position;
                 position->x -= 128;
                 position->y += 128;
