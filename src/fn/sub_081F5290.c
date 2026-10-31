@@ -1,22 +1,14 @@
 #include "global.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_components.h"
 
 #ifdef NONMATCHING
-// fuzzy: 71.8%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: owner and random-source allocation, scale decay and state setup.
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+// fuzzy: 78.7%
 struct Actor {
     u8 pad0[0x51];
     u8 angle;
     u8 pad52[2];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 pad64[0x2c];
     u32 timer;
     s16 health;
@@ -39,9 +31,9 @@ struct Actor {
     u8 pad180[0x1ac];
     u8 animation[0x20];
     u8 animationData[0x20];
-    struct Vec anchor;
+    struct ContactPosition anchor;
     u8 pad374[0x58];
-    struct Vec home;
+    struct ContactPosition home;
     u8 pad3D4[0xa78];
     s16 selectedPoint, selectedTarget;
     u16 padE50;
@@ -51,10 +43,6 @@ struct Actor {
     u8 motionFlag, padE71, targetAngle, phaseTimer;
     s16 hitTimer, terrainTimer;
 };
-#define H(o) (*(s16 *)((u8 *)p2 + (o)))
-#define U(o) (*(u16 *)((u8 *)p2 + (o)))
-#define B(o) (*(u8 *)((u8 *)p2 + (o)))
-#define W(o) (*(u32 *)((u8 *)p2 + (o)))
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
@@ -69,25 +57,25 @@ static inline u32 randomA(void)
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
-static inline void facing(struct Actor *p, s32 angle)
-{
-    u32 v;
-    s32 shift;
-    p->angle = angle;
-    shift = (p->angle + 0x60) >> 6;
-    v = 3;
-    v &= shift;
-    p->facing = v;
-    shift = (p->angle + 0x70) >> 5;
-    v = 7;
-    v &= shift;
-    p->facing8 = v;
-}
+#define SET_FACING(actor, heading)                                                                 \
+    do {                                                                                           \
+        u32 facingValue;                                                                           \
+        s32 shift;                                                                                 \
+        (actor)->angle = (heading);                                                                \
+        shift = ((actor)->angle + 0x60) >> 6;                                                      \
+        facingValue = 3;                                                                           \
+        facingValue &= shift;                                                                      \
+        (actor)->facing = facingValue;                                                             \
+        shift = ((actor)->angle + 0x70) >> 5;                                                      \
+        facingValue = 7;                                                                           \
+        facingValue &= shift;                                                                      \
+        (actor)->facing8 = facingValue;                                                            \
+    } while (0)
 static inline s32 trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct Vec *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
     s32 zero = 0;
@@ -95,17 +83,27 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
     v->y = zero;
     v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
+static inline void sum(struct ContactPosition *d, struct ContactPosition *a,
+                       struct ContactPosition *b)
 {
     d->x = a->x + b->x;
     d->y = a->y + b->y;
     d->z = a->z + b->z;
 }
 void Ratatosk_InitAnimatedParticleParams(void *);
-void Ratatosk_ConfigureAnimatedParticle(void *, s32, s32, u8, s32, s32, s32);
-void sub_081FC26C(void *, struct Vec *);
+void Ratatosk_ConfigureAnimatedParticle(void *, u16, u32, u8, u32, u32, u32);
+void sub_081FC26C(void *, struct ContactPosition *);
 void Ratatosk_UpdateDirectionalAnimation(void);
 void Ratatosk_UpdateDefeatSequence(void);
+struct EffectRandomSample {
+    u16 value;
+};
+static inline u32 ReadEffectRandomCursor(const struct EffectRandomSample *table, u32 *cursor,
+                                         u32 mask)
+{
+    *cursor = (*cursor + 1) & mask;
+    return ((const struct EffectRandomSample *)(*cursor * 2 + (u32)table))->value;
+}
 static inline void decay(u16 *v)
 {
     u16 n = *v;
@@ -128,13 +126,18 @@ static inline void setState(struct Actor *p, void (*update)(void), u8 state)
 void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
 {
     s32 tick = elapsed;
+    u32 one = 1;
+    u32 randomMask = 1023;
     u8 params[0x1c];
-    struct Vec spawn;
+    struct ContactPosition spawn;
     struct Actor *p2 = p;
-    u8 *sprite = ((u8 *)p) + 0x48;
+    struct SceneActorBody *body = (struct SceneActorBody *)((u8 *)p + 0x48);
     u16 *scaleX;
     u16 *scaleZ;
-    register u32 *flags asm("r9");
+    u32 *flags;
+    s32 speed;
+    const struct EffectRandomSample *randomTable = (const struct EffectRandomSample *)gUnk_086141BC;
+    u32 *randomCursor = &gEffectRandomTableIndex;
     if (p->changed) {
         s32 angle;
         p->changed = 0;
@@ -142,9 +145,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
             angle = p->savedAngle;
         else
             angle = p->targetAngle + 128;
-        do {
-            facing(p, angle);
-        } while (0);
+        SET_FACING(p, angle);
         SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 29, 0, 1, 4);
         Sound_PlaySong(0x55e);
     }
@@ -152,15 +153,16 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
         if (!p->locked) {
             u8 *angleAddress = &p2->targetAngle;
             s32 duration = 16;
-            struct Vec *v = (struct Vec *)(sprite + 20);
-            u32 angle = *angleAddress;
-            s32 speed = duration - tick;
+            struct ContactPosition *v = &body->motion;
+            s16 angle = *angleAddress;
+            speed = duration - tick;
             polar(v, angle, speed);
         } else {
             s32 angle = p->savedAngle;
             s32 duration = 16;
-            struct Vec *v = (struct Vec *)(sprite + 20);
-            polar(v, angle + 128, duration - tick);
+            struct ContactPosition *v = &body->motion;
+            speed = duration - tick;
+            polar(v, angle + 128, speed);
         }
     }
     scaleX = &p2->scaleX;
@@ -185,18 +187,17 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
                 setState(p, Ratatosk_UpdateDefeatSequence, 15);
             } else {
                 setState(p, Ratatosk_UpdateDirectionalAnimation, 1);
-                p->nextState = 1;
+                p->finished = 1;
             }
         } else {
-            register u32 one asm("r12") = 1;
-            asm("" : "+r"(one));
             if (tick & one) {
-                register u32 speed asm("r7") = randomA() & 7;
-                register u32 variant asm("r6") = randomA() & one;
-                register u32 angle asm("r8") = (u8)randomA();
-                register u32 drift asm("r4") = randomA() & 15;
-                struct Vec *position = &spawn;
-                spawn = p->position;
+                u32 speed = ReadEffectRandomCursor(randomTable, randomCursor, randomMask) & 7;
+                u32 variant = ReadEffectRandomCursor(randomTable, randomCursor, randomMask) & one;
+                u32 angle = (u8)ReadEffectRandomCursor(randomTable, randomCursor, randomMask);
+                u32 drift = ReadEffectRandomCursor(randomTable, randomCursor, randomMask) & 15;
+                struct ContactPosition source = p->position;
+                struct ContactPosition *position = &spawn;
+                spawn = source;
                 position->x -= 128;
                 position->y += 128;
                 variant <<= 12;

@@ -1,24 +1,14 @@
 #include "global.h"
 #include "ram.h"
+#include "contact_position.h"
 #include "engine_globals.h"
+#include "scene_actor_components.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.1%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: register allocation, pointer lifetimes and shared block placement.
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
+// fuzzy: 99.4%
 struct Actor {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[2];
-    struct Vec position, velocity;
-    u8 pad64[0x2c];
+    u8 pad0[0x48];
+    struct SceneActorBody body;
     u32 timer;
     s16 health;
     u8 pad96[6];
@@ -40,9 +30,9 @@ struct Actor {
     u8 pad180[0x1ac];
     u8 animation[0x20];
     u8 animationData[0x20];
-    struct Vec anchor;
+    struct ContactPosition anchor;
     u8 pad374[0x58];
-    struct Vec home;
+    struct ContactPosition home;
     u8 pad3D4[0xa78];
     s16 selectedPoint, selectedTarget;
     u16 padE50;
@@ -52,18 +42,12 @@ struct Actor {
     u8 motionFlag, padE71, targetAngle, phaseTimer;
     s16 hitTimer, terrainTimer;
 };
-#define H(o) (*(s16 *)((u8 *)p2 + (o)))
-#define U(o) (*(u16 *)((u8 *)p2 + (o)))
-#define B(o) (*(u8 *)((u8 *)p2 + (o)))
-#define W(o) (*(u32 *)((u8 *)p2 + (o)))
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
-void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void SceneActors_StartAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
 void Sound_StopSong(u32);
-u8 Callback_InvokeActor(void *, void *);
 s32 Math_Atan2(s32, s32);
 static inline u32 randomA(void)
 {
@@ -74,12 +58,12 @@ static inline void facing(struct Actor *p, s32 angle)
 {
     u32 v;
     s32 shift;
-    p->angle = angle;
-    shift = (p->angle + 0x60) >> 6;
+    p->body.direction = angle;
+    shift = (p->body.direction + 0x60) >> 6;
     v = 3;
     v &= shift;
     p->facing = v;
-    shift = (p->angle + 0x70) >> 5;
+    shift = (p->body.direction + 0x70) >> 5;
     v = 7;
     v &= shift;
     p->facing8 = v;
@@ -88,7 +72,7 @@ static inline s32 trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct Vec *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
     s32 zero = 0;
@@ -96,15 +80,17 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
     v->y = zero;
     v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
-{
-    d->x = a->x + b->x;
-    d->y = a->y + b->y;
-    d->z = a->z + b->z;
-}
-void Ratatosk_InitAnimatedParticleParams(void *);
-void Ratatosk_ConfigureAnimatedParticle(void *, s32, s32, u8, s32, s32, s32);
-void sub_081FC26C(void *, struct Vec *);
+struct AnimatedParticleParams {
+    u16 kind, animation;
+    u8 reserved4[2];
+    u8 angle, reserved7;
+    u32 speed, variant, drift;
+    u32 field14, active;
+};
+void Ratatosk_InitAnimatedParticleParams(struct AnimatedParticleParams *);
+void Ratatosk_ConfigureAnimatedParticle(struct AnimatedParticleParams *, u16, u32, u8, u32, u32,
+                                        u32);
+void sub_081FC26C(struct AnimatedParticleParams *, struct ContactPosition *);
 // confidence=low: defeat role inferred from event flag 0x51 and persistent counters.
 struct Map {
     u32 pad;
@@ -122,7 +108,7 @@ void SunOrb_FadeOutAll(void *);
 void sub_08159164(u16);
 void GameState_SetEventFlag(s32);
 s32 Mod(s32, s32);
-static inline s32 cellAt(struct Vec *v)
+static inline s32 cellAt(struct ContactPosition *v)
 {
     s32 x = v->x >> 8, z = v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -142,11 +128,6 @@ struct Anim {
     u32 pad[2];
     u32 flags;
 };
-static inline void delta(struct Vec *a, struct Vec *b, s32 *x, s32 *z)
-{
-    *x = a->x - b->x;
-    *z = a->z - b->z;
-}
 static inline void clearFade(struct Anim *a)
 {
     a->flags &= ~0x200;
@@ -166,14 +147,19 @@ static inline u32 Arg1(u32 k_, struct Actor *p)
 
 void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
 {
-    u8 params[0x1c];
-    struct Vec spawn;
+    struct AnimatedParticleParams params;
+    struct ContactPosition spawn;
     struct Actor *p2 = p;
+    s32 i;
+    s32 value;
+    u8 angle;
+    u16 radius;
     if (p->changed) {
         p->changed = 0;
-        if (p->locked)
-            facing(p, p->savedAngle);
-        else {
+        if (p->locked) {
+            angle = p->savedAngle;
+            facing(p, (s8)angle);
+        } else {
             Task_Kill(*((void **)(((u8 *)p2) + 0xf20)));
             SceneActors_RunFirstEventScript(p, &p2->anchor);
         }
@@ -189,16 +175,21 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         Sound_StopSong(0x569);
         Sound_StopSong(0x570);
     }
-    if (cellFlags(cellAt(&p->position)) & 1)
+    if (cellFlags(cellAt(&p->body.position)) & 1)
         p2->terrainTimer = 8;
     if (p2->terrainTimer > 0) {
         p2->terrainTimer--;
         {
-            struct Vec *home = &p2->home;
-            struct Vec *pos = &p->position;
+            struct ContactPosition *home = &p2->home;
+            struct ContactPosition *pos = &p->body.position;
             s32 x = home->x - pos->x;
             s32 z = home->z - pos->z;
-            polar(&p->velocity, Math_Atan2(x, z), 20);
+            {
+                s32 angle = Math_Atan2(x, z);
+                struct ContactPosition *velocity = &p->body.motion;
+                radius = 20;
+                polar(velocity, angle, radius);
+            }
         }
     }
     if (tick == 140) {
@@ -206,47 +197,47 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         SceneActors_StartAnimation(p, p2->animationData, p2->animation, 28, 0, 4);
     }
     if (((Mod(tick, 16) == 0) || (tick > 136)) && (tick <= 150)) {
-        s32 i = 1;
-        do {
-            u16 speed = randomA() & 15;
-            u16 variant = randomA() & 1;
-            s8 angle = randomA();
-            u16 drift = randomA() & 15;
-            struct Vec *position = &spawn;
-            spawn = p->position;
+        for (i = 0; i < 2; ++i) {
+            struct ContactPosition *position = &spawn;
+            u16 speedSample = randomA() & 15;
+            u16 variant;
+            value = speedSample;
+            variant = randomA() & 1;
+            angle = (u8)randomA();
+            radius = randomA() & 15;
+            spawn = p->body.position;
             position->x -= 128;
             position->y += 64;
-            drift <<= 12;
             variant <<= 12;
-            Ratatosk_InitAnimatedParticleParams(params);
+            radius <<= 12;
+            Ratatosk_InitAnimatedParticleParams(&params);
             {
-                u8 k1 = 31;
-                Ratatosk_ConfigureAnimatedParticle(params, (randomA() & k1) + 292, speed, angle, 1,
-                                                   variant, drift);
+                Ratatosk_ConfigureAnimatedParticle(&params, (randomA() & 31) + 292, value, angle, 1,
+                                                   variant, radius);
             }
-            sub_081FC26C(params, position);
-        } while ((--i) >= 0);
+            sub_081FC26C(&params, position);
+        }
     }
     if (tick == 440) {
         if (!p->locked) {
-            s32 value;
+            s32 count;
             SceneActors_RunSecondEventScript(p, &p2->anchor);
             sub_08159164(*((u16 *)(((u8 *)p2) + 0xed2)));
             GameState_SetEventFlag(0x51);
             increment((u16 *)(gGameState + 0x87c));
             increment((u16 *)(gGameState + 0x538));
             increment((u16 *)(gGameState + 0x55e));
-            value = (*((s16 *)(gGameState + 0x592))) + 1;
-            if (value > 9999)
-                value = 9999;
-            else if (value < 0)
-                value = 0;
-            *((u16 *)(gGameState + 0x592)) = value;
+            count = (*((s16 *)(gGameState + 0x592))) + 1;
+            if (count > 9999)
+                count = 9999;
+            else if (count < 0)
+                count = 0;
+            *((u16 *)(gGameState + 0x592)) = count;
         }
         p->finished = 1;
     }
     {
-        u32 value = Arg1(15, p);
+        value = Arg1(15, p);
         p->flags = value & (~16);
     }
 }

@@ -1,74 +1,16 @@
-#include "global.h"
-
-/* Frame sequencer shared by the animation cases: a looping table of frame words. */
-struct h10cFrame {
-    u16 *table;
-    u8 flags4;
-    u8 count5;
-    u8 value6;
-    u8 limit7;
-    u16 index8;
-    u16 unkA;
-    u16 scaleC;
-    u16 timerE;
-};
-
-static inline void h10c_StepFrame(struct h10cFrame *f)
-{
-    u16 timer = f->timerE + 1;
-    f->timerE = timer;
-    if (timer >= f->limit7) {
-        f->timerE = 0;
-        if (f->flags4 & 4) {
-            if (f->index8 != 0) {
-                f->index8--;
-            } else if (f->flags4 & 8) {
-                f->index8 = f->count5 - 1;
-            } else {
-                f->index8 = f->count5;
-            }
-        } else {
-            f->index8++;
-            if (f->index8 >= f->count5) {
-                if (f->flags4 & 8) {
-                    f->timerE = 0;
-                    f->index8 = f->count5 - 1;
-                }
-            }
-        }
-    }
-    f->value6 = f->table[f->index8] & 0xF;
-    f->limit7 = (u8)((f->value6 * f->scaleC) >> 6);
-    if (f->limit7 == 0) {
-        f->limit7 = 1;
-    }
-}
-
-// confidence=low: Vanargand boss action state machine, dispatched on the phase byte at +0xA2
+#include "contact_swarm.h"
+#include "display_sequence_inline.h"
+#include "input.h"
+#include "motion_track.h"
 
 s32 Vanargand_GetTargetLateralDistance(void *);
 
-/* Frame sequencer for the animation held at +0x298: advances a looping table of frame words and
-   mirrors the current frame into the drawable's flags. Returns 1 when the sequence ended. */
-
-/* Writes the three s16 offsets derived from two packed s16 values (a, b) */
-
-// confidence=low: Vanargand boss action state machine, dispatched on the phase byte at +0xA2
-
-/* Frame sequencer for the animation held at +0x298: advances a looping table of frame words and
-   mirrors the current frame into the drawable's flags. Returns 1 when the sequence ended. */
-
-/* Writes the three s16 offsets derived from two packed s16 values (a, b) */
-
-// confidence=low: Vanargand boss action state machine, dispatched on the phase byte at +0xA2
 void Vanargand_SetPendingCue(void *, u16);
 s32 Callback_InvokeActor(void *, void *);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void Debug_NudgeWorldPositionWithA(void *);
-void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void MotionTrack_Update(void *);
-u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void VanargandAfterimagePool_Spawn(void *, void *);
 void Vanargand_StartActionSequence(void *);
 void Vanargand_CreateTransientEffect(void *, u8);
@@ -78,363 +20,521 @@ void Sprite_ApplyAnimation(void *, void *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void PlayerContact_ApplySyntheticContact(void *, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
-s32 sub_081A6AEC(void *);
 s32 sub_081A6A08(void *);
 extern const s16 gUnk_086149C4[];
 
-#define VG_AT(T, off) (*(T *)(base + (off)))
-
-/* Frame sequencer for the animation held at +0x298: advances a looping table of frame words and
-   mirrors the current frame into the drawable's flags. Returns 1 when the sequence ended. */
-struct Vg_FrameSeq {
-    u16 *table;
-    u8 flags4;
-    u8 count5;
-    u8 value6;
-    u8 limit7;
-    u16 index8;
-    u16 unkA;
-    u16 scaleC;
-    u16 timerE;
+struct VanargandSprite {
+    struct ContactSwarmSprite sprite;
+    u8 graphics[0x64 - 0x2C];
+    struct DisplaySequenceState sequence;
+    void *resource;
+    u8 unknown78[8];
+    struct ContactPosition offset;
 };
 
-static inline u32 Vg_081ABA64_StepFrame(struct Vg_FrameSeq *f, u32 *target)
-{
-    u16 *frame = f->table + f->index8;
-    u32 done = 0;
-    u16 tmr;
+struct VanargandAnimationParts {
+    u8 animation[0x60];
+    u8 paired[0xA4 - 0x60];
+    u8 side, effectStage, unknownA6[2];
+    struct VanargandSprite sprite;
+};
 
-    ((u16 *)target)[8] = *frame >> 6;
-    if ((f->flags4 & 1) != ((*frame >> 4) & 1))
-        *target |= 4;
-    else
-        *target &= ~4;
-    if ((f->flags4 & 2) != ((*frame >> 4) & 2))
-        *target |= 8;
-    else
-        *target &= ~8;
-    tmr = f->timerE + 1;
-    f->timerE = tmr;
-    if (tmr >= f->limit7) {
-        f->timerE = 0;
-        if (f->flags4 & 4) {
-            if (f->index8 == 0) {
-                if (f->flags4 & 8)
-                    f->timerE = f->limit7;
+struct VanargandSecondaryPart {
+    u8 unknown0[0x48];
+    struct DisplaySequenceState sequence;
+    void *resource;
+    u32 flags;
+};
+struct VanargandBoss {
+    u8 unknown0[0x54 - 0x0];
+    struct ContactPosition position;
+    struct ContactPosition velocity;
+    u8 unknown64[0x9C - 0x64];
+    u32 flags;
+    u8 unknownA0[0xA2 - 0xA0];
+    u8 phase;
+    u8 unknownA3[0xA4 - 0xA3];
+    u32 timer;
+    u8 unknownA8[0xAF - 0xA8];
+    u8 finished;
+    u8 unknownB0[0xB1 - 0xB0];
+    u8 pending;
+    u8 animationEnded;
+    u8 unknownB3[0xCC - 0xB3];
+    u8 heading;
+    u8 unknownCD[0x104 - 0xCD];
+    void *callback;
+    u8 unknown108[0x10C - 0x108];
+    void *contactActor;
+    u8 unknown110[0x18C - 0x110];
+    struct VanargandAnimationParts parts;
+    u8 unknown2BC[0x3FC - 0x2BC];
+    struct VanargandSecondaryPart secondary;
+    u8 unknown45C[0x500 - 0x45C];
+    u16 secondaryActive;
+    u8 unknown502[0x534 - 0x502];
+    struct MotionTrack track;
+    void *pair;
+    u8 unknown570[0x58E - 0x570];
+    u16 contactForce;
+    u8 unknown590[0xF18 - 0x590];
+    u32 paletteState;
+    u32 paletteFrame;
+    u16 paletteStart;
+    u16 paletteEnd;
+    u32 variant;
+    u8 unknownF28[0xF44 - 0xF28];
+    void *afterimages;
+};
+
+static inline void Vg_SetFlags(struct VanargandBoss *actor, u32 mask)
+{
+    actor->flags |= mask;
+}
+static inline void Vg_ChangePhase(struct VanargandBoss *actor, u32 next)
+{
+    u32 zero = 0;
+    actor->phase = next;
+    actor->timer = zero;
+}
+static inline void Vg_SetPalette(struct VanargandBoss *actor, u32 first, u32 last, u32 frame)
+{
+    actor->paletteFrame = 0;
+    actor->paletteStart = first;
+    actor->paletteEnd = last;
+    actor->paletteState = frame;
+}
+static inline void Vg_ResetSprite(struct VanargandSprite *sprite)
+{
+    u32 frame = 24;
+    Sprite_ApplyAnimation(sprite, sprite->graphics);
+    sprite->sprite.frame = frame;
+}
+static inline s32 Vg_ShiftTowardZero(s32 n, u32 shift)
+{
+    return n >= 0 ? n >> shift : -((-n) >> shift);
+}
+static inline void Vg_Polar(struct ContactPosition *out, s32 angle, s32 radius)
+{
+    out->x = Vg_ShiftTowardZero(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius, 12);
+    out->y = 0;
+    out->z = Vg_ShiftTowardZero(gUnk_086149C4[angle] * radius, 12);
+}
+static inline u8 Vg_TrackEnded(struct VanargandBoss *actor)
+{
+    u8 ended = 0;
+    if (actor->track.active == 2)
+        ended = 1;
+    return ended;
+}
+static inline void Vg_RestartSecondary(struct VanargandBoss *actor, u32 flags)
+{
+    struct VanargandSecondaryPart *part = &actor->secondary;
+    Anim_SetSequence(&part->sequence, part->resource, 0, 0, flags);
+    actor->secondaryActive = 1;
+    part->flags = 0;
+}
+static inline void Vg_SetPosition(struct ContactPosition *out, s32 x, s32 y, s32 z)
+{
+    out->x = x;
+    out->y = y;
+    out->z = z;
+}
+static inline u32 Vg_081ABA64_StepFrame(struct VanargandSprite *owner)
+{
+    u32 done;
+    struct DisplaySequenceState *state;
+    const u16 *command;
+    state = &owner->sequence;
+    {
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    owner->sprite.frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->sprite.flags |= 4;
+        else
+            owner->sprite.flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->sprite.flags |= 8;
+        else
+            owner->sprite.flags &= ~8;
+    }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
                 else
-                    f->index8 = f->count5 - 1;
+                    state->index = state->frameCount - 1;
                 done = 1;
             } else {
-                f->index8 = f->index8 - 1;
+                state->index--;
+                done = 0;
             }
         } else {
-            f->index8 = f->index8 + 1;
-            if ((u16)f->index8 >= f->count5) {
-                if (f->flags4 & 8) {
-                    f->timerE = f->limit7;
-                    f->index8 = f->count5 - 1;
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
                 } else {
-                    f->index8 = 0;
+                    state->index = 0;
                 }
                 done = 1;
-            }
+            } else
+                done = 0;
         }
-        frame = f->table + f->index8;
-        f->value6 = *frame & 0xF;
-        f->limit7 = (f->value6 * f->scaleC) >> 6;
-        if (f->limit7 == 0)
-            f->limit7 = 1;
-    }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else
+        done = 0;
     return done;
 }
 
-/* Writes the three s16 offsets derived from two packed s16 values (a, b) */
-static inline void Vg_081ABA64_SetOffsets(s16 *dst, u32 value)
+// confidence=low: charged attack sequence with contact damage and a screen flash.
+#define Vanargand_UpdateChargeSequence sub_081ABA64
+void Vanargand_UpdateChargeSequence(struct VanargandBoss *arg0)
 {
-    volatile u32 packed = value;
-    s16 a = ((volatile s16 *)&packed)[0];
-    s16 b = ((volatile s16 *)&packed)[1];
-    s32 t;
+    struct VanargandBoss *self = arg0;
+    struct VanargandAnimationParts *sub = &arg0->parts;
+    u8 result;
+    struct ContactPosition org, org2;
+    struct ContactPosition projected1, projected2, projected3, projected4, projected5;
+    s32 radius, heading;
+    s32 angle;
+    u32 sequenceEnded;
+    u32 entryTimer;
 
-    t = ((a + b) * 32) / 3 + 0x40;
-    dst[0] = t / 2;
-    dst[1] = 0x40;
-    t = ((b - a) * 32) / 3 + 0x40;
-    dst[2] = t / 2;
-}
-
-static inline void Vg_081ABA64_Contact(u8 *base)
-{
-    if (sub_081A6A08(base)) {
-        if (VG_AT(u8, 0x230) == 0)
-            PlayerContact_ApplySyntheticContact(VG_AT(void *, 0x10C), VG_AT(u16, 0x58E), 2, 0x20, 0,
-                                                1);
-        else
-            PlayerContact_ApplySyntheticContact(VG_AT(void *, 0x10C), VG_AT(u16, 0x58E), 2, 0x20, 0,
-                                                2);
-    }
-}
-
-#ifdef NONMATCHING
-// fuzzy: 34.0%
-// scope shape 946 (differences once low registers are set aside)
-// confidence=low: Vanargand boss action state machine, dispatched on the phase byte at +0xA2
-void sub_081ABA64(void *arg0)
-{
-    u8 *base = arg0;
-    u8 *sub = base + 0x18C;
-    u8 *counter = base + 0xA4;
-    u8 *phaseP = base + 0xA2;
-    struct Vg_FrameSeq *seq = (struct Vg_FrameSeq *)(base + 0x298);
-    u32 *target = (u32 *)(sub + 0xA8);
-    u8 r4;
-    s16 org[4];
-    u32 packed;
-    s32 d, ang;
-    s32 i;
-
-    VG_AT(u32, 0x9C) |= 8;
+    Vg_SetFlags(arg0, 8);
     Vanargand_SetPendingCue(arg0, 1);
-    r4 = Callback_InvokeActor(arg0, VG_AT(void *, 0x104));
-    if (r4 != 0)
+    result = Callback_InvokeActor(arg0, arg0->callback);
+    if (result != 0)
         return;
 
-    if (VG_AT(u8, 0xB1) != 0) {
-        VG_AT(u8, 0xB1) = r4;
-        PairedSceneActor_ApplyToSelectedHalves(VG_AT(void *, 0x56C), 3, 0x13);
-        *phaseP = 1;
-        *(u32 *)counter = r4;
+    if (arg0->pending != 0) {
+        arg0->pending = result;
+        PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 0x13);
+        arg0->phase = 1;
+        arg0->timer = result;
     }
-    if (*phaseP > 10)
-        return;
 
-    switch (*phaseP) {
+    switch (arg0->phase) {
         case 0:
-            Debug_NudgeWorldPositionWithA(base + 0x54);
-            if ((*(u16 *)(0x03005260 + 2) & 0x100) == 0)
+            Debug_NudgeWorldPositionWithA(&arg0->position);
+            if ((gPadState[1] & 0x100) == 0)
                 return;
-            if (*(u16 *)0x03005260 & 1)
-                sub[0xA4] = 1;
+            if (gPadState[0] & 1)
+                sub->side = 1;
             else
-                sub[0xA4] = 0;
-            *phaseP = 2;
-            *(u32 *)counter = 0;
+                sub->side = 0;
+            Vg_ChangePhase(arg0, 2);
             return;
         case 1:
-            if (*(u32 *)counter == 0) {
-                SceneActors_StartUnmirroredAnimation(arg0, sub, sub + 0x60, 2, 1, 0);
-                d = sub_081A6AEC(arg0);
-                if (d > 0x200)
-                    d = 0x200;
-                ang = VG_AT(u8, 0xCC);
-                i = 0xE0;
-                if ((u32)(ang - 0x20) <= 0x7F)
-                    i = 0x60;
-                org[0] = (gUnk_086149C4[(i + 0x40) & 0xFF] * d) / 0x1000;
-                org[1] = 0;
-                org[2] = (gUnk_086149C4[i] * d) / 0x1000;
-                org[0] += 0x380;
-                org[1] = 0x300;
-                org[2] += 0x380;
-                MotionTrack_Initialize(base + 0x534, base + 0x54, org, 0, 4);
-                *(u32 *)counter += 1;
-                Anim_SetSequence(base + 0x444, VG_AT(void *, 0x454), 0, 0, 0);
-                VG_AT(u16, 0x500) = 1;
-                VG_AT(u32, 0x458) = 0;
+            if (arg0->timer == 0) {
+                SceneActors_StartUnmirroredAnimation(arg0, sub, sub->paired, 2, 1, 0);
+                radius = Vanargand_GetTargetLateralDistance(arg0);
+                if (radius > 0x200)
+                    radius = 0x200;
+                angle = arg0->heading;
+                heading = angle - 0x20;
+                angle = 0xE0;
+                if ((u32)heading <= 0x7F)
+                    angle = 0x60;
+                Vg_Polar(&org, angle, radius);
+                org.x += 0x380;
+                org.y = 0x300;
+                org.z += 0x380;
+                MotionTrack_Initialize(&self->track, &arg0->position,
+                                       (const struct MotionTrackVector *)&org, 0, 4);
+                arg0->timer += 1;
+                Vg_RestartSecondary(self, 0);
             }
-            MotionTrack_Update(base + 0x534);
-            if (VG_AT(u8, 0x55D) == 2) {
-                *phaseP = 2;
-                *(u32 *)counter = 0;
+            MotionTrack_Update(&self->track);
+            if (Vg_TrackEnded(self)) {
+                Vg_ChangePhase(arg0, 2);
                 return;
             }
-            VanargandAfterimagePool_Spawn(VG_AT(void *, 0xF44), base + 0x1AC);
+            VanargandAfterimagePool_Spawn(self->afterimages, self->parts.animation + 0x20);
             return;
         case 2:
-            if (*(u32 *)counter == 0) {
-                SceneActors_StartUnmirroredAnimation(arg0, sub, sub + 0x60, 0xA, 2, 0);
-                if (sub[0xA4] == 0) {
-                    VG_AT(u32, 0xF1C) = 0;
-                    VG_AT(u16, 0xF20) = 2;
-                    VG_AT(u16, 0xF22) = 6;
+            entryTimer = arg0->timer;
+            if (entryTimer == 0) {
+                SceneActors_StartUnmirroredAnimation(arg0, sub, sub->paired, 0xA, 2, 0);
+                if (sub->side == 0) {
+                    Vg_SetPalette(self, 2, 6, entryTimer);
                 } else {
-                    VG_AT(u32, 0xF1C) = 0;
-                    VG_AT(u16, 0xF20) = 3;
-                    VG_AT(u16, 0xF22) = 6;
+                    Vg_SetPalette(self, 3, 6, entryTimer);
                 }
-                VG_AT(u32, 0xF18) = 0;
             }
-            if (*(u32 *)counter == 7) {
-                Sprite_ApplyAnimation(sub + 0xA8, sub + 0xD4);
-                ((u16 *)(sub + 0xA8))[8] = 0x18;
-                Vg_081ABA64_SetOffsets((s16 *)(sub + 0x128), 0);
-            } else if (*(u32 *)counter == 0xA) {
-                Vg_081ABA64_SetOffsets((s16 *)(sub + 0x128), 0x10000);
+            if (arg0->timer == 7) {
+                Vg_ResetSprite(&sub->sprite);
+                {
+                    struct ContactPosition *dst = &sub->sprite.offset;
+                    struct ContactPosition *point;
+                    s32 a, b;
+                    projected1.x = 0;
+                    projected1.y = 0;
+                    point = &projected1;
+                    a = point->x;
+                    b = point->y;
+                    dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
+                    dst->y = 0x40;
+                    dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
+                }
+            } else if (arg0->timer == 0xA) {
+                {
+                    struct ContactPosition *dst = &sub->sprite.offset;
+                    struct ContactPosition *point;
+                    s32 a, b;
+                    projected2.x = 0;
+                    projected2.y = 1;
+                    point = &projected2;
+                    a = point->x;
+                    b = point->y;
+                    dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
+                    dst->y = 0x40;
+                    dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
+                }
             }
-            if (*(u32 *)counter > 6)
-                VG_AT(u32, 0x9C) |= 0x80000;
-            if (VG_AT(u8, 0xB2) != 0) {
-                *phaseP = 3;
-                *(u32 *)counter = 0;
+            if (arg0->timer > 6)
+                Vg_SetFlags(arg0, 0x80000);
+            if (arg0->animationEnded != 0) {
+                Vg_ChangePhase(arg0, 3);
                 return;
             }
-            *(u32 *)counter += 1;
+            arg0->timer += 1;
             return;
         case 3:
-            VG_AT(u32, 0x9C) |= 0x80000;
-            if (*(u32 *)counter == 0) {
-                Anim_SetSequence(seq, *(void **)(sub + 0xA8 + 0x74), 3, 0, 0);
-                *(u32 *)counter += 1;
+            Vg_SetFlags(arg0, 0x80000);
+            if (arg0->timer == 0) {
+                struct VanargandSprite *sprite = &sub->sprite;
+                struct DisplaySequenceState *sequence = &sprite->sequence;
+                Anim_SetSequence(sequence, sprite->resource, 3, 0, 0);
+                arg0->timer += 1;
             }
-            if (*(u32 *)counter == 1) {
-                Vg_081ABA64_StepFrame(seq, target);
+            if (arg0->timer == 1) {
+                sequenceEnded = Vg_081ABA64_StepFrame(&sub->sprite);
+                if (sequenceEnded)
+                    arg0->timer += 1;
                 return;
             }
-            *(u32 *)counter += 1;
-            if (*(u32 *)counter <= 10)
+            arg0->timer += 1;
+            if (arg0->timer <= 10)
                 return;
-            *phaseP = 4;
-            *(u32 *)counter = 0;
+            Vg_ChangePhase(arg0, 4);
             return;
         case 4:
-            VG_AT(u32, 0x9C) |= 0x80000;
-            if (*(u32 *)counter == 0) {
-                Anim_SetSequence(seq, *(void **)(sub + 0xA8 + 0x74), 4, 0, 0);
-                *(u32 *)counter += 1;
-                if (VG_AT(u32, 0xF24) == 1)
+            Vg_SetFlags(arg0, 0x80000);
+            if (arg0->timer == 0) {
+                struct VanargandSprite *sprite = &sub->sprite;
+                struct DisplaySequenceState *sequence = &sprite->sequence;
+                Anim_SetSequence(sequence, sprite->resource, 4, 0, 0);
+                arg0->timer += 1;
+                if (self->variant == 1)
                     Sound_PlaySong(0x543);
             }
-            if (!Vg_081ABA64_StepFrame(seq, target)) {
-                *(u32 *)counter += 1;
+            sequenceEnded = Vg_081ABA64_StepFrame(&sub->sprite);
+            if (sequenceEnded && arg0->timer > 0xA) {
+                Vg_ChangePhase(arg0, 5);
                 return;
             }
-            if (*(u32 *)counter <= 0xA) {
-                *(u32 *)counter += 1;
-                return;
-            }
-            *phaseP = 5;
-            *(u32 *)counter = 0;
+            arg0->timer += 1;
             return;
         case 5:
-            VG_AT(u32, 0x9C) |= 0x80000;
-            if (*(u32 *)counter == 0) {
-                SceneActors_StartUnmirroredAnimation(arg0, sub, sub + 0x60, 0xB, 2, 0);
-                Anim_SetSequence(seq, *(void **)(sub + 0xA8 + 0x74), 5, 0, 0);
-                Vg_081ABA64_SetOffsets((s16 *)(sub + 0x128), 0x30000);
-                Vg_081ABA64_StepFrame(seq, target);
-                Vanargand_StartActionSequence(base + 0x21C);
-                Vanargand_CreateTransientEffect(base + 0x250, sub[0xA4]);
+            Vg_SetFlags(arg0, 0x80000);
+            if (arg0->timer == 0) {
+                SceneActors_StartUnmirroredAnimation(arg0, sub, sub->paired, 0xB, 2, 0);
+                {
+                    struct VanargandSprite *sprite = &sub->sprite;
+                    struct DisplaySequenceState *sequence = &sprite->sequence;
+                    Anim_SetSequence(sequence, sprite->resource, 5, 0, 0);
+                }
+                {
+                    struct ContactPosition *dst = &sub->sprite.offset;
+                    struct ContactPosition *point;
+                    s32 a, b;
+                    projected3.x = 0;
+                    projected3.y = 3;
+                    point = &projected3;
+                    a = point->x;
+                    b = point->y;
+                    dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
+                    dst->y = 0x40;
+                    dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
+                }
+                sequenceEnded = Vg_081ABA64_StepFrame(&sub->sprite);
+                Vanargand_StartActionSequence((u8 *)self + 0x21C);
+                Vanargand_CreateTransientEffect(&sub->sprite.sprite.position, sub->side);
                 Sound_PlaySong(0x584);
             }
-            *(u32 *)counter += 1;
-            if (*(u32 *)counter <= 0x3C)
+            arg0->timer += 1;
+            if (arg0->timer <= 0x3C)
                 return;
-            *phaseP = 6;
-            *(u32 *)counter = 0;
-            if (VG_AT(u8, 0x230) == 0)
+            Vg_ChangePhase(arg0, 6);
+            if (self->parts.side == 0)
                 ScreenTransition_SendCommand(0, 3, 0x1F, 0x1F, 0x1F, 0xFFFF, 0);
             else
                 ScreenTransition_SendCommand(0, 3, 4, 4, 4, 0xFFFF, 0);
             return;
         case 6:
-            VG_AT(u32, 0x9C) |= 0x80000;
-            if (*(u32 *)counter == 0) {
-                SceneActors_StartUnmirroredAnimation(arg0, sub, sub + 0x60, 0xB, 2, 0);
-                Vanargand_AdvanceEffectStageOne(base + 0x21C);
-                org[0] = VG_AT(s16, 0x54) - 0x100;
-                org[1] = VG_AT(s16, 0x56);
-                org[2] = VG_AT(s16, 0x58) - 0x100;
-                MotionTrack_Initialize(base + 0x534, base + 0x54, org, 0, 4);
+            Vg_SetFlags(arg0, 0x80000);
+            if (arg0->timer == 0) {
+                SceneActors_StartUnmirroredAnimation(arg0, sub, sub->paired, 0xB, 2, 0);
+                Vanargand_AdvanceEffectStageOne((u8 *)self + 0x21C);
+                {
+                    s32 x = arg0->position.x;
+                    s32 y = arg0->position.y;
+                    s32 z = arg0->position.z;
+                    struct MotionTrack *track;
+                    s32 delta;
+                    u32 mode;
+                    track = &self->track;
+                    delta = -0x100;
+                    x += delta;
+                    z += delta;
+                    mode = 4;
+                    Vg_SetPosition(&org2, x, y, z);
+                    MotionTrack_Initialize(track, &arg0->position,
+                                           (const struct MotionTrackVector *)&org2, 0, mode);
+                }
             }
-            Vg_081ABA64_StepFrame(seq, target);
-            Vg_081ABA64_Contact(base);
-            MotionTrack_Update(base + 0x534);
-            if (VG_AT(u8, 0x231) == 3) {
-                *phaseP = 7;
-                *(u32 *)counter = 0;
+            sequenceEnded = Vg_081ABA64_StepFrame(&sub->sprite);
+            if (sub_081A6A08(arg0)) {
+                if (self->parts.side == 0)
+                    PlayerContact_ApplySyntheticContact(arg0->contactActor, self->contactForce, 2,
+                                                        0x20, 0, 1);
+                else
+                    PlayerContact_ApplySyntheticContact(arg0->contactActor, self->contactForce, 2,
+                                                        0x20, 0, 2);
+            }
+            MotionTrack_Update(&self->track);
+            if (self->parts.effectStage == 3) {
+                Vg_ChangePhase(arg0, 7);
                 return;
             }
-            *(u32 *)counter += 1;
+            arg0->timer += 1;
             return;
         case 7:
-            VG_AT(u32, 0x9C) |= 0x80000;
-            if (*(u32 *)counter == 0)
-                SceneActors_StartUnmirroredAnimation(arg0, sub, sub + 0x60, 0xB, 2, 0);
-            Vg_081ABA64_StepFrame(seq, target);
-            if (*(u32 *)counter <= 0x3B) {
-                Vg_081ABA64_Contact(base);
-                if (*(u32 *)counter & 1) {
-                    VG_AT(s16, 0x5C) = -2;
-                    VG_AT(s16, 0x5E) = 0;
-                    VG_AT(s16, 0x60) = -2;
+            Vg_SetFlags(arg0, 0x80000);
+            if (arg0->timer == 0)
+                SceneActors_StartUnmirroredAnimation(arg0, sub, sub->paired, 0xB, 2, 0);
+            sequenceEnded = Vg_081ABA64_StepFrame(&sub->sprite);
+            if (arg0->timer <= 0x3B) {
+                if (sub_081A6A08(arg0)) {
+                    if (self->parts.side == 0)
+                        PlayerContact_ApplySyntheticContact(arg0->contactActor, self->contactForce,
+                                                            2, 0x20, 0, 1);
+                    else
+                        PlayerContact_ApplySyntheticContact(arg0->contactActor, self->contactForce,
+                                                            2, 0x20, 0, 2);
+                }
+                if (arg0->timer & 1) {
+                    Vg_SetPosition(&arg0->velocity, -2, 0, -2);
                 }
             }
-            if (*(u32 *)counter == 0x3C)
-                Vanargand_AdvanceEffectStageThree(base + 0x21C);
-            if (VG_AT(u8, 0x231) == 0) {
-                *phaseP = 8;
-                *(u32 *)counter = 0;
+            if (arg0->timer == 0x3C)
+                Vanargand_AdvanceEffectStageThree((u8 *)self + 0x21C);
+            if (self->parts.effectStage == 0) {
+                Vg_ChangePhase(arg0, 8);
                 return;
             }
-            *(u32 *)counter += 1;
+            arg0->timer += 1;
             return;
         case 8:
-            VG_AT(u32, 0x9C) |= 0x80000;
-            if (*(u32 *)counter == 0) {
-                Anim_SetSequence(seq, *(void **)(sub + 0xA8 + 0x74), 6, 0, 0);
-                *(u32 *)counter += 1;
+            Vg_SetFlags(arg0, 0x80000);
+            if (arg0->timer == 0) {
+                struct VanargandSprite *sprite = &sub->sprite;
+                struct DisplaySequenceState *sequence = &sprite->sequence;
+                Anim_SetSequence(sequence, sprite->resource, 6, 0, 0);
+                arg0->timer += 1;
             }
-            if (*(u32 *)counter == 1) {
-                Vg_081ABA64_StepFrame(seq, target);
+            if (arg0->timer == 1) {
+                sequenceEnded = Vg_081ABA64_StepFrame(&sub->sprite);
+                if (sequenceEnded)
+                    arg0->timer += 1;
                 return;
             }
-            VG_AT(s16, 0x5C) = *(u32 *)counter;
-            VG_AT(s16, 0x5E) = 0;
-            VG_AT(s16, 0x60) = *(u32 *)counter;
-            *(u32 *)counter += 1;
-            if (*(u32 *)counter <= 0xF)
+            Vg_SetPosition(&arg0->velocity, arg0->timer, 0, arg0->timer);
+            arg0->timer += 1;
+            if (arg0->timer <= 0xF)
                 return;
-            *phaseP = 9;
-            *(u32 *)counter = 0;
+            Vg_ChangePhase(arg0, 9);
             return;
         case 9:
-            if (*(u32 *)counter == 0) {
-                SceneActors_StartUnmirroredAnimation(arg0, sub, sub + 0x60, 0xA, 2, 2);
-                Sprite_ApplyAnimation(sub + 0xA8, sub + 0xD4);
-                ((u16 *)(sub + 0xA8))[8] = 0x18;
-                Vg_081ABA64_SetOffsets((s16 *)(sub + 0x128), 0x10000);
-                if (sub[0xA4] == 0) {
-                    VG_AT(u32, 0xF1C) = 0;
-                    VG_AT(u16, 0xF20) = 4;
-                    VG_AT(u16, 0xF22) = 5;
-                } else {
-                    VG_AT(u32, 0xF1C) = 0;
-                    VG_AT(u16, 0xF20) = 5;
-                    VG_AT(u16, 0xF22) = 5;
+            if (arg0->timer == 0) {
+                SceneActors_StartUnmirroredAnimation(arg0, sub, sub->paired, 0xA, 2, 2);
+                Vg_ResetSprite(&sub->sprite);
+                {
+                    struct ContactPosition *dst = &sub->sprite.offset;
+                    struct ContactPosition *point;
+                    s32 a, b;
+                    projected4.x = 0;
+                    projected4.y = 1;
+                    point = &projected4;
+                    a = point->x;
+                    b = point->y;
+                    dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
+                    dst->y = 0x40;
+                    dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
                 }
-                VG_AT(u32, 0xF18) = 0;
-                Anim_SetSequence(base + 0x444, VG_AT(void *, 0x454), 0, 0, 4);
-                VG_AT(u16, 0x500) = 1;
-                VG_AT(u32, 0x458) = 0;
+                if (sub->side == 0) {
+                    Vg_SetPalette(self, 4, 5, 0);
+                } else {
+                    Vg_SetPalette(self, 5, 5, 0);
+                }
+                {
+                    struct VanargandSecondaryPart *part = &self->secondary;
+                    u32 zero = 0;
+                    u32 flags = 4;
+                    struct DisplaySequenceState *sequence = &part->sequence;
+                    Anim_SetSequence(sequence, part->resource, 0, 0, flags);
+                    self->secondaryActive = 1;
+                    part->flags = zero;
+                }
             }
-            if (*(u32 *)counter == 3)
-                Vg_081ABA64_SetOffsets((s16 *)(sub + 0x128), 0);
-            if (*(u32 *)counter > 6)
-                VG_AT(u32, 0x9C) |= 0x80000;
-            if (VG_AT(u8, 0xB2) != 0) {
-                *phaseP = 10;
-                *(u32 *)counter = 0;
+            if (arg0->timer == 3) {
+                struct ContactPosition *dst = &sub->sprite.offset;
+                struct ContactPosition *point;
+                s32 a, b;
+                projected5.x = 0;
+                projected5.y = 0;
+                point = &projected5;
+                a = point->x;
+                b = point->y;
+                dst->x = Vg_ShiftTowardZero(((a + b) << 5) / 3 + 0x40, 1);
+                dst->y = 0x40;
+                dst->z = Vg_ShiftTowardZero(((-a + b) << 5) / 3 + 0x40, 1);
+            }
+            if (arg0->timer <= 6)
+                Vg_SetFlags(arg0, 0x80000);
+            if (arg0->animationEnded != 0) {
+                Vg_ChangePhase(arg0, 10);
                 return;
             }
-            *(u32 *)counter += 1;
+            arg0->timer += 1;
             return;
         case 10:
-            VG_AT(u8, 0xAF) = 1;
-            *phaseP = 0;
-            *(u32 *)counter = 0;
+            arg0->finished = 1;
+            Vg_ChangePhase(arg0, 0);
             return;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081ABA64);
-#endif

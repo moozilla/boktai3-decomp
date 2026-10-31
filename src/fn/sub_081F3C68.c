@@ -1,23 +1,26 @@
-#include "global.h"
+#include "contact_position.h"
 #include "ram.h"
 #include "engine_globals.h"
-// MATCHING_CONCESSION: register-pinning
+#include "monster_particle_random.h"
 
-#ifdef NONMATCHING
-// fuzzy: 81.3%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: vector pointer lifetimes, collider argument reloads and loop scheduling.
-struct Vec {
-    s16 x, y, z, pad;
+struct PositionWords {
+    u32 xy, zPad;
 };
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
+struct SummonConfig {
+    u16 flags, lifetime;
+    u8 unknown4[2], angle, variant;
+    u32 behaviorValue;
+    void *callback;
+    s16 primaryCollider[3];
+    u16 unknown16;
+    s16 secondaryCollider[3];
+    u16 unknown1E;
 };
 struct Actor {
     u8 pad0[0x51];
     u8 angle;
     u8 pad52[2];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 pad64[0x2c];
     u32 timer;
     s16 health;
@@ -40,9 +43,9 @@ struct Actor {
     u8 pad180[0x1ac];
     u8 animation[0x20];
     u8 animationData[0x20];
-    struct Vec anchor;
+    struct ContactPosition anchor;
     u8 pad374[0x58];
-    struct Vec home;
+    struct ContactPosition home;
     u8 pad3D4[0xa78];
     s16 selectedPoint, selectedTarget;
     u16 padE50;
@@ -59,19 +62,11 @@ struct Actor {
     u8 padEd2[8];
     s16 projectileCount, cloneCount;
 };
-#define H(o) (*(s16 *)((u8 *)p2 + (o)))
-#define U(o) (*(u16 *)((u8 *)p2 + (o)))
-#define B(o) (*(u8 *)((u8 *)p2 + (o)))
-#define W(o) (*(u32 *)((u8 *)p2 + (o)))
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
-void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
-void SceneActors_StartAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
-void Sound_StopSong(u32);
 u8 Callback_InvokeActor(void *, void *);
-s32 Math_Atan2(s32, s32);
 static inline u32 randomA(void)
 {
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
@@ -95,7 +90,7 @@ static inline s32 trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct Vec *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
     s32 zero = 0;
@@ -103,30 +98,53 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
     v->y = zero;
     v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
+static inline void sum(struct ContactPosition *d, struct ContactPosition *a,
+                       struct ContactPosition *b)
 {
     d->x = a->x + b->x;
     d->y = a->y + b->y;
     d->z = a->z + b->z;
 }
 
-struct Vec *Player_GetEffectivePosition(s32);
+struct ContactPosition *Player_GetEffectivePosition(s32);
 s32 Div(s32, s32);
 void HomingProjectile_InitParams(void *);
 void HomingProjectile_SetMotionParams(void *, s32, s32, u8, s32);
 void HomingProjectile_SetPrimaryColliderParams(void *, s32, s32, s32);
 void HomingProjectile_SetSecondaryColliderParams(void *, s32, s32, s32);
-void HomingProjectile_Spawn(void *, struct Vec *);
+void HomingProjectile_Spawn(void *, struct ContactPosition *);
 void PlayerClone_InitConfig(void *);
 void PlayerClone_SetLifetimeAndBehavior(void *, s32, s32, u8);
 void PlayerClone_SetColliderExtents(void *, s32, s32, s32, s32, s32, s32);
-s32 sub_08201160(void *, struct Vec *);
+s32 sub_08201160(void *, struct ContactPosition *);
 static inline u32 randomB(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
+    return *(const u16 *)(gRandomIndex * 2 + RANDOM_TABLE_ADDR);
 }
-static inline void clampSpawn(struct Vec *spawn)
+static inline struct ContactPosition *ClampSpawnX(struct ContactPosition *point)
+{
+    if (point->x <= 1059)
+        point->x = 1060;
+    if (point->x > 3290) {
+        point->x = 3290;
+        return point;
+    }
+    return point;
+}
+static inline s32 ReadPositionZ(struct ContactPosition *const position)
+{
+    return position->z;
+}
+static inline void ClampProjectileSpawn(struct ContactPosition *spawn)
+{
+    struct ContactPosition *point = ClampSpawnX(spawn);
+    if (ReadPositionZ(point) <= 1319)
+        point->z = 1320;
+    if (point->z > 3030)
+        point->z = 3030;
+}
+static inline void clampSpawn(struct ContactPosition *spawn)
 {
     if (spawn->x <= 1059)
         spawn->x = 1060;
@@ -137,16 +155,19 @@ static inline void clampSpawn(struct Vec *spawn)
     if (spawn->z > 3030)
         spawn->z = 3030;
 }
+static inline void Ratatosk_CopyPositionWords(void *dest, const void *source)
+{
+    *(struct PositionWords *)dest = *(const struct PositionWords *)source;
+}
+
 // confidence=low: surrounds the player with homing projectiles or clone actors.
 #define Ratatosk_UpdateRadialSummonAttack sub_081F3C68
 void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
 {
-    u8 projectile[0x20];
-    u8 clone[0x20];
-    struct Vec delta;
-    struct Vec spawn;
-    struct Vec cloneDelta;
-    struct Vec cloneSpawn;
+    struct SummonConfig projectile, clone;
+    struct ContactPosition positions[2];
+    struct ContactPosition cloneDelta;
+    struct ContactPosition cloneSpawn;
     struct Actor *p2 = p;
     facing(p, p->requestedAngle);
     if (p->changed) {
@@ -162,31 +183,38 @@ void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
     if (tick > 56) {
         if (p->active == 3) {
             u8 angle = (u8)randomA();
-            register s32 pattern asm("r10") = randomB();
-            u8 i;
+            u16 pattern = randomB();
+            s32 i;
             pattern &= 3;
             for (i = 0; i < p2->projectileCount; i++) {
-                register struct Vec *deltaPtr asm("r9") = &delta;
-                register struct Vec *spawnPtr asm("r8") = &spawn;
-                register u32 variant asm("r6") = randomA() & 1;
-                spawn = *Player_GetEffectivePosition(0);
+                struct ContactPosition *deltaPtr = &positions[0];
+                struct ContactPosition *spawnPtr;
+                u32 variant;
+                gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+                PARTICLE_RANDOM_READ_SAMPLE(variant, gUnk_086141BC, gEffectRandomTableIndex);
+                variant &= 1;
+                spawnPtr = deltaPtr + 1;
+                Ratatosk_CopyPositionWords(&positions[1], Player_GetEffectivePosition(0));
                 polar(deltaPtr, (u8)angle, 512);
                 sum(spawnPtr, spawnPtr, deltaPtr);
-                HomingProjectile_InitParams(projectile);
-                HomingProjectile_SetMotionParams(projectile, 60, 0, angle + 128, variant);
-                HomingProjectile_SetPrimaryColliderParams(projectile, p2->primaryCollider[0],
+                HomingProjectile_InitParams(&projectile);
+                HomingProjectile_SetMotionParams(&projectile, 60, 0, angle + 128, variant);
+                HomingProjectile_SetPrimaryColliderParams(&projectile, p2->primaryCollider[0],
                                                           p2->primaryCollider[1],
                                                           p2->primaryCollider[2]);
-                if (variant == 0)
-                    HomingProjectile_SetSecondaryColliderParams(
-                        projectile, p2->secondaryColliderB[0], p2->secondaryColliderB[1],
-                        p2->secondaryColliderB[2]);
-                else
-                    HomingProjectile_SetSecondaryColliderParams(
-                        projectile, p2->secondaryColliderA[0], p2->secondaryColliderA[1],
-                        p2->secondaryColliderA[2]);
-                clampSpawn(&spawn);
-                HomingProjectile_Spawn(projectile, &spawn);
+                {
+                    struct ContactPosition *spawnPoint = &positions[1];
+                    if (variant == 0)
+                        HomingProjectile_SetSecondaryColliderParams(
+                            &projectile, p2->secondaryColliderB[0], p2->secondaryColliderB[1],
+                            p2->secondaryColliderB[2]);
+                    else
+                        HomingProjectile_SetSecondaryColliderParams(
+                            &projectile, p2->secondaryColliderA[0], p2->secondaryColliderA[1],
+                            p2->secondaryColliderA[2]);
+                    ClampProjectileSpawn(spawnPoint);
+                    HomingProjectile_Spawn(&projectile, spawnPoint);
+                }
                 switch (pattern) {
                     case 0:
                         angle += Div(256, p2->projectileCount);
@@ -221,14 +249,14 @@ void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
                 cloneSpawn = *Player_GetEffectivePosition(0);
                 polar(&cloneDelta, angle, 512);
                 sum(&cloneSpawn, &cloneSpawn, &cloneDelta);
-                PlayerClone_InitConfig(clone);
-                *((u32 *)(clone + 8)) = (randomB() & 15) + 16;
-                PlayerClone_SetLifetimeAndBehavior(clone, 60, 5, angle + 128);
-                PlayerClone_SetColliderExtents(clone, p2->cloneCollider[0], p2->cloneCollider[1],
+                PlayerClone_InitConfig(&clone);
+                clone.behaviorValue = (randomB() & 15) + 16;
+                PlayerClone_SetLifetimeAndBehavior(&clone, 60, 5, angle + 128);
+                PlayerClone_SetColliderExtents(&clone, p2->cloneCollider[0], p2->cloneCollider[1],
                                                p2->cloneCollider[2], p2->cloneCollider[3],
                                                p2->cloneCollider[4], p2->cloneCollider[5]);
                 clampSpawn(&cloneSpawn);
-                sub_08201160(clone, &cloneSpawn);
+                sub_08201160(&clone, &cloneSpawn);
                 angle += Div(256, p2->cloneCount);
             }
         }
@@ -240,7 +268,3 @@ void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
         p->flags |= mask;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F3C68);
-#endif
