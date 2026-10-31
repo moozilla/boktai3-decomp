@@ -26,3 +26,9 @@ the origin before indexing the physical sample table reproduces both literal
 loads with stock agbcc. That candidate places the loads at the later capture
 of the sample cursor. The original code places them before the first draw in
 each direction. The origin's meaning before compilation is still unknown.
+
+ActorParticles_SpawnBurst at 0812E5A4 reproduces all 332 bytes with a named
+statement macro that captures the numeric origin. The first draw uses the
+physical table address. The three spread draws and the count draw use
+ParticleRandom_ReadRelativeSample. This removes both assembly barriers and
+retains the original early load without using addresses from other RAM objects.
