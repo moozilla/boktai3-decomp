@@ -3,8 +3,6 @@
 #include "player.h"
 #include "ram.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.0%
 struct RatatoskOrbitPoint {
     u32 xy, z;
 };
@@ -62,10 +60,8 @@ static inline u8 consume(struct RatatoskOrbitActor *p)
 }
 static inline u32 randomB(void)
 {
-    u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gRandomTable);
+    return *(const u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
 }
 static inline s32 trunc12(s32 v)
 {
@@ -238,7 +234,3 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct RatatoskOrbitActor *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F7FD0);
-#endif
