@@ -399,9 +399,11 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round7-vorn-defeat_2026-10-30.md](../notes/round7-vorn-defeat_2026-10-30.md) | Round 7: Vorn defeat completion | #matching #monsters #vorn #080AEE08 #scope | 3 |
 | [notes/round8-armor-axis-decision.md](../notes/round8-armor-axis-decision.md) | Armor axis attack decision |  | 1 |
 | [notes/round8-armor-layered-animation.md](../notes/round8-armor-layered-animation.md) | Armor layered animation | #matching #armor #compiler | 0 |
+| [notes/round8-dog-init.md](../notes/round8-dog-init.md) | Dog_Init | #matching #dog #compiler #round8 | 1 |
 | [notes/round8-effect-group-fade.md](../notes/round8-effect-group-fade.md) | EffectGroup_FadeFirstActive | #effects #matching #round8 | 0 |
 | [notes/round8-feather-ground-scatter.md](../notes/round8-feather-ground-scatter.md) | FeatherEffectPool_SpawnGroundScatter | #matching #effects #compiler #round8 | 1 |
 | [notes/round8-linked-effect-variant.md](../notes/round8-linked-effect-variant.md) | LinkedEffect_SetVariant | #matching #effects #compiler #round8 | 0 |
+| [notes/round8-particle-sample-origin.md](../notes/round8-particle-sample-origin.md) | Particle sample address origin | #rng #matching #round8 | 2 |
 | [notes/round8-player-clone-pool.md](../notes/round8-player-clone-pool.md) | PlayerClone_UpdatePool | #matching #player #compiler #round8 | 0 |
 | [notes/round8-player-target-motion.md](../notes/round8-player-target-motion.md) | Player_UpdateTargetMotion | #matching #player #compiler #round8 | 0 |
 | [notes/round8-projectile-impact-pair.md](../notes/round8-projectile-impact-pair.md) | Projectile_SpawnImpactPair | #matching #effects #compiler #round8 | 0 |
@@ -409,6 +411,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round8-runtime-maps.md](../notes/round8-runtime-maps.md) | Runtime state and effect lookup tables | #ram #data #studio #matching #round8 | 2 |
 | [notes/round8-scene-effect-messages.md](../notes/round8-scene-effect-messages.md) | Scene effect queue messages | #effects #projection #matching #round8 | 1 |
 | [notes/round8-scene-target-begin-move.md](../notes/round8-scene-target-begin-move.md) | SceneTarget_BeginMove | #effects #projection #matching #round8 | 0 |
+| [notes/round8-secondary-flicker-burst.md](../notes/round8-secondary-flicker-burst.md) | FlickerParticle_StartSecondaryBurst | #effects #round8 #matching | 1 |
+| [notes/round8-sound-test.md](../notes/round8-sound-test.md) | Sound-test song lists | #sound #studio #data #matching #round8 | 1 |
 | [notes/round8-spark-particle-spawn.md](../notes/round8-spark-particle-spawn.md) | SparkParticle_Spawn | #matching #effects #compiler #round8 | 0 |
 | [notes/round8-spider-health-pins.md](../notes/round8-spider-health-pins.md) | Spider pursuit and health restore entry | #round8 #matching #compiler | 1 |
 | [notes/round8-vanargand-part-impact.md](../notes/round8-vanargand-part-impact.md) | Vanargand_UpdatePartImpact | #matching #vanargand #compiler #round8 | 0 |
