@@ -1,11 +1,10 @@
-#include "global.h"
+#include "player_cue.h"
 
-void PlayerCue_UpdateRunOverlay(u8 *p)
+void PlayerCue_UpdateRunOverlay(struct Player *p)
 {
-    u16 *q = (u16 *)(p + 0xAD6);
-    u16 v = 0xBA;
-
-    v <<= 1;
-    *q = v;
-    *(u16 *)(p + 0xAD8) = 0x18;
+    u16 *parameter = &p->actionEighteenParameter;
+    u16 value = 0xBA;
+    value <<= 1;
+    *parameter = value;
+    p->actionEighteenDuration = 0x18;
 }
