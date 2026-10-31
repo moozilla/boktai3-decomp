@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct A {
     u8 pad0[0x51];
@@ -20,21 +19,19 @@ typedef struct A {
 
 static inline void setFacing(A *p, int angle)
 {
-    register u32 value asm("r1");
-    register int shifted asm("r0");
     p->angle = angle;
-    shifted = p->angle + 0x60;
-    asm("" : "+r"(shifted));
-    shifted >>= 6;
-    value = 3 & shifted;
-    asm("" : "+r"(value));
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    asm("" : "+r"(shifted));
-    shifted >>= 5;
-    value = 7 & shifted;
-    asm("" : "+r"(value));
-    p->facing8 = value;
+    {
+        int shifted = (p->angle + 0x60) >> 6;
+        u32 value = 3;
+        value &= shifted;
+        p->facing = value;
+    }
+    {
+        int shifted = (p->angle + 0x70) >> 5;
+        u32 value = 7;
+        value &= shifted;
+        p->facing8 = value;
+    }
 }
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void sub_0817F330(A *p)
