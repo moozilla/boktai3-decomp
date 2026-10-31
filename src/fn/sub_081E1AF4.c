@@ -1,6 +1,5 @@
 #include "global.h"
 // Provisional name: SoundTest_CountEntries
-// MATCHING_CONCESSION: register-pinning
 struct Sprite {
     u8 head[8];
     u32 flags;
@@ -36,12 +35,15 @@ s32 Div(s32, s32);
 extern const s16 gUnk_086136F0[], gUnk_086137AE[], gUnk_08613BC4[];
 static inline s32 count(const s16 *list)
 {
-    register s32 n asm("r2") = 0;
-    while (*list != -1) {
-        list++;
-        n++;
+    const s16 *cursor = list;
+    s32 count = 0;
+    s32 entry = *cursor;
+    while (entry != -1) {
+        cursor++;
+        count++;
+        entry = *cursor;
     }
-    return n;
+    return count;
 }
 // Count entries in each of the three sound-test categories.
 void SoundTest_CountEntries(struct Viewer *p)
