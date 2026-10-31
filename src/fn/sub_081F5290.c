@@ -3,8 +3,7 @@
 #include "scene_actor_components.h"
 
 #ifdef NONMATCHING
-// fuzzy: 63.6%
-// Remaining differences: owner and random-source allocation, scale decay and state setup.
+// fuzzy: 78.7%
 struct Actor {
     u8 pad0[0x51];
     u8 angle;
@@ -58,20 +57,20 @@ static inline u32 randomA(void)
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
-static inline void facing(struct Actor *p, s32 angle)
-{
-    u32 v;
-    s32 shift;
-    p->angle = angle;
-    shift = (p->angle + 0x60) >> 6;
-    v = 3;
-    v &= shift;
-    p->facing = v;
-    shift = (p->angle + 0x70) >> 5;
-    v = 7;
-    v &= shift;
-    p->facing8 = v;
-}
+#define SET_FACING(actor, heading)                                                                 \
+    do {                                                                                           \
+        u32 facingValue;                                                                           \
+        s32 shift;                                                                                 \
+        (actor)->angle = (heading);                                                                \
+        shift = ((actor)->angle + 0x60) >> 6;                                                      \
+        facingValue = 3;                                                                           \
+        facingValue &= shift;                                                                      \
+        (actor)->facing = facingValue;                                                             \
+        shift = ((actor)->angle + 0x70) >> 5;                                                      \
+        facingValue = 7;                                                                           \
+        facingValue &= shift;                                                                      \
+        (actor)->facing8 = facingValue;                                                            \
+    } while (0)
 static inline s32 trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
@@ -96,6 +95,15 @@ void Ratatosk_ConfigureAnimatedParticle(void *, u16, u32, u8, u32, u32, u32);
 void sub_081FC26C(void *, struct ContactPosition *);
 void Ratatosk_UpdateDirectionalAnimation(void);
 void Ratatosk_UpdateDefeatSequence(void);
+struct EffectRandomSample {
+    u16 value;
+};
+static inline u32 ReadEffectRandomCursor(const struct EffectRandomSample *table, u32 *cursor,
+                                         u32 mask)
+{
+    *cursor = (*cursor + 1) & mask;
+    return ((const struct EffectRandomSample *)(*cursor * 2 + (u32)table))->value;
+}
 static inline void decay(u16 *v)
 {
     u16 n = *v;
@@ -118,6 +126,8 @@ static inline void setState(struct Actor *p, void (*update)(void), u8 state)
 void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
 {
     s32 tick = elapsed;
+    u32 one = 1;
+    u32 randomMask = 1023;
     u8 params[0x1c];
     struct ContactPosition spawn;
     struct Actor *p2 = p;
@@ -125,6 +135,9 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
     u16 *scaleX;
     u16 *scaleZ;
     u32 *flags;
+    s32 speed;
+    const struct EffectRandomSample *randomTable = (const struct EffectRandomSample *)gUnk_086141BC;
+    u32 *randomCursor = &gEffectRandomTableIndex;
     if (p->changed) {
         s32 angle;
         p->changed = 0;
@@ -132,9 +145,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
             angle = p->savedAngle;
         else
             angle = p->targetAngle + 128;
-        do {
-            facing(p, angle);
-        } while (0);
+        SET_FACING(p, angle);
         SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 29, 0, 1, 4);
         Sound_PlaySong(0x55e);
     }
@@ -143,14 +154,15 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
             u8 *angleAddress = &p2->targetAngle;
             s32 duration = 16;
             struct ContactPosition *v = &body->motion;
-            u32 angle = *angleAddress;
-            s32 speed = duration - tick;
+            s16 angle = *angleAddress;
+            speed = duration - tick;
             polar(v, angle, speed);
         } else {
             s32 angle = p->savedAngle;
             s32 duration = 16;
             struct ContactPosition *v = &body->motion;
-            polar(v, angle + 128, duration - tick);
+            speed = duration - tick;
+            polar(v, angle + 128, speed);
         }
     }
     scaleX = &p2->scaleX;
@@ -175,17 +187,17 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
                 setState(p, Ratatosk_UpdateDefeatSequence, 15);
             } else {
                 setState(p, Ratatosk_UpdateDirectionalAnimation, 1);
-                p->nextState = 1;
+                p->finished = 1;
             }
         } else {
-            u32 one = 1;
             if (tick & one) {
-                u32 speed = randomA() & 7;
-                u32 variant = randomA() & one;
-                u32 angle = (u8)randomA();
-                u32 drift = randomA() & 15;
+                u32 speed = ReadEffectRandomCursor(randomTable, randomCursor, randomMask) & 7;
+                u32 variant = ReadEffectRandomCursor(randomTable, randomCursor, randomMask) & one;
+                u32 angle = (u8)ReadEffectRandomCursor(randomTable, randomCursor, randomMask);
+                u32 drift = ReadEffectRandomCursor(randomTable, randomCursor, randomMask) & 15;
+                struct ContactPosition source = p->position;
                 struct ContactPosition *position = &spawn;
-                spawn = p->position;
+                spawn = source;
                 position->x -= 128;
                 position->y += 128;
                 variant <<= 12;
