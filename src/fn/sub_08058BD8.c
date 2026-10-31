@@ -183,7 +183,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                 for (y = minY; y < maxY; y += 2) {
                     register s32 x asm("r5");
                     for (x = minX; x < maxX; x++) {
-                        register s32 dx = tileX + x, dy asm("r1") = tileY + y;
+                        register s32 dx = tileX + x, dy = tileY + y;
                         dx &= 31;
                         dy &= 31;
                         {
