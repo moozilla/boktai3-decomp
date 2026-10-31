@@ -1,18 +1,26 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 79.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: random-source lifetimes, sprite pointers and inlined sequence allocation.
+// fuzzy: 92.0%
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
 #include "contact_swarm.h"
+#include "display_sequence_inline.h"
 #include "ram.h"
+struct ParticleConfig {
+    u16 appearanceFlags;
+    u16 animationId;
+    u16 unknown4;
+    s8 angle;
+    u8 unknown7;
+    s32 speed;
+    u32 scaleX, scaleZ;
+    u32 kind;
+    u32 behavior;
+};
 struct Particle {
     u32 age;
     u8 pad4[8];
-    s16 vx, vy, vz, padE;
-    u16 appearanceFlags;
-    u8 config[0x1a];
+    struct ContactPosition velocity;
+    struct ParticleConfig config;
     struct ContactSwarmSprite sprite;
     u32 flags;
     u32 pad5C;
@@ -24,16 +32,10 @@ struct ParticlePool {
     u32 mask;
     u8 pad1C[0x1c];
     struct Particle particles[32];
+    void *sequenceResource;
+    u32 activeCount;
 };
-struct ParticleConfig {
-    u8 pad0[6];
-    s8 angle;
-    u8 pad7;
-    s32 speed;
-    u8 pad0C[8];
-    u32 kind;
-    u32 behavior;
-};
+
 extern void *const gUnk_08613F6C[];
 extern const s16 gUnk_086149C4[];
 void *Ratatosk_CreateAnimatedParticlePool(void);
@@ -45,121 +47,6 @@ static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceState *state,
-                                  struct ContactSwarmSprite *sprite)
-{
-    struct Particle *e = eIn;
-    const volatile u16 *command;
-    u32 flags;
-    u32 bit;
-    struct ContactSwarmSprite *result;
-    {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = e->sequence.commands;
-        command = (const volatile u16 *)(((u32)table) + offset);
-    }
-    sprite->frame = (*command) >> 6;
-    {
-        u32 input = state->flags;
-        u32 first;
-        u32 maskBit = 1;
-        bit = maskBit;
-        first = bit;
-        first &= input;
-        {
-            u32 second = (((*command) & 0x30) >> 4) & bit;
-            result = sprite;
-            if (first != second)
-                e->sprite.flags |= 4;
-            else
-                e->sprite.flags &= ~4;
-        }
-    }
-    {
-        u32 input = state->flags;
-        u32 bit;
-        u32 first;
-        bit = 2;
-        first = bit;
-        first &= input;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-        first = (u8)first;
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        u32 duration;
-        u32 temp;
-        u32 savedDuration;
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                } else {
-                    state->index = index - 1;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                } else {
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)(((u32)table) + offset);
-            }
-            state->frameWeight = (*command) & 15;
-            {
-                s32 weight = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!((u8)speed)) {
-                    u32 one = 1;
-                    state->duration = one;
-                }
-            }
-        }
-    }
-}
-
 extern const u16 gUnk_086141BC[];
 static inline u32 RandomSample(void)
 {
@@ -167,120 +54,65 @@ static inline u32 RandomSample(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 // confidence=low: randomizes a larger particle record and its sprite or sequence.
-inline static void updatePlayback_081FC26C(struct Particle *eIn, struct DisplaySequenceState *state,
-                                           struct ContactSwarmSprite *sprite)
+static inline void StepSequence(struct Particle *owner, struct DisplaySequenceState *state,
+                                struct ContactSwarmSprite *sprite)
 {
-    struct Particle *e = eIn;
-    const volatile u16 *command;
-    u32 flags;
-    u32 bit;
-    struct ContactSwarmSprite *result;
-    typeof(state->speed) t1;
+    const u16 *command;
     {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = e->sequence.commands;
-        command = (const volatile u16 *)(((u32)table) + offset);
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = owner->sequence.commands;
+        command = (const u16 *)((u32)table + offset);
     }
-    sprite->frame = (*command) >> 6;
+    sprite->frame = *command >> 6;
     {
-        u32 input = state->flags;
-        u32 first;
-        u32 maskBit = 1;
-        bit = maskBit;
-        first = bit;
-        first &= input;
-        {
-            u32 second = (((*command) & 0x30) >> 4) & bit;
-            result = sprite;
-            if (first != second)
-                e->sprite.flags |= 4;
-            else
-                e->sprite.flags &= ~4;
-        }
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->sprite.flags |= 4;
+        else
+            owner->sprite.flags &= ~4;
     }
     {
-        u32 input = state->flags;
-        u32 bit;
-        u32 first;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
         bit = 2;
-        first = bit;
-        first &= input;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
-        first = (u8)first;
     }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        u32 duration;
-        u32 temp;
-        u32 savedDuration;
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                } else {
-                    state->index = index - 1;
-                }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
             } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
+                state->index--;
+            }
+        } else {
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
                 } else {
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)(((u32)table) + offset);
-            }
-            state->frameWeight = (*command) & 15;
-            {
-                s32 weight = state->frameWeight;
-                s32 speed;
-                t1 = state->speed;
-                speed = t1;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!((u8)speed)) {
-                    u32 one = 1;
-                    state->duration = one;
+                    state->index = 0;
                 }
             }
         }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
     }
 }
 
@@ -299,67 +131,69 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     if (!e)
         return -1;
     Ratatosk_SetAnimatedParticleUpdateCallback(config, gUnk_08613F6C[config->behavior]);
-    Memory_Copy(&e->appearanceFlags, config, 0x1c);
+    Memory_Copy(&e->config, config, sizeof(*config));
     e->age = 0;
-    e->lift = *((u32 *)(((u8 *)e) + 0x24));
+    e->lift = e->config.scaleZ;
     {
-        s16 *vel = &e->vx;
+        struct ContactPosition *vel = &e->velocity;
         s32 angle = config->angle;
         s32 speed = config->speed;
         s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
         s32 zero = 0;
-        vel[0] = x;
-        vel[1] = zero;
-        vel[2] = Scale(gUnk_086149C4[angle & 255] * speed);
+        vel->x = x;
+        vel->y = zero;
+        vel->z = Scale(gUnk_086149C4[angle & 255] * speed);
     }
     e->sprite.position = *position;
-    e->appearanceFlags = 0;
-    kind = (kind == 3) ? (1) : (RandomSample() & 3);
-    {
-        typeof(e->appearanceFlags) *q1 = &e->appearanceFlags;
-        *q1 = kind;
+    e->config.appearanceFlags = 0;
+    kind = RandomSample() & 3;
+    if (kind == 3) {
+        kind = 1;
+        e->config.appearanceFlags = kind;
+    } else {
+        e->config.appearanceFlags = kind;
     }
-    if ((e->appearanceFlags & 15) <= 1) {
+    if ((e->config.appearanceFlags & 15) <= 1) {
         if (RandomSample() & 1) {
-            Anim_SetSequence(&e->sequence, *((void **)(((u8 *)pool) + 0xf38)), 1, 0, 0);
+            Anim_SetSequence(&e->sequence, pool->sequenceResource, 1, 0, 0);
             sprite = &e->sprite;
-            updatePlayback_081FC26C(e, &e->sequence, sprite);
+            StepSequence(e, &e->sequence, sprite);
         } else {
             u32 variant = RandomSample() & 7;
             if (variant > 5)
                 variant = 5;
-            e->appearanceFlags |= variant << 12;
+            e->config.appearanceFlags |= variant << 12;
             sprite = &e->sprite;
-            sprite->frame = (e->appearanceFlags >> 12) + 3;
-            e->appearanceFlags |= 0x200;
+            sprite->frame = (e->config.appearanceFlags >> 12) + 3;
+            e->config.appearanceFlags |= 0x200;
         }
     } else {
-        e->appearanceFlags |= (RandomSample() & 3) << 12;
+        e->config.appearanceFlags |= (RandomSample() & 3) << 12;
         sprite = &e->sprite;
-        sprite->frame = (e->appearanceFlags >> 12) + 0x26;
-        e->appearanceFlags |= 0x200;
+        sprite->frame = (e->config.appearanceFlags >> 12) + 0x26;
+        e->config.appearanceFlags |= 0x200;
     }
     if (RandomSample() & 1) {
         e->sprite.flags |= 4;
         e->sequence.flags |= 1;
-        e->appearanceFlags |= 0x10;
+        e->config.appearanceFlags |= 0x10;
     }
     if (RandomSample() & 1) {
         e->sprite.flags |= 8;
         e->sequence.flags |= 2;
-        e->appearanceFlags |= 0x20;
+        e->config.appearanceFlags |= 0x20;
     }
-    if (((e->appearanceFlags & 15) != 2) && (!(e->appearanceFlags & 0x200))) {
+    if (((e->config.appearanceFlags & 15) != 2) && (!(e->config.appearanceFlags & 0x200))) {
         if (RandomSample() & 1) {
             e->sequence.flags |= 4;
-            e->appearanceFlags |= 0x100;
+            e->config.appearanceFlags |= 0x100;
         }
     }
     e->sprite.flags &= ~1;
     Sprite_LinkToList(sprite, 0);
-    *(((u8 *)e) + 0x37) = 1;
+    e->sprite.priority = 1;
     pool->mask |= 1 << slot;
-    *((u32 *)(((u8 *)pool) + 0xf3c)) += 1;
+    pool->activeCount += 1;
     return slot;
 }
 
