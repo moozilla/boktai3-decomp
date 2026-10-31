@@ -19,7 +19,6 @@
             (absZ) = -(deltaZ);                                                                    \
     } while (0)
 
-// MATCHING_CONCESSION: register-pinning
 struct ArmorDecisionActor {
     u8 pad0[0x18];
     u16 taskFlags;
@@ -52,14 +51,6 @@ extern struct ArmorDecisionTarget *gGameState;
 void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
-static inline void Armor_ClearDecision(struct ArmorDecisionActor *actor, u8 *cachedDecision)
-{
-    u8 *address = &actor->decision;
-    u32 zero = 0;
-    // Keep the cached address live and the new address ahead of the zero value.
-    asm("" : "+r"(zero) : "r"(address), "r"(cachedDecision));
-    *address = zero;
-}
 // Tentative field meanings: aligned strike and recovery decisions.
 void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *actor)
 {
@@ -159,16 +150,18 @@ void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *actor)
             case 1:
                 if (absY <= 127) {
                     if (deltaX == 0) {
-                        if ((deltaZ < 0) && (actor->facing == 192))
-                            goto strike;
+                        if ((deltaZ < 0) && (actor->facing == 192)) {
+                            ActorController_SetBehavior(actor, 22);
+                            *decisionPtr = flag;
+                            return;
+                        }
                         if (actor->facing == 64) {
                             ActorController_SetBehavior(actor, 22);
-                            Armor_ClearDecision(actor, decisionPtr);
+                            actor->decision = 0;
                             break;
                         }
                     } else if (deltaZ == 0) {
                         if ((deltaX < 0) && (actor->facing == 128)) {
-                        strike:
                             ActorController_SetBehavior(actor, 22);
                             *decisionPtr = flag;
                             break;
