@@ -1633,8 +1633,8 @@ struct NidhoggrPartInit {
 };
 
 #ifdef NONMATCHING
-// fuzzy: 69.9%
-// scope shape 46 (differences once low registers are set aside)
+// fuzzy: 99.1%
+// Final zero initialization and loop-bound comparison differ.
 void Nidhoggr_InitParts(void *arg0)
 {
     struct NidhoggrPartInit *t = arg0;
@@ -1670,48 +1670,55 @@ void Nidhoggr_InitParts(void *arg0)
         } while (i <= 25);
     }
     {
-        struct NidhoggrPartVector *bounds;
-        struct NidhoggrPartVector *offset;
+        u32 bodyOffset;
+        u32 attackOffset;
         damage = t->optionD >> 1;
         {
-            struct NidhoggrPartCollider *collider = &t->colliders[0];
-            bounds = &gUnk_0824F4CC;
-            collider->bounds = *bounds;
-            offset = &gUnk_0824F4C4;
-            collider->offset = *offset;
+            struct NidhoggrPartCollider *collider;
+            bodyOffset = (u32)&t->colliders[0];
+            bodyOffset -= (u32)t;
+            collider = (void *)((u8 *)t + bodyOffset);
+            collider->bounds = gUnk_0824F4CC;
+            collider->offset = gUnk_0824F4C4;
             Nidhoggr_MaskPartFlags(collider, ~4);
             Collider_SetBodyProperties(collider, damage, 0x120, 16);
             Collider_SetCallback(collider, Nidhoggr_ReceivePartContact, t);
         }
         {
-            struct NidhoggrPartCollider *collider = &t->attackColliders[0];
-            bounds = &gUnk_0824F4CC;
-            collider->bounds = *bounds;
-            offset = &gUnk_0824F4C4;
-            collider->offset = *offset;
+            struct NidhoggrPartCollider *collider;
+            attackOffset = (u32)&t->attackColliders[0];
+            attackOffset -= (u32)t;
+            collider = (void *)((u8 *)t + attackOffset);
+            collider->bounds = gUnk_0824F4CC;
+            collider->offset = gUnk_0824F4C4;
             Nidhoggr_MaskPartFlags(collider, ~4);
             Collider_SetAttackProperties(collider, 10, 10, 0, 0x40000, 30);
             Collider_SetCallback(collider, 0, 0);
         }
         {
-            struct NidhoggrPartCollider *collider = &t->colliders[1];
-            bounds = &gUnk_0824F4DC;
-            collider->bounds = *bounds;
-            offset = &gUnk_0824F4D4;
-            collider->offset = *offset;
+            struct NidhoggrPartCollider *collider;
+            collider = &t->colliders[1];
+            collider->bounds = gUnk_0824F4DC;
+            collider->offset = gUnk_0824F4D4;
             Nidhoggr_MaskPartFlags(collider, ~4);
-            Collider_SetBodyProperties(collider, damage, 0x120, 16);
-            Collider_SetCallback(collider, Nidhoggr_ReceivePartContact, t);
+            bodyOffset += sizeof(*collider);
+            bodyOffset += (u32)t;
+            Collider_SetBodyProperties((void *)bodyOffset, damage, 0x120, 16);
+            Collider_SetCallback((void *)bodyOffset, Nidhoggr_ReceivePartContact, t);
         }
         {
-            struct NidhoggrPartCollider *collider = &t->attackColliders[1];
-            bounds = &gUnk_0824F4DC;
-            collider->bounds = *bounds;
-            offset = &gUnk_0824F4D4;
-            collider->offset = *offset;
+            struct NidhoggrPartCollider *collider;
+            collider = &t->attackColliders[1];
+            collider->bounds = gUnk_0824F4DC;
+            collider->offset = gUnk_0824F4D4;
             Nidhoggr_MaskPartFlags(collider, ~4);
-            Collider_SetAttackProperties(collider, 10, 10, 0, 0x40000, 30);
-            Collider_SetCallback(collider, 0, 0);
+            attackOffset += sizeof(*collider);
+            {
+                u32 address = (u32)t + attackOffset;
+                attackOffset = address;
+            }
+            Collider_SetAttackProperties((void *)attackOffset, 10, 10, 0, 0x40000, 30);
+            Collider_SetCallback((void *)attackOffset, 0, 0);
         }
     }
     damage = t->optionD;
@@ -1740,7 +1747,8 @@ void Nidhoggr_InitParts(void *arg0)
     {
         struct NidhoggrPartCollider *collider = &t->colliders[18];
         u32 flags = 0x1008;
-        for (i = 1; i >= 0; collider++, i--) {
+        s32 lowerBound = 0;
+        for (i = 1; i >= lowerBound; collider++, i--) {
             collider->bounds = gUnk_0824F4BC;
             collider->offset = gUnk_0824F4B4;
             Collider_SetBodyProperties(collider, damage, 0x120, 16);
