@@ -49,7 +49,7 @@ struct PhaseObjectView {
 s32 Div(s32, s32);
 
 void ChildGroup_UpdateAlternatingCallbacks(void);
-void sub_080F2F7C(void);
+void PhaseObject_UpdateEntryScatter(void);
 // confidence=low: interpolates the four entries toward the shared target before enabling them.
 void PhaseObject_ConvergeEntries(struct PhaseObjectView *p)
 {
@@ -97,6 +97,6 @@ void PhaseObject_ConvergeEntries(struct PhaseObjectView *p)
             *flags8D = one | *flags8D;
         }
         p->action = ChildGroup_UpdateAlternatingCallbacks;
-        p->callback = sub_080F2F7C;
+        p->callback = PhaseObject_UpdateEntryScatter;
     }
 }

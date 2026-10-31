@@ -3848,6 +3848,7 @@ addr,name,mode,confidence,source,notes
 080F2C34,PhaseObject_TickCountdown,thumb,low,src-alias,
 080F2D50,PhaseObject_ApproachTarget,thumb,low,src-alias,
 080F2E6C,PhaseObject_EndApproachPause,thumb,low,src-alias,
+080F2F7C,PhaseObject_UpdateEntryScatter,thumb,low,src-alias,Tentative: fades four entries then chooses a target-relative scatter origin
 080F31AC,PhaseObject_BeginEntryMotion,thumb,low,src-alias,
 080F3230,PhaseObject_ConvergeEntries,thumb,low,src-alias,
 080F34C8,ChildGroup_WaitForInactiveMembers,thumb,low,src-alias,
