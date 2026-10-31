@@ -4,8 +4,6 @@
 #include "engine_globals.h"
 #include "scene_actor_components.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.4%
 struct Actor {
     u8 pad0[0x48];
     struct SceneActorBody body;
@@ -197,6 +195,9 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         SceneActors_StartAnimation(p, p2->animationData, p2->animation, 28, 0, 4);
     }
     if (((Mod(tick, 16) == 0) || (tick > 136)) && (tick <= 150)) {
+        /* Each particle spawns at a pointer taken once, before the loop; the
+         * per-iteration pointer only builds the offset position. */
+        struct ContactPosition *spawnAt = &spawn;
         for (i = 0; i < 2; ++i) {
             struct ContactPosition *position = &spawn;
             u16 speedSample = randomA() & 15;
@@ -215,7 +216,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
                 Ratatosk_ConfigureAnimatedParticle(&params, (randomA() & 31) + 292, value, angle, 1,
                                                    variant, radius);
             }
-            sub_081FC26C(&params, position);
+            sub_081FC26C(&params, spawnAt);
         }
     }
     if (tick == 440) {
@@ -241,7 +242,3 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         p->flags = value & (~16);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateDefeatSequence);
-#endif
