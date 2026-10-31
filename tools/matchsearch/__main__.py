@@ -15,6 +15,7 @@ from pathlib import Path
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 import traceback
 from typing import Any
@@ -26,13 +27,16 @@ MAX_REQUEST = 16 * 1024 * 1024
 
 
 def _socket_path(directory: Path) -> Path:
-    # Keep socket names below AF_UNIX's 108-byte bound even for long sessions.
-    root = Path(__file__).resolve().parents[2] / "build" / "matchsearch" / "sockets"
-    root.mkdir(parents=True, exist_ok=True)
-    path = root / (digest(str(directory.resolve()))[:20] + ".sock")
-    if len(os.fsencode(path)) >= 104:
-        raise ValueError("checkout path is too long for a Unix socket; use serve --stdio or request --local")
-    return path
+    # Keep socket names below AF_UNIX's 104-byte bound (macOS) even for long sessions:
+    # in the checkout when its path is short enough, else in the user's temp directory.
+    name = digest(str(directory.resolve()))[:20] + ".sock"
+    for root in (Path(__file__).resolve().parents[2] / "build" / "matchsearch" / "sockets",
+                 Path(tempfile.gettempdir()) / "matchsearch"):
+        path = root / name
+        if len(os.fsencode(path)) < 104:
+            root.mkdir(mode=0o700, parents=True, exist_ok=True)
+            return path
+    raise ValueError("checkout path is too long for a Unix socket; use serve --stdio or request --local")
 
 
 def _answer(session, request: dict[str, Any]) -> dict[str, Any]:
