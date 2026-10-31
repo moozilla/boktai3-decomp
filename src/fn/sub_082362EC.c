@@ -51,61 +51,73 @@ static inline u32 NextRandom(void)
     return *(const u16 *)(index * 2 + RANDOM_TABLE_ADDR);
 }
 
-static inline void Store16(s16 *dst, s32 value)
-{
-    *dst = value;
-}
-
 static inline s32 Scale12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 84.8%
 void RadialBurstEffect_StartBurst(struct RadialBurst *owner, struct RadialPosition *origin)
 {
+    s32 verticalVelocity = 0;
+    u16 initialTimer = 0;
     u32 angle = (u8)NextRandom();
     struct RadialParticleState *state = &owner->particles[0].state;
     struct RadialParticle *particle = owner->particles;
-    void *drawable = particle;
-    s32 i = 11;
+    s32 i;
 
-    do {
+    for (i = 0; i < 12; i++) {
+        s32 sineIndex;
+        s32 sineValue;
+        s32 zSpeed;
+        void *drawable = &owner->particles[i];
         state->active = 1;
         {
-            const void *lookup = (const void *)RANDOM_TABLE_ADDR;
-            u32 *seed = &gRandomIndex;
-            u16 index = *seed + 1;
-            u32 mask = 1023;
-            u32 speed;
+            union {
+                const u16 *random;
+                const s16 *sine;
+            } bank;
+            s32 xSpeed;
+            s32 cosineIndex;
+            s32 cosine;
+            const s16 *sine;
+            u32 *seed;
+            u16 index;
+            u32 mask;
+            const u16 *random;
+            bank.random = (const u16 *)RANDOM_TABLE_ADDR;
+            random = bank.random;
+            seed = &gRandomIndex;
+            index = *seed + 1;
+            mask = 1023;
             index &= mask;
             {
-                u32 raw = *(const u16 *)(index * 2 + (u32)lookup);
-                u32 smallMask = 15;
-                raw &= smallMask;
+                u32 jitterMask;
+                u16 raw;
+                raw = random[index];
+                jitterMask = 15;
+                jitterMask &= raw;
+                raw = jitterMask;
                 state->angle = raw + angle - 9;
+                index = (index + 1) & mask;
+                *seed = index;
+                raw = random[index];
+                raw &= 15;
+                state->speed = raw + 25;
             }
-            index = (index + 1) & mask;
-            *seed = index;
-            {
-                u32 raw = *(const u16 *)(index * 2 + (u32)lookup);
-                u32 smallMask = 15;
-                raw &= smallMask;
-                raw += 25;
-                state->speed = raw;
-            }
-            speed = state->speed;
-            lookup = gUnk_086149C4;
-            Store16(&state->vx, Scale12(speed * ((const s16 *)lookup)[(state->angle + 64) & 255]));
+            xSpeed = state->speed;
+            sine = gUnk_086149C4;
+            bank.sine = sine;
+            cosineIndex = (state->angle + 64) & 255;
+            cosine = bank.sine[cosineIndex];
+            state->vx = Scale12(xSpeed * cosine);
         }
-        state->vy = 0;
-        {
-            s32 speed = state->speed;
-            Store16(&state->vz, Scale12(speed * gUnk_086149C4[state->angle]));
-        }
+        state->vy = verticalVelocity;
+        zSpeed = state->speed;
+        sineIndex = state->angle;
+        sineValue = gUnk_086149C4[sineIndex];
+        state->vz = Scale12(zSpeed * sineValue);
         state->update = RadialBurstEffect_UpdateParticle;
-        state->timer = 0;
+        state->timer = initialTimer;
         particle->flags &= ~1;
         SpriteDrawable_SelectTileFrame(drawable, owner->graphics, state->tile);
         state->x = origin->x + state->vx;
@@ -113,13 +125,8 @@ void RadialBurstEffect_StartBurst(struct RadialBurst *owner, struct RadialPositi
         state->z = origin->z + state->vz;
         particle->visible = 1;
         angle = (angle + 24) & 255;
-        state = (struct RadialParticleState *)((u8 *)state + sizeof(struct RadialParticle));
-        drawable = (u8 *)drawable + sizeof(struct RadialParticle);
+        state = (struct RadialParticleState *)((u8 *)state + sizeof(*particle));
         particle++;
-        i--;
-    } while (i >= 0);
+    }
     owner->active = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RadialBurstEffect_StartBurst);
-#endif
