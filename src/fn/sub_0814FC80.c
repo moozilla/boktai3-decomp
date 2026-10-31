@@ -59,15 +59,22 @@ static inline u8 slowed(struct PlayerScriptDestination *p)
         result = 1;
     return result;
 }
-#ifdef NONMATCHING
-// fuzzy: 99.8%
+union PlayerCueReference {
+    void *actor;
+    struct PlayerScriptDestination *player;
+};
+static inline struct PlayerScriptDestination *PlayerCue_ResolveReference(void *actor)
+{
+    union PlayerCueReference reference;
+    reference.actor = actor;
+    return reference.player;
+}
 void Player_AdvanceScriptDestination(struct PlayerScriptDestination *p)
 {
     s32 dx = (p->scriptDestination.x) - (p->position.x);
     s32 dz = (p->scriptDestination.z) - (p->position.z);
     s32 angle = Math_Atan2(dx, dz);
     s32 speed = 12;
-    s32 footstepSound;
     Player_GetMovementRateScale(12);
     if (p && slowed(p))
         speed = (speed * p->movementSpeedScale) >> 6;
@@ -118,8 +125,7 @@ void Player_AdvanceScriptDestination(struct PlayerScriptDestination *p)
         if ((!((p->actionCueFlags) & 3)) && (!(p->actionCueCounter))) {
             if ((!((p && (p->active)) && (!(p->sceneMode)))) &&
                 (!(p && ((u8)flags(&p->actionFlags, 4))))) {
-                footstepSound = 0x28E;
-                if (p && slowed(p)) {
+                if (PlayerCue_ResolveReference(p) && slowed(p)) {
                     if (!(p->actionCueFlags))
                         Sound_PlaySong(0xC8);
                     else
@@ -130,7 +136,7 @@ void Player_AdvanceScriptDestination(struct PlayerScriptDestination *p)
                     else
                         Sound_PlaySong(0xC9);
                 } else if (!(p->actionCueFlags))
-                    Sound_PlaySong(footstepSound);
+                    Sound_PlaySong(0x28E);
                 else
                     Sound_PlaySong(0x28D);
             }
@@ -138,6 +144,3 @@ void Player_AdvanceScriptDestination(struct PlayerScriptDestination *p)
         Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 1), 64, 1);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Player_AdvanceScriptDestination);
-#endif
