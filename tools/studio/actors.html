@@ -86,7 +86,7 @@ body.embed main { grid-template-columns: 1fr; }
 // GCL names come from gcl/names/chara.csv; cross-references from
 // tools/assets/actors.py.
 studioHeader();
-let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, commandTables = {}, sel = null;
+let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, commandTables = {}, playerAnimations = null, sel = null;
 
 const label = a => noteOf('actor', a.key)?.label;
 const gclTitle = a => a.gcl.length ? a.gcl[0].name + (a.gcl[0].english ? ` (${a.gcl[0].english})` : '') : '';
@@ -104,7 +104,8 @@ function renderList() {
     return d;
   };
   $('list').replaceChildren(special('names', 'Name lists from the game (monsters, characters)'),
-    special('commands', `Command tables (${Object.keys(commandTables).length} decoded)`), ...hits.map(a => {
+    special('commands', `Command tables (${Object.keys(commandTables).length} decoded)`),
+    ...(playerAnimations ? [special('player-animations', 'Player animation variants (4 modes)')] : []), ...hits.map(a => {
     const d = document.createElement('div'); d.className = 'row' + (a.key === sel ? ' on' : ''); d.dataset.key = a.key;
     d.innerHTML = `<code>${a.key}</code><b></b><small></small>`;
     d.querySelector('b').textContent = title(a);
@@ -127,6 +128,7 @@ async function show(key) {
   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
   if (key === 'names') return showNames();
   if (navKey === 'commands') return showCommandTables(key.split(':')[1]);
+  if (key === 'player-animations') return showPlayerAnimations();
   const a = byKey[key], v = $('view');
   if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
   const names = a.names.map(n => `${stringLink(n.id)} ${esc(n.jp)}${en[n.id] ? ` <span class="cand">(${esc(en[n.id])})</span>` : ''}`).join('<br>');
@@ -194,6 +196,29 @@ function showCommandTables(addr) {
     <p class="meta">Rows keep the dispatch order. Handler names follow the current code symbols; pointer values retain the Thumb bit.</p>`;
 }
 
+function showPlayerAnimations() {
+  const data = playerAnimations;
+  if (!data) {
+    $('view').innerHTML = '<h2>Player animation variants</h2><div class="empty">No decoded tables.</div>';
+    return;
+  }
+  const hex = value => value.toString(16).toUpperCase().padStart(4, '0');
+  $('view').innerHTML = `<h2>Player animation variants</h2>
+    <p class="meta">${codeLink(data.lookup.addr, data.lookup.name)} selects one of four tables by action mode and reads its numeric index.
+      ${codeLink(data.select.addr, data.select.name)} adds the folded heading to that base sequence before selecting keyframes.</p>
+    <div class="meta"><span class="mono">${data.addr}–${data.end}</span> · ${data.size} bytes · <code>${esc(data.source)}</code></div>
+    <table class="commands"><thead><tr><th>Index</th>${data.tables.map(t => `<th>Mode ${t.mode}<br><span class="mono">${t.addr}</span></th>`).join('')}</tr></thead><tbody>
+      ${data.tables[0].entries.map((entry, index) => `<tr><td>${entry.index}</td>${data.tables.map(t => {
+        const value = t.entries[index].base_sequence;
+        return `<td class="mono${value === 0xFFFF ? ' meta' : ''}">${hex(value)}</td>`;
+      }).join('')}</tr>`).join('')}
+    </tbody></table>
+    <p class="meta">Base sequences are hexadecimal. FFFF values retain their stored value. Rows keep the game's index order; editing the CSV changes the normal data build.</p>
+    <h3>Direct player cue callers (${data.consumers.length})</h3>
+    <div class="chips">${data.consumers.map(f => `<span class="chip">${codeLink(f.addr, f.name)}</span>`).join('')}</div>
+    <p class="meta">Calls to the table lookup in the player cue code, read from ROM disassembly. Function names follow the current code symbols.</p>`;
+}
+
 function showNames() {
   const linked = {};
   for (const a of A) for (const n of a.names) (linked[n.id] ||= []).push(a);
@@ -209,12 +234,12 @@ function showNames() {
 
 $('q').oninput = renderList; $('fspr').onchange = renderList; $('fused').onchange = renderList; $('fgcl').onchange = renderList;
 listKeys(() => $('list'), '.row');
-const routeKey = hash => hash.toLowerCase() === 'names' ? 'names' : /^commands(?::|$)/i.test(hash) ? 'commands' + hash.slice(8).toUpperCase() : hash.toUpperCase();
+const routeKey = hash => hash.toLowerCase() === 'names' ? 'names' : hash.toLowerCase() === 'player-animations' ? 'player-animations' : /^commands(?::|$)/i.test(hash) ? 'commands' + hash.slice(8).toUpperCase() : hash.toUpperCase();
 window.onhashchange = () => { const k = routeKey(location.hash.slice(1)); if (k && k !== sel) show(k); };
 (async () => {
   await loadNotes();
   const [d, e] = await Promise.all([fetch('/api/actors').then(r => r.json()), fetch('/api/english').then(r => r.json()).catch(() => ({}))]);
-  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {};
+  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {}; playerAnimations = d.player_animations || null;
   byKey = Object.fromEntries(A.map(a => [a.key, a]));
   renderList();
   const k = routeKey(location.hash.slice(1)) || A.find(a => a.loader && a.sprites.length)?.key;

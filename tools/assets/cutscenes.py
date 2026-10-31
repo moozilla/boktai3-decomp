@@ -49,7 +49,7 @@ DIRECTOR = 0x4E69
 # receiver kinds: the class each registration site gives (08020CD4 callers)
 KINDS = {
     1: ("director", "SceneMessages_Initialize", "SceneMessages_Dispatch"),
-    2: ("player", "sub_0815D688", "PlayerCue_Dispatch"),
+    2: ("player", "Player_RegisterSceneMessageReceiver", "PlayerCue_Dispatch"),
     3: ("registry actor", "SceneActorRegistry_RegisterCategoryReceiver", None),
     4: ("scene actor", "SceneActors_Initialize", "SceneActors_DispatchCommands"),
     5: ("npc", "SceneNpc_CreateFromScript", "SceneNpc_DispatchCommands"),

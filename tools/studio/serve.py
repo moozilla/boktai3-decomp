@@ -377,9 +377,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path in ("/actors", "/scripts", "/code", "/world"):
             self.send(200, open(os.path.join(HERE, self.path[1:] + ".html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/actors":
+            import player_cue
             self.send(200, {"actors": actors.actors(), "enemies": actors.name_list(*actors.ENEMY_NAMES),
                             "characters": actors.name_list(*actors.CHARACTER_NAMES), "scenes": scene_info(),
-                            "command_tables": actors.command_tables()})
+                            "command_tables": actors.command_tables(),
+                            "player_animations": player_cue.animation_variants()})
         elif self.path == "/api/procs":
             import gclview
             self.send(200, {"procs": actors.proc_list(), "scenes": scene_info(), "callees": gclview.callee_names(),
