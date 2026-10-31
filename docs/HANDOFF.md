@@ -58,10 +58,10 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
-* **Player cue worker batch prepared** (2026-10-30): seven assigned callbacks
+* **Player cue worker batch complete** (2026-10-30): all assigned callbacks
   now match without concessions on `codex/finish-player-cue`, with shared sequence
-  stepping and typed movement/animation records. The guarded drafts at 0814FC80
-  and 08153610 retain precise jump-threading and reload-copy blockers. Per-unit
+  stepping and typed movement/animation records. The continuation resolved the
+  final jump-threading and halfword-mask reload decisions in ordinary C. Per-unit
   stock checks pass; combined ROM validation and report regeneration are left to
   the integrator. See [the worker note](../notes/finish-player-cue_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
