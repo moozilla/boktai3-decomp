@@ -95,8 +95,6 @@ static inline void SubtractContactNode(struct ContactPosition *out, struct Chase
     struct ChaseTarget *target = *node;
     SceneActorTerrain_Subtract(out, &target->position, from);
 }
-#ifdef NONMATCHING
-// fuzzy: 99.1%
 // scope shape 5 (differences once low registers are set aside)
 void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *actor)
 {
@@ -157,7 +155,8 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
         {
             u32 mask = 0x1000;
             if (TestMotion(motionFlags, mask)) {
-                Callback_InvokeActor(actor, group->interactionCallback);
+                void (*callback)(struct SceneActorRegistryResetView *) = group->interactionCallback;
+                callback(actor);
                 return;
             }
         }
@@ -197,6 +196,3 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
     } else
         actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081314E8);
-#endif
