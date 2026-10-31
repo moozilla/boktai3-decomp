@@ -5395,6 +5395,7 @@ addr,name,mode,confidence,source,notes
 08151EB8,PlayerCue_UpdateWalkTarget,thumb,low,src-alias,
 08152174,PlayerCue_UpdateMotionFade,thumb,low,src-alias,
 08152A5C,PlayerCue_UpdateRecoilSlide,thumb,low,src-alias,
+08152C3C,PlayerCue_UpdateAlternateFormChange,thumb,low,src-alias,confidence=low: changes alternate form while advancing its auxiliary display
 08153224,PlayerCue_UpdateFormChange,thumb,low,src-alias,
 08153610,PlayerCue_UpdateSpiralMotion,thumb,low,src-alias,
 081538DC,Player_RestartAnimationFromResource,thumb,low,src-alias,
