@@ -1,5 +1,6 @@
-#include "global.h"
-void ScriptActor_EnableCompletionScript(u8 *p)
+#include "player_cue.h"
+
+void ScriptActor_EnableCompletionScript(struct Player *p)
 {
-    p[0x59e] = 1;
+    PlayerCue_Messages(p)->completionKind = 1;
 }
