@@ -1,4 +1,3 @@
-#define SCENE_ACTOR_CHASE_WIDE_STATE 1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 void sub_080B1FA8(void *);
