@@ -5507,6 +5507,7 @@ addr,name,mode,confidence,source,notes
 0815ACF4,ScriptActor_TestFlagBit20FromScript,thumb,low,src-alias,"via index i=Script_GetActorIndex(), tests fixed bit 0x100000 (bit 20) of the scripted actor's flags word at +0x20, right after the ""st"" state field; returns 1"
 0815AD24,Player_EnableStatGaugeFromScript,thumb,low,src-alias,
 0815AD3C,Player_EnableStatGaugeAndHistoryFromScript,thumb,low,src-alias,
+0815AD60,Player_RestrictActionRequestsFromScript,thumb,low,src-alias,
 0815AD78,Player_EnterKindTwo,thumb,low,src-alias,
 0815AE94,PlayerCue_OverlaySet,thumb,low,src-alias,"player cutscene cmds 48 (n) and 50: +0xAE4 = 1, +0xAD6 = n + 366 (cmd 50: 378)"
 0815AEAC,PlayerCue_OverlayOn,thumb,low,src-alias,"player cutscene cmd 47 (n): +0xAE4 = 2, +0xAD6 = n + 366"
