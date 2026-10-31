@@ -1127,14 +1127,12 @@ int SelectionMenu_Initialize(struct SelectionMenu *p, void *a, void *b)
 {
     struct SceneInputResource *resource = ScriptProc_Start(0xcb05, 0x530d);
     if (!resource)
-        goto fail;
-    asm("" ::: "r0");
+        return -1;
     p->panelResource = *resource;
     ResourceHeader_Relocate(&p->panelResource, resource);
     resource = ScriptProc_Start(0xcb05, 0x5d04);
     if (!resource)
-        goto fail;
-    asm("" ::: "r0");
+        return -1;
     p->iconResource = *resource;
     ResourceHeader_Relocate(&p->iconResource, resource);
     p->cancelScript = Script_GetKeywordValue('c', 0);
