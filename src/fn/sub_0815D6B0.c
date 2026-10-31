@@ -50,7 +50,7 @@ void PlayerCue_Refresh(struct Player *);
 void PlayerCue_OverlaySet(struct Player *, s32);
 void PlayerCue_OverlayOn(struct Player *, s32);
 void PlayerCue_OverlayOff(struct Player *);
-void sub_0815C73C(struct Player *, s32, s32, s32);
+void Player_ConfigureAttachmentEffect(struct Player *, s32, s32, s32);
 
 static inline s32 PlayerCue_ReadArgument(const struct SceneEventCommand *command, u32 index)
 {
@@ -328,11 +328,11 @@ void PlayerCue_Dispatch(struct Player *p)
                         case 6:
                         case 7:
                         case 8:
-                            sub_0815C73C(p, PlayerCue_ReadArgument(command, 0), 0, 0);
+                            Player_ConfigureAttachmentEffect(p, PlayerCue_ReadArgument(command, 0), 0, 0);
                             break;
                         case 4:
                         case 5:
-                            sub_0815C73C(p, PlayerCue_ReadArgument(command, 0),
+                            Player_ConfigureAttachmentEffect(p, PlayerCue_ReadArgument(command, 0),
                                          PlayerCue_ReadArgument(command, 1),
                                          PlayerCue_ReadArgument(command, 2));
                             break;

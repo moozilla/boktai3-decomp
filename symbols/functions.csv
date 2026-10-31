@@ -5567,6 +5567,7 @@ addr,name,mode,confidence,source,notes
 0815C4FC,PlayerCue_StateMotion,thumb,low,src-alias,"player cutscene cmd 31: motion 0xD/0xE/0xF by state 3/4/5; returns 0 in states 0, 1, 6"
 0815C5A4,PlayerCue_ShakeEffect,thumb,low,src-alias,"player cutscene cmd 43: random offset by state, sub_082315A8(+0x5B8, 2, 3600) and sound 0x191/0x133 by +0x5B9; clears +0x530"
 0815C730,PlayerCue_Refresh,thumb,low,src-alias,player cutscene cmd 44: calls sub_0813D4E0
+0815C73C,Player_ConfigureAttachmentEffect,thumb,low,src-alias,
 0815C99C,PlayerCue_ReleaseControl,thumb,low,src-alias,Resets cue-related fields and restores state 1; tentatively returns the actor to normal control
 0815C9EC,ScriptActor_GetDirectionFromScript,thumb,low,src-alias,Reads option -d or returns -1 to preserve the current direction
 0815CA08,ScriptActor_GetCueOptionFromScript,thumb,low,src-alias,Reads shared cue option -e with default zero; its precise meaning remains tentative

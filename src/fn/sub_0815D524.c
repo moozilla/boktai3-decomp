@@ -2,8 +2,8 @@
 #include "engine.h"
 #include "player.h"
 s32 Script_GetActorIndex(void);
-void sub_0815C73C(u8 *actor, s32 mode, s32 c, s32 a);
-/* Script: sub_0815C73C on the scripted actor chosen by -i with mode -m; modes
+void Player_ConfigureAttachmentEffect(u8 *actor, s32 mode, s32 c, s32 a);
+/* Script: Player_ConfigureAttachmentEffect on the scripted actor chosen by -i with mode -m; modes
    4 and 5 also take -c and -A (default 120 each), others pass 0. */
 void ScriptActor_SetModeFromScript(void)
 {
@@ -26,6 +26,6 @@ void ScriptActor_SetModeFromScript(void)
             a = 0;
             c = 0;
         }
-        sub_0815C73C(actor, mode, c, a);
+        Player_ConfigureAttachmentEffect(actor, mode, c, a);
     }
 }

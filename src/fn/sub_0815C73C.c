@@ -2,7 +2,6 @@
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, u32, u32, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
 // confidence=low: selects player attachment descriptors and associated sound effects.
-#define Player_ConfigureAttachmentEffect sub_0815C73C
 static inline void Attachment_SetValue(u16 *dest, s32 value)
 {
     *dest = value;
