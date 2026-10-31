@@ -100,7 +100,7 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         slot->speed = 16;
     }
     if (!slot->steeringTimer) {
-        register const u16 *table asm("r4");
+        const u16 *table;
         s32 jitter;
         struct ContactPosition *steeringDestination;
         position = &slot->position;
