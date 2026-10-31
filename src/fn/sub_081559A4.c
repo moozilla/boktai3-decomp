@@ -1,6 +1,5 @@
 // confidence=low: inferred from player cue phases and animation consumers.
-#include "global.h"
-// fix.py best (sweep after the inlined-insn fix)
+#include "player_cue.h"
 // confidence=low: timed held-action phases, animation and completion script.
 void Player_AddControlFlags(void *, u32);
 s32 ActorVariant_GetTableValue(u32, u32);
@@ -9,59 +8,17 @@ void ActorSequence_Begin(void *, s32, s32);
 void Player_SetActionOrigin(void *);
 void Player_UpdateFacingSide(void *);
 void PlayerCue_EnterStandUpdate(void *);
-void Sound_PlaySong(u32);
-void Sound_StopSong(u32);
 void ConvergingEffects_EmitNearParticle(void *, void *);
 void Hud_ClearTimer(void);
-void Script_Call(u32, void *);
-extern u8 *gGameState;
-struct Call {
-    u32 count : 16;
-    u32 pad : 16;
-    s32 *values;
-};
-struct ChargePosition {
-    s16 x, y, z, pad;
-};
-struct TimedChargePlayer {
-    u8 unk0[0x20];
-    u32 flags;
-    u8 unk24[0x324];
-    const u16 *inputKeys;
-    u8 unk34C[0x56];
-    u8 heading;
-    u8 side;
-    u8 facing;
-    u8 unk3A5[0x73];
-    u8 actionMode;
-    u8 unk419[0x3F];
-    u8 phase;
-    u8 unk459[0x1];
-    u16 frame;
-    u8 unk45C[0x9C];
-    u16 count;
-    u8 unk4FA[0x3];
-    u8 soundActive;
-    u8 unk4FE[0x2A];
-    u16 timeLeft;
-    u16 elapsed;
-    u16 duration;
-    u8 unk52E[0x76];
-    u32 script;
-    u8 unk5A8[0x154];
-    u16 effectTimer;
-    u8 unk6FE[0x382];
-    struct ChargePosition origin;
-};
-static inline u32 held(struct TimedChargePlayer *p, u32 mask)
+static inline u32 held(struct Player *p, u32 mask)
 {
-    return p->flags & mask;
+    return p->statusFlags & mask;
 }
-void Player_UpdateTimedChargeAction(struct TimedChargePlayer *actor)
+void Player_UpdateTimedChargeAction(struct Player *actor)
 {
-    struct TimedChargePlayer *p = actor;
+    struct Player *p = actor;
     Player_AddControlFlags(p, 8);
-    switch (p->phase) {
+    switch (p->tetherPhase) {
         case 0:
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0), 64, 1);
             if ((p->inputKeys[1]) & 1)
@@ -69,7 +26,7 @@ void Player_UpdateTimedChargeAction(struct TimedChargePlayer *actor)
             break;
 
         case 1: {
-            u16 *frame = &p->frame;
+            u16 *frame = &p->tetherFrame;
             if (!(*frame)) {
                 p->facing = 4;
                 p->heading = 1;
@@ -77,7 +34,7 @@ void Player_UpdateTimedChargeAction(struct TimedChargePlayer *actor)
                 Player_SetActionOrigin(p);
                 (*frame)++;
             }
-            p->effectTimer = 15;
+            p->resetValue6FC = 15;
             if (!Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 8), 64, 1))
                 break;
             Sound_PlaySong(203);
@@ -85,54 +42,54 @@ void Player_UpdateTimedChargeAction(struct TimedChargePlayer *actor)
                 goto release;
             if (held(p, 16)) {
                 Sound_PlaySong(216);
-                p->soundActive = 1;
-                p->count = 0;
+                p->chargeSoundActive = 1;
+                p->chargeCounter = 0;
                 ActorSequence_Begin(p, 7, 2);
                 break;
             }
-            p->count = 0;
+            p->chargeCounter = 0;
             goto pause;
         }
 
         case 2: {
             u32 flags = 160;
             u16 *count;
-            p->flags |= flags;
-            count = &p->count;
+            p->statusFlags |= flags;
+            count = &p->chargeCounter;
             if ((*count) <= 4) {
                 if (((++(*count)) == 5) && (!(p->actionMode)))
                     Sound_PlaySong(296);
             }
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 9), 64, 1);
-            p->effectTimer = 30;
-            ConvergingEffects_EmitNearParticle(p, &p->origin);
+            p->resetValue6FC = 30;
+            ConvergingEffects_EmitNearParticle(p, &p->actionOrigin);
             if (!((p->inputKeys[0]) & 1)) {
                 Sound_StopSong(216);
-                p->soundActive = 0;
+                p->chargeSoundActive = 0;
                 goto release;
             }
             if (!held(p, 16)) {
                 Sound_StopSong(216);
-                p->soundActive = 0;
+                p->chargeSoundActive = 0;
             pause:
                 ActorSequence_Begin(p, 7, 3);
 
                 goto end;
             }
             {
-                s32 elapsed = *((s16 *)(gGameState + 0x876));
-                elapsed += p->elapsed;
-                p->elapsed = elapsed;
-                if ((u16)elapsed >= (p->duration)) {
+                s32 elapsed = gGameState->unk876;
+                elapsed += PlayerCue_Timers(p)->elapsed;
+                PlayerCue_Timers(p)->elapsed = elapsed;
+                if ((u16)elapsed >= (PlayerCue_Timers(p)->required)) {
                     u32 *scriptPtr;
                     u32 script;
                     Hud_ClearTimer();
                     ActorSequence_Begin(p, 7, 5);
-                    scriptPtr = &p->script;
+                    scriptPtr = &p->cueParameter;
                     script = *scriptPtr;
                     if (script) {
                         s32 value;
-                        struct Call call;
+                        struct ScriptUtilityArguments call;
                         call.count = 1;
                         call.values = &value;
                         do {
@@ -148,9 +105,9 @@ void Player_UpdateTimedChargeAction(struct TimedChargePlayer *actor)
 
         case 3: {
             u32 flags = 128;
-            p->flags |= flags;
+            p->statusFlags |= flags;
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 10), 64, 1);
-            p->effectTimer = 30;
+            p->resetValue6FC = 30;
             if (!((p->inputKeys[0]) & 1)) {
             release:
                 ActorSequence_Begin(p, 7, 4);
@@ -159,14 +116,14 @@ void Player_UpdateTimedChargeAction(struct TimedChargePlayer *actor)
             }
             if (held(p, 16)) {
                 Sound_PlaySong(216);
-                p->soundActive = 1;
-                p->count = 0;
+                p->chargeSoundActive = 1;
+                p->chargeCounter = 0;
                 ActorSequence_Begin(p, 7, 2);
             }
             break;
         }
         case 4:
-            p->effectTimer = 15;
+            p->resetValue6FC = 15;
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 11), 64, 1)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 7, 0);
@@ -175,25 +132,25 @@ void Player_UpdateTimedChargeAction(struct TimedChargePlayer *actor)
 
         case 5:
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 9), 64, 1);
-            p->effectTimer = 30;
-            ConvergingEffects_EmitNearParticle(p, &p->origin);
+            p->resetValue6FC = 30;
+            ConvergingEffects_EmitNearParticle(p, &p->actionOrigin);
             break;
     }
 
 end:
-    if ((p->phase) != 5) {
-        if (!(--(p->timeLeft))) {
+    if ((p->tetherPhase) != 5) {
+        if (!(--(PlayerCue_Timers(p)->remaining))) {
             u32 *scriptPtr;
             u32 script;
             Hud_ClearTimer();
             Sound_StopSong(216);
             Player_UpdateFacingSide(p);
             PlayerCue_EnterStandUpdate(p);
-            scriptPtr = &p->script;
+            scriptPtr = &p->cueParameter;
             script = *scriptPtr;
             if (script) {
                 s32 value;
-                struct Call call;
+                struct ScriptUtilityArguments call;
                 call.count = 1;
                 call.values = &value;
                 value = 0;
