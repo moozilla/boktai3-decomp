@@ -1,7 +1,6 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: targets player zero and starts the contact pursuit control.
 u32 Nav_IsPositionInMesh(void *, void *, void *);
 s32 Terrain_ApplyBlocked(void *, void *, void *);
