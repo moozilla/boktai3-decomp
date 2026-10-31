@@ -1,21 +1,30 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 97.1%
+// fuzzy: 99.8%
 // confidence=low: action role inferred from local animation, motion and effects.
 #include "contact_swarm.h"
-#include "scene_vec.h"
+#include "motion_track.h"
 #include "display_sequence_inline.h"
-// Remaining differences: lifetimes, instruction order and literal pools.
+// Remaining difference: the burst count is materialized before the particle type load.
+
+struct VanargandOwner {
+    u8 unknown0[0x205];
+    u8 firstAction;
+    u8 unknown206[0x421 - 0x206];
+    u8 secondAction;
+    u8 unknown422[0x4D0 - 0x422];
+    void *sequenceResource;
+};
 
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
     struct DisplaySequenceState sequence;
-    u8 motion[0x38];
-    struct SceneVec *basePosition;
+    struct MotionTrack motion;
+    struct MotionTrackVector *basePosition;
     u8 unknown94[8];
-    struct SceneVec origin;
-    struct SceneVec target;
+    struct MotionTrackVector origin;
+    struct MotionTrackVector target;
     s16 heading, distance, particleAngle;
     u8 unknownB2[0xaa];
     u32 variant, flags, state, timer;
@@ -25,7 +34,6 @@ struct VanargandPart {
     u8 unknown17C[0x20];
     u32 flashTimer;
 };
-void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void MotionTrack_Update(void *);
 extern const s16 gUnk_086149C4[];
 static inline u32 StepSequence(struct VanargandPart *owner)
@@ -101,7 +109,6 @@ static inline u32 StepSequence(struct VanargandPart *owner)
 }
 
 // confidence=low: paired part travels to an impact point and emits a burst.
-void MotionTrack_Update(void *);
 s32 ScenePair_CountPositiveCounters(void *);
 void Sound_PlaySong(u32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
@@ -110,25 +117,27 @@ static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void Set(struct SceneVec *v, s32 x, s32 y, s32 z)
+static inline void Set(struct MotionTrackVector *v, s32 x, s32 y, s32 z)
 {
     v->x = x;
     v->y = y;
     v->z = z;
 }
-static inline void Diff(struct SceneVec *v, struct SceneVec *a, struct SceneVec *b)
+static inline void Diff(struct MotionTrackVector *v, struct MotionTrackVector *a,
+                        struct MotionTrackVector *b)
 {
     v->x = a->x - b->x;
     v->y = a->y - b->y;
     v->z = a->z - b->z;
 }
-static inline void Vector(struct SceneVec *v, s32 angle, s32 scale)
+static inline void Vector(struct MotionTrackVector *v, s32 angle, s32 scale)
 {
     v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * scale);
     v->y = 0;
     v->z = Scale(gUnk_086149C4[angle & 255] * scale);
 }
-static inline void Add(struct SceneVec *v, struct SceneVec *b, struct SceneVec *a)
+static inline void Add(struct MotionTrackVector *v, struct MotionTrackVector *b,
+                       struct MotionTrackVector *a)
 {
     v->x = b->x + a->x;
     v->y = b->y + a->y;
@@ -136,14 +145,14 @@ static inline void Add(struct SceneVec *v, struct SceneVec *b, struct SceneVec *
 }
 static inline u8 Ended(struct VanargandPart *p)
 {
-    return p->motion[0x29] == 2;
+    return p->motion.active == 2;
 }
 static inline void SetState(struct VanargandPart *p, u32 state)
 {
     p->state = state;
     p->timer = 0;
 }
-void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
+void Vanargand_UpdatePartImpact(struct VanargandOwner *boss, struct VanargandPart *p, u32 frame)
 {
     u8 *enter;
     u32 entering;
@@ -164,8 +173,7 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                 {
                     u32 zero = 0;
                     *enter = zero;
-                    Anim_SetSequence(&p->sequence, *((void **)(boss + 0x4d0)), 8, (u8)p->variant,
-                                     zero);
+                    Anim_SetSequence(&p->sequence, boss->sequenceResource, 8, (u8)p->variant, zero);
                 }
             }
             if (StepSequence(p)) {
@@ -175,7 +183,7 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
             break;
 
         case 1: {
-            struct SceneVec delta;
+            struct MotionTrackVector delta;
             entering = p->enter;
             enter = &p->enter;
             if (entering) {
@@ -185,9 +193,9 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                 else
                     Vector(&delta, 96, 64);
                 Add(&delta, &delta, &p->origin);
-                MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
+                MotionTrack_Initialize(&p->motion, &p->origin, &delta, 0, 4);
             }
-            MotionTrack_Update(p->motion);
+            MotionTrack_Update(&p->motion);
             if (Ended(p)) {
                 SetState(p, 2);
                 *enter = 1;
@@ -206,22 +214,26 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                     Set(&p->target, 0x2cb, 0x100, 0x3ab);
                 }
                 Diff(&p->target, &p->target, p->basePosition);
-                MotionTrack_Initialize(p->motion, &p->origin, &p->target, 0, 2);
+                MotionTrack_Initialize(&p->motion, &p->origin, &p->target, 0, 2);
             }
-            MotionTrack_Update(p->motion);
+            MotionTrack_Update(&p->motion);
             if (Ended(p)) {
                 if ((ScenePair_CountPositiveCounters(boss) == 2) &&
-                    (boss[(p->variant == 1) ? (0x205) : (0x421)] == 12)) {
-                    struct SceneVec point;
+                    (*((p->variant == 1) ? &boss->firstAction : &boss->secondAction) == 12)) {
+                    struct MotionTrackVector point;
                     Sound_PlaySong(0x1ba);
                     Add(&point, &p->target, p->basePosition);
                     AnimatedParticles_EmitBurst(&point, p->particleAngle, 0, 64, 4, 4, 4, 4);
                     p->flashTimer = 15;
                     SetState(p, 3);
                 } else {
+                    void *position;
+                    s32 vertical;
                     Sound_PlaySong(0x3d9);
-                    AnimatedParticles_EmitBurst(&p->sprite.position, p->particleAngle, 0, 64, 4, 4,
-                                                4, 4);
+                    position = &p->sprite.position;
+                    vertical = 4;
+                    AnimatedParticles_EmitBurst(position, p->particleAngle, 0, 64, vertical, 4, 4,
+                                                4);
                     SetState(p, 3);
                 }
                 {
