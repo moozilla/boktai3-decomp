@@ -227,7 +227,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #animation #axe #bosses #camera #campaign #charge #compiler #effect-pool #effects #hresvelgr #inventory #ivy #linked-effect #map-menu #matching #monster-book #monsters #mummy #nidhoggr #nonmatching #palette #particles #player #ratatosk #reactions #register-pinning #registry-f3e4 #scene-actor #scene-actors #scene-npc #screamer #script-combat-actor #singleton-slot7 #slime #spider #sprite-effects #tentacle #terrain #vanargand #wireless | 19 |
 | [docs/history/2026-10-27.md](../docs/history/2026-10-27.md) | Work history: 2026-10-27 | #matching #ram #tooling | 1 |
 | [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29: matching search and the largest-function experiment | #compiler #ghoul #golem #matching #monsters #mummy #process #scene-actor #skeleton #tooling #vanargand | 7 |
-| [docs/history/2026-10-30.md](../docs/history/2026-10-30.md) | 2026-10-30: monster initializers and shared engine records | #compiler #cue #data #matching #monsters #player #ram #structs #tooling | 5 |
+| [docs/history/2026-10-30.md](../docs/history/2026-10-30.md) | 2026-10-30: monster initializers and shared engine records | #compiler #cue #data #matching #monsters #player #ram #structs #studio #tooling | 6 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
@@ -303,7 +303,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/encoded-records_2026-10-14.md](../notes/encoded-records_2026-10-14.md) | Encoded records and password callers, 08044C80–080454C0 | *#menu #tooling* | 5 |
 | [notes/ewram-layout_2026-10-27.md](../notes/ewram-layout_2026-10-27.md) | EWRAM shared declarations and layouts (2026-10-27) | #matching #tooling | 11 |
 | [notes/far-branch-tails.md](../notes/far-branch-tails.md) | Far-branch tails: big functions that were split in pieces | #matching #tooling | 3 |
-| [notes/finish-player-cue_2026-10-30.md](../notes/finish-player-cue_2026-10-30.md) | Player cue worker batch — 2026-10-30 | #matching #player #cue #compiler | 10 |
+| [notes/finish-player-cue_2026-10-30.md](../notes/finish-player-cue_2026-10-30.md) | Player cue worker batch — 2026-10-30 | #matching #player #cue #compiler | 11 |
 | [notes/foundry-actor-route-behavior_2026-10-18.md](../notes/foundry-actor-route-behavior_2026-10-18.md) | Actor route and behavior foundry pass | #matching #foundry #scene-actor #route | 2 |
 | [notes/foundry-actor-stats-style_2026-10-18.md](../notes/foundry-actor-stats-style_2026-10-18.md) | Actor stats, preview palette and style foundry pass | #matching #foundry #actor-stats #scene-actor | 2 |
 | [notes/foundry-display-resources_2026-10-18.md](../notes/foundry-display-resources_2026-10-18.md) | Foundry display resource functions, 2026-10-18 | #matching #assets | 2 |
@@ -353,6 +353,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/parameterized-motion-pool_2026-10-14.md](../notes/parameterized-motion-pool_2026-10-14.md) | Parameterized motion pool, 080454C0–08045A20 |  | 5 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
+| [notes/player-cue-cleanup_2026-10-30.md](../notes/player-cue-cleanup_2026-10-30.md) | Player cue cleanup — 2026-10-30 | #matching #player #cue #structs #compiler #data #studio | 11 |
 | [notes/player_3.md](../notes/player_3.md) | Player 3 unit consolidation | #player #matching #types | 7 |
 | [notes/projected-display_2026-10-14.md](../notes/projected-display_2026-10-14.md) | Five-entry projected display, 08045A20–08045D18 | *#animation #assets* | 4 |
 | [notes/proximity-emitter_2026-10-14.md](../notes/proximity-emitter_2026-10-14.md) | Proximity emitter, 08051A3C–08052130 | *#particles* | 3 |

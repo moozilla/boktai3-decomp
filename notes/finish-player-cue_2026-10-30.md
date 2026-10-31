@@ -154,3 +154,11 @@ was performed. `PROGRESS.md` and `PROGRESS.json` stay unchanged. The integrator
 must run the combined build, require `build/boktai3.gba: OK`, and regenerate both
 reports before merging this batch. No ROM, generated assembly or emulator output
 is committed.
+
+## Follow-on cleanup
+
+The owner's follow-up removes concessions from the neighboring callbacks and
+consolidates the full subsection's owner/field layouts, playback, editable tables
+and Studio wiring. See [the cleanup note](player-cue-cleanup_2026-10-30.md) for
+accepted extents, the one remaining transition barrier mechanism and integration
+requirements. The nine matches above remain exact after those shared migrations.

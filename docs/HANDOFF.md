@@ -58,12 +58,15 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
-* **Player cue worker batch complete** (2026-10-30): all assigned callbacks
-  now match without concessions on `codex/finish-player-cue`, with shared sequence
-  stepping and typed movement/animation records. The continuation resolved the
-  final jump-threading and halfword-mask reload decisions in ordinary C. Per-unit
-  stock checks pass; combined ROM validation and report regeneration are left to
-  the integrator. See [the worker note](../notes/finish-player-cue_2026-10-30.md).
+* **Player cue worker batch and cleanup prepared** (2026-10-30): the assigned
+  callbacks match without concessions on `codex/finish-player-cue`. Existing cue
+  callbacks and setup/dispatch now share canonical player, graphics, message and
+  coordinate records; editable animation tables are browsable in Studio. Explicit
+  register pins are removed; the transition callback retains two empty barriers
+  with a proved first-CSE operand-order blocker. Stock unit checks pass; combined
+  ROM validation and report regeneration remain with the integrator. See the
+  [matching note](../notes/finish-player-cue_2026-10-30.md) and
+  [cleanup note](../notes/player-cue-cleanup_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches
