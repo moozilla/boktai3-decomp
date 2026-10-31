@@ -1,15 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 88.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining: terrain/center allocation and pointer/register lifetimes.
-// The original falls through on the unobstructed path without setting its result.
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene_actor_terrain.h"
+/* The original falls through without setting its result on an unobstructed path. */
 struct Feather {
     u32 flags;
     u8 unknown4[3], priority;
@@ -17,7 +8,7 @@ struct Feather {
     void *graphics;
     u16 frame;
     u8 unknown12[10];
-    struct Vec position;
+    struct ContactPosition position;
     u8 unknown24[8];
     u8 animation[0x10];
     u8 unknown3C[0x54];
@@ -28,57 +19,49 @@ struct Feather {
     u8 enter, angle;
     u32 effectFlags, variant;
 };
-static inline u32 Random(void)
+void SpriteEffectController_Create(struct ContactPosition *, struct ContactPosition *, s32, u32,
+                                   u32, u32, u32, u32, u32, u32, u32, u32, s32, s32, s32, s32, s32,
+                                   s32);
+static inline u8 *FeatherEffectPool_CellDataAndCenter(s32 cell, struct ContactPosition *center,
+                                                      struct ContactPosition **output)
 {
-    u32 index = (gRandomIndex + 1) & 1023;
-    gRandomIndex = index;
-    return *(const u16 *)(index * 2 + RANDOM_TABLE_ADDR);
+    u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
+    *output = center;
+    if (data)
+        return data + 4;
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
-static inline s32 CellIndex(struct Vec *p)
+static inline void FeatherEffectPool_GetCellCenter(s32 cell, struct ContactPosition *center,
+                                                   struct ContactPosition **result)
 {
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
+    u8 *data;
+    s32 x = Mod(cell, SceneActorTerrain_Width());
+    s32 z = Div(cell, SceneActorTerrain_Width());
+    center->x = (x << 8) + 128;
+    data = FeatherEffectPool_CellDataAndCenter(cell, center, result);
+    center->y = (*data & 15) << 8;
+    center->z = (z << 8) + 128;
 }
-u8 *TerrainModifiers_FindCellOverride(u32, u32);
-static inline u8 *CellData(s32 index)
+static inline void FeatherEffectPool_ClearWords(const void *source, void *destination, u32 control)
 {
-    u8 *p = TerrainModifiers_FindCellOverride(index, 1);
-    if (p)
-        p += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = index * 4 + 12;
-        p = map->cells + offset;
-    }
-    return p;
+    CpuSet(source, destination, control);
 }
-static inline s32 Scale(s32 x)
-{
-    if (x >= 0)
-        return x >> 12;
-    return -(-x >> 12);
-}
-void SpriteEffectController_Create(struct Vec *, struct Vec *, s32, u32, u32, u32, u32, u32, u32,
-                                   u32, u32, u32, s32, s32, s32, s32, s32, s32);
-s32 Mod(s32, s32);
-s32 Div(s32, s32);
-// confidence=low: scans intervening cells and clips the scatter position at rising terrain.
-u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 current, s32 target,
-                                     s32 inputDirection)
+#ifdef NONMATCHING
+// fuzzy: 98.1%
+// Tentative feather identity; clips the scatter position at rising terrain.
+u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct ContactPosition *spot, s32 current,
+                                     s32 target, s32 direction)
 {
     struct {
         u32 zero;
-        struct Vec velocity;
-        struct Vec center;
+        struct ContactPosition velocity;
+        struct ContactPosition center;
     } local;
-    register s32 direction asm("r9") = inputDirection;
     s32 previous;
     s32 height;
-    struct Vec *velocity = &local.velocity;
+    struct ContactPosition *velocity = &local.velocity;
     local.zero = 0;
-    CpuSet(&local.zero, velocity, 0x05000002);
+    FeatherEffectPool_ClearWords(&local.zero, velocity, 0x05000002);
     if (current != target) {
         do {
             previous = current;
@@ -88,7 +71,7 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
                     break;
 
                 case 1:
-                    current += *((s16 *)(gTerrainMap->cells + 4));
+                    current += SceneActorTerrain_Width();
                     break;
 
                 case 2:
@@ -96,23 +79,16 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
                     break;
 
                 case 3:
-                    current -= *((s16 *)(gTerrainMap->cells + 4));
+                    current -= SceneActorTerrain_Width();
                     break;
             }
 
-            if ((*CellData(current)) >> 4)
+            if ((*SceneActorTerrain_GetCell(current)) >> 4)
                 return 1;
-            height = (*CellData(previous)) & 15;
-            if (height < ((*CellData(current)) & 15)) {
-                register struct Vec *center asm("r6") = &local.center;
-                s32 x;
-                register s32 z asm("r8");
-                asm("" : "+r"(center));
-                x = Mod(current, *((s16 *)(gTerrainMap->cells + 4)));
-                z = Div(current, *((s16 *)(gTerrainMap->cells + 4)));
-                center->x = (x << 8) + 128;
-                center->y = ((*CellData(current)) & 15) << 8;
-                center->z = (z << 8) + 128;
+            height = (*SceneActorTerrain_GetCell(previous)) & 15;
+            if (height < ((*SceneActorTerrain_GetCell(current)) & 15)) {
+                struct ContactPosition *center;
+                FeatherEffectPool_GetCellCenter(current, &local.center, &center);
                 switch (direction) {
                     case 0:
                         spot->x = center->x - 128;
@@ -132,29 +108,23 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
                 }
 
                 {
-                    register const u16 *table asm("r5") = (const u16 *)0x0203B400;
-                    register u32 *rng asm("r4") = &gRandomIndex;
-                    register u32 mask asm("r6") = 1023;
+                    const u16 *table = gRandomTable;
+                    u32 *rng = &gRandomIndex;
                     u32 index;
-                    register u32 zero asm("r3");
-                    asm("" : "+r"(table), "+r"(rng), "+r"(mask));
-                    {
-                        u8 k1 = 1;
-                        index = ((*rng) + k1) & mask;
-                    }
+                    u32 zero;
+                    index = ((*rng) + 1) & 1023;
                     *rng = index;
                     {
-                        typeof(table[index]) v1 = table[index];
+                        u16 v1 = table[index];
                         spot->y = (height << 8) + (v1 & 255);
                     }
                     zero = 0;
-                    asm("" : "+r"(zero));
                     if (!p->variant) {
                         s32 life;
-                        index = ((*rng) + 1) & mask;
-                        *rng = index;
+                        u16 nextIndex = (index + 1) & 1023;
+                        *rng = nextIndex;
                         {
-                            typeof(table[index]) v2 = table[index];
+                            u16 v2 = table[nextIndex];
                             life = (v2 & 63) + 30;
                         }
                         SpriteEffectController_Create(spot, &local.velocity, 0x1C1A, 0xD1B8, 3,
@@ -171,7 +141,6 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
         } while (current != target);
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_ClipScatterPath);
 #endif
