@@ -20,7 +20,7 @@ void Armor_InitPartLunge(struct Motion0818Object *p)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
         u32 offset = gRandomIndex * 2;
-        register const u16 *table asm("r3") = gRandomTable;
+        const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
         choice = *(const u16 *)(offset + (u32)table);
     }
     one = 1;
