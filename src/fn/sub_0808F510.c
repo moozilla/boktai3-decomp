@@ -5,7 +5,7 @@ s32 Math_Atan2(s32, s32);
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-void sub_0808FA40(void *, u32);
+void Slime_SelectWanderTarget(void *, u32);
 struct SavedMotion {
     u8 pad[12];
     struct ContactPosition position;
@@ -84,7 +84,7 @@ void Slime_ApproachSavedTarget(struct SceneActorRegistryResetView *actor)
     s32 speed;
     if (Take(&actor->field2B1)) {
         Control(actor, *(void **)((u8 *)actor + 0x228), 1);
-        sub_0808FA40(actor, *((u8 *)actor + 0x59));
+        Slime_SelectWanderTarget(actor, *((u8 *)actor + 0x59));
         actor->field2C2 = 0x40;
         return;
     }
@@ -92,7 +92,7 @@ void Slime_ApproachSavedTarget(struct SceneActorRegistryResetView *actor)
     speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x3E0), speed))
-        sub_0808FA40(actor, *((u8 *)actor + 0x59));
+        Slime_SelectWanderTarget(actor, *((u8 *)actor + 0x59));
     {
         u32 m = 0x2000;
         u32 f = actor->flags2CC;

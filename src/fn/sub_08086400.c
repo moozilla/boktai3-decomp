@@ -1,211 +1,113 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 84.8%
-// fix.py best version
-// fix.py best version (reprinted C)
-// Shared animation tails, duration-pointer lifetime, and branch/register allocation still differ.
-// MATCHING_CONCESSION: register-pinning
-#include "scene_actor_chase.h"
-// confidence=low: chooses turn animations and rotates toward the route's facing.
-u32 Route_GetCurrentPointFacing(void *);
-struct TurnSequence {
-    u8 pad[8];
-    u16 frame;
-    u8 padA[4];
-    u16 timer;
-};
-static inline void SelectTurn(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
-                              u32 flags)
-{
-    u32 force;
-    register u8 *restart asm("r4");
-    if (flags & 0x10) {
-        force = 0x10;
-        flags &= ~0x10;
-    } else
-        force = 0;
-    if (!actor->drawableKind) {
-        struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
-        drawable = actor->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
-                         (u8)variant, (u8)flags);
-        restart = &actor->restart;
-    } else {
-        struct SceneActorAnimationTile *tile =
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
-        u8 *savedSelection;
-        selection += variant;
-        {
-            u8 *selectionAddress = &actor->selection;
-            u32 previous = *selectionAddress;
-            savedSelection = selectionAddress;
-            restart = &actor->restart;
-            if (!force && previous == selection && !*restart) {
-                if (flags == 1 && (tile->flags & 4))
-                    return;
-                if (flags == 0 && !(tile->flags & 4))
-                    return;
-            }
-        }
-        *savedSelection = selection;
-        {
-            u32 mask = 4;
-            u32 mode;
-            if (flags & mask)
-                mode = 6;
-            else
-                mode = 4;
-            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
-                              actor->drawable, (u16)selection, 2, (u16)mode);
-            if (flags & 1)
-                tile->flags |= mask;
-            else
-                tile->flags &= ~4;
-        }
-    }
-    *restart = 0;
-}
-static inline u32 TurnFlags(u16 *field, u32 mask)
-{
-    return *field & mask;
-}
-// confidence=low: rotates the Ghoul toward the route point facing using animation nine.
-inline static u32 Chase_Bits32_1(struct SceneActorRegistryResetView *actor_, u32 mask)
-{
-    u32 *field = &actor_->flags2CC;
-    return (*field) & mask;
-}
+#include "scene_actor_chase_reaction.h"
+#include "scene_actor_reaction.h"
+#include "scene_actor_turn.h"
+#include "display_sequence.h"
 
-void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
+u32 Route_GetCurrentPointFacing(void *);
+
+/* Turn toward the route-facing octant, then restore the waiting controller. */
+void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *a)
 {
-    u8 *direction = ((u8 *)actor) + 0x50;
-    void *route = ((u8 *)actor) + 0x448;
-    u8 *group = (u8 *)(&actor->group.common);
+    struct SceneActorBody *motion = &a->body;
+    struct SceneActorRegistryRoute *route = &a->group.homeRoute;
+    struct SceneActorChaseGroup *group = &a->group;
+    struct DisplaySequenceState *sequence;
     u16 *motionFlags;
-    u8 prepared = SceneActorReaction_TakePrepared(actor);
-    motionFlags = &actor->flags2D4;
+    u8 prepared = SceneActorReaction_TakePrepared(a);
+    s32 direction, target, delta;
+
+    motionFlags = &a->flags2D4;
     if (prepared) {
-        s32 quadrant;
-        s32 facing;
-        actor->body.direction = ((((actor->body.direction + 0x60) >> 6) & 3) * 64) - 64;
-        quadrant = ((actor->body.direction + 0x60) >> 6) & 3;
-        if (((actor->behavior2AA != 6) && (actor->behavior2AA != 17)) &&
-            (!TurnFlags(motionFlags, 0x4480))) {
-            facing = ((((u16)Route_GetCurrentPointFacing(route)) + 0x70) >> 5) & 7;
-            ((struct SceneActorAnimationView *)actor)->nextDirection = facing;
-        } else
-            facing = ((struct SceneActorAnimationView *)actor)->nextDirection;
-        if (quadrant == (facing >> 1)) {
-            actor->field2B0 = 1;
-            if (TurnFlags(motionFlags, 0x400)) {
-                SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-                Chase_SetState(actor, 3, 1, 0);
-                Chase_SetCtl(actor, *((void **)(group + 0x21C)), 0x1B);
-            } else
-                SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        a->body.direction = (SceneActorTurn_Cardinal(a->body.direction) << 6) - 0x40;
+        direction = SceneActorTurn_Cardinal(a->body.direction);
+        if (a->behavior2AA != 6 && a->behavior2AA != 17 &&
+            !SceneActorTurn_Flags(motionFlags, 0x4480)) {
+            target = (((u16)Route_GetCurrentPointFacing(route) + 0x70) >> 5) & 7;
+            a->unknown3CD[0] = target;
+        } else {
+            target = a->unknown3CD[0];
+        }
+        if (direction == (target >> 1)) {
+            a->field2B0 = 1;
+            if (SceneActorTurn_Flags(motionFlags, 0x400)) {
+                SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
+                SceneActorChase_SetState(a, 3, 1, 0);
+                SceneActorChase_SetControl(a, group->turnControl, 0x1B);
+            } else {
+                SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
+            }
             return;
         }
-        switch (quadrant) {
+        switch (direction) {
             case 0:
-                if (((u32)(facing - 2)) <= 3) {
-                    SelectTurn((void *)actor, 9, 1, 0);
-                    goto forward;
+                if ((u32)(target - 2) <= 3) {
+                    SceneActorTurn_SelectAnimation(a, 9, 1, 0);
+                    SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
-                    SelectTurn((void *)actor, 9, 0, 4);
-                    goto backward;
+                    SceneActorTurn_SelectAnimation(a, 9, 0, 4);
+                    SceneActorChase_ClearWordFlags(&a->flags2CC, 0x10000);
                 }
                 break;
-
             case 1:
-                if (((u32)(facing - 4)) <= 3) {
-                    SelectTurn((void *)actor, 9, 2, 0);
-                    goto forward;
+                if ((u32)(target - 4) <= 3) {
+                    SceneActorTurn_SelectAnimation(a, 9, 2, 0);
+                    SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
-                    SelectTurn((void *)actor, 9, 1, 4);
-                    goto backward;
+                    SceneActorTurn_SelectAnimation(a, 9, 1, 4);
+                    SceneActorChase_ClearWordFlags(&a->flags2CC, 0x10000);
                 }
                 break;
-
             case 2:
-                if (((u32)(facing - 1)) > 4) {
-                    SelectTurn((void *)actor, 9, 1, 5);
-                    goto forward;
+                if ((u32)(target - 1) > 4) {
+                    SceneActorTurn_SelectAnimation(a, 9, 1, 5);
+                    SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
-                    SelectTurn((void *)actor, 9, 2, 4);
-                    goto backward;
+                    SceneActorTurn_SelectAnimation(a, 9, 2, 4);
+                    SceneActorChase_ClearWordFlags(&a->flags2CC, 0x10000);
                 }
                 break;
-
             case 3:
-                if (((u32)facing) <= 3) {
-                    SelectTurn((void *)actor, 9, 0, 0);
-                    goto forward;
+                if ((u32)target <= 3) {
+                    SceneActorTurn_SelectAnimation(a, 9, 0, 0);
+                    SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
-                    SelectTurn((void *)actor, 9, 1, 1);
-                    goto backward;
+                    SceneActorTurn_SelectAnimation(a, 9, 1, 1);
+                    SceneActorChase_ClearWordFlags(&a->flags2CC, 0x10000);
                 }
                 break;
         }
-
-        goto entryDone;
-    forward: {
-        s16 mask = 0x10000;
-        mask |= actor->flags2CC;
-        actor->flags2CC = mask;
+        a->field2B3 = 0;
     }
-
-        goto entryDone;
-    backward:
-        actor->flags2CC &= ~0x10000;
-
-    entryDone:
-        actor->field2B3 = 0;
-    }
-    {
-        struct TurnSequence *sequence = (void *)(((u8 *)actor->drawable) + 0x48);
-        if ((!sequence->timer) && ((sequence->frame == 1) || (sequence->frame == 3))) {
-            s32 desired = ((((struct SceneActorAnimationView *)actor)->nextDirection + 5) & 7) << 5;
-            s32 difference = actor->body.direction - desired;
-            if (difference < 0)
-                difference = -difference;
-            if (difference <= 0x20)
-                direction[9] = desired;
-            else if (Chase_Bits32_1(actor, 0x10000))
-                direction[9] += 0x20;
-            else
-                direction[9] -= 0x20;
-        }
-    }
-    {
-        u32 k1 = 0xA02F;
-        if ((*motionFlags) & k1)
-            actor->field2C2 = 0x40;
-        else if (!actor->field2C2)
-            actor->field2C2 = 0x40;
-    }
-    if (!actor->drawableKind)
-        Anim_SetDurationScale(((u8 *)actor->drawable) + 0x48, actor->field2C2);
-    else
-        Anim_SetFrameDurationScale(((u8 *)actor->drawable) + 0x20, actor->field2C2);
-    if (actor->field2B3) {
-        s32 facing = ((actor->body.direction + 0x70) >> 5) & 7;
-        s32 difference = ((struct SceneActorAnimationView *)actor)->nextDirection - facing;
+    sequence = ((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence;
+    if (sequence->elapsed == 0 && (sequence->index == 1 || sequence->index == 3)) {
+        s32 targetDirection = SceneActorTurn_OctantDirection(a->unknown3CD[0]);
+        s32 difference = motion->direction - targetDirection;
         if (difference < 0)
             difference = -difference;
-        if (difference <= 0) {
-            actor->field2B0 = 1;
-            actor->body.direction = ((((actor->body.direction + 0x60) >> 6) & 3) * 64) - 64;
-            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            if (TurnFlags(motionFlags, 0x400)) {
-                Chase_SetState(actor, 3, 1, 0);
-                Chase_SetCtl(actor, *((void **)(group + 0x21C)), 0x1B);
+        if (difference <= 0x20)
+            motion->direction = targetDirection;
+        else if (SceneActorTurn_ActorFlags(a, 0x10000))
+            motion->direction += 0x20;
+        else
+            motion->direction -= 0x20;
+    }
+    SceneActorTurn_ApplyDuration(a, motionFlags);
+    if (a->field2B3) {
+        s32 current = ((a->body.direction + 0x70) >> 5) & 7;
+        delta = a->unknown3CD[0] - current;
+        if (delta < 0)
+            delta = -delta;
+        if (delta <= 0) {
+            a->field2B0 = 1;
+            a->body.direction = (SceneActorTurn_Cardinal(a->body.direction) << 6) - 0x40;
+            SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
+            if (SceneActorTurn_Flags(motionFlags, 0x400)) {
+                SceneActorChase_SetState(a, 3, 1, 0);
+                SceneActorChase_SetControl(a, group->turnControl, 0x1B);
             }
-        } else
-            Chase_SetCtl(actor, actor->entryTarget224, 2);
+        } else {
+            SceneActorChase_SetControl(a, a->entryTarget224, 2);
+        }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ghoul_TurnTowardRoute);
-#endif

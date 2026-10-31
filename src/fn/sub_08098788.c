@@ -1,12 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: address scheduling, inlined tests and register allocation.
 #include "scene_actor_reset.h"
+#include "scene_actor_control_helpers.h"
 #include "engine.h"
 #include "player.h"
 #include "ram.h"
@@ -17,110 +12,119 @@ void ActorVisibility_TickRevealDelay(void *);
 void Ghost_UpdateRandomDestination(void *);
 void Ghost_ReactToPlayerMovement(void *);
 void SceneActor_EasePlayerHeight(void *);
-static inline u8 Flag(u8 *p, u32 mask)
+struct GhostVisibilityContext {
+    u8 unknown0[0x558];
+    u32 flags;
+    u8 unknown55C[0x56];
+    u16 elapsed;
+};
+
+static inline u8 Ghost_TestVisibilityFlags(struct GhostVisibilityContext *p, u32 mask)
 {
-    if (*(u32 *)(p + 0x558) & mask)
+    if (p->flags & mask)
         return 1;
     return 0;
 }
-static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 Ghost_ReadMotionFlags(struct SceneActorRegistryResetView *actor, u32 inputMask)
 {
     u32 mask = inputMask;
-    u32 offset = 0x2D4;
-    u16 *flags;
-    flags = (void *)((u8 *)actor + offset);
+    u16 *flags = &actor->flags2D4;
     return *flags & mask;
 }
-static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 Ghost_ReadStatusFlags(struct SceneActorRegistryResetView *actor, u32 inputMask)
 {
     u32 mask = inputMask;
-    u32 offset = 0x2D0;
-    u32 *flags;
-    flags = (void *)((u8 *)actor + offset);
+    u32 *flags = &actor->flags2D0;
     return *flags & mask;
 }
-static inline u8 Unavailable(struct SceneActorRegistryResetView *input)
+static inline u8 Ghost_IsUnavailable(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
     if (actor) {
-        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
+        if (Ghost_ReadMotionFlags(actor, 0x40) || Ghost_ReadStatusFlags(actor, 0x20000) ||
+            actor->health <= 0)
             return 1;
     }
     return 0;
 }
-static inline u32 Hidden(struct SceneActorRegistryResetView *input)
+static inline u8 Ghost_IsHidden(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryResetView *actor = input;
     u32 mask = 1;
-    register u32 result asm("r0");
-    if (actor->drawableKind == 0) {
-        u32 flags = *(u32 *)actor->drawable & mask;
-        if (flags) {
-            result = 1;
-            goto done;
-        }
-        asm("" ::: "r1");
-    } else {
-        u32 flags = *(u32 *)((u8 *)actor->drawable + 0x28) & mask;
-        if (flags) {
-            result = 1;
-            goto done;
-        }
+    if (!actor->drawableKind) {
+        if (*(u32 *)actor->drawable & mask)
+            goto hidden;
+        goto visible;
     }
-    result = 0;
-done:
-    return result;
+    if (!(*(u32 *)((u8 *)actor->drawable + 0x28) & mask))
+        goto visible;
+hidden:
+    return 1;
+visible:
+    return 0;
 }
-static inline u8 PlayerMode(void)
+static inline u8 Ghost_IsLocalPlayerRevealing(void)
 {
-    u8 *p = (*(u8 **)gPlayers);
+    struct Player *p = gPlayers[0];
     if (p) {
+        u32 state = p->active;
         u32 result = 0;
-        if (*(u16 *)(p + 0x538) && *(u16 *)(p + 0x534) == 4)
+        if (state && p->sceneMode == 4)
             result = 1;
         return result;
     }
     return 0;
 }
-static inline u8 GlobalMode(void)
+static inline u8 Ghost_IsGlobalRevealActive(void)
 {
+    u32 state = gPlayerPassageState;
     u32 result = 0;
-    if (gPlayerPassageState && gPlayerInteractionMode == 4)
+    if (state && gPlayerInteractionMode == 4)
         result = 1;
     return result;
 }
-static inline u32 PlayerFlag(u8 *p, u32 mask)
+static inline u8 Ghost_TestSaveFlags(u32 mask)
 {
-    return *(u32 *)(p + 0x448) & mask;
-}
-static inline u8 SaveFlag(u32 mask)
-{
-    if (*(u32 *)((u8 *)gGameState + 0x868) & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }
-// confidence=low: coordinates Ghost visibility transitions with player reveal state.
-static inline u32 PlayerFlag_1(u8 *p)
+static inline u32 Ghost_ReadPlayerRevealFlag(struct Player *p)
 {
-    return (*((u32 *)(p + 0x448))) & 0x10;
+    u32 *flags = &p->actionFlags;
+    u32 mask = 0x10;
+    return *flags & mask;
+}
+
+static inline u32 Ghost_TestGlobalFlags(u32 flags, u32 mask)
+{
+    return flags & mask ? 1 : 0;
+}
+
+static inline void Ghost_ClearVisibilityFlags(struct GhostVisibilityContext *context, u32 bits)
+{
+    u32 mask = ~bits;
+    context->flags &= mask;
+}
+static inline void Ghost_SetVisibilityFlags(struct GhostVisibilityContext *context, u32 bits)
+{
+    context->flags |= bits;
 }
 
 u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
 {
     struct SceneActorRegistryResetView *saved = a;
-    u8 *ctx;
-    u32 k1;
+    struct GhostVisibilityContext *ctx;
     {
         struct ContactCollider *c = &a->colliderB;
         c->flags |= 4;
     }
-    if (ReadFlags16(a, 0x4000)) {
-        if (Flag((u8 *)a, 0x200)) {
+    if (Ghost_ReadMotionFlags(a, 0x4000)) {
+        if (Ghost_TestVisibilityFlags((void *)a, 0x200)) {
             *((u32 *)a->drawable) |= 1;
-            ActorShadow_Disable(((u8 *)a) + 0x320);
+            ActorShadow_Disable(a->shadow);
             {
                 s8 mask = ~0x20;
-                u32 *flags = (void *)(((u8 *)saved) + (k1 = 0x558));
+                u32 *flags = &((struct GhostVisibilityContext *)saved)->flags;
                 *flags &= mask;
             }
         } else
@@ -129,49 +133,41 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
         goto finish;
     }
     ctx = a->context;
-    if (!Unavailable(a)) {
-        u32 discarded = gEngineFlags & 0x4800;
-        u32 *flags = (u32 *)(ctx + k1);
+    if (!Ghost_IsUnavailable(a)) {
         s32 reveal;
-        if (Flag(ctx, 0x100)) {
-            reveal = SaveFlag(0x20);
+        Ghost_TestGlobalFlags(gEngineFlags, 0x4800);
+        if (Ghost_TestVisibilityFlags(ctx, 0x100)) {
+            reveal = Ghost_TestSaveFlags(0x20);
         } else
-            reveal = *((s16 *)(((u8 *)gGameState) + 0x876));
-        asm("" : : "r"(discarded));
+            reveal = gGameState->unk876;
         if (reveal > 0) {
             u32 mode;
             if (gEngineFlags & 0x800)
-                mode = PlayerMode();
+                mode = Ghost_IsLocalPlayerRevealing();
             else {
                 if (gWeatherCollisionTimer > 0)
                     goto hide;
-                if ((*(u8 **)gPlayers) && PlayerFlag_1((*(u8 **)gPlayers)))
+                if (gPlayers[0] && Ghost_ReadPlayerRevealFlag(gPlayers[0]))
                     goto hide;
-                mode = GlobalMode();
+                mode = Ghost_IsGlobalRevealActive();
             }
             if (mode)
                 goto hide;
-            if (!Flag(ctx, 0x40)) {
-                u32 hidden = Hidden(a);
+            if (!Ghost_TestVisibilityFlags(ctx, 0x40)) {
+                u32 hidden = Ghost_IsHidden(a);
                 if (!hidden) {
-                    *((u16 *)(ctx + 0x5B2)) = hidden;
-                    {
-                        u32 mask = ~0x20;
-                        u32 value = (*flags) & mask;
-                        *flags = value | 0x40;
-                    }
+                    ctx->elapsed = hidden;
+                    Ghost_ClearVisibilityFlags(ctx, 0x20);
+                    Ghost_SetVisibilityFlags(ctx, 0x40);
                 }
             }
         } else {
         hide:
-            if (!Flag(ctx, 0x20)) {
-                if ((u8)Hidden(a)) {
-                    *((u16 *)(ctx + 0x5B2)) = 0;
-                    {
-                        u32 mask = ~0x40;
-                        u32 value = (*flags) & mask;
-                        *flags = value | 0x20;
-                    }
+            if (!Ghost_TestVisibilityFlags(ctx, 0x20)) {
+                if ((u8)Ghost_IsHidden(a)) {
+                    ctx->elapsed = 0;
+                    Ghost_ClearVisibilityFlags(ctx, 0x40);
+                    Ghost_SetVisibilityFlags(ctx, 0x20);
                 }
             }
         }
@@ -185,7 +181,3 @@ finish:
 
     return 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ghost_UpdateVisibility);
-#endif

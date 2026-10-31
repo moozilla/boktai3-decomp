@@ -6,7 +6,7 @@ struct AxeColliderBlock {
     struct ContactCollider body[2];
 };
 void SceneActorCollision_InitBody(struct SceneActorRegistryActor *, void *, void *, void *, void *);
-void sub_080F75C0(void);
+void Axe_OnBodyContact(void);
 void Axe_OnAttackColliderContact(void);
 void Axe_InitColliders(struct SceneActorRegistryActor *actor)
 {
@@ -21,7 +21,7 @@ void Axe_InitColliders(struct SceneActorRegistryActor *actor)
     bodyOff.x = 0;
     bodyOff.y = 0;
     bodyOff.z = 0;
-    SceneActorCollision_InitBody(actor, &bodySize, &bodyOff, sub_080F75C0, actor);
+    SceneActorCollision_InitBody(actor, &bodySize, &bodyOff, Axe_OnBodyContact, actor);
     for (i = 0; i < 2; i++) {
         struct ContactCollider *c = &blk->body[i];
         Collider_Init(c, actor->id, 0x4001, 0, 16, &bodySize, &bodyOff);
@@ -29,7 +29,7 @@ void Axe_InitColliders(struct SceneActorRegistryActor *actor)
                                    SceneActorCollision_ReadBodyReactionFlags(actor),
                                    SceneActorCollision_ReadBodyField34(actor));
         Collider_SetPosition(c, &actor->position, 0);
-        Collider_SetCallback(c, sub_080F75C0, actor);
+        Collider_SetCallback(c, Axe_OnBodyContact, actor);
         Collider_Refresh(c);
     }
     atkSize.x = 0x18;

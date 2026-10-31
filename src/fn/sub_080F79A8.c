@@ -1,28 +1,10 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-#ifdef NONMATCHING
-// fuzzy: 93.3%
-
-// Remaining: polar address reuse, signed RNG/direction loads, collider loop allocation and phase-tail scheduling.
-
-// confidence=low: axe attack behavior inferred from orbit and trail state updates.
-
-// Branch layout, address reuse and register allocation still differ.
-// confidence=low: the axe and its auxiliary sprite orbit a shared moving center.
-#define H(p, off) (*(u16 *)((u8 *)(p) + (off)))
-#define S(p, off) (*(s16 *)((u8 *)(p) + (off)))
-#define B(p, off) (*((u8 *)(p) + (off)))
-#define W(p, off) (*(u32 *)((u8 *)(p) + (off)))
-#define P(p, off) ((u8 *)(p) + (off))
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Collider {
-    u8 pad[6];
-    u16 flags;
-    u8 rest[0x4C];
-};
+#include "scene_actor_chase_shared.h"
+#include "scene_actor_control_phase.h"
+#include "player.h"
+#include "contact_swarm.h"
 struct AxeContext {
     u8 pad0[0xA38];
     u32 spriteFlags;
@@ -33,11 +15,11 @@ struct AxeContext {
     u8 padA56[0x2];
     u16 spriteZ;
     u8 padA5A[0x36];
-    struct Collider attack[3];
-    struct Collider body[3];
-    struct Vec origin;
+    struct ContactCollider attack[3];
+    struct ContactCollider body[3];
+    struct ContactPosition origin;
     u8 padC90[0x8];
-    struct Vec center;
+    struct ContactPosition center;
     s16 radius;
     u8 padCA2[0x2];
     u8 speed;
@@ -50,45 +32,14 @@ struct AxeContext {
     u8 padCAC[0x204];
     u8 timer;
 };
-struct ColliderFlags {
-    u8 pad[6];
-    u16 flags;
-};
-struct AxeActor {
-    u8 pad0[0x4];
-    u8 *sprite;
-    u8 pad8[0x54];
-    struct Vec position;
-    u8 pad64[0xA0];
-    u32 word104;
-    u8 pad108[0xC];
-    u32 flags114;
-    u8 pad118[0x1C];
-    struct ColliderFlags bodyCollider;
-    u8 pad13C[0x4C];
-    struct ColliderFlags attackCollider;
-    u8 pad190[0x8C];
-    void *callback;
-    u8 pad220[0x90];
-    u8 state;
-    u8 pad2B1[0x1];
-    u8 entered;
-    u8 pad2B3[0x2];
-    u8 phase;
-    u8 pad2B6[0x12];
-    u16 timer;
-    u8 pad2CA[0x106];
-    struct AxeContext *context;
-};
 extern const s16 gUnk_086149C4[];
-extern u8 *gPlayers;
 s32 Mod(s32, s32);
 s32 Math_Atan2(s32, s32);
 void Sound_PlaySong(u32);
 void Axe_UpdateAttackColliderPositions(void *);
 void ActorPhase_UpdateAcceleratingTrail(void);
 void ActorPhase_UpdateReverseFlicker(void);
-static inline u8 TakeEntry(u8 *p)
+static inline u8 Axe_TakeEntry(u8 *p)
 {
     if (*p) {
         *p = 0;
@@ -96,51 +47,51 @@ static inline u8 TakeEntry(u8 *p)
     }
     return 0;
 }
-static inline void Difference(struct Vec *v, struct Vec *a, struct Vec *b)
+static inline void Axe_Difference(struct ContactPosition *v, struct ContactPosition *b,
+                                  struct ContactPosition *a)
 {
     v->x = a->x - b->x;
     v->y = a->y - b->y;
     v->z = a->z - b->z;
 }
-static inline void Add(struct Vec *out, struct Vec *a, struct Vec *b)
+static inline void Axe_AddPositions(struct ContactPosition *out, struct ContactPosition *a,
+                                    struct ContactPosition *b)
 {
     out->x = b->x + a->x;
     out->y = b->y + a->y;
     out->z = b->z + a->z;
 }
-static inline s32 Scale(s32 value, s32 bits)
+static inline s32 Axe_ScaleTowardZero(s32 value, s32 bits)
 {
     if (value >= 0)
         return value >> bits;
     return -(-value >> bits);
 }
-static inline void Clear(u32 mask, u32 *flags)
+static inline s32 Axe_RandomByte(void)
 {
-    *flags &= mask;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return *(const u8 *)&((const u16 *)RANDOM_TABLE_ADDR)[index];
 }
-static inline void ClearFlags(u32 *flags, u32 mask)
+
+static inline s32 Axe_ReadContactIndex(const s32 *index)
 {
-    *flags &= mask;
+    return *index;
 }
-static inline void ChangePhase(struct AxeActor *p, void *callback, u32 phase)
+static inline s32 Axe_ContactIndex(s32 index)
 {
-    p->entered = 1;
-    p->state = 0;
-    p->phase = phase;
-    p->callback = callback;
-    p->timer = 0;
-    ClearFlags(&p->flags114, ~1);
-    p->word104 = 0;
+    return Axe_ReadContactIndex(&index);
 }
-void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
+/* Orbit the actor and its auxiliary sprite around a moving shared center. */
+void Axe_UpdateOrbitAttack(struct SceneActorRegistryResetView *p, s32 frame)
 {
     struct AxeContext *data = p->context;
-    struct Vec delta;
-    struct Vec *position;
+    struct ContactPosition delta;
+    struct ContactPosition *position;
     u8 entered;
     s32 difference, absolute;
-    entered = TakeEntry(&p->entered);
-    position = &p->position;
+    entered = Axe_TakeEntry(&p->field2B2);
+    position = &p->body.position;
     if (entered) {
         data->flags |= 2;
         data->angle = 0;
@@ -148,26 +99,27 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
         data->speed = 4;
         data->direction = 1;
         data->center = data->origin;
-        Difference(&delta, position, &data->center);
-        delta.x = Scale(delta.x, 1);
-        delta.z = Scale(delta.z, 1);
-        Add(&data->center, &data->center, &delta);
+        Axe_Difference(&delta, &data->center, position);
+        delta.x = Axe_ScaleTowardZero(delta.x, 1);
+        delta.z = Axe_ScaleTowardZero(delta.z, 1);
+        Axe_AddPositions(&data->center, &data->center, &delta);
     }
-    position->x =
-        data->center.x + Scale(gUnk_086149C4[(data->angle + 64) & 255] * data->radius, 12);
-    p->position.z = data->center.z + Scale(gUnk_086149C4[data->angle] * data->radius, 12);
-    data->spriteX =
-        data->center.x +
-        Scale(gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius, 12);
+    position->x = data->center.x +
+                  Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 64) & 255] * data->radius, 12);
+    p->body.position.z =
+        data->center.z + Axe_ScaleTowardZero(gUnk_086149C4[data->angle] * data->radius, 12);
+    data->spriteX = data->center.x +
+                    Axe_ScaleTowardZero(
+                        gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius, 12);
     data->spriteZ =
-        data->center.z + Scale(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
+        data->center.z +
+        Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
     if (frame < 60) {
         data->speed += 2;
         data->timer = 0;
     } else if (frame < 180) {
         if (Mod(frame, 4) == 0) {
-            gRandomIndex = (gRandomIndex + 1) & 1023;
-            if ((s32) * (const u8 *)&gRandomTable[gRandomIndex] <= 19) {
+            if (Axe_RandomByte() <= 19) {
                 {
                     s32 direction = data->direction;
                     data->direction = -direction;
@@ -175,7 +127,7 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
                 Sound_PlaySong(0x169);
             }
         }
-        Difference(&delta, (void *)P(gPlayers, 0x30), &data->center);
+        Axe_Difference(&delta, &data->center, (void *)&gPlayers[0]->position);
         data->heading = Math_Atan2(delta.x, delta.z);
         data->timer = 0;
     } else {
@@ -191,7 +143,7 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
                 data->flags |= 4;
             }
         }
-        Difference(&delta, (void *)P(gPlayers, 0x30), &data->center);
+        Axe_Difference(&delta, &data->center, (void *)&gPlayers[0]->position);
         difference = Math_Atan2(delta.x, delta.z) - data->heading;
         if (difference > 128)
             difference -= 256;
@@ -206,17 +158,17 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
             else
                 data->heading -= 4;
         }
-        data->center.x += Scale(gUnk_086149C4[(data->heading + 64) & 255] * 2, 12);
-        data->center.z += Scale(gUnk_086149C4[data->heading] * 2, 12);
+        data->center.x += Axe_ScaleTowardZero(gUnk_086149C4[(data->heading + 64) & 255] * 2, 12);
+        data->center.z += Axe_ScaleTowardZero(gUnk_086149C4[data->heading] * 2, 12);
         if (data->flags & 4) {
-            u8 *sprite = p->sprite;
+            struct DisplaySequenceSprite *sprite = p->drawable;
             u32 previous;
-            W(sprite, 0) |= 2;
+            sprite->flags |= 2;
             data->spriteFlags |= 2;
-            previous = B(sprite, 6);
-            B(sprite, 6) = previous - 6;
+            previous = sprite->attribute;
+            sprite->attribute = previous - 6;
             data->spriteAngle += 6;
-            if ((s32)previous < B(p->sprite, 6))
+            if ((s32)previous < ((struct DisplaySequenceSprite *)p->drawable)->attribute)
                 Sound_PlaySong(0x169);
             if (data->flags & 4) {
                 if (frame < 480)
@@ -232,28 +184,33 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
             }
         }
     }
-    data->angle += Scale(data->speed * (s8)data->direction, 4);
+    data->angle += Axe_ScaleTowardZero(data->speed * (s8)data->direction, 4);
     Axe_UpdateAttackColliderPositions(p);
     if (data->flags & 1) {
-        ChangePhase(p, ActorPhase_UpdateAcceleratingTrail, 0x2E);
+        SceneActorChase_SetControl(p, ActorPhase_UpdateAcceleratingTrail, 0x2E);
     } else if (frame > 1000) {
         s32 i;
+        u32 stride = sizeof(struct ContactCollider);
         {
-            struct ColliderFlags *c = &p->attackCollider;
+            struct ContactCollider *c = &p->colliderB;
             c->flags |= 4;
         }
         {
-            struct ColliderFlags *c = &p->bodyCollider;
+            struct ContactCollider *c = &p->colliderA;
             c->flags |= 4;
         }
-        for (i = 0; i < 3; i++) {
-            data->attack[i].flags |= 4;
-            data->body[i].flags |= 4;
-        }
-        ChangePhase(p, ActorPhase_UpdateReverseFlicker, 0x2F);
+        i = 0;
+        do {
+            u32 attackStride = sizeof(data->attack[0]);
+            struct ContactCollider *attackBase = data->attack;
+            struct ContactCollider *attack = (void *)((u8 *)attackBase + i * attackStride);
+            typedef u8 AxeBodyRecord[stride];
+            struct ContactCollider *body =
+                (struct ContactCollider *)&((AxeBodyRecord *)data->body)[i];
+            attack->flags |= 4;
+            body->flags |= 4;
+            ++i;
+        } while (Axe_ContactIndex(i) <= 2);
+        SceneActorChase_SetControl(p, ActorPhase_UpdateReverseFlicker, 0x2F);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateOrbitAttack);
-#endif

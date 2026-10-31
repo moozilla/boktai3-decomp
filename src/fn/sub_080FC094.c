@@ -14,12 +14,14 @@ struct Burst080FC094Drawable {
 
 static inline s32 Burst080FC094_Scale(s32 value)
 {
-    return value >= 0 ? value >> 12 : -(-value >> 12);
+    s32 result;
+    if (value >= 0)
+        result = value >> 12;
+    else
+        result = -(-value >> 12);
+    return result;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 83.0%
-// scope shape 32 (differences once low registers are set aside)
 // confidence=low: spawns a particle burst at a point offset from the drawable by its heading.
 void sub_080FC094(struct SceneActorRegistryResetView *actor, s32 count)
 {
@@ -31,7 +33,7 @@ void sub_080FC094(struct SceneActorRegistryResetView *actor, s32 count)
         struct ContactPosition p;
         struct ContactPackedVector v;
     } position;
-    s32 x, z, x2;
+    s32 x, z, x2, z2;
 
     range.x = 120;
     range.y = 60;
@@ -45,10 +47,7 @@ void sub_080FC094(struct SceneActorRegistryResetView *actor, s32 count)
     z = Burst080FC094_Scale(offset.z * gUnk_086149C4[drawable->heading]);
     position.v.x = x + z + position.p.x;
     x2 = Burst080FC094_Scale(-(offset.x * gUnk_086149C4[drawable->heading]));
-    z = Burst080FC094_Scale(offset.z * gUnk_086149C4[(drawable->heading + 64) & 255]);
-    position.v.z = x2 + z + position.p.z;
+    z2 = Burst080FC094_Scale(offset.z * gUnk_086149C4[(drawable->heading + 64) & 255]);
+    position.v.z = x2 + z2 + position.p.z;
     SceneParticleBurst_CreateWithPause(&position, &velocity, &range, count, 2, 4);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080FC094);
-#endif

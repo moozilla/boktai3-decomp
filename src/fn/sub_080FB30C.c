@@ -1,13 +1,6 @@
 #include "global.h"
-
-static inline s32 ClampLevel(s32 level)
-{
-    if (level > 3)
-        return 3;
-    if (level < 0)
-        return 0;
-    return level;
-}
+#include "scene_actor_state.h"
+#include "display_track.h"
 
 struct AxeFlashState {
     u8 unk_00[0x908];
@@ -23,38 +16,21 @@ struct AxeFlashState {
     u8 reset;
 };
 struct AxeFlashDrawable {
-    u8 unk_00[0x2C];
-    u8 animData[6];
-    u16 profile;
-    u8 unk_34[4];
-    u16 *palette;
+    struct ContactSwarmSprite sprite;
+    struct DisplayTrackGraphics graphics;
 };
-struct AxeFlashActor {
-    u32 unk_00;
-    struct AxeFlashDrawable *drawable;
-    u8 unk_08[0x1E0 - 8];
-    u16 paletteBank;
-    u8 unk_1E2[4];
-    u16 paletteOffset;
-    u8 unk_1E8[0x3D0 - 0x1E8];
-    struct AxeFlashState *state;
-};
-void AnimData_SelectPaletteBank(void *, u32);
 
-static inline u32 TestFlag(u32 flags, u32 mask)
+static inline u8 TestFlag(const u32 *flags, u32 mask)
 {
-    if (flags & mask)
+    if (*flags & mask)
         return 1;
     return 0;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 78.6%
-// scope shape 31 (differences once low registers are set aside)
-// confidence=low: axe flash actor update; fades the palette by level and timer, then clears the active flag.
-void sub_080FB30C(struct AxeFlashActor *actor)
+/* Fade the attack palette, then restore the actor palette when the level reaches zero. */
+void sub_080FB30C(struct SceneActorRegistryResetView *actor)
 {
-    struct AxeFlashState *state = actor->state;
+    struct AxeFlashState *state = actor->context;
     u32 *flags;
     if (state->start) {
         state->level = 0;
@@ -65,16 +41,19 @@ void sub_080FB30C(struct AxeFlashActor *actor)
         }
         state->start = 0;
     }
-    flags = &state->flags;
-    if (state->stop) {
-        {
-            u32 bit = 0x100;
-            *flags |= bit;
+    {
+        u8 stop = state->stop;
+        flags = &state->flags;
+        if (stop) {
+            {
+                u32 bit = 0x100;
+                *flags |= bit;
+            }
+            *flags &= ~0x80;
+            state->level = 3;
+            state->timer = 0;
+            state->stop = 0;
         }
-        *flags &= ~0x80;
-        state->level = 3;
-        state->timer = 0;
-        state->stop = 0;
     }
     if (state->reset) {
         {
@@ -95,9 +74,9 @@ void sub_080FB30C(struct AxeFlashActor *actor)
     }
     {
         u32 mask = 0x180;
-        if (TestFlag(*flags, mask)) {
-            actor->drawable->profile = 0x13F;
-            actor->drawable->palette = state->palette;
+        if (TestFlag(flags, mask)) {
+            ((struct AxeFlashDrawable *)actor->drawable)->graphics.defaultPalette = 0x13F;
+            ((struct AxeFlashDrawable *)actor->drawable)->graphics.palette = state->palette;
             switch (state->level) {
                 case 0:
                     state->palette[1] = 0;
@@ -113,10 +92,12 @@ void sub_080FB30C(struct AxeFlashActor *actor)
                     break;
             }
             if (++state->timer > 9) {
-                if (!TestFlag(*flags, 0x80)) {
+                if (!TestFlag(flags, 0x80)) {
                     if (--state->level <= 0) {
-                        AnimData_SelectPaletteBank(actor->drawable->animData,
-                                                   actor->paletteBank + actor->paletteOffset);
+                        void *drawable = &((struct AxeFlashDrawable *)actor->drawable)->graphics;
+                        u16 *palette = &actor->basePaletteBank;
+                        u16 *offset = &actor->paletteOffset;
+                        AnimData_SelectPaletteBank(drawable, *palette + *offset);
                         {
                             u32 clr = ~0x100;
                             *flags &= clr;
@@ -132,6 +113,3 @@ void sub_080FB30C(struct AxeFlashActor *actor)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080FB30C);
-#endif

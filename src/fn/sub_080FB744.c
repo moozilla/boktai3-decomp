@@ -1,4 +1,5 @@
 #include "scene_actor_palette.h"
+#include "scene_actor_placement.h"
 
 struct AxePaletteTransition {
     u16 colors[16];
@@ -15,93 +16,80 @@ struct AxePaletteContext {
 };
 void Axe_SetAuxiliarySpriteResource(struct SceneActorRegistryActor *, const u16 *);
 
-static inline u32 ReadMasked(u32 mask, const u32 *field)
+static inline u32 Axe_ReadMaskedFlags(u32 mask, const u32 *field)
 {
     return *field & mask;
 }
-static inline u32 ActorFlag(struct SceneActorRegistryActor *actor, u32 mask, u32 offset)
-{
-    if (offset == 0x2D4)
-        return actor->flags2D4 & mask;
-    return actor->flags2D0 & mask;
-}
-static inline u8 Unavailable(struct SceneActorRegistryActor *actor)
-{
-    if (actor &&
-        (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) || actor->health <= 0))
-        return 1;
-    return 0;
-}
-static inline u8 Test(u32 value, u32 mask)
+static inline u8 Axe_TestFlags(u32 value, u32 mask)
 {
     if (value & mask)
         return 1;
     return 0;
 }
-static inline s32 ChannelValue(s32 value)
+static inline s32 Axe_ChannelValue(s32 value)
 {
-    if (value >= 0)
-        return value >> 8;
-    return -(-value >> 8);
+    return value >= 0 ? value >> 8 : -(-value >> 8);
 }
-static inline void BindPalette(struct SceneActorRegistryActor *actor,
-                               struct AxePaletteTransition *p)
+static inline void Axe_BindPalette(struct SceneActorRegistryActor *actor,
+                                   struct AxePaletteTransition *p)
 {
     ((struct SceneActorPaletteSequenceView *)actor->drawable)->palette = p->colors;
     Axe_SetAuxiliarySpriteResource(actor, p->colors);
 }
-#ifdef NONMATCHING
-// fuzzy: 59.8%
-// scope shape 64 (differences once low registers are set aside)
-// confidence=low: fades the 16-color palette one step toward its targets and binds it to the drawable when the fade ends.
-u32 sub_080FB744(struct SceneActorRegistryActor *actor)
+static inline u32 Axe_ReadBindingFlags(u32 *const *flags, u32 mask)
+{
+    return **flags & mask;
+}
+static inline s16 *Axe_UpdateRedSlot(s16 *const *values, s16 *const *deltas, s32 index)
+{
+    s16 *slot = &(*values)[index];
+    *slot += (*deltas)[index];
+    return slot;
+}
+static inline void Axe_GetPaletteUpdateHandles(s16 **deltas, u32 **flags, s16 **values,
+                                               struct SceneActorRegistryActor *actor,
+                                               struct AxePaletteTransition *transition)
+{
+    *flags = &actor->flags2CC;
+    *values = transition->red;
+    *deltas = transition->deltaRed;
+}
+// confidence=low: advances the palette transition and binds its colors when the actor flags allow it.
+u32 Axe_UpdatePaletteTransition(struct SceneActorRegistryActor *actor)
 {
     struct AxePaletteContext *context;
     struct AxePaletteTransition *p;
-    u16 *color;
-    s16 *red, *green, *blue;
-    s16 *deltaRed, *deltaGreen, *deltaBlue;
+    s16 *red;
+    s16 *deltaRed;
     s32 i;
-    if (Unavailable(actor))
+    u32 *actorFlags;
+    if (SceneActorPlacement_IsUnavailable((void *)actor))
         return 0;
     context = actor->context;
-    if (!Test(ReadMasked(2, &context->flags), ~0))
+    if (!Axe_TestFlags(Axe_ReadMaskedFlags(2, &context->flags), ~0))
         return 0;
     p = &context->transition;
     if (!p->remaining) {
-        if (!ReadMasked(0x02008000, &actor->flags2CC))
-            BindPalette(actor, p);
+        if (!Axe_ReadMaskedFlags(0x02008000, &actor->flags2CC))
+            Axe_BindPalette(actor, p);
         return 1;
     }
-    red = p->red;
-    deltaRed = p->deltaRed;
-    deltaGreen = p->deltaGreen;
-    deltaBlue = p->deltaBlue;
-    color = p->colors;
-    blue = p->blue;
-    green = p->green;
-    i = 0;
-    do {
+    Axe_GetPaletteUpdateHandles(&deltaRed, &actorFlags, &red, actor, p);
+    for (i = 0; i < 16; i++) {
         s32 r, g, b;
-        *red += *(s16 *)((u8 *)deltaRed + i);
-        *green += *(s16 *)((u8 *)deltaGreen + i);
-        *blue += *(s16 *)((u8 *)deltaBlue + i);
-        r = ChannelValue(*red);
-        g = ChannelValue(*green);
-        b = ChannelValue(*blue);
-        *color++ = r | (g << 5) | (b << 10);
-        blue++;
-        red++;
-        i += 2;
-        green++;
-    } while ((s32)color <= (s32)&p->colors[15]);
+        s16 *redSlot;
+        redSlot = Axe_UpdateRedSlot(&red, &deltaRed, i);
+        p->green[i] += p->deltaGreen[i];
+        p->blue[i] += p->deltaBlue[i];
+        r = Axe_ChannelValue(*redSlot);
+        g = Axe_ChannelValue(p->green[i]);
+        b = Axe_ChannelValue(p->blue[i]);
+        p->colors[i] = r | (g << 5) | (b << 10);
+    }
     p->remaining--;
-    if (!ReadMasked(0x02008000, &actor->flags2CC))
-        BindPalette(actor, p);
+    if (!Axe_ReadBindingFlags(&actorFlags, 0x02008000))
+        Axe_BindPalette(actor, p);
     if (!p->remaining)
         return 1;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080FB744);
-#endif

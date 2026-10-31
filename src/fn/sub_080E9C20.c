@@ -2,18 +2,15 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
+#include "display_sequence_inline.h"
+#include "scene_actor_chase_reaction.h"
+#include "scene_actor_terrain.h"
 
-struct S080E9C20Anim {
-    u8 unk0[8];
-    u16 unk8;
-    u8 unkA[4];
-    u16 unkE;
-};
-struct S080E9C20Target {
+struct OctopusCaptureTarget {
     u8 unk0[8];
     u8 kind;
     u8 unk9[0x3C - 9];
-    struct SceneActorTerrainCollisionView *unk3C;
+    struct SceneActorRegistryResetView *actor;
 };
 struct Player;
 s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
@@ -22,13 +19,15 @@ void sub_0807D2E0(void *, u32, struct ContactPosition *, u32, u32, u32);
 s32 SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
 void Octopus_UpdateHold(void);
 void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *);
-extern const struct ContactPosition gUnk_086062B0[];
-extern void *gUnknown_02000580[];
+struct OctopusOffset {
+    u16 x, y, z, pad;
+};
+extern const struct OctopusOffset gUnk_086062B0[2][5];
 
-static inline void S080E9C20_Facing(struct SceneActorRegistryResetView *actor, u8 *quadrant,
-                                    u8 *flip)
+static inline void Octopus_GetCaptureFacing(struct SceneActorRegistryResetView *actor, u8 *quadrant,
+                                            u8 *flip)
 {
-    s32 side = ((actor->body.direction + 0x60) >> 6) & 3;
+    s16 side = ((actor->body.direction + 0x60) >> 6) & 3;
     if (side > 1) {
         *flip = 1;
         *quadrant = 3 - side;
@@ -38,101 +37,94 @@ static inline void S080E9C20_Facing(struct SceneActorRegistryResetView *actor, u
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 41.4%
-// scope shape 159 (differences once low registers are set aside)
-// confidence=low: timed follow-up step of the reaction state machine; picks a throw offset from gUnk_086062B0
-// and starts the player or actor position request, or rearms the PlayEntry17 state.
+static inline void Octopus_EnableCollider(struct ContactCollider *collider)
+{
+    collider->flags |= 4;
+    collider->flags &= 0xFFF7;
+}
+static inline void Octopus_SetContactFlag(struct SceneActorRegistryResetView *actor, u32 bits)
+{
+    actor->flags2C0 = bits | actor->flags2C0;
+}
+static inline void Octopus_DisableContact(struct SceneActorRegistryResetView *actor)
+{
+    actor->colliderA.flags &= 0xFFFB;
+    actor->colliderA.flags |= 8;
+    SceneActorChase_ClearFlagComponent((void *)&actor->flags2C0, 0x800);
+}
+
+struct OctopusFrameIndex {
+    u16 index;
+};
+static inline struct OctopusFrameIndex Octopus_ReadFrame(struct DisplaySequenceState *sequence)
+{
+    struct OctopusFrameIndex value = {0};
+    value.index = sequence->index;
+    return value;
+}
+
 void sub_080E9C20(struct SceneActorRegistryResetView *actor)
 {
-    struct S080E9C20Anim *anim;
-    struct S080E9C20Target *target;
+    struct DisplaySequenceState *anim;
+    struct OctopusCaptureTarget *target;
     struct ContactPosition pos;
-    const struct ContactPosition *e;
     u8 quadrant, flip;
     u32 started;
     s32 limit;
-    u16 v8;
+    u16 *palette;
 
-    anim = (struct S080E9C20Anim *)((u8 *)actor->drawable + 0x48);
+    anim = &((struct SceneActorControlMotionDrawable *)actor->drawable)->sequence;
     started = SceneActorReaction_TakePrepared(actor);
+    palette = &actor->paletteOffset;
     if (started) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
-        if (actor->paletteOffset == 1)
+        if (*palette == 1)
             Anim_SetDurationScale(anim, 0x30);
     }
-    v8 = anim->unk8;
-    if (anim->unk8 == 3 && anim->unkE == 0)
+    if (anim->index == 3 && anim->elapsed == 0)
         Sound_PlaySong(0x1DD);
 
-    if (actor->paletteOffset == 1)
+    if (*palette == 1)
         limit = 3;
     else
         limit = 6;
 
-    if (v8 == 3 && anim->unkE > limit) {
-        actor->colliderA.flags = (actor->colliderA.flags | 4) & 0xFFF7;
-        actor->flags2C0 |= 0x800;
+    if (Octopus_ReadFrame(anim).index == 3 && anim->elapsed > limit) {
+        Octopus_EnableCollider(&actor->colliderA);
+        Octopus_SetContactFlag(actor, 0x800);
         if (SceneActorReaction_FindAdjacentTarget(actor, 0)) {
-            *((u8 *)actor + 0x2B2) = 1;
-            *((u8 *)actor + 0x2B0) = 0;
-            *((u8 *)actor + 0x2B5) = 0x25;
-            actor->target = Octopus_UpdateHold;
-            *(u16 *)((u8 *)actor + 0x2C8) = 0;
-            actor->flags114 &= ~1;
-            actor->word104 = 0;
-            actor->state2A8 = 0;
-            actor->phase2A9 = 2;
-            actor->behavior2AA = 1;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            SceneActorChase_SetControl(actor, Octopus_UpdateHold, 0x25);
+            SceneActorChase_SetState(actor, 0, 2, 1);
             SceneActorAnimation_SelectDirectionalFlags((void *)actor, 0x12);
 
-            S080E9C20_Facing(actor, &quadrant, &flip);
-            e = &gUnk_086062B0[flip * 5 + anim->unk8];
-            pos.x = e->x + actor->body.position.x;
-            pos.y = e->y + actor->body.position.y;
-            pos.z = e->z + actor->body.position.z;
-            target = *(struct S080E9C20Target **)((u8 *)actor + 0xDC);
+            Octopus_GetCaptureFacing(actor, &quadrant, &flip);
+            pos.x = actor->body.position.x + gUnk_086062B0[flip][anim->index].x;
+            pos.y = actor->body.position.y + gUnk_086062B0[flip][anim->index].y;
+            pos.z = actor->body.position.z + gUnk_086062B0[flip][anim->index].z;
+            target = (void *)actor->tracking.target;
             if (target->kind <= 3) {
-                Player_BeginPositionRequest((void *)gUnknown_02000580[target->kind], &pos, 0, 0,
-                                            flip, 0, 0, 0, 0);
+                Player_BeginPositionRequest((void *)gUnknown_02000580[target->kind], (void *)&pos,
+                                            0, 0, flip, 0, 0, 0, 0);
             } else if (target->kind == 4) {
-                struct SceneActorTerrainCollisionView *t = target->unk3C;
-                *(u16 *)((u8 *)t + 0x178) = 0;
-                SceneActorTerrain_ClearCollisionTimers(t);
-                *(u16 *)((u8 *)t + 0x2D4) &= ~0x20;
-                sub_0807D2E0(t, 0, &pos, 0, flip, 0);
+                struct SceneActorRegistryResetView *t = target->actor;
+                t->colliderA.responseValue = 0;
+                SceneActorTerrain_ClearCollisionTimers((void *)t);
+                SceneActorChase_ClearMotionFlagComponent(t, 0x20);
+                sub_0807D2E0(t, 0, (void *)&pos, 0, flip, 0);
             }
             return;
         }
+    } else if (Octopus_ReadFrame(anim).index <= 1) {
+        Octopus_DisableContact(actor);
     } else {
-        if (v8 > 1) {
-            actor->colliderA.flags = (actor->colliderA.flags | 4) & 0xFFF7;
-            actor->flags2C0 |= 0x800;
-        } else {
-            actor->colliderA.flags = (actor->colliderA.flags & 0xFFFB) | 8;
-            actor->flags2C0 &= 0xF7FF;
-        }
+        actor->colliderA.flags |= 4;
+        actor->colliderA.flags &= 0xFFF7;
+        Octopus_SetContactFlag(actor, 0x800);
     }
 
     if (actor->field2B3) {
-        actor->colliderA.flags = (actor->colliderA.flags & 0xFFFB) | 8;
-        actor->flags2C0 &= 0xF7FF;
-        *((u8 *)actor + 0x2B2) = 1;
-        *((u8 *)actor + 0x2B0) = 0;
-        *((u8 *)actor + 0x2B5) = 0x27;
-        actor->target = SceneActorReaction_PlayEntry17;
-        *(u16 *)((u8 *)actor + 0x2C8) = 0;
-        actor->flags114 &= ~1;
-        actor->word104 = 0;
-        actor->state2A8 = 0;
-        actor->phase2A9 = 2;
-        actor->behavior2AA = 3;
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
+        Octopus_DisableContact(actor);
+        SceneActorChase_SetControl(actor, SceneActorReaction_PlayEntry17, 0x27);
+        SceneActorChase_SetState(actor, 0, 2, 3);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080E9C20);
-#endif

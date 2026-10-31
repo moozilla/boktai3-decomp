@@ -66,12 +66,52 @@ log. Acceptance requires zero differing bytes and a byte-identical 16 MiB ROM.
 No compiler overrides, new selectors, register pins or assembly barriers are used
 by the new matches.
 
-Preserved unresolved work includes Dog 080E0750 (4,232-byte instruction stream
-with two PRE slot swaps), Golem 080C8774 (PRE ordering and one reload decision),
-and the Ghoul 08085DD0/Dog 080DEF78 scan-loop ownership problems. Golem 080C725C
+Preserved unresolved work includes Golem 080C8774 (PRE ordering and one reload
+decision) and the Ghoul 08085DD0 scan-loop ownership problem. Golem 080C725C
 and Dog 080DF908 retain an unused RNG-table literal in the ROM; existing relatives
 use concessions to retain it, so those spellings were not adopted. Resume from
 the exported candidates and causal reports rather than their old rough drafts.
 Skeleton 080BF0E4 retains an animation selection/restart-pointer allocation and
 tail-sharing gap. Golem 080CCD7C retains context-address PRE and charge-tail
 sharing differences. Their ordinary sources and diagnostic traces are preserved.
+
+## Dog displacement recovery — 080E0750
+
+All 4,232 bytes match in ordinary C. Canonical actor fields and the shared chase
+operations replace the duplicated raw-offset draft. Signed axis getters, a
+reference to the current displacement value, magnitude scaling, and an
+early-return clamp preserve the recovery arithmetic and the native expansion
+identities needed for PRE stack ordering. The final source uses the existing
+chase selectors only; the stock check reports zero differing bytes.
+
+## Dog retreat scan — 080DEF78
+
+All 800 bytes match. Distinct symbolic and fixed-address map receivers preserve
+the completed and interrupted vertical scans. A retained route-position output
+separates the later route query from the slope-position owner, reproducing the
+three spill slots and their initialization order. Shared height and cell-center
+operations remain in use; the stock check reports zero differing bytes.
+
+## Dog item contact — 080DF6EC
+
+All 540 bytes match. Typed item-context, collider and player-position fields
+replace raw accesses. The contact-cost value is reused for the subsequent zeroed
+response words; their signed-offset field operation preserves the two response
+views. This reproduces the health clamp and later collider stores without
+register hints or compiler overrides. The stock check covers the complete extent.
+
+## Poison Hand damage and defeat particles — 0820E2A4
+
+All 1,140 bytes match. The particle loop retains the random bank while its first
+three samples use the shared sample-capture operation. Reusing the data owner
+for the final actor age update preserves the bank's stack lifetime. Animation
+playback uses the canonical display-sequence record without volatile reads.
+Private actor fields begin at 0x108, preventing a full canonical actor prefix.
+
+## Screamer damage particles — 0820C9AC
+
+All 840 bytes match. Separate direct and captured sample reads preserve the
+particle direction and speed operands. The shared data owner holds the random
+bank through the loop and the actor for the final age increment. The native
+particle count and copied position reproduce the full stack layout without
+register pins, assembly barriers or compiler overrides.

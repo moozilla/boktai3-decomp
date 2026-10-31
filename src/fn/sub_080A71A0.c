@@ -1,104 +1,80 @@
 #include "global.h"
-#include "scene_actor_reset.h"
+#include "scene_actor_chase_reaction.h"
+#include "scene_actor_reaction.h"
+#include "scene_actor_control_phase.h"
 
-s32 Div(s32, s32);
+struct TentacleTrailState {
+    u8 unknown0[0x8EA];
+    u8 segmentCount;
+    u8 healthPerSegment;
+};
 s32 ActorTrail_RemoveLastSegment(struct SceneActorRegistryResetView *);
-void SceneActorControl_OnIdle(void);
-static inline void h10a_SetControl(struct SceneActorRegistryResetView *actor, void *control,
-                                   u32 kind)
+
+static inline s32 Tentacle_Shift(s32 value, u32 bits)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
-    {
-        u32 *flags = &actor->flags114;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->word104 = 0;
+    s32 result;
+    if (value >= 0)
+        result = value >> bits;
+    else
+        result = -((-value) >> bits);
+    return result;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 51.1%
-// scope shape 123 (differences once low registers are set aside)
-// confidence=low: per-frame chase of a tentacle body toward its target position, then idle
-void sub_080A71A0(struct SceneActorRegistryResetView *a)
+static inline s32 Tentacle_ClampStep(s32 value, s16 limit)
 {
-    u8 *trail = a->context;
-    u32 flag = 0;
-    s32 n;
-    s32 vx, vz;
-    s32 dx, dz;
-    u32 *p2CC = &a->flags2CC;
-    u32 *p2D0 = &a->flags2D0;
-    u16 *p310 = (u16 *)((u8 *)a + 0x310);
-    u16 *p318 = (u16 *)((u8 *)a + 0x318);
-    u16 *p314 = (u16 *)((u8 *)a + 0x314);
-    u16 *p31C = (u16 *)((u8 *)a + 0x31C);
-    u16 *p64 = (u16 *)((u8 *)a + 0x64);
-    u16 *p68 = (u16 *)((u8 *)a + 0x68);
+    if (value > limit)
+        return limit;
+    if (value < -limit)
+        return -limit;
+    return value;
+}
 
-    if (a->field2B2) {
-        a->field2B2 = 0;
-        flag = 1;
-    }
-    if (flag) {
-        a->flags2D4 = (a->flags2D4 | 0x20) & ~1;
-        n = Div((s16)a->health, trail[0x8EB]);
-        if (n < trail[0x8EA]) {
-            do {
-                ActorTrail_RemoveLastSegment(a);
-                n++;
-            } while (n < trail[0x8EA]);
-        }
-    }
-    *p2CC |= 0x2000;
-    *p2D0 |= 0x10000;
+static inline void Tentacle_SetReactionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+{
+    actor->flags2D0 |= bits;
+}
 
-    dx = (s16)*p310 - (s16)*p318;
-    if (dx < 0) {
-        vx = -((-dx) >> 2);
-    } else {
-        vx = dx >> 2;
-    }
-    if (vx > 0xC8) {
-        vx = 0xC8;
-    } else if (vx < -0xC8) {
-        vx = -0xC8;
-    }
-    dz = (s16)*p314 - (s16)*p31C;
-    if (dz < 0) {
-        vz = -((-dz) >> 2);
-    } else {
-        vz = dz >> 2;
-    }
-    if (vz > 0xC8) {
-        vz = 0xC8;
-    } else if (vz < -0xC8) {
-        vz = -0xC8;
-    }
-    *p64 += vx;
-    *p68 += vz;
-    *p318 += vx;
-    *p31C += vz;
+static inline u8 Tentacle_ApproachReactionEnd(struct SceneActorRegistryResetView *actor)
+{
+    s32 x, z;
+    SceneActorChase_SetActorFlags(actor, 0x2000);
+    Tentacle_SetReactionFlags(actor, 0x10000);
+    x = Tentacle_Shift(actor->reactionStart.x - actor->reactionEnd.x, 2);
+    z = Tentacle_Shift(actor->reactionStart.z - actor->reactionEnd.z, 2);
+    x = Tentacle_ClampStep(x, 200);
+    z = Tentacle_ClampStep(z, 200);
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
+    actor->reactionEnd.x += x;
+    actor->reactionEnd.z += z;
+    if (x == 0 && z == 0)
+        return 1;
+    return 0;
+}
 
-    if (vx == 0 && vz == 0) {
-        u32 one = 1;
-        u32 five = 5;
-        a->field2B0 = one;
-        a->flags2D4 &= ~0x20;
-        h10a_SetControl(a, SceneActorControl_OnIdle, 0x10);
-        a->state2A8 = 0;
-        a->phase2A9 = 0;
-        a->behavior2AA = five;
-        a->counter2AC = 0;
-        a->field2B1 = one;
-        a->body.direction = a->tracking.heading;
-        a->field2C2 = 0x40;
+static inline void Tentacle_PrepareRecoil(struct SceneActorRegistryResetView *actor, u16 bits)
+{
+    struct SceneActorChaseFlags16 *flags = (void *)&actor->flags2D4;
+    SceneActorChase_SetFlagComponent(flags, bits);
+    SceneActorChase_ClearFlagComponent(flags, 1);
+}
+
+void TentacleBody_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
+{
+    struct TentacleTrailState *trail = actor->context;
+    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+        s32 segments;
+        Tentacle_PrepareRecoil(actor, 0x20);
+        segments = Div(actor->health, trail->healthPerSegment);
+        for (; segments < trail->segmentCount; segments++)
+            ActorTrail_RemoveLastSegment(actor);
+    }
+    if (Tentacle_ApproachReactionEnd(actor)) {
+        actor->field2B0 = 1;
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+        SceneActorChase_SetState(actor, 0, 0, 5);
+        actor->body.direction = actor->tracking.heading;
+        actor->field2C2 = 64;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080A71A0);
-#endif

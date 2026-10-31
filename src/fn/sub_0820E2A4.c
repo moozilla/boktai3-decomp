@@ -1,7 +1,9 @@
 #include "global.h"
+#include "display_sequence_inline.h"
 #include "scene_vec.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
 struct PoisonHandSprite {
     u32 flags;
@@ -18,11 +20,7 @@ struct PoisonHandCollider {
     u8 unk_1C[0x27];
     u8 direction;
 };
-struct PoisonHandSequence {
-    const volatile u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unk_0A, speed, elapsed;
-};
+/* This actor has private state at 0x108, inside the canonical actor prefix. */
 struct PoisonHand {
     u8 unk_00[0x18];
     u32 age;
@@ -35,7 +33,7 @@ struct PoisonHand {
     u16 blinkTimer;
     u8 unk_B2[0x56];
     void *update;
-    struct PoisonHandSequence sequence;
+    struct DisplaySequenceState sequence;
     u8 unk_11C[0xe];
     s16 flashTimer;
     u8 unk_12C[4];
@@ -85,94 +83,82 @@ static inline u32 TestFlag(u32 mask, u32 *p)
 {
     return *p & mask;
 }
-static inline u32 RandomFrom(const u16 *table)
+static inline u32 PoisonHand_StepSequence(struct PoisonHandSprite *owner,
+                                          struct DisplaySequenceState *state)
 {
-    table += 512;
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return table[gRandomIndex];
-}
-static inline u32 RandomValue(void)
-{
-    return RandomFrom((const u16 *)gUnk_0203B000);
-}
-static inline void StepAnimation(struct PoisonHand *p, struct PoisonHandSprite *sprite,
-                                 struct PoisonHandSequence *s)
-{
-    u32 flags, elapsed, duration, mask, savedDuration;
-    const volatile u16 *c = s->commands + s->index;
-    sprite->frame = *c >> 6;
+    const u16 *command;
+    u32 ended;
     {
-        u32 input = s->flags, bit = 1;
-        u8 first = bit;
-        first &= input;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            p->sprite.flags |= 4;
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    owner->frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
         else
-            p->sprite.flags &= ~4;
+            owner->flags &= ~4;
     }
     {
-        u32 input = s->flags, bit = 2;
-        u8 first = bit;
-        first &= input;
-        first = (u8)first;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
         else
-            sprite->flags &= ~8;
+            owner->flags &= ~8;
     }
-    elapsed = s->elapsed + 1;
-    s->elapsed = elapsed;
-    mask = 0xffff;
-    duration = s->duration;
-    elapsed &= mask;
-    savedDuration = duration;
-    if (elapsed >= duration) {
-        s->elapsed = 0;
-        flags = s->flags;
-        if (flags & 4) {
-            u32 i = s->index;
-            if (!i) {
-                u32 hold = 8;
-                hold &= flags;
-                if (hold)
-                    s->elapsed = savedDuration;
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
                 else
-                    s->index = s->frameCount - 1;
-            } else
-                s->index = i - 1;
+                    state->index = state->frameCount - 1;
+                ended = 1;
+            } else {
+                state->index--;
+                ended = 0;
+            }
         } else {
-            u32 i = s->index + 1, n;
-            s->index = i;
-            n = s->frameCount;
-            if ((i & mask) >= n) {
-                u32 hold = 8;
-                hold &= flags;
-                if ((u8)hold) {
-                    s->elapsed = duration;
-                    s->index = n - 1;
-                } else
-                    s->index = 0;
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+                ended = 1;
+            } else {
+                ended = 0;
             }
         }
-        c = s->commands + s->index;
-        s->frameWeight = *c & 15;
-        {
-            s32 speed = s->frameWeight;
-            s32 w = s->speed;
-            speed *= w;
-            speed >>= 6;
-            s->duration = speed;
-            if (!(u8)speed)
-                s->duration = 1;
-        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
     }
+    return ended;
 }
-#ifdef NONMATCHING
-// fuzzy: 82.4%
-// scope shape 37 (differences once low registers are set aside)
+
 s32 PoisonHand_Update(struct PoisonHand *p)
 {
     struct PoisonHandCollider *collider;
+    /* The loop bank and final age update share the current data owner. */
+    void *dataOwner;
     if (TestPair(0x400, &gEngineFlags, &gScenePauseFlags) || TestFlag(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->update);
@@ -207,26 +193,34 @@ s32 PoisonHand_Update(struct PoisonHand *p)
                 s32 i;
                 p->defeated = 1;
                 p->blinkTimer = 0;
-                randomTable = (const u16 *)gUnk_0203B000;
-                for (i = 0; i <= 7; i++) {
-                    s32 frame = Mod(RandomFrom(randomTable), 2) + 0x1d;
-                    u8 direction;
-                    EnemyParticle_InitParameters(&parameters);
-                    direction = RandomFrom(randomTable);
-                    EnemyParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame, 0x1c5);
-                    EnemyParticle_SetMotionParameters(&parameters, 0, 60, direction,
-                                                      RandomFrom(randomTable) & 15);
-                    EnemyParticle_SetVerticalMotion(&parameters, 0x2000, 0x18000);
-                    EnemyParticle_EnableShadow(&parameters);
-                    if (i & 1)
-                        EnemyParticle_AddFlags(&parameters, 0x200);
-                    else
-                        EnemyParticle_AddFlags(&parameters, 0x400);
-                    if (RandomValue() & 1)
-                        EnemyParticle_AddFlags(&parameters, 4);
-                    if (RandomValue() & 1)
-                        EnemyParticle_AddFlags(&parameters, 8);
-                    EnemyParticle_Emit(&parameters, &p->position);
+                i = 0;
+                for (; i <= 7; i++) {
+                    dataOwner = gUnk_0203B000;
+                    randomTable = (const u16 *)dataOwner + 512;
+                    {
+                        s32 frame = Mod(ParticleRandom_ReadSample(randomTable), 2) + 0x1d;
+                        u8 direction;
+                        EnemyParticle_InitParameters(&parameters);
+                        direction = ParticleRandom_ReadSample(randomTable);
+                        EnemyParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame, 0x1c5);
+                        EnemyParticle_SetMotionParameters(&parameters, 0, 60, direction,
+                                                          ParticleRandom_ReadSample(randomTable) &
+                                                              15);
+                        EnemyParticle_SetVerticalMotion(&parameters, 0x2000, 0x18000);
+                        EnemyParticle_EnableShadow(&parameters);
+                        if (i & 1)
+                            EnemyParticle_AddFlags(&parameters, 0x200);
+                        else
+                            EnemyParticle_AddFlags(&parameters, 0x400);
+                        {
+                            const u16 *lateBank = (const u16 *)dataOwner;
+                            if (ParticleRandom_ReadBankSample(lateBank) & 1)
+                                EnemyParticle_AddFlags(&parameters, 4);
+                            if (ParticleRandom_ReadBankSample(lateBank) & 1)
+                                EnemyParticle_AddFlags(&parameters, 8);
+                        }
+                        EnemyParticle_Emit(&parameters, &p->position);
+                    }
                 }
                 Anim_RestartSequence(&p->sequence, p->animationResource, 0x19, 0, 0);
                 AnimData_SelectPaletteBank(p->graphics, 0x1c5);
@@ -256,9 +250,7 @@ s32 PoisonHand_Update(struct PoisonHand *p)
         else
             p->sprite.flags &= ~1;
     }
-    StepAnimation(p, &p->sprite, &p->sequence);
-    p->age++;
+    PoisonHand_StepSequence(&p->sprite, &p->sequence);
+    dataOwner = p;
+    ((struct PoisonHand *)dataOwner)->age++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PoisonHand_Update);
-#endif

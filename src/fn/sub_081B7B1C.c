@@ -1,22 +1,32 @@
 #include "global.h"
 #include "render.h"
 
-typedef struct GrowthHazardManager {
+struct GrowthHazardManager {
     u8 unk_00[0x18];
     u8 count;
     u8 pending;
     u8 flash[2];
     u16 palette[2][16];
-} Obj;
+};
 
 extern const u32 gUnk_08612154[];
 void Sound_PlaySong(u32);
 
-#ifdef NONMATCHING
-// fuzzy: 96.3%
-// scope shape 8 (differences once low registers are set aside)
+static inline u16 GrowthHazard_ReadColor(const u16 *color)
+{
+    return *color;
+}
+static inline u32 GrowthHazard_ReadBank(const u32 *bank)
+{
+    return *bank;
+}
+
+static inline u32 GrowthHazard_MaskChannel(u32 value, const u32 *mask)
+{
+    return value & *mask;
+}
 // Starts 32-tick palette flashes and blends their last 15 ticks.
-void GrowthHazard_UpdateSharedFlash(Obj *manager)
+void GrowthHazard_UpdateSharedFlash(struct GrowthHazardManager *manager)
 {
     s32 channel;
     if (manager->pending) {
@@ -37,20 +47,20 @@ void GrowthHazard_UpdateSharedFlash(Obj *manager)
                 CpuSet(gPaletteBankData + 0x1AA0, manager->palette[channel], 0x04000008);
             else if (manager->flash[channel] > 15) {
                 const u32 *banks = gUnk_08612154;
-                CpuSet(gPaletteBankData + banks[channel] * 32, manager->palette[channel],
-                       0x04000008);
+                CpuSet(gPaletteBankData + GrowthHazard_ReadBank(banks + channel) * 32,
+                       manager->palette[channel], 0x04000008);
             } else {
                 s32 flash = manager->flash[channel];
                 s32 inverse = 16 - flash;
                 const u32 *banks = gUnk_08612154;
-                u16 *from = (u16 *)(gPaletteBankData + banks[channel] * 32);
+                u16 *from = (u16 *)(gPaletteBankData + GrowthHazard_ReadBank(banks + channel) * 32);
                 u16 *to = (u16 *)(gPaletteBankData + 0x1AA0);
                 s32 colorIndex;
                 u32 channelMask;
                 colorIndex = 0;
                 channelMask = 31;
                 do {
-                    u32 fromColor = *from;
+                    u32 fromColor = GrowthHazard_ReadColor(from);
                     s32 fromRed = 31;
                     s32 fromGreen;
                     u32 toColor;
@@ -60,17 +70,17 @@ void GrowthHazard_UpdateSharedFlash(Obj *manager)
                     fromRed &= fromColor;
                     fromColor <<= 16;
                     fromGreen = fromColor >> 21;
-                    fromGreen &= channelMask;
+                    fromGreen = GrowthHazard_MaskChannel(fromGreen, &channelMask);
                     fromColor >>= 26;
-                    fromColor &= channelMask;
-                    toColor = *to;
+                    fromColor = GrowthHazard_MaskChannel(fromColor, &channelMask);
+                    toColor = GrowthHazard_ReadColor(to);
                     toRed = 31;
                     toRed &= toColor;
                     toColor <<= 16;
                     toGreen = toColor >> 21;
-                    toGreen &= channelMask;
+                    toGreen = GrowthHazard_MaskChannel(toGreen, &channelMask);
                     toColor >>= 26;
-                    toColor &= channelMask;
+                    toColor = GrowthHazard_MaskChannel(toColor, &channelMask);
                     red = (fromRed * flash + toRed * inverse) >> 4;
                     green = (fromGreen * flash + toGreen * inverse) >> 4;
                     blue = ((s32)fromColor * flash + (s32)toColor * inverse) >> 4;
@@ -82,6 +92,3 @@ void GrowthHazard_UpdateSharedFlash(Obj *manager)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", GrowthHazard_UpdateSharedFlash);
-#endif

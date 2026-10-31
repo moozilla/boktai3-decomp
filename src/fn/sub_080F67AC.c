@@ -1,262 +1,444 @@
-#include "global.h"
-
-// confidence=low: sword task setup; reads script parameters, initializes the main sprite, shadow, colliders and four sword segments
-#define FIELD(p, off, type) (*(type *)((u8 *)(p) + (off)))
-#define READ_OPT()          (Script_GetPc() ? Script_GetValue() : 0)
-
-// confidence=low: sword task setup; reads script parameters, initializes the main sprite, shadow, colliders and four sword segments
-#define FIELD(p, off, type) (*(type *)((u8 *)(p) + (off)))
-#define READ_OPT()          (Script_GetPc() ? Script_GetValue() : 0)
-
-// confidence=low: sword task setup; reads script parameters, initializes the main sprite, shadow, colliders and four sword segments
-#define FIELD(p, off, type) (*(type *)((u8 *)(p) + (off)))
-#define READ_OPT()          (Script_GetPc() ? Script_GetValue() : 0)
-
-// confidence=low: sword task setup; reads script parameters, initializes the main sprite, shadow, colliders and four sword segments
-#define FIELD(p, off, type) (*(type *)((u8 *)(p) + (off)))
-#define READ_OPT()          (Script_GetPc() ? Script_GetValue() : 0)
+#include "contact_swarm.h"
+#include "display_sequence_inline.h"
 
 extern void *gUnknown_02000580;
-
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void *ScriptProc_Start(u32, u32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
-void ScaledShadow_Initialize(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32);
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetPc(void);
-s32 Script_GetValue(void);
-s32 Script_GetKeywordValue(u32, s32);
+void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 s32 Terrain_GetHeightAt(void *);
-void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
-void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void Collider_SetBodyProperties(void *, s32, s32, s32);
-void Collider_SetCallback(void *, void *, void *);
-void Collider_Refresh(void *);
 void Ivy_InitPaletteBuffers(void *);
 void Ivy_SetSegmentProperties(void *, void *, u32);
 void ChildGroup_ReadScriptParameters(void *);
 void TargetRegistry_RegisterSceneActor(void *, void *, void *);
-void AnimData_SelectPaletteBank(void *, u32);
-extern void Ivy_OnDestroy(void);
-extern void ColorPulse_ApplyContact(void);
-extern void ChildGroup_ProcessEvent(void);
-extern void sub_080F20AC(void);
-extern void sub_080F3B30(void);
-extern void Ivy_InitColorTransition(void);
+void Ivy_OnDestroy(void);
+void ColorPulse_ApplyContact(void);
+void ChildGroup_ProcessEvent(void);
+void sub_080F20AC(void);
+void sub_080F3B30(void);
+void Ivy_InitColorTransition(void);
 
-static inline void AdvanceAnim080F67AC(u8 *anim)
-{
-    u32 timer;
+union SwordVector {
+    struct ContactPackedVector packed;
+    struct ContactPosition position;
+};
+
+struct SwordTask {
+    u8 unknown0[0x60];
+    void *target;
+    u16 field64, field66, field68, field6A, field6C, field6E, field70;
+    u8 unknown72[0xC];
+    s16 health, body80, field82, field84, field86, body88, body8A;
+    u8 field8C, flags8D, field8E, field8F, field90, field91, field92, field93;
+    u8 unknown94[0x6];
+    u16 field9A, field9C;
+    u8 field9E, field9F;
+    u8 unknownA0[0x8];
+    struct ContactSwarmSprite segments[4];
+    struct ContactSwarmGraphics segmentGraphics[4];
+    struct ContactCollider segmentAttacks[4];
+    struct ContactCollider segmentBodies[4];
+    u8 unknown468[0x6F0];
+    struct DisplaySequenceState sequence;
+    struct ContactSwarmSprite sprite;
+    struct ContactSwarmGraphics graphics;
+    u8 shadow[0x6C];
+    struct ContactCollider attack;
+    struct ContactCollider body;
+    u8 unknownCC4[0x4];
+    void *update;
+    u8 unknownCCC[0x4];
+    void *onContact;
+    u8 unknownCD4[0x18];
+    u32 fieldCEC;
+    void *colorUpdate;
+    u8 unknownCF4[0x4];
     u32 duration;
-    u32 frameIndex;
-    u16 *frame;
+    u8 unknownCFC[0x8];
+    s16 attackD04[2], attackD08[2], attackD0C[2], attackD10[2];
+    u8 unknownD14[0x1C];
+    u16 palette[16];
+    u8 unknownD50[0x2];
+    u8 fieldD52, fieldD53, fieldD54, variant;
+    u16 paletteBank;
+    u8 unknownD58[0x4];
+    u16 initialHealth;
+    u8 parameter;
+    u8 unknownD5F[0x27];
+    u16 fieldD86;
+    u8 registry[4];
+};
 
-    timer = (u16)(FIELD(anim, 0xE, u16) + 1);
-    FIELD(anim, 0xE, u16) = timer;
-    duration = FIELD(anim, 7, u8);
-    if (timer >= duration) {
-        FIELD(anim, 0xE, u16) = 0;
-        if (FIELD(anim, 4, u8) & 4) {
-            if (FIELD(anim, 8, u16) == 0) {
-                if (FIELD(anim, 4, u8) & 8) {
-                    FIELD(anim, 0xE, u16) = duration;
-                    goto frame_done;
-                }
-                frameIndex = FIELD(anim, 5, u8) - 1;
-            } else {
-                frameIndex = FIELD(anim, 8, u16) - 1;
-            }
-            FIELD(anim, 8, u16) = frameIndex;
-            goto frame_done;
-        }
-        frameIndex = FIELD(anim, 8, u16) + 1;
-        if ((u16)frameIndex < FIELD(anim, 5, u8)) {
-            FIELD(anim, 8, u16) = frameIndex;
-        } else {
-            if (FIELD(anim, 4, u8) & 8) {
-                FIELD(anim, 0xE, u16) = duration;
-                frameIndex = FIELD(anim, 5, u8) - 1;
-            } else {
-                frameIndex = 0;
-            }
-            FIELD(anim, 8, u16) = frameIndex;
-        }
+static inline s32 Sword_ReadArgument(void)
+{
+    return Script_GetPc() ? Script_GetValue() : 0;
+}
+
+static inline void Sword_SetFrame(struct ContactSwarmSprite *sprite, u16 frame)
+{
+    sprite->frame = frame;
+}
+static inline void Sword_SetFrameIndex(struct DisplaySequenceState *state, u16 index)
+{
+    state->index = index;
+}
+static inline u16 Sword_ReadCommand(const u16 *command)
+{
+    return *command;
+}
+static inline u8 Sword_GetFrameCount(struct DisplaySequenceState *state)
+{
+    return state->frameCount;
+}
+/* The four child sprites advance one shared playback state during setup. */
+static inline u32 Sword_StepSequence(struct ContactSwarmSprite *owner,
+                                     struct DisplaySequenceState *state)
+{
+    const u16 *command;
+    u32 ended;
+    {
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
     }
-frame_done:
-    frame = (u16 *)((u8 *)FIELD(anim, 0, void *) + (FIELD(anim, 8, u16) << 1));
-    FIELD(anim, 6, u8) = *frame & 0xF;
-    FIELD(anim, 7, u8) = (FIELD(anim, 0xC, u16) * FIELD(anim, 6, u8)) >> 6;
-    if (FIELD(anim, 7, u8) == 0)
-        FIELD(anim, 7, u8) = 1;
+    Sword_SetFrame(owner, Sword_ReadCommand(command) >> 6);
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
+        else
+            owner->flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
+        else
+            owner->flags &= ~8;
+    }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    Sword_SetFrameIndex(state, Sword_GetFrameCount(state) - 1);
+                ended = 1;
+            } else {
+                Sword_SetFrameIndex(state, state->index - 1);
+                ended = 0;
+            }
+        } else {
+            if (++state->index >= Sword_GetFrameCount(state)) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    Sword_SetFrameIndex(state, Sword_GetFrameCount(state) - 1);
+                } else {
+                    Sword_SetFrameIndex(state, 0);
+                }
+                ended = 1;
+            } else {
+                ended = 0;
+            }
+        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(Sword_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
+    }
+    return ended;
+}
+static inline u16 Sword_SequenceIndex(struct DisplaySequenceState *const *state)
+{
+    return (*state)->index;
+}
+static inline void Sword_HoldElapsed(struct DisplaySequenceState *state, u16 duration)
+{
+    state->elapsed = duration;
+}
+#define SWORD_HOLD_CURRENT_FRAME(state, duration)                                                  \
+    do {                                                                                           \
+        (state)->elapsed = (duration);                                                             \
+    } while (0)
+#define SWORD_READ_SEQUENCE_FLAGS(out_, state_)                                                    \
+    do {                                                                                           \
+        (out_) = (state_)->flags;                                                                  \
+    } while (0)
+static inline u32 Sword_StepMainSequence(struct ContactSwarmSprite *owner,
+                                         struct DisplaySequenceState *state)
+{
+    const u16 *command;
+    u32 ended;
+    u32 duration;
+    u16 heldDuration;
+    u16 elapsedSnapshot[1];
+    u32 elapsedValue;
+    {
+        u32 offset = Sword_SequenceIndex(&state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    Sword_SetFrame(owner, Sword_ReadCommand(command) >> 6);
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
+        else
+            owner->flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
+        else
+            owner->flags &= ~8;
+    }
+    /* Retain the stored counter and the duration of the current frame. */
+    elapsedSnapshot[0] = ++state->elapsed;
+    duration = state->duration;
+    elapsedValue = elapsedSnapshot[0];
+    heldDuration = duration;
+    if (elapsedValue >= duration) {
+        u8 flags;
+        state->elapsed = 0;
+        SWORD_READ_SEQUENCE_FLAGS(flags, state);
+        if (flags & 4) {
+            if (state->index == 0) {
+                u32 holdMask = 8;
+                holdMask &= flags;
+                if (holdMask)
+                    Sword_HoldElapsed(state, heldDuration);
+                else
+                    Sword_SetFrameIndex(state, Sword_GetFrameCount(state) - 1);
+                ended = 1;
+            } else {
+                Sword_SetFrameIndex(state, state->index - 1);
+                ended = 0;
+            }
+        } else {
+            u8 frameCount;
+            if (++state->index >= (frameCount = Sword_GetFrameCount(state))) {
+                u32 holdMask = 8;
+                holdMask &= flags;
+                if ((u8)holdMask) {
+                    SWORD_HOLD_CURRENT_FRAME(state, duration);
+                    Sword_SetFrameIndex(state, frameCount - 1);
+                } else {
+                    Sword_SetFrameIndex(state, 0);
+                }
+                ended = 1;
+            } else {
+                ended = 0;
+            }
+        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(Sword_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
+    }
+    return ended;
 }
 
-static inline void SyncSpriteFlag(u32 *flags, u8 anim4, u16 frame, u32 bit, u32 mask)
+static inline void Sword_SetByteFlags(u8 *field, u8 bits)
 {
-    if ((anim4 & mask) != (((frame & 0x30) >> 4) & mask))
-        *flags |= bit;
-    else
-        *flags &= ~bit;
+    bits |= *field;
+    *field = bits;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 52.6%
-// scope shape 468 (differences once low registers are set aside)
-void sub_080F67AC(struct SwordTask *p)
+static inline void *Sword_ReadSpriteResource(void *const *field)
 {
-    u8 *anim;
-    u8 *spriteMain;
-    u8 *animMain;
-    u32 hit[2];
-    u32 box[2];
+    return *field;
+}
+static inline void Sword_InitSegmentCollider(struct ContactCollider *collider, u32 flags,
+                                             const union SwordVector *halfSize,
+                                             const union SwordVector *offset,
+                                             const u32 *contactFlags)
+{
+    Collider_Init(collider, 0, flags, 0, *contactFlags, halfSize, offset);
+}
+#define SWORD_BIND_PALETTE(graphics, colors)                                                       \
+    do {                                                                                           \
+        (graphics)->paletteData = (colors);                                                        \
+    } while (0)
+static inline void Sword_ReadArgumentField(s16 *array, s32 index)
+{
+    s16 *field = (s16 *)((u8 *)array + index);
+    *field = Sword_ReadArgument();
+}
+/* Initialize the main actor and its four child sprites from the script. */
+void Sword_InitTask(struct SwordTask *p)
+{
+    struct DisplaySequenceState *anim;
+    struct ContactSwarmSprite *spriteMain;
+    struct ContactSwarmGraphics *animMain;
+    union SwordVector hit;
+    union SwordVector box;
     s32 i;
     s32 sb;
-    u16 *frame;
 
-    FIELD(p, 0x60, void *) = gUnknown_02000580;
-    FIELD(p, 0x64, u16) = 0;
-    FIELD(p, 0x66, u16) = 0;
-    FIELD(p, 0x68, u16) = 0;
-    FIELD(p, 0x6C, u16) = 0;
-    FIELD(p, 0x6E, u16) = 1;
-    FIELD(p, 0x70, u16) = 0;
-    FIELD(p, 0x8D, u8) = 0;
-    FIELD(p, 0x7E, u16) = 0;
-    FIELD(p, 0x8E, u8) = 0;
-    FIELD(p, 0x9E, u8) = 0;
-    FIELD(p, 0x9F, u8) = 0;
-    FIELD(p, 0x9A, u16) = 0;
-    FIELD(p, 0x9C, u16) = 0;
-    FIELD(p, 0x92, u8) = 1;
-    FIELD(p, 0x93, u8) = 0;
-    FIELD(p, 0x8D, u8) |= 1;
-    FIELD(p, 0xCEC, u32) = 0;
-    FIELD(p, 0xCF8, u32) = 0x14;
-    FIELD(p, 0xCC8, void *) = sub_080F3B30;
-    FIELD(p, 0xCF0, void *) = Ivy_InitColorTransition;
+    p->target = gUnknown_02000580;
+    animMain = &p->graphics;
+    spriteMain = &p->sprite;
+    p->field64 = 0;
+    p->field66 = 0;
+    p->field68 = 0;
+    p->field6C = 0;
+    p->field6E = 1;
+    p->field70 = 0;
+    p->flags8D = 0;
+    p->health = 0;
+    p->field8E = 0;
+    p->field9E = 0;
+    p->field9F = 0;
+    p->field9A = 0;
+    p->field9C = 0;
+    p->field92 = 1;
+    p->field93 = 0;
+    Sword_SetByteFlags(&p->flags8D, 1);
+    p->update = sub_080F3B30;
+    p->colorUpdate = Ivy_InitColorTransition;
+    p->fieldCEC = 0;
+    p->duration = 0x14;
 
-    animMain = (u8 *)p + 0xB94;
-    spriteMain = (u8 *)p + 0xB68;
     AnimData_Load(animMain, 0x5291);
     Sprite_Init(spriteMain, animMain, 0);
     {
         void *script = ScriptProc_Start(0x922E, 0x3F72);
-        anim = (u8 *)p + 0xB58;
-        Anim_SetSequence(anim, script, 0, FIELD(p, 0xD55, u8), 0);
+        anim = &p->sequence;
+        Anim_SetSequence(anim, script, 0, p->variant, 0);
     }
 
-    frame = (u16 *)((u8 *)FIELD(anim, 0, void *) + (FIELD(anim, 8, u16) << 1));
-    FIELD(spriteMain, 0x10, u16) = *frame >> 6;
-    SyncSpriteFlag((u32 *)spriteMain, FIELD(anim, 4, u8), *frame, 4, 1);
-    SyncSpriteFlag((u32 *)spriteMain, FIELD(anim, 4, u8), *frame, 8, 2);
-    AdvanceAnim080F67AC(anim);
-    FIELD(spriteMain, 0, u32) |= 2;
+    Sword_StepMainSequence(spriteMain, anim);
+    spriteMain->flags |= 2;
 
-    AnimData_SelectPaletteBank(FIELD(p, 0xB74, void *), FIELD(p, 0xD56, u16));
+    AnimData_SelectPaletteBank(
+        Sword_ReadSpriteResource(&((struct DisplaySequenceSprite *)&p->sprite)->resource),
+        p->paletteBank);
 
     {
-        u16 *src = FIELD(animMain, 0xC, u16 *);
-        u16 *dst = (u16 *)((u8 *)p + 0xD30);
-        for (i = 15; i >= 0; i--) {
-            *dst++ = *src++;
+        for (i = 0; i < 16; i++) {
+            *(p->palette + i) = ((const u16 *)animMain->paletteData)[i];
         }
-        FIELD(animMain, 0xC, u16 *) = (u16 *)((u8 *)p + 0xD30);
+        SWORD_BIND_PALETTE(animMain, p->palette);
     }
-    FIELD(p, 0xD52, u8) = 5;
-    FIELD(p, 0xD53, u8) = 0;
-    FIELD(p, 0xD54, u8) = 0;
+    p->fieldD52 = 5;
+    p->fieldD53 = 0;
+    p->fieldD54 = 0;
 
-    ScaledShadow_Initialize((u8 *)p + 0xBB0, (u8 *)p + 0xB84, 0x30, 0x30, 0x30, 0, 0, 0, 0, 0, 0);
+    ScaledShadow_Initialize(p->shadow, &p->sprite.position, 0x30, 0x30, 0x30, 0x30, 0, 0, 0, 0, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        FIELD(p, 0x7E, s16) = READ_OPT();
-        FIELD(p, 0x80, u16) = READ_OPT();
-        FIELD(p, 0x82, u16) = READ_OPT();
-        FIELD(p, 0x84, u16) = READ_OPT();
-        FIELD(p, 0x8A, u16) = READ_OPT();
-        FIELD(p, 0x88, u16) = READ_OPT();
-        FIELD(p, 0xD5C, u16) = FIELD(p, 0x7E, u16);
+        p->health = Sword_ReadArgument();
+        p->body80 = Sword_ReadArgument();
+        p->field82 = Sword_ReadArgument();
+        p->field84 = Sword_ReadArgument();
+        p->body8A = Sword_ReadArgument();
+        p->body88 = Sword_ReadArgument();
+        p->initialHealth = p->health;
     }
     if (Script_SeekToKeyword(0x54)) {
-        for (sb = 1; sb >= 0; sb--) {
-            i = sb * 2;
-            FIELD(p, 0xD04 + i, s16) = READ_OPT();
-            FIELD(p, 0xD08 + i, s16) = READ_OPT();
-            FIELD(p, 0xD0C + i, s16) = READ_OPT();
-            FIELD(p, 0xD10 + i, s16) = READ_OPT();
+        for (sb = 0, i = 1; i >= 0; sb += sizeof(s16), i--) {
+            Sword_ReadArgumentField(p->attackD04, sb);
+            Sword_ReadArgumentField(p->attackD08, sb);
+            Sword_ReadArgumentField(p->attackD0C, sb);
+            Sword_ReadArgumentField(p->attackD10, sb);
         }
     }
     if (Script_SeekToKeyword(0x70)) {
-        FIELD(spriteMain, 0x1C, s16) = Script_GetValue();
-        FIELD(spriteMain, 0x1E, s16) = Script_GetValue();
-        FIELD(spriteMain, 0x20, s16) = Script_GetValue();
+        spriteMain->position.x = Script_GetValue();
+        spriteMain->position.y = Script_GetValue();
+        spriteMain->position.z = Script_GetValue();
     } else {
-        FIELD(spriteMain, 0x1C, s16) = 0;
-        FIELD(spriteMain, 0x1E, s16) = 0;
-        FIELD(spriteMain, 0x20, s16) = 0;
+        spriteMain->position.x = 0;
+        spriteMain->position.y = 0;
+        spriteMain->position.z = 0;
     }
-    FIELD(p, 0xD5E, u8) = Script_GetKeywordValue(0x4B, 2);
-    FIELD(p, 0xD86, u16) = Script_GetKeywordValue(0x56, -1);
-    FIELD(spriteMain, 0x1E, s16) = Terrain_GetHeightAt(spriteMain + 0x1C) + 0x15E;
+    p->parameter = Script_GetKeywordValue(0x4B, 2);
+    p->fieldD86 = Script_GetKeywordValue(0x56, -1);
+    spriteMain->position.y = Terrain_GetHeightAt(&spriteMain->position) + 0x15E;
 
-    hit[0] = (((hit[0] & 0xFFFF0000) | 0x32) & 0xFFFF) | (0xC8 << 14);
-    hit[1] = (hit[1] & 0xFFFF0000) | 0x32;
-    box[0] = 0;
-    box[1] &= 0xFFFF0000;
+    hit.packed.x = 50;
+    hit.packed.y = 50;
+    hit.packed.z = 50;
+    box.packed.x = 0;
+    box.packed.y = 0;
+    box.packed.z = 0;
 
-    Collider_Init((u8 *)p + 0xC1C, 0, 0x2001, 0, 0x10, hit, box);
-    Collider_SetAttackProperties((u8 *)p + 0xC1C, FIELD(p, 0xD04, s16), FIELD(p, 0xD08, s16), 0,
-                                 FIELD(p, 0xD0C, s16), FIELD(p, 0xD10, s16));
-    Collider_SetCallback((u8 *)p + 0xC1C, Ivy_OnDestroy, p);
-    Collider_Refresh((u8 *)p + 0xC1C);
-    FIELD(p, 0xC22, u16) &= 0xFFFB;
+    Collider_Init(&p->attack, 0, 0x2001, 0, 0x10, &hit, &box);
+    Collider_SetAttackProperties(&p->attack, p->attackD04[0], p->attackD08[0], 0, p->attackD0C[0],
+                                 p->attackD10[0]);
+    Collider_SetCallback(&p->attack, Ivy_OnDestroy, p);
+    Collider_Refresh(&p->attack);
+    p->attack.flags &= 0xFFFB;
 
-    ((s16 *)hit)[0] = 0x40;
-    ((s16 *)hit)[1] = 0x40;
-    ((s16 *)hit)[2] = 0x40;
-    Collider_Init((u8 *)p + 0xC70, 0, 0x5009, 0, 0x10, hit, box);
-    Collider_SetBodyProperties((u8 *)p + 0xC70, FIELD(p, 0x80, s16), FIELD(p, 0x8A, s16),
-                               FIELD(p, 0x88, s16));
-    Collider_SetCallback((u8 *)p + 0xC70, ColorPulse_ApplyContact, p);
-    Collider_Refresh((u8 *)p + 0xC70);
-    FIELD(p, 0xCD0, void *) = sub_080F20AC;
+    hit.position.x = 0x40;
+    hit.position.y = 0x40;
+    hit.position.z = 0x40;
+    Collider_Init(&p->body, 0, 0x5009, 0, 0x10, &hit, &box);
+    Collider_SetBodyProperties(&p->body, p->body80, p->body8A, p->body88);
+    Collider_SetCallback(&p->body, ColorPulse_ApplyContact, p);
+    Collider_Refresh(&p->body);
+    p->onContact = sub_080F20AC;
 
-    for (sb = 0; sb <= 3; sb++) {
-        u8 *sprite;
-        u8 *col;
-        u8 *anim2 = (u8 *)p + 0xB58;
-        u8 *animSeg = (u8 *)p + 0x158 + sb * 0x1C;
-        AnimData_Load(animSeg, 0x5291);
-        sprite = (u8 *)p + 0xA8 + sb * 0x2C;
-        Sprite_Init(sprite, animSeg, 0);
-        frame = (u16 *)((u8 *)FIELD(anim2, 0, void *) + (FIELD(anim2, 8, u16) << 1));
-        FIELD(sprite, 0x10, u16) = *frame >> 6;
-        SyncSpriteFlag((u32 *)sprite, FIELD(anim2, 4, u8), *frame, 4, 1);
-        SyncSpriteFlag((u32 *)sprite, FIELD(anim2, 4, u8), *frame, 8, 2);
-        AdvanceAnim080F67AC(anim2);
+    {
+        u32 childContactFlags = 0x10;
+        for (i = 0; i <= 3; i++) {
+            struct ContactSwarmSprite *sprite;
+            u32 spriteOffset;
+            struct ContactCollider *attack;
+            struct ContactCollider *body;
+            struct DisplaySequenceState *anim2 = &p->sequence;
+            struct ContactSwarmGraphics *animSeg = &p->segmentGraphics[i];
+            AnimData_Load(animSeg, 0x5291);
+            spriteOffset = i * sizeof(struct ContactSwarmSprite);
+            Sprite_Init(&p->segments[i], animSeg, 0);
+            sprite = (struct ContactSwarmSprite *)(spriteOffset + (u32)p);
+            sprite = (struct ContactSwarmSprite *)((u8 *)sprite + 0xA8);
+            Sword_StepSequence(sprite, anim2);
 
-        FIELD(p, 0xA8 + sb * 0x2C, u32) = 0x203;
-        FIELD(p, 0xAF + sb * 0x2C, u8) = 3;
-        FIELD(p, 0xC4 + sb * 0x2C, u16) = 0;
-        FIELD(p, 0xC6 + sb * 0x2C, u16) = 0;
-        FIELD(p, 0xC8 + sb * 0x2C, u16) = 0;
+            p->segments[i].flags = 0x203;
+            p->segments[i].priority = 3;
+            p->segments[i].position.x = 0;
+            p->segments[i].position.y = 0;
+            p->segments[i].position.z = 0;
 
-        col = (u8 *)p + sb * 0x54 + 0x1C8;
-        Collider_Init(col, 0, 0x2001, 0, 0x10, hit, box);
-        Collider_SetCallback(col, 0, p);
-        Collider_Refresh(col);
-        Collider_SetAttackProperties(col, FIELD(p, 0xD06, s16), FIELD(p, 0xD0A, s16), 0,
-                                     FIELD(p, 0xD0E, s16), FIELD(p, 0xD12, s16));
+            attack = &p->segmentAttacks[i];
+            Sword_InitSegmentCollider(attack, 0x2001, &hit, &box, &childContactFlags);
+            Collider_SetCallback(attack, 0, p);
+            Collider_Refresh(attack);
+            Collider_SetAttackProperties(attack, p->attackD04[1], p->attackD08[1], 0,
+                                         p->attackD0C[1], p->attackD10[1]);
 
-        col = (u8 *)p + sb * 0x54;
-        FIELD(col, 0x1CE, u16) |= 4;
-        col = (u8 *)p + sb * 0x54 + 0x318;
-        Collider_Init(col, 0, 0x4009, 0, 0x10, hit, box);
-        Collider_SetBodyProperties(col, FIELD(p, 0x80, s16), FIELD(p, 0x8A, s16),
-                                   FIELD(p, 0x88, s16));
-        Collider_SetCallback(col, 0, p);
-        Collider_Refresh(col);
-        FIELD(p, sb * 0x54 + 0x31E, u16) |= 4;
+            p->segmentAttacks[i].flags |= 4;
+            body = &p->segmentBodies[i];
+            Sword_InitSegmentCollider(body, 0x4009, &hit, &box, &childContactFlags);
+            Collider_SetBodyProperties(body, p->body80, p->body8A, p->body88);
+            Collider_SetCallback(body, 0, p);
+            Collider_Refresh(body);
+            p->segmentBodies[i].flags |= 4;
+        }
     }
 
     Ivy_InitPaletteBuffers(p);
@@ -264,9 +446,5 @@ void sub_080F67AC(struct SwordTask *p)
     ChildGroup_ReadScriptParameters(p);
     Script_GetKeywordValue(0x4E, 0);
     if (Script_GetKeywordValue(0x4D, 0) & 0x200)
-        TargetRegistry_RegisterSceneActor((u8 *)p + 0xD88, (u8 *)p + 0xC70,
-                                          ChildGroup_ProcessEvent);
+        TargetRegistry_RegisterSceneActor(p->registry, &p->body, ChildGroup_ProcessEvent);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080F67AC);
-#endif

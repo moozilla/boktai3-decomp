@@ -1,97 +1,115 @@
 #include "global.h"
-
-#include "scene_actor_reset.h"
+#include "scene_actor_chase_reaction.h"
 #include "scene_actor_terrain.h"
-#include "engine.h"
-#include "ram.h"
 
-u8 sub_0812E118(u32, u32, u32, u32);
+struct SlimeWanderContext {
+    u8 unknown0[0x3EC];
+    struct ContactPosition target;
+};
 
-static inline s32 sub0808FA40_Quarter(s32 heading)
+u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
+
+static inline s32 Slime_QuarterDirection(s32 heading)
 {
     if (heading >= 0)
         return heading >> 6;
     return -(-heading >> 6);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 68.7%
-// scope shape 111 (differences once low registers are set aside)
-// confidence=low: rolls a heading, walks up to two free cells that way, and stores the chosen cell center in the actor's context
-void sub_0808FA40(void *arg0, u32 arg1)
+static inline u16 Slime_RandomDirection(void)
 {
-    struct SceneActorRegistryResetView *actor = arg0;
-    struct ContactPosition center;
-    void *context;
-    s32 tries = 0;
-    u32 cell, height, shape;
-    s32 chosen, next, i;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    index *= 2;
+    return *(const u16 *)(RANDOM_TABLE_ADDR + index);
+}
 
-    context = actor->context;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    actor->body.direction = gRandomTable[gRandomIndex];
-    do {
-        cell = actor->terrainCell;
-        height = SceneActorTerrain_GetHeight(cell, &actor->body.position);
-        shape = *SceneActorTerrain_GetCell(cell) >> 4;
-        switch (sub0808FA40_Quarter(actor->body.direction + 32) & 3) {
-            case 0:
-                next = cell + 1;
-                i = 0;
+static inline s32 Slime_MapWidth(struct EngineMap **terrain)
+{
+    return ((struct SceneActorChaseTerrainGrid *)(*terrain)->cells)->width;
+}
+
+static inline s32 Slime_ForwardCell(struct SceneActorRegistryResetView *actor, s32 steps)
+{
+    s32 cell = actor->terrainCell;
+    struct ContactPosition *position = &actor->body.position;
+    struct EngineMap **cachedMapSlot = &gTerrainMap;
+    u32 height = SceneActorChase_HeightAt(cell, position);
+    u32 shape = SceneActorChase_CellProperties(cell)->attributes >> 4;
+    s32 direction = Slime_QuarterDirection(actor->body.direction + 32) & 3;
+    s32 next;
+    s32 i;
+    struct EngineMap **completionMapSlot;
+    switch (direction) {
+        case 0:
+            next = cell + 1;
+            i = 0;
+            if (i < steps)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next++;
-                    i++;
-                } while (i != 2);
-                chosen = next - 1;
-                break;
-            case 1:
-                next = cell + SceneActorTerrain_Width();
-                i = 0;
+                } while (++i < steps);
+            return next - 1;
+        case 1:
+            next = cell + Slime_MapWidth(cachedMapSlot);
+            i = 0;
+            completionMapSlot = (struct EngineMap **)0x030052F4;
+            if (i < steps)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
-                        break;
-                    next += SceneActorTerrain_Width();
-                    i++;
-                } while (i != 2);
-                chosen = next - SceneActorTerrain_Width();
-                break;
-            case 2:
-                next = cell - 1;
-                i = 0;
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
+                        goto south;
+                    next += Slime_MapWidth(cachedMapSlot);
+                } while (++i < steps);
+            return next - Slime_MapWidth(completionMapSlot);
+        case 2:
+            next = cell - 1;
+            i = 0;
+            if (i < steps)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next--;
-                    i++;
-                } while (i != 2);
-                chosen = next + 1;
-                break;
-            case 3:
-                next = cell - SceneActorTerrain_Width();
-                i = 0;
+                } while (++i < steps);
+            return next + 1;
+        case 3:
+            next = cell - Slime_MapWidth(cachedMapSlot);
+            i = 0;
+            completionMapSlot = (struct EngineMap **)0x030052F4;
+            if (i < steps)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
-                        break;
-                    next -= SceneActorTerrain_Width();
-                    i++;
-                } while (i != 2);
-                chosen = next + SceneActorTerrain_Width();
-                break;
-            default:
-                chosen = cell;
-                break;
-        }
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
+                        goto north;
+                    next -= Slime_MapWidth(cachedMapSlot);
+                } while (++i < steps);
+            return next + Slime_MapWidth(completionMapSlot);
+        default:
+            goto home;
+    }
+south:
+    return next - Slime_MapWidth(cachedMapSlot);
+north:
+    return next + Slime_MapWidth(cachedMapSlot);
+home:
+    return actor->terrainCell;
+}
+
+void Slime_SelectWanderTarget(struct SceneActorRegistryResetView *actor, u32 direction)
+{
+    struct ContactPosition center;
+    struct SlimeWanderContext *context = actor->context;
+    s32 tries, chosen;
+    actor->body.direction = Slime_RandomDirection();
+    tries = 0;
+    do {
+        chosen = Slime_ForwardCell(actor, 2);
         if (chosen != actor->terrainCell)
-            break;
+            goto selected;
         actor->body.direction += 64;
         tries++;
     } while (tries <= 3);
-    actor->body.direction = arg1;
+selected:
+    actor->body.direction = direction;
     SceneActorTerrain_GetCenter(chosen, &center);
-    *(struct ContactPosition *)((u8 *)context + 0x3EC) = center;
+    context->target = center;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0808FA40);
-#endif

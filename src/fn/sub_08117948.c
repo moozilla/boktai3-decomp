@@ -3,16 +3,18 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "area_effect_link.h"
-// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 91.0%
-// fix.py best version (reprinted C)
-struct Obj {
+union GloveAnimationKey {
+    u32 word;
+    u16 half[2];
+};
+
+struct GloveMotion {
     u8 pad0[4];
     u32 unk4;
     u32 unk8;
-    u8 padC[0x18 - 0xC];
+    u32 boundsFlags;
+    u8 pad10[0x18 - 0x10];
     s32 z;
     u8 pad1C[4];
     s32 outX, outY, outZ; /* 0x20 */
@@ -26,14 +28,26 @@ struct Obj {
     u16 recoveryValue;
     u8 pad80[0xC0 - 0x80];
     s32 unkC0;
-    u8 padC4[0x307 - 0xC4];
+    u8 padC4[0x2B0 - 0xC4];
+    u32 primaryCallback;
+    u8 pad2B4, primaryKind;
+    u8 pad2B6[0x305 - 0x2B6];
+    u8 primarySpriteRefresh, primaryLatched;
     u8 actionActive;
     u16 actionCooldown;
-    u8 pad30A[0x319 - 0x30A];
+    u8 pad30A[4];
+    u16 primaryKeyframes;
+    u8 pad310[4];
+    u32 secondaryCallback;
+    u8 pad318;
     u8 actionKind;
-    u8 pad31A[0x326 - 0x31A];
+    u8 pad31A[0x324 - 0x31A];
+    u8 secondaryEnabled, pad325;
     u16 recoveryTimer, cooldown;
-    u8 pad32A[0x57A - 0x32A];
+    u8 secondaryRelease, secondaryLatched;
+    u8 pad32C[0x524 - 0x32C];
+    union GloveAnimationKey animation;
+    u8 pad528[0x57A - 0x528];
     u8 damageTimer;
     u8 pad57B[0x5AC - 0x57B];
     s32 vy; /* 0x5AC */
@@ -58,10 +72,16 @@ struct Obj {
     u8 pad5F2[6];
 };
 
+struct GloveModel {
+    u8 pad0[0x60];
+    u8 primarySprite[0x180];
+    u8 primaryAnimation[0x70];
+};
+
 struct Glove {
     u8 pad0[0x18];
-    struct Obj motion;
-    u8 model[0x860 - 0x610];
+    struct GloveMotion motion;
+    struct GloveModel model;
     s8 marker, markerSlot;
     u8 pad862[2];
     u32 timer;
@@ -80,22 +100,16 @@ struct Glove {
     s32 launchSpeed;
     u8 launchPhase;
 };
-#define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
-#define S8(p, o)  (*(s8 *)((u8 *)(p) + (o)))
-#define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
-#define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
-#define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
-#define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
 s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct Obj *);
-void PalFade_Update(struct Obj *);
-void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-void ActorParticles_SpawnImpactBurst(struct Obj *);
+void Terrain_ResolveActorMotion(struct GloveMotion *);
+void PalFade_Update(struct GloveMotion *);
+void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct Obj *);
-void Actor_ClampMovementSpeed(struct Obj *);
+void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
+void Actor_ClampMovementSpeed(struct GloveMotion *);
 void MotionActor_UpdateMovementAudio(struct Glove *);
 u8 LinkParticipant_IsLocallySelected(struct Glove *);
 void Sound_StopSong(s32);
@@ -105,33 +119,59 @@ void PalFade_Start(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 s32 sub_08249240(void *, s32, u32);
 void ChargeMarker_TickHold(void *, void *, u32);
-void Glove_UpdateStopping(struct Glove *);
 
-// Action-pointer lifetimes, constant reuse and register allocation still differ.
-static inline void ClearDamageFlag(s8 *p, s32 mask)
+static inline void Glove_BeginStopping(union GloveAnimationKey *animation, struct Glove *p,
+                                       u8 *entry)
+{
+    u16 elapsedReset[] = {0};
+    u8 entryClear = 0;
+    animation->half[0] = 0x88;
+    p->motion.animation.half[1] = elapsedReset[0];
+    *entry = entryClear;
+}
+static inline s32 Glove_ReadHeightLimit(const s32 *limit)
+{
+    return *limit;
+}
+struct GloveFlagBinding {
+    u16 *field;
+};
+static inline u16 *Glove_FlagsFromBinding(const struct GloveFlagBinding *binding)
+{
+    return binding->field;
+}
+struct GloveMotionBinding {
+    struct GloveMotion *field;
+};
+static inline struct GloveMotion *Glove_MotionFromBinding(struct GloveMotionBinding binding)
+{
+    return binding.field;
+}
+static inline void Glove_ClearDamageFlag(s8 *p, s32 mask)
 {
     *p &= mask;
 }
-static inline void UpdateSecondaryAction(struct Glove *p, u16 *flags)
+static inline void Glove_UpdateSecondaryAction(struct Glove *p, struct GloveMotion *self,
+                                               u16 *flags)
 {
-    struct Obj *self = &p->motion;
-    if (*((u8 *)(((u8 *)p) + 0x33C))) {
-        if ((*((u8 *)(((u8 *)p) + 0x331))) == 5) {
-            s8 palette = CharacterModel_GetPrimaryPaletteIndex(p->model);
+    s32 palette;
+    if (p->motion.secondaryEnabled) {
+        if ((p->motion.actionKind) == 5) {
+            palette = CharacterModel_GetPrimaryPaletteIndex(&p->model);
             if (p->input[0] & 1) {
-                if (!sub_08249240(((u8 *)p) + 0x32C, 0, *((u32 *)(((u8 *)p) + 0x32C)))) {
-                    if ((*((u8 *)(((u8 *)p) + 0x343))) == 1) {
-                        PalFade_Start(self, palette, *((u16 *)(((u8 *)p) + 0x96)), 0, 0, 16, 1, 1);
-                        *((u8 *)(((u8 *)p) + 0x343)) = 0;
+                if (!sub_08249240(&p->motion.secondaryCallback, 0, p->motion.secondaryCallback)) {
+                    if ((p->motion.secondaryLatched) == 1) {
+                        PalFade_Start(self, palette, p->motion.recoveryValue, 0, 0, 16, 1, 1);
+                        p->motion.secondaryLatched = 0;
                     }
-                    *((u8 *)(((u8 *)p) + 0x342)) = 0;
+                    p->motion.secondaryRelease = 0;
                 }
-            } else if ((*((u8 *)(((u8 *)p) + 0x343))) && (p->previousInput & 1)) {
-                PalFade_Start(self, palette, *((u16 *)(((u8 *)p) + 0x96)), 0, 0, 16, 1, 1);
-                *((u8 *)(((u8 *)p) + 0x342)) = 0;
+            } else if ((p->motion.secondaryLatched) && (p->previousInput & 1)) {
+                PalFade_Start(self, palette, p->motion.recoveryValue, 0, 0, 16, 1, 1);
+                p->motion.secondaryRelease = 0;
             }
         } else if (p->input[1] & 1)
-            sub_08249240(((u8 *)p) + 0x32C, 0, *((u32 *)(((u8 *)p) + 0x32C)));
+            sub_08249240(&p->motion.secondaryCallback, 0, p->motion.secondaryCallback);
         if (self->actionKind == 4) {
             if (self->recoveryTimer) {
                 u16 bit = 2;
@@ -140,11 +180,11 @@ static inline void UpdateSecondaryAction(struct Glove *p, u16 *flags)
             }
         } else if ((self->actionKind == 1) && self->recoveryTimer) {
             self->recoveryTimer--;
-            ClearDamageFlag(&self->damageFlags, ~1);
+            Glove_ClearDamageFlag(&self->damageFlags, ~1);
             self->damageTimer = 0;
             self->pendingDamage = 0;
             if (!self->recoveryTimer) {
-                s32 palette = CharacterModel_GetPrimaryPaletteIndex(p->model);
+                palette = CharacterModel_GetPrimaryPaletteIndex(&p->model);
                 PalFade_Start(self, palette, self->recoveryValue, 0, 0, 16, 1, 1);
             }
         }
@@ -153,80 +193,107 @@ static inline void UpdateSecondaryAction(struct Glove *p, u16 *flags)
     }
 }
 
-static inline void UpdateActions(struct Glove *p, u16 *flags)
+static inline void Glove_UpdatePrimaryAction(struct Glove *p, struct GloveMotion *self, u32 kind)
 {
-    struct Obj *self = &p->motion;
-    if (U8(p, 0x2CD) == 2) {
-        ChargeMarker_TickHold(self, p->model, (u32)p->input);
-    } else if (U8(p, 0x2CD) == 5) {
+    if (kind == 2) {
+        ChargeMarker_TickHold(self, &p->model, (u32)p->input);
+    } else if (kind == 5) {
         if (p->input[0] & 2) {
-            if (!sub_08249240((u8 *)p + 0x2C8, 0, U32(p, 0x2C8))) {
-                if (U8(p, 0x31E)) {
-                    Anim_SetKeyframes((u8 *)p + 0x670, (u8 *)p + 0x7F0, U16(p, 0x326), 2, 0);
-                    Anim_Step((u8 *)p + 0x670, (u8 *)p + 0x7F0);
-                    U8(p, 0x31D) = 1;
-                    U8(p, 0x31E) = 0;
+            if (!sub_08249240(&p->motion.primaryCallback, 0, p->motion.primaryCallback)) {
+                if (p->motion.primaryLatched) {
+                    Anim_SetKeyframes(p->model.primarySprite, p->model.primaryAnimation,
+                                      p->motion.primaryKeyframes, 2, 0);
+                    Anim_Step(p->model.primarySprite, p->model.primaryAnimation);
+                    p->motion.primarySpriteRefresh = 1;
+                    p->motion.primaryLatched = 0;
                     if (LinkParticipant_IsLocallySelected(p))
                         Sound_StopSong(0x93);
                 }
                 self->actionActive = 1;
             } else {
-                U8(p, 0x31E) = 1;
+                p->motion.primaryLatched = 1;
             }
         } else {
-            if (U8(p, 0x31E)) {
-                Anim_SetKeyframes((u8 *)p + 0x670, (u8 *)p + 0x7F0, U16(p, 0x326), 2, 0);
-                Anim_Step((u8 *)p + 0x670, (u8 *)p + 0x7F0);
-                U8(p, 0x31D) = 1;
-                U8(p, 0x31E) = 0;
+            if (p->motion.primaryLatched) {
+                Anim_SetKeyframes(p->model.primarySprite, p->model.primaryAnimation,
+                                  p->motion.primaryKeyframes, 2, 0);
+                Anim_Step(p->model.primarySprite, p->model.primaryAnimation);
+                p->motion.primarySpriteRefresh = 1;
+                p->motion.primaryLatched = 0;
                 if (LinkParticipant_IsLocallySelected(p))
                     Sound_StopSong(0x93);
             }
             self->actionActive = 0;
         }
-    } else if (U8(p, 0x2CD) == 3) {
+    } else if (kind == 3) {
         if (p->input[1] & 2)
-            sub_08249240((u8 *)p + 0x2C8, 0, U32(p, 0x2C8));
-        if (U16(p, 0x320) == 1)
-            Anim_SetKeyframes((u8 *)p + 0x670, (u8 *)p + 0x7F0, U16(p, 0x326), 2, 0);
-        Anim_Step((u8 *)p + 0x670, (u8 *)p + 0x7F0);
+            sub_08249240(&p->motion.primaryCallback, 0, p->motion.primaryCallback);
+        if (p->motion.actionCooldown == 1)
+            Anim_SetKeyframes(p->model.primarySprite, p->model.primaryAnimation,
+                              p->motion.primaryKeyframes, 2, 0);
+        Anim_Step(p->model.primarySprite, p->model.primaryAnimation);
     } else {
         if (p->input[1] & 2)
-            sub_08249240((u8 *)p + 0x2C8, 0, U32(p, 0x2C8));
+            sub_08249240(&p->motion.primaryCallback, 0, p->motion.primaryCallback);
     }
     if (self->actionCooldown)
         self->actionCooldown--;
-    UpdateSecondaryAction(p, flags);
-    if ((!p || !(*flags & 4)) && (U32(self, 0xC) & 0x800))
-        self->damageFlags |= 4;
+}
+static inline struct GloveMotion *Glove_BorrowMotion(const struct GloveMotionBinding *binding)
+{
+    return binding->field;
+}
+static inline u16 Glove_DamageFlagWord(const u16 *field)
+{
+    return *field;
+}
+static inline struct GloveModel *Glove_ModelFromWorkOwner(void *const *object)
+{
+    return &((struct Glove *)*object)->model;
+}
+static inline void Glove_UpdateDamageAndAccessories(struct Glove *p,
+                                                    struct GloveMotionBinding binding, u16 *flags)
+{
+    void *object = Glove_BorrowMotion(&binding);
+    if ((!p || !(Glove_DamageFlagWord(flags) & 4)) &&
+        (((struct GloveMotion *)object)->boundsFlags & 0x800)) {
+        u8 bit = 4;
+        ((struct GloveMotion *)object)->damageFlags |= bit;
+    }
+    object = p;
+    CharacterModel_UpdateAccessoryAnimations(Glove_ModelFromWorkOwner(&object));
 }
 void Glove_UpdateStopping(struct Glove *p)
 {
-    struct Obj *self = &p->motion;
+    struct GloveMotion *self = &p->motion;
     s32 h;
     s32 dx;
     s32 dz;
     u32 a;
     u32 b;
+    struct GloveMotion *actionMotion;
+    struct GloveMotionBinding secondaryBinding;
+    u32 primaryKind;
     {
-        register u8 *entry asm("r4") = &p->active;
+        u8 *entry = &p->active;
         if (*entry) {
             {
-                typeof(*((u16 *)(((u8 *)p) + 0x53C))) *q1 = &(*((u16 *)(((u8 *)p) + 0x53C)));
-                u8 z1 = 0;
-                *q1 = 0x88;
-                *((u16 *)(((u8 *)p) + 0x53E)) = z1;
-                *entry = z1;
+                Glove_BeginStopping(&p->motion.animation, p, entry);
             }
         }
     }
     {
-        u16 *flags = &p->flags;
+        s32 heightLimit;
+        u16 *flags;
+        struct GloveFlagBinding movementFlags;
+        movementFlags.field = &p->flags;
         MotionActor_UpdateMovementAudio(p);
         ScenePool_ClampMotionSpeeds(self);
         h = self->vy + self->unkC0;
-        if (h > 0xF000)
-            h = 0xF000;
+        heightLimit = 0xF000;
+        flags = Glove_FlagsFromBinding(&movementFlags);
+        if (h > Glove_ReadHeightLimit(&heightLimit))
+            h = Glove_ReadHeightLimit(&heightLimit);
         self->y += 0x200;
         if (self->steps > 0) {
             self->x += self->dx;
@@ -281,7 +348,7 @@ void Glove_UpdateStopping(struct Glove *p)
             }
             p->height = h;
             PalFade_Update(self);
-            Actor_UpdateShadowSpriteParts(self, p->model);
+            Actor_UpdateShadowSpriteParts(self, &p->model);
             if (self->flags40 & 4)
                 ActorParticles_SpawnImpactBurst(self);
             if (self->flags40 & 2)
@@ -289,11 +356,12 @@ void Glove_UpdateStopping(struct Glove *p)
             if (self->flags40 & 1)
                 *py = 0;
         }
-        UpdateActions(p, flags);
+        actionMotion = &p->motion;
+        primaryKind = p->motion.primaryKind;
+        secondaryBinding.field = actionMotion;
+        Glove_UpdatePrimaryAction(p, actionMotion, primaryKind);
+        Glove_UpdateSecondaryAction(p, Glove_MotionFromBinding(secondaryBinding), flags);
+        Glove_UpdateDamageAndAccessories(p, secondaryBinding, flags);
     }
-    CharacterModel_UpdateAccessoryAnimations(p->model);
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Glove_UpdateStopping);
-#endif

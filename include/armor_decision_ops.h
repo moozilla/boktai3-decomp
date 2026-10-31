@@ -1,0 +1,44 @@
+#ifndef GUARD_ARMOR_DECISION_OPS_H
+#define GUARD_ARMOR_DECISION_OPS_H
+
+/* Coordinate and state operations shared by Armor attack decisions. */
+/* The signed component is retained alongside its initialized magnitude. */
+#define ARMOR_ABSOLUTE_COMPONENT(magnitude, value)                                                 \
+    do {                                                                                           \
+        if ((value) < 0)                                                                           \
+            (magnitude) = -(value);                                                                \
+    } while (0)
+#define ARMOR_CLEAR_DECISION(field)                                                                \
+    do {                                                                                           \
+        *(field) = 0;                                                                              \
+    } while (0)
+#define ARMOR_BRANCH_OUTSIDE_GRID(magnitude, maximum, label)                                       \
+    do {                                                                                           \
+        if ((magnitude) > (maximum))                                                               \
+            goto label;                                                                            \
+    } while (0)
+
+#define ARMOR_ROUND_GRID_COMPONENT(value)                                                          \
+    do {                                                                                           \
+        (value) = ((value) + 128) >> 8;                                                            \
+    } while (0)
+#define ARMOR_BRANCH_FACING_AXIS(actor, delta, negative, positive, aligned, unaligned)             \
+    do {                                                                                           \
+        if ((delta) < 0) {                                                                         \
+            if ((actor)->facing == (negative))                                                     \
+                goto aligned;                                                                      \
+        } else if ((actor)->facing == (positive))                                                  \
+            goto aligned;                                                                          \
+        goto unaligned;                                                                            \
+    } while (0)
+#define ARMOR_CAPTURE_COMPONENT_DELTA(out, target, actor)                                          \
+    do {                                                                                           \
+        (out) = (target) - (actor);                                                                \
+    } while (0)
+#define ARMOR_BRANCH_AXIS_UNALIGNED(x, z, label)                                                   \
+    do {                                                                                           \
+        if ((x) != 0 && (z) != 0)                                                                  \
+            goto label;                                                                            \
+    } while (0)
+
+#endif
