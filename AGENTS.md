@@ -1,16 +1,21 @@
 # Boktai 3 agent entry point
 
-Read `README.md`, `CLAUDE.md`, `docs/HANDOFF.md` (the four phases, current state,
-the owner's preferences), then `docs/WORKER.md` and `tools/scope/WORKER.md` (the
-matching loop). Look everything else up in `docs/INDEX.md`
+Read `README.md`, `CLAUDE.md`, `docs/ROADMAP.md` (the four phases), `docs/HANDOFF.md`
+(current state, the owner's preferences), then `docs/WORKER.md`, `tools/scope/WORKER.md`
+(the matching loop) and `tools/matchsearch/README.md` (the persistent search). Look everything else up in `docs/INDEX.md`
 (`python3 tools/docindex.py ADDR`). The matching and evidence requirements in those
 files apply to every model.
 
-Aim for the final form: C that matches with no register pins or barriers and reads
-like the original authors wrote it. Work in ROM order through a subsystem and stay on
-a function until it matches or the blocking compiler decision is proved with a scope
-knob; concessions are a last resort. Codex subsystem workers get
-`tools/scope/subsystem/BRIEF.md` (see that directory's README).
+Aim for the final form: C that matches with no register pins, barriers or compiler
+overrides and reads like the original authors wrote it. The project is in phase 3, so
+a pinned match is not finished work and new work never adds a pin. Work in ROM order
+through a subsystem and stay on a function until it matches. Proving the compiler
+decision that blocks it is the halfway point; then find the C that produces it. A
+function is left as a holdout only after the extreme effort `docs/WORKER.md` "Stay on a
+function until it matches" describes, and a run keeps going until its whole queue is
+matched or holdouts. A session's brief sets its queue, branch and quota; these rules
+apply on top of it. Codex subsystem workers get the briefs in `tools/scope/subsystem/`
+(see that directory's README).
 
 Use `build/venv/bin/python` (or activate `build/venv`) for local tooling.
 Worker checkouts must have their own build outputs; only `gen/`, the ROM,
@@ -54,8 +59,6 @@ Every batch integration PR regenerates the checked-in report in the same commit:
 `PROGRESS.json` (the tree that the progress mod reads); commit both. CI does not
 commit them.
 
-Local register pinning is user-authorized as a temporary matching concession.
-Mark affected translation units `// MATCHING_CONCESSION: register-pinning`;
-count exact bytes normally and report them in the Register-pinned category.
-Retain readable C, fast exact checks, and batch validation; defer removing the
-hints. This does not authorize handwritten instruction bodies.
+Units with pins left from phase 2 carry `// MATCHING_CONCESSION: register-pinning`
+and are reported in the Register-pinned category; removing those pins is phase 3
+work. Hand-written instruction bodies are never allowed.

@@ -19,8 +19,7 @@ Use your judgment. The process below is a default, not a cage. If a tool is in y
 the fix separately, see below) or work around it, and say so in your report.
 
 Your subsystem: **{category}** ({n} drafts). Your queue: build/scope/campaign/queue.json, in ROM order. Work
-it in that order; hard functions are not skipped. Never work on Golem_ReactToContact (src/fn/sub_080C12FC.c):
-another agent owns it.
+it in that order; hard functions are not skipped.
 
 Setup once: `export SCOPE_RUN={run}`; use `build/venv/bin/python` for matchsearch. About twenty workers share
 this machine: keep one compile at a time.
@@ -39,12 +38,14 @@ For each function FUNC (unit file SRC) in queue order, skipping any with build/s
    fail its session check in this checkout; use campaign.py.) Then write the commit request:
    `echo "Match FUNC" > build/scope/campaign/FUNC/commit` (a runner outside the sandbox commits SRC within a
    minute; never run git commands that write).
-   Register pins are allowed as a last resort; a pin-free match is worth far more. Mark a pinned unit
-   `// MATCHING_CONCESSION: register-pinning`. Never hand-written instructions in `asm()`.
+   Ordinary C only: no register pins, `asm()` barriers or compiler overrides, and never hand-written
+   instructions in `asm()`. A pinned result is not a match.
 3. A function is finished only when it matches. Stay on it: do not move to the next function while it is
    unmatched. When you are stuck, change approach rather than leave: recover the struct, macro or helper
    the original used, rewrite a component from the ROM, read the agbcc source behind the decision, or
-   improve the tools so the next step is visible. On MATCH: `touch build/scope/campaign/FUNC/done` and
+   improve the tools so the next step is visible. Leave it as a holdout only after the extreme effort
+   docs/WORKER.md "Stay on a function until it matches" describes, with best.c, a note and the store.
+   On MATCH: `touch build/scope/campaign/FUNC/done` and
    append one line to build/scope/campaign/LOG.md: `FUNC  MATCH  pins P  note`. Keep your current best in
    build/scope/campaign/FUNC/best.c so a stop or a crash loses nothing.
 4. Paper cuts: whenever a tool confused you, was slow, wrong, or missing something, add one line to

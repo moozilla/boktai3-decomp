@@ -1,6 +1,7 @@
 # Working on the Boktai 3 decomp (notes for agents and humans)
 
-Read `README.md` first, then `docs/HANDOFF.md` (current state and next steps). Look
+Read `README.md` first, then `docs/ROADMAP.md` (the four phases) and `docs/HANDOFF.md`
+(current state and next steps). Look
 things up in `docs/INDEX.md` and with `python3 tools/docindex.py ADDR` rather than
 reading docs in full; `docs/history/` is a record, not required reading. The ROM (`baserom.gba`, SHA-1 `2651c5e6…`) is never
 committed, and neither is anything generated from it (`build/`, `extracted/`).
@@ -16,15 +17,19 @@ write `~`). The hooks in `.githooks` run `tools/pii_check.py`.
   integration PR also regenerates `PROGRESS.md` and `PROGRESS.json` with
   `python3 tools/progress.py --markdown PROGRESS.md` (see `AGENTS.md`). Rebuild or
   run relocation/emulator tests again only when changes or failures justify it.
-* Matching means byte-identical. No hand-written instructions inside `asm()`
-  to force a match. The one exception is source the original authors wrote as
-  inline assembly: the SDK's `SystemCall(n)` (`include/gba/syscall.h`, an
+* Matching means byte-identical, built by the stock compiler from ordinary C. No
+  hand-written instructions inside `asm()`, no register pins
+  (`register T x asm("rN")`), no empty `asm("")` barriers and no compiler overrides.
+  Pins were a phase 2 stopgap; phase 3 removes them, so new work never adds one.
+  The one exception is source the original authors wrote as inline assembly: the SDK's `SystemCall(n)` (`include/gba/syscall.h`, an
   in-place `swi n`, as in Power_EnterSleep and m4a). It counts as a normal match;
   a native port implements `SystemCall` in its BIOS layer.
   `INCLUDE_ASM` is the placeholder for unfinished functions.
   Nonmatching C goes on `main` only inside `#ifdef NONMATCHING` with an
   `INCLUDE_ASM` `#else` branch (see `docs/WORKER.md`). The default build never
   compiles it; it is reported as a fuzzy score, never as exact progress.
+* No selector macros (a `#define` a file sets before including a shared header
+  to change the header's code). Use real struct fields and types from `include/`.
 * One translation unit per change/PR. A unit is a `src/*.c` file covering a
   **contiguous** run of functions in ROM order.
   The user-authorized orchestration exception is a reviewed batch integration
@@ -42,10 +47,20 @@ write `~`). The hooks in `.githooks` run `tools/pii_check.py`.
 
 ## Decompiling a function
 
-The project is in phases 2 and 3 of four (draft, match, no concessions, cleanup;
-`docs/HANDOFF.md`). Aim for the final form: matching C with no pins, written like
-the original. Go through a subsystem in ROM order and stay on a function until it
-matches. The loop is `tools/scope/WORKER.md`; the frame is `docs/WORKER.md`.
+The project is in phase 3 of four (draft, match, no concessions, cleanup;
+`docs/ROADMAP.md`): the last drafts get matched, and existing matches lose their pins.
+Aim for the final form: matching C with no pins, written like the original. Go through
+a subsystem in ROM order and stay on a function until it matches. The loop is
+`tools/scope/WORKER.md`; the frame is `docs/WORKER.md`.
+
+**Stay until it matches.** Naming the compiler decision that blocks a function is the
+halfway point, not a place to stop; the next step is the C that produces it. When an
+approach stalls, change it: recover the original struct or helper from a matched
+relative, rewrite from the ROM, run a persistent matchsearch, read the agbcc source,
+improve the tool. Only after extreme effort (`docs/WORKER.md` "Stay on a function until
+it matches") is a function left as a holdout, with its best draft, a note and its
+matchsearch store, for a stronger model to pick up. Keep going through the queue; never
+stop a run early.
 
 1. Look at it: `python3 tools/scope/scope.py rom FUNC` (calls and literals named),
    `scope.py like FUNC` and `tools/relatives.py FUNC --c` (similar matched C),
@@ -54,14 +69,18 @@ matches. The loop is `tools/scope/WORKER.md`; the frame is `docs/WORKER.md`.
    prints MATCH or the differing hunks with the C line and compiler pass behind each.
    `why UID` explains a difference; confirm with a what-if knob
    (`AGBCC_PRI=name:+N`, ...), then find C with the same effect.
-3. Land a match with `scope.py land FUNC` (merges into the unit, formats, checks
+3. For a long search, `build/venv/bin/python -m tools.matchsearch init
+   build/matchsearch/FUNC FILE.c FUNC` keeps every hypothesis, the frontier of best
+   candidates and the compiler evidence (`tools/matchsearch/README.md`); later
+   sessions resume from the store.
+4. Land a match with `scope.py land FUNC` (merges into the unit, formats, checks
    it); `tools/check.py FILE.c` is the exact check of one unit. Unfinished
-   neighbours stay as `INCLUDE_ASM("asm/nonmatching", sub_XXXXXXXX);`.
-4. Compiler facts: `agbcc -O2 -mthumb-interwork` (pret's agbcc). Leaf
+   neighbors stay as `INCLUDE_ASM("asm/nonmatching", sub_XXXXXXXX);`.
+5. Compiler facts: `agbcc -O2 -mthumb-interwork` (pret's agbcc). Leaf
    functions push `lr`, which agbcc does and old_agbcc doesn't. scope's
    findings: `tools/scope/README.md` "agbcc facts established with scope";
    the Yu-Gi-Oh! EDS catalog: `docs/external/eds/matching-tricks.md`.
-5. Library code exists already. MP2K (`m4a`) functions match pokeemerald's
+6. Library code exists already. MP2K (`m4a`) functions match pokeemerald's
    `src/m4a.c` byte-for-byte (43 identified, see `symbols/functions.csv`),
    and `libagbsyscall` is standard. Use `tools/sigmatch.py OBJ.o` to find more
    library code (agb_flash, siirtc, libgcc/libc pieces).
@@ -91,8 +110,7 @@ matches. The loop is `tools/scope/WORKER.md`; the frame is `docs/WORKER.md`.
    a pointer the scan can't see (unaligned or in a structure; add it to
    `pointers.txt` or teach a walker like `tools/m4a.py`).
 
-Local register pinning is user-authorized as a temporary matching concession.
-Mark affected translation units `// MATCHING_CONCESSION: register-pinning`;
-count exact bytes normally and report them in the Register-pinned category.
-Retain readable C, fast exact checks, and batch validation; defer removing the
-hints. This does not authorize handwritten instruction bodies.
+Units that still carry pins from phase 2 are marked
+`// MATCHING_CONCESSION: register-pinning` and reported in the Register-pinned
+category. Take the pins out of a unit you touch (`scope.py FILE.c pins`,
+`tools/depin.py`); the marker goes when the last one does.

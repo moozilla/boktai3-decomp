@@ -2,8 +2,8 @@
 
 Tags: #process
 
-The entry point for a new agent or a thread after compaction. Read this file, then
-[docs/WORKER.md](WORKER.md) and [tools/scope/WORKER.md](../tools/scope/WORKER.md) before
+The entry point for a new agent or a thread after compaction. Read this file and
+[ROADMAP.md](ROADMAP.md), then [docs/WORKER.md](WORKER.md) and [tools/scope/WORKER.md](../tools/scope/WORKER.md) before
 matching. Everything else is looked up, not read: [docs/INDEX.md](INDEX.md) maps every doc
 by topic, and `python3 tools/docindex.py ADDR` lists what has been written about a function.
 Keep this file short and about the present. The previous version (with the October recent-work
@@ -12,33 +12,22 @@ list) is [history/HANDOFF_2026-10-23.md](history/HANDOFF_2026-10-23.md); older r
 
 ## The goal: four phases, aiming at the last one
 
-The project owner splits the decomp into four phases:
+[ROADMAP.md](ROADMAP.md) has the plan: (1) draft, done; (2) match, nearly done;
+(3) no concessions, current; (4) cleanup, where it comes naturally; plus the side
+threads (RAM and data annotation, Studio, translation, tooling).
 
-1. **Draft.** Every function in the game has C (an exact match or a guarded
-   `#ifdef NONMATCHING` draft with a fuzzy score).
-2. **Match.** Every function matches byte for byte. Concessions (register pins,
-   empty `asm("")` barriers) are allowed here as an interim.
-3. **No concessions.** Every match is plain C: no pins, no barriers, no
-   `*(u16 *)((u8 *)p + 0x172)` field access.
-4. **Cleanup.** Human-readable and organized: names, shared structs and headers,
-   enums, comments, a real source tree (contiguous units).
+**Always aim for the final form.** When you touch a function, write C that matches
+with no register pins, barriers or compiler overrides and reads like the original
+authors wrote it. Pins were the phase 2 stopgap; new work never adds one.
 
-Phase 1 is done: every function has C. The work now is phases 2 and 3, subsystem
-by subsystem, and phase 4 where it comes naturally.
-
-**Always aim for the final form.** When you touch a function, try for C that matches
-with no concessions and reads like the original authors wrote it. A pin is a last
-resort, used only where a knob proved an allocation decision you could not reproduce
-in C after real attempts. Easy matches with pins are interim work that phase 3 has to
-redo.
-
-**Work systematically, and don't spin wheels.** Go through a subsystem in ROM order.
-Don't sort for likely wins, and don't skip or defer the hard functions. Stay on a function
-until it matches, or until you can name the one compiler decision blocking it (proved with
-a knob, with the C spellings for it tried). Then record that as a scope gap. Measure
-progress by exact matches and removed concessions, not by fuzzy scores. Blind spelling
-sweeps don't count. When an approach stops paying, change the approach or the tool,
-not just the function.
+**Work systematically, and stay until it matches.** Go through a subsystem in ROM order.
+Don't sort for likely wins, and don't skip or defer the hard functions. Proving the
+compiler decision that blocks a function is the halfway point; then find the C that
+produces it. When an approach stops paying, change the approach or the tool, not the
+function. A function becomes a holdout (best draft, note and matchsearch store, for a
+stronger model) only after the extreme effort [WORKER.md](WORKER.md) "Stay on a function
+until it matches" describes. Measure progress by exact matches and removed concessions,
+not by fuzzy scores. Blind spelling sweeps don't count.
 
 ## Where things stand (2026-10-31)
 
@@ -50,110 +39,20 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 |---|---|
 | Build | `make` rebuilds the ROM byte-identical (`build/boktai3.gba: OK`, SHA-1 `2651c5e6…`) |
 | Phase 1 | complete: every function has C |
-| Phase 2 | the remaining guarded drafts (PROGRESS.md "Nonmatching drafts"), by subsystem in PROGRESS.md; most left are Monsters and Scene actors |
+| Phase 2 | the last guarded drafts (PROGRESS.md "Nonmatching drafts"): GPT-6 Pro's round 9 queue (scene actors 1, 2 and 4, misc) and 17 round 8 holdouts, which an Opus worker is retrying |
 | Phase 3 | the Register-pinned share in PROGRESS.md; `scope.py FILE.c pins` and `tools/depin.py` remove them |
-| Phase 4 | [EWRAM declaration/layout worker batch](../notes/ewram-layout_2026-10-27.md) prepared with per-unit validation; protected-dependent objects deferred and combined ROM validation pending integration |
+| Phase 4 | names, shared types, a real source tree and a self-placing build ([ROADMAP.md](ROADMAP.md)); so far the [EWRAM shared declarations](../notes/ewram-layout_2026-10-27.md) and naming as functions match |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data that round-trips through an editable form (`tools/data_roundtrip.py`), by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
-Recent:
+Recent (details in [docs/history/](history/README.md) and the notes they link):
 
-* **Round 8 holdouts** (2026-10-31). The first batch recovers player motion,
-  Vanargand impact, two projectile and particle routines, scene motion and
-  messaging, and the effect-group fade. See the
-  [batch history](history/2026-10-31.md#round-8-holdouts) and the per-function
-  notes indexed under Round 8.
-
-* **Player cue worker batch and cleanup prepared** (2026-10-30): the assigned
-  callbacks match without concessions on `codex/finish-player-cue`. Existing cue
-  callbacks and setup/dispatch now share canonical player, graphics, message and
-  coordinate records; editable animation tables are browsable in Studio. The
-  transition callback's final barriers are removed: a De Morgan identity delays
-  AND formation until combine and preserves the ROM's operand order. The whole
-  subsection is ordinary C with no compiler blockers. Stock unit checks pass; combined
-  ROM validation and report regeneration remain with the integrator. See the
-  [matching note](../notes/finish-player-cue_2026-10-30.md) and
-  [cleanup note](../notes/player-cue-cleanup_2026-10-30.md).
-* **Scene actor part 3 worker** (2026-10-31): thirteen reserved targets match in
-  ordinary C, including the recovered forward-floor neighbor. The damage resolver
-  and fragment launcher remain guarded with narrow compiler proofs. Three nearby
-  exact units lose their hints; shared damage fields/visibility/APIs and editable
-  marker tables with Studio views are verified. Work is checkpointed before the
-  owner's 20% quota floor. Combined ROM/shift validation and report regeneration
-  remain batch-integration work. See the
-  [worker note](../notes/finish-scene-actors-3_2026-10-30.md).
-* **Boss worker continuation** (2026-10-31): ten of the fifteen reserved
-  Ratatosk, Vanargand and Hresvelgr functions match in ordinary C. Five guarded
-  drafts remain; the latest recovery draft also corrects the successful-state
-  byte. Work stopped at the owner's request to preserve the 20% quota reserve.
-  The requested broader pin-removal and struct/data/Studio cleanup remains open.
-  Per-unit checks and separate source commits are on `codex/finish-bosses`;
-  combined validation, alias promotion and progress reports remain with the
-  integrator. See the [boss worker note](../notes/finish-bosses_2026-10-30.md).
-* **Finish-player quota checkpoint** (2026-10-31): nine reserved functions match
-  in ordinary C on `codex/finish-player`; the two remaining guarded drafts are
-  now 99.6% and 96.1% fuzzy with specific reload/vector-copy blockers. Cleanup
-  candidates for pins, shared records, Player callback data and Studio are
-  preserved separately. Stopped at the owner's requested quota buffer; combined
-  ROM validation and progress regeneration remain for integration. See the
-  [finish-player note](../notes/finish-player_2026-10-30.md).
-* **Effects and presentation continuation** (2026-10-31): additional ordinary-C
-  matches cover particle groups, directional and anchored spawning, bounce updates,
-  palette preparation, projectile creation, both fragment updates and scatter clipping.
-  Work is checkpointed at the user's quota floor; resume remaining targets before
-  the register-pin, shared records/data and Studio audit. Ground scatter's improved
-  guarded C has four differing bytes and earns no exact credit. Remaining drafts retain stock
-  assembly fallbacks and documented compiler/source gaps. The branch
-  `codex/finish-effects` has per-unit validation; combined ROM validation and
-  progress reports remain for integration. See the
-  [effects note](../notes/finish-effects_2026-10-30.md).
-* **Round 7 recovery and continued matching** (2026-10-30): the interrupted
-  run's four integrated matches and an unmerged Skeleton worker match were
-  recovered. Ten further functions are exact; cumulative bundles and patches
-  contain fifteen matches with complete stock checks. Turn and delayed-response operations are shared,
-  three initializers embed the canonical actor prefix, and all eleven installed
-  command tables are editable in Studio. The formatter interruption test now
-  handles canonicalized temporary paths. See the
-  [Round 7 note](../notes/round7-monster-recovery_2026-10-30.md) for accepted
-  extents and preserved blockers. PROGRESS files remain unchanged.
-* **Round 6 initializer family completed** (2026-10-30): all 17 reserved
-  initializers match in ordinary C, with one initial matching commit per function.
-  They share canonical actor/body/attack/target/group/route records and common
-  initialization, graphics and callback operations. Engine owner checks confirm
-  the recovered body and resource records; four command tables now roundtrip
-  through editable CSV and are browsable in Studio. Final reviewed unit checks,
-  the combined ROM and RAM-literal checks pass. Two older chase selectors were
-  removed; ten remain, along with several compiler-sensitive body variants.
-  The [family note](../notes/monster-initializers_2026-10-30.md) records the exact
-  extents, shared migrations and remaining work. The supplied monster queue has
-  107 functions left. Aggregate reports are left for the integrator to regenerate.
-* **Round 4 shared monster batch completed** (2026-10-29): all five reserved
-  targets match in ordinary C: Mummy movement (`080DA97C`), Ghoul contact
-  (`0808B3EC`), `SceneActor_UpdateStatus` (`08078EE8`), `Vanargand_Init`
-  (`081AE0C0`), and Mummy displacement recovery (`080D2584`). Golem, Skeleton,
-  Ghoul, and both Mummy reactions now share the chase records and operations;
-  the status updater reuses the same component/control/terrain layer. Stock and
-  complete-unit gates, old-consumer preservation, and the combined ROM/RAM-literal
-  build pass. Remaining matching interfaces and the symlink-root landing fix
-  are documented in [the batch note](../notes/shared-monster-round4_2026-10-29.md)
-  and [shared-operation guide](SHARED_MONSTER_REACTIONS.md). This batch starts
-  from the supplied PR 887 bundle; refresh aggregate reports after combining
-  additional worker commits.
-* **Earlier largest matches**: `Skeleton_ReactToContact` (`080C12FC`) and
-  `Golem_UpdateHitReaction` (`080C9C04`) remain exact after shared-header cleanup.
-  The [PRE ordering guide](../tools/scope/PRE_STACK_ORDER.md) explains the compiler
-  rule and rejects applying it before physical instructions and stack identities
-  are verified. Vorn `080AEB74` remains exact.
-* **Second subsystem run with RAM layout workers** (2026-10-27): 29 more matches (to 79.7%) and RAM
-  objects with one shared declaration 29% -> 75%; gpt-6.1-terra tried and dropped for Sol
-  ([notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md)).
-* **Subsystem scope run** (2026-10-25/26): 16 Codex gpt-6.1-sol workers, one or two per
-  subsystem, matched 65 drafts in 4.5 hours for half the weekly Codex quota (77.0% -> 78.6%;
-  [#849](https://github.com/moozilla/boktai3-decomp/pull/849),
-  [#854](https://github.com/moozilla/boktai3-decomp/pull/854)).
-  Lessons (ROM order, no per-function budget, no blind sweeps) and how to run one are in
-  [tools/scope/subsystem/README.md](../tools/scope/subsystem/README.md); the results are in
-  [notes/subsystem-run_2026-10-25.md](../notes/subsystem-run_2026-10-25.md).
+* **2026-10-31**: the finish-subsystem Codex sessions (scene actors 3, bosses, player,
+  effects) and GPT-6 Pro round 8 are integrated. Round 8 left 18 holdouts with notes and
+  matchsearch stores; an Opus worker matched `Ratatosk_UpdateDefeatSequence` (`081F4CF8`) from them and is continuing. scope's `why`
+  now explains stack-slot reloads ([batch history](history/2026-10-31.md)).
+* **2026-10-30**: rounds 6 and 7 (monster initializers and recovery) and the player cue
+  batch; many command and animation tables are editable and browsable in Studio.
 * **ARM code**: `sub_08000430` (IWRAM, `src/iwram_code.c`) matched without pinning
   through an instrumented ARM compiler (`agbcc_arm`; [notes/arm-08000430.md](../notes/arm-08000430.md)).
   scope compiles Thumb only.
@@ -194,9 +93,10 @@ commit both files), then opens the PR and merges it.
 
 ## Standing preferences (the owner's)
 
-* The phases and "aim for the final form" above. Concessions are a last resort.
-* ROM order; no easy-first sorting; stay on a function until it matches or the blocking
-  decision is proved; no per-function compile budgets; no blind spelling sweeps.
+* The phases and "aim for the final form" above. No new pins, barriers or overrides.
+* ROM order; no easy-first sorting; stay on a function until it matches (holdouts only
+  after extreme effort); no per-function compile budgets; no blind spelling sweeps;
+  never stop a run early.
 * **Tooling first.** Every scope gap a worker hits is the next tool change. Workers
   report where scope was confusing, wrong or missing; fold that into
   tools/scope/README.md "Gaps" and fix the tool.
