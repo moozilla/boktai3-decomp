@@ -88,7 +88,6 @@ void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
                         {
                             /* Keep the separate zero load for the sixth-repeat reset. */
                             register u32 zero asm("r0") = 0;
-                            asm("" : "+r"(zero));
                             p->timer = zero;
                         }
                     }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 struct ScenePoolManager *ScenePool_GetInstance(void);
 struct ScenePoolEntry *ScenePool_FindFreeEntry(struct ScenePoolManager *, u32 *);
@@ -10,14 +9,10 @@ s32 ScenePool_CreateEntryFromScript(void)
     struct ScenePoolEntry *entry;
     u32 index;
     if (!manager)
-        goto failure;
-    asm("" : "+r"(manager));
+        return -1;
     entry = ScenePool_FindFreeEntry(manager, &index);
-    if (entry)
-        goto create;
-failure:
-    return -1;
-create:
+    if (!entry)
+        return -1;
     ScenePool_ParseEntryParameters(entry);
     ScenePool_RegisterEntry(manager, entry);
     entry->step = 0x200;

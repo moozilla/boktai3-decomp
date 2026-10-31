@@ -15,7 +15,6 @@ static inline u32 firstCellAtPosition(struct ContactPosition *position)
     struct ContactPosition *source = position;
     s16 *xAddress = (s16 *)source;
     s32 x, z;
-    asm("" : "+r"(xAddress));
     x = *xAddress >> 8;
     z = source->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)

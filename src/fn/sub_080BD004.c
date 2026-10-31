@@ -63,12 +63,12 @@ void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor
             u32 zero = 0;
             *field = state;
             {
-                register u32 phaseOffset asm("r3") = 0x2A9;
+                u32 phaseOffset = 0x2A9;
                 field = (u8 *)actor + phaseOffset;
             }
             *field = zero;
             {
-                register u32 behaviorOffset asm("r1") = 0x2AA;
+                u32 behaviorOffset = 0x2AA;
                 field = (u8 *)actor + behaviorOffset;
             }
             *field = zero;

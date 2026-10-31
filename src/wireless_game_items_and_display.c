@@ -148,16 +148,16 @@ u32 WirelessGame_IsItemToggleEnabled(void)
 int WirelessGame_ToggleItemMode(void)
 {
     struct WirelessGameExchange *p = WirelessExchange_Get();
-    asm("" : "+r"(p));
-    if (p && p->enabled) {
-        /* Address the controller representation: byte 6 is itemMode, beyond
-         * the four-element counts array. Keep this base for matching. */
-        u8 *v = (u8 *)p + (u32) & ((struct WirelessGameExchange *)0)->counts;
-        v[6] = 1 - v[6];
-        Sound_PlaySong(267);
-        return v[6];
-    }
-    return 0;
+    u8 *v;
+    if (!p)
+        return 0;
+    if (!p->enabled)
+        return 0;
+    /* Byte 6 past the four-element counts array is itemMode. */
+    v = (u8 *)p + (u32) & ((struct WirelessGameExchange *)0)->counts;
+    v[6] = 1 - v[6];
+    Sound_PlaySong(267);
+    return v[6];
 }
 
 u32 WirelessGame_GetRoundCount(void)

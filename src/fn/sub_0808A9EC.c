@@ -11,10 +11,9 @@ struct GhoulSavedAction {
 static inline void SaveAction(struct GhoulSavedAction *input, u32 time, void *callback, u32 kind)
 {
     struct GhoulSavedAction *action = input;
-    register void *target asm("r2") = callback;
-    register u32 behavior asm("r3") = kind;
-    register u32 duration asm("r0") = time;
-    asm("" : "+r"(action), "+r"(target), "+r"(behavior));
+    void *target = callback;
+    u32 behavior = kind;
+    u32 duration = time;
     action->duration = duration;
     action->target = target;
     action->state = 0;
@@ -25,12 +24,11 @@ static inline void SaveReturnAction(struct SceneActorRegistryResetView *actor, u
 {
     struct GhoulSavedAction *action = (void *)((u8 *)actor + 0x460);
     void *target;
-    register u32 behavior asm("r3");
-    register u32 duration asm("r0");
+    u32 behavior;
+    u32 duration;
     target = actor->entryTarget228;
     behavior = kind;
     duration = time;
-    asm("" : "+r"(action), "+r"(target), "+r"(behavior));
     action->duration = duration;
     action->target = target;
     action->state = 0;

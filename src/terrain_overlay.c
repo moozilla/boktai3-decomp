@@ -41,18 +41,15 @@ struct TerrainOverlay *ResourceRegistry_GetResource(u16);
 // MATCHING_CONCESSION: register-pinning
 s32 TerrainOverlay_QueueCommand(u32 type, u32 id)
 {
-    struct TerrainOverlay *p = ({
-        struct TerrainOverlay *value = ResourceRegistry_GetResource(0x7BE3);
-        asm("" : "+r"(value));
-        value;
-    });
-    if (p && p->count <= 15) {
-        p->commands[p->count][0] = type;
-        p->commands[p->count][1] = id;
-        p->count++;
-        return 0;
-    }
-    return -1;
+    struct TerrainOverlay *p = ResourceRegistry_GetResource(0x7BE3);
+    if (!p)
+        return -1;
+    if (p->count > 15)
+        return -1;
+    p->commands[p->count][0] = type;
+    p->commands[p->count][1] = id;
+    p->count++;
+    return 0;
 }
 
 u32 TerrainOverlay_QueueAddActor(u32 *p)
