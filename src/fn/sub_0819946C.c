@@ -25,7 +25,6 @@ static inline s32 ScaleProjection(s32 v)
 }
 #ifdef NONMATCHING
 // fuzzy: 97.0%
-// Tentative: post a type-zero scene-effect message for the player's screen side.
 void SceneEffectQueue_PostTypeZeroMessage(s32 value)
 {
     s16 values[3];
@@ -61,8 +60,13 @@ void SceneEffectQueue_PostTypeZeroMessage(s32 value)
     values[2] = value;
     MessageQueue_PostMessage(&message);
 }
-/* Recovered adjacent routine: same message payload, effect type one. */
-void sub_08199578(s32 value)
+#else
+INCLUDE_ASM("asm/nonmatching", SceneEffectQueue_PostTypeZeroMessage);
+#endif
+
+#ifdef NONMATCHING
+// fuzzy: 97.0%
+void SceneEffectQueue_PostTypeOneMessage(s32 value)
 {
     s16 values[3];
     struct Message message;
@@ -97,8 +101,13 @@ void sub_08199578(s32 value)
     values[2] = value;
     MessageQueue_PostMessage(&message);
 }
-/* Recovered adjacent routine: same message payload, effect type three. */
-void sub_08199684(s32 value)
+#else
+INCLUDE_ASM("asm/nonmatching", SceneEffectQueue_PostTypeOneMessage);
+#endif
+
+#ifdef NONMATCHING
+// fuzzy: 97.0%
+void SceneEffectQueue_PostTypeThreeMessage(s32 value)
 {
     s16 values[3];
     struct Message message;
@@ -134,5 +143,5 @@ void sub_08199684(s32 value)
     MessageQueue_PostMessage(&message);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", SceneEffectQueue_PostTypeZeroMessage);
+INCLUDE_ASM("asm/nonmatching", SceneEffectQueue_PostTypeThreeMessage);
 #endif
