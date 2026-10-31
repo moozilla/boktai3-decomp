@@ -3715,6 +3715,7 @@ addr,name,mode,confidence,source,notes
 080E56E8,Dog_Update,thumb,low,src-alias,Prepares the frame and dispatches the current state when enabled before finishing frame maintenance
 080E572C,Dog_OnAuxiliaryUpdate,thumb,low,src-alias,Auxiliary callback delegates to a shared actor update helper and returns zero; precise role is tentative
 080E5738,Dog_ReleaseResources,thumb,low,src-alias,Releases actor effect resources during dog cleanup and failed creation
+080E5744,Dog_Init,thumb,low,src-alias,Initializes a Dog actor and installs its behavior and resource callbacks.
 080E6814,Dog_Create,thumb,low,src-alias,Allocates and initializes the dog actor registered under GCL key F836
 080E6848,Dog_ResetIdleControl,thumb,low,src-alias,
 080E696C,SceneActor_UpdateAlternateEntryPhase,thumb,low,src-alias,

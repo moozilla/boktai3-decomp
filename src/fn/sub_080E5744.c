@@ -102,7 +102,6 @@ static inline void DogInit_InstallCompletionCallbacks(struct SceneActorRegistryR
     actor->destroyCallback = Dog_ReleaseResources;
 }
 
-#define Dog_Init sub_080E5744
 s32 Dog_Init(void *object)
 {
     struct DogActor *dog = object;
