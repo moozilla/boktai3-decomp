@@ -2,8 +2,6 @@
 #include "player.h"
 #include "contact_collider.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.7%
 // confidence=low: selects sweep, vertical-arc or radial reach from the active attack animation.
 #define Player_UpdateAttackColliderMotion sub_0814D264
 struct AttackMotionContext {
@@ -36,12 +34,6 @@ static inline s32 Scale12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
-static inline void PlaceRadial(struct AttackMotionContext *q, s32 radius)
-{
-    q->dest.x = q->origin.x + Scale12(gUnk_086149C4[(q->heading + 64) & 255] * radius);
-    q->dest.y = q->origin.y;
-    q->dest.z = q->origin.z + Scale12(gUnk_086149C4[q->heading] * radius);
-}
 static inline void EnableExtendedContact(struct ContactCollider *collider)
 {
     u32 mask = 0x800000;
@@ -61,6 +53,7 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
     u32 flags = ActorFlags_GetResponseBits(p);
     s32 power;
     s32 animation;
+    s32 radialRadius;
     if (p->currentStatB < ActorFlags_SelectResponse(p))
         flags = 0;
     if (forced) {
@@ -120,7 +113,7 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
             q->dest.y = q->origin.y + Scale12(gUnk_086149C4[angle & 255] * 250);
             radius = Scale12(gUnk_086149C4[(angle + 64) & 255] * 250);
             q->dest.x = q->origin.x + Scale12(gUnk_086149C4[(q->heading + 64) & 255] * radius);
-            q->dest.z = q->origin.z + Scale12(gUnk_086149C4[q->heading] * radius);
+            q->dest.z = q->origin.z + Scale12(radius * gUnk_086149C4[q->heading]);
             break;
         }
 
@@ -132,12 +125,20 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
             ++q->timer;
             if (q->timer < q->phase1) {
                 ((struct AttackMotionPlayerFields *)p)->previousAnimation = -1;
-                PlaceRadial(q, (q->speed * q->timer) + 0xCC);
+                radialRadius = (q->speed * q->timer) + 0xCC;
+                q->dest.x =
+                    q->origin.x + Scale12(gUnk_086149C4[(q->heading + 64) & 255] * radialRadius);
+                q->dest.y = q->origin.y;
+                q->dest.z = q->origin.z + Scale12(gUnk_086149C4[q->heading] * radialRadius);
             } else if (q->timer < (q->phase1 + q->phase2)) {
                 if (((struct AttackMotionPlayerFields *)p)->previousAnimation != 0x72)
                     Sound_PlaySong(0x385);
                 ((struct AttackMotionPlayerFields *)p)->previousAnimation = animation;
-                PlaceRadial(q, (q->speed * q->phase1) + 0xCC);
+                radialRadius = (q->speed * q->phase1) + 0xCC;
+                q->dest.x =
+                    q->origin.x + Scale12(gUnk_086149C4[(q->heading + 64) & 255] * radialRadius);
+                q->dest.y = q->origin.y;
+                q->dest.z = q->origin.z + Scale12(gUnk_086149C4[q->heading] * radialRadius);
             }
             break;
 
@@ -159,7 +160,3 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
         q->collider.direction = heading;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0814D264);
-#endif
