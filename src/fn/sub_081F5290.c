@@ -3,8 +3,6 @@
 #include "ram.h"
 #include "scene_actor_components.h"
 
-#ifdef NONMATCHING
-// fuzzy: 78.7%
 struct Actor {
     u8 pad0[0x51];
     u8 angle;
@@ -38,7 +36,8 @@ struct Actor {
     u8 pad3D4[0xa78];
     s16 selectedPoint, selectedTarget;
     u16 padE50;
-    u16 scaleX, scaleZ, padE56, scaleStep;
+    u16 scaleX, scaleZ;
+    u16 padE56, scaleStep;
     u8 padE5A[0x14];
     u16 motion;
     u8 motionFlag, padE71, targetAngle, phaseTimer;
@@ -47,12 +46,7 @@ struct Actor {
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
-void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
-void SceneActors_StartAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
-void Sound_StopSong(u32);
-u8 Callback_InvokeActor(void *, void *);
-s32 Math_Atan2(s32, s32);
 static inline u32 randomA(void)
 {
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
@@ -70,35 +64,19 @@ static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
     v->y = zero;
     v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void sum(struct ContactPosition *d, struct ContactPosition *a,
-                       struct ContactPosition *b)
-{
-    d->x = a->x + b->x;
-    d->y = a->y + b->y;
-    d->z = a->z + b->z;
-}
-void Ratatosk_InitAnimatedParticleParams(void *);
-void Ratatosk_ConfigureAnimatedParticle(void *, u16, u32, u8, u32, u32, u32);
-void sub_081FC26C(void *, struct ContactPosition *);
+struct AnimatedParticleParams {
+    u16 kind, animation;
+    u8 reserved4[2];
+    u8 angle, reserved7;
+    u32 speed, variant, drift;
+    u32 field14, active;
+};
+void Ratatosk_InitAnimatedParticleParams(struct AnimatedParticleParams *);
+void Ratatosk_ConfigureAnimatedParticle(struct AnimatedParticleParams *, u16, u32, u8, u32, u32,
+                                        u32);
+void sub_081FC26C(struct AnimatedParticleParams *, struct ContactPosition *);
 void Ratatosk_UpdateDirectionalAnimation(void);
 void Ratatosk_UpdateDefeatSequence(void);
-struct EffectRandomSample {
-    u16 value;
-};
-static inline u32 ReadEffectRandomCursor(const struct EffectRandomSample *table, u32 *cursor,
-                                         u32 mask)
-{
-    *cursor = (*cursor + 1) & mask;
-    return ((const struct EffectRandomSample *)(*cursor * 2 + (u32)table))->value;
-}
-static inline void decay(u16 *v)
-{
-    u16 n = *v;
-    if ((s16)*v > 23)
-        *v = n - 24;
-    else
-        *v = 0;
-}
 static inline void setState(struct Actor *p, void (*update)(void), u8 state)
 {
     p->animationId = state;
@@ -110,21 +88,14 @@ static inline void setState(struct Actor *p, void (*update)(void), u8 state)
 }
 // confidence=low: recovers from knockback, choosing defeat when health is depleted.
 #define Ratatosk_UpdateKnockbackRecovery sub_081F5290
-void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
+void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 tick)
 {
-    s32 tick = elapsed;
-    u32 one = 1;
-    u32 randomMask = 1023;
-    u8 params[0x1c];
+    struct AnimatedParticleParams params;
     struct ContactPosition spawn;
     struct Actor *p2 = p;
     struct SceneActorBody *body = (struct SceneActorBody *)((u8 *)p + 0x48);
     u16 *scaleX;
     u16 *scaleZ;
-    u32 *flags;
-    s32 speed;
-    const struct EffectRandomSample *randomTable = (const struct EffectRandomSample *)gUnk_086141BC;
-    u32 *randomCursor = &gEffectRandomTableIndex;
     if (p->changed) {
         s32 angle;
         p->changed = 0;
@@ -137,74 +108,80 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
         Sound_PlaySong(0x55e);
     }
     if (tick <= 15) {
-        if (!p->locked) {
-            u8 *angleAddress = &p2->targetAngle;
-            s32 duration = 16;
-            struct ContactPosition *v = &body->motion;
-            s16 angle = *angleAddress;
-            speed = duration - tick;
-            polar(v, angle, speed);
-        } else {
-            s32 angle = p->savedAngle;
-            s32 duration = 16;
-            struct ContactPosition *v = &body->motion;
-            speed = duration - tick;
-            polar(v, angle + 128, speed);
-        }
+        if (!p->locked)
+            polar(&body->motion, p2->targetAngle, 16 - tick);
+        else
+            polar(&body->motion, p->savedAngle + 128, 16 - tick);
     }
-    scaleX = &p2->scaleX;
-    decay(scaleX);
-    scaleZ = &p2->scaleZ;
-    decay(scaleZ);
     {
-        typeof(p2->phaseTimer) *q1 = &p2->phaseTimer;
-        u8 z1 = 8;
-        *q1 = z1;
-        p2->motion = 0;
-        {
-            u32 mask = 12;
-            flags = &p->flags;
-            *flags |= mask;
-        }
-        if (tick > 29) {
+        u16 *value = &p2->scaleX;
+        u16 old = *value;
+        s32 current = (s16)*value;
+        scaleX = value;
+        if (current > 23)
+            *scaleX = old - 24;
+        else
             *scaleX = 0;
+    }
+    {
+        u16 *value = &p2->scaleZ;
+        u16 old = *value;
+        s32 current = (s16)*value;
+        scaleZ = value;
+        if (current > 23)
+            *scaleZ = old - 24;
+        else
             *scaleZ = 0;
-            p2->scaleStep = 0;
-            if ((p->health <= 0) && (!p->locked)) {
-                setState(p, Ratatosk_UpdateDefeatSequence, 15);
-            } else {
-                setState(p, Ratatosk_UpdateDirectionalAnimation, 1);
-                p->finished = 1;
-            }
+    }
+    p2->phaseTimer = 8;
+    p2->motion = 0;
+    {
+        u32 mask = 12;
+        p->flags |= mask;
+    }
+    if (tick > 29) {
+        *scaleX = 0;
+        *scaleZ = 0;
+        p2->scaleStep = 0;
+        if (p->health <= 0 && !p->locked) {
+            setState(p, Ratatosk_UpdateDefeatSequence, 15);
         } else {
-            if (tick & one) {
-                u32 speed = ReadEffectRandomCursor(randomTable, randomCursor, randomMask) & 7;
-                u32 variant = ReadEffectRandomCursor(randomTable, randomCursor, randomMask) & one;
-                u32 angle = (u8)ReadEffectRandomCursor(randomTable, randomCursor, randomMask);
-                u32 drift = ReadEffectRandomCursor(randomTable, randomCursor, randomMask) & 15;
-                struct ContactPosition source = p->position;
-                struct ContactPosition *position = &spawn;
-                spawn = source;
-                position->x -= 128;
-                position->y += 128;
+            setState(p, Ratatosk_UpdateDirectionalAnimation, 1);
+            p->finished = 1;
+        }
+    } else {
+        if (tick & 1) {
+            struct ContactPosition *position;
+            u32 speed;
+            u8 angle;
+            s32 variant;
+            s32 drift;
+            speed = randomA() & 7;
+            variant = randomA() & 1;
+            angle = (u8)randomA();
+            drift = randomA() & 15;
+            position = &spawn;
+            spawn = p->position;
+            position->x -= 128;
+            position->y += 128;
+            /* Sign-symmetric fixed-point conversions. The samples are never negative,
+             * but combine folds the tests only after cse has split the block there. */
+            if (variant < 0)
+                variant = -((-variant) << 12);
+            else
                 variant <<= 12;
+            if (drift < 0)
+                drift = -((-drift) << 12);
+            else
                 drift <<= 12;
-                Ratatosk_InitAnimatedParticleParams(params);
-                Ratatosk_ConfigureAnimatedParticle(params, (randomA() & 31) + 52, speed, angle, 1,
-                                                   variant, drift);
-                sub_081FC26C(params, position);
-            }
-            {
-                u32 mask = 1;
-                {
-                    s32 v1 = (*flags) | mask;
-                    *flags = v1;
-                }
-            }
+            Ratatosk_InitAnimatedParticleParams(&params);
+            Ratatosk_ConfigureAnimatedParticle(&params, (randomA() & 31) + 52, speed, angle, 1,
+                                               variant, drift);
+            sub_081FC26C(&params, &spawn);
+        }
+        {
+            u32 bit = 1;
+            p->flags |= bit;
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F5290);
-#endif
