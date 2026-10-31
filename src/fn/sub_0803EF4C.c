@@ -1,8 +1,5 @@
-#ifdef NONMATCHING
-// fuzzy: 64.3%
-// fix.py best (sweep after the inlined-insn fix)
-// Allocation and projection/animation scheduling still differ; reviewed extent is 1112 bytes.
 #include "scene_arc.h"
+#include "display_sequence.h"
 s32 __divsi3(s32, s32);
 s32 Terrain_GetHeightAtFixedPosition(struct ScenePoolVec32 *);
 s32 Terrain_GetHeightAtPosition(struct ScenePoolVec32 *);
@@ -31,13 +28,105 @@ static inline void ProjectArc(struct SceneArcSlot *slot, struct SceneArcSprite *
     screen->x = (slot->position.x >> 12) - gSceneCamera->x;
     screen->y = ((position->z + (position->y - height)) >> 12) + 96;
     screen->z = position->z >> 12;
-    screen->y = (u16)screen->y - lift;
+    sprite->screen.y = (u16)sprite->screen.y - lift;
 }
 static inline u8 PlayerSuspendsArc(void)
 {
-    if (gParticipantActors[0] && (gParticipantActors[0]->flags & 4))
-        return 1;
+    if (gParticipantActors[0]) {
+        u32 flags = gParticipantActors[0]->flags;
+        if (flags & 4)
+            return 1;
+    }
     return 0;
+}
+static inline void MakeVelocity(struct SceneVec *out, s32 angle, s32 speed)
+{
+    out->x = SignedShift(gUnk_086149C4[(angle + 64) & 255] << 13, 12);
+    out->y = SignedShift(gUnk_086149C4[angle & 255] * speed, 12);
+    out->z = 0;
+}
+static inline u16 DisplaySequence_GetIndex(struct SceneArcAnimation *state)
+{
+    return state->frame;
+}
+
+static inline u32 DisplaySequence_ReadCommand(const u16 *command)
+{
+    return *command;
+}
+
+static inline u32 DisplaySequence_MaskCommand(u32 command, u32 mask)
+{
+    mask &= command;
+    return mask;
+}
+
+/* Apply the current frame and flips, then advance the stored playback state.
+ * The duration calculation uses the newly selected command's low four bits. */
+static inline void StepArc(struct SceneArcSprite *owner, struct SceneArcAnimation *state)
+{
+    const u16 *command;
+    {
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->data;
+        command = (const u16 *)((u32)table + offset);
+    }
+    owner->frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
+        else
+            owner->flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
+        else
+            owner->flags &= ~8;
+    }
+    if (++state->timer >= state->rate) {
+        state->timer = 0;
+        if (state->flags & 4) {
+            if (state->frame == 0) {
+                if (state->flags & 8)
+                    state->timer = state->rate;
+                else
+                    state->frame = state->count - 1;
+            } else {
+                state->frame--;
+            }
+        } else {
+            if (++state->frame >= state->count) {
+                if (state->flags & 8) {
+                    state->timer = state->rate;
+                    state->frame = state->count - 1;
+                } else {
+                    state->frame = 0;
+                }
+            }
+        }
+        command = state->data + state->frame;
+        state->factor = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->rate = (state->factor * (s32)state->scale) >> 6;
+        if (state->rate == 0)
+            state->rate = 1;
+    }
+}
+
+static inline void HideSprite(struct SceneArcSprite *sprite)
+{
+    sprite->flags |= 1;
 }
 void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *slot, u32 index)
 {
@@ -48,10 +137,12 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
     struct ScenePoolVec32 *position;
     u32 paused;
     if (frame <= duration) {
-        u32 remainder = duration - frame;
+        u32 remainder;
         s32 lift;
         s32 terrain;
+        s32 screenY;
         sprite = &slot->sprite;
+        remainder = duration - frame;
         slot->position.x =
             __divsi3(((slot->target.x >> 12) * frame) + ((slot->start.x >> 12) * remainder),
                      duration)
@@ -67,9 +158,10 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
         lift = SignedShift(
             gUnk_086149C4[Div(slot->frame << 7, slot->flightDuration) & 255] * slot->height, 12);
         ProjectArc(slot, sprite, lift);
+        terrain = Terrain_GetHeightAtFixedPosition(&slot->position);
+        screenY = sprite->screen.y;
         position = &slot->position;
-        terrain = Terrain_GetHeightAtFixedPosition(position);
-        if (terrain < sprite->screen.y) {
+        if (terrain < screenY) {
             sprite->screen.y = terrain;
             slot->grounded = 1;
             slot->frame = slot->endFrame;
@@ -80,21 +172,23 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
             Sound_PlaySongChecked(0x166);
         }
     } else {
-        s32 lift = 0;
-        u32 remaining = duration - frame;
-        u32 interval = duration - slot->endFrame;
+        s32 lift;
+        u32 remaining;
+        u32 interval;
         struct ArcDirection direction;
         struct SceneVec velocity;
         s32 angle;
         s32 terrain;
+        s32 screenY;
         sprite = &slot->sprite;
+        lift = 0;
+        remaining = duration - frame;
+        interval = duration - slot->endFrame;
         direction.x = (slot->target.x >> 12) - (slot->start.x >> 12);
         direction.y = slot->target.y - (slot->start.y >> 12);
         direction.z = (slot->target.z >> 12) - (slot->start.z >> 12);
         angle = Math_Atan2(direction.x, direction.z);
-        velocity.x = SignedShift(gUnk_086149C4[(angle + 64) & 255] << 13, 12);
-        velocity.y = SignedShift(gUnk_086149C4[angle & 255] * 8192, 12);
-        velocity.z = 0;
+        MakeVelocity(&velocity, angle, 8192);
         if (slot->grounded != 1) {
             slot->position.x += velocity.x;
             slot->position.y += velocity.y;
@@ -104,12 +198,16 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
             slot->position.z = 0x6000;
         else if (slot->position.z > 0x34000)
             slot->position.z = 0x34000;
-        if (interval != 0)
-            lift = SignedShift(gUnk_086149C4[Div(remaining << 7, interval) & 255], 10);
+        if (interval != 0) {
+            s32 phase = Div(remaining << 7, interval);
+            const s16 *table = gUnk_086149C4;
+            lift = SignedShift(table[phase & 255], 10);
+        }
         ProjectArc(slot, sprite, lift);
+        terrain = Terrain_GetHeightAtFixedPosition(&slot->position);
+        screenY = sprite->screen.y;
         position = &slot->position;
-        terrain = Terrain_GetHeightAtFixedPosition(position);
-        if (terrain < sprite->screen.y) {
+        if (terrain < screenY) {
             sprite->screen.y = terrain;
             slot->grounded = 1;
         }
@@ -124,7 +222,7 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
                 slot->position.y = -(Terrain_GetHeightAtPosition(position) << 12);
                 SpriteEffect_CreateAtPosition(position, 0, 0, 0x8639, 0x75f6, paused, paused,
                                               paused, paused, 0x153, 30, paused, paused, 1, paused);
-                sprite->flags |= 1;
+                HideSprite(&slot->sprite);
                 GroundEffect_DisableProjection(&slot->ground);
             }
         }
@@ -133,67 +231,6 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
             return;
         }
     }
-    {
-        struct SceneArcAnimation *animation = &slot->animation;
-        const u16 *key = &animation->data[animation->frame];
-        u32 two;
-        u32 limit;
-        u32 rate;
-        u32 flags;
-        u32 next;
-        sprite->frame = (*key) >> 6;
-        if ((animation->flags & 1) != (((*key) >> 4) & 1))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-        two = 2;
-        if (((u8)(animation->flags & two)) != (((*key) >> 4) & two))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-        animation->timer++;
-        limit = 0xffff;
-        rate = animation->rate;
-        if (animation->timer >= rate) {
-            animation->timer = 0;
-            flags = animation->flags;
-            if (flags & 4) {
-                next = animation->frame;
-                if (!next) {
-                    if (flags & 8) {
-                        animation->timer = rate;
-                        goto newFrame;
-                    }
-                    next = animation->count;
-                }
-                next--;
-                goto storeFrame;
-            } else {
-                next = animation->frame + 1;
-                animation->frame = next;
-                if ((next & limit) < animation->count)
-                    goto newFrame;
-                if ((u8)(flags & 8)) {
-                    animation->timer = rate;
-                    next = animation->count - 1;
-                } else
-                    next = (u8)(flags & 8);
-            storeFrame:
-                animation->frame = next;
-            }
-        newFrame:
-            key = &animation->data[animation->frame];
-
-            animation->factor = (*key) & 15;
-            animation->rate = (animation->scale * animation->factor) >> 6;
-            if (!animation->rate)
-                animation->rate = 1;
-        }
-    }
+    StepArc(&slot->sprite, &slot->animation);
     slot->frame++;
 }
-
-#else
-#include "global.h"
-INCLUDE_ASM("asm/nonmatching", SceneArc_UpdateSlot);
-#endif
