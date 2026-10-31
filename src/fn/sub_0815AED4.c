@@ -1,18 +1,7 @@
-#include "global.h"
+#include "player_cue.h"
+#include "contact_position.h"
 
-struct P {
-    u8 filler[0x30];
-    u32 a;
-    u32 b;
-};
-struct Q {
-    u32 a;
-    u32 b;
-};
-
-void PlayerCue_SetPosition(struct P *p, struct Q *q)
+void PlayerCue_SetPosition(struct Player *p, const struct ContactPosition *position)
 {
-    u32 t = q->b;
-    p->a = q->a;
-    p->b = t;
+    PlayerCue_Coordinates(p)->position = *position;
 }
