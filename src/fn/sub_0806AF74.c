@@ -4,8 +4,6 @@
 // confidence=low: animation controller with terrain bounce and intermittent gravity.
 #define SpriteEffectController_UpdateTileBounce sub_0806AF74
 void Heap_Free(void *);
-#ifdef NONMATCHING
-// fuzzy: 99.8%
 static inline struct ContactPosition *AddVelocity(struct ContactPosition *position,
                                                   struct ContactPosition *velocity)
 {
@@ -45,8 +43,6 @@ void SpriteEffectController_UpdateTileBounce(struct SpriteEffectControllerPool *
                                              struct SpriteEffectController *controller)
 {
     struct SpriteEffectTileDrawable *tile = controller->drawable;
-    struct ContactPosition *position;
-    u16 *flags;
     u32 ended;
     u32 mode;
     if (controller->enter) {
@@ -55,8 +51,6 @@ void SpriteEffectController_UpdateTileBounce(struct SpriteEffectControllerPool *
         controller->enter = 0;
     }
     mode = controller->flags & 0x80;
-    flags = &controller->flags;
-    position = &tile->position;
     if (mode) {
         struct ContactPosition *velocity;
         s32 cell;
@@ -76,7 +70,7 @@ void SpriteEffectController_UpdateTileBounce(struct SpriteEffectControllerPool *
             controller->velocity.z = Div(controller->velocity.z * 5, 10);
             sum = Square(controller->velocity.x) + Square(velocity->y);
             if ((sum + Square(velocity->z)) == 0)
-                *flags &= 0xFF7F;
+                controller->flags &= 0xFF7F;
         } else if (Mod(controller->frame, 4))
             controller->velocity.y -= 2;
     }
@@ -89,7 +83,6 @@ void SpriteEffectController_UpdateTileBounce(struct SpriteEffectControllerPool *
         struct DisplaySequenceState *state = (struct DisplaySequenceState *)prefix;
         const struct SpriteEffectTileResource *graphics;
         const volatile u16 *command;
-        u32 duration;
         u32 flags;
         graphics = ((struct SpriteEffectTileDrawable *)raw)->graphics;
         command = state->commands + state->index;
@@ -170,12 +163,12 @@ void SpriteEffectController_UpdateTileBounce(struct SpriteEffectControllerPool *
     }
     controller->frame++;
     if (ended) {
-        if ((*flags) & 1) {
+        if (controller->flags & 1) {
             struct SpriteEffectDrawablePrefix *drawable;
             gSpriteEffectControllerPool->used &= ~(1 << controller->index);
             controller->state = 0;
             {
-                u16 *reloadFlags = flags;
+                u16 *reloadFlags = &controller->flags;
                 mode = (*reloadFlags) & 8;
             }
             if (mode) {
@@ -192,13 +185,9 @@ void SpriteEffectController_UpdateTileBounce(struct SpriteEffectControllerPool *
                 }
             }
             controller->index = -1;
-            *flags = 0;
+            controller->flags = 0;
         } else
             controller->state = 4;
         controller->enter = 1;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0806AF74);
-#endif
