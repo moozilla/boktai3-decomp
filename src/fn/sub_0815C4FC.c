@@ -1,42 +1,31 @@
-#include "global.h"
+#include "player.h"
 
-struct P {
-    u8 filler[0x3A4];
-    u8 dir;
-    u8 filler2[0x418 - 0x3A5];
-    u8 state;
-    u8 filler3[0x58C - 0x419];
-    void *fn;
-    u8 filler4[0x5A4 - 0x590];
-    u32 c;
-};
+void Player_EnterKindTwo(struct Player *);
+void ActorSequence_Begin(struct Player *, s32, s32);
+void Player_UpdateFacingSide(struct Player *);
+void PlayerCue_UpdateSpiralMotion(struct Player *);
+void PlayerCue_UpdateSpiralRecovery(struct Player *);
+void Player_UpdateStateMotionCue(struct Player *);
 
-void Player_EnterKindTwo(struct P *);
-void ActorSequence_Begin(struct P *, s32, s32);
-void Player_UpdateFacingSide(struct P *);
-void PlayerCue_UpdateSpiralMotion(void);
-void PlayerCue_UpdateSpiralRecovery(void);
-void Player_UpdateStateMotionCue(void);
-
-u32 PlayerCue_StateMotion(struct P *p, u32 c)
+u32 PlayerCue_StateMotion(struct Player *p, u32 c)
 {
-    p->c = c;
-    if (p->state <= 1 || p->state == 6)
+    p->cueParameter = c;
+    if (p->actionMode <= 1 || p->actionMode == 6)
         return 0;
-    if (p->state == 3) {
+    if (p->actionMode == 3) {
         Player_EnterKindTwo(p);
         ActorSequence_Begin(p, 0xD, 0);
-        p->fn = PlayerCue_UpdateSpiralMotion;
-    } else if (p->state == 4) {
+        p->triggerAnimationCallback = PlayerCue_UpdateSpiralMotion;
+    } else if (p->actionMode == 4) {
         Player_EnterKindTwo(p);
         ActorSequence_Begin(p, 0xE, 0);
-        p->fn = PlayerCue_UpdateSpiralRecovery;
-    } else if (p->state == 5) {
-        p->dir = 4;
+        p->triggerAnimationCallback = PlayerCue_UpdateSpiralRecovery;
+    } else if (p->actionMode == 5) {
+        p->facing = 4;
         Player_UpdateFacingSide(p);
         Player_EnterKindTwo(p);
         ActorSequence_Begin(p, 0xF, 0);
-        p->fn = Player_UpdateStateMotionCue;
+        p->triggerAnimationCallback = Player_UpdateStateMotionCue;
     } else {
         return 0;
     }
