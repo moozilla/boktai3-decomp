@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "scene_actor_registry.h"
-// Packed-position address lowering and constructor constant lifetimes still differ.
 struct Feather {
     u32 flags;
     u8 unknown4[3], priority;
@@ -20,6 +19,10 @@ struct Feather {
     u8 enter, angle;
     u32 effectFlags, variant;
 };
+static inline struct ContactPosition *ScatterCursor(struct ContactPosition **cursor)
+{
+    return *cursor;
+}
 static inline u32 Random(const u16 *table, u32 *rng)
 {
     u32 index = (*rng + 1) & 1023;
@@ -78,9 +81,17 @@ static inline void Add(struct ContactPosition *out, struct ContactPosition *a,
     out->y = a->y + b->y;
     out->z = a->z + b->z;
 }
+/* Defaults pack priority in bits 0-7, controller flags in 8-15, and contactB in 16-31. */
+static inline void CreateScatter(struct Feather *owner, struct ContactPosition *position,
+                                 struct ContactPosition *velocity, u32 sequence, u32 life, u32 zero,
+                                 const u32 *defaults)
+{
+    SpriteEffectController_Create(position, velocity, 0x1C1A, 0xD1B8, sequence, zero,
+                                  (*defaults >> 8) & 255, zero, (u8)*defaults, zero, zero, life, 4,
+                                  *defaults >> 16, owner->effectFlags, 30, 8, 8);
+}
 #ifdef NONMATCHING
-// fuzzy: 82.7%
-// scope shape 10 (differences once low registers are set aside)
+// fuzzy: 99.0%
 void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
 {
     struct ContactPosition center;
@@ -96,19 +107,21 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
         sourceCell = current;
     }
     ZeroFill8(&velocity);
-    if (count > 0) {
-        u32 *rng = &gRandomIndex;
-        s32 remaining = count;
-        do {
+    {
+        s32 i;
+        for (i = 0; i < count; ++i) {
+            u32 *rng = &gRandomIndex;
             const void *data = gRandomTable;
             s32 height;
             s32 difference;
+            struct ContactPosition *scatter;
             spot.packed.x = (Random((const u16 *)data, rng) & 255) - 128;
             spot.packed.y = 0;
             spot.packed.z = (Random((const u16 *)data, rng) & 255) - 128;
-            Add(&spot.position, &center, &spot.position);
-            cell = CellIndex(&spot.position);
-            if (FeatherEffectPool_ClipScatterPath(p, &spot.position, sourceCell, cell,
+            scatter = &spot.position;
+            Add(ScatterCursor(&scatter), &center, ScatterCursor(&scatter));
+            cell = CellIndex(ScatterCursor(&scatter));
+            if (FeatherEffectPool_ClipScatterPath(p, scatter, sourceCell, cell,
                                                   Divide64(direction)))
                 goto next;
             data = CellData(cell);
@@ -130,25 +143,20 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
             }
             {
                 u32 zero;
-                u8 one;
-                spot.position.y = difference << 8;
+                u32 defaults;
+                scatter->y = difference << 8;
                 zero = 0;
-                one = 1;
                 if (!p->variant) {
                     s32 life = (((u8)Random((const u16 *)RANDOM_TABLE_ADDR, rng)) & 63) + 20;
-                    SpriteEffectController_Create(&spot.position, &velocity, 0x1C1A, 0xD1B8, 3,
-                                                  zero, 0x31, zero, one, zero, zero, life, 4, one,
-                                                  p->effectFlags, 30, 8, 8);
+                    defaults = 0x00013101;
+                    CreateScatter(p, scatter, &velocity, 3, life, zero, &defaults);
                 } else {
-                    SpriteEffectController_Create(&spot.position, &velocity, 0x1C1A, 0xD1B8, 0x12,
-                                                  zero, 0x11, zero, one, zero, zero, zero, 4, one,
-                                                  p->effectFlags, 30, 8, 8);
+                    defaults = 0x00011101;
+                    CreateScatter(p, scatter, &velocity, 0x12, zero, zero, &defaults);
                 }
             }
         next:
-            remaining--;
-
-        } while (remaining);
+        }
     }
 }
 #else
