@@ -1,19 +1,17 @@
-#include "global.h"
+#include "player_cue.h"
 
-void SceneActor_SpawnModeParticles(u8 *);
-
-void PlayerCue_UpdatePeriodicParticles(u8 *p)
+void SceneActor_SpawnModeParticles(struct Player *);
+void PlayerCue_UpdatePeriodicParticles(struct Player *p)
 {
-    u8 *c;
-    s32 v;
-
-    if (p[0x5A1] != 0) {
-        c = p + 0x5A2;
-        v = *c + 1;
-        *c = v;
-        if ((u8)v > 7) {
+    u8 *frame;
+    s32 next;
+    if (PlayerCue_Messages(p)->periodicParticlesEnabled != 0) {
+        frame = &PlayerCue_Messages(p)->periodicParticleFrame;
+        next = *frame + 1;
+        *frame = next;
+        if ((u8)next > 7) {
             SceneActor_SpawnModeParticles(p);
-            *c = 0;
+            *frame = 0;
         }
     }
 }

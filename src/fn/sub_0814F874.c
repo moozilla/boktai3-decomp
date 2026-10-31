@@ -1,13 +1,10 @@
-#include "global.h"
+#include "player_cue.h"
 
-void Trigger_ConsumePending(u8 *, s32);
-
-void PlayerCue_AcknowledgePendingTrigger(u8 *p)
+void PlayerCue_AcknowledgePendingTrigger(struct Player *p)
 {
-    u8 *flag = p + 0x59F;
-
-    if (*flag != 0) {
-        Trigger_ConsumePending(p + 0x2F8, 1);
-        *flag = 0;
+    u8 *pending = &PlayerCue_Messages(p)->acknowledgementPending;
+    if (*pending != 0) {
+        Trigger_ConsumePending(&PlayerCue_Messages(p)->receiver, 1);
+        *pending = 0;
     }
 }

@@ -109,6 +109,7 @@ class ActorCommandTableTests(unittest.TestCase):
         with patch.object(atlas, 'rom_load', return_value=segments), \
              patch.object(atlas, 'notes', return_value={}), \
              patch.object(atlas, 'load', return_value={'entities': {}, 'funcs': {}}), \
+             patch.object(atlas, 'player_animation_blocks', return_value=[]), \
              patch.dict(sys.modules, {'sound': sound}):
             tree = atlas.rom_tree()
         data = [block for block in tree['children'] if block['k'] == 'data']

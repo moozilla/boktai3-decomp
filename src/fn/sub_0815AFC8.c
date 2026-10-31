@@ -1,26 +1,17 @@
-#include "global.h"
+#include "player.h"
 
-struct P {
-    u8 filler[0x3A4];
-    s8 b;
-    u8 filler2[0x58C - 0x3A5];
-    void *fn;
-    u8 filler3[0x5A4 - 0x590];
-    u32 c;
-};
+void Player_UpdateFacingSide(struct Player *);
+void Player_EnterKindTwo(struct Player *);
+void ActorSequence_Begin(struct Player *, s32, s32);
+void Player_UpdateTriggerAnimation(struct Player *);
 
-void Player_UpdateFacingSide(struct P *);
-void Player_EnterKindTwo(struct P *);
-void ActorSequence_Begin(struct P *, s32, s32);
-void Player_UpdateTriggerAnimation(void);
-
-void PlayerCue_StandVariant2(struct P *p, s32 v, u32 c)
+void PlayerCue_StandVariant2(struct Player *p, s32 v, u32 c)
 {
     if (v >= 0)
-        p->b = v;
+        p->facing = v;
     Player_UpdateFacingSide(p);
-    p->c = c;
+    p->cueParameter = c;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0, 2);
-    p->fn = Player_UpdateTriggerAnimation;
+    p->triggerAnimationCallback = Player_UpdateTriggerAnimation;
 }

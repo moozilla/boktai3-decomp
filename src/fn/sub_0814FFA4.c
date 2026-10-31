@@ -1,16 +1,12 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "player_cue.h"
 // confidence=low: MoveTo callback approaches destination and decelerates its movement effect.
 extern const s16 gUnk_086149C4[];
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 s32 Math_Atan2(s32, s32);
-void Script_Call(u32, u32);
 void Player_ConstrainTetherTarget(void *, s32, s32, u32);
-#define B(o) (*(u8 *)(p + (o)))
-#define H(o) (*(u16 *)(p + (o)))
-#define S(o) (*(s16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
+#include "scene_vec.h"
+
 static inline s32 scale12(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
@@ -19,113 +15,106 @@ static inline s32 scale6(s32 n)
 {
     return n >= 0 ? n >> 6 : -((-n) >> 6);
 }
-static inline void putB(u8 *p, u32 o, u32 v)
+static inline void faceFromAngle(struct Player *p, u16 angle)
 {
-    p[o] = v;
-}
-static inline void face(u8 *p)
-{
-    if (B(0x3A4) > 4) {
-        putB(p, 0x3A2, 8 - B(0x3A4));
-        B(0x3A3) = 1;
+    s32 shifted = (((u16)angle) + 0x70) >> 5;
+    u32 mask = 7;
+    u8 direction;
+    u8 *facing;
+    mask &= shifted;
+    facing = &p->facing;
+    direction = mask;
+    *facing = mask;
+    if (direction > 4) {
+        p->heading = 8 - direction;
+        p->side = 1;
     } else {
-        B(0x3A2) = B(0x3A4);
-        B(0x3A3) = 0;
+        p->heading = mask;
+        p->side = 0;
     }
 }
-#ifdef NONMATCHING
-// fuzzy: 82.4%
-// fix.py best version
-inline static void putB_UpdateMoveDestination(u8 *p, u32 o, u8 v)
+void PlayerCue_UpdateMoveDestination(struct Player *p)
 {
-    p[o] = v;
-}
-
-inline static u32 Arg1(u32 k_, u8 *p)
-{
-    return p + k_;
-}
-
-void PlayerCue_UpdateMoveDestination(u8 *p)
-{
-    s32 dx = (*((s16 *)(p + 0x590))) - (*((s16 *)(p + 0x30)));
-    s32 dz = (*((s16 *)(p + 0x594))) - (*((s16 *)(p + 0x34)));
-    register s32 distance asm("r8") = (dx * dx) + (dz * dz);
-    register s32 x asm("sl") = 0;
-    register s32 z asm("sb") = 0;
+    s32 dx = (PlayerCue_Motion(p)->destination.x) - (p->position.x);
+    s32 dz = (PlayerCue_Motion(p)->destination.z) - (p->position.z);
+    s32 distance = (dx * dx) + (dz * dz);
+    s32 x = 0;
+    s32 z = 0;
     s32 moving;
     s32 anim;
     s32 angle;
-    typeof(angle) c1;
     if (!distance) {
-        anim = ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 16);
-        if ((*((s8 *)(p + 0x59D))) >= 0) {
-            *((u8 *)Arg1(0x3A4, p)) = *((u8 *)(p + 0x59D));
-            *((u8 *)(p + 0x59D)) = 255;
-            face(p);
+        anim = ActorVariant_GetTableValue(p->actionMode, 16);
+        if ((p->targetFacing) >= 0) {
+            p->facing = p->targetFacing;
+            p->targetFacing = -1;
+            {
+                u32 direction = p->facing;
+                if (direction > 4) {
+                    p->heading = 8 - direction;
+                    p->side = 1;
+                } else {
+                    p->heading = direction;
+                    p->side = 0;
+                }
+            }
         }
-        if (*((u8 *)(p + 0x59A))) {
-            if (*((u8 *)(p + 0x59B))) {
+        if (p->animationBranchRequested) {
+            if (p->cuePhase) {
                 moving = 1;
-                angle = (((*((u8 *)(p + 0x3A4))) + 1) & 7) << 5;
+                angle = (((p->facing) + 1) & 7) << 5;
                 x = gUnk_086149C4[(angle + 64) & 255];
                 z = gUnk_086149C4[angle & 255];
-                *((u8 *)(p + 0x59B)) = ((*((u8 *)(p + 0x59B))) * 7) >> 3;
+                p->cuePhase = ((p->cuePhase) * 7) >> 3;
             } else {
                 moving = 0;
-                if (*((u32 *)(p + 0x5A4))) {
-                    u32 script = *((u32 *)(p + 0x5A4));
-                    *((u32 *)(p + 0x5A4)) = 0;
+                if (p->cueParameter) {
+                    u32 script = p->cueParameter;
+                    p->cueParameter = 0;
                     Script_Call(script, 0);
                 }
-                *((u8 *)(p + 0x59A)) = 0;
+                p->animationBranchRequested = 0;
             }
         } else {
             moving = 0;
-            if (*((u32 *)(p + 0x5A4))) {
-                u32 script = *((u32 *)(p + 0x5A4));
-                *((u32 *)(p + 0x5A4)) = 0;
+            if (p->cueParameter) {
+                u32 script = p->cueParameter;
+                p->cueParameter = 0;
                 Script_Call(script, 0);
             }
         }
     } else {
-        anim = ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 17);
+        anim = ActorVariant_GetTableValue(p->actionMode, 17);
         moving = 1;
-        angle = Math_Atan2(dx, dz);
-        c1 = angle;
-        putB_UpdateMoveDestination(p, 0x3A4, ((((u16)angle) + 0x70) >> 5) & 7);
-        face(p);
-        angle = (((*((u8 *)(p + 0x3A4))) + 1) & 7) << 5;
+        faceFromAngle(p, Math_Atan2(dx, dz));
+        angle = (((p->facing) + 1) & 7) << 5;
         x = gUnk_086149C4[(angle + 64) & 255];
-        z = gUnk_086149C4[c1 & 255];
-        if ((*((u16 *)(p + 0xA0))) & 3) {
+        z = gUnk_086149C4[angle & 255];
+        if ((p->actionCueFlags) & 3) {
             if (distance <= 64) {
-                *((u16 *)(p + 0x30)) = *((u16 *)(p + 0x590));
-                *((u16 *)(p + 0x34)) = *((u16 *)(p + 0x594));
+                p->position.x = PlayerCue_Motion(p)->destination.x;
+                p->position.z = PlayerCue_Motion(p)->destination.z;
             } else {
-                *((u16 *)(p + 0x38)) = -scale12(x * 8);
-                *((u16 *)(p + 0x3C)) = -scale12(z * 8);
-                if ((*((u8 *)(p + 0x28F))) == 1) {
-                    if ((*((s16 *)(p + 0x3C))) < 0)
-                        *((u16 *)(p + 0x3C)) = scale6((*((s16 *)(p + 0x3C))) * 40);
+                s32 speed = 8;
+                p->velocityX = -scale12(x * speed);
+                p->velocityZ = -scale12(z * speed);
+                if ((p->velocityScaleAxis) == 1) {
+                    if ((p->velocityZ) < 0)
+                        p->velocityZ = scale6((p->velocityZ) * 40);
                     else
-                        *((u16 *)(p + 0x3C)) = scale6((*((s16 *)(p + 0x3C))) * 52);
-                } else if ((*((u8 *)(p + 0x28F))) == 2) {
-                    if ((*((s16 *)(p + 0x38))) < 0)
-                        *((u16 *)(p + 0x38)) = scale6((*((s16 *)(p + 0x38))) * 40);
+                        p->velocityZ = scale6((p->velocityZ) * 52);
+                } else if ((p->velocityScaleAxis) == 2) {
+                    if ((p->velocityX) < 0)
+                        p->velocityX = scale6((p->velocityX) * 40);
                     else
-                        *((u16 *)(p + 0x38)) = scale6((*((s16 *)(p + 0x38))) * 52);
+                        p->velocityX = scale6((p->velocityX) * 52);
                 }
             }
-            if ((*((u8 *)(p + 0x59A))) && ((*((u8 *)(p + 0x59B))) <= 149))
-                *((u8 *)(p + 0x59B)) = ((*((u8 *)(p + 0x59B))) * 15) >> 4;
+            if ((p->animationBranchRequested) && ((p->cuePhase) <= 149))
+                p->cuePhase = ((p->cuePhase) * 15) >> 4;
         }
     }
     Player_SetAnimation(p, anim, 64, 1);
     if (moving)
-        Player_ConstrainTetherTarget(p, x, z, *((u8 *)(p + 0x59B)));
+        Player_ConstrainTetherTarget(p, x, z, p->cuePhase);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateMoveDestination);
-#endif

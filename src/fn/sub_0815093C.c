@@ -45,7 +45,7 @@ void PlayerCue_UpdateDeparture(struct Player *p)
             Player_AddControlFlags(p, 4);
             if (++p->tetherFrame > 5) {
                 p->terrainRecoveryCounter = 0;
-                *((u8 *)p + 0xA6) = 1;
+                p->unkA2[4] = 1;
                 Sound_PlaySong(0x1AE);
                 ActorSequence_Begin(p, 0x1B, 2);
             }

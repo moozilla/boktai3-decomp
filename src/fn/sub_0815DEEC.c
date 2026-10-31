@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
@@ -8,8 +7,9 @@ u32 SunClock_GetPhase(void);
 void Collider_SetContactMode(void *, u32);
 static inline u32 ReadMaskedFlags(u32 mask, u32 *flags)
 {
-    asm("" : "+r"(mask));
-    return *flags & mask;
+    u32 selected = mask;
+    selected &= *flags;
+    return selected;
 }
 static inline u32 PlayerCue_TestFlags(struct Player *p, u32 mask)
 {

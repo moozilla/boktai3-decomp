@@ -11,6 +11,7 @@ skeleton_script_commands,086060FC,08606120,callback_array,data/actor_commands/sk
 octopus_script_commands,0860635C,08606384,callback_array,data/actor_commands/octopus.csv,Octopus actor script command handlers (10 entries)
 ivy_script_commands,08606400,0860641C,callback_array,data/actor_commands/ivy.csv,Ivy actor script command handlers (7 entries)
 actor_default_commands,086108B0,086108C8,callback_array,data/actor_commands/default.csv,Default actor script command handlers (6 entries)
+player_animation_variants,08610980,08610B50,player_animations,data/player_cue/animations.csv,Player animation base sequences by action mode and index (four modes with 58 entries each)
 text_bank,08D6B1E4,08DD6B96,text_bank,build/text/bank.tsv,"Script text: gcx section words, entry table + strings and blobs (ROM-derived source, extracted on demand; strings may change length)"
 res_anm,08614DCC,08617084,resource_archive,build/res/anm/index.txt,"Resource archive anm (ROM-derived entries, extracted on demand; entries may change size)"
 res_map,08617084,087C4C98,resource_archive,build/res/map/index.txt,"Resource archive map (ROM-derived entries, extracted on demand; entries may change size)"

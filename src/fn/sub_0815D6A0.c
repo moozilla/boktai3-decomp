@@ -1,8 +1,6 @@
-#include "global.h"
-
-void SceneMessages_UnregisterReceiver(u8 *);
-
-void Player_UnregisterSceneMessageReceiver(u8 *p)
+#include "player_cue.h"
+void SceneMessages_UnregisterReceiver(struct SceneEventReceiver *);
+void Player_UnregisterSceneMessageReceiver(struct Player *p)
 {
-    SceneMessages_UnregisterReceiver(p + 0x2F8);
+    SceneMessages_UnregisterReceiver(&PlayerCue_Messages(p)->receiver);
 }

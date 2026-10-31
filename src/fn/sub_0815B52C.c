@@ -1,46 +1,31 @@
-#include "global.h"
+#include "player.h"
 
-struct P {
-    u8 filler[0x3A2];
-    u8 b3A2;
-    u8 b3A3;
-    u8 dir;
-    u8 filler2[0x418 - 0x3A5];
-    u8 state;
-    u8 filler3[0x58C - 0x419];
-    void *fn;
-    u8 filler4[0x598 - 0x590];
-    u16 h598;
-    u8 filler5[0x5A4 - 0x59A];
-    u32 c;
-};
+void Player_EnterKindTwo(struct Player *);
+void ActorSequence_Begin(struct Player *, s32, s32);
+void PlayerCue_UpdateRecoilSlide(struct Player *);
+void PlayerCue_UpdateSideRecoil(struct Player *);
+void Player_UpdateRecoilAction(struct Player *);
 
-void Player_EnterKindTwo(struct P *);
-void ActorSequence_Begin(struct P *, s32, s32);
-void PlayerCue_UpdateRecoilSlide(void);
-void PlayerCue_UpdateSideRecoil(void);
-void Player_UpdateRecoilAction(void);
-
-void PlayerCue_Motion29(struct P *p, s32 dir, u32 h, u32 c)
+void PlayerCue_Motion29(struct Player *p, s32 dir, u32 h, u32 c)
 {
     if (dir >= 0)
-        p->dir = dir;
-    p->dir |= 1;
-    if (p->dir > 4) {
-        p->b3A2 = (8 - p->dir) >> 1;
-        p->b3A3 = 1;
+        p->facing = dir;
+    p->facing |= 1;
+    if (p->facing > 4) {
+        p->heading = (8 - p->facing) >> 1;
+        p->side = 1;
     } else {
-        p->b3A2 = p->dir >> 1;
-        p->b3A3 = 0;
+        p->heading = p->facing >> 1;
+        p->side = 0;
     }
-    p->h598 = h;
-    p->c = c;
+    p->recoilSpeed = h;
+    p->cueParameter = c;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0x1D, 0);
-    if (p->state == 3)
-        p->fn = PlayerCue_UpdateRecoilSlide;
-    else if (p->state == 4)
-        p->fn = PlayerCue_UpdateSideRecoil;
+    if (p->actionMode == 3)
+        p->triggerAnimationCallback = PlayerCue_UpdateRecoilSlide;
+    else if (p->actionMode == 4)
+        p->triggerAnimationCallback = PlayerCue_UpdateSideRecoil;
     else
-        p->fn = Player_UpdateRecoilAction;
+        p->triggerAnimationCallback = Player_UpdateRecoilAction;
 }

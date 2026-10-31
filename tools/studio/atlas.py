@@ -54,7 +54,8 @@ INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py",
           "tools/assets/cutscenes.py", "tools/mgba/scenes.py", "tools/assets/gclfiles.py",
           "tools/assets/areas.py", "tools/assets/stages.py", "tools/assets/story.py",
-          "tools/assets/saves.py"]
+          "tools/assets/saves.py", "tools/assets/player_cue.py", "data/player_cue/animations.csv",
+          "data/manifest.csv", "tools/datafmt/player_animations.py"]
 # the monster list's bosses: 黒騎士 and ニーズホッグ (9902-9903), then 伯爵 on (9915-)
 BOSSES = {9902, 9903} | set(range(9915, 9922))
 
@@ -959,6 +960,15 @@ def command_table_blocks():
             for t in actors.command_tables().values()]
 
 
+def player_animation_blocks():
+    """Keep each mode's exact decoded interval and the shared table viewer."""
+    import player_cue
+    data = player_cue.animation_variants()
+    return [{"s": int(table["addr"], 16), "n": table["size"], "k": "data",
+             "t": f"Player animation variants: mode {table['mode']}", "u": "decoded",
+             "r": "/actors#player-animations"} for table in data["tables"]] if data else []
+
+
 def rom_tree():
     """The ROM as nested blocks in address order: top-level regions (code by
     subsystem and function, each asset archive by resource, sound, text,
@@ -1106,6 +1116,7 @@ def rom_tree():
     tops.append({"s": kids[0]["s"], "n": sum(x["n"] for x in kids), "k": "sound", "t": "Sound (MP2K)", "c": kids})
     # Tables are separated by other data, so each keeps its own ROM interval.
     tops.extend(command_table_blocks())
+    tops.extend(player_animation_blocks())
     # the documented regions that items don't cover (sound, text, scripts, graphics, tables)
     covered = sorted((c["s"], c["s"] + c["n"]) for t in tops for c in (t.get("c") or [t]) for c in (c.get("c") or [c]))
     merged = []

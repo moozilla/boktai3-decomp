@@ -58,6 +58,16 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+* **Player cue worker batch and cleanup prepared** (2026-10-30): the assigned
+  callbacks match without concessions on `codex/finish-player-cue`. Existing cue
+  callbacks and setup/dispatch now share canonical player, graphics, message and
+  coordinate records; editable animation tables are browsable in Studio. The
+  transition callback's final barriers are removed: a De Morgan identity delays
+  AND formation until combine and preserves the ROM's operand order. The whole
+  subsection is ordinary C with no compiler blockers. Stock unit checks pass; combined
+  ROM validation and report regeneration remain with the integrator. See the
+  [matching note](../notes/finish-player-cue_2026-10-30.md) and
+  [cleanup note](../notes/player-cue-cleanup_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches

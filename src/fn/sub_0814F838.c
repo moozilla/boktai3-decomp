@@ -1,14 +1,11 @@
-#include "global.h"
+#include "player_cue.h"
 
-void Script_Call(s32, s32);
-
-void ScriptActor_CallCompletionScript(u8 *p)
+void ScriptActor_CallCompletionScript(struct Player *p)
 {
-    u8 *slot = p + 0x5A4;
-    s32 v = *(s32 *)slot;
-
-    if (v != 0) {
-        *(s32 *)slot = 0;
-        Script_Call(v, 0);
+    u32 *slot = &PlayerCue_Messages(p)->completionScript;
+    u32 script = *slot;
+    if (script != 0) {
+        *slot = 0;
+        Script_Call(script, 0);
     }
 }

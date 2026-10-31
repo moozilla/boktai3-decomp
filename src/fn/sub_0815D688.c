@@ -1,15 +1,7 @@
-#include "global.h"
-
-struct P {
-    u8 f00[0x24];
-    u32 w24;
-    u8 f28[0x2F8 - 0x28];
-    u8 sub[1];
-};
-
-void SceneMessages_RegisterReceiver(u8 *, u32, s32);
-
-void Player_RegisterSceneMessageReceiver(struct P *p)
+#include "player_cue.h"
+void SceneMessages_RegisterReceiver(struct SceneEventReceiver *, u32, s32);
+void Player_RegisterSceneMessageReceiver(struct Player *p)
 {
-    SceneMessages_RegisterReceiver(p->sub, p->w24, 2);
+    SceneMessages_RegisterReceiver(&PlayerCue_Messages(p)->receiver,
+                                   PlayerCue_Messages(p)->receiverIdentifier, 2);
 }

@@ -5395,6 +5395,7 @@ addr,name,mode,confidence,source,notes
 08151EB8,PlayerCue_UpdateWalkTarget,thumb,low,src-alias,
 08152174,PlayerCue_UpdateMotionFade,thumb,low,src-alias,
 08152A5C,PlayerCue_UpdateRecoilSlide,thumb,low,src-alias,
+08152C3C,PlayerCue_UpdateAlternateFormChange,thumb,low,src-alias,confidence=low: changes alternate form while advancing its auxiliary display
 08153224,PlayerCue_UpdateFormChange,thumb,low,src-alias,
 08153610,PlayerCue_UpdateSpiralMotion,thumb,low,src-alias,
 081538DC,Player_RestartAnimationFromResource,thumb,low,src-alias,
@@ -5408,7 +5409,9 @@ addr,name,mode,confidence,source,notes
 08155008,PlayerCue_UpdateAlternateFade,thumb,low,src-alias,
 081556E0,Player_UpdateStateMotionCue,thumb,low,src-alias,
 081559A4,Player_UpdateTimedChargeAction,thumb,low,src-alias,
+08155D58,PlayerCue_UpdateTimedChargePulse,thumb,low,src-alias,confidence=low: timed held action with pulsing overlay and completion script
 081561A8,PlayerCue_UpdateStandDiagonalB,thumb,low,src-alias,Alternate diagonal standing callback that completes the cue after two animation completion checks
+081561EC,PlayerCue_UpdateTargetDash,thumb,low,src-alias,confidence=low: scripted alternate-position approach strike and return
 08156BBC,Player_GetInputDirection,thumb,low,src-alias,
 08156C1C,Player_UpdateDirectionHistory,thumb,low,src-alias,Shifts ten direction samples and records the current input direction adjusted by the actor direction offset
 08156C68,Player_StopMovementEffects,thumb,low,src-alias,Stops form dependent movement sounds and clears an active auxiliary effect; movement ownership is tentative
@@ -5502,6 +5505,9 @@ addr,name,mode,confidence,source,notes
 0815AAFC,ScriptActor_SetField4A2FromScript,thumb,low,src-alias,"via index i=Script_GetActorIndex(), sets the scripted actor's +0x4a2 flag byte to 1; purpose of the flag is unclear so named by offset"
 0815AC04,ScriptActor_TestFacingPointFromScript,thumb,low,src-alias,Tests a mode-12 script actor against a nearby point and two facing-angle windows.
 0815ACF4,ScriptActor_TestFlagBit20FromScript,thumb,low,src-alias,"via index i=Script_GetActorIndex(), tests fixed bit 0x100000 (bit 20) of the scripted actor's flags word at +0x20, right after the ""st"" state field; returns 1"
+0815AD24,Player_EnableStatGaugeFromScript,thumb,low,src-alias,
+0815AD3C,Player_EnableStatGaugeAndHistoryFromScript,thumb,low,src-alias,
+0815AD60,Player_RestrictActionRequestsFromScript,thumb,low,src-alias,
 0815AD78,Player_EnterKindTwo,thumb,low,src-alias,
 0815AE94,PlayerCue_OverlaySet,thumb,low,src-alias,"player cutscene cmds 48 (n) and 50: +0xAE4 = 1, +0xAD6 = n + 366 (cmd 50: 378)"
 0815AEAC,PlayerCue_OverlayOn,thumb,low,src-alias,"player cutscene cmd 47 (n): +0xAE4 = 2, +0xAD6 = n + 366"
@@ -5561,6 +5567,7 @@ addr,name,mode,confidence,source,notes
 0815C4FC,PlayerCue_StateMotion,thumb,low,src-alias,"player cutscene cmd 31: motion 0xD/0xE/0xF by state 3/4/5; returns 0 in states 0, 1, 6"
 0815C5A4,PlayerCue_ShakeEffect,thumb,low,src-alias,"player cutscene cmd 43: random offset by state, sub_082315A8(+0x5B8, 2, 3600) and sound 0x191/0x133 by +0x5B9; clears +0x530"
 0815C730,PlayerCue_Refresh,thumb,low,src-alias,player cutscene cmd 44: calls sub_0813D4E0
+0815C73C,Player_ConfigureAttachmentEffect,thumb,low,src-alias,
 0815C99C,PlayerCue_ReleaseControl,thumb,low,src-alias,Resets cue-related fields and restores state 1; tentatively returns the actor to normal control
 0815C9EC,ScriptActor_GetDirectionFromScript,thumb,low,src-alias,Reads option -d or returns -1 to preserve the current direction
 0815CA08,ScriptActor_GetCueOptionFromScript,thumb,low,src-alias,Reads shared cue option -e with default zero; its precise meaning remains tentative
@@ -5605,6 +5612,7 @@ addr,name,mode,confidence,source,notes
 0815D688,Player_RegisterSceneMessageReceiver,thumb,low,src-alias,Registers the embedded receiver with the player identifier and receiver kind 2
 0815D6A0,Player_UnregisterSceneMessageReceiver,thumb,low,src-alias,Passes the embedded scene message receiver to the removal helper
 0815D6B0,PlayerCue_Dispatch,thumb,low,src-alias,kind 2 (player) cutscene receiver: switch on the command byte (52 cases); acknowledges with sub_0814F858/sub_0814F874
+0815DBF4,Player_SendSceneMessage,thumb,low,src-alias,
 0815DC48,PlayerCue_InitCollider,thumb,low,src-alias,
 0815DD14,Player_OnStateOneEvent,thumb,low,src-alias,Event callback that adds four to the global counter at offset 0x600 when player state is 1
 0815DD3C,Player_ScaleLevelValue,thumb,low,src-alias,

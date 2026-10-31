@@ -1,8 +1,8 @@
-#include "global.h"
+#include "player.h"
 
-void Player_EmitQueuedEffects(u8 *);
+void Player_EmitQueuedEffects(struct Player *);
 
-void PlayerCue_Refresh(u8 *p)
+void PlayerCue_Refresh(struct Player *p)
 {
     Player_EmitQueuedEffects(p);
 }

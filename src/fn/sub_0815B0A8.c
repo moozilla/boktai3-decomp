@@ -1,47 +1,29 @@
-#include "global.h"
+#include "player_cue.h"
+#include "contact_position.h"
 
-struct Pos {
-    u32 x, y;
-};
+void Player_EnterKindTwo(struct Player *);
+void ActorSequence_Begin(struct Player *, s32, s32);
+void PlayerCue_UpdateWalkTarget(struct Player *);
+void PlayerCue_UpdateSideWalkTarget(struct Player *);
+void Player_AdvanceScriptDestination(struct Player *);
 
-struct P {
-    u8 filler[0x418];
-    u8 state;
-    u8 filler2[0x464 - 0x419];
-    u8 b464;
-    u8 b465;
-    u8 filler3[0x58C - 0x466];
-    void *fn;
-    struct Pos target;
-    u8 filler4[0x59D - 0x598];
-    u8 b59D;
-    u8 filler5[0x5A4 - 0x59E];
-    u32 c;
-};
-
-void Player_EnterKindTwo(struct P *);
-void ActorSequence_Begin(struct P *, s32, s32);
-void PlayerCue_UpdateWalkTarget(void);
-void PlayerCue_UpdateSideWalkTarget(void);
-void Player_AdvanceScriptDestination(void);
-
-void PlayerCue_WalkTo(struct P *p, struct Pos *pos, u32 c, s32 a)
+void PlayerCue_WalkTo(struct Player *p, const struct ContactPosition *pos, u32 c, s32 a)
 {
-    p->target = *pos;
-    p->c = c;
-    p->b59D = a;
-    if (p->state == 3) {
+    PlayerCue_Coordinates(p)->destination = *pos;
+    p->cueParameter = c;
+    p->targetFacing = a;
+    if (p->actionMode == 3) {
         if ((s8)a >= 0)
-            p->b59D = ((s8)a >> 1) * 2 + 1;
-        p->fn = PlayerCue_UpdateWalkTarget;
-    } else if (p->state == 4) {
-        p->fn = PlayerCue_UpdateSideWalkTarget;
-    } else if (p->state == 5) {
-        p->b464 = 1;
-        p->b465 = 1;
-        p->fn = Player_AdvanceScriptDestination;
+            p->targetFacing = ((s8)a >> 1) * 2 + 1;
+        p->triggerAnimationCallback = PlayerCue_UpdateWalkTarget;
+    } else if (p->actionMode == 4) {
+        p->triggerAnimationCallback = PlayerCue_UpdateSideWalkTarget;
+    } else if (p->actionMode == 5) {
+        p->actionLatch464 = 1;
+        p->actionLatch465 = 1;
+        p->triggerAnimationCallback = Player_AdvanceScriptDestination;
     } else {
-        p->fn = Player_AdvanceScriptDestination;
+        p->triggerAnimationCallback = Player_AdvanceScriptDestination;
     }
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 1, 0);
