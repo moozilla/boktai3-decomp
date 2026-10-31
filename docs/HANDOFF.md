@@ -40,7 +40,7 @@ progress by exact matches and removed concessions, not by fuzzy scores. Blind sp
 sweeps don't count. When an approach stops paying, change the approach or the tool,
 not just the function.
 
-## Where things stand (2026-10-30)
+## Where things stand (2026-10-31)
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -58,10 +58,12 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
-* **Effects and presentation worker pass** (2026-10-30): ordinary C now covers
-  the recovered HUD routines, part-contact damage handling and homing manager,
-  alongside the particle, arc, fade and sun-disc matches. Remaining drafts retain
-  stock assembly fallbacks and documented compiler/source gaps. The branch
+* **Effects and presentation continuation** (2026-10-31): additional ordinary-C
+  matches cover particle groups, directional and anchored spawning, bounce updates,
+  palette preparation, projectile creation, both fragment updates and scatter clipping.
+  Active workers continue through every remaining target, then will audit register
+  pins, shared records/data and Studio integration. Remaining drafts retain stock
+  assembly fallbacks and documented compiler/source gaps. The branch
   `codex/finish-effects` has per-unit validation; combined ROM validation and
   progress reports remain for integration. See the
   [effects note](../notes/finish-effects_2026-10-30.md).
