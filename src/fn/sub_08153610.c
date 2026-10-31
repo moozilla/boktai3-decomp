@@ -53,9 +53,20 @@ void Player_UpdateFacingSide(struct PlayerCueSpiral *);
 u32 Player_SetAnimation(struct PlayerCueSpiral *, u32, u32, u32);
 void SpiralTrail_CreateWithParticles(struct PlayerCueSpiral *, s32, void *, s32, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 89.1%
-// scope shape 5 (differences once low registers are set aside)
+static inline void PlayerCue_AdvanceSpiralCounters(struct PlayerCueSpiral *p, u16 trailLimit,
+                                                   u16 timerLimit)
+{
+    if ((p->trailExtent += 3) > trailLimit)
+        p->trailExtent = trailLimit;
+    if (++p->timer > timerLimit) {
+        p->actionLatch464 = 1;
+        p->actionLatch465 = 1;
+        Player_UpdateFacingSide(p);
+        PlayerCue_EnterStandUpdate(p);
+        p->pendingAnimationTrigger = 1;
+    }
+}
+
 void PlayerCue_UpdateSpiralMotion(struct PlayerCueSpiral *p)
 {
     if (p->timer == 0) {
@@ -100,25 +111,5 @@ void PlayerCue_UpdateSpiralMotion(struct PlayerCueSpiral *p)
         u32 resource = 0x2DD;
         *destination = resource;
     }
-    {
-        u32 value = p->trailExtent + 3;
-        u16 counterMask;
-        u32 timer;
-        p->trailExtent = value;
-        counterMask = 0xFFFF;
-        if ((u16)(value & counterMask) > 32)
-            p->trailExtent = 32;
-        timer = p->timer + 1;
-        p->timer = timer;
-        if ((timer & counterMask) > 31) {
-            p->actionLatch464 = 1;
-            p->actionLatch465 = 1;
-            Player_UpdateFacingSide(p);
-            PlayerCue_EnterStandUpdate(p);
-            p->pendingAnimationTrigger = 1;
-        }
-    }
+    PlayerCue_AdvanceSpiralCounters(p, 32, 31);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralMotion);
-#endif
