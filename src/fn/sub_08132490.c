@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_actor_damage_visibility.h"
 #include "scene_actor_reaction.h"
+#include "scene_actor_palette.h"
 #include "area_effect_link.h"
 #include "render.h"
 #include "runtime.h"
@@ -59,17 +60,18 @@ static inline void Fill(u32 *zero, void *dst)
 }
 void SceneActorReaction_ApplyCategoryDamage(struct SceneActorRegistryResetView *actor)
 {
-    u8 *collider = (u8 *)&actor->colliderA;
+    struct ContactCollider *collider = &actor->colliderA;
     {
         u32 damage = actor->reactionSoundVariant;
         actor->health -= damage;
     }
     if (!(actor->field2D8 & 0x20000)) {
-        u16 bank = *(u16 *)((u8 *)actor + 0x1E2);
+        u16 bank = actor->paletteAlternateBank;
         if (actor->drawableKind == 0)
             AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
         else
-            *(u8 **)((u8 *)actor->drawable + 0x68) = gPaletteBankData + bank * 32;
+            ((struct SceneActorPaletteTileView *)actor->drawable)->palette =
+                (const u16 *)(gPaletteBankData + bank * 32);
         {
             u32 eight = 8;
             actor->field1E8 = eight;
@@ -82,9 +84,9 @@ void SceneActorReaction_ApplyCategoryDamage(struct SceneActorRegistryResetView *
             u32 zero;
             u32 buffer[2];
             s32 health = actor->health;
-            u32 max = *(u16 *)((u8 *)actor + 0xB0);
-            s32 kind = *(s16 *)((u8 *)actor + 0xB2);
-            s32 param = *(s16 *)((u8 *)actor + 0x9A);
+            u32 max = (u16)actor->defaultHealth;
+            s32 kind = (s16)actor->fieldB2;
+            s32 param = (s16)actor->field9A;
             SceneHud_SetTimedState(actor->body.id, health, max, kind, 0, param);
             Fill(&zero, buffer);
             if (actor->reactionSoundVariant || !(actor->field2D8 & 0x20000))
@@ -108,10 +110,10 @@ void SceneActorReaction_ApplyCategoryDamage(struct SceneActorRegistryResetView *
         *flags = mask & *flags;
     }
     if (actor->health <= 0) {
-        *(u16 *)(collider + 0x44) = 0;
+        collider->responseValue = 0;
         Hide(actor);
         {
-            void *control = *(void **)((u8 *)actor + 0x234);
+            void *control = actor->deathControl;
             Reaction_SetControl(actor, 17, control);
         }
         {
