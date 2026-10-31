@@ -58,6 +58,12 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+* **Player cue worker batch prepared** (2026-10-30): seven assigned callbacks
+  now match without concessions on `codex/finish-player-cue`, with shared sequence
+  stepping and typed movement/animation records. The guarded drafts at 0814FC80
+  and 08153610 retain precise jump-threading and reload-copy blockers. Per-unit
+  stock checks pass; combined ROM validation and report regeneration are left to
+  the integrator. See [the worker note](../notes/finish-player-cue_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches
