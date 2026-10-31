@@ -470,6 +470,7 @@ addr,name,mode,confidence,source,notes
 080154D0,AnimatedParticle_PriorityFromFlags,thumb,low,src-alias,
 080154EC,AnimatedParticles_Create,thumb,low,src-alias,
 08015984,AnimatedParticles_EmitRing,thumb,low,src-alias,
+08015A0C,AnimatedParticles_EmitRandomBurst,thumb,low,src-alias,
 08015B84,AnimatedParticles_EmitChargeSparkle,thumb,low,src-alias,Wraps AnimatedParticles_Create with fixed yellow/white sparkle parameters; used by Transformation_Charge and related charge-up effects
 08015BD4,AnimatedParticles_EmitDirectional,thumb,low,src-alias,
 08015C30,AnimatedParticles_EmitBurst,thumb,low,src-alias,
