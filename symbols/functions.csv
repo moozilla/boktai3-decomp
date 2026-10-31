@@ -470,6 +470,7 @@ addr,name,mode,confidence,source,notes
 080154D0,AnimatedParticle_PriorityFromFlags,thumb,low,src-alias,
 080154EC,AnimatedParticles_Create,thumb,low,src-alias,
 08015984,AnimatedParticles_EmitRing,thumb,low,src-alias,
+08015A0C,AnimatedParticles_EmitRandomBurst,thumb,low,src-alias,
 08015B84,AnimatedParticles_EmitChargeSparkle,thumb,low,src-alias,Wraps AnimatedParticles_Create with fixed yellow/white sparkle parameters; used by Transformation_Charge and related charge-up effects
 08015BD4,AnimatedParticles_EmitDirectional,thumb,low,src-alias,
 08015C30,AnimatedParticles_EmitBurst,thumb,low,src-alias,
@@ -4892,6 +4893,7 @@ addr,name,mode,confidence,source,notes
 0812993C,BlinkingSprite_UpdateExpiry,thumb,low,src-alias,
 081299F8,SunDiscSprite_Update,thumb,low,src-alias,
 08129B04,SunDiscEffect_Update,thumb,low,src-alias,
+08129C64,SunDiscPool_UpdateTravellingDisc,thumb,low,src-alias,
 08129FF0,SunDiscPool_UpdateFallingDisc,thumb,low,src-alias,
 0812A24C,EffectPoolA_AllocateSlot,thumb,low,src-alias,
 0812A2AC,SunDiscPool_AllocSprite,thumb,low,src-alias,Wraps the slot allocator and returns the allocated record's leading sprite field
@@ -6100,8 +6102,12 @@ addr,name,mode,confidence,source,notes
 081744AC,Presentation_ApplyGraphicSettings,thumb,low,src-alias,
 08174578,Presentation_ApplyPackedGraphicData,thumb,low,src-alias,
 08174594,Presentation_SelectGraphicResource,thumb,low,src-alias,
-081745DC,SceneHud_RefreshEquipmentPreview,thumb,low,src-alias,Refreshes the selected equipment graphic and message-window setup; its 168-byte routine is exact; but the 732-byte inventory extent includes another routine at 08174684.
+081745DC,SceneHud_RefreshEquipmentPreview,thumb,low,src-alias,Refreshes the selected equipment graphic and message-window setup
+08174684,SceneHud_RefreshEquipmentValues,thumb,low,src-alias,Tentative: redraw equipment values and highlight a changed slot-zero value
 081748B8,InventoryGrid_GetSlotPosition,thumb,low,src-alias,
+08174930,SceneHud_RefreshEquipmentAvailability,thumb,low,src-alias,Tentative: refresh equipment icons and level-availability palettes
+08174A44,SceneHud_ConfigureEquipmentTransfer,thumb,low,src-alias,Tentative: configure an equipment icon transfer between grid slots
+08174AD8,SceneHud_GetEquipmentActionFlags,thumb,low,src-alias,Tentative: compute equipped-slot and action-category availability bits
 08174B8C,Presentation_DrawEntryCount,thumb,low,src-alias,
 08174BBC,Presentation_SetAmountGlyphRows,thumb,low,src-alias,Shows and positions three rows of three amount glyphs; then redraws the entry count.
 08174C2C,InventoryGrid_UpdateStatPreview,thumb,low,src-alias,
@@ -6682,6 +6688,7 @@ addr,name,mode,confidence,source,notes
 081937F8,Nidhoggr_UnregisterTerrainCells,thumb,low,src-alias,Removes both terrain registrations when active and clears their active flag
 0819382C,Nidhoggr_SetTerrainCellFlag40,thumb,low,src-alias,Sets flag 0x40 on both terrain registrations with its gameplay meaning still tentative
 0819384C,Nidhoggr_EmitSparks,thumb,low,src-alias,Calls the spark particle emitter with a fixed spread and emission parameters
+08193874,Nidhoggr_ReceivePartContact,thumb,low,src-alias,Tentative: receive part contact and update grouped damage response
 08193D34,Nidhoggr_ApplyPartDamage,thumb,low,src-alias,
 081940F8,Nidhoggr_InitParts,thumb,low,src-alias,Initializes 26 Nidhoggr part animations; paired colliders and target records; then configures collider groups and a time-dependent palette.
 08194480,Nidhoggr_DestroyParts,thumb,low,src-alias,Removes all 26 part animations and colliders and releases their auxiliary records

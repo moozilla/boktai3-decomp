@@ -4,27 +4,28 @@
 #include "engine.h"
 #include "ram.h"
 
-static inline u16 Particles_NextRandom(void)
+static inline u16 Particles_NextRandom(u32 *indexAddress, const u16 *table, u32 limit)
 {
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gRandomTable[gRandomIndex];
+    *indexAddress = (*indexAddress + 1) & limit;
+    return table[*indexAddress];
 }
-#ifdef NONMATCHING
-// fuzzy: 64.0%
-// scope shape 22 (differences once low registers are set aside)
-// scope shape 38 (differences once low registers are set aside)
-void sub_08015A0C(struct SceneVec *base, struct SceneVec *mask, s32 yaw, s32 yawRange, s32 count,
-                  s32 type, s32 flags, s32 speed, s16 horizontal, s32 start, s32 decay)
+void AnimatedParticles_EmitRandomBurst(struct SceneVec *base, struct SceneVec *mask, s32 yaw,
+                                       s32 yawRange, s32 count, s32 type, s32 flags, s32 speed,
+                                       s32 horizontal, s32 start, s32 decay)
 {
     struct AnimatedParticleConfig config;
     struct SceneVec pos;
-    s32 i;
+    s32 remaining;
+    u32 *indexAddress;
+    u32 limit;
+    const u16 *table;
+    s16 horizontalValue = horizontal;
     config.type = type;
     config.flags = flags;
     config.speed = speed;
     config.vertical = 0;
     config.verticalRange = 0;
-    config.horizontal = horizontal;
+    config.horizontal = horizontalValue;
     config.horizontalRange = 0;
     config.pitch = 0;
     config.pitchRange = 0;
@@ -38,13 +39,17 @@ void sub_08015A0C(struct SceneVec *base, struct SceneVec *mask, s32 yaw, s32 yaw
     config.horizontalStartRange = 0;
     config.horizontalDecay = decay;
     config.horizontalDecayRange = 0;
-    for (i = count; i > 0; i--) {
-        pos.x = (Particles_NextRandom() & mask->x) + base->x;
-        pos.y = (Particles_NextRandom() & mask->y) + base->y;
-        pos.z = (Particles_NextRandom() & mask->z) + base->z;
-        AnimatedParticles_Create(1, &pos, &config);
+    if (count > 0) {
+        indexAddress = &gRandomIndex;
+        limit = 1023;
+        remaining = count;
+        do {
+            table = gRandomTable;
+            pos.x = (Particles_NextRandom(indexAddress, table, limit) & mask->x) + base->x;
+            pos.y = (Particles_NextRandom(indexAddress, table, limit) & mask->y) + base->y;
+            pos.z = (Particles_NextRandom(indexAddress, table, limit) & mask->z) + base->z;
+            AnimatedParticles_Create(1, &pos, &config);
+            table = 0;
+        } while (--remaining);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08015A0C);
-#endif

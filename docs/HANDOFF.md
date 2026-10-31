@@ -40,7 +40,7 @@ progress by exact matches and removed concessions, not by fuzzy scores. Blind sp
 sweeps don't count. When an approach stops paying, change the approach or the tool,
 not just the function.
 
-## Where things stand (2026-10-30)
+## Where things stand (2026-10-31)
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -58,6 +58,7 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 * **Player cue worker batch and cleanup prepared** (2026-10-30): the assigned
@@ -97,6 +98,18 @@ Recent:
   ROM validation and progress regeneration remain for integration. See the
   [finish-player note](../notes/finish-player_2026-10-30.md).
 >>>>>>> codex/finish-player
+=======
+* **Effects and presentation continuation** (2026-10-31): additional ordinary-C
+  matches cover particle groups, directional and anchored spawning, bounce updates,
+  palette preparation, projectile creation, both fragment updates and scatter clipping.
+  Work is checkpointed at the user's quota floor; resume remaining targets before
+  the register-pin, shared records/data and Studio audit. Ground scatter's improved
+  guarded C has four differing bytes and earns no exact credit. Remaining drafts retain stock
+  assembly fallbacks and documented compiler/source gaps. The branch
+  `codex/finish-effects` has per-unit validation; combined ROM validation and
+  progress reports remain for integration. See the
+  [effects note](../notes/finish-effects_2026-10-30.md).
+>>>>>>> codex/finish-effects
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches
