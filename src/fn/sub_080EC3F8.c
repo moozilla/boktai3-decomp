@@ -24,7 +24,7 @@ void Memory_Clear(void *, u32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 u8 sub_0807F81C(void *);
 
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 void SceneActorScript_OnCommand(void);
@@ -215,7 +215,7 @@ s32 Octopus_Init(void *object)
     SceneActorCollision_InitCompactBody(actor);
     MonsterInit_InstallSequenceCallbacks(actor, Octopus_Update, 0, 0, 0, 0, 0, 0,
                                          Octopus_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
-                                         0, sub_081363F4,
+                                         0, SceneActorReaction_ResolvePlacementDamage,
                                          SceneActorControl_BeginSoundTransition_080EBC38);
     MonsterInit_InitializeGroup(group, 0, 0, 0, 0, 0, 0, 1);
     OctopusInit_InstallRoutes(actor);

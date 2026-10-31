@@ -5032,6 +5032,7 @@ addr,name,mode,confidence,source,notes
 08135D74,SceneActorReaction_TryBeginControl29,thumb,low,src-alias,
 08135F38,SceneActor_ClearReactionFlags,thumb,low,src-alias,
 08135F70,SceneActorReaction_ResolveDamage,thumb,low,src-alias,
+081363F4,SceneActorReaction_ResolvePlacementDamage,thumb,low,src-alias,Tentative: applies pending placement damage; updates HUD and dispatches the resulting state
 081369C8,SceneActorPlacement_ResetStateThree,thumb,low,src-alias,
 08136AF0,SceneActorPlacement_PlayResponseAndResetState,thumb,low,src-alias,
 08136C4C,SceneActorScript_ApplyRouteStartCommand,thumb,low,src-alias,Starts the actor route from three command arguments when its signed active field is positive

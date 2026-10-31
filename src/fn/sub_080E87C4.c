@@ -30,7 +30,7 @@ void Memory_Clear(void *, u32);
 void SceneActorReaction_OnEnemyDefault(void);
 u8 sub_0807F81C(void *);
 void SceneActorTarget_ResolvePendingObject(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 void SceneActorScript_OnCommand(void);
@@ -226,7 +226,7 @@ s32 Mimic_Init(void *object)
         actor, Mimic_UpdateBehavior, 0, 0, SceneActor_EnterFlaggedEntryPhase,
         Mimic_OnAnimationStateChanged, 0, Mimic_ConvergeAndTurn, Mimic_UpdateDefeatBlink,
         SceneActorReaction_OnEnemyDefault, SceneActor_AcquireCollisionTarget,
-        SceneActorTarget_ResolvePendingObject, sub_081363F4, Mimic_StartHitReaction);
+        SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage, Mimic_StartHitReaction);
     MonsterInit_InitializeGroupWithBounds(group, (u8 *)arg0 + 0x624, (u8 *)arg0 + 0x648, 0, 0,
                                           Mimic_OnBehaviorComplete, 0, 1, body);
     MimicInit_InstallRoutes(actor);

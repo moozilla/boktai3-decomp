@@ -22,7 +22,7 @@ void Ghoul_UpdateHiddenRecovery(void);
 void SceneActorReaction_OnEnemyDefault(void);
 u8 sub_0807F81C(void *);
 void SceneActorTarget_ResolvePendingObject(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void Ghoul_UpdateDyingState(void);
 void Bat_ResumeSavedTarget(void);
@@ -141,7 +141,7 @@ s32 Ghoul_Init(void *object)
         actor, Ghoul_Update, Bat_LookupAnimationEntry, Ghoul_TurnTowardRoute, Ghoul_UpdateIdleState,
         Ghoul_UpdateStandingState, Ghoul_UpdateHiddenRecovery, sub_08087A70, Bat_UpdateDefeat,
         SceneActorReaction_OnEnemyDefault, sub_0807F81C, SceneActorTarget_ResolvePendingObject,
-        sub_081363F4, SceneActorPlacement_ResetStateThree);
+        SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(group, (u8 *)arg0 + 0x64C, (u8 *)arg0 + 0x670,
                                           Ghoul_UpdateDyingState, Bat_ResumeSavedTarget,
                                           SceneActorReaction_BeginTargetRecovery,

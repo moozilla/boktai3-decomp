@@ -41,7 +41,7 @@ void Memory_Clear(void *, u32);
 void SceneActorReaction_OnEnemyDefault(void);
 u8 sub_0807F81C(void *);
 void SceneActorReaction_SinkAndRemove(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 void SceneActorScript_OnCommand(void);
@@ -200,7 +200,7 @@ s32 Axe_Init(void *object)
                            Axe_OnAnimationReset, sub_080F93A4, 0, Axe_ConvergeRecoveryMotion,
                            Axe_UpdateDefeat, SceneActorReaction_OnEnemyDefault,
                            SceneActorControl_CanAdvanceHover, SceneActorTarget_ResolvePendingObject,
-                           sub_081363F4, SceneActorControl_AdvanceReactionCount);
+                           SceneActorReaction_ResolvePlacementDamage, SceneActorControl_AdvanceReactionCount);
     MonsterInit_InitializeGroup(group, (u8 *)arg0 + 0xED8, (u8 *)arg0 + 0xEFC, 0, 0, 0, 0, 1);
     AxeInit_InstallRoutes(actor);
     group->responseCallback = 0;

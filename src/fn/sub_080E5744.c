@@ -82,7 +82,7 @@ void sub_0808170C(void);
 void sub_080DE6E0(void);
 void sub_080DFC34(void);
 void sub_080E0750(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 struct ResourceCopy {
     u32 words[8];
 };
@@ -260,7 +260,7 @@ static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
     PTR(a, 0x250) = (void *)gUnk_086108B0;
     PTR(a, 0x26C) = (void *)Dog_ResolvePendingObject;
     PTR(a, 0x238) = (void *)SceneActorReaction_SinkAndRemove;
-    PTR(a, 0x264) = (void *)sub_081363F4;
+    PTR(a, 0x264) = (void *)SceneActorReaction_ResolvePlacementDamage;
     PTR(a, 0x268) = (void *)SceneActorPlacement_ResetStateThree;
     PTR(a, 0x248) = 0;
     PTR(a, 0x240) = 0;
