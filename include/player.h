@@ -352,6 +352,9 @@ struct Player {
     void *updateCallback;          /* 0xCA4: called with the player each update */
 };
 
+/* 0x02000560 */
+extern u32 gPlayerSlotStatus[4]; /* one status word per player, cleared with the player slots */
+/* 0x02000580 */
 extern struct Player *gPlayers[4];
 
 #endif

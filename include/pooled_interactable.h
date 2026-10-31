@@ -58,6 +58,7 @@ struct PooledInteractableManager {
     struct PooledResource resources[3];
 };
 
+/* 0x02000034 */
 extern struct PooledInteractableManager *gPooledInteractableManager;
 extern u16 gUnk_086049C8[];
 extern u16 gUnk_086049CE[][2];

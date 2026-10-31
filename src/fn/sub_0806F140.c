@@ -1,5 +1,4 @@
 #include "player.h"
-extern u32 gUnk_02000560[4];
 struct Player *SceneActorQuery_FindPlayerInBounds(const struct SceneVec *center,
                                                   const struct SceneVec *radius, s32 slot)
 {
@@ -8,7 +7,7 @@ struct Player *SceneActorQuery_FindPlayerInBounds(const struct SceneVec *center,
         goto absent;
     {
         u32 mask = 8;
-        u32 *flags = &gUnk_02000560[slot];
+        u32 *flags = &gPlayerSlotStatus[slot];
         if (*flags & mask)
             goto absent;
     }

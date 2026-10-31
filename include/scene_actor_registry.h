@@ -149,7 +149,9 @@ struct SceneActorRegistryManager {
     u8 unknown64[0x21C];
     u32 subsystem[2];
 };
+/* 0x020004A8 */
 extern struct SceneActorRegistryManager *gSceneActorRegistryManager;
+/* 0x020004AC */
 extern struct SceneActorRegistryNode *gSceneActorRegistryNode;
 void sub_08070FA8(struct SceneActorRegistryManager *);
 void SceneActorRegistry_DestroyActors(void);

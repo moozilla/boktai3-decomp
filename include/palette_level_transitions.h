@@ -17,6 +17,7 @@ struct PaletteLevels {
     s8 current[4], target[4]; /* 0x2C, 0x30: 0..15 */
 };
 
+/* 0x02000070 */
 extern struct PaletteLevels *gPaletteLevels;
 
 void PaletteLevels_Increase(struct PaletteLevels *p);

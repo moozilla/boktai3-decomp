@@ -160,6 +160,7 @@ struct GameState {
     s16 unk894;
 };
 
+/* 0x02000710 */
 extern struct GameState *gGameState;
 
 /* Backup of gGameState, and the active/backup pair of the shared

@@ -44,6 +44,7 @@ struct StackedActor {
     u16 unknown380, frame;
     void (*update)(struct StackedActor *);
 };
+/* 0x02000118 */
 extern struct StackedActor *gStackedActor;
 void StackedActor_SetUpdate(struct StackedActor *, void (*)(struct StackedActor *));
 void StackedActor_UpdateSegments(struct StackedActor *);

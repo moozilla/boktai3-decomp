@@ -30,6 +30,7 @@ struct DisplayTrackManager {
     u8 capacity, count, unknown1A[2];
     struct DisplayTrack entries[1];
 };
+/* 0x02000494 */
 extern struct DisplayTrackManager *gDisplayTrackManager;
 struct DisplayTrack *DisplayTrack_FindFromScript(void);
 void DisplayTrack_Update(struct DisplayTrack *);

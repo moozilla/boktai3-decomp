@@ -28,7 +28,7 @@ extern u16
 /* 0x0300172A */
 extern u16 gSerialActiveSendWord; /* Current multiplayer send word, with protocol status bits */
 /* 0x03001738 */
-extern u8 gRfuApiBuffer[]; /* RFU API workspace passed to rfu_initializeAPI with size 0xE64 */
+extern u8 gRfuApiBuffer[0xE64]; /* RFU API workspace passed to rfu_initializeAPI with size 0xE64 */
 /* 0x03003A14 */
 extern u8 gRfuIrqSlots
     []; /* Interior view of interrupt dispatch table entry 1, passed as RFU handler slots; not an independent allocation */

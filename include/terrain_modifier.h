@@ -33,6 +33,7 @@ struct TerrainScriptVec {
     u32 z : 16;
 };
 
+/* 0x02000028 */
 extern struct TerrainModifierManager *gTerrainModifierManager;
 
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);

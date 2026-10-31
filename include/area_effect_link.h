@@ -74,6 +74,7 @@ struct AreaEffectLinkState {
     u8 unknown260[0x80];
     u32 positionScript; /* 0x2E0 */
 };
+/* 0x020004B4 */
 extern struct AreaEffectLinkState *gLinkSession;
 extern struct AreaEffectPlayer *gPlayers[4];
 #endif

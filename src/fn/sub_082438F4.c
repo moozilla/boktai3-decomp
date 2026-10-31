@@ -7,7 +7,6 @@ struct LinkRef {
     s16 bit;
 };
 extern struct LinkRef *gLinkSession;
-extern u32 gUnk_02000560[];
 void Player_ResetActionState(struct Player *);
 s32 Player_ApplyTerrainDamage(struct Player *);
 void LinkPlayer_ResetToIdleState(struct Player *);
@@ -41,7 +40,7 @@ s32 Player_UpdateLinkCore(struct Player *p)
     }
     Callback_InvokeActor(p, p->updateCallback);
     sub_0823A2E4(p);
-    gUnk_02000560[p->slot] = p->kind;
+    gPlayerSlotStatus[p->slot] = p->kind;
     if (p->slot == LocalPlayer()) {
         *(u16 *)((u8 *)gGameState + 0x30) = p->position.x;
         *(u16 *)((u8 *)gGameState + 0x32) = p->position.y;

@@ -25,5 +25,6 @@ struct TransientSpriteEffects {
     u8 task[0x18];
     struct TransientSpriteEffect slots[16];
 };
+/* 0x020000A0 */
 extern struct TransientSpriteEffects *gTransientSpriteEffects;
 #endif

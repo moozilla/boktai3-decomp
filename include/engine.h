@@ -31,7 +31,7 @@ struct Task {
 #include "engine_map.h"
 
 #include "ram.h"
-extern const s16 gUnk_086149C4[];         /* sine table (guess) */
+extern const s16 gUnk_086149C4[];         /* 256-step Q12 sine plus a 64-step cosine extension */
 
 /* ---- Tasks and memory -------------------------------------------------- */
 

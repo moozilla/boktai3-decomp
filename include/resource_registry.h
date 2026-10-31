@@ -11,6 +11,7 @@ struct ResourceRegistryEntry {
     u8 unk3;
     void *data;
 };
+/* 0x0203B000 */
 extern struct ResourceRegistryEntry gResourceRegistryEntries[32];
 
 #define RESOURCE_REGISTRY_ENTRIES_ADDR 0x0203B000 /* gResourceRegistryEntries */

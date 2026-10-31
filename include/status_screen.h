@@ -92,6 +92,7 @@ extern const u16 gUnk_08604B3C[]; // default phase durations
 void Bg_SetPriority(u32, s32);
 void Bg_SetupLayer(u32, u32, void *, s32, s32, s32, s32, void *);
 void *Video_GetBackgroundMap(u32);
+/* 0x02000044 */
 extern struct StatusScreen *gStatusScreen; // the live status screen, or NULL
 
 #endif

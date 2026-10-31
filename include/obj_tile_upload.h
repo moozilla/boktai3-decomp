@@ -14,6 +14,7 @@ struct ObjTileUploadRequest {
         } rows;
     } transfer;
 };
+/* 0x02039000 */
 extern struct ObjTileUploadRequest gObjTileUploadRequests[];
 
 #endif

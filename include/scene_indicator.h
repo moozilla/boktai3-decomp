@@ -58,6 +58,7 @@ struct SceneActor {
     s16 y;
 };
 
+/* 0x0200004C */
 extern struct SceneIndicators *gSceneIndicators;
 extern struct SceneActor *gPlayers;
 
