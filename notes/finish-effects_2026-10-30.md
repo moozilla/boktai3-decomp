@@ -21,7 +21,7 @@ The first pass and ongoing continuation on `codex/finish-effects` have matched t
 | 08128268 | `FragmentBurst_UpdateRadialAnimation` | 632 | Exact | Sequence setup captures actual resource and mirror outputs before returning the base, deferring its reduction to pass two. Shared position and animation records replace local duplicates. |
 | 08128554 | `FragmentBurst_UpdateImpactAnimation` | 536 | Exact | Animation/origin output capture fixes setup order; a native whole-byte control snapshot prevents the dying-input ties. |
 | 08128D24 | `FeatherEffectPool_ClipScatterPath` | 628 | Exact | The incoming cell cursor becomes the random-table cursor after clipping; its earlier nonconstant phase restores table/mask allocation. |
-| 08128F98 | `FeatherEffectPool_SpawnGroundScatter` | 828 | Draft | Addressable packed constructor settings recover branch-local argument constants; preheader ordering and two random-sample operand pairs remain. |
+| 08128F98 | `FeatherEffectPool_SpawnGroundScatter` | 828 | Draft | Addressable packed constructor settings and the compiler-reversed ascending loop recover the full shape; four register-related bytes remain, 99.0%. |
 | 08129C64 | `SunDiscPool_UpdateTravellingDisc` | 908 | Exact | Shared records, cached sprite view, vector operand order and inline parameter/capture order. |
 | 08129FF0 | `SunDiscPool_UpdateFallingDisc` | 604 | Exact | Canonical playback, signed coordinate views, cached sprite owner and terrain conversion boundaries. |
 | 0812A928 | `LinkedEffect_SetVariant` | 228 | Open | Real component/operand phases recover every instruction; the table still loses allocation priority to the count and mask. |
@@ -55,7 +55,7 @@ Continuation evidence is under `build/scope/campaign/resume_ADDRESS/REPORT.md` a
 
 Tags: #effects #scope-gap #compiler
 
-This note records production scores from landed source; search candidates can score differently when unrelated guarded neighbors compile. Ground scatter is 82.7%, Nidhoggr initialization 99.1%, message queue 97.0% and timed effects 86.5%. Fuzzy figures earn no exact credit. Arc movement's former draft has since been replaced by an exact match.
+This note records production scores from landed source; search candidates can score differently when unrelated guarded neighbors compile. Ground scatter is 99.0%, Nidhoggr initialization 99.1%, message queue 97.0% and timed effects 86.5%. Fuzzy figures earn no exact credit. Arc movement's former draft has since been replaced by an exact match.
 
 The linked-effect variant, impact-pair spawner and orbit manager retain their existing drafts because their ordinary alternatives did not justify replacement. They still have persistent hypothesis graphs and compiler evidence. The message queue retains one guarded 804-byte extent: its two recovered trailing routines are not registered separately while the span is nonmatching. The HUD exact spans register 08174684, 08174A44 and 08174AD8; independent checks still cover the original 732/604 bytes.
 
@@ -74,7 +74,7 @@ Tags: #compiler #scope-gap #effects
 The following counterfactuals are diagnostic evidence. Exact credit always uses production bytes with every knob absent. Pseudo/UID numbers refer to the preserved campaign candidate, not an arbitrary later spelling.
 
 - `0806A160`: suppressing table `REG_EQUIV` for pseudo36 alone gives exact 704 bytes in the earlier witness. A real pool-handle/table union now preserves the table stack home in ordinary C; its loop body agrees after the first sample. Reusing the incoming position parameter for pool setup also recovers the first load and complete loop body, but moves the origin capture and pool stores. The remaining boundary is pool capture and initial reload selection.
-- `08128F98`: the continuation recovers the packed coordinate operations and terrain mask. A real addressable packed constructor configuration delays field folding until CSE2, restoring branch-local one/zero constants and every constructor instruction. Count/cursor setup order and two random-sample operand pairs remain under active investigation.
+- `08128F98`: the continuation recovers the packed coordinate operations and terrain mask. A real addressable packed constructor configuration delays field folding until CSE2, restoring branch-local one/zero constants and every constructor instruction. The ascending `for (i = 0; i < count; ++i)` loop is reversed by loop.c after invariant motion, restoring count/cursor setup naturally. The four remaining differences are the initial RNG-address load/copy and second sample/mask destinations. `AGBCC_FORCE=209:1` plus `AGBCC_SPILL=7:1` jointly match the preserved witness, diagnostically only. The improved source is committed behind its original fallback; it earns no exact credit.
 - `0812A928`: real sine/mask/sample operand phases and a reused Z component recover all 228 bytes of instruction structure. The table's seven references yield priority 933, below count/mask at 985; a diagnostic priority increase alone matches. A readonly one-pointer bank raises table priority naturally and recovers the body, but initializes its literal too late. No diagnostic setting is accepted as production evidence.
 - `081940F8`: a private CSE fold restriction on 26328+84 and 24144+84 proved the collider offset boundary. Field-derived relative offsets reproduce it in ordinary C. A literal-bound witness plus `AGBCC_FORCE=flags#2:8` leaves only the missing zero and padding; a real named lower bound recovers 904-byte size and all allocation but moves zero to the preheader and uses a register comparison. The two-instruction guarded gap is genuine.
 - `0819946C`: three 268-byte routines have only twelve ip/r8 choices left. Packet pointer priority 153 loses to retained argument 183; `AGBCC_PRI=199:+31,201:+31` gives exact 804 bytes. A byte conversion used in the final type payload prevents an earlier zero sink. Canonical literal types instead emit 792 bytes. No hidden-start registration is counted yet.
@@ -97,3 +97,51 @@ Tags: #matching #effects #presentation #cleanup
 The continuation added nine stock exact spans, +0.236 percentage points (+5,680 bytes), without concessions. Register/mode and real storage boundaries resolved all nine earlier diagnostic gaps: 080148CC, 08047DF4, 08068500, 0806AF74, 08111578, 08127590, 08128268, 08128554 and 08128D24. Each was landed separately, verified with the stock production compiler/relocator, and checked independently across its complete reviewed extent. The radial fragment update also adopts shared ContactPosition and DisplaySequenceState layouts. Broader pin removal, shared data/layout unification and Studio cleanup remain after matching is finished.
 
 A stale scope symbol cache initially missed the renamed Nidhoggr callback after the requested tooling cherry-pick. Rebuilding only the local cache resolves it; no combined build or production compiler edit is needed. The cache key currently omits the checker and function-name inventory, a tooling follow-up for integration.
+
+## Quota checkpoint and resume
+
+Tags: #effects #handoff #matching #cleanup
+
+The user requested wrapping up with at least 20% weekly quota remaining. Workers
+stopped at their current functions; no new targets were started for the wrap-up.
+This is a checkpoint, not completion of the request to match every target.
+Fourteen original spans remain nonmatching. The later register-pin audit,
+shared struct/data unification and Studio cleanup are still pending; the radial
+fragment shared-record migration is already committed.
+
+The latest code checkpoint is `5a977ed09`, the guarded ground-scatter refinement.
+Its complete 828-byte fallback passes the normal unit check; active C has four
+differing bytes and a recorded 99.0% score. This does not change the exact gain.
+Each of the nine continuation matches already passed stock matching acceptance
+and independent complete-extent checks. No combined ROM build was run here;
+the integrator still owns that build and checked-in report regeneration.
+
+Preserve this worktree's ignored evidence when resuming:
+
+- Spark spawning: `build/scope/campaign/resume_0806A160/REPORT.md` explains
+  `best_current.c` and the newer `root/ensure-owner-value.c` and
+  `root/position-pool-phase.c` witnesses. Their graph nodes are `e6b72fc4`
+  and `fce5ab2a` in `build/matchsearch/resume_0806A160`.
+- Ground scatter: `build/scope/campaign/resume_08128F98/REPORT.md`, clean
+  `best.c`, and graph `build/matchsearch/resume_08128F98`, node `419ec772`.
+  Continue from the committed C rather than a private placement diagnostic.
+- Linked variants: `build/scope/campaign/resume_0812A928/REPORT.md` and
+  `build/matchsearch/resume_0812A928` retain the table/count/mask priority
+  witnesses. Clean `best.c`, node `7265a26f`, has eight differing bytes across
+  the complete 228-byte span, 92.9%, with the count correct and table/mask
+  swapped. It is saved as a candidate; the tracked draft is unchanged.
+- Nidhoggr initialization: `build/scope/campaign/resume_081940F8_agent/REPORT.md`,
+  `best_current.c`, `stock-verify.json`, and graph
+  `build/matchsearch/resume_081940F8_agent`, baseline node `e6ac90c5`.
+  The two-instruction zero/bound gap remains; wide-counter and unused-field
+  controls were rejected, not accepted as source solutions.
+- Message posting: `build/scope/campaign/resume_0819946C/REPORT.md` and graph
+  `build/matchsearch/resume_0819946C`, current node `f43780e6`.
+  A shared inline operation is byte-identical to the three retained bodies;
+  frame-owner alternatives do not recover the allocation. Pseudo numbers in
+  the older priority proof differ from the current source.
+
+The remaining original targets continue at 0806A160, 08128F98, 0812A928,
+081940F8, 0819946C, 081C32C8, 081D9D3C, 081DA3D8, 081FCA44, 081FE2C4,
+082314C4, 082335F0, 08234868 and 082362EC. Earlier sections retain the
+per-function evidence for targets not reopened during this continuation.

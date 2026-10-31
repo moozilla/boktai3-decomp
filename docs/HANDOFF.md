@@ -61,8 +61,9 @@ Recent:
 * **Effects and presentation continuation** (2026-10-31): additional ordinary-C
   matches cover particle groups, directional and anchored spawning, bounce updates,
   palette preparation, projectile creation, both fragment updates and scatter clipping.
-  Active workers continue through every remaining target, then will audit register
-  pins, shared records/data and Studio integration. Remaining drafts retain stock
+  Work is checkpointed at the user's quota floor; resume remaining targets before
+  the register-pin, shared records/data and Studio audit. Ground scatter's improved
+  guarded C has four differing bytes and earns no exact credit. Remaining drafts retain stock
   assembly fallbacks and documented compiler/source gaps. The branch
   `codex/finish-effects` has per-unit validation; combined ROM validation and
   progress reports remain for integration. See the
