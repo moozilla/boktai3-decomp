@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ratatosk_facing.h"
 
 struct Ratatosk {
     u8 pad0[0x51];
@@ -24,22 +24,6 @@ struct Ratatosk {
 };
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void Sound_PlaySongChecked(u32);
-static inline void Ratatosk_SetFacing(struct Ratatosk *p, int angle)
-{
-    int shifted;
-    u32 value;
-    p->angle = angle;
-    shifted = p->angle + 0x60;
-    shifted >>= 6;
-    value = 3;
-    value &= shifted;
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    shifted >>= 5;
-    value = 7;
-    value &= shifted;
-    p->facing8 = value;
-}
 void Ratatosk_BeginDirectionalReaction(struct Ratatosk *p)
 {
     struct Ratatosk *p2 = p;
@@ -50,12 +34,8 @@ void Ratatosk_BeginDirectionalReaction(struct Ratatosk *p)
             angle = p->savedAngle;
         else
             angle = p->targetAngle + 0x80;
-        Ratatosk_SetFacing(p, angle);
-        {
-            u32 mode = 0;
-            asm("" : "+r"(mode));
-            SceneActors_StartDirectionalAnimation(p, p2->anim, p2->animData, 0x1d, mode, 1, 4);
-        }
+        RATATOSK_SET_FACING(p, angle);
+        SceneActors_StartDirectionalAnimation(p, p2->anim, p2->animData, 0x1d, 0, 1, 4);
         Sound_PlaySongChecked(0x55f);
     }
     p2->motion = 0;

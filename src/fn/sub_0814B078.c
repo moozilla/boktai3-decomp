@@ -67,7 +67,7 @@ struct MotionTarget *Player_SelectNearestMotionTarget(struct Player *arg, u32 li
     best = 0;
     if (entry)
         do {
-            register u32 rawFlags asm("r1") = entry->flags;
+            u32 rawFlags = entry->flags;
             u32 inactive = rawFlags & 1;
             u32 flags = rawFlags;
             if (!inactive) {

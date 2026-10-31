@@ -49,6 +49,7 @@ struct RouteSpritePool {
 };
 typedef void (*RouteSpriteStateCallback)(struct RouteSpritePool *, struct RouteSpriteActor *);
 extern RouteSpriteStateCallback gUnk_08605BB0[];
+/* 0x02000198 */
 extern struct RouteSpritePool *gRouteSpritePool;
 struct RouteSpriteActor *RouteSpritePool_AllocateSlot(struct RouteSpritePool *);
 struct RouteSpriteActor *RouteSpritePool_TryAllocateSlot(struct RouteSpritePool *);

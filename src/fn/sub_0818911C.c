@@ -211,11 +211,6 @@ void sub_0818911C(void *arg0)
     asm("" : "+r"(stateAddress));
     stateAddress += (u32)a;
     decision = (u8 *)stateAddress;
-    {
-        register u8 *state asm("r9") = decision;
-        asm("" : "+r"(state));
-        decision = state;
-    }
     switch (*(u8 *)stateAddress) {
         case 0:
             if (absoluteX + distance <= 4) {

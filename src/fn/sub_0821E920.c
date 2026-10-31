@@ -24,7 +24,7 @@ s32 Path_PickRandomPoint(struct PathPos *out, u32 pathId)
     }
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        s32 sample = (*(&gRandomTable))[gRandomIndex];
+        s32 sample = ((const u16 *)gRandomTable)[gRandomIndex];
         point = Mod(sample, def[0]);
     }
     Path_GetPointPositionById((u16 *)out, pathId, point);

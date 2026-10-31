@@ -1,7 +1,6 @@
 #include "global.h"
 #include "ram.h"
 #include "player.h"
-extern u32 gUnk_02000560[4];
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: clears the link-mode shared arrays and counters in the movement-state tail.
 #define Player_ResetLinkState sub_08158C14
@@ -16,7 +15,7 @@ void Player_ResetLinkState(void)
     for (i = 0; i < 4; i++) {
         gPlayers[i] = 0;
         gTrackedPlayerId[i] = 0;
-        gUnk_02000560[i] = 0;
+        gPlayerSlotStatus[i] = 0;
     }
 
     gPlayerInteractionMode = 0;

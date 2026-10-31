@@ -118,6 +118,7 @@ struct TetherActor {
     void *pendingEffectHandle;
     u16 effectValue, unknown482;
 };
+/* 0x02000488 */
 extern struct TetherActor *gTetherActor;
 void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);

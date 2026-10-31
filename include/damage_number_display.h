@@ -29,6 +29,7 @@ struct DamageNumberDisplay {
     void *resource;
     struct DamageNumberGroup groups[4];
 };
+/* 0x02000074 */
 extern struct DamageNumberDisplay *gDamageNumberDisplay;
 s32 DamageNumberDisplay_Show(struct DamageNumberSource *source, u32 amount, u32 kind,
                              const struct ContactPosition *position,

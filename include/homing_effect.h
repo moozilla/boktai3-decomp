@@ -74,6 +74,7 @@ struct EffectAnimId {
 typedef s32 (*EffectParticleUpdate)(struct EffectManager *, struct Effect *, s32, u32, u32,
                                     struct EffectContext *);
 
+/* 0x02000040 */
 extern struct EffectManager *gEffectManager;
 extern s16 gUnk_086149C4[];
 extern u32 gUnk_02000560;

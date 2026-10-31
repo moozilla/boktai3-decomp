@@ -394,13 +394,15 @@ def command_tables_of(funcs):
 
 @cached
 def numeric_tables():
-    """Reviewed marker parameter tables, with their exact consumer provenance."""
+    """Reviewed numeric tables and examples of the functions that consume them."""
     out = {}
     for entry in load_manifest():
-        if entry.format != "actor_marker_table":
+        if entry.format not in ("actor_marker_table", "math_lookup"):
             continue
         module = entry.module()
         schema = module.table_schema(entry.start, entry.end)
+        if entry.extracted() and not os.path.exists(entry.file):
+            entry.extract()
         with open(entry.file, encoding="utf-8") as source:
             rows = module.parse_rows(source.read(), entry.start, entry.end)
         key = f"{entry.start:08X}"

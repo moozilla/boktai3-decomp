@@ -12,7 +12,7 @@ static inline u32 cellAtPosition(struct ContactPosition *position)
 }
 static inline u32 firstCellAtPosition(struct ContactPosition *position)
 {
-    register struct ContactPosition *source asm("r6") = position;
+    struct ContactPosition *source = position;
     s16 *xAddress = (s16 *)source;
     s32 x, z;
     asm("" : "+r"(xAddress));
@@ -26,7 +26,7 @@ s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32 
 {
     struct BreakableProp *prop = input;
     struct ContactPackedVector packet;
-    register struct ContactPosition *position asm("r6");
+    struct ContactPosition *position;
     u32 cell, height, surface;
     u8 *properties;
     u32 script;

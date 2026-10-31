@@ -34,6 +34,7 @@ struct SparkParticlePool {
     const struct SparkParticleResource *graphics;
     u32 activeCount;
 };
+/* 0x02000168 */
 extern struct SparkParticlePool *gSparkParticlePool;
 s32 SparkParticle_UpdatePool(struct SparkParticlePool *);
 s32 SparkParticle_DestroyPool(struct SparkParticlePool *);

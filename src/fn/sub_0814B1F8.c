@@ -201,10 +201,7 @@ static inline s32 PlayerMotion_OrbitAngle(u8 direction)
     return ((direction - 0x20) & ~0x3F) + 0x40;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 99.6%
 // confidence=low: player "throw/bolt at target" state machine: 8-phase switch (approach, dash, strike, return)
-#define Player_UpdateTargetMotion sub_0814B1F8
 void Player_UpdateTargetMotion(struct Player *p)
 {
     union PlayerMotionPosition vel, particlePosition, vel2, particlePosition2;
@@ -507,7 +504,9 @@ void Player_UpdateTargetMotion(struct Player *p)
             }
             if (p->tetherFrame == 0)
                 PLAYER_START_ANIM(0x1A4, 0x1A9, 2, 0);
-            goto step_and_count;
+            Anim_Step(&p->secondaryAnimation, p->animationData);
+            p->tetherFrame++;
+            break;
         }
         case 5: {
             struct PlayerAnimation *animation;
@@ -540,7 +539,6 @@ void Player_UpdateTargetMotion(struct Player *p)
             }
             if (p->tetherFrame == 0)
                 PLAYER_START_ANIM(0x1A4, 0x1A9, 2, 0);
-        step_and_count:
             Anim_Step(&p->secondaryAnimation, p->animationData);
             p->tetherFrame++;
             break;
@@ -560,6 +558,3 @@ void Player_UpdateTargetMotion(struct Player *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0814B1F8);
-#endif

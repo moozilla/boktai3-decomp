@@ -17,6 +17,7 @@ struct BurstEmitterPool {
     u32 used;
     struct BurstEmitter slots[5];
 };
+/* 0x02000160 */
 extern struct BurstEmitterPool *gBurstEmitterPool;
 extern void *gUnk_08605B78[];
 void BurstEmitter_EmitFrame(struct BurstEmitter *);

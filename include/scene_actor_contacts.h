@@ -17,6 +17,7 @@ struct SceneActorContactManager {
     u16 resourceId, unknown26;
     struct SceneActorContactNode *head;
 };
+/* 0x020001A0 */
 extern struct SceneActorContactManager *gSceneActorContactManager;
 void SceneActorScript_DispatchKindPayload(void *);
 void SceneActorContacts_ResetList(void);

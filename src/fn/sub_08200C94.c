@@ -109,7 +109,8 @@ static inline void Vec_FromAngle(struct CloneVec *v, s32 angle, s32 speed)
 }
 static inline void Vec_Sum(struct CloneVec *d, struct CloneVec *a, struct CloneVec *b)
 {
-    d->x = b->x + a->x;
+    const s16 *x = &b->x;
+    d->x = *x + a->x;
     d->y = b->y + a->y;
     d->z = b->z + a->z;
 }
@@ -171,8 +172,6 @@ struct CloneProjectionVectors {
     struct CloneVec delta, position;
 };
 /* Advance each active clone, its animation and colliders, and its lifetime. */
-#ifdef NONMATCHING
-// fuzzy: 96.1%
 s32 PlayerClone_UpdatePool(struct PlayerClonePool *pool)
 {
     struct PlayerClone *slot = pool->entries;
@@ -283,6 +282,3 @@ s32 PlayerClone_UpdatePool(struct PlayerClonePool *pool)
     } while (i <= 2);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerClone_UpdatePool);
-#endif

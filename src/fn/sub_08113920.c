@@ -20,10 +20,9 @@ static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r2");
+        u32 first;
         u32 maskBit = 1;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -34,12 +33,10 @@ static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
     {
         u32 input = state->flags;
         u32 bit;
-        register u32 first asm("r1");
+        u32 first;
         bit = 2;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
             sprite->flags |= 8;
@@ -49,14 +46,12 @@ static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
+        u32 temp;
+        u32 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
         /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -86,7 +81,6 @@ static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
                     endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -110,7 +104,7 @@ static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                s32 weight = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
@@ -178,10 +172,9 @@ static inline void Project(struct Packed *out, struct Vec *pos, s32 h)
 }
 static inline u32 TrailRandom(void)
 {
-    register u32 value asm("r0");
+    u32 value;
     typeof(value) t1;
     value = (t1 = gUnk_086141BC[gEffectRandomTableIndex]);
-    asm("" : "+r"(t1));
     value &= 7;
     asm("" : "+r"(value));
     return value;

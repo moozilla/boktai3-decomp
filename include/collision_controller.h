@@ -74,6 +74,7 @@ struct CollisionScene {
     u8 mode;
 };
 
+/* 0x0200003C */
 extern struct CollisionManager *gCollisionManager;
 extern struct CollisionScene gSunClock;
 extern void *gUnk_08604A00[2][3];

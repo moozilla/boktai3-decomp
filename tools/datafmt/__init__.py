@@ -75,11 +75,14 @@ class Entry:
         from romlib import load_rom
         os.makedirs(os.path.dirname(self.file), exist_ok=True)
         mod = self.module()
+        # write then rename: make -j runs symbolize twice, and the other run may read this file
+        tmp = f"{self.file}.{os.getpid()}.tmp"
         if hasattr(mod, "extract"):
-            mod.extract(load_rom(), self.start, self.end, self.file)
-            return
-        with open(self.file, "w", encoding="utf-8") as f:
-            f.write(mod.decode(load_rom(), self.start, self.end, {}))
+            mod.extract(load_rom(), self.start, self.end, tmp)
+        else:
+            with open(tmp, "w", encoding="utf-8") as f:
+                f.write(mod.decode(load_rom(), self.start, self.end, {}))
+        os.replace(tmp, self.file)
 
 
 def load_manifest():

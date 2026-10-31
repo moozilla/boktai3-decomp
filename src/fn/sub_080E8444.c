@@ -12,7 +12,6 @@ struct PlayerFlags {
     u8 pad[0x20];
     u32 flags;
 };
-extern u32 gUnk_02000560[];
 // confidence=low: tests whether the collision target is absent or its player is unavailable.
 u8 SceneActor_IsCollisionTargetUnavailable(struct Actor *actor)
 {
@@ -25,7 +24,7 @@ u8 SceneActor_IsCollisionTargetUnavailable(struct Actor *actor)
                 return 1;
             {
                 u32 mask8 = 8;
-                u32 flags = gUnk_02000560[target->player];
+                u32 flags = gPlayerSlotStatus[target->player];
                 if (flags & mask8)
                     return 1;
             }

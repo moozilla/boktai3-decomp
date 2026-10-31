@@ -1,9 +1,6 @@
 #define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH           1
 #define SCENE_ACTOR_CHASE_FRACTION_ACCESSOR        1
-#define SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS      1
 #define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL     1
-#define SCENE_ACTOR_CHASE_SCALAR_COORDINATE_OUTPUT 1
-#define SCENE_ACTOR_CHASE_ROUTE_COUNT_ACCESSOR     1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "spark_particle.h"

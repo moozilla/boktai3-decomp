@@ -204,7 +204,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000550,gPlayerBackgroundState,2,object,extern u16 gPlayerBackgroundState;,include/ram.h,low,provisional: shared background/player state halfword
 02000554,gPlayerAbilityLatched,2,object,extern u16 gPlayerAbilityLatched;,include/ram.h,low,provisional: ability request latch; ROM reader loads an unsigned halfword
 02000558,gForceDirectionMode,2,object,extern u16 gForceDirectionMode;,include/ram.h,low,
-02000560,gUnk_02000560,10,object,,,,
+02000560,gPlayerSlotStatus,10,object,extern u32 gPlayerSlotStatus[4];,include/player.h,high,Four words cleared at 08158C14. Player creation publishes status by slot and targeting tests bit 3.
 02000570,gPlayerSolarActionPending,2,object,extern u16 gPlayerSolarActionPending;,include/ram.h,low,provisional: solar action pending flag; separate from four slot words
 02000580,gPlayers,10,object,extern struct Player *gPlayers[4];,include/player.h,low,the four player actors (slot 0 is the local player)
 02000590,gPlayerEffectPendingCount,2,object,extern u16 gPlayerEffectPendingCount;,include/ram.h,low,provisional: pending player effect count; separate from actor pointers
@@ -241,7 +241,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02037000,gBgMapWorkBuffer,2000,object,extern u8 gBgMapWorkBuffer[0x2000];,include/ram.h,low,"background map work buffer, cleared for 0x2000 bytes"
 02039000,gObjTileUploadRequests,8,object,extern struct ObjTileUploadRequest gObjTileUploadRequests[];,include/obj_tile_upload.h,low,eight-byte rectangular tile-upload records; descriptor aliases two halfwords; protected ARM producer retained
 0203B000,gResourceRegistryEntries,100,object,extern struct ResourceRegistryEntry gResourceRegistryEntries[32];,include/resource_registry.h,low,"32-entry resource registry; id, flags and data pointer; protected draft views retained"
-0203B400,gRandomTable,800,object,extern const u16 gRandomTable[];,include/ram.h,low,random value table indexed by gRandomIndex (1024 entries)
+0203B400,gRandomTable,800,object,extern u16 gRandomTable[1024];,include/ram.h,high,Random_InitValueTable fills 1024 halfwords from Random_Next15. Readers use the wrapping cursor at 03005308
 0203C400,gGameStateStorage,,object,extern u8 gGameStateStorage[];,include/ram.h,low,backing storage for timer-jittered game-state and variable regions
 03000000,gIwramCode,FC,object,extern u8 gIwramCode[];,include/runtime.h,low,IWRAM instruction buffer populated from Palette_CacheObjectBankArm through AgbMain__addr at startup; extent is not inferred from the partial RFU read
 03001110,gVideoIrqPhase,4,object,extern u32 gVideoIrqPhase;,include/runtime.h,low,Two-phase video/sound IRQ handler latch; toggled by sub_08214144 (tentative name)
@@ -269,14 +269,14 @@ addr,name,size,kind,decl,header,confidence,notes
 0300169C,gSerialByteSendWrite,4,object,extern s32 gSerialByteSendWrite;,include/serial.h,low,Write cursor of the 64-byte serial send ring
 030016A0,gSerialByteSendRead,4,object,extern s32 gSerialByteSendRead;,include/serial.h,low,Read cursor of the 64-byte serial send ring
 030016A4,gSerialByteSendCount,4,object,extern s32 gSerialByteSendCount;,include/serial.h,low,Queued send-byte count
-030016A8,gSerialByteReceiveBuffer,82,object,extern u8 gSerialByteReceiveBuffer[64];,include/serial.h,low,64-byte receive ring; independent from the adjacent send ring
+030016A8,gSerialByteReceiveBuffer,40,object,extern u8 gSerialByteReceiveBuffer[64];,include/serial.h,low,64-byte receive ring; independent from the adjacent send ring
 030016E8,gSerialByteSendBuffer,40,object,extern u8 gSerialByteSendBuffer[64];,include/serial.h,low,"Separate 64-byte serial send ring; direct literal base, not part of receive ring"
 03001728,gSerialQueuedSendWord,2,object,extern u16 gSerialQueuedSendWord;,include/serial.h,low,Separate queued multiplayer send word; not part of either byte ring
 0300172A,gSerialActiveSendWord,2,object,extern u16 gSerialActiveSendWord;,include/serial.h,low,"Current multiplayer send word, with protocol status bits"
 0300172C,gSerialReceiveIndex,4,object,extern u32 gSerialReceiveIndex;,include/ram.h,low,
 03001730,gSerialReceivePending,4,object,extern u32 gSerialReceivePending;,include/ram.h,low,
 03001734,gSerialLatestPacketIndex,4,object,extern u32 gSerialLatestPacketIndex;,include/ram.h,low,
-03001738,gRfuApiBuffer,,object,extern u8 gRfuApiBuffer[];,include/serial.h,low,RFU API workspace passed to rfu_initializeAPI with size 0xE64
+03001738,gRfuApiBuffer,E64,object,extern u8 gRfuApiBuffer[0xE64];,include/serial.h,low,RFU API workspace passed to rfu_initializeAPI with size 0xE64
 030025A0,gSceneLifecycleTask,20,object,extern struct SceneRuntimeTask gSceneLifecycleTask;,include/runtime.h,high callback identity,Static scene lifecycle task; common scheduler header followed by state and counter words
 030025E8,gCommandSet,E,object,extern struct CommandSet gCommandSet;,include/ram.h,low,
 030025F8,gSceneBodyRegistry,4,object,extern struct SceneBodyRegistry *gSceneBodyRegistry;,include/scene_body_registry.h,high field offsets and subsystem,Scene body registry task pointer; linked-list first/last pointers at +18/+1C
@@ -292,7 +292,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030035C6,gRtcProtected,1,object,extern u8 gRtcProtected;,include/runtime.h,low,RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize
 030035C8,gSoftDoubleNaN,14,object,extern struct SoftDoubleNumber gSoftDoubleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software double-precision NaN object; 20-byte fp-bit-base number layout
 030035E0,gSoftSingleNaN,10,object,extern struct SoftSingleNumber gSoftSingleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software floating-point NaN number object; shared fp-bit-base layout
-030035F0,SoundMainRAM_Buffer,402,object,extern u8 SoundMainRAM_Buffer[0x400];,include/sound.h,low,MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object
+030035F0,SoundMainRAM_Buffer,400,object,extern u8 SoundMainRAM_Buffer[0x400];,include/sound.h,low,MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object
 030039F0,gScriptEntryProcedure,2,object,extern u16 gScriptEntryProcedure;,include/engine_globals.h,low,Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer
 03003A00,gScanlineDmaTarget,4,object,extern void *gScanlineDmaTarget;,include/render.h,low,"HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY)"
 03003A04,gVideoUploadFlags,4,object,extern u32 gVideoUploadFlags;,include/runtime.h,low,Video upload dirty flags; bit 0 requests OAM upload
@@ -412,16 +412,16 @@ addr,name,size,kind,decl,header,confidence,notes
 03005250,gLinkMenuActive,4,object,extern u32 gLinkMenuActive;,include/ram.h,low,
 03005260,gPadState,10,object,extern u16 gPadState[];,include/input.h,low,"input state: two slots of {held, pressed, released, pad}; updated by sub_08219B24"
 03005270,gHardwareKeys,2,object,extern u16 gHardwareKeys;,include/runtime.h,low,Raw active-low KEYINPUT sampled before per-player input records are updated
-03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/ram.h,low,
-03005278,gLcgState,4,object,extern u32 gLcgState;,include/runtime.h,low,"Independent LCG state, separate from gRandomIndex at 03005274; initialized to 123456 and advanced by Random_Next15"
+03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/ram.h,high,Wireless input publisher writes five consecutive halfwords. Slots 2 and 3 overlap the word used by Random_Next15.
+03005278,gLcgState,4,interior,extern u32 gLcgState;,include/runtime.h,high,Random_Next15 updates this word. WirelessController writes input slots 2 and 3 at the same address.
 03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine_globals.h,low,task lists by priority
 030052F0,gResourceRegistryCount,4,object,extern s32 gResourceRegistryCount;,include/runtime.h,low,"High-water count of resource-registry entries, capped at 32"
 030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/engine_globals.h,low,
 030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/engine_globals.h,low,
 030052FC,gTerrainHeight,4,object,extern u32 gTerrainHeight;,include/engine_globals.h,low,
 03005300,gTerrainTrapSerial,4,object,extern u32 gTerrainTrapSerial;,include/ram.h,low,
-03005304,gEffectRandomTableIndex,4,object,extern u32 gEffectRandomTableIndex;,include/ram.h,low,
-03005308,gRandomIndex,4,object,extern u32 gRandomIndex;,include/engine_globals.h,low,
+03005304,gEffectRandomTableIndex,4,object,extern u32 gEffectRandomTableIndex;,include/ram.h,high,Ten-bit cursor into the fixed 1024-halfword ROM bank at 086141BC. Seeded by Random_InitValueTable
+03005308,gRandomIndex,4,object,extern u32 gRandomIndex;,include/engine_globals.h,high,Ten-bit cursor into the writable 1024-halfword bank at 0203B400. Seeded by Random_InitValueTable
 0300530C,gSerialMultiplayer1Word,2,object,extern u16 gSerialMultiplayer1Word;,include/serial.h,low,Last word sampled from SIOMULTI1 by the byte-transfer interrupt
 03005310,gSerialPeer1Interrupts,4,object,extern s32 gSerialPeer1Interrupts;,include/serial.h,low,Counter advanced by the SIOMULTI1 byte-transfer handler; tentative name
 03005314,gSerialInitialized,4,object,extern u32 gSerialInitialized;,include/serial.h,low,Set to 1 by Serial_InitMultiplayer; no semantic reader observed here

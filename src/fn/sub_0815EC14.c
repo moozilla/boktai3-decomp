@@ -3,7 +3,6 @@
 #include "ram.h"
 /* Byte view preserves the original global-pointer reloads between stores. */
 extern u8 *gGameState;
-extern u32 gUnk_02000560[];
 void Player_SaveStateSnapshot(struct Player *p)
 {
     s32 i;
@@ -35,6 +34,6 @@ void Player_SaveStateSnapshot(struct Player *p)
     gPlayerPassageState = p->active;
     for (i = 0; i < 2; i++)
         gPlayerInitialSlotValues[i] = p->scriptStatus[i];
-    gUnk_02000560[p->movementRequestBlocked] = p->kind;
+    gPlayerSlotStatus[p->movementRequestBlocked] = p->kind;
     gPlayerAbilityLatched = p->actionSelectionStamp;
 }

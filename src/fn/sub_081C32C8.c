@@ -45,27 +45,24 @@ static inline void FromScreen(struct ContactPosition *out, const struct ContactP
     out->y = offset;
     out->z = Half(__divsi3((y - x) << 5, 3) + offset);
 }
-static inline u32 ToScreen(struct ContactPosition *screen, struct ContactPosition *world)
+static inline void ToScreen(struct ContactPosition *screen, struct ContactPosition *world)
 {
     s32 x = world->x;
     s32 z = world->z;
     s32 sum;
     s32 y;
-    u32 zero;
-    s32 sy;
+    s32 sy, depth;
     screen->x = Scale(x - z);
     sum = Scale(x + z);
     y = Scale(world->y);
     sy = sum - y;
-    zero = 0;
+
     screen->y = sy;
-    sum += y;
-    screen->z = sum;
+    depth = sum + y;
+    screen->z = depth;
     screen->x = screen->x - gCameraOrigin[0] + 120;
     screen->y = screen->y - gCameraOrigin[1] + 80;
-    sum -= gCameraOrigin[2];
-    screen->z = sum;
-    return zero;
+    screen->z -= gCameraOrigin[2];
 }
 
 static inline void SetCallback(void (*callback)(void), void (**slot)(void))
@@ -73,9 +70,6 @@ static inline void SetCallback(void (*callback)(void), void (**slot)(void))
     *slot = callback;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 96.8%
-// Projection-local world pointer and zero choose r4 instead of r5.
 void SceneTarget_BeginMove(struct ContactImpactEffect *input, struct ContactPosition *source,
                            struct ContactPosition *destination, s32 initialScale, u32 rampTo,
                            u32 arcParameter, u32 trackMode)
@@ -121,22 +115,15 @@ void SceneTarget_BeginMove(struct ContactImpactEffect *input, struct ContactPosi
         effect->rampFrom = (s8)effect->byte3C;
     else
         effect->rampFrom = rampFrom;
-    {
-        typeof(effect->rampTo) *q1 = &effect->rampTo;
-        u32 z1;
-        *q1 = rampTo;
-        z1 = ToScreen(&effect->screen, origin);
-        effect->byte3C = effect->rampFrom;
-        effect->byte3D = effect->rampFrom;
-        OrbitMotion_BeginArc(((u8 *)effect) + 0xA0, origin, target, arcParameter, trackMode);
-        effect->shakeThreshold = trackMode;
-        effect->flags &= ~1;
-        SetCallback(ContactImpactEffect_UpdateContact, &effect->update);
-        effect->shakeTimer = z1;
-        effect->shakeFlag = z1;
-        Callback_InvokeActor(effect);
-    }
+    effect->rampTo = rampTo;
+    ToScreen(&effect->screen, origin);
+    effect->byte3C = effect->rampFrom;
+    effect->byte3D = effect->rampFrom;
+    OrbitMotion_BeginArc((u8 *)effect + 0xA0, origin, target, arcParameter, trackMode);
+    effect->shakeThreshold = trackMode;
+    effect->flags &= ~1;
+    SetCallback(ContactImpactEffect_UpdateContact, &effect->update);
+    effect->shakeTimer = 0;
+    effect->shakeFlag = 0;
+    Callback_InvokeActor(effect);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneTarget_BeginMove);
-#endif

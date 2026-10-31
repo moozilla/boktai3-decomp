@@ -95,7 +95,7 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
     }
     if ((s32)actor->counter2AC <= 5) {
         const s16 *first = gUnk_086149C4;
-        register u32 offset asm("r6") = 0x3EC;
+        u32 offset = 0x3EC;
         u8 *field;
         const s16 *table;
         s32 value;

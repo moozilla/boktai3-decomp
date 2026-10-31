@@ -1,4 +1,3 @@
-#define SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS 1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"

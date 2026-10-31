@@ -216,7 +216,7 @@ void LinkedEffect_FollowTarget(struct Pool *poolArg, struct Effect *p)
     if (p->ended) {
         s32 value = RandomByte();
         if (value <= 63) {
-            register const u16 *randomTable asm("r2") = gRandomTable;
+            const u16 *randomTable = gRandomTable;
             void *resource = pool->resource;
             asm("" : : "r"(randomTable));
             Anim_SetSequence(sequence, resource, 21, 0, 0);

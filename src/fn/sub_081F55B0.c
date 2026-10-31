@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 struct Vec {
     s16 x, y, z, pad;
@@ -103,21 +102,13 @@ void Ratatosk_UpdateOrbitingParticlePose(struct Actor *p)
     SlotMotion_Initialize(params);
     Ratatosk_ConfigureParticle(params, 20, 0, 0, 2, 0);
     SceneParticles_SpawnAtPosition(params, &spawn);
-    {
-        register u32 *current asm("r1") = savedTimer;
-        asm("" : "+r"(current));
-        if (*current > 5) {
-            u32 mask = 0x800000;
-            p->flags |= mask;
-        }
+    if (*savedTimer > 5) {
+        u32 mask = 0x800000;
+        p->flags |= mask;
     }
-    {
-        register u32 *current asm("r2") = savedTimer;
-        asm("" : "+r"(current));
-        if (*current > 120) {
-            Sound_StopSong(0x56b);
-            p->finished = 1;
-        }
+    if (*savedTimer > 120) {
+        Sound_StopSong(0x56b);
+        p->finished = 1;
     }
     Callback_InvokeActor(p, p->callback);
 }

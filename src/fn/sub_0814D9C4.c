@@ -114,7 +114,7 @@ void Player_UpdateWeaponCueCombo(struct WeaponCuePlayer *p)
         }
 
         case 3: {
-            register u32 offset asm("r0") = p->comboIndex * sizeof(struct WeaponCuePhase);
+            u32 offset = p->comboIndex * sizeof(struct WeaponCuePhase);
             register const struct WeaponCuePhase *phase =
                 (const struct WeaponCuePhase *)((u8 *)record->phases + offset);
             if (!(p->timer)) {

@@ -159,7 +159,9 @@ struct BackgroundMapEntry {
 };
 
 /* Shared globals (task pointer tables are indexed by layer). */
+/* 0x02000000 */
 extern struct Background *gBackgrounds[];
+/* 0x02000010 */
 extern struct ScrollingBackground *gScrollingBackgrounds[];
 
 /* Engine functions used by this unit. */

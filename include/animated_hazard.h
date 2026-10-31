@@ -44,6 +44,7 @@ struct AnimatedHazardManager {
     struct AnimatedHazard hazards[8];
 };
 
+/* 0x02000050 */
 extern struct AnimatedHazardManager *gAnimatedHazardManager;
 
 struct SceneVec *Player_GetEffectivePosition(s32);

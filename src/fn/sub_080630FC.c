@@ -3,7 +3,7 @@ extern const s8 gUnk_0824DF7C[];
 void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *input)
 {
     struct SceneInventoryScriptCatalog *p = input;
-    s32 page, next asm("r5"), count asm("r4");
+    s32 page, next, count;
     s8 *destination;
     const s8 *source;
     const s8 *table;

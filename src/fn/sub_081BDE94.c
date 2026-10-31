@@ -49,7 +49,7 @@ struct SwapInventory {
 
 static inline struct SwapWidget *Storage_EquipmentWidget(u8 *menu, s32 slot)
 {
-    register u32 base asm("r0") = slot * sizeof(struct SwapWidget);
+    u32 base = slot * sizeof(struct SwapWidget);
     register u32 offset;
     base += (u32)menu;
     offset = SWAP_OFFSET(markers);

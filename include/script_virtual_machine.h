@@ -28,6 +28,7 @@ struct ScriptProcedureTable {
     u8 *body;
     u8 *mainBlock;
 };
+/* 0x02000438 */
 extern struct ScriptProcedureTable gScriptProcedureTable;
 
 /* A registered table of native script commands (gScriptCommandTables is the head of
@@ -53,6 +54,7 @@ struct ScriptVm {
     u32 stack[24];
     u32 *argSp;
 };
+/* 0x02000610 */
 extern struct ScriptVm gScriptVm;
 
 /* ---- Resource lookup (archive keyed by extension/name hash pair) -------- */
