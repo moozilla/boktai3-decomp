@@ -113,9 +113,9 @@ int MessageWindow_ShowMessage(int index)
                         }
                     }
                     {
-                        register void *fn asm("r1") = MessageWindow_UpdateImmediatePlayback;
+                        void *fn = MessageWindow_UpdateImmediatePlayback;
                         u32 offset;
-                        register void **dst asm("r0");
+                        void **dst;
                         offset = 0x2cc;
                         dst = (void **)((u8 *)p + offset);
                         *dst = fn;
