@@ -1,34 +1,12 @@
-#include "global.h"
+#include "player_cue.h"
 // confidence=low: MoveTo callback approaches destination and decelerates its movement effect.
 extern const s16 gUnk_086149C4[];
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 s32 Math_Atan2(s32, s32);
-void Script_Call(u32, u32);
 void Player_ConstrainTetherTarget(void *, s32, s32, u32);
 #include "scene_vec.h"
-struct PlayerMoveDestination {
-    u8 unknown0[0x30];
-    struct SceneVec position;
-    s16 velocityX;
-    u16 unknown3A;
-    s16 velocityZ;
-    u8 unknown3E[0xA0 - 0x3E];
-    u16 actionCueFlags;
-    u8 unknownA2[0x28F - 0xA2];
-    u8 velocityScaleAxis;
-    u8 unknown290[0x3A2 - 0x290];
-    u8 heading, side, facing;
-    u8 unknown3A5[0x418 - 0x3A5];
-    u8 actionMode;
-    u8 unknown419[0x590 - 0x419];
-    struct SceneVec scriptDestination;
-    u8 unknown598[2];
-    u8 animationBranchRequested, cuePhase, kindTwoEntered;
-    s8 targetFacing;
-    u8 unknown59E[6];
-    u32 cueParameter;
-};
+
 static inline s32 scale12(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
@@ -37,7 +15,7 @@ static inline s32 scale6(s32 n)
 {
     return n >= 0 ? n >> 6 : -((-n) >> 6);
 }
-static inline void faceFromAngle(struct PlayerMoveDestination *p, u16 angle)
+static inline void faceFromAngle(struct Player *p, u16 angle)
 {
     s32 shifted = (((u16)angle) + 0x70) >> 5;
     u32 mask = 7;
@@ -55,10 +33,10 @@ static inline void faceFromAngle(struct PlayerMoveDestination *p, u16 angle)
         p->side = 0;
     }
 }
-void PlayerCue_UpdateMoveDestination(struct PlayerMoveDestination *p)
+void PlayerCue_UpdateMoveDestination(struct Player *p)
 {
-    s32 dx = (p->scriptDestination.x) - (p->position.x);
-    s32 dz = (p->scriptDestination.z) - (p->position.z);
+    s32 dx = (PlayerCue_Motion(p)->destination.x) - (p->position.x);
+    s32 dz = (PlayerCue_Motion(p)->destination.z) - (p->position.z);
     s32 distance = (dx * dx) + (dz * dz);
     s32 x = 0;
     s32 z = 0;
@@ -114,8 +92,8 @@ void PlayerCue_UpdateMoveDestination(struct PlayerMoveDestination *p)
         z = gUnk_086149C4[angle & 255];
         if ((p->actionCueFlags) & 3) {
             if (distance <= 64) {
-                p->position.x = p->scriptDestination.x;
-                p->position.z = p->scriptDestination.z;
+                p->position.x = PlayerCue_Motion(p)->destination.x;
+                p->position.z = PlayerCue_Motion(p)->destination.z;
             } else {
                 s32 speed = 8;
                 p->velocityX = -scale12(x * speed);
