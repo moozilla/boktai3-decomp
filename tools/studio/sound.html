@@ -163,11 +163,11 @@ async function showSong(s) {
   stop();
   CUR = s; renderList(); document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
   document.title = 'Boktai 3 Sound · ' + titleOf(s);
+  const test = positionsOf(s).map(p => `<span class="badge">${TEST[p.list]} No. ${p.no}</span>`).join(' ');
   if (s.empty) {
-    $('view').innerHTML = `<div class="page"><h1 class="t">Empty slot ${s.n}</h1><div class="sub">Song table entry ${s.n} points at the shared 0-track header <span class="mono">${s.addr}</span> (${s.shared} entries do).</div></div>`;
+    $('view').innerHTML = `<div class="page"><h1 class="t">Empty slot ${s.n}</h1><div class="sub">Song table entry ${s.n} points at the shared 0-track header <span class="mono">${s.addr}</span> (${s.shared} entries do).</div>${test}</div>`;
     return;
   }
-  const test = positionsOf(s).map(p => `<span class="badge">${TEST[p.list]} No. ${p.no}</span>`).join(' ');
   $('view').innerHTML = `<div class="page"><div class="full">
     <h1 class="t" id="title">${esc(titleOf(s))}</h1>
     <div class="sub">Song ${s.n} · header <span class="mono">${s.addr}</span> · ${playerName(s.player)} (${s.player_tracks} tracks) · ${s.tracks.length} track${s.tracks.length > 1 ? 's' : ''} · ${kb(s.size)} · voicegroup <a class="mono" href="#vg=${s.voicegroup}">${s.voicegroup}</a></div>
