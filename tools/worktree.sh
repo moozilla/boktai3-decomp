@@ -7,7 +7,7 @@
 # ../b3-base; tools/base.sh keeps it built at origin/main):
 #   gen/  build/res/  build/text/  build/boktai3.elf  build/src/  build/asm/  are APFS clones (cp -c: instant, no
 #       extra disk until a file changes), so a worker's own build never touches the base;
-#   baserom.gba  build/tools/  build/venv/  tools/emu/harness  are symlinks (read-only).
+#   baserom.gba  build/tools/  build/venv/  build/scope/agbcc/  tools/emu/harness  are symlinks (read-only).
 # Workers check with tools/check.py (one function or unit, seconds); the full ROM
 # build (tools/build.py, minutes) runs once per batch at integration.
 set -e
@@ -37,6 +37,8 @@ link "$MAIN/baserom.gba" "$DIR/baserom.gba"
 link "$MAIN/build/tools" "$DIR/build/tools"
 link "$MAIN/build/venv" "$DIR/build/venv"
 link "$MAIN/tools/emu/harness" "$DIR/tools/emu/harness"
+mkdir -p "$DIR/build/scope"
+link "$MAIN/build/scope/agbcc" "$DIR/build/scope/agbcc"  # scope's compiler: tools/scope/build_agbcc.sh
 clone "$SHARED/gen" "$DIR/gen"
 clone "$SHARED/build/res" "$DIR/build/res"
 clone "$SHARED/build/text" "$DIR/build/text"
