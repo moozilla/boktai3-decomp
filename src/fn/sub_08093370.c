@@ -1,6 +1,6 @@
 #include "global.h"
 void Bee_SetMovementEndpoints(u8 *, s16 *);
-void sub_08093138(u8 *);
+void Bee_AdvanceMovementCurve(u8 *);
 u32 Math_Atan2(s32, s32);
 void CpuSet(const void *, void *, u32);
 static inline void Fill(void *dst, u32 *tmp, u32 v)
@@ -16,7 +16,7 @@ void Bee_BeginMoveToPosition(u8 *s, s16 *v)
     s16 *a;
     s16 *b;
     Bee_SetMovementEndpoints(s, v);
-    sub_08093138(s);
+    Bee_AdvanceMovementCurve(s);
     {
         u32 one = 1;
         u8 *q = s + 0x2a8;

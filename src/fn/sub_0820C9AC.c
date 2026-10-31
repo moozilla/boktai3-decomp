@@ -1,12 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 78.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: pause branch layout, random-table lifetimes, stack slots and explicit callback return.
-#include "screamer_playback.h"
+#include "screamer_state.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 extern u32 gUnk_02000560;
 extern u8 gUnk_0203B000[];
 void SceneDrawablePair_SetFlags(void);
@@ -28,38 +23,28 @@ static inline u32 PauseFlags(u32 mask)
 {
     return (gEngineFlags | gScenePauseFlags) & mask;
 }
-static inline u32 TestFlags(u32 *flags, u32 mask)
+static inline u32 TestFlags(s16 mask, u32 *flags)
 {
     return *flags & mask;
 }
-static inline u32 RandomFrom(const u16 *table)
+static inline void Screamer_CopyPosition(struct ActorPosition *out, const struct ActorPosition *in)
 {
-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return table[gRandomIndex];
+    *out = *in;
 }
-static inline u32 RandomValue(void)
-{
-    return RandomFrom((const u16 *)RANDOM_TABLE_ADDR);
-}
-void Screamer_UpdateDamageParticles(struct ScreamerState *p)
+s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
 {
     struct ScreamerParticleParameters parameters;
     struct ActorPosition position;
-    struct ActorPosition *offsetPosition;
-    s32 i;
-    void *graphics;
+    s32 emitted;
+    void *dataOwner;
     u16 *blink;
-    register u32 allocationToken asm("r0");
-    s32 t1;
-    t1 = 4;
-    if (PauseFlags(0x400) || TestFlags(&gUnk_02000560, t1))
-        return;
+    if (PauseFlags(0x400) || TestFlags(4, &gUnk_02000560))
+        return 0;
     Callback_InvokeActor(p, p->update);
-    graphics = p->graphics;
     if ((p->f1DC > 0) && (!p->f1E0)) {
         p->f1E4 -= p->f1DC;
         p->f200 = p->f204;
-        Sound_PlaySong(0x13E);
+        Sound_PlaySong(0x13e);
         if (p->f1DC > 0) {
             DamageNumberDisplay_Show(p->bodyCollider, p->f1DC, 0, ((u8 *)p) + 0xCC,
                                      ((u8 *)p) + 0xD4, 1);
@@ -67,42 +52,41 @@ void Screamer_UpdateDamageParticles(struct ScreamerState *p)
                                    p->f1F4);
         }
         if (p->f1E4 <= 0) {
-            register const u16 *randomTable asm("r10");
+            const u16 *randomTable;
             p->f1E0 = 1;
-            {
-                u16 *d1 = (u16 *)(((u8 *)p) + 0xFC);
-                d1[4] = 0;
-            }
-            offsetPosition = &position;
-            asm("" : "+r"(&position));
-            randomTable = (const u16 *)(gUnk_0203B000 + 0x400);
-            asm("" : "+r"(randomTable));
-            for (i = 0; i <= 7; i++) {
-                s32 frame = Mod(RandomFrom(randomTable), 4) + 0x18;
-                u8 direction;
-                EnemyParticle_InitParameters(&parameters);
-                direction = RandomFrom(randomTable);
-                EnemyParticle_SetGraphicsParameters(&parameters, 0x7E7C, frame, 0x1C4);
-                EnemyParticle_SetMotionParameters(&parameters, 0, 60, direction,
-                                                  RandomFrom(randomTable) & 15);
-                EnemyParticle_SetVerticalMotion(&parameters, 0x2000, 0x18000);
-                EnemyParticle_EnableShadow(&parameters);
-                if (i & 1)
-                    EnemyParticle_AddFlags(&parameters, 0x200);
-                else
-                    EnemyParticle_AddFlags(&parameters, 0x400);
-                if (RandomValue() & 1)
-                    EnemyParticle_AddFlags(&parameters, 4);
-                if (RandomValue() & 1)
-                    EnemyParticle_AddFlags(&parameters, 8);
-                position = p->sprite.position;
-                if (!p->f1D8)
-                    (&position)->x += 16;
-                else
-                    (&position)->z += 16;
-                EnemyParticle_Emit(&parameters, &position);
-            }
+            *(u16 *)((u8 *)p + 0x104) = 0;
 
+            emitted = 0;
+
+            for (; emitted <= 7; emitted++) {
+                dataOwner = gUnk_0203B000;
+                randomTable = (const u16 *)dataOwner + 512;
+                {
+                    s32 frame = Mod(ParticleRandom_ReadSample(randomTable), 4) + 0x18;
+                    u8 direction;
+                    EnemyParticle_InitParameters(&parameters);
+                    direction = ParticleRandom_ReadDirectSample(randomTable);
+                    EnemyParticle_SetGraphicsParameters(&parameters, 0x7E7C, frame, 0x1C4);
+                    EnemyParticle_SetMotionParameters(&parameters, 0, 60, direction,
+                                                      ParticleRandom_ReadSample(randomTable) & 15);
+                    EnemyParticle_SetVerticalMotion(&parameters, 0x2000, 0x18000);
+                    EnemyParticle_EnableShadow(&parameters);
+                    if (emitted & 1)
+                        EnemyParticle_AddFlags(&parameters, 0x200);
+                    else
+                        EnemyParticle_AddFlags(&parameters, 0x400);
+                    if (ParticleRandom_ReadBankSample((const u16 *)dataOwner) & 1)
+                        EnemyParticle_AddFlags(&parameters, 4);
+                    if (ParticleRandom_ReadBankSample((const u16 *)dataOwner) & 1)
+                        EnemyParticle_AddFlags(&parameters, 8);
+                    Screamer_CopyPosition(&position, &p->sprite.position);
+                    if (!p->f1D8)
+                        (&position)->x += 16;
+                    else
+                        (&position)->z += 16;
+                    EnemyParticle_Emit(&parameters, &position);
+                }
+            }
             p->f1DE = 0;
             p->update = SceneDrawablePair_SetFlags;
             p->age = 0;
@@ -115,11 +99,10 @@ void Screamer_UpdateDamageParticles(struct ScreamerState *p)
     }
     if (p->f1DE > 0) {
         AnimData_SelectPaletteBank(p->graphics, 0x192);
-        asm("" : "=r"(allocationToken));
+
         p->f1DE--;
     } else {
         AnimData_SelectPaletteBank(p->graphics, 0x1C4);
-        asm("" : "=r"(allocationToken));
     }
     blink = (u16 *)(((u8 *)p) + 0x104);
     if ((*blink) && (!p->f1E0)) {
@@ -129,11 +112,6 @@ void Screamer_UpdateDamageParticles(struct ScreamerState *p)
         else
             p->sprite.flags &= ~1;
     }
-    p->age++;
-    asm("" : : "r"(allocationToken));
-    return;
+    dataOwner = p;
+    ((struct ScreamerState *)dataOwner)->age++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Screamer_UpdateDamageParticles);
-#endif

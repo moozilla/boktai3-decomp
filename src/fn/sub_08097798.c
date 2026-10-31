@@ -1,76 +1,75 @@
 #include "global.h"
-
 #include "contact_actor.h"
 
-// confidence=low: steps a 0..1023 phase and writes the cubic blend of the start and end points to dest.
+#include "scene_actor_reset.h"
 
-struct Sub08097798Context {
-    u8 unk0[0x5B4];
-    u16 phase5B4;
-    u8 unk5B6[2];
-    s16 scale5B8;
-    u8 unk5BA[0x5D4 - 0x5BA];
-    struct ContactPosition dest5D4;
-    u8 unk5DC[0x5EC - 0x5DC];
-    struct ContactPosition start5EC;
-    struct ContactPosition end5F4;
+struct GhostCurveContext {
+    u8 unknown0[0x5B4];
+    u16 time;
+    u8 unknown5B6[2];
+    s16 curve;
+    u8 unknown5BA[0x5D4 - 0x5BA];
+    struct ContactPosition output;
+    u8 unknown5DC[0x5EC - 0x5DC];
+    struct ContactPosition start, end;
 };
-
-struct Sub08097798Actor {
-    u8 unk0[0x3D0];
-    struct Sub08097798Context *context;
-};
-
-static inline s32 Trunc10_08097798(s32 value)
+static inline s32 Ghost_TruncateFixed10(s32 value)
 {
-    if (value >= 0)
-        return value >> 10;
-    return -((-value) >> 10);
+    return value >= 0 ? value >> 10 : -((-value) >> 10);
 }
-
-#ifdef NONMATCHING
-// fuzzy: 36.1%
-// scope shape 150 (differences once low registers are set aside)
-// confidence=low: steps a 0..1023 phase and writes the cubic blend of the start and end points to dest.
-u8 sub_08097798(void *arg0)
+static inline void Ghost_SubtractPositions(struct ContactPosition *out, struct ContactPosition *a,
+                                           struct ContactPosition *b)
 {
-    struct Sub08097798Context *ctx = ((struct Sub08097798Actor *)arg0)->context;
-    struct ContactPosition start;
-    struct ContactPosition end;
-    struct ContactPosition delta;
-    struct ContactPosition offset;
-    u16 phase;
-    s32 q;
-    s32 w;
-    s32 h00;
-    s32 h01;
-    s32 tangent;
-
-    start = ctx->start5EC;
-    ((u32 *)&start)[0] &= 0xFFFF;
-    end = ctx->end5F4;
-    ((u32 *)&end)[0] &= 0xFFFF;
-    delta.x = end.x - start.x;
-    delta.y = end.y - start.y;
-    delta.z = end.z - start.z;
-    ZeroFill8(&offset);
-
-    phase = ctx->phase5B4;
-    q = Trunc10_08097798(phase * phase);
-    w = Trunc10_08097798(phase * q);
-    h00 = 2 * w - 3 * q + 1;
-    h01 = 3 * q - 2 * w;
-    tangent = ctx->scale5B8 * (w - 2 * q + phase);
-
-    ctx->dest5D4.x = start.x + Trunc10_08097798(offset.x * h00 + delta.x * h01 + tangent);
-    ctx->dest5D4.y = start.y + Trunc10_08097798(offset.y * h00 + delta.y * h01 + tangent);
-    ctx->dest5D4.z = start.z + Trunc10_08097798(offset.z * h00 + delta.z * h01 + tangent);
-
-    if (ctx->phase5B4 > 0x3FF)
+    out->x = b->x - a->x;
+    out->y = b->y - a->y;
+    out->z = b->z - a->z;
+}
+static inline void Ghost_InterpolatePosition(struct ContactPosition *out,
+                                             struct ContactPosition *start,
+                                             struct ContactPosition *end, s32 initialScale, s32 t,
+                                             s32 finalScale, s32 speed)
+{
+    struct ContactPosition delta, tangent;
+    s32 square, cube, twiceCube, thriceSquare, sway, final;
+    s32 scaled, value;
+    Ghost_SubtractPositions(&delta, start, end);
+    ZeroFill8(&tangent);
+    square = Ghost_TruncateFixed10(t * t);
+    cube = Ghost_TruncateFixed10(square * t);
+    twiceCube = cube * 2;
+    thriceSquare = square * 3;
+    sway = (cube - 2 * square + t) * speed;
+    final = (cube - square) * finalScale;
+    scaled = ((twiceCube - thriceSquare + 1) * tangent.x) * initialScale;
+    value = (thriceSquare - twiceCube) * delta.x;
+    value = scaled + value + sway + final;
+    out->x = start->x + Ghost_TruncateFixed10(value);
+    scaled = ((twiceCube - thriceSquare + 1) * tangent.y) * initialScale;
+    value = (-twiceCube + thriceSquare) * delta.y;
+    value = scaled + value + sway + final;
+    out->y = start->y + Ghost_TruncateFixed10(value);
+    scaled = ((twiceCube - thriceSquare + 1) * tangent.z) * initialScale;
+    value = (-twiceCube + thriceSquare) * delta.z;
+    value = scaled + value + sway + final;
+    out->z = start->z + Ghost_TruncateFixed10(value);
+}
+u8 sub_08097798(struct SceneActorRegistryResetView *actor)
+{
+    struct GhostCurveContext *ctx = actor->context;
+    struct ContactPosition start, end;
+    start = ctx->start;
+    {
+        u32 mask = 0xFFFF;
+        *(u32 *)&start = mask & *(u32 *)&start;
+    }
+    end = ctx->end;
+    {
+        u32 mask = 0xFFFF;
+        *(u32 *)&end = mask & *(u32 *)&end;
+    }
+    Ghost_InterpolatePosition(&ctx->output, &start, &end, 1, ctx->time, 0, ctx->curve);
+    if (ctx->time > 1023)
         return 1;
-    ctx->phase5B4 = ctx->phase5B4 + 0x80;
+    ctx->time += 128;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08097798);
-#endif

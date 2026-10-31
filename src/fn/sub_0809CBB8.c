@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 void Lun_OnBodyContact(void);
-void sub_0809AE0C(void);
+void Lun_HandlePlayerContact(void);
 void SceneActorCollision_InitBody(void *, void *, void *, void *, void *);
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
@@ -31,5 +31,5 @@ void ActorContact_InitializeBodyAndSecondary(struct SceneActorRegistryResetView 
     }
     Collider_SetAttackProperties(collider, 0, 0, 0, 0, 0);
     Collider_SetPosition(collider, &a->body.position, 0);
-    Collider_SetCallback(collider, sub_0809AE0C, a);
+    Collider_SetCallback(collider, Lun_HandlePlayerContact, a);
 }

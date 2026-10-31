@@ -1,11 +1,11 @@
 #include "global.h"
+#include "scene_actor_style.h"
 #include "game_state.h"
 #include "ram.h"
 #include "engine_globals.h"
 #include "area_effect_link.h"
-// MATCHING_CONCESSION: register-pinning
 
-struct Obj {
+struct GloveMotion {
     u8 pad0[4];
     u32 unk4;
     u32 unk8;
@@ -17,7 +17,9 @@ struct Obj {
     s32 unk38;
     s32 unk3C;
     u32 flags40;
-    u8 pad44[0x68 - 0x44];
+    u8 color[4];
+    struct SceneActorStyle style;
+    u8 pad64[4];
     u32 pendingDamage;
     u8 pad6C[0x7E - 0x6C];
     u16 recoveryValue;
@@ -55,10 +57,15 @@ struct Obj {
     u8 pad5F2[6];
 };
 
+struct GloveModel {
+    u8 pad0[8];
+    u32 flags;
+    u8 padC[0x250 - 0xC];
+};
 struct Glove {
     u8 pad0[0x18];
-    struct Obj motion;
-    u8 model[0x860 - 0x610];
+    struct GloveMotion motion;
+    struct GloveModel model;
     s8 marker, markerSlot;
     u8 pad862[2];
     u32 timer;
@@ -77,22 +84,16 @@ struct Glove {
     s32 launchSpeed;
     u8 launchPhase;
 };
-#define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
-#define S8(p, o)  (*(s8 *)((u8 *)(p) + (o)))
-#define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
-#define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
-#define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
-#define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
 s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct Obj *);
-void PalFade_Update(struct Obj *);
-void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-void ActorParticles_SpawnImpactBurst(struct Obj *);
+void Terrain_ResolveActorMotion(struct GloveMotion *);
+void PalFade_Update(struct GloveMotion *);
+void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct Obj *);
-void Actor_ClampMovementSpeed(struct Obj *);
+void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
+void Actor_ClampMovementSpeed(struct GloveMotion *);
 void MotionActor_UpdateMovementAudio(struct Glove *);
 u8 LinkParticipant_IsLocallySelected(struct Glove *);
 void Sound_StopSong(s32);
@@ -110,49 +111,63 @@ void CharacterModel_SetAnimationFlags(void *, s32);
 void ActorMarkerPool_ShowMarker(s32);
 void Character_SetLowResourceColorEffect(void *, void *);
 
-#ifdef NONMATCHING
-// fuzzy: 82.3%
-// fix.py best (sweep after the inlined-insn fix)
 // confidence=low: restores appearance and resources after defeat recovery.
 #define Glove_UpdateRecoveryFlash sub_08117F6C
 static inline u32 LinkMode(u32 mask)
 {
     return (gEngineFlags | gScenePauseFlags) & mask;
 }
+union GloveResourceHalfword {
+    u16 bits;
+    s16 value;
+};
+static inline void Glove_ChangeUpdate(struct Glove *p, void (*callback)(void *))
+{
+    u8 *active = &p->active;
+    u32 zero = 0;
+    *active = 1;
+    p->update = callback;
+    p->timer = zero;
+}
 void Glove_UpdateRecoveryFlash(struct Glove *p)
 {
-    struct Obj *self = &p->motion;
-    register s32 h asm("r10");
+    struct GloveMotion *self = &p->motion;
+    s32 h;
     s32 dx;
     s32 dz;
     u32 a;
     u32 b;
     u16 *flags;
+    s32 *vy, *py, *pvz, *bias;
     if (p->active) {
         if (!LinkMode(0x800))
             GameState_AddActionCount894(1);
-        CharacterModel_ClearAnimationFlags(p->model, 1);
+        CharacterModel_ClearAnimationFlags(&p->model, 1);
         p->active = 0;
         p->blinkTimer = 3;
     }
     {
         u16 bit = 1;
-        flags = &p->flags;
-        *flags |= bit;
+        p->flags |= bit;
     }
     {
-        s32 *vy = &self->vy;
-        s32 *bias = &self->unkC0;
-        s32 *py;
+        s32 decay;
         s32 *px;
         s32 *idy;
         s32 *idz;
-        h = (*vy) + (*bias);
-        if (h > 0xF000)
-            h = 0xF000;
+        h = self->vy + self->unkC0;
+        {
+            s32 limit = 0xF000;
+            flags = &p->flags;
+            vy = &self->vy;
+            bias = &self->unkC0;
+            if (h > limit)
+                h = limit;
+        }
         self->y += 0x200;
+        decay = self->steps;
         py = &self->y;
-        if (self->steps > 0) {
+        if (decay > 0) {
             self->x += self->dx;
             self->dx += Div(-self->dx, self->steps);
             self->dy += Div(-self->dy, self->steps);
@@ -171,7 +186,6 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
         {
             s32 *pprevZ;
             s32 *pprevX;
-            s32 *pvz;
             s32 lim;
             self->outX = ((*px) + h) - self->prevX;
             self->outY = (*py) + (*idy);
@@ -206,7 +220,7 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
                 self->flags40 &= ~1;
             }
             p->height = h;
-            Actor_UpdateShadowSpriteParts(self, p->model);
+            Actor_UpdateShadowSpriteParts(self, &p->model);
             if (self->flags40 & 2)
                 *pvz = 0;
             if (self->flags40 & 1)
@@ -216,46 +230,42 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
     if (p->blinkTimer) {
         p->blinkTimer--;
     } else {
-        if ((*((u32 *)(((u8 *)p) + 0x618))) & 1)
-            CharacterModel_ClearAnimationFlags(p->model, 1);
+        if ((p->model.flags) & 1)
+            CharacterModel_ClearAnimationFlags(&p->model, 1);
         else
-            CharacterModel_SetAnimationFlags(p->model, 1);
+            CharacterModel_SetAnimationFlags(&p->model, 1);
         p->blinkTimer = 3;
     }
-    *((u32 *)(((u8 *)self) + 0x5C)) = *((u32 *)(((u8 *)self) + 0x60));
+    self->style.initialWord = self->style.currentWord;
     {
-        u16 *current = (u16 *)(((u8 *)self) + 0x58);
-        u16 *target = (u16 *)(((u8 *)self) + 0x5A);
-        if (((s16)(*current)) < ((s16)(*target))) {
-            if ((((s16)(*target)) - (*((s16 *)current))) > 100)
-                *current += 20;
+        union GloveResourceHalfword *current, *target;
+        union GloveResourceHalfword *currentField = (void *)&self->style.initialHalfword;
+        union GloveResourceHalfword *targetField = (void *)&self->style.currentHalfword;
+        u32 currentBits = currentField->bits;
+        s32 currentValue = (s16)currentBits;
+        u32 targetBits = targetField->bits;
+        s32 targetValue = (s16)targetBits;
+        current = currentField;
+        target = targetField;
+        if (currentValue < targetValue) {
+            if (target->value - current->value > 100)
+                current->bits = currentBits + 20;
             else
-                *current += 5;
+                current->bits = currentBits + 5;
         } else
-            *current = *target;
+            current->bits = targetBits;
         if (p->timer > 120) {
-            *((u32 *)(((u8 *)self) + 0x5C)) = *((u32 *)(((u8 *)self) + 0x60));
-            *current = *target;
-            CharacterModel_ClearAnimationFlags(p->model, 1);
-            {
-                void (*callback)(void *) = (void (*)(void *))Glove_UpdateStopping;
-                u8 *active = &p->active;
-                u32 zero = 0;
-                *active = 1;
-                p->update = callback;
-                p->timer = zero;
-            }
+            self->style.initialWord = self->style.currentWord;
+            current->bits = target->bits;
+            CharacterModel_ClearAnimationFlags(&p->model, 1);
+            Glove_ChangeUpdate(p, (void (*)(void *))Glove_UpdateStopping);
             ActorMarkerPool_ShowMarker(p->marker);
             {
                 s32 mask = ~1;
                 *flags &= mask;
             }
-            Character_SetLowResourceColorEffect(((u8 *)self) + 0x44, ((u8 *)self) + 0x48);
+            Character_SetLowResourceColorEffect(self->color, &self->style);
         } else
             p->timer++;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08117F6C);
-#endif

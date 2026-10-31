@@ -2,258 +2,226 @@
 #include "game_state.h"
 #include "engine.h"
 #include "ram.h"
+#include "scene_actor_components.h"
+#include "contact_collider.h"
+#include "armor_decision_ops.h"
 
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-struct S08189FF8Actor {
-    u8 pad0[0x18];
+struct ArmorDecisionActor {
+    u8 task[0x18];
     u16 taskFlags;
-    u8 pad1a[0x48 - 0x1a];
-    s16 x, y, z;
-    u8 pad4e[0x28c - 0x4e];
-    struct {
-        u8 pad[6];
-        s16 flags;
-    } collision;
-    u8 pad294[0xb32 - 0x294];
+    u8 unknown1A[0x3C - 0x1A];
+    struct SceneActorBody body;
+    u8 unknown84[0x28C - 0x84];
+    struct ContactCollider collision;
+    u8 unknown2E0[0xB32 - 0x2E0];
     u16 flags;
-    u8 padb34[4];
-    u8 type;
-    u8 facing;
-    u8 padb3a[2];
+    u8 unknownB34[4];
+    u8 type, facing;
+    u8 unknownB3A[2];
     u8 behavior, phase;
-    u8 padb3e[0x1120 - 0xb3e];
+    u8 unknownB3E[0xB58 - 0xB3E];
+    u8 sequence[0x1120 - 0xB58];
     u8 decision, fastMode;
-    s16 attackCooldown, secondaryCooldown, collisionCooldown, modeTimer, timer112a;
-};
-struct S08189FF8Target {
-    u8 pad[0x30];
-    s16 x, y, z;
+    u16 attackCooldown, secondaryCooldown, collisionCooldown, modeTimer;
 };
 void ActorController_SetBehavior(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
 s32 Math_Atan2(s32, s32);
 
-static inline u16 S08189FF8_Rand(void)
+static inline void Armor_ClearCollision(struct ContactCollider *collision, u32 bits)
 {
+    u32 mask = ~bits;
+    collision->flags &= mask;
+}
+static inline void Armor_SetCollision(struct ContactCollider *collision)
+{
+    collision->flags |= 4;
+}
+static inline u16 Armor_NextRandom(void)
+{
+    u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gRandomTable[gRandomIndex];
+    offset = gRandomIndex * sizeof(u16);
+    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 53.4%
-// scope shape 177 (differences once low registers are set aside)
-// confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
-void sub_08189FF8(struct S08189FF8Actor *p)
+static inline u8 Armor_FacingValue(struct ArmorDecisionActor *actor)
 {
-    struct S08189FF8Target *tg;
-    s32 rawX;
-    s32 rawZ;
-    s32 dx;
-    s32 dz;
-    s32 adx;
-    s32 adz;
-    s32 dist;
-    s32 dir;
-    s16 t;
-    s32 ok;
+    return actor->facing;
+}
 
-    t = p->attackCooldown;
-    if (t > 0) {
-        p->attackCooldown = t - 1;
+// Selects axis attacks and recovery behavior while updating the current mode timers.
+void Armor_UpdateModeAttackDecision(struct ArmorDecisionActor *p)
+{
+    s32 playerX, actorX, playerZ, actorZ;
+    s32 dx, dz, absX, absZ, distance, direction;
+    u32 mode;
+    u16 timer;
+    timer = p->attackCooldown;
+    if ((s16)timer > 0) {
+        p->attackCooldown = timer - 1;
         if (p->fastMode)
-            p->attackCooldown = t - 2;
+            p->attackCooldown = timer - 2;
     }
-    t = p->collisionCooldown;
-    if (t > 0) {
-        p->collisionCooldown = t - 1;
+    timer = p->collisionCooldown;
+    if ((s16)timer > 0) {
+        p->collisionCooldown = timer - 1;
         if (p->fastMode)
-            p->collisionCooldown = t - 2;
+            p->collisionCooldown = timer - 2;
+        if ((s16)p->collisionCooldown > 0)
+            goto setCollision;
     }
-    if (p->collisionCooldown > 0 || !(p->flags & 1)) {
-        p->collision.flags |= 4;
-    } else {
-        p->collision.flags &= ~4;
+    if (p->flags & 1)
+        Armor_ClearCollision(&p->collision, 4);
+    else {
+    setCollision:
+        Armor_SetCollision(&p->collision);
     }
-
-    p->modeTimer--;
-    if (p->modeTimer <= 0) {
-        if (p->flags & 1) {
+    if ((s16)--p->modeTimer <= 0) {
+        u32 flag = p->flags & 1;
+        if (flag) {
             p->fastMode = !p->fastMode;
             p->modeTimer = 300;
-        } else {
-            p->modeTimer = 0;
-        }
+        } else
+            p->modeTimer = flag;
     }
-    if (!(p->flags & 1))
-        p->fastMode = 0;
-
-    if (p->phase != 0xff) {
-        u8 b = p->behavior;
-        if (b != 0x13 && b != 0x21 && b != 0x20 && b != 0x22 && b != 2 && b != 0x25)
-            return;
+    {
+        u32 flag = p->flags & 1;
+        if (!flag)
+            p->fastMode = flag;
     }
-
-    tg = (struct S08189FF8Target *)gGameState;
-    rawX = tg->x - p->x;
-    rawZ = tg->z - p->z;
-    dx = (rawX + 0x80) >> 8;
-    dz = (rawZ + 0x80) >> 8;
-    adx = dx;
-    adz = dz;
-    if (adx < 0)
-        adx = -adx;
-    if (adz < 0)
-        adz = -adz;
-    dist = adx + adz;
-
-    if (p->flags & 1) {
-        if (p->decision == 0) {
-            if (dist <= 3) {
-                if (p->fastMode)
-                    ActorController_SetBehavior(p, 0x22);
+    if (p->phase != 255 && p->behavior != 19 && p->behavior != 33 && p->behavior != 32 &&
+        p->behavior != 34 && p->behavior != 2 && p->behavior != 37)
+        return;
+    playerX = gGameState->positionX;
+    actorX = p->body.position.x;
+    ARMOR_CAPTURE_COMPONENT_DELTA(dx, playerX, actorX);
+    playerZ = gGameState->positionZ;
+    actorZ = p->body.position.z;
+    ARMOR_CAPTURE_COMPONENT_DELTA(dz, playerZ, actorZ);
+    ARMOR_ROUND_GRID_COMPONENT(dx);
+    ARMOR_ROUND_GRID_COMPONENT(dz);
+    absX = dx;
+    absZ = dz;
+    ARMOR_ABSOLUTE_COMPONENT(absX, dx);
+    ARMOR_ABSOLUTE_COMPONENT(absZ, dz);
+    mode = p->flags & 1;
+    if (mode) {
+        switch (p->decision) {
+            case 0:
+                if (absX + absZ <= 3) {
+                    if (p->fastMode)
+                        ActorController_SetBehavior(p, 34);
+                    else
+                        ActorController_SetBehavior(p, 32);
+                    p->decision = 1;
+                    p->attackCooldown = 180;
+                } else if (Armor_IsSequenceIncomplete(p->sequence))
+                    ActorController_SetBehavior(p, 8);
+                else if (p->fastMode)
+                    ActorController_SetBehavior(p, 33);
                 else
-                    ActorController_SetBehavior(p, 0x20);
+                    ActorController_SetBehavior(p, 19);
+                break;
+            case 1:
+                if (p->behavior == 3)
+                    goto recover;
+                distance = absX + absZ;
+                if (distance > 4) {
+                    if (p->fastMode)
+                        ActorController_SetBehavior(p, 33);
+                    else
+                        ActorController_SetBehavior(p, 19);
+                    p->decision = 0;
+                    break;
+                }
+                direction = Math_Atan2(playerX - actorX, playerZ - actorZ);
+                direction = (direction + 32) & 192;
+                if (Armor_FacingValue(p) == direction && distance <= 1)
+                    goto attack;
+                if ((s16)p->attackCooldown <= 0) {
+                    if (dx == 0) {
+                        ARMOR_BRANCH_FACING_AXIS(p, dz, 192, 64, alignedZ, approach);
+                    alignedZ:
+                        if (Armor_NextRandom() & 4)
+                            goto spin;
+                        goto swing;
+                    } else if (dz == 0) {
+                        ARMOR_BRANCH_FACING_AXIS(p, dx, 128, 0, alignedX, approach);
+                    alignedX:
+                        if (Armor_NextRandom() & 4) {
+                        spin:
+                            ActorController_SetBehavior(p, 36);
+                        } else {
+                        swing:
+                            ActorController_SetBehavior(p, 24);
+                        }
+                        break;
+                    }
+                }
+            approach:
+                if (p->fastMode)
+                    ActorController_SetBehavior(p, 34);
+                else
+                    ActorController_SetBehavior(p, 32);
+                break;
+            case 2:
+                if (p->behavior == 15)
+                    goto attack;
+                if (p->fastMode)
+                    ActorController_SetBehavior(p, 34);
+                else
+                    ActorController_SetBehavior(p, 32);
                 p->decision = 1;
                 p->attackCooldown = 180;
-            } else if (Armor_IsSequenceIncomplete((u8 *)p + 0xB58)) {
-                ActorController_SetBehavior(p, 8);
-            } else {
-                if (p->fastMode)
-                    ActorController_SetBehavior(p, 0x21);
-                else
-                    ActorController_SetBehavior(p, 0x13);
-            }
-        } else if (p->decision == 1) {
-            if (p->behavior == 3) {
-                ActorController_SetBehavior(p, 0x1e);
-                return;
-            }
-            if (dist > 4) {
-                if (p->fastMode)
-                    ActorController_SetBehavior(p, 0x21);
-                else
-                    ActorController_SetBehavior(p, 0x13);
-                p->decision = 0;
-                return;
-            }
-            dir = (Math_Atan2(rawX, rawZ) + 0x20) & 0xC0;
-            if (p->facing == dir && dist <= 1) {
-                ActorController_SetBehavior(p, 3);
-                return;
-            }
-            ok = 0;
-            if (p->attackCooldown <= 0) {
-                if (dx == 0 && dz < 0)
-                    ok = (p->facing == 0xC0);
-                else if (dx == 0 && dz >= 0)
-                    ok = (p->facing == 0x40);
-                else if (dz == 0 && dx < 0)
-                    ok = (p->facing == 0x80);
-                else if (dz == 0 && dx >= 0)
-                    ok = (p->facing == 0);
-            }
-            if (ok) {
-                if (S08189FF8_Rand() & 4)
-                    ActorController_SetBehavior(p, 0x24);
-                else
-                    ActorController_SetBehavior(p, 0x18);
-                return;
-            }
-            if (p->fastMode)
-                ActorController_SetBehavior(p, 0x22);
-            else
-                ActorController_SetBehavior(p, 0x20);
-        } else if (p->decision == 2) {
-            if (p->behavior == 0xf) {
-                ActorController_SetBehavior(p, 3);
-                return;
-            }
-            if (p->fastMode)
-                ActorController_SetBehavior(p, 0x22);
-            else
-                ActorController_SetBehavior(p, 0x20);
-            p->decision = 1;
-            p->attackCooldown = 180;
+                break;
         }
     } else {
-        if (p->decision == 0) {
-            if (dist <= 4) {
-                ActorController_SetBehavior(p, 0x25);
-                p->decision = 1;
-                p->attackCooldown = 360;
-            } else {
-                ActorController_SetBehavior(p, 2);
-            }
-        } else if (p->decision == 1) {
-            if (p->behavior == 3) {
-                ActorController_SetBehavior(p, 0x1e);
-                return;
-            }
-            dir = (Math_Atan2(rawX, rawZ) + 0x20) & 0xC0;
-            if (p->facing == dir) {
-                if (dist > 5) {
-                    ActorController_SetBehavior(p, 7);
-                    p->decision = 0;
-                    return;
+        u8 *decision = &p->decision;
+        switch (*decision) {
+            case 0:
+                if (absX + absZ <= 4) {
+                    ActorController_SetBehavior(p, 37);
+                    *decision = 1;
+                    p->attackCooldown = 360;
+                } else
+                    ActorController_SetBehavior(p, 2);
+                break;
+            case 1:
+                if (p->behavior == 3) {
+                recover:
+                    ActorController_SetBehavior(p, 30);
+                    break;
                 }
-                if (dist <= 1) {
-                    ActorController_SetBehavior(p, 3);
-                    return;
+                direction = Math_Atan2(playerX - actorX, playerZ - actorZ);
+                direction = (direction + 32) & 192;
+                if (Armor_FacingValue(p) == direction) {
+                    s32 alignedDistance = absX + absZ;
+                    if (alignedDistance > 5) {
+                        ActorController_SetBehavior(p, 7);
+                        *decision = mode;
+                        break;
+                    }
+                    if (alignedDistance <= 1) {
+                    attack:
+                        ActorController_SetBehavior(p, 3);
+                        break;
+                    }
                 }
-            }
-            if (p->attackCooldown > 0) {
-                ActorController_SetBehavior(p, 0x25);
-            } else if (dx == 0 || dz == 0) {
-                ActorController_SetBehavior(p, 0x24);
+                if ((s16)p->attackCooldown > 0)
+                    goto axisApproach;
+                ARMOR_BRANCH_AXIS_UNALIGNED(dx, dz, axisApproach);
+                ActorController_SetBehavior(p, 36);
                 p->attackCooldown = 360;
-            } else {
-                ActorController_SetBehavior(p, 0x25);
-            }
-        } else if (p->decision == 2) {
-            ActorController_SetBehavior(p, 3);
-            p->decision = 1;
-            p->attackCooldown = 360;
+                break;
+            axisApproach:
+                ActorController_SetBehavior(p, 37);
+                break;
+            case 2:
+                ActorController_SetBehavior(p, 3);
+                *decision = 1;
+                p->attackCooldown = 360;
+                break;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08189FF8);
-#endif
