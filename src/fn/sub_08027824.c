@@ -77,7 +77,7 @@ void SceneActors_UpdateDirectionalTurn(ActorAnimation *p)
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;
     if (p->changed) {
-        register int sequence asm("r6");
+        int sequence;
         p->changed = 0;
         sequence = choose(p->mode, 43, 5);
         {
@@ -86,7 +86,7 @@ void SceneActors_UpdateDirectionalTurn(ActorAnimation *p)
                                                   1, 4);
         }
     } else {
-        register int sequence asm("r6") = choose(p->mode, 43, 5);
+        int sequence = choose(p->mode, 43, 5);
         {
             int offset = 0x240;
             SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1,

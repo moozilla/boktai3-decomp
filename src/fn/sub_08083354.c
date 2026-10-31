@@ -63,18 +63,17 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
         gRandomIndex = index;
         index *= 2;
         {
-            register const u16 *table asm("r3") = gRandomTable;
+            const u16 *table = gRandomTable;
             u32 value = *(u16 *)(index + (u32)table);
             register u32 offset = 0x3EC;
 
             {
-                register u8 *field asm("r1") = (u8 *)control + offset;
+                u8 *field = (u8 *)control + offset;
                 *field = value;
                 {
                     register const s16 *sine = gUnk_086149C4;
                     s32 sample;
                     sample = sine[*field];
-                    asm("" ::"r"(offset));
                     actor->secondaryMotion.x = Scale(sample);
                     asm("" ::"r"(table));
                 }

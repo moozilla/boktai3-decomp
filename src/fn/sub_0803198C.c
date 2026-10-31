@@ -84,7 +84,7 @@ void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 static inline void MessageWindow_StepSprite(struct MsgSprite *sprite, struct MsgAnim *a,
                                             u32 inputBit)
 {
-    register u32 bit asm("r9") = inputBit;
+    u32 bit = inputBit;
     u16 *fr;
     fr = a->frames + a->frameIdx;
     sprite->frame = *fr >> 6;

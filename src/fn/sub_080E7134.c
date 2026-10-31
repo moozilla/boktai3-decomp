@@ -137,11 +137,9 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
         {
             s32 angle = Math_Atan2(delta.x, delta.z);
             u8 *heading = &actor->body.direction;
-            asm("" : "+r"(heading));
             *heading = angle;
             {
-                register u32 offset asm("r2") = 0x2ec;
-                asm("" : "+r"(offset));
+                u32 offset = 0x2ec;
                 Polar((void *)((u8 *)actor + offset), *heading, speed);
             }
         }

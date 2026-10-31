@@ -1,8 +1,6 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
-// Remaining differences: projection source register and vertical-bound operand allocation.
 struct Vec {
     s16 x, y, z;
 };
@@ -30,10 +28,9 @@ static inline void screen(struct Vec *dst, struct Sprite *sp)
 {
     u32 off = 0x1c;
     struct Vec *t;
-    register struct Vec *src asm("r12");
+    struct Vec *src;
     s32 depth, height, y, z;
     s32 sx, sz;
-    asm("" : "+r"(off));
     off += (u32)sp;
     t = (struct Vec *)off;
     src = t;
@@ -42,7 +39,7 @@ static inline void screen(struct Vec *dst, struct Sprite *sp)
     dst->x = project(sx - sz);
     depth = project(sx + sz);
     {
-        register struct Vec *q asm("r2") = src;
+        struct Vec *q = src;
         height = project(q->y);
     }
     y = depth - height;

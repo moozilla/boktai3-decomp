@@ -61,7 +61,6 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
             /* Reserve the scratch register across the signed coordinate load. */
             register s32 scratch asm("r3");
             s32 current;
-            asm("" : "=r"(scratch));
             current = out->y;
             asm volatile("" : : "r"(scratch));
             out->y = ScalarApproach_StepEighth(current, target->y);

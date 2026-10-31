@@ -723,7 +723,6 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
         {
             register u32 d asm("r1");
             s32 ax;
-            asm("" : "=r"(d));
             ax = -p->offset.x;
             asm("" ::"r"(d));
             p->direction = Math_Atan2(ax, -p->offset.z);
