@@ -115,17 +115,18 @@ static inline void SetFacing(struct PlayerClone *slot, u16 angle)
     mask &= facing;
     slot->state.facing = mask;
 }
-static inline void UpdateVelocity(u32 *flags, struct CloneVec *velocity, struct CloneParams *params)
+static inline void UpdateVelocity(u32 *flags, struct PlayerClone *slot, struct CloneParams *params)
 {
-    if (*flags & 1) {
+    u32 moving = *flags & 1;
+    struct CloneVec *velocity = &slot->velocity;
+    if (moving) {
         Vec_FromAngle(velocity, params->direction, params->speed);
         ClearFlags(flags, 1);
     }
 }
 /* Advance each active clone, its animation and colliders, and its lifetime. */
 #ifdef NONMATCHING
-// fuzzy: 70.1%
-// scope shape 86 (differences once low registers are set aside)
+// fuzzy: 77.4%
 s32 PlayerClone_UpdatePool(struct PlayerClonePool *pool)
 {
     struct PlayerClone *slot = pool->entries;
@@ -152,7 +153,7 @@ s32 PlayerClone_UpdatePool(struct PlayerClonePool *pool)
             SetFacing(slot, (u16)params->direction);
             DirectionalSprite_FoldFacing(slot);
             {
-                UpdateVelocity(&slot->state.flags, &slot->velocity, params);
+                UpdateVelocity(&slot->state.flags, slot, params);
                 Vec_Sum(&anim->position, &anim->position, &slot->velocity);
             }
             if (anim->position.x > 0xcda)
