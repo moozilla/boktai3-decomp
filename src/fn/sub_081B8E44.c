@@ -24,10 +24,8 @@ static inline void OrbitMotion_ProjectCrossedPair(struct OrbitVector *v, struct 
         *destinationX = projectedX;
     }
     v->y = 0;
-    v->z = OrbitMotion_HalfTowardZero(((screenY - screenX) << 5) / 3);
+    v->z = OrbitMotion_HalfTowardZero(((screenY - (s16)screenX) << 5) / 3);
 }
-#ifdef NONMATCHING
-// fuzzy: 97.0%
 s32 OrbitMotion_UpdateCrossedSines(struct OrbitMotion *p)
 {
     struct OrbitWavePair pair;
@@ -41,6 +39,3 @@ s32 OrbitMotion_UpdateCrossedSines(struct OrbitMotion *p)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", OrbitMotion_UpdateCrossedSines);
-#endif
