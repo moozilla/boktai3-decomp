@@ -1,7 +1,6 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: targets player zero and starts the contact pursuit control.
 u32 Nav_IsPositionInMesh(void *, void *, void *);
 s32 Terrain_ApplyBlocked(void *, void *, void *);
@@ -74,6 +73,17 @@ inline static void ClearMotion_BeginPlayerPursuit(struct SceneActorRegistryReset
     }
 }
 
+#define SPIDER_CAPTURE_PURSUIT_MOTION_MASK(out_)                                                   \
+    do {                                                                                           \
+        (out_) = 0x200;                                                                            \
+    } while (0)
+
+#define SPIDER_START_PURSUIT(context_)                                                             \
+    do {                                                                                           \
+        (context_)->flags |= 2;                                                                    \
+        (context_)->timer = 0;                                                                     \
+    } while (0)
+
 void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
 {
     struct PursuitContext *ctx;
@@ -84,7 +94,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     void *terrain;
     void *dest;
     s32 result;
-    register u32 motionMask asm("r9");
+    u32 motionMask;
     if (Blocked(a))
         return;
     if (!(*(u8 **)gPlayers))
@@ -97,7 +107,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     mesh = &((struct SpiderPursuitGroup *)group)->mesh;
     if (!Nav_IsPositionInMesh(*mesh, &a->body.position, (*(u8 **)gPlayers) + 0x30))
         return;
-    motionMask = 0x200;
+    SPIDER_CAPTURE_PURSUIT_MOTION_MASK(motionMask);
     point = &((struct SpiderPursuitGroup *)group)->point;
     *(*point) = a->body.position;
     (*point)->pad = ready;
@@ -115,9 +125,5 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     }
     SetFlags(a, 0x4010);
     a->field2C2 = Div(64, 3);
-    {
-        u32 mask = 2;
-        ctx->flags = mask | ctx->flags;
-    }
-    ctx->timer = 0;
+    SPIDER_START_PURSUIT(ctx);
 }

@@ -62,7 +62,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
     struct Manager *m;
     struct Group *g;
     register struct Group *base asm("r8");
-    register u16 *speeds asm("sl");
+    u16 *speeds;
     register u32 *rng asm("sb");
     s32 i;
     u8 *animation;

@@ -2,8 +2,6 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-#include "heap.h"
-#include "resource_registry.h"
 #include "monster_particle_random.h"
 // confidence=low: creates a pooled projectile with optional spin and collider.
 #define SpriteProjectile_Create sub_08127590
@@ -202,9 +200,11 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position,
         sprite->flags = attributes;
     }
     if (flags & 2) {
-        u32 origin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
-        const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
+        u32 origin;
+        const u16 *table;
         s32 spinSample;
+        PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
+        table = (const u16 *)RANDOM_TABLE_ADDR;
         sprite->angle = ParticleRandom_ReadDirectSample(table);
         spinSample = ParticleRandom_ReadDirectSample(table);
         spinSample &= 255;

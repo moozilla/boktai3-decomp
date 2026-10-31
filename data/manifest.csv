@@ -16,6 +16,12 @@ ivy_script_commands,08606400,0860641C,callback_array,data/actor_commands/ivy.csv
 actor_default_commands,086108B0,086108C8,callback_array,data/actor_commands/default.csv,Default actor script command handlers (6 entries)
 player_animation_variants,08610980,08610B50,player_animations,data/player_cue/animations.csv,Player animation base sequences by action mode and index (four modes with 58 entries each)
 text_bank,08D6B1E4,08DD6B96,text_bank,build/text/bank.tsv,"Script text: gcx section words, entry table + strings and blobs (ROM-derived source, extracted on demand; strings may change length)"
+sound_test_music,086136F0,086137AE,sound_test,build/sound_test/music.csv,Sound test music menu song IDs
+sound_test_effects,086137AE,08613BC4,sound_test,build/sound_test/effects.csv,Sound test effects menu song IDs
+sound_test_voices,08613BC4,08613CF2,sound_test,build/sound_test/voices.csv,Sound test voices menu song IDs
+effect_random_samples,086141BC,086149BC,math_lookup,build/effect_random_samples.csv,Fixed effect random sample bank
+math_sine,086149C4,08614C44,math_lookup,data/math/sine.csv,Q12 sine wave and cosine extension
+math_atan,08614C44,08614D45,math_lookup,data/math/atan.csv,First-octant arctangent angles
 res_anm,08614DCC,08617084,resource_archive,build/res/anm/index.txt,"Resource archive anm (ROM-derived entries, extracted on demand; entries may change size)"
 res_map,08617084,087C4C98,resource_archive,build/res/map/index.txt,"Resource archive map (ROM-derived entries, extracted on demand; entries may change size)"
 res_tAE6C,087C4C98,088223C4,resource_archive,build/res/tAE6C/index.txt,"Resource archive tAE6C (ROM-derived entries, extracted on demand; entries may change size)"

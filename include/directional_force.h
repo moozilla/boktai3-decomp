@@ -9,6 +9,7 @@ struct DirectionalForce {
     u16 baseMagnitude, magnitudeRange, baseDelay, delayRange;
     u16 magnitude, targetMagnitude, angle, targetAngle, delay, unknown2E;
 };
+/* 0x02000114 */
 extern struct DirectionalForce *gDirectionalForce;
 s32 Mod(s32, s32);
 #endif

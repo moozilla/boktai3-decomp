@@ -125,6 +125,7 @@ struct SceneObjectManager {
     struct SceneObject *objects;
 };
 
+/* 0x02000024 */
 extern struct SceneObjectManager *gSceneObjectManager;
 
 /* Engine helpers shared by the functions below. */

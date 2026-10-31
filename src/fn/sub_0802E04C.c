@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 struct Position {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -34,7 +33,7 @@ static inline s32 Scale(s32 value)
 }
 static inline void Polar(const s16 *table, struct Position *v, u32 angle, const s32 radius)
 {
-    register u32 heading asm("r3") = angle;
+    u32 heading = angle;
     s32 length = radius;
     v->x = Scale(table[(heading + 64) & 255] * length);
     v->y = 0;

@@ -120,7 +120,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 16 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 17 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -228,7 +228,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-27.md](../docs/history/2026-10-27.md) | Work history: 2026-10-27 | #matching #ram #tooling | 1 |
 | [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29: matching search and the largest-function experiment | #compiler #ghoul #golem #matching #monsters #mummy #process #scene-actor #skeleton #tooling #vanargand | 7 |
 | [docs/history/2026-10-30.md](../docs/history/2026-10-30.md) | 2026-10-30: monster initializers and shared engine records | #bosses #compiler #cue #data #effects #hresvelgr #matching #monsters #player #presentation #ram #ratatosk #scene-actors #scope-gap #structs #studio #tooling #vanargand | 9 |
-| [docs/history/2026-10-31.md](../docs/history/2026-10-31.md) | 2026-10-31: finish-subsystem sessions | #bosses #cleanup #compiler #data #effects #hresvelgr #matching #player #presentation #ratatosk #register-pinning #scene-actors #structs #studio #tooling #vanargand | 5 |
+| [docs/history/2026-10-31.md](../docs/history/2026-10-31.md) | 2026-10-31: finish-subsystem sessions | #bosses #cleanup #compiler #data #effects #hresvelgr #matching #player #presentation #ratatosk #register-pinning #scene-actors #structs #studio #tooling #vanargand | 6 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
@@ -397,6 +397,25 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round7-sword-task-initializer_2026-10-30.md](../notes/round7-sword-task-initializer_2026-10-30.md) | Round 7: Sword task initialization | #matching #monsters #sword #080F67AC #scope | 2 |
 | [notes/round7-tentacle-wander_2026-10-30.md](../notes/round7-tentacle-wander_2026-10-30.md) | Tentacle wander-route selection | #matching #monsters #tentacle #080A8904 | 1 |
 | [notes/round7-vorn-defeat_2026-10-30.md](../notes/round7-vorn-defeat_2026-10-30.md) | Round 7: Vorn defeat completion | #matching #monsters #vorn #080AEE08 #scope | 3 |
+| [notes/round8-armor-axis-decision.md](../notes/round8-armor-axis-decision.md) | Armor axis attack decision |  | 1 |
+| [notes/round8-armor-layered-animation.md](../notes/round8-armor-layered-animation.md) | Armor layered animation | #matching #armor #compiler | 0 |
+| [notes/round8-dog-init.md](../notes/round8-dog-init.md) | Dog_Init | #matching #dog #compiler #round8 | 1 |
+| [notes/round8-effect-group-fade.md](../notes/round8-effect-group-fade.md) | EffectGroup_FadeFirstActive | #effects #matching #round8 | 0 |
+| [notes/round8-feather-ground-scatter.md](../notes/round8-feather-ground-scatter.md) | FeatherEffectPool_SpawnGroundScatter | #matching #effects #compiler #round8 | 1 |
+| [notes/round8-linked-effect-variant.md](../notes/round8-linked-effect-variant.md) | LinkedEffect_SetVariant | #matching #effects #compiler #round8 | 0 |
+| [notes/round8-particle-sample-origin.md](../notes/round8-particle-sample-origin.md) | Particle sample address origin | #rng #matching #round8 | 2 |
+| [notes/round8-player-clone-pool.md](../notes/round8-player-clone-pool.md) | PlayerClone_UpdatePool | #matching #player #compiler #round8 | 0 |
+| [notes/round8-player-target-motion.md](../notes/round8-player-target-motion.md) | Player_UpdateTargetMotion | #matching #player #compiler #round8 | 0 |
+| [notes/round8-projectile-impact-pair.md](../notes/round8-projectile-impact-pair.md) | Projectile_SpawnImpactPair | #matching #effects #compiler #round8 | 0 |
+| [notes/round8-radial-burst.md](../notes/round8-radial-burst.md) | RadialBurstEffect_StartBurst | #matching #effects #compiler #round8 | 1 |
+| [notes/round8-runtime-maps.md](../notes/round8-runtime-maps.md) | Runtime state and effect lookup tables | #ram #data #studio #matching #round8 | 2 |
+| [notes/round8-scene-effect-messages.md](../notes/round8-scene-effect-messages.md) | Scene effect queue messages | #effects #projection #matching #round8 | 1 |
+| [notes/round8-scene-target-begin-move.md](../notes/round8-scene-target-begin-move.md) | SceneTarget_BeginMove | #effects #projection #matching #round8 | 0 |
+| [notes/round8-secondary-flicker-burst.md](../notes/round8-secondary-flicker-burst.md) | FlickerParticle_StartSecondaryBurst | #effects #round8 #matching | 1 |
+| [notes/round8-sound-test.md](../notes/round8-sound-test.md) | Sound-test song lists | #sound #studio #data #matching #round8 | 1 |
+| [notes/round8-spark-particle-spawn.md](../notes/round8-spark-particle-spawn.md) | SparkParticle_Spawn | #matching #effects #compiler #round8 | 0 |
+| [notes/round8-spider-health-pins.md](../notes/round8-spider-health-pins.md) | Spider pursuit and health restore entry | #round8 #matching #compiler | 1 |
+| [notes/round8-vanargand-part-impact.md](../notes/round8-vanargand-part-impact.md) | Vanargand_UpdatePartImpact | #matching #vanargand #compiler #round8 | 0 |
 | [notes/s0.md](../notes/s0.md) | s0 notes | *#tooling* | 11 |
 | [notes/s1.md](../notes/s1.md) | s1 notes | *#tooling* | 12 |
 | [notes/s2.md](../notes/s2.md) | s2 notes (range 080C9844-0813B134) |  | 11 |

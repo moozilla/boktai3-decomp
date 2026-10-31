@@ -8,6 +8,7 @@ struct WirelessLinkIndicator {
     struct ProjectedDisplayResource resource;
     struct ProjectedDisplayEntry animation;
 };
+/* 0x020000F4 */
 extern struct WirelessLinkIndicator *gWirelessLinkIndicator;
 void WirelessLinkIndicator_SelectStrengthFrame(struct WirelessLinkIndicator *, s32);
 void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *);

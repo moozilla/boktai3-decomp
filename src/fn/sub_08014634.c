@@ -69,7 +69,7 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position,
                                 s32 lifetimeMask)
 {
     struct SpawnArgs args = {count, options, position};
-    register struct Vec *velocityInput asm("r3") = velocityArg;
+    struct Vec *velocityInput = velocityArg;
     struct Vec *velocity;
     register struct Manager *m asm("r1");
     u8 *resource;

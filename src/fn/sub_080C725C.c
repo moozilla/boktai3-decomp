@@ -1,6 +1,4 @@
 #include "global.h"
-#include "heap.h"
-#include "resource_registry.h"
 #include "monster_particle_random.h"
 #include "scene_object.h"
 #include "scene_actor_chase_reaction.h"
@@ -88,11 +86,8 @@ void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 fram
         context->colliderDelay = 20;
         velocity.x = GolemSlide_Quarter(body->motion.z);
         /* The recovered origin cancels when a later sample address becomes a table offset. */
-        randomOrigin = HEAP_HEAD_ADDR + RESOURCE_REGISTRY_ENTRIES_ADDR;
-        velocity.y =
-            GolemSlide_Random((const u16 *)(randomOrigin - HEAP_HEAD_ADDR +
-                                            (RANDOM_TABLE_ADDR - RESOURCE_REGISTRY_ENTRIES_ADDR))) &
-            7;
+        PARTICLE_RANDOM_CAPTURE_ORIGIN(randomOrigin);
+        velocity.y = GolemSlide_Random((const u16 *)RANDOM_TABLE_ADDR) & 7;
         velocity.z = GolemSlide_Quarter(body->motion.x);
         spread.x = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 3) + 15;
         spread.y = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 7) + 15;

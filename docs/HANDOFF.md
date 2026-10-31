@@ -58,6 +58,12 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+* **Round 8 holdouts** (2026-10-31). The first batch recovers player motion,
+  Vanargand impact, two projectile and particle routines, scene motion and
+  messaging, and the effect-group fade. See the
+  [batch history](history/2026-10-31.md#round-8-holdouts) and the per-function
+  notes indexed under Round 8.
+
 * **Player cue worker batch and cleanup prepared** (2026-10-30): the assigned
   callbacks match without concessions on `codex/finish-player-cue`. Existing cue
   callbacks and setup/dispatch now share canonical player, graphics, message and

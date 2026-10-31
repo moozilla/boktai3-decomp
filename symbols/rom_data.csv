@@ -10,7 +10,16 @@ start,end,kind,unit,identified,evidence
 0857D8D8,08602CA0,sound,Songs,545736,"song headers and 5525 track streams (tools/m4a.py walk)"
 08602CA0,08603300,tables,Pointer tables before the registry,0,"located (ROM_MAP pointer tables)"
 08603300,08604998,actors,Actor registry,5784,"keyed_callbacks: data/actor_registry.csv"
-08604998,08614DCC,tables,Dispatch tables,0,"Thumb function-pointer tables (actor/state dispatch); located"
+08604998,086136F0,tables,Dispatch tables,0,"Thumb function-pointer tables (actor/state dispatch); located"
+086136F0,086137AE,tables,Sound test music menu,190,Ordered song numbers with signed terminator
+086137AE,08613BC4,tables,Sound test effects menu,1046,Ordered song numbers with signed terminator
+08613BC4,08613CF2,tables,Sound test voices menu,302,Ordered song numbers with signed terminator
+08613CF2,086141BC,tables,Tables after the sound test lists,0,Undecoded interval before the effect sample bank
+086141BC,086149BC,tables,Fixed effect random samples,2048,1024 unsigned halfwords indexed by the effect cursor
+086149BC,086149C4,tables,Data before sine lookup,0,Undecoded eight-byte interval
+086149C4,08614C44,tables,Q12 sine wave,640,One turn plus one quarter turn at 256 steps per turn
+08614C44,08614D45,tables,First-octant arctangent,257,Equal components select the inclusive endpoint at ratio 256
+08614D45,08614DCC,tables,Data after arctangent lookup,0,Alignment and resource archive directory
 08614DCC,08617084,graphics,Animation scripts (922E),8888,"anm archive: animation scripts (tools/assets)"
 08617084,087C4C98,graphics,Maps (C091),1760276,"MP maps, LZ77 (tools/assets/tilesets.py, Studio Maps view)"
 087C4C98,088223C4,other,Stage terrain (AE6C),382764,"HP terrain: grid, boxes, paths, nav meshes (tools/assets/hp.py)"

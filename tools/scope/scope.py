@@ -214,6 +214,7 @@ def by_dumps(*files):
 def elf_syms():
     elf = os.path.join(ROOT, "build", "boktai3.elf")
     ram = os.path.join(ROOT, "symbols", "ram.csv")
+    functions = os.path.join(ROOT, "symbols", "functions.csv")
 
     def resolve():
         syms = check.elf_symbols()
@@ -223,7 +224,7 @@ def elf_syms():
             syms.setdefault(name, (address, "OBJECT"))
         return syms
 
-    return cached("elf_symbols", [elf, ram, __file__], resolve)
+    return cached("elf_symbols", [elf, ram, functions, __file__], resolve)
 
 
 def inventory():
@@ -1356,7 +1357,7 @@ def cmd_vs(src_a, src_b, func, env):
             import shutil
             keep = info["wd"] + ".A"
             if os.path.exists(keep):
-                shutil.move(keep, os.path.join(os.path.expanduser("~/.Trash"), os.path.basename(keep) + f".{int(time.time())}"))
+                os.rename(keep, f"{keep}.{time.time_ns()}")
             shutil.copytree(info["wd"], keep)
     a, b = tabs
     def fmt(d):
@@ -2455,12 +2456,15 @@ def fast_compile(src, func, env=None, plain=None):
     addr = addr_all[rom_name(src, func)]
     key = (flags, addr)
     f = _FAST.get(key)
+    symbols = elf_syms()
     if f is None:
         import atexit
-        f = _FAST[key] = fast.Fast(INSTR, list(flags), build.AS, elf_syms(), addr,
+        f = _FAST[key] = fast.Fast(INSTR, list(flags), build.AS, symbols, addr,
                                    os.path.join(WORK, "cache"), fixup=inline_macros)
         atexit.register(f.close)  # stops its agbcc servers and removes their directories
         os.makedirs(os.path.join(WORK, "cache"), exist_ok=True)
+    else:
+        f.rom_syms = symbols
     knobs = {k: v for k, v in (env or {}).items() if k.startswith(("AGBCC_", "CSE_"))}
     code, err = f.bytes(fast_preprocess(src, env, func), source_group(src, func), knobs)
     if code is None:

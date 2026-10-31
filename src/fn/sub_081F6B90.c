@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-// MATCHING_CONCESSION: register-pinning
 
 struct Vec {
     s16 x, y, z, pad;
@@ -224,9 +223,8 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
                     q->position.z = message[6];
                     ((struct Anchor *)p)->position.x = q->position.x;
                     {
-                        register s32 lift asm("r0") = ((struct Extension *)p)->anchorLift;
-                        register u32 y asm("r3") = (u16)q->position.y;
-                        ((struct Anchor *)p)->position.y = lift + y;
+                        u16 y = q->position.y;
+                        ((struct Anchor *)p)->position.y = ((struct Extension *)p)->anchorLift + y;
                     }
                     ((struct Anchor *)p)->position.z = q->position.z;
                     Trigger_ConsumePending(&q->entry, 1);

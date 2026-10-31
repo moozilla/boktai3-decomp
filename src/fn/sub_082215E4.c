@@ -1,5 +1,5 @@
 #include "global.h"
-// Empty asm hints keep agbcc from cross-jumping the shared "subs" tails.
+/* The first octant includes equal components at Q8 ratio 256. */
 extern const u8 gUnk_08614C44[];
 s32 Div(s32, s32);
 s32 Math_Atan2(s32 x, s32 y)

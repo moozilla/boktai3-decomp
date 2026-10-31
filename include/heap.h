@@ -10,6 +10,7 @@ struct HeapBlock {
     u32 size; /* Low 20 bits: size including this header; bit 31: free. */
     u32 unused;
 };
+/* 0x02000714 */
 extern struct HeapBlock gHeapHead;
 
 #define HEAP_HEAD_ADDR 0x02000714 /* gHeapHead */

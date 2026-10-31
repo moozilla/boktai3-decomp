@@ -682,7 +682,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                         flags = (void *)((u8 *)actor + offset);
                         if (*flags & mask) {
                             register u32 addMask = 0x10000;
-                            register u32 offset asm("r0") = (u8 *)&actor->flags2D0 - (u8 *)actor;
+                            u32 offset = (u8 *)&actor->flags2D0 - (u8 *)actor;
                             register u32 *field;
                             field = (void *)((u8 *)actor + offset);
                             *field |= addMask;
@@ -699,7 +699,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                         elapsed = ((struct SceneActorMotionTile *)actor->drawable)->elapsed;
                     if (!elapsed) {
                         register u32 mask = 0x10000;
-                        register u32 offset asm("r2") = (u8 *)&actor->flags2D0 - (u8 *)actor;
+                        u32 offset = (u8 *)&actor->flags2D0 - (u8 *)actor;
                         register u32 *flags;
                         flags = (void *)((u8 *)actor + offset);
                         if (*flags & mask) {
@@ -715,7 +715,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
     }
 refresh: {
     register struct SceneActorMotionTerrainGroup *group asm("r3") = cache.group;
-    register u32 offset asm("r4") = (u8 *)&group->contact - (u8 *)group;
+    u32 offset = (u8 *)&group->contact - (u8 *)group;
     register void *contact;
     register u32 mask;
     register u32 *flags asm("r2");

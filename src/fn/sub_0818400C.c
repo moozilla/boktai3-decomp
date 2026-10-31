@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #define gActorLayeredMidAnimations gUnk_0824EE10
 #include "global.h"
 struct ActorAnimationLayer {
@@ -22,10 +21,11 @@ void ActorController_UpdateLayeredMidNoSound(u8 *p)
             (*s)++;
             p[0xb41] = st;
             {
-                u16 *f = (u16 *)(p + 0xb32);
-                register u32 v asm("r1") = *f;
-                register u32 two asm("r0") = 2;
-                *f = two | v;
+                u16 *flags = (u16 *)(p + 0xb32);
+                u32 current = *flags;
+                u32 updated = 2;
+                updated |= current;
+                *flags = updated;
             }
             four = 4;
             ((struct ActorAnimationLayer *)(p + 0x238))->flags &= ~four;

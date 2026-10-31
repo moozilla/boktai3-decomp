@@ -41,13 +41,13 @@ for p in (os.path.join(ROOT, "tools", "assets"), os.path.join(ROOT, "tools"), HE
         sys.path.insert(0, p)
 
 import m4a  # noqa: E402
+from datafmt import load_manifest, sound_test as sound_test_format  # noqa: E402
 
 CACHE = os.path.join(ROOT, "build", "cache", "sound.json")
 INPUTS = ["tools/studio/sound.py", "tools/m4a.py", "gen/code_sym.s", "gcl/names/proc.csv", "tools/assets/gclroles.py",
           "data/labels/scenes.csv", "data/labels/areas.csv"]
 ROM_BASE = 0x08000000
 PLAYER_TABLE = 0x082643EC  # gMPlayTable: {MusicPlayerInfo*, MusicPlayerTrack*, u16 ntracks, u16 unk}
-SOUND_TEST = [("music", 0x086136F0), ("effects", 0x086137AE), ("voices", 0x08613BC4)]
 BGM_PROCS = {1048: ("play_bgm", 0), 1049: ("play_bgm_with_fade", 1), 1050: ("play_bgm_urgent", 0), 1051: ("play_bgm_fade", 1)}
 START_CMDS = {0x53BF: "start song (53BF)", 0xE7CA: "start song (E7CA)", 0x1870: "start song, raw (1870)"}
 CODE_PLAY = {"Sound_PlaySong", "Sound_PlaySongChecked", "m4aSongNumStart", "m4aSongNumStartOrChange",
@@ -76,17 +76,19 @@ def players():
 
 
 def sound_test():
-    """{song: (list, position from 1)}."""
-    out = {}
-    for name, a in SOUND_TEST:
-        o, i = a - ROM_BASE, 0
-        while True:
-            v = struct.unpack_from("<h", rom(), o + 2 * i)[0]
-            if v == -1:
-                break
-            out.setdefault(v, (name, i + 1))
-            i += 1
-    return out
+    """All menu positions of each song, including songs listed more than once."""
+    positions = collections.defaultdict(list)
+    for entry in load_manifest():
+        if entry.format != "sound_test":
+            continue
+        if not os.path.exists(entry.file):
+            entry.extract()
+        with open(entry.file, encoding="utf-8") as source:
+            songs = sound_test_format.songs(source.read(), entry.start, entry.end)
+        category = sound_test_format.LISTS[entry.start][0]
+        for number, song in enumerate(songs, 1):
+            positions[song].append({"list": category, "no": number})
+    return positions
 
 
 def walk_song(song, ntracks, vg):
@@ -293,21 +295,21 @@ def build():
     for n, song, nt, vg in w.songs:
         ms, me = struct.unpack_from("<HH", rom(), m4a.SONG_TABLE + 8 * n + 4 - ROM_BASE)
         nblocks, prio, reverb = rom()[song + 1 - ROM_BASE], rom()[song + 2 - ROM_BASE], rom()[song + 3 - ROM_BASE]
+        t = test.get(n, [])
         if nt == 0:
-            songs.append({"n": n, "addr": f"{song:08X}", "tracks": [], "empty": True, "shared": hdr_count[song], "player": ms})
+            songs.append({"test": t[0] if t else None, "test_positions": t, "n": n, "addr": f"{song:08X}", "tracks": [], "empty": True, "shared": hdr_count[song], "player": ms})
             continue
         tracks, sw, voices = walk_song(song, nt, vg)
         vg_users[vg].append(n)
         uses = su.get(n, [])
         procs = sorted({u["proc"] for u in uses})
         sc, shared = scenes_of(procs)
-        t = test.get(n)
         songs.append({
             "n": n, "addr": f"{song:08X}",
             "player": ms, "player_tracks": pl.get(ms, 0), "priority": prio, "reverb": reverb, "blocks": nblocks,
             "voicegroup": f"{vg:08X}", "voices": sorted(voices),
             "tracks": tracks, "size": 8 + 4 * nt + _sizes(sw), "start": min(int(x["addr"], 16) for x in tracks),
-            "test": {"list": t[0], "no": t[1]} if t else None,
+            "test": t[0] if t else None, "test_positions": t,
             "scripts": [dict(u, name=procnames.get(u["proc"], ""), file=fof.get(u["proc"])) for u in uses],
             "scenes": [{"scene": s, "title": slab.get(s, ""), "area": scene_area.get(s, -1),
                         "area_title": alab.get(scene_area.get(s, -1), "")} for s in sc],
@@ -340,7 +342,9 @@ def titles():
 
 
 def load():
-    newest = max(os.path.getmtime(os.path.join(ROOT, p)) for p in INPUTS if os.path.exists(os.path.join(ROOT, p)))
+    inputs = [os.path.join(ROOT, p) for p in INPUTS + ["data/manifest.csv", "tools/datafmt/sound_test.py"]]
+    inputs.extend(e.file for e in load_manifest() if e.format == "sound_test")
+    newest = max(os.path.getmtime(p) for p in inputs if os.path.exists(p))
     if os.path.exists(CACHE) and os.path.getmtime(CACHE) >= newest:
         return json.load(open(CACHE))
     out = build()

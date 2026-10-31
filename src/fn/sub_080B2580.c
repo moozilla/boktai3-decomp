@@ -1,5 +1,4 @@
 #define SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES 1
-#define SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS 1
 #include "scene_actor_chase_reaction.h"
 
 // Tentative: searches progressively shorter cardinal routes around the actor.

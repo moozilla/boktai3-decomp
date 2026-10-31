@@ -37,6 +37,7 @@ struct BouncingPool *BouncingObject_EnsurePool(void);
 void Shadow_Initialize(void *, struct ContactPosition *, s32);
 void BouncingObject_InitializeColliders(struct BouncingObject *, s16, s16);
 void Shadow_Destroy(void *);
+/* 0x0200014C */
 extern struct BouncingPool *gBouncingPool;
 struct BouncingObject *BouncingObject_Allocate(struct BouncingPool *);
 void BouncingObject_ApplyContactImpulse(struct BouncingContact *, struct BouncingContact *,

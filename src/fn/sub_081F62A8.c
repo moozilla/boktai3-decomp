@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ratatosk_facing.h"
 struct Ratatosk081F62A8 {
     u8 pad0[0x51];
     u8 angle;
@@ -26,24 +26,12 @@ struct Sub081F62A8 {
 };
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 s32 Callback_InvokeActor(void *, void *);
+
 static inline void SetFacing(struct Ratatosk081F62A8 *p, int angle)
 {
-    register u32 value asm("r1");
-    int shifted;
-    p->angle = angle;
-    shifted = p->angle + 0x60;
-    shifted >>= 6;
-    value = 3;
-    value &= shifted;
-    asm("" : "+r"(value));
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    shifted >>= 5;
-    value = 7;
-    value &= shifted;
-    asm("" : "+r"(value));
-    p->facing8 = value;
+    RATATOSK_SET_FACING(p, angle);
 }
+
 void sub_081F62A8(struct Ratatosk081F62A8 *p)
 {
     struct Ratatosk081F62A8 *p2 = p;

@@ -59,6 +59,7 @@ struct FallingPackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 
+/* 0x0200046C */
 extern struct FallingObjectManager *gFallingObjectManager;
 
 enum {

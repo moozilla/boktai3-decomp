@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct PointDistance {
     u32 distance;
     u8 pad4[20];
@@ -9,10 +8,12 @@ void *SceneActors_GetBySlot(u32);
 #define Ratatosk_FindNearestPointExcept sub_081F3414
 s32 Ratatosk_FindNearestPointExcept(void *unused, s32 excluded)
 {
-    register s32 best asm("r4") = -1;
+    s32 best = -1;
     u32 minimum = best;
     void *actor = SceneActors_GetBySlot(4);
-    if (actor) {
+    if (!actor)
+        return best;
+    {
         s32 index = 0;
         struct PointDistance *point = (void *)((u8 *)actor + 0xd28);
         do {

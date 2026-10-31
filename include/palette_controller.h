@@ -37,5 +37,6 @@ struct PaletteGameState {
     u8 state;
 };
 extern struct PaletteGameState gSunClock;
+/* 0x02000468 */
 extern struct PaletteController *gPaletteController;
 #endif

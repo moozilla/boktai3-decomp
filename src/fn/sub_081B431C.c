@@ -1,11 +1,8 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.8%
 // confidence=low: action role inferred from local animation, motion and effects.
 #include "contact_swarm.h"
 #include "motion_track.h"
 #include "display_sequence_inline.h"
-// Remaining difference: the burst count is materialized before the particle type load.
 
 struct VanargandOwner {
     u8 unknown0[0x205];
@@ -152,6 +149,14 @@ static inline void SetState(struct VanargandPart *p, u32 state)
     p->state = state;
     p->timer = 0;
 }
+static inline void FinishImpact(struct VanargandPart *p, u8 *enter)
+{
+    u32 one;
+    SetState(p, 3);
+    one = 1;
+    *enter = one;
+    p->finished = one;
+}
 void Vanargand_UpdatePartImpact(struct VanargandOwner *boss, struct VanargandPart *p, u32 frame)
 {
     u8 *enter;
@@ -225,21 +230,12 @@ void Vanargand_UpdatePartImpact(struct VanargandOwner *boss, struct VanargandPar
                     Add(&point, &p->target, p->basePosition);
                     AnimatedParticles_EmitBurst(&point, p->particleAngle, 0, 64, 4, 4, 4, 4);
                     p->flashTimer = 15;
-                    SetState(p, 3);
+                    FinishImpact(p, enter);
                 } else {
-                    void *position;
-                    s32 vertical;
                     Sound_PlaySong(0x3d9);
-                    position = &p->sprite.position;
-                    vertical = 4;
-                    AnimatedParticles_EmitBurst(position, p->particleAngle, 0, 64, vertical, 4, 4,
-                                                4);
-                    SetState(p, 3);
-                }
-                {
-                    u32 one = 1;
-                    *enter = one;
-                    p->finished = one;
+                    AnimatedParticles_EmitBurst(&p->sprite.position, p->particleAngle, 0, 64, 4, 4,
+                                                4, 4);
+                    FinishImpact(p, enter);
                 }
             } else if (!(savedFrame & 1))
                 Vanargand_EmitPartTrail(p);
@@ -250,7 +246,3 @@ void Vanargand_UpdatePartImpact(struct VanargandOwner *boss, struct VanargandPar
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartImpact);
-#endif
