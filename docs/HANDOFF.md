@@ -58,6 +58,13 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+* **Effects and presentation worker pass** (2026-10-30): ordinary C now covers
+  the recovered HUD routines, part-contact damage handling and homing manager,
+  alongside the particle, arc, fade and sun-disc matches. Remaining drafts retain
+  stock assembly fallbacks and documented compiler/source gaps. The branch
+  `codex/finish-effects` has per-unit validation; combined ROM validation and
+  progress reports remain for integration. See the
+  [effects note](../notes/finish-effects_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches
