@@ -1,5 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "scene_actor_chase_reaction.h"
 struct ActorCommand {
     u8 unknown0[6];
     u8 command, unknown7;
@@ -22,45 +21,15 @@ struct CommandRoute {
     u8 unknown14[8];
     struct CommandPositionRoute destination;
 };
-struct SceneActorRegistryResetView {
-    void *object;
-    u8 unknown4[8];
+struct SceneActorCommandFields {
+    u8 unknown0[0xC];
     struct CommandReceiver receiver;
-    u8 unknown34[0x50 - 0x34];
-    u32 id;
-    u8 unknown54[5];
-    u8 direction;
-    u8 unknown5A[2];
-    struct CommandPosition {
-        s16 x, y, z, pad;
-    } position;
-    u8 unknown64[0x98 - 0x64];
-    u8 category;
-    u8 unknown99[0xA8 - 0x99];
-    s16 fieldA8, fieldAA;
-    u8 unknownAC[0x104 - 0xAC];
-    u32 word104;
-    u8 unknown108[0x114 - 0x108];
-    u32 flags114;
-    u8 unknown118[0x21C - 0x118];
-    void *target;
-    u8 unknown220[0x2A8 - 0x220];
-    u8 state2A8, phase2A9, behavior2AA, unknown2AB;
-    u32 counter2AC;
-    u8 field2B0, field2B1, field2B2, unknown2B3[2], field2B5;
-    u8 unknown2B6[0x2C0 - 0x2B6];
-    u16 flags2C0;
-    u8 unknown2C2[6];
-    u16 field2C8;
-    u8 unknown2CA[0x2D4 - 0x2CA];
-    u16 flags2D4;
-    u8 unknown2D6[0x2FC - 0x2D6];
-    s16 x2FC, y2FE, z300;
-    u8 unknown302[0x3CD - 0x302];
+    u8 unknown34[0x2FC - 0x34];
+    struct ContactPosition destination;
+    u8 unknown304[0x3CD - 0x304];
     u8 desiredDirection;
-    u8 unknown3CE[6];
-    u8 group[0x200];
 };
+#define CommandFields(actor) ((struct SceneActorCommandFields *)(actor))
 extern struct CommandScene *gSceneEventDispatchState;
 void SceneActorControl_OnIdle(void);
 u32 Trigger_ConsumePending(void *, u32);
@@ -75,9 +44,6 @@ void *ActorAttachment_CreatePartsSlotWithCount(u32, void *, u32, s32, u32, void 
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, u32, u32, u32, u32, s32, s32);
 void *ActorAttachment_ReleaseResource(void *, u32, u32);
 void *ActorAttachment_ReleasePartsResource(void *, u32, u32);
-#ifdef NONMATCHING
-// fuzzy: 72.2%
-/* Repeated behavior/control tails are merged; receiver and attachment lifetimes differ. */
 static inline u8 HasFlag(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     if (actor->flags2C0 & mask)
@@ -90,9 +56,9 @@ static inline u8 HasGroup(struct SceneActorRegistryResetView *actor)
         return 1;
     return 0;
 }
-static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void SetBehaviorAndIdle(struct SceneActorRegistryResetView *actor, u32 state,
+                                      u32 behavior)
 {
-    u32 state = 2;
     u8 *field = &actor->state2A8;
     u32 zero = 0;
     *field = state;
@@ -117,25 +83,27 @@ static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 be
     }
 }
 // confidence=low: dispatches pending receiver commands and attachment requests.
-#define SceneActorReaction_DispatchPendingCommands sub_0812E7EC
+#ifdef NONMATCHING
+// fuzzy: 76.0%
+// scope shape 202 (differences once low registers are set aside)
 s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
-    u8 *group;
+    struct SceneActorChaseGroup *group;
     void *attachment;
     struct CommandReceiver *receiver;
-    register u32 category asm("r10");
+    u32 category;
     s32 i;
     s16 packet[3];
     s32 y, z;
     if (!HasFlag(actor, 0x100))
         return 0;
     if (HasGroup(actor))
-        group = (u8 *)&actor->group.common;
+        group = &actor->group;
     else
         group = 0;
     attachment = 0;
-    receiver = &actor->receiver;
+    receiver = &CommandFields(actor)->receiver;
     category = actor->category;
     i = 0;
     if (i >= receiver->counts[gSceneEventDispatchState->bank])
@@ -145,12 +113,12 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
         switch (command->command) {
             case 0:
                 if (category == 18) {
-                    actor->x2FC = command->args[0];
-                    actor->y2FE = command->args[1];
-                    actor->z300 = command->args[2];
-                    SetBehavior(actor, 3);
+                    CommandFields(actor)->destination.x = command->args[0];
+                    CommandFields(actor)->destination.y = command->args[1];
+                    CommandFields(actor)->destination.z = command->args[2];
+                    SetBehaviorAndIdle(actor, 2, 3);
                 } else {
-                    struct CommandRoute **route = (void *)(group + 0x1FC);
+                    struct CommandRoute **route = (void *)&group->route;
                     (*route)->destination.x = command->args[0];
                     (*route)->destination.y = command->args[1];
                     (*route)->destination.z = command->args[2];
@@ -159,7 +127,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                     else
                         actor->flags2D4 &= ~0x200;
                     (*route)->current = (*route)->destination;
-                    SetBehavior(actor, 3);
+                    SetBehaviorAndIdle(actor, 2, 3);
                 }
                 break;
             case 1: {
@@ -175,38 +143,39 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                     delta = -delta;
                 if (category == 23) {
                     if (delta) {
-                        actor->desiredDirection = ((u8)command->args[0] + 5 & 7) << 5;
-                        SetBehavior(actor, 4);
+                        CommandFields(actor)->desiredDirection = ((u8)command->args[0] + 5 & 7)
+                                                                 << 5;
+                        SetBehaviorAndIdle(actor, 2, 4);
                     } else
                         Trigger_ConsumePending(receiver, 1);
                 } else if (delta > 1) {
-                    actor->desiredDirection = command->args[0];
-                    SetBehavior(actor, 4);
+                    CommandFields(actor)->desiredDirection = command->args[0];
+                    SetBehaviorAndIdle(actor, 2, 4);
                 } else
                     Trigger_ConsumePending(receiver, 1);
                 break;
             }
             case 2:
                 actor->body.direction = ((u8)command->args[0] + 5 & 7) << 5;
-                SetBehavior(actor, 2);
+                SetBehaviorAndIdle(actor, 2, 2);
                 break;
             case 4:
-                SetBehavior(actor, 5);
+                SetBehaviorAndIdle(actor, 2, 5);
                 break;
             case 8:
                 actor->body.direction = ((u8)command->args[0] + 5 & 7) << 5;
-                SetBehavior(actor, 6);
+                SetBehaviorAndIdle(actor, 2, 6);
                 break;
             case 9:
                 actor->body.direction = ((u8)command->args[0] + 5 & 7) << 5;
-                SetBehavior(actor, 7);
+                SetBehaviorAndIdle(actor, 2, 7);
                 break;
             case 10:
                 actor->body.direction = ((u8)command->args[0] + 5 & 7) << 5;
-                SetBehavior(actor, 8);
+                SetBehaviorAndIdle(actor, 2, 8);
                 break;
             case 11:
-                SetBehavior(actor, 9);
+                SetBehaviorAndIdle(actor, 2, 9);
                 break;
             case 5:
                 packet[0] = 6;
@@ -245,8 +214,8 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                         *initial = command->args[2];
                         SceneActorAttachment_SelectOffsets(category, 1, &y, &z);
                         attachment = ActorAttachment_CreateValueSpriteSlot(
-                            0, &actor->body.position, actor->body.id, y, z, category, value, *initial, 0,
-                            actor, &actor->body.id);
+                            0, &actor->body.position, actor->body.id, y, z, category, value,
+                            *initial, 0, actor, &actor->body.id);
                         break;
                     }
                     case 5: {
@@ -264,16 +233,16 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                     }
                     case 6:
                         SceneActorAttachment_SelectOffsets(category, 1, &y, &z);
-                        attachment = ActorAttachment_UpdateFromDescriptor(attachment, &actor->body.id, 5,
-                                                                          0, 0, 0, z, y);
+                        attachment = ActorAttachment_UpdateFromDescriptor(
+                            attachment, &actor->body.id, 5, 0, 0, 0, z, y);
                         break;
                     case 7:
                         SceneActorAttachment_SelectOffsets(category, 1, &y, &z);
-                        attachment = ActorAttachment_UpdateFromDescriptor(attachment, &actor->body.id, 4,
-                                                                          0, 0, 0, z, y);
+                        attachment = ActorAttachment_UpdateFromDescriptor(
+                            attachment, &actor->body.id, 4, 0, 0, 0, z, y);
                         break;
                     case 8: {
-                        void **slot = (void *)(group + 0xA0);
+                        void **slot = &group->attachment;
                         *slot = ActorAttachment_ReleaseResource(*slot, 0, actor->body.id);
                         *slot = ActorAttachment_ReleaseResource(*slot, 1, actor->body.id);
                         *slot = ActorAttachment_ReleaseResource(*slot, 2, actor->body.id);
@@ -291,7 +260,6 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
     } while (i < receiver->counts[gSceneEventDispatchState->bank]);
     return 1;
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0812E7EC);
 #endif

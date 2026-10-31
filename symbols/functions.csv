@@ -4987,6 +4987,7 @@ addr,name,mode,confidence,source,notes
 0812E5A4,ActorParticles_SpawnBurst,thumb,low,src-alias,
 0812E6F0,ActorMode_SelectOddStateVariant,thumb,low,src-alias,
 0812E714,ActorParticles_SpawnWideBurst,thumb,low,src-alias,
+0812E7EC,SceneActorReaction_DispatchPendingCommands,thumb,low,src-alias,Tentative: dispatches receiver movement; behavior; messages and attachment commands
 0812EED4,SceneActorReaction_OnEnemyDefault,thumb,low,src-alias,Shared callback installed by enemy initializers that returns zero; specific callback role is tentative
 0812EED8,SceneActorReaction_BeginTargetRecovery,thumb,low,src-alias,
 0812F12C,SceneActor_UpdateActiveCallbacks,thumb,low,src-alias,
