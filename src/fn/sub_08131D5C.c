@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_actor_damage_visibility.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_palette.h"
 #include "area_effect_link.h"
@@ -48,44 +49,6 @@ void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
-static inline s32 LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
-static inline u16 OwnershipFlagBits(u32 value, u32 mask)
-{
-    return value & mask;
-}
-static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
-{
-    if (Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->field2E0;
-        u32 mask = *owner;
-        if (!OwnershipFlagBits(mask, 0x20) && mask) {
-            switch (LocalPlayer()) {
-                case 0:
-                    if (*owner != 1)
-                        return 0;
-                    break;
-                case 1:
-                    if (*owner != 2)
-                        return 0;
-                    break;
-                case 2:
-                    if (*owner != 4)
-                        return 0;
-                    break;
-                case 3:
-                    if (*owner != 8)
-                        return 0;
-                    break;
-            }
-        }
-    }
-    return 1;
-}
 
 struct FlagHalfword {
     s16 bits : 16;
@@ -186,7 +149,7 @@ u8 SceneActorReaction_ApplyAreaDamage(struct SceneActorRegistryResetView *actor)
                 u32 bit = 0x8000;
                 *flags2CC |= bit;
             }
-            if (ShouldShowDamage(actor)) {
+            if (SceneActorDamage_ShouldShow(actor)) {
                 u32 zero;
                 u32 buffer[2];
                 s32 h = *health;
