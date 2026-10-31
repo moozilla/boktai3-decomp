@@ -1,12 +1,10 @@
 #include "global.h"
 #include "player.h"
 #include "ram.h"
+#include "game_state.h"
 
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 // confidence=low: tentative cue role inferred from named callers and callback behavior.
 
-void Sound_PlaySong(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
@@ -16,7 +14,6 @@ void Player_UpdateFacingSide(void *);
 extern const s16 gUnk_086149C4[];
 
 // confidence=low: motion seven rotates toward a target and pulses three palette colors.
-extern u8 *gGameState;
 static inline u32 Arg1(u32 k_, s32 green)
 {
     return (green << 5) | k_;
@@ -126,7 +123,7 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
     p->visualParameterC = green;
     if ((++(p->unk59F[1])) > 15)
         p->unk59F[1] = 0;
-    if ((*((s16 *)(gGameState + 0x5A8))) != 2) {
+    if (gGameState->form != 2) {
         gPlayerCueTimer = 0;
         gPlayerActionPending = 0;
     }
