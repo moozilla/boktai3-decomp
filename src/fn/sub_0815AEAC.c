@@ -1,7 +1,7 @@
-#include "global.h"
+#include "player_cue.h"
 
-void PlayerCue_OverlayOn(u8 *p, s32 v)
+void PlayerCue_OverlayOn(struct Player *p, s32 v)
 {
-    *(u16 *)(p + 0xAE4) = 2;
-    *(u16 *)(p + 0xAD6) = v;
+    PlayerCue_Motion(p)->overlayMode = 2;
+    p->actionEighteenParameter = v;
 }
