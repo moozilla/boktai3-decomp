@@ -1,5 +1,7 @@
 # FeatherEffectPool_SpawnGroundScatter
 
+Tags: #matching #effects #compiler #round8
+
 All 828 bytes at 08128F98 match with stock agbcc. Assigning the initial cell
 index directly to its retained local introduces the r0 reload on the
 out-of-bounds path. The next reload then loads the random-index address into

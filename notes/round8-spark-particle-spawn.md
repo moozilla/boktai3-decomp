@@ -1,5 +1,7 @@
 # SparkParticle_Spawn
 
+Tags: #matching #effects #compiler #round8
+
 All 704 bytes at 0806A160 match with stock agbcc. The word that later holds
 the random table first captures the incoming emission angle. The incoming
 angle word then holds the requested count. Saving the captured direction

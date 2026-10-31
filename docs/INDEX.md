@@ -398,12 +398,14 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round7-tentacle-wander_2026-10-30.md](../notes/round7-tentacle-wander_2026-10-30.md) | Tentacle wander-route selection | #matching #monsters #tentacle #080A8904 | 1 |
 | [notes/round7-vorn-defeat_2026-10-30.md](../notes/round7-vorn-defeat_2026-10-30.md) | Round 7: Vorn defeat completion | #matching #monsters #vorn #080AEE08 #scope | 3 |
 | [notes/round8-effect-group-fade.md](../notes/round8-effect-group-fade.md) | EffectGroup_FadeFirstActive | #effects #matching #round8 | 0 |
+| [notes/round8-feather-ground-scatter.md](../notes/round8-feather-ground-scatter.md) | FeatherEffectPool_SpawnGroundScatter | #matching #effects #compiler #round8 | 1 |
 | [notes/round8-linked-effect-variant.md](../notes/round8-linked-effect-variant.md) | LinkedEffect_SetVariant | #matching #effects #compiler #round8 | 0 |
 | [notes/round8-player-clone-pool.md](../notes/round8-player-clone-pool.md) | PlayerClone_UpdatePool | #matching #player #compiler #round8 | 0 |
 | [notes/round8-player-target-motion.md](../notes/round8-player-target-motion.md) | Player_UpdateTargetMotion | #matching #player #compiler #round8 | 0 |
 | [notes/round8-projectile-impact-pair.md](../notes/round8-projectile-impact-pair.md) | Projectile_SpawnImpactPair | #matching #effects #compiler #round8 | 0 |
 | [notes/round8-scene-effect-messages.md](../notes/round8-scene-effect-messages.md) | Scene effect queue messages | #effects #projection #matching #round8 | 1 |
 | [notes/round8-scene-target-begin-move.md](../notes/round8-scene-target-begin-move.md) | SceneTarget_BeginMove | #effects #projection #matching #round8 | 0 |
+| [notes/round8-spark-particle-spawn.md](../notes/round8-spark-particle-spawn.md) | SparkParticle_Spawn | #matching #effects #compiler #round8 | 0 |
 | [notes/round8-vanargand-part-impact.md](../notes/round8-vanargand-part-impact.md) | Vanargand_UpdatePartImpact | #matching #vanargand #compiler #round8 | 0 |
 | [notes/s0.md](../notes/s0.md) | s0 notes | *#tooling* | 11 |
 | [notes/s1.md](../notes/s1.md) | s1 notes | *#tooling* | 12 |
