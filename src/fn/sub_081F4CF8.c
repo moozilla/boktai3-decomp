@@ -1,15 +1,10 @@
 #include "global.h"
 #include "ram.h"
+#include "contact_position.h"
 #include "engine_globals.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.1%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: register allocation, pointer lifetimes and shared block placement.
-struct Vec {
-    s16 x, y, z, pad;
-};
+// fuzzy: 92.4%
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -17,7 +12,7 @@ struct Actor {
     u8 pad0[0x51];
     u8 angle;
     u8 pad52[2];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 pad64[0x2c];
     u32 timer;
     s16 health;
@@ -40,9 +35,9 @@ struct Actor {
     u8 pad180[0x1ac];
     u8 animation[0x20];
     u8 animationData[0x20];
-    struct Vec anchor;
+    struct ContactPosition anchor;
     u8 pad374[0x58];
-    struct Vec home;
+    struct ContactPosition home;
     u8 pad3D4[0xa78];
     s16 selectedPoint, selectedTarget;
     u16 padE50;
@@ -88,7 +83,7 @@ static inline s32 trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-static inline void polar(struct Vec *v, s32 angle, s32 radius)
+static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
     s32 zero = 0;
@@ -96,15 +91,16 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
     v->y = zero;
     v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
+static inline void sum(struct ContactPosition *d, struct ContactPosition *a,
+                       struct ContactPosition *b)
 {
     d->x = a->x + b->x;
     d->y = a->y + b->y;
     d->z = a->z + b->z;
 }
 void Ratatosk_InitAnimatedParticleParams(void *);
-void Ratatosk_ConfigureAnimatedParticle(void *, s32, s32, u8, s32, s32, s32);
-void sub_081FC26C(void *, struct Vec *);
+void Ratatosk_ConfigureAnimatedParticle(void *, u16, u32, u8, u32, u32, u32);
+void sub_081FC26C(void *, struct ContactPosition *);
 // confidence=low: defeat role inferred from event flag 0x51 and persistent counters.
 struct Map {
     u32 pad;
@@ -122,7 +118,7 @@ void SunOrb_FadeOutAll(void *);
 void sub_08159164(u16);
 void GameState_SetEventFlag(s32);
 s32 Mod(s32, s32);
-static inline s32 cellAt(struct Vec *v)
+static inline s32 cellAt(struct ContactPosition *v)
 {
     s32 x = v->x >> 8, z = v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -142,7 +138,7 @@ struct Anim {
     u32 pad[2];
     u32 flags;
 };
-static inline void delta(struct Vec *a, struct Vec *b, s32 *x, s32 *z)
+static inline void delta(struct ContactPosition *a, struct ContactPosition *b, s32 *x, s32 *z)
 {
     *x = a->x - b->x;
     *z = a->z - b->z;
@@ -167,7 +163,7 @@ static inline u32 Arg1(u32 k_, struct Actor *p)
 void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
 {
     u8 params[0x1c];
-    struct Vec spawn;
+    struct ContactPosition spawn;
     struct Actor *p2 = p;
     if (p->changed) {
         p->changed = 0;
@@ -194,11 +190,14 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
     if (p2->terrainTimer > 0) {
         p2->terrainTimer--;
         {
-            struct Vec *home = &p2->home;
-            struct Vec *pos = &p->position;
+            struct ContactPosition *home = &p2->home;
+            struct ContactPosition *pos = &p->position;
             s32 x = home->x - pos->x;
             s32 z = home->z - pos->z;
-            polar(&p->velocity, Math_Atan2(x, z), 20);
+            {
+                s32 angle = Math_Atan2(x, z);
+                polar(&p->velocity, angle, 20);
+            }
         }
     }
     if (tick == 140) {
@@ -212,7 +211,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
             u16 variant = randomA() & 1;
             s8 angle = randomA();
             u16 drift = randomA() & 15;
-            struct Vec *position = &spawn;
+            struct ContactPosition *position = &spawn;
             spawn = p->position;
             position->x -= 128;
             position->y += 64;
