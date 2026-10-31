@@ -46,10 +46,8 @@ static inline void FeatherEffectPool_ClearWords(const void *source, void *destin
 {
     CpuSet(source, destination, control);
 }
-#ifdef NONMATCHING
-// fuzzy: 98.1%
 // Tentative feather identity; clips the scatter position at rising terrain.
-u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct ContactPosition *spot, s32 current,
+u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct ContactPosition *spot, s32 cursor,
                                      s32 target, s32 direction)
 {
     struct {
@@ -62,33 +60,33 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct ContactPosition *
     struct ContactPosition *velocity = &local.velocity;
     local.zero = 0;
     FeatherEffectPool_ClearWords(&local.zero, velocity, 0x05000002);
-    if (current != target) {
+    if (cursor != target) {
         do {
-            previous = current;
+            previous = cursor;
             switch (direction) {
                 case 0:
-                    current++;
+                    cursor++;
                     break;
 
                 case 1:
-                    current += SceneActorTerrain_Width();
+                    cursor += SceneActorTerrain_Width();
                     break;
 
                 case 2:
-                    current--;
+                    cursor--;
                     break;
 
                 case 3:
-                    current -= SceneActorTerrain_Width();
+                    cursor -= SceneActorTerrain_Width();
                     break;
             }
 
-            if ((*SceneActorTerrain_GetCell(current)) >> 4)
+            if ((*SceneActorTerrain_GetCell(cursor)) >> 4)
                 return 1;
             height = (*SceneActorTerrain_GetCell(previous)) & 15;
-            if (height < ((*SceneActorTerrain_GetCell(current)) & 15)) {
+            if (height < ((*SceneActorTerrain_GetCell(cursor)) & 15)) {
                 struct ContactPosition *center;
-                FeatherEffectPool_GetCellCenter(current, &local.center, &center);
+                FeatherEffectPool_GetCellCenter(cursor, &local.center, &center);
                 switch (direction) {
                     case 0:
                         spot->x = center->x - 128;
@@ -108,14 +106,16 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct ContactPosition *
                 }
 
                 {
-                    const u16 *table = gRandomTable;
-                    u32 *rng = &gRandomIndex;
+                    u32 *rng;
                     u32 index;
                     u32 zero;
+                    /* Clipping is complete; the cursor now addresses the random table. */
+                    cursor = (u32)gRandomTable;
+                    rng = &gRandomIndex;
                     index = ((*rng) + 1) & 1023;
                     *rng = index;
                     {
-                        u16 v1 = table[index];
+                        u16 v1 = ((const u16 *)cursor)[index];
                         spot->y = (height << 8) + (v1 & 255);
                     }
                     zero = 0;
@@ -124,7 +124,7 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct ContactPosition *
                         u16 nextIndex = (index + 1) & 1023;
                         *rng = nextIndex;
                         {
-                            u16 v2 = table[nextIndex];
+                            u16 v2 = ((const u16 *)cursor)[nextIndex];
                             life = (v2 & 63) + 30;
                         }
                         SpriteEffectController_Create(spot, &local.velocity, 0x1C1A, 0xD1B8, 3,
@@ -138,9 +138,6 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct ContactPosition *
                 }
                 return 1;
             }
-        } while (current != target);
+        } while (cursor != target);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_ClipScatterPath);
-#endif
