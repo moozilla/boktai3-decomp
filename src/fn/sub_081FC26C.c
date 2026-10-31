@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 92.0%
+// fuzzy: 99.6%
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
 #include "contact_swarm.h"
 #include "display_sequence_inline.h"
@@ -41,7 +41,6 @@ extern const s16 gUnk_086149C4[];
 void *Ratatosk_CreateAnimatedParticlePool(void);
 struct Particle *Ratatosk_FindFreeAnimatedParticle(struct ParticlePool *, s32 *);
 void Ratatosk_SetAnimatedParticleUpdateCallback(void *, void *);
-void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sprite_LinkToList(void *, s32);
 static inline s32 Scale(s32 x)
 {
@@ -53,9 +52,9 @@ static inline u32 RandomSample(void)
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
-// confidence=low: randomizes a larger particle record and its sprite or sequence.
 static inline void StepSequence(struct Particle *owner, struct DisplaySequenceState *state,
-                                struct ContactSwarmSprite *sprite)
+                                struct ContactSwarmSprite *sprite,
+                                struct ContactSwarmSprite **result)
 {
     const u16 *command;
     {
@@ -67,11 +66,13 @@ static inline void StepSequence(struct Particle *owner, struct DisplaySequenceSt
     sprite->frame = *command >> 6;
     {
         union DisplaySequenceControl control;
-        u32 bit, first;
+        u32 bit, first, second;
         control.raw = state->flags;
         bit = 1;
         first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
+        second = (((*command & 0x30) >> 4) & bit);
+        *result = sprite;
+        if (first != second)
             owner->sprite.flags |= 4;
         else
             owner->sprite.flags &= ~4;
@@ -116,6 +117,7 @@ static inline void StepSequence(struct Particle *owner, struct DisplaySequenceSt
     }
 }
 
+// Initialize one particle with a random appearance, animation, and flip state.
 s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct ContactPosition *position)
 {
     struct ParticlePool *pool = gRatatoskParticlePool;
@@ -156,22 +158,29 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     if ((e->config.appearanceFlags & 15) <= 1) {
         if (RandomSample() & 1) {
             Anim_SetSequence(&e->sequence, pool->sequenceResource, 1, 0, 0);
-            sprite = &e->sprite;
-            StepSequence(e, &e->sequence, sprite);
+            StepSequence(e, &e->sequence, &e->sprite, &sprite);
         } else {
-            u32 variant = RandomSample() & 7;
+            struct ContactSwarmSprite *draw;
+            u32 frame;
+            s32 variant = RandomSample() & 7;
             if (variant > 5)
                 variant = 5;
             e->config.appearanceFlags |= variant << 12;
-            sprite = &e->sprite;
-            sprite->frame = (e->config.appearanceFlags >> 12) + 3;
+            frame = e->config.appearanceFlags >> 12;
+            draw = &e->sprite;
+            draw->frame = frame + 3;
             e->config.appearanceFlags |= 0x200;
+            sprite = draw;
         }
     } else {
+        struct ContactSwarmSprite *draw;
+        u32 frame;
         e->config.appearanceFlags |= (RandomSample() & 3) << 12;
-        sprite = &e->sprite;
-        sprite->frame = (e->config.appearanceFlags >> 12) + 0x26;
+        frame = e->config.appearanceFlags >> 12;
+        draw = &e->sprite;
+        draw->frame = frame + 0x26;
         e->config.appearanceFlags |= 0x200;
+        sprite = draw;
     }
     if (RandomSample() & 1) {
         e->sprite.flags |= 4;
