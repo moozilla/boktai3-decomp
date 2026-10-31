@@ -12,13 +12,19 @@ struct CloneCollider {
     u16 timer;
     u8 unk_46[0x54 - 0x46];
 };
+struct PlayerClone;
+typedef s32 (*CloneUpdateCallback)(struct PlayerClone *, s32);
+struct CloneCallback {
+    CloneUpdateCallback callback;
+    u16 unknown10, unknown12;
+};
 struct CloneParams {
     u16 unk_00, lifetime, unk_04;
     s8 direction;
     u8 unk_07;
     s32 speed;
-    void *callback;
-    u8 unk_10[0x10];
+    struct CloneCallback operation;
+    u8 unk_14[0xc];
 };
 struct CloneAnim {
     u8 unk_00[0x20];
@@ -70,7 +76,6 @@ struct PlayerClonePool {
 };
 extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
-s32 sub_08249240(void *, s32, void *);
 void PlayerClone_ReleaseSlot(struct PlayerClonePool *, struct PlayerClone *, s32);
 void DirectionalSprite_FoldFacing(struct PlayerClone *);
 s32 PlayerClone_SetAnimation(struct PlayerClone *, s32, u32, u32);
@@ -80,6 +85,18 @@ void Collider_SetAttackProperties(struct CloneCollider *, s32, s32, u32, u32, s3
 struct CloneVec *Player_GetEffectivePosition(s32);
 void Anim_SelectPaletteBank(struct CloneAnim *, u32);
 
+static inline CloneUpdateCallback CloneCallback_Get(struct CloneCallback operation)
+{
+    return operation.callback;
+}
+static inline u16 CloneMemberOffset_Value(u16 value)
+{
+    struct {
+        u16 value : 16;
+    } field;
+    field.value = value;
+    return field.value;
+}
 static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
@@ -108,6 +125,10 @@ static inline void ClearFlags(u32 *flags, u32 mask)
 {
     *flags &= ~mask;
 }
+static inline s8 CloneParams_GetDirection(struct CloneParams *params)
+{
+    return params->direction;
+}
 static inline void SetFacing(struct PlayerClone *slot, u16 angle)
 {
     s32 facing = (angle + 0x70) >> 5;
@@ -115,46 +136,90 @@ static inline void SetFacing(struct PlayerClone *slot, u16 angle)
     mask &= facing;
     slot->state.facing = mask;
 }
-static inline void UpdateVelocity(u32 *flags, struct PlayerClone *slot, struct CloneParams *params)
+static inline void UpdateVelocity(u32 moving, struct PlayerClone *slot, struct CloneParams *params)
 {
-    u32 moving = *flags & 1;
-    struct CloneVec *velocity = &slot->velocity;
+    u32 *flags = &slot->state.flags;
     if (moving) {
+        struct CloneVec *velocity = &slot->velocity;
         Vec_FromAngle(velocity, params->direction, params->speed);
         ClearFlags(flags, 1);
     }
 }
+struct CloneAreaWork {
+    struct CloneCollider *collider;
+    u8 *facing;
+};
+struct CloneColliderHeader {
+    void *next;
+    u16 unknown4;
+    u16 flags;
+};
+static inline u8 Clone_ColliderHasFlags(struct CloneColliderHeader header, s16 mask)
+{
+    mask &= header.flags;
+    return mask != 0;
+}
+static inline void CloneAnim_SetPaletteFlags(struct CloneAnim *anim, u16 flags)
+{
+    anim->paletteFlags = flags;
+}
+static inline void CloneAnim_SetPalette(struct CloneAnim *anim, void *palette)
+{
+    anim->palette = palette;
+}
+struct CloneProjectionVectors {
+    struct CloneVec delta, position;
+};
 /* Advance each active clone, its animation and colliders, and its lifetime. */
 #ifdef NONMATCHING
-// fuzzy: 77.4%
+// fuzzy: 96.1%
 s32 PlayerClone_UpdatePool(struct PlayerClonePool *pool)
 {
     struct PlayerClone *slot = pool->entries;
     s32 i = 0;
-    struct CloneVec position;
-    struct CloneVec delta;
+    struct CloneProjectionVectors projection;
+    struct CloneVec *positionRef = &projection.position;
+    u32 stride = sizeof(*slot);
+    u32 stateOffset = CloneMemberOffset_Value((u32) & ((struct PlayerClone *)0)->state);
     do {
+        struct CloneAnim *walkAnim = &slot->anim;
         struct CloneCollider *area;
-        u32 active = pool->activeMask & (1 << i);
+        u8 *facing;
+        struct CloneAreaWork areaWork;
+        u32 active;
+        active = pool->activeMask & (1 << i);
         area = &slot->area;
         if (active) {
-            struct CloneAnim *anim = &slot->anim;
-            u8 *facing = &slot->state.facing;
+            struct CloneAnim *anim = walkAnim;
             struct CloneParams *params = &slot->params;
-            if (IsPaused(0x400))
+            struct CloneCollider *collider;
+            struct CloneAnim *metadata;
+            u32 paused;
+            s32 callbackResult;
+
+            paused = IsPaused(0x400);
+            metadata = walkAnim;
+            if (paused)
                 goto next;
             if (TestGlobal(4))
                 goto next;
             slot->area.flags |= 4;
-            if (sub_08249240(slot, i, params->callback) == 1) {
+            callbackResult =
+                ((s32(*)(struct PlayerClone *, s32))CloneCallback_Get(params->operation))(slot, i);
+            areaWork.collider = area;
+            if (callbackResult == 1) {
                 PlayerClone_ReleaseSlot(pool, slot, i);
                 goto next;
             }
-            SetFacing(slot, (u16)params->direction);
+            facing = (u8 *)slot + stateOffset + (u32) & ((struct CloneState *)0)->facing;
+            SetFacing(slot, (u16)CloneParams_GetDirection(params));
             DirectionalSprite_FoldFacing(slot);
             {
-                UpdateVelocity(&slot->state.flags, slot, params);
-                Vec_Sum(&anim->position, &anim->position, &slot->velocity);
+                u32 moving = slot->state.flags & 1;
+                areaWork.facing = facing;
+
+                UpdateVelocity(moving, slot, params);
+                Vec_Sum(&anim->position, &slot->velocity, &anim->position);
             }
             if (anim->position.x > 0xcda)
                 anim->position.x = 0xcda;
@@ -169,24 +234,26 @@ s32 PlayerClone_UpdatePool(struct PlayerClonePool *pool)
             else
                 PlayerClone_SetAnimation(slot, slot->state.animation, 0x40, 1);
             {
-                struct CloneCollider *collider = &slot->contact;
-                struct CloneVec *pos = &slot->anim.position;
+                struct CloneVec *pos;
+                collider = &slot->contact;
+                pos = &slot->anim.position;
                 Collider_SetPosition(collider, pos, 0);
                 if (!(slot->body.flags & 4))
                     Collider_Refresh(collider);
                 collider = &slot->body;
                 Collider_SetPosition(collider, pos, 0);
             }
-            if (!(slot->area.flags & 4)) {
-                struct CloneCollider *collider = area;
-                position = slot->anim.position;
-                Vec_FromAngle(&delta, *facing, 0x80);
-                Vec_Sum(&position, &position, &delta);
-                Collider_SetPosition(collider, &position, 0);
+            if (!Clone_ColliderHasFlags(*(struct CloneColliderHeader *)&slot->area, 4)) {
+                struct CloneVec *deltaRef;
+                collider = areaWork.collider;
+                projection.position = slot->anim.position;
+                deltaRef = &projection.delta;
+                Vec_FromAngle(deltaRef, *areaWork.facing, 0x80);
+                Vec_Sum(positionRef, positionRef, &projection.delta);
+                Collider_SetPosition(collider, positionRef, 0);
                 Collider_Refresh(collider);
             }
             if (slot->state.attackPending) {
-                struct CloneCollider *collider;
                 slot->state.attackPending = 0;
                 collider = &slot->playerAttack;
                 Collider_SetAttackProperties(collider, slot->state.attack, slot->state.element, 0,
@@ -196,13 +263,13 @@ s32 PlayerClone_UpdatePool(struct PlayerClonePool *pool)
             }
             if (slot->state.paletteTimer > 0) {
                 slot->state.paletteTimer--;
-                Anim_SelectPaletteBank(&slot->anim, 0x192);
-                slot->anim.paletteFlags = 0xe013;
-                slot->anim.palette = pool->palette1;
+                Anim_SelectPaletteBank(metadata, 0x192);
+                CloneAnim_SetPaletteFlags(walkAnim, 0xe013);
+                CloneAnim_SetPalette(walkAnim, pool->palette1);
             } else {
-                Anim_SelectPaletteBank(&slot->anim, 0x1f4);
-                slot->anim.paletteFlags = 0xe000;
-                slot->anim.palette = pool->palette2;
+                Anim_SelectPaletteBank(metadata, 0x1f4);
+                CloneAnim_SetPaletteFlags(walkAnim, 0xe000);
+                CloneAnim_SetPalette(walkAnim, pool->palette2);
             }
             if (slot->frame >= (u32)(i * 30 + 0x2b2))
                 PlayerClone_ReleaseSlot(pool, slot, i);
