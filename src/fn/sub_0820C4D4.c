@@ -286,7 +286,6 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
                     if ((s16)next >= ({
                             s32 value;
                             value = *limit;
-                            asm("" : : "r"(limitOffset));
                             value;
                         })) {
                         Anim_RestartSequence(&p->sequence, p->f218, 0x1D, (u8)p->f1D8, 0);
