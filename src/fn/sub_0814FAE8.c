@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-// MATCHING_CONCESSION: register-pinning
 void Player_UpdateFacingSide(struct Player *);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
@@ -33,9 +32,8 @@ void Player_UpdateTransitionAnimation(struct Player *p)
                 u32 frame = p->tetherFrame;
                 s32 mask = 7;
                 s32 low;
-                asm("" : "+r"(mask));
-                low = mask;
-                low &= frame;
+                /* Low three frame bits. */
+                low = ~(~frame | ~mask);
                 frame >>= 3;
                 {
                     s32 threshold = mask - frame;
@@ -55,9 +53,8 @@ void Player_UpdateTransitionAnimation(struct Player *p)
                 u32 frame = p->tetherFrame;
                 s32 mask = 7;
                 s32 low;
-                asm("" : "+r"(mask));
-                low = mask;
-                low &= frame;
+                /* Low three frame bits. */
+                low = ~(~frame | ~mask);
                 frame >>= 3;
                 {
                     s32 threshold = mask - frame;
