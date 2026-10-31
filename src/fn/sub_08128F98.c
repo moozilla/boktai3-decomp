@@ -29,6 +29,20 @@ static inline u32 Random(const u16 *table, u32 *rng)
     *rng = index;
     return *(const volatile u16 *)(index * 2 + (u32)table);
 }
+static inline u32 ScatterRandomByte(const u16 *table, u32 *rng)
+{
+    union {
+        u32 cursorMask;
+        u16 sample;
+    } operand;
+    u32 index = *rng + 1;
+
+    operand.cursorMask = 1023;
+    index &= operand.cursorMask;
+    *rng = index;
+    operand.sample = *(const volatile u16 *)(table + index);
+    return operand.sample & 255;
+}
 static inline s32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
@@ -90,8 +104,6 @@ static inline void CreateScatter(struct Feather *owner, struct ContactPosition *
                                   (*defaults >> 8) & 255, zero, (u8)*defaults, zero, zero, life, 4,
                                   *defaults >> 16, owner->effectFlags, 30, 8, 8);
 }
-#ifdef NONMATCHING
-// fuzzy: 99.0%
 void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
 {
     struct ContactPosition center;
@@ -102,10 +114,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
     s32 cell;
     SetVelocity(&center, direction, 512);
     Add(&center, &p->position, &center);
-    {
-        s32 current = CellIndex(&p->position);
-        sourceCell = current;
-    }
+    sourceCell = CellIndex(&p->position);
     ZeroFill8(&velocity);
     {
         s32 i;
@@ -117,7 +126,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
             struct ContactPosition *scatter;
             spot.packed.x = (Random((const u16 *)data, rng) & 255) - 128;
             spot.packed.y = 0;
-            spot.packed.z = (Random((const u16 *)data, rng) & 255) - 128;
+            spot.packed.z = ScatterRandomByte((const u16 *)data, rng) - 128;
             scatter = &spot.position;
             Add(ScatterCursor(&scatter), &center, ScatterCursor(&scatter));
             cell = CellIndex(ScatterCursor(&scatter));
@@ -159,6 +168,3 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_SpawnGroundScatter);
-#endif
