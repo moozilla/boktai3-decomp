@@ -1,0 +1,60 @@
+--- a/src/fn/sub_0814DF58.c
++++ b/src/fn/sub_0814DF58.c
+@@ -5,21 +5,24 @@
+ 
+ #define EN_OFF   ((u32) & ((struct Player *)0)->statModifierContext.statBOverrideEnabled)
+ #define MODE_OFF ((u32) & ((struct Player *)0)->statModifierContext.statBOverrideMode)
+-#define LOADB(var, reg, off, p)                                                                    \
+-    {                                                                                              \
+-        register u32 o asm(reg) = off;                                                             \
+-        register u8 *q asm("r0");                                                                  \
+-        asm("" : "+r"(o));                                                                         \
+-        q = (u8 *)(p) + o;                                                                         \
+-        var = *q;                                                                                  \
+-    }
+ void Player_SubtractStatB(struct Player *p, s32 amount)
+ {
+     s32 value;
+     u32 en, mode;
+-    LOADB(en, "r2", EN_OFF, p);
++    {
++        register u32 o asm("r2") = EN_OFF;
++        register u8 *q asm("r0");
++        asm("" : "+r"(o));
++        q = (u8 *)(p) + o;
++        en = *q;
++    }
+     if (en) {
+-        LOADB(mode, "r2", MODE_OFF, p);
++        {
++        register u32 o asm("r2") = MODE_OFF;
++        register u8 *q asm("r0");
++        q = (u8 *)(p) + o;
++        mode = *q;
++    }
+         if (mode == 7) {
+             value = gGameState->unk77C;
+             goto have;
+@@ -31,9 +34,20 @@
+         value = 0;
+     else
+         value -= amount;
+-    LOADB(en, "r1", EN_OFF, p);
++    {
++        register u32 o asm("r1") = EN_OFF;
++        register u8 *q asm("r0");
++        asm("" : "+r"(o));
++        q = (u8 *)(p) + o;
++        en = *q;
++    }
+     if (en) {
+-        LOADB(mode, "r1", MODE_OFF, p);
++        {
++        register u32 o asm("r1") = MODE_OFF;
++        register u8 *q asm("r0");
++        q = (u8 *)(p) + o;
++        mode = *q;
++    }
+         if (mode == 7) {
+             gGameState->unk77C = value;
+             return;

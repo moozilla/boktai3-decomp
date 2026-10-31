@@ -1,0 +1,30 @@
+[
+  {
+    "address": "0814B078",
+    "source": "src/fn/sub_0814B078.c",
+    "patch": "0814B078-depin.patch",
+    "source_sha256": "faa5ef2b8e5ece14da2212f8640a76ccd64b3bf6d65396e3a6d7769ec5b44b19",
+    "stock_verification": "0 differing bytes; fuzzy 100.0%; extent=candidate-length; artifacts: build/check/run-0mss8usx\nsub_0814B078: MATCH (360 bytes at 0x0814B078)\n"
+  },
+  {
+    "address": "0814C248",
+    "source": "src/fn/sub_0814C248.c",
+    "patch": "0814C248-depin.patch",
+    "source_sha256": "bcb366e40a05ea539815dfb063d64c26bd26f13ac271cecc9a91b4581f170e25",
+    "stock_verification": "0 differing bytes; fuzzy 100.0%; extent=candidate-length; artifacts: build/check/run-kaj7pw80\nsub_0814C248: MATCH (336 bytes at 0x0814C248)\n"
+  },
+  {
+    "address": "0814D9C4",
+    "source": "src/fn/sub_0814D9C4.c",
+    "patch": "0814D9C4-depin.patch",
+    "source_sha256": "e7bc00bdd8aa6840b91adad131724255ae2c74277df940b79465906d1c3cec4d",
+    "stock_verification": "0 differing bytes; fuzzy 100.0%; extent=candidate-length; artifacts: build/check/run-94ef346o\nsub_0814D9C4: MATCH (780 bytes at 0x0814D9C4)\n"
+  },
+  {
+    "address": "08146EAC",
+    "source": "src/fn/sub_08146EAC.c",
+    "patch": "08146EAC-depin.patch",
+    "source_sha256": "a8eefba8e0db9f78ff0d4b5af7242b9ad21cbef4074ae9e0a54958e52272123f",
+    "stock_verification": "0 differing bytes; fuzzy 100.0%; extent=candidate-length; artifacts: build/check/run-1rzd0ny_\nPlayer_UpdateAlternateFormCue: MATCH (2188 bytes at 0x08146EAC)\n"
+  }
+]

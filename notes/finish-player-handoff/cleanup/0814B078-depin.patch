@@ -1,0 +1,11 @@
+--- a/src/fn/sub_0814B078.c
++++ b/src/fn/sub_0814B078.c
+@@ -67,7 +67,7 @@
+     best = 0;
+     if (entry)
+         do {
+-            register u32 rawFlags asm("r1") = entry->flags;
++            register u32 rawFlags = entry->flags;
+             u32 inactive = rawFlags & 1;
+             u32 flags = rawFlags;
+             if (!inactive) {

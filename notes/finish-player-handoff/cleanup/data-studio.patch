@@ -1,0 +1,668 @@
+--- a/data/manifest.csv
++++ b/data/manifest.csv
+@@ -1,24 +1,31 @@
+-name,start,end,format,file,description
+-actor_registry,08603300,08604998,keyed_callbacks,data/actor_registry.csv,Script chara registry: string-hash key to actor/controller constructor (722 entries + sentinel)
+-bat_script_commands,08605C74,08605C94,callback_array,data/actor_commands/bat.csv,Bat actor script command handlers (8 entries)
+-bee_script_commands,08605DB8,08605DD4,callback_array,data/actor_commands/bee.csv,Bee actor script command handlers (7 entries)
+-ghost_script_commands,08605E14,08605E34,callback_array,data/actor_commands/ghost.csv,Ghost actor script command handlers (8 entries)
+-lun_script_commands,08605E78,08605E94,callback_array,data/actor_commands/lun.csv,Lun actor script command handlers (7 entries)
+-crow_script_commands,08605EC4,08605EE0,callback_array,data/actor_commands/crow.csv,Crow actor script command handlers (7 entries)
+-spider_script_commands,08605F34,08605F50,callback_array,data/actor_commands/spider.csv,Spider actor script command handlers (7 entries)
+-vorn_script_commands,08606038,08606058,callback_array,data/actor_commands/vorn.csv,Vorn actor script command handlers (8 entries)
+-skeleton_script_commands,086060FC,08606120,callback_array,data/actor_commands/skeleton.csv,Skeleton actor script command handlers (9 entries)
+-octopus_script_commands,0860635C,08606384,callback_array,data/actor_commands/octopus.csv,Octopus actor script command handlers (10 entries)
+-ivy_script_commands,08606400,0860641C,callback_array,data/actor_commands/ivy.csv,Ivy actor script command handlers (7 entries)
+-actor_default_commands,086108B0,086108C8,callback_array,data/actor_commands/default.csv,Default actor script command handlers (6 entries)
+-text_bank,08D6B1E4,08DD6B96,text_bank,build/text/bank.tsv,"Script text: gcx section words, entry table + strings and blobs (ROM-derived source, extracted on demand; strings may change length)"
+-res_anm,08614DCC,08617084,resource_archive,build/res/anm/index.txt,"Resource archive anm (ROM-derived entries, extracted on demand; entries may change size)"
+-res_map,08617084,087C4C98,resource_archive,build/res/map/index.txt,"Resource archive map (ROM-derived entries, extracted on demand; entries may change size)"
+-res_tAE6C,087C4C98,088223C4,resource_archive,build/res/tAE6C/index.txt,"Resource archive tAE6C (ROM-derived entries, extracted on demand; entries may change size)"
+-res_t92B3,088223C4,0883BDA8,resource_archive,build/res/t92B3/index.txt,"Resource archive t92B3 (ROM-derived entries, extracted on demand; entries may change size)"
+-res_ptn,0883BDA8,089F8ED8,resource_archive,build/res/ptn/index.txt,"Resource archive ptn (ROM-derived entries, extracted on demand; entries may change size)"
+-res_fnt,089F8ED8,08A2AF80,resource_archive,build/res/fnt/index.txt,"Resource archive fnt (ROM-derived entries, extracted on demand; entries may change size)"
+-res_tCEAA,08A2AF80,08A2D944,resource_archive,build/res/tCEAA/index.txt,"Resource archive tCEAA (ROM-derived entries, extracted on demand; entries may change size)"
+-res_t98F5,08A2D944,08BDDE08,resource_archive,build/res/t98F5/index.txt,"Resource archive t98F5 (ROM-derived entries, extracted on demand; entries may change size)"
+-res_tCB05,08BDDE08,08D530DC,resource_archive,build/res/tCB05/index.txt,"Resource archive tCB05 (ROM-derived entries, extracted on demand; entries may change size)"
+-res_t9B1B,08D530DC,08D5A85C,resource_archive,build/res/t9B1B/index.txt,"Resource archive t9B1B (ROM-derived entries, extracted on demand; entries may change size)"
++name,start,end,format,file,description,owner,selector,dispatchers
++actor_registry,08603300,08604998,keyed_callbacks,data/actor_registry.csv,Script chara registry: string-hash key to actor/controller constructor (722 entries + sentinel),,,
++bat_script_commands,08605C74,08605C94,callback_array,data/actor_commands/bat.csv,Bat actor script command handlers (8 entries),Actor script,command packet first halfword,08136F1C
++bee_script_commands,08605DB8,08605DD4,callback_array,data/actor_commands/bee.csv,Bee actor script command handlers (7 entries),Actor script,command packet first halfword,08136F1C
++ghost_script_commands,08605E14,08605E34,callback_array,data/actor_commands/ghost.csv,Ghost actor script command handlers (8 entries),Actor script,command packet first halfword,08136F1C
++lun_script_commands,08605E78,08605E94,callback_array,data/actor_commands/lun.csv,Lun actor script command handlers (7 entries),Actor script,command packet first halfword,08136F1C
++crow_script_commands,08605EC4,08605EE0,callback_array,data/actor_commands/crow.csv,Crow actor script command handlers (7 entries),Actor script,command packet first halfword,08136F1C
++spider_script_commands,08605F34,08605F50,callback_array,data/actor_commands/spider.csv,Spider actor script command handlers (7 entries),Actor script,command packet first halfword,08136F1C
++vorn_script_commands,08606038,08606058,callback_array,data/actor_commands/vorn.csv,Vorn actor script command handlers (8 entries),Actor script,command packet first halfword,08136F1C
++skeleton_script_commands,086060FC,08606120,callback_array,data/actor_commands/skeleton.csv,Skeleton actor script command handlers (9 entries),Actor script,command packet first halfword,08136F1C
++octopus_script_commands,0860635C,08606384,callback_array,data/actor_commands/octopus.csv,Octopus actor script command handlers (10 entries),Actor script,command packet first halfword,08136F1C
++ivy_script_commands,08606400,0860641C,callback_array,data/actor_commands/ivy.csv,Ivy actor script command handlers (7 entries),Actor script,command packet first halfword,08136F1C
++actor_default_commands,086108B0,086108C8,callback_array,data/actor_commands/default.csv,Default actor script command handlers (6 entries),Actor script,command packet first halfword,08136F1C
++player_action_updates,08610964,08610980,callback_array,data/player_callbacks/action_updates.csv,Player update callbacks selected by actionMode (7 entries),Player,actionMode,0813FC38
++player_action_movement,08610B70,08610C0C,callback_array,data/player_callbacks/action_movement.csv,Player action movement callbacks selected by tetherMode (39 entries),Player,tetherMode,0815788C
++player_interaction_movement,08610C0C,08610CA8,callback_array,data/player_callbacks/interaction_movement.csv,Player interaction movement callbacks selected by tetherMode (39 entries),Player,tetherMode,08157CFC
++player_interaction_modes,08610CA8,08610D18,callback_array,data/player_callbacks/interaction_modes.csv,Player interaction mode callbacks (28 entries),Player,Player_SelectInteractionMode result,0815849C
++player_alternate_interaction_modes,08610D18,08610D88,callback_array,data/player_callbacks/alternate_interaction_modes.csv,Player alternate interaction mode callbacks (28 entries),Player,Player_SelectAlternateInteractionMode result,08158754
++player_link_movement,08610D88,08610E24,callback_array,data/player_callbacks/link_movement.csv,Player link movement callbacks selected by tetherMode (39 entries),Player,tetherMode,08158848
++player_attack_effect_elements,08610E2C,08610E44,callback_array,data/player_callbacks/attack_effect_elements.csv,Player attack emission callbacks selected by element (6 entries),Player attack effect,element,0816233C
++res_anm,08614DCC,08617084,resource_archive,build/res/anm/index.txt,"Resource archive anm (ROM-derived entries, extracted on demand; entries may change size)",,,
++res_map,08617084,087C4C98,resource_archive,build/res/map/index.txt,"Resource archive map (ROM-derived entries, extracted on demand; entries may change size)",,,
++res_tAE6C,087C4C98,088223C4,resource_archive,build/res/tAE6C/index.txt,"Resource archive tAE6C (ROM-derived entries, extracted on demand; entries may change size)",,,
++res_t92B3,088223C4,0883BDA8,resource_archive,build/res/t92B3/index.txt,"Resource archive t92B3 (ROM-derived entries, extracted on demand; entries may change size)",,,
++res_ptn,0883BDA8,089F8ED8,resource_archive,build/res/ptn/index.txt,"Resource archive ptn (ROM-derived entries, extracted on demand; entries may change size)",,,
++res_fnt,089F8ED8,08A2AF80,resource_archive,build/res/fnt/index.txt,"Resource archive fnt (ROM-derived entries, extracted on demand; entries may change size)",,,
++res_tCEAA,08A2AF80,08A2D944,resource_archive,build/res/tCEAA/index.txt,"Resource archive tCEAA (ROM-derived entries, extracted on demand; entries may change size)",,,
++res_t98F5,08A2D944,08BDDE08,resource_archive,build/res/t98F5/index.txt,"Resource archive t98F5 (ROM-derived entries, extracted on demand; entries may change size)",,,
++res_tCB05,08BDDE08,08D530DC,resource_archive,build/res/tCB05/index.txt,"Resource archive tCB05 (ROM-derived entries, extracted on demand; entries may change size)",,,
++res_t9B1B,08D530DC,08D5A85C,resource_archive,build/res/t9B1B/index.txt,"Resource archive t9B1B (ROM-derived entries, extracted on demand; entries may change size)",,,
++text_bank,08D6B1E4,08DD6B96,text_bank,build/text/bank.tsv,"Script text: gcx section words, entry table + strings and blobs (ROM-derived source, extracted on demand; strings may change length)",,,
+--- /dev/null
++++ b/data/player_callbacks/action_movement.csv
+@@ -0,0 +1,40 @@
++index,callback,name
++0,08141A81,Player_BeginVariantAction
++1,08141E81,Player_UpdateMovement
++2,08141FA1,Player_UpdateResourceDash
++3,081442FD,Player_InvokeStoredCallback
++4,08142195,Player_UpdateObjectPush
++5,08142AA1,Player_UpdateObjectPushRecovery
++6,08143ED1,Player_UpdateTetherMovement
++7,08142CC1,Player_UpdateFlaggedResourceRecovery
++8,081432DD,Player_UpdateHeldInteraction
++9,08143605,Player_UpdateHeldEnergyBurst
++10,08147769,Player_UpdateFormChangeCue
++11,08146EAD,Player_UpdateAlternateFormCue
++12,0814C3A5,Player_UpdateGrabMotion
++13,08147CF1,Player_UpdateSpiralRelease
++14,08147FB9,Player_UpdateSpiralAfterglow
++15,00000000,
++16,08144409,Player_UpdateChargedBurst
++17,08144625,Player_UpdateSpiralBurst
++18,08144825,Player_UpdateActionEighteen
++19,0814499D,Player_UpdateActionEffectSequence
++20,08144AAD,sub_08144AAC
++21,08144D65,sub_08144D64
++22,08144311,Player_ResetIdleMotion
++23,0814433D,Player_UpdateMovementFacing
++24,08145221,Player_UpdateFallPose
++25,08145255,sub_08145254
++26,08145401,Player_UpdateScaleTransition
++27,08144F41,sub_08144F40
++28,08145131,Player_UpdateCountdownAnimation
++29,081454E1,Player_UpdateTerrainRecoil
++30,08145829,Player_UpdateContactKnockdown
++31,08145B19,Player_UpdateDefeatSlide
++32,08145DA1,Player_UpdateDefeatRecoil
++33,081460F5,Player_UpdateDeathSequence
++34,081462DD,sub_081462DC
++35,08146479,Player_UpdateTimedCuePhase
++36,08146C65,Player_UpdateAttachmentCue
++37,08146575,Player_UpdateInputCadenceCue
++38,0814B1F9,Player_UpdateTargetMotion
+--- /dev/null
++++ b/data/player_callbacks/action_updates.csv
+@@ -0,0 +1,8 @@
++index,callback,name
++0,0815788D,Player_UpdateActionModeMovement
++1,0815788D,Player_UpdateActionModeMovement
++2,0815788D,Player_UpdateActionModeMovement
++3,00000000,
++4,00000000,
++5,00000000,
++6,08157CFD,Player_UpdateInteractionMovement
+--- /dev/null
++++ b/data/player_callbacks/alternate_interaction_modes.csv
+@@ -0,0 +1,29 @@
++index,callback,name
++0,08148E4D,sub_08148E4C
++1,08148FC1,Player_UpdateWalkFootsteps
++2,00000000,
++3,00000000,
++4,081491E5,sub_081491E4
++5,00000000,
++6,00000000,
++7,00000000,
++8,00000000,
++9,00000000,
++10,00000000,
++11,00000000,
++12,00000000,
++13,08149DF1,Player_UpdateSpiralTrailAction
++14,00000000,
++15,00000000,
++16,00000000,
++17,00000000,
++18,00000000,
++19,00000000,
++20,081493E5,Player_UpdateMovementPose
++21,0814957D,Player_UpdateOddDirectionPose
++22,00000000,
++23,00000000,
++24,08149721,Player_UpdatePoseRecovery
++25,08149A15,Player_UpdateRecoilMotion
++26,00000000,
++27,00000000,
+--- /dev/null
++++ b/data/player_callbacks/attack_effect_elements.csv
+@@ -0,0 +1,7 @@
++index,callback,name
++0,081608B1,PlayerAttackEffect_EmitPaletteBaseTrail
++1,08160EA5,PlayerAttackEffect_EmitPaletteZeroTrail
++2,081612C9,PlayerAttackEffect_EmitPaletteFiveTrail
++3,081616D1,PlayerAttackEffect_EmitPaletteTwoTrail
++4,08161AF5,PlayerAttackEffect_EmitPaletteThreeTrail
++5,08161F19,PlayerAttackEffect_EmitPaletteFourTrail
+--- /dev/null
++++ b/data/player_callbacks/interaction_modes.csv
+@@ -0,0 +1,29 @@
++index,callback,name
++0,081481E5,sub_081481E4
++1,08148319,Player_UpdateWaveringMovement
++2,00000000,
++3,00000000,
++4,00000000,
++5,00000000,
++6,00000000,
++7,00000000,
++8,00000000,
++9,00000000,
++10,00000000,
++11,00000000,
++12,08148B65,Player_UpdateSpiralDisorientation
++13,00000000,
++14,00000000,
++15,00000000,
++16,00000000,
++17,00000000,
++18,00000000,
++19,00000000,
++20,081487B5,Player_UpdateTimedMovementRecovery
++21,08148609,Player_UpdateDirectionRecovery
++22,00000000,
++23,00000000,
++24,00000000,
++25,08148915,Player_UpdateDecayingRecoil
++26,00000000,
++27,00000000,
+--- /dev/null
++++ b/data/player_callbacks/interaction_movement.csv
+@@ -0,0 +1,40 @@
++index,callback,name
++0,08141A81,Player_BeginVariantAction
++1,08141E81,Player_UpdateMovement
++2,08146871,Player_UpdateBriefAction
++3,0814A9D5,sub_0814A9D4
++4,08142195,Player_UpdateObjectPush
++5,08142AA1,Player_UpdateObjectPushRecovery
++6,08143ED1,Player_UpdateTetherMovement
++7,08142FC5,Player_UpdateUnflaggedResourceRecovery
++8,081432DD,Player_UpdateHeldInteraction
++9,0814692D,Player_UpdateEnergyBurst
++10,00000000,
++11,00000000,
++12,00000000,
++13,00000000,
++14,00000000,
++15,00000000,
++16,00000000,
++17,00000000,
++18,00000000,
++19,00000000,
++20,00000000,
++21,08144D65,sub_08144D64
++22,08144311,Player_ResetIdleMotion
++23,0814433D,Player_UpdateMovementFacing
++24,08145221,Player_UpdateFallPose
++25,08145255,sub_08145254
++26,08145401,Player_UpdateScaleTransition
++27,08144F41,sub_08144F40
++28,08145131,Player_UpdateCountdownAnimation
++29,081454E1,Player_UpdateTerrainRecoil
++30,08145829,Player_UpdateContactKnockdown
++31,08145B19,Player_UpdateDefeatSlide
++32,08145DA1,Player_UpdateDefeatRecoil
++33,081460F5,Player_UpdateDeathSequence
++34,081462DD,sub_081462DC
++35,08146479,Player_UpdateTimedCuePhase
++36,08146C65,Player_UpdateAttachmentCue
++37,00000000,
++38,00000000,
+--- /dev/null
++++ b/data/player_callbacks/link_movement.csv
+@@ -0,0 +1,40 @@
++index,callback,name
++0,08141A81,Player_BeginVariantAction
++1,08141E81,Player_UpdateMovement
++2,0814A01D,Player_UpdateStatBAction
++3,081442FD,Player_InvokeStoredCallback
++4,08142195,Player_UpdateObjectPush
++5,08142AA1,Player_UpdateObjectPushRecovery
++6,08143ED1,Player_UpdateTetherMovement
++7,08142CC1,Player_UpdateFlaggedResourceRecovery
++8,081432DD,Player_UpdateHeldInteraction
++9,08143605,Player_UpdateHeldEnergyBurst
++10,08147769,Player_UpdateFormChangeCue
++11,08146EAD,Player_UpdateAlternateFormCue
++12,0814C3A5,Player_UpdateGrabMotion
++13,08147CF1,Player_UpdateSpiralRelease
++14,08147FB9,Player_UpdateSpiralAfterglow
++15,00000000,
++16,08144409,Player_UpdateChargedBurst
++17,0814A129,Player_UpdateStatARestoreAction
++18,0814A361,Player_UpdateStatBEffectAction
++19,0814499D,Player_UpdateActionEffectSequence
++20,08144AAD,sub_08144AAC
++21,08144D65,sub_08144D64
++22,08144311,Player_ResetIdleMotion
++23,0814433D,Player_UpdateMovementFacing
++24,08145221,Player_UpdateFallPose
++25,08145255,sub_08145254
++26,08145401,Player_UpdateScaleTransition
++27,08144F41,sub_08144F40
++28,08145131,Player_UpdateCountdownAnimation
++29,081454E1,Player_UpdateTerrainRecoil
++30,08145829,Player_UpdateContactKnockdown
++31,08145B19,Player_UpdateDefeatSlide
++32,08145DA1,Player_UpdateDefeatRecoil
++33,00000000,
++34,00000000,
++35,00000000,
++36,00000000,
++37,00000000,
++38,0814B1F9,Player_UpdateTargetMotion
+--- a/docs/DATA.md
++++ b/docs/DATA.md
+@@ -7,6 +7,9 @@
+ ## Pipeline
+ 
+ * `data/manifest.csv` lists decoded ranges: `name,start,end,format,file,description`.
++  Optional `owner`, `selector` and `dispatchers` columns describe reviewed uses
++  for browsing; dispatchers are space-separated 8-digit code addresses. This
++  metadata does not change bytes or turn adjacent labels into logical bounds.
+ * `tools/datafmt/<format>.py` decodes a range to a source file (`decode`) and
+   encodes the file back to items (`encode`): sized integers, and ROM pointers
+   that `tools/symbolize.py` writes as symbols, so decoded tables stay movable.
+@@ -56,7 +59,7 @@
+ | Format | Range | File | Notes |
+ |---|---|---|---|
+ | `keyed_callbacks` | `08603300`–`08604998` | `data/actor_registry.csv` | 722 sorted `(key, callback)` records and a zero sentinel. The script `chara` command binary-searches it (`08225844`) and calls the callback. |
+-| `callback_array` | Eleven ranges listed in `data/manifest.csv` | `data/actor_commands/*.csv` | Ordered Thumb callback pointers for the common actor commands and ten monster extensions. The command packet's first halfword selects an entry; every non-null pointer remains a linker relocation. |
++| `callback_array` | Ranges listed in `data/manifest.csv` | `data/actor_commands/*.csv`, `data/player_callbacks/*.csv` | Ordered Thumb callback pointers. Actor commands use the packet's first halfword; Player arrays use the documented mode or element selector. Every non-null pointer remains a linker relocation. |
+ | `resource_archive` | 10 ranges `08614DCC`–`08D5A85C` | `build/res/LABEL/index.txt` + `HASH.bin` (extracted) | The archives found by `ScriptProc_Start` (anm, map, ptn, fnt, sprites...). Header, sorted hash table and offsets are regenerated; entries are emitted as `.incbin` of their files and may change size. Their contents are position-independent: about 7,300 pointer-like words inside them (tile and map data) are no longer relocated. Verified in-game: growing the first `anm` entry by 37 bytes shifts every archive and leaves all menu and field screenshots identical. |
+ | `text_bank` | `08D6B1E4`–`08DD6B96` | `build/text/bank.tsv` (extracted) | Script text, resizable. The gcx section words, 9,977 entry offsets, then strings (`T`, decoded with `data/charmap.tsv`) and binary blobs (`B`, 82 tables read by script code). Verified in-game: a lengthened config help line renders and the field still plays. |
+ 
+@@ -149,3 +152,32 @@
+ Tables named as literals in the callback or loader; initialization may
+ install another table later. Studio's ROM view gives each table its own block
+ and marks exactly 336 bytes across the eleven table extents as decoded.
++
++### Player callback tables
++
++Seven decoded arrays under `data/player_callbacks/` contain 186 entries (744
++bytes). These are fixed physical extents, with the selector and reviewed
++consumer recorded in the manifest:
++
++| Range (end exclusive) | Entries | Selector | Consumer |
++|---|---:|---|---|
++| `08610964`–`08610980` | 7 | `actionMode` | `0813FC38` |
++| `08610B70`–`08610C0C` | 39 | `tetherMode` | `0815788C` |
++| `08610C0C`–`08610CA8` | 39 | `tetherMode` | `08157CFC` |
++| `08610CA8`–`08610D18` | 28 | `Player_SelectInteractionMode` result | `0815849C` |
++| `08610D18`–`08610D88` | 28 | `Player_SelectAlternateInteractionMode` result | `08158754` |
++| `08610D88`–`08610E24` | 39 | `tetherMode` | `08158848` |
++| `08610E2C`–`08610E44` | 6 | `element` | `0816233C` |
++
++Studio's **Callback tables** view (`/actors#callbacks`) includes these arrays
++and the actor command tables. It shows ownership, selector, dispatcher links
++and every handler in numeric order. Code pages link exact table-start literals
++back to that view, and the ROM view marks only each decoded extent. The older
++`/actors#commands` links retain the actor-command subset. After editing a CSV,
++manifest metadata or function symbols, reload the page: the server refreshes
++the table index and its dependent actor/name caches.
++
++The gap `08610E24`–`08610E2C` remains undecoded here. The high-ROM region
++`08E87A10`–`08E87B78` also remains outside the manifest: dispatch indices cross
++its apparent subtable labels, so those labels alone do not establish separate
++array bounds. No null entry or unknown extent is silently removed.
+--- a/tests/tools/test_actor_command_tables.py
++++ b/tests/tools/test_actor_command_tables.py
+@@ -36,7 +36,7 @@
+         self.addCleanup(context.stop)
+         self.add_table('first', 0x08600000)
+ 
+-    def add_table(self, name, start, directory='actor_commands'):
++    def add_table(self, name, start, directory='actor_commands', **metadata):
+         relative = f'data/{directory}/{name}.csv'
+         path = self.root / relative
+         path.parent.mkdir(parents=True, exist_ok=True)
+@@ -44,8 +44,50 @@
+                         '1,00000000,Unused\n2,08136EB1,OldRestoreName\n')
+         self.entries.append(datafmt.Entry({
+             'name': name, 'start': f'{start:08X}', 'end': f'{start + 12:08X}',
+-            'format': 'callback_array', 'file': relative, 'description': name + ' commands',
++            'format': 'callback_array', 'file': relative, 'description': name + ' commands', **metadata,
+         }))
++
++    def test_player_tables_have_metadata_and_links_without_becoming_actor_commands(self):
++        self.add_table('player', 0x08600100, 'player_callbacks', owner='Player',
++                       selector='actionMode', dispatchers='0813FC38')
++        table = actors.callback_tables()['08600100']
++        self.assertEqual(table['owner'], 'Player')
++        self.assertEqual(table['selector'], 'actionMode')
++        self.assertEqual(table['dispatchers'], [{'addr': '0813FC38', 'name': 'Current_0813FC38'}])
++        self.assertEqual(table['url'], '/actors#callbacks:08600100')
++        self.assertNotIn('08600100', actors.command_tables())
++        with patch.object(actors, 'literals', return_value=[0x08600100, 0x08600104]):
++            self.assertEqual([t['addr'] for t in actors.callback_tables_of([0x0813FC38])], ['08600100'])
++        self.assertEqual(atlas.command_table_blocks()[1]['r'], '/actors#callbacks:08600100')
++
++    def test_table_edits_and_removals_refresh_dependent_caches(self):
++        first = actors.callback_tables()
++        actors._CACHE['actors'] = ['stale reference']
++        path = self.root / 'data/actor_commands/first.csv'
++        path.write_text(path.read_text().replace('080837D5', '080837D9'))
++        second = actors.callback_tables()
++        self.assertEqual(first['08600000']['entries'][0]['callback'], '080837D5')
++        self.assertEqual(second['08600000']['entries'][0]['callback'], '080837D9')
++        self.assertNotIn('actors', actors._CACHE)
++        self.entries.clear()
++        self.assertEqual(actors.callback_tables(), {})
++
++    def test_symbol_changes_refresh_names_even_when_callback_csv_is_unchanged(self):
++        symbol = self.root / 'symbols/functions.csv'
++        symbol.parent.mkdir()
++        symbol.write_text('first')
++        actors.callback_tables()
++        actors._CACHE['symbols'] = {'stale': True}
++        actors._CACHE['callers'] = {'stale': True}
++        symbol.write_text('changed')
++        actors.callback_tables()
++        self.assertNotIn('symbols', actors._CACHE)
++        self.assertNotIn('callers', actors._CACHE)
++
++    def test_dispatcher_metadata_requires_even_hex_address(self):
++        for address in ('0813FC39', '813FC38', 'not-an-address'):
++            with self.subTest(address=address), self.assertRaises(ValueError):
++                self.add_table('bad', 0x08600100, 'player_callbacks', dispatchers=address)
+ 
+     def test_order_thumb_addresses_current_names_and_nulls(self):
+         # A callback_array elsewhere need not be an actor command table.
+--- a/tools/assets/actors.py
++++ b/tools/assets/actors.py
+@@ -193,6 +193,7 @@
+ 
+ def code_info(addr):
+     """Disassembly and C (when present) of the function containing addr."""
++    callback_tables()  # refresh names and references before reading cached code
+     a = func_at(addr)
+     if a is None:
+         return None
+@@ -204,7 +205,8 @@
+             "confidence": sym.get("confidence"), "notes": sym.get("notes"),
+             "c": src and {"file": src[0], "line": src[1], "text": src[2], "nonmatching": src[3]},
+             "calls": [{"addr": f"{names[c]:08X}", "name": fname(names[c])} for c in sorted(set(calls(a)))],
+-            "callers": callers().get(f"{a:08X}", [])}
++            "callers": callers().get(f"{a:08X}", []),
++            "callback_tables": callback_tables_of([a])}
+ 
+ 
+ @cached
+@@ -352,18 +354,36 @@
+ 
+ 
+ # ---------- actors ----------
+-@cached
+-def command_tables():
+-    """Reviewed actor command arrays, keyed by their original ROM address.
+-
+-    The encoder validates indices, callback values and table extents. Names
+-    come from current function symbols, not the CSV's informational column.
++def _stamp(path):
++    """A missing input also participates in the callback-index signature."""
++    try:
++        stat = os.stat(path)
++        return (path, stat.st_mtime_ns, stat.st_size)
++    except FileNotFoundError:
++        return (path, None, None)
++
++
++def callback_tables():
++    """All decoded callback arrays, with reviewed ownership and selectors.
++
++    Refresh after manifest, CSV, symbol or disassembly changes. The dependent
++    actor/reference caches must not keep removed tables or old handler names.
+     """
+-    out = {}
+-    for entry in load_manifest():
++    entries = [e for e in load_manifest() if e.format == "callback_array"]
++    paths = [os.path.join(ROOT, p) for p in
++             ("data/manifest.csv", "symbols/functions.csv", "gen/code.s")]
++    signature = tuple(_stamp(p) for p in paths + [e.file for e in entries])
++    # Include metadata as well: callers/tests can supply an in-memory manifest.
++    signature += tuple((e.name, e.start, e.end, e.description, e.owner,
++                        e.selector, tuple(e.dispatchers)) for e in entries)
++    cached_tables = _CACHE.get("callback_tables")
++    if cached_tables and cached_tables[0] == signature:
++        return cached_tables[1]
++    for name in ("symbols", "code", "_starts", "sources", "callers", "actors"):
++        _CACHE.pop(name, None)
++    out = {}
++    for entry in entries:
+         source = os.path.relpath(entry.file, ROOT).replace(os.sep, "/")
+-        if entry.format != "callback_array" or not source.startswith("data/actor_commands/"):
+-            continue
+         handlers = []
+         for index, (_, callback, _) in enumerate(entry.encode()):
+             addr = callback & ~1
+@@ -373,8 +393,26 @@
+         key = f"{entry.start:08X}"
+         out[key] = {"addr": key, "end": f"{entry.end:08X}", "name": entry.name,
+                     "description": entry.description, "source": source,
+-                    "size": entry.end - entry.start, "entries": handlers}
+-    return out
++                    "size": entry.end - entry.start, "entries": handlers,
++                    "owner": entry.owner, "selector": entry.selector,
++                    "dispatchers": [{"addr": f"{a:08X}", "name": fname(a)}
++                                    for a in entry.dispatchers],
++                    "url": f"/actors#callbacks:{key}"}
++    _CACHE["callback_tables"] = (signature, out)
++    return out
++
++
++def command_tables():
++    """The legacy actor-command subset of the general callback-table index."""
++    return {key: table for key, table in callback_tables().items()
++            if table["source"].startswith("data/actor_commands/")}
++
++
++def callback_tables_of(funcs):
++    """Decoded arrays named by literals in these exact functions."""
++    tables = callback_tables()
++    keys = {f"{value:08X}" for addr in funcs for value in literals(addr)}
++    return [tables[key] for key in sorted(keys) if key in tables]
+ 
+ 
+ def command_tables_of(funcs):
+--- a/tools/datafmt/__init__.py
++++ b/tools/datafmt/__init__.py
+@@ -4,6 +4,9 @@
+ data/manifest.csv lists the decoded ranges:
+ 
+     name,start,end,format,file,description
++
++Optional browsing columns are owner, selector and dispatchers (space-separated
++8-digit function addresses). They describe reviewed uses and do not affect bytes.
+ 
+ Each format module (tools/datafmt/<format>.py) provides
+ 
+@@ -32,6 +35,7 @@
+ import csv
+ import importlib
+ import os
++import re
+ 
+ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ ROM_BASE = 0x08000000
+@@ -46,6 +50,15 @@
+         self.format = row["format"]
+         self.file = os.path.join(ROOT, row["file"])
+         self.description = row.get("description", "")
++        # Optional browsing metadata. It does not change encoding or ownership
++        # of the bytes; dispatchers are reviewed code references, not bounds.
++        self.owner = row.get("owner", "") or ""
++        self.selector = row.get("selector", "") or ""
++        self.dispatchers = []
++        for address in (row.get("dispatchers", "") or "").split():
++            if not re.fullmatch(r"08[0-9A-Fa-f]{6}", address) or int(address, 16) & 1:
++                raise ValueError(f"{self.name}: dispatcher must be an even 8-digit ROM address")
++            self.dispatchers.append(int(address, 16))
+ 
+     def module(self):
+         return importlib.import_module("datafmt." + self.format)
+--- a/tools/datafmt/callback_array.py
++++ b/tools/datafmt/callback_array.py
+@@ -2,7 +2,7 @@
+ 
+ CSV columns: index (decimal), callback (hex with the Thumb bit), name
+ (informational; ignored by encode). Null entries are allowed. Array order is
+-semantic: the actor command dispatcher indexes these tables by command[0].
++semantic: the table's consumer selects a callback by its numeric index.
+ Every non-null callback is emitted as a relocatable pointer by symbolize.py.
+ """
+ import csv
+--- a/tools/studio/actors.html
++++ b/tools/studio/actors.html
+@@ -86,7 +86,7 @@
+ // GCL names come from gcl/names/chara.csv; cross-references from
+ // tools/assets/actors.py.
+ studioHeader();
+-let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, commandTables = {}, sel = null;
++let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, commandTables = {}, callbackTables = {}, sel = null;
+ 
+ const label = a => noteOf('actor', a.key)?.label;
+ const gclTitle = a => a.gcl.length ? a.gcl[0].name + (a.gcl[0].english ? ` (${a.gcl[0].english})` : '') : '';
+@@ -99,12 +99,12 @@
+   $('count').textContent = `${hits.length} of ${A.length} registry entries`;
+   const special = (key, text) => {
+     const d = document.createElement('div');
+-    d.className = 'row special' + (sel?.split(':')[0] === key ? ' on' : ''); d.dataset.key = key;
++    d.className = 'row special' + ([sel?.split(':')[0], sel?.startsWith('commands') ? 'callbacks' : ''].includes(key) ? ' on' : ''); d.dataset.key = key;
+     d.textContent = text; d.onclick = () => { location.hash = key; };
+     return d;
+   };
+   $('list').replaceChildren(special('names', 'Name lists from the game (monsters, characters)'),
+-    special('commands', `Command tables (${Object.keys(commandTables).length} decoded)`), ...hits.map(a => {
++    special('callbacks', `Callback tables (${Object.keys(callbackTables).length} decoded)`), ...hits.map(a => {
+     const d = document.createElement('div'); d.className = 'row' + (a.key === sel ? ' on' : ''); d.dataset.key = a.key;
+     d.innerHTML = `<code>${a.key}</code><b></b><small></small>`;
+     d.querySelector('b').textContent = title(a);
+@@ -122,11 +122,12 @@
+ 
+ async function show(key) {
+   sel = key;
+-  const navKey = key.startsWith('commands:') ? 'commands' : key;
++  const kind = key.split(':')[0];
++  const navKey = ['commands', 'callbacks'].includes(kind) ? 'callbacks' : key;
+   document.querySelectorAll('.row').forEach(d => d.classList.toggle('on', d.dataset.key === navKey));
+   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
+   if (key === 'names') return showNames();
+-  if (navKey === 'commands') return showCommandTables(key.split(':')[1]);
++  if (navKey === 'callbacks') return showCallbackTables(key.split(':')[1], kind === 'commands');
+   const a = byKey[key], v = $('view');
+   if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
+   const names = a.names.map(n => `${stringLink(n.id)} ${esc(n.jp)}${en[n.id] ? ` <span class="cand">(${esc(en[n.id])})</span>` : ''}`).join('<br>');
+@@ -172,23 +173,27 @@
+     <div class="meta">Decoded tables named in this callback or loader. Initialization can replace a table after installing the common defaults.</div>`;
+ }
+ 
+-function showCommandTables(addr) {
+-  const tables = addr ? [commandTables[addr]].filter(Boolean) : Object.values(commandTables);
++function showCallbackTables(addr, commandsOnly = false) {
++  const catalog = commandsOnly ? commandTables : callbackTables;
++  const heading = commandsOnly ? 'Actor script command tables' : 'Decoded callback tables';
++  const tables = addr ? [catalog[addr]].filter(Boolean) : Object.values(catalog);
+   if (!tables.length) {
+-    $('view').innerHTML = `<h2>Actor script command tables</h2><div class="empty">${addr ? `No decoded table at ${esc(addr)}.` : 'No tables decoded yet.'}</div>`;
++    $('view').innerHTML = `<h2>${heading}</h2><div class="empty">${addr ? `No decoded table at ${esc(addr)}.` : 'No tables decoded yet.'}</div>`;
+     return;
+   }
+-  $('view').innerHTML = `<h2>Actor script command tables</h2>
+-    <p class="meta">A command packet selects a handler by its numeric index. ${codeLink('08136F1C', 'SceneActorScript_OnCommand')} reads the table from the actor and passes the actor and packet to the selected handler. These indices are separate from GCL registry keys.</p>
+-    ${addr ? '<p><a href="#commands">All decoded command tables</a></p>' : ''}
++  $('view').innerHTML = `<h2>${heading}</h2>
++    <p class="meta">Each consumer selects a callback by its numeric index. The owner, selector and reviewed dispatcher links below describe its use; the displayed extent is the decoded physical range.</p>
++    ${commandsOnly ? `<p class="meta">${codeLink('08136F1C', 'SceneActorScript_OnCommand')} selects actor script commands using a packet's first halfword. These indices are separate from GCL registry keys.</p>` : ''}
++    ${addr || commandsOnly ? '<p><a href="#callbacks">All decoded callback tables</a></p>' : ''}
+     ${tables.map(t => {
+       const users = A.filter(a => (a.command_tables || []).some(r => r.table === t.addr));
+-      return `<section><h3><a href="#commands:${t.addr}">${esc(t.description || t.name)}</a></h3>
++      return `<section><h3><a href="#callbacks:${t.addr}">${esc(t.description || t.name)}</a></h3>
+         <div class="meta"><span class="mono">${t.addr}–${t.end}</span> · ${t.size} bytes · <code>${esc(t.source)}</code></div>
++        <div class="meta">Owner: ${esc(t.owner || 'not assigned')} · Index: ${esc(t.selector || 'numeric entry')}${t.dispatchers?.length ? ' · Dispatcher: ' + t.dispatchers.map(f => codeLink(f.addr, f.name)).join(', ') : ''}</div>
+         <table class="commands"><thead><tr><th>Index</th><th>Handler</th><th>Thumb pointer</th></tr></thead><tbody>
+           ${t.entries.map(e => `<tr><td>${e.index}</td><td>${e.addr ? codeLink(e.addr, e.name) : '<span class="empty">Empty slot</span>'}</td><td class="mono">${e.callback}</td></tr>`).join('')}
+         </tbody></table>
+-        <div class="meta">${users.length ? 'Referenced by registry entries: ' + users.map(a => `<a href="#${a.key}" title="${esc(a.callback_name)}">${a.key}</a>`).join(', ') : 'No direct reference found in the registry callbacks or their loaders.'}</div>
++        ${users.length ? `<div class="meta">Referenced by registry entries: ${users.map(a => `<a href="#${a.key}" title="${esc(a.callback_name)}">${a.key}</a>`).join(', ')}</div>` : ''}
+       </section>`;
+     }).join('')}
+     <p class="meta">Rows keep the dispatch order. Handler names follow the current code symbols; pointer values retain the Thumb bit.</p>`;
+@@ -209,12 +214,12 @@
+ 
+ $('q').oninput = renderList; $('fspr').onchange = renderList; $('fused').onchange = renderList; $('fgcl').onchange = renderList;
+ listKeys(() => $('list'), '.row');
+-const routeKey = hash => hash.toLowerCase() === 'names' ? 'names' : /^commands(?::|$)/i.test(hash) ? 'commands' + hash.slice(8).toUpperCase() : hash.toUpperCase();
++const routeKey = hash => hash.toLowerCase() === 'names' ? 'names' : /^(commands|callbacks)(?::|$)/i.test(hash) ? hash.split(':')[0].toLowerCase() + (hash.includes(':') ? ':' + hash.split(':')[1].toUpperCase() : '') : hash.toUpperCase();
+ window.onhashchange = () => { const k = routeKey(location.hash.slice(1)); if (k && k !== sel) show(k); };
+ (async () => {
+   await loadNotes();
+   const [d, e] = await Promise.all([fetch('/api/actors').then(r => r.json()), fetch('/api/english').then(r => r.json()).catch(() => ({}))]);
+-  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {};
++  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {}; callbackTables = d.callback_tables || commandTables;
+   byKey = Object.fromEntries(A.map(a => [a.key, a]));
+   renderList();
+   const k = routeKey(location.hash.slice(1)) || A.find(a => a.loader && a.sprites.length)?.key;
+--- a/tools/studio/atlas.py
++++ b/tools/studio/atlas.py
+@@ -950,13 +950,13 @@
+ 
+ 
+ def command_table_blocks():
+-    """Exact decoded extents, rather than treating their surrounding region
+-    as decoded. The Actors page shows the ordered handlers and references."""
++    """Exact decoded extents for all callback owners, without claiming gaps."""
+     import actors
+     return [{"s": int(t["addr"], 16), "n": t["size"], "k": "data",
+              "t": t["description"] or t["name"], "u": "decoded",
+-             "r": f"/actors#commands:{t['addr']}"}
+-            for t in actors.command_tables().values()]
++             "r": (f"/actors#commands:{t['addr']}" if t["source"].startswith("data/actor_commands/")
++                   else t["url"])}
++            for t in actors.callback_tables().values()]
+ 
+ 
+ def rom_tree():
+--- a/tools/studio/code.html
++++ b/tools/studio/code.html
+@@ -66,6 +66,7 @@
+     ${d.notes ? `<p>${esc(d.notes)}</p>` : ''}
+     <h3>Called by (${d.callers.length})</h3><div class="refs">${d.callers.map(c => `<a href="${codeHref(c.addr)}">${esc(c.name)}</a>`).join('') || '<span class="empty">no direct calls (a callback, table entry or entry point)</span>'}</div>
+     <h3>Calls (${d.calls.length})</h3><div class="refs">${d.calls.map(c => `<a href="${codeHref(c.addr)}">${esc(c.name)}</a>`).join('') || '<span class="empty">none</span>'}</div>
++    ${(d.callback_tables || []).length ? `<h3>Referenced callback tables</h3><div class="refs">${d.callback_tables.map(t => `<a href="${esc(t.url)}">${esc(t.description || t.name)}</a> <span class="meta">${esc(t.owner)} · index: ${esc(t.selector || 'numeric entry')}</span>`).join('')}</div>` : ''}
+     ${d.c ? `<h3>C · <code style="text-transform:none;letter-spacing:0">${esc(d.c.file)}:${d.c.line}</code></h3><pre>${esc(d.c.text)}</pre>` : ''}
+     <h3>Disassembly · gen/code.s</h3><pre>${asm}</pre>`;
+ }
+--- a/tools/studio/serve.py
++++ b/tools/studio/serve.py
+@@ -377,9 +377,10 @@
+         elif self.path in ("/actors", "/scripts", "/code", "/world"):
+             self.send(200, open(os.path.join(HERE, self.path[1:] + ".html"), "rb").read(), "text/html; charset=utf-8")
+         elif self.path == "/api/actors":
++            tables = actors.callback_tables()  # refresh dependent actor/name caches first
+             self.send(200, {"actors": actors.actors(), "enemies": actors.name_list(*actors.ENEMY_NAMES),
+                             "characters": actors.name_list(*actors.CHARACTER_NAMES), "scenes": scene_info(),
+-                            "command_tables": actors.command_tables()})
++                            "command_tables": actors.command_tables(), "callback_tables": tables})
+         elif self.path == "/api/procs":
+             import gclview
+             self.send(200, {"procs": actors.proc_list(), "scenes": scene_info(), "callees": gclview.callee_names(),

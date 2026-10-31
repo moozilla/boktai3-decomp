@@ -169,6 +169,13 @@ cross its apparent label boundaries, and the manifest currently lacks alias
 views. Do not describe separate physical labels as independently bounded
 logical arrays. The eight-byte `08610E24` scalar range is not a callback table.
 
+## Portable integrator bundle
+
+The [committed handoff bundle](finish-player-handoff/README.md) includes the
+prepared cleanup patches, validation summaries and detailed remaining-match
+reports. It preserves the deliverables without requiring ignored scratch files.
+The cleanup patches are still unapplied.
+
 ## Tooling and integration
 
 The requested cherry-pick `02f36efc6` landed as `1c2fa2aed`, fixing current ELF

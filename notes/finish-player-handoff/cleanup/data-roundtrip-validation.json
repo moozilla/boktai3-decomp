@@ -1,0 +1,65 @@
+[
+  {
+    "name": "player_action_updates",
+    "start": "08610964",
+    "end": "08610980",
+    "entries": 7,
+    "bytes": 28,
+    "pointers": 4,
+    "roundtrip": true
+  },
+  {
+    "name": "player_action_movement",
+    "start": "08610B70",
+    "end": "08610C0C",
+    "entries": 39,
+    "bytes": 156,
+    "pointers": 38,
+    "roundtrip": true
+  },
+  {
+    "name": "player_interaction_movement",
+    "start": "08610C0C",
+    "end": "08610CA8",
+    "entries": 39,
+    "bytes": 156,
+    "pointers": 26,
+    "roundtrip": true
+  },
+  {
+    "name": "player_interaction_modes",
+    "start": "08610CA8",
+    "end": "08610D18",
+    "entries": 28,
+    "bytes": 112,
+    "pointers": 6,
+    "roundtrip": true
+  },
+  {
+    "name": "player_alternate_interaction_modes",
+    "start": "08610D18",
+    "end": "08610D88",
+    "entries": 28,
+    "bytes": 112,
+    "pointers": 8,
+    "roundtrip": true
+  },
+  {
+    "name": "player_link_movement",
+    "start": "08610D88",
+    "end": "08610E24",
+    "entries": 39,
+    "bytes": 156,
+    "pointers": 33,
+    "roundtrip": true
+  },
+  {
+    "name": "player_attack_effect_elements",
+    "start": "08610E2C",
+    "end": "08610E44",
+    "entries": 6,
+    "bytes": 24,
+    "pointers": 6,
+    "roundtrip": true
+  }
+]
