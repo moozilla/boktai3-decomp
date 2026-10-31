@@ -1086,7 +1086,29 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     return 1
 
 
+def dumped_function(func):
+    """The name FUNC's dumps are kept under: a run directory is named for the C spelling, so a
+    sub_XXXXXXXX label or an address of a function renamed since resolves to that directory."""
+    def dumped(name):
+        d = os.path.join(WORK, name)
+        return os.path.isdir(d) and any(f.startswith("u.i.") for f in os.listdir(d))
+    if dumped(func):
+        return func
+    by_label, addr, _ = inventory()
+    m = re.fullmatch(r"(?:sub_|0x)?(0?8[0-9A-Fa-f]{6})", func)
+    name = by_label.get(func) or (next((n for n, a in addr.items() if a & ~1 == int(m.group(1), 16)), func)
+                                  if m else func)
+    if name in addr:
+        same = [n for n in ([name, last_func()] + sorted(os.listdir(WORK) if os.path.isdir(WORK) else []))
+                if n and addr.get(n, -1) & ~1 == addr[name] & ~1 and dumped(n)]
+        if same:
+            return same[0]
+    sys.exit(f"{func}: no compiler dumps under {os.path.relpath(WORK, ROOT)}; "
+             f"compile it first with scope.py FILE.c {func}")
+
+
 def cmd_insn(uid, func):
+    func = dumped_function(func)
     wd = workdir(func)
     last = None
     print(f"insn {uid} in {func}:")
@@ -1104,6 +1126,7 @@ def cmd_insn(uid, func):
 
 def cmd_uses(regs, func, passes):
     """For each pseudo, the insns (uid@C line) that mention it after each pass."""
+    func = dumped_function(func)
     wd = workdir(func)
     for reg in regs:
         print(f"pseudo {reg} in {func}:")
@@ -3827,6 +3850,8 @@ def cmd_why(src, func, uid, env, via=None):
               " split or branch), so its cause is the insns around it")
     else:
         print("  registers through the passes: " + "  ->  ".join(trail))
+    if row and trail and trail[0].startswith("greg"):  # born in reload
+        explain_slot_reload(wd, info["obj_name"], uid, rows, row, nm, at)
     if row and row["rom"] and row["draft"] and row["rom"].split()[0] != row["draft"].split()[0]:
         print(f"  this is a shape difference ({row['rom'].split()[0]} vs {row['draft'].split()[0]}), not a"
               " register choice: compare the RTL (`scope.py insn UID`) with what the ROM implies")
@@ -4246,6 +4271,62 @@ def physical_frame_slot_pairs(rows):
                 return None
             pair[x], reverse[y] = y, x
     return pair
+
+
+def explain_slot_reload(wd, func, uid, rows, row, nm, at):
+    """A reload insn that loads a spilled pseudo from its stack slot: name the pseudo, and follow its
+    equivalence notes through the passes. A spilled pseudo with a REG_EQUIV to a frame address is
+    recomputed where it is needed (`mov rN, sp` / `add rN, sp, #K`); without one reload reads the slot."""
+    path = os.path.join(wd, "u.i.greg")
+    text = open(path).read() if os.path.exists(path) else ""
+    m = re.search(r"^\(insn(?:/\w)* %d .*?(?=^\(|\Z)" % uid, text, re.S | re.M)
+    load = m and re.search(r"\(set \(reg:SI \d+ \w+\)\s+\(mem:SI \((?:plus:SI \(reg:SI 13 sp\)\s+"
+                           r"\(const_int (\d+)\)|reg:SI 13 sp)\)", m.group(0))
+    if not load:
+        return
+    offset = int(load.group(1) or 0)
+    slot = frame_slots(wd, func).get(offset)
+    if not slot:
+        return
+    pseudo = slot[0]
+    print(f"  reload: {at(uid)} reloads pseudo {nm(pseudo)} from its stack slot sp+{offset}: the pseudo got no"
+          " hard register, and reload reads the slot because the pseudo has no REG_EQUIV at allocation")
+    trail, sets_at_lreg, kept = [], 0, None
+    for p in PASSES[:PASSES.index("greg")]:
+        dump = os.path.join(wd, "u.i." + p)
+        if not os.path.exists(dump):
+            continue
+        sets, notes = 0, []
+        for blk in re.split(r"\n(?=\()", open(dump).read()):
+            if re.match(r"\((?:insn|call_insn|jump_insn)(?:/\w)* \d+ ", blk) and \
+                    re.search(r"\(set \(reg(?:/\w)*:\w+ %d\)" % pseudo, blk):
+                sets += 1
+                flat = " ".join(blk.split())
+                notes += [f"{k} {v}" for k, v in re.findall(r"expr_list:(REG_EQU(?:AL|IV)) (\((?:[^()]|\([^()]*\))*\))", flat)]
+        if sets:
+            state = ", ".join(sorted(set(notes))) or "no equivalence note"
+            if not trail or trail[-1][1] != state:
+                trail.append((p, state))
+            if notes:
+                kept = p
+        if p == "lreg":
+            sets_at_lreg = sets
+    if trail:
+        print("    its sets through the passes: " + "  ->  ".join(f"{p}: {s}" for p, s in trail))
+    if kept and trail[-1][1] == "no equivalence note":
+        lost = trail[-1][0]
+        print(f"    {lost} dropped the equivalence note"
+              + (" (combine's distribute_notes drops a note when it merges the insn that carried it)"
+                 if lost == "combine" else ""))
+    if sets_at_lreg > 1:
+        print(f"    {sets_at_lreg} sets at local-alloc: update_equiv_regs (local-alloc.c) records REG_EQUIV only"
+              " for a pseudo set once")
+    i = rows.index(row) if row in rows else None
+    near = [r["rom"] for r in (rows[max(0, i - 2):i + 3] if i is not None else []) if r.get("rom")]
+    if any(re.match(r"(?:mov r\d+, sp|add r\d+, sp, #)", r) for r in near):
+        print("    the ROM recomputes a stack address here instead: that is reload's code for a spilled pseudo"
+              " whose REG_EQUIV is a frame address. Lever: keep the value's note alive to local-alloc, e.g."
+              " a separate pointer for another use, so combine can't merge the set that carries it")
 
 
 def frame_slots(wd, func):

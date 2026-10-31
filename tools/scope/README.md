@@ -123,7 +123,7 @@ The first subsystem is **Bosses** (160 KB of code: 42% natural, 13% pinned,
 ```
 python3 tools/scope/scope.py FILE.c [FUNC]        real differences, one call
 python3 tools/scope/scope.py FILE.c KNOB=V ...    same compile with instrumented knobs (a what-if)
-python3 tools/scope/scope.py insn UID [FUNC]      one RTL insn through every pass
+python3 tools/scope/scope.py insn UID [FUNC]      one RTL insn through every pass (FUNC: name, sub_ label or address)
 python3 tools/scope/scope.py uses REG... [PASS...] which insns (uid@C line) use a pseudo after each pass
 python3 tools/scope/scope.py FILE.c why UID       why insn UID has the registers it has (see below)
 python3 tools/scope/scope.py FILE.c why all [RANGE]   why on the first real difference of each hunk (SCOPE_WHY_MAX=24;
