@@ -18,9 +18,10 @@ write `~`). The hooks in `.githooks` run `tools/pii_check.py`.
   `python3 tools/progress.py --markdown PROGRESS.md` (see `AGENTS.md`). Rebuild or
   run relocation/emulator tests again only when changes or failures justify it.
 * Matching means byte-identical, built by the stock compiler from ordinary C. No
-  hand-written instructions inside `asm()`, no register pins
-  (`register T x asm("rN")`), no empty `asm("")` barriers and no compiler overrides.
-  Pins were a phase 2 stopgap; phase 3 removes them, so new work never adds one.
+  hand-written instructions inside `asm()` and no compiler overrides, ever. Register
+  pins (`register T x asm("rN")`) and empty `asm("")` barriers are heavily
+  discouraged: phase 3 is removing them. Land one only for the hardest functions,
+  after trying without (`land --allow-pins`; see `docs/WORKER.md`).
   The one exception is source the original authors wrote as inline assembly: the SDK's `SystemCall(n)` (`include/gba/syscall.h`, an
   in-place `swi n`, as in Power_EnterSleep and m4a). It counts as a normal match;
   a native port implements `SystemCall` in its BIOS layer.
@@ -58,9 +59,10 @@ halfway point, not a place to stop; the next step is the C that produces it. Whe
 approach stalls, change it: recover the original struct or helper from a matched
 relative, rewrite from the ROM, run a persistent matchsearch, read the agbcc source,
 improve the tool. Only after extreme effort (`docs/WORKER.md` "Stay on a function until
-it matches") is a function left as a holdout, with its best draft, a note and its
-matchsearch store, for a stronger model to pick up. Keep going through the queue; never
-stop a run early.
+it matches") does a function get a pinned match (`land --allow-pins`, with a note on why)
+or, if even that fails, become a holdout: its best draft, a note and its matchsearch
+store, for a stronger model to pick up. Keep going through the queue; never stop a run
+early.
 
 1. Look at it: `python3 tools/scope/scope.py rom FUNC` (calls and literals named),
    `scope.py like FUNC` and `tools/relatives.py FUNC --c` (similar matched C),
@@ -110,7 +112,6 @@ stop a run early.
    a pointer the scan can't see (unaligned or in a structure; add it to
    `pointers.txt` or teach a walker like `tools/m4a.py`).
 
-Units that still carry pins from phase 2 are marked
-`// MATCHING_CONCESSION: register-pinning` and reported in the Register-pinned
-category. Take the pins out of a unit you touch (`scope.py FILE.c pins`,
-`tools/depin.py`); the marker goes when the last one does.
+Units with pins are marked `// MATCHING_CONCESSION: register-pinning` and reported
+in the Register-pinned category. Take the pins out of a unit you touch
+(`scope.py FILE.c pins`, `tools/depin.py`); the marker goes when the last one does.

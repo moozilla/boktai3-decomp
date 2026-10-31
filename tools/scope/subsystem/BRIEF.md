@@ -65,17 +65,18 @@ Effort per function: do not give up on a function. There is no compile budget: s
 MATCHes. Naming the compiler decision that blocks it, proved with a knob, is the halfway point: then find
 the C that produces it. When an approach stalls, change it (docs/WORKER.md "Stay on a function until it
 matches": recover the original struct or helper, rewrite from the ROM, a matchsearch store, the agbcc
-source). Leave a function as a holdout only after that extreme effort, with best.c, REPORT.md and the
-matchsearch store. Scripted sweeps over C spellings are not diagnosis: every variant must test a
+source). A pinned match (`campaign.py land FUNC . --allow-pins`) or a holdout (best.c, REPORT.md and
+the matchsearch store) comes only after that extreme effort. Scripted sweeps over C spellings are not diagnosis: every variant must test a
 hypothesis from scope's output, and a function closed out by a sweep is not done. **Do not stop the run**:
 keep going function after function until the queue is exhausted. When it is, go back to the holdouts with
 the fewest differing instructions and take a second pass with the new ideas you gained.
 
 Rules:
-- Matching means byte-identical with the stock compiler. No hand-written instructions in asm(), ever, and
-  no register pins (`register T x asm("rN")`), empty `asm("" : "+r"(x))` barriers or compiler overrides:
-  knobs locate a mechanism, and the landed C matches without them. A pinned result is not a match. Remove
-  the pins a draft already has (`pins` shows the cost of each).
+- Matching means byte-identical with the stock compiler. No hand-written instructions in asm() and no
+  compiler overrides, ever: knobs locate a mechanism, and the landed C matches without them. Register pins
+  (`register T x asm("rN")`) and empty `asm("" : "+r"(x))` barriers are heavily discouraged; landing
+  refuses them without `--allow-pins` (see above). Remove the pins a draft already has (`pins` shows the
+  cost of each).
 - Keep the C readable: struct fields and names, no magic offsets where a struct fits. Comments in the C must
   stand alone: do not mention REPORT.md, your directory or your experiments.
 - Never run make (other than through the land command), tools/build.py, a full build, or whole-corpus

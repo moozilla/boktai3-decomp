@@ -95,7 +95,7 @@ class LocalLanding(unittest.TestCase):
         alias.symlink_to(self.repo, target_is_directory=True)
         self.evaluator.repo = alias
         self.evaluator.source_path = alias / 'src' / 'unit.c'
-        result = worker.land(self.session, self.node, dry_run=True)
+        result = worker.land(self.session, self.node, dry_run=True, allow_pins=True)
         self.assertFalse(result['landed'])
         self.assertTrue(result['verification']['exact'])
         self.assertEqual(self.target.read_text(), BASE)
@@ -106,12 +106,17 @@ class LocalLanding(unittest.TestCase):
         self.target.unlink()
         self.target.symlink_to(outside)
         with self.assertRaisesRegex(ValueError, 'existing src/ C unit'):
-            worker.land(self.session, self.node)
+            worker.land(self.session, self.node, allow_pins=True)
         self.assertEqual(outside.read_text(), BASE)
+
+    def test_a_pinned_match_needs_allow_pins(self):
+        with self.assertRaisesRegex(ValueError, '--allow-pins'):
+            worker.land(self.session, self.node)
+        self.assertEqual(self.target.read_text(), BASE)
 
     def test_merge_preserves_macros_comments_and_current_neighbor_changes(self):
         self.target.write_text(BASE.replace('// neighbor belongs to another worker', '// reviewed neighbor note'))
-        result = worker.land(self.session, self.node)
+        result = worker.land(self.session, self.node, allow_pins=True)
         landed = self.target.read_text()
         self.assertTrue(result['landed'])
         self.assertEqual(result['concessions']['register_pins'], 1)
@@ -131,7 +136,7 @@ class LocalLanding(unittest.TestCase):
         self.checker.write_text('import sys\nprint("unit: MISMATCH")\nsys.exit(1)\n')
         before = self.target.read_bytes()
         with self.assertRaisesRegex(RuntimeError, 'unit_check failed'):
-            worker.land(self.session, self.node)
+            worker.land(self.session, self.node, allow_pins=True)
         self.assertEqual(self.target.read_bytes(), before)
         self.assertTrue(list((self.store.directory / 'landing').glob('*/unit_check.log')))
 
@@ -146,7 +151,7 @@ class LocalLanding(unittest.TestCase):
                     exception = subprocess.TimeoutExpired
                 before = self.target.read_bytes()
                 with self.assertRaises(exception):
-                    worker.land(self.session, self.node, timeout=0.05)
+                    worker.land(self.session, self.node, timeout=0.05, allow_pins=True)
                 self.assertEqual(self.target.read_bytes(), before)
 
     def test_interruption_during_formatter_also_restores_source(self):
@@ -169,21 +174,21 @@ class LocalLanding(unittest.TestCase):
 
                 with patch.object(worker.subprocess, 'run', side_effect=interrupted):
                     with self.assertRaises(KeyboardInterrupt):
-                        worker.land(self.session, self.node)
+                        worker.land(self.session, self.node, allow_pins=True)
                 self.assertEqual(self.target.read_text(), BASE)
 
     def test_failed_stock_gate_and_diagnostic_match_never_write_source(self):
         self.evaluator.verify = lambda _: {'exact': False, 'byte_mismatches': 2}
         with self.assertRaisesRegex(ValueError, 'stock-compiler'):
-            worker.land(self.session, self.node)
+            worker.land(self.session, self.node, allow_pins=True)
         self.assertEqual(self.target.read_text(), BASE)
         self.production.diagnostic_knobs = {'AGBCC_FORCE': '1:2'}
         with self.assertRaisesRegex(ValueError, 'ordinary production'):
-            worker.land(self.session, self.node)
+            worker.land(self.session, self.node, allow_pins=True)
         self.assertEqual(self.target.read_text(), BASE)
 
     def test_dry_run_is_concrete_verified_and_does_not_touch_source(self):
-        result = worker.land(self.session, self.node, dry_run=True)
+        result = worker.land(self.session, self.node, dry_run=True, allow_pins=True)
         self.assertFalse(result['landed'])
         self.assertTrue(result['verification']['exact'])
         self.assertIn('return 1;', (Path(result['evidence_directory']) / 'proposed.c').read_text())
@@ -195,7 +200,7 @@ class LocalLanding(unittest.TestCase):
         root, _ = self.store.add(aliased)
         self.store.set_meta('root', root)
         node, _ = self.store.add(aliased.replace('return 2;', 'return 1;'), parent=root)
-        worker.land(self.session, node)
+        worker.land(self.session, node, allow_pins=True)
         self.assertIn('#define LocalTarget Target', self.target.read_text())
         self.assertIn('int LocalTarget(int x)', self.target.read_text())
         self.assertNotIn('INCLUDE_ASM', self.target.read_text())
@@ -204,7 +209,7 @@ class LocalLanding(unittest.TestCase):
         guarded = self.candidate.replace('#else\nINCLUDE_ASM("asm/nonmatching", Target);\n', '')
         node, _ = self.store.add(guarded, parent='root')
         with self.assertRaisesRegex(ValueError, 'not active in the normal build'):
-            worker.land(self.session, node)
+            worker.land(self.session, node, allow_pins=True)
         self.assertEqual(self.target.read_text(), BASE)
 
     def test_unhandled_guard_and_instruction_asm_cannot_silently_land(self):
@@ -220,11 +225,11 @@ class LocalLanding(unittest.TestCase):
                     with patch.object(self.store, 'source', side_effect=lambda n: (
                             BASE.replace('#ifdef NONMATCHING', '#if defined(NONMATCHING)') if n == 'root' else source)):
                         with self.assertRaisesRegex(ValueError, reason):
-                            worker.land(self.session, node)
+                            worker.land(self.session, node, allow_pins=True)
                     self.target.write_text(BASE)
                 else:
                     with self.assertRaisesRegex(ValueError, reason):
-                        worker.land(self.session, node)
+                        worker.land(self.session, node, allow_pins=True)
                 self.assertEqual(self.target.read_text(), BASE)
 
 

@@ -230,6 +230,8 @@ def main(argv: list[str] | None = None) -> int:
     landing.add_argument('node')
     landing.add_argument('--dry-run', action='store_true', help='save the verified merged proposal without editing src/')
     landing.add_argument('--timeout', type=float, default=120, help='seconds allowed for each landing tool')
+    landing.add_argument('--allow-pins', action='store_true',
+                         help='land a match with register pins or asm barriers (refused without it)')
     for command in (proposal, diff, export, landing):
         command.add_argument('--json', dest='json_output', action='store_true', help='emit structured output')
     for name in ("status", "stop"):
@@ -279,7 +281,8 @@ def main(argv: list[str] | None = None) -> int:
                 elif args.command == 'export':
                     payload = session.export(args.node, args.output)
                 else:
-                    payload = worker.land(session, args.node, dry_run=args.dry_run, timeout=args.timeout)
+                    payload = worker.land(session, args.node, dry_run=args.dry_run, timeout=args.timeout,
+                                          allow_pins=args.allow_pins)
             result = {'ok': True, 'result': payload}
         else:
             result = request(args.directory.resolve(), {"op": "shutdown" if args.command == "stop" else "status"})

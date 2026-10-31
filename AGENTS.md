@@ -7,13 +7,14 @@ Read `README.md`, `CLAUDE.md`, `docs/ROADMAP.md` (the four phases), `docs/HANDOF
 files apply to every model.
 
 Aim for the final form: C that matches with no register pins, barriers or compiler
-overrides and reads like the original authors wrote it. The project is in phase 3, so
-a pinned match is not finished work and new work never adds a pin. Work in ROM order
-through a subsystem and stay on a function until it matches. Proving the compiler
-decision that blocks it is the halfway point; then find the C that produces it. A
-function is left as a holdout only after the extreme effort `docs/WORKER.md` "Stay on a
-function until it matches" describes, and a run keeps going until its whole queue is
-matched or holdouts. A session's brief sets its queue, branch and quota; these rules
+overrides and reads like the original authors wrote it. The project is in phase 3,
+which removes pins, so pins are heavily discouraged: the landing tools refuse a match
+that adds one unless given `--allow-pins`, which is for the hardest functions after
+real attempts without. Work in ROM order through a subsystem and stay on a function
+until it matches. Proving the compiler decision that blocks it is the halfway point;
+then find the C that produces it. A pinned match or a holdout comes only after the
+extreme effort `docs/WORKER.md` "Stay on a function until it matches" describes, and a
+run keeps going until its whole queue is matched or holdouts. A session's brief sets its queue, branch and quota; these rules
 apply on top of it. Codex subsystem workers get the briefs in `tools/scope/subsystem/`
 (see that directory's README).
 
@@ -59,6 +60,6 @@ Every batch integration PR regenerates the checked-in report in the same commit:
 `PROGRESS.json` (the tree that the progress mod reads); commit both. CI does not
 commit them.
 
-Units with pins left from phase 2 carry `// MATCHING_CONCESSION: register-pinning`
-and are reported in the Register-pinned category; removing those pins is phase 3
-work. Hand-written instruction bodies are never allowed.
+Units with pins carry `// MATCHING_CONCESSION: register-pinning` and are reported in
+the Register-pinned category; removing those pins is phase 3 work. Hand-written
+instruction bodies and compiler overrides are never allowed.

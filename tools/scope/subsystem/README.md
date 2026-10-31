@@ -29,8 +29,8 @@ into its worktree first. `--exclude` keeps units another effort owns out of the 
 authorization and a quota floor (`tools/codex_quota.py`); start with one worker per subsystem,
 measure for 10 minutes, then decide. 16 workers burned about 25 points of the weekly quota per hour.
 
-After `integrate.sh`: review the diff (no hand-written instructions in `asm()`, no new pins or barriers,
-the `MATCHING_CONCESSION` marker wherever an old one remains, no comments about the worker's
+After `integrate.sh`: review the diff (no hand-written instructions in `asm()`, a reason in the note for
+any new pin, the `MATCHING_CONCESSION` marker wherever there is a pin or barrier, no comments about the worker's
 experiments), `make` must print `build/boktai3.gba: OK`, then
 `python3 tools/progress.py --markdown PROGRESS.md`, commit both PROGRESS files, open the PR,
 merge it, and append `build/subsystem/integrated.pending` to `build/subsystem/integrated.txt`.
