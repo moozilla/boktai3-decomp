@@ -5411,6 +5411,7 @@ addr,name,mode,confidence,source,notes
 081559A4,Player_UpdateTimedChargeAction,thumb,low,src-alias,
 08155D58,PlayerCue_UpdateTimedChargePulse,thumb,low,src-alias,confidence=low: timed held action with pulsing overlay and completion script
 081561A8,PlayerCue_UpdateStandDiagonalB,thumb,low,src-alias,Alternate diagonal standing callback that completes the cue after two animation completion checks
+081561EC,PlayerCue_UpdateTargetDash,thumb,low,src-alias,confidence=low: scripted alternate-position approach strike and return
 08156BBC,Player_GetInputDirection,thumb,low,src-alias,
 08156C1C,Player_UpdateDirectionHistory,thumb,low,src-alias,Shifts ten direction samples and records the current input direction adjusted by the actor direction offset
 08156C68,Player_StopMovementEffects,thumb,low,src-alias,Stops form dependent movement sounds and clears an active auxiliary effect; movement ownership is tentative

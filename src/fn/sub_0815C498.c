@@ -12,7 +12,7 @@ struct P {
 
 void Player_EnterKindTwo(struct P *);
 void ActorSequence_Begin(struct P *, s32, s32);
-void sub_081561EC(void);
+void PlayerCue_UpdateTargetDash(void);
 
 u32 PlayerCue_Motion38To(struct P *p, u16 *pos, u32 c)
 {
@@ -22,7 +22,7 @@ u32 PlayerCue_Motion38To(struct P *p, u16 *pos, u32 c)
     if (p->state == 2) {
         Player_EnterKindTwo(p);
         ActorSequence_Begin(p, 0x26, 0);
-        p->fn = sub_081561EC;
+        p->fn = PlayerCue_UpdateTargetDash;
         p->target[0] = pos[0];
         p->target[1] = pos[1];
         p->target[2] = pos[2];
