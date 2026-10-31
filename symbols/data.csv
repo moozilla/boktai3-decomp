@@ -15,3 +15,7 @@ addr,name,size,kind,confidence,source,notes
 0824E6D4,gUnk_0824E6D4,12,table,high,src/fn/sub_08180CE0.c,Actor marker fragment frames: two facing groups of nine byte indices; legacy linker label retained
 0824E6E6,gUnk_0824E6E6,12,table,high,src/fn/sub_08180CE0.c,Actor marker fragment animations: two marker-kind groups of nine byte indices; legacy linker label retained
 0824E818,gUnk_0824E818,90,table,high,src/fn/sub_08181514.c,Actor marker fragment offsets: two facing groups of nine four-halfword records; legacy linker label retained
+086141BC,gUnk_086141BC,800,table,high,Random_InitValueTable and effect readers,Fixed ROM bank of 1024 unsigned effect samples indexed by gEffectRandomTableIndex
+086149C4,gUnk_086149C4,280,table,high,math_sine,320 signed Q12 samples at 256 phases per turn
+08614A84,gUnk_08614A84,,interior,high,src/fn/sub_08047068.c,Sine lookup starting at index 96 of the Q12 table
+08614C44,gUnk_08614C44,101,table,high,Math_Atan2,257 unsigned first-octant angle steps for Q8 ratios 0 through 256
