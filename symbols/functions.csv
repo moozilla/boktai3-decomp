@@ -3379,7 +3379,7 @@ addr,name,mode,confidence,source,notes
 080AE940,Vorn_UpdateApproachRange,thumb,low,src-alias,
 080AEA80,SceneActorPhase_SelectLinkedAnimation,thumb,low,src-alias,
 080AEB74,Vorn_TryRestorePatrolRoute,thumb,low,src-alias,
-080AEE08,Vorn_UpdateDefeat,thumb,low,src-alias,
+080AEE08,Vorn_UpdateDefeat,thumb,low,src-alias,ordinary C: complete 984-byte match
 080AF1E0,Vorn_UpdateScriptedAction,thumb,low,src-alias,
 080AFBE4,Vorn_InitSpecialActionTable,thumb,low,src-alias,Installs the action table at actor offset 0x288; special action role is tentative
 080AFBF4,Vorn_UpdateAnimationRetries,thumb,low,src-alias,
