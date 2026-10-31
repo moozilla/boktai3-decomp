@@ -32,3 +32,9 @@ statement macro that captures the numeric origin. The first draw uses the
 physical table address. The three spread draws and the count draw use
 ParticleRandom_ReadRelativeSample. This removes both assembly barriers and
 retains the original early load without using addresses from other RAM objects.
+
+Golem_UpdateSlideImpact (860 bytes, load at 080C73E0) and SpriteProjectile_Create
+(696 bytes, load at 081277A0) also match when they capture the numeric origin
+directly. Each original load dies without an arithmetic use. The Golem's first
+sample and the projectile's first two samples read the physical table directly.
+Their later spread and spin-scale draws use the relative reader.
