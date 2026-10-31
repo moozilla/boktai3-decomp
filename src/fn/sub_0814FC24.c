@@ -1,11 +1,11 @@
-#include "global.h"
+#include "player_cue.h"
 
-s32 Player_SetAnimation(u8 *, s32, s32, s32);
-void Player_UpdateFacingSide(u8 *);
-void PlayerCue_EnterStandUpdate(u8 *);
-void PlayerCue_CompleteAction(u8 *);
+s32 Player_SetAnimation(struct Player *, s32, s32, s32);
+void Player_UpdateFacingSide(struct Player *);
+void PlayerCue_EnterStandUpdate(struct Player *);
+void PlayerCue_CompleteAction(struct Player *);
 
-void PlayerCue_UpdateStandDiagonal(u8 *p)
+void PlayerCue_UpdateStandDiagonal(struct Player *p)
 {
     if (Player_SetAnimation(p, 0x161, 0x40, 1) != 0) {
         Player_UpdateFacingSide(p);
