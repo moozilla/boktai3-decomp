@@ -1,13 +1,11 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.3%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
+// fuzzy: 97.1%
 // confidence=low: action role inferred from local animation, motion and effects.
 #include "contact_swarm.h"
 #include "scene_vec.h"
-// Remaining differences: register lifetimes, instruction order and literal pools.
+#include "display_sequence_inline.h"
+// Remaining differences: lifetimes, instruction order and literal pools.
 
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -30,123 +28,74 @@ struct VanargandPart {
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void MotionTrack_Update(void *);
 extern const s16 gUnk_086149C4[];
-static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequenceState *state,
-                               struct VanargandPart *base, u32 one)
+static inline u32 StepSequence(struct VanargandPart *owner)
 {
-    struct ContactSwarmSprite *sprite = &owner->sprite;
-    const volatile u16 *command;
+    struct DisplaySequenceState *state;
+    const u16 *command;
     u32 ended;
-    u32 duration;
-    u32 flags;
-    u32 bit;
+    state = &owner->sequence;
     {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = base->sequence.commands;
-        command = (const volatile u16 *)(((u32)table) + offset);
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = owner->sequence.commands;
+        command = (const u16 *)((u32)table + offset);
     }
-    sprite->frame = (*command) >> 6;
+    owner->sprite.frame = *command >> 6;
     {
-        u32 input = state->flags;
-        register u32 first asm("r1");
-        u32 maskBit = one;
-        bit = maskBit;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
             owner->sprite.flags |= 4;
         else
             owner->sprite.flags &= ~4;
     }
     {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r1");
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
         bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
             owner->sprite.flags |= 8;
         else
             owner->sprite.flags &= ~8;
     }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u16 temp asm("r2");
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                    ended = 1;
-                } else {
-                    state->index = index - 1;
-                    ended = 0;
-                }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+                ended = 1;
             } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                    ended = 1;
-                } else {
-                    ended = 0;
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)(((u32)table) + offset);
-            }
-            state->frameWeight = (*command) & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!((u8)speed))
-                    state->duration = 1;
+                state->index--;
+                ended = 0;
             }
         } else {
-            ended = 0;
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+                ended = 1;
+            } else {
+                ended = 0;
+            }
         }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
     }
     return ended;
 }
@@ -179,11 +128,11 @@ static inline void Vector(struct SceneVec *v, s32 angle, s32 scale)
     v->y = 0;
     v->z = Scale(gUnk_086149C4[angle & 255] * scale);
 }
-static inline void Add(struct SceneVec *v, struct SceneVec *a, struct SceneVec *b)
+static inline void Add(struct SceneVec *v, struct SceneVec *b, struct SceneVec *a)
 {
     v->x = b->x + a->x;
     v->y = b->y + a->y;
-    v->z = a->z + b->z;
+    v->z = b->z + a->z;
 }
 static inline u8 Ended(struct VanargandPart *p)
 {
@@ -197,8 +146,8 @@ static inline void SetState(struct VanargandPart *p, u32 state)
 void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
 {
     u8 *enter;
-    register u32 entering asm("r1");
-    register u32 savedFrame asm("r8") = frame;
+    u32 entering;
+    u32 savedFrame = frame;
     u32 mask = 0x20;
     p->flags |= mask;
     if (p->reset) {
@@ -210,18 +159,16 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
     switch (p->state) {
         case 0:
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 {
                     u32 zero = 0;
                     *enter = zero;
-                    asm("" : "+r"(zero));
                     Anim_SetSequence(&p->sequence, *((void **)(boss + 0x4d0)), 8, (u8)p->variant,
                                      zero);
                 }
             }
-            if (StepPlayback(p, &p->sequence, p, 1)) {
+            if (StepSequence(p)) {
                 SetState(p, 1);
                 *enter = 1;
             }
@@ -230,7 +177,6 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
         case 1: {
             struct SceneVec delta;
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 *enter = 0;
@@ -238,7 +184,7 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                     Vector(&delta, 224, 64);
                 else
                     Vector(&delta, 96, 64);
-                Add(&delta, &p->origin, &delta);
+                Add(&delta, &delta, &p->origin);
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
             }
             MotionTrack_Update(p->motion);
@@ -251,7 +197,6 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
 
         case 2:
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 *enter = 0;
@@ -269,18 +214,21 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                     (boss[(p->variant == 1) ? (0x205) : (0x421)] == 12)) {
                     struct SceneVec point;
                     Sound_PlaySong(0x1ba);
-                    Add(&point, p->basePosition, &p->target);
+                    Add(&point, &p->target, p->basePosition);
                     AnimatedParticles_EmitBurst(&point, p->particleAngle, 0, 64, 4, 4, 4, 4);
                     p->flashTimer = 15;
                     SetState(p, 3);
                 } else {
                     Sound_PlaySong(0x3d9);
-                    AnimatedParticles_EmitBurst(((u8 *)p) + 0x1c, p->particleAngle, 0, 64, 4, 4, 4,
-                                                4);
+                    AnimatedParticles_EmitBurst(&p->sprite.position, p->particleAngle, 0, 64, 4, 4,
+                                                4, 4);
                     SetState(p, 3);
                 }
-                *enter = 1;
-                p->finished = 1;
+                {
+                    u32 one = 1;
+                    *enter = one;
+                    p->finished = one;
+                }
             } else if (!(savedFrame & 1))
                 Vanargand_EmitPartTrail(p);
             break;
