@@ -9,114 +9,148 @@ s32 Mod(s32, s32);
 void Effect_SetPalette(void *, u32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 
-static inline u32 spark_0806A160_Random(void)
+struct SparkParticleDrawView {
+    struct SparkParticleSprite sprite;
+    struct SparkParticleMotion motion;
+};
+
+static inline u32 SparkParticle_NextSample(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gRandomTable[gRandomIndex];
+    return table[gRandomIndex];
 }
 
-static inline s32 spark_0806A160_Spread(s32 range)
+static inline s32 SparkParticle_Half(s32 value)
 {
-    return Mod(spark_0806A160_Random(), range) - range / 2;
+    if (value >= 0)
+        return value >> 1;
+    return -((-value) >> 1);
+}
+
+static inline s32 SparkParticle_ScaleVelocity(s32 value)
+{
+    if (value >= 0)
+        return value >> 12;
+    return -((-value) >> 12);
+}
+
+static inline void SparkParticle_SetVelocity(struct ContactPosition *input, s32 angle, s32 speed)
+{
+    struct ContactPosition *velocity = input;
+    velocity->x = SparkParticle_ScaleVelocity(gUnk_086149C4[(angle + 64) & 255] * speed);
+    velocity->y = 0;
+    velocity->z = SparkParticle_ScaleVelocity(gUnk_086149C4[angle & 255] * speed);
 }
 
 #ifdef NONMATCHING
-// fuzzy: 38.3%
-// scope shape 204 (differences once low registers are set aside)
-// confidence=low: emits up to count sparks into free slots of the 48-entry pool, placed around pos with optional per-axis spread, moving at angle and speed, with a palette and animation chosen by kind.
+// fuzzy: 80.6%
+// scope shape 48 (differences once low registers are set aside)
 s32 SparkParticle_Spawn(const struct ContactPosition *pos, u8 count,
                         const struct ContactPosition *spread, s32 angle, s32 speed,
                         s32 verticalRange, s32 kind, u32 priority)
 {
     struct SparkParticlePool *pool;
-    struct SparkParticle *particle;
     s32 index;
-    s32 sequence;
+    const u16 *table;
+    struct SparkParticle *particle;
+    struct SparkParticleMotion *motion;
+    struct SparkParticleSprite *sprite;
+    struct SparkParticleDrawView *projected;
+    s16 sequence;
+    u32 sampleMask;
 
     pool = gSparkParticlePool;
     if (pool == NULL) {
         pool = SparkParticle_CreatePool();
-        if (pool == NULL) {
+        if (pool == NULL)
             return 0;
-        }
     }
-
+    index = 0;
+    table = gRandomTable;
+    motion = (struct SparkParticleMotion *)&pool->particles[0].velocity;
+    sprite = &pool->particles[0].sprite;
+    projected = (struct SparkParticleDrawView *)sprite;
     particle = pool->particles;
-    for (index = 0; index < 48; index++, particle++) {
-        if (particle->active != 0) {
-            continue;
-        }
-
-        if (spread != NULL) {
-            if (spread->x == 0) {
-                particle->sprite.position.x = pos->x;
+    for (index = 0; index < 48; index++) {
+        if (motion->active)
+            goto next;
+        {
+            if (spread != NULL) {
+                if (spread->x == 0)
+                    projected->sprite.position.x = pos->x;
+                else {
+                    s32 sample;
+                    s32 offset;
+                    u32 next = gRandomIndex + 1;
+                    sampleMask = 1023;
+                    next &= sampleMask;
+                    gRandomIndex = next;
+                    sample = table[next];
+                    offset = Mod(sample, spread->x);
+                    projected->sprite.position.x = offset - SparkParticle_Half(spread->x) + pos->x;
+                }
+                if (spread->y == 0)
+                    projected->sprite.position.y = pos->y;
+                else {
+                    s32 sample = SparkParticle_NextSample(table);
+                    s32 offset = Mod(sample, spread->y);
+                    projected->sprite.position.y = offset - SparkParticle_Half(spread->y) + pos->y;
+                }
+                if (spread->z == 0)
+                    projected->sprite.position.z = pos->z;
+                else {
+                    s32 sample = SparkParticle_NextSample(table);
+                    s32 offset = Mod(sample, spread->z);
+                    projected->sprite.position.z = offset - SparkParticle_Half(spread->z) + pos->z;
+                }
             } else {
-                particle->sprite.position.x = pos->x + spark_0806A160_Spread(spread->x);
+                projected->sprite.position.x = pos->x;
+                projected->sprite.position.y = pos->y;
+                projected->sprite.position.z = pos->z;
             }
-            if (spread->y == 0) {
-                particle->sprite.position.y = pos->y;
-            } else {
-                particle->sprite.position.y = pos->y + spark_0806A160_Spread(spread->y);
+            sampleMask = 1023;
+            projected->sprite.flags &= ~1;
+            projected->sprite.priority = priority;
+            motion->active = 1;
+            ZeroFill8(&motion->velocity);
+            if (speed)
+                SparkParticle_SetVelocity(&motion->velocity, angle, speed);
+            if (verticalRange == 0)
+                projected->motion.velocity.y = Mod(SparkParticle_NextSample(table), 32);
+            else
+                projected->motion.velocity.y = Mod(SparkParticle_NextSample(table), verticalRange);
+            switch (kind) {
+                case 0:
+                    sequence = 15;
+                    Effect_SetPalette(sprite, 1);
+                    break;
+                case 1:
+                    sequence = 15;
+                    Effect_SetPalette(sprite, 1);
+                    break;
+                case 2:
+                    sequence = 16;
+                    Effect_SetPalette(sprite, 0);
+                    break;
+                case 3:
+                    sequence = 17;
+                    Effect_SetPalette(sprite, 0);
+                    break;
+                default:
+                    sequence = 15;
+                    Effect_SetPalette(sprite, 0);
+                    break;
             }
-            if (spread->z == 0) {
-                particle->sprite.position.z = pos->z;
-            } else {
-                particle->sprite.position.z = pos->z + spark_0806A160_Spread(spread->z);
-            }
-        } else {
-            particle->sprite.position.x = pos->x;
-            particle->sprite.position.y = pos->y;
-            particle->sprite.position.z = pos->z;
+            Anim_SetSequence(particle, pool->sequenceResource, sequence, 0, 0);
+            pool->activeCount++;
+            if (--count == 0)
+                break;
         }
-        particle->sprite.flags &= ~1;
-        particle->sprite.priority = priority;
-
-        particle->active = 1;
-        ZeroFill8(&particle->velocity);
-
-        if (speed != 0) {
-            s32 product;
-
-            product = gUnk_086149C4[(angle + 0x40) & 0xFF] * speed;
-            if (product < 0) {
-                particle->velocity.x = -((-product) >> 12);
-            } else {
-                particle->velocity.x = product >> 12;
-            }
-            particle->velocity.y = 0;
-            product = gUnk_086149C4[angle & 0xFF] * speed;
-            if (product < 0) {
-                particle->velocity.z = -((-product) >> 12);
-            } else {
-                particle->velocity.z = product >> 12;
-            }
-        }
-        if (verticalRange == 0) {
-            particle->velocity.y = Mod(spark_0806A160_Random(), 0x20);
-        } else {
-            particle->velocity.y = Mod(spark_0806A160_Random(), verticalRange);
-        }
-
-        if (kind == 0 || kind == 1) {
-            sequence = 0xF;
-            Effect_SetPalette(&particle->sprite, 1);
-        } else if (kind == 2) {
-            sequence = 0x10;
-            Effect_SetPalette(&particle->sprite, 0);
-        } else if (kind == 3) {
-            sequence = 0x11;
-            Effect_SetPalette(&particle->sprite, 0);
-        } else {
-            sequence = 0xF;
-            Effect_SetPalette(&particle->sprite, 0);
-        }
-        Anim_SetSequence(particle, pool->sequenceResource, sequence, 0, 0);
-        pool->activeCount++;
-
-        count--;
-        if (count == 0) {
-            return 1;
-        }
+    next:
+        motion = (struct SparkParticleMotion *)((u8 *)motion + sizeof(*particle));
+        projected = (struct SparkParticleDrawView *)((u8 *)projected + sizeof(*particle));
+        sprite = (struct SparkParticleSprite *)((u8 *)sprite + sizeof(*particle));
+        particle++;
     }
     return 1;
 }
