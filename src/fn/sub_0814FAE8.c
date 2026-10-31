@@ -1,12 +1,6 @@
 #include "global.h"
 #include "player.h"
 // MATCHING_CONCESSION: register-pinning
-#define Player_FoldFacing              Player_UpdateFacingSide
-#define Player_SetAnimationPhase       ActorSequence_Begin
-#define Player_SetAnimationFlags       Player_AddControlFlags
-#define Player_ResetTriggerAnimation   PlayerCue_EnterStandUpdate
-#define Player_DispatchPendingTrigger  PlayerCue_CompleteAction
-#define Player_SetHiddenAnimationFlags PlayerCue_UpdateHidden
 void Player_UpdateFacingSide(struct Player *);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
