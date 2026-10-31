@@ -86,7 +86,7 @@ body.embed main { grid-template-columns: 1fr; }
 // GCL names come from gcl/names/chara.csv; cross-references from
 // tools/assets/actors.py.
 studioHeader();
-let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, commandTables = {}, sel = null;
+let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, commandTables = {}, numericTables = {}, sel = null;
 
 const label = a => noteOf('actor', a.key)?.label;
 const gclTitle = a => a.gcl.length ? a.gcl[0].name + (a.gcl[0].english ? ` (${a.gcl[0].english})` : '') : '';
@@ -104,7 +104,8 @@ function renderList() {
     return d;
   };
   $('list').replaceChildren(special('names', 'Name lists from the game (monsters, characters)'),
-    special('commands', `Command tables (${Object.keys(commandTables).length} decoded)`), ...hits.map(a => {
+    special('commands', `Command tables (${Object.keys(commandTables).length} decoded)`),
+    special('tables', `Marker tables (${Object.keys(numericTables).length} decoded)`), ...hits.map(a => {
     const d = document.createElement('div'); d.className = 'row' + (a.key === sel ? ' on' : ''); d.dataset.key = a.key;
     d.innerHTML = `<code>${a.key}</code><b></b><small></small>`;
     d.querySelector('b').textContent = title(a);
@@ -122,11 +123,12 @@ const sceneChip = s => {
 
 async function show(key) {
   sel = key;
-  const navKey = key.startsWith('commands:') ? 'commands' : key;
+  const navKey = key.startsWith('commands:') ? 'commands' : key.startsWith('tables:') ? 'tables' : key;
   document.querySelectorAll('.row').forEach(d => d.classList.toggle('on', d.dataset.key === navKey));
   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
   if (key === 'names') return showNames();
   if (navKey === 'commands') return showCommandTables(key.split(':')[1]);
+  if (navKey === 'tables') return showNumericTables(key.split(':')[1]);
   const a = byKey[key], v = $('view');
   if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
   const names = a.names.map(n => `${stringLink(n.id)} ${esc(n.jp)}${en[n.id] ? ` <span class="cand">(${esc(en[n.id])})</span>` : ''}`).join('<br>');
@@ -194,6 +196,22 @@ function showCommandTables(addr) {
     <p class="meta">Rows keep the dispatch order. Handler names follow the current code symbols; pointer values retain the Thumb bit.</p>`;
 }
 
+function showNumericTables(addr) {
+  const tables = addr ? [numericTables[addr]].filter(Boolean) : Object.values(numericTables);
+  $('view').innerHTML = `<h2>Actor marker tables</h2>
+    ${addr ? '<p><a href="#tables">All marker tables</a></p>' : ''}
+    ${tables.length ? tables.map(t => `<section>
+      <h3><a href="#tables:${t.addr}">${esc(t.description || t.name)}</a></h3>
+      <div class="meta"><span class="mono">${t.addr}–${t.end}</span> · ${t.size} bytes · <code>${esc(t.source)}</code></div>
+      <p>${esc(t.meaning)}</p>
+      <table><thead><tr>${t.columns.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>
+        ${t.entries.map(e => `<tr>${t.columns.map(c => `<td>${esc(String(e[c]))}</td>`).join('')}</tr>`).join('')}
+      </tbody></table>
+      <p class="meta">Read by ${t.consumers.map(f => codeLink(f.addr, f.name)).join(', ')}.</p>
+    </section>`).join('') : '<div class="empty">No decoded marker table at this address.</div>'}
+    <p class="meta">Edit the CSV sources to change these parameters. Keep group and fragment rows in order; the fixed ranges cannot resize. XYZ offsets are signed halfwords.</p>`;
+}
+
 function showNames() {
   const linked = {};
   for (const a of A) for (const n of a.names) (linked[n.id] ||= []).push(a);
@@ -209,12 +227,12 @@ function showNames() {
 
 $('q').oninput = renderList; $('fspr').onchange = renderList; $('fused').onchange = renderList; $('fgcl').onchange = renderList;
 listKeys(() => $('list'), '.row');
-const routeKey = hash => hash.toLowerCase() === 'names' ? 'names' : /^commands(?::|$)/i.test(hash) ? 'commands' + hash.slice(8).toUpperCase() : hash.toUpperCase();
+const routeKey = hash => hash.toLowerCase() === 'names' ? 'names' : /^commands(?::|$)/i.test(hash) ? 'commands' + hash.slice(8).toUpperCase() : /^tables(?::|$)/i.test(hash) ? 'tables' + hash.slice(6).toUpperCase() : hash.toUpperCase();
 window.onhashchange = () => { const k = routeKey(location.hash.slice(1)); if (k && k !== sel) show(k); };
 (async () => {
   await loadNotes();
   const [d, e] = await Promise.all([fetch('/api/actors').then(r => r.json()), fetch('/api/english').then(r => r.json()).catch(() => ({}))]);
-  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {};
+  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {}; numericTables = d.numeric_tables || {};
   byKey = Object.fromEntries(A.map(a => [a.key, a]));
   renderList();
   const k = routeKey(location.hash.slice(1)) || A.find(a => a.loader && a.sprites.length)?.key;

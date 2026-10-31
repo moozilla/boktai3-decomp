@@ -959,6 +959,15 @@ def command_table_blocks():
             for t in actors.command_tables().values()]
 
 
+def numeric_table_blocks():
+    """Reviewed parameter tables keep their own decoded ROM intervals."""
+    import actors
+    return [{"s": int(t["addr"], 16), "n": t["size"], "k": "data",
+             "t": t["description"] or t["name"], "u": "decoded",
+             "r": f"/actors#tables:{t['addr']}"}
+            for t in actors.numeric_tables().values()]
+
+
 def rom_tree():
     """The ROM as nested blocks in address order: top-level regions (code by
     subsystem and function, each asset archive by resource, sound, text,
@@ -1106,6 +1115,7 @@ def rom_tree():
     tops.append({"s": kids[0]["s"], "n": sum(x["n"] for x in kids), "k": "sound", "t": "Sound (MP2K)", "c": kids})
     # Tables are separated by other data, so each keeps its own ROM interval.
     tops.extend(command_table_blocks())
+    tops.extend(numeric_table_blocks())
     # the documented regions that items don't cover (sound, text, scripts, graphics, tables)
     covered = sorted((c["s"], c["s"] + c["n"]) for t in tops for c in (t.get("c") or [t]) for c in (c.get("c") or [c]))
     merged = []

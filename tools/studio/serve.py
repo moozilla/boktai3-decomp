@@ -379,7 +379,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/actors":
             self.send(200, {"actors": actors.actors(), "enemies": actors.name_list(*actors.ENEMY_NAMES),
                             "characters": actors.name_list(*actors.CHARACTER_NAMES), "scenes": scene_info(),
-                            "command_tables": actors.command_tables()})
+                            "command_tables": actors.command_tables(),
+                            "numeric_tables": actors.numeric_tables()})
         elif self.path == "/api/procs":
             import gclview
             self.send(200, {"procs": actors.proc_list(), "scenes": scene_info(), "callees": gclview.callee_names(),
