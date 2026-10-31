@@ -23,7 +23,7 @@ extern const u8 gUnk_08606400[];
 
 void Memory_Clear(void *, u32);
 void SceneActorReaction_OnEnemyDefault(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void);
 void sub_08080BE0(void);
 u32 Route_GetCurrentPointFacing(void *);
@@ -219,7 +219,7 @@ s32 Ivy_Init(void *object)
     MonsterInit_ReadPalette(actor, 0x12A, 0x192);
     SceneActor_InitCollision5005(actor);
     MonsterInit_InstallOpaqueContactCallbacks(actor, Ivy_Update, 0, 0, 0, 0, 0, 0, Ivy_UpdateDefeat,
-                                              SceneActorReaction_OnEnemyDefault, 0, 0, sub_081363F4,
+                                              SceneActorReaction_OnEnemyDefault, 0, 0, SceneActorReaction_ResolvePlacementDamage,
                                               SceneActorControl_BeginSoundTransition);
     MonsterInit_InitializeGroup(group, 0, 0, 0, 0, 0, 0, 1);
     IvyInit_InstallRoutes(actor);

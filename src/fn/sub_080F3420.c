@@ -22,36 +22,43 @@ void Sword_BeginRestOrbit(void);
 void ChildGroup_WaitForInactiveMembers(struct SwordGroup *);
 // confidence=low: launches the next resting sword every launchDelay frames; once all are out,
 // waits for them to finish.
-#ifdef NONMATCHING
-// fuzzy: 63.9%
-// fix.py best (sweep after the inlined-insn fix)
-// agbcc strength-reduces i*0x194 into a pointer; the ROM keeps i and multiplies in the found block.
-void sub_080F3420(struct SwordGroup *p)
+void ChildGroup_LaunchNextInactiveMember(struct SwordGroup *p)
 {
     s32 i;
+    u32 stride;
     if (p->delay) {
         p->delay--;
         return;
     }
-    for (i = 0; i < p->count; i++) {
-        if (p->children[i].active == 0) {
-            struct SwordChild *child = &p->children[i];
-            {
-                typeof(child->active) *q1 = &child->active;
-                s16 z1 = 0;
-                *q1 = 1;
-                child->entered = z1;
-                child->flags |= 1;
-                p->children[i].update = Sword_BeginRestOrbit;
-                p->delay = p->launchDelay;
-                return;
+    i = 0;
+    if (i < p->count) {
+        stride = sizeof(struct SwordChild);
+        for (; i < p->count; i++) {
+            if (p->children[i].active == 0) {
+                u32 address = i * stride;
+                struct SwordChild *child;
+                void (**callback)(void);
+                u32 offset;
+                address += (u32)p;
+                address += (u32) & ((struct SwordGroup *)0)->children;
+                child = (struct SwordChild *)address;
+                {
+                    u8 one = 1;
+                    u8 *active = &child->active;
+                    s16 entered = 0;
+                    *active = one;
+                    child->entered = entered;
+                    child->flags = one | child->flags;
+                    offset = i * stride;
+                    callback = &p->children[0].update;
+                    callback = (void *)((u8 *)callback + offset);
+                    *callback = Sword_BeginRestOrbit;
+                    p->delay = p->launchDelay;
+                    return;
+                }
             }
         }
     }
 
     p->callback = ChildGroup_WaitForInactiveMembers;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080F3420);
-#endif

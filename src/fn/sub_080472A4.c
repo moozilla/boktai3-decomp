@@ -5,10 +5,6 @@ s32 DamageNumberDisplay_FindAvailableGroup(struct DamageNumberDisplay *, s32);
 struct DamageNumberDisplay *DamageNumberDisplay_SetGroup(struct DamageNumberDisplay *, s32, u32,
                                                          u32, const struct ContactPosition *,
                                                          const struct ContactPosition *, u32, u32);
-struct DamageNumberSource {
-    u32 unknown0;
-    u16 id;
-};
 s32 DamageNumberDisplay_Show(struct DamageNumberSource *source, u32 amount, u32 kind,
                              const struct ContactPosition *position,
                              const struct ContactPosition *offset, s32 priority)

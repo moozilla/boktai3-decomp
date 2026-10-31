@@ -3517,6 +3517,7 @@ addr,name,mode,confidence,source,notes
 080C0750,SceneActorApproach_RunTimedAction,thumb,low,src-alias,
 080C0828,SceneActorApproach_RunAlternateTimedAction,thumb,low,src-alias,
 080C0900,SceneActorApproach_CaptureTargetAndRunAction,thumb,low,src-alias,
+080C09F0,Skeleton_UpdateTargetApproach,thumb,low,src-alias,Tentative: approaches partner cell or steers within configured distance bands
 080C12EC,Skeleton_SetReactionControlTable,thumb,low,src-alias,Installs the table at actor offset 0x28C during initialization; reaction role tentative
 080C12FC,Skeleton_ReactToContact,thumb,low,src-alias,Skeleton_Init installs this callback at +0x268; AD03 registry and GCL name identify Skeleton. ReactToContact is a descriptive reconstruction.
 080C2BE0,SceneActorControl_UpdateProbeApproach,thumb,low,src-alias,
@@ -3847,8 +3848,10 @@ addr,name,mode,confidence,source,notes
 080F2C34,PhaseObject_TickCountdown,thumb,low,src-alias,
 080F2D50,PhaseObject_ApproachTarget,thumb,low,src-alias,
 080F2E6C,PhaseObject_EndApproachPause,thumb,low,src-alias,
+080F2F7C,PhaseObject_UpdateEntryScatter,thumb,low,src-alias,Tentative: fades four entries then chooses a target-relative scatter origin
 080F31AC,PhaseObject_BeginEntryMotion,thumb,low,src-alias,
 080F3230,PhaseObject_ConvergeEntries,thumb,low,src-alias,
+080F3420,ChildGroup_LaunchNextInactiveMember,thumb,low,src-alias,Tentative: launches one inactive member per delay interval; then waits for completion
 080F34C8,ChildGroup_WaitForInactiveMembers,thumb,low,src-alias,
 080F3560,ChildGroup_ShowDamageNumber,thumb,low,src-alias,
 080F360C,Ivy_InitPaletteBuffers,thumb,low,src-alias,Clears sixteen working colors and copies sixteen source colors into the adjacent buffer
@@ -4977,12 +4980,14 @@ addr,name,mode,confidence,source,notes
 0812E058,SceneActor_SetPositionXZ,thumb,low,src-alias,
 0812E084,SceneActorReaction_ResetResponseState,thumb,low,src-alias,Clears embedded response state bytes and control words used by actor restoration callers
 0812E094,SceneActorRoute_SelectRandomNextPoint,thumb,low,src-alias,Selects a route point avoiding the two recent indices with four random attempts and an increment-and-wrap fallback.
-0812E118,SceneActorTerrain_CanTraverseCell,thumb,low,src-alias,Tests route-cell flags; slope compatibility; adjacency and height; initializes a position the ROM reads before writing.
+0812E118,SceneActorTerrain_CanTraverseCell,thumb,low,src-alias,Tests route-cell flags, slope compatibility, adjacency and height; preserves slope sampling before the position is filled.
+0812E2BC,SceneActorTerrain_IsBelowForwardFloor,thumb,low,src-alias,Tentative: compares actor height with terrain ahead of the first moving horizontal axis
 0812E3DC,InventorySlot_PickRandom,thumb,low,src-alias,
 0812E46C,ActorParticles_SpawnDirectionalBurst,thumb,low,src-alias,When amount is positive; spawn 2–3 actor particles with direction-based horizontal velocity and randomized velocity spread.
 0812E5A4,ActorParticles_SpawnBurst,thumb,low,src-alias,
 0812E6F0,ActorMode_SelectOddStateVariant,thumb,low,src-alias,
 0812E714,ActorParticles_SpawnWideBurst,thumb,low,src-alias,
+0812E7EC,SceneActorReaction_DispatchPendingCommands,thumb,low,src-alias,Tentative: dispatches receiver movement; behavior; messages and attachment commands
 0812EED4,SceneActorReaction_OnEnemyDefault,thumb,low,src-alias,Shared callback installed by enemy initializers that returns zero; specific callback role is tentative
 0812EED8,SceneActorReaction_BeginTargetRecovery,thumb,low,src-alias,
 0812F12C,SceneActor_UpdateActiveCallbacks,thumb,low,src-alias,
@@ -5009,6 +5014,7 @@ addr,name,mode,confidence,source,notes
 08130BA0,SceneActor_DispatchActivePhase,thumb,low,src-alias,
 08130BD4,SceneActorRoute_UpdateTimedPhase,thumb,low,src-alias,
 08130E60,SceneActorRoute_UpdateWaitPhase,thumb,low,src-alias,
+081314E8,SceneActorRoute_UpdateContactRecovery,thumb,low,src-alias,Tentative: selects contact-recovery route phases and reinstalls the entry controller
 08131820,SceneActorControl_UpdateRouteApproach,thumb,low,src-alias,
 08131BC4,SceneActorBehavior_DispatchOrEnterState2,thumb,low,src-alias,
 08131C48,SceneActorBehavior_DispatchAlternateOrEnterState2,thumb,low,src-alias,
@@ -5026,6 +5032,7 @@ addr,name,mode,confidence,source,notes
 08135D74,SceneActorReaction_TryBeginControl29,thumb,low,src-alias,
 08135F38,SceneActor_ClearReactionFlags,thumb,low,src-alias,
 08135F70,SceneActorReaction_ResolveDamage,thumb,low,src-alias,
+081363F4,SceneActorReaction_ResolvePlacementDamage,thumb,low,src-alias,Tentative: applies pending placement damage; updates HUD and dispatches the resulting state
 081369C8,SceneActorPlacement_ResetStateThree,thumb,low,src-alias,
 08136AF0,SceneActorPlacement_PlayResponseAndResetState,thumb,low,src-alias,
 08136C4C,SceneActorScript_ApplyRouteStartCommand,thumb,low,src-alias,Starts the actor route from three command arguments when its signed active field is positive

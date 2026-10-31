@@ -1,6 +1,5 @@
 #include "global.h"
 #include "damage_number_display.h"
-void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 static inline void SetScale(struct ContactPosition *p, s16 x, s16 y, s16 z)
 {
     p->x = x;

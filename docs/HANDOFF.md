@@ -68,6 +68,14 @@ Recent:
   ROM validation and report regeneration remain with the integrator. See the
   [matching note](../notes/finish-player-cue_2026-10-30.md) and
   [cleanup note](../notes/player-cue-cleanup_2026-10-30.md).
+* **Scene actor part 3 worker** (2026-10-31): thirteen reserved targets match in
+  ordinary C, including the recovered forward-floor neighbor. The damage resolver
+  and fragment launcher remain guarded with narrow compiler proofs. Three nearby
+  exact units lose their hints; shared damage fields/visibility/APIs and editable
+  marker tables with Studio views are verified. Work is checkpointed before the
+  owner's 20% quota floor. Combined ROM/shift validation and report regeneration
+  remain batch-integration work. See the
+  [worker note](../notes/finish-scene-actors-3_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches

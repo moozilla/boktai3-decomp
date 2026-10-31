@@ -9,7 +9,7 @@ struct ColorPulse {
 };
 u8 Callback_InvokeActor(void *, void *);
 void Sound_PlaySong(u32);
-void sub_080F2F7C(struct ColorPulse *);
+void PhaseObject_UpdateEntryScatter(struct ColorPulse *);
 
 /* The far-approach twin of ColorPulse_BeginNearApproach. */
 void sub_080F2F24(struct ColorPulse *p)
@@ -18,7 +18,7 @@ void sub_080F2F24(struct ColorPulse *p)
         p->approaches++;
     if (p->approaches > 1) {
         p->approaches = 0;
-        p->updateCE0 = sub_080F2F7C;
+        p->updateCE0 = PhaseObject_UpdateEntryScatter;
         Sound_PlaySong(0x16B);
     }
 }

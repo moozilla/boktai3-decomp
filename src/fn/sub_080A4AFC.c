@@ -12,7 +12,7 @@ void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void);
 extern SceneActorCommandHandler const gUnk_086108B0[];
 void AnimData_SelectPaletteBank(void *, s32);
@@ -150,7 +150,7 @@ s32 Spider_Init(void *object)
         actor, Spider_OnUpdate, Spider_GetAnimationEvent, Spider_AdvanceTurnAnimation,
         Spider_SelectActiveAnimation, Spider_SelectIdleAnimation, Spider_OnActionEvent,
         Spider_UpdateLandingMotion, Spider_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
-        SceneActorPlacement_BeginContactRoute, sub_081363F4,
+        SceneActorPlacement_BeginContactRoute, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_BeginDefaultResponse);
     MonsterInit_InitializeGroupWithBounds(
         group, arg0->bounds630, arg0->bounds654, Spider_OnSecondaryColliderContact, 0,

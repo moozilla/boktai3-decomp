@@ -57,6 +57,7 @@ the bank, were encoded with it.
 |---|---|---|---|
 | `keyed_callbacks` | `08603300`–`08604998` | `data/actor_registry.csv` | 722 sorted `(key, callback)` records and a zero sentinel. The script `chara` command binary-searches it (`08225844`) and calls the callback. |
 | `callback_array` | Eleven ranges listed in `data/manifest.csv` | `data/actor_commands/*.csv` | Ordered Thumb callback pointers for the common actor commands and ten monster extensions. The command packet's first halfword selects an entry; every non-null pointer remains a linker relocation. |
+| `actor_marker_table` | `0824E6D4`–`0824E6F8`, `0824E818`–`0824E8A8` | `data/actor_marker/*.csv` | 180 bytes: fragment frame/animation indices and facing-dependent XYZ offsets, with fixed group/fragment order and no pointers. |
 | `resource_archive` | 10 ranges `08614DCC`–`08D5A85C` | `build/res/LABEL/index.txt` + `HASH.bin` (extracted) | The archives found by `ScriptProc_Start` (anm, map, ptn, fnt, sprites...). Header, sorted hash table and offsets are regenerated; entries are emitted as `.incbin` of their files and may change size. Their contents are position-independent: about 7,300 pointer-like words inside them (tile and map data) are no longer relocated. Verified in-game: growing the first `anm` entry by 37 bytes shifts every archive and leaves all menu and field screenshots identical. |
 | `text_bank` | `08D6B1E4`–`08DD6B96` | `build/text/bank.tsv` (extracted) | Script text, resizable. The gcx section words, 9,977 entry offsets, then strings (`T`, decoded with `data/charmap.tsv`) and binary blobs (`B`, 82 tables read by script code). Verified in-game: a lengthened config help line renders and the field still plays. |
 
@@ -149,3 +150,30 @@ callback or loader and identifies the function containing each reference.
 Tables named as literals in the callback or loader; initialization may
 install another table later. Studio's ROM view gives each table its own block
 and marks exactly 336 bytes across the eleven table extents as decoded.
+
+### Actor marker fragment tables
+
+`data/actor_marker/` holds the two nine-fragment frame groups, the two
+animation-selection sets, and two groups of nine four-halfword offset records.
+`ActorMarker_InitBouncingParticles` reads the frame and animation tables;
+`ActorMarker_LaunchFragments` reads the offsets. Facing group zero is selected
+for quantized directions one/two, group one for zero/three. Animation set zero
+is selected for marker kinds 3/5/7/9/13/15, set one for the other kinds.
+
+CSV coordinates are signed halfwords; `unknown` preserves the fourth
+halfword without assigning it a role. The codec validates exact ranges, all
+18 rows, physical group/fragment order and numeric bounds. Animation indices
+must select one of the two embedded animations. Existing `gUnk_` linker labels
+are retained so source consumers do not need to change with a data edit.
+
+These are numeric tables, including four frame bytes at `0824E6D8` that the
+pointer scanner previously interpreted as a code address. Their reviewed
+intervals are listed in `symbols/nonpointer_ranges.txt`; the encoder emits
+only numeric byte/halfword items. This prevents those indices being relocated
+when code or data moves.
+
+Edit the CSVs and run `build/venv/bin/python tools/datafmt/check.py` to check
+the original bytes, or `make mod` for an intentional edit. Studio's Actors page
+lists them at `/actors#tables`, with signed coordinates and links to their
+exact consumer functions. The ROM view marks only their 180 bytes decoded;
+the intervening parameter tables remain separate, undecoded intervals.

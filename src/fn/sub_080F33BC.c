@@ -11,10 +11,10 @@ struct ColorPulse {
     s8 approaches;
 };
 u8 Callback_InvokeActor(void *, void *);
-void sub_080F3420(struct ColorPulse *);
+void ChildGroup_LaunchNextInactiveMember(struct ColorPulse *);
 
 /* Twin of ColorPulse_BeginNearApproach: after two approaches, restart the
-   timer and hand over to sub_080F3420. */
+   timer and hand over to ChildGroup_LaunchNextInactiveMember. */
 void sub_080F33BC(struct ColorPulse *p)
 {
     if (p->callbackCF0 && Callback_InvokeActor(p, p->callbackCF0))
@@ -22,6 +22,6 @@ void sub_080F33BC(struct ColorPulse *p)
     if (p->approaches > 1) {
         p->approaches = 0;
         p->timerB4E = p->periodB4C;
-        p->updateCE4 = sub_080F3420;
+        p->updateCE4 = ChildGroup_LaunchNextInactiveMember;
     }
 }
