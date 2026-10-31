@@ -54,26 +54,26 @@ static inline void PlayerMotion_SetTarget(void *target)
 {
     gUnk_02000538 = target;
 }
-s32 Player_ConsumeStateEntry(void *);
+u32 Player_ConsumeStateEntry(void *);
 void *ParticlePool_Create(void);
 void *sub_0814B078(void *, s32, s32);
-void Player_OnTargetMotionExit(void);
+void Player_OnTargetMotionExit(struct Player *);
 void Player_SetPendingCallback(void *, void *);
 void WirelessGame_ResetCyclingItemLatch(void);
 void Player_EmitQueuedEffects(void *);
 void Player_NotifyActionCategories(void *);
 void Player_AddControlFlags(void *, u32);
 void Sound_PlaySong(u32);
-void Player_SetActionPhase(void *, u32);
+void Player_SetActionPhase(void *, u8);
 void Player_SetFacingFromAngle(void *, s32);
 s32 Math_Atan2(s32, s32);
-void Anim_SetKeyframes(void *, void *, u32, u32, u32);
-void Anim_Step(void *, void *);
+void Anim_SetKeyframes(void *, void *, u16, u16, u16);
+s32 Anim_Step(void *, void *);
 void ParticlePool_EmitTriple(void *, void *, s32, s32);
-void SceneMovingParticle_Create(void *, void *, s32, s32);
+u32 SceneMovingParticle_Create(void *, void *, s32, s32);
 void PlayerCue_InitAttackCollider(void *, void *, s32, s32);
 s32 Div(s32, s32);
-void TemporaryAnimationPool_CreateEntry(void *, s32, s32, s32, s32);
+void *TemporaryAnimationPool_CreateEntry(void *, u32, u32, s32, const void *);
 void Player_UpdateFacingSide(void *);
 void ActorSequence_Begin(void *, s32, s32);
 
@@ -85,15 +85,14 @@ static inline s32 PlayerMotion_Scale12(s32 v)
     return -((-v) >> 12);
 }
 
-static inline void PlayerMotion_SetPolar(struct ContactPosition *out, s32 angle, s32 magnitude)
+static inline void PlayerMotion_SetPolar(struct ContactPosition *out, u16 angle, s32 magnitude)
 {
     s32 rawX = gUnk_086149C4[(angle + 64) & 255] * magnitude;
-    const s16 *sine = gUnk_086149C4;
     s32 x = PlayerMotion_Scale12(rawX);
     s32 zero = 0;
     out->x = x;
     out->y = zero;
-    out->z = PlayerMotion_Scale12(sine[angle & 255] * magnitude);
+    out->z = PlayerMotion_Scale12(gUnk_086149C4[angle & 255] * magnitude);
 }
 
 static inline void PlayerMotion_ClearAnimationFlags(struct PlayerAnimation *animation, u32 flags)
@@ -112,26 +111,27 @@ static inline void PlayerMotion_AddPosition(struct SceneVec *out, const struct S
 }
 
 #define PLAYER_START_ANIM(A0, A1, N, F)                                                            \
-    do {                                                                                           \
-        struct PlayerAnimation *animation;                                                         \
-        void *data;                                                                                \
+    {                                                                                              \
         if (p->heading == 0) {                                                                     \
-            animation = &p->secondaryAnimation;                                                    \
-            data = p->animationData;                                                               \
-            Anim_SetKeyframes(animation, data, A0, N, F);                                          \
+            struct PlayerAnimation *channel = &p->secondaryAnimation;                              \
+            void *data = p->animationData;                                                         \
+            Anim_SetKeyframes(channel, data, A0, N, F);                                            \
         } else {                                                                                   \
-            animation = &p->secondaryAnimation;                                                    \
-            data = p->animationData;                                                               \
-            Anim_SetKeyframes(animation, data, A1, N, F);                                          \
+            struct PlayerAnimation *channel = &p->secondaryAnimation;                              \
+            void *data = p->animationData;                                                         \
+            Anim_SetKeyframes(channel, data, A1, N, F);                                            \
         }                                                                                          \
-        if (p->side)                                                                               \
-            animation->flags |= 4;                                                                 \
-        else                                                                                       \
-            animation->flags &= ~4;                                                                \
-    } while (0)
+        {                                                                                          \
+            struct PlayerAnimation *flagChannel = &p->secondaryAnimation;                          \
+            if (p->side)                                                                           \
+                flagChannel->flags |= 4;                                                           \
+            else                                                                                   \
+                flagChannel->flags &= ~4;                                                          \
+        }                                                                                          \
+    }
 
 #define PLAYER_START_ANIM_OWNER(A0, A1, N, F)                                                      \
-    do {                                                                                           \
+    {                                                                                              \
         void *data;                                                                                \
         if (p->heading == 0) {                                                                     \
             animation = &p->secondaryAnimation;                                                    \
@@ -146,28 +146,68 @@ static inline void PlayerMotion_AddPosition(struct SceneVec *out, const struct S
             animation->flags |= 4;                                                                 \
         else                                                                                       \
             animation->flags &= ~4;                                                                \
-    } while (0)
+    }
 
-static inline s32 PlayerMotion_RandomFrom(const u16 *table)
+#define PLAYER_START_ANIM_SHARED(A0, A1, N, F)                                                     \
+    {                                                                                              \
+        if (p->heading == 0) {                                                                     \
+            animation = &p->secondaryAnimation;                                                    \
+            data = p->animationData;                                                               \
+            Anim_SetKeyframes(animation, data, A0, N, F);                                          \
+        } else {                                                                                   \
+            animation = &p->secondaryAnimation;                                                    \
+            data = p->animationData;                                                               \
+            Anim_SetKeyframes(animation, data, A1, N, F);                                          \
+        }                                                                                          \
+        if (p->side)                                                                               \
+            animation->flags |= 4;                                                                 \
+        else                                                                                       \
+            animation->flags &= ~4;                                                                \
+    }
+
+static inline u32 PlayerMotion_RandomFrom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }
 
-static inline s32 PlayerMotion_ReadRandomSample(void)
+static inline u32 PlayerMotion_ReadRandomSample(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     return *(const u16 *)(RANDOM_TABLE_ADDR + index * 2);
 }
 
+static inline void PlayerMotion_SetModeFlags(struct Player *p, u32 mask)
+{
+    p->statusFlags = (p->statusFlags & mask) | 0x60000;
+}
+
+union PlayerMotionPosition {
+    struct ContactPosition value;
+    s16 coordinates[3];
+};
+struct PlayerMotionCounter {
+    u16 value : 16;
+};
+
+static inline void PlayerMotion_SetFlags(struct Player *p, u32 flags)
+{
+    p->statusFlags |= flags;
+}
+
+static inline s32 PlayerMotion_OrbitAngle(u8 direction)
+{
+    return ((direction - 0x20) & ~0x3F) + 0x40;
+}
+
 #ifdef NONMATCHING
-// fuzzy: 82.4%
+// fuzzy: 99.6%
 // confidence=low: player "throw/bolt at target" state machine: 8-phase switch (approach, dash, strike, return)
 #define Player_UpdateTargetMotion sub_0814B1F8
 void Player_UpdateTargetMotion(struct Player *p)
 {
-    struct ContactPosition vel, particlePosition, vel2, particlePosition2, pos;
+    union PlayerMotionPosition vel, particlePosition, vel2, particlePosition2;
 
     if (Player_ConsumeStateEntry(p)) {
         if (MOTION->particles == 0)
@@ -193,45 +233,50 @@ void Player_UpdateTargetMotion(struct Player *p)
     MOTION->spriteResource = p->spriteResource;
     MOTION->variantResource = p->actionVariantResource;
     Player_AddControlFlags(p, 9);
-    p->statusFlags = (p->statusFlags & ~0x4000) | 0x60000;
+    PlayerMotion_SetModeFlags(p, ~0x4000);
 
     switch (p->tetherPhase) {
         case 0: {
             s32 dx, dy;
             s16 *tp;
-            struct PlayerAnimation *animation;
+            s32 frame;
             if (gUnk_02000538 == 0) {
                 Sound_PlaySong(0x124);
                 Player_SetActionPhase(p, 5);
                 break;
             }
-            animation = &p->secondaryAnimation;
-            if (p->tetherFrame == 0) {
+            frame = p->tetherFrame;
+            if (frame == 0) {
                 tp = TGT_POS();
                 dx = tp[0] - MOTION->position.x;
                 tp = TGT_POS();
                 dy = tp[2] - MOTION->position.z;
                 Player_SetFacingFromAngle(p, Math_Atan2(dx, dy));
                 if (p->heading == 0) {
-                    animation = &p->secondaryAnimation;
-                    Anim_SetKeyframes(animation, p->animationData, 0x1A1, 1, 0);
+                    struct PlayerAnimation *channel = &p->secondaryAnimation;
+                    Anim_SetKeyframes(channel, p->animationData, 0x1A1, 1, 0);
                 } else {
-                    animation = &p->secondaryAnimation;
-                    Anim_SetKeyframes(animation, p->animationData, 0x1A6, 1, 0);
+                    struct PlayerAnimation *channel = &p->secondaryAnimation;
+                    Anim_SetKeyframes(channel, p->animationData, 0x1A6, 1, 0);
                 }
-                if (p->side)
-                    animation->flags |= 4;
-                else
-                    animation->flags &= ~4;
+                {
+                    struct PlayerAnimation *channel = &p->secondaryAnimation;
+                    if (p->side)
+                        channel->flags |= 4;
+                    else
+                        channel->flags &= ~4;
+                }
             }
-            Anim_Step(animation, p->animationData);
+            Anim_Step(&p->secondaryAnimation, p->animationData);
             p->tetherFrame++;
             if (p->tetherFrame <= 10)
                 break;
             goto phase1_exit;
         }
         case 1: {
-            s32 dx, dy, ang, cnt, q, r0, r1;
+            s32 dx, dy, ang, q, r0, r1;
+            struct PlayerMotionCounter count;
+            u16 frame;
             s16 *tp;
             struct PlayerAnimation *animation;
             tp = TGT_POS();
@@ -240,9 +285,10 @@ void Player_UpdateTargetMotion(struct Player *p)
             dy = tp[2] - MOTION->position.z;
             ang = Math_Atan2(dx, dy);
             ParticlePool_EmitTriple(MOTION->particles, &MOTION->position, (ang + 0x80) & 0xFF, 0);
-            cnt = p->tetherFrame;
+            count.value = p->tetherFrame;
+            frame = count.value;
             animation = &p->secondaryAnimation;
-            if (cnt == 0) {
+            if (frame == 0) {
                 Player_SetFacingFromAngle(p, ang);
                 Sound_PlaySong(0x4F5);
                 if (p->heading == 0)
@@ -268,10 +314,9 @@ void Player_UpdateTargetMotion(struct Player *p)
                         s32 raw = PlayerMotion_RandomFrom(earlyTable);
                         s32 mask = 31;
                         raw &= mask;
-                        velocity = &vel;
-                        r1 = raw;
+                        velocity = &vel.value;
+                        r1 = raw - 16;
                     }
-                    r1 -= 16;
                     {
                         s32 x = PlayerMotion_Scale12(gUnk_086149C4[(r0 + 0x40) & 0xFF] * r1);
                         s32 zero = 0;
@@ -280,17 +325,22 @@ void Player_UpdateTargetMotion(struct Player *p)
                         velocity->z = PlayerMotion_Scale12(gUnk_086149C4[r0] * r1);
                     }
                 }
-                vel.y = (PlayerMotion_ReadRandomSample() & 0x3F) * 2 - 0x30;
                 {
-                    particlePosition = *(struct ContactPosition *)TGT_POS();
-                    particlePosition.y += 30;
-                    SceneMovingParticle_Create(&particlePosition, &vel, 60, 1);
+                    s32 verticalSpeed = (PlayerMotion_ReadRandomSample() & 0x3F) * 2 - 0x30;
+                    vel.value.y = verticalSpeed;
+                }
+                {
+                    particlePosition.value = *(struct ContactPosition *)TGT_POS();
+                    particlePosition.value.y += 30;
+                    SceneMovingParticle_Create(&particlePosition.value, &vel.value, 60, 1);
                 }
             } else {
                 MOTION->position.x +=
                     PlayerMotion_Scale12(gUnk_086149C4[(ang + 0x40) & 0xFF] * MOTION->speed);
-                MOTION->position.z +=
-                    PlayerMotion_Scale12(gUnk_086149C4[ang & 0xFF] * MOTION->speed);
+                {
+                    u16 speed = MOTION->speed;
+                    MOTION->position.z += PlayerMotion_Scale12(gUnk_086149C4[ang & 0xFF] * speed);
+                }
                 p->facing = (((ang + 0x20) & 0xFF) >> 6) * 2 + 3 & 7;
                 if (Div(p->movementDuration, 2) < p->tetherFrame) {
                     MOTION->position.y -= 0x50;
@@ -346,29 +396,29 @@ void Player_UpdateTargetMotion(struct Player *p)
                 u32 randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
                 u32 sampleOrigin;
                 struct ContactPosition *velocity;
-                struct ContactPosition *result;
                 const u16 *earlyTable = (const u16 *)RANDOM_TABLE_ADDR;
                 r0 = PlayerMotion_RandomFrom(earlyTable) & 0xFF;
-                r1 = PlayerMotion_RandomFrom(earlyTable) & 0x1F;
-                velocity = &vel2;
-                r1 -= 16;
+                {
+                    s32 raw = PlayerMotion_RandomFrom(earlyTable) & 0x1F;
+                    velocity = &vel2.value;
+                    r1 = raw - 16;
+                }
                 {
                     s32 rawX = gUnk_086149C4[(r0 + 0x40) & 0xFF] * r1;
                     sampleOrigin = randomOrigin;
-                    result = velocity;
                     velocity->x = PlayerMotion_Scale12(rawX);
                 }
                 velocity->y = 0;
                 velocity->z = PlayerMotion_Scale12(gUnk_086149C4[r0] * r1);
-                result->y = (ParticleRandom_ReadRelativeSample(sampleOrigin,
-                                                               (const u16 *)RANDOM_TABLE_ADDR) &
-                             0x3F) *
-                                2 -
-                            0x30;
+                vel2.value.y = (ParticleRandom_ReadRelativeSample(sampleOrigin,
+                                                                  (const u16 *)RANDOM_TABLE_ADDR) &
+                                0x3F) *
+                                   2 -
+                               0x30;
                 {
-                    particlePosition2 = *(struct ContactPosition *)TGT_POS();
-                    particlePosition2.y += 30;
-                    SceneMovingParticle_Create(&particlePosition2, result, 60, 1);
+                    particlePosition2.value = *(struct ContactPosition *)TGT_POS();
+                    particlePosition2.value.y += 30;
+                    SceneMovingParticle_Create(&particlePosition2.value, &vel2.value, 60, 1);
                 }
             }
             p->tetherFrame++;
@@ -394,10 +444,12 @@ void Player_UpdateTargetMotion(struct Player *p)
             break;
         }
         case 3: {
+            struct ContactPosition pos;
             struct PlayerAnimation *animation;
+            void *data;
             s16 cnt;
             if (p->tetherFrame == 0) {
-                MOTION->orbitAngle = (((u8)p->unk2D - 0x20) & ~0x3F) + 0x40;
+                MOTION->orbitAngle = PlayerMotion_OrbitAngle(p->unk2D);
                 Sound_PlaySong(0x4FC);
                 Sound_PlaySong(0x4FA);
             }
@@ -421,11 +473,11 @@ void Player_UpdateTargetMotion(struct Player *p)
             ParticlePool_EmitTriple(MOTION->particles, &MOTION->position,
                                     (MOTION->orbitAngle + 0xA0) & 0xFF, 0);
             Player_SetFacingFromAngle(p, MOTION->orbitAngle);
-            PLAYER_START_ANIM_OWNER(0x1A2, 0x1A7, 1, 1);
-            Anim_Step(animation, p->animationData);
+            PLAYER_START_ANIM_SHARED(0x1A2, 0x1A7, 1, 1);
+            Anim_Step(animation, data);
             if ((p->tetherFrame & 3) == 0)
-                TemporaryAnimationPool_CreateEntry(&p->secondaryAnimation, 0x10, 0x200,
-                                                   MOTION->particlePalette, 0);
+                TemporaryAnimationPool_CreateEntry(animation, 0x10, 0x200, MOTION->particlePalette,
+                                                   0);
             PlayerCue_InitAttackCollider(p, &MOTION->position, 1, 0x20);
             p->tetherFrame++;
             if (p->tetherFrame > 0x1D)
@@ -435,10 +487,10 @@ void Player_UpdateTargetMotion(struct Player *p)
         case 4: {
             s32 dx, dy, ang;
             if (p->tetherFrame == 0) {
-                MOTION->orbitAngle = (((u8)p->unk2D - 0x20) & ~0x3F) + 0x40;
+                MOTION->orbitAngle = PlayerMotion_OrbitAngle(p->unk2D);
                 ang = (MOTION->orbitAngle - 0x80) & 0xFF;
                 PlayerMotion_SetPolar((struct ContactPosition *)&MOTION->position, ang, 0x100);
-                PlayerMotion_AddPosition(&MOTION->position, &MOTION->position, &p->position);
+                PlayerMotion_AddPosition(&MOTION->position, &p->position, &MOTION->position);
             }
             dx = p->position.x - MOTION->position.x;
             dy = p->position.z - MOTION->position.z;
@@ -459,14 +511,15 @@ void Player_UpdateTargetMotion(struct Player *p)
         }
         case 5: {
             struct PlayerAnimation *animation;
-            PLAYER_START_ANIM_OWNER(0x1A1, 0x1A6, 1, 0);
-            Anim_Step(animation, p->animationData);
+            void *data;
+            PLAYER_START_ANIM_SHARED(0x1A1, 0x1A6, 1, 0);
+            Anim_Step(animation, data);
             Player_UpdateFacingSide(p);
             p->tetherFrame++;
             if (p->tetherFrame > 0x1F)
                 ActorSequence_Begin(p, 0, 0);
             MOTION->position = p->position;
-            p->statusFlags |= 0x4000;
+            PlayerMotion_SetFlags(p, 0x4000);
             break;
         }
         case 6: {
@@ -494,8 +547,10 @@ void Player_UpdateTargetMotion(struct Player *p)
         }
         case 7: {
             struct PlayerAnimation *animation;
+            u16 frame;
+            frame = p->tetherFrame;
             animation = &p->secondaryAnimation;
-            if (p->tetherFrame == 0)
+            if (frame == 0)
                 PLAYER_START_ANIM_OWNER(0x1A4, 0x1A9, 1, 0);
             Anim_Step(animation, p->animationData);
             if (p->tetherFrame > 10)
