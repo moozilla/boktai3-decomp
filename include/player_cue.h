@@ -57,7 +57,9 @@ struct PlayerCueTimers {
 };
 
 struct PlayerCueMessages {
-    u8 unknown0[0x2F8];
+    u8 unknown0[0x24];
+    u32 receiverIdentifier;
+    u8 unknown28[0x2D0];
     struct SceneEventReceiver receiver;
     u8 unknown320[0x27E];
     u8 completionKind, acknowledgementPending;

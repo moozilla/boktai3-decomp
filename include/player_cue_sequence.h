@@ -69,8 +69,9 @@ static inline void PlayerCue_StepSequence(struct ContactSwarmSprite *sprite,
 
 /* Auxiliary displays also report completion of a forward or reverse cycle. */
 // confidence=low: auxiliary sprite and motion field names are tentative.
-static inline u32 PlayerCue_StepSequenceEnded(struct ContactSwarmSprite *owner,
-                                              struct DisplaySequenceState *state)
+static inline u32 PlayerCue_StepSequenceEndedWithFirstFlipMask(struct ContactSwarmSprite *owner,
+                                                               struct DisplaySequenceState *state,
+                                                               u32 firstFlipMask)
 {
     const u16 *command;
     u32 ended;
@@ -85,7 +86,7 @@ static inline u32 PlayerCue_StepSequenceEnded(struct ContactSwarmSprite *owner,
         union DisplaySequenceControl control;
         u32 bit, first;
         control.raw = state->flags;
-        bit = 1;
+        bit = firstFlipMask;
         first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit))
             owner->flags |= 4;
@@ -138,6 +139,12 @@ static inline u32 PlayerCue_StepSequenceEnded(struct ContactSwarmSprite *owner,
         ended = 0;
     }
     return ended;
+}
+
+static inline u32 PlayerCue_StepSequenceEnded(struct ContactSwarmSprite *owner,
+                                              struct DisplaySequenceState *state)
+{
+    return PlayerCue_StepSequenceEndedWithFirstFlipMask(owner, state, 1);
 }
 
 #endif
