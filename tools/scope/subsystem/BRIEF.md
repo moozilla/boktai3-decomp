@@ -5,8 +5,8 @@ one function after another, using the `scope` tool, in C the original authors co
 You are in your own git worktree ({wt}), branch {branch}. Run every command from its root. Other workers run
 at the same time in other worktrees on other subsystems; you never touch theirs.
 
-Start here (the process below is built on these; docs/HANDOFF.md, AGENTS.md and docs/WORKER.md describe
-older, coordinator-driven workflows, so don't take their process instructions as yours):
+Start here (AGENTS.md, CLAUDE.md and docs/WORKER.md set the project rules; this brief adds your queue and
+the per-function bookkeeping):
 - tools/scope/WORKER.md: the matching loop (why, knobs, try, probe, life, vs, pins, hoist, giv, frame, spill).
 - tools/scope/README.md: the scope thread's notes; its section "agbcc facts established with scope" is the
   first place to look when a difference looks familiar (allocation order, loop motion, slot order, forms).
@@ -62,19 +62,20 @@ For each function in queue order (FUNC, its src file SRC):
    Then go straight on to the next function.
 
 Effort per function: do not give up on a function. There is no compile budget: stay on it until it
-MATCHes, or until you can name the one compiler decision still blocking it, have proved it with a knob,
-and have tried the C spellings that should produce it (WORKER.md "Do not give up on a function"). Only
-then record that in REPORT.md and move on. Scripted sweeps over C spellings are not diagnosis: every
-variant must test a hypothesis from scope's output, and a function closed out by a sweep is not done. **Do not stop the run**: keep going function after function until
-the queue is exhausted. When it is, go back to the unmatched ones with the fewest differing instructions and
-take a second pass with the new ideas you gained; stop only when that pass also runs dry.
+MATCHes. Naming the compiler decision that blocks it, proved with a knob, is the halfway point: then find
+the C that produces it. When an approach stalls, change it (docs/WORKER.md "Stay on a function until it
+matches": recover the original struct or helper, rewrite from the ROM, a matchsearch store, the agbcc
+source). Leave a function as a holdout only after that extreme effort, with best.c, REPORT.md and the
+matchsearch store. Scripted sweeps over C spellings are not diagnosis: every variant must test a
+hypothesis from scope's output, and a function closed out by a sweep is not done. **Do not stop the run**:
+keep going function after function until the queue is exhausted. When it is, go back to the holdouts with
+the fewest differing instructions and take a second pass with the new ideas you gained.
 
 Rules:
-- Matching means byte-identical. No hand-written instructions in asm(), ever. Register pins
-  (`register T x asm("rN")`) and empty `asm("" : "+r"(x))` barriers are a last resort: only where a knob
-  proved an allocation or reload decision you could not reproduce in C after real attempts; say so in the
-  report. Remove pins a draft already has when you can (`pins` shows the cost of each). A match with pins
-  still lands (the landing marks the file MATCHING_CONCESSION: register-pinning).
+- Matching means byte-identical with the stock compiler. No hand-written instructions in asm(), ever, and
+  no register pins (`register T x asm("rN")`), empty `asm("" : "+r"(x))` barriers or compiler overrides:
+  knobs locate a mechanism, and the landed C matches without them. A pinned result is not a match. Remove
+  the pins a draft already has (`pins` shows the cost of each).
 - Keep the C readable: struct fields and names, no magic offsets where a struct fits. Comments in the C must
   stand alone: do not mention REPORT.md, your directory or your experiments.
 - Never run make (other than through the land command), tools/build.py, a full build, or whole-corpus

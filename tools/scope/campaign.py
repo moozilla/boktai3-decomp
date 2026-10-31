@@ -56,16 +56,18 @@ Task:
   pay off only together (WORKER.md step 5).
 - Commands (WORKER.md, `scope.py --help`): why UID / why all, probe, spill, try (score several variant
   files of one hypothesis in one call, ~12 ms each), life, vs, pins, insn, uses.
-- Register pins (`register T x asm("rN")`) and empty `asm("" : "+r"(x))` barriers are a last resort: use
-  one only where a knob proved an allocation or reload decision that you could not reproduce in C after
-  real attempts, and say so in the report. Never hand-written instructions. If the draft already has
-  pins or barriers, try to remove them (`pins` shows the cost of each).
-- Goal 2: if you matched with concessions, remove as many as you can while keeping MATCH.
+- Ordinary C only: no register pins (`register T x asm("rN")`), empty `asm("" : "+r"(x))` barriers or
+  compiler overrides, and never hand-written instructions. Knobs locate a mechanism; the C must match
+  without them, and a pinned result is not a match. If the draft already has pins or barriers, remove
+  them (`pins` shows the cost of each).
 - Keep the C readable: struct fields and names, no magic offsets where the draft has fields. Comments in
   the C must stand alone: do not mention REPORT.md, your directory or your experiments.
 - Do not edit anything outside {wd} (not src/, symbols/, tools/, include/); do not commit, push or run
   make. Never use `rm -rf` (move files to ~/.Trash). agbcc is C89 (declarations first in each block).
-- Budget: about 120 compiles; stop earlier when you run out of ideas backed by `why`.
+- No compile budget: stay on the function until it matches. Naming the blocking compiler decision is the
+  halfway point; then find the C that produces it, or change approach (rewrite from the ROM, recover the
+  original struct or helper). Stop unmatched only after the extreme effort docs/WORKER.md "Stay on a
+  function until it matches" describes.
 
 Deliverables in {wd}:
 - best_match.c: your best MATCHing file, if any (the whole file, NONMATCHING block kept as it is in
@@ -114,15 +116,13 @@ knob, then C). `frame` compares stack slots; `hoist` explains loop-invariant mot
 re-set lever; `probe` flips each cse/gcse/loop decision alone; `spill` checks reload rotation.
 
 Rules:
-- No hand-written instructions, ever. Register pins (`register T x asm("rN")`) and empty `asm("" : "+r"(x))`
-  barriers are a last resort, only where a knob proved an allocation decision you could not reproduce in C
-  after real attempts; say so in the report.
+- No hand-written instructions, ever, and no register pins, `asm("")` barriers or compiler overrides.
 - Keep the C readable: struct fields and names, no magic offsets where a struct fits. Comments in the C must
   stand alone: do not mention REPORT.md, your directory or your experiments.
 - Edit nothing outside {wd} (not src/, symbols/, tools/, include/); do not commit, push or run make. Never use
   `rm -rf` (move files to ~/.Trash). Do not run whole-corpus checks.
-- Budget: about 150 compiles. A good draft that does not match is a fine result: stop when `why`-backed ideas
-  run out.
+- No compile budget. A draft is the first step: once the calls and control flow line up, keep going to the
+  match as docs/WORKER.md "Stay on a function until it matches" describes.
 
 Deliverables in {wd}:
 - best.c: your best file (the whole file, as start.c is), matching or not. best_match.c as well if it MATCHes.
@@ -396,9 +396,9 @@ def cmd_tick(args):
         hint = os.path.join(wd, "hint.txt")  # a reviewer's note for this function, read once
         hint = (" A reviewer adds: " + open(hint).read().strip()) if os.path.exists(hint) else ""
         if resume(r, model, note=(f"You stopped at {res['counts']}" + (": a reviewer has a lead (below)." if again else ": very close.")
-                                   + " Take one more round of up to 80"
-                                   " compiles on the remaining hunks (why on each, confirm with a knob, then C;"
-                                   " a pin is acceptable only as the last resort). scope has new commands since"
+                                   + " Take one more round"
+                                   " on the remaining hunks (why on each, confirm with a knob, then C;"
+                                   " no pins or barriers). scope has new commands since"
                                    " you started: `scope.py FILE.c probe` flips each cse/gcse/loop decision"
                                    " (canonical register, jump follow, PRE, loop strength reduction) alone and names the one behind the"
                                    " difference, with the C lines involved; and a difference that is only a"

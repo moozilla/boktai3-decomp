@@ -205,27 +205,28 @@ the same function wait for each other (`waiting: another scope command ...`).
 
 * agbcc is C89: in each block, declarations come before statements.
   `COMPILE FAILED` means the file did not compile; fix that first.
-* No hand-written instructions in `asm()`, ever. Register pins
-  (`register T x asm("rN")`) and empty `asm("" : "+r"(x))` barriers are
-  allowed by CLAUDE.md but not recommended. Again and again, removing a pin
-  and finding the C that gives the same allocation has turned out easier
-  than it looked, and the pin hides the real cause. Use one only where a
-  knob proved an allocation decision you could not reproduce in C after
-  real attempts, and say so in the report. Remove the ones a draft already
-  has (`pins` shows the cost of each).
+* No hand-written instructions in `asm()`, ever, and no register pins
+  (`register T x asm("rN")`), empty `asm("" : "+r"(x))` barriers or
+  compiler overrides in C you land. Knobs find the mechanism; the C must
+  match with the stock compiler. Again and again, the C that gives the
+  allocation a pin forced has turned out easier to find than it looked.
+  Remove the pins a draft already has (`pins` shows the cost of each).
 * Keep the C readable: names, struct fields, inline helpers are fine.
 * Do not give up on a function. When progress stalls, the next step is
   more diagnosis (`why all`, `probe`, `hoist`, `giv`, `frame`, `spill`,
-  `life`), not a different function. Stop only at MATCH, or when you can
-  name the one compiler decision still blocking it, have proved it with a
-  knob, and have tried the C spellings that should produce it. Then report
-  that decision as a scope gap: it is the next tool change.
+  `life`) or a different approach, not a different function. Naming the
+  compiler decision that blocks a function is the halfway point: then find
+  the C that makes it. A function is left as a holdout only after the
+  extreme effort [docs/WORKER.md](../../docs/WORKER.md) "Stay on a function
+  until it matches" describes. Report every decision scope could not
+  explain as a scope gap: it is the next tool change.
 
 ## Report
 
-* MATCH, or the blocking decision (the hunk, what `why` and the knob
-  showed, the C spellings tried) with the count of differing insns
-  (`N ROM / M draft`) and the path of your best file.
+* MATCH, or for a holdout: the blocking decision (the hunk, what `why`
+  and the knob showed, the C spellings and rewrites tried) with the count of
+  differing insns (`N ROM / M draft`), the path of your best file and of the
+  function's matchsearch store.
 * For each change that helped: what `why` said and what you changed.
 * **Where scope's output was confusing, wrong or missing** (this matters as
   much as the match: it is how the tool gets better).

@@ -3,25 +3,61 @@
 Tags: #matching #process
 
 How to take a function from the ROM to C that compiles byte for byte to it. Read
-[HANDOFF.md](HANDOFF.md) first for the phases and the goal. The matching loop itself
+[ROADMAP.md](ROADMAP.md) for the phases and [HANDOFF.md](HANDOFF.md) for where things stand. The matching loop itself
 is [tools/scope/WORKER.md](../tools/scope/WORKER.md); this file is the frame around it.
 The previous playbook (wip/ files, explain.py, family rounds) is kept in
 [history/WORKER_2026-10-24.md](history/WORKER_2026-10-24.md).
 
 ## Aim for the final form
 
-Every function goes through four phases (draft, match, no concessions, cleanup;
-HANDOFF.md), but **aim straight for the end**: C that matches with no register pins
-or `asm("")` barriers, with struct fields, real types and names, written the way the
-original authors would have. A concession is a last resort, used only when a knob
-proved an allocation decision you could not reproduce in C after real attempts, and
-the report says so. Easy C that matches with pins is not the target; it is an interim
-result that phase 3 has to redo.
+The project is in phase 3 (ROADMAP.md): phase 2 is nearly done, and the work now is
+matching the last drafts and removing the register pins from existing matches. **A match
+is ordinary C**: no register pins (`register T x asm("rN")`), no `asm("")` barriers, no
+compiler overrides, with struct fields, real types and names, written the way the original
+authors would have. A pinned match does not count as finished work any more; land a match
+only when it is pin-free.
 
 Work systematically: in ROM order through a subsystem, staying on a function until it
 matches. Don't sort for likely wins, don't skip the hard ones, don't hop between
 functions when one gets difficult. When progress stalls the next step is more
-diagnosis, not another function.
+diagnosis or a different approach, not another function.
+
+## Stay on a function until it matches
+
+A function is finished when it matches. Finding the compiler decision that blocks it is
+progress, not a reason to stop: the next step is the C that produces that decision. Hard
+functions take hundreds of compiles and hours, and many that one model left as hopeless were
+matched later (`Ratatosk_UpdateDefeatSequence`, `081F4CF8`, after a round where GPT-6 Pro
+set it aside). There is no compile or time budget.
+
+When one approach stops paying, change the approach, in roughly this order:
+
+1. `why` on the first real difference of every hunk, confirmed with a knob, and the C
+   spellings the mechanism suggests (tools/scope/WORKER.md).
+2. Recover what the original source had: the struct, macro or inline helper a matched
+   relative uses (`scope.py like`, `tools/relatives.py --c`, `scope.py fields`).
+3. Rewrite the function, or the stuck part of it, fresh from the ROM instead of patching
+   the draft.
+4. A persistent search: `tools/matchsearch` keeps every hypothesis, the best candidates and
+   the compiler evidence across a long search, and keeps sources that are structurally right
+   even when their byte distance is worse.
+5. Read the agbcc source behind the decision (`build/scope/agbcc/gcc`; scope names the
+   function and pass).
+6. Fix or extend the tool so the next step becomes visible, and record the gap.
+
+**Holdouts.** Leave a function unmatched only after extreme effort: all six steps above,
+every remaining hunk explained by a mechanism proved with a knob, the C for each tried and
+recorded in the function's matchsearch store, and no well-founded idea left. Then keep the
+best ordinary-C draft in its `#ifdef NONMATCHING` branch, write the function's note (the
+differing instructions, the mechanism, what was tried and what was ruled out, and the path
+of the matchsearch store), list it as a holdout in your final message, and go on to the
+next function. A holdout is handed to a stronger model with your store and notes, so they
+are the most valuable thing you leave. Being stuck for a while, a hard-looking diff or a
+long function is not a holdout.
+
+**Don't stop the run.** Keep going until every function in your queue is matched or a
+holdout. A quota floor or the owner's stop is a checkpoint: commit what matches, keep the
+best draft of the current function and write its note.
 
 ## Setup
 
@@ -55,12 +91,16 @@ diagnosis, not another function.
    `probe`, `spill`, `hoist`, `giv`, `frame`, `life`, `vs`, `pins` cover the rest.
 4. Changes interact: keep one `why` asked for unless it makes things worse, and stack
    the next. Matches usually take two or three together.
-5. On MATCH: `scope.py land FUNC [--name Prefix_Action]` (from a `new` workspace), or
-   in a subsystem run `campaign.py land FUNC .`. Either merges into the unit, adds or
-   removes the concession marker, runs `make format` and checks the unit. Commit one
-   function per commit (`Match FUNC`).
-6. Pins in an existing match (phase 3): `scope.py FILE.c pins` gives the cost of
-   removing each; `tools/depin.py FILE --write` drops the free ones.
+5. A long search: `build/venv/bin/python -m tools.matchsearch init build/matchsearch/FUNC
+   SRC FUNC` starts a persistent store; `propose` complete C sources as hypotheses and
+   `request` diagnoses, moves and the frontier ([tools/matchsearch/README.md](../tools/matchsearch/README.md)).
+   Keep using the store for the function; it is what a later session resumes from.
+6. On MATCH: `scope.py land FUNC [--name Prefix_Action]` (from a `new` workspace), or
+   in a subsystem run `campaign.py land FUNC .`. Either merges into the unit, runs
+   `make format` and checks the unit. Commit one function per commit (`Match FUNC`).
+7. Pins in an existing match (phase 3): `scope.py FILE.c pins` gives the cost of
+   removing each; `tools/depin.py FILE --write` drops the free ones. Removing the last
+   pin of a unit also removes its concession marker.
 
 The compiler facts scope has established are in [tools/scope/README.md](../tools/scope/README.md),
 section "agbcc facts established with scope": grep it when a difference looks familiar.
@@ -90,10 +130,16 @@ that is a scope gap: record it (below) so the tool gets better.
 
 ## Rules
 
-* Matching means byte-identical. **No hand-written instructions in `asm()`**, ever.
-  Register pins and empty `asm("")` barriers are counted concessions: the unit carries
-  `// MATCHING_CONCESSION: register-pinning` (land adds it) and `progress.py` reports
-  them as Register-pinned.
+* Matching means byte-identical, with the stock compiler. **No hand-written instructions
+  in `asm()`**, ever. No register pins, empty `asm("")` barriers or compiler overrides
+  in new work: scope's knobs (`AGBCC_PRI`, `AGBCC_SPILL`, ...) find a mechanism, and the
+  landed C must match without them. Units that still have pins from phase 2 carry
+  `// MATCHING_CONCESSION: register-pinning`, and `progress.py` reports them as
+  Register-pinned; take pins out of a unit you touch, never add one.
+* The SDK's `SystemCall(n)` (`include/gba/syscall.h`) is the one inline assembly that
+  counts as ordinary C: the original authors wrote it that way.
+* No selector macros: a `#define` a file sets before including a shared header to change
+  the header's code. Shared code is a shared inline helper or macro the callers use as is.
 * Nonmatching C on `main` only as a guarded draft:
   ```c
   #ifdef NONMATCHING
