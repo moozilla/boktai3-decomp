@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ratatosk_facing.h"
 
 struct Ratatosk {
     u8 pad0[0x51];
@@ -23,21 +24,6 @@ struct Ratatosk {
 };
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void Sound_PlaySongChecked(u32);
-#define SET_FACING(actor, heading)                                                                 \
-    do {                                                                                           \
-        u32 facingValue;                                                                           \
-        s32 shift;                                                                                 \
-        (actor)->angle = (heading);                                                                \
-        shift = ((actor)->angle + 0x60) >> 6;                                                      \
-        facingValue = 3;                                                                           \
-        facingValue &= shift;                                                                      \
-        (actor)->facing = facingValue;                                                             \
-        shift = ((actor)->angle + 0x70) >> 5;                                                      \
-        facingValue = 7;                                                                           \
-        facingValue &= shift;                                                                      \
-        (actor)->facing8 = facingValue;                                                            \
-    } while (0)
-
 void Ratatosk_BeginDirectionalReaction(struct Ratatosk *p)
 {
     struct Ratatosk *p2 = p;
@@ -48,7 +34,7 @@ void Ratatosk_BeginDirectionalReaction(struct Ratatosk *p)
             angle = p->savedAngle;
         else
             angle = p->targetAngle + 0x80;
-        SET_FACING(p, angle);
+        RATATOSK_SET_FACING(p, angle);
         SceneActors_StartDirectionalAnimation(p, p2->anim, p2->animData, 0x1d, 0, 1, 4);
         Sound_PlaySongChecked(0x55f);
     }

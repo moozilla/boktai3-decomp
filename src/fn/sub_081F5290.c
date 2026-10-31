@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ratatosk_facing.h"
 #include "ram.h"
 #include "scene_actor_components.h"
 
@@ -57,20 +58,6 @@ static inline u32 randomA(void)
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
-#define SET_FACING(actor, heading)                                                                 \
-    do {                                                                                           \
-        u32 facingValue;                                                                           \
-        s32 shift;                                                                                 \
-        (actor)->angle = (heading);                                                                \
-        shift = ((actor)->angle + 0x60) >> 6;                                                      \
-        facingValue = 3;                                                                           \
-        facingValue &= shift;                                                                      \
-        (actor)->facing = facingValue;                                                             \
-        shift = ((actor)->angle + 0x70) >> 5;                                                      \
-        facingValue = 7;                                                                           \
-        facingValue &= shift;                                                                      \
-        (actor)->facing8 = facingValue;                                                            \
-    } while (0)
 static inline s32 trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
@@ -145,7 +132,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
             angle = p->savedAngle;
         else
             angle = p->targetAngle + 128;
-        SET_FACING(p, angle);
+        RATATOSK_SET_FACING(p, angle);
         SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 29, 0, 1, 4);
         Sound_PlaySong(0x55e);
     }
