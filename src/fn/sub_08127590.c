@@ -7,8 +7,6 @@
 #include "monster_particle_random.h"
 // confidence=low: creates a pooled projectile with optional spin and collider.
 #define SpriteProjectile_Create sub_08127590
-#ifdef NONMATCHING
-// fuzzy: 98.5%
 struct ParticleVector {
     u16 x, y, z, unused;
 };
@@ -153,6 +151,10 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position,
     struct ProjectilePool *pool = gPooledSpriteManager;
     struct Projectile *p;
     struct Projectile *sprite;
+    union {
+        struct DisplaySequenceState *sequence;
+        u32 active;
+    } playback;
     if (!pool) {
         pool = SpriteProjectile_EnsurePool();
         if (!pool)
@@ -187,13 +189,15 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position,
     AnimData_Load(p->graphics, resource);
     p->sequenceResource = ScriptProc_Start(0x922E, script);
     Sprite_Init(p, p->graphics, 0);
-    Anim_SetSequence(&p->sequence, p->sequenceResource, sequence, flip, speed);
+    playback.sequence = &p->sequence;
+    Anim_SetSequence(playback.sequence, p->sequenceResource, sequence, flip, speed);
     AnimData_SelectPaletteBank(p->paletteResource, palette);
-    SpriteProjectile_StepPlayback(sprite, &p->sequence, p);
+    SpriteProjectile_StepPlayback(sprite, playback.sequence, p);
     {
         u32 attributes = sprite->flags;
-        attributes |= 1;
-        sprite->priority = 1;
+        playback.active = 1;
+        attributes |= playback.active;
+        sprite->priority = playback.active;
         attributes |= flags;
         sprite->flags = attributes;
     }
@@ -207,7 +211,7 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position,
         if (spinSample <= 127)
             p->spin = -1;
         else
-            p->spin = 1;
+            p->spin = playback.active;
         p->spinScale =
             (ParticleRandom_ReadRelativeSample(origin, (const u16 *)RANDOM_TABLE_ADDR) & 7) + 7;
     }
@@ -217,7 +221,3 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position,
     }
     return p;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08127590);
-#endif
