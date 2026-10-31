@@ -29,9 +29,10 @@
                                 place of FUNC's definition, then the score: no hand edits of the unit copy
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
-  scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching]   put a matching draft into
+  scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching] [--allow-pins]   put a matching draft into
                                 src/ (unit merge, or a new src/fn file and the hidden boundary), check the
-                                file, name it; --nonmatching: an unfinished draft under #ifdef NONMATCHING
+                                file, name it; --nonmatching: an unfinished draft under #ifdef NONMATCHING;
+                                --allow-pins: land a match that adds pins or barriers (refused without it)
   scope.py rename FUNC NEW [--note T]   functions.csv and every C spelling of the old name or sub_ label
   scope.py like FUNC|ADDR [N]   matched functions whose ROM shares the most rare 3-insn windows with
                                 FUNC's, with the calls and constants they share: whose C to read first
@@ -5020,7 +5021,7 @@ def cmd_new(target):
     return 0
 
 
-def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatching=False):
+def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatching=False, allow_pins=False):
     """Put a matching draft into the source tree: merged into its unit, or a new src/fn file (a hidden
     function also gets its replacement end). Then the concession marker, clang-format, a check of
     every C function in the landed file, and optionally the name and a whole-ROM build.
@@ -5106,6 +5107,10 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         if text is None:
             sys.exit(f"{name}: no definition of {name} in {rel}")
     text, pins, bars = land.concessions(text)
+    if not nonmatching and not allow_pins:
+        added = land.added_concessions(open(path).read() if os.path.exists(path) else "", text)
+        if any(added):
+            sys.exit(land.pin_refusal(name, *added, dest))
 
     def remember(p):
         if p not in before:
@@ -5521,7 +5526,7 @@ def validate_cli(args):
             cli_error(syntax)
         return
     if cmd == "land":
-        syntax = "land FUNC [DRAFT.c] [--name NEW] [--note TEXT] [--rom] [--nonmatching]"
+        syntax = "land FUNC [DRAFT.c] [--name NEW] [--note TEXT] [--rom] [--nonmatching] [--allow-pins]"
         if not tail or tail[0].startswith("--"):
             cli_error(syntax)
         i, drafts = 1, 0
@@ -5531,7 +5536,7 @@ def validate_cli(args):
                 if i + 1 == len(tail) or tail[i + 1].startswith("--"):
                     cli_error(syntax, f"{a} needs a value")
                 i += 2
-            elif a in ("--rom", "--nonmatching"):
+            elif a in ("--rom", "--nonmatching", "--allow-pins"):
                 i += 1
             elif a.startswith("--"):
                 cli_error(syntax, f"unknown option: {a}")
@@ -5607,19 +5612,19 @@ def main():
         return cmd_rom(args[1])
     if args[0] == "new":  # new FUNC: a draft in build/scope/work/ seeded from the unit or a twin
         return cmd_new(args[1])
-    if args[0] == "land":  # land FUNC [DRAFT.c] [--name NEW] [--note TEXT] [--rom] [--nonmatching]
+    if args[0] == "land":  # land FUNC [DRAFT.c] [--name NEW] [--note TEXT] [--rom] [--nonmatching] [--allow-pins]
         opt = {}
         rest = []
         it = iter(args[2:])
         for a in it:
             if a in ("--name", "--note"):
                 opt[a[2:]] = next(it)
-            elif a in ("--rom", "--nonmatching"):
+            elif a in ("--rom", "--nonmatching", "--allow-pins"):
                 opt[a[2:]] = True
             else:
                 rest.append(a)
         return cmd_land(args[1], rest[0] if rest else None, opt.get("name"), opt.get("rom", False), opt.get("note"),
-                        opt.get("nonmatching", False))
+                        opt.get("nonmatching", False), opt.get("allow-pins", False))
     if args[0] == "rename":  # rename FUNC NEW [--note TEXT]
         note = args[args.index("--note") + 1] if "--note" in args else None
         return cmd_rename(args[1], args[2], note)

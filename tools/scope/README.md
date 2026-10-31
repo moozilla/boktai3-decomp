@@ -144,7 +144,7 @@ python3 tools/scope/scope.py FILE.c hoist [FUNC]  loop-invariant motion pass by 
                                                   then for each hoisted variable it scores the dead re-set before the loop's closing brace
 python3 tools/scope/scope.py todo [N] [addr|prior|size]   functions with no C yet, in ROM order (default) or by prior art/size
 python3 tools/scope/scope.py new FUNC             open FUNC: build/scope/work/FUNC.c (its unit with a stub, or a like twin's C)
-python3 tools/scope/scope.py land FUNC [--name N] [--rom] [--nonmatching]   put the draft into src/ and check it
+python3 tools/scope/scope.py land FUNC [--name N] [--rom] [--nonmatching] [--allow-pins]   put the draft into src/ and check it
 python3 tools/scope/scope.py rename FUNC NEW      functions.csv plus every C spelling of the old name or sub_ label
 python3 tools/scope/scope.py like FUNC|ADDR [N]   matched functions sharing the most rare 3-insn windows (helpers to reuse)
 python3 tools/scope/scope.py rom FUNC|ADDR        ROM listing, literal pools as data, calls named (no draft needed)
@@ -325,7 +325,9 @@ the twin renamed, or a stub. Every scope command run on the workspace file
 defaults to FUNC, not the unit's last function. The unit suffix is cut at
 FUNC's closing brace, so a variant in a 30-function unit compiles in ~38 ms.
 
-`land FUNC` requires a match. It three-way merges the draft into the unit
+`land FUNC` requires a match, and refuses one that adds register pins or
+asm barriers to the compiled code (drafts don't count) unless given
+`--allow-pins`; the refusal points at `pins` and docs/WORKER.md. It three-way merges the draft into the unit
 (`git merge-file` against `FUNC.base.c`, so edits made to the unit since
 `new` survive) or writes the new file and the hidden function's replacement
 end. Then it adds or removes the concession marker, runs clang-format, and

@@ -15,7 +15,8 @@ function, write it the way it will finally be.
 2. **Match** (nearly done, about 96% of code). Every function compiles byte for byte to the ROM.
    Register pins and empty `asm("")` barriers were allowed in this phase as a stopgap, and about
    a quarter of matched code still has them (the Register-pinned category in PROGRESS.md). The
-   last drafts are matched **without** them: a new pinned match is phase 3 work for later.
+   last drafts aim for matches without them; a pin is now a last resort for the hardest
+   functions (`land --allow-pins`), and phase 3 work for later.
 3. **No concessions** (current). Every match is ordinary C: no register pins, no barriers, no
    compiler overrides, no `*(u16 *)((u8 *)p + 0x172)` access where a struct field fits.
    `progress.py --list-pinned` is the queue; `scope.py FILE.c pins` gives the cost of removing

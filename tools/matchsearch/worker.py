@@ -160,7 +160,8 @@ def _replace(path: Path, contents: bytes, mode: int) -> None:
         Path(temporary).unlink(missing_ok=True)
 
 
-def land(session, node: str, *, dry_run: bool = False, timeout: float = 120) -> dict[str, Any]:
+def land(session, node: str, *, dry_run: bool = False, timeout: float = 120,
+         allow_pins: bool = False) -> dict[str, Any]:
     """Merge one exact candidate and roll back any unsuccessful unit check.
 
     This intentionally supports existing src/ units only. A new-unit/rename
@@ -224,6 +225,10 @@ def land(session, node: str, *, dry_run: bool = False, timeout: float = 120) -> 
         concessions = _concessions(expanded, names)
         if concessions['inline_assembly']:
             raise ValueError('automatic landing of instruction asm is unsupported; review SDK/original asm separately')
+        if (concessions['register_pins'] or concessions['asm_barriers']) and not allow_pins:
+            raise ValueError(_land_helpers(repo).pin_refusal(evaluator.function, concessions['register_pins'],
+                                                             concessions['asm_barriers'],
+                                                             str(target.relative_to(repo))))
         marker = '// MATCHING_CONCESSION: register-pinning'
         if (concessions['register_pins'] or concessions['asm_barriers']) and marker not in merged:
             merged = marker + '\n' + merged

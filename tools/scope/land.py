@@ -139,6 +139,45 @@ def concessions(text):
     return text, pins, bars
 
 
+def without_drafts(text):
+    """TEXT without the #ifdef NONMATCHING branches, which the default build never compiles."""
+    out, depth = [], 0  # depth > 0: inside a NONMATCHING branch, counting nested #if lines
+    for line in text.splitlines(keepends=True):
+        word = line.strip().split(None, 1)[0] if line.strip() else ""
+        if depth:
+            if word in ("#if", "#ifdef", "#ifndef"):
+                depth += 1
+            elif word == "#endif" or word == "#else" and depth == 1:
+                depth -= 1
+                if word == "#endif" and depth == 0:
+                    out.append(line)
+            continue
+        if re.match(r"\s*#\s*ifdef\s+NONMATCHING\b", line):
+            depth = 1
+            continue
+        out.append(line)
+    return "".join(out)
+
+
+def added_concessions(before, after):
+    """(pins, barriers) that the compiled code of AFTER has beyond BEFORE (drafts don't count)."""
+    _, p0, b0 = concessions(without_drafts(before))
+    _, p1, b1 = concessions(without_drafts(after))
+    return max(p1 - p0, 0), max(b1 - b0, 0)
+
+
+def pin_refusal(func, pins, bars, unit):
+    what = " and ".join(x for x in (f"{pins} register pin{'s' * (pins != 1)}" if pins else "",
+                                    f"{bars} asm barrier{'s' * (bars != 1)}" if bars else "") if x)
+    return (f"{func}: not landed: this match adds {what}.\n"
+            "Pins are a last resort: the project is removing them (phase 3), so each one is work to undo later,\n"
+            "and the C that gives the same allocation has usually turned out easier to find than it looked.\n"
+            f"  scope.py {unit} pins       what removing each one costs, and the free ones\n"
+            "  docs/WORKER.md \"Stay on a function until it matches\"   the approaches to try first\n"
+            "If you have tried those and the function still needs them, land it anyway with --allow-pins:\n"
+            "the unit gets the MATCHING_CONCESSION marker and counts as Register-pinned. Say why in its note.")
+
+
 def context_key(text):
     """Whitespace-insensitive unit context, preserving string/character literal contents."""
     text = re.sub(r"^// scope: (?:write|put) .*\n", "", text, flags=re.M)

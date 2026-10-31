@@ -18,14 +18,16 @@ threads (RAM and data annotation, Studio, translation, tooling).
 
 **Always aim for the final form.** When you touch a function, write C that matches
 with no register pins, barriers or compiler overrides and reads like the original
-authors wrote it. Pins were the phase 2 stopgap; new work never adds one.
+authors wrote it. Pins are heavily discouraged now that phase 3 is removing them: the
+landing tools refuse new ones without `--allow-pins`, which is for the hardest
+functions after real attempts without.
 
 **Work systematically, and stay until it matches.** Go through a subsystem in ROM order.
 Don't sort for likely wins, and don't skip or defer the hard functions. Proving the
 compiler decision that blocks a function is the halfway point; then find the C that
 produces it. When an approach stops paying, change the approach or the tool, not the
-function. A function becomes a holdout (best draft, note and matchsearch store, for a
-stronger model) only after the extreme effort [WORKER.md](WORKER.md) "Stay on a function
+function. A pinned match, or a holdout (best draft, note and matchsearch store, for a
+stronger model), comes only after the extreme effort [WORKER.md](WORKER.md) "Stay on a function
 until it matches" describes. Measure progress by exact matches and removed concessions,
 not by fuzzy scores. Blind spelling sweeps don't count.
 
@@ -93,9 +95,9 @@ commit both files), then opens the PR and merges it.
 
 ## Standing preferences (the owner's)
 
-* The phases and "aim for the final form" above. No new pins, barriers or overrides.
-* ROM order; no easy-first sorting; stay on a function until it matches (holdouts only
-  after extreme effort); no per-function compile budgets; no blind spelling sweeps;
+* The phases and "aim for the final form" above. Pins heavily discouraged, never overrides.
+* ROM order; no easy-first sorting; stay on a function until it matches (pinned matches
+  and holdouts only after extreme effort); no per-function compile budgets; no blind spelling sweeps;
   never stop a run early.
 * **Tooling first.** Every scope gap a worker hits is the next tool change. Workers
   report where scope was confusing, wrong or missing; fold that into

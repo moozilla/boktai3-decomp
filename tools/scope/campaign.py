@@ -14,10 +14,11 @@
   campaign.py review [--model M] | review --say MSG   an independent reviewer of scope itself
                                                    (build/scope/campaign/review/REVIEW.md); --say continues it
   campaign.py status                               what ran, what matched, what is in flight
-  campaign.py land FUNC WORKTREE [REV]                  verify FUNC's best_match.c, unwrap its NONMATCHING block,
+  campaign.py land FUNC WORKTREE [REV] [--allow-pins]  verify FUNC's best_match.c, unwrap its NONMATCHING block,
                                                    three-way merge it into WORKTREE's file, check the unit
                                                    (a phase-1 draft: `scope.py land` in WORKTREE, exact if
-                                                   best_match.c matches, else best.c --nonmatching)
+                                                   best_match.c matches, else best.c --nonmatching);
+                                                   --allow-pins: a match that adds pins (refused without it)
 
 Each worker gets its own directory build/scope/campaign/FUNC/ (start.c = the draft as on origin/main,
 base.c = the same, kept for a three-way merge at landing) and SCOPE_RUN=FUNC. Workers are detached:
@@ -56,10 +57,11 @@ Task:
   pay off only together (WORKER.md step 5).
 - Commands (WORKER.md, `scope.py --help`): why UID / why all, probe, spill, try (score several variant
   files of one hypothesis in one call, ~12 ms each), life, vs, pins, insn, uses.
-- Ordinary C only: no register pins (`register T x asm("rN")`), empty `asm("" : "+r"(x))` barriers or
-  compiler overrides, and never hand-written instructions. Knobs locate a mechanism; the C must match
-  without them, and a pinned result is not a match. If the draft already has pins or barriers, remove
-  them (`pins` shows the cost of each).
+- Aim for ordinary C: never hand-written instructions or compiler overrides (knobs locate a mechanism; the
+  C must match without them). Register pins (`register T x asm("rN")`) and empty `asm("" : "+r"(x))`
+  barriers are heavily discouraged: use one only when the function still won't match without it after the
+  extreme effort docs/WORKER.md describes, and say in the report what it forces and what you tried. If the
+  draft already has pins or barriers, remove them (`pins` shows the cost of each).
 - Keep the C readable: struct fields and names, no magic offsets where the draft has fields. Comments in
   the C must stand alone: do not mention REPORT.md, your directory or your experiments.
 - Do not edit anything outside {wd} (not src/, symbols/, tools/, include/); do not commit, push or run
@@ -116,7 +118,8 @@ knob, then C). `frame` compares stack slots; `hoist` explains loop-invariant mot
 re-set lever; `probe` flips each cse/gcse/loop decision alone; `spill` checks reload rotation.
 
 Rules:
-- No hand-written instructions, ever, and no register pins, `asm("")` barriers or compiler overrides.
+- No hand-written instructions or compiler overrides, ever. Register pins and `asm("")` barriers are heavily
+  discouraged (as above).
 - Keep the C readable: struct fields and names, no magic offsets where a struct fits. Comments in the C must
   stand alone: do not mention REPORT.md, your directory or your experiments.
 - Edit nothing outside {wd} (not src/, symbols/, tools/, include/); do not commit, push or run make. Never use
@@ -398,7 +401,7 @@ def cmd_tick(args):
         if resume(r, model, note=(f"You stopped at {res['counts']}" + (": a reviewer has a lead (below)." if again else ": very close.")
                                    + " Take one more round"
                                    " on the remaining hunks (why on each, confirm with a knob, then C;"
-                                   " no pins or barriers). scope has new commands since"
+                                   " pins only as a last resort). scope has new commands since"
                                    " you started: `scope.py FILE.c probe` flips each cse/gcse/loop decision"
                                    " (canonical register, jump follow, PRE, loop strength reduction) alone and names the one behind the"
                                    " difference, with the C lines involved; and a difference that is only a"
@@ -479,7 +482,7 @@ def unwrap(text, func, addr):
     return land.unwrap(text, func, addr)
 
 
-def land_draft(func, tree, wd):
+def land_draft(func, tree, wd, allow_pins=False):
     """A phase-1 result through `scope.py land` in TREE: its unit merge against the workspace base the
     worker started from, the check of every function in the file, the provisional name."""
     import shutil
@@ -501,6 +504,8 @@ def land_draft(func, tree, wd):
         cmd += ["--name", name] + (["--note", res["note"]] if res.get("note") else [])
     if not exact:
         cmd.append("--nonmatching")
+    elif allow_pins:
+        cmd.append("--allow-pins")
     env = {k: v for k, v in os.environ.items() if k != "SCOPE_RUN"}  # the base was copied to the unscoped workspace
     p = subprocess.run(cmd, cwd=tree, capture_output=True, text=True, env=env)
     if p.returncode and "is already used" in p.stdout + p.stderr and "--name" in cmd:
@@ -776,12 +781,14 @@ def cmd_review(args):
 
 
 def cmd_land(args):
+    allow_pins = "--allow-pins" in args  # a match that adds pins or barriers is refused without it
+    args = [a for a in args if a != "--allow-pins"]
     func, tree = args[0], os.path.abspath(os.path.expanduser(args[1]))
     rows = {r["func"]: r for r in json.load(open(QUEUE))}
     r = rows[func]
     wd = os.path.join(CAMP, func)
     if r.get("kind") == "draft":
-        return land_draft(func, tree, wd)
+        return land_draft(func, tree, wd, allow_pins)
     cand = os.path.join(wd, "best_match.c")
     rel = os.path.relpath(cand, ROOT)
     out = sh("python3", "tools/scope/scope.py", rel, func, env=dict(os.environ, SCOPE_RUN=func))
@@ -826,6 +833,11 @@ def cmd_land(args):
             merged = open(a).read()
     # worker notes pointing at their own REPORT.md / build paths do not belong in src
     merged = re.sub(r"^\s*//[^\n]*(REPORT\.md|build/scope)[^\n]*\n", "", merged, flags=re.M)
+    sys.path.insert(0, os.path.join(ROOT, "tools", "scope"))
+    import land as landlib
+    added = landlib.added_concessions(cur, merged)
+    if any(added) and not allow_pins:
+        sys.exit(landlib.pin_refusal(func, *added, r["src"]))
     pins = len(re.findall(r'\basm\s*\(\s*"(?:r\d+|sl|sb|fp|ip|lr|sp|pc)"\s*\)', merged))
     bars = len(re.findall(r'\basm(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', merged))
     marker = "// MATCHING_CONCESSION: register-pinning"

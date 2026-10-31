@@ -205,18 +205,20 @@ the same function wait for each other (`waiting: another scope command ...`).
 
 * agbcc is C89: in each block, declarations come before statements.
   `COMPILE FAILED` means the file did not compile; fix that first.
-* No hand-written instructions in `asm()`, ever, and no register pins
-  (`register T x asm("rN")`), empty `asm("" : "+r"(x))` barriers or
-  compiler overrides in C you land. Knobs find the mechanism; the C must
-  match with the stock compiler. Again and again, the C that gives the
+* No hand-written instructions in `asm()` and no compiler overrides, ever.
+  Knobs find the mechanism; the C must match with the stock compiler.
+  Register pins (`register T x asm("rN")`) and empty `asm("" : "+r"(x))`
+  barriers are heavily discouraged: again and again, the C that gives the
   allocation a pin forced has turned out easier to find than it looked.
+  `land` refuses a match that adds them unless given `--allow-pins`, which
+  is for the hardest functions after the effort docs/WORKER.md describes.
   Remove the pins a draft already has (`pins` shows the cost of each).
 * Keep the C readable: names, struct fields, inline helpers are fine.
 * Do not give up on a function. When progress stalls, the next step is
   more diagnosis (`why all`, `probe`, `hoist`, `giv`, `frame`, `spill`,
   `life`) or a different approach, not a different function. Naming the
   compiler decision that blocks a function is the halfway point: then find
-  the C that makes it. A function is left as a holdout only after the
+  the C that makes it. A pinned match or a holdout comes only after the
   extreme effort [docs/WORKER.md](../../docs/WORKER.md) "Stay on a function
   until it matches" describes. Report every decision scope could not
   explain as a scope gap: it is the next tool change.

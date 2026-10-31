@@ -32,14 +32,16 @@ For each function FUNC (unit file SRC) in queue order, skipping any with build/s
    `python3 tools/scope/campaign.py land FUNC .`); it must print unit MATCH. Then write the commit request:
    `echo "Match FUNC" > build/scope/campaign/FUNC/commit` (a runner outside the sandbox commits SRC within a
    minute; never run git commands that write).
-   Ordinary C only: no register pins, `asm()` barriers or compiler overrides, and never hand-written
-   instructions in `asm()`. A pinned result is not a match.
+   Ordinary C is the goal: no register pins or `asm()` barriers, never compiler overrides or hand-written
+   instructions in `asm()`. Pins are heavily discouraged; landing refuses a match that adds them unless you
+   pass `--allow-pins`, which is only for a function that still needs them after the extreme effort
+   docs/WORKER.md describes (say in the note what the pin forces and what you tried without it).
 3. A function is finished only when it matches. Stay on it: do not move to the next function while it is
    unmatched. When you are stuck, that is the moment to change approach rather than leave: rewrite a
    component from the ROM, look for the struct, macro or helper the original used, read the agbcc source
    behind the decision, or improve seek or scope so the next step is visible (tool fixes are welcome).
-   Leave it as a holdout only after the extreme effort docs/WORKER.md "Stay on a function until it
-   matches" describes, with best.c and your notes.
+   A pinned match or a holdout (best.c and your notes) comes only after the extreme effort
+   docs/WORKER.md "Stay on a function until it matches" describes.
    On MATCH: `touch build/scope/campaign/FUNC/done` and append one line to build/scope/campaign/LOG.md:
    `FUNC  MATCH  pins P  note`. Keep your current best in build/scope/campaign/FUNC/best.c and `seek note`
    your findings as you go, so a stop or a crash loses nothing.
