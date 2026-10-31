@@ -24,6 +24,7 @@ static inline s32 ScaleProjection(s32 v)
     return r;
 }
 #ifdef NONMATCHING
+// fuzzy: 97.0%
 // Tentative: post a type-zero scene-effect message for the player's screen side.
 void SceneEffectQueue_PostTypeZeroMessage(s32 value)
 {
@@ -133,5 +134,5 @@ void sub_08199684(s32 value)
     MessageQueue_PostMessage(&message);
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0819946C);
+INCLUDE_ASM("asm/nonmatching", SceneEffectQueue_PostTypeZeroMessage);
 #endif
