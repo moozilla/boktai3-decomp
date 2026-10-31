@@ -1,7 +1,7 @@
-#include "global.h"
+#include "player_cue.h"
 
-void PlayerCue_BeginAcknowledgement(u8 *p)
+void PlayerCue_BeginAcknowledgement(struct Player *p)
 {
-    p[0x59E] = 2;
-    p[0x59F] = 1;
+    PlayerCue_Messages(p)->completionKind = 2;
+    PlayerCue_Messages(p)->acknowledgementPending = 1;
 }
