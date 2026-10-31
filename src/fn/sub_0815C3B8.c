@@ -1,47 +1,22 @@
-#include "global.h"
+#include "player.h"
 
-struct P {
-    u8 f00[0x1c];
-    s32 st;
-    u8 f20[0x3A2 - 0x20];
-    u8 a2;
-    u8 a3;
-    s8 a4;
-    u8 f3a5[0x418 - 0x3A5];
-    u8 d18;
-    u8 f419[0x457 - 0x419];
-    u8 c57;
-    u8 c58;
-    u8 f459[0x58C - 0x459];
-    void *fn;
-    struct Q {
-        u32 a, b;
-    } v590;
-    u8 f598[2];
-    u8 b9a;
-    u8 b9b;
-    u8 f59c;
-    u8 b9d;
-    u8 f59e[0x5A4 - 0x59E];
-    u32 w5a4;
-};
-void Player_SetAnimation(struct P *, s32, s32, s32);
+void Player_SetAnimation(struct Player *, s32, s32, s32);
 s32 ActorVariant_GetTableValue(s32, s32);
-void Player_EnterKindTwo(struct P *);
-void Player_UpdateFacingSide(struct P *);
-void ActorSequence_Begin(struct P *, s32, s32);
-void PlayerCue_Motion7Turn(struct P *, s32);
-void PlayerCue_Stand(struct P *, s32);
+void Player_EnterKindTwo(struct Player *);
+void Player_UpdateFacingSide(struct Player *);
+void ActorSequence_Begin(struct Player *, s32, s32);
+void PlayerCue_Motion7Turn(struct Player *, s32);
+void PlayerCue_Stand(struct Player *, s32);
 void Player_UpdateSongCueAnimation(void);
 void Player_UpdateTimedCueAnimation(void);
 void Sound_PlaySong(s32);
-void Player_UpdateAlternateFormCue(void);
+void Player_UpdateAlternateFormCue(struct Player *);
 
-s32 PlayerCue_Motion11(struct P *p, u32 w)
+s32 PlayerCue_Motion11(struct Player *p, u32 w)
 {
-    p->w5a4 = w;
+    p->cueParameter = w;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 0xb, 0);
-    p->fn = Player_UpdateAlternateFormCue;
+    p->triggerAnimationCallback = Player_UpdateAlternateFormCue;
     return 1;
 }
