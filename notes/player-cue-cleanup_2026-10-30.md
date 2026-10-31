@@ -2,13 +2,12 @@
 
 Tags: #matching #player #cue #structs #compiler #data #studio
 
-Twelve of thirteen existing concession-bearing functions now match in ordinary C.
-The subsection's ordinary-C share rises to 99.199351%, a gain of 16.793352
-percentage points (6,628 bytes moved out of the Register-pinned category).
-All 90 explicit register pins and 74 of 76 empty barriers are removed. The two
-remaining barriers are in `Player_UpdateTransitionAnimation` (`0814FAE8`), with
-one sufficient compiler decision proved below. Exact-match coverage is preserved;
-this cleanup adds no new exact-code progress.
+All thirteen formerly concession-bearing functions now match in ordinary C.
+The subsection reaches 100% ordinary C, a combined gain of 17.594000 percentage
+points (6,944 bytes moved out of the Register-pinned category). The final
+continuation adds 0.800649 percentage points (316 bytes). All 90 explicit register
+pins and all 76 empty barriers are removed. Exact-match coverage is preserved;
+this cleanup adds no new exact-code progress. No compiler blockers remain.
 
 On `codex/finish-player-cue`, 106 Player cue source units are cleaned, and one
 additional caller is updated for a promoted name. Every changed unit passes an
@@ -20,7 +19,7 @@ matching batch remains documented in
 
 | Address | Function | Bytes | Result and deciding source property |
 |---|---|---:|---|
-| 0814FAE8 | Player_UpdateTransitionAnimation | 316 | Exact with two existing barriers; constant-first AND commutation remains blocked. Unused compatibility aliases removed. |
+| 0814FAE8 | Player_UpdateTransitionAnimation | 316 | Ordinary C; De Morgan form delays AND formation until combine, preserving mask-first operand order. |
 | 081516C0 | PlayerCue_UpdateRunTo | 684 | Ordinary C; named angle mask and typed canonical player fields retain the direction copy. |
 | 08151D90 | Player_RestartAnimationFromSetup | 296 | Ordinary C; shared packed sequence stepping replaces the pinned playback copy. |
 | 08151EB8 | PlayerCue_UpdateWalkTarget | 700 | Ordinary C; shared sprite/sequence operation preserves command masking and flag updates. |
@@ -34,9 +33,9 @@ matching batch remains documented in
 | 08154EE4 | PlayerCue_RestartAlternateAnimation | 292 | Ordinary C; shared sequence stepping. |
 | 0815DEEC | PlayerCue_ApplyColliderScale | 328 | Ordinary C; capture the mask in a separate local before reading the flags, preserving its early lifetime without barriers. |
 
-### Remaining transition decision
+### Resolved transition decision
 
-Removing both barriers from `0814FAE8` leaves four ROM/four draft differing
+Simply removing both barriers from `0814FAE8` leaves four ROM/four draft differing
 instructions, equal 316-byte extents and no structural difference. In each pulse
 condition the ROM copies mask 7 before ANDing the frame; the draft copies the
 frame before ANDing mask 7. Initial RTL has the intended operand order. First CSE
@@ -54,10 +53,23 @@ inline predicates and side-effect helpers, modulo/division forms, packed control
 and scalar-backed unions, bitfields, typed QI/HI field operations and a mask shared
 across switch arms. Narrow field operations create separate constants in different
 machine modes; a shared mask adds another saved register; predicates materialize
-an extra boolean. None removes the final barriers while retaining the ROM bytes.
-The remaining source requirement is to keep mask 7 opaque through first CSE while
-still allowing its late rematerialization. Private evidence is in
+an extra boolean. Those forms did not remove the final barriers while retaining
+the ROM bytes. Early diagnostic evidence is in
 `build/player_cue_cleanup/early/0814FAE8/REPORT.md`.
+
+The successful source is `low = ~(~frame | ~mask);`, De Morgan's identity for
+`frame & mask`. NOT(frame), NOT(mask), OR and NOT survive both CSE passes, so
+there is no AND for CSE to commute. Combine then reduces those operations to a
+single AND with mask first; regmove copies mask into the result, exactly as the
+ROM does. No extra instructions or storage remain. With unsigned frame and
+mask 7, the result is 0 through 7 and safely fits the signed destination.
+
+The final formatted source passes scope and independent production comparison
+for all 316 bytes, with zero differences. A separate review also confirms semantic
+equivalence and audits all subsystem sources and their included headers: no
+pins, barriers, concession markers, fallbacks or compiler selectors remain. Final
+RTL and verification evidence is in `build/player_cue_final/original/REPORT.md`;
+the complete landed-source audit is `build/player_cue_final/final_audit.json`.
 
 ## Shared ownership, fields and operations
 
@@ -156,7 +168,7 @@ was performed. The integrator must run one complete combined build printing
 `build/boktai3.gba: OK` and regenerate both PROGRESS files for the integration
 commit. Aggregate reports remain unchanged here.
 
-Private handoff evidence is under `build/player_cue_cleanup/` (per-unit stock
+Private handoff evidence is under `build/player_cue_final/` and `build/player_cue_cleanup/` (per-unit stock
 proofs, final audit, landing ledger and candidate reports) and
 `build/player-cue-data/REPORT.md`. These build artifacts are not committed.
 

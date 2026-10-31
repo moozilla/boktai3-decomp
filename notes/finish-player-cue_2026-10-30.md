@@ -160,5 +160,5 @@ is committed.
 The owner's follow-up removes concessions from the neighboring callbacks and
 consolidates the full subsection's owner/field layouts, playback, editable tables
 and Studio wiring. See [the cleanup note](player-cue-cleanup_2026-10-30.md) for
-accepted extents, the one remaining transition barrier mechanism and integration
+accepted extents, the resolved transition operand-order mechanism and integration
 requirements. The nine matches above remain exact after those shared migrations.
