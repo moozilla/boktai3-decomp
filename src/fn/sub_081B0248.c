@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "engine.h"
+#include "monster_particle_random.h"
 
 struct VanargandPart {
     u8 unk_00[0x90];
@@ -9,7 +10,6 @@ struct VanargandPart {
     u32 variant;
 };
 extern const s16 gUnk_086149C4[];
-#define RANDOM_TABLE_ADDR 0x0203B400
 void *VanargandEffect_Create(s32, s32, struct SceneVec *, struct SceneVec *, u32);
 
 static inline s32 Scale(s32 value)
@@ -28,17 +28,7 @@ static inline void Add(struct SceneVec *out, struct SceneVec *base, struct Scene
     out->y = offset->y + base->y;
     out->z = offset->z + base->z;
 }
-static inline s32 RandomValue(u32 table)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(table + offset);
-}
 
-#ifdef NONMATCHING
-// fuzzy: 87.8%
-// scope shape 6 (differences once low registers are set aside)
 void Vanargand_SpawnPartEmergenceEffects(void *arg0)
 {
     struct VanargandPart *part = arg0;
@@ -48,6 +38,9 @@ void Vanargand_SpawnPartEmergenceEffects(void *arg0)
     for (i = 0; i < 4; i++) {
         s32 angle;
         s32 offset, radius;
+        const u16 *table;
+        u32 *index;
+        s32 sample, sampleRadius, shifted;
         if (part->variant == 0)
             angle = (i << 3) + 48;
         else
@@ -55,12 +48,16 @@ void Vanargand_SpawnPartEmergenceEffects(void *arg0)
         Vector(&position, angle, 640);
         Add(&position, part->basePosition, &position);
         position.y += 256;
-        offset = (RandomValue(RANDOM_TABLE_ADDR) >> 3) % 32;
-        radius = (RandomValue(RANDOM_TABLE_ADDR) >> 3) % 8;
+        table = gRandomTable;
+        index = &gRandomIndex;
+        *index = (*index + 1) & 1023;
+        PARTICLE_RANDOM_READ_SAMPLE(sample, table, *index);
+        shifted = sample >> 3;
+        offset = shifted - shifted / 32 * 32;
+        *index = (*index + 1) & 1023;
+        PARTICLE_RANDOM_READ_SAMPLE(sampleRadius, table, *index);
+        radius = (sampleRadius >> 3) % 8;
         Vector(&velocity, angle + offset, radius + 12);
         VanargandEffect_Create(0, 0, &position, &velocity, 1 - part->variant);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_SpawnPartEmergenceEffects);
-#endif

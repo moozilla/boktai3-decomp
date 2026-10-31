@@ -1,11 +1,11 @@
 #include "global.h"
-#include "scene_actor_reaction.h"
+#include "scene_actor_init_actor.h"
 #include "engine.h"
 #include "scene_vec.h"
 #include "render.h"
 
 void SceneActors_Register(void *, s32);
-void SceneActors_Initialize(void *, void *, s32, void *, s32);
+void SceneActors_Initialize(void *, u32, s32, void *, s32);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void SceneActors_SetHealthLimits(void *, s32, s32, s32);
 void SceneActors_SetDamageCallback(void *, void *, void *, s32);
@@ -19,7 +19,7 @@ void Ratatosk_InitBodyCollider(void *);
 void Ratatosk_InitFrontCollider(void *);
 void Ratatosk_InitWideBodyCollider(void *, s32);
 void Ratatosk_InitOuterCollider(void *);
-void CameraFollow_Initialize(void *, s32, void *, s32);
+void CameraFollow_Initialize(void *, const void *, void *, s32);
 void ScaledShadow_InitializeDefault(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 void *HomingProjectile_CreateManager(void);
@@ -30,51 +30,209 @@ void *Ratatosk_CreateAnimatedParticlePool(void);
 void *Ratatosk_CreateParticlePool(void);
 s32 Mod(s32, s32);
 extern void *gUnknown_02000580;
+s32 sub_081F6428(void *);
+void Ratatosk_InitRequestedState(void *);
+void Ratatosk_ApplyDamageReaction(void);
 
-#define H8(off)  (*(u8 *)(a + (off)))
-#define H16(off) (*(u16 *)(a + (off)))
-#define H32(off) (*(u32 *)(a + (off)))
+struct RatatoskCamera {
+    u8 unknown0[0x10];
+    u32 angle, distance;
+    u8 unknown18[0x14];
+    u32 duration;
+};
+struct RatatoskOrbSlot {
+    struct ContactPosition position;
+    u8 unknown8[0x10];
+};
+struct RatatoskInitBase {
+    u8 unknown0[0x48 - 0x0];
+    struct SceneActorBody body;
+    u8 unknown90[0x9C - 0x90];
+    u32 flags;
+    u8 unknownA0[0xAC - 0xA0];
+    u8 animationMode;
+    u8 animationPhase;
+    u8 animationEntry;
+    u8 unknownAF[0xB0 - 0xAF];
+    u8 animationChanged;
+    u8 unknownB1[0xB3 - 0xB1];
+    u8 specialMode;
+    u8 unknownB4[0xC4 - 0xB4];
+    u32 animationTimer;
+    u8 unknownC8[0xE8 - 0xC8];
+    u32 eventScriptA;
+    u32 eventScriptB;
+    u8 unknownF0[0x104 - 0xF0];
+    void *damageCallback;
+    void *stateCallback;
+    const void *target;
+    const void *targetPosition;
+    u8 savedFacing;
+    u8 unknown115[0x178 - 0x115];
+};
+
+struct RatatoskInit {
+    struct RatatoskInitBase base;
+    u8 unknown178[0x188 - 0x178];
+    u8 damageContext[1];
+    u8 unknown189[0x32C - 0x189];
+    u8 animation[0x20];
+    u8 animationData[0x20];
+    struct ContactPosition anchor;
+    u8 unknown374[0x394 - 0x374];
+    void *palette;
+    u8 unknown398[0x3AC - 0x398];
+    u8 motion[0x30];
+    struct RatatoskCamera camera;
+    u8 shadow[0x40];
+    u8 unknown44C[0x494 - 0x44C];
+    u32 displayResource;
+    u8 unknown498[0x4AC - 0x498];
+    u8 blendMode;
+    u8 unknown4AD[0x4AE - 0x4AD];
+    u8 blendEnabled;
+    u8 blendShift;
+    u32 blendResource;
+    u8 unknown4B4[0x4B8 - 0x4B4];
+    u8 paletteBase[0x200];
+    u8 paletteNormal[0x200];
+    u8 paletteAlternate[0x200];
+    u8 unknownAB8[0xCCC - 0xAB8];
+    struct ContactPosition points[9];
+    u8 unknownD14[0xD1C - 0xD14];
+    struct RatatoskOrbSlot orbSlots[9];
+    u8 unknownDF4[0xE52 - 0xDF4];
+    u16 scaleX;
+    u16 scaleZ;
+    u8 unknownE56[0xE58 - 0xE56];
+    u16 scaleStep;
+    u8 unknownE5A[0xE5C - 0xE5A];
+    struct ContactPosition destination;
+    u8 unknownE64[0xE6C - 0xE64];
+    u16 motionScale;
+    u8 unknownE6E[0xE9C - 0xE6E];
+    u16 hurtX;
+    u16 hurtY;
+    u16 hurtZ;
+    u16 hurtAttack;
+    u16 hurtDamage;
+    u16 hurtKind;
+    u16 bodyX;
+    u16 bodyY;
+    u16 bodyZ;
+    u16 wideX;
+    u16 wideY;
+    u16 wideZ;
+    u16 projectileX;
+    u16 projectileY;
+    u16 projectileZ;
+    u16 secondaryX;
+    u16 secondaryY;
+    u16 secondaryZ;
+    u16 alternateX;
+    u16 alternateY;
+    u16 alternateZ;
+    u16 cloneX;
+    u16 cloneY;
+    u16 cloneZ;
+    u16 cloneSecondaryX;
+    u16 cloneSecondaryY;
+    u16 cloneSecondaryZ;
+    u16 parameterED2;
+    u16 parameterED4;
+    u8 unknownED6[0xEDA - 0xED6];
+    u16 projectileCount;
+    u16 cloneCount;
+    u8 unknownEDE[0xEE6 - 0xEDE];
+    u16 parameterEE6;
+    u8 unknownEE8[0xEF0 - 0xEE8];
+    u32 savedState;
+    u8 unknownEF4[0xEFC - 0xEF4];
+    u16 rangeX;
+    u16 rangeY;
+    u16 rangeZ;
+    u8 unknownF02[0xF04 - 0xF02];
+    u32 delay;
+    u8 unknownF08[0xF0C - 0xF08];
+    u16 parameterF0C;
+    u8 unknownF0E[0xF18 - 0xF0E];
+    void *homingProjectiles;
+    void *playerClones;
+    void *particles;
+    void *animatedParticles;
+    void *sceneProjectiles;
+    void *sunOrbs;
+};
+
+static inline const void *RatatoskInit_GetTargetPosition(struct RatatoskInitBase *base)
+{
+    return base->targetPosition;
+}
+
+static inline void RatatoskInit_SetTarget(struct RatatoskInitBase *base, void *target)
+{
+    if (target) {
+        base->target = target;
+        base->targetPosition = (u8 *)target + 0x30;
+    } else {
+        base->target = 0;
+        base->targetPosition = 0;
+    }
+}
+static inline void RatatoskInit_SetDamageHandler(struct RatatoskInitBase *base, void *callback)
+{
+    base->damageCallback = callback;
+}
+static inline void RatatoskInit_SetStateHandler(struct RatatoskInitBase *base, void *callback)
+{
+    base->stateCallback = callback;
+}
+static inline void RatatoskInit_ConfigureAnimation(struct RatatoskInitBase *base, u8 mode, u8 entry)
+{
+    base->animationMode = mode;
+    base->animationPhase = 0;
+    base->animationEntry = entry;
+    base->animationTimer = 0;
+    base->animationChanged = 1;
+}
 
 #ifdef NONMATCHING
-// fuzzy: 53.0%
-// scope shape 281 (differences once low registers are set aside)
-// confidence=low: Ratatosk boss setup. Reads the scene script keywords into the actor (ranges, timings, path points,
-// palette copies, collider and projectile pools) and returns -1 when a pool could not be created.
-s32 sub_081FAE0C(void *arg0, void *arg1)
+// fuzzy: 84.4%
+// confidence=low: Initializes Ratatosk from script dimensions, timing values, paths, palettes, and pools.
+#define Ratatosk_InitializeFromScript sub_081FAE0C
+s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
 {
-    u8 *a = arg0;
+    struct RatatoskInitBase *self;
     struct ContactPosition sizes;
     struct ContactPosition motion;
-    u32 zero;
     u32 hpA, hpB;
-    s32 r5;
+    u32 facing;
     s32 i;
     s32 found;
-    u8 *p44;
     u8 *base;
-    u32 pv[2];
-    u32 *zc;
+    struct ContactPosition pv;
+    u32 *randomIndex;
     s32 k;
-    s32 v44;
-    void *g;
+    s32 animationGate;
+    void *target;
     void *pdata;
 
-    r5 = 0;
     hpA = 0x7D0;
-    zero = 0;
-    SceneActors_Register(a, 4);
-    CpuSet(&zero, &sizes, 0x05000002);
+    hpB = 0;
+    facing = 0;
+    self = &actor->base;
+    SceneActors_Register(actor, 4);
+    ZeroFill8(&sizes);
     sizes.x = 0x800;
     sizes.y = 0x200;
     sizes.z = 0x400;
-    hpB = zero;
 
     if (Script_SeekToKeyword(0x65)) {
-        H32(0xE8) = Script_GetValue();
-        H32(0xEC) = Script_GetValue();
+        actor->base.eventScriptA = Script_GetValue();
+        actor->base.eventScriptB = Script_GetValue();
     } else {
-        H32(0xE8) = zero;
-        H32(0xEC) = zero;
+        actor->base.eventScriptA = hpB;
+        actor->base.eventScriptB = hpB;
     }
     if (Script_SeekToKeyword(0x6C)) {
         hpA = Script_GetValue();
@@ -91,261 +249,238 @@ s32 sub_081FAE0C(void *arg0, void *arg1)
         motion.z = Script_GetValue();
     } else {
         motion.x = 0x800;
-        motion.y = 0x80;
+        motion.y = 0x200;
         motion.z = 0x800;
     }
-    Math_SetMotionPosition(a + 0x3AC, &motion);
+    Math_SetMotionPosition(actor->motion, &motion);
 
     if (Script_SeekToKeyword(0x6D)) {
         for (i = 0; i < 6; i++) {
-            H16(0xCCC + i * 8) = Script_GetValue();
-            H16(0xCCE + i * 8) = Script_GetValue();
-            H16(0xCD0 + i * 8) = Script_GetValue();
+            actor->points[i].x = Script_GetValue();
+            actor->points[i].y = Script_GetValue();
+            actor->points[i].z = Script_GetValue();
         }
     }
     if (Script_SeekToKeyword(0x41)) {
-        H16(0xE9C) = Script_GetValue();
-        H16(0xE9E) = Script_GetValue();
-        H16(0xEA0) = Script_GetValue();
-        H16(0xEA2) = Script_GetValue();
-        H16(0xEA4) = Script_GetValue();
-        H16(0xEA6) = Script_GetValue();
+        actor->hurtX = Script_GetValue();
+        actor->hurtY = Script_GetValue();
+        actor->hurtZ = Script_GetValue();
+        actor->hurtAttack = Script_GetValue();
+        actor->hurtDamage = Script_GetValue();
+        actor->hurtKind = Script_GetValue();
     } else {
-        H16(0xE9C) = 0x1E;
-        H16(0xE9E) = 0xF;
-        H16(0xEA0) = 0x1E;
-        H16(0xEA2) = 0x28;
-        H16(0xEA4) = 0x1E;
-        H16(0xEA6) = 0x1E;
+        actor->hurtX = 0x1E;
+        actor->hurtY = 0xF;
+        actor->hurtZ = 0x1E;
+        actor->hurtAttack = 0x28;
+        actor->hurtDamage = 0x1E;
+        actor->hurtKind = 0x1E;
     }
     if (Script_SeekToKeyword(0x63)) {
-        H16(0xEAE) = Script_GetValue();
-        H16(0xEB0) = Script_GetValue();
-        H16(0xEB2) = Script_GetValue();
+        actor->wideX = Script_GetValue();
+        actor->wideY = Script_GetValue();
+        actor->wideZ = Script_GetValue();
     } else {
-        H16(0xEAE) = 5;
-        H16(0xEB0) = 0;
-        H16(0xEB2) = 0x14;
+        actor->wideX = 5;
+        actor->wideY = 0;
+        actor->wideZ = 0x14;
     }
     if (Script_SeekToKeyword(0x42)) {
-        H16(0xEA8) = Script_GetValue();
-        H16(0xEAA) = Script_GetValue();
-        H16(0xEAC) = Script_GetValue();
+        actor->bodyX = Script_GetValue();
+        actor->bodyY = Script_GetValue();
+        actor->bodyZ = Script_GetValue();
     } else {
-        H16(0xEA8) = 0x1E;
-        H16(0xEAA) = 0x1E;
-        H16(0xEAC) = 0x1E;
+        actor->bodyX = 0x1E;
+        actor->bodyY = 0x1E;
+        actor->bodyZ = 0x1E;
     }
     if (Script_SeekToKeyword(0x53)) {
-        H16(0xEB4) = Script_GetValue();
-        H16(0xEB6) = Script_GetValue();
-        H16(0xEB8) = Script_GetValue();
-        H16(0xEBA) = Script_GetValue();
-        H16(0xEBC) = Script_GetValue();
-        H16(0xEBE) = Script_GetValue();
-        H16(0xEC0) = Script_GetValue();
-        H16(0xEC2) = Script_GetValue();
-        H16(0xEC4) = Script_GetValue();
+        actor->projectileX = Script_GetValue();
+        actor->projectileY = Script_GetValue();
+        actor->projectileZ = Script_GetValue();
+        actor->secondaryX = Script_GetValue();
+        actor->secondaryY = Script_GetValue();
+        actor->secondaryZ = Script_GetValue();
+        actor->alternateX = Script_GetValue();
+        actor->alternateY = Script_GetValue();
+        actor->alternateZ = Script_GetValue();
     } else {
-        H16(0xEB4) = 0x1E;
-        H16(0xEB6) = 0xA;
-        H16(0xEB8) = 0x1E;
-        H16(0xEBA) = 0x32;
-        H16(0xEBC) = 0x1E;
-        H16(0xEBE) = 0x1E;
-        H16(0xEC0) = 0x1E;
-        H16(0xEC2) = 0x1E;
-        H16(0xEC4) = 0x1E;
+        actor->projectileX = 0x1E;
+        actor->projectileY = 0xA;
+        actor->projectileZ = 0x1E;
+        actor->secondaryX = 0x32;
+        actor->secondaryY = 0x1E;
+        actor->secondaryZ = 0x1E;
+        actor->alternateX = 0x1E;
+        actor->alternateY = 0x1E;
+        actor->alternateZ = 0x1E;
     }
     if (Script_SeekToKeyword(0x73)) {
-        H16(0xEC6) = Script_GetValue();
-        H16(0xEC8) = Script_GetValue();
-        H16(0xECA) = Script_GetValue();
-        H16(0xECC) = Script_GetValue();
-        H16(0xECE) = Script_GetValue();
-        H16(0xED0) = Script_GetValue();
+        actor->cloneX = Script_GetValue();
+        actor->cloneY = Script_GetValue();
+        actor->cloneZ = Script_GetValue();
+        actor->cloneSecondaryX = Script_GetValue();
+        actor->cloneSecondaryY = Script_GetValue();
+        actor->cloneSecondaryZ = Script_GetValue();
     } else {
-        H16(0xEC6) = 0x1E;
-        H16(0xEC8) = 0x1E;
-        H16(0xECA) = 0x1E;
-        H16(0xECC) = 0x1E;
-        H16(0xECE) = 0x1E;
-        H16(0xED0) = 0x1E;
+        actor->cloneX = 0x1E;
+        actor->cloneY = 0x1E;
+        actor->cloneZ = 0x1E;
+        actor->cloneSecondaryX = 0x1E;
+        actor->cloneSecondaryY = 0x1E;
+        actor->cloneSecondaryZ = 0x1E;
     }
     if (Script_SeekToKeyword(0x52)) {
-        H16(0xEFC) = Script_GetValue();
-        H16(0xEFE) = Script_GetValue();
-        H16(0xF00) = Script_GetValue();
+        actor->rangeX = Script_GetValue();
+        actor->rangeY = Script_GetValue();
+        actor->rangeZ = Script_GetValue();
     } else {
-        H16(0xEFC) = 0x1E;
-        H16(0xEFE) = 5;
-        H16(0xF00) = 0x1E;
+        actor->rangeX = 0x1E;
+        actor->rangeY = 5;
+        actor->rangeZ = 0x1E;
     }
     if (Script_SeekToKeyword(0x47)) {
-        H16(0xEE6) = Script_GetValue();
+        actor->parameterEE6 = Script_GetValue();
     } else {
-        H16(0xEE6) = 0x14;
+        actor->parameterEE6 = 0x14;
     }
     if (Script_SeekToKeyword(0x62)) {
         for (i = 0; i < 6; i++) {
-            H16(0xD1C + i * 0x18) = Script_GetValue();
-            H16(0xD1E + i * 0x18) = Script_GetValue();
-            H16(0xD20 + i * 0x18) = Script_GetValue();
+            actor->orbSlots[i].position.x = Script_GetValue();
+            actor->orbSlots[i].position.y = Script_GetValue();
+            actor->orbSlots[i].position.z = Script_GetValue();
         }
     }
     if (Script_SeekToKeyword(0x44)) {
-        v44 = Script_GetValue();
+        animationGate = Script_GetValue();
     } else {
-        v44 = 0;
+        animationGate = 0;
     }
     if (Script_SeekToKeyword(0x64)) {
-        r5 = (u8)(((Script_GetValue() << 29) + 0xA0000000u) >> 24);
+        facing = (u8)(((Script_GetValue() << 29) + 0xA0000000u) >> 24);
     }
     if (Script_SeekToKeyword(0x58)) {
-        H16(0xED2) = Script_GetValue();
+        actor->parameterED2 = Script_GetValue();
     } else {
-        H16(0xED2) = 0x3E8;
+        actor->parameterED2 = 0x3E8;
     }
     found = Script_SeekToKeyword(0x74);
     if (found) {
-        H16(0xF0C) = Script_GetValue();
+        actor->parameterF0C = Script_GetValue();
     } else {
-        H16(0xF0C) = found;
+        actor->parameterF0C = found;
     }
-    g = gUnknown_02000580;
-    if (g) {
-        H32(0x10C) = (u32)g;
-        H32(0x110) = (u32)g + 0x30;
-    } else {
-        H32(0x10C) = 0;
-        H32(0x110) = 0;
-    }
-    SceneActors_Initialize(a, arg1, 4, &sizes, r5);
-    H8(0x114) = r5;
-    H32(0x494) = 0xFB81;
-    SceneResource_InitializeHiddenSprite(a);
-    SceneActors_StartUnmirroredAnimation(a, a + 0x34C, a + 0x32C, 7, 1, 0);
+    target = gUnknown_02000580;
+    RatatoskInit_SetTarget(self, target);
+    SceneActors_Initialize(self, id, 4, &sizes, facing);
+    self->savedFacing = facing;
+    actor->displayResource = 0xFB81;
+    SceneResource_InitializeHiddenSprite(actor);
+    SceneActors_StartUnmirroredAnimation(self, actor->animationData, actor->animation, 7, 1, 0);
 
-    p44 = a + 0xB3;
-    *p44 = Script_GetKeywordValue(0x69, 0);
-    if (*p44 == 0) {
+    self->specialMode = Script_GetKeywordValue(0x69, 0);
+    if (self->specialMode == 0) {
         pdata = Path_GetPointData(Path_GetDefinition(0));
         for (i = 0; i <= 8; i++) {
-            Path_GetPointPosition((void *)pv, pdata, i);
-            H32(0xCCC + i * 8) = pv[0];
-            H32(0xCCC + i * 8 + 4) = pv[1];
-            H16(0xCCC + i * 8 + 2) = 0x200;
+            Path_GetPointPosition(&pv, pdata, i);
+            actor->points[i] = pv;
+            actor->points[i].y = 0x200;
         }
         pdata = Path_GetPointData(Path_GetDefinition(1));
         for (i = 0; i <= 8; i++) {
-            Path_GetPointPosition((void *)pv, pdata, i);
-            H32(0xD1C + i * 0x18) = pv[0];
-            H32(0xD1C + i * 0x18 + 4) = pv[1];
-            H16(0xD1C + i * 0x18 + 2) = 0x200;
+            Path_GetPointPosition(&pv, pdata, i);
+            actor->orbSlots[i].position = pv;
+            actor->orbSlots[i].position.y = 0x200;
         }
     }
-    H32(0x104) = 0x81F6429;
-    H32(0x108) = 0x81F63D1;
-    SceneActors_SetHealthLimits(a, hpA, hpA, hpB);
+    RatatoskInit_SetDamageHandler(self, sub_081F6428);
+    RatatoskInit_SetStateHandler(self, Ratatosk_InitRequestedState);
+    SceneActors_SetHealthLimits(self, hpA, hpA, hpB);
 
     if (!Script_SeekToKeyword(0x70)) {
-        H32(0x54) = H32(0xCCC);
-        H32(0x58) = H32(0xCD0);
+        self->body.position = actor->points[0];
     }
-    Ratatosk_InitHurtCollider(a, zero);
-    Ratatosk_InitBodyCollider(a);
-    Ratatosk_InitFrontCollider(a);
-    Ratatosk_InitWideBodyCollider(a, zero);
-    Ratatosk_InitOuterCollider(a);
+    Ratatosk_InitHurtCollider(actor, hpB);
+    Ratatosk_InitBodyCollider(actor);
+    Ratatosk_InitFrontCollider(actor);
+    Ratatosk_InitWideBodyCollider(actor, hpB);
+    Ratatosk_InitOuterCollider(actor);
 
-    base = gPaletteBankData;
     for (i = 0; i < 16; i++) {
-        CpuSet(base + 0x3E40 + i * 0x20, a + 0x4B8 + i * 0x20, 0x4000008);
+        base = gPaletteBankData + 0x3E40 + i * 0x20;
+        CpuSet(base, actor->paletteBase + i * 0x20, 0x4000008);
     }
-    base = gPaletteBankData;
     for (i = 0; i < 16; i++) {
-        CpuSet(base + 0x3E40 + i * 0x20, a + 0x6B8 + i * 0x20, 0x4000008);
+        base = gPaletteBankData + 0x3E40 + i * 0x20;
+        CpuSet(base, actor->paletteNormal + i * 0x20, 0x4000008);
     }
-    H16(0x6C2) = 0x1F;
-    base = gPaletteBankData;
+    ((u16 *)actor->paletteNormal)[5] = 0x1F;
+    base = gPaletteBankData + 0x3240;
     for (i = 0; i < 16; i++) {
-        CpuSet(base + 0x3240, a + 0x8B8 + i * 0x20, 0x4000008);
+        CpuSet(base, actor->paletteAlternate + i * 0x20, 0x4000008);
     }
-    H32(0x394) = (u32)(a + 0x4B8);
-    H8(0x4AE) = 0;
-    H32(0x4B0) = 0x1F2;
-    H8(0x4AC) = 0;
-    H8(0x4AF) = 5;
-    H32(0xF04) = 0x3C;
-    H32(0x9C) |= 0x10;
+    actor->palette = actor->paletteBase;
+    actor->blendEnabled = 0;
+    actor->blendResource = 0x1F2;
+    actor->blendMode = 0;
+    actor->blendShift = 5;
+    actor->delay = 0x3C;
+    self->flags |= 0x10;
 
-    if (*p44 == 0) {
-        H8(0xAC) = 0;
-        H8(0xAD) = 0;
-        H8(0xAE) = 1;
-        H32(0xC4) = 0;
-        k = 1;
-    } else if (v44 == 0) {
-        H8(0xAC) = 2;
-        H8(0xAD) = 0;
-        H8(0xAE) = 1;
-        H32(0xC4) = 0;
-        k = 1;
+    if (self->specialMode == 0) {
+        RatatoskInit_ConfigureAnimation(self, 0, 1);
+    } else if (animationGate == 0) {
+        RatatoskInit_ConfigureAnimation(self, 2, 1);
     } else {
-        H8(0xAC) = 2;
-        H8(0xAD) = 0;
-        H8(0xAE) = 0;
-        H32(0xC4) = 0;
-        k = 1;
+        RatatoskInit_ConfigureAnimation(self, 2, 0);
     }
-    H8(0xB0) = k;
-    H16(0xED4) = 0;
-    H16(0xE9C) = 0x1E;
-    H16(0xE9E) = 0xF;
-    H16(0xE52) = 0;
-    H16(0xE54) = 0;
-    H16(0xE58) = 0;
-    H16(0xEDA) = 3;
-    H16(0xEDC) = 3;
-    H16(0xE6C) = 0x40;
-    H16(0xE6C) = 0x80;
-    H32(0xEF0) = 2;
+    actor->parameterED4 = 0;
+    actor->hurtX = 0x1E;
+    actor->hurtY = 0xF;
+    actor->scaleX = 0;
+    actor->scaleZ = 0;
+    actor->scaleStep = 0;
+    actor->projectileCount = 3;
+    actor->cloneCount = 3;
+    actor->motionScale = 0x40;
+    actor->savedState = 2;
+    actor->motionScale = 0x80;
 
-    zc = &gRandomIndex;
-    *zc = (*zc + 1) & 0x3FF;
-    k = Mod(gRandomTable[*zc], 9);
-    H32(0xE5C) = H32(0xCCC + k * 8);
-    H32(0xE60) = H32(0xCCC + k * 8 + 4);
+    randomIndex = &gRandomIndex;
+    *randomIndex = (*randomIndex + 1) & 0x3FF;
+    k = Mod(((u16 *)RANDOM_TABLE_ADDR)[*randomIndex], 9);
+    actor->destination = actor->points[k];
 
-    if (*p44 == 0) {
-        CameraFollow_Initialize(a + 0x3DC, *(u32 *)(a + 0x110), a + 0x54, 1);
-        *(u32 *)(a + 0x3DC + 0x10) = 0x8C;
-        *(u32 *)(a + 0x3DC + 0x14) = 0xFF;
-        *(u32 *)(a + 0x3DC + 0x2C) = 0x1E;
+    if (self->specialMode == 0) {
+        CameraFollow_Initialize(&actor->camera, RatatoskInit_GetTargetPosition(self),
+                                &actor->base.body.position, 1);
+        actor->camera.angle = 0x8C;
+        actor->camera.distance = 0xFF;
+        actor->camera.duration = 0x1E;
     }
-    SceneActors_SetDamageCallback(a, a + 0x188, (void *)0x081F9F11, 0);
-    ScaledShadow_InitializeDefault(a + 0x40C, a + 0x36C);
-    if (*p44 != 0)
-        TerrainOverlay_QueueAddActor(a + 0x48);
-    if (*p44 == 0) {
-        H32(0xF18) = (u32)HomingProjectile_CreateManager();
-        if (H32(0xF18) == 0)
+    SceneActors_SetDamageCallback(self, actor->damageContext, Ratatosk_ApplyDamageReaction, 0);
+    ScaledShadow_InitializeDefault(actor->shadow, &actor->anchor);
+    if (self->specialMode != 0)
+        TerrainOverlay_QueueAddActor(&actor->base.body);
+    if (self->specialMode == 0) {
+        actor->homingProjectiles = HomingProjectile_CreateManager();
+        if (actor->homingProjectiles == 0)
             return -1;
-        H32(0xF1C) = (u32)PlayerClone_CreatePool();
-        if (H32(0xF1C) == 0)
+        actor->playerClones = PlayerClone_CreatePool();
+        if (actor->playerClones == 0)
             return -1;
     }
-    H32(0xF28) = (u32)SceneProjectile_CreatePool();
-    if (H32(0xF28) == 0)
+    actor->sceneProjectiles = SceneProjectile_CreatePool();
+    if (actor->sceneProjectiles == 0)
         return -1;
-    H32(0xF2C) = (u32)SunOrb_GetOrCreateManager();
-    if (H32(0xF2C) == 0)
+    actor->sunOrbs = SunOrb_GetOrCreateManager();
+    if (actor->sunOrbs == 0)
         return -1;
-    H32(0xF24) = (u32)Ratatosk_CreateAnimatedParticlePool();
-    if (H32(0xF24) == 0)
+    actor->animatedParticles = Ratatosk_CreateAnimatedParticlePool();
+    if (actor->animatedParticles == 0)
         return -1;
-    H32(0xF20) = (u32)Ratatosk_CreateParticlePool();
-    if (H32(0xF20) == 0)
+    actor->particles = Ratatosk_CreateParticlePool();
+    if (actor->particles == 0)
         return -1;
     return 0;
 }

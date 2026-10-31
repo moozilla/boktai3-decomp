@@ -393,6 +393,28 @@ def command_tables_of(funcs):
 
 
 @cached
+def numeric_tables():
+    """Reviewed marker parameter tables, with their exact consumer provenance."""
+    out = {}
+    for entry in load_manifest():
+        if entry.format != "actor_marker_table":
+            continue
+        module = entry.module()
+        schema = module.table_schema(entry.start, entry.end)
+        with open(entry.file, encoding="utf-8") as source:
+            rows = module.parse_rows(source.read(), entry.start, entry.end)
+        key = f"{entry.start:08X}"
+        out[key] = {"addr": key, "end": f"{entry.end:08X}", "name": entry.name,
+                    "description": entry.description,
+                    "source": os.path.relpath(entry.file, ROOT).replace(os.sep, "/"),
+                    "size": entry.end - entry.start, "columns": list(schema["columns"]),
+                    "entries": rows, "meaning": schema["meaning"],
+                    "consumers": [{"addr": f"{addr:08X}", "name": fname(addr)}
+                                  for addr in schema["consumers"]]}
+    return out
+
+
+@cached
 def registry():
     out = {}
     with open(os.path.join(ROOT, "data", "actor_registry.csv")) as f:

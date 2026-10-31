@@ -1,0 +1,26 @@
+unit	name	address	bytes	kinds	file
+Player	Player_UpdateAlternateFormCue	08146EAC	2188	pin	src/fn/sub_08146EAC.c
+Player	Player_UpdateSpiralRelease	08147CF0	712	pin,operand	src/fn/sub_08147CF0.c
+Player	Player_UpdateSpiralAfterglow	08147FB8	556	pin,operand	src/fn/sub_08147FB8.c
+Player	sub_081481E4	081481E4	308	helper	src/fn/sub_081481E4.c
+Player	Player_UpdateDirectionRecovery	08148608	428	pin,operand	src/fn/sub_08148608.c
+Player	Player_UpdateTimedMovementRecovery	081487B4	352	pin,operand	src/fn/sub_081487B4.c
+Player	Player_UpdateDecayingRecoil	08148914	592	pin,operand	src/fn/sub_08148914.c
+Player	Player_UpdateSpiralDisorientation	08148B64	744	pin,operand	src/fn/sub_08148B64.c
+Player	sub_08148E4C	08148E4C	308	helper	src/fn/sub_08148E4C.c
+Player	Player_UpdateWalkFootsteps	08148FC0	548	pin,operand	src/fn/sub_08148FC0.c
+Player	sub_081491E4	081491E4	512	helper	src/fn/sub_081491E4.c
+Player	Player_UpdateMovementPose	081493E4	408	pin,operand	src/fn/sub_081493E4.c
+Player	Player_UpdateOddDirectionPose	0814957C	420	pin,operand	src/fn/sub_0814957C.c
+Player	Player_UpdatePoseRecovery	08149720	756	helper	src/fn/sub_08149720.c
+Player	Player_UpdateRecoilMotion	08149A14	988	pin,operand	src/fn/sub_08149A14.c
+Player	Player_UpdateSpiralTrailAction	08149DF0	556	pin,operand	src/fn/sub_08149DF0.c
+Player attack effect	sub_081606C0	081606C0	496	pin,operand	src/fn/sub_081606C0.c
+Player	Player_UpdateChargeSpin	08240F9C	560	pin,operand	src/fn/sub_08240F9C.c
+Player	Player_RestartAnimation	082411CC	324	helper	src/fn/sub_082411CC.c
+Player	Player_BeginWalk	08241350	436	pin,operand	src/fn/sub_08241350.c
+Player	PlayerCue_UpdateOffsetBurst	08241504	528	helper	src/fn/sub_08241504.c
+Player	sub_08241714	08241714	440	pin,clobber	src/fn/sub_08241714.c
+Player	PlayerCue_UpdatePoseRecovery	082418CC	760	helper	src/fn/sub_082418CC.c
+Player	PlayerCue_UpdateTerrainSlide	08241BC4	756	pin,operand	src/fn/sub_08241BC4.c
+Player	PlayerCue_UpdateSpiralPose	08241EB8	540	pin,operand	src/fn/sub_08241EB8.c

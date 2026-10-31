@@ -1,6 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_actor_damage_visibility.h"
 #include "scene_actor_reaction.h"
+#include "scene_actor_palette.h"
 #include "area_effect_link.h"
 #include "render.h"
 #include "runtime.h"
@@ -51,40 +52,6 @@ void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorReaction_PlayStaggerBurst(void);
-static inline s32 LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
-static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
-{
-    if (Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->field2E0;
-        register u32 mask asm("r2") = *owner;
-        if (!(mask & 0x20) && mask) {
-            switch (LocalPlayer()) {
-                case 0:
-                    if (*owner != 1)
-                        return 0;
-                    break;
-                case 1:
-                    if (*owner != 2)
-                        return 0;
-                    break;
-                case 2:
-                    if (*owner != 4)
-                        return 0;
-                    break;
-                case 3:
-                    if (*owner != 8)
-                        return 0;
-                    break;
-            }
-        }
-    }
-    return 1;
-}
 
 struct FlagHalfword {
     s16 bits : 16;
@@ -93,9 +60,9 @@ static inline void ClearHit(struct FlagHalfword *flags, u32 mask)
 {
     flags->bits = mask & flags->bits;
 }
-static inline void SetHit(u16 *p, u32 bit)
+static inline void SetHit(s16 bit, struct FlagHalfword *p)
 {
-    *p = bit | *p;
+    p->bits = bit | p->bits;
 }
 static inline void Fill(u32 *zero, void *dst)
 {
@@ -104,17 +71,18 @@ static inline void Fill(u32 *zero, void *dst)
 }
 void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *actor)
 {
-    u8 *collider = (u8 *)&actor->colliderA;
+    struct ContactCollider *collider = &actor->colliderA;
     {
         u32 damage = actor->reactionSoundVariant;
         actor->health -= damage;
     }
     if (!(actor->field2D8 & 0x20000)) {
-        u16 bank = *(u16 *)((u8 *)actor + 0x1E2);
+        u16 bank = actor->paletteAlternateBank;
         if (actor->drawableKind == 0)
             AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
         else
-            *(u8 **)((u8 *)actor->drawable + 0x68) = gPaletteBankData + bank * 32;
+            ((struct SceneActorPaletteTileView *)actor->drawable)->palette =
+                (const u16 *)(gPaletteBankData + bank * 32);
         {
             u32 eight = 8;
             actor->field1E8 = eight;
@@ -123,13 +91,13 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
             u32 bit = 0x8000;
             actor->flags2CC |= bit;
         }
-        if (ShouldShowDamage(actor)) {
+        if (SceneActorDamage_ShouldShow(actor)) {
             u32 zero;
             u32 buffer[2];
             s32 health = actor->health;
-            u32 max = *(u16 *)((u8 *)actor + 0xB0);
-            s32 kind = *(s16 *)((u8 *)actor + 0xB2);
-            s32 param = *(s16 *)((u8 *)actor + 0x9A);
+            u32 max = (u16)actor->defaultHealth;
+            s32 kind = (s16)actor->fieldB2;
+            s32 param = (s16)actor->field9A;
             SceneHud_SetTimedState(actor->body.id, health, max, kind, 0, param);
             Fill(&zero, buffer);
             if (actor->reactionSoundVariant || !(actor->field2D8 & 0x20000))
@@ -150,10 +118,10 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
         *flags = mask & *flags;
     }
     if (actor->health <= 0) {
-        *(u16 *)(collider + 0x44) = 0;
+        collider->responseValue = 0;
         Hide(actor);
         {
-            void *control = *(void **)((u8 *)actor + 0x234);
+            void *control = actor->deathControl;
             Reaction_SetControl(actor, 17, control);
         }
         {
@@ -168,11 +136,7 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
         if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
     } else {
-        {
-            u32 bit = 0x20;
-            asm("" : "+r"(bit));
-            actor->flags2D4 = bit | actor->flags2D4;
-        }
+        SetHit(0x20, (void *)&actor->flags2D4);
         {
             void *control = SceneActorReaction_PlayStaggerBurst;
             Reaction_SetControl(actor, 0x21, control);

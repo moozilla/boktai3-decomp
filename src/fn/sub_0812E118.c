@@ -1,7 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "contact_actor.h"
+#include "scene_actor_components.h"
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
@@ -35,9 +35,9 @@ static inline struct TerrainCell *CellProperties(s32 cell)
 
 static inline s32 CellHeight(s32 cell, const struct ContactPosition *position)
 {
-    register u32 attributes asm("r1") = CellProperties(cell)->heightAndShape;
-    u32 shape = attributes >> 4;
-    s32 height = (attributes & 15) << 8;
+    struct TerrainCell *properties = CellProperties(cell);
+    u32 shape = properties->heightAndShape >> 4;
+    s32 height = (properties->heightAndShape & 15) << 8;
     switch (shape) {
         case 1:
             height -= (u8)position->z;
@@ -65,18 +65,15 @@ static inline s32 Absolute(s32 value)
     return value;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 70.6%
-// scope shape 140 (differences once low registers are set aside)
 // Tentative: test a route cell against the starting cell's slope and height.
 u8 SceneActorTerrain_CanTraverseCell(s32 startCell, s32 cell, s32 startHeight, u32 startShape)
 {
-    struct ContactPosition center = {128, 0, 128, 0};
+    struct ContactPosition center;
     u32 shape;
     s32 height;
     s32 allowHeightStep;
 
-    /* Sample slopes at the center of the cell. */
+    /* The original query samples slopes before the position is filled. */
     shape = CellProperties(cell)->heightAndShape >> 4;
     height = CellHeight(cell, &center);
     CellCenter(cell, &center);
@@ -106,6 +103,47 @@ u8 SceneActorTerrain_CanTraverseCell(s32 startCell, s32 cell, s32 startHeight, u
         return 0;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorTerrain_CanTraverseCell);
-#endif
+
+static inline s32 CellAt(struct ContactPosition *position)
+{
+    s32 x = position->x >> 8;
+    s32 z = position->z >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+        return 0;
+    return gTerrainMap->rows[z] + x;
+}
+
+/* Test the floor ahead along the first moving horizontal axis. */
+u8 SceneActorTerrain_IsBelowForwardFloor(struct SceneActorBody *body)
+{
+    struct ContactPackedVector offset;
+    struct ContactPackedVector point;
+    s32 cell;
+    s32 height;
+    if (body->motion.x != 0) {
+        if (body->motion.x < 0) {
+            offset.x = -32;
+            offset.z = 0;
+        } else {
+            offset.x = 32;
+            offset.z = 0;
+        }
+    } else if (body->motion.z != 0) {
+        if (body->motion.z < 0) {
+            offset.x = 0;
+            offset.z = -32;
+        } else {
+            offset.x = 0;
+            offset.z = 32;
+        }
+    } else
+        return 0;
+    point.x = body->position.x + body->motion.x + offset.x;
+    point.y = body->position.y + body->motion.y;
+    point.z = body->position.z + body->motion.z + offset.z;
+    cell = CellAt((struct ContactPosition *)&point);
+    height = (CellProperties(cell)->heightAndShape & 15) << 8;
+    if (body->position.y < height)
+        return 1;
+    return 0;
+}

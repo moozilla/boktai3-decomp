@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
@@ -49,7 +48,7 @@ static inline u32 NextRandom(void)
     u32 mask = 1023;
     index &= mask;
     *seed = index;
-    return *(const u16 *)(index * 2 + 0x0203B400);
+    return *(const u16 *)(index * 2 + RANDOM_TABLE_ADDR);
 }
 
 static inline void Store16(s16 *dst, s32 value)
@@ -63,7 +62,7 @@ static inline s32 Scale12(s32 value)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 91.8%
+// fuzzy: 84.8%
 void RadialBurstEffect_StartBurst(struct RadialBurst *owner, struct RadialPosition *origin)
 {
     u32 angle = (u8)NextRandom();
@@ -75,35 +74,38 @@ void RadialBurstEffect_StartBurst(struct RadialBurst *owner, struct RadialPositi
     do {
         state->active = 1;
         {
-            register u32 table asm("r3") = 0x0203B400;
+            const void *lookup = (const void *)RANDOM_TABLE_ADDR;
             u32 *seed = &gRandomIndex;
             u16 index = *seed + 1;
             u32 mask = 1023;
+            u32 speed;
             index &= mask;
             {
-                u32 raw = *(const u16 *)(index * 2 + table);
+                u32 raw = *(const u16 *)(index * 2 + (u32)lookup);
                 u32 smallMask = 15;
                 raw &= smallMask;
                 state->angle = raw + angle - 9;
             }
             index = (index + 1) & mask;
             *seed = index;
-            state->speed = (*(const u16 *)(index * 2 + (u32)table) & 15) + 25;
+            {
+                u32 raw = *(const u16 *)(index * 2 + (u32)lookup);
+                u32 smallMask = 15;
+                raw &= smallMask;
+                raw += 25;
+                state->speed = raw;
+            }
+            speed = state->speed;
+            lookup = gUnk_086149C4;
+            Store16(&state->vx, Scale12(speed * ((const s16 *)lookup)[(state->angle + 64) & 255]));
         }
-        Store16(&state->vx, Scale12(state->speed * gUnk_086149C4[(state->angle + 64) & 255]));
+        state->vy = 0;
         {
-            register u32 zero asm("r2") = 0;
-            state->vy = zero;
-        }
-        {
-            register s32 speed asm("r0") = state->speed;
+            s32 speed = state->speed;
             Store16(&state->vz, Scale12(speed * gUnk_086149C4[state->angle]));
         }
         state->update = RadialBurstEffect_UpdateParticle;
-        {
-            register u32 zero asm("r3") = 0;
-            state->timer = zero;
-        }
+        state->timer = 0;
         particle->flags &= ~1;
         SpriteDrawable_SelectTileFrame(drawable, owner->graphics, state->tile);
         state->x = origin->x + state->vx;

@@ -13,7 +13,7 @@ void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void sub_08080BE0(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
@@ -260,7 +260,7 @@ s32 Vorn_Init(void *object)
         actor, Vorn_OnUpdate, Vorn_GetAnimationEvent, Vorn_UpdateIdleFacing, Vorn_ResetStateEntry,
         Vorn_BeginIdle, Vorn_UpdateHiddenRecovery, sub_080AD75C, Vorn_UpdateDefeat,
         SceneActorReaction_OnEnemyDefault, Vorn_UpdateContactResponse, SceneActorTarget_ResolvePendingObject,
-        sub_081363F4, SceneActorPlacement_ResetStateThree);
+        SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718,
                                           Vorn_OnReactionNoOp, SceneActorReaction_ResumeSavedTarget,
                                           Vorn_TryRestorePatrolRoute, 0, 1, body);

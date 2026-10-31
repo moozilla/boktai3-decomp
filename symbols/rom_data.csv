@@ -1,5 +1,10 @@
 start,end,kind,unit,identified,evidence
-0824DAFC,08250674,tables,Code rodata,0,"the C files' .rodata in link order (docs/DATA_TRACKING.md 2.3); located, not decoded"
+0824DAFC,0824E6D4,tables,Code rodata before marker tables,0,"the C files' .rodata in link order (docs/DATA_TRACKING.md 2.3); located, not decoded"
+0824E6D4,0824E6E6,tables,Actor marker fragment frames,18,actor_marker_table: data/actor_marker/fragment_frames.csv
+0824E6E6,0824E6F8,tables,Actor marker fragment animations,18,actor_marker_table: data/actor_marker/fragment_animations.csv
+0824E6F8,0824E818,tables,Code rodata between marker tables,0,"the C files' .rodata in link order; located, not decoded"
+0824E818,0824E8A8,tables,Actor marker fragment offsets,144,actor_marker_table: data/actor_marker/fragment_offsets.csv
+0824E8A8,08250674,tables,Code rodata after marker tables,0,"the C files' .rodata in link order; located, not decoded"
 08250674,082641EC,sound,Voicegroups,65988,"81 voicegroups (tools/m4a.py); keysplit tables and player table not walked"
 082641EC,0857D8D8,sound,Samples and song table,3241985,"415 PCM samples and the 1483-entry song table (tools/studio/sound.py)"
 0857D8D8,08602CA0,sound,Songs,545736,"song headers and 5525 track streams (tools/m4a.py walk)"

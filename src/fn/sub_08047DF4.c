@@ -1,19 +1,11 @@
-// MATCHING_CONCESSION: register-pinning
 #include "directional_particles.h"
+#include "scene_actor_registry.h"
 #include "engine.h"
+#include "heap.h"
+#include "resource_registry.h"
+#include "monster_particle_random.h"
 
-#ifdef NONMATCHING
-// fuzzy: 69.9%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 s32 DirectionalParticle_Update(void *, struct DirectionalParticle *);
-// Lifetime/speed/position behavior recovered; stack and register allocation remain different.
-// The original also materializes an unused 0x0403B714 literal, not reproduced here.
-static inline u32 nextRandom(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
-}
 static inline s32 scaleVelocity(s32 value)
 {
     if (value >= 0)
@@ -24,39 +16,42 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
 {
     struct DirectionalParticle *particle = SpritePool_Allocate();
     struct DirectionalParticleMotion *motion;
-    struct ContactPosition position;
+    union SceneActorRegistryPackedPosition position;
     struct ContactPosition *point;
     s32 speed;
-    u16 randomIndex;
-    typeof(motion) c1;
-    typeof(point) c2;
-    typeof(point) c3;
+    u32 randomOrigin, sampleOrigin;
+    const u16 *earlyTable;
     if (!particle)
         return -1;
     motion = &particle->motion;
-    c1 = motion;
-    c1->lifetime = (nextRandom() & 7) + 10;
-    speed = (nextRandom() & 7) + 24;
-    c1->velocity.x = scaleVelocity(gUnk_086149C4[(direction + 64) & 255] * speed);
-    c1->velocity.y = 0;
-    motion->velocity.z = scaleVelocity(gUnk_086149C4[direction & 255] * speed);
-    point = &position;
-    c3 = point;
-    c2 = c3;
-    asm("" : "+r"(c3));
-    *c2 = *source->position;
-    randomIndex = (gRandomIndex + 1) & 1023;
-    c2->x = (c2->x - 64) + (((const u16 *)0x0203B400)[randomIndex] & 127);
-    randomIndex = (randomIndex + 1) & 1023;
+    /* The origin cancels when sample addresses become offsets in the physical table. */
+    randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
+    earlyTable = (const u16 *)RANDOM_TABLE_ADDR;
+    motion->lifetime = (ParticleRandom_ReadDirectSample(earlyTable) & 7) + 10;
+    speed = (ParticleRandom_ReadDirectSample(earlyTable) & 7) + 24;
     {
-        typeof(((const u16 *)0x0203B400)[randomIndex]) v2 = ((const u16 *)0x0203B400)[randomIndex];
-        c3->y = (c3->y + 16) + (v2 & 31);
+        s32 product = gUnk_086149C4[(direction + 64) & 255] * speed;
+        sampleOrigin = randomOrigin;
+        motion->velocity.x = scaleVelocity(product);
     }
-    randomIndex = (randomIndex + 1) & 1023;
-    gRandomIndex = randomIndex;
+    motion->velocity.y = 0;
+    motion->velocity.z = scaleVelocity(gUnk_086149C4[direction & 255] * speed);
+    point = &position.position;
+    *point = *source->position;
     {
-        typeof(((const u16 *)0x0203B400)[randomIndex]) v1 = ((const u16 *)0x0203B400)[randomIndex];
-        c3->z = (c3->z - 64) + (v1 & 127);
+        u32 sample = ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable);
+        s32 coordinate = (u16)point->x - 64;
+        position.packed.x = coordinate + (sample & 127);
+    }
+    {
+        u32 sample = ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable);
+        s32 coordinate = (u16)point->y + 16;
+        position.packed.y = coordinate + (sample & 31);
+    }
+    {
+        u32 sample = ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable);
+        s32 coordinate = (u16)point->z - 64;
+        position.packed.z = coordinate + (sample & 127);
     }
     particle->visible = 1;
     SpritePool_SetResource(particle, 0x4147);
@@ -66,7 +61,3 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
     SpritePool_Activate(particle, (void *)DirectionalParticle_Update, source);
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", DirectionalParticle_Spawn);
-#endif

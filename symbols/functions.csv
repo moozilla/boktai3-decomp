@@ -470,6 +470,7 @@ addr,name,mode,confidence,source,notes
 080154D0,AnimatedParticle_PriorityFromFlags,thumb,low,src-alias,
 080154EC,AnimatedParticles_Create,thumb,low,src-alias,
 08015984,AnimatedParticles_EmitRing,thumb,low,src-alias,
+08015A0C,AnimatedParticles_EmitRandomBurst,thumb,low,src-alias,
 08015B84,AnimatedParticles_EmitChargeSparkle,thumb,low,src-alias,Wraps AnimatedParticles_Create with fixed yellow/white sparkle parameters; used by Transformation_Charge and related charge-up effects
 08015BD4,AnimatedParticles_EmitDirectional,thumb,low,src-alias,
 08015C30,AnimatedParticles_EmitBurst,thumb,low,src-alias,
@@ -3517,6 +3518,7 @@ addr,name,mode,confidence,source,notes
 080C0750,SceneActorApproach_RunTimedAction,thumb,low,src-alias,
 080C0828,SceneActorApproach_RunAlternateTimedAction,thumb,low,src-alias,
 080C0900,SceneActorApproach_CaptureTargetAndRunAction,thumb,low,src-alias,
+080C09F0,Skeleton_UpdateTargetApproach,thumb,low,src-alias,Tentative: approaches partner cell or steers within configured distance bands
 080C12EC,Skeleton_SetReactionControlTable,thumb,low,src-alias,Installs the table at actor offset 0x28C during initialization; reaction role tentative
 080C12FC,Skeleton_ReactToContact,thumb,low,src-alias,Skeleton_Init installs this callback at +0x268; AD03 registry and GCL name identify Skeleton. ReactToContact is a descriptive reconstruction.
 080C2BE0,SceneActorControl_UpdateProbeApproach,thumb,low,src-alias,
@@ -3847,8 +3849,10 @@ addr,name,mode,confidence,source,notes
 080F2C34,PhaseObject_TickCountdown,thumb,low,src-alias,
 080F2D50,PhaseObject_ApproachTarget,thumb,low,src-alias,
 080F2E6C,PhaseObject_EndApproachPause,thumb,low,src-alias,
+080F2F7C,PhaseObject_UpdateEntryScatter,thumb,low,src-alias,Tentative: fades four entries then chooses a target-relative scatter origin
 080F31AC,PhaseObject_BeginEntryMotion,thumb,low,src-alias,
 080F3230,PhaseObject_ConvergeEntries,thumb,low,src-alias,
+080F3420,ChildGroup_LaunchNextInactiveMember,thumb,low,src-alias,Tentative: launches one inactive member per delay interval; then waits for completion
 080F34C8,ChildGroup_WaitForInactiveMembers,thumb,low,src-alias,
 080F3560,ChildGroup_ShowDamageNumber,thumb,low,src-alias,
 080F360C,Ivy_InitPaletteBuffers,thumb,low,src-alias,Clears sixteen working colors and copies sixteen source colors into the adjacent buffer
@@ -4889,6 +4893,7 @@ addr,name,mode,confidence,source,notes
 0812993C,BlinkingSprite_UpdateExpiry,thumb,low,src-alias,
 081299F8,SunDiscSprite_Update,thumb,low,src-alias,
 08129B04,SunDiscEffect_Update,thumb,low,src-alias,
+08129C64,SunDiscPool_UpdateTravellingDisc,thumb,low,src-alias,
 08129FF0,SunDiscPool_UpdateFallingDisc,thumb,low,src-alias,
 0812A24C,EffectPoolA_AllocateSlot,thumb,low,src-alias,
 0812A2AC,SunDiscPool_AllocSprite,thumb,low,src-alias,Wraps the slot allocator and returns the allocated record's leading sprite field
@@ -4977,12 +4982,14 @@ addr,name,mode,confidence,source,notes
 0812E058,SceneActor_SetPositionXZ,thumb,low,src-alias,
 0812E084,SceneActorReaction_ResetResponseState,thumb,low,src-alias,Clears embedded response state bytes and control words used by actor restoration callers
 0812E094,SceneActorRoute_SelectRandomNextPoint,thumb,low,src-alias,Selects a route point avoiding the two recent indices with four random attempts and an increment-and-wrap fallback.
-0812E118,SceneActorTerrain_CanTraverseCell,thumb,low,src-alias,Tests route-cell flags; slope compatibility; adjacency and height; initializes a position the ROM reads before writing.
+0812E118,SceneActorTerrain_CanTraverseCell,thumb,low,src-alias,Tests route-cell flags, slope compatibility, adjacency and height; preserves slope sampling before the position is filled.
+0812E2BC,SceneActorTerrain_IsBelowForwardFloor,thumb,low,src-alias,Tentative: compares actor height with terrain ahead of the first moving horizontal axis
 0812E3DC,InventorySlot_PickRandom,thumb,low,src-alias,
 0812E46C,ActorParticles_SpawnDirectionalBurst,thumb,low,src-alias,When amount is positive; spawn 2–3 actor particles with direction-based horizontal velocity and randomized velocity spread.
 0812E5A4,ActorParticles_SpawnBurst,thumb,low,src-alias,
 0812E6F0,ActorMode_SelectOddStateVariant,thumb,low,src-alias,
 0812E714,ActorParticles_SpawnWideBurst,thumb,low,src-alias,
+0812E7EC,SceneActorReaction_DispatchPendingCommands,thumb,low,src-alias,Tentative: dispatches receiver movement; behavior; messages and attachment commands
 0812EED4,SceneActorReaction_OnEnemyDefault,thumb,low,src-alias,Shared callback installed by enemy initializers that returns zero; specific callback role is tentative
 0812EED8,SceneActorReaction_BeginTargetRecovery,thumb,low,src-alias,
 0812F12C,SceneActor_UpdateActiveCallbacks,thumb,low,src-alias,
@@ -5009,6 +5016,7 @@ addr,name,mode,confidence,source,notes
 08130BA0,SceneActor_DispatchActivePhase,thumb,low,src-alias,
 08130BD4,SceneActorRoute_UpdateTimedPhase,thumb,low,src-alias,
 08130E60,SceneActorRoute_UpdateWaitPhase,thumb,low,src-alias,
+081314E8,SceneActorRoute_UpdateContactRecovery,thumb,low,src-alias,Tentative: selects contact-recovery route phases and reinstalls the entry controller
 08131820,SceneActorControl_UpdateRouteApproach,thumb,low,src-alias,
 08131BC4,SceneActorBehavior_DispatchOrEnterState2,thumb,low,src-alias,
 08131C48,SceneActorBehavior_DispatchAlternateOrEnterState2,thumb,low,src-alias,
@@ -5026,6 +5034,7 @@ addr,name,mode,confidence,source,notes
 08135D74,SceneActorReaction_TryBeginControl29,thumb,low,src-alias,
 08135F38,SceneActor_ClearReactionFlags,thumb,low,src-alias,
 08135F70,SceneActorReaction_ResolveDamage,thumb,low,src-alias,
+081363F4,SceneActorReaction_ResolvePlacementDamage,thumb,low,src-alias,Tentative: applies pending placement damage; updates HUD and dispatches the resulting state
 081369C8,SceneActorPlacement_ResetStateThree,thumb,low,src-alias,
 08136AF0,SceneActorPlacement_PlayResponseAndResetState,thumb,low,src-alias,
 08136C4C,SceneActorScript_ApplyRouteStartCommand,thumb,low,src-alias,Starts the actor route from three command arguments when its signed active field is positive
@@ -5337,10 +5346,13 @@ addr,name,mode,confidence,source,notes
 0814A884,Player_AccumulateContactCost,thumb,low,src-alias,
 0814AFE4,Player_SetFacingFromAngle,thumb,low,src-alias,Converts an eight-bit angle into a directional animation index and mirror flag
 0814B1E0,Player_OnTargetMotionExit,thumb,low,src-alias,Restores the sprite position and hides the auxiliary sprite when the target interaction motion exits
+0814B1F8,Player_UpdateTargetMotion,thumb,low,src-alias,Tentative: updates target-relative player motion and animation phases
 0814C398,Player_OnGrabMotionExit,thumb,low,src-alias,Hides the auxiliary sprite when the apparent grab interaction motion exits; grab interpretation is tentative
+0814C3A4,Player_UpdateGrabMotion,thumb,low,src-alias,Tentative: updates grab-related player motion and paired animation
 0814CFC0,Player_UpdateStatThreshold,thumb,low,src-alias,
 0814D02C,Player_SelectActionVariant,thumb,low,src-alias,
 0814D104,Player_ComputeActionScale,thumb,low,src-alias,
+0814D264,Player_UpdateAttackColliderMotion,thumb,low,src-alias,Tentative: updates attack collider motion through animation phases
 0814D724,Player_InitializeActionContact,thumb,low,src-alias,
 0814D7F8,Player_SelectActionCue,thumb,low,src-alias,
 0814D8D8,Player_HasWeaponComboEntry,thumb,low,src-alias,Tests whether the current weapon table contains an entry for the selected combo stage; combo interpretation is tentative
@@ -5656,6 +5668,7 @@ addr,name,mode,confidence,source,notes
 0815FFB8,PlayerBurst_Destroy,thumb,low,src-alias,Task destruction callback that removes its animation and sixteen particle effects
 0815FFDC,PlayerTransition_LoadAnimation,thumb,low,src-alias,
 08160060,PlayerTransition_InitCollider,thumb,low,src-alias,
+08160108,PlayerBurst_InitializeParticles,thumb,low,src-alias,Initializes sixteen player burst particle records; burst interpretation tentative
 081602D0,PlayerStatEffect_Initialize,thumb,low,src-alias,
 0816033C,PlayerBurst_Create,thumb,low,src-alias,Creates the player associated animation and particle task; burst interpretation is tentative
 08160380,FrameDisplay_GetCompactFrameIndex,thumb,low,src-alias,
@@ -5675,6 +5688,7 @@ addr,name,mode,confidence,source,notes
 081616D0,PlayerAttackEffect_EmitPaletteTwoTrail,thumb,low,src-alias,Emits the same attack arc patterns using animation bank two
 08161AF4,PlayerAttackEffect_EmitPaletteThreeTrail,thumb,low,src-alias,Emits the same attack arc patterns using animation bank three
 08161F18,PlayerAttackEffect_EmitPaletteFourTrail,thumb,low,src-alias,Emits the same attack arc patterns using animation bank four
+0816233C,PlayerAttackEffect_UpdateParticles,thumb,low,src-alias,Updates player attack-effect particle movement and playback; effect interpretation tentative
 08162598,PlayerAttackEffect_Destroy,thumb,low,src-alias,Task destruction callback that removes sixteen particle sprites and clears the singleton
 081626E0,PlayerAttackEffect_Create,thumb,low,src-alias,Creates or returns the singleton task holding player attack particle animations and sprites
 08162740,PlayerAttackEffect_SetElementMode,thumb,low,src-alias,Selects the emission dispatch mode apparently corresponding to the player's active element; tentative interpretation
@@ -6088,8 +6102,12 @@ addr,name,mode,confidence,source,notes
 081744AC,Presentation_ApplyGraphicSettings,thumb,low,src-alias,
 08174578,Presentation_ApplyPackedGraphicData,thumb,low,src-alias,
 08174594,Presentation_SelectGraphicResource,thumb,low,src-alias,
-081745DC,SceneHud_RefreshEquipmentPreview,thumb,low,src-alias,Refreshes the selected equipment graphic and message-window setup; its 168-byte routine is exact; but the 732-byte inventory extent includes another routine at 08174684.
+081745DC,SceneHud_RefreshEquipmentPreview,thumb,low,src-alias,Refreshes the selected equipment graphic and message-window setup
+08174684,SceneHud_RefreshEquipmentValues,thumb,low,src-alias,Tentative: redraw equipment values and highlight a changed slot-zero value
 081748B8,InventoryGrid_GetSlotPosition,thumb,low,src-alias,
+08174930,SceneHud_RefreshEquipmentAvailability,thumb,low,src-alias,Tentative: refresh equipment icons and level-availability palettes
+08174A44,SceneHud_ConfigureEquipmentTransfer,thumb,low,src-alias,Tentative: configure an equipment icon transfer between grid slots
+08174AD8,SceneHud_GetEquipmentActionFlags,thumb,low,src-alias,Tentative: compute equipped-slot and action-category availability bits
 08174B8C,Presentation_DrawEntryCount,thumb,low,src-alias,
 08174BBC,Presentation_SetAmountGlyphRows,thumb,low,src-alias,Shows and positions three rows of three amount glyphs; then redraws the entry count.
 08174C2C,InventoryGrid_UpdateStatPreview,thumb,low,src-alias,
@@ -6670,6 +6688,7 @@ addr,name,mode,confidence,source,notes
 081937F8,Nidhoggr_UnregisterTerrainCells,thumb,low,src-alias,Removes both terrain registrations when active and clears their active flag
 0819382C,Nidhoggr_SetTerrainCellFlag40,thumb,low,src-alias,Sets flag 0x40 on both terrain registrations with its gameplay meaning still tentative
 0819384C,Nidhoggr_EmitSparks,thumb,low,src-alias,Calls the spark particle emitter with a fixed spread and emission parameters
+08193874,Nidhoggr_ReceivePartContact,thumb,low,src-alias,Tentative: receive part contact and update grouped damage response
 08193D34,Nidhoggr_ApplyPartDamage,thumb,low,src-alias,
 081940F8,Nidhoggr_InitParts,thumb,low,src-alias,Initializes 26 Nidhoggr part animations; paired colliders and target records; then configures collider groups and a time-dependent palette.
 08194480,Nidhoggr_DestroyParts,thumb,low,src-alias,Removes all 26 part animations and colliders and releases their auxiliary records
@@ -10009,6 +10028,7 @@ addr,name,mode,confidence,source,notes
 0823C0A4,LinkPlayer_ResetToIdleState,thumb,low,src-alias,
 0823C368,Player_SelectHistoryDirectionB,thumb,low,src-alias,
 0823C3CC,Player_EnterIdleAnimation,thumb,low,src-alias,Restores state zero and facing before selecting the idle animation; idle interpretation tentative
+0823C4B4,Player_GetLinkedSmoothedDirection,thumb,low,src-alias,Tentative linked-action twin of Player_GetSmoothedDirection
 0823C520,Player_GetMovementAnimationRate,thumb,low,src-alias,Maps a movement timing value to an animation rate centered on 0x40 at twelve
 0823C548,Player_PlayActionCueSound,thumb,low,src-alias,
 0823C930,Player_UpdateTerrainSidestep,thumb,low,src-alias,

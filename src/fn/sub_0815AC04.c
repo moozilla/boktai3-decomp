@@ -10,9 +10,6 @@ s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 Math_Atan2(s32, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 88.1%
-// scope shape 10 (differences once low registers are set aside)
 s32 ScriptActor_TestFacingPointFromScript(void)
 {
     struct ScriptActorPackedPoint point;
@@ -27,6 +24,7 @@ s32 ScriptActor_TestFacingPointFromScript(void)
         point.z = Script_GetValue();
         dx = (s16)point.x - actor->position.x;
         dz = (s16)point.z - actor->position.z;
+        actor = NULL;
         if (dx * dx + dz * dz <= 1400 * 1400) {
             direction = ((player->facing + 5) & 7) * 32;
             angle = Math_Atan2(dx, dz);
@@ -38,6 +36,3 @@ s32 ScriptActor_TestFacingPointFromScript(void)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0815AC04);
-#endif

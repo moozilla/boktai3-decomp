@@ -12,7 +12,7 @@ void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void);
 void AnimData_SelectPaletteBank(void *, s32);
 void SceneActorPlacement_HideActor(void *, s32);
@@ -143,7 +143,7 @@ s32 Mummy_Init(void *object)
         actor, Mummy_OnUpdate, Mummy_GetAnimationStepOffset, Mummy_TurnTowardRoute,
         Mummy_UpdateWalking, Mummy_UpdateIdle, Mummy_UpdateHiddenRecovery,
         Mummy_UpdateDisplacementRecovery, Mummy_UpdateDefeat, SceneActorReaction_OnEnemyDefault,
-        sub_080D7568, SceneActorTarget_ResolvePendingObject, sub_081363F4,
+        sub_080D7568, SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
         group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718, Mummy_UpdateDying, Mummy_ResumeSavedTarget,

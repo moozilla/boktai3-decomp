@@ -40,7 +40,7 @@ progress by exact matches and removed concessions, not by fuzzy scores. Blind sp
 sweeps don't count. When an approach stops paying, change the approach or the tool,
 not just the function.
 
-## Where things stand (2026-10-30)
+## Where things stand (2026-10-31)
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -68,6 +68,39 @@ Recent:
   ROM validation and report regeneration remain with the integrator. See the
   [matching note](../notes/finish-player-cue_2026-10-30.md) and
   [cleanup note](../notes/player-cue-cleanup_2026-10-30.md).
+* **Scene actor part 3 worker** (2026-10-31): thirteen reserved targets match in
+  ordinary C, including the recovered forward-floor neighbor. The damage resolver
+  and fragment launcher remain guarded with narrow compiler proofs. Three nearby
+  exact units lose their hints; shared damage fields/visibility/APIs and editable
+  marker tables with Studio views are verified. Work is checkpointed before the
+  owner's 20% quota floor. Combined ROM/shift validation and report regeneration
+  remain batch-integration work. See the
+  [worker note](../notes/finish-scene-actors-3_2026-10-30.md).
+* **Boss worker continuation** (2026-10-31): ten of the fifteen reserved
+  Ratatosk, Vanargand and Hresvelgr functions match in ordinary C. Five guarded
+  drafts remain; the latest recovery draft also corrects the successful-state
+  byte. Work stopped at the owner's request to preserve the 20% quota reserve.
+  The requested broader pin-removal and struct/data/Studio cleanup remains open.
+  Per-unit checks and separate source commits are on `codex/finish-bosses`;
+  combined validation, alias promotion and progress reports remain with the
+  integrator. See the [boss worker note](../notes/finish-bosses_2026-10-30.md).
+* **Finish-player quota checkpoint** (2026-10-31): nine reserved functions match
+  in ordinary C on `codex/finish-player`; the two remaining guarded drafts are
+  now 99.6% and 96.1% fuzzy with specific reload/vector-copy blockers. Cleanup
+  candidates for pins, shared records, Player callback data and Studio are
+  preserved separately. Stopped at the owner's requested quota buffer; combined
+  ROM validation and progress regeneration remain for integration. See the
+  [finish-player note](../notes/finish-player_2026-10-30.md).
+* **Effects and presentation continuation** (2026-10-31): additional ordinary-C
+  matches cover particle groups, directional and anchored spawning, bounce updates,
+  palette preparation, projectile creation, both fragment updates and scatter clipping.
+  Work is checkpointed at the user's quota floor; resume remaining targets before
+  the register-pin, shared records/data and Studio audit. Ground scatter's improved
+  guarded C has four differing bytes and earns no exact credit. Remaining drafts retain stock
+  assembly fallbacks and documented compiler/source gaps. The branch
+  `codex/finish-effects` has per-unit validation; combined ROM validation and
+  progress reports remain for integration. See the
+  [effects note](../notes/finish-effects_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches

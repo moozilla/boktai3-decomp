@@ -12,7 +12,7 @@ void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void);
 void AnimData_SelectPaletteBank(void *, s32);
 void SceneActorPlacement_HideActor(void *, s32);
@@ -167,7 +167,7 @@ s32 Skeleton_Init(void *object)
         Skeleton_UpdateInactiveState, Skeleton_UpdateIdleState,
         TentacleBody_UpdateReactionTransition, Skeleton_ConvergeDisplacedPosition,
         Skeleton_UpdateDefeat, SceneActorReaction_OnEnemyDefault, sub_0807F81C,
-        SceneActorTarget_ResolvePendingObjectSkeleton, sub_081363F4,
+        SceneActorTarget_ResolvePendingObjectSkeleton, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
         group, (u8 *)arg0 + 0x71C, (u8 *)arg0 + 0x740, Skeleton_UpdateDownedState,

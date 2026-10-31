@@ -2,8 +2,6 @@
 #include "engine_globals.h"
 #include "ram.h"
 
-// confidence=low: steps the four entry weights and, on a timer, re-aims the pulse at the target.
-
 struct ColorPulsePart {
     u32 flags;
     u8 pad4[2];
@@ -14,8 +12,6 @@ struct ColorPulsePart {
     s16 x, y, z;
     u8 pad22[0xA];
 };
-
-// confidence=low: steps the four entry weights and, on a timer, re-aims the pulse at the target.
 
 // confidence=low: steps the four entry weights and, on a timer, re-aims the pulse at the target.
 struct ColorPulseTarget {
@@ -35,7 +31,9 @@ struct ColorPulse {
     u16 counterA;
     u8 pad6E[2];
     u16 counterB;
-    u8 pad72[0x468 - 0x72];
+    u8 pad72[0xA8 - 0x72];
+    struct ColorPulsePart entries[4];
+    u8 pad158[0x468 - 0x158];
     struct ColorPulsePoint saved[4];
     struct ColorPulsePoint goal;
     u8 pad490[0xB6E - 0x490];
@@ -53,23 +51,32 @@ extern s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 void PhaseObject_BeginEntryMotion(struct ColorPulse *);
 
-#ifdef NONMATCHING
-// fuzzy: 63.3%
-// scope shape 74 (differences once low registers are set aside)
+static inline u32 PhaseObject_RandomHeading(void)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    u32 mask = 255;
+    u32 value;
+    gRandomIndex = index;
+    index *= 2;
+    value = *(const u16 *)(index + RANDOM_TABLE_ADDR);
+    return value & mask;
+}
+
 // confidence=low: steps the four entry weights and, on a timer, re-aims the pulse at the target.
-void sub_080F2F7C(struct ColorPulse *p)
+void PhaseObject_UpdateEntryScatter(struct ColorPulse *p)
 {
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        u8 *e = (u8 *)p + i * 0x2c;
+        struct ColorPulse *entry;
         p->posA = -p->posA;
         p->posB = -p->posB;
-        *(s16 *)(e + 0xC4) += p->posA;
-        *(s16 *)(e + 0xC8) -= p->posB;
-        *(s8 *)(e + 0xB0) -= 2;
-        if (*(s8 *)(e + 0xB0) <= 1)
-            *(s8 *)(e + 0xB0) = 1;
+        entry = (void *)((u8 *)p + i * 0x2c);
+        entry->entries[0].x += p->posA;
+        entry->entries[0].z -= p->posB;
+        entry->entries[0].weight -= 2;
+        if (entry->entries[0].weight <= 1)
+            entry->entries[0].weight = 1;
     }
     if (!(p->flagsD80 & 1)) {
         p->counterA++;
@@ -78,33 +85,26 @@ void sub_080F2F7C(struct ColorPulse *p)
         p->posB = p->counterB;
         if ((s16)p->counterA > 15) {
             u32 sel;
-            struct ColorPulsePoint *sv = (struct ColorPulsePoint *)p;
 
-            p->posA = *(s16 *)((u8 *)p + 0xC4) - p->origin.x;
-            p->posB = *(s16 *)((u8 *)p + 0xC8) - p->origin.z;
-            gRandomIndex = (gRandomIndex + 1) & 1023;
-            sel = *(u8 *)&gRandomTable[gRandomIndex];
+            p->posA = p->entries[0].x - p->origin.x;
+            p->posB = p->entries[0].z - p->origin.z;
+            sel = PhaseObject_RandomHeading();
             p->origin.x = p->target->x + Div(gUnk_086149C4[(sel + 64) & 255] * 200, 4096);
             p->origin.y = p->target->y + 350;
             p->origin.z = p->target->z + Div(gUnk_086149C4[sel & 255] * 200, 4096);
             for (i = 0; i < 4; i++) {
-                u8 *e = (u8 *)p + i * 0x2c;
-                s16 v;
+                struct ColorPulse *entry;
 
-                *(u32 *)(e + 0xA8) |= 1;
-                v = p->posA + p->origin.x;
-                sv[0x8d].x = v;
-                *(s16 *)(e + 0xC4) = v;
-                v = p->posB + p->origin.z;
-                sv[0x8d].z = v;
-                *(s16 *)(e + 0xC8) = v;
+                p->entries[i].flags |= 1;
+                entry = (void *)((u8 *)p + i * 0x2c);
+                entry->entries[0].x = p->saved[i].x = p->origin.x + p->posA;
+                entry->entries[0].z = p->saved[i].z = p->origin.z + p->posB;
                 p->goal.x = p->origin.x;
                 p->goal.y = p->origin.y;
                 p->goal.z = p->origin.z;
                 p->posA = -p->posA;
                 p->posB = -p->posB;
-                *(u8 *)(e + 0xAE) = 0x80;
-                sv++;
+                entry->entries[0].mode = 0x80;
             }
             p->phase = 0x80;
             p->delay = 30;
@@ -112,6 +112,3 @@ void sub_080F2F7C(struct ColorPulse *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080F2F7C);
-#endif

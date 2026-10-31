@@ -26,8 +26,7 @@ void Sound_PlaySongChecked(u32);
 
 /* Tentative: launch the nine embedded fragments during an actor break-apart sequence. */
 #ifdef NONMATCHING
-// fuzzy: 87.4%
-// scope shape 8 (differences once low registers are set aside)
+// fuzzy: 90.1%
 void ActorMarker_LaunchFragments(struct ActorMarker *p, u32 fast)
 {
     s32 row = 0;

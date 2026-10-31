@@ -12,3 +12,6 @@ addr,name,size,kind,confidence,source,notes
 08D74DDC,gScriptText,61D7B,text,high,notes.txt,"main script bank (encoding: docs/FINDINGS.md)"
 08DD6B96,gEventBytecode,,bytecode,medium,coverage,"event script bytecode (keyword VM, EUC-JP debug labels like ★★★ゲームスタート画面★★★)"
 08E8755C,gEventBytecodePtrs,,table,medium,"coverage+scan","pointer table into event bytecode (>=240 entries)"
+0824E6D4,gUnk_0824E6D4,12,table,high,src/fn/sub_08180CE0.c,Actor marker fragment frames: two facing groups of nine byte indices; legacy linker label retained
+0824E6E6,gUnk_0824E6E6,12,table,high,src/fn/sub_08180CE0.c,Actor marker fragment animations: two marker-kind groups of nine byte indices; legacy linker label retained
+0824E818,gUnk_0824E818,90,table,high,src/fn/sub_08181514.c,Actor marker fragment offsets: two facing groups of nine four-halfword records; legacy linker label retained

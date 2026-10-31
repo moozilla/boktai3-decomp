@@ -13,7 +13,7 @@ void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void sub_08080BE0(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
-void sub_081363F4(void);
+void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
@@ -234,7 +234,7 @@ s32 Golem_Init(void *object)
         actor, Golem_OnUpdate, Skeleton_LookupAnimationEntry, sub_080C5930, Golem_UpdateIdleState,
         Golem_UpdateIdle, Golem_UpdateRevivalReturn, Golem_ResumeBehaviorAfterDisplacement,
         Golem_UpdateDefeat, SceneActorReaction_OnEnemyDefault, sub_0807F81C,
-        SceneActorTarget_ResolvePendingObject, sub_081363F4, SceneActorPlacement_ResetStateThree);
+        SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
         group, (u8 *)arg0 + 0x638, (u8 *)arg0 + 0x65C, Golem_UpdateDying, Golem_ResumeSavedTarget,
         SceneActorReaction_BeginTargetRecovery, Golem_OnUnusedState, 1, &actor->body);

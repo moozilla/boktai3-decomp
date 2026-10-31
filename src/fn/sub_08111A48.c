@@ -2,11 +2,6 @@
 #include "engine.h"
 #include "ram.h"
 #include "render.h"
-#ifdef NONMATCHING
-// fuzzy: 52.9%
-// fix.py best (sweep after the inlined-insn fix)
-// Open: the color channels: the original re-zero-extends the colors and
-// uses fresh constants for the red channel.
 struct PaletteFade {
     u8 pad0[0x24];
     u16 *targets;
@@ -27,10 +22,8 @@ void sub_08111578(struct PaletteFade *);
    buffer towards palette -g of the fade task over -f frames (default 60; 0 =
    at once), -r (default 8). Per color it keeps the start channels and the
    channel deltas as 8.24 fixed point. */
-inline static u32 Arg1(u32 k_, s32 tg, s32 fg)
-{
-    return (tg - fg) << k_;
-}
+#define PALETTE_FADE_READ_RED(color_, red_, sample_)                                               \
+    ((color_ = (sample_)), (red_ = 31), (red_ &= color_), red_)
 
 void PaletteFade_StartFromScript(void)
 {
@@ -48,39 +41,33 @@ void PaletteFade_StartFromScript(void)
     p = gPaletteFade;
     PaletteFade_SetTransitionParameters(p, slot, target, rate, frames);
     if (frames <= 0) {
-        u16 *from = &gBgPaletteBuffer[p->slot * 16];
-        u16 *to = &p->targets[p->target * 16];
+        s32 sourceBankOffset = p->slot * 32;
+        u16 *sourcePalette = gBgPaletteBuffer;
+        u16 *targetPalette = p->targets;
+        s32 targetBankOffset = p->target * 32;
         s32 i;
         for (i = 0; i <= 15; i++) {
-            u16 t = *to;
-            u16 f = *from;
-            s32 fr;
-            s32 fg;
-            s32 fb;
-            s32 tg;
-            s32 tb;
-            do {
-                fr = f & 0x1F;
-            } while (0);
-            p->deltaR[p->slot][i] = ((t & 0x1F) - fr) << 24;
-            tg = (((u32)(t << 16)) >> 21) & 0x1F;
-            fg = (((u32)(f << 16)) >> 21) & 0x1F;
-            p->deltaG[p->slot][i] = Arg1(24, tg, fg);
-            tb = (((u32)(t << 16)) >> 26) & 0x1F;
-            fb = (((u32)((unsigned short)(f << 16))) >> 26) & 0x1F;
-            p->deltaB[p->slot][i] = (tb - fb) << 24;
-            p->r[p->slot][i] = fr << 24;
-            p->g[p->slot][i] = fg << 24;
-            p->b[p->slot][i] = fb << 24;
-            from++;
-            to++;
+            u32 targetColor, sourceColor;
+            u16 initialRed, initialGreen, initialBlue;
+            u16 targetRed, sourceRed;
+            p->deltaR[p->slot][i] =
+                (PALETTE_FADE_READ_RED(targetColor, targetRed,
+                                       *(u16 *)((u32)targetPalette + i * 2 + targetBankOffset)) -
+                 (initialRed = PALETTE_FADE_READ_RED(
+                      sourceColor, sourceRed,
+                      *(u16 *)((u32)sourcePalette + i * 2 + sourceBankOffset))))
+                << 24;
+            p->deltaG[p->slot][i] = ((((targetColor <<= 16) >> 21) & 31) -
+                                     (initialGreen = ((sourceColor <<= 16) >> 21) & 31))
+                                    << 24;
+            p->deltaB[p->slot][i] =
+                (((targetColor >> 26) & 31) - (initialBlue = (sourceColor >> 26) & 31)) << 24;
+            p->r[p->slot][i] = initialRed << 24;
+            p->g[p->slot][i] = initialGreen << 24;
+            p->b[p->slot][i] = initialBlue << 24;
         }
 
         PaletteFade_AdvanceColors(p);
     } else
         sub_08111578(p);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PaletteFade_StartFromScript);
-#endif
