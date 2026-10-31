@@ -1,10 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "display_sequence.h"
+#include "scene_vec.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Sprite {
     u32 flags;
     u8 visible, unknown5, palette, unknown7;
@@ -12,13 +10,8 @@ struct Sprite {
     u8 padA[6];
     u16 frame;
     u8 pad12[10];
-    struct Vec position;
+    struct SceneVec position;
     u8 pad24[0x24];
-};
-struct Anim {
-    const volatile u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
 };
 struct Disc {
     u32 flags;
@@ -28,13 +21,13 @@ struct Disc {
     u8 padA[6];
     u16 frame;
     u8 pad12[10];
-    struct Vec position;
+    struct SceneVec position;
     u8 pad24[8];
-    struct Anim anim;
+    struct DisplaySequenceState anim;
     u8 pad3C[12];
-    struct Vec projected;
+    struct SceneVec projected;
     u8 pad50[0x34];
-    struct Vec target, velocity;
+    struct SceneVec target, velocity;
     u8 pad94[8];
     u8 collider[0x54];
     u16 falling;
@@ -46,9 +39,6 @@ struct Disc {
 struct DiscPool {
     u8 pad[0x38];
     u32 allocated;
-};
-struct Packed {
-    u32 a, b;
 };
 struct Map {
     u32 unknown;
@@ -65,7 +55,7 @@ extern const s16 gUnk_086149C4[];
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
 
-static inline u16 Height(struct Vec *position)
+static inline u16 Height(struct SceneVec *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8, index, height, slope;
     u8 *cell;
@@ -96,181 +86,136 @@ static inline s32 Scale(s32 value)
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
 
-static inline void Polar(struct Vec *out, s32 angle, s32 radius)
+static inline void Polar(s32 angle, s32 radius, struct SceneVec *out)
 {
     out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     out->y = 0;
     out->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
 
-static inline u8 TestFalling(u16 *flags, u32 mask)
+static inline u8 TestFalling(u32 mask, u16 *flags)
 {
     if (*flags & mask)
         return 1;
     return 0;
 }
 
-static inline void Add(struct Vec *out, struct Vec *a, struct Vec *b)
+static inline void Add(struct SceneVec *out, struct SceneVec *a, struct SceneVec *b)
 {
-    u32 value = (u16)a->x;
-    out->x = value + (u16)b->x;
-    value = (u16)a->y;
-    out->y = value + (u16)b->y;
-    value = (u16)a->z;
-    out->z = value + (u16)b->z;
+    out->x = b->x + a->x;
+    out->y = b->y + a->y;
+    out->z = b->z + a->z;
 }
-static inline void Subtract(struct Vec *out, struct Vec *a, struct Vec *b)
+static inline void Subtract(struct SceneVec *out, struct SceneVec *a, struct SceneVec *b)
 {
     out->x = a->x - b->x;
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 87.0%
-// scope shape 20 (differences once low registers are set aside)
+static inline u16 DisplaySequence_GetIndex(struct DisplaySequenceState *state)
+{
+    return state->index;
+}
+
+static inline u32 DisplaySequence_ReadCommand(const u16 *command)
+{
+    return *command;
+}
+
+static inline u32 DisplaySequence_MaskCommand(u32 command, u32 mask)
+{
+    mask &= command;
+    return mask;
+}
+
+/* Apply the current frame and flips, then advance the stored playback state.
+ * The duration calculation uses the newly selected command's low four bits. */
+static inline void SunDisc_StepAnimation(struct Disc *owner, struct DisplaySequenceState *state,
+                                         struct Sprite *sprite)
+{
+    const u16 *command;
+    {
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    owner->frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
+        else
+            owner->flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
+    }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+            } else {
+                state->index--;
+            }
+        } else {
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+            }
+        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    }
+}
+
 // confidence=low: updates a disc's sprite and position each frame, advancing its animation and falling state
-void sub_08129C64(struct DiscPool *pool, struct Disc *p)
+void SunDiscPool_UpdateTravellingDisc(struct DiscPool *pool, struct Disc *p)
 {
     struct Sprite *sprite = (struct Sprite *)p;
-    struct Anim *anim = &p->anim;
-    struct Vec ahead, delta;
-    register s16 *velocityZ asm("r6");
+    struct DisplaySequenceState *anim = &p->anim;
+    struct SceneVec ahead, delta;
+    s16 *velocityZ;
     u16 height;
     if (p->entered) {
         p->flags &= ~1;
         p->age = 0;
         p->entered = 0;
     }
-    {
-
-        const volatile u16 *command; /* preserve observed packed-command reads */
-        u32 ended, duration, flags, bit;
-        {
-            u32 offset = anim->index << 1;
-            const volatile u16 *table;
-            table = *(const volatile u16 *const *)((u8 *)sprite + 0x2C);
-            command = (const volatile u16 *)((u32)table + offset);
-        }
-        p->frame = *command >> 6;
-        {
-            u32 input = anim->flags;
-            register u32 first asm("r1");
-            u32 maskBit = 1;
-            bit = maskBit;
-            asm("" : "+r"(bit));
-
-            first = bit;
-            first &= input;
-            asm("" : "+r"(first));
-            if (first != (((*command & 0x30) >> 4) & bit))
-                p->flags |= 4;
-            else
-                p->flags &= ~4;
-        }
-        {
-            u32 input = anim->flags;
-            u32 bit;
-            register u32 first asm("r1");
-            bit = 2;
-            asm("" : "+r"(bit));
-
-            first = bit;
-            first &= input;
-            asm("" : "+r"(first));
-
-            first = (u8)first;
-            if (first != (((*command & 0x30) >> 4) & bit))
-                sprite->flags |= 8;
-            else
-                sprite->flags &= ~8;
-        }
-        {
-            u32 elapsed = anim->elapsed + 1;
-            register u32 mask asm("r5");
-            register u32 temp asm("r1");
-            register u32 savedDuration asm("r3");
-            anim->elapsed = elapsed;
-            temp = 0xFFFF;
-
-            asm("" : "+r"(temp));
-            mask = temp;
-
-            duration = anim->duration;
-            elapsed = (u16)elapsed;
-            savedDuration = duration;
-            if (elapsed >= duration) {
-                anim->elapsed = 0;
-                flags = anim->flags;
-                if (flags & 4) {
-                    u32 index = anim->index;
-                    if (index == 0) {
-                        u32 hold = 8;
-                        hold &= flags;
-                        if (hold) {
-                            anim->elapsed = savedDuration;
-                        } else {
-                            anim->index = anim->frameCount - 1;
-                        }
-                        ended = 1;
-                    } else {
-                        anim->index = index - 1;
-                        ended = 0;
-                    }
-                } else {
-                    u32 index = anim->index + 1;
-                    u32 frameCount;
-                    u32 endFlag;
-                    anim->index = index;
-                    frameCount = anim->frameCount;
-                    if ((index & mask) >= frameCount) {
-                        endFlag = 8;
-                        endFlag &= flags;
-
-                        endFlag = (u8)endFlag;
-                        if (endFlag) {
-                            anim->elapsed = duration;
-                            {
-                                u32 lastIndex = frameCount - 1;
-                                anim->index = lastIndex;
-                            }
-                        } else {
-                            anim->index = 0;
-                        }
-                        ended = 1;
-                    } else {
-                        ended = 0;
-                    }
-                }
-                {
-                    u32 offset = anim->index << 1;
-                    const volatile u16 *table;
-                    table = anim->commands;
-                    command = (const volatile u16 *)((u32)table + offset);
-                }
-                anim->frameWeight = *command & 15;
-                {
-                    register s32 weight asm("r1") = anim->frameWeight;
-                    s32 speed;
-                    speed = anim->speed;
-                    speed = (speed * weight) >> 6;
-                    anim->duration = speed;
-                    if (!(u8)speed)
-                        anim->duration = 1;
-                }
-            } else {
-                ended = 0;
-            }
-        }
-    }
+    SunDisc_StepAnimation(p, anim, sprite);
     Add(&sprite->position, &sprite->position, &p->velocity);
-    *(struct Packed *)&p->projected = *(struct Packed *)&p->position;
-    Polar(&ahead, Math_Atan2(p->velocity.x, p->velocity.z), 32);
+    p->projected = p->position;
+    Polar(Math_Atan2(p->velocity.x, p->velocity.z), 32, &ahead);
     velocityZ = &p->velocity.z;
     Add(&ahead, &ahead, &sprite->position);
-    if (!TestFalling(&p->falling, 1)) {
-        struct Vec *previous = &p->projected;
-        Subtract(&delta, &p->target, previous);
+    if (!TestFalling(1, &p->falling)) {
+        struct SceneVec *difference = &delta;
+        struct SceneVec *previous = &p->projected;
+        Subtract(difference, &p->target, previous);
         if (delta.x * delta.x + delta.z * delta.z <= 0xBD0F) {
             p->falling |= 1;
             p->velocity.y -= 4;
@@ -299,10 +244,7 @@ void sub_08129C64(struct DiscPool *pool, struct Disc *p)
         *velocityZ = 0;
         p->state = 3;
         p->entered = 1;
-        *(struct Packed *)&p->projected = *(struct Packed *)&p->position;
+        p->projected = p->position;
         Sound_PlaySong(242);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08129C64);
-#endif

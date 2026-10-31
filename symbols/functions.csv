@@ -4890,6 +4890,7 @@ addr,name,mode,confidence,source,notes
 0812993C,BlinkingSprite_UpdateExpiry,thumb,low,src-alias,
 081299F8,SunDiscSprite_Update,thumb,low,src-alias,
 08129B04,SunDiscEffect_Update,thumb,low,src-alias,
+08129C64,SunDiscPool_UpdateTravellingDisc,thumb,low,src-alias,
 08129FF0,SunDiscPool_UpdateFallingDisc,thumb,low,src-alias,
 0812A24C,EffectPoolA_AllocateSlot,thumb,low,src-alias,
 0812A2AC,SunDiscPool_AllocSprite,thumb,low,src-alias,Wraps the slot allocator and returns the allocated record's leading sprite field
