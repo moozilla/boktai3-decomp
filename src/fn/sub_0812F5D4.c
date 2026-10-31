@@ -47,6 +47,18 @@ static inline void ContactRoute_ApplyDuration(struct SceneActorRegistryResetView
                                    *scale);
 }
 
+static inline u16 ContactRoute_AdvanceRandomCursor(u32 *cursor, u16 wrap)
+{
+    u32 index = (*cursor + 1) & wrap;
+    *cursor = index;
+    return index;
+}
+
+static inline u16 ContactRoute_RandomSampleBits(u16 sample, u16 mask)
+{
+    return sample & mask;
+}
+
 #define CONTACT_ROUTE_READ_RANDOM_SAMPLE(out_, samples_, index_)                                   \
     do {                                                                                           \
         (out_) = (samples_)[index_];                                                               \
@@ -58,35 +70,46 @@ static inline void ContactRoute_ApplyDuration(struct SceneActorRegistryResetView
         u32 *cursor_ = (seed_);                                                                    \
         u32 wrap_mask_ = (wrap_);                                                                  \
         u32 result_mask_ = (bits_);                                                                \
-        u32 index_ = (*cursor_ + 1) & wrap_mask_;                                                  \
-        u32 sample_;                                                                               \
-        *cursor_ = index_;                                                                         \
+        u16 index_ = ContactRoute_AdvanceRandomCursor(cursor_, wrap_mask_);                        \
+        u16 sample_;                                                                               \
+        /* The cursor helper stores the wrapped value. */                                          \
         CONTACT_ROUTE_READ_RANDOM_SAMPLE(sample_, samples_, index_);                               \
-        sample_ &= result_mask_;                                                                   \
+        sample_ = ContactRoute_RandomSampleBits(sample_, result_mask_);                            \
         sample_;                                                                                   \
     })
+
+static inline u8 ContactRoute_HeadingFromSample(u16 sample)
+{
+    return sample << 6;
+}
 
 static inline u32 ContactRoute_RandomDirectionExcept(u32 current, const u16 *randomSamples)
 {
     s32 tries;
     struct SceneActorChaseRandomTable table = {randomSamples};
     for (tries = 0; tries < 4; tries++) {
-        u32 direction = ContactRoute_NextSample(&table, &gRandomIndex, 1023, 3) << 6;
+        u8 direction =
+            ContactRoute_HeadingFromSample(ContactRoute_NextSample(&table, &gRandomIndex, 1023, 3));
         if (direction != current)
             return direction;
     }
     return current;
 }
 
+static inline u8 ContactRoute_CurrentDirection(const struct SceneActorRegistryResetView *actor)
+{
+    return actor->body.direction;
+}
+
 static inline void ContactRoute_BeginProbeTurn(void *object, u32 saved, u16 *motionFlags)
 {
-    struct SceneActorChaseGroup *group;
+    struct SceneActorChaseGroup *group = object;
     struct SceneActorRegistryResetView *actor = object;
-    group = SceneActorChase_GroupOf(object);
+    group = (void *)((u8 *)group + (u32) & ((struct SceneActorRegistryResetView *)0)->group);
     if (!ContactRoute_FieldBits(0x400, motionFlags) &&
         !SceneActorChase_TestField((u16 *)&actor->group.common.gate.flags, 4)) {
         group->turn.direction =
-            ContactRoute_RandomDirectionExcept(actor->body.direction, gRandomTable);
+            ContactRoute_RandomDirectionExcept(ContactRoute_CurrentDirection(actor), gRandomTable);
         SceneActorChase_SaveControl(&group->saved, actor);
         group->turn.savedDirection = saved;
         SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
@@ -112,9 +135,6 @@ static inline void ContactRoute_SetBehavior(struct SceneActorRegistryResetView *
     actor->field2B1 = 1;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 95.4%
-// scope shape 32 (differences once low registers are set aside)
 void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -150,6 +170,3 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
     }
     actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateContactRoute);
-#endif
