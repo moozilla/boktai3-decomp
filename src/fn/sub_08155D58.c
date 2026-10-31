@@ -1,5 +1,4 @@
-#include "global.h"
-#include "script_utility.h"
+#include "player_cue.h"
 #include "scene_vec.h"
 // confidence=low: timed held-action phases, animation and completion script.
 void Player_AddControlFlags(void *, u32);
@@ -13,46 +12,20 @@ void Sound_PlaySong(u32);
 void Sound_StopSong(u32);
 void ConvergingEffects_EmitFarParticle(void *, void *);
 void Hud_ClearTimer(void);
-struct PlayerChargePulse {
-    u8 unknown0[0x20];
-    u32 statusFlags;
-    u8 unknown24[0x324];
-    const u16 *inputKeys;
-    u8 unknown34C[0x56];
-    u8 heading, side, facing;
-    u8 unknown3A5[0x73];
-    u8 actionMode;
-    u8 unknown419[0x3F];
-    u8 phase, unknown459;
-    u16 timer;
-    u8 unknown45C[0x9C];
-    u16 chargeCounter;
-    u8 unknown4FA[3];
-    u8 chargeSoundActive;
-    u8 unknown4FE[0x2A];
-    u16 remainingFrames, elapsed, requiredFrames;
-    u8 unknown52E[0x76];
-    u32 completionScript;
-    u8 unknown5A8[0x154];
-    u16 effectDuration;
-    u8 unknown6FE[0x382];
-    struct SceneVec actionOrigin;
-    u8 unknownA88[0x4E];
-    u16 overlayResource, overlayIntensity;
-};
+
 static inline void AddStatusFlags(u32 *flags, u32 mask)
 {
     *flags |= mask;
 }
-static inline u32 TestStatusFlags(struct PlayerChargePulse *p, u32 mask)
+static inline u32 TestStatusFlags(struct Player *p, u32 mask)
 {
     return p->statusFlags & mask;
 }
 // confidence=low: sibling of timed charge action with reversed hold gating and a pulsing overlay.
-void PlayerCue_UpdateTimedChargePulse(struct PlayerChargePulse *p)
+void PlayerCue_UpdateTimedChargePulse(struct Player *p)
 {
     Player_AddControlFlags(p, 8);
-    switch (p->phase) {
+    switch (p->tetherPhase) {
         case 0:
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0), 64, 1);
             if (p->inputKeys[1] & 1)
@@ -60,7 +33,7 @@ void PlayerCue_UpdateTimedChargePulse(struct PlayerChargePulse *p)
             break;
 
         case 1: {
-            u16 *frame = &p->timer;
+            u16 *frame = &p->tetherFrame;
             if (!(*frame)) {
                 p->facing = 4;
                 p->heading = 1;
@@ -68,7 +41,7 @@ void PlayerCue_UpdateTimedChargePulse(struct PlayerChargePulse *p)
                 Player_SetActionOrigin(p);
                 (*frame)++;
             }
-            p->effectDuration = 15;
+            p->resetValue6FC = 15;
             if (!Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 8), 64, 1))
                 break;
             Sound_PlaySong(0xCB);
@@ -94,15 +67,15 @@ void PlayerCue_UpdateTimedChargePulse(struct PlayerChargePulse *p)
                     Sound_PlaySong(0x239);
             }
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 9), 64, 1);
-            p->effectDuration = 30;
+            p->resetValue6FC = 30;
             ConvergingEffects_EmitFarParticle(p, &p->actionOrigin);
-            p->overlayResource = 0x16F;
-            if ((p->timer) <= 31)
-                p->overlayIntensity = p->timer;
+            p->actionEighteenParameter = 0x16F;
+            if ((p->tetherFrame) <= 31)
+                p->actionEighteenDuration = p->tetherFrame;
             else
-                p->overlayIntensity = 64 - (p->timer);
-            if ((++(p->timer)) > 64)
-                p->timer = 0;
+                p->actionEighteenDuration = 64 - (p->tetherFrame);
+            if ((++(p->tetherFrame)) > 64)
+                p->tetherFrame = 0;
             if (!(p->inputKeys[0] & 1)) {
                 Sound_StopSong(0x239);
                 p->chargeSoundActive = 0;
@@ -117,12 +90,12 @@ void PlayerCue_UpdateTimedChargePulse(struct PlayerChargePulse *p)
                 goto end;
             }
             {
-                if ((p->elapsed += 4) >= p->requiredFrames) {
+                if ((PlayerCue_Timers(p)->elapsed += 4) >= PlayerCue_Timers(p)->required) {
                     u32 *scriptPtr;
                     u32 script;
                     Hud_ClearTimer();
-                    p->phase = 5;
-                    scriptPtr = &p->completionScript;
+                    p->tetherPhase = 5;
+                    scriptPtr = &p->cueParameter;
                     script = *scriptPtr;
                     if (script) {
                         s32 value;
@@ -141,7 +114,7 @@ void PlayerCue_UpdateTimedChargePulse(struct PlayerChargePulse *p)
         case 3:
             AddStatusFlags(&p->statusFlags, 0x80);
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 10), 64, 1);
-            p->effectDuration = 30;
+            p->resetValue6FC = 30;
             if (!(p->inputKeys[0] & 1)) {
             release:
                 ActorSequence_Begin(p, 7, 4);
@@ -157,7 +130,7 @@ void PlayerCue_UpdateTimedChargePulse(struct PlayerChargePulse *p)
             break;
 
         case 4:
-            p->effectDuration = 15;
+            p->resetValue6FC = 15;
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 11), 64, 1)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 7, 0);
@@ -165,29 +138,29 @@ void PlayerCue_UpdateTimedChargePulse(struct PlayerChargePulse *p)
             break;
 
         case 5:
-            p->overlayResource = 0x16F;
-            if ((p->timer) <= 31)
-                p->overlayIntensity = p->timer;
+            p->actionEighteenParameter = 0x16F;
+            if ((p->tetherFrame) <= 31)
+                p->actionEighteenDuration = p->tetherFrame;
             else
-                p->overlayIntensity = 64 - (p->timer);
-            if ((++(p->timer)) > 64)
-                p->timer = 0;
+                p->actionEighteenDuration = 64 - (p->tetherFrame);
+            if ((++(p->tetherFrame)) > 64)
+                p->tetherFrame = 0;
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 9), 64, 1);
-            p->effectDuration = 30;
+            p->resetValue6FC = 30;
             ConvergingEffects_EmitFarParticle(p, &p->actionOrigin);
             break;
     }
 
 end:
-    if ((p->phase) != 5) {
-        if (!(--(p->remainingFrames))) {
+    if ((p->tetherPhase) != 5) {
+        if (!(--(PlayerCue_Timers(p)->remaining))) {
             u32 *scriptPtr;
             u32 script;
             Hud_ClearTimer();
             Sound_StopSong(0x239);
             Player_UpdateFacingSide(p);
             PlayerCue_EnterStandUpdate(p);
-            scriptPtr = &p->completionScript;
+            scriptPtr = &p->cueParameter;
             script = *scriptPtr;
             if (script) {
                 s32 value;
