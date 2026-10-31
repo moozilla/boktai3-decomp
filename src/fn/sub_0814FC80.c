@@ -1,4 +1,4 @@
-#include "global.h"
+#include "player_cue.h"
 #include "scene_vec.h"
 // confidence=low: role inferred from callers and callback phases.
 // confidence=low: approaches the scripted planar destination and returns to the standing update.
@@ -10,35 +10,7 @@ s32 Player_SetAnimation(void *, s32, s32, s32);
 void PlayerCue_EnterStandUpdate(void *);
 void PlayerCue_CompleteAction(void *);
 void Sound_PlaySong(u32);
-struct PlayerScriptDestination {
-    u8 unknown0[0x30];
-    struct SceneVec position;
-    s16 velocityX;
-    u16 unknown3A;
-    s16 velocityZ;
-    u8 unknown3E[0x5A];
-    u16 actionCueCounter;
-    u8 unknown9A[6];
-    u16 actionCueFlags;
-    u8 unknownA2[0x1E];
-    u8 movementSpeedScale;
-    u8 unknownC1[0x1CE];
-    u8 velocityScaleAxis;
-    u8 unknown290[0x112];
-    u8 heading, side, facing;
-    u8 unknown3A5[0x73];
-    u8 actionMode;
-    u8 unknown419[0x2F];
-    u32 actionFlags;
-    u8 unknown44C[0x28];
-    u16 tetherStatusFlags;
-    u8 unknown476[0xBE];
-    u16 sceneMode, unknown536, active;
-    u8 unknown53A[0x56];
-    struct SceneVec scriptDestination;
-    u8 unknown598[5];
-    s8 targetFacing;
-};
+
 static inline s32 scale12(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
@@ -51,7 +23,7 @@ static inline u32 flags(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-static inline u8 slowed(struct PlayerScriptDestination *p)
+static inline u8 slowed(struct Player *p)
 {
     s32 active = p->active;
     s32 result = 0;
@@ -61,26 +33,26 @@ static inline u8 slowed(struct PlayerScriptDestination *p)
 }
 union PlayerCueReference {
     void *actor;
-    struct PlayerScriptDestination *player;
+    struct Player *player;
 };
-static inline struct PlayerScriptDestination *PlayerCue_ResolveReference(void *actor)
+static inline struct Player *PlayerCue_ResolveReference(void *actor)
 {
     union PlayerCueReference reference;
     reference.actor = actor;
     return reference.player;
 }
-void Player_AdvanceScriptDestination(struct PlayerScriptDestination *p)
+void Player_AdvanceScriptDestination(struct Player *p)
 {
-    s32 dx = (p->scriptDestination.x) - (p->position.x);
-    s32 dz = (p->scriptDestination.z) - (p->position.z);
+    s32 dx = (PlayerCue_Motion(p)->destination.x) - (p->position.x);
+    s32 dz = (PlayerCue_Motion(p)->destination.z) - (p->position.z);
     s32 angle = Math_Atan2(dx, dz);
     s32 speed = 12;
     Player_GetMovementRateScale(12);
     if (p && slowed(p))
         speed = (speed * p->movementSpeedScale) >> 6;
     if (((dx * dx) + (dz * dz)) <= (speed * speed)) {
-        p->position.x = p->scriptDestination.x;
-        p->position.z = p->scriptDestination.z;
+        p->position.x = PlayerCue_Motion(p)->destination.x;
+        p->position.z = PlayerCue_Motion(p)->destination.z;
         if ((p->targetFacing) >= 0) {
             p->facing = p->targetFacing;
             p->targetFacing = -1;
