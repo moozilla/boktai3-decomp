@@ -34,17 +34,30 @@ struct EffectManager *FloatingEffectManager_GetOrCreate(void);
 void FloatingEffect_Init(struct Effect *);
 u32 Selection_GetDisplayFrame(u32);
 void Anim_LoadKeyframe(void *, void *, u16, u32);
-static inline int FloatingEffect_Scale3(int v)
+static inline int FloatingEffect_ScaleProjection(int v)
 {
-    v *= 3;
-    return v >= 0 ? v >> 5 : -((-v) >> 5);
+    if (v >= 0)
+        v = v >> 5;
+    else
+        v = -((-v) >> 5);
+    return v;
 }
-#ifdef NONMATCHING
-// fuzzy: 59.1%
-// scope shape 14 (differences once low registers are set aside)
-// scope shape 64 (differences once low registers are set aside)
-s32 FloatingItemEffect_Spawn(int kind, int item, int mode, int index, struct Vec *position, struct Vec *target,
-                 int duration, u32 id)
+static inline void FloatingEffect_ProjectPosition(struct Vec *s, struct Vec *position)
+{
+    int x, z, depth, height;
+    x = position->x;
+    z = position->z;
+    s->x = FloatingEffect_ScaleProjection((x - z) * 3);
+    depth = FloatingEffect_ScaleProjection((x + z) * 3);
+    height = FloatingEffect_ScaleProjection(position->y * 3);
+    s->y = depth - height;
+    s->z = depth + height;
+    s->x = s->x - (*(struct Vec *)gCameraOrigin).x + 120;
+    s->y = s->y - (*(struct Vec *)gCameraOrigin).y + 80;
+    s->z = s->z - (*(struct Vec *)gCameraOrigin).z;
+}
+s32 FloatingItemEffect_Spawn(int kind, int item, int mode, int index, struct Vec *position,
+                             struct Vec *target, int duration, u32 id)
 {
     struct EffectManager *m = FloatingEffectManager_GetOrCreate();
     u32 key = (id & 0xFFFFFF) | (kind << 28);
@@ -53,8 +66,6 @@ s32 FloatingItemEffect_Spawn(int kind, int item, int mode, int index, struct Vec
     s32 i;
     u32 frame;
     int idx;
-    struct Vec *s;
-    int depth, height;
     i = 0;
     do {
         if (!(m->active & (1 << i))) {
@@ -128,21 +139,10 @@ s32 FloatingItemEffect_Spawn(int kind, int item, int mode, int index, struct Vec
     e->sprite.flags &= ~1;
     e->position = *position;
     e->target = target;
-    s = &e->sprite.position;
-    s->x = FloatingEffect_Scale3(position->x - position->z);
-    depth = FloatingEffect_Scale3(position->x + position->z);
-    height = FloatingEffect_Scale3(position->y);
-    s->y = depth - height;
-    s->z = depth + height;
-    s->x = s->x - (*(struct Vec *)gCameraOrigin).x + 120;
-    s->y = s->y - (*(struct Vec *)gCameraOrigin).y + 80;
-    s->z = s->z - (*(struct Vec *)gCameraOrigin).z;
-    s->x -= 8;
+    FloatingEffect_ProjectPosition(&e->sprite.position, position);
+    e->sprite.position.x -= 8;
     e->sprite.position.y -= 8;
     if (slot >= 0)
         m->active |= 1 << slot;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", FloatingItemEffect_Spawn);
-#endif
