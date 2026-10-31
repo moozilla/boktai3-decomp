@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "engine.h"
+#include "monster_particle_random.h"
 
 struct VanargandPart {
     u8 unk_00[0x90];
@@ -27,16 +28,7 @@ static inline void Add(struct SceneVec *out, struct SceneVec *base, struct Scene
     out->y = offset->y + base->y;
     out->z = offset->z + base->z;
 }
-static inline s32 RandomValue(const u16 *table)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
 
-#ifdef NONMATCHING
-// fuzzy: 98.9%
 void Vanargand_SpawnPartEmergenceEffects(void *arg0)
 {
     struct VanargandPart *part = arg0;
@@ -45,7 +37,10 @@ void Vanargand_SpawnPartEmergenceEffects(void *arg0)
     s32 i;
     for (i = 0; i < 4; i++) {
         s32 angle;
-        s32 offset, value;
+        s32 offset, radius;
+        const u16 *table;
+        u32 *index;
+        s32 sample, sampleRadius, shifted;
         if (part->variant == 0)
             angle = (i << 3) + 48;
         else
@@ -53,19 +48,16 @@ void Vanargand_SpawnPartEmergenceEffects(void *arg0)
         Vector(&position, angle, 640);
         Add(&position, part->basePosition, &position);
         position.y += 256;
-        value = (s32)gRandomTable;
-        {
-            s32 sample = RandomValue((const u16 *)value) >> 3;
-            offset = sample - sample / 32 * 32;
-        }
-        {
-            s32 remainder = (RandomValue((const u16 *)value) >> 3) % 8;
-            value = remainder;
-        }
-        Vector(&velocity, angle + offset, value + 12);
+        table = gRandomTable;
+        index = &gRandomIndex;
+        *index = (*index + 1) & 1023;
+        PARTICLE_RANDOM_READ_SAMPLE(sample, table, *index);
+        shifted = sample >> 3;
+        offset = shifted - shifted / 32 * 32;
+        *index = (*index + 1) & 1023;
+        PARTICLE_RANDOM_READ_SAMPLE(sampleRadius, table, *index);
+        radius = (sampleRadius >> 3) % 8;
+        Vector(&velocity, angle + offset, radius + 12);
         VanargandEffect_Create(0, 0, &position, &velocity, 1 - part->variant);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_SpawnPartEmergenceEffects);
-#endif
