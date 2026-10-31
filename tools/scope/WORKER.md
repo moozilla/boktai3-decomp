@@ -179,6 +179,11 @@ the same function wait for each other (`waiting: another scope command ...`).
   index, `AGBCC_GIV=UID` steps it); a hit names the C line. `AGBCC_LOOP_TRACE=1` lists them.
 * **Expression shape with no `why` answer:** run `probe` before trying C forms; a
   matching `CSE_NOFOLLOW` or `AGBCC_NOPRE` says which cse/gcse decision it is.
+* **Spilled pointer reloaded from the stack:** when the draft has `ldr rN, [sp, #K]`
+  (born `greg/reload`) where the ROM recomputes `mov rN, sp` / `add rN, sp, #K`,
+  `why UID` names the spilled pseudo, follows its REG_EQUAL/REG_EQUIV notes through
+  the passes and says which pass dropped them. Reload recomputes a spilled pseudo
+  only when it still has a REG_EQUIV to the frame address at local-alloc.
 * **Reload rotation:** `why UID` on the differing register says which
   register the ROM's previous reload choice must have taken (and the
   `AGBCC_SPILL=K:D` that confirms it), or why no rotation gives the ROM's
