@@ -58,11 +58,13 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
-* **Finish-player worker batch prepared** (2026-10-30): seven reserved
-  functions match in ordinary C on `codex/finish-player`; four improved guarded
-  drafts retain documented compiler blockers after a second pass. All reviewed
-  unit checks pass. Combined ROM validation and report regeneration remain for
-  the integrator. See the [finish-player note](../notes/finish-player_2026-10-30.md).
+* **Finish-player quota checkpoint** (2026-10-31): nine reserved functions match
+  in ordinary C on `codex/finish-player`; the two remaining guarded drafts are
+  now 99.6% and 96.1% fuzzy with specific reload/vector-copy blockers. Cleanup
+  candidates for pins, shared records, Player callback data and Studio are
+  preserved separately. Stopped at the owner's requested quota buffer; combined
+  ROM validation and progress regeneration remain for integration. See the
+  [finish-player note](../notes/finish-player_2026-10-30.md).
 * **Round 7 recovery and continued matching** (2026-10-30): the interrupted
   run's four integrated matches and an unmerged Skeleton worker match were
   recovered. Ten further functions are exact; cumulative bundles and patches

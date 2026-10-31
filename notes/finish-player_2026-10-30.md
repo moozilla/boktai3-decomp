@@ -1,167 +1,190 @@
 # Finish-player worker batch
 
-Tags: #matching #player #compiler #structs
+Tags: #matching #player #compiler #structs #cleanup #data #studio
 
-Seven of the eleven assigned functions now match in ordinary C on
-`codex/finish-player`. This converts 54.188% of the reserved code from guarded
-drafts to exact C (+54.188 percentage points within this queue), adding
-0.331724 project code percentage points against the starting report's
-2,410,438-byte denominator. The exact contribution is 7,996 bytes. Four improved
-drafts remain guarded and receive no exact credit.
+## Checkpoint at the requested quota stop
 
-All eleven normal-build units pass fresh stock per-unit checks over their
-explicit reviewed extents. The seven C matches have no register pins, barriers,
-handwritten instructions or compiler overrides. The other four still select
-their original assembly fallback in normal builds. Each function has its own
-source commit, in ROM order; naming metadata and this handoff are separate.
+Nine of eleven assigned functions match in ordinary C on `codex/finish-player`:
+65.519% of this queue, a gain of 65.519 percentage points within the queue and
+0.401089 project code percentage points (9,668 exact bytes). The continuation
+added two matches and 0.069365 project percentage points (1,672 bytes).
+The two remaining C drafts are preserved in Git under `NONMATCHING`; they do
+not receive exact credit. Work stopped at the owner's request to retain at
+least 20% weekly quota; the final wrap checks reported 22% remaining.
+
+All nine exact functions have stock per-unit evidence and no register pins,
+barriers, instruction bodies or compiler overrides. Both new guarded drafts
+were formatted, scored with explicit reviewed extents and independently checked
+in normal fallback mode. A combined ROM build and progress regeneration remain
+for integration; this worker did not merge, push, regroup or open a PR.
 
 ## Results in ROM order
 
 | Address | Bytes | Result | Deciding source property |
 |---|---:|---|---|
-| 08143B54 | 892 | Exact: `Player_ConstrainTetherTarget` | X-before-Z scaling, a named scale result, an initial position view, and a saved unsigned X copy after both cell coordinates preserve the required value lifetimes without pins or a barrier. |
-| 08143ED0 | 1,068 | Exact: `Player_UpdateTetherMovement` | The combined nullable movement predicate and a by-value one-pointer player reference together preserve the null branch and flag-load value boundary. Either change alone fails. |
-| 08148318 | 752 | Exact: `Player_UpdateWaveringMovement` | Shared ordinary playback operations replace pins/barriers. Capturing the random-table origin after the first sample and separating facing capture from masking restores the evaluation order. |
-| 0814B1F8 | 4,176 | Guarded: `Player_UpdateTargetMotion`, 82.4% fuzzy | Typed player/target records, whole-vector transfers, corrected animation mask, and branch-local polar calculations recover much of the function. PRE-generated output-pointer and sine-alias lifetimes remain different. |
-| 0814C3A4 | 2,952 | Exact: `Player_UpdateGrabMotion` | An unsigned 16-bit bitfield mask delays constant folding until combine; an unsigned-byte folded-facing value avoids the extra wide constant reload. Separate branch-local hit results prevent incorrect tail sharing. |
-| 0814D264 | 1,216 | Guarded: `Player_UpdateAttackColliderMotion`, 92.7% fuzzy | Ordinary contact/flag operations recover control flow and most allocations. A PRE-generated trig-table pseudo still receives the wrong register; a diagnostic priority increase proves the remaining allocation decision. |
-| 08160108 | 456 | Guarded: `PlayerBurst_InitializeParticles`, 73.1% fuzzy | Correct 60-byte records, recovered field offsets and an ordinary advancing sixteen-particle loop repair the draft. CSE still shares the initial and loop masks across the resource call. |
-| 0816233C | 604 | Exact: `PlayerAttackEffect_UpdateParticles` | Shared playback value boundaries, per-branch stored/reloaded angle, by-value sprite reference and frame-add operand order reproduce the ROM without the inherited volatile helper. |
-| 082003BC | 1,620 | Exact: `PlayerClone_UpdateBehavior` | Typed clone records, delayed player-position capture, signed halfword flags and palette bitfields restore loads/stores. Reusing the height-field pointer to derive the blink drawable supplies the final required lifetime. |
-| 08200C94 | 912 | Guarded: `PlayerClone_UpdatePool`, 77.4% fuzzy | Constructing the velocity address after reading movement flags restores ordering. Loop induction still chooses different address families; an optional collider also loses its preferred register. |
-| 0823C4B4 | 108 | Exact: `Player_GetLinkedSmoothedDirection` | The byte-identical matched twin at 08141BAC supplies the ordinary C form: a separate wide sample and explicit second history read into a signed halfword result. |
+| 08143B54 | 892 | Exact: `Player_ConstrainTetherTarget` | X-before-Z scaling, named scale result, initial position view and saved unsigned X copy after both cell coordinates. |
+| 08143ED0 | 1,068 | Exact: `Player_UpdateTetherMovement` | Combined nullable movement predicate plus a by-value one-pointer player reference preserve the null branch and flag-load boundary. |
+| 08148318 | 752 | Exact: `Player_UpdateWaveringMovement` | Ordinary shared playback replaces pins/barriers; RNG origin capture and separate facing/mask operations restore ordering. |
+| 0814B1F8 | 4,176 | Guarded: `Player_UpdateTargetMotion`, 99.6% fuzzy | Nine register instructions differ, ten bytes; shape zero and exact extent. See the remaining reload below. |
+| 0814C3A4 | 2,952 | Exact: `Player_UpdateGrabMotion` | Halfword bitfield mask, byte folded-facing value, typed fields and branch-local hit results. |
+| 0814D264 | 1,216 | Exact: `Player_UpdateAttackColliderMotion` | One shared radial-radius variable across both branches, then commute the final arc Z product. Its dying operand changes the radius/table preferences without hints. |
+| 08160108 | 456 | Exact: `PlayerBurst_InitializeParticles` | Correct 60-byte particle records, separate trig captures, raw halfword sample before masking, and a real ten-bit RNG cursor type. |
+| 0816233C | 604 | Exact: `PlayerAttackEffect_UpdateParticles` | Shared playback boundaries, branch-local stored/reloaded angle, by-value sprite reference and frame-add operand order. |
+| 082003BC | 1,620 | Exact: `PlayerClone_UpdateBehavior` | Typed records, signed halfword flags, palette bitfields and reuse of the height-field pointer to derive the blink drawable. |
+| 08200C94 | 912 | Guarded: `PlayerClone_UpdatePool`, 96.1% fuzzy | Scope has 15/15 differences, shape four, exact extent; one missing vector-pointer copy causes the attack reload cascade. |
+| 0823C4B4 | 108 | Exact: `Player_GetLinkedSmoothedDirection` | Matched twin's ordinary form: wide sample plus explicit second history read into a signed halfword result. |
 
-The target-motion, grab, attack-collider, burst/effect and linked-action names
-remain tentative. Their low-confidence entries are recorded in
-`symbols/functions.csv`. Source address aliases are retained so this worker's
-inherited generated assembly and external address references remain compatible;
-`tools/split.py` supports these aliases when the integrator regenerates symbols.
-No shared declarations were changed.
+Names with uncertain gameplay interpretations remain low confidence in
+`symbols/functions.csv`. Existing raw-address aliases are retained for this
+worktree's generated assembly. No project-wide declaration change was made.
 
-## Open matching work
+## New exact matches
 
-### 0814B1F8: output pointer and captured sine table
+`0814D264` is commit `45f04f21e`. The earlier table-priority blocker was solved
+by sharing one radius variable and changing only the dying operand's order in
+the final multiply. The final source expands the geometry directly and has no
+register concession. Stock verification covers all 1,216 bytes.
 
-The selected draft is 4,200 bytes against 4,176 target bytes, with 271 ROM / 281
-draft differing instructions and shape 210. It improves the starting 38.7%
-draft to 82.4%. Besides the recovered records, real corrections include the
-secondary-animation mask (`~1`), whole-vector transfers, signed counter reads
-observed through unsigned-halfword views, and splitting the angle adjustment
-before multiplication. Separate polar calls retain distinct branch value
-boundaries. The target getter's flag test is retained even though its two
-branches currently return the same address.
+`08160108` is commit `218da4993`. The ten-bit cursor expresses the RNG ring's
+wraparound and changes the implicit mask's lifetime, resolving both the
+particle/table allocation and the initial reload sequence. Trig-capture tail
+resets keep loop.c from hoisting those captures; flow deletes the resets.
+The stock 456-byte match uses no compiler knobs or register declarations.
 
-In the separate `polar-relative.c` diagnostic candidate, output-address pseudo
-2203 grows from flow lifetime 87 to allocation lifetime 696 (eightfold) under
-PRE and has priority 114 versus the captured sine table's 555. A diagnostic
-priority increase of 442 restores the low output register, but then the sine
-table receives r8 instead of the ROM's r9. These numeric pseudos and lifetime
-figures belong to that diagnostic candidate, not the selected `best.c` draft.
-Diagnostic role bindings align the polar arithmetic without solving the whole
-function. The original low table value must survive a later-removed use while a
-captured alias feeds the Z calculation.
+## Remaining target motion: 0814B1F8
 
-Tried pointer/result boundaries, full versus planar vector transfers, store
-scopes and table capture after the X product. The second pass checked narrow
-halfword X/zero values and delayed-mask folding: the narrow version is
-byte-identical, and the required delayed mask already survives until combine.
-Shared/typed mask variants regress. No single diagnostic knob establishes a
-whole-function match; PRE lifetime/source-sharing remains open.
+The improved guarded draft is commit `91bffdc26`. Stock `check.py --nonmatching
+--target-size 4176 --record` reports 99.6%, ten differing bytes and nine
+realigned register instructions, zero register-blind differences. Its normal
+assembly fallback passes the same explicit extent. Root checks are
+`build/check/run-8mjc9bes` and `build/check/run-hj3bqw44` respectively.
 
-### 0814D264: one proven table allocation decision
+Recovered source boundaries include actual stack aggregate ownership, four
+BLK particle views, a plain final position owner, direct polar-table reads,
+separate branch animation owners, and the actual narrow primary callee types.
+The phase-two result alias and copy were unnecessary; writing the existing
+vector directly restores PRE's table/output capture order.
 
-The selected 1,216-byte draft has 40 ROM / 40 draft differing instructions,
-shape 20 and no moved branches. Removing two ineffective barriers, simplifying
-the contact helper, preserving the heading capture and using an else-local
-whole angle sum recover the surrounding register choices. A signed previous
-animation value restores shared tails.
+The remaining nine rows are one phase-five reload rotation. A diagnostic
+`AGBCC_SPILL=137:1` gives a whole match. More decisively, evicting native flags
+pseudo 1930 before reload introduces an output reload in a phase-four negative
+flag-update block that jump2 later deletes. That hidden reload fixes every
+phase-five register row; its extra spill slot only changes the frame from
+0x2C to 0x30. Thus the source problem is a flags/control value boundary that
+needs the existing dead position slot, not nine independent register choices.
+A typed control aggregate or read-control macro is the next bounded hypothesis;
+that last macro hypothesis was not executed at the stop.
 
-Trig-table pseudo 723 has four sets and ten references; PRE expands lifetime
-113 to 1,808 (sixteenfold), leaving priority 165 and stock allocation r8 rather
-than r3. `AGBCC_PRI=723:+907` is the minimum tested diagnostic increase that
-produces MATCH (table priority 1,072 just exceeds radius priority 1,071);
-`+906` does not. No override is used in the committed source.
+Disabling reload inheritance across the whole function on an isolated compiler
+has no effect. The private compiler's identity and positive hook execution
+were verified. Do not repeat the inheritance search. Reports and exact source
+hashes live in `build/scope/campaign/sub_0814B1F8/round4/CURRENT.md` and
+`round5-helper/REPORT.md`; private diagnostic artifacts remain ignored.
 
-Per-case/per-geometry table captures, sine/cosine readers, scalar/aggregate
-polar operations, a scale macro, later table capture and a centered pointer did
-not reproduce it in stock C. A second-pass first-radial-value form reaches
-shape zero but leaves 82/82 register differences, so the better selected draft
-is preserved. The needed source expression must change the table's PRE
-lifetime or priority without disturbing the recovered surrounding roles.
+## Remaining clone pool: 08200C94
 
-### 08160108: constant reuse across initialization and the loop
+The improved guarded draft is commit `1a1ee07ba`. Stock explicit-extent scoring
+is 96.1%, 146 differing bytes; anchordiff reports 18 differing instructions,
+five register-blind. Scope's alignment metric is 15/15, shape four, 912 bytes.
+These metrics differ because moved code/padding changes encoded branch and
+call offsets. Neither metric is an exact match. Root stock evidence is
+`build/check/run-6z5nzrcb`; its normal fallback passes in
+`build/check/run-b7e1_hvl`.
 
-The selected draft compiles to 444 bytes against 456 target bytes, with 59 ROM /
-53 draft differing instructions and shape 22. The former record omitted eight
-bytes between position and activity, giving a 52-byte stride instead of 60.
-The former loop also failed to advance its index: its increment expression
-only evaluated `t1`, while the preceding `t1 = i++` read uninitialized `i`.
-The `typeof(i++)` declaration itself did not evaluate the increment. Both bugs
-are corrected; the committed draft advances all sixteen records using named
-fields.
+The source now recovers the actual indirect callback call: `08249240` is a
+`bx r2` thunk, not a semantic three-argument API. An eight-byte operation view
+contains the typed callback and two halfword parameters observed in
+`PlayerClone_InitConfig`; by-value extraction narrows to the single required
+load and prevents the incorrect callback/late-attack address family. The
+fabricated third callback argument and attack-offset workaround are gone.
 
-CSE reuses initial mask 1023 (pseudo 30) for the loop-mask setter at UID 76,
-extending it across the resource call. The ROM uses a short initial r1 value
-and a separate loop r4 mask; the draft consequently assigns cursor/table/mask
-roles differently. The use list and instruction trace show this substitution;
-the available CSE keep/canonicalization knobs do not isolate it.
+Other recovered structure:
 
-On revisit, deriving ring capacity through a two-pointer helper after capturing
-the next cursor delays cancellation until combine and separates the initial
-and loop masks correctly. That alternative still gives 67/65 differences,
-shape 38, with worse particle/table/index allocation. Its table lifetime grows
-from 158 to 316 (priority 1,234 versus particle 4,387). Retain the selected draft;
-there is no whole-function diagnostic proof for this blocker. A targeted
-constant-substitution control would make the next experiment more decisive.
+* A real area-work record saves the collider after the callback and the facing
+  pointer after the movement-mask read. Both snapshots now occupy the target
+  stack slots.
+* The facing address is computed after the callback-release test, before
+  `SetFacing`, in the same basic block as its snapshot. `last_use_this_basic_block`
+  therefore permits its independent slot-derived walk. Indexed facing is
+  rejected: its increment occurs before i++, contrary to the ROM.
+* An unconditional animation owner, explicit palette setter helpers and the
+  later metadata capture produce exactly the required state/facing/animation/
+  body-timer initializer and increment order.
+* One reused collider pointer gives the desired collider/angle/radius roles.
+  A by-value collider-header flag test with a signed halfword mask restores
+  the body-timer-relative load and mask-copy order without the old address PRE.
+* An actual pair of projection vectors plus an early cached position reference
+  gives every target stack slot. A late explicit delta reference puts its
+  address capture before the facing load.
+* A signed-byte direction getter preserves the actual field type, lengths and
+  main register roles while retaining the word-sized facing mask.
 
-### 08200C94: loop address families and a local collider allocation
+Only the first X read in the final vector sum lacks the target's extra pointer
+copy (`adds r1,r2,#0`). The draft instead uses a reload r5; that one extra reload
+rotates the following attack block. Diagnostic `AGBCC_SPILL=36:4` fixes that
+entire attack block, leaving only the vector-copy difference and padding.
+The next source question is an actual by-value vector/component reader or
+reference boundary, not more attack-field changes. The final 83-decision
+canonical/PRE/GIV/hoist probe changes no count; it does not cover arbitrary
+source types or all reload decisions.
 
-The selected draft has the correct 912-byte extent, 98/98 differing
-instructions, shape 76 and three moved branches, versus the starting 104/102,
-shape 84 and 908 bytes. It improves fuzzy agreement from 70.1% to 77.4%.
+Temporary local views and the mode-preserving member-offset helper remain in
+this guarded draft. Shared-header unification is still phase-four work.
+`build/scope/campaign/PlayerClone_UpdatePool/round4/REPORT.md` and
+`round6-fresh/REPORT.md` retain the source frontiers and rejected mechanisms.
 
-Loop induction reduces the player-attack address (+0x128) and reuses it for the
-callback (+0x1A4), while the ROM recomputes the attack address later and reads
-the callback from the parameters base. The ROM also steps the facing field
-independently. `AGBCC_NOGIV=840` removes that particular reduction but cascades
-into 146/146 differences; adding `AGBCC_GIV=39` yields 141/147. These establish
-individual address decisions, not an exact solution. The area collider's
-pseudo 273 has priority 2,033 versus angle pseudo 280's 5,217;
-`AGBCC_PRI=273:+3185` corrects that allocation but leaves 91/91 differences.
+## Cleanup prepared, not applied
 
-Manual field walks, indexed slots, scoped collider/animation/state aliases,
-angle widths, typed flag/read helpers, ordered vectors and by-value slot
-references were tested. A compound vector addition restores the ROM's
-velocity-first loads but worsens allocation. A second pass sharing the facing
-pointer for both the early write and later read leaves 98/98 and worsens shape
-to 80. Neither is selected. The next useful tool support would explain or
-control GIV representative-family combination, including candidate bases and
-their benefit/lifetime arithmetic. This is not a stack-slot permutation or a
-single proven whole-function allocation blocker.
+The requested cleanup was prepared in parallel and deliberately remains
+separate from the two unfinished matches. No pin-removal or data/Studio patch
+has been applied to tracked sources yet.
 
-## Evidence and integration
+`build/scope/campaign/finish-player-cleanup/depin-fresh/REPORT.md` and
+`verified-candidates.json` preserve stock-exact candidates and patches:
 
-Final unit logs are under `build/finish-player-validation/ADDR.log`. Searches
-and compiler traces are in the ignored, local
-`build/scope/campaign/FUNCTION/` and `build/matchsearch/FUNCTION/` directories;
-the four blocker descriptions above preserve the important findings in Git.
-Every guarded fuzzy score was recorded with `tools/check.py --nonmatching
---record`. Default-build validation uses the assembly fallback for those four;
-it does not establish an exact C match.
+* Five freely removable pins across `0814B078` (one), `0814C248` (three) and
+  `0814D9C4` (one), covering 360, 336 and 780 bytes respectively.
+* `08146EAC` has a stock-exact 2,188-byte ordinary playback replacement for six
+  pins and five barriers; a separate game-state address pin remains.
+* Expanded `0814DF58` proves two removable `MODE_OFF` barriers over 132 exact
+  bytes; specialize the shared macro rather than landing the expanded draft.
 
-For 082003BC, the original bare return on the null-pool path is intentional.
-ROM +0x3B6 branches directly to the epilogue after the void `Anim_SetKeyframes`
-call at +0x3A0, leaving that call's unconstrained r0 residue. Returning zero, a
-coordinate, or the clone pointer changes the code. The exact C preserves that
-observed path rather than asserting an unsupported return value.
+The ROM-order scan covered all 77 concession-bearing functions in this
+subsection. Shared playback-family and record inventories are in
+`build/scope/campaign/finish-player-cleanup/INVENTORY.md`. The seven orbit-effect
+functions share a 0x3C particle record and 0x4C8 task layout; Clone records and
+the playback-family views are the next shared-header candidates.
 
-Scope also misclassified a complete candidate with a pointer-returning typed
-getter as a snippet and duplicated its records. Direct whole-file scope
-compilation accepted it and proved the final behavior match; no production
-tool change was needed.
+`build/scope/campaign/finish-player-cleanup/data-studio/` contains reviewed
+`data-studio.patch`, optional `roundtrip-records.patch`, candidates and REPORT:
+seven Player callback arrays (186 entries, 744 bytes), optional owner/selector/
+dispatcher manifest metadata and a generic Studio callback-table browser with
+Code/ROM links and cache refresh. All eighteen existing plus proposed tables
+round-trip 1,080 bytes; the seven new tables retain 121 relocations and 65 null
+slots. Fourteen focused tests, Python/JavaScript syntax and fixture UI checks
+pass. The GUI check used a read-only fixture, not a complete live Studio index.
 
-The queue was attempted in ROM order and all four unfinished functions were
-revisited after the later matches. Quota remained above the requested 50%
-floor. No combined build, report regeneration, regrouping, push or PR was run.
-The integrator must validate the combined batch with `build/boktai3.gba: OK`
-and regenerate both progress files when integrating it into main.
+The high-ROM 90-word callback region is explicitly deferred: observed indices
+cross its apparent label boundaries, and the manifest currently lacks alias
+views. Do not describe separate physical labels as independently bounded
+logical arrays. The eight-byte `08610E24` scalar range is not a callback table.
+
+## Tooling and integration
+
+The requested cherry-pick `02f36efc6` landed as `1c2fa2aed`, fixing current ELF
+names in `check.py` and short matchsearch sockets. Scope resident caches from
+before it must be bypassed with `SCOPE_SERVER=0`; use a new matchsearch context
+when symbol/data classification changed.
+
+Two further diagnostic gaps are recorded, not patched in production: built
+scope compilers silently lack the `PREF`/`NOINHERIT` hooks found in patch source,
+and fast source grouping misses a macro-defined old function name in this
+renamed target-motion unit. Only isolated private diagnostic copies were used.
+Generated named assembly can also be absent for newly promoted names; a local
+read-only alias fixed target-motion jump-table classification. No generated
+assembly, ROM, emulator dump or compiler binary is committed.
+
+At integration, review the nine exact source commits and both guarded drafts,
+finish the remaining C matches, apply/recheck the prepared cleanup, then run
+one complete combined build (`build/boktai3.gba: OK`). Regenerate and commit both
+progress reports once for that batch. This worker leaves them unchanged.
