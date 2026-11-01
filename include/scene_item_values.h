@@ -28,6 +28,8 @@ struct SceneValueConsumableDefinition {
     s16 baseValue;
     u8 unknownA[6];
 };
+u32 Inventory_GetEquipmentId(u32 slot);
+u32 Inventory_CanAssignEquipment(u32 slot);
 struct SceneValueEquipment *Inventory_GetEquipmentEntry(u32);
 struct SceneValueEquipmentDefinition *Equipment_GetDefinition(u32);
 struct SceneValueConsumableDefinition *GameState_GetConsumableDescriptor(u32);
