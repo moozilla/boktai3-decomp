@@ -1,31 +1,16 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-// MATCHING_CONCESSION: register-pinning
 /* Records attack contacts and queues a timed reaction (tentative). */
 #define Mummy_OnAttackCollision sub_080D0C30
+static inline u32 Mummy_Flag(u8 *a, u32 m, u32 off)
+{
+    return off == 0x2D4 ? *(u16 *)(a + off) & m : *(u32 *)(a + off) & m;
+}
 static inline u8 Mummy_IsAttackBlocked(u8 *c)
 {
-    u32 mask;
-    u32 *p;
-    u32 off;
-    if (!c)
-        goto zero;
-    mask = 0x40;
-    off = (u32) & ((struct SceneActorRegistryResetView *)0)->flags2D4;
-    p = (u32 *)(c + off);
-    if ((*((u16 *)p)) & mask)
-        goto one;
-    mask = 0x20000;
-    off -= sizeof(u32);
-    p = (u32 *)(c + off);
-    if ((*p) & mask)
-        goto one;
-    if ((((struct SceneActorRegistryResetView *)c)->health) > 0)
-        goto zero;
-one:
-    return 1;
-
-zero:
+    if (c && (Mummy_Flag(c, 0x40, 0x2D4) || Mummy_Flag(c, 0x20000, 0x2D0) ||
+              ((struct SceneActorRegistryResetView *)c)->health <= 0))
+        return 1;
     return 0;
 }
 
@@ -61,8 +46,8 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
     struct SceneActorRegistryResetView *base = (void *)input;
     struct MummyContext *state = ((struct SceneActorRegistryResetView *)input)->context;
     u16 responseCost;
-    register u16 contactFlags asm("r2");
-    register u32 rawKind asm("r1");
+    u16 contactFlags;
+    u32 rawKind;
     u32 kindIndex;
     if (Mummy_IsAttackBlocked(input))
         return;
@@ -104,7 +89,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
                 struct ContactCollider *collider = &base->colliderA;
                 collider->cost = 1;
             }
-            responseCost = *(volatile u16 *)&base->colliderA.cost;
+            responseCost = base->colliderA.cost;
             base->reactionSoundVariant = responseCost;
             base->colliderA.responseParameter = 1;
             base->colliderA.responseValue = 30;
