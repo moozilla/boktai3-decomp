@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_chase.h"
 
@@ -26,9 +25,6 @@ u8 Skeleton_RerouteToTarget(void *obj)
         s32 x;
         s32 z;
         u8 *data;
-        void *route;
-        u8 ok;
-        s32 result;
         x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
         z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
         target.x = (x << 8) + 0x80;
@@ -42,21 +38,10 @@ u8 Skeleton_RerouteToTarget(void *obj)
             targetPointer->y = h;
         }
         targetPointer->z = (z << 8) + 0x80;
-        route = *(void **)(group + 0x1FC);
-        if (Nav_IsPositionInMesh(route, &actor->body.position, &target) &&
-            (result = Terrain_ApplyBlocked(route, &actor->body.position, &target))) {
-            if (result != 2)
-                Memory_Clear(&alt->body.motion, 8);
-            ok = 1;
-        } else {
-            Chase_ClearBits(&alt->flags2D4, 0x200);
-            ok = 0;
-        }
-        asm("" : "+r"(ok));
-        if (ok)
-            return 1;
-        Callback_InvokeActor(actor, *(void **)(group + 0x224));
     }
+    if (Chase_TryRoute(alt, *(void **)(group + 0x1FC), &actor->body.position, &target))
+        return 1;
+    Callback_InvokeActor(actor, *(void **)(group + 0x224));
 done:
     return 0;
 }
