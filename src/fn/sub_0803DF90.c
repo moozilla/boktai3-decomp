@@ -1,13 +1,5 @@
 #include "scene_pool.h"
 
-#ifdef NONMATCHING
-// fuzzy: 87.3%
-// The random paths write their stores out (no Enter call: the constants are materialized at
-// each store as in the ROM) and jump to done, so jump2 merges them into the direction>0 tail at
-// the stateEntered store, as the ROM does. Left: the ROM keeps case 3's and the last
-// direction's Enter tails unmerged and merges cases 0/1 and 2 into case 2's copy; here every
-// tail merges into the direction>0 copy. jump2 takes the first jump in the target label's
-// chain (last jump first), so the ROM's groups had different labels at jump2.
 s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
@@ -42,9 +34,9 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
         entry->turnStep = 0x200;
     }
     if (ScenePool_SelectStateAtPositionLimit(entry))
-        goto done;
+        return 0;
     if (ScenePool_ResumeAfterIdle(actor, entry))
-        goto done;
+        return 0;
     Or(0x10, &actor->stateFlags);
     ScenePool_UpdateSpeedPulse(actor, entry, gUnk_0860588C);
     if (entry->speedControlActive) {
@@ -87,16 +79,21 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
         switch (entry->kind) {
             case 0:
             case 1:
-                Enter(entry, 5, flag); return 0;
+                Enter(entry, 5, flag);
+                break;
             case 2:
                 if (entry->mode == 0)
                     Enter(entry, 5, flag);
                 else
-                    Enter(entry, 7, flag); return 0;
+                    Enter(entry, 7, flag);
+                break;
             case 3:
-                Enter(entry, 7, flag); break;
+                Enter(entry, 7, flag);
+                break;
         }
-    } else if (entry->stateFrame > 239) {
+        return 0;
+    }
+    if (entry->stateFrame > 239) {
         flag = PlayerHasFlag(2);
         if (flag) {
             s32 sample;
@@ -106,24 +103,20 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                 entry->state = 2;
                 entry->stateFrame = 0;
                 entry->stateEntered = 1;
-                Memory_Clear(entry->history, 0x100); goto done;
+                Memory_Clear(entry->history, 0x100);
             } else {
                 entry->state = 0;
                 entry->stateFrame = 0;
                 entry->stateEntered = 1;
-                Memory_Clear(entry->history, 0x100); goto done;
+                Memory_Clear(entry->history, 0x100);
             }
         } else if (entry->direction > 0) {
-            Enter(entry, 1, flag); goto done;
+            Enter(entry, 1, flag);
         } else {
-            Enter(entry, 2, flag); return 0;
+            Enter(entry, 2, flag);
         }
-    } else
-        entry->stateFrame++;
-done:
+        return 0;
+    }
+    entry->stateFrame++;
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ScenePool_StateTrackAdaptive);
-#endif
