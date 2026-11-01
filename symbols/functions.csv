@@ -2804,6 +2804,7 @@ addr,name,mode,confidence,source,notes
 080727EC,SceneActorScript_ClearManagerFlagsFromScript,thumb,low,src-alias,
 08072814,SceneActorScript_GetManagerField62,thumb,low,src-alias,
 08072830,SceneActorScript_SetManagerModeFromScript,thumb,low,src-alias,
+08072854,SceneActorRegistry_ApplyTerrainReactions,thumb,low,src-alias,
 08072B44,SceneActorRegistry_GetManager,thumb,low,src-alias,
 08072B50,SceneActorScript_DispatchKindPayload,thumb,low,src-alias,
 08072BA8,SceneActorContacts_ResetList,thumb,low,src-alias,
