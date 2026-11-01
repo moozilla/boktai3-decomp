@@ -3,8 +3,11 @@
 #include "serial.h"
 #include "gba/io_reg.h"
 
-#ifdef NONMATCHING
-// fuzzy: 89.7%
+#define SERIAL_QUEUE_TAIL(index)                                                                   \
+    do {                                                                                           \
+        (index) = (gSerialPacketReadIndex + gSerialQueuedPacketCount) & 3;                         \
+    } while (0)
+
 static inline void CopyQueued(u16 *out)
 {
     out[0] = gSerialPacketQueue[gSerialPacketReadIndex][0];
@@ -12,7 +15,7 @@ static inline void CopyQueued(u16 *out)
     out[2] = gSerialPacketQueue[gSerialPacketReadIndex][2];
     out[3] = gSerialPacketQueue[gSerialPacketReadIndex][3];
 }
-static inline void QueuePacket(const u16 *packet, u32 index)
+static inline void QueuePacket(const u16 *packet, u16 index)
 {
     gSerialPacketQueue[index][0] = packet[0];
     gSerialPacketQueue[index][1] = packet[1];
@@ -30,6 +33,7 @@ void Serial_ServiceInterrupt(void)
 {
     u32 control;
     u16 nextRead;
+    s32 writeSlot;
 
     (void)REG_SIOMULTI0;
     gSerialTransferStatus = 0;
@@ -59,23 +63,28 @@ void Serial_ServiceInterrupt(void)
             bits |= word;
         if (!(bits & 0x4000)) {
             if (gSerialReceivePending) {
-                u32 pos = (gSerialPacketReadIndex + gSerialQueuedPacketCount) & 3;
-                gSerialPacketQueue[pos][0] = first;
-                gSerialPacketQueue[pos][1] = latest[1];
-                gSerialPacketQueue[pos][2] = latest[2];
-                gSerialPacketQueue[pos][3] = latest[3];
+                SERIAL_QUEUE_TAIL(writeSlot);
+                gSerialPacketQueue[writeSlot][0] = first;
+                gSerialPacketQueue[writeSlot][1] = latest[1];
+                gSerialPacketQueue[writeSlot][2] = latest[2];
+                gSerialPacketQueue[writeSlot][3] = latest[3];
                 ++gSerialQueuedPacketCount;
                 gSerialActiveSendWord = 0x4000;
             } else {
                 if (gSerialQueuedPacketCount) {
-                    volatile u16 count;
+                    u16(*serialValue)[4] = gSerialPacketQueue;
                     CopyQueued(receive);
-                    nextRead = (gSerialPacketReadIndex + 1) & 3;
+                    nextRead = gSerialPacketReadIndex;
+                    nextRead++;
+                    nextRead &= 3;
                     gSerialPacketReadIndex = nextRead;
-                    count = gSerialQueuedPacketCount;
-                    --gSerialQueuedPacketCount;
-                    QueuePacket(latest, (nextRead + gSerialQueuedPacketCount) & 3);
-                    gSerialQueuedPacketCount = count;
+                    {
+                        u16 savedDepth[1] = {gSerialQueuedPacketCount};
+                        --gSerialQueuedPacketCount;
+                        SERIAL_QUEUE_TAIL(writeSlot);
+                        QueuePacket(latest, writeSlot);
+                        gSerialQueuedPacketCount = savedDepth[0];
+                    }
                 } else {
                     receive[0] = first;
                     receive[1] = latest[1];
@@ -102,7 +111,3 @@ void Serial_ServiceInterrupt(void)
     }
     INTR_CHECK = 0x80;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Serial_ServiceInterrupt);
-#endif
