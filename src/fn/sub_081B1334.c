@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 
@@ -28,18 +27,9 @@ void MotionTrack_Initialize(void *, const void *, const void *, const void *, u3
 void MotionTrack_Update(void *);
 struct SceneVec *Player_GetEffectivePosition(u32);
 void Sound_PlaySong(u32);
-static inline void SetAnimation(struct ActorStatusPart *p, u8 *boss, u32 id, u32 options)
+static inline void SetAnimation(struct ActorStatusPart *p, void *data, u32 id, u32 options)
 {
-    void *data = *(void **)(boss + 0x4d0);
-    struct DisplaySequenceState *seq;
-    if (id == 9) {
-        void *resource = data;
-        register u32 zero asm("r2");
-        zero = 0;
-        data = resource;
-        options = zero;
-    }
-    seq = &p->sequence;
+    struct DisplaySequenceState *seq = &p->sequence;
     Anim_SetSequence(seq, data, id, (u8)p->variant, options);
     PlayerCue_StepSequence((struct ContactSwarmSprite *)p, seq);
 }
@@ -96,6 +86,11 @@ static inline void RequestBehavior(struct ActorStatusPart *p, u32 action)
         }
     }
 }
+static inline void SetState(struct ActorStatusPart *p, u32 state)
+{
+    p->state = state;
+    p->timer = 0;
+}
 void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
 {
     u8 *owner = boss;
@@ -107,7 +102,7 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
-        SetAnimation(p, owner, 11, 0);
+        SetAnimation(p, *(void **)(owner + 0x4d0), 11, 0);
         {
             u32 zero = 0;
             p->state = zero;
@@ -117,19 +112,14 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
         Sound_PlaySong(0x58a);
     }
     {
-        register u32 offset asm("r1") = 0x164;
-        u32 *state;
-        state = (u32 *)(((u8 *)p) + offset);
-        switch (*state) {
+        switch (p->state) {
             case 0: {
                 u32 entered;
-                register void *motion asm("r6");
                 {
                     u8 *address = &p->enter;
                     entered = *address;
                     enter = address;
                 }
-                motion = p->motion;
                 if (entered) {
                     u32 zero = 0;
                     *enter = zero;
@@ -137,14 +127,13 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
                     {
                         struct SceneVec *origin = &p->offset;
                         AddOffset(&target, origin, &target);
-                        MotionTrack_Initialize(motion, origin, &target, 0, 4);
+                        MotionTrack_Initialize(p->motion, origin, &target, 0, 4);
                     }
                 }
-                MotionTrack_Update(motion);
+                MotionTrack_Update(p->motion);
                 if (MotionEnded(p)) {
                     u32 next = 1;
-                    p->state = next;
-                    p->timer = 0;
+                    SetState(p, next);
                     *enter = next;
                 }
                 break;
@@ -152,28 +141,22 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
 
             case 1: {
                 u32 entered;
-                register void *motion asm("r6");
                 {
                     u8 *address = &p->enter;
                     entered = *address;
                     enter = address;
                 }
-                motion = p->motion;
                 if (entered) {
                     u32 zero = 0;
                     *enter = zero;
                     Difference(&delta, Player_GetEffectivePosition(zero), p->anchor);
-                    MotionTrack_Initialize(motion, &p->offset, &delta, 0, 4);
+                    MotionTrack_Initialize(p->motion, &p->offset, &delta, 0, 4);
                 }
-                MotionTrack_Update(motion);
+                MotionTrack_Update(p->motion);
                 if (PlayerNear(p)) {
                     RequestBehavior(p, 18);
                 } else if (MotionEnded(p)) {
-                    {
-                        u32 next = 2;
-                        p->state = next;
-                    }
-                    p->timer = 0;
+                    SetState(p, 2);
                     *enter = 1;
                 }
                 break;
@@ -182,23 +165,19 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
             case 2: {
                 u32 entered;
                 {
-                    register u8 *address = &p->enter;
+                    u8 *address = &p->enter;
                     entered = *address;
                     enter = address;
                 }
                 if (entered) {
                     u32 zero = 0;
                     *enter = zero;
-                    SetAnimation(p, owner, 12, zero);
+                    SetAnimation(p, *(void **)(owner + 0x4d0), 12, zero);
                     Sound_PlaySong(0x58a);
                 }
                 if ((++p->timer) > 120) {
-                    SetAnimation(p, owner, 9, 0);
-                    {
-                        register u32 next = 3;
-                        p->state = next;
-                    }
-                    p->timer = 0;
+                    SetAnimation(p, *(void **)(owner + 0x4d0), 9, 0);
+                    SetState(p, 3);
                     {
                         u8 *e = enter;
                         *e = 1;
