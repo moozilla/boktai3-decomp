@@ -835,8 +835,6 @@ void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const
     AnimatedParticles_Create(1, &position, config);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateGlow(struct TetherActor *actor)
 {
     switch (actor->glowMode) {
@@ -853,8 +851,9 @@ void TetherActor_UpdateGlow(struct TetherActor *actor)
             if (actor->glowFrame <= 63)
                 frame = actor->glowFrame;
             else {
-                register s32 current asm("r0") = actor->glowFrame;
-                frame = 128 - current;
+                s32 current = actor->glowFrame;
+                frame = 128;
+                frame -= current;
             }
             actor->palette[1] = (frame * 31) >> 6;
             ++actor->glowFrame;
