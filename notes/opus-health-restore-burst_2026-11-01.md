@@ -8,7 +8,10 @@ The best ordinary-C draft is in the unit's `#ifdef NONMATCHING` block: fuzzy
 instructions differing (was 20 / 16), shape 10 (was 12). It has no register
 pins, barriers, inline assembly or compiler overrides. With the scope knob
 `AGBCC_NOEQUIV=29`, which gives pseudo 29 (the random table) no equivalence,
-the `-g` compile of this draft is byte-identical to the ROM. That is the same
+the build's compile of this draft is byte-identical to the ROM (the `-g` one
+too; this note first said only `-g`, an artifact of a scope bug fixed on
+2026-11-01: a knob set in the environment didn't reach the build's compile).
+That is the same
 single blocker as ChargedBurst_EmitSpark
 (`notes/opus-charged-burst-spark_2026-10-31.md`). The matchsearch store is
 `build/matchsearch/opus_08234868` (root = the landed draft, nine ruled-out
@@ -103,7 +106,7 @@ Numbers are scope's ROM / draft differing instructions.
 | h2 | offset BIV, block-local bases, the table last | 25 / 19 (shape 32) |
 | h2, `AGBCC_NOMOVE=132` | knob: the 255 pair stays | 17 / 13 |
 | h2, `AGBCC_NOEQUIV=29` | knob: no table equivalence | 16 / 16 |
-| h2, both knobs | diagnostic | exact `-g` compile |
+| h2, both knobs | diagnostic | exact (build and `-g`) |
 | h3 | the natural form, the globals read in the helper | 28 / 22 |
 | h4 | `const u16 *volatile table` | 11 / 11 (shape 4) |
 | h5 | the volatile read inside the helper | 15 / 15 (shape 4) |
@@ -113,11 +116,13 @@ Numbers are scope's ROM / draft differing instructions.
 | h8, `AGBCC_NOEQUIV=29` | knob: byteMask spans the loop, refilled into r7 | 2 / 2 |
 | h9 | a do-while(0) random macro to raise the insn count (78) | 33 / 32 |
 | h10 (landed) | h2 with the twice-set `byteMask` for the sine | 17 / 13 (shape 10) |
-| h10, `AGBCC_NOEQUIV=29` | knob, diagnostic | exact `-g` compile |
+| h10, `AGBCC_NOEQUIV=29` | knob, diagnostic | exact (build and `-g`) |
 | h11 | h10 with `byteMask` declared after `offset` | 17 / 13 |
 | h12 | the twice-set `byteMask` on the cosine side | 25 / 21 |
 | lb1, lb2, lb4 | the table as an integer address: `u32 table = RANDOM_TABLE_ADDR` (or `(u32)gRandomTable`), read as `*(const u16 *)(*index * 2 + table)` | 17 / 13, as h10 |
 | lb3 | the integer address written in the helper, no table variable | 25 / 22 |
+| un1 | h10 with `union RandomTableView table = {gRandomTable};` (PR 944) | 17 / 13, as h10 |
+| un2 | un1 with the union opened inside the loop | 17 / 13, as h10 |
 
 The drafts are in `build/scope/drafts/hr/` (worktree scratch, not committed).
 
@@ -129,12 +134,28 @@ non-constant value first (Dog_UpdateTurnSequence, fact 20) has nothing to reuse
 here. Every value set before the loop (i, index, mask, sine, offset, motion) lives
 into the loop, so none can share the table's pseudo.
 
+The one-member union (PR 944, README fact 21) was tried too (un1, un2). It is a
+lever for loop.c, not for update_equiv_regs. Its initializer emits a CLOBBER and
+then the set, so in a loop the table has two sets and loop.c leaves the load in
+the loop. Here the ROM loads the table before the loop, and once flow has run
+the CLOBBER is dead (the set follows it) and is deleted. By local-alloc the
+table is again set once from the pool, with `REG_EQUAL`.
+
 ## The table across the ROM
 
 The same spilled table, with no equivalence, appears in loops in 08068500,
-080BF0E4, 080C8774 and 080CCD7C (still `INCLUDE_ASM`). It also appears outside
-loops in 081EEECC and 0807D2E0. Whatever gives the table no equivalence in
-ordinary C should fix them all.
+080BF0E4, 080C8774 and 080CCD7C. It also appears outside loops in 081EEECC
+and 0807D2E0. 080C8774 and 080CCD7C have matched since (PR 936, PR 940). In
+both, the shared chase step sets `randomSamples = gRandomTable` many blocks
+before the turn, and the turn copies it into a `struct
+SceneActorChaseRandomTable`. cse sees the copy in a later extended block, so it
+gets no `REG_EQUAL` and no equivalence
+(`notes/opus-golem-displacement-recovery_2026-11-01.md`). That works only
+because a label separates the copy from the pool load. This function has no
+such label before its loop. `scope.py frame FUNC` now finds the pattern: a ROM
+slot that holds a pool constant, the draft pseudo whose `REG_EQUIV` keeps it out
+of memory, and a score with `AGBCC_NOEQUIV` on that pseudo. It reports MATCH
+here and for 082335F0.
 
 ## Scope gaps
 
@@ -143,8 +164,9 @@ ordinary C should fix them all.
   prints a `match` line in combine_movables, and `hoist` marks the moved set
   `+ equal set insn 183 line 57` with the lever above (commit `59d2b1077`;
   `tools/scope/README.md` fact 21).
-* **The spilled-constant pattern still has no detector.** The ChargedBurst
-  note proposed one: a ROM `ldr rN, =CONST; str rN, [sp, #K]` with later
-  loads from `[sp, #K]`, while the draft's pseudo for CONST has a `REG_EQUIV`
-  note. `probe` doesn't try `AGBCC_NOEQUIV`. Here both knobs had to be found by
-  hand: the pseudo number from the `-g` dump and the 255's insn from `hoist`.
+* **The spilled-constant pattern had no detector.** It has one now: `frame`
+  matches a ROM `ldr rN, =CONST; str rN, [sp, #K]` that is read back only from
+  `[sp, #K]`. It names the draft pseudos with that constant as `REG_EQUIV` and
+  scores `AGBCC_NOEQUIV` on them (2026-11-01). When this note was first
+  written, both knobs had to be found by hand: the pseudo number from the `-g`
+  dump and the 255's insn from `hoist`.
