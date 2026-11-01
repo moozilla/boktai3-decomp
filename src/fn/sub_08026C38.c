@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
@@ -94,22 +93,14 @@ void SceneActors_UpdateTravelProjectileAttack(ActorAnimation *p, int tick)
                 u8 *anglePtr = &p->angle;
                 s16 *velocity = (s16 *)&spawn;
                 u32 angle = *anglePtr;
+                int speed = 128;
                 {
-                    int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * 128);
+                    int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
                     int zero = 0;
                     velocity[0] = x;
                     velocity[1] = zero;
                 }
-                {
-                    int speed;
-                    int sample = gUnk_086149C4[angle];
-                    speed = 128;
-                    asm("" : "+r"(speed) : "r"(sample));
-                    {
-                        int z = trunc12(sample * speed);
-                        velocity[2] = z;
-                    }
-                }
+                velocity[2] = trunc12(gUnk_086149C4[angle] * speed);
                 add(&spawn, (Vec *)((u8 *)p + 0x54));
                 spawn.y += 300;
                 SceneSteeringActor_CreateTravelActor(
