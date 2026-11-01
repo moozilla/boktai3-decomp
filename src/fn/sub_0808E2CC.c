@@ -1,9 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "scene_actor_chase.h"
 // confidence=low: terrain-edge response is registered as the Slime body collider callback.
-void SceneActorBehavior_ApplyContactReaction(void *, void *);
+void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
+                                             struct SceneActorBehaviorContactView *,
+                                             struct SceneActorBehaviorView *);
 void SceneActorMotion_ArmPrimaryCollider(void *);
 struct SlimeContact {
     u8 unknown0[6];
@@ -11,9 +12,8 @@ struct SlimeContact {
     u8 unknown8[0x1C];
     struct ContactPosition position;
 };
-static inline u8 Unavailable(struct SceneActorRegistryResetView *input)
+static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
 {
-    register struct SceneActorRegistryResetView *actor asm("r2") = input;
     if (actor) {
         u32 mask = 0x40;
         if (actor->flags2D4 & mask)
@@ -54,12 +54,11 @@ void Slime_ResolveBodyContact(struct SlimeContact *contact, void *other,
     struct ContactPosition next, displacement, center, fromContact, adjusted;
     s32 angle;
     u32 contactFlags;
-    register struct SceneActorRegistryResetView *checkActor asm("r2") = actor;
+    struct SceneActorRegistryResetView *checkActor = actor;
     if (Unavailable(checkActor))
         return;
     contactFlags = ContactFlags(contact, 0x800);
-    /* Keep the checked actor live through the contact flag load. */
-    asm("" : : "r"(checkActor));
+
     if (contactFlags) {
         Add(&next, &actor->body.position, &actor->body.motion);
         Subtract(&displacement, &contact->position, &next);
@@ -99,5 +98,5 @@ void Slime_ResolveBodyContact(struct SlimeContact *contact, void *other,
             }
         }
     } else
-        SceneActorBehavior_ApplyContactReaction(contact, other);
+        SceneActorBehavior_ApplyContactReaction((void *)contact, other, (void *)checkActor);
 }

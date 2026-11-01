@@ -1,6 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 struct SwordTask {
     u8 unknown0[0x86];
     u16 value86;
@@ -22,20 +21,20 @@ void Sword_InitAttackComponents(struct SwordTask *);
 void Sword_InitTask(struct SwordTask *);
 static inline u8 Sword_ClampKind(s32 kind)
 {
-    if (kind > 1)
-        return 1;
-    return kind;
+    s32 value = kind;
+    if (kind < 0)
+        value = 0;
+    else if (kind > 1)
+        value = 1;
+    return value;
 }
 
 s32 Sword_InitializeFromScript(struct SwordTask *p)
 {
     s32 i;
-    register s32 kind asm("r1");
     s32 *argument;
     p->kind = Script_GetKeywordValue('t', 0);
-    kind = p->kind;
-    kind = Sword_ClampKind(kind);
-    p->kind = kind;
+    p->kind = Sword_ClampKind(p->kind);
     p->palette = 701;
     p->animation = 402;
     Script_SeekToKeyword('a');

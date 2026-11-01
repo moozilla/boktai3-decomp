@@ -1,3 +1,4 @@
+#include "scene_actor_displacement.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 
@@ -6,16 +7,6 @@ void Vorn_SendMessage(void *);
 u8 Vorn_HasActiveResponse(void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 
-static inline s32 Vorn_QuarterDisplacement(s32 value)
-{
-    return value >= 0 ? value >> 2 : -(-value >> 2);
-}
-static inline s32 Vorn_ReadDisplacementAxis(s32 desired, s16 *current, s16 **field)
-{
-    s32 difference = desired - *current;
-    *field = current;
-    return Vorn_QuarterDisplacement(difference);
-}
 static inline u8 Vorn_DisplacementStopped(s32 x, s32 z)
 {
     if (!x && !z)
@@ -140,8 +131,8 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
         if (frame < threshold)
             SceneActorChase_SetReactionFlags(actor, 32);
     }
-    dx = Vorn_ReadDisplacementAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
-    dz = Vorn_ReadDisplacementAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    dx = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
+    dz = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
     if (dx > 200)
         dx = 200;
     else if (dx < -200)

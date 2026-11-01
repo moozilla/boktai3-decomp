@@ -67,6 +67,7 @@ import shlex
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -2678,7 +2679,8 @@ def fast_preprocess(src, env=None, func=None):
     if ((env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
             or (env or {}).get('SCOPE_NEIGHBORS_ASM', os.environ.get('SCOPE_NEIGHBORS_ASM')) == '1'):
         return preprocess(src, env, func)
-    text = open(os.path.join(ROOT, src)).read()
+    with open(os.path.join(ROOT, src)) as source:
+        text = source.read()
     lines = text.split("\n")
     last = max((i for i, ln in enumerate(lines) if ln.lstrip().startswith("#")), default=-1)
     head = "\n".join(lines[:last + 1]) + "\n"
@@ -2686,27 +2688,30 @@ def fast_preprocess(src, env=None, func=None):
     if last < 0 or any(not re.match(r"\s*(#\s*include\b.*)?$", ln) and not re.match(r"\s*(//.*)?$", ln)
                        for ln in lines[:last + 1]):
         return preprocess(src, env, func)  # a #define, #if, or code between the includes
-    h = _HEADS.get(head)
-    if h is not None and any(os.path.getmtime(os.path.join(ROOT, f)) != t for f, t in h[2]):
+    source_dir = os.path.dirname(os.path.abspath(os.path.join(ROOT, src)))
+    key = (source_dir, head)
+    h = _HEADS.get(key)
+    if h is not None and any(not os.path.exists(os.path.join(ROOT, f))
+                             or os.path.getmtime(os.path.join(ROOT, f)) != t for f, t in h[2]):
         h = None
     if h is None:
         work = os.path.join(WORK, "cache")
         os.makedirs(work, exist_ok=True)
         rel = os.path.relpath(os.path.join(work, "head.c"), ROOT)
-        tmp = os.path.join(work, f"head{os.getpid()}.c")  # the process's own: commands of one run share work/
-        open(tmp, "w").write(head)
-        trel = os.path.relpath(tmp, ROOT)
-        # how many newlines cpp leaves after its last marker depends on the last include (a guarded
-        # header emits none); a marker of our own says where the body starts
-        out = re.sub(r"\n+\Z", "\n", build.sh(cpp_command(trel))).replace(f'"{trel}"', f'"{rel}"')
-        out += f'# {last + 2} "{rel}"\n'
-        cmd = cpp_command(trel)
-        e = cmd.index("-E") + 1
-        defs = build.sh(cmd[:e] + ["-dM"] + cmd[e:])
-        os.remove(tmp)
+        with tempfile.NamedTemporaryFile(dir=work, suffix=".c", mode="w") as source:
+            source.write(head)
+            source.flush()
+            trel = os.path.relpath(source.name, ROOT)
+            cmd = cpp_command(trel)
+            e = cmd.index("-E") + 1
+            cmd = cmd[:e] + ["-iquote", source_dir] + cmd[e:]
+            # Keep line markers stable across private preprocessing files.
+            out = re.sub(r"\n+\Z", "\n", build.sh(cmd)).replace(f'"{trel}"', f'"{rel}"')
+            out += f'# {last + 2} "{rel}"\n'
+            defs = build.sh(cmd[:e] + ["-dM"] + cmd[e:])
         macros = set(re.findall(r"^#define (\w+)", defs, re.M)) | _DYNAMIC
         files = sorted({f for f in re.findall(r'^# \d+ "([^"<][^"]*)"', out, re.M) if os.path.exists(os.path.join(ROOT, f))})
-        h = _HEADS[head] = (out, macros, [(f, os.path.getmtime(os.path.join(ROOT, f))) for f in files])
+        h = _HEADS[key] = (out, macros, [(f, os.path.getmtime(os.path.join(ROOT, f))) for f in files])
     out, macros, _ = h
     if "\\\n" in body or "??" in body:
         return preprocess(src, env, func)

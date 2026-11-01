@@ -1,25 +1,17 @@
+#include "scene_actor_part_burst.h"
 #include "scene_actor_palette.h"
 #include "engine.h"
 #include "ram.h"
+#include "scene_actor_placement.h"
+#include "game_state.h"
 #ifdef NONMATCHING
-// fuzzy: 57.7%
+// fuzzy: 59.7%
 void Heap_Free(void *);
-void EffectGroup_SpawnPart(void *, s32, void *, void *, void *, s32, s32);
-union RegistryParticleVector {
-    struct ContactPosition position;
-    struct {
-        s32 x : 16, y : 16, z : 16, pad : 16;
-    } packed;
-};
-static inline u32 RandomValue(void)
-{
-    u32 index = (gRandomIndex + 1) & 1023;
-    gRandomIndex = index;
-    return ((const u16 *)RANDOM_TABLE_ADDR)[index];
-}
+
 static inline u8 Removed(struct SceneActorRegistryActor *p)
 {
-    if (p->flags2D6 & 0x1000)
+    u32 mask = 0x1000;
+    if (mask & p->flags2D6)
         return 1;
     return 0;
 }
@@ -37,25 +29,22 @@ static inline u8 Paused(void)
 }
 static inline u8 CurrentRegion(struct SceneActorRegistryActor *p)
 {
-    if (*(u32 *)((u8 *)gGameState + 0x5A0) == p->regionId)
-        return 1;
-    return 0;
-}
-static inline u8 Ineligible(struct SceneActorRegistryActor *p)
-{
-    if ((p->flags2D4 & 0x40) || (p->flags2D0 & 0x20000) || p->health <= 0)
+    u16 region = p->regionId;
+    if (gGameState->region == region)
         return 1;
     return 0;
 }
 static inline u8 TransitionEnabled(struct SceneActorRegistryManager *p)
 {
-    if (p->flags & 0x2000)
+    u32 mask = 0x2000;
+    if (p->flags & mask)
         return 1;
     return 0;
 }
 static inline u8 TransitionComplete(struct SceneActorRegistryManager *p)
 {
-    if (p->flags & 0x20000)
+    u32 mask = 0x20000;
+    if (mask & p->flags)
         return 1;
     return 0;
 }
@@ -67,12 +56,10 @@ static inline u8 Stopped(void)
     return value;
 }
 // confidence=low: registry callback traversal, regional deactivation and palette transitions.
-#define SceneActorRegistry_UpdateActors sub_08070FA8
 void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
 {
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor;
-    union RegistryParticleVector velocity, bounds, position;
     if (!node)
         return;
     actor = node->actor;
@@ -83,16 +70,15 @@ void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
             context = actor->context;
             Callback_InvokeActor(context, actor->destroy);
             Heap_Free(context);
-            if (!node)
-                return;
             actor = node->actor;
             continue;
         }
         Callback_InvokeActor(actor->context, actor->update);
         if (!MissingObject(actor) && !Paused() && !(actor->flags2D4 & 0x4000) &&
             !(actor->flags2D0 & 8) && actor->enabled && !(actor->flags2CC & 2) &&
-            (*(u32 *)((u8 *)gGameState + 0x868) & 2) && CurrentRegion(actor) &&
-            !Ineligible(actor) && *(s16 *)((u8 *)gGameState + 0x876) > 0 && !Stopped()) {
+            (gGameState->flags868 & 2) && CurrentRegion(actor) &&
+            !SceneActorPlacement_IsUnavailable((void *)actor) && gGameState->unk876 > 0 &&
+            !Stopped()) {
             actor->field178 = 0;
             actor->field2B8 = 0;
             if (actor->drawableKind == 0)
@@ -100,25 +86,8 @@ void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
             else
                 ((struct SceneActorRegistryTileDrawable *)actor->drawable)->flags &= ~1;
             actor->health = 0;
-            if (actor->flags2D4 & 0x2000) {
-                s32 i = 2;
-                do {
-                    velocity.packed.x = (RandomValue() & 15) - 7;
-                    velocity.packed.y = (RandomValue() & 31) - 16;
-                    velocity.packed.z = (RandomValue() & 15) - 7;
-                    bounds.packed.x = 5;
-                    bounds.packed.y = 10;
-                    bounds.packed.z = 5;
-                    position.packed.x = actor->effectOrigin->x;
-                    position.packed.y = actor->effectOrigin->y + 128;
-                    position.packed.z = actor->effectOrigin->z;
-                    EffectGroup_SpawnPart(actor->effectConfig, 3, &position, &velocity, &bounds, 40,
-                                          40);
-                    i--;
-                } while (i >= 0);
-                actor->fieldAA = 0;
-                actor->field2B8 = 0;
-            }
+            if (actor->flags2D4 & 0x2000)
+                SceneActorEffects_SpawnContactParts(actor);
             actor->flags2D4 &= ~0x2000;
             actor->flags2CC |= 0x1000;
         }
@@ -163,5 +132,5 @@ void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08070FA8);
+INCLUDE_ASM("asm/nonmatching", SceneActorRegistry_UpdateActors);
 #endif

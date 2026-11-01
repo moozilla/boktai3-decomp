@@ -6,6 +6,7 @@ actor_registry,08603300,08604998,keyed_callbacks,data/actor_registry.csv,Script 
 bat_script_commands,08605C74,08605C94,callback_array,data/actor_commands/bat.csv,Bat actor script command handlers (8 entries)
 bee_script_commands,08605DB8,08605DD4,callback_array,data/actor_commands/bee.csv,Bee actor script command handlers (7 entries)
 ghost_script_commands,08605E14,08605E34,callback_array,data/actor_commands/ghost.csv,Ghost actor script command handlers (8 entries)
+lun_route_progress_rates,08605E48,08605E68,math_lookup,build/lun_route_progress_rates.csv,Lun route progress rates by phase
 lun_script_commands,08605E78,08605E94,callback_array,data/actor_commands/lun.csv,Lun actor script command handlers (7 entries)
 crow_script_commands,08605EC4,08605EE0,callback_array,data/actor_commands/crow.csv,Crow actor script command handlers (7 entries)
 spider_script_commands,08605F34,08605F50,callback_array,data/actor_commands/spider.csv,Spider actor script command handlers (7 entries)

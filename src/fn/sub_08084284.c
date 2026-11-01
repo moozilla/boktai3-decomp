@@ -83,7 +83,7 @@ void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *ac
     SceneActorControl_TickSway(actor);
     if (Approach(actor, (void *)(body + 0x3F0),
                  Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260)))) {
-        if ((u8)sub_08083C38(actor)) {
+        if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
             struct ContactPosition target;
             u32 angle;
             angle = (u8)Rand();

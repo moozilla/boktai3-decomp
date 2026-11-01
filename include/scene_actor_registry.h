@@ -153,7 +153,7 @@ struct SceneActorRegistryManager {
 extern struct SceneActorRegistryManager *gSceneActorRegistryManager;
 /* 0x020004AC */
 extern struct SceneActorRegistryNode *gSceneActorRegistryNode;
-void sub_08070FA8(struct SceneActorRegistryManager *);
+void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *);
 void SceneActorRegistry_DestroyActors(void);
 void SceneActorRegistry_AdvanceInactiveActors(struct SceneActorRegistryManager *);
 void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *);

@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "armor_decision_ops.h"
 #include "game_state.h"
 
 struct ArmorPart {
@@ -51,21 +51,6 @@ struct ArmorTargetPosition {
     u8 unknown32[2];
     s16 z;
 };
-
-/* Evaluate each position once; round the relative offset to whole tiles and take its magnitude. */
-#define ARMOR_GET_RELATIVE_GRID(deltaX, deltaZ, absX, absZ, targetX, actorX, targetZ, actorZ)      \
-    do {                                                                                           \
-        (deltaX) = (targetX) - (actorX);                                                           \
-        (deltaZ) = (targetZ) - (actorZ);                                                           \
-        (deltaX) = ((deltaX) + 0x80) >> 8;                                                         \
-        (deltaZ) = ((deltaZ) + 0x80) >> 8;                                                         \
-        (absX) = (deltaX);                                                                         \
-        (absZ) = (deltaZ);                                                                         \
-        if ((deltaX) < 0)                                                                          \
-            (absX) = -(deltaX);                                                                    \
-        if ((deltaZ) < 0)                                                                          \
-            (absZ) = -(deltaZ);                                                                    \
-    } while (0)
 
 // Tentative field meanings: armor pursuit and close-range attack decisions.
 void Armor_UpdateFacingDecision(struct ArmorFacingActor *actor)

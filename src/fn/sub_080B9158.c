@@ -102,7 +102,7 @@ static inline void Skeleton_UpdateArrival(void *obj)
         u8 saved = actor->body.direction;
         SceneActorChase_BeginTurn(obj, saved, randomSamples);
     }
-    sub_0807E334(obj);
+    SceneActorTerrain_RequestRetreatRoute(obj);
     actor->field2C2 = 0x20;
     return;
 reroute: {

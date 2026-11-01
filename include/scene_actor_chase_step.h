@@ -234,7 +234,7 @@ static inline u8 SceneActorChase_Arrive(void *obj)
         u8 saved = actor->body.direction;
         SceneActorChase_BeginTurn(obj, saved, randomSamples);
     }
-    sub_0807E334(obj);
+    SceneActorTerrain_RequestRetreatRoute(obj);
     actor->field2C2 = 0x20;
     return 0;
 reroute: {

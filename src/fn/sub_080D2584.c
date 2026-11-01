@@ -4,6 +4,7 @@
 #define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL     1
 #define SCENE_ACTOR_CHASE_SCALAR_COORDINATE_OUTPUT 1
 #define SCENE_ACTOR_CHASE_ROUTE_COUNT_ACCESSOR     1
+#include "scene_actor_displacement.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "spark_particle.h"
@@ -11,23 +12,11 @@
 void SceneActorMovement_ResolveRoutePosition(void *);
 void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *, s32);
 
-static inline s32 Mummy_QuarterDisplacement(s32 value)
-{
-    return value >= 0 ? value >> 2 : -(-value >> 2);
-}
-
 static inline u8 Mummy_DisplacementStopped(s32 x, s32 z)
 {
     if (!x && !z)
         return 1;
     return 0;
-}
-
-static inline s32 Mummy_ReadDisplacementAxis(s32 desired, s16 *current, s16 **field)
-{
-    s32 difference = desired - *current;
-    *field = current;
-    return Mummy_QuarterDisplacement(difference);
 }
 
 /* Ease recoil displacement, then select route or pursuit recovery. */
@@ -42,8 +31,8 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     s16 *x, *z;
     s32 dx, dz;
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->secondaryMotion.x = Mummy_QuarterDisplacement(actor->secondaryMotion.x);
-        actor->secondaryMotion.z = Mummy_QuarterDisplacement(actor->secondaryMotion.z);
+        actor->secondaryMotion.x = SceneActorDisplacement_Quarter(actor->secondaryMotion.x);
+        actor->secondaryMotion.z = SceneActorDisplacement_Quarter(actor->secondaryMotion.z);
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
         if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
             Sound_PlaySong(0x12A);
@@ -75,8 +64,8 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         SparkParticle_Spawn(&actor->body.position, count, (const struct ContactPosition *)&range,
                             actor->body.direction + 128, 10, 6, 2, 2);
     }
-    dx = Mummy_ReadDisplacementAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
-    dz = Mummy_ReadDisplacementAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    dx = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
+    dz = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
     if (dx > 200)
         dx = 200;
     else if (dx < -200)

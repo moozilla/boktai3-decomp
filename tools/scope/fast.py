@@ -267,20 +267,19 @@ def place(obj, own, rom_syms, address):
 
 
 def assemble(assembler, asm, workdir, tag=None):
-    """Object bytes for ASM, or (None, stderr). The files are the process's own: several scope
-    commands under one SCOPE_RUN share WORKDIR, and a shared f.o was read after another replaced it."""
-    tag = tag or f"f{os.getpid()}"
-    s_path, o_path = os.path.join(workdir, tag + ".s"), os.path.join(workdir, tag + ".o")
+    """Assemble ASM in a private directory, including when callers share a tag or PID."""
     asm = re.sub(r"^(\w+):\n", lambda m: f"{m[1]}:\n\t.global {m[1]}__addr\n{m[1]}__addr:\n"
                  if not m[1].startswith(".") else m[0], asm, flags=re.M)
-    open(s_path, "w").write(asm + "\t.text\n\t.align\t2, 0\n")
-    r = subprocess.run(assembler + ["-o", o_path, s_path], capture_output=True, text=True)
-    if r.returncode:
-        return None, r.stderr
-    obj = open(o_path, "rb").read()
-    for path in (s_path, o_path):
-        os.remove(path)
-    return obj, ""
+    with tempfile.TemporaryDirectory(prefix=(tag or "as") + "-", dir=workdir) as staging:
+        s_path = os.path.join(staging, "unit.s")
+        o_path = os.path.join(staging, "unit.o")
+        with open(s_path, "w") as source:
+            source.write(asm + "\t.text\n\t.align\t2, 0\n")
+        result = subprocess.run(assembler + ["-o", o_path, s_path], capture_output=True, text=True)
+        if result.returncode:
+            return None, result.stderr
+        with open(o_path, "rb") as obj:
+            return obj.read(), ""
 
 
 class Fast:

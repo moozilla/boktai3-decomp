@@ -11,9 +11,19 @@ struct ContactSequenceScriptArgs {
     s32 *values;
 };
 #ifdef NONMATCHING
-// fuzzy: 84.4%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: signed-field scratch registers and the script-count mask reload.
+// fuzzy: 92.5%
+static inline u32 RandomValue(const u16 *table)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return table[index];
+}
+static inline u32 RandomBits(const u16 *table, u16 mask)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return table[index] & mask;
+}
 void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
                                       struct ContactSequenceActor *actor)
 {
@@ -26,40 +36,17 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
     s32 coordinates[3];
     struct ContactSequenceScriptArgs args;
     const u16 *table;
-    u32 randomMask;
+
     u32 xzMask;
     if (ContactSequenceActor_TakeEntryFlag(actor)) {
-        table = (const u16 *)0x0203B400;
+        table = (const u16 *)RANDOM_TABLE_ADDR;
         {
-            u16 randomIndex;
-            u32 sample;
-            u32 smallMask;
-            u32 lowMask;
-            u32 sampleY;
-            u32 yMask;
-            u32 *counter;
-            u32 sampleZ;
-            u32 zMask;
-            randomIndex = gRandomIndex + 1;
-            randomMask = 1023;
-            randomIndex &= randomMask;
-            sample = table[randomIndex];
-            smallMask = 63;
-            xzMask = smallMask;
-            lowMask = xzMask;
-            scatter.bits.x = sample & lowMask;
-            randomIndex = (randomIndex + 1) & randomMask;
-            sampleY = table[randomIndex];
-            yMask = 127;
-            sampleY &= yMask;
-            scatter.bits.y = sampleY;
-            randomIndex = (randomIndex + 1) & randomMask;
-            counter = &gRandomIndex;
-            *counter = randomIndex;
-            sampleZ = table[randomIndex];
-            zMask = xzMask;
-            scatter.bits.z = sampleZ & zMask;
+            u32 sample = RandomValue(table);
+            xzMask = 63;
+            scatter.bits.x = sample & xzMask;
         }
+        scatter.bits.y = RandomBits(table, 127);
+        scatter.bits.z = RandomBits(table, xzMask);
         scatterPosition = &scatter.position;
         {
             u32 x = (u16)actor->position.x;
@@ -67,15 +54,13 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             u32 y;
             u32 sourceY;
             struct ContactPosition *lowPosition;
-            u32 positionOffset;
             u32 sourceZ;
             u32 dz;
             x += dx;
             scatterPosition->x = x;
             y = (u16)scatterPosition->y;
-            positionOffset = 0x10;
-            lowPosition = (struct ContactPosition *)(positionOffset + ((u32)actor));
-            position = lowPosition;
+            lowPosition = &actor->position;
+            position = &actor->position;
             sourceY = (u16)actor->position.y;
             y += sourceY;
             scatterPosition->y = y;
@@ -86,44 +71,16 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
         }
         TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         {
-            u8 randomIndex;
-            u32 sampleX;
-            u32 lowMask;
-            u32 sampleY;
-            u32 yMask;
-            u32 *counter;
-            u32 sampleZ;
-            u32 sourceX;
-            struct ContactPosition *lowPosition;
-            u32 sourceY;
-            u32 zMask;
-            u32 sourceZ;
-            randomIndex = (gRandomIndex + 1) & randomMask;
-            sampleX = table[randomIndex];
-            lowMask = xzMask;
-            sampleX &= lowMask;
-            scatterPosition->x = sampleX;
-            randomIndex = (randomIndex + 1) & randomMask;
-            sampleY = table[randomIndex];
-            yMask = 127;
-            sampleY &= yMask;
-            scatterPosition->y = sampleY;
-            randomIndex = (randomIndex + 1) & randomMask;
-            counter = &gRandomIndex;
-            *counter = randomIndex;
-            sampleZ = table[randomIndex];
-            sourceX = (u16)actor->position.x;
-            sampleX += sourceX;
-            scatterPosition->x = sampleX;
-            lowPosition = position;
-            sourceY = (u16)lowPosition->y;
-            sampleY += sourceY;
-            scatterPosition->y = sampleY;
-            zMask = xzMask;
-            sampleZ &= zMask;
-            sourceZ = (u16)lowPosition->z;
-            sampleZ += sourceZ;
-            scatterPosition->z = sampleZ;
+            u32 sx = RandomBits(table, xzMask), sy, sz;
+            scatterPosition->x = sx;
+            sy = RandomBits(table, 127);
+            scatterPosition->y = sy;
+            sz = RandomBits(table, xzMask);
+            sx += (u16)actor->position.x;
+            scatterPosition->x = sx;
+            sy += (u16)position->y;
+            scatterPosition->y = sy;
+            scatterPosition->z = (u16)position->z + sz;
         }
         TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         sub_080148CC(4, 14, position, 64, 256, 12, 8, 8, 8, 30, 30);

@@ -34,7 +34,7 @@ void Dog_SelectAnimationOne(void *);
 void Dog_SelectAnimationZero(void *);
 void SceneActorControl_BeginHiddenDefeat(void *);
 void Dog_OnReactionCleanup(void *);
-u8 sub_0807F81C(void *);
+u8 SceneActorTarget_UpdateTrackedContact(void *);
 void Dog_ResolvePendingObject(void);
 void Dog_UpdateDefeatDelay(void);
 void Dog_ResumeAfterReaction(void);
@@ -156,7 +156,7 @@ s32 Dog_Init(void *object)
     MonsterInit_InstallSequenceCallbacks(
         actor, Dog_Update, sub_080DE6E0, sub_080DFC34, Dog_SelectAnimationOne,
         Dog_SelectAnimationZero, Dog_OnReactionCleanup, sub_080E0750,
-        SceneActorControl_BeginHiddenDefeat, SceneActorReaction_OnEnemyDefault, sub_0807F81C,
+        SceneActorControl_BeginHiddenDefeat, SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
         Dog_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(

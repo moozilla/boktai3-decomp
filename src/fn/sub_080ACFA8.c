@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 u16 Route_GetCurrentPointFacing(void *);
 void Anim_SetDurationScale(void *, u32);
@@ -6,10 +5,6 @@ void Anim_SetFrameDurationScale(void *, u32);
 static inline u32 Flags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     return a->flags2D4 & mask;
-}
-static inline s32 Direction(s32 value, s32 mask)
-{
-    return ((value + 0x60) >> 6) & mask;
 }
 // confidence=low: aligns idle facing with the saved route direction after animation completion.
 void Vorn_UpdateIdleFacing(struct SceneActorRegistryResetView *actor)
@@ -55,13 +50,10 @@ void Vorn_UpdateIdleFacing(struct SceneActorRegistryResetView *actor)
         group[9] = (*((u8 *)actor + 0x3CD) + 5) << 5;
         actor->field2B0 = 1;
         {
-            register s32 facing asm("r1") = actor->body.direction + 0x60;
-            asm("" : "+r"(facing));
-            facing >>= 6;
-            {
-                s32 mask = 3;
-                actor->body.direction = (mask & facing) * 64 - 64;
-            }
+            u32 facing = (actor->body.direction + 0x60) >> 6;
+            u32 quadrant = 3;
+            quadrant &= facing;
+            actor->body.direction = (quadrant << 6) - 64;
         }
         SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     }

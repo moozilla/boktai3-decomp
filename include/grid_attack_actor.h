@@ -5,6 +5,8 @@
 #include "engine.h"
 
 #include "scene_vec.h"
+#include "camera_tracking.h"
+#include "contact_swarm.h"
 #include "contact_actor.h"
 #include "scene_event_dispatch.h"
 
@@ -13,12 +15,6 @@
 
 struct GridAttackPacked {
     s32 x : 16, y : 16, z : 16, pad : 16;
-};
-
-/* Word-aligned position copy used by the original compiler. */
-
-struct GridAttackPoint {
-    u32 a, b;
 };
 
 struct GridAttackPacket {
@@ -33,18 +29,13 @@ struct GridAttackTransform {
     u8 unknown0[9];
     u8 angle;
     u8 unknownA[2];
-    struct GridAttackPoint coordinates;
+    struct ContactPosition coordinates;
 };
 
 struct GridAttackAnimData {
     u8 unknown0[0xC];
     void *palette;
     u8 unknown10[0xC];
-};
-
-struct GridAttackDrawable {
-    u8 sprite[0x1C];
-    u8 position[0x10];
 };
 
 struct GridAttackActor {
@@ -80,26 +71,26 @@ struct GridAttackActor {
     u8 animationMode;  /* 0xB6 */
     u8 animationSpeed; /* 0xB7 */
     u8 unknownB8[4];
-    s32 contactSource;  /* 0xBC */
-    u32 contactFlags;   /* 0xC0 */
-    u32 actionTimer;    /* 0xC4 */
-    u32 targetDistance; /* 0xC8 */
-    u8 requestedAngle;  /* 0xCC */
+    s32 contactSource;      /* 0xBC */
+    u32 contactFlags;       /* 0xC0 */
+    u32 actionTimer;        /* 0xC4 */
+    u32 targetDistances[1]; /* 0xC8 */
+    u8 requestedAngles[1];  /* 0xCC */
     u8 unknownCD[0x3];
-    struct GridAttackPoint savedPosition; /* 0xD0 */
+    struct ContactPosition savedPosition; /* 0xD0 */
     u8 unknownD8[0x9];
     u8 attackRange;            /* 0xE1 */
     u8 contactRewardParameter; /* 0xE2 */
     u8 unknownE3;
     u32 effectTimer; /* 0xE4 */
     u8 unknownE8[8];
-    u32 scriptArgs[4];        /* 0xF0 */
-    void (*callback)(void *); /* 0x100 */
-    u8 (*tryUpdate)(void *);  /* 0x104 */
-    u8 (*reset)(void *);      /* 0x108 */
-    u8 *damageSource;         /* 0x10C */
-    s16 *targetPosition;      /* 0x110 */
-    s8 savedAngle;            /* 0x114 */
+    u32 scriptArgs[4];                   /* 0xF0 */
+    void (*callback)(void *);            /* 0x100 */
+    u8 (*tryUpdate)(void *);             /* 0x104 */
+    u8 (*reset)(void *);                 /* 0x108 */
+    struct Player *players[1];           /* 0x10C */
+    struct SceneVec *targetPositions[1]; /* 0x110 */
+    s8 savedAngle;                       /* 0x114 */
     u8 unknown115[0x3];
     struct SceneEventReceiver receiver; /* 0x118 */
     u8 unknown140[0x34];
@@ -113,7 +104,7 @@ struct GridAttackActor {
     s16 height;     /* 0x184 */
     u8 unknown186[6];
     s16 flash;          /* 0x18C */
-    s16 stun;           /* 0x18E */
+    u16 stun;           /* 0x18E */
     u16 actionDuration; /* 0x190 */
     u16 bodyMode;       /* 0x192 */
     u8 shakeAngle;      /* 0x194 */
@@ -153,11 +144,11 @@ struct GridAttackActor {
     struct ContactCollider damageCollider;
     struct GridAttackAnimData animData; /* 0x86C */
 
-    struct GridAttackDrawable drawable;    /* 0x888 */
+    struct ContactSwarmSprite drawable;    /* 0x888 */
     struct DisplaySequenceState animation; /* 0x8B4 */
     void *resource;                        /* 0x8C4 */
-    struct GridAttackPoint shadowPosition; /* 0x8C8 */
-    u8 shadow[0x30];
+    struct ContactPosition shadowPosition; /* 0x8C8 */
+    struct CameraTracking camera;
     void *projectedDisplay;         /* 0x900 */
     void *contactPool;              /* 0x904 */
     void *orbitContact;             /* 0x908 */
