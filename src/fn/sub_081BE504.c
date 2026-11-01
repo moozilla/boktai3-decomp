@@ -27,30 +27,27 @@ static inline void ShowWidget(struct SceneInputWidget *widget)
 
 #define STORAGE_MEMBER_OFFSET(member) ((u32) & ((struct StorageCategoryWidgets *)0)->member)
 
-static inline void ClearOffset(u32 *offset)
+static inline void Storage_ClearOffset(u32 *offset)
 {
     *offset = 0;
 }
-#define STORAGE_CLEAR_EMPTY(p)                                                                     \
-    do {                                                                                           \
-        (p)->emptyCarried = 255;                                                                   \
-        (p)->emptyStored = -1;                                                                     \
-    } while (0)
+
 void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
 {
-    s32 col, row, marker, equipmentId;
+    s32 col, row, marker;
+    s32 id;
     struct StorageCategoryWidgets *cellBase;
     u32 widgetOffset;
     u32 rowBytes;
     u32 rowSlot;
     u32 markerBytes;
-    u32 markerStart;
-    STORAGE_CLEAR_EMPTY(p);
+    p->emptyCarried = 255;
+    p->emptyStored = -1;
     marker = 0;
     row = 0;
     rowBytes = 0;
-    ClearOffset(&rowSlot);
-    ClearOffset(&markerBytes);
+    Storage_ClearOffset(&rowSlot);
+    Storage_ClearOffset(&markerBytes);
     do {
         u32 *hideFlags;
         struct StorageCategoryWidgets *markerBase;
@@ -65,19 +62,24 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
         markerBase = (void *)(markerBytes + (u32)p);
         markerOffset = markerBytes;
         do {
-            u32 index = rowSlot + col;
-            equipmentId = Inventory_GetEquipmentId(p->slots[index]);
-            if (equipmentId != 255) {
+            s32 index = rowSlot + col;
+            id = Inventory_GetEquipmentId(p->slots[index]);
+            if (id != 255) {
                 struct SceneInputWidget *widget;
                 ShowWidget(&cellBase->carried[0][0]);
-                widget = (void *)((u8 *)&p->carried[0][0] + widgetOffset);
-                Anim_LoadKeyframe(widget, &p->resource, (u16)(equipmentId + 240), 0);
+                {
+                    u32 offset = widgetOffset + STORAGE_MEMBER_OFFSET(carried);
+                    widget = (void *)((u32)p + offset);
+                }
+                Anim_LoadKeyframe(widget, &p->resource, (u16)(id + 240), 0);
                 if (Storage_FindEquippedItemSlot(p, p->slots[index]) >= 0) {
                     struct SceneInputWidget *mark;
                     SceneHud_SetKeyframePaletteBank(widget, 0x374);
-                    markerStart = STORAGE_MEMBER_OFFSET(markers);
-                    ShowWidget((void *)((u8 *)markerBase + markerStart));
-                    mark = (void *)((u8 *)p + (markerOffset + markerStart));
+                    ShowWidget(&markerBase->markers[0]);
+                    {
+                        u32 offset = STORAGE_MEMBER_OFFSET(markers) + markerOffset;
+                        mark = (void *)((u32)p + offset);
+                    }
                     Storage_GetSlotPosition(&mark->position, p->slots[index]);
                     markerBase = (void *)((u8 *)markerBase + sizeof(struct SceneInputWidget));
                     markerOffset += sizeof(struct SceneInputWidget);
@@ -98,43 +100,47 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
             widgetOffset += sizeof(struct SceneInputWidget);
             col++;
             if (col > 3)
-                break;
+                goto carriedRowDone;
         } while (1);
+    carriedRowDone:
         rowBytes += sizeof(p->carried[0]);
         rowSlot += 4;
-        if (++row > 3)
-            goto stored;
+        row++;
+        if (row > 3)
+            goto carriedDone;
     } while (1);
-stored:
+carriedDone:
     for (row = 0; row < 4;) {
         struct SceneInputWidget *widget;
-        u32 rowSlot;
-        u32 index;
+        s32 slot;
+        s32 index;
         s32 nextRow;
         u32 offset;
         struct SceneInputWidget *base;
         col = 0;
-        rowSlot = row * 4;
+        slot = row * 4;
         nextRow = row + 1;
-        offset = ((row << 3) + rowSlot) << 5;
+        offset = ((row << 3) + slot) << 5;
         base = &p->stored[0][0];
         widget = (void *)(offset + (u32)base);
-        index = rowSlot + 16;
-    nextStored:
-        equipmentId = Inventory_GetEquipmentId(p->slots[index]);
-        if (equipmentId != 255) {
-            widget->flags &= ~1;
-            Anim_LoadKeyframe(widget, &p->resource, (u16)(equipmentId + 240), 1);
-        } else {
-            if (p->emptyStored < 0)
-                p->emptyStored = index;
-            widget->flags |= 1;
-        }
-        widget++;
-        index++;
-        col++;
-        if (col <= 3)
-            goto nextStored;
+        index = slot + 16;
+        do {
+            id = Inventory_GetEquipmentId(p->slots[index]);
+            if (id != 255) {
+                widget->flags &= ~1;
+                Anim_LoadKeyframe(widget, &p->resource, (u16)(id + 240), 1);
+            } else {
+                if (p->emptyStored < 0)
+                    p->emptyStored = index;
+                widget->flags |= 1;
+            }
+            widget++;
+            index++;
+            col++;
+            if (col > 3)
+                goto storedRowDone;
+        } while (1);
+    storedRowDone:
         row = nextRow;
     }
     for (; marker < 8; marker++)
