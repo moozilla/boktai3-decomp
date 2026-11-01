@@ -11,7 +11,14 @@ struct ContactSequenceScriptArgs {
     s32 *values;
 };
 #ifdef NONMATCHING
-// fuzzy: 92.5%
+// fuzzy: 97.5%
+// Remaining difference: the ROM reloads xzMask (sl) afresh into r2 for the first `&`
+// (movs r3, #0x3f; mov sl, r3; mov r2, sl), where this draft inherits r3. The same
+// no-inheritance pattern appears in 91 ROM places; in matched DirectionalParticle_Spawn and
+// ActorParticles_SpawnWideBurst it comes from a shared constant whose set is HImode (an `&`
+// narrowed by a 16-bit store) and whose use is SImode, so find_equiv_reg rejects the mode.
+// Writing every `& 63` as a narrowed literal shares one HImode pseudo, but it gets no register
+// here (0x1004 takes sl): 8 differing insns.
 static inline u32 RandomValue(const u16 *table)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -48,27 +55,9 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
         scatter.bits.y = RandomBits(table, 127);
         scatter.bits.z = RandomBits(table, xzMask);
         scatterPosition = &scatter.position;
-        {
-            u32 x = (u16)actor->position.x;
-            u32 dx = (u16)scatterPosition->x;
-            u32 y;
-            u32 sourceY;
-            struct ContactPosition *lowPosition;
-            u32 sourceZ;
-            u32 dz;
-            x += dx;
-            scatterPosition->x = x;
-            y = (u16)scatterPosition->y;
-            lowPosition = &actor->position;
-            position = &actor->position;
-            sourceY = (u16)actor->position.y;
-            y += sourceY;
-            scatterPosition->y = y;
-            sourceZ = (u16)lowPosition->z;
-            dz = (u16)scatterPosition->z;
-            sourceZ += dz;
-            scatterPosition->z = sourceZ;
-        }
+        scatterPosition->x += actor->position.x;
+        scatterPosition->y += (position = &actor->position)->y;
+        scatterPosition->z += position->z;
         TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         {
             u32 sx = RandomBits(table, xzMask), sy, sz;

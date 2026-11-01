@@ -5379,6 +5379,44 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
                 res = "MATCH" if k == 0 else inf.get("counts", f"{k} differ")
                 print(f"  lever: `{name} = {m.group(1).strip()};` again before line {close + 1}: {res}"
                       f" ({'better' if k < base else 'same' if k == base else 'worse'}; {var})")
+                view = union_view_variant(rows, ln, name)
+                if view is None:
+                    continue
+                var = var[:-len(f".lever-{name}.c")] + f".lever-{name}-view.c"
+                with open(os.path.join(ROOT, var), "w") as f:
+                    f.write("\n".join(view))
+                k, inf = score(var, func, env)
+                res = "MATCH" if k == 0 else inf.get("counts", f"{k} differ")
+                print(f"  lever: set {name} through a one-member union (`union RandomTableView` in ram.h is"
+                      f" one) at line {ln}: {res} ({'better' if k < base else 'same' if k == base else 'worse'};"
+                      f" {var})")
+
+
+UNION_VIEW_TYPE = r"((?:(?:const|volatile|unsigned|signed|struct|union)\s+)*[A-Za-z_]\w*(?:\s*\*+\s*|\s+))"
+
+
+def union_view_variant(rows, ln, name):
+    """Rows with line LN's `name = expr;` routed through a one-member union initializer, or None.
+    A union initializer expands to a CLOBBER of the union's register before the set (expr.c
+    store_constructor), so loop.c counts two sets, may_not_optimize, and leaves the value in the
+    loop even when the body is one basic block, where the dead re-set lever does nothing because cse
+    deletes the repeat (SceneActorEffects_EmitRandomOffsets and the random-table loops)."""
+    row = rows[ln - 1]
+    m = re.fullmatch(rf"(\s*){UNION_VIEW_TYPE}{name}\s*=\s*([^;]+);\s*", row)
+    if m:  # a declaration: keep it, initialized from the view
+        ind, typ, expr = m.group(1), m.group(2).strip(), m.group(3).strip()
+        return rows[:ln - 1] + [f"{ind}union {{ {typ} v; }} {name}View = {{{expr}}};",
+                                f"{ind}{typ} {name} = {name}View.v;"] + rows[ln:]
+    m = re.fullmatch(rf"(\s*){name}\s*=\s*([^;=][^;]*);\s*", row)
+    if not m:
+        return None
+    for i in range(ln - 2, -1, -1):  # the declaration's type, when it declares only NAME
+        d = re.fullmatch(rf"\s*{UNION_VIEW_TYPE}{name}\s*(?:=[^;]*)?;\s*", rows[i])
+        if d:
+            typ = d.group(1).strip()
+            ind, expr = m.group(1), m.group(2).strip()
+            return rows[:ln - 1] + [f"{ind}{{ union {{ {typ} v; }} view = {{{expr}}}; {name} = view.v; }}"] + rows[ln:]
+    return None
 
 
 def frame_slot_pairs(rows):
