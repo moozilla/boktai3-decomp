@@ -1,9 +1,4 @@
 // MATCHING_CONCESSION: register-pinning
-#define VC_FIRST    "r1"
-#define VC_TEMP     "r2"
-#define VC_MASK     "r4"
-#define VC_DURATION "r3"
-#define VC_WEIGHT   "r1"
 #include "vulcan_cannon_worker.h"
 s32 Mod(s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
