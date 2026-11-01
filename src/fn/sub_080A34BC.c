@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "scene_actor_reset.h"
@@ -15,6 +16,10 @@ void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorPlacement_TriggerTetherAction(void *);
 s32 SceneActor_IsWithinTetherRange(void *, u32, u32);
 void Spider_SelectRecoveryRoute();
+// Concession: a single-use statement macro with no evidence that the original had it. Its loop
+// notes make flow count the table's set twice (scope fact 26), so global alloc takes the table
+// before the 0x3FF mask and the table gets ip, as in the ROM. Ordinary C still needs a real reason
+// for those refs (a use of the table at depth 2, or a helper the original shared).
 #define SPIDER_CAPTURE_RANDOM_TABLE(out_)                                                          \
     do {                                                                                           \
         (out_) = gRandomTable;                                                                     \
