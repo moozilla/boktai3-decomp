@@ -118,7 +118,7 @@ void GridAttackActor_InitBodyCollider(struct GridAttackActor *p)
     offset.y = 128;
     offset.z = 0;
     Collider_Init(collider, 0, 0x2401, 0, 16, &size, &offset);
-    Collider_SetPosition(collider, p->drawable.position, 0);
+    Collider_SetPosition(collider, &p->drawable.position, 0);
     Collider_SetCallback(collider, GridAttackActor_OnBodyCollision, p);
     Collider_SetAttackProperties(collider, p->attackPower, p->attackKind, 0, 0, p->attackParameter);
 }
@@ -134,7 +134,7 @@ void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode)
     offset.y = 128;
     offset.z = 0;
     Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
-    Collider_SetPosition(collider, p->drawable.position, 0);
+    Collider_SetPosition(collider, &p->drawable.position, 0);
     Collider_SetCallback(collider, GridAttackActor_OnDamageCollision, p);
     Collider_SetBodyProperties(collider, mode, 0x808, 4);
     Collider_Refresh(collider);
@@ -167,7 +167,7 @@ static inline int GridAttack_RandomColumn(u16 *table)
 
 void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p)
 {
-    if ((p->targetPosition)[2] < 0xc00) {
+    if (p->targetPositions[0]->z < 0xc00) {
         GridAttackActor_SpawnGridContact(p, 0, 0);
         GridAttackActor_SpawnGridContact(p, 2, 0);
         GridAttackActor_SpawnGridContact(p, 0, 1);
@@ -364,7 +364,7 @@ void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
         index = (index + 1) & mask;
         *indexPtr = index;
         speed = (table[index] & smallMask) + 20;
-        SparkParticle_Spawn(graphics->position, 3, &size, angle, count, speed, 2, 2);
+        SparkParticle_Spawn(&graphics->position, 3, &size, angle, count, speed, 2, 2);
     }
 }
 
@@ -423,7 +423,7 @@ static inline void GridAttack_SetFacingPinned(struct GridAttackActor *p, int ang
 void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
 {
     if (!p->locked)
-        GridAttack_SetFacingPinned(p, p->requestedAngle);
+        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
     if (p->changed) {
         p->changed = 0;
         if (p->locked)
@@ -443,7 +443,7 @@ void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttack_SetFacingPinned(p, p->requestedAngle);
+        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
         GridAttackActor_ResetAttackAnimationHistory(p);
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         Sound_PlaySongChecked(1355);
@@ -473,7 +473,7 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
     if (p->changed) {
         int zero = 0;
         p->changed = zero;
-        GridAttack_SetFacingPinned(p, p->requestedAngle);
+        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
         GridAttackActor_SetAnimation(p, 3, 1, 8);
         p->stage = zero;
         p->counter = zero;
@@ -567,7 +567,7 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     struct GridAttackActor *base = p;
     if (p->changed) {
         p->changed = 0;
-        GridAttack_SetFacingPinned(p, p->requestedAngle);
+        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
         GridAttackActor_ResetAttackAnimationHistory(p);
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
@@ -586,8 +586,8 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     if (p->reset(p))
         return;
     if (tick == 8)
-        GridAttackActor_SpawnTargetedProjectile(base, (struct GridAttackPoint *)p->targetPosition,
-                                                base->targetAttackParameter);
+        GridAttackActor_SpawnTargetedProjectile(
+            base, (struct GridAttackPoint *)p->targetPositions[0], base->targetAttackParameter);
     if (p->animationEnded)
         p->finished = 1;
 }
@@ -667,7 +667,7 @@ void GridAttack_UpdateDeathState(struct GridAttackActor *p)
     if (p->changed) {
         p->changed = 0;
         GridAttackActor_SetAnimation(p, 10, 1, 8);
-        SceneActors_RunFirstEventScript(p, p->drawable.position);
+        SceneActors_RunFirstEventScript(p, &p->drawable.position);
         ContactSequencePool_BeginAllDeaths(p->contactPool);
         GridAttack_SetDeathEffect(p, 2, 349, 1);
         base->stage = 0;
@@ -676,7 +676,7 @@ void GridAttack_UpdateDeathState(struct GridAttackActor *p)
     }
     if (p->animationEnded && !base->stage) {
         GameState_SetEventFlag(80);
-        SceneActors_RunSecondEventScript(p, base->drawable.position);
+        SceneActors_RunSecondEventScript(p, &base->drawable.position);
         base->stage++;
     }
     {
@@ -1785,7 +1785,7 @@ void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *input)
     register struct GridAttackActor *base asm("sb") = p;
     struct GridAttackTransform *transform = &p->transform;
     struct SceneVec *position = (void *)(&transform->coordinates);
-    struct SceneVec *draw = (void *)p->drawable.position;
+    struct SceneVec *draw = (void *)&p->drawable.position;
     s32 height;
     u32 i;
     asm("" : "+r"(p), "+r"(base));
@@ -1880,12 +1880,12 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
         (&base->damageCollider)->flags |= 4;
     else {
         (&base->damageCollider)->flags &= ~4;
-        Collider_SetPosition(&base->damageCollider, base->drawable.position, 0);
+        Collider_SetPosition(&base->damageCollider, &base->drawable.position, 0);
         (&base->damageCollider)->direction = transform->angle;
     }
     body = &base->bodyCollider;
     if (!(p->flags & 8)) {
-        Collider_SetPosition(body, base->drawable.position, 0);
+        Collider_SetPosition(body, &base->drawable.position, 0);
         body->direction = transform->angle;
         Collider_Refresh(body);
     }
@@ -2045,7 +2045,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
     count = Script_GetKeywordValue(0x50, 1);
     p->targetCount = count;
     {
-        u32 *target = (u32 *)&p->targetPosition;
+        u32 *target = (u32 *)&p->targetPositions[0];
         u32 *slot = (u32 *)&p->damageSource;
         for (i = 0; i < count; i++) {
             u32 value = (u32)gPlayers[i];
@@ -2117,7 +2117,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
     AnimData_Load(&p->animData, 0x4147);
     Sprite_Init(&p->drawable, &p->animData, 1);
     *(u32 *)p->drawable.sprite &= ~2;
-    *(struct GridAttackPoint *)p->drawable.position = *(struct GridAttackPoint *)&pk;
+    *(struct GridAttackPoint *)&p->drawable.position = *(struct GridAttackPoint *)&pk;
     p->drawable.sprite[7] = 1;
     p->resource = ScriptProc_Start(0x922E, 0xC5E2);
     Anim_SetSequence(&p->animation, p->resource, 2, 0, 0);
@@ -2217,8 +2217,9 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
     p->effectVariant = 0;
     p->effectDuration = 5;
 
-    *(struct GridAttackPoint *)&p->shadowPosition = *(struct GridAttackPoint *)p->drawable.position;
-    CameraFollow_Initialize(p->shadow, p->targetPosition, &p->shadowPosition, 1);
+    *(struct GridAttackPoint *)&p->shadowPosition =
+        *(struct GridAttackPoint *)&p->drawable.position;
+    CameraFollow_Initialize(p->shadow, p->targetPositions[0], &p->shadowPosition, 1);
     ((u32 *)p->shadow)[4] = 0;
     ((u32 *)p->shadow)[5] = 0x8C;
 
@@ -2231,7 +2232,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
     p->contactPool =
         ContactSequencePool_Create(poolHealth, poolValue, poolResource, ctx, (s16)p->contactReward);
     p->orbitContact = OrbitContactActor_Create(&p->transform.coordinates, orbitValue);
-    p->contactBurst = ContactBurst_Create((struct ContactPosition *)p->drawable.position);
+    p->contactBurst = ContactBurst_Create((struct ContactPosition *)&p->drawable.position);
     p->linkedActorId = Script_GetKeywordValue(0x54, 0);
     p->linkedActorPhase = 0;
     p->phaseTimer = 0;

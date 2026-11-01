@@ -18,8 +18,8 @@ struct GridAttackPacked {
 /* Word-aligned position copy used by the original compiler. */
 
 struct GridAttackPoint {
-    u32 a, b;
-};
+    s16 x, y, z, pad;
+} __attribute__((aligned(4)));
 
 struct GridAttackPacket {
     u16 id;
@@ -44,7 +44,8 @@ struct GridAttackAnimData {
 
 struct GridAttackDrawable {
     u8 sprite[0x1C];
-    u8 position[0x10];
+    struct GridAttackPoint position;
+    u8 unknown24[8];
 };
 
 struct GridAttackActor {
@@ -80,11 +81,11 @@ struct GridAttackActor {
     u8 animationMode;  /* 0xB6 */
     u8 animationSpeed; /* 0xB7 */
     u8 unknownB8[4];
-    s32 contactSource;  /* 0xBC */
-    u32 contactFlags;   /* 0xC0 */
-    u32 actionTimer;    /* 0xC4 */
-    u32 targetDistance; /* 0xC8 */
-    u8 requestedAngle;  /* 0xCC */
+    s32 contactSource;      /* 0xBC */
+    u32 contactFlags;       /* 0xC0 */
+    u32 actionTimer;        /* 0xC4 */
+    u32 targetDistances[1]; /* 0xC8 */
+    u8 requestedAngles[1];  /* 0xCC */
     u8 unknownCD[0x3];
     struct GridAttackPoint savedPosition; /* 0xD0 */
     u8 unknownD8[0x9];
@@ -93,13 +94,13 @@ struct GridAttackActor {
     u8 unknownE3;
     u32 effectTimer; /* 0xE4 */
     u8 unknownE8[8];
-    u32 scriptArgs[4];        /* 0xF0 */
-    void (*callback)(void *); /* 0x100 */
-    u8 (*tryUpdate)(void *);  /* 0x104 */
-    u8 (*reset)(void *);      /* 0x108 */
-    u8 *damageSource;         /* 0x10C */
-    s16 *targetPosition;      /* 0x110 */
-    s8 savedAngle;            /* 0x114 */
+    u32 scriptArgs[4];                   /* 0xF0 */
+    void (*callback)(void *);            /* 0x100 */
+    u8 (*tryUpdate)(void *);             /* 0x104 */
+    u8 (*reset)(void *);                 /* 0x108 */
+    u8 *damageSource;                    /* 0x10C */
+    struct SceneVec *targetPositions[1]; /* 0x110 */
+    s8 savedAngle;                       /* 0x114 */
     u8 unknown115[0x3];
     struct SceneEventReceiver receiver; /* 0x118 */
     u8 unknown140[0x34];
