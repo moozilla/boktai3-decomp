@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
 
-// MATCHING_CONCESSION: register-pinning
 
 struct ArmorDecisionActor {
     u8 pad0[0x18];
@@ -34,39 +33,41 @@ extern struct ArmorDecisionTarget *gGameState;
 void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
+// Grid-cell deltas (x and z rounded to 256-unit cells) and their magnitudes.
+#define ARMOR_GRID_DELTAS(target, actor, dx, dy, dz, ax, ay, az)                                   \
+    do {                                                                                           \
+        dx = (target)->x - (actor)->x;                                                             \
+        dy = (target)->y - (actor)->y;                                                             \
+        dz = (target)->z - (actor)->z;                                                             \
+        dx = (dx + 128) >> 8;                                                                      \
+        dz = (dz + 128) >> 8;                                                                      \
+        ax = dx;                                                                                   \
+        ay = dy;                                                                                   \
+        az = dz;                                                                                   \
+        if (dx < 0)                                                                                \
+            ax = -dx;                                                                              \
+        if (dy < 0)                                                                                \
+            ay = -dy;                                                                              \
+        if (dz < 0)                                                                                \
+            az = -dz;                                                                              \
+    } while (0)
+
 // confidence=low: selects attacks when player and armor share a horizontal grid axis.
 void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
 {
-    u32 mode;
     s32 dx;
     s32 dy;
-    s32 zDelta;
-    register s32 gridZ asm("r5");
+    s32 dz;
     s32 ax;
     s32 ay;
-    register s32 az asm("r2");
+    s32 az;
     s16 *cooldown = &p->attackCooldown;
     if ((*cooldown) > 0)
         --(*cooldown);
     if ((p->phase != 255) && (p->behavior != 20))
         return;
-    dx = gGameState->x - p->x;
-    dy = gGameState->y - p->y;
-    zDelta = gGameState->z - p->z;
-    dx = (dx + 128) >> 8;
-    zDelta = (zDelta + 128) >> 8;
-    ax = dx;
-    ay = dy;
-    az = zDelta;
-    if (dx < 0)
-        ax = -dx;
-    if (dy < 0)
-        ay = -dy;
-    if (zDelta < 0)
-        az = -zDelta;
-    gridZ = zDelta;
-    mode = p->flags & 1;
-    if (mode) {
+    ARMOR_GRID_DELTAS(gGameState, p, dx, dy, dz, ax, ay, az);
+    if (p->flags & 1) {
         u8 *decision = &p->decision;
         switch (*decision) {
             case 0:
@@ -77,7 +78,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                 if ((p->behavior != 20) || (!(p->taskFlags & 4)))
                     goto idle;
                 if (dx == 0) {
-                    if (gridZ < 0) {
+                    if (dz < 0) {
                         if (p->facing == 192)
                             goto aligned0;
                     } else if (p->facing == 64)
@@ -86,16 +87,16 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                 aligned0:
                     if ((ay <= 127) && (az <= 1)) {
                         p->decision = 1;
-                        // Preserve this state store before the shared attack tail.
-                        asm volatile("" : : "m"(p->decision));
-                        goto attack;
+                        ActorController_SetBehavior(p, 3);
+                        break;
                     }
                     if (az > 3)
                         goto idle;
-                } else if (gridZ == 0) {
-                    register s32 gridX asm("r5") = dx;
-                    asm("" : : "r"(gridX));
-                    if (gridX < 0) {
+                    p->decision = 1;
+                    ActorController_SetBehavior(p, 10);
+                    break;
+                } else if (dz == 0) {
+                    if (dx < 0) {
                         if (p->facing == 128)
                             goto aligned1;
                     } else if (p->facing == 0)
@@ -104,7 +105,8 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                 aligned1:
                     if ((ay <= 127) && (ax <= 1)) {
                         p->decision = 1;
-                        goto attack;
+                        ActorController_SetBehavior(p, 3);
+                        break;
                     }
                     if (ax > 3)
                         goto idle;
@@ -120,7 +122,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                 if ((p->behavior == 21) && (!((u16)(p->taskFlags & 4))))
                     *decision = 0;
                 if (dx == 0) {
-                    if (gridZ < 0) {
+                    if (dz < 0) {
                         if (p->facing == 192)
                             goto aligned2;
                     } else if (p->facing == 64)
@@ -128,8 +130,8 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                     goto reset;
                 aligned2:
                     if ((ay <= 127) && (az <= 1))
-                        goto attack;
-                } else if (gridZ == 0) {
+                        goto attack2;
+                } else if (dz == 0) {
                     if (dx < 0) {
                         if (p->facing == 128)
                             goto aligned3;
@@ -138,7 +140,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                     goto reset;
                 aligned3:
                     if ((ay <= 127) && (ax <= 1))
-                        goto attack;
+                        goto attack2;
                 } else
                     goto reset;
                 ActorController_SetBehaviorIfFinished(p, 21);
@@ -151,7 +153,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                     break;
                 if (dx == 0)
                     p->decision = 1;
-                else if (gridZ == 0)
+                else if (dz == 0)
                     p->decision = 1;
                 else {
                 reset:
@@ -176,15 +178,16 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
                 }
                 if (ay <= 127) {
                     if (dx == 0) {
-                        if (az > 1)
-                            goto far;
-                    } else if (gridZ != 0 || ax > 1)
-                        goto far;
-                attack:
-                    ActorController_SetBehavior(p, 3);
-                    break;
+                        if (az <= 1) {
+                        attack2:
+                            ActorController_SetBehavior(p, 3);
+                            break;
+                        }
+                    } else if (dz == 0 && ax <= 1) {
+                        ActorController_SetBehavior(p, 3);
+                        break;
+                    }
                 }
-            far:
                 if (((++p->collisionCooldown) > 300) &&
                     Armor_IsSequenceIncomplete(((u8 *)p) + 0xb58)) {
                     ActorController_SetBehavior(p, 31);
@@ -199,18 +202,18 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
             case 1:
                 if ((*cooldown) <= 0) {
                     ActorController_SetBehavior(p, 6);
-                    *decision = mode;
-                    p->secondaryCooldown = mode;
-                    p->collisionCooldown = mode;
+                    *decision = 0;
+                    p->secondaryCooldown = 0;
+                    p->collisionCooldown = 0;
                 } else
                     ActorController_SetBehaviorIfFinished(p, 5);
                 break;
 
             case 2:
                 ActorController_SetBehaviorIfFinished(p, 23);
-                *decision = mode;
-                p->secondaryCooldown = mode;
-                p->collisionCooldown = mode;
+                *decision = 0;
+                p->secondaryCooldown = 0;
+                p->collisionCooldown = 0;
                 break;
 
             case 16:
