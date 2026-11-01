@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.6%
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
 #include "contact_swarm.h"
 #include "display_sequence_inline.h"
@@ -141,19 +139,21 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
         s32 angle = config->angle;
         s32 speed = config->speed;
         s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
-        s32 zero = 0;
         vel->x = x;
-        vel->y = zero;
+        vel->y = 0;
         vel->z = Scale(gUnk_086149C4[angle & 255] * speed);
     }
     e->sprite.position = *position;
     e->config.appearanceFlags = 0;
     kind = RandomSample() & 3;
-    if (kind == 3) {
+    if (kind == 3)
         kind = 1;
-        e->config.appearanceFlags = kind;
-    } else {
-        e->config.appearanceFlags = kind;
+    e->config.appearanceFlags = kind;
+    {
+        u16 type = kind;
+        // Reject a kind outside the 4-bit field (kind is 0, 1 or 2 here).
+        if (type >= 3 && (type & ~15))
+            return -1;
     }
     if ((e->config.appearanceFlags & 15) <= 1) {
         if (RandomSample() & 1) {
@@ -205,7 +205,3 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     pool->activeCount += 1;
     return slot;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081FC26C);
-#endif
