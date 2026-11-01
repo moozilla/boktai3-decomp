@@ -2844,6 +2844,7 @@ addr,name,mode,confidence,source,notes
 08074DC0,SceneActorCollision_InitExternalAttack,thumb,low,src-alias,
 08074E38,SceneActorCollision_InitExternalAttackWithField34,thumb,low,src-alias,
 08075508,SceneActorMovement_ProjectProbe,thumb,low,src-alias,
+08075588,SceneActorMovement_UpdateStatus,thumb,low,src-alias,
 08075FC8,SceneActorMovement_RequestAvailableAction,thumb,low,src-alias,
 08076020,SceneActorRegistry_SetObjectContext,thumb,low,src-alias,
 08076034,SceneActorAnimation_SelectDirectionalEntry,thumb,low,src-alias,

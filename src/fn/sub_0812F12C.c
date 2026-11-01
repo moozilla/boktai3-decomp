@@ -5,7 +5,7 @@
 extern u32 gUnk_02000560;
 void SceneActorPlacement_HideActor(struct SceneActorRegistryActor *, s32);
 void SceneActorPlacement_ShowActor(struct SceneActorRegistryActor *, s32);
-void sub_08075588(struct SceneActorRegistryActor *);
+void SceneActorMovement_UpdateStatus(struct SceneActorRegistryActor *);
 void sub_08074EB0(struct SceneActorRegistryActor *);
 void SceneActorPlacement_ConsumeCallbackFlag(struct SceneActorRegistryActor *);
 void SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *);
@@ -59,7 +59,7 @@ s32 SceneActor_UpdateActiveCallbacks(struct SceneActorRegistryActor *p)
         if (!unavailable(p))
             Callback_InvokeActor(p, p->activeCallback264);
         SceneActorPlacement_ConsumeCallbackFlag(p);
-        sub_08075588(p);
+        SceneActorMovement_UpdateStatus(p);
         dispatch(&p->contextCallback274, p->context);
         SceneActorMovement_RequestAvailableAction(p);
         sub_08074EB0(p);
