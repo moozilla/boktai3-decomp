@@ -12,7 +12,7 @@ struct GlyphTrail {
 };
 void Task_Kill(void *);
 void sub_082377B8(void *);
-void sub_08237938(void *);
+void ActorGlyphTrail_UpdateParticles(void *);
 void sub_08237A28(void *);
 void ActorGlyphTrail_HideParticles(void *);
 void ActorGlyphTrail_SetState(void *, void (*)(void));
@@ -34,7 +34,7 @@ void ActorGlyphTrail_Update(struct GlyphTrail *p)
         ActorGlyphTrail_SetState(p, TimedSprite_UpdateMotion);
         return;
     }
-    sub_08237938(p);
+    ActorGlyphTrail_UpdateParticles(p);
     if (p->owner[0x458] == 2) {
         u16 *tmp = &p->timer;
         state &= *tmp;
