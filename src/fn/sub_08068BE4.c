@@ -3,215 +3,196 @@
 #include "engine.h"
 #include "contact_actor.h"
 #include "bouncing_object.h"
+#include "player_cue_sequence.h"
 extern const u8 gUnk_08605B68[];
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void Sound_PlaySong(u32 song);
 
-static inline u8 *sub08068BE4_CellDefinition(s32 cell)
+static inline s32 Cell(struct ContactPosition *p)
 {
-    u8 *definition = TerrainModifiers_FindCellOverride(cell, 1);
-    if (definition)
-        return definition + 4;
-    return gTerrainMap->cells + cell * 4 + 12;
-}
-
-static inline s32 sub08068BE4_Height(u8 *definition, struct ContactPosition *position)
-{
-    u32 kind = *definition >> 4;
-    s32 height = (*definition & 15) << 8;
-    switch (kind) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    return height;
-}
-
-static inline s32 sub08068BE4_CellIndex(struct ContactPosition *position)
-{
-    s32 x = position->x >> 8;
-    s32 z = position->z >> 8;
+    s32 x = (s16)p->x >> 8, z = (s16)p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return gTerrainMap->rows[z] + x;
 }
-
-#ifdef NONMATCHING
-// fuzzy: 45.1%
-// scope shape 321 (differences once low registers are set aside)
-// confidence=low: per-frame update of one bouncing object (ground contact, velocity, sequence, timer)
-void sub_08068BE4(struct BouncingPool *pool, struct BouncingObject *obj)
+static inline u8 *Properties(u32 cell)
 {
+    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
+    if (p)
+        return p + 4;
+    return gTerrainMap->cells + (cell * 4 + 12);
+}
+static inline s32 Height(u32 cell, struct ContactPosition *p)
+{
+    u8 *data = Properties(cell);
+    u32 shape = *data >> 4;
+    s32 height = (*data & 15) << 8;
+    switch (shape) {
+        case 1:
+            height -= (u8)p->z;
+            break;
+        case 2:
+            height -= (u8)p->x;
+            break;
+    }
+    return height;
+}
+static inline u32 Attributes(u32 cell)
+{
+    return *(u16 *)(Properties(cell) + 2);
+}
+
+// confidence=low: per-frame update of one bouncing object (ground contact, velocity, sequence, timer)
+void sub_08068BE4(struct BouncingPool *pool, struct BouncingObject *input)
+{
+    struct BouncingObject *obj = input;
+    struct BouncingObject *sprite = input;
     struct ContactPosition rel;
-    struct ContactPosition np;
-    struct ContactPosition *pos;
-    struct ContactPosition *position = &obj->sprite.position;
-    struct ContactPosition *velocity = &obj->velocity;
-    struct DisplaySequenceState *seq = &obj->sequence;
-    s32 cell, ground, ground2, ground3, speed, dist2, idx, timer;
-    u32 cellFlags;
-    u8 *definition;
-    u16 savedElapsed, savedIndex;
-    u8 animation;
+    struct ContactPosition next;
+    struct ContactPosition *position, *velocity;
+    u32 cell, nextCell, attrs;
+    s32 floor, nextFloor;
+    u8 *delay;
+    u16 *flags;
+    u32 value, test;
 
     if (obj->enter) {
-        obj->sprite.flags &= ~2;
+        obj->sprite.flags &= ~1;
         obj->stateFrame = 0;
         obj->enter = 0;
     }
-
-    cell = sub08068BE4_CellIndex(position);
-    obj->mapCell = cell;
-
-    if (obj->flags & 1) {
-        ground = sub08068BE4_Height(sub08068BE4_CellDefinition(obj->mapCell), position);
-        pos = position;
-        if ((u32)position->y <= (u32)ground)
-            goto afterGravity;
-    } else {
-        rel.x = obj->origin.x - position->x;
-        rel.y = obj->origin.y - position->y;
-        rel.z = obj->origin.z - position->z;
-        dist2 = rel.x * rel.x + rel.z * rel.z;
-        pos = &rel;
-        if (!(dist2 <= 0x3FFFF || obj->stateFrame > 8))
-            goto afterGravity;
-        obj->flags |= 1;
+    {
+        u16 c = Cell(&obj->sprite.position);
+        obj->mapCell = c;
     }
-    velocity->y -= 4;
-afterGravity:
-
-    cell = obj->mapCell;
+    flags = &obj->flags;
+    value = *flags;
+    test = 1;
+    test &= value;
+    if (test) {
+        s32 y = sprite->sprite.position.y;
+        u32 c = obj->mapCell;
+        struct ContactPosition *at = &sprite->sprite.position;
+        floor = Height(c, at);
+        if ((u32)y > (u32)floor)
+            obj->velocity.y -= 4;
+    } else {
+        s32 dist2;
+        struct ContactPosition *d = &rel;
+        struct ContactPosition *at = &sprite->sprite.position;
+        struct ContactPosition *o = &obj->origin;
+        d->x = o->x - sprite->sprite.position.x;
+        d->y = o->y - at->y;
+        d->z = o->z - at->z;
+        dist2 = d->x * d->x + d->z * d->z;
+        if (dist2 <= 0x3FFFF || obj->stateFrame > 8) {
+            u32 mask = 1;
+            mask |= value;
+            *flags = mask;
+            obj->velocity.y -= 4;
+        }
+    }
+    {
+        u16 *mc = &obj->mapCell;
+        position = &sprite->sprite.position;
+        velocity = &obj->velocity;
+        cell = *mc;
+    }
     Math_Atan2(velocity->x, velocity->z);
-    ground2 = sub08068BE4_Height(sub08068BE4_CellDefinition(cell), pos);
-
+    floor = Height(cell, position);
     if (velocity->x + velocity->z + velocity->y != 0) {
-        if (pos->y <= ground2) {
-            velocity->x = Div(6 * velocity->x, 10);
-            velocity->y = -Div(4 * velocity->y, 10);
-            velocity->z = Div(6 * velocity->z, 10);
-            speed = velocity->x + velocity->z + velocity->y;
-            if (speed < 0)
-                speed = -speed;
-            if (speed > 2) {
-                Sound_PlaySong(0x166);
-            } else {
-                velocity->x = 0;
-                velocity->y = 0;
-                velocity->z = 0;
+        if (position->y <= floor) {
+            velocity->x = Div(velocity->x * 6, 10);
+            velocity->y = -Div(velocity->y * 4, 10);
+            velocity->z = Div(velocity->z * 6, 10);
+            {
+                s32 x = velocity->x, z = velocity->z, y = velocity->y;
+                s32 speed = x + z + y;
+                if (speed < 0)
+                    speed = -speed;
+                if (speed <= 2) {
+                    velocity->x = 0;
+                    velocity->y = 0;
+                    velocity->z = 0;
+                } else {
+                    Sound_PlaySong(0x166);
+                }
             }
-            pos->y = ground2;
+            position->y = floor;
         }
-
-        np.x = velocity->x + pos->x;
-        np.y = velocity->y + pos->y;
-        np.z = velocity->z + pos->z;
-        cell = sub08068BE4_CellIndex(&np);
-        ground3 = sub08068BE4_Height(sub08068BE4_CellDefinition(cell), &np);
-        cellFlags = ((u16 *)sub08068BE4_CellDefinition(cell))[1];
-
-        if (cell != obj->mapCell) {
-            if (ground2 < ground3 || (((u16 *)sub08068BE4_CellDefinition(cell))[1] & 3) != 0) {
-                velocity->x = -Div(5 * velocity->x, 10);
-                velocity->z = -Div(5 * velocity->z, 10);
-                Sound_PlaySong(0x166);
-            }
+        next.x = position->x + velocity->x;
+        next.y = position->y + velocity->y;
+        next.z = position->z + velocity->z;
+        nextCell = Cell(&next);
+        nextFloor = Height(nextCell, &next);
+        attrs = Attributes(nextCell);
+        if (cell != nextCell && (floor < nextFloor || (Attributes(nextCell) & 3))) {
+            velocity->x = -Div(velocity->x * 5, 10);
+            velocity->z = -Div(velocity->z * 5, 10);
+            Sound_PlaySong(0x166);
         }
-
-        if (!(ground3 > 0 && (cellFlags & 0x40) == 0) && np.y <= ground3) {
-            gBouncingPool->used &= ~(1u << obj->index);
+        if ((nextFloor <= 0 || (attrs & 0x40)) && next.y <= nextFloor) {
+            struct BouncingPool *bp = gBouncingPool;
+            s8 *index = &obj->index;
+            s32 slot = *index;
+            bp->used &= ~(1 << slot);
             obj->state = 0;
             Sprite_Remove(obj);
-            Shadow_Destroy((u8 *)obj + 0xE4);
+            Shadow_Destroy(obj->registration);
             Collider_Remove(&obj->removalCollider);
-            obj->index = -1;
+            *(u8 *)index = 255;
             obj->flags = 0;
             obj->timer = 0;
-            goto collider;
+        } else {
+            position->x += velocity->x;
+            position->y += velocity->y;
+            position->z += velocity->z;
         }
-
-        pos->x += velocity->x;
-        pos->y += velocity->y;
-        pos->z += velocity->z;
     }
-
-collider:
-    Collider_SetPosition(&obj->removalCollider, position, 0);
+    Collider_SetPosition(&obj->removalCollider, &obj->sprite.position, 0);
     if (obj->collisionDelay != 0) {
         obj->collisionDelay--;
     } else {
-        Collider_SetPosition(&obj->bodyCollider, position, 0);
+        Collider_SetPosition(&obj->bodyCollider, &obj->sprite.position, 0);
         Collider_Refresh(&obj->bodyCollider);
     }
-
-    if (obj->animationDelay != 0) {
-        obj->animationDelay--;
-    } else if (obj->timer <= 0x59) {
-        timer = obj->timer;
+    {
+        u32 d = obj->animationDelay;
+        delay = &obj->animationDelay;
+        if (d != 0) {
+            *delay = d - 1;
+            goto step;
+        }
+    }
+    {
+        u32 idx;
+        u16 savedElapsed, savedIndex;
+        u32 timer = obj->timer;
         if (timer <= 0x1D)
             idx = 3;
         else if (timer <= 0x31)
             idx = 2;
-        else
+        else if (timer <= 0x59)
             idx = 1;
-        savedElapsed = seq->elapsed;
-        savedIndex = seq->index;
+        else
+            goto step;
+        savedElapsed = obj->sequence.elapsed;
+        savedIndex = obj->sequence.index;
         if (obj->animation == 1) {
-            Anim_SetSequence(seq, pool->sequenceResource, 2, 0, 0);
-            animation = 2;
+            Anim_SetSequence(&obj->sequence, pool->sequenceResource, 2, 0, 0);
+            obj->animation = 2;
         } else {
-            Anim_SetSequence(seq, pool->sequenceResource, 1, 0, 0);
-            animation = 1;
+            Anim_SetSequence(&obj->sequence, pool->sequenceResource, 1, 0, 0);
+            obj->animation = 1;
         }
-        obj->animation = animation;
-        seq->elapsed = savedElapsed;
-        seq->index = savedIndex;
-        obj->animationDelay = gUnk_08605B68[idx];
+        obj->sequence.elapsed = savedElapsed;
+        obj->sequence.index = savedIndex;
+        *delay = gUnk_08605B68[idx];
     }
-
-    obj->sprite.frame = ((u16 *)seq->commands)[seq->index] >> 6;
-    if ((seq->flags & 1) != ((((u16 *)seq->commands)[seq->index] >> 4) & 1))
-        obj->sprite.flags |= 4;
-    else
-        obj->sprite.flags &= ~5;
-    if ((seq->flags & 2) != ((((u16 *)seq->commands)[seq->index] >> 4) & 2))
-        obj->sprite.flags |= 8;
-    else
-        obj->sprite.flags &= ~9;
-
-    seq->elapsed++;
-    if (seq->elapsed >= seq->duration) {
-        seq->elapsed = 0;
-        if (seq->flags & 4) {
-            if (seq->index != 0) {
-                seq->index = seq->index - 1;
-            } else if (seq->flags & 8) {
-                seq->elapsed = seq->duration;
-            } else {
-                seq->index = seq->frameCount - 1;
-            }
-        } else {
-            seq->index = seq->index + 1;
-            if (seq->index >= seq->frameCount) {
-                if (seq->flags & 8) {
-                    seq->elapsed = seq->duration;
-                    seq->index = seq->frameCount - 1;
-                } else {
-                    seq->index = 0;
-                }
-            }
-        }
-        seq->frameWeight = ((u16 *)seq->commands)[seq->index] & 0xF;
-        seq->duration = (seq->speed * seq->frameWeight) >> 6;
-        if ((u8)seq->duration == 0)
-            seq->duration = 1;
-    }
-
+step:
+    PlayerCue_StepSequence(&sprite->sprite, &obj->sequence);
     obj->stateFrame++;
     if (obj->timer != 0) {
         obj->timer--;
@@ -220,6 +201,3 @@ collider:
         obj->enter = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08068BE4);
-#endif
