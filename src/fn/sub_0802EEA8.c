@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 // Provisional name: Actor_OnRisingFadeUpdate (tentative)
@@ -77,10 +76,7 @@ static inline int height(struct Vec *pos)
         index = 0;
     else
         index = ((struct Map *)gTerrainMap)->rows[z] + x;
-    {
-        register int c asm("r1") = *cell(index);
-        return c & 15;
-    }
+    return *cell(index) & 15;
 }
 void Actor_OnRisingFadeUpdate(void *unused, struct Actor *p, int ticks)
 {
@@ -97,6 +93,8 @@ void Actor_OnRisingFadeUpdate(void *unused, struct Actor *p, int ticks)
     {
         int a = 0x40;
         int b = 0;
+        struct Vec *dq;
+        int h;
         switch (p->phase) {
             case 0: {
                 int c = a - ticks * 4;
@@ -106,31 +104,17 @@ void Actor_OnRisingFadeUpdate(void *unused, struct Actor *p, int ticks)
                 }
                 if (ticks > 14)
                     p->phase = 1;
-                {
-                    register int v asm("r0") = height(p->drawPos);
-                    register int h asm("r2");
-                    struct Vec *dq;
-                    register int sum asm("r0");
-                    h = v << 8;
-                    dq = p->drawPos;
-                    sum = h + b;
-                    dq->y = sum;
-                }
+                h = height(p->drawPos) << 8;
+                dq = p->drawPos;
+                dq->y = h + b;
                 DisplayAnimation_SetPalette(&p->drawable, c, a, 0);
                 break;
             }
             case 1: {
                 b = ticks * 200 + 0xa0;
-                {
-                    register int v asm("r0") = height(p->drawPos);
-                    register int h asm("r2");
-                    struct Vec *dq;
-                    register int sum asm("r0");
-                    h = v << 8;
-                    dq = p->drawPos;
-                    sum = h + b;
-                    dq->y = sum;
-                }
+                h = height(p->drawPos) << 8;
+                dq = p->drawPos;
+                dq->y = h + b;
                 if (ticks > 7) {
                     u32 mask = 256;
                     p->flags |= mask;
@@ -150,20 +134,19 @@ void Actor_OnRisingFadeUpdate(void *unused, struct Actor *p, int ticks)
         }
         {
             int ang = p->targetAngle;
-            register int t1 asm("r1");
-            register int k asm("r0");
-            asm("" : "+r"(ang));
             p->angle = ang;
-            t1 = ang + 112;
-            t1 >>= 5;
-            k = 7;
-            k &= t1;
-            p->facing8 = k;
-            ang += 96;
-            ang >>= 6;
-            k = 3;
-            k &= ang;
-            p->facing4 = k;
+            {
+                s32 shifted = (ang + 112) >> 5;
+                u32 mask = 7;
+                mask &= shifted;
+                p->facing8 = mask;
+            }
+            {
+                s32 shifted = (ang + 96) >> 6;
+                u32 mask = 3;
+                mask &= shifted;
+                p->facing4 = mask;
+            }
             if (p->kind != 5)
                 Actor_PlayAnimationEntry(p, 0, 2, 0, 0);
         }

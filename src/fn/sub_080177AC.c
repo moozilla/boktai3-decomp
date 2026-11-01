@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "player.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: creates weather particles with two terrain-adjusted endpoints.
 #define Weather_SpawnTerrainParticles sub_080177AC
 struct Vec {
@@ -31,12 +30,12 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-#define RANDOM_TABLE ((u16 *)0x0203B400)
 u32 Weather_TestFlags(u32, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_LinkToList(void *, u32);
 s32 Mod(s32, s32);
+#define RANDOM_TABLE ((u16 *)0x0203B400)
 static inline u32 Random(void)
 {
     u32 n = (gRandomIndex + 1) & 0x3ff;
@@ -70,7 +69,7 @@ static inline s32 GroundHeight(struct Vec *position, s16 x, s16 z)
     }
     return height;
 }
-static inline u32 RandomAt(u16 *table)
+static inline u32 RandomAt(const u16 *table)
 {
     u32 n = (gRandomIndex + 1) & 0x3ff;
     gRandomIndex = n;
@@ -78,14 +77,14 @@ static inline u32 RandomAt(u16 *table)
 }
 static inline void SetPoint(struct Part *out, struct Part *sample, struct Camera *camera, u32 index)
 {
-    register u16 *table asm("r3") = RANDOM_TABLE;
+    union RandomTableView table = {gRandomTable};
     s32 x, z;
-    x = (RandomAt(table) & 0xfff) + camera->x - 0x800;
+    x = (RandomAt(table.samples) & 0xfff) + camera->x - 0x800;
     if (index == 0)
         out->first.x = x;
     else
         out->secondX = x;
-    z = (RandomAt(table) & 0xfff) + camera->z - 0x800;
+    z = (RandomAt(table.samples) & 0xfff) + camera->z - 0x800;
     if (index == 0)
         out->first.z = z;
     else
