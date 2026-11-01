@@ -1,152 +1,172 @@
 #include "global.h"
-#include "engine_globals.h"
+#include "engine.h"
 #include "ram.h"
+#include "scene_vec.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.4%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining: recoil address lifetimes, load scheduling, and scratch register allocation.
-
-void Collision_CalculateDamageResponse(void *, void *);
-void AnimData_SelectPaletteBank(void *, u32);
-void Armor_UpdatePartPaletteRestore(void);
-void Armor_DampPartWaveReturn(void);
-void Armor_UpdatePartLungeDelay(void);
-void Armor_UpdatePartLunge(void);
-void SpinningApproach_UpdateSpinRamp(void);
-void SpinningApproach_UpdateApproach(void);
-void SpinningApproach_UpdateOwnerRelativeSegment(void);
-void Armor_DampPartMovement(void);
-void SpinningApproach_DampReturnMovement(void);
-void Armor_CapturePartMotionEndpoint(void *);
-void Sound_PlaySongChecked(u32);
-s32 Math_Atan2(s32, s32);
-extern const s16 gUnk_086149C4[];
-
-struct PartVector {
-    s16 x, y, z, pad;
+struct ArmorContact {
+    u8 pad0[0x6];
+    u16 flags;
+    u8 pad8[0x4];
+    u16 pos[3];
+    u8 pad12[0x22 - 0x12];
+    u16 force;
+    u8 pad24[0x34 - 0x24];
+    u32 contactFlags;
+    u8 pad38[0x3E - 0x38];
+    u16 damage;
+    u8 pad40[0x42 - 0x40];
+    u8 direction;
+    u8 pad43[0x44 - 0x43];
+    u16 responseValue;
 };
-static inline void Delta(struct PartVector *out, struct PartVector *b, struct PartVector *a)
+struct ArmorBody {
+    u8 pad0[0x5BE];
+    u16 palette;
+};
+struct ArmorPart {
+    u8 pad0[0xC];
+    void *animation;
+    u8 pad10[0x52 - 0x10];
+    u16 field52;
+    u8 pad54[0x6A - 0x54];
+    u16 force;
+    u8 pad6C[0xA6 - 0x6C];
+    u16 fieldA6;
+    u8 padA8[0xE0 - 0xA8];
+    u16 disabled;
+    u8 padE2[0x100 - 0xE2];
+    s16 velocityX;
+    u8 pad102[2];
+    s16 velocityZ;
+    u8 pad106[0x10A - 0x106];
+    s16 health;
+    u8 pad10C[0x119 - 0x10C];
+    u8 flags;
+    u8 direction;
+    u8 pad11B[0x11E - 0x11B];
+    u8 active;
+    u8 phase;
+    u8 pad120[0x128 - 0x120];
+    u16 paletteTimer;
+    u8 pad12A[0x15C - 0x12A];
+    struct ArmorBody *parent;
+    u8 pad160[0x1CC - 0x160];
+    void (*paletteUpdate)(struct ArmorPart *);
+    void (*callback)(struct ArmorPart *);
+    u8 pad1D4[2];
+    u16 timer;
+};
+extern const s16 gUnk_086149C4[];
+void Collision_CalculateDamageResponse(void *, void *);
+void Armor_UpdatePartPaletteRestore(struct ArmorPart *);
+void Armor_DampPartWaveReturn(struct ArmorPart *);
+void Armor_UpdatePartLungeDelay(struct ArmorPart *);
+void Armor_UpdatePartLunge(struct ArmorPart *);
+void SpinningApproach_UpdateSpinRamp(struct ArmorPart *);
+void SpinningApproach_UpdateApproach(struct ArmorPart *);
+void SpinningApproach_UpdateOwnerRelativeSegment(struct ArmorPart *);
+void Armor_DampPartMovement(struct ArmorPart *);
+void SpinningApproach_DampReturnMovement(struct ArmorPart *);
+void Armor_CapturePartMotionEndpoint(struct ArmorPart *);
+
+static inline u32 Armor_ContactFlags(struct ArmorContact *contact, u32 mask)
 {
-    typeof(a->y - b->y) t1;
-    out->x = a->x - b->x;
-    t1 = a->y - b->y;
-    out->y = t1;
-    out->z = a->z - b->z;
+    return contact->contactFlags & mask;
+}
+static inline void Armor_SetPartState(struct ArmorPart *part, u8 active, u8 phase)
+{
+    part->active = active;
+    part->phase = phase;
+    part->flags |= active;
+}
+static inline void Armor_ContactDisplacement(struct SceneVec *out, const struct SceneVec *target,
+                                             const struct SceneVec *source)
+{
+    out->x = source->x - target->x;
+    out->y = source->y - target->y;
+    out->z = source->z - target->z;
+}
+static inline u32 Armor_GetPhase(struct ArmorPart *part, u8 **field)
+{
+    u32 value = part->phase;
+    *field = &part->phase;
+    return value;
 }
 
-static inline u32 AttackFlags(u8 *attack, u32 mask)
+void Armor_OnPartDamageCollision(struct ArmorContact *source, struct ArmorContact *target,
+                                 struct ArmorPart *part)
 {
-    return *(u32 *)(attack + 0x34) & mask;
-}
-static inline void EnterBroken(u8 *part, u32 one, u32 mode)
-{
-    part[0x11E] = one;
-    part[0x11F] = mode;
-    part[0x119] = one | part[0x119];
-}
-inline static void EnterBroken_OnPartDamageCollision(u8 *part, u8 one, u32 mode)
-{
-    part[0x11E] = one;
-    part[0x11F] = mode;
-    {
-        typeof(part[0x119]) v1 = part[0x119];
-        part[0x119] = one | v1;
-    }
-}
+    struct SceneVec displacement;
+    s16 *health;
+    struct ArmorBody *parent;
+    u32 phaseSnapshot;
+    u8 *phase;
 
-void Armor_OnPartDamageCollision(u8 *attack, u8 *response, u8 *part)
-{
-    u8 *owner = *((u8 **)(part + 0x15C));
-    s16 *hp = (s16 *)(part + 0x10A);
-    void (**palette)(void);
-    u8 *mode;
-    void (*motion)(void);
-    u32 angle;
-    struct PartVector delta;
-    if ((((*hp) <= 0) || AttackFlags(attack, 0x2000)) || (*((u16 *)(part + 0xE0))))
+    parent = part->parent;
+    health = &part->health;
+    if (*health <= 0)
         return;
-    Collision_CalculateDamageResponse(attack, response);
-    {
-        u32 value = *((u16 *)(attack + 0x44));
-        *((u16 *)(response + 0x44)) = value;
-    }
-    palette = (void (**)(void))(part + 0x1CC);
-    if ((!(*palette)) && (*((u16 *)(response + 0x3E)))) {
-        *((u16 *)(part + 0x128)) = 8;
-        *palette = Armor_UpdatePartPaletteRestore;
-        AnimData_SelectPaletteBank(*((void **)(part + 0xC)), *((u16 *)(owner + 0x5BE)));
-        *hp -= *((u16 *)(response + 0x3E));
-        if ((*hp) <= 0) {
-            EnterBroken_OnPartDamageCollision(part, 1, 5);
-            goto hit;
+    if (Armor_ContactFlags(source, 0x2000))
+        return;
+    if (part->disabled)
+        return;
+    Collision_CalculateDamageResponse(source, target);
+    target->responseValue = source->responseValue;
+    if (part->paletteUpdate == 0 && target->damage != 0) {
+        part->paletteTimer = 8;
+        part->paletteUpdate = Armor_UpdatePartPaletteRestore;
+        AnimData_SelectPaletteBank(part->animation, parent->palette);
+        *health -= target->damage;
+        if (*health <= 0) {
+            Armor_SetPartState(part, 1, 5);
+            Sound_PlaySongChecked(0x13E);
+            return;
         }
     }
-    mode = part + 0x11F;
-    if (((*mode) == 2) && ((*((void (**)(void))(part + 0x1D0))) != Armor_DampPartWaveReturn))
-        goto recoil;
-    motion = *((void (**)(void))(part + 0x1D0));
-    if (((((motion == Armor_UpdatePartLungeDelay) || (motion == Armor_UpdatePartLunge)) ||
-          (motion == SpinningApproach_UpdateSpinRamp)) ||
-         (motion == SpinningApproach_UpdateApproach)) ||
-        (motion == SpinningApproach_UpdateOwnerRelativeSegment)) {
-    recoil:
+
+    phaseSnapshot = Armor_GetPhase(part, &phase);
+    if ((phaseSnapshot == 2 && part->callback != Armor_DampPartWaveReturn) ||
+        part->callback == Armor_UpdatePartLungeDelay || part->callback == Armor_UpdatePartLunge ||
+        part->callback == SpinningApproach_UpdateSpinRamp ||
+        part->callback == SpinningApproach_UpdateApproach ||
+        part->callback == SpinningApproach_UpdateOwnerRelativeSegment) {
         Armor_CapturePartMotionEndpoint(part);
-
-        switch (*mode) {
+        switch (*phase) {
             case 2:
-                *((u16 *)(part + 0x1D6)) = 128;
-                *((void (**)(void))(part + 0x1D0)) = Armor_DampPartWaveReturn;
+                part->timer = 0x80;
+                part->callback = Armor_DampPartWaveReturn;
                 break;
-
             case 3:
-                *((u16 *)(part + 0x1D6)) = 20;
-                *((void (**)(void))(part + 0x1D0)) = Armor_DampPartMovement;
+                part->timer = 0x14;
+                part->callback = Armor_DampPartMovement;
                 break;
-
             case 4:
-                *((u16 *)(part + 0x1D6)) = 100;
-                *((void (**)(void))(part + 0x1D0)) = SpinningApproach_DampReturnMovement;
+                part->timer = 0x64;
+                part->callback = SpinningApproach_DampReturnMovement;
                 break;
         }
-
-        if ((*((u16 *)(attack + 6))) & 0x100) {
-            angle = attack[0x42];
+        if (source->flags & 0x100) {
+            part->direction = source->direction;
         } else {
-            Delta(&delta, (void *)(response + 0xC), (void *)(attack + 0xC));
-            if ((delta.x == 0) && (delta.z == 0)) {
-                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-                angle = gRandomTable[gRandomIndex];
+            Armor_ContactDisplacement(&displacement, (void *)target->pos, (void *)source->pos);
+            if (displacement.x == 0 && displacement.z == 0) {
+                u32 *counter = &gRandomIndex;
+                *counter = (*counter + 1) & 0x3FF;
+                part->direction = ((const u16 *)RANDOM_TABLE_ADDR)[*counter];
             } else {
-                angle = Math_Atan2(delta.x, delta.z);
+                part->direction = Math_Atan2(displacement.x, displacement.z);
             }
         }
-        part[0x11A] = angle;
-        *((u16 *)(part + 0xA6)) = 1;
-        *((u16 *)(part + 0x52)) = 1;
-        {
-            u32 value = *((u16 *)(attack + 0x22));
-            *((u16 *)(part + 0x6A)) = value;
-        }
-        {
-            s32 value = gUnk_086149C4[(part[0x11A] + 64) & 255] >> 7;
-            *((u16 *)(part + 0x100)) = value;
-        }
-        {
-            s32 value = gUnk_086149C4[part[0x11A]] >> 7;
-            *((u16 *)(part + 0x104)) = value;
-        }
+        part->fieldA6 = 1;
+        part->field52 = 1;
+        part->force = source->force;
+        part->velocityX = gUnk_086149C4[(part->direction + 0x40) & 0xFF] >> 7;
+        part->velocityZ = gUnk_086149C4[part->direction] >> 7;
         Sound_PlaySongChecked(0x170);
-    } else if (*((u16 *)(response + 0x3E))) {
-    hit:
-        Sound_PlaySongChecked(0x13E);
-
     } else {
-        Sound_PlaySongChecked(0x190);
+        if (target->damage != 0)
+            Sound_PlaySongChecked(0x13E);
+        else
+            Sound_PlaySongChecked(0x190);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_OnPartDamageCollision);
-#endif
