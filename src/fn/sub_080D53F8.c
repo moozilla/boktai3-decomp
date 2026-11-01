@@ -46,37 +46,6 @@ static inline void Mummy_ApplyDuration(struct SceneActorRegistryResetView *a)
                                    *scale);
 }
 
-#define MUMMY_READ_RANDOM_SAMPLE(out_, samples_, index_)                                           \
-    do {                                                                                           \
-        (out_) = (samples_)[index_];                                                               \
-    } while (0)
-#define Mummy_NextSample(table_, seed_, wrap_, bits_)                                              \
-    ({                                                                                             \
-        const struct SceneActorChaseRandomTable *table_view_ = (table_);                           \
-        const u16 *samples_ = table_view_->samples;                                                \
-        u32 *cursor_ = (seed_);                                                                    \
-        u32 wrap_mask_ = (wrap_);                                                                  \
-        u32 result_mask_ = (bits_);                                                                \
-        u32 index_ = (*cursor_ + 1) & wrap_mask_;                                                  \
-        u32 sample_;                                                                               \
-        *cursor_ = index_;                                                                         \
-        MUMMY_READ_RANDOM_SAMPLE(sample_, samples_, index_);                                       \
-        sample_ &= result_mask_;                                                                   \
-        sample_;                                                                                   \
-    })
-
-static inline u32 Mummy_RandomDirectionExcept(u32 current, const u16 *randomSamples)
-{
-    s32 tries;
-    struct SceneActorChaseRandomTable table = {randomSamples};
-    for (tries = 0; tries < 4; tries++) {
-        u32 direction = Mummy_NextSample(&table, &gRandomIndex, 1023, 3) << 6;
-        if (direction != current)
-            return direction;
-    }
-    return current;
-}
-
 struct MummyProbeGroup {
     struct SceneActorChaseGroup *group;
 };
@@ -87,14 +56,15 @@ static inline struct MummyProbeGroup Mummy_ProbeGroup(void *object)
     owner.group = SceneActorChase_GroupOf(actor);
     return owner;
 }
-static inline void Mummy_BeginProbeTurn(void *object, u32 saved)
+static inline void Mummy_BeginProbeTurn(void *object, u32 saved, const u16 *randomSamples)
 {
     struct SceneActorRegistryResetView *actor = object;
     struct MummyProbeGroup owner = Mummy_ProbeGroup(object);
     struct SceneActorChaseGroup *group = owner.group;
     if (!Mummy_MotionBits(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&actor->group.common.gate.flags, 4)) {
-        group->turn.direction = Mummy_RandomDirectionExcept(actor->body.direction, gRandomTable);
+        group->turn.direction =
+            SceneActorChase_RandomDirectionExcept(actor->body.direction, randomSamples);
         SceneActorChase_SaveControl(&group->saved, actor);
         group->turn.savedDirection = saved;
         SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
@@ -116,6 +86,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     struct MummyNavigationContext *body = actor->context;
     s32 speed;
+    const u16 *randomSamples = gRandomTable;
     if (SceneActorControl_TakeStateEntry(actor)) {
         u16 *field = &body->flags;
         u32 mask = ~0x1000;
@@ -135,7 +106,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
                 return;
             if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 1)) {
                 u32 saved = ((actor->unknown3CD[0] + 5) & 7) << 5;
-                Mummy_BeginProbeTurn(actor, saved);
+                Mummy_BeginProbeTurn(actor, saved, randomSamples);
                 return;
             }
         }
