@@ -1118,13 +1118,12 @@ u32 TetherActor_TestInteractionPath(struct TetherActor *p)
     return r;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_SelectInteractionState(struct TetherActor *actor)
 {
     actor->currentValue = actor->maximumValue;
-    asm("" ::: "r3");
-    if (!actor->interactionEnabled || actor->statusFlags)
+    if (actor->interactionEnabled == 0)
+        TetherActor_SetState(gTetherActor, 0);
+    else if (actor->statusFlags)
         TetherActor_SetState(gTetherActor, 0);
     else if (TetherActor_TestInteractionPath(actor))
         TetherActor_SetState(gTetherActor, 3);
