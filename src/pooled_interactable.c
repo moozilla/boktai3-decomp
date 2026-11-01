@@ -1,7 +1,7 @@
 #include "pooled_interactable.h"
+#include "scene_actor_terrain.h"
 /* Breakable_NullCallback: Empty no-op function used as a placeholder/gap callback entry. */
 #define Breakable_NullCallback sub_08008C18
-// MATCHING_CONCESSION: register-pinning
 
 struct PooledInteractable *Breakable_FindFreeSlot(struct PooledInteractableManager *manager)
 {
@@ -299,33 +299,10 @@ void *Breakable_GetOrCreateManager(void)
     return p;
 }
 
-static inline s32 cellIndex(struct SceneVec *pos)
-{
-    s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 static inline s32 groundHeight(struct SceneVec *position)
 {
-    s32 index = cellIndex(position), height;
-    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
-    u32 kind;
-    if (cell)
-        cell += 4;
-    else
-        cell = gTerrainMap->cells + 12 + index * 4;
-    kind = *cell >> 4;
-    height = (*cell & 15) << 8;
-    switch (kind) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    return height;
+    const struct ContactPosition *p = (const struct ContactPosition *)position;
+    return SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(p), p);
 }
 
 s32 Breakable_ScriptCreate(void)
@@ -334,10 +311,8 @@ s32 Breakable_ScriptCreate(void)
     struct PooledInteractableManager *manager = gPooledInteractableManager;
     struct PooledInteractable *slot;
     s32 placed;
-    void *drawable;
     if (!manager)
-        goto fail;
-    asm("" : : "r"(manager));
+        return -1;
     slot = Breakable_FindFreeSlot(manager);
     if (!slot)
         goto fail;
@@ -382,39 +357,27 @@ s32 Breakable_ScriptCreate(void)
     slot->resource = &manager->resources[slot->kind];
     slot->script = Script_GetKeywordValue('p', 0);
     slot->arg = Script_GetKeywordValue('a', 0);
-    {
-        u32 motion = slot->motion;
-        register struct PooledResource **resource asm("r7") = &slot->resource;
-        if (motion != 2)
-            position.y = groundHeight(&position);
-        if (Script_GetKeywordValue('M', 0))
-            slot->region = Region_FindContaining(&position);
+    if (slot->motion != 2)
+        position.y = groundHeight(&position);
+    if (Script_GetKeywordValue('M', 0))
+        slot->region = Region_FindContaining(&position);
+    else
+        slot->region = -1;
+    slot->drawable.position = position;
+    slot->drawable.flags &= ~1;
+    if (slot->state == 1) {
+        Anim_SetKeyframes(&slot->drawable, slot->resource, gUnk_086049CE[slot->kind][0], 1, 0);
+        if (slot->kind != 2)
+            Anim_SelectPaletteBank(&slot->drawable, gUnk_086049DA[slot->kind] + 1);
         else
-            slot->region = -1;
-        slot->drawable.position = position;
-        slot->drawable.flags &= ~1;
-        if (slot->state == 1) {
-            drawable = &slot->drawable;
-            {
-                struct PooledResource *res = *resource;
-                Anim_SetKeyframes(drawable, res, gUnk_086049CE[slot->kind][0], 1, 0);
-            }
-            if (slot->kind != 2)
-                Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind] + 1);
-            else
-                Anim_SelectPaletteBank(drawable, gUnk_086049DA[2]);
-        } else {
-            drawable = &slot->drawable;
-            {
-                struct PooledResource *res = *resource;
-                Anim_SetKeyframes(drawable, res, gUnk_086049CE[slot->kind][1], 1, 0);
-            }
-            Anim_SelectPaletteBank(drawable, gUnk_086049DA[slot->kind]);
-        }
-        Anim_LinkToList(drawable, 0);
-        slot->active = 1;
-        return 0;
+            Anim_SelectPaletteBank(&slot->drawable, gUnk_086049DA[2]);
+    } else {
+        Anim_SetKeyframes(&slot->drawable, slot->resource, gUnk_086049CE[slot->kind][1], 1, 0);
+        Anim_SelectPaletteBank(&slot->drawable, gUnk_086049DA[slot->kind]);
     }
+    Anim_LinkToList(&slot->drawable, 0);
+    slot->active = 1;
+    return 0;
 }
 
 void Breakable_ScriptSetTimeout(void)
