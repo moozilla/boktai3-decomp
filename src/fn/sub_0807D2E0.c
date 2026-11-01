@@ -51,7 +51,7 @@ static inline void SetReactionState(struct SceneActorRegistryResetView *a, u32 s
 }
 
 #ifdef NONMATCHING
-// fuzzy: 60.3%
+// fuzzy: 54.9%
 void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactPosition *position, u32 p3, u32 flip,
                   u32 p5)
 {

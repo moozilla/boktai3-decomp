@@ -1,7 +1,7 @@
 #include "global.h"
 // confidence=low: runs a timed reaction burst and restores actor control on expiry.
 #ifdef NONMATCHING
-// fuzzy: 68.3%
+// fuzzy: 67.5%
 // Complete timing, palette and particle paths; loop allocation and field lifetimes differ.
 #include "scene_actor_chase.h"
 #include "scene_actor_reaction.h"
