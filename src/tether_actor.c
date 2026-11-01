@@ -2408,40 +2408,30 @@ void TetherActor_UpdateSampledPosition(struct TetherActor *p)
     p->sampledPosition.z += y;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
 {
     struct ContactPosition *position = &actor->position;
     s32 x = position->x >> 8;
-    s16 *clampX;
     s32 z = position->z >> 8;
-    s16 **positionZReference;
     s32 cell;
     u8 *properties;
-    if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
-    } else {
+    else
         cell = gTerrainMap->rows[z] + x;
-    }
     properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties) {
+    if (properties)
         properties += 4;
-    } else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = (cell * 4) + 12;
-        properties = map->cells + offset;
-    }
+    else
+        properties = gTerrainMap->cells + (cell * 4 + 12);
     {
-        u32 attributes = *((u16 *)(properties + 2));
+        u32 attributes = *(u16 *)(properties + 2);
         attributes &= 128;
-        if (!attributes) {
-            goto done;
-        }
+        if (!attributes)
+            return;
     }
-    if (!flaggedCellHandlingEnabled()) {
-        goto done;
-    }
+    if (!flaggedCellHandlingEnabled())
+        return;
     {
         s32 column = Mod(actor->movementProbeStorage.previousCell, ((s16 *)gTerrainMap->cells)[2]);
         s32 row = Div(actor->movementProbeStorage.previousCell, ((s16 *)gTerrainMap->cells)[2]);
@@ -2451,49 +2441,32 @@ void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
         s32 cellZ = row << 8;
         s32 minZ = cellZ + 1;
         s32 maxZ = cellZ + 255;
-        register s16 *positionX asm("r6") = &actor->position.x;
-        s16 *positionZ;
-        s32 pointX = *positionX;
-        s32 dx;
-        s32 dz;
-        pointX -= 127;
-        clampX = positionX;
-        dx = cellX - pointX;
-        positionZ = &actor->position.z;
-        pointX = *positionZ;
-        pointX -= 127;
-        dz = cellZ - pointX;
-        {
-            register s32 direction asm("r0") = (u8)Math_Atan2(dx, dz);
-            s32 angle;
-            direction = (direction - 32) & (~63);
-            asm("" : "+r"(direction));
-            angle = direction;
-            angle += 64;
-            if ((*clampX) < minX) {
-                *clampX = minX;
-            } else if ((*clampX) > maxX) {
-                *clampX = maxX;
-            }
-            positionZReference = &positionZ;
-            if ((*(*positionZReference)) < minZ) {
-                *positionZ = minZ;
-            } else if ((*positionZ) > maxZ) {
-                *(*positionZReference) = maxZ;
-            }
-            TetherActor_RequestKindNineAction(100, angle);
-            if (actor->requestMode) {
-                Sound_PlaySong(0x3F4);
-                Sound_PlaySong(0x4ED);
-                --actor->requestMode;
-            }
-            actor->requestStatus = 1;
-            if (actor->onActionScriptId) {
-                Script_Call(actor->onActionScriptId, 0);
-            }
+        s32 point, dx, dz, angle;
+        point = actor->position.x;
+        point -= 127;
+        dx = cellX - point;
+        point = actor->position.z;
+        point -= 127;
+        dz = cellZ - point;
+        angle = (((u8)Math_Atan2(dx, dz) - 32) & ~63) + 64;
+        if (actor->position.x < minX)
+            actor->position.x = minX;
+        else if (actor->position.x > maxX)
+            actor->position.x = maxX;
+        if (actor->position.z < minZ)
+            actor->position.z = minZ;
+        else if (actor->position.z > maxZ)
+            actor->position.z = maxZ;
+        TetherActor_RequestKindNineAction(100, angle);
+        if (actor->requestMode) {
+            Sound_PlaySong(0x3F4);
+            Sound_PlaySong(0x4ED);
+            --actor->requestMode;
         }
+        actor->requestStatus = 1;
+        if (actor->onActionScriptId)
+            Script_Call(actor->onActionScriptId, 0);
     }
-done:;
 }
 
 // MATCHING_CONCESSION: register-pinning
