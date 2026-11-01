@@ -133,4 +133,3 @@ void StateActor_UpdateDelayedAttackEffect(u8 *a, u8 *b, s32 inputFrame)
             break;
     }
 }
-
