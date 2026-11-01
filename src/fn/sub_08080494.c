@@ -68,7 +68,10 @@ static inline void ResetStateEntry(struct SceneActorRegistryResetView *actor, u3
 // ROM's table (REG_EQUIV gRandomTable, 7 refs, priority ~680) must outrank the
 // range pointer (9 refs, 1134), so it needs two more refs (9 refs -> 1184),
 // which a single-set constant cannot have; position (8 refs, 1132) also needs
-// one fewer insn of life or one more ref.
+// one fewer insn of life or one more ref. Dropping the table's equivalence
+// alone (AGBCC_NOEQUIV, the fix ContactActor_UpdateRoaming needed) is not
+// enough here: the order is decided in local-alloc, whose priority (679) does
+// not depend on the equivalence (scope 45/46 with the knob).
 void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *actor)
 {
     union {
