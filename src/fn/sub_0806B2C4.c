@@ -18,7 +18,7 @@ struct TileDrawable {
 u32 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 static inline void StepSprite(struct SpriteEffectController *input)
 {
-    register struct SpriteEffectController *slot asm("r6") = input;
+    struct SpriteEffectController *slot = input;
     struct SequenceDrawable *sprite;
     register struct SpriteEffectController *base asm("r12");
     register struct DisplaySequenceState *state asm("r12");
@@ -180,7 +180,7 @@ static inline void StepSprite(struct SpriteEffectController *input)
 }
 static inline void StepEffect(struct SpriteEffectController *input)
 {
-    register struct SpriteEffectController *slot asm("r6") = input;
+    struct SpriteEffectController *slot = input;
     struct TileDrawable *sprite;
     register struct SpriteEffectController *base asm("r12");
     register struct DisplaySequenceState *state asm("r12");
@@ -347,7 +347,7 @@ static inline void StepEffect(struct SpriteEffectController *input)
 void SpriteEffectController_FadeAndDestroy(struct SpriteEffectControllerPool *unused,
                                            struct SpriteEffectController *input)
 {
-    register struct SpriteEffectController *slot asm("r6") = input;
+    struct SpriteEffectController *slot = input;
     u16 *flags;
     {
         u8 *enter = &slot->enter;
