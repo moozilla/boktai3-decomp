@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
@@ -29,34 +28,29 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 k)
 
 static inline u8 SaveControlFlags(u8 *c, u16 **out, u32 m)
 {
-    register u16 *p asm("r1") = (void *)(c + 0x62c);
-    u32 value;
-    value = *p & m;
+    u16 *p = (void *)(c + 0x62c);
+    u16 value = *p;
+    value &= m;
     *out = p;
     if (value)
         return 1;
     return 0;
 }
+static inline u16 Actor16(struct SceneActorRegistryResetView *a, u32 m)
+{
+    u16 value = a->flags2D4;
+    value &= m;
+    return value;
+}
+static inline u32 Actor32(struct SceneActorRegistryResetView *a, u32 m)
+{
+    return a->flags2D0 & m;
+}
 static inline u8 Disabled(struct SceneActorRegistryResetView *a)
 {
     if (a) {
-        u32 m = 64;
-        register u32 off asm("r2") = 0x2d4;
-        if (F(a, off, u16) & m)
+        if (Actor16(a, 64) || Actor32(a, 0x20000) || a->health <= 0)
             return 1;
-        m = 0x20000;
-        off -= 4;
-        {
-            u32 value = F(a, off, u32) & m;
-            if (value)
-                return 1;
-        }
-        {
-            s32 hp = a->health;
-            asm("" : : "r"(off));
-            if (hp <= 0)
-                return 1;
-        }
     }
     return 0;
 }
@@ -78,7 +72,7 @@ static inline u8 Slow(void)
 // confidence=low: global flag applies a temporary movement slowdown
 void SceneActorPlacement_UpdateMovementSlowdown(struct SceneActorRegistryResetView *a)
 {
-    register u8 *c asm("r3") = (void *)SceneActorControl_GetState(a);
+    u8 *c = (void *)SceneActorControl_GetState(a);
     u16 *flags;
     if (Disabled(a))
         return;
