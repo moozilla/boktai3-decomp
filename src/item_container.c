@@ -1,6 +1,7 @@
 #include "global.h"
 #include "item_container.h"
 #include "ram.h"
+#include "display_sequence_inline.h"
 // MATCHING_CONCESSION: register-pinning
 
 extern u32 gUnk_02000560[];
@@ -9,7 +10,8 @@ void ScaledShadow_Destroy(void *);
 s32 sub_0822D490(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ScaledShadow_Disable(void *);
-void FloatingItemEffect_Spawn(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
+void FloatingItemEffect_Spawn(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32,
+                              struct Trigger *);
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void ParticleSprite_Initialize(struct TriggerSprite *, struct TriggerGraphics *, u32);
 void Effect_SetOrigin(struct TriggerSprite *, s32, s32);
@@ -20,9 +22,7 @@ void ScaledShadow_Initialize(void *, struct SceneVec *, s32, s32, s32, s32, s32,
 
 static inline u32 frame_factor(u16 v)
 {
-    register u32 value asm("r1") = v;
-    u32 mask = 15;
-    return mask & value;
+    return DisplaySequence_MaskCommand(v, 15);
 }
 static inline s32 absolute(s32 value)
 {
@@ -275,7 +275,8 @@ void Trigger_UpdateShake(struct Trigger *p)
     }
 }
 
-static inline s32 inBox(struct SceneVec *v, struct SceneVec *proj, s16 *o, struct Player *actor, s32 dy)
+static inline s32 inBox(struct SceneVec *v, struct SceneVec *proj, s16 *o, struct Player *actor,
+                        s32 dy)
 {
     if (absolute(v->y - actor->position.y) <= 127 && absolute(o[0] - proj->x) <= 14 && dy >= -24) {
         if (dy <= 4)

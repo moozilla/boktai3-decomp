@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "display_sequence_inline.h"
 struct Obj {
     u32 flags;
     u8 pad[12];
@@ -40,9 +41,7 @@ void sub_081FEDE8(struct Pool *, struct Entry *, s32);
 s32 sub_08249240(struct Entry *, s32, u32);
 static inline u32 frame_factor(u16 v)
 {
-    register u32 value asm("r1") = v;
-    u32 mask = 15;
-    return mask & value;
+    return DisplaySequence_MaskCommand(v, 15);
 }
 s32 SpriteParticle_UpdateManager(struct Pool *pool)
 {

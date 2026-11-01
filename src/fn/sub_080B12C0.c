@@ -3,7 +3,6 @@
 #include "engine.h"
 #include "ram.h"
 
-// MATCHING_CONCESSION: register-pinning
 #define Route_GetPoints Path_GetPointData
 struct SceneActorRouteSelection {
     u8 unknown0[0x2be];
@@ -19,12 +18,10 @@ struct RouteSelectionPosition {
 };
 static inline s32 randomValue(void)
 {
-    register const u16 *table asm("r3");
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    table = gRandomTable;
-    return *(const u16 *)(offset + (u32)table);
+    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 void SceneActor_SelectDistantRoutePoint(struct SceneActorRouteSelection *p,
                                         struct ContactPosition *out, struct ContactPosition *origin,
@@ -72,10 +69,9 @@ void SceneActor_SelectDistantRoutePoint(struct SceneActorRouteSelection *p,
         struct ContactPosition *dest = out;
         dest->x = route.current->x;
         {
-            register struct SceneActorRouteSelection *a asm("r2") = actor;
-            register u32 c asm("r3") = 0x2be;
-            register u16 *q asm("r1");
-            asm("" : "+r"(a), "+r"(c));
+            struct SceneActorRouteSelection *a = actor;
+            u32 c = 0x2be;
+            u16 *q;
             q = (u16 *)((u32)a + c);
             dest->y = *q;
         }

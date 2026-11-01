@@ -2,6 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "display_sequence_inline.h"
 struct ProjPos {
     s16 x, y, z, pad;
 };
@@ -65,9 +66,7 @@ static inline s32 Truncate(s32 v)
 }
 static inline u32 FrameFactor(u16 v)
 {
-    register u32 value asm("r1") = v;
-    u32 mask = 15;
-    return mask & value;
+    return DisplaySequence_MaskCommand(v, 15);
 }
 static inline void Polar(struct ProjPos *d, struct ProjParams *p)
 {
