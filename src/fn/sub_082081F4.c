@@ -73,7 +73,7 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
         target->reaction = source->reaction;
         if (source->flags & 0x40) {
             register void *hud asm("r8");
-            register s32 health asm("r7");
+            s32 health;
             s32 a, b, direction;
             target->reaction = 0x26;
             target->flash = 8;
@@ -87,7 +87,6 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
             direction = 0;
             if (target->direction == 4)
                 direction = 1;
-            asm("" : "+r"(health));
             SceneHud_SetTimedState(hud, health, a, b, direction, target->hudTime);
             if (source->flags & 0x40)
                 goto sparks;
