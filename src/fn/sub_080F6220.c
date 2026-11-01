@@ -1,7 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-// foundry draft (worker best 95.1%); what differs is mostly register allocation and instruction order
 struct TargetMotionVector {
     u32 x : 16;
     s32 y : 16;
@@ -38,11 +36,9 @@ static inline u32 TargetMotion_ClearFlag(u32 flags)
     m &= flags;
     return m;
 }
-static inline void TargetMotion_SetFlag(struct TargetMotionExit *p, u32 flag)
+static inline void TargetMotion_SetFlag(struct TargetMotionExit *p, u8 flag)
 {
-    u32 value = flag;
-    asm("" : "+r"(value));
-    p->flags119 = value | p->flags119;
+    p->flags119 |= flag;
 }
 static inline u8 TargetMotion_TakeExitFlag(struct TargetMotionExit *p)
 {

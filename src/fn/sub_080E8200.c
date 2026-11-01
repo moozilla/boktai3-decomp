@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "player.h"
@@ -46,8 +45,7 @@ static inline void setTargetFlags(struct SceneActorRegistryResetView *actor)
 s32 SceneActor_AcquireCollisionTarget(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
-    u8 *motion;
-    void *target;
+    struct SceneActorChaseTarget *target;
     s32 d;
     if (!motionFlag(actor))
         goto zero;
@@ -75,18 +73,12 @@ yes:
     setTargetFlags(actor);
     return 1;
 collision:
-    motion = (u8 *)&actor->tracking.target;
-    target = (void *)((struct SceneActorReactionMotion *)motion)->fieldDC;
+    target = actor->tracking.target;
     if (!target)
+        return 0;
+    if (actor->tracking.distance >= actor->tracking.limit)
         goto zero;
-    {
-        struct SceneActorRegistryResetView *a2 = actor;
-        asm("" : "+r"(a2));
-        if (a2->tracking.distance >= actor->tracking.limit)
-            goto zero;
-    }
-    if (!Nav_IsPositionInMesh(*(void **)(group + 0x1FC), &actor->body.position,
-                              (struct ContactPosition *)((u8 *)target + 12)))
+    if (!Nav_IsPositionInMesh(*(void **)(group + 0x1FC), &actor->body.position, &target->position))
         goto zero;
     if (!nearFlag(actor))
         goto zero;
