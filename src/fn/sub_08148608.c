@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
 #include "player_cue_sequence.h"
@@ -25,13 +24,12 @@ void Player_UpdateDirectionRecovery(struct Player *p)
         ActorSequence_Begin(p, 23, 0);
     if ((s16)p->directionHistory[0] >= 0) {
         u8 *facing = &p->facing;
-        asm("" : : "r"(facing));
         p->facing = (p->directionHistory[0] & 254) + 1;
-        if (p->facing > 4) {
-            p->heading = (8 - p->facing) >> 1;
+        if (*facing > 4) {
+            p->heading = (8 - *facing) >> 1;
             p->side = 1;
         } else {
-            p->heading = p->facing >> 1;
+            p->heading = *facing >> 1;
             p->side = 0;
         }
     }
