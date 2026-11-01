@@ -82,6 +82,11 @@ int Target(int v)
         a, b = reach["#PINNED"]
         self.assertIn('asm("r1")', source[a:b])
 
+    def test_a_barrier_line_inside_a_macro_is_a_site(self):
+        source = "#define KEEP(v)  \\\n    ({  \\\n        asm(\"\" : \"+r\"(v));  \\\n        v;  \\\n    })\n"
+        kinds = [k for _, k, _ in self.scope.concession_sites(source)]
+        self.assertEqual(kinds, ["barrier"])
+
 
 if __name__ == "__main__":
     unittest.main()

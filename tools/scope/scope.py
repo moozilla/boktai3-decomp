@@ -2945,7 +2945,7 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
-BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?$')
+BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?\\?\s*$')
 
 
 def concession_sites(text):
