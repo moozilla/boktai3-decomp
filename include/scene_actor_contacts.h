@@ -23,7 +23,7 @@ void SceneActorScript_DispatchKindPayload(void *);
 void SceneActorContacts_ResetList(void);
 u8 SceneActorContacts_CanSelectNode(struct SceneActorContactNode *);
 void SceneActorContacts_ReleaseInvalidOwners(void);
-u8 sub_08072F4C(struct SceneActorContactNode *, struct SceneActorRegistryActor *, s32 *);
+u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *, struct SceneActorRegistryActor *, s32 *);
 struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *,
                                                                 u32);
 void SceneActorContacts_TickCooldowns(void);

@@ -177,7 +177,7 @@ gate:
     return 0;
 }
 
-u8 sub_08072F4C(struct SceneActorContactNode *node, struct SceneActorRegistryActor *base,
+u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, struct SceneActorRegistryActor *base,
                 s32 *distance)
 {
 
@@ -229,5 +229,5 @@ u8 sub_08072F4C(struct SceneActorContactNode *node, struct SceneActorRegistryAct
 
 #else
 #include "global.h"
-INCLUDE_ASM("asm/nonmatching", sub_08072F4C);
+INCLUDE_ASM("asm/nonmatching", SceneActorContacts_EvaluateCandidate);
 #endif

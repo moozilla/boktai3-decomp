@@ -2821,6 +2821,7 @@ addr,name,mode,confidence,source,notes
 08072E08,SceneActorContacts_ReleaseNode,thumb,low,src-alias,
 08072E50,SceneActorContacts_SetDistanceGate,thumb,low,src-alias,
 08072E98,SceneActorContacts_TestPlayerCondition,thumb,low,src-alias,
+08072F4C,SceneActorContacts_EvaluateCandidate,thumb,low,src-alias,Checks a sampled or player-owned contact and updates the distance gate when a route is usable.
 08073A3C,SceneActorContacts_SelectForActor,thumb,low,src-alias,
 08073B38,SceneActorContacts_TickCooldowns,thumb,low,src-alias,
 08073B60,SceneActorContacts_Update,thumb,low,src-alias,
