@@ -1018,7 +1018,17 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         ex = next(i for i in sorted(mv) if rows_json[i]["tag"] == "+")
         print(f"{len(mv) // 2} of the differing insns are the same instruction at another position (an order"
               f" difference, not a missing one): `why {rows_json[ex]['uid']}` names what reads each copy")
-    for i, ln, tied in and_tie_hints(rows_json):
+    for i, ln, tied, shared in and_tie_hints(rows_json):
+        if shared:
+            print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes a constant of its own, the draft's"
+                  f" `{rows_json[i]['draft']}` the value's register: the draft's constant "
+                  + (f"is shared with the and on line {shared} and does not die here" if shared != "reload"
+                     else "is a spilled pseudo that reload loads here, and it lives on past this and")
+                  + "; no operand order ties to it. Give this and its"
+                  f" own constant pseudo: cse merges equal constants of one mode, and u16 operands narrow to"
+                  f" HImode, `x & K` copying its constant to SImode and `(x >> n) & K` using the HImode one"
+                  f" (README fact 37)")
+            continue
         print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes the {tied}'s register, the draft's"
               f" `{rows_json[i]['draft']}` the other operand's. "
               + ("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
@@ -1716,11 +1726,23 @@ def constant_def(texts, i, reg, window=8):
     return False
 
 
+def last_write(texts, i, reg, window=8):
+    """The index of the last line within WINDOW before TEXTS[i] that writes REG, or None."""
+    for j in range(i - 1, max(-1, i - 1 - window), -1):
+        if texts[j] and asm_dest(texts[j]) == reg:
+            return j
+    return None
+
+
 def and_tie_hints(rows):
-    """[(row index, line, tied)] where the ROM's `ands rA, rB` writes the register holding the
-    constant and the draft's writes the value (or the other way round): the and's tied operand
+    """[(row index, line, tied, shared)] where the ROM's `ands rA, rB` writes the register holding
+    the constant and the draft's writes the value (or the other way round): the and's tied operand
     differs, which the C operand order decides (README fact 33). Identical text counts too, when
-    the registers' roles differ."""
+    the registers' roles differ. SHARED is set when the ROM keeps the constant's register and the
+    draft's constant lives on past the and: the line of a later and that reads its register again,
+    or "reload" when reload loads it there (a spilled pseudo, which regmove did not tie to, so it
+    does not die here). regmove cannot tie to such a constant whatever the operand order
+    (README fact 37)."""
     rom = [r["rom"] for r in rows]
     dr = [r["draft"] for r in rows]
     out = []
@@ -1734,7 +1756,13 @@ def and_tie_hints(rows):
         rk = constant_def(rom, i, a), constant_def(rom, i, b)
         dk = constant_def(dr, i, p), constant_def(dr, i, q)
         if rk[0] != rk[1] and dk[0] != dk[1] and rk[0] != dk[0]:
-            out.append((i, r.get("line") or "", "constant" if rk[0] else "value"))
+            shared = None
+            if rk[0]:
+                later = [j for j in readers_after(rows, i, "draft", q) if (dr[j] or "").startswith("ands ")]
+                d = last_write(dr, i, q)
+                shared = ((rows[later[0]].get("line") or "?") if later
+                          else "reload" if d is not None and (rows[d].get("born") or "").startswith("greg") else None)
+            out.append((i, r.get("line") or "", "constant" if rk[0] else "value", shared))
     return out
 
 

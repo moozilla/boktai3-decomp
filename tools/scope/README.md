@@ -1026,6 +1026,28 @@ Each was read from the compiler source and confirmed on a live draft.
    and, and the u8 zero, used once, is moved next to its use by local-alloc. Zeros parked in high
    registers in the middle of a halfword update point here.
 
+37. **u16 masks narrow to HImode, and `x & K` and `(x >> n) & K` get different constants.**
+   c-typeck narrows `&` and `>>` on a u16 operand to HImode. expand_binop forces an expensive
+   constant (any K in an and) into an HImode pseudo and widens the operation to SImode, because
+   Thumb has no `andhi3`. In `(x >> n) & K` the HImode operand 0 is a SUBREG of the shift, so
+   expand_binop swaps the operands and the and reads `(subreg:SI (reg:HI K))` directly. In
+   `x & K`, x is a register (a promoted variable, or a load under `-fforce-mem`), so nothing
+   swaps and the andsi3 expander copies the constant into an SImode pseudo. cse keeps the two
+   modes in separate classes.
+
+   In LinkPlayer_BlendPalette (08239848) the four shifted channels share the HImode 31 (r7),
+   and the two unshifted reds share the SImode copy. Global alloc leaves the copy unallocated,
+   so reload rematerializes it into each and's output (`movs r0, #0x1f; ands r0, r2`, the
+   commutative swap). The draft that shifted a u32 (`packed = color << 16;
+   g = (packed >> 21) & 31`) made g and b SImode. That merged them into the reds' constant, which
+   then lived past every and, so regmove tied each and to a copy of the color. Reading each
+   channel through the u16 (`(*source >> 5) & 31`) matched it, and its twin sub_0813C9B4 lost 13
+   pins.
+
+   Fact 33's constant-first lever needs a constant that dies at the and. When the draft's
+   constant lives on (a later and reads it, or reload loads it there as a spilled pseudo),
+   scope's hint names this fact instead.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
