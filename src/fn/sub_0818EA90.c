@@ -1,6 +1,7 @@
 #include "global.h"
 #include "game_state.h"
 
+// MATCHING_CONCESSION: register-pinning
 
 /* Partial views of the three embedded Armor parts. */
 struct ArmorLaunchPosition {
@@ -40,16 +41,11 @@ static inline s32 ArmorLaunch_Scale(s32 value)
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
 
-/* One more part in flight. */
-#define ARMOR_LAUNCH_COUNT_ACTIVE(count)                                                           \
-    do {                                                                                           \
-        (*(count))++;                                                                              \
-    } while (0)
 void Armor_QueueFallingParts(void *arg0)
 {
     struct ArmorLaunchGroup *group = arg0;
     s32 x, y, z, stepX, targetY, stepZ, angle;
-    register s32 i;
+    register s32 i asm("r8");
     struct ArmorLaunchState *state;
     struct ArmorLaunchPositionSlot *position;
     struct ArmorLaunchPart *part;
@@ -91,7 +87,7 @@ void Armor_QueueFallingParts(void *arg0)
             }
             state->action = 6;
             state->flags = 1 | state->flags;
-            ARMOR_LAUNCH_COUNT_ACTIVE(activeCount);
+            (*activeCount)++;
         }
         state++;
         position++;
