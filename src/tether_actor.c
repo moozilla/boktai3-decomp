@@ -1552,32 +1552,22 @@ void TetherActor_RequestPaletteBlend(u32 a)
         p->blendRequested = a;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 u32 TetherActor_CanStartInteraction(void)
 {
     struct TetherActor *actor = gTetherActor;
-    u32 result;
     if (!actor)
-        goto no;
+        return 0;
     if (actor->interactionLock)
-        goto no;
-    asm("" ::: "r2");
+        return 0;
     if (actor->blendRequested)
-        goto no;
-    asm("" ::: "r2");
+        return 0;
     if (actor->statusFlags)
-        goto no;
-    asm("" ::: "r2");
+        return 0;
     if (actor->interactionCooldown)
-        goto no;
+        return 0;
     if (actor->state <= 1 || ((u8)(actor->state - 3) <= 1 && actor->chargeReady))
-        result = 1;
-    else {
-    no:
-        result = 0;
-    }
-    return result;
+        return 1;
+    return 0;
 }
 
 // MATCHING_CONCESSION: register-pinning
