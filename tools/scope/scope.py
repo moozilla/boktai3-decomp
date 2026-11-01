@@ -2150,7 +2150,18 @@ def mention_lines(wd, reg):
         shift = re.search(r"\((?:ashift|ashiftrt|lshiftrt):SI \(reg(?:/\w)*:SI %d\)" % reg, pats.get(u, "")) \
             or re.search(r"\(set \(reg(?:/\w)*:SI %d\) \((?:ashift|ashiftrt|lshiftrt):" % reg, pats.get(u, ""))
         parts.append(f"line {lines.get(u, '?')}" + (f" x{d}" if d > 1 else "") + (" in a shift" if shift else ""))
-    return " (counted at " + ", ".join(parts) + ")"
+    # refs in code that jump2 deletes as a duplicate tail (cross-jumping, fact 27) count for allocation
+    # but leave no instruction: a source that reaches the surviving copy instead never counts them
+    after_reload = {u for u, _, _ in insn_list(wd, "greg")}
+    kept = {u for u, _, _ in insn_list(wd, "jump2")}
+    crossed = [u for u, _ in ms if u in after_reload and kept and u not in kept]
+    tail = ""
+    if crossed:
+        where = sorted({lines.get(u, '?') for u in crossed}, key=lambda x: (not isinstance(x, int), x))
+        tail = (f"; {len(crossed)} of them in tails jump2 cross-jumps away (line{'s' if len(where) > 1 else ''} "
+                + ", ".join(map(str, where)) + "): a source that shares that code instead of writing it"
+                " out again has that many fewer refs, with the same instructions")
+    return " (counted at " + ", ".join(parts) + tail + ")"
 
 
 def later_holders_only(holders, calls, rec, recs):

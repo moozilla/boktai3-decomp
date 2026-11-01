@@ -870,6 +870,11 @@ Each was read from the compiler source and confirmed on a live draft.
    Writing the tails out removed rotation barriers from sub_0818911C (the mode branch's
    fastMode/secondaryCooldown choices) and Armor_ApplySceneCommands (each case's own
    Trigger_ConsumePending). `why` on a rotation difference now lists the gotos before it.
+   The other direction matters for allocation: a duplicate tail's refs count toward its
+   pseudos' priority although jump2 deletes the code, so a source that shares the tail has
+   fewer refs and the same instructions. `why`'s ref lever now says how many of the refs it
+   lists sit in tails jump2 cross-jumps away, and on which lines (sub_080BF0E4: 4 of the
+   actor's 97, in category 6's directional tail).
 28. **The ref lever needs a macro the original shared.** A `do { ... } while (0)` that
    wraps one statement only to double its refs is a priority knob in disguise and counts as
    a barrier, like an empty one; a statement macro counts as ordinary C when there is
