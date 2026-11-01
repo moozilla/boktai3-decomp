@@ -86,7 +86,7 @@ static inline u8 Skeleton_ArriveAfterRecovery(void *obj)
         u8 saved = actor->body.direction;
         Skeleton_BeginRecoveryTurn(obj, saved, randomSamples);
     }
-    sub_0807E334(obj);
+    SceneActorTerrain_RequestRetreatRoute(obj);
     actor->field2C2 = 0x20;
     return 0;
 reroute: {

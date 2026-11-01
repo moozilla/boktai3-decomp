@@ -7,7 +7,7 @@
 // confidence=low: per-frame route follower: releases its contact node, resets its reaction control, then follows its route point (flag 0x80) or pursues its route, choosing a new wander direction when blocked (provisional)
 
 // confidence=low: per-frame route follower: releases its contact node, resets its reaction control, then follows its route point (flag 0x80) or pursues its route, choosing a new wander direction when blocked (provisional)
-void sub_0807E334(void *);
+void SceneActorTerrain_RequestRetreatRoute(void *);
 void SceneActorContacts_ReleaseNode(struct SceneActorContactNode *);
 
 struct Sub0807DB34Point {
@@ -69,7 +69,7 @@ static inline void Sub0807DB34_SetState(struct SceneActorRegistryResetView *acto
 
 static inline void Sub0807DB34_Finish(struct SceneActorRegistryResetView *actor)
 {
-    sub_0807E334(actor);
+    SceneActorTerrain_RequestRetreatRoute(actor);
     actor->field2C2 = 0x20;
 }
 

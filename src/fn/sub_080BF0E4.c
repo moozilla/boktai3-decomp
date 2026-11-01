@@ -10,7 +10,7 @@
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(void *);
-void sub_0807E334(void *);
+void SceneActorTerrain_RequestRetreatRoute(void *);
 
 struct SkeletonRoutePoint {
     s16 x, z;
@@ -409,7 +409,7 @@ static inline void ReturnHome(struct SceneActorRegistryResetView *outer)
             }
         }
         Resume(outer, group, actor->body.direction);
-        sub_0807E334(outer);
+        SceneActorTerrain_RequestRetreatRoute(outer);
         actor->field2C2 = 0x20;
         return;
     } else {

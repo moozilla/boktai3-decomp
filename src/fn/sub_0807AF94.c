@@ -8,7 +8,7 @@
 #include "engine.h"
 
 void Skeleton_UpdateScriptWaitState(void);
-void sub_0807E334(void *);
+void SceneActorTerrain_RequestRetreatRoute(void *);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void Anim_SetDurationScale(void *, u32);
@@ -237,7 +237,7 @@ static inline u8 Chase_Arrive(void *obj)
         u8 saved = actor->body.direction;
         Chase_BeginTurn(obj, saved, 6);
     }
-    sub_0807E334(actor);
+    SceneActorTerrain_RequestRetreatRoute(actor);
     actor->field2C2 = 0x20;
     goto done;
 reroute: {

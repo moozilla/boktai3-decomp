@@ -82,7 +82,7 @@ static inline u8 Golem_ArriveAfterDelay(void *obj)
         u8 saved = actor->body.direction;
         Golem_BeginDelayedTurn(obj, saved, randomSamples);
     }
-    sub_0807E334(obj);
+    SceneActorTerrain_RequestRetreatRoute(obj);
     actor->field2C2 = 0x20;
     return 0;
 reroute: {
