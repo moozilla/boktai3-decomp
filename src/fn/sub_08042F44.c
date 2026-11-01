@@ -46,10 +46,7 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
 {
     struct ContactPosition delta;
     /* One pointer serves the health collider on entry and the random table while steering. */
-    union {
-        struct ContactCollider *collider;
-        const u16 *table;
-    } work;
+    void *work;
     if (slot->enter) {
         slot->enter = 0;
         if (slot->targetIndex >= 0) {
@@ -72,10 +69,10 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         }
         {
             s32 mask;
-            work.collider = &slot->healthCollider;
+            work = &slot->healthCollider;
             mask = -5;
-            mask &= work.collider->flags;
-            work.collider->flags = mask;
+            mask &= ((struct ContactCollider *)work)->flags;
+            ((struct ContactCollider *)work)->flags = mask;
         }
     }
     if (pool->clearRequested) {
@@ -91,13 +88,13 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
     if (!slot->steeringTimer) {
         u32 mask;
         s32 roll;
-        work.table = gRandomTable;
+        work = (void *)gRandomTable;
         mask = 255;
-        roll = nextSample(work.table) & mask;
+        roll = nextSample((const u16 *)work) & mask;
         if (roll <= 191) {
             if (slot->targetIndex >= 0) {
                 u32 scale = 256;
-                u32 angle = nextSample(work.table);
+                u32 angle = nextSample((const u16 *)work);
                 struct ContactPosition *write = &delta;
                 angle &= mask;
                 write->x = truncateShift12(gUnk_086149C4[(angle + 64) & mask] * scale);
@@ -111,7 +108,7 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
                 slot->direction += jitter;
             }
         } else
-            slot->direction = nextSample(work.table);
+            slot->direction = nextSample((const u16 *)work);
         slot->steeringTimer = (nextRandom() & 15) + 16;
     } else
         slot->steeringTimer--;

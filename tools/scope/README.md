@@ -1135,6 +1135,20 @@ Each was read from the compiler source and confirmed on a live draft.
    declared before the `if` and assigned in both branches. That pseudo lives in two blocks,
    so global alloc gets it (r2 through the copy), and the load takes the lowest free
    register. This also moved NativeEffect_CreateFromProfile's case-2 offset from r4 to r3.
+=======
+43. **A constant variable is reloaded from its reload register; a 16-bit literal from its
+   home.** A pseudo set once to a constant gets a REG_EQUIV note, and reload replaces every
+   use of it by the constant (find_reloads), even when global alloc gave it a register.
+   When that register is high (`movs r3, #0x3f; mov sl, r3`), an and right after the set
+   needs a low register, and find_equiv_reg (reload.c) finds the reload insn that put 63 in
+   r3, so the draft's `ands r0, r3` copies nothing. The ROM's `mov r2, sl; ands r0, r2`
+   came from a constant made in another mode: a `& 63` narrowed by a 16-bit store or
+   bitfield is an HImode and, its literal becomes an HImode pseudo that cse shares among the
+   ands, and find_equiv_reg rejects the SImode copy of an HImode set, so each use reloads sl
+   afresh. ContactSequenceActor_UpdateDying matched once its `u32 xzMask = 63` became
+   literal `& 63`s, each store narrowed (`(u16)(... & 63)` for the u32 temporaries); the
+   127 masks stayed in the `u16 mask` helper. `why` names this inheritance when a reload
+   register the draft reused held an operand's REG_EQUIV constant.
 
 ## Survey: random table as a literal address (2026-10-24)
 
