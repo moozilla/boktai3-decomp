@@ -812,6 +812,16 @@ Each was read from the compiler source and confirmed on a live draft.
    ROM never uses its high register ("class: ... prefers STACK_REG and sits in ip"). Fix in
    Slime_EmitDeathDebris: one `u8 *base` that is the actor and then, after `base += 0x5C`,
    the position, so the in-place add and the call arguments give it a low class.
+25. **Zeros between a halfword AND and its store come from a bitfield store.** ROM
+   signature: `ands rA, rB; movs rX, #0; [movs rY, #0;] strh rA, [..]`. Later byte and word
+   zero stores reuse rX/rY, and the second zero often takes r4 and moves a pointer up one
+   register. Typed zero locals cannot give two zeros: cse1's `make_regs_eqv` merges every
+   pair (128 type and order variants tried). Clearing through a bitfield view does:
+   `struct ChaseFlags40 *f = (void *)&x->flags; s32 mask = ~0x40; f->bits &= mask;`; its
+   store expands with the zeros exactly there. A `u16 value : 16` view does the same for
+   `++timer->value`. This depinned Vorn_UpdateApproachRange, Vorn_UpdatePursuitWait and
+   Vorn_RestoreRouteMovement; about 110 functions show the signature, and a pinned one should
+   try this first.
 
 ## Survey: random table as a literal address (2026-10-24)
 
