@@ -8270,6 +8270,7 @@ addr,name,mode,confidence,source,notes
 081E682C,Actor_HideAndResetChildren,thumb,low,src-alias,Hides the actor and shadow then assigns reset callbacks to all active children
 081E692C,Actor_MoveAlongCurveToRest,thumb,low,src-alias,
 081E6E0C,Actor_MoveAlongScriptedCurve,thumb,low,src-alias,
+081E728C,Actor_MoveTowardTarget,thumb,low,matching,Advances the animated actor to its target position and final facing
 081E78F4,Actor_UpdateFadeAnimation,thumb,low,src-alias,Advances sequence 11 while invoking the palette fade callback and returns to frame 1 on completion
 081E7AA0,Actor_UpdateReverseFadeAnimation,thumb,low,src-alias,Advances sequence 19 while invoking the reverse palette fade callback
 081E7C3C,Actor_UpdateNotifyingAnimation,thumb,low,src-alias,Advances sequence 18 with the existing callback and resumes the pending script when playback completes

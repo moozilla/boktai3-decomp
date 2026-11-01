@@ -1,5 +1,6 @@
 #include "global.h"
 #include "actor_animation_controller.h"
+#include "display_sprite_playback.h"
 #include "render.h"
 #include "input.h"
 #include "ram.h"
@@ -598,12 +599,14 @@ void Anim_SetSequence(void *, u32, u32, u32, u32);
 
 void ActorShadow_Disable(void *);
 
-static inline u8 take_v2(struct ActorAnimController *p)
+static inline u8 TakeApproachEntry(struct ActorAnimController *p)
 {
-    s32 m = 1;
-    s32 v = p->flags;
-    if (v & m) {
-        p->flags = ~m & v;
+    s32 mask = 1;
+    u32 flags = p->flags;
+    if (flags & mask) {
+        mask = ~mask;
+        mask &= flags;
+        p->flags = mask;
         p->done = 0;
         return 1;
     }
@@ -1582,10 +1585,11 @@ struct Rotator {
     s8 delta;
 };
 
-static inline void rotate(struct ActorAnimController *p)
+static inline void Actor_ApplyBob(struct ActorAnimController *p, struct Rotator *obj)
 {
-    struct Rotator *o = (struct Rotator *)&p->obj;
+    struct Rotator *o = obj;
     if (!(p->count++ & 3)) {
+
         switch ((int)(p->anim.frame & 3)) {
             case 0:
             case 3:
@@ -1604,6 +1608,11 @@ static inline void rotate(struct ActorAnimController *p)
         }
         o->angle += o->delta;
     }
+}
+
+static inline void rotate(struct ActorAnimController *p)
+{
+    Actor_ApplyBob(p, (void *)&p->obj);
 }
 
 static inline u32 frame_factor(u16 v)
@@ -2699,69 +2708,41 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
 
 extern const s16 gUnk_086149C4[];
 
-/* Animation-tick step shared by the two places that advance the sequence (081E728C). */
-static inline u8 sub_081E728C_Advance(struct ActorAnimController *p, u32 direction, u32 flip)
+static inline s16 SetApproachDirection(s16 angle, u8 *directionOut, u8 *flipOut)
 {
-    struct ActorAnim *anim = &p->anim;
-    struct ActorSprite *obj = &p->obj;
-    const u16 *entry;
-    u8 wrapped = 0;
-
-    Anim_SetSequence(anim, p->arg, p->state, direction, flip);
-    entry = anim->data + anim->frame;
-    obj->frame = *entry >> 6;
-    if ((anim->flags & 1) != ((*entry >> 4) & 1))
-        obj->flags |= 4;
-    else
-        obj->flags &= ~4;
-    if ((anim->flags & 2) != ((*entry >> 4) & 2))
-        obj->flags |= 8;
-    else
-        obj->flags &= ~8;
-
-    anim->timer++;
-    if (anim->timer >= anim->rate) {
-        anim->timer = 0;
-        if (anim->flags & 4) {
-            if (anim->frame != 0) {
-                anim->frame--;
-            } else {
-                if (anim->flags & 8)
-                    anim->timer = anim->rate;
-                else
-                    anim->frame = anim->count - 1;
-                wrapped = 1;
-            }
+    while (angle < 0)
+        angle += 256;
+    while (angle > 255)
+        angle -= 256;
+    angle = ((angle - 16) >> 5) & 7;
+    {
+        s32 choice = angle;
+        if (choice == 4)
+            *directionOut = 0;
+        else if (choice == 0)
+            *directionOut = 4;
+        else if (choice < 4) {
+            *directionOut = 4 - angle;
+            *flipOut = 1;
         } else {
-            anim->frame++;
-            if (anim->frame >= anim->count) {
-                if (anim->flags & 8) {
-                    anim->timer = anim->rate;
-                    anim->frame = anim->count - 1;
-                } else {
-                    anim->frame = 0;
-                }
-                wrapped = 1;
-            }
+            *directionOut = angle - 4;
+            *flipOut = 0;
         }
-        entry = anim->data + anim->frame;
-        anim->factor = *entry & 15;
-        anim->rate = (anim->scale * anim->factor) >> 6;
-        if (anim->rate == 0)
-            anim->rate = 1;
     }
-    return wrapped;
+    return angle;
 }
 
-/* Settle path shared by the near-target branch: copies the target, optionally advances, finishes. */
-static inline void sub_081E728C_Finish(struct ActorAnimController *p)
+static inline void FinishApproach(struct ActorAnimController *p)
 {
     *(u16 *)((u8 *)p + 0xF5A) &= 0xF;
     if (p->oldMode == 3 && p->mode == 3) {
         p->savedFrame = p->anim.frame;
         p->savedTimer = p->anim.timer;
     }
-    p->flags |= 1;
+    {
+        u8 set = 1;
+        p->flags = set | p->flags;
+    }
     if (p->handle) {
         void *handle = p->handle;
         p->handle = 0;
@@ -2769,62 +2750,30 @@ static inline void sub_081E728C_Finish(struct ActorAnimController *p)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 36.6%
-// scope shape 331 (differences once low registers are set aside)
-// confidence=low: steps an actor's animation toward its target: heading, sprite playback, and motion.
-void sub_081E728C(struct ActorAnimController *p)
+/* Advance the sprite toward its scripted position and settle into its final facing. */
+void Actor_MoveTowardTarget(struct ActorAnimController *p)
 {
     s32 dx, dz, adx, adz;
-    s16 targetY;
-    u8 snap;
 
     dx = p->targetX - p->obj.x;
     dz = p->targetZ - p->obj.z;
     p->heading = Math_Atan2(dx, dz);
 
-    if (take_v2(p)) {
-        s32 idx;
-        s16 v;
-
+    if (TakeApproachEntry(p)) {
         p->state = 0;
-        v = (s16)p->heading;
-        while (v < 0)
-            v += 256;
-        while (v > 255)
-            v -= 256;
-        idx = ((v - 16) >> 5) & 7;
-        if (idx == 4) {
-            p->direction = 0;
-        } else if (idx == 0) {
-            p->direction = 4;
-        } else if (idx <= 3) {
-            p->direction = 4 - idx;
-            p->flip = 1;
-        } else {
-            p->direction = idx - 4;
-            p->flip = 0;
+        {
+            s32 facing = SetApproachDirection(p->heading, &p->direction, &p->flip);
+            facing -= 4;
+            facing &= 7;
+            p->facing = facing;
         }
-        p->facing = (idx - 4) & 7;
         p->heightSettled = 0;
         ActorShadow_Enable(p->p2);
     }
 
-    {
-        u16 old = p->count;
-        p->count = old + 1;
-        if ((old & 3) == 0) {
-            s32 sel = p->anim.frame & 3;
-            if (sel == 0 || sel == 3) {
-                p->delta = (p->obj.flags & 0x10) ? 1 : -8;
-            } else {
-                p->delta = (p->obj.flags & 0x10) ? -1 : 8;
-            }
-            p->obj.y += p->delta;
-        }
-    }
-
-    p->done = sub_081E728C_Advance(p, p->direction, p->flip);
+    Actor_ApplyBob(p, (void *)&p->obj);
+    Anim_SetSequence(&p->anim, p->arg, p->state, p->direction, p->flip);
+    p->done = PlayerCue_StepSequenceEnded((void *)&p->obj, (void *)&p->anim);
 
     adx = dx < 0 ? -dx : dx;
     adz = dz < 0 ? -dz : dz;
@@ -2832,37 +2781,39 @@ void sub_081E728C(struct ActorAnimController *p)
         p->obj.x = p->targetX;
         p->obj.z = p->targetZ;
         if (p->targetFacing >= 0) {
-            u32 m = p->targetFacing & 7;
+            s8 row;
             u32 flip = 0;
             p->facing = p->targetFacing;
-            if (m > 4) {
-                m = (u8)(8 - m);
+            row = p->targetFacing;
+            row &= 7;
+            if (row > 4) {
+                row = (u8)(8 - row);
                 flip = 1;
             }
-            p->done = sub_081E728C_Advance(p, m, flip);
+            Anim_SetSequence(&p->anim, p->arg, p->state, (u8)row, flip);
+            p->done = PlayerCue_StepSequenceEnded((void *)&p->obj, (void *)&p->anim);
         }
-        sub_081E728C_Finish(p);
+        FinishApproach(p);
         return;
     }
 
     if (p->heightSettled == 0) {
-        targetY = p->targetY;
-        snap = 0;
-        if (targetY > p->obj.y) {
+        if (p->targetY > p->obj.y) {
             p->obj.y += 7;
             p->savedY += 7;
-            if (targetY < p->obj.y)
-                snap = 1;
-        } else if (targetY < p->obj.y) {
+            if (p->targetY < p->obj.y) {
+                p->obj.y = p->targetY;
+                p->savedY = p->targetY;
+                p->heightSettled = 1;
+            }
+        } else if (p->targetY < p->obj.y) {
             p->obj.y -= 7;
             p->savedY -= 7;
-            if (targetY > p->obj.y)
-                snap = 1;
-        }
-        if (snap) {
-            p->obj.y = targetY;
-            p->savedY = targetY;
-            p->heightSettled = 1;
+            if (p->targetY > p->obj.y) {
+                p->obj.y = p->targetY;
+                p->savedY = p->targetY;
+                p->heightSettled = 1;
+            }
         }
     }
 
@@ -2870,9 +2821,9 @@ void sub_081E728C(struct ActorAnimController *p)
         return;
     {
         const s16 *sine = gUnk_086149C4;
-        s16 cosv = sine[((s16)p->heading + 0x40) & 0xFF];
-        s16 sinv = sine[p->heading & 0xFF];
-        p->deltaX = Div(cosv, 500);
+        s16 sinv;
+        p->deltaX = Div(sine[((s16)p->heading + 64) & 255], 500);
+        sinv = sine[p->heading & 255];
         p->deltaZ = Div(sinv, 500);
         p->obj.x += p->deltaX;
         p->obj.z += p->deltaZ;
@@ -2880,9 +2831,6 @@ void sub_081E728C(struct ActorAnimController *p)
         p->savedZ = p->obj.z;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081E728C);
-#endif
 
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
