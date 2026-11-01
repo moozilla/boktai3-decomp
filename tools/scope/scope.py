@@ -1736,6 +1736,51 @@ def has_equiv_note(wd, x):
                for b in re.split(r"\n\n", open(path).read()))
 
 
+def reg_pref(wd, x):
+    """Pseudo X's preferred register class as regclass left it ('Register N used ...; pref CLASS' in the
+    lreg dump), or None."""
+    path = os.path.join(wd, "u.i.lreg")
+    text = open(path).read() if os.path.exists(path) else ""
+    m = re.search(rf"^Register {x} used [^\n]*?pref (\w+)", text, re.M)
+    return m.group(1) if m else None
+
+
+def class_note(wd, x, got, want):
+    """A line when X's preferred class holds no register global alloc can give it (Thumb's STACK_REG is
+    sp alone, HI_REGS r8-r15), so it lands in the alternate class: the usual reason a value that should
+    be in r4-r7 sits in ip or r8. Empty otherwise."""
+    pref = reg_pref(wd, x)
+    if pref not in ("STACK_REG", "HI_REGS") or (got >= 8) == (want >= 8):
+        return ""
+    why = ("its only uses are adds of constants that `add rd, sp, #imm` could encode (multiples of 4 up to"
+           " 1020), so regclass prices sp cheapest" if pref == "STACK_REG" else
+           "regclass found high registers cheapest for its uses")
+    return (f"    its preferred class is {pref} ({why}); find_reg finds nothing there and takes"
+            f" {rname(got)} from the alternate class. Lever: give it a use that needs a low register (a load"
+            f" or store through it, an in-place add), or fold it into a variable that has one")
+
+
+HI_NAMES = {8: "r8", 9: "sb", 10: "sl", 11: "fp", 12: "ip"}
+
+
+def class_misplaced(wd, func, rom_text):
+    """Lines for global-alloc pseudos whose preferred class has no allocatable register (STACK_REG, or
+    HI_REGS) and that sit in a high register the ROM never names: their class, not their priority, put
+    them there (Slime_EmitDeathDebris: an actor copy used only in adds of sp-encodable offsets went to ip)."""
+    hard, names, out = hard_of(wd), pseudo_names(wd, func), []
+    used = set(re.findall(r"\b(r\d+|sb|sl|fp|ip)\b", rom_text))
+    for x, rec in sorted(alloc_records(wd, func).items()):
+        h = hard.get(x, rec[6])
+        if rec[0] != "G" or h not in HI_NAMES or HI_NAMES[h] in used:
+            continue
+        pref = reg_pref(wd, x)
+        if pref in ("STACK_REG", "HI_REGS"):
+            nm = f"{x} ({names[x]})" if names.get(x) else str(x)
+            out.append(f"class: {nm} prefers {pref} and sits in {HI_NAMES[h]}, which the ROM never uses."
+                       + class_note(wd, x, h, 0).replace("    its preferred class", " Its preferred class"))
+    return out
+
+
 def g_priority(refs, live):
     """global.c allocno_compare: floor_log2(refs) * refs / live * 10000 (size 1)."""
     return (max(refs, 1).bit_length() - 1) * refs * 10000 // max(live, 1)
@@ -1943,6 +1988,9 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         print(f"    {nm(pseudo)} is a global-alloc pseudo: allocated {rank + 1} of {total} by priority {pri}"
               f" ({refs} refs{ref_note(wd, pseudo, refs)}, live {live} insns, crosses {calls} call(s)); it got"
               f" {rname(got)}, the ROM has {rname(want)}." + life_note(wd, pseudo, live))
+        note = class_note(wd, pseudo, got, want)
+        if note:
+            print(note)
     elif rec:
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
@@ -3319,6 +3367,9 @@ def cmd_why_all(src, func, env, rng=None):
     scope_note = [ln for ln in details.splitlines() if re.match(r"\(\d+ of \d+ hunks in", ln)]
     print(first.split('; per hunk:')[0] + f"; {len(groups)} distinct mechanism(s)"
           + (" " + scope_note[0] if scope_note else ""))
+    rom_text = " ".join(r.get("rom") or "" for r in rows)
+    for ln in class_misplaced(wd, func, rom_text):
+        print("  - " + ln)
     shown = causes + sure
     if len(shown) < 12:
         shown += common[:12 - len(shown)]
