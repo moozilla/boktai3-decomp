@@ -1582,10 +1582,6 @@ void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *p)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 54.2%
-// fix.py best (sweep after the inlined-insn fix)
-// Collider flag flow, palette branch layout and register allocation still differ.
 s32 ContactSequencePool_GetActiveCount(void *);
 void ContactBurst_SetEnabled(void *, s32);
 s32 ContactBurst_GetEnabled(void *);
@@ -1594,15 +1590,44 @@ void SceneActors_UpdateEffects(void *);
 
 void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *);
 void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
+
+static inline void GridAttack_CopyPalette(const void *source, void *dest)
+{
+    CpuSet(source, dest, 0x04000008);
+}
+static inline void GridAttack_AddFlags(struct GridAttackActor *p, u32 mask)
+{
+    p->flags |= mask;
+}
+static inline void GridAttack_ClearFlags(struct GridAttackActor *p, u32 mask)
+{
+    p->flags &= ~mask;
+}
+static inline void GridAttack_SetColliderFlags(struct ContactCollider *c, u32 mask)
+{
+    c->flags |= mask;
+}
+static inline void GridAttack_ClearColliderFlags(struct ContactCollider *c, u32 mask)
+{
+    u32 keep = ~mask;
+    c->flags = keep & c->flags;
+}
+static inline void GridAttack_SetCameraFlags(struct CameraTracking *camera, u32 mask)
+{
+    camera->requests |= mask;
+}
+static inline void GridAttack_ClearCameraFlags(struct CameraTracking *camera, u32 mask)
+{
+    camera->requests &= ~mask;
+}
 void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     struct GridAttackTransform *transform = &p->transform;
-    struct ContactCollider *damage;
-    struct ContactCollider *body;
+    struct ContactCollider *collider;
     if (ContactSequencePool_GetActiveCount(p->contactPool) > p->contactCountLimit) {
         ContactBurst_SetEnabled(p->contactBurst, 1);
-        p->flags |= 4;
+        GridAttack_AddFlags(p, 4);
         p->attackCount = 0;
     } else {
         if ((!p->attackCount) && ContactBurst_GetEnabled(p->contactBurst)) {
@@ -1614,91 +1639,108 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
             base->attackCount++;
     }
     if (ContactBurst_GetEnabled(base->contactBurst))
-        p->flags &= ~0x40;
+        GridAttack_ClearFlags(p, 0x40);
     SceneActors_UpdateEffects(p);
     if (base->stun) {
-        p->flags |= 4;
+        GridAttack_AddFlags(p, 4);
         base->stun--;
     }
-    damage = &base->damageCollider;
-    if (p->flags & 4)
-        (&base->damageCollider)->flags |= 4;
+    collider = &base->damageCollider;
+    if (GridAttack_TestFlags(p, 4))
+        collider->flags |= 4;
     else {
-        (&base->damageCollider)->flags &= ~4;
-        Collider_SetPosition(&base->damageCollider, &base->drawable.position, 0);
-        (&base->damageCollider)->direction = transform->angle;
+        GridAttack_ClearColliderFlags(collider, 4);
+        Collider_SetPosition(collider, &base->drawable.position, 0);
+        collider->direction = transform->angle;
     }
-    body = &base->bodyCollider;
-    if (!(p->flags & 8)) {
-        Collider_SetPosition(body, &base->drawable.position, 0);
-        body->direction = transform->angle;
-        Collider_Refresh(body);
+    collider = &base->bodyCollider;
+    if (!(GridAttack_TestFlags(p, 8))) {
+        Collider_SetPosition(collider, &base->drawable.position, 0);
+        collider->direction = transform->angle;
+        Collider_Refresh(collider);
     }
-    if (p->flags & 16) {
+    if (GridAttack_TestFlags(p, 16)) {
         base->drawable.flags |= 1;
-        *((u32 *)(((u8 *)base) + 0x8F0)) &= ~1;
-        (&base->damageCollider)->flags &= ~8;
+        GridAttack_ClearCameraFlags(&base->camera, 1);
+        GridAttack_ClearColliderFlags(&base->damageCollider, 8);
     } else {
         base->drawable.flags &= ~1;
         if (p->locked)
-            *((u32 *)(((u8 *)base) + 0x8F0)) &= ~1;
+            GridAttack_ClearCameraFlags(&base->camera, 1);
         else
-            *((u32 *)(((u8 *)base) + 0x8F0)) |= 1;
-        if (p->flags & 32)
-            (&base->damageCollider)->flags |= 8;
+            GridAttack_SetCameraFlags(&base->camera, 1);
+        if (GridAttack_TestFlags(p, 32))
+            GridAttack_SetColliderFlags(&base->damageCollider, 8);
         else
-            (&base->damageCollider)->flags &= ~8;
+            GridAttack_ClearColliderFlags(&base->damageCollider, 8);
     }
     if (base->shake) {
         base->shake--;
-        p->flags |= 0x20000;
+        GridAttack_AddFlags(p, 0x20000);
     }
     if (base->flash > 0) {
         if (!(--base->flash))
             base->animData.palette = base->palette;
     } else {
-        u8 *palette = base->palette;
-        switch (base->effectMode) {
-            case 1:
-                if (base->effectVariant >= (1 << base->effectDuration))
-                    break;
-                base->effectVariant++;
-                Palette_InterpolateBanks(palette, gPaletteBankData,
-                                         gPaletteBankData + (base->effectId << 5),
-                                         base->effectVariant, base->effectDuration);
+        s32 zero = 0;
+        u32 id = base->effectId;
+        if (base->effectMode == 1) {
+            s8 *amount = &base->effectVariant;
+            s32 value = *amount;
+            u8 *duration = &base->effectDuration;
+            if (value < (1 << *duration)) {
+                u8 *src;
+                u8 *dest;
+                void *palette;
+                (*amount)++;
+                src = gPaletteBankData;
+                dest = src + (id << 5);
+                palette = base->palette;
+                Palette_InterpolateBanks(palette, src, dest, *amount, *duration);
                 base->animData.palette = palette;
-                break;
-
-            case 2:
-                if (base->effectVariant > 0) {
-                    base->effectVariant--;
-                    Palette_InterpolateBanks(palette, gPaletteBankData,
-                                             gPaletteBankData + (base->effectId << 5),
-                                             base->effectVariant, base->effectDuration);
-                } else {
-                    base->effectVariant = 0;
-                    base->effectMode = 0;
-                    base->effectId = 1;
-                    CpuSet(gPaletteBankData + 0x2BA0, palette, 0x04000008);
+            }
+        } else if (base->effectMode == 2) {
+            void *palette;
+            s8 *amount = &base->effectVariant;
+            if (*amount > 0) {
+                u8 *src;
+                u8 *dest;
+                (*amount)--;
+                src = gPaletteBankData;
+                dest = src + (id << 5);
+                palette = base->palette;
+                Palette_InterpolateBanks(palette, src, dest, *amount, base->effectDuration);
+                base->animData.palette = palette;
+            } else {
+                const u8 *src;
+                *amount = zero;
+                base->effectMode = zero;
+                base->effectId = 1;
+                src = gPaletteBankData + 0x2BA0;
+                palette = base->palette;
+                GridAttack_CopyPalette(src, palette);
+                base->animData.palette = palette;
+            }
+        } else if (base->effectMode == 3) {
+            u8 *src = gPaletteBankData;
+            u8 *dest = src + (id << 5);
+            void *palette = base->palette;
+            s8 *amount = &base->effectVariant;
+            Palette_InterpolateBanks(palette, src, dest, *amount, base->effectDuration);
+            base->animData.palette = palette;
+            if (!base->effectDirection) {
+                (*amount)++;
+                if (*amount > 31) {
+                    *amount = 32;
+                    base->effectDirection = 1;
                 }
-                base->animData.palette = palette;
-                break;
-
-            case 3:
-                Palette_InterpolateBanks(palette, gPaletteBankData,
-                                         gPaletteBankData + (base->effectId << 5),
-                                         base->effectVariant, base->effectDuration);
-                base->animData.palette = palette;
-                if (!base->effectDirection) {
-                    if ((++base->effectVariant) > 31) {
-                        base->effectVariant = 32;
-                        base->effectDirection = 1;
-                    }
-                } else if ((--base->effectVariant) <= 0) {
-                    base->effectVariant = 0;
-                    base->effectDirection = 0;
+            } else {
+                (*amount)--;
+                if (*amount <= 0) {
+                    *amount = zero;
+                    base->effectDirection = zero;
                 }
-                break;
+            }
         }
     }
     if (base->projectedDisplay)
@@ -1713,10 +1755,6 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
     p->contactFlags = 0;
     p->effectTimer++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", GridAttack_UpdateCollidersAndPalette);
-#endif
 
 int GridAttack_Update(struct GridAttackActor *p)
 {
