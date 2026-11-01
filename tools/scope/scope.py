@@ -1023,6 +1023,10 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
               + ("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
                  if tied == "constant" else "Write the value first: `m = v & K;`")
               + " (README fact 33)")
+    for i, ln, reg in arg_order_hints(rows_json):
+        print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
+              f" precomputes an argument that needs converting to its parameter's type: declare that"
+              f" parameter narrower (`u8`) or cast the argument (README fact 35)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -1350,6 +1354,31 @@ def cmd_life(names, func):
             for ln in order:
                 print(f"  line {ln:4}: {len(by[ln]):3}  {' '.join(by[ln])}")
             print("  (* = mentions it; compare two drafts by variable name to see which line gained or lost insns)")
+            note = combine_dead_note([u for u, _ in ins], {u for u, _, _ in insn_list(wd, "combine")},
+                                     {u: r for u, _, r in insn_list(wd, "flow")}, lines)
+            if note:
+                print(note)
+
+
+def combine_dead_note(counted, after_combine, flow_rtl, lines):
+    """A struct halfword `|=`/`&=` expands as a field insertion, `(old & 0) | new`; its zero and second
+    ior reach flow, which counts them toward every life that spans them, and combine deletes them
+    after. In a priority swap those insns are life without code (README fact 34). COUNTED: the uids
+    flow counted toward one pseudo's life; AFTER_COMBINE: the uids still in combine's dump; FLOW_RTL:
+    uid -> rtl at flow. Names the lines with such a zero and how many of their counted insns go."""
+    if not after_combine:
+        return ""
+    gone = [u for u in counted if u in flow_rtl and u not in after_combine]
+    zero_lines = []
+    for u in gone:
+        if re.match(r"\(set \(reg:HI \d+\) \(const_int 0\)\)", flow_rtl[u]) and lines.get(u, 0) not in zero_lines:
+            zero_lines.append(lines.get(u, 0))
+    if not zero_lines:
+        return ""
+    per = ", ".join(f"line {ln} ({sum(1 for u in gone if lines.get(u, 0) == ln)})" for ln in zero_lines)
+    return (f"  halfword field insertion counted in this life, deleted by combine: {per}. A struct u16"
+            " `|=`/`&=` stores as `(old & 0) | new`; written through a `u16 *` (a helper's parameter)"
+            " it has none of these insns (README fact 34)")
 
 
 def alloc_table(wd, func):
@@ -1705,6 +1734,36 @@ def and_tie_hints(rows):
         dk = constant_def(dr, i, p), constant_def(dr, i, q)
         if rk[0] != rk[1] and dk[0] != dk[1] and rk[0] != dk[0]:
             out.append((i, r.get("line") or "", "constant" if rk[0] else "value"))
+    return out
+
+
+def arg_order_hints(rows):
+    """[(row index of the bl, line, register)] where the ROM sets argument register rN first in
+    the setup of a call and the draft sets it later: expand_call precomputed that argument, which
+    it does for one that needs a conversion to the parameter's type (README fact 35)."""
+    out = []
+    for i, r in enumerate(rows):
+        if not (r["rom"] or "").startswith("bl ") or not (r["draft"] or "").startswith("bl "):
+            continue
+        orders = {}
+        for side in ("rom", "draft"):
+            seq = []
+            for j in range(i - 1, max(-1, i - 13), -1):
+                t = rows[j][side]
+                if t is None:
+                    continue
+                if re.match(r"(bl?|b[a-z]{2}|bx|cmp|pop|push)\s", t) or t.startswith("."):
+                    break
+                d = asm_dest(t)
+                if d is not None and d <= 3 and d not in seq:
+                    seq.append(d)
+            orders[side] = seq[::-1]
+        ro, do = orders["rom"], orders["draft"]
+        if len(ro) < 2 or sorted(ro) != sorted(do) or ro == do:
+            continue
+        first = ro[0]
+        if do.index(first) > 0 and [x for x in ro if x != first] == [x for x in do if x != first]:
+            out.append((i, r.get("line") or "", first))
     return out
 
 

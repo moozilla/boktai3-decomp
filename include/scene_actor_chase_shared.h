@@ -339,6 +339,20 @@ static inline void SceneActorChase_ClearWordFlags(u32 *flags, u32 bits)
     *flags &= mask;
 }
 
+/* Mask-first forms: the mask is loaded before the field (it reaches the body as a parameter), and
+   the halfword store goes through a pointer, not a struct field insertion (tools/scope/README.md,
+   fact 34). For a block-scoped mask: { u32 mask = 0x200; SceneActorChase_OrHalfFlags(p, mask); } */
+static inline void SceneActorChase_AndWordFlags(u32 *flags, u32 mask)
+{
+    *flags &= mask;
+}
+
+static inline void SceneActorChase_OrHalfFlags(u16 *flags, u32 input)
+{
+    u32 mask = input;
+    *flags |= mask;
+}
+
 static inline void SceneActorChase_HalfwordFlagsSet(u16 *field, u32 bits)
 {
     u32 value = *field;
