@@ -2,15 +2,7 @@
 #define GUARD_CONTACT_SWARM_H
 /* Tentative second sixteen-slot contact pool, beginning at 08043F64. */
 #include "contact_actor.h"
-struct ContactSwarmSprite {
-    u32 flags;
-    u8 unknown4[3], priority;
-    u8 unknown8[8];
-    u16 frame;
-    u8 unknown12[0xA];
-    struct ContactPosition position;
-    u8 unknown24[8];
-};
+#include "contact_swarm_sprite.h"
 struct ContactSwarmGraphics {
     u8 unknown0[0xC];
     const void *paletteData;

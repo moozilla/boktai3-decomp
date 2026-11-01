@@ -5,10 +5,13 @@
 #include "engine_globals.h"
 
 /* The original draw code retains this numeric origin before rebasing to the sample table. */
-#define PARTICLE_RANDOM_CAPTURE_ORIGIN(out_)                                                       \
+#define PARTICLE_RANDOM_SAVE_ORIGIN(out_, origin_)                                                 \
     do {                                                                                           \
-        (out_) = 0x0403B714;                                                                       \
+        (out_) = (origin_);                                                                        \
     } while (0)
+#define PARTICLE_RANDOM_SAMPLE_ORIGIN 0x0403B714
+#define PARTICLE_RANDOM_CAPTURE_ORIGIN(out_) \
+    PARTICLE_RANDOM_SAVE_ORIGIN(out_, PARTICLE_RANDOM_SAMPLE_ORIGIN)
 
 /* Capture a sample separately from advancing the shared random cursor. */
 #define PARTICLE_RANDOM_READ_SAMPLE(out, table, index)                                             \

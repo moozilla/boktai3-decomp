@@ -33,15 +33,15 @@ void NamedObject_ConstrainTether(struct NamedObject *o)
     if (!HasFlag(0x10, &o->flags))
         return;
     TetherActor_CopyPosition(&tether);
-    x = ((struct SceneVec *)&o->x)->x >> 8;
-    z = ((struct SceneVec *)&o->x)->z >> 8;
+    x = ((struct SceneVec *)&o->body.position.x)->x >> 8;
+    z = ((struct SceneVec *)&o->body.position.x)->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
         cell = gTerrainMap->rows[z] + x;
-    if (NamedObject_IsMapCellOccupied(cell) && tether.y == o->y)
+    if (NamedObject_IsMapCellOccupied(cell) && tether.y == o->body.position.y)
         return;
-    Difference(&delta, (struct SceneVec *)&o->x, &tether);
+    Difference(&delta, (struct SceneVec *)&o->body.position.x, &tether);
     if (delta.x > gUnk_086064C4.x || delta.x < -gUnk_086064C4.x || delta.y > gUnk_086064C4.y ||
         delta.y < -gUnk_086064C4.y || delta.z > gUnk_086064C4.z || delta.z < -gUnk_086064C4.z) {
         if (delta.x > gUnk_086064C4.x)
@@ -52,9 +52,9 @@ void NamedObject_ConstrainTether(struct NamedObject *o)
             delta.z = gUnk_086064C4.z;
         else if (delta.z < -gUnk_086064C4.z)
             delta.z = -gUnk_086064C4.z;
-        tether.x = o->x + delta.x;
-        tether.y = o->y;
-        tether.z = o->z + delta.z;
+        tether.x = o->body.position.x + delta.x;
+        tether.y = o->body.position.y;
+        tether.z = o->body.position.z + delta.z;
         TetherActor_SetPosition(&tether);
         SetFlag2(0x200, (u16 *)&o->flags);
     }

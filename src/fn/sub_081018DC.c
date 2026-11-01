@@ -12,7 +12,7 @@ static inline s32 Load(s16 *p)
 void NamedObject_UpdateRouteFollower(struct NamedObject *o)
 {
     struct NamedObjectManager **managerPtr;
-    u8 *route;
+    struct SceneActorRouteCursor *route;
     u8 step;
     u32 *np;
     struct NamedObjectManager *m;
@@ -28,9 +28,9 @@ void NamedObject_UpdateRouteFollower(struct NamedObject *o)
                     else
                         values[0] = 1;
                 } else
-                    values[0] = o->route[2];
-                values[1] = Load(&o->x);
-                values[2] = Load(&o->z);
+                    values[0] = o->route.pointIndex;
+                values[1] = Load(&o->body.position.x);
+                values[2] = Load(&o->body.position.z);
                 args.count = 3;
                 args.values = values;
                 Script_Call(o->script, &args);
@@ -41,11 +41,11 @@ void NamedObject_UpdateRouteFollower(struct NamedObject *o)
     }
     managerPtr = &gNamedActorManager;
     if (!sub_08101094(o)) {
-        route = o->route;
-        step = route[3]++;
+        route = &o->route;
+        step = route->unknown3++;
         if (step >= Route_GetCurrentPointNodeId(route)) {
             Route_AdvancePoint(route);
-            if (SceneActorRoute_IsOutsidePointBounds(route, &o->x, 16, 16)) {
+            if ((u8)SceneActorRoute_IsOutsidePointBounds(route, &o->body.position, 16, 16)) {
                 o->state = 1;
                 m = *managerPtr;
                 np = &o->name;

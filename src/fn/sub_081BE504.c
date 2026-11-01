@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_input.h"
+#include "scene_item_values.h"
 
 struct StorageCategoryWidgets {
     u8 unk_00[0x318];
@@ -15,8 +16,6 @@ struct StorageCategoryWidgets {
     u8 unk_1758[0x38];
     u8 slots[32];
 };
-s32 Inventory_GetEquipmentId(u32);
-s32 Inventory_CanAssignEquipment(u32);
 s32 Storage_FindEquippedItemSlot(struct StorageCategoryWidgets *, s32);
 void SceneHud_SetKeyframePaletteBank(void *, u32);
 void Storage_GetSlotPosition(void *, s32);

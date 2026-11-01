@@ -281,7 +281,7 @@ u32 Navigation_FindContainingRegion(void *);
 
 void ProximityVolume_TranslateBounds(void *, void *);
 
-u32 sub_0821F2EC(void *, void *, void *);
+u32 NavMesh_FindRoute(void *, void *, void *);
 
 void SceneActorContacts_RemoveNode(void *);
 
@@ -1127,7 +1127,7 @@ u32 TetherActor_TestInteractionPath(struct TetherActor *p)
     u32 r;
     if (Navigation_FindContainingRegion(a) == 0xFF ||
         (b = (u8 *)&p->interactionProbe, ProximityVolume_TranslateBounds(b, a),
-         sub_0821F2EC(b, a, (u8 *)&p->interactionTarget) == 0))
+         NavMesh_FindRoute(b, a, (u8 *)&p->interactionTarget) == 0))
         r = 0;
     else
         r = 1;
@@ -1546,7 +1546,7 @@ void TetherActor_SetInteractionPathFromScript(void)
             a = &p->position.x;
             if (Navigation_FindContainingRegion(a) == 0xFF ||
                 (b = &p->interactionProbe, ProximityVolume_TranslateBounds(b, a),
-                 sub_0821F2EC(b, a, &p->interactionTarget.x) == 0))
+                 NavMesh_FindRoute(b, a, &p->interactionTarget.x) == 0))
                 TetherActor_SetState(p, 0);
             else
                 TetherActor_SetState(p, 3);

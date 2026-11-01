@@ -1,8 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.3%
-// fix.py best (sweep after the inlined-insn fix)
 struct GlyphPosition {
     u16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -40,37 +36,38 @@ static inline s32 Truncate(s32 value)
 static inline s32 WidenAngle(s32 offset)
 {
     offset += 256;
-    asm("" : "+r"(offset));
     return offset;
 }
 // confidence=low: advances four orbiting glyphs and hides each after fourteen frames.
-#define ActorGlyphTrail_UpdateParticles sub_08237938
 void ActorGlyphTrail_UpdateParticles(struct GlyphTrail *p)
 {
-    register s32 direction asm("r10") = ((p->direction + 5) & 7) << 5;
-    register u16 *timer asm("r5") = &p->slots[0].timer;
-    s32 i;
-    typeof(timer = (u16 *)(((u8 *)timer) + 0x30)) t1;
-    u32 k1 = 255;
-    t1 = (timer = (u16 *)(((u8 *)timer) + 0x30));
-    for (i = 0; i <= 3; i++, t1) {
-        struct GlyphParticleView *slot = (void *)((((u8 *)p) + 0x94) + (i * 0x30));
+    s32 direction = ((p->direction + 5) & 7) << 5;
+    u32 mask = 255;
+    const s16 *sines = gUnk_086149C4;
+    s32 offset = 0;
+    struct GlyphParticleView *slot = (void *)&p->slots[0].position;
+    u16 *timer = &p->slots[0].timer;
+    s32 count = 3;
+    do {
         if (slot->active) {
             slot->timer++;
             if (slot->timer > 14) {
                 slot->active = 0;
-                p->slots[i].flags |= 1;
+                {
+                    struct GlyphSlot *base = p->slots;
+                    u32 *flags = (u32 *)(offset + (u8 *)base);
+                    *flags |= 1;
+                }
             } else {
                 s32 radius = (slot->radius * (16 - (*timer))) >> 3;
-                s32 angle = (direction + WidenAngle(slot->angle)) & k1;
+                s32 angle = (direction + WidenAngle(slot->angle)) & mask;
                 slot->position = p->position;
-                slot->position.x += Truncate(gUnk_086149C4[(angle + 64) & k1] * radius);
-                slot->position.z += Truncate(gUnk_086149C4[angle & k1] * radius);
+                slot->position.x += Truncate(sines[(angle + 64) & mask] * radius);
+                slot->position.z += Truncate(sines[angle & mask] * radius);
             }
         }
-    }
+        offset += sizeof(struct GlyphSlot);
+        slot = (void *)((u8 *)slot + sizeof(struct GlyphSlot));
+        timer = (void *)((u8 *)timer + sizeof(struct GlyphSlot));
+    } while (--count >= 0);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08237938);
-#endif

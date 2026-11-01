@@ -1,94 +1,106 @@
-#include "global.h"
-
 #include "engine.h"
-struct Position {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
-struct Sub0821C8F8Probe {
-    u16 x, y, z, w;
-};
-u8 sub_0821C254(u8 *, u16 *, struct Sub0821C8F8Probe *, u8);
-void Terrain_SampleSurface(u8 *, u16 *, struct Sub0821C8F8Probe *);
-u32 sub_0821BF5C(void *, void *, u8);
+#include "contact_position.h"
+#include "terrain_probe.h"
+
+u32 sub_0821C254(u8 *, struct ContactPosition *, struct TerrainProbe *, u8);
+void Terrain_SampleSurface(u8 *, struct ContactPosition *, struct TerrainProbe *);
+u32 sub_0821BF5C(struct ContactPosition *, struct TerrainProbe *, u8);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 
-#define SUB0821C8F8_PROBE(p)  sub_0821C254(out, (u16 *)pos, (p), flag)
-#define SUB0821C8F8_SAMPLE(p) Terrain_SampleSurface(out, (u16 *)pos, (p))
-#define SUB0821C8F8_MOVE(dst, src, mx, mz)                                                         \
-    do {                                                                                           \
-        (dst)->x = (src)->x + (mx);                                                                \
-        (dst)->y = (src)->y;                                                                       \
-        (dst)->z = (src)->z + (mz);                                                                \
-        (dst)->w = (src)->w;                                                                       \
-    } while (0)
-#define SUB0821C8F8_DIAGONAL(ux, uz)                                                               \
-    do {                                                                                           \
-        SUB0821C8F8_MOVE(&c, &base, (ux) * stepX, (uz) * stepZ);                                   \
-        if (SUB0821C8F8_PROBE(&c)) {                                                               \
-            SUB0821C8F8_SAMPLE(&base);                                                             \
-            out[0] = 1;                                                                            \
-            break;                                                                                 \
-        }                                                                                          \
-        qpos = *pos;                                                                               \
-        qpos.x = pos->x + delta->x + (ux) * stepX;                                                 \
-        s1 = sub_0821BF5C(pos, &qpos, flag);                                                       \
-        rpos = *pos;                                                                               \
-        rpos.z = pos->z + delta->z + (uz) * stepZ;                                                 \
-        s2 = sub_0821BF5C(pos, &rpos, flag);                                                       \
-        if (s1) {                                                                                  \
-            if (s2) {                                                                              \
-                SUB0821C8F8_SAMPLE(&base);                                                         \
-                break;                                                                             \
+#define HIGH_EDGE(n)            ((((n) + 1) << 8) - 1)
+#define LOW_EDGE(n)             (((n) << 8) + 1)
+#define OFFSET(v, step, sign)   ((sign) > 0 ? (v) + (step) : (v) - (step))
+#define UNOFFSET(v, step, sign) ((sign) > 0 ? (v) - (step) : (v) + (step))
+#define BOUND(n, sign)          ((sign) > 0 ? HIGH_EDGE(n) : LOW_EDGE(n))
+
+#define SET_FOOTPRINT_CORNER(xSign, zSign)                                                         \
+    corner = destination;                                                                          \
+    corner.x = OFFSET(corner.x, stepX, xSign);                                                     \
+    corner.z = OFFSET(corner.z, stepZ, zSign);
+
+#define SAMPLE_ADJUSTED_CORNER(xSign, zSign)                                                       \
+    corner.x = UNOFFSET(corner.x, stepX, xSign);                                                   \
+    corner.z = UNOFFSET(corner.z, stepZ, zSign);                                                   \
+    Terrain_SampleSurface(track, pos, &corner);
+
+#define TEST_FOOTPRINT_AXES(xSign, zSign)                                                          \
+    probeX = *(struct TerrainProbe *)pos;                                                          \
+    probeX.x += OFFSET(delta->x, stepX, xSign);                                                    \
+    openX = sub_0821BF5C(pos, &probeX, flag);                                                      \
+    probeZ = *(struct TerrainProbe *)pos;                                                          \
+    probeZ.z += OFFSET(delta->z, stepZ, zSign);                                                    \
+    openZ = sub_0821BF5C(pos, &probeZ, flag);
+
+#define SAMPLE_BLOCKED_X(xSign)                                                                    \
+    sub_0821C254(track, pos, &probeX, flag);                                                       \
+    probeX.x = UNOFFSET(probeX.x, stepX, xSign);                                                   \
+    probeX.z += delta->z;                                                                          \
+    Terrain_SampleSurface(track, pos, &probeX);
+
+#define SAMPLE_BLOCKED_Z(zSign)                                                                    \
+    sub_0821C254(track, pos, &probeZ, flag);                                                       \
+    probeZ.x += delta->x;                                                                          \
+    probeZ.z = UNOFFSET(probeZ.z, stepZ, zSign);                                                   \
+    Terrain_SampleSurface(track, pos, &probeZ);
+
+#define PROBE_CARDINAL(x1, z1, x2, z2)                                                             \
+    {                                                                                              \
+        SET_FOOTPRINT_CORNER(x1, z1);                                                              \
+        if (sub_0821C254(track, pos, &corner, flag)) {                                             \
+            SAMPLE_ADJUSTED_CORNER(x1, z1);                                                        \
+            track[0] = 1;                                                                          \
+            return;                                                                                \
+        } else {                                                                                   \
+            SET_FOOTPRINT_CORNER(x2, z2);                                                          \
+            if (sub_0821C254(track, pos, &corner, flag)) {                                         \
+                SAMPLE_ADJUSTED_CORNER(x2, z2);                                                    \
+                track[0] = 1;                                                                      \
+                return;                                                                            \
+            } else {                                                                               \
+                Terrain_SampleSurface(track, pos, &destination);                                   \
             }                                                                                      \
-            c = base;                                                                              \
-            SUB0821C8F8_PROBE(&c);                                                                 \
-            c.x = c.x + delta->x;                                                                  \
-            c.z = c.z - (uz) * stepZ;                                                              \
-            SUB0821C8F8_SAMPLE(&c);                                                                \
-            out[0] = 1;                                                                            \
-            break;                                                                                 \
         }                                                                                          \
-        if (s2) {                                                                                  \
-            c = base;                                                                              \
-            SUB0821C8F8_PROBE(&c);                                                                 \
-            c.x = c.x - (ux) * stepX;                                                              \
-            c.z = c.z + delta->z;                                                                  \
-            SUB0821C8F8_SAMPLE(&c);                                                                \
-            out[0] = 1;                                                                            \
-            break;                                                                                 \
-        }                                                                                          \
-        cellX = Mod(*(u16 *)(out + 6), gTerrainWidth);                                             \
-        cellZ = Div(*(u16 *)(out + 6), gTerrainWidth);                                             \
-        c.x = ((cellX + 1) << 8) - 1 - (ux) * stepX;                                               \
-        c.z = ((cellZ + 1) << 8) - 1 - (uz) * stepZ;                                               \
-        c.y = base.y;                                                                              \
-        c.w = base.w;                                                                              \
-        SUB0821C8F8_SAMPLE(&c);                                                                    \
-        out[0] = 1;                                                                                \
-    } while (0)
+    }
 
-#ifdef NONMATCHING
-// fuzzy: 20.3%
-// scope shape 1228 (differences once low registers are set aside)
-// confidence=low: moves an actor position by its delta, probing terrain cells in the delta's sign quadrant.
-void sub_0821C8F8(void *arg0, struct Position *arg1, struct Position *arg2, u32 arg3, u32 arg4,
-                  u32 arg5)
+/* A blocked X axis finishes through the exit for its X direction. */
+#define PROBE_DIAGONAL(xSign, zSign, finished, xBlocked)                                           \
+    {                                                                                              \
+        SET_FOOTPRINT_CORNER(xSign, zSign);                                                        \
+        if (sub_0821C254(track, pos, &corner, flag)) {                                             \
+            SAMPLE_ADJUSTED_CORNER(xSign, zSign);                                                  \
+            track[0] = 1;                                                                          \
+            return;                                                                                \
+        } else {                                                                                   \
+            struct TerrainProbe probeX, probeZ;                                                    \
+            u32 openX, openZ;                                                                      \
+            TEST_FOOTPRINT_AXES(xSign, zSign);                                                     \
+            if (openX && openZ) {                                                                  \
+                Terrain_SampleSurface(track, pos, &destination);                                   \
+            } else if (!openX && !openZ) {                                                         \
+                corner.x = BOUND(Mod(*(u16 *)(track + 6), gTerrainWidth), xSign);                  \
+                corner.z = BOUND(Div(*(u16 *)(track + 6), gTerrainWidth), zSign);                  \
+                SAMPLE_ADJUSTED_CORNER(xSign, zSign);                                              \
+                goto finished;                                                                     \
+            } else if (!openX) {                                                                   \
+                SAMPLE_BLOCKED_X(xSign);                                                           \
+                goto xBlocked;                                                                     \
+            } else {                                                                               \
+                SAMPLE_BLOCKED_Z(zSign);                                                           \
+            finished:                                                                              \
+                track[0] = 1;                                                                      \
+                return;                                                                            \
+            }                                                                                      \
+        }                                                                                          \
+    }
+
+void Terrain_MoveFootprint(u8 *track, struct ContactPosition *pos, struct ContactPosition *delta,
+                           u16 stepX, u16 stepZ, u8 flag)
 {
-    u8 *out = arg0;
-    struct Position *pos = arg1;
-    struct Position *delta = arg2;
-    s32 stepX = (u16)arg3;
-    s32 stepZ = (u16)arg4;
-    u8 flag = (u8)arg5;
-    s32 mode = 0;
-    s32 tx, tz;
-    s32 cell;
-    s32 cellX, cellZ;
-    u32 s1, s2;
-    struct Sub0821C8F8Probe base, c;
-    struct Position qpos, rpos;
-
+    u32 mode = 0;
+    u8 clear;
+    s32 tileX, tileZ, cell;
+    struct TerrainProbe destination, corner;
     if (delta->x > 0)
         mode = 0x10;
     else if (delta->x < 0)
@@ -97,101 +109,47 @@ void sub_0821C8F8(void *arg0, struct Position *arg1, struct Position *arg2, u32 
         mode |= 1;
     else if (delta->z < 0)
         mode |= 2;
-
-    tx = (s8)(pos->x >> 8);
-    tz = (s8)(pos->z >> 8);
-    if (tx >= 0 && tz >= 0 && tx < gTerrainWidth && tz < gTerrainHeight)
-        cell = gTerrainMap->rows[tz] + tx;
-    else
+    tileX = (s8)(pos->x >> 8);
+    tileZ = (s8)(pos->z >> 8);
+    if (tileX < 0 || tileZ < 0 || (u32)tileX >= gTerrainWidth || (u32)tileZ >= gTerrainHeight)
         cell = 0;
-    *(u16 *)(out + 6) = cell;
-
-    base.x = pos->x + delta->x;
-    base.y = pos->y + delta->y;
-    base.z = pos->z + delta->z;
-    base.w = 0x10;
-    out[0] = 0;
-
+    else
+        cell = gTerrainMap->rows[tileZ] + tileX;
+    clear = 0;
+    *(u16 *)(track + 6) = cell;
+    destination.x = pos->x + delta->x;
+    destination.y = pos->y + delta->y;
+    destination.z = pos->z + delta->z;
+    destination.w = 0x10;
+    track[0] = clear;
     switch (mode) {
-        case 0x00:
-            SUB0821C8F8_SAMPLE(&base);
-            break;
-        case 0x01:
-            SUB0821C8F8_MOVE(&c, &base, stepX, stepZ);
-            if (SUB0821C8F8_PROBE(&c)) {
-                SUB0821C8F8_SAMPLE(&base);
-                out[0] = 1;
-                break;
-            }
-            SUB0821C8F8_MOVE(&c, &base, -stepX, stepZ);
-            if (SUB0821C8F8_PROBE(&c)) {
-                SUB0821C8F8_SAMPLE(&base);
-                out[0] = 1;
-                break;
-            }
-            SUB0821C8F8_SAMPLE(&base);
-            break;
-        case 0x02:
-            SUB0821C8F8_MOVE(&c, &base, stepX, -stepZ);
-            if (SUB0821C8F8_PROBE(&c)) {
-                SUB0821C8F8_SAMPLE(&base);
-                out[0] = 1;
-                break;
-            }
-            SUB0821C8F8_MOVE(&c, &base, -stepX, -stepZ);
-            if (SUB0821C8F8_PROBE(&c)) {
-                SUB0821C8F8_SAMPLE(&base);
-                out[0] = 1;
-                break;
-            }
-            SUB0821C8F8_SAMPLE(&base);
+        case 0:
+            Terrain_SampleSurface(track, pos, &destination);
             break;
         case 0x10:
-            SUB0821C8F8_MOVE(&c, &base, stepX, stepZ);
-            if (SUB0821C8F8_PROBE(&c)) {
-                SUB0821C8F8_SAMPLE(&base);
-                out[0] = 1;
-                break;
-            }
-            SUB0821C8F8_MOVE(&c, &base, stepX, -stepZ);
-            if (SUB0821C8F8_PROBE(&c)) {
-                SUB0821C8F8_SAMPLE(&base);
-                out[0] = 1;
-                break;
-            }
-            SUB0821C8F8_SAMPLE(&base);
+            PROBE_CARDINAL(1, 1, 1, -1);
             break;
         case 0x20:
-            SUB0821C8F8_MOVE(&c, &base, -stepX, stepZ);
-            if (SUB0821C8F8_PROBE(&c)) {
-                SUB0821C8F8_SAMPLE(&base);
-                out[0] = 1;
-                break;
-            }
-            SUB0821C8F8_MOVE(&c, &base, -stepX, -stepZ);
-            if (SUB0821C8F8_PROBE(&c)) {
-                SUB0821C8F8_SAMPLE(&base);
-                out[0] = 1;
-                break;
-            }
-            SUB0821C8F8_SAMPLE(&base);
+            PROBE_CARDINAL(-1, 1, -1, -1);
+            break;
+        case 0x01:
+            PROBE_CARDINAL(1, 1, -1, 1);
+            break;
+        case 0x02:
+            PROBE_CARDINAL(1, -1, -1, -1);
             break;
         case 0x11:
-            SUB0821C8F8_DIAGONAL(1, 1);
+            PROBE_DIAGONAL(1, 1, hitPosXPosZ, hitPosXNegZ);
             break;
         case 0x21:
-            SUB0821C8F8_DIAGONAL(-1, 1);
+            PROBE_DIAGONAL(-1, 1, hitNegXPosZ, hitNegXNegZ);
             break;
         case 0x12:
-            SUB0821C8F8_DIAGONAL(1, -1);
+            PROBE_DIAGONAL(1, -1, hitPosXNegZ, hitPosXNegZ);
             break;
         case 0x22:
-            SUB0821C8F8_DIAGONAL(-1, -1);
-            break;
-        default:
+            PROBE_DIAGONAL(-1, -1, hitNegXNegZ, hitNegXNegZ);
             break;
     }
+    return;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0821C8F8);
-#endif

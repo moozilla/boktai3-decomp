@@ -47,11 +47,11 @@ void NamedObject_TryCapturePlayer(struct NamedObject *o)
                 attr = *(u16 *)(data + 2);
                 if (attr & 0x80) {
                     struct SceneVec delta;
-                    Difference(&delta, (struct SceneVec *)&o->x, &gPlayers[i]->position);
+                    Difference(&delta, (struct SceneVec *)&o->body.position.x, &gPlayers[i]->position);
                     if (delta.x > gUnk_086064B4.x || delta.x < -gUnk_086064B4.x ||
                         delta.y > gUnk_086064B4.y || delta.y < -gUnk_086064B4.y ||
                         delta.z > gUnk_086064B4.z || delta.z < -gUnk_086064B4.z) {
-                        Player_SetPendingObject(gPlayers[i], &o->x);
+                        Player_SetPendingObject(gPlayers[i], &o->body.position.x);
                         SetFlag2(0x100, (u16 *)&o->flags);
                     }
                 }

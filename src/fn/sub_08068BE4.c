@@ -1,183 +1,38 @@
 #include "global.h"
-
 #include "engine.h"
-#include "contact_actor.h"
-#include "bouncing_object.h"
 #include "player_cue_sequence.h"
-extern const u8 gUnk_08605B68[];
+#include "scene_actor_terrain.h"
+#include "bouncing_object.h"
 
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
-s32 Div(s32, s32);
 void Sound_PlaySong(u32 song);
 
-static inline s32 Cell(struct ContactPosition *p)
+static inline void UpdateCollidersAndAnimation(struct BouncingObject *obj,
+                                               struct ContactSwarmSprite *sprite,
+                                               struct BouncingPool *pool,
+                                               struct ContactPosition *position)
 {
-    s32 x = (s16)p->x >> 8, z = (s16)p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-static inline u8 *Properties(u32 cell)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    if (p)
-        return p + 4;
-    return gTerrainMap->cells + (cell * 4 + 12);
-}
-static inline s32 Height(u32 cell, struct ContactPosition *p)
-{
-    u8 *data = Properties(cell);
-    u32 shape = *data >> 4;
-    s32 height = (*data & 15) << 8;
-    switch (shape) {
-        case 1:
-            height -= (u8)p->z;
-            break;
-        case 2:
-            height -= (u8)p->x;
-            break;
-    }
-    return height;
-}
-static inline u32 Attributes(u32 cell)
-{
-    return *(u16 *)(Properties(cell) + 2);
-}
-
-// confidence=low: per-frame update of one bouncing object (ground contact, velocity, sequence, timer)
-void sub_08068BE4(struct BouncingPool *pool, struct BouncingObject *input)
-{
-    struct BouncingObject *obj = input;
-    struct BouncingObject *sprite = input;
-    struct ContactPosition rel;
-    struct ContactPosition next;
-    struct ContactPosition *position, *velocity;
-    u32 cell, nextCell, attrs;
-    s32 floor, nextFloor;
-    u8 *delay;
-    u16 *flags;
-    u32 value, test;
-
-    if (obj->enter) {
-        obj->sprite.flags &= ~1;
-        obj->stateFrame = 0;
-        obj->enter = 0;
-    }
-    {
-        u16 c = Cell(&obj->sprite.position);
-        obj->mapCell = c;
-    }
-    flags = &obj->flags;
-    value = *flags;
-    test = 1;
-    test &= value;
-    if (test) {
-        s32 y = sprite->sprite.position.y;
-        u32 c = obj->mapCell;
-        struct ContactPosition *at = &sprite->sprite.position;
-        floor = Height(c, at);
-        if ((u32)y > (u32)floor)
-            obj->velocity.y -= 4;
-    } else {
-        s32 dist2;
-        struct ContactPosition *d = &rel;
-        struct ContactPosition *at = &sprite->sprite.position;
-        struct ContactPosition *o = &obj->origin;
-        d->x = o->x - sprite->sprite.position.x;
-        d->y = o->y - at->y;
-        d->z = o->z - at->z;
-        dist2 = d->x * d->x + d->z * d->z;
-        if (dist2 <= 0x3FFFF || obj->stateFrame > 8) {
-            u32 mask = 1;
-            mask |= value;
-            *flags = mask;
-            obj->velocity.y -= 4;
-        }
-    }
-    {
-        u16 *mc = &obj->mapCell;
-        position = &sprite->sprite.position;
-        velocity = &obj->velocity;
-        cell = *mc;
-    }
-    Math_Atan2(velocity->x, velocity->z);
-    floor = Height(cell, position);
-    if (velocity->x + velocity->z + velocity->y != 0) {
-        if (position->y <= floor) {
-            velocity->x = Div(velocity->x * 6, 10);
-            velocity->y = -Div(velocity->y * 4, 10);
-            velocity->z = Div(velocity->z * 6, 10);
-            {
-                s32 x = velocity->x, z = velocity->z, y = velocity->y;
-                s32 speed = x + z + y;
-                if (speed < 0)
-                    speed = -speed;
-                if (speed <= 2) {
-                    velocity->x = 0;
-                    velocity->y = 0;
-                    velocity->z = 0;
-                } else {
-                    Sound_PlaySong(0x166);
-                }
-            }
-            position->y = floor;
-        }
-        next.x = position->x + velocity->x;
-        next.y = position->y + velocity->y;
-        next.z = position->z + velocity->z;
-        nextCell = Cell(&next);
-        nextFloor = Height(nextCell, &next);
-        attrs = Attributes(nextCell);
-        if (cell != nextCell && (floor < nextFloor || (Attributes(nextCell) & 3))) {
-            velocity->x = -Div(velocity->x * 5, 10);
-            velocity->z = -Div(velocity->z * 5, 10);
-            Sound_PlaySong(0x166);
-        }
-        if ((nextFloor <= 0 || (attrs & 0x40)) && next.y <= nextFloor) {
-            struct BouncingPool *bp = gBouncingPool;
-            s8 *index = &obj->index;
-            s32 slot = *index;
-            bp->used &= ~(1 << slot);
-            obj->state = 0;
-            Sprite_Remove(obj);
-            Shadow_Destroy(obj->registration);
-            Collider_Remove(&obj->removalCollider);
-            *(u8 *)index = 255;
-            obj->flags = 0;
-            obj->timer = 0;
-        } else {
-            position->x += velocity->x;
-            position->y += velocity->y;
-            position->z += velocity->z;
-        }
-    }
-    Collider_SetPosition(&obj->removalCollider, &obj->sprite.position, 0);
+    s16 delayIndex;
+    u32 timer;
+    u32 savedElapsed, savedIndex;
+    Collider_SetPosition(&obj->removalCollider, position, 0);
     if (obj->collisionDelay != 0) {
         obj->collisionDelay--;
     } else {
-        Collider_SetPosition(&obj->bodyCollider, &obj->sprite.position, 0);
+        Collider_SetPosition(&obj->bodyCollider, position, 0);
         Collider_Refresh(&obj->bodyCollider);
     }
-    {
-        u32 d = obj->animationDelay;
-        delay = &obj->animationDelay;
-        if (d != 0) {
-            *delay = d - 1;
-            goto step;
-        }
-    }
-    {
-        u32 idx;
-        u16 savedElapsed, savedIndex;
-        u32 timer = obj->timer;
-        if (timer <= 0x1D)
-            idx = 3;
-        else if (timer <= 0x31)
-            idx = 2;
-        else if (timer <= 0x59)
-            idx = 1;
+    if (obj->animationDelay) {
+        obj->animationDelay--;
+    } else {
+        timer = obj->timer;
+        if (timer <= 29)
+            delayIndex = 3;
+        else if (timer <= 49)
+            delayIndex = 2;
+        else if (timer <= 89)
+            delayIndex = 1;
         else
-            goto step;
+            goto playback;
         savedElapsed = obj->sequence.elapsed;
         savedIndex = obj->sequence.index;
         if (obj->animation == 1) {
@@ -189,10 +44,110 @@ void sub_08068BE4(struct BouncingPool *pool, struct BouncingObject *input)
         }
         obj->sequence.elapsed = savedElapsed;
         obj->sequence.index = savedIndex;
-        *delay = gUnk_08605B68[idx];
+        obj->animationDelay = gBouncingObjectBlinkDelays[delayIndex];
     }
-step:
-    PlayerCue_StepSequence(&sprite->sprite, &obj->sequence);
+playback:
+    PlayerCue_StepSequence(sprite, &obj->sequence);
+}
+static inline u32 TerrainBlockingFlags(s32 cell)
+{
+    u16 flags = ((u16 *)SceneActorTerrain_GetCell(cell))[1];
+    u32 mask = 3;
+    return flags & mask;
+}
+static inline s32 SumVelocity(const struct ContactPosition *velocity)
+{
+    s32 x = velocity->x, z = velocity->z, y = velocity->y;
+    return x + z + y;
+}
+void BouncingObject_TickActive(struct BouncingPool *pool, struct BouncingObject *input)
+{
+    struct BouncingObject *obj = input;
+    struct ContactSwarmSprite *sprite = &input->sprite;
+    u16 *cellPtr;
+    u16 currentCell;
+    s32 currentGround;
+    struct ContactPosition rel;
+    union {
+        struct ContactPackedVector packed;
+        struct ContactPosition position;
+    } candidate;
+    struct ContactPosition *pos;
+    struct ContactPosition *velocity;
+    s32 cell, ground, nextGround, speed, dist2;
+    u32 cellFlags;
+
+    if (obj->enter) {
+        obj->sprite.flags &= ~1;
+        obj->stateFrame = 0;
+        obj->enter = 0;
+    }
+    obj->mapCell = SceneActorTerrain_GetCellIndex(&obj->sprite.position);
+    if (obj->flags & 1) {
+        s32 height = sprite->position.y;
+        s32 oldCell = obj->mapCell;
+        struct ContactPosition *here = &sprite->position;
+        ground = SceneActorTerrain_GetHeight(oldCell, here);
+        if ((u32)height > (u32)ground)
+            obj->velocity.y -= 4;
+    } else {
+        struct ContactPosition *delta = &rel;
+        struct ContactPosition *here = &sprite->position;
+        struct ContactPosition *origin = &obj->origin;
+        SceneActorTerrain_Subtract(delta, origin, here);
+        dist2 = delta->x * delta->x + delta->z * delta->z;
+        if (dist2 <= 0x3ffff || obj->stateFrame > 8) {
+            obj->flags |= 1;
+            obj->velocity.y -= 4;
+        }
+    }
+
+    cellPtr = &obj->mapCell;
+    pos = &sprite->position;
+    velocity = &obj->velocity;
+    currentCell = *cellPtr;
+    Math_Atan2(velocity->x, velocity->z);
+    currentGround = SceneActorTerrain_GetHeight(currentCell, pos);
+    if (velocity->x + velocity->z + velocity->y != 0) {
+        if (pos->y <= currentGround) {
+            velocity->x = Div(6 * velocity->x, 10);
+            velocity->y = -Div(4 * velocity->y, 10);
+            velocity->z = Div(6 * velocity->z, 10);
+            speed = SumVelocity(velocity);
+            if (speed < 0)
+                speed = -speed;
+            if (speed <= 2) {
+                velocity->x = 0;
+                velocity->y = 0;
+                velocity->z = 0;
+            } else {
+                Sound_PlaySong(0x166);
+            }
+            pos->y = currentGround;
+        }
+        candidate.packed.x = pos->x + velocity->x;
+        candidate.packed.y = pos->y + velocity->y;
+        candidate.packed.z = pos->z + velocity->z;
+        cell = SceneActorTerrain_GetCellIndex(&candidate.position);
+        nextGround = SceneActorTerrain_GetHeight(cell, &candidate.position);
+        cellFlags = ((u16 *)SceneActorTerrain_GetCell(cell))[1];
+        if (currentCell != cell) {
+            if (currentGround < nextGround || TerrainBlockingFlags(cell) != 0) {
+                velocity->x = -Div(5 * velocity->x, 10);
+                velocity->z = -Div(5 * velocity->z, 10);
+                Sound_PlaySong(0x166);
+            }
+        }
+        if ((nextGround <= 0 || (cellFlags & 0x40)) && candidate.position.y <= nextGround) {
+            BouncingObject_ReleaseSlot(obj);
+        } else {
+            pos->x += velocity->x;
+            pos->y += velocity->y;
+            pos->z += velocity->z;
+        }
+    }
+
+    UpdateCollidersAndAnimation(obj, sprite, pool, &obj->sprite.position);
     obj->stateFrame++;
     if (obj->timer != 0) {
         obj->timer--;

@@ -1,15 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "render.h"
-#include "engine.h"
+
 #include "background_controller.h"
-#include "ram.h"
-#ifdef NONMATCHING
-// fuzzy: 90.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Differs: argument evaluation order of the final SpriteEffectController_Create call
-// (0x1C1E/0xD43F pool loads come last in the original) and a few register choices.
+#include "contact_position.h"
+#include "monster_particle_random.h"
 
 struct Camera {
     u8 pad[0x44];
@@ -18,27 +11,37 @@ struct Camera {
 extern const s16 gUnk_086149C4[];
 void Actor_UpdateVisibilityAndShadow(u32, u8 *);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
-struct ContactPosition {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
 void *SpriteEffectController_Create(const struct ContactPosition *, const struct ContactPosition *,
                                     s32, u32, u32, u32, u32, u32, u32, u32, u32, u32, s32, s32, s32,
                                     s32, s32, s32);
-struct Pair {
-    u32 a, b;
+struct SceneNpcEffectState {
+    u8 unknown0[0xC];
+    u8 active, attached;
+    s16 paletteFrame;
 };
-
-static inline s32 Load(u32 addr)
-{
-    return *(const u16 *)addr;
-}
-
-static inline s32 Rand(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
-}
-
+struct SceneNpcEffect {
+    u8 unknown0[6];
+    u8 state;
+    u8 unknown7[5];
+    u16 flags, displayFlags;
+    u8 unknown10[0x10];
+    struct SceneNpcEffectState effect;
+    u8 unknown30[0x68 - 0x30];
+    struct ContactPosition position;
+    u8 unknown70[0x90 - 0x70];
+    u16 size[2];
+    u8 unknown94[0x160 - 0x94];
+    struct ContactPosition *displayPosition;
+    u8 unknown164[0x1cc - 0x164];
+    u8 palette[0x20];
+    u8 unknown1ec[0x300 - 0x1ec];
+    s32 projected[3];
+    u8 unknown30c[0x328 - 0x30c];
+    s32 height;
+};
+struct ParticleSampleOrigin {
+    u32 value;
+};
 static inline s32 Truncate(s32 v)
 {
     if (v >= 0)
@@ -46,124 +49,116 @@ static inline s32 Truncate(s32 v)
     return -((-v) >> 12);
 }
 
-s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
+static inline u32 IsEmissionFrame(u8 frame, u32 mask)
 {
-    register u32 a asm("r12") = a_;
-    u8 k2;
-    u8 *p = p_;
-    register u8 *q asm("r6") = p + 0x20;
-    if (q[0xd] != 0) {
-        register s32 zero asm("r8") = 0;
+    if ((frame & mask) != 0)
+        return 0;
+    return frame < 128;
+}
+s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
+{
+    u32 work = context;
+    u8 *p = actor;
+    u8 *effectData = p + 0x20;
+    struct SceneNpcEffect *npc = (void *)p;
+    struct SceneNpcEffectState *fx = &npc->effect;
+    if (effectData[0xd] != 0) {
+        s32 zero = 0;
         s32 *pos;
         struct ContactPosition *dst;
-        s32 adj;
-        q[0xc] = 1;
+        s32 height;
+        fx->active = 1;
         pos = (s32 *)(p + 0x300);
-        dst = *((struct ContactPosition **)(p + 0x160));
-        {
-            register u32 off asm("r4") = 0x328;
-            register u32 addr asm("r0");
-            asm("" : "+r"(off));
-            addr = ((u32)p) + off;
-            asm("" : "+r"(addr));
-            adj = *((s32 *)addr);
-        }
+        dst = npc->displayPosition;
+        height = npc->height;
         dst->x = (pos[0] >> 12) - gSceneCamera->x;
-        dst->y = ((pos[2] + (pos[1] + adj)) >> 12) + 0x60;
+        dst->y = ((pos[2] + (pos[1] + height)) >> 12) + 0x60;
         dst->z = pos[2] >> 12;
         {
-            u16 *w = (u16 *)(p + 0x90);
-            register u16 c asm("r0");
+            u16 *w = npc->size;
+            u16 height;
             *w = 4;
             w++;
-            c = 0xFFE8;
-            asm("" : "+r"(c));
-            *w = c;
+            height = 0xFFE8;
+            *w = height;
         }
-        *((struct Pair *)(p + 0x68)) = *(*((struct Pair **)(p + 0x160)));
-        *((u16 *)(p + 0x6c)) = zero;
+        npc->position = *npc->displayPosition;
+        npc->position.z = zero;
         {
             u32 m = 0x200;
-            asm("" : "+r"(m));
-            *((u16 *)(p + 0xe)) = m | (*((u16 *)(p + 0xe)));
+            npc->displayFlags = m | npc->displayFlags;
         }
     }
-    Actor_UpdateVisibilityAndShadow(a, p);
-    if ((q[0xc] == 0) && (p[6] <= 0x10)) {
+    Actor_UpdateVisibilityAndShadow(work, p);
+    if (!fx->active && npc->state <= 0x10) {
         u32 m = 0x402;
-        asm("" : "+r"(m));
-        *((u16 *)(p + 0xe)) = m | (*((u16 *)(p + 0xe)));
+        npc->displayFlags = m | npc->displayFlags;
     }
     {
-        register u32 m asm("r1") = 4;
-        asm("" : "+r"(m));
+        u32 m = 4;
         if ((m & (*((u16 *)(p + 0xc)))) != 0) {
             s32 t;
-            if ((*((s16 *)(q + 0xe))) <= 0x3f) {
+            if ((*((s16 *)(effectData + 0xe))) <= 0x3f) {
                 u8 *g = gPaletteBankData;
                 void *s1 = g + 0x2AE0;
                 void *s2 = g + 0x2B00;
                 void *d = p + 0x1CC;
-                Palette_InterpolateBanks(d, s1, s2, *((s16 *)(q + 0xe)), 6);
+                Palette_InterpolateBanks(d, s1, s2, *((s16 *)(effectData + 0xe)), 6);
             } else {
                 u8 *g = gPaletteBankData;
                 void *s1 = g + 0x2AE0;
                 void *s2 = g + 0x2B00;
                 void *d = p + 0x1CC;
-                Palette_InterpolateBanks(d, s1, s2, (k2 = 0x80) - (*((s16 *)(q + 0xe))), 6);
+                Palette_InterpolateBanks(d, s1, s2, 0x80 - (*((s16 *)(effectData + 0xe))), 6);
             }
-            t = ((*((u16 *)(q + 0xe))) + 1) & 0x7f;
-            *((u16 *)(q + 0xe)) = t;
-            if (q[0xd] != 0) {
-                register u32 mask asm("r12") = 3;
-                if ((t & mask) == 0) {
-                    struct ContactPosition pos_;
-                    struct ContactPosition vel_;
-                    struct ContactPosition *pos = &pos_;
-                    s32 *pp = (s32 *)(p + 0x300);
-                    s32 adj = *((s32 *)(p + 0x328));
-                    pos->x = (pp[0] >> 12) - gSceneCamera->x;
-                    pos->y = ((pp[2] + (pp[1] + adj)) >> 12) + 0x60;
-                    pos->z = pp[2] >> 12;
+            t = ((*((u16 *)(effectData + 0xe))) + 1) & 0x7f;
+            *((u16 *)(effectData + 0xe)) = t;
+            if (effectData[0xd] != 0) {
+                work = 3;
+                if (!IsEmissionFrame(t, work))
+                    return 0;
+                {
+                    u32 sheet = 0x1c1e, sequence = 0xd43f;
+                    struct ContactPosition position;
+                    struct ContactPosition velocityStorage;
+                    s32 *projected = (s32 *)(p + 0x300);
+                    struct ContactPosition *pos = &position;
+                    s32 height = *((s32 *)(p + 0x328));
+                    pos->x = (projected[0] >> 12) - gSceneCamera->x;
+                    pos->y = ((projected[2] + (projected[1] + height)) >> 12) + 0x60;
+                    pos->z = projected[2] >> 12;
                     {
-                        register u32 opaque asm("r8") = 0x0403b714;
-                        register s32 r1 asm("r1");
-                        register s32 r2 asm("r0");
-                        s32 e;
-                        register u32 *cursor asm("r4");
-                        asm volatile("" : "+r"(opaque));
-                        {
-                            register const u16 *table asm("r5") = gRandomTable;
-                            register u32 index asm("r0") =
-                                ((cursor = &gRandomIndex, (*cursor) + 1)) & 0x3FF;
-                            r1 = (Load((index * 2) + ((u32)table)) >> 4) & 0x3F;
-                            index = (index + 1) & 0x3FF;
-                            *cursor = index;
-                            r2 = (Load((index * 2) + ((u32)table)) >> 4) & mask;
-                        }
-                        {
-                            register struct ContactPosition *vel asm("r3") = &vel_;
-                            s32 ang = r1 + 0x60;
-                            register s32 magp asm("r5") = r2 + 2;
-                            register const s16 *sine asm("r2") = gUnk_086149C4;
-                            s32 product = sine[(r1 + 0xA0) & 0xFF] * magp;
-                            register u32 scratch asm("r6") = opaque;
-                            register struct ContactPosition *v8 asm("r8");
-                            asm volatile("" : : "r"(scratch));
-                            v8 = vel;
-                            vel->x = Truncate(product);
-                            vel->y = Truncate(sine[ang] * magp);
-                            {
-                                register u32 z asm("r2") = 0;
-                                vel->z = z;
-                                *cursor = ((*cursor) + 1) & 0x3FF;
-                                e = ((Load(((*cursor) * 2) + ((u32)gRandomTable)) >> 4) & 0xF) +
-                                    0xF;
-                                SpriteEffectController_Create(&pos_, v8, 0x1C1E, 0xD43F, z, 0x10,
-                                                              0x11, 1, 2, 1, z, e, z, z, z, z, -4,
-                                                              -4);
-                            }
-                        }
+                        struct ParticleSampleOrigin origin, saved;
+                        struct ContactPosition *velocityArgument;
+                        const u16 *table;
+                        struct ContactPosition *velocity;
+                        s32 spread, magnitude, angle, speed, product, life, zero;
+                        s32 horizontalScale, verticalScale;
+                        origin.value =
+                            (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
+                        table = (const u16 *)RANDOM_TABLE_ADDR;
+                        spread = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 63;
+                        magnitude = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & work;
+                        velocity = &velocityStorage;
+                        angle = spread + 0x60;
+                        speed = magnitude + 2;
+                        horizontalScale = gUnk_086149C4[(spread + 0xa0) & 255];
+                        product = horizontalScale * speed;
+                        saved = origin;
+                        velocityArgument = velocity;
+                        velocity->x = Truncate(product);
+                        verticalScale = gUnk_086149C4[angle];
+                        velocity->y = Truncate(verticalScale * speed);
+                        zero = 0;
+                        velocity->z = zero;
+                        life = (((s32)ParticleRandom_ReadRelativeSample(
+                                     saved.value, (const u16 *)RANDOM_TABLE_ADDR) >>
+                                 4) &
+                                15) +
+                               15;
+                        SpriteEffectController_Create(&position, velocityArgument, sheet, sequence,
+                                                      zero, 16, 17, 1, 2, 1, zero, life, zero, zero,
+                                                      zero, zero, -4, -4);
                     }
                 }
             }
@@ -171,7 +166,3 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
     }
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneNpc_OnStateEffectUpdate);
-#endif
