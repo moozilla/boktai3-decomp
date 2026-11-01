@@ -516,7 +516,7 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor);
 
 void TetherActor_LimitPlayerDistance(struct TetherActor *input);
 
-void TetherActor_UpdateSecondaryLock(struct TetherActor *input);
+void TetherActor_UpdateSecondaryLock(struct TetherActor *actor);
 
 void TetherActor_UpdateFollowingState(struct TetherActor *actor);
 
@@ -2941,25 +2941,15 @@ void TetherActor_LimitPlayerDistance(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
-void TetherActor_UpdateSecondaryLock(struct TetherActor *input)
+void TetherActor_UpdateSecondaryLock(struct TetherActor *actor)
 {
-    register struct TetherActor *actor asm("r2") = input;
     if (!actor->statusFlags) {
-        u16 *value = &actor->secondaryValue;
-        u32 loaded = *value;
-        register u32 current asm("r3");
-        current = loaded;
-        if (current)
-            *value = loaded - 1;
+        if (actor->secondaryValue)
+            actor->secondaryValue--;
         else {
-            *value = actor->secondaryMaximum;
+            actor->secondaryValue = actor->secondaryMaximum;
             actor->interactionLock = 1;
-            {
-                register u16 *frame asm("r0") = &actor->lockFrame;
-                *frame = current;
-            }
+            actor->lockFrame = 0;
         }
     }
 }
