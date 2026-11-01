@@ -467,39 +467,29 @@ static inline s32 ReadPositionReference(u32 *entry, struct BoxSearchPosition **o
     return *out != NULL;
 }
 
-// MATCHING_CONCESSION: register-pinning
 // Finds the first tracked position inside the inclusive x/z bounds.
 s32 sub_08022624(void *actor, s32 count, struct BoxSearchPosition *min,
                  struct BoxSearchPosition *max)
 {
     u8 *bytes = actor;
     s32 i;
+    for (i = 0; i < count; i++) {
+        s32 offset = i * 4;
+        struct BoxSearchPosition *pos;
+        u32 address = (u32)(bytes + 0x110);
 
-    i = 0;
-    if (i >= count)
-        goto end;
-loop: {
-    s32 offset = i * 4;
-    struct BoxSearchPosition *pos;
-    u32 address = (u32)(bytes + 0x110);
-
-    address += offset;
-    ReadPositionReference((u32 *)address, &pos);
-    if (pos) {
-        s32 x = pos->x;
-        s32 minX = min->x;
-        register s32 inside asm("r4") = 0;
-
-        if (x >= minX && x <= max->x && pos->z >= min->z && pos->z <= max->z)
-            inside = 1;
-        if (inside)
-            return i;
+        address += offset;
+        ReadPositionReference((u32 *)address, &pos);
+        if (pos) {
+            s32 x = pos->x;
+            s32 minX = min->x;
+            s32 inside = 0;
+            if (x >= minX && x <= max->x && pos->z >= min->z && pos->z <= max->z)
+                inside = 1;
+            if (inside)
+                return i;
+        }
     }
-}
-    i++;
-    if (i < count)
-        goto loop;
-end:
     return -1;
 }
 
