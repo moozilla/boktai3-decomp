@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "player_cue_sequence.h"
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -13,6 +12,16 @@ void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 #define H(o) (*(s16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
+/* The state callback, sequence, defeat flag and resource slot that the script setup writes. */
+// confidence=low: field names follow FanCannon, whose layout this tail mirrors.
+struct CannonTurretTail {
+    u8 pad0[0x108];
+    void (*update)(void);
+    u8 sequence[0x24];
+    s16 dead;
+    u8 pad132[0x32];
+    void *resource;
+};
 s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
@@ -87,25 +96,15 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
     *(struct SceneVec *)(p + 0x40) = *(struct SceneVec *)(p + 0x1c);
     AnimData_SelectPaletteBank(p + 0x50, 0x1bc);
     resource = ScriptProc_Start(0x922e, 0x5184);
-    *(void **)(p + 0x164) = resource;
+    ((struct CannonTurretTail *)p)->resource = resource;
     if (H(0x146) == 0) {
-        {
-            u32 off = 0x108;
-            u8 *q;
-            q = p + off;
-            *(void (**)(void))q = sub_0820843C;
-        }
+        ((struct CannonTurretTail *)p)->update = sub_0820843C;
         sequenceResult = Anim_SetSequence(p + 0x10c, resource, 8, 0, 0);
     } else {
-        *(void (**)(void))(p + 0x108) = sub_082086B8;
-        {
-            u32 zero;
-            s16 *q = &H(0x130);
-            zero = 0;
-            *q = 1;
-            asm("" : : : "memory");
-            sequenceResult = Anim_SetSequence(p + 0x10c, *(void **)(p + 0x164), 10, 0, zero);
-        }
+        ((struct CannonTurretTail *)p)->update = sub_082086B8;
+        ((struct CannonTurretTail *)p)->dead = 1;
+        sequenceResult =
+            Anim_SetSequence(p + 0x10c, ((struct CannonTurretTail *)p)->resource, 10, 0, 0);
     }
     PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)(p + 0x24), (void *)(p + 0x10c));
     if (H(0x146) == 0)

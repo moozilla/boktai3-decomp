@@ -1,9 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: parses the spawn script (position, attack, health, timing keywords), loads
 // graphics and the first animation frame, and installs the idle callback.
 #include "scene_vec.h"
 #include "engine_globals.h"
+#include "player_cue_sequence.h"
 struct PHVec {
     s16 x, y, z, pad;
 };
@@ -16,13 +16,6 @@ struct PHTerrain {
     u8 pad[0x24];
     u16 rows[1];
 };
-s32 Script_SeekToKeyword(s32);
-s32 Script_GetValue(void);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, s32);
-void AnimData_SelectPaletteBank(void *, s32);
-void *ScriptProc_Start(u32, u32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
 void EnemyF426_InitCollider(void *);
 void sub_08203CA0(void);
 s32 Script_GetValueSafe(void);
@@ -40,113 +33,24 @@ static inline s32 EnemyF426_CellIndex(struct PHVec *v)
         return 0;
     return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
 }
-static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s)
-{
-    u32 flags, elapsed;
-    u32 duration;
-    // Reuse the command address temporary as the index wrap mask.
-    u32 commandOrMask;
-    register u32 savedDuration asm("r4");
-    commandOrMask = (u32)(s->commands + s->index);
-    {
-        u32 frame;
-        register void *highSprite asm("r8") = sprite;
-        void *frameSprite;
-        frame = *(const volatile u16 *)commandOrMask >> 6;
-        frameSprite = highSprite;
-        asm("" : "+r"(frameSprite));
-        *(u16 *)((u8 *)frameSprite + 0x10) = frame;
-    }
-    {
-        u32 input = s->flags, bit = 1;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*(const volatile u16 *)commandOrMask & 0x30) >> 4) & bit))
-            *(u32 *)(p + 0x24) |= 4;
-        else
-            *(u32 *)(p + 0x24) &= ~4;
-    }
-    {
-        u32 input = s->flags, bit = 2;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*(const volatile u16 *)commandOrMask & 0x30) >> 4) & bit)) {
-            register u32 *f asm("r3") = sprite;
-            *f |= 8;
-        } else {
-            register u32 *f asm("r4") = sprite;
-            *f &= ~8;
-        }
-    }
-    elapsed = s->elapsed + 1;
-    s->elapsed = elapsed;
-    {
-        register u32 temp asm("r2") = 0xffff;
-        asm("" : "+r"(temp));
-        commandOrMask = temp;
-    }
-    duration = s->duration;
-    elapsed = (u16)elapsed;
-    savedDuration = duration;
-    asm("" : "+r"(savedDuration) : "r"(elapsed));
-    if ((u16)elapsed >= duration) {
-        s->elapsed = 0;
-        flags = s->flags;
-        if (flags & 4) {
-            u32 i = s->index;
-            if (!i) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold)
-                        s->elapsed = savedDuration;
-                    else
-                        s->index = s->count - 1;
-                }
-            } else
-                s->index = i - 1;
-        } else {
-            u32 i = s->index + 1, n;
-            s->index = i;
-            n = s->count;
-            if ((i & commandOrMask) >= n) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if ((u8)hold) {
-                        s->elapsed = duration;
-                        s->index = n - 1;
-                    } else
-                        s->index = 0;
-                }
-            }
-        }
-        commandOrMask = (u32)(s->commands + s->index);
-        s->weight = *(const volatile u16 *)commandOrMask & 15;
-        {
-            register s32 w asm("r2") = s->weight;
-            s32 speed = s->speed;
-            speed = (speed * w) >> 6;
-            s->duration = speed;
-            if (!(u8)speed)
-                s->duration = 1;
-        }
-    }
-}
+/* The state callback, sequence, hit flag, facing, defeat flag and resource slot the script setup writes. */
+// confidence=low: field names follow FanCannon, whose setup tail this mirrors.
+struct EnemyF426Tail {
+    u8 pad0[0x108];
+    void (*update)(void);
+    u8 sequence[0x22];
+    s16 hit;
+    u8 pad130[2];
+    u8 direction;
+    u8 pad133[0x11];
+    s16 dead;
+    u8 pad146[0xe];
+    void *resource;
+};
 s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
 {
-    register void *sprite asm("r8");
-    void *earlySprite;
-    void **slot;
     void *resource;
     s32 found;
-    s32 dead;
     if (Script_SeekToKeyword('p')) {
         H(0x1c) = Script_GetValue();
         H(0x1e) = Script_GetValue();
@@ -221,43 +125,30 @@ s32 EnemyF426_InitializeFromScript(u8 *p, void *parent)
         H(0x142) = 0;
     *(void **)(p + 0x15c) = parent;
     AnimData_Load(p + 0x50, 0x7e82);
-    earlySprite = p + 0x24;
-    Sprite_Init(earlySprite, p + 0x50, 1);
+    Sprite_Init(p + 0x24, p + 0x50, 1);
     *(struct SceneVec *)(p + 0x40) = *(struct SceneVec *)(p + 0x1c);
     AnimData_SelectPaletteBank(p + 0x50, 0x225);
     resource = ScriptProc_Start(0x922e, 0xfa45);
-    slot = (void **)(p + 0x154);
-    *slot = resource;
-    dead = H(0x144);
-    sprite = earlySprite;
-    if (dead == 0) {
-        Anim_SetSequence(p + 0x10c, resource, 0, *(u8 *)(p + 0x132), dead);
+    ((struct EnemyF426Tail *)p)->resource = resource;
+    if (!((struct EnemyF426Tail *)p)->dead) {
+        Anim_SetSequence(p + 0x10c, resource, 0, ((struct EnemyF426Tail *)p)->direction, 0);
     } else {
-        register u32 zero;
-        s16 *q = &H(0x12e);
-        s32 four = 4;
-        zero = 0;
-        *q = 1;
-        asm("" : : : "memory");
-        Anim_SetSequence(p + 0x10c, *slot, 1, *(u8 *)((u8 *)q + four), zero);
+        ((struct EnemyF426Tail *)p)->hit = 1;
+        Anim_SetSequence(p + 0x10c, ((struct EnemyF426Tail *)p)->resource, 1,
+                         ((struct EnemyF426Tail *)p)->direction, 0);
     }
-    EnemyF426_StepAnimation(p, sprite, (struct FanSeq *)(p + 0x10c));
-    {
-        register u32 offset asm("r3") = 0x144;
-        s16 *deadPtr;
-        asm("" : "+r"(offset));
-        deadPtr = (s16 *)(p + offset);
-        if (*deadPtr == 0)
-            EnemyF426_InitCollider(p);
-        if (W(0x150) && *deadPtr == 0) {
-            s32 cell = EnemyF426_CellIndex((struct PHVec *)(p + 0x40));
-            TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
-        }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)(p + 0x24),
+                           (struct DisplaySequenceState *)(p + 0x10c));
+    if (!((struct EnemyF426Tail *)p)->dead)
+        EnemyF426_InitCollider(p);
+    if (W(0x150) && !((struct EnemyF426Tail *)p)->dead) {
+        s32 cell = EnemyF426_CellIndex((struct PHVec *)(p + 0x40));
+        TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
     }
     if (H(0x140)) {
         u8 *body = p + 0xc0;
         SceneBody_Init(body, *(void **)(p + 0x15c), p + 0x40, 0, 4, p);
-        SceneBody_SetSprite(body, sprite);
+        SceneBody_SetSprite(body, p + 0x24);
         TerrainOverlay_QueueAddActor(body);
     }
     if (W(0x148))
