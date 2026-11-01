@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -11,6 +10,11 @@ struct Orbit {
     u16 startX, startY, startZ;
     u8 pad142[2];
     u16 dx, dy, dz;
+    u8 pad14A[0x3e];
+    u8 rotation;
+    u8 pad189;
+    s8 spin;
+    u8 spinActive;
 };
 extern s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
@@ -27,11 +31,10 @@ void Sword_BeginTargetOrbit(u8 *p)
     p[0x11a] = angle;
     {
         s32 rotation = 0xa0 - angle;
-        p[0x188] = rotation;
+        o->rotation = rotation;
     }
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        register s32 turn asm("r1");
         s32 choice;
         u32 one;
         {
@@ -42,14 +45,13 @@ void Sword_BeginTargetOrbit(u8 *p)
         one = 1;
         choice &= one;
         {
-            register s32 negative asm("r3") = -1;
-            asm("" : "+r"(negative));
-            turn = negative;
+            s16 turn[] = {1};
+            turn[0] = -turn[0];
+            if (choice)
+                turn[0] = 1;
+            o->spin = turn[0];
         }
-        if (choice)
-            turn = 1;
-        p[0x18a] = turn;
-        p[0x18b] = one;
+        o->spinActive = one;
     }
 
     o->startX = *(u16 *)(p + 0x1c);
