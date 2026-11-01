@@ -4138,6 +4138,7 @@ addr,name,mode,confidence,source,notes
 08106D64,Pool1B4_Create,thumb,low,src-alias,Creates the task managing up to 32 sprite objects and installs its update and destruction callbacks
 08106DA0,Pool1B4_ResetInstance,thumb,low,src-alias,Clears the manager singleton during scene subsystem reset
 08106DAC,ScriptTriggerActor_DispatchPendingScripts,thumb,low,src-alias,
+08106E98,TileTrigger_ApplyContactEffects,thumb,low,src-alias,Apply press contacts to players and registry actors; trigger tether and particle effects
 08107240,Pool1B8_Allocate,thumb,low,src-alias,
 08107298,TileTrigger_IsTetherNearby,thumb,low,src-alias,
 08107320,TileTrigger_TickIdle,thumb,low,src-alias,

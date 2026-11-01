@@ -1,11 +1,11 @@
 #include "tile_trigger.h"
-void sub_08106E98(struct TileTrigger *);
+void TileTrigger_ApplyContactEffects(struct TileTrigger *);
 void TileTrigger_StepPress(struct TileTrigger *p)
 {
     struct ContactSwarmSprite *sprite = &p->sprite;
     sprite->flags &= ~1;
     if ((p->animation.index == 1) && (p->animation.elapsed != 0)) {
-        sub_08106E98(p);
+        TileTrigger_ApplyContactEffects(p);
         p->frame++;
     } else {
         PlayerCue_StepSequence(sprite, &p->animation);

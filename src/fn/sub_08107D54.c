@@ -22,7 +22,7 @@ struct TileTrigger {
     u8 forced, frame;
     s32 timer;
 };
-void sub_08106E98(struct TileTrigger *);
+void TileTrigger_ApplyContactEffects(struct TileTrigger *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
