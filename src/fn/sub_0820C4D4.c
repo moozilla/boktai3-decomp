@@ -248,15 +248,13 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
         case 0:
             Screamer_StepAnimation(p);
             if (({
-                    register u32 off asm("r2") = 0x1ca;
-                    register s16 *field asm("r1");
-                    asm("" : "+r"(off));
+                    u32 off = 0x1ca;
+                    s16 *field;
                     field = (void *)((u8 *)p + off);
                     *field;
                 }) > ({
-                    register u32 off asm("r3") = 0x1d4;
-                    register s16 *field asm("r0");
-                    asm("" : "+r"(off));
+                    u32 off = 0x1d4;
+                    s16 *field;
                     field = (void *)((u8 *)p + off);
                     *field;
                 })) {
