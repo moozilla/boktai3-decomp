@@ -21,7 +21,7 @@ static inline u8 SceneActor_IsAdjacentCellOpen(struct SceneActorRegistryResetVie
 {
     s32 cell = actor->terrainCell;
     s32 level = actor->body.position.y >> 8;
-    s32 i;
+    s32 i, width;
     if ((goal - 1) == cell) {
         i = cell + 1;
         if (!SceneActor_IsCellOpen(i, level))
@@ -29,8 +29,10 @@ static inline u8 SceneActor_IsAdjacentCellOpen(struct SceneActorRegistryResetVie
         if (i == goal)
             return 1;
         return 0;
-    } else if (goal == (cell + SceneActorTerrain_Width())) {
-        i = cell + SceneActorTerrain_Width();
+    }
+    width = SceneActorTerrain_Width();
+    if (goal == (cell + width)) {
+        i = cell + width;
         if (!SceneActor_IsCellOpen(i, level))
             return 0;
         if (i == goal)
@@ -43,8 +45,10 @@ static inline u8 SceneActor_IsAdjacentCellOpen(struct SceneActorRegistryResetVie
         if (i == goal)
             return 1;
         return 0;
-    } else if (goal == (cell - SceneActorTerrain_Width())) {
-        i = cell - SceneActorTerrain_Width();
+    }
+    width = SceneActorTerrain_Width();
+    if (goal == (cell - width)) {
+        i = cell - width;
         if (!SceneActor_IsCellOpen(i, level))
             return 0;
         if (i == goal)
