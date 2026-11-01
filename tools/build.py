@@ -123,10 +123,24 @@ def headers_hash():
                        for f in sorted(os.listdir(os.path.join(ROOT, d))) if f.endswith(".h")], "tools/build.py")
 
 
+def inline_macros(text):
+    """Put asm/macros.inc in place of the `.include` that global.h's top-level asm() emits.
+
+    gas reads a source file in 32 KiB buffers. When the first buffer of a .s ends at
+    certain points inside a quoted string, gas does not take the `@` that starts the
+    included file (macros.inc's first-line comment) as a comment, and the unit fails with
+    "asm/macros.inc:1: junk at end of line, first unrecognized character is `@'". -g output
+    is big and full of .debug_info strings, and their length depends on the checkout path
+    (DW_AT_comp_dir), so which units failed changed with the path. Inlined, the .s
+    includes nothing at its top (scope.py's inline_macros does the same)."""
+    macros = open(os.path.join(ROOT, "asm", "macros.inc")).read()
+    return re.sub(r'^\s*\.include\s+"asm/macros\.inc"\s*$', lambda m: macros, text, flags=re.M)
+
+
 def build_c(src, obj):
     lint_c(src)
     # INCLUDE_ASM pulls in split.py output, which changes with gen/ and symbols.
-    deps = [src] + [os.path.join("build", "asm", "nonmatching", n + ".s")
+    deps = [src, os.path.join("asm", "macros.inc")] + [os.path.join("build", "asm", "nonmatching", n + ".s")
                     for n in re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', open(os.path.join(ROOT, src)).read())
                     if os.path.exists(os.path.join(ROOT, "build", "asm", "nonmatching", n + ".s"))]
     cflags = cflags_for(src)
@@ -151,7 +165,7 @@ def build_c(src, obj):
     # relocation against a Thumb function symbol would set bit 0).
     text = re.sub(r"^(\w+):\n", lambda m: f"{m.group(1)}:\n\t.global {m.group(1)}__addr\n{m.group(1)}__addr:\n"
                   if not m.group(1).startswith(".") else m.group(0), asm.stdout, flags=re.M)
-    open(s_path, "w").write(text + "\t.text\n\t.align\t2, 0\n")
+    open(s_path, "w").write(inline_macros(text) + "\t.text\n\t.align\t2, 0\n")
     sh(AS + ["-o", obj, s_path])
     stamp(os.path.join(ROOT, obj), key)
 
