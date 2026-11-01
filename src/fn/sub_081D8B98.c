@@ -26,7 +26,7 @@ struct Sub {
 void Anim_RestartSequence(void *, void *, u16, u8, u8);
 void Projectile_SetUpdateCallback(void *, void *);
 void Projectile_SetCollisionSize(void *, s32, s32, s32);
-void sub_081D8CF0(void);
+void Task4E01_UpdateGrowingImpact(void);
 // confidence=low: initializes a small collision, starts its script and first animation frame.
 s32 Task4E01_StartTimedImpact(u8 *p)
 {
@@ -41,6 +41,6 @@ s32 Task4E01_StartTimedImpact(u8 *p)
     frames = p + 0x180;
     Anim_RestartSequence(frames, resource, 3, 0, 0);
     StepPlayback((void *)(p + 0x8c), (void *)frames);
-    Projectile_SetUpdateCallback(config, sub_081D8CF0);
+    Projectile_SetUpdateCallback(config, Task4E01_UpdateGrowingImpact);
     return 0;
 }

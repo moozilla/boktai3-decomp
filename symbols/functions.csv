@@ -8032,6 +8032,7 @@ addr,name,mode,confidence,source,notes
 081D8AAC,Task4E01_UpdateTimedSprite,thumb,low,src-alias,
 081D8B14,Task4E01_OnType7DirectionalAnimation,thumb,low,src-alias,Handles type seven directional frames and flips before completing after tick five
 081D8B98,Task4E01_StartTimedImpact,thumb,low,src-alias,
+081D8CF0,Task4E01_UpdateGrowingImpact,thumb,low,src-alias,
 081D8F88,Task4E01_OnType4Animation,thumb,low,src-alias,Immediately returns completion for the callback installed for type four
 081D8F8C,Task4E01_StartType4TimedAnimation,thumb,low,src-alias,Selects frame 25 and installs the timed completion callback in the type four handler group; role tentative
 081D8FAC,Projectile_UpdateTimedRemoval,thumb,low,src-alias,Expiry callback that sets flag 2 and returns removal status when the lifetime elapses
