@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
+#include "debug.h"
 void Vorn_ClearRouteResumeFlag(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 u8 sub_0812F3CC(void *);
@@ -38,15 +38,13 @@ void Vorn_RestoreRouteMovement(struct SceneActorRegistryResetView *a)
     u8 *context = a->context;
     u8 *group = context + 0x3D4;
     u32 *action;
-    u8 result;
     u32 *flags;
-    asm("" : "+r"(group));
-    if (a->field2B1)
-        a->field2B1 = 0;
+    if (Chase_TakeArrived(a)) {
+        DEBUG_PRINT();
+    }
     if ((u8)Callback_InvokeActor(a, a->contactQuery.opaque))
         return;
-    result = sub_0812F3CC(a);
-    if (result)
+    if (sub_0812F3CC(a))
         return;
     if (a->field2B0) {
         struct SceneActorRegistryControl *control;
@@ -58,22 +56,17 @@ void Vorn_RestoreRouteMovement(struct SceneActorRegistryResetView *a)
         action = &a->flags2CC;
         if (Chase_Bits32(action, actionMask)) {
             s32 mask;
-            u16 *motion;
             u32 *state = &a->flags2D0;
             mask = ~0x1000000;
             *state = mask & *state;
-            motion = &a->flags2D4;
             {
-                u32 motionMask = ~0x200;
-                motionMask &= *motion;
-                {
-                    register u32 zero asm("r1") = 0;
-                    *motion = motionMask;
-                    control->mode = zero;
-                }
+                struct ChaseFlags40 *motion = (void *)&a->flags2D4;
+                s32 motionMask = ~0x200;
+                motion->bits &= motionMask;
             }
-            control->counter = result;
-            control->timer = result;
+            control->mode = 0;
+            control->counter = 0;
+            control->timer = 0;
         }
         {
             s32 mask = ~0x90;
@@ -83,7 +76,7 @@ void Vorn_RestoreRouteMovement(struct SceneActorRegistryResetView *a)
         Memory_Clear(*(void **)(group + 0x200), 8);
         Chase_SetBehavior(a, 2);
         flags = Route_SetCtl(a, *(void **)((u8 *)a + 0x22C), 0);
-        Route_RestoreMotion(a, result, flags);
+        Route_RestoreMotion(a, 0, flags);
     } else
         a->counter2AC++;
 }
