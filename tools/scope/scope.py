@@ -1614,7 +1614,10 @@ def register_twin(rows, row):
     idx = next((i for i, r in enumerate(rows) if r is row), None)
     if idx is None:
         return None
-    shape = REG_TOKEN.sub("R", row["draft"])
+    def copy_shape(text):  # a low-register copy is `adds rD, rS, #0`, a high one `mov rD, rS`: one insn
+        t = REG_TOKEN.sub("R", text)
+        return "mov R, R" if t == "adds R, R, #0" else t
+    shape = copy_shape(row["draft"])
 
     def run(i, tag, step):
         out = []
@@ -1630,7 +1633,7 @@ def register_twin(rows, row):
         hi += 1
     pos = idx - lo
     for minus in (run(lo - 1, "-", -1)[::-1], run(hi + 1, "-", 1)):
-        same = [j for j in minus if rows[j]["rom"] and REG_TOKEN.sub("R", rows[j]["rom"]) == shape]
+        same = [j for j in minus if rows[j]["rom"] and copy_shape(rows[j]["rom"]) == shape]
         if pos < len(minus) and minus[pos] in same:
             return rows[minus[pos]]
         if len(same) == 1:
