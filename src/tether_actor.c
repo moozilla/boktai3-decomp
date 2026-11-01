@@ -3519,14 +3519,8 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
 
 void *ActorAttachment_ReleaseResource(void *, u32, u32);
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateDescendingState(struct TetherActor *actor)
 {
-    u16 *frame;
-    register u32 raw asm("r0");
-    register u32 incremented asm("r1");
-    register u32 current asm("r0");
     u32 zero;
     if (actor->state != 6)
         TetherActor_SetState(actor, 6);
@@ -3534,29 +3528,19 @@ void TetherActor_UpdateDescendingState(struct TetherActor *actor)
     if (zero)
         return;
     actor->glowMode = zero;
-    frame = &actor->stateFrame;
-    raw = *frame;
-    incremented = raw + 1;
-    *frame = incremented;
-    current = (u16)incremented;
-    if (current <= 5) {
-        current = (u16)incremented;
-        if (current == 1) {
-            u16 *value = &actor->effectValue;
-            void **handle;
-            *value = zero;
-            handle = &actor->pendingEffectHandle;
-            *handle = ActorAttachment_UpdateFromDescriptor(*handle, &actor->bodyConfig, 1, 0, value,
-                                                           200, 250, 290);
+    if (++actor->stateFrame <= 5) {
+        if (actor->stateFrame == 1) {
+            actor->effectValue = zero;
+            actor->pendingEffectHandle =
+                ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
+                                                     1, 0, &actor->effectValue, 200, 250, 290);
         }
     } else {
-        current = (u16)incremented;
-        if (current == 6) {
-            void **handle = &actor->pendingEffectHandle;
-            *handle = ActorAttachment_ReleaseResource(*handle, 1, actor->bodyConfig.id);
-        }
+        if (actor->stateFrame == 6)
+            actor->pendingEffectHandle = ActorAttachment_ReleaseResource(actor->pendingEffectHandle,
+                                                                         1, actor->bodyConfig.id);
         actor->displayOffsetY -= 30;
-        if (*frame > 8)
+        if (actor->stateFrame > 8)
             actor->destroyRequested = 1;
     }
 }
