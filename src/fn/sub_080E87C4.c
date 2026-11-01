@@ -28,7 +28,7 @@ void Mimic_ReleaseResources(void);
 
 void Memory_Clear(void *, u32);
 void SceneActorReaction_OnEnemyDefault(void);
-u8 sub_0807F81C(void *);
+u8 SceneActorTarget_UpdateTrackedContact(void *);
 void SceneActorTarget_ResolvePendingObject(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);

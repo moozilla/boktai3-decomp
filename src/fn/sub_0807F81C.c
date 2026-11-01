@@ -4,11 +4,27 @@ void SceneActorTarget_ResetContactResponse(void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 extern const u8 gUnk_0824E114[];
 
-#ifdef NONMATCHING
-// fuzzy: 95.2%
+static inline void SceneActorTarget_UpdateContactRoute(struct SceneActorRegistryResetView *actor,
+                                                       u16 *motionFlags, void *route,
+                                                       struct ContactPosition *source,
+                                                       struct ContactPosition *target)
+{
+    s32 result = Nav_IsPositionInMesh(route, source, target);
+    if (!result)
+        SceneActorChase_ClearBits(motionFlags, 0x200);
+    else {
+        result = Terrain_ApplyBlocked(route, source, target);
+        if (result) {
+            if (result != 2)
+                Memory_Clear(&actor->body.motion, 8);
+        } else
+            SceneActorChase_ClearBits(motionFlags, 0x200);
+    }
+}
+
 // confidence=low: releases a prior contact, checks the route to the target cell,
 // and starts the idle reaction when the target is inactive.
-u8 sub_0807F81C(struct SceneActorRegistryResetView *actor)
+u8 SceneActorTarget_UpdateTrackedContact(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorContactTracking *motion;
     struct SceneActorContactTracking *tracking;
@@ -28,7 +44,7 @@ u8 sub_0807F81C(struct SceneActorRegistryResetView *actor)
         return 0;
     if ((u8)Callback_InvokeActor(actor, actor->update26C))
         return 1;
-    if (!SceneActorContact_TestTracking((motion = (void *)&actor->tracking), 1))
+    if (!SceneActorContact_TestTrackingOwned((void *)&actor->tracking, 1, &motion))
         return 0;
     motionFlags = SceneActorContact_MotionField(actor);
     {
@@ -50,7 +66,7 @@ u8 sub_0807F81C(struct SceneActorRegistryResetView *actor)
     if (SceneActorContact_QueryMotionField(actor, 0x1000, &work)) {
         SceneActorContacts_ReleaseNode(*nodeSlot);
         SceneActorChase_ClearBits(savedFlags, 0x1000);
-        *nodeSlot = (void *)zero;
+        *nodeSlot = (void *)(u32)zero;
     }
     target = contact->object;
     motion->tracking.target = &target->target;
@@ -60,8 +76,9 @@ u8 sub_0807F81C(struct SceneActorRegistryResetView *actor)
     if (motion->active) {
         if (SceneActorContact_TestTracking(motion, 8)) {
             if (SceneActorContact_SavedTargetCell(actor) != cell) {
-                SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                         &tracking->tracking.target->position);
+                SceneActorTarget_UpdateContactRoute(actor, savedFlags, group->route,
+                                                    &actor->body.position,
+                                                    &tracking->tracking.target->position);
                 *(u16 *)actor->unknown2F8 = cell;
             }
         } else
@@ -78,15 +95,11 @@ u8 sub_0807F81C(struct SceneActorRegistryResetView *actor)
     SceneActorReaction_ResetResponseState(&actor->group.saved, gUnk_0824E114, 0x682);
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
     SceneActorChase_SetState(actor, 3, 1, 0);
-    SceneActorChase_ClearBits(motionFlags, 0x400);
+    SceneActorChase_ClearBits(savedFlags, 0x400);
     actor->group.turn.turnsRemaining = -1;
-    SceneActorAnimation_SelectDirectionalEntry(SceneActorContact_ActorFromWork(&work), 0);
+    SceneActorAnimation_SelectDirectionalEntry((void *)SceneActorContact_ActorFromWork(&work), 0);
     actor->group.common.control.timer = 0xB4;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
     SceneActorChase_SetReactionFlags(actor, 0x100);
     return 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0807F81C);
-#endif

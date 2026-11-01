@@ -49,7 +49,7 @@ void Skeleton_UpdateInactiveState(void *);
 void Skeleton_UpdateIdleState(void *);
 void Skeleton_ConvergeDisplacedPosition(void *);
 void Skeleton_UpdateDefeat(void *);
-u8 sub_0807F81C(void *);
+u8 SceneActorTarget_UpdateTrackedContact(void *);
 void TentacleBody_UpdateReactionTransition(void *);
 void SceneActorTarget_ResolvePendingObjectSkeleton(void);
 void SceneActorPlacement_ResetStateThree(void);
@@ -166,7 +166,7 @@ s32 Skeleton_Init(void *object)
         actor, Skeleton_Update, SceneActorReaction_SelectTileParameter, sub_080BAE04,
         Skeleton_UpdateInactiveState, Skeleton_UpdateIdleState,
         TentacleBody_UpdateReactionTransition, Skeleton_ConvergeDisplacedPosition,
-        Skeleton_UpdateDefeat, SceneActorReaction_OnEnemyDefault, sub_0807F81C,
+        Skeleton_UpdateDefeat, SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
         SceneActorTarget_ResolvePendingObjectSkeleton, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(

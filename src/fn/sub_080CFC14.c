@@ -48,7 +48,7 @@ struct GolemInstanceState {
 void SceneActorBehavior_InitializeShadow(void *);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
-u8 sub_0807F81C(void *);
+u8 SceneActorTarget_UpdateTrackedContact(void *);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 
@@ -233,7 +233,7 @@ s32 Golem_Init(void *object)
     MonsterInit_InstallSequenceCallbacks(
         actor, Golem_OnUpdate, Skeleton_LookupAnimationEntry, sub_080C5930, Golem_UpdateIdleState,
         Golem_UpdateIdle, Golem_UpdateRevivalReturn, Golem_ResumeBehaviorAfterDisplacement,
-        Golem_UpdateDefeat, SceneActorReaction_OnEnemyDefault, sub_0807F81C,
+        Golem_UpdateDefeat, SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
         group, (u8 *)arg0 + 0x638, (u8 *)arg0 + 0x65C, Golem_UpdateDying, Golem_ResumeSavedTarget,

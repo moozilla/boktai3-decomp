@@ -2909,6 +2909,7 @@ addr,name,mode,confidence,source,notes
 0807E908,SceneActorEffects_ReleaseResources,thumb,low,src-alias,
 0807F4B8,SceneActorTarget_ResetContactResponse,thumb,low,src-alias,
 0807F710,SceneActorTarget_ResolvePendingObject,thumb,low,src-alias,
+0807F81C,SceneActorTarget_UpdateTrackedContact,thumb,low,src-alias,Checks the route to a contact target and starts the idle response when it is inactive
 0807FAD8,SceneActorTarget_ApplyResetCommand,thumb,low,src-alias,
 0807FC5C,SceneActorControl_DispatchControl,thumb,low,src-alias,Resets the substate and increments the control frame counter before invoking the active control callback with its previous value
 0807FC90,SceneActorControl_OnIdle,thumb,low,src-alias,Clears flag 2B2 when invoked as the default idle control callback

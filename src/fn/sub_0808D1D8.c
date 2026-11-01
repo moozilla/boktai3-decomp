@@ -20,7 +20,7 @@ void sub_08087A70(void);
 void Bat_UpdateDefeat(void);
 void Ghoul_UpdateHiddenRecovery(void);
 void SceneActorReaction_OnEnemyDefault(void);
-u8 sub_0807F81C(void *);
+u8 SceneActorTarget_UpdateTrackedContact(void *);
 void SceneActorTarget_ResolvePendingObject(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
@@ -140,7 +140,7 @@ s32 Ghoul_Init(void *object)
     MonsterInit_InstallAnimationCallbacks(
         actor, Ghoul_Update, Bat_LookupAnimationEntry, Ghoul_TurnTowardRoute, Ghoul_UpdateIdleState,
         Ghoul_UpdateStandingState, Ghoul_UpdateHiddenRecovery, sub_08087A70, Bat_UpdateDefeat,
-        SceneActorReaction_OnEnemyDefault, sub_0807F81C, SceneActorTarget_ResolvePendingObject,
+        SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact, SceneActorTarget_ResolvePendingObject,
         SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(group, (u8 *)arg0 + 0x64C, (u8 *)arg0 + 0x670,
                                           Ghoul_UpdateDyingState, Bat_ResumeSavedTarget,
