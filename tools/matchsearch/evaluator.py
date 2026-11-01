@@ -111,6 +111,10 @@ def _concessions(preprocessed: str, names: tuple[str, ...]) -> dict[str, int]:
     def count(parts: list[str], *, outside_body: bool = False) -> dict[str, int]:
         found = {'register_pins': 0, 'asm_barriers': 0, 'inline_assembly': 0}
         for index, token in enumerate(parts):
+            # an empty `do { } while (0)` acts as a barrier: its loop notes end cse blocks and weight refs
+            if token == 'do' and parts[index + 1:index + 7] == ['{', '}', 'while', '(', '0', ')']:
+                found['asm_barriers'] += 1
+                continue
             if token not in {'asm', '__asm', '__asm__'}:
                 continue
             at = index + 1

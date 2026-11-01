@@ -254,8 +254,10 @@ def check_tails(elf, source_root=Path(ROOT) / "src"):
 
 
 MARK = "// MATCHING_CONCESSION: register-pinning"
+# an empty `do { } while (0)` counts too: its loop notes end cse blocks and weight refs like a barrier
+EMPTY_LOOP = r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)'
 HINT = re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*(?:volatile\s*)?\(\s*""'
-                  r'|\basm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)')
+                  r'|\basm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)|' + EMPTY_LOOP)
 
 
 def _bodies(text):
@@ -315,6 +317,7 @@ HINT_KINDS = [
     ("clobber", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""[^;]*:\s*"(?:r\d+|sl|fp|ip|lr)"')),
     ("operand", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*:[^;:]*\(')),
     ("barrier", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*(?:\)|:\s*:\s*:\s*"memory")')),
+    ("empty-loop", re.compile(EMPTY_LOOP)),
 ]
 
 
