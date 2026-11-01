@@ -1,11 +1,15 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 66.2%
-// Open: register allocation (the object should live in r8 and its sprite in
-// sb), one extra spill slot, and the kind-2 palette switch, whose calls the
-// original does not cross-jump.
+// fuzzy: see scope (184 ROM / 198 draft insns differ, was 240 / 251)
+// Open: global alloc must run the kind switch value before `e` (AGBCC_PRI on
+// the kind pseudo +21 leaves 11 differing insns). In the draft the kind's life
+// spans three PRE insertions (the name, row and anim addresses) at the end of
+// the switch block; the ROM's is shorter. Also open: a dead halfword-insertion
+// zero (`movs r7, #0`) inside the `flags |= 1` after TerrainModifiers_RegisterCell,
+// which keeps `follow` in r5 and the route in sb; and Anim_SetSequence loading
+// `sequence` before the row. Work files: build/depin/w/no.
+#include "terrain_cell_probe.h"
 #include "display_animation.h"
 #include "actor_attachment_sprite_playback.h"
 #include "player.h"
@@ -56,6 +60,26 @@ struct NamedObjectManager {
     u32 field1370;
     u32 field1374;
 };
+static inline void SelectPlatformPalette(struct NamedObject *e)
+{
+    switch (e->row) {
+        case 0:
+            AnimData_SelectPaletteBank(e->anim, 0x23F);
+            break;
+        case 1:
+            AnimData_SelectPaletteBank(e->anim, 0x241);
+            break;
+        case 2:
+            AnimData_SelectPaletteBank(e->anim, 0x246);
+            break;
+        case 3:
+            AnimData_SelectPaletteBank(e->anim, 0x245);
+            break;
+        case 4:
+            AnimData_SelectPaletteBank(e->anim, 0x247);
+            break;
+    }
+}
 struct NamedObject *NamedObject_AllocateSlot(struct NamedObjectManager *);
 void Path_GetPointPositionById(void *, u32, u32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
@@ -76,6 +100,14 @@ void NamedObject_UpdateEntryTrigger(void);
 void NamedObject_ClampTetherToPlatform(void);
 void NamedObject_ConstrainPlayer(void);
 void NamedObject_ConstrainTether(void);
+static inline void ClearFlag(s32 mask, s16 *flags)
+{
+    *flags &= ~mask;
+}
+static inline void SetFlag2(u16 mask, u16 *flags)
+{
+    *flags = mask | *flags;
+}
 static inline s32 optionalValue(void)
 {
     if (Script_GetPc())
@@ -84,10 +116,7 @@ static inline s32 optionalValue(void)
 }
 static inline void readOptional(u32 *dst)
 {
-    if (Script_GetPc())
-        *dst = Script_GetValue();
-    else
-        *dst = 0;
+    *dst = optionalValue();
 }
 /* Registry routine A4FC: creates a named scene object (-n) of kind -k (0-3)
    in the gNamedActorManager object pool, with heights -Y, sprite rows -T and
@@ -99,7 +128,7 @@ void NamedObject_CreateFromScript(void)
     struct NamedObjectSprite *sprite;
     u32 sequence;
     s32 follow;
-    s32 x, z, cell;
+    s32 cell;
     if (!manager)
         return;
     sequence = 0;
@@ -117,7 +146,7 @@ void NamedObject_CreateFromScript(void)
     }
     e->kind = Script_GetKeywordValue('k', 0);
     if (Script_GetKeywordValue('O', 0))
-        e->flags |= 0x2000;
+        SetFlag2(0x2000, (u16 *)&e->flags);
     if (Script_SeekToKeyword('Y')) {
         s32 height;
         readOptional(&e->heightLow);
@@ -126,10 +155,10 @@ void NamedObject_CreateFromScript(void)
         if (e->kind == 2) {
             if (height == e->heightLow) {
                 sprite->y = height;
-                e->flags &= ~2;
+                ClearFlag(2, &e->flags);
             } else if (height == e->heightHigh) {
                 sprite->y = height;
-                e->flags |= 2;
+                SetFlag2(2, (u16 *)&e->flags);
             }
         } else
             sprite->y = e->heightLow;
@@ -204,23 +233,7 @@ void NamedObject_CreateFromScript(void)
             e->handlers[1] = NamedObject_ConstrainTether;
             e->handlers[2] = NamedObject_UpdateTerrainRegistration;
             sequence = 0;
-            switch (e->row) {
-                case 0:
-                    AnimData_SelectPaletteBank(e->anim, 0x23F);
-                    break;
-                case 1:
-                    AnimData_SelectPaletteBank(e->anim, 0x241);
-                    break;
-                case 2:
-                    AnimData_SelectPaletteBank(e->anim, 0x246);
-                    break;
-                case 3:
-                    AnimData_SelectPaletteBank(e->anim, 0x245);
-                    break;
-                case 4:
-                    AnimData_SelectPaletteBank(e->anim, 0x247);
-                    break;
-            }
+            SelectPlatformPalette(e);
             e->fieldE0 = Script_GetKeywordValue('m', 1);
             e->fieldC0 = Script_GetKeywordValue('w', 0x78);
             if (Script_GetKeywordValue('M', 0))
@@ -228,24 +241,27 @@ void NamedObject_CreateFromScript(void)
             break;
     }
     Sprite_Init(sprite, e->anim, 0);
-    Anim_SetSequence(&e->sequence, manager->sequences, sequence, e->row, 0);
+    Anim_SetSequence(&e->sequence, manager->sequences, sequence, e->row & 0xFF, 0);
     ActorAttachment_StepSprite((struct ContactSwarmSprite *)sprite, &e->sequence);
     sprite->flags &= ~1;
     sprite->field7 = 2;
-    SceneBody_Init(&e->body, e->index + 0xD0E9, &sprite->x, 0, 7, e);
-    SceneBody_SetSprite(&e->body, sprite);
-    SceneBody_StartRoute(&e->body, e->fieldF4, e->fieldF0, e->fieldF1, e->fieldF2);
-    e->body.field1C = 0;
+    {
+        struct NamedObjectBody *body = &e->body;
+        SceneBody_Init(body, e->index + 0xD0E9, &sprite->x, 0, 7, e);
+        SceneBody_SetSprite(body, sprite);
+        SceneBody_StartRoute(body, e->fieldF4, e->fieldF0, e->fieldF1, e->fieldF2);
+        body->field1C = 0;
+    }
     sprite->x -= 0x100;
     if (Script_GetKeywordValue('d', 0))
-        e->flags |= 0x80;
+        SetFlag2(0x80, (u16 *)&e->flags);
     if (Script_GetKeywordValue('F', 0))
-        e->flags |= 0x1000;
+        SetFlag2(0x1000, (u16 *)&e->flags);
     e->fieldBA = 0;
     e->fieldC2 = 0;
     follow = Script_GetKeywordValue('f', 0);
     if (follow) {
-        switch ((s8)e->kind) {
+        switch (e->kind) {
             case 0:
             case 1:
             case 3:
@@ -258,32 +274,33 @@ void NamedObject_CreateFromScript(void)
         NamedObject_ClearAttachmentFlag(manager->field1370, 0);
         manager->field1370 = e->name;
         Player_AddAttachmentFlags((*(u8 **)gPlayers), 1, e->name);
-        e->flags |= 8;
-        (*(u8 **)gPlayers)[0x701] |= 1;
-        x = e->body.x >> 8;
-        z = e->body.z >> 8;
-        if (x < 0 || z < 0 || x >= gTerrainWidth || z >= gTerrainHeight)
-            cell = 0;
-        else
-            cell = gTerrainMap->rows[z] + x;
+        SetFlag2(8, (u16 *)&e->flags);
+        {
+            u8 *p = *(u8 **)gPlayers + 0x701;
+            u32 v = *p;
+            u32 m = 1;
+            m |= v;
+            *p = m;
+        }
+        cell = cellIndexAt((struct Pos16 *)&e->body.x);
         TerrainModifiers_RegisterCell(e->body.field48, cell, 0, e->body.height >> 8, 0xFF, 4);
-        e->flags |= 1;
+        SetFlag2(1, (u16 *)&e->flags);
         Player_SetPositionAndSave((*(u8 **)gPlayers), &e->body.x);
         if (follow == 2) {
             TetherActor_SetPosition(&e->body.x);
             NamedObject_ClearAttachmentFlag(manager->field1374, 1);
             manager->field1374 = e->name;
             TetherActor_AddStatusFlags(3, e->name);
-            e->flags |= 0x10;
+            SetFlag2(0x10, (u16 *)&e->flags);
         }
     }
     NamedObject_SnapTetherToPlatform(manager, e);
     e->fieldBE = Script_GetKeywordValue('s', 6);
-    switch ((s8)e->kind) {
+    switch (e->kind) {
         case 0:
         case 1:
         case 3:
-            if (NamedObject_IsWithinSpriteBounds(sprite, &e->body.x, (s16)e->fieldBE))
+            if (NamedObject_IsWithinSpriteBounds(e->fieldF4, &e->body.x, (s16)e->fieldBE))
                 e->state = 3;
             break;
     }
