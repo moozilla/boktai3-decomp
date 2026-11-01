@@ -1082,6 +1082,29 @@ Each was read from the compiler source and confirmed on a live draft.
    which, and for a tail the draft keeps whole where the ROM's is shorter, whether a nop
    blocked the first try.
 
+40. **A loop that leaves through `break` can be reversed; one that leaves through `goto` is
+   not. Under `-g`, a `break;` on its own line is not reversed either.** check_dbra_loop and
+   loop_iterations (loop.c) need the conditional jump to be the insn just before
+   NOTE_INSN_LOOP_END. expand_end_loop (stmt.c, the Cygnus "loop test" code) scans from the
+   start label for exit tests (jumps to the loop's end label: a `break`, a `while` or `for`
+   condition). It moves everything from the start label through the last one it finds to
+   the bottom of the loop; block notes stay where they are. In
+   `do { ...; if (col > 3) break; } while (1);`, jump1 then leaves the inverted test right
+   before LOOP_END, so a counter that nothing else reads counts down (`subs #1; cmp #0; bge`).
+   A `goto` to a label after the loop is not an exit test, so the loop is not rotated.
+   jump1 threads the test back to the start, and the LOOP_CONT note stays between the test
+   and LOOP_END. loop.c reports "No final conditional branch found" and the counter counts
+   up (`adds #1; cmp #3; ble`). With `-g`, the line note of the `break;` statement follows
+   the test, and on its own line it blocks the reversal the same way. `if (c) break;` on one
+   line does not: emit_note drops the repeated line. All 10,094 matched units compile to the
+   same `.text` with and without `-g` (35 of them assemble only with `-ffix-debug-line`), so
+   among matched code `-g` changes only this pattern. The project builds without `-g`.
+   Changing that would make matches depend on line breaks, so loops leave through `goto`
+   (accepted until phase 4). Storage_RefreshEquipmentSlots matched pin-free this way, and its
+   twin Storage_RefreshConsumableSlots lost the two `asm("" : : "r"(row))` barriers that had
+   stopped the reversal by giving the counter a use. Scope's note "-g changes agbcc's code
+   ... the -g compile MATCHES" is the sign of this pattern.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

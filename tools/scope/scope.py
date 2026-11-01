@@ -397,7 +397,9 @@ def compile_draft(src, func, env=None):
             print(f"note: -g changes agbcc's code for {func}; the bytes here are the real build's (no -g),"
                   " so C lines and insn uids in this listing are approximate"
                   + ("; the -g compile MATCHES the ROM, so knobs that name insn uids (only -g has them) say"
-                     " nothing here: find what -g changes (loop.c reads line notes: a loop reversed or not)"
+                     " nothing here: find what -g changes (loop.c reads line notes: under -g a `break;` on its own line"
+                     " keeps a loop from being reversed; the build does the same for a loop left through"
+                     " `goto`, README fact 40)"
                      if g_match else ""), file=sys.stderr)
         info.update(data=plain[2], lines={}, g_differs=True)
         mine = plain[0]
@@ -1041,6 +1043,17 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
               f" precomputes an argument that needs converting to its parameter's type: declare that"
               f" parameter narrower (`u8`) or cast the argument (README fact 35)")
+    for i, ln, down in reversed_loop_hints(rows_json)[:3]:
+        ln = ln if str(ln).startswith("at ") else f"line {ln}"
+        if down == "draft":
+            print(f"{ln}: loop.c reversed this loop in the draft (its counter counts down to 0); the ROM's"
+                  f" counts up. Nothing else reads the counter, and the test is the last insn before the loop"
+                  f" end. Leave the loop through `goto` to a label after it instead of `break` or a do-while"
+                  f" condition: the loop is not rotated, and loop.c leaves the counter alone (README fact 40)")
+        else:
+            print(f"{ln}: the ROM's loop counts its counter down to 0 (loop.c reversed it), the draft's"
+                  f" counts up: let nothing but the test read the counter, and end the loop in its test (a"
+                  f" do-while condition, or a `break` the loop rotates to its end) (README fact 40)")
     try:
         cross = cross_jump_hints(rows_json, cross_merges(open(os.path.join(wd, "stderr.txt")).read(),
                                                          info["obj_name"]),
@@ -1864,6 +1877,55 @@ def arg_order_hints(rows):
         first = ro[0]
         if do.index(first) > 0 and [x for x in ro if x != first] == [x for x in do if x != first]:
             out.append((i, r.get("line") or "", first))
+    return out
+
+
+def reversed_loop_hints(rows):
+    """[(row index, line, side)] where loop.c reversed a loop on SIDE ("draft" or "rom") and not on
+    the other (README fact 40). The draft's reversed loop ends in a `cmp rN, #0` that loop.c made
+    (born "loop"), near a ROM `cmp rM, #K` with K != 0 that the draft lacks; the ROM's is a
+    `cmp rN, #0` after `subs rN, #1` aligned with a draft `cmp rM, #K` after `adds rM, #1`."""
+    cmp = re.compile(r"cmp (r\d+|sb|sl|fp|ip), #(0x[0-9a-f]+|\d+)$")
+    out, seen = [], set()
+    for i, r in enumerate(rows):
+        m = cmp.match(r["draft"] or "")
+        if not m or int(m.group(2), 0) != 0 or r["tag"] == "=":
+            continue
+        near = range(max(0, i - 8), min(len(rows), i + 9))
+        if r.get("born") != "loop":
+            # no pass names (the build's bytes differ from the -g compile's): ask for the decrement
+            # (`subs rN, #1`, or -1 made by `rsbs` for a high register) and the ROM's increment
+            back = [rows[j]["draft"] or "" for j in range(max(0, i - 6), i)]
+            if not any(t == f"subs {m.group(1)}, #1" or re.match(r"rsbs (r\d), \1, #0$", t) for t in back):
+                continue
+            if not any(rows[j]["tag"] != "=" and re.match(r"adds (r\d+), #1$", rows[j]["rom"] or "")
+                       for j in near):
+                continue
+        for j in near:
+            mr = cmp.match(rows[j]["rom"] or "")
+            if mr and int(mr.group(2), 0) != 0 and rows[j]["tag"] != "=":
+                if j not in seen:
+                    seen.add(j)
+                    out.append((i, r.get("line") or rows[j].get("line") or f"at ROM {rows[j]['rom_addr']}",
+                                "draft"))
+                break
+    for i, r in enumerate(rows):
+        mr, md = cmp.match(r["rom"] or ""), cmp.match(r["draft"] or "")
+        if not (mr and md) or int(mr.group(2), 0) != 0 or int(md.group(2), 0) == 0:
+            continue
+        steps = 0
+        for side, op, reg in (("rom", "subs", mr.group(1)), ("draft", "adds", md.group(1))):
+            for j in range(i - 1, max(-1, i - 6), -1):
+                t = rows[j][side]
+                if t is None:
+                    continue
+                if t == f"{op} {reg}, #1":
+                    steps += 1
+                    break
+                if re.match(r"(bl?|b[a-z]{2}|bx|pop|push)\s", t) or t.startswith("."):
+                    break
+        if steps == 2:
+            out.append((i, r.get("line") or f"at ROM {r['rom_addr']}", "rom"))
     return out
 
 
