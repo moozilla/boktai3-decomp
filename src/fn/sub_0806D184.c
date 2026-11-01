@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "route_sprite_playback.h"
 #include "engine.h"
 s32 Div(s32, s32);
@@ -53,33 +52,15 @@ void RouteSpriteActor_TickHopToRandomPoint(struct RouteSpritePool *pool,
     }
     if (!actor->animationEnded) {
         u32 ended = RouteSpriteActor_StepPlayback(actor);
-        {
-            u32 endedOffset = 0x158;
-            {
-                register u8 *endedFlag asm("r0") = (u8 *)((u32)actor + endedOffset);
-                *endedFlag = ended;
-            }
-        }
+        actor->animationEnded = ended;
         if (!ended)
             return;
     }
     if (actor->moveTimer <= 0) {
-        register u32 offset asm("r6") = 0x148;
-        *(struct ContactPosition *)((u32)actor + offset) = actor->sprite.position;
+        actor->savedPosition = actor->sprite.position;
         actor->state = 2;
-        {
-            register u32 changed asm("r2") = 0x157;
-            *(u8 *)((u32)actor + changed) = 1;
-            offset += 0x1E;
-            {
-                register u8 *prepared asm("r1") = (u8 *)((u32)actor + offset);
-                *prepared = 1;
-            }
-            changed -= 1;
-            {
-                register u8 *entered asm("r1") = (u8 *)((u32)actor + changed);
-                *entered = 1;
-            }
-        }
+        actor->positionChanged = 1;
+        actor->prepared = 1;
+        actor->entered = 1;
     }
 }
