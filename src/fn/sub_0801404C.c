@@ -1,5 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
+#include "monster_particle_random.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: integrates group particles and bounces them against terrain.
 #define ParticleGroup_UpdateBouncing sub_0801404C
@@ -37,7 +39,6 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-#define gRandomTable ((u16 *)0x0203B400)
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(int, int);
 void Effect_Remove(void *);
@@ -54,12 +55,6 @@ static inline struct Cell *Cell(int i)
     if (p)
         return (void *)(p + 4);
     return (void *)(gTerrainMap->cells + 12 + i * 4);
-}
-static inline u32 Random(u16 *table)
-{
-    u32 r = (gRandomIndex + 1) & 0x3ff;
-    gRandomIndex = r;
-    return table[r];
 }
 static inline int Scale(int a, int b)
 {
@@ -106,14 +101,14 @@ void ParticleGroup_UpdateBouncing(struct Manager *m, struct Group *g)
                             if (d < 0)
                                 d = -d;
                             if (d == 1) {
-                                u32 random = Random(table);
+                                u32 random = ParticleRandom_ReadDirectSample(table);
                                 p->velocity.x = -Scale(p->velocity.x, (random & 7) + 50);
                                 if (index - p->cell < 0)
                                     p->position.x = (p->position.x & ~255) + 256;
                                 else
                                     p->position.x = (p->position.x & ~255) - 1;
                             } else {
-                                u32 random = Random(table);
+                                u32 random = ParticleRandom_ReadDirectSample(table);
                                 p->velocity.z = -Scale(p->velocity.z, (random & 7) + 50);
                                 if (index - p->cell < 0)
                                     p->position.z = (p->position.z & ~255) + 256;
@@ -123,7 +118,7 @@ void ParticleGroup_UpdateBouncing(struct Manager *m, struct Group *g)
                         } else
                             p->height = height;
                         {
-                            u32 random = Random(table);
+                            u32 random = ParticleRandom_ReadDirectSample(table);
                             p->velocity.y = -Scale(p->velocity.y, (random & 3) + 55);
                         }
                     }
