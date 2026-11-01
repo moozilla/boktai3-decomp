@@ -1,9 +1,10 @@
 #include "global.h"
 
-void SpriteParticle_SetMotionParams(u8 *p, u16 a, u16 b, u8 c, u32 d)
+void SpriteParticle_SetMotionParams(void *params, u32 flags, u32 lifetime, u32 direction, u32 speed)
 {
-    *(u16 *)(p + 0) = a;
-    *(u16 *)(p + 2) = b;
-    *(u8 *)(p + 6) = c;
-    *(u32 *)(p + 8) = d;
+    u8 *p = params;
+    *(u16 *)(p + 0) = flags;
+    *(u16 *)(p + 2) = lifetime;
+    *(u8 *)(p + 6) = direction;
+    *(u32 *)(p + 8) = speed;
 }

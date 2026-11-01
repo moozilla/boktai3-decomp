@@ -30,25 +30,25 @@ static inline void Play(struct NamedObject *o)
     }
     Sound_PlaySong(song);
 }
-void NamedObject_UpdateMovementSound(u8 *manager)
+void NamedObject_UpdateMovementSound(struct NamedObjectManager *manager)
 {
     u32 attached = 0;
-    struct NamedObject *objects = (struct NamedObject *)(manager + 0x1C);
+    struct NamedObject *objects = manager->slots;
     s32 i;
     struct NamedObject *o;
     for (i = 0; i < 12; i++) {
-        if (Active(*(u32 *)(manager + 0x136C), 1 << i)) {
-            o = (struct NamedObject *)(i * 0x19C + (u32)objects);
+        if (Active(*(u32 *)((u8 *)manager + 0x136C), 1 << i)) {
+            o = (struct NamedObject *)(i * (s32)sizeof(*objects) + (u32)objects);
             if ((s16)o->state != 6 && (o->field_E0 & 0x10)) {
                 if ((s16)o->state != 1) {
-                    if (manager[0x1378] == 1) {
+                    if (manager->movementSoundActive == 1) {
                         Stop();
-                        manager[0x1378] = 0;
+                        manager->movementSoundActive = 0;
                     }
                 } else {
-                    if (!manager[0x1378]) {
+                    if (!manager->movementSoundActive) {
                         Play(o);
-                        manager[0x1378] = 1;
+                        manager->movementSoundActive = 1;
                     }
                 }
                 return;
@@ -64,20 +64,20 @@ void NamedObject_UpdateMovementSound(u8 *manager)
         return;
     if (attached) {
         if ((s16)objects->state != 1) {
-            if (manager[0x1378] == 1) {
+            if (manager->movementSoundActive == 1) {
                 Stop();
-                manager[0x1378] = 0;
+                manager->movementSoundActive = 0;
             }
         } else {
-            if (!manager[0x1378]) {
+            if (!manager->movementSoundActive) {
                 Play(objects);
-                manager[0x1378] = 1;
+                manager->movementSoundActive = 1;
             }
         }
     } else {
-        if (manager[0x1378] == 1) {
+        if (manager->movementSoundActive == 1) {
             Stop();
-            manager[0x1378] = attached;
+            manager->movementSoundActive = attached;
         }
     }
 }

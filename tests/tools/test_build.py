@@ -14,9 +14,10 @@ class CompilerCacheTests(unittest.TestCase):
     def test_changed_compiler_rebuilds_unchanged_source(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            for path in ('include/gba', 'tools', 'build'):
+            for path in ('include/gba', 'tools', 'build', 'asm'):
                 (root / path).mkdir(parents=True)
             (root / 'tools/build.py').write_text('fixture')
+            (root / 'asm/macros.inc').write_text('@ fixture\n')
             src = root / 'candidate.c'
             src.write_text('int f(void) { return 1; }\n')
             normal, old = root / 'agbcc', root / 'old_agbcc'
@@ -58,9 +59,10 @@ class CompilerInputTests(unittest.TestCase):
     def test_large_input_and_early_output_use_file_backed_stdin(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            for path in ('include/gba', 'tools', 'build'):
+            for path in ('include/gba', 'tools', 'build', 'asm'):
                 (root / path).mkdir(parents=True)
             (root / 'tools/build.py').write_text('fixture')
+            (root / 'asm/macros.inc').write_text('@ fixture\n')
             (root / 'candidate.c').write_text('int f(void) { return 1; }')
             compiler = root / 'agbcc'
             compiler.write_text(

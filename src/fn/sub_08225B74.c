@@ -20,7 +20,7 @@ struct Obj {
     u32 *f2C;
     u32 *f30;
 };
-void sub_0821C8F8(void *, void *, void *, u32, u32, u32);
+void Terrain_MoveFootprint(void *, void *, void *, u16, u16, u8);
 
 void Obj_StepPosition(struct Obj *o)
 {
@@ -28,7 +28,7 @@ void Obj_StepPosition(struct Obj *o)
     if (p != 0) {
         switch (gCamera.mode) {
             case 0:
-                sub_0821C8F8(p, &o->fC, &o->f14, o->f20, o->f22, o->f8);
+                Terrain_MoveFootprint(p, &o->fC, &o->f14, o->f20, o->f22, o->f8);
                 break;
             case 1:
                 o->fC += o->f14;

@@ -1,109 +1,89 @@
-#include "global.h"
-#include "engine.h"
+#include "state_actor.h"
+#include "scene_event_dispatch.h"
+#include "monster_particle_random.h"
 #include "input.h"
-#include "ram.h"
-#ifdef NONMATCHING
-// fuzzy: 55.0%
-// fix.py best (sweep after the inlined-insn fix)
-struct Position {
-    s16 x, y, z, pad;
+
+struct DirectionCommand {
+    u8 header[8];
+    struct StateActorPos target;
 };
-struct Command {
-    u8 pad0[6];
-    u8 kind;
-    u8 pad7;
-    union {
-        struct Position position;
-        u8 direction;
-    } data;
-};
-struct Receiver {
-    u8 pad0[6];
-    u8 counts[2];
-    struct Command *commands[2][4];
-};
-struct StateActor {
-    u8 pad0[2], state, phase, behavior, pad5, kind, pad7, active, pending;
-    u8 padA[6];
-    u32 counter, timer;
-    u8 flags18, facing4, facing8, angle;
-    u8 pad1C[0x54 - 0x1C];
-    struct Position target;
-    u8 pad5C[0x68 - 0x5C];
-    struct Position position;
-    u8 pad70[0x168 - 0x70];
-    struct Receiver receiver;
-    u8 pad190[0x2CC - 0x190];
-    void (*update)(void *);
-};
-extern u8 *gSceneEventDispatchState;
 s32 Math_Atan2(s32, s32);
-void SceneMessages_SetPendingTrigger(void *, void *);
-void sub_0802EA90(void *);
-static inline s32 RandomPart(void)
+void sub_0802EA90(void);
+
+static inline s32 TargetAngle(struct StateActorPos *target, struct StateActorPos *position)
 {
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return (gRandomTable[gRandomIndex] >> 4) & 1023;
+    return Math_Atan2(target->x - position->x, target->z - position->z);
 }
-static inline void ResetMotion(struct StateActor *actor, u32 behavior)
-{
-    u8 zeroByte = 0;
-    u32 zero = 0;
-    actor->state = zeroByte;
-    actor->phase = zeroByte;
-    actor->behavior = behavior;
-    actor->timer = zero;
-    actor->active = 1;
-}
-// confidence=low: consumes facing/position messages and an input-triggered random target.
-#define StateActor_ProcessDirectionMessages sub_081C6780
+
 void StateActor_ProcessDirectionMessages(struct StateActor *actor)
 {
-    struct Receiver *receiver = &actor->receiver;
-    s32 i;
-    u32 k1;
-    for (i = 0; i < receiver->counts[gSceneEventDispatchState[0x24]]; i++) {
-        struct Command *command = receiver->commands[gSceneEventDispatchState[0x24]][i];
-        switch (command->kind) {
-            case 4:
-                actor->target.x = command->data.position.x;
-                actor->target.y = command->data.position.y;
-                actor->target.z = command->data.position.z;
-                actor->angle = Math_Atan2(actor->target.x - actor->position.x,
-                                          actor->target.z - actor->position.z);
-                ResetMotion(actor, 2);
-                break;
-
-            case 3:
-                actor->angle = (command->data.direction + 5) << 5;
-                ResetMotion(actor, 3);
-                break;
-        }
-
-        SceneMessages_SetPendingTrigger(receiver, command);
-    }
-
+    u8 enter = 1;
+    struct SceneEventReceiver *receiver = (void *)actor->receiver;
+    s32 i = 0;
+    if (i < receiver->count[gSceneEventDispatchState->phase])
+        do {
+            struct SceneEventDispatchState *event = gSceneEventDispatchState;
+            struct SceneEventCommand *command = receiver->pending[event->phase][i];
+            switch (command->kind) {
+                case 4: {
+                    struct DirectionCommand *message = (void *)command;
+                    actor->target.x = message->target.x;
+                    actor->target.y = message->target.y;
+                    actor->target.z = message->target.z;
+                    actor->targetAngle = TargetAngle(&actor->target, &actor->position);
+                    {
+                        actor->unk2[0] = 0;
+                        actor->unk2[1] = 0;
+                        actor->state = 2;
+                        actor->timer = 0;
+                        actor->enterCommand = enter;
+                    }
+                    break;
+                }
+                case 3:
+                    actor->targetAngle = (*(u8 *)&command->value + 5) << 5;
+                    {
+                        actor->unk2[0] = 0;
+                        actor->unk2[1] = 0;
+                        actor->state = 3;
+                        actor->timer = 0;
+                        actor->enterCommand = 1;
+                    }
+                    break;
+            }
+            SceneMessages_SetPendingTrigger(receiver, command);
+            i++;
+        } while (i < receiver->count[gSceneEventDispatchState->phase]);
     if (gPadState[1] & 2) {
-        s32 x = RandomPart();
-        s32 z = RandomPart();
-        struct Position *target = &actor->target;
+        const u16 *table = gRandomTable;
+        s32 x = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1023;
+        s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1023;
+        struct StateActorPos *target = &actor->target;
         {
-            typeof(target->x) *q1 = &target->x;
-            u32 z1 = 256;
-            *q1 = x + (k1 = 1024);
-            target->y = z1;
-            target->z = z + k1;
-            actor->angle = Math_Atan2(target->x - actor->position.x, target->z - actor->position.z);
-            ResetMotion(actor, 2);
-            actor->kind = 3;
-            actor->update = sub_0802EA90;
-            actor->counter = 0;
-            actor->pending = 1;
-            actor->flags18 = 0;
+            u32 base = 1024;
+            u32 height;
+            x += base;
+            height = 256;
+            z += base;
+            target->x = x;
+            target->y = height;
+            target->z = z;
         }
+        actor->targetAngle = TargetAngle(target, &actor->position);
+        {
+            actor->unk2[0] = 0;
+            actor->unk2[1] = 0;
+            actor->state = 2;
+            actor->timer = 0;
+            actor->enterCommand = 1;
+        }
+        {
+            void (*update)(void) = sub_0802EA90;
+            actor->prevState = 3;
+            actor->stateCallback = update;
+        }
+        actor->stateFrame = 0;
+        actor->enter = 1;
+        actor->phase = 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C6780);
-#endif

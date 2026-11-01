@@ -1,146 +1,147 @@
-#include "global.h"
-#include "engine.h"
+#include "tile_trigger.h"
+#include "scene_actor_chase.h"
 #include "ram.h"
 
-struct SceneVec {
-    s16 x, y, z;
-    s16 pad;
-};
 struct Player;
-void *SceneActorQuery_FindPlayerInBounds(const void *center, const void *radius, s32 slot);
-u8 *sub_0806F06C(const void *center, const void *radius, u32 *cursor);
-u8 TileTrigger_IsTetherNearby(struct TileTrigger *p);
-s32 Player_BeginDirectionalCue(struct Player *p, s32 mode);
-void TetherActor_BeginDetachedState(s32 mode);
-void ScriptTriggerActor_DispatchPendingScripts(struct TileTrigger *p);
-s32 EffectGroup_SpawnPart(void *, u32, void *, void *, void *, u32, u32);
-void SceneActorReaction_SinkAndRemove(void);
+struct EffectGroup;
+struct ScriptTriggerActor;
+struct Player *SceneActorQuery_FindPlayerInBounds(const struct SceneVec *, const struct SceneVec *,
+                                                  s32);
+struct SceneActorRegistryActor *sub_0806F06C(const struct ContactPosition *,
+                                             const struct ContactPosition *, u32 *);
+u8 TileTrigger_IsTetherNearby(struct TileTrigger *);
+s32 Player_BeginDirectionalCue(struct Player *, s32);
+void TetherActor_BeginDetachedState(u32);
+void ScriptTriggerActor_DispatchPendingScripts(struct ScriptTriggerActor *);
+s32 EffectGroup_SpawnPart(struct EffectGroup *, u32, u32, u32, u32, u32, u32);
+void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 30.1%
-// scope shape 204 (differences once low registers are set aside)
-// confidence=low: per-frame tile trigger update that sweeps nearby actors and players, spawns a burst of sparks on each new actor, and sets the trigger state from the results
-void sub_08106E98(struct TileTrigger *arg0)
+static inline u32 ContactActor_ReadMotionFlags(const struct SceneActorRegistryResetView *actor,
+                                               u32 mask)
 {
-    u8 *self = (u8 *)arg0;
-    struct SceneVec radius;
-    struct SceneVec vel;
-    struct SceneVec scale;
-    struct SceneVec pos;
-    u32 cursor;
-    u8 inRange[4];
-    void *players[4];
-    s32 anyTether;
-    s32 found;
+    return mask & actor->flags2D4;
+}
+static inline u8 ContactActor_IsControlled(struct SceneActorRegistryResetView *actor)
+{
+    if (actor->object == (void *)1)
+        return 1;
+    return 0;
+}
+
+static inline u32 TileContact_NextParticleSample(u32 *cursor, const u16 *table)
+{
+    u32 index = (*cursor + 1) & 1023;
+    *cursor = index;
+    return table[index];
+}
+static inline void TileContact_EmitThreeParts(struct SceneActorRegistryActor *actor)
+{
     s32 i;
-    s32 n;
-    s32 idx;
-    u8 *a;
+    u16 sample;
+    const void *source;
+    struct ContactPackedVector velocity, scale, position;
+    for (i = 0; i < 3; i++) {
+        source = gRandomTable;
+        sample = TileContact_NextParticleSample(&gRandomIndex, source);
+        velocity.x = (sample & 15) - 7;
+        velocity.y = (TileContact_NextParticleSample(&gRandomIndex, source) & 31) - 16;
+        velocity.z = (TileContact_NextParticleSample(&gRandomIndex, source) & 15) - 7;
+        scale.x = 5;
+        scale.y = 10;
+        scale.z = 5;
+        position.x = actor->effectOrigin->x;
+        position.y = actor->effectOrigin->y + 128;
+        position.z = actor->effectOrigin->z;
+        source = actor->effectConfig;
+        EffectGroup_SpawnPart((struct EffectGroup *)source, 3, (u32)&position, (u32)&velocity,
+                              (u32)&scale, 40, 40);
+    }
+    actor->fieldAA = 0;
+    actor->field2B8 = 0;
+}
+void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
+{
+    struct Player *players[4];
+    u8 inRange[4];
+    struct ContactPackedVector radius;
+    u32 cursor;
+    s32 tetherInRange, actorFound, i;
+    struct SceneActorRegistryResetView *actor;
+    void (*callback)(struct SceneActorRegistryResetView *, s32);
 
+    callback = SceneActorReaction_SinkAndRemove;
     cursor = 0;
-    anyTether = 0;
-    found = 0;
-    radius.x = 0x80;
-    radius.y = 0x10;
-    radius.z = 0x80;
-    for (i = 0; i < 4; i++) {
+    radius.z = 128;
+    radius.x = 128;
+    radius.y = 16;
+    for (i = 0; i < 4; i++)
         inRange[i] = 0;
-    }
-
+    actorFound = 0;
+    tetherInRange = 0;
     for (i = 0; i < 4; i++) {
-        players[i] = SceneActorQuery_FindPlayerInBounds(self + 0x84, &radius, i);
-        if (players[i] != 0) {
+        players[i] = SceneActorQuery_FindPlayerInBounds(&self->position,
+                                                        (const struct SceneVec *)&radius, i);
+        if (players[i]) {
             inRange[i] = 1;
-            *(u16 *)(self + 0xC0) |= 0x80;
+            self->triggerFlags |= 0x80;
         }
     }
-
-    if (TileTrigger_IsTetherNearby(arg0) != 0) {
-        anyTether = 1;
-        *(u16 *)(self + 0xC0) |= 0x100;
+    if (TileTrigger_IsTetherNearby(self)) {
+        tetherInRange = 1;
+        self->triggerFlags |= 0x100;
     }
-
-    while ((a = sub_0806F06C(self + 0x84, &radius, &cursor)) != 0) {
-        if (((a[0x2B5] - 0x16) & 0xFF) <= 1) {
+    while ((actor = (void *)sub_0806F06C((const struct ContactPosition *)&self->position,
+                                         (const struct ContactPosition *)&radius, &cursor)) !=
+           NULL) {
+        if ((u8)(actor->field2B5 - 0x16) <= 1)
             continue;
-        }
-        a[0x2B2] = 1;
-        a[0x2B0] = 0;
-        a[0x2B5] = 0x16;
-        *(void **)(a + 0x21C) = SceneActorReaction_SinkAndRemove;
-        *(u16 *)(a + 0x2C8) = 0;
-        *(u32 *)(a + 0x114) &= ~1;
-        *(u32 *)(a + 0x104) = 0;
-        a[0x2A8] = 3;
-        a[0x2A9] = 0;
-        a[0x2AA] = 0;
-        *(u32 *)(a + 0x2AC) = 0;
-        a[0x2B1] = 1;
-        *(u16 *)(a + 0x2B8) = 0;
-        if (*(u32 *)a == 1 && (*(u16 *)(a + 0x2D4) & 0x2000)) {
-            for (n = 0; n < 3; n++) {
-                idx = gRandomIndex;
-                idx = (idx + 1) & 0x3FF;
-                vel.x = (gRandomTable[idx] & 0xF) - 7;
-                idx = (idx + 1) & 0x3FF;
-                vel.y = (gRandomTable[idx] & 0x1F) - 16;
-                idx = (idx + 1) & 0x3FF;
-                gRandomIndex = idx;
-                vel.z = (gRandomTable[idx] & 0xF) - 7;
-                scale.x = 5;
-                scale.y = 10;
-                scale.z = 5;
-                {
-                    u16 *src = *(u16 **)(a + 0x484);
-                    pos.x = src[0];
-                    pos.y = src[1] + 0x80;
-                    pos.z = src[2];
-                }
-                EffectGroup_SpawnPart(a + 0x47C, 3, &pos, &vel, &scale, 40, 40);
+        {
+            u8 kind = 0x16;
+            actor->field2B2 = 1;
+            actor->field2B0 = 0;
+            actor->field2B5 = kind;
+            actor->target = callback;
+            actor->field2C8 = 0;
+            {
+                u32 *field = &actor->flags114;
+                u32 mask = ~1;
+                *field &= mask;
             }
-            *(u16 *)(a + 0xAA) = 0;
-            *(u16 *)(a + 0x2B8) = 0;
+            actor->word104 = 0;
         }
-        found = 1;
+        Chase_SetState(actor, 3, 0, 0);
+        actor->field2B8 = 0;
+        if (ContactActor_IsControlled(actor) && ContactActor_ReadMotionFlags(actor, 0x2000)) {
+            TileContact_EmitThreeParts((struct SceneActorRegistryActor *)actor);
+        }
+        actorFound = 1;
     }
-
     if (inRange[0] || inRange[1] || inRange[2] || inRange[3]) {
-        if ((gEngineFlags & 0x800) != 0) {
-            if ((*(u16 *)(self + 0xC0) & 0x10) == 0) {
-                *(u16 *)(self + 0xBE) = 5;
-                self[0xC2] = 1;
+        if (gEngineFlags & 0x800) {
+            if (!(self->triggerFlags & 0x10)) {
+                self->state = 5;
+                self->forced = 1;
             }
         } else {
-            *(u16 *)(self + 0xBE) = 7;
+            self->state = 7;
         }
-        if (anyTether) {
-            for (i = 0; i < 4; i++) {
-                if (inRange[i] && Player_BeginDirectionalCue(players[i], 1)) {
-                    *(u16 *)(self + 0xC0) |= 0x400;
-                }
-            }
+        if (tetherInRange) {
+            for (i = 0; i < 4; i++)
+                if (inRange[i] && Player_BeginDirectionalCue(players[i], 1))
+                    self->triggerFlags |= 0x400;
             TetherActor_BeginDetachedState(1);
         } else {
-            for (i = 0; i < 4; i++) {
-                if (inRange[i] && Player_BeginDirectionalCue(players[i], 0)) {
-                    *(u16 *)(self + 0xC0) |= 0x400;
-                }
-            }
+            for (i = 0; i < 4; i++)
+                if (inRange[i] && Player_BeginDirectionalCue(players[i], 0))
+                    self->triggerFlags |= 0x400;
         }
-    } else {
-        if (anyTether) {
-            ScriptTriggerActor_DispatchPendingScripts(arg0);
-            TetherActor_BeginDetachedState(0);
-            *(u16 *)(self + 0xBE) = 5;
-            self[0xC2] = 1;
-        } else if (found != 0) {
-            if ((*(u16 *)(self + 0xC0) & 0x10) == 0) {
-                *(u16 *)(self + 0xBE) = 5;
-                self[0xC2] = 1;
-            }
-        }
+    } else if (tetherInRange) {
+        ScriptTriggerActor_DispatchPendingScripts((struct ScriptTriggerActor *)self);
+        TetherActor_BeginDetachedState(0);
+        self->state = 5;
+        self->forced = 1;
+    } else if (actorFound && !(self->triggerFlags & 0x10)) {
+        self->state = 5;
+        self->forced = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08106E98);
-#endif

@@ -26,7 +26,7 @@ struct Emitter {
 };
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
-void sub_0821C8F8(void *, struct Position *, struct Position *, u32, u32, u32);
+void Terrain_MoveFootprint(void *, struct Position *, struct Position *, u16, u16, u8);
 static inline s32 Scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -(-value >> 12);
@@ -82,7 +82,7 @@ void SceneActorAnimation_EmitTowardNearbyActors(struct Emitter *emitter)
                 Add(&offset, position, &offset);
                 Subtract(&emitter->delta, &offset, &emitter->position);
                 if (emitter->resource)
-                    sub_0821C8F8(emitter->resource, &emitter->position, &emitter->delta,
+                    Terrain_MoveFootprint(emitter->resource, &emitter->position, &emitter->delta,
                                  emitter->first, emitter->second, emitter->kind);
             }
         }

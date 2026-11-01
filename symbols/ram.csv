@@ -182,7 +182,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020004BC,gPanelSpritePool,4,object,extern u8 *gPanelSpritePool;,include/ram.h,low,
 020004C0,gSpriteSlots,4,object,extern u32 gSpriteSlots;,include/ram.h,low,
 020004C4,gDebrisPool,4,object,extern struct DebrisPool *gDebrisPool;,include/ram.h,low,
-020004C8,gSceneCallbackPool,4,object,extern u32 gSceneCallbackPool;,include/ram.h,low,
+020004C8,gSceneCallbackPool,4,object,extern struct SceneCallbackPool *gSceneCallbackPool;,include/ram.h,low,
 020004CC,gSceneProcSprites,4,object,extern u8 *gSceneProcSprites;,include/ram.h,low,
 020004D0,gSceneProcParticles,4,object,extern u32 gSceneProcParticles;,include/ram.h,low,
 020004D4,gSpritePairPool,4,object,extern u32 gSpritePairPool;,include/ram.h,low,

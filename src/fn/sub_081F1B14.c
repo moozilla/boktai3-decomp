@@ -45,7 +45,7 @@ void SceneActors_UpdateTargetMetrics(struct SingletonSlot7Actor *);
 void SceneActors_UpdateEffects(struct SingletonSlot7Actor *);
 void Sound_StopSong(u32);
 void SceneActors_UpdateIdleDisplay(void);
-void sub_081F1274(struct SingletonSlot7Actor *);
+void SingletonSlot7_UpdatePresentation(struct SingletonSlot7Actor *);
 
 static inline u8 PlayerHasFlag(void)
 {
@@ -91,6 +91,6 @@ s32 SingletonSlot7_Update(void *arg)
         *fp |= mask;
     }
     SceneActors_UpdateEffects(p);
-    sub_081F1274(actor);
+    SingletonSlot7_UpdatePresentation(actor);
     return 0;
 }
