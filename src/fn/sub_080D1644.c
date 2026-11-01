@@ -7,15 +7,11 @@ static inline void StoreHalf(struct SceneActorRegistryResetView *a, u32 v)
     u32 value = v;
     *(u16 *)((u8 *)a + 0x1EA) = value;
 }
-static inline void SetHalf(struct SceneActorRegistryResetView *a, u32 mask)
+static inline void SetHalf(struct SceneActorRegistryResetView *a, u16 mask)
 {
-    u32 value = mask;
-    u16 *p;
-    asm("" : "+r"(value));
-    p = &a->flags2D4;
-    *p = value | *p;
+    a->flags2D4 = mask | a->flags2D4;
 }
-// MATCHING_CONCESSION: register-pinning
+
 // confidence=low: waits for the recovery timer before restoring route animation.
 #define Mummy_UpdateRecoveryWait sub_080D1644
 void Mummy_UpdateRecoveryWait(struct SceneActorRegistryResetView *a)
