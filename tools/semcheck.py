@@ -318,23 +318,37 @@ def compare(rom, cand, check_r0, arity=None):
                     f"{_byte(wa.get(addr), a[3][1].get(addr))} in ROM, {_byte(wb.get(addr), b[3][1].get(addr))} in draft")
     if len(rom.calls) != len(cand.calls):
         more = rom if len(rom.calls) > len(cand.calls) else cand
-        who = "ROM" if more is rom else "draft"
-        extra = more.calls[min(len(rom.calls), len(cand.calls))][0]
-        return f"{who} makes {abs(len(rom.calls) - len(cand.calls))} more call(s), first {extra}"
-    for addr in sorted(set(rom.writes) | set(cand.writes)):
+        shorter = cand if more is rom else rom
+        if shorter.status != "step limit":
+            who = "ROM" if more is rom else "draft"
+            extra = more.calls[min(len(rom.calls), len(cand.calls))][0]
+            return f"{who} makes {abs(len(rom.calls) - len(cand.calls))} more call(s), first {extra}"
+    rom_limited = rom.status == "step limit"
+    cand_limited = cand.status == "step limit"
+    if rom_limited and cand_limited:
+        return None  # only the shared call prefix is synchronized
+    # A partial run can still prove it touched an address the other run never
+    # touched. Values at shared addresses can change in the unobserved suffix.
+    if rom_limited:
+        comparable = rom.writes.keys() - cand.writes.keys()
+    elif cand_limited:
+        comparable = cand.writes.keys() - rom.writes.keys()
+    else:
+        comparable = rom.writes.keys() | cand.writes.keys()
+    for addr in sorted(comparable):
         a, b = rom.writes.get(addr), cand.writes.get(addr)
         if a != b:
             return (f"memory 0x{addr:08X}: {_byte(a, rom.writer.get(addr))} in ROM, "
                     f"{_byte(b, cand.writer.get(addr))} in draft")
     extra = sorted(set(cand.reads) - set(rom.reads))
-    if extra:
+    if extra and not rom_limited:
         return (f"the draft reads 0x{extra[0]:08X} (at 0x{cand.reads[extra[0]]:08X}), which the ROM does not"
                 + (f" ({len(extra)} such addresses)" if len(extra) > 1 else ""))
     missing = sorted(set(rom.reads) - set(cand.reads))
-    if missing:
+    if missing and not cand_limited:
         return (f"the ROM reads 0x{missing[0]:08X} (at 0x{rom.reads[missing[0]]:08X}), which the draft does not"
                 + (f" ({len(missing)} such addresses)" if len(missing) > 1 else ""))
-    if check_r0 and rom.r0 != cand.r0:
+    if check_r0 and not (rom_limited or cand_limited) and rom.r0 != cand.r0:
         return f"return value 0x{rom.r0:08X} in ROM, 0x{cand.r0:08X} in draft"
     return None
 
@@ -442,7 +456,7 @@ class Oracle:
             c = Run(self.rom, cstart, cend, names or self.names, seed, regs, overlay=(addr, data),
                     arity=self.arity)
             diff = compare(r, c, self.check_r0 and r.status == "ok", self.arity)
-            if r.status != c.status:
+            if r.status != c.status and "step limit" not in (r.status, c.status):
                 diff = (diff + "; " if diff else "") + f"ROM run: {r.status}, draft run: {c.status}"
             if verbose:
                 print(f"  trial {seed - 1000}: {len(r.calls)} calls, {len(r.writes)} bytes written, "
@@ -450,8 +464,10 @@ class Oracle:
             if diff:
                 args = ", ".join(f"0x{v:X}" for v in regs)
                 return "DIFFERENT", f"trial {seed - 1000} (args {args}): {diff}"
-            if r.status != "ok":
+            if r.status != "ok" or c.status != "ok":
                 verdict = "INCOMPLETE"
+                if detail is None:
+                    detail = f"trial {seed - 1000}: ROM run: {r.status}, draft run: {c.status}"
         return verdict, detail
 
 
