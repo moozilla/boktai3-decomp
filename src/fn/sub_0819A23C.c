@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
+#include "display_sequence_inline.h"
 struct CannonBatteryMessage {
     u32 id;
     u16 *data;
@@ -24,9 +25,7 @@ void CannonBattery_CreateCannon(void *, u32, u32, u32, u32);
 
 static inline u32 frame_factor(u16 v)
 {
-    register u32 value asm("r1") = v;
-    u32 mask = 15;
-    return mask & value;
+    return DisplaySequence_MaskCommand(v, 15);
 }
 static inline u32 CannonBattery_StepAnimation(struct CannonBatteryEffect *e)
 {
