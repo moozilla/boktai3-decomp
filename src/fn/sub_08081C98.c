@@ -1,8 +1,11 @@
 #include "global.h"
 // confidence=low: runs a timed reaction burst and restores actor control on expiry.
 #ifdef NONMATCHING
-// fuzzy: 67.5%
-// Complete timing, palette and particle paths; loop allocation and field lifetimes differ.
+// fuzzy: 94.3%
+// 36 insns differ, all stack-slot order of the PRE pseudos (and frame 0x88 vs 0x84): the code
+// is otherwise identical. `scope.py preorder` puts the ROM's slot order at T = 267 buckets, so
+// gcse's input needs N = 532..535 real insns (this draft has 510). Narrow temporaries, casts and
+// helper-local copies all fold before gcse; insns that only flow or jump2 remove would add N.
 #include "scene_actor_chase.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
@@ -31,6 +34,21 @@ static inline void Reaction_ClearWord(u32 *field, s32 mask)
 static inline void Reaction_ClearMotion(struct SceneActorReactionMotion *motion, s32 mask)
 {
     motion->flags &= mask;
+}
+static inline void Reaction_ClearRoute(u32 *flags, struct SceneActorRegistryControl *control)
+{
+    Reaction_ClearWord(flags, ~0x141C0);
+    control->counter = 0;
+    control->field14 = 0;
+    control->timer = 0;
+}
+static inline u32 Reaction_Motion(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    return actor->flags2D4 & mask;
+}
+static inline void Reaction_ClearMotionBits(struct SceneActorRegistryResetView *actor, s32 mask)
+{
+    actor->flags2D4 &= mask;
 }
 static inline void Reaction_SetHalf(struct SceneActorRegistryResetView *actor, u16 mask)
 {
@@ -73,6 +91,7 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
         u32 *flags;
         u32 *word;
         u16 *motion;
+        u32 bit;
         actor->body.direction = (((actor->body.direction + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         actor->field2C2 = 64;
@@ -87,7 +106,9 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
         Reaction_ClearHalf(motion, ~0x380);
         Reaction_ClearMotion(reaction, ~0x18);
         control = &actor->group.common.control;
-        if (Reaction_Flags(actor, 0x200000)) {
+        bit = 0x200000;
+        flags = &actor->flags2CC;
+        if (*flags & bit) {
             Reaction_ClearWord(word, ~0x1000000);
             Reaction_ClearHalf(motion, ~0x200);
             control->mode = 0;
@@ -96,20 +117,18 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
         }
         Reaction_ClearHalf(motion, ~0x400);
         actor->group.turn.turnsRemaining = -1;
-        flags = &actor->flags2CC;
-        control = &actor->group.common.control;
-        Reaction_ClearWord(flags, ~0x141C0);
-        control->counter = 0;
-        control->field14 = 0;
-        control->timer = 0;
+        Reaction_ClearRoute(flags, (void *)(group + 0x4C));
         EffectGroup_Reset(group + 0xA8);
         SceneActorEffects_EmitRandomOffsets(actor, 3, 2, 10, 20, 3600);
         Reaction_SetWord(flags, 0x2000000);
-        *word = (*word | 0x4000) & ~0x140;
-        if (*word & 0x4000)
-            Reaction_Palette(actor, actor->alternatePalette);
-        else
-            Reaction_Palette(actor, actor->alternateOffset);
+        {
+            u32 shown = 0x4000;
+            *word = (shown | *word) & ~0x140;
+            if (*word & shown)
+                Reaction_Palette(actor, actor->alternatePalette);
+            else
+                Reaction_Palette(actor, actor->alternateOffset);
+        }
     }
     duration = *(u16 *)(group + 0x1FA);
     if (duration * 2 == actor->field2B8 || duration == actor->field2B8) {
@@ -126,12 +145,9 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
         struct ContactCollider *collider = &actor->colliderA;
         u32 mask = 0x100;
         collider->flags = mask | collider->flags;
-        if (Chase_MotionFlags(actor, 0x2000)) {
+        if (Reaction_Motion(actor, 0x2000))
             SceneActorEffects_SpawnContactParts((void *)actor);
-            actor->fieldAA = 0;
-            actor->field2B8 = 0;
-        }
-        ((struct ChaseFlags40 *)&actor->flags2D4)->bits &= ~0x2000;
+        Reaction_ClearMotionBits(actor, ~0x2000);
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, *(void **)(group + 0x210), 15);
         actor->field2B6 = (Reaction_ThirtySecond((actor->body.direction + 128) & 255) + 7) & 7;
@@ -139,7 +155,6 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
         actor->field2B8--;
     }
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateTimedBurst);
 #endif
