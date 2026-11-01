@@ -2914,6 +2914,7 @@ addr,name,mode,confidence,source,notes
 0807FF48,SceneActorReaction_RestoreAlternateAfterDelay,thumb,low,src-alias,
 08080008,SceneActorReaction_UpdateAnimationGate,thumb,low,src-alias,
 0808005C,SceneActorReaction_PlayAnimationBUntilComplete,thumb,low,src-alias,Consumes the prepared flag to select directional animation 0xB and marks the reaction complete when byte 0x2B3 is set
+080800A4,SceneActorReaction_UpdateContactRouteRecovery,thumb,low,src-alias,Restores route control or enters defeat when contact recovery completes
 08080494,SceneActorReaction_BeginDefeatBurst,thumb,low,src-alias,
 08080868,SceneActorReaction_BeginFadedState,thumb,low,src-alias,
 08080984,SceneActorReaction_BeginReactionSound,thumb,low,src-alias,
