@@ -782,6 +782,14 @@ Each was read from the compiler source and confirmed on a live draft.
    goes first in an AND, and a `(u8)` cast narrows it. For a mask-first `ands`, write
    `1 & a->flags`. A local pointer variable (`sprite = &p->sprite`) creates the
    DEST_REG giv that strength reduction steps; the same address written inline does not.
+24. **A pointer used only in adds of sp-encodable offsets prefers STACK_REG.** Thumb's
+   addsi3 has an `add rd, sp, #imm` alternative (multiples of 4 up to 1020), so regclass can
+   price sp cheapest for a pseudo whose only uses are `p + 0x1E0` and `p + 0x5C`. STACK_REG is
+   sp alone, so find_reg falls to the alternate class and a value that does not cross a call
+   lands in ip (r12, call-clobbered, first free). `why all` now reports such a pseudo when the
+   ROM never uses its high register ("class: ... prefers STACK_REG and sits in ip"). Fix in
+   Slime_EmitDeathDebris: one `u8 *base` that is the actor and then, after `base += 0x5C`,
+   the position, so the in-place add and the call arguments give it a low class.
 
 ## Survey: random table as a literal address (2026-10-24)
 
