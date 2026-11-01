@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // confidence=low: control reacquires a player route once the context delay clears.
@@ -28,23 +27,21 @@ static inline u8 Test16(u16 *p, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 PickTurn(u32 dir)
+struct MummyRandomTable {
+    const u16 *samples;
+};
+static inline u32 PickTurn(u32 dir, const u16 *randomSamples)
 {
-    u32 d;
     s32 i;
+    struct MummyRandomTable table = {randomSamples};
     for (i = 0; i < 4; i++) {
-        {
-            const u16 *table = gRandomTable;
-            u32 index;
-            u32 v;
-            /* Temporary concession: retain the table address as a loop value. */
-            asm("" : "+r"(table));
-            index = (gRandomIndex + 1) & 1023;
-            gRandomIndex = index;
-            index *= 2;
-            v = *((const u16 *)(index + (u32)table));
-            d = (v & 3) << 6;
-        }
+        const u16 *samples = (&table)->samples;
+        u32 index = (gRandomIndex + 1) & 1023;
+        u32 d;
+        gRandomIndex = index;
+        d = samples[index];
+        d &= 3;
+        d <<= 6;
         if (d != dir)
             return d;
     }
@@ -60,7 +57,7 @@ struct MummySavedControl {
     void *target;
     u8 state, phase, behavior, kind;
 };
-static inline void Turn(u8 saved, void *ctx)
+static inline void Turn(u8 saved, void *ctx, const u16 *randomSamples)
 {
     struct SceneActorRegistryResetView *actor = ctx;
     u8 *group = (u8 *)&actor->group.common;
@@ -71,7 +68,8 @@ static inline void Turn(u8 saved, void *ctx)
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
         return;
-    ((struct MummyTurnBytes *)(group + 0x204))->direction = PickTurn(actor->body.direction);
+    ((struct MummyTurnBytes *)(group + 0x204))->direction =
+        PickTurn(actor->body.direction, randomSamples);
     {
         struct MummySavedControl *save = (struct MummySavedControl *)(group + 0x8C);
         save->target = actor->target;
@@ -99,6 +97,7 @@ static inline u8 Arrive(void *obj)
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
+    const u16 *randomSamples = gRandomTable;
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
     if (Chase_Test(gEngineFlags, 0x4800)) {
         struct ChaseTarget *t = *slot;
@@ -137,7 +136,7 @@ static inline u8 Arrive(void *obj)
     }
     {
         u8 saved = actor->body.direction;
-        Turn(saved, obj);
+        Turn(saved, obj, randomSamples);
     }
     SceneActorTerrain_RequestRetreatRoute(obj);
     actor->field2C2 = 0x20;
