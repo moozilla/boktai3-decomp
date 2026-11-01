@@ -56,7 +56,6 @@ static inline u8 Stopped(void)
     return value;
 }
 // confidence=low: registry callback traversal, regional deactivation and palette transitions.
-#define SceneActorRegistry_UpdateActors sub_08070FA8
 void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
 {
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
@@ -133,5 +132,5 @@ void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08070FA8);
+INCLUDE_ASM("asm/nonmatching", SceneActorRegistry_UpdateActors);
 #endif

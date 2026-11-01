@@ -2784,6 +2784,7 @@ addr,name,mode,confidence,source,notes
 08070EE4,SceneActorRegistry_TestScriptActorLiving,thumb,low,src-alias,
 08070F10,SceneActorRegistry_TestScriptActorPresent,thumb,low,src-alias,
 08070F2C,SceneActorRegistry_TestCategoryFlags,thumb,low,src-alias,
+08070FA8,SceneActorRegistry_UpdateActors,thumb,low,src-alias,Traverses actor updates and destruction callbacks and applies regional visibility and palette changes.
 08071434,SceneActorRegistry_DestroyActors,thumb,low,src-alias,
 08071470,SceneActorRegistry_AdvanceInactiveActors,thumb,low,src-alias,
 080714E4,SceneActorRegistry_ResetRouteAndColliders,thumb,low,src-alias,

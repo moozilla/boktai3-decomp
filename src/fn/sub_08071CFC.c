@@ -10,7 +10,7 @@ s32 SceneActorRegistry_TickManager(struct SceneActorRegistryManager *manager)
     SceneActorRegistry_AdvanceCursor(manager);
     SceneActorRegistry_ScheduleAvailableActors(manager);
     SceneActorRegistry_UpdateBackgroundFlag(manager);
-    sub_08070FA8(manager);
+    SceneActorRegistry_UpdateActors(manager);
     mask = 0xFFFF3FFF;
     manager->flags &= mask;
     manager->frame++;
