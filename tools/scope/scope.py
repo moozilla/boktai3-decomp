@@ -5373,6 +5373,20 @@ def equiv_constants(wd):
     return out
 
 
+def equiv_copies(wd, holders):
+    """[(copy, uid, holder)] for each register copy `(set (reg X) (reg P))` before allocation (lreg dump)
+    whose source P is in HOLDERS and whose destination X has no REG_EQUIV. Reload rematerializes P at
+    the copy and X, if it spills, gets a stack slot of its own: a slot that holds P's constant may be
+    X's."""
+    eq = {p for p, _, _, _ in equiv_constants(wd)}
+    out = []
+    for u, _, r in insn_list(wd, "lreg"):
+        m = re.match(r"\(set \(reg(?:/\w)*:SI (\d+)\) \(reg(?:/\w)*:SI (\d+)\)\)$", r)
+        if m and int(m.group(2)) in holders and int(m.group(1)) >= 16 and int(m.group(1)) not in eq:
+            out.append((int(m.group(1)), u, int(m.group(2))))
+    return out
+
+
 def pseudo_value(wd, pseudo):
     """A short reading of what an unnamed pseudo holds: the source of its first set before allocation,
     with the C line."""
@@ -6409,6 +6423,17 @@ def frame_constant_slots(src, func, env, wd, rows, pair, slots):
                                               for p, u, _ in holders)
               + (" has" if len(holders) == 1 else " have") + " it as REG_EQUIV, so reload loads the constant"
               " again at each use when it spills, and gives it no slot.")
+        hard = dispositions(wd)
+        copies = equiv_copies(wd, {p for p, _, _ in holders})
+        for x, u, p in copies:
+            where = (f"has a slot at sp+{next(o for o, s in slots.items() if s[0] == x):#x}"
+                     if any(s[0] == x for s in slots.values())
+                     else f"keeps r{hard[x]}" if hard.get(x, -1) >= 0 else "has no register")
+            print(f"  Pseudo {x}" + (f" ({pn[x]})" if pn.get(x) else "") + f" is a copy of pseudo {p} (insn {u})"
+                  f" with no equivalence, so when it spills it gets a slot of its own. The ROM's slot may be"
+                  f" this copy's, evicted by reload, with {p} rematerialized into it (`ldr rN, =CONST` right"
+                  f" before the store). In the draft it {where}; if it keeps a register, the slot is a"
+                  " register-pressure difference rather than an equivalence one (080BF0E4).")
         knob = ",".join(str(p) for p, _, _ in holders)
         base = fast_score(src, func, env)
         base_shape = getattr(fast_score, "shape", None)
@@ -6421,6 +6446,13 @@ def frame_constant_slots(src, func, env, wd, rows, pair, slots):
         print("  A constant gets a slot only when update_equiv_regs gives it no equivalence: a non-constant set"
               " of the same variable first (README fact 20), or a union initializer's CLOBBER that a loop keeps"
               " alive (fact 21; in straight-line code flow deletes the dead CLOBBER first).")
+        if copies:
+            continue
+        print("  Try first: a local `union { const u16 *table; u16 halves[2]; }` with the halves stored"
+              " separately (`u.halves[0] = (u16)ADDR; u.halves[1] = ADDR >> 16;`), read through an inline"
+              " that takes `&u` (`return source->table;`). Only combine folds the halves into the constant,"
+              " and it adds no REG_EQUAL note, so there is nothing to make a REG_EQUIV from (fact 48;"
+              " 081EEECC, 082335F0, 08234868).")
 
 
 def cmd_shape(src, func, env):

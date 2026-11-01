@@ -1,22 +1,34 @@
-# HealthRestoreEffect_StartParticleBurst (08234868): holdout, one equivalence short
+# HealthRestoreEffect_StartParticleBurst (08234868): matched (2026-11-01)
 
-Tags: #matching #health-restore #random-table #compiler #loop #local-alloc #reload #holdout
+Tags: #matching #health-restore #random-table #compiler #loop #local-alloc #reload
 
-**Not matched.** `HealthRestoreEffect_StartParticleBurst` stays `INCLUDE_ASM`.
-The best ordinary-C draft is in the unit's `#ifdef NONMATCHING` block: fuzzy
-84.4% (the unit's earlier draft was 82.8%), scope 17 ROM / 13 draft
-instructions differing (was 20 / 16), shape 10 (was 12). It has no register
-pins, barriers, inline assembly or compiler overrides. With the scope knob
-`AGBCC_NOEQUIV=29`, which gives pseudo 29 (the random table) no equivalence,
-the build's compile of this draft is byte-identical to the ROM (the `-g` one
-too; this note first said only `-g`, an artifact of a scope bug fixed on
-2026-11-01: a knob set in the environment didn't reach the build's compile).
-That is the same
-single blocker as ChargedBurst_EmitSpark
-(`notes/opus-charged-burst-spark_2026-10-31.md`). The matchsearch store is
-`build/matchsearch/opus_08234868` (root = the landed draft, nine ruled-out
-nodes with their hypotheses). The scope change from this session is commit
-`59d2b1077`.
+**Matched, pin-free** (commit `152967a2c`, merged in PR 965). The one change to
+the holdout draft: the random table pointer is a union assembled from its two
+halves, the 081EEECC idiom (`tools/scope/README.md` fact 48):
+
+```c
+union HealthRestoreTableSource source;
+const u16 *table;
+...
+source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+source.halves[1] = RANDOM_TABLE_ADDR >> 16;
+table = HealthRestore_ReadTable(&source);   /* return source->table; */
+```
+
+cse cannot fold the two half insertions. Only combine folds them, into
+`(set (reg 30) (const_int 0x203B400))`, and it adds no REG_EQUAL note.
+update_equiv_regs makes REG_EQUIV only from such a note or from a memory
+source, so the table has no equivalence. Reload spills it to r7's slot at sp+0
+and reads it back for each sample, as in the ROM. This was the single blocker
+found below (`AGBCC_NOEQUIV=29` was exact). The sample reads are
+`table[*index]` used directly as memory operands, so they are index first
+already (README fact 49); writing them as integer sums changed nothing (i1).
+In `build/scope/drafts/hr2/`: u1 (the union) and ui1 (union + index-first
+sums) are exact; i1 (index-first sums alone) is 17 / 13, as before.
+
+The rest of this note is the holdout record as it stood before the match. The
+"Not tried" idea there (a second set that generates no code) was not needed:
+the union's set is a single one, but it carries no note.
 
 ## What the ROM shows
 
