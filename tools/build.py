@@ -199,6 +199,15 @@ def wait_for_cloud_setup():
         time.sleep(1)
 
 
+def link_elf(elf):
+    # Scope and check.py read this file while a combined build may be linking it.
+    destination = os.path.join(ROOT, elf)
+    with tempfile.TemporaryDirectory(dir=os.path.dirname(destination)) as directory:
+        linked = os.path.join(directory, "linked.elf")
+        sh(["arm-none-eabi-ld", "-T", "build/link.ld", "-o", linked])
+        os.replace(linked, destination)
+
+
 def main():
     wait_for_cloud_setup()
     ap = argparse.ArgumentParser()
@@ -255,7 +264,7 @@ def main():
         ld += open(ram).read().splitlines()
     open(os.path.join(ROOT, "build", "link.ld"), "w").write("\n".join(ld) + "\n")
     elf = a.out[:-4] + ".elf"
-    sh(["arm-none-eabi-ld", "-T", "build/link.ld", "-o", elf])
+    link_elf(elf)
     sh(["arm-none-eabi-objcopy", "-O", "binary", "-j", ".text", elf, a.out])
     # Shifted or resized data grows the image into the trailing zero padding:
     # trim back to 16 MiB so EEPROM stays at 0x0D000000.
