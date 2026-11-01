@@ -185,7 +185,10 @@ integer address (see the literal survey below).
 
 * the ROM and draft instruction, and which pseudo holds the differing register
   (operands matched by position between the lreg dump and the same insn after
-  reload, so local-alloc pseudos are covered);
+  reload, so local-alloc pseudos are covered). When the listing shows a pure
+  register swap as a `-` row and a `+` row (the alignment counts high
+  registers, so `mov ip, r2` and `mov sb, r2` do not pair), `why` on the `+`
+  row finds its ROM twin by shape and explains it as one insn;
 * the insn's registers after every pass that changed them, pseudos named by C
   variable (`24 (phase)`);
 * for a cse change: the equivalence class at the first look (cheapest first,
@@ -215,7 +218,10 @@ integer address (see the literal survey below).
     ROM also keeps there) and the arithmetic to allocate that one first;
   * in both rival cases the arithmetic to flip the order: refs or live length
     each side would need, live lengths in flow's units, and the
-    `AGBCC_PRI`/`AGBCC_FORCE` what-if that confirms it;
+    `AGBCC_PRI`/`AGBCC_FORCE` what-if that confirms it; when the pseudo's life
+    is doubled by a REG_EQUIV note (fact 20) and the undoubled life alone would
+    win, it says so and gives `AGBCC_NOEQUIV=REG` (the random table in
+    sub_080A34BC, sub_082335F0 and sub_08234868);
 * for a reload register (operand not a pseudo before allocation): the reload
   choice number, the spill registers as that choice saw them (free, shared
   with another reload of the insn, holding a named pseudo, taken), the

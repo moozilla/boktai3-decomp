@@ -1601,6 +1601,43 @@ def reg_nums(text):
     return out
 
 
+REG_TOKEN = re.compile(r"\b(?:r\d+|sb|sl|fp|ip|sp|lr|pc)\b")
+
+
+def register_twin(rows, row):
+    """The ROM row a '+' row stands for when the listing shows them as '-' and '+' only because the
+    alignment counts high registers (`mov ip, r2` against `mov sb, r2`): in the run of '-' rows next to
+    the run of '+' rows holding ROW, the one at the same position, or else the only one, with the same
+    text once registers are set aside. None if there is none."""
+    if not row or row.get("tag") != "+" or row.get("rom") or not row.get("draft"):
+        return None
+    idx = next((i for i, r in enumerate(rows) if r is row), None)
+    if idx is None:
+        return None
+    shape = REG_TOKEN.sub("R", row["draft"])
+
+    def run(i, tag, step):
+        out = []
+        while 0 <= i < len(rows) and rows[i]["tag"] == tag:
+            out.append(i)
+            i += step
+        return out
+    lo = idx
+    while lo - 1 >= 0 and rows[lo - 1]["tag"] == "+":
+        lo -= 1
+    hi = idx
+    while hi + 1 < len(rows) and rows[hi + 1]["tag"] == "+":
+        hi += 1
+    pos = idx - lo
+    for minus in (run(lo - 1, "-", -1)[::-1], run(hi + 1, "-", 1)):
+        same = [j for j in minus if rows[j]["rom"] and REG_TOKEN.sub("R", rows[j]["rom"]) == shape]
+        if pos < len(minus) and minus[pos] in same:
+            return rows[minus[pos]]
+        if len(same) == 1:
+            return rows[same[0]]
+    return None
+
+
 def moved_rows(rows, window=8):
     """{index: partner index} for a '+' row and a '-' row with the same text close together: the
     same instruction at another position (an order difference), not a missing or extra one."""
@@ -2091,6 +2128,12 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
             print(f"    to flip the order (priority = floor_log2(refs) * refs / live * 10000; flow counts refs"
                   f" inside loops weighted by depth): " + "; or ".join(flip_levers(nm, pseudo, rec, top, recs[top], wd)))
             print(f"    what-if: AGBCC_PRI={kref(wd, func, pseudo)}:+{recs[top][2] - rec[2] + 1} or AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
+            fl = live_lengths(wd, "flow").get(pseudo)
+            if fl and rec[4] == 2 * fl and has_equiv_note(wd, pseudo) and g_priority(rec[3], fl) > recs[top][2]:
+                print(f"    its doubled life alone decides it: without the equivalence it would rank"
+                      f" {g_priority(rec[3], fl)} against {recs[top][2]}. what-if: AGBCC_NOEQUIV={pseudo} (no REG_EQUIV,"
+                      f" no doubling; the random table often needs this, see fact 20 and"
+                      f" notes/opus-charged-burst-spark_2026-10-31.md)")
         else:
             print(f"    lever: raise {nm(pseudo)}'s priority above theirs (more uses or a shorter life), or end"
                   f" the overlap; what-if: AGBCC_PRI={kref(wd, func, pseudo)}:+N or AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
@@ -4110,8 +4153,13 @@ def cmd_why(src, func, uid, env, via=None):
     code = srclines[ln - 1].strip() if ln and ln <= len(srclines) else ""
     print(f"why insn {uid}  line {ln}: {code}")
     if row:
-        print(f"  ROM: {row['rom'] or '(none)'}   draft: {row['draft']}   [{'same' if row['tag'] == '=' else 'differs'}]")
-        rr, dr = reg_nums(row["rom"]), reg_nums(row["draft"])
+        twin = register_twin(rows, row)
+        rom_text = row["rom"] or (twin["rom"] if twin else None)
+        print(f"  ROM: {rom_text or '(none)'}   draft: {row['draft']}   [{'same' if row['tag'] == '=' else 'differs'}]")
+        if twin:
+            print(f"  (the listing shows them as '-' and '+' because high registers count in its alignment; the"
+                  f" ROM's {twin['rom']} at {twin['rom_addr']} is this insn with other registers)")
+        rr, dr = reg_nums(rom_text), reg_nums(row["draft"])
         hmap = hard_of(wd)
         pre = next((r for u, _, r in insn_list(wd, "lreg") if u == uid), None)
         for a, b in zip(rr, dr):
