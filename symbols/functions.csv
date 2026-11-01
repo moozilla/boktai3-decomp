@@ -4366,6 +4366,7 @@ addr,name,mode,confidence,source,notes
 08110B7C,SceneTilemap_IsActive,thumb,low,src-alias,Reports whether the scrolling tilemap controller singleton exists
 08110B98,TileRows_CopyPackedRows,thumb,low,src-alias,
 08110BF8,TilemapPanel_DrawRegion,thumb,low,src-alias,
+08110C9C,TilemapPanel_StreamColumns,thumb,low,src-alias,Draws newly exposed 8-pixel columns while the tilemap panel scrolls
 08110E14,SceneTilemap_Update,thumb,low,src-alias,Task callback that samples an external scroll position and streams visible tilemap columns
 08110E38,SceneTilemap_Destroy,thumb,low,src-alias,Task destruction callback that frees both allocated map buffers and clears the singleton
 08110E58,Bg_SetControlFields,thumb,low,src-alias,Packs background control fields into the selected BG control register with a layer-specific priority

@@ -22,5 +22,5 @@ struct TilemapPanel {
 };
 void TilemapPanel_DrawRegion(struct TilemapPanel *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                              s32);
-void sub_08110C9C(struct TilemapPanel *);
+void TilemapPanel_StreamColumns(struct TilemapPanel *);
 #endif
