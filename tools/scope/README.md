@@ -1098,7 +1098,16 @@ Each was read from the compiler source and confirmed on a live draft.
    the test, and on its own line it blocks the reversal the same way. `if (c) break;` on one
    line does not: emit_note drops the repeated line. All 10,094 matched units compile to the
    same `.text` with and without `-g` (35 of them assemble only with `-ffix-debug-line`), so
-   among matched code `-g` changes only this pattern. The project builds without `-g`.
+   among matched code `-g` changes only this pattern. A whole `-g` build still failed to
+   assemble a few units with `asm/macros.inc:1: junk at end of line, first unrecognized
+   character is '@'`. gas reads a .s in 32 KiB buffers, and when its first buffer ends at
+   certain points inside a quoted string, it does not take the `@` that starts an
+   `.include`d file (macros.inc's first-line comment) as a comment. `-g` output is big and
+   full of .debug_info strings whose length depends on the checkout path (DW_AT_comp_dir),
+   so which units failed changed with the path: sub_080332B0 assembles in one worktree and
+   fails when the path is 44, 102, 158 or 217 characters longer. build_c now inlines
+   asm/macros.inc (`build.inline_macros`), as scope already did, so no unit includes a file
+   at its top. The project builds without `-g`.
    Changing that would make matches depend on line breaks, so loops leave through `goto`
    (accepted until phase 4). Storage_RefreshEquipmentSlots matched pin-free this way, and its
    twin Storage_RefreshConsumableSlots lost the two `asm("" : : "r"(row))` barriers that had
