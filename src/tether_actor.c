@@ -3688,8 +3688,6 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
 {
     if (actor->state != 11) {
@@ -3703,27 +3701,16 @@ void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
     if (!actor->stateFrame)
         actor->displayOffsetY = 300;
     {
-        register u32 angle asm("r3") = actor->actionAngle;
-        const s16 *table = gUnk_086149C4;
-        actor->movementDelta.x = scale(table[(angle + 64) & 255] * actor->actionMagnitude);
-        actor->movementDelta.z = scale(table[angle] * actor->actionMagnitude);
-        asm("" : : "r"(angle));
+        u32 angle = actor->actionAngle;
+        actor->movementDelta.x = scale(gUnk_086149C4[(angle + 64) & 255] * actor->actionMagnitude);
+        actor->movementDelta.z = scale(gUnk_086149C4[angle] * actor->actionMagnitude);
     }
     actor->actionMagnitude = (actor->actionMagnitude * 3) >> 2;
-    {
-        register u16 *frame asm("r3") = &actor->stateFrame;
-        u32 current;
-        current = *frame;
-        if (current > 3) {
-            u16 *height = &actor->displayOffsetY;
-            register u32 remaining asm("r2") = *height;
-            u32 reduction = current << 3;
-            if ((s32)remaining >= (s32)reduction)
-                reduction = remaining - reduction;
-            else
-                reduction = 0;
-            *height = reduction;
-        }
+    if (actor->stateFrame > 3) {
+        if (actor->displayOffsetY >= actor->stateFrame * 8)
+            actor->displayOffsetY -= actor->stateFrame * 8;
+        else
+            actor->displayOffsetY = 0;
     }
     ++actor->stateFrame;
     if (actor->actionMagnitude <= 19 && !actor->displayOffsetY) {
