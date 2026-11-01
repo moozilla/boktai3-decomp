@@ -11,6 +11,33 @@ below). With the what-if `AGBCC_PRI=cell:+90` the same draft is 102 / 103,
 shape 67. The matchsearch store is `build/matchsearch/opus_080BF0E4` (node
 `best-t1` is the landed draft; `flip-*` are the order-flipping variants).
 
+## Round 10 (2026-11-01): the table slot follows from the allocation
+
+Still not matched; the blocker is unchanged (actor against cell, below).
+
+* `frame` reports the ROM's table slot (sp+0x5c, `ldr r2, =0x203B400; str r2,
+  [sp, #0x5c]`) and the draft pseudo 773 (`randomSamples`) with `REG_EQUIV`. That
+  is not a separate difference. The loop reads `samples_` (1470), a copy of 773 with
+  no equivalence. Under `AGBCC_PRI_LABEL=cell:+90`, reload evicts 1470 from r3 and
+  gives it sp+0x5c, as in the ROM, with 773 rematerialized into it. In the plain
+  draft it keeps r3, and 1465 (the saved direction byte) takes the last slot
+  instead. `frame` now names such a copy (commit `b7aee82bf`).
+* The halves union that matched 082335F0 and 08234868 (README fact 48) makes this
+  one worse: 375 / 378 with the halves at the top of the arrival helper (u1), 356
+  / 359 with them right before the turn (u2). Under the priority what-if those are
+  143 / 146 and 124 / 127, against 102 / 103 without the union. The first half
+  store reads the uninitialized union. When combine folds that read away,
+  distribute_notes finds no earlier use before the turn's label and leaves a
+  `(use (reg))` there. That keeps the union live from the function's entry
+  (1041 insns, 14 calls) and gives it a second slot, sp+0x1c.
+* Cell (894 in this numbering) has 51 live insns (`life cell`): the selection and
+  test (lines 164-172) and the reroute path. The ROM has the same `player = 0`
+  after the cell computation (`movs r2, #0` at 080BF7A6), the same jump out of
+  the player branch and the same terrain test. None of those insns is one the ROM
+  lacks, so dropping one of them is no lever.
+
+Drafts: `build/scope/drafts/sk2/` (worktree scratch).
+
 ## What the draft settles
 
 * The arrival tail is `Skeleton_ArriveAfterDelay` from the matched neighbor
