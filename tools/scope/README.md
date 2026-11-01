@@ -1029,6 +1029,18 @@ Each was read from the compiler source and confirmed on a live draft.
    and, and the u8 zero, used once, is moved next to its use by local-alloc. Zeros parked in high
    registers in the middle of a halfword update point here.
 
+37. **Exactly three local quantities in a block are not sorted by priority.** block_alloc
+   (local-alloc.c) sorts two or three qtys by hand, but its `qty_compare (0, 1)` and
+   `qty_compare (1, 2)` compare qty numbers (birth order), not the `qty_order` entries it
+   exchanges. With three, only the orders 0-1-2, 0-2-1 and 2-1-0 are reachable: when qty 1
+   outranks qty 0 the two swaps of 0 and 1 cancel, and the first-born value takes r0 ahead of
+   a higher-priority one. Two qtys, or four and more (qsort), go by priority. In
+   PlayerCue_UpdateFacingPose's branches the dir load, the `8 - dir` chain and the facing
+   address were three qtys, so dir got r0 and the chain r1 (the ROM: chain r0); AGBCC_PRI on
+   the chain does nothing, AGBCC_FORCE matches. Storing facing through a block-local pointer
+   and flip through a plain field store left four qtys per branch and the function matched with
+   no pin. `why` prints the order used and the order by priority for such a block.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

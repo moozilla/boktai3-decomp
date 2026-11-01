@@ -1623,6 +1623,49 @@ def alloc_records(wd, func):
     return out
 
 
+def small_sort_order(pris):
+    """local-alloc's allocation order for a block's qtys, given their priorities by qty number.
+    block_alloc sorts 2 or 3 qtys by hand, but its qty_compare(0, 1) and qty_compare(1, 2) compare qty
+    numbers, not the entries of qty_order being exchanged; 4 or more go through qsort (priority, then
+    qty number). Returns (order used, order by priority)."""
+    n = len(pris)
+    real = sorted(range(n), key=lambda q: (-pris[q], q))
+    order = list(range(n))
+    cmp = lambda a, b: pris[b] - pris[a]
+    if n == 3:
+        if cmp(0, 1) > 0:
+            order[0], order[1] = order[1], order[0]
+        if cmp(1, 2) > 0:
+            order[2], order[1] = order[1], order[2]
+    if n in (2, 3) and cmp(0, 1) > 0:
+        order[0], order[1] = order[1], order[0]
+    return (order if n in (2, 3) else real), real
+
+
+def small_sort_note(wd, func, blk):
+    """A note when BLK has exactly three local qtys and local-alloc's hand sort (small_sort_order)
+    allocates them in a different order than their priorities give."""
+    func = dump_func(wd, func)
+    path = os.path.join(wd, "names.txt")
+    qtys = {}
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if p[0] == "L" and p[1] == func and int(p[2]) == blk:
+            qtys.setdefault(int(p[4]), (int(p[3]), int(p[5]), p[11] if len(p) > 11 else "-"))
+    if len(qtys) != 3 or sorted(qtys) != [0, 1, 2]:
+        return None
+    used, real = small_sort_order([qtys[q][1] for q in range(3)])
+    if used == real:
+        return None
+    say = lambda order: ", ".join(f"{qtys[q][0]}{'' if qtys[q][2] == '-' else ' ' + qtys[q][2]}"
+                                  f" (priority {qtys[q][1]})" for q in order)
+    return (f"    block {blk} has exactly three local quantities. block_alloc sorts so few by hand, and its"
+            f" qty_compare(0, 1) / (1, 2) compare qty numbers, not the entries it swaps (local-alloc.c), so they"
+            f" are allocated as {say(used)} instead of by priority ({say(real)}). A fourth local value in"
+            f" the block (for example a store through a block-local pointer), or one fewer, gives a real sort"
+            f" (fact 37)")
+
+
 def conflicts(wd):
     """pseudo -> (pseudo conflicts, hard-register conflicts), from global-alloc's dump."""
     out = {}
@@ -2308,6 +2351,9 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
               f" it got {rname(got)}, the ROM has {rname(want)}.")
+        note = small_sort_note(wd, func, blk)
+        if note:
+            print(note)
     else:
         print(f"    {nm(pseudo)} has no allocation record; it got {rname(got)}, the ROM has {rname(want)}.")
     if rec and rec[0] == "G" and rec[6] != got:
