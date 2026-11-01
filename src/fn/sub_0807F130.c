@@ -25,7 +25,7 @@ static inline s8 SceneActorTarget_FindStimulus(struct SceneActorRegistryResetVie
 }
 
 // confidence=low: starts a route to the tagged position of an overlapping stimulus.
-u32 sub_0807F130(void *object)
+u32 SceneActorTarget_TryStimulusRoute(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
     struct SceneActorChaseGroup *group = &actor->group;
@@ -97,5 +97,5 @@ failed:
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0807F130);
+INCLUDE_ASM("asm/nonmatching", SceneActorTarget_TryStimulusRoute);
 #endif
