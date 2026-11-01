@@ -1956,7 +1956,46 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
         r = next((r for r in range(hrefs - 1, 0, -1) if g_priority(r, hlive) < lpri), None)
         if r:
             out.append(f"{nm(hi)} with {r} refs instead of {hrefs}" + (mention_lines(wd, hi) if wd else ""))
+    lever = macro_lever(wd, lo, lo_rec, hi, hi_rec) if wd else None
+    if lever:
+        a, b, nl, nh = lever
+        out.append(f"a statement macro (`do {{ ... }} while (0)`) around lines {a}-{b}: flow counts each ref"
+                   f" inside its loop notes twice, giving {nm(lo)} {nl} refs ({g_priority(nl, llive)}) against"
+                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)}). Reify it as the macro the original likely had"
+                   f" (the loop notes also end cse blocks there)")
     return out
+
+
+def macro_lever(wd, lo, lo_rec, hi, hi_rec, mentions=None, lines=None):
+    """The narrowest run of C lines (a, b, lo_refs, hi_refs) such that wrapping lines a..b in a do-while(0)
+    lets LO outrank HI: flow adds the loop depth per mention, so a mention moved inside one more loop counts
+    one more ref. Only runs that hold one of LO's mentions at either end are tried. None if none does."""
+    lrefs, llive = lo_rec[3], lo_rec[4]
+    hrefs, hlive = hi_rec[3], hi_rec[4]
+    if mentions is None:
+        mentions = {r: ref_mentions(wd, r) for r in (lo, hi)}
+    if lines is None:
+        lines = uid_lines(wd)
+
+    def by_line(reg):
+        d = {}
+        for u, _ in mentions.get(reg, []):
+            ln = lines.get(u)
+            if isinstance(ln, int):
+                d[ln] = d.get(ln, 0) + 1
+        return d
+
+    lo_l, hi_l = by_line(lo), by_line(hi)
+    keys = sorted(lo_l)
+    best = None
+    for i, a in enumerate(keys):
+        for b in keys[i:]:
+            nl = lrefs + sum(n for ln, n in lo_l.items() if a <= ln <= b)
+            nh = hrefs + sum(n for ln, n in hi_l.items() if a <= ln <= b)
+            if g_priority(nl, llive) > g_priority(nh, hlive) and (best is None or b - a < best[1] - best[0]):
+                best = (a, b, nl, nh)
+                break
+    return best
 
 
 def mention_lines(wd, reg):
