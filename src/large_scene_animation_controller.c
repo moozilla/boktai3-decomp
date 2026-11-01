@@ -1625,11 +1625,6 @@ struct NidhoggrPartInit {
     u8 paletteTransition[0x38];
 };
 
-#ifdef NONMATCHING
-// fuzzy: 99.9%
-// The last loop's 0x120 and callback arguments are loaded before the others.
-// The do/while (0) around the goto loop and the palette writes keeps the
-// flag store's field zero alive (notes/opus-nidhoggr-init-parts_2026-10-31.md).
 void Nidhoggr_InitParts(void *arg0)
 {
     struct NidhoggrPartInit *t = arg0;
@@ -1639,6 +1634,9 @@ void Nidhoggr_InitParts(void *arg0)
     struct NidhoggrTargetRecord *target;
     struct NidhoggrPartCollider *collider;
     u32 damage;
+    u32 partAttributes = 0x120;
+    void (*receiveContact)(void *, struct NidhoggrContactCollider *, struct Nidhoggr *) =
+        Nidhoggr_ReceivePartContact;
     src = ScriptProc_Start(0xcb05, 0x546b);
     t->animHdr = *src;
     ResourceHeader_Relocate(&t->animHdr, src);
@@ -1724,8 +1722,8 @@ void Nidhoggr_InitParts(void *arg0)
             collider->bounds = gUnk_0824F4BC;
             collider->offset = gUnk_0824F4B4;
             Nidhoggr_OrPartFlags(collider, flags);
-            Collider_SetBodyProperties(collider, damage, 0x120, 16);
-            Collider_SetCallback(collider, Nidhoggr_ReceivePartContact, t);
+            Collider_SetBodyProperties(collider, damage, partAttributes, 16);
+            Collider_SetCallback(collider, receiveContact, t);
         }
     }
     {
@@ -1734,35 +1732,30 @@ void Nidhoggr_InitParts(void *arg0)
         for (i = 7; i >= 0; collider++, i--) {
             collider->bounds = gUnk_0824F4BC;
             collider->offset = gUnk_0824F4B4;
-            Collider_SetBodyProperties(collider, damage, 0x120, 16);
-            Collider_SetCallback(collider, Nidhoggr_ReceivePartContact, t);
+            Collider_SetBodyProperties(collider, damage, partAttributes, 16);
+            Collider_SetCallback(collider, receiveContact, t);
             Nidhoggr_OrPartFlags(collider, flags);
         }
     }
     {
         struct NidhoggrPartCollider *collider = &t->colliders[18];
         u32 flags = 0x1008;
-        do {
-            i = 1;
-        nextCollider:
+        for (i = 1; i >= 0;) {
             collider->bounds = gUnk_0824F4BC;
             collider->offset = gUnk_0824F4B4;
-            Collider_SetBodyProperties(collider, damage, 0x120, 16);
-            Collider_SetCallback(collider, Nidhoggr_ReceivePartContact, t);
+            Collider_SetBodyProperties(collider, damage, partAttributes, 16);
+            Collider_SetCallback(collider, receiveContact, t);
             Nidhoggr_OrPartFlags(collider, flags);
             collider++;
-            if (--i >= 0)
-                goto nextCollider;
-            TimePalette_InitTransition(t->paletteTransition, gPaletteBankData + 0x3500,
-                                       gPaletteBankData + 0x3560, gPaletteBankData + 0x3580);
-            t->rows[21].widget.paletteIndex = 0xf1a3;
-            t->rows[21].palette = &t->rowBlink[18];
-        } while (0);
+            if (--i < 0) {
+                TimePalette_InitTransition(t->paletteTransition, gPaletteBankData + 0x3500,
+                                           gPaletteBankData + 0x3560, gPaletteBankData + 0x3580);
+                t->rows[21].widget.paletteIndex = 0xf1a3;
+                t->rows[21].palette = &t->rowBlink[18];
+            }
+        }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Nidhoggr_InitParts);
-#endif
 
 void Anim_Remove(void *);
 
