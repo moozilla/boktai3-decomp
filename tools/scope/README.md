@@ -1209,7 +1209,13 @@ Each was read from the compiler source and confirmed on a live draft.
    so does `source.table` with the address never taken (u6 in ChargedBurst: 54 / 62). Matched
    this way: SingletonSlot7_UpdateShakingDeparture (081EEECC), ChargedBurst_EmitSpark
    (082335F0, with fact 49) and HealthRestoreEffect_StartParticleBurst (08234868, where this
-   was the only difference). `frame` suggests it when it finds the pattern.
+   was the only difference). `frame` suggests it when it finds the pattern. It names instead a
+   copy of the equivalent pseudo that has no equivalence of its own (an inline's parameter):
+   in 080BF0E4 the ROM's slot is that copy's, evicted by reload with the constant
+   rematerialized into it, so the slot follows from register pressure. There the union adds a
+   second slot. Its first half store reads the uninitialized union, and when combine folds
+   that read away, distribute_notes finds no earlier use before the turn's label and leaves
+   a `(use (reg))` there, which keeps the union live from the function's entry.
 
 49. **A pointer sum keeps the C's operand order, and the order decides local-alloc's tie.**
    `&table[index]` and `table + index` expand to `(plus table (index*2))`: c-typeck puts the
