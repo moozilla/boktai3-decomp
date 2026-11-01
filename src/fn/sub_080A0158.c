@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
@@ -27,6 +26,11 @@ struct CrowPlacement {
 
 /* Crow ground-state reset (tentative): clears the context's state, restores the stored position,
  * resnaps the actor to the terrain height and steps the display sequence. */
+static inline void Fill(void *dst, u32 *tmp, u32 v)
+{
+    *tmp = v;
+    CpuSet(tmp, dst, 0x05000002);
+}
 void Crow_ResetGroundState(struct SceneActorRegistryResetView *actor)
 {
     struct CrowResetContext *context = actor->context;
@@ -50,33 +54,9 @@ void Crow_ResetGroundState(struct SceneActorRegistryResetView *actor)
     else
         *(struct CrowPlacement *)((u8 *)actor->drawable + 0x40) =
             *(struct CrowPlacement *)&actor->body.position;
-    {
-        void *dst = &context->vectors[0];
-        void *src = &zero;
-        u32 control = 0x05000002;
-        zero = 0;
-        asm("" : "+r"(src));
-        asm("" : "+r"(control));
-        CpuSet(src, dst, control);
-    }
-    {
-        void *dst = &context->vectors[1];
-        void *src = &zero;
-        u32 control = 0x05000002;
-        zero = 0;
-        asm("" : "+r"(src));
-        asm("" : "+r"(control));
-        CpuSet(src, dst, control);
-    }
-    {
-        void *dst = &context->vectors[2];
-        void *src = &zero;
-        u32 control = 0x05000002;
-        zero = 0;
-        asm("" : "+r"(src));
-        asm("" : "+r"(control));
-        CpuSet(src, dst, control);
-    }
+    Fill(&context->vectors[0], &zero, 0);
+    Fill(&context->vectors[1], &zero, 0);
+    Fill(&context->vectors[2], &zero, 0);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     DisplaySequence_Step(actor->drawable);
 }
