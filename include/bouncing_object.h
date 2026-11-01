@@ -47,4 +47,26 @@ void BouncingObject_ApplyContactImpulse(struct BouncingContact *, struct Bouncin
 void BouncingObject_HandleTimerContact(struct BouncingContact *, void *, struct BouncingObject *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 s32 Math_Atan2(s32, s32);
+
+static inline void BouncingObject_ReleaseSlot(struct BouncingObject *object)
+{
+    s8 *index;
+    {
+        struct BouncingPool *pool = gBouncingPool;
+        s32 id;
+        u32 *used;
+        index = &object->index;
+        id = *index;
+        used = &pool->used;
+        *used &= ~(1U << id);
+    }
+    object->state = 0;
+    Sprite_Remove(object);
+    Shadow_Destroy(object->registration);
+    Collider_Remove(&object->removalCollider);
+    *(u8 *)index = 255;
+    object->flags = 0;
+    object->timer = 0;
+}
+
 #endif
