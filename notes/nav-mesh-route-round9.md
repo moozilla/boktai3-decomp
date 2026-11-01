@@ -1,11 +1,14 @@
 # NavMesh_FindRoute
 
-The guarded route finder reaches 89.9% fuzzy from 27.9%. It chooses the first
-region containing the destination, gathers up to six regions at each endpoint,
-and breaks equal graph distances by the squared distance from the origin to the
-candidate waypoint. Each full-vector copy preserves the fourth halfword. The
-waypoint-only update writes three components and leaves that halfword alone.
+The route finder matches all 1,212 bytes. It gathers up to six regions at
+each endpoint, then chooses a pair of nodes by graph distance. Equal graph
+distances are resolved by squared distance to the origin. A direct route
+copies the complete position, including the fourth halfword. A graph
+waypoint writes only X, Y and Z.
 
-The original 500-case comparison covered cached, failed, direct and waypoint
-routes. The reconstructed candidate still has 62 realigned differences, three
-when registers are ignored. It is four bytes longer than the 1,212-byte ROM body.
+The destination node slot advances after the inner membership scan. Giving
+this cursor its own update keeps agbcc from moving the increment before
+the scan and spilling its result. The index declaration also controls the
+order of the two slots used later during the node-pair search.
+
+Tags: #navigation #matching #round9b

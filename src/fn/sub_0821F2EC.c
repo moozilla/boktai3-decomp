@@ -13,14 +13,43 @@ struct NavMeshRoute {
     struct ContactPosition waypoint;
 };
 
-#ifdef NONMATCHING
-// fuzzy: 89.9%
-// confidence=low: regions the point pair into the navigation graph; returns 0, 1 or 2 and records the result in the state.
-u32 NavMesh_FindRoute(void *arg0, void *arg1, void *arg2)
+#define NAV_MESH_GET_NODE(out, nodes, region, slot)                                                \
+    do {                                                                                           \
+        (out) = &(nodes)[(region)->nodes[(slot)]];                                                 \
+    } while (0)
+
+#define NAV_MESH_COLLECT_NEIGHBORS(nodeArg, regionTable, position, found, count, j, t)             \
+    do {                                                                                           \
+        for (j = 0; j <= 5 && nodeArg->regions[j] != 0xFF && count <= 5; j++) {                    \
+            if (nodeArg->regions[j] != found[0] &&                                                 \
+                NavMesh_IsPointInsideRegion(regionTable, position, nodeArg->regions[j])) {         \
+                s32 isNew = 1;                                                                     \
+                for (t = 0; t < count; t++) {                                                      \
+                    if (found[t] == nodeArg->regions[j])                                           \
+                        isNew = 0;                                                                 \
+                }                                                                                  \
+                if (isNew) {                                                                       \
+                    found[count] = nodeArg->regions[j];                                            \
+                    count++;                                                                       \
+                }                                                                                  \
+            }                                                                                      \
+        }                                                                                          \
+    } while (0)
+
+/* Advance from the slot that supplied the current destination node. */
+static inline s32 NavMesh_NextNodeSlot(s32 *currentSlot, s32 slot)
 {
-    struct NavMeshRoute *state = arg0;
-    const struct ContactPosition *from = arg1;
-    const struct ContactPosition *to = arg2;
+    *currentSlot = slot;
+    return *currentSlot + 1;
+}
+
+/* Returns 2 for the cached endpoints, 1 for a route, or 0 if no route exists. */
+u32 NavMesh_FindRoute(void *route, void *origin, void *destination)
+{
+    s32 i;
+    struct NavMeshRoute *state = route;
+    const struct ContactPosition *from = origin;
+    const struct ContactPosition *to = destination;
     struct NavMeshResource *table;
     struct NavMeshGraph *mesh;
     struct NavMeshRegion *regions;
@@ -31,9 +60,11 @@ u32 NavMesh_FindRoute(void *arg0, void *arg1, void *arg2)
     u16 destinationRegions[6];
     u16 originRegions[6];
     u32 shortest, waypointNode, targetNode;
-    u16 destinationCount, originCount;
-    s32 meshId, regionId;
-    s32 i, j, k, t, u, v;
+    u16 destinationCount;
+    u16 originCount;
+    s32 meshId;
+    s32 regionId;
+    s32 j, k, t, u, v;
 
     if (state->destination.x == to->x && state->destination.z == to->z &&
         state->origin.x == from->x && state->origin.z == from->z)
@@ -46,6 +77,7 @@ u32 NavMesh_FindRoute(void *arg0, void *arg1, void *arg2)
     regionId = 0xFF;
     mesh = 0;
     regions = 0;
+
     for (i = 0; i < table->count; i++) {
         u32 shift = i << 2;
         u32 *offsets = table->offsets;
@@ -61,6 +93,7 @@ u32 NavMesh_FindRoute(void *arg0, void *arg1, void *arg2)
             }
         }
     }
+
     if (regionId == 0xFF) {
         state->status = 0;
         return 0;
@@ -86,50 +119,41 @@ u32 NavMesh_FindRoute(void *arg0, void *arg1, void *arg2)
     destinationRegion = &regions[regionId];
     destinationRegions[0] = regionId;
     destinationCount = 1;
-    for (i = 0; i <= 11 && destinationRegion->nodes[i] != 0xFF && destinationCount <= 5; i++) {
-        struct NavMeshNode *node = &nodes[destinationRegion->nodes[i]];
-        for (j = 0; j <= 5 && node->regions[j] != 0xFF && destinationCount <= 5; j++) {
-            if (node->regions[j] != destinationRegions[0] &&
-                NavMesh_IsPointInsideRegion(regions, to, node->regions[j])) {
-                s32 isNew = 1;
-                for (t = 0; t < destinationCount; t++) {
-                    if (destinationRegions[t] == node->regions[j])
-                        isNew = 0;
-                }
-                if (isNew) {
-                    destinationRegions[destinationCount] = node->regions[j];
-                    destinationCount++;
+    {
+        s32 currentSlot;
+        for (i = 0; i <= 11 && destinationRegion->nodes[i] != 0xFF && destinationCount <= 5;
+             i = NavMesh_NextNodeSlot(&currentSlot, i)) {
+            struct NavMeshNode *node;
+            NAV_MESH_GET_NODE(node, nodes, destinationRegion, i);
+            for (j = 0; j <= 5 && node->regions[j] != 0xFF && destinationCount <= 5; j++) {
+                if (node->regions[j] != destinationRegions[0] &&
+                    NavMesh_IsPointInsideRegion(regions, to, node->regions[j])) {
+                    s32 isNew = 1;
+                    for (t = 0; t < destinationCount; t++) {
+                        if (destinationRegions[t] == node->regions[j])
+                            isNew = 0;
+                    }
+                    if (isNew) {
+                        destinationRegions[destinationCount] = node->regions[j];
+                        destinationCount++;
+                    }
                 }
             }
         }
     }
 
     {
-        u16 current = state->region;
+        u16 current;
         for (t = 0; t < 6; t++)
             originRegions[t] = 0xFF;
-        originRegion = &regions[current];
+        originRegion = &regions[current = state->region];
         originRegions[0] = current;
     }
     originCount = 1;
     for (i = 0; i <= 11 && originRegion->nodes[i] != 0xFF && originCount <= 5; i++) {
         struct NavMeshNode *node = &nodes[originRegion->nodes[i]];
-        for (j = 0; j <= 5 && node->regions[j] != 0xFF && originCount <= 5; j++) {
-            if (node->regions[j] != originRegions[0] &&
-                NavMesh_IsPointInsideRegion(regions, from, node->regions[j])) {
-                s32 isNew = 1;
-                for (t = 0; t < originCount; t++) {
-                    if (originRegions[t] == node->regions[j])
-                        isNew = 0;
-                }
-                if (isNew) {
-                    originRegions[originCount] = node->regions[j];
-                    originCount++;
-                }
-            }
-        }
+        NAV_MESH_COLLECT_NEIGHBORS(node, regions, from, originRegions, originCount, j, t);
     }
-
     for (i = 0; i < originCount; i++) {
         for (j = 0; j < destinationCount; j++) {
             if (originRegions[i] == destinationRegions[j]) {
@@ -188,6 +212,3 @@ u32 NavMesh_FindRoute(void *arg0, void *arg1, void *arg2)
     state->status = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", NavMesh_FindRoute);
-#endif
