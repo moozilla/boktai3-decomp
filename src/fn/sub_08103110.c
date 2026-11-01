@@ -16,10 +16,6 @@ void Player_SetPositionAndSave(void *, void *);
 void TetherActor_SetPosition(void *);
 void TetherActor_AddStatusFlags(s32, u32);
 void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *, struct NamedObject *);
-static inline void SetAttachmentFlags(u16 mask, struct NamedObject *object)
-{
-    object->flags = mask | object->flags;
-}
 static inline void SelectObjectPalette(struct NamedObject *object, s32 index)
 {
     AnimData_SelectPaletteBank(object->anim, index);
@@ -231,14 +227,14 @@ void NamedObject_CreateFromScript(void)
         gPlayers[0]->shadow[1] |= 1;
         cell = SceneActorTerrain_GetCellIndex(&e->body.position);
         TerrainModifiers_RegisterCell(e->registration, cell, 0, e->body.position.y >> 8, 0xFF, 4);
-        SetAttachmentFlags(1, e);
+        NamedObject_EnableFlags(1, e);
         Player_SetPositionAndSave(gPlayers[0], &e->body.position);
         if (follow == 2) {
             TetherActor_SetPosition(&e->body.position);
             NamedObject_ClearAttachmentFlag(manager->tetherName, 1);
             manager->tetherName = e->name;
             TetherActor_AddStatusFlags(3, e->name);
-            SetAttachmentFlags(0x10, e);
+            NamedObject_EnableFlags(0x10, e);
         }
     }
     NamedObject_SnapTetherToPlatform(manager, e);

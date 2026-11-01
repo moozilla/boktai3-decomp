@@ -48,6 +48,14 @@ struct NamedObjectManager {
     u8 movementSoundActive;
 };
 typedef char NamedObjectManagerSizeCheck[(sizeof(struct NamedObjectManager) == 0x137C) ? 1 : -1];
+static inline void NamedObject_EnableFlags(u16 mask, struct NamedObject *object)
+{
+    object->flags = mask | object->flags;
+}
+static inline void NamedObject_DisableFlags(u16 mask, struct NamedObject *object)
+{
+    object->flags &= ~mask;
+}
 struct NamedObject *NamedObject_AllocateSlot(struct NamedObjectManager *);
 void NamedActor_PlayMovementSound(struct NamedObject *);
 void NamedObject_TryCapturePlayer(struct NamedObject *);
