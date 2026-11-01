@@ -31,13 +31,14 @@ static inline u8 nearby(struct SceneVec *p, struct SceneVec *a, struct TriggerOp
 {
     if (absolute(p->x - actor->position.x) <= 95 && absolute(p->y - a->y) <= 127) {
         s32 distance = absolute(p->z - a->z);
-        register u32 yes asm("r0") = 1;
-        asm("" : : "r"(yes));
-        if (distance <= 95)
-            return yes;
+        s32 yes = 1;
+        if (distance > 95)
+            yes = 0;
+        return yes;
     }
     return 0;
 }
+
 static inline s32 cellIndex(struct SceneVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
