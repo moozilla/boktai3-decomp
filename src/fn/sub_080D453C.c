@@ -2,6 +2,7 @@
 // confidence=low: consumes a nearby stimulus and attempts a tagged-position route.
 #define Mummy_TryStimulusRoute sub_080D453C
 #include "scene_actor_chase.h"
+#include "scene_actor_stimulus.h"
 u8 SceneStimulus_FindOverlap(s16, s16, u16, u8, u16);
 void SceneActorPosition_ResolveTaggedPosition(void *, void *, void *, s8);
 u8 SceneActor_TryTrackNearbyPlayer(void *, void *, u32);
@@ -62,14 +63,6 @@ static inline u8 Mummy_TestContactFlags(struct SceneActorReactionMotion *motion,
     if (motion->flags & mask)
         return 1;
     return 0;
-}
-static inline u16 KeepMotionFlags(struct SceneActorRegistryResetView *a, u32 mask, u16 **out)
-{
-    u16 *flags = &a->flags2D4;
-    u16 value = *flags;
-    value &= mask;
-    *out = flags;
-    return value;
 }
 static inline u32 ActorWordBits(struct SceneActorRegistryResetView *a, u32 mask)
 {
@@ -138,11 +131,8 @@ u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
         }
         started = 1;
     }
-    if (KeepMotionFlags(a, 0x80, &motionFlags)) {
-        u16 *timer = &((struct MummyStimulusGroup *)&a->group.common)->movementTimer;
-        *timer += 300;
-        if ((*timer) > (((struct MummyStimulusGroup *)&a->group.common)->timerLimit))
-            *timer = ((struct MummyStimulusGroup *)&a->group.common)->timerLimit;
+    if (SceneActorStimulus_CaptureMotionFlags(a, 0x80, &motionFlags)) {
+        SceneActorStimulus_ExtendGate(a);
     }
     SceneActorPosition_ResolveTaggedPosition(&group->stimulus, &a->body.id, group->route, tag);
     if (SceneActor_TryTrackNearbyPlayer(a, &group->target, group->cell))

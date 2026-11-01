@@ -48,4 +48,22 @@ static inline u8 SceneActorStimulus_CheckBusy(struct SceneActorRegistryResetView
     return SceneActorStimulus_HasLock(raw);
 }
 
+static inline u16 SceneActorStimulus_CaptureMotionFlags(struct SceneActorRegistryResetView *actor,
+                                                        u32 mask, u16 **field)
+{
+    u16 *flags = &actor->flags2D4;
+    u16 value = *flags;
+    value &= mask;
+    *field = flags;
+    return value;
+}
+
+static inline void SceneActorStimulus_ExtendGate(struct SceneActorRegistryResetView *actor)
+{
+    u16 *counter = &actor->group.common.gate.counter;
+    *counter += 300;
+    if (*counter > actor->group.common.gate.duration)
+        *counter = actor->group.common.gate.duration;
+}
+
 #endif
