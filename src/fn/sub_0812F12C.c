@@ -5,8 +5,8 @@
 extern u32 gUnk_02000560;
 void SceneActorPlacement_HideActor(struct SceneActorRegistryActor *, s32);
 void SceneActorPlacement_ShowActor(struct SceneActorRegistryActor *, s32);
-void SceneActorMovement_UpdateStatus(struct SceneActorRegistryActor *);
-void sub_08074EB0(struct SceneActorRegistryActor *);
+s32 SceneActorMovement_UpdateStatus(struct SceneActorRegistryActor *);
+s32 SceneActorMovement_UpdateAnimationAndTerrain(struct SceneActorRegistryActor *);
 void SceneActorPlacement_ConsumeCallbackFlag(struct SceneActorRegistryActor *);
 void SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *);
 s32 SceneActorMovement_RequestAvailableAction(struct SceneActorRegistryActor *);
@@ -62,7 +62,7 @@ s32 SceneActor_UpdateActiveCallbacks(struct SceneActorRegistryActor *p)
         SceneActorMovement_UpdateStatus(p);
         dispatch(&p->contextCallback274, p->context);
         SceneActorMovement_RequestAvailableAction(p);
-        sub_08074EB0(p);
+        SceneActorMovement_UpdateAnimationAndTerrain(p);
         SceneActorPlacement_ConsumeShakeFlags(p);
         SceneActorTarget_OnBindingChanged(p);
         return 1;
