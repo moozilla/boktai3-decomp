@@ -5501,9 +5501,9 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         text = land.wrap_nonmatching(text, name, asm_name or name, info.get("fuzzy", 0.0), info.get("shape"))
         if text is None:
             sys.exit(f"{name}: no definition of {name} in {rel}")
-    text, pins, bars = land.concessions(text)
+    text, pins, bars = land.concessions(text, path)
     if not nonmatching and not allow_pins:
-        added = land.added_concessions(open(path).read() if os.path.exists(path) else "", text)
+        added = land.added_concessions(open(path).read() if os.path.exists(path) else "", text, path)
         if any(added):
             sys.exit(land.pin_refusal(name, *added, dest))
 
