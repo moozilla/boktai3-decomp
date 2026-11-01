@@ -39,6 +39,25 @@ class MacroLever(unittest.TestCase):
         lines = {494: 28, 510: 30, 900: 30, 500: 29, 503: 29, 896: 29}
         self.assertEqual(self.scope.macro_lines(None, 257, lo_rec, 263, hi_rec, mentions, lines), [28, 30])
 
+    def test_hint_requires_a_shared_macro(self):
+        s = self.scope
+        saved = s.macro_lever, s.mention_lines, s.macro_lines, s.source_lines, s.shared_statement_macros
+        try:
+            s.macro_lever = lambda *a, **k: (54, 59, 16, 10)
+            s.mention_lines = lambda *a, **k: ""
+            s.macro_lines = lambda *a, **k: [54, 59]
+            s.source_lines = lambda *a, **k: {54: "x = t[i];"}
+            s.shared_statement_macros = lambda *a, **k: [("READ_SAMPLE", "include/r.h", 3, "(out) = (t)[(i)];")]
+            out = s.flip_levers(str, 26, ("G", 87, 2748, 12, 131, 0, 7), 77, ("G", 81, 3947, 10, 76, 0, 5), wd="w")
+        finally:
+            (s.macro_lever, s.mention_lines, s.macro_lines, s.source_lines,
+             s.shared_statement_macros) = saved
+        hint = next(o for o in out if o.startswith("a statement macro"))
+        self.assertIn("several functions share", hint)
+        self.assertIn("single-use wrapper is a priority knob and counts as a barrier", hint)
+        self.assertIn("each of lines 54, 59 flips it alone", hint)
+        self.assertIn("READ_SAMPLE (include/r.h, 3 files", hint)
+
 
 class SharedMacros(unittest.TestCase):
     @classmethod

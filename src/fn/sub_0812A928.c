@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "contact_position.h"
 #include "engine.h"
 #include "ram.h"

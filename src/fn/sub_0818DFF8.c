@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct StretchBody {
@@ -69,7 +68,6 @@ void Armor_InitPartStretch(struct StretchPart *p)
     if (reset((u8 *)p)) {
         struct StretchBody *parent = p->parent;
         s32 one, choice;
-        register s32 turn asm("r1");
         p->id10A = parent->value;
         p->angle = parent->base + Div(256, parent->count) * p->index118;
         p->x = parent->x + Div(gUnk_086149C4[(p->angle + 64) & 255] * 200, 4096);
@@ -86,29 +84,11 @@ void Armor_InitPartStretch(struct StretchPart *p)
             choice = *(const u16 *)(offset + (u32)gRandomTable);
         }
         choice &= one;
-        {
-            register s32 negative asm("r2") = -1;
-            asm("" : "+r"(negative));
-            turn = negative;
-        }
-        if (choice)
-            turn = 1;
-        {
-            register u32 off asm("r3") = 0x1DA;
-            register u32 addr asm("r0");
-            asm("" : "+r"(off));
-            addr = (u32)p + off;
-            *(s8 *)addr = turn;
-        }
+        p->spin = choice ? 1 : -1;
         p->flagsA2 &= ~4;
         p->flags4E &= ~4;
         p->paramA6 = 16;
         p->param52 = 16;
-        {
-            u32 off = 0x1D0;
-            u32 addr;
-            addr = (u32)p + off;
-            *(void **)addr = Armor_BeginPartStretch;
-        }
+        p->callback = Armor_BeginPartStretch;
     }
 }

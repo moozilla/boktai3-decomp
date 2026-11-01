@@ -148,7 +148,11 @@ that is a scope gap: record it (below) so the tool gets better.
   Register-pinned. Take pins out of a unit you touch.
 * An empty `do { } while (0);` counts as a barrier. Its loop notes end the first cse pass
   and weight register refs the way a barrier does. A statement macro wrapped in
-  `do { ... } while (0)` with a body is ordinary C. An empty one is accepted as ordinary C
+  `do { ... } while (0)` with a body is ordinary C only when the original plausibly had
+  it, and the usual evidence is that several functions share it (twins computing the same
+  thing). One used at a single site, written only to double its statement's refs, is a
+  priority knob: the tools count it as a barrier (`tools/statement_macros.py`) and land
+  refuses it without `--allow-pins`. An empty one is accepted as ordinary C
   only with evidence that the original had a compiled-out macro at that spot, for example
   the same statement in every caller of a shared helper. The tools count it and land
   refuses it without `--allow-pins`.

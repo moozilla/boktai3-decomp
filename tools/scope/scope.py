@@ -1800,6 +1800,42 @@ def class_note(wd, x, got, want):
 HI_NAMES = {8: "r8", 9: "sb", 10: "sl", 11: "fp", 12: "ip"}
 
 
+def minus_one_copy(rows):
+    """Lines for a ROM `movs rA, #1; rsbs rA, rA, #0; adds rB, rA, #0` the draft lacks: reload loading -1
+    for a QImode pseudo (movqi takes only constants 0..255, so -1 goes through a SImode spill register and
+    a copy). A local s8/u8 is promoted to SImode and loads -1 directly (or #0xff); the unpromoted QImode
+    temporary comes from a conditional stored into a struct field, `p->field = c ? 1 : -1;`, which
+    store_field expands into a temporary. Through a cast pointer, `*(s8 *)(p + off) = c ? 1 : -1;`,
+    store_expr instead stores in each arm (Armor_InitPartStretch, Armor_BeginPartTravelToPlayer)."""
+    def triples(seq):
+        out = []
+        for i in range(len(seq) - 2):
+            a = re.fullmatch(r"movs (r\d), #1", seq[i][0])
+            if not a:
+                continue
+            r = a.group(1)
+            b = re.fullmatch(rf"rsbs {r}, {r}, #0", seq[i + 1][0])
+            c = re.fullmatch(rf"adds (r\d), {r}, #0", seq[i + 2][0])
+            if b and c and c.group(1) != r:
+                out.append(seq[i])
+        return out
+    rom, last = [], None
+    for r in rows:  # a ROM-only row has no C line: use the last one seen
+        last = r.get("line") or last
+        if r.get("rom"):
+            rom.append((r["rom"], r.get("line") or last, r.get("tag")))
+    draft = [(r["draft"], r.get("line"), r.get("tag")) for r in rows if r.get("draft")]
+    have = triples(rom)
+    if not have or len(triples(draft)) >= len(have):
+        return []
+    lines = sorted({str(x[1]) for x in have if x[1]})
+    at = f" (near C line {', '.join(lines)})" if lines else ""
+    return [f"minus-one copy: the ROM loads -1 into a spill register and copies it{at}, which is reload "
+            "moving -1 into a QImode pseudo. Store the conditional straight into a struct field, "
+            "`p->field = c ? 1 : -1;` (not through a cast pointer, and not via a local s8, which is "
+            "promoted to SImode)."]
+
+
 def class_misplaced(wd, func, rom_text):
     """Lines for global-alloc pseudos whose preferred class has no allocatable register (STACK_REG, or
     HI_REGS) and that sit in a high register the ROM never names: their class, not their priority, put
@@ -2004,9 +2040,9 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
                    f" inside its loop notes twice, giving {nm(lo)} {nl} refs ({g_priority(nl, llive)}) against"
                    f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)})"
                    + (f"; each of lines {', '.join(map(str, alone))} flips it alone" if len(alone) > 1 else "")
-                   + ". It counts as ordinary C only if the original plausibly had the macro, usually because"
-                   " several functions share it; a single-use wrapper written for the refs is a concession"
-                   " (the loop notes also end cse blocks there)"
+                   + ". Only as a macro the original plausibly had, one several functions share (twins"
+                   " computing the same thing); a single-use wrapper is a priority knob and counts as a barrier"
+                   " (tools/statement_macros.py). The loop notes also end cse blocks there"
                    + ("; shared ones in include/: " + "; ".join(
                        f"{n} ({h}, {k} files: {body})" for n, h, k, body in shared) if shared else ""))
     return out
@@ -2114,6 +2150,15 @@ def mention_lines(wd, reg):
     return " (counted at " + ", ".join(parts) + ")"
 
 
+def later_holders_only(holders, calls, rec, recs):
+    """True when every value seen holding the wanted register is a global-alloc pseudo allocated after
+    this one: the dump's hard-register conflicts include registers handed out later, so the register
+    was free when this pseudo chose, and the order (not a prior holder) is the cause."""
+    if calls or not holders or not rec or rec[0] != "G":
+        return False
+    return all(x >= 16 and recs.get(x, ("L",))[0] == "G" and recs[x][1] > rec[1] for x in holders)
+
+
 def explain_alloc(wd, func, pseudo, want, got, nm, at):
     """Why PSEUDO got hard register GOT and not WANT (the ROM's)."""
     recs, conf, hard = alloc_records(wd, func), conflicts(wd), hard_of(wd)
@@ -2159,10 +2204,10 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         print(f"    it lives across a call, so r0-r3 are unavailable to it: the ROM's value does not cross that call.")
         return
     pc, hc = conf.get(pseudo, (set(), set()))
+    holders, calls = {}, []
     if want in hc:
         seq = insn_list(wd, "lreg")
         idx = [i for i, (_, _, r) in enumerate(seq) if pseudo in regs_of(r)]
-        holders, calls = {}, []
         if idx:
             for u, kind, r in seq[idx[0]:idx[-1] + 1]:
                 if kind == "call_insn" and want < 4:
@@ -2170,6 +2215,7 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
                 for x in regs_of(r):
                     if x != pseudo and (x == want or hard.get(x) == want):
                         holders.setdefault(x, u)
+    if want in hc and not later_holders_only(holders, calls, rec, recs):
         what = [f"{nm(x) if x >= 16 else 'hard r%d' % x} (from {at(u)})" for x, u in list(holders.items())[:5]]
         if calls:
             what.append(f"a call at {at(calls[0])}")
@@ -3592,6 +3638,8 @@ def cmd_why_all(src, func, env, rng=None):
     rom_text = " ".join(r.get("rom") or "" for r in rows)
     for ln in class_misplaced(wd, func, rom_text):
         print("  - " + ln)
+    for ln in minus_one_copy(rows):
+        print("  - " + ln)
     shown = causes + sure
     if len(shown) < 12:
         shown += common[:12 - len(shown)]
@@ -4177,6 +4225,46 @@ def explain_moved(wd, rows, row, nm, at):
           " one constant in two modes); the ROM's order says which copy each reader should get")
 
 
+def reload_move_pseudo(wd, uid, reg, order=None, pre=None, hmap=None):
+    """For an insn reload made to move a value into or out of high register REG (thumb insns cannot use a
+    high register directly), the pseudo allocated to REG that the next insns after UID mention before
+    reload. None if there is not exactly one."""
+    order = [u for u, _, _ in insn_list(wd, "greg")] if order is None else order
+    pre = {u: r for u, _, r in insn_list(wd, "lreg")} if pre is None else pre
+    hmap = hard_of(wd) if hmap is None else hmap
+    if uid not in order:
+        return None
+    i = order.index(uid)
+    for u in order[i + 1:i + 4] + order[max(i - 3, 0):i][::-1]:
+        hits = {x for x in regs_of(pre.get(u)) if x >= 16 and hmap.get(x) == reg}
+        if len(hits) == 1:
+            return hits.pop()
+    return None
+
+
+def insn_shape(text):
+    """An instruction with its registers blanked: `mov sl, r1` and `mov sb, r2` share one shape."""
+    return re.sub(r"\b(?:r\d+|sb|sl|fp|ip|sp|lr)\b", "R", text or "").strip()
+
+
+def pair_rom_only(rows, row):
+    """A draft-only row (tag '+') that sits next to a ROM-only row ('-') of the same shape is really one
+    insn whose registers differ: the aligner drew it as a delete plus an insert. Returns the row merged
+    with that ROM line (tag '~'), or None."""
+    if row.get("tag") != "+" or row.get("rom") or not row.get("draft"):
+        return None
+    try:
+        i = rows.index(row)
+    except ValueError:
+        return None
+    for j in (i - 1, i + 1):
+        if 0 <= j < len(rows):
+            o = rows[j]
+            if o.get("tag") == "-" and o.get("rom") and insn_shape(o["rom"]) == insn_shape(row["draft"]):
+                return dict(row, rom=o["rom"], rom_addr=o.get("rom_addr"), tag="~")
+    return None
+
+
 def cmd_why(src, func, uid, env, via=None):
     import contextlib
     import io
@@ -4202,6 +4290,11 @@ def cmd_why(src, func, uid, env, via=None):
     alloc_diffs = []
     rows = json.load(open(os.path.join(wd, "diff.json")))
     row = via or next((r for r in rows if r["uid"] == uid), None)
+    paired = pair_rom_only(rows, row) if row and not via else None
+    if paired:
+        print(f"  (the listing shows this as an inserted line next to the ROM-only `{paired['rom']}`; the two"
+              " differ only in registers, so they are compared as one insn)")
+        row = paired
     if row and not via and uid not in {u for u, _, _ in insn_list(wd, "greg")}:
         v = pool_load_origin(wd, row["draft"], lines.get(uid))
         if v:
@@ -4326,6 +4419,10 @@ def cmd_why(src, func, uid, env, via=None):
             print("    no class-head takeover found for these registers; see the raw trace")
     for ps, want, got in alloc_diffs:
         # even when cse put this pseudo here, its register is allocation's choice: explain both
+        if ps is None and got >= 8:
+            ps = reload_move_pseudo(wd, uid, got)
+            if ps is not None:
+                print(f"  this is reload's move into {rname(got)}, the register global alloc gave {nm(ps)}:")
         if ps is not None:
             print(f"  allocation: {nm(ps)}")
             explain_alloc(wd, info["obj_name"], ps, want, got, nm, at)
@@ -5536,9 +5633,9 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         text = land.wrap_nonmatching(text, name, asm_name or name, info.get("fuzzy", 0.0), info.get("shape"))
         if text is None:
             sys.exit(f"{name}: no definition of {name} in {rel}")
-    text, pins, bars = land.concessions(text)
+    text, pins, bars = land.concessions(text, path)
     if not nonmatching and not allow_pins:
-        added = land.added_concessions(open(path).read() if os.path.exists(path) else "", text)
+        added = land.added_concessions(open(path).read() if os.path.exists(path) else "", text, path)
         if any(added):
             sys.exit(land.pin_refusal(name, *added, dest))
 

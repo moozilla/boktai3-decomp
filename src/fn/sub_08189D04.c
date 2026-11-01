@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 /* Horizontal deltas use whole tiles; height stays in position units. */
