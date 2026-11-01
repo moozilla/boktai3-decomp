@@ -64,6 +64,12 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
     actor->field2B1 = 1;
 }
 
+// Remaining (scope 38/37): in the sparks the ROM spills the gRandomIndex
+// address (reloaded before each sample) and keeps 20/2/1 in sl/sb/r8; the draft's
+// cse-merged index pseudo (13 refs, priority 1741) outranks the REG_EQUIV
+// constants (~670) and takes sl. Splitting the first sample's address did not
+// lower it. Also open: the group pointer's register at the top and the
+// SetControl/SetAnimation constants the ROM rebuilds instead of sharing.
 void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *actor)
 {
     union {

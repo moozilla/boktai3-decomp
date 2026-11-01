@@ -32,6 +32,7 @@
   scope.py FILE.c put SNIPPET.c [FUNC]   SNIPPET.c (FUNC's definition, with its structs/helpers above) in
                                 place of FUNC's definition, then the score: no hand edits of the unit copy
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
+  scope.py twins [N] [all]      drafts (all: also no C) by their closest matched relative: twins first
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
   scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching] [--allow-pins]   put a matching draft into
                                 src/ (unit merge, or a new src/fn file and the hidden boundary), check the
@@ -1026,6 +1027,10 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
                  ("Load the value, then write the constant first: `u32 v = x; u32 m = K; m |= v; x = m;`"
                   if tied == "constant" else "Write the value first: `m = v | K;`"))
               + " (README fact 33)")
+    for i, ln, reg in arg_order_hints(rows_json):
+        print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
+              f" precomputes an argument that needs converting to its parameter's type: declare that"
+              f" parameter narrower (`u8`) or cast the argument (README fact 35)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -1353,6 +1358,31 @@ def cmd_life(names, func):
             for ln in order:
                 print(f"  line {ln:4}: {len(by[ln]):3}  {' '.join(by[ln])}")
             print("  (* = mentions it; compare two drafts by variable name to see which line gained or lost insns)")
+            note = combine_dead_note([u for u, _ in ins], {u for u, _, _ in insn_list(wd, "combine")},
+                                     {u: r for u, _, r in insn_list(wd, "flow")}, lines)
+            if note:
+                print(note)
+
+
+def combine_dead_note(counted, after_combine, flow_rtl, lines):
+    """A struct halfword `|=`/`&=` expands as a field insertion, `(old & 0) | new`; its zero and second
+    ior reach flow, which counts them toward every life that spans them, and combine deletes them
+    after. In a priority swap those insns are life without code (README fact 34). COUNTED: the uids
+    flow counted toward one pseudo's life; AFTER_COMBINE: the uids still in combine's dump; FLOW_RTL:
+    uid -> rtl at flow. Names the lines with such a zero and how many of their counted insns go."""
+    if not after_combine:
+        return ""
+    gone = [u for u in counted if u in flow_rtl and u not in after_combine]
+    zero_lines = []
+    for u in gone:
+        if re.match(r"\(set \(reg:HI \d+\) \(const_int 0\)\)", flow_rtl[u]) and lines.get(u, 0) not in zero_lines:
+            zero_lines.append(lines.get(u, 0))
+    if not zero_lines:
+        return ""
+    per = ", ".join(f"line {ln} ({sum(1 for u in gone if lines.get(u, 0) == ln)})" for ln in zero_lines)
+    return (f"  halfword field insertion counted in this life, deleted by combine: {per}. A struct u16"
+            " `|=`/`&=` stores as `(old & 0) | new`; written through a `u16 *` (a helper's parameter)"
+            " it has none of these insns (README fact 34)")
 
 
 def alloc_table(wd, func):
@@ -1709,6 +1739,36 @@ def and_tie_hints(rows):
         dk = constant_def(dr, i, p), constant_def(dr, i, q)
         if rk[0] != rk[1] and dk[0] != dk[1] and rk[0] != dk[0]:
             out.append((i, r.get("line") or "", "constant" if rk[0] else "value"))
+    return out
+
+
+def arg_order_hints(rows):
+    """[(row index of the bl, line, register)] where the ROM sets argument register rN first in
+    the setup of a call and the draft sets it later: expand_call precomputed that argument, which
+    it does for one that needs a conversion to the parameter's type (README fact 35)."""
+    out = []
+    for i, r in enumerate(rows):
+        if not (r["rom"] or "").startswith("bl ") or not (r["draft"] or "").startswith("bl "):
+            continue
+        orders = {}
+        for side in ("rom", "draft"):
+            seq = []
+            for j in range(i - 1, max(-1, i - 13), -1):
+                t = rows[j][side]
+                if t is None:
+                    continue
+                if re.match(r"(bl?|b[a-z]{2}|bx|cmp|pop|push)\s", t) or t.startswith("."):
+                    break
+                d = asm_dest(t)
+                if d is not None and d <= 3 and d not in seq:
+                    seq.append(d)
+            orders[side] = seq[::-1]
+        ro, do = orders["rom"], orders["draft"]
+        if len(ro) < 2 or sorted(ro) != sorted(do) or ro == do:
+            continue
+        first = ro[0]
+        if do.index(first) > 0 and [x for x in ro if x != first] == [x for x in do if x != first]:
+            out.append((i, r.get("line") or "", first))
     return out
 
 
@@ -6403,6 +6463,19 @@ def cmd_todo(show, order):
                           like_tables(), arm)
 
 
+def cmd_twins(show, everything):
+    """Functions not yet exact, each with its closest matched relative: where a twin's C may carry over."""
+    import structure
+    import progress
+    funcs, sizes = progress.load_functions()
+    status, files = code_status()
+    try:
+        pinned = progress.collect_pinned(funcs, os.path.join(ROOT, "src"))
+    except Exception:  # the pin marks are a convenience; the ranking stands without them
+        pinned = set()
+    return structure.twins(like_index(), status, funcs, sizes, files, pinned, show, everything, like_tables())
+
+
 def cmd_like(target, show):
     import structure
     import progress
@@ -6707,6 +6780,10 @@ def validate_cli(args):
         if len(tail) > 2 or any(a not in ("addr", "prior", "size") and not a.isdigit() for a in tail):
             cli_error("todo [N] [addr|prior|size]")
         return
+    if cmd == "twins":
+        if len(tail) > 2 or any(a != "all" and not a.isdigit() for a in tail):
+            cli_error("twins [N] [all]")
+        return
     if cmd == "uses":
         if not any(a.isdigit() for a in tail):
             cli_error("uses REG... [PASS...] [FUNC]")
@@ -6791,6 +6868,8 @@ def main():
         return cmd_todo(n, order)
     if args[0] == "like":  # like FUNC|ADDR: matched functions whose ROM looks like this one's
         return cmd_like(args[1], int(args[2]) if len(args) > 2 else 8)
+    if args[0] == "twins":  # twins [N] [all]: drafts (all: also no C) by their closest matched relative
+        return cmd_twins(next((int(a) for a in args[1:] if a.isdigit()), 60), "all" in args[1:])
     if args[0] == "census":  # census [CALLEE]: concessions across src/ grouped by the call they serve
         import structure
         return structure.census(ROOT, want=args[1] if len(args) > 1 else None)
