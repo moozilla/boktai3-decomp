@@ -151,7 +151,7 @@ that is a scope gap: record it (below) so the tool gets better.
   `asm("")` barriers only as above, with `--allow-pins`; the unit carries
   `// MATCHING_CONCESSION: register-pinning` and `progress.py` reports it as
   Register-pinned. Take pins out of a unit you touch.
-* An empty `do { } while (0);` counts as a barrier. Its loop notes end the first cse pass
+* An empty `do { } while (0);`, or `DEBUG_NOP()` (`include/global.h`), which expands to one, counts as a barrier. Its loop notes end the first cse pass
   and weight register refs the way a barrier does. A statement macro wrapped in
   `do { ... } while (0)` with a body is ordinary C only when the original plausibly had
   it, and the usual evidence is that several functions share it (twins computing the same
