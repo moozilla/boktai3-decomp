@@ -1,39 +1,25 @@
 #include "global.h"
 // confidence=low: hidden recovery disables the shadow and waits to enter revival.
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
-static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor, u32 zero)
+#include "scene_actor_reaction.h"
+static inline void Mummy_GetDirectionVariant(struct SceneActorRegistryResetView *actor, u8 *variant,
+                                             u8 *mirror, u32 zero)
 {
-    u8 directionVariant, mirror;
-    u32 selection;
-    register u8 *mirrorPointer asm("r2");
-    u8 *variantPointer = &directionVariant;
-    u32 flags;
-    register u32 mirrorValue asm("r2");
-    u8 variant;
-    register u32 entryFlags asm("r0");
-    u8 *variantReload;
+    s32 quadrant = ((actor->body.direction + 0x60) >> 6) & 3;
+    if (quadrant > 1) {
+        *mirror = 1;
+        *variant = 3 - quadrant;
+    } else {
+        *mirror = zero;
+        *variant = quadrant;
+    }
+}
+
+static inline void Mummy_SelectAnimation(struct SceneActorRegistryResetView *actor, u32 selection,
+                                         u32 variant, u32 flags)
+{
     u32 force;
     u8 *restart;
-    {
-        u8 *mirrorAddress = &mirror;
-        s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
-        asm("" : "+r"(quadrant), "+r"(mirrorAddress));
-        mirrorPointer = mirrorAddress;
-        if (quadrant > 1) {
-            *mirrorPointer = 1;
-            *variantPointer = 3 - quadrant;
-        } else {
-            *mirrorPointer = zero;
-            *variantPointer = quadrant;
-        }
-    }
-    variantReload = &directionVariant;
-    mirrorValue = *mirrorPointer;
-    entryFlags = 4;
-    selection = 8;
-    variant = *variantReload;
-    flags = mirrorValue | entryFlags;
     if (flags & 0x10) {
         force = 0x10;
         flags &= ~0x10;
@@ -41,30 +27,23 @@ static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
-        {
-            void *sequence = drawable->sequence;
-            void *resource = (void *)drawable->resource;
-            u32 selected = (u16)selection;
-            register u32 row asm("r3");
-            row = variant;
-            Anim_SetSequence(sequence, resource, selected, row, flags);
-        }
-        restart = &actor->restart;
+        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+                         (u8)variant, (u8)flags);
+        restart = &actor->field2B3;
     } else {
         struct SceneActorAnimationTile *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
-
         selection += variant;
-        savedSelection = &actor->selection;
-        restart = &actor->restart;
+        savedSelection = &actor->animationIndex;
+        restart = &actor->field2B3;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
-                goto selected;
+                return;
             if (flags == 0 && !(tile->flags & 4))
-                goto selected;
+                return;
         }
         *savedSelection = selection;
         {
@@ -77,7 +56,6 @@ static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor
             Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
                               actor->drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
-            asm("" : "+r"(flags));
             if (flags)
                 tile->flags |= mask;
             else
@@ -85,15 +63,22 @@ static inline void SelectRecoveryAnimation(struct SceneActorAnimationView *actor
         }
     }
     *restart = 0;
-selected:;
 }
 
-#include "scene_actor_reaction.h"
+static inline u8 TakeSaved(u8 *flag, u8 **saved)
+{
+    u32 value = *flag;
+    *saved = flag;
+    if (value) {
+        **saved = 0;
+        return 1;
+    }
+    return 0;
+}
 void Mummy_UpdateRevival(void *);
 void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    register u32 queued asm("r5");
-    u32 t;
+    u32 queued;
     u8 *prepared;
     u32 mask = 1;
     if (!actor->drawableKind) {
@@ -103,36 +88,21 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
         struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->drawable + 0x20);
         tile->flags |= mask;
     }
-    {
-        u32 off = 0x2B2;
-        u8 *q;
-        u32 v;
-        q = (u8 *)actor + off;
-        v = *q;
-        prepared = q;
-        t = v ? ({
-            u32 z = 0;
-            u8 *pp;
-            pp = prepared;
-            *pp = z;
-            1;
-        })
-              : 0;
-    }
-    asm("" : "+r"(t));
-    queued = t;
+    queued = TakeSaved(&actor->field2B2, &prepared);
     if (queued) {
-        u32 off = 0x320;
-        ActorShadow_Disable((u8 *)actor + off);
+        ActorShadow_Disable((u8 *)actor + 0x320);
     } else if (frame > 0x1A) {
         void *callback;
-        u32 kind, zero, one;
-        SelectRecoveryAnimation((void *)actor, queued);
+        u32 kind, zero;
+        {
+            u8 directionVariant, mirror;
+            Mummy_GetDirectionVariant(actor, &directionVariant, &mirror, queued);
+            Mummy_SelectAnimation(actor, 8, directionVariant, mirror | 4);
+        }
         callback = Mummy_UpdateRevival;
         kind = 13;
         zero = 0;
-        one = 1;
-        *prepared = one;
+        *prepared = 1;
         actor->field2B0 = zero;
         actor->field2B5 = kind;
         actor->target = callback;
