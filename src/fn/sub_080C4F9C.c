@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_motion.h"
 #include "display_sequence_inline.h"
-// MATCHING_CONCESSION: register-pinning
 
 struct GolemCombatResetContext {
     u8 pad0[0x624];
@@ -54,8 +53,7 @@ void Golem_ResetCombatState(u8 *p)
     SceneActorMovement_ResolveRoutePosition(p);
     SceneActorAnimation_SelectDirectionalEntry((void *)p, 0);
     {
-        register void *drawable asm("r0") = ((struct GolemResetActor *)p)->spr;
-        asm("" : "+r"(drawable));
-        DisplaySequence_Step(drawable);
+        struct SceneActorControlMotionDrawable *drawable = ((struct GolemResetActor *)p)->spr;
+        DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }
