@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
 static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
 {
@@ -16,9 +15,8 @@ static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inp
     flags = (void *)((u8 *)actor + offset);
     return *flags & mask;
 }
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
+static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
 {
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
     if (actor) {
         if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
             return 1;
@@ -45,13 +43,11 @@ static inline void Hide(struct SceneActorRegistryResetView *actor)
     }
 }
 
-static inline void Show(struct SceneActorRegistryResetView *input)
+static inline void Show(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryResetView *actor = input;
     if (actor->drawableKind == 0) {
         u32 *flags = actor->drawable;
         u32 mask;
-        asm("" ::: "r1");
         mask = ~1;
         *flags &= mask;
     } else {
@@ -68,9 +64,8 @@ static inline void Show(struct SceneActorRegistryResetView *input)
         ActorShadow_Enable((void *)((u8 *)actor + offset));
     }
 }
-void sub_080B5BEC(struct SceneActorRegistryResetView *input)
+void sub_080B5BEC(struct SceneActorRegistryResetView *actor)
 {
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
     struct SceneActorControlMotionState *state;
     u32 unavailable = IsUnavailable(actor);
     if (unavailable)
@@ -97,22 +92,12 @@ void sub_080B5BEC(struct SceneActorRegistryResetView *input)
         }
         value = counter >> 16;
         if (value <= 19) {
-            if (({
-                    u32 shifted = counter >> 18;
-                    register u32 one asm("r1");
-                    one = 1;
-                    shifted & one;
-                }))
+            if ((u8)(counter >> 18) & 1)
                 Show(actor);
             else
                 Hide(actor);
         } else if (value <= 29) {
-            if (({
-                    u32 shifted = counter >> 17;
-                    register u32 one asm("r1");
-                    one = 1;
-                    shifted & one;
-                }))
+            if ((u8)(counter >> 17) & 1)
                 Show(actor);
             else
                 Hide(actor);
