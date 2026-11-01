@@ -15,6 +15,7 @@ struct TileTrigger {
     s16 state;
     u16 triggerFlags;
     u8 forced, frame;
+    s32 timer;
 };
 
 #endif
