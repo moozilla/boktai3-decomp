@@ -2364,7 +2364,13 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
     view = find_reg_view(wd, func).get(pseudo)
     if not view or not rec or rec[0] != "G":
         return False
-    f = view[0]
+    f = next((entry for entry in view if not entry["retrying"] and entry["final"] >= 0), view[0])
+    if f["first"] < 0 and f["final"] >= 0:
+        print(f"    find_reg (global.c) found no free register for {nm(pseudo)}. It took"
+              f" {rname(f['final'])} from local allocation: its references per live instruction"
+              " exceed the aggregate for the locals placed there. All their assignments are"
+              " cleared, including locals in other blocks.")
+        return True
     lo = set(range(8))
     used = f["used1"] & lo
     pass0 = (f["sofar"] - f["used1"] - f["someone"]) & lo
@@ -2614,6 +2620,15 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
               f" it got {rname(got)}, the ROM has {rname(want)}.")
+        if rec[6] != got:
+            for owner, attempts in find_reg_view(wd, func).items():
+                if any(not f["retrying"] and f["first"] < 0 and f["final"] == rec[6] for f in attempts):
+                    print(f"    local allocation first placed {nm(pseudo)} in {rname(rec[6])}."
+                          f" Global allocation took that register for {nm(owner)}, evicting"
+                          " every value local allocation had placed there.")
+                    if want == rec[6]:
+                        return
+                    break
         note = small_sort_note(wd, func, blk)
         if note:
             print(note)
