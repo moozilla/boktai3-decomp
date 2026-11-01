@@ -1,9 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "route_sprite_actor.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
 extern const s16 gUnk_086149C4[];
 extern void *gUnknown_02000580;
@@ -19,12 +19,6 @@ static inline s32 f0806D438_T10(s32 value)
 static inline s32 f0806D438_T12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
-}
-
-static inline u32 f0806D438_NextRandom(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return table[gRandomIndex];
 }
 
 static inline void f0806D438_SubVec(struct ContactPosition *out, struct ContactPosition *a,
@@ -99,8 +93,7 @@ void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)
     s16 angle;
 
     table = gRandomTable;
-    asm("" : "+r"(table));
-    index = Mod(f0806D438_NextRandom(table), route->resource->pointCount);
+    index = Mod(ParticleRandom_ReadSample(table), route->resource->pointCount);
     if (index == route->index) {
         index = Mod(index + 1, route->resource->pointCount);
     }
@@ -115,8 +108,8 @@ void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)
     actor->elevatedPosition = *target;
     actor->prepared = 0;
 
-    angle = f0806D438_NextRandom(table) & 255;
-    radius = f0806D438_NextRandom(table) & 255;
+    angle = ParticleRandom_ReadSample(table) & 255;
+    radius = ParticleRandom_ReadSample(table) & 255;
     f0806D438_Polar(&polar, angle, radius - 0x80);
     actor->elevatedPosition.x = actor->elevatedPosition.x + polar.x;
     actor->elevatedPosition.z = actor->elevatedPosition.z + polar.z;
