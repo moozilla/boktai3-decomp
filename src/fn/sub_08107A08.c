@@ -1,25 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
-#include "scene_vec.h"
+#include "display_sprite_playback.h"
+#include "tile_trigger.h"
 #include "ram.h"
 struct TileTriggerManager {
     u8 unknown0[0x18];
     void *animationData;
-};
-struct TileTrigger {
-    u32 flags;
-    u8 unknown4[0xC];
-    u16 spriteFrame;
-    u8 unknown12[0x62];
-    struct DisplaySequenceState animation;
-    struct SceneVec position;
-    u8 unknown8C[0x2C];
-    u16 sequence, delay, unknownBC;
-    s16 state;
-    u16 triggerFlags;
-    u8 forced, frame;
-    s32 timer;
 };
 void TileTrigger_ApplyContactEffects(struct TileTrigger *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
@@ -36,7 +23,7 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
         table = base->animation.commands;
         command = (const volatile u16 *)((u32)table + offset);
     }
-    sprite->spriteFrame = *command >> 6;
+    sprite->sprite.frame = *command >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
@@ -46,9 +33,9 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 4;
+            owner->sprite.flags |= 4;
         else
-            owner->flags &= ~4;
+            owner->sprite.flags &= ~4;
     }
     {
         u32 input = state->flags;
@@ -61,9 +48,9 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
         asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 8;
+            owner->sprite.flags |= 8;
         else
-            owner->flags &= ~8;
+            owner->sprite.flags &= ~8;
     }
     {
         u32 elapsed = state->elapsed + 1;
@@ -160,9 +147,9 @@ void TileTrigger_StepActivation(struct TileTrigger *p)
                     break;
             }
         }
-        if (!StepPlayback(self, &p->animation, p))
+        if (!PlayerCue_StepSequenceEnded(&self->sprite, &p->animation))
             goto tick;
-        self->flags |= 1;
+        self->sprite.flags |= 1;
         p->state = 1;
         p->timer = 0;
         return;
@@ -179,7 +166,7 @@ void TileTrigger_StepRelease(struct TileTrigger *p)
     struct TileTriggerManager *manager;
     self = p;
     manager = gTileTriggerManager;
-    p->flags &= ~1;
+    p->sprite.flags &= ~1;
     if (p->triggerFlags & 0x40) {
         u8 *forced = &p->forced;
         if (*forced) {
@@ -194,7 +181,7 @@ void TileTrigger_StepRelease(struct TileTrigger *p)
         }
         if (!StepPlayback(self, &p->animation, p))
             goto tick;
-        self->flags |= 1;
+        self->sprite.flags |= 1;
         p->state = 3;
         p->timer = 0;
         p->triggerFlags &= ~0x42;
