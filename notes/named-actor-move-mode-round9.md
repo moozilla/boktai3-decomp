@@ -1,9 +1,8 @@
 # NamedActor_SetMoveModeFromScript
 
-The ROM compares the full script value of `m` against 2 and 4. The older draft
-narrowed it to eight bits, so a value of 258 could incorrectly set bit 1. The
-corrected guarded implementation uses the shared named object slot.
+All 136 bytes match. The two flags are updated through the shared halfword
+helpers. In mode four, the separate clear and set collapse to one store, while
+the implicit halfword zero from the earlier state assignment survives in r6.
+The script value is compared at full width, so mode 258 does not enable bit 1.
 
-The 132-byte candidate scores 93.7%. Every instruction producing a live result
-agrees after realignment. The original's unused zero in r6 at +0x3E, its
-save/restore and alignment account for the remaining differences.
+Tags: #matching #round9b #named-object
