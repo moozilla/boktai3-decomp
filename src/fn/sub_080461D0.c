@@ -10,15 +10,9 @@ struct ContactSequenceScriptArgs {
     u32 unused : 16;
     s32 *values;
 };
-#ifdef NONMATCHING
-// fuzzy: 97.5%
-// Remaining difference: the ROM reloads xzMask (sl) afresh into r2 for the first `&`
-// (movs r3, #0x3f; mov sl, r3; mov r2, sl), where this draft inherits r3. The same
-// no-inheritance pattern appears in 91 ROM places; in matched DirectionalParticle_Spawn and
-// ActorParticles_SpawnWideBurst it comes from a shared constant whose set is HImode (an `&`
-// narrowed by a 16-bit store) and whose use is SImode, so find_equiv_reg rejects the mode.
-// Writing every `& 63` as a narrowed literal shares one HImode pseudo, but it gets no register
-// here (0x1004 takes sl): 8 differing insns.
+/* The 63 masks are 16-bit literals: cse shares one HImode constant register (sl) among
+   them, and reload takes each SImode use from sl afresh because find_equiv_reg rejects a
+   copy made in another mode. */
 static inline u32 RandomValue(const u16 *table)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -44,27 +38,22 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
     struct ContactSequenceScriptArgs args;
     const u16 *table;
 
-    u32 xzMask;
     if (ContactSequenceActor_TakeEntryFlag(actor)) {
         table = (const u16 *)RANDOM_TABLE_ADDR;
-        {
-            u32 sample = RandomValue(table);
-            xzMask = 63;
-            scatter.bits.x = sample & xzMask;
-        }
+        scatter.bits.x = RandomValue(table) & 63;
         scatter.bits.y = RandomBits(table, 127);
-        scatter.bits.z = RandomBits(table, xzMask);
+        scatter.bits.z = RandomValue(table) & 63;
         scatterPosition = &scatter.position;
         scatterPosition->x += actor->position.x;
         scatterPosition->y += (position = &actor->position)->y;
         scatterPosition->z += position->z;
         TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         {
-            u32 sx = RandomBits(table, xzMask), sy, sz;
+            u32 sx = (u16)(RandomValue(table) & 63), sy, sz;
             scatterPosition->x = sx;
             sy = RandomBits(table, 127);
             scatterPosition->y = sy;
-            sz = RandomBits(table, xzMask);
+            sz = (u16)(RandomValue(table) & 63);
             sx += (u16)actor->position.x;
             scatterPosition->x = sx;
             sy += (u16)position->y;
@@ -89,7 +78,3 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
     ContactSequenceActor_SetFlags(actor, 1);
     ContactSequenceActor_Deactivate(parent, actor);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ContactSequenceActor_UpdateDying);
-#endif

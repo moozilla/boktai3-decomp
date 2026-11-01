@@ -1641,6 +1641,44 @@ def insn_list(wd, p):
             for m in re.finditer(r"^\((insn|jump_insn|call_insn)(?:/\w)* (\d+) .*?(?=^\(|\Z)", open(path).read(), re.S | re.M)]
 
 
+def equiv_constant_inherit(greg, lreg, uid, got):
+    """Reload's find_equiv_reg inheritance of a constant (reload.c): an operand pseudo with a REG_EQUIV
+    constant is replaced by the constant before reload, and an earlier insn that loaded that constant
+    into a low register (often the reload of the pseudo's own set) serves it. GREG and LREG are
+    insn_list rows. Returns (pseudo, constant, load uid, set uid) or None."""
+    order = [u for u, _, _ in greg]
+    after = {u: r for u, _, r in greg}
+    kinds = {u: k for u, k, _ in greg}
+    if uid not in after:
+        return None
+    sets = {}
+    for u, _, r in lreg:
+        m = re.match(r"\(set \(reg(?:/\w)*:\w+ (\d+)\) \(const_int (-?\d+)\)\)", r or "")
+        if m:
+            sets.setdefault(int(m.group(1)), []).append((u, int(m.group(2))))
+    before = {u: r for u, _, r in lreg}.get(uid)
+    if before is None:
+        return None
+    i = order.index(uid)
+    for u in reversed(order[max(0, i - 12):i]):
+        r = after[u] or ""
+        m = re.match(r"\(set \(reg(?:/\w)*:\w+ (\d+) \w+\) (.*)\)$", r)
+        if kinds[u] == "call_insn":  # a call clobbers the low registers
+            return None
+        if not m or int(m.group(1)) != got:
+            continue
+        mc = re.match(r"\(const_int (-?\d+)\)$", m.group(2))
+        if not mc:
+            return None
+        c = int(mc.group(1))
+        for ps in regs_of(before):
+            ss = sets.get(ps, [])
+            if len(ss) == 1 and ss[0][1] == c:
+                return ps, c, u, ss[0][0]
+        return None
+    return None
+
+
 def hard_of(wd):
     """pseudo -> hard register, read off the insns: each operand before allocation (lreg) against the
     same operand after reload (greg). Covers local-alloc pseudos, which 'Register dispositions' omits."""
@@ -3967,6 +4005,7 @@ def why_all_issues(text):
             cse = re.match(r"  cse pass (\d) replaced (.*?) by (.*?)\.\n", section)
             regmove = re.match(r"  regmove replaced (.*?) by (.*?)\.\n", section)
             reload = re.match(r"  reload:.*?choice #(\d+)", section)
+            inherit = re.match(r"  reload: (\S+) is inherited by find_equiv_reg[^\n]*?: (\d+) \(?(\w*)", section)
             whatif = knob(section)
             if alloc:
                 pseudo = int(alloc.group(1))
@@ -3990,6 +4029,10 @@ def why_all_issues(text):
             elif regmove:
                 key = ('regmove', tuple(sorted(set(ids(regmove.group(1)) + ids(regmove.group(2))))))
                 title = f"regmove: {regmove.group(1)} -> {regmove.group(2)}"
+            elif inherit:
+                key = ('reload inheritance', int(inherit.group(2)))
+                title = (f"reload inheritance: {inherit.group(1)} still holds the REG_EQUIV constant of"
+                         f" {inherit.group(2)} ({inherit.group(3)}); the ROM reloads it afresh")
             elif reload:
                 key = ('reload rotation', int(reload.group(1)))
                 title = section.splitlines()[0].strip()
@@ -4889,7 +4932,17 @@ def cmd_why(src, func, uid, env, via=None):
                       " took another register; a store, call or other reload between the two insns that"
                       " clobbers the register stops inheritance")
             else:
-                print(f"  {rname(got)} is not a pseudo before allocation and no reload record names it here")
+                eq = equiv_constant_inherit(insn_list(wd, "greg"), insn_list(wd, "lreg"), uid, got)
+                if eq:
+                    ps, c, lu, su = eq
+                    print(f"  reload: {rname(got)} is inherited by find_equiv_reg (reload.c): {nm(ps)} is set"
+                          f" once to {c} ({at(su)}), so it has a REG_EQUIV constant and reload replaces this use"
+                          f" by {c}; {at(lu)} already loaded {c} into {rname(got)}, so reload copies nothing."
+                          f" The ROM's {rname(want)} means it reloaded the value afresh: no constant equivalence"
+                          " for that use, or one made in another mode (find_equiv_reg rejects a copy whose mode"
+                          " differs, as with a 16-bit literal that cse shares as one HImode register; fact 43)")
+                else:
+                    print(f"  {rname(got)} is not a pseudo before allocation and no reload record names it here")
     print(f"  raw traces: {os.path.relpath(wd, ROOT)}/stderr.txt")
     return 0
 
