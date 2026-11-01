@@ -2913,6 +2913,7 @@ addr,name,mode,confidence,source,notes
 0807E7DC,SceneActorMovement_ResolveRoutePosition,thumb,low,src-alias,
 0807E8E8,SceneActorEffects_InitAtActorPosition,thumb,low,src-alias,Initializes the embedded effect context using the actor position and three zero parameters
 0807E908,SceneActorEffects_ReleaseResources,thumb,low,src-alias,
+0807E9D0,SceneActorReaction_HandleColliderContact,thumb,low,src-alias,Handles collision damage or target selection and the corresponding reaction state.
 0807F4B8,SceneActorTarget_ResetContactResponse,thumb,low,src-alias,
 0807F710,SceneActorTarget_ResolvePendingObject,thumb,low,src-alias,
 0807F81C,SceneActorTarget_UpdateTrackedContact,thumb,low,src-alias,Checks the route to a contact target and starts the idle response when it is inactive

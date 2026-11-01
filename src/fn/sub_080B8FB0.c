@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_script.h"
-void sub_0807E9D0(void *, void *);
+void SceneActorReaction_HandleColliderContact(void *, void *);
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
     u32 mask = input;
@@ -38,5 +38,5 @@ void SceneActor_TryForward(void *a, void *b, struct SceneActorRegistryResetView 
     }
     if (*((u8 *)state + 0x6D0))
         return;
-    sub_0807E9D0(a, b);
+    SceneActorReaction_HandleColliderContact(a, b);
 }
