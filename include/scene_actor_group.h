@@ -26,7 +26,7 @@ struct SceneActorRegistryControl {
     u32 radiusSquared;
     u16 timer;
     u8 mode, active;
-    u8 unknownC[8];
+    struct ContactPosition targetPosition;
     u16 field14;
     u8 unknown16[2];
     u32 counter;

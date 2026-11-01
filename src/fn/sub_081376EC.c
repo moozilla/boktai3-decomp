@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_terrain.h"
-#include "scene_actor_reset.h"
+#include "scene_actor_stimulus.h"
 
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
@@ -34,51 +34,6 @@ static inline void SetHalfFlags(u16 *flags, u32 input)
 {
     u32 mask = input;
     *flags |= mask;
-}
-
-static inline u8 TestBit(struct SceneActorReactionMotion *motion, u32 input)
-{
-    u32 mask = input;
-    if (motion->flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline u8 IsIdle(u8 *raw)
-{
-    if (FIELD(raw, 0x2B8, u16) || FIELD(raw, 0x178, u16))
-        return 1;
-    return 0;
-}
-
-static inline u8 IsBusy(struct SceneActorRegistryResetView *actor)
-{
-    u8 *raw = (u8 *)actor;
-    u32 flags2D0, flags2CC;
-    u32 *p = &actor->flags2D0;
-    {
-        u32 mask = ~0x1000000;
-        flags2D0 = *p & mask;
-        *p = flags2D0;
-    }
-    {
-        u32 mask = 0x200000;
-        flags2CC = actor->flags2CC;
-        if (!(mask & flags2CC))
-            return 1;
-    }
-    if (flags2D0 & 4)
-        return 1;
-    if (flags2CC & 0x100)
-        return 1;
-    {
-        u32 mask = 0xE13F;
-        if (actor->flags2D4 & mask)
-            return 1;
-    }
-    if (TestBit((struct SceneActorReactionMotion *)&actor->tracking.target, 0x10))
-        return 1;
-    return IsIdle(raw);
 }
 
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
@@ -192,7 +147,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView 
     s32 settle = 360;
 
     {
-        u32 busy = IsBusy(actor);
+        u32 busy = SceneActorStimulus_CheckBusy(actor);
         if (busy)
             return 0;
         group = (u8 *)&actor->group.common;
