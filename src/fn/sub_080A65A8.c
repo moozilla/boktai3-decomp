@@ -23,27 +23,31 @@ void TentacleBody_UpdateSpreadRelease(struct SceneActorRegistryResetView *actor,
         scale = TentacleSpread_Scale(raw);
         direction = field;
     }
-    *(u16 *)((u8 *)actor + 0x64) += TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
+    *(u16 *)((u8 *)actor + 0x64) +=
+        TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
     *(u16 *)((u8 *)actor + 0x68) += TentacleSpread_Shift(gUnk_086149C4[angle] * scale, 12);
     body->spin += 12;
     n = 0;
     for (i = 0; i < body->segmentCount; i++) {
-        if (TentacleSpread_Test(&body->segments[i], 2) && !TentacleSpread_Test(&body->segments[i], 5)) {
-            body->segments[i].offset.x = Div(*(s16 *)((u8 *)actor + 0x64), i + 1);
-            body->segments[i].offset.y = 0;
-            body->segments[i].offset.z = Div(*(s16 *)((u8 *)actor + 0x68), i + 1);
+        if (TentacleSpread_Test(&body->segments[i], 2) &&
+            !TentacleSpread_Test(&body->segments[i], 5)) {
+            TENTACLE_SPREAD_SET_OFFSET(body->segments[i].offset, actor->body.motion, i + 1);
             switch (n) {
                 case 0:
-                    body->segments[i].position.x = *(u16 *)((u8 *)actor + 0x5C) -
-                                             TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 54, 12);
+                    body->segments[i].position.x =
+                        *(u16 *)((u8 *)actor + 0x5C) -
+                        TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 54, 12);
                     body->segments[i].position.z =
-                        *(u16 *)((u8 *)actor + 0x60) - TentacleSpread_Shift(gUnk_086149C4[*direction] * 54, 12);
+                        *(u16 *)((u8 *)actor + 0x60) -
+                        TentacleSpread_Shift(gUnk_086149C4[*direction] * 54, 12);
                     break;
                 case 1:
-                    body->segments[i].position.x = *(u16 *)((u8 *)actor + 0x5C) -
-                                             TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 20, 12);
+                    body->segments[i].position.x =
+                        *(u16 *)((u8 *)actor + 0x5C) -
+                        TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 20, 12);
                     body->segments[i].position.z =
-                        *(u16 *)((u8 *)actor + 0x60) - TentacleSpread_Shift(gUnk_086149C4[*direction] * 20, 12);
+                        *(u16 *)((u8 *)actor + 0x60) -
+                        TentacleSpread_Shift(gUnk_086149C4[*direction] * 20, 12);
                     break;
                 default:
                     body->segments[i].position.x = *(u16 *)((u8 *)actor + 0x5C);

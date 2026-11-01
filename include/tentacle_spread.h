@@ -34,4 +34,12 @@ static inline u32 TentacleSpread_Scale(u8 spin)
     return magnitude >> 4;
 }
 
+#define TENTACLE_SPREAD_SET_OFFSET(out_, motion_, divisor_)                                        \
+    do {                                                                                           \
+        s32 count_ = (divisor_);                                                                   \
+        (out_).x = Div((motion_).x, count_);                                                       \
+        (out_).y = 0;                                                                              \
+        (out_).z = Div((motion_).z, count_);                                                       \
+    } while (0)
+
 #endif
