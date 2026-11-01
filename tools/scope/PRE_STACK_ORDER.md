@@ -112,7 +112,7 @@ do not rise, and searches:
 * for the nearest table size, how far all the movable bases may shift together and keep
   the order; and when it needs fewer insns, the function body's lines that load a large
   field offset into a register before the add. Each one moved into an inline helper is one
-  insn fewer with the same final code (README fact 30).
+  insn fewer with the same final code (README fact 31).
 
 `frame` prints the same report, without the full key table, when the slot order is not
 pseudo order. Expressions of other shapes (pool loads, register sums) are left out: their

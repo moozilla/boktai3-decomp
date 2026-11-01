@@ -5427,7 +5427,7 @@ def body_offset_loads(wd, func):
     {(file, line): count}, counted in gcse's input. expand_binop (optabs.c) forces a constant outside
     -255..255 into a register when expensive optimizations are on, so `p->field` at a large offset is two
     insns there. In an inline copy integrate.c's try_constants folds the constant back into the add (one
-    insn, fact 30), so each one moved into an inline helper lowers N by one with the same final code."""
+    insn, fact 31), so each one moved into an inline helper lowers N by one with the same final code."""
     path = os.path.join(wd, "u.i.addressof")
     if not os.path.exists(path):
         return {}
@@ -5727,7 +5727,7 @@ def pre_order_report(wd, func, chain, src=None, full=False):
 
 def pre_n_levers(wd, func, unit, n0, want):
     """Lines saying how to reach WANT (lo, hi) insns into gcse without changing the final code: the
-    function body's large field offsets, each one insn fewer inside an inline helper (fact 30)."""
+    function body's large field offsets, each one insn fewer inside an inline helper (fact 31)."""
     if n0 is None or not want or want[1] >= n0:
         return []
     need = n0 - want[1]
@@ -5739,7 +5739,7 @@ def pre_n_levers(wd, func, unit, n0, want):
     shown = ", ".join(f"{ln}" + (f" ({v})" if v > 1 else "") for (_, ln), v in lines[:40])
     return [f"  fewer insns, the same code: the function body loads {total} large field offset(s) into a"
             " register before the add, two insns each into gcse; in an inline helper integrate.c folds the"
-            f" offset into the add (one insn, fact 30). {need} or more fewer reach it. Lines: {shown}"
+            f" offset into the add (one insn, fact 31). {need} or more fewer reach it. Lines: {shown}"
             + (" ..." if len(lines) > 40 else "")]
 
 

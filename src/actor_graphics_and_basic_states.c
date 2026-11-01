@@ -6,6 +6,7 @@
 #include "player.h"
 #include "ram.h"
 #include "debug.h"
+#include "hit_spark_random.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -26,34 +27,51 @@ u8 *SceneActorGraphics_GetDefaultResourceId(void)
 
 int SceneActorGraphics_GetResourceId(struct StateActor *);
 
-// MATCHING_CONCESSION: register-pinning
-void SceneActorGraphics_SelectResource(u8 *p)
+struct T {
+    u8 pad0[0x260];
+    u16 h260, h262, h264;
+    u8 pad266[0x288 - 0x266];
+    u8 *palette;
+    u8 pad28c[0x344 - 0x28C];
+    u16 h344;
+    u8 pad346[0x38C - 0x346];
+    u8 b38C;
+    u8 pad38d;
+    u8 b38E;
+    u8 b38F;
+    u32 w390;
+    u8 pad394[0x3B8 - 0x394];
+    u8 b3B8;
+    u8 pad3b9;
+    u8 b3BA;
+    u8 pad3bb[0x3C4 - 0x3BB];
+    u8 pal3C4[0x5C4 - 0x3C4];
+    u8 pal5C4[0x7C4 - 0x5C4];
+    u8 pal7C4[0x9C4 - 0x7C4];
+    u16 h9C4, h9C6, h9C8;
+    u8 pad9ca[0x9DC - 0x9CA];
+    void *flash;
+};
+void CpuSet(const void *, void *, u32);
+static inline void DispatchSelectPalette(struct T *t, s32 r)
 {
-    /* Raw offsets, not struct SceneActorGraphics fields (0x38c effectScale,
-     * 0x38e effectMode, 0x390 resourceId, 0x288 palette, 0x3c4/0x5c4/0x7c4
-     * palette banks): going through the struct perturbs this pinned match. */
-    if (p[0x38e]) {
-        int resource;
-        p[0x38c] = 0;
-        p[0x38e] = 0;
-        *(int *)(p + 0x390) = SceneActorGraphics_GetResourceId((struct StateActor *)p);
-        resource = SceneActorGraphics_GetResourceId((struct StateActor *)p);
-        {
-            int test = resource;
-            asm("" : "+r"(test));
-            if (test == 0)
-                *(void **)(p + 0x288) = p + 0x5c4;
-            else if (test == 1)
-                *(void **)(p + 0x288) = p + 0x7c4;
-            else {
-                {
-                    void *src = gPaletteBankData + resource * 32;
-                    register void *dst asm("r1") = p + 0x3c4;
-                    CpuSet(src, dst, 0x4000008);
-                }
-                *(void **)(p + 0x288) = p + 0x3c4;
-            }
-        }
+    if (r == 0)
+        t->palette = t->pal5C4;
+    else if (r == 1)
+        t->palette = t->pal7C4;
+    else {
+        CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
+        t->palette = t->pal3C4;
+    }
+}
+
+void SceneActorGraphics_SelectResource(struct T *t)
+{
+    if (t->b38E) {
+        t->b38C = 0;
+        t->b38E = 0;
+        t->w390 = SceneActorGraphics_GetResourceId((struct StateActor *)t);
+        DispatchSelectPalette(t, SceneActorGraphics_GetResourceId((struct StateActor *)t));
     }
 }
 
@@ -357,7 +375,6 @@ static inline void setFacing(ActorAnimation *p, int angle)
 
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 
-// MATCHING_CONCESSION: register-pinning
 void SceneActors_StartDisappearEffect(u32 *position)
 {
     ActorAnimation *p = SceneActors_GetBySlot(0);
@@ -449,39 +466,29 @@ static inline s32 ReadPositionReference(u32 *entry, struct BoxSearchPosition **o
     return *out != NULL;
 }
 
-// MATCHING_CONCESSION: register-pinning
 // Finds the first tracked position inside the inclusive x/z bounds.
 s32 sub_08022624(void *actor, s32 count, struct BoxSearchPosition *min,
                  struct BoxSearchPosition *max)
 {
     u8 *bytes = actor;
     s32 i;
+    for (i = 0; i < count; i++) {
+        s32 offset = i * 4;
+        struct BoxSearchPosition *pos;
+        u32 address = (u32)(bytes + 0x110);
 
-    i = 0;
-    if (i >= count)
-        goto end;
-loop: {
-    s32 offset = i * 4;
-    struct BoxSearchPosition *pos;
-    u32 address = (u32)(bytes + 0x110);
-
-    address += offset;
-    ReadPositionReference((u32 *)address, &pos);
-    if (pos) {
-        s32 x = pos->x;
-        s32 minX = min->x;
-        register s32 inside asm("r4") = 0;
-
-        if (x >= minX && x <= max->x && pos->z >= min->z && pos->z <= max->z)
-            inside = 1;
-        if (inside)
-            return i;
+        address += offset;
+        ReadPositionReference((u32 *)address, &pos);
+        if (pos) {
+            s32 x = pos->x;
+            s32 minX = min->x;
+            s32 inside = 0;
+            if (x >= minX && x <= max->x && pos->z >= min->z && pos->z <= max->z)
+                inside = 1;
+            if (inside)
+                return i;
+        }
     }
-}
-    i++;
-    if (i < count)
-        goto loop;
-end:
     return -1;
 }
 
@@ -628,35 +635,35 @@ void sub_08022878(BurstVec *p)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
 {
     u8 *graphics = (u8 *)p + 0x240;
     struct Packed size;
     int i;
     for (i = 0; i < 2; i++) {
-        int angle, speed;
-        int count;
-        register u32 index asm("r1");
+        u32 angle, count;
+        u32 index;
         u32 *indexPtr;
         u32 mask;
-        int smallMask;
-        register const u16 *table asm("r4");
+        u32 smallMask;
+        u32 value;
+        u32 speed;
         size.x = 164;
         size.y = 16;
         size.z = 164;
         indexPtr = &gRandomIndex;
         mask = 1023;
         smallMask = 3;
-        table = gRandomTable;
-        index = (*indexPtr + 1) & mask;
-        angle = (u8)table[index];
-        index = (index + 1) & mask;
-        count = (table[index] & smallMask) + 2;
-        index = (index + 1) & mask;
+        value = (u32)gRandomTable;
+        index = HitSpark_NextIndex(*indexPtr, mask);
+        angle = (u8)HitSpark_Sample(value, index);
+        index = HitSpark_NextIndex(index, mask);
+        count = (HitSpark_Sample(value, index) & smallMask) + 2;
+        index = HitSpark_NextIndex(index, mask);
         *indexPtr = index;
-        speed = (table[index] & smallMask) + 20;
-        SparkParticle_Spawn((struct ContactPosition *)(graphics + 0x20), 3, &size, angle, count,
+        speed = (HitSpark_Sample(value, index) & smallMask) + 20;
+        value = 3;
+        SparkParticle_Spawn((struct ContactPosition *)(graphics + 0x20), value, &size, angle, count,
                             speed, 2, 2);
     }
 }
@@ -833,37 +840,42 @@ fail:
 
 // confidence=low: chooses the next action phase from the reaction kind and flash state.
 #define SceneActorState_SelectReactionPhase sub_08022DBC
-// MATCHING_CONCESSION: register-pinning
 static inline s32 phaseValue(u8 *p)
 {
     s32 value = *p;
     return value;
 }
+static inline void enterPhase(u8 *p, u32 phase)
+{
+    u8 *field = p + 0xae;
+    u32 zero = 0;
+    *field = phase;
+    *(u32 *)(p + 0xc4) = zero;
+    p[0xb0] = 1;
+}
 void SceneActorState_SelectReactionPhase(u8 *p)
 {
-    u32 phase;
     u8 *actor = p;
     if (*(u32 *)(p + 0x358) == 3) {
         if (p[0x3b9]) {
-            phase = 14;
-            goto set;
+            enterPhase(p, 14);
+            return;
         }
     } else {
         if (p[0x3b9] == 3)
             SceneActors_StopBackgroundFlash(p);
         else if (p[0x3b9]) {
-            phase = 14;
-            asm("" : : "i"(1));
-            goto set;
+            enterPhase(p, 14);
+            return;
         }
     }
     switch (*(u16 *)(actor + 0x3b2)) {
         case 0:
-            phase = 9;
-            break;
+            enterPhase(p, 9);
+            return;
         case 1:
-            phase = 10;
-            break;
+            enterPhase(p, 10);
+            return;
         case 2:
             if (*(u32 *)(actor + 0x358) != 3 && phaseValue(p + 0xe1) <= 63) {
                 u8 *flag = actor + 0x394;
@@ -872,41 +884,30 @@ void SceneActorState_SelectReactionPhase(u8 *p)
                 u8 *flag = actor + 0x394;
                 *flag = 0;
             }
-            phase = 2;
-            break;
+            enterPhase(p, 2);
+            return;
         case 3:
-            phase = 11;
-            break;
+            enterPhase(p, 11);
+            return;
         case 4:
             if (phaseValue(p + 0xe1) <= 63) {
-                phase = 14;
-                asm("" : : "i"(3));
+                enterPhase(p, 14);
+                return;
             } else {
-                phase = 11;
-                asm("" : : "i"(4));
+                enterPhase(p, 11);
+                return;
             }
-            break;
         case 5:
-            phase = 15;
-            break;
+            enterPhase(p, 15);
+            return;
         case 6:
-            phase = 16;
-            break;
-        default:
+            enterPhase(p, 16);
             return;
     }
-set: {
-    register u8 *phaseField asm("r2") = p + 0xae;
-    u32 zero = 0;
-    *phaseField = phase;
-    *(u32 *)(p + 0xc4) = zero;
-    p[0xb0] = 1;
-}
 }
 
 // confidence=low: reaction-kind selector controls the far-point mode and motion timer.
 #define SceneActorState_SnapReactionPosition sub_08022EA4
-// MATCHING_CONCESSION: register-pinning
 void Path_SnapToRandomFarPoint(void *, void *, u32, u32);
 struct SnapVector {
     u32 a, b;
@@ -917,29 +918,32 @@ void SceneActorState_SnapReactionPosition(u8 *p, struct SnapVector *position)
     switch (*(u16 *)(p + 0x3b2)) {
         case 0:
             Path_SnapToRandomFarPoint(position, sprite + 12, 0, 65536);
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 1:
             Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 2:
             Path_SnapToRandomFarPoint(position, sprite + 12, 1, 65536);
             *(u16 *)(p + 0x354) = 32;
             return;
         case 3:
             Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 4:
             Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
-            asm("" : : "i"(4));
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 5:
             Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
-            asm("" : : "i"(5));
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 6:
             Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
-            asm("" : : "i"(6));
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         default:
             *position = *(struct SnapVector *)(p + 0x54);
             break;
@@ -976,37 +980,9 @@ struct S {
     Entry entry;
 };
 
-struct T {
-    u8 pad0[0x260];
-    u16 h260, h262, h264;
-    u8 pad266[0x288 - 0x266];
-    u8 *palette;
-    u8 pad28c[0x344 - 0x28C];
-    u16 h344;
-    u8 pad346[0x38C - 0x346];
-    u8 b38C;
-    u8 pad38d;
-    u8 b38E;
-    u8 b38F;
-    u32 w390;
-    u8 pad394[0x3B8 - 0x394];
-    u8 b3B8;
-    u8 pad3b9;
-    u8 b3BA;
-    u8 pad3bb[0x3C4 - 0x3BB];
-    u8 pal3C4[0x5C4 - 0x3C4];
-    u8 pal5C4[0x7C4 - 0x5C4];
-    u8 pal7C4[0x9C4 - 0x7C4];
-    u16 h9C4, h9C6, h9C8;
-    u8 pad9ca[0x9DC - 0x9CA];
-    void *flash;
-};
-
 extern u8 *gSceneEventDispatchState;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
-
-void CpuSet(const void *, void *, u32);
 
 static inline void setStateFull(struct S *s, u32 state, u32 entered, u32 sub)
 {
@@ -1031,18 +1007,6 @@ static inline void effect2(struct T *p, int mode, int id, int duration)
 }
 
 #define effect(p, id, mode, d) effect2(p, mode, id, d)
-
-static inline void DispatchSelectPalette(struct T *t, s32 r)
-{
-    if (r == 0)
-        t->palette = t->pal5C4;
-    else if (r == 1)
-        t->palette = t->pal7C4;
-    else {
-        CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
-        t->palette = t->pal3C4;
-    }
-}
 
 void SceneActors_DispatchCommands(struct S *s)
 {
@@ -2761,7 +2725,6 @@ void SceneActorState_UpdateLongRecovery(struct S_080247AC *p)
 
 // confidence=low: variant-dependent recovery animations and timed return to the default action.
 #define SceneActorState_UpdateVariantRecovery sub_0802483C
-// MATCHING_CONCESSION: register-pinning
 struct VariantRecoveryActor {
     u8 pad0[0xaa];
     u8 animation, state, mode, index, phase, finished, enter;
@@ -2804,23 +2767,22 @@ void SceneActorState_UpdateVariantRecovery(struct VariantRecoveryActor *p)
     }
     if (p->finished) {
         if (q->state == 3) {
-            u32 animation;
             u32 offset = 0x358;
             if (*(u32 *)((u8 *)q + offset) == 3 && variantAlternate(q, offset)) {
-                animation = 38;
-                asm("" : "+r"(animation));
+                u32 animation = 38;
+                q->animation = animation;
             } else {
-                animation = 17;
+                u32 animation = 17;
+                q->animation = animation;
             }
-            q->animation = animation;
         } else if (p->state == 17) {
-            register u32 animation asm("r0");
             if (q->flags & 4) {
-                animation = 19;
+                u32 animation = 19;
+                p->animation = animation;
             } else {
-                animation = 18;
+                u32 animation = 18;
+                p->animation = animation;
             }
-            p->animation = animation;
         } else {
             u32 zero = 0;
             q->mode = zero;
@@ -3166,22 +3128,21 @@ typedef struct ActorAnimation_08024CE0 {
 
 static inline void setFacing_08024CE0(ActorAnimation_08024CE0 *p, int angle)
 {
+    int shifted;
     u32 value;
-    register int shifted asm("r0");
     p->angle = angle;
     shifted = p->angle + 0x60;
-    asm("" : "+r"(shifted));
     shifted >>= 6;
-    value = 3 & shifted;
+    value = 3;
+    value &= shifted;
     p->facing = value;
     shifted = p->angle + 0x70;
-    asm("" : "+r"(shifted));
     shifted >>= 5;
-    value = 7 & shifted;
+    value = 7;
+    value &= shifted;
     p->facing8 = value;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void SceneActorAnimation_UpdateDirectionalCallback(ActorAnimation_08024CE0 *p)
 {
     ActorAnimation_08024CE0 *p2 = p;
@@ -3248,24 +3209,23 @@ typedef struct ActorAnimation_08024E18 {
 
 static inline void setFacing_08024E18(ActorAnimation_08024E18 *p, int angle)
 {
+    int shifted;
     u32 value;
-    register int shifted asm("r0");
     p->angle = angle;
     shifted = p->angle + 0x60;
-    asm("" : "+r"(shifted));
     shifted >>= 6;
-    value = 3 & shifted;
+    value = 3;
+    value &= shifted;
     p->facing = value;
     shifted = p->angle + 0x70;
-    asm("" : "+r"(shifted));
     shifted >>= 5;
-    value = 7 & shifted;
+    value = 7;
+    value &= shifted;
     p->facing8 = value;
 }
 
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 
-// MATCHING_CONCESSION: register-pinning
 void SceneActorAnimation_UpdateEightDirectionCallback(ActorAnimation_08024E18 *p)
 {
     if (!p->locked)

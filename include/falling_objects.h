@@ -1,6 +1,7 @@
 #ifndef FALLING_OBJECTS_H
 #define FALLING_OBJECTS_H
 #include "engine.h"
+#include "display_sequence.h"
 
 // Tentative: a manager task owning a linked list of objects that drop from above (type 0 and 1
 // props, type 2+ variants with cycling frames), land, then get destroyed or bounce away.
@@ -20,12 +21,6 @@ struct FallingSprite {
     u8 tail[8];
 };
 
-struct FallingAnim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-
 struct FallingObject {
     u16 id;
     u8 type, entered, state, flags; // flags: 1 body collider, 2 attack collider, 4 big
@@ -37,7 +32,7 @@ struct FallingObject {
     void *collider, *attack;
     u8 resource[28];
     struct FallingSprite sprite;
-    struct FallingAnim anim;
+    struct DisplaySequenceState anim;
     u8 effect[108];
     struct FallingObject *previous, *next;
 };

@@ -917,7 +917,17 @@ Each was read from the compiler source and confirmed on a live draft.
    inline). The search knows one cut; when none fits, the order needs two changes or a
    different expression index order.
 
-30. **An inline helper folds field offsets: one insn each, where the body takes two.**
+30. **Identical case bodies that the ROM keeps apart each end in their own copy of the tail.**
+   When a switch's cases share a `break` to one tail, jump2 cross-jumps identical case
+   bodies together (sub_08022EA4's cases 3/4/5 call Path_SnapToRandomFarPoint alike).
+   The ROM's separate copies, each ending `b tail`, came from cases that each wrote the tail
+   and returned: jump2 merges those tails into one copy first, and the bodies before them
+   stay apart. This replaced `asm("" : : "i"(N))` barriers in SceneActorState_SnapReactionPosition
+   (`*(u16 *)(p + 0x354) = 64; return;` per case) and SceneActorState_SelectReactionPhase
+   (an inline that stores the phase, called and returned from at each choice, which also kept
+   its repeated `movs r0, #14; b tail` pairs apart).
+
+31. **An inline helper folds field offsets: one insn each, where the body takes two.**
    expand_binop (optabs.c) forces a constant outside -255..255 into a register when
    expensive optimizations are on (`preserve_subexpressions_p`), so `p->field` at a large
    offset reaches gcse as `(set (reg c) (const_int K))` and `(plus (reg p) (reg c))`, and
@@ -928,7 +938,8 @@ Each was read from the compiler source and confirmed on a live draft.
    and N sets PRE's table size (fact 29). Golem_UpdateChargePursuit: the three identical
    turn-away blocks as `Golem_TurnAway(body)`, with a `Golem_SetBehavior(body, n)` commit,
    took N from 1902 to 1869 and T from 951 to 935. The ROM's slot order needed T 927..939,
-   and the function matched. `preorder` now lists the body lines that load an offset when
+   and the function matched; its stop blocks keep their own commit and `return` for the
+   reason fact 30 gives. `preorder` now lists the body lines that load an offset when
    the order needs fewer insns. A `do { } while (0)` costs two insns into gcse (and is a
    barrier).
 
