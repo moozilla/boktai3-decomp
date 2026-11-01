@@ -988,7 +988,10 @@ Each was read from the compiler source and confirmed on a live draft.
    now prints the lever on each aligned `ands` pair whose tied operand differs (a constant
    in one, the value in the other), also when both read `ands r0, r1` with the registers'
    roles swapped (Vanargand_UpdatePartLeap's terrain mask); the opposite case asks for the
-   value first.
+   value first. The same holds for `orrs` (the hint covers it too): SceneActors_UpdatePeriodicEffectAction's hold
+   flag matched as `u32 value = *flags; u32 mask = 4; mask |= value; *flags = mask;`. Reading
+   the value first also matters there: with `mask = 4` declared before the load, the
+   `movs` came ahead of the `ldrb` (the ROM loads first, then the constant).
 
 ## Survey: random table as a literal address (2026-10-24)
 

@@ -1020,8 +1020,11 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     for i, ln, tied in and_tie_hints(rows_json):
         print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes the {tied}'s register, the draft's"
               f" `{rows_json[i]['draft']}` the other operand's. "
-              + ("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
-                 if tied == "constant" else "Write the value first: `m = v & K;`")
+              + (("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
+                  if tied == "constant" else "Write the value first: `m = v & K;`")
+                 if rows_json[i]["rom"].startswith("ands") else
+                 ("Load the value, then write the constant first: `u32 v = x; u32 m = K; m |= v; x = m;`"
+                  if tied == "constant" else "Write the value first: `m = v | K;`"))
               + " (README fact 33)")
     tail = []
     for x, y, t in reversed(pairs):
@@ -1687,15 +1690,16 @@ def constant_def(texts, i, reg, window=8):
 
 
 def and_tie_hints(rows):
-    """[(row index, line, tied)] where the ROM's `ands rA, rB` writes the register holding the
-    constant and the draft's writes the value (or the other way round): the and's tied operand
-    differs, which the C operand order decides (README fact 33). Identical text counts too, when
-    the registers' roles differ."""
+    """[(row index, line, tied)] where the ROM's `ands rA, rB` (or `orrs`) writes the register
+    holding the constant and the draft's writes the value (or the other way round): the tied
+    operand differs, which the C operand order decides (README fact 33). Identical text counts
+    too, when the registers' roles differ."""
     rom = [r["rom"] for r in rows]
     dr = [r["draft"] for r in rows]
     out = []
     for i, r in enumerate(rows):
-        if not (r["rom"] or "").startswith("ands ") or not (r["draft"] or "").startswith("ands "):
+        op = (r["rom"] or "").split(" ", 1)[0]
+        if op not in ("ands", "orrs") or (r["draft"] or "").split(" ", 1)[0] != op:
             continue
         a, b = (reg_nums(r["rom"]) + [None, None])[:2]
         p, q = (reg_nums(r["draft"]) + [None, None])[:2]
