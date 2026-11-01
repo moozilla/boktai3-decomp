@@ -3834,8 +3834,6 @@ void TetherActor_UpdateDirectedState(struct TetherActor *p)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateReverseDirectedMovement(struct TetherActor *actor)
 {
     if (actor->directedTimer == 30) {
@@ -3848,14 +3846,12 @@ void TetherActor_UpdateReverseDirectedMovement(struct TetherActor *actor)
         }
     } else if (actor->directedTimer <= 29) {
         u32 angle;
-        register const s16 *table asm("r2");
         {
             u32 value = (actor->directedHeading + 5) & 7;
             angle = value << 5;
         }
-        table = gUnk_086149C4;
-        actor->position.x += scale(table[(angle + 64) & 255] * 6);
-        actor->position.z += scale(table[angle] * 6);
+        actor->position.x += scale(gUnk_086149C4[(angle + 64) & 255] * 6);
+        actor->position.z += scale(gUnk_086149C4[angle] * 6);
         actor->heading = ((u8)actor->directedHeading + 4) & 7;
         TetherActor_LimitPlayerDistance(actor);
         actor->moving = 1;
