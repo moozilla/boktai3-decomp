@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "engine.h"
@@ -73,9 +72,7 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
     if (SceneActorRegistry_CountLiving() > 1)
         return;
     timer = q->timer68D;
-    zero = timer;
-    asm("" : "+r"(zero));
-    if (zero)
+    if ((zero = timer) != 0)
         q->timer68D = timer - 1;
     else {
         q->timer68D = 0xF0;
