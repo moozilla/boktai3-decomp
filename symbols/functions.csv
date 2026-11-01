@@ -7649,6 +7649,7 @@ addr,name,mode,confidence,source,notes
 081C6704,StateActor_OnCommand,thumb,low,src-alias,Command callback that dispatches the current command and returns zero
 081C6710,StateActor_EnterPendingState,thumb,low,src-alias,Installs the pending state handler and resets frame and entry bookkeeping
 081C674C,StateActor_OnUpdateState,thumb,low,src-alias,Update callback that clears transient flags and invokes the state handler with its frame count
+081C6780,StateActor_ProcessDirectionMessages,thumb,low,src-alias,
 081C6918,StateActor_OnUpdateDisplay,thumb,low,src-alias,Display update callback that processes actor state and updates position and animation
 081C6938,StateActor_OnRender,thumb,low,src-alias,Render callback that delegates actor visibility and display submission
 081C6944,StateActor_OnUnregisterReceiver,thumb,low,src-alias,Cleanup callback that removes the embedded scene message receiver
