@@ -3,6 +3,7 @@
 
 #include "scene_actor_reset.h"
 #include "actor_animation_controller.h"
+#include "display_sequence_inline.h"
 void Ghost_GetDirectionalFrame(u16, u32 *, u32 *);
 s32 Mod(s32, s32);
 struct GhostVisual {
@@ -19,9 +20,7 @@ struct GhostVisualContext {
 };
 static inline u32 Ghost_GetFrameFactor(u16 v)
 {
-    register u32 value asm("r1") = v;
-    u32 mask = 15;
-    return mask & value;
+    return DisplaySequence_MaskCommand(v, 15);
 }
 // confidence=low: refreshes one of four timed Ghost afterimage sprites at the actor's position.
 inline static void Ghost_StepAfterimage(struct ActorSprite *o, struct ActorAnim *a,
