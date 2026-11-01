@@ -1614,7 +1614,10 @@ def register_twin(rows, row):
     idx = next((i for i, r in enumerate(rows) if r is row), None)
     if idx is None:
         return None
-    shape = REG_TOKEN.sub("R", row["draft"])
+    def copy_shape(text):  # a low-register copy is `adds rD, rS, #0`, a high one `mov rD, rS`: one insn
+        t = REG_TOKEN.sub("R", text)
+        return "mov R, R" if t == "adds R, R, #0" else t
+    shape = copy_shape(row["draft"])
 
     def run(i, tag, step):
         out = []
@@ -1630,7 +1633,7 @@ def register_twin(rows, row):
         hi += 1
     pos = idx - lo
     for minus in (run(lo - 1, "-", -1)[::-1], run(hi + 1, "-", 1)):
-        same = [j for j in minus if rows[j]["rom"] and REG_TOKEN.sub("R", rows[j]["rom"]) == shape]
+        same = [j for j in minus if rows[j]["rom"] and copy_shape(rows[j]["rom"]) == shape]
         if pos < len(minus) and minus[pos] in same:
             return rows[minus[pos]]
         if len(same) == 1:
@@ -2032,13 +2035,73 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
     lever = macro_lever(wd, lo, lo_rec, hi, hi_rec) if wd else None
     if lever:
         a, b, nl, nh = lever
+        alone = macro_lines(wd, lo, lo_rec, hi, hi_rec)
+        src = source_lines(wd)
+        text = " ".join(src.get(ln, "") for ln in alone or range(a, b + 1))
+        shared = shared_statement_macros(want_index="[" in text)
         out.append(f"a statement macro (`do {{ ... }} while (0)`) around lines {a}-{b}: flow counts each ref"
                    f" inside its loop notes twice, giving {nm(lo)} {nl} refs ({g_priority(nl, llive)}) against"
-                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)}). Only as a macro the original plausibly had,"
-                   f" one several functions share (twins computing the same thing); a single-use wrapper is a"
-                   f" priority knob and counts as a barrier (tools/statement_macros.py). The loop notes also"
-                   f" end cse blocks there")
+                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)})"
+                   + (f"; each of lines {', '.join(map(str, alone))} flips it alone" if len(alone) > 1 else "")
+                   + ". Only as a macro the original plausibly had, one several functions share (twins"
+                   " computing the same thing); a single-use wrapper is a priority knob and counts as a barrier"
+                   " (tools/statement_macros.py). The loop notes also end cse blocks there"
+                   + ("; shared ones in include/: " + "; ".join(
+                       f"{n} ({h}, {k} files: {body})" for n, h, k, body in shared) if shared else ""))
     return out
+
+
+def macro_lines(wd, lo, lo_rec, hi, hi_rec, mentions=None, lines=None):
+    """The single C lines whose mentions, inside one more loop, would each let LO outrank HI."""
+    if mentions is None:
+        mentions = {r: ref_mentions(wd, r) for r in (lo, hi)}
+    if lines is None:
+        lines = uid_lines(wd)
+    count = {}
+    for reg in (lo, hi):
+        for u, _ in mentions.get(reg, []):
+            ln = lines.get(u)
+            if isinstance(ln, int):
+                count.setdefault(reg, {}).setdefault(ln, 0)
+                count[reg][ln] += 1
+    lo_l, hi_l = count.get(lo, {}), count.get(hi, {})
+    return [ln for ln in sorted(lo_l)
+            if g_priority(lo_rec[3] + lo_l[ln], lo_rec[4]) > g_priority(hi_rec[3] + hi_l.get(ln, 0), hi_rec[4])]
+
+
+_SHARED_MACROS = None
+
+
+def shared_statement_macros(want_index=False, limit=3, root=None):
+    """[(name, header, files, body)] for the statement macros (`do { ... } while (0)` with a body) in
+    include/ that two or more src files use, directly or through a static inline of the same header: the
+    shared ones count as evidence the original had them. WANT_INDEX keeps the ones that read through an
+    index (`x[i]`), the usual case for a random-table sample."""
+    global _SHARED_MACROS
+    found = _SHARED_MACROS if root is None else None
+    if found is None:
+        found, base = [], root or ROOT
+        srcs = {}
+        for f in glob.glob(os.path.join(base, "src", "**", "*.c"), recursive=True):
+            srcs[f] = open(f, errors="replace").read()
+        for h in sorted(glob.glob(os.path.join(base, "include", "*.h"))):
+            text = open(h, errors="replace").read()
+            for m in re.finditer(r"#define\s+(\w+)\([^)]*\)\s*\\\n\s*do\s*\{(.*?)\}\s*while\s*\(\s*0\s*\)",
+                                 text, re.S):
+                name, body = m.group(1), re.sub(r"\s*\\\n\s*", " ", m.group(2)).strip()
+                if not body:
+                    continue  # an empty one is a barrier (DEBUG_NOP), not evidence
+                users = {name} | {f.group(1) for f in re.finditer(
+                    r"static inline [^;{]*?\b(\w+)\([^;{]*\)\s*\{(?:[^{}]|\{[^{}]*\})*?\b%s\(" % name, text)}
+                pat = re.compile(r"\b(?:%s)\(" % "|".join(map(re.escape, users)))
+                files = sum(1 for t in srcs.values() if pat.search(t))
+                if files >= 2:
+                    found.append((name, os.path.relpath(h, base), files, body[:60]))
+        found.sort(key=lambda r: -r[2])
+        if root is None:
+            _SHARED_MACROS = found
+    rows = [r for r in found if not want_index or "[" in r[3]]
+    return rows[:limit]
 
 
 def macro_lever(wd, lo, lo_rec, hi, hi_rec, mentions=None, lines=None):
@@ -2087,7 +2150,18 @@ def mention_lines(wd, reg):
         shift = re.search(r"\((?:ashift|ashiftrt|lshiftrt):SI \(reg(?:/\w)*:SI %d\)" % reg, pats.get(u, "")) \
             or re.search(r"\(set \(reg(?:/\w)*:SI %d\) \((?:ashift|ashiftrt|lshiftrt):" % reg, pats.get(u, ""))
         parts.append(f"line {lines.get(u, '?')}" + (f" x{d}" if d > 1 else "") + (" in a shift" if shift else ""))
-    return " (counted at " + ", ".join(parts) + ")"
+    # refs in code that jump2 deletes as a duplicate tail (cross-jumping, fact 27) count for allocation
+    # but leave no instruction: a source that reaches the surviving copy instead never counts them
+    after_reload = {u for u, _, _ in insn_list(wd, "greg")}
+    kept = {u for u, _, _ in insn_list(wd, "jump2")}
+    crossed = [u for u, _ in ms if u in after_reload and kept and u not in kept]
+    tail = ""
+    if crossed:
+        where = sorted({lines.get(u, '?') for u in crossed}, key=lambda x: (not isinstance(x, int), x))
+        tail = (f"; {len(crossed)} of them in tails jump2 cross-jumps away (line{'s' if len(where) > 1 else ''} "
+                + ", ".join(map(str, where)) + "): a source that shares that code instead of writing it"
+                " out again has that many fewer refs, with the same instructions")
+    return " (counted at " + ", ".join(parts) + tail + ")"
 
 
 def later_holders_only(holders, calls, rec, recs):
