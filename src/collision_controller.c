@@ -1,4 +1,5 @@
 #include "collision_controller.h"
+#include "scene_actor_status.h"
 /* CollisionController_ClearGlobal: Zeroes gCollisionManager; matches the ClearGlobal pattern already used by EffectManager_ClearGlobal and is hinted by the file's own #define. */
 #define CollisionController_ClearGlobal sub_08009E30
 // MATCHING_CONCESSION: register-pinning
@@ -96,21 +97,6 @@ static inline s32 globalMode(void)
     if (active && gPlayerInteractionMode == 4)
         yes = 1;
     return yes;
-}
-
-static inline void resetIdle(struct CollisionManager *manager)
-{
-    u32 one = 1;
-    u8 *p = &manager->slots[0].mode;
-    register s32 i asm("r6") = 15;
-    do {
-        if (p[0] == 0) {
-            p[0] = 0;
-            *(u16 *)(p + 8) = 0;
-            p[5] = one;
-        }
-        p += 160;
-    } while (--i >= 0);
 }
 
 static inline u32 randomDelay(u32 restart)
@@ -340,55 +326,43 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
     }
 }
 
-s32 CollisionController_UpdateAll(struct CollisionManager *input)
+s32 CollisionController_UpdateAll(struct CollisionManager *manager)
 {
-    struct CollisionManager *manager = input;
     s32 paused = 0;
     s32 i;
     struct CollisionSlot *p;
     u32 mode = gSunClock.mode;
-    s32 available;
-    if ((u8)(mode - 4) <= 1 || mode == 0)
-        goto pause;
-    if (gEngineFlags & 2048)
-        available = stateMode();
-    else {
-        struct Player *actor;
-        if (gWeatherCollisionTimer > 0)
-            goto pause;
-        actor = gPlayers[0];
-        if (actor) {
-            u32 *address = &actor->actionFlags;
-            u32 mask = 16;
-            if (*address & mask)
-                goto pause;
-        }
-        available = globalMode();
-    }
-    asm("" : : "r"(available));
-    if (available) {
-    pause:
+    if ((u8)(mode - 4) <= 1 || mode == 0 || ActorStatus_EnvironmentPaletteActive(0)) {
         paused = 1;
         if (manager->paused == 0)
-            resetIdle(manager);
-    } else if (manager->paused == 1)
-        resetIdle(manager);
-    manager->paused = paused;
-    asm("" : "+r"(manager) : : "r4", "r5", "r6");
-    {
-        register void **table asm("r9") = &gUnk_08604A00[0][0];
-        u32 row = paused * 12;
-        u8 *control = &manager->slots[0].mode;
-        p = manager->slots;
-        for (i = 15; i >= 0; control += 160, p++, i--)
-            if (control[3]) {
-                if (control[4])
-                    CollisionController_RemoveSlot(manager, p);
-                else {
-                    control[6] = 0;
-                    sub_08249240(manager, p, *(void **)(control[0] * 4 + row + (u32)table));
+            for (i = 0; i < 16; i++) {
+                struct CollisionSlot *slot = &manager->slots[i];
+                if (slot->mode == 0) {
+                    slot->mode = 0;
+                    slot->timer = 0;
+                    slot->entered = 1;
                 }
             }
+    } else if (manager->paused == 1)
+        for (i = 0; i < 16; i++) {
+            struct CollisionSlot *slot = &manager->slots[i];
+            if (slot->mode == 0) {
+                slot->mode = 0;
+                slot->timer = 0;
+                slot->entered = 1;
+            }
+        }
+    manager->paused = paused;
+    for (i = 0; i < 16; i++) {
+        p = &manager->slots[i];
+        if (p->active) {
+            if (p->finished)
+                CollisionController_RemoveSlot(manager, p);
+            else {
+                p->done = 0;
+                sub_08249240(manager, p, gUnk_08604A00[paused][p->mode]);
+            }
+        }
     }
     return 0;
 }
