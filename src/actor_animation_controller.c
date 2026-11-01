@@ -4324,11 +4324,6 @@ struct ActorRegionController {
     struct ActorRegionChild children[16];
 };
 
-struct ActorRegionCount {
-    s32 count;
-    u8 unk_04[0xd8];
-};
-
 struct ActorRegionPlayer {
     u8 unk_00[0x5a0];
     u32 region;
@@ -4342,38 +4337,28 @@ static inline u8 ActorChild_IsCurrentRegion(u32 current, u32 region)
 }
 
 /* Update child visibility for the current region, then tick active visible children. */
-#ifdef NONMATCHING
-// fuzzy: 61.8%
-// scope shape 28 (differences once low registers are set aside)
 void Actor_UpdateRegionChildren(struct ActorRegionController *p)
 {
-    s32 i = 0;
-    struct ActorRegionCount *countBase = (struct ActorRegionCount *)&p->children[0].regionCount;
-    struct ActorRegionChild *children = p->children;
-    for (; i < 16; i++) {
+    s32 i;
+    for (i = 0; i < 16; i++) {
+        struct ActorRegionChild *children = p->children;
         s32 visible = 0;
-        if (visible < countBase[i].count) {
+        if (visible < p->children[i].regionCount) {
             u32 current = ((struct ActorRegionPlayer *)gGameState)->region;
-            s32 count = p->children[i].regionCount;
-            s32 j = 0;
-            do {
+            s32 j;
+            for (j = 0; j < p->children[i].regionCount; j++) {
                 if (ActorChild_IsCurrentRegion(current, p->children[i].regions[j]))
                     visible = 1;
-                j++;
-            } while (--count != 0);
+            }
         }
-        {
-            u32 value;
-            if (visible)
-                value = children[i].flags & ~1;
-            else
-                value = children[i].flags | 1;
-            children[i].flags = value;
-        }
+        if (visible)
+            children[i].flags &= ~1;
+        else
+            children[i].flags |= 1;
     }
     for (i = 0; i < 16; i++) {
         if (p->children[i].control & 4) {
-            if (!(children[i].flags & 1)) {
+            if (!(p->children[i].flags & 1)) {
                 if (p->children[i].timer)
                     p->children[i].timer--;
                 p->children[i].callback(p, &p->children[i]);
@@ -4381,9 +4366,6 @@ void Actor_UpdateRegionChildren(struct ActorRegionController *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Actor_UpdateRegionChildren);
-#endif
 
 /* Tentative role: Copy the saved position and dispatch the animation phase. */
 
