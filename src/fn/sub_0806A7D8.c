@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_playback.h"
 void Heap_Free(void *);
 void SpriteEffectController_TickAnimation(struct SpriteEffectControllerPool *unusedPool,
@@ -17,11 +16,8 @@ void SpriteEffectController_TickAnimation(struct SpriteEffectControllerPool *unu
     }
     {
         u16 *lowFlags = &controller->flags;
-        register u32 loaded asm("r1") = *lowFlags;
-        u32 selected = loaded & 8;
-        asm("" : "+r"(selected) : "r"(lowFlags));
+        mode = *lowFlags & 8;
         flags = lowFlags;
-        mode = selected;
     }
     if (mode) {
         ended = SpriteEffectController_StepDrawable(controller, 1);
@@ -32,17 +28,10 @@ void SpriteEffectController_TickAnimation(struct SpriteEffectControllerPool *unu
     }
     SpriteEffectController_RefreshCollider(controller, position);
     if (*flags & 0x80) {
-        register struct ContactPosition *velocity asm("r1") = &controller->velocity;
-        register u32 x asm("r0");
-        x = (u16)position->x;
-        asm("" : "+r"(x));
-        position->x = x + (u16)controller->velocity.x;
-        x = (u16)position->y;
-        asm("" : "+r"(x));
-        position->y = x + (u16)velocity->y;
-        x = (u16)position->z;
-        asm("" : "+r"(x));
-        position->z = x + (u16)velocity->z;
+        struct ContactPosition *velocity = &controller->velocity;
+        position->x = velocity->x + position->x;
+        position->y = velocity->y + position->y;
+        position->z = velocity->z + position->z;
     }
     controller->frame++;
     if (ended) {
@@ -52,11 +41,7 @@ void SpriteEffectController_TickAnimation(struct SpriteEffectControllerPool *unu
             struct SpriteEffectDrawablePrefix *drawable;
             gSpriteEffectControllerPool->used &= ~(1 << controller->index);
             controller->state = 0;
-            {
-                register u16 *reloadFlags asm("r2") = flags;
-                asm("" : "+r"(reloadFlags));
-                mode = *reloadFlags & 8;
-            }
+            mode = *flags & 8;
             if (mode) {
                 drawable = controller->drawable;
                 if (drawable->active) {
