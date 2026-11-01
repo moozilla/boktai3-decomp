@@ -21,26 +21,24 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-struct DamageHitHalfword {
-    s16 bits : 16;
-};
 struct DamageMotionOwner {
     u16 *field;
 };
-static inline u32 MarkHitSaveOwner(struct SceneActorRegistryResetView *actor, s16 bits,
-                                   struct DamageMotionOwner *owner)
-{
-    struct DamageHitHalfword *field = (void *)&actor->flags2D4;
-    struct {
-        s32 bits : 16;
-    } mask;
-    u32 value;
-    mask.bits = bits;
-    value = mask.bits | *(u16 *)field;
-    field->bits = value;
-    owner->field = (void *)field;
-    return value;
-}
+// Both statement macros need their do/while (0): written as plain blocks, 20
+// (DAMAGE_MARK_HIT) or 113 (DAMAGE_READ_MASKED_FLAGS) instructions differ.
+#define DAMAGE_MARK_HIT(actor_, mask_, owner_, out_)                                               \
+    do {                                                                                           \
+        u32 value = (mask_);                                                                       \
+        u16 *field = &(actor_)->flags2D4;                                                          \
+        value |= *field;                                                                           \
+        *field = value;                                                                            \
+        (owner_)->field = field;                                                                   \
+        (out_) = value;                                                                            \
+    } while (0)
+#define DAMAGE_READ_MASKED_FLAGS(out_, mask_, value_)                                              \
+    do {                                                                                           \
+        (out_) = (mask_) & (value_);                                                               \
+    } while (0)
 static inline u8 HasPendingHit(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2E6 == 0)
@@ -207,10 +205,6 @@ static inline void Fill(u32 *zero, void *dst)
     CpuSet(zero, dst, 0x05000002);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 96.4%
-// scope shape 4 (differences once low registers are set aside)
-// scope shape 28 (differences once low registers are set aside)
 u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
 {
     s16 *savedHealth;
@@ -221,38 +215,38 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     u32 mode;
     u32 *flags2D8;
     u32 *flags2CC;
-    u16 updated;
+    u32 updated;
     u32 four;
     u32 bits;
     u32 strong;
     u32 c1;
     if (!HasPendingHit(actor)) {
         if (SceneActorReaction_ApplyAreaDamage(actor)) {
-            {
-
-                u16 *borrowed = &actor->flags2D4;
-                u32 flags = *borrowed;
-                flags2D4 = borrowed;
-                if (flags) {
-                    u32 down = IsDown(actor, flags);
-                    if (down) {
-                        u32 zero = 0;
-                        *flags2D4 = 0x40;
-                        actor->field2E6 = zero;
-                        {
-                            u16 *flags2D6 = &actor->flags2D6;
-                            s32 mask = ~0x980;
-                            *flags2D6 &= mask;
-                        }
-                        goto hitFlagsDone;
-                    }
+            u16 *borrowed = &actor->flags2D4;
+            u32 flags = *borrowed;
+            flags2D4 = borrowed;
+            // The clear is written in both places it applies. jump2 cross-jumps the
+            // two copies into one, but reload has already loaded the 0x2CC offset for
+            // each, which advances its spill rotation before IsDown.
+            if (!flags) {
+                u32 *flags2CC = &actor->flags2CC;
+                u32 mask = ~0x2000;
+                *flags2CC &= mask;
+            } else {
+                u32 down = IsDown(actor, flags);
+                if (down) {
+                    u32 zero = 0;
+                    *flags2D4 = 0x40;
+                    actor->field2E6 = zero;
                     {
-                        u32 mask = 0x803E;
-                        flags = *flags2D4;
-                        if (!(mask & flags))
-                            goto hitFlagsClear;
+                        u16 *flags2D6 = &actor->flags2D6;
+                        s32 mask = ~0x980;
+                        *flags2D6 &= mask;
                     }
-                    {
+                } else {
+                    u32 mask = 0x803E;
+                    flags = *flags2D4;
+                    if (mask & flags) {
                         u32 *flags2CC;
                         {
                             union {
@@ -300,16 +294,12 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
                             u32 bit = 0x2000;
                             *flags2CC |= bit;
                         }
-                        goto hitFlagsDone;
+                    } else {
+                        u32 *flags2CC = &actor->flags2CC;
+                        u32 mask = ~0x2000;
+                        *flags2CC &= mask;
                     }
                 }
-            hitFlagsClear: {
-                u32 *flags2CC = &actor->flags2CC;
-                u32 mask = ~0x2000;
-                *flags2CC &= mask;
-            }
-
-            hitFlagsDone:;
             }
             SceneActor_ClearReactionFlags(actor);
             return 1;
@@ -329,12 +319,12 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     }
     {
         struct DamageMotionOwner savedMotion;
-        updated = MarkHitSaveOwner(actor, 0x20, &savedMotion);
+        DAMAGE_MARK_HIT(actor, 0x20, &savedMotion, updated);
         {
             u32 v = actor->field2E6;
             four = 4;
             c1 = four;
-            bits = c1 & v;
+            DAMAGE_READ_MASKED_FLAGS(bits, c1, v);
             mode = 1;
             flags2D4 = savedMotion.field;
             savedHealth = healthOwner.field;
@@ -425,6 +415,3 @@ done: {
     SceneActorTerrain_ClearCollisionTimers(actor);
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ResolveDamage);
-#endif
