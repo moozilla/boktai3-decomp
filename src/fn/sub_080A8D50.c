@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 /* TentacleBody_InitSegmentAnimations: Loads animation data and scripts for each tentacle segment */
 
 s32 Div(s32, s32);
@@ -45,11 +44,7 @@ void TentacleBody_InitSegmentAnimations(u8 *p, s32 animId, u32 scriptKey, u32 di
     s32 row, frame;
 
     g->count = 4;
-    {
-        register u32 m asm("r2");
-        m = 4;
-        g->mode = m;
-    }
+    g->mode = g->count;
     g->limit = 0x7fffffff;
     g->step = Div(*(s16 *)(p + 0x9c), g->count + 1);
     first = 0;
