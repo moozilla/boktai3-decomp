@@ -975,6 +975,21 @@ Each was read from the compiler source and confirmed on a live draft.
    right after its `ldr rN, =C`), the draft pseudo whose REG_EQUIV keeps it out of
    memory, and the score with `AGBCC_NOEQUIV` on it.
 
+32. **An and is tied to its first operand: write the constant first to keep it.** Thumb's
+   `ands` is two-operand, and regmove ties the result to operand 1 of the `and` RTL. C's
+   `x = v & K` (or `K & v`, which fold canonicalizes the same way) puts the value first, so
+   the draft's `ands rValue, rConst` writes the value's register; the ROM's
+   `ands rConst, rValue` keeps the constant's. `u32 m = K; m &= v; x = m;` makes the
+   constant's pseudo operand 1 and the tie follows it, with no barrier. It replaced empty
+   `asm("" : "+r"(m))` barriers in Hresvelgr_RefreshTarget (the facing masks 3 and 7), and
+   pins in sub_0813727C (`s32 bits = ~0x20; bits &= *flagsp;`, a negated constant through
+   `rsbs`), and a pin and two barriers each in SceneActorAnimation_UpdateDirectionalCallback
+   and UpdateEightDirectionCallback (the same facing masks in their setFacing helper). scope's default diff
+   now prints the lever on each aligned `ands` pair whose tied operand differs (a constant
+   in one, the value in the other), also when both read `ands r0, r1` with the registers'
+   roles swapped (Vanargand_UpdatePartLeap's terrain mask); the opposite case asks for the
+   value first.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

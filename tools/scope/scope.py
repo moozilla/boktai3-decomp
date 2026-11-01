@@ -1017,6 +1017,12 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         ex = next(i for i in sorted(mv) if rows_json[i]["tag"] == "+")
         print(f"{len(mv) // 2} of the differing insns are the same instruction at another position (an order"
               f" difference, not a missing one): `why {rows_json[ex]['uid']}` names what reads each copy")
+    for i, ln, tied in and_tie_hints(rows_json):
+        print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes the {tied}'s register, the draft's"
+              f" `{rows_json[i]['draft']}` the other operand's. "
+              + ("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
+                 if tied == "constant" else "Write the value first: `m = v & K;`")
+              + " (README fact 32)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -1662,6 +1668,43 @@ def moved_rows(rows, window=8):
             if q["tag"] == "-" and j not in out and q["rom"] == r["draft"]:
                 out[i], out[j] = j, i
                 break
+    return out
+
+
+def constant_def(texts, i, reg, window=8):
+    """True when register REG holds a constant at TEXTS[i]: its last write within WINDOW lines
+    before i is `movs`/`ldr =`, possibly through a self-applied `rsbs`/`lsls`/`mvns` of it."""
+    for j in range(i - 1, max(-1, i - 1 - window), -1):
+        t = texts[j]
+        if not t or asm_dest(t) != reg:
+            continue
+        if re.match(r"(movs\s+r\d+,\s*#|ldr\s+r\d+,\s*=)", t):
+            return True
+        if re.match(r"(rsbs|lsls|mvns)\s", t) and reg_nums(t)[1:2] == [reg]:
+            return constant_def(texts, j, reg, window)
+        return False
+    return False
+
+
+def and_tie_hints(rows):
+    """[(row index, line, tied)] where the ROM's `ands rA, rB` writes the register holding the
+    constant and the draft's writes the value (or the other way round): the and's tied operand
+    differs, which the C operand order decides (README fact 32). Identical text counts too, when
+    the registers' roles differ."""
+    rom = [r["rom"] for r in rows]
+    dr = [r["draft"] for r in rows]
+    out = []
+    for i, r in enumerate(rows):
+        if not (r["rom"] or "").startswith("ands ") or not (r["draft"] or "").startswith("ands "):
+            continue
+        a, b = (reg_nums(r["rom"]) + [None, None])[:2]
+        p, q = (reg_nums(r["draft"]) + [None, None])[:2]
+        if a is None or p is None:
+            continue
+        rk = constant_def(rom, i, a), constant_def(rom, i, b)
+        dk = constant_def(dr, i, p), constant_def(dr, i, q)
+        if rk[0] != rk[1] and dk[0] != dk[1] and rk[0] != dk[0]:
+            out.append((i, r.get("line") or "", "constant" if rk[0] else "value"))
     return out
 
 

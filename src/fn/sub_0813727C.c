@@ -241,8 +241,9 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
         return 0;
     group = (void *)&actor->group.common;
     {
-        register s32 result asm("r0") = *flagsp & ~0x20;
-        ((struct FlagHalfword *)flagsp)->bits = result;
+        s32 bits = ~0x20;
+        bits &= *flagsp;
+        ((struct FlagHalfword *)flagsp)->bits = bits;
     }
     actor->field2C2 = 0x40;
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
