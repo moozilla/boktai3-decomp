@@ -2950,7 +2950,7 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
-BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?$')
+BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?\\?\s*$')
 
 
 def concession_sites(text):
@@ -2965,7 +2965,15 @@ def concession_sites(text):
         if ln.lstrip().startswith("//"):
             continue
         if PIN_RE.search(ln) and "register" in ln:
-            out.append((i, "pin", lambda ls, i=i: ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]))
+            # one site per pin: `register s32 a asm("r9"), b asm("r6");` declares two
+            names = [m.group(1) for m in re.finditer(r"(\w+)" + PIN_RE.pattern, ln)]
+            for name in names or [None]:
+                def drop(ls, i=i, name=name):
+                    if name is None:
+                        return ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]
+                    pat = re.compile(r"\b(" + re.escape(name) + r")" + PIN_RE.pattern)
+                    return ls[:i] + [pat.sub(r"\1", ls[i], count=1)] + ls[i + 1:]
+                out.append((i, "pin", drop))
         elif re.match(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', ln):
             end = i + 1
             while ";" not in "\n".join(lines[i:end]) and end < len(lines):
@@ -3023,27 +3031,40 @@ def function_reach(text, func):
         defs[name] = (a, b, inline)
     if func not in defs:
         return {}
+    # Function-like and object-like macros: a concession in a macro body changes the code of every
+    # function that expands it, so a reached function's macros are reached too (keyed `#NAME`).
+    macros = {}
+    for m in re.finditer(r"^#\s*define\s+(\w+)(?:.*\\\n)*.*$", text, re.M):
+        if not any(x <= m.start() < y for x, y in drafts):
+            macros[m.group(1)] = (m.start(), m.end())
     reach, todo = {}, [func]
     while todo:
         n = todo.pop()
         if n in reach:
             continue
-        a, b, _ = defs[n]
-        reach[n] = (a, b)
-        body = text[a:b]
-        body = body[body.index("{"):]
+        if n.startswith("#"):
+            a, b = macros[n[1:]]
+            reach[n] = (a, b)
+            body = text[a:b].split(None, 2)[-1]
+        else:
+            a, b, _ = defs[n]
+            reach[n] = (a, b)
+            body = text[a:b]
+            body = body[body.index("{"):]
         for c in set(re.findall(r"\b(\w+)\s*\(", body)):
             if c in defs and defs[c][2] and c not in reach:
                 todo.append(c)
+        for c in set(re.findall(r"\b(\w+)\b", body)):
+            if c in macros and "#" + c not in reach and c != n[1:]:
+                todo.append("#" + c)
     return reach
 
 
 def site_variables(line):
     """C variable names a concession site names: a pin's declarator and a barrier's operands."""
     out = set()
-    m = re.search(r"(\w+)\s+(?:asm|__asm__)\s*\(\s*\"", line)
-    if m and "register" in line:
-        out.add(m.group(1))
+    if "register" in line:
+        out |= set(re.findall(r"(\w+)\s+(?:asm|__asm__)\s*\(\s*\"", line))
     if re.match(r"\s*(?:asm|__asm__)\b", line):
         out |= set(re.findall(r"\"[^\"]*\"\s*\(\s*(\w+)\s*\)", line))
     return out
@@ -4953,7 +4974,13 @@ def top_level_spans(text):
     spans, depth, start, brace, i = [], 0, None, None, 0
     while i < len(text):
         c = text[i]
-        if text.startswith("//", i) or (c == "#" and (i == 0 or text[i - 1] == "\n")):
+        if c == "#" and (i == 0 or text[i - 1] == "\n"):  # a directive, with its continued lines
+            j = text.find("\n", i)
+            while j > 0 and text[j - 1] == "\\":
+                j = text.find("\n", j + 1)
+            i = len(text) if j < 0 else j
+            continue
+        if text.startswith("//", i):
             j = text.find("\n", i)
             i = len(text) if j < 0 else j
             continue

@@ -2,6 +2,7 @@
 #include "item_container.h"
 #include "ram.h"
 #include "display_sequence_inline.h"
+#include "player_cue_sequence.h"
 // MATCHING_CONCESSION: register-pinning
 
 extern u32 gUnk_02000560[];
@@ -20,10 +21,6 @@ s32 Region_FindContaining();
 void ScaledShadow_Initialize(void *, struct SceneVec *, s32, s32, s32, s32, s32, s32, s32, s32,
                              s32);
 
-static inline u32 frame_factor(u16 v)
-{
-    return DisplaySequence_MaskCommand(v, 15);
-}
 static inline s32 absolute(s32 value)
 {
     if (value < 0)
@@ -34,13 +31,14 @@ static inline u8 nearby(struct SceneVec *p, struct SceneVec *a, struct TriggerOp
 {
     if (absolute(p->x - actor->position.x) <= 95 && absolute(p->y - a->y) <= 127) {
         s32 distance = absolute(p->z - a->z);
-        register u32 yes asm("r0") = 1;
-        asm("" : : "r"(yes));
-        if (distance <= 95)
-            return yes;
+        s32 yes = 1;
+        if (distance > 95)
+            yes = 0;
+        return yes;
     }
     return 0;
 }
+
 static inline s32 cellIndex(struct SceneVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
@@ -69,7 +67,7 @@ static inline s32 groundHeight(struct SceneVec *position)
     }
     return height;
 }
-static inline s32 stateMode(void)
+static inline u8 stateMode(void)
 {
     struct Player *state = gPlayers[0];
     if (state) {
@@ -447,61 +445,7 @@ void Trigger_UpdateLanding(struct TriggerManager *manager, struct Trigger *p)
 
 void Trigger_UpdateBobbingAnimation(struct TriggerManager *manager, struct Trigger *p)
 {
-    struct TriggerObject *o;
-    struct TriggerAnim *a;
-    const u16 *entry;
-    register u16 n asm("r0");
-    o = p->object;
-    a = p->animation;
-    entry = a->data + a->frame;
-    o->frame = *entry >> 6;
-    {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    n = ++a->timer;
-    if (n >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8) {
-                    a->timer = a->rate;
-                } else {
-                    a->frame = a->count - 1;
-                }
-            } else {
-                a->frame--;
-            }
-        } else {
-            if (++a->frame >= a->count) {
-                if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
-                } else {
-                    a->frame = 0;
-                }
-            }
-        }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
-    }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (p->timer <= 3)
@@ -543,61 +487,7 @@ void Trigger_UpdateDropTimer(struct TriggerManager *a, struct Trigger *b)
 
 void Trigger_UpdateIdleAnimation(struct TriggerManager *manager, struct Trigger *p)
 {
-    struct TriggerObject *o;
-    struct TriggerAnim *a;
-    const u16 *entry;
-    register u16 n asm("r0");
-    o = p->object;
-    a = p->animation;
-    entry = a->data + a->frame;
-    o->frame = *entry >> 6;
-    {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    n = ++a->timer;
-    if (n >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8) {
-                    a->timer = a->rate;
-                } else {
-                    a->frame = a->count - 1;
-                }
-            } else {
-                a->frame--;
-            }
-        } else {
-            if (++a->frame >= a->count) {
-                if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
-                } else {
-                    a->frame = 0;
-                }
-            }
-        }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
-    }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     p->timer++;
@@ -605,69 +495,9 @@ void Trigger_UpdateIdleAnimation(struct TriggerManager *manager, struct Trigger 
 
 void Trigger_UpdateOpeningAnimation(struct TriggerManager *manager, struct Trigger *p)
 {
-    struct TriggerObject *o;
-    struct TriggerAnim *a;
-    const u16 *entry;
-    register u16 n asm("r0");
-    u8 done;
+    s32 done;
     struct SceneVec raised;
-    o = p->object;
-    a = p->animation;
-    entry = a->data + a->frame;
-    o->frame = *entry >> 6;
-    {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    n = ++a->timer;
-    if (n >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8) {
-                    a->timer = a->rate;
-                } else {
-                    a->frame = a->count - 1;
-                }
-                done = 1;
-            } else {
-                a->frame--;
-                done = 0;
-            }
-        } else {
-            if (++a->frame >= a->count) {
-                if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
-                    done = 1;
-                } else {
-                    a->frame = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
-    } else
-        done = 0;
+    done = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (done) {
@@ -690,61 +520,7 @@ void Trigger_UpdateOpeningAnimation(struct TriggerManager *manager, struct Trigg
 
 void Trigger_UpdateActivation(struct TriggerManager *manager, struct Trigger *p)
 {
-    struct TriggerObject *o;
-    struct TriggerAnim *a;
-    const u16 *entry;
-    register u16 n asm("r0");
-    o = p->object;
-    a = p->animation;
-    entry = a->data + a->frame;
-    o->frame = *entry >> 6;
-    {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    n = ++a->timer;
-    if (n >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8) {
-                    a->timer = a->rate;
-                } else {
-                    a->frame = a->count - 1;
-                }
-            } else {
-                a->frame--;
-            }
-        } else {
-            if (++a->frame >= a->count) {
-                if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
-                } else {
-                    a->frame = 0;
-                }
-            }
-        }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
-    }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (p->timer == 8) {
@@ -762,61 +538,7 @@ void Trigger_UpdateActivation(struct TriggerManager *manager, struct Trigger *p)
 
 void Trigger_UpdateLockedPause(struct TriggerManager *manager, struct Trigger *p)
 {
-    struct TriggerObject *o;
-    struct TriggerAnim *a;
-    const u16 *entry;
-    register u16 n asm("r0");
-    o = p->object;
-    a = p->animation;
-    entry = a->data + a->frame;
-    o->frame = *entry >> 6;
-    {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    n = ++a->timer;
-    if (n >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8) {
-                    a->timer = a->rate;
-                } else {
-                    a->frame = a->count - 1;
-                }
-            } else {
-                a->frame--;
-            }
-        } else {
-            if (++a->frame >= a->count) {
-                if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
-                } else {
-                    a->frame = 0;
-                }
-            }
-        }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
-    }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (p->timer > 31) {
@@ -829,68 +551,8 @@ void Trigger_UpdateLockedPause(struct TriggerManager *manager, struct Trigger *p
 
 void Trigger_UpdateLockedRecovery(struct TriggerManager *manager, struct Trigger *p)
 {
-    struct TriggerObject *o;
-    struct TriggerAnim *a;
-    const u16 *entry;
-    register u16 n asm("r0");
-    u8 done;
-    o = p->object;
-    a = p->animation;
-    entry = a->data + a->frame;
-    o->frame = *entry >> 6;
-    {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    n = ++a->timer;
-    if (n >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8) {
-                    a->timer = a->rate;
-                } else {
-                    a->frame = a->count - 1;
-                }
-                done = 1;
-            } else {
-                a->frame--;
-                done = 0;
-            }
-        } else {
-            if (++a->frame >= a->count) {
-                if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
-                    done = 1;
-                } else {
-                    a->frame = 0;
-                    done = 1;
-                }
-            } else
-                done = 0;
-        }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
-    } else
-        done = 0;
+    s32 done;
+    done = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (done) {
@@ -908,56 +570,29 @@ s32 TriggerManager_Update(struct TriggerManager *input)
     s32 i;
     struct Trigger *trigger, *next;
     u8 *delay;
-    {
-        struct Player **table;
-        i = 0;
-        table = gPlayers;
-        for (; i < 4; i++) {
-            struct Player *actor;
-            asm("" : "+r"(i));
-            actor = ({
-                struct Player *a = table[i];
-                a;
-            });
-            p->actors[i] = actor;
-            if (actor) {
-                u32 offset = i * 8;
-                struct SceneVec *out;
-                struct SceneVec *in;
-                s32 x, z, horizontal, height;
-                out = (struct SceneVec *)(offset + (u32)({
-                                              struct TriggerManager *manager = p;
-                                              manager;
-                                          }));
-                out = (struct SceneVec *)((u8 *)out + 60);
-                in = &actor->position;
-                x = ({
-                    register s32 value asm("r4") = actor->position.x;
-                    asm("" : : "r"(value));
-                    value;
-                });
-                z = in->z;
-                out->x = scale(x - z);
-                horizontal = scale(({
-                    register s32 sum asm("r1") = x + z;
-                    asm("" : : "r"(sum));
-                    sum;
-                }));
-                height = scaleHeight(in->y);
-                out->y = horizontal - height;
-                out->z = horizontal + height;
-            }
+    for (i = 0; i < 4; i++) {
+        struct Player *actor;
+        actor = gPlayers[i];
+        p->actors[i] = actor;
+        if (actor) {
+            u32 offset = i * 8;
+            struct SceneVec *out;
+            struct SceneVec *in;
+            s32 x, z, horizontal, height;
+            out = (struct SceneVec *)(offset + (u32)p);
+            out = (struct SceneVec *)((u8 *)out + 60);
+            in = &actor->position;
+            x = actor->position.x;
+            z = in->z;
+            out->x = scale(x - z);
+            horizontal = scale(x + z);
+            height = scaleHeight(in->y);
+            out->y = horizontal - height;
+            out->z = horizontal + height;
         }
     }
-    trigger = ({
-        struct TriggerManager *m = p;
-        m->head;
-    });
-    delay = ({
-        u8 *value = (u8 *)36;
-        value = (u8 *)((u32)value + (u32)p);
-        value;
-    });
+    trigger = p->head;
+    delay = &p->soundDelay;
     for (; trigger; trigger = next) {
         next = trigger->next;
         if (trigger->flags & 1)
@@ -968,10 +603,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                     trigger->sprite->flags &= ~1;
                 {
                     struct TriggerObject *object;
-                    struct TriggerObject *candidate = ({
-                        struct TriggerObject *value = trigger->object;
-                        value;
-                    });
+                    struct TriggerObject *candidate = trigger->object;
                     object = candidate;
                     if (candidate) {
                         if (!trigger->started)
@@ -993,14 +625,13 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                                 goto available;
                             else
                                 available = globalMode();
-                            asm("" : : "r"(available));
                             if (available) {
                             available:
                                 if (trigger->visible)
                                     trigger->flash = 31;
                                 {
                                     u32 ticks = trigger->flash;
-                                    register u32 saved asm("r2") = ticks;
+                                    u8 saved = ticks;
                                     if (saved) {
                                         ticks--;
                                         trigger->flash = ticks;
@@ -1055,10 +686,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
         }
     }
     {
-        u8 *timer = ({
-            u8 *value = delay;
-            value;
-        });
+        u8 *timer = delay;
         u32 ticks = *timer;
         if (ticks)
             *timer = ticks - 1;
@@ -1340,60 +968,38 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
         AnimData_SelectPaletteBank(p->other, 775);
     else
         AnimData_SelectPaletteBank(p->other, 776);
-    {
-        s32 hidden = p->started;
-        if (hidden) {
-            s32 available;
-            p->object->flags |= 1;
-            if (gEngineFlags & 2048) {
-                available = stateMode();
-            } else {
-                if (gWeatherCollisionTimer > 0)
-                    goto reveal;
-                if (gPlayers[0] && (({
-                        u32 *flags = &gPlayers[0]->actionFlags;
-                        u32 mask = 16;
-                        *flags &mask;
-                    })))
-                    goto reveal;
-                available = globalMode();
-            }
-            asm("" : : "r"(available));
-            if (!available)
-                goto conceal;
-        reveal:
-            hidden = 0;
-            goto visibilityDone;
-        conceal:
-            hidden = 1;
+    if (p->started) {
+        s32 available;
+        p->object->flags |= 1;
+        if (gEngineFlags & 2048) {
+            available = stateMode();
+        } else {
+            if (gWeatherCollisionTimer > 0)
+                goto reveal;
+            if (gPlayers[0] && (({
+                    u32 *flags = &gPlayers[0]->actionFlags;
+                    u32 mask = 16;
+                    *flags &mask;
+                })))
+                goto reveal;
+            available = globalMode();
         }
-    visibilityDone:
-        p->visible = hidden;
-    }
-    {
-        void *animation = p->animation;
-        void *resource = ({
-            struct TriggerManager *m = manager;
-            m->resource;
-        });
-        register s32 zero asm("r2") = 0;
-        Anim_SetSequence(animation, resource, zero, 0, zero);
-    }
-    {
-        s32 value;
-        if (({
-                register s32 input asm("r3") = sound;
-                input;
-            }))
-            value = Region_FindContaining(&p->object->position);
-        else
-            value = *(u16 *)&sound;
-        p->sound = value;
-    }
-    ScaledShadow_Initialize(p->effect, &p->object->position, 64, 24, 40, 32, 512, 1, 5, 1, ({
-                                register s32 zero asm("r0") = 0;
-                                zero;
-                            }));
+        if (!available)
+            goto conceal;
+    reveal:
+        p->visible = 0;
+        goto visibilityDone;
+    conceal:
+        p->visible = 1;
+    } else
+        p->visible = 0;
+visibilityDone:
+    Anim_SetSequence(p->animation, manager->resource, 0, 0, 0);
+    if (sound)
+        p->sound = Region_FindContaining(&p->object->position);
+    else
+        p->sound = sound;
+    ScaledShadow_Initialize(p->effect, &p->object->position, 64, 24, 40, 32, 512, 1, 5, 1, 0);
     ScaledShadow_Disable(p->effect);
     TriggerManager_InsertTrigger(p);
     return 0;

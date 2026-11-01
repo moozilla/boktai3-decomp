@@ -1,33 +1,15 @@
 #include "global.h"
 #include "scene_object.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
-static inline void scatter(u16 *coordinate, const u8 *random)
+static inline void scatter(u16 *coordinate, const u16 *sample)
 {
     s32 value = *coordinate - 128;
-    u32 noise = *random;
-    {
-        u32 result = value + noise;
-        *coordinate = result;
-    }
+    u32 noise = (u8)*sample;
+    *coordinate = value + noise;
 }
 
-static inline u32 edgeJitter(const u16 *random)
-{
-    u32 value = *random;
-    value &= 15;
-    return value;
-}
-
-static inline const u16 *scatterAddress(u32 index, const u16 *table)
-{
-    register u32 address asm("r2") = index * 2;
-    address += (u32)table;
-    asm("" : "+r"(address));
-    return (const u16 *)address;
-}
-
-// MATCHING_CONCESSION: register-pinning
 void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
 {
     struct SceneExtent size;
@@ -38,32 +20,21 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
     size.y = 0;
     size.z = 32;
     for (i = 0; i < 10; i++) {
-        u32 seed;
-        register const u16 *table asm("r3") = gRandomTable;
+        const u16 *table = gRandomTable;
         p = (u16 *)&point;
-        /* The two jitter samples are consumed before the next external call. */
-        seed = (gRandomIndex + 1) & 1023;
-        gRandomIndex = seed;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         point = *position;
         if (!(i & 1)) {
-            u32 index = (seed + 1) & 1023;
-            const u16 *random = (const u16 *)(index * 2 + (u32)table);
-            p[0] += offset + edgeJitter(random);
-            index = (index + 1) & 1023;
-            gRandomIndex = index;
-            random = scatterAddress(index, table);
-            scatter(&p[2], (u8 *)random);
+            p[0] += offset + (ParticleRandom_ReadDirectSample(table) & 15);
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            scatter(&p[2], &table[gRandomIndex]);
         } else {
-            register u32 index asm("r1") = (seed + 1) & 1023;
-            const u16 *random;
-            random = scatterAddress(index, table);
-            scatter(&p[0], (u8 *)random);
-            index = (index + 1) & 1023;
-            gRandomIndex = index;
-            random = (const u16 *)(index * 2 + (u32)table);
-            p[2] += offset + edgeJitter(random);
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            scatter(&p[0], &table[gRandomIndex]);
+            p[2] += offset + (ParticleRandom_ReadDirectSample(table) & 15);
         }
-        SceneParticleBurst_CreateWithPause(&point, 0, &size, 1, 3, 4);
+        table = 0;
+        SceneParticleBurst_CreateWithPause(&point, (s32)table, &size, 1, 3, 4);
     }
 }
 
@@ -250,14 +221,13 @@ void SceneObjects_PlayPushSound(s32 type)
 
 void AnimatedParticles_EmitBurst(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
 
-// MATCHING_CONCESSION: register-pinning
 void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
-                                   struct SceneObject *actor)
+                                   struct SceneObject *object)
 {
-    register struct SceneObject *incoming asm("r0") = actor;
     s32 applied;
+    struct SceneObject *actor;
     applied = 0;
-    actor = incoming;
+    actor = object;
     if (actor->type == 0) {
         if (({
                 u32 mask = 0x17;
@@ -1166,14 +1136,12 @@ static inline u8 ownerIsCurrent(u32 owner)
 
 static inline void disableCollision(u16 *flags)
 {
-    register u32 value asm("r1") = *flags;
-    {
-        u32 result = value | 4;
-        *flags = result;
-    }
+    u32 value = *flags;
+    u32 state = 4;
+    state |= value;
+    *flags = state;
 }
 
-// MATCHING_CONCESSION: register-pinning
 s32 SceneObjects_Update(struct SceneObjectManager *manager)
 {
     struct SceneObject *p = manager->objects;
@@ -1516,18 +1484,12 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     return 0;
 }
 
-#define RESOURCE(value)                                                                            \
-    ({                                                                                             \
-        s32 result = (value);                                                                      \
-        asm("" : "+r"(result));                                                                    \
-        result;                                                                                    \
-    })
 s32 SceneObjects_CreateFromScript(void)
 {
     struct SceneExtent position;
     s32 id, type;
-    s32 initial, animation, script, defaultResource;
-    register s32 flags asm("r9"), resource asm("r6"), drawMode, health;
+    s32 initial, animation, script;
+    s32 flags, resource, drawMode, health;
     id = Script_GetKeywordValue('n', 0);
     type = Script_GetKeywordValue('t', 0);
     flags = Script_GetKeywordValue('f', 0);
@@ -1543,24 +1505,21 @@ s32 SceneObjects_CreateFromScript(void)
         position.z = 0;
     }
     if (type == 0)
-        goto fallback;
+        resource = Script_GetKeywordValue('a', 0x9D41);
     else if (type == 1)
-        defaultResource = RESOURCE(0x84EE);
+        resource = Script_GetKeywordValue('a', 0x84EE);
     else if (type == 2)
-        defaultResource = RESOURCE(0x9D40);
+        resource = Script_GetKeywordValue('a', 0x9D40);
     else if (type == 3)
-        defaultResource = RESOURCE(0x9D43);
+        resource = Script_GetKeywordValue('a', 0x9D43);
     else if (type == 4)
-        defaultResource = RESOURCE(0xE0C9);
+        resource = Script_GetKeywordValue('a', 0xE0C9);
     else if (type == 5)
-        defaultResource = RESOURCE(0x5A2);
+        resource = Script_GetKeywordValue('a', 0x5A2);
     else if (type == 6)
-        defaultResource = RESOURCE(0xB306);
-    else {
-    fallback:
-        defaultResource = RESOURCE(0x9D41);
-    }
-    resource = Script_GetKeywordValue('a', defaultResource);
+        resource = Script_GetKeywordValue('a', 0xB306);
+    else
+        resource = Script_GetKeywordValue('a', 0x9D41);
     drawMode = Script_GetKeywordValue('i', 0);
     health = Script_GetKeywordValue('l', 128);
     if (type == 0)
