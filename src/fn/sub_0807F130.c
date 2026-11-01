@@ -9,17 +9,6 @@ void SceneActorPosition_ResolveTaggedPosition(struct SceneActorTaggedPosition *,
                                               const struct SceneActorPositionSource *, void *, s32);
 void SceneActorAttachment_RetargetNearestPlayer(void *, const struct ContactPosition *);
 
-static inline void SceneActorTarget_ClearFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
-}
-
-static inline void SceneActorTarget_SetHalfFlags(u16 *flags, u32 input)
-{
-    u32 mask = input;
-    *flags |= mask;
-}
-
 static inline s8 SceneActorTarget_FindStimulus(struct SceneActorRegistryResetView *owner,
                                                struct SceneActorChaseGroup *group)
 {
@@ -55,7 +44,7 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     timer = &group->common.control.timer;
     if (!*timer) {
         control = &group->common.control;
-        SceneActorTarget_ClearFlags(&actor->flags2CC, ~0x141C0);
+        SceneActorChase_AndWordFlags(&actor->flags2CC, ~0x141C0);
         control->counter = 0;
         control->field14 = 0;
         /* The control record is reset before the overlap timer is armed. */
@@ -99,7 +88,7 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     }
     {
         u32 mask = 0x200;
-        SceneActorTarget_SetHalfFlags(&actor->flags2D4, mask);
+        SceneActorChase_OrHalfFlags(&actor->flags2D4, mask);
     }
     actor->field2C2 = 0x20;
     {
