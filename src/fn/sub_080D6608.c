@@ -1,6 +1,6 @@
 #include "global.h"
 #define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL 1
-#include "scene_actor_chase_reaction.h"
+#include "scene_actor_chase_direct_arrival.h"
 #include "scene_actor_cardinal_path.h"
 
 struct MummyRouteContext {
@@ -23,73 +23,6 @@ static inline u8 FindPath(struct SceneActorRegistryResetView *actor, s32 goal)
     return SceneActorPath_CanReach(cell, goal, y, kind, total);
 }
 
-static inline u8 Mummy_Arrive(void *obj)
-{
-    struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
-    struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
-    struct SceneActorChaseTracking *tracking = &actor->tracking;
-    s32 cell, player;
-    const u16 *randomSamples = gRandomTable;
-    void **callback;
-    SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
-    if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
-        struct SceneActorChaseTarget *t = tracking->target;
-        if (!t)
-            goto invalid_target;
-        player = SceneActorChase_PlayerSlot(t);
-        if (player < 0) {
-        invalid_target:
-            Callback_InvokeActor(actor, group->fallback);
-            return 0;
-        }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
-    } else {
-        struct SceneActorChaseTarget *t = tracking->target;
-        cell = SceneActorChase_CellAt(&t->position);
-        player = 0;
-    }
-    if (cell != actor->terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
-                                0x20000))
-        goto reroute;
-    if (SceneActorChase_MotionFlags(actor, 0x400))
-        return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
-    if (SceneActorChase_MotionFlags(actor, 0x80)) {
-        SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
-        SceneActorChase_SetBehavior(actor, 12);
-    } else {
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
-        SceneActorChase_SetBehavior(actor, 5);
-        SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
-        (group->destination)->y = SceneActorChase_HeightAt(
-            SceneActorChase_CellAt(group->destination), group->destination);
-        (group->destination)->pad = 0;
-    }
-    {
-        u8 saved = actor->body.direction;
-        SceneActorChase_BeginTurn(obj, saved, randomSamples);
-    }
-    SceneActorTerrain_RequestRetreatRoute(obj);
-    actor->field2C2 = 0x20;
-    return 0;
-reroute: {
-    SceneActorChase_CellCenter(cell, &target);
-    if (SceneActorChase_TryRoute(obj, group->route, &actor->body.position, &target))
-        goto success;
-}
-    callback = &group->fallback;
-invoke:
-    Callback_InvokeActor(actor, *callback);
-    return 0;
-success:
-    return 1;
-}
-
 u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
 {
     struct MummyRouteContext *body = actor->context;
@@ -106,6 +39,6 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
         return 0;
     }
     SceneActorChase_TrackPlayer(actor);
-    Mummy_Arrive(actor);
+    SceneActorChase_ArriveWithDirectFallback(actor);
     return 0;
 }
