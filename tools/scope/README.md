@@ -975,7 +975,7 @@ Each was read from the compiler source and confirmed on a live draft.
    right after its `ldr rN, =C`), the draft pseudo whose REG_EQUIV keeps it out of
    memory, and the score with `AGBCC_NOEQUIV` on it.
 
-32. **An and is tied to its first operand: write the constant first to keep it.** Thumb's
+33. **An and is tied to its first operand: write the constant first to keep it.** Thumb's
    `ands` is two-operand, and regmove ties the result to operand 1 of the `and` RTL. C's
    `x = v & K` (or `K & v`, which fold canonicalizes the same way) puts the value first, so
    the draft's `ands rValue, rConst` writes the value's register; the ROM's

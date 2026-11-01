@@ -1022,7 +1022,7 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
               f" `{rows_json[i]['draft']}` the other operand's. "
               + ("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
                  if tied == "constant" else "Write the value first: `m = v & K;`")
-              + " (README fact 32)")
+              + " (README fact 33)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -1689,7 +1689,7 @@ def constant_def(texts, i, reg, window=8):
 def and_tie_hints(rows):
     """[(row index, line, tied)] where the ROM's `ands rA, rB` writes the register holding the
     constant and the draft's writes the value (or the other way round): the and's tied operand
-    differs, which the C operand order decides (README fact 32). Identical text counts too, when
+    differs, which the C operand order decides (README fact 33). Identical text counts too, when
     the registers' roles differ."""
     rom = [r["rom"] for r in rows]
     dr = [r["draft"] for r in rows]
