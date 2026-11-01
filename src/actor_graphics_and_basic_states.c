@@ -2725,7 +2725,6 @@ void SceneActorState_UpdateLongRecovery(struct S_080247AC *p)
 
 // confidence=low: variant-dependent recovery animations and timed return to the default action.
 #define SceneActorState_UpdateVariantRecovery sub_0802483C
-// MATCHING_CONCESSION: register-pinning
 struct VariantRecoveryActor {
     u8 pad0[0xaa];
     u8 animation, state, mode, index, phase, finished, enter;
@@ -2768,23 +2767,22 @@ void SceneActorState_UpdateVariantRecovery(struct VariantRecoveryActor *p)
     }
     if (p->finished) {
         if (q->state == 3) {
-            u32 animation;
             u32 offset = 0x358;
             if (*(u32 *)((u8 *)q + offset) == 3 && variantAlternate(q, offset)) {
-                animation = 38;
-                asm("" : "+r"(animation));
+                u32 animation = 38;
+                q->animation = animation;
             } else {
-                animation = 17;
+                u32 animation = 17;
+                q->animation = animation;
             }
-            q->animation = animation;
         } else if (p->state == 17) {
-            register u32 animation asm("r0");
             if (q->flags & 4) {
-                animation = 19;
+                u32 animation = 19;
+                p->animation = animation;
             } else {
-                animation = 18;
+                u32 animation = 18;
+                p->animation = animation;
             }
-            p->animation = animation;
         } else {
             u32 zero = 0;
             q->mode = zero;
