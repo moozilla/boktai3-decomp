@@ -1,5 +1,4 @@
-#ifdef NONMATCHING
-// fuzzy: 97.4%
+// fuzzy: 73.7%
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
@@ -46,6 +45,11 @@ static inline void addPosition(struct ContactPosition *out, const struct Contact
 void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)
 {
     struct ContactPosition delta;
+    /* One pointer serves the health collider on entry and the random table while steering. */
+    union {
+        struct ContactCollider *collider;
+        const u16 *table;
+    } work;
     if (slot->enter) {
         slot->enter = 0;
         if (slot->targetIndex >= 0) {
@@ -67,10 +71,11 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
             slot->steeringTimer = (nextSample(table) & 15) + 16;
         }
         {
-            struct ContactCollider *collider = &slot->healthCollider;
-            s32 mask = -5;
-            mask &= collider->flags;
-            collider->flags = mask;
+            s32 mask;
+            work.collider = &slot->healthCollider;
+            mask = -5;
+            mask &= work.collider->flags;
+            work.collider->flags = mask;
         }
     }
     if (pool->clearRequested) {
@@ -84,13 +89,15 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         return;
     }
     if (!slot->steeringTimer) {
-        const u16 *table = gRandomTable;
-        u32 mask = 255;
-        s32 roll = nextSample(table) & mask;
+        u32 mask;
+        s32 roll;
+        work.table = gRandomTable;
+        mask = 255;
+        roll = nextSample(work.table) & mask;
         if (roll <= 191) {
             if (slot->targetIndex >= 0) {
                 u32 scale = 256;
-                u32 angle = nextSample(table);
+                u32 angle = nextSample(work.table);
                 struct ContactPosition *write = &delta;
                 angle &= mask;
                 write->x = truncateShift12(gUnk_086149C4[(angle + 64) & mask] * scale);
@@ -104,7 +111,7 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
                 slot->direction += jitter;
             }
         } else
-            slot->direction = nextSample(table);
+            slot->direction = nextSample(work.table);
         slot->steeringTimer = (nextRandom() & 15) + 16;
     } else
         slot->steeringTimer--;
@@ -146,8 +153,3 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         slot->stateFrame++;
     }
 }
-
-#else
-#include "global.h"
-INCLUDE_ASM("asm/nonmatching", ContactActor_UpdateRoaming);
-#endif
