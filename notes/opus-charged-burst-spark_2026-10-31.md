@@ -108,8 +108,24 @@ Numbers are scope's ROM / draft differing instructions.
 | d2 | each sample in `do { } while (0)` | 73 / 61 |
 | d3 | struct table set before the test, read in the body | 49 / 39 |
 | d4 | the table set before the test | 49 / 39 |
+| lb1, lb2 | the table as an integer address in a `u32` variable | as v3 |
+| lb3 | the integer address written in each sample, no variable | 20 / 18 (shape 14) |
+| la1 to la4 | one `u32 work` for the `nextSpark` offset 0x204, then the table | as v3, or 51 / 47 |
 
 Why the near misses fail:
+
+* **lb3** has fewer differences but the wrong mechanism. The table is set at its
+  first use, keeps r4, and the 1023 mask takes the spill. The mask has an
+  equivalence, so it is rematerialized (`ldr r5, =0x3FF` at each use). The ROM
+  spills the table and keeps the mask in r4.
+* **la1 to la4** tried a variant of fact 20's lever: another value first in the
+  table's pseudo, as in Dog_UpdateTurnSequence (there the first value is not a
+  constant; here it is the offset 0x204, and the second, different constant
+  would call no_equiv). r5's
+  `movs r5, #0x81; lsls r5, r5, #2` before the table load is not a pseudo.
+  It is reload's register for the constant in `(plus p (const_int 516))`.
+  cse folds a `work = 0x204` variable into that add, so the variable's first set
+  dies, and the table is again set once.
 
 * **w1** gives the table a second set, so the second set calls no_equiv. But
   update_equiv_regs records the equivalence at the first set and doubles the

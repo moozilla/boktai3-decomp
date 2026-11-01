@@ -116,8 +116,18 @@ Numbers are scope's ROM / draft differing instructions.
 | h10, `AGBCC_NOEQUIV=29` | knob, diagnostic | exact `-g` compile |
 | h11 | h10 with `byteMask` declared after `offset` | 17 / 13 |
 | h12 | the twice-set `byteMask` on the cosine side | 25 / 21 |
+| lb1, lb2, lb4 | the table as an integer address: `u32 table = RANDOM_TABLE_ADDR` (or `(u32)gRandomTable`), read as `*(const u16 *)(*index * 2 + table)` | 17 / 13, as h10 |
+| lb3 | the integer address written in the helper, no table variable | 25 / 22 |
 
 The drafts are in `build/scope/drafts/hr/` (worktree scratch, not committed).
+
+Two levers that the Monsters depin work found for the random table were tried
+after the note was first written. Reading the table as an integer address
+(SceneActor_LeapTowardTarget) still leaves a pseudo set from a constant, and cse
+puts the same `REG_EQUAL` on it (lb1 to lb4). Reusing a pointer that held a
+non-constant value first (Dog_UpdateTurnSequence, fact 20) has nothing to reuse
+here. Every value set before the loop (i, index, mask, sine, offset, motion) lives
+into the loop, so none can share the table's pseudo.
 
 ## The table across the ROM
 
