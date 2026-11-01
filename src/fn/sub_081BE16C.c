@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct StorageWidget {
     u8 unknown0[8];
@@ -23,15 +22,15 @@ void SceneHud_SetKeyframePaletteBank(void *, u32);
 void Storage_RefreshItemSlots(struct StorageItems *p)
 {
     s32 row;
-    register s32 col asm("r9");
+    s32 col;
     u32 rowBytes;
+    s32 rowSlot;
     p->emptyCarried = 0xFF;
     p->emptyStored = -1;
     row = 0;
     rowBytes = 0;
     for (; row < 4; row++) {
         struct StorageWidget *widget;
-        s32 rowSlot;
         col = 0;
         rowSlot = row * 4;
         {
@@ -57,7 +56,6 @@ void Storage_RefreshItemSlots(struct StorageItems *p)
     }
     for (row = 0; row < 4;) {
         struct StorageWidget *widget;
-        register s32 rowSlot asm("r8");
         s32 index;
         s32 nextRow;
         col = 0;
@@ -82,7 +80,10 @@ void Storage_RefreshItemSlots(struct StorageItems *p)
             widget++;
             index++;
             col++;
-        } while (col <= 3);
+            if (col > 3)
+                goto storedRowDone;
+        } while (1);
+    storedRowDone:
         row = nextRow;
     }
     {
