@@ -4433,74 +4433,114 @@ struct ScriptInteractionChild {
     struct InteractionChildHandler handler;
 };
 
-typedef char ScriptInteractionChildSizeCheck[sizeof(struct ScriptInteractionChild) == 0xDC ? 1 : -1];
+typedef char
+    ScriptInteractionChildSizeCheck[sizeof(struct ScriptInteractionChild) == 0xDC ? 1 : -1];
 
 void Terrain_GetBoxMinPosition(u16, void *);
 u8 *Script_GetPc(void);
 s32 Region_FindContaining(void *);
 
+#define CHILD_FIELD_OFFSET(t, m) ((u32) & ((t *)0)->m)
+#define SCRIPT_CHILD_BASE(g, member)                                                               \
+    ((u8 *)(g) + CHILD_FIELD_OFFSET(struct ActorAnimController, children) +                        \
+     CHILD_FIELD_OFFSET(struct ScriptInteractionChild, member))
+#define SET_CHILD_SCRIPT(base, offset, value)                                                      \
+    do {                                                                                           \
+        *(s32 *)((offset) + (base)) = (value);                                                     \
+    } while (0)
+
 /* Save the previous mode before the scripted interaction starts. */
-static inline void interaction_state(struct ActorAnimController *g, u32 mode, u32 phase)
+static inline void InteractionChild_SetMode(struct ActorAnimController *g, u32 mode, u32 phase,
+                                            u16 *oldMode)
 {
-    g->oldMode = g->mode;
+    *oldMode = g->mode;
     g->mode = mode;
     *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 15) | (phase << 4);
-    if (g->oldMode == 3 && g->mode == 3) {
+    if (*oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
     }
     {
         u8 flag = 1;
-        g->flags |= flag;
+        u8 *entry = &g->flags;
+        *entry = flag | *entry;
     }
 }
+/* Apply the selected slot's horizontal flip to the original controller. */
+static inline void InteractionChild_Flip(struct ActorAnimController *const *owner, s32 byteOffset)
+{
+    struct ActorChildSlot *first = (*owner)->children;
+    struct ActorChildSlot *child = (struct ActorChildSlot *)((u8 *)first + byteOffset);
+    child->flags |= 4;
+}
 
-/* Tentative name: Actor_ConfigureInteractionChildFromScript.
- * Configure the first available interaction marker from the current script. */
-#ifdef NONMATCHING
-// fuzzy: 70.0%
+/* Configure the first available interaction marker using the current script. */
 void Actor_ConfigureInteractionChildFromScript(void)
 {
     struct Vec position;
+    s32 byteOffset;
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     struct ScriptInteractionChild *children;
-    s32 i, j;
-    u32 interactionMode = 1;
+    struct Vec *world;
+    u8 *orientation;
+    struct ScriptInteractionChild *slot;
+    struct InteractionChildHandler *handler;
+    s32 *regions;
+    u8 *control;
+    s32 i;
+    u16 *oldMode;
+    s32 remaining;
+    u32 interactionMode;
     if (!g) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
         if (!g)
             return;
     }
+
     children = (void *)g->children;
-    for (i = 0; i < 16; i++) {
-        struct InteractionChildHandler *handler = &children[i].handler;
-        struct ActorSprite *sprite = &children[i].sprite;
-        struct Vec *world = &children[i].world;
+
+    i = 0;
+    oldMode = &g->oldMode;
+    byteOffset = 0;
+    regions = &children[0].handler.regions[0];
+    world = &children[0].world;
+    orientation = &children[0].handler.orientation;
+    slot = children;
+    control = &children[0].handler.control;
+    handler = &children[0].handler;
+    interactionMode = 1;
+
+    for (; i < 16; i++) {
         if (handler->control & 2) {
+            struct ActorSprite *selectedSprite;
+            u8 *completionBase;
+            u8 direction;
             handler->control = 4;
             switch (Script_GetKeywordValue('t', 0)) {
                 case 0:
                     handler->effect = 104;
-                    interaction_state(g, interactionMode, 1);
+                    InteractionChild_SetMode(g, interactionMode, 1, oldMode);
                     handler->fn = Actor_OnInteractionChildUpdate;
                     handler->control |= 1;
                     break;
                 case 1:
                     handler->control |= 8;
                     handler->effect = 104;
-                    interaction_state(g, interactionMode, 4);
+                    InteractionChild_SetMode(g, interactionMode, 4, oldMode);
                     handler->fn = Actor_OnEffectChildPaletteInit;
                     handler->control |= 1;
                     break;
                 case 2:
                     handler->control |= 16;
                     handler->effect = 107;
-                    sprite->frame = 1;
-                    interaction_state(g, interactionMode, 1);
+                    slot->sprite.frame = 1;
+                    InteractionChild_SetMode(g, interactionMode, 1, oldMode);
                     handler->fn = Actor_OnInteractionChildUpdate;
                     handler->control |= 1;
                     break;
             }
+
+            selectedSprite = &slot->sprite;
             handler->orientation = Script_GetKeywordValue('r', 0);
             handler->option = Script_GetKeywordValue('A', 0);
             if (Script_SeekToKeyword('R')) {
@@ -4512,63 +4552,85 @@ void Actor_ConfigureInteractionChildFromScript(void)
                 position.y = Script_GetValue() - 64;
                 position.z = Script_GetValue();
             }
-            if (handler->orientation) {
+            direction = *orientation;
+            if (direction) {
                 world->x = position.x;
-                sprite->x = position.x;
+                selectedSprite->x = position.x;
                 world->y = position.y;
-                sprite->y = position.y;
+                selectedSprite->y = position.y;
                 world->z = position.z;
-                sprite->z = position.z - 128;
+                selectedSprite->z = position.z - 128;
             } else {
                 world->x = position.x;
-                sprite->x = position.x - 128;
+                selectedSprite->x = position.x - 128;
                 world->y = position.y;
-                sprite->y = position.y;
+                selectedSprite->y = position.y;
                 world->z = position.z;
-                sprite->z = position.z;
+                selectedSprite->z = position.z;
             }
-            sprite->x += 60;
-            sprite->z += 60;
-            sprite->y += 84;
-            sprite->priority = 2;
+            selectedSprite->x += 60;
+            selectedSprite->z += 60;
+            selectedSprite->y += 84;
+            selectedSprite->priority = 2;
+
             if (Script_SeekToKeyword('m')) {
                 handler->regionCount = 0;
                 while (Script_GetPc()) {
-                    handler->regions[children[i].handler.regionCount] = Script_GetValue();
-                    handler->regionCount++;
+                    s32 value = Script_GetValue();
+                    s32 *region = (s32 *)((u8 *)regions + ((u32)slot->handler.regionCount << 2));
+                    *region = value;
+                    slot->handler.regionCount++;
                 }
             } else {
                 handler->regionCount = 1;
                 handler->regions[0] = Region_FindContaining(&position);
             }
+            /* Both script fields use the offset of the selected slot. */
+            completionBase = SCRIPT_CHILD_BASE(g, completionScript);
+            orientation = SCRIPT_CHILD_BASE(g, startScript);
             if (Script_SeekToKeyword('C'))
-                children[i].completionScript = Script_GetValue();
+                *(s32 *)(completionBase + byteOffset) = Script_GetValue();
             else
-                children[i].completionScript = 0;
+                *(s32 *)(completionBase + byteOffset) = 0;
             if (Script_SeekToKeyword('a'))
-                children[i].startScript = Script_GetValue();
+                SET_CHILD_SCRIPT(orientation, byteOffset, Script_GetValue());
             else
-                children[i].startScript = 0;
-            children[i].handler.variant = Script_GetKeywordValue('u', 0);
+                SET_CHILD_SCRIPT(orientation, byteOffset, 0);
+            ((struct InteractionChildHandler *)(control -
+                                                CHILD_FIELD_OFFSET(struct InteractionChildHandler,
+                                                                   control)))
+                ->variant = Script_GetKeywordValue('u', 0);
             if (!handler->orientation) {
-                *(u16 *)g->unkF62 = -64;
+                g->interactionHeading = -64;
             } else {
-                children[i].sprite.flags |= 4;
-                *(u16 *)g->unkF62 = 64;
+                struct ActorAnimController *controller = g;
+                InteractionChild_Flip(&controller, byteOffset);
+                g->interactionHeading = 64;
             }
-            j = handler->regionCount;
-            if (j > 0) {
+            remaining = slot->handler.regionCount;
+            if (remaining > 0) {
                 do {
-                    j--;
-                } while (j != 0);
+                    remaining--;
+                } while (remaining != 0);
             }
             return;
         }
+        byteOffset += sizeof(*children);
+        regions = (s32 *)((u8 *)regions + sizeof(*children));
+        world = (struct Vec *)((u8 *)world + sizeof(*children));
+        do {
+            orientation += sizeof(*children);
+            slot++;
+        } while (0);
+        control += sizeof(*children);
+        handler = (struct InteractionChildHandler *)((u8 *)handler + sizeof(*children));
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Actor_ConfigureInteractionChildFromScript);
-#endif
+
+#undef SET_CHILD_SCRIPT
+#undef SCRIPT_CHILD_BASE
+#undef CHILD_FIELD_OFFSET
+
 // Provisional name: Actor_ConfigureFromScript
 
 static inline void state(struct ActorAnimController *g, u32 mode, u32 phase)

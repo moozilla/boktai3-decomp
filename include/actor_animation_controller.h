@@ -88,7 +88,7 @@ struct ActorAnimController {
     u16 phase : 12;
     u16 oldMode;        /* 0xF5C */
     u16 speed, heading; /* 0xF5E */
-    u8 unkF62[2];
+    s16 interactionHeading; /* 0xF62 */
     u8 flags;       /* 0xF64: state-entry flag */
     u8 phaseSelect; /* 0xF65: provisional, selects a (mode,phase) pair on setup */
     u8 direction;   /* 0xF66 */
