@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_input_navigation.h"
 
@@ -26,11 +25,6 @@ s32 Inventory_GetConsumableId(u32);
 s32 GameState_IsConsumableSlotEquipped(u32);
 void SceneHud_SetKeyframePaletteBank(void *, u32);
 void Storage_GetSlotPosition(struct SceneInputPosition *, u32);
-
-static inline void Storage_AdvanceSlotRow(u32 *slot)
-{
-    *slot += 4;
-}
 
 static inline void Storage_ClearOffset(u32 *offset)
 {
@@ -100,31 +94,31 @@ void Storage_RefreshConsumableSlots(struct StorageCategoryWidgets *p)
             widget++;
             col++;
             if (col > 3)
-                break;
+                goto carriedRowDone;
         } while (1);
+    carriedRowDone:
         rowBytes += 0x180;
-        /* Advance by the four carried slots processed in this row. */
-        Storage_AdvanceSlotRow(&rowSlot);
-        asm("" : : "r"(row));
+        rowSlot += 4;
         row++;
         if (row > 3)
-            break;
+            goto carriedDone;
     } while (1);
+carriedDone:
     for (row = 0; row < 4;) {
         struct StorageWidget *widget;
-        s32 rowSlot;
+        s32 slot;
         s32 index;
         s32 nextRow;
         u32 offset;
         col = 0;
-        rowSlot = row * 4;
+        slot = row * 4;
         nextRow = row + 1;
-        offset = ((row << 3) + rowSlot) << 5;
+        offset = ((row << 3) + slot) << 5;
         {
             struct StorageWidget *base = p->stored;
             widget = (void *)(offset + (u32)base);
         }
-        index = rowSlot + 16;
+        index = slot + 16;
         do {
             s32 id = Inventory_GetConsumableId(p->slots[index]);
             if (id != -1) {
@@ -137,11 +131,11 @@ void Storage_RefreshConsumableSlots(struct StorageCategoryWidgets *p)
             }
             widget++;
             index++;
-            asm("" : : "r"(col));
             col++;
             if (col > 3)
-                break;
+                goto storedRowDone;
         } while (1);
+    storedRowDone:
         row = nextRow;
     }
     while (equipped <= 7) {
