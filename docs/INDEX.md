@@ -354,6 +354,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/monster_init_shared_groups_2026-10-30.md](../notes/monster_init_shared_groups_2026-10-30.md) | Shared monster initialization groups | *#actors* | 4 |
 | [notes/opus-ratatosk-defeat_2026-10-31.md](../notes/opus-ratatosk-defeat_2026-10-31.md) | Ratatosk_UpdateDefeatSequence (081F4CF8): exact match | #matching #ratatosk #compiler #reload #addressing | 6 |
 | [notes/opus-ratatosk-knockback_2026-10-31.md](../notes/opus-ratatosk-knockback_2026-10-31.md) | Ratatosk_UpdateKnockbackRecovery (081F5290): exact match | #matching #ratatosk #compiler #cse #combine #basic-blocks | 6 |
+| [notes/opus-ratatosk-spawn-particle_2026-10-31.md](../notes/opus-ratatosk-spawn-particle_2026-10-31.md) | Ratatosk_SpawnAnimatedParticle (081FC26C): exact match | #matching #ratatosk #compiler #combine #jump2 #flow #dead-code | 9 |
 | [notes/orbit-background_2026-10-14.md](../notes/orbit-background_2026-10-14.md) | Orbit-positioned background controller |  | 4 |
 | [notes/orbit-number-display_2026-10-14.md](../notes/orbit-number-display_2026-10-14.md) | Rotating contact actor and floating numbers, October 14 | *#actors* | 7 |
 | [notes/orbiting_particles_2026-10-18.md](../notes/orbiting_particles_2026-10-18.md) | Orbiting particles unit consolidation (2026-10-18) | #particles #types #matching | 3 |
