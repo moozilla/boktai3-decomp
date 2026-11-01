@@ -4,6 +4,7 @@
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
 #include "render.h"
+#include "scene_actor_damage_visibility.h"
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, u32, s32, s32);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -12,47 +13,6 @@ void SceneBody_StartRoute(void *, void *, int, int, int);
 void AnimData_SelectPaletteBank(void *, s32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
-
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
-static inline s32 LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
-static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
-{
-    if (Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->field2E0;
-        register u32 mask asm("r3") = *owner;
-        if (!(mask & 0x20) && mask) {
-            switch (LocalPlayer()) {
-                case 0:
-                    if (*owner != 1)
-                        return 0;
-                    break;
-                case 1:
-                    if (*owner != 2)
-                        return 0;
-                    break;
-                case 2:
-                    if (*owner != 4)
-                        return 0;
-                    break;
-                case 3:
-                    if (*owner != 8)
-                        return 0;
-                    break;
-            }
-        }
-    }
-    return 1;
-}
 
 static inline u8 Pick(u8 *nav)
 {
@@ -80,7 +40,6 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
         if (!(test & value)) {
             u32 *flags2D0;
             u8 *hits;
-            u16 *health;
             {
                 u32 v = 0x10 | value;
                 v &= ~0xA007;
@@ -121,14 +80,13 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
             actor->reactionSoundVariant = 1 << *hits;
             {
                 u32 d = actor->reactionSoundVariant;
-                health = (u16 *)&actor->health;
-                *health -= d;
+                actor->health -= d;
             }
-            if (ShouldShowDamage(actor)) {
+            if (SceneActorDamage_ShouldShow(actor)) {
                 u32 zero;
                 u32 buffer[2];
                 {
-                    s32 h = *(s16 *)health;
+                    s32 h = actor->health;
                     s32 maxh = FIELD(actor, 0xB0, u16);
                     s32 kind = FIELD(actor, 0xB2, s16);
                     s32 param = FIELD(actor, 0x9A, s16);
