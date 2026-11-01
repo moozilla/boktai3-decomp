@@ -1,5 +1,5 @@
 #ifdef NONMATCHING
-// fuzzy: 73.7%
+// fuzzy: 87.6%
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
@@ -14,6 +14,19 @@ static inline u32 nextRandom(void)
     gRandomIndex = index;
     return ((const u16 *)RANDOM_TABLE_ADDR)[index];
 }
+static inline u32 nextSample(const u16 *table)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return table[index];
+}
+static inline void addPosition(struct ContactPosition *out, const struct ContactPosition *delta,
+                               const struct ContactPosition *base)
+{
+    out->x = base->x + delta->x;
+    out->y = base->y + delta->y;
+    out->z = base->z + delta->z;
+}
 void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)
 {
     struct ContactPosition delta;
@@ -21,28 +34,30 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
     struct ContactPosition *position;
     if (slot->enter) {
         slot->enter = 0;
-        destination = &slot->destination;
         if (slot->targetIndex >= 0) {
             u32 scale = 256;
-            u32 angle = nextRandom() & 255;
-            const struct ContactPosition *target;
+            u32 angle = nextRandom();
+            u32 mask = 255;
             struct ContactPosition *write = &delta;
-            write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * scale);
+            angle &= mask;
+            write->x = truncateShift12(gUnk_086149C4[(angle + 64) & mask] * scale);
             write->y = 0;
             write->z = truncateShift12(gUnk_086149C4[angle] * scale);
-            target = pool->targets[slot->targetIndex];
             {
-                const struct ContactPosition *read = &delta;
-                const struct ContactPosition *first = &delta;
-                slot->destination.x = first->x + target->x;
-                destination->y = read->y + target->y;
-                destination->z = read->z + target->z;
+                struct ContactPosition *out = &slot->destination;
+                addPosition(out, &delta, pool->targets[slot->targetIndex]);
+                destination = out;
             }
-        }
+        } else
+            destination = &slot->destination;
         slot->direction =
             Math_Atan2(slot->destination.x - slot->position.x, destination->z - slot->position.z);
-        slot->direction += (nextRandom() & 63) - 32;
-        slot->steeringTimer = (nextRandom() & 15) + 16;
+        {
+            const u16 *table = gRandomTable;
+            s32 jitter = (nextSample(table) & 63) - 32;
+            slot->direction += jitter;
+            slot->steeringTimer = (nextSample(table) & 15) + 16;
+        }
         {
             struct ContactCollider *collider = &slot->healthCollider;
             s32 mask = -5;
@@ -61,31 +76,33 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         return;
     }
     if (!slot->steeringTimer) {
-        if ((nextRandom() & 255) <= 191) {
-            destination = &slot->destination;
+        const u16 *table = gRandomTable;
+        u32 mask = 255;
+        if ((nextSample(table) & mask) <= 191) {
             if (slot->targetIndex >= 0) {
                 u32 scale = 256;
-                u32 angle = nextRandom() & 255;
-                const struct ContactPosition *target;
+                u32 angle = nextSample(table);
                 struct ContactPosition *write = &delta;
-                write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * scale);
+                angle &= mask;
+                write->x = truncateShift12(gUnk_086149C4[(angle + 64) & mask] * scale);
                 write->y = 0;
                 write->z = truncateShift12(gUnk_086149C4[angle] * scale);
-                target = pool->targets[slot->targetIndex];
                 {
-                    const struct ContactPosition *read = &delta;
-                    const struct ContactPosition *first = &delta;
-                    slot->destination.x = first->x + target->x;
-                    destination->y = read->y + target->y;
-                    destination->z = read->z + target->z;
+                    struct ContactPosition *out = &slot->destination;
+                    addPosition(out, &delta, pool->targets[slot->targetIndex]);
+                    destination = out;
                 }
-            }
+            } else
+                destination = &slot->destination;
             position = &slot->position;
             slot->direction =
                 Math_Atan2(slot->destination.x - slot->position.x, destination->z - position->z);
-            slot->direction += (nextRandom() & 63) - 32;
+            {
+                s32 jitter = (nextRandom() & 63) - 32;
+                slot->direction += jitter;
+            }
         } else {
-            slot->direction = nextRandom();
+            slot->direction = nextSample(table);
             destination = &slot->destination;
             position = &slot->position;
         }
@@ -103,13 +120,9 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         struct ContactPosition *write = &delta;
         u32 direction = slot->direction;
         u32 speed = slot->speed;
-        {
-            typeof(write->x) *q1 = &write->x;
-            u8 z1 = 0;
-            *q1 = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
-            write->y = z1;
-            write->z = truncateShift12(gUnk_086149C4[direction] * speed);
-        }
+        write->x = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
+        write->y = 0;
+        write->z = truncateShift12(gUnk_086149C4[direction] * speed);
     }
     {
         const struct ContactPosition *read = &delta;
