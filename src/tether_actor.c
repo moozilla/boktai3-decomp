@@ -187,41 +187,12 @@ static inline s32 absolute_0804BB30(s32 value)
     return value;
 }
 
-static inline u8 *propertiesAt_0804BCD4(struct ContactPosition *input)
-{
-    register struct ContactPosition *position asm("r6") = input;
-    s32 x = position->x >> 8;
-    s32 z = position->z >> 8;
-    s32 cell;
-    u8 *properties;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = gTerrainMap->rows[z] + x;
-    properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties)
-        properties += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        properties = map->cells + offset;
-    }
-    return properties;
-}
-
-static inline u32 terrainFlagEnabled(void)
+static inline u8 flaggedTerrainEnabled(void)
 {
     u32 mask = 16;
-    u32 flags;
-    u32 result;
-    flags = gGameState->flags868;
-    if (flags & mask) {
-        result = 1;
-        asm("" : "+r"(result));
-    } else {
-        result = 0;
-    }
-    return result;
+    if (gGameState->flags868 & mask)
+        return TRUE;
+    return FALSE;
 }
 
 static inline s32 scale(s32 value)
@@ -520,8 +491,8 @@ void TetherActor_UpdateSecondaryLock(struct TetherActor *actor);
 
 void TetherActor_UpdateFollowingState(struct TetherActor *actor);
 
-u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *input,
-                                 u32 inputMask);
+u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *candidate,
+                                 u32 mask);
 
 u32 TetherActor_TestStepDelta(struct ContactPackedVector *origin, struct ContactPackedVector *delta,
                               u32 mask);
@@ -2999,48 +2970,24 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
-u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *input,
-                                 u32 inputMask)
+u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *candidate,
+                                 u32 mask)
 {
-    register struct ContactPosition *candidate asm("r6");
-    u32 mask;
-    u8 *properties;
-    u32 attributes;
-    s32 height, difference;
-    u32 surface;
-    candidate = input;
-    asm("" : : "r"(candidate));
-    mask = inputMask;
-    properties = propertiesAt_0804BCD4(candidate);
-    attributes = *(u16 *)(properties + 2);
-    mask &= attributes;
-    if (mask)
-        goto no;
-    if ((attributes & 128) && terrainFlagEnabled())
-        goto no;
-    properties = propertiesAt_0804BCD4(candidate);
-    surface = *properties >> 4;
-    height = (*properties & 15) << 8;
-    switch (surface) {
-        case 1:
-            height -= (u8)candidate->z;
-            break;
-        case 2:
-            height -= (u8)candidate->x;
-            break;
-    }
-    difference = origin->y - height;
+    u8 *properties = cellProperties(cellIndex_0804B6A4(candidate->x >> 8, candidate->z >> 8));
+    u32 attributes = *(u16 *)(properties + 2);
+    s32 difference;
+    if (mask & attributes)
+        return 0;
+    if ((attributes & 128) && flaggedTerrainEnabled())
+        return 0;
+    difference = origin->y - surfaceHeight(candidate);
     if (difference < 0)
         difference = -difference;
     if (difference > 50)
-        goto no;
+        return 0;
     if (NamedObject_FindNearPosition(candidate))
-        goto no;
+        return 0;
     return 1;
-no:
-    return 0;
 }
 
 u32 TetherActor_TestStepDelta(struct ContactPackedVector *origin, struct ContactPackedVector *delta,
