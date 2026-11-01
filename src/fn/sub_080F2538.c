@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: approaches the scene anchor, then restores retarget control on expiry.
 #define Ivy_UpdateAnchorApproach sub_080F2538
 struct IvyAnchorScene {
@@ -43,11 +42,10 @@ static inline s32 Ivy_Halve(s32 value)
         return value >> 1;
     return -((-value) >> 1);
 }
-static inline void Ivy_SetMode(struct IvyAnchorActor *actor, u32 state, u32 phase)
+static inline void Ivy_SetMode(struct IvyAnchorActor *actor, u8 state, u8 phase)
 {
     actor->state = state;
     actor->phase = phase;
-    asm("" : "+r"(state));
     state |= actor->flags8D;
     actor->flags8D = state;
 }

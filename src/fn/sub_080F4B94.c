@@ -1,7 +1,5 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
-// foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
 struct PhaseParent {
     u8 unknown0[0xB84];
     s16 x;
@@ -32,6 +30,12 @@ s32 Div(s32, s32);
 void Sword_UpdateWaveAttack(void);
 void Sword_UpdateThrustAttack(void);
 void Sword_UpdateSpinningLungeAttack(void);
+static inline void SetMode(struct PhaseActor *p, u8 enabled, u8 phase)
+{
+    p->field11E = enabled;
+    p->field11F = phase;
+    p->flags119 |= enabled;
+}
 void ActorPhase_OrbitParent(struct PhaseActor *p)
 {
     struct PhaseParent *parent = p->parent;
@@ -42,23 +46,16 @@ void ActorPhase_OrbitParent(struct PhaseActor *p)
         p->z += Div(parent->z + Div(gUnk_086149C4[p->angle] * 200, 4096) - p->z, p->timer);
     }
     if (--p->timer == 0) {
-        register u32 enabled asm("r0");
-        register u32 phase asm("r1");
-        register void (*update)(void) = parent->update;
+        void (*update)(void) = parent->update;
         if (update == Sword_UpdateWaveAttack) {
-            enabled = 1;
-            phase = 2;
+            SetMode(p, 1, 2);
+            p->update164 = update;
         } else if (update == Sword_UpdateThrustAttack) {
-            enabled = 1;
-            phase = 3;
+            SetMode(p, 1, 3);
+            p->update164 = update;
         } else if (update == Sword_UpdateSpinningLungeAttack) {
-            enabled = 1;
-            phase = 4;
-        } else
-            return;
-        p->field11E = enabled;
-        p->field11F = phase;
-        p->flags119 = enabled | p->flags119;
-        p->update164 = update;
+            SetMode(p, 1, 4);
+            p->update164 = update;
+        }
     }
 }
