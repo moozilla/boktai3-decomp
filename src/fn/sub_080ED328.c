@@ -1,8 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
-void SceneActorBehavior_ApplyContactReaction(void *, void *);
+void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
@@ -38,6 +37,5 @@ void sub_080ED328(void *source, void *target, struct SceneActorRegistryResetView
         return;
     if (Test(ContextFlag(actor->context, 1), ~0))
         return;
-    asm("" ::"r"(actor));
-    SceneActorBehavior_ApplyContactReaction(source, target);
+    SceneActorBehavior_ApplyContactReaction(source, target, actor);
 }
