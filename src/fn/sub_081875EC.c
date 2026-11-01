@@ -1,7 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "armor_decision_ops.h"
 #include "engine_globals.h"
-
 
 struct ArmorDecisionActor {
     u8 pad0[0x18];
@@ -34,24 +33,6 @@ extern struct ArmorDecisionTarget *gGameState;
 void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
-// Grid-cell deltas (x and z rounded to 256-unit cells) and their magnitudes.
-#define ARMOR_GRID_DELTAS(target, actor, dx, dy, dz, ax, ay, az)                                   \
-    do {                                                                                           \
-        dx = (target)->x - (actor)->x;                                                             \
-        dy = (target)->y - (actor)->y;                                                             \
-        dz = (target)->z - (actor)->z;                                                             \
-        dx = (dx + 128) >> 8;                                                                      \
-        dz = (dz + 128) >> 8;                                                                      \
-        ax = dx;                                                                                   \
-        ay = dy;                                                                                   \
-        az = dz;                                                                                   \
-        if (dx < 0)                                                                                \
-            ax = -dx;                                                                              \
-        if (dy < 0)                                                                                \
-            ay = -dy;                                                                              \
-        if (dz < 0)                                                                                \
-            az = -dz;                                                                              \
-    } while (0)
 
 // confidence=low: selects attacks when player and armor share a horizontal grid axis.
 void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
@@ -67,7 +48,7 @@ void Armor_UpdateAlignedAttackDecision(struct ArmorDecisionActor *p)
         --(*cooldown);
     if ((p->phase != 255) && (p->behavior != 20))
         return;
-    ARMOR_GRID_DELTAS(gGameState, p, dx, dy, dz, ax, ay, az);
+    ARMOR_ALIGNED_GRID(dx, dy, dz, ax, ay, az, gGameState, p);
     if (p->flags & 1) {
         u8 *decision = &p->decision;
         switch (*decision) {

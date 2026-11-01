@@ -1,24 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "armor_decision_ops.h"
 #include "engine_globals.h"
-/* Horizontal deltas use whole tiles; height stays in position units. */
-#define ARMOR_ALIGNED_GRID(deltaX, deltaY, deltaZ, absX, absY, absZ, target, actor)                \
-    do {                                                                                           \
-        (deltaX) = (target)->x - (actor)->x;                                                       \
-        (deltaY) = (target)->y - (actor)->y;                                                       \
-        (deltaZ) = (target)->z - (actor)->z;                                                       \
-        (deltaX) = ((deltaX) + 128) >> 8;                                                          \
-        (deltaZ) = ((deltaZ) + 128) >> 8;                                                          \
-        (absX) = (deltaX);                                                                         \
-        (absY) = (deltaY);                                                                         \
-        (absZ) = (deltaZ);                                                                         \
-        if ((deltaX) < 0)                                                                          \
-            (absX) = -(deltaX);                                                                    \
-        if ((deltaY) < 0)                                                                          \
-            (absY) = -(deltaY);                                                                    \
-        if ((deltaZ) < 0)                                                                          \
-            (absZ) = -(deltaZ);                                                                    \
-    } while (0)
 
 struct ArmorDecisionActor {
     u8 pad0[0x18];

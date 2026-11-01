@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "armor_decision_ops.h"
 #include "game_state.h"
 
 struct ArmorPart {
@@ -52,26 +52,6 @@ struct ArmorTarget {
     s16 z;
 };
 
-// Player-relative x and z deltas in 256-unit grid cells, and their magnitudes.
-#define ARMOR_PLAYER_GRID(actor, px, ax, pz, az, dx, dz, absX, absZ)                               \
-    do {                                                                                           \
-        struct ArmorTarget *player_ = (struct ArmorTarget *)gGameState;                            \
-        px = player_->x;                                                                           \
-        ax = (actor)->x;                                                                           \
-        dx = px - ax;                                                                              \
-        pz = player_->z;                                                                           \
-        az = (actor)->z;                                                                           \
-        dz = pz - az;                                                                              \
-        dx = (dx + 0x80) >> 8;                                                                     \
-        dz = (dz + 0x80) >> 8;                                                                     \
-        absX = dx;                                                                                 \
-        absZ = dz;                                                                                 \
-        if (dx < 0)                                                                                \
-            absX = -dx;                                                                            \
-        if (dz < 0)                                                                                \
-            absZ = -dz;                                                                            \
-    } while (0)
-
 // confidence=low: switches timed armor attack modes and selects aligned attacks.
 void sub_0818911C(void *arg0)
 {
@@ -104,7 +84,9 @@ void sub_0818911C(void *arg0)
         return;
     }
 
-    ARMOR_PLAYER_GRID(a, targetX, actorX, targetZ, actorZ, gridX, gridZ, absoluteX, absZ);
+    ARMOR_GET_RELATIVE_GRID(gridX, gridZ, absoluteX, absZ,
+                            targetX = ((struct ArmorTarget *)gGameState)->x, actorX = a->x,
+                            targetZ = ((struct ArmorTarget *)gGameState)->z, actorZ = a->z);
 
     if (a->flags & 1) {
         switch (a->decision) {
