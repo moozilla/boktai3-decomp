@@ -545,61 +545,8 @@ void Trigger_UpdateActivation(struct TriggerManager *manager, struct Trigger *p)
 
 void Trigger_UpdateLockedPause(struct TriggerManager *manager, struct Trigger *p)
 {
-    struct TriggerObject *o;
-    struct TriggerAnim *a;
-    const u16 *entry;
-    register u16 n asm("r0");
-    o = p->object;
-    a = p->animation;
-    entry = a->data + a->frame;
-    o->frame = *entry >> 6;
-    {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 4;
-        else
-            o->flags &= ~4;
-    }
-    {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    n = ++a->timer;
-    if (n >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8) {
-                    a->timer = a->rate;
-                } else {
-                    a->frame = a->count - 1;
-                }
-            } else {
-                a->frame--;
-            }
-        } else {
-            if (++a->frame >= a->count) {
-                if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
-                } else {
-                    a->frame = 0;
-                }
-            }
-        }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
-    }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object,
+                           (struct DisplaySequenceState *)p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (p->timer > 31) {
