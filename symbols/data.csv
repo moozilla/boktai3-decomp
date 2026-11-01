@@ -22,3 +22,4 @@ addr,name,size,kind,confidence,source,notes
 086136F0,gUnk_086136F0,BE,table,high,SoundTest_CountEntries,Sound test music menu ordered song numbers followed by -1
 086137AE,gUnk_086137AE,416,table,high,SoundTest_CountEntries,Sound test effects menu ordered song numbers followed by -1
 08613BC4,gUnk_08613BC4,12E,table,high,SoundTest_CountEntries,Sound test voices menu ordered song numbers followed by -1
+08605E48,gLunRouteProgressRates,20,table,high,Lun_GetRouteProgressRate,Eight 32-bit rates indexed by the capped route progress phase
