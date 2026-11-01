@@ -1,6 +1,11 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
+/* The collider's flags as a 16-bit bitfield: the read-modify-write leaves the zeros that the
+ * SetControl and ResetPhase stores reuse. */
+struct IvyColliderBits {
+    u8 unknown0[6];
+    u16 flags : 16;
+};
 
 #define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
 struct SceneActorTargetWaitState {
@@ -23,28 +28,12 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->word104 = 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind,
-                              u8 zero8, u32 zero)
+static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 behavior)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = zero8;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = zero;
-    {
-        u32 *flags = &actor->flags114;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->word104 = zero;
-}
-static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 behavior, u8 zero8,
-                              u32 zero)
-{
-    actor->state2A8 = zero8;
-    actor->phase2A9 = zero8;
+    actor->state2A8 = 0;
+    actor->phase2A9 = 0;
     actor->behavior2AA = behavior;
-    actor->counter2AC = zero;
+    actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
 void SceneActorControl_UpdateTargetApproachPhase(struct SceneActorRegistryResetView *actor)
@@ -57,23 +46,17 @@ void SceneActorControl_UpdateTargetApproachPhase(struct SceneActorRegistryResetV
         state->targetMissFrames = 0;
     }
     if (actor->field2B0) {
-        struct ContactCollider *collider = &actor->colliderA;
-        u32 value = ~4;
-        u32 zero;
-        u8 zero8;
-        value &= collider->flags;
-        zero8 = 0;
-        asm("" : "+r"(zero8));
-        zero = 0;
-        value |= 8;
-        collider->flags = value;
+        struct IvyColliderBits *collider = (void *)&actor->colliderA;
+        u32 mask = ~4;
+        collider->flags &= mask;
+        collider->flags |= 8;
         {
             u16 *flags = &actor->flags2C0;
             u32 mask = ~0x800;
             *flags = mask & *flags;
         }
-        SetControl(actor, Ivy_UpdateActiveState, 0x22, zero8, zero);
-        ResetPhase(actor, 2, zero8, zero);
+        BeginControl(actor, Ivy_UpdateActiveState, 0x22);
+        ResetPhase(actor, 2);
     }
     actor->counter2AC++;
 }

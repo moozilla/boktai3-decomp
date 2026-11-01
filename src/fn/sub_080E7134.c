@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "ram.h"
@@ -73,13 +72,7 @@ static inline u8 HasMode(u8 *p)
 }
 static inline s32 SpeedBase(u8 *context)
 {
-    register u8 *base asm("r4") = context;
-    u32 offset;
-    register u8 *sample asm("r0");
-    asm("" : "+r"(base));
-    offset = 0x65e;
-    sample = base + offset;
-    return *sample - 2;
+    return context[0x65E] - 2;
 }
 // confidence=low: generic scene actor leap; species ownership is not established.
 void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
@@ -129,7 +122,7 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
             gRandomIndex = (gRandomIndex + 1) & 1023;
             {
                 u32 offset = gRandomIndex * 2;
-                u32 random = *(u16 *)(offset + (u32)gRandomTable);
+                u32 random = *(u16 *)(offset + RANDOM_TABLE_ADDR);
                 s32 base = SpeedBase(context);
                 speed = base + (random & 3);
             }

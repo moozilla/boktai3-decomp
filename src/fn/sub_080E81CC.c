@@ -1,20 +1,14 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+/* Every quadrant has a case, but the switch keeps a default path that falls off the end with no
+ * return statement; r0 still holds direction there, as in the ROM. */
 u32 SceneActor_GetDirectionFlags(s32 direction)
 {
-    register s32 result asm("r0") = direction;
-    register s32 quadrant asm("r1") = (direction + 16) & 255;
-    asm("" : "+r"(quadrant));
-    quadrant >>= 6;
-    switch (quadrant) {
+    switch (((direction + 16) & 255) >> 6) {
         case 0:
         case 2:
-            result = 0;
-            break;
+            return 0;
         case 1:
         case 3:
-            result = 1;
-            break;
+            return 1;
     }
-    return result;
 }

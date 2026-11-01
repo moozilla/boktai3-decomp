@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
@@ -19,7 +18,6 @@ struct AxeGroup {
     u16 field44;
     u8 unknown46[0x36];
     struct AxeRoutePoint *point;
-    u32 has;
 };
 struct AxeContext {
     u8 unknown0[0xE4C];
@@ -64,25 +62,17 @@ static inline u32 Flag(void *base, u32 maskInput, u32 off)
     u32 mask = maskInput;
     return off == 0x2D4 ? *(u16 *)((u8 *)base + off) & mask : *(u32 *)((u8 *)base + off) & mask;
 }
-static inline u32 IsDown(struct SceneActorRegistryResetView *actor)
+static inline u8 IsDown(struct SceneActorRegistryResetView *actor)
 {
-    u32 r;
     if (actor && (Flag(actor, 0x40, 0x2D4) || Flag(actor, 0x20000, 0x2D0) || actor->health <= 0))
-        r = 1;
-    else
-        r = 0;
-    asm("" : "+r"(r));
-    return r;
+        return 1;
+    return 0;
 }
-static inline u32 HasMark(struct AxeContext *context)
+static inline u8 HasMark(struct AxeContext *context)
 {
-    u32 r;
-    if (Flag(context, 0x10, 0xE4C)) {
-        r = 1;
-        asm("" : "+r"(r));
-    } else
-        r = 0;
-    return r;
+    if (Flag(context, 0x10, 0xE4C))
+        return 1;
+    return 0;
 }
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                             u8 behavior)
@@ -101,14 +91,11 @@ void Axe_UpdateRouteWander(struct SceneActorRegistryResetView *actor)
     struct AxeVec targetStorage;
     struct AxeVec *target;
     struct AxeRoutePoint *point;
-    u32 has;
     if (IsDown(actor))
         return;
     if (Flag(actor, 0x100, 0x2D4))
         return;
-    has = HasMark(context);
-    asm("" : "+r"(has));
-    if (has == 0) {
+    if (!HasMark(context)) {
         group->field44 = 0;
         return;
     }

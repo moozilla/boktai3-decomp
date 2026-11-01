@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 s32 Mod(s32, s32);
 void SceneActorAnimation_SelectDirectionalEntry(u8 *, s32);
@@ -23,9 +22,8 @@ inline static u8 TakeFlag(u8 *flag)
     return 0;
 }
 
-void Mummy_UpdateDying(u8 *s, s32 argIn)
+void Mummy_UpdateDying(u8 *s, s32 arg)
 {
-    register s32 arg asm("r5") = argIn;
     struct Sub *c = &(*(struct Ctx **)(s + 4))->sub;
     u8 *part = s + 0x3D4;
     s32 zero;
@@ -67,11 +65,9 @@ void Mummy_UpdateDying(u8 *s, s32 argIn)
             *((void (**)(void))(s + 0x21C)) = fn;
             *((u16 *)(s + 0x2C8)) = zero;
             flags = (u32 *)(s + 0x114);
-            do {
-                clear = ~1;
-                *flags &= clear;
-                *((u32 *)(s + 0x104)) = zero;
-            } while (0);
+            clear = ~1;
+            *flags &= clear;
+            *((u32 *)(s + 0x104)) = zero;
             return;
         }
     }
