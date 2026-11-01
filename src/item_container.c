@@ -570,56 +570,29 @@ s32 TriggerManager_Update(struct TriggerManager *input)
     s32 i;
     struct Trigger *trigger, *next;
     u8 *delay;
-    {
-        struct Player **table;
-        i = 0;
-        table = gPlayers;
-        for (; i < 4; i++) {
-            struct Player *actor;
-            asm("" : "+r"(i));
-            actor = ({
-                struct Player *a = table[i];
-                a;
-            });
-            p->actors[i] = actor;
-            if (actor) {
-                u32 offset = i * 8;
-                struct SceneVec *out;
-                struct SceneVec *in;
-                s32 x, z, horizontal, height;
-                out = (struct SceneVec *)(offset + (u32)({
-                                              struct TriggerManager *manager = p;
-                                              manager;
-                                          }));
-                out = (struct SceneVec *)((u8 *)out + 60);
-                in = &actor->position;
-                x = ({
-                    register s32 value asm("r4") = actor->position.x;
-                    asm("" : : "r"(value));
-                    value;
-                });
-                z = in->z;
-                out->x = scale(x - z);
-                horizontal = scale(({
-                    register s32 sum asm("r1") = x + z;
-                    asm("" : : "r"(sum));
-                    sum;
-                }));
-                height = scaleHeight(in->y);
-                out->y = horizontal - height;
-                out->z = horizontal + height;
-            }
+    for (i = 0; i < 4; i++) {
+        struct Player *actor;
+        actor = gPlayers[i];
+        p->actors[i] = actor;
+        if (actor) {
+            u32 offset = i * 8;
+            struct SceneVec *out;
+            struct SceneVec *in;
+            s32 x, z, horizontal, height;
+            out = (struct SceneVec *)(offset + (u32)p);
+            out = (struct SceneVec *)((u8 *)out + 60);
+            in = &actor->position;
+            x = actor->position.x;
+            z = in->z;
+            out->x = scale(x - z);
+            horizontal = scale(x + z);
+            height = scaleHeight(in->y);
+            out->y = horizontal - height;
+            out->z = horizontal + height;
         }
     }
-    trigger = ({
-        struct TriggerManager *m = p;
-        m->head;
-    });
-    delay = ({
-        u8 *value = (u8 *)36;
-        value = (u8 *)((u32)value + (u32)p);
-        value;
-    });
+    trigger = p->head;
+    delay = &p->soundDelay;
     for (; trigger; trigger = next) {
         next = trigger->next;
         if (trigger->flags & 1)
@@ -630,10 +603,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                     trigger->sprite->flags &= ~1;
                 {
                     struct TriggerObject *object;
-                    struct TriggerObject *candidate = ({
-                        struct TriggerObject *value = trigger->object;
-                        value;
-                    });
+                    struct TriggerObject *candidate = trigger->object;
                     object = candidate;
                     if (candidate) {
                         if (!trigger->started)
@@ -655,14 +625,13 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                                 goto available;
                             else
                                 available = globalMode();
-                            asm("" : : "r"(available));
                             if (available) {
                             available:
                                 if (trigger->visible)
                                     trigger->flash = 31;
                                 {
                                     u32 ticks = trigger->flash;
-                                    register u32 saved asm("r2") = ticks;
+                                    u8 saved = ticks;
                                     if (saved) {
                                         ticks--;
                                         trigger->flash = ticks;
@@ -717,10 +686,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
         }
     }
     {
-        u8 *timer = ({
-            u8 *value = delay;
-            value;
-        });
+        u8 *timer = delay;
         u32 ticks = *timer;
         if (ticks)
             *timer = ticks - 1;
