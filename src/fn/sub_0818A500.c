@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: applies queued scene commands to the armor actor (behavior, attachments, flags).
 
 typedef struct {
@@ -16,20 +15,6 @@ void *ActorAttachment_CreateSpriteSlot(u32, void *, void *, s32, s32, u32, void 
 void *ActorAttachment_CreateValueSpriteSlot(u32, void *, void *, s32, s32, u32, s16 *, s32, u32,
                                             void *, void *);
 void *ActorAttachment_ReleaseResource(void *, u32, void *);
-
-#define ADC(x)                                                                                     \
-    ({                                                                                             \
-        u32 o_ = 0xADC;                                                                            \
-                                                                                                   \
-        (void *)((x) + o_);                                                                        \
-    })
-
-#define B(x, o)                                                                                    \
-    ({                                                                                             \
-        u8 *t_ = (x);                                                                              \
-                                                                                                   \
-        t_ + (o);                                                                                  \
-    })
 
 typedef struct {
     u16 flags;
@@ -66,16 +51,14 @@ void Armor_ApplySceneCommands(u8 *arg)
                 ActorController_SetBehavior(p, 0);
                 {
                     u32 v = (((u8)m[4] + 5) & 7) << 5;
-                    u32 offset = 0xB39;
-                    register u8 *d asm("r2");
-                    asm("" : "+r"(offset) : : "r1", "r2");
-                    d = p + offset;
+                    u8 *d = p + 0xB39;
                     *d = v & 0xc0;
                 }
-                goto consume;
+                Trigger_ConsumePending((p + 0xADC), 1);
+                break;
             case 14:
                 ActorController_SetBehavior(p, 0x2d);
-                Trigger_ConsumePending(ADC(p), 1);
+                Trigger_ConsumePending((p + 0xADC), 1);
                 break;
             case 3: {
                 s32 a = m[4];
@@ -118,21 +101,16 @@ void Armor_ApplySceneCommands(u8 *arg)
                     case 7:
                         break;
                 }
-                goto consume;
+                Trigger_ConsumePending((p + 0xADC), 1);
+                break;
             }
             case 12: {
-                // Keep r1 unavailable across the signed argument load.
-                register u32 reserved asm("r1");
-                s32 active;
-                asm("" : "=r"(reserved));
-                active = m[4];
-                asm("" : : "r"(reserved));
+                s32 active = m[4];
                 if (active != 0)
                     SETF(p);
                 else
                     *(u16 *)(p + 0xB32) &= 0xFBFF;
-            consume:
-                Trigger_ConsumePending(ADC(p), 1);
+                Trigger_ConsumePending((p + 0xADC), 1);
                 break;
             }
             case 13:
@@ -158,15 +136,15 @@ void Armor_ApplySceneCommands(u8 *arg)
                 break;
             case 15: {
                 u16 v = m[4];
-                *(u16 *)B(p, 0x48) = v;
+                *(u16 *)(p + 0x48) = v;
             }
                 {
                     u16 v = m[5];
-                    *(u16 *)B(p, 0x4a) = v;
+                    *(u16 *)(p + 0x4a) = v;
                 }
                 {
                     u16 v = m[6];
-                    *(u16 *)B(p, 0x4c) = v;
+                    *(u16 *)(p + 0x4c) = v;
                 }
                 break;
         }
