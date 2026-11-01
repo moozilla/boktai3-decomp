@@ -381,7 +381,7 @@ s32 TetherActor_SetHeadingEntry(struct TetherActor *actor, u32 entry);
 
 s32 TetherActor_SetCardinalEntry(struct TetherActor *actor, u32 unusedEntry);
 
-s32 TetherActor_SetEntry(struct TetherActor *input, u32 inputBase);
+s32 TetherActor_SetEntry(struct TetherActor *actor, u32 base);
 
 void TetherActor_ApplyPendingEffect(struct TetherActor *actor);
 
@@ -1079,20 +1079,12 @@ s32 TetherActor_SetCardinalEntry(struct TetherActor *actor, u32 unusedEntry)
     return DisplayAnimation_UpdatePlayback(display);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
-s32 TetherActor_SetEntry(struct TetherActor *input, u32 inputBase)
+s32 TetherActor_SetEntry(struct TetherActor *actor, u32 base)
 {
-    struct TetherActor *actor = input;
-    u32 base = inputBase;
-    register u32 kind asm("r0") = actor->kind;
     s32 result;
-    if (kind != 9) {
-        register u32 entry asm("r1") = kind;
-        asm("" : "+r"(entry));
-        entry = base + entry;
-        result = TetherActor_SetHeadingEntry(actor, entry);
-    } else
+    if (actor->kind != 9)
+        result = TetherActor_SetHeadingEntry(actor, base + actor->kind);
+    else
         result = TetherActor_SetCardinalEntry(actor, base);
     return result;
 }
