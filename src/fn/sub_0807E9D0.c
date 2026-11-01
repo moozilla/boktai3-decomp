@@ -71,7 +71,7 @@ static inline void ExtendContactTimer(struct SceneActorRegistryResetView *actor)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 38.1%
+// fuzzy: 34.8%
 void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactView *source,
                   struct SceneActorBehaviorContactView *destination,
                   struct SceneActorRegistryResetView *actor)
