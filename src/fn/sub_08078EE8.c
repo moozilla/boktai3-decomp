@@ -58,7 +58,6 @@ static inline void ActorStatus_MaskHalfword(u16 *field, u32 mask)
 void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, s32, s32, s32);
 s32 Callback_InvokeActor(void *, void *);
-void SceneActorContacts_ReleaseNode(void *);
 s32 Div(s32, s32);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
@@ -80,18 +79,6 @@ static inline void ActorStatus_ClearPlacementFlags(struct SceneActorChasePlaceme
 {
     u32 mask = ~bits;
     placement->flags &= mask;
-}
-
-
-
-static inline void ActorStatus_ReleaseContact(struct SceneActorRegistryResetView *actor)
-{
-    u32 flag = 0x1000;
-    if (actor->flags2D4 & flag) {
-        SceneActorContacts_ReleaseNode(actor->group.contactNode);
-        actor->flags2D4 &= ~flag;
-        actor->group.contactNode = 0;
-    }
 }
 
 static inline void ActorStatus_ResetInteractionAt(struct SceneActorRegistryResetView *actor,

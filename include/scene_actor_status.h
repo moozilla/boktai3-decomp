@@ -7,6 +7,7 @@
 #include "ram.h"
 #include "runtime.h"
 #include "engine_globals.h"
+#include "scene_actor_contact_list.h"
 
 extern u32 gLinkSession;
 extern u8 *gUnknown_02000580[];
@@ -150,6 +151,16 @@ static inline void ActorStatus_SetBodyBit(struct SceneActorRegistryResetView *ac
 static inline void ActorStatus_ClearMotionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
 {
     actor->flags2D4 &= ~bits;
+}
+
+static inline void ActorStatus_ReleaseContact(struct SceneActorRegistryResetView *actor)
+{
+    u32 flag = 0x1000;
+    if (actor->flags2D4 & flag) {
+        SceneActorContacts_ReleaseNode(actor->group.contactNode);
+        actor->flags2D4 &= ~flag;
+        actor->group.contactNode = 0;
+    }
 }
 
 static inline void ActorStatus_ClearInteraction(struct SceneActorRegistryResetView *actor,
