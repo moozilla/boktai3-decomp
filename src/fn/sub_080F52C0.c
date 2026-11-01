@@ -1,4 +1,5 @@
 #include "global.h"
+#include "sword_orbit.h"
 #include "engine_globals.h"
 #include "ram.h"
 // confidence=low: computes a target-relative endpoint before accelerating the turn.
@@ -44,13 +45,7 @@ void Sword_BeginTargetOrbit(u8 *p)
         }
         one = 1;
         choice &= one;
-        {
-            s16 turn[] = {1};
-            turn[0] = -turn[0];
-            if (choice)
-                turn[0] = 1;
-            o->spin = turn[0];
-        }
+        o->spin = Sword_OrbitDirection(choice);
         o->spinActive = one;
     }
 
