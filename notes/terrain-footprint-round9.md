@@ -1,11 +1,15 @@
 # Terrain_MoveFootprint
 
-The guarded footprint mover reaches 82.2% fuzzy from 20.3%. A corner probe can
-change its input position. The caller undoes the footprint offset on that
-adjusted position before sampling the surface. A diagonal uses independent
-positions for the X-only and Z-only probes. When both axes are blocked, their
-movement signs select the boundaries of the current tile.
+All 2,176 bytes match. Cardinal movement tests two leading corners. Diagonal
+movement tests the leading corner, then the two axes independently. The
+caller removes its footprint offset from a corrected probe before sampling
+the surface. If both axes are blocked, the motion signs select the edges of
+the current cell.
 
-The reconstructed candidate has the same 2,128-byte extent and 47 register-blind
-instruction differences as the earlier draft tested across 432 combinations
-of direction, starting position and probe outcomes.
+Each diagonal has its own exit that sets the adjustment byte. An X-only
+correction shares that exit across directions with the same X sign. Keeping
+the exit labels just after the final Z-probe calls lets agbcc share the two
+matching instruction tails. Moving those writes to the bottom of the function
+changes the branch destinations.
+
+Tags: 0821C8F8, Terrain_MoveFootprint, terrain, matching
