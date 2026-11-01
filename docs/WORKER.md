@@ -152,6 +152,12 @@ that is a scope gap: record it (below) so the tool gets better.
   only with evidence that the original had a compiled-out macro at that spot, for example
   the same statement in every caller of a shared helper. The tools count it and land
   refuses it without `--allow-pins`.
+* An `if` whose body the original compiled out is written with `DEBUG_PRINT()`
+  (`include/debug.h`, expands to nothing): `if (TakeFlag(f)) { DEBUG_PRINT(); }`. Matched
+  code has 13 such sites, nearly all on `Take*` flag calls. Use it only where the original
+  plausibly logged something: the condition is a call or a test worth reporting. An `if`
+  with a bare empty body (`{ }` or `;`) is a fence; the tools count it as a barrier and
+  land refuses it without `--allow-pins`.
 * The SDK's `SystemCall(n)` (`include/gba/syscall.h`) is the one inline assembly that
   counts as ordinary C: the original authors wrote it that way.
 * No selector macros: a `#define` a file sets before including a shared header to change

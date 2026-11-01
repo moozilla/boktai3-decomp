@@ -1,4 +1,5 @@
 #include "scene_item_values.h"
+#include "debug.h"
 s32 SceneItemValue_CalculateEquipment(u32 slot)
 {
     struct SceneValueEquipment *equipment = Inventory_GetEquipmentEntry(slot);
@@ -14,6 +15,7 @@ s32 SceneItemValue_CalculateEquipment(u32 slot)
     else if (equipment->condition <= 250)
         percent = 50;
     else if (equipment->condition <= 500) {
+        DEBUG_PRINT();
     } else if (equipment->condition <= 750)
         percent = 90;
     else if (equipment->condition <= 1000)

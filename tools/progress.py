@@ -256,8 +256,10 @@ def check_tails(elf, source_root=Path(ROOT) / "src"):
 MARK = "// MATCHING_CONCESSION: register-pinning"
 # an empty `do { } while (0)` counts too: its loop notes end cse blocks and weight refs like a barrier
 EMPTY_LOOP = r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)'
+# so does an if with nothing in its body; one whose body is DEBUG_PRINT() (include/debug.h) is ordinary C
+EMPTY_IF = r'\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{(?:\s|/\*.*?\*/|//[^\n]*)*\}|;)'
 HINT = re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*(?:volatile\s*)?\(\s*""'
-                  r'|\basm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)|' + EMPTY_LOOP)
+                  r'|\basm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)|' + EMPTY_LOOP + '|' + EMPTY_IF)
 
 
 def _bodies(text):
@@ -318,6 +320,7 @@ HINT_KINDS = [
     ("operand", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*:[^;:]*\(')),
     ("barrier", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*(?:\)|:\s*:\s*:\s*"memory")')),
     ("empty-loop", re.compile(EMPTY_LOOP)),
+    ("empty-if", re.compile(EMPTY_IF)),
 ]
 
 

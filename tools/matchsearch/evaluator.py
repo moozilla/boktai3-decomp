@@ -115,6 +115,17 @@ def _concessions(preprocessed: str, names: tuple[str, ...]) -> dict[str, int]:
             if token == 'do' and parts[index + 1:index + 7] == ['{', '}', 'while', '(', '0', ')']:
                 found['asm_barriers'] += 1
                 continue
+            # so does an if with nothing in its body; DEBUG_PRINT() (include/debug.h) leaves `{ ; }`
+            if token == 'if' and parts[index + 1:index + 2] == ['(']:
+                depth, at = 0, index + 1
+                while at < len(parts):
+                    depth += (parts[at] == '(') - (parts[at] == ')')
+                    at += 1
+                    if depth == 0:
+                        break
+                if parts[at:at + 2] == ['{', '}'] or parts[at:at + 1] == [';']:
+                    found['asm_barriers'] += 1
+                continue
             if token not in {'asm', '__asm', '__asm__'}:
                 continue
             at = index + 1

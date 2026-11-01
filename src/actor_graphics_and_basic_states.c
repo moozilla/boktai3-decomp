@@ -5,6 +5,7 @@
 #include "engine_globals.h"
 #include "player.h"
 #include "ram.h"
+#include "debug.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -2383,7 +2384,7 @@ void sub_080243CC(State_08023F98 *p)
     u32 zero = 0;
     *vulnerable = 1;
     if (SceneRecovery_TakeEntry(p, zero)) {
-        /* This recovery state needs no additional initialization. */
+        DEBUG_PRINT();
     }
     if (p->finished) {
         u32 variant = actor[0x383];

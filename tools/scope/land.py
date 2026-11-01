@@ -134,6 +134,9 @@ def concessions(text):
     bars = len(re.findall(r'\basm(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', text))
     # an empty `do { } while (0)` acts as a barrier: its loop notes end cse blocks and weight refs
     bars += len(re.findall(r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)', text))
+    # as does an if with nothing in its body (one whose body is DEBUG_PRINT(), include/debug.h, is plain C)
+    bars += len(re.findall(r'\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{\s*\}|;)',
+                           re.sub(r"//[^\n]*|/\*.*?\*/", "", text, flags=re.S)))
     if (pins or bars) and MARKER not in text:
         text = MARKER + "\n" + text
     if not (pins or bars) and MARKER in text:

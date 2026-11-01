@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "engine.h"
+#include "debug.h"
 struct ActorRevealState {
     u8 unknown0[0x5BB];
     u8 revealTicks;
@@ -35,6 +36,7 @@ void ActorVisibility_TickRevealDelay(struct SceneActorRegistryResetView *a)
     if (Unavailable(a))
         return;
     if (Test(gEngineFlags, 0x4800)) {
+        DEBUG_PRINT();
     }
     if (s->revealTicks) {
         *(u32 *)a->drawable &= ~1;
