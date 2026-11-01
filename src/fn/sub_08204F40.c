@@ -1,10 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
 #include "render.h"
 #include "engine.h"
 #include "ram.h"
+#include "player_cue_sequence.h"
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
@@ -41,97 +41,6 @@ static inline u32 RandomFrom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     return table[gRandomIndex];
-}
-static inline void StepAnimation(u8 *p, void *sprite, struct DisplaySequenceState *s)
-{
-    u32 flags, elapsed;
-    u32 duration;
-    register u32 mask asm("r6");
-    register u32 savedDuration asm("r4");
-    const volatile u16 *c = s->commands + s->index;
-    {
-        u32 frame;
-        frame = *c >> 6;
-        *(u16 *)((u8 *)sprite + 0x10) = frame;
-    }
-    {
-        u32 input = s->flags, bit = 1;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            *(u32 *)(p + 0x24) |= 4;
-        else
-            *(u32 *)(p + 0x24) &= ~4;
-    }
-    {
-        u32 input = s->flags, bit = 2;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            *(u32 *)sprite |= 8;
-        else
-            *(u32 *)sprite &= ~8;
-    }
-    elapsed = s->elapsed + 1;
-    s->elapsed = elapsed;
-    {
-        register u32 temp asm("r2") = 0xffff;
-        asm("" : "+r"(temp));
-        mask = temp;
-    }
-    duration = s->duration;
-    elapsed = (u16)elapsed;
-    savedDuration = duration;
-    asm("" : "+r"(savedDuration) : "r"(elapsed));
-    if ((u16)elapsed >= duration) {
-        s->elapsed = 0;
-        flags = s->flags;
-        if (flags & 4) {
-            u32 i = s->index;
-            if (!i) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold)
-                        s->elapsed = savedDuration;
-                    else
-                        s->index = s->frameCount - 1;
-                }
-            } else
-                s->index = i - 1;
-        } else {
-            u32 i = s->index + 1, n;
-            s->index = i;
-            n = s->frameCount;
-            if ((i & mask) >= n) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if ((u8)hold) {
-                        s->elapsed = duration;
-                        s->index = n - 1;
-                    } else
-                        s->index = 0;
-                }
-            }
-        }
-        c = s->commands + s->index;
-        s->frameWeight = *c & 15;
-        {
-            register s32 w asm("r2") = s->frameWeight;
-            s32 speed = s->speed;
-            speed = (speed * w) >> 6;
-            s->duration = speed;
-            if (!(u8)speed)
-                s->duration = 1;
-        }
-    }
 }
 s32 EnemyD459_Update(u8 *p)
 {
@@ -218,6 +127,7 @@ s32 EnemyD459_Update(u8 *p)
         else
             W(0x24) &= ~1;
     }
-    StepAnimation(p, p + 0x24, (void *)(p + 0x10c));
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)(p + 0x24),
+                           (struct DisplaySequenceState *)(p + 0x10c));
     W(0x18)++;
 }

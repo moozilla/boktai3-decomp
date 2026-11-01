@@ -5825,11 +5825,12 @@ def c_change(base_lines, path):
 
 def is_snippet(base_lines, text, func):
     """Is TEXT a `put` snippet rather than a whole copy of the workspace: it lacks a function or
-    INCLUDE_ASM the workspace has besides FUNC, or the workspace's #include lines."""
+    INCLUDE_ASM the workspace has besides FUNC, or the workspace's #include lines. A static helper
+    (`static inline` or `inline static`) the variant drops, e.g. for a shared header's, does not count."""
     base = "\n".join(base_lines)
 
     def defined(t):
-        return (set(re.findall(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*?\b(\w+)\s*\([^;{}]*\)\s*\{", t, re.M))
+        return (set(re.findall(r"^(?!(?:inline\s+|__inline__\s+)*static\b)[A-Za-z_][^\n;=(){}]*?\b(\w+)\s*\([^;{}]*\)\s*\{", t, re.M))
                 | set(re.findall(r"INCLUDE_ASM\([^,]+,\s*(\w+)\)", t)))
     if (defined(base) - {func}) - defined(text):
         return True

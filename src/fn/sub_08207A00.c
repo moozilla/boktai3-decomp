@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
 #include "engine.h"
 s32 Script_SeekToKeyword(s32);
@@ -14,113 +13,6 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, s32, s32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-static inline u8 VulcanCannon_MaskedFlags(u8 value, u32 mask)
-{
-    mask &= value;
-    return mask;
-}
-static inline u32 VulcanCannon_StepAnimation_(struct VulcanCannon *owner)
-{
-    struct DisplaySequenceSprite *sprite = &owner->display.sprite;
-    struct DisplaySequenceState *state = &owner->sequence;
-    const volatile u16 *command;
-    u32 ended;
-    u32 duration;
-    u32 flags;
-    register u32 bit asm("r3");
-    {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = state->commands;
-        command = (const volatile u16 *)(((u32)table) + offset);
-    }
-    sprite->frame = (*command) >> 6;
-    {
-        u8 input = state->flags;
-        register u32 first asm("r1");
-        bit = 1;
-        first = bit;
-        first &= input;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        u8 input = state->flags;
-        register u32 bit asm("r3");
-        register u32 first asm("r1");
-        bit = 2;
-        first = bit;
-        first &= input;
-        first = (u8)first;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-    {
-        u8 savedDuration;
-        if (++state->elapsed >= (savedDuration = duration = state->duration)) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                    ended = 1;
-                } else {
-                    state->index = index - 1;
-                    ended = 0;
-                }
-            } else {
-                u8 frameCount;
-                u32 endFlag;
-                if (++state->index >= (frameCount = state->frameCount)) {
-                    endFlag = VulcanCannon_MaskedFlags(flags, 8);
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                    ended = 1;
-                } else {
-                    ended = 0;
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)(((u32)table) + offset);
-            }
-            state->frameWeight = (*command) & 15;
-            {
-                s32 weight = state->frameWeight;
-                s32 speed;
-                s32 delay;
-                speed = state->speed;
-                delay = (speed * weight) >> 6;
-                state->duration = delay;
-                if (!((u8)delay))
-                    state->duration = 1;
-            }
-        } else {
-            ended = 0;
-        }
-    }
-    return ended;
-}
 
 s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
 {
@@ -229,7 +121,7 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
         p->dead = 1;
         Anim_SetSequence(&p->sequence, p->resource, 0x13, (u8)p->facing, 0);
     }
-    VulcanCannon_StepAnimation_(p);
+    VulcanCannon_StepAnimation(p);
     if (!p->inert)
         VulcanCannon_InitCollider(p);
     if (p->terrainEnabled && (!p->inert)) {

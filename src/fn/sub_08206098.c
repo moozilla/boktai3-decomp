@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "display_animation.h"
@@ -53,7 +52,6 @@ static inline void Ooze_OffsetBodyPosition(struct SceneVec *position, s32 facing
 s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
 {
     struct SceneVec position;
-    register s32 result asm("r0");
     if (Script_SeekToKeyword('p')) {
         p->initialPosition.x = Script_GetValue();
         p->initialPosition.y = Script_GetValue();
@@ -123,45 +121,28 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
     p->resource = ScriptProc_Start(0x922e, 0x5184);
     Anim_SetSequence(&p->sequence, p->resource, 0x22, (u8)p->facing, 8);
     Ooze_StepInitialAnimation(&p->sprite, &p->sequence);
-    {
-        u32 off = 0x122;
-        if (*(s16 *)((u8 *)p + off) == 0) {
-            off += 0x24;
-            *(u16 *)((u8 *)p + off) = 0x22;
-            p->startSequence = 0x23;
-            off += 4;
-            *(u16 *)((u8 *)p + off) = 0x24;
-            p->endSequence = 0x25;
-        } else {
-            off = 0x146;
-            *(u16 *)((u8 *)p + off) = 0x1e;
-            p->startSequence = 0x1f;
-            off += 4;
-            *(u16 *)((u8 *)p + off) = 0x20;
-            p->endSequence = 0x21;
-        }
-        asm("" ::"r"(off));
+    if (p->variant == 0) {
+        p->idleSequence = 0x22;
+        p->startSequence = 0x23;
+        p->holdSequence = 0x24;
+        p->endSequence = 0x25;
+    } else {
+        p->idleSequence = 0x1e;
+        p->startSequence = 0x1f;
+        p->holdSequence = 0x20;
+        p->endSequence = 0x21;
     }
     Ooze_InitAttackCollider(p);
-    {
-        u32 d;
-        if (p->delayScript)
-            Ooze_ReadScriptValueList(p);
-    }
-    {
-        u32 d0;
-        s32 r;
-        r = p->solid;
-        if (r) {
-            CopyPosition(&position, (struct SceneVec *)((u8 *)p + 0x3c));
-            if (p->variant == 1) {
-                Ooze_OffsetBodyPosition(&position, p->facing);
-            }
-            SceneBody_Init(p->body, p->parent, &position, 0, 4, p);
-            SceneBody_SetSprite(p->body, &p->sprite);
-            result = TerrainOverlay_QueueAddActor(p->body);
+    if (p->delayScript)
+        Ooze_ReadScriptValueList(p);
+    if (p->solid) {
+        CopyPosition(&position, (struct SceneVec *)((u8 *)p + 0x3c));
+        if (p->variant == 1) {
+            Ooze_OffsetBodyPosition(&position, p->facing);
         }
+        SceneBody_Init(p->body, p->parent, &position, 0, 4, p);
+        SceneBody_SetSprite(p->body, &p->sprite);
+        TerrainOverlay_QueueAddActor(p->body);
     }
     p->state = Ooze_UpdateAttackDelay;
-    return result;
 }
