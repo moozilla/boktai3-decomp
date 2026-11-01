@@ -5,7 +5,7 @@
 #include "scene_actor_placement.h"
 #include "game_state.h"
 #ifdef NONMATCHING
-// fuzzy: 87.7%
+// fuzzy: 88.4%
 // The action and motion flag reads span the regional-deactivation and palette branches.
 void Heap_Free(void *);
 
@@ -124,7 +124,7 @@ static inline u8 ActorCategory(struct SceneActorRegistryActor *p)
 /* The motion and state words are adjoining members of the same registry actor. */
 static inline u32 ReadStateFlags(const u16 *motion, u32 mask)
 {
-    u32 motionOffset = (u32)&((struct SceneActorRegistryActor *)0)->flags2D4;
+    u32 motionOffset = (u32) & ((struct SceneActorRegistryActor *)0)->flags2D4;
     const struct SceneActorRegistryActor *actor = (const void *)((const u8 *)motion - motionOffset);
     return actor->flags2D0 & mask;
 }
@@ -146,6 +146,13 @@ static inline u32 DefaultPalette(struct SceneActorRegistryActor *actor)
 static inline u32 ReadMotionFlags(u16 *motion, u32 mask)
 {
     return *motion & mask;
+}
+static inline u8 MotionFlagSet(const u16 *flags, u32 mask)
+{
+    u8 found = 0;
+    if (*flags & mask)
+        found = 1;
+    return found;
 }
 static inline u8 MissingObject(struct SceneActorRegistryActor *p)
 {
@@ -183,10 +190,10 @@ next:
         Callback_InvokeActor(context, *update);
         missing = MissingObject(actor);
         motion = &actor->flags2D4;
-        if (!missing && !Paused() && !ReadMotionFlags(motion, 0x4000) &&
-            !ReadStateFlags(motion, 8) && actor->enabled && !ReadFlags2CC(actor, 2) &&
-            (gGameState->flags868 & 2) && CurrentRegion(actor) && CanUpdate(actor, motion) &&
-            gGameState->unk876 > 0 && !Stopped()) {
+        if (!missing && !Paused() && !MotionFlagSet(motion, 0x4000) && !ReadStateFlags(motion, 8) &&
+            actor->enabled && !ReadFlags2CC(actor, 2) && (gGameState->flags868 & 2) &&
+            CurrentRegion(actor) && CanUpdate(actor, motion) && gGameState->unk876 > 0 &&
+            !Stopped()) {
             actor->field178 = 0;
             ClearField2B8(actor);
             ClearDrawableFlags(actor, 1);
@@ -197,7 +204,7 @@ next:
             SetFlags2CC(actor, 0x1000);
         }
         motion = &actor->flags2D4;
-        if (!ReadMotionFlags(motion, 0x4000) && TransitionEnabled(manager)) {
+        if (!MotionFlagSet(motion, 0x4000) && TransitionEnabled(manager)) {
             s32 category = ActorCategory(actor);
             state = &actor->flags2D0;
             if (category == 10 || category == 23) {
