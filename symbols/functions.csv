@@ -8346,6 +8346,7 @@ addr,name,mode,confidence,source,notes
 081EEAC4,SceneActors_DestroyTask,thumb,low,src-alias,Termination callback disables actor displays and clears occupancy before killing the task
 081EEAD8,SceneActors_UpdatePaletteDispersal,thumb,low,src-alias,
 081EEE34,SceneMover_InterpolateScreenX,thumb,low,src-alias,
+081EEECC,SingletonSlot7_UpdateShakingDeparture,thumb,low,src-alias,Shakes the two drawable layers and emits particles during their departure
 081EF140,SceneActors_TickStateCallback,thumb,low,src-alias,Actor update helper forwards execution to SceneActors_RunStateCallback
 081EF14C,SceneActors_EnterIdleState,thumb,low,src-alias,State table callback installs the baseline animation handler and resets transition fields
 081EF1A0,SceneActors_EnterMovementState,thumb,low,src-alias,State table callback installs the movement handler and resets transition fields

@@ -18,3 +18,10 @@ SingletonSlot7_InitFromScript matches all 1,032 bytes. Separate indices
 fill the white palette and snapshot the four background banks. The
 byte-valued hold flag survives the palette bank setup before both drawable
 modes are set.
+
+Tags: 081EEECC SingletonSlot7_UpdateShakingDeparture
+
+The guarded shaking draft has 89.2% fuzzy agreement and 29 realigned
+instruction differences. Both particle branches now read the effect
+resource at +0x388. The ROM spills the first random table pointer to
+SP+0x44. The draft keeps it in r8.

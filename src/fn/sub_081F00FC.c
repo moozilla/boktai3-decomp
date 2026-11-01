@@ -16,7 +16,7 @@ struct SceneActorTween {
     u32 completed;
 };
 void SceneMover_InterpolateScreenX(void);
-void sub_081EEECC(void);
+void SingletonSlot7_UpdateShakingDeparture(void);
 u32 Trigger_ConsumePending(void *, u32);
 static inline u8 ConsumeEntry(struct SceneActorTween *p)
 {
@@ -35,7 +35,7 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
 void SceneActors_AdvanceToHorizontalTween(struct SceneActorTween *p)
 {
     if (ConsumeEntry(p) == 1) {
-        SetCallback(sub_081EEECC, &p->callback);
+        SetCallback(SingletonSlot7_UpdateShakingDeparture, &p->callback);
         p->frame = 0;
         p->initialize = 1;
         p->progressFlag = 0;
