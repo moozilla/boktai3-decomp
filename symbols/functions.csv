@@ -8335,6 +8335,7 @@ addr,name,mode,confidence,source,notes
 081ECD44,SceneMover_ApproachScreenX,thumb,low,src-alias,
 081ECE80,SceneMover_StepPastScreenX,thumb,low,src-alias,
 081ECF18,SceneActors_UpdateIdleDisplay,thumb,low,src-alias,
+081ED1A4,SceneActors_UpdatePlayerFollowingDisplay,thumb,low,src-alias,Tracks the first participant and updates the two display layers
 081ED5F4,SceneActors_UpdateMovingDisplay,thumb,low,src-alias,
 081ED8A0,SceneActors_UpdateDelayedMovement,thumb,low,src-alias,
 081EDB74,SceneActors_UpdateLeftDeparture,thumb,low,src-alias,

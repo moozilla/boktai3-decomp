@@ -18,3 +18,10 @@ Tags: 081EE518 SceneActors_UpdateHitSensitiveDeparture
 SceneActors_UpdateHitSensitiveDeparture matches all 1,452 bytes. It starts
 sequence 2 on entry and sequence 3 at tick 91. The first two phases both
 move toward the target, with a different random vertical offset in each.
+
+Tags: 081ED1A4 SceneActors_UpdatePlayerFollowingDisplay
+
+SceneActors_UpdatePlayerFollowingDisplay matches all 1,104 bytes. It follows
+the first participant's world x, changes acceleration with the distance,
+and undoes the last horizontal step beyond screen x 160. Both catch-up
+states return to state 4 when their velocity crosses the player's.
