@@ -1,7 +1,7 @@
 #include "global.h"
 #define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL 1
 #include "scene_actor_chase_reaction.h"
-#include "scene_actor_terrain.h"
+#include "scene_actor_cardinal_path.h"
 
 struct MummyRouteContext {
     u8 unknown0[0x6D2];
@@ -13,55 +13,14 @@ struct MummyRouteTarget {
     struct SceneActorChasePlayerCell *cell;
 };
 
-u8 SceneActorTerrain_CanTraverseCell(s32, s32, s32, u32);
 u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *);
-static inline s32 GridWidth(void)
-{
-    return ((struct SceneActorChaseTerrainGrid *)gTerrainMap->cells)->width;
-}
-static inline s32 GridHeight(void)
-{
-    return ((struct SceneActorChaseTerrainGrid *)gTerrainMap->cells)->height;
-}
-
-static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
-{
-    s32 i, col;
-    if (cell < goal) {
-        i = cell + 1;
-        for (col = Mod(i, GridWidth());
-             col < GridWidth() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i++, col++) {
-            if (i == goal)
-                return 1;
-        }
-        for (i = cell + GridWidth();
-             total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i += GridWidth()) {
-            if (i == goal)
-                return 1;
-        }
-    } else {
-        i = cell - 1;
-        for (col = Mod(i, GridWidth());
-             col >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i--, col--) {
-            if (i == goal)
-                return 1;
-        }
-        for (i = cell - GridWidth(); i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
-             i -= GridWidth()) {
-            if (i == goal)
-                return 1;
-        }
-    }
-    return 0;
-}
-
 static inline u8 FindPath(struct SceneActorRegistryResetView *actor, s32 goal)
 {
     s32 cell = actor->terrainCell;
     s32 y = actor->body.position.y;
     u32 kind = *SceneActorTerrain_GetCell(cell) >> 4;
-    s32 total = GridWidth() * GridHeight();
-    return CanReach(cell, goal, y, kind, total);
+    s32 total = SceneActorPath_Width() * SceneActorPath_Height();
+    return SceneActorPath_CanReach(cell, goal, y, kind, total);
 }
 
 static inline u8 Mummy_Arrive(void *obj)
