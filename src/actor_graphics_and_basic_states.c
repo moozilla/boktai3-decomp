@@ -913,7 +913,6 @@ set: {
 
 // confidence=low: reaction-kind selector controls the far-point mode and motion timer.
 #define SceneActorState_SnapReactionPosition sub_08022EA4
-// MATCHING_CONCESSION: register-pinning
 void Path_SnapToRandomFarPoint(void *, void *, u32, u32);
 struct SnapVector {
     u32 a, b;
@@ -924,29 +923,32 @@ void SceneActorState_SnapReactionPosition(u8 *p, struct SnapVector *position)
     switch (*(u16 *)(p + 0x3b2)) {
         case 0:
             Path_SnapToRandomFarPoint(position, sprite + 12, 0, 65536);
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 1:
             Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 2:
             Path_SnapToRandomFarPoint(position, sprite + 12, 1, 65536);
             *(u16 *)(p + 0x354) = 32;
             return;
         case 3:
             Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 4:
             Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
-            asm("" : : "i"(4));
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 5:
             Path_SnapToRandomFarPoint(position, sprite + 12, 3, 65536);
-            asm("" : : "i"(5));
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         case 6:
             Path_SnapToRandomFarPoint(position, sprite + 12, 2, 65536);
-            asm("" : : "i"(6));
-            break;
+            *(u16 *)(p + 0x354) = 64;
+            return;
         default:
             *position = *(struct SnapVector *)(p + 0x54);
             break;
