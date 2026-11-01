@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
 static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
 {
@@ -18,35 +17,27 @@ static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inp
 }
 static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
+    struct SceneActorRegistryResetView *actor = input;
     if (actor) {
         if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
             return 1;
     }
     return 0;
 }
-static inline u32 IsHidden(struct SceneActorRegistryResetView *input)
+static inline u8 IsHidden(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryResetView *actor = input;
     u32 mask = 1;
-    register u32 result asm("r0");
-    if (actor->drawableKind == 0) {
-        u32 flags = *(u32 *)actor->drawable & mask;
-        if (flags) {
-            result = 1;
-            goto done;
-        }
-        asm("" ::: "r1");
-    } else {
-        u32 flags = *(u32 *)((u8 *)actor->drawable + 0x28) & mask;
-        if (flags) {
-            result = 1;
-            goto done;
-        }
+    if (!actor->drawableKind) {
+        if (*(u32 *)actor->drawable & mask)
+            goto hidden;
+        goto visible;
     }
-    result = 0;
-done:
-    return result;
+    if (!(*(u32 *)((u8 *)actor->drawable + 0x28) & mask))
+        goto visible;
+hidden:
+    return 1;
+visible:
+    return 0;
 }
 static inline void Hide(struct SceneActorRegistryResetView *actor)
 {
@@ -68,7 +59,7 @@ static inline void Hide(struct SceneActorRegistryResetView *actor)
 void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *input,
                                          const u16 *inputRequest)
 {
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
+    struct SceneActorRegistryResetView *actor = input;
     const u16 *request = inputRequest;
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     u32 unavailable = IsUnavailable(actor);
@@ -101,7 +92,6 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
             active = SceneActorControl_TestFlags(active, ~0);
             if (!active) {
                 u32 hidden = IsHidden(actor);
-                asm("" : "+r"(hidden));
                 if (hidden) {
                     {
                         u32 offset = 0x3EE;

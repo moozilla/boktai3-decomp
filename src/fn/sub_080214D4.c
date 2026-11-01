@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
@@ -26,18 +25,18 @@ typedef struct ActorAnimation {
 } ActorAnimation;
 static inline void setFacing(ActorAnimation *p, int angle)
 {
+    int shifted;
     u32 value;
-    register int shifted asm("r0");
     p->angle = angle;
     shifted = p->angle + 0x60;
-    asm("" : "+r"(shifted));
     shifted >>= 6;
-    value = 3 & shifted;
+    value = 3;
+    value &= shifted;
     p->facing = value;
     shifted = p->angle + 0x70;
-    asm("" : "+r"(shifted));
     shifted >>= 5;
-    value = 7 & shifted;
+    value = 7;
+    value &= shifted;
     p->facing8 = value;
 }
 
@@ -46,14 +45,13 @@ void SceneBody_SetPositionOffset(void *, void *);
 void SceneMessages_RegisterReceiver(void *, int, int);
 int SceneActors_Initialize(u8 *p, int id, int type, int arg, int facingArg)
 {
-    register int firstId asm("r1") = id;
+    int firstId = id;
     int facing = facingArg;
     struct {
         s16 x, y, z;
     } v;
     u8 *dst = p + 0x9b;
     int zero = 0;
-    asm("" : : "r"(dst), "r"(zero), "r"(facing), "r"(firstId));
     *dst = type;
     SceneBody_Init(p + 0x48, firstId, arg, (u8)facing, 5, p);
     v.x = 0;

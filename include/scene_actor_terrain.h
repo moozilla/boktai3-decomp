@@ -39,9 +39,9 @@ static inline void SceneActorTerrain_GetCenter(s32 cell, struct ContactPosition 
 }
 static inline s32 SceneActorTerrain_GetHeight(s32 cell, const struct ContactPosition *position)
 {
-    register u32 attributes asm("r1") = *SceneActorTerrain_GetCell(cell);
-    u32 kind = attributes >> 4;
-    s32 height = (attributes & 15) << 8;
+    u8 *attributes = SceneActorTerrain_GetCell(cell);
+    u32 kind = *attributes >> 4;
+    s32 height = (*attributes & 15) << 8;
     switch (kind) {
         case 1:
             height -= ((const u8 *)position)[4];

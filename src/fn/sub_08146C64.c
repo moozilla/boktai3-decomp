@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "engine_globals.h"
@@ -29,13 +28,16 @@ void Player_UpdateAttachmentCue(struct Player *p)
                     1, 0, 0, 0, 0x50);
                 Sound_PlaySong(0x1B1);
                 if (gTetherActor) {
-                    register s32 direction asm("r1");
-                    direction =
-                        7 & (((u16)Math_Atan2(*(s16 *)(gTetherActor + 0x50) - p->position.x,
-                                              *(s16 *)(gTetherActor + 0x54) - p->position.z) +
-                              0x70) >>
-                             5);
-                    p->facing = direction;
+                    s32 direction =
+                        ((u16)Math_Atan2(*(s16 *)(gTetherActor + 0x50) - p->position.x,
+                                         *(s16 *)(gTetherActor + 0x54) - p->position.z) +
+                         0x70) >>
+                        5;
+                    {
+                        s32 facing = 7;
+                        facing &= direction;
+                        p->facing = facing;
+                    }
                     Player_UpdateFacingSide(p);
                 }
             }

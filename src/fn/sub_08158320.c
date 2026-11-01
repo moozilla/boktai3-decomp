@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "engine_globals.h"
@@ -15,11 +14,9 @@ s32 Mod(s32, s32);
 static inline s32 randomValue(void)
 {
     u32 offset;
-    register u32 base asm("r3");
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    offset = gRandomIndex << 1;
-    base = (u32)gRandomTable;
-    return *(u16 *)(offset + base);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
+    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 static inline s32 hoverTarget(void)
 {
@@ -34,9 +31,8 @@ void Player_UpdateInteractionHoverDisplay(struct Player *p)
         u8 *timer = (u8 *)p + 0x468;
         if (!*timer) {
             s32 value = hoverTarget();
-            register u32 offset asm("r2") = 0x467;
-            register u8 *target asm("r1");
-            asm("" : "+r"(offset));
+            u32 offset = 0x467;
+            u8 *target;
             target = (u8 *)p + offset;
             *target = value;
             *timer = 16;

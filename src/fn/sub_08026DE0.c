@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
@@ -28,18 +27,18 @@ typedef struct ActorAnimation {
 
 static inline void setFacing(ActorAnimation *p, int angle)
 {
+    int shifted;
     u32 value;
-    register int shifted asm("r0");
     p->angle = angle;
     shifted = p->angle + 0x60;
-    asm("" : "+r"(shifted));
     shifted >>= 6;
-    value = 3 & shifted;
+    value = 3;
+    value &= shifted;
     p->facing = value;
     shifted = p->angle + 0x70;
-    asm("" : "+r"(shifted));
     shifted >>= 5;
-    value = 7 & shifted;
+    value = 7;
+    value &= shifted;
     p->facing8 = value;
 }
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
@@ -61,11 +60,10 @@ static inline int trunc12(int x)
 }
 static inline void decay(s16 *p)
 {
-    s16 *dst = p;
-    u32 old = (u16)*dst;
-    register int next asm("r0");
-    next = *dst > 23 ? old - 24 : 0;
-    *dst = next;
+    if (*p > 23)
+        *p -= 24;
+    else
+        *p = 0;
 }
 void SceneActorGraphics_SelectResource(void *);
 void SceneActors_UpdateShrinkingReaction(ActorAnimation *p)

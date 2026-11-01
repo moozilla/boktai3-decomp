@@ -61,18 +61,9 @@ static inline u32 GroundHeight(struct EffectPosition *position)
 static inline void AddPosition(struct EffectPosition *out, struct EffectPosition *a,
                                struct EffectPosition *b)
 {
-    u32 x, y, z;
-    register u32 deltaZ asm("r3");
-    x = (u16)a->x;
-    x += (u16)b->x;
-    out->x = x;
-    y = (u16)a->y;
-    y += (u16)b->y;
-    out->y = y;
-    z = (u16)a->z;
-    deltaZ = (u16)b->z;
-    z += deltaZ;
-    out->z = z;
+    out->x = b->x + a->x;
+    out->y = b->y + a->y;
+    out->z = b->z + a->z;
 }
 
 // confidence=low: animates a pooled collider effect, integrates its velocity and stops it at terrain.

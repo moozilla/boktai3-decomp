@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_animation.h"
 #include "engine.h"
@@ -28,11 +27,12 @@ static inline s32 AngleIndex(s32 angle)
 static inline s32 RandomByte(void)
 {
     u32 offset;
-    register u16 *table asm("r4");
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    offset = gRandomIndex * 2;
-    table = gRandomTable;
-    return *(u8 *)(offset + (u32)table);
+    u32 *index = &gRandomIndex;
+    u32 next = *index + 1;
+    u32 mask = 1023;
+    *index = next & mask;
+    offset = *index * 2;
+    return *(const u8 *)(offset + RANDOM_TABLE_ADDR);
 }
 void SceneActorPhase_SelectLinkedAnimation(struct SceneActorAnimationView *p)
 {

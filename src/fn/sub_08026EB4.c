@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
@@ -59,11 +58,10 @@ static inline int trunc12(int x)
 }
 static inline void decay(s16 *p)
 {
-    s16 *dst = p;
-    u32 old = (u16)*dst;
-    register int next asm("r0");
-    next = *dst > 23 ? old - 24 : 0;
-    *dst = next;
+    if (*p > 23)
+        *p -= 24;
+    else
+        *p = 0;
 }
 void SceneActorGraphics_SelectResource(void *);
 void SceneActors_UpdateKnockbackReaction(ActorAnimation *base, int time)

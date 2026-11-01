@@ -11,13 +11,10 @@ void Player_CallEventScript(struct Player *, u32);
 void *PlayerBurst_Create(void *);
 static inline u16 nextRandom(void)
 {
-    register u32 table asm("r2");
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    table = (u32)gRandomTable;
-    offset += table;
-    return *(const u16 *)offset;
+    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 void PlayerContact_UpdateThresholdEvent(struct Player *p)
 {

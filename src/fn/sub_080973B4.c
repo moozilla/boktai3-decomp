@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
 static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
 {
@@ -25,28 +24,20 @@ static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
     }
     return 0;
 }
-static inline u32 IsHidden(struct SceneActorRegistryResetView *input)
+static inline u8 IsHidden(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryResetView *actor = input;
     u32 mask = 1;
-    register u32 result asm("r0");
-    if (actor->drawableKind == 0) {
-        u32 flags = *(u32 *)actor->drawable & mask;
-        if (flags) {
-            result = 1;
-            goto done;
-        }
-        asm("" ::: "r1");
-    } else {
-        u32 flags = *(u32 *)((u8 *)actor->drawable + 0x28) & mask;
-        if (flags) {
-            result = 1;
-            goto done;
-        }
+    if (!actor->drawableKind) {
+        if (*(u32 *)actor->drawable & mask)
+            goto hidden;
+        goto visible;
     }
-    result = 0;
-done:
-    return result;
+    if (!(*(u32 *)((u8 *)actor->drawable + 0x28) & mask))
+        goto visible;
+hidden:
+    return 1;
+visible:
+    return 0;
 }
 /* actor must be nonnull: its control context is loaded before the availability gate. */
 
@@ -78,7 +69,6 @@ void Ghost_RequestVisibility(struct SceneActorRegistryResetView *input, const u1
             active = SceneActorControl_TestFlags(active, ~0);
             if (!active) {
                 u32 hidden = IsHidden(actor);
-                asm("" : "+r"(hidden));
                 if (hidden) {
                     {
                         u32 offset = 0x5B2;
