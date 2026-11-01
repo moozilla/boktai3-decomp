@@ -1,30 +1,13 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-/* Skeleton_OnContactEvent: records the hit and flags the state unless the actor is unavailable */
-inline static u8 blocked2048(u8 *c)
+/* Skeleton_OnAttackCollision: records the hit unless the actor is unavailable */
+static inline u32 Flag(u8 *a, u32 m, u32 off)
 {
-    u32 mask;
-    u32 *p;
-    u32 off;
-    if (!c)
-        goto zero;
-    mask = 0x40;
-    off = 0xB5;
-    off <<= 2;
-    p = (u32 *)(c + off);
-    if ((*((u16 *)p)) & mask)
-        goto one;
-    mask = 0x80;
-    mask <<= 10;
-    off -= 4;
-    p = (u32 *)(c + off);
-    if ((*p) & mask)
-        goto one;
-    if ((*((s16 *)(c + 0x9C))) > 0)
-        goto zero;
-one:
-    return 1;
-zero:
+    return off == 0x2D4 ? *(u16 *)(a + off) & m : *(u32 *)(a + off) & m;
+}
+static inline u8 Unavailable(u8 *c)
+{
+    if (c && (Flag(c, 0x40, 0x2D4) || Flag(c, 0x20000, 0x2D0) || *(s16 *)(c + 0x9C) <= 0))
+        return 1;
     return 0;
 }
 
@@ -41,17 +24,16 @@ void Skeleton_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
     int mask;
     u32 *flags;
     u8 *base = ctx;
-    register u32 *state asm("r4") = *(u32 **)(ctx + 0x3D0);
-    if (blocked2048(ctx))
+    u32 *state = *(u32 **)(ctx + 0x3D0);
+    if (Unavailable(ctx))
         return;
     {
         u32 bit = 0x10;
-        register u32 *sp asm("r1") = (u32 *)((u8 *)state + 0x6DC);
+        u32 *sp = (u32 *)((u8 *)state + 0x6DC);
         u32 *held;
         u32 v;
         v = *sp & bit;
         held = sp;
-
         if (Test(v, ~0)) {
             u32 bit = 0x800;
             if (Test(*held, bit)) {
@@ -61,7 +43,7 @@ void Skeleton_OnAttackCollision(u8 *unused, u8 *obj, u8 *ctx)
             return;
         }
     }
-    if ((blocked2048(ctx) == 0) && ((*((u16 *)(obj + 0xA))) & 0xF)) {
+    if ((Unavailable(ctx) == 0) && ((*((u16 *)(obj + 0xA))) & 0xF)) {
         *((u32 *)(ctx + 0x304)) = *((u16 *)(obj + 4));
         flags = (u32 *)(ctx + 0x2D0);
         mask = 0xFEFFFFFF;
