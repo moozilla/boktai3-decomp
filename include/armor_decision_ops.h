@@ -60,4 +60,19 @@
         if ((deltaZ) < 0)                                                                          \
             (absZ) = -(deltaZ);                                                                    \
     } while (0)
+/* The x/z form, with each position component evaluated once. */
+#define ARMOR_GET_RELATIVE_GRID(deltaX, deltaZ, absX, absZ, targetX, actorX, targetZ, actorZ)      \
+    do {                                                                                           \
+        (deltaX) = (targetX) - (actorX);                                                           \
+        (deltaZ) = (targetZ) - (actorZ);                                                           \
+        (deltaX) = ((deltaX) + 0x80) >> 8;                                                         \
+        (deltaZ) = ((deltaZ) + 0x80) >> 8;                                                         \
+        (absX) = (deltaX);                                                                         \
+        (absZ) = (deltaZ);                                                                         \
+        if ((deltaX) < 0)                                                                          \
+            (absX) = -(deltaX);                                                                    \
+        if ((deltaZ) < 0)                                                                          \
+            (absZ) = -(deltaZ);                                                                    \
+    } while (0)
+
 #endif
