@@ -3262,6 +3262,7 @@ addr,name,mode,confidence,source,notes
 080A2634,Spider_SelectRecoveryRoute,thumb,low,src-alias,
 080A28A0,Spider_OnSecondaryColliderContact,thumb,low,src-alias,Empty callback tentatively associated with the secondary collider initialized by Spider_Init
 080A28A4,Spider_OnActionEvent,thumb,low,src-alias,Empty action-event callback installed by Spider_Init
+080A28A8,Spider_UpdateContactWindup,thumb,low,src-alias,Plays a frame-triggered cue; then begins contact pursuit after the windup.
 080A2A38,SceneActorReaction_ResumeEntryTarget,thumb,low,src-alias,
 080A2AEC,Spider_UpdateLandingMotion,thumb,low,src-alias,
 080A2CEC,Spider_UpdateDefeat,thumb,low,src-alias,

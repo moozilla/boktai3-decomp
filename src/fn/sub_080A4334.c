@@ -52,7 +52,7 @@ u8 SceneActorPlacement_BeginContactRoute(void *);
 s32 Math_Atan2(s32, s32);
 u8 sub_0821D4F0(void *, void *, u32, u32);
 void sub_080A4798(void *);
-void sub_080A28A8(void);
+void Spider_UpdateContactWindup(void);
 static inline void Delta(struct ContactPosition *out, struct ContactPosition *from,
                          struct ContactPosition *to)
 {
@@ -141,7 +141,7 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
         BeginContact(a, &a->group.common);
     else {
         State(a, 16);
-        Control(a, sub_080A28A8, 3);
+        Control(a, Spider_UpdateContactWindup, 3);
     }
     return 1;
 }
