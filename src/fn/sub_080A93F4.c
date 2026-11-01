@@ -18,13 +18,6 @@ static inline u8 TestMask4(struct TentacleSegmentAnimation *p, u32 mask)
         return 1;
     return 0;
 }
-static inline u8 TestMask2(struct TentacleSegmentAnimation *p, u32 mask)
-{
-    register u32 m asm("r1") = mask;
-    if (*(volatile u8 *)&p->status & m)
-        return 1;
-    return 0;
-}
 static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
 {
     u32 f = p->status;
@@ -165,7 +158,7 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
     }
     do {
         if (!TestMask4(a, 1)) {
-            if (TestMask2(a, 4)) {
+            if (TentacleSegment_HasStatus(a, 4)) {
                 Anim_RestartSequence(a, ScriptAt(body, offset), 1, row, ({
                                          s32 t = frame.flags;
                                          u32 u = (u8)t;
