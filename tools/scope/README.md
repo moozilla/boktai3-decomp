@@ -140,6 +140,9 @@ python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): c
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
 python3 tools/scope/scope.py FILE.c shape [FUNC]  the diff with low registers blanked: order and shape differences only
 python3 tools/scope/scope.py FILE.c frame [FUNC]  stack slots, ROM against draft, with the pseudo (C variable) reload put in each
+python3 tools/scope/scope.py FILE.c preorder [FUNC]  the ROM's order of PRE's spilled field addresses against gcse's hash table:
+                                                  the model checked on the draft, the slots out of order, and the table sizes
+                                                  (insn counts) and pseudo renumberings that give the ROM's order
 python3 tools/scope/scope.py FILE.c hoist [FUNC]  loop-invariant motion pass by pass: what loop.c moved out, what stayed, and why;
                                                   then for each hoisted variable it scores the dead re-set before the loop's closing brace
 python3 tools/scope/scope.py todo [N] [addr|prior|size]   functions with no C yet, in ROM order (default) or by prior art/size
@@ -896,7 +899,24 @@ Each was read from the compiler source and confirmed on a live draft.
    path and stores in each arm. Armor_InitPartStretch, Armor_BeginPartTravelToPlayer and
    Armor_RetractPartStretch matched or moved this way; `why all` now names the pattern.
 
-29. **Identical case bodies that the ROM keeps apart each end in their own copy of the tail.**
+29. **PRE numbers its field-address pseudos in hash-table order.** pre_delete (gcse.c) makes
+   one reaching pseudo per replaced expression while it walks the expression table bucket by
+   bucket, each chain in first-discovery (index) order, and reload gives the spilled ones
+   slots in pseudo order (fact 22). For `(plus:SI (reg R) (const_int O))` the bucket is
+   (13772 + R + O) % T, T = max(11, N // 2) | 1, N the real insns into gcse (u.i.addressof;
+   copy propagation's SET table has N // 4 | 1). So these slots move with the insn count
+   and the base pseudos' numbers, not with declarations. `preorder`, and `frame` when the
+   slots are out of order, check the model against the draft's own table, list the slots
+   out of (bucket, index) order, and search the table sizes and one renumbering cut (every
+   base pseudo from one on moved by d) that give the ROM's order.
+   Golem_ResumeBehaviorAfterDisplacement: a draft with N 1696, T 849 had 3 pairs out of
+   order; no table size alone gave the order, a cut before `actor#7` of +35..+55 at T 851
+   or +43..+57 at T 853 did. The match has N 1705, T 853, and its bases from `actor#7` on
+   are 38 to 51 pseudos later (the Dog-style displacement helpers and the Golem_Drift
+   inline). The search knows one cut; when none fits, the order needs two changes or a
+   different expression index order.
+
+30. **Identical case bodies that the ROM keeps apart each end in their own copy of the tail.**
    When a switch's cases share a `break` to one tail, jump2 cross-jumps identical case
    bodies together (sub_08022EA4's cases 3/4/5 call Path_SnapToRandomFarPoint alike).
    The ROM's separate copies, each ending `b tail`, came from cases that each wrote the tail
