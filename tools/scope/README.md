@@ -134,7 +134,7 @@ python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a
 python3 tools/scope/scope.py FILE.c pre           gcse's PRE replacements by expression: C names, pool values, where
                                                   it is computed and inserted, the lines replaced, AGBCC_NOPRE=k scores
 python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
-python3 tools/scope/scope.py FILE.c pins          remove each register pin / empty asm barrier in turn: its cost; then greedy free removal
+python3 tools/scope/scope.py FILE.c pins [FUNC]   FUNC's pins / barriers (and its inline helpers'): each alone, grouped, all; greedy removal
 python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or `try KNOB={a,b}`: one variant per knob value), best first (by shape distance), ~12 ms each
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
@@ -158,13 +158,22 @@ per insn where the register is live before it, plus one where it is set), so
 its count equals the `Register N used R times across L insns` line; compare
 two drafts by name to see which C line gained or lost an insn.
 
-`pins` (phase 3) compiles the file once per concession with that one
-removed and prints the change in differing insns, then removes greedily
-(cheapest first, keeping each removal that adds nothing) and writes
-`build/scope/drafts/FUNC.fewer_pins.c`. Variants stay in
+`pins` (phase 3) looks only at the concessions that can change FUNC's code: those
+in its definition and in the unit's inline helpers it reaches by calls (it says how
+many others the unit has; earlier it offered those as free removals). It compiles
+the file once per concession with that one removed, then once per group whose
+members may only work together: every concession of FUNC and its helpers, each
+helper's, and a pin with the barriers on the same variable. It writes
+`build/scope/drafts/FUNC.no_pins.c` (all of them removed: the near-miss draft a
+rematch starts from), then removes greedily (singles and groups, cheapest first,
+keeping each removal that adds nothing) into `FUNC.fewer_pins.c`. It names helpers
+other functions of the unit also use, and header helpers with concessions FUNC
+calls (a header edit: check every unit including it). Variants stay in
 `build/scope/drafts/.pins/` for `why`. It handles one-line pins
 (`register T x asm("rN")`, the `register` keyword is kept) and one-line
-`asm("" ...)` statements; suggested by the second Haiku trial.
+`asm("" ...)` statements; suggested by the second Haiku trial. It supersedes
+`tools/depin.py` and the earlier depinning worker's group sweeps: the free
+removals are used up, and what is left is rematching from `FUNC.no_pins.c`.
 
 `SCOPE_TRANSFORM` points at a module with `transform(text) -> text`, applied
 to the preprocessed source before compiling: a what-if that leaves the file
