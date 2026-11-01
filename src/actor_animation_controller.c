@@ -4462,18 +4462,7 @@ s32 Actor_DestroyController(struct ActorAnimController *p)
     gScriptedActorController = 0;
 }
 
-struct ScriptInteractionChild {
-    u32 flags;
-    u8 unk_04[3];
-    u8 priority;
-    u8 unk_08[8];
-    u16 frame;
-    u8 unk_12[10];
-    s16 x, y, z;
-    u8 unk_22[0x26];
-    s16 worldX, worldY, worldZ;
-    u8 unk_4E[0x56];
-    s32 completionScript, startScript;
+struct InteractionChildHandler {
     void (*fn)(struct ActorAnimController *, struct ActorChildSlot *);
     u8 group, control, orientation, option;
     u8 timer;
@@ -4487,11 +4476,20 @@ struct ScriptInteractionChild {
     u8 unk_D2[0xa];
 };
 
+struct ScriptInteractionChild {
+    struct ActorSprite sprite;
+    u8 unknown24[0x48 - 0x24];
+    struct Vec world;
+    u8 unknown4E[0xA4 - 0x4E];
+    s32 completionScript, startScript;
+    struct InteractionChildHandler handler;
+};
+
 void Terrain_GetBoxMinPosition(u16, void *);
 u8 *Script_GetPc(void);
 s32 Region_FindContaining(void *);
 
-/* The active value is one: interaction mode and the state-entry flag. */
+/* Save the previous mode before the scripted interaction starts. */
 static inline void interaction_state(struct ActorAnimController *g, u32 mode, u32 phase)
 {
     g->oldMode = g->mode;
@@ -4501,55 +4499,60 @@ static inline void interaction_state(struct ActorAnimController *g, u32 mode, u3
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
     }
-    g->flags |= mode;
+    {
+        u8 flag = 1;
+        g->flags |= flag;
+    }
 }
 
 /* Tentative name: Actor_ConfigureInteractionChildFromScript.
  * Configure the first available interaction marker from the current script. */
 #ifdef NONMATCHING
-// fuzzy: 57.3%
-// scope shape 125 (differences once low registers are set aside)
+// fuzzy: 70.2%
 void Actor_ConfigureInteractionChildFromScript(void)
 {
     struct Vec position;
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    struct ScriptInteractionChild *child;
+    struct ScriptInteractionChild *children;
     s32 i, j;
-    u32 one = 1;
+    u32 interactionMode = 1;
     if (!g) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
         if (!g)
             return;
     }
-    child = (struct ScriptInteractionChild *)g->children;
-    for (i = 0; i < 16; i++, child++) {
-        if (child->control & 2) {
-            child->control = 4;
+    children = (void *)g->children;
+    for (i = 0; i < 16; i++) {
+        struct InteractionChildHandler *handler = &children[i].handler;
+        struct ActorSprite *sprite = &children[i].sprite;
+        struct Vec *world = &children[i].world;
+        if (handler->control & 2) {
+            handler->control = 4;
             switch (Script_GetKeywordValue('t', 0)) {
                 case 0:
-                    child->effect = 104;
-                    interaction_state(g, one, 1);
-                    child->fn = Actor_OnInteractionChildUpdate;
-                    child->control |= 1;
+                    handler->effect = 104;
+                    interaction_state(g, interactionMode, 1);
+                    handler->fn = Actor_OnInteractionChildUpdate;
+                    handler->control |= 1;
                     break;
                 case 1:
-                    child->control |= 8;
-                    child->effect = 104;
-                    interaction_state(g, one, 4);
-                    child->fn = Actor_OnEffectChildPaletteInit;
-                    child->control |= 1;
+                    handler->control |= 8;
+                    handler->effect = 104;
+                    interaction_state(g, interactionMode, 4);
+                    handler->fn = Actor_OnEffectChildPaletteInit;
+                    handler->control |= 1;
                     break;
                 case 2:
-                    child->control |= 16;
-                    child->effect = 107;
-                    child->frame = 1;
-                    interaction_state(g, one, 1);
-                    child->fn = Actor_OnInteractionChildUpdate;
-                    child->control |= 1;
+                    handler->control |= 16;
+                    handler->effect = 107;
+                    sprite->frame = 1;
+                    interaction_state(g, interactionMode, 1);
+                    handler->fn = Actor_OnInteractionChildUpdate;
+                    handler->control |= 1;
                     break;
             }
-            child->orientation = Script_GetKeywordValue('r', 0);
-            child->option = Script_GetKeywordValue('A', 0);
+            handler->orientation = Script_GetKeywordValue('r', 0);
+            handler->option = Script_GetKeywordValue('A', 0);
             if (Script_SeekToKeyword('R')) {
                 Terrain_GetBoxMinPosition(Script_GetValue(), &position);
             } else {
@@ -4559,55 +4562,51 @@ void Actor_ConfigureInteractionChildFromScript(void)
                 position.y = Script_GetValue() - 64;
                 position.z = Script_GetValue();
             }
-            if (child->orientation) {
-                ((struct ScriptInteractionChild *)g->children)[i].worldX = position.x;
-                child->x = position.x;
-                ((struct ScriptInteractionChild *)g->children)[i].worldY = position.y;
-                child->y = position.y;
-                ((struct ScriptInteractionChild *)g->children)[i].worldZ = position.z;
-                child->z = position.z - 128;
+            if (handler->orientation) {
+                world->x = position.x;
+                sprite->x = position.x;
+                world->y = position.y;
+                sprite->y = position.y;
+                world->z = position.z;
+                sprite->z = position.z - 128;
             } else {
-                ((struct ScriptInteractionChild *)g->children)[i].worldX = position.x;
-                child->x = position.x - 128;
-                ((struct ScriptInteractionChild *)g->children)[i].worldY = position.y;
-                child->y = position.y;
-                ((struct ScriptInteractionChild *)g->children)[i].worldZ = position.z;
-                child->z = position.z;
+                world->x = position.x;
+                sprite->x = position.x - 128;
+                world->y = position.y;
+                sprite->y = position.y;
+                world->z = position.z;
+                sprite->z = position.z;
             }
-            child->x += 60;
-            child->z += 60;
-            child->y += 84;
-            child->priority = 2;
+            sprite->x += 60;
+            sprite->z += 60;
+            sprite->y += 84;
+            sprite->priority = 2;
             if (Script_SeekToKeyword('m')) {
-                child->regionCount = 0;
+                handler->regionCount = 0;
                 while (Script_GetPc()) {
-                    ((struct ScriptInteractionChild *)g->children)[i].regions[child->regionCount] =
-                        Script_GetValue();
-                    child->regionCount++;
+                    handler->regions[children[i].handler.regionCount] = Script_GetValue();
+                    handler->regionCount++;
                 }
             } else {
-                child->regionCount = 1;
-                ((struct ScriptInteractionChild *)g->children)[i].regions[0] =
-                    Region_FindContaining(&position);
+                handler->regionCount = 1;
+                handler->regions[0] = Region_FindContaining(&position);
             }
             if (Script_SeekToKeyword('C'))
-                ((struct ScriptInteractionChild *)g->children)[i].completionScript =
-                    Script_GetValue();
+                children[i].completionScript = Script_GetValue();
             else
-                ((struct ScriptInteractionChild *)g->children)[i].completionScript = 0;
+                children[i].completionScript = 0;
             if (Script_SeekToKeyword('a'))
-                ((struct ScriptInteractionChild *)g->children)[i].startScript = Script_GetValue();
+                children[i].startScript = Script_GetValue();
             else
-                ((struct ScriptInteractionChild *)g->children)[i].startScript = 0;
-            ((struct ScriptInteractionChild *)g->children)[i].variant =
-                Script_GetKeywordValue('u', 0);
-            if (!child->orientation) {
+                children[i].startScript = 0;
+            children[i].handler.variant = Script_GetKeywordValue('u', 0);
+            if (!handler->orientation) {
                 *(u16 *)g->unkF62 = -64;
             } else {
-                ((struct ScriptInteractionChild *)g->children)[i].flags |= 4;
+                children[i].sprite.flags |= 4;
                 *(u16 *)g->unkF62 = 64;
             }
-            j = child->regionCount;
+            j = handler->regionCount;
             if (j > 0) {
                 do {
                     j--;
