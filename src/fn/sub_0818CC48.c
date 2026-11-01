@@ -1,7 +1,6 @@
 #include "global.h"
 #include "ram.h"
 
-// MATCHING_CONCESSION: register-pinning
 #define gPlayerObject     gGameState
 #define gRandomTableIndex gRandomIndex
 extern u32 gRandomTableIndex;
@@ -49,7 +48,6 @@ void Armor_BeginPartTravelToPlayer(struct ArmorPart *p)
         delta = -delta;
     if (delta > 9) {
         s32 dx, dz;
-        u32 direction;
         u32 random;
         struct ArmorTravelTarget *target;
         p->startX = p->x;
@@ -66,16 +64,9 @@ void Armor_BeginPartTravelToPlayer(struct ArmorPart *p)
         gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
         {
             u32 index = gRandomTableIndex << 1;
-            register const u16 *table asm("r2") = gRandomTable;
-            random = *(const u16 *)(index + (u32)table);
+            random = *(const u16 *)(index + RANDOM_TABLE_ADDR);
         }
-        direction = 1;
-        if (random & 1) {
-            register s32 negative asm("r0") = -1;
-            asm("" : "+r"(negative));
-            direction = negative;
-        }
-        p->direction = direction;
+        p->direction = (random & 1) ? -1 : 1;
         dx = p->dx;
         if (dx < 0)
             dx = -dx;
