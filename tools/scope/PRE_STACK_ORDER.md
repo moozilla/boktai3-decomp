@@ -109,6 +109,10 @@ do not rise, and searches:
   it makes `d` more or fewer pseudos), with `T` within 60 of the draft's. Parameters keep
   their numbers. Each cut names the base's first set (`line 189 of
   scene_actor_chase_step.h` for an inline copy).
+* for the nearest table size, how far all the movable bases may shift together and keep
+  the order; and when it needs fewer insns, the function body's lines that load a large
+  field offset into a register before the add. Each one moved into an inline helper is one
+  insn fewer with the same final code (README fact 30).
 
 `frame` prints the same report, without the full key table, when the slot order is not
 pseudo order. Expressions of other shapes (pool loads, register sums) are left out: their

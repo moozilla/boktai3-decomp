@@ -141,8 +141,9 @@ SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the p
 python3 tools/scope/scope.py FILE.c shape [FUNC]  the diff with low registers blanked: order and shape differences only
 python3 tools/scope/scope.py FILE.c frame [FUNC]  stack slots, ROM against draft, with the pseudo (C variable) reload put in each
 python3 tools/scope/scope.py FILE.c preorder [FUNC]  the ROM's order of PRE's spilled field addresses against gcse's hash table:
-                                                  the model checked on the draft, the slots out of order, and the table sizes
-                                                  (insn counts) and pseudo renumberings that give the ROM's order
+                                                  the model checked on the draft, the slots out of order, the table sizes
+                                                  (insn counts) and pseudo renumberings that give the ROM's order, and the
+                                                  body lines whose field offsets an inline helper would fold (fewer insns)
 python3 tools/scope/scope.py FILE.c hoist [FUNC]  loop-invariant motion pass by pass: what loop.c moved out, what stayed, and why;
                                                   then for each hoisted variable it scores the dead re-set before the loop's closing brace
 python3 tools/scope/scope.py todo [N] [addr|prior|size]   functions with no C yet, in ROM order (default) or by prior art/size
@@ -915,6 +916,21 @@ Each was read from the compiler source and confirmed on a live draft.
    are 38 to 51 pseudos later (the Dog-style displacement helpers and the Golem_Drift
    inline). The search knows one cut; when none fits, the order needs two changes or a
    different expression index order.
+
+30. **An inline helper folds field offsets: one insn each, where the body takes two.**
+   expand_binop (optabs.c) forces a constant outside -255..255 into a register when
+   expensive optimizations are on (`preserve_subexpressions_p`), so `p->field` at a large
+   offset reaches gcse as `(set (reg c) (const_int K))` and `(plus (reg p) (reg c))`, and
+   cse1 keeps them (the constant costs more than the register). In an inline copy,
+   integrate.c's `try_constants` substitutes the known constant into the add,
+   `(plus (reg p) (const_int K))`, and the load dies before gcse. The final code is the same,
+   since reload splits the add again, but N falls by one per access moved into a helper,
+   and N sets PRE's table size (fact 29). Golem_UpdateChargePursuit: the three identical
+   turn-away blocks as `Golem_TurnAway(body)`, with a `Golem_SetBehavior(body, n)` commit,
+   took N from 1902 to 1869 and T from 951 to 935. The ROM's slot order needed T 927..939,
+   and the function matched. `preorder` now lists the body lines that load an offset when
+   the order needs fewer insns. A `do { } while (0)` costs two insns into gcse (and is a
+   barrier).
 
 ## Survey: random table as a literal address (2026-10-24)
 
