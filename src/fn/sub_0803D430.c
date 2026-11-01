@@ -5,7 +5,7 @@ void ScenePool_UpdateOccupiedActorSlots(struct ScenePoolManager *);
 #ifdef NONMATCHING
 // fuzzy: 85.9%
 // confidence=low: records active player positions, then updates nearby pooled actors.
-s32 sub_0803D430(struct ScenePoolManager *m)
+s32 ScenePool_UpdateManager(struct ScenePoolManager *m)
 {
     s32 i;
     u32 *regions;
@@ -36,5 +36,5 @@ s32 sub_0803D430(struct ScenePoolManager *m)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0803D430);
+INCLUDE_ASM("asm/nonmatching", ScenePool_UpdateManager);
 #endif

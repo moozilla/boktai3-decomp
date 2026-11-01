@@ -1473,6 +1473,7 @@ addr,name,mode,confidence,source,notes
 0803D1E8,ScenePool_ReadActorBounds,thumb,low,src-alias,
 0803D210,ScenePool_IsEntryInSpawnBand,thumb,low,src-alias,Tests whether the entry origin lies 100–200 units outside the selected side's actor bounds
 0803D288,ScenePool_SpawnEntriesNearPlayers,thumb,low,src-alias,
+0803D430,ScenePool_UpdateManager,thumb,low,src-alias,Records player positions and regions before updating nearby entries and occupied slots.
 0803D4D0,ScenePool_DestroyManager,thumb,low,src-alias,Task destruction callback that releases four actor slots and the registry and frees the entry pool
 0803D514,ScenePool_InitializeManager,thumb,low,src-alias,Allocates the configurable entry pool and initializes four actor slots and the registry
 0803D5A8,ScenePool_CreateManager,thumb,low,src-alias,Creates the manager task and installs its update and destruction callbacks
