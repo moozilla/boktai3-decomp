@@ -146,6 +146,12 @@ that is a scope gap: record it (below) so the tool gets better.
   `asm("")` barriers only as above, with `--allow-pins`; the unit carries
   `// MATCHING_CONCESSION: register-pinning` and `progress.py` reports it as
   Register-pinned. Take pins out of a unit you touch.
+* An empty `do { } while (0);` counts as a barrier. Its loop notes end the first cse pass
+  and weight register refs the way a barrier does. A statement macro wrapped in
+  `do { ... } while (0)` with a body is ordinary C. An empty one is accepted as ordinary C
+  only with evidence that the original had a compiled-out macro at that spot, for example
+  the same statement in every caller of a shared helper. The tools count it and land
+  refuses it without `--allow-pins`.
 * The SDK's `SystemCall(n)` (`include/gba/syscall.h`) is the one inline assembly that
   counts as ordinary C: the original authors wrote it that way.
 * No selector macros: a `#define` a file sets before including a shared header to change
