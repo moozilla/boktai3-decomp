@@ -7708,6 +7708,7 @@ addr,name,mode,confidence,source,notes
 081CA208,Actor_UpdateKindFiveEntryEight,thumb,low,src-alias,Animation state callback selecting entry 8 for kind 5 and resetting phase before awaiting completion
 081CA2C8,StateActor_StartKind5Animation9AndAttach,thumb,low,src-alias,
 081CA3D4,Actor_UpdateKindFiveEntryTen,thumb,low,src-alias,Animation state callback selecting entry 10 for kind 5 and marking completion
+081CA490,StateActor_UpdateEightWayBurst,thumb,low,src-alias,
 081CA854,Actor_BeginKindFifteenEntryNine,thumb,low,src-alias,Animation state callback starting entry 9 for kind 15 on state entry without testing completion
 081CA900,Actor_UpdateKindFifteenEntryTenTimed,thumb,low,src-alias,Animation state callback starting entry 10 for kind 15 and marking completion when the frame argument exceeds 15
 081CA9B8,StateActor_UpdateTwoStageAnimationB,thumb,low,src-alias,
