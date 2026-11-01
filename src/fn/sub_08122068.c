@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "hit_spark_random.h"
 
 /* tentative: falling shard with gravity that bursts into debris on landing */
 
@@ -94,24 +94,14 @@ void SpriteEffect_UpdateFallingShard(struct SpriteEffectPool *manager, struct Sp
         p->unkD0 = 0;
         low.x = -12;
         {
-            const u16 *table = gRandomTable;
-            u32 *indexPtr = &gRandomIndex;
-            u32 index = *indexPtr + 1;
-            u32 mask = 1023;
-            register u32 small asm("r9");
-            u32 next;
-            index &= mask;
-            {
-                u32 first = table[index];
-                small = 7;
-                asm("" : "+r"(small));
-                low.y = first & small;
-            }
+            u32 table = (u32)gRandomTable;
+            u32 index = (gRandomIndex + 1) & 1023;
+            low.y = HitSpark_Sample(table, index) & 7;
             low.z = -12;
             high.x = 24;
-            next = (index + 1) & mask;
-            *indexPtr = next;
-            high.y = (table[next] & small) + 3;
+            index = HitSpark_NextIndex(index, 1023);
+            gRandomIndex = index;
+            high.y = (HitSpark_Sample(table, index) & 7) + 3;
             high.z = 24;
         }
         sub_08014634(6, 3, &p->position, &low, &high, 32, 31);
