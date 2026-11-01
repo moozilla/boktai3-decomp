@@ -69,7 +69,7 @@ static inline s32 groundHeight(struct SceneVec *position)
     }
     return height;
 }
-static inline s32 stateMode(void)
+static inline u8 stateMode(void)
 {
     struct Player *state = gPlayers[0];
     if (state) {
@@ -1340,60 +1340,38 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
         AnimData_SelectPaletteBank(p->other, 775);
     else
         AnimData_SelectPaletteBank(p->other, 776);
-    {
-        s32 hidden = p->started;
-        if (hidden) {
-            s32 available;
-            p->object->flags |= 1;
-            if (gEngineFlags & 2048) {
-                available = stateMode();
-            } else {
-                if (gWeatherCollisionTimer > 0)
-                    goto reveal;
-                if (gPlayers[0] && (({
-                        u32 *flags = &gPlayers[0]->actionFlags;
-                        u32 mask = 16;
-                        *flags &mask;
-                    })))
-                    goto reveal;
-                available = globalMode();
-            }
-            asm("" : : "r"(available));
-            if (!available)
-                goto conceal;
-        reveal:
-            hidden = 0;
-            goto visibilityDone;
-        conceal:
-            hidden = 1;
+    if (p->started) {
+        s32 available;
+        p->object->flags |= 1;
+        if (gEngineFlags & 2048) {
+            available = stateMode();
+        } else {
+            if (gWeatherCollisionTimer > 0)
+                goto reveal;
+            if (gPlayers[0] && (({
+                    u32 *flags = &gPlayers[0]->actionFlags;
+                    u32 mask = 16;
+                    *flags &mask;
+                })))
+                goto reveal;
+            available = globalMode();
         }
-    visibilityDone:
-        p->visible = hidden;
-    }
-    {
-        void *animation = p->animation;
-        void *resource = ({
-            struct TriggerManager *m = manager;
-            m->resource;
-        });
-        register s32 zero asm("r2") = 0;
-        Anim_SetSequence(animation, resource, zero, 0, zero);
-    }
-    {
-        s32 value;
-        if (({
-                register s32 input asm("r3") = sound;
-                input;
-            }))
-            value = Region_FindContaining(&p->object->position);
-        else
-            value = *(u16 *)&sound;
-        p->sound = value;
-    }
-    ScaledShadow_Initialize(p->effect, &p->object->position, 64, 24, 40, 32, 512, 1, 5, 1, ({
-                                register s32 zero asm("r0") = 0;
-                                zero;
-                            }));
+        if (!available)
+            goto conceal;
+    reveal:
+        p->visible = 0;
+        goto visibilityDone;
+    conceal:
+        p->visible = 1;
+    } else
+        p->visible = 0;
+visibilityDone:
+    Anim_SetSequence(p->animation, manager->resource, 0, 0, 0);
+    if (sound)
+        p->sound = Region_FindContaining(&p->object->position);
+    else
+        p->sound = sound;
+    ScaledShadow_Initialize(p->effect, &p->object->position, 64, 24, 40, 32, 512, 1, 5, 1, 0);
     ScaledShadow_Disable(p->effect);
     TriggerManager_InsertTrigger(p);
     return 0;
