@@ -187,41 +187,12 @@ static inline s32 absolute_0804BB30(s32 value)
     return value;
 }
 
-static inline u8 *propertiesAt_0804BCD4(struct ContactPosition *input)
-{
-    register struct ContactPosition *position asm("r6") = input;
-    s32 x = position->x >> 8;
-    s32 z = position->z >> 8;
-    s32 cell;
-    u8 *properties;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = gTerrainMap->rows[z] + x;
-    properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties)
-        properties += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        properties = map->cells + offset;
-    }
-    return properties;
-}
-
-static inline u32 terrainFlagEnabled(void)
+static inline u8 flaggedTerrainEnabled(void)
 {
     u32 mask = 16;
-    u32 flags;
-    u32 result;
-    flags = gGameState->flags868;
-    if (flags & mask) {
-        result = 1;
-        asm("" : "+r"(result));
-    } else {
-        result = 0;
-    }
-    return result;
+    if (gGameState->flags868 & mask)
+        return TRUE;
+    return FALSE;
 }
 
 static inline s32 scale(s32 value)
@@ -516,12 +487,12 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor);
 
 void TetherActor_LimitPlayerDistance(struct TetherActor *input);
 
-void TetherActor_UpdateSecondaryLock(struct TetherActor *input);
+void TetherActor_UpdateSecondaryLock(struct TetherActor *actor);
 
 void TetherActor_UpdateFollowingState(struct TetherActor *actor);
 
-u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *input,
-                                 u32 inputMask);
+u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *candidate,
+                                 u32 mask);
 
 u32 TetherActor_TestStepDelta(struct ContactPackedVector *origin, struct ContactPackedVector *delta,
                               u32 mask);
@@ -2292,30 +2263,17 @@ void TetherActor_UpdateChargeDecay(struct TetherActor *p)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateInteractionCooldown(struct TetherActor *actor)
 {
-    u16 *field = &actor->interactionCooldown;
-    u32 timer = *field;
-    register u32 saved asm("r3") = timer;
-    register u32 result asm("r0");
-    if (!saved)
-        goto done;
-    if (actor->state != 1)
-        goto other;
-    if (saved <= 2)
-        goto zero;
-    result = timer - 2;
-    goto store;
-zero:
-    result = 0;
-    goto store;
-other:
-    result = timer - 1;
-store:
-    *field = result;
-done:;
+    if (actor->interactionCooldown) {
+        if (actor->state == 1) {
+            if (actor->interactionCooldown > 2)
+                actor->interactionCooldown -= 2;
+            else
+                actor->interactionCooldown = 0;
+        } else
+            actor->interactionCooldown--;
+    }
 }
 
 void TetherActor_UpdateChargeAndCooldown(struct TetherActor *actor)
@@ -2421,40 +2379,30 @@ void TetherActor_UpdateSampledPosition(struct TetherActor *p)
     p->sampledPosition.z += y;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
 {
     struct ContactPosition *position = &actor->position;
     s32 x = position->x >> 8;
-    s16 *clampX;
     s32 z = position->z >> 8;
-    s16 **positionZReference;
     s32 cell;
     u8 *properties;
-    if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
-    } else {
+    else
         cell = gTerrainMap->rows[z] + x;
-    }
     properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties) {
+    if (properties)
         properties += 4;
-    } else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = (cell * 4) + 12;
-        properties = map->cells + offset;
-    }
+    else
+        properties = gTerrainMap->cells + (cell * 4 + 12);
     {
-        u32 attributes = *((u16 *)(properties + 2));
+        u32 attributes = *(u16 *)(properties + 2);
         attributes &= 128;
-        if (!attributes) {
-            goto done;
-        }
+        if (!attributes)
+            return;
     }
-    if (!flaggedCellHandlingEnabled()) {
-        goto done;
-    }
+    if (!flaggedCellHandlingEnabled())
+        return;
     {
         s32 column = Mod(actor->movementProbeStorage.previousCell, ((s16 *)gTerrainMap->cells)[2]);
         s32 row = Div(actor->movementProbeStorage.previousCell, ((s16 *)gTerrainMap->cells)[2]);
@@ -2464,49 +2412,32 @@ void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
         s32 cellZ = row << 8;
         s32 minZ = cellZ + 1;
         s32 maxZ = cellZ + 255;
-        register s16 *positionX asm("r6") = &actor->position.x;
-        s16 *positionZ;
-        s32 pointX = *positionX;
-        s32 dx;
-        s32 dz;
-        pointX -= 127;
-        clampX = positionX;
-        dx = cellX - pointX;
-        positionZ = &actor->position.z;
-        pointX = *positionZ;
-        pointX -= 127;
-        dz = cellZ - pointX;
-        {
-            register s32 direction asm("r0") = (u8)Math_Atan2(dx, dz);
-            s32 angle;
-            direction = (direction - 32) & (~63);
-            asm("" : "+r"(direction));
-            angle = direction;
-            angle += 64;
-            if ((*clampX) < minX) {
-                *clampX = minX;
-            } else if ((*clampX) > maxX) {
-                *clampX = maxX;
-            }
-            positionZReference = &positionZ;
-            if ((*(*positionZReference)) < minZ) {
-                *positionZ = minZ;
-            } else if ((*positionZ) > maxZ) {
-                *(*positionZReference) = maxZ;
-            }
-            TetherActor_RequestKindNineAction(100, angle);
-            if (actor->requestMode) {
-                Sound_PlaySong(0x3F4);
-                Sound_PlaySong(0x4ED);
-                --actor->requestMode;
-            }
-            actor->requestStatus = 1;
-            if (actor->onActionScriptId) {
-                Script_Call(actor->onActionScriptId, 0);
-            }
+        s32 point, dx, dz, angle;
+        point = actor->position.x;
+        point -= 127;
+        dx = cellX - point;
+        point = actor->position.z;
+        point -= 127;
+        dz = cellZ - point;
+        angle = (((u8)Math_Atan2(dx, dz) - 32) & ~63) + 64;
+        if (actor->position.x < minX)
+            actor->position.x = minX;
+        else if (actor->position.x > maxX)
+            actor->position.x = maxX;
+        if (actor->position.z < minZ)
+            actor->position.z = minZ;
+        else if (actor->position.z > maxZ)
+            actor->position.z = maxZ;
+        TetherActor_RequestKindNineAction(100, angle);
+        if (actor->requestMode) {
+            Sound_PlaySong(0x3F4);
+            Sound_PlaySong(0x4ED);
+            --actor->requestMode;
         }
+        actor->requestStatus = 1;
+        if (actor->onActionScriptId)
+            Script_Call(actor->onActionScriptId, 0);
     }
-done:;
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -2981,30 +2912,18 @@ void TetherActor_LimitPlayerDistance(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
-void TetherActor_UpdateSecondaryLock(struct TetherActor *input)
+void TetherActor_UpdateSecondaryLock(struct TetherActor *actor)
 {
-    register struct TetherActor *actor asm("r2") = input;
     if (!actor->statusFlags) {
-        u16 *value = &actor->secondaryValue;
-        u32 loaded = *value;
-        register u32 current asm("r3");
-        current = loaded;
-        if (current)
-            *value = loaded - 1;
+        if (actor->secondaryValue)
+            actor->secondaryValue--;
         else {
-            *value = actor->secondaryMaximum;
+            actor->secondaryValue = actor->secondaryMaximum;
             actor->interactionLock = 1;
-            {
-                register u16 *frame asm("r0") = &actor->lockFrame;
-                *frame = current;
-            }
+            actor->lockFrame = 0;
         }
     }
 }
-
-// MATCHING_CONCESSION: register-pinning
 
 void TetherActor_UpdateFollowingState(struct TetherActor *actor)
 {
@@ -3022,16 +2941,11 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
     if (actor->parameter >= 0)
         TetherActor_LimitPlayerDistance(actor);
     else {
-        register s16 *x asm("r2") = &actor->position.x;
-        s16 *z;
-        register s32 dx asm("r1") = *x;
-        s32 target = actor->targetPosition.x;
-        dx = absolute_0804BB30(dx - target);
-        z = &actor->position.z;
-        if (dx > 2 || absolute_0804BB30(*z - actor->targetPosition.z) > 2)
+        if (absolute_0804BB30(actor->position.x - actor->targetPosition.x) > 2 ||
+            absolute_0804BB30(actor->position.z - actor->targetPosition.z) > 2)
             actor->moving = 1;
-        *x = actor->targetPosition.x;
-        *z = actor->targetPosition.z;
+        actor->position.x = actor->targetPosition.x;
+        actor->position.z = actor->targetPosition.z;
     }
     actor->heading = actor->targetPosition.pad;
     if (actor->kind == 5 && actor->moving)
@@ -3056,48 +2970,24 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
-u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *input,
-                                 u32 inputMask)
+u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactPosition *candidate,
+                                 u32 mask)
 {
-    register struct ContactPosition *candidate asm("r6");
-    u32 mask;
-    u8 *properties;
-    u32 attributes;
-    s32 height, difference;
-    u32 surface;
-    candidate = input;
-    asm("" : : "r"(candidate));
-    mask = inputMask;
-    properties = propertiesAt_0804BCD4(candidate);
-    attributes = *(u16 *)(properties + 2);
-    mask &= attributes;
-    if (mask)
-        goto no;
-    if ((attributes & 128) && terrainFlagEnabled())
-        goto no;
-    properties = propertiesAt_0804BCD4(candidate);
-    surface = *properties >> 4;
-    height = (*properties & 15) << 8;
-    switch (surface) {
-        case 1:
-            height -= (u8)candidate->z;
-            break;
-        case 2:
-            height -= (u8)candidate->x;
-            break;
-    }
-    difference = origin->y - height;
+    u8 *properties = cellProperties(cellIndex_0804B6A4(candidate->x >> 8, candidate->z >> 8));
+    u32 attributes = *(u16 *)(properties + 2);
+    s32 difference;
+    if (mask & attributes)
+        return 0;
+    if ((attributes & 128) && flaggedTerrainEnabled())
+        return 0;
+    difference = origin->y - surfaceHeight(candidate);
     if (difference < 0)
         difference = -difference;
     if (difference > 50)
-        goto no;
+        return 0;
     if (NamedObject_FindNearPosition(candidate))
-        goto no;
+        return 0;
     return 1;
-no:
-    return 0;
 }
 
 u32 TetherActor_TestStepDelta(struct ContactPackedVector *origin, struct ContactPackedVector *delta,
@@ -3456,24 +3346,17 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateDisplayDeparture(struct TetherActor *actor)
 {
-    u16 *frame;
-    register u32 current asm("r0");
     actor->heading = 0;
     actor->chargeCollider.flags |= 4;
-    frame = &actor->stateFrame;
-    ++*frame;
+    ++actor->stateFrame;
     TetherActor_SetEntry(actor, 0);
-    current = *frame;
-    asm("" : "+r"(current) : : "memory");
-    if (current <= 27)
+    if (actor->stateFrame <= 27)
         return;
-    if (current <= 43) {
-        u32 savedFrame = current;
-        s32 phase = savedFrame - 28;
+    if (actor->stateFrame <= 43) {
+        u32 frame = actor->stateFrame;
+        s32 phase = frame - 28;
         struct DisplayAnimation *display = &actor->display.animation;
         s32 first, second;
         DisplayAnimation_SetFlags(display, 2);
@@ -3481,44 +3364,31 @@ void TetherActor_UpdateDisplayDeparture(struct TetherActor *actor)
         second = 64;
         if (phase > 8) {
             second = phase * 8;
-            {
-                u32 height = (savedFrame - 36) * 30;
-                actor->displayOffsetY = height;
-            }
+            actor->displayOffsetY = (frame - 36) * 30;
         }
         DisplayAnimation_SetPalette(display, first, second, 0);
-    } else if (current <= 51)
-        actor->displayOffsetY = (*frame - 44) * 200 + 240;
+    } else if (actor->stateFrame <= 51)
+        actor->displayOffsetY = (actor->stateFrame - 44) * 200 + 240;
     else
         DisplayAnimation_SetFlags(&actor->display.animation, 1);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateDisplayReturn(struct TetherActor *actor)
 {
-    u32 zero;
-    u8 *heading = &actor->heading;
-    u16 *frame;
-    u32 current;
-    zero = 0;
-    *heading = zero;
+    actor->heading = 0;
     actor->chargeCollider.flags |= 4;
     TetherActor_SetEntry(actor, 0);
-    frame = &actor->stateFrame;
-    current = *frame;
-    asm("" : "+r"(current) : : "memory");
-    if (current <= 75)
+    if (actor->stateFrame <= 75)
         DisplayAnimation_SetFlags(&actor->display.animation, 1);
-    else if (current <= 83) {
-        u32 phase = *frame - 76;
+    else if (actor->stateFrame <= 83) {
+        u32 phase = actor->stateFrame - 76;
         struct DisplayAnimation *display = &actor->display.animation;
         DisplayAnimation_ClearFlags(display, 1);
         DisplayAnimation_SetFlags(display, 2);
         DisplayAnimation_SetPalette(display, 4, 120, 0);
         actor->displayOffsetY = (8 - phase) * 200 + 240;
-    } else if (current <= 99) {
-        s32 phase = *frame - 84;
+    } else if (actor->stateFrame <= 99) {
+        s32 phase = actor->stateFrame - 84;
         s32 remaining = 15 - phase;
         s32 first = 64 - remaining * 4, second;
         if (phase <= 7) {
@@ -3526,7 +3396,7 @@ void TetherActor_UpdateDisplayReturn(struct TetherActor *actor)
             actor->displayOffsetY = (8 - phase) * 30;
         } else {
             second = 64;
-            actor->displayOffsetY = zero;
+            actor->displayOffsetY = 0;
         }
         DisplayAnimation_SetPalette(&actor->display.animation, first, second, 0);
     }
@@ -3649,14 +3519,8 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
 
 void *ActorAttachment_ReleaseResource(void *, u32, u32);
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateDescendingState(struct TetherActor *actor)
 {
-    u16 *frame;
-    register u32 raw asm("r0");
-    register u32 incremented asm("r1");
-    register u32 current asm("r0");
     u32 zero;
     if (actor->state != 6)
         TetherActor_SetState(actor, 6);
@@ -3664,72 +3528,41 @@ void TetherActor_UpdateDescendingState(struct TetherActor *actor)
     if (zero)
         return;
     actor->glowMode = zero;
-    frame = &actor->stateFrame;
-    raw = *frame;
-    incremented = raw + 1;
-    *frame = incremented;
-    current = (u16)incremented;
-    if (current <= 5) {
-        current = (u16)incremented;
-        if (current == 1) {
-            u16 *value = &actor->effectValue;
-            void **handle;
-            *value = zero;
-            handle = &actor->pendingEffectHandle;
-            *handle = ActorAttachment_UpdateFromDescriptor(*handle, &actor->bodyConfig, 1, 0, value,
-                                                           200, 250, 290);
+    if (++actor->stateFrame <= 5) {
+        if (actor->stateFrame == 1) {
+            actor->effectValue = zero;
+            actor->pendingEffectHandle =
+                ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
+                                                     1, 0, &actor->effectValue, 200, 250, 290);
         }
     } else {
-        current = (u16)incremented;
-        if (current == 6) {
-            void **handle = &actor->pendingEffectHandle;
-            *handle = ActorAttachment_ReleaseResource(*handle, 1, actor->bodyConfig.id);
-        }
+        if (actor->stateFrame == 6)
+            actor->pendingEffectHandle = ActorAttachment_ReleaseResource(actor->pendingEffectHandle,
+                                                                         1, actor->bodyConfig.id);
         actor->displayOffsetY -= 30;
-        if (*frame > 8)
+        if (actor->stateFrame > 8)
             actor->destroyRequested = 1;
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateRapidDescendingState(struct TetherActor *actor)
 {
-    u16 *frame;
-    register u32 raw asm("r0");
-    register u32 incremented asm("r1");
-    register u32 current asm("r0");
-    u32 zero;
     if (actor->state != 7)
         TetherActor_SetState(actor, 7);
-    {
-        u16 *glow = &actor->glowMode;
-        zero = 0;
-        *glow = zero;
-    }
-    frame = &actor->stateFrame;
-    raw = *frame;
-    incremented = raw + 1;
-    *frame = incremented;
-    current = (u16)incremented;
-    if (current <= 5) {
-        current = (u16)incremented;
-        if (current == 1) {
-            u16 *value = &actor->effectValue;
-            void **handle;
-            *value = zero;
-            handle = &actor->pendingEffectHandle;
-            *handle = ActorAttachment_UpdateFromDescriptor(*handle, &actor->bodyConfig, 1, 0, value,
-                                                           200, 250, 290);
+    actor->glowMode = 0;
+    if (++actor->stateFrame <= 5) {
+        if (actor->stateFrame == 1) {
+            actor->effectValue = 0;
+            actor->pendingEffectHandle =
+                ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
+                                                     1, 0, &actor->effectValue, 200, 250, 290);
         }
     } else {
-        current = (u16)incremented;
-        if (current == 6) {
-            void **handle = &actor->pendingEffectHandle;
-            *handle = ActorAttachment_ReleaseResource(*handle, 1, actor->bodyConfig.id);
-        }
+        if (actor->stateFrame == 6)
+            actor->pendingEffectHandle = ActorAttachment_ReleaseResource(actor->pendingEffectHandle,
+                                                                         1, actor->bodyConfig.id);
         actor->displayOffsetY -= 60;
-        if (*frame > 29)
+        if (actor->stateFrame > 29)
             actor->destroyRequested = 1;
     }
 }
@@ -3855,8 +3688,6 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
 {
     if (actor->state != 11) {
@@ -3870,27 +3701,16 @@ void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
     if (!actor->stateFrame)
         actor->displayOffsetY = 300;
     {
-        register u32 angle asm("r3") = actor->actionAngle;
-        const s16 *table = gUnk_086149C4;
-        actor->movementDelta.x = scale(table[(angle + 64) & 255] * actor->actionMagnitude);
-        actor->movementDelta.z = scale(table[angle] * actor->actionMagnitude);
-        asm("" : : "r"(angle));
+        u32 angle = actor->actionAngle;
+        actor->movementDelta.x = scale(gUnk_086149C4[(angle + 64) & 255] * actor->actionMagnitude);
+        actor->movementDelta.z = scale(gUnk_086149C4[angle] * actor->actionMagnitude);
     }
     actor->actionMagnitude = (actor->actionMagnitude * 3) >> 2;
-    {
-        register u16 *frame asm("r3") = &actor->stateFrame;
-        u32 current;
-        current = *frame;
-        if (current > 3) {
-            u16 *height = &actor->displayOffsetY;
-            register u32 remaining asm("r2") = *height;
-            u32 reduction = current << 3;
-            if ((s32)remaining >= (s32)reduction)
-                reduction = remaining - reduction;
-            else
-                reduction = 0;
-            *height = reduction;
-        }
+    if (actor->stateFrame > 3) {
+        if (actor->displayOffsetY >= actor->stateFrame * 8)
+            actor->displayOffsetY -= actor->stateFrame * 8;
+        else
+            actor->displayOffsetY = 0;
     }
     ++actor->stateFrame;
     if (actor->actionMagnitude <= 19 && !actor->displayOffsetY) {
@@ -3961,8 +3781,6 @@ void TetherActor_UpdateDirectedEntryTransition(struct TetherActor *p)
         TetherActor_SetState(p, p->directedStep);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateDirectedMovement(struct TetherActor *actor)
 {
     if (actor->directedTimer == 30) {
@@ -3976,14 +3794,12 @@ void TetherActor_UpdateDirectedMovement(struct TetherActor *actor)
         actor->moving = 1;
     } else if (actor->directedTimer <= 29) {
         u32 angle;
-        register const s16 *table asm("r2");
         {
             u32 value = (actor->directedHeading + 5) & 7;
             angle = value << 5;
         }
-        table = gUnk_086149C4;
-        actor->position.x += scale(table[(angle + 64) & 255] * 5);
-        actor->position.z += scale(table[angle] * 5);
+        actor->position.x += scale(gUnk_086149C4[(angle + 64) & 255] * 5);
+        actor->position.z += scale(gUnk_086149C4[angle] * 5);
         actor->heading = actor->directedHeading;
     }
     if (--actor->directedTimer == 0) {
@@ -4018,8 +3834,6 @@ void TetherActor_UpdateDirectedState(struct TetherActor *p)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateReverseDirectedMovement(struct TetherActor *actor)
 {
     if (actor->directedTimer == 30) {
@@ -4032,14 +3846,12 @@ void TetherActor_UpdateReverseDirectedMovement(struct TetherActor *actor)
         }
     } else if (actor->directedTimer <= 29) {
         u32 angle;
-        register const s16 *table asm("r2");
         {
             u32 value = (actor->directedHeading + 5) & 7;
             angle = value << 5;
         }
-        table = gUnk_086149C4;
-        actor->position.x += scale(table[(angle + 64) & 255] * 6);
-        actor->position.z += scale(table[angle] * 6);
+        actor->position.x += scale(gUnk_086149C4[(angle + 64) & 255] * 6);
+        actor->position.z += scale(gUnk_086149C4[angle] * 6);
         actor->heading = ((u8)actor->directedHeading + 4) & 7;
         TetherActor_LimitPlayerDistance(actor);
         actor->moving = 1;

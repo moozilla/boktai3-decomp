@@ -1180,6 +1180,19 @@ Each was read from the compiler source and confirmed on a live draft.
    after reload, so the layout is the same. TetherActor_CanStartInteraction lost three `r2`
    clobbers this way. TetherActor_SelectInteractionState (`!enabled || statusFlags`) lost one by
    testing the two fields in separate ifs that both set state 0 (cross-jumped into one call).
+47. **When the ROM copies a loaded field into a second register, the C reads the field again.**
+   A pinned draft that loads `*frame` into one variable and uses it in each test and update
+   (`current = *frame; if (current <= 27) ...; phase = current - 28;`) fights the ROM's
+   `ldrh r0, [r4]` / `adds r6, r0, #0`. Plain `actor->stateFrame` in every test and in the
+   arithmetic matches: cse turns the second read into a copy of the first load, and the copy
+   is the ROM's second register. The same goes for `++actor->stateFrame <= 5` followed by
+   `actor->stateFrame == 1`, which gives the ROM's repeated `lsls`/`lsrs` zero-extends of the
+   incremented register. Matched this way: TetherActor_SetEntry (`base + actor->kind` in each
+   arm), UpdateInteractionCooldown, UpdateSecondaryLock, UpdateDisplayDeparture,
+   UpdateDisplayReturn, UpdateDescendingState, UpdateRapidDescendingState. A related case: a
+   pinned `table` local for `gUnk_086149C4[...]` swaps r2/r3 with the angle. Indexing the
+   global directly, with only the angle in a local, matched UpdateKindNineRecoil and both
+   UpdateDirectedMovement functions.
 
 ## Survey: random table as a literal address (2026-10-24)
 
