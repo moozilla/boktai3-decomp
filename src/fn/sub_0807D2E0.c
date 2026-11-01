@@ -5,7 +5,6 @@
 #include "engine.h"
 
 #include "scene_actor_damage_visibility.h"
-#include "spark_particle.h"
 #include "runtime.h"
 #include "ram.h"
 
@@ -52,7 +51,7 @@ static inline void SetReactionState(struct SceneActorRegistryResetView *a, u32 s
 }
 
 #ifdef NONMATCHING
-// fuzzy: 60.4%
+// fuzzy: 60.3%
 void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 p3, u32 flip,
                   u32 p5)
 {
@@ -127,25 +126,14 @@ mode2:
         if (SceneActorDamage_ShouldShow(a))
             ShowDamage(a);
         if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) && !(a->flags2D0 & 0x800))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, a->body.id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)a->body.id);
         if (category == 4 || category == 1) {
             union SceneActorRegistryPackedPosition range;
-            const u16 *table = gRandomTable;
             range.packed.x = 80;
             range.packed.y = 60;
             range.packed.z = 60;
-            SparkParticle_Spawn(&a->body.position, (SceneActorEffects_NextSample(table) & 3) + 1,
-                                &range.position, 0x20, 4, 20, 2, 1);
-            SparkParticle_Spawn(&a->body.position, (SceneActorEffects_NextSample(table) & 3) + 1,
-                                &range.position, 0x40, 4, 20, 2, 1);
-            SparkParticle_Spawn(&a->body.position, (SceneActorEffects_NextSample(table) & 3) + 1,
-                                &range.position, 0x5E, 4, 20, 2, 1);
-            SparkParticle_Spawn(&a->body.position, (SceneActorEffects_NextSample(table) & 3) + 1,
-                                &range.position, 0x80, 4, 20, 2, 1);
-            SparkParticle_Spawn(&a->body.position, (SceneActorEffects_NextSample(table) & 3) + 1,
-                                &range.position, 0xC4, 4, 20, 2, 1);
-            SparkParticle_Spawn(&a->body.position, (SceneActorEffects_NextSample(table) & 3) + 1,
-                                &range.position, 0xF0, 4, 20, 2, 1);
+            SceneActorEffects_SpawnDefeatSparks(a, &range.position, gRandomTable,
+                                                SceneActorEffects_NextSparkCount(gRandomTable));
             switch (a->category) {
                 case 4:
                 case 1:
