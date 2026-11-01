@@ -158,6 +158,10 @@ that is a scope gap: record it (below) so the tool gets better.
   plausibly logged something: the condition is a call or a test worth reporting. An `if`
   with a bare empty body (`{ }` or `;`) is a fence; the tools count it as a barrier and
   land refuses it without `--allow-pins`.
+* A `goto` loop is ordinary C, accepted for now where loop.c would rewrite the structured
+  form (a counter reversed to count down, for example); phase 4 revisits them. So is a
+  non-void function that falls off the end, leaving its argument in r0, when the ROM does
+  that.
 * The SDK's `SystemCall(n)` (`include/gba/syscall.h`) is the one inline assembly that
   counts as ordinary C: the original authors wrote it that way.
 * No selector macros: a `#define` a file sets before including a shared header to change

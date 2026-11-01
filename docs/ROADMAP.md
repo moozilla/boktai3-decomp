@@ -41,6 +41,9 @@ function, write it the way it will finally be.
 
 Phase 4 is also when the remaining `NONMATCHING` scaffolding, per-file helper copies and
 compatibility declarations go.
+It also revisits `goto` loops: phase 3 accepts one where a structured loop would be rewritten
+by loop.c (a reversed counter, for example), and cleanup looks for the structured form the
+original more likely had.
 
 ## Side threads
 
