@@ -1,16 +1,11 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "display_sprite_playback.h"
 
 struct CollectionRes {
     u32 w[8];
 };
 struct CollectionPos {
     u16 x, y, z, pad;
-};
-struct CollectionAnim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unk0A, scale, timer;
 };
 struct CollectionSprite {
     u32 flags;
@@ -46,54 +41,6 @@ void Sprite_Init(void *, void *, u32);
 void Anim_SetSequence(void *, void *, u16, u32, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 
-static inline void StepAnim(struct CollectionAnim *a, struct CollectionSprite *s)
-{
-    const volatile u16 *entry = a->data + a->frame;
-
-    s->frame = *entry >> 6;
-    {
-        u32 left = a->flags & 1;
-        if (left != (((*entry & 0x30) >> 4) & 1))
-            s->flags |= 4;
-        else
-            s->flags &= ~4;
-    }
-    {
-        /* Load the flags before materializing the shared mask. */
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        if ((u8)(mask & input) != (((*entry & 0x30) >> 4) & mask))
-            s->flags |= 8;
-        else
-            s->flags &= ~8;
-    }
-    if ((u16)++a->timer >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8)
-                    a->timer = a->rate;
-                else
-                    a->frame = a->count - 1;
-            } else {
-                a->frame--;
-            }
-        } else if ((u16)++a->frame >= a->count) {
-            if ((u8)(a->flags & 8)) {
-                a->timer = a->rate;
-                a->frame = a->count - 1;
-            } else {
-                a->frame = 0;
-            }
-        }
-        entry = a->data + a->frame;
-        a->factor = *entry & 15;
-        a->rate = (a->factor * a->scale) >> 6;
-        if (a->rate == 0)
-            a->rate = 1;
-    }
-}
-
 /* Tentative: builds the collection menu widgets and the 27 entry sprites. */
 void CollectionMenu_InitGraphics(u8 *m)
 {
@@ -126,7 +73,7 @@ void CollectionMenu_InitGraphics(u8 *m)
     pos.x = 0x18;
     pos.y = 0x18;
     for (i = 0; i < 27; i++) {
-        struct CollectionSprite *s;
+        struct ContactSwarmSprite *s;
         struct CollectionMenu *c = (struct CollectionMenu *)m;
 
         AnimData_Load(m + 0x368 + i * 0x1c, 0x593a);
@@ -137,8 +84,8 @@ void CollectionMenu_InitGraphics(u8 *m)
         c->sprites[i].visible = 1;
         *(void **)(m + 0xb10) = ScriptProc_Start(0x922e, 0x4bbf);
         Anim_SetSequence(m + 0xb00, *(void **)(m + 0xb10), sequences[i], 0, 0);
-        s = (struct CollectionSprite *)(m + i * 0x2c + 0x65c);
-        StepAnim((struct CollectionAnim *)(m + 0xb00), s);
+        s = (struct ContactSwarmSprite *)(m + i * 0x2c + 0x65c);
+        PlayerCue_StepSequenceEnded(s, (struct DisplaySequenceState *)(m + 0xb00));
         {
             s32 field = 0x668;
             s32 off = i * 0x2c;
