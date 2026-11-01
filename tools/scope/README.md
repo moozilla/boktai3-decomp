@@ -149,6 +149,9 @@ python3 tools/scope/scope.py FILE.c preorder [FUNC]  the ROM's order of PRE's sp
 python3 tools/scope/scope.py FILE.c hoist [FUNC]  loop-invariant motion pass by pass: what loop.c moved out, what stayed, and why;
                                                   then for each hoisted variable it scores the dead re-set before the loop's closing brace
 python3 tools/scope/scope.py todo [N] [addr|prior|size]   functions with no C yet, in ROM order (default) or by prior art/size
+python3 tools/scope/scope.py twins [N] [all]     every draft (all: also no C) with its closest matched relative by like's ranking,
+                                                  best first: twin >= 0.75 similarity, near >= 0.45 covering >= 40%,
+                                                  * marks a relative with pins (its de-pinned C fixes both)
 python3 tools/scope/scope.py new FUNC             open FUNC: build/scope/work/FUNC.c (its unit with a stub, or a like twin's C)
 python3 tools/scope/scope.py land FUNC [--name N] [--rom] [--nonmatching] [--allow-pins]   put the draft into src/ and check it
 python3 tools/scope/scope.py rename FUNC NEW      functions.csv plus every C spelling of the old name or sub_ label
@@ -988,7 +991,10 @@ Each was read from the compiler source and confirmed on a live draft.
    now prints the lever on each aligned `ands` pair whose tied operand differs (a constant
    in one, the value in the other), also when both read `ands r0, r1` with the registers'
    roles swapped (Vanargand_UpdatePartLeap's terrain mask); the opposite case asks for the
-   value first.
+   value first. The same holds for `orrs` (the hint covers it too): SceneActors_UpdatePeriodicEffectAction's hold
+   flag matched as `u32 value = *flags; u32 mask = 4; mask |= value; *flags = mask;`. Reading
+   the value first also matters there: with `mask = 4` declared before the load, the
+   `movs` came ahead of the `ldrb` (the ROM loads first, then the constant).
 34. **A struct halfword `|=` is a field insertion; through a `u16 *` it is not.**
    `s->f |= mask` on a `u16` struct member expands to 21 RTL insns: the ior, then a store
    as `(old & 0) | new` with a `(set (reg:HI) (const_int 0))`; through a pointer
@@ -1022,6 +1028,40 @@ Each was read from the compiler source and confirmed on a live draft.
    `orrs`; a single `u16 value = set | f->value; ... f->value = result;` gives one pair after the
    and, and the u8 zero, used once, is moved next to its use by local-alloc. Zeros parked in high
    registers in the middle of a halfword update point here.
+
+37. **u16 masks narrow to HImode, and `x & K` and `(x >> n) & K` get different constants.**
+   c-typeck narrows `&` and `>>` on a u16 operand to HImode. expand_binop forces an expensive
+   constant (any K in an and) into an HImode pseudo and widens the operation to SImode, because
+   Thumb has no `andhi3`. In `(x >> n) & K` the HImode operand 0 is a SUBREG of the shift, so
+   expand_binop swaps the operands and the and reads `(subreg:SI (reg:HI K))` directly. In
+   `x & K`, x is a register (a promoted variable, or a load under `-fforce-mem`), so nothing
+   swaps and the andsi3 expander copies the constant into an SImode pseudo. cse keeps the two
+   modes in separate classes.
+
+   In LinkPlayer_BlendPalette (08239848) the four shifted channels share the HImode 31 (r7),
+   and the two unshifted reds share the SImode copy. Global alloc leaves the copy unallocated,
+   so reload rematerializes it into each and's output (`movs r0, #0x1f; ands r0, r2`, the
+   commutative swap). The draft that shifted a u32 (`packed = color << 16;
+   g = (packed >> 21) & 31`) made g and b SImode. That merged them into the reds' constant, which
+   then lived past every and, so regmove tied each and to a copy of the color. Reading each
+   channel through the u16 (`(*source >> 5) & 31`) matched it, and its twin sub_0813C9B4 lost 13
+   pins.
+
+   Fact 33's constant-first lever needs a constant that dies at the and. When the draft's
+   constant lives on (a later and reads it, or reload loads it there as a spilled pseudo),
+   scope's hint names this fact instead.
+
+38. **Exactly three local quantities in a block are not sorted by priority.** block_alloc
+   (local-alloc.c) sorts two or three qtys by hand, but its `qty_compare (0, 1)` and
+   `qty_compare (1, 2)` compare qty numbers (birth order), not the `qty_order` entries it
+   exchanges. With three, only the orders 0-1-2, 0-2-1 and 2-1-0 are reachable: when qty 1
+   outranks qty 0 the two swaps of 0 and 1 cancel, and the first-born value takes r0 ahead of
+   a higher-priority one. Two qtys, or four and more (qsort), go by priority. In
+   PlayerCue_UpdateFacingPose's branches the dir load, the `8 - dir` chain and the facing
+   address were three qtys, so dir got r0 and the chain r1 (the ROM: chain r0); AGBCC_PRI on
+   the chain does nothing, AGBCC_FORCE matches. Storing facing through a block-local pointer
+   and flip through a plain field store left four qtys per branch and the function matched with
+   no pin. `why` prints the order used and the order by priority for such a block.
 
 ## Survey: random table as a literal address (2026-10-24)
 

@@ -371,6 +371,58 @@ def fields(offs, lay, want=None, show=10):
     return 0
 
 
+TWIN, NEAR_TWIN = 0.75, (0.45, 0.40)  # similarity; (similarity, coverage)
+
+
+def twins(index, status, funcs, sizes, files, pinned=frozenset(), show=60, everything=False, tabs=None):
+    """For each function not yet exact (a NONMATCHING draft; with EVERYTHING also those with no C), its
+    closest matched relatives by like's ranking (idf-weighted shared rare 3-insn windows), best first.
+    A twin's C usually carries over with its structs and helpers renamed: Armor_OnPartDamageCollision
+    matched on its first compile in the form of the Sword collider callback, a relative at 0.55
+    (covers 57%). A pinned relative is still where to start: whatever C removes its pins fixes both."""
+    import math
+    addr = dict(funcs)
+    want = ("draft", "undrafted") if everything else ("draft",)
+    targets = [n for n, s in status.items() if s in want and n in addr and n in index]
+    sh, df, idf = tabs or tables(index)
+    matched = [n for n, s in status.items() if s == "matched" and n in sh]
+    inv = collections.defaultdict(list)
+    for n in matched:
+        for s in sh[n]:
+            inv[s].append(n)
+    weight = {n: sum(idf[s] for s in sh[n]) or 1 for n in matched}
+    rows = []
+    for n in targets:
+        mine = sh.get(n, set())
+        self_w = sum(idf[s] for s in mine) or 1
+        acc = collections.Counter()
+        for s in mine:
+            for m in inv.get(s, ()):
+                acc[m] += idf[s]
+        best = sorted(((w / math.sqrt(self_w * weight[m]), w / self_w, m) for m, w in acc.items()),
+                      reverse=True)[:2]
+        if best:
+            rows.append((best[0][0], n, best))
+    rows.sort(key=lambda r: (-r[0], addr[r[1]]))
+    kind = lambda sim, cover: ("twin" if sim >= TWIN else
+                               "near" if sim >= NEAR_TWIN[0] and cover >= NEAR_TWIN[1] else "")
+    print(f"{len(rows)} functions not yet exact ({'drafts and functions with no C' if everything else 'drafts'}),"
+          f" by their closest matched relative (like's ranking; twin: similarity >= {TWIN},"
+          f" near: >= {NEAR_TWIN[0]} covering >= {NEAR_TWIN[1]:.0%}; * = the relative uses pins):")
+    for sim, n, best in rows[:show]:
+        (s0, c0, m0) = best[0]
+        line = (f"  {kind(s0, c0):4} {s0:.2f} covers {c0:4.0%}  {addr[n]:08X} {n:38} {len(index[n]):4} insns"
+                f"  ~ {m0}{'*' if m0 in pinned else ''} ({len(index[m0])} insns, {files.get(m0, '?')})")
+        if len(best) > 1 and kind(*best[1][:2]):
+            s1, c1, m1 = best[1]
+            line += f"; then {m1}{'*' if m1 in pinned else ''} {s1:.2f}/{c1:.0%}"
+        print(line)
+    if len(rows) > show:
+        print(f"  ... {len(rows) - show} more (twins N)")
+    print("next: scope.py like FUNC (the shared calls) | tools/relatives.py FUNC --c (the relative's C, aligned)")
+    return 0
+
+
 def todo(index, status, funcs, sizes, asm_ranges, show=20, order="addr", tabs=None, arm=()):
     """Phase-1 work list: functions with no C at all (not even a draft), outside the reviewed assembly
     ranges, in ROM order (take them in turn), with how much matched prior art `like` finds for each.

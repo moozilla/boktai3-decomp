@@ -1,10 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
 #include "engine_globals.h"
-struct ScriptActorVec {
-    s16 x, y, z, pad;
-};
+#include "player_cue_sequence.h"
+#include "terrain_cell_probe.h"
 struct ScriptActorSequence {
     const volatile u16 *commands;
     u8 flags, count, weight, duration;
@@ -34,17 +32,8 @@ struct ScriptActor {
     void *sequence;
     u8 cell[0x10];
 };
-struct ScriptActorTerrain {
-    u8 pad[0x24];
-    u16 rows[1];
-};
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, s32);
-void AnimData_SelectPaletteBank(void *, s32);
-void *ScriptProc_Start(u32, u32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
 void sub_08201784(void *);
 u32 ScriptCombatActor_TryProjectileAttack(u8 *);
 void ScriptCombatActor_UpdateDefeatEffect(void);
@@ -52,118 +41,77 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-static inline s32 ScriptActor_CellIndex(struct ScriptActorVec *v)
+/* PlayerCue_StepSequence, except that the first flip writes the actor's own sprite. */
+static inline void ScriptActor_StepAnimation(struct ScriptActor *p,
+                                             struct ContactSwarmSprite *sprite,
+                                             struct DisplaySequenceState *state)
 {
-    s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return ((struct ScriptActorTerrain *)gTerrainMap)->rows[z] + x;
-}
-static inline void ScriptActor_StepAnimation(u8 *p, void *sprite, struct ScriptActorSequence *s)
-{
-    u32 flags, elapsed;
-    u32 duration;
-    register u32 mask asm("r7");
-    register u32 savedDuration asm("r4");
-    const volatile u16 *c = s->commands + s->index;
+    const u16 *command;
     {
-        u32 frame;
-        register void *highSprite asm("r8") = sprite;
-        register void *frameSprite asm("r3");
-        frame = *c >> 6;
-        frameSprite = highSprite;
-        asm("" : "+r"(frameSprite));
-        *(u16 *)((u8 *)frameSprite + 0x10) = frame;
+        u32 offset = state->index << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
     }
+    sprite->frame = *command >> 6;
     {
-        u32 input = s->flags, bit = 1;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            *(u32 *)(p + 0x24) |= 4;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            ((struct ContactSwarmSprite *)p->sprite)->flags |= 4;
         else
-            *(u32 *)(p + 0x24) &= ~4;
+            ((struct ContactSwarmSprite *)p->sprite)->flags &= ~4;
     }
     {
-        u32 input = s->flags, bit = 2;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*c & 0x30) >> 4) & bit)) {
-            u32 value = *(u32 *)sprite;
-            asm("" : "+r"(value) : : "r3");
-            *(u32 *)sprite = value | 8;
-        } else
-            *(u32 *)sprite &= ~8;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
     }
-    elapsed = s->elapsed + 1;
-    s->elapsed = elapsed;
-    {
-        register u32 temp asm("r2") = 0xffff;
-        asm("" : "+r"(temp));
-        mask = temp;
-    }
-    duration = s->duration;
-    elapsed = (u16)elapsed;
-    savedDuration = duration;
-    asm("" : "+r"(savedDuration) : "r"(elapsed));
-    if ((u16)elapsed >= duration) {
-        s->elapsed = 0;
-        flags = s->flags;
-        if (flags & 4) {
-            u32 i = s->index;
-            if (!i) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold)
-                        s->elapsed = savedDuration;
-                    else
-                        s->index = s->count - 1;
-                }
-            } else
-                s->index = i - 1;
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+            } else {
+                state->index--;
+            }
         } else {
-            u32 i = s->index + 1, n;
-            s->index = i;
-            n = s->count;
-            if ((i & mask) >= n) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if ((u8)hold) {
-                        s->elapsed = duration;
-                        s->index = n - 1;
-                    } else
-                        s->index = 0;
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
                 }
             }
         }
-        c = s->commands + s->index;
-        s->weight = *c & 15;
-        {
-            register s32 w asm("r2") = s->weight;
-            s32 speed = s->speed;
-            speed = (speed * w) >> 6;
-            s->duration = speed;
-            if (!(u8)speed)
-                s->duration = 1;
-        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
     }
 }
-// confidence=low: parses actor script options and initializes display, collision and terrain state.
+
 #define ScriptCombatActor_InitializeFromScript sub_0820212C
 s32 ScriptCombatActor_InitializeFromScript(struct ScriptActor *p, void *parent)
 {
     void *resource;
-    register void *sprite asm("r8");
+    void *sprite;
     void *earlySprite;
-    register void **slot asm("r4");
+    void **slot;
     s32 found;
     s32 dead;
     if (Script_SeekToKeyword('p')) {
@@ -254,28 +202,19 @@ s32 ScriptCombatActor_InitializeFromScript(struct ScriptActor *p, void *parent)
         Anim_SetSequence(&p->playback, resource, 0, 0, dead);
     } else {
         p->action = ScriptCombatActor_UpdateDefeatEffect;
-        {
-            u32 zero;
-            s16 *q = &p->dead;
-            zero = 0;
-            *q = 1;
-            Anim_SetSequence(&p->playback, ({
-                void *r = *slot;
-                r;
-            }),
-                             2, 0, zero);
-        }
+        p->dead = 1;
+        Anim_SetSequence(&p->playback, p->sequence, 2, 0, 0);
     }
-    ScriptActor_StepAnimation((u8 *)p, sprite, &p->playback);
     {
-        register u32 offset asm("r3") = 0x1a8;
-        s16 *initialDead;
-        asm("" : "+r"(offset));
-        initialDead = (s16 *)((u8 *)p + offset);
+        struct ContactSwarmSprite *frameSprite = sprite;
+        ScriptActor_StepAnimation(p, frameSprite, (struct DisplaySequenceState *)&p->playback);
+    }
+    {
+        s16 *initialDead = &p->initialDead;
         if (*initialDead == 0)
             sub_08201784(p);
         if (p->terrain && *initialDead == 0) {
-            s32 cell = ScriptActor_CellIndex((struct ScriptActorVec *)(&p->position));
+            s32 cell = cellIndexAt((struct Pos16 *)&p->position);
             TerrainModifiers_RegisterCell(p->cell, cell, 0, p->position.y >> 8, 0, 0x803);
         }
     }

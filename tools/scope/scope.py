@@ -32,6 +32,7 @@
   scope.py FILE.c put SNIPPET.c [FUNC]   SNIPPET.c (FUNC's definition, with its structs/helpers above) in
                                 place of FUNC's definition, then the score: no hand edits of the unit copy
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
+  scope.py twins [N] [all]      drafts (all: also no C) by their closest matched relative: twins first
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
   scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching] [--allow-pins]   put a matching draft into
                                 src/ (unit merge, or a new src/fn file and the hidden boundary), check the
@@ -1017,11 +1018,24 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         ex = next(i for i in sorted(mv) if rows_json[i]["tag"] == "+")
         print(f"{len(mv) // 2} of the differing insns are the same instruction at another position (an order"
               f" difference, not a missing one): `why {rows_json[ex]['uid']}` names what reads each copy")
-    for i, ln, tied in and_tie_hints(rows_json):
+    for i, ln, tied, shared in and_tie_hints(rows_json):
+        if shared:
+            print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes a constant of its own, the draft's"
+                  f" `{rows_json[i]['draft']}` the value's register: the draft's constant "
+                  + (f"is shared with the and on line {shared} and does not die here" if shared != "reload"
+                     else "is a spilled pseudo that reload loads here, and it lives on past this and")
+                  + "; no operand order ties to it. Give this and its"
+                  f" own constant pseudo: cse merges equal constants of one mode, and u16 operands narrow to"
+                  f" HImode, `x & K` copying its constant to SImode and `(x >> n) & K` using the HImode one"
+                  f" (README fact 37)")
+            continue
         print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes the {tied}'s register, the draft's"
               f" `{rows_json[i]['draft']}` the other operand's. "
-              + ("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
-                 if tied == "constant" else "Write the value first: `m = v & K;`")
+              + (("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
+                  if tied == "constant" else "Write the value first: `m = v & K;`")
+                 if rows_json[i]["rom"].startswith("ands") else
+                 ("Load the value, then write the constant first: `u32 v = x; u32 m = K; m |= v; x = m;`"
+                  if tied == "constant" else "Write the value first: `m = v | K;`"))
               + " (README fact 33)")
     for i, ln, reg in arg_order_hints(rows_json):
         print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
@@ -1619,6 +1633,49 @@ def alloc_records(wd, func):
     return out
 
 
+def small_sort_order(pris):
+    """local-alloc's allocation order for a block's qtys, given their priorities by qty number.
+    block_alloc sorts 2 or 3 qtys by hand, but its qty_compare(0, 1) and qty_compare(1, 2) compare qty
+    numbers, not the entries of qty_order being exchanged; 4 or more go through qsort (priority, then
+    qty number). Returns (order used, order by priority)."""
+    n = len(pris)
+    real = sorted(range(n), key=lambda q: (-pris[q], q))
+    order = list(range(n))
+    cmp = lambda a, b: pris[b] - pris[a]
+    if n == 3:
+        if cmp(0, 1) > 0:
+            order[0], order[1] = order[1], order[0]
+        if cmp(1, 2) > 0:
+            order[2], order[1] = order[1], order[2]
+    if n in (2, 3) and cmp(0, 1) > 0:
+        order[0], order[1] = order[1], order[0]
+    return (order if n in (2, 3) else real), real
+
+
+def small_sort_note(wd, func, blk):
+    """A note when BLK has exactly three local qtys and local-alloc's hand sort (small_sort_order)
+    allocates them in a different order than their priorities give."""
+    func = dump_func(wd, func)
+    path = os.path.join(wd, "names.txt")
+    qtys = {}
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if p[0] == "L" and p[1] == func and int(p[2]) == blk:
+            qtys.setdefault(int(p[4]), (int(p[3]), int(p[5]), p[11] if len(p) > 11 else "-"))
+    if len(qtys) != 3 or sorted(qtys) != [0, 1, 2]:
+        return None
+    used, real = small_sort_order([qtys[q][1] for q in range(3)])
+    if used == real:
+        return None
+    say = lambda order: ", ".join(f"{qtys[q][0]}{'' if qtys[q][2] == '-' else ' ' + qtys[q][2]}"
+                                  f" (priority {qtys[q][1]})" for q in order)
+    return (f"    block {blk} has exactly three local quantities. block_alloc sorts so few by hand, and its"
+            f" qty_compare(0, 1) / (1, 2) compare qty numbers, not the entries it swaps (local-alloc.c), so they"
+            f" are allocated as {say(used)} instead of by priority ({say(real)}). A fourth local value in"
+            f" the block (for example a store through a block-local pointer), or one fewer, gives a real sort"
+            f" (fact 38)")
+
+
 def conflicts(wd):
     """pseudo -> (pseudo conflicts, hard-register conflicts), from global-alloc's dump."""
     out = {}
@@ -1715,16 +1772,29 @@ def constant_def(texts, i, reg, window=8):
     return False
 
 
+def last_write(texts, i, reg, window=8):
+    """The index of the last line within WINDOW before TEXTS[i] that writes REG, or None."""
+    for j in range(i - 1, max(-1, i - 1 - window), -1):
+        if texts[j] and asm_dest(texts[j]) == reg:
+            return j
+    return None
+
+
 def and_tie_hints(rows):
-    """[(row index, line, tied)] where the ROM's `ands rA, rB` writes the register holding the
-    constant and the draft's writes the value (or the other way round): the and's tied operand
-    differs, which the C operand order decides (README fact 33). Identical text counts too, when
-    the registers' roles differ."""
+    """[(row index, line, tied, shared)] where the ROM's `ands rA, rB` (or `orrs`) writes the
+    register holding the constant and the draft's writes the value (or the other way round): the
+    tied operand differs, which the C operand order decides (README fact 33). Identical text counts
+    too, when the registers' roles differ. SHARED is set when the ROM keeps the constant's register
+    and the draft's constant lives on past the and: the line of a later and that reads its register
+    again, or "reload" when reload loads it there (a spilled pseudo, which regmove did not tie to,
+    so it does not die here). regmove cannot tie to such a constant whatever the operand order
+    (README fact 37)."""
     rom = [r["rom"] for r in rows]
     dr = [r["draft"] for r in rows]
     out = []
     for i, r in enumerate(rows):
-        if not (r["rom"] or "").startswith("ands ") or not (r["draft"] or "").startswith("ands "):
+        op = (r["rom"] or "").split(" ", 1)[0]
+        if op not in ("ands", "orrs") or (r["draft"] or "").split(" ", 1)[0] != op:
             continue
         a, b = (reg_nums(r["rom"]) + [None, None])[:2]
         p, q = (reg_nums(r["draft"]) + [None, None])[:2]
@@ -1733,7 +1803,13 @@ def and_tie_hints(rows):
         rk = constant_def(rom, i, a), constant_def(rom, i, b)
         dk = constant_def(dr, i, p), constant_def(dr, i, q)
         if rk[0] != rk[1] and dk[0] != dk[1] and rk[0] != dk[0]:
-            out.append((i, r.get("line") or "", "constant" if rk[0] else "value"))
+            shared = None
+            if rk[0]:
+                later = [j for j in readers_after(rows, i, "draft", q) if (dr[j] or "").startswith("ands ")]
+                d = last_write(dr, i, q)
+                shared = ((rows[later[0]].get("line") or "?") if later
+                          else "reload" if d is not None and (rows[d].get("born") or "").startswith("greg") else None)
+            out.append((i, r.get("line") or "", "constant" if rk[0] else "value", shared))
     return out
 
 
@@ -2303,6 +2379,9 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
               f" it got {rname(got)}, the ROM has {rname(want)}.")
+        note = small_sort_note(wd, func, blk)
+        if note:
+            print(note)
     else:
         print(f"    {nm(pseudo)} has no allocation record; it got {rname(got)}, the ROM has {rname(want)}.")
     if rec and rec[0] == "G" and rec[6] != got:
@@ -6458,6 +6537,19 @@ def cmd_todo(show, order):
                           like_tables(), arm)
 
 
+def cmd_twins(show, everything):
+    """Functions not yet exact, each with its closest matched relative: where a twin's C may carry over."""
+    import structure
+    import progress
+    funcs, sizes = progress.load_functions()
+    status, files = code_status()
+    try:
+        pinned = progress.collect_pinned(funcs, os.path.join(ROOT, "src"))
+    except Exception:  # the pin marks are a convenience; the ranking stands without them
+        pinned = set()
+    return structure.twins(like_index(), status, funcs, sizes, files, pinned, show, everything, like_tables())
+
+
 def cmd_like(target, show):
     import structure
     import progress
@@ -6762,6 +6854,10 @@ def validate_cli(args):
         if len(tail) > 2 or any(a not in ("addr", "prior", "size") and not a.isdigit() for a in tail):
             cli_error("todo [N] [addr|prior|size]")
         return
+    if cmd == "twins":
+        if len(tail) > 2 or any(a != "all" and not a.isdigit() for a in tail):
+            cli_error("twins [N] [all]")
+        return
     if cmd == "uses":
         if not any(a.isdigit() for a in tail):
             cli_error("uses REG... [PASS...] [FUNC]")
@@ -6846,6 +6942,8 @@ def main():
         return cmd_todo(n, order)
     if args[0] == "like":  # like FUNC|ADDR: matched functions whose ROM looks like this one's
         return cmd_like(args[1], int(args[2]) if len(args) > 2 else 8)
+    if args[0] == "twins":  # twins [N] [all]: drafts (all: also no C) by their closest matched relative
+        return cmd_twins(next((int(a) for a in args[1:] if a.isdigit()), 60), "all" in args[1:])
     if args[0] == "census":  # census [CALLEE]: concessions across src/ grouped by the call they serve
         import structure
         return structure.census(ROOT, want=args[1] if len(args) > 1 else None)
