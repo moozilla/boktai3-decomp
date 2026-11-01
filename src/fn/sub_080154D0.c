@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 int AnimatedParticle_PriorityFromFlags(int flags)
 {

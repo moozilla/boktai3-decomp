@@ -870,6 +870,23 @@ Each was read from the compiler source and confirmed on a live draft.
    Writing the tails out removed rotation barriers from sub_0818911C (the mode branch's
    fastMode/secondaryCooldown choices) and Armor_ApplySceneCommands (each case's own
    Trigger_ConsumePending). `why` on a rotation difference now lists the gotos before it.
+   The other direction matters for allocation: a duplicate tail's refs count toward its
+   pseudos' priority although jump2 deletes the code, so a source that shares the tail has
+   fewer refs and the same instructions. `why`'s ref lever now says how many of the refs it
+   lists sit in tails jump2 cross-jumps away, and on which lines (sub_080BF0E4: 4 of the
+   actor's 97, in category 6's directional tail).
+28. **The ref lever needs a macro the original shared.** A `do { ... } while (0)` that
+   wraps one statement only to double its refs is a priority knob in disguise and counts as
+   a barrier, like an empty one; a statement macro counts as ordinary C when there is
+   evidence the original had it, usually several functions sharing it. sub_080A34BC (the
+   spider recovery tick) needed its random table allocated before the 0x3FF mask (ip and
+   sb): 3 refs each, the table's life longer, so the mask won (348 against 300). Reading the
+   delay samples through `ParticleRandom_ReadSample`, whose `PARTICLE_RANDOM_READ_SAMPLE`
+   eight matched functions share (include/monster_particle_random.h), counts that read at
+   depth 2: 4 refs, 800, and an exact match with no concession. `why`'s macro lever now
+   lists each line that flips the order alone and the shared statement macros in include/
+   (two or more src files, directly or through an inline of the same header), preferring
+   ones that read through an index when the line does.
 
 28. **`movs rA, #1; rsbs rA, rA, #0; adds rB, rA, #0` is -1 reloaded into a QImode pseudo.**
    movqi takes only constants 0..255, so reload puts -1 in a SImode spill register and copies

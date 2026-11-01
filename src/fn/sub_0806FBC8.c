@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *actor)

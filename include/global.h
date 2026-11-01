@@ -16,7 +16,8 @@ asm(".include \"asm/macros.inc\"");
  * every build, so these cannot drift from the symbols. */
 /* An empty statement macro: the shape a debug check compiled out of a release
  * build takes. Its empty loop still splits the code around it, which some
- * functions need to match. The original name is unknown (confidence=low). */
+ * functions need to match. Like a bare empty do/while(0), it counts as a
+ * barrier (docs/WORKER.md). The original name is unknown (confidence=low). */
 #define DEBUG_NOP()                                                                                \
     do {                                                                                           \
     } while (0)

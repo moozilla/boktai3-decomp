@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // Box_Overlaps (Box_Overlaps) inlined; the stack box address is kept in a register

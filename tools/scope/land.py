@@ -144,7 +144,7 @@ def concessions(text, path=None):
     pins = len(re.findall(r'\basm\("r\d+"\)|\basm\("(?:sb|sl|fp|ip)"\)', text))
     bars = len(re.findall(r'\basm(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', text))
     # an empty `do { } while (0)` acts as a barrier: its loop notes end cse blocks and weight refs
-    bars += len(re.findall(r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)', text))
+    bars += len(re.findall(r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)|\bDEBUG_NOP\s*\(\s*\)', text))  # DEBUG_NOP() is one
     # a do { ... } while (0) macro used at only one site is a priority knob, so a barrier too:
     # a statement macro is ordinary C only when several functions share it
     bars += len(single_use_macros(text, path))

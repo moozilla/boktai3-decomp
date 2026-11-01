@@ -255,7 +255,7 @@ def check_tails(elf, source_root=Path(ROOT) / "src"):
 
 MARK = "// MATCHING_CONCESSION: register-pinning"
 # an empty `do { } while (0)` counts too: its loop notes end cse blocks and weight refs like a barrier
-EMPTY_LOOP = r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)'
+EMPTY_LOOP = r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)|\bDEBUG_NOP\s*\(\s*\)'  # DEBUG_NOP() expands to one
 # so does an if with nothing in its body; one whose body is DEBUG_PRINT() (include/debug.h) is ordinary C
 EMPTY_IF = r'\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{(?:\s|/\*.*?\*/|//[^\n]*)*\}|;)'
 HINT = re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*(?:volatile\s*)?\(\s*""'
