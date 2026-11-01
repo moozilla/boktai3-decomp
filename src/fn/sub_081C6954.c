@@ -88,10 +88,9 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
     {
         u16 a = angle;
         {
-            register s32 t asm("r2");
+            s32 t;
             u32 m;
             t = a + 0x70;
-            asm("" : "+r"(t));
             t >>= 5;
             m = 7;
             m &= t;
