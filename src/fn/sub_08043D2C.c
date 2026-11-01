@@ -22,6 +22,12 @@ static inline u32 NextRandom(const u16 *table)
     return table[index];
 }
 // confidence=low: initializes and scatters sixteen contact actors around a supplied position.
+// Remaining difference: the ROM's random table is a loop-invariant hoisted in loop pass 2 (after
+// the healthCollider giv) that gets r8 ahead of gRandomIndex, so it has no REG_EQUIV and no doubled
+// live length. A plain table is doubled and loses r8; sharing `work` with fadeMode gives r8 but
+// hoists it in pass 1 and routes fadeMode through r8. AGBCC_NOEQUIV on a pass-2 table (fadeMode
+// stored directly) leaves 2 insns. A hoisted copy of a `samples` local has no note in loop, but
+// cse2 adds REG_EQUAL because the pre-loop code is one block (see notes on 082335F0).
 s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPosition *position,
                            const struct ContactPosition *center, u32 speed, u32 parameter)
 {

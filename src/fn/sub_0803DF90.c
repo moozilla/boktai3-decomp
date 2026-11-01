@@ -1,7 +1,13 @@
 #include "scene_pool.h"
 
 #ifdef NONMATCHING
-// fuzzy: 93.2%
+// fuzzy: 87.3%
+// The random paths write their stores out (no Enter call: the constants are materialized at
+// each store as in the ROM) and jump to done, so jump2 merges them into the direction>0 tail at
+// the stateEntered store, as the ROM does. Left: the ROM keeps case 3's and the last
+// direction's Enter tails unmerged and merges cases 0/1 and 2 into case 2's copy; here every
+// tail merges into the direction>0 copy. jump2 takes the first jump in the target label's
+// chain (last jump first), so the ROM's groups had different labels at jump2.
 s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
@@ -81,17 +87,14 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
         switch (entry->kind) {
             case 0:
             case 1:
-                Enter(entry, 5, flag);
-                return 0;
+                Enter(entry, 5, flag); return 0;
             case 2:
                 if (entry->mode == 0)
                     Enter(entry, 5, flag);
                 else
-                    Enter(entry, 7, flag);
-                return 0;
+                    Enter(entry, 7, flag); return 0;
             case 3:
-                Enter(entry, 7, flag);
-                return 0;
+                Enter(entry, 7, flag); break;
         }
     } else if (entry->stateFrame > 239) {
         flag = PlayerHasFlag(2);
@@ -100,14 +103,20 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             sample = *((u8 *)RANDOM_TABLE_ADDR + (gRandomIndex << 1));
             if (sample <= 127) {
-                Enter(entry, 2, 0);
+                entry->state = 2;
+                entry->stateFrame = 0;
+                entry->stateEntered = 1;
+                Memory_Clear(entry->history, 0x100); goto done;
             } else {
-                Enter(entry, 0, 0);
+                entry->state = 0;
+                entry->stateFrame = 0;
+                entry->stateEntered = 1;
+                Memory_Clear(entry->history, 0x100); goto done;
             }
         } else if (entry->direction > 0) {
-            Enter(entry, 1, flag);
+            Enter(entry, 1, flag); goto done;
         } else {
-            Enter(entry, 2, flag);
+            Enter(entry, 2, flag); return 0;
         }
     } else
         entry->stateFrame++;

@@ -435,5 +435,10 @@ extern u32
     gClockSynced; /* nonzero once the clock has been synced from the RTC; SunClock_Refresh syncs while it is zero */
 /* 0x0203B400 */
 extern u16 gRandomTable[1024]; /* filled by Random_InitValueTable and indexed by gRandomIndex */
+/* The table as a sampling loop holds it: set at the top of each pass, read through .samples.
+   As a union it is re-set every pass instead of hoisted (tools/scope/README.md, fact 21). */
+union RandomTableView {
+    const u16 *samples;
+};
 
 #endif
