@@ -6421,6 +6421,11 @@ def frame_constant_slots(src, func, env, wd, rows, pair, slots):
         print("  A constant gets a slot only when update_equiv_regs gives it no equivalence: a non-constant set"
               " of the same variable first (README fact 20), or a union initializer's CLOBBER that a loop keeps"
               " alive (fact 21; in straight-line code flow deletes the dead CLOBBER first).")
+        print("  Try first: a local `union { const u16 *table; u16 halves[2]; }` with the halves stored"
+              " separately (`u.halves[0] = (u16)ADDR; u.halves[1] = ADDR >> 16;`), read through an inline"
+              " that takes `&u` (`return source->table;`). Only combine folds the halves into the constant,"
+              " and it adds no REG_EQUAL note, so there is nothing to make a REG_EQUIV from (fact 48;"
+              " 081EEECC, 082335F0, 08234868).")
 
 
 def cmd_shape(src, func, env):
