@@ -1023,6 +1023,10 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
               + ("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
                  if tied == "constant" else "Write the value first: `m = v & K;`")
               + " (README fact 33)")
+    for i, ln, reg in arg_order_hints(rows_json):
+        print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
+              f" precomputes an argument that needs converting to its parameter's type: declare that"
+              f" parameter narrower (`u8`) or cast the argument (README fact 35)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -1730,6 +1734,36 @@ def and_tie_hints(rows):
         dk = constant_def(dr, i, p), constant_def(dr, i, q)
         if rk[0] != rk[1] and dk[0] != dk[1] and rk[0] != dk[0]:
             out.append((i, r.get("line") or "", "constant" if rk[0] else "value"))
+    return out
+
+
+def arg_order_hints(rows):
+    """[(row index of the bl, line, register)] where the ROM sets argument register rN first in
+    the setup of a call and the draft sets it later: expand_call precomputed that argument, which
+    it does for one that needs a conversion to the parameter's type (README fact 35)."""
+    out = []
+    for i, r in enumerate(rows):
+        if not (r["rom"] or "").startswith("bl ") or not (r["draft"] or "").startswith("bl "):
+            continue
+        orders = {}
+        for side in ("rom", "draft"):
+            seq = []
+            for j in range(i - 1, max(-1, i - 13), -1):
+                t = rows[j][side]
+                if t is None:
+                    continue
+                if re.match(r"(bl?|b[a-z]{2}|bx|cmp|pop|push)\s", t) or t.startswith("."):
+                    break
+                d = asm_dest(t)
+                if d is not None and d <= 3 and d not in seq:
+                    seq.append(d)
+            orders[side] = seq[::-1]
+        ro, do = orders["rom"], orders["draft"]
+        if len(ro) < 2 or sorted(ro) != sorted(do) or ro == do:
+            continue
+        first = ro[0]
+        if do.index(first) > 0 and [x for x in ro if x != first] == [x for x in do if x != first]:
+            out.append((i, r.get("line") or "", first))
     return out
 
 

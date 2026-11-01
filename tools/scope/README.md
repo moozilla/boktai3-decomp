@@ -1004,6 +1004,25 @@ Each was read from the compiler source and confirmed on a live draft.
    `{ u32 mask = 0x200; SetHalfFlags(&a->flags2D4, mask); }`. `life NAME` flags a
    halfword field insertion it counted ("deleted by combine").
 
+35. **An argument that needs converting is computed before the others.** expand_call
+   precomputes an argument whose value has to change type for its parameter, then loads the
+   argument registers in order, so that argument's register is set first. In
+   SceneActorReaction_SettleDisplacement the ROM sets `adds r3, r4, #0` (category) before
+   `r0, r1, r2` for `SceneActorAttachment_ReplaceResponseSlot`; the draft's u32 prototype set it
+   last. Declaring the parameters `u8` (the callee zero-extends all three) or casting the
+   argument `(u8)category` matched it. scope prints "the ROM sets rN first" for such a call.
+
+36. **A set then a clear of the same struct halfword: flow drops the first store, cse keeps its
+   zeros.** `SetFlagComponent(f, 2); ClearFlagComponent(f, 0x17A9);` compiles to one
+   `ldrh; orrs; ands; strh`, like the single-store form, but the first store's field insertion
+   (fact 34) sets an HI and an SI zero pseudo before the ior. Flow deletes the dead first store;
+   cse has already made later zero stores (a `u8` field through the HI zero's lowpart, halfword
+   and word fields through the SI zero) use those pseudos, so they live on. SettleDisplacement's
+   ROM has them as `movs r5, #0; mov sl, r5; movs r3, #0; mov r8, r3` between the `ldrh` and the
+   `orrs`; a single `u16 value = set | f->value; ... f->value = result;` gives one pair after the
+   and, and the u8 zero, used once, is moved next to its use by local-alloc. Zeros parked in high
+   registers in the middle of a halfword update point here.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
