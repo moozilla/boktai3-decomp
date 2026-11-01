@@ -1,6 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.0%
+
 #include "background_controller.h"
 #include "contact_position.h"
 #include "monster_particle_random.h"
@@ -40,6 +39,9 @@ struct SceneNpcEffect {
     u8 unknown30c[0x328 - 0x30c];
     s32 height;
 };
+struct ParticleSampleOrigin {
+    u32 value;
+};
 static inline s32 Truncate(s32 v)
 {
     if (v >= 0)
@@ -47,21 +49,25 @@ static inline s32 Truncate(s32 v)
     return -((-v) >> 12);
 }
 
-/* Begin the sprite velocity vector with its Q12 horizontal component. */
-#define START_PARTICLE_VELOCITY(argument, destination, productX)                                   \
+/* Capture the horizontal sine sample before scaling either axis. */
+#define READ_HORIZONTAL_SINE(out, table, angle)                                                    \
     do {                                                                                           \
-        (argument) = (destination);                                                                \
-        (destination)->x = Truncate(productX);                                                     \
+        (out) = (table)[((angle) + 0xa0) & 255];                                                   \
     } while (0)
 
+static inline u32 IsEmissionFrame(u8 frame, u32 mask)
+{
+    if ((frame & mask) != 0)
+        return 0;
+    return frame < 128;
+}
 s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
 {
     u32 work = context;
-    u8 palettePeriod;
     u8 *p = actor;
     u8 *effectData = p + 0x20;
     struct SceneNpcEffect *npc = (void *)p;
-    struct SceneNpcEffectState *fx = (void *)effectData;
+    struct SceneNpcEffectState *fx = &npc->effect;
     if (effectData[0xd] != 0) {
         s32 zero = 0;
         s32 *pos;
@@ -80,26 +86,22 @@ s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
             *w = 4;
             w++;
             height = 0xFFE8;
-
             *w = height;
         }
         npc->position = *npc->displayPosition;
         npc->position.z = zero;
         {
             u32 m = 0x200;
-
             npc->displayFlags = m | npc->displayFlags;
         }
     }
     Actor_UpdateVisibilityAndShadow(work, p);
-    if ((fx->active == 0) && (npc->state <= 0x10)) {
+    if (!fx->active && npc->state <= 0x10) {
         u32 m = 0x402;
-
         npc->displayFlags = m | npc->displayFlags;
     }
     {
         u32 m = 4;
-
         if ((m & (*((u16 *)(p + 0xc)))) != 0) {
             s32 t;
             if ((*((s16 *)(effectData + 0xe))) <= 0x3f) {
@@ -113,14 +115,15 @@ s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
                 void *s1 = g + 0x2AE0;
                 void *s2 = g + 0x2B00;
                 void *d = p + 0x1CC;
-                Palette_InterpolateBanks(
-                    d, s1, s2, (palettePeriod = 0x80) - (*((s16 *)(effectData + 0xe))), 6);
+                Palette_InterpolateBanks(d, s1, s2, 0x80 - (*((s16 *)(effectData + 0xe))), 6);
             }
             t = ((*((u16 *)(effectData + 0xe))) + 1) & 0x7f;
             *((u16 *)(effectData + 0xe)) = t;
             if (effectData[0xd] != 0) {
                 work = 3;
-                if ((t & work) == 0) {
+                if (!IsEmissionFrame(t, work))
+                    return 0;
+                {
                     u32 sheet = 0x1c1e, sequence = 0xd43f;
                     struct ContactPosition position;
                     struct ContactPosition velocityStorage;
@@ -131,27 +134,33 @@ s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
                     pos->y = ((projected[2] + (projected[1] + height)) >> 12) + 0x60;
                     pos->z = projected[2] >> 12;
                     {
-                        u32 origin;
+                        struct ParticleSampleOrigin origin, saved;
                         struct ContactPosition *velocityArgument;
                         const u16 *table;
                         struct ContactPosition *velocity;
                         s32 spread, magnitude, angle, speed, product, life, zero;
+                        s32 horizontalScale, verticalScale;
                         const s16 *sine;
-                        PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
-                        table = gRandomTable;
+                        origin.value =
+                            (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
+                        table = (const u16 *)RANDOM_TABLE_ADDR;
                         spread = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 63;
                         magnitude = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & work;
                         velocity = &velocityStorage;
                         angle = spread + 0x60;
                         speed = magnitude + 2;
                         sine = gUnk_086149C4;
-                        product = sine[(spread + 0xA0) & 255] * speed;
-                        START_PARTICLE_VELOCITY(velocityArgument, velocity, product);
-                        velocity->y = Truncate(sine[angle] * speed);
+                        READ_HORIZONTAL_SINE(horizontalScale, sine, spread);
+                        product = horizontalScale * speed;
+                        saved = origin;
+                        velocityArgument = velocity;
+                        velocity->x = Truncate(product);
+                        verticalScale = sine[angle];
+                        velocity->y = Truncate(verticalScale * speed);
                         zero = 0;
                         velocity->z = zero;
                         life = (((s32)ParticleRandom_ReadRelativeSample(
-                                     origin, (const u16 *)RANDOM_TABLE_ADDR) >>
+                                     saved.value, (const u16 *)RANDOM_TABLE_ADDR) >>
                                  4) &
                                 15) +
                                15;
@@ -165,7 +174,3 @@ s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
     }
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneNpc_OnStateEffectUpdate);
-#endif

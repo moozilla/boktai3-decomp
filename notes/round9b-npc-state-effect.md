@@ -2,6 +2,6 @@
 
 Tags: #matching #scene-actor #particles
 
-SceneNpc_OnStateEffectUpdate at 081D0928 projects the attached display position, advances a 128-frame triangular palette pulse, and emits a particle every fourth frame while attached. The first two random samples control velocity and the third sets a lifetime from 15 to 30. The Q12 products truncate toward zero.
+SceneNpc_OnStateEffectUpdate matches all 612 bytes. The NPC projects its attachment's position, advances a 128-frame triangular palette pulse, and emits one particle every fourth frame while attached. Two random samples choose its velocity and a third chooses a lifetime from 15 through 30.
 
-The guarded 608-byte C candidate has 92.0% similarity against the 612-byte ROM body. The palette-frame mask and the transfers between the saved random origin and the velocity pointer account for the remaining differences. A differential Thumb check compared actor and display memory, the random cursor, and external calls across all 256 combinations of two activation flags, two actor states, the palette flag, eight frames and two height inputs.
+The four-frame test takes the bounded palette clock. Capturing the horizontal sine sample before scaling gives the sine table and speed their original registers. A copied sample-origin value stays in a saved register until the velocity pointer takes its place. The literal's offset is measured from the physical random table, as in the other particle sample readers.
