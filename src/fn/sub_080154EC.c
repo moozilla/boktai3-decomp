@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
+#include "display_sequence_inline.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -72,9 +73,7 @@ static inline void setFrame(struct Obj *o, int f)
 }
 static inline u32 frame_factor(u16 v)
 {
-    register u32 value asm("r1") = v;
-    u32 mask = 15;
-    return mask & value;
+    return DisplaySequence_MaskCommand(v, 15);
 }
 int AnimatedParticles_Create(int count, struct Vec *pos, struct Config *c)
 {
