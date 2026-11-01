@@ -1682,14 +1682,15 @@ def constant_def(texts, i, reg, window=8):
 
 
 def and_tie_hints(rows):
-    """[(row index, line)] where the ROM's `ands rA, rB` writes the register holding the constant
-    and the draft's writes the value (or the other way round): the and's tied operand differs,
-    which the C operand order decides (README fact 32)."""
+    """[(row index, line, tied)] where the ROM's `ands rA, rB` writes the register holding the
+    constant and the draft's writes the value (or the other way round): the and's tied operand
+    differs, which the C operand order decides (README fact 32). Identical text counts too, when
+    the registers' roles differ."""
     rom = [r["rom"] for r in rows]
     dr = [r["draft"] for r in rows]
     out = []
     for i, r in enumerate(rows):
-        if r["tag"] == "=" or not (r["rom"] or "").startswith("ands ") or not (r["draft"] or "").startswith("ands "):
+        if not (r["rom"] or "").startswith("ands ") or not (r["draft"] or "").startswith("ands "):
             continue
         a, b = (reg_nums(r["rom"]) + [None, None])[:2]
         p, q = (reg_nums(r["draft"]) + [None, None])[:2]

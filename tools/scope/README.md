@@ -965,7 +965,9 @@ Each was read from the compiler source and confirmed on a live draft.
    `rsbs`), and a pin and two barriers each in SceneActorAnimation_UpdateDirectionalCallback
    and UpdateEightDirectionCallback (the same facing masks in their setFacing helper). scope's default diff
    now prints the lever on each aligned `ands` pair whose tied operand differs (a constant
-   in one, the value in the other); the opposite case asks for the value first.
+   in one, the value in the other), also when both read `ands r0, r1` with the registers'
+   roles swapped (Vanargand_UpdatePartLeap's terrain mask); the opposite case asks for the
+   value first.
 
 ## Survey: random table as a literal address (2026-10-24)
 
