@@ -1,20 +1,11 @@
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: retained provisional behavior name from caller and state-transition evidence.
 #include "scene_actor_chase.h"
 // confidence=low: resumes group chase or the saved route after arrival.
-static inline u32 Dog_SetMotionBits(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Dog_SetMotionBits(struct SceneActorRegistryResetView *actor, s32 mask)
 {
-    u32 flags = mask;
-    register u16 stateZero asm("r4");
-    register u32 counterZero asm("r5");
-    u32 value = actor->flags2D4;
-    stateZero = 0;
-    counterZero = 0;
-    asm("" : : "r"(stateZero), "r"(counterZero), "r"(value));
-    flags |= value;
-    actor->flags2D4 = flags;
-    flags &= 0x80;
-    return flags;
+    struct ChaseFlags40 *flags = (void *)&actor->flags2D4;
+    flags->bits |= mask;
+    return Chase_MotionFlags(actor, 0x80);
 }
 static inline void Dog_SetMovementBits(struct SceneActorRegistryResetView *actor, u32 mask)
 {
