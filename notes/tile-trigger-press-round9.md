@@ -6,15 +6,13 @@ to the sprite preserves the input across the press callback. The trigger gets
 
 ## TileTrigger_ApplyContactEffects
 
-The guarded C at 0x08106E98 compiles to 936 bytes, the full ROM extent, with
-74.2% stock instruction similarity. It shares the press actor layout and the
-registry control, state and random-sample helpers. The remaining differences
-include register allocation through the actor loop and packed-vector stores.
-The default build uses the ROM assembly.
+All 936 bytes match. The scan preserves each nearby player's contact flag and
+switches eligible actors to the sink callback. For a controlled actor with
+motion flag 0x2000 it emits three parts at the registry's effect origin,
+then clears the two actor timers.
 
-All 400 differential cases returned in both bodies. The comparison covered
-the full tile and actor buffers, final random cursor and all seven external
-call types, including the position, velocity and scale of 258 particle spawns.
-The cases reached 37 of the 40 block starts reported by the ROM decoder.
+Keeping the callback in a local before the scan lets agbcc load it at the
+point of installation. The particle helper uses the same pointer for the
+random table during sampling and the effect group during emission.
 
-Tags: 08106E98, 081078B0, tile-trigger, NONMATCHING
+Tags: 08106E98, 081078B0, tile-trigger, matching

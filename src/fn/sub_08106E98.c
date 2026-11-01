@@ -1,6 +1,6 @@
 #include "tile_trigger.h"
 #include "scene_actor_chase.h"
-#include "monster_particle_random.h"
+#include "ram.h"
 
 struct Player;
 struct EffectGroup;
@@ -16,13 +16,11 @@ void ScriptTriggerActor_DispatchPendingScripts(struct ScriptTriggerActor *);
 s32 EffectGroup_SpawnPart(struct EffectGroup *, u32, u32, u32, u32, u32, u32);
 void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 74.2%
-struct ContactEffectGroup {
-    u8 unknown0[8];
-    const struct ContactPosition *position;
-};
-
+static inline u32 ContactActor_ReadMotionFlags(const struct SceneActorRegistryResetView *actor,
+                                               u32 mask)
+{
+    return mask & actor->flags2D4;
+}
 static inline u8 ContactActor_IsControlled(struct SceneActorRegistryResetView *actor)
 {
     if (actor->object == (void *)1)
@@ -30,20 +28,53 @@ static inline u8 ContactActor_IsControlled(struct SceneActorRegistryResetView *a
     return 0;
 }
 
+static inline u32 TileContact_NextParticleSample(u32 *cursor, const u16 *table)
+{
+    u32 index = (*cursor + 1) & 1023;
+    *cursor = index;
+    return table[index];
+}
+static inline void TileContact_EmitThreeParts(struct SceneActorRegistryActor *actor)
+{
+    s32 i;
+    u16 sample;
+    const void *source;
+    struct ContactPackedVector velocity, scale, position;
+    for (i = 0; i < 3; i++) {
+        source = gRandomTable;
+        sample = TileContact_NextParticleSample(&gRandomIndex, source);
+        velocity.x = (sample & 15) - 7;
+        velocity.y = (TileContact_NextParticleSample(&gRandomIndex, source) & 31) - 16;
+        velocity.z = (TileContact_NextParticleSample(&gRandomIndex, source) & 15) - 7;
+        scale.x = 5;
+        scale.y = 10;
+        scale.z = 5;
+        position.x = actor->effectOrigin->x;
+        position.y = actor->effectOrigin->y + 128;
+        position.z = actor->effectOrigin->z;
+        source = actor->effectConfig;
+        EffectGroup_SpawnPart((struct EffectGroup *)source, 3, (u32)&position, (u32)&velocity,
+                              (u32)&scale, 40, 40);
+    }
+    actor->fieldAA = 0;
+    actor->field2B8 = 0;
+}
 void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
 {
     struct Player *players[4];
     u8 inRange[4];
-    struct ContactPackedVector radius, velocity, scale, position;
+    struct ContactPackedVector radius;
     u32 cursor;
     s32 tetherInRange, actorFound, i;
     struct SceneActorRegistryResetView *actor;
+    void (*callback)(struct SceneActorRegistryResetView *, s32);
 
+    callback = SceneActorReaction_SinkAndRemove;
     cursor = 0;
     radius.z = 128;
     radius.x = 128;
     radius.y = 16;
-    for (i = 3; i >= 0; i--)
+    for (i = 0; i < 4; i++)
         inRange[i] = 0;
     actorFound = 0;
     tetherInRange = 0;
@@ -62,31 +93,26 @@ void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
     while ((actor = (void *)sub_0806F06C((const struct ContactPosition *)&self->position,
                                          (const struct ContactPosition *)&radius, &cursor)) !=
            NULL) {
-        u16 *timer = &actor->fieldAA;
         if ((u8)(actor->field2B5 - 0x16) <= 1)
             continue;
-        Chase_SetCtl(actor, SceneActorReaction_SinkAndRemove, 0x16);
+        {
+            u8 kind = 0x16;
+            actor->field2B2 = 1;
+            actor->field2B0 = 0;
+            actor->field2B5 = kind;
+            actor->target = callback;
+            actor->field2C8 = 0;
+            {
+                u32 *field = &actor->flags114;
+                u32 mask = ~1;
+                *field &= mask;
+            }
+            actor->word104 = 0;
+        }
         Chase_SetState(actor, 3, 0, 0);
         actor->field2B8 = 0;
-        if (ContactActor_IsControlled(actor) && Chase_Test(actor->flags2D4, 0x2000)) {
-            u16 *cooldown = &actor->field2B8;
-            struct ContactEffectGroup *group = (void *)((u8 *)actor + 0x47C);
-
-            for (i = 0; i < 3; i++) {
-                velocity.x = (ParticleRandom_ReadDirectSample(gRandomTable) & 15) - 7;
-                velocity.y = (ParticleRandom_ReadDirectSample(gRandomTable) & 31) - 16;
-                velocity.z = (ParticleRandom_ReadDirectSample(gRandomTable) & 15) - 7;
-                scale.x = 5;
-                scale.y = 10;
-                scale.z = 5;
-                position.x = group->position->x;
-                position.y = group->position->y + 128;
-                position.z = group->position->z;
-                EffectGroup_SpawnPart((struct EffectGroup *)group, 3, (u32)&position,
-                                      (u32)&velocity, (u32)&scale, 40, 40);
-            }
-            *timer = 0;
-            *cooldown = 0;
+        if (ContactActor_IsControlled(actor) && ContactActor_ReadMotionFlags(actor, 0x2000)) {
+            TileContact_EmitThreeParts((struct SceneActorRegistryActor *)actor);
         }
         actorFound = 1;
     }
@@ -119,6 +145,3 @@ void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
         self->forced = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TileTrigger_ApplyContactEffects);
-#endif
