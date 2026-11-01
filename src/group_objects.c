@@ -466,18 +466,9 @@ int BoardPieces_DispatchCommands(struct GroupObjects *manager)
 
 static inline void addPosition(struct GroupVec *d, struct GroupVec *s)
 {
-    struct GroupVec *dst = d;
-    struct GroupVec *src = s;
-    {
-        u32 value = (u16)s->x;
-        {
-            register u32 other asm("r3") = (u16)d->x;
-            value = value + other;
-        }
-        d->x = value;
-    }
-    dst->y += src->y;
-    dst->z += src->z;
+    d->x = d->x + s->x;
+    d->y = d->y + s->y;
+    d->z = d->z + s->z;
 }
 
 static inline struct GroupVec *addPositionN(struct GroupVec *d, struct GroupVec *s)
