@@ -36,7 +36,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
     Collider_SetPosition(&slot->display.healthCollider, position, 0);
     {
         u32 frame = slot->stateFrame;
-        register u32 limit asm("r5");
+        u32 limit;
         limit = slot->trackingFrames;
         if (frame >= limit) {
             u32 offset = (u8 *)&pool->target - (u8 *)pool;
@@ -52,7 +52,6 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
             register u32 mask asm("r2");
             target = (void *)((u8 *)pool + offset);
             dx = target->x;
-            asm("" : "+r"(dx), "+r"(limit));
             current = sprite;
             dx -= current->position.x;
             dz = target->z;
