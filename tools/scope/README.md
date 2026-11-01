@@ -1063,6 +1063,25 @@ Each was read from the compiler source and confirmed on a live draft.
    and flip through a plain field store left four qtys per branch and the function matched with
    no pin. `why` prints the order used and the order by priority for such a block.
 
+39. **Two natural walls against cross-jumping: a return, and a call that falls into a label.**
+   jump2 (jump.c) tries each simple jump against the code that falls into its label first
+   (one shared insn is enough), then against the other jumps to that label, the last one
+   first; the first that shares at least two insns wins. A `return 0` in a tail is
+   `r0 = 0; use r0; jump return_label`: the first try shares the `r0 = 0` with the
+   function's last return, and the jump then targets a label put before that insn. When no
+   label stood there, the new label's uid is past the jump chain table, so that tail is never
+   cross-jumped again. And find_basic_blocks (flow.c) puts a `(use (const_int 0))` nop after
+   a call that falls into a label (the last branch of an if/else chain or a switch, ahead of
+   shared code); cross-jumping compares USE insns, so no tail whose call is followed by a jump
+   can share that call. ScenePool_StateTrackAdaptive and _StateTrackFast matched with no pin
+   once each Enter tail returned and the direction chain fell into one shared `return 0`:
+   its last branch carries the nop, and the random paths jump to that return and merge into
+   the direction>0 copy (the last jump to it), as in the ROM. The pinned twin had kept the
+   tails apart with `asm volatile("")` and an operand asm. scope compiles with
+   AGBCC_CROSS_TRACE on and prints, next to a difference, which tail jump2 cross-jumped into
+   which, and for a tail the draft keeps whole where the ROM's is shorter, whether a nop
+   blocked the first try.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

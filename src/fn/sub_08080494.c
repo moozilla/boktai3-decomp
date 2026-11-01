@@ -70,6 +70,15 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
 // constants (~670) and takes sl. Splitting the first sample's address did not
 // lower it. Also open: the group pointer's register at the top and the
 // SetControl/SetAnimation constants the ROM rebuilds instead of sharing.
+// Found since: `u32 *cursor = &gRandomIndex;` at the top of the function (as
+// Vorn_UpdateDefeat has it) with a local count helper taking the cursor fixes
+// the index (REG_EQUIV, live from the top, priority 919, no register). Without
+// the union, the group pointer stays in r2 as in the ROM. The allocation then
+// needs, in knob terms, AGBCC_PRI=table:+1500,position:+100 (table r4,
+// position r5, range r6, then priority/kind/verticalRange r8/sb/sl at shape
+// 10). The ROM's table therefore has at least 8 refs and no REG_EQUIV: one
+// pseudo shared with something short-lived in the spark block, not the zero
+// (r1 in the ROM) or the group pointer (r2). Scratch: build/match/w/bdb/s1.c.
 void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *actor)
 {
     union {

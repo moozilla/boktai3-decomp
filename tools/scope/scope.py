@@ -495,7 +495,7 @@ def compile_draft_g(src, func, env=None):
     # size_of_line_info); its truncated unit then breaks the line reader.
     r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-ffix-debug-line", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
                        cwd=wd, capture_output=True, text=True,
-                       env=dict(os.environ, AGBCC_DUMPPRI=names, **(env or {})))
+                       env=dict(os.environ, AGBCC_DUMPPRI=names, AGBCC_CROSS_TRACE="1", **(env or {})))
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
     uninit = []
     for blk in re.split(r"(?m)^(?=.*In function `)", r.stderr):
@@ -1041,6 +1041,30 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
               f" precomputes an argument that needs converting to its parameter's type: declare that"
               f" parameter narrower (`u8`) or cast the argument (README fact 35)")
+    try:
+        cross = cross_jump_hints(rows_json, cross_merges(open(os.path.join(wd, "stderr.txt")).read(),
+                                                         info["obj_name"]),
+                                 *jump2_input(wd, info["obj_name"])[:2], uid_lines(wd),
+                                 jump2_input(wd, info["obj_name"])[2])
+    except OSError:
+        cross = []
+    for ln, count, to, via, extra in cross[:6]:
+        if count is None:
+            print(f"line {ln}: the draft keeps this tail whole and the ROM's is shorter. jump2 shares a tail"
+                  f" with the code that falls into the jump's label first, then with the other jumps to that"
+                  f" label, the last first"
+                  + ("; here the code before the label ends in a call and flow's (use 0) nop (a call that falls"
+                     " into a label), which a call followed by a jump does not match" if extra == "nop" else
+                     "; here nothing falls into the label" if extra == "barrier" else ""))
+            continue
+        print(f"line {ln}: jump2 cross-jumps this tail ({count} insn{'s' if count != 1 else ''}) into line"
+              f" {to}'s copy" + (" (the code before its label)" if via == "label" else " (another jump to its label)")
+              + (", where the ROM keeps code of its own" if extra else ""))
+    if cross:
+        print("  To keep a tail apart: end it in `return` (it shares only its r0 set with the last return, then"
+              " jumps to a new label with no jump chain), or let its call fall into a label, as an if/else"
+              " chain's last branch before shared code does: flow puts a (use 0) nop after that call, which no"
+              " jumping tail matches. To share one, let it jump to that label (README fact 39)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -1840,6 +1864,103 @@ def arg_order_hints(rows):
         first = ro[0]
         if do.index(first) > 0 and [x for x in ro if x != first] == [x for x in do if x != first]:
             out.append((i, r.get("line") or "", first))
+    return out
+
+
+def cross_merges(stderr, func):
+    """[(jump, target, first, first_target)]: jump2's cross-jumps in FUNC, from AGBCC_CROSS_TRACE.
+    JUMP's tail from FIRST on is replaced by a jump to FIRST_TARGET, the same code before TARGET
+    (the label JUMP goes to, or another jump to that label)."""
+    out = []
+    for m in re.finditer(r"^CROSS (?:(\S+) )?jump (\d+) target (\d+): share (\d+) with (\d+)$", stderr, re.M):
+        if m.group(1) in (None, func):
+            out.append(tuple(int(m.group(k)) for k in range(2, 6)))
+    return out
+
+
+def jump2_input(wd, func):
+    """(real insn uids in order, uid -> kind, all insns and labels in order as (uid, kind, head)) for
+    FUNC as jump2 starts (the greg dump). USE and CLOBBER insns are left out of the order:
+    cross-jumping compares them but does not count them."""
+    path = os.path.join(wd, "u.i.greg")
+    order, kinds, seq = [], {}, []
+    if not os.path.exists(path):
+        return order, kinds, seq
+    text = open(path).read()
+    parts = re.split(r"(?m)^(?=;; Function \w+)", text)
+    mine = [p for p in parts if re.match(r";; Function %s\b" % re.escape(func), p)]
+    for blk in re.split(r"\n\n", mine[0] if mine else text):
+        blk = re.sub(r"\A(?:;;[^\n]*\n)+", "", blk.lstrip("\n"))
+        m = re.match(r"\((insn|jump_insn|call_insn|code_label|barrier)(?:/\w)* (\d+) \d+ \d+ ?(.*)", blk, re.S)
+        if not m:
+            continue
+        u = int(m.group(2))
+        kinds[u] = m.group(1)
+        seq.append((u, m.group(1), m.group(3)))
+        if m.group(1) not in ("code_label", "barrier") and not re.match(r"\((?:use|clobber) ", m.group(3)):
+            order.append(u)
+    return order, kinds, seq
+
+
+def label_fallin(seq, jump):
+    """What reaches JUMP's label by falling into it, as jump2's first try sees it: "nop" when the code
+    before the label ends in a call and flow's (use 0) after it, "barrier" when nothing falls in,
+    else None."""
+    at = {u: i for i, (u, _, _) in enumerate(seq)}
+    i = at.get(jump)
+    m = re.search(r"\(label_ref (\d+)\)", seq[i][2]) if i is not None else None
+    j = at.get(int(m.group(1))) if m else None
+    if j is None:
+        return None
+    j -= 1
+    while j >= 0 and seq[j][1] == "code_label":
+        j -= 1
+    if j < 0:
+        return None
+    if seq[j][1] == "barrier":
+        return "barrier"
+    if seq[j][2].startswith("(use (const_int 0))") and j > 0 and seq[j - 1][1] == "call_insn":
+        return "nop"
+    return None
+
+
+def cross_jump_hints(rows, merges, order, kinds, lines, seq=()):
+    """[(line, count, target line, via, apart)] for the cross-jumps next to a difference.
+    A merge of one insn into the code before a label is a return's r0 set joining the last return
+    (README fact 39) and is left out. APART is True when the ROM keeps code there that the draft's
+    merge deleted (ROM rows the draft lacks next to the jump). Then (line, None, None, None, why)
+    for a tail the draft keeps whole while the ROM's is shorter: draft-only rows ending at a jump
+    that jump2 did not merge; WHY is label_fallin's reason the first try failed."""
+    at = {r.get("uid"): i for i, r in enumerate(rows) if r.get("uid")}
+    pos = {u: i for i, u in enumerate(order)}
+    out, merged = [], set()
+    for jump, target, first, first_t in merges:
+        merged.add(jump)
+        if first not in pos or jump not in pos:
+            continue
+        count = pos[jump] - pos[first]
+        via = "label" if kinds.get(target) == "code_label" else "jump"
+        if count < 2 and via == "label":
+            continue
+        i = at.get(jump)
+        if i is None:
+            continue
+        near = rows[max(0, i - 5):i + 1]
+        if all(r["tag"] == "=" for r in near):
+            continue
+        apart = any(r["tag"] == "-" for r in near)
+        out.append((lines.get(jump, "?"), count, lines.get(target, "?"), via, apart))
+    for i, r in enumerate(rows):
+        u = r.get("uid")
+        if not u or kinds.get(u) != "jump_insn" or u in merged or not (r["draft"] or "").startswith("b "):
+            continue
+        run = 0
+        for j in range(i - 1, -1, -1):
+            if rows[j]["tag"] != "+":
+                break
+            run += 1
+        if run >= 2:
+            out.append((lines.get(u, r.get("line") or "?"), None, None, None, label_fallin(seq, u)))
     return out
 
 
