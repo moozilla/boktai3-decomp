@@ -587,9 +587,9 @@ in the patch.
   access pattern (which offsets each block reads), not row votes.
 * `hoist` explains the draft side only. When the ROM keeps an invariant in the
   loop, the tool cannot tell which "stays" reason the original source used.
-  Open case: a table used in one basic block (sub_081A0EA4 and the other
-  register-pinned random-table loops); cse deletes a repeated set there, so the
-  dead-store lever below does not apply.
+  The one-basic-block case (a table used in one block, where cse deletes a repeated
+  set) now has a lever: the union initializer of fact 21. sub_081A0EA4 and the other
+  register-pinned random-table loops are the next place to try it.
 
 ## agbcc facts established with scope
 
@@ -814,6 +814,17 @@ Each was read from the compiler source and confirmed on a live draft.
    try. `hoist` now writes and scores that variant for every hoisted variable
    (`lever: ... MATCH`). It needs a C variable to re-set: when the hoisted value is an
    unnamed constant inside an inline, name it at the top of the body first.
+   **One basic block: set it through a union.** A union initializer
+   (`union RandomTableView table = {gRandomTable};`, ram.h) expands to a CLOBBER of the
+   union's register and then the set (expr.c `store_constructor`); loop.c counts the
+   clobber as a second set, so the value is may_not_optimize and stays in the loop, and
+   nothing extra reaches the output. A struct does not do it: a constant struct
+   initializer zeroes the register first, and the zero and the set are consecutive
+   invariant sets that move together. SceneActorEffects_EmitRandomOffsets (pinned table,
+   index and count) matched with no pins this way on the first try, and
+   SceneActorRegistry_UpdateActors' SpawnContactParts loop got its table load back
+   (`AGBCC_NOMOVE` on the table gives the same output). `hoist` writes and scores this
+   variant too (`lever: set NAME through a one-member union`).
    **Equal constants add up.** combine_movables folds later sets of the same invariant
    into the first (same constant, same mode or the first wider, not used outside the
    loop), summing savings and lifetime. HealthRestoreEffect_StartParticleBurst's two
