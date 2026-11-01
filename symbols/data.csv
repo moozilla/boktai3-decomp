@@ -22,3 +22,5 @@ addr,name,size,kind,confidence,source,notes
 086136F0,gUnk_086136F0,BE,table,high,SoundTest_CountEntries,Sound test music menu ordered song numbers followed by -1
 086137AE,gUnk_086137AE,416,table,high,SoundTest_CountEntries,Sound test effects menu ordered song numbers followed by -1
 08613BC4,gUnk_08613BC4,12E,table,high,SoundTest_CountEntries,Sound test voices menu ordered song numbers followed by -1
+08605B68,gBouncingObjectBlinkDelays,4,table,high,disasm,Four frame delays used by the active bouncing object blink sequence
+08605B6C,gBouncingObjectStateCallbacks,C,table,high,disasm,Three callbacks indexed by the bouncing object state

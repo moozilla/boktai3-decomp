@@ -3,7 +3,6 @@
 #include "engine.h"
 #include "contact_actor.h"
 #include "bouncing_object.h"
-extern const u8 gUnk_08605B68[];
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
@@ -171,7 +170,7 @@ collider:
         obj->animation = animation;
         seq->elapsed = savedElapsed;
         seq->index = savedIndex;
-        obj->animationDelay = gUnk_08605B68[idx];
+        obj->animationDelay = gBouncingObjectBlinkDelays[idx];
     }
 
     obj->sprite.frame = ((u16 *)seq->commands)[seq->index] >> 6;

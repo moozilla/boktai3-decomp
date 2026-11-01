@@ -3,6 +3,7 @@ actor_marker_fragment_frames,0824E6D4,0824E6E6,actor_marker_table,data/actor_mar
 actor_marker_fragment_animations,0824E6E6,0824E6F8,actor_marker_table,data/actor_marker/fragment_animations.csv,Actor marker fragment animations (two marker-kind groups of nine)
 actor_marker_fragment_offsets,0824E818,0824E8A8,actor_marker_table,data/actor_marker/fragment_offsets.csv,Actor marker fragment offsets (two facing groups of nine XYZ records)
 actor_registry,08603300,08604998,keyed_callbacks,data/actor_registry.csv,Script chara registry: string-hash key to actor/controller constructor (722 entries + sentinel)
+bouncing_object_callbacks,08605B6C,08605B78,callback_array,build/bouncing_object_callbacks.csv,Bouncing object state callbacks (3 entries)
 bat_script_commands,08605C74,08605C94,callback_array,data/actor_commands/bat.csv,Bat actor script command handlers (8 entries)
 bee_script_commands,08605DB8,08605DD4,callback_array,data/actor_commands/bee.csv,Bee actor script command handlers (7 entries)
 ghost_script_commands,08605E14,08605E34,callback_array,data/actor_commands/ghost.csv,Ghost actor script command handlers (8 entries)
