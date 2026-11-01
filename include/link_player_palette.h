@@ -30,4 +30,7 @@ struct LinkPlayerFade {
     u16 fadeOut;
 };
 
+void LinkPlayer_BlendPalette(struct LinkPlayerFade *actor, const u16 *source, s32 sourceWeight,
+                             s32 baseWeight, s32 shift);
+
 #endif

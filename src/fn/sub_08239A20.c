@@ -6,7 +6,6 @@ void LinkPlayer_LoadAnimationParameters(void *);
 s32 ActorEffect_SelectModeFlag(void *);
 void PaletteFade_ApplySelectiveBrightness(void *);
 s32 Player_GetActionIndex(void *);
-void sub_08239848(void *, void *, s32, s32, s32);
 void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
 {
     s32 mode;
@@ -36,7 +35,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
                 amount = 0x50 - p->fadeOut;
             else
                 amount = 0;
-            sub_08239848(p, src, amount, 0x20 - amount, 5);
+            LinkPlayer_BlendPalette(p, (const u16 *)src, amount, 0x20 - amount, 5);
             p->fadeOut++;
             if (p->fadeOut > 0x5f)
                 p->fadeOut = 0;
@@ -54,7 +53,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
                 if (p->fadeOut > 0x4f)
                     p->fadeOut = 0;
             }
-            sub_08239848(p, src, amount, 0x20 - amount, 5);
+            LinkPlayer_BlendPalette(p, (const u16 *)src, amount, 0x20 - amount, 5);
         } else {
             p->fadeOut = 0;
             if (p->alternate == 0)
@@ -91,7 +90,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
                 p->target->palette = p->workPalette;
             }
         } else {
-            sub_08239848(p, gPaletteBankData + p->srcSlot * 32, p->fadeIn, 0x20 - p->fadeIn, 5);
+            LinkPlayer_BlendPalette(p, (const u16 *)(gPaletteBankData + p->srcSlot * 32), p->fadeIn, 0x20 - p->fadeIn, 5);
         }
         p->fadeIn--;
     }

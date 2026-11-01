@@ -9994,6 +9994,7 @@ addr,name,mode,confidence,source,notes
 08239664,PaletteFade_ApplySelectiveBrightness,thumb,low,src-alias,
 082397B0,ActorEffect_SelectModeFlag,thumb,low,src-alias,
 082397FC,LinkPlayer_LoadAnimationParameters,thumb,low,src-alias,Loads three animation parameter halfwords selected by the current animation index
+08239848,LinkPlayer_BlendPalette,thumb,low,src-alias,Blends a weighted RGB15 palette and preserves three entries for the primary form
 08239C80,LinkPlayer_InitAnimationSlots,thumb,low,src-alias,Initializes four animation ID pairs including a player-slot-specific entry
 08239CDC,LinkPlayer_InitAnimationState,thumb,low,src-alias,Resets animation selectors and binds the player animation data before its first update
 08239E6C,LinkPlayer_FlushPendingEffects,thumb,low,src-alias,Processes the pending effect count through the shared effect handler; effect identity tentative

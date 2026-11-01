@@ -1,120 +1,82 @@
-#include "global.h"
+#include "link_player_palette.h"
+
 #ifdef NONMATCHING
-// fuzzy: 67.9%
-// fix.py best (sweep after the inlined-insn fix)
-struct LinkPalTarget {
-    u8 pad0[0xC];
-    u16 *palette;
-};
-struct LinkPlayerPalette {
-    u8 pad0[0xD4];
-    u16 *palette;
-    u8 padD8[0xA0];
-    struct LinkPalTarget *target;
-    u8 pad17C[0x1E4];
-    u16 base[16], work[16];
-    u8 pad3A0[0x79];
-    u8 alternate;
-    u8 pad41A[0x6AC];
-    u8 brightness;
-};
-static inline u16 Blend(u16 source, const u16 *base, const u8 *brightnessPtr, s32 sourceWeight,
-                        s32 baseWeight, s32 shift)
-{
-    s32 r, g, b, brightness;
-    u32 packed;
-    s32 br, bg, bb;
-    r = source & 31;
-    brightness = *brightnessPtr;
-    r += brightness;
-    if (r > 31)
-        r = 31;
-    packed = (u32)source << 16;
-    g = ((packed >> 21) & 31) + brightness;
-    if (g > 31)
-        g = 31;
-    b = ((packed >> 26) & 31) + brightness;
-    if (b > 31)
-        b = 31;
-    br = *base & 31;
-    bg = (*base >> 5) & 31;
-    bb = (*base >> 10) & 31;
-    r = (sourceWeight * r + baseWeight * br) >> shift;
-    g = (sourceWeight * g + baseWeight * bg) >> shift;
-    b = (sourceWeight * b + baseWeight * bb) >> shift;
-    return (b << 10) | (g << 5) | r;
-}
-// confidence=low: blends palette channels, preserving selected entries for the primary form.
-#define LinkPlayer_BlendPalette sub_08239848
-inline static u16 Blend_08239848(u16 source, const u16 *base, const u8 *brightnessPtr,
+// fuzzy: 97.0%
+static inline u16 BlendLinkColor(u16 source, const u16 *base, const u8 *brightnessPtr,
                                  s32 sourceWeight, s32 baseWeight, s32 shift)
 {
-    s32 r;
-    s32 g;
-    s32 b;
-    s32 brightness;
     u32 packed;
-    s32 br;
-    s32 bg;
-    s32 bb;
-    r = source & 31;
+    s32 red, green, blue, baseRed, baseGreen, baseBlue;
+    s32 brightness;
+    s32 sourceRed = source & 31;
     brightness = *brightnessPtr;
-    r += brightness;
-    if (r > 31)
-        r = 31;
-    packed = ((u32)source) << 16;
-    g = ((packed >> 21) & 31) + brightness;
-    if (g > 31)
-        g = 31;
-    b = ((packed >> 26) & 31) + brightness;
-    if (b > 31)
-        b = 31;
-    br = (*base) & 31;
-    bg = ((*base) >> 5) & 31;
-    bb = ((*base) >> 10) & 31;
-    r = ((sourceWeight * r) + (baseWeight * br)) >> shift;
-    g = ((g * sourceWeight) + (baseWeight * bg)) >> shift;
-    b = ((sourceWeight * b) + (baseWeight * bb)) >> shift;
-    return ((b << 10) | (g << 5)) | r;
+    red = sourceRed + brightness;
+    if (red > 31)
+        red = 31;
+    packed = (u32)source << 16;
+    green = (s16)((packed >> 21) & 31) + brightness;
+    if (green > 31)
+        green = 31;
+    blue = (s16)((packed >> 26) & 31) + brightness;
+    if (blue > 31)
+        blue = 31;
+    baseRed = *base & 31;
+    baseGreen = (*base >> 5) & 31;
+    baseBlue = (*base >> 10) & 31;
+    red = (red * sourceWeight + baseWeight * baseRed) >> shift;
+    green = (green * sourceWeight + baseWeight * baseGreen) >> shift;
+    blue = (blue * sourceWeight + baseWeight * baseBlue) >> shift;
+    return (blue << 10) | (green << 5) | red;
 }
 
-void LinkPlayer_BlendPalette(struct LinkPlayerPalette *p, const u16 *source, s32 sourceWeight,
+void LinkPlayer_BlendPalette(struct LinkPlayerFade *p, const u16 *input, s32 sourceWeight,
                              s32 baseWeight, s32 shift)
 {
     s32 i;
+    const u16 *source;
+    u8 *primaryBrightness;
+    u8 *alternateBrightness;
     if (sourceWeight == 0) {
         if (!p->alternate)
-            p->palette = p->base;
+            p->palette = p->basePalette;
         else
-            p->target->palette = p->base;
+            p->target->palette = p->basePalette;
         return;
     }
+    source = input;
     if (!p->alternate) {
-        u16 *base = p->base;
-        for (i = 0; i <= 15; i++) {
-            if ((((u32)(i - 5)) <= 1) || (i == 13))
+        u16 *base;
+        u16 **slot;
+        i = 0;
+        slot = &p->palette;
+        base = p->basePalette;
+        primaryBrightness = &p->brightness;
+        for (; i < 16; i++) {
+            if ((u32)(i - 5) <= 1 || i == 13)
                 base[16] = *base;
             else
-                base[16] =
-                    Blend_08239848(*source, base, &p->brightness, sourceWeight, baseWeight, shift);
-            base++;
+                base[16] = BlendLinkColor(*source, base, primaryBrightness, sourceWeight,
+                                          baseWeight, shift);
             source++;
+            base++;
         }
-
-        p->palette = p->work;
+        *slot = p->workPalette;
     } else {
-        u16 *base = p->base;
-        for (i = 0; i <= 15; i++) {
+        u16 *base;
+        i = 0;
+        alternateBrightness = &p->brightness;
+        base = p->basePalette;
+        while (1) {
             base[16] =
-                Blend_08239848(*source, base, &p->brightness, sourceWeight, baseWeight, shift);
-            base++;
+                BlendLinkColor(*source, base, alternateBrightness, sourceWeight, baseWeight, shift);
             source++;
+            base++;
+            if (++i > 15)
+                break;
         }
-
-        p->target->palette = p->work;
+        p->target->palette = p->workPalette;
     }
 }
-
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08239848);
+INCLUDE_ASM("asm/nonmatching", LinkPlayer_BlendPalette);
 #endif
