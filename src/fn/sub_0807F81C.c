@@ -1,105 +1,92 @@
-#include "global.h"
-
-#include "scene_actor_reset.h"
-#include "scene_actor_contact_list.h"
-#include "scene_actor_reaction.h"
-extern const u8 gUnk_0824E114[];
-
-// confidence=low: arms a contact reaction on an actor after a reset-phase check; returns 1 when armed.
+#include "scene_actor_contact_response.h"
+void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void SceneActorTarget_ResetContactResponse(void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
-void SceneActorReaction_ResetResponseState(void *, const void *, u32);
+extern const u8 gUnk_0824E114[];
 
 #ifdef NONMATCHING
-// fuzzy: 42.2%
-// scope shape 186 (differences once low registers are set aside)
-// confidence=low: arms a contact reaction on an actor after a reset-phase check; returns 1 when armed.
-u8 sub_0807F81C(struct SceneActorRegistryResetView *a)
+// fuzzy: 95.2%
+// confidence=low: releases a prior contact, checks the route to the target cell,
+// and starts the idle reaction when the target is inactive.
+u8 sub_0807F81C(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorReactionMotion *motion;
+    struct SceneActorContactTracking *motion;
+    struct SceneActorContactTracking *tracking;
+    struct SceneActorChaseGroup *group;
+    u16 zero;
+    u16 *motionFlags;
+    u16 *savedFlags;
+    void *work;
+    void **nodeSlot;
     struct SceneActorContactNode *contact;
-    struct SceneActorContactNode **nodeSlot = (struct SceneActorContactNode **)((u8 *)a + 0x45C);
-    u32 zero;
+    struct SceneActorContactTarget *target;
     u16 cell;
-    void *route;
-    u8 *pos;
-    s32 blocked;
-    u32 *flags2CC;
-
-    if (a->flags2D4 & 0x10)
+    u32 active;
+    u32 *actionFlags;
+    work = actor;
+    if (SceneActorContact_MotionFlags(SceneActorContact_ActorFromWork(&work), 0x10))
         return 0;
-    if ((u8)Callback_InvokeActor(a, a->update26C))
+    if ((u8)Callback_InvokeActor(actor, actor->update26C))
         return 1;
-    motion = (struct SceneActorReactionMotion *)&a->tracking.target;
-    if (!(motion->flags & 1))
+    if (!SceneActorContact_TestTracking((motion = (void *)&actor->tracking), 1))
         return 0;
-    zero = a->flags2D4 & 0x100;
+    motionFlags = SceneActorContact_MotionField(actor);
+    {
+        u16 flags;
+        SCENE_ACTOR_CONTACT_READ_MOTION_FIELD(flags, motionFlags);
+        zero = flags & 0x100;
+    }
+    savedFlags = motionFlags;
     if (zero)
         return 0;
-    if (!a->tracking.limit)
+    group = &actor->group;
+    tracking = motion;
+    nodeSlot = &actor->group.contactNode;
+    if (!actor->tracking.limit)
         return 0;
-    contact = SceneActorContacts_SelectForActor(a, 6);
+    SCENE_ACTOR_CONTACT_FIND_CONTACT(contact, actor);
     if (!contact)
         return 0;
-    if (a->flags2D4 & 0x1000) {
+    if (SceneActorContact_QueryMotionField(actor, 0x1000, &work)) {
         SceneActorContacts_ReleaseNode(*nodeSlot);
-        a->flags2D4 &= ~0x1000;
-        *nodeSlot = (struct SceneActorContactNode *)zero;
+        SceneActorChase_ClearBits(savedFlags, 0x1000);
+        *nodeSlot = (void *)zero;
     }
-    motion->fieldDC = *(u32 *)contact;
-    cell = *(u16 *)(*(u8 **)((u8 *)motion->fieldDC + 0x1C) + 6);
-    a->group.common.gate.flags &= -3;
-    *nodeSlot = 0;
-    if (*(u32 *)((u8 *)a + 0x100) != 0) {
-        if (motion->flags & 8) {
-            if (*(u16 *)((u8 *)a + 0x2F8) != cell) {
-                route = *(void **)((u8 *)a + 0x5D0);
-                pos = (u8 *)motion->fieldDC + 0xC;
-                if (!Nav_IsPositionInMesh(route, &a->body.position, (struct ContactPosition *)pos)) {
-                    a->flags2D4 &= ~0x200;
-                } else {
-                    blocked =
-                        Terrain_ApplyBlocked(route, &a->body.position, (struct ContactPosition *)pos);
-                    if (blocked == 0)
-                        a->flags2D4 &= ~0x200;
-                    else if (blocked != 2)
-                        Memory_Clear(&a->body.motion, 8);
-                }
-                *(u16 *)((u8 *)a + 0x2F8) = cell;
+    target = contact->object;
+    motion->tracking.target = &target->target;
+    cell = target->cell->index;
+    work = actor;
+    SceneActorChase_ClearFlagComponent(SceneActorContact_GateFromWork(&work), 2);
+    if (motion->active) {
+        if (SceneActorContact_TestTracking(motion, 8)) {
+            if (SceneActorContact_SavedTargetCell(actor) != cell) {
+                SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                         &tracking->tracking.target->position);
+                *(u16 *)actor->unknown2F8 = cell;
             }
-        } else {
-            SceneActorTarget_ResetContactResponse(a);
-        }
-        a->flags2D6 |= 0x80;
-        motion->flags |= 0x10;
+        } else
+            SceneActorTarget_ResetContactResponse(actor);
+        SceneActorChase_SetReactionFlags(actor, 0x80);
+        SceneActorContact_SetTrackingFlags(motion, 0x10);
         return 0;
     }
-    flags2CC = &a->flags2CC;
-    if (*flags2CC & 0x80)
+    active = SceneActorContact_ReadActorFlags(actor, 0x80, &actionFlags);
+    if (active)
         return 0;
-    *flags2CC |= 0x80;
-    a->flags2D4 &= ~0x100;
-    SceneActorReaction_ResetResponseState((u8 *)a + 0x460, (const void *)gUnk_0824E114, 0x682);
-    a->field2B2 = 1;
-    a->field2B0 = 0;
-    a->field2B5 = 0x10;
-    a->target = SceneActorControl_OnIdle;
-    a->field2C8 = 0;
-    a->flags114 &= ~1;
-    a->word104 = 0;
-    a->state2A8 = 3;
-    a->phase2A9 = 1;
-    a->behavior2AA = 0;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
-    a->flags2D4 &= ~0x400;
-    *(u8 *)((u8 *)a + 0x5DA) = 0xFF;
-    SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)a, 0);
-    *(u16 *)((u8 *)a + 0x428) = 0xB4;
-    SceneActorAttachment_ReplaceResponseSlot(a, 0, 1, a->category);
-    a->flags2D6 |= 0x100;
+    *actionFlags |= 0x80;
+    SceneActorChase_ClearBits(motionFlags, 0x100);
+    SceneActorReaction_ResetResponseState(&actor->group.saved, gUnk_0824E114, 0x682);
+    SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
+    SceneActorChase_SetState(actor, 3, 1, 0);
+    SceneActorChase_ClearBits(motionFlags, 0x400);
+    actor->group.turn.turnsRemaining = -1;
+    SceneActorAnimation_SelectDirectionalEntry(SceneActorContact_ActorFromWork(&work), 0);
+    actor->group.common.control.timer = 0xB4;
+    SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
+    SceneActorChase_SetReactionFlags(actor, 0x100);
     return 1;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0807F81C);
 #endif
