@@ -1,24 +1,12 @@
 #include "global.h"
 #include "display_animation.h"
 #include "display_sprite_playback.h"
-#include "scene_vec.h"
+#include "tile_trigger.h"
 #include "engine.h"
 #include "ram.h"
 struct TileTriggerManager {
     u8 unknown0[0x18];
     void *animationData;
-};
-struct TileTrigger {
-    struct ContactSwarmSprite sprite;
-    u8 unknown2C[0x48];
-    struct DisplaySequenceState animation;
-    struct SceneVec position;
-    u8 unknown8C[0x2C];
-    u16 sequence, delay, unknownBC;
-    s16 state;
-    u16 triggerFlags;
-    u8 forced, frame;
-    s32 timer;
 };
 void TileTrigger_ApplyContactEffects(struct TileTrigger *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
