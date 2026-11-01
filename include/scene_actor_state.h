@@ -102,7 +102,7 @@ struct SceneActorRegistryResetView {
     u16 previousTerrainCell;
     u8 unknown2F8[2];
     u16 regionId;
-    u8 unknown2FC[8];
+    struct ContactPosition previousPosition;
     u32 field304;
     u32 profileId;
     u32 field30C;
