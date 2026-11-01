@@ -18,22 +18,24 @@ struct NavMeshRoute {
         (out) = &(nodes)[(region)->nodes[(slot)]];                                                 \
     } while (0)
 
-#define NAV_MESH_COLLECT_NEIGHBORS(nodeArg, regionTable, position, found, count, j, t)             \
-    do {                                                                                           \
-        for (j = 0; j <= 5 && nodeArg->regions[j] != 0xFF && count <= 5; j++) {                    \
-            if (nodeArg->regions[j] != found[0] &&                                                 \
-                NavMesh_IsPointInsideRegion(regionTable, position, nodeArg->regions[j])) {         \
-                s32 isNew = 1;                                                                     \
-                for (t = 0; t < count; t++) {                                                      \
-                    if (found[t] == nodeArg->regions[j])                                           \
-                        isNew = 0;                                                                 \
-                }                                                                                  \
-                if (isNew) {                                                                       \
-                    found[count] = nodeArg->regions[j];                                            \
-                    count++;                                                                       \
-                }                                                                                  \
+#define NAV_MESH_GATHER_LINK_MEMBERS(node, regionTable, position, found, count, j, t)              \
+    for (j = 0; j <= 5 && node->regions[j] != 0xFF && count <= 5; j++) {                           \
+        if (node->regions[j] != found[0] &&                                                        \
+            NavMesh_IsPointInsideRegion(regionTable, position, node->regions[j])) {                \
+            s32 isNew = 1;                                                                         \
+            for (t = 0; t < count; t++) {                                                          \
+                if (found[t] == node->regions[j])                                                  \
+                    isNew = 0;                                                                     \
+            }                                                                                      \
+            if (isNew) {                                                                           \
+                found[count] = node->regions[j];                                                   \
+                count++;                                                                           \
             }                                                                                      \
         }                                                                                          \
+    }
+#define NAV_MESH_COLLECT_NEIGHBORS(node, regionTable, position, found, count, j, t)                \
+    do {                                                                                           \
+        NAV_MESH_GATHER_LINK_MEMBERS(node, regionTable, position, found, count, j, t);             \
     } while (0)
 
 /* Advance from the slot that supplied the current destination node. */
@@ -125,20 +127,8 @@ u32 NavMesh_FindRoute(void *route, void *origin, void *destination)
              i = NavMesh_NextNodeSlot(&currentSlot, i)) {
             struct NavMeshNode *node;
             NAV_MESH_GET_NODE(node, nodes, destinationRegion, i);
-            for (j = 0; j <= 5 && node->regions[j] != 0xFF && destinationCount <= 5; j++) {
-                if (node->regions[j] != destinationRegions[0] &&
-                    NavMesh_IsPointInsideRegion(regions, to, node->regions[j])) {
-                    s32 isNew = 1;
-                    for (t = 0; t < destinationCount; t++) {
-                        if (destinationRegions[t] == node->regions[j])
-                            isNew = 0;
-                    }
-                    if (isNew) {
-                        destinationRegions[destinationCount] = node->regions[j];
-                        destinationCount++;
-                    }
-                }
-            }
+            NAV_MESH_GATHER_LINK_MEMBERS(node, regions, to, destinationRegions, destinationCount, j,
+                                         t);
         }
     }
 
@@ -151,7 +141,8 @@ u32 NavMesh_FindRoute(void *route, void *origin, void *destination)
     }
     originCount = 1;
     for (i = 0; i <= 11 && originRegion->nodes[i] != 0xFF && originCount <= 5; i++) {
-        struct NavMeshNode *node = &nodes[originRegion->nodes[i]];
+        struct NavMeshNode *node;
+        NAV_MESH_GET_NODE(node, nodes, originRegion, i);
         NAV_MESH_COLLECT_NEIGHBORS(node, regions, from, originRegions, originCount, j, t);
     }
     for (i = 0; i < originCount; i++) {
