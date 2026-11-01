@@ -2805,8 +2805,8 @@ void sub_081E728C(struct ActorAnimController *p)
             p->direction = idx - 4;
             p->flip = 0;
         }
-        p->unkF67[1] = (idx - 4) & 7;
-        p->unkF7C = 0;
+        p->facing = (idx - 4) & 7;
+        p->heightSettled = 0;
         ActorShadow_Enable(p->p2);
     }
 
@@ -2828,13 +2828,13 @@ void sub_081E728C(struct ActorAnimController *p)
 
     adx = dx < 0 ? -dx : dx;
     adz = dz < 0 ? -dz : dz;
-    if (adx + adz <= 9 && p->unkF7C != 0) {
+    if (adx + adz <= 9 && p->heightSettled != 0) {
         p->obj.x = p->targetX;
         p->obj.z = p->targetZ;
-        if ((s8)p->unkF67[0] >= 0) {
-            u32 m = (s8)p->unkF67[0] & 7;
+        if (p->targetFacing >= 0) {
+            u32 m = p->targetFacing & 7;
             u32 flip = 0;
-            p->unkF67[1] = p->unkF67[0];
+            p->facing = p->targetFacing;
             if (m > 4) {
                 m = (u8)(8 - m);
                 flip = 1;
@@ -2845,7 +2845,7 @@ void sub_081E728C(struct ActorAnimController *p)
         return;
     }
 
-    if (p->unkF7C == 0) {
+    if (p->heightSettled == 0) {
         targetY = p->targetY;
         snap = 0;
         if (targetY > p->obj.y) {
@@ -2862,7 +2862,7 @@ void sub_081E728C(struct ActorAnimController *p)
         if (snap) {
             p->obj.y = targetY;
             p->savedY = targetY;
-            p->unkF7C = 1;
+            p->heightSettled = 1;
         }
     }
 
@@ -2873,9 +2873,9 @@ void sub_081E728C(struct ActorAnimController *p)
         s16 cosv = sine[((s16)p->heading + 0x40) & 0xFF];
         s16 sinv = sine[p->heading & 0xFF];
         p->deltaX = Div(cosv, 500);
-        *(s16 *)p->unkECC = Div(sinv, 500);
+        p->deltaZ = Div(sinv, 500);
         p->obj.x += p->deltaX;
-        p->obj.z += *(s16 *)p->unkECC;
+        p->obj.z += p->deltaZ;
         p->savedX = p->obj.x;
         p->savedZ = p->obj.z;
     }

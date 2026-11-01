@@ -67,8 +67,8 @@ struct ActorAnimController {
     u8 unkE7B[17];
     u16 dx, dy, dz; /* 0xE8C */
     u8 unkE92[0x36];
-    s16 deltaX, deltaY; /* 0xEC8 */
-    u8 unkECC[4];
+    s16 deltaX, deltaY, deltaZ; /* 0xEC8 */
+    u8 unkECE[2];
     s16 targetX, targetY, targetZ; /* 0xED0 */
     u8 unkED6[2];
     s16 startX, startY, startZ; /* 0xED8 */
@@ -92,7 +92,8 @@ struct ActorAnimController {
     u8 flags;       /* 0xF64: state-entry flag */
     u8 phaseSelect; /* 0xF65: provisional, selects a (mode,phase) pair on setup */
     u8 direction;   /* 0xF66 */
-    u8 unkF67[2];
+    s8 targetFacing;
+    u8 facing;
     s8 bend;       /* 0xF69 */
     u8 option;     /* 0xF6A: provisional, copied from InteractionPartner.option */
     u8 flip;       /* 0xF6B */
@@ -103,7 +104,7 @@ struct ActorAnimController {
     u8 variant8; /* 0xF77: provisional, not the same slot as .variant below */
     u8 unkF78[2];
     u16 savedY2; /* 0xF7A: provisional idle-restore save, distinct from sprite.y */
-    u8 unkF7C;
+    u8 heightSettled;
     u8 interrupted; /* 0xF7D */
     u16 savedPhase; /* 0xF7E */
     u8 unkF80[4];
