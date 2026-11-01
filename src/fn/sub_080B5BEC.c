@@ -40,8 +40,7 @@ static inline void Hide(struct SceneActorRegistryResetView *actor)
         tile->flags |= one;
     }
     {
-        register u32 offset asm("r1") = 0x320;
-        asm("" : "+r"(offset));
+        u32 offset = 0x320;
         ActorShadow_Disable((void *)((u8 *)actor + offset));
     }
 }
@@ -65,8 +64,7 @@ static inline void Show(struct SceneActorRegistryResetView *input)
         tile->flags &= mask;
     }
     {
-        register u32 offset asm("r2") = 0x320;
-        asm("" : "+r"(offset));
+        u32 offset = 0x320;
         ActorShadow_Enable((void *)((u8 *)actor + offset));
     }
 }
@@ -122,10 +120,9 @@ void sub_080B5BEC(struct SceneActorRegistryResetView *input)
             u32 mask = 0x4000;
             u32 *inputFlags;
             u32 *flags;
-            register u32 active asm("r0");
+            u32 active;
             inputFlags = (u32 *)((u8 *)state + 0x6DC);
             active = *inputFlags & mask;
-            asm("" : "+r"(active));
             flags = inputFlags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (active) {

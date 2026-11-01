@@ -22,8 +22,7 @@ void ProximityEmitter_TickRise(struct ProximityEmitter *input)
             u16 *height = (u16 *)&emitter->position.y;
             u32 rise = frame * 2;
             {
-                register u32 baseHeight asm("r3") = *height;
-                asm("" : "+r"(baseHeight));
+                u32 baseHeight = *height;
                 rise += baseHeight;
             }
             emitter->primary.sprite.position.y = rise;

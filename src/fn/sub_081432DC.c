@@ -33,10 +33,9 @@ static inline u32 MaskFlags(u32 *p, u32 mask)
 }
 static inline void ClearHolding(u8 *p)
 {
-    register u32 offset asm("r1") = 0x4FD;
+    u32 offset = 0x4FD;
     u8 *state;
     register u32 zero asm("r1");
-    asm("" : "+r"(offset));
     state = p + offset;
     zero = 0;
     *state = zero;
@@ -50,10 +49,9 @@ static inline u32 Quantize(s32 angle)
 }
 static inline u32 ReadVariant(u8 *p)
 {
-    register u32 offset asm("r2") = 0x418;
-    asm("" : "+r"(offset));
+    u32 offset = 0x418;
     {
-        register u8 *field asm("r0") = p + offset;
+        u8 *field = p + offset;
         return *field;
     }
 }
@@ -68,9 +66,8 @@ static inline u32 ReadHeldInput(u8 *p)
 static inline s32 ReadHeldEnergy(void)
 {
     u8 *global = gGameState;
-    register u32 offset asm("r2");
+    u32 offset;
     offset = 0x77C;
-    asm("" : "+r"(offset));
     return *(s32 *)(global + offset);
 }
 // MATCHING_CONCESSION: register-pinning

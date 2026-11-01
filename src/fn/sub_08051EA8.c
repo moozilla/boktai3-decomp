@@ -10,7 +10,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
     register struct ContactSwarmSprite *sprite asm("r5");
     u16 *nearby;
     u32 script;
-    register u32 zero asm("r6");
+    u32 zero;
     if (Script_SeekToKeyword('p')) {
         u32 cell;
         u32 height, surface;
@@ -73,12 +73,11 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
     AnimData_SelectPaletteBank(graphics, 0xA2);
     emitter->primary.sprite.flags |= 0x200;
     {
-        register u32 value asm("r1") = 3;
-        asm("" : "+r"(value));
+        u32 value = 3;
         priority = value;
     }
     {
-        register u32 value asm("r2") = priority;
+        u32 value = priority;
         emitter->primary.sprite.priority = value;
     }
     {

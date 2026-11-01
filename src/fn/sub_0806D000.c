@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "route_sprite_playback.h"
 void RouteSpriteActor_FinishAnimation(struct RouteSpritePool *pool, struct RouteSpriteActor *actor)
 {
@@ -9,7 +8,6 @@ void RouteSpriteActor_FinishAnimation(struct RouteSpritePool *pool, struct Route
     if (RouteSpriteActor_StepPlayback(actor)) {
         u32 offset = 0x153;
         s8 *indexPointer;
-        asm("" : "+r"(offset));
         indexPointer = (s8 *)((u32)actor + offset);
         pool->occupiedMask &= ~(1 << *indexPointer);
         actor->state = 0;

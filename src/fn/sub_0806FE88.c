@@ -48,13 +48,11 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
             register u32 request asm("r9");
             {
                 u32 low = 3;
-                asm("" : "+r"(low));
                 blocked = low;
             }
             tickOffset = 0x3CC;
             {
                 u32 low = 0;
-                asm("" : "+r"(low));
                 zero = low;
             }
             {

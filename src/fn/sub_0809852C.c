@@ -23,7 +23,7 @@ static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inp
 }
 static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
+    struct SceneActorRegistryResetView *actor = input;
     if (actor) {
         if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
             return 1;
@@ -32,7 +32,7 @@ static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
 }
 static inline void Hide(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
+    struct SceneActorRegistryResetView *actor = input;
     {
         u32 *flags = actor->drawable;
         register u32 value asm("r0") = *flags;
@@ -40,15 +40,14 @@ static inline void Hide(struct SceneActorRegistryResetView *input)
         *flags = value | one;
     }
     {
-        register u32 offset asm("r1") = 0x320;
-        asm("" : "+r"(offset));
+        u32 offset = 0x320;
         ActorShadow_Disable((void *)((u8 *)actor + offset));
     }
 }
 
 static inline void Show(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
+    struct SceneActorRegistryResetView *actor = input;
     {
         u32 *flags = actor->drawable;
         register u32 value asm("r0") = *flags;
@@ -58,15 +57,14 @@ static inline void Show(struct SceneActorRegistryResetView *input)
         *flags = value & mask;
     }
     {
-        register u32 offset asm("r2") = 0x320;
-        asm("" : "+r"(offset));
+        u32 offset = 0x320;
         ActorShadow_Enable((void *)((u8 *)actor + offset));
     }
 }
 // confidence=low: flickers the drawable and shadow during a pending visibility transition.
 void Ghost_TickVisibilityTransition(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
+    struct SceneActorRegistryResetView *actor = input;
     struct GhostVisibilityState *state;
     u32 unavailable = IsUnavailable(actor);
     if (unavailable)
@@ -118,10 +116,9 @@ void Ghost_TickVisibilityTransition(struct SceneActorRegistryResetView *input)
             u32 mask = 0x20;
             u32 *inputFlags;
             u32 *flags;
-            register u32 active asm("r0");
+            u32 active;
             inputFlags = &state->flags;
             active = *inputFlags & mask;
-            asm("" : "+r"(active));
             flags = inputFlags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (active) {

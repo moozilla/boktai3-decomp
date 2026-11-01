@@ -31,9 +31,8 @@ void SceneSteeringActor_DestroySlot(struct SceneSteeringActorPool *p,
             asm("" : "+r"(frame), "+r"(zero)::"r0");
             *frame = 0;
             {
-                register u32 offset asm("r1") = 0x115;
+                u32 offset = 0x115;
                 u8 *status;
-                asm("" : "+r"(offset));
                 status = (void *)((u8 *)actor + offset);
                 if (!*status) {
                     ScaledShadow_Destroy(actor->shadow);
@@ -44,10 +43,9 @@ void SceneSteeringActor_DestroySlot(struct SceneSteeringActorPool *p,
             p->used &= ~(1U << actor->index);
             actor->index = -1;
             {
-                register u32 offset asm("r1") = 0x122;
+                u32 offset = 0x122;
                 u8 *state;
                 register u32 lowZero asm("r1");
-                asm("" : "+r"(offset));
                 state = (void *)((u8 *)actor + offset);
                 lowZero = zero;
                 *state = lowZero;

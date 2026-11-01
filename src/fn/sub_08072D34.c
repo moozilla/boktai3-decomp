@@ -6,7 +6,7 @@ static inline u8 Unavailable(struct SceneActorRegistryActor *inputActor, u16 *in
     register struct SceneActorRegistryActor *actor asm("r3") = inputActor;
     u32 disabled = inputDisabled;
     u16 *state = inputState;
-    register u32 excluded asm("r12") = inputExcluded;
+    u32 excluded = inputExcluded;
     u32 flags;
     flags = *state;
     if ((flags & disabled) || (actor->flags2D0 & excluded) || actor->health <= 0)
@@ -31,7 +31,7 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
         return;
     {
         u32 disabled = 0x40;
-        register u32 excluded asm("r12") = 0x20000;
+        u32 excluded = 0x20000;
         u32 required = 0x1000;
         u32 invalidMask = 3;
         u32 clearMask = 0xFD;

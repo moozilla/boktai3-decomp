@@ -56,7 +56,7 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
     }
     {
         register u16 *flags asm("r5");
-        register u32 ownership asm("r8");
+        u32 ownership;
         u32 inputMask = 0x1000;
         u32 *actorFlags;
         register u32 byteZero asm("r8");
@@ -73,7 +73,6 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
             {
                 u32 old = *flags;
                 u32 mask;
-                asm("" : "+r"(old), "+r"(ownership));
                 mask = ownership;
                 *flags = old & ~mask;
             }

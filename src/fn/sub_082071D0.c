@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
 void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);

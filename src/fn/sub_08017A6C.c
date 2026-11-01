@@ -63,12 +63,11 @@ s32 Weather_UpdateStormTrigger(struct Weather *p)
     }
     if (!Weather_TestFlags(p->flags, 2)) {
         s32 volume = Weather_GetStormVolume(p);
-        register s32 light asm("r5") = *(s16 *)(gGameState + 0x876);
+        s32 light = *(s16 *)(gGameState + 0x876);
         if (!IsPaused(0x400) && p->enabled) {
             if (light > 0) {
                 s32 *timer = StormTimer(gGameState);
                 *timer += light >> 2;
-                asm("" : : "r"(light));
                 {
                     u8 *base = gGameState;
                     timer = StormTimer(base);

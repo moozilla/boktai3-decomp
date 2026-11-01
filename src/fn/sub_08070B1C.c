@@ -5,7 +5,7 @@ void SceneActorControl_OnIdle(u8 *);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *input, u16 **saved,
                                u32 excludedInput)
 {
-    register struct SceneActorRegistryActor *actor asm("r3") = input;
+    struct SceneActorRegistryActor *actor = input;
     register u32 excluded asm("r10") = excludedInput;
     u32 offset = 0x2d4;
     u16 *field;
@@ -38,7 +38,7 @@ zero:
 void SceneActorRegistry_ResetEligibleCategoryState(void)
 {
     struct SceneActorRegistryNode *node;
-    register struct SceneActorRegistryActor *actor asm("r3");
+    struct SceneActorRegistryActor *actor;
     SceneActorRegistry_GetManager();
     node = gSceneActorRegistryNode;
     actor = node->actor;
@@ -54,13 +54,11 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
             reject = initial;
         }
         {
-            register const void *initial asm("r2") = (const void *)SceneActorControl_OnIdle;
-            asm("" : "+r"(initial));
+            const void *initial = (const void *)SceneActorControl_OnIdle;
             callback = initial;
         }
         {
-            register u32 initial asm("r0") = 16;
-            asm("" : "+r"(initial));
+            u32 initial = 16;
             substate = initial;
         }
         do {

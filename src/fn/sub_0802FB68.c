@@ -98,8 +98,8 @@ void sub_0802FB68(void *unused, struct Actor *arg)
             p->done = 1;
         } else {
             u8 *ap = &p->angle;
-            register struct Vec *vel asm("r4") = &p->velocity;
-            register int angle asm("r6") = *ap;
+            struct Vec *vel = &p->velocity;
+            int angle = *ap;
             int speed = p->speed;
 
             s32 product = speed * gUnk_086149C4[(angle + 64) & 255];
@@ -108,7 +108,6 @@ void sub_0802FB68(void *unused, struct Actor *arg)
             vel->x = scale(product);
             vel->y = 0;
             vel->z = scale(speed * gUnk_086149C4[angle]);
-            asm("" ::"r"(angle), "r"(speed));
             {
                 struct Vec *target = savedTarget;
                 s32 x;

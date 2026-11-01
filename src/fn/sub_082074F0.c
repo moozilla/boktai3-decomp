@@ -100,27 +100,24 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             smoke.x += 128;
             {
                 s32 zero = 0;
-                asm("" : "+r"(zero));
                 Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
             }
             smoke.x -= 128;
             smoke.z += 128;
             {
-                register s32 zero asm("r1") = 0;
+                s32 zero = 0;
                 Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
             }
             smoke.z -= 128;
             smoke.x -= 128;
             {
                 s32 zero = 0;
-                asm("" : "+r"(zero));
                 Explosion_CreateAt(&smoke, 16, zero, 0, zero, 60, zero, 5);
             }
             smoke.x += 128;
             smoke.z -= 128;
             {
                 s32 zero = 0;
-                asm("" : "+r"(zero));
                 Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, 5);
             }
             {

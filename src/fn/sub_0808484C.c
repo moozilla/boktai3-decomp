@@ -124,10 +124,9 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *input)
             u32 mask = 0x20;
             u32 *inputFlags;
             u32 *flags;
-            register u32 active asm("r0");
+            u32 active;
             inputFlags = &state->flags3D4;
             active = *inputFlags & mask;
-            asm("" : "+r"(active));
             flags = inputFlags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (active) {

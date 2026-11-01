@@ -22,7 +22,7 @@ static inline u32 Screamer_StepScreamLoop(struct ScreamerState *owner, u32 initi
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm(SCREAMER_FIRST);
+        register u32 first asm("r1");
         u32 maskBit = initialBit;
         bit = maskBit;
         first = bit;
@@ -35,7 +35,7 @@ static inline u32 Screamer_StepScreamLoop(struct ScreamerState *owner, u32 initi
     {
         u32 input = state->flags;
         u32 bit;
-        register u32 first asm(SCREAMER_FIRST);
+        register u32 first asm("r1");
         bit = 2;
         asm("" : "+r"(bit));
         first = bit;
@@ -49,9 +49,9 @@ static inline u32 Screamer_StepScreamLoop(struct ScreamerState *owner, u32 initi
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm(SCREAMER_MASK);
+        register u32 mask asm("r6");
         register u32 temp asm("r2");
-        register u32 savedDuration asm(SCREAMER_DURATION);
+        register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
@@ -111,7 +111,7 @@ static inline u32 Screamer_StepScreamLoop(struct ScreamerState *owner, u32 initi
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm(SCREAMER_WEIGHT) = state->frameWeight;
+                register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
@@ -143,7 +143,7 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm(SCREAMER_FIRST);
+        register u32 first asm("r1");
         u32 maskBit = 1;
         bit = maskBit;
         asm("" : "+r"(bit));
@@ -157,7 +157,7 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
     {
         u32 input = state->flags;
         u32 bit;
-        register u32 first asm(SCREAMER_FIRST);
+        register u32 first asm("r1");
         bit = 2;
         asm("" : "+r"(bit));
         first = bit;
@@ -226,7 +226,7 @@ static inline u32 Screamer_StepRecovery(struct ScreamerState *owner)
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm(SCREAMER_WEIGHT) = state->frameWeight;
+                register s32 weight asm("r1") = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
@@ -248,15 +248,13 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
         case 0:
             Screamer_StepAnimation(p);
             if (({
-                    register u32 off asm("r2") = 0x1ca;
-                    register s16 *field asm("r1");
-                    asm("" : "+r"(off));
+                    u32 off = 0x1ca;
+                    s16 *field;
                     field = (void *)((u8 *)p + off);
                     *field;
                 }) > ({
-                    register u32 off asm("r3") = 0x1d4;
-                    register s16 *field asm("r0");
-                    asm("" : "+r"(off));
+                    u32 off = 0x1d4;
+                    s16 *field;
                     field = (void *)((u8 *)p + off);
                     *field;
                 })) {

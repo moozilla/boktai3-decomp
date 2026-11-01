@@ -2910,7 +2910,7 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
     struct ContactPosition *position;
     s32 playerCell;
     s32 actorCell;
-    register s32 rowStride asm("r1");
+    s32 rowStride;
     attributes &= 1;
     position = &actor->position;
     if (attributes == 0) {
@@ -2970,7 +2970,6 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
     else if (actorCell == playerCell - rowStride)
         gPlayers[0]->position.z = (((actor->position.z >> 8) + 1) << 8) - 2;
     else {
-        asm("" : : "r"(rowStride), "r"(playerCell));
         gPlayers[0]->position.x = position->x;
         gPlayers[0]->position.z = actor->position.z;
     }

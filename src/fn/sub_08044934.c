@@ -20,23 +20,19 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
     index = 0;
     draw = &pool->slots[0].display.animation.draw;
     do {
-        register u32 initialMask asm("r2") = 1;
+        u32 initialMask = 1;
         register u32 mask asm("r10");
         u32 bits;
-        register s32 bitIndex asm("r1");
-        register const struct ContactSwarm *current asm("r2");
+        s32 bitIndex;
+        const struct ContactSwarm *current;
         u32 active;
-        asm("" : "+r"(initialMask));
         mask = initialMask;
         asm("" : "+r"(mask));
         bits = mask;
-        asm("" : "+r"(bits));
         bitIndex = index;
-        asm("" : "+r"(bitIndex));
         bits <<= bitIndex;
         mask = bits;
         current = pool;
-        asm("" : "+r"(current));
         active = current->activeMask & bits;
         if (!active) {
             register struct ContactPosition *destination asm("r5");
@@ -47,7 +43,7 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
                 u32 firstWord;
                 u32 secondWord;
                 s32 heading;
-                register u32 randomMask asm("r0");
+                u32 randomMask;
                 register u32 *counter asm("r2");
                 u32 headingIndex;
                 register u32 state asm("r0") = 1;
@@ -65,10 +61,9 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
                 slot->advanceFrames = firstWord;
                 slot->advanceSpeed = 20;
                 {
-                    register s32 stagger asm("r2") = index;
-                    asm("" : "+r"(stagger));
+                    s32 stagger = index;
                     {
-                        register u32 frames asm("r0") = stagger * 8 + 15;
+                        u32 frames = stagger * 8 + 15;
                         slot->trackingFrames = frames;
                     }
                 }
@@ -79,7 +74,6 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
                 *counter = randomIndex;
                 secondWord = table[randomIndex];
                 headingIndex = index;
-                asm("" : "+r"(headingIndex));
                 headingIndex &= 1;
                 heading = headings[headingIndex];
                 secondWord &= 63;
@@ -93,7 +87,6 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
                 struct ContactSwarmDrawPacket *view;
                 copy = *source;
                 view = draw;
-                asm("" : "+r"(view));
                 view->sprite.position = copy;
                 view->sprite.flags &= ~1;
             }
@@ -116,7 +109,7 @@ s32 ContactSwarm_SpawnPairedAdvance(struct ContactSwarm *pool,
             Collider_SetPosition(collider, destination, 0);
             collider->flags |= 4;
             {
-                register struct ContactSwarm *update asm("r1") = pool;
+                struct ContactSwarm *update = pool;
                 {
                     u32 bit;
                     u32 flags = update->activeMask;
