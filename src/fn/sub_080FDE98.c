@@ -55,11 +55,9 @@ static inline u16 Random(void)
 static inline u16 RandomMotion(void)
 {
     u32 offset;
-    register const u16 *table asm("r3");
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    table = gRandomTable;
-    return *(const u16 *)(offset + (u32)table);
+    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 static inline u32 Facing(u32 value, u8 *direction)
 {
@@ -102,7 +100,7 @@ void Axe_FollowAcceleratingRoute(struct SceneActorRegistryResetView *actor)
     Axe_EmitMotionTrail(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
         actor->body.direction = Math_Atan2(route->points[route->index].x - actor->body.position.x,
-                                      route->points[route->index].z - actor->body.position.z);
+                                           route->points[route->index].z - actor->body.position.z);
         Polar(&delta, actor->body.direction, route->speed);
         actor->body.motion.x += delta.x;
         actor->body.motion.z += delta.z;
