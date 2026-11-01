@@ -27,7 +27,6 @@ u8 *SceneActorGraphics_GetDefaultResourceId(void)
 
 int SceneActorGraphics_GetResourceId(struct StateActor *);
 
-// MATCHING_CONCESSION: register-pinning
 struct T {
     u8 pad0[0x260];
     u16 h260, h262, h264;
@@ -376,7 +375,6 @@ static inline void setFacing(ActorAnimation *p, int angle)
 
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 
-// MATCHING_CONCESSION: register-pinning
 void SceneActors_StartDisappearEffect(u32 *position)
 {
     ActorAnimation *p = SceneActors_GetBySlot(0);
