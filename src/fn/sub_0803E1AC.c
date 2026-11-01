@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
@@ -27,8 +26,6 @@ s32 ScenePool_StateTrackFast(void *manager, struct ScenePoolActor *actor,
 {
     u32 *history = entry->history;
     u32 flag;
-    u8 *entered;
-    register u32 value asm("r0");
     if (entry->stateEntered) {
         entry->stateEntered = 0;
         history[0] = 0;
@@ -36,9 +33,9 @@ s32 ScenePool_StateTrackFast(void *manager, struct ScenePoolActor *actor,
         entry->turnStep = 0x200;
     }
     if (ScenePool_SelectStateAtPositionLimit(entry))
-        goto done;
+        return 0;
     if (ScenePool_ResumeAfterIdle(actor, entry))
-        goto done;
+        return 0;
     Or(0x10, &actor->stateFlags);
     ScenePool_UpdateSpeedPulse(actor, entry, gUnk_086058A0);
     if (entry->speedControlActive) {
@@ -62,52 +59,32 @@ s32 ScenePool_StateTrackFast(void *manager, struct ScenePoolActor *actor,
     flag = PlayerHasFlag(2);
     if (!flag && history[0] > 9) {
         Enter(entry, 6, flag);
-        asm volatile("");
-        goto done;
+        return 0;
     }
     if (entry->stateFrame > 239) {
         flag = PlayerHasFlag(2);
         if (flag) {
-            s32 random;
+            s32 sample;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-            {
-                u32 offset = gRandomIndex << 1;
-                register const u8 *table asm("r3");
-                table = (const u8 *)gRandomTable;
-                random = *(const u8 *)(offset + (u32)table);
-            }
-            if (random <= 127) {
+            sample = *((u8 *)RANDOM_TABLE_ADDR + (gRandomIndex << 1));
+            if (sample <= 127) {
                 entry->state = 2;
                 entry->stateFrame = 0;
-                entered = &entry->stateEntered;
-                value = 1;
-                goto sharedEntry;
+                entry->stateEntered = 1;
+                Memory_Clear(entry->history, 0x100);
             } else {
                 entry->state = 0;
                 entry->stateFrame = 0;
-                entered = &entry->stateEntered;
-                value = 1;
-                asm("" : "+r"(entered), "+r"(value));
-                goto sharedEntry;
+                entry->stateEntered = 1;
+                Memory_Clear(entry->history, 0x100);
             }
         } else if (entry->direction > 0) {
-            value = 1;
-            entry->state = value;
-            entry->stateFrame = flag;
-            entered = &entry->stateEntered;
-        sharedEntry:
-            *entered = value;
-            {
-                u32 *arg = entry->history;
-                Memory_Clear(arg, 0x100);
-            }
-            goto done;
+            Enter(entry, 1, flag);
         } else {
             Enter(entry, 2, flag);
-            asm volatile("");
         }
-    } else
-        entry->stateFrame++;
-done:
+        return 0;
+    }
+    entry->stateFrame++;
     return 0;
 }
