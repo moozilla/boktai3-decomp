@@ -124,40 +124,38 @@ u32 SceneIndicators_Destroy(struct SceneIndicators *s)
 int SceneIndicators_Initialize(struct SceneIndicators *m)
 {
     int i;
-    struct IndicatorAnimation *a;
     struct SceneIndicator *first;
     gSceneIndicators = m;
     m->count = 0;
     if (Script_SeekToKeyword('t')) {
-        for (i = 0, a = m->animations; i < 4; a++, i++) {
+        for (i = 0; i < 4; i++) {
             int value;
             if (Script_GetPc()) {
                 value = Script_GetValue();
                 m->count++;
             } else
                 value = 0x4211;
-            if (!AnimData_Load(a, value))
+            if (!AnimData_Load(&m->animations[i], value))
                 return -1;
         }
     } else {
-        for (i = 0, a = m->animations; i < 4; a++, i++)
-            if (!AnimData_Load(a, 0x4211))
+        for (i = 0; i < 4; i++)
+            if (!AnimData_Load(&m->animations[i], 0x4211))
                 return -1;
         m->count = 4;
     }
-    asm("" : "+r"(m));
     {
         int has = Script_SeekToKeyword('p');
         first = m->indicators;
         if (has) {
-            for (a = m->animations, i = 3; i >= 0; a++, i--) {
+            for (i = 0; i < 4; i++) {
                 int value;
                 if (Script_GetPc()) {
                     value = Script_GetValue();
                     m->count++;
                 } else
                     value = 0;
-                AnimData_SelectPaletteBank(a, a->frame + value);
+                AnimData_SelectPaletteBank(&m->animations[i], m->animations[i].frame + value);
             }
         }
     }
@@ -238,7 +236,6 @@ static inline u8 *cell(int i)
     return gTerrainMap->cells + 12 + i * 4;
 }
 
-// MATCHING_CONCESSION: register-pinning
 int SceneIndicator_CreateFromScript(void)
 {
     struct SceneIndicators *m = SceneIndicators_GetInstance();
