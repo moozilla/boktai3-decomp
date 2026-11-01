@@ -318,6 +318,15 @@ syntax). Added in this thread (in `tools/scope/agbcc.patch`):
   A ROM operand that is read from memory straight into a reload register, with
   no allocated register of its own, looks like this (`mov r3, r8; ldrh r3,
   [r3]; adds r0, r1, r3` in ActorMarker_LaunchFragments).
+* `AGBCC_NOEQUIV=REG,...`: update_equiv_regs gives those pseudos no
+  equivalence, as a second, different set would. A spilled one then gets a
+  stack slot instead of being rematerialized at each use. It is the what-if for
+  a ROM that stores a constant to the stack right after loading it
+  (`ldr r5, =0x203B400; str r5, [sp, #4]`) and reloads it from there. It also
+  skips update_equiv_regs' doubling of the live length. On
+  ChargedBurst_EmitSpark (082335F0), `AGBCC_NOEQUIV=36` (the random table)
+  turns the best draft into an exact `-g` compile; see
+  `notes/opus-charged-burst-spark_2026-10-31.md`.
 * `AGBCC_COMBKEEP=REG,...`: combine never merges an insn that sets one of
   those pseudos into another insn (the what-if for a load or copy the ROM
   keeps).
