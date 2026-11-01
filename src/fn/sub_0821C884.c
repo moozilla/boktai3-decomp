@@ -1,10 +1,5 @@
-#include "global.h"
-struct TerrainProbe {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-    u32 w : 16;
-};
+#include "terrain_probe.h"
+
 u8 sub_0821C254(u8 *, u16 *, struct TerrainProbe *, u8);
 void Terrain_SampleSurface(u8 *, u16 *, struct TerrainProbe *);
 
