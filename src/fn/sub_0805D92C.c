@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_tail.h"
 #include "scene_panel_subject_playback.h"
 s32 ScenePanelSubject_Initialize(struct ScenePanelSubject *subject,
@@ -37,8 +36,7 @@ s32 ScenePanelSubject_Initialize(struct ScenePanelSubject *subject,
             Collider_Refresh(&subject->collider);
             break;
         case 4: {
-            register const u16 *limit asm("r2") = &subject->contactLimit;
-            asm("" : : "r"(limit));
+            const u16 *limit = &subject->contactLimit;
             subject->contactProgress = *limit;
         }
             subject->paletteBank = 0x24D;
