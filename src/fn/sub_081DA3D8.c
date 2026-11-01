@@ -47,8 +47,7 @@ struct EffectPlayer {
 extern struct EffectPlayer *gUnknown_02000580;
 extern const s16 gUnk_086149C4[];
 void TimedEffect_RemoveFromManager(struct TimedEffectManager *, struct TimedEffect *, s32);
-s32 TimedEffect_UpdateTerrainTurn(struct TimedEffectManager *, struct TimedEffect *, s32,
-                                  struct ContactPosition *);
+s32 TimedEffect_UpdateTerrainTurn(struct TimedEffectManager *, struct TimedEffect *, s32);
 void Task4E01_BeginImpactAnimation(struct TimedEffect *);
 
 static inline s32 Scale(s32 value)
@@ -63,19 +62,6 @@ static inline void Polar(struct ContactPosition *output, s32 direction, s32 spee
     output->y = zero;
     output->z = Scale(gUnk_086149C4[direction & 255] * speed);
 }
-static inline s32 TimedEffect_TurnSnapshot(struct TimedEffectManager *manager,
-                                           struct TimedEffect *entry, s32 index,
-                                           struct ContactPosition *velocity,
-                                           struct ContactPosition **saved)
-{
-    s32 status;
-    *saved = velocity;
-    status = TimedEffect_UpdateTerrainTurn(manager, entry, index, velocity);
-    return status;
-}
-#ifdef NONMATCHING
-// fuzzy: 86.5%
-// scope shape 16 (differences once low registers are set aside)
 s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
 {
     struct TimedEffect *entry = manager->entries;
@@ -110,6 +96,7 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
                     position->y += cursor->velocity.y;
                     position->z += cursor->velocity.z;
                 } else {
+                    s32 zero = 0;
                     if (status != 1) {
                         struct ContactPosition *position = &sprite->position;
                         struct ContactPosition *rollbackPosition;
@@ -125,15 +112,15 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
                         rollbackPosition = position;
                         if (type == 9 || type == 6)
                             sprite->position.y -= tail->elapsed;
+                        savedVelocity = &velocity;
                         velocity = cursor->velocity;
-                        status =
-                            TimedEffect_TurnSnapshot(manager, entry, i, &velocity, &savedVelocity);
+                        status = TimedEffect_UpdateTerrainTurn(manager, entry, i);
                         if (status <= 0) {
                             if (status == -1) {
                                 config->flags |= 0x20;
                                 Task4E01_BeginImpactAnimation(entry);
                             } else if (config->type != 9) {
-                                sprite->position.x -= velocity.x;
+                                sprite->position.x -= savedVelocity->x;
                                 rollbackPosition->y -= savedVelocity->y;
                                 rollbackPosition->z -= savedVelocity->z;
                             }
@@ -147,10 +134,11 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
                         tail->cooldown--;
                     }
                     entry->colliders[1].flags |= 4;
-                    if (config->type != 9) {
+                    // The ROM keeps this always-true test (movs r2, #0; cmp r2, #0).
+                    if (config->type != 9 && !zero) {
                         u32 mask = 2;
                         if (cursor->flags & mask) {
-                            Collider_SetPosition(collider, &sprite->position, 0);
+                            Collider_SetPosition(collider, &sprite->position, zero);
                             Collider_Refresh(collider);
                         }
                     }
@@ -172,6 +160,3 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TimedEffect_UpdateManager);
-#endif
