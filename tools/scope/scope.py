@@ -23,7 +23,8 @@
   scope.py FILE.c shape         the diff with low registers blanked: order and instruction differences only
   scope.py FILE.c frame         stack slots, ROM against draft, with the pseudo (C variable) in each
   scope.py FILE.c preorder      the ROM's order of PRE's spilled field addresses against gcse's hash table:
-                                the table sizes (insn counts) and pseudo renumberings that give it
+                                the table sizes (insn counts) and pseudo renumberings that give it, and the
+                                body lines whose offsets an inline helper folds (fewer insns, same code)
   scope.py FILE.c hoist         loop-invariant motion pass by pass: what loop.c moved out, what stayed, why
   scope.py FILE.c giv           loop strength reduction: each induction value, loop.c's benefit and decision
   scope.py FILE.c pre           gcse's PRE replacements: expression, where it is computed and inserted, the
@@ -5421,6 +5422,40 @@ def gcse_input_insns(wd, func):
     return len(re.findall(r"^\((?:insn|jump_insn|call_insn)(?:/[a-z]+)? ", text, re.M))
 
 
+def body_offset_loads(wd, func):
+    """Offsets the function body loads into a register before adding them to a pointer, by source line:
+    {(file, line): count}, counted in gcse's input. expand_binop (optabs.c) forces a constant outside
+    -255..255 into a register when expensive optimizations are on, so `p->field` at a large offset is two
+    insns there. In an inline copy integrate.c's try_constants folds the constant back into the add (one
+    insn, fact 31), so each one moved into an inline helper lowers N by one with the same final code."""
+    path = os.path.join(wd, "u.i.addressof")
+    if not os.path.exists(path):
+        return {}
+    text = dump_section(open(path).read(), dump_func(wd, func))
+    loads, used, where = {}, set(), None
+    for blk in re.split(r"\n(?=\()", text):
+        m = re.match(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("([^"]*)"\) (\d+)\)', blk)
+        if m:
+            where = (os.path.basename(m.group(1)), int(m.group(2)))
+            continue
+        m = re.match(r"\(insn (\d+) ", blk)  # an inline copy's insns print as insn/i
+        if not m:
+            continue
+        one = " ".join(blk.split())
+        c = re.search(r"\(set \(reg:SI (\d+)\) \(const_int (-?\d+)\)\)", one)
+        if c and abs(int(c.group(2))) > 255:
+            loads[int(c.group(1))] = where
+            continue
+        a = re.search(r"\(set \(reg(?:/v)?:SI \d+\) \(plus:SI \(reg(?:/v)?:SI \d+\) \(reg:SI (\d+)\)\)\)", one)
+        if a and int(a.group(1)) in loads:
+            used.add(int(a.group(1)))
+    out = {}
+    for r in used:
+        if loads[r]:
+            out[loads[r]] = out.get(loads[r], 0) + 1
+    return out
+
+
 def pre_table_size(n):
     """The bucket count alloc_expr_hash_table (gcse.c) picks for N insns."""
     return max(11, n // 2) | 1
@@ -5628,16 +5663,44 @@ def pre_order_report(wd, func, chain, src=None, full=False):
         out.append(f"  no table size within {t0}+-240 gives the order with these pseudo numbers")
     if res["tail"]:
         out.append(f"  every T >= {res['tail']} gives it too (no bucket wraps there)")
+    def left_out():
+        lines = []
+        if full and (unmodeled or skipped):
+            for p, e, b, rtl in unmodeled:
+                lines.append(f"  left out: {p} (expression {e}, bucket {b}) {rtl[:70]}: hash not modeled")
+            if skipped:
+                lines.append(f"  left out: {', '.join(label(p) for p in skipped)}: not PRE's (expand-time"
+                             " variables, numbered before every PRE pseudo, or evicted later)")
+        return lines
+
+    if res["t_only"]:
+        t = min(res["t_only"], key=lambda t: abs(t - t0))
+        out.append(f"  smallest: no renumbering, only the insn count: {ns(t)} at gcse gives T {t}."
+                   " Compile it before trusting it: a change moves N, the expression indices and the"
+                   " bases at once.")
+        movable = [i for i in range(len(bases)) if i not in fixed]
+        if movable:
+            lo = movable[0]
+            ds = [d for d in range(-200, 201) if bases[lo] + d > (bases[lo - 1] if lo else 0)
+                  and pre_order_ok(keyed, t, [0 if i < lo else d for i in range(len(bases))])]
+            if ds:
+                out.append(f"    at T {t} the bases from {label(bases[lo])} on may all move by d {fmt_ranges(ds)}"
+                           " (C before them all renumbers them together)")
+        out.extend(pre_n_levers(wd, func, unit, n0, pre_table_insns(t)))
+        # a cut is only news at a table size the same pseudos cannot use
+        res["cuts"] = [x for x in res["cuts"] if x[2] not in res["t_only"]]
+        if not res["cuts"] or not full:
+            return out + left_out()
     if not res["cuts"]:
         out.append("  no single renumbering (one base and all later ones moved by up to 200, T within +-60)"
                    " gives it: the order needs two changes or a different expression index order")
-        return out
+        return out + left_out()
     by_cut = {}
     for c, d, t in res["cuts"]:
         by_cut.setdefault(c, []).append((d, t))
     best = sorted(res["cuts"], key=lambda x: (abs(x[1]) + abs(x[2] - t0) // 2, abs(x[1])))
     out.append("  one renumbering cut (each base from the named one on gets d more pseudos), T within"
-               f" {t0}+-60:")
+               f" {t0}+-60" + (", at the table sizes the same pseudos cannot use:" if res["t_only"] else ":"))
     shown = 0
     for c in sorted(by_cut, key=lambda c: min(abs(d) + abs(t - t0) // 2 for d, t in by_cut[c])):
         per_t = {}
@@ -5654,16 +5717,30 @@ def pre_order_report(wd, func, chain, src=None, full=False):
         if not full and shown >= 4:
             break
     c, d, t = best[0]
-    out.append(f"  smallest: the C before {label(bases[c], True)} makes {abs(d)} {'more' if d > 0 else 'fewer'}"
-               f" pseudos, with {ns(t)} insns at gcse (T {t}). Compile it before trusting it: a change"
-               " moves N, the expression indices and the bases at once.")
-    if full and (unmodeled or skipped):
-        for p, e, b, rtl in unmodeled:
-            out.append(f"  left out: {p} (expression {e}, bucket {b}) {rtl[:70]}: hash not modeled")
-        if skipped:
-            out.append(f"  left out: {', '.join(label(p) for p in skipped)}: not PRE's (expand-time"
-                       " variables, numbered before every PRE pseudo, or evicted later)")
-    return out
+    if not res["t_only"]:
+        out.append(f"  smallest: the C before {label(bases[c], True)} makes {abs(d)} {'more' if d > 0 else 'fewer'}"
+                   f" pseudos, with {ns(t)} insns at gcse (T {t}). Compile it before trusting it: a change"
+                   " moves N, the expression indices and the bases at once.")
+        out.extend(pre_n_levers(wd, func, unit, n0, pre_table_insns(t)))
+    return out + left_out()
+
+
+def pre_n_levers(wd, func, unit, n0, want):
+    """Lines saying how to reach WANT (lo, hi) insns into gcse without changing the final code: the
+    function body's large field offsets, each one insn fewer inside an inline helper (fact 31)."""
+    if n0 is None or not want or want[1] >= n0:
+        return []
+    need = n0 - want[1]
+    loads = {k: v for k, v in body_offset_loads(wd, func).items() if not unit or k[0] == unit}
+    if not loads:
+        return []
+    total = sum(loads.values())
+    lines = sorted(loads.items(), key=lambda kv: kv[0][1])
+    shown = ", ".join(f"{ln}" + (f" ({v})" if v > 1 else "") for (_, ln), v in lines[:40])
+    return [f"  fewer insns, the same code: the function body loads {total} large field offset(s) into a"
+            " register before the add, two insns each into gcse; in an inline helper integrate.c folds the"
+            f" offset into the add (one insn, fact 31). {need} or more fewer reach it. Lines: {shown}"
+            + (" ..." if len(lines) > 40 else "")]
 
 
 def fmt_ranges(values):
