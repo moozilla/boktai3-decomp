@@ -3,7 +3,7 @@
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabled, u32 excluded)
 {
-    register struct SceneActorRegistryActor *actor asm("r3") = input;
+    struct SceneActorRegistryActor *actor = input;
     u32 maskDisabled = disabled;
     register u32 maskExcluded asm("r9") = excluded;
     register u32 offset asm("r1") = 0x2d4;
@@ -31,7 +31,7 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabl
 void SceneActorRegistry_ResetCategoryControl(void)
 {
     struct SceneActorRegistryNode *node;
-    register struct SceneActorRegistryActor *actor asm("r3");
+    struct SceneActorRegistryActor *actor;
     SceneActorRegistry_GetManager();
     node = gSceneActorRegistryNode;
     actor = node->actor;
