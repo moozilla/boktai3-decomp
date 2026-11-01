@@ -1,19 +1,14 @@
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: see scope (184 ROM / 198 draft insns differ, was 240 / 251)
-// Open: global alloc must run the kind switch value before `e` (AGBCC_PRI on
-// the kind pseudo +21 leaves 11 differing insns). In the draft the kind's life
-// spans three PRE insertions (the name, row and anim addresses) at the end of
-// the switch block; the ROM's is shorter. Also open: a dead halfword-insertion
-// zero (`movs r7, #0`) inside the `flags |= 1` after TerrainModifiers_RegisterCell,
-// which keeps `follow` in r5 and the route in sb; and Anim_SetSequence loading
-// `sequence` before the row. Work files: build/depin/w/no.
 #include "terrain_cell_probe.h"
 #include "display_animation.h"
-#include "actor_attachment_sprite_playback.h"
+#include "player_cue_sequence.h"
 #include "player.h"
 #include "ram.h"
+/* Packed so that flag updates store through a field insertion. */
+struct NamedObjectFlags {
+    u16 value;
+} __attribute__((packed, aligned(2)));
 struct NamedObjectSprite {
     u32 flags;
     u8 pad4[3];
@@ -39,7 +34,7 @@ struct NamedObject {
     u8 pad58[0x5C];
     s16 index;
     u16 state;
-    s16 flags;
+    struct NamedObjectFlags flags;
     u8 fieldBA, fieldBB;
     u16 fieldBC, fieldBE, fieldC0, fieldC2;
     u32 fieldC4, fieldC8, fieldCC;
@@ -92,7 +87,7 @@ void Player_SetPositionAndSave(void *, void *);
 void TetherActor_SetPosition(void *);
 void TetherActor_AddStatusFlags(s32, u32);
 void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *, struct NamedObject *);
-u8 NamedObject_IsWithinSpriteBounds(void *, void *, s32);
+u8 NamedObject_IsWithinSpriteBounds(void *, void *, s32, s32);
 void NamedObject_TryCapturePlayer(void);
 void NamedObject_ClampTetherAtBarrier(void);
 void NamedObject_UpdateTerrainRegistration(void);
@@ -100,13 +95,14 @@ void NamedObject_UpdateEntryTrigger(void);
 void NamedObject_ClampTetherToPlatform(void);
 void NamedObject_ConstrainPlayer(void);
 void NamedObject_ConstrainTether(void);
-static inline void ClearFlag(s32 mask, s16 *flags)
+static inline void SetFlagComponent(struct NamedObjectFlags *field, u16 bits)
 {
-    *flags &= ~mask;
+    field->value = bits | field->value;
 }
-static inline void SetFlag2(u16 mask, u16 *flags)
+static inline void ClearFlagComponent(struct NamedObjectFlags *field, u32 bits)
 {
-    *flags = mask | *flags;
+    u32 mask = ~bits;
+    field->value = mask & field->value;
 }
 static inline s32 optionalValue(void)
 {
@@ -135,7 +131,7 @@ void NamedObject_CreateFromScript(void)
     e = NamedObject_AllocateSlot(manager);
     if (!e)
         return;
-    e->flags = sequence;
+    e->flags.value = sequence;
     e->fieldBC = sequence;
     sprite = &e->sprite;
     if (Script_SeekToKeyword('r')) {
@@ -146,7 +142,7 @@ void NamedObject_CreateFromScript(void)
     }
     e->kind = Script_GetKeywordValue('k', 0);
     if (Script_GetKeywordValue('O', 0))
-        SetFlag2(0x2000, (u16 *)&e->flags);
+        SetFlagComponent(&e->flags, 0x2000);
     if (Script_SeekToKeyword('Y')) {
         s32 height;
         readOptional(&e->heightLow);
@@ -155,10 +151,10 @@ void NamedObject_CreateFromScript(void)
         if (e->kind == 2) {
             if (height == e->heightLow) {
                 sprite->y = height;
-                ClearFlag(2, &e->flags);
+                ClearFlagComponent(&e->flags, 2);
             } else if (height == e->heightHigh) {
                 sprite->y = height;
-                SetFlag2(2, (u16 *)&e->flags);
+                SetFlagComponent(&e->flags, 2);
             }
         } else
             sprite->y = e->heightLow;
@@ -241,8 +237,8 @@ void NamedObject_CreateFromScript(void)
             break;
     }
     Sprite_Init(sprite, e->anim, 0);
-    Anim_SetSequence(&e->sequence, manager->sequences, sequence, e->row & 0xFF, 0);
-    ActorAttachment_StepSprite((struct ContactSwarmSprite *)sprite, &e->sequence);
+    Anim_SetSequence(&e->sequence, manager->sequences, (u16)sequence, e->row & 0xFF, 0);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)sprite, &e->sequence);
     sprite->flags &= ~1;
     sprite->field7 = 2;
     {
@@ -254,9 +250,9 @@ void NamedObject_CreateFromScript(void)
     }
     sprite->x -= 0x100;
     if (Script_GetKeywordValue('d', 0))
-        SetFlag2(0x80, (u16 *)&e->flags);
+        SetFlagComponent(&e->flags, 0x80);
     if (Script_GetKeywordValue('F', 0))
-        SetFlag2(0x1000, (u16 *)&e->flags);
+        SetFlagComponent(&e->flags, 0x1000);
     e->fieldBA = 0;
     e->fieldC2 = 0;
     follow = Script_GetKeywordValue('f', 0);
@@ -274,7 +270,7 @@ void NamedObject_CreateFromScript(void)
         NamedObject_ClearAttachmentFlag(manager->field1370, 0);
         manager->field1370 = e->name;
         Player_AddAttachmentFlags((*(u8 **)gPlayers), 1, e->name);
-        SetFlag2(8, (u16 *)&e->flags);
+        SetFlagComponent(&e->flags, 8);
         {
             u8 *p = *(u8 **)gPlayers + 0x701;
             u32 v = *p;
@@ -284,14 +280,14 @@ void NamedObject_CreateFromScript(void)
         }
         cell = cellIndexAt((struct Pos16 *)&e->body.x);
         TerrainModifiers_RegisterCell(e->body.field48, cell, 0, e->body.height >> 8, 0xFF, 4);
-        SetFlag2(1, (u16 *)&e->flags);
+        SetFlagComponent(&e->flags, 1);
         Player_SetPositionAndSave((*(u8 **)gPlayers), &e->body.x);
         if (follow == 2) {
             TetherActor_SetPosition(&e->body.x);
             NamedObject_ClearAttachmentFlag(manager->field1374, 1);
             manager->field1374 = e->name;
             TetherActor_AddStatusFlags(3, e->name);
-            SetFlag2(0x10, (u16 *)&e->flags);
+            SetFlagComponent(&e->flags, 0x10);
         }
     }
     NamedObject_SnapTetherToPlatform(manager, e);
@@ -300,12 +296,10 @@ void NamedObject_CreateFromScript(void)
         case 0:
         case 1:
         case 3:
-            if (NamedObject_IsWithinSpriteBounds(e->fieldF4, &e->body.x, (s16)e->fieldBE))
+            if (NamedObject_IsWithinSpriteBounds(e->fieldF4, &e->body.x, (s16)e->fieldBE,
+                                                 (s16)e->fieldBE))
                 e->state = 3;
             break;
     }
     e->fieldBB = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", NamedObject_CreateFromScript);
-#endif
