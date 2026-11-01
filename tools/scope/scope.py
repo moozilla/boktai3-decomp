@@ -1601,6 +1601,43 @@ def reg_nums(text):
     return out
 
 
+REG_TOKEN = re.compile(r"\b(?:r\d+|sb|sl|fp|ip|sp|lr|pc)\b")
+
+
+def register_twin(rows, row):
+    """The ROM row a '+' row stands for when the listing shows them as '-' and '+' only because the
+    alignment counts high registers (`mov ip, r2` against `mov sb, r2`): in the run of '-' rows next to
+    the run of '+' rows holding ROW, the one at the same position, or else the only one, with the same
+    text once registers are set aside. None if there is none."""
+    if not row or row.get("tag") != "+" or row.get("rom") or not row.get("draft"):
+        return None
+    idx = next((i for i, r in enumerate(rows) if r is row), None)
+    if idx is None:
+        return None
+    shape = REG_TOKEN.sub("R", row["draft"])
+
+    def run(i, tag, step):
+        out = []
+        while 0 <= i < len(rows) and rows[i]["tag"] == tag:
+            out.append(i)
+            i += step
+        return out
+    lo = idx
+    while lo - 1 >= 0 and rows[lo - 1]["tag"] == "+":
+        lo -= 1
+    hi = idx
+    while hi + 1 < len(rows) and rows[hi + 1]["tag"] == "+":
+        hi += 1
+    pos = idx - lo
+    for minus in (run(lo - 1, "-", -1)[::-1], run(hi + 1, "-", 1)):
+        same = [j for j in minus if rows[j]["rom"] and REG_TOKEN.sub("R", rows[j]["rom"]) == shape]
+        if pos < len(minus) and minus[pos] in same:
+            return rows[minus[pos]]
+        if len(same) == 1:
+            return rows[same[0]]
+    return None
+
+
 def moved_rows(rows, window=8):
     """{index: partner index} for a '+' row and a '-' row with the same text close together: the
     same instruction at another position (an order difference), not a missing or extra one."""
@@ -2091,6 +2128,12 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
             print(f"    to flip the order (priority = floor_log2(refs) * refs / live * 10000; flow counts refs"
                   f" inside loops weighted by depth): " + "; or ".join(flip_levers(nm, pseudo, rec, top, recs[top], wd)))
             print(f"    what-if: AGBCC_PRI={kref(wd, func, pseudo)}:+{recs[top][2] - rec[2] + 1} or AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
+            fl = live_lengths(wd, "flow").get(pseudo)
+            if fl and rec[4] == 2 * fl and has_equiv_note(wd, pseudo) and g_priority(rec[3], fl) > recs[top][2]:
+                print(f"    its doubled life alone decides it: without the equivalence it would rank"
+                      f" {g_priority(rec[3], fl)} against {recs[top][2]}. what-if: AGBCC_NOEQUIV={pseudo} (no REG_EQUIV,"
+                      f" no doubling; the random table often needs this, see fact 20 and"
+                      f" notes/opus-charged-burst-spark_2026-10-31.md)")
         else:
             print(f"    lever: raise {nm(pseudo)}'s priority above theirs (more uses or a shorter life), or end"
                   f" the overlap; what-if: AGBCC_PRI={kref(wd, func, pseudo)}:+N or AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
@@ -4110,8 +4153,13 @@ def cmd_why(src, func, uid, env, via=None):
     code = srclines[ln - 1].strip() if ln and ln <= len(srclines) else ""
     print(f"why insn {uid}  line {ln}: {code}")
     if row:
-        print(f"  ROM: {row['rom'] or '(none)'}   draft: {row['draft']}   [{'same' if row['tag'] == '=' else 'differs'}]")
-        rr, dr = reg_nums(row["rom"]), reg_nums(row["draft"])
+        twin = register_twin(rows, row)
+        rom_text = row["rom"] or (twin["rom"] if twin else None)
+        print(f"  ROM: {rom_text or '(none)'}   draft: {row['draft']}   [{'same' if row['tag'] == '=' else 'differs'}]")
+        if twin:
+            print(f"  (the listing shows them as '-' and '+' because high registers count in its alignment; the"
+                  f" ROM's {twin['rom']} at {twin['rom_addr']} is this insn with other registers)")
+        rr, dr = reg_nums(rom_text), reg_nums(row["draft"])
         hmap = hard_of(wd)
         pre = next((r for u, _, r in insn_list(wd, "lreg") if u == uid), None)
         for a, b in zip(rr, dr):
@@ -5006,6 +5054,7 @@ def cmd_hoist(src, func, env):
     fnames = (func, rom_name(src, func))
     names, lines = pseudo_names(wd, info["obj_name"]), uid_lines(wd)
     passes, cur = [], None
+    merged = {}  # (pass, uid) -> [uids of equal invariants combine_movables folded into it]
     for ln in tr.splitlines():
         m = re.match(r"loopopt fn=(\w+)", ln)
         if m:
@@ -5014,6 +5063,11 @@ def cmd_hoist(src, func, env):
                 passes.append(cur)
             continue
         if cur is None:
+            continue
+        m = re.match(r"match fn=\w+ insn=(\d+) regno=\d+ into=(\d+) savings=(\d+) lifetime=(\d+)", ln)
+        if m:
+            merged.setdefault((len(passes), int(m.group(2))), []).append(tuple(map(int, (m.group(1), m.group(3),
+                                                                                        m.group(4)))))
             continue
         m = re.match(r"cand fn=\w+ loop=(\d+) insn=(\d+) regno=(\d+) may_not=(\d) maybe_never=(\d) used_before=(\d)"
                      r" in_block=(\d) set_in_loop=(\d+) invariant=(\d)", ln)
@@ -5033,11 +5087,17 @@ def cmd_hoist(src, func, env):
             if uid in last:
                 need = cnt * (2 if once else 1)
                 ok = done or t * sv * life >= need
-                last[uid]["move"] = (ok, f"{t} x {sv} x {life} {'>=' if ok else '<'} {need}", life)
+                test = f"{t} x {sv} x {life} {'>=' if ok else '<'} {need}"
+                also = merged.get((len(passes), uid), [])
+                if also:  # combine_movables summed them: what the first set scores alone
+                    sv1, life1 = sv - sum(a[1] for a in also), life - sum(a[2] for a in also)
+                    test += f"; alone {t} x {sv1} x {life1} {'>=' if t * sv1 * life1 >= need else '<'} {need}"
+                last[uid]["move"] = (ok, test, life)
     if not passes:
         sys.exit(f"no loop trace for {func}: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh), or it has no loop")
     print(f"{func}: {info.get('counts') or 'MATCH'}; loop invariants, {len(passes)} loop pass(es)"
           " (threshold x savings x lifetime >= insns moves it)")
+    joined = False
     for i, ps in enumerate(passes, 1):
         for loop, cands in ps.items():
             first = min(cands, key=lambda u: lines.get(u, 1 << 30)) if cands else None
@@ -5046,8 +5106,13 @@ def cmd_hoist(src, func, env):
             for uid, c in cands.items():
                 name = names.get(c["reg"], "")
                 what = f"line {lines.get(uid, '?'):>4}  insn {uid:>5}  pseudo {c['reg']}" + (f" `{name}`" if name else "")
-                if c["move"] and (c["move"][0] or c["move"][2] > 2):
+                also = merged.get((i, uid), [])
+                if also:  # the same invariant set again later: its savings and lifetime are in this test
+                    what += "  + equal set" + "s" * (len(also) > 1) + " " + ", ".join(
+                        f"insn {u} line {lines.get(u, '?')}" for u, _, _ in also)
+                if c["move"] and (c["move"][0] or c["move"][2] > 2 or also):
                     print(f"    {'moved' if c['move'][0] else 'kept '}  {what}  ({c['move'][1]})")
+                    joined |= bool(also) and c["move"][0]
                 elif c["why"]:
                     print(f"    stays  {what}  ({c['why']})")
                 else:
@@ -5056,6 +5121,11 @@ def cmd_hoist(src, func, env):
                 print(f"    ({quiet} more used once or twice: kept, or folded into the use)")
     print("  probe flips each hoist (AGBCC_NOMOVE=UID); a set the ROM keeps in the loop needs one of the"
           " 'stays' reasons in C (see probe's note).")
+    if joined:
+        print("  '+ equal set': combine_movables added a later set of the same invariant to this one's savings"
+              " and lifetime; apart, each may fail the test. To keep both in the loop, give the later one a"
+              " variable set before the loop and again before its use, after a branch in the body"
+              " (HealthRestoreEffect_StartParticleBurst's byteMask; docs/REGALLOC.md item 10).")
     if n:
         hoist_levers(src, func, env, passes, names, lines, n, info)
     return 0
