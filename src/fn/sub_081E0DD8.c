@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "display_sprite_playback.h"
 #include "game_state.h"
 #include "menu_parameters.h"
 
@@ -40,54 +41,6 @@ s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 #define GS_H(o) (*(s16 *)((u8 *)gGameState + (o)))
 #define GS_W(o) (*(s32 *)((u8 *)gGameState + (o)))
 
-static inline void StepAnim(struct GameStartAnim *a, struct GameStartSprite *s)
-{
-    const volatile u16 *entry = a->data + a->frame;
-
-    s->frame = *entry >> 6;
-    {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 1;
-        if ((mask & input) != (((*entry & 0x30) >> 4) & mask))
-            s->flags |= 4;
-        else
-            s->flags &= ~4;
-    }
-    {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        if ((u8)(mask & input) != (((*entry & 0x30) >> 4) & mask))
-            s->flags |= 8;
-        else
-            s->flags &= ~8;
-    }
-    if ((u16)++a->timer >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8)
-                    a->timer = a->rate;
-                else
-                    a->frame = a->count - 1;
-            } else {
-                a->frame--;
-            }
-        } else if ((u16)++a->frame >= a->count) {
-            if ((u8)(a->flags & 8)) {
-                a->timer = a->rate;
-                a->frame = a->count - 1;
-            } else {
-                a->frame = 0;
-            }
-        }
-        entry = a->data + a->frame;
-        a->factor = *entry & 15;
-        a->rate = (a->factor * a->scale) >> 6;
-        if (a->rate == 0)
-            a->rate = 1;
-    }
-}
-
 // Tentative: draws the Game Start save summary (name, region, play time, level, labels).
 void GameStart_DrawSaveInfo(u8 *p)
 {
@@ -122,7 +75,8 @@ void GameStart_DrawSaveInfo(u8 *p)
         }
         idx = 0;
         Anim_SetSequence(p + 0x4bc, *(void **)(p + 0x4ec), seqs.seq[idx], 0, 0);
-        StepAnim((struct GameStartAnim *)(p + 0x4bc), (struct GameStartSprite *)(p + 0x474));
+        PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)(p + 0x474),
+                                    (struct DisplaySequenceState *)(p + 0x4bc));
         W(0x474) &= ~1;
         for (i = 0; i <= 11; i++) {
             Bg_SetTilemapEntry(3, i + 8, 6, names[idx][i], 0, 2);
