@@ -10,13 +10,6 @@ void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
 void Anim_SetSequence(void *, void *, u32, u8, u8);
 void Anim_RestartSequence(void *, void *, u32, u8, u8);
 void Anim_SetDurationScale(void *, u32);
-static inline u8 TestMask2(struct TentacleSegmentAnimation *p, u32 mask)
-{
-    register u32 m asm("r1") = mask;
-    if (*(volatile u8 *)&p->status & m)
-        return 1;
-    return 0;
-}
 static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
 {
     u32 f = p->status;
@@ -142,7 +135,7 @@ void TentacleBody_ResetDirectionalAnimations(u8 *input, s32 inputKind)
     s = (void *)(body + 0x3d4);
     do {
         if (!TestMask(a, 1)) {
-            if (TestMask2(a, 4)) {
+            if (TentacleSegment_HasStatus(a, 4)) {
                 TentacleBody_GetDirectionFrame((a->direction + 128) & 255, &frame.row,
                                                &frame.flags);
                 Anim_SetSequence(a, ScriptAt(body, offset), 1, frame.row, frame.flags);
