@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
@@ -40,7 +39,7 @@ static inline u32 LastRandom(void)
     gRandomIndex = index;
     {
         u32 offset = index * 2;
-        register const u16 *lastTable asm("r3") = gRandomTable;
+        const u16 *lastTable = (const u16 *)RANDOM_TABLE_ADDR;
         return *(const u16 *)(offset + (u32)lastTable);
     }
 }
@@ -53,8 +52,7 @@ static inline s32 Truncate(s32 value)
 static inline s32 Scaled(s32 value, s32 speed)
 {
     s32 sample = value;
-    register s32 magnitude asm("r2") = speed;
-    asm("" : : "r"(sample), "r"(magnitude));
+    s32 magnitude = speed;
     return Truncate(sample * magnitude);
 }
 // confidence=low: creates a randomized radial spark with optional palette selection.
@@ -97,11 +95,9 @@ s32 BurstSpark_Create(const struct SparkPosition *position, s32 priority, s32 de
     p->mode = mode;
     {
         s32 test = palette;
-        asm("" : "+r"(test));
         if (test > 0) {
             void *anim = sprite->animation;
-            register s32 bank asm("r2") = palette;
-            asm("" : : "r"(anim), "r"(bank));
+            s32 bank = palette;
             AnimData_SelectPaletteBank(anim, bank + 0x153);
         }
     }

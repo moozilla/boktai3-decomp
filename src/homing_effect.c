@@ -585,11 +585,7 @@ static inline u32 randomValue(s32 reverse)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    if (reverse) {
-        register u16 *table asm("r2") = gRandomTable;
-        return *(u16 *)(offset + (u32)table);
-    }
-    return *(u16 *)(offset + (u32)gRandomTable);
+    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 static inline s32 scale(s32 input)
 {
