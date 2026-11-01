@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
 #include "player_cue_sequence.h"
@@ -27,13 +26,16 @@ void Player_UpdateOddDirectionPose(struct Player *p)
     Player_ConsumeStateEntry(p);
     if ((s16)p->directionHistory[0] >= 0) {
         u8 *facing = &p->facing;
-        asm("" : : "r"(facing));
-        p->facing = (p->directionHistory[0] & 254) + 1;
+        *facing = (p->directionHistory[0] & 254) + 1;
         if (p->facing > 4) {
-            p->heading = (8 - p->facing) >> 1;
+            s32 heading = (8 - p->facing) >> 1;
+            u8 *slot = &p->heading;
+            *slot = heading;
             p->side = 1;
         } else {
-            p->heading = p->facing >> 1;
+            u32 heading = p->facing >> 1;
+            u8 *slot = &p->heading;
+            *slot = heading;
             p->side = 0;
         }
     }

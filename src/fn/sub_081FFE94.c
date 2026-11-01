@@ -1,6 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "player_cue_sequence.h"
 struct HomingVec {
     s16 x, y, z, pad;
 };
@@ -69,13 +69,9 @@ extern const s16 gUnk_086149C4[];
 void HomingProjectile_CreateManager(void);
 struct HomingSlot *HomingProjectile_FindFreeSlot(struct HomingManager *, s32 *);
 void HomingProjectile_SetBehaviorCallback(struct HomingParams *, void *);
-void Memory_Copy(void *, const void *, s32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 void Collider_SetPosition(void *, void *, u32);
-s32 AnimData_Load(void *, s32);
-void *ScriptProc_Start(u16, u16);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
 void Sprite_LinkToList(void *, u32);
 
 static inline s32 Scale(s32 x)
@@ -84,105 +80,12 @@ static inline s32 Scale(s32 x)
 }
 static inline void Vector(struct HomingVec *v, s32 angle, s32 inScale)
 {
-    register s32 scale asm("r6") = inScale;
+    s32 scale = inScale;
     v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * scale);
     v->y = 0;
     {
         s32 sample = gUnk_086149C4[angle & 255];
         v->z = Scale(sample * scale);
-    }
-}
-
-static inline void StepSequence(struct HomingSprite *sprite, struct HomingSequence *state)
-{
-    const volatile u16 *command;
-    u32 duration, flags, bit;
-    command = state->commands + state->index;
-    sprite->frame = *command >> 6;
-    {
-        u32 input = state->flags;
-        register u32 first asm("r1");
-        register u32 maskBit asm("r3") = 1;
-        bit = maskBit;
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r1");
-        bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                } else {
-                    state->index = index - 1;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        state->index = frameCount - 1;
-                    } else {
-                        state->index = 0;
-                    }
-                }
-            }
-            command = state->commands + state->index;
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
-        }
     }
 }
 
@@ -256,27 +159,12 @@ s32 HomingProjectile_Spawn(struct HomingParams *params, struct HomingVec *positi
     else
         *second = 0;
     Anim_SetSequence(&p->sequence, p->resource, (u16)sequence, flips[0], *saved);
-    StepSequence(&p->sprite, &p->sequence);
-    {
-        register u32 offset asm("r2") = 0x10c;
-        struct HomingSprite *sprite;
-        asm("" : "+r"(offset));
-        sprite = (void *)((u8 *)p + offset);
-        sprite->flags &= ~1;
-        Sprite_LinkToList(sprite, 0);
-    }
-    {
-        register u32 offset asm("r3") = 0x113;
-        register u8 *priority asm("r1");
-        asm("" : "+r"(offset));
-        priority = (u8 *)p + offset;
-        *priority = 2;
-    }
-    {
-        u32 bit = 1 << index;
-        register struct HomingManager *held asm("r4") = m;
-        held->activeMask |= bit;
-    }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->sprite,
+                           (struct DisplaySequenceState *)&p->sequence);
+    p->sprite.flags &= ~1;
+    Sprite_LinkToList(&p->sprite, 0);
+    p->sprite.priority = 2;
+    m->activeMask |= 1 << index;
     m->count++;
     return index;
 }

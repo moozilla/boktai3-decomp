@@ -991,7 +991,10 @@ Each was read from the compiler source and confirmed on a live draft.
    now prints the lever on each aligned `ands` pair whose tied operand differs (a constant
    in one, the value in the other), also when both read `ands r0, r1` with the registers'
    roles swapped (Vanargand_UpdatePartLeap's terrain mask); the opposite case asks for the
-   value first.
+   value first. The same holds for `orrs` (the hint covers it too): SceneActors_UpdatePeriodicEffectAction's hold
+   flag matched as `u32 value = *flags; u32 mask = 4; mask |= value; *flags = mask;`. Reading
+   the value first also matters there: with `mask = 4` declared before the load, the
+   `movs` came ahead of the `ldrb` (the ROM loads first, then the constant).
 34. **A struct halfword `|=` is a field insertion; through a `u16 *` it is not.**
    `s->f |= mask` on a `u16` struct member expands to 21 RTL insns: the ior, then a store
    as `(old & 0) | new` with a `(set (reg:HI) (const_int 0))`; through a pointer
@@ -1047,6 +1050,18 @@ Each was read from the compiler source and confirmed on a live draft.
    Fact 33's constant-first lever needs a constant that dies at the and. When the draft's
    constant lives on (a later and reads it, or reload loads it there as a spilled pseudo),
    scope's hint names this fact instead.
+
+38. **Exactly three local quantities in a block are not sorted by priority.** block_alloc
+   (local-alloc.c) sorts two or three qtys by hand, but its `qty_compare (0, 1)` and
+   `qty_compare (1, 2)` compare qty numbers (birth order), not the `qty_order` entries it
+   exchanges. With three, only the orders 0-1-2, 0-2-1 and 2-1-0 are reachable: when qty 1
+   outranks qty 0 the two swaps of 0 and 1 cancel, and the first-born value takes r0 ahead of
+   a higher-priority one. Two qtys, or four and more (qsort), go by priority. In
+   PlayerCue_UpdateFacingPose's branches the dir load, the `8 - dir` chain and the facing
+   address were three qtys, so dir got r0 and the chain r1 (the ROM: chain r0); AGBCC_PRI on
+   the chain does nothing, AGBCC_FORCE matches. Storing facing through a block-local pointer
+   and flip through a plain field store left four qtys per branch and the function matched with
+   no pin. `why` prints the order used and the order by priority for such a block.
 
 ## Survey: random table as a literal address (2026-10-24)
 

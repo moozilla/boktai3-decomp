@@ -1031,8 +1031,11 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
             continue
         print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes the {tied}'s register, the draft's"
               f" `{rows_json[i]['draft']}` the other operand's. "
-              + ("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
-                 if tied == "constant" else "Write the value first: `m = v & K;`")
+              + (("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
+                  if tied == "constant" else "Write the value first: `m = v & K;`")
+                 if rows_json[i]["rom"].startswith("ands") else
+                 ("Load the value, then write the constant first: `u32 v = x; u32 m = K; m |= v; x = m;`"
+                  if tied == "constant" else "Write the value first: `m = v | K;`"))
               + " (README fact 33)")
     for i, ln, reg in arg_order_hints(rows_json):
         print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
@@ -1630,6 +1633,49 @@ def alloc_records(wd, func):
     return out
 
 
+def small_sort_order(pris):
+    """local-alloc's allocation order for a block's qtys, given their priorities by qty number.
+    block_alloc sorts 2 or 3 qtys by hand, but its qty_compare(0, 1) and qty_compare(1, 2) compare qty
+    numbers, not the entries of qty_order being exchanged; 4 or more go through qsort (priority, then
+    qty number). Returns (order used, order by priority)."""
+    n = len(pris)
+    real = sorted(range(n), key=lambda q: (-pris[q], q))
+    order = list(range(n))
+    cmp = lambda a, b: pris[b] - pris[a]
+    if n == 3:
+        if cmp(0, 1) > 0:
+            order[0], order[1] = order[1], order[0]
+        if cmp(1, 2) > 0:
+            order[2], order[1] = order[1], order[2]
+    if n in (2, 3) and cmp(0, 1) > 0:
+        order[0], order[1] = order[1], order[0]
+    return (order if n in (2, 3) else real), real
+
+
+def small_sort_note(wd, func, blk):
+    """A note when BLK has exactly three local qtys and local-alloc's hand sort (small_sort_order)
+    allocates them in a different order than their priorities give."""
+    func = dump_func(wd, func)
+    path = os.path.join(wd, "names.txt")
+    qtys = {}
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if p[0] == "L" and p[1] == func and int(p[2]) == blk:
+            qtys.setdefault(int(p[4]), (int(p[3]), int(p[5]), p[11] if len(p) > 11 else "-"))
+    if len(qtys) != 3 or sorted(qtys) != [0, 1, 2]:
+        return None
+    used, real = small_sort_order([qtys[q][1] for q in range(3)])
+    if used == real:
+        return None
+    say = lambda order: ", ".join(f"{qtys[q][0]}{'' if qtys[q][2] == '-' else ' ' + qtys[q][2]}"
+                                  f" (priority {qtys[q][1]})" for q in order)
+    return (f"    block {blk} has exactly three local quantities. block_alloc sorts so few by hand, and its"
+            f" qty_compare(0, 1) / (1, 2) compare qty numbers, not the entries it swaps (local-alloc.c), so they"
+            f" are allocated as {say(used)} instead of by priority ({say(real)}). A fourth local value in"
+            f" the block (for example a store through a block-local pointer), or one fewer, gives a real sort"
+            f" (fact 38)")
+
+
 def conflicts(wd):
     """pseudo -> (pseudo conflicts, hard-register conflicts), from global-alloc's dump."""
     out = {}
@@ -1735,19 +1781,20 @@ def last_write(texts, i, reg, window=8):
 
 
 def and_tie_hints(rows):
-    """[(row index, line, tied, shared)] where the ROM's `ands rA, rB` writes the register holding
-    the constant and the draft's writes the value (or the other way round): the and's tied operand
-    differs, which the C operand order decides (README fact 33). Identical text counts too, when
-    the registers' roles differ. SHARED is set when the ROM keeps the constant's register and the
-    draft's constant lives on past the and: the line of a later and that reads its register again,
-    or "reload" when reload loads it there (a spilled pseudo, which regmove did not tie to, so it
-    does not die here). regmove cannot tie to such a constant whatever the operand order
+    """[(row index, line, tied, shared)] where the ROM's `ands rA, rB` (or `orrs`) writes the
+    register holding the constant and the draft's writes the value (or the other way round): the
+    tied operand differs, which the C operand order decides (README fact 33). Identical text counts
+    too, when the registers' roles differ. SHARED is set when the ROM keeps the constant's register
+    and the draft's constant lives on past the and: the line of a later and that reads its register
+    again, or "reload" when reload loads it there (a spilled pseudo, which regmove did not tie to,
+    so it does not die here). regmove cannot tie to such a constant whatever the operand order
     (README fact 37)."""
     rom = [r["rom"] for r in rows]
     dr = [r["draft"] for r in rows]
     out = []
     for i, r in enumerate(rows):
-        if not (r["rom"] or "").startswith("ands ") or not (r["draft"] or "").startswith("ands "):
+        op = (r["rom"] or "").split(" ", 1)[0]
+        if op not in ("ands", "orrs") or (r["draft"] or "").split(" ", 1)[0] != op:
             continue
         a, b = (reg_nums(r["rom"]) + [None, None])[:2]
         p, q = (reg_nums(r["draft"]) + [None, None])[:2]
@@ -2332,6 +2379,9 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
               f" it got {rname(got)}, the ROM has {rname(want)}.")
+        note = small_sort_note(wd, func, blk)
+        if note:
+            print(note)
     else:
         print(f"    {nm(pseudo)} has no allocation record; it got {rname(got)}, the ROM has {rname(want)}.")
     if rec and rec[0] == "G" and rec[6] != got:

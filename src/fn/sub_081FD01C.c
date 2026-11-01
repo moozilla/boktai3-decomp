@@ -1,6 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "player_cue_sequence.h"
 #include "engine_globals.h"
 
 #define PROJECTILE_RANDOM_TABLE ((const u16 *)0x0203B400)
@@ -83,9 +83,6 @@ void Projectile_SetBehaviorCallback(struct Params *, void *);
 void Memory_Copy(void *, const void *, s32);
 void Collider_SetAttackProperties(void *, s32, s32, u32, u32, s32);
 void Collider_SetPosition(void *, void *, u32);
-void Collider_Refresh(void *);
-s32 AnimData_Load(void *, u32);
-void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_LinkToList(void *, u32);
 void *ScriptProc_Start(u16, u16);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
@@ -99,120 +96,6 @@ static inline s32 Truncate(s32 v)
     return -((-v) >> 12);
 }
 
-/* Apply packed frame/flip commands, then advance the sequence timer once. */
-static inline void StepPlayback(struct Entry *e, struct Obj *sprite, struct Anim *state)
-{
-    struct Obj *copy = sprite;
-    const volatile u16 *command;
-    u32 duration, flags, bit;
-    {
-        u32 offset = state->frame << 1;
-        const volatile u16 *table;
-        table = e->anim.data;
-        command = (const volatile u16 *)((u32)table + offset);
-    }
-    sprite->frame = *command >> 6;
-    {
-        u32 input = state->flags;
-        register u32 first asm("r1");
-        register u32 maskBit asm("r3") = 1;
-        bit = maskBit;
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        register u32 bit asm("r3");
-        register u32 first asm("r1");
-        bit = 2;
-        first = bit;
-        first &= input;
-        first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit)) {
-            register u32 flags asm("r0") = copy->flags | 8;
-            register struct Obj *target asm("r2") = copy;
-            asm("" : "+r"(target));
-            target->flags = flags;
-        } else {
-            register struct Obj *target asm("r3") = copy;
-            target->flags &= ~8;
-        }
-    }
-    {
-        u32 elapsed = state->timer + 1;
-        register u32 mask asm("r6");
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
-        state->timer = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = state->rate;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->timer = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->frame;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->timer = savedDuration;
-                    } else {
-                        state->frame = state->count - 1;
-                    }
-                } else {
-                    state->frame = index - 1;
-                }
-            } else {
-                u32 index = state->frame + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->frame = index;
-                frameCount = state->count;
-                if ((index & mask) >= frameCount) {
-                    endFlag = 8;
-                    endFlag &= flags;
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->timer = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->frame = lastIndex;
-                        }
-                    } else {
-                        state->frame = 0;
-                    }
-                }
-            }
-            {
-                u32 offset = state->frame << 1;
-                const volatile u16 *table;
-                table = state->data;
-                command = (const volatile u16 *)((u32)table + offset);
-            }
-            state->factor = *command & 15;
-            {
-                register s32 weight asm("r1") = state->factor;
-                s32 speed;
-                speed = state->scale;
-                speed = (speed * weight) >> 6;
-                state->rate = speed;
-                if (!(u8)speed)
-                    state->rate = 1;
-            }
-        }
-    }
-}
-
-/* Variant 0 uses direction zero, variant 1 uses eight directions, and
- * variant 2 uses a random four-way sequence and the secondary collider. */
 s32 Projectile_SpawnAtPosition(struct Params *params, struct Pos *pos)
 {
     struct Behaviors behaviors = gUnk_0824FE28;
@@ -271,21 +154,21 @@ s32 Projectile_SpawnAtPosition(struct Params *params, struct Pos *pos)
         void *proc = ScriptProc_Start(0x922E, (u16)e->params.script);
         e->scriptProc = proc;
         if (e->params.variant == 0) {
-            q = (u8 *)&e->anim;
-            Anim_SetSequence(q, proc, (u16)e->params.sequence, 0, zero);
+            Anim_SetSequence(&e->anim, proc, (u16)e->params.sequence, 0, zero);
         } else if (e->params.variant == 1) {
             u32 var = (((u16)e->params.angle + 0x70) >> 5) & 7;
-            q = (u8 *)&e->anim;
-            Anim_SetSequence(q, proc, (u16)e->params.sequence, var, zero);
+            Anim_SetSequence(&e->anim, proc, (u16)e->params.sequence, var, zero);
         } else {
             u32 var;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             var = PROJECTILE_RANDOM_TABLE[gRandomIndex];
             var &= 3;
-            q = (u8 *)&e->anim;
-            Anim_SetSequence(q, proc, (u16)e->params.sequence, var, zero);
+            Anim_SetSequence(&e->anim, proc, (u16)e->params.sequence, var, zero);
         }
-        StepPlayback(e, o, (struct Anim *)q);
+        {
+            struct ContactSwarmSprite *sprite = (struct ContactSwarmSprite *)o;
+            PlayerCue_StepSequence(sprite, (struct DisplaySequenceState *)&e->anim);
+        }
     }
     e->speed = params->speed;
     e->priority = params->priority;
