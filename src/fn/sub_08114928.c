@@ -1,11 +1,5 @@
 #include "global.h"
 // confidence=low: profile-driven native effect motion and creation.
-#ifdef NONMATCHING
-// fuzzy: 90.6%
-// fix.py best (sweep after the inlined-insn fix)
-/* Open: the ROM masks the second group id with 0xFF (word load of the timer) where this
- * truncates, and the case-2 offset/constant temporaries swap r3/r4.
- * The u8/u16 form keeps the timer address from being shared with the first GroupId. */
 #include "actor_attachment_state.h"
 #include "ram.h"
 struct Vec {
@@ -64,8 +58,9 @@ void Sound_PlaySong(u32);
 static inline u32 GroupId(struct Manager *m, s32 group)
 {
     u32 frame = m->timer;
-    u32 mask = 255;
-    return (group & mask) | ((frame & mask) << 8);
+    u32 id = group & 255;
+    id |= (frame & 255) << 8;
+    return id;
 }
 // confidence=low: selects a sprite and motion state from an emission profile.
 s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec *velocity,
@@ -115,8 +110,10 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
             m->effects[i].active = 1;
             m->effects[i].state = 0;
             {
-                typeof(m->timer) v1 = m->timer;
-                m->effects[i].id = ((u8)group) | ((u16)(v1 << 8));
+                u32 frame = m->timer;
+                u32 id = group & 255;
+                id |= (frame & 255) << 8;
+                m->effects[i].id = id;
             }
             switch (profile->type) {
                 case 0:
@@ -133,13 +130,16 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                     m->effects[i].position.x += 0xc000;
                     m->effects[i].velocity.x += 0x5000;
                     m->effects[i].speed = m->effects[i].velocity.x >> 12;
-                    if (profile->threshold > 60) {
-                        s32 damage = profile->damage * 2;
-                        NativeEffect_InitDefaultCollider(&m->effects[i], sub_0811455C, damage);
-                    } else {
-                        s32 damage = profile->damage;
-                        NativeEffect_InitDefaultCollider(&m->effects[i],
-                                                         NativeEffect_OnColliderExpire, damage);
+                    {
+                        s32 damage;
+                        if (profile->threshold > 60) {
+                            damage = profile->damage * 2;
+                            NativeEffect_InitDefaultCollider(&m->effects[i], sub_0811455C, damage);
+                        } else {
+                            damage = profile->damage;
+                            NativeEffect_InitDefaultCollider(&m->effects[i],
+                                                             NativeEffect_OnColliderExpire, damage);
+                        }
                     }
                     NativeEffect_SetState(&m->effects[i], NativeEffect_UpdateLinearFlight);
                     Sound_PlaySong(0xcd);
@@ -177,7 +177,3 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
 
     return -1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", NativeEffect_CreateFromProfile);
-#endif

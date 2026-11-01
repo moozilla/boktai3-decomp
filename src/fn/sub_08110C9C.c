@@ -5,8 +5,11 @@
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Scrolls the tilemap panel horizontally and draws the newly exposed 8px column(s).
-// Remaining: original keeps case 0/2 zeros as literals, sets offset (r1) by movs and
-// tail-merges every DrawRegion call into one bl; here the cases keep separate calls.
+// Remaining (10/8 insns): jump2 cross-jumps every case's call into the last call
+// of case 3's two-column branch (the code that falls into the switch's end
+// label); here that call is followed by flow's (use 0) nop, so the tails
+// cross-jump into the one-column call instead (README fact 39). The do/while
+// around `cellWidth = 1` is a barrier and must go.
 struct TilemapPanel {
     u8 pad0[0x3c];
     s32 atEnd;
@@ -48,8 +51,9 @@ void sub_08110C9C(struct TilemapPanel *p)
     right = p->scrollX + 240;
     diff = p->drawnX - right;
     if (diff < 8) {
+        s32 column = p->scrollX >> 5;
         next = p->drawnX + 7;
-        if ((p->scrollX >> 5) > limit) {
+        if (column > limit) {
             next = p->drawnX;
             p->atEnd = 1;
         }

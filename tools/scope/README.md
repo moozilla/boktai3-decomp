@@ -1114,6 +1114,28 @@ Each was read from the compiler source and confirmed on a live draft.
    stopped the reversal by giving the counter a use. Scope's note "-g changes agbcc's code
    ... the -g compile MATCHES" is the sign of this pattern.
 
+41. **Setting a value again stops regmove's forward tie, so the and copies its other operand.**
+   When `x = a & b` and `a` dies there, fixup_match_1 (regmove.c, forward pass) scans ahead
+   to the insn where `x` dies and renames `x` to `a`. It stops when a later insn sets `x`
+   again (`reg_set_p (dst, p)`). The backward pass then finds no insn setting `a` in the
+   block. Its first operand that is still live afterwards (`copy_src`, here the 255 register,
+   needed again for the second and) is copied into the result. In
+   NativeEffect_CreateFromProfile the ROM has `movs r2, #0xff; adds r1, r2, #0; mov r3, sb;
+   ands r1, r3` for the second group id. `id = (group & 255) | ((frame & 255) << 8)` ties the
+   and to the dying group (`mov r2, sb; ands r2, r1`). `u32 id = group & 255;
+   id |= (frame & 255) << 8;` matched. A `mask & group` operand order cannot do it, because
+   cse puts the operand it knows is constant second (fold_rtx).
+
+42. **A variable assigned in two branches is not local, so local-alloc does not tie into it.**
+   local-alloc's combine_regs ties the dying input of `(set y (op x ...))` to `y` only when
+   `y` is local to one block (`reg_qty[sreg] != -1`). With `s32 damage = profile->damage * 2;`
+   in one branch and another `s32 damage = profile->damage;` in the other, each is local.
+   The ldrh pseudo ties into the shift, and both take the argument's r2 (`ldrh r2; lsls r2,
+   r2, #1`). The ROM's `ldrh r0, [r6, #6]; lsls r2, r0, #1` comes from one `s32 damage;`
+   declared before the `if` and assigned in both branches. That pseudo lives in two blocks,
+   so global alloc gets it (r2 through the copy), and the load takes the lowest free
+   register. This also moved NativeEffect_CreateFromProfile's case-2 offset from r4 to r3.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
