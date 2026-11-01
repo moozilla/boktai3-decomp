@@ -1,33 +1,15 @@
 #include "global.h"
 #include "scene_object.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
-static inline void scatter(u16 *coordinate, const u8 *random)
+static inline void scatter(u16 *coordinate, const u16 *sample)
 {
     s32 value = *coordinate - 128;
-    u32 noise = *random;
-    {
-        u32 result = value + noise;
-        *coordinate = result;
-    }
+    u32 noise = (u8)*sample;
+    *coordinate = value + noise;
 }
 
-static inline u32 edgeJitter(const u16 *random)
-{
-    u32 value = *random;
-    value &= 15;
-    return value;
-}
-
-static inline const u16 *scatterAddress(u32 index, const u16 *table)
-{
-    register u32 address asm("r2") = index * 2;
-    address += (u32)table;
-    asm("" : "+r"(address));
-    return (const u16 *)address;
-}
-
-// MATCHING_CONCESSION: register-pinning
 void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
 {
     struct SceneExtent size;
@@ -38,32 +20,21 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
     size.y = 0;
     size.z = 32;
     for (i = 0; i < 10; i++) {
-        u32 seed;
-        register const u16 *table asm("r3") = gRandomTable;
+        const u16 *table = gRandomTable;
         p = (u16 *)&point;
-        /* The two jitter samples are consumed before the next external call. */
-        seed = (gRandomIndex + 1) & 1023;
-        gRandomIndex = seed;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         point = *position;
         if (!(i & 1)) {
-            u32 index = (seed + 1) & 1023;
-            const u16 *random = (const u16 *)(index * 2 + (u32)table);
-            p[0] += offset + edgeJitter(random);
-            index = (index + 1) & 1023;
-            gRandomIndex = index;
-            random = scatterAddress(index, table);
-            scatter(&p[2], (u8 *)random);
+            p[0] += offset + (ParticleRandom_ReadDirectSample(table) & 15);
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            scatter(&p[2], &table[gRandomIndex]);
         } else {
-            register u32 index asm("r1") = (seed + 1) & 1023;
-            const u16 *random;
-            random = scatterAddress(index, table);
-            scatter(&p[0], (u8 *)random);
-            index = (index + 1) & 1023;
-            gRandomIndex = index;
-            random = (const u16 *)(index * 2 + (u32)table);
-            p[2] += offset + edgeJitter(random);
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            scatter(&p[0], &table[gRandomIndex]);
+            p[2] += offset + (ParticleRandom_ReadDirectSample(table) & 15);
         }
-        SceneParticleBurst_CreateWithPause(&point, 0, &size, 1, 3, 4);
+        table = 0;
+        SceneParticleBurst_CreateWithPause(&point, (s32)table, &size, 1, 3, 4);
     }
 }
 
