@@ -3781,8 +3781,6 @@ void TetherActor_UpdateDirectedEntryTransition(struct TetherActor *p)
         TetherActor_SetState(p, p->directedStep);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateDirectedMovement(struct TetherActor *actor)
 {
     if (actor->directedTimer == 30) {
@@ -3796,14 +3794,12 @@ void TetherActor_UpdateDirectedMovement(struct TetherActor *actor)
         actor->moving = 1;
     } else if (actor->directedTimer <= 29) {
         u32 angle;
-        register const s16 *table asm("r2");
         {
             u32 value = (actor->directedHeading + 5) & 7;
             angle = value << 5;
         }
-        table = gUnk_086149C4;
-        actor->position.x += scale(table[(angle + 64) & 255] * 5);
-        actor->position.z += scale(table[angle] * 5);
+        actor->position.x += scale(gUnk_086149C4[(angle + 64) & 255] * 5);
+        actor->position.z += scale(gUnk_086149C4[angle] * 5);
         actor->heading = actor->directedHeading;
     }
     if (--actor->directedTimer == 0) {
