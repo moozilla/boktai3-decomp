@@ -352,6 +352,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/monster-initializers_2026-10-30.md](../notes/monster-initializers_2026-10-30.md) | Monster initializer family: 17 exact matches | #matching #monster #compiler #structs #ram #data | 8 |
 | [notes/monster_init_primitives_2026-10-30.md](../notes/monster_init_primitives_2026-10-30.md) | Shared initializer script and terrain operations | *#scripts #text* | 5 |
 | [notes/monster_init_shared_groups_2026-10-30.md](../notes/monster_init_shared_groups_2026-10-30.md) | Shared monster initialization groups | *#actors* | 4 |
+| [notes/opus-actor-marker-fragments_2026-10-31.md](../notes/opus-actor-marker-fragments_2026-10-31.md) | ActorMarker_LaunchFragments (08181514): holdout | #matching #actor-marker #compiler #reload #local-alloc #combine #scope-gap | 8 |
 | [notes/opus-ratatosk-defeat_2026-10-31.md](../notes/opus-ratatosk-defeat_2026-10-31.md) | Ratatosk_UpdateDefeatSequence (081F4CF8): exact match | #matching #ratatosk #compiler #reload #addressing | 6 |
 | [notes/opus-ratatosk-init_2026-10-31.md](../notes/opus-ratatosk-init_2026-10-31.md) | Ratatosk_InitializeFromScript (081FAE0C): exact match | #matching #ratatosk #compiler #cse #reload #defaults | 7 |
 | [notes/opus-ratatosk-knockback_2026-10-31.md](../notes/opus-ratatosk-knockback_2026-10-31.md) | Ratatosk_UpdateKnockbackRecovery (081F5290): exact match | #matching #ratatosk #compiler #cse #combine #basic-blocks | 6 |
