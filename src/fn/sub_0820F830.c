@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "player_cue_sequence.h"
 #include "scene_vec.h"
 #include "engine_globals.h"
 struct PHVec {
@@ -16,11 +16,8 @@ struct PHTerrain {
 };
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-void *ScriptProc_Start(u32, u32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
 void OrangeSpine_InitCollider(void *);
 void OrangeSpine_TryFireAtPlayer(void);
 void OrangeSpine_UpdateDefeatEffect(void);
@@ -30,6 +27,20 @@ void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 #define H(o) (*(s16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
+/* The state callback, hit flag, facing, defeat flag and resource slot the script setup writes. */
+// confidence=low: field names follow FanCannon, whose setup tail this mirrors.
+struct OrangeSpineTail {
+    u8 pad0[0x108];
+    void (*update)(void);
+    u8 pad10c[0x22];
+    s16 hit;
+    u8 pad130[2];
+    u8 direction;
+    u8 pad133[0x17];
+    s16 dead;
+    u8 pad14c[0x24];
+    void *resource;
+};
 static inline s32 OrangeSpine_CellIndex(struct PHVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
@@ -37,114 +48,9 @@ static inline s32 OrangeSpine_CellIndex(struct PHVec *v)
         return 0;
     return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
 }
-static inline void OrangeSpine_StepAnimation(u8 *p, void *sprite, struct FanSeq *s)
-{
-    u32 flags, elapsed;
-    u32 duration;
-    register u32 mask asm("r7");
-    register u32 savedDuration asm("r4");
-    const volatile u16 *c = s->commands + s->index;
-    {
-        u32 frame;
-        register void *highSprite asm("r8") = sprite;
-        void *frameSprite;
-        frame = *c >> 6;
-        frameSprite = highSprite;
-        asm("" : "+r"(frameSprite));
-        *(u16 *)((u8 *)frameSprite + 0x10) = frame;
-    }
-    {
-        u32 input = s->flags, bit = 1;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            *(u32 *)(p + 0x24) |= 4;
-        else
-            *(u32 *)(p + 0x24) &= ~4;
-    }
-    {
-        u32 input = s->flags, bit = 2;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*c & 0x30) >> 4) & bit)) {
-            register u32 *f asm("r3") = sprite;
-            *f |= 8;
-        } else {
-            register u32 *f asm("r4") = sprite;
-            *f &= ~8;
-        }
-    }
-    elapsed = s->elapsed + 1;
-    s->elapsed = elapsed;
-    {
-        register u32 temp asm("r2") = 0xffff;
-        asm("" : "+r"(temp));
-        mask = temp;
-    }
-    duration = s->duration;
-    elapsed = (u16)elapsed;
-    savedDuration = duration;
-    asm("" : "+r"(savedDuration) : "r"(elapsed));
-    if ((u16)elapsed >= duration) {
-        s->elapsed = 0;
-        flags = s->flags;
-        if (flags & 4) {
-            u32 i = s->index;
-            if (!i) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold)
-                        s->elapsed = savedDuration;
-                    else
-                        s->index = s->count - 1;
-                }
-            } else
-                s->index = i - 1;
-        } else {
-            u32 i = s->index + 1, n;
-            s->index = i;
-            n = s->count;
-            if ((i & mask) >= n) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if ((u8)hold) {
-                        s->elapsed = duration;
-                        s->index = n - 1;
-                    } else
-                        s->index = 0;
-                }
-            }
-        }
-        c = s->commands + s->index;
-        s->weight = *c & 15;
-        {
-            register s32 w asm("r2") = s->weight;
-            s32 speed = s->speed;
-            speed = (speed * w) >> 6;
-            s->duration = speed;
-            if (!(u8)speed)
-                s->duration = 1;
-        }
-    }
-}
-
 s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
-    register void *sprite asm("r8");
-    void *earlySprite;
-    void **slot;
-    s32 found;
-    s32 dead;
-    s16 *dp;
     if (Script_SeekToKeyword('p')) {
         H(0x1c) = Script_GetValue();
         H(0x1e) = Script_GetValue();
@@ -218,56 +124,42 @@ s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
         H(0x144) = Script_GetValue();
         H(0x146) = Script_GetValue();
     }
-    found = Script_SeekToKeyword('V');
-    if (found) {
+    if (Script_SeekToKeyword('V')) {
         H(0x148) = Script_GetValue();
         if (H(0x148) > 99)
             H(0x148) = 99;
         if (H(0x148) <= 0)
             H(0x148) = 1;
     } else
-        H(0x148) = found;
+        H(0x148) = 0;
     *(void **)(p + 0x14c) = parent;
     AnimData_Load(p + 0x50, 0x7e7d);
-    earlySprite = p + 0x24;
-    Sprite_Init(earlySprite, p + 0x50, 1);
+    Sprite_Init(p + 0x24, p + 0x50, 1);
     *(struct SceneVec *)(p + 0x40) = *(struct SceneVec *)(p + 0x1c);
     AnimData_SelectPaletteBank(p + 0x50, 0x1c1);
     resource = ScriptProc_Start(0x922e, 0x5184);
-    slot = (void **)(p + 0x170);
-    *slot = resource;
-    dead = H(0x14a);
-    sprite = earlySprite;
-    if (dead == 0) {
-        *(void (**)(void))(p + 0x108) = OrangeSpine_TryFireAtPlayer;
-        Anim_SetSequence(p + 0x10c, resource, 0xe, *(u8 *)(p + 0x132), dead);
+    ((struct OrangeSpineTail *)p)->resource = resource;
+    if (!((struct OrangeSpineTail *)p)->dead) {
+        ((struct OrangeSpineTail *)p)->update = OrangeSpine_TryFireAtPlayer;
+        Anim_SetSequence(p + 0x10c, resource, 0xe, ((struct OrangeSpineTail *)p)->direction, 0);
     } else {
-        *(void (**)(void))(p + 0x108) = OrangeSpine_UpdateDefeatEffect;
-        {
-            u32 zero;
-            s16 *q = &H(0x12e);
-            zero = 0;
-            *q = 1;
-            asm("" : : : "memory");
-            Anim_SetSequence(p + 0x10c, *slot, 0x10, *(u8 *)(p + 0x132), zero);
-        }
+        ((struct OrangeSpineTail *)p)->update = OrangeSpine_UpdateDefeatEffect;
+        ((struct OrangeSpineTail *)p)->hit = 1;
+        Anim_SetSequence(p + 0x10c, ((struct OrangeSpineTail *)p)->resource, 0x10,
+                         ((struct OrangeSpineTail *)p)->direction, 0);
     }
-    OrangeSpine_StepAnimation(p, sprite, (struct FanSeq *)(p + 0x10c));
-    {
-        register u32 off asm("r3") = 0x14a;
-        asm("" : "+r"(off));
-        dp = (s16 *)(p + off);
-    }
-    if (*dp == 0)
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)(p + 0x24),
+                           (struct DisplaySequenceState *)(p + 0x10c));
+    if (!((struct OrangeSpineTail *)p)->dead)
         OrangeSpine_InitCollider(p);
-    if (W(0x16c) && *dp == 0) {
+    if (W(0x16c) && !((struct OrangeSpineTail *)p)->dead) {
         s32 cell = OrangeSpine_CellIndex((struct PHVec *)(p + 0x40));
         TerrainModifiers_RegisterCell(p + 0x174, cell, 0, H(0x42) >> 8, 0, 1);
     }
     if (H(0x142)) {
         u8 *body = p + 0xc0;
         SceneBody_Init(body, *(void **)(p + 0x14c), p + 0x40, 0, 4, p);
-        SceneBody_SetSprite(body, sprite);
+        SceneBody_SetSprite(body, p + 0x24);
         TerrainOverlay_QueueAddActor(body);
     }
 }
