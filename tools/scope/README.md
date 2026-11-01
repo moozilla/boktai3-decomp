@@ -149,6 +149,9 @@ python3 tools/scope/scope.py FILE.c preorder [FUNC]  the ROM's order of PRE's sp
 python3 tools/scope/scope.py FILE.c hoist [FUNC]  loop-invariant motion pass by pass: what loop.c moved out, what stayed, and why;
                                                   then for each hoisted variable it scores the dead re-set before the loop's closing brace
 python3 tools/scope/scope.py todo [N] [addr|prior|size]   functions with no C yet, in ROM order (default) or by prior art/size
+python3 tools/scope/scope.py twins [N] [all]     every draft (all: also no C) with its closest matched relative by like's ranking,
+                                                  best first: twin >= 0.75 similarity, near >= 0.45 covering >= 40%,
+                                                  * marks a relative with pins (its de-pinned C fixes both)
 python3 tools/scope/scope.py new FUNC             open FUNC: build/scope/work/FUNC.c (its unit with a stub, or a like twin's C)
 python3 tools/scope/scope.py land FUNC [--name N] [--rom] [--nonmatching] [--allow-pins]   put the draft into src/ and check it
 python3 tools/scope/scope.py rename FUNC NEW      functions.csv plus every C spelling of the old name or sub_ label
