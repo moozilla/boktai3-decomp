@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: contact healing updates health feedback and selects a recovery phase.
 #define SceneActorControl_ApplyRecoveryContact sub_08082648
 #include "scene_actor_control_phase.h"
@@ -221,8 +220,8 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
     zero = TestMotion(motion, 8);
     if (zero) {
         PhaseStart(a, 2, 1);
-        asm("" : "+r"(a));
-        Set32(LocalState(a), 4);
+        Set32((struct SceneActorControlState *)((struct RecoveryContextView *)a)->controlAddress,
+              4);
     } else {
         SetMotion(motion, 8);
         SetStatus(a, 0x100);
