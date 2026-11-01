@@ -35,7 +35,9 @@ def split_source(text, func_names):
     m = None
     ends = []
     for name in func_names:
-        for m2 in re.finditer(r"^[^\n;#]*\b" + re.escape(name) + r"\s*\([^;{]*\)\s*\{", text, re.M):
+        # a definition's head has no braces, parentheses or operators before the name: this keeps
+        # `} else if (!FUNC(a, b)) {` (a call in a later function) from counting as one
+        for m2 in re.finditer(r"^[^\n;#{}()=!&|]*\b" + re.escape(name) + r"\s*\([^;{]*\)\s*\{", text, re.M):
             if m is None:
                 m = m2
             ends.append(body_end(text, m2.end() - 1))
