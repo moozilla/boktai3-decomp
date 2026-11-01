@@ -1,11 +1,12 @@
 # BouncingObject_TickActive
 
-The active callback clears sprite flag bit zero. Its distance check uses a
-stack displacement, while the bounce, movement and collider updates use the
-sprite position. It retains the starting cell for comparison with the proposed
-cell and preserves sequence timing when switching the blink animation.
+All 1,584 bytes match with stock agbcc. Gravity reads the signed sprite height
+before querying the terrain. After that test, the handler keeps the sprite
+position and velocity pointers separately across the bounce and wall checks.
+The candidate position adds velocity to position in a packed vector.
 
-The guarded C scores 74.3% over the reviewed 1,584-byte extent, up from 45.1%.
-The candidate emits 1,592 bytes. Seventy realigned instructions still differ
-after ignoring register choices. The original independently keeps the input
-object, sprite position and animation-delay address live through these phases.
+The two colliders use the object-owned position. A blink changes the sequence
+but preserves its elapsed time and command index before advancing the shared
+player-cue playback routine.
+
+Tags: #matching #round9b #bouncing-object

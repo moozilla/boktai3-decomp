@@ -6,96 +6,14 @@
 
 void Sound_PlaySong(u32 song);
 
-#ifdef NONMATCHING
-// fuzzy: 74.3%
-void BouncingObject_TickActive(struct BouncingPool *pool, struct BouncingObject *input)
+static inline void UpdateCollidersAndAnimation(struct BouncingObject *obj,
+                                               struct ContactSwarmSprite *sprite,
+                                               struct BouncingPool *pool,
+                                               struct ContactPosition *position)
 {
-    struct BouncingObject *obj = input;
-    u16 currentCell;
-    s32 currentGround;
-    u8 *delay;
-    struct ContactPosition rel;
-    union {
-        struct ContactPackedVector packed;
-        struct ContactPosition position;
-    } candidate;
-    struct ContactPosition *pos;
-    struct ContactPosition *velocity = &obj->velocity;
-    struct DisplaySequenceState *seq;
-    s32 cell, ground, nextGround, speed, dist2, delayIndex, timer;
-    u32 cellFlags;
-    u16 savedElapsed, savedIndex;
-    u8 *animationSlot;
-    struct ContactPosition *position;
-
-    if (obj->enter) {
-        obj->sprite.flags &= ~1;
-        obj->stateFrame = 0;
-        obj->enter = 0;
-    }
-    position = &obj->sprite.position;
-    cell = SceneActorTerrain_GetCellIndex(position);
-    obj->mapCell = cell;
-
-    if (obj->flags & 1) {
-        s32 y = obj->sprite.position.y;
-        ground = SceneActorTerrain_GetHeight(obj->mapCell, &obj->sprite.position);
-        pos = &obj->sprite.position;
-        if ((u32)y > (u32)ground)
-            obj->velocity.y -= 4;
-    } else {
-        SceneActorTerrain_Subtract(&rel, &obj->origin, &input->sprite.position);
-        dist2 = rel.x * rel.x + rel.z * rel.z;
-        pos = &input->sprite.position;
-        if (dist2 <= 0x3ffff || obj->stateFrame > 8) {
-            obj->flags |= 1;
-            obj->velocity.y -= 4;
-        }
-    }
-    currentCell = obj->mapCell;
-    Math_Atan2(velocity->x, velocity->z);
-    currentGround = SceneActorTerrain_GetHeight(currentCell, &input->sprite.position);
-    if (velocity->x + velocity->z + velocity->y != 0) {
-        if (pos->y <= currentGround) {
-            velocity->x = Div(6 * velocity->x, 10);
-            velocity->y = -Div(4 * velocity->y, 10);
-            velocity->z = Div(6 * velocity->z, 10);
-            speed = velocity->x + velocity->z + velocity->y;
-            if (speed < 0)
-                speed = -speed;
-            if (speed > 2) {
-                Sound_PlaySong(0x166);
-            } else {
-                velocity->x = 0;
-                velocity->y = 0;
-                velocity->z = 0;
-            }
-            pos->y = currentGround;
-        }
-        candidate.packed.x = velocity->x + pos->x;
-        candidate.packed.y = velocity->y + pos->y;
-        candidate.packed.z = velocity->z + pos->z;
-        cell = SceneActorTerrain_GetCellIndex(&candidate.position);
-        nextGround = SceneActorTerrain_GetHeight(cell, &candidate.position);
-        cellFlags = ((u16 *)SceneActorTerrain_GetCell(cell))[1];
-        if (cell != currentCell) {
-            if (currentGround < nextGround ||
-                (((u16 *)SceneActorTerrain_GetCell(cell))[1] & 3) != 0) {
-                velocity->x = -Div(5 * velocity->x, 10);
-                velocity->z = -Div(5 * velocity->z, 10);
-                Sound_PlaySong(0x166);
-            }
-        }
-        if ((nextGround <= 0 || (cellFlags & 0x40)) && candidate.position.y <= nextGround) {
-            BouncingObject_ReleaseSlot(obj);
-            goto collider;
-        }
-        pos->x += velocity->x;
-        pos->y += velocity->y;
-        pos->z += velocity->z;
-    }
-
-collider:
+    s16 delayIndex;
+    u32 timer;
+    u32 savedElapsed, savedIndex;
     Collider_SetPosition(&obj->removalCollider, position, 0);
     if (obj->collisionDelay != 0) {
         obj->collisionDelay--;
@@ -103,40 +21,133 @@ collider:
         Collider_SetPosition(&obj->bodyCollider, position, 0);
         Collider_Refresh(&obj->bodyCollider);
     }
-    delay = &obj->animationDelay;
-    if (*delay) {
-        (*delay)--;
-        seq = &obj->sequence;
+    if (obj->animationDelay) {
+        obj->animationDelay--;
     } else {
         timer = obj->timer;
         if (timer <= 29)
             delayIndex = 3;
         else if (timer <= 49)
             delayIndex = 2;
-        else {
-            seq = &obj->sequence;
-            if (timer > 89)
-                goto playback;
+        else if (timer <= 89)
             delayIndex = 1;
-        }
+        else
+            goto playback;
         savedElapsed = obj->sequence.elapsed;
         savedIndex = obj->sequence.index;
-        animationSlot = &obj->animation;
-        if (*animationSlot == 1) {
-            seq = &obj->sequence;
-            Anim_SetSequence(seq, pool->sequenceResource, 2, 0, 0);
-            *animationSlot = 2;
+        if (obj->animation == 1) {
+            Anim_SetSequence(&obj->sequence, pool->sequenceResource, 2, 0, 0);
+            obj->animation = 2;
         } else {
-            seq = &obj->sequence;
-            Anim_SetSequence(seq, pool->sequenceResource, 1, 0, 0);
-            *animationSlot = 1;
+            Anim_SetSequence(&obj->sequence, pool->sequenceResource, 1, 0, 0);
+            obj->animation = 1;
         }
         obj->sequence.elapsed = savedElapsed;
         obj->sequence.index = savedIndex;
-        *delay = gBouncingObjectBlinkDelays[delayIndex];
+        obj->animationDelay = gBouncingObjectBlinkDelays[delayIndex];
     }
 playback:
-    PlayerCue_StepSequence(&input->sprite, seq);
+    PlayerCue_StepSequence(sprite, &obj->sequence);
+}
+static inline u32 TerrainBlockingFlags(s32 cell)
+{
+    u16 flags = ((u16 *)SceneActorTerrain_GetCell(cell))[1];
+    u32 mask = 3;
+    return flags & mask;
+}
+static inline s32 SumVelocity(const struct ContactPosition *velocity)
+{
+    s32 x = velocity->x, z = velocity->z, y = velocity->y;
+    return x + z + y;
+}
+void BouncingObject_TickActive(struct BouncingPool *pool, struct BouncingObject *input)
+{
+    struct BouncingObject *obj = input;
+    struct ContactSwarmSprite *sprite = &input->sprite;
+    u16 *cellPtr;
+    u16 currentCell;
+    s32 currentGround;
+    struct ContactPosition rel;
+    union {
+        struct ContactPackedVector packed;
+        struct ContactPosition position;
+    } candidate;
+    struct ContactPosition *pos;
+    struct ContactPosition *velocity;
+    s32 cell, ground, nextGround, speed, dist2;
+    u32 cellFlags;
+
+    if (obj->enter) {
+        obj->sprite.flags &= ~1;
+        obj->stateFrame = 0;
+        obj->enter = 0;
+    }
+    obj->mapCell = SceneActorTerrain_GetCellIndex(&obj->sprite.position);
+    if (obj->flags & 1) {
+        s32 height = sprite->position.y;
+        s32 oldCell = obj->mapCell;
+        struct ContactPosition *here = &sprite->position;
+        ground = SceneActorTerrain_GetHeight(oldCell, here);
+        if ((u32)height > (u32)ground)
+            obj->velocity.y -= 4;
+    } else {
+        struct ContactPosition *delta = &rel;
+        struct ContactPosition *here = &sprite->position;
+        struct ContactPosition *origin = &obj->origin;
+        SceneActorTerrain_Subtract(delta, origin, here);
+        dist2 = delta->x * delta->x + delta->z * delta->z;
+        if (dist2 <= 0x3ffff || obj->stateFrame > 8) {
+            obj->flags |= 1;
+            obj->velocity.y -= 4;
+        }
+    }
+
+    cellPtr = &obj->mapCell;
+    pos = &sprite->position;
+    velocity = &obj->velocity;
+    currentCell = *cellPtr;
+    Math_Atan2(velocity->x, velocity->z);
+    currentGround = SceneActorTerrain_GetHeight(currentCell, pos);
+    if (velocity->x + velocity->z + velocity->y != 0) {
+        if (pos->y <= currentGround) {
+            velocity->x = Div(6 * velocity->x, 10);
+            velocity->y = -Div(4 * velocity->y, 10);
+            velocity->z = Div(6 * velocity->z, 10);
+            speed = SumVelocity(velocity);
+            if (speed < 0)
+                speed = -speed;
+            if (speed <= 2) {
+                velocity->x = 0;
+                velocity->y = 0;
+                velocity->z = 0;
+            } else {
+                Sound_PlaySong(0x166);
+            }
+            pos->y = currentGround;
+        }
+        candidate.packed.x = pos->x + velocity->x;
+        candidate.packed.y = pos->y + velocity->y;
+        candidate.packed.z = pos->z + velocity->z;
+        cell = SceneActorTerrain_GetCellIndex(&candidate.position);
+        nextGround = SceneActorTerrain_GetHeight(cell, &candidate.position);
+        cellFlags = ((u16 *)SceneActorTerrain_GetCell(cell))[1];
+        if (currentCell != cell) {
+            if (currentGround < nextGround || TerrainBlockingFlags(cell) != 0) {
+                velocity->x = -Div(5 * velocity->x, 10);
+                velocity->z = -Div(5 * velocity->z, 10);
+                Sound_PlaySong(0x166);
+            }
+        }
+        if ((nextGround <= 0 || (cellFlags & 0x40)) && candidate.position.y <= nextGround) {
+            BouncingObject_ReleaseSlot(obj);
+        } else {
+            pos->x += velocity->x;
+            pos->y += velocity->y;
+            pos->z += velocity->z;
+        }
+    }
+
+    UpdateCollidersAndAnimation(obj, sprite, pool, &obj->sprite.position);
     obj->stateFrame++;
     if (obj->timer != 0) {
         obj->timer--;
@@ -145,6 +156,3 @@ playback:
         obj->enter = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", BouncingObject_TickActive);
-#endif
