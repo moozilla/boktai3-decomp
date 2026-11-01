@@ -1150,6 +1150,37 @@ Each was read from the compiler source and confirmed on a live draft.
    127 masks stayed in the `u16 mask` helper. `why` names this inheritance when a reload
    register the draft reused held an operand's REG_EQUIV constant.
 
+44. **A two-case switch is a linear chain; a third case label next to `default` gives the
+   tree.** balance_case_nodes (stmt.c) splits the sorted case list only when it has more than
+   two nodes. With cases 0 and K, emit_case_nodes tests them in order (`cmp 0; beq; cmp K;
+   beq`). The ROM's `cmp K; beq LK; cmp K; bgt default; cmp 0; bne default` is a three-node
+   list split at K, with the third node above K. When that node's label is the default code,
+   its own test folds into the `bgt`. sub_081C0CE4 matched with `case 0: ... case 1: ...
+   case 2: default: ...` and `case 0: ... case 4: ... case 5: default: ...`. Casting the index
+   to an enum type (no cost table) does not change a two-node list.
+
+45. **Loops that share one counter in the ROM share one variable in the C.** Each inlined copy
+   of a helper gets its own counter pseudo. A counter first set to a constant has its
+   priority doubled (update_equiv_regs), so a short loop's counter is allocated early and
+   takes the lowest free register. One function-level `i` used by every loop lives across
+   all of them and lands in a callee-saved register, the same one in each loop.
+   CollisionController_UpdateAll's two idle resets and its slot loop all count in r6. Writing
+   the resets out with the function's `i`, instead of calling a `resetIdle` helper twice,
+   matched it. The pin-free helper version gave i r2 and pushed manager from r7 to r6.
+   Related: a loop over `&manager->slots[i]` gets its pointers from loop.c (givs, created
+   after gcse). Explicit `p = manager->slots` initialisations exist before gcse, and PRE
+   hoists them into the reset paths.
+
+46. **Reload keeps what a register holds across a conditional branch, but not across a
+   label.** reload_as_needed forgets its inheritance only at a CODE_LABEL. Tests chained by
+   `goto no` or `||` fall through from one `bne` to the next test with no label between, so
+   reload builds the next field offset from the last one (`adds r2, #0x76`, `subs r3, #0x28`)
+   where the ROM loads it fresh (`ldr r2, =0x472`). Each `if (x) return 0;`, or each arm of an
+   else-if chain, starts the next test at the label of the skipped arm; jump2 deletes the label
+   after reload, so the layout is the same. TetherActor_CanStartInteraction lost three `r2`
+   clobbers this way. TetherActor_SelectInteractionState (`!enabled || statusFlags`) lost one by
+   testing the two fields in separate ifs that both set state 0 (cross-jumped into one call).
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

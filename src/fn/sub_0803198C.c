@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "player_cue_sequence.h"
 
 struct MsgTextState {
     u8 pad0[9];
@@ -15,31 +16,10 @@ struct MsgTextState {
     u32 values[1];
 };
 
-struct MsgAnim {
-    u16 *frames;
-    u8 flags;
-    u8 count;
-    u8 nibble;
-    u8 scaled;
-    u16 frameIdx;
-    u16 unkA;
-    u16 speed;
-    u16 counter;
-};
-
 struct MsgHdr {
     u32 w[8];
 };
 
-struct MsgSprite {
-    u32 flags;
-    u8 unknown4[3], priority;
-    u8 unknown8[8];
-    u16 frame;
-    u8 unknown12[0xA];
-    u16 x, y, z;
-    u8 unknown22[0xA];
-};
 struct MsgWin {
     u8 pad00[0x18];
     struct MsgTextState state;
@@ -64,8 +44,8 @@ struct MsgWin {
     u8 hdr[0x20];
     u8 widget[0x60];
     u8 animData[0x1C];
-    struct MsgSprite sprite;
-    struct MsgAnim anim;
+    struct ContactSwarmSprite sprite;
+    struct DisplaySequenceState anim;
     void *proc2C8;
     void (*fnDone)(void);
 };
@@ -81,69 +61,6 @@ void MessageWindow_ApplyPalette(void *);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 
-static inline void MessageWindow_StepSprite(struct MsgSprite *sprite, struct MsgAnim *a,
-                                            u32 inputBit)
-{
-    u32 bit = inputBit;
-    u16 *fr;
-    fr = a->frames + a->frameIdx;
-    sprite->frame = *fr >> 6;
-    {
-        u32 input = a->flags;
-        register u32 first asm("r1");
-        first = bit;
-        first &= input;
-        if (first != ((*fr & 0x30) >> 4 & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        u32 input = a->flags;
-        register u32 first asm("r1");
-        u32 bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != ((*fr & 0x30) >> 4 & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-    if (++a->counter >= a->scaled) {
-        a->counter = 0;
-        if (a->flags & 4) {
-            if (a->frameIdx == 0) {
-                if (a->flags & 8) {
-                    a->counter = a->scaled;
-                    goto update;
-                }
-                a->frameIdx = a->count - 1;
-            } else {
-                a->frameIdx--;
-            }
-        } else {
-            if (++a->frameIdx >= a->count) {
-                if (a->flags & 8) {
-                    a->counter = a->scaled;
-                    a->frameIdx = a->count - 1;
-                } else {
-                    a->frameIdx = 0;
-                }
-            }
-        }
-    update:
-        fr = a->frames + a->frameIdx;
-        a->nibble = *(const volatile u16 *)fr & 15;
-        a->scaled = (a->nibble * a->speed) >> 6;
-        if ((u8)a->scaled == 0)
-            a->scaled = 1;
-    }
-}
-
-// scope shape 41 (differences once low registers are set aside)
 // confidence=low: opens a message window from script keywords (bounds, palette, text source, value list) and starts its script, sprite and animation setup.
 int sub_0803198C(void *arg0, void *arg1)
 {
@@ -151,11 +68,8 @@ int sub_0803198C(void *arg0, void *arg1)
     struct MsgTextState *st;
     u32 buf[2];
     void *proc;
-    struct MsgAnim *a;
     s32 palette;
-    register struct MsgSprite *sprite asm("r8");
     u32 bufferMask;
-    register u32 bit;
     void (**fnSlot)(void);
 
     gMessageWindow = p;
@@ -225,19 +139,16 @@ int sub_0803198C(void *arg0, void *arg1)
     bufferMask = 0xFFFF0000;
     buf[0] = 0;
     buf[1] &= bufferMask;
-    Widget_InitLinked(p->widget, p->hdr, 0x3D, 0x3071, 0, (bit = 1), 0x3C, buf);
+    Widget_InitLinked(p->widget, p->hdr, 0x3D, 0x3071, 0, 1, 0x3C, buf);
     Anim_SetKeyframes(p->widget, p->hdr, 0, 1, 0);
     AnimData_Load(p->animData, 0x593A);
     p->proc2C8 = ScriptProc_Start(0x922E, 0x4BBF);
-    sprite = &p->sprite;
-    Sprite_Init(sprite, p->animData, 0x1051);
+    Sprite_Init(&p->sprite, p->animData, 0x1051);
     p->sprite.priority = 0;
     Anim_SetSequence(&p->anim, p->proc2C8, 0, 0, 0);
-    a = &p->anim;
-    asm("" : "+r"(bit));
-    MessageWindow_StepSprite(sprite, a, bit);
-    p->sprite.x = 4;
-    p->sprite.y = 0x40;
-    p->sprite.z = 0;
+    PlayerCue_StepSequence(&p->sprite, &p->anim);
+    p->sprite.position.x = 4;
+    p->sprite.position.y = 0x40;
+    p->sprite.position.z = 0;
     return 0;
 }

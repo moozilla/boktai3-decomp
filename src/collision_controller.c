@@ -1,4 +1,6 @@
 #include "collision_controller.h"
+#include "scene_actor_status.h"
+#include "display_sequence.h"
 /* CollisionController_ClearGlobal: Zeroes gCollisionManager; matches the ClearGlobal pattern already used by EffectManager_ClearGlobal and is hinted by the file's own #define. */
 #define CollisionController_ClearGlobal sub_08009E30
 // MATCHING_CONCESSION: register-pinning
@@ -98,21 +100,6 @@ static inline s32 globalMode(void)
     return yes;
 }
 
-static inline void resetIdle(struct CollisionManager *manager)
-{
-    u32 one = 1;
-    u8 *p = &manager->slots[0].mode;
-    register s32 i asm("r6") = 15;
-    do {
-        if (p[0] == 0) {
-            p[0] = 0;
-            *(u16 *)(p + 8) = 0;
-            p[5] = one;
-        }
-        p += 160;
-    } while (--i >= 0);
-}
-
 static inline u32 randomDelay(u32 restart)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -135,7 +122,6 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
     struct CollisionSprite *o;
     struct CollisionAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     u8 done;
     if (p->entered) {
         p->entered = 0;
@@ -171,25 +157,28 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
                 }
             }
             {
-                u32 input = a->flags;
-                register u32 left asm("r1") = firstMask;
-                left &= input;
-                if (left != (((*entry & 0x30) >> 4) & firstMask))
+                union DisplaySequenceControl control;
+                u32 bit, first;
+                control.raw = a->flags;
+                bit = firstMask;
+                first = (u8)(control.raw & bit);
+                if (first != (((*entry & 0x30) >> 4) & bit))
                     o->flags |= 4;
                 else
                     o->flags &= ~4;
             }
             {
-                register u32 input asm("r0") = a->flags;
-                u32 mask = 2;
-                u32 left = (u8)(mask & input);
-                if (left != (((*entry & 0x30) >> 4) & mask))
+                union DisplaySequenceControl control;
+                u32 bit, first;
+                control.raw = a->flags;
+                bit = 2;
+                first = (u8)(control.raw & bit);
+                if (first != (((*entry & 0x30) >> 4) & bit))
                     o->flags |= 8;
                 else
                     o->flags &= ~8;
             }
-            n = ++a->timer;
-            if (n >= a->rate) {
+            if (++a->timer >= a->rate) {
                 a->timer = 0;
                 if (a->flags & 4) {
                     if (a->frame == 0) {
@@ -247,7 +236,6 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
     struct CollisionSprite *o;
     struct CollisionAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     u8 done;
     struct SceneExtent effect;
     if (p->entered) {
@@ -284,25 +272,28 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
         }
     }
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -340,55 +331,43 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
     }
 }
 
-s32 CollisionController_UpdateAll(struct CollisionManager *input)
+s32 CollisionController_UpdateAll(struct CollisionManager *manager)
 {
-    struct CollisionManager *manager = input;
     s32 paused = 0;
     s32 i;
     struct CollisionSlot *p;
     u32 mode = gSunClock.mode;
-    s32 available;
-    if ((u8)(mode - 4) <= 1 || mode == 0)
-        goto pause;
-    if (gEngineFlags & 2048)
-        available = stateMode();
-    else {
-        struct Player *actor;
-        if (gWeatherCollisionTimer > 0)
-            goto pause;
-        actor = gPlayers[0];
-        if (actor) {
-            u32 *address = &actor->actionFlags;
-            u32 mask = 16;
-            if (*address & mask)
-                goto pause;
-        }
-        available = globalMode();
-    }
-    asm("" : : "r"(available));
-    if (available) {
-    pause:
+    if ((u8)(mode - 4) <= 1 || mode == 0 || ActorStatus_EnvironmentPaletteActive(0)) {
         paused = 1;
         if (manager->paused == 0)
-            resetIdle(manager);
-    } else if (manager->paused == 1)
-        resetIdle(manager);
-    manager->paused = paused;
-    asm("" : "+r"(manager) : : "r4", "r5", "r6");
-    {
-        register void **table asm("r9") = &gUnk_08604A00[0][0];
-        u32 row = paused * 12;
-        u8 *control = &manager->slots[0].mode;
-        p = manager->slots;
-        for (i = 15; i >= 0; control += 160, p++, i--)
-            if (control[3]) {
-                if (control[4])
-                    CollisionController_RemoveSlot(manager, p);
-                else {
-                    control[6] = 0;
-                    sub_08249240(manager, p, *(void **)(control[0] * 4 + row + (u32)table));
+            for (i = 0; i < 16; i++) {
+                struct CollisionSlot *slot = &manager->slots[i];
+                if (slot->mode == 0) {
+                    slot->mode = 0;
+                    slot->timer = 0;
+                    slot->entered = 1;
                 }
             }
+    } else if (manager->paused == 1)
+        for (i = 0; i < 16; i++) {
+            struct CollisionSlot *slot = &manager->slots[i];
+            if (slot->mode == 0) {
+                slot->mode = 0;
+                slot->timer = 0;
+                slot->entered = 1;
+            }
+        }
+    manager->paused = paused;
+    for (i = 0; i < 16; i++) {
+        p = &manager->slots[i];
+        if (p->active) {
+            if (p->finished)
+                CollisionController_RemoveSlot(manager, p);
+            else {
+                p->done = 0;
+                sub_08249240(manager, p, gUnk_08604A00[paused][p->mode]);
+            }
+        }
     }
     return 0;
 }

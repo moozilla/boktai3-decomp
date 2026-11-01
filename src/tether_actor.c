@@ -381,7 +381,7 @@ s32 TetherActor_SetHeadingEntry(struct TetherActor *actor, u32 entry);
 
 s32 TetherActor_SetCardinalEntry(struct TetherActor *actor, u32 unusedEntry);
 
-s32 TetherActor_SetEntry(struct TetherActor *input, u32 inputBase);
+s32 TetherActor_SetEntry(struct TetherActor *actor, u32 base);
 
 void TetherActor_ApplyPendingEffect(struct TetherActor *actor);
 
@@ -705,8 +705,6 @@ void TetherActor_UpdateShake(struct TetherActor *actor)
     ++actor->shakeFrame;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_EmitDirectionalEffect(struct TetherActor *input)
 {
     struct TetherActor *actor = input;
@@ -716,17 +714,12 @@ void TetherActor_EmitDirectionalEffect(struct TetherActor *input)
     s32 rawX;
     s32 scaledX;
     s32 scaledZ;
-    u32 highX;
-    u16 y;
     struct ContactPackedVector position, velocity, size;
     rawX = sourceTable[(angle + 64) & 255] * 100;
     table = sourceTable;
     scaledX = scaleEmission(rawX);
-    highX = (u32)((u16)actor->position.x + scaledX) << 16;
-    asm("" : "+r"(highX), "+r"(actor));
-    y = actor->position.y;
-    position.x = highX >> 16;
-    position.y = y;
+    position.x = actor->position.x + scaledX;
+    position.y = actor->position.y;
     scaledZ = scaleEmission(table[angle & 255] * 100);
     position.z = actor->position.z + scaledZ;
     velocity.x = scaleEmission(table[(angle + 64) & 255] * 10);
@@ -842,8 +835,6 @@ void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const
     AnimatedParticles_Create(1, &position, config);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateGlow(struct TetherActor *actor)
 {
     switch (actor->glowMode) {
@@ -860,8 +851,9 @@ void TetherActor_UpdateGlow(struct TetherActor *actor)
             if (actor->glowFrame <= 63)
                 frame = actor->glowFrame;
             else {
-                register s32 current asm("r0") = actor->glowFrame;
-                frame = 128 - current;
+                s32 current = actor->glowFrame;
+                frame = 128;
+                frame -= current;
             }
             actor->palette[1] = (frame * 31) >> 6;
             ++actor->glowFrame;
@@ -1087,20 +1079,12 @@ s32 TetherActor_SetCardinalEntry(struct TetherActor *actor, u32 unusedEntry)
     return DisplayAnimation_UpdatePlayback(display);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
-s32 TetherActor_SetEntry(struct TetherActor *input, u32 inputBase)
+s32 TetherActor_SetEntry(struct TetherActor *actor, u32 base)
 {
-    struct TetherActor *actor = input;
-    u32 base = inputBase;
-    register u32 kind asm("r0") = actor->kind;
     s32 result;
-    if (kind != 9) {
-        register u32 entry asm("r1") = kind;
-        asm("" : "+r"(entry));
-        entry = base + entry;
-        result = TetherActor_SetHeadingEntry(actor, entry);
-    } else
+    if (actor->kind != 9)
+        result = TetherActor_SetHeadingEntry(actor, base + actor->kind);
+    else
         result = TetherActor_SetCardinalEntry(actor, base);
     return result;
 }
@@ -1134,13 +1118,12 @@ u32 TetherActor_TestInteractionPath(struct TetherActor *p)
     return r;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_SelectInteractionState(struct TetherActor *actor)
 {
     actor->currentValue = actor->maximumValue;
-    asm("" ::: "r3");
-    if (!actor->interactionEnabled || actor->statusFlags)
+    if (actor->interactionEnabled == 0)
+        TetherActor_SetState(gTetherActor, 0);
+    else if (actor->statusFlags)
         TetherActor_SetState(gTetherActor, 0);
     else if (TetherActor_TestInteractionPath(actor))
         TetherActor_SetState(gTetherActor, 3);
@@ -1569,32 +1552,22 @@ void TetherActor_RequestPaletteBlend(u32 a)
         p->blendRequested = a;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 u32 TetherActor_CanStartInteraction(void)
 {
     struct TetherActor *actor = gTetherActor;
-    u32 result;
     if (!actor)
-        goto no;
+        return 0;
     if (actor->interactionLock)
-        goto no;
-    asm("" ::: "r2");
+        return 0;
     if (actor->blendRequested)
-        goto no;
-    asm("" ::: "r2");
+        return 0;
     if (actor->statusFlags)
-        goto no;
-    asm("" ::: "r2");
+        return 0;
     if (actor->interactionCooldown)
-        goto no;
+        return 0;
     if (actor->state <= 1 || ((u8)(actor->state - 3) <= 1 && actor->chargeReady))
-        result = 1;
-    else {
-    no:
-        result = 0;
-    }
-    return result;
+        return 1;
+    return 0;
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -2037,12 +2010,9 @@ void TetherActor_InitKindFromScript(struct TetherActor *actor, u32 entry)
 
 extern const u8 gUnk_08605A04[];
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
 {
     s32 value = Script_SeekToKeyword('r');
-    register u32 capacity asm("r0");
     if (value) {
         actor->interactionTarget.x = Script_GetValue();
         actor->interactionTarget.y = Script_GetValue();
@@ -2057,9 +2027,7 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
         actor->interactionScriptId = Script_GetValue();
     else
         actor->interactionScriptId = value;
-    capacity = gUnk_08605A04[actor->kind] * 120;
-    actor->maximumValue = capacity;
-    actor->currentValue = capacity;
+    actor->currentValue = actor->maximumValue = gUnk_08605A04[actor->kind] * 120;
     if (actor->kind == 2 || actor->kind == 9) {
         actor->interactionEnabled = 0;
         if ((u8)(actor->state - 3) <= 1)
@@ -2069,9 +2037,7 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
         if ((u8)(actor->state - 3) <= 1)
             TetherActor_SelectInteractionState(actor);
     }
-    capacity = gUnk_08605A04[actor->kind] * 60;
-    actor->secondaryMaximum = capacity;
-    actor->secondaryValue = capacity;
+    actor->secondaryValue = actor->secondaryMaximum = gUnk_08605A04[actor->kind] * 60;
     actor->recoveryDuration = 300;
     actor->recoveryTimer = 0;
 }
