@@ -1136,7 +1136,21 @@ Each was read from the compiler source and confirmed on a live draft.
    so global alloc gets it (r2 through the copy), and the load takes the lowest free
    register. This also moved NativeEffect_CreateFromProfile's case-2 offset from r4 to r3.
 
-43. **A two-case switch is a linear chain; a third case label next to `default` gives the
+43. **A constant variable is reloaded from its reload register; a 16-bit literal from its
+   home.** A pseudo set once to a constant gets a REG_EQUIV note, and reload replaces every
+   use of it by the constant (find_reloads), even when global alloc gave it a register.
+   When that register is high (`movs r3, #0x3f; mov sl, r3`), an and right after the set
+   needs a low register, and find_equiv_reg (reload.c) finds the reload insn that put 63 in
+   r3, so the draft's `ands r0, r3` copies nothing. The ROM's `mov r2, sl; ands r0, r2`
+   came from a constant made in another mode: a `& 63` narrowed by a 16-bit store or
+   bitfield is an HImode and, its literal becomes an HImode pseudo that cse shares among the
+   ands, and find_equiv_reg rejects the SImode copy of an HImode set, so each use reloads sl
+   afresh. ContactSequenceActor_UpdateDying matched once its `u32 xzMask = 63` became
+   literal `& 63`s, each store narrowed (`(u16)(... & 63)` for the u32 temporaries); the
+   127 masks stayed in the `u16 mask` helper. `why` names this inheritance when a reload
+   register the draft reused held an operand's REG_EQUIV constant.
+
+44. **A two-case switch is a linear chain; a third case label next to `default` gives the
    tree.** balance_case_nodes (stmt.c) splits the sorted case list only when it has more than
    two nodes. With cases 0 and K, emit_case_nodes tests them in order (`cmp 0; beq; cmp K;
    beq`). The ROM's `cmp K; beq LK; cmp K; bgt default; cmp 0; bne default` is a three-node
@@ -1145,7 +1159,7 @@ Each was read from the compiler source and confirmed on a live draft.
    case 2: default: ...` and `case 0: ... case 4: ... case 5: default: ...`. Casting the index
    to an enum type (no cost table) does not change a two-node list.
 
-44. **Loops that share one counter in the ROM share one variable in the C.** Each inlined copy
+45. **Loops that share one counter in the ROM share one variable in the C.** Each inlined copy
    of a helper gets its own counter pseudo. A counter first set to a constant has its
    priority doubled (update_equiv_regs), so a short loop's counter is allocated early and
    takes the lowest free register. One function-level `i` used by every loop lives across
@@ -1157,7 +1171,7 @@ Each was read from the compiler source and confirmed on a live draft.
    after gcse). Explicit `p = manager->slots` initialisations exist before gcse, and PRE
    hoists them into the reset paths.
 
-45. **Reload keeps what a register holds across a conditional branch, but not across a
+46. **Reload keeps what a register holds across a conditional branch, but not across a
    label.** reload_as_needed forgets its inheritance only at a CODE_LABEL. Tests chained by
    `goto no` or `||` fall through from one `bne` to the next test with no label between, so
    reload builds the next field offset from the last one (`adds r2, #0x76`, `subs r3, #0x28`)
