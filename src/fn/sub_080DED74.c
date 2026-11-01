@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_registry.h"
 
@@ -22,10 +21,10 @@ static inline u8 Unavailable(struct SceneActorRegistryActor *actor)
     }
     return 0;
 }
-static inline u8 HasPending(struct SceneActorRegistryActor *actor)
+static inline u8 HasPending(void **slot)
 {
     u32 mask = 1;
-    if (((struct SceneActorActionCooldown *)actor->context)->flags & mask)
+    if (((struct SceneActorActionCooldown *)*slot)->flags & mask)
         return 1;
     return 0;
 }
@@ -48,8 +47,6 @@ static inline void QueueAction(struct SceneActorRegistryActor *actor)
         u32 *flags;
         s32 mask;
         struct SceneActorActionCooldown *ctx;
-        /* Keep this context address separate from the pending-action test. */
-        asm("" : "+r"(actor));
         ctx = actor->context;
         flags = &ctx->flags;
         mask = -2;
@@ -85,7 +82,7 @@ void SceneActorControl_TickActionCooldown(struct SceneActorRegistryActor *actor)
         u32 *p = &cooldown->flags;
         *p |= one;
     }
-    if (HasPending(actor)) {
+    if (HasPending(&actor->context)) {
         QueueAction(actor);
     }
 }
