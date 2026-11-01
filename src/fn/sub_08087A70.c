@@ -1,29 +1,18 @@
 #define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH           1
 #define SCENE_ACTOR_CHASE_FRACTION_ACCESSOR        1
 #define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL     1
+#include "scene_actor_displacement.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "spark_particle.h"
 
 void sub_08087018(struct SceneActorRegistryResetView *, s32);
 
-static inline s32 Bat_QuarterDisplacement(s32 value)
-{
-    return value >= 0 ? value >> 2 : -(-value >> 2);
-}
-
 static inline u8 Bat_DisplacementStopped(s32 x, s32 z)
 {
     if (!x && !z)
         return 1;
     return 0;
-}
-
-static inline s32 Bat_ReadDisplacementAxis(s32 desired, s16 *current, s16 **field)
-{
-    s32 difference = desired - *current;
-    *field = current;
-    return Bat_QuarterDisplacement(difference);
 }
 
 /* Ease recoil displacement, then select route or pursuit recovery. */
@@ -69,8 +58,8 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
         SparkParticle_Spawn(&actor->body.position, count, (const struct ContactPosition *)&range,
                             actor->body.direction + 128, 10, 6, 2, 2);
     }
-    dx = Bat_ReadDisplacementAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
-    dz = Bat_ReadDisplacementAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    dx = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
+    dz = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
     if (dx > 200)
         dx = 200;
     else if (dx < -200)
