@@ -4053,7 +4053,7 @@ addr,name,mode,confidence,source,notes
 08100AD4,NamedObject_FindNearPosition,thumb,low,src-alias,
 08100BC8,NamedObject_AllocateSlot,thumb,low,src-alias,Reserves the first free named object slot among twelve and stores its index
 08100C18,NamedObject_EmitMovementTrail,thumb,low,src-alias,
-08100F28,NamedObject_IsWithinSpriteBounds,thumb,low,src-alias,Tests whether a position lies within supplied horizontal and vertical distances of sprite coordinates
+08100F28,NamedObject_IsWithinRoutePointBounds,thumb,high,src-alias,Compares the current route point to a world position using separate unsigned X and Z distance limits
 08100F60,NamedObject_StepTowardTarget,thumb,low,src-alias,
 081010E0,NamedObject_UpdateVerticalTravel,thumb,low,src-alias,
 08101340,NamedObject_UpdateMovementSound,thumb,low,src-alias,
