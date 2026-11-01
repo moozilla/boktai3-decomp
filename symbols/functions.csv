@@ -2862,6 +2862,7 @@ addr,name,mode,confidence,source,notes
 080771E4,SceneActorTerrain_DisableCollision,thumb,low,src-alias,
 08077288,SceneActorTerrain_ResumeDrawable,thumb,low,src-alias,
 080772C0,SceneActorPlacement_ResetActorState,thumb,low,src-alias,Resets route and behavior state according to the supplied mode or restores actor defaults; flag 0x800 prevents repeated processing
+08077444,SceneActorPlacement_ResetToPathPoint,thumb,low,src-alias,
 08077654,SceneActorPlacement_ConsumeCallbackFlag,thumb,low,src-alias,
 080776E4,SceneActorPlacement_ConsumeShakeFlags,thumb,low,src-alias,
 08077848,SceneActorPlacement_PlayVariantEventSound,thumb,low,src-alias,
