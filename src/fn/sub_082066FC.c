@@ -103,7 +103,7 @@ void VulcanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
             do {
                 u32 random;
                 u32 value;
-                u32 sample;
+                u16 sample;
                 u32 x;
                 frame.velocity = gUnk_0824FE7C;
                 frame.position = *src;
@@ -119,7 +119,7 @@ void VulcanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
                 random = HitSpark_NextIndex(random, limit);
                 *index = random;
                 {
-                    u32 last = HitSpark_Sample(value, random);
+                    u16 last = HitSpark_Sample(value, random);
                     x = pos->z - 0x40;
                     last &= mask;
                     x += last;
