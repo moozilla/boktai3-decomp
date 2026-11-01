@@ -8378,6 +8378,7 @@ addr,name,mode,confidence,source,notes
 081F0F68,SingletonSlot7_InitDisplaySprites,thumb,low,src-alias,
 081F1240,SingletonSlot7_RemoveSprites,thumb,low,src-alias,Removes the two embedded sprites during object destruction
 081F1260,SingletonSlot7_ResetDisplayState,thumb,low,src-alias,Clears the state byte at offset 0xAA and calls the display update helper; tentative display role
+081F1274,SingletonSlot7_UpdatePresentation,thumb,low,src-alias,Updates slot-seven collisions and palettes and handles particle bursts and damage feedback
 081F1B14,SingletonSlot7_Update,thumb,low,src-alias,
 081F1BF8,SingletonSlot7_OnDestroy,thumb,low,src-alias,Task destruction callback that stops sound and releases render nodes actor resources and sprites
 081F1C2C,SingletonSlot7_InitFromScript,thumb,low,src-alias,
