@@ -33,10 +33,6 @@ struct NavMeshRoute {
             }                                                                                      \
         }                                                                                          \
     }
-#define NAV_MESH_COLLECT_NEIGHBORS(node, regionTable, position, found, count, j, t)                \
-    do {                                                                                           \
-        NAV_MESH_GATHER_LINK_MEMBERS(node, regionTable, position, found, count, j, t);             \
-    } while (0)
 
 /* Advance from the slot that supplied the current destination node. */
 static inline s32 NavMesh_NextNodeSlot(s32 *currentSlot, s32 slot)
@@ -143,7 +139,7 @@ u32 NavMesh_FindRoute(void *route, void *origin, void *destination)
     for (i = 0; i <= 11 && originRegion->nodes[i] != 0xFF && originCount <= 5; i++) {
         struct NavMeshNode *node;
         NAV_MESH_GET_NODE(node, nodes, originRegion, i);
-        NAV_MESH_COLLECT_NEIGHBORS(node, regions, from, originRegions, originCount, j, t);
+        NAV_MESH_GATHER_LINK_MEMBERS(node, regions, from, originRegions, originCount, j, t);
     }
     for (i = 0; i < originCount; i++) {
         for (j = 0; j < destinationCount; j++) {
