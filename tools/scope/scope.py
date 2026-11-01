@@ -6077,6 +6077,33 @@ def pre_order_ok(items, t, shift=None):
     return True
 
 
+def pre_receiver_shifts(items, t):
+    """Modular raw-hash deltas on exactly one receiver that recover the requested slot order.
+
+    The field offsets, discovery indices, table size and other receivers stay fixed.
+    A delta represents a changed address expression, including one based on a different
+    component of the same object. It does not require renumbering an incoming parameter.
+    """
+    keys = [(raw % t, index) for raw, index, _ in items]
+    inversions = [{left[2], right[2]} for left, right, a, b in
+                  zip(items, items[1:], keys, keys[1:]) if a >= b]
+    if not inversions:
+        return {}
+    candidates = set.intersection(*inversions)
+    shifts = [0] * (max(base for _, _, base in items) + 1)
+    result = {}
+    for base in sorted(candidates):
+        deltas = []
+        for delta in range(1, t):
+            shifts[base] = delta
+            if pre_order_ok(items, t, shifts):
+                deltas.append(delta)
+        shifts[base] = 0
+        if deltas:
+            result[base] = deltas
+    return result
+
+
 def pre_order_search(items, bases, fixed, t0, t_window=60, d_window=200):
     """The ways the ROM's slot order can come out of the draft's PRE expressions.
     ITEMS: [(raw hash, index, base position)] in ROM slot order; BASES: the base pseudos, rising;
@@ -6184,6 +6211,14 @@ def pre_order_report(wd, func, chain, src=None, full=False):
         return out
     out.append(f"  at T = {t0}: {len(breaks)} adjacent pair(s) out of (bucket, index) order: "
                + ", ".join(f"{a} before {b}" for a, b in breaks[:6]) + (" ..." if len(breaks) > 6 else ""))
+    if full:
+        for position, deltas in pre_receiver_shifts(keyed, t0).items():
+            first = next(raw for raw, _, base in keyed if base == position)
+            buckets = sorted((first + delta) % t0 for delta in deltas)
+            out.append(f"  changing only the field-address hashes based on {label(bases[position])}"
+                       f" can give the slot order at T {t0}. The first such expression's bucket"
+                       f" {first % t0} must move to {fmt_ranges(buckets)}"
+                       f" (common hash delta {fmt_ranges(deltas)} modulo {t0}).")
     res = pre_order_search(keyed, bases, fixed, t0)
 
     def ns(t):
