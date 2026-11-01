@@ -1,7 +1,7 @@
 #include "global.h"
+#include "sword_orbit.h"
 #include "engine_globals.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct StretchBody {
@@ -72,9 +72,8 @@ void Sword_BeginRestOrbit(struct StretchPart *p)
 {
     if (reset((u8 *)p)) {
         struct StretchBody *parent = p->parent;
-        register s32 one asm("r3");
+        s32 one;
         s32 choice;
-        register s32 turn asm("r1");
         p->id10A = parent->value;
         p->angle = parent->base + Div(256, parent->count) * p->index118;
         p->x = parent->x + Div(gUnk_086149C4[(p->angle + 64) & 255] * 200, 4096);
@@ -88,16 +87,11 @@ void Sword_BeginRestOrbit(struct StretchPart *p)
         gRandomIndex = (gRandomIndex + 1) & 1023;
         {
             u32 offset = gRandomIndex * 2;
-            register u32 table asm("r2") = (u32)gRandomTable;
-            choice = *(const u16 *)(offset + table);
+            const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
+            choice = *(const u16 *)(offset + (u32)table);
         }
         choice &= one;
-        one -= 2;
-        asm("" : "+r"(one));
-        turn = one;
-        if (choice)
-            turn = 1;
-        p->spin = turn;
+        p->spin = Sword_OrbitDirection(choice);
         p->target = &parent->x;
         p->flagsA2 &= ~4;
         p->flags4E &= ~4;
