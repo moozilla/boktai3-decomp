@@ -6,6 +6,7 @@
 #include "player.h"
 #include "ram.h"
 #include "debug.h"
+#include "hit_spark_random.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -636,35 +637,35 @@ void sub_08022878(BurstVec *p)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
 {
     u8 *graphics = (u8 *)p + 0x240;
     struct Packed size;
     int i;
     for (i = 0; i < 2; i++) {
-        int angle, speed;
-        int count;
-        register u32 index asm("r1");
+        u32 angle, count;
+        u32 index;
         u32 *indexPtr;
         u32 mask;
-        int smallMask;
-        register const u16 *table asm("r4");
+        u32 smallMask;
+        u32 value;
+        u32 speed;
         size.x = 164;
         size.y = 16;
         size.z = 164;
         indexPtr = &gRandomIndex;
         mask = 1023;
         smallMask = 3;
-        table = gRandomTable;
-        index = (*indexPtr + 1) & mask;
-        angle = (u8)table[index];
-        index = (index + 1) & mask;
-        count = (table[index] & smallMask) + 2;
-        index = (index + 1) & mask;
+        value = (u32)gRandomTable;
+        index = HitSpark_NextIndex(*indexPtr, mask);
+        angle = (u8)HitSpark_Sample(value, index);
+        index = HitSpark_NextIndex(index, mask);
+        count = (HitSpark_Sample(value, index) & smallMask) + 2;
+        index = HitSpark_NextIndex(index, mask);
         *indexPtr = index;
-        speed = (table[index] & smallMask) + 20;
-        SparkParticle_Spawn((struct ContactPosition *)(graphics + 0x20), 3, &size, angle, count,
+        speed = (HitSpark_Sample(value, index) & smallMask) + 20;
+        value = 3;
+        SparkParticle_Spawn((struct ContactPosition *)(graphics + 0x20), value, &size, angle, count,
                             speed, 2, 2);
     }
 }
