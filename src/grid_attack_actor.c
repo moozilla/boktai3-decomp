@@ -1,5 +1,8 @@
 #include "grid_attack_actor.h"
 #include "player_cue_sequence.h"
+#include "player.h"
+#include "contact_burst.h"
+#include "projected_display.h"
 
 void GridAttackActor_RemoveSprite(struct GridAttackActor *p)
 {
@@ -25,8 +28,6 @@ void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 
 void SceneMessages_Send(void *);
 
-void ProjectedDisplay_SetHeight(void *, int);
-
 void OrbitContactActor_BeginExpansion(void *);
 
 void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *, struct ContactPosition *,
@@ -43,8 +44,6 @@ void SceneActors_RunSecondEventScript(void *, void *);
 u8 Sprite_BlinkUntilExpired(int *, int, int, int);
 
 void SceneActors_RunStateCallback(u32);
-
-int ContactBurst_GetEnabled(void *);
 
 int ContactSequencePool_GetActiveCount(void *);
 
@@ -288,7 +287,7 @@ int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
             }
             break;
         case 1: {
-            int angle = (p->damageSource)[0x2d];
+            int angle = (u8)p->players[0]->unk2D;
             u8 *dst = &p->damageAngle;
             int zero = 0;
             *dst = angle;
@@ -1519,7 +1518,6 @@ void GridAttack_UpdateActionController(struct GridAttackActor *p)
     Callback_InvokeActor(p, (void *)gUnk_08605040[p->active]);
 }
 
-s32 ProjectedDisplay_GetHeight(void *);
 void SceneActors_UpdateTargetMetrics(void *);
 static inline s32 GridAttack_Truncate12(s32 value)
 {
@@ -1583,8 +1581,6 @@ void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *p)
 }
 
 s32 ContactSequencePool_GetActiveCount(void *);
-void ContactBurst_SetEnabled(void *, s32);
-s32 ContactBurst_GetEnabled(void *);
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 void SceneActors_UpdateEffects(void *);
 
@@ -1787,7 +1783,7 @@ s32 SceneActors_Initialize(void *, u32, s32, void *, s32);
 void SceneActors_SetHealthLimits(void *, s32, s32, s32);
 void SceneActors_SetEventScripts(void *, s32, s32);
 void SceneActors_SetDamageCallback(void *, void *, void *, s32);
-void CameraFollow_Initialize(void *, u32, void *, u32);
+void CameraFollow_Initialize(void *, void *, void *, u32);
 void *ContactSequencePool_Create(s32, u32, s32, u32, u32);
 void *OrbitContactActor_Create(const struct ContactPosition *, u32);
 
@@ -1829,7 +1825,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
     p->targetCount = count;
     {
         u32 *target = (u32 *)&p->targetPositions[0];
-        u32 *slot = (u32 *)&p->damageSource;
+        u32 *slot = (u32 *)p->players;
         for (i = 0; i < count; i++) {
             u32 value = (u32)gPlayers[i];
             if (value) {

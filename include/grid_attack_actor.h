@@ -88,7 +88,7 @@ struct GridAttackActor {
     void (*callback)(void *);            /* 0x100 */
     u8 (*tryUpdate)(void *);             /* 0x104 */
     u8 (*reset)(void *);                 /* 0x108 */
-    u8 *damageSource;                    /* 0x10C */
+    struct Player *players[1];           /* 0x10C */
     struct SceneVec *targetPositions[1]; /* 0x110 */
     s8 savedAngle;                       /* 0x114 */
     u8 unknown115[0x3];
