@@ -321,9 +321,14 @@ def resolve_knobs(src, func, env):
     """AGBCC_PRI / AGBCC_FORCE may name pseudos by C variable (`table:+214`): compile once without them to
     learn the numbers, then substitute."""
     env = dict(env or {})
-    for k in ("AGBCC_PRI", "AGBCC_FORCE"):
-        if k not in env and os.environ.get(k):
-            env[k] = os.environ[k]
+    # A knob set in the environment (`AGBCC_NOEQUIV=36 scope.py FILE.c`) reaches the -g compile through
+    # os.environ, but the fork server's compile only sees the knobs passed with each request: copy them all
+    # into ENV, so the build's (no -g) bytes get them too. Without this the plain compile ran without the
+    # knob and scope reported "-g changes agbcc's code" for what was the knob's effect.
+    for k, v in os.environ.items():
+        if (k.startswith(("AGBCC_", "CSE_")) and k not in ("AGBCC_SERVER", "AGBCC_DUMPPRI", "AGBCC_EXTRA")
+                and k not in env and v and " " not in v):
+            env[k] = v
     if env.get("AGBCC_FORCE"):
         # Accept the register spellings printed by allocation explanations.
         # The compiler parses decimal register numbers, so passing r6 through
@@ -4891,6 +4896,53 @@ def frame_slots(wd, func):
     return out
 
 
+def rom_constant_slots(rows):
+    """ROM stack slots that hold a literal-pool constant: {sp offset: (value, store address, [load
+    addresses])} for each slot stored once, by the insn right after an `ldr rN, =C` of the same register,
+    and only read after that. Reload gives a constant such a slot only when its pseudo has no
+    equivalence; with one (REG_EQUIV) it reloads the constant at each use instead."""
+    rom = [r for r in rows if r["rom"]]
+    stores, loads = {}, {}
+    for k, r in enumerate(rom):
+        m = re.match(r"(str|ldr) (\w+), " + SP_SLOT.pattern + "$", r["rom"])
+        if m:
+            o = int(m.group(3) or "0", 0)
+            (stores if m.group(1) == "str" else loads).setdefault(o, []).append((k, m.group(2)))
+    out = {}
+    for o, st in stores.items():
+        if len(st) != 1 or not loads.get(o) or st[0][0] == 0:
+            continue
+        k, reg = st[0]
+        m = re.match(r"ldr %s, =0x([0-9A-Fa-f]+)$" % reg, rom[k - 1]["rom"])
+        if m and all(j > k for j, _ in loads[o]):
+            out[o] = (int(m.group(1), 16), rom[k]["rom_addr"], [rom[j]["rom_addr"] for j, _ in loads[o]])
+    return out
+
+
+def equiv_constants(wd):
+    """[(pseudo, uid, value, note text)] for each set before allocation (lreg dump) whose REG_EQUIV is a
+    constant: a const_int, or a symbol (its address from the ROM ELF)."""
+    syms = elf_syms()
+    out = []
+    path = os.path.join(wd, "u.i.lreg")
+    text = open(path).read() if os.path.exists(path) else ""
+    for blk in re.finditer(r"^\(insn(?:/\w)* (\d+) .*?(?=^\(|\Z)", text, re.S | re.M):
+        r = " ".join(blk.group(0).split())
+        u = int(blk.group(1))
+        m = re.match(r"\(insn(?:/\w)* \d+ \d+ \d+ \(set \(reg(?:/\w)*:SI (\d+)\)", r)
+        e = re.search(r"REG_EQUIV \((symbol_ref:SI \(\"(\w+)\"\)|const_int (-?\d+))", r)
+        if not (m and e):
+            continue
+        if e.group(3) is not None:
+            v = int(e.group(3)) & 0xFFFFFFFF
+        elif e.group(2) in syms:
+            v = syms[e.group(2)][0]
+        else:
+            continue
+        out.append((int(m.group(1)), u, v, e.group(1)))
+    return out
+
+
 def pseudo_value(wd, pseudo):
     """A short reading of what an unnamed pseudo holds: the source of its first set before allocation,
     with the C line."""
@@ -5844,6 +5896,10 @@ def cmd_frame(src, func, env):
         uses_sp = any(SP_SLOT.search(r[k] or "") for r in rows for k in ("rom", "draft"))
         if not any_s and uses_sp and not os.path.exists(path):
             sys.exit("no names.txt from this compile: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh)")
+        if rom_constant_slots(rows):
+            print(f"{func}: reload gave no pseudo a stack slot in the draft; the ROM spills a constant:")
+            frame_constant_slots(src, func, env, wd, rows, {}, {})
+            return 1
         sys.exit(f"{func}: reload gave no pseudo a stack slot in the draft"
                  + ("; the sp accesses are locals that live in memory (arrays, structs, address-taken"
                     " variables: their order is declaration order) or outgoing call arguments, not spills"
@@ -5891,7 +5947,50 @@ def cmd_frame(src, func, env):
     if extra:
         print(f"\n{len(extra)} draft slot(s) the ROM does not have: those values need a register in the ROM's"
               " allocation, or do not exist there (a temporary the ROM's C does not make).")
+    frame_constant_slots(src, func, env, wd, rows, pair, slots)
     return 1
+
+
+def frame_constant_slots(src, func, env, wd, rows, pair, slots):
+    """For each ROM slot that holds a pool constant (stored once, right after its `ldr rN, =C`) and that
+    the draft gives no slot: the draft pseudos with that constant as REG_EQUIV, and whether the build
+    matches when they have none (AGBCC_NOEQUIV, a diagnostic knob). Reload rematerializes a spilled
+    pseudo with a constant equivalence; only one without gets a stack slot."""
+    consts = rom_constant_slots(rows)
+    todo = {o: c for o, c in consts.items() if pair.get(o) not in slots}
+    if not todo:
+        return
+    eq = equiv_constants(wd)
+    pn = pseudo_names(wd, func)
+    by_addr = {}
+    for n, (a, _) in elf_syms().items():
+        if not n.startswith(("_", "$")) and not n.endswith("__addr"):
+            by_addr.setdefault(a & ~1, n)
+    for o in sorted(todo):
+        v, at, reads = todo[o]
+        label = f" ({by_addr[v]})" if v in by_addr else ""
+        print(f"\nsp+{o:#x} holds the constant {v:#x}{label}: the ROM stores it once, at {at} right after"
+              f" loading it, and reads it back at {', '.join(reads)}.")
+        holders = [(p, u, t) for p, u, vv, t in eq if vv == v]
+        if not holders:
+            print("  No draft pseudo has it as REG_EQUIV; the draft computes or rematerializes it some other way.")
+            continue
+        print("  In the draft, " + ", ".join(f"pseudo {p} (" + (f"{pn[p]}, " if pn.get(p) else "") + f"set at insn {u})"
+                                              for p, u, _ in holders)
+              + (" has" if len(holders) == 1 else " have") + " it as REG_EQUIV, so reload loads the constant"
+              " again at each use when it spills, and gives it no slot.")
+        knob = ",".join(str(p) for p, _, _ in holders)
+        base = fast_score(src, func, env)
+        base_shape = getattr(fast_score, "shape", None)
+        r = fast_score(src, func, dict(env or {}, AGBCC_NOEQUIV=knob))
+        if r is not None:
+            n, text = r
+            was = f" (without it: {base[1]}, shape {base_shape})" if base is not None and base[0] else ""
+            print(f"  With AGBCC_NOEQUIV={knob} (diagnostic only): "
+                  f"{text if n == 0 else text + f', shape {fast_score.shape}'}{was}.")
+        print("  A constant gets a slot only when update_equiv_regs gives it no equivalence: a non-constant set"
+              " of the same variable first (README fact 20), or a union initializer's CLOBBER that a loop keeps"
+              " alive (fact 21; in straight-line code flow deletes the dead CLOBBER first).")
 
 
 def cmd_shape(src, func, env):
