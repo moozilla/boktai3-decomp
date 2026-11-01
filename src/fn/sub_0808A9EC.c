@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: sets a timed route-return command and validates the current contact target.
 struct GhoulSavedAction {
@@ -38,9 +37,8 @@ static inline void SaveReturnAction(struct SceneActorRegistryResetView *actor, u
 static inline void SetRouteFlag(u8 *group)
 {
     u16 *flags = (void *)(group + 0x40);
-    register u32 mask asm("r0") = 4;
-    register u32 value asm("r1") = *flags;
-    *flags = mask | value;
+    u16 mask = 4;
+    *flags |= mask;
 }
 static inline u32 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {

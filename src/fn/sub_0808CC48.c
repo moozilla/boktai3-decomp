@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "scene_actor_chase.h"
@@ -70,7 +69,7 @@ static inline u8 TestPending(struct GhoulContext *context, u32 mask, u16 **pendi
 }
 s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
 {
-    register struct GhoulContext *context = actor->context;
+    struct GhoulContext *context = actor->context;
     struct GhoulGroup *group = (void *)&actor->group.common;
     struct GhoulRouteOrigin **routeSlot;
     u16 *flags;
@@ -109,8 +108,9 @@ s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
                              group->route.pointId);
         {
             void *route = *routeSlot;
-            register struct ContactPosition *position asm("r4") = &actor->body.position;
-            struct ContactPosition *target = &context->target;
+            u32 offset = 0x62C;
+            struct ContactPosition *position = &actor->body.position;
+            struct ContactPosition *target = (void *)((u8 *)context + offset);
             s32 result = Nav_IsPositionInMesh(route, position, target);
             if (!result) {
                 u32 mask = ~0x200;
