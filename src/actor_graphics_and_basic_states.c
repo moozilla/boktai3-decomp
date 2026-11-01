@@ -840,37 +840,42 @@ fail:
 
 // confidence=low: chooses the next action phase from the reaction kind and flash state.
 #define SceneActorState_SelectReactionPhase sub_08022DBC
-// MATCHING_CONCESSION: register-pinning
 static inline s32 phaseValue(u8 *p)
 {
     s32 value = *p;
     return value;
 }
+static inline void enterPhase(u8 *p, u32 phase)
+{
+    u8 *field = p + 0xae;
+    u32 zero = 0;
+    *field = phase;
+    *(u32 *)(p + 0xc4) = zero;
+    p[0xb0] = 1;
+}
 void SceneActorState_SelectReactionPhase(u8 *p)
 {
-    u32 phase;
     u8 *actor = p;
     if (*(u32 *)(p + 0x358) == 3) {
         if (p[0x3b9]) {
-            phase = 14;
-            goto set;
+            enterPhase(p, 14);
+            return;
         }
     } else {
         if (p[0x3b9] == 3)
             SceneActors_StopBackgroundFlash(p);
         else if (p[0x3b9]) {
-            phase = 14;
-            asm("" : : "i"(1));
-            goto set;
+            enterPhase(p, 14);
+            return;
         }
     }
     switch (*(u16 *)(actor + 0x3b2)) {
         case 0:
-            phase = 9;
-            break;
+            enterPhase(p, 9);
+            return;
         case 1:
-            phase = 10;
-            break;
+            enterPhase(p, 10);
+            return;
         case 2:
             if (*(u32 *)(actor + 0x358) != 3 && phaseValue(p + 0xe1) <= 63) {
                 u8 *flag = actor + 0x394;
@@ -879,36 +884,26 @@ void SceneActorState_SelectReactionPhase(u8 *p)
                 u8 *flag = actor + 0x394;
                 *flag = 0;
             }
-            phase = 2;
-            break;
+            enterPhase(p, 2);
+            return;
         case 3:
-            phase = 11;
-            break;
+            enterPhase(p, 11);
+            return;
         case 4:
             if (phaseValue(p + 0xe1) <= 63) {
-                phase = 14;
-                asm("" : : "i"(3));
+                enterPhase(p, 14);
+                return;
             } else {
-                phase = 11;
-                asm("" : : "i"(4));
+                enterPhase(p, 11);
+                return;
             }
-            break;
         case 5:
-            phase = 15;
-            break;
+            enterPhase(p, 15);
+            return;
         case 6:
-            phase = 16;
-            break;
-        default:
+            enterPhase(p, 16);
             return;
     }
-set: {
-    register u8 *phaseField asm("r2") = p + 0xae;
-    u32 zero = 0;
-    *phaseField = phase;
-    *(u32 *)(p + 0xc4) = zero;
-    p[0xb0] = 1;
-}
 }
 
 // confidence=low: reaction-kind selector controls the far-point mode and motion timer.
