@@ -207,9 +207,9 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                 Sound_PlaySong(0x3df);
                 for (i = 0; i < 2; i++) {
                     struct Vec position;
-                    register const u16 *table asm("r3") = (const u16 *)RANDOM_TABLE_ADDR;
-                    SetVector(&position, (RandomValue(table) >> 3) % 1024 - 512, 0,
-                              -((RandomValue(table) >> 3) % 256));
+                    union RandomTableView table = {gRandomTable};
+                    SetVector(&position, (RandomValue(table.samples) >> 3) % 1024 - 512, 0,
+                              -((RandomValue(table.samples) >> 3) % 256));
                     AddVector(&position, &position, &saved->position);
                     AnimatedParticles_EmitBurst(&position, 7, 0, 64, 4, 4, 4, 4);
                 }

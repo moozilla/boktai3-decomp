@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
 #include "display_animation.h"
 #include "engine.h"
@@ -50,28 +49,9 @@ void RouteSpriteActor_TickWandering(struct RouteSpritePool *pool, struct RouteSp
     if (actor->entered) {
         Anim_SetSequence(sequence, pool->sequenceResource, 0xE, 0, finished);
         actor->timer = actor->initialTimer;
-        {
-            s32 value;
-            register u32 angleOffset asm("r5");
-            register u8 *angle asm("r1");
-            {
-                u32 offset;
-                register u32 table asm("r3");
-                gRandomIndex = (gRandomIndex + 1) & 1023;
-                offset = gRandomIndex * 2;
-                table = (u32)gRandomTable;
-                value = *(const u16 *)(offset + table);
-            }
-            angleOffset = 0x15A;
-            asm("" : "+r"(angleOffset));
-            angle = (u8 *)((u32)actor + angleOffset);
-            *angle = value;
-            {
-                u32 targetOffset = 0x140;
-                asm("" : "+r"(targetOffset));
-                Polar((struct ContactPosition *)((u32)actor + targetOffset), *angle, 0x18);
-            }
-        }
+        gRandomIndex = (gRandomIndex + 1) & 1023;
+        actor->angle = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+        Polar(&actor->target, (u8)actor->angle, 0x18);
         actor->moveTimer = 0x460;
         actor->frames = 0;
         actor->entered = 0;

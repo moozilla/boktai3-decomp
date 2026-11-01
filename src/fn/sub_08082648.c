@@ -6,6 +6,7 @@
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
 #include "engine.h"
+#include "scene_actor_damage_visibility.h"
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -123,35 +124,6 @@ static inline s32 LocalPlayer(void)
         return -1;
     return gLinkSession->localPlayer;
 }
-static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
-{
-    if (Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->field2E0;
-        register u32 mask asm("r2") = *owner;
-        if (!(mask & 0x20) && mask) {
-            switch (LocalPlayer()) {
-                case 0:
-                    if (*owner != 1)
-                        return 0;
-                    break;
-                case 1:
-                    if (*owner != 2)
-                        return 0;
-                    break;
-                case 2:
-                    if (*owner != 4)
-                        return 0;
-                    break;
-                case 3:
-                    if (*owner != 8)
-                        return 0;
-                    break;
-            }
-        }
-    }
-    return 1;
-}
-
 static inline void Fill(u32 *zero, void *dst)
 {
     *zero = 0;
@@ -218,7 +190,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
                 recovery.collider = local;
             }
             a->reactionSoundVariant = recovery.collider->cost;
-            if (a->reactionSoundVariant && ShouldShowDamage(a)) {
+            if (a->reactionSoundVariant && SceneActorDamage_ShouldShow(a)) {
                 u32 zero;
                 u32 buffer[2];
                 s32 hp = a->health;
