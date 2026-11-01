@@ -839,6 +839,14 @@ Each was read from the compiler source and confirmed on a live draft.
    fastMode/secondaryCooldown choices) and Armor_ApplySceneCommands (each case's own
    Trigger_ConsumePending). `why` on a rotation difference now lists the gotos before it.
 
+28. **`movs rA, #1; rsbs rA, rA, #0; adds rB, rA, #0` is -1 reloaded into a QImode pseudo.**
+   movqi takes only constants 0..255, so reload puts -1 in a SImode spill register and copies
+   it. A local s8/u8 is promoted to SImode (a direct -1, or #0xff), so the pseudo is the
+   temporary store_field makes for `p->field = c ? 1 : -1;`. The same conditional stored
+   through a cast pointer, `*(s8 *)(p + 0x1DA) = ...`, takes store_expr's COND_EXPR-into-MEM
+   path and stores in each arm. Armor_InitPartStretch, Armor_BeginPartTravelToPlayer and
+   Armor_RetractPartStretch matched or moved this way; `why all` now names the pattern.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

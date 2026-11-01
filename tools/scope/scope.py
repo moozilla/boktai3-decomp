@@ -1763,6 +1763,42 @@ def class_note(wd, x, got, want):
 HI_NAMES = {8: "r8", 9: "sb", 10: "sl", 11: "fp", 12: "ip"}
 
 
+def minus_one_copy(rows):
+    """Lines for a ROM `movs rA, #1; rsbs rA, rA, #0; adds rB, rA, #0` the draft lacks: reload loading -1
+    for a QImode pseudo (movqi takes only constants 0..255, so -1 goes through a SImode spill register and
+    a copy). A local s8/u8 is promoted to SImode and loads -1 directly (or #0xff); the unpromoted QImode
+    temporary comes from a conditional stored into a struct field, `p->field = c ? 1 : -1;`, which
+    store_field expands into a temporary. Through a cast pointer, `*(s8 *)(p + off) = c ? 1 : -1;`,
+    store_expr instead stores in each arm (Armor_InitPartStretch, Armor_BeginPartTravelToPlayer)."""
+    def triples(seq):
+        out = []
+        for i in range(len(seq) - 2):
+            a = re.fullmatch(r"movs (r\d), #1", seq[i][0])
+            if not a:
+                continue
+            r = a.group(1)
+            b = re.fullmatch(rf"rsbs {r}, {r}, #0", seq[i + 1][0])
+            c = re.fullmatch(rf"adds (r\d), {r}, #0", seq[i + 2][0])
+            if b and c and c.group(1) != r:
+                out.append(seq[i])
+        return out
+    rom, last = [], None
+    for r in rows:  # a ROM-only row has no C line: use the last one seen
+        last = r.get("line") or last
+        if r.get("rom"):
+            rom.append((r["rom"], r.get("line") or last, r.get("tag")))
+    draft = [(r["draft"], r.get("line"), r.get("tag")) for r in rows if r.get("draft")]
+    have = triples(rom)
+    if not have or len(triples(draft)) >= len(have):
+        return []
+    lines = sorted({str(x[1]) for x in have if x[1]})
+    at = f" (near C line {', '.join(lines)})" if lines else ""
+    return [f"minus-one copy: the ROM loads -1 into a spill register and copies it{at}, which is reload "
+            "moving -1 into a QImode pseudo. Store the conditional straight into a struct field, "
+            "`p->field = c ? 1 : -1;` (not through a cast pointer, and not via a local s8, which is "
+            "promoted to SImode)."]
+
+
 def class_misplaced(wd, func, rom_text):
     """Lines for global-alloc pseudos whose preferred class has no allocatable register (STACK_REG, or
     HI_REGS) and that sit in a high register the ROM never names: their class, not their priority, put
@@ -3496,6 +3532,8 @@ def cmd_why_all(src, func, env, rng=None):
           + (" " + scope_note[0] if scope_note else ""))
     rom_text = " ".join(r.get("rom") or "" for r in rows)
     for ln in class_misplaced(wd, func, rom_text):
+        print("  - " + ln)
+    for ln in minus_one_copy(rows):
         print("  - " + ln)
     shown = causes + sure
     if len(shown) < 12:
