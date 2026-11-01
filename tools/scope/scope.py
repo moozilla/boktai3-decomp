@@ -1956,7 +1956,46 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
         r = next((r for r in range(hrefs - 1, 0, -1) if g_priority(r, hlive) < lpri), None)
         if r:
             out.append(f"{nm(hi)} with {r} refs instead of {hrefs}" + (mention_lines(wd, hi) if wd else ""))
+    lever = macro_lever(wd, lo, lo_rec, hi, hi_rec) if wd else None
+    if lever:
+        a, b, nl, nh = lever
+        out.append(f"a statement macro (`do {{ ... }} while (0)`) around lines {a}-{b}: flow counts each ref"
+                   f" inside its loop notes twice, giving {nm(lo)} {nl} refs ({g_priority(nl, llive)}) against"
+                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)}). Reify it as the macro the original likely had"
+                   f" (the loop notes also end cse blocks there)")
     return out
+
+
+def macro_lever(wd, lo, lo_rec, hi, hi_rec, mentions=None, lines=None):
+    """The narrowest run of C lines (a, b, lo_refs, hi_refs) such that wrapping lines a..b in a do-while(0)
+    lets LO outrank HI: flow adds the loop depth per mention, so a mention moved inside one more loop counts
+    one more ref. Only runs that hold one of LO's mentions at either end are tried. None if none does."""
+    lrefs, llive = lo_rec[3], lo_rec[4]
+    hrefs, hlive = hi_rec[3], hi_rec[4]
+    if mentions is None:
+        mentions = {r: ref_mentions(wd, r) for r in (lo, hi)}
+    if lines is None:
+        lines = uid_lines(wd)
+
+    def by_line(reg):
+        d = {}
+        for u, _ in mentions.get(reg, []):
+            ln = lines.get(u)
+            if isinstance(ln, int):
+                d[ln] = d.get(ln, 0) + 1
+        return d
+
+    lo_l, hi_l = by_line(lo), by_line(hi)
+    keys = sorted(lo_l)
+    best = None
+    for i, a in enumerate(keys):
+        for b in keys[i:]:
+            nl = lrefs + sum(n for ln, n in lo_l.items() if a <= ln <= b)
+            nh = hrefs + sum(n for ln, n in hi_l.items() if a <= ln <= b)
+            if g_priority(nl, llive) > g_priority(nh, hlive) and (best is None or b - a < best[1] - best[0]):
+                best = (a, b, nl, nh)
+                break
+    return best
 
 
 def mention_lines(wd, reg):
@@ -2193,6 +2232,39 @@ def spill_word(code, nm):
     return SPILL_WORDS.get(code, code)
 
 
+def source_lines(wd):
+    """{line: text} for the compiled C file itself (not its headers), from u.i's line markers."""
+    path = os.path.join(wd, "u.i")
+    if not os.path.exists(path):
+        return {}
+    out, main, cur, line = {}, None, None, 0
+    for text in open(path, errors="replace").read().split("\n"):
+        m = re.match(r'# (\d+) "([^"]*)"', text)
+        if m:
+            line, cur = int(m.group(1)), m.group(2)
+            if main is None:
+                main = cur
+            continue
+        if cur == main:
+            out[line] = text
+        line += 1
+    return out
+
+
+def gotos_before(wd, func, uid, limit=4, src=None, lines=None):
+    """The `goto` statements of FUNC's C that come before insn UID's line, nearest last (at most LIMIT):
+    [(line, text)]. The function's span is the lines its insns carry."""
+    lines = uid_lines(wd) if lines is None else lines
+    src = source_lines(wd) if src is None else src
+    at = lines.get(uid)
+    span = [ln for ln in lines.values() if isinstance(ln, int) and ln > 0]
+    if not isinstance(at, int) or not span:
+        return []
+    first = min(span)
+    hits = [(ln, src[ln].strip()) for ln in sorted(src) if first <= ln < at and re.search(r"\bgoto\s+\w+\s*;", src[ln])]
+    return hits[-limit:]
+
+
 def explain_spill(wd, func, k, want, got, nm, at, indent="    "):
     """Why reload choice K took GOT and what gives the ROM's WANT: the spill set as the choice saw it, the
     concrete AGBCC_SPILL shift (and so which register the previous choice must have taken), or why no
@@ -2259,6 +2331,13 @@ def explain_spill(wd, func, k, want, got, nm, at, indent="    "):
               " (one more or fewer per place, mod "
               f"{n}), or one of the previous choices took a different register; an inherited reload makes no"
               " choice")
+        gotos = gotos_before(wd, func, x["uid"])
+        if gotos:
+            print(f"{indent}gotos into shared code before this insn: "
+                  + "; ".join(f"line {ln} `{t}`" for ln, t in gotos)
+                  + ". Cross-jumping (jump2) runs after reload, so a tail the original wrote out on each path"
+                  " makes its reload choices there before jump2 merges it into this goto shape: write such a"
+                  " tail out in place of its goto (Armor_ApplySceneCommands, sub_0818911C)")
         return d, (f"; the ROM's {rn(want)} means its previous choice took {' or '.join(map(rn, need))},"
                    f" not {rn(regs[x['start']])}"), out
     if code.startswith("L"):
