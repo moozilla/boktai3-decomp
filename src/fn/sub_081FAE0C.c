@@ -196,8 +196,13 @@ static inline void RatatoskInit_ConfigureAnimation(struct RatatoskInitBase *base
     base->animationChanged = 1;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 84.4%
+static inline void RatatoskInit_SetCameraOrbit(struct RatatoskCamera *camera, u32 angle,
+                                               u32 distance)
+{
+    camera->angle = angle;
+    camera->distance = distance;
+}
+
 // confidence=low: Initializes Ratatosk from script dimensions, timing values, paths, palettes, and pools.
 #define Ratatosk_InitializeFromScript sub_081FAE0C
 s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
@@ -206,19 +211,23 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
     struct ContactPosition sizes;
     struct ContactPosition motion;
     u32 hpA, hpB;
+    u32 defaultHurtX;
+    u32 defaultHurtY;
+    u32 param;
+    u32 value;
+    u16 *slot;
     u32 facing;
     s32 i;
-    s32 found;
     u8 *base;
     struct ContactPosition pv;
-    u32 *randomIndex;
     s32 k;
     s32 animationGate;
-    void *target;
     void *pdata;
 
     hpA = 0x7D0;
     hpB = 0;
+    defaultHurtX = 0x1E;
+    defaultHurtY = 0xF;
     facing = 0;
     self = &actor->base;
     SceneActors_Register(actor, 4);
@@ -231,8 +240,8 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
         actor->base.eventScriptA = Script_GetValue();
         actor->base.eventScriptB = Script_GetValue();
     } else {
-        actor->base.eventScriptA = hpB;
-        actor->base.eventScriptB = hpB;
+        actor->base.eventScriptA = 0;
+        actor->base.eventScriptB = 0;
     }
     if (Script_SeekToKeyword(0x6C)) {
         hpA = Script_GetValue();
@@ -267,22 +276,37 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
         actor->hurtZ = Script_GetValue();
         actor->hurtAttack = Script_GetValue();
         actor->hurtDamage = Script_GetValue();
-        actor->hurtKind = Script_GetValue();
+        value = Script_GetValue();
+        slot = &actor->hurtKind;
     } else {
-        actor->hurtX = 0x1E;
-        actor->hurtY = 0xF;
-        actor->hurtZ = 0x1E;
-        actor->hurtAttack = 0x28;
-        actor->hurtDamage = 0x1E;
-        actor->hurtKind = 0x1E;
+        // The defaults are stored through slot. param is reassigned for each store, and
+        // value carries the last one to the store after the join, as in the parse branch.
+        actor->hurtX = defaultHurtX;
+        actor->hurtY = defaultHurtY;
+        slot = &actor->hurtZ;
+        param = 0x1E;
+        *slot = param;
+        slot = &actor->hurtAttack;
+        param = 0x28;
+        *slot = param;
+        slot = &actor->hurtDamage;
+        param = 0x1E;
+        *slot = param;
+        slot = &actor->hurtKind;
+        value = 0x1E;
     }
+    *slot = value;
     if (Script_SeekToKeyword(0x63)) {
         actor->wideX = Script_GetValue();
         actor->wideY = Script_GetValue();
         actor->wideZ = Script_GetValue();
     } else {
-        actor->wideX = 5;
-        actor->wideY = 0;
+        slot = &actor->wideX;
+        param = 5;
+        *slot = param;
+        slot = &actor->wideY;
+        param = 0;
+        *slot = param;
         actor->wideZ = 0x14;
     }
     if (Script_SeekToKeyword(0x42)) {
@@ -290,9 +314,12 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
         actor->bodyY = Script_GetValue();
         actor->bodyZ = Script_GetValue();
     } else {
-        actor->bodyX = 0x1E;
-        actor->bodyY = 0x1E;
-        actor->bodyZ = 0x1E;
+        slot = &actor->bodyX;
+        *slot = 0x1E;
+        slot = &actor->bodyY;
+        *slot = 0x1E;
+        slot = &actor->bodyZ;
+        *slot = 0x1E;
     }
     if (Script_SeekToKeyword(0x53)) {
         actor->projectileX = Script_GetValue();
@@ -303,33 +330,58 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
         actor->secondaryZ = Script_GetValue();
         actor->alternateX = Script_GetValue();
         actor->alternateY = Script_GetValue();
-        actor->alternateZ = Script_GetValue();
+        value = Script_GetValue();
+        slot = &actor->alternateZ;
     } else {
-        actor->projectileX = 0x1E;
-        actor->projectileY = 0xA;
-        actor->projectileZ = 0x1E;
-        actor->secondaryX = 0x32;
-        actor->secondaryY = 0x1E;
-        actor->secondaryZ = 0x1E;
-        actor->alternateX = 0x1E;
-        actor->alternateY = 0x1E;
-        actor->alternateZ = 0x1E;
+        slot = &actor->projectileX;
+        param = 0x1E;
+        *slot = param;
+        slot = &actor->projectileY;
+        param = 0xA;
+        *slot = param;
+        slot = &actor->projectileZ;
+        param = 0x1E;
+        *slot = param;
+        slot = &actor->secondaryX;
+        param = 0x32;
+        *slot = param;
+        slot = &actor->secondaryY;
+        param = 0x1E;
+        *slot = param;
+        slot = &actor->secondaryZ;
+        param = 0x1E;
+        *slot = param;
+        slot = &actor->alternateX;
+        param = 0x1E;
+        *slot = param;
+        slot = &actor->alternateY;
+        value = 0x1E;
+        *slot = value;
+        slot = &actor->alternateZ;
     }
+    *slot = value;
     if (Script_SeekToKeyword(0x73)) {
         actor->cloneX = Script_GetValue();
         actor->cloneY = Script_GetValue();
         actor->cloneZ = Script_GetValue();
         actor->cloneSecondaryX = Script_GetValue();
         actor->cloneSecondaryY = Script_GetValue();
-        actor->cloneSecondaryZ = Script_GetValue();
+        value = Script_GetValue();
+        slot = &actor->cloneSecondaryZ;
     } else {
-        actor->cloneX = 0x1E;
+        slot = &actor->cloneX;
+        *slot = 0x1E;
         actor->cloneY = 0x1E;
-        actor->cloneZ = 0x1E;
-        actor->cloneSecondaryX = 0x1E;
-        actor->cloneSecondaryY = 0x1E;
-        actor->cloneSecondaryZ = 0x1E;
+        slot = &actor->cloneZ;
+        *slot = 0x1E;
+        slot = &actor->cloneSecondaryX;
+        *slot = 0x1E;
+        slot = &actor->cloneSecondaryY;
+        value = 0x1E;
+        *slot = value;
+        slot = &actor->cloneSecondaryZ;
     }
+    *slot = value;
     if (Script_SeekToKeyword(0x52)) {
         actor->rangeX = Script_GetValue();
         actor->rangeY = Script_GetValue();
@@ -364,14 +416,12 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
     } else {
         actor->parameterED2 = 0x3E8;
     }
-    found = Script_SeekToKeyword(0x74);
-    if (found) {
+    if (Script_SeekToKeyword(0x74)) {
         actor->parameterF0C = Script_GetValue();
     } else {
-        actor->parameterF0C = found;
+        actor->parameterF0C = 0;
     }
-    target = gUnknown_02000580;
-    RatatoskInit_SetTarget(self, target);
+    RatatoskInit_SetTarget(self, gUnknown_02000580);
     SceneActors_Initialize(self, id, 4, &sizes, facing);
     self->savedFacing = facing;
     actor->displayResource = 0xFB81;
@@ -435,8 +485,8 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
         RatatoskInit_ConfigureAnimation(self, 2, 0);
     }
     actor->parameterED4 = 0;
-    actor->hurtX = 0x1E;
-    actor->hurtY = 0xF;
+    actor->hurtX = defaultHurtX;
+    actor->hurtY = defaultHurtY;
     actor->scaleX = 0;
     actor->scaleZ = 0;
     actor->scaleStep = 0;
@@ -445,23 +495,22 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
     actor->motionScale = 0x40;
     actor->savedState = 2;
     actor->motionScale = 0x80;
-
-    randomIndex = &gRandomIndex;
-    *randomIndex = (*randomIndex + 1) & 0x3FF;
-    k = Mod(((u16 *)RANDOM_TABLE_ADDR)[*randomIndex], 9);
-    actor->destination = actor->points[k];
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    k = Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 9);
+    actor->destination = *(k + actor->points);
 
     if (self->specialMode == 0) {
-        CameraFollow_Initialize(&actor->camera, RatatoskInit_GetTargetPosition(self),
-                                &actor->base.body.position, 1);
-        actor->camera.angle = 0x8C;
-        actor->camera.distance = 0xFF;
-        actor->camera.duration = 0x1E;
+        struct RatatoskCamera *camera = &actor->camera;
+        const void *targetPosition = RatatoskInit_GetTargetPosition(self);
+        struct ContactPosition *origin = &actor->base.body.position;
+        CameraFollow_Initialize(camera, targetPosition, origin, 1);
+        RatatoskInit_SetCameraOrbit(camera, 140, 255);
+        camera->duration = 30;
     }
     SceneActors_SetDamageCallback(self, actor->damageContext, Ratatosk_ApplyDamageReaction, 0);
     ScaledShadow_InitializeDefault(actor->shadow, &actor->anchor);
-    if (self->specialMode != 0)
-        TerrainOverlay_QueueAddActor(&actor->base.body);
+    if (self->specialMode)
+        TerrainOverlay_QueueAddActor(&self->body);
     if (self->specialMode == 0) {
         actor->homingProjectiles = HomingProjectile_CreateManager();
         if (actor->homingProjectiles == 0)
@@ -484,6 +533,3 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
         return -1;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081FAE0C);
-#endif
