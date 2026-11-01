@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "ram.h"
@@ -19,12 +18,7 @@ struct GhoulDraw {
 };
 static inline u32 MotionFlag(struct SceneActorRegistryResetView *a, u32 mask)
 {
-    register u32 offset asm("r2") = (u32) & ((struct SceneActorRegistryResetView *)0)->flags2D4;
-    asm("" : : "r"(offset));
-    {
-        register u16 *flags asm("r0") = (void *)((u8 *)a + offset);
-        return *flags & mask;
-    }
+    return a->flags2D4 & mask;
 }
 static inline u32 RandomSample(void)
 {
@@ -32,13 +26,7 @@ static inline u32 RandomSample(void)
     u32 v;
     gRandomIndex = index;
     index *= 2;
-    {
-        register const u16 *table asm("r3") = gRandomTable;
-        {
-            const u16 *entry = (const u16 *)(index + (u32)table);
-            v = *entry;
-        }
-    }
+    v = *(const u16 *)(index + (u32)RANDOM_TABLE_ADDR);
     v &= 3;
     return v + 1;
 }
@@ -50,32 +38,6 @@ static inline s32 Quarter(s32 value)
     else
         result = -((-value) >> 2);
     return result;
-}
-static inline s32 AxisDelta(struct SceneActorRegistryResetView *actor, u32 offset, s16 **saved)
-{
-    s32 source;
-    s16 *current;
-    register s32 value asm("r0");
-    if (offset == 0x310) {
-        register u32 sourceOffset asm("r5") = offset;
-        asm("" : "+r"(sourceOffset));
-        {
-            register s16 *address asm("r0") = (void *)((u8 *)actor + sourceOffset);
-            source = *address;
-        }
-    } else {
-        u32 sourceOffset = offset;
-        {
-            s16 *address = (void *)((u8 *)actor + sourceOffset);
-            source = *address;
-        }
-    }
-    current = (void *)((u8 *)actor + (offset + 8));
-    value = *current;
-    value = source - value;
-    asm("" : "+r"(value));
-    *saved = current;
-    return Quarter(value);
 }
 static inline u8 Stopped(s32 x, s32 z)
 {
@@ -107,11 +69,23 @@ void Ghoul_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         range.x = 60;
         range.y = 60;
         range.z = 40;
-        SparkParticle_Spawn(&actor->body.position, RandomSample(), &range, actor->body.direction + 128, 10, 6,
-                            2, 2);
+        SparkParticle_Spawn(&actor->body.position, RandomSample(), &range,
+                            actor->body.direction + 128, 10, 6, 2, 2);
     }
-    dx = AxisDelta(actor, 0x310, &x);
-    dz = AxisDelta(actor, 0x314, &z);
+    {
+        s32 current = *(s16 *)((u8 *)actor + 0x310);
+        s16 *field = (void *)((u8 *)actor + 0x318);
+        s32 difference = current - *field;
+        x = field;
+        dx = Quarter(difference);
+    }
+    {
+        s32 current = *(s16 *)((u8 *)actor + 0x314);
+        s16 *field = (void *)((u8 *)actor + 0x31C);
+        s32 difference = current - *field;
+        z = field;
+        dz = Quarter(difference);
+    }
     if (dx > 200)
         dx = 200;
     else if (dx < -200)
@@ -124,12 +98,6 @@ void Ghoul_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     actor->body.motion.z += dz;
     *x += dx;
     *z += dz;
-    if (Stopped(dx, dz) && actor->field2B3) {
-        register u32 offset asm("r2") = (u32) & ((struct SceneActorRegistryResetView *)0)->field2B0;
-        asm("" : : "r"(offset));
-        {
-            register u8 *state asm("r1") = (void *)((u8 *)actor + offset);
-            *state = 1;
-        }
-    }
+    if (Stopped(dx, dz) && actor->field2B3)
+        actor->field2B0 = 1;
 }
