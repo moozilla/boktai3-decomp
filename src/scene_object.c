@@ -1486,18 +1486,12 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     return 0;
 }
 
-#define RESOURCE(value)                                                                            \
-    ({                                                                                             \
-        s32 result = (value);                                                                      \
-        asm("" : "+r"(result));                                                                    \
-        result;                                                                                    \
-    })
 s32 SceneObjects_CreateFromScript(void)
 {
     struct SceneExtent position;
     s32 id, type;
-    s32 initial, animation, script, defaultResource;
-    register s32 flags asm("r9"), resource asm("r6"), drawMode, health;
+    s32 initial, animation, script;
+    s32 flags, resource, drawMode, health;
     id = Script_GetKeywordValue('n', 0);
     type = Script_GetKeywordValue('t', 0);
     flags = Script_GetKeywordValue('f', 0);
@@ -1513,24 +1507,21 @@ s32 SceneObjects_CreateFromScript(void)
         position.z = 0;
     }
     if (type == 0)
-        goto fallback;
+        resource = Script_GetKeywordValue('a', 0x9D41);
     else if (type == 1)
-        defaultResource = RESOURCE(0x84EE);
+        resource = Script_GetKeywordValue('a', 0x84EE);
     else if (type == 2)
-        defaultResource = RESOURCE(0x9D40);
+        resource = Script_GetKeywordValue('a', 0x9D40);
     else if (type == 3)
-        defaultResource = RESOURCE(0x9D43);
+        resource = Script_GetKeywordValue('a', 0x9D43);
     else if (type == 4)
-        defaultResource = RESOURCE(0xE0C9);
+        resource = Script_GetKeywordValue('a', 0xE0C9);
     else if (type == 5)
-        defaultResource = RESOURCE(0x5A2);
+        resource = Script_GetKeywordValue('a', 0x5A2);
     else if (type == 6)
-        defaultResource = RESOURCE(0xB306);
-    else {
-    fallback:
-        defaultResource = RESOURCE(0x9D41);
-    }
-    resource = Script_GetKeywordValue('a', defaultResource);
+        resource = Script_GetKeywordValue('a', 0xB306);
+    else
+        resource = Script_GetKeywordValue('a', 0x9D41);
     drawMode = Script_GetKeywordValue('i', 0);
     health = Script_GetKeywordValue('l', 128);
     if (type == 0)
