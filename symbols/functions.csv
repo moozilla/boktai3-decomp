@@ -7721,6 +7721,7 @@ addr,name,mode,confidence,source,notes
 081CBC44,SceneCharacter_UpdateParticleDissolve,thumb,low,src-alias,Tentative dissolve callback captures a linked position and emits diminishing particle bursts with sound over 31 frames
 081CBCBC,SceneCharacter_StartAnimationEleven,thumb,low,src-alias,State callback starts kind 29 animation 11 and immediately marks the command complete
 081CBD6C,SceneCharacter_UpdateAnimationSeven,thumb,low,src-alias,State callback plays kind 29 animation 7 and waits for completion
+081CBE30,StateActor_UpdateDelayedAttackEffect,thumb,low,src-alias,
 081CC004,SceneCharacter_UpdateAnimationTen,thumb,low,src-alias,State callback plays kind 29 animation 10 and waits for completion
 081CC0C8,StateActor_StartAnimStep,thumb,low,src-alias,
 081CC498,SceneCharacter_StartAnimationThree,thumb,low,src-alias,State callback starts animation 3 and immediately marks the command complete
