@@ -221,14 +221,13 @@ void SceneObjects_PlayPushSound(s32 type)
 
 void AnimatedParticles_EmitBurst(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
 
-// MATCHING_CONCESSION: register-pinning
 void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
-                                   struct SceneObject *actor)
+                                   struct SceneObject *object)
 {
-    register struct SceneObject *incoming asm("r0") = actor;
     s32 applied;
+    struct SceneObject *actor;
     applied = 0;
-    actor = incoming;
+    actor = object;
     if (actor->type == 0) {
         if (({
                 u32 mask = 0x17;
