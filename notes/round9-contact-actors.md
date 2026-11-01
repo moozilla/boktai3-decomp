@@ -20,3 +20,11 @@ The guarded death callback wraps all six random draws at 1024, including
 the three after the first particle spawn. Its old byte index wrapped at
 256 there. The remaining differences are the low-register copy of the
 horizontal mask and the register allocation of the first vector addition.
+
+Tags: 08042F44 #contact-actors #nonmatching
+
+The roaming draft now matches the scale calculation in the first turn
+sample. Keeping the 256-unit radius in a local makes agbcc shift the
+cosine component and multiply the sine component, as in the ROM.
+The target-vector address order and allocations across the two steering
+branches still differ.
