@@ -98,13 +98,10 @@ static inline void ActorStatus_ResetInteractionAt(struct SceneActorRegistryReset
                                                   struct SceneActorRegistryControl *control)
 {
     if (ActorStatus_HasBehaviorFlags(actor, 0x200000)) {
-        SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x1000000);
-        ActorStatus_ClearMotionFlags(actor, 0x200);
-        control->mode = 0;
-        control->counter = 0;
-        control->timer = 0;
+        ActorStatus_ClearInteraction(actor, control);
     }
 }
+
 static inline void ActorStatus_ResetInteraction(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;

@@ -152,6 +152,16 @@ static inline void ActorStatus_ClearMotionFlags(struct SceneActorRegistryResetVi
     actor->flags2D4 &= ~bits;
 }
 
+static inline void ActorStatus_ClearInteraction(struct SceneActorRegistryResetView *actor,
+                                                struct SceneActorRegistryControl *control)
+{
+    SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x1000000);
+    ActorStatus_ClearMotionFlags(actor, 0x200);
+    control->mode = 0;
+    control->counter = 0;
+    control->timer = 0;
+}
+
 static inline struct SceneEnvironmentSnapshot SceneEnvironment_Read(void)
 {
     struct SceneEnvironmentSnapshot result;
