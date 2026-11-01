@@ -1157,6 +1157,16 @@ Each was read from the compiler source and confirmed on a live draft.
    after gcse). Explicit `p = manager->slots` initialisations exist before gcse, and PRE
    hoists them into the reset paths.
 
+45. **Reload keeps what a register holds across a conditional branch, but not across a
+   label.** reload_as_needed forgets its inheritance only at a CODE_LABEL. Tests chained by
+   `goto no` or `||` fall through from one `bne` to the next test with no label between, so
+   reload builds the next field offset from the last one (`adds r2, #0x76`, `subs r3, #0x28`)
+   where the ROM loads it fresh (`ldr r2, =0x472`). Each `if (x) return 0;`, or each arm of an
+   else-if chain, starts the next test at the label of the skipped arm; jump2 deletes the label
+   after reload, so the layout is the same. TetherActor_CanStartInteraction lost three `r2`
+   clobbers this way. TetherActor_SelectInteractionState (`!enabled || statusFlags`) lost one by
+   testing the two fields in separate ifs that both set state 0 (cross-jumped into one call).
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
