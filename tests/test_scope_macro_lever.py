@@ -30,6 +30,19 @@ class MacroLever(unittest.TestCase):
         lines = {10: 5, 11: 6, 12: 5, 13: 6}
         self.assertIsNone(self.scope.macro_lever(None, 1, lo_rec, 2, hi_rec, mentions, lines))
 
+    def test_hint_requires_a_shared_macro(self):
+        s = self.scope
+        saved = s.macro_lever, s.mention_lines
+        try:
+            s.macro_lever = lambda *a, **k: (54, 59, 16, 10)
+            s.mention_lines = lambda *a, **k: ""
+            out = s.flip_levers(str, 26, ("G", 87, 2748, 12, 131, 0, 7), 77, ("G", 81, 3947, 10, 76, 0, 5), wd="w")
+        finally:
+            s.macro_lever, s.mention_lines = saved
+        hint = next(o for o in out if o.startswith("a statement macro"))
+        self.assertIn("several functions share", hint)
+        self.assertIn("single-use wrapper is a priority knob and counts as a barrier", hint)
+
 
 if __name__ == "__main__":
     unittest.main()

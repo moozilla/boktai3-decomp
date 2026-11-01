@@ -9,6 +9,7 @@ import glob
 import os
 import re
 import subprocess
+import sys
 import tempfile
 
 IDENT = re.compile(r"[A-Za-z_]\w*\Z")
@@ -129,11 +130,24 @@ def rename(root, addr, old, new, mode="thumb", note=None, confidence="low", dry=
     return changed
 
 
-def concessions(text):
+def single_use_macros(text, path=None):
+    """Statement macros TEXT uses at their only site in the tree (tools/statement_macros.py).
+    PATH is the file TEXT replaces, so its copy on disk is not counted as a second use."""
+    tools = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    from statement_macros import single_use_in
+    return single_use_in(text, exclude=path)
+
+
+def concessions(text, path=None):
     pins = len(re.findall(r'\basm\("r\d+"\)|\basm\("(?:sb|sl|fp|ip)"\)', text))
     bars = len(re.findall(r'\basm(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', text))
     # an empty `do { } while (0)` acts as a barrier: its loop notes end cse blocks and weight refs
     bars += len(re.findall(r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)', text))
+    # a do { ... } while (0) macro used at only one site is a priority knob, so a barrier too:
+    # a statement macro is ordinary C only when several functions share it
+    bars += len(single_use_macros(text, path))
     # as does an if with nothing in its body (one whose body is DEBUG_PRINT(), include/debug.h, is plain C)
     bars += len(re.findall(r'\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{\s*\}|;)',
                            re.sub(r"//[^\n]*|/\*.*?\*/", "", text, flags=re.S)))
@@ -164,10 +178,11 @@ def without_drafts(text):
     return "".join(out)
 
 
-def added_concessions(before, after):
-    """(pins, barriers) that the compiled code of AFTER has beyond BEFORE (drafts don't count)."""
-    _, p0, b0 = concessions(without_drafts(before))
-    _, p1, b1 = concessions(without_drafts(after))
+def added_concessions(before, after, path=None):
+    """(pins, barriers) that the compiled code of AFTER has beyond BEFORE (drafts don't count).
+    PATH is the unit both versions belong to."""
+    _, p0, b0 = concessions(without_drafts(before), path)
+    _, p1, b1 = concessions(without_drafts(after), path)
     return max(p1 - p0, 0), max(b1 - b0, 0)
 
 
