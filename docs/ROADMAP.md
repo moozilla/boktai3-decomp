@@ -19,8 +19,9 @@ function, write it the way it will finally be.
    functions (`land --allow-pins`), and phase 3 work for later.
 3. **No concessions** (current). Every match is ordinary C: no register pins, no barriers, no
    compiler overrides, no `*(u16 *)((u8 *)p + 0x172)` access where a struct field fits.
-   `progress.py --list-pinned` is the queue; `scope.py FILE.c pins` gives the cost of removing
-   each pin and `tools/depin.py` drops the free ones.
+   `progress.py --list-pinned` is the queue; `scope.py FILE.c pins FUNC` gives the cost of removing
+   each pin, alone and grouped, and writes the pin-free draft a rematch starts from (the free removals
+   `tools/depin.py` made are used up).
 4. **Cleanup** (where it comes naturally; the main push comes after phase 3). Source that reads
    like the original and builds the same ROM:
    * **Names.** No `sub_XXXXXXXX` functions or `gUnk_XXXXXXXX` RAM objects left: every function,
