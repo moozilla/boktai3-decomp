@@ -2954,8 +2954,6 @@ void TetherActor_UpdateSecondaryLock(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateFollowingState(struct TetherActor *actor)
 {
     if (actor->state != 1)
@@ -2972,16 +2970,11 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
     if (actor->parameter >= 0)
         TetherActor_LimitPlayerDistance(actor);
     else {
-        register s16 *x asm("r2") = &actor->position.x;
-        s16 *z;
-        register s32 dx asm("r1") = *x;
-        s32 target = actor->targetPosition.x;
-        dx = absolute_0804BB30(dx - target);
-        z = &actor->position.z;
-        if (dx > 2 || absolute_0804BB30(*z - actor->targetPosition.z) > 2)
+        if (absolute_0804BB30(actor->position.x - actor->targetPosition.x) > 2 ||
+            absolute_0804BB30(actor->position.z - actor->targetPosition.z) > 2)
             actor->moving = 1;
-        *x = actor->targetPosition.x;
-        *z = actor->targetPosition.z;
+        actor->position.x = actor->targetPosition.x;
+        actor->position.z = actor->targetPosition.z;
     }
     actor->heading = actor->targetPosition.pad;
     if (actor->kind == 5 && actor->moving)
