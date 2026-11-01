@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_palette.h"
+#include "scene_actor_placement.h"
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -12,26 +13,7 @@ static inline u32 ReadMasked(u32 mask, u32 *field)
 }
 static inline u8 Unavailable(struct SceneActorRegistryActor *actor, u32 disabled, u32 excluded)
 {
-    if (actor) {
-        register u32 mask asm("r1") = disabled;
-        u32 offset = 0x2D4;
-        u32 value;
-        asm("" : "+r"(offset), "+r"(mask));
-        value = *(u16 *)((u32)actor + offset);
-        value &= mask;
-        if (value)
-            return 1;
-        mask = excluded;
-        offset -= 4;
-        {
-            u32 *field = (void *)((u32)actor + offset);
-            value = *field;
-        }
-        value &= mask;
-        if (value || actor->health <= 0)
-            return 1;
-    }
-    return 0;
+    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
 }
 static inline u16 Remaining(struct SceneActorPaletteTransition *transition)
 {
@@ -65,7 +47,7 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *input
 {
     struct SceneActorPaletteManagerView *manager = inputManager;
     register struct SceneActorPaletteTransition *transition asm("r12");
-    register struct SceneActorRegistryActor *actorInput asm("r1") = inputActor;
+    struct SceneActorRegistryActor *actorInput = inputActor;
     struct SceneActorRegistryActor *actor;
     u32 alreadyAdvanced;
     u32 category;
@@ -80,7 +62,6 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *input
         u32 *actorFlags;
         s16 *blue;
     } channels;
-    asm("" : "+r"(manager), "+r"(actorInput));
     actor = actorInput;
     if (Unavailable(actor, 0x40, 0x20000))
         goto failure;

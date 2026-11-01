@@ -1,4 +1,5 @@
 #include "animated_hazard.h"
+#include "display_sequence_inline.h"
 /* AnimatedHazard_Noop: Empty function with no callers or taken address; placeholder/no-op in the animated-hazard unit. */
 #define AnimatedHazard_Noop sub_08012134
 
@@ -99,9 +100,7 @@ void AnimatedHazard_EmitWarning(void *m, struct AnimatedHazard *p)
 
 static inline u32 frame_factor(u16 v)
 {
-    register u32 value asm("r1") = v;
-    u32 mask = 15;
-    return mask & value;
+    return DisplaySequence_MaskCommand(v, 15);
 }
 
 // MATCHING_CONCESSION: register-pinning

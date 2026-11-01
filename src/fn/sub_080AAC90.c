@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
+#include "scene_actor_placement.h"
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 void Collision_CalculateDamageResponse(struct SceneActorBehaviorContactView *,
                                        struct SceneActorBehaviorContactView *);
@@ -7,32 +8,7 @@ void TentacleActor_EnterHitReaction(void *);
 s32 Math_Atan2(s32, s32);
 static inline u32 Unavailable(struct SceneActorBehaviorView *actor)
 {
-    u32 result;
-    if (actor) {
-        u32 mask = 0x40;
-        u32 offset = 0x2D4;
-        u32 value;
-        value = *(u16 *)((u32)actor + offset);
-        if (value & mask)
-            goto unavailable;
-        mask = 0x20000;
-        {
-            u32 offset = 0x2D0;
-            value = *(u32 *)((u32)actor + offset);
-        }
-        if (value & mask)
-            goto unavailable;
-        if (actor->health > 0)
-            goto available;
-    unavailable:
-        result = 1;
-        goto done;
-    }
-available:
-    result = 0;
-done:
-    asm("" : "+r"(result));
-    return result;
+    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
 }
 void TentacleActor_ReactToContact(struct SceneActorBehaviorContactView *source,
                                   struct SceneActorBehaviorContactView *destination, void *input)

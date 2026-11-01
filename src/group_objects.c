@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "group_objects.h"
+#include "display_sequence_inline.h"
 
 // MATCHING_CONCESSION: register-pinning
 int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int index)
@@ -40,9 +41,7 @@ u32 BoardPiece_Destroy(struct GroupObjects *m, struct GroupPiece *p, int index)
 
 static inline u32 frame_factor(u16 v)
 {
-    register u32 value asm("r1") = v;
-    u32 mask = 15;
-    return mask & value;
+    return DisplaySequence_MaskCommand(v, 15);
 }
 
 void BoardPiece_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int index)
