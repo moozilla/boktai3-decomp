@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "engine.h"
@@ -134,7 +133,6 @@ void sub_08187F44(struct ArmorChaseActor *actor)
                 if (absX + absZ <= 3) {
                     ActorController_SetBehavior(actor, 32);
                     *decision = 1;
-                    DEBUG_NOP();
                     actor->attackCooldown = 180;
                 } else
                     ActorController_SetBehaviorIfFinished(actor, 19);
