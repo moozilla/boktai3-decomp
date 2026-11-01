@@ -47,16 +47,36 @@ static inline u8 Armor_FacingValue(struct ArmorChaseActor *actor)
     return actor->facing;
 }
 
-// MATCHING_CONCESSION: register-pinning
+// Player-relative deltas, x and z rounded to 256-unit grid cells, and their magnitudes.
+#define ARMOR_PLAYER_DELTAS(actor, px, ax, pz, az, dx, dy, dz, absX, absY, absZ)                   \
+    do {                                                                                           \
+        px = gGameState->positionX;                                                                \
+        ax = (actor)->x;                                                                           \
+        dx = px - ax;                                                                              \
+        dy = gGameState->positionY - (actor)->y;                                                   \
+        pz = gGameState->positionZ;                                                                \
+        az = (actor)->z;                                                                           \
+        dz = pz - az;                                                                              \
+        dx = (dx + 128) >> 8;                                                                      \
+        dz = (dz + 128) >> 8;                                                                      \
+        absX = dx;                                                                                 \
+        absY = dy;                                                                                 \
+        absZ = dz;                                                                                 \
+        if (dx < 0)                                                                                \
+            absX = -dx;                                                                            \
+        if (dy < 0)                                                                                \
+            absY = -dy;                                                                            \
+        if (dz < 0)                                                                                \
+            absZ = -dz;                                                                            \
+    } while (0)
+
 // confidence=low: steers toward the player and selects aligned attacks.
 void sub_081879A8(struct ArmorChaseActor *actor)
 {
     s32 playerX, actorX, playerZ, actorZ, deltaY, distance, absZ, direction;
-    register s32 absZValue asm("r2");
-    register s32 absX asm("r8");
-    register s32 gridX asm("r6");
+    s32 absX;
+    s32 absY;
     s32 deltaX;
-    register s32 gridZ asm("r5");
     s32 deltaZ;
 
     u16 timer;
@@ -88,27 +108,8 @@ void sub_081879A8(struct ArmorChaseActor *actor)
     if (actor->phase != 255 && actor->behavior != 19 && actor->behavior != 33 &&
         actor->behavior != 32 && actor->behavior != 34)
         return;
-    playerX = gGameState->positionX;
-    actorX = actor->x;
-    deltaX = playerX - actorX;
-    deltaY = gGameState->positionY - actor->y;
-    playerZ = gGameState->positionZ;
-    actorZ = actor->z;
-    deltaZ = playerZ - actorZ;
-    deltaX = (deltaX + 128) >> 8;
-    deltaZ = (deltaZ + 128) >> 8;
-    absX = deltaX;
-    distance = deltaY;
-    absZValue = deltaZ;
-    if (deltaX < 0)
-        absX = -deltaX;
-    if (deltaY < 0)
-        distance = -deltaY;
-    if (deltaZ < 0)
-        absZValue = -deltaZ;
-    absZ = absZValue;
-    gridX = deltaX;
-    gridZ = deltaZ;
+    ARMOR_PLAYER_DELTAS(actor, playerX, actorX, playerZ, actorZ, deltaX, deltaY, deltaZ, absX, absY,
+                        absZ);
     if (actor->flags & 1) {
         decision = &actor->decision;
         switch (*decision) {
@@ -134,8 +135,8 @@ void sub_081879A8(struct ArmorChaseActor *actor)
                 if (Armor_FacingValue(actor) == direction && distance <= 1)
                     goto attack;
                 if ((s16)actor->attackCooldown <= 0) {
-                    if (gridX == 0) {
-                        if (gridZ < 0) {
+                    if (deltaX == 0) {
+                        if (deltaZ < 0) {
                             if (actor->facing == 192)
                                 goto alignHighZ;
                         } else if (actor->facing == 64)
@@ -145,8 +146,8 @@ void sub_081879A8(struct ArmorChaseActor *actor)
                         ActorController_SetBehavior(actor, 24);
                         actor->attackCooldown = 180;
                         break;
-                    } else if (gridZ == 0) {
-                        if (gridX < 0) {
+                    } else if (deltaZ == 0) {
+                        if (deltaX < 0) {
                             if (actor->facing == 128)
                                 goto alignHighX;
                         } else if (actor->facing == 0)
@@ -173,29 +174,29 @@ void sub_081879A8(struct ArmorChaseActor *actor)
                     ActorController_SetBehavior(actor, 10);
                 if ((s16)actor->attackCooldown > 0)
                     break;
-                if (gridX == 0) {
-                    if (gridZ < 0) {
+                if (deltaX == 0) {
+                    if (deltaZ < 0) {
                         if (actor->facing == 192)
                             goto strikeHighZ;
                     } else if (actor->facing == 64)
                         goto strikeHighZ;
                     goto resetHigh;
                 strikeHighZ:
-                    if (distance <= 127 && absZ <= 4) {
+                    if (absY <= 127 && absZ <= 4) {
                         ActorController_SetBehavior(actor, 36);
                         actor->decision = 0;
                         break;
                     }
                     goto resetHigh;
-                } else if (gridZ == 0) {
-                    if (gridX < 0) {
+                } else if (deltaZ == 0) {
+                    if (deltaX < 0) {
                         if (actor->facing == 128)
                             goto strikeHighX;
                     } else if (actor->facing == 0)
                         goto strikeHighX;
                     goto resetHigh;
                 strikeHighX:
-                    if (distance <= 127 && absX <= 4) {
+                    if (absY <= 127 && absX <= 4) {
                         ActorController_SetBehavior(actor, 36);
                         actor->decision = 0;
                         break;
@@ -244,8 +245,8 @@ void sub_081879A8(struct ArmorChaseActor *actor)
                 if (Armor_FacingValue(actor) == direction && distance <= 1)
                     goto attack;
                 if ((s16)actor->attackCooldown <= 0) {
-                    if (gridX == 0) {
-                        if (gridZ < 0) {
+                    if (deltaX == 0) {
+                        if (deltaZ < 0) {
                             if (actor->facing == 192)
                                 goto alignLowZ;
                         } else if (actor->facing == 64)
@@ -255,8 +256,8 @@ void sub_081879A8(struct ArmorChaseActor *actor)
                         ActorController_SetBehavior(actor, 24);
                         actor->attackCooldown = 180;
                         break;
-                    } else if (gridZ == 0) {
-                        if (gridX < 0) {
+                    } else if (deltaZ == 0) {
+                        if (deltaX < 0) {
                             if (actor->facing == 128)
                                 goto alignLowX;
                         } else if (actor->facing == 0)
