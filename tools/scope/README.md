@@ -820,7 +820,8 @@ Each was read from the compiler source and confirmed on a live draft.
    outside the loop (reg_in_basic_block_p fails). The cosine's mask then scores alone,
    and both stay `movs r0, #0xff` as in the ROM. On the cosine side instead the
    variable's set comes before the branch, so it moves (25 / 21). Flow deletes the dead
-   set before the loop. `hoist` marks a folded set `+ equal set insn U line L`.
+   set before the loop. `hoist` marks a folded set `+ equal set insn U line L` and adds
+   the first set's own score to the test (`26 x 2 x 2 >= 77; alone 26 x 1 x 1 < 77`).
 22. **Stack slot order is pseudo order.** Reload gives each spilled pseudo a slot in
    pseudo-number order (alter_reg), at rising offsets; pseudos it evicts later come
    after. Pseudo numbers follow first appearance, so declaration order is a frame lever.

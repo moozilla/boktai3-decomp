@@ -5064,9 +5064,10 @@ def cmd_hoist(src, func, env):
             continue
         if cur is None:
             continue
-        m = re.match(r"match fn=\w+ insn=(\d+) regno=\d+ into=(\d+)", ln)
+        m = re.match(r"match fn=\w+ insn=(\d+) regno=\d+ into=(\d+) savings=(\d+) lifetime=(\d+)", ln)
         if m:
-            merged.setdefault((len(passes), int(m.group(2))), []).append(int(m.group(1)))
+            merged.setdefault((len(passes), int(m.group(2))), []).append(tuple(map(int, (m.group(1), m.group(3),
+                                                                                        m.group(4)))))
             continue
         m = re.match(r"cand fn=\w+ loop=(\d+) insn=(\d+) regno=(\d+) may_not=(\d) maybe_never=(\d) used_before=(\d)"
                      r" in_block=(\d) set_in_loop=(\d+) invariant=(\d)", ln)
@@ -5086,7 +5087,12 @@ def cmd_hoist(src, func, env):
             if uid in last:
                 need = cnt * (2 if once else 1)
                 ok = done or t * sv * life >= need
-                last[uid]["move"] = (ok, f"{t} x {sv} x {life} {'>=' if ok else '<'} {need}", life)
+                test = f"{t} x {sv} x {life} {'>=' if ok else '<'} {need}"
+                also = merged.get((len(passes), uid), [])
+                if also:  # combine_movables summed them: what the first set scores alone
+                    sv1, life1 = sv - sum(a[1] for a in also), life - sum(a[2] for a in also)
+                    test += f"; alone {t} x {sv1} x {life1} {'>=' if t * sv1 * life1 >= need else '<'} {need}"
+                last[uid]["move"] = (ok, test, life)
     if not passes:
         sys.exit(f"no loop trace for {func}: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh), or it has no loop")
     print(f"{func}: {info.get('counts') or 'MATCH'}; loop invariants, {len(passes)} loop pass(es)"
@@ -5103,7 +5109,7 @@ def cmd_hoist(src, func, env):
                 also = merged.get((i, uid), [])
                 if also:  # the same invariant set again later: its savings and lifetime are in this test
                     what += "  + equal set" + "s" * (len(also) > 1) + " " + ", ".join(
-                        f"insn {u} line {lines.get(u, '?')}" for u in also)
+                        f"insn {u} line {lines.get(u, '?')}" for u, _, _ in also)
                 if c["move"] and (c["move"][0] or c["move"][2] > 2 or also):
                     print(f"    {'moved' if c['move'][0] else 'kept '}  {what}  ({c['move'][1]})")
                     joined |= bool(also) and c["move"][0]
