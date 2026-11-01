@@ -17,12 +17,57 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline s32 SelectContactTarget(struct SceneActorBehaviorContactView *source,
-                                      struct SceneActorRegistryResetView *actor, u32 parameter)
+static inline u32 Unavailable(struct SceneActorRegistryResetView *actor)
 {
+    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
+}
+static inline u32 Motion(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    return SceneActorPlacement_ReadFlags16((struct SceneActorPlacementView *)actor, mask);
+}
+static inline u16 *MotionFlags(struct SceneActorRegistryResetView *actor)
+{
+    return &actor->flags2D4;
+}
+static inline u8 TestControl(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    if (actor->flags2C0 & mask)
+        return 1;
+    return 0;
+}
+static inline void MarkContact(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    actor->flags2CC = mask | actor->flags2CC;
+}
+static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorContactView *source)
+{
+    u32 mask = inputMask;
+    return source->reactionFlags & mask;
+}
+static inline u32 TestMotion(u16 *flags, u32 mask)
+{
+    return *flags & mask;
+}
+static inline void AimAtContactTarget(struct SceneActorRegistryResetView *actor)
+{
+    struct SceneActorChaseTarget *target;
+    if (TestControl(actor, 2))
+        actor->tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+    else if (actor->tracking.target == 0)
+        return;
+    target = actor->tracking.target;
+    {
+        s32 dx = target->position.x - actor->body.position.x;
+        s32 dy = target->position.z - actor->body.position.z;
+        actor->tracking.heading = Math_Atan2(dx, dy);
+        actor->tracking.distance = dx * dx + dy * dy;
+    }
+}
+static inline void SelectContactTarget(struct SceneActorBehaviorContactView *source, void *object)
+{
+    struct SceneActorRegistryResetView *actor = object;
     s32 flagged = 0;
     u16 owners = source->kind;
-    u32 reaction = source->reactionFlags;
     if (owners & 1) {
         actor->tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         flagged = 1;
@@ -42,137 +87,143 @@ static inline s32 SelectContactTarget(struct SceneActorBehaviorContactView *sour
         flagged = 1;
     }
     actor->field2E0 = owners;
-    actor->field2D8 = parameter;
-    actor->field2DC = reaction;
-    return flagged;
-}
-
-static inline void AimAtContactTarget(struct SceneActorRegistryResetView *actor)
-{
-    struct SceneActorChaseTarget *target;
-    if (Test(actor->flags2C0, 2))
-        actor->tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
-    else if (actor->tracking.target == 0)
-        return;
-    target = actor->tracking.target;
     {
-        s32 dx = target->position.x - actor->body.position.x;
-        s32 dy = target->position.z - actor->body.position.z;
-        actor->tracking.heading = Math_Atan2(dx, dy);
-        actor->tracking.distance = dx * dx + dy * dy;
+        u32 parameter = source->parameter34;
+        u32 reaction = source->reactionFlags;
+        actor->field2D8 = parameter;
+        actor->field2DC = reaction;
     }
+    if (flagged)
+        AimAtContactTarget(actor);
 }
-
 static inline void ExtendContactTimer(struct SceneActorRegistryResetView *actor)
 {
     actor->group.common.gate.counter += 0x12C;
     if (actor->group.common.gate.counter > actor->group.common.gate.duration)
         actor->group.common.gate.counter = actor->group.common.gate.duration;
 }
-
 #ifdef NONMATCHING
-// fuzzy: 34.8%
+// fuzzy: 93.5%
+// 47 insns differ; with AGBCC_PRI=source:+36 (source in sb, as the ROM has it) 20 do.
+// The ROM starts with a dead `ldr r0, [r6]` (actor->object) and no null check:
+// delete_null_pointer_checks removed IsUnavailable's `if (actor)` after a dereference, yet that load
+// survived flow. The ROM also keeps IsUnavailable's flags2D4 address for every later flag test (sl),
+// which LCM only does when that occurrence is upward-exposed in its block; here `motion` is assigned
+// first instead, so the 0x40 mask loads after the address and source and motion swap sb/sl. The
+// rest are PRE stack slots: preorder wants N 808..811 (+3..+6) at gcse.
 void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactView *source,
-                  struct SceneActorBehaviorContactView *destination,
-                  struct SceneActorRegistryResetView *actor)
+                                              struct SceneActorBehaviorContactView *destination,
+                                              struct SceneActorRegistryResetView *actor)
 {
-    u32 attackFlag;
-    s32 flagged;
-
-    if (SceneActorPlacement_IsUnavailable((void *)actor))
+    struct ContactCollider *primary;
+    u16 *motion;
+    u32 unavailable;
+    u32 sourceFlags;
+    s32 power;
+    motion = MotionFlags(actor);
+    unavailable = Unavailable(actor);
+    if (unavailable)
         return;
-
-    if (((struct SceneActorRegistryActor *)actor)->field178 != 0) {
-        if (actor->field2E6 == 0)
-            return;
-        destination->remaining = 0;
-        destination->mode = 0;
-        return;
-    }
-    if (actor->colliderA.flags & 4)
-        return;
-    if (source->flags & 1)
-        goto damage;
-
-    if (!(source->parameter34 & 0x20000))
-        return;
-    if (actor->flags2D4 & 0xA007)
-        return;
-    if (actor->group.countdown5C8 != 0)
-        return;
-    actor->group.countdown5C8 = 0x3C;
-    attackFlag = actor->flags2D0 & 0x8000000;
-    if (attackFlag) {
-        if ((destination->flags & 0x100) && (source->flags & 0x100)) {
-            s32 d = destination->direction - source->direction;
-            if (d < 0)
-                d = -d;
-            if (d <= 0x20) {
-                actor->field2B8 = source->unknown3C;
-                actor->field2E6 = 1;
-                *(u16 *)actor->group.unknown5CE = Div(actor->field2B8, 3);
-                actor->flags2D4 |= 0x2000;
-                return;
-            }
+    primary = &actor->colliderA;
+    if (((struct SceneActorRegistryActor *)actor)->field178) {
+        if (actor->field2E6) {
+            destination->remaining = unavailable;
+            destination->mode = 0;
         }
-        destination->remaining = 0;
-        actor->reactionSoundVariant = 0;
-        flagged = SelectContactTarget(source, actor, source->parameter34);
-        if (flagged)
-            AimAtContactTarget(actor);
-    } else {
-        destination->remaining = attackFlag;
-        actor->reactionSoundVariant = attackFlag;
-        flagged = SelectContactTarget(source, actor, source->parameter34);
-        if (flagged)
-            AimAtContactTarget(actor);
+        return;
     }
-    if (actor->flags2D4 & 0x80)
-        ExtendContactTimer(actor);
-    actor->field2E6 = 1;
-    return;
-
-damage:
-    if (gEngineFlags & 0x4800)
+    {
+        u32 mask = 4;
+        if (primary->flags & mask)
+            return;
+    }
+    {
+        u32 mask = 1;
+        sourceFlags = source->flags;
+        if (!(sourceFlags & mask)) {
+            u32 attack;
+            {
+                u32 mask = 0x20000;
+                if (!(mask & source->parameter34))
+                    return;
+            }
+            if (TestMotion(motion, 0xA007))
+                return;
+            if (actor->group.countdown5C8)
+                return;
+            actor->group.countdown5C8 = 0x3C;
+            attack =
+                SceneActorPlacement_ReadFlags32((struct SceneActorPlacementView *)actor, 0x8000000);
+            if (attack) {
+                u32 mask = 0x100;
+                if ((destination->flags & mask) && (sourceFlags & mask)) {
+                    s32 d = destination->direction - source->direction;
+                    if (d < 0)
+                        d = -d;
+                    if (d <= 0x20) {
+                        actor->field2B8 = source->unknown3C;
+                        actor->field2E6 = 1;
+                        *(u16 *)actor->group.unknown5CE = Div(actor->field2B8, 3);
+                        {
+                            u32 bit = 0x2000;
+                            *motion = bit | *motion;
+                        }
+                        return;
+                    }
+                }
+                destination->remaining = 0;
+                actor->reactionSoundVariant = 0;
+                SelectContactTarget(source, actor);
+            } else {
+                destination->remaining = attack;
+                actor->reactionSoundVariant = attack;
+                SelectContactTarget(source, actor);
+            }
+            if (TestMotion(motion, 0x80))
+                ExtendContactTimer(actor);
+            actor->field2E6 = 1;
+            return;
+        }
+    }
+    if (Test(gEngineFlags, 0x4800))
         sub_08220204(source, destination);
     else
         Collision_CalculateDamageResponse(source, destination);
     destination->parameter44 = source->parameter44;
-    {
-        u16 t = destination->mode;
-        actor->field2E6 = t;
+    actor->field2E6 = destination->mode;
+    if (ReadReactionFlags(0x40000, source)) {
+        u8 *defense = &actor->field9F;
+        power = source->power;
+        power -= *defense;
+        if (power < 0)
+            power = 0;
+        destination->power = power;
     }
-    if (source->reactionFlags & 0x40000) {
-        s32 v = source->power - actor->field9F;
-        destination->power = v < 0 ? 0 : v;
-    }
-    if (actor->flags2D4 & 6) {
-        destination->remaining = destination->remaining << 1;
-        {
-            s32 power = destination->power;
-            destination->power = power >= 0 ? power >> 1 : -(-power >> 1);
-        }
+    if (TestMotion(motion, 6)) {
+        destination->remaining <<= 1;
+        power = destination->power;
+        power = power >= 0 ? power >> 1 : -(-power >> 1);
+        destination->power = power;
     }
     SceneActor_SetContactReactionDirection(actor, source, destination);
-    flagged = SelectContactTarget(source, actor, source->parameter34);
-    if (flagged)
-        AimAtContactTarget(actor);
-    if (actor->field2E6 != 0 || (source->reactionFlags & 0x40)) {
-        if (actor->flags2D4 & 0x80)
+    SelectContactTarget(source, actor);
+    if (actor->field2E6 || ReadReactionFlags(0x40, source)) {
+        if (TestMotion(motion, 0x80))
             ExtendContactTimer(actor);
     }
-    if (Test(gGameState->flags868, 0x800) || (source->reactionFlags & 0x40)) {
-        destination->remaining = 0;
-        actor->reactionSoundVariant = 0;
-        actor->field2E6 = 1;
+    {
+        u32 mask = 0x800;
+        if (Test(gGameState->flags868, mask) || ReadReactionFlags(0x40, source)) {
+            destination->remaining = 0;
+            actor->reactionSoundVariant = 0;
+            actor->field2E6 = 1;
+        }
     }
-    if (actor->flags2D4 & 0x2000) {
+    if (TestMotion(motion, 0x2000))
         SceneActorEffects_SpawnContactParts((void *)actor);
-    }
     actor->reactionSoundVariant = destination->remaining;
     PlayerStats_AddContactHundredths(source, destination, actor->fieldA0);
-    actor->flags2CC |= 0x2000;
-    return;
+    MarkContact(actor, 0x2000);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_HandleColliderContact);
