@@ -1,4 +1,4 @@
-"""scope's hint for an and whose tied operand differs (constant-first `&=`, README fact 32)."""
+"""scope's hint for an and whose tied operand differs (constant-first `&=`, README fact 33)."""
 from pathlib import Path
 import unittest
 
