@@ -42,7 +42,7 @@ static inline struct ContactSwarmSprite *updatePlayback(struct Particle *eIn,
                                                         struct DisplaySequenceState *state,
                                                         struct ContactSwarmSprite *sprite)
 {
-    register struct Particle *e asm("r5") = eIn;
+    struct Particle *e = eIn;
     const volatile u16 *command;
     register u32 flags asm("r1");
     u32 bit;
@@ -159,7 +159,7 @@ static inline struct ContactSwarmSprite *updatePlayback(struct Particle *eIn,
 s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct ContactPosition *position)
 {
     struct ParticlePool *pool = gParticlePool;
-    register struct Particle *e asm("r5");
+    struct Particle *e;
     s32 slot;
     u32 zero2;
     if (!pool) {
@@ -207,7 +207,7 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
             e->sprite.flags &= ~1;
             Sprite_LinkToList(link, 0);
             {
-                register u8 *kind asm("r1") = (u8 *)e + 0x33;
+                u8 *kind = (u8 *)e + 0x33;
                 *kind = 2;
             }
         }
