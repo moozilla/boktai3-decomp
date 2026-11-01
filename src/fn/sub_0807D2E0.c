@@ -1,91 +1,39 @@
-// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_part_burst.h"
 #include "global.h"
 
 #include "scene_actor_reset.h"
 #include "engine.h"
 
-// confidence=low: hit reaction for a victim actor; mode 0/1 sets a stagger state, mode 2 a knockback path, then shows damage and sparks.
-
-#include "area_effect_link.h"
+#include "scene_actor_damage_visibility.h"
 #include "runtime.h"
 #include "ram.h"
 
-// confidence=low: hit reaction for a victim actor; mode 0/1 sets a stagger state, mode 2 a knockback path, then shows damage and sparks.
-
-// confidence=low: hit reaction for a victim actor; mode 0/1 sets a stagger state, mode 2 a knockback path, then shows damage and sparks.
-
-// confidence=low: hit reaction for a victim actor; mode 0/1 sets a stagger state, mode 2 a knockback path, then shows damage and sparks.
 void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void EffectGroup_SpawnPart(void *, s32, void *, void *, void *, s32, s32);
 
-static inline u8 F0807D2E0_Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
-
-static inline s32 F0807D2E0_LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
-
-static inline u8 F0807D2E0_ShouldShow(struct SceneActorRegistryResetView *actor)
-{
-    if (F0807D2E0_Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->field2E0;
-        register u32 mask asm("r2") = *owner;
-        if (!(mask & 0x20) && mask) {
-            switch (F0807D2E0_LocalPlayer()) {
-                case 0:
-                    if (*owner != 1)
-                        return 0;
-                    break;
-                case 1:
-                    if (*owner != 2)
-                        return 0;
-                    break;
-                case 2:
-                    if (*owner != 4)
-                        return 0;
-                    break;
-                case 3:
-                    if (*owner != 8)
-                        return 0;
-                    break;
-            }
-        }
-    }
-    return 1;
-}
-
-static inline void F0807D2E0_Fill(u32 *zero, void *dst)
+static inline void ClearDamageOffset(u32 *zero, void *dst)
 {
     *zero = 0;
     CpuSet(zero, dst, 0x05000002);
 }
 
-static inline void F0807D2E0_ShowDamage(struct SceneActorRegistryResetView *a)
+static inline void ShowDamage(struct SceneActorRegistryResetView *a, u32 *zero)
 {
-    u32 zero;
     u32 buffer[2];
     s32 health = a->health;
-    u32 max = *(u16 *)((u8 *)a + 0xB0);
-    s32 kind = *(s16 *)((u8 *)a + 0xB2);
-    s32 param = *(s16 *)((u8 *)a + 0x9A);
+    u32 max = (u16)a->defaultHealth;
+    s32 kind = (s16)a->fieldB2;
+    s32 param = (s16)a->field9A;
     SceneHud_SetTimedState(a->body.id, health, max, kind, 0, param);
-    F0807D2E0_Fill(&zero, buffer);
+    ClearDamageOffset(zero, buffer);
     if (a->reactionSoundVariant || !(a->field2D8 & 0x20000))
-        DamageNumberDisplay_Show(&a->colliderA, a->reactionSoundVariant, 0, &a->body.position, buffer,
-                                 1);
+        DamageNumberDisplay_Show(&a->colliderA, a->reactionSoundVariant, 0, &a->body.position,
+                                 buffer, 1);
 }
 
-static inline void F0807D2E0_SetState(struct SceneActorRegistryResetView *a, u32 state, u32 phase,
-                                      u32 behavior, u32 kind, void *target)
+static inline void SetReactionState(struct SceneActorRegistryResetView *a, u32 state, u32 phase,
+                                    u32 behavior, u32 kind, void *target)
 {
     a->state2A8 = state;
     a->phase2A9 = phase;
@@ -102,61 +50,59 @@ static inline void F0807D2E0_SetState(struct SceneActorRegistryResetView *a, u32
 }
 
 #ifdef NONMATCHING
-// fuzzy: 37.6%
-// scope shape 728 (differences once low registers are set aside)
-void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 p3, u32 flip,
-                  u32 p5)
+// fuzzy: 57.7%
+// Accesses the ROM makes through the parameter (sb) go through victim, the rest
+// through a (r7); the collider pointer and the damage-display zero are
+// function-level locals, as the ROM's early stack slots show. Remaining: the
+// zero's slot (ROM sp+0x10, allocated before the burst loop's unions), two
+// spilled pseudos the ROM has at sp+0x60/0x64, mask-first flag tests.
+// `scope.py frame`: sp+0x60 is the spark table (gRandomTable, stored once and
+// reloaded six times), sp+0x64 is &a->body.position. With no equivalence
+// (AGBCC_NOEQUIV) the table takes sb instead, so the ROM's table keeps the
+// doubled live length of a constant set but loses the equivalence (fact 20: a
+// later non-constant set), and the ROM keeps the spark spread 4 in sl like
+// 20/2/1, so the helper likely names it as a variable too.
+void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactPosition *position,
+                                         u32 p3, u32 flip, u32 p5)
 {
     struct SceneActorRegistryResetView *a = victim;
     struct SceneActorRegistryControlGroup *group = &a->group.common;
+    struct ContactCollider *collider = &a->colliderA;
     s32 category;
-    s32 i;
-    u32 pack[2];
-    u32 burst[2];
-    u32 hudPos[2];
+    u32 zero;
 
     category = a->category;
     a->field2B8 = 0;
 
-    if (a->flags2D4 & 0x2000) {
-        for (i = 2; i >= 0; i--) {
-            u32 idx = (gRandomIndex + 1) & 0x3FF;
-            gRandomIndex = idx;
-            pack[0] = (pack[0] & 0xFFFF0000) | ((gRandomTable[idx] & 0xF) - 7 & 0xFFFF);
-            idx = (idx + 1) & 0x3FF;
-            pack[0] = (pack[0] & 0xFFFF) | (((gRandomTable[idx] & 0x1F) - 16) << 16);
-            gRandomIndex = idx;
-            burst[0] = (pack[0] & 0xFFFF0000) | 5;
-            burst[0] = (burst[0] & 0xFFFF) | (0xA0000);
-            burst[1] = (burst[1] & 0xFFFF0000) | 5;
-            EffectGroup_SpawnPart(&a->group.common, 3, group, pack, burst, 0x28, 0x28);
-        }
-        a->flags2D4 &= ~0x2000;
-    }
+    if (a->flags2D4 & 0x2000)
+        SceneActorEffects_SpawnContactParts((void *)a);
+    a->flags2D4 &= ~0x2000;
 
-    if (mode > 1) {
-        if (mode == 2)
-            goto mode2;
-        goto done;
-    }
     if ((s32)mode < 0)
-        goto done;
+        return;
+    if (mode == 2)
+        goto mode2;
+    if (mode > 1)
+        return;
 
     if (a->field2B5 != 0x15) {
-        F0807D2E0_SetState(a, 3, 0, 0, 0x15, *(void **)((u8 *)group + 0x228));
+        SetReactionState(a, 3, 0, 0, 0x15, *(void **)((u8 *)group + 0x228));
+        a->field2B8 = 0;
         a->flags2D0 |= 0x20000;
     }
     a->flags2D0 |= 4;
     a->flags2CC &= ~0x400000;
-    a->field2C2 = 0x40;
-    group->gate.flags = 0;
-    group->gate.counter = 0;
-    a->flags2D4 &= ~0x380;
-    a->tracking.flags &= ~0x18;
+    ((struct SceneActorRegistryResetView *)victim)->field2C2 = 0x40;
+    ((struct SceneActorRegistryResetView *)victim)->group.common.gate.flags = 0;
+    ((struct SceneActorRegistryResetView *)victim)->group.common.gate.counter = 0;
+    ((struct SceneActorRegistryResetView *)victim)->flags2D4 &= ~0x380;
+    ((struct SceneActorRegistryResetView *)victim)->tracking.flags &= ~0x18;
     if (a->flags2CC & 0x200000) {
         a->flags2D0 &= ~0x1000000;
         a->flags2D4 &= ~0x200;
-        a->field2D8 = 0;
+        group->control.mode = 0;
+        group->control.counter = 0;
+        group->control.timer = 0;
     }
     a->flags2D4 &= ~0x400;
     a->group.turn.turnsRemaining = 0xFF;
@@ -167,7 +113,7 @@ void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 
     else
         *(struct ContactPosition *)((u8 *)a->drawable + 0x40) = a->body.position;
     a->flags2D6 |= 0x2000;
-    goto done;
+    return;
 
 mode2:
     a->flags2D0 |= 4;
@@ -178,46 +124,53 @@ mode2:
         *(u32 *)((u8 *)a->drawable + 0x28) |= 1;
     if ((s32)flip > 0) {
         a->field2EA = 0;
-        *(s16 *)((u8 *)a + 0x2E4) = *(s16 *)((u8 *)a + 0x9C);
-        *(s16 *)((u8 *)&a->colliderA + 0x3E) = *(s16 *)((u8 *)a + 0x9C);
-        *(s16 *)((u8 *)a + 0x9C) = 0;
+        a->reactionSoundVariant = a->health;
+        *(s16 *)((u8 *)collider + 0x3E) = a->health;
+        a->health = 0;
         a->flags2D4 |= 8;
         a->flags2CC |= 0x400;
         a->flags2D0 |= 0xA0000;
-        SceneActorAttachment_ReplaceResponseSlot((u8 *)a, 0, 0x7F, 0);
-        SceneActorAttachment_ReplaceResponseSlot((u8 *)a, 1, 0x7F, 0);
-        SceneActorAttachment_ReplaceResponseSlot((u8 *)a, 3, 0x7F, 0);
-        SceneActorEffects_AdvanceSteps((u8 *)a, 4);
-        F0807D2E0_SetState(a, 3, 0, 0, 0x11, *(void **)((u8 *)a + 0x234));
-        if (F0807D2E0_ShouldShow(a))
-            F0807D2E0_ShowDamage(a);
-        if (!F0807D2E0_Test(gEngineFlags, 0x4800) && !(a->flags2D0 & 0x800))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, a->body.id);
+        SceneActorAttachment_ReplaceResponseSlot(victim, 0, 0x7F, 0);
+        SceneActorAttachment_ReplaceResponseSlot(victim, 1, 0x7F, 0);
+        SceneActorAttachment_ReplaceResponseSlot(victim, 3, 0x7F, 0);
+        SceneActorEffects_AdvanceSteps(victim, 4);
+        SetReactionState(a, 3, 0, 0, 0x11, a->deathControl);
+        if (SceneActorDamage_ShouldShow(a))
+            ShowDamage(a, &zero);
+        if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) && !(a->flags2D0 & 0x800))
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)a->body.id);
         if (category == 4 || category == 1) {
-            hudPos[0] = (hudPos[0] & 0xFFFF0000) | 0x50;
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0x20);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0x40);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0x5E);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0x80);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0xC4);
-            SparkParticle_Spawn(&a->colliderA, 0x14, &a->body.position, 0, 2, 1, 0, 0xF0);
-            Sound_PlaySong(0xE5);
+            union SceneActorRegistryPackedPosition range;
+            range.packed.x = 80;
+            range.packed.y = 60;
+            range.packed.z = 60;
+            SceneActorEffects_SpawnDefeatSparks(a, &range.position, gRandomTable,
+                                                SceneActorEffects_NextSparkCount(gRandomTable));
+            switch (a->category) {
+                case 4:
+                case 1:
+                case 5:
+                case 7:
+                case 6:
+                case 24:
+                case 25:
+                    Sound_PlaySong(0xE5);
+                    break;
+            }
         }
     } else {
-        s32 half = *(s16 *)((u8 *)a + 0x9C) / 2;
+        s32 half = a->health / 2;
         s32 left;
-        *(s16 *)((u8 *)a + 0x2E4) = half;
-        *(s16 *)((u8 *)&a->colliderA + 0x3E) = half;
-        left = *(s16 *)((u8 *)a + 0x9C) - half;
+        a->reactionSoundVariant = half;
+        *(s16 *)((u8 *)collider + 0x3E) = half;
+        left = a->health - half;
         if (left <= 0)
             left = 0;
-        *(s16 *)((u8 *)a + 0x9C) = left;
-        if (F0807D2E0_ShouldShow(a))
-            F0807D2E0_ShowDamage(a);
+        a->health = left;
+        if (SceneActorDamage_ShouldShow(a))
+            ShowDamage(a, &zero);
     }
-
-done:;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0807D2E0);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyHitResponse);
 #endif

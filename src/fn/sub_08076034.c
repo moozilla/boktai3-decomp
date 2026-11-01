@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
 void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *actor, s32 index)
 {

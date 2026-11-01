@@ -46,4 +46,8 @@ ActorAttachment_CreateAlternateSpriteSlot(struct ContactPosition *, void *, s32,
 struct ActorAttachmentSlotView *
 ActorAttachment_CreateMeterPartsSlot(u32, struct ContactPosition *, void *, s32, u32, s16 *, s32,
                                      u32, struct ActorAttachmentFollowView *, u32);
+struct ActorAttachmentSlotView *
+ActorAttachment_CreatePartsSlotWithCount(u8, struct ContactPosition *, void *, s32, u32, s16 *, s32,
+                                         u32, struct ActorAttachmentFollowView *, u32);
+s32 ActorAttachment_IsUnavailable(struct ActorAttachmentSlotView *);
 #endif

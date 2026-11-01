@@ -835,7 +835,7 @@ def cmd_land(args):
     merged = re.sub(r"^\s*//[^\n]*(REPORT\.md|build/scope)[^\n]*\n", "", merged, flags=re.M)
     sys.path.insert(0, os.path.join(ROOT, "tools", "scope"))
     import land as landlib
-    added = landlib.added_concessions(cur, merged)
+    added = landlib.added_concessions(cur, merged, os.path.join(ROOT, r["src"]))
     if any(added) and not allow_pins:
         sys.exit(landlib.pin_refusal(func, *added, r["src"]))
     pins = len(re.findall(r'\basm\s*\(\s*"(?:r\d+|sl|sb|fp|ip|lr|sp|pc)"\s*\)', merged))

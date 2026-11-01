@@ -133,6 +133,11 @@ scope is the main tool, not a cage. Use whatever helps, and write down what work
   [BIG_FUNCTIONS.md](BIG_FUNCTIONS.md).
 * A matched relative's C (`scope.py like`, `tools/relatives.py --c`), or rewriting the
   function from the ROM instead of patching the draft.
+* A private inline helper that copies a shared one: `tools/shared_inline.py FILE.c` (or
+  `--queue QUEUE.md`) lists each static inline that resembles a header's. A pinned private
+  copy of the display-sequence step is common; calling `PlayerCue_StepSequence*` or the
+  object's header step instead dropped every pin in EnemyD459_Update, Ooze_BeginAttack and
+  VulcanCannon_InitializeFromScript.
 
 What does not count as diagnosis: scripts that sweep C spellings blindly. Every variant
 should test a hypothesis that scope's output gave you. When a hunk cannot be explained,
@@ -146,9 +151,13 @@ that is a scope gap: record it (below) so the tool gets better.
   `asm("")` barriers only as above, with `--allow-pins`; the unit carries
   `// MATCHING_CONCESSION: register-pinning` and `progress.py` reports it as
   Register-pinned. Take pins out of a unit you touch.
-* An empty `do { } while (0);` counts as a barrier. Its loop notes end the first cse pass
+* An empty `do { } while (0);`, or `DEBUG_NOP()` (`include/global.h`), which expands to one, counts as a barrier. Its loop notes end the first cse pass
   and weight register refs the way a barrier does. A statement macro wrapped in
-  `do { ... } while (0)` with a body is ordinary C. An empty one is accepted as ordinary C
+  `do { ... } while (0)` with a body is ordinary C only when the original plausibly had
+  it, and the usual evidence is that several functions share it (twins computing the same
+  thing). One used at a single site, written only to double its statement's refs, is a
+  priority knob: the tools count it as a barrier (`tools/statement_macros.py`) and land
+  refuses it without `--allow-pins`. An empty one is accepted as ordinary C
   only with evidence that the original had a compiled-out macro at that spot, for example
   the same statement in every caller of a shared helper. The tools count it and land
   refuses it without `--allow-pins`.

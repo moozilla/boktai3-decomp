@@ -1,43 +1,58 @@
 #include "scene_pool.h"
 void ScenePool_SpawnEntriesNearPlayers(struct ScenePoolManager *);
 void ScenePool_UpdateOccupiedActorSlots(struct ScenePoolManager *);
-// confidence=low: records the position, map region and presence mask of each player (stopping
-// at the first missing one), then spawns nearby entries and updates occupied actor slots.
+
 #ifdef NONMATCHING
-// fuzzy: 61.3%
-// fix.py best (sweep after the inlined-insn fix)
-// The ROM does not strength-reduce regions[i] (it recomputes i*4 each iteration) and keeps m in r8.
-s32 sub_0803D430(struct ScenePoolManager *m)
+// fuzzy: 86.2%
+// confidence=low: records active player positions, then updates nearby pooled actors.
+// Order and shape match (source-level pointers set before the counter; the null exit is a goto so
+// stmt.c does not roll it into a duplicated exit test; `offset & ~3` keeps loop.c from reducing
+// the region address and keeps regions first). Left: global alloc ranks offset (4 refs, live 13)
+// above i (11 refs, live 30 doubled by update_equiv_regs for its constant first set), so i takes
+// r5; and reload picks r1 for the regions address where the ROM's r1 is unavailable (spill set
+// {r0, r3}). AGBCC_PRI=i:+654 AGBCC_SPILL=0:2 leaves 2 insns.
+s32 ScenePool_UpdateManager(struct ScenePoolManager *m)
 {
     s32 i;
-    u32 *regions = m->regions;
-    do {
-        m->playerCount = 0;
-    } while (0);
+    u32 *regions;
+    u32 *mask;
+    s32 *pos;
+    s32 *count;
+    struct ScenePoolPlayer **pp;
+    m->playerCount = 0;
     m->playerMask = 0;
+    regions = m->regions;
+    mask = &m->playerMask;
+    pos = m->playerPositions[0];
+    count = &m->playerCount;
+    pp = gParticipantActors;
     for (i = 0; i < 2; i++) {
-        struct ScenePoolPlayer *player = gParticipantActors[i];
-        if (player == ((void *)0)) {
-            do {
-                m->playerPositions[i][0] = 0;
-            } while (0);
-            m->playerPositions[i][1] = 0;
-            m->playerPositions[i][2] = 0;
-            break;
+        struct ScenePoolPlayer *player;
+        u32 offset = (u32)i * sizeof(*regions);
+        player = *pp;
+        if (!player) {
+            pos[0] = 0;
+            pos[1] = 0;
+            pos[2] = 0;
+            goto done;
         }
-        m->playerPositions[i][0] = player->position[0];
-        m->playerPositions[i][1] = player->position[1];
-        m->playerPositions[i][2] = player->position[2];
-        regions[i] = ((u32)m->playerPositions[i][0]) >> 24;
-        m->playerMask |= 1 << i;
-        m->playerCount++;
+        pos[0] = player->position[0];
+        pos[1] = player->position[1];
+        pos[2] = player->position[2];
+        {
+            u32 region = (u32)pos[0] >> 24;
+            *(u32 *)((u8 *)regions + (offset & ~3)) = region;
+        }
+        *mask |= 1u << i;
+        (*count)++;
+        pos += 4;
+        pp++;
     }
-
+done:
     ScenePool_SpawnEntriesNearPlayers(m);
     ScenePool_UpdateOccupiedActorSlots(m);
     return 0;
 }
-
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0803D430);
+INCLUDE_ASM("asm/nonmatching", ScenePool_UpdateManager);
 #endif

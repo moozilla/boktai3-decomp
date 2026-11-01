@@ -35,7 +35,9 @@ def split_source(text, func_names):
     m = None
     ends = []
     for name in func_names:
-        for m2 in re.finditer(r"^[^\n;#]*\b" + re.escape(name) + r"\s*\([^;{]*\)\s*\{", text, re.M):
+        # a definition's head has no braces, parentheses or operators before the name: this keeps
+        # `} else if (!FUNC(a, b)) {` (a call in a later function) from counting as one
+        for m2 in re.finditer(r"^[^\n;#{}()=!&|]*\b" + re.escape(name) + r"\s*\([^;{]*\)\s*\{", text, re.M):
             if m is None:
                 m = m2
             ends.append(body_end(text, m2.end() - 1))
@@ -265,20 +267,19 @@ def place(obj, own, rom_syms, address):
 
 
 def assemble(assembler, asm, workdir, tag=None):
-    """Assemble in a private directory, including when workers share a PID or diagnostic tag."""
+    """Assemble ASM in a private directory, including when callers share a tag or PID."""
     asm = re.sub(r"^(\w+):\n", lambda m: f"{m[1]}:\n\t.global {m[1]}__addr\n{m[1]}__addr:\n"
                  if not m[1].startswith(".") else m[0], asm, flags=re.M)
-    with tempfile.TemporaryDirectory(dir=workdir, prefix="as-") as temp:
-        name = tag or "unit"
-        s_path = os.path.join(temp, name + ".s")
-        o_path = os.path.join(temp, name + ".o")
-        with open(s_path, "w") as f:
-            f.write(asm + "\t.text\n\t.align\t2, 0\n")
+    with tempfile.TemporaryDirectory(prefix=(tag or "as") + "-", dir=workdir) as staging:
+        s_path = os.path.join(staging, "unit.s")
+        o_path = os.path.join(staging, "unit.o")
+        with open(s_path, "w") as source:
+            source.write(asm + "\t.text\n\t.align\t2, 0\n")
         result = subprocess.run(assembler + ["-o", o_path, s_path], capture_output=True, text=True)
         if result.returncode:
             return None, result.stderr
-        with open(o_path, "rb") as f:
-            return f.read(), ""
+        with open(o_path, "rb") as obj:
+            return obj.read(), ""
 
 
 class Fast:

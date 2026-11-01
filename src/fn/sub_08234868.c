@@ -36,29 +36,42 @@ static inline s32 Scale(s32 value)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 82.8%
-// scope shape 12 (differences once low registers are set aside)
+// fuzzy: 84.4%
+// scope: 17 ROM / 13 draft insns differ, shape 10. Exact with AGBCC_NOEQUIV=29
+// (the random table gets no REG_EQUIV); see notes/opus-health-restore-burst_2026-11-01.md
 // Initialize the eight outward-moving particles used by the health restore effect.
 void HealthRestoreEffect_StartParticleBurst(struct HealthRestoreEffect *effect)
 {
-    const u16 *table = gRandomTable;
     s32 i = 0;
     u32 *index = &gRandomIndex;
     u32 mask = 0x3FF;
     const s16 *sine = gUnk_086149C4;
+    u32 offset = 0;
     struct FlickerMotion *motion = &effect->particles[0].motion;
+    const u16 *table = gRandomTable;
+    u32 byteMask = 255;
+
     for (; i < 8; i++) {
         s32 angle, speed;
         motion->x = 16;
         motion->y = 32;
-        angle = (i * 32 + ((NextRandom(table, index, mask) >> 3) & 15)) - 8;
+        angle = i * 32 + ((NextRandom(table, index, mask) >> 3) & 15) - 8;
         speed = ((NextRandom(table, index, mask) >> 3) & 3) + 4;
         motion->velocityX = Scale(sine[(angle + 64) & 255] * speed);
-        motion->velocityY = Scale(sine[angle & 255] * speed);
-        effect->particles[i].flags &= ~1;
+        byteMask = 255;
+        motion->velocityY = Scale(sine[angle & byteMask] * speed);
+        {
+            u8 *base = (u8 *)effect->particles;
+            struct FlickerParticle *particle = (struct FlickerParticle *)(base + offset);
+            particle->flags &= ~1;
+        }
         motion->active = 1;
         motion->age = 0;
-        effect->particles[i].update = FlickerParticle_UpdateMotion;
+        {
+            u8 *base = (u8 *)&effect->particles[0].update;
+            *(void (**)(struct FlickerParticle *))(base + offset) = FlickerParticle_UpdateMotion;
+        }
+        offset += sizeof(struct FlickerParticle);
         motion = (struct FlickerMotion *)((u8 *)motion + sizeof(struct FlickerParticle));
     }
 }

@@ -95,11 +95,13 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
         links[1] = boss + 0x554;
         CpuSet(links[0], *palette, 0x04000008);
         {
-            register u32 stride asm("r0") = 0x21c;
-            links = (void **)(((u8 *)links) + stride);
-            palette = (void **)(((u8 *)palette) + stride);
-            key = (u16 *)(((u8 *)key) + stride);
-            half += stride;
+            union {
+                u32 v;
+            } stride = {0x21c};
+            links = (void **)(((u8 *)links) + stride.v);
+            palette = (void **)(((u8 *)palette) + stride.v);
+            key = (u16 *)(((u8 *)key) + stride.v);
+            half += stride.v;
         }
         i++;
     } while (i <= 1);

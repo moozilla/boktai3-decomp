@@ -1,35 +1,11 @@
-// MATCHING_CONCESSION: register-pinning
 #include "breakable_prop.h"
-static inline u32 cellAtPosition(struct ContactPosition *position)
+#include "scene_actor_terrain.h"
+s32 BreakableProp_InitializeFromScript(struct BreakableProp *prop, u32 id, u32 unused)
 {
-    s16 *xAddress = (s16 *)position;
-    s32 x, z;
-    x = *xAddress >> 8;
-    z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-static inline u32 firstCellAtPosition(struct ContactPosition *position)
-{
-    struct ContactPosition *source = position;
-    s16 *xAddress = (s16 *)source;
-    s32 x, z;
-    x = *xAddress >> 8;
-    z = source->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32 unused)
-{
-    struct BreakableProp *prop = input;
     struct ContactPackedVector packet;
     struct ContactPosition *position;
-    u32 cell, height, surface;
-    u8 *properties;
+    u32 height;
     u32 script;
-    asm("" : "+r"(prop));
     if (Script_SeekToKeyword('p')) {
         packet.x = ((Script_GetValue() >> 8) << 8) + 128;
         packet.y = Script_GetValue();
@@ -40,31 +16,11 @@ s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32 
         packet.z = 0;
     }
     position = (void *)&packet;
-    cell = firstCellAtPosition(position);
-    properties = TerrainModifiers_FindCellOverride(cell, 1);
-    if (properties)
-        properties += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        properties = map->cells + offset;
-    }
-    surface = *properties >> 4;
-    height = (*properties & 15) << 8;
-    switch (surface) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
+    height = SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(position), position);
     {
         struct ContactPosition *point = (void *)&packet;
-        u32 cellValue;
         point->y = height;
-        cellValue = cellAtPosition(point);
-        prop->cell = cellValue;
+        prop->cell = SceneActorTerrain_GetCellIndex(point);
     }
     {
         struct ContactPosition *point = (void *)&packet;

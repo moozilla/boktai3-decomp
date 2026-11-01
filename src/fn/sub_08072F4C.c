@@ -1,243 +1,233 @@
-#include "global.h"
-#include "scene_actor_contacts.h"
-#include "scene_actor_registry.h"
-#include "engine.h"
-
-/* Terrain cell record: the modifier override (+4) if one exists, else the map's cell entry. */
-
-/* Cell lies in the direction `dir` (low nibble) and carries no blocking override bits. */
-
-/* Half of the signed value a, rounded toward zero. */
-
-/* Map cell index for a position, or 0 when the position is off the map. */
-
-/* Contact probe of one candidate position; inlined twice in the ROM (looped copy and single copy). */
-
-// confidence=low: scene actor contact search; reports a contact distance through arg2 and returns whether one was found.
-
-/* Terrain cell record: the modifier override (+4) if one exists, else the map's cell entry. */
-
-/* Cell lies in the direction `dir` (low nibble) and carries no blocking override bits. */
-
-/* Half of the signed value a, rounded toward zero. */
-
-/* Map cell index for a position, or 0 when the position is off the map. */
-
-/* Contact probe of one candidate position; inlined twice in the ROM (looped copy and single copy). */
-
-// confidence=low: scene actor contact search; reports a contact distance through arg2 and returns whether one was found.
-void SceneActorContacts_SetDistanceGate(void *, void *, s32, s32, s32, s32);
-s32 SceneActorContacts_TestPlayerCondition(void *, s32, s32);
-s32 SceneActorTerrain_IsFacingPosition(void *, void *);
-void TetherActor_CopySampledPosition(void *);
-s32 sub_08076CDC(void *, void *, void *);
-s32 sub_0821D4F0(void *, void *, s32, s32);
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
-s32 Div(s32, s32);
-s32 Math_Atan2(s32, s32);
-s32 Nav_IsPositionInMesh(void *, void *, void *);
-void *memcpy(void *, const void *, u32);
+#ifdef NONMATCHING
+// fuzzy: 98.6%
+#include "scene_actor_init_actor.h"
+#include "scene_actor_contact_list.h"
+#include "scene_actor_adjacent_cell.h"
+struct SceneActorContactSample {
+    u8 unknown0[8];
+    u8 playerSlot, unknown9[3];
+    struct ContactPosition position;
+    u8 unknown14[0x48 - 0x14];
+};
+u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactSample *, u32, u32);
+u32 SceneActorTerrain_IsFacingPosition(struct SceneActorTerrainView *,
+                                       const struct ContactPosition *);
+u32 TetherActor_CopySampledPosition(struct ContactPosition *);
+s32 sub_08076CDC(struct SceneActorRegistryResetView *, struct ContactPosition *,
+                 struct ContactPosition *);
+s32 sub_0821D4F0(struct ContactPosition *, struct ContactPosition *, s32, s32);
+s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
+void *memcpy(void *, const void *, unsigned long);
 extern u32 gUnk_02000560[];
+static inline u8 TestEngineFlags(u32 flags, u32 mask)
+{
+    if (flags & mask)
+        return 1;
+    return 0;
+}
+static inline u8 TrackFlags(struct SceneActorChaseTracking *tracking, u32 mask)
+{
+    if (tracking->flags & mask)
+        return 1;
+    return 0;
+}
+static inline s32 HalfDistance(s32 a)
+{
+    if (a >= 0)
+        a = a >> 1;
+    else
+        a = -((-a) >> 1);
+    return a;
+}
+static inline s32 SquareDistance(struct ContactPosition *p)
+{
+    s32 x = p->x;
+    u32 squaredX = x * x;
+    s32 z = p->z;
+    u32 squaredZ = z * z;
+    return squaredX + squaredZ;
+}
+static inline u32 PlayerMask(s32 index, u32 mask)
+{
+    return gUnk_02000560[index] & mask;
+}
+static inline s32 Absolute(s32 angle)
+{
+    return angle < 0 ? -angle : angle;
+}
+static inline struct SceneActorChaseTracking *TrackingOf(struct SceneActorRegistryResetView *self)
+{
+    return &self->tracking;
+}
+static inline void WriteDelta(struct ContactPosition *delta, const struct ContactPosition *target,
+                              const struct ContactPosition *source)
+{
+    s16 *components = (s16 *)delta;
+    components[0] = target->x - source->x;
+    components[1] = target->y - source->y;
+    components[2] = target->z - source->z;
+}
+static inline s32 AngleSeparation(s32 angle)
+{
+    if (angle > 128)
+        angle -= 256;
+    else if (angle < -128)
+        angle += 256;
+    return Absolute(angle);
+}
 
-/* Terrain cell record: the modifier override (+4) if one exists, else the map's cell entry. */
-static inline u8 *Sub08072F4C_Cell(s32 cell)
+static inline s32 PlayerSlot(struct SceneActorContactSample *p)
 {
-    u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
-    if (data)
-        return data + 4;
-    return gTerrainMap->cells + (cell * 4 + 12);
-}
-/* Cell lies in the direction `dir` (low nibble) and carries no blocking override bits. */
-static inline s32 Sub08072F4C_Walkable(s32 cell, s32 dir)
-{
-    u8 *rec = Sub08072F4C_Cell(cell);
-    if ((rec[0] & 15) != dir)
-        return 0;
-    rec = Sub08072F4C_Cell(cell);
-    return (*(u16 *)(rec + 2) & 0x43) == 0;
-}
-/* Half of the signed value a, rounded toward zero. */
-static inline s32 Sub08072F4C_Half(s32 a)
-{
-    if (a < 0)
-        return -((-a) >> 1);
-    return a >> 1;
-}
-/* Map cell index for a position, or 0 when the position is off the map. */
-static inline s32 Sub08072F4C_CellAt(struct ContactPosition *p)
-{
-    s32 cx = (s8)(p->x >> 8);
-    s32 cz = (s8)(p->z >> 8);
-    if (cx < 0 || cz < 0)
-        return 0;
-    if (cx >= gTerrainWidth || cz >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[cz] + cx;
+    if (p->playerSlot <= 3)
+        return p->playerSlot;
+    return -1;
 }
 
-/* Contact probe of one candidate position; inlined twice in the ROM (looped copy and single copy). */
-static inline s32 Sub08072F4C_Probe(struct SceneActorRegistryActor *self, void *obj,
-                                    struct ContactPosition *pos, s32 kind, s32 *out)
+static inline u8 EvaluateSample(struct SceneActorRegistryResetView *base,
+                                struct SceneActorContactSample *sample, u32 kind, s32 *bestDistance)
 {
-    u8 *a1 = (u8 *)self;
-    u8 *g = a1 + 0xDC;
-    s16 dv[3];
-    s32 dist, angle, r4, sb, rc, cell, dir, width, cur, res;
-
-    dv[0] = pos->x - self->position.x;
-    dv[1] = pos->y - self->position.y;
-    dv[2] = pos->z - self->position.z;
-    dist = dv[0] * dv[0] + dv[2] * dv[2];
-    if (SceneActorTerrain_IsFacingPosition(self, pos)) {
-        *out = dist;
-        SceneActorContacts_SetDistanceGate(self, g, dist, 0, 0, kind);
+    struct SceneActorRegistryResetView *self;
+    struct SceneActorChaseGroup *group = &base->group;
+    struct ContactPosition difference;
+    struct ContactPosition *delta = &difference;
+    struct ContactPosition *own = &base->body.position;
+    struct ContactPosition *position = &sample->position;
+    s32 dist, angle, limit, threshold, transition, cell;
+    u32 facing;
+    WriteDelta(delta, position, own);
+    dist = SquareDistance(&difference);
+    self = base;
+    if ((u8)SceneActorTerrain_IsFacingPosition((void *)self, position)) {
+        *bestDistance = dist;
+        SceneActorContacts_SetDistanceGate((void *)base, (void *)&base->tracking, dist, 0, 0, kind);
         return 1;
     }
-    angle = Math_Atan2(dv[0], dv[2]) - a1[0x59];
-    if (angle > 0x80)
-        angle -= 0x100;
-    else if (angle < -0x80)
-        angle += 0x200;
-    if (angle < 0)
-        angle = -angle;
-    if (angle > a1[0xEA])
+    facing = self->body.direction;
+    angle = AngleSeparation(Math_Atan2(delta->x, delta->z) - facing);
+    if (angle > self->tracking.fieldEA)
         return 0;
 
     if (kind == 2) {
-        if (gEngineFlags & 0x4800) {
-            if (!SceneActorContacts_TestPlayerCondition(obj, 1, 0x10000))
+        if (TestEngineFlags(gEngineFlags, 0x4800)) {
+            if (!SceneActorContacts_TestPlayerCondition(sample, 1, 0x10000))
                 goto plain;
-            r4 = Sub08072F4C_Half(*(s32 *)(a1 + 0xF8));
-            if (g[0xF] & 4)
-                sb = r4;
+            limit = HalfDistance((s32)self->tracking.limit);
+            if (TrackFlags(TrackingOf(self), 4))
+                threshold = limit;
             else
-                sb = Div(r4 * 7, 10);
+                threshold = Div(limit * 7, 10);
         } else {
-            if (SceneActorContacts_TestPlayerCondition(obj, 1, 0x10000) ||
-                !(*(u32 *)((u8 *)gGameState + 0x868) & 0x20)) {
-                r4 = Sub08072F4C_Half(*(s32 *)(a1 + 0xF8));
-                if (g[0xF] & 4)
-                    sb = r4;
+            if (SceneActorContacts_TestPlayerCondition(sample, 1, 0x10000) ||
+                !(MonsterInit_TestWorldFlags(0x20))) {
+                limit = HalfDistance((s32)self->tracking.limit);
+                if (TrackFlags(TrackingOf(self), 4))
+                    threshold = limit;
                 else
-                    sb = Div(r4 * 7, 10);
+                    threshold = Div(limit * 7, 10);
             } else {
                 goto plain;
             }
         }
     } else {
-        if (gEngineFlags & 0x4800)
+        if (TestEngineFlags(gEngineFlags, 0x4800))
             return 0;
-        if (!(*(u32 *)((u8 *)gGameState + 0x868) & 0x20)) {
-            r4 = Sub08072F4C_Half(*(s32 *)(a1 + 0xF8));
-            if (g[0xF] & 4)
-                sb = r4;
+        if (!MonsterInit_TestWorldFlags(0x20)) {
+            limit = HalfDistance((s32)self->tracking.limit);
+            if (TrackFlags(TrackingOf(self), 4))
+                threshold = limit;
             else
-                sb = Div(r4 * 7, 10);
+                threshold = Div(limit * 7, 10);
         } else {
             goto plain;
         }
     }
     goto gate;
 plain:
-    r4 = *(s32 *)(a1 + 0xF8);
-    sb = *(s32 *)(a1 + 0xF4);
+    limit = (s32)self->tracking.limit;
+    threshold = (s32)self->tracking.range;
 gate:
-    if (dist > r4)
+    if (dist > limit)
         return 0;
-    rc = sub_08076CDC(self, a1 + 0x5C, pos);
-    if (rc < 0)
+    transition = sub_08076CDC(self, &self->body.position, &sample->position);
+    if (transition < 0)
         return 0;
-    cell = Sub08072F4C_CellAt(pos);
-    cur = *(u16 *)(a1 + 0x2F4);
-    dir = (s8)(*(u16 *)(a1 + 0x5E) >> 8);
-    width = *(s16 *)(gTerrainMap->cells + 4);
-    res = (cell - 1 == cur && Sub08072F4C_Walkable(cell, dir)) ||
-          (cell == cur + width && Sub08072F4C_Walkable(cell, dir)) ||
-          (cell + 1 == cur && Sub08072F4C_Walkable(cell, dir)) ||
-          (cell == cur - width && Sub08072F4C_Walkable(cell, dir));
-    if (res) {
-        if (!(g[0xF] & 4)) {
-            if (!Nav_IsPositionInMesh(*(void **)(a1 + 0x5D0), a1 + 0x5C, pos))
+    cell = SceneActorTerrain_GetCellIndex(&sample->position);
+    if (SceneActor_IsAdjacentCellOpen(self, cell)) {
+        if (!TrackFlags(TrackingOf(self), 4)) {
+            if (!Nav_IsPositionInMesh(group->route, &self->body.position, &sample->position))
                 return 0;
         }
-        *out = dist;
-        SceneActorContacts_SetDistanceGate(self, g, dist, 0, 0, kind);
+        *bestDistance = dist;
+        SceneActorContacts_SetDistanceGate((void *)self, (void *)&self->tracking, dist, 0, 0, kind);
         return 1;
     }
-    if (rc != 2) {
-        void *src;
-        if (g[0xF] & 0x20)
-            src = a1 + 0xE0;
-        else
-            src = a1 + 0x5C;
-        if (!sub_0821D4F0(src, pos, 10, 0x100))
+    if (transition != 2) {
+        if (TrackFlags(TrackingOf(self), 0x20)) {
+            if (!(u8)sub_0821D4F0(&self->tracking.destination, &sample->position, 10, 0x100))
+                return 0;
+        } else if (!(u8)sub_0821D4F0(&self->body.position, &sample->position, 10, 0x100))
             return 0;
     }
-    if (dist >= *out)
-        return 0;
-    *out = dist;
-    SceneActorContacts_SetDistanceGate(self, g, dist, sb, rc, kind);
-    return 1;
+    if (dist < *bestDistance) {
+        *bestDistance = dist;
+        SceneActorContacts_SetDistanceGate((void *)self, (void *)&self->tracking, dist, threshold,
+                                           transition, kind);
+        return 1;
+    }
+    return 0;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 27.2%
-// scope shape 863 (differences once low registers are set aside)
-// confidence=low: scene actor contact search; reports a contact distance through arg2 and returns whether one was found.
-u8 sub_08072F4C(struct SceneActorContactNode *arg0, struct SceneActorRegistryActor *arg1, s32 *arg2)
+u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, struct SceneActorRegistryActor *base,
+                s32 *distance)
 {
-    u8 snap[0x48];
-    u8 *a1 = (u8 *)arg1;
-    u8 *g;
-    u8 *obj;
-    s32 kind;
-    s32 tries;
-    s32 idx;
 
-    kind = arg0->kind;
-    if (kind == 2)
-        goto kind2;
-    if (kind != 1 && kind != 4)
-        return 0;
-    memcpy(snap, arg0->object, 0x48);
-    tries = 0;
-    do {
-        if (Sub08072F4C_Probe(arg1, snap, (struct ContactPosition *)(snap + 0xC), arg0->kind,
-                              arg2) &&
-            Nav_IsPositionInMesh(*(void **)(a1 + 0x5D0), a1 + 0x5C, snap + 0xC))
-            return 1;
-        TetherActor_CopySampledPosition(snap + 0xC);
-        tries++;
-    } while (tries <= 1);
-    return 0;
-
-kind2:
-    g = a1 + 0xDC;
-    if (!(g[0xF] & 2))
-        return 0;
-    obj = arg0->object;
-    if (gEngineFlags & 0x4800) {
-        u32 t;
-        if (obj == 0)
-            return 0;
-        t = obj[8];
-        idx = -1;
-        if (t <= 3)
-            idx = t;
-        if (idx < 0)
-            return 0;
-        if (gUnk_02000560[idx] & 8)
-            return 0;
+    struct SceneActorContactSample copy;
+    struct SceneActorContactSample *sample;
+    int tries;
+    switch (node->kind) {
+        case 1:
+        case 4:
+            memcpy(&copy, node->object, sizeof(copy));
+            for (tries = 0; tries < 2; tries++) {
+                if (EvaluateSample((void *)base, &copy, node->kind, distance) &&
+                    Nav_IsPositionInMesh(((struct SceneActorRegistryResetView *)base)->group.route,
+                                         &base->position, &copy.position))
+                    return 1;
+                TetherActor_CopySampledPosition(&copy.position);
+            }
+            break;
+        case 2:
+            if (!TrackFlags(&((struct SceneActorRegistryResetView *)base)->tracking, 2))
+                break;
+            {
+                u32 mode = TestEngineFlags(gEngineFlags, 0x4800);
+                struct SceneActorContactSample *candidate = node->object;
+                if (mode) {
+                    if (!candidate)
+                        break;
+                    {
+                        s32 index = PlayerSlot(candidate);
+                        if (index < 0)
+                            break;
+                        if (PlayerMask(index, 8))
+                            break;
+                    }
+                }
+                if (SceneActorContacts_TestPlayerCondition(candidate, 1, 0x21000))
+                    break;
+            }
+            sample = node->object;
+            if (EvaluateSample((void *)base, sample, node->kind, distance) &&
+                Nav_IsPositionInMesh(((struct SceneActorRegistryResetView *)base)->group.route,
+                                     &base->position,
+                                     &((struct SceneActorContactSample *)node->object)->position))
+                return 1;
+            break;
     }
-    if (SceneActorContacts_TestPlayerCondition(obj, 1, 0x21000))
-        return 0;
-    obj = arg0->object;
-    kind = arg0->kind;
-    if (Sub08072F4C_Probe(arg1, obj, (struct ContactPosition *)(obj + 0xC), kind, arg2) &&
-        Nav_IsPositionInMesh(*(void **)(a1 + 0x5D0), a1 + 0x5C, obj + 0xC))
-        return 1;
     return 0;
 }
+
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08072F4C);
+#include "global.h"
+INCLUDE_ASM("asm/nonmatching", SceneActorContacts_EvaluateCandidate);
 #endif

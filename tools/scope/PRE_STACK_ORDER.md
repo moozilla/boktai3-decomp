@@ -92,6 +92,33 @@ The larger Golem experiment likewise retained a 152-byte candidate over a
 69-byte alternative because the former had the useful relative ordering.
 Byte count was not the objective once instruction structure agreed.
 
+## With scope
+
+`scope.py FILE.c preorder [FUNC]` does the steps above on the last compile. It reads the
+expression table (`T`, each index's bucket and RTL) and PRE's reaching pseudos from
+`u.i.gcse`, counts `N` in `u.i.addressof`, and checks both halves of the model on the
+draft: every `(plus:SI reg const)` entry's bucket, and that PRE made its pseudos in
+`(bucket, index)` order. It then takes the ROM's slot order from `frame`'s pairing
+(spilled pseudos only; evicted ones get later slots), marks the adjacent pairs whose keys
+do not rise, and searches:
+
+* the table sizes that give the order with the draft's pseudo numbers, each with the
+  insn counts that produce it (`T 853 [N 1704..1707 (+8..+11)]`), and the size from which
+  no bucket wraps;
+* one renumbering cut: every base pseudo from a named one on moved by `d` (the C before
+  it makes `d` more or fewer pseudos), with `T` within 60 of the draft's. Parameters keep
+  their numbers. Each cut names the base's first set (`line 189 of
+  scene_actor_chase_step.h` for an inline copy).
+* for the nearest table size, how far all the movable bases may shift together and keep
+  the order; and when it needs fewer insns, the function body's lines that load a large
+  field offset into a register before the add. Each one moved into an inline helper is one
+  insn fewer with the same final code (README fact 31).
+
+`frame` prints the same report, without the full key table, when the slot order is not
+pseudo order. Expressions of other shapes (pool loads, register sums) are left out: their
+hash includes symbol addresses or codes the model does not have. The search keeps the
+draft's expression indices; a source change can reorder them, so compile every prediction.
+
 ## Source and acceptance discipline
 
 Use types, record layout, operation ownership, and call/return boundaries that

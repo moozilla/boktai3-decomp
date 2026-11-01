@@ -1,7 +1,7 @@
 #include "global.h"
+#include "hit_spark_random.h"
 #include "engine.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     u16 x, y, z, pad;
 };
@@ -80,11 +80,6 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             hud = target->hud;
             health = target->health;
             a = target->hudA;
-            {
-                register u32 d asm("r1");
-                asm("" : "=r"(d));
-                asm("" : : "r"(d));
-            }
             b = target->hudB;
             direction = 0;
             if (target->direction == 4)
@@ -96,41 +91,40 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         PlayerStats_AddContactHundredths(source, hit, 0);
     sparks:
         if (source->flags & target->sparkMask) {
-            register s32 i asm("r6");
+            s32 i;
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
             u32 *index = &gRandomIndex;
+            u32 limit = 0x3ff;
             u32 mask = 0x7f;
             i = 2;
             do {
-                register u32 random asm("r1");
-                register const u16 *table asm("r3");
+                u32 random;
+                u32 value;
                 u32 sample;
                 u32 x;
                 frame.velocity = gUnk_0824FE8C;
                 frame.position = target->position;
-                table = (const u16 *)RANDOM_TABLE_ADDR;
-                random = (*index + 1) & 0x3ff;
-                sample = table[random];
+                value = (u32)gRandomTable;
+                random = HitSpark_NextIndex(*index, limit);
+                sample = HitSpark_Sample(value, random);
                 x = pos->x - 0x40;
                 sample &= mask;
                 x += sample;
                 pos->x = x;
-                random = (random + 1) & 0x3ff;
-                pos->y += (u8)table[random];
-                random = (random + 1) & 0x3ff;
+                random = HitSpark_NextIndex(random, limit);
+                pos->y += (u8)HitSpark_Sample(value, random);
+                random = HitSpark_NextIndex(random, limit);
+                *index = random;
                 {
-                    u32 *cursor = index;
-                    *cursor = random;
-                }
-                {
-                    u32 last = table[random];
+                    u32 last = HitSpark_Sample(value, random);
                     x = pos->z - 0x40;
                     last &= mask;
                     x += last;
                     pos->z = x;
                 }
-                SparkParticle_Spawn(&frame.position, 1, vel, 0, 3, 8, 2, 2);
+                value = 0;
+                SparkParticle_Spawn(&frame.position, 1, vel, value, 3, 8, 2, 2);
                 i--;
             } while (i >= 0);
         }

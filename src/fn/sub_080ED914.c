@@ -13,7 +13,7 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s32, s32, s32, u32);
 s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
                                 s32, s32, s32, u32);
-void sub_0807D2E0(void *, u32, struct ContactPosition *, u32, u32, u32);
+void SceneActorReaction_ApplyHitResponse(void *, u32, struct ContactPosition *, u32, u32, u32);
 void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
 void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
 u32 Ivy_GetAnimationStatus(struct SceneActorRegistryResetView *);
@@ -247,7 +247,7 @@ void Ivy_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
         struct SceneActorRegistryResetView *victim;
         ((struct IvyDrawable *)actor->drawable)->mode = 2;
         victim = target->player;
-        sub_0807D2E0(victim, 0, &position, 0, flip, 0);
+        SceneActorReaction_ApplyHitResponse(victim, 0, &position, 0, flip, 0);
         if (frame <= 0x8C)
             goto animate;
         {

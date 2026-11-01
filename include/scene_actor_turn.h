@@ -100,6 +100,14 @@ static inline void SceneActorTurn_SelectAnimation(struct SceneActorRegistryReset
     a->field2B3 = 0;
 }
 
+static inline void SceneActorTurn_SelectProfileAnimation(struct SceneActorAnimationView *actor,
+                                                         s32 index, u32 variant, u32 flags)
+{
+    struct SceneActorProfileEntry *entry =
+        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
+    SceneActorTurn_SelectAnimation((void *)actor, entry->value, variant, flags);
+}
+
 static inline u8 SceneActorTurn_OctantDirection(u32 octant)
 {
     return ((octant + 5) & 7) << 5;

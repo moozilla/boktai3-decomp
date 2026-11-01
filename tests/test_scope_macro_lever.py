@@ -1,5 +1,6 @@
 """`why` suggests the statement-macro (do-while(0)) lever for a global-alloc priority swap."""
 from pathlib import Path
+import tempfile
 import unittest
 
 from tools.matchsearch.evaluator import _load_scope
@@ -29,6 +30,56 @@ class MacroLever(unittest.TestCase):
         mentions = {1: [(10, 1), (11, 1)], 2: [(12, 1), (13, 1)]}
         lines = {10: 5, 11: 6, 12: 5, 13: 6}
         self.assertIsNone(self.scope.macro_lever(None, 1, lo_rec, 2, hi_rec, mentions, lines))
+
+    def test_each_line_that_flips_alone(self):
+        # sub_080A34BC: the table (3 refs, life 100) against the 0x3FF mask (3 refs, life 86).
+        lo_rec = ("G", 257, 300, 3, 100, 0, 9)
+        hi_rec = ("G", 263, 348, 3, 86, 0, 12)
+        mentions = {257: [(494, 1), (510, 1), (900, 1)], 263: [(500, 1), (503, 1), (896, 1)]}
+        lines = {494: 28, 510: 30, 900: 30, 500: 29, 503: 29, 896: 29}
+        self.assertEqual(self.scope.macro_lines(None, 257, lo_rec, 263, hi_rec, mentions, lines), [28, 30])
+
+    def test_hint_requires_a_shared_macro(self):
+        s = self.scope
+        saved = s.macro_lever, s.mention_lines, s.macro_lines, s.source_lines, s.shared_statement_macros
+        try:
+            s.macro_lever = lambda *a, **k: (54, 59, 16, 10)
+            s.mention_lines = lambda *a, **k: ""
+            s.macro_lines = lambda *a, **k: [54, 59]
+            s.source_lines = lambda *a, **k: {54: "x = t[i];"}
+            s.shared_statement_macros = lambda *a, **k: [("READ_SAMPLE", "include/r.h", 3, "(out) = (t)[(i)];")]
+            out = s.flip_levers(str, 26, ("G", 87, 2748, 12, 131, 0, 7), 77, ("G", 81, 3947, 10, 76, 0, 5), wd="w")
+        finally:
+            (s.macro_lever, s.mention_lines, s.macro_lines, s.source_lines,
+             s.shared_statement_macros) = saved
+        hint = next(o for o in out if o.startswith("a statement macro"))
+        self.assertIn("several functions share", hint)
+        self.assertIn("single-use wrapper is a priority knob and counts as a barrier", hint)
+        self.assertIn("each of lines 54, 59 flips it alone", hint)
+        self.assertIn("READ_SAMPLE (include/r.h, 3 files", hint)
+
+
+class SharedMacros(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.scope, _ = _load_scope(Path(__file__).resolve().parents[1])
+
+    def test_shared_through_an_inline_and_not_single_use(self):
+        with tempfile.TemporaryDirectory() as root:
+            Path(root, "include").mkdir()
+            Path(root, "src", "fn").mkdir(parents=True)
+            Path(root, "include", "r.h").write_text(
+                "#define READ_SAMPLE(out, table, index) \\\n    do { \\\n        (out) = (table)[(index)]; \\\n"
+                "    } while (0)\n"
+                "#define ONCE(x) \\\n    do { \\\n        (x) = 1; \\\n    } while (0)\n"
+                "#define NOTHING() \\\n    do { \\\n    } while (0)\n"
+                "static inline unsigned ReadSample(const unsigned short *t)\n{\n    unsigned s;\n"
+                "    READ_SAMPLE(s, t, 3);\n    return s;\n}\n")
+            Path(root, "src", "fn", "a.c").write_text("x = ReadSample(t); ONCE(y); NOTHING();\n")
+            Path(root, "src", "fn", "b.c").write_text("READ_SAMPLE(v, t, i); NOTHING();\n")
+            rows = self.scope.shared_statement_macros(root=root, limit=5)
+            self.assertEqual([r[:3] for r in rows], [("READ_SAMPLE", "include/r.h", 2)])
+            self.assertEqual(self.scope.shared_statement_macros(want_index=True, root=root)[0][0], "READ_SAMPLE")
 
 
 if __name__ == "__main__":

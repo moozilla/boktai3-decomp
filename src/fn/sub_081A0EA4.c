@@ -2,7 +2,6 @@
 #include "engine_globals.h"
 #include "ram.h"
 
-// MATCHING_CONCESSION: register-pinning
 #define gMotionRandomIndex gRandomIndex
 typedef struct MotionDelta {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -41,11 +40,11 @@ static inline void emitBurst(u32 emitter)
 
     for (i = 0; i < 4; ++i) {
         MotionDelta delta = {0};
-        register const u16 *table asm("r4") = gRandomTable;
-        delta.x = (nextRandom(table) & 15) - 8;
-        delta.y = nextRandom(table) & 7;
-        delta.z = (nextRandom(table) & 15) - 8;
-        MotionEntry_CreateWithDelta(emitter, &delta, nextRandom(table) % 4, 60);
+        union RandomTableView table = {gRandomTable};
+        delta.x = (nextRandom(table.samples) & 15) - 8;
+        delta.y = nextRandom(table.samples) & 7;
+        delta.z = (nextRandom(table.samples) & 15) - 8;
+        MotionEntry_CreateWithDelta(emitter, &delta, nextRandom(table.samples) % 4, 60);
     }
 }
 void Hresvelgr_EmitRandomMotionBurst(HresvelgrActor *p)

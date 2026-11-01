@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "display_sequence_inline.h"
 

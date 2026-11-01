@@ -41,4 +41,38 @@
             goto label;                                                                            \
     } while (0)
 
+/* Grid-cell deltas from actor to target: x and z rounded to 256-unit cells, with each
+ * component's magnitude (y is left unrounded). */
+#define ARMOR_ALIGNED_GRID(deltaX, deltaY, deltaZ, absX, absY, absZ, target, actor)                \
+    do {                                                                                           \
+        (deltaX) = (target)->x - (actor)->x;                                                       \
+        (deltaY) = (target)->y - (actor)->y;                                                       \
+        (deltaZ) = (target)->z - (actor)->z;                                                       \
+        (deltaX) = ((deltaX) + 128) >> 8;                                                          \
+        (deltaZ) = ((deltaZ) + 128) >> 8;                                                          \
+        (absX) = (deltaX);                                                                         \
+        (absY) = (deltaY);                                                                         \
+        (absZ) = (deltaZ);                                                                         \
+        if ((deltaX) < 0)                                                                          \
+            (absX) = -(deltaX);                                                                    \
+        if ((deltaY) < 0)                                                                          \
+            (absY) = -(deltaY);                                                                    \
+        if ((deltaZ) < 0)                                                                          \
+            (absZ) = -(deltaZ);                                                                    \
+    } while (0)
+/* The x/z form, with each position component evaluated once. */
+#define ARMOR_GET_RELATIVE_GRID(deltaX, deltaZ, absX, absZ, targetX, actorX, targetZ, actorZ)      \
+    do {                                                                                           \
+        (deltaX) = (targetX) - (actorX);                                                           \
+        (deltaZ) = (targetZ) - (actorZ);                                                           \
+        (deltaX) = ((deltaX) + 0x80) >> 8;                                                         \
+        (deltaZ) = ((deltaZ) + 0x80) >> 8;                                                         \
+        (absX) = (deltaX);                                                                         \
+        (absZ) = (deltaZ);                                                                         \
+        if ((deltaX) < 0)                                                                          \
+            (absX) = -(deltaX);                                                                    \
+        if ((deltaZ) < 0)                                                                          \
+            (absZ) = -(deltaZ);                                                                    \
+    } while (0)
+
 #endif

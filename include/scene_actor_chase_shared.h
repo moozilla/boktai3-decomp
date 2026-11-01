@@ -11,7 +11,7 @@ extern u8 *gUnknown_02000580[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void sub_0807E334(struct SceneActorRegistryResetView *);
+void SceneActorTerrain_RequestRetreatRoute(struct SceneActorRegistryResetView *);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 
@@ -337,6 +337,20 @@ static inline void SceneActorChase_ClearWordFlags(u32 *flags, u32 bits)
 {
     u32 mask = ~bits;
     *flags &= mask;
+}
+
+/* Mask-first forms: the mask is loaded before the field (it reaches the body as a parameter), and
+   the halfword store goes through a pointer, not a struct field insertion (tools/scope/README.md,
+   fact 34). For a block-scoped mask: { u32 mask = 0x200; SceneActorChase_OrHalfFlags(p, mask); } */
+static inline void SceneActorChase_AndWordFlags(u32 *flags, u32 mask)
+{
+    *flags &= mask;
+}
+
+static inline void SceneActorChase_OrHalfFlags(u16 *flags, u32 input)
+{
+    u32 mask = input;
+    *flags |= mask;
 }
 
 static inline void SceneActorChase_HalfwordFlagsSet(u16 *field, u32 bits)

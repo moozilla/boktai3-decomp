@@ -23,6 +23,15 @@ class MathLookups(unittest.TestCase):
                 self.assertTrue(all(not pointer for _, _, pointer in items))
                 self.assertEqual(to_bytes(items), expected)
 
+    def test_lun_rates_roundtrip_as_unsigned_words(self):
+        start = 0x08605E48
+        bank = struct.pack("<8I", 0, 1, 127, 256, 65535, 65536, 0x80000000, 0xFFFFFFFF)
+        end = start + len(bank)
+        rom = bytes(start - math_lookup.ROM_BASE) + bank
+        source = math_lookup.decode(rom, start, end, {})
+        self.assertEqual(source.splitlines()[0], "phase,rate")
+        self.assertEqual(to_bytes(math_lookup.encode(source, start, end)), bank)
+
     def test_unsigned_effect_bank_roundtrips_and_rejects_bad_indices(self):
         start = 0x086141BC
         bank = struct.pack("<1024H", *range(65535, 65535 - 1024, -1))

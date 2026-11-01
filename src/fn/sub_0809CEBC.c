@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
@@ -53,8 +52,7 @@ void Lun_ResetMovementState(struct SceneActorRegistryResetView *actor)
     Fill((u8 *)context + 0x424, &tmp, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     {
-        register void *drawable asm("r0") = actor->drawable;
-        asm("" : "+r"(drawable));
-        DisplaySequence_Step(drawable);
+        struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+        DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }

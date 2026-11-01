@@ -22,6 +22,9 @@
                                 or STRUCT's member at each offset
   scope.py FILE.c shape         the diff with low registers blanked: order and instruction differences only
   scope.py FILE.c frame         stack slots, ROM against draft, with the pseudo (C variable) in each
+  scope.py FILE.c preorder      the ROM's order of PRE's spilled field addresses against gcse's hash table:
+                                the table sizes (insn counts) and pseudo renumberings that give it, and the
+                                body lines whose offsets an inline helper folds (fewer insns, same code)
   scope.py FILE.c hoist         loop-invariant motion pass by pass: what loop.c moved out, what stayed, why
   scope.py FILE.c giv           loop strength reduction: each induction value, loop.c's benefit and decision
   scope.py FILE.c pre           gcse's PRE replacements: expression, where it is computed and inserted, the
@@ -29,6 +32,7 @@
   scope.py FILE.c put SNIPPET.c [FUNC]   SNIPPET.c (FUNC's definition, with its structs/helpers above) in
                                 place of FUNC's definition, then the score: no hand edits of the unit copy
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
+  scope.py twins [N] [all]      drafts (all: also no C) by their closest matched relative: twins first
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
   scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching] [--allow-pins]   put a matching draft into
                                 src/ (unit merge, or a new src/fn file and the hidden boundary), check the
@@ -324,9 +328,14 @@ def resolve_knobs(src, func, env):
     """AGBCC_PRI / AGBCC_FORCE may name pseudos by C variable (`table:+214`): compile once without them to
     learn the numbers, then substitute."""
     env = dict(env or {})
-    for k in ("AGBCC_PRI", "AGBCC_FORCE"):
-        if k not in env and os.environ.get(k):
-            env[k] = os.environ[k]
+    # A knob set in the environment (`AGBCC_NOEQUIV=36 scope.py FILE.c`) reaches the -g compile through
+    # os.environ, but the fork server's compile only sees the knobs passed with each request: copy them all
+    # into ENV, so the build's (no -g) bytes get them too. Without this the plain compile ran without the
+    # knob and scope reported "-g changes agbcc's code" for what was the knob's effect.
+    for k, v in os.environ.items():
+        if (k.startswith(("AGBCC_", "CSE_")) and k not in ("AGBCC_SERVER", "AGBCC_DUMPPRI", "AGBCC_EXTRA")
+                and k not in env and v and " " not in v):
+            env[k] = v
     if env.get("AGBCC_FORCE"):
         # Accept the register spellings printed by allocation explanations.
         # The compiler parses decimal register numbers, so passing r6 through
@@ -492,7 +501,7 @@ def compile_draft_g(src, func, env=None):
     # size_of_line_info); its truncated unit then breaks the line reader.
     r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-ffix-debug-line", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
                        cwd=wd, capture_output=True, text=True,
-                       env=dict(os.environ, AGBCC_DUMPPRI=names, **(env or {})))
+                       env=dict(os.environ, AGBCC_DUMPPRI=names, AGBCC_CROSS_TRACE="1", **(env or {})))
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
     uninit = []
     for blk in re.split(r"(?m)^(?=.*In function `)", r.stderr):
@@ -1015,6 +1024,53 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         ex = next(i for i in sorted(mv) if rows_json[i]["tag"] == "+")
         print(f"{len(mv) // 2} of the differing insns are the same instruction at another position (an order"
               f" difference, not a missing one): `why {rows_json[ex]['uid']}` names what reads each copy")
+    for i, ln, tied, shared in and_tie_hints(rows_json):
+        if shared:
+            print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes a constant of its own, the draft's"
+                  f" `{rows_json[i]['draft']}` the value's register: the draft's constant "
+                  + (f"is shared with the and on line {shared} and does not die here" if shared != "reload"
+                     else "is a spilled pseudo that reload loads here, and it lives on past this and")
+                  + "; no operand order ties to it. Give this and its"
+                  f" own constant pseudo: cse merges equal constants of one mode, and u16 operands narrow to"
+                  f" HImode, `x & K` copying its constant to SImode and `(x >> n) & K` using the HImode one"
+                  f" (README fact 37)")
+            continue
+        print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes the {tied}'s register, the draft's"
+              f" `{rows_json[i]['draft']}` the other operand's. "
+              + (("Write the constant first so the and is tied to it: `u32 m = K; m &= v; x = m;`"
+                  if tied == "constant" else "Write the value first: `m = v & K;`")
+                 if rows_json[i]["rom"].startswith("ands") else
+                 ("Load the value, then write the constant first: `u32 v = x; u32 m = K; m |= v; x = m;`"
+                  if tied == "constant" else "Write the value first: `m = v | K;`"))
+              + " (README fact 33)")
+    for i, ln, reg in arg_order_hints(rows_json):
+        print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
+              f" precomputes an argument that needs converting to its parameter's type: declare that"
+              f" parameter narrower (`u8`) or cast the argument (README fact 35)")
+    try:
+        cross = cross_jump_hints(rows_json, cross_merges(open(os.path.join(wd, "stderr.txt")).read(),
+                                                         info["obj_name"]),
+                                 *jump2_input(wd, info["obj_name"])[:2], uid_lines(wd),
+                                 jump2_input(wd, info["obj_name"])[2])
+    except OSError:
+        cross = []
+    for ln, count, to, via, extra in cross[:6]:
+        if count is None:
+            print(f"line {ln}: the draft keeps this tail whole and the ROM's is shorter. jump2 shares a tail"
+                  f" with the code that falls into the jump's label first, then with the other jumps to that"
+                  f" label, the last first"
+                  + ("; here the code before the label ends in a call and flow's (use 0) nop (a call that falls"
+                     " into a label), which a call followed by a jump does not match" if extra == "nop" else
+                     "; here nothing falls into the label" if extra == "barrier" else ""))
+            continue
+        print(f"line {ln}: jump2 cross-jumps this tail ({count} insn{'s' if count != 1 else ''}) into line"
+              f" {to}'s copy" + (" (the code before its label)" if via == "label" else " (another jump to its label)")
+              + (", where the ROM keeps code of its own" if extra else ""))
+    if cross:
+        print("  To keep a tail apart: end it in `return` (it shares only its r0 set with the last return, then"
+              " jumps to a new label with no jump chain), or let its call fall into a label, as an if/else"
+              " chain's last branch before shared code does: flow puts a (use 0) nop after that call, which no"
+              " jumping tail matches. To share one, let it jump to that label (README fact 39)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -1342,6 +1398,31 @@ def cmd_life(names, func):
             for ln in order:
                 print(f"  line {ln:4}: {len(by[ln]):3}  {' '.join(by[ln])}")
             print("  (* = mentions it; compare two drafts by variable name to see which line gained or lost insns)")
+            note = combine_dead_note([u for u, _ in ins], {u for u, _, _ in insn_list(wd, "combine")},
+                                     {u: r for u, _, r in insn_list(wd, "flow")}, lines)
+            if note:
+                print(note)
+
+
+def combine_dead_note(counted, after_combine, flow_rtl, lines):
+    """A struct halfword `|=`/`&=` expands as a field insertion, `(old & 0) | new`; its zero and second
+    ior reach flow, which counts them toward every life that spans them, and combine deletes them
+    after. In a priority swap those insns are life without code (README fact 34). COUNTED: the uids
+    flow counted toward one pseudo's life; AFTER_COMBINE: the uids still in combine's dump; FLOW_RTL:
+    uid -> rtl at flow. Names the lines with such a zero and how many of their counted insns go."""
+    if not after_combine:
+        return ""
+    gone = [u for u in counted if u in flow_rtl and u not in after_combine]
+    zero_lines = []
+    for u in gone:
+        if re.match(r"\(set \(reg:HI \d+\) \(const_int 0\)\)", flow_rtl[u]) and lines.get(u, 0) not in zero_lines:
+            zero_lines.append(lines.get(u, 0))
+    if not zero_lines:
+        return ""
+    per = ", ".join(f"line {ln} ({sum(1 for u in gone if lines.get(u, 0) == ln)})" for ln in zero_lines)
+    return (f"  halfword field insertion counted in this life, deleted by combine: {per}. A struct u16"
+            " `|=`/`&=` stores as `(old & 0) | new`; written through a `u16 *` (a helper's parameter)"
+            " it has none of these insns (README fact 34)")
 
 
 def alloc_table(wd, func):
@@ -1585,6 +1666,49 @@ def alloc_records(wd, func, *, global_order=False):
     return out
 
 
+def small_sort_order(pris):
+    """local-alloc's allocation order for a block's qtys, given their priorities by qty number.
+    block_alloc sorts 2 or 3 qtys by hand, but its qty_compare(0, 1) and qty_compare(1, 2) compare qty
+    numbers, not the entries of qty_order being exchanged; 4 or more go through qsort (priority, then
+    qty number). Returns (order used, order by priority)."""
+    n = len(pris)
+    real = sorted(range(n), key=lambda q: (-pris[q], q))
+    order = list(range(n))
+    cmp = lambda a, b: pris[b] - pris[a]
+    if n == 3:
+        if cmp(0, 1) > 0:
+            order[0], order[1] = order[1], order[0]
+        if cmp(1, 2) > 0:
+            order[2], order[1] = order[1], order[2]
+    if n in (2, 3) and cmp(0, 1) > 0:
+        order[0], order[1] = order[1], order[0]
+    return (order if n in (2, 3) else real), real
+
+
+def small_sort_note(wd, func, blk):
+    """A note when BLK has exactly three local qtys and local-alloc's hand sort (small_sort_order)
+    allocates them in a different order than their priorities give."""
+    func = dump_func(wd, func)
+    path = os.path.join(wd, "names.txt")
+    qtys = {}
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if p[0] == "L" and p[1] == func and int(p[2]) == blk:
+            qtys.setdefault(int(p[4]), (int(p[3]), int(p[5]), p[11] if len(p) > 11 else "-"))
+    if len(qtys) != 3 or sorted(qtys) != [0, 1, 2]:
+        return None
+    used, real = small_sort_order([qtys[q][1] for q in range(3)])
+    if used == real:
+        return None
+    say = lambda order: ", ".join(f"{qtys[q][0]}{'' if qtys[q][2] == '-' else ' ' + qtys[q][2]}"
+                                  f" (priority {qtys[q][1]})" for q in order)
+    return (f"    block {blk} has exactly three local quantities. block_alloc sorts so few by hand, and its"
+            f" qty_compare(0, 1) / (1, 2) compare qty numbers, not the entries it swaps (local-alloc.c), so they"
+            f" are allocated as {say(used)} instead of by priority ({say(real)}). A fourth local value in"
+            f" the block (for example a store through a block-local pointer), or one fewer, gives a real sort"
+            f" (fact 38)")
+
+
 def conflicts(wd):
     """pseudo -> (pseudo conflicts, hard-register conflicts), from global-alloc's dump."""
     out = {}
@@ -1611,6 +1735,46 @@ def reg_nums(text):
     return out
 
 
+REG_TOKEN = re.compile(r"\b(?:r\d+|sb|sl|fp|ip|sp|lr|pc)\b")
+
+
+def register_twin(rows, row):
+    """The ROM row a '+' row stands for when the listing shows them as '-' and '+' only because the
+    alignment counts high registers (`mov ip, r2` against `mov sb, r2`): in the run of '-' rows next to
+    the run of '+' rows holding ROW, the one at the same position, or else the only one, with the same
+    text once registers are set aside. None if there is none."""
+    if not row or row.get("tag") != "+" or row.get("rom") or not row.get("draft"):
+        return None
+    idx = next((i for i, r in enumerate(rows) if r is row), None)
+    if idx is None:
+        return None
+    def copy_shape(text):  # a low-register copy is `adds rD, rS, #0`, a high one `mov rD, rS`: one insn
+        t = REG_TOKEN.sub("R", text)
+        return "mov R, R" if t == "adds R, R, #0" else t
+    shape = copy_shape(row["draft"])
+
+    def run(i, tag, step):
+        out = []
+        while 0 <= i < len(rows) and rows[i]["tag"] == tag:
+            out.append(i)
+            i += step
+        return out
+    lo = idx
+    while lo - 1 >= 0 and rows[lo - 1]["tag"] == "+":
+        lo -= 1
+    hi = idx
+    while hi + 1 < len(rows) and rows[hi + 1]["tag"] == "+":
+        hi += 1
+    pos = idx - lo
+    for minus in (run(lo - 1, "-", -1)[::-1], run(hi + 1, "-", 1)):
+        same = [j for j in minus if rows[j]["rom"] and copy_shape(rows[j]["rom"]) == shape]
+        if pos < len(minus) and minus[pos] in same:
+            return rows[minus[pos]]
+        if len(same) == 1:
+            return rows[same[0]]
+    return None
+
+
 def moved_rows(rows, window=8):
     """{index: partner index} for a '+' row and a '-' row with the same text close together: the
     same instruction at another position (an order difference), not a missing or extra one."""
@@ -1623,6 +1787,189 @@ def moved_rows(rows, window=8):
             if q["tag"] == "-" and j not in out and q["rom"] == r["draft"]:
                 out[i], out[j] = j, i
                 break
+    return out
+
+
+def constant_def(texts, i, reg, window=8):
+    """True when register REG holds a constant at TEXTS[i]: its last write within WINDOW lines
+    before i is `movs`/`ldr =`, possibly through a self-applied `rsbs`/`lsls`/`mvns` of it."""
+    for j in range(i - 1, max(-1, i - 1 - window), -1):
+        t = texts[j]
+        if not t or asm_dest(t) != reg:
+            continue
+        if re.match(r"(movs\s+r\d+,\s*#|ldr\s+r\d+,\s*=)", t):
+            return True
+        if re.match(r"(rsbs|lsls|mvns)\s", t) and reg_nums(t)[1:2] == [reg]:
+            return constant_def(texts, j, reg, window)
+        return False
+    return False
+
+
+def last_write(texts, i, reg, window=8):
+    """The index of the last line within WINDOW before TEXTS[i] that writes REG, or None."""
+    for j in range(i - 1, max(-1, i - 1 - window), -1):
+        if texts[j] and asm_dest(texts[j]) == reg:
+            return j
+    return None
+
+
+def and_tie_hints(rows):
+    """[(row index, line, tied, shared)] where the ROM's `ands rA, rB` (or `orrs`) writes the
+    register holding the constant and the draft's writes the value (or the other way round): the
+    tied operand differs, which the C operand order decides (README fact 33). Identical text counts
+    too, when the registers' roles differ. SHARED is set when the ROM keeps the constant's register
+    and the draft's constant lives on past the and: the line of a later and that reads its register
+    again, or "reload" when reload loads it there (a spilled pseudo, which regmove did not tie to,
+    so it does not die here). regmove cannot tie to such a constant whatever the operand order
+    (README fact 37)."""
+    rom = [r["rom"] for r in rows]
+    dr = [r["draft"] for r in rows]
+    out = []
+    for i, r in enumerate(rows):
+        op = (r["rom"] or "").split(" ", 1)[0]
+        if op not in ("ands", "orrs") or (r["draft"] or "").split(" ", 1)[0] != op:
+            continue
+        a, b = (reg_nums(r["rom"]) + [None, None])[:2]
+        p, q = (reg_nums(r["draft"]) + [None, None])[:2]
+        if a is None or p is None:
+            continue
+        rk = constant_def(rom, i, a), constant_def(rom, i, b)
+        dk = constant_def(dr, i, p), constant_def(dr, i, q)
+        if rk[0] != rk[1] and dk[0] != dk[1] and rk[0] != dk[0]:
+            shared = None
+            if rk[0]:
+                later = [j for j in readers_after(rows, i, "draft", q) if (dr[j] or "").startswith("ands ")]
+                d = last_write(dr, i, q)
+                shared = ((rows[later[0]].get("line") or "?") if later
+                          else "reload" if d is not None and (rows[d].get("born") or "").startswith("greg") else None)
+            out.append((i, r.get("line") or "", "constant" if rk[0] else "value", shared))
+    return out
+
+
+def arg_order_hints(rows):
+    """[(row index of the bl, line, register)] where the ROM sets argument register rN first in
+    the setup of a call and the draft sets it later: expand_call precomputed that argument, which
+    it does for one that needs a conversion to the parameter's type (README fact 35)."""
+    out = []
+    for i, r in enumerate(rows):
+        if not (r["rom"] or "").startswith("bl ") or not (r["draft"] or "").startswith("bl "):
+            continue
+        orders = {}
+        for side in ("rom", "draft"):
+            seq = []
+            for j in range(i - 1, max(-1, i - 13), -1):
+                t = rows[j][side]
+                if t is None:
+                    continue
+                if re.match(r"(bl?|b[a-z]{2}|bx|cmp|pop|push)\s", t) or t.startswith("."):
+                    break
+                d = asm_dest(t)
+                if d is not None and d <= 3 and d not in seq:
+                    seq.append(d)
+            orders[side] = seq[::-1]
+        ro, do = orders["rom"], orders["draft"]
+        if len(ro) < 2 or sorted(ro) != sorted(do) or ro == do:
+            continue
+        first = ro[0]
+        if do.index(first) > 0 and [x for x in ro if x != first] == [x for x in do if x != first]:
+            out.append((i, r.get("line") or "", first))
+    return out
+
+
+def cross_merges(stderr, func):
+    """[(jump, target, first, first_target)]: jump2's cross-jumps in FUNC, from AGBCC_CROSS_TRACE.
+    JUMP's tail from FIRST on is replaced by a jump to FIRST_TARGET, the same code before TARGET
+    (the label JUMP goes to, or another jump to that label)."""
+    out = []
+    for m in re.finditer(r"^CROSS (?:(\S+) )?jump (\d+) target (\d+): share (\d+) with (\d+)$", stderr, re.M):
+        if m.group(1) in (None, func):
+            out.append(tuple(int(m.group(k)) for k in range(2, 6)))
+    return out
+
+
+def jump2_input(wd, func):
+    """(real insn uids in order, uid -> kind, all insns and labels in order as (uid, kind, head)) for
+    FUNC as jump2 starts (the greg dump). USE and CLOBBER insns are left out of the order:
+    cross-jumping compares them but does not count them."""
+    path = os.path.join(wd, "u.i.greg")
+    order, kinds, seq = [], {}, []
+    if not os.path.exists(path):
+        return order, kinds, seq
+    text = open(path).read()
+    parts = re.split(r"(?m)^(?=;; Function \w+)", text)
+    mine = [p for p in parts if re.match(r";; Function %s\b" % re.escape(func), p)]
+    for blk in re.split(r"\n\n", mine[0] if mine else text):
+        blk = re.sub(r"\A(?:;;[^\n]*\n)+", "", blk.lstrip("\n"))
+        m = re.match(r"\((insn|jump_insn|call_insn|code_label|barrier)(?:/\w)* (\d+) \d+ \d+ ?(.*)", blk, re.S)
+        if not m:
+            continue
+        u = int(m.group(2))
+        kinds[u] = m.group(1)
+        seq.append((u, m.group(1), m.group(3)))
+        if m.group(1) not in ("code_label", "barrier") and not re.match(r"\((?:use|clobber) ", m.group(3)):
+            order.append(u)
+    return order, kinds, seq
+
+
+def label_fallin(seq, jump):
+    """What reaches JUMP's label by falling into it, as jump2's first try sees it: "nop" when the code
+    before the label ends in a call and flow's (use 0) after it, "barrier" when nothing falls in,
+    else None."""
+    at = {u: i for i, (u, _, _) in enumerate(seq)}
+    i = at.get(jump)
+    m = re.search(r"\(label_ref (\d+)\)", seq[i][2]) if i is not None else None
+    j = at.get(int(m.group(1))) if m else None
+    if j is None:
+        return None
+    j -= 1
+    while j >= 0 and seq[j][1] == "code_label":
+        j -= 1
+    if j < 0:
+        return None
+    if seq[j][1] == "barrier":
+        return "barrier"
+    if seq[j][2].startswith("(use (const_int 0))") and j > 0 and seq[j - 1][1] == "call_insn":
+        return "nop"
+    return None
+
+
+def cross_jump_hints(rows, merges, order, kinds, lines, seq=()):
+    """[(line, count, target line, via, apart)] for the cross-jumps next to a difference.
+    A merge of one insn into the code before a label is a return's r0 set joining the last return
+    (README fact 39) and is left out. APART is True when the ROM keeps code there that the draft's
+    merge deleted (ROM rows the draft lacks next to the jump). Then (line, None, None, None, why)
+    for a tail the draft keeps whole while the ROM's is shorter: draft-only rows ending at a jump
+    that jump2 did not merge; WHY is label_fallin's reason the first try failed."""
+    at = {r.get("uid"): i for i, r in enumerate(rows) if r.get("uid")}
+    pos = {u: i for i, u in enumerate(order)}
+    out, merged = [], set()
+    for jump, target, first, first_t in merges:
+        merged.add(jump)
+        if first not in pos or jump not in pos:
+            continue
+        count = pos[jump] - pos[first]
+        via = "label" if kinds.get(target) == "code_label" else "jump"
+        if count < 2 and via == "label":
+            continue
+        i = at.get(jump)
+        if i is None:
+            continue
+        near = rows[max(0, i - 5):i + 1]
+        if all(r["tag"] == "=" for r in near):
+            continue
+        apart = any(r["tag"] == "-" for r in near)
+        out.append((lines.get(jump, "?"), count, lines.get(target, "?"), via, apart))
+    for i, r in enumerate(rows):
+        u = r.get("uid")
+        if not u or kinds.get(u) != "jump_insn" or u in merged or not (r["draft"] or "").startswith("b "):
+            continue
+        run = 0
+        for j in range(i - 1, -1, -1):
+            if rows[j]["tag"] != "+":
+                break
+            run += 1
+        if run >= 2:
+            out.append((lines.get(u, r.get("line") or "?"), None, None, None, label_fallin(seq, u)))
     return out
 
 
@@ -1771,6 +2118,42 @@ def class_note(wd, x, got, want):
 
 
 HI_NAMES = {8: "r8", 9: "sb", 10: "sl", 11: "fp", 12: "ip"}
+
+
+def minus_one_copy(rows):
+    """Lines for a ROM `movs rA, #1; rsbs rA, rA, #0; adds rB, rA, #0` the draft lacks: reload loading -1
+    for a QImode pseudo (movqi takes only constants 0..255, so -1 goes through a SImode spill register and
+    a copy). A local s8/u8 is promoted to SImode and loads -1 directly (or #0xff); the unpromoted QImode
+    temporary comes from a conditional stored into a struct field, `p->field = c ? 1 : -1;`, which
+    store_field expands into a temporary. Through a cast pointer, `*(s8 *)(p + off) = c ? 1 : -1;`,
+    store_expr instead stores in each arm (Armor_InitPartStretch, Armor_BeginPartTravelToPlayer)."""
+    def triples(seq):
+        out = []
+        for i in range(len(seq) - 2):
+            a = re.fullmatch(r"movs (r\d), #1", seq[i][0])
+            if not a:
+                continue
+            r = a.group(1)
+            b = re.fullmatch(rf"rsbs {r}, {r}, #0", seq[i + 1][0])
+            c = re.fullmatch(rf"adds (r\d), {r}, #0", seq[i + 2][0])
+            if b and c and c.group(1) != r:
+                out.append(seq[i])
+        return out
+    rom, last = [], None
+    for r in rows:  # a ROM-only row has no C line: use the last one seen
+        last = r.get("line") or last
+        if r.get("rom"):
+            rom.append((r["rom"], r.get("line") or last, r.get("tag")))
+    draft = [(r["draft"], r.get("line"), r.get("tag")) for r in rows if r.get("draft")]
+    have = triples(rom)
+    if not have or len(triples(draft)) >= len(have):
+        return []
+    lines = sorted({str(x[1]) for x in have if x[1]})
+    at = f" (near C line {', '.join(lines)})" if lines else ""
+    return [f"minus-one copy: the ROM loads -1 into a spill register and copies it{at}, which is reload "
+            "moving -1 into a QImode pseudo. Store the conditional straight into a struct field, "
+            "`p->field = c ? 1 : -1;` (not through a cast pointer, and not via a local s8, which is "
+            "promoted to SImode)."]
 
 
 def class_misplaced(wd, func, rom_text):
@@ -1974,11 +2357,73 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
     lever = macro_lever(wd, lo, lo_rec, hi, hi_rec) if wd else None
     if lever:
         a, b, nl, nh = lever
+        alone = macro_lines(wd, lo, lo_rec, hi, hi_rec)
+        src = source_lines(wd)
+        text = " ".join(src.get(ln, "") for ln in alone or range(a, b + 1))
+        shared = shared_statement_macros(want_index="[" in text)
         out.append(f"a statement macro (`do {{ ... }} while (0)`) around lines {a}-{b}: flow counts each ref"
                    f" inside its loop notes twice, giving {nm(lo)} {nl} refs ({g_priority(nl, llive)}) against"
-                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)}). Reify it as the macro the original likely had"
-                   f" (the loop notes also end cse blocks there)")
+                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)})"
+                   + (f"; each of lines {', '.join(map(str, alone))} flips it alone" if len(alone) > 1 else "")
+                   + ". Only as a macro the original plausibly had, one several functions share (twins"
+                   " computing the same thing); a single-use wrapper is a priority knob and counts as a barrier"
+                   " (tools/statement_macros.py). The loop notes also end cse blocks there"
+                   + ("; shared ones in include/: " + "; ".join(
+                       f"{n} ({h}, {k} files: {body})" for n, h, k, body in shared) if shared else ""))
     return out
+
+
+def macro_lines(wd, lo, lo_rec, hi, hi_rec, mentions=None, lines=None):
+    """The single C lines whose mentions, inside one more loop, would each let LO outrank HI."""
+    if mentions is None:
+        mentions = {r: ref_mentions(wd, r) for r in (lo, hi)}
+    if lines is None:
+        lines = uid_lines(wd)
+    count = {}
+    for reg in (lo, hi):
+        for u, _ in mentions.get(reg, []):
+            ln = lines.get(u)
+            if isinstance(ln, int):
+                count.setdefault(reg, {}).setdefault(ln, 0)
+                count[reg][ln] += 1
+    lo_l, hi_l = count.get(lo, {}), count.get(hi, {})
+    return [ln for ln in sorted(lo_l)
+            if g_priority(lo_rec[3] + lo_l[ln], lo_rec[4]) > g_priority(hi_rec[3] + hi_l.get(ln, 0), hi_rec[4])]
+
+
+_SHARED_MACROS = None
+
+
+def shared_statement_macros(want_index=False, limit=3, root=None):
+    """[(name, header, files, body)] for the statement macros (`do { ... } while (0)` with a body) in
+    include/ that two or more src files use, directly or through a static inline of the same header: the
+    shared ones count as evidence the original had them. WANT_INDEX keeps the ones that read through an
+    index (`x[i]`), the usual case for a random-table sample."""
+    global _SHARED_MACROS
+    found = _SHARED_MACROS if root is None else None
+    if found is None:
+        found, base = [], root or ROOT
+        srcs = {}
+        for f in glob.glob(os.path.join(base, "src", "**", "*.c"), recursive=True):
+            srcs[f] = open(f, errors="replace").read()
+        for h in sorted(glob.glob(os.path.join(base, "include", "*.h"))):
+            text = open(h, errors="replace").read()
+            for m in re.finditer(r"#define\s+(\w+)\([^)]*\)\s*\\\n\s*do\s*\{(.*?)\}\s*while\s*\(\s*0\s*\)",
+                                 text, re.S):
+                name, body = m.group(1), re.sub(r"\s*\\\n\s*", " ", m.group(2)).strip()
+                if not body:
+                    continue  # an empty one is a barrier (DEBUG_NOP), not evidence
+                users = {name} | {f.group(1) for f in re.finditer(
+                    r"static inline [^;{]*?\b(\w+)\([^;{]*\)\s*\{(?:[^{}]|\{[^{}]*\})*?\b%s\(" % name, text)}
+                pat = re.compile(r"\b(?:%s)\(" % "|".join(map(re.escape, users)))
+                files = sum(1 for t in srcs.values() if pat.search(t))
+                if files >= 2:
+                    found.append((name, os.path.relpath(h, base), files, body[:60]))
+        found.sort(key=lambda r: -r[2])
+        if root is None:
+            _SHARED_MACROS = found
+    rows = [r for r in found if not want_index or "[" in r[3]]
+    return rows[:limit]
 
 
 def macro_lever(wd, lo, lo_rec, hi, hi_rec, mentions=None, lines=None):
@@ -2027,7 +2472,27 @@ def mention_lines(wd, reg):
         shift = re.search(r"\((?:ashift|ashiftrt|lshiftrt):SI \(reg(?:/\w)*:SI %d\)" % reg, pats.get(u, "")) \
             or re.search(r"\(set \(reg(?:/\w)*:SI %d\) \((?:ashift|ashiftrt|lshiftrt):" % reg, pats.get(u, ""))
         parts.append(f"line {lines.get(u, '?')}" + (f" x{d}" if d > 1 else "") + (" in a shift" if shift else ""))
-    return " (counted at " + ", ".join(parts) + ")"
+    # refs in code that jump2 deletes as a duplicate tail (cross-jumping, fact 27) count for allocation
+    # but leave no instruction: a source that reaches the surviving copy instead never counts them
+    after_reload = {u for u, _, _ in insn_list(wd, "greg")}
+    kept = {u for u, _, _ in insn_list(wd, "jump2")}
+    crossed = [u for u, _ in ms if u in after_reload and kept and u not in kept]
+    tail = ""
+    if crossed:
+        where = sorted({lines.get(u, '?') for u in crossed}, key=lambda x: (not isinstance(x, int), x))
+        tail = (f"; {len(crossed)} of them in tails jump2 cross-jumps away (line{'s' if len(where) > 1 else ''} "
+                + ", ".join(map(str, where)) + "): a source that shares that code instead of writing it"
+                " out again has that many fewer refs, with the same instructions")
+    return " (counted at " + ", ".join(parts) + tail + ")"
+
+
+def later_holders_only(holders, calls, rec, recs):
+    """True when every value seen holding the wanted register is a global-alloc pseudo allocated after
+    this one: the dump's hard-register conflicts include registers handed out later, so the register
+    was free when this pseudo chose, and the order (not a prior holder) is the cause."""
+    if calls or not holders or not rec or rec[0] != "G":
+        return False
+    return all(x >= 16 and recs.get(x, ("L",))[0] == "G" and recs[x][1] > rec[1] for x in holders)
 
 
 def explain_alloc(wd, func, pseudo, want, got, nm, at):
@@ -2049,6 +2514,9 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
               f" it got {rname(got)}, the ROM has {rname(want)}.")
+        note = small_sort_note(wd, func, blk)
+        if note:
+            print(note)
     else:
         print(f"    {nm(pseudo)} has no allocation record; it got {rname(got)}, the ROM has {rname(want)}.")
     if rec and rec[0] == "G" and rec[6] != got:
@@ -2075,10 +2543,10 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         print(f"    it lives across a call, so r0-r3 are unavailable to it: the ROM's value does not cross that call.")
         return
     pc, hc = conf.get(pseudo, (set(), set()))
+    holders, calls = {}, []
     if want in hc:
         seq = insn_list(wd, "lreg")
         idx = [i for i, (_, _, r) in enumerate(seq) if pseudo in regs_of(r)]
-        holders, calls = {}, []
         if idx:
             for u, kind, r in seq[idx[0]:idx[-1] + 1]:
                 if kind == "call_insn" and want < 4:
@@ -2086,6 +2554,7 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
                 for x in regs_of(r):
                     if x != pseudo and (x == want or hard.get(x) == want):
                         holders.setdefault(x, u)
+    if want in hc and not later_holders_only(holders, calls, rec, recs):
         what = [f"{nm(x) if x >= 16 else 'hard r%d' % x} (from {at(u)})" for x, u in list(holders.items())[:5]]
         if calls:
             what.append(f"a call at {at(calls[0])}")
@@ -2106,6 +2575,12 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
             print(f"    to flip the order (priority = floor_log2(refs) * refs / live * 10000; flow counts refs"
                   f" inside loops weighted by depth): " + "; or ".join(flip_levers(nm, pseudo, rec, top, recs[top], wd)))
             print(f"    what-if: AGBCC_PRI={kref(wd, func, pseudo)}:+{recs[top][2] - rec[2] + 1} or AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
+            fl = live_lengths(wd, "flow").get(pseudo)
+            if fl and rec[4] == 2 * fl and has_equiv_note(wd, pseudo) and g_priority(rec[3], fl) > recs[top][2]:
+                print(f"    its doubled life alone decides it: without the equivalence it would rank"
+                      f" {g_priority(rec[3], fl)} against {recs[top][2]}. what-if: AGBCC_NOEQUIV={pseudo} (no REG_EQUIV,"
+                      f" no doubling; the random table often needs this, see fact 20 and"
+                      f" notes/opus-charged-burst-spark_2026-10-31.md)")
         else:
             print(f"    lever: raise {nm(pseudo)}'s priority above theirs (more uses or a shorter life), or end"
                   f" the overlap; what-if: AGBCC_PRI={kref(wd, func, pseudo)}:+N or AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
@@ -2528,7 +3003,8 @@ def fast_preprocess(src, env=None, func=None):
     if ((env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
             or (env or {}).get('SCOPE_NEIGHBORS_ASM', os.environ.get('SCOPE_NEIGHBORS_ASM')) == '1'):
         return preprocess(src, env, func)
-    text = open(os.path.join(ROOT, src)).read()
+    with open(os.path.join(ROOT, src)) as source:
+        text = source.read()
     lines = text.split("\n")
     last = max((i for i, ln in enumerate(lines) if ln.lstrip().startswith("#")), default=-1)
     head = "\n".join(lines[:last + 1]) + "\n"
@@ -2536,27 +3012,30 @@ def fast_preprocess(src, env=None, func=None):
     if last < 0 or any(not re.match(r"\s*(#\s*include\b.*)?$", ln) and not re.match(r"\s*(//.*)?$", ln)
                        for ln in lines[:last + 1]):
         return preprocess(src, env, func)  # a #define, #if, or code between the includes
-    h = _HEADS.get(head)
-    if h is not None and any(os.path.getmtime(os.path.join(ROOT, f)) != t for f, t in h[2]):
+    source_dir = os.path.dirname(os.path.abspath(os.path.join(ROOT, src)))
+    key = (source_dir, head)
+    h = _HEADS.get(key)
+    if h is not None and any(not os.path.exists(os.path.join(ROOT, f))
+                             or os.path.getmtime(os.path.join(ROOT, f)) != t for f, t in h[2]):
         h = None
     if h is None:
         work = os.path.join(WORK, "cache")
         os.makedirs(work, exist_ok=True)
         rel = os.path.relpath(os.path.join(work, "head.c"), ROOT)
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".c", dir=work) as f:
-            f.write(head)
-            f.flush()
-            trel = os.path.relpath(f.name, ROOT)
-            # how many newlines cpp leaves after its last marker depends on the last include (a guarded
-            # header emits none); a marker of our own says where the body starts
-            out = re.sub(r"\n+\Z", "\n", build.sh(cpp_command(trel))).replace(f'"{trel}"', f'"{rel}"')
-            out += f'# {last + 2} "{rel}"\n'
+        with tempfile.NamedTemporaryFile(dir=work, suffix=".c", mode="w") as source:
+            source.write(head)
+            source.flush()
+            trel = os.path.relpath(source.name, ROOT)
             cmd = cpp_command(trel)
             e = cmd.index("-E") + 1
+            cmd = cmd[:e] + ["-iquote", source_dir] + cmd[e:]
+            # Keep line markers stable across private preprocessing files.
+            out = re.sub(r"\n+\Z", "\n", build.sh(cmd)).replace(f'"{trel}"', f'"{rel}"')
+            out += f'# {last + 2} "{rel}"\n'
             defs = build.sh(cmd[:e] + ["-dM"] + cmd[e:])
         macros = set(re.findall(r"^#define (\w+)", defs, re.M)) | _DYNAMIC
         files = sorted({f for f in re.findall(r'^# \d+ "([^"<][^"]*)"', out, re.M) if os.path.exists(os.path.join(ROOT, f))})
-        h = _HEADS[head] = (out, macros, [(f, os.path.getmtime(os.path.join(ROOT, f))) for f in files])
+        h = _HEADS[key] = (out, macros, [(f, os.path.getmtime(os.path.join(ROOT, f))) for f in files])
     out, macros, _ = h
     if "\\\n" in body or "??" in body:
         return preprocess(src, env, func)
@@ -2795,7 +3274,7 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
-BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?$')
+BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?\\?\s*$')
 
 
 def concession_sites(text):
@@ -2810,7 +3289,15 @@ def concession_sites(text):
         if ln.lstrip().startswith("//"):
             continue
         if PIN_RE.search(ln) and "register" in ln:
-            out.append((i, "pin", lambda ls, i=i: ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]))
+            # one site per pin: `register s32 a asm("r9"), b asm("r6");` declares two
+            names = [m.group(1) for m in re.finditer(r"(\w+)" + PIN_RE.pattern, ln)]
+            for name in names or [None]:
+                def drop(ls, i=i, name=name):
+                    if name is None:
+                        return ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]
+                    pat = re.compile(r"\b(" + re.escape(name) + r")" + PIN_RE.pattern)
+                    return ls[:i] + [pat.sub(r"\1", ls[i], count=1)] + ls[i + 1:]
+                out.append((i, "pin", drop))
         elif re.match(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', ln):
             end = i + 1
             while ";" not in "\n".join(lines[i:end]) and end < len(lines):
@@ -2868,27 +3355,40 @@ def function_reach(text, func):
         defs[name] = (a, b, inline)
     if func not in defs:
         return {}
+    # Function-like and object-like macros: a concession in a macro body changes the code of every
+    # function that expands it, so a reached function's macros are reached too (keyed `#NAME`).
+    macros = {}
+    for m in re.finditer(r"^#\s*define\s+(\w+)(?:.*\\\n)*.*$", text, re.M):
+        if not any(x <= m.start() < y for x, y in drafts):
+            macros[m.group(1)] = (m.start(), m.end())
     reach, todo = {}, [func]
     while todo:
         n = todo.pop()
         if n in reach:
             continue
-        a, b, _ = defs[n]
-        reach[n] = (a, b)
-        body = text[a:b]
-        body = body[body.index("{"):]
+        if n.startswith("#"):
+            a, b = macros[n[1:]]
+            reach[n] = (a, b)
+            body = text[a:b].split(None, 2)[-1]
+        else:
+            a, b, _ = defs[n]
+            reach[n] = (a, b)
+            body = text[a:b]
+            body = body[body.index("{"):]
         for c in set(re.findall(r"\b(\w+)\s*\(", body)):
             if c in defs and defs[c][2] and c not in reach:
                 todo.append(c)
+        for c in set(re.findall(r"\b(\w+)\b", body)):
+            if c in macros and "#" + c not in reach and c != n[1:]:
+                todo.append("#" + c)
     return reach
 
 
 def site_variables(line):
     """C variable names a concession site names: a pin's declarator and a barrier's operands."""
     out = set()
-    m = re.search(r"(\w+)\s+(?:asm|__asm__)\s*\(\s*\"", line)
-    if m and "register" in line:
-        out.add(m.group(1))
+    if "register" in line:
+        out |= set(re.findall(r"(\w+)\s+(?:asm|__asm__)\s*\(\s*\"", line))
     if re.match(r"\s*(?:asm|__asm__)\b", line):
         out |= set(re.findall(r"\"[^\"]*\"\s*\(\s*(\w+)\s*\)", line))
     return out
@@ -3502,6 +4002,8 @@ def cmd_why_all(src, func, env, rng=None):
     rom_text = " ".join(r.get("rom") or "" for r in rows)
     for ln in class_misplaced(wd, func, rom_text):
         print("  - " + ln)
+    for ln in minus_one_copy(rows):
+        print("  - " + ln)
     shown = causes + sure
     if len(shown) < 12:
         shown += common[:12 - len(shown)]
@@ -4087,6 +4589,46 @@ def explain_moved(wd, rows, row, nm, at):
           " one constant in two modes); the ROM's order says which copy each reader should get")
 
 
+def reload_move_pseudo(wd, uid, reg, order=None, pre=None, hmap=None):
+    """For an insn reload made to move a value into or out of high register REG (thumb insns cannot use a
+    high register directly), the pseudo allocated to REG that the next insns after UID mention before
+    reload. None if there is not exactly one."""
+    order = [u for u, _, _ in insn_list(wd, "greg")] if order is None else order
+    pre = {u: r for u, _, r in insn_list(wd, "lreg")} if pre is None else pre
+    hmap = hard_of(wd) if hmap is None else hmap
+    if uid not in order:
+        return None
+    i = order.index(uid)
+    for u in order[i + 1:i + 4] + order[max(i - 3, 0):i][::-1]:
+        hits = {x for x in regs_of(pre.get(u)) if x >= 16 and hmap.get(x) == reg}
+        if len(hits) == 1:
+            return hits.pop()
+    return None
+
+
+def insn_shape(text):
+    """An instruction with its registers blanked: `mov sl, r1` and `mov sb, r2` share one shape."""
+    return re.sub(r"\b(?:r\d+|sb|sl|fp|ip|sp|lr)\b", "R", text or "").strip()
+
+
+def pair_rom_only(rows, row):
+    """A draft-only row (tag '+') that sits next to a ROM-only row ('-') of the same shape is really one
+    insn whose registers differ: the aligner drew it as a delete plus an insert. Returns the row merged
+    with that ROM line (tag '~'), or None."""
+    if row.get("tag") != "+" or row.get("rom") or not row.get("draft"):
+        return None
+    try:
+        i = rows.index(row)
+    except ValueError:
+        return None
+    for j in (i - 1, i + 1):
+        if 0 <= j < len(rows):
+            o = rows[j]
+            if o.get("tag") == "-" and o.get("rom") and insn_shape(o["rom"]) == insn_shape(row["draft"]):
+                return dict(row, rom=o["rom"], rom_addr=o.get("rom_addr"), tag="~")
+    return None
+
+
 def cmd_why(src, func, uid, env, via=None):
     import contextlib
     import io
@@ -4112,6 +4654,11 @@ def cmd_why(src, func, uid, env, via=None):
     alloc_diffs = []
     rows = json.load(open(os.path.join(wd, "diff.json")))
     row = via or next((r for r in rows if r["uid"] == uid), None)
+    paired = pair_rom_only(rows, row) if row and not via else None
+    if paired:
+        print(f"  (the listing shows this as an inserted line next to the ROM-only `{paired['rom']}`; the two"
+              " differ only in registers, so they are compared as one insn)")
+        row = paired
     if row and not via and uid not in {u for u, _, _ in insn_list(wd, "greg")}:
         v = pool_load_origin(wd, row["draft"], lines.get(uid))
         if v:
@@ -4125,8 +4672,13 @@ def cmd_why(src, func, uid, env, via=None):
     code = srclines[ln - 1].strip() if ln and ln <= len(srclines) else ""
     print(f"why insn {uid}  line {ln}: {code}")
     if row:
-        print(f"  ROM: {row['rom'] or '(none)'}   draft: {row['draft']}   [{'same' if row['tag'] == '=' else 'differs'}]")
-        rr, dr = reg_nums(row["rom"]), reg_nums(row["draft"])
+        twin = register_twin(rows, row)
+        rom_text = row["rom"] or (twin["rom"] if twin else None)
+        print(f"  ROM: {rom_text or '(none)'}   draft: {row['draft']}   [{'same' if row['tag'] == '=' else 'differs'}]")
+        if twin:
+            print(f"  (the listing shows them as '-' and '+' because high registers count in its alignment; the"
+                  f" ROM's {twin['rom']} at {twin['rom_addr']} is this insn with other registers)")
+        rr, dr = reg_nums(rom_text), reg_nums(row["draft"])
         hmap = hard_of(wd)
         pre = next((r for u, _, r in insn_list(wd, "lreg") if u == uid), None)
         for a, b in zip(rr, dr):
@@ -4231,6 +4783,10 @@ def cmd_why(src, func, uid, env, via=None):
             print("    no class-head takeover found for these registers; see the raw trace")
     for ps, want, got in alloc_diffs:
         # even when cse put this pseudo here, its register is allocation's choice: explain both
+        if ps is None and got >= 8:
+            ps = reload_move_pseudo(wd, uid, got)
+            if ps is not None:
+                print(f"  this is reload's move into {rname(got)}, the register global alloc gave {nm(ps)}:")
         if ps is not None:
             print(f"  allocation: {nm(ps)}")
             explain_alloc(wd, info["obj_name"], ps, want, got, nm, at)
@@ -4653,6 +5209,53 @@ def frame_slots(wd, func):
     return out
 
 
+def rom_constant_slots(rows):
+    """ROM stack slots that hold a literal-pool constant: {sp offset: (value, store address, [load
+    addresses])} for each slot stored once, by the insn right after an `ldr rN, =C` of the same register,
+    and only read after that. Reload gives a constant such a slot only when its pseudo has no
+    equivalence; with one (REG_EQUIV) it reloads the constant at each use instead."""
+    rom = [r for r in rows if r["rom"]]
+    stores, loads = {}, {}
+    for k, r in enumerate(rom):
+        m = re.match(r"(str|ldr) (\w+), " + SP_SLOT.pattern + "$", r["rom"])
+        if m:
+            o = int(m.group(3) or "0", 0)
+            (stores if m.group(1) == "str" else loads).setdefault(o, []).append((k, m.group(2)))
+    out = {}
+    for o, st in stores.items():
+        if len(st) != 1 or not loads.get(o) or st[0][0] == 0:
+            continue
+        k, reg = st[0]
+        m = re.match(r"ldr %s, =0x([0-9A-Fa-f]+)$" % reg, rom[k - 1]["rom"])
+        if m and all(j > k for j, _ in loads[o]):
+            out[o] = (int(m.group(1), 16), rom[k]["rom_addr"], [rom[j]["rom_addr"] for j, _ in loads[o]])
+    return out
+
+
+def equiv_constants(wd):
+    """[(pseudo, uid, value, note text)] for each set before allocation (lreg dump) whose REG_EQUIV is a
+    constant: a const_int, or a symbol (its address from the ROM ELF)."""
+    syms = elf_syms()
+    out = []
+    path = os.path.join(wd, "u.i.lreg")
+    text = open(path).read() if os.path.exists(path) else ""
+    for blk in re.finditer(r"^\(insn(?:/\w)* (\d+) .*?(?=^\(|\Z)", text, re.S | re.M):
+        r = " ".join(blk.group(0).split())
+        u = int(blk.group(1))
+        m = re.match(r"\(insn(?:/\w)* \d+ \d+ \d+ \(set \(reg(?:/\w)*:SI (\d+)\)", r)
+        e = re.search(r"REG_EQUIV \((symbol_ref:SI \(\"(\w+)\"\)|const_int (-?\d+))", r)
+        if not (m and e):
+            continue
+        if e.group(3) is not None:
+            v = int(e.group(3)) & 0xFFFFFFFF
+        elif e.group(2) in syms:
+            v = syms[e.group(2)][0]
+        else:
+            continue
+        out.append((int(m.group(1)), u, v, e.group(1)))
+    return out
+
+
 def pseudo_value(wd, pseudo):
     """A short reading of what an unnamed pseudo holds: the source of its first set before allocation,
     with the C line."""
@@ -4739,7 +5342,13 @@ def top_level_spans(text):
     spans, depth, start, brace, i = [], 0, None, None, 0
     while i < len(text):
         c = text[i]
-        if text.startswith("//", i) or (c == "#" and (i == 0 or text[i - 1] == "\n")):
+        if c == "#" and (i == 0 or text[i - 1] == "\n"):  # a directive, with its continued lines
+            j = text.find("\n", i)
+            while j > 0 and text[j - 1] == "\\":
+                j = text.find("\n", j + 1)
+            i = len(text) if j < 0 else j
+            continue
+        if text.startswith("//", i):
             j = text.find("\n", i)
             i = len(text) if j < 0 else j
             continue
@@ -5018,6 +5627,7 @@ def cmd_hoist(src, func, env):
     fnames = (func, rom_name(src, func))
     names, lines = pseudo_names(wd, info["obj_name"]), uid_lines(wd)
     passes, cur = [], None
+    merged = {}  # (pass, uid) -> [uids of equal invariants combine_movables folded into it]
     for ln in tr.splitlines():
         m = re.match(r"loopopt fn=(\w+)", ln)
         if m:
@@ -5026,6 +5636,11 @@ def cmd_hoist(src, func, env):
                 passes.append(cur)
             continue
         if cur is None:
+            continue
+        m = re.match(r"match fn=\w+ insn=(\d+) regno=\d+ into=(\d+) savings=(\d+) lifetime=(\d+)", ln)
+        if m:
+            merged.setdefault((len(passes), int(m.group(2))), []).append(tuple(map(int, (m.group(1), m.group(3),
+                                                                                        m.group(4)))))
             continue
         m = re.match(r"cand fn=\w+ loop=(\d+) insn=(\d+) regno=(\d+) may_not=(\d) maybe_never=(\d) used_before=(\d)"
                      r" in_block=(\d) set_in_loop=(\d+) invariant=(\d)", ln)
@@ -5045,11 +5660,17 @@ def cmd_hoist(src, func, env):
             if uid in last:
                 need = cnt * (2 if once else 1)
                 ok = done or t * sv * life >= need
-                last[uid]["move"] = (ok, f"{t} x {sv} x {life} {'>=' if ok else '<'} {need}", life)
+                test = f"{t} x {sv} x {life} {'>=' if ok else '<'} {need}"
+                also = merged.get((len(passes), uid), [])
+                if also:  # combine_movables summed them: what the first set scores alone
+                    sv1, life1 = sv - sum(a[1] for a in also), life - sum(a[2] for a in also)
+                    test += f"; alone {t} x {sv1} x {life1} {'>=' if t * sv1 * life1 >= need else '<'} {need}"
+                last[uid]["move"] = (ok, test, life)
     if not passes:
         sys.exit(f"no loop trace for {func}: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh), or it has no loop")
     print(f"{func}: {info.get('counts') or 'MATCH'}; loop invariants, {len(passes)} loop pass(es)"
           " (threshold x savings x lifetime >= insns moves it)")
+    joined = False
     for i, ps in enumerate(passes, 1):
         for loop, cands in ps.items():
             first = min(cands, key=lambda u: lines.get(u, 1 << 30)) if cands else None
@@ -5058,8 +5679,13 @@ def cmd_hoist(src, func, env):
             for uid, c in cands.items():
                 name = names.get(c["reg"], "")
                 what = f"line {lines.get(uid, '?'):>4}  insn {uid:>5}  pseudo {c['reg']}" + (f" `{name}`" if name else "")
-                if c["move"] and (c["move"][0] or c["move"][2] > 2):
+                also = merged.get((i, uid), [])
+                if also:  # the same invariant set again later: its savings and lifetime are in this test
+                    what += "  + equal set" + "s" * (len(also) > 1) + " " + ", ".join(
+                        f"insn {u} line {lines.get(u, '?')}" for u, _, _ in also)
+                if c["move"] and (c["move"][0] or c["move"][2] > 2 or also):
                     print(f"    {'moved' if c['move'][0] else 'kept '}  {what}  ({c['move'][1]})")
+                    joined |= bool(also) and c["move"][0]
                 elif c["why"]:
                     print(f"    stays  {what}  ({c['why']})")
                 else:
@@ -5068,6 +5694,11 @@ def cmd_hoist(src, func, env):
                 print(f"    ({quiet} more used once or twice: kept, or folded into the use)")
     print("  probe flips each hoist (AGBCC_NOMOVE=UID); a set the ROM keeps in the loop needs one of the"
           " 'stays' reasons in C (see probe's note).")
+    if joined:
+        print("  '+ equal set': combine_movables added a later set of the same invariant to this one's savings"
+              " and lifetime; apart, each may fail the test. To keep both in the loop, give the later one a"
+              " variable set before the loop and again before its use, after a branch in the body"
+              " (HealthRestoreEffect_StartParticleBurst's byteMask; docs/REGALLOC.md item 10).")
     if n:
         hoist_levers(src, func, env, passes, names, lines, n, info)
     return 0
@@ -5113,6 +5744,449 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
                 res = "MATCH" if k == 0 else inf.get("counts", f"{k} differ")
                 print(f"  lever: `{name} = {m.group(1).strip()};` again before line {close + 1}: {res}"
                       f" ({'better' if k < base else 'same' if k == base else 'worse'}; {var})")
+                view = union_view_variant(rows, ln, name)
+                if view is None:
+                    continue
+                var = var[:-len(f".lever-{name}.c")] + f".lever-{name}-view.c"
+                with open(os.path.join(ROOT, var), "w") as f:
+                    f.write("\n".join(view))
+                k, inf = score(var, func, env)
+                res = "MATCH" if k == 0 else inf.get("counts", f"{k} differ")
+                print(f"  lever: set {name} through a one-member union (`union RandomTableView` in ram.h is"
+                      f" one) at line {ln}: {res} ({'better' if k < base else 'same' if k == base else 'worse'};"
+                      f" {var})")
+
+
+UNION_VIEW_TYPE = r"((?:(?:const|volatile|unsigned|signed|struct|union)\s+)*[A-Za-z_]\w*(?:\s*\*+\s*|\s+))"
+
+
+def union_view_variant(rows, ln, name):
+    """Rows with line LN's `name = expr;` routed through a one-member union initializer, or None.
+    A union initializer expands to a CLOBBER of the union's register before the set (expr.c
+    store_constructor), so loop.c counts two sets, may_not_optimize, and leaves the value in the
+    loop even when the body is one basic block, where the dead re-set lever does nothing because cse
+    deletes the repeat (SceneActorEffects_EmitRandomOffsets and the random-table loops)."""
+    row = rows[ln - 1]
+    m = re.fullmatch(rf"(\s*){UNION_VIEW_TYPE}{name}\s*=\s*([^;]+);\s*", row)
+    if m:  # a declaration: keep it, initialized from the view
+        ind, typ, expr = m.group(1), m.group(2).strip(), m.group(3).strip()
+        return rows[:ln - 1] + [f"{ind}union {{ {typ} v; }} {name}View = {{{expr}}};",
+                                f"{ind}{typ} {name} = {name}View.v;"] + rows[ln:]
+    m = re.fullmatch(rf"(\s*){name}\s*=\s*([^;=][^;]*);\s*", row)
+    if not m:
+        return None
+    for i in range(ln - 2, -1, -1):  # the declaration's type, when it declares only NAME
+        d = re.fullmatch(rf"\s*{UNION_VIEW_TYPE}{name}\s*(?:=[^;]*)?;\s*", rows[i])
+        if d:
+            typ = d.group(1).strip()
+            ind, expr = m.group(1), m.group(2).strip()
+            return rows[:ln - 1] + [f"{ind}{{ union {{ {typ} v; }} view = {{{expr}}}; {name} = view.v; }}"] + rows[ln:]
+    return None
+
+
+def frame_slot_pairs(rows):
+    """(ROM sp offset -> draft sp offset, the physical pairing or None, every ROM offset used). The
+    physical pairing holds when the listings agree everywhere but in SP displacements; otherwise each
+    ROM slot pairs with the draft slot most often aligned with it."""
+    off = lambda t: [int(m.group(1) or "0", 0) for m in SP_SLOT.finditer(t or "")]
+    votes, rom_seen = {}, set()
+    for r in rows:
+        a, b = off(r["rom"]), off(r["draft"])
+        rom_seen.update(a)
+        if len(a) == 1 and len(b) == 1:
+            votes.setdefault(a[0], {}).setdefault(b[0], 0)
+            votes[a[0]][b[0]] += 1
+    physical = physical_frame_slot_pairs(rows)
+    pair = physical if physical is not None else {a: max(v, key=v.get) for a, v in votes.items()}
+    return pair, physical, rom_seen
+
+
+# hash_expr_1's code and mode terms for (plus:SI (reg:SI R) (const_int O)) in this agbcc: such an
+# expression lands in bucket (PRE_HASH_BASE + R + O) % T of gcse's table (tools/scope/PRE_STACK_ORDER.md)
+PRE_HASH_BASE = 13772
+
+
+def dump_section(text, func):
+    """FUNC's part of a multi-function RTL dump; the whole text when it holds one function."""
+    heads = list(re.finditer(r"^;; Function (\S+)", text, re.M))
+    for i, m in enumerate(heads):
+        if len(heads) > 1 and m.group(1) == func:
+            return text[m.start():heads[i + 1].start() if i + 1 < len(heads) else len(text)]
+    return text
+
+
+def gcse_input_insns(wd, func):
+    """N, the real insns (insn, jump_insn, call_insn) gcse numbers with cuids, counted in its input
+    (u.i.addressof). Its expression table gets pre_table_size(N) buckets."""
+    path = os.path.join(wd, "u.i.addressof")
+    if not os.path.exists(path):
+        return None
+    text = dump_section(open(path).read(), dump_func(wd, func))
+    return len(re.findall(r"^\((?:insn|jump_insn|call_insn)(?:/[a-z]+)? ", text, re.M))
+
+
+def body_offset_loads(wd, func):
+    """Offsets the function body loads into a register before adding them to a pointer, by source line:
+    {(file, line): count}, counted in gcse's input. expand_binop (optabs.c) forces a constant outside
+    -255..255 into a register when expensive optimizations are on, so `p->field` at a large offset is two
+    insns there. In an inline copy integrate.c's try_constants folds the constant back into the add (one
+    insn, fact 31), so each one moved into an inline helper lowers N by one with the same final code."""
+    path = os.path.join(wd, "u.i.addressof")
+    if not os.path.exists(path):
+        return {}
+    text = dump_section(open(path).read(), dump_func(wd, func))
+    loads, used, where = {}, set(), None
+    for blk in re.split(r"\n(?=\()", text):
+        m = re.match(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("([^"]*)"\) (\d+)\)', blk)
+        if m:
+            where = (os.path.basename(m.group(1)), int(m.group(2)))
+            continue
+        m = re.match(r"\(insn (\d+) ", blk)  # an inline copy's insns print as insn/i
+        if not m:
+            continue
+        one = " ".join(blk.split())
+        c = re.search(r"\(set \(reg:SI (\d+)\) \(const_int (-?\d+)\)\)", one)
+        if c and abs(int(c.group(2))) > 255:
+            loads[int(c.group(1))] = where
+            continue
+        a = re.search(r"\(set \(reg(?:/v)?:SI \d+\) \(plus:SI \(reg(?:/v)?:SI \d+\) \(reg:SI (\d+)\)\)\)", one)
+        if a and int(a.group(1)) in loads:
+            used.add(int(a.group(1)))
+    out = {}
+    for r in used:
+        if loads[r]:
+            out[loads[r]] = out.get(loads[r], 0) + 1
+    return out
+
+
+def pre_table_size(n):
+    """The bucket count alloc_expr_hash_table (gcse.c) picks for N insns."""
+    return max(11, n // 2) | 1
+
+
+def pre_table_insns(t):
+    """(lo, hi): the insn counts N that give table size T, or None when no N does."""
+    if t < 11 or t % 2 == 0:
+        return None
+    return (0, 23) if t == 11 else (2 * t - 2, 2 * t + 1)
+
+
+def pre_plus_const(rtl):
+    """(R, O) for (plus:SI (reg:SI R) (const_int O)), the shape whose hash the model knows; else None."""
+    m = re.fullmatch(r"\(plus:SI \(reg(?:/\w)*:SI (\d+)(?: [\w-]+)?\) \(const_int (-?\d+)\)\)", rtl.strip())
+    return (int(m.group(1)), int(m.group(2))) if m else None
+
+
+def pre_raw_hash(r, o):
+    return (PRE_HASH_BASE + r + o) & 0xFFFFFFFF
+
+
+@by_dumps("u.i.gcse", "names.txt")
+def pre_table(wd, func):
+    """gcse's PRE expression table for FUNC: {"T": buckets, "entries": {index: (bucket, rtl)},
+    "reaching": {pseudo: index}}. pre_delete makes one reaching pseudo per replaced expression while
+    it walks the buckets in order, and each bucket's chain in index (first-discovery) order."""
+    path = os.path.join(wd, "u.i.gcse")
+    if not os.path.exists(path):
+        return None
+    text = dump_section(open(path).read(), dump_func(wd, func))
+    for blk in re.split(r"(?m)^(?=Expression hash table|SET hash table|PRE GCSE of)", text):
+        head = re.match(r"Expression hash table \((\d+) buckets, (\d+) entries\)", blk)
+        if not head:
+            continue
+        entries = {int(m.group(1)): (int(m.group(2)), one_line(m.group(3)))
+                   for m in re.finditer(r"^Index (\d+) \(hash value (\d+)\)\n((?:  .*\n)+)", blk, re.M)}
+        reaching = {}
+        for m in re.finditer(r"^PRE: redundant insn \d+ \(expression (\d+)\) in bb \d+, reaching reg is (\d+)",
+                             blk, re.M):
+            reaching.setdefault(int(m.group(2)), int(m.group(1)))
+        return {"T": int(head.group(1)), "entries": entries, "reaching": reaching}
+    return None
+
+
+@by_dumps("u.i.rtl")
+def pseudo_births(wd, func):
+    """pseudo -> where expand first sets it: 'line L', or 'line L of FILE' inside an inline helper from
+    another file (an inline copy's parameters are set where the helper starts)."""
+    path = os.path.join(wd, "u.i.rtl")
+    if not os.path.exists(path):
+        return {}
+    out, where = {}, None
+    for blk in re.split(r"\n(?=\()", dump_section(open(path).read(), dump_func(wd, func))):
+        m = re.match(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("([^"]*)"\) (\d+)\)', blk)
+        if m:
+            f = os.path.basename(m.group(1))
+            where = (m.group(2), f)
+            continue
+        if where and re.match(r"\((?:insn|jump_insn|call_insn)(?:/\w)* ", blk):
+            for q in re.findall(r"\(set \(reg(?:/\w)*:\w+ (\d+)\)", blk):
+                out.setdefault(int(q), where)
+    return out
+
+
+def parameter_pseudos(wd, func):
+    """Pseudos set before NOTE_INSN_FUNCTION_BEG in the first RTL dump: the incoming parameters, whose
+    numbers no change to the body moves."""
+    path = os.path.join(wd, "u.i.rtl")
+    if not os.path.exists(path):
+        return set()
+    head = dump_section(open(path).read(), dump_func(wd, func)).split("NOTE_INSN_FUNCTION_BEG")[0]
+    return {int(p) for p in re.findall(r"\(set \(reg(?:/\w)*:\w+ (\d+)\)", head)}
+
+
+def pre_order_ok(items, t, shift=None):
+    """True when ITEMS [(raw hash, index, base)] in ROM slot order have strictly rising (bucket, index)
+    keys at table size T, each raw hash moved by SHIFT[base] (pseudos renumbered)."""
+    prev = (-1, -1)
+    for raw, e, b in items:
+        k = ((raw + (shift[b] if shift else 0)) % t, e)
+        if k <= prev:
+            return False
+        prev = k
+    return True
+
+
+def pre_order_search(items, bases, fixed, t0, t_window=60, d_window=200):
+    """The ways the ROM's slot order can come out of the draft's PRE expressions.
+    ITEMS: [(raw hash, index, base position)] in ROM slot order; BASES: the base pseudos, rising;
+    FIXED: base positions that cannot move (parameters). Returns {"t_only": [T...] in T0 +- 4 * t_window,
+    "tail": the T from which on every larger table keeps the order (or None), "cuts": [(position, d, T)]}
+    for one renumbering cut: every base from BASES[position] on moved by d pseudos, T within t_window."""
+    raws = [raw for raw, _, _ in items]
+    span = range(max(11, t0 - 4 * t_window) | 1, t0 + 4 * t_window + 1, 2)
+    t_only = [t for t in span if pre_order_ok(items, t)]
+    top = max(raws) + 1 if raws else 11
+    tail = (top | 1) if pre_order_ok(items, top | 1) else None
+    cuts = []
+    movable = [i for i in range(len(bases)) if i not in fixed]
+    if movable:
+        lo = movable[0]
+        ts = range(max(11, t0 - t_window) | 1, t0 + t_window + 1, 2)
+        for c in range(lo, len(bases)):
+            for d in range(-d_window, d_window + 1):
+                if d == 0 or bases[c] + d <= (bases[c - 1] if c else 0):
+                    continue
+                shift = [0 if i < c else d for i in range(len(bases))]
+                for t in ts:
+                    if pre_order_ok(items, t, shift):
+                        cuts.append((c, d, t))
+    return {"t_only": t_only, "tail": tail, "cuts": cuts}
+
+
+def pre_order_report(wd, func, chain, src=None, full=False):
+    """Explain the ROM's order of the draft's spilled PRE pseudos (CHAIN: draft pseudos in ROM slot
+    order) with gcse's hash table, and search the table sizes and pseudo renumberings that give it.
+    Returns the printed lines."""
+    out = []
+    table = pre_table(wd, func)
+    if not table:
+        return ["  no PRE expression table in u.i.gcse (no PRE replacements in this function)"]
+    t0, entries, reaching = table["T"], table["entries"], table["reaching"]
+    n0 = gcse_input_insns(wd, func)
+    names = pseudo_names(wd, func)
+    shape_ok = shape_all = 0
+    for b, rtl in entries.values():
+        rc = pre_plus_const(rtl)
+        if rc:
+            shape_all += 1
+            shape_ok += pre_raw_hash(*rc) % t0 == b
+    made = sorted(reaching, key=lambda p: (entries.get(reaching[p], (1 << 30,))[0], reaching[p]))
+    order_ok = made == sorted(reaching)
+    nline = (f"N = {n0} real insns into gcse, " if n0 is not None else "") + f"T = {t0} buckets"
+    if n0 is not None and pre_table_size(n0) != t0:
+        nline += f" (but N gives {pre_table_size(n0)}: the insn count is off; T is read from the dump)"
+    out.append(f"  draft: {nline}")
+    out.append(f"  model: {shape_ok}/{shape_all} (plus:SI reg const) entries in bucket (13772 + reg + offset) % T;"
+               f" PRE made its {len(reaching)} reaching pseudos in (bucket, index) order: "
+               + ("yes" if order_ok else "NO, so the order below is not explained by the table"))
+
+    births = pseudo_births(wd, func)
+
+    unit = os.path.basename(src) if src else None
+
+    def label(p, line=False):
+        nm = names.get(p)
+        s = f"r{p} `{nm}`" if nm else f"r{p}" + (f" [{pseudo_value(wd, p)[0]}]" if pseudo_value(wd, p)[0] else "")
+        if line and p in births:
+            ln, f = births[p]
+            s += f" (line {ln}" + ("" if f == unit else f" of {f}") + ")"
+        return s
+
+    items, skipped, unmodeled = [], [], []
+    for p in chain:
+        e = reaching.get(p)
+        if e is None:
+            skipped.append(p)
+            continue
+        b, rtl = entries.get(e, (None, "?"))
+        rc = pre_plus_const(rtl)
+        if not rc:
+            unmodeled.append((p, e, b, rtl))
+            continue
+        items.append((p, rc[0], rc[1], e, b))
+    if not items:
+        out.append("  none of the reordered slots holds a (plus:SI reg const) PRE pseudo")
+        return out
+    bases = sorted({r for _, r, _, _, _ in items})
+    pos = {r: i for i, r in enumerate(bases)}
+    params = parameter_pseudos(wd, func)
+    fixed = {pos[r] for r in bases if r in params}
+    keyed = [(pre_raw_hash(r, o), e, pos[r]) for _, r, o, e, _ in items]
+    breaks = []
+    prev = None
+    for (p, r, o, e, b), (raw, _, _) in zip(items, keyed):
+        k = (raw % t0, e)
+        if prev is not None and k <= prev[0]:
+            breaks.append((prev[1], p))
+        prev = (k, p)
+    out.append(f"  ROM slot order of the draft's PRE pseudos: {len(items)} with a modeled hash"
+               + (f", {len(unmodeled)} of another shape (left out)" if unmodeled else "")
+               + (f", {len(skipped)} not made by PRE (left out)" if skipped else ""))
+    if full or breaks:
+        out.append(f"    {'pseudo':>6}  {'base':28} {'offset':>6} {'raw':>6} {'bucket':>6} {'index':>5}")
+        bad = {q for pair in breaks for q in pair}
+        for (p, r, o, e, b), (raw, _, _) in zip(items, keyed):
+            if full or p in bad:
+                out.append(f"  {'!' if p in bad else ' '} {p:>6}  {label(r)[:28]:28} {o:>6} {raw:>6} {raw % t0:>6} {e:>5}")
+    if not breaks:
+        out.append(f"  at T = {t0} the keys already rise in ROM order: the slots' order is not this table's doing")
+        return out
+    out.append(f"  at T = {t0}: {len(breaks)} adjacent pair(s) out of (bucket, index) order: "
+               + ", ".join(f"{a} before {b}" for a, b in breaks[:6]) + (" ..." if len(breaks) > 6 else ""))
+    res = pre_order_search(keyed, bases, fixed, t0)
+
+    def ns(t):
+        lo, hi = pre_table_insns(t)
+        return f"N {lo}..{hi}" + (f" ({lo - n0:+d}..{hi - n0:+d})" if n0 is not None else "")
+    if res["t_only"]:
+        near = sorted(res["t_only"], key=lambda t: abs(t - t0))[:6]
+        out.append("  the same pseudos at another table size: T = " + ", ".join(f"{t} [{ns(t)}]" for t in sorted(near))
+                   + (f" ({len(res['t_only'])} in all within {t0}+-240)" if len(res["t_only"]) > len(near) else ""))
+    else:
+        out.append(f"  no table size within {t0}+-240 gives the order with these pseudo numbers")
+    if res["tail"]:
+        out.append(f"  every T >= {res['tail']} gives it too (no bucket wraps there)")
+    def left_out():
+        lines = []
+        if full and (unmodeled or skipped):
+            for p, e, b, rtl in unmodeled:
+                lines.append(f"  left out: {p} (expression {e}, bucket {b}) {rtl[:70]}: hash not modeled")
+            if skipped:
+                lines.append(f"  left out: {', '.join(label(p) for p in skipped)}: not PRE's (expand-time"
+                             " variables, numbered before every PRE pseudo, or evicted later)")
+        return lines
+
+    if res["t_only"]:
+        t = min(res["t_only"], key=lambda t: abs(t - t0))
+        out.append(f"  smallest: no renumbering, only the insn count: {ns(t)} at gcse gives T {t}."
+                   " Compile it before trusting it: a change moves N, the expression indices and the"
+                   " bases at once.")
+        movable = [i for i in range(len(bases)) if i not in fixed]
+        if movable:
+            lo = movable[0]
+            ds = [d for d in range(-200, 201) if bases[lo] + d > (bases[lo - 1] if lo else 0)
+                  and pre_order_ok(keyed, t, [0 if i < lo else d for i in range(len(bases))])]
+            if ds:
+                out.append(f"    at T {t} the bases from {label(bases[lo])} on may all move by d {fmt_ranges(ds)}"
+                           " (C before them all renumbers them together)")
+        out.extend(pre_n_levers(wd, func, unit, n0, pre_table_insns(t)))
+        # a cut is only news at a table size the same pseudos cannot use
+        res["cuts"] = [x for x in res["cuts"] if x[2] not in res["t_only"]]
+        if not res["cuts"] or not full:
+            return out + left_out()
+    if not res["cuts"]:
+        out.append("  no single renumbering (one base and all later ones moved by up to 200, T within +-60)"
+                   " gives it: the order needs two changes or a different expression index order")
+        return out + left_out()
+    by_cut = {}
+    for c, d, t in res["cuts"]:
+        by_cut.setdefault(c, []).append((d, t))
+    best = sorted(res["cuts"], key=lambda x: (abs(x[1]) + abs(x[2] - t0) // 2, abs(x[1])))
+    out.append("  one renumbering cut (each base from the named one on gets d more pseudos), T within"
+               f" {t0}+-60" + (", at the table sizes the same pseudos cannot use:" if res["t_only"] else ":"))
+    shown = 0
+    for c in sorted(by_cut, key=lambda c: min(abs(d) + abs(t - t0) // 2 for d, t in by_cut[c])):
+        per_t = {}
+        for d, t in by_cut[c]:
+            per_t.setdefault(t, []).append(d)
+        ts = sorted(per_t, key=lambda t: (min(abs(d) for d in per_t[t]) + abs(t - t0) // 2))
+        prev = f", after {label(bases[c - 1], True)}" if c else ""
+        out.append(f"    from {label(bases[c], True)}{prev}:")
+        for t in ts[:None if full else 3]:
+            out.append(f"      T {t} [{ns(t)}]: d {fmt_ranges(per_t[t])}")
+        if len(ts) > 3 and not full:
+            out.append(f"      ... {len(ts) - 3} more table sizes")
+        shown += 1
+        if not full and shown >= 4:
+            break
+    c, d, t = best[0]
+    if not res["t_only"]:
+        out.append(f"  smallest: the C before {label(bases[c], True)} makes {abs(d)} {'more' if d > 0 else 'fewer'}"
+                   f" pseudos, with {ns(t)} insns at gcse (T {t}). Compile it before trusting it: a change"
+                   " moves N, the expression indices and the bases at once.")
+        out.extend(pre_n_levers(wd, func, unit, n0, pre_table_insns(t)))
+    return out + left_out()
+
+
+def pre_n_levers(wd, func, unit, n0, want):
+    """Lines saying how to reach WANT (lo, hi) insns into gcse without changing the final code: the
+    function body's large field offsets, each one insn fewer inside an inline helper (fact 31)."""
+    if n0 is None or not want or want[1] >= n0:
+        return []
+    need = n0 - want[1]
+    loads = {k: v for k, v in body_offset_loads(wd, func).items() if not unit or k[0] == unit}
+    if not loads:
+        return []
+    total = sum(loads.values())
+    lines = sorted(loads.items(), key=lambda kv: kv[0][1])
+    shown = ", ".join(f"{ln}" + (f" ({v})" if v > 1 else "") for (_, ln), v in lines[:40])
+    return [f"  fewer insns, the same code: the function body loads {total} large field offset(s) into a"
+            " register before the add, two insns each into gcse; in an inline helper integrate.c folds the"
+            f" offset into the add (one insn, fact 31). {need} or more fewer reach it. Lines: {shown}"
+            + (" ..." if len(lines) > 40 else "")]
+
+
+def fmt_ranges(values):
+    """[-3, -2, 5, 6, 7] -> '-3..-2, +5..+7' (sorted, runs joined)."""
+    vs = sorted(set(values))
+    runs, start = [], None
+    for i, v in enumerate(vs):
+        if start is None:
+            start = v
+        if i + 1 == len(vs) or vs[i + 1] != v + 1:
+            runs.append(f"{start:+d}" if start == v else f"{start:+d}..{v:+d}")
+            start = None
+    return ", ".join(runs[:8]) + (" ..." if len(runs) > 8 else "")
+
+
+def frame_pre_chain(wd, func, rows):
+    """The draft pseudos of the slots global alloc's spills got, in ROM slot order (the pairing frame
+    prints), and whether the pairing is physical."""
+    slots = frame_slots(wd, func)
+    pair, physical, _ = frame_slot_pairs(rows)
+    order = [pair[a] for a in sorted(pair) if pair[a] in slots and slots[pair[a]][2] > 0]
+    # a pseudo reload evicts from a hard register gets its slot later, out of pseudo order
+    return [slots[b][0] for b in order if slots[b][3] < 0], physical is not None
+
+
+def cmd_preorder(src, func, env):
+    """The ROM's stack-slot order of PRE's spilled field addresses against gcse's hash table: the model
+    check on the draft, the slots out of order, and the table sizes and pseudo renumberings that give
+    the ROM's order (tools/scope/PRE_STACK_ORDER.md)."""
+    n, info = score(src, func, env, full=True)
+    if n == 0:
+        print(f"{func}: MATCH")
+        return 0
+    wd = info["wd"]
+    rows = json.load(open(os.path.join(wd, "diff.json")))
+    chain, physical = frame_pre_chain(wd, func, rows)
+    if not chain:
+        sys.exit(f"{func}: reload gave no pseudo a stack slot in the draft (see `frame`)")
+    print(f"{func}: PRE stack-slot order"
+          + ("" if physical else " (slots paired by aligned uses, not physically: confirm with `frame`)"))
+    for ln in pre_order_report(wd, func, chain, src, full=True):
+        print(ln)
+    return 1
 
 
 def cmd_frame(src, func, env):
@@ -5135,22 +6209,16 @@ def cmd_frame(src, func, env):
         uses_sp = any(SP_SLOT.search(r[k] or "") for r in rows for k in ("rom", "draft"))
         if not any_s and uses_sp and not os.path.exists(path):
             sys.exit("no names.txt from this compile: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh)")
+        if rom_constant_slots(rows):
+            print(f"{func}: reload gave no pseudo a stack slot in the draft; the ROM spills a constant:")
+            frame_constant_slots(src, func, env, wd, rows, {}, {})
+            return 1
         sys.exit(f"{func}: reload gave no pseudo a stack slot in the draft"
                  + ("; the sp accesses are locals that live in memory (arrays, structs, address-taken"
                     " variables: their order is declaration order) or outgoing call arguments, not spills"
                     if uses_sp else "; neither side uses the stack beyond pushes"))
-    off = lambda t: [int(m.group(1) or "0", 0) for m in SP_SLOT.finditer(t or "")]
     size = lambda side: next((int(m.group(1), 0) for r in rows for m in [re.match(r"sub sp, #(\S+)$", r[side] or "")] if m), 0)
-    votes, rom_seen, dr_seen = {}, set(), set()
-    for r in rows:
-        a, b = off(r["rom"]), off(r["draft"])
-        rom_seen.update(a)
-        dr_seen.update(b)
-        if len(a) == 1 and len(b) == 1:
-            votes.setdefault(a[0], {}).setdefault(b[0], 0)
-            votes[a[0]][b[0]] += 1
-    physical_pair = physical_frame_slot_pairs(rows)
-    pair = physical_pair if physical_pair is not None else {a: max(v, key=v.get) for a, v in votes.items()}
+    pair, physical_pair, rom_seen = frame_slot_pairs(rows)
 
     def who(o):
         if o not in slots:
@@ -5183,15 +6251,59 @@ def cmd_frame(src, func, env):
             print("\nAligned slot uses suggest this pseudo creation order; confirm the slot identities"
                   " when instruction structure differs:")
         print("  " + " < ".join(f"{slots[b][0]} {names.get(slots[b][0], '')}".strip() for b in order))
-        print("  PRE-generated field addresses can follow hash-bucket and first-discovery order."
-              " For (plus:SI reg const), this agbcc uses (13772 + pseudo + offset) % T,"
-              " with T = max(11, pre-GCSE real-insn-count // 2) | 1. Validate the candidate's"
-              " actual ordering before inferring target constraints; declaration order may"
-              " not control these temporaries. See tools/scope/PRE_STACK_ORDER.md.")
+        print("\nPRE makes its field-address pseudos in gcse hash-table order, (bucket, index): for"
+              " (plus:SI reg const) the bucket is (13772 + reg + offset) % T, T = max(11, N // 2) | 1"
+              " (tools/scope/PRE_STACK_ORDER.md). Against the draft's table:")
+        for ln in pre_order_report(wd, func, [slots[b][0] for b in order if slots[b][3] < 0], src):
+            print(ln)
+        print("  `scope.py FILE.c preorder` lists every slot's key and every cut.")
     if extra:
         print(f"\n{len(extra)} draft slot(s) the ROM does not have: those values need a register in the ROM's"
               " allocation, or do not exist there (a temporary the ROM's C does not make).")
+    frame_constant_slots(src, func, env, wd, rows, pair, slots)
     return 1
+
+
+def frame_constant_slots(src, func, env, wd, rows, pair, slots):
+    """For each ROM slot that holds a pool constant (stored once, right after its `ldr rN, =C`) and that
+    the draft gives no slot: the draft pseudos with that constant as REG_EQUIV, and whether the build
+    matches when they have none (AGBCC_NOEQUIV, a diagnostic knob). Reload rematerializes a spilled
+    pseudo with a constant equivalence; only one without gets a stack slot."""
+    consts = rom_constant_slots(rows)
+    todo = {o: c for o, c in consts.items() if pair.get(o) not in slots}
+    if not todo:
+        return
+    eq = equiv_constants(wd)
+    pn = pseudo_names(wd, func)
+    by_addr = {}
+    for n, (a, _) in elf_syms().items():
+        if not n.startswith(("_", "$")) and not n.endswith("__addr"):
+            by_addr.setdefault(a & ~1, n)
+    for o in sorted(todo):
+        v, at, reads = todo[o]
+        label = f" ({by_addr[v]})" if v in by_addr else ""
+        print(f"\nsp+{o:#x} holds the constant {v:#x}{label}: the ROM stores it once, at {at} right after"
+              f" loading it, and reads it back at {', '.join(reads)}.")
+        holders = [(p, u, t) for p, u, vv, t in eq if vv == v]
+        if not holders:
+            print("  No draft pseudo has it as REG_EQUIV; the draft computes or rematerializes it some other way.")
+            continue
+        print("  In the draft, " + ", ".join(f"pseudo {p} (" + (f"{pn[p]}, " if pn.get(p) else "") + f"set at insn {u})"
+                                              for p, u, _ in holders)
+              + (" has" if len(holders) == 1 else " have") + " it as REG_EQUIV, so reload loads the constant"
+              " again at each use when it spills, and gives it no slot.")
+        knob = ",".join(str(p) for p, _, _ in holders)
+        base = fast_score(src, func, env)
+        base_shape = getattr(fast_score, "shape", None)
+        r = fast_score(src, func, dict(env or {}, AGBCC_NOEQUIV=knob))
+        if r is not None:
+            n, text = r
+            was = f" (without it: {base[1]}, shape {base_shape})" if base is not None and base[0] else ""
+            print(f"  With AGBCC_NOEQUIV={knob} (diagnostic only): "
+                  f"{text if n == 0 else text + f', shape {fast_score.shape}'}{was}.")
+        print("  A constant gets a slot only when update_equiv_regs gives it no equivalence: a non-constant set"
+              " of the same variable first (README fact 20), or a union initializer's CLOBBER that a loop keeps"
+              " alive (fact 21; in straight-line code flow deletes the dead CLOBBER first).")
 
 
 def cmd_shape(src, func, env):
@@ -5416,9 +6528,9 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         text = land.wrap_nonmatching(text, name, asm_name or name, info.get("fuzzy", 0.0), info.get("shape"))
         if text is None:
             sys.exit(f"{name}: no definition of {name} in {rel}")
-    text, pins, bars = land.concessions(text)
+    text, pins, bars = land.concessions(text, path)
     if not nonmatching and not allow_pins:
-        added = land.added_concessions(open(path).read() if os.path.exists(path) else "", text)
+        added = land.added_concessions(open(path).read() if os.path.exists(path) else "", text, path)
         if any(added):
             sys.exit(land.pin_refusal(name, *added, dest))
 
@@ -5557,6 +6669,19 @@ def cmd_todo(show, order):
                           like_tables(), arm)
 
 
+def cmd_twins(show, everything):
+    """Functions not yet exact, each with its closest matched relative: where a twin's C may carry over."""
+    import structure
+    import progress
+    funcs, sizes = progress.load_functions()
+    status, files = code_status()
+    try:
+        pinned = progress.collect_pinned(funcs, os.path.join(ROOT, "src"))
+    except Exception:  # the pin marks are a convenience; the ranking stands without them
+        pinned = set()
+    return structure.twins(like_index(), status, funcs, sizes, files, pinned, show, everything, like_tables())
+
+
 def cmd_like(target, show):
     import structure
     import progress
@@ -5668,11 +6793,12 @@ def c_change(base_lines, path):
 
 def is_snippet(base_lines, text, func):
     """Is TEXT a `put` snippet rather than a whole copy of the workspace: it lacks a function or
-    INCLUDE_ASM the workspace has besides FUNC, or the workspace's #include lines."""
+    INCLUDE_ASM the workspace has besides FUNC, or the workspace's #include lines. A static helper
+    (`static inline` or `inline static`) the variant drops, e.g. for a shared header's, does not count."""
     base = "\n".join(base_lines)
 
     def defined(t):
-        return (set(re.findall(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*?\b(\w+)\s*\([^;{}]*\)\s*\{", t, re.M))
+        return (set(re.findall(r"^(?!(?:inline\s+|__inline__\s+)*static\b)[A-Za-z_][^\n;=(){}]*?\b(\w+)\s*\([^;{}]*\)\s*\{", t, re.M))
                 | set(re.findall(r"INCLUDE_ASM\([^,]+,\s*(\w+)\)", t)))
     if (defined(base) - {func}) - defined(text):
         return True
@@ -5860,6 +6986,10 @@ def validate_cli(args):
         if len(tail) > 2 or any(a not in ("addr", "prior", "size") and not a.isdigit() for a in tail):
             cli_error("todo [N] [addr|prior|size]")
         return
+    if cmd == "twins":
+        if len(tail) > 2 or any(a != "all" and not a.isdigit() for a in tail):
+            cli_error("twins [N] [all]")
+        return
     if cmd == "uses":
         if not any(a.isdigit() for a in tail):
             cli_error("uses REG... [PASS...] [FUNC]")
@@ -5895,7 +7025,7 @@ def validate_cli(args):
     elif rest and rest[0] == "pins":
         if len([a for a in rest if a != "--all"]) > 2:
             cli_error("FILE.c pins [FUNC] [--all]")
-    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "giv", "spill", "pre", "calls")):
+    elif any(a in rest for a in ("probe", "shape", "frame", "preorder", "hoist", "giv", "spill", "pre", "calls")):
         if len(rest) > 2:
             cli_error("FILE.c COMMAND [FUNC]")
     elif len(rest) > 1:
@@ -5944,6 +7074,8 @@ def main():
         return cmd_todo(n, order)
     if args[0] == "like":  # like FUNC|ADDR: matched functions whose ROM looks like this one's
         return cmd_like(args[1], int(args[2]) if len(args) > 2 else 8)
+    if args[0] == "twins":  # twins [N] [all]: drafts (all: also no C) by their closest matched relative
+        return cmd_twins(next((int(a) for a in args[1:] if a.isdigit()), 60), "all" in args[1:])
     if args[0] == "census":  # census [CALLEE]: concessions across src/ grouped by the call they serve
         import structure
         return structure.census(ROOT, want=args[1] if len(args) > 1 else None)
@@ -6054,6 +7186,10 @@ def main():
         rest.remove("hoist")
         func = source_function(src, rest[0] if rest else None)
         return cmd_hoist(src, func, env)
+    if "preorder" in rest:  # FILE.c preorder [FUNC]: the ROM's PRE slot order against gcse's hash table
+        rest.remove("preorder")
+        func = source_function(src, rest[0] if rest else None)
+        return cmd_preorder(src, func, env)
     if "frame" in rest:  # FILE.c frame [FUNC]: stack slots, ROM against draft, with the pseudo in each
         rest.remove("frame")
         func = source_function(src, rest[0] if rest else None)

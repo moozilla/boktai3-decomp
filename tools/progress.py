@@ -255,7 +255,7 @@ def check_tails(elf, source_root=Path(ROOT) / "src"):
 
 MARK = "// MATCHING_CONCESSION: register-pinning"
 # an empty `do { } while (0)` counts too: its loop notes end cse blocks and weight refs like a barrier
-EMPTY_LOOP = r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)'
+EMPTY_LOOP = r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)|\bDEBUG_NOP\s*\(\s*\)'  # DEBUG_NOP() expands to one
 # so does an if with nothing in its body; one whose body is DEBUG_PRINT() (include/debug.h) is ordinary C
 EMPTY_IF = r'\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{(?:\s|/\*.*?\*/|//[^\n]*)*\}|;)'
 HINT = re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*(?:volatile\s*)?\(\s*""'
@@ -296,12 +296,15 @@ def _hinted_helpers(bodies, known=frozenset()):
 
 
 def header_helpers(roots=("include", "src")):
-    """Hinted static inline helpers and macros defined in headers."""
+    """Hinted static inline helpers and macros defined in headers, plus every statement macro
+    used at only one site in the tree (tools/statement_macros.py): a single-use
+    `do { ... } while (0)` wrapper is a priority knob, so it counts as a barrier."""
+    from statement_macros import single_use_names
     bodies = {}
     for root in roots:
         for path in sorted((Path(ROOT) / root).rglob("*.h")):
             bodies.update(_bodies(path.read_text()))
-    return _hinted_helpers(bodies)
+    return _hinted_helpers(bodies, frozenset(single_use_names(Path(ROOT))))
 
 
 def hinted_functions(text, names, shared=frozenset()):
@@ -325,7 +328,12 @@ HINT_KINDS = [
 
 
 def hint_kinds(text):
-    return [k for k, r in HINT_KINDS if r.search(text)]
+    from statement_macros import single_use_names
+    kinds = [k for k, r in HINT_KINDS if r.search(text)]
+    once = single_use_names(Path(ROOT))
+    if once and re.search(r"\b(" + "|".join(map(re.escape, sorted(once))) + r")\s*\(", text):
+        kinds.append("single-use-macro")
+    return kinds
 
 
 def collect_pinned(funcs, source_root):

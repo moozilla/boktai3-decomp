@@ -1,3 +1,4 @@
+#include "scene_actor_displacement.h"
 #include "scene_actor_control_phase.h"
 #include "player.h"
 #include "engine.h"
@@ -5,16 +6,6 @@ u32 SceneActor_GetDirectionFlags(u32);
 u8 SceneActorTarget_TrySelectNearestParticipant(struct SceneActorRegistryResetView *);
 void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *);
 void SceneActorAnimation_SelectEntryFlags(struct SceneActorAnimationView *, s32, u32);
-static inline s32 Quarter(s32 v)
-{
-    return v >= 0 ? v >> 2 : -(-v >> 2);
-}
-static inline s32 ReadAxis(s32 desired, s16 *current, s16 **field)
-{
-    s32 difference = desired - *current;
-    *field = current;
-    return Quarter(difference);
-}
 static inline u8 AtRest(s32 x, s32 z)
 {
     if (!x && !z)
@@ -63,8 +54,8 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *actor)
             *flags = mask | *flags;
         }
     }
-    x = ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &px);
-    z = ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &pz);
+    x = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &px);
+    z = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &pz);
     if (x > 200)
         x = 200;
     else if (x < -200)

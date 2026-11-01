@@ -65,6 +65,38 @@ class PinsScope(unittest.TestCase):
         self.assertEqual(self.scope.site_variables('    asm("" : "+r"(t), "=r"(u));'), {"t", "u"})
         self.assertEqual(self.scope.site_variables('    asm("" ::: "memory");'), set())
 
+    def test_a_function_after_a_continued_define_is_found_with_the_macros_it_uses(self):
+        source = """#define PINNED(v)                                                   \\
+    ({                                                                \\
+        register int m asm("r1") = (v);                               \\
+        m;                                                            \\
+    })
+#define UNUSED(v) ({ register int n asm("r2") = (v); n; })
+int Target(int v)
+{
+    return PINNED(v) + 1;
+}
+"""
+        reach = self.scope.function_reach(source, "Target")
+        self.assertEqual(set(reach), {"Target", "#PINNED"})
+        a, b = reach["#PINNED"]
+        self.assertIn('asm("r1")', source[a:b])
+
+    def test_a_barrier_line_inside_a_macro_is_a_site(self):
+        source = "#define KEEP(v)  \\\n    ({  \\\n        asm(\"\" : \"+r\"(v));  \\\n        v;  \\\n    })\n"
+        kinds = [k for _, k, _ in self.scope.concession_sites(source)]
+        self.assertEqual(kinds, ["barrier"])
+
+    def test_each_pin_of_a_declaration_line_is_a_site(self):
+        source = 'int F(void)\n{\n    register int a asm("r9"), b asm("r6"), c;\n    return a + b;\n}\n'
+        sites = self.scope.concession_sites(source)
+        self.assertEqual(len(sites), 2)
+        lines = source.split("\n")
+        self.assertEqual(sites[0][2](lines)[2].strip(), 'register int a, b asm("r6"), c;')
+        self.assertEqual(sites[1][2](lines)[2].strip(), 'register int a asm("r9"), b, c;')
+        both = sites[1][2](sites[0][2](lines))
+        self.assertEqual(both[2].strip(), "register int a, b, c;")
+
 
 if __name__ == "__main__":
     unittest.main()

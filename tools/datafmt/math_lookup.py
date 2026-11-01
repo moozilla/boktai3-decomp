@@ -1,4 +1,4 @@
-"""Numeric lookup tables used by particle emitters and the angle routines."""
+"""Numeric lookup tables used by movement, particle emitters and the angle routines."""
 import csv
 import io
 import struct
@@ -8,6 +8,8 @@ ROM_BASE = 0x08000000
 
 # Each row keeps its physical index, including the extra quarter-turn of sine.
 TABLES = {
+    0x08605E48: ("I", 8, ("phase", "rate"), (0x0809CC8C,),
+                 "Lun selects a rate by shifting route progress right by seven and capping the table index at seven."),
     0x086141BC: ("H", 1024, ("index", "sample"), (0x081EE130, 0x0818B2A0),
                  "The effect RNG cursor at 03005304 wraps modulo 1024 in this fixed ROM bank."),
     0x086149C4: ("h", 320, ("phase", "sine_q12"), (0x082362EC, 0x08128F98, 0x08047068),

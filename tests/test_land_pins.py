@@ -31,6 +31,9 @@ class LandPins(unittest.TestCase):
         self.assertEqual(land.added_concessions(DRAFT, loop), (0, 1))
         self.assertEqual(land.added_concessions(DRAFT, "int F(void) { do { g(); } while (0); return 0; }\n"), (0, 0))
 
+    def test_debug_nop_counts_as_a_barrier(self):
+        self.assertEqual(land.added_concessions(DRAFT, "int F(void) { DEBUG_NOP(); return 0; }\n"), (0, 1))
+
     def test_an_empty_if_counts_unless_its_body_is_debug_print(self):
         self.assertEqual(land.added_concessions(DRAFT, "int F(void) { if (G(1)) { } return 0; }\n"), (0, 1))
         self.assertEqual(land.added_concessions(DRAFT, "int F(void) { if (G(1)) {\n DEBUG_PRINT();\n }\n"

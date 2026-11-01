@@ -14,8 +14,7 @@ static inline u32 PauseFlags(u32 mask)
 }
 static inline u32 TestFlags(u32 bits)
 {
-    register u32 mask asm("r1") = bits;
-    return gUnk_02000560 & mask;
+    return gUnk_02000560 & bits;
 }
 static inline u32 PinkSpine_AdvanceDamageSequence(struct PinkSpineState *owner)
 {
@@ -24,9 +23,7 @@ static inline u32 PinkSpine_AdvanceDamageSequence(struct PinkSpineState *owner)
 
 s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
 {
-    s32 pauseMask;
-    pauseMask = 4;
-    if (PauseFlags(0x400) || TestFlags(pauseMask))
+    if (PauseFlags(0x400) || TestFlags(4))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;

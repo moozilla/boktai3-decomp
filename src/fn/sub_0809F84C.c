@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "player.h"
@@ -7,10 +6,6 @@ struct CrowDrawableView {
     u32 flags;
     u16 unknown4;
     u8 direction;
-};
-struct CrowPlayerView {
-    u8 pad[0x30];
-    struct ContactPosition position;
 };
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
@@ -101,7 +96,7 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
         SetControl(actor, actor->entryTarget224, 2);
     }
     if (state->approachTime < ((s32)actor->counter2AC)) {
-        Delta(&delta, &actor->body.position, &(*(struct CrowPlayerView **)0x02000580)->position);
+        Delta(&delta, &actor->body.position, (void *)&gPlayers[0]->position);
         t1 = delta.x;
         t2 = delta.z;
         angle = Math_Atan2(t1, t2);
@@ -130,7 +125,7 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
         SetState(actor, 0, 0, 4);
         return;
     } else if (state->orbitRange > actor->tracking.distance) {
-        Delta(&delta, &(*(struct CrowPlayerView **)0x02000580)->position, &actor->body.position);
+        Delta(&delta, (void *)&gPlayers[0]->position, &actor->body.position);
         angle = Math_Atan2(delta.x, delta.z);
         turn = Magnitude(Normalize(((angle + 64) & 255) - actor->body.direction));
         if (turn <= 63)
@@ -143,7 +138,7 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
             step = 2;
         goto clamp;
     } else {
-        Delta(&delta, &actor->body.position, &(*(struct CrowPlayerView **)0x02000580)->position);
+        Delta(&delta, &actor->body.position, (void *)&gPlayers[0]->position);
         angle = Math_Atan2(delta.x, delta.z);
         turn = Normalize(angle - actor->body.direction);
         if (turn < 0)
@@ -157,11 +152,14 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
         if (step > 6)
             step = 6;
     }
-    Polar(&velocity, actor->body.direction, state->speed);
+    {
+        u8 *speed = &state->speed;
+        struct ContactPosition *out = &velocity;
+        Polar(out, actor->body.direction, *speed);
+    }
     actor->body.motion = velocity;
     if (!state->turnDelay) {
         s32 difference = Normalize(angle - actor->body.direction);
-        asm("" : "+r"(difference) : "r"(angle));
         if (difference > 0)
             actor->body.direction += step;
         else

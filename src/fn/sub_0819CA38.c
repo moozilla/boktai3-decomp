@@ -69,14 +69,14 @@ s32 Hresvelgr_RefreshTarget(struct OffsetActor *p)
     {
         u32 v = (obj->facing + 0x60) >> 6;
         u32 m = 3;
-        asm("" : "+r"(m));
-        obj->facing4 = m & v;
+        m &= v;
+        obj->facing4 = m;
     }
     {
         u32 v = (obj->facing + 0x70) >> 5;
         u32 m = 7;
-        asm("" : "+r"(m));
-        obj->facing8 = m & v;
+        m &= v;
+        obj->facing8 = m;
     }
     Subtract(&v, &obj->position);
     {

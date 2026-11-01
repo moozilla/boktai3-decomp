@@ -139,10 +139,19 @@ python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
 python3 tools/scope/scope.py FILE.c shape [FUNC]  the diff with low registers blanked: order and shape differences only
-python3 tools/scope/scope.py FILE.c frame [FUNC]  stack slots, ROM against draft, with the pseudo (C variable) reload put in each
+python3 tools/scope/scope.py FILE.c frame [FUNC]  stack slots, ROM against draft, with the pseudo (C variable) reload put in each;
+                                                  a ROM slot holding a pool constant names the draft pseudo whose REG_EQUIV
+                                                  keeps it out of memory and scores AGBCC_NOEQUIV on it (fact 32)
+python3 tools/scope/scope.py FILE.c preorder [FUNC]  the ROM's order of PRE's spilled field addresses against gcse's hash table:
+                                                  the model checked on the draft, the slots out of order, the table sizes
+                                                  (insn counts) and pseudo renumberings that give the ROM's order, and the
+                                                  body lines whose field offsets an inline helper would fold (fewer insns)
 python3 tools/scope/scope.py FILE.c hoist [FUNC]  loop-invariant motion pass by pass: what loop.c moved out, what stayed, and why;
                                                   then for each hoisted variable it scores the dead re-set before the loop's closing brace
 python3 tools/scope/scope.py todo [N] [addr|prior|size]   functions with no C yet, in ROM order (default) or by prior art/size
+python3 tools/scope/scope.py twins [N] [all]     every draft (all: also no C) with its closest matched relative by like's ranking,
+                                                  best first: twin >= 0.75 similarity, near >= 0.45 covering >= 40%,
+                                                  * marks a relative with pins (its de-pinned C fixes both)
 python3 tools/scope/scope.py new FUNC             open FUNC: build/scope/work/FUNC.c (its unit with a stub, or a like twin's C)
 python3 tools/scope/scope.py land FUNC [--name N] [--rom] [--nonmatching] [--allow-pins]   put the draft into src/ and check it
 python3 tools/scope/scope.py rename FUNC NEW      functions.csv plus every C spelling of the old name or sub_ label
@@ -185,7 +194,10 @@ integer address (see the literal survey below).
 
 * the ROM and draft instruction, and which pseudo holds the differing register
   (operands matched by position between the lreg dump and the same insn after
-  reload, so local-alloc pseudos are covered);
+  reload, so local-alloc pseudos are covered). When the listing shows a pure
+  register swap as a `-` row and a `+` row (the alignment counts high
+  registers, so `mov ip, r2` and `mov sb, r2` do not pair), `why` on the `+`
+  row finds its ROM twin by shape and explains it as one insn;
 * the insn's registers after every pass that changed them, pseudos named by C
   variable (`24 (phase)`);
 * for a cse change: the equivalence class at the first look (cheapest first,
@@ -215,7 +227,10 @@ integer address (see the literal survey below).
     ROM also keeps there) and the arithmetic to allocate that one first;
   * in both rival cases the arithmetic to flip the order: refs or live length
     each side would need, live lengths in flow's units, and the
-    `AGBCC_PRI`/`AGBCC_FORCE` what-if that confirms it;
+    `AGBCC_PRI`/`AGBCC_FORCE` what-if that confirms it; when the pseudo's life
+    is doubled by a REG_EQUIV note (fact 20) and the undoubled life alone would
+    win, it says so and gives `AGBCC_NOEQUIV=REG` (the random table in
+    sub_080A34BC, sub_082335F0 and sub_08234868);
 * for a reload register (operand not a pseudo before allocation): the reload
   choice number, the spill registers as that choice saw them (free, shared
   with another reload of the insn, holding a named pseudo, taken), the
@@ -285,8 +300,10 @@ post-increment or a stepped register before writing C; it reached 24/25 by C, no
 `AGBCC_NOMOVE=U1,U2` (loop.c: leave the invariant set by insn U in the loop; with
 `AGBCC_LOOP_TRACE=1` the trace also prints `loopopt fn=` once per loop pass, a `cand` line
 for every pseudo set in each loop (may_not_optimize, maybe_never, used_before, in_block,
-set_in_loop, invariant) and a `move` line with the threshold arithmetic; `probe` flips each
-hoist and `hoist` prints the table), reload1.c `S` lines in names.txt (each stack slot:
+set_in_loop, invariant), a `move` line with the threshold arithmetic and a `match` line
+for each equal invariant combine_movables folds into an earlier one (its savings and
+lifetime join that one's test); `probe` flips each hoist and `hoist` prints the table),
+reload1.c `S` lines in names.txt (each stack slot:
 pseudo, sp offset, size, allocation order; `frame` reads them),
 `CSE_NOCANON=N`
 (new reg N never becomes a class head), `CSE_KEEP=N,...` (keep N canonical),
@@ -318,6 +335,15 @@ syntax). Added in this thread (in `tools/scope/agbcc.patch`):
   A ROM operand that is read from memory straight into a reload register, with
   no allocated register of its own, looks like this (`mov r3, r8; ldrh r3,
   [r3]; adds r0, r1, r3` in ActorMarker_LaunchFragments).
+* `AGBCC_NOEQUIV=REG,...`: update_equiv_regs gives those pseudos no
+  equivalence, as a second, different set would. A spilled one then gets a
+  stack slot instead of being rematerialized at each use. It is the what-if for
+  a ROM that stores a constant to the stack right after loading it
+  (`ldr r5, =0x203B400; str r5, [sp, #4]`) and reloads it from there. It also
+  skips update_equiv_regs' doubling of the live length. On
+  ChargedBurst_EmitSpark (082335F0), `AGBCC_NOEQUIV=36` (the random table)
+  turns the best draft into an exact `-g` compile; see
+  `notes/opus-charged-burst-spark_2026-10-31.md`.
 * `AGBCC_COMBKEEP=REG,...`: combine never merges an insn that sets one of
   those pseudos into another insn (the what-if for a load or copy the ROM
   keeps).
@@ -566,9 +592,9 @@ in the patch.
   access pattern (which offsets each block reads), not row votes.
 * `hoist` explains the draft side only. When the ROM keeps an invariant in the
   loop, the tool cannot tell which "stays" reason the original source used.
-  Open case: a table used in one basic block (sub_081A0EA4 and the other
-  register-pinned random-table loops); cse deletes a repeated set there, so the
-  dead-store lever below does not apply.
+  The one-basic-block case (a table used in one block, where cse deletes a repeated
+  set) now has a lever: the union initializer of fact 21. sub_081A0EA4 and the other
+  register-pinned random-table loops are the next place to try it.
 
 ## agbcc facts established with scope
 
@@ -738,8 +764,12 @@ Each was read from the compiler source and confirmed on a live draft.
    logs these sets; `why` explains from it.
 
 17. **flow measures lives before combine.** The pass order is cse2, flow,
-   combine, regmove, lreg: REG_LIVE_LENGTH and REG_N_REFS come from the RTL
-   as expand and cse left it. RTL that combine later folds away (a type
+   combine, regmove, lreg: REG_LIVE_LENGTH and REG_BASIC_BLOCK come from the RTL
+   as expand and cse left it. REG_N_SETS and REG_N_REFS do not: toplev.c calls
+   recompute_reg_usage (flow.c) right before regclass and local-alloc, which
+   recounts them from the RTL combine and regmove left, by loop depth, so a set
+   or use that combine removes counts nowhere (the flow and lreg dumps' `used N
+   times` differ). RTL that combine later folds away (a type
    conversion's extension whose result is known narrow, a copy combine
    merges) still lengthens every value live across it. That makes parameter
    and variable types a lever on allocation order that leaves the
@@ -793,6 +823,29 @@ Each was read from the compiler source and confirmed on a live draft.
    try. `hoist` now writes and scores that variant for every hoisted variable
    (`lever: ... MATCH`). It needs a C variable to re-set: when the hoisted value is an
    unnamed constant inside an inline, name it at the top of the body first.
+   **One basic block: set it through a union.** A union initializer
+   (`union RandomTableView table = {gRandomTable};`, ram.h) expands to a CLOBBER of the
+   union's register and then the set (expr.c `store_constructor`); loop.c counts the
+   clobber as a second set, so the value is may_not_optimize and stays in the loop, and
+   nothing extra reaches the output. A struct does not do it: a constant struct
+   initializer zeroes the register first, and the zero and the set are consecutive
+   invariant sets that move together. SceneActorEffects_EmitRandomOffsets (pinned table,
+   index and count) matched with no pins this way on the first try, and
+   SceneActorRegistry_UpdateActors' SpawnContactParts loop got its table load back
+   (`AGBCC_NOMOVE` on the table gives the same output). `hoist` writes and scores this
+   variant too (`lever: set NAME through a one-member union`).
+   **Equal constants add up.** combine_movables folds later sets of the same invariant
+   into the first (same constant, same mode or the first wider, not used outside the
+   loop), summing savings and lifetime. HealthRestoreEffect_StartParticleBurst's two
+   `& 255` masks (cosine and sine) moved together at 26 x 2 x 2 >= 77; alone each scores
+   26 < 77. A variable for the later mask, set before the loop and again before its use
+   (`u32 byteMask = 255;` ... `byteMask = 255;` after the cosine's branch), is no
+   movable at all: its in-loop set follows a branch, and its first appearance is
+   outside the loop (reg_in_basic_block_p fails). The cosine's mask then scores alone,
+   and both stay `movs r0, #0xff` as in the ROM. On the cosine side instead the
+   variable's set comes before the branch, so it moves (25 / 21). Flow deletes the dead
+   set before the loop. `hoist` marks a folded set `+ equal set insn U line L` and adds
+   the first set's own score to the test (`26 x 2 x 2 >= 77; alone 26 x 1 x 1 < 77`).
 22. **Stack slot order is pseudo order.** Reload gives each spilled pseudo a slot in
    pseudo-number order (alter_reg), at rising offsets; pseudos it evicts later come
    after. Pseudo numbers follow first appearance, so declaration order is a frame lever.
@@ -828,7 +881,10 @@ Each was read from the compiler source and confirmed on a live draft.
    priority swap (dz 12 refs/131 lost r5 to the mode bit's 10/76); one macro around the
    delta, grid rounding and magnitude statements gave dz 18 and az 8 refs and matched. `why`
    now names the narrowest line run that would flip such a swap ("a statement macro ...
-   around lines A-B"). Its reload rotation was a separate fix: a tail that cross-jumping
+   around lines A-B"). The macro must be one the original plausibly had, shared by several
+   functions (the Armor twins' ARMOR_PLAYER_DELTAS); a wrapper used at one site, written
+   only to double its statement's refs, is a priority knob and counts as a barrier
+   (tools/statement_macros.py; progress, land and matchsearch count it). Its reload rotation was a separate fix: a tail that cross-jumping
    later merges still takes its reload choices first, so writing out the duplicated
    `p->decision = 1; ...; break;` tails the ROM merged set the rotation.
 27. **A goto into a shared tail hides the tail's reload choices.** jump2 cross-jumps after
@@ -838,6 +894,193 @@ Each was read from the compiler source and confirmed on a live draft.
    Writing the tails out removed rotation barriers from sub_0818911C (the mode branch's
    fastMode/secondaryCooldown choices) and Armor_ApplySceneCommands (each case's own
    Trigger_ConsumePending). `why` on a rotation difference now lists the gotos before it.
+   The other direction matters for allocation: a duplicate tail's refs count toward its
+   pseudos' priority although jump2 deletes the code, so a source that shares the tail has
+   fewer refs and the same instructions. `why`'s ref lever now says how many of the refs it
+   lists sit in tails jump2 cross-jumps away, and on which lines (sub_080BF0E4: 4 of the
+   actor's 97, in category 6's directional tail).
+28. **The ref lever needs a macro the original shared.** A `do { ... } while (0)` that
+   wraps one statement only to double its refs is a priority knob in disguise and counts as
+   a barrier, like an empty one; a statement macro counts as ordinary C when there is
+   evidence the original had it, usually several functions sharing it. sub_080A34BC (the
+   spider recovery tick) needed its random table allocated before the 0x3FF mask (ip and
+   sb): 3 refs each, the table's life longer, so the mask won (348 against 300). Reading the
+   delay samples through `ParticleRandom_ReadSample`, whose `PARTICLE_RANDOM_READ_SAMPLE`
+   eight matched functions share (include/monster_particle_random.h), counts that read at
+   depth 2: 4 refs, 800, and an exact match with no concession. `why`'s macro lever now
+   lists each line that flips the order alone and the shared statement macros in include/
+   (two or more src files, directly or through an inline of the same header), preferring
+   ones that read through an index when the line does.
+
+28. **`movs rA, #1; rsbs rA, rA, #0; adds rB, rA, #0` is -1 reloaded into a QImode pseudo.**
+   movqi takes only constants 0..255, so reload puts -1 in a SImode spill register and copies
+   it. A local s8/u8 is promoted to SImode (a direct -1, or #0xff), so the pseudo is the
+   temporary store_field makes for `p->field = c ? 1 : -1;`. The same conditional stored
+   through a cast pointer, `*(s8 *)(p + 0x1DA) = ...`, takes store_expr's COND_EXPR-into-MEM
+   path and stores in each arm. Armor_InitPartStretch, Armor_BeginPartTravelToPlayer and
+   Armor_RetractPartStretch matched or moved this way; `why all` now names the pattern.
+
+29. **PRE numbers its field-address pseudos in hash-table order.** pre_delete (gcse.c) makes
+   one reaching pseudo per replaced expression while it walks the expression table bucket by
+   bucket, each chain in first-discovery (index) order, and reload gives the spilled ones
+   slots in pseudo order (fact 22). For `(plus:SI (reg R) (const_int O))` the bucket is
+   (13772 + R + O) % T, T = max(11, N // 2) | 1, N the real insns into gcse (u.i.addressof;
+   copy propagation's SET table has N // 4 | 1). So these slots move with the insn count
+   and the base pseudos' numbers, not with declarations. `preorder`, and `frame` when the
+   slots are out of order, check the model against the draft's own table, list the slots
+   out of (bucket, index) order, and search the table sizes and one renumbering cut (every
+   base pseudo from one on moved by d) that give the ROM's order.
+   Golem_ResumeBehaviorAfterDisplacement: a draft with N 1696, T 849 had 3 pairs out of
+   order; no table size alone gave the order, a cut before `actor#7` of +35..+55 at T 851
+   or +43..+57 at T 853 did. The match has N 1705, T 853, and its bases from `actor#7` on
+   are 38 to 51 pseudos later (the Dog-style displacement helpers and the Golem_Drift
+   inline). The search knows one cut; when none fits, the order needs two changes or a
+   different expression index order.
+
+30. **Identical case bodies that the ROM keeps apart each end in their own copy of the tail.**
+   When a switch's cases share a `break` to one tail, jump2 cross-jumps identical case
+   bodies together (sub_08022EA4's cases 3/4/5 call Path_SnapToRandomFarPoint alike).
+   The ROM's separate copies, each ending `b tail`, came from cases that each wrote the tail
+   and returned: jump2 merges those tails into one copy first, and the bodies before them
+   stay apart. This replaced `asm("" : : "i"(N))` barriers in SceneActorState_SnapReactionPosition
+   (`*(u16 *)(p + 0x354) = 64; return;` per case) and SceneActorState_SelectReactionPhase
+   (an inline that stores the phase, called and returned from at each choice, which also kept
+   its repeated `movs r0, #14; b tail` pairs apart).
+
+31. **An inline helper folds field offsets: one insn each, where the body takes two.**
+   expand_binop (optabs.c) forces a constant outside -255..255 into a register when
+   expensive optimizations are on (`preserve_subexpressions_p`), so `p->field` at a large
+   offset reaches gcse as `(set (reg c) (const_int K))` and `(plus (reg p) (reg c))`, and
+   cse1 keeps them (the constant costs more than the register). In an inline copy,
+   integrate.c's `try_constants` substitutes the known constant into the add,
+   `(plus (reg p) (const_int K))`, and the load dies before gcse. The final code is the same,
+   since reload splits the add again, but N falls by one per access moved into a helper,
+   and N sets PRE's table size (fact 29). Golem_UpdateChargePursuit: the three identical
+   turn-away blocks as `Golem_TurnAway(body)`, with a `Golem_SetBehavior(body, n)` commit,
+   took N from 1902 to 1869 and T from 951 to 935. The ROM's slot order needed T 927..939,
+   and the function matched; its stop blocks keep their own commit and `return` for the
+   reason fact 30 gives. `preorder` now lists the body lines that load an offset when
+   the order needs fewer insns. A `do { } while (0)` costs two insns into gcse (and is a
+   barrier).
+32. **Reload evicts by refs times the number of usable registers at or above it.**
+   order_regs_for_reload (reload1.c) resets `hard_reg_n_uses[i]` at iteration i and
+   then adds every live pseudo's REG_N_REFS to its own register's count, so register
+   r ends with refs x (usable registers numbered r or higher: not fixed, not live as
+   a hard register across the insn). In a Thumb body r0 counts 12, r1 11, r4 8, r5 7.
+   A pseudo in a high-numbered register is cheaper to evict at equal refs.
+   ChargedBurst_EmitSpark: at the x jitter's add (insn 178, `AGBCC_RTRACE=1`) reload
+   needs two low registers. r3 is free, then r5 (the table, 4 refs: 28) beats r4 (the
+   0x3FF mask, 4 refs: 32) and r1 (the position address, 3 refs: 33). With the table
+   at 5 refs (35), reload takes r4 and rematerializes the mask instead. So a lever
+   that removes the table's equivalence by giving its variable another set (fact 20,
+   or a live CLOBBER) only works when the competitors' counts leave room for the
+   extra ref. `frame` now names ROM slots that hold a pool constant (stored once,
+   right after its `ldr rN, =C`), the draft pseudo whose REG_EQUIV keeps it out of
+   memory, and the score with `AGBCC_NOEQUIV` on it.
+
+33. **An and is tied to its first operand: write the constant first to keep it.** Thumb's
+   `ands` is two-operand, and regmove ties the result to operand 1 of the `and` RTL. C's
+   `x = v & K` (or `K & v`, which fold canonicalizes the same way) puts the value first, so
+   the draft's `ands rValue, rConst` writes the value's register; the ROM's
+   `ands rConst, rValue` keeps the constant's. `u32 m = K; m &= v; x = m;` makes the
+   constant's pseudo operand 1 and the tie follows it, with no barrier. It replaced empty
+   `asm("" : "+r"(m))` barriers in Hresvelgr_RefreshTarget (the facing masks 3 and 7), and
+   pins in sub_0813727C (`s32 bits = ~0x20; bits &= *flagsp;`, a negated constant through
+   `rsbs`), and a pin and two barriers each in SceneActorAnimation_UpdateDirectionalCallback
+   and UpdateEightDirectionCallback (the same facing masks in their setFacing helper). scope's default diff
+   now prints the lever on each aligned `ands` pair whose tied operand differs (a constant
+   in one, the value in the other), also when both read `ands r0, r1` with the registers'
+   roles swapped (Vanargand_UpdatePartLeap's terrain mask); the opposite case asks for the
+   value first. The same holds for `orrs` (the hint covers it too): SceneActors_UpdatePeriodicEffectAction's hold
+   flag matched as `u32 value = *flags; u32 mask = 4; mask |= value; *flags = mask;`. Reading
+   the value first also matters there: with `mask = 4` declared before the load, the
+   `movs` came ahead of the `ldrb` (the ROM loads first, then the constant).
+34. **A struct halfword `|=` is a field insertion; through a `u16 *` it is not.**
+   `s->f |= mask` on a `u16` struct member expands to 21 RTL insns: the ior, then a store
+   as `(old & 0) | new` with a `(set (reg:HI) (const_int 0))`; through a pointer
+   (`static inline void SetHalfFlags(u16 *flags, u32 input) { u32 mask = input; *flags |= mask; }`)
+   it is 11. Both compile to the same code, but the insertion's zero and second ior reach
+   flow and only combine deletes them, so they count toward every live length that spans
+   them. In SceneActorTarget_TryStimulusRoute two such insns in the tail made `object`'s
+   life 371 against `group`'s 345 (15 vs 14 refs), so group won sb; the helper form made
+   it 369 and the function matched. The same function wanted its masks loaded first
+   (`ldr r1, =0xFFFEBE3F` before the word load, `movs r0, #0x80; lsls` before the halfword
+   load), which a mask that reaches the store as a helper parameter or a block-scoped
+   `u32 mask` set before the call gives: `ClearFlags(&a->flags2CC, ~0x141C0)` and
+   `{ u32 mask = 0x200; SetHalfFlags(&a->flags2D4, mask); }`. `life NAME` flags a
+   halfword field insertion it counted ("deleted by combine").
+
+35. **An argument that needs converting is computed before the others.** expand_call
+   precomputes an argument whose value has to change type for its parameter, then loads the
+   argument registers in order, so that argument's register is set first. In
+   SceneActorReaction_SettleDisplacement the ROM sets `adds r3, r4, #0` (category) before
+   `r0, r1, r2` for `SceneActorAttachment_ReplaceResponseSlot`; the draft's u32 prototype set it
+   last. Declaring the parameters `u8` (the callee zero-extends all three) or casting the
+   argument `(u8)category` matched it. scope prints "the ROM sets rN first" for such a call.
+
+36. **A set then a clear of the same struct halfword: flow drops the first store, cse keeps its
+   zeros.** `SetFlagComponent(f, 2); ClearFlagComponent(f, 0x17A9);` compiles to one
+   `ldrh; orrs; ands; strh`, like the single-store form, but the first store's field insertion
+   (fact 34) sets an HI and an SI zero pseudo before the ior. Flow deletes the dead first store;
+   cse has already made later zero stores (a `u8` field through the HI zero's lowpart, halfword
+   and word fields through the SI zero) use those pseudos, so they live on. SettleDisplacement's
+   ROM has them as `movs r5, #0; mov sl, r5; movs r3, #0; mov r8, r3` between the `ldrh` and the
+   `orrs`; a single `u16 value = set | f->value; ... f->value = result;` gives one pair after the
+   and, and the u8 zero, used once, is moved next to its use by local-alloc. Zeros parked in high
+   registers in the middle of a halfword update point here.
+
+37. **u16 masks narrow to HImode, and `x & K` and `(x >> n) & K` get different constants.**
+   c-typeck narrows `&` and `>>` on a u16 operand to HImode. expand_binop forces an expensive
+   constant (any K in an and) into an HImode pseudo and widens the operation to SImode, because
+   Thumb has no `andhi3`. In `(x >> n) & K` the HImode operand 0 is a SUBREG of the shift, so
+   expand_binop swaps the operands and the and reads `(subreg:SI (reg:HI K))` directly. In
+   `x & K`, x is a register (a promoted variable, or a load under `-fforce-mem`), so nothing
+   swaps and the andsi3 expander copies the constant into an SImode pseudo. cse keeps the two
+   modes in separate classes.
+
+   In LinkPlayer_BlendPalette (08239848) the four shifted channels share the HImode 31 (r7),
+   and the two unshifted reds share the SImode copy. Global alloc leaves the copy unallocated,
+   so reload rematerializes it into each and's output (`movs r0, #0x1f; ands r0, r2`, the
+   commutative swap). The draft that shifted a u32 (`packed = color << 16;
+   g = (packed >> 21) & 31`) made g and b SImode. That merged them into the reds' constant, which
+   then lived past every and, so regmove tied each and to a copy of the color. Reading each
+   channel through the u16 (`(*source >> 5) & 31`) matched it, and its twin sub_0813C9B4 lost 13
+   pins.
+
+   Fact 33's constant-first lever needs a constant that dies at the and. When the draft's
+   constant lives on (a later and reads it, or reload loads it there as a spilled pseudo),
+   scope's hint names this fact instead.
+
+38. **Exactly three local quantities in a block are not sorted by priority.** block_alloc
+   (local-alloc.c) sorts two or three qtys by hand, but its `qty_compare (0, 1)` and
+   `qty_compare (1, 2)` compare qty numbers (birth order), not the `qty_order` entries it
+   exchanges. With three, only the orders 0-1-2, 0-2-1 and 2-1-0 are reachable: when qty 1
+   outranks qty 0 the two swaps of 0 and 1 cancel, and the first-born value takes r0 ahead of
+   a higher-priority one. Two qtys, or four and more (qsort), go by priority. In
+   PlayerCue_UpdateFacingPose's branches the dir load, the `8 - dir` chain and the facing
+   address were three qtys, so dir got r0 and the chain r1 (the ROM: chain r0); AGBCC_PRI on
+   the chain does nothing, AGBCC_FORCE matches. Storing facing through a block-local pointer
+   and flip through a plain field store left four qtys per branch and the function matched with
+   no pin. `why` prints the order used and the order by priority for such a block.
+
+39. **Two natural walls against cross-jumping: a return, and a call that falls into a label.**
+   jump2 (jump.c) tries each simple jump against the code that falls into its label first
+   (one shared insn is enough), then against the other jumps to that label, the last one
+   first; the first that shares at least two insns wins. A `return 0` in a tail is
+   `r0 = 0; use r0; jump return_label`: the first try shares the `r0 = 0` with the
+   function's last return, and the jump then targets a label put before that insn. When no
+   label stood there, the new label's uid is past the jump chain table, so that tail is never
+   cross-jumped again. And find_basic_blocks (flow.c) puts a `(use (const_int 0))` nop after
+   a call that falls into a label (the last branch of an if/else chain or a switch, ahead of
+   shared code); cross-jumping compares USE insns, so no tail whose call is followed by a jump
+   can share that call. ScenePool_StateTrackAdaptive and _StateTrackFast matched with no pin
+   once each Enter tail returned and the direction chain fell into one shared `return 0`:
+   its last branch carries the nop, and the random paths jump to that return and merge into
+   the direction>0 copy (the last jump to it), as in the ROM. The pinned twin had kept the
+   tails apart with `asm volatile("")` and an operand asm. scope compiles with
+   AGBCC_CROSS_TRACE on and prints, next to a difference, which tail jump2 cross-jumped into
+   which, and for a tail the draft keeps whole where the ROM's is shorter, whether a nop
+   blocked the first try.
 
 ## Survey: random table as a literal address (2026-10-24)
 
@@ -990,6 +1233,13 @@ which is exactly `10:1`. Not tested.
 * check.py prints raw hex when run outside the venv (no capstone).
 * agbccsrc.py keyword lookup returns unrelated sections.
 * `tools/worktree.sh` does not build scope's compiler in new worktrees: run `sh tools/scope/build_agbcc.sh` once.
+* scope itself, fixed (2026-11-01): a knob set in the environment
+  (`AGBCC_NOEQUIV=36 scope.py FILE.c`) reached the `-g` compile through
+  os.environ but not the fork server's plain compile, which takes knobs only
+  with each request. The build's bytes came out without the knob, and scope
+  printed "-g changes agbcc's code ... the -g compile MATCHES" for what was the
+  knob's effect. resolve_knobs now copies every AGBCC_/CSE_ variable into the
+  request, so both compiles see the same knobs.
 * scope itself, fixed: `FILE.c insn UID` used to treat `insn` as the function
   name; high registers (sb/sl/fp/ip) were not parsed, which mis-paired ROM and
   draft operands; positional operand pairing reported reload registers as a
