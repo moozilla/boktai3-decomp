@@ -18,13 +18,32 @@ struct TentacleAnimationSegment {
     u8 unknown108[0x20];
 };
 
-typedef char TentacleAnimationSegmentSize[(sizeof(struct TentacleAnimationSegment) == 0x128) ? 1 : -1];
+typedef char
+    TentacleAnimationSegmentSize[(sizeof(struct TentacleAnimationSegment) == 0x128) ? 1 : -1];
 
 static inline u8 TentacleSegment_HasStatus(struct TentacleSegmentAnimation *animation, u8 mask)
 {
     if (mask & animation->status)
         return 1;
     return 0;
+}
+
+struct TentacleBodyAnimationView {
+    u8 unknown0[0x2C2];
+    u16 speed;
+    u32 profileMode;
+    u8 unknown2C8[0x308 - 0x2C8];
+    u32 profileId;
+    u8 unknown30C[0x3D4 - 0x30C];
+    struct TentacleAnimationSegment segments[4];
+    u8 unknown874[0x8DA - 0x874];
+    s16 segmentCount;
+};
+
+static inline void *TentacleSegment_ScriptAt(struct TentacleBodyAnimationView *body, s32 offset)
+{
+    void **script = &body->segments[0].animation.script;
+    return *(void **)((u8 *)script + offset);
 }
 
 #endif

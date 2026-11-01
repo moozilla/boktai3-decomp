@@ -2,8 +2,6 @@
 #include "tentacle_segment_animation.h"
 // MATCHING_CONCESSION: register-pinning
 
-
-#define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 void *SceneActorProfiles_GetEntryAddress(u32, u32, s32);
 void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
 void Anim_SetSequence(void *, void *, u32, u8, u8);
@@ -25,14 +23,8 @@ static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
         return 1;
     return 0;
 }
-static inline void *ScriptAt(u8 *body, s32 offset)
-{
-    u32 address = 0x4d4;
-    address += (u32)body;
-    address += offset;
-    return *(void **)address;
-}
-static inline void Step(struct TentacleSegmentAnimation *input, struct TentacleAnimationSegment *sprite)
+static inline void Step(struct TentacleSegmentAnimation *input,
+                        struct TentacleAnimationSegment *sprite)
 {
     register struct TentacleAnimationSegment *seg asm("r8") = sprite;
     register struct TentacleAnimationSegment *o asm("r6") = seg;
@@ -127,9 +119,10 @@ static inline void Step(struct TentacleSegmentAnimation *input, struct TentacleA
         }
     }
 }
-void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32 flagsIn)
+void TentacleBody_RestartSegmentAnimations(struct TentacleBodyAnimationView *input, s32 kindIn,
+                                           s32 rowIn, s32 flagsIn)
 {
-    u8 *body = input;
+    struct TentacleBodyAnimationView *body = input;
     struct {
         s32 kind, flags;
         u8 *actor, *profile;
@@ -143,14 +136,13 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
     frame.kind = kindIn;
     row = sourceRow;
     frame.flags = flagsIn;
-    frame.actor = body;
-    frame.profile =
-        SceneActorProfiles_GetEntryAddress(FIELD(body, 0x308, u32), FIELD(body, 0x2c4, u32), 0);
+    frame.actor = (void *)body;
+    frame.profile = SceneActorProfiles_GetEntryAddress(body->profileId, body->profileMode, 0);
     frame.i = 0;
-    if (frame.i >= FIELD(body, 0x8da, s16))
+    if (frame.i >= body->segmentCount)
         return;
     offset = 0;
-    a = (void *)(body + 0x4c4);
+    a = &body->segments[0].animation;
     {
         u32 t = 0x3d4;
         t += (u32)body;
@@ -159,7 +151,7 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
     do {
         if (!TestMask4(a, 1)) {
             if (TentacleSegment_HasStatus(a, 4)) {
-                Anim_RestartSequence(a, ScriptAt(body, offset), 1, row, ({
+                Anim_RestartSequence(a, TentacleSegment_ScriptAt(body, offset), 1, row, ({
                                          s32 t = frame.flags;
                                          u32 u = (u8)t;
                                          asm("" ::"r"(t));
@@ -167,7 +159,7 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
                                      }));
             } else {
                 s32 four = 4;
-                Anim_RestartSequence(a, ScriptAt(body, offset),
+                Anim_RestartSequence(a, TentacleSegment_ScriptAt(body, offset),
                                      *(u8 *)(({
                                                  register s32 k asm("r2") = frame.kind;
                                                  register s32 x asm("r0") = k * four;
@@ -186,14 +178,14 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
                 {
                     register u8 *act asm("r1") = frame.actor;
                     register u16 *ad asm("r0");
-                    ad = (u16 *)(act + 0x2c2);
+                    ad = &((struct TentacleBodyAnimationView *)act)->speed;
                     Anim_SetDurationScale(a, *ad);
                 }
             }
             Step(a, s);
         }
         {
-            register u32 step asm("r1") = 0x128;
+            register u32 step asm("r1") = sizeof(struct TentacleAnimationSegment);
             offset += step;
             a = (void *)((u8 *)a + step);
             s = (void *)((u8 *)s + step);
@@ -205,7 +197,7 @@ void TentacleBody_RestartSegmentAnimations(u8 *input, s32 kindIn, s32 rowIn, s32
              }) < ({
                  register u32 d asm("r1");
                  s32 cnt;
-                 cnt = FIELD(body, 0x8da, s16);
+                 cnt = body->segmentCount;
                  asm("" ::"r"(d));
                  cnt;
              }));
