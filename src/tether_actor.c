@@ -705,8 +705,6 @@ void TetherActor_UpdateShake(struct TetherActor *actor)
     ++actor->shakeFrame;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_EmitDirectionalEffect(struct TetherActor *input)
 {
     struct TetherActor *actor = input;
@@ -716,17 +714,12 @@ void TetherActor_EmitDirectionalEffect(struct TetherActor *input)
     s32 rawX;
     s32 scaledX;
     s32 scaledZ;
-    u32 highX;
-    u16 y;
     struct ContactPackedVector position, velocity, size;
     rawX = sourceTable[(angle + 64) & 255] * 100;
     table = sourceTable;
     scaledX = scaleEmission(rawX);
-    highX = (u32)((u16)actor->position.x + scaledX) << 16;
-    asm("" : "+r"(highX), "+r"(actor));
-    y = actor->position.y;
-    position.x = highX >> 16;
-    position.y = y;
+    position.x = actor->position.x + scaledX;
+    position.y = actor->position.y;
     scaledZ = scaleEmission(table[angle & 255] * 100);
     position.z = actor->position.z + scaledZ;
     velocity.x = scaleEmission(table[(angle + 64) & 255] * 10);
