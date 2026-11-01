@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_terrain.h"
 // confidence=low: state actor kind 28 dash with decreasing speed and height above terrain.
 struct NpcTag {
