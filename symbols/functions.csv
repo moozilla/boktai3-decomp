@@ -8378,6 +8378,7 @@ addr,name,mode,confidence,source,notes
 081F05D0,SingletonSlot7_OnTargetContact,thumb,low,src-alias,
 081F065C,SingletonSlot7_RegisterRenderCallback,thumb,low,src-alias,Registers the embedded render node with its payload and object-specific callback; tentative rendering role
 081F067C,SingletonSlot7_SetMotionMode,thumb,low,src-alias,
+081F0734,SingletonSlot7_DispatchPendingCommands,thumb,low,src-alias,Dispatches pending scene commands to the slot-seven motion and palette controls
 081F0E24,SingletonSlot7_InitBackgroundAndMotion,thumb,low,src-alias,Configures background layers and copies script resources before initializing position and motion fields
 081F0F68,SingletonSlot7_InitDisplaySprites,thumb,low,src-alias,
 081F1240,SingletonSlot7_RemoveSprites,thumb,low,src-alias,Removes the two embedded sprites during object destruction
