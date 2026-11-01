@@ -6,18 +6,11 @@
 
 /* Auxiliary displays also report completion of a forward or reverse cycle. */
 // confidence=low: auxiliary sprite and motion field names are tentative.
-static inline u32 PlayerCue_StepSequenceEndedWithFirstFlipMask(struct ContactSwarmSprite *owner,
-                                                               struct DisplaySequenceState *state,
-                                                               u32 firstFlipMask)
+static inline u32 PlayerCue_AdvanceCommand(struct ContactSwarmSprite *owner,
+                                           struct DisplaySequenceState *state, const u16 *command,
+                                           u32 firstFlipMask)
 {
-    const u16 *command;
     u32 ended;
-    {
-        u32 offset = DisplaySequence_GetIndex(state) << 1;
-        const u16 *table;
-        table = state->commands;
-        command = (const u16 *)((u32)table + offset);
-    }
     owner->frame = *command >> 6;
     {
         union DisplaySequenceControl control;
@@ -76,6 +69,20 @@ static inline u32 PlayerCue_StepSequenceEndedWithFirstFlipMask(struct ContactSwa
         ended = 0;
     }
     return ended;
+}
+
+static inline u32 PlayerCue_StepSequenceEndedWithFirstFlipMask(struct ContactSwarmSprite *owner,
+                                                               struct DisplaySequenceState *state,
+                                                               u32 firstFlipMask)
+{
+    const u16 *command;
+    {
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    return PlayerCue_AdvanceCommand(owner, state, command, firstFlipMask);
 }
 
 static inline u32 PlayerCue_StepSequenceEnded(struct ContactSwarmSprite *owner,
