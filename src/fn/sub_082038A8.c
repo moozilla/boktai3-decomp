@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "hit_spark_random.h"
 #include "engine.h"
 #include "ram.h"
 // confidence=low: collision callback records damage and emits sparks for selected source flags.
@@ -63,19 +63,18 @@ void EnemyF426_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         struct Vec position, velocity;
     } frame;
     struct Source *source = sourceInput;
-    register struct Hit *hit asm("r6") = input;
+    struct Hit *hit = input;
     struct Target *target = targetInput;
     Collision_CalculateDamageResponse(source);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;
-        asm("" : : "r"(hit));
     } else {
         target->damage = hit->damage;
         target->damageType = source->type;
         target->reaction = source->reaction;
         if (source->flags & 0x40) {
-            register void *hud asm("r8");
+            void *hud;
             s32 a, b, direction;
             s32 health;
             target->reaction = 0x26;
@@ -99,47 +98,40 @@ void EnemyF426_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         PlayerStats_AddContactHundredths(source, hit, 0);
     sparks:
         if (source->flags & target->sparkMask) {
-            register s32 i asm("r6");
+            s32 i;
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
             u32 *index = &gRandomIndex;
+            u32 limit = 0x3ff;
             u32 mask = 0x7f;
             i = 2;
             do {
-                register u32 random asm("r1");
-                register const u16 *table asm("r3");
+                u32 random;
+                u32 value;
                 u32 sample;
                 u32 x;
                 frame.velocity = gUnk_0824FE4C;
                 frame.position = target->position;
-                table = (const u16 *)RANDOM_TABLE_ADDR;
-                {
-                    u32 c = *index + 1;
-                    {
-                        u32 m = 0x3ff;
-                        random = c & m;
-                    }
-                }
-                sample = table[random];
+                value = (u32)gRandomTable;
+                random = HitSpark_NextIndex(*index, limit);
+                sample = HitSpark_Sample(value, random);
                 x = pos->x - 0x40;
                 sample &= mask;
                 x += sample;
                 pos->x = x;
-                random = (random + 1) & 0x3ff;
-                pos->y += (u8)table[random];
-                random = (random + 1) & 0x3ff;
+                random = HitSpark_NextIndex(random, limit);
+                pos->y += (u8)HitSpark_Sample(value, random);
+                random = HitSpark_NextIndex(random, limit);
+                *index = random;
                 {
-                    u32 *cursor = index;
-                    *cursor = random;
-                }
-                {
-                    u32 last = table[random];
+                    u32 last = HitSpark_Sample(value, random);
                     x = pos->z - 0x40;
                     last &= mask;
                     x += last;
                     pos->z = x;
                 }
-                SparkParticle_Spawn(&frame.position, 1, vel, 0, 3, 8, 2, 2);
+                value = 0;
+                SparkParticle_Spawn(&frame.position, 1, vel, value, 3, 8, 2, 2);
                 i--;
             } while (i >= 0);
         }
