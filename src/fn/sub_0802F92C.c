@@ -1,156 +1,144 @@
-#include "global.h"
+#include "scene_actor_route.h"
+#include "display_keyframe.h"
+void ProximityVolume_TranslateBounds(void *, void *);
+u32 Route_Start(struct SceneActorRouteCursor *, u32, u32, u32);
+void Path_GetPointPosition(struct ContactPosition *, struct SceneActorRoutePoint *, u32);
+s32 Terrain_ApplyBlocked(void *, void *, void *);
+s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
+s32 Math_Atan2(s32, s32);
+void NavMesh_UpdateProbe(void *, void *);
+void Actor_PlayFootstepSound(void *, s32);
 
-// confidence=low: steps the actor toward its probe target along the route, with table-driven motion when the animation allows.
-
-// confidence=low: steps the actor toward its probe target along the route, with table-driven motion when the animation allows.
-
-// confidence=low: steps the actor toward its probe target along the route, with table-driven motion when the animation allows.
-
-// confidence=low: steps the actor toward its probe target along the route, with table-driven motion when the animation allows.
-
-// confidence=low: steps the actor toward its probe target along the route, with table-driven motion when the animation allows.
-extern const s16 gUnk_086149C4[];
-
-struct Sub0802F92CVec {
-    s16 x;
-    s16 y;
-    s16 z;
-    s16 pad;
-};
-
-struct Sub0802F92CMotion {
+struct RouteWalkMotion {
     u8 unk00[9];
     u8 angle;
     u8 unk0A[2];
-    struct Sub0802F92CVec pos;
+    struct ContactPosition pos;
 };
 
-struct Sub0802F92CProbe {
+struct RouteWalkProbe {
     u8 unk00[0xC];
-    struct Sub0802F92CVec current;
+    struct ContactPosition current;
     u8 unk14[8];
-    struct Sub0802F92CVec target;
+    struct ContactPosition target;
 };
 
-struct Sub0802F92CAnim {
-    u8 unk00[0x14];
-    u16 flags14;
-    u8 unk16[0x1D - 0x16];
-    u8 flags1D;
-};
-
-struct Sub0802F92CActor {
+struct RouteWalkActor {
     u8 unk00[7];
-    u8 flag07;
+    u8 finished;
     u8 unk08;
-    u8 flag09;
+    u8 entered;
     u8 unk0A[4];
-    u16 flags0E;
+    u16 flags;
     u8 unk10[9];
-    u8 unk19;
-    u8 unk1A;
+    u8 facing4;
+    u8 facing8;
     u8 unk1B[0x5C - 0x1B];
-    struct Sub0802F92CMotion motion;
+    struct RouteWalkMotion motion;
     u8 unk70[0xD4 - 0x70];
     u32 animType;
     u8 unkD8[0x100 - 0xD8];
-    struct Sub0802F92CAnim anim;
-    u8 unk11E[0x19C - 0x11E];
-    u8 route[8];
-    u32 pathSource;
-    struct Sub0802F92CProbe probe;
+    struct DisplayKeyframeState keyframe;
+    u8 unk13C[0x19C - 0x100 - sizeof(struct DisplayKeyframeState)];
+    struct SceneActorRouteCursor route;
+    struct RouteWalkProbe probe;
     u8 unk1CC[0x1F0 - 0x1CC];
-    u8 clear1F0;
+    u8 routeProgress;
     u8 unk1F1[2];
-    s8 routeParam1F3;
+    s8 routeId;
     u8 unk1F4[0x210 - 0x1F4];
-    u16 routeParam210;
+    u16 routeMode;
     u8 unk212[0x214 - 0x212];
-    u16 routeParam214;
+    u16 routePoint;
     u8 unk216[0x2E4 - 0x216];
-    void *callback;
+    s32 (*callback)(struct RouteWalkActor *);
 };
 
-static inline s32 Helper0802F92C_Scale(s32 value)
+static inline s32 RouteWalk_Scale12(s32 value)
 {
     if (value >= 0)
         return value >> 12;
     return -((-value) >> 12);
 }
-
-static inline void Helper0802F92C_Polar(struct Sub0802F92CVec *out, u8 angle, s32 speed)
+static inline void RouteWalk_Polar(struct ContactPosition *step, s32 angle, s32 speed)
 {
-    out->x = Helper0802F92C_Scale(speed * gUnk_086149C4[(u8)(angle + 0x40)]);
-    out->y = 0;
-    out->z = Helper0802F92C_Scale(speed * gUnk_086149C4[angle]);
+    step->x = RouteWalk_Scale12(speed * gUnk_086149C4[(angle + 64) & 255]);
+    step->y = 0;
+    step->z = RouteWalk_Scale12(speed * gUnk_086149C4[angle]);
 }
-
-static inline void Helper0802F92C_Aim(struct Sub0802F92CActor *self)
+static inline void RouteWalk_SetFacing(struct RouteWalkActor *p, u16 angle)
 {
-    struct Sub0802F92CProbe *probe = &self->probe;
-    struct Sub0802F92CMotion *motion = &self->motion;
-    s32 angle = Math_Atan2(probe->target.x - motion->pos.x, probe->target.z - motion->pos.z);
-    u16 narrowed;
-    s32 value;
-
-    motion->angle = angle;
-    narrowed = angle;
-    value = narrowed;
-    self->unk1A = ((value + 0x70) >> 5) & 7;
-    self->unk19 = ((value + 0x60) >> 6) & 3;
+    s32 value = angle;
+    s32 shifted = value + 112;
+    s32 facing8;
+    s32 facing4;
+    shifted >>= 5;
+    facing8 = 7;
+    facing8 &= shifted;
+    p->facing8 = facing8;
+    value = (value + 96) >> 6;
+    facing4 = 3;
+    facing4 &= value;
+    p->facing4 = facing4;
 }
-
-#ifdef NONMATCHING
-// fuzzy: 36.6%
-// scope shape 106 (differences once low registers are set aside)
-// confidence=low: steps the actor toward its probe target along the route, with table-driven motion when the animation allows.
-void sub_0802F92C(void *unused, struct Sub0802F92CActor *self)
+void SceneActorAnimation_UpdateRouteWalk(void *unused, struct RouteWalkActor *p)
 {
-    struct Sub0802F92CMotion *motion = &self->motion;
-    struct Sub0802F92CProbe *probe = &self->probe;
-    struct Sub0802F92CVec *pos = &motion->pos;
-    struct Sub0802F92CVec path;
-    struct Sub0802F92CVec step;
-    s32 dx;
-    s32 dz;
-    s32 distSq;
-
-    if (self->flag09) {
-        self->flag09 = 0;
-        self->flag07 = 0;
-        self->clear1F0 = 0;
+    struct RouteWalkMotion *motion = &p->motion;
+    struct RouteWalkProbe *probe = &p->probe;
+    struct SceneActorRouteCursor *route = &p->route;
+    u32 *animType = &p->animType;
+    if (p->entered) {
+        struct ContactPosition path;
+        struct ContactPosition *pos;
+        struct ContactPosition *target;
+        s32 angle;
+        p->entered = 0;
+        p->finished = 0;
+        p->routeProgress = 0;
+        pos = &p->motion.pos;
         ProximityVolume_TranslateBounds(probe, pos);
-        Route_Start(self->route, self->routeParam1F3, self->routeParam210, self->routeParam214);
-        Path_GetPointPosition(&path, (void *)self->pathSource, 0);
+        Route_Start(route, p->routeId, p->routeMode, p->routePoint);
+        Path_GetPointPosition(&path, p->route.point, 0);
         Terrain_ApplyBlocked(probe, pos, &path);
-        Helper0802F92C_Aim(self);
-        Actor_PlayAnimationEntry(self, 1, 1, 0, 4);
+        target = &p->probe.target;
+        angle = Math_Atan2(probe->target.x - motion->pos.x, target->z - pos->z);
+        p->motion.angle = angle;
+        RouteWalk_SetFacing(p, angle);
+        Actor_PlayAnimationEntry(p, 1, 1, 0, 4);
     }
-    self->flags0E |= 0x1000;
-    if ((u8)Callback_InvokeActor(self, self->callback) != 1) {
-        dx = probe->current.x - motion->pos.x;
-        dz = probe->current.z - pos->z;
-        distSq = dx * dx + dz * dz;
-        if (distSq <= 0x9C3) {
-            motion->pos.x = probe->target.x;
-            motion->pos.z = probe->target.z;
-            self->flag07 = 1;
-        } else if (self->animType == 2) {
-            struct Sub0802F92CAnim *anim = &self->anim;
-            if (anim->flags1D & 4) {
+    {
+        u32 mask = 0x1000;
+        p->flags |= mask;
+    }
+    if ((u8)p->callback(p) != 1) {
+        struct ContactPosition *pos = &p->motion.pos;
+        struct ContactPosition *probePos = &p->probe.current;
+        s32 x = probe->current.x - motion->pos.x;
+        s32 z = probePos->z - pos->z;
+        s32 distance = (s32)((u32)x * x + (u32)z * z);
+        s32 limit = 0x9C3;
+        struct ContactPosition *current = pos;
+        if (distance <= limit) {
+            motion->pos.x = p->probe.target.x;
+            motion->pos.z = p->probe.target.z;
+            p->finished = 1;
+        } else if (*animType == 2) {
+            struct DisplayKeyframeState *anim = &p->keyframe;
+            if (anim->status & 4) {
+                struct ContactPosition *target = &p->probe.target;
+                s32 angle = Math_Atan2(probe->target.x - motion->pos.x, target->z - current->z);
                 s32 speed;
-                Helper0802F92C_Aim(self);
-                speed = (anim->flags14 & 1) ? 0x18 : 0x30;
-                Helper0802F92C_Polar(&step, motion->angle, speed);
+                struct ContactPosition step;
+                p->motion.angle = angle;
+                RouteWalk_SetFacing(p, angle);
+                speed = (anim->frame & 1) ? 24 : 48;
+                RouteWalk_Polar(&step, motion->angle, speed);
                 motion->pos.x += step.x;
                 motion->pos.z += step.z;
             }
         }
-        NavMesh_UpdateProbe(probe, pos);
-        Actor_PlayFootstepSound(self, 1);
-        Actor_PlayAnimationEntry(self, 1, 1, 0, 1);
+        NavMesh_UpdateProbe(probe, current);
+        Actor_PlayFootstepSound(p, 1);
+        Actor_PlayAnimationEntry(p, 1, 1, 0, 1);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0802F92C);
-#endif

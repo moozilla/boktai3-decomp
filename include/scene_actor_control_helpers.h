@@ -8,7 +8,7 @@ struct SceneActorControlPositionView {
 };
 void SceneActorControl_InitPositionCurveEndpoints(struct SceneActorRegistryResetView *,
                                                   const struct ContactPosition *);
-s32 sub_08083C38(struct SceneActorRegistryResetView *);
+s32 SceneActorControl_AdvancePositionCurve(struct SceneActorRegistryResetView *);
 void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *,
                                           const struct ContactPosition *);
 static inline u8 SceneActorControl_TestFlags(u32 flags, u32 mask)

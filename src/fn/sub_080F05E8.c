@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
@@ -37,8 +36,7 @@ void Ivy_TickDrawable(struct SceneActorRegistryResetView *actor)
             *(struct IvyPlacement *)&actor->body.position;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
-        register void *drawable asm("r0") = actor->drawable;
-        asm("" : "+r"(drawable));
-        DisplaySequence_Step(drawable);
+        struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+        DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }

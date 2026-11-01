@@ -139,7 +139,7 @@ static inline u8 Arrive(void *obj)
         u8 saved = actor->body.direction;
         Turn(saved, obj);
     }
-    sub_0807E334(obj);
+    SceneActorTerrain_RequestRetreatRoute(obj);
     actor->field2C2 = 0x20;
     return 0;
 reroute: {

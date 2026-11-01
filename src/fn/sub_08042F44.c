@@ -1,7 +1,5 @@
 #ifdef NONMATCHING
-// fuzzy: 65.8%
-// fix.py best (sweep after the inlined-insn fix)
-// Reviewed full extent; register lifetimes and instruction scheduling still differ.
+// fuzzy: 73.7%
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
@@ -25,12 +23,13 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         slot->enter = 0;
         destination = &slot->destination;
         if (slot->targetIndex >= 0) {
+            u32 scale = 256;
             u32 angle = nextRandom() & 255;
             const struct ContactPosition *target;
             struct ContactPosition *write = &delta;
-            write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * 256);
+            write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * scale);
             write->y = 0;
-            write->z = truncateShift12(gUnk_086149C4[angle] * 256);
+            write->z = truncateShift12(gUnk_086149C4[angle] * scale);
             target = pool->targets[slot->targetIndex];
             {
                 const struct ContactPosition *read = &delta;
@@ -44,24 +43,34 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
             Math_Atan2(slot->destination.x - slot->position.x, destination->z - slot->position.z);
         slot->direction += (nextRandom() & 63) - 32;
         slot->steeringTimer = (nextRandom() & 15) + 16;
-        slot->healthCollider.flags &= ~4;
+        {
+            struct ContactCollider *collider = &slot->healthCollider;
+            s32 mask = -5;
+            mask &= collider->flags;
+            collider->flags = mask;
+        }
     }
     if (pool->clearRequested) {
-        slot->state = 6;
-        slot->enter = 1;
-        slot->stateFrame = 0;
+        {
+            u32 state = 6;
+            u32 frame = 0;
+            slot->state = state;
+            slot->enter = 1;
+            slot->stateFrame = frame;
+        }
         return;
     }
     if (!slot->steeringTimer) {
         if ((nextRandom() & 255) <= 191) {
             destination = &slot->destination;
             if (slot->targetIndex >= 0) {
+                u32 scale = 256;
                 u32 angle = nextRandom() & 255;
                 const struct ContactPosition *target;
                 struct ContactPosition *write = &delta;
-                write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * 256);
+                write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * scale);
                 write->y = 0;
-                write->z = truncateShift12(gUnk_086149C4[angle] * 256);
+                write->z = truncateShift12(gUnk_086149C4[angle] * scale);
                 target = pool->targets[slot->targetIndex];
                 {
                     const struct ContactPosition *read = &delta;

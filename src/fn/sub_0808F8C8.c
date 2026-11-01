@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
@@ -17,8 +16,7 @@ void Slime_ResetIdlePlayback(struct SceneActorRegistryResetView *actor)
     context->timer = 0;
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     {
-        register void *drawable asm("r0") = actor->drawable;
-        asm("" : "+r"(drawable));
-        DisplaySequence_Step(drawable);
+        struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+        DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }

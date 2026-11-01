@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
@@ -51,13 +50,10 @@ void Lun_ResumeAfterLiftPenalty(struct SceneActorRegistryResetView *input, s32 e
     {
         u32 flags = 0x10;
         u16 *p = &input->flags2D6;
-        u32 v = *p;
-        {
-            u8 k1 = 0;
-            zero8 = k1;
-        }
-        asm("" : "+r"(zero8));
-        flags = flags | v;
+        u32 value = *p;
+        u16 initialState[1] = {0};
+        zero8 = initialState[0];
+        flags |= value;
         *p = flags;
     }
     {

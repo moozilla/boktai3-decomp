@@ -11,7 +11,7 @@
 struct Player;
 s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
                                 s32, s32, s32, u32);
-void sub_0807D2E0(void *, u32, struct ContactPosition *, u32, u32, u32);
+void SceneActorReaction_ApplyHitResponse(void *, u32, struct ContactPosition *, u32, u32, u32);
 
 struct OctopusTarget {
     u8 unknown0[8];
@@ -92,7 +92,7 @@ void Octopus_ThrowCapturedTarget(struct SceneActorRegistryResetView *actor)
     position.z = actor->body.position.z + gUnk_08606300[flip][index].z;
     if (target->kind & 4) {
         who = target->player;
-        sub_0807D2E0(who, 1, &position, 0, flip, 0);
+        SceneActorReaction_ApplyHitResponse(who, 1, &position, 0, flip, 0);
     } else if (target->kind <= 3) {
         player = target->player;
         Player_BeginPositionRequest(player, (void *)&position, 0, 3, flip, 0, 0, 0, 0);
@@ -104,7 +104,7 @@ void Octopus_ThrowCapturedTarget(struct SceneActorRegistryResetView *actor)
         Sound_PlaySong(0x1E0);
         if (target->kind & 4) {
             who = SceneActorRegistry_FindById(*(u32 *)target);
-            sub_0807D2E0(who, 2, &position, 0, 0, 0);
+            SceneActorReaction_ApplyHitResponse(who, 2, &position, 0, 0, 0);
             SpriteParticle_SpawnBatch(&actor->body.position, 1, 2, 0, 0x154);
         } else if (target->kind <= 3) {
             player = target->player;

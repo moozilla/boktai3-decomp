@@ -15,7 +15,7 @@ struct OctopusCaptureTarget {
 struct Player;
 s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
                                 s32, s32, s32, u32);
-void sub_0807D2E0(void *, u32, struct ContactPosition *, u32, u32, u32);
+void SceneActorReaction_ApplyHitResponse(void *, u32, struct ContactPosition *, u32, u32, u32);
 s32 SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
 void Octopus_UpdateHold(void);
 void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *);
@@ -110,7 +110,7 @@ void sub_080E9C20(struct SceneActorRegistryResetView *actor)
                 t->colliderA.responseValue = 0;
                 SceneActorTerrain_ClearCollisionTimers((void *)t);
                 SceneActorChase_ClearMotionFlagComponent(t, 0x20);
-                sub_0807D2E0(t, 0, (void *)&pos, 0, flip, 0);
+                SceneActorReaction_ApplyHitResponse(t, 0, (void *)&pos, 0, flip, 0);
             }
             return;
         }

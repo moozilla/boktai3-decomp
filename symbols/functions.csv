@@ -1072,6 +1072,7 @@ addr,name,mode,confidence,source,notes
 0802F0C0,Actor_OnConfiguredAnimationUpdate,thumb,low,src-alias,Animation state callback that starts the configured animation and invokes the actor callback
 0802F110,Actor_OnPathFollowUpdate,thumb,low,src-alias,
 0802F524,Actor_OnTimedIdleUpdate,thumb,low,src-alias,Timed idle callback that finishes after eight ticks when the actor callback permits completion
+0802F92C,SceneActorAnimation_UpdateRouteWalk,thumb,low,src-alias,
 0802FCA8,Actor_SelectPathNodeAction,thumb,low,src-alias,Records the path node identifier and selects a wait turn or movement action from node flags
 0802FD14,SceneCharacter_GetPathNodeState,thumb,low,src-alias,Returns the current node action state within 40 units on both axes or movement state 9 otherwise
 0802FD60,SceneCharacter_UpdateIdleState,thumb,low,src-alias,Selects action 1 and consumes the pending trigger on state entry; idle interpretation is tentative
@@ -1472,6 +1473,7 @@ addr,name,mode,confidence,source,notes
 0803D1E8,ScenePool_ReadActorBounds,thumb,low,src-alias,
 0803D210,ScenePool_IsEntryInSpawnBand,thumb,low,src-alias,Tests whether the entry origin lies 100–200 units outside the selected side's actor bounds
 0803D288,ScenePool_SpawnEntriesNearPlayers,thumb,low,src-alias,
+0803D430,ScenePool_UpdateManager,thumb,low,src-alias,Records player positions and regions before updating nearby entries and occupied slots.
 0803D4D0,ScenePool_DestroyManager,thumb,low,src-alias,Task destruction callback that releases four actor slots and the registry and frees the entry pool
 0803D514,ScenePool_InitializeManager,thumb,low,src-alias,Allocates the configurable entry pool and initializes four actor slots and the registry
 0803D5A8,ScenePool_CreateManager,thumb,low,src-alias,Creates the manager task and installs its update and destruction callbacks
@@ -1662,6 +1664,7 @@ addr,name,mode,confidence,source,notes
 080447D4,ContactSwarm_Initialize,thumb,low,src-alias,
 08044814,ContactSwarm_Create,thumb,low,src-alias,
 08044854,ContactSwarm_SpawnCharge,thumb,low,src-alias,
+08044AD4,ContactSwarm_SpawnPairedAdvanceCount,thumb,low,src-alias,Spawns available swarm slots on alternating headings up to the supplied count.
 08044C80,EncodedRecord_WriteBits,thumb,low,src-alias,
 08044CF4,EncodedRecord_ReadBits,thumb,low,src-alias,
 08044D58,EncodedRecord_NextMaskWord,thumb,low,src-alias,
@@ -2781,6 +2784,7 @@ addr,name,mode,confidence,source,notes
 08070EE4,SceneActorRegistry_TestScriptActorLiving,thumb,low,src-alias,
 08070F10,SceneActorRegistry_TestScriptActorPresent,thumb,low,src-alias,
 08070F2C,SceneActorRegistry_TestCategoryFlags,thumb,low,src-alias,
+08070FA8,SceneActorRegistry_UpdateActors,thumb,low,src-alias,Traverses actor updates and destruction callbacks and applies regional visibility and palette changes.
 08071434,SceneActorRegistry_DestroyActors,thumb,low,src-alias,
 08071470,SceneActorRegistry_AdvanceInactiveActors,thumb,low,src-alias,
 080714E4,SceneActorRegistry_ResetRouteAndColliders,thumb,low,src-alias,
@@ -2803,6 +2807,7 @@ addr,name,mode,confidence,source,notes
 080727EC,SceneActorScript_ClearManagerFlagsFromScript,thumb,low,src-alias,
 08072814,SceneActorScript_GetManagerField62,thumb,low,src-alias,
 08072830,SceneActorScript_SetManagerModeFromScript,thumb,low,src-alias,
+08072854,SceneActorRegistry_ApplyTerrainReactions,thumb,low,src-alias,
 08072B44,SceneActorRegistry_GetManager,thumb,low,src-alias,
 08072B50,SceneActorScript_DispatchKindPayload,thumb,low,src-alias,
 08072BA8,SceneActorContacts_ResetList,thumb,low,src-alias,
@@ -2816,6 +2821,7 @@ addr,name,mode,confidence,source,notes
 08072E08,SceneActorContacts_ReleaseNode,thumb,low,src-alias,
 08072E50,SceneActorContacts_SetDistanceGate,thumb,low,src-alias,
 08072E98,SceneActorContacts_TestPlayerCondition,thumb,low,src-alias,
+08072F4C,SceneActorContacts_EvaluateCandidate,thumb,low,src-alias,Checks a sampled or player-owned contact and updates the distance gate when a route is usable.
 08073A3C,SceneActorContacts_SelectForActor,thumb,low,src-alias,
 08073B38,SceneActorContacts_TickCooldowns,thumb,low,src-alias,
 08073B60,SceneActorContacts_Update,thumb,low,src-alias,
@@ -2840,7 +2846,9 @@ addr,name,mode,confidence,source,notes
 08074D34,SceneActorCollision_InitAttack,thumb,low,src-alias,
 08074DC0,SceneActorCollision_InitExternalAttack,thumb,low,src-alias,
 08074E38,SceneActorCollision_InitExternalAttackWithField34,thumb,low,src-alias,
+08074EB0,SceneActorMovement_UpdateAnimationAndTerrain,thumb,low,src-alias,
 08075508,SceneActorMovement_ProjectProbe,thumb,low,src-alias,
+08075588,SceneActorMovement_UpdateStatus,thumb,low,src-alias,
 08075FC8,SceneActorMovement_RequestAvailableAction,thumb,low,src-alias,
 08076020,SceneActorRegistry_SetObjectContext,thumb,low,src-alias,
 08076034,SceneActorAnimation_SelectDirectionalEntry,thumb,low,src-alias,
@@ -2857,6 +2865,7 @@ addr,name,mode,confidence,source,notes
 080771E4,SceneActorTerrain_DisableCollision,thumb,low,src-alias,
 08077288,SceneActorTerrain_ResumeDrawable,thumb,low,src-alias,
 080772C0,SceneActorPlacement_ResetActorState,thumb,low,src-alias,Resets route and behavior state according to the supplied mode or restores actor defaults; flag 0x800 prevents repeated processing
+08077444,SceneActorPlacement_ResetToPathPoint,thumb,low,src-alias,
 08077654,SceneActorPlacement_ConsumeCallbackFlag,thumb,low,src-alias,
 080776E4,SceneActorPlacement_ConsumeShakeFlags,thumb,low,src-alias,
 08077848,SceneActorPlacement_PlayVariantEventSound,thumb,low,src-alias,
@@ -2873,6 +2882,7 @@ addr,name,mode,confidence,source,notes
 08078700,SceneActorBehavior_UpdateColliders,thumb,low,src-alias,
 08078854,SceneActorBehavior_ApplyContactReaction,thumb,low,src-alias,
 080789EC,SceneActorBehavior_RecordDefeat,thumb,low,src-alias,
+08078BB4,SceneActorAttachment_ApplySlotCommand,thumb,low,src-alias,
 08078DEC,SceneActorBehavior_ActivatePendingControl,thumb,low,src-alias,
 08078EE8,SceneActor_UpdateStatus,thumb,low,src-alias,Per-actor status timers; palette/reaction recovery; contact release and target facing
 0807A62C,SceneActorBehavior_UpdateTimersAndContacts,thumb,low,src-alias,
@@ -2896,13 +2906,19 @@ addr,name,mode,confidence,source,notes
 0807CDC4,SceneActorAttachment_FindReachableNeighbor,thumb,low,src-alias,
 0807D1E8,SceneActorPosition_ResolveTaggedPosition,thumb,low,src-alias,
 0807D220,SceneActorAttachment_RetargetNearestPlayer,thumb,low,src-alias,
+0807D2E0,SceneActorReaction_ApplyHitResponse,thumb,low,src-alias,Applies the requested hit or defeat mode and updates the actor's position and reaction effects.
+0807DB34,SceneActorRecovery_ResumePursuit,thumb,low,src-alias,
+0807E334,SceneActorTerrain_RequestRetreatRoute,thumb,low,src-alias,Tries four cardinal directions; starting opposite the current facing; and requests a path to the selected cell; confidence=low.
 0807E6FC,SceneActorEffects_EmitRandomOffsets,thumb,low,src-alias,
 0807E7B0,SceneActorEffects_AdvanceSteps,thumb,low,src-alias,Advances the embedded effect context the requested number of steps when its state byte is 1
 0807E7DC,SceneActorMovement_ResolveRoutePosition,thumb,low,src-alias,
 0807E8E8,SceneActorEffects_InitAtActorPosition,thumb,low,src-alias,Initializes the embedded effect context using the actor position and three zero parameters
 0807E908,SceneActorEffects_ReleaseResources,thumb,low,src-alias,
+0807E9D0,SceneActorReaction_HandleColliderContact,thumb,low,src-alias,Handles collision damage or target selection and the corresponding reaction state.
+0807F130,SceneActorTarget_TryStimulusRoute,thumb,low,src-alias,Starts a route toward the tagged position of an overlapping stimulus.
 0807F4B8,SceneActorTarget_ResetContactResponse,thumb,low,src-alias,
 0807F710,SceneActorTarget_ResolvePendingObject,thumb,low,src-alias,
+0807F81C,SceneActorTarget_UpdateTrackedContact,thumb,low,src-alias,Checks the route to a contact target and starts the idle response when it is inactive
 0807FAD8,SceneActorTarget_ApplyResetCommand,thumb,low,src-alias,
 0807FC5C,SceneActorControl_DispatchControl,thumb,low,src-alias,Resets the substate and increments the control frame counter before invoking the active control callback with its previous value
 0807FC90,SceneActorControl_OnIdle,thumb,low,src-alias,Clears flag 2B2 when invoked as the default idle control callback
@@ -2910,14 +2926,18 @@ addr,name,mode,confidence,source,notes
 0807FF48,SceneActorReaction_RestoreAlternateAfterDelay,thumb,low,src-alias,
 08080008,SceneActorReaction_UpdateAnimationGate,thumb,low,src-alias,
 0808005C,SceneActorReaction_PlayAnimationBUntilComplete,thumb,low,src-alias,Consumes the prepared flag to select directional animation 0xB and marks the reaction complete when byte 0x2B3 is set
+080800A4,SceneActorReaction_UpdateContactRouteRecovery,thumb,low,src-alias,Restores route control or enters defeat when contact recovery completes
 08080494,SceneActorReaction_BeginDefeatBurst,thumb,low,src-alias,
 08080868,SceneActorReaction_BeginFadedState,thumb,low,src-alias,
 08080984,SceneActorReaction_BeginReactionSound,thumb,low,src-alias,
 08080AF0,SceneActorReaction_TurnBackToRoute,thumb,low,src-alias,
+08080BE0,SceneActorReaction_SetMotionMode,thumb,low,src-alias,Applies stationary or directional reaction motion to a registered target
 08080FB4,SceneActorReaction_BeginHiddenDefeat,thumb,low,src-alias,
 08081290,SceneActorReaction_SinkAndRemove,thumb,low,src-alias,
 0808148C,SceneActorReaction_PlayStaggerBurst,thumb,low,src-alias,
+0808170C,SceneActorReaction_SettleDisplacement,thumb,low,src-alias,Settles the reaction displacement and restores actor control.
 08081B9C,SceneActorReaction_ResumeAfterAnimation,thumb,low,src-alias,
+08081C98,SceneActorReaction_UpdateTimedBurst,thumb,low,src-alias,Updates a timed part burst and restores control when the reaction expires.
 08082184,SceneActorReaction_TryResumeRoute,thumb,low,src-alias,
 08082444,SceneActorReaction_RestoreAfterTurns,thumb,low,src-alias,
 080829C0,SceneActorControl_ApplyContactPowerFloor,thumb,low,src-alias,
@@ -2940,6 +2960,7 @@ addr,name,mode,confidence,source,notes
 08083AEC,SceneActorControl_InitContactColliders,thumb,low,src-alias,Initializes the actor body and external attack colliders with their contact callbacks.
 08083B90,SceneActorControl_GetTravelProfile,thumb,low,src-alias,
 08083BFC,SceneActorControl_InitPositionCurveEndpoints,thumb,low,src-alias,Copies the current position and destination into control context endpoints and resets interpolation progress.
+08083C38,SceneActorControl_AdvancePositionCurve,thumb,low,src-alias,Advances the position curve from its stored endpoints and returns one at completion; confidence=low.
 08083E18,SceneActorControl_SetDefaultProfile,thumb,low,src-alias,Assigns the category 18 mode 0 profile to the actor profile field.
 08083E34,SceneActorControl_ResetCollisionPhase,thumb,low,src-alias,
 08083E70,SceneActorControl_GetDirectionalVariant,thumb,low,src-alias,Converts an angle into a symmetric animation variant index from 0 to 4 and a mirrored-side flag.
@@ -3250,6 +3271,7 @@ addr,name,mode,confidence,source,notes
 080A2634,Spider_SelectRecoveryRoute,thumb,low,src-alias,
 080A28A0,Spider_OnSecondaryColliderContact,thumb,low,src-alias,Empty callback tentatively associated with the secondary collider initialized by Spider_Init
 080A28A4,Spider_OnActionEvent,thumb,low,src-alias,Empty action-event callback installed by Spider_Init
+080A28A8,Spider_UpdateContactWindup,thumb,low,src-alias,Plays a frame-triggered cue; then begins contact pursuit after the windup.
 080A2A38,SceneActorReaction_ResumeEntryTarget,thumb,low,src-alias,
 080A2AEC,Spider_UpdateLandingMotion,thumb,low,src-alias,
 080A2CEC,Spider_UpdateDefeat,thumb,low,src-alias,

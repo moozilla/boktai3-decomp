@@ -11,7 +11,7 @@ extern u8 *gUnknown_02000580[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void sub_0807E334(struct SceneActorRegistryResetView *);
+void SceneActorTerrain_RequestRetreatRoute(struct SceneActorRegistryResetView *);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 

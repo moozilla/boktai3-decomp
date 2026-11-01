@@ -1,15 +1,5 @@
 #define Camera_SetFollowMode Camera_ResetOffset
-#include "global.h"
-struct CameraPosition {
-    s16 x, y, z;
-};
-struct CameraTracking {
-    struct CameraPosition *first, *second;
-    s32 scale, scaleStep, minimum, maximum, divisor;
-    u32 flags, requests;
-    s32 active, blend;
-    s32 followMode;
-};
+#include "camera_tracking.h"
 s32 Camera_CalculateDistanceScale(struct CameraTracking *);
 void CameraTracking_UpdatePosition(struct CameraTracking *);
 void Camera_ResetOffset(s32);

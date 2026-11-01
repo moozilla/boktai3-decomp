@@ -16,7 +16,7 @@ s32 Math_Atan2(s32, s32);
 s32 SceneActorTerrain_CompareNeighborHeight(s32, u32, u32);
 void Skeleton_StepPosition(struct ContactPosition *, u32);
 void sub_080C47DC(void *);
-void sub_0807E334(struct SceneActorRegistryResetView *);
+void SceneActorTerrain_RequestRetreatRoute(struct SceneActorRegistryResetView *);
 void SceneActorReaction_SlideBack(void);
 void Golem_UpdateChargeStop(void);
 void Golem_UpdateChargeRecovery(void);
@@ -376,7 +376,7 @@ static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
             }
         }
         Golem_Wander2(input, actor->body.direction);
-        sub_0807E334(input);
+        SceneActorTerrain_RequestRetreatRoute(input);
         actor->field2C2 = 0x20;
         return 0;
     }

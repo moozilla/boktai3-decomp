@@ -1,22 +1,19 @@
-#include "global.h"
+#include "effect_group.h"
 // MATCHING_CONCESSION: register-pinning
 #include "engine.h"
 #include "ram.h"
 // confidence=low: fills the first inactive group with randomized bouncing particles.
 #define ParticleGroup_SpawnBouncing sub_08014634
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Particle {
     u8 active, pad, timer, lifetime;
     u16 cell;
     s16 height;
-    struct Vec velocity;
+    struct ContactPosition velocity;
     volatile u32 flags;
     u8 pad14[4];
     u16 tile;
     u8 pad1a[5], priority, pad20[8];
-    struct Vec position;
+    struct ContactPosition position;
     u8 tail[8];
 };
 struct Group {
@@ -37,7 +34,7 @@ struct Map {
 };
 #define gRandomTable ((u16 *)0x0203B400)
 extern u32 gUnk_08604B90[];
-static inline int CellIndex(struct Vec *p)
+static inline int CellIndex(struct ContactPosition *p)
 {
     int x = p->x >> 8, z = p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -49,7 +46,7 @@ s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
 struct SpawnArgs {
     s32 count, options;
-    struct Vec *position;
+    const struct ContactPosition *position;
 };
 static inline s32 Random(u16 *table, u32 mask, u32 *rng)
 {
@@ -64,13 +61,13 @@ static inline void ClearFlag(volatile u32 *p, u32 mask)
     v &= ~mask;
     *p = v;
 }
-s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position,
-                                struct Vec *velocityArg, struct Vec *spread, s32 lifetime,
+s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosition *position,
+                                const struct ContactPosition *velocityArg, const struct ContactPosition *spread, s32 lifetime,
                                 s32 lifetimeMask)
 {
     struct SpawnArgs args = {count, options, position};
-    struct Vec *velocityInput = velocityArg;
-    struct Vec *velocity;
+    const struct ContactPosition *velocityInput = velocityArg;
+    const struct ContactPosition *velocity;
     register struct Manager *m asm("r1");
     u8 *resource;
     struct Group *g;
@@ -150,7 +147,7 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position,
                         p->lifetime = lifetime + (Random(table, mask, rng) & lifetimeMask);
                         p->cell = CellIndex(args.position);
                         {
-                            register struct Vec *source asm("r2") = args.position;
+                            register const struct ContactPosition *source asm("r2") = args.position;
                             p->height = source->y;
                         }
                         if (spread->x) {
@@ -174,7 +171,7 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position,
                             p->flags &= ~4;
                         ClearFlag(&p->flags, 1);
                         {
-                            register struct Vec *source asm("r2") = args.position;
+                            register const struct ContactPosition *source asm("r2") = args.position;
                             p->position = *source;
                         }
                         {
