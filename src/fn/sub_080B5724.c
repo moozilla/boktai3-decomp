@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
@@ -7,22 +6,33 @@
 void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *, const u16 *);
 static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
 {
-    if (actor) {
-        u32 mask = 0x40;
-        register u32 offset asm("r2") = 0x2D4;
-        if (*(u16 *)((u8 *)actor + offset) & mask)
-            return 1;
+    if (!actor)
+        goto zero;
+    {
+        u32 mask;
+        u32 offset;
+        u32 *field;
+        u32 value;
+        mask = 0x40;
+        offset = 0x2d4;
+        field = (void *)((u8 *)actor + offset);
+        value = *(u16 *)field;
+        value &= mask;
+        if (value)
+            goto one;
         mask = 0x20000;
         offset -= 4;
-        {
-            register u8 *q asm("r0");
-            q = (u8 *)actor + offset;
-            if (*(u32 *)q & mask)
-                return 1;
-        }
-        if (actor->health <= 0)
-            return 1;
+        field = (void *)((u8 *)actor + offset);
+        value = *field;
+        value &= mask;
+        if (value)
+            goto one;
     }
+    if (actor->health > 0)
+        goto zero;
+one:
+    return 1;
+zero:
     return 0;
 }
 void SceneActorControl_RestartBehavior57(struct SceneActorRegistryResetView *actor)
