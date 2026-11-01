@@ -1,4 +1,5 @@
 #include "scene_actor_reaction.h"
+#include "debug.h"
 /* SceneActorReaction_ResumeEntryTarget: tentative */
 
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
@@ -29,8 +30,8 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
 void SceneActorReaction_ResumeEntryTarget(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorReactionGroup *group = (void *)&actor->group.common;
-    /* The flag is consumed with nothing to do, as in sub_080EB8CC. */
     if (SceneActorReaction_TakePrepared(actor)) {
+        DEBUG_PRINT();
     }
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
     if (group->timer418 == 0) {
