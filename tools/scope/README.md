@@ -1145,6 +1145,18 @@ Each was read from the compiler source and confirmed on a live draft.
    case 2: default: ...` and `case 0: ... case 4: ... case 5: default: ...`. Casting the index
    to an enum type (no cost table) does not change a two-node list.
 
+44. **Loops that share one counter in the ROM share one variable in the C.** Each inlined copy
+   of a helper gets its own counter pseudo. A counter first set to a constant has its
+   priority doubled (update_equiv_regs), so a short loop's counter is allocated early and
+   takes the lowest free register. One function-level `i` used by every loop lives across
+   all of them and lands in a callee-saved register, the same one in each loop.
+   CollisionController_UpdateAll's two idle resets and its slot loop all count in r6. Writing
+   the resets out with the function's `i`, instead of calling a `resetIdle` helper twice,
+   matched it. The pin-free helper version gave i r2 and pushed manager from r7 to r6.
+   Related: a loop over `&manager->slots[i]` gets its pointers from loop.c (givs, created
+   after gcse). Explicit `p = manager->slots` initialisations exist before gcse, and PRE
+   hoists them into the reset paths.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
