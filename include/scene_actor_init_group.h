@@ -15,7 +15,7 @@ void sub_0807FCA8(struct SceneActorRegistryResetView *, s32);
 void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *);
 s32 SceneActorTarget_TryStimulusRoute(struct SceneActorRegistryResetView *);
 void SceneActorReaction_UpdateAnimationGate(struct SceneActorRegistryResetView *);
-void sub_0808170C(struct SceneActorRegistryResetView *);
+void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *);
 void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView *, s32);
 void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *, s32);
 void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *);
@@ -203,7 +203,7 @@ static inline void MonsterInit_InitializeGroup(struct SceneActorChaseGroup *grou
     group->common.fallback = SceneActorTarget_TryStimulusRoute;
     group->common.gate.control = SceneActorReaction_UpdateAnimationGate;
     group->common.gate.field41A = 0x28;
-    group->contactControl = sub_0808170C;
+    group->contactControl = SceneActorReaction_SettleDisplacement;
     group->field5E0 = SceneActorReaction_ResumeAfterAnimation;
     group->field5E4 = SceneActorReaction_TryResumeRoute;
     group->field610 = SceneActorReaction_BeginReactionSound;

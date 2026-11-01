@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: settles reaction displacement and restores normal actor control.
-#define SceneActorReaction_SettleDisplacement sub_0808170C
 #ifdef NONMATCHING
 // fuzzy: 87.7%
 #include "scene_actor_chase_reaction.h"
@@ -211,5 +210,5 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0808170C);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_SettleDisplacement);
 #endif

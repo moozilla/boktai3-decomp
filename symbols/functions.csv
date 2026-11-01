@@ -2934,6 +2934,7 @@ addr,name,mode,confidence,source,notes
 08080FB4,SceneActorReaction_BeginHiddenDefeat,thumb,low,src-alias,
 08081290,SceneActorReaction_SinkAndRemove,thumb,low,src-alias,
 0808148C,SceneActorReaction_PlayStaggerBurst,thumb,low,src-alias,
+0808170C,SceneActorReaction_SettleDisplacement,thumb,low,src-alias,Settles the reaction displacement and restores actor control.
 08081B9C,SceneActorReaction_ResumeAfterAnimation,thumb,low,src-alias,
 08082184,SceneActorReaction_TryResumeRoute,thumb,low,src-alias,
 08082444,SceneActorReaction_RestoreAfterTurns,thumb,low,src-alias,
