@@ -831,6 +831,13 @@ Each was read from the compiler source and confirmed on a live draft.
    around lines A-B"). Its reload rotation was a separate fix: a tail that cross-jumping
    later merges still takes its reload choices first, so writing out the duplicated
    `p->decision = 1; ...; break;` tails the ROM merged set the rotation.
+27. **A goto into a shared tail hides the tail's reload choices.** jump2 cross-jumps after
+   reload, so the ROM's `b shared_tail` may come from a tail the original wrote out on that
+   path: the copy makes its reload choices (constants, addresses) and only then is merged.
+   A decompiled `goto` skips those choices and shifts the rotation for everything after it.
+   Writing the tails out removed rotation barriers from sub_0818911C (the mode branch's
+   fastMode/secondaryCooldown choices) and Armor_ApplySceneCommands (each case's own
+   Trigger_ConsumePending). `why` on a rotation difference now lists the gotos before it.
 
 ## Survey: random table as a literal address (2026-10-24)
 
