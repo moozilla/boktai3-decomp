@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -30,7 +29,7 @@ static inline s32 Shift(s32 n, u32 bits)
 static inline u32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
+    return *(const u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR);
 }
 
 static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
@@ -79,46 +78,25 @@ void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
     if (Take(&actor->field2B1)) {
         u8 *body = actor->context;
         u32 angle;
-        u32 o1;
         Control(actor, actor->entryTarget228, 1);
         Clear(&zero, body + 0x480);
         angle = (u8)Rand();
         {
-            const s16 *tab1 = gUnk_086149C4;
-            s32 vx;
-            s16 *q;
-            s32 t;
-            t = tab1[angle];
-            asm("" ::"r"(tab1));
-            vx = Shift(t, 6);
-            o1 = 0x2EC;
-            q = (s16 *)((u8 *)actor + o1);
-            *q = vx;
+            const s16 *table = gUnk_086149C4;
+            s32 vx = Shift(table[angle], 6);
+            *(s16 *)((u8 *)actor + 0x2EC) = vx;
         }
         {
-            const s16 *tab = gUnk_086149C4;
-            u32 idx;
-            u32 msk;
+            const s16 *table = gUnk_086149C4;
+            u32 index = angle + 64;
+            u32 mask = 255;
             s32 vz;
-            register u32 o asm("r2");
-            register s16 *q asm("r0");
-            idx = angle + 64;
-            msk = 255;
-            idx &= msk;
-            vz = Shift(tab[idx], 6);
-            o = 0x2F0;
-            asm("" : "+r"(o));
-            q = (s16 *)((u8 *)actor + o);
-            *q = vz;
+            index &= mask;
+            vz = Shift(table[index], 6);
+            *(s16 *)((u8 *)actor + 0x2F0) = vz;
         }
     }
-    {
-        register u32 mo asm("r6") = 0x2EC;
-        u8 *ma;
-        asm("" : "+r"(mo));
-        ma = (u8 *)actor + mo;
-        motion = (struct ContactPosition *)ma;
-    }
+    motion = (struct ContactPosition *)((u8 *)actor + 0x2EC);
     length = motion->x * motion->x + motion->z * motion->z;
     if (!length) {
         Bee_DisableMovement(actor);
