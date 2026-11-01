@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
@@ -39,20 +38,19 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
     } scratch;
     struct ContactPackedVector jitter;
     struct ContactPosition *step;
-    s16 *motionZ;
     if (SceneActorReaction_TakePrepared(p)) {
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x14);
         Sound_PlaySong(0x3AB);
     }
     heading = &p->body.direction;
     HeadingStep(&scratch.step, heading, 32);
+    {
+        struct ContactPosition *v = &scratch.step;
+        AddHalf(&p->body.motion.x, &v->x);
+        v = &p->body.motion;
+        AddZ(&v->z, &scratch.step);
+    }
     step = &scratch.step;
-    /* Keep the motion source separate from the vector cleared for the burst. */
-    asm("" : "+r"(step));
-    AddHalf(&p->body.motion.x, &step->x);
-    motionZ = &p->body.motion.z;
-    step = &scratch.step;
-    AddZ(motionZ, step);
     {
         u32 mask = 0x2000;
         u32 *fl = &p->flags2CC;
