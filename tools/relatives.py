@@ -108,12 +108,20 @@ def functions():
         if fresh:
             fresh = False
             m = FUNC_LABEL.match(ln)
-            if m and prev and int(m.group(2), 16) in nonentries:
-                # Interior label (not in the inventory): the body
-                # continues the previous function.
-                del out[cur]
-                cur = prev
-                continue
+            if m:
+                addr = int(m.group(2), 16)
+                if prev and addr in nonentries:
+                    # An interior label continues the previous function.
+                    del out[cur]
+                    cur = prev
+                    continue
+                # Generated assembly may already use the name in functions.csv.
+                # The inventory, matched-source index and porters use address keys.
+                key = f"sub_{addr:08X}"
+                if nm.get(key) == cur and key != cur:
+                    out[key] = out.pop(cur)
+                    cur = key
+                out[cur][0] = addr
         if cur and ln.startswith("\t") and not ln.startswith("\t."):
             t = token(ln, nm)
             if t:
