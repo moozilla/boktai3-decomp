@@ -1,18 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
+#include "display_sprite_playback.h"
 #include "contact_actor.h"
 #include "ram.h"
 struct WoodenCrate {
-    u32 flags;
-    u8 pad4[3];
-    u8 priority;
-    u8 pad8[4];
-    void *drawable;
-    u16 frame;
-    u8 pad12[10];
-    struct ContactPosition position;
-    u8 pad24[8];
+    struct ContactSwarmSprite sprite;
     struct DisplaySequenceState animation;
     u8 resource[0x1C];
     struct ContactPosition origin;
@@ -43,79 +35,12 @@ struct CrateArguments {
     u32 pad : 16;
     s32 *values;
 };
-static inline u32 Step(struct WoodenCrate *crate)
-{
-    struct DisplaySequenceState *a = &crate->animation;
-    const volatile u16 *entry;
-    u32 done;
-    {
-        u32 offset = a->index * 2;
-        const u16 *table = crate->animation.commands;
-        entry = (const volatile u16 *)((u32)table + offset);
-    }
-    crate->frame = *entry >> 6;
-    {
-        u32 input = a->flags;
-        u32 mask = 1;
-        u32 left;
-        asm("" : "+r"(input), "+r"(mask));
-        left = mask & input;
-        asm("" : "+r"(left));
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            crate->flags |= 4;
-        else
-            crate->flags &= ~4;
-    }
-    {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 2;
-        register u32 left asm("r1");
-        left = mask & input;
-        left = (u8)left;
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            crate->flags |= 8;
-        else
-            crate->flags &= ~8;
-    }
-    if (++a->elapsed >= a->duration) {
-        a->elapsed = 0;
-        if (a->flags & 4) {
-            if (a->index == 0) {
-                if (a->flags & 8)
-                    a->elapsed = a->duration;
-                else
-                    a->index = a->frameCount - 1;
-                done = 1;
-            } else {
-                --a->index;
-                done = 0;
-            }
-        } else {
-            if (++a->index >= a->frameCount) {
-                if ((u8)(a->flags & 8)) {
-                    a->elapsed = a->duration;
-                    a->index = a->frameCount - 1;
-                } else
-                    a->index = 0;
-                done = 1;
-            } else
-                done = 0;
-        }
-        entry = a->commands + a->index;
-        a->frameWeight = *entry & 15;
-        a->duration = (a->frameWeight * a->speed) >> 6;
-        if (!a->duration)
-            a->duration = 1;
-    } else
-        done = 0;
-    return done;
-}
 // confidence=low: finishes the opening/closing animation and invokes its script with crate name and flags.
 void WoodenCrate_UpdateToggleAnimation(struct WoodenCrateManager *manager,
                                        struct WoodenCrate *crate)
 {
     WoodenCrate_UpdatePaletteTimers(crate);
-    if (Step(crate)) {
+    if (PlayerCue_StepSequenceEnded(&crate->sprite, &crate->animation)) {
         s32 values[2];
         struct CrateArguments args;
         if (crate->animation.flags & 4) {

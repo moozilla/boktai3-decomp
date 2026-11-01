@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "display_sequence_inline.h"
 
@@ -167,14 +166,6 @@ static inline void Sword_HoldElapsed(struct DisplaySequenceState *state, u16 dur
 {
     state->elapsed = duration;
 }
-#define SWORD_HOLD_CURRENT_FRAME(state, duration)                                                  \
-    do {                                                                                           \
-        (state)->elapsed = (duration);                                                             \
-    } while (0)
-#define SWORD_READ_SEQUENCE_FLAGS(out_, state_)                                                    \
-    do {                                                                                           \
-        (out_) = (state_)->flags;                                                                  \
-    } while (0)
 static inline u32 Sword_StepMainSequence(struct ContactSwarmSprite *owner,
                                          struct DisplaySequenceState *state)
 {
@@ -219,9 +210,9 @@ static inline u32 Sword_StepMainSequence(struct ContactSwarmSprite *owner,
     elapsedValue = elapsedSnapshot[0];
     heldDuration = duration;
     if (elapsedValue >= duration) {
-        u8 flags;
+        u32 flags;
         state->elapsed = 0;
-        SWORD_READ_SEQUENCE_FLAGS(flags, state);
+        flags = state->flags;
         if (flags & 4) {
             if (state->index == 0) {
                 u32 holdMask = 8;
@@ -241,7 +232,7 @@ static inline u32 Sword_StepMainSequence(struct ContactSwarmSprite *owner,
                 u32 holdMask = 8;
                 holdMask &= flags;
                 if ((u8)holdMask) {
-                    SWORD_HOLD_CURRENT_FRAME(state, duration);
+                    state->elapsed = duration;
                     Sword_SetFrameIndex(state, frameCount - 1);
                 } else {
                     Sword_SetFrameIndex(state, 0);
@@ -279,10 +270,6 @@ static inline void Sword_InitSegmentCollider(struct ContactCollider *collider, u
 {
     Collider_Init(collider, 0, flags, 0, *contactFlags, halfSize, offset);
 }
-#define SWORD_BIND_PALETTE(graphics, colors)                                                       \
-    do {                                                                                           \
-        (graphics)->paletteData = (colors);                                                        \
-    } while (0)
 static inline void Sword_ReadArgumentField(s16 *array, s32 index)
 {
     s16 *field = (s16 *)((u8 *)array + index);
@@ -342,7 +329,7 @@ void Sword_InitTask(struct SwordTask *p)
         for (i = 0; i < 16; i++) {
             *(p->palette + i) = ((const u16 *)animMain->paletteData)[i];
         }
-        SWORD_BIND_PALETTE(animMain, p->palette);
+        animMain->paletteData = p->palette;
     }
     p->fieldD52 = 5;
     p->fieldD53 = 0;

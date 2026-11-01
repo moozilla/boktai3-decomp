@@ -1,10 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "named_object.h"
 #include "player.h"
 
-#define TerrainRegistration_Remove  TerrainModifiers_UnregisterCell
-#define TerrainRegistration_SetCell TerrainModifiers_RegisterCell
 void TerrainModifiers_UnregisterCell(void *);
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 static inline u8 HasFlag(s32 mask, s16 *flags)
@@ -20,8 +17,8 @@ static inline void ClearFlag(s32 mask, s16 *flags)
 static inline void SetFlag(u16 *flags, u32 mask)
 {
     u32 m = mask;
-    asm("" : "+r"(m));
-    *flags = m | *flags;
+    m |= *flags;
+    *flags = m;
 }
 static inline s32 GetCell(struct ContactPosition *position, struct EngineMap *map)
 {
@@ -52,8 +49,8 @@ void NamedObject_UpdateTerrainRegistration(struct NamedObject *object)
         if (object->body.position.y != gPlayers[0]->position.y)
             return;
         cell = GetCell(&object->body.position, map);
-        TerrainModifiers_RegisterCell(object->registration, cell, 0, object->body.position.y >> 8, 0xFF,
-                                      4);
+        TerrainModifiers_RegisterCell(object->registration, cell, 0, object->body.position.y >> 8,
+                                      0xFF, 4);
         SetFlag((u16 *)&object->flags, 1);
     }
 }
