@@ -2010,12 +2010,9 @@ void TetherActor_InitKindFromScript(struct TetherActor *actor, u32 entry)
 
 extern const u8 gUnk_08605A04[];
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
 {
     s32 value = Script_SeekToKeyword('r');
-    register u32 capacity asm("r0");
     if (value) {
         actor->interactionTarget.x = Script_GetValue();
         actor->interactionTarget.y = Script_GetValue();
@@ -2030,9 +2027,7 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
         actor->interactionScriptId = Script_GetValue();
     else
         actor->interactionScriptId = value;
-    capacity = gUnk_08605A04[actor->kind] * 120;
-    actor->maximumValue = capacity;
-    actor->currentValue = capacity;
+    actor->currentValue = actor->maximumValue = gUnk_08605A04[actor->kind] * 120;
     if (actor->kind == 2 || actor->kind == 9) {
         actor->interactionEnabled = 0;
         if ((u8)(actor->state - 3) <= 1)
@@ -2042,9 +2037,7 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
         if ((u8)(actor->state - 3) <= 1)
             TetherActor_SelectInteractionState(actor);
     }
-    capacity = gUnk_08605A04[actor->kind] * 60;
-    actor->secondaryMaximum = capacity;
-    actor->secondaryValue = capacity;
+    actor->secondaryValue = actor->secondaryMaximum = gUnk_08605A04[actor->kind] * 60;
     actor->recoveryDuration = 300;
     actor->recoveryTimer = 0;
 }
