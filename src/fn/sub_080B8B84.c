@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -7,19 +6,23 @@ void SceneActorReaction_SinkAndRemove(void);
 
 static inline u8 Blocked(struct SceneActorRegistryResetView *actor)
 {
-    u32 mask = 0x40;
-    register u32 offset asm("r2") = 0x2D4;
-    if (*(u16 *)((u8 *)actor + offset) & mask)
-        return 1;
-    mask = 0x20000;
-    offset -= 4;
+    if (!actor)
+        goto zero;
     {
-        register u32 *field asm("r0") = (void *)((u8 *)actor + offset);
-        if (*field & mask)
-            return 1;
+        u32 mask = 0x40;
+        if (actor->flags2D4 & mask)
+            goto one;
     }
-    if (actor->health <= 0)
-        return 1;
+    {
+        u32 mask = 0x20000;
+        if (actor->flags2D0 & mask)
+            goto one;
+    }
+    if (actor->health > 0)
+        goto zero;
+one:
+    return 1;
+zero:
     return 0;
 }
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
