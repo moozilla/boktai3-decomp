@@ -51,18 +51,33 @@ struct ArmorTarget {
     s16 z;
 };
 
-// MATCHING_CONCESSION: register-pinning
+// Player-relative x and z deltas in 256-unit grid cells, and their magnitudes.
+#define ARMOR_PLAYER_GRID(actor, px, ax, pz, az, dx, dz, absX, absZ)                               \
+    do {                                                                                           \
+        struct ArmorTarget *player_ = (struct ArmorTarget *)gGameState;                            \
+        px = player_->x;                                                                           \
+        ax = (actor)->x;                                                                           \
+        dx = px - ax;                                                                              \
+        pz = player_->z;                                                                           \
+        az = (actor)->z;                                                                           \
+        dz = pz - az;                                                                              \
+        dx = (dx + 0x80) >> 8;                                                                     \
+        dz = (dz + 0x80) >> 8;                                                                     \
+        absX = dx;                                                                                 \
+        absZ = dz;                                                                                 \
+        if (dx < 0)                                                                                \
+            absX = -dx;                                                                            \
+        if (dz < 0)                                                                                \
+            absZ = -dz;                                                                            \
+    } while (0)
+
 // confidence=low: switches timed armor attack modes and selects aligned attacks.
 void sub_0818911C(void *arg0)
 {
     struct ArmorTimedActor *a = arg0;
-    struct ArmorTarget *player;
     s32 targetX, targetZ, actorX, actorZ;
-    s32 gridX, gridZ, absoluteX, distance;
-    register s32 absoluteXValue asm("r6");
-    u32 mode;
+    s32 gridX, gridZ, absoluteX, absZ, total;
     u8 *decision;
-    register u32 stateAddress asm("r3");
 
     if (a->attackCooldown > 0) {
         a->attackCooldown--;
@@ -88,65 +103,43 @@ void sub_0818911C(void *arg0)
         return;
     }
 
-    player = (struct ArmorTarget *)gGameState;
-    targetX = player->x;
-    actorX = a->x;
-    gridX = targetX - actorX;
-    targetZ = player->z;
-    actorZ = a->z;
-    gridZ = targetZ - actorZ;
-    gridX = (gridX + 0x80) >> 8;
-    gridZ = (gridZ + 0x80) >> 8;
-    absoluteXValue = gridX;
-    distance = gridZ;
-    if (gridX < 0)
-        absoluteXValue = -gridX;
-    if (gridZ < 0)
-        distance = -gridZ;
+    ARMOR_PLAYER_GRID(a, targetX, actorX, targetZ, actorZ, gridX, gridZ, absoluteX, absZ);
 
-    absoluteX = absoluteXValue;
-    mode = a->flags & 1;
-    if (mode) {
+    if (a->flags & 1) {
         switch (a->decision) {
             case 0:
-                if (absoluteX + distance <= 4) {
+                if (absoluteX + absZ <= 4) {
                     if (a->fastMode)
                         ActorController_SetBehavior(a, 0x27);
                     else
                         ActorController_SetBehavior(a, 0x25);
                     a->decision = 1;
                     a->attackCooldown = 0x168;
-                } else {
-                    if (a->fastMode != 0)
-                        goto idle38;
-                    if (a->secondaryCooldown <= 0)
-                        goto idle38;
-                    goto idle2;
-                }
+                } else if (a->fastMode != 0 || a->secondaryCooldown <= 0)
+                    ActorController_SetBehavior(a, 0x26);
+                else
+                    ActorController_SetBehavior(a, 2);
                 return;
             case 1:
                 if (a->behavior == 3) {
                     ActorController_SetBehavior(a, 0x1e);
                     return;
                 }
-                {
-                    s32 total = absoluteX + distance;
-                    distance = total;
-                }
-                if (distance > 5) {
-                    if (a->fastMode != 0)
-                        goto reset38;
-                    if (a->secondaryCooldown <= 0)
-                        goto reset38;
-                    goto reset2;
+                total = absoluteX + absZ;
+                if (total > 5) {
+                    if (a->fastMode != 0 || a->secondaryCooldown <= 0)
+                        ActorController_SetBehavior(a, 0x26);
+                    else
+                        ActorController_SetBehavior(a, 2);
+                    a->decision = 0;
+                    return;
                 }
                 {
                     s32 dir;
                     struct ArmorTarget *target = (struct ArmorTarget *)gGameState;
-                    asm("" : : "r"(absoluteX));
                     dir = Math_Atan2(target->x - a->x, target->z - a->z);
                     dir = (dir + 0x20) & 0xC0;
-                    if (a->facing == dir && distance <= 1) {
+                    if (a->facing == dir && total <= 1) {
                         ActorController_SetBehavior(a, 3);
                         return;
                     }
@@ -157,13 +150,10 @@ void sub_0818911C(void *arg0)
                             ActorController_SetBehavior(a, 0x18);
                         }
                         a->attackCooldown = 0x168;
-                    } else {
-                        if (a->fastMode != 0)
-                            goto wait39;
-                        if (a->secondaryCooldown <= 0)
-                            goto wait39;
-                        goto wait37;
-                    }
+                    } else if (a->fastMode != 0 || a->secondaryCooldown <= 0)
+                        ActorController_SetBehavior(a, 0x27);
+                    else
+                        ActorController_SetBehavior(a, 0x25);
                 }
                 return;
             case 2:
@@ -207,54 +197,32 @@ void sub_0818911C(void *arg0)
         ActorController_SetBehavior(a, 0x29);
         return;
     }
-    stateAddress = (u32) & ((struct ArmorTimedActor *)0)->decision;
-    asm("" : "+r"(stateAddress));
-    stateAddress += (u32)a;
-    decision = (u8 *)stateAddress;
-    switch (*(u8 *)stateAddress) {
+    decision = &a->decision;
+    switch (*decision) {
         case 0:
-            if (absoluteX + distance <= 4) {
-                { /* Reserve r2 during this load; the asm output defines this scratch value. */
-                    register u32 reservedScratch asm("r2");
-                    u8 fastMode;
-                    asm("" : "=r"(reservedScratch));
-                    fastMode = a->fastMode;
-                    asm("" : : "r"(stateAddress), "r"(reservedScratch));
-                    if (fastMode)
-                        ActorController_SetBehavior(a, 0x27);
-                    else
-                        ActorController_SetBehavior(a, 0x25);
-                }
+            if (absoluteX + absZ <= 4) {
+                if (a->fastMode)
+                    ActorController_SetBehavior(a, 0x27);
+                else
+                    ActorController_SetBehavior(a, 0x25);
                 a->decision = 1;
                 a->attackCooldown = 0x168;
-            } else {
-                if (a->fastMode == 0 && a->secondaryCooldown > 0)
-                    goto idle2;
-            idle38:
+            } else if (a->fastMode != 0 || a->secondaryCooldown <= 0)
                 ActorController_SetBehavior(a, 0x26);
-                return;
-            idle2:
+            else
                 ActorController_SetBehavior(a, 2);
-            }
             return;
         case 1:
             if (a->behavior == 3) {
                 ActorController_SetBehavior(a, 0x1e);
                 return;
             }
-            {
-                s32 total = absoluteX + distance;
-                distance = total;
-            }
-            if (distance > 5) {
-                if (a->fastMode == 0 && a->secondaryCooldown > 0)
-                    goto reset2;
-            reset38:
-                ActorController_SetBehavior(a, 0x26);
-                goto clearDecision;
-            reset2:
-                ActorController_SetBehavior(a, 2);
-            clearDecision:
+            total = absoluteX + absZ;
+            if (total > 5) {
+                if (a->fastMode != 0 || a->secondaryCooldown <= 0)
+                    ActorController_SetBehavior(a, 0x26);
+                else
+                    ActorController_SetBehavior(a, 2);
                 a->decision = 0;
                 return;
             }
@@ -262,7 +230,7 @@ void sub_0818911C(void *arg0)
                 s32 dir;
                 dir = Math_Atan2(targetX - actorX, targetZ - actorZ);
                 dir = (dir + 0x20) & 0xC0;
-                if (a->facing == dir && distance <= 1) {
+                if (a->facing == dir && total <= 1) {
                     ActorController_SetBehavior(a, 3);
                     return;
                 }
@@ -273,15 +241,10 @@ void sub_0818911C(void *arg0)
                         ActorController_SetBehavior(a, 0x18);
                     }
                     a->attackCooldown = 0x168;
-                } else {
-                    if (a->fastMode == 0 && a->secondaryCooldown > 0)
-                        goto wait37;
-                wait39:
+                } else if (a->fastMode != 0 || a->secondaryCooldown <= 0)
                     ActorController_SetBehavior(a, 0x27);
-                    return;
-                wait37:
+                else
                     ActorController_SetBehavior(a, 0x25);
-                }
             }
             return;
         case 2:
@@ -292,9 +255,9 @@ void sub_0818911C(void *arg0)
         case 4:
             if (a->attackCooldown <= 0) {
                 ActorController_SetBehavior(a, 2);
-                *decision = mode;
-                a->fastMode = mode;
-                a->modeTimer = mode;
+                *decision = 0;
+                a->fastMode = 0;
+                a->modeTimer = 0;
                 return;
             } else {
                 ActorController_SetBehavior(a, 0x1d);
