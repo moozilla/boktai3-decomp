@@ -285,8 +285,10 @@ post-increment or a stepped register before writing C; it reached 24/25 by C, no
 `AGBCC_NOMOVE=U1,U2` (loop.c: leave the invariant set by insn U in the loop; with
 `AGBCC_LOOP_TRACE=1` the trace also prints `loopopt fn=` once per loop pass, a `cand` line
 for every pseudo set in each loop (may_not_optimize, maybe_never, used_before, in_block,
-set_in_loop, invariant) and a `move` line with the threshold arithmetic; `probe` flips each
-hoist and `hoist` prints the table), reload1.c `S` lines in names.txt (each stack slot:
+set_in_loop, invariant), a `move` line with the threshold arithmetic and a `match` line
+for each equal invariant combine_movables folds into an earlier one (its savings and
+lifetime join that one's test); `probe` flips each hoist and `hoist` prints the table),
+reload1.c `S` lines in names.txt (each stack slot:
 pseudo, sp offset, size, allocation order; `frame` reads them),
 `CSE_NOCANON=N`
 (new reg N never becomes a class head), `CSE_KEEP=N,...` (keep N canonical),
@@ -802,6 +804,17 @@ Each was read from the compiler source and confirmed on a live draft.
    try. `hoist` now writes and scores that variant for every hoisted variable
    (`lever: ... MATCH`). It needs a C variable to re-set: when the hoisted value is an
    unnamed constant inside an inline, name it at the top of the body first.
+   **Equal constants add up.** combine_movables folds later sets of the same invariant
+   into the first (same constant, same mode or the first wider, not used outside the
+   loop), summing savings and lifetime. HealthRestoreEffect_StartParticleBurst's two
+   `& 255` masks (cosine and sine) moved together at 26 x 2 x 2 >= 77; alone each scores
+   26 < 77. A variable for the later mask, set before the loop and again before its use
+   (`u32 byteMask = 255;` ... `byteMask = 255;` after the cosine's branch), is no
+   movable at all: its in-loop set follows a branch, and its first appearance is
+   outside the loop (reg_in_basic_block_p fails). The cosine's mask then scores alone,
+   and both stay `movs r0, #0xff` as in the ROM. On the cosine side instead the
+   variable's set comes before the branch, so it moves (25 / 21). Flow deletes the dead
+   set before the loop. `hoist` marks a folded set `+ equal set insn U line L`.
 22. **Stack slot order is pseudo order.** Reload gives each spilled pseudo a slot in
    pseudo-number order (alter_reg), at rising offsets; pseudos it evicts later come
    after. Pseudo numbers follow first appearance, so declaration order is a frame lever.

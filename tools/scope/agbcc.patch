@@ -1662,7 +1662,18 @@
        if (GET_CODE (p) == INSN
  	  && (set = single_set (p))
  	  && GET_CODE (SET_DEST (set)) == REG
-@@ -1828,7 +1867,16 @@
+@@ -1489,6 +1528,10 @@
+ 	      && ((m->dependencies == m1->dependencies)
+ 		  || rtx_equal_p (m->dependencies, m1->dependencies)))
+ 	    {
++	      if (getenv ("AGBCC_LOOP_TRACE"))  /* scope: an equal invariant whose savings join M's */
++		fprintf (stderr, "match fn=%s insn=%d regno=%d into=%d savings=%d lifetime=%d\n",
++			 current_function_name, INSN_UID (m1->insn), m1->regno,
++			 INSN_UID (m->insn), m1->savings, m1->lifetime);
+ 	      m->lifetime += m1->lifetime;
+ 	      m->savings += m1->savings;
+ 	      m1->done = 1;
+@@ -1828,7 +1871,16 @@
  	  /* It is also desirable to move if it can be moved at no
  	     extra cost because something else was already moved.  */
  
@@ -1680,7 +1691,7 @@
  	      || flag_move_all_movables
  	      || (threshold * savings * m->lifetime) >=
  		 (moved_once[regno] ? insn_count * 2 : insn_count)
-@@ -4533,6 +4581,12 @@
+@@ -4533,6 +4585,12 @@
  	{
  	  struct induction *tv;
  
@@ -1693,7 +1704,7 @@
  	  if (v->ignore || v->same)
  	    continue;
  
-@@ -4591,8 +4645,25 @@
+@@ -4591,8 +4649,25 @@
  	     of such giv's whether or not we know they are used after the loop
  	     exit.  */
  

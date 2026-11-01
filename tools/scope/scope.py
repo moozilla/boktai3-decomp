@@ -4927,6 +4927,7 @@ def cmd_hoist(src, func, env):
     fnames = (func, rom_name(src, func))
     names, lines = pseudo_names(wd, info["obj_name"]), uid_lines(wd)
     passes, cur = [], None
+    merged = {}  # (pass, uid) -> [uids of equal invariants combine_movables folded into it]
     for ln in tr.splitlines():
         m = re.match(r"loopopt fn=(\w+)", ln)
         if m:
@@ -4935,6 +4936,10 @@ def cmd_hoist(src, func, env):
                 passes.append(cur)
             continue
         if cur is None:
+            continue
+        m = re.match(r"match fn=\w+ insn=(\d+) regno=\d+ into=(\d+)", ln)
+        if m:
+            merged.setdefault((len(passes), int(m.group(2))), []).append(int(m.group(1)))
             continue
         m = re.match(r"cand fn=\w+ loop=(\d+) insn=(\d+) regno=(\d+) may_not=(\d) maybe_never=(\d) used_before=(\d)"
                      r" in_block=(\d) set_in_loop=(\d+) invariant=(\d)", ln)
@@ -4959,6 +4964,7 @@ def cmd_hoist(src, func, env):
         sys.exit(f"no loop trace for {func}: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh), or it has no loop")
     print(f"{func}: {info.get('counts') or 'MATCH'}; loop invariants, {len(passes)} loop pass(es)"
           " (threshold x savings x lifetime >= insns moves it)")
+    joined = False
     for i, ps in enumerate(passes, 1):
         for loop, cands in ps.items():
             first = min(cands, key=lambda u: lines.get(u, 1 << 30)) if cands else None
@@ -4967,8 +4973,13 @@ def cmd_hoist(src, func, env):
             for uid, c in cands.items():
                 name = names.get(c["reg"], "")
                 what = f"line {lines.get(uid, '?'):>4}  insn {uid:>5}  pseudo {c['reg']}" + (f" `{name}`" if name else "")
-                if c["move"] and (c["move"][0] or c["move"][2] > 2):
+                also = merged.get((i, uid), [])
+                if also:  # the same invariant set again later: its savings and lifetime are in this test
+                    what += "  + equal set" + "s" * (len(also) > 1) + " " + ", ".join(
+                        f"insn {u} line {lines.get(u, '?')}" for u in also)
+                if c["move"] and (c["move"][0] or c["move"][2] > 2 or also):
                     print(f"    {'moved' if c['move'][0] else 'kept '}  {what}  ({c['move'][1]})")
+                    joined |= bool(also) and c["move"][0]
                 elif c["why"]:
                     print(f"    stays  {what}  ({c['why']})")
                 else:
@@ -4977,6 +4988,11 @@ def cmd_hoist(src, func, env):
                 print(f"    ({quiet} more used once or twice: kept, or folded into the use)")
     print("  probe flips each hoist (AGBCC_NOMOVE=UID); a set the ROM keeps in the loop needs one of the"
           " 'stays' reasons in C (see probe's note).")
+    if joined:
+        print("  '+ equal set': combine_movables added a later set of the same invariant to this one's savings"
+              " and lifetime; apart, each may fail the test. To keep both in the loop, give the later one a"
+              " variable set before the loop and again before its use, after a branch in the body"
+              " (HealthRestoreEffect_StartParticleBurst's byteMask; docs/REGALLOC.md item 10).")
     if n:
         hoist_levers(src, func, env, passes, names, lines, n, info)
     return 0
