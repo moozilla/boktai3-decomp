@@ -2644,6 +2644,7 @@ addr,name,mode,confidence,source,notes
 08068A3C,BouncingObject_HandleTimerContact,thumb,low,src-alias,
 08068A78,BouncingObject_InitializeColliders,thumb,low,src-alias,
 08068B8C,BouncingObject_Allocate,thumb,low,src-alias,
+08068BE4,BouncingObject_TickActive,thumb,low,src-alias,Runs bouncing object physics; collider updates; and the blink timer
 08069214,BouncingObject_TickRemoval,thumb,low,src-alias,
 080692C8,BouncingObject_Spawn,thumb,low,src-alias,
 08069510,BouncingObject_UpdatePool,thumb,low,src-alias,
