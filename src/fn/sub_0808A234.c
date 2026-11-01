@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
@@ -75,9 +74,8 @@ void Ghoul_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
             return;
         }
     }
-    speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
+    speed = Callback_InvokeActor(*(&actor), FIELD(actor, 0x260, void *));
     actor->field2C2 = Div(0x40, 6);
-    asm("" : "+r"(actor));
     {
         u32 mask = 0xA02F;
         if (actor->flags2D4 & mask) {
@@ -106,13 +104,9 @@ void Ghoul_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
                                                              0x20, speed)) {
         ResetState(actor, 3, 0, 0);
         {
-            u32 bit = 2;
-            u16 *flags;
-            u32 value;
-            asm("" : "+r"(bit));
-            flags = (u16 *)(control + 0x628);
-            value = *flags;
-            *flags = bit | value;
+            u16 bit = 2;
+            u16 *flags = (u16 *)(control + 0x628);
+            *flags |= bit;
         }
         return;
     }

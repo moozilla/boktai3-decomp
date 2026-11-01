@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
@@ -44,34 +43,35 @@ static inline void Polar(s32 angle, struct Position *v, s32 radius, u32 mask)
         angle = Rand() & 255;                                                                      \
         Polar(angle, &v, (Rand() & 15) + 6, mask);                                                 \
     }
-void Slime_EmitDeathDebris(struct Actor *input)
+void Slime_EmitDeathDebris(struct Actor *actor)
 {
-    register struct Actor *p asm("r6") = input;
+    /* The actor, then (from the first emission on) the actor's position at 0x5C. */
+    u8 *base = (u8 *)actor;
     struct Position v;
     u16 *a;
     u16 *b;
-    u8 *pos;
     BURST(v)
     v.y = 0x30;
-    a = &p->a;
-    b = &p->b;
-    asm("" : : "r"(a));
-
+    {
+        u32 offset = 0x1E6;
+        a = &((struct Actor *)base)->a;
+        b = (u16 *)(base + offset);
+    }
     {
         u32 sum = *a + *b;
-        pos = (u8 *)p + 0x5C;
-        sub_08127590(pos, &v, 0xB96C, 0xA929, 6, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
+        base += 0x5C;
+        sub_08127590(base, &v, 0xB96C, 0xA929, 6, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
     }
     BURST(v)
     v.y = 0x25;
     {
         u32 sum = *a + *b;
-        sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
+        sub_08127590(base, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
     }
     BURST(v)
     v.y = 0x20;
     {
         u32 sum = *a + *b;
-        sub_08127590(pos, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 1, 0, 0, 0, 0, 0);
+        sub_08127590(base, &v, 0xB96C, 0xA929, 7, 0x18, 0x200, 0, sum, 1, 0, 0, 0, 0, 0);
     }
 }
