@@ -1,7 +1,6 @@
 #include "global.h"
 #include "render.h"
-#ifdef NONMATCHING
-// fuzzy: 98.3%
+
 typedef struct {
     u16 id;
     u8 unk[4];
@@ -100,7 +99,12 @@ static inline void ApplyCommandFacing(struct SceneNpc *npc, u32 a)
         npc->facing4 = mask;
     }
 }
-static inline void SetFlaggedFacing(struct SceneNpc *npc, u32 a, u32 fMask)
+static inline u16 FacingBits(s8 mask, u32 shifted)
+{
+    mask &= shifted;
+    return mask;
+}
+static inline void SetFlaggedFacing(struct SceneNpc *npc, u32 a, u8 directionMask)
 {
     npc->motionAngle = a;
     {
@@ -110,10 +114,7 @@ static inline void SetFlaggedFacing(struct SceneNpc *npc, u32 a, u32 fMask)
         npc->facing8 = mask;
     }
     {
-        s32 shifted = (s32)(a + 0x60) >> 6;
-        u32 mask = fMask;
-        mask &= shifted;
-        npc->facing4 = mask;
+        npc->facing4 = FacingBits(directionMask, (s32)(a + 0x60) >> 6);
     }
 }
 struct CmdFlags {
@@ -123,6 +124,10 @@ struct CmdFlags {
 static inline u16 MessageBits(struct CmdFlags *msg, u32 bits)
 {
     return msg->flags & bits;
+}
+static inline u16 MaskedMessageFlags(u16 value, s8 mask)
+{
+    return (((u32)value << 16) & ((u32)mask << 16)) >> 16;
 }
 struct PaletteResource {
     u8 pad[0xc];
@@ -155,7 +160,6 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
     struct NpcAuxState *sub;
     NpcReceiver *entry;
     u32 modeBit = 2;
-    u32 messageMask = 3;
     u32 copyWords = 0x04000008;
     s32 i;
     entry = &npc->entry;
@@ -227,10 +231,10 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
                     break;
 
                 case 8: {
-                    u32 directionMask;
+                    u8 directionMask;
                     npc->angle = (((u8 *)m)[8] + 5) << 5;
                     directionMask = 3;
-                    npc->flags |= MessageBits((void *)m, messageMask);
+                    npc->flags |= MaskedMessageFlags(((struct CmdFlags *)m)->flags, directionMask);
                     if (((u16 *)m)[2] & 1)
                         npc->flags |= 1;
                     SetFlaggedFacing(npc, npc->angle, directionMask);
@@ -378,7 +382,3 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
             i++;
         } while (i < entry->count[gSceneEventDispatchState[0x24]]);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneNpc_DispatchCommands);
-#endif

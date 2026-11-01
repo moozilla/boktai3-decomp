@@ -2,8 +2,6 @@
 
 Tags: #matching #scene-actor #commands
 
-SceneNpc_DispatchCommands at 081D01C8 remains guarded at its 1,552-byte ROM extent. Commands 17 and 18 read a signed halfword speed. Command 15 clears the halfword at actor offset 0x2E before the palette transfer.
+SceneNpc_DispatchCommands matches all 1,552 bytes. Command 8 merges the low two message bits into the actor flags and reuses its direction mask for four-way facing. Masking both halfwords in the upper half of a word gives agbcc the same two-address Thumb AND as the ROM. The compiler removes the shifts.
 
-The stock comparison reports 98.3% fuzzy. In command 8, one direction mask is loaded before the message flags. The ROM also copies its mask before combining it with the shifted angle. This changes an alignment halfword and several branch distances.
-
-A differential execution compared all 69 command values under both dispatch phases, both attachment states and two signed message speeds. The 552 paired executions produced identical actor memory and external call arguments.
+Commands 17 and 18 read a signed halfword speed. Command 15 clears the halfword at actor offset 0x2E before the palette transfer.
