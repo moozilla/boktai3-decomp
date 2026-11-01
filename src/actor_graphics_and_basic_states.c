@@ -27,33 +27,51 @@ u8 *SceneActorGraphics_GetDefaultResourceId(void)
 int SceneActorGraphics_GetResourceId(struct StateActor *);
 
 // MATCHING_CONCESSION: register-pinning
-void SceneActorGraphics_SelectResource(u8 *p)
+struct T {
+    u8 pad0[0x260];
+    u16 h260, h262, h264;
+    u8 pad266[0x288 - 0x266];
+    u8 *palette;
+    u8 pad28c[0x344 - 0x28C];
+    u16 h344;
+    u8 pad346[0x38C - 0x346];
+    u8 b38C;
+    u8 pad38d;
+    u8 b38E;
+    u8 b38F;
+    u32 w390;
+    u8 pad394[0x3B8 - 0x394];
+    u8 b3B8;
+    u8 pad3b9;
+    u8 b3BA;
+    u8 pad3bb[0x3C4 - 0x3BB];
+    u8 pal3C4[0x5C4 - 0x3C4];
+    u8 pal5C4[0x7C4 - 0x5C4];
+    u8 pal7C4[0x9C4 - 0x7C4];
+    u16 h9C4, h9C6, h9C8;
+    u8 pad9ca[0x9DC - 0x9CA];
+    void *flash;
+};
+void CpuSet(const void *, void *, u32);
+static inline void DispatchSelectPalette(struct T *t, s32 r)
 {
-    /* Raw offsets, not struct SceneActorGraphics fields (0x38c effectScale,
-     * 0x38e effectMode, 0x390 resourceId, 0x288 palette, 0x3c4/0x5c4/0x7c4
-     * palette banks): going through the struct perturbs this pinned match. */
-    if (p[0x38e]) {
-        int resource;
-        p[0x38c] = 0;
-        p[0x38e] = 0;
-        *(int *)(p + 0x390) = SceneActorGraphics_GetResourceId((struct StateActor *)p);
-        resource = SceneActorGraphics_GetResourceId((struct StateActor *)p);
-        {
-            int test = resource;
-            asm("" : "+r"(test));
-            if (test == 0)
-                *(void **)(p + 0x288) = p + 0x5c4;
-            else if (test == 1)
-                *(void **)(p + 0x288) = p + 0x7c4;
-            else {
-                {
-                    void *src = gPaletteBankData + resource * 32;
-                    register void *dst asm("r1") = p + 0x3c4;
-                    CpuSet(src, dst, 0x4000008);
-                }
-                *(void **)(p + 0x288) = p + 0x3c4;
-            }
-        }
+    if (r == 0)
+        t->palette = t->pal5C4;
+    else if (r == 1)
+        t->palette = t->pal7C4;
+    else {
+        CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
+        t->palette = t->pal3C4;
+    }
+}
+
+void SceneActorGraphics_SelectResource(struct T *t)
+{
+    if (t->b38E) {
+        t->b38C = 0;
+        t->b38E = 0;
+        t->w390 = SceneActorGraphics_GetResourceId((struct StateActor *)t);
+        DispatchSelectPalette(t, SceneActorGraphics_GetResourceId((struct StateActor *)t));
     }
 }
 
@@ -976,37 +994,9 @@ struct S {
     Entry entry;
 };
 
-struct T {
-    u8 pad0[0x260];
-    u16 h260, h262, h264;
-    u8 pad266[0x288 - 0x266];
-    u8 *palette;
-    u8 pad28c[0x344 - 0x28C];
-    u16 h344;
-    u8 pad346[0x38C - 0x346];
-    u8 b38C;
-    u8 pad38d;
-    u8 b38E;
-    u8 b38F;
-    u32 w390;
-    u8 pad394[0x3B8 - 0x394];
-    u8 b3B8;
-    u8 pad3b9;
-    u8 b3BA;
-    u8 pad3bb[0x3C4 - 0x3BB];
-    u8 pal3C4[0x5C4 - 0x3C4];
-    u8 pal5C4[0x7C4 - 0x5C4];
-    u8 pal7C4[0x9C4 - 0x7C4];
-    u16 h9C4, h9C6, h9C8;
-    u8 pad9ca[0x9DC - 0x9CA];
-    void *flash;
-};
-
 extern u8 *gSceneEventDispatchState;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
-
-void CpuSet(const void *, void *, u32);
 
 static inline void setStateFull(struct S *s, u32 state, u32 entered, u32 sub)
 {
@@ -1031,18 +1021,6 @@ static inline void effect2(struct T *p, int mode, int id, int duration)
 }
 
 #define effect(p, id, mode, d) effect2(p, mode, id, d)
-
-static inline void DispatchSelectPalette(struct T *t, s32 r)
-{
-    if (r == 0)
-        t->palette = t->pal5C4;
-    else if (r == 1)
-        t->palette = t->pal7C4;
-    else {
-        CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
-        t->palette = t->pal3C4;
-    }
-}
 
 void SceneActors_DispatchCommands(struct S *s)
 {
