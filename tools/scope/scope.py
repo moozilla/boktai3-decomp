@@ -22,6 +22,8 @@
                                 or STRUCT's member at each offset
   scope.py FILE.c shape         the diff with low registers blanked: order and instruction differences only
   scope.py FILE.c frame         stack slots, ROM against draft, with the pseudo (C variable) in each
+  scope.py FILE.c preorder      the ROM's order of PRE's spilled field addresses against gcse's hash table:
+                                the table sizes (insn counts) and pseudo renumberings that give it
   scope.py FILE.c hoist         loop-invariant motion pass by pass: what loop.c moved out, what stayed, why
   scope.py FILE.c giv           loop strength reduction: each induction value, loop.c's benefit and decision
   scope.py FILE.c pre           gcse's PRE replacements: expression, where it is computed and inserted, the
@@ -2950,7 +2952,7 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
-BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?$')
+BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?\\?\s*$')
 
 
 def concession_sites(text):
@@ -2965,7 +2967,15 @@ def concession_sites(text):
         if ln.lstrip().startswith("//"):
             continue
         if PIN_RE.search(ln) and "register" in ln:
-            out.append((i, "pin", lambda ls, i=i: ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]))
+            # one site per pin: `register s32 a asm("r9"), b asm("r6");` declares two
+            names = [m.group(1) for m in re.finditer(r"(\w+)" + PIN_RE.pattern, ln)]
+            for name in names or [None]:
+                def drop(ls, i=i, name=name):
+                    if name is None:
+                        return ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]
+                    pat = re.compile(r"\b(" + re.escape(name) + r")" + PIN_RE.pattern)
+                    return ls[:i] + [pat.sub(r"\1", ls[i], count=1)] + ls[i + 1:]
+                out.append((i, "pin", drop))
         elif re.match(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', ln):
             end = i + 1
             while ";" not in "\n".join(lines[i:end]) and end < len(lines):
@@ -3023,27 +3033,40 @@ def function_reach(text, func):
         defs[name] = (a, b, inline)
     if func not in defs:
         return {}
+    # Function-like and object-like macros: a concession in a macro body changes the code of every
+    # function that expands it, so a reached function's macros are reached too (keyed `#NAME`).
+    macros = {}
+    for m in re.finditer(r"^#\s*define\s+(\w+)(?:.*\\\n)*.*$", text, re.M):
+        if not any(x <= m.start() < y for x, y in drafts):
+            macros[m.group(1)] = (m.start(), m.end())
     reach, todo = {}, [func]
     while todo:
         n = todo.pop()
         if n in reach:
             continue
-        a, b, _ = defs[n]
-        reach[n] = (a, b)
-        body = text[a:b]
-        body = body[body.index("{"):]
+        if n.startswith("#"):
+            a, b = macros[n[1:]]
+            reach[n] = (a, b)
+            body = text[a:b].split(None, 2)[-1]
+        else:
+            a, b, _ = defs[n]
+            reach[n] = (a, b)
+            body = text[a:b]
+            body = body[body.index("{"):]
         for c in set(re.findall(r"\b(\w+)\s*\(", body)):
             if c in defs and defs[c][2] and c not in reach:
                 todo.append(c)
+        for c in set(re.findall(r"\b(\w+)\b", body)):
+            if c in macros and "#" + c not in reach and c != n[1:]:
+                todo.append("#" + c)
     return reach
 
 
 def site_variables(line):
     """C variable names a concession site names: a pin's declarator and a barrier's operands."""
     out = set()
-    m = re.search(r"(\w+)\s+(?:asm|__asm__)\s*\(\s*\"", line)
-    if m and "register" in line:
-        out.add(m.group(1))
+    if "register" in line:
+        out |= set(re.findall(r"(\w+)\s+(?:asm|__asm__)\s*\(\s*\"", line))
     if re.match(r"\s*(?:asm|__asm__)\b", line):
         out |= set(re.findall(r"\"[^\"]*\"\s*\(\s*(\w+)\s*\)", line))
     return out
@@ -4953,7 +4976,13 @@ def top_level_spans(text):
     spans, depth, start, brace, i = [], 0, None, None, 0
     while i < len(text):
         c = text[i]
-        if text.startswith("//", i) or (c == "#" and (i == 0 or text[i - 1] == "\n")):
+        if c == "#" and (i == 0 or text[i - 1] == "\n"):  # a directive, with its continued lines
+            j = text.find("\n", i)
+            while j > 0 and text[j - 1] == "\\":
+                j = text.find("\n", j + 1)
+            i = len(text) if j < 0 else j
+            continue
+        if text.startswith("//", i):
             j = text.find("\n", i)
             i = len(text) if j < 0 else j
             continue
@@ -5351,6 +5380,335 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
                       f" ({'better' if k < base else 'same' if k == base else 'worse'}; {var})")
 
 
+def frame_slot_pairs(rows):
+    """(ROM sp offset -> draft sp offset, the physical pairing or None, every ROM offset used). The
+    physical pairing holds when the listings agree everywhere but in SP displacements; otherwise each
+    ROM slot pairs with the draft slot most often aligned with it."""
+    off = lambda t: [int(m.group(1) or "0", 0) for m in SP_SLOT.finditer(t or "")]
+    votes, rom_seen = {}, set()
+    for r in rows:
+        a, b = off(r["rom"]), off(r["draft"])
+        rom_seen.update(a)
+        if len(a) == 1 and len(b) == 1:
+            votes.setdefault(a[0], {}).setdefault(b[0], 0)
+            votes[a[0]][b[0]] += 1
+    physical = physical_frame_slot_pairs(rows)
+    pair = physical if physical is not None else {a: max(v, key=v.get) for a, v in votes.items()}
+    return pair, physical, rom_seen
+
+
+# hash_expr_1's code and mode terms for (plus:SI (reg:SI R) (const_int O)) in this agbcc: such an
+# expression lands in bucket (PRE_HASH_BASE + R + O) % T of gcse's table (tools/scope/PRE_STACK_ORDER.md)
+PRE_HASH_BASE = 13772
+
+
+def dump_section(text, func):
+    """FUNC's part of a multi-function RTL dump; the whole text when it holds one function."""
+    heads = list(re.finditer(r"^;; Function (\S+)", text, re.M))
+    for i, m in enumerate(heads):
+        if len(heads) > 1 and m.group(1) == func:
+            return text[m.start():heads[i + 1].start() if i + 1 < len(heads) else len(text)]
+    return text
+
+
+def gcse_input_insns(wd, func):
+    """N, the real insns (insn, jump_insn, call_insn) gcse numbers with cuids, counted in its input
+    (u.i.addressof). Its expression table gets pre_table_size(N) buckets."""
+    path = os.path.join(wd, "u.i.addressof")
+    if not os.path.exists(path):
+        return None
+    text = dump_section(open(path).read(), dump_func(wd, func))
+    return len(re.findall(r"^\((?:insn|jump_insn|call_insn)(?:/[a-z]+)? ", text, re.M))
+
+
+def pre_table_size(n):
+    """The bucket count alloc_expr_hash_table (gcse.c) picks for N insns."""
+    return max(11, n // 2) | 1
+
+
+def pre_table_insns(t):
+    """(lo, hi): the insn counts N that give table size T, or None when no N does."""
+    if t < 11 or t % 2 == 0:
+        return None
+    return (0, 23) if t == 11 else (2 * t - 2, 2 * t + 1)
+
+
+def pre_plus_const(rtl):
+    """(R, O) for (plus:SI (reg:SI R) (const_int O)), the shape whose hash the model knows; else None."""
+    m = re.fullmatch(r"\(plus:SI \(reg(?:/\w)*:SI (\d+)(?: [\w-]+)?\) \(const_int (-?\d+)\)\)", rtl.strip())
+    return (int(m.group(1)), int(m.group(2))) if m else None
+
+
+def pre_raw_hash(r, o):
+    return (PRE_HASH_BASE + r + o) & 0xFFFFFFFF
+
+
+@by_dumps("u.i.gcse", "names.txt")
+def pre_table(wd, func):
+    """gcse's PRE expression table for FUNC: {"T": buckets, "entries": {index: (bucket, rtl)},
+    "reaching": {pseudo: index}}. pre_delete makes one reaching pseudo per replaced expression while
+    it walks the buckets in order, and each bucket's chain in index (first-discovery) order."""
+    path = os.path.join(wd, "u.i.gcse")
+    if not os.path.exists(path):
+        return None
+    text = dump_section(open(path).read(), dump_func(wd, func))
+    for blk in re.split(r"(?m)^(?=Expression hash table|SET hash table|PRE GCSE of)", text):
+        head = re.match(r"Expression hash table \((\d+) buckets, (\d+) entries\)", blk)
+        if not head:
+            continue
+        entries = {int(m.group(1)): (int(m.group(2)), one_line(m.group(3)))
+                   for m in re.finditer(r"^Index (\d+) \(hash value (\d+)\)\n((?:  .*\n)+)", blk, re.M)}
+        reaching = {}
+        for m in re.finditer(r"^PRE: redundant insn \d+ \(expression (\d+)\) in bb \d+, reaching reg is (\d+)",
+                             blk, re.M):
+            reaching.setdefault(int(m.group(2)), int(m.group(1)))
+        return {"T": int(head.group(1)), "entries": entries, "reaching": reaching}
+    return None
+
+
+@by_dumps("u.i.rtl")
+def pseudo_births(wd, func):
+    """pseudo -> where expand first sets it: 'line L', or 'line L of FILE' inside an inline helper from
+    another file (an inline copy's parameters are set where the helper starts)."""
+    path = os.path.join(wd, "u.i.rtl")
+    if not os.path.exists(path):
+        return {}
+    out, where = {}, None
+    for blk in re.split(r"\n(?=\()", dump_section(open(path).read(), dump_func(wd, func))):
+        m = re.match(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("([^"]*)"\) (\d+)\)', blk)
+        if m:
+            f = os.path.basename(m.group(1))
+            where = (m.group(2), f)
+            continue
+        if where and re.match(r"\((?:insn|jump_insn|call_insn)(?:/\w)* ", blk):
+            for q in re.findall(r"\(set \(reg(?:/\w)*:\w+ (\d+)\)", blk):
+                out.setdefault(int(q), where)
+    return out
+
+
+def parameter_pseudos(wd, func):
+    """Pseudos set before NOTE_INSN_FUNCTION_BEG in the first RTL dump: the incoming parameters, whose
+    numbers no change to the body moves."""
+    path = os.path.join(wd, "u.i.rtl")
+    if not os.path.exists(path):
+        return set()
+    head = dump_section(open(path).read(), dump_func(wd, func)).split("NOTE_INSN_FUNCTION_BEG")[0]
+    return {int(p) for p in re.findall(r"\(set \(reg(?:/\w)*:\w+ (\d+)\)", head)}
+
+
+def pre_order_ok(items, t, shift=None):
+    """True when ITEMS [(raw hash, index, base)] in ROM slot order have strictly rising (bucket, index)
+    keys at table size T, each raw hash moved by SHIFT[base] (pseudos renumbered)."""
+    prev = (-1, -1)
+    for raw, e, b in items:
+        k = ((raw + (shift[b] if shift else 0)) % t, e)
+        if k <= prev:
+            return False
+        prev = k
+    return True
+
+
+def pre_order_search(items, bases, fixed, t0, t_window=60, d_window=200):
+    """The ways the ROM's slot order can come out of the draft's PRE expressions.
+    ITEMS: [(raw hash, index, base position)] in ROM slot order; BASES: the base pseudos, rising;
+    FIXED: base positions that cannot move (parameters). Returns {"t_only": [T...] in T0 +- 4 * t_window,
+    "tail": the T from which on every larger table keeps the order (or None), "cuts": [(position, d, T)]}
+    for one renumbering cut: every base from BASES[position] on moved by d pseudos, T within t_window."""
+    raws = [raw for raw, _, _ in items]
+    span = range(max(11, t0 - 4 * t_window) | 1, t0 + 4 * t_window + 1, 2)
+    t_only = [t for t in span if pre_order_ok(items, t)]
+    top = max(raws) + 1 if raws else 11
+    tail = (top | 1) if pre_order_ok(items, top | 1) else None
+    cuts = []
+    movable = [i for i in range(len(bases)) if i not in fixed]
+    if movable:
+        lo = movable[0]
+        ts = range(max(11, t0 - t_window) | 1, t0 + t_window + 1, 2)
+        for c in range(lo, len(bases)):
+            for d in range(-d_window, d_window + 1):
+                if d == 0 or bases[c] + d <= (bases[c - 1] if c else 0):
+                    continue
+                shift = [0 if i < c else d for i in range(len(bases))]
+                for t in ts:
+                    if pre_order_ok(items, t, shift):
+                        cuts.append((c, d, t))
+    return {"t_only": t_only, "tail": tail, "cuts": cuts}
+
+
+def pre_order_report(wd, func, chain, src=None, full=False):
+    """Explain the ROM's order of the draft's spilled PRE pseudos (CHAIN: draft pseudos in ROM slot
+    order) with gcse's hash table, and search the table sizes and pseudo renumberings that give it.
+    Returns the printed lines."""
+    out = []
+    table = pre_table(wd, func)
+    if not table:
+        return ["  no PRE expression table in u.i.gcse (no PRE replacements in this function)"]
+    t0, entries, reaching = table["T"], table["entries"], table["reaching"]
+    n0 = gcse_input_insns(wd, func)
+    names = pseudo_names(wd, func)
+    shape_ok = shape_all = 0
+    for b, rtl in entries.values():
+        rc = pre_plus_const(rtl)
+        if rc:
+            shape_all += 1
+            shape_ok += pre_raw_hash(*rc) % t0 == b
+    made = sorted(reaching, key=lambda p: (entries.get(reaching[p], (1 << 30,))[0], reaching[p]))
+    order_ok = made == sorted(reaching)
+    nline = (f"N = {n0} real insns into gcse, " if n0 is not None else "") + f"T = {t0} buckets"
+    if n0 is not None and pre_table_size(n0) != t0:
+        nline += f" (but N gives {pre_table_size(n0)}: the insn count is off; T is read from the dump)"
+    out.append(f"  draft: {nline}")
+    out.append(f"  model: {shape_ok}/{shape_all} (plus:SI reg const) entries in bucket (13772 + reg + offset) % T;"
+               f" PRE made its {len(reaching)} reaching pseudos in (bucket, index) order: "
+               + ("yes" if order_ok else "NO, so the order below is not explained by the table"))
+
+    births = pseudo_births(wd, func)
+
+    unit = os.path.basename(src) if src else None
+
+    def label(p, line=False):
+        nm = names.get(p)
+        s = f"r{p} `{nm}`" if nm else f"r{p}" + (f" [{pseudo_value(wd, p)[0]}]" if pseudo_value(wd, p)[0] else "")
+        if line and p in births:
+            ln, f = births[p]
+            s += f" (line {ln}" + ("" if f == unit else f" of {f}") + ")"
+        return s
+
+    items, skipped, unmodeled = [], [], []
+    for p in chain:
+        e = reaching.get(p)
+        if e is None:
+            skipped.append(p)
+            continue
+        b, rtl = entries.get(e, (None, "?"))
+        rc = pre_plus_const(rtl)
+        if not rc:
+            unmodeled.append((p, e, b, rtl))
+            continue
+        items.append((p, rc[0], rc[1], e, b))
+    if not items:
+        out.append("  none of the reordered slots holds a (plus:SI reg const) PRE pseudo")
+        return out
+    bases = sorted({r for _, r, _, _, _ in items})
+    pos = {r: i for i, r in enumerate(bases)}
+    params = parameter_pseudos(wd, func)
+    fixed = {pos[r] for r in bases if r in params}
+    keyed = [(pre_raw_hash(r, o), e, pos[r]) for _, r, o, e, _ in items]
+    breaks = []
+    prev = None
+    for (p, r, o, e, b), (raw, _, _) in zip(items, keyed):
+        k = (raw % t0, e)
+        if prev is not None and k <= prev[0]:
+            breaks.append((prev[1], p))
+        prev = (k, p)
+    out.append(f"  ROM slot order of the draft's PRE pseudos: {len(items)} with a modeled hash"
+               + (f", {len(unmodeled)} of another shape (left out)" if unmodeled else "")
+               + (f", {len(skipped)} not made by PRE (left out)" if skipped else ""))
+    if full or breaks:
+        out.append(f"    {'pseudo':>6}  {'base':28} {'offset':>6} {'raw':>6} {'bucket':>6} {'index':>5}")
+        bad = {q for pair in breaks for q in pair}
+        for (p, r, o, e, b), (raw, _, _) in zip(items, keyed):
+            if full or p in bad:
+                out.append(f"  {'!' if p in bad else ' '} {p:>6}  {label(r)[:28]:28} {o:>6} {raw:>6} {raw % t0:>6} {e:>5}")
+    if not breaks:
+        out.append(f"  at T = {t0} the keys already rise in ROM order: the slots' order is not this table's doing")
+        return out
+    out.append(f"  at T = {t0}: {len(breaks)} adjacent pair(s) out of (bucket, index) order: "
+               + ", ".join(f"{a} before {b}" for a, b in breaks[:6]) + (" ..." if len(breaks) > 6 else ""))
+    res = pre_order_search(keyed, bases, fixed, t0)
+
+    def ns(t):
+        lo, hi = pre_table_insns(t)
+        return f"N {lo}..{hi}" + (f" ({lo - n0:+d}..{hi - n0:+d})" if n0 is not None else "")
+    if res["t_only"]:
+        near = sorted(res["t_only"], key=lambda t: abs(t - t0))[:6]
+        out.append("  the same pseudos at another table size: T = " + ", ".join(f"{t} [{ns(t)}]" for t in sorted(near))
+                   + (f" ({len(res['t_only'])} in all within {t0}+-240)" if len(res["t_only"]) > len(near) else ""))
+    else:
+        out.append(f"  no table size within {t0}+-240 gives the order with these pseudo numbers")
+    if res["tail"]:
+        out.append(f"  every T >= {res['tail']} gives it too (no bucket wraps there)")
+    if not res["cuts"]:
+        out.append("  no single renumbering (one base and all later ones moved by up to 200, T within +-60)"
+                   " gives it: the order needs two changes or a different expression index order")
+        return out
+    by_cut = {}
+    for c, d, t in res["cuts"]:
+        by_cut.setdefault(c, []).append((d, t))
+    best = sorted(res["cuts"], key=lambda x: (abs(x[1]) + abs(x[2] - t0) // 2, abs(x[1])))
+    out.append("  one renumbering cut (each base from the named one on gets d more pseudos), T within"
+               f" {t0}+-60:")
+    shown = 0
+    for c in sorted(by_cut, key=lambda c: min(abs(d) + abs(t - t0) // 2 for d, t in by_cut[c])):
+        per_t = {}
+        for d, t in by_cut[c]:
+            per_t.setdefault(t, []).append(d)
+        ts = sorted(per_t, key=lambda t: (min(abs(d) for d in per_t[t]) + abs(t - t0) // 2))
+        prev = f", after {label(bases[c - 1], True)}" if c else ""
+        out.append(f"    from {label(bases[c], True)}{prev}:")
+        for t in ts[:None if full else 3]:
+            out.append(f"      T {t} [{ns(t)}]: d {fmt_ranges(per_t[t])}")
+        if len(ts) > 3 and not full:
+            out.append(f"      ... {len(ts) - 3} more table sizes")
+        shown += 1
+        if not full and shown >= 4:
+            break
+    c, d, t = best[0]
+    out.append(f"  smallest: the C before {label(bases[c], True)} makes {abs(d)} {'more' if d > 0 else 'fewer'}"
+               f" pseudos, with {ns(t)} insns at gcse (T {t}). Compile it before trusting it: a change"
+               " moves N, the expression indices and the bases at once.")
+    if full and (unmodeled or skipped):
+        for p, e, b, rtl in unmodeled:
+            out.append(f"  left out: {p} (expression {e}, bucket {b}) {rtl[:70]}: hash not modeled")
+        if skipped:
+            out.append(f"  left out: {', '.join(label(p) for p in skipped)}: not PRE's (expand-time"
+                       " variables, numbered before every PRE pseudo, or evicted later)")
+    return out
+
+
+def fmt_ranges(values):
+    """[-3, -2, 5, 6, 7] -> '-3..-2, +5..+7' (sorted, runs joined)."""
+    vs = sorted(set(values))
+    runs, start = [], None
+    for i, v in enumerate(vs):
+        if start is None:
+            start = v
+        if i + 1 == len(vs) or vs[i + 1] != v + 1:
+            runs.append(f"{start:+d}" if start == v else f"{start:+d}..{v:+d}")
+            start = None
+    return ", ".join(runs[:8]) + (" ..." if len(runs) > 8 else "")
+
+
+def frame_pre_chain(wd, func, rows):
+    """The draft pseudos of the slots global alloc's spills got, in ROM slot order (the pairing frame
+    prints), and whether the pairing is physical."""
+    slots = frame_slots(wd, func)
+    pair, physical, _ = frame_slot_pairs(rows)
+    order = [pair[a] for a in sorted(pair) if pair[a] in slots and slots[pair[a]][2] > 0]
+    # a pseudo reload evicts from a hard register gets its slot later, out of pseudo order
+    return [slots[b][0] for b in order if slots[b][3] < 0], physical is not None
+
+
+def cmd_preorder(src, func, env):
+    """The ROM's stack-slot order of PRE's spilled field addresses against gcse's hash table: the model
+    check on the draft, the slots out of order, and the table sizes and pseudo renumberings that give
+    the ROM's order (tools/scope/PRE_STACK_ORDER.md)."""
+    n, info = score(src, func, env, full=True)
+    if n == 0:
+        print(f"{func}: MATCH")
+        return 0
+    wd = info["wd"]
+    rows = json.load(open(os.path.join(wd, "diff.json")))
+    chain, physical = frame_pre_chain(wd, func, rows)
+    if not chain:
+        sys.exit(f"{func}: reload gave no pseudo a stack slot in the draft (see `frame`)")
+    print(f"{func}: PRE stack-slot order"
+          + ("" if physical else " (slots paired by aligned uses, not physically: confirm with `frame`)"))
+    for ln in pre_order_report(wd, func, chain, src, full=True):
+        print(ln)
+    return 1
+
+
 def cmd_frame(src, func, env):
     """The stack frame side by side: each ROM stack slot, the corresponding draft slot, and the pseudo
     (C variable) reload put there, in the order reload gave the slots out. Use physical offsets when
@@ -5375,18 +5733,8 @@ def cmd_frame(src, func, env):
                  + ("; the sp accesses are locals that live in memory (arrays, structs, address-taken"
                     " variables: their order is declaration order) or outgoing call arguments, not spills"
                     if uses_sp else "; neither side uses the stack beyond pushes"))
-    off = lambda t: [int(m.group(1) or "0", 0) for m in SP_SLOT.finditer(t or "")]
     size = lambda side: next((int(m.group(1), 0) for r in rows for m in [re.match(r"sub sp, #(\S+)$", r[side] or "")] if m), 0)
-    votes, rom_seen, dr_seen = {}, set(), set()
-    for r in rows:
-        a, b = off(r["rom"]), off(r["draft"])
-        rom_seen.update(a)
-        dr_seen.update(b)
-        if len(a) == 1 and len(b) == 1:
-            votes.setdefault(a[0], {}).setdefault(b[0], 0)
-            votes[a[0]][b[0]] += 1
-    physical_pair = physical_frame_slot_pairs(rows)
-    pair = physical_pair if physical_pair is not None else {a: max(v, key=v.get) for a, v in votes.items()}
+    pair, physical_pair, rom_seen = frame_slot_pairs(rows)
 
     def who(o):
         if o not in slots:
@@ -5419,11 +5767,12 @@ def cmd_frame(src, func, env):
             print("\nAligned slot uses suggest this pseudo creation order; confirm the slot identities"
                   " when instruction structure differs:")
         print("  " + " < ".join(f"{slots[b][0]} {names.get(slots[b][0], '')}".strip() for b in order))
-        print("  PRE-generated field addresses can follow hash-bucket and first-discovery order."
-              " For (plus:SI reg const), this agbcc uses (13772 + pseudo + offset) % T,"
-              " with T = max(11, pre-GCSE real-insn-count // 2) | 1. Validate the candidate's"
-              " actual ordering before inferring target constraints; declaration order may"
-              " not control these temporaries. See tools/scope/PRE_STACK_ORDER.md.")
+        print("\nPRE makes its field-address pseudos in gcse hash-table order, (bucket, index): for"
+              " (plus:SI reg const) the bucket is (13772 + reg + offset) % T, T = max(11, N // 2) | 1"
+              " (tools/scope/PRE_STACK_ORDER.md). Against the draft's table:")
+        for ln in pre_order_report(wd, func, [slots[b][0] for b in order if slots[b][3] < 0], src):
+            print(ln)
+        print("  `scope.py FILE.c preorder` lists every slot's key and every cut.")
     if extra:
         print(f"\n{len(extra)} draft slot(s) the ROM does not have: those values need a register in the ROM's"
               " allocation, or do not exist there (a temporary the ROM's C does not make).")
@@ -6132,7 +6481,7 @@ def validate_cli(args):
     elif rest and rest[0] == "pins":
         if len([a for a in rest if a != "--all"]) > 2:
             cli_error("FILE.c pins [FUNC] [--all]")
-    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "giv", "spill", "pre", "calls")):
+    elif any(a in rest for a in ("probe", "shape", "frame", "preorder", "hoist", "giv", "spill", "pre", "calls")):
         if len(rest) > 2:
             cli_error("FILE.c COMMAND [FUNC]")
     elif len(rest) > 1:
@@ -6291,6 +6640,10 @@ def main():
         rest.remove("hoist")
         func = source_function(src, rest[0] if rest else None)
         return cmd_hoist(src, func, env)
+    if "preorder" in rest:  # FILE.c preorder [FUNC]: the ROM's PRE slot order against gcse's hash table
+        rest.remove("preorder")
+        func = source_function(src, rest[0] if rest else None)
+        return cmd_preorder(src, func, env)
     if "frame" in rest:  # FILE.c frame [FUNC]: stack slots, ROM against draft, with the pseudo in each
         rest.remove("frame")
         func = source_function(src, rest[0] if rest else None)
