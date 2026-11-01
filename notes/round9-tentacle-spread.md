@@ -3,5 +3,7 @@ The spin is loaded before the direction branch. Its unsigned low byte feeds the
 magnitude accumulator afterward, and the saved direction address is reused for
 segment placement.
 
-TentacleBody_UpdateChargeSpread matches all 808 bytes with the same scale
-helper. Its mask barrier is gone. The entry clobber on r8 remains.
+TentacleBody_UpdateChargeSpread now matches all 808 bytes without a register
+pin or barrier. Grouping the segment's three offset assignments keeps the
+segment-index calculation in r8 and the body pointer in r9. The same operation
+is shared with the release callback.
