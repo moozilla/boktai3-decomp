@@ -1,5 +1,5 @@
 #ifdef NONMATCHING
-// fuzzy: 87.6%
+// fuzzy: 97.4%
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
@@ -20,8 +20,24 @@ static inline u32 nextSample(const u16 *table)
     gRandomIndex = index;
     return table[index];
 }
-static inline void addPosition(struct ContactPosition *out, const struct ContactPosition *delta,
-                               const struct ContactPosition *base)
+static inline u32 headingTo(const struct ContactPosition *to, const struct ContactPosition *from)
+{
+    return Math_Atan2(to->x - from->x, to->z - from->z);
+}
+static inline void movePosition(struct ContactPosition *p, const struct ContactPosition *d)
+{
+    p->x += d->x;
+    p->y += d->y;
+    p->z += d->z;
+}
+static inline s32 distanceSq(const struct ContactPosition *a, const struct ContactPosition *b)
+{
+    s32 dx = a->x - b->x;
+    s32 dz = a->z - b->z;
+    return dx * dx + dz * dz;
+}
+static inline void addPosition(struct ContactPosition *out, const struct ContactPosition *base,
+                               const struct ContactPosition *delta)
 {
     out->x = base->x + delta->x;
     out->y = base->y + delta->y;
@@ -30,8 +46,6 @@ static inline void addPosition(struct ContactPosition *out, const struct Contact
 void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)
 {
     struct ContactPosition delta;
-    struct ContactPosition *destination;
-    struct ContactPosition *position;
     if (slot->enter) {
         slot->enter = 0;
         if (slot->targetIndex >= 0) {
@@ -43,15 +57,9 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
             write->x = truncateShift12(gUnk_086149C4[(angle + 64) & mask] * scale);
             write->y = 0;
             write->z = truncateShift12(gUnk_086149C4[angle] * scale);
-            {
-                struct ContactPosition *out = &slot->destination;
-                addPosition(out, &delta, pool->targets[slot->targetIndex]);
-                destination = out;
-            }
-        } else
-            destination = &slot->destination;
-        slot->direction =
-            Math_Atan2(slot->destination.x - slot->position.x, destination->z - slot->position.z);
+            addPosition(&slot->destination, pool->targets[slot->targetIndex], &delta);
+        }
+        slot->direction = headingTo(&slot->destination, &slot->position);
         {
             const u16 *table = gRandomTable;
             s32 jitter = (nextSample(table) & 63) - 32;
@@ -78,7 +86,8 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
     if (!slot->steeringTimer) {
         const u16 *table = gRandomTable;
         u32 mask = 255;
-        if ((nextSample(table) & mask) <= 191) {
+        s32 roll = nextSample(table) & mask;
+        if (roll <= 191) {
             if (slot->targetIndex >= 0) {
                 u32 scale = 256;
                 u32 angle = nextSample(table);
@@ -87,31 +96,18 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
                 write->x = truncateShift12(gUnk_086149C4[(angle + 64) & mask] * scale);
                 write->y = 0;
                 write->z = truncateShift12(gUnk_086149C4[angle] * scale);
-                {
-                    struct ContactPosition *out = &slot->destination;
-                    addPosition(out, &delta, pool->targets[slot->targetIndex]);
-                    destination = out;
-                }
-            } else
-                destination = &slot->destination;
-            position = &slot->position;
-            slot->direction =
-                Math_Atan2(slot->destination.x - slot->position.x, destination->z - position->z);
+                addPosition(&slot->destination, pool->targets[slot->targetIndex], &delta);
+            }
+            slot->direction = headingTo(&slot->destination, &slot->position);
             {
                 s32 jitter = (nextRandom() & 63) - 32;
                 slot->direction += jitter;
             }
-        } else {
+        } else
             slot->direction = nextSample(table);
-            destination = &slot->destination;
-            position = &slot->position;
-        }
         slot->steeringTimer = (nextRandom() & 15) + 16;
-    } else {
+    } else
         slot->steeringTimer--;
-        destination = &slot->destination;
-        position = &slot->position;
-    }
     if (slot->targetHeight < slot->desiredHeight)
         slot->targetHeight++;
     else if (slot->targetHeight > slot->desiredHeight)
@@ -124,33 +120,30 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         write->y = 0;
         write->z = truncateShift12(gUnk_086149C4[direction] * speed);
     }
-    {
-        const struct ContactPosition *read = &delta;
-        const struct ContactPosition *first = &delta;
-        slot->position.x += first->x;
-        position->y += read->y;
-        position->z += read->z;
-    }
-    Collider_SetPosition(&slot->healthCollider, position, 0);
+    movePosition(&slot->position, &delta);
+    Collider_SetPosition(&slot->healthCollider, &slot->position, 0);
     ContactActor_SetDirectionalSequence(pool, slot, 0);
-    {
-        s32 dx = slot->destination.x - slot->position.x;
-        s32 dz = destination->z - position->z;
-        if (((dx * dx) + (dz * dz)) <= 16383) {
-            slot->state = 2;
-            slot->enter = 1;
-            slot->stateFrame = 0;
-        } else {
-            if (slot->retargetTimer && (!(--slot->retargetTimer))) {
-                if (pool->mode == 2)
-                    slot->targetIndex = (index > 7) ? (0) : (1);
-                else if (pool->mode == 1)
+    if (distanceSq(&slot->destination, &slot->position) <= 16383) {
+        slot->state = 2;
+        slot->enter = 1;
+        slot->stateFrame = 0;
+    } else {
+        if (slot->retargetTimer) {
+            u32 timer = slot->retargetTimer - 1;
+            slot->retargetTimer = timer;
+            if (!(u8)timer) {
+                if (pool->mode == 2) {
+                    if (index <= 7)
+                        slot->targetIndex = 1;
+                    else
+                        slot->targetIndex = 0;
+                } else if (pool->mode == 1)
                     slot->targetIndex = 0;
                 else
-                    slot->targetIndex = 255;
+                    slot->targetIndex = -1;
             }
-            slot->stateFrame++;
         }
+        slot->stateFrame++;
     }
 }
 
