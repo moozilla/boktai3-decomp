@@ -50,15 +50,13 @@ static inline void BindPalette(struct SceneActorRegistryActor *actor,
     register struct SceneActorPaletteTransition *transition asm("r12") = inputTransition;
     if (actor->drawableKind == 0) {
         void *drawable = actor->drawable;
-        register const u16 *colors asm("r1");
+        const u16 *colors;
         colors = transition->colors;
-        asm("" : "+r"(colors) : "r"(drawable));
         ((struct SceneActorPaletteSequenceView *)drawable)->palette = colors;
     } else {
         void *drawable = actor->drawable;
-        register const u16 *colors asm("r2");
+        const u16 *colors;
         colors = transition->colors;
-        asm("" : "+r"(colors) : "r"(drawable));
         ((struct SceneActorPaletteTileView *)drawable)->palette = colors;
     }
 }
