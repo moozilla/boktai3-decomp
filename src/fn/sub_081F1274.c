@@ -18,40 +18,46 @@ void SpriteParticle_SetPlanarVelocity(void *, s32, s32);
 s32 SpriteParticle_Emit(void *, void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
-#define RESTORE_BACKGROUND_PALETTES(actor, i, writeRow) do { \
-    Slot7PaletteBank *readRow; \
-    u16 *bg = gBgPaletteBuffer; \
-    u32 bank = 4; \
-    writeRow = (Slot7PaletteBank *)(bg + bank * 16); \
-    readRow = (actor)->savedPalettes; \
-    for (i = 0; i < 4; i++) CpuSet(readRow + i, writeRow + i, 16); \
-} while (0)
+#define RESTORE_BACKGROUND_PALETTES(actor, i, writeRow)                                            \
+    do {                                                                                           \
+        Slot7PaletteBank *readRow;                                                                 \
+        u16 *bg = gBgPaletteBuffer;                                                                \
+        u32 bank = 4;                                                                              \
+        writeRow = (Slot7PaletteBank *)(bg + bank * 16);                                           \
+        readRow = (actor)->savedPalettes;                                                          \
+        for (i = 0; i < 4; i++)                                                                    \
+            CpuSet(readRow + i, writeRow + i, 16);                                                 \
+    } while (0)
 
-#define UPDATE_FLASH_PALETTE(actor, writeRow) { \
-    s32 i; \
-    for (i = 0; i < 4; i++) \
-        CpuSet((actor)->flashPalette, (u8 *)gBgPaletteBuffer + (i + 4) * 32, 16); \
-    (actor)->foregroundGraphics.paletteData = (u8 *)(actor)->flashPalette; \
-    (actor)->accentGraphics.paletteData = (u8 *)(actor)->flashPalette; \
-    (actor)->slowdownTimer--; \
-    if ((actor)->slowdownTimer == 0) { \
-        RESTORE_BACKGROUND_PALETTES(actor, i, writeRow); \
-        AnimData_SelectPaletteBank(&(actor)->foregroundGraphics, (actor)->foregroundBank); \
-        AnimData_SelectPaletteBank(&(actor)->accentGraphics, (actor)->accentBank); \
-    } \
-    if ((actor)->slowdownTimer & 1) (actor)->shakeStrength = (actor)->slowdownTimer >> 2; \
-    else (actor)->shakeStrength = -((actor)->slowdownTimer >> 2); \
-}
+#define UPDATE_FLASH_PALETTE(actor, writeRow)                                                      \
+    {                                                                                              \
+        s32 i;                                                                                     \
+        for (i = 0; i < 4; i++)                                                                    \
+            CpuSet((actor)->flashPalette, (u8 *)gBgPaletteBuffer + (i + 4) * 32, 16);              \
+        (actor)->foregroundGraphics.paletteData = (u8 *)(actor)->flashPalette;                     \
+        (actor)->accentGraphics.paletteData = (u8 *)(actor)->flashPalette;                         \
+        (actor)->slowdownTimer--;                                                                  \
+        if ((actor)->slowdownTimer == 0) {                                                         \
+            RESTORE_BACKGROUND_PALETTES(actor, i, writeRow);                                       \
+            AnimData_SelectPaletteBank(&(actor)->foregroundGraphics, (actor)->foregroundBank);     \
+            AnimData_SelectPaletteBank(&(actor)->accentGraphics, (actor)->accentBank);             \
+        }                                                                                          \
+        if ((actor)->slowdownTimer & 1)                                                            \
+            (actor)->shakeStrength = (actor)->slowdownTimer >> 2;                                  \
+        else                                                                                       \
+            (actor)->shakeStrength = -((actor)->slowdownTimer >> 2);                               \
+    }
 
-#define SET_RANDOM_EFFECT_TRACK(actor, params, paletteBank) { \
-    if ((s32)(ParticleRandom_ReadSample(gRandomTable) & 255) > 128) { \
-        SpriteParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank)); \
-        SpriteParticle_SetAnimationTrack(params, (actor)->effectGraphics, 5); \
-    } else { \
-        SpriteParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank)); \
-        SpriteParticle_SetAnimationTrack(params, (actor)->effectGraphics, 6); \
-    } \
-}
+#define SET_RANDOM_EFFECT_TRACK(actor, params, paletteBank)                                        \
+    {                                                                                              \
+        if ((s32)(ParticleRandom_ReadSample(gRandomTable) & 255) > 128) {                          \
+            SpriteParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank));   \
+            SpriteParticle_SetAnimationTrack(params, (actor)->effectGraphics, 5);                  \
+        } else {                                                                                   \
+            SpriteParticle_SetSpriteResource(params, (actor)->effectResource, 0, (paletteBank));   \
+            SpriteParticle_SetAnimationTrack(params, (actor)->effectGraphics, 6);                  \
+        }                                                                                          \
+    }
 
 static inline u32 ReadDamageSoundSample(void)
 {
@@ -66,7 +72,8 @@ static inline u8 IsSceneHidden(void)
     if (gParticipantActors[0]) {
         u32 flags = gParticipantActors[0]->flags;
         u32 mask = 1;
-        if (flags & mask) return 1;
+        if (flags & mask)
+            return 1;
     }
     return 0;
 }
@@ -125,32 +132,37 @@ void SingletonSlot7_UpdatePresentation(struct DepartureActor *actor)
                         u8 *from = gPaletteBankData + fromBank * 32;
                         u8 *to = gPaletteBankData + actor->foregroundTo * 32;
                         u16 *dest = actor->foregroundPalette;
-                        Palette_InterpolateBanks(dest, from, to, actor->fadeFrame, actor->fadeShift);
+                        Palette_InterpolateBanks(dest, from, to, actor->fadeFrame,
+                                                 actor->fadeShift);
                     }
                     actor->foregroundGraphics.paletteData = (u8 *)actor->foregroundPalette;
-                    Anim_SetDurationScale(&actor->foreground.sequence,
-                      (u16)(Div(actor->fadeFrame * 192, 1 << actor->fadeShift) + 64));
+                    Anim_SetDurationScale(
+                        &actor->foreground.sequence,
+                        (u16)(Div(actor->fadeFrame * 192, 1 << actor->fadeShift) + 64));
                     {
                         u8 *from = gPaletteBankData + actor->accentFrom * 32;
                         u8 *to = gPaletteBankData + actor->accentTo * 32;
                         u16 *dest = actor->accentPalette;
-                        Palette_InterpolateBanks(dest, from, to, actor->fadeFrame, actor->fadeShift);
+                        Palette_InterpolateBanks(dest, from, to, actor->fadeFrame,
+                                                 actor->fadeShift);
                     }
                     actor->accentGraphics.paletteData = (u8 *)actor->accentPalette;
-                    for (i=0; i<=3; ++i)
-                        Palette_InterpolateBanks(gUnk_03005040[i], actor->paletteLinks.banks.from[i],
-                          actor->paletteLinks.banks.to[i], actor->fadeFrame, actor->fadeShift);
+                    for (i = 0; i <= 3; ++i)
+                        Palette_InterpolateBanks(
+                            gUnk_03005040[i], actor->paletteLinks.banks.from[i],
+                            actor->paletteLinks.banks.to[i], actor->fadeFrame, actor->fadeShift);
                     if (actor->fadeFrame == (u32)(1 << actor->fadeShift)) {
                         Slot7PaletteBank *readRow;
                         writeRow = actor->savedPalettes;
                         readRow = gUnk_03005040;
-                        for (i=0; i<4; i++) {
+                        for (i = 0; i < 4; i++) {
                             CpuSet(readRow, writeRow, 16);
                             ++writeRow;
                             ++readRow;
                         }
                     }
-                    if (actor->fadeFrame == 120) Sound_PlaySong(0x594);
+                    if (actor->fadeFrame == 120)
+                        Sound_PlaySong(0x594);
                 }
             }
         }
@@ -171,7 +183,8 @@ void SingletonSlot7_UpdatePresentation(struct DepartureActor *actor)
                 dx = ((ParticleRandom_ReadSample(gRandomTable) & 15) - 8) << 10;
                 dz = -(s32)((ParticleRandom_ReadSample(gRandomTable) & 7) << 10);
                 SpriteParticle_InitParams(params);
-                SpriteParticle_SetMotionParams(params, 0, (ParticleRandom_ReadSample(gRandomTable) & 15) + 0x34, 0, remainder);
+                SpriteParticle_SetMotionParams(
+                    params, 0, (ParticleRandom_ReadSample(gRandomTable) & 15) + 0x34, 0, remainder);
                 if (actor->effectStyle == 0) {
                     SpriteParticle_SetSpriteResource(params, 0x4384, 0, 0x2A7);
                     SpriteParticle_SetAnimationTrack(params, 0xF62B, 0);
@@ -187,8 +200,10 @@ void SingletonSlot7_UpdatePresentation(struct DepartureActor *actor)
                         SpriteParticle_SetAnimationTrack(params, 0x31F4, 8);
                     }
                 } else {
-                    position.x = (ParticleRandom_ReadSample(gRandomTable) & 15) + actor->accent.sprite.position.x - 8;
-                    position.y = (ParticleRandom_ReadSample(gRandomTable) & 7) + actor->accent.sprite.position.y;
+                    position.x = (ParticleRandom_ReadSample(gRandomTable) & 15) +
+                                 actor->accent.sprite.position.x - 8;
+                    position.y = (ParticleRandom_ReadSample(gRandomTable) & 7) +
+                                 actor->accent.sprite.position.y;
                     position.z = 100;
                     SpriteParticle_SetMotionParams(params, 0, 42, 0, remainder);
                     SET_RANDOM_EFFECT_TRACK(actor, params, 2);
@@ -211,9 +226,12 @@ void SingletonSlot7_UpdatePresentation(struct DepartureActor *actor)
             offset.y = 0;
             offset.z = 32;
             DamageNumberDisplay_Show(&actor->damageSource, actor->pendingDamage, 0,
-              (const struct ContactPosition *)&actor->initialPosition, (const struct ContactPosition *)&offset, 1);
-            if ((s32)(ReadDamageSoundSample() & 255) > 196) Sound_PlaySong(0x587);
-            else Sound_PlaySong(0x13E);
+                                     (const struct ContactPosition *)&actor->initialPosition,
+                                     (const struct ContactPosition *)&offset, 1);
+            if ((s32)(ReadDamageSoundSample() & 255) > 196)
+                Sound_PlaySong(0x587);
+            else
+                Sound_PlaySong(0x13E);
         }
         if (base->health <= 0 && actor->phaseTimer2 == 0 && *mode == 1) {
             RESTORE_BACKGROUND_PALETTES(actor, i, writeRow);
@@ -221,10 +239,12 @@ void SingletonSlot7_UpdatePresentation(struct DepartureActor *actor)
             actor->phaseTimer2 = 1;
         }
     }
-    if (actor->damageTimer) actor->damageTimer--;
+    if (actor->damageTimer)
+        actor->damageTimer--;
     if (*mode == 0 && actor->contactTimer) {
         actor->contactTimer--;
-        if (actor->contactTimer == 0) actor->contactActive = 0;
+        if (actor->contactTimer == 0)
+            actor->contactActive = 0;
     }
     actor->pendingDamage = 0;
     base->ticks++;

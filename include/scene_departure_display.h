@@ -82,7 +82,9 @@ struct DepartureActor {
     u16 cameraActive, healthSeventh, healthTenth;
     u32 foregroundFrom, foregroundTo, foregroundBank, accentFrom, accentTo, accentBank;
     union {
-        struct { u16 *from[4], *to[4]; } banks;
+        struct {
+            u16 *from[4], *to[4];
+        } banks;
         u16 *rows[8];
     } paletteLinks;
     void *effectPool;
@@ -93,13 +95,14 @@ void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
 void SceneActors_EmitPeriodicParticles(void *, s32);
 
-static inline void DepartureActor_StartPhase(struct DepartureActor *actor, u32 state, u32 substate, u32 phase)
+static inline void DepartureActor_StartPhase(struct DepartureActor *actor, u32 state, u32 substate,
+                                             u32 phase)
 {
-    actor->state=state;
-    actor->substate=substate;
-    actor->statePhase=phase;
-    actor->stateCounter=0;
-    actor->stateEntered=1;
+    actor->state = state;
+    actor->substate = substate;
+    actor->statePhase = phase;
+    actor->stateCounter = 0;
+    actor->stateEntered = 1;
 }
 
 static inline void DepartureActor_EnterDisplay(struct DepartureActor *input)
