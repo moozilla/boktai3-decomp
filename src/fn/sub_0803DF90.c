@@ -1,10 +1,7 @@
 #include "scene_pool.h"
 
 #ifdef NONMATCHING
-// fuzzy: 85.6%
-// fix.py best (sweep after the inlined-insn fix)
-// twin.py transplant from a matched near-clone
-// fix.py best version (reprinted C)
+// fuzzy: 93.2%
 s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
@@ -27,35 +24,11 @@ static inline void Enter(struct ScenePoolEntry *entry, u32 state, u32 zero)
     entry->stateEntered = 1;
     Memory_Clear(entry->history, 0x100);
 }
-static inline void Enter_1(struct ScenePoolEntry *entry, u32 zero)
-{
-    entry->state = 7;
-    entry->stateFrame = zero;
-    {
-        typeof(entry->stateEntered) *q1 = &entry->stateEntered;
-        *q1 = 1;
-    }
-    Memory_Clear(entry->history, 0x100);
-}
-
-inline static void Enter_StateTrackAdaptive(struct ScenePoolEntry *entry, u32 state, u32 zero)
-{
-    entry->state = state;
-    entry->stateFrame = zero;
-    entry->stateEntered = 1;
-    do {
-        Memory_Clear(entry->history, 0x100);
-    } while (0);
-}
-
 s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                                  struct ScenePoolEntry *entry)
 {
     u32 *history = entry->history;
     u32 flag;
-    u8 *entered;
-    u32 value;
-    typeof(value) c1;
     if (entry->stateEntered) {
         entry->stateEntered = 0;
         history[0] = 0;
@@ -104,75 +77,37 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
     } else
         history[0] = 0;
     flag = PlayerHasFlag(2);
-    if ((!flag) && (history[0] > 9)) {
-        u32 state;
+    if (!flag && history[0] > 9) {
         switch (entry->kind) {
             case 0:
-
             case 1:
-                state = 5;
-                break;
-
+                Enter(entry, 5, flag);
+                return 0;
             case 2:
-                if (!(entry->mode != 0))
-                    state = 5;
+                if (entry->mode == 0)
+                    Enter(entry, 5, flag);
                 else
-                    state = 7;
-                break;
-
+                    Enter(entry, 7, flag);
+                return 0;
             case 3:
-                Enter_1(entry, flag);
-                goto done;
-
-            default:
-                goto done;
+                Enter(entry, 7, flag);
+                return 0;
         }
-
-        Enter_StateTrackAdaptive(entry, state, flag);
-        goto done;
-    }
-    if (entry->stateFrame > 239) {
+    } else if (entry->stateFrame > 239) {
         flag = PlayerHasFlag(2);
         if (flag) {
-            s32 random;
+            s32 sample;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-            {
-                u32 offset = gRandomIndex << 1;
-                register const u8 *table asm("r3");
-                table = (const u8 *)gRandomTable;
-                random = *((const u8 *)(offset + ((u32)table)));
-            }
-            if (random <= 127) {
-                entry->state = 2;
-                entry->stateFrame = 0;
-                entered = &entry->stateEntered;
-                value = 1;
-                goto sharedEntry;
+            sample = *((u8 *)RANDOM_TABLE_ADDR + (gRandomIndex << 1));
+            if (sample <= 127) {
+                Enter(entry, 2, 0);
             } else {
-                entry->state = 0;
-                entry->stateFrame = 0;
-                entered = &entry->stateEntered;
-                value = 1;
-                asm("" : "+r"(entered), "+r"(value));
-                goto sharedEntry;
+                Enter(entry, 0, 0);
             }
         } else if (entry->direction > 0) {
-            value = 1;
-            c1 = value;
-            entry->state = c1;
-            entry->stateFrame = flag;
-            entered = &entry->stateEntered;
-        sharedEntry:
-            *entered = c1;
-
-            {
-                u32 *arg = entry->history;
-                Memory_Clear(arg, 0x100);
-            }
-            goto done;
+            Enter(entry, 1, flag);
         } else {
-            Enter_StateTrackAdaptive(entry, 2, flag);
-            asm volatile("");
+            Enter(entry, 2, flag);
         }
     } else
         entry->stateFrame++;
