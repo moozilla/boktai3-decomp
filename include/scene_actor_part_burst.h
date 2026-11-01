@@ -18,12 +18,12 @@ static inline void SceneActorEffects_SpawnContactParts(struct SceneActorRegistry
 {
     union SceneActorRegistryPackedPosition velocity, bounds, position;
     s32 i;
-    for (i = 2; i >= 0; i--) {
-        const u16 *table = gRandomTable;
+    for (i = 0; i < 3; i++) {
+        union RandomTableView table = {gRandomTable};
         const struct ContactPosition *origin;
-        velocity.packed.x = (SceneActorEffects_NextSample(table) & 15) - 7;
-        velocity.packed.y = (SceneActorEffects_NextSample(table) & 31) - 16;
-        velocity.packed.z = (SceneActorEffects_NextSample(table) & 15) - 7;
+        velocity.packed.x = (SceneActorEffects_NextSample(table.samples) & 15) - 7;
+        velocity.packed.y = (SceneActorEffects_NextSample(table.samples) & 31) - 16;
+        velocity.packed.z = (SceneActorEffects_NextSample(table.samples) & 15) - 7;
         bounds.packed.x = 5;
         bounds.packed.y = 10;
         bounds.packed.z = 5;
