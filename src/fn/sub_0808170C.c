@@ -2,38 +2,14 @@
 // confidence=low: settles reaction displacement and restores normal actor control.
 #define SceneActorReaction_SettleDisplacement sub_0808170C
 #ifdef NONMATCHING
-// fuzzy: 74.8%
-// fix.py best (sweep after the inlined-insn fix)
-// Full flow recovered; reset-field and motion-pointer lifetimes still differ.
-#include "scene_actor_chase.h"
+// fuzzy: 87.7%
+#include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
+#include "scene_actor_displacement.h"
+#include "display_sequence.h"
 
-void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u8);
-struct ReactionFollowMotion {
-    struct ContactPosition target;
-    struct ContactPosition current;
-};
-struct ReactionAnimationStatus {
-    u8 unknown0[7];
-    u8 active;
-    u16 mode, unknownA, unknownC, frame;
-};
-static inline u32 Reaction_WordFlags(u32 *field, u32 mask)
-{
-    return *field & mask;
-}
-static inline u32 Reaction_ActorWord(struct SceneActorRegistryResetView *actor, u32 mask)
-{
-    return actor->flags2D0 & mask;
-}
-static inline u32 Reaction_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
-{
-    return actor->flags2CC & mask;
-}
-static inline void Reaction_SetMotion(struct SceneActorRegistryResetView *actor, u32 bits, s32 mask)
-{
-    actor->flags2D4 = (bits | actor->flags2D4) & mask;
-}
+void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
+
 static inline void Reaction_ClearHalf(u16 *field, s32 mask)
 {
     *field &= mask;
@@ -42,69 +18,90 @@ static inline void Reaction_ClearWord(u32 *field, s32 mask)
 {
     *field &= mask;
 }
-static inline void Reaction_ClearMotion(struct SceneActorReactionMotion *motion, s32 mask)
-{
-    motion->flags &= mask;
-}
-static inline s32 Reaction_Quarter(s32 value)
-{
-    if (value >= 0)
-        return value >> 2;
-    return -((-value) >> 2);
-}
+
 static inline s32 Reaction_ThirtySecond(s32 value)
 {
     if (value >= 0)
         return value >> 5;
     return -((-value) >> 5);
 }
-static inline s32 Reaction_ClampMotion(s32 value)
-{
-    if (value > 200)
-        return 200;
-    if (value < -200)
-        return -200;
-    return value;
-}
+
 static inline u8 Reaction_MotionStopped(s32 x, s32 z)
 {
     if (!x && !z)
         return 1;
     return 0;
 }
-static inline u8 Reaction_Test(u32 value, u32 mask)
+
+static inline u32 Recovery_StatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    if (value & mask)
-        return 1;
-    return 0;
+    return actor->flags2D0 & mask;
 }
+static inline u32 Recovery_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    return actor->flags2CC & mask;
+}
+static inline void Recovery_ClearStatusFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+{
+    u32 mask = ~bits;
+    actor->flags2D0 &= mask;
+}
+static inline void Recovery_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    actor->flags2D0 = mask | actor->flags2D0;
+}
+static inline void Recovery_ClearTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
+{
+    u32 mask = ~bits;
+    tracking->flags &= mask;
+}
+
+static inline void Recovery_AdjustMotionFlags(struct SceneActorChaseFlags16 *field, u16 set,
+                                              u32 clear)
+{
+    u16 value = set;
+    u32 result;
+    value |= field->value;
+    result = value;
+    result &= ~clear;
+    field->value = result;
+}
+
+static inline void Recovery_ClearRoute(struct SceneActorRegistryResetView *actor,
+                                       struct SceneActorRegistryControl *control)
+{
+    SceneActorChase_ClearActorFlags(actor, 0x141C0);
+    control->counter = 0;
+    control->field14 = 0;
+    control->timer = 0;
+}
+
+static inline u8 Recovery_ActorCollisionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+{
+    return SceneActorChase_TestField(&actor->flags2C0, bits);
+}
+
 void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group.common);
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 counter;
-    struct ReactionFollowMotion *follow;
+    s16 *priorX, *priorZ;
     s32 x;
     s32 z;
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 category = actor->category;
         u32 *word;
-        u32 original;
-        u16 *motion;
-        struct SceneActorReactionMotion *reaction;
-        struct SceneActorRegistryControl *control;
-        u32 *flags;
+        struct SceneActorChaseFlags16 *motion;
         actor->body.direction = (((actor->body.direction + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 6);
-        original = Reaction_ActorWord(actor, ~0U);
         word = &actor->flags2D0;
-        word = &actor->flags2D0;
-        if (!(original & 2)) {
-            if (original & 1) {
+        if (!Recovery_StatusFlags(actor, 2)) {
+            if (*word & 1) {
                 SceneActorAttachment_ReplaceResponseSlot(actor, 3, 2, category);
-                Reaction_ClearWord(word, ~1);
+                Recovery_ClearStatusFlags(actor, 1);
             } else
                 SceneActorAttachment_ReplaceResponseSlot(actor, 3, 0, category);
-            *word |= 2;
+            Recovery_SetStatusFlags(actor, 2);
             switch (category) {
                 case 4:
                     Sound_PlaySong(237);
@@ -123,9 +120,7 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
                     break;
 
                 case 5:
-
                 case 6:
-
                 case 7:
                     Sound_PlaySong(316);
                     break;
@@ -135,73 +130,77 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
                     break;
             }
         }
-        Reaction_SetMotion(actor, 2, ~0x17A9);
-        motion = &actor->flags2D4;
-        actor->field2C2 = 64;
-        *((u16 *)(((u8 *)actor) + 0x414)) = 0;
-        *((u16 *)(((u8 *)actor) + 0x418)) = 0;
-        Reaction_ClearHalf(motion, ~0x380);
-        reaction = (void *)(((u8 *)actor) + 0xDC);
-        Reaction_ClearMotion(reaction, ~0x18);
-        control = (void *)(((u8 *)actor) + 0x420);
-        if (Reaction_ActorFlags(actor, 0x200000)) {
-            Reaction_ClearWord(word, ~0x1000000);
-            Reaction_ClearHalf(motion, ~0x200);
-            *((u8 *)(((u8 *)control) + 0xA)) = 0;
-            control->counter = 0;
-            control->timer = 0;
+        {
+            u16 bits = 2;
+            motion = (void *)&actor->flags2D4;
+            Recovery_AdjustMotionFlags(motion, bits, 0x17A9);
         }
-        flags = &actor->flags2CC;
-        Reaction_ClearHalf(motion, ~0x400);
-        *((u8 *)(group + 0x206)) = 255;
-        Reaction_ClearWord(flags, ~0x80);
+        {
+            struct SceneActorRegistryControl *control;
+            actor->field2C2 = 64;
+            actor->group.common.gate.flags = 0;
+            actor->group.common.gate.counter = 0;
+            SceneActorChase_ClearFlagComponent(motion, 0x380);
+            Recovery_ClearTrackingFlags(&actor->tracking, 0x18);
+            control = &actor->group.common.control;
+            if (Recovery_ActorFlags(actor, 0x200000)) {
+                Recovery_ClearStatusFlags(actor, 0x1000000);
+                SceneActorChase_ClearFlagComponent(motion, 0x200);
+                control->mode = 0;
+                control->counter = 0;
+                control->timer = 0;
+            }
+            SceneActorChase_ClearFlagComponent(motion, 0x400);
+            actor->group.turn.turnsRemaining = -1;
+        }
+        SceneActorChase_ClearActorFlags(actor, 0x80);
         actor->field2C2 = 64;
-        Reaction_ClearMotion(reaction, ~0x18);
-        Reaction_ClearWord(word, ~0x1000000);
-        control = (void *)(group + 0x4C);
-        Reaction_ClearWord(flags, ~0x141C0);
-        control->counter = 0;
-        *((u16 *)(((u8 *)control) + 0x14)) = 0;
-        control->timer = 0;
+        Recovery_ClearTrackingFlags(&actor->tracking, 0x18);
+        Recovery_ClearStatusFlags(actor, 0x1000000);
+        Recovery_ClearRoute(actor, &group->common.control);
     }
     if (!actor->drawableKind) {
-        struct ReactionAnimationStatus *status = (void *)(((u8 *)actor->drawable) + 0x48);
-        if (((status->mode == 2) && (status->frame == (!(!status->active)))) &&
-            (status->active != 1))
-            status->frame = 0;
+        struct DisplaySequenceState *status = (void *)((u8 *)actor->drawable + 0x48);
+        if (((status->index == 2) && (status->elapsed == (status->duration != 0))) &&
+            (status->duration != 1))
+            status->elapsed = 0;
     }
-    counter = *((s16 *)(&actor->fieldAA));
+    counter = (s16)actor->fieldAA;
     if (((u32)(counter - 30)) <= 89) {
         s32 remainder = Mod(counter, 30);
         s32 limit = 15 - Div(counter, 10);
         if (remainder < limit) {
-            u32 mask = 0x20;
-            actor->flags2D6 = mask | actor->flags2D6;
+            SceneActorChase_SetFlagComponent((void *)&actor->flags2D6, 0x20);
         }
     }
-    follow = (void *)(((u8 *)actor) + 0x310);
-    x = Reaction_Quarter(follow->target.x - follow->current.x);
-    z = Reaction_Quarter(follow->target.z - follow->current.z);
-    x = Reaction_ClampMotion(x);
-    z = Reaction_ClampMotion(z);
+    x = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &priorX);
+    z = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &priorZ);
+    if (x > 200)
+        x = 200;
+    else if (x < -200)
+        x = -200;
+    if (z > 200)
+        z = 200;
+    else if (z < -200)
+        z = -200;
     actor->body.motion.x += x;
     actor->body.motion.z += z;
-    follow->current.x += x;
-    follow->current.z += z;
+    *priorX += x;
+    *priorZ += z;
     if (Reaction_MotionStopped(x, z) && (counter <= 0)) {
         struct ContactCollider *collider;
         actor->fieldAA = 0;
         actor->field2B6 = (Reaction_ThirtySecond(actor->body.direction) + 7) & 7;
-        Chase_SetState(actor, 3, 1, 0);
-        Chase_SetCtl(actor, *((void **)(group + 0x20C)), 8);
+        SceneActorChase_SetState(actor, 3, 1, 0);
+        SceneActorChase_SetControl(actor, group->field5E0, 8);
         Reaction_ClearWord(&actor->flags2D0, ~2);
         Reaction_ClearHalf(&actor->flags2D4, ~0x3A);
-        Chase_SetState(actor, 3, 1, 0);
+        SceneActorChase_SetState(actor, 3, 1, 0);
         actor->body.direction = ((actor->body.direction + 32) >> 6) << 6;
         collider = &actor->colliderA;
-        if (Reaction_Test(actor->flags2C0, 0x40)) {
+        if (Recovery_ActorCollisionFlags(actor, 0x40)) {
             collider->flags &= 0xFEFF;
-        } else if (Chase_MotionFlags(actor, 0x2016)) {
+        } else if (SceneActorChase_MotionFlags(actor, 0x2016)) {
             collider->flags &= 0xFEFF;
         } else {
             u32 old = collider->flags;
