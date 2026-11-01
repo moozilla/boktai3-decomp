@@ -303,18 +303,14 @@ int SceneIndicator_CreateFromScript(void)
     p->index = 0;
     p->count = 0;
     if (Script_SeekToKeyword('t')) {
-        register u16 *base asm("r6") = p->times;
-        u16 *t = base;
-        do {
+        int i;
+        for (i = 0; i < 8; i++) {
             if (Script_GetPc()) {
-                *t = Script_GetValue();
+                p->times[i] = Script_GetValue();
                 p->count++;
-            } else {
-                u32 all = 65535;
-                *t = all;
-            }
-            t++;
-        } while ((s32)t <= (s32)(base + 7));
+            } else
+                p->times[i] = 65535;
+        }
         if (p->count & 1)
             return -1;
         p->mode = 0;
@@ -323,17 +319,11 @@ int SceneIndicator_CreateFromScript(void)
         effect = p->effect;
     } else {
         int i;
-        register u32 mask asm("r3");
         position = &p->sprite.position;
         sprite = &p->sprite;
         effect = p->effect;
-        {
-            register u32 all asm("r0") = 65535;
-            asm("" : : "r"(all));
-            mask = all;
-        }
         for (i = 0; i < 8; i++)
-            p->times[i] |= mask;
+            p->times[i] |= 65535;
     }
     p->delay = 0;
     p->period = Script_GetKeywordValue('T', -1);
@@ -353,15 +343,11 @@ int SceneIndicator_CreateFromScript(void)
         sprite->flags |= 1;
     Collider_SetAttackPowerAndForce(effect, (u16)Script_GetKeywordValue('d', 10), 1);
     {
-        register u32 raw asm("r0") = (u16)position->x;
-        register int x asm("r2");
-        int z;
-        x = (s16)raw >> 8;
-        z = position->z >> 8;
+        int x = position->x >> 8, z = position->z >> 8;
         if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             p->value = 0;
         else
-            p->value = gTerrainMap->rows[z] + x;
+            p->value = gTerrainMap->rows[z] - -x; /* keeps the add's operand order (row + x) */
     }
     p->active = 1;
     return 0;
