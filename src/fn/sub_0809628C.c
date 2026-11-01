@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -50,9 +49,6 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         Bee_ConsumeFlag80(actor);
         if (!Flag(actor, 0x4000, 0x2D4)) {
             s32 i;
-            u16 px;
-            u16 py;
-            register u16 pz asm("r0");
             struct ContactPosition *pos;
             u32 index = (gRandomIndex + 1) & 1023;
             u32 count;
@@ -60,23 +56,14 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             count = Mod(*((u16 *)(0x0203B400 + (index * 2))), 3) + 1;
             pos = &actor->body.position;
             {
-                u16 *a = (u16 *)pos;
-                u16 *b = (u16 *)&actor->body.position.y;
-                u16 *c = (u16 *)&actor->body.position.z;
-                px = *a;
-                py = *b;
-                pz = *c;
-            }
-            {
-                u16 *q = &pieces[0].x;
-                s32 n = 2;
-                i = n;
-                do {
-                    q[0] = px;
-                    q[1] = py;
-                    q[2] = pz;
-                    q += sizeof(pieces[0]) / sizeof(*q);
-                } while ((--i) >= 0);
+                u16 *x = (u16 *)&pos->x;
+                u16 *y = (u16 *)&actor->body.position.y;
+                u16 *z = (u16 *)&actor->body.position.z;
+                for (i = 0; i < 3; i++) {
+                    pieces[i].x = *x;
+                    pieces[i].y = *y;
+                    pieces[i].z = *z;
+                }
             }
             EffectManager_SpawnParticlesAt(count, 0, ctx->particleStyle, pos, pieces, 300, 120);
         }
