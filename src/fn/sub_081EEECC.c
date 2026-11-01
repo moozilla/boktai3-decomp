@@ -8,8 +8,6 @@ void SpriteParticle_SetPlanarVelocity(void *, s32, s32);
 s32 SpriteParticle_Emit(void *, void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 89.2%
 static inline u32 NextRandom(const u16 *table)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -17,6 +15,14 @@ static inline u32 NextRandom(const u16 *table)
     return table[gRandomIndex];
 }
 
+union DepartureJitterSource {
+    const u16 *table;
+    u16 halves[2];
+};
+static inline u32 ReadDepartureJitter(const union DepartureJitterSource *source)
+{
+    return NextRandom(source->table);
+}
 void SingletonSlot7_UpdateShakingDeparture(struct DepartureActor *input, s32 frame)
 {
     struct DepartureActor *actor = input;
@@ -29,8 +35,11 @@ void SingletonSlot7_UpdateShakingDeparture(struct DepartureActor *input, s32 fra
     input->shakeX = 0;
     input->shakeZ = 0;
     if (frame < 60) {
-        input->shakeX = (NextRandom(gRandomTable) & 7) - 4;
-        input->shakeZ = (NextRandom(gRandomTable) & 7) - 4;
+        union DepartureJitterSource jitter;
+        jitter.halves[0] = (u16)RANDOM_TABLE_ADDR;
+        jitter.halves[1] = RANDOM_TABLE_ADDR >> 16;
+        input->shakeX = (ReadDepartureJitter(&jitter) & 7) - 4;
+        input->shakeZ = (ReadDepartureJitter(&jitter) & 7) - 4;
     } else if (input->foreground.mode && input->accent.mode) {
         input->dispersalTimer += 2;
     }
@@ -38,7 +47,7 @@ void SingletonSlot7_UpdateShakingDeparture(struct DepartureActor *input, s32 fra
         struct ContactPackedVector position;
         u32 params[0x34 / sizeof(u32)];
         s32 dx, dz;
-        s32 originX;
+        u16 originX;
         u32 roll;
         roll = NextRandom(gRandomTable);
         originX = actor->foreground.sprite.position.x;
@@ -71,6 +80,3 @@ void SingletonSlot7_UpdateShakingDeparture(struct DepartureActor *input, s32 fra
     if (frame > 90 && Sprite_BlinkUntilExpired(&actor->foreground, frame - 90, 45, 90))
         input->finished = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SingletonSlot7_UpdateShakingDeparture);
-#endif

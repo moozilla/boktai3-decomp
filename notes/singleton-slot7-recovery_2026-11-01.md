@@ -21,7 +21,12 @@ modes are set.
 
 Tags: 081EEECC SingletonSlot7_UpdateShakingDeparture
 
-The guarded shaking draft has 89.2% fuzzy agreement and 29 realigned
-instruction differences. Both particle branches now read the effect
-resource at +0x388. The ROM spills the first random table pointer to
-SP+0x44. The draft keeps it in r8.
+All 608 bytes match. The actor jitters two display coordinates for the
+first 60 frames, then emits a particle on odd frames. The spawn position
+uses the low halfword of the foreground sprite's x coordinate before
+adding the horizontal jitter.
+
+Loading the jitter sample address through its two GBA halfwords lets agbcc
+keep the first table pointer on the stack. In a diagnostic build,
+suppressing its early register-equivalence note on an ordinary pointer
+gave the same code. The later particle draws use the shared RAM symbol.
