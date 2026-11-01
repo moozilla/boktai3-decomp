@@ -132,6 +132,8 @@ def rename(root, addr, old, new, mode="thumb", note=None, confidence="low", dry=
 def concessions(text):
     pins = len(re.findall(r'\basm\("r\d+"\)|\basm\("(?:sb|sl|fp|ip)"\)', text))
     bars = len(re.findall(r'\basm(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', text))
+    # an empty `do { } while (0)` acts as a barrier: its loop notes end cse blocks and weight refs
+    bars += len(re.findall(r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)', text))
     if (pins or bars) and MARKER not in text:
         text = MARKER + "\n" + text
     if not (pins or bars) and MARKER in text:

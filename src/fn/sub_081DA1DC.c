@@ -51,7 +51,7 @@ static inline void polar(struct ContactPosition *v, s32 angle, s32 speed)
     v->z = trunc12(gUnk_086149C4[angle & 255] * speed);
 }
 
-s32 TimedEffect_UpdateTerrainTurn(void *ctx, struct TEntry *e)
+s32 TimedEffect_UpdateTerrainTurn(void *ctx, struct TEntry *e, s32 index)
 {
     struct TESprite *sp = (struct TESprite *)((u8 *)e + 0x8C);
     struct TEConfig *config = &e->config;

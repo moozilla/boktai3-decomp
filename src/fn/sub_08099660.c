@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_control_phase.h"
@@ -52,7 +53,7 @@ void Ghost_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
         Ghost_SetMovementEndpoints(actor, p);
         sub_08097798(actor);
         SetState(actor, 0, 0, 1);
-        /* An empty statement, as a macro compiled to nothing leaves it. */
+        /* An empty loop: its loop notes end the first cse pass here (a counted concession). */
         do {
         } while (0);
         from = &actor->body.position;

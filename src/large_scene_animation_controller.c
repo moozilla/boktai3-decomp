@@ -5,6 +5,7 @@
 #include "engine.h"
 #include "render.h"
 #include "ram.h"
+#include "display_keyframe.h"
 
 void SceneAnimation_UpdateSlotAnimation10(struct Nidhoggr *p, s32 i)
 {
@@ -1575,11 +1576,11 @@ struct NidhoggrTargetRecord {
     void *callback;
     void *next;
 };
-struct NidhoggrPaletteRow {
-    u8 unk_00[0x3a];
-    u16 paletteIndex;
-    u8 unk_3c[12];
+struct NidhoggrPartRow {
+    struct DisplayKeyframeState widget;
+    u8 unk_3c[0x48 - 0x3c];
     void *palette;
+    u8 unk_4c[0x60 - 0x4c];
 };
 extern const u8 gUnk_0824F490[];
 extern u8 gUnk_0824F4AC[];
@@ -1597,14 +1598,6 @@ static inline void Nidhoggr_MaskPartFlags(struct NidhoggrPartCollider *p, u32 ma
 {
     p->flags &= mask;
 }
-static inline void Nidhoggr_SetPaletteIndex(u16 *p, u32 value)
-{
-    *p = value;
-}
-static inline void Nidhoggr_SetPalette(void **p, void *value)
-{
-    *p = value;
-}
 static inline void Nidhoggr_OrPartFlags(struct NidhoggrPartCollider *p, u32 mask)
 {
     p->flags |= mask;
@@ -1619,7 +1612,7 @@ struct NidhoggrPartInit {
     u32 actorId;
     u8 unk_50[0x541c - 0x50];
     struct NidhoggrResourceHeader animHdr;
-    struct NidhoggrAnimRow rows[26];
+    struct NidhoggrPartRow rows[26];
     struct NidhoggrPartCollider timedCollider;
     struct NidhoggrPartCollider attackColliders[26];
     struct NidhoggrPartCollider colliders[26];
@@ -1633,14 +1626,16 @@ struct NidhoggrPartInit {
 };
 
 #ifdef NONMATCHING
-// fuzzy: 99.1%
-// Final zero initialization and loop-bound comparison differ.
+// fuzzy: 99.9%
+// The last loop's 0x120 and callback arguments are loaded before the others.
+// The do/while (0) around the goto loop and the palette writes keeps the
+// flag store's field zero alive (notes/opus-nidhoggr-init-parts_2026-10-31.md).
 void Nidhoggr_InitParts(void *arg0)
 {
     struct NidhoggrPartInit *t = arg0;
     struct NidhoggrResourceHeader *src;
     s32 i;
-    struct NidhoggrAnimRow *row;
+    struct NidhoggrPartRow *row;
     struct NidhoggrTargetRecord *target;
     struct NidhoggrPartCollider *collider;
     u32 damage;
@@ -1747,19 +1742,23 @@ void Nidhoggr_InitParts(void *arg0)
     {
         struct NidhoggrPartCollider *collider = &t->colliders[18];
         u32 flags = 0x1008;
-        s32 lowerBound = 0;
-        for (i = 1; i >= lowerBound; collider++, i--) {
+        do {
+            i = 1;
+        nextCollider:
             collider->bounds = gUnk_0824F4BC;
             collider->offset = gUnk_0824F4B4;
             Collider_SetBodyProperties(collider, damage, 0x120, 16);
             Collider_SetCallback(collider, Nidhoggr_ReceivePartContact, t);
             Nidhoggr_OrPartFlags(collider, flags);
-        }
+            collider++;
+            if (--i >= 0)
+                goto nextCollider;
+            TimePalette_InitTransition(t->paletteTransition, gPaletteBankData + 0x3500,
+                                       gPaletteBankData + 0x3560, gPaletteBankData + 0x3580);
+            t->rows[21].widget.paletteIndex = 0xf1a3;
+            t->rows[21].palette = &t->rowBlink[18];
+        } while (0);
     }
-    TimePalette_InitTransition(t->paletteTransition, gPaletteBankData + 0x3500,
-                               gPaletteBankData + 0x3560, gPaletteBankData + 0x3580);
-    Nidhoggr_SetPaletteIndex(&((struct NidhoggrPaletteRow *)&t->rows[21])->paletteIndex, 0xf1a3);
-    Nidhoggr_SetPalette(&((struct NidhoggrPaletteRow *)&t->rows[21])->palette, &t->rowBlink[18]);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", Nidhoggr_InitParts);

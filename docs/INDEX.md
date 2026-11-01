@@ -352,11 +352,15 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/monster-initializers_2026-10-30.md](../notes/monster-initializers_2026-10-30.md) | Monster initializer family: 17 exact matches | #matching #monster #compiler #structs #ram #data | 8 |
 | [notes/monster_init_primitives_2026-10-30.md](../notes/monster_init_primitives_2026-10-30.md) | Shared initializer script and terrain operations | *#scripts #text* | 5 |
 | [notes/monster_init_shared_groups_2026-10-30.md](../notes/monster_init_shared_groups_2026-10-30.md) | Shared monster initialization groups | *#actors* | 4 |
+| [notes/opus-actor-marker-fragments_2026-10-31.md](../notes/opus-actor-marker-fragments_2026-10-31.md) | ActorMarker_LaunchFragments (08181514): holdout | #matching #actor-marker #compiler #reload #local-alloc #combine #scope-gap | 8 |
+| [notes/opus-nidhoggr-init-parts_2026-10-31.md](../notes/opus-nidhoggr-init-parts_2026-10-31.md) | Nidhoggr_InitParts (081940F8): holdout | #matching #nidhoggr #compiler #cse #combine #local-alloc #loop #scope-gap | 7 |
 | [notes/opus-ratatosk-defeat_2026-10-31.md](../notes/opus-ratatosk-defeat_2026-10-31.md) | Ratatosk_UpdateDefeatSequence (081F4CF8): exact match | #matching #ratatosk #compiler #reload #addressing | 6 |
 | [notes/opus-ratatosk-init_2026-10-31.md](../notes/opus-ratatosk-init_2026-10-31.md) | Ratatosk_InitializeFromScript (081FAE0C): exact match | #matching #ratatosk #compiler #cse #reload #defaults | 7 |
 | [notes/opus-ratatosk-knockback_2026-10-31.md](../notes/opus-ratatosk-knockback_2026-10-31.md) | Ratatosk_UpdateKnockbackRecovery (081F5290): exact match | #matching #ratatosk #compiler #cse #combine #basic-blocks | 6 |
 | [notes/opus-ratatosk-spawn-particle_2026-10-31.md](../notes/opus-ratatosk-spawn-particle_2026-10-31.md) | Ratatosk_SpawnAnimatedParticle (081FC26C): exact match | #matching #ratatosk #compiler #combine #jump2 #flow #dead-code | 9 |
 | [notes/opus-resolve-damage_2026-10-31.md](../notes/opus-resolve-damage_2026-10-31.md) | SceneActorReaction_ResolveDamage (08135F70): exact match | #matching #scene-actors #damage #compiler #reload #jump2 #cross-jump | 5 |
+| [notes/opus-scene-projectile-pool_2026-10-31.md](../notes/opus-scene-projectile-pool_2026-10-31.md) | SceneProjectile_UpdatePool (081FCA44): exact match | #matching #scene-projectile #ratatosk #compiler #loop #giv #inline #jump2 #cross-jump | 9 |
+| [notes/opus-timed-effect-manager_2026-10-31.md](../notes/opus-timed-effect-manager_2026-10-31.md) | TimedEffect_UpdateManager (081DA3D8): exact match | #matching #timed-effect #compiler #global-alloc #caller-save #cse #abi | 7 |
 | [notes/orbit-background_2026-10-14.md](../notes/orbit-background_2026-10-14.md) | Orbit-positioned background controller |  | 4 |
 | [notes/orbit-number-display_2026-10-14.md](../notes/orbit-number-display_2026-10-14.md) | Rotating contact actor and floating numbers, October 14 | *#actors* | 7 |
 | [notes/orbiting_particles_2026-10-18.md](../notes/orbiting_particles_2026-10-18.md) | Orbiting particles unit consolidation (2026-10-18) | #particles #types #matching | 3 |

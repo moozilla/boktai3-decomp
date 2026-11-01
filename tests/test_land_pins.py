@@ -26,6 +26,11 @@ class LandPins(unittest.TestCase):
     def test_removing_pins_elsewhere_adds_none(self):
         self.assertEqual(land.added_concessions(KEPT + DRAFT, "int G(void) { return 0; }\n" + DRAFT), (0, 0))
 
+    def test_an_empty_do_while_counts_as_a_barrier(self):
+        loop = "int F(void) { do {\n    } while (0);\n    return 0; }\n"
+        self.assertEqual(land.added_concessions(DRAFT, loop), (0, 1))
+        self.assertEqual(land.added_concessions(DRAFT, "int F(void) { do { g(); } while (0); return 0; }\n"), (0, 0))
+
     def test_refusal_names_the_flag_and_the_pins_command(self):
         text = land.pin_refusal("F", 1, 0, "src/fn/f.c")
         self.assertIn("1 register pin.", text)
