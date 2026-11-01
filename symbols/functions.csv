@@ -2903,6 +2903,7 @@ addr,name,mode,confidence,source,notes
 0807CDC4,SceneActorAttachment_FindReachableNeighbor,thumb,low,src-alias,
 0807D1E8,SceneActorPosition_ResolveTaggedPosition,thumb,low,src-alias,
 0807D220,SceneActorAttachment_RetargetNearestPlayer,thumb,low,src-alias,
+0807DB34,SceneActorRecovery_ResumePursuit,thumb,low,src-alias,
 0807E334,SceneActorTerrain_RequestRetreatRoute,thumb,low,src-alias,Tries four cardinal directions; starting opposite the current facing; and requests a path to the selected cell; confidence=low.
 0807E6FC,SceneActorEffects_EmitRandomOffsets,thumb,low,src-alias,
 0807E7B0,SceneActorEffects_AdvanceSteps,thumb,low,src-alias,Advances the embedded effect context the requested number of steps when its state byte is 1

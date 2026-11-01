@@ -9,7 +9,7 @@ s32 Path_GetPointPositionById(u16 *, u32, u32);
 void ProximityVolume_TranslateBounds(void *, struct ContactPosition *);
 void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *);
 void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *);
-void sub_0807DB34(struct SceneActorRegistryResetView *);
+void SceneActorRecovery_ResumePursuit(struct SceneActorRegistryResetView *);
 void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *, s32);
 void sub_0807FCA8(struct SceneActorRegistryResetView *, s32);
 void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *);
@@ -191,7 +191,7 @@ static inline void MonsterInit_InitializeGroup(struct SceneActorChaseGroup *grou
     group->common.field43C = returnToRoute;
     group->common.field440 = 0;
     group->common.control.active = active;
-    group->interactionCallback = sub_0807DB34;
+    group->interactionCallback = SceneActorRecovery_ResumePursuit;
     group->field608 = 0;
     group->responseCallback = 0;
     group->field620 = 0;
