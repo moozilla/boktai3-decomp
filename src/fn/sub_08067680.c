@@ -147,7 +147,6 @@ static inline u16 *Step(struct SceneActorControlSlot *slot,
 static inline u8 *PreserveKind(u8 *flip, u32 value)
 {
     u32 one = value;
-    asm("" : : "r"(one), "r"(flip));
     return flip;
 }
 s32 SceneActorControl_CreateFromPosition(const struct SceneActorControlInput *argument)
@@ -173,7 +172,7 @@ s32 SceneActorControl_CreateFromPosition(const struct SceneActorControlInput *ar
         goto failure;
     {
         register u32 zero asm("r5") = 0;
-        register u32 one asm("r0") = 1;
+        u32 one = 1;
         slot->kind = one;
         SceneActorControl_DecodeDirection(input, &unused, PreserveKind(&sequence, one));
         saved = &slot->savedPosition;

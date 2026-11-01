@@ -1,9 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 /* tentative: falls under gravity, lands with a sound and switches to the active state */
 
-#include "actor_attachment_sprite_playback.h"
+#include "player_cue_sequence.h"
 #include "background_controller.h"
 
 struct BurstPos {
@@ -63,7 +62,7 @@ void ParticleBurstEffect_UpdateFalling(struct BurstEntry *p)
         dst->y = ((s32)(pos->z + (pos->y + yOff)) >> 12) + 0x60;
         dst->z = pos->z >> 12;
     }
-    ActorAttachment_StepSprite(&p->sprite, &p->anim);
+    PlayerCue_StepSequenceEnded(&p->sprite, &p->anim);
     Collider_SetFixedPositionWithYOffset(p->collider, &p->position, p->yOffset);
     SpatialIndex_InsertEntry(p->collider);
 }

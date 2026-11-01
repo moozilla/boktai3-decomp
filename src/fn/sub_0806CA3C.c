@@ -147,7 +147,7 @@ void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *positio
     s32 savedDirection = direction;
     struct SceneSteeringActorPool *pool;
     struct SceneSteeringActor *slot;
-    register u32 zero asm("r8");
+    u32 zero;
     u32 one;
     struct SceneSteeringActor *sprite;
     register struct DisplaySequenceState *sequence asm("r5");
@@ -169,7 +169,6 @@ void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *positio
         u32 temp = 0;
         zero = temp;
         *state = 2;
-        asm("" : "+r"(zero));
     }
     slot->lifetime = 120;
     {

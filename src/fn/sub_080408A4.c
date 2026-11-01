@@ -7,7 +7,7 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
 {
     struct ModifierGraphicsResource *resource;
     struct SceneVec origin;
-    register u32 attribute asm("r8");
+    u32 attribute;
     struct SceneVec *originPointer;
     struct ModifierDisplayObject *object;
     struct ModifierGraphicsResource *graphics;
@@ -44,7 +44,6 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
     object->y = 8;
     object = &menu->displays[14];
     attribute = 0;
-    asm("" : "+r"(attribute));
     remaining = 3;
     do {
         Anim_LoadKeyframe(object, &menu->graphicsA, 0x50, 0);

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "ram.h"
+#include "player_cue_sequence.h"
 
 struct NidhoggrPoolSequence {
     const volatile u16 *commands;
@@ -48,95 +49,7 @@ void ScenePanelEffect_CreatePositionEffect(struct NidhoggrEffectVector *, void *
 
 static inline void StepSequence(struct NidhoggrAnimatedSlot *owner)
 {
-    struct NidhoggrPoolSprite *sprite = &owner->sprite;
-    struct NidhoggrPoolSequence *state = &owner->sequence;
-    const volatile u16 *command = state->commands + state->index;
-    u32 duration, flags, bit;
-    sprite->frame = *command >> 6;
-    {
-        u32 input = state->flags;
-        register u32 first asm("r1");
-        u32 one = 1;
-        bit = one;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        u32 bit = 2;
-        register u32 first asm("r1");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r1");
-        u8 savedDuration;
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        asm("" : "+r"(mask));
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold)
-                        state->elapsed = savedDuration;
-                    else
-                        state->index = state->frameCount - 1;
-                } else {
-                    state->index = index - 1;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        state->index = frameCount - 1;
-                    } else
-                        state->index = 0;
-                }
-            }
-            command = state->commands + state->index;
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
-        }
-    }
+    PlayerCue_StepSequence(&owner->sprite, &owner->sequence);
 }
 
 static inline s32 RandomValue(void)
@@ -172,7 +85,6 @@ void Nidhoggr_UpdateOwnedSeekingEffect(struct NidhoggrAnimatedSlot *owner)
             struct NidhoggrTarget *target = *targetSlot;
             s32 targetX = target->x;
             /* Keep both address values live through the signed coordinate load. */
-            asm("" : : "r"(targetSlot), "r"(stateOffset));
             dx = targetX - (s16)owner->sprite.position.x;
             dy = target->y - (s16)owner->sprite.position.y;
             dz = target->z - (s16)owner->sprite.position.z;

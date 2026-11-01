@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_playback.h"
 void ScenePanelSubject_TickIdle(struct ScenePanelSubject *owner)
 {

@@ -1,6 +1,5 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
-#include "actor_attachment_sprite_playback.h"
+#include "player_cue_sequence.h"
 #include "engine.h"
 #include "ram.h"
 #include "background_controller.h"
@@ -111,7 +110,7 @@ void ParticleEmitter_UpdateFlight(struct Emitter *p)
         dst->y = ((s32)(pos->z + (pos->y + yOff)) >> 12) + 0x60;
         dst->z = pos->z >> 12;
     }
-    ActorAttachment_StepSprite(&p->sprite, &p->anim);
+    PlayerCue_StepSequenceEnded(&p->sprite, &p->anim);
     p->sprite.flags |= 12;
     if (HeightProbe_IsBelowLimit(p)) {
         p->update = ParticleEmitter_UpdateScatterTrail;

@@ -6,7 +6,7 @@ void SceneActorControl_OnIdle(void);
 void Sound_PlaySong(u32);
 static inline u8 Blocked(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *s asm("r12") = input;
+    struct SceneActorRegistryResetView *s = input;
     if (!s)
         goto zero;
     {
@@ -40,7 +40,7 @@ static inline void ColliderFlag(struct ContactCollider *c)
 void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
                                 struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *s asm("r12") = input;
+    struct SceneActorRegistryResetView *s = input;
     if (!Blocked(s)) {
         register u32 mask asm("r1") = 0x4000;
         u16 zero = s->flags2D4 & mask;

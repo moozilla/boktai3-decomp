@@ -54,8 +54,7 @@ void RouteSpriteActor_TickHopToRandomPoint(struct RouteSpritePool *pool,
     if (!actor->animationEnded) {
         u32 ended = RouteSpriteActor_StepPlayback(actor);
         {
-            register u32 endedOffset asm("r6") = 0x158;
-            asm("" : "+r"(endedOffset));
+            u32 endedOffset = 0x158;
             {
                 register u8 *endedFlag asm("r0") = (u8 *)((u32)actor + endedOffset);
                 *endedFlag = ended;

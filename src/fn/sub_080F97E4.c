@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 // confidence=low: converges saved motion, then enables the axe recovery behavior.
 
@@ -26,8 +25,9 @@ static inline u8 AtRest(s32 x, s32 z)
 
 static inline void SetFlags(struct SceneActorRegistryResetView *a, u32 m)
 {
-    asm("" : "+r"(m));
-    a->flags2D4 = m | a->flags2D4;
+    u32 v = m;
+    v |= a->flags2D4;
+    a->flags2D4 = v;
 }
 static inline void SetForced(struct SceneActorRegistryResetView *a, u32 m)
 {

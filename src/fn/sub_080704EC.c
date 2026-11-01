@@ -7,7 +7,7 @@ void SceneActorTerrain_DisableCollision(struct SceneActorRegistryActor *);
 void SceneActorRecord_RecordPair(u32, u32);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *input)
 {
-    register struct SceneActorRegistryActor *actor asm("r4") = input;
+    struct SceneActorRegistryActor *actor = input;
     if (!actor)
         goto zero;
     {
@@ -57,7 +57,7 @@ static inline u32 ReadSuppressionFlag(struct SceneActorRegistryActor *actor)
 void SceneActorRegistry_DefeatActorsFromScript(void)
 {
     struct SceneActorRegistryNode *node;
-    register struct SceneActorRegistryActor *actor asm("r4");
+    struct SceneActorRegistryActor *actor;
     u32 special;
     u32 category;
     SceneActorRegistry_GetManager();
@@ -198,7 +198,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                     u32 specialCopy = special;
                     if (specialCopy) {
                         u32 offset;
-                        register u32 *field asm("r1");
+                        u32 *field;
                         u32 value;
                         specialCopy = 0x400000;
                         offset = 0x2d0;

@@ -54,7 +54,7 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
     if (p->changed) {
         p->changed = 0;
         if (!p->variant) {
-            register int sequence asm("r6");
+            int sequence;
             p->variant = 1;
             p->scaleStep = 32;
             sequence = choose(p->mode, 45, 7);
@@ -64,7 +64,7 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
                                                       sequence, 2, 1, 4);
             }
         } else {
-            register int sequence asm("r6");
+            int sequence;
             p->variant = 0;
             p->scaleStep = -32;
             sequence = choose(p->mode, 47, 9);
@@ -110,7 +110,7 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
                                                   2, 1, 1);
         }
     } else if (p2->scale > 319) {
-        register int sequence asm("r6");
+        int sequence;
         eightMode = p2->mode;
         variant = 1;
     eightSelection:
