@@ -139,7 +139,9 @@ python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
 python3 tools/scope/scope.py FILE.c shape [FUNC]  the diff with low registers blanked: order and shape differences only
-python3 tools/scope/scope.py FILE.c frame [FUNC]  stack slots, ROM against draft, with the pseudo (C variable) reload put in each
+python3 tools/scope/scope.py FILE.c frame [FUNC]  stack slots, ROM against draft, with the pseudo (C variable) reload put in each;
+                                                  a ROM slot holding a pool constant names the draft pseudo whose REG_EQUIV
+                                                  keeps it out of memory and scores AGBCC_NOEQUIV on it (fact 32)
 python3 tools/scope/scope.py FILE.c preorder [FUNC]  the ROM's order of PRE's spilled field addresses against gcse's hash table:
                                                   the model checked on the draft, the slots out of order, the table sizes
                                                   (insn counts) and pseudo renumberings that give the ROM's order, and the
@@ -759,8 +761,12 @@ Each was read from the compiler source and confirmed on a live draft.
    logs these sets; `why` explains from it.
 
 17. **flow measures lives before combine.** The pass order is cse2, flow,
-   combine, regmove, lreg: REG_LIVE_LENGTH and REG_N_REFS come from the RTL
-   as expand and cse left it. RTL that combine later folds away (a type
+   combine, regmove, lreg: REG_LIVE_LENGTH and REG_BASIC_BLOCK come from the RTL
+   as expand and cse left it. REG_N_SETS and REG_N_REFS do not: toplev.c calls
+   recompute_reg_usage (flow.c) right before regclass and local-alloc, which
+   recounts them from the RTL combine and regmove left, by loop depth, so a set
+   or use that combine removes counts nowhere (the flow and lreg dumps' `used N
+   times` differ). RTL that combine later folds away (a type
    conversion's extension whose result is known narrow, a copy combine
    merges) still lengthens every value live across it. That makes parameter
    and variable types a lever on allocation order that leaves the
@@ -953,6 +959,21 @@ Each was read from the compiler source and confirmed on a live draft.
    reason fact 30 gives. `preorder` now lists the body lines that load an offset when
    the order needs fewer insns. A `do { } while (0)` costs two insns into gcse (and is a
    barrier).
+32. **Reload evicts by refs times the number of usable registers at or above it.**
+   order_regs_for_reload (reload1.c) resets `hard_reg_n_uses[i]` at iteration i and
+   then adds every live pseudo's REG_N_REFS to its own register's count, so register
+   r ends with refs x (usable registers numbered r or higher: not fixed, not live as
+   a hard register across the insn). In a Thumb body r0 counts 12, r1 11, r4 8, r5 7.
+   A pseudo in a high-numbered register is cheaper to evict at equal refs.
+   ChargedBurst_EmitSpark: at the x jitter's add (insn 178, `AGBCC_RTRACE=1`) reload
+   needs two low registers. r3 is free, then r5 (the table, 4 refs: 28) beats r4 (the
+   0x3FF mask, 4 refs: 32) and r1 (the position address, 3 refs: 33). With the table
+   at 5 refs (35), reload takes r4 and rematerializes the mask instead. So a lever
+   that removes the table's equivalence by giving its variable another set (fact 20,
+   or a live CLOBBER) only works when the competitors' counts leave room for the
+   extra ref. `frame` now names ROM slots that hold a pool constant (stored once,
+   right after its `ldr rN, =C`), the draft pseudo whose REG_EQUIV keeps it out of
+   memory, and the score with `AGBCC_NOEQUIV` on it.
 
 32. **An and is tied to its first operand: write the constant first to keep it.** Thumb's
    `ands` is two-operand, and regmove ties the result to operand 1 of the `and` RTL. C's
@@ -1120,6 +1141,13 @@ which is exactly `10:1`. Not tested.
 * check.py prints raw hex when run outside the venv (no capstone).
 * agbccsrc.py keyword lookup returns unrelated sections.
 * `tools/worktree.sh` does not build scope's compiler in new worktrees: run `sh tools/scope/build_agbcc.sh` once.
+* scope itself, fixed (2026-11-01): a knob set in the environment
+  (`AGBCC_NOEQUIV=36 scope.py FILE.c`) reached the `-g` compile through
+  os.environ but not the fork server's plain compile, which takes knobs only
+  with each request. The build's bytes came out without the knob, and scope
+  printed "-g changes agbcc's code ... the -g compile MATCHES" for what was the
+  knob's effect. resolve_knobs now copies every AGBCC_/CSE_ variable into the
+  request, so both compiles see the same knobs.
 * scope itself, fixed: `FILE.c insn UID` used to treat `insn` as the function
   name; high registers (sb/sl/fp/ip) were not parsed, which mis-paired ROM and
   draft operands; positional operand pairing reported reload registers as a
