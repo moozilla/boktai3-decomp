@@ -122,7 +122,6 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
     struct CollisionSprite *o;
     struct CollisionAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     u8 done;
     if (p->entered) {
         p->entered = 0;
@@ -158,25 +157,28 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
                 }
             }
             {
-                u32 input = a->flags;
-                register u32 left asm("r1") = firstMask;
-                left &= input;
-                if (left != (((*entry & 0x30) >> 4) & firstMask))
+                union DisplaySequenceControl control;
+                u32 bit, first;
+                control.raw = a->flags;
+                bit = firstMask;
+                first = (u8)(control.raw & bit);
+                if (first != (((*entry & 0x30) >> 4) & bit))
                     o->flags |= 4;
                 else
                     o->flags &= ~4;
             }
             {
-                register u32 input asm("r0") = a->flags;
-                u32 mask = 2;
-                u32 left = (u8)(mask & input);
-                if (left != (((*entry & 0x30) >> 4) & mask))
+                union DisplaySequenceControl control;
+                u32 bit, first;
+                control.raw = a->flags;
+                bit = 2;
+                first = (u8)(control.raw & bit);
+                if (first != (((*entry & 0x30) >> 4) & bit))
                     o->flags |= 8;
                 else
                     o->flags &= ~8;
             }
-            n = ++a->timer;
-            if (n >= a->rate) {
+            if (++a->timer >= a->rate) {
                 a->timer = 0;
                 if (a->flags & 4) {
                     if (a->frame == 0) {
