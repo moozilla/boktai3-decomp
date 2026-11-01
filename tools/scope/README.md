@@ -295,6 +295,20 @@ syntax). Added in this thread (in `tools/scope/agbcc.patch`):
   being processed), `newlastuid=`/`firstlastuid=` (the last-use insns
   compared) and `head=` (the class head after the decision); `CSE_WHY` class
   rows carry `canon N`, the member's current class head.
+* `AGBCC_NOREG=REG,...`: local and global allocation leave those pseudos
+  without a hard register. Reload then gives each one a stack slot, or
+  substitutes its REG_EQUIV value (a constant or a memory read) at every use.
+  A ROM operand that is read from memory straight into a reload register, with
+  no allocated register of its own, looks like this (`mov r3, r8; ldrh r3,
+  [r3]; adds r0, r1, r3` in ActorMarker_LaunchFragments).
+* `AGBCC_COMBKEEP=REG,...`: combine never merges an insn that sets one of
+  those pseudos into another insn (the what-if for a load or copy the ROM
+  keeps).
+* `AGBCC_RTRACE=1`: a reload trace in stderr: pseudos kicked out of spill
+  registers (`RT kick`), each spill register chosen for an insn (`RT insn U
+  spill rN`), the spill cost order at each insn with reloads (`RT order`,
+  ascending uses), and the output-reload deletion decisions (`try
+  delete_output_reload`, `inherit rN store=UID`, `dor ...`).
 
 With no knobs set the instrumented compiler emits the same code as agbcc
 (checked on 62 files, default and NONMATCHING, after these additions; again
