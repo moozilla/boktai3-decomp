@@ -1,15 +1,18 @@
 --- a/local-alloc.c
 +++ b/local-alloc.c
-@@ -70,6 +70,325 @@
+@@ -69,6 +69,327 @@
+ #include "insn-config.h"
  #include "insn-attr.h"
  #include "recog.h"
- #include "output.h"
++#include "output.h"
 +
 +/* Instrumentation for tools/rasolve.py (Boktai 3 decomp). Never used by the
 +   real build: this copy of agbcc lives in build/agbcc-instr.
 +     AGBCC_PRI="reg:delta,..."   add DELTA to pseudo REG's allocation priority
 +     AGBCC_FORCE="reg:hard,..."  allocate pseudo REG to hard register HARD
-+     AGBCC_DUMPPRI=FILE          append each pseudo's priority and register  */
++     AGBCC_DUMPPRI=FILE          append each pseudo's priority and register
++     AGBCC_NOREG="reg,..."       never give pseudo REG a hard register  */
++int agbcc_list_has ();
 +#define AGBCC_MAXREG 40000
 +int agbcc_pri_delta[AGBCC_MAXREG];
 +int agbcc_force[AGBCC_MAXREG];
@@ -322,11 +325,10 @@
 +    agbcc_dump = fopen (e, "a");
 +}
 +#undef done
-+#include "output.h"
+ #include "output.h"
  #include "toplev.h"
  
- /* Next quantity number available for allocation.  */
-@@ -249,6 +568,8 @@
+@@ -249,6 +570,8 @@
  static int qty_sugg_compare    	(int, int);
  static int qty_sugg_compare_1	(const void *, const void *);
  static int qty_compare    	(int, int);
@@ -335,7 +337,7 @@
  static int qty_compare_1	(const void *, const void *);
  static int combine_regs		(rtx, rtx, int, int, rtx, int);
  static int reg_meets_class_p	(int, enum reg_class);
-@@ -298,6 +619,9 @@
+@@ -298,6 +621,9 @@
    register int b, i;
    int max_qty;
  
@@ -345,10 +347,22 @@
    /* Leaf functions and non-leaf functions have different needs.
       If defined, let the machine say what kind of ordering we
       should use.  */
-@@ -1005,6 +1329,28 @@
+@@ -356,7 +682,9 @@
+ 
+   for (i = FIRST_PSEUDO_REGISTER; i < max_regno; i++)
+     {
+-      if (REG_BASIC_BLOCK (i) >= 0 && REG_N_DEATHS (i) == 1
++      if (agbcc_list_has ("AGBCC_NOREG", i))
++	reg_qty[i] = -1;
++      else if (REG_BASIC_BLOCK (i) >= 0 && REG_N_DEATHS (i) == 1
+ 	  && (reg_alternate_class (i) == NO_REGS
+ 	      || ! CLASS_LIKELY_SPILLED_P (reg_preferred_class (i))))
+ 	reg_qty[i] = -2;
+@@ -1004,6 +1332,51 @@
+ 
  /* Allocate hard regs to the pseudo regs used only within block number B.
     Only the pseudos that die but once can be handled.  */
- 
++
 +/* AGBCC_NOTIE=uid,uid,...: never tie an output to an input at these insns
 +   (explain.py's counterfactual probes).  */
 +static int
@@ -370,11 +384,33 @@
 +  return 0;
 +}
 +
-+
++/* Whether the comma-separated list in environment variable NAME contains V.
++   AGBCC_NOREG=reg,...: local and global allocation leave these pseudos
++   without a hard register (reload then gives them a stack slot or
++   substitutes their REG_EQUIV value).  */
++int
++agbcc_list_has (name, v)
++     char *name;
++     int v;
++{
++  char *e = getenv (name);
++  if (!e)
++    return 0;
++  while (*e)
++    {
++      if (atoi (e) == v)
++	return 1;
++      while (*e && *e != ',')
++	e++;
++      if (*e == ',')
++	e++;
++    }
++  return 0;
++}
+ 
  static void
  block_alloc (b)
-      int b;
-@@ -1168,7 +1514,7 @@
+@@ -1168,7 +1541,7 @@
  			   );
  		      
  		      if (GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG)
@@ -383,7 +419,7 @@
  					    insn_number, insn, 0);
  		    }
  		  if (win)
-@@ -1204,12 +1550,12 @@
+@@ -1204,12 +1577,12 @@
  	      if (r1 = XEXP (note, 0), GET_CODE (r1) == REG
  		  /* Check that we have such a sequence.  */
  		  && no_conflict_p (insn, r0, r1))
@@ -398,7 +434,7 @@
  
  	      /* Here we care if the operation to be computed is
  		 commutative.  */
-@@ -1219,7 +1565,7 @@
+@@ -1219,7 +1592,7 @@
  		       && (r1 = XEXP (XEXP (note, 0), 1),
  			   (GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG))
  		       && no_conflict_p (insn, r0, r1))
@@ -407,12 +443,10 @@
  
  	      /* If we did combine something, show the register number
  		 in question so that we know to ignore its death.  */
-@@ -1328,6 +1674,21 @@
- 
-     default:
+@@ -1330,12 +1703,29 @@
        qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
-+    }
-+
+     }
+ 
 +  /* Instrumentation: forced quantities take their register first.  */
 +  agbcc_instr_init ();
 +  qty_forced = (char *) alloca (next_qty + 1);
@@ -426,10 +460,11 @@
 +	  qty_phys_reg[i] = agbcc_force[r];
 +	  post_mark_life (agbcc_force[r], qty_mode[i], 1, qty_birth[i], qty_death[i]);
 +	}
-     }
- 
++    }
++
    /* Try to put each quantity in a suggested physical register, if it has one.
-@@ -1336,6 +1697,8 @@
+      This may cause registers to be allocated that otherwise wouldn't be, but
+      this seems acceptable in local allocation (unlike global allocation).  */
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -438,7 +473,7 @@
        if (qty_phys_num_sugg[q] != 0 || qty_phys_num_copy_sugg[q] != 0)
  	qty_phys_reg[q] = find_free_reg (qty_min_class[q], qty_mode[q], q,
  					 0, 1, qty_birth[q], qty_death[q]);
-@@ -1387,7 +1750,7 @@
+@@ -1387,7 +1777,7 @@
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -447,7 +482,7 @@
  	{
  	  if (N_REG_CLASSES > 1)
  	    {
-@@ -1414,6 +1777,13 @@
+@@ -1414,6 +1804,13 @@
  	for (i = qty_first_reg[q]; i >= 0; i = reg_next_in_qty[i])
  	  reg_renumber[i] = qty_phys_reg[q] + reg_offset[i];
        }
@@ -461,7 +496,7 @@
  }
  
  /* Compare two quantities' priority for getting real registers.
-@@ -1432,11 +1802,21 @@
+@@ -1432,9 +1829,19 @@
     Multiplying this by 10000 can't overflow.
     QTY_CMP_PRI is also used by qty_sugg_compare.  */
  
@@ -472,19 +507,17 @@
 +#define QTY_CMP_PRI(q) (QTY_CMP_PRI_BASE (q) \
 +  + (qty_first_reg[q] >= 0 && qty_first_reg[q] < AGBCC_MAXREG \
 +     ? agbcc_pri_delta[qty_first_reg[q]] : 0))
- 
- static int
++
++static int
 +qty_compare_pri (q)
 +     int q;
 +{
 +  return QTY_CMP_PRI (q);
 +}
-+
-+static int
+ 
+ static int
  qty_compare (q1, q2)
-      int q1, q2;
- {
-@@ -1505,6 +1885,7 @@
+@@ -1505,6 +1912,7 @@
  
  #undef QTY_CMP_SUGG
  #undef QTY_CMP_PRI
@@ -494,12 +527,13 @@
     Returns 1 if have done so, or 0 if cannot.
 --- a/global.c
 +++ b/global.c
-@@ -263,6 +263,13 @@
+@@ -263,6 +263,14 @@
  
  static HARD_REG_SET eliminable_regset;
  
 +extern int agbcc_pri_delta[];
 +extern int agbcc_force[];
++extern int agbcc_list_has ();
 +extern FILE *agbcc_dump;
 +extern void agbcc_instr_init ();
 +extern char *agbcc_name_get ();
@@ -508,7 +542,7 @@
  static int allocno_compare	(const void *, const void *);
  static void global_conflicts	(void);
  static void expand_preferences	(void);
-@@ -562,6 +569,13 @@
+@@ -562,6 +570,13 @@
      gcc_obstack_init (&global_obstack);
  
      global_init (file);
@@ -522,10 +556,20 @@
    
      for (i = 0; i < (size_t) max_allocno; i++)
      {
-@@ -583,6 +597,22 @@
+@@ -574,6 +589,8 @@
+             /* If we have more than one register class,
+                first try allocating in the class that is cheapest
+                for this pseudo-reg.  If that fails, try any reg.  */
++            if (agbcc_list_has ("AGBCC_NOREG", regno))
++              continue;
+             if (reg_renumber[regno] < 0 && N_REG_CLASSES > 1)
+               find_reg (order, 0, 0, 0, 0);
+ 
+@@ -582,6 +599,22 @@
+               find_reg (order, 0, 1, 0, 0);
          }
      }
- 
++
 +    if (agbcc_dump)
 +      for (i = 0; i < (size_t) max_allocno; i++)
 +	fprintf (agbcc_dump, "G %s %d %d %d %d %d %d %s\n", current_function_name,
@@ -541,11 +585,10 @@
 +		 allocno_calls_crossed[allocno_order[i]],
 +		 reg_renumber[allocno_reg[allocno_order[i]]],
 +		 agbcc_pseudo_label (allocno_reg[allocno_order[i]]));
-+
+ 
      /* Do the reloads now while the allocno data still exist, so that we can
         try to assign new hard regs to any pseudo regs that are spilled.  */
- 
-@@ -622,6 +652,10 @@
+@@ -622,6 +655,10 @@
      = (((double) (floor_log2 (allocno_n_refs[v2]) * allocno_n_refs[v2])
  	/ allocno_live_length[v2])
         * 10000 * allocno_size[v2]);
@@ -556,7 +599,7 @@
    if (pri2 - pri1)
      return pri2 - pri1;
  
-@@ -939,6 +973,8 @@
+@@ -939,6 +976,8 @@
    HARD_REG_SET used_nopref;
    register int pseudo = allocno_reg[allocno];
    /* END CYGNUS LOCAL */
@@ -565,17 +608,17 @@
  
    enum reg_class class = (alt_regs_p
  			  ? reg_alternate_class (allocno_reg[allocno])
-@@ -1012,6 +1048,9 @@
- 	    }
+@@ -1013,6 +1052,9 @@
  	  }
        }
-+
+ 
 +  agbcc_first = best_reg;
 +  agbcc_pass = pass - 1;
- 
++
    /* See if there is a preferred register with the same class as the register
       we allocated above.  Making this restriction prevents register
-@@ -1024,6 +1063,14 @@
+      preferencing from creating worse register allocation.
+@@ -1024,6 +1066,14 @@
       First do this for those register with copy preferences, then all
       preferred registers.  */
  
@@ -590,7 +633,7 @@
    AND_COMPL_HARD_REG_SET (hard_reg_copy_preferences[allocno], used);
    GO_IF_HARD_REG_SUBSET (hard_reg_copy_preferences[allocno],
  			 reg_class_contents[(int) NO_REGS], no_copy_prefs);
-@@ -1186,6 +1233,28 @@
+@@ -1186,6 +1236,28 @@
      }
  
    /* Did we find a register?  */
@@ -619,7 +662,7 @@
  
    if (best_reg >= 0)
      {
-@@ -1221,6 +1290,23 @@
+@@ -1221,6 +1293,23 @@
      }
  }
  
@@ -776,7 +819,29 @@
        if (addr)
  	{
  	  if (reg_renumber[i] < 0)
-@@ -2257,6 +2359,11 @@
+@@ -1713,6 +1815,12 @@
+     if (r <= spill_regs[i] && r + nregs > spill_regs[i])
+       {
+ 	SET_REGNO_REG_SET (spilled_pseudos, reg);
++	/* Boktai 3 decomp instrumentation (tools/scope): AGBCC_RTRACE=1 traces
++	   on stderr the pseudos kicked out of spill registers, each spill
++	   register chosen for an insn, the spill cost order, and the
++	   decisions about deleting output reloads.  */
++	if (getenv ("AGBCC_RTRACE"))
++	  fprintf (stderr, "RT kick pseudo %d from r%d\n", reg, r);
+ 	return;
+       }
+ }
+@@ -2167,6 +2275,8 @@
+       return;
+     }
+ 
++  if (getenv ("AGBCC_RTRACE"))
++    fprintf (stderr, "RT insn %d spill r%d (class %d)\n", INSN_UID (chain->insn), regno, class);
+   /* Make reg REGNO an additional reload reg.  */
+ 
+   potential_reload_regs[i] = -1;
+@@ -2257,6 +2367,11 @@
      {
        register rtx x;
        int inherent_size = PSEUDO_REGNO_BYTES (i);
@@ -788,10 +853,26 @@
        int total_size = MAX (inherent_size, reg_max_ref_width[i]);
        int adjust = 0;
  
-@@ -5028,6 +5135,91 @@
+@@ -3842,6 +3957,14 @@
+   for (i = 0; i < FIRST_PSEUDO_REGISTER; i++)
+     if (TEST_HARD_REG_BIT (bad_spill_regs, hard_reg_n_uses[i].regno))
+       potential_reload_regs[o++] = hard_reg_n_uses[i].regno;
++  if (getenv ("AGBCC_RTRACE"))
++    {
++      fprintf (stderr, "RT order insn %d:", INSN_UID (chain->insn));
++      for (i = 0; i < FIRST_PSEUDO_REGISTER; i++)
++	if (! TEST_HARD_REG_BIT (bad_spill_regs, hard_reg_n_uses[i].regno))
++	  fprintf (stderr, " r%d=%d", hard_reg_n_uses[i].regno, hard_reg_n_uses[i].uses);
++      fprintf (stderr, "\n");
++    }
+ }
+ 
+ /* Reload pseudo-registers into hard regs around each insn as needed.
+@@ -5027,7 +5150,92 @@
+ 
     If NOERROR is nonzero, we return 1 if successful,
     or 0 if we couldn't find a spill reg and we didn't change anything.  */
- 
++
 +/* The label of reload R's value: "=constant", "regN" or "-".  */
 +static char *
 +agbcc_reload_label (r)
@@ -813,7 +894,7 @@
 +    }
 +  return "-";
 +}
-+
+ 
 +/* AGBCC_DUMPPRI: after reload choice K (an R line), one X line with the rotation
 +   it scanned: the index it started after (START, -1 = from the first) and every
 +   spill register's standing at this insn, in spill_regs order:
@@ -880,7 +961,7 @@
  static int
  allocate_reload_reg (chain, r, last_reload, noerror)
       struct insn_chain *chain;
-@@ -5066,6 +5258,28 @@
+@@ -5066,6 +5274,28 @@
       reloads A and B can share regs.  These need two regs.
       Suppose A and B are given different regs.
       That leaves none for C.  */
@@ -909,7 +990,7 @@
    for (pass = 0; pass < 2; pass++)
      {
        /* I is the index in spill_regs.
-@@ -5194,6 +5408,8 @@
+@@ -5194,6 +5424,8 @@
  	       && ! HARD_REGNO_MODE_OK (regno, GET_MODE (reload_out[r]))))
  	  {
  	    /* The reg is OK.  */
@@ -918,7 +999,7 @@
  	    last_spill_reg = i;
  
  	    /* Mark as in use for this insn the reload regs we use
-@@ -5203,6 +5419,29 @@
+@@ -5203,6 +5435,29 @@
  
  	    reload_reg_rtx[r] = new;
  	    reload_spill_index[r] = spill_regs[i];
@@ -948,7 +1029,7 @@
  	    return 1;
  	  }
      }
-@@ -5617,6 +5856,10 @@
+@@ -5617,6 +5872,10 @@
  			      reload_override_in[r] = last_reg;
  			      reload_inheritance_insn[r]
  				= reg_reloaded_insn[i];
@@ -959,7 +1040,7 @@
  			    }
  			  else
  			    {
-@@ -5632,6 +5875,10 @@
+@@ -5632,6 +5891,10 @@
  			      reload_inherited[r] = 1;
  			      reload_inheritance_insn[r]
  				= reg_reloaded_insn[i];
@@ -970,6 +1051,57 @@
  			      reload_spill_index[r] = i;
  			      for (k = 0; k < nr; k++)
  				SET_HARD_REG_BIT (reload_reg_used_for_inherit,
+@@ -6691,7 +6954,18 @@
+ 			     spill_reg_stored_to[REGNO (reload_reg_rtx[j])])
+ 	      || rtx_equal_p (spill_reg_stored_to[REGNO (reload_reg_rtx[j])],
+ 			      reload_out_reg[j])))
+-	delete_output_reload (insn, j, REGNO (reload_reg_rtx[j]));
++	{
++	  if (getenv ("AGBCC_RTRACE"))
++	    fprintf (stderr, "RT insn %d try delete_output_reload r%d\n", INSN_UID (insn), REGNO (reload_reg_rtx[j]));
++	  delete_output_reload (insn, j, REGNO (reload_reg_rtx[j]));
++	}
++      else if (getenv ("AGBCC_RTRACE") && optimize
++	       && (reload_inherited[j] || reload_override_in[j])
++	       && reload_reg_rtx[j] && GET_CODE (reload_reg_rtx[j]) == REG)
++	fprintf (stderr, "RT insn %d inherit r%d store=%d deadorset=%d\n", INSN_UID (insn),
++		 REGNO (reload_reg_rtx[j]),
++		 spill_reg_store[REGNO (reload_reg_rtx[j])] ? INSN_UID (spill_reg_store[REGNO (reload_reg_rtx[j])]) : 0,
++		 spill_reg_store[REGNO (reload_reg_rtx[j])] ? dead_or_set_p (insn, spill_reg_stored_to[REGNO (reload_reg_rtx[j])]) : -1);
+ 
+       /* Input-reloading is done.  Now do output-reloading,
+ 	 storing the value from the reload-register after the main insn
+@@ -7567,6 +7841,8 @@
+   n_occurrences = count_occurrences (PATTERN (insn), reg);
+   if (substed)
+     n_occurrences += count_occurrences (PATTERN (insn), substed);
++  if (getenv ("AGBCC_RTRACE"))
++    fprintf (stderr, "RT dor insn %d reg %d occ=%d inh=%d\n", INSN_UID (insn), REGNO (reg), n_occurrences, n_inherited);
+   if (n_occurrences > n_inherited)
+     return;
+ 
+@@ -7579,7 +7855,11 @@
+        i1 != insn; i1 = NEXT_INSN (i1))
+     {
+       if (GET_CODE (i1) == CODE_LABEL || GET_CODE (i1) == JUMP_INSN)
+-	return;
++	{
++	  if (getenv ("AGBCC_RTRACE"))
++	    fprintf (stderr, "RT dor label/jump %d\n", INSN_UID (i1));
++	  return;
++	}
+       if ((GET_CODE (i1) == INSN || GET_CODE (i1) == CALL_INSN)
+ 	  && reg_mentioned_p (reg, PATTERN (i1)))
+ 	{
+@@ -7592,6 +7872,8 @@
+ 	    }
+ 	  if (n_occurrences <= n_inherited && i1 == insn)
+ 	    break;
++	  if (getenv ("AGBCC_RTRACE"))
++	    fprintf (stderr, "RT dor ref between %d occ=%d inh=%d\n", INSN_UID (i1), n_occurrences, n_inherited);
+ 	  return;
+ 	}
+     }
 --- a/stmt.c
 +++ b/stmt.c
 @@ -49,6 +49,7 @@
@@ -1671,3 +1803,26 @@
  
        for (lnote = REG_NOTES (newlpos); lnote; lnote = XEXP (lnote, 1))
  	if ((REG_NOTE_KIND (lnote) == REG_EQUAL
+--- a/combine.c
++++ b/combine.c
+@@ -1518,6 +1518,20 @@
+     }
+ #endif
+ 
++  /* Boktai 3 decomp instrumentation (tools/scope): AGBCC_COMBKEEP=reg,...
++     keeps every insn that sets one of these pseudos out of combinations.  */
++  {
++    extern int agbcc_list_has ();
++    rtx s2 = single_set (i2), s1 = i1 ? single_set (i1) : 0;
++    if ((s2 && GET_CODE (SET_DEST (s2)) == REG
++	 && agbcc_list_has ("AGBCC_COMBKEEP", REGNO (SET_DEST (s2))))
++	|| (s1 && GET_CODE (SET_DEST (s1)) == REG
++	    && agbcc_list_has ("AGBCC_COMBKEEP", REGNO (SET_DEST (s1)))))
++      {
++	undo_all ();
++	return 0;
++      }
++  }
+   /* Verify that I2 and I1 are valid for combining.  */
+   if (! can_combine_p (i2, i3, i1, NULL_RTX, &i2dest, &i2src)
+       || (i1 && ! can_combine_p (i1, i3, NULL_RTX, i2, &i1dest, &i1src)))
