@@ -1,7 +1,3 @@
-#ifdef NONMATCHING
-// fuzzy: 95.3%
-// fix.py best (sweep after the inlined-insn fix)
-// Reviewed original extent: 384 bytes; candidate is 380 bytes. Initialization ordering/allocation differs.
 #include "contact_actor.h"
 void Shadow_Initialize(void *, void *, s32);
 void ContactActor_ApplyHealthContact(struct ContactCollider *, struct ContactCollider *,
@@ -9,14 +5,17 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *, struct ContactCol
 void ContactActor_ApplyResourceContact(void *, struct ContactCollider *, struct ContactActor *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
-inline static u32 Arg1(u32 k_, struct ContactActor *slot)
+static inline void *SlotSpritePosition(struct ContactActor *slot)
 {
-    return ((u8 *)slot) + k_;
+    return slot->sprite.unknown1C;
 }
 
+static inline void SelectSlotPalette(void *graphics)
+{
+    AnimData_SelectPaletteBank(graphics, 0x2D3);
+}
 u32 ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactActor *slot)
 {
-    u32 zero;
     struct ContactPackedVector bounds;
     struct ContactPackedVector offset;
     void *graphics;
@@ -24,20 +23,21 @@ u32 ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactAct
     void *shadow;
     struct ContactCollider *collider;
     const struct ContactPosition *position;
+    u16 initialFrame[] = {0};
     slot->state = 0;
-    slot->stateFrame = 0;
     slot->enter = 1;
+    slot->stateFrame = initialFrame[0];
     slot->direction = 0;
     graphics = slot->graphics;
     AnimData_Load(graphics, 0xDA6D);
-    AnimData_SelectPaletteBank(graphics, 0x2D3);
+    SelectSlotPalette(graphics);
     *((void **)(((u8 *)graphics) + 0xC)) = pool->tileData;
     sprite = &slot->sprite;
     Sprite_Init(sprite, graphics, 1);
     sprite->priority = 2;
-    CpuSet((zero = 0, &zero), Arg1(0x100, slot), 0x05000002);
+    ZeroFill8(SlotSpritePosition(slot));
     shadow = slot->shadow;
-    Shadow_Initialize(shadow, ((u8 *)slot) + 0x100, 0);
+    Shadow_Initialize(shadow, slot->sprite.unknown1C, 0);
     ActorShadow_Disable(shadow);
     collider = &slot->healthCollider;
     bounds.x = 32;
@@ -62,10 +62,5 @@ u32 ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactAct
     Collider_Init(collider, 0, 0x2001, 0, 16, &bounds, &offset);
     Collider_SetPosition(collider, (void *)position, 0);
     Collider_SetCallback(collider, ContactActor_ApplyResourceContact, slot);
-    Collider_SetAttackProperties(collider, pool->resourceColliderId, 30, 0x02080000, 0x20000, 30);
+    Collider_SetAttackProperties(collider, pool->resourceColliderId, 30, 0x208000, 0x20000, 30);
 }
-
-#else
-#include "global.h"
-INCLUDE_ASM("asm/nonmatching", ContactActor_InitializeSlot);
-#endif
