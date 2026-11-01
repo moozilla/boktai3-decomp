@@ -46,6 +46,19 @@ _SEMANTIC_CONTRACT_MODEL = "frozen-baseline-address-contracts-v1"
 _SEMANTIC_TIMEOUT_SECONDS = 30
 
 
+_REPO = Path(__file__).resolve().parents[2]
+
+
+def _single_use_macros(source: str, path: Path | None, repo: Path) -> list[str]:
+    """Statement macros SOURCE uses at their only site in REPO (tools/statement_macros.py);
+    PATH, the unit SOURCE replaces, is not counted as another use."""
+    tools = str(Path(repo) / "tools")
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    from statement_macros import single_use_in
+    return single_use_in(source, exclude=path, root=Path(repo))
+
+
 def _concessions(preprocessed: str, names: tuple[str, ...]) -> dict[str, int]:
     """Count expanded concessions in the target and referenced inline bodies.
 
@@ -804,6 +817,10 @@ class Evaluator:
             self._last_preprocessed = pre
             own = self.source_names(pre)
             result.concessions = _concessions(pre, own)
+            if not preprocessed:
+                # a do { ... } while (0) macro used only here is a priority knob: a barrier
+                result.concessions['asm_barriers'] += len(_single_use_macros(
+                    source, getattr(self, "source_path", None), getattr(self, "repo", _REPO)))
             resolved = knobs
             if any(re.search(r"(^|,)[A-Za-z_]", knobs.get(k, "")) for k in ("AGBCC_PRI", "AGBCC_FORCE")):
                 self._input.write_text(source)

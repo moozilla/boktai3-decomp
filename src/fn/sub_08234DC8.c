@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 extern s16 gUnk_086149C4[];

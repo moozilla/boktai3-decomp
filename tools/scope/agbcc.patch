@@ -1,10 +1,9 @@
 --- a/local-alloc.c
 +++ b/local-alloc.c
-@@ -69,6 +69,327 @@
- #include "insn-config.h"
+@@ -70,6 +70,327 @@
  #include "insn-attr.h"
  #include "recog.h"
-+#include "output.h"
+ #include "output.h"
 +
 +/* Instrumentation for tools/rasolve.py (Boktai 3 decomp). Never used by the
 +   real build: this copy of agbcc lives in build/agbcc-instr.
@@ -325,9 +324,10 @@
 +    agbcc_dump = fopen (e, "a");
 +}
 +#undef done
- #include "output.h"
++#include "output.h"
  #include "toplev.h"
  
+ /* Next quantity number available for allocation.  */
 @@ -249,6 +570,8 @@
  static int qty_sugg_compare    	(int, int);
  static int qty_sugg_compare_1	(const void *, const void *);
@@ -358,7 +358,27 @@
  	  && (reg_alternate_class (i) == NO_REGS
  	      || ! CLASS_LIKELY_SPILLED_P (reg_preferred_class (i))))
  	reg_qty[i] = -2;
-@@ -1004,6 +1332,51 @@
+@@ -724,6 +1052,19 @@
+       dest = SET_DEST (set);
+       src = SET_SRC (set);
+ 
++      /* Instrumentation: AGBCC_NOEQUIV=reg,... gives these pseudos no
++	 equivalence (as a second, different set would), so reload stores a
++	 spilled one to a stack slot instead of rematerializing it.  */
++      if (GET_CODE (dest) == REG && REGNO (dest) >= FIRST_PSEUDO_REGISTER
++	  && agbcc_list_has ("AGBCC_NOEQUIV", REGNO (dest)))
++	{
++	  rtx n = find_reg_note (insn, REG_EQUIV, NULL_RTX);
++	  if (n)
++	    remove_note (insn, n);
++	  no_equiv (dest, set);
++	  continue;
++	}
++
+       /* If this sets a MEM to the contents of a REG that is only used
+ 	 in a single basic block, see if the register is always equivalent
+ 	 to that memory location and if moving the store from INSN to the
+@@ -1004,6 +1345,51 @@
  
  /* Allocate hard regs to the pseudo regs used only within block number B.
     Only the pseudos that die but once can be handled.  */
@@ -410,7 +430,7 @@
  
  static void
  block_alloc (b)
-@@ -1168,7 +1541,7 @@
+@@ -1168,7 +1554,7 @@
  			   );
  		      
  		      if (GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG)
@@ -419,7 +439,7 @@
  					    insn_number, insn, 0);
  		    }
  		  if (win)
-@@ -1204,12 +1577,12 @@
+@@ -1204,12 +1590,12 @@
  	      if (r1 = XEXP (note, 0), GET_CODE (r1) == REG
  		  /* Check that we have such a sequence.  */
  		  && no_conflict_p (insn, r0, r1))
@@ -434,7 +454,7 @@
  
  	      /* Here we care if the operation to be computed is
  		 commutative.  */
-@@ -1219,7 +1592,7 @@
+@@ -1219,7 +1605,7 @@
  		       && (r1 = XEXP (XEXP (note, 0), 1),
  			   (GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG))
  		       && no_conflict_p (insn, r0, r1))
@@ -443,7 +463,7 @@
  
  	      /* If we did combine something, show the register number
  		 in question so that we know to ignore its death.  */
-@@ -1330,12 +1703,29 @@
+@@ -1330,12 +1716,29 @@
        qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
      }
  
@@ -473,7 +493,7 @@
        if (qty_phys_num_sugg[q] != 0 || qty_phys_num_copy_sugg[q] != 0)
  	qty_phys_reg[q] = find_free_reg (qty_min_class[q], qty_mode[q], q,
  					 0, 1, qty_birth[q], qty_death[q]);
-@@ -1387,7 +1777,7 @@
+@@ -1387,7 +1790,7 @@
    for (i = 0; i < next_qty; i++)
      {
        q = qty_order[i];
@@ -482,7 +502,7 @@
  	{
  	  if (N_REG_CLASSES > 1)
  	    {
-@@ -1414,6 +1804,13 @@
+@@ -1414,6 +1817,13 @@
  	for (i = qty_first_reg[q]; i >= 0; i = reg_next_in_qty[i])
  	  reg_renumber[i] = qty_phys_reg[q] + reg_offset[i];
        }
@@ -496,7 +516,7 @@
  }
  
  /* Compare two quantities' priority for getting real registers.
-@@ -1432,9 +1829,19 @@
+@@ -1432,11 +1842,21 @@
     Multiplying this by 10000 can't overflow.
     QTY_CMP_PRI is also used by qty_sugg_compare.  */
  
@@ -507,17 +527,19 @@
 +#define QTY_CMP_PRI(q) (QTY_CMP_PRI_BASE (q) \
 +  + (qty_first_reg[q] >= 0 && qty_first_reg[q] < AGBCC_MAXREG \
 +     ? agbcc_pri_delta[qty_first_reg[q]] : 0))
-+
-+static int
+ 
+ static int
 +qty_compare_pri (q)
 +     int q;
 +{
 +  return QTY_CMP_PRI (q);
 +}
- 
- static int
++
++static int
  qty_compare (q1, q2)
-@@ -1505,6 +1912,7 @@
+      int q1, q2;
+ {
+@@ -1505,6 +1925,7 @@
  
  #undef QTY_CMP_SUGG
  #undef QTY_CMP_PRI
@@ -1640,7 +1662,18 @@
        if (GET_CODE (p) == INSN
  	  && (set = single_set (p))
  	  && GET_CODE (SET_DEST (set)) == REG
-@@ -1828,7 +1867,16 @@
+@@ -1489,6 +1528,10 @@
+ 	      && ((m->dependencies == m1->dependencies)
+ 		  || rtx_equal_p (m->dependencies, m1->dependencies)))
+ 	    {
++	      if (getenv ("AGBCC_LOOP_TRACE"))  /* scope: an equal invariant whose savings join M's */
++		fprintf (stderr, "match fn=%s insn=%d regno=%d into=%d savings=%d lifetime=%d\n",
++			 current_function_name, INSN_UID (m1->insn), m1->regno,
++			 INSN_UID (m->insn), m1->savings, m1->lifetime);
+ 	      m->lifetime += m1->lifetime;
+ 	      m->savings += m1->savings;
+ 	      m1->done = 1;
+@@ -1828,7 +1871,16 @@
  	  /* It is also desirable to move if it can be moved at no
  	     extra cost because something else was already moved.  */
  
@@ -1658,7 +1691,7 @@
  	      || flag_move_all_movables
  	      || (threshold * savings * m->lifetime) >=
  		 (moved_once[regno] ? insn_count * 2 : insn_count)
-@@ -4533,6 +4581,12 @@
+@@ -4533,6 +4585,12 @@
  	{
  	  struct induction *tv;
  
@@ -1671,7 +1704,7 @@
  	  if (v->ignore || v->same)
  	    continue;
  
-@@ -4591,8 +4645,25 @@
+@@ -4591,8 +4649,25 @@
  	     of such giv's whether or not we know they are used after the loop
  	     exit.  */
  

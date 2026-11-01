@@ -20,8 +20,11 @@ struct ChargedBurst {
 };
 
 #ifdef NONMATCHING
-// fuzzy: 67.1%
-// scope shape 34 (differences once low registers are set aside)
+// fuzzy: 66.7%
+// scope shape 36 (differences once low registers are set aside)
+// Exact once the table has no equivalence (scope knob AGBCC_NOEQUIV=36): the ROM
+// stores it to the stack, the draft reloads the constant. See
+// notes/opus-charged-burst-spark_2026-10-31.md.
 // Emits one spark every second call, cycling through the eight slots.
 void ChargedBurst_EmitSpark(struct ChargedBurst *p)
 {
@@ -30,7 +33,7 @@ void ChargedBurst_EmitSpark(struct ChargedBurst *p)
     u32 byteMask;
     *delayAddress = delay;
     byteMask = 255;
-    if ((u8)delay > 1) {
+    if ((u8)(delay & byteMask) > 1) {
         const u16 *table;
         u32 *seed;
         u16 index;
