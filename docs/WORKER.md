@@ -152,6 +152,10 @@ that is a scope gap: record it (below) so the tool gets better.
   only with evidence that the original had a compiled-out macro at that spot, for example
   the same statement in every caller of a shared helper. The tools count it and land
   refuses it without `--allow-pins`.
+* `if (Call(...)) { }` with an empty body is ordinary C: a debug body compiled out, as in
+  `if (TakeFlag(f)) { DPRINTF(...); }`. Matched code has 10 such sites in 9 functions,
+  nearly all on `Take*` flag calls. The condition has to be a call the original could have
+  logged; an empty `if` on a bare variable is a fence and counts as a barrier.
 * The SDK's `SystemCall(n)` (`include/gba/syscall.h`) is the one inline assembly that
   counts as ordinary C: the original authors wrote it that way.
 * No selector macros: a `#define` a file sets before including a shared header to change
