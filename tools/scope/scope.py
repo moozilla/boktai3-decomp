@@ -1997,8 +1997,10 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
         a, b, nl, nh = lever
         out.append(f"a statement macro (`do {{ ... }} while (0)`) around lines {a}-{b}: flow counts each ref"
                    f" inside its loop notes twice, giving {nm(lo)} {nl} refs ({g_priority(nl, llive)}) against"
-                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)}). Reify it as the macro the original likely had"
-                   f" (the loop notes also end cse blocks there)")
+                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)}). Only as a macro the original plausibly had,"
+                   f" one several functions share (twins computing the same thing); a single-use wrapper is a"
+                   f" priority knob and counts as a barrier (tools/statement_macros.py). The loop notes also"
+                   f" end cse blocks there")
     return out
 
 
