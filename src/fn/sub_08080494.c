@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 86.1%
+// fuzzy: 93.1%
 #include "scene_actor_reaction.h"
 #include "scene_actor_part_burst.h"
 #include "scene_actor_behavior.h"
@@ -23,62 +23,52 @@ static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput,
     u32 mask = maskInput;
     return off == 0x2D4 ? actor->flags2D4 & mask : actor->flags2D0 & mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor)
+static inline void ResetMotionControl(struct SceneActorRegistryResetView *actor)
 {
-    void *callback = (void *)SceneActorControl_OnIdle;
-    u8 kind = 16;
-    u32 zero;
-    {
-        u32 preparedOffset = 0x2B2;
-        u8 *field;
-        u8 one;
-        field = (u8 *)actor + preparedOffset;
-        zero = 0;
-        one = 1;
-        *field = one;
-    }
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    {
-        u32 off = 0x2C8;
-        {
-            u16 *field = (void *)((u8 *)actor + off);
-            *field = zero;
-        }
-    }
+    actor->field2C8 = 0;
     {
         u32 *field = &actor->flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = zero;
+    actor->word104 = 0;
 }
-static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                                u8 behavior)
+static inline void InstallIdleControl(struct SceneActorRegistryResetView *actor, void *callback,
+                                      u32 kind, u32 prepared)
+{
+    actor->field2B2 = prepared;
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->target = callback;
+    ResetMotionControl(actor);
+}
+static inline void SelectState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
+                               u8 behavior)
 {
     actor->state2A8 = state;
     actor->phase2A9 = phase;
     actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
 }
-
-// Remaining (scope 38/37): in the sparks the ROM spills the gRandomIndex
-// address (reloaded before each sample) and keeps 20/2/1 in sl/sb/r8; the draft's
-// cse-merged index pseudo (13 refs, priority 1741) outranks the REG_EQUIV
-// constants (~670) and takes sl. Splitting the first sample's address did not
-// lower it. Also open: the group pointer's register at the top and the
-// SetControl/SetAnimation constants the ROM rebuilds instead of sharing.
-// Found since: `u32 *cursor = &gRandomIndex;` at the top of the function (as
-// Vorn_UpdateDefeat has it) with a local count helper taking the cursor fixes
-// the index (REG_EQUIV, live from the top, priority 919, no register). Without
-// the union, the group pointer stays in r2 as in the ROM. The allocation then
-// needs, in knob terms, AGBCC_PRI=table:+1500,position:+100 (table r4,
-// position r5, range r6, then priority/kind/verticalRange r8/sb/sl at shape
-// 10). The ROM's table therefore has at least 8 refs and no REG_EQUIV: one
-// pseudo shared with something short-lived in the spark block, not the zero
-// (r1 in the ROM) or the group pointer (r2). Scratch: build/match/w/bdb/s1.c.
+static inline void ResetStateEntry(struct SceneActorRegistryResetView *actor, u32 prepared)
+{
+    actor->counter2AC = 0;
+    actor->field2B1 = prepared;
+}
+// Remaining (scope 14/16): the tail matches once a `completedState = 1` set
+// before TakePrepared feeds all three entry fields (as in Vorn_UpdateDefeat):
+// the long-lived constant gets no register and is rebuilt at each store. Open:
+// (1) the group pointer is r2 in the ROM and r4 here (the union with the table
+// makes it one global pseudo); (2) in the sparks the ROM reloads the
+// gRandomIndex address before each sample and keeps 20 in sl, while the
+// cse-merged index pseudo (13 refs) takes sl here. A `u32 *cursor =
+// &gRandomIndex;` at the top with a cursor-taking count helper fixes (2), and
+// without the union (1) too (build/match/w/bdb/e7.c, scope 76/77); what is left
+// there is local-alloc order in the spark block: AGBCC_PRI=table:+600 plus
+// position:+10 leaves 8 insns (the phase-0 pseudo r4 vs r5 in the tail). The
+// ROM's table (REG_EQUIV gRandomTable, 7 refs, priority ~680) must outrank the
+// range pointer (9 refs, 1134), so it needs two more refs (9 refs -> 1184),
+// which a single-set constant cannot have; position (8 refs, 1132) also needs
+// one fewer insn of life or one more ref.
 void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *actor)
 {
     union {
@@ -90,7 +80,9 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     struct ScriptUtilityArguments arguments;
     u16 script;
     void *drawable;
+    u32 completedState;
     source.group = &actor->group.common;
+    completedState = 1;
     if (!SceneActorReaction_TakePrepared(actor))
         return;
     {
@@ -181,13 +173,13 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(actor->category - 11) > 2)
         GameState_SetEventFlag(
             BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
-    SetControl(actor);
-    SetAnimation(actor, 1, 0, 2);
+    InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
+    SelectState(actor, completedState, 0, 2);
+    ResetStateEntry(actor, completedState);
     if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->body.id);
     ActorShadow_Disable(actor->shadow);
 }
-
 #else
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_BeginDefeatBurst);
 #endif
