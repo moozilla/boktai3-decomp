@@ -1,8 +1,4 @@
 // MATCHING_CONCESSION: register-pinning
-#define SCREAMER_FIRST    "r1"
-#define SCREAMER_MASK     "r5"
-#define SCREAMER_DURATION "r3"
-#define SCREAMER_WEIGHT   "r1"
 #include "screamer_playback.h"
 s32 Screamer_UpdateScream(struct ScreamerState *);
 struct ActorPosition *Player_GetEffectivePosition(u32);
