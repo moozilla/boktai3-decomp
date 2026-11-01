@@ -116,7 +116,7 @@ void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *ac
     {
         s32 speed = Callback_InvokeActor(actor, ((struct WanderCallbackView *)actor)->callback);
         if (Approach(actor, &body->saved, speed)) {
-            if ((u8)sub_08083C38(actor)) {
+            if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
                 Trigger_ConsumePending(((struct WanderTriggerView *)actor)->trigger, 1);
                 Phase(actor, 2, 2);
             }

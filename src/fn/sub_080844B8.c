@@ -124,7 +124,7 @@ void sub_080844B8(struct SceneActorRegistryResetView *actor)
             target.x += Shift(gUnk_086149C4[angle], 3);
             target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 3);
             SceneActorControl_InitPositionCurveEndpoints(actor, &target);
-            sub_08083C38(actor);
+            SceneActorControl_AdvancePositionCurve(actor);
             {
                 u32 *flags = &body->flags;
                 u32 mask = ~8;
@@ -150,7 +150,7 @@ void sub_080844B8(struct SceneActorRegistryResetView *actor)
         if (Approach(actor, &body->saved,
                      Callback_InvokeActor(actor,
                                           ((struct ActorApproachCallbackView *)actor)->callback))) {
-            if ((u8)sub_08083C38(actor)) {
+            if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
                 struct ContactPosition target;
                 u32 angle;
                 angle = (u8)Rand();
@@ -158,7 +158,7 @@ void sub_080844B8(struct SceneActorRegistryResetView *actor)
                 target.x += Shift(gUnk_086149C4[angle], 3);
                 target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 3);
                 SceneActorControl_InitPositionCurveEndpoints(actor, &target);
-                sub_08083C38(actor);
+                SceneActorControl_AdvancePositionCurve(actor);
             }
         }
         if (actor->tracking.distance > 0xFDE8) {

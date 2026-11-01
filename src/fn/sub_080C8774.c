@@ -14,7 +14,7 @@
 s32 Callback_InvokeActor(void *, void *);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
-void sub_0807E334(struct SceneActorRegistryResetView *);
+void SceneActorTerrain_RequestRetreatRoute(struct SceneActorRegistryResetView *);
 void Sound_PlaySong(u32);
 
 #define F8(a, o)  (*(u8 *)((u8 *)(a) + (o)))
@@ -284,7 +284,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
             }
         }
         Wander(input, actor->body.direction);
-        sub_0807E334(input);
+        SceneActorTerrain_RequestRetreatRoute(input);
         actor->field2C2 = 0x20;
         return 0;
     }

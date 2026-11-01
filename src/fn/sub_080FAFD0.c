@@ -4,46 +4,54 @@
 
 // confidence=low: initializes scripted cooldown lengths and the health threshold.
 
-struct Q080FAFD0 {
+struct AxeCooldownState {
     u8 filler[0xeb4];
-    u16 mid;
+    u16 healthThreshold;
     u16 pad;
-    u16 b[4];
-    u16 v[4];
+    u16 timers[4];
+    u16 lengths[4];
 };
 
-struct S080FAFD0 {
+struct AxeCooldownActor {
     u8 filler[0x9c];
     s16 health;
     u8 filler2[0x3d0 - 0x9e];
-    struct Q080FAFD0 *q;
+    struct AxeCooldownState *state;
 };
 
-static inline s32 Quarter(s16 x)
+#define TRUNCATE_QUARTER(out, input)                                                               \
+    do {                                                                                           \
+        s16 value = (input);                                                                       \
+        if (value >= 0)                                                                            \
+            (out) = value >> 2;                                                                    \
+        else                                                                                       \
+            (out) = -(-value >> 2);                                                                \
+    } while (0)
+
+static inline s32 HealthThreshold(u16 health, s16 original)
 {
-    if (x >= 0)
-        return x >> 2;
-    return -(-x >> 2);
+    s32 quarter;
+    TRUNCATE_QUARTER(quarter, health);
+    return original - quarter;
 }
 
-void Axe_InitAttackCooldowns(struct S080FAFD0 *s)
+void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor)
 {
-    struct Q080FAFD0 *q = s->q;
+    struct AxeCooldownState *state = actor->state;
     s32 i;
-    register s32 h asm("r0");
     int zero;
-    u32 hw;
-    s16 *hp;
+    s16 *healthField;
     if (Script_SeekToKeyword(0x50) != 0) {
         for (i = 0; i <= 3; i++) {
-            q->v[i] = Script_GetPc() ? Script_GetValue() : 0;
+            state->lengths[i] = Script_GetPc() ? Script_GetValue() : 0;
         }
     }
-    hp = &s->health;
+    healthField = &actor->health;
     zero = 0;
     for (i = 3; i >= 0; i--)
-        q->b[i] = zero;
-    h = *hp;
-    hw = h;
-    q->mid = hw - Quarter(h);
+        state->timers[i] = zero;
+    {
+        s32 health = *healthField;
+        state->healthThreshold = HealthThreshold(health, *healthField);
+    }
 }

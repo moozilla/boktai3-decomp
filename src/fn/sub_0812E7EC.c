@@ -46,7 +46,7 @@ void SceneActorControl_OnIdle(void);
 u32 Trigger_ConsumePending(void *, u32);
 void SceneMessages_SetPendingTrigger(void *, void *);
 void SceneActorRegistry_SendToActorId(u8, void *, u16);
-void sub_08078BB4(void *, void *, u32, u32, u32);
+void SceneActorAttachment_ApplySlotCommand(struct SceneActorRegistryResetView *, void *, u32, u32, u32);
 void SceneActorAttachment_SelectOffsets(u8, u8, s32 *, s32 *);
 void *ActorAttachment_CreateValueSpriteSlot(u32, void *, u32, s32, s32, u32, void *, s32, u32,
                                             void *, void *);
@@ -223,13 +223,13 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                     switch ((u32)command->data.args[0]) {
                         case 1:
                         case 2:
-                            sub_08078BB4(actor, attachment, 0, 0, category);
+                            SceneActorAttachment_ApplySlotCommand(actor, attachment, 0, 0, category);
                             break;
                         case 0:
-                            sub_08078BB4(actor, attachment, 0, 1, category);
+                            SceneActorAttachment_ApplySlotCommand(actor, attachment, 0, 1, category);
                             break;
                         case 3:
-                            sub_08078BB4(actor, attachment, 0, 2, category);
+                            SceneActorAttachment_ApplySlotCommand(actor, attachment, 0, 2, category);
                             break;
                         case 4: {
                             s16 *value;

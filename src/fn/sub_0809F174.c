@@ -1,9 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_chase.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
-
-// Remaining differences: placement of two zero constants and the halfword flag mask load.
 
 void Crow_DisableAttackCollision(struct SceneActorRegistryResetView *);
 static inline void OrFlags(u16 *field, u32 mask)
@@ -92,32 +90,29 @@ void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32
         actor->flags2D6 = m;
     }
     if (EaseMotion(actor) && elapsed > 30) {
-        u32 z4, z6;
+        u32 clearedWord;
         u16 v = *(u16 *)((u8 *)actor + 0x178) + 10;
-        z4 = 0;
-        z6 = 0;
-        asm("" : "+r"(z4), "+r"(z6));
+        u16 initialState[] = {0};
+        clearedWord = 0;
+
         *(u16 *)((u8 *)actor + 0x178) = v;
         actor->field2B0 = 1;
         {
+            u16 *field = &actor->flags2D4;
             u32 mask;
-            u32 value;
-            asm("" ::"r"(&actor->flags2D4));
             mask = ~0x20;
-            value = actor->flags2D4;
-            mask &= value;
-            actor->flags2D4 = mask;
+            ((struct ChaseFlags40 *)field)->bits &= mask;
         }
         {
             u32 *flags = &actor->flags2CC;
             u32 mask = ~0x80;
             *flags &= mask;
         }
-        state[0x3EC] = z4;
+        state[0x3EC] = initialState[0];
         Crow_DisableAttackCollision(actor);
         actor->body.direction = actor->tracking.heading;
-        SetControl(actor, SceneActorControl_OnIdle, 16, z4, z6);
-        SetState(actor, z4, z4, 1, z6);
+        SetControl(actor, SceneActorControl_OnIdle, 16, initialState[0], clearedWord);
+        SetState(actor, initialState[0], initialState[0], 1, clearedWord);
         actor->body.direction = actor->tracking.heading;
         actor->field2C2 = 64;
     }

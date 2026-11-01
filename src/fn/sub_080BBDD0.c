@@ -1,3 +1,4 @@
+#include "scene_actor_displacement.h"
 #include "global.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
@@ -86,7 +87,7 @@ static inline u8 Skeleton_ArriveAfterRecovery(void *obj)
         u8 saved = actor->body.direction;
         Skeleton_BeginRecoveryTurn(obj, saved, randomSamples);
     }
-    sub_0807E334(obj);
+    SceneActorTerrain_RequestRetreatRoute(obj);
     actor->field2C2 = 0x20;
     return 0;
 reroute: {
@@ -102,28 +103,11 @@ success:
     return 1;
 }
 
-static inline s32 Skeleton_QuarterDisplacement(s32 d)
-{
-    s32 result;
-    if (d >= 0)
-        result = d >> 2;
-    else
-        result = -(-d >> 2);
-    return result;
-}
-
 static inline u8 Skeleton_DisplacementStopped(s32 dx, s32 dz)
 {
     if (dx == 0 && dz == 0)
         return 1;
     return 0;
-}
-
-static inline s32 Skeleton_ReadDisplacementAxis(s32 desired, s16 *current, s16 **field)
-{
-    s32 difference = desired - *current;
-    *field = current;
-    return Skeleton_QuarterDisplacement(difference);
 }
 
 static inline u8 Skeleton_Drift(struct SceneActorRegistryResetView *actor)
@@ -137,8 +121,8 @@ static inline u8 Skeleton_Drift(struct SceneActorRegistryResetView *actor)
         u32 mask = 0x10000;
         actor->flags2D0 |= mask;
     }
-    dx = Skeleton_ReadDisplacementAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
-    dz = Skeleton_ReadDisplacementAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    dx = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
+    dz = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
     if (dx > 200)
         dx = 200;
     else if (dx < -200)

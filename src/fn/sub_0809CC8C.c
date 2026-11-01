@@ -1,15 +1,13 @@
-#include "global.h"
-extern const u32 gUnk_08605E48[8];
-// MATCHING_CONCESSION: register-pinning
-// confidence=low: maps the movement-curve progress to its capped eight-entry rate table.
-u32 Lun_GetRouteProgressRate(u8 *p)
+#include "scene_actor_control_motion.h"
+
+extern const u32 gLunRouteProgressRates[8];
+
+u32 Lun_GetRouteProgressRate(void *actor)
 {
-    u8 *q = *(u8 **)(p + 0x3D0);
-    u32 phase = *(u16 *)(q + 0x3E0) >> 7;
-    s32 i;
-    asm("" : : "r"(phase));
-    i = phase;
-    if (i > 7)
-        i = 7;
-    return gUnk_08605E48[i];
+    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
+    s32 phase = state->field3E0 >> 7;
+    s16 index = phase;
+    if (phase > 7)
+        index = 7;
+    return gLunRouteProgressRates[index];
 }

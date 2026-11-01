@@ -1,8 +1,12 @@
 #include "grid_attack_actor.h"
+#include "player_cue_sequence.h"
+#include "player.h"
+#include "contact_burst.h"
+#include "projected_display.h"
 
 void GridAttackActor_RemoveSprite(struct GridAttackActor *p)
 {
-    Sprite_Remove(p->drawable.sprite);
+    Sprite_Remove(&p->drawable);
 }
 
 void Anim_RestartSequence(void *, void *, int, int, int);
@@ -24,11 +28,9 @@ void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 
 void SceneMessages_Send(void *);
 
-void ProjectedDisplay_SetHeight(void *, int);
-
 void OrbitContactActor_BeginExpansion(void *);
 
-void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *, struct GridAttackPoint *,
+void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *, struct ContactPosition *,
                                              int);
 
 void ContactSequencePool_BeginAllDeaths(void *);
@@ -42,8 +44,6 @@ void SceneActors_RunSecondEventScript(void *, void *);
 u8 Sprite_BlinkUntilExpired(int *, int, int, int);
 
 void SceneActors_RunStateCallback(u32);
-
-int ContactBurst_GetEnabled(void *);
 
 int ContactSequencePool_GetActiveCount(void *);
 
@@ -118,7 +118,7 @@ void GridAttackActor_InitBodyCollider(struct GridAttackActor *p)
     offset.y = 128;
     offset.z = 0;
     Collider_Init(collider, 0, 0x2401, 0, 16, &size, &offset);
-    Collider_SetPosition(collider, p->drawable.position, 0);
+    Collider_SetPosition(collider, &p->drawable.position, 0);
     Collider_SetCallback(collider, GridAttackActor_OnBodyCollision, p);
     Collider_SetAttackProperties(collider, p->attackPower, p->attackKind, 0, 0, p->attackParameter);
 }
@@ -134,7 +134,7 @@ void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode)
     offset.y = 128;
     offset.z = 0;
     Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
-    Collider_SetPosition(collider, p->drawable.position, 0);
+    Collider_SetPosition(collider, &p->drawable.position, 0);
     Collider_SetCallback(collider, GridAttackActor_OnDamageCollision, p);
     Collider_SetBodyProperties(collider, mode, 0x808, 4);
     Collider_Refresh(collider);
@@ -167,7 +167,7 @@ static inline int GridAttack_RandomColumn(u16 *table)
 
 void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p)
 {
-    if ((p->targetPosition)[2] < 0xc00) {
+    if (p->targetPositions[0]->z < 0xc00) {
         GridAttackActor_SpawnGridContact(p, 0, 0);
         GridAttackActor_SpawnGridContact(p, 2, 0);
         GridAttackActor_SpawnGridContact(p, 0, 1);
@@ -215,7 +215,7 @@ static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int
 }
 
 void *BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
-static inline void GridAttack_ClearPoint(const void *source, struct GridAttackPoint *dest)
+static inline void GridAttack_ClearPoint(const void *source, struct ContactPosition *dest)
 {
     CpuSet(source, dest, 0x05000002);
 }
@@ -237,25 +237,25 @@ static inline void GridAttack_OffsetCoordinate(volatile s16 *coordinate, u32 ran
     *coordinate = (rounded + ((random & mask) + center)) - 32;
 }
 void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
-                                             struct GridAttackPoint *point, int kind)
+                                             struct ContactPosition *point, int kind)
 {
     volatile u32 zero;
-    struct GridAttackPoint velocity;
+    struct ContactPosition velocity;
     struct SceneVec position;
-    struct GridAttackPoint target;
-    struct GridAttackPoint original;
-    struct GridAttackPoint *vel = &velocity;
+    struct ContactPosition target;
+    struct ContactPosition original;
+    struct ContactPosition *vel = &velocity;
     volatile s16 *pos;
     zero = 0;
     GridAttack_ClearPoint((const void *)&zero, vel);
     pos = (volatile s16 *)&position;
     original = *point;
-    *(struct GridAttackPoint *)&position = original;
+    *(struct ContactPosition *)&position = original;
     GridAttack_OffsetCoordinate(&pos[0], GridAttack_RandomValue());
     pos[1] += 1024;
     GridAttack_OffsetCoordinate(&pos[2], GridAttack_RandomValue());
     {
-        struct GridAttackPoint *dest = &target;
+        struct ContactPosition *dest = &target;
         *dest = original;
         BouncingObject_Spawn(&position, vel, dest, actor->projectileDamage, 50, kind, 0);
     }
@@ -287,7 +287,7 @@ int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
             }
             break;
         case 1: {
-            int angle = (p->damageSource)[0x2d];
+            int angle = (u8)p->players[0]->unk2D;
             u8 *dst = &p->damageAngle;
             int zero = 0;
             *dst = angle;
@@ -339,7 +339,7 @@ done:
 
 void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
 {
-    struct GridAttackDrawable *graphics = &p->drawable;
+    struct ContactSwarmSprite *graphics = &p->drawable;
     struct GridAttackPacked size;
     int i;
     for (i = 0; i < 2; i++) {
@@ -364,7 +364,7 @@ void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
         index = (index + 1) & mask;
         *indexPtr = index;
         speed = (table[index] & smallMask) + 20;
-        SparkParticle_Spawn(graphics->position, 3, &size, angle, count, speed, 2, 2);
+        SparkParticle_Spawn(&graphics->position, 3, &size, angle, count, speed, 2, 2);
     }
 }
 
@@ -423,7 +423,7 @@ static inline void GridAttack_SetFacingPinned(struct GridAttackActor *p, int ang
 void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
 {
     if (!p->locked)
-        GridAttack_SetFacingPinned(p, p->requestedAngle);
+        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
     if (p->changed) {
         p->changed = 0;
         if (p->locked)
@@ -443,7 +443,7 @@ void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttack_SetFacingPinned(p, p->requestedAngle);
+        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
         GridAttackActor_ResetAttackAnimationHistory(p);
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         Sound_PlaySongChecked(1355);
@@ -473,7 +473,7 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
     if (p->changed) {
         int zero = 0;
         p->changed = zero;
-        GridAttack_SetFacingPinned(p, p->requestedAngle);
+        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
         GridAttackActor_SetAnimation(p, 3, 1, 8);
         p->stage = zero;
         p->counter = zero;
@@ -567,7 +567,7 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     struct GridAttackActor *base = p;
     if (p->changed) {
         p->changed = 0;
-        GridAttack_SetFacingPinned(p, p->requestedAngle);
+        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
         GridAttackActor_ResetAttackAnimationHistory(p);
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
@@ -586,8 +586,8 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     if (p->reset(p))
         return;
     if (tick == 8)
-        GridAttackActor_SpawnTargetedProjectile(base, (struct GridAttackPoint *)p->targetPosition,
-                                                base->targetAttackParameter);
+        GridAttackActor_SpawnTargetedProjectile(
+            base, (struct ContactPosition *)p->targetPositions[0], base->targetAttackParameter);
     if (p->animationEnded)
         p->finished = 1;
 }
@@ -667,7 +667,7 @@ void GridAttack_UpdateDeathState(struct GridAttackActor *p)
     if (p->changed) {
         p->changed = 0;
         GridAttackActor_SetAnimation(p, 10, 1, 8);
-        SceneActors_RunFirstEventScript(p, p->drawable.position);
+        SceneActors_RunFirstEventScript(p, &p->drawable.position);
         ContactSequencePool_BeginAllDeaths(p->contactPool);
         GridAttack_SetDeathEffect(p, 2, 349, 1);
         base->stage = 0;
@@ -676,7 +676,7 @@ void GridAttack_UpdateDeathState(struct GridAttackActor *p)
     }
     if (p->animationEnded && !base->stage) {
         GameState_SetEventFlag(80);
-        SceneActors_RunSecondEventScript(p, base->drawable.position);
+        SceneActors_RunSecondEventScript(p, &base->drawable.position);
         base->stage++;
     }
     {
@@ -1518,346 +1518,112 @@ void GridAttack_UpdateActionController(struct GridAttackActor *p)
     Callback_InvokeActor(p, (void *)gUnk_08605040[p->active]);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 83.8%
-// fix.py best (sweep after the inlined-insn fix)
-// Packed playback, coordinate addressing and target-array allocation still differ.
-// MATCHING_CONCESSION: register-pinning
-#include "contact_swarm.h"
-#include "scene_vec.h"
-#include "player.h"
-#include "ram.h"
-// Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
-struct Drawable {
-    struct ContactSwarmSprite sprite;
-    struct DisplaySequenceState sequence;
-    u32 unknown3C;
-    s32 ended;
-    u32 mode;
-};
-static inline u32 GridAttack_StepPlayback(struct Drawable *owner,
-                                          struct DisplaySequenceState *state)
-{
-    struct ContactSwarmSprite *sprite = &owner->sprite;
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, duration, flags, bit;
-    {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
-    }
-    sprite->frame = *command >> 6;
-    {
-        u32 input = state->flags;
-        register u32 first asm("r1");
-        register u32 maskBit asm("r3") = 1;
-        bit = maskBit;
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->sprite.flags |= 4;
-        else
-            owner->sprite.flags &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        register u32 bit asm("r3");
-        register u32 first asm("r1");
-        bit = 2;
-        first = bit;
-        first &= input;
-        first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->sprite.flags |= 8;
-        else
-            owner->sprite.flags &= ~8;
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                    ended = 1;
-                } else {
-                    state->index = index - 1;
-                    ended = 0;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                    ended = 1;
-                } else {
-                    ended = 0;
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
-            }
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
-        } else {
-            ended = 0;
-        }
-    }
-    return ended;
-}
-
-s32 ProjectedDisplay_GetHeight(void *);
 void SceneActors_UpdateTargetMetrics(void *);
 static inline s32 GridAttack_Truncate12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
-static inline u32
-GridAttack_StepPlayback_UpdateAnimationAndTargets(struct Drawable *owner,
-                                                  struct DisplaySequenceState *state)
+
+static inline u32 GridAttack_TestFlags(struct GridAttackActor *actor, u32 mask)
 {
-    struct ContactSwarmSprite *sprite = &owner->sprite;
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended;
-    u32 duration;
-    u32 flags;
-    u32 bit;
-    {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
-    }
-    sprite->frame = *command >> 6;
-    {
-        u32 input = state->flags;
-        register u32 first asm("r1");
-        register u32 maskBit asm("r3") = 1;
-        bit = maskBit;
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->sprite.flags |= 4;
-        else
-            owner->sprite.flags &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        register u32 bit asm("r3");
-        register u32 first asm("r1");
-        bit = 2;
-        first = bit;
-        first &= input;
-        first = (u8)first;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->sprite.flags |= 8;
-        else
-            owner->sprite.flags &= ~8;
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                    ended = 1;
-                } else {
-                    state->index = index - 1;
-                    ended = 0;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                    ended = 1;
-                } else {
-                    ended = 0;
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
-            }
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
-        } else {
-            ended = 0;
-        }
-    }
-    return ended;
+    return actor->flags & mask;
 }
 
-void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *input)
+void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *p)
 {
-    struct GridAttackActor *p = input;
-    register struct GridAttackActor *base asm("sb") = p;
-    struct GridAttackTransform *transform = &p->transform;
-    struct SceneVec *position = (void *)(&transform->coordinates);
-    struct SceneVec *draw = (void *)p->drawable.position;
+    struct GridAttackActor *actor = p;
+    struct GridAttackActor *owner = p;
+    struct GridAttackTransform *body = &actor->transform;
     s32 height;
     u32 i;
-    asm("" : "+r"(p), "+r"(base));
-    GridAttack_ProcessMessages(p);
-    Obj_StepPosition(transform);
-    base->animationEnded = GridAttack_StepPlayback_UpdateAnimationAndTargets(
-        (struct Drawable *)(&p->drawable), &p->animation);
-    if (p->projectedDisplay)
-        height = ProjectedDisplay_GetHeight(p->projectedDisplay);
+    GridAttack_ProcessMessages(actor);
+    Obj_StepPosition(body);
+    owner->animationEnded = PlayerCue_StepSequenceEnded(&actor->drawable, &actor->animation);
+    if (actor->projectedDisplay)
+        height = ProjectedDisplay_GetHeight(actor->projectedDisplay);
     else
         height = 0;
-    *((s16 *)(((u8 *)p) + 0x8A4)) = position->x;
-    *((s16 *)(((u8 *)p) + 0x8A6)) = (position->y + height) + 128;
-    *((s16 *)(((u8 *)p) + 0x8A8)) = position->z;
-    p->shadowPosition = *((struct GridAttackPoint *)draw);
-    if (base->flags & 0x20000) {
-        *((s16 *)(((u8 *)p) + 0x8A4)) +=
-            GridAttack_Truncate12(gUnk_086149C4[(p->shakeAngle + 64) & 255] * (p->shake << 2));
-        *((s16 *)(((u8 *)p) + 0x8A8)) +=
-            GridAttack_Truncate12(gUnk_086149C4[p->shakeAngle] * (p->shake << 2));
+    actor->drawable.position.x = body->coordinates.x;
+    actor->drawable.position.y = body->coordinates.y + height + 128;
+    actor->drawable.position.z = body->coordinates.z;
+    actor->shadowPosition = actor->drawable.position;
+    if (GridAttack_TestFlags(owner, 0x20000)) {
+        actor->drawable.position.x += GridAttack_Truncate12(
+            gUnk_086149C4[(actor->shakeAngle + 64) & 255] * (actor->shake << 2));
+        actor->drawable.position.z +=
+            GridAttack_Truncate12(gUnk_086149C4[actor->shakeAngle] * (actor->shake << 2));
     }
-    if (p->reactionCooldown) {
+    if (actor->reactionCooldown) {
         u32 angle;
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        angle = gRandomTable[gRandomIndex];
-        *((s16 *)(((u8 *)p) + 0x8A4)) +=
-            GridAttack_Truncate12(gUnk_086149C4[(angle + 64) & 255] * (p->reactionCooldown << 2));
-        *((s16 *)(((u8 *)p) + 0x8A8)) +=
-            GridAttack_Truncate12(gUnk_086149C4[angle & 255] * (p->reactionCooldown << 2));
-        p->reactionCooldown--;
+        angle = *(u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
+        actor->drawable.position.x += GridAttack_Truncate12(gUnk_086149C4[(angle + 64) & 255] *
+                                                            (actor->reactionCooldown << 2));
+        actor->drawable.position.z +=
+            GridAttack_Truncate12(gUnk_086149C4[angle & 255] * (actor->reactionCooldown << 2));
+        actor->reactionCooldown--;
     }
-    SceneActors_UpdateTargetMetrics(base);
-    for (i = 0; i < p->targetCount; i++) {
-        s16 *target = ((s16 **)(((u8 *)base) + 0x110))[i];
-        if (target) {
-            s32 x = target[0] - position->x;
-            s32 z = target[2] - position->z;
-            do {
-                (((u8 *)base) + 0xCC)[i] = Math_Atan2(x, z);
-            } while (0);
-            do {
-                ((s32 *)(((u8 *)base) + 0xC8))[i] = (x * x) + (z * z);
-            } while (0);
-        }
+    SceneActors_UpdateTargetMetrics(owner);
+    i = 0;
+    if (i < actor->targetCount) {
+        struct GridAttackTransform *base = &owner->transform;
+        do {
+            struct SceneVec *target = owner->targetPositions[i];
+            if (target) {
+                s32 x = target->x - base->coordinates.x;
+                s32 z = target->z - base->coordinates.z;
+                owner->requestedAngles[i] = Math_Atan2(x, z);
+                owner->targetDistances[i] = x * x + z * z;
+            }
+            i++;
+        } while (i < actor->targetCount);
     }
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", GridAttack_UpdateAnimationAndTargets);
-#endif
-
-#ifdef NONMATCHING
-// fuzzy: 54.2%
-// fix.py best (sweep after the inlined-insn fix)
-// Collider flag flow, palette branch layout and register allocation still differ.
 s32 ContactSequencePool_GetActiveCount(void *);
-void ContactBurst_SetEnabled(void *, s32);
-s32 ContactBurst_GetEnabled(void *);
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 void SceneActors_UpdateEffects(void *);
-void CameraTracking_Update(void *);
+
 void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *);
 void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
+
+static inline void GridAttack_CopyPalette(const void *source, void *dest)
+{
+    CpuSet(source, dest, 0x04000008);
+}
+static inline void GridAttack_AddFlags(struct GridAttackActor *p, u32 mask)
+{
+    p->flags |= mask;
+}
+static inline void GridAttack_ClearFlags(struct GridAttackActor *p, u32 mask)
+{
+    p->flags &= ~mask;
+}
+static inline void GridAttack_SetColliderFlags(struct ContactCollider *c, u32 mask)
+{
+    c->flags |= mask;
+}
+static inline void GridAttack_ClearColliderFlags(struct ContactCollider *c, u32 mask)
+{
+    u32 keep = ~mask;
+    c->flags = keep & c->flags;
+}
+static inline void GridAttack_SetCameraFlags(struct CameraTracking *camera, u32 mask)
+{
+    camera->requests |= mask;
+}
+static inline void GridAttack_ClearCameraFlags(struct CameraTracking *camera, u32 mask)
+{
+    camera->requests &= ~mask;
+}
 void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     struct GridAttackTransform *transform = &p->transform;
-    struct ContactCollider *damage;
-    struct ContactCollider *body;
+    struct ContactCollider *collider;
     if (ContactSequencePool_GetActiveCount(p->contactPool) > p->contactCountLimit) {
         ContactBurst_SetEnabled(p->contactBurst, 1);
-        p->flags |= 4;
+        GridAttack_AddFlags(p, 4);
         p->attackCount = 0;
     } else {
         if ((!p->attackCount) && ContactBurst_GetEnabled(p->contactBurst)) {
@@ -1869,109 +1635,122 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
             base->attackCount++;
     }
     if (ContactBurst_GetEnabled(base->contactBurst))
-        p->flags &= ~0x40;
+        GridAttack_ClearFlags(p, 0x40);
     SceneActors_UpdateEffects(p);
     if (base->stun) {
-        p->flags |= 4;
+        GridAttack_AddFlags(p, 4);
         base->stun--;
     }
-    damage = &base->damageCollider;
-    if (p->flags & 4)
-        (&base->damageCollider)->flags |= 4;
+    collider = &base->damageCollider;
+    if (GridAttack_TestFlags(p, 4))
+        collider->flags |= 4;
     else {
-        (&base->damageCollider)->flags &= ~4;
-        Collider_SetPosition(&base->damageCollider, base->drawable.position, 0);
-        (&base->damageCollider)->direction = transform->angle;
+        GridAttack_ClearColliderFlags(collider, 4);
+        Collider_SetPosition(collider, &base->drawable.position, 0);
+        collider->direction = transform->angle;
     }
-    body = &base->bodyCollider;
-    if (!(p->flags & 8)) {
-        Collider_SetPosition(body, base->drawable.position, 0);
-        body->direction = transform->angle;
-        Collider_Refresh(body);
+    collider = &base->bodyCollider;
+    if (!(GridAttack_TestFlags(p, 8))) {
+        Collider_SetPosition(collider, &base->drawable.position, 0);
+        collider->direction = transform->angle;
+        Collider_Refresh(collider);
     }
-    if (p->flags & 16) {
-        *((u32 *)base->drawable.sprite) |= 1;
-        *((u32 *)(((u8 *)base) + 0x8F0)) &= ~1;
-        (&base->damageCollider)->flags &= ~8;
+    if (GridAttack_TestFlags(p, 16)) {
+        base->drawable.flags |= 1;
+        GridAttack_ClearCameraFlags(&base->camera, 1);
+        GridAttack_ClearColliderFlags(&base->damageCollider, 8);
     } else {
-        *((u32 *)base->drawable.sprite) &= ~1;
+        base->drawable.flags &= ~1;
         if (p->locked)
-            *((u32 *)(((u8 *)base) + 0x8F0)) &= ~1;
+            GridAttack_ClearCameraFlags(&base->camera, 1);
         else
-            *((u32 *)(((u8 *)base) + 0x8F0)) |= 1;
-        if (p->flags & 32)
-            (&base->damageCollider)->flags |= 8;
+            GridAttack_SetCameraFlags(&base->camera, 1);
+        if (GridAttack_TestFlags(p, 32))
+            GridAttack_SetColliderFlags(&base->damageCollider, 8);
         else
-            (&base->damageCollider)->flags &= ~8;
+            GridAttack_ClearColliderFlags(&base->damageCollider, 8);
     }
     if (base->shake) {
         base->shake--;
-        p->flags |= 0x20000;
+        GridAttack_AddFlags(p, 0x20000);
     }
     if (base->flash > 0) {
         if (!(--base->flash))
             base->animData.palette = base->palette;
     } else {
-        u8 *palette = base->palette;
-        switch (base->effectMode) {
-            case 1:
-                if (base->effectVariant >= (1 << base->effectDuration))
-                    break;
-                base->effectVariant++;
-                Palette_InterpolateBanks(palette, gPaletteBankData,
-                                         gPaletteBankData + (base->effectId << 5),
-                                         base->effectVariant, base->effectDuration);
+        s32 zero = 0;
+        u32 id = base->effectId;
+        if (base->effectMode == 1) {
+            s8 *amount = &base->effectVariant;
+            s32 value = *amount;
+            u8 *duration = &base->effectDuration;
+            if (value < (1 << *duration)) {
+                u8 *src;
+                u8 *dest;
+                void *palette;
+                (*amount)++;
+                src = gPaletteBankData;
+                dest = src + (id << 5);
+                palette = base->palette;
+                Palette_InterpolateBanks(palette, src, dest, *amount, *duration);
                 base->animData.palette = palette;
-                break;
-
-            case 2:
-                if (base->effectVariant > 0) {
-                    base->effectVariant--;
-                    Palette_InterpolateBanks(palette, gPaletteBankData,
-                                             gPaletteBankData + (base->effectId << 5),
-                                             base->effectVariant, base->effectDuration);
-                } else {
-                    base->effectVariant = 0;
-                    base->effectMode = 0;
-                    base->effectId = 1;
-                    CpuSet(gPaletteBankData + 0x2BA0, palette, 0x04000008);
+            }
+        } else if (base->effectMode == 2) {
+            void *palette;
+            s8 *amount = &base->effectVariant;
+            if (*amount > 0) {
+                u8 *src;
+                u8 *dest;
+                (*amount)--;
+                src = gPaletteBankData;
+                dest = src + (id << 5);
+                palette = base->palette;
+                Palette_InterpolateBanks(palette, src, dest, *amount, base->effectDuration);
+                base->animData.palette = palette;
+            } else {
+                const u8 *src;
+                *amount = zero;
+                base->effectMode = zero;
+                base->effectId = 1;
+                src = gPaletteBankData + 0x2BA0;
+                palette = base->palette;
+                GridAttack_CopyPalette(src, palette);
+                base->animData.palette = palette;
+            }
+        } else if (base->effectMode == 3) {
+            u8 *src = gPaletteBankData;
+            u8 *dest = src + (id << 5);
+            void *palette = base->palette;
+            s8 *amount = &base->effectVariant;
+            Palette_InterpolateBanks(palette, src, dest, *amount, base->effectDuration);
+            base->animData.palette = palette;
+            if (!base->effectDirection) {
+                (*amount)++;
+                if (*amount > 31) {
+                    *amount = 32;
+                    base->effectDirection = 1;
                 }
-                base->animData.palette = palette;
-                break;
-
-            case 3:
-                Palette_InterpolateBanks(palette, gPaletteBankData,
-                                         gPaletteBankData + (base->effectId << 5),
-                                         base->effectVariant, base->effectDuration);
-                base->animData.palette = palette;
-                if (!base->effectDirection) {
-                    if ((++base->effectVariant) > 31) {
-                        base->effectVariant = 32;
-                        base->effectDirection = 1;
-                    }
-                } else if ((--base->effectVariant) <= 0) {
-                    base->effectVariant = 0;
-                    base->effectDirection = 0;
+            } else {
+                (*amount)--;
+                if (*amount <= 0) {
+                    *amount = zero;
+                    base->effectDirection = zero;
                 }
-                break;
+            }
         }
     }
     if (base->projectedDisplay)
-        base->drawable.sprite[7] = 1;
+        base->drawable.priority = 1;
     else
-        base->drawable.sprite[7] = 2;
+        base->drawable.priority = 2;
     if (!p->locked)
-        CameraTracking_Update(((u8 *)base) + 0x8D0);
+        CameraTracking_Update(&base->camera);
     if ((p->locked && base->messageParameter) && (!(p->effectTimer & 15)))
         GridAttackActor_EmitSpriteParticles(base);
     p->contactSource = 0;
     p->contactFlags = 0;
     p->effectTimer++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", GridAttack_UpdateCollidersAndPalette);
-#endif
 
 int GridAttack_Update(struct GridAttackActor *p)
 {
@@ -2004,38 +1783,37 @@ s32 SceneActors_Initialize(void *, u32, s32, void *, s32);
 void SceneActors_SetHealthLimits(void *, s32, s32, s32);
 void SceneActors_SetEventScripts(void *, s32, s32);
 void SceneActors_SetDamageCallback(void *, void *, void *, s32);
-void CameraFollow_Initialize(void *, u32, void *, u32);
+void CameraFollow_Initialize(void *, void *, void *, u32);
 void *ContactSequencePool_Create(s32, u32, s32, u32, u32);
 void *OrbitContactActor_Create(const struct ContactPosition *, u32);
 
-// Sets the mode fields for the scripted start states (shared tail of the switch cases).
-static inline void Sub0802BFAC_ResetMode(struct GridAttackActor *p)
+static inline void GridAttack_SetCameraLimits(struct CameraTracking *camera, s32 min, s32 max)
 {
-    p->timer = 0;
-    p->changed = 1;
-    p->stateReset = 0;
-    p->pending = 0;
+    camera->minimum = min;
+    camera->maximum = max;
 }
-
-#ifdef NONMATCHING
-// fuzzy: 53.3%
-// scope shape 243 (differences once low registers are set aside)
-// confidence=low: builds a grid attack actor from its script keywords and starts its idle state.
-s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
+s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
 {
-    struct GridAttackActor *p = arg0;
+    struct GridAttackActor *actor = p;
     struct GridAttackPacked pk;
-    u32 ctx = arg1;
+
     s32 kind;
-    s32 count;
     s32 i;
+    u32 count;
+    u32 targetIndex;
     s32 health;
     u8 facing;
     s32 poolHealth;
     s32 poolValue;
     s32 poolResource;
     s32 orbitValue;
-    u8 *base;
+    struct ContactPosition *position;
+    u8 *locked;
+    u8 (**tryUpdate)(void *);
+    u8 (**reset)(void *);
+    struct SceneVec **positions;
+    u32 *dst;
+    const u8 *palette;
 
     kind = Script_GetKeywordValue(0x74, 3);
     if (kind != 3)
@@ -2044,31 +1822,36 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
     p->locked = Script_GetKeywordValue(0x69, 0);
     count = Script_GetKeywordValue(0x50, 1);
     p->targetCount = count;
-    {
-        u32 *target = (u32 *)&p->targetPosition;
-        u32 *slot = (u32 *)&p->damageSource;
-        for (i = 0; i < count; i++) {
-            u32 value = (u32)gPlayers[i];
-            if (value) {
-                *slot = value;
-                value += 0x30;
-            } else
-                *slot = value;
-            *target = value;
-            target++;
-            slot++;
-        }
+    targetIndex = 0;
+    positions = p->targetPositions;
+    locked = &p->locked;
+    tryUpdate = &p->tryUpdate;
+    reset = &p->reset;
+    position = &p->transform.coordinates;
+    if (targetIndex < count) {
+        u32 targetCount = count;
+        do {
+            struct Player *player = gPlayers[targetIndex];
+            if (player) {
+                actor->players[targetIndex] = player;
+                positions[targetIndex] = &player->position;
+            } else {
+                actor->players[targetIndex] = 0;
+                positions[targetIndex] = 0;
+            }
+            targetIndex++;
+        } while (targetIndex < targetCount);
     }
 
     if (Script_SeekToKeyword(0x70)) {
         pk.x = Script_GetValue();
         pk.y = Script_GetValue();
         pk.z = Script_GetValue();
-        facing = ((Script_GetValue() & 7) << 5) + 0xA0;
+        facing = ((u32)Script_GetValue() << 5) + 0xA0;
     } else {
-        pk.x = *(u16 *)((u8 *)gGameState + 0x30);
-        pk.y = *(u16 *)((u8 *)gGameState + 0x32);
-        pk.z = *(u16 *)((u8 *)gGameState + 0x34);
+        pk.x = (u16)gGameState->positionX;
+        pk.y = (u16)gGameState->positionY;
+        pk.z = (u16)gGameState->positionZ;
         facing = 0x40;
     }
 
@@ -2113,133 +1896,121 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
         poolResource = 50;
     }
 
-    SceneActors_Initialize(p, ctx, kind, &pk, facing);
+    SceneActors_Initialize(actor, ctx, kind, &pk, facing);
     AnimData_Load(&p->animData, 0x4147);
     Sprite_Init(&p->drawable, &p->animData, 1);
-    *(u32 *)p->drawable.sprite &= ~2;
-    *(struct GridAttackPoint *)p->drawable.position = *(struct GridAttackPoint *)&pk;
-    p->drawable.sprite[7] = 1;
+    p->drawable.flags &= ~1;
+    p->drawable.position = *(struct ContactPosition *)&pk;
+    p->drawable.priority = 1;
     p->resource = ScriptProc_Start(0x922E, 0xC5E2);
     Anim_SetSequence(&p->animation, p->resource, 2, 0, 0);
 
-    if (p->locked) {
+    if (*locked) {
         switch (Script_GetKeywordValue(0x44, 0)) {
             case 0:
-                p->active = 2;
-                p->actionReset = 0;
-                p->action = 1;
-                p->actionTimer = 0;
-                p->entered = 1;
-                p->state = 10;
-                p->callback = (void (*)(void *))GridAttack_UpdateIdleState;
-                Sub0802BFAC_ResetMode(p);
+                GridAttack_StartActionMode(actor, 2, 0, 1);
+                GridAttack_SetState(actor, (void *)GridAttack_UpdateIdleState, 10);
                 break;
             case 1:
-                p->active = 2;
-                p->actionReset = 0;
-                p->action = 0;
-                p->actionTimer = 0;
-                p->entered = 1;
-                p->state = 9;
-                p->callback = (void (*)(void *))GridAttack_UpdateHiddenState;
-                Sub0802BFAC_ResetMode(p);
+                GridAttack_StartActionMode(actor, 2, 0, 0);
+                GridAttack_SetState(actor, (void *)GridAttack_UpdateHiddenState, 9);
                 break;
             case 2:
-                p->active = 2;
-                p->actionReset = 0;
-                p->action = 4;
-                p->actionTimer = 0;
-                p->entered = 1;
-                p->state = 13;
-                p->callback = (void (*)(void *))GridAttack_UpdateAlternateIdleState;
-                Sub0802BFAC_ResetMode(p);
+                GridAttack_StartActionMode(actor, 2, 0, 4);
+                GridAttack_SetState(actor, (void *)GridAttack_UpdateAlternateIdleState, 13);
                 break;
             case 3:
-                p->active = 2;
-                p->actionReset = 0;
-                p->action = 3;
-                p->actionTimer = 0;
-                p->entered = 1;
-                p->state = 12;
-                p->callback = (void (*)(void *))GridAttack_UpdateAnimationElevenState;
-                Sub0802BFAC_ResetMode(p);
+                GridAttack_StartActionMode(actor, 2, 0, 3);
+                GridAttack_SetState(actor, (void *)GridAttack_UpdateAnimationElevenState, 12);
                 break;
         }
     } else {
-        p->active = 0;
-        p->actionReset = 0;
-        p->action = 0;
-        p->actionTimer = 0;
-        p->entered = 1;
-        p->actionDuration = 90;
-        p->state = 1;
-        p->callback = (void (*)(void *))GridAttackActor_UpdateIdle;
-        p->stateReset = 0;
-        Sub0802BFAC_ResetMode(p);
+        u16 duration = 90;
+        GridAttack_StartActionMode(p, 0, 0, 0);
+        p->actionDuration = duration;
+        GridAttack_SetState(actor, (void *)GridAttackActor_UpdateIdle, 1);
     }
 
-    p->tryUpdate = (void *)GridAttack_ApplyPendingDamage;
-    p->reset = (void *)GridAttack_ApplyRequestedState;
-    SceneActors_SetHealthLimits(p, health, health, p->bodyMode);
+    *tryUpdate = (void *)GridAttack_ApplyPendingDamage;
+    *reset = (void *)GridAttack_ApplyRequestedState;
+    SceneActors_SetHealthLimits(actor, health, health, p->bodyMode);
     GridAttackActor_InitBodyCollider(p);
     GridAttackActor_InitDamageCollider(p, p->bodyMode);
 
     if (Script_SeekToKeyword(0x63)) {
-        s32 a = Script_GetValue();
-        s32 b = Script_GetValue();
-        SceneActors_SetEventScripts(p, a, b);
+        s32 first = Script_GetValue();
+        s32 second = Script_GetValue();
+        SceneActors_SetEventScripts(actor, first, second);
         ctx = Script_GetValue();
     } else {
-        SceneActors_SetEventScripts(p, 0, 0);
+        SceneActors_SetEventScripts(actor, 0, 0);
         ctx = 0;
     }
 
     if (Script_SeekToKeyword(0x41)) {
         for (i = 0; i <= 3 && Script_GetPc() != 0; i++)
-            p->scriptArgs[i] = Script_GetValue();
+            actor->scriptArgs[i] = Script_GetValue();
     }
 
     p->contactReward = Script_GetKeywordValue(0x53, 0);
 
-    base = gPaletteBankData;
-    for (i = 0; i < 16; i++)
-        CpuSet(base + 0x2BA0 + i * 0x20, p->palette + i * 0x20, 0x04000008);
-    base = gPaletteBankData;
-    for (i = 0; i < 16; i++)
-        CpuSet(base + 0x3240, p->normalDamageGraphics + i * 0x20, 0x04000008);
-    base = gPaletteBankData;
-    for (i = 0; i < 16; i++)
-        CpuSet(base + 0x3240, p->specialDamageGraphics + i * 0x20, 0x04000008);
+    {
+        u8 **bank = &gPaletteBankData;
+        u32 off;
+        dst = (u32 *)p->palette;
+        off = 0x2BA0;
+        i = 15;
+        do {
+            palette = *bank + off;
+            CpuSet(palette, dst, 0x04000008);
+            dst += 8;
+            off += 0x20;
+        } while (--i >= 0);
+    }
+    {
+        palette = gPaletteBankData + 0x3240;
+        dst = (u32 *)p->normalDamageGraphics;
+        i = 15;
+        do {
+            CpuSet(palette, dst, 0x04000008);
+            dst += 8;
+        } while (--i >= 0);
+    }
+    {
+        palette = gPaletteBankData + 0x3240;
+        dst = (u32 *)p->specialDamageGraphics;
+        i = 15;
+        do {
+            CpuSet(palette, dst, 0x04000008);
+            dst += 8;
+        } while (--i >= 0);
+    }
 
-    *(u8 **)((u8 *)p + 0x878) = p->palette;
+    p->animData.palette = p->palette;
     p->effectMode = 0;
     p->effectId = 0x15D;
     p->effectVariant = 0;
     p->effectDuration = 5;
 
-    *(struct GridAttackPoint *)&p->shadowPosition = *(struct GridAttackPoint *)p->drawable.position;
-    CameraFollow_Initialize(p->shadow, p->targetPosition, &p->shadowPosition, 1);
-    ((u32 *)p->shadow)[4] = 0;
-    ((u32 *)p->shadow)[5] = 0x8C;
+    p->shadowPosition = p->drawable.position;
+    CameraFollow_Initialize(&p->camera, positions[0], &p->shadowPosition, 1);
+    GridAttack_SetCameraLimits(&p->camera, 0, 0x8C);
 
-    SceneActors_SetDamageCallback(p, (u8 *)p + 0x818, (void *)GridAttackActor_OnDamage, 0);
+    SceneActors_SetDamageCallback(actor, &p->damageCollider, (void *)GridAttackActor_OnDamage, 0);
     if (Script_GetKeywordValue(0x43, 1) != 0)
-        p->projectedDisplay = ProjectedDisplay_Create(&p->transform.coordinates);
+        p->projectedDisplay = ProjectedDisplay_Create(position);
     else
         p->projectedDisplay = 0;
 
     p->contactPool =
         ContactSequencePool_Create(poolHealth, poolValue, poolResource, ctx, (s16)p->contactReward);
-    p->orbitContact = OrbitContactActor_Create(&p->transform.coordinates, orbitValue);
-    p->contactBurst = ContactBurst_Create((struct ContactPosition *)p->drawable.position);
+    p->orbitContact = OrbitContactActor_Create(position, orbitValue);
+    p->contactBurst = ContactBurst_Create(&p->drawable.position);
     p->linkedActorId = Script_GetKeywordValue(0x54, 0);
     p->linkedActorPhase = 0;
     p->phaseTimer = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", GridAttackActor_Initialize);
-#endif
 
 struct GridAttackActor *GridAttackActor_Create(u32 a)
 {

@@ -1,6 +1,6 @@
 #include "global.h"
-void sub_0807E9D0(void);
+void SceneActorReaction_HandleColliderContact(void);
 void Golem_OnBodyCollision(void)
 {
-    sub_0807E9D0();
+    SceneActorReaction_HandleColliderContact();
 }

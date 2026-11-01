@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_motion.h"
@@ -30,8 +29,7 @@ void Mimic_ResetPursuitDrawable(struct SceneActorRegistryResetView *actor)
     SceneActorAnimation_SelectEntryFlags((void *)actor, 0,
                                          SceneActor_GetDirectionFlags(actor->body.direction));
     {
-        register void *drawable asm("r0") = actor->drawable;
-        asm("" : "+r"(drawable));
-        DisplaySequence_Step(drawable);
+        struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+        DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }

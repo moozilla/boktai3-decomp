@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorControl_UpdateMotionPhase_080EBD0C: same code as SceneActorControl_UpdateMotionPhase at another address (ported by relatives.py; provisional name) */
 #include "scene_actor_reset.h"
@@ -38,8 +37,7 @@ void SceneActorControl_UpdateMotionPhase_080EBD0C(struct SceneActorRegistryReset
             *(struct IvyPlacement *)&actor->body.position;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
-        register void *drawable asm("r0") = actor->drawable;
-        asm("" : "+r"(drawable));
-        DisplaySequence_Step(drawable);
+        struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+        DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }

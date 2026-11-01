@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-void sub_0807E334(void *);
+void SceneActorTerrain_RequestRetreatRoute(void *);
 
 struct ApproachRoutePoint {
     s16 x, z;

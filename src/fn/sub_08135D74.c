@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
-/* When flags2D0 bit 27 and flags2D4 bit 13 are set and field2B8 is live, switch to control kind 29 (sub_08081C98) and reset hit state. */
+/* When flags2D0 bit 27 and flags2D4 bit 13 are set and field2B8 is live, switch to control kind 29 (SceneActorReaction_UpdateTimedBurst) and reset hit state. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void sub_08081C98(void);
+void SceneActorReaction_UpdateTimedBurst(void);
 static inline u8 Test(u32 value)
 {
     if (value)
@@ -22,7 +22,7 @@ static inline u32 Mask(u16 *flags, u32 maskInput)
 }
 static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 zero)
 {
-    void *callback = sub_08081C98;
+    void *callback = SceneActorReaction_UpdateTimedBurst;
     u32 kind = 29;
     actor->field2B2 = 1;
     actor->field2B0 = zero;

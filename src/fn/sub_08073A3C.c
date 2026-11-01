@@ -29,7 +29,7 @@ SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *argument, u32 
     contactFlags = (u8 *)owner + 0xDC;
     while (node) {
         if ((node->flags & 1) && node->object && (node->kind & kindMask) &&
-            SceneActorContacts_CanSelectNode(node) && sub_08072F4C(node, actor, &distance)) {
+            SceneActorContacts_CanSelectNode(node) && SceneActorContacts_EvaluateCandidate(node, actor, &distance)) {
             best = node;
             selectionStatus = (s32)best;
         }

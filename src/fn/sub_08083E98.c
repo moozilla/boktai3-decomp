@@ -14,7 +14,7 @@ void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *ac
     u32 zeroValue;
     u32 one;
     SceneActorControl_InitPositionCurveEndpoints(actor, target);
-    sub_08083C38(actor);
+    SceneActorControl_AdvancePositionCurve(actor);
     one = 1;
     {
         u8 *field = &actor->state2A8;

@@ -1,4 +1,4 @@
-#include "global.h"
+#include "effect_group.h"
 struct EffectGroupEntry {
     u8 state, fadeTimer;
     u16 frame;
@@ -11,8 +11,10 @@ struct EffectGroup {
     u8 unknown4[8];
     struct EffectGroupEntry entries[4];
 };
-void sub_08014634(u32, u32, u32, u32, u32, u32, u32);
-s32 EffectGroup_SpawnPart(struct EffectGroup *group, u32 a, u32 b, u32 c, u32 d, u32 e, u32 f)
+s32 EffectGroup_SpawnPart(struct EffectGroup *group, s32 count,
+                          const struct ContactPosition *position,
+                          const struct ContactPosition *velocity,
+                          const struct ContactPosition *spread, s32 lifetime, s32 lifetimeMask)
 {
     struct EffectGroupEntry *entry;
     s32 spawned = 0;
@@ -28,7 +30,7 @@ s32 EffectGroup_SpawnPart(struct EffectGroup *group, u32 a, u32 b, u32 c, u32 d,
             entry->fadeTimer = 10;
             entry->frame = zero;
             spawned = 1;
-            sub_08014634(a, group->mode, b, c, d, e, f);
+            sub_08014634(count, group->mode, position, velocity, spread, lifetime, lifetimeMask);
             break;
         }
     }
