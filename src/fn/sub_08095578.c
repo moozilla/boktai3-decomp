@@ -1,9 +1,14 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
 void SceneActorControl_OnIdle(void);
 void Sound_PlaySong(u32);
+struct LinkedReactionContext {
+    u8 unknown0[0x558];
+    u32 flags;
+    u8 unknown55C[0x5BB - 0x55C];
+    u8 phase;
+};
 static inline u8 Blocked(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *s = input;
@@ -26,9 +31,10 @@ one:
 zero:
     return 0;
 }
-static inline u8 Test(u32 *p, u32 mask)
+static inline u8 LinkedFlag(struct LinkedReactionContext *p)
 {
-    if (*p & mask)
+    u32 mask = 0x80;
+    if (p->flags & mask)
         return 1;
     return 0;
 }
@@ -42,16 +48,19 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
 {
     struct SceneActorRegistryResetView *s = input;
     if (!Blocked(s)) {
-        register u32 mask asm("r1") = 0x4000;
-        u16 zero = s->flags2D4 & mask;
+        u32 mask = 0x4000;
+        u16 zero;
+        zero = s->flags2D4;
+        zero &= mask;
         if (!zero && contact->contactFlags == 1) {
-            register u8 *p asm("r6") = s->context;
+            struct LinkedReactionContext *p = s->context;
             void *fn = SceneActorControl_OnIdle;
             u8 code = 0x10;
             u8 one = 1;
             u8 zero8;
             u32 *flags;
             u32 two;
+            u8 linked;
 
             s->field2B2 = one;
             s->field2B0 = zero;
@@ -78,31 +87,18 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
                 u32 mask = ~0x180;
                 *f &= mask;
             }
-            {
-                u32 mask = 0x80;
-                register u32 offset asm("r2") = 0x558;
-                u32 test;
-                u32 *field;
-                field = (u32 *)(p + offset);
-                test = *field & mask;
-                asm volatile("" : : "r"(test) : "memory");
-            }
+            /* The linked flag is read here, but the result goes unused. */
+            linked = LinkedFlag(p);
             {
                 u8 *player = (*(u8 **)gPlayers);
                 u32 three;
                 three = 3;
                 player[0x4F6] += 3;
                 {
-                    register u32 mask asm("r2") = 0x80;
-                    u32 offset = 0x558;
-                    u32 *flags;
-                    flags = (u32 *)(p + offset);
-                    *flags |= mask;
+                    u32 mask = 0x80;
+                    p->flags |= mask;
                 }
-                {
-                    register u8 *field asm("r0") = p + 0x5BB;
-                    *field = three;
-                }
+                p->phase = three;
             }
             Sound_PlaySong(0x3CB);
         }
