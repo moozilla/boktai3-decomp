@@ -2889,6 +2889,7 @@ addr,name,mode,confidence,source,notes
 0807A62C,SceneActorBehavior_UpdateTimersAndContacts,thumb,low,src-alias,
 0807A714,SceneActorBehavior_DispatchPendingFlags,thumb,low,src-alias,
 0807A8CC,SceneActorMotion_Update,thumb,low,src-alias,
+0807AF94,SceneActorRoute_TryRecoveryDetour,thumb,low,src-alias,When the recovery gate permits it; tries the open cells perpendicular to the actor facing and routes to the last open cell. Uses direct arrival when the tracked target is at a different height.
 0807C11C,SceneActorEffect_PlayCategorySound,thumb,low,src-alias,
 0807C374,SceneActorEffect_PlayCategorySoundIfEnabled,thumb,low,src-alias,
 0807C394,SceneActorAttachment_SelectCategory4Offsets,thumb,low,src-alias,

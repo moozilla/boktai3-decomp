@@ -1,10 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.8%
-// Remaining difference (17 insns): reload's spill rotation in the failure tail (SetControl/SetState).
-// AGBCC_SPILL=251:5 matches: the ROM's choice before the actor reload took r4/r5, i.e. the routed
-// SetGate reload (ldr r6, [sp, #0xa4]) made no rotation step in the ROM. The u16 random index and
-// u8 direction in the turn loop fix the group/packet and table/tries allocation order.
 #include "scene_actor_chase_direct_arrival.h"
 #include "scene_actor_straight_route.h"
 #include "scene_actor_cardinal_path.h"
@@ -21,25 +15,22 @@ static inline u16 RecoveryRoute_AdvanceRandomCursor(u32 *cursor, u16 wrap)
     *cursor = index;
     return index;
 }
-#define RecoveryRoute_NextSample(table_, seed_, wrap_, bits_)                                      \
-    ({                                                                                             \
-        const struct SceneActorChaseRandomTable *table_view_ = (table_);                           \
-        const u16 *samples_ = table_view_->samples;                                                \
-        u32 *cursor_ = (seed_);                                                                    \
-        u32 wrap_mask_ = (wrap_);                                                                  \
-        u32 result_mask_ = (bits_);                                                                \
-        u16 index_ = RecoveryRoute_AdvanceRandomCursor(cursor_, wrap_mask_);                       \
-        u16 sample_;                                                                               \
-        sample_ = samples_[index_];                                                                \
-        sample_ &= result_mask_;                                                                   \
-        sample_;                                                                                   \
-    })
 static inline u32 RecoveryRoute_NewHeading(u32 current, const u16 *randomSamples)
 {
     s32 tries;
     struct SceneActorChaseRandomTable table = {randomSamples};
     for (tries = 0; tries < 4; tries++) {
-        u8 direction = RecoveryRoute_NextSample(&table, &gRandomIndex, 1023, 3) << 6;
+        u8 direction;
+        const struct SceneActorChaseRandomTable *view = &table;
+        const u16 *samples = view->samples;
+        u32 *cursor = &gRandomIndex;
+        u32 wrap = 1023;
+        u32 mask = 3;
+        u16 index = RecoveryRoute_AdvanceRandomCursor(cursor, wrap);
+        u16 sample;
+        sample = samples[index];
+        sample &= mask;
+        direction = sample << 6;
         if (direction != current)
             return direction;
     }
@@ -107,14 +98,16 @@ static inline s32 RecoveryRoute_SelectDirection(struct SceneActorRegistryResetVi
     return -1;
 }
 
-u8 sub_0807AF94(void *object)
+u8 SceneActorRoute_TryRecoveryDetour(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorChaseTracking *tracking = &actor->tracking;
+    s32 result;
     s16 *actorHeight;
     struct SceneActorChaseTarget *subject;
-    s32 direction, target;
+    s32 direction;
+    long routeValue;
     struct ContactPosition *point;
     struct ContactPosition center;
     const u16 *randomSamples;
@@ -133,28 +126,30 @@ u8 sub_0807AF94(void *object)
     direction = RecoveryRoute_SelectDirection(actor);
     if (direction < 0)
         return 0;
-    target = SceneActorTerrain_LastOpenCell(actor, direction);
-    if (!target || target == actor->terrainCell)
+    routeValue = SceneActorTerrain_LastOpenCell(actor, direction);
+    if (!routeValue || routeValue == actor->terrainCell)
         return 0;
     RecoveryRoute_BeginTurn(object, direction, randomSamples);
     point = &center;
     {
-        s32 x = Mod(target, SceneActorTerrain_Width());
-        s32 z = Div(target, SceneActorTerrain_Width());
+        s32 x = Mod(routeValue, SceneActorTerrain_Width());
+        result = Div(routeValue, SceneActorTerrain_Width());
         center.x = ((u32)x << 8) + 128;
-        point->y = (*SceneActorTerrain_GetCell(target) & 15) << 8;
-        point->z = ((u32)z << 8) + 128;
+        point->y = (*SceneActorTerrain_GetCell(routeValue) & 15) << 8;
+        point->z = ((u32)result << 8) + 128;
     }
     center.y = actor->body.position.y;
-    if (SceneActorChase_TryRoute(object, group->route, &actor->body.position, &center))
+    result = SceneActorChase_TryRoute(object, group->route, &actor->body.position, &center);
+    if (result)
         goto routed;
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
     SceneActorChase_SetState(actor, 3, 0, 0);
     return 0;
-routed:
-    RecoveryRoute_SetGate((void *)&group->common.gate.flags, 2);
+routed: {
+    u32 mask = 2;
+    routeValue = (long)&group->common.gate.flags;
+    mask |= *(u16 *)routeValue;
+    *(u16 *)routeValue = mask;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0807AF94);
-#endif
+}

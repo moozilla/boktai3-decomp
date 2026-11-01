@@ -7,7 +7,7 @@ u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
-u8 sub_0807AF94(void *);
+u8 SceneActorRoute_TryRecoveryDetour(void *);
 static inline u32 ContactRoute_FieldBits(u32 mask, u16 *field)
 {
     return *field & mask;
@@ -156,7 +156,7 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 32, 32, speed)) {
             if (!SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
-                if (sub_0807AF94(actor))
+                if (SceneActorRoute_TryRecoveryDetour(actor))
                     return;
                 if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 1)) {
                     u32 saved = ((actor->unknown3CD[0] + 5) & 7) << 5;
