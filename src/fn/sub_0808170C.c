@@ -1,22 +1,11 @@
 #include "global.h"
 // confidence=low: settles reaction displacement and restores normal actor control.
-#ifdef NONMATCHING
-// fuzzy: 87.7%
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_displacement.h"
 #include "display_sequence.h"
 
-void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
-
-static inline void Reaction_ClearHalf(u16 *field, s32 mask)
-{
-    *field &= mask;
-}
-static inline void Reaction_ClearWord(u32 *field, s32 mask)
-{
-    *field &= mask;
-}
+void SceneActorAttachment_ReplaceResponseSlot(void *, u8, u8, u8);
 
 static inline s32 Reaction_ThirtySecond(s32 value)
 {
@@ -55,17 +44,6 @@ static inline void Recovery_ClearTrackingFlags(struct SceneActorChaseTracking *t
     tracking->flags &= mask;
 }
 
-static inline void Recovery_AdjustMotionFlags(struct SceneActorChaseFlags16 *field, u16 set,
-                                              u32 clear)
-{
-    u16 value = set;
-    u32 result;
-    value |= field->value;
-    result = value;
-    result &= ~clear;
-    field->value = result;
-}
-
 static inline void Recovery_ClearRoute(struct SceneActorRegistryResetView *actor,
                                        struct SceneActorRegistryControl *control)
 {
@@ -89,13 +67,11 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
     s32 z;
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 category = actor->category;
-        u32 *word;
         struct SceneActorChaseFlags16 *motion;
         actor->body.direction = (((actor->body.direction + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 6);
-        word = &actor->flags2D0;
         if (!Recovery_StatusFlags(actor, 2)) {
-            if (*word & 1) {
+            if (Recovery_StatusFlags(actor, 1)) {
                 SceneActorAttachment_ReplaceResponseSlot(actor, 3, 2, category);
                 Recovery_ClearStatusFlags(actor, 1);
             } else
@@ -132,7 +108,8 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
         {
             u16 bits = 2;
             motion = (void *)&actor->flags2D4;
-            Recovery_AdjustMotionFlags(motion, bits, 0x17A9);
+            SceneActorChase_SetFlagComponent(motion, bits);
+            SceneActorChase_ClearFlagComponent(motion, 0x17A9);
         }
         {
             struct SceneActorRegistryControl *control;
@@ -169,7 +146,7 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
         s32 remainder = Mod(counter, 30);
         s32 limit = 15 - Div(counter, 10);
         if (remainder < limit) {
-            SceneActorChase_SetFlagComponent((void *)&actor->flags2D6, 0x20);
+            SceneActorChase_SetReactionFlags(actor, 32);
         }
     }
     x = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &priorX);
@@ -192,23 +169,17 @@ void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *a
         actor->field2B6 = (Reaction_ThirtySecond(actor->body.direction) + 7) & 7;
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, group->field5E0, 8);
-        Reaction_ClearWord(&actor->flags2D0, ~2);
-        Reaction_ClearHalf(&actor->flags2D4, ~0x3A);
+        SceneActorChase_ClearWordFlags(&actor->flags2D0, 2);
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x3A);
         SceneActorChase_SetState(actor, 3, 1, 0);
         actor->body.direction = ((actor->body.direction + 32) >> 6) << 6;
         collider = &actor->colliderA;
         if (Recovery_ActorCollisionFlags(actor, 0x40)) {
             collider->flags &= 0xFEFF;
-        } else if (SceneActorChase_MotionFlags(actor, 0x2016)) {
+        } else if (SceneActorChase_QueryMotionFlagComponent(actor, 0x2016)) {
             collider->flags &= 0xFEFF;
         } else {
-            u32 old = collider->flags;
-            u32 mask = 0x100;
-            collider->flags = mask | old;
+            collider->flags |= 0x100;
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_SettleDisplacement);
-#endif
