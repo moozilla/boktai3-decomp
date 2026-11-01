@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 void Slime_RollMoveFlag(struct SceneActorRegistryResetView *actor)
 {
@@ -9,21 +8,22 @@ void Slime_RollMoveFlag(struct SceneActorRegistryResetView *actor)
         SceneActorAnimation_SelectProfileEntry((void *)actor, 0x10);
     }
     {
-        register s32 r asm("r0");
-        u32 idx;
-        register u32 *g asm("r0") = &gRandomIndex;
-        idx = (*g + 1) & 1023;
-        *g = idx;
-        r = *(u8 *)(idx * 2 + (u32)gRandomTable);
-        if (r <= 7)
-            r = 0x10;
-        else if (r <= 13)
-            r = 0x20;
-        else
-            return;
-        {
-            register u16 *f asm("r2") = &actor->flags2D6;
-            *f = r | *f;
+        u32 *cur = &gRandomIndex;
+        u32 index;
+        s32 roll;
+        index = (*cur + 1) & 0x3ff;
+        *cur = index;
+        roll = *(u8 *)(index * 2 + RANDOM_TABLE_ADDR);
+        if (roll <= 7) {
+            u32 mask = 0x10;
+            u16 *flags = &actor->flags2D6;
+            mask |= *flags;
+            *flags = mask;
+        } else if (roll <= 13) {
+            u32 mask = 0x20;
+            u16 *flags = &actor->flags2D6;
+            mask |= *flags;
+            *flags = mask;
         }
     }
 }
