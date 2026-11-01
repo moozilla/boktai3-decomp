@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
 s32 Mod(s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
