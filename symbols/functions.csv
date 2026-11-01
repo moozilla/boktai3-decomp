@@ -2942,6 +2942,7 @@ addr,name,mode,confidence,source,notes
 08083AEC,SceneActorControl_InitContactColliders,thumb,low,src-alias,Initializes the actor body and external attack colliders with their contact callbacks.
 08083B90,SceneActorControl_GetTravelProfile,thumb,low,src-alias,
 08083BFC,SceneActorControl_InitPositionCurveEndpoints,thumb,low,src-alias,Copies the current position and destination into control context endpoints and resets interpolation progress.
+08083C38,SceneActorControl_AdvancePositionCurve,thumb,low,src-alias,Advances the position curve from its stored endpoints and returns one at completion; confidence=low.
 08083E18,SceneActorControl_SetDefaultProfile,thumb,low,src-alias,Assigns the category 18 mode 0 profile to the actor profile field.
 08083E34,SceneActorControl_ResetCollisionPhase,thumb,low,src-alias,
 08083E70,SceneActorControl_GetDirectionalVariant,thumb,low,src-alias,Converts an angle into a symmetric animation variant index from 0 to 4 and a mirrored-side flag.
