@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
@@ -21,6 +20,10 @@ static inline u8 TestActor(struct SceneActorRegistryResetView *p, u32 mask)
         return 1;
     return 0;
 }
+static inline void SetFlags(u16 mask, u16 *field)
+{
+    *field |= mask;
+}
 static inline u8 TestValue(u32 value)
 {
     if (value)
@@ -28,27 +31,15 @@ static inline u8 TestValue(u32 value)
     return 0;
 }
 
-u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *p0, u32 reset0)
+u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *q, u32 reset)
 {
-    struct SceneActorRegistryResetView *q;
-    struct SceneActorRegistryResetView *p;
+    struct SceneActorRegistryResetView *p = q;
     u16 *flags;
     u32 first;
-    u32 reset;
-    {
-        register struct SceneActorRegistryResetView *input asm("r3") = p0;
-        u32 incomingReset = reset0;
-        asm("" : "+r"(input), "+r"(incomingReset));
-        reset = incomingReset;
-        q = input;
-    }
-    p = q;
     if (TestActor(p, 1)) {
         if (reset == 1) {
-            u32 mask = 2;
             q->field69E = 0;
-            asm("" : "+r"(mask));
-            q->flags6D4 = mask | q->flags6D4;
+            SetFlags(2, &q->flags6D4);
         }
         sub_080B3110(p, reset, gUnk_0824E230, 0x60B);
         return 1;
