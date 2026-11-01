@@ -1,6 +1,5 @@
 # Actor_ConfigureInteractionChildFromScript
 
-The guarded child setup reaches 70.2% fuzzy. The controller uses a sprite, a
-three-component world position and a callback/control record in each 0xDC-byte
-slot. The C compiler still combines several address computations that the ROM
-carries separately through the slot search. The recovered draft is 816 bytes.
+The scripted child has a 0xDC-byte stride and a callback at offset 0xAC. agbcc rounds the three-halfword position at 0x48 up to eight bytes, so the following padding starts at 0x50. With that layout the guarded C and ROM produced identical controller bytes and script/API calls in 2,880 paired executions, including later and unavailable slots, missing controllers, both orientations and all four command cases tested. The guarded draft scores 70.0% against the 892-byte extent.
+
+Tags: #actor-animation #script #matching

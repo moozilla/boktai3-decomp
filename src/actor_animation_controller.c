@@ -4428,10 +4428,12 @@ struct ScriptInteractionChild {
     struct ActorSprite sprite;
     u8 unknown24[0x48 - 0x24];
     struct Vec world;
-    u8 unknown4E[0xA4 - 0x4E];
+    u8 unknown50[0xA4 - 0x50];
     s32 completionScript, startScript;
     struct InteractionChildHandler handler;
 };
+
+typedef char ScriptInteractionChildSizeCheck[sizeof(struct ScriptInteractionChild) == 0xDC ? 1 : -1];
 
 void Terrain_GetBoxMinPosition(u16, void *);
 u8 *Script_GetPc(void);
@@ -4456,7 +4458,7 @@ static inline void interaction_state(struct ActorAnimController *g, u32 mode, u3
 /* Tentative name: Actor_ConfigureInteractionChildFromScript.
  * Configure the first available interaction marker from the current script. */
 #ifdef NONMATCHING
-// fuzzy: 70.2%
+// fuzzy: 70.0%
 void Actor_ConfigureInteractionChildFromScript(void)
 {
     struct Vec position;
