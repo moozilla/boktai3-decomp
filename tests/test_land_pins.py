@@ -31,6 +31,11 @@ class LandPins(unittest.TestCase):
         self.assertEqual(land.added_concessions(DRAFT, loop), (0, 1))
         self.assertEqual(land.added_concessions(DRAFT, "int F(void) { do { g(); } while (0); return 0; }\n"), (0, 0))
 
+    def test_an_empty_if_counts_unless_its_body_is_debug_print(self):
+        self.assertEqual(land.added_concessions(DRAFT, "int F(void) { if (G(1)) { } return 0; }\n"), (0, 1))
+        self.assertEqual(land.added_concessions(DRAFT, "int F(void) { if (G(1)) {\n DEBUG_PRINT();\n }\n"
+                                                       " return 0; }\n"), (0, 0))
+
     def test_refusal_names_the_flag_and_the_pins_command(self):
         text = land.pin_refusal("F", 1, 0, "src/fn/f.c")
         self.assertIn("1 register pin.", text)

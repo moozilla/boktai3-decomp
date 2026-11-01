@@ -2,6 +2,7 @@
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_turn.h"
+#include "debug.h"
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
@@ -142,6 +143,7 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
     struct ContactRouteFlagOwner motionFlags;
     u32 durationMask;
     if (SceneActorControl_TakeStateEntry(actor)) {
+        DEBUG_PRINT();
     }
     if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;

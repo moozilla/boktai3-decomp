@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ivy_phase.h"
+#include "debug.h"
 
 /* Like Ivy_ResetPhase, but the phase's behaviour byte restarts at 1. */
 static inline void Ivy_ResetPhaseActive(u8 *p)
@@ -20,6 +21,7 @@ void sub_080EBA84(u8 *p)
 {
     u8 *sub = p + 0x3D4;
     if (SceneActorControl_TakeFlag(&p[0x2B1])) {
+        DEBUG_PRINT();
     }
     if (*(u16 *)(sub + 0x42) <= *(s32 *)(p + 0x2AC))
         Ivy_ResetPhaseActive(p);

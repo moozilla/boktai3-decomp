@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
+#include "debug.h"
 
 // confidence=low: preserves the existing tentative reaction-state interpretation.
 
@@ -44,6 +45,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
     u8 result;
     u32 *savedFlags;
     if (Chase_TakeArrived(actor)) {
+        DEBUG_PRINT();
     }
     if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;

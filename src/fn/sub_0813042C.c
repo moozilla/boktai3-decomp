@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
+#include "debug.h"
 
 static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
 {
@@ -33,6 +34,7 @@ void SceneActorControl_EnterTimedState(struct SceneActorRegistryResetView *actor
     u32 zero;
     u32 bit;
     if (TakeReset(actor)) {
+        DEBUG_PRINT();
     }
     bit = 0x20;
     masked = *(u16 *)((u8 *)actor + 0x2d4) & bit;
