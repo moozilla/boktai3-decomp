@@ -15,7 +15,7 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s32, s32, s32, u32);
 s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
                                 s32, s32, s32, u32);
-void sub_0807D2E0(void *, u32, struct ContactPosition *, u32, u32, u32);
+void SceneActorReaction_ApplyHitResponse(void *, u32, struct ContactPosition *, u32, u32, u32);
 
 struct OctopusTarget {
     u8 unknown0[8];
@@ -194,7 +194,7 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
             Sound_PlaySong(0xE6);
         } else if (target->kind & 4) {
             victim = target->player;
-            sub_0807D2E0(victim, 2, &position, 0, 0, 0);
+            SceneActorReaction_ApplyHitResponse(victim, 2, &position, 0, 0, 0);
             SceneActorBehavior_PlayReactionSound(victim);
         }
     } else
@@ -207,7 +207,7 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
         Hide(actor);
         if (target->kind & 4) {
             victim = target->player;
-            sub_0807D2E0(victim, 2, &position, 0, 0x40, 0);
+            SceneActorReaction_ApplyHitResponse(victim, 2, &position, 0, 0x40, 0);
         } else if (target->kind <= 3) {
             s32 turn, angle;
             player = target->player;

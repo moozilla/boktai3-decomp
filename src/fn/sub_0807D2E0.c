@@ -52,7 +52,7 @@ static inline void SetReactionState(struct SceneActorRegistryResetView *a, u32 s
 
 #ifdef NONMATCHING
 // fuzzy: 60.3%
-void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 p3, u32 flip,
+void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactPosition *position, u32 p3, u32 flip,
                   u32 p5)
 {
     struct SceneActorRegistryResetView *a = victim;
@@ -160,5 +160,5 @@ mode2:
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0807D2E0);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyHitResponse);
 #endif
