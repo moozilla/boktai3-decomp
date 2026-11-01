@@ -1136,14 +1136,12 @@ static inline u8 ownerIsCurrent(u32 owner)
 
 static inline void disableCollision(u16 *flags)
 {
-    register u32 value asm("r1") = *flags;
-    {
-        u32 result = value | 4;
-        *flags = result;
-    }
+    u32 value = *flags;
+    u32 state = 4;
+    state |= value;
+    *flags = state;
 }
 
-// MATCHING_CONCESSION: register-pinning
 s32 SceneObjects_Update(struct SceneObjectManager *manager)
 {
     struct SceneObject *p = manager->objects;
