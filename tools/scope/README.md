@@ -1194,6 +1194,47 @@ Each was read from the compiler source and confirmed on a live draft.
    global directly, with only the angle in a local, matched UpdateKindNineRecoil and both
    UpdateDirectedMovement functions.
 
+48. **A pointer assembled from its two halves has no equivalence, so when it spills it gets a
+   stack slot.** The ROM's `ldr rN, =0x203B400; str rN, [sp, #K]`, read back only from
+   `[sp, #K]`, is a spilled pseudo that reload could not rematerialize. update_equiv_regs
+   (local-alloc.c) makes a REG_EQUIV only from a REG_EQUAL note or a memory source, and cse1
+   puts `REG_EQUAL (symbol_ref)` on every plain `table = gRandomTable` set (fact 21's union
+   initializer included). A local `union { const u16 *table; u16 halves[2]; }` avoids the
+   note: store the halves separately (`source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+   source.halves[1] = RANDOM_TABLE_ADDR >> 16;`) and read the pointer through an inline that
+   takes `&source` (`return source->table;`). purge_addressof makes the union an SImode pseudo
+   and the half stores bit-field insertions. cse cannot fold those, and combine folds them into
+   the constant without adding a note. Write the halves directly: storing them through a
+   pointer helper keeps the union in memory (the offset-2 store keeps the pointer pseudo), and
+   so does `source.table` with the address never taken (u6 in ChargedBurst: 54 / 62). Matched
+   this way: SingletonSlot7_UpdateShakingDeparture (081EEECC), ChargedBurst_EmitSpark
+   (082335F0, with fact 49) and HealthRestoreEffect_StartParticleBurst (08234868, where this
+   was the only difference). `frame` suggests it when it finds the pattern. It names instead a
+   copy of the equivalent pseudo that has no equivalence of its own (an inline's parameter):
+   in 080BF0E4 the ROM's slot is that copy's, evicted by reload with the constant
+   rematerialized into it, so the slot follows from register pressure. There the union adds a
+   second slot. Its first half store reads the uninitialized union, and when combine folds
+   that read away, distribute_notes finds no earlier use before the turn's label and leaves
+   a `(use (reg))` there, which keeps the union live from the function's entry.
+
+49. **A pointer sum keeps the C's operand order, and the order decides local-alloc's tie.**
+   `&table[index]` and `table + index` expand to `(plus table (index*2))`: c-typeck puts the
+   pointer first, and expand_binop swaps commutative operands only when the first is a
+   constant, or a non-register while the second is a register. At -O2, flag_force_mem loads a
+   memory operand into a register before that test, so a `source->table` read does not swap
+   either. Integer arithmetic keeps the written order: `(const u16 *)(index * sizeof(*table) +
+   (u32)table)` gives `(plus (index*2) table)`. When both operands die at the add,
+   local-alloc's combine_regs ties the sum to the first. In ChargedBurst_EmitSpark,
+   pointer-first tied the z sample address to the table. That made the table's register,
+   r6, just too dense (6 refs over 58 insns, 0.103) for p (11 over 108, 0.102) to take it over
+   in global.c's find_reg, which hands a pseudo that finds no free register the highest local
+   register used more sparsely than itself (`local_reg_n_refs / local_reg_live_length`). So p
+   took r5 (63 / 59). Index first, the sum ties to the shifted index, the table sits alone in
+   r6 at 4 refs over 50, and p evicts it there, as in the ROM. The sign in a listing is the ROM's `adds rD, rD, rT`
+   for a sample address where the draft has `adds rD, rT, rD`. An array read used directly as
+   a memory operand (`samples_[index_]`) is index first already (expand_expr's EXPAND_SUM
+   path puts a multiplication first).
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

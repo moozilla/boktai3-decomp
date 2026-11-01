@@ -19,13 +19,18 @@ struct ChargedBurst {
     u8 nextSpark, sparkDelay;
 };
 
-#ifdef NONMATCHING
-// fuzzy: 66.7%
-// scope shape 36 (differences once low registers are set aside)
-// Exact once the table has no equivalence (scope knob AGBCC_NOEQUIV=36): the ROM
-// stores it to the stack, the draft reloads the constant. See
-// notes/opus-charged-burst-spark_2026-10-31.md.
-// Emits one spark every second call, cycling through the eight slots.
+// The random table's address is assembled from its two halves; the ROM keeps the
+// pointer in a stack slot rather than reloading the constant (as in 081EEECC).
+union ChargedBurstTableSource {
+    const u16 *table;
+    u16 halves[2];
+};
+static inline const u16 *ChargedBurst_ReadTable(const union ChargedBurstTableSource *source)
+{
+    return source->table;
+}
+// Emits one spark every second call, cycling through the eight slots. Each spark
+// starts at the burst's position, offset by -127 to +128 on each axis.
 void ChargedBurst_EmitSpark(struct ChargedBurst *p)
 {
     u8 *delayAddress = &p->sparkDelay;
@@ -35,26 +40,29 @@ void ChargedBurst_EmitSpark(struct ChargedBurst *p)
     byteMask = 255;
     if ((u8)(delay & byteMask) > 1) {
         const u16 *table;
+        union ChargedBurstTableSource source;
         u32 *seed;
         u16 index;
         u32 mask;
 
         p->sparks[p->nextSpark].flags &= ~1;
         p->sparks[p->nextSpark].position = p->position;
-        table = gRandomTable;
+        source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+        source.halves[1] = RANDOM_TABLE_ADDR >> 16;
+        table = ChargedBurst_ReadTable(&source);
         seed = &gRandomIndex;
         index = *seed + 1;
         mask = 1023;
         index &= mask;
         {
-            const u16 *sample = &table[index];
+            const u16 *sample = (const u16 *)(index * sizeof(*table) + (u32)table);
             u32 coordinate = (u16)p->sparks[p->nextSpark].position.x;
             coordinate -= 127;
             p->sparks[p->nextSpark].position.x = coordinate + (u8)*sample;
         }
         index = (index + 1) & mask;
         {
-            const u16 *sample = &table[index];
+            const u16 *sample = (const u16 *)(index * sizeof(*table) + (u32)table);
             u32 coordinate = (u16)p->sparks[p->nextSpark].position.y;
             coordinate -= 127;
             p->sparks[p->nextSpark].position.y = coordinate + (u8)*sample;
@@ -62,7 +70,7 @@ void ChargedBurst_EmitSpark(struct ChargedBurst *p)
         index = (index + 1) & mask;
         *seed = index;
         {
-            const u16 *sample = &table[index];
+            const u16 *sample = (const u16 *)(index * sizeof(*table) + (u32)table);
             u32 coordinate = (u16)p->sparks[p->nextSpark].position.z;
             coordinate -= 127;
             p->sparks[p->nextSpark].position.z = coordinate + (u8)*sample;
@@ -78,6 +86,3 @@ void ChargedBurst_EmitSpark(struct ChargedBurst *p)
         *delayAddress = 0;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ChargedBurst_EmitSpark);
-#endif

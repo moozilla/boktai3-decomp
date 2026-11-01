@@ -1,19 +1,48 @@
-# ChargedBurst_EmitSpark (082335F0): holdout, one equivalence short
+# ChargedBurst_EmitSpark (082335F0): matched (2026-11-01)
 
-Tags: #matching #charged-burst #random-table #compiler #local-alloc #reload #combine #holdout
+Tags: #matching #charged-burst #random-table #compiler #local-alloc #reload #combine #global-alloc
 
-**Not matched.** `ChargedBurst_EmitSpark` stays `INCLUDE_ASM`. The best
-ordinary-C draft is in the unit's `#ifdef NONMATCHING` block: fuzzy 66.7%,
-scope 50 ROM / 40 draft instructions differing, shape 36. It has no register
-pins, barriers, inline assembly or compiler overrides. With the scope knob
-`AGBCC_NOEQUIV=36`, which gives pseudo 36 (the random table) no equivalence,
-the build's compile of this draft is byte-identical to the ROM (the `-g` one
-too). The knob is diagnostic only (commit `2d1a19e0f`). This note used to say
-only the `-g` compile matched: with the knob set in the environment, scope's
-plain compile ran without it, a scope bug fixed on 2026-11-01. No ordinary C found so far gives the
-table pseudo that property. The matchsearch store is
-`build/matchsearch/opus_082335F0` (root = the landed draft, five ruled-out
-nodes with their hypotheses).
+**Matched, pin-free** (commit `d7da7d897`, merged in PR 965). Two ordinary-C
+changes to the holdout draft did it:
+
+1. **The table pointer is a union assembled from its two halves** (the
+   081EEECC idiom): `union ChargedBurstTableSource { const u16 *table; u16
+   halves[2]; }`, `source.halves[0] = (u16)RANDOM_TABLE_ADDR; source.halves[1] =
+   RANDOM_TABLE_ADDR >> 16;`, then `table = ChargedBurst_ReadTable(&source)`
+   (an inline returning `source->table`). cse cannot fold the two half
+   insertions, and combine folds them into 0x203B400 without a REG_EQUAL note.
+   So update_equiv_regs has nothing to make a REG_EQUIV from, and the spilled
+   table gets the ROM's slot at sp+4 (shape 36 to 4; 63 / 59 differing).
+2. **Each sample address is index first**: `(const u16 *)(index *
+   sizeof(*table) + (u32)table)`. `&table[index]` expands to `(plus table
+   (index*2))`. expand_binop does not swap it, because flag_force_mem has
+   already loaded any memory operand into a register (o1, o3 below). At the z
+   sample both operands die, and local-alloc ties the sum to the first, the
+   table. That puts table and z sample in r6 at 6 refs over 58 insns, just
+   denser than p (11 over 108). So global.c's takeover of a sparse local
+   register skips r6, and p takes r5. Index first, the sum ties to the shifted
+   index, the table sits alone in r6 (4 over 50), and p evicts it. The table
+   moves to r5, mask to r4, and the 0x2c constant is rematerialized, as in the
+   ROM. Then the reload rotation matches as well.
+
+`tools/scope/README.md` facts 48 and 49 describe both. `frame` now suggests the
+union when it finds the spilled-constant pattern.
+
+| Draft (`build/scope/drafts/cb2/`) | Change | Differing |
+|---|---|---|
+| base | the holdout draft | 50 / 40 (shape 36) |
+| u1, u4, u5, u7 | halves union (read per sample, or once into `table`) | 63 / 59 (shape 4) |
+| u2 | `source.table = gRandomTable` | 50 / 40, as base |
+| u3, u6 | halves with `&source.table[index]` / `table = source.table` (address never taken) | 54 / 62, 54 / 62 (shape 38) |
+| o1 | helper returning `&source->table[index]` | 63 / 59 |
+| o2 | halves stored through a pointer helper: the union stays in memory (two `strh`) | 55 / 57 (shape 28) |
+| o3 | `ChargedBurst_ReadTable(&source) + index` | 63 / 59 |
+| i5 | `(const u16 *)((u32)table + index * 2)` (pointer first) | 63 / 59 |
+| i4 | `(const u16 *)((u8 *)table + index * 2)` | 63 / 59 |
+| b1 | index first without the union | 50 / 40 (shape 36) |
+| i1, i2, i3, i6 (landed) | union + index first (`* 2`, `<< 1`, `(u32)index * 2`, `* sizeof(*table)`) | **exact** |
+
+The rest of this note is the holdout record as it stood before the match.
 
 ## What the ROM shows
 
