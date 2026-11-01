@@ -1135,7 +1135,7 @@ Each was read from the compiler source and confirmed on a live draft.
    declared before the `if` and assigned in both branches. That pseudo lives in two blocks,
    so global alloc gets it (r2 through the copy), and the load takes the lowest free
    register. This also moved NativeEffect_CreateFromProfile's case-2 offset from r4 to r3.
-=======
+
 43. **A constant variable is reloaded from its reload register; a 16-bit literal from its
    home.** A pseudo set once to a constant gets a REG_EQUIV note, and reload replaces every
    use of it by the constant (find_reloads), even when global alloc gave it a register.
