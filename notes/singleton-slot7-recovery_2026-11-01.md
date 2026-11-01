@@ -11,3 +11,10 @@ Tags: 081F0734 SingletonSlot7_DispatchPendingCommands
 The dispatcher matches all 1,776 bytes. Five paths snapshot four palette
 banks, then record the source and destination rows for the transition.
 Command 16 retains both argument tests and repeats the dark transition.
+
+Tags: 081F1C2C SingletonSlot7_InitFromScript
+
+SingletonSlot7_InitFromScript matches all 1,032 bytes. Separate indices
+fill the white palette and snapshot the four background banks. The
+byte-valued hold flag survives the palette bank setup before both drawable
+modes are set.
