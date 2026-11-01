@@ -1,24 +1,16 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 88.6%
+// fuzzy: 89.0%
 #include "scene_actor_reaction.h"
+#include "scene_actor_part_burst.h"
 #include "scene_actor_behavior.h"
 #include "script_utility.h"
 #include "runtime.h"
-#include "spark_particle.h"
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void ActorParticles_SpawnWideBurst(void *);
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 #include "scene_actor_record.h"
-static inline u32 NextRandom(const u16 *table)
-{
-    u32 *index = &gRandomIndex;
-    u32 next;
-    next = (*index + 1) & 1023;
-    *index = next;
-    return table[next];
-}
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -107,11 +99,8 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
             bit = 4;
             collider->flags = bit | collider->flags;
             {
-
-                {
-                    u16 *field = &collider->responseValue;
-                    *field = zero;
-                }
+                u16 *field = &collider->responseValue;
+                *field = zero;
             }
             actor->fieldAA = zero;
         }
@@ -149,29 +138,10 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     range.x = 80;
     range.y = 60;
     range.z = 60;
-    {
-        struct ContactPosition *rangePointer = &range;
-        u32 life;
-        u32 mode;
-        u32 flag;
-        {
-            const u16 *raw = (const u16 *)RANDOM_TABLE_ADDR;
-            source.table = raw;
-        }
-        SparkParticle_Spawn(&actor->body.position,
-                            (NextRandom((const u16 *)RANDOM_TABLE_ADDR) & 3) + 1, rangePointer, 32,
-                            4, (life = 20), (mode = 2), (flag = 1));
-        SparkParticle_Spawn(&actor->body.position, (NextRandom(source.table) & 3) + 1, rangePointer,
-                            64, 4, life, mode, flag);
-        SparkParticle_Spawn(&actor->body.position, (NextRandom(source.table) & 3) + 1, rangePointer,
-                            94, 4, life, mode, flag);
-        SparkParticle_Spawn(&actor->body.position, (NextRandom(source.table) & 3) + 1, rangePointer,
-                            128, 4, life, mode, flag);
-        SparkParticle_Spawn(&actor->body.position, (NextRandom(source.table) & 3) + 1, rangePointer,
-                            196, 4, life, mode, flag);
-        SparkParticle_Spawn(&actor->body.position, (NextRandom(source.table) & 3) + 1, rangePointer,
-                            240, 4, life, mode, flag);
-    }
+    source.table = (const u16 *)RANDOM_TABLE_ADDR;
+    SceneActorEffects_SpawnDefeatSparks(
+        actor, &range, source.table,
+        SceneActorEffects_NextSparkCount((const u16 *)RANDOM_TABLE_ADDR));
     if (actor->category == 4 || actor->category == 1 || actor->category == 5 ||
         actor->category == 7 || actor->category == 6 || actor->category == 24 ||
         actor->category == 25)
@@ -199,7 +169,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);
     if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
-        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->body.id);
     ActorShadow_Disable(actor->shadow);
 }
 
