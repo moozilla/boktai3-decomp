@@ -1,9 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 /* tentative: per-frame active state: counts down, re-arms the collider and restarts the animation */
 
-#include "actor_attachment_sprite_playback.h"
+#include "player_cue_sequence.h"
 #include "background_controller.h"
 
 struct BurstPos {
@@ -71,7 +70,7 @@ skip: {
     dst->y = ((s32)(pos->z + (pos->y + yOff)) >> 12) + 0x60;
     dst->z = pos->z >> 12;
 }
-    ActorAttachment_StepSprite(&p->sprite, &p->anim);
+    PlayerCue_StepSequenceEnded(&p->sprite, &p->anim);
     SpatialIndex_InsertEntry(p->collider);
     if (--p->duration == 0)
         ParticleBurstEffect_SetStateCallback(p, SpriteEffect_HideWithScatterBurst);
