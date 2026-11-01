@@ -1,6 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 
 void ActorContact_TickAuxiliaryTimers(u8 *actor)
 {
@@ -10,17 +9,16 @@ void ActorContact_TickAuxiliaryTimers(u8 *actor)
     u32 offset = 0x430;
     s32 i;
     i = 3;
-    do {
-        u16 *timer = (u16 *)(entry + offset);
-        if (*timer) {
-            --*timer;
-            if (*timer == 0) {
-                u32 value = *flags;
-                register u32 bit asm("r1") = 1;
-                *flags = value | bit;
-            }
-        }
-        flags = (u32 *)((u8 *)flags + 0x60);
-        entry += 0x60;
-    } while (--i >= 0);
+loop: {
+    u16 *timer = (u16 *)(entry + offset);
+    if (*timer) {
+        --*timer;
+        if (*timer == 0)
+            *flags |= 1;
+    }
+    flags = (u32 *)((u8 *)flags + 0x60);
+    entry += 0x60;
+}
+    if (--i >= 0)
+        goto loop;
 }

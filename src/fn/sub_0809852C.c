@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
 #include "engine.h"
 struct GhostVisibilityState {
@@ -35,8 +34,8 @@ static inline void Hide(struct SceneActorRegistryResetView *input)
     struct SceneActorRegistryResetView *actor = input;
     {
         u32 *flags = actor->drawable;
-        register u32 value asm("r0") = *flags;
-        register u32 one asm("r1") = 1;
+        u32 value = *flags;
+        u32 one = 1;
         *flags = value | one;
     }
     {
@@ -50,9 +49,8 @@ static inline void Show(struct SceneActorRegistryResetView *input)
     struct SceneActorRegistryResetView *actor = input;
     {
         u32 *flags = actor->drawable;
-        register u32 value asm("r0") = *flags;
-        register u32 mask asm("r1");
-        asm("" ::: "r1");
+        u32 value = *flags;
+        u32 mask;
         mask = ~1;
         *flags = value & mask;
     }
@@ -81,10 +79,10 @@ void Ghost_TickVisibilityTransition(struct SceneActorRegistryResetView *input)
             return;
     }
     {
-        u32 ignored = gEngineFlags & 0x4800;
+        /* The engine flags are tested here, but the result goes unused. */
+        u8 ignored = SceneActorControl_TestFlags(gEngineFlags, 0x4800);
         u32 counter;
         u32 value;
-        asm volatile("" : "+r"(ignored));
         {
             u32 offset = 0x5B2;
             u16 *field;
@@ -93,22 +91,12 @@ void Ghost_TickVisibilityTransition(struct SceneActorRegistryResetView *input)
         }
         value = counter >> 16;
         if (value <= 19) {
-            if (({
-                    u32 shifted = counter >> 18;
-                    u32 one;
-                    one = 1;
-                    shifted & one;
-                }))
+            if ((u8)(counter >> 18) & 1)
                 Show(actor);
             else
                 Hide(actor);
         } else if (value <= 29) {
-            if (({
-                    u32 shifted = counter >> 17;
-                    u32 one;
-                    one = 1;
-                    shifted & one;
-                }))
+            if ((u8)(counter >> 17) & 1)
                 Show(actor);
             else
                 Hide(actor);

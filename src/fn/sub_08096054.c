@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
@@ -31,6 +30,15 @@ static inline u32 Test(u16 *f, u32 maskInput)
     u32 mask = maskInput;
     return *f & mask;
 }
+static inline void SetPhase(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
+                            u8 behavior)
+{
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
+}
 static inline u32 Random4(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -48,14 +56,15 @@ void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick)
     struct ContactPosition range;
     s32 x, z;
     s16 *priorX, *priorZ;
-    register u16 *f asm("r6");
+    u16 *f;
     u8 taken;
     taken = SceneActorControl_TakeFlag(&actor->field2B2);
     f = &actor->flags2D4;
     if (taken) {
         {
-            register u32 mask asm("r0") = 0x20;
-            *f = mask | *f;
+            u32 value = 0x20;
+            value |= *f;
+            *f = value;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         Bee_ClearActionFlags(actor);
@@ -68,31 +77,21 @@ void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick)
             range.x = 60;
             range.y = 60;
             range.z = 40;
-            SparkParticle_Spawn(&actor->body.position, Random4(), &range, actor->body.direction + 128, 10, 6,
-                                2, 2);
+            SparkParticle_Spawn(&actor->body.position, Random4(), &range,
+                                actor->body.direction + 128, 10, 6, 2, 2);
         }
     }
     {
-        u32 offset = 0x310;
-        s32 current = *(s16 *)((u8 *)actor + offset);
-        u32 priorOffset;
-        s16 *field;
-        s32 difference;
-        priorOffset = 0x318;
-        field = (void *)((u8 *)actor + priorOffset);
-        difference = current - *field;
+        s32 current = *(s16 *)((u8 *)actor + 0x310);
+        s16 *field = (void *)((u8 *)actor + 0x318);
+        s32 difference = current - *field;
         priorX = field;
         x = Quarter(difference);
     }
     {
-        register u32 offset asm("r4") = 0x314;
-        s32 current = *(s16 *)((u8 *)actor + offset);
-        register s16 *field asm("r1");
-        s32 difference;
-        offset += 8;
-        asm("" : "+r"(offset));
-        field = (void *)((u8 *)actor + offset);
-        difference = current - *field;
+        s32 current = *(s16 *)((u8 *)actor + 0x314);
+        s16 *field = (void *)((u8 *)actor + 0x31C);
+        s32 difference = current - *field;
         priorZ = field;
         z = Quarter(difference);
     }
@@ -103,34 +102,25 @@ void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick)
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z)) {
-        u32 ready;
-        register u32 zero asm("r9");
-        u32 stateTest;
-        {
-            u32 offset = 0x2B0;
-            u8 *field = (u8 *)actor + offset;
-            zero = 0;
-            ready = 1;
-            *field = ready;
-        }
+        actor->field2B0 = 1;
         Bee_ConsumeFlag80(actor);
         {
-            u32 mask = ~0x28;
-            u32 loaded = *f;
-            mask &= loaded;
-            stateTest = 0;
-            *f = mask;
+            struct SignedFlag {
+                s32 bits : 16;
+            };
+            struct SignedFlag *flags = (void *)f;
+            s32 m = ~0x28;
+            m &= (u16)flags->bits;
+            flags->bits = m;
         }
         {
             u32 *flags = &actor->flags2CC;
-            u32 mask = ~0x80;
+            s32 mask = ~0x80;
             *flags &= mask;
         }
         {
             u32 mask = 0x100000;
-            u32 offset = 0x2D0;
-            u32 *flags = (void *)((u8 *)actor + offset);
-            *flags |= mask;
+            actor->flags2D0 |= mask;
         }
         SceneActor_EndLinkedReaction(actor);
         {
@@ -142,15 +132,6 @@ void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick)
             u16 v = *(u16 *)(ctx + 0x622);
             *(u16 *)(ctx + 0x624) = v;
         }
-        {
-            u32 phase = 2;
-            u32 offset = 0x2A8;
-            u8 *field = (u8 *)actor + offset;
-            *field = stateTest;
-            *((u8 *)actor + 0x2A9) = phase;
-            *((u8 *)actor + 0x2AA) = phase;
-            *((u32 *)((u8 *)actor + 0x2AC)) = zero;
-            *((u8 *)actor + 0x2B1) = ready;
-        }
+        SetPhase(actor, 0, 2, 2);
     }
 }

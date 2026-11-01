@@ -2,7 +2,6 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_control_phase.h"
 
-// MATCHING_CONCESSION: register-pinning
 
 struct GhostRouteEntry {
     u8 unknown0[4];
@@ -62,23 +61,23 @@ void Ghost_ChooseRouteDestination(struct SceneActorRegistryResetView *actor)
     }
     if ((s32)actor->counter2AC > 60) {
         struct GhostRouteEntry *route;
+        struct ContactPosition *p, *q, *from;
         route = (struct GhostRouteEntry *)(state + 0x60C);
         Ghost_SelectRandomRouteEntry(route);
         RoutePosition(&local.target, route);
-        Ghost_SetMovementEndpoints(actor, &local.target);
+        p = &local.target;
+        Ghost_SetMovementEndpoints(actor, p);
         sub_08097798(actor);
         SetState(actor, 0, 0, 2);
-        {
-            struct ContactPosition *q;
-            struct ContactPosition *p = &local.target;
-            struct ContactPosition *from = &actor->body.position;
-            asm("" ::: "r7");
-            q = &local.target;
-            q->x = q->x - from->x;
-            p->y = p->y - from->y;
-            p->z = p->z - from->z;
-            *((u8 *)actor + 0x3CD) = Math_Atan2(q->x, p->z);
-        }
+        /* An empty statement, as a macro compiled to nothing leaves it. */
+        do {
+        } while (0);
+        from = &actor->body.position;
+        q = &local.target;
+        q->x = q->x - from->x;
+        p->y = p->y - from->y;
+        p->z = p->z - from->z;
+        *((u8 *)actor + 0x3CD) = Math_Atan2(q->x, p->z);
         ClearVector(&local.zero, (struct ContactPosition *)(state + 0x5FC));
     }
     actor->counter2AC++;
