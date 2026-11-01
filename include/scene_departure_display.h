@@ -93,6 +93,15 @@ void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
 void SceneActors_EmitPeriodicParticles(void *, s32);
 
+static inline void DepartureActor_StartPhase(struct DepartureActor *actor, u32 state, u32 substate, u32 phase)
+{
+    actor->state=state;
+    actor->substate=substate;
+    actor->statePhase=phase;
+    actor->stateCounter=0;
+    actor->stateEntered=1;
+}
+
 static inline void DepartureActor_EnterDisplay(struct DepartureActor *input)
 {
     if (input->entered) {
