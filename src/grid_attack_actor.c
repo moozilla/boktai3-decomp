@@ -3,7 +3,7 @@
 
 void GridAttackActor_RemoveSprite(struct GridAttackActor *p)
 {
-    Sprite_Remove(p->drawable.sprite);
+    Sprite_Remove(&p->drawable);
 }
 
 void Anim_RestartSequence(void *, void *, int, int, int);
@@ -29,7 +29,7 @@ void ProjectedDisplay_SetHeight(void *, int);
 
 void OrbitContactActor_BeginExpansion(void *);
 
-void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *, struct GridAttackPoint *,
+void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *, struct ContactPosition *,
                                              int);
 
 void ContactSequencePool_BeginAllDeaths(void *);
@@ -216,7 +216,7 @@ static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int
 }
 
 void *BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
-static inline void GridAttack_ClearPoint(const void *source, struct GridAttackPoint *dest)
+static inline void GridAttack_ClearPoint(const void *source, struct ContactPosition *dest)
 {
     CpuSet(source, dest, 0x05000002);
 }
@@ -238,25 +238,25 @@ static inline void GridAttack_OffsetCoordinate(volatile s16 *coordinate, u32 ran
     *coordinate = (rounded + ((random & mask) + center)) - 32;
 }
 void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
-                                             struct GridAttackPoint *point, int kind)
+                                             struct ContactPosition *point, int kind)
 {
     volatile u32 zero;
-    struct GridAttackPoint velocity;
+    struct ContactPosition velocity;
     struct SceneVec position;
-    struct GridAttackPoint target;
-    struct GridAttackPoint original;
-    struct GridAttackPoint *vel = &velocity;
+    struct ContactPosition target;
+    struct ContactPosition original;
+    struct ContactPosition *vel = &velocity;
     volatile s16 *pos;
     zero = 0;
     GridAttack_ClearPoint((const void *)&zero, vel);
     pos = (volatile s16 *)&position;
     original = *point;
-    *(struct GridAttackPoint *)&position = original;
+    *(struct ContactPosition *)&position = original;
     GridAttack_OffsetCoordinate(&pos[0], GridAttack_RandomValue());
     pos[1] += 1024;
     GridAttack_OffsetCoordinate(&pos[2], GridAttack_RandomValue());
     {
-        struct GridAttackPoint *dest = &target;
+        struct ContactPosition *dest = &target;
         *dest = original;
         BouncingObject_Spawn(&position, vel, dest, actor->projectileDamage, 50, kind, 0);
     }
@@ -340,7 +340,7 @@ done:
 
 void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
 {
-    struct GridAttackDrawable *graphics = &p->drawable;
+    struct ContactSwarmSprite *graphics = &p->drawable;
     struct GridAttackPacked size;
     int i;
     for (i = 0; i < 2; i++) {
@@ -588,7 +588,7 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
         return;
     if (tick == 8)
         GridAttackActor_SpawnTargetedProjectile(
-            base, (struct GridAttackPoint *)p->targetPositions[0], base->targetAttackParameter);
+            base, (struct ContactPosition *)p->targetPositions[0], base->targetAttackParameter);
     if (p->animationEnded)
         p->finished = 1;
 }
@@ -1540,8 +1540,7 @@ void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *p)
     u32 i;
     GridAttack_ProcessMessages(actor);
     Obj_StepPosition(body);
-    owner->animationEnded =
-        PlayerCue_StepSequenceEnded((void *)&actor->drawable, &actor->animation);
+    owner->animationEnded = PlayerCue_StepSequenceEnded(&actor->drawable, &actor->animation);
     if (actor->projectedDisplay)
         height = ProjectedDisplay_GetHeight(actor->projectedDisplay);
     else
@@ -1592,7 +1591,7 @@ void ContactBurst_SetEnabled(void *, s32);
 s32 ContactBurst_GetEnabled(void *);
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 void SceneActors_UpdateEffects(void *);
-void CameraTracking_Update(void *);
+
 void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *);
 void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
 void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
@@ -1636,11 +1635,11 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
         Collider_Refresh(body);
     }
     if (p->flags & 16) {
-        *((u32 *)base->drawable.sprite) |= 1;
+        base->drawable.flags |= 1;
         *((u32 *)(((u8 *)base) + 0x8F0)) &= ~1;
         (&base->damageCollider)->flags &= ~8;
     } else {
-        *((u32 *)base->drawable.sprite) &= ~1;
+        base->drawable.flags &= ~1;
         if (p->locked)
             *((u32 *)(((u8 *)base) + 0x8F0)) &= ~1;
         else
@@ -1703,11 +1702,11 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
         }
     }
     if (base->projectedDisplay)
-        base->drawable.sprite[7] = 1;
+        base->drawable.priority = 1;
     else
-        base->drawable.sprite[7] = 2;
+        base->drawable.priority = 2;
     if (!p->locked)
-        CameraTracking_Update(((u8 *)base) + 0x8D0);
+        CameraTracking_Update(&base->camera);
     if ((p->locked && base->messageParameter) && (!(p->effectTimer & 15)))
         GridAttackActor_EmitSpriteParticles(base);
     p->contactSource = 0;
@@ -1862,9 +1861,9 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
     SceneActors_Initialize(p, ctx, kind, &pk, facing);
     AnimData_Load(&p->animData, 0x4147);
     Sprite_Init(&p->drawable, &p->animData, 1);
-    *(u32 *)p->drawable.sprite &= ~2;
-    *(struct GridAttackPoint *)&p->drawable.position = *(struct GridAttackPoint *)&pk;
-    p->drawable.sprite[7] = 1;
+    p->drawable.flags &= ~2;
+    *(struct ContactPosition *)&p->drawable.position = *(struct ContactPosition *)&pk;
+    p->drawable.priority = 1;
     p->resource = ScriptProc_Start(0x922E, 0xC5E2);
     Anim_SetSequence(&p->animation, p->resource, 2, 0, 0);
 
@@ -1963,11 +1962,11 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
     p->effectVariant = 0;
     p->effectDuration = 5;
 
-    *(struct GridAttackPoint *)&p->shadowPosition =
-        *(struct GridAttackPoint *)&p->drawable.position;
-    CameraFollow_Initialize(p->shadow, p->targetPositions[0], &p->shadowPosition, 1);
-    ((u32 *)p->shadow)[4] = 0;
-    ((u32 *)p->shadow)[5] = 0x8C;
+    *(struct ContactPosition *)&p->shadowPosition =
+        *(struct ContactPosition *)&p->drawable.position;
+    CameraFollow_Initialize(&p->camera, p->targetPositions[0], &p->shadowPosition, 1);
+    p->camera.minimum = 0;
+    p->camera.maximum = 0x8C;
 
     SceneActors_SetDamageCallback(p, (u8 *)p + 0x818, (void *)GridAttackActor_OnDamage, 0);
     if (Script_GetKeywordValue(0x43, 1) != 0)

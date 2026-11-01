@@ -1,16 +1,6 @@
-#include "global.h"
-struct CameraPosition {
-    s16 x, y, z;
-};
+#include "camera_tracking.h"
 struct CameraPackedPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
-};
-struct CameraTracking {
-    struct CameraPosition *first, *second;
-    s32 scale, scaleStep, minimum, maximum, divisor;
-    u32 flags, requests;
-    s32 active, blend;
-    s32 followMode;
 };
 u16 Sqrt(u32);
 s32 Div(s32, s32);
