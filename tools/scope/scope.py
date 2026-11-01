@@ -5918,15 +5918,17 @@ def union_view_variant(rows, ln, name):
 def frame_slot_pairs(rows):
     """(ROM sp offset -> draft sp offset, the physical pairing or None, every ROM offset used). The
     physical pairing holds when the listings agree everywhere but in SP displacements; otherwise each
-    ROM slot pairs with the draft slot most often aligned with it."""
+    ROM slot pairs with the draft slot most often aligned with it, breaking ties by how often the
+    complete instruction agrees apart from the displacement."""
     off = lambda t: [int(m.group(1) or "0", 0) for m in SP_SLOT.finditer(t or "")]
     votes, rom_seen = {}, set()
     for r in rows:
         a, b = off(r["rom"]), off(r["draft"])
         rom_seen.update(a)
         if len(a) == 1 and len(b) == 1:
-            votes.setdefault(a[0], {}).setdefault(b[0], 0)
-            votes[a[0]][b[0]] += 1
+            counts = votes.setdefault(a[0], {}).setdefault(b[0], [0, 0])
+            counts[0] += 1
+            counts[1] += SP_SLOT.sub("[sp]", r["rom"]) == SP_SLOT.sub("[sp]", r["draft"])
     physical = physical_frame_slot_pairs(rows)
     pair = physical if physical is not None else {a: max(v, key=v.get) for a, v in votes.items()}
     return pair, physical, rom_seen
