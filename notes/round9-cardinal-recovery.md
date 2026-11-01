@@ -1,5 +1,5 @@
-The guarded 0x0807AF94 callback reaches 79.1% after replacing private pursuit,
-terrain and navigation code with the matching Mummy helpers. It tests the two
-perpendicular directions in order and starts a two-tick turn before requesting
-a route to the center of the last open cell. The helper expansions and temporary
-lifetimes still differ across the callback.
+# Cardinal recovery route at 0807AF94
+
+The guarded C candidate has the ROM length of 4,488 bytes. The stock check reports 45 differing bytes and a 98.9% fuzzy match. It tries the two perpendicular directions in order. The selected direction is saved during a two-tick random turn. The actor requests a path to the last open cell at its current height. On failure it installs the idle control and enters state 3, phase 0, behavior 0.
+
+The initial gates, arrival callback, four inlined searches, and last-open-cell traversal reproduce the ROM. At 0807BEF4, the sample table should be materialized before the RNG cursor and the 1,023 wrap mask. Reordering sample-helper parameters can place the literals correctly but can change the wrap-mask register. At 0807C014, the two pointers to the cell center have different lifetimes. Splitting out the current-height store recovers the frame layout, while storing through the other pointer changes the allocator choice and subsequent reload rotation. The matchsearch history is in `build/matchsearch/sub_0807AF94`.
