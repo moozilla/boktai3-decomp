@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
 s32 Callback_InvokeActor(void *, void (*)(void));

@@ -363,6 +363,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/opus-ratatosk-spawn-particle_2026-10-31.md](../notes/opus-ratatosk-spawn-particle_2026-10-31.md) | Ratatosk_SpawnAnimatedParticle (081FC26C): exact match | #matching #ratatosk #compiler #combine #jump2 #flow #dead-code | 9 |
 | [notes/opus-resolve-damage_2026-10-31.md](../notes/opus-resolve-damage_2026-10-31.md) | SceneActorReaction_ResolveDamage (08135F70): exact match | #matching #scene-actors #damage #compiler #reload #jump2 #cross-jump | 5 |
 | [notes/opus-scene-projectile-pool_2026-10-31.md](../notes/opus-scene-projectile-pool_2026-10-31.md) | SceneProjectile_UpdatePool (081FCA44): exact match | #matching #scene-projectile #ratatosk #compiler #loop #giv #inline #jump2 #cross-jump | 9 |
+| [notes/opus-skeleton-rise-recovery_2026-11-01.md](../notes/opus-skeleton-rise-recovery_2026-11-01.md) | sub_080BF0E4 (Skeleton rise and recovery): holdout, allocation order | #matching #skeleton #global-alloc #priority #pre #stack-slots #holdout | 5 |
 | [notes/opus-timed-effect-manager_2026-10-31.md](../notes/opus-timed-effect-manager_2026-10-31.md) | TimedEffect_UpdateManager (081DA3D8): exact match | #matching #timed-effect #compiler #global-alloc #caller-save #cse #abi | 7 |
 | [notes/orbit-background_2026-10-14.md](../notes/orbit-background_2026-10-14.md) | Orbit-positioned background controller |  | 4 |
 | [notes/orbit-number-display_2026-10-14.md](../notes/orbit-number-display_2026-10-14.md) | Rotating contact actor and floating numbers, October 14 | *#actors* | 7 |

@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_input.h"
 void SceneInput_InitGlyphPair(struct SceneInputPair *pair)
 {

@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_particle_burst.h"
 static inline u8 IsUsed(u32 *used, u32 index, u32 one)
 {
