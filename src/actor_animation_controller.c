@@ -1425,7 +1425,7 @@ void Actor_SetPreviousAnimationStateFromScript(void)
     p[0xF6C] = Script_GetKeywordValue(0x72, 0);
 }
 
-void Actor_OnControllerIdle(void)
+void Actor_OnControllerIdle(void *controller, void *child)
 {
 }
 
@@ -4775,11 +4775,15 @@ static inline void ActorInit_InitMainSprite(struct ActorInitController *p, struc
     obj->flags = 3;
 }
 
-// Provisional name: Actor_InitializeController
+static inline void ActorInit_SetChildControl(void (*callback)(void *, void *),
+                                             struct ActorChildSlot *child)
+{
+    child->control = 2;
+    child->fn = callback;
+    child->control |= 1;
+}
 
 /* Initialize the singleton controller, its palette banks and child sprites. */
-#ifdef NONMATCHING
-// fuzzy: 95.5%
 s32 Actor_InitializeController(void *arg0)
 {
     struct ActorInitController *p = arg0;
@@ -4827,18 +4831,14 @@ s32 Actor_InitializeController(void *arg0)
     p->heading = 0;
     p->flip = 0;
     for (i = 0; i < 16; i++) {
-        u32 one = 1;
-        void (*callback)(void *, void *) = (void (*)(void *, void *))Actor_OnControllerIdle;
         struct ActorChildSlot *child = &p->children[i];
         void *data = child->sprite;
         AnimData_Load(data, 0xa850);
         Sprite_Init(child, data, 0);
         Sprite_SetOriginStub(child, -8, -16);
-        child->flags = one;
+        child->flags = 1;
         child->index = i;
-        child->control = 2;
-        child->fn = callback;
-        child->control |= one;
+        ActorInit_SetChildControl(Actor_OnControllerIdle, child);
     }
     p->scaleFn = 0;
     p->otherFn = 0;
@@ -4858,9 +4858,6 @@ s32 Actor_InitializeController(void *arg0)
     p->variant = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Actor_InitializeController);
-#endif
 
 void Actor_RequestControllerRemoval(void)
 {
