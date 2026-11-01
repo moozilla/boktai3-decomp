@@ -896,6 +896,16 @@ Each was read from the compiler source and confirmed on a live draft.
    path and stores in each arm. Armor_InitPartStretch, Armor_BeginPartTravelToPlayer and
    Armor_RetractPartStretch matched or moved this way; `why all` now names the pattern.
 
+29. **Identical case bodies that the ROM keeps apart each end in their own copy of the tail.**
+   When a switch's cases share a `break` to one tail, jump2 cross-jumps identical case
+   bodies together (sub_08022EA4's cases 3/4/5 call Path_SnapToRandomFarPoint alike).
+   The ROM's separate copies, each ending `b tail`, came from cases that each wrote the tail
+   and returned: jump2 merges those tails into one copy first, and the bodies before them
+   stay apart. This replaced `asm("" : : "i"(N))` barriers in SceneActorState_SnapReactionPosition
+   (`*(u16 *)(p + 0x354) = 64; return;` per case) and SceneActorState_SelectReactionPhase
+   (an inline that stores the phase, called and returned from at each choice, which also kept
+   its repeated `movs r0, #14; b tail` pairs apart).
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
