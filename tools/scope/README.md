@@ -235,6 +235,14 @@ per free register, from its X record), and the choices next to differing insns
 go first, so the budget is not spent on early choices (Player_GetSmoothedDirection:
 1 compile, was 7; GridAttackActor_OnDamageCollision: 2). A MATCH means the C
 has the right shape and pseudos and only reload's rotation state differs.
+Before searching, `spill` names any low register the ROM reloads into that is
+not in the draft's spill list. `finish_spills` builds that list from every
+register some insn's `find_reg` picked, so a list one register shorter shifts
+nearly every later choice, and no `AGBCC_SPILL` shift can fix it. The line names
+the pseudos that hold the register in the draft. In OrbitEffect_UpdateManager,
+the ROM rotates over r0 to r3, but in the draft a dead field-store zero held r3
+and the list was r0 to r2 (130 / 126 differing). On a matching function,
+`spill` prints the spill list and stops.
 
 The rotation records come from `AGBCC_DUMPPRI`: after each `R` line (choice K,
 insn, register, C line, value) an `X` line gives the index the scan started

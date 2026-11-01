@@ -3011,6 +3011,38 @@ def cmd_calls(src, func, env):
     return 0
 
 
+def spill_list_gap(wd, func, rows, regs):
+    """Name the low registers the ROM reloads into that are not in the draft's spill list. reload1.c's
+    finish_spills builds spill_regs from every register some insn's find_reg picked; allocate_reload_reg
+    then rotates over that list, so one register more or fewer shifts nearly every later choice."""
+    def reload_reg(text):  # the register a reload insn loads, copies or stores
+        ops = re.findall(r"\b(r\d|sl|sb|ip|fp)\b", text or "")
+        low = [int(o[1:]) for o in ops if re.fullmatch(r"r[0-7]", o)]
+        if not ops or not low:
+            return None
+        return low[0] if re.fullmatch(r"r[0-7]", ops[0]) else (low[0] if len(ops) > 1 else None)
+    seen = {}
+    for r in rows:
+        if r["tag"] in "=~" and (r.get("born") or "").startswith("greg") and r.get("rom"):
+            n, d = reload_reg(r["rom"]), reload_reg(r.get("draft"))
+            # the draft's own register must be a spill register, or this is a copy into an allocated one
+            if n is not None and n not in regs and d in regs:
+                seen.setdefault(n, []).append(r["rom_addr"])
+    if not seen:
+        return
+    recs = alloc_records(wd, func)
+    names = pseudo_names(wd, func)
+    for n, addrs in sorted(seen.items()):
+        held = sorted((x for x, rec in recs.items() if rec[-1] == n), key=lambda x: -recs[x][2])
+        who = ", ".join(f"{names.get(x, x)} ({'global' if recs[x][0] == 'G' else 'local'}, priority {recs[x][2]}"
+                        + (f", live {recs[x][4]} insns" if recs[x][0] == "G" else "") + ")" for x in held[:4])
+        print(f"  the ROM reloads into r{n} ({len(addrs)} aligned reload insn(s), first at {addrs[0]}), but r{n} is not"
+              f" one of the draft's spill registers, so the ROM's rotation has {len(regs) + 1}. A register joins the"
+              f" list only where some insn's find_reg picks it: there the registers before it hold live values."
+              f" In the draft r{n} holds: {who or 'no pseudo'}. Find the ROM insn that needs r{n} as a reload"
+              f" register, and the value the draft keeps in r{n} (or in the lower ones) there.")
+
+
 def cmd_spill(src, func, env):
     """Is the whole difference reload's spill rotation? Greedily shift the rotation (AGBCC_SPILL) before
     each reload choice, from the first differing instruction on, keeping shifts that reduce the diff.
@@ -3022,14 +3054,20 @@ def cmd_spill(src, func, env):
     xs = spill_states(wd, info["obj_name"])
     order = [u for u, _, _ in insn_list(wd, "greg")]
     pos = {u: i for i, u in enumerate(order)}
-    rows = json.load(open(os.path.join(wd, "diff.json")))
-    bad = [pos[r["uid"]] for r in rows if r["tag"] != "=" and r["uid"] in pos]
-    first = min(bad, default=0)
     regs = sorted({r[2] for r in rel})
     if xs:
         regs = next(iter(xs.values()))["regs"]
+    reg_text = ", ".join("r%d" % r for r in regs)
+    diff_path = os.path.join(wd, "diff.json")
+    if not os.path.exists(diff_path):  # a match writes no diff: report the rotation and stop
+        print(f"{func}: MATCH; {len(rel)} reload register choices, spill registers {reg_text}")
+        return 0
+    rows = json.load(open(diff_path))
+    bad = [pos[r["uid"]] for r in rows if r["tag"] != "=" and r["uid"] in pos]
+    first = min(bad, default=0)
     print(f"{func}: {count_text(rows)} differ ({base} by spill's count); {len(rel)} reload register choices,"
-          f" spill registers {', '.join('r%d' % r for r in regs)}")
+          f" spill registers {reg_text}")
+    spill_list_gap(wd, info["obj_name"], rows, regs)
     budget = int(os.environ.get("SCOPE_SPILL_MAX", "42"))
 
     def shifts(k, got):  # [(D, register it gives)], one D per register other than GOT

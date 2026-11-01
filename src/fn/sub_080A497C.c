@@ -1,92 +1,48 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 
-static inline u32 TestResponse(struct SceneActorRegistryResetView *p)
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
 {
-    register u32 off asm("r2") = 0x2DC;
-    register u32 *field asm("r0");
-    asm("" : "+r"(off));
-    field = (void *)((u8 *)p + off);
-    return *field & 0x40000;
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = k;
+    actor->target = cb;
+    actor->field2C8 = 0;
+    {
+        u32 *flags = &actor->flags114;
+        u32 mask = ~1;
+        *flags &= mask;
+    }
+    actor->word104 = 0;
+}
+static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+{
+    actor->state2A8 = s;
+    actor->phase2A9 = p;
+    actor->behavior2AA = b;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
 }
 s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView *p)
 {
-    u32 offset;
-    u32 control;
-    u32 zero;
-    u8 byteZero;
-    u32 one;
-    register u32 stateOffset asm("r2");
     if (p->reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x112);
-    if (TestResponse(p)) {
+    if (p->field2DC & 0x40000) {
         u32 mask = 32;
-        u32 off = 0x2D4;
-        u16 *flags;
-        flags = (void *)((u8 *)p + off);
+        u16 *flags = &p->flags2D4;
         mask |= *flags;
         *flags = mask;
     }
-    offset = 0x230;
-    control = *(u32 *)((u8 *)p + offset);
-    {
-        u32 kind = 18;
-        u8 *field = &p->field2B2;
-        zero = 0;
-        one = 1;
-        *field = one;
-        offset += 0x80;
-        *((u8 *)p + offset) = zero;
-        offset += 5;
-        *((u8 *)p + offset) = kind;
-        p->target = (void *)control;
-        {
-            register u16 *field asm("r0");
-            register u32 halfOffset asm("r2") = 0x2C8;
-            asm("" : "+r"(halfOffset));
-            field = (u16 *)((u8 *)p + halfOffset);
-            byteZero = 0;
-            *field = zero;
-        }
-        {
-            u32 *flags = &p->flags114;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        p->word104 = zero;
-        {
-            u32 state = 3;
-            u32 stateOffset2;
-            u32 phaseOffset;
-            stateOffset = 0x2A8;
-            *((u8 *)p + stateOffset) = state;
-            asm("" : "+r"(stateOffset));
-            phaseOffset = 0x2A9;
-            *((u8 *)p + phaseOffset) = byteZero;
-            stateOffset += 2;
-            {
-                register u8 *field asm("r0") = (u8 *)p + stateOffset;
-                *field = byteZero;
-            }
-            offset = 0x2AC;
-            *(u32 *)((u8 *)p + offset) = zero;
-            phaseOffset += 8;
-            {
-                register u8 *field asm("r0") = (u8 *)p + phaseOffset;
-                *field = one;
-            }
-        }
-    }
+    SetControl(p, p->reactionTarget230, 18);
+    SetState(p, 3, 0, 0);
     {
         u32 *flags = &p->flags2D0;
         u32 mask = ~0x1000000;
         *flags &= mask;
     }
-    offset += 0x2A;
     {
-        u16 *flags = (u16 *)((u8 *)p + offset);
+        u16 *flags = &p->flags2D6;
         s32 mask = (s32)0xFFFFF636;
         mask &= *flags;
         *flags = mask;
