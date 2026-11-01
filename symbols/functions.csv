@@ -7486,6 +7486,7 @@ addr,name,mode,confidence,source,notes
 081C0C24,PlayStats_RemoveAnimations,thumb,low,src-alias,Removes eight entry animations and two additional screen animations
 081C0C58,PlayStats_HideEntryAnimations,thumb,low,src-alias,Sets flag bit 0 on all eight animation entries to tentatively hide them
 081C0C74,PlayStats_DrawLabels,thumb,low,src-alias,Draws the PLAY TIME and ENERGY and PLAY SIDE and PLAY STYLE labels
+081C0CE4,PlayStats_UpdateResults,thumb,low,src-alias,
 081C1384,PlayStats_Update,thumb,low,src-alias,Task update callback advances enabled counters and dispatches the current statistics screen state
 081C13C0,RecordDisplay_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the display animations
 081C13CC,RecordDisplay_LoadBackground,thumb,low,src-alias,Loads the background resource and configures its BG layer
