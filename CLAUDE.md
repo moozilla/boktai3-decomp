@@ -20,7 +20,8 @@ write `~`). The hooks in `.githooks` run `tools/pii_check.py`.
 * Matching means byte-identical, built by the stock compiler from ordinary C. No
   hand-written instructions inside `asm()` and no compiler overrides, ever. Register
   pins (`register T x asm("rN")`) and empty `asm("")` barriers (and an empty
-  `do { } while (0);`, which acts as one) are heavily discouraged: phase 3 is removing them. Land one only for the hardest functions,
+  `do { } while (0);` or an `if` with an empty body, which act as one; an `if` whose body
+  the original compiled out holds `DEBUG_PRINT();` from `include/debug.h`) are heavily discouraged: phase 3 is removing them. Land one only for the hardest functions,
   after trying without (`land --allow-pins`; see `docs/WORKER.md`).
   The one exception is source the original authors wrote as inline assembly: the SDK's `SystemCall(n)` (`include/gba/syscall.h`, an
   in-place `swi n`, as in Power_EnterSleep and m4a). It counts as a normal match;

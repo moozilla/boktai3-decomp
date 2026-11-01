@@ -1,4 +1,5 @@
 #include "global.h"
+#include "debug.h"
 
 struct ActorRestart {
     u8 pad[0xA1];
@@ -32,6 +33,7 @@ void ActorState_Restart(struct ActorRestart *arg)
     struct ActorRestart *base = p;
     u8 t;
     if (TakeFlag(p)) {
+        DEBUG_PRINT();
     }
     t = p->f1;
     if (t) {

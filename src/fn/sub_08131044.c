@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_control_motion.h"
+#include "debug.h"
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
@@ -88,6 +89,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct SceneActorRegistryResetView *a
     u16 *motionFlags;
 
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+        DEBUG_PRINT();
     }
     if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
