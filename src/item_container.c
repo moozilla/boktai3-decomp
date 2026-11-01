@@ -444,8 +444,7 @@ void Trigger_UpdateLanding(struct TriggerManager *manager, struct Trigger *p)
 
 void Trigger_UpdateBobbingAnimation(struct TriggerManager *manager, struct Trigger *p)
 {
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object,
-                           (struct DisplaySequenceState *)p->animation);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (p->timer <= 3)
@@ -487,8 +486,7 @@ void Trigger_UpdateDropTimer(struct TriggerManager *a, struct Trigger *b)
 
 void Trigger_UpdateIdleAnimation(struct TriggerManager *manager, struct Trigger *p)
 {
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object,
-                           (struct DisplaySequenceState *)p->animation);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     p->timer++;
@@ -498,8 +496,7 @@ void Trigger_UpdateOpeningAnimation(struct TriggerManager *manager, struct Trigg
 {
     s32 done;
     struct SceneVec raised;
-    done = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)p->object,
-                                       (struct DisplaySequenceState *)p->animation);
+    done = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (done) {
@@ -522,8 +519,7 @@ void Trigger_UpdateOpeningAnimation(struct TriggerManager *manager, struct Trigg
 
 void Trigger_UpdateActivation(struct TriggerManager *manager, struct Trigger *p)
 {
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object,
-                           (struct DisplaySequenceState *)p->animation);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (p->timer == 8) {
@@ -541,8 +537,7 @@ void Trigger_UpdateActivation(struct TriggerManager *manager, struct Trigger *p)
 
 void Trigger_UpdateLockedPause(struct TriggerManager *manager, struct Trigger *p)
 {
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object,
-                           (struct DisplaySequenceState *)p->animation);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (p->timer > 31) {
@@ -556,9 +551,7 @@ void Trigger_UpdateLockedPause(struct TriggerManager *manager, struct Trigger *p
 void Trigger_UpdateLockedRecovery(struct TriggerManager *manager, struct Trigger *p)
 {
     s32 done;
-
-    done = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)p->object,
-                                       (struct DisplaySequenceState *)p->animation);
+    done = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)p->object, p->animation);
     if (p->flip)
         p->object->flags |= 4;
     if (done) {

@@ -3,6 +3,7 @@
 #include "global.h"
 #include "scene_object.h"
 #include "player.h"
+#include "display_sequence.h"
 
 /*
  * "Triggers": dropped items (type 0) and treasure containers (type 1) that live in a linked list
@@ -10,19 +11,6 @@
  * animation, a shadow effect and an update callback that walks it through falling, landing,
  * idle, opening and locked states.
  */
-
-/* Animation state advanced by the shared frame stepper (16 bytes). */
-struct TriggerAnim {
-    const u16 *data; /* frame table; each entry: frame number << 6 | flip bits | factor */
-    u8 flags;        /* bit 2: play backwards, bit 3: hold on the last frame */
-    u8 count;
-    u8 factor;
-    u8 rate;
-    u16 frame;
-    u16 unused;
-    u16 scale;
-    u16 timer;
-};
 
 struct TriggerGraphics {
     u32 pad0;
@@ -86,7 +74,7 @@ struct Trigger {
     struct TriggerSprite *sprite;
     struct TriggerObject *object;
     struct SceneAnimation *other;
-    struct TriggerAnim *animation;
+    struct DisplaySequenceState *animation; /* frame stepper state (16 bytes) */
     struct SceneVec *position;
     u32 startScript, script, arguments[3];
     TriggerUpdate update;
