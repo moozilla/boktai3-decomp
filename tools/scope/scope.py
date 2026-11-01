@@ -1996,11 +1996,73 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
     lever = macro_lever(wd, lo, lo_rec, hi, hi_rec) if wd else None
     if lever:
         a, b, nl, nh = lever
+        alone = macro_lines(wd, lo, lo_rec, hi, hi_rec)
+        src = source_lines(wd)
+        text = " ".join(src.get(ln, "") for ln in alone or range(a, b + 1))
+        shared = shared_statement_macros(want_index="[" in text)
         out.append(f"a statement macro (`do {{ ... }} while (0)`) around lines {a}-{b}: flow counts each ref"
                    f" inside its loop notes twice, giving {nm(lo)} {nl} refs ({g_priority(nl, llive)}) against"
-                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)}). Reify it as the macro the original likely had"
-                   f" (the loop notes also end cse blocks there)")
+                   f" {nm(hi)}'s {nh} ({g_priority(nh, hlive)})"
+                   + (f"; each of lines {', '.join(map(str, alone))} flips it alone" if len(alone) > 1 else "")
+                   + ". It counts as ordinary C only if the original plausibly had the macro, usually because"
+                   " several functions share it; a single-use wrapper written for the refs is a concession"
+                   " (the loop notes also end cse blocks there)"
+                   + ("; shared ones in include/: " + "; ".join(
+                       f"{n} ({h}, {k} files: {body})" for n, h, k, body in shared) if shared else ""))
     return out
+
+
+def macro_lines(wd, lo, lo_rec, hi, hi_rec, mentions=None, lines=None):
+    """The single C lines whose mentions, inside one more loop, would each let LO outrank HI."""
+    if mentions is None:
+        mentions = {r: ref_mentions(wd, r) for r in (lo, hi)}
+    if lines is None:
+        lines = uid_lines(wd)
+    count = {}
+    for reg in (lo, hi):
+        for u, _ in mentions.get(reg, []):
+            ln = lines.get(u)
+            if isinstance(ln, int):
+                count.setdefault(reg, {}).setdefault(ln, 0)
+                count[reg][ln] += 1
+    lo_l, hi_l = count.get(lo, {}), count.get(hi, {})
+    return [ln for ln in sorted(lo_l)
+            if g_priority(lo_rec[3] + lo_l[ln], lo_rec[4]) > g_priority(hi_rec[3] + hi_l.get(ln, 0), hi_rec[4])]
+
+
+_SHARED_MACROS = None
+
+
+def shared_statement_macros(want_index=False, limit=3, root=None):
+    """[(name, header, files, body)] for the statement macros (`do { ... } while (0)` with a body) in
+    include/ that two or more src files use, directly or through a static inline of the same header: the
+    shared ones count as evidence the original had them. WANT_INDEX keeps the ones that read through an
+    index (`x[i]`), the usual case for a random-table sample."""
+    global _SHARED_MACROS
+    found = _SHARED_MACROS if root is None else None
+    if found is None:
+        found, base = [], root or ROOT
+        srcs = {}
+        for f in glob.glob(os.path.join(base, "src", "**", "*.c"), recursive=True):
+            srcs[f] = open(f, errors="replace").read()
+        for h in sorted(glob.glob(os.path.join(base, "include", "*.h"))):
+            text = open(h, errors="replace").read()
+            for m in re.finditer(r"#define\s+(\w+)\([^)]*\)\s*\\\n\s*do\s*\{(.*?)\}\s*while\s*\(\s*0\s*\)",
+                                 text, re.S):
+                name, body = m.group(1), re.sub(r"\s*\\\n\s*", " ", m.group(2)).strip()
+                if not body:
+                    continue  # an empty one is a barrier (DEBUG_NOP), not evidence
+                users = {name} | {f.group(1) for f in re.finditer(
+                    r"static inline [^;{]*?\b(\w+)\([^;{]*\)\s*\{(?:[^{}]|\{[^{}]*\})*?\b%s\(" % name, text)}
+                pat = re.compile(r"\b(?:%s)\(" % "|".join(map(re.escape, users)))
+                files = sum(1 for t in srcs.values() if pat.search(t))
+                if files >= 2:
+                    found.append((name, os.path.relpath(h, base), files, body[:60]))
+        found.sort(key=lambda r: -r[2])
+        if root is None:
+            _SHARED_MACROS = found
+    rows = [r for r in found if not want_index or "[" in r[3]]
+    return rows[:limit]
 
 
 def macro_lever(wd, lo, lo_rec, hi, hi_rec, mentions=None, lines=None):
