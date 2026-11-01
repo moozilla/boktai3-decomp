@@ -5,7 +5,7 @@
 #include "scene_actor_placement.h"
 #include "game_state.h"
 #ifdef NONMATCHING
-// fuzzy: 80.1%
+// fuzzy: 82.0%
 // Guarded until its allocation and the ordering of the PRE-created stack slots are exact.
 void Heap_Free(void *);
 
@@ -128,11 +128,13 @@ static inline u32 ReadMotionFlags(u16 *motion, u32 mask)
 {
     return *motion & mask;
 }
-static inline u8 MissingObject(struct SceneActorRegistryActor *actor, u16 **motion)
+static inline u8 MissingObject(struct SceneActorRegistryActor *p, u16 **motion)
 {
-    *motion = &actor->flags2D4;
-    if (!actor->object)
+    if (!p->object) {
+        *motion = &p->flags2D4;
         return 1;
+    }
+    *motion = &p->flags2D4;
     return 0;
 }
 
@@ -157,8 +159,7 @@ next:
         goto next;
     }
     {
-        void **update = &actor->update;
-        Callback_InvokeActor(actor->context, *update);
+        Callback_InvokeActor(actor->context, actor->update);
         if (!MissingObject(actor, &motion) && !Paused() && !ReadMotionFlags(motion, 0x4000) &&
             !SceneActorPlacement_ReadFlags32((void *)actor, 8) && actor->enabled &&
             !ReadFlags2CC(actor, 2) && (gGameState->flags868 & 2) && CurrentRegion(actor) &&
