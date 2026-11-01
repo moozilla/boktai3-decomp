@@ -1,86 +1,44 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 /* SceneActorReaction_ResumeEntryTarget: tentative */
 
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
+static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
 {
-    register u32 offset asm("r2") = 0x2B2;
-    u8 *field;
-    asm("" : "+r"(offset));
-    field = (u8 *)actor + offset;
-    if (*field) {
-        *field = 0;
-        return 1;
+    u32 behavior = b;
+    actor->state2A8 = s;
+    actor->phase2A9 = p;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
+}
+
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+{
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = k;
+    actor->target = cb;
+    actor->field2C8 = 0;
+    {
+        u32 *flags = &actor->flags114;
+        s32 mask = ~1;
+        *flags &= mask;
     }
-    return 0;
+    actor->word104 = 0;
 }
 
 void SceneActorReaction_ResumeEntryTarget(struct SceneActorRegistryResetView *actor)
 {
-    register struct SceneActorReactionGroup *group asm("r5") = (void *)&actor->group.common;
-    register u32 timer asm("r5");
-    TakePrepared(actor);
-    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
-    {
-        register u16 *tp asm("r0") = &group->timer418;
-        timer = *tp;
+    struct SceneActorReactionGroup *group = (void *)&actor->group.common;
+    /* The flag is consumed with nothing to do, as in sub_080EB8CC. */
+    if (SceneActorReaction_TakePrepared(actor)) {
     }
-    if (timer == 0) {
-        register u32 offset asm("r6");
-        register u32 off2 asm("r2");
-        u8 one, zero, seven;
-        u32 mask, clr;
-        void *saved;
-        mask = 0x81;
+    SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
+    if (group->timer418 == 0) {
         {
-            register u32 o3 asm("r3") = 0x2D4;
-            register u16 *fp asm("r2");
-            u16 v;
-            asm("" : "+r"(o3));
-            fp = (u16 *)((u8 *)actor + o3);
-            v = *fp & -mask;
-            zero = 0;
-            *fp = v;
+            u32 mask = 0x80;
+            actor->flags2D4 &= ~mask;
         }
-        seven = 7;
-        offset = 0x2A8;
-        *((u8 *)actor + offset) = zero;
-        off2 = 0x2A9;
-        *((u8 *)actor + off2) = zero;
-        offset += 2;
-        *((u8 *)actor + offset) = seven;
-        actor->counter2AC = timer;
-        one = 1;
-        off2 += 8;
-        {
-            register u8 *p asm("r0") = (u8 *)actor + off2;
-            one = 1;
-            asm("" : "+r"(one));
-            *p = one;
-        }
-        offset -= 0x82;
-        saved = *(void **)((u8 *)actor + offset);
-        offset += 0x8A;
-        *((u8 *)actor + offset) = one;
-        offset -= 2;
-        *((u8 *)actor + offset) = zero;
-        actor->field2B5 = one;
-        offset -= 0x94;
-        {
-            register void **dst asm("r0") = (void **)((u8 *)actor + offset);
-            *dst = saved;
-        }
-        actor->field2C8 = timer;
-        {
-            u32 *f = &actor->flags114;
-            clr = ~1;
-            *f &= clr;
-        }
-        offset = 0x104;
-        asm("" : "+r"(offset));
-        {
-            register u32 *w asm("r0") = (u32 *)((u8 *)actor + offset);
-            *w = timer;
-        }
+        SetState(actor, 0, 0, 7);
+        SetControl(actor, actor->entryTarget228, 1);
     }
 }
