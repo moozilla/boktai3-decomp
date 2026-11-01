@@ -9,19 +9,24 @@ void SceneActorPosition_ResolveTaggedPosition(struct SceneActorTaggedPosition *,
                                               const struct SceneActorPositionSource *, void *, s32);
 void SceneActorAttachment_RetargetNearestPlayer(void *, const struct ContactPosition *);
 
-#ifdef NONMATCHING
-// fuzzy: 88.4%
+static inline void SceneActorTarget_ClearFlags(u32 *flags, u32 mask)
+{
+    *flags &= mask;
+}
+
+static inline void SceneActorTarget_SetHalfFlags(u16 *flags, u32 input)
+{
+    u32 mask = input;
+    *flags |= mask;
+}
+
 static inline s8 SceneActorTarget_FindStimulus(struct SceneActorRegistryResetView *owner,
-                                               struct SceneActorChaseGroup *group,
-                                               struct ContactPosition **source, u32 *tag)
+                                               struct SceneActorChaseGroup *group)
 {
     struct ContactPosition *position = &owner->body.position;
-    u8 raw =
-        SceneStimulus_FindOverlap(position->x, owner->body.position.z, group->common.control.radius,
-                                  group->common.control.active, (u16)owner->body.id);
-    *source = position;
-    *tag = raw;
-    return (s8)raw;
+    return SceneStimulus_FindOverlap(position->x, owner->body.position.z,
+                                     group->common.control.radius, group->common.control.active,
+                                     (u16)owner->body.id);
 }
 
 // confidence=low: starts a route to the tagged position of an overlapping stimulus.
@@ -31,22 +36,26 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorRegistryControl *control;
     u16 *timer;
-    struct ContactPosition *position;
     struct ContactPosition *destination;
     u16 *motionFlags;
-    u32 tag;
+    u8 tag;
     u32 started;
     u32 busy = SceneActorStimulus_CheckBusy(actor);
+    struct ContactPosition *position;
+    s8 found;
     if (busy)
         return 0;
     group->common.control.mode = busy;
     started = 0;
-    if (SceneActorTarget_FindStimulus(actor, group, &position, &tag) < 0)
+    found = SceneActorTarget_FindStimulus(actor, group);
+    tag = found;
+    position = &actor->body.position;
+    if (found < 0)
         goto failed;
-    timer = &actor->group.common.control.timer;
-    control = &group->common.control;
+    timer = &group->common.control.timer;
     if (!*timer) {
-        actor->flags2CC &= ~0x141C0;
+        control = &group->common.control;
+        SceneActorTarget_ClearFlags(&actor->flags2CC, ~0x141C0);
         control->counter = 0;
         control->field14 = 0;
         /* The control record is reset before the overlap timer is armed. */
@@ -57,23 +66,30 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
         SceneActorChase_SetBehavior(actor, 11);
         started = 1;
     }
-    if (SceneActorStimulus_CaptureMotionFlags(actor, 0x1000, &motionFlags)) {
-        struct SceneActorRegistryResetView *owner = object;
-        SceneActorContacts_ReleaseNode(owner->group.contactNode);
-        *motionFlags &= ~0x1000;
-        owner->group.contactNode = NULL;
+    {
+        u32 mask = 0x1000;
+        if (SceneActorStimulus_CaptureMotionFlags(object, mask, &motionFlags)) {
+            struct SceneActorRegistryResetView *owner = object;
+            SceneActorContacts_ReleaseNode(owner->group.contactNode);
+            *motionFlags &= ~mask;
+            owner->group.contactNode = NULL;
+        }
     }
-    SceneActorPosition_ResolveTaggedPosition((void *)control, (void *)&actor->body.id, group->route,
-                                             (s8)tag);
-    if (*motionFlags & 0x80)
-        SceneActorStimulus_ExtendGate(object);
+    SceneActorPosition_ResolveTaggedPosition((void *)&group->common.control,
+                                             (void *)&actor->body.id, group->route, (s8)tag);
+    {
+        u32 mask = 0x80;
+        if (*motionFlags & mask)
+            SceneActorStimulus_ExtendGate(object);
+    }
     destination = group->destination;
     SceneActorChase_SnapToRoute(destination, &group->homeRoute);
     /* Fetch the active destination again after reading the terrain. */
     group->destination->y = actor->body.position.y;
     group->destination->pad = 0;
 
-    if (!SceneActorChase_TryRoute(actor, group->route, position, &control->targetPosition)) {
+    if (!SceneActorChase_TryRoute(object, group->route, position,
+                                  &group->common.control.targetPosition)) {
         Callback_InvokeActor(actor, group->fallback);
         return 1;
     }
@@ -83,19 +99,16 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     }
     {
         u32 mask = 0x200;
-        actor->flags2D4 |= mask;
+        SceneActorTarget_SetHalfFlags(&actor->flags2D4, mask);
     }
     actor->field2C2 = 0x20;
     {
         u32 mask = 0x1000000;
         actor->flags2D0 |= mask;
     }
-    SceneActorAttachment_RetargetNearestPlayer(object, &control->targetPosition);
+    SceneActorAttachment_RetargetNearestPlayer(object, &group->common.control.targetPosition);
     if (started)
         return 1;
 failed:
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorTarget_TryStimulusRoute);
-#endif
