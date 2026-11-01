@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_playback.h"
 #include "scene_actor_terrain.h"
 
@@ -33,9 +32,7 @@ static inline s32 CellAndVelocity(struct ContactPosition *position,
 
 static inline u32 HasMotion(u16 *flags)
 {
-    register u16 *test asm("r3") = flags;
-    asm("" : "+r"(test));
-    return *test & 0x80;
+    return *flags & 0x80;
 }
 
 void SpriteEffectController_UpdateBouncing(struct SpriteEffectControllerPool *unusedPool,
@@ -55,11 +52,8 @@ void SpriteEffectController_UpdateBouncing(struct SpriteEffectControllerPool *un
     }
     {
         u16 *lowFlags = &controller->flags;
-        register u32 loaded asm("r1") = *lowFlags;
-        u32 selected = loaded & 8;
-        asm("" : "+r"(selected) : "r"(lowFlags));
+        mode = *lowFlags & 8;
         flags = lowFlags;
-        mode = selected;
     }
     if (mode) {
         ended = SpriteEffectController_StepDrawable(controller, 1);
