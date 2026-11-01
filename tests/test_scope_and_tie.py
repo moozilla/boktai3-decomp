@@ -40,7 +40,7 @@ class AndTie(unittest.TestCase):
     def test_orrs_same_text_other_roles(self):
         rows = [row("~", "ldrb r1, [r2]", "ldrb r0, [r2]"), row("~", "movs r0, #4", "movs r1, #4"),
                 row("=", "orrs r0, r1", "orrs r0, r1")]
-        self.assertEqual(self.scope.and_tie_hints(rows), [(2, "7", "constant")])
+        self.assertEqual(self.scope.and_tie_hints(rows), [(2, "7", "constant", None)])
 
     def test_mixed_ops_give_nothing(self):
         rows = [row("=", "movs r1, #3", "movs r1, #3"), row("~", "ands r1, r0", "orrs r0, r1")]
