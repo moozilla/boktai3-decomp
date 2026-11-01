@@ -4602,9 +4602,11 @@ def pool_load_origin(wd, draft, line):
         source = st.group(1)
         known = rtl_constant_value(source, symbols)
         if known is None and re.match(r"\(mem/u:SI \(symbol_ref", source):
-            note = re.search(r"REG_EQU(?:IV|AL) ", raw)
-            if note:
+            # A pseudo stored to memory carries REG_EQUIV (mem ...) before its constant one: try each note.
+            for note in re.finditer(r"REG_EQU(?:IV|AL) ", raw):
                 known = rtl_constant_value(" ".join(raw[note.end():_sexp_end(raw, note.end())].split()), symbols)
+                if known is not None:
+                    break
         if known == value:
             cands.append(int(m.group(1)))
     return min(cands, key=lambda u: abs((lines.get(u) or 0) - (line or 0))) if cands else None
