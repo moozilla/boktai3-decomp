@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
 static inline void *resourceAt(void **resource)
 {

@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // The original copies p at entry (adds r5, r4) and uses the copy only in the
 // retry branch; r5 is reused for 0xFFFF in the init loop. A plain `q = p` copy

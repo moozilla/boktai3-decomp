@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 // confidence=low: recoil callback selects animation 15 and completes after sixty ticks.

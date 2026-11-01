@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 /* SceneActorQuery_FindInBox: like sub_0806EFB8, but skips actors with flag 0x400 before
    advancing the cursor and tests a center +/- radius box on all three axes.
    The loop counter is pinned to r5 (rasolve: needs priority above the three pointers). */

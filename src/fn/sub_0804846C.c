@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "wireless_link_indicator.h"
 void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *input)
 {

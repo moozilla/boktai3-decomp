@@ -125,7 +125,8 @@ def _concessions(preprocessed: str, names: tuple[str, ...]) -> dict[str, int]:
         found = {'register_pins': 0, 'asm_barriers': 0, 'inline_assembly': 0}
         for index, token in enumerate(parts):
             # an empty `do { } while (0)` acts as a barrier: its loop notes end cse blocks and weight refs
-            if token == 'do' and parts[index + 1:index + 7] == ['{', '}', 'while', '(', '0', ')']:
+            if (token == 'do' and parts[index + 1:index + 7] == ['{', '}', 'while', '(', '0', ')']) or \
+                    (token == 'DEBUG_NOP' and parts[index + 1:index + 3] == ['(', ')']):
                 found['asm_barriers'] += 1
                 continue
             # so does an if with nothing in its body; DEBUG_PRINT() (include/debug.h) leaves `{ ; }`

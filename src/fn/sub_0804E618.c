@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "area_effect.h"
 #include "input.h"
 void Player_AddEnergy(struct AreaEffectPlayer *, s32);

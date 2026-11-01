@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
 void SpriteEffectController_RefreshCollider(struct SpriteEffectController *controller,
                                             struct ContactPosition *position)
