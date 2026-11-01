@@ -1072,6 +1072,7 @@ addr,name,mode,confidence,source,notes
 0802F0C0,Actor_OnConfiguredAnimationUpdate,thumb,low,src-alias,Animation state callback that starts the configured animation and invokes the actor callback
 0802F110,Actor_OnPathFollowUpdate,thumb,low,src-alias,
 0802F524,Actor_OnTimedIdleUpdate,thumb,low,src-alias,Timed idle callback that finishes after eight ticks when the actor callback permits completion
+0802F92C,SceneActorAnimation_UpdateRouteWalk,thumb,low,src-alias,
 0802FCA8,Actor_SelectPathNodeAction,thumb,low,src-alias,Records the path node identifier and selects a wait turn or movement action from node flags
 0802FD14,SceneCharacter_GetPathNodeState,thumb,low,src-alias,Returns the current node action state within 40 units on both axes or movement state 9 otherwise
 0802FD60,SceneCharacter_UpdateIdleState,thumb,low,src-alias,Selects action 1 and consumes the pending trigger on state entry; idle interpretation is tentative
