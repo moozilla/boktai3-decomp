@@ -87,6 +87,16 @@ int Target(int v)
         kinds = [k for _, k, _ in self.scope.concession_sites(source)]
         self.assertEqual(kinds, ["barrier"])
 
+    def test_each_pin_of_a_declaration_line_is_a_site(self):
+        source = 'int F(void)\n{\n    register int a asm("r9"), b asm("r6"), c;\n    return a + b;\n}\n'
+        sites = self.scope.concession_sites(source)
+        self.assertEqual(len(sites), 2)
+        lines = source.split("\n")
+        self.assertEqual(sites[0][2](lines)[2].strip(), 'register int a, b asm("r6"), c;')
+        self.assertEqual(sites[1][2](lines)[2].strip(), 'register int a asm("r9"), b, c;')
+        both = sites[1][2](sites[0][2](lines))
+        self.assertEqual(both[2].strip(), "register int a, b, c;")
+
 
 if __name__ == "__main__":
     unittest.main()

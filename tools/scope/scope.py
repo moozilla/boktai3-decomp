@@ -2960,7 +2960,15 @@ def concession_sites(text):
         if ln.lstrip().startswith("//"):
             continue
         if PIN_RE.search(ln) and "register" in ln:
-            out.append((i, "pin", lambda ls, i=i: ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]))
+            # one site per pin: `register s32 a asm("r9"), b asm("r6");` declares two
+            names = [m.group(1) for m in re.finditer(r"(\w+)" + PIN_RE.pattern, ln)]
+            for name in names or [None]:
+                def drop(ls, i=i, name=name):
+                    if name is None:
+                        return ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]
+                    pat = re.compile(r"\b(" + re.escape(name) + r")" + PIN_RE.pattern)
+                    return ls[:i] + [pat.sub(r"\1", ls[i], count=1)] + ls[i + 1:]
+                out.append((i, "pin", drop))
         elif re.match(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', ln):
             end = i + 1
             while ";" not in "\n".join(lines[i:end]) and end < len(lines):
@@ -3050,9 +3058,8 @@ def function_reach(text, func):
 def site_variables(line):
     """C variable names a concession site names: a pin's declarator and a barrier's operands."""
     out = set()
-    m = re.search(r"(\w+)\s+(?:asm|__asm__)\s*\(\s*\"", line)
-    if m and "register" in line:
-        out.add(m.group(1))
+    if "register" in line:
+        out |= set(re.findall(r"(\w+)\s+(?:asm|__asm__)\s*\(\s*\"", line))
     if re.match(r"\s*(?:asm|__asm__)\b", line):
         out |= set(re.findall(r"\"[^\"]*\"\s*\(\s*(\w+)\s*\)", line))
     return out
