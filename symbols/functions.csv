@@ -9170,6 +9170,7 @@ addr,name,mode,confidence,source,notes
 0821BC68,CellObject_Init,thumb,low,src-alias,
 0821BD48,Terrain_GetHeightAt,thumb,low,src-alias,
 0821C754,Terrain_SampleSurface,thumb,low,src-alias,
+0821C8F8,Terrain_MoveFootprint,thumb,low,matching,Adjusts a moving footprint against terrain corners and samples the resulting surface
 0821D630,TerrainModifiers_InitCell,thumb,low,src-alias,Initializes a cell override with packed tile and height data plus flags
 0821D64C,TerrainModifiers_FindCellOverride,thumb,low,src-alias,Finds the highest override for a cell while excluding masked flags
 0821D698,TerrainModifiers_RegisterCell,thumb,low,src-alias,Initializes a cell override and inserts it at the terrain override list head
