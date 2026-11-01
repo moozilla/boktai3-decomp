@@ -3373,32 +3373,22 @@ void TetherActor_UpdateDisplayDeparture(struct TetherActor *actor)
         DisplayAnimation_SetFlags(&actor->display.animation, 1);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateDisplayReturn(struct TetherActor *actor)
 {
-    u32 zero;
-    u8 *heading = &actor->heading;
-    u16 *frame;
-    u32 current;
-    zero = 0;
-    *heading = zero;
+    actor->heading = 0;
     actor->chargeCollider.flags |= 4;
     TetherActor_SetEntry(actor, 0);
-    frame = &actor->stateFrame;
-    current = *frame;
-    asm("" : "+r"(current) : : "memory");
-    if (current <= 75)
+    if (actor->stateFrame <= 75)
         DisplayAnimation_SetFlags(&actor->display.animation, 1);
-    else if (current <= 83) {
-        u32 phase = *frame - 76;
+    else if (actor->stateFrame <= 83) {
+        u32 phase = actor->stateFrame - 76;
         struct DisplayAnimation *display = &actor->display.animation;
         DisplayAnimation_ClearFlags(display, 1);
         DisplayAnimation_SetFlags(display, 2);
         DisplayAnimation_SetPalette(display, 4, 120, 0);
         actor->displayOffsetY = (8 - phase) * 200 + 240;
-    } else if (current <= 99) {
-        s32 phase = *frame - 84;
+    } else if (actor->stateFrame <= 99) {
+        s32 phase = actor->stateFrame - 84;
         s32 remaining = 15 - phase;
         s32 first = 64 - remaining * 4, second;
         if (phase <= 7) {
@@ -3406,7 +3396,7 @@ void TetherActor_UpdateDisplayReturn(struct TetherActor *actor)
             actor->displayOffsetY = (8 - phase) * 30;
         } else {
             second = 64;
-            actor->displayOffsetY = zero;
+            actor->displayOffsetY = 0;
         }
         DisplayAnimation_SetPalette(&actor->display.animation, first, second, 0);
     }
