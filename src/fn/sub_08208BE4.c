@@ -1,5 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
+#include "player_cue_sequence.h"
 #include "display_animation.h"
 #include "scene_vec.h"
 s32 Script_SeekToKeyword(s32);
@@ -12,143 +13,6 @@ void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 #define H(o) (*(s16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
-static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg, u32 flipMask)
-{
-    register struct DisplaySequenceSprite *sprite asm("ip") =
-        (struct DisplaySequenceSprite *)(owner + 0x24);
-    struct DisplaySequenceState *state = stateArg;
-    const volatile u16 *command; /* preserve observed packed-command reads */
-    u32 ended, duration, flags, bit;
-    {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = state->commands;
-        command = (const volatile u16 *)((u32)table + offset);
-    }
-    {
-        u32 frame = *command >> 6;
-        struct DisplaySequenceSprite *o = (struct DisplaySequenceSprite *)(owner + 0x24);
-        o->frame = frame;
-    }
-    {
-        u32 input = state->flags;
-        register u32 first asm("r2");
-        u32 maskBit = 1;
-        bit = maskBit;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*command & 0x30) >> 4) & bit)) {
-            u32 flags = (*(u32 *)(owner + 0x24));
-            u32 flip = flipMask;
-            (*(u32 *)(owner + 0x24)) = flags | flip;
-        } else
-            (*(u32 *)(owner + 0x24)) &= ~4;
-    }
-    {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r2");
-        bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        {
-            register u32 flags asm("r1");
-            if (first != (((*command & 0x30) >> 4) & bit)) {
-                register struct DisplaySequenceSprite *read asm("r2") = sprite;
-                flags = read->flags | 8;
-            } else {
-                register struct DisplaySequenceSprite *read asm("r2") = sprite;
-                flags = read->flags & ~8;
-            }
-            {
-                register struct DisplaySequenceSprite *out asm("r3") = sprite;
-                out->flags = flags;
-            }
-        }
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r2");
-        register u32 savedDuration asm("r4");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                    ended = 1;
-                } else {
-                    state->index = index - 1;
-                    ended = 0;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                    ended = 1;
-                } else {
-                    ended = 0;
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
-            }
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r2") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
-        } else {
-            ended = 0;
-        }
-    }
-    return ended;
-}
-
 s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
 {
     void *resource;
@@ -243,27 +107,13 @@ s32 CannonTurret_InitializeFromScript(u8 *p, void *parent)
             sequenceResult = Anim_SetSequence(p + 0x10c, *(void **)(p + 0x164), 10, 0, zero);
         }
     }
-    StepAnimation(p, (void *)(p + 0x10c), 4);
-    {
-        register u32 off0 asm("r3") = 0x146;
-        register u8 *a0 asm("r1");
-        asm("" : "+r"(off0));
-        a0 = p + off0;
-        if (*(s16 *)a0 == 0)
-            CannonTurret_InitCollider(p);
-    }
-    {
-        u32 off = 0x13e;
-        if (*(s16 *)(p + off) != 0) {
-            u8 *body = p + 0xc0;
-            void *par;
-            u8 *pa;
-            off += 0xa;
-            pa = p + off;
-            par = *(void **)pa;
-            SceneBody_Init(body, par, p + 0x40, 0, 4, p);
-            SceneBody_SetSprite(body, p + 0x24);
-            TerrainOverlay_QueueAddActor(body);
-        }
+    PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)(p + 0x24), (void *)(p + 0x10c));
+    if (H(0x146) == 0)
+        CannonTurret_InitCollider(p);
+    if (H(0x13e) != 0) {
+        u8 *body = p + 0xc0;
+        SceneBody_Init(body, *(void **)(p + 0x148), p + 0x40, 0, 4, p);
+        SceneBody_SetSprite(body, p + 0x24);
+        TerrainOverlay_QueueAddActor(body);
     }
 }
