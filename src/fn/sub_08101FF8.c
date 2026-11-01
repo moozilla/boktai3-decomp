@@ -47,7 +47,7 @@ void NamedObject_UpdateEntryTrigger(struct NamedObject *o)
                 if (attr & 0x40) {
                     if (!NamedObject_IsMapCellOccupied(cell)) {
                         struct SceneVec delta;
-                        Difference(&delta, (struct SceneVec *)&o->x, &gPlayers[i]->position);
+                        Difference(&delta, (struct SceneVec *)&o->body.position.x, &gPlayers[i]->position);
                         if (o->field_E0 & 8) {
                             if (delta.x > gUnk_086064B4.x || delta.x < -gUnk_086064B4.x ||
                                 delta.y > gUnk_086064B4.y || delta.y < -gUnk_086064B4.y ||

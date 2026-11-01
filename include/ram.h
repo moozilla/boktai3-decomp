@@ -135,7 +135,7 @@ extern u32 gSerialReceiveIndex;
 /* 0x03005370 */
 extern s16 gSerialReceivePackets[];
 /* 0x020004C8 */
-extern u32 gSceneCallbackPool;
+extern struct SceneCallbackPool *gSceneCallbackPool;
 /* 0x020001A4 */
 extern u8 *gWoodenCrateManager;
 /* 0x02000474 */

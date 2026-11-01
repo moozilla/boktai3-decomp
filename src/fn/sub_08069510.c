@@ -33,21 +33,21 @@ s32 BouncingObject_UpdatePool(struct BouncingPool *input)
             blocked = gUnk_02000560 & blockedMask;
             if (!blocked) {
                 u32 *used;
-                void **table;
+                BouncingObjectCallback const *table;
                 i = 0;
                 {
                     u32 usedOffset = (u32) & ((struct BouncingPool *)0)->used;
                     used = (void *)((u32)pool + usedOffset);
                 }
                 {
-                    void **low = gUnk_08605B6C;
+                    BouncingObjectCallback const *low = gBouncingObjectStateCallbacks;
                     table = low;
                 }
                 do {
                     if (Occupied(used, 1u << i)) {
                         struct BouncingObject *slot =
                             (void *)((u32)i * sizeof(*slots) + (u32)slots);
-                        sub_08249240(pool, slot, table[slot->state]);
+                        table[slot->state](pool, slot);
                     }
                     i++;
                 } while (i < 12);

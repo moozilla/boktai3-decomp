@@ -8,5 +8,6 @@ s32 NativeEffect_DestroyManager(void)
     s32 i;
     for (i = 0; i <= 0xf; i++)
         SlotRegistry_RemoveSprite(i);
-    return gSceneCallbackPool = 0;
+    gSceneCallbackPool = 0;
+    return 0;
 }

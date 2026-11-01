@@ -53,7 +53,7 @@ void NamedObject_ClampTetherToPlatform(struct NamedObject *o)
         cell = gTerrainMap->rows[z] + x;
     if (tether.y == ((*CellData(cell) & 15) << 8) && !(Attributes(cell) & 0x40))
         return;
-    Difference(&delta, (struct SceneVec *)&o->x, &tether);
+    Difference(&delta, (struct SceneVec *)&o->body.position.x, &tether);
     if (delta.x > gUnk_086064B4.x || delta.x < -gUnk_086064B4.x || delta.y > gUnk_086064B4.y ||
         delta.y < -gUnk_086064B4.y || delta.z > gUnk_086064B4.z || delta.z < -gUnk_086064B4.z) {
         if (delta.x > gUnk_086064B4.x)
@@ -64,9 +64,9 @@ void NamedObject_ClampTetherToPlatform(struct NamedObject *o)
             delta.z = gUnk_086064B4.z;
         else if (delta.z < -gUnk_086064B4.z)
             delta.z = -gUnk_086064B4.z;
-        tether.x = o->x + delta.x;
-        tether.y = o->y;
-        tether.z = o->z + delta.z;
+        tether.x = o->body.position.x + delta.x;
+        tether.y = o->body.position.y;
+        tether.z = o->body.position.z + delta.z;
         TetherActor_SetPosition(&tether);
         SetFlag2(0x200, (u16 *)&o->flags);
     }

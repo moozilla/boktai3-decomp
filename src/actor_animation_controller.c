@@ -1,5 +1,6 @@
 #include "global.h"
 #include "actor_animation_controller.h"
+#include "display_sprite_playback.h"
 #include "render.h"
 #include "input.h"
 #include "ram.h"
@@ -598,12 +599,14 @@ void Anim_SetSequence(void *, u32, u32, u32, u32);
 
 void ActorShadow_Disable(void *);
 
-static inline u8 take_v2(struct ActorAnimController *p)
+static inline u8 TakeApproachEntry(struct ActorAnimController *p)
 {
-    s32 m = 1;
-    s32 v = p->flags;
-    if (v & m) {
-        p->flags = ~m & v;
+    s32 mask = 1;
+    u32 flags = p->flags;
+    if (flags & mask) {
+        mask = ~mask;
+        mask &= flags;
+        p->flags = mask;
         p->done = 0;
         return 1;
     }
@@ -1425,7 +1428,7 @@ void Actor_SetPreviousAnimationStateFromScript(void)
     p[0xF6C] = Script_GetKeywordValue(0x72, 0);
 }
 
-void Actor_OnControllerIdle(void)
+void Actor_OnControllerIdle(void *controller, void *child)
 {
 }
 
@@ -1582,10 +1585,11 @@ struct Rotator {
     s8 delta;
 };
 
-static inline void rotate(struct ActorAnimController *p)
+static inline void Actor_ApplyBob(struct ActorAnimController *p, struct Rotator *obj)
 {
-    struct Rotator *o = (struct Rotator *)&p->obj;
+    struct Rotator *o = obj;
     if (!(p->count++ & 3)) {
+
         switch ((int)(p->anim.frame & 3)) {
             case 0:
             case 3:
@@ -1604,6 +1608,11 @@ static inline void rotate(struct ActorAnimController *p)
         }
         o->angle += o->delta;
     }
+}
+
+static inline void rotate(struct ActorAnimController *p)
+{
+    Actor_ApplyBob(p, (void *)&p->obj);
 }
 
 static inline u32 frame_factor(u16 v)
@@ -2699,69 +2708,41 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
 
 extern const s16 gUnk_086149C4[];
 
-/* Animation-tick step shared by the two places that advance the sequence (081E728C). */
-static inline u8 sub_081E728C_Advance(struct ActorAnimController *p, u32 direction, u32 flip)
+static inline s16 SetApproachDirection(s16 angle, u8 *directionOut, u8 *flipOut)
 {
-    struct ActorAnim *anim = &p->anim;
-    struct ActorSprite *obj = &p->obj;
-    const u16 *entry;
-    u8 wrapped = 0;
-
-    Anim_SetSequence(anim, p->arg, p->state, direction, flip);
-    entry = anim->data + anim->frame;
-    obj->frame = *entry >> 6;
-    if ((anim->flags & 1) != ((*entry >> 4) & 1))
-        obj->flags |= 4;
-    else
-        obj->flags &= ~4;
-    if ((anim->flags & 2) != ((*entry >> 4) & 2))
-        obj->flags |= 8;
-    else
-        obj->flags &= ~8;
-
-    anim->timer++;
-    if (anim->timer >= anim->rate) {
-        anim->timer = 0;
-        if (anim->flags & 4) {
-            if (anim->frame != 0) {
-                anim->frame--;
-            } else {
-                if (anim->flags & 8)
-                    anim->timer = anim->rate;
-                else
-                    anim->frame = anim->count - 1;
-                wrapped = 1;
-            }
+    while (angle < 0)
+        angle += 256;
+    while (angle > 255)
+        angle -= 256;
+    angle = ((angle - 16) >> 5) & 7;
+    {
+        s32 choice = angle;
+        if (choice == 4)
+            *directionOut = 0;
+        else if (choice == 0)
+            *directionOut = 4;
+        else if (choice < 4) {
+            *directionOut = 4 - angle;
+            *flipOut = 1;
         } else {
-            anim->frame++;
-            if (anim->frame >= anim->count) {
-                if (anim->flags & 8) {
-                    anim->timer = anim->rate;
-                    anim->frame = anim->count - 1;
-                } else {
-                    anim->frame = 0;
-                }
-                wrapped = 1;
-            }
+            *directionOut = angle - 4;
+            *flipOut = 0;
         }
-        entry = anim->data + anim->frame;
-        anim->factor = *entry & 15;
-        anim->rate = (anim->scale * anim->factor) >> 6;
-        if (anim->rate == 0)
-            anim->rate = 1;
     }
-    return wrapped;
+    return angle;
 }
 
-/* Settle path shared by the near-target branch: copies the target, optionally advances, finishes. */
-static inline void sub_081E728C_Finish(struct ActorAnimController *p)
+static inline void FinishApproach(struct ActorAnimController *p)
 {
     *(u16 *)((u8 *)p + 0xF5A) &= 0xF;
     if (p->oldMode == 3 && p->mode == 3) {
         p->savedFrame = p->anim.frame;
         p->savedTimer = p->anim.timer;
     }
-    p->flags |= 1;
+    {
+        u8 set = 1;
+        p->flags = set | p->flags;
+    }
     if (p->handle) {
         void *handle = p->handle;
         p->handle = 0;
@@ -2769,100 +2750,70 @@ static inline void sub_081E728C_Finish(struct ActorAnimController *p)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 36.6%
-// scope shape 331 (differences once low registers are set aside)
-// confidence=low: steps an actor's animation toward its target: heading, sprite playback, and motion.
-void sub_081E728C(struct ActorAnimController *p)
+/* Advance the sprite toward its scripted position and settle into its final facing. */
+void Actor_MoveTowardTarget(struct ActorAnimController *p)
 {
     s32 dx, dz, adx, adz;
-    s16 targetY;
-    u8 snap;
 
     dx = p->targetX - p->obj.x;
     dz = p->targetZ - p->obj.z;
     p->heading = Math_Atan2(dx, dz);
 
-    if (take_v2(p)) {
-        s32 idx;
-        s16 v;
-
+    if (TakeApproachEntry(p)) {
         p->state = 0;
-        v = (s16)p->heading;
-        while (v < 0)
-            v += 256;
-        while (v > 255)
-            v -= 256;
-        idx = ((v - 16) >> 5) & 7;
-        if (idx == 4) {
-            p->direction = 0;
-        } else if (idx == 0) {
-            p->direction = 4;
-        } else if (idx <= 3) {
-            p->direction = 4 - idx;
-            p->flip = 1;
-        } else {
-            p->direction = idx - 4;
-            p->flip = 0;
+        {
+            s32 facing = SetApproachDirection(p->heading, &p->direction, &p->flip);
+            facing -= 4;
+            facing &= 7;
+            p->facing = facing;
         }
-        p->unkF67[1] = (idx - 4) & 7;
-        p->unkF7C = 0;
+        p->heightSettled = 0;
         ActorShadow_Enable(p->p2);
     }
 
-    {
-        u16 old = p->count;
-        p->count = old + 1;
-        if ((old & 3) == 0) {
-            s32 sel = p->anim.frame & 3;
-            if (sel == 0 || sel == 3) {
-                p->delta = (p->obj.flags & 0x10) ? 1 : -8;
-            } else {
-                p->delta = (p->obj.flags & 0x10) ? -1 : 8;
-            }
-            p->obj.y += p->delta;
-        }
-    }
-
-    p->done = sub_081E728C_Advance(p, p->direction, p->flip);
+    Actor_ApplyBob(p, (void *)&p->obj);
+    Anim_SetSequence(&p->anim, p->arg, p->state, p->direction, p->flip);
+    p->done = PlayerCue_StepSequenceEnded((void *)&p->obj, (void *)&p->anim);
 
     adx = dx < 0 ? -dx : dx;
     adz = dz < 0 ? -dz : dz;
-    if (adx + adz <= 9 && p->unkF7C != 0) {
+    if (adx + adz <= 9 && p->heightSettled != 0) {
         p->obj.x = p->targetX;
         p->obj.z = p->targetZ;
-        if ((s8)p->unkF67[0] >= 0) {
-            u32 m = (s8)p->unkF67[0] & 7;
+        if (p->targetFacing >= 0) {
+            s8 row;
             u32 flip = 0;
-            p->unkF67[1] = p->unkF67[0];
-            if (m > 4) {
-                m = (u8)(8 - m);
+            p->facing = p->targetFacing;
+            row = p->targetFacing;
+            row &= 7;
+            if (row > 4) {
+                row = (u8)(8 - row);
                 flip = 1;
             }
-            p->done = sub_081E728C_Advance(p, m, flip);
+            Anim_SetSequence(&p->anim, p->arg, p->state, (u8)row, flip);
+            p->done = PlayerCue_StepSequenceEnded((void *)&p->obj, (void *)&p->anim);
         }
-        sub_081E728C_Finish(p);
+        FinishApproach(p);
         return;
     }
 
-    if (p->unkF7C == 0) {
-        targetY = p->targetY;
-        snap = 0;
-        if (targetY > p->obj.y) {
+    if (p->heightSettled == 0) {
+        if (p->targetY > p->obj.y) {
             p->obj.y += 7;
             p->savedY += 7;
-            if (targetY < p->obj.y)
-                snap = 1;
-        } else if (targetY < p->obj.y) {
+            if (p->targetY < p->obj.y) {
+                p->obj.y = p->targetY;
+                p->savedY = p->targetY;
+                p->heightSettled = 1;
+            }
+        } else if (p->targetY < p->obj.y) {
             p->obj.y -= 7;
             p->savedY -= 7;
-            if (targetY > p->obj.y)
-                snap = 1;
-        }
-        if (snap) {
-            p->obj.y = targetY;
-            p->savedY = targetY;
-            p->unkF7C = 1;
+            if (p->targetY > p->obj.y) {
+                p->obj.y = p->targetY;
+                p->savedY = p->targetY;
+                p->heightSettled = 1;
+            }
         }
     }
 
@@ -2870,19 +2821,16 @@ void sub_081E728C(struct ActorAnimController *p)
         return;
     {
         const s16 *sine = gUnk_086149C4;
-        s16 cosv = sine[((s16)p->heading + 0x40) & 0xFF];
-        s16 sinv = sine[p->heading & 0xFF];
-        p->deltaX = Div(cosv, 500);
-        *(s16 *)p->unkECC = Div(sinv, 500);
+        s16 sinv;
+        p->deltaX = Div(sine[((s16)p->heading + 64) & 255], 500);
+        sinv = sine[p->heading & 255];
+        p->deltaZ = Div(sinv, 500);
         p->obj.x += p->deltaX;
-        p->obj.z += *(s16 *)p->unkECC;
+        p->obj.z += p->deltaZ;
         p->savedX = p->obj.x;
         p->savedZ = p->obj.z;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081E728C);
-#endif
 
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
@@ -4324,11 +4272,6 @@ struct ActorRegionController {
     struct ActorRegionChild children[16];
 };
 
-struct ActorRegionCount {
-    s32 count;
-    u8 unk_04[0xd8];
-};
-
 struct ActorRegionPlayer {
     u8 unk_00[0x5a0];
     u32 region;
@@ -4342,38 +4285,28 @@ static inline u8 ActorChild_IsCurrentRegion(u32 current, u32 region)
 }
 
 /* Update child visibility for the current region, then tick active visible children. */
-#ifdef NONMATCHING
-// fuzzy: 61.8%
-// scope shape 28 (differences once low registers are set aside)
 void Actor_UpdateRegionChildren(struct ActorRegionController *p)
 {
-    s32 i = 0;
-    struct ActorRegionCount *countBase = (struct ActorRegionCount *)&p->children[0].regionCount;
-    struct ActorRegionChild *children = p->children;
-    for (; i < 16; i++) {
+    s32 i;
+    for (i = 0; i < 16; i++) {
+        struct ActorRegionChild *children = p->children;
         s32 visible = 0;
-        if (visible < countBase[i].count) {
+        if (visible < p->children[i].regionCount) {
             u32 current = ((struct ActorRegionPlayer *)gGameState)->region;
-            s32 count = p->children[i].regionCount;
-            s32 j = 0;
-            do {
+            s32 j;
+            for (j = 0; j < p->children[i].regionCount; j++) {
                 if (ActorChild_IsCurrentRegion(current, p->children[i].regions[j]))
                     visible = 1;
-                j++;
-            } while (--count != 0);
+            }
         }
-        {
-            u32 value;
-            if (visible)
-                value = children[i].flags & ~1;
-            else
-                value = children[i].flags | 1;
-            children[i].flags = value;
-        }
+        if (visible)
+            children[i].flags &= ~1;
+        else
+            children[i].flags |= 1;
     }
     for (i = 0; i < 16; i++) {
         if (p->children[i].control & 4) {
-            if (!(children[i].flags & 1)) {
+            if (!(p->children[i].flags & 1)) {
                 if (p->children[i].timer)
                     p->children[i].timer--;
                 p->children[i].callback(p, &p->children[i]);
@@ -4381,9 +4314,6 @@ void Actor_UpdateRegionChildren(struct ActorRegionController *p)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Actor_UpdateRegionChildren);
-#endif
 
 /* Tentative role: Copy the saved position and dispatch the animation phase. */
 
@@ -4480,18 +4410,7 @@ s32 Actor_DestroyController(struct ActorAnimController *p)
     gScriptedActorController = 0;
 }
 
-struct ScriptInteractionChild {
-    u32 flags;
-    u8 unk_04[3];
-    u8 priority;
-    u8 unk_08[8];
-    u16 frame;
-    u8 unk_12[10];
-    s16 x, y, z;
-    u8 unk_22[0x26];
-    s16 worldX, worldY, worldZ;
-    u8 unk_4E[0x56];
-    s32 completionScript, startScript;
+struct InteractionChildHandler {
     void (*fn)(struct ActorAnimController *, struct ActorChildSlot *);
     u8 group, control, orientation, option;
     u8 timer;
@@ -4505,69 +4424,125 @@ struct ScriptInteractionChild {
     u8 unk_D2[0xa];
 };
 
+struct ScriptInteractionChild {
+    struct ActorSprite sprite;
+    u8 unknown24[0x48 - 0x24];
+    struct Vec world;
+    u8 unknown50[0xA4 - 0x50];
+    s32 completionScript, startScript;
+    struct InteractionChildHandler handler;
+};
+
+typedef char
+    ScriptInteractionChildSizeCheck[sizeof(struct ScriptInteractionChild) == 0xDC ? 1 : -1];
+
 void Terrain_GetBoxMinPosition(u16, void *);
 u8 *Script_GetPc(void);
 s32 Region_FindContaining(void *);
 
-/* The active value is one: interaction mode and the state-entry flag. */
-static inline void interaction_state(struct ActorAnimController *g, u32 mode, u32 phase)
+#define CHILD_FIELD_OFFSET(t, m) ((u32) & ((t *)0)->m)
+#define SCRIPT_CHILD_BASE(g, member)                                                               \
+    ((u8 *)(g) + CHILD_FIELD_OFFSET(struct ActorAnimController, children) +                        \
+     CHILD_FIELD_OFFSET(struct ScriptInteractionChild, member))
+#define SET_CHILD_SCRIPT(base, offset, value)                                                      \
+    do {                                                                                           \
+        *(s32 *)((offset) + (base)) = (value);                                                     \
+    } while (0)
+
+/* Save the previous mode before the scripted interaction starts. */
+static inline void InteractionChild_SetMode(struct ActorAnimController *g, u32 mode, u32 phase,
+                                            u16 *oldMode)
 {
-    g->oldMode = g->mode;
+    *oldMode = g->mode;
     g->mode = mode;
     *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 15) | (phase << 4);
-    if (g->oldMode == 3 && g->mode == 3) {
+    if (*oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
     }
-    g->flags |= mode;
+    {
+        u8 flag = 1;
+        u8 *entry = &g->flags;
+        *entry = flag | *entry;
+    }
+}
+/* Apply the selected slot's horizontal flip to the original controller. */
+static inline void InteractionChild_Flip(struct ActorAnimController *const *owner, s32 byteOffset)
+{
+    struct ActorChildSlot *first = (*owner)->children;
+    struct ActorChildSlot *child = (struct ActorChildSlot *)((u8 *)first + byteOffset);
+    child->flags |= 4;
 }
 
-/* Tentative name: Actor_ConfigureInteractionChildFromScript.
- * Configure the first available interaction marker from the current script. */
-#ifdef NONMATCHING
-// fuzzy: 57.3%
-// scope shape 125 (differences once low registers are set aside)
+/* Configure the first available interaction marker using the current script. */
 void Actor_ConfigureInteractionChildFromScript(void)
 {
     struct Vec position;
+    s32 byteOffset;
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    struct ScriptInteractionChild *child;
-    s32 i, j;
-    u32 one = 1;
+    struct ScriptInteractionChild *children;
+    struct Vec *world;
+    u8 *orientation;
+    struct ScriptInteractionChild *slot;
+    struct InteractionChildHandler *handler;
+    s32 *regions;
+    u8 *control;
+    s32 i;
+    u16 *oldMode;
+    s32 remaining;
+    u32 interactionMode;
     if (!g) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
         if (!g)
             return;
     }
-    child = (struct ScriptInteractionChild *)g->children;
-    for (i = 0; i < 16; i++, child++) {
-        if (child->control & 2) {
-            child->control = 4;
+
+    children = (void *)g->children;
+
+    i = 0;
+    oldMode = &g->oldMode;
+    byteOffset = 0;
+    regions = &children[0].handler.regions[0];
+    world = &children[0].world;
+    orientation = &children[0].handler.orientation;
+    slot = children;
+    control = &children[0].handler.control;
+    handler = &children[0].handler;
+    interactionMode = 1;
+
+    for (; i < 16; i++) {
+        if (handler->control & 2) {
+            struct ActorSprite *selectedSprite;
+            u8 *completionBase;
+            u8 direction;
+            handler->control = 4;
             switch (Script_GetKeywordValue('t', 0)) {
                 case 0:
-                    child->effect = 104;
-                    interaction_state(g, one, 1);
-                    child->fn = Actor_OnInteractionChildUpdate;
-                    child->control |= 1;
+                    handler->effect = 104;
+                    InteractionChild_SetMode(g, interactionMode, 1, oldMode);
+                    handler->fn = Actor_OnInteractionChildUpdate;
+                    handler->control |= 1;
                     break;
                 case 1:
-                    child->control |= 8;
-                    child->effect = 104;
-                    interaction_state(g, one, 4);
-                    child->fn = Actor_OnEffectChildPaletteInit;
-                    child->control |= 1;
+                    handler->control |= 8;
+                    handler->effect = 104;
+                    InteractionChild_SetMode(g, interactionMode, 4, oldMode);
+                    handler->fn = Actor_OnEffectChildPaletteInit;
+                    handler->control |= 1;
                     break;
                 case 2:
-                    child->control |= 16;
-                    child->effect = 107;
-                    child->frame = 1;
-                    interaction_state(g, one, 1);
-                    child->fn = Actor_OnInteractionChildUpdate;
-                    child->control |= 1;
+                    handler->control |= 16;
+                    handler->effect = 107;
+                    slot->sprite.frame = 1;
+                    InteractionChild_SetMode(g, interactionMode, 1, oldMode);
+                    handler->fn = Actor_OnInteractionChildUpdate;
+                    handler->control |= 1;
                     break;
             }
-            child->orientation = Script_GetKeywordValue('r', 0);
-            child->option = Script_GetKeywordValue('A', 0);
+
+            selectedSprite = &slot->sprite;
+            handler->orientation = Script_GetKeywordValue('r', 0);
+            handler->option = Script_GetKeywordValue('A', 0);
             if (Script_SeekToKeyword('R')) {
                 Terrain_GetBoxMinPosition(Script_GetValue(), &position);
             } else {
@@ -4577,67 +4552,85 @@ void Actor_ConfigureInteractionChildFromScript(void)
                 position.y = Script_GetValue() - 64;
                 position.z = Script_GetValue();
             }
-            if (child->orientation) {
-                ((struct ScriptInteractionChild *)g->children)[i].worldX = position.x;
-                child->x = position.x;
-                ((struct ScriptInteractionChild *)g->children)[i].worldY = position.y;
-                child->y = position.y;
-                ((struct ScriptInteractionChild *)g->children)[i].worldZ = position.z;
-                child->z = position.z - 128;
+            direction = *orientation;
+            if (direction) {
+                world->x = position.x;
+                selectedSprite->x = position.x;
+                world->y = position.y;
+                selectedSprite->y = position.y;
+                world->z = position.z;
+                selectedSprite->z = position.z - 128;
             } else {
-                ((struct ScriptInteractionChild *)g->children)[i].worldX = position.x;
-                child->x = position.x - 128;
-                ((struct ScriptInteractionChild *)g->children)[i].worldY = position.y;
-                child->y = position.y;
-                ((struct ScriptInteractionChild *)g->children)[i].worldZ = position.z;
-                child->z = position.z;
+                world->x = position.x;
+                selectedSprite->x = position.x - 128;
+                world->y = position.y;
+                selectedSprite->y = position.y;
+                world->z = position.z;
+                selectedSprite->z = position.z;
             }
-            child->x += 60;
-            child->z += 60;
-            child->y += 84;
-            child->priority = 2;
+            selectedSprite->x += 60;
+            selectedSprite->z += 60;
+            selectedSprite->y += 84;
+            selectedSprite->priority = 2;
+
             if (Script_SeekToKeyword('m')) {
-                child->regionCount = 0;
+                handler->regionCount = 0;
                 while (Script_GetPc()) {
-                    ((struct ScriptInteractionChild *)g->children)[i].regions[child->regionCount] =
-                        Script_GetValue();
-                    child->regionCount++;
+                    s32 value = Script_GetValue();
+                    s32 *region = (s32 *)((u8 *)regions + ((u32)slot->handler.regionCount << 2));
+                    *region = value;
+                    slot->handler.regionCount++;
                 }
             } else {
-                child->regionCount = 1;
-                ((struct ScriptInteractionChild *)g->children)[i].regions[0] =
-                    Region_FindContaining(&position);
+                handler->regionCount = 1;
+                handler->regions[0] = Region_FindContaining(&position);
             }
+            /* Both script fields use the offset of the selected slot. */
+            completionBase = SCRIPT_CHILD_BASE(g, completionScript);
+            orientation = SCRIPT_CHILD_BASE(g, startScript);
             if (Script_SeekToKeyword('C'))
-                ((struct ScriptInteractionChild *)g->children)[i].completionScript =
-                    Script_GetValue();
+                *(s32 *)(completionBase + byteOffset) = Script_GetValue();
             else
-                ((struct ScriptInteractionChild *)g->children)[i].completionScript = 0;
+                *(s32 *)(completionBase + byteOffset) = 0;
             if (Script_SeekToKeyword('a'))
-                ((struct ScriptInteractionChild *)g->children)[i].startScript = Script_GetValue();
+                SET_CHILD_SCRIPT(orientation, byteOffset, Script_GetValue());
             else
-                ((struct ScriptInteractionChild *)g->children)[i].startScript = 0;
-            ((struct ScriptInteractionChild *)g->children)[i].variant =
-                Script_GetKeywordValue('u', 0);
-            if (!child->orientation) {
-                *(u16 *)g->unkF62 = -64;
+                SET_CHILD_SCRIPT(orientation, byteOffset, 0);
+            ((struct InteractionChildHandler *)(control -
+                                                CHILD_FIELD_OFFSET(struct InteractionChildHandler,
+                                                                   control)))
+                ->variant = Script_GetKeywordValue('u', 0);
+            if (!handler->orientation) {
+                g->interactionHeading = -64;
             } else {
-                ((struct ScriptInteractionChild *)g->children)[i].flags |= 4;
-                *(u16 *)g->unkF62 = 64;
+                struct ActorAnimController *controller = g;
+                InteractionChild_Flip(&controller, byteOffset);
+                g->interactionHeading = 64;
             }
-            j = child->regionCount;
-            if (j > 0) {
+            remaining = slot->handler.regionCount;
+            if (remaining > 0) {
                 do {
-                    j--;
-                } while (j != 0);
+                    remaining--;
+                } while (remaining != 0);
             }
             return;
         }
+        byteOffset += sizeof(*children);
+        regions = (s32 *)((u8 *)regions + sizeof(*children));
+        world = (struct Vec *)((u8 *)world + sizeof(*children));
+        do {
+            orientation += sizeof(*children);
+            slot++;
+        } while (0);
+        control += sizeof(*children);
+        handler = (struct InteractionChildHandler *)((u8 *)handler + sizeof(*children));
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Actor_ConfigureInteractionChildFromScript);
-#endif
+
+#undef SET_CHILD_SCRIPT
+#undef SCRIPT_CHILD_BASE
+#undef CHILD_FIELD_OFFSET
+
 // Provisional name: Actor_ConfigureFromScript
 
 static inline void state(struct ActorAnimController *g, u32 mode, u32 phase)
@@ -4793,11 +4786,15 @@ static inline void ActorInit_InitMainSprite(struct ActorInitController *p, struc
     obj->flags = 3;
 }
 
-// Provisional name: Actor_InitializeController
+static inline void ActorInit_SetChildControl(void (*callback)(void *, void *),
+                                             struct ActorChildSlot *child)
+{
+    child->control = 2;
+    child->fn = callback;
+    child->control |= 1;
+}
 
 /* Initialize the singleton controller, its palette banks and child sprites. */
-#ifdef NONMATCHING
-// fuzzy: 95.5%
 s32 Actor_InitializeController(void *arg0)
 {
     struct ActorInitController *p = arg0;
@@ -4845,18 +4842,14 @@ s32 Actor_InitializeController(void *arg0)
     p->heading = 0;
     p->flip = 0;
     for (i = 0; i < 16; i++) {
-        u32 one = 1;
-        void (*callback)(void *, void *) = (void (*)(void *, void *))Actor_OnControllerIdle;
         struct ActorChildSlot *child = &p->children[i];
         void *data = child->sprite;
         AnimData_Load(data, 0xa850);
         Sprite_Init(child, data, 0);
         Sprite_SetOriginStub(child, -8, -16);
-        child->flags = one;
+        child->flags = 1;
         child->index = i;
-        child->control = 2;
-        child->fn = callback;
-        child->control |= one;
+        ActorInit_SetChildControl(Actor_OnControllerIdle, child);
     }
     p->scaleFn = 0;
     p->otherFn = 0;
@@ -4876,9 +4869,6 @@ s32 Actor_InitializeController(void *arg0)
     p->variant = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Actor_InitializeController);
-#endif
 
 void Actor_RequestControllerRemoval(void)
 {

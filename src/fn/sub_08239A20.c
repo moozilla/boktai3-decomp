@@ -1,36 +1,11 @@
 #include "global.h"
 #include "render.h"
-struct LinkPalTarget {
-    u8 pad0[0xc];
-    u16 *palette;
-};
-struct LinkPlayerFade {
-    u8 pad0[0xd4];
-    u16 *palette;
-    u8 padD8[0x178 - 0xd8];
-    struct LinkPalTarget *target;
-    u8 pad17C[0x360 - 0x17c];
-    u16 basePalette[16];
-    u16 workPalette[16];
-    u8 pad3A0[0x419 - 0x3a0];
-    u8 flag;
-    u8 pad41A[0xac4 - 0x41a];
-    s16 modeArg;
-    u8 mode;
-    u8 pad_ac7;
-    u8 animIdx;
-    u8 animIdxNew;
-    u8 padACA[0xad6 - 0xaca];
-    u16 srcSlot;
-    u16 fadeIn;
-    u16 dstSlot;
-    u16 fadeOut;
-};
+#include "link_player_palette.h"
+
 void LinkPlayer_LoadAnimationParameters(void *);
 s32 ActorEffect_SelectModeFlag(void *);
 void PaletteFade_ApplySelectiveBrightness(void *);
 s32 Player_GetActionIndex(void *);
-void sub_08239848(void *, void *, s32, s32, s32);
 void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
 {
     s32 mode;
@@ -40,9 +15,9 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
         LinkPlayer_LoadAnimationParameters(p);
     }
     mode = ActorEffect_SelectModeFlag(p);
-    if (p->modeArg != arg || p->mode != mode) {
+    if (p->modeArg != arg || p->brightness != mode) {
         p->modeArg = arg;
-        p->mode = mode;
+        p->brightness = mode;
         PaletteFade_ApplySelectiveBrightness(p);
     }
     if (p->fadeIn == 0) {
@@ -60,7 +35,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
                 amount = 0x50 - p->fadeOut;
             else
                 amount = 0;
-            sub_08239848(p, src, amount, 0x20 - amount, 5);
+            LinkPlayer_BlendPalette(p, (const u16 *)src, amount, 0x20 - amount, 5);
             p->fadeOut++;
             if (p->fadeOut > 0x5f)
                 p->fadeOut = 0;
@@ -78,10 +53,10 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
                 if (p->fadeOut > 0x4f)
                     p->fadeOut = 0;
             }
-            sub_08239848(p, src, amount, 0x20 - amount, 5);
+            LinkPlayer_BlendPalette(p, (const u16 *)src, amount, 0x20 - amount, 5);
         } else {
             p->fadeOut = 0;
-            if (p->flag == 0)
+            if (p->alternate == 0)
                 p->palette = p->basePalette;
             else
                 p->target->palette = p->basePalette;
@@ -90,7 +65,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
         p->fadeOut = 0;
         if (p->fadeIn > 0x1f) {
             u16 *src = (u16 *)(gPaletteBankData + p->srcSlot * 32);
-            if (p->flag == 0) {
+            if (p->alternate == 0) {
                 u16 **slot;
                 u16 *dst;
                 u16 *base;
@@ -115,7 +90,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
                 p->target->palette = p->workPalette;
             }
         } else {
-            sub_08239848(p, gPaletteBankData + p->srcSlot * 32, p->fadeIn, 0x20 - p->fadeIn, 5);
+            LinkPlayer_BlendPalette(p, (const u16 *)(gPaletteBankData + p->srcSlot * 32), p->fadeIn, 0x20 - p->fadeIn, 5);
         }
         p->fadeIn--;
     }

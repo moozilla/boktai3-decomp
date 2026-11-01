@@ -241,7 +241,12 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [gcl/examples/scale_quiz.md](../gcl/examples/scale_quiz.md) | Worked example: the Blackbeard Brothers' scale quiz | *#scripts #assets #tooling* | 10 |
 | [gcl/examples/sealed_prison.md](../gcl/examples/sealed_prison.md) | Worked example: the Sealed Prison, the first dungeon | *#scripts #assets #tooling* | 6 |
 | [notes/actor-contact-target-draft.md](../notes/actor-contact-target-draft.md) | Contact target and damage update | #scene-actors #matching | 1 |
+| [notes/actor-controller-init-round9.md](../notes/actor-controller-init-round9.md) | Actor_InitializeController | *#assets* | 0 |
 | [notes/actor-damage-particle-bursts.md](../notes/actor-damage-particle-bursts.md) | Hit reaction particle bursts | #scene-actors #matching | 1 |
+| [notes/actor-glyph-trail_2026-11-01.md](../notes/actor-glyph-trail_2026-11-01.md) | Actor glyph trail | *#actors* | 0 |
+| [notes/actor-interaction-child-recovery.md](../notes/actor-interaction-child-recovery.md) | Actor_ConfigureInteractionChildFromScript | *#scripts #assets* | 1 |
+| [notes/actor-move-toward-target-round9.md](../notes/actor-move-toward-target-round9.md) | Actor_MoveTowardTarget | *#animation #assets* | 0 |
+| [notes/actor-region-children-round9.md](../notes/actor-region-children-round9.md) | Actor_UpdateRegionChildren | *#assets* | 0 |
 | [notes/actor_animation_controller.md](../notes/actor_animation_controller.md) | Actor animation controller (081E34D0-081EAB64) | *#actors #animation #assets #tooling* | 8 |
 | [notes/actor_graphics_and_basic_states.md](../notes/actor_graphics_and_basic_states.md) | Actor graphics and basic states (08021EA8-08024F2C) | #actors #animation | 8 |
 | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
@@ -249,7 +254,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/arm-08000430.md](../notes/arm-08000430.md) | sub_08000430: unpinned exact match, and how it works | #matching #compiler #register-pinning #arm | 6 |
 | [notes/axe-trail-playback.md](../notes/axe-trail-playback.md) | Axe trail playback | #monsters #matching | 0 |
+| [notes/background-palette-fade_2026-11-01.md](../notes/background-palette-fade_2026-11-01.md) | Background palette fade | *#assets* | 0 |
 | [notes/bk.md](../notes/bk.md) | bk notes (backlog retry, 45 matches) |  | 5 |
+| [notes/bouncing-object-active-round9.md](../notes/bouncing-object-active-round9.md) | BouncingObject_TickActive | #matching #round9b #bouncing-object | 1 |
 | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
 | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
 | [notes/cgb.md](../notes/cgb.md) | CgbSound (0x08230AC8) - matched (register-pinning concession) | *#sound* | 3 |
@@ -270,6 +277,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/codex-high.md](../notes/codex-high.md) | Codex high: task 0808AF38 | #matching #ghoul #slime #register-pinning | 244 |
 | [notes/codex-low.md](../notes/codex-low.md) | Task 080D812C — 2026-10-20 | #matching #dog | 376 |
 | [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
+| [notes/collision-process-pairs-round9.md](../notes/collision-process-pairs-round9.md) | Collision_ProcessPairs |  | 0 |
 | [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 12 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |
 | [notes/contact-actor-states_2026-10-14.md](../notes/contact-actor-states_2026-10-14.md) | Contact actor states and lifecycle, 08042E18–08043F64 | *#actors #tooling* | 5 |
@@ -328,6 +336,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/foundry-scene-hud-action-grid_2026-10-18.md](../notes/foundry-scene-hud-action-grid_2026-10-18.md) | Scene HUD action grid foundry candidates | #foundry #matching #scene-hud #input | 3 |
 | [notes/foundry-scene-npc-callbacks_2026-10-18.md](../notes/foundry-scene-npc-callbacks_2026-10-18.md) | Foundry: scene NPC callbacks, 2026-10-18 | #matching #foundry #state-actor | 2 |
 | [notes/ghost-init_2026-10-30.md](../notes/ghost-init_2026-10-30.md) | Ghost initializer: typed stores and the reload register pool | #matching #monster #ghost #compiler #ram | 5 |
+| [notes/golem-charge-windup-round9.md](../notes/golem-charge-windup-round9.md) | Golem_UpdateChargeWindup | *#particles #animation* | 0 |
 | [notes/grid_attack_actor.md](../notes/grid_attack_actor.md) | Grid attack actor unit consolidation | #grid-attack-actor #unit #matching #080297E8 #0802C678 | 5 |
 | [notes/grid_attack_animation_and_targets.md](../notes/grid_attack_animation_and_targets.md) | Grid attack animation and targets | #matching #bosses | 1 |
 | [notes/grid_attack_colliders_and_palette.md](../notes/grid_attack_colliders_and_palette.md) | Grid attack colliders and palette | #matching #bosses | 0 |
@@ -339,6 +348,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/large_scene_animation_controller.md](../notes/large_scene_animation_controller.md) | Large scene animation controller = Nidhoggr boss (081915E0-0819792C) | *#scene #animation* | 5 |
 | [notes/link-field2.md](../notes/link-field2.md) | Field objects and hazards: open near misses (wip/field2) | *#particles #animation #assets* | 3 |
 | [notes/link-menus_2026-10-12.md](../notes/link-menus_2026-10-12.md) | Wireless menus and result panels | *#panel #menu #wireless* | 4 |
+| [notes/link-player-palette_2026-11-01.md](../notes/link-player-palette_2026-11-01.md) | Link player palette | *#assets* | 0 |
 | [notes/lun-route-progress-rate.md](../notes/lun-route-progress-rate.md) | Lun route progress rate | #monsters #matching | 0 |
 | [notes/matching-idioms-batch_2026-10-19.md](../notes/matching-idioms-batch_2026-10-19.md) | Matching idioms from the 2026-10-19 cloud batch | #matching #agbcc #techniques | 3 |
 | [notes/matching-search-completion_2026-10-29.md](../notes/matching-search-completion_2026-10-29.md) | Completing the largest unmatched function in ordinary C | #matching #compiler #tooling #monsters | 13 |
@@ -361,6 +371,10 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/monster-initializers_2026-10-30.md](../notes/monster-initializers_2026-10-30.md) | Monster initializer family: 17 exact matches | #matching #monster #compiler #structs #ram #data | 8 |
 | [notes/monster_init_primitives_2026-10-30.md](../notes/monster_init_primitives_2026-10-30.md) | Shared initializer script and terrain operations | *#scripts #text* | 5 |
 | [notes/monster_init_shared_groups_2026-10-30.md](../notes/monster_init_shared_groups_2026-10-30.md) | Shared monster initialization groups | *#actors* | 4 |
+| [notes/named-actor-move-mode-round9.md](../notes/named-actor-move-mode-round9.md) | NamedActor_SetMoveModeFromScript | #matching #round9b #named-object | 0 |
+| [notes/named-object-create-round9.md](../notes/named-object-create-round9.md) | NamedObject_CreateFromScript | #matching #round9b #named-object | 1 |
+| [notes/native-effect-profile-round9.md](../notes/native-effect-profile-round9.md) | NativeEffect_CreateFromProfile |  | 1 |
+| [notes/nav-mesh-route-round9.md](../notes/nav-mesh-route-round9.md) | NavMesh_FindRoute |  | 1 |
 | [notes/opus-actor-marker-fragments_2026-10-31.md](../notes/opus-actor-marker-fragments_2026-10-31.md) | ActorMarker_LaunchFragments (08181514): holdout | #matching #actor-marker #compiler #reload #local-alloc #combine #scope-gap | 8 |
 | [notes/opus-armor-part-damage_2026-11-01.md](../notes/opus-armor-part-damage_2026-11-01.md) | Armor_OnPartDamageCollision (0818C6F8): matched in ordinary C | #matching #armor #twin #random-table #cross-jump | 2 |
 | [notes/opus-charged-burst-spark_2026-10-31.md](../notes/opus-charged-burst-spark_2026-10-31.md) | ChargedBurst_EmitSpark (082335F0): holdout, one equivalence short | #matching #charged-burst #random-table #compiler #local-alloc #reload #combine #holdout | 12 |
@@ -397,6 +411,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/push20-low.md](../notes/push20-low.md) | Push20 low range |  | 14 |
 | [notes/push20-mid.md](../notes/push20-mid.md) | Push20 mid-range worker | *#text* | 10 |
 | [notes/push20-root.md](../notes/push20-root.md) | Push toward 20%: parent matches |  | 8 |
+| [notes/region-actor-behavior-round9.md](../notes/region-actor-behavior-round9.md) | RegionActor_UpdateBehaviorAnimation | *#animation #assets* | 0 |
 | [notes/registry-particle-burst.md](../notes/registry-particle-burst.md) | Registry update and contact particles | #scene-actors #matching | 0 |
 | [notes/registry_terrain_reactions.md](../notes/registry_terrain_reactions.md) | Registered actor terrain reactions | #matching #scene-actors | 0 |
 | [notes/repeated-effect_2026-10-14.md](../notes/repeated-effect_2026-10-14.md) | Contiguous repeated effect cohort (Sol, 2026-10-14) |  | 5 |
@@ -467,6 +482,17 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round9-timed-reaction-burst.md](../notes/round9-timed-reaction-burst.md) | Timed reaction burst (08081C98) | #matching #scene-actors | 0 |
 | [notes/round9-tracked-contact.md](../notes/round9-tracked-contact.md) | Tracked contact update (0807F81C) | #matching #scene-actors | 0 |
 | [notes/round9-vorn-idle-facing.md](../notes/round9-vorn-idle-facing.md) | round9-vorn-idle-facing.md | *#animation* | 0 |
+| [notes/round9b-081c0ce4.md](../notes/round9b-081c0ce4.md) | PlayStats_UpdateResults | #matching #round9b | 0 |
+| [notes/round9b-081c6780.md](../notes/round9b-081c6780.md) | StateActor_ProcessDirectionMessages | #matching #round9b | 0 |
+| [notes/round9b-081ca490.md](../notes/round9b-081ca490.md) | State actor eight-way burst | #matching #state-actor #particles | 1 |
+| [notes/round9b-081cbe30.md](../notes/round9b-081cbe30.md) | StateActor_UpdateDelayedAttackEffect | #matching #round9b | 0 |
+| [notes/round9b-081d7c68.md](../notes/round9b-081d7c68.md) | Task4E01_StartTerminalAnimation | #matching #round9b | 0 |
+| [notes/round9b-081d8cf0.md](../notes/round9b-081d8cf0.md) | Task4E01_UpdateGrowingImpact | #matching #round9b | 0 |
+| [notes/round9b-081d95f0.md](../notes/round9b-081d95f0.md) | Task4E01_UpdateExpandingImpact | #matching #round9b | 0 |
+| [notes/round9b-081d9904.md](../notes/round9b-081d9904.md) | Task4E01_SpawnImpactChildren | #matching #round9b | 0 |
+| [notes/round9b-bg-tilemap.md](../notes/round9b-bg-tilemap.md) | Background tilemap window | #matching #background #tilemap | 1 |
+| [notes/round9b-npc-dispatch.md](../notes/round9b-npc-dispatch.md) | Scene NPC command dispatch | #matching #scene-actor #commands | 0 |
+| [notes/round9b-npc-state-effect.md](../notes/round9b-npc-state-effect.md) | Scene NPC state effect | #matching #scene-actor #particles | 1 |
 | [notes/s0.md](../notes/s0.md) | s0 notes | *#tooling* | 11 |
 | [notes/s1.md](../notes/s1.md) | s1 notes | *#tooling* | 12 |
 | [notes/s2.md](../notes/s2.md) | s2 notes (range 080C9844-0813B134) |  | 11 |
@@ -482,6 +508,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-actor-retreat-route.md](../notes/scene-actor-retreat-route.md) | Scene actor retreat route | #scene-actors #terrain #matching | 0 |
 | [notes/scene-actor-twenty_2026-10-12.md](../notes/scene-actor-twenty_2026-10-12.md) | Scene actors and dialogue: reaching 20% | *#actors #scene* | 3 |
 | [notes/scene-arc-effects_2026-10-13.md](../notes/scene-arc-effects_2026-10-13.md) | Scene arc slots and projected ground effects (tentative) | *#scene* | 4 |
+| [notes/scene-departure-display_2026-11-01.md](../notes/scene-departure-display_2026-11-01.md) | Scene departure display | *#scene* | 1 |
 | [notes/scene-panel-background_2026-10-14.md](../notes/scene-panel-background_2026-10-14.md) | Scene panel background effects and overlay setup | *#scene #panel* | 2 |
 | [notes/scene-panel-rig-states_2026-10-14.md](../notes/scene-panel-rig-states_2026-10-14.md) | Scene panel rig states and animation (tentative identities) | *#scene #panel #animation* | 6 |
 | [notes/scene-panel-rig_2026-10-14.md](../notes/scene-panel-rig_2026-10-14.md) | Scene panel rig and contact/movement contracts (tentative) | *#scene #panel #assets* | 4 |
@@ -499,8 +526,11 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |
 | [notes/script_virtual_machine.md](../notes/script_virtual_machine.md) | Script virtual machine, merged unit | *#scripts* | 8 |
 | [notes/selection_menu.md](../notes/selection_menu.md) | Selection menu unit (tentative) | #selection-menu #translation-unit #matching | 5 |
+| [notes/serial-service-round9.md](../notes/serial-service-round9.md) | Serial_ServiceInterrupt |  | 1 |
 | [notes/shake-icon-display_2026-10-14.md](../notes/shake-icon-display_2026-10-14.md) | Short-lived shaking keyframe icon |  | 2 |
 | [notes/shared-monster-round4_2026-10-29.md](../notes/shared-monster-round4_2026-10-29.md) | Round 4: shared monster operations and five exact matches | #matching #scene-actor #monsters #golem #skeleton #ghoul #mummy #vanargand #compiler #tooling #080DA97C #0808B3EC #08078EE8 #081AE0C0 #080D2584 | 6 |
+| [notes/singleton-slot7-recovery_2026-11-01.md](../notes/singleton-slot7-recovery_2026-11-01.md) | Slot-seven presentation | *#assets* | 1 |
+| [notes/skeleton-knocked-flight-round9.md](../notes/skeleton-knocked-flight-round9.md) | Skeleton_BeginKnockedFlight |  | 0 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |
 | [notes/sol-family-push-3.md](../notes/sol-family-push-3.md) | Sol family push 3 |  | 8 |
 | [notes/sol-family-push-4.md](../notes/sol-family-push-4.md) | Sol family push 4 |  | 2 |
@@ -512,16 +542,20 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/sonnet-from-end-08241504.md](../notes/sonnet-from-end-08241504.md) | sub_0824261C (Player update by kind) — unfinished |  | 1 |
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |
 | [notes/staged-effect_2026-10-14.md](../notes/staged-effect_2026-10-14.md) | Contiguous staged effect subsection (Sol, 2026-10-14) | *#tooling* | 4 |
+| [notes/storage-equipment-slots-round9.md](../notes/storage-equipment-slots-round9.md) | Storage_RefreshEquipmentSlots |  | 1 |
 | [notes/sub_082392E8.md](../notes/sub_082392E8.md) | sub_082392E8.md | *#particles* | 1 |
 | [notes/subsystem-run_2026-10-25.md](../notes/subsystem-run_2026-10-25.md) | Subsystem scope run, 2026-10-25/26 | #process #tooling #matching | 4 |
 | [notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md) | Subsystem scope run, 2026-10-27 | #process #tooling #matching #ram | 1 |
 | [notes/sword-script-kind.md](../notes/sword-script-kind.md) | Sword script kind | #monsters #matching | 0 |
+| [notes/terrain-footprint-round9.md](../notes/terrain-footprint-round9.md) | Terrain_MoveFootprint |  | 1 |
 | [notes/tether-emission-palette_2026-10-14.md](../notes/tether-emission-palette_2026-10-14.md) | Tether actor emissions, palette and movement effects, October 14 | *#actors #tether #assets* | 8 |
 | [notes/tether-initialization_2026-10-14.md](../notes/tether-initialization_2026-10-14.md) | Tether initialization, charge and flagged terrain | *#actors #tether* | 7 |
 | [notes/tether-interaction_2026-10-14.md](../notes/tether-interaction_2026-10-14.md) | Tether actor entry, interaction and script controls | *#scripts #actors #tether* | 5 |
 | [notes/tether-roaming-states_2026-10-14.md](../notes/tether-roaming-states_2026-10-14.md) | Tether roaming, recovery and lifecycle states | *#actors #tether* | 6 |
 | [notes/tether-world-states_2026-10-14.md](../notes/tether-world-states_2026-10-14.md) | Tether world position, player boundary and state callbacks | *#actors #tether* | 6 |
 | [notes/tether_actor.md](../notes/tether_actor.md) | Tether actor unit consolidation | #tether-actor #unit #matching #types | 5 |
+| [notes/tile-trigger-press-round9.md](../notes/tile-trigger-press-round9.md) | TileTrigger_StepPress | *#assets* | 1 |
+| [notes/tilemap-stream-columns-round9.md](../notes/tilemap-stream-columns-round9.md) | TilemapPanel_StreamColumns |  | 0 |
 | [notes/w0.md](../notes/w0.md) | w0 notes | *#tooling* | 5 |
 | [notes/w1.md](../notes/w1.md) | w1 notes (range 0803CC90-0806FC64) |  | 2 |
 | [notes/w2.md](../notes/w2.md) | w2.md | *#tooling* | 2 |

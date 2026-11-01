@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_081F0734(u8 *);
+void SingletonSlot7_DispatchPendingCommands(u8 *);
 
 void SingletonSlot7_ResetDisplayState(u8 *p)
 {
     *(u8 *)(p + 0xAA) = 0;
-    sub_081F0734(p);
+    SingletonSlot7_DispatchPendingCommands(p);
 }

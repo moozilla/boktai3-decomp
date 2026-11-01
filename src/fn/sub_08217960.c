@@ -1,41 +1,34 @@
 #include "global.h"
 #include "render.h"
-// MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 90.7%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: loop setup, mask hoisting, backdrop temporaries and register allocation.
+
 u16 *Palette_GetBackgroundBuffer(void);
 void Palette_ApplyBackgroundFade(void)
 {
     u16 *buffer = Palette_GetBackgroundBuffer();
-    s32 product = gBgFadeLevel * gFadeMultiplier;
-    s32 value = product >> 6;
-    s32 i;
-    s32 j;
+    s32 productOrBank = gBgFadeLevel * gFadeMultiplier;
+    s32 value = productOrBank >> 6;
+    s32 entry;
     u16 *src;
     u16 *dst;
-    register s32 level asm("r12");
-    s32 other;
-    u32 rb;
-    register u32 g asm("r10");
+    s32 level;
+    s32 inverse;
+    u32 fadeRedBlue;
+    u32 fadeGreen;
     if (value == 64) {
         gBgPaletteSource = gBgPaletteBuffer;
         return;
     }
     if (value == 0) {
         dst = buffer;
-        for (i = 0; i < 16; i++) {
-            if ((gBgFadeBankMask >> i) & 1) {
-                for (j = 0; j < 16; j++) {
-                    *(dst++) = gBgFadeColor;
+        for (productOrBank = 0; productOrBank < 16; productOrBank++) {
+            if ((gBgFadeBankMask >> productOrBank) & 1) {
+                for (entry = 0; entry < 16; entry++) {
+                    *dst++ = gBgFadeColor;
                 }
-
             } else {
-                src = gBgPaletteBuffer + (i * 16);
-                for (j = 0; j < 16; j++) {
-                    *(dst++) = *(src++);
+                src = gBgPaletteBuffer + (productOrBank * 16);
+                for (entry = 0; entry < 16; entry++) {
+                    *dst++ = *src++;
                 }
             }
         }
@@ -43,72 +36,57 @@ void Palette_ApplyBackgroundFade(void)
         gBgPaletteSource = buffer;
         return;
     }
-    level = product >> 7;
-    other = 32 - level;
+    level = productOrBank >> 7;
+    inverse = 32 - level;
     gBgPaletteSource = buffer;
     if (!gBgFadeColor) {
         src = gBgPaletteBuffer;
         dst = buffer;
-        for (i = 0; i < 16; i++) {
-            if ((gBgFadeBankMask >> i) & 1) {
-                for (j = 0; j < 16; j++) {
+        for (productOrBank = 0; productOrBank < 16; productOrBank++) {
+            if ((gBgFadeBankMask >> productOrBank) & 1) {
+                for (entry = 0; entry < 16; entry++) {
                     u32 c = *src;
-                    *dst = (((level * (c & 0x7c1f)) & 0xf83e0) |
-                            ((level * ((u16)(c & 0x3e0))) & 0x7c00)) >>
+                    *dst = (((level * (c & 0x7C1F)) & 0xF83E0) |
+                            ((level * ((u16)(c & 0x3E0))) & 0x7C00)) >>
                            5;
                     src++;
                     dst++;
                 }
-
             } else {
-                for (j = 0; j < 16; j++) {
-                    *(dst++) = *(src++);
+                for (entry = 0; entry < 16; entry++) {
+                    *dst++ = *src++;
                 }
             }
         }
-
     } else {
-        rb = gBgFadeColor & 0x7c1f;
-        {
-            u8 k1 = 0x3e0;
-            g = gBgFadeColor & k1;
-        }
+        fadeRedBlue = gBgFadeColor & 0x7C1F;
+        fadeGreen = gBgFadeColor & 0x3E0;
         src = gBgPaletteBuffer;
         dst = buffer;
-        for (i = 0; i < 16; i++) {
-            if ((gBgFadeBankMask >> i) & 1) {
-                register u32 green asm("r8") = g * other;
-                register u32 mask asm("r9") = 0x7c1f;
-                register u8 redblue asm("r7") = other * rb;
-                for (j = 0; j < 16; j++) {
+        for (productOrBank = 0; productOrBank < 16; productOrBank++) {
+            if ((gBgFadeBankMask >> productOrBank) & 1) {
+                for (entry = 0; entry < 16; entry++) {
                     u32 c = *src;
-                    register u32 redTerm asm("r2") = (level * (c & mask)) + redblue;
-                    register u32 greenTerm asm("r0");
-                    redTerm &= 0xf83e0;
-                    greenTerm = ((level * (c & 0x3e0)) + green) & 0x7c00;
-                    *dst = (redTerm | greenTerm) >> 5;
+                    *dst = (((level * ((u16)c & 0x7C1F) + (fadeRedBlue * inverse)) & 0xF83E0) |
+                            ((level * (c & 0x3E0) + (fadeGreen * inverse)) & 0x7C00)) >>
+                           5;
                     src++;
                     dst++;
                 }
-
             } else {
-                for (j = 0; j < 16; j++) {
-                    *(dst++) = *(src++);
+                for (entry = 0; entry < 16; entry++) {
+                    *dst++ = *src++;
                 }
             }
         }
     }
     if (gBackdropOverride) {
-        u32 rb = gBgFadeColor & 0x7c1f;
-        u32 g = gBgFadeColor & 0x3e0;
-        s32 old = (*(s16 *)&gBackdropColor);
-        (*(s16 *)&gBackdropColor) = ((((level * (old & 0x7c1f)) + (rb * other)) & 0xf83e0) |
-                                     (((level * (old & 0x3e0)) + (g * other)) & 0x7c00)) >>
+        u32 fadeRedBlue = gBgFadeColor & 0x7C1F;
+        u32 fadeGreen = gBgFadeColor & 0x3E0;
+        s32 old = (s16)gBackdropColor;
+        gBackdropColor = ((((level * (old & 0x7C1F)) + (fadeRedBlue * inverse)) & 0xF83E0) |
+                                     (((level * (old & 0x3E0)) + (fadeGreen * inverse)) & 0x7C00)) >>
                                     5;
     }
     gBgFadeApplied = value;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Palette_ApplyBackgroundFade);
-#endif

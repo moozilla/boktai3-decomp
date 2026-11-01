@@ -32,14 +32,14 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
                 s32 x, z, cell;
                 if (!HasFlag(8, &o->flags))
                     return;
-                x = ((((struct SceneVec *)&o->x)->x >> 4) >> 2) >> 2;
-                z = ((struct SceneVec *)&o->x)->z >> 8;
+                x = ((((struct SceneVec *)&o->body.position.x)->x >> 4) >> 2) >> 2;
+                z = ((struct SceneVec *)&o->body.position.x)->z >> 8;
                 if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                     cell = 0;
                 else
                     cell = gTerrainMap->rows[z] + x;
-                if (!(NamedObject_IsMapCellOccupied(cell) && gPlayers[i]->position.y == o->y)) {
-                    Difference(&delta, (struct SceneVec *)&o->x, &gPlayers[i]->position);
+                if (!(NamedObject_IsMapCellOccupied(cell) && gPlayers[i]->position.y == o->body.position.y)) {
+                    Difference(&delta, (struct SceneVec *)&o->body.position.x, &gPlayers[i]->position);
                     if (delta.x > gUnk_086064C4.x || delta.x < -gUnk_086064C4.x ||
                         delta.y > gUnk_086064C4.y || delta.y < -gUnk_086064C4.y ||
                         delta.z > gUnk_086064C4.z || delta.z < -gUnk_086064C4.z) {
@@ -51,9 +51,9 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
                             delta.z = gUnk_086064C4.z;
                         else if (delta.z < -gUnk_086064C4.z)
                             delta.z = -gUnk_086064C4.z;
-                        delta.x = o->x + delta.x;
-                        delta.y = o->y;
-                        delta.z = o->z + delta.z;
+                        delta.x = o->body.position.x + delta.x;
+                        delta.y = o->body.position.y;
+                        delta.z = o->body.position.z + delta.z;
                         Player_SetPositionAndSave(gPlayers[i], &delta);
                         SetFlag2(0x100, (u16 *)&o->flags);
                     }
