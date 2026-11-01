@@ -1,14 +1,11 @@
 #include "global.h"
 #include "engine.h"
 #include "terrain_cell_probe.h"
+#include "named_object_flags.h"
 #include "display_animation.h"
 #include "player_cue_sequence.h"
 #include "player.h"
 #include "ram.h"
-/* Packed so that flag updates store through a field insertion. */
-struct NamedObjectFlags {
-    u16 value;
-} __attribute__((packed, aligned(2)));
 struct NamedObjectSprite {
     u32 flags;
     u8 pad4[3];
@@ -95,15 +92,6 @@ void NamedObject_UpdateEntryTrigger(void);
 void NamedObject_ClampTetherToPlatform(void);
 void NamedObject_ConstrainPlayer(void);
 void NamedObject_ConstrainTether(void);
-static inline void SetFlagComponent(struct NamedObjectFlags *field, u16 bits)
-{
-    field->value = bits | field->value;
-}
-static inline void ClearFlagComponent(struct NamedObjectFlags *field, u32 bits)
-{
-    u32 mask = ~bits;
-    field->value = mask & field->value;
-}
 static inline s32 optionalValue(void)
 {
     if (Script_GetPc())
@@ -142,7 +130,7 @@ void NamedObject_CreateFromScript(void)
     }
     e->kind = Script_GetKeywordValue('k', 0);
     if (Script_GetKeywordValue('O', 0))
-        SetFlagComponent(&e->flags, 0x2000);
+        NamedObjectFlags_Set(&e->flags, 0x2000);
     if (Script_SeekToKeyword('Y')) {
         s32 height;
         readOptional(&e->heightLow);
@@ -151,10 +139,10 @@ void NamedObject_CreateFromScript(void)
         if (e->kind == 2) {
             if (height == e->heightLow) {
                 sprite->y = height;
-                ClearFlagComponent(&e->flags, 2);
+                NamedObjectFlags_Clear(&e->flags, 2);
             } else if (height == e->heightHigh) {
                 sprite->y = height;
-                SetFlagComponent(&e->flags, 2);
+                NamedObjectFlags_Set(&e->flags, 2);
             }
         } else
             sprite->y = e->heightLow;
@@ -250,9 +238,9 @@ void NamedObject_CreateFromScript(void)
     }
     sprite->x -= 0x100;
     if (Script_GetKeywordValue('d', 0))
-        SetFlagComponent(&e->flags, 0x80);
+        NamedObjectFlags_Set(&e->flags, 0x80);
     if (Script_GetKeywordValue('F', 0))
-        SetFlagComponent(&e->flags, 0x1000);
+        NamedObjectFlags_Set(&e->flags, 0x1000);
     e->fieldBA = 0;
     e->fieldC2 = 0;
     follow = Script_GetKeywordValue('f', 0);
@@ -270,7 +258,7 @@ void NamedObject_CreateFromScript(void)
         NamedObject_ClearAttachmentFlag(manager->field1370, 0);
         manager->field1370 = e->name;
         Player_AddAttachmentFlags((*(u8 **)gPlayers), 1, e->name);
-        SetFlagComponent(&e->flags, 8);
+        NamedObjectFlags_Set(&e->flags, 8);
         {
             u8 *p = *(u8 **)gPlayers + 0x701;
             u32 v = *p;
@@ -280,14 +268,14 @@ void NamedObject_CreateFromScript(void)
         }
         cell = cellIndexAt((struct Pos16 *)&e->body.x);
         TerrainModifiers_RegisterCell(e->body.field48, cell, 0, e->body.height >> 8, 0xFF, 4);
-        SetFlagComponent(&e->flags, 1);
+        NamedObjectFlags_Set(&e->flags, 1);
         Player_SetPositionAndSave((*(u8 **)gPlayers), &e->body.x);
         if (follow == 2) {
             TetherActor_SetPosition(&e->body.x);
             NamedObject_ClearAttachmentFlag(manager->field1374, 1);
             manager->field1374 = e->name;
             TetherActor_AddStatusFlags(3, e->name);
-            SetFlagComponent(&e->flags, 0x10);
+            NamedObjectFlags_Set(&e->flags, 0x10);
         }
     }
     NamedObject_SnapTetherToPlatform(manager, e);
