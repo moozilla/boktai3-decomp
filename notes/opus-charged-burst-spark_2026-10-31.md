@@ -7,8 +7,10 @@ ordinary-C draft is in the unit's `#ifdef NONMATCHING` block: fuzzy 66.7%,
 scope 50 ROM / 40 draft instructions differing, shape 36. It has no register
 pins, barriers, inline assembly or compiler overrides. With the scope knob
 `AGBCC_NOEQUIV=36`, which gives pseudo 36 (the random table) no equivalence,
-the `-g` compile of this draft is byte-identical to the ROM. The knob is
-diagnostic only (commit `2d1a19e0f`). No ordinary C found so far gives the
+the build's compile of this draft is byte-identical to the ROM (the `-g` one
+too). The knob is diagnostic only (commit `2d1a19e0f`). This note used to say
+only the `-g` compile matched: with the knob set in the environment, scope's
+plain compile ran without it, a scope bug fixed on 2026-11-01. No ordinary C found so far gives the
 table pseudo that property. The matchsearch store is
 `build/matchsearch/opus_082335F0` (root = the landed draft, five ruled-out
 nodes with their hypotheses).
@@ -94,7 +96,7 @@ Numbers are scope's ROM / draft differing instructions.
 |---|---|---|
 | unit draft | `(u8)delay > 1` | 49 / 37 (shape 34) |
 | v3 (landed) | `(u8)(delay & byteMask) > 1` | 50 / 40 (shape 36) |
-| v3, `AGBCC_NOEQUIV=36` | knob, diagnostic | exact `-g` compile |
+| v3, `AGBCC_NOEQUIV=36` | knob, diagnostic | exact (build and `-g`) |
 | v1, v2 | `(delay & byteMask) > 1`, or `& 0xFF` twice | 52 / 38 |
 | v4 | v3 with a `u8` count | 50 / 40 |
 | t1 | table at function scope | 53 / 43 |
@@ -151,6 +153,62 @@ What would give the table no equivalence, from update_equiv_regs
 The ROM rules out a pair: the table is in r5 and seed in r8. No copy escapes
 cse in one block. regmove only rewrites two-address patterns such as `ands`
 and large-immediate `adds`, and the table's uses are three-register adds.
+
+## Round 8, 2026-11-01: the union lever and reload's arithmetic
+
+Still not matched. Two things are new.
+
+**The union table view (PR 944) does nothing here.** With `union
+RandomTableView table = {gRandomTable};` opened after the position copy and
+`table.samples[index]` for the three samples (un1), the score is v3's (50 / 40,
+shape 36), and the table pseudo still has `REG_EQUIV` (insn 101). The
+initializer expands to `(clobber (reg 69))` and then the pool load. In a loop,
+loop.c counts the clobber as a second set and keeps the load in the loop (fact
+21). Here there is no loop, and the clobber is dead because the set follows it
+at once. Flow deletes it before update_equiv_regs runs, and the table is again
+set once from the pool.
+
+**The table may have only four refs.** At the x jitter's add (insn 178)
+reload needs two low registers. r3 is already a spill register; for the second
+it compares refs times the number of usable registers at or above each one (a
+quirk of order_regs_for_reload, README fact 32): r5 (the table, 4 refs) 28, r4
+(the 0x3FF mask, 4 refs) 32, r1 (the x position address, 3 refs) 33. The table
+loses r5 only while 7 x refs < 32, so its pseudo can have one set and its three
+uses, nothing more. That is why every lever that kills the equivalence with a
+second set fails:
+
+* w1 (the table reused as the z sample pointer) and w_next1 (a `work`
+  variable that holds `nextSpark` first): 6 refs, 42. Reload keeps the table
+  and evicts the position address or the mask.
+* a live CLOBBER or any other extra set: 5 refs, 35, above the mask's 32.
+
+REG_N_REFS is recounted after combine (recompute_reg_usage; README fact 17 is
+corrected), so a ref that combine removes doesn't lower the table's count, and
+one it removes from the mask doesn't raise the mask's.
+
+With one set and no equivalence, update_equiv_regs (local-alloc.c) leaves two
+cases:
+
+* the set is a register copy with no REG_EQUAL note. cse2 puts one on every copy
+  here, because the function is one extended block from entry to the last
+  sample. A second variable for the y and z samples (cp1) is merged by cse,
+  as before;
+* the source is in a single-register class (`CLASS_LIKELY_SPILLED_P`, which
+  for Thumb means STACK_REG). The table's uses are three-register adds, so its
+  class is LO_REGS.
+
+A pool load with no note would still get `REG_EQUIV (mem)`, because the table
+is local to one block. So no C form found yet gives the ROM's allocation.
+
+**Scope, from this session:**
+
+* `frame` now finds ROM slots that hold a pool constant: the slot is stored
+  once, right after its `ldr rN, =C`. It names the draft pseudo whose
+  REG_EQUIV keeps the constant out of memory, and scores `AGBCC_NOEQUIV` on it.
+  Here it reports MATCH. It reports MATCH for 08234868 as well, and finds the
+  same slot in 081EEECC and 0807D2E0.
+* Knobs set in the environment now reach the build's compile too (see the
+  README's paper cuts).
 
 ## Scope gaps
 
