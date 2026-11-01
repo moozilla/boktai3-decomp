@@ -1136,6 +1136,15 @@ Each was read from the compiler source and confirmed on a live draft.
    so global alloc gets it (r2 through the copy), and the load takes the lowest free
    register. This also moved NativeEffect_CreateFromProfile's case-2 offset from r4 to r3.
 
+43. **A two-case switch is a linear chain; a third case label next to `default` gives the
+   tree.** balance_case_nodes (stmt.c) splits the sorted case list only when it has more than
+   two nodes. With cases 0 and K, emit_case_nodes tests them in order (`cmp 0; beq; cmp K;
+   beq`). The ROM's `cmp K; beq LK; cmp K; bgt default; cmp 0; bne default` is a three-node
+   list split at K, with the third node above K. When that node's label is the default code,
+   its own test folds into the `bgt`. sub_081C0CE4 matched with `case 0: ... case 1: ...
+   case 2: default: ...` and `case 0: ... case 4: ... case 5: default: ...`. Casting the index
+   to an enum type (no cost table) does not change a two-node list.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
