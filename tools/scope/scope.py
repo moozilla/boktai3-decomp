@@ -67,6 +67,7 @@ import shlex
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -167,6 +168,15 @@ if sys.platform == "darwin" and "CPP" not in os.environ and os.path.exists(CLANG
 _MEMO = {}
 
 
+def write_cache(path, value):
+    """Publish a complete pickle, even when different PID namespaces share this cache."""
+    with tempfile.TemporaryDirectory(dir=os.path.dirname(path), prefix="cache-") as temp:
+        tmp = os.path.join(temp, "entry")
+        with open(tmp, "wb") as f:
+            pickle.dump(value, f)
+        os.replace(tmp, path)
+
+
 def cached(name, key_paths, make):
     """make() memoised in memory and on disk, keyed by the paths' mtimes and sizes
     (the ROM ELF changes only on a full build)."""
@@ -182,10 +192,7 @@ def cached(name, key_paths, make):
     except (OSError, ValueError, EOFError, pickle.UnpicklingError):
         value = make()
         os.makedirs(CACHE, exist_ok=True)
-        tmp = f"{path}.{os.getpid()}"
-        with open(tmp, "wb") as f:
-            pickle.dump((key, value), f)
-        os.replace(tmp, path)  # atomic: another command may be reading it
+        write_cache(path, (key, value))
     _MEMO[name] = (key, value)
     return value
 
@@ -2536,17 +2543,17 @@ def fast_preprocess(src, env=None, func=None):
         work = os.path.join(WORK, "cache")
         os.makedirs(work, exist_ok=True)
         rel = os.path.relpath(os.path.join(work, "head.c"), ROOT)
-        tmp = os.path.join(work, f"head{os.getpid()}.c")  # the process's own: commands of one run share work/
-        open(tmp, "w").write(head)
-        trel = os.path.relpath(tmp, ROOT)
-        # how many newlines cpp leaves after its last marker depends on the last include (a guarded
-        # header emits none); a marker of our own says where the body starts
-        out = re.sub(r"\n+\Z", "\n", build.sh(cpp_command(trel))).replace(f'"{trel}"', f'"{rel}"')
-        out += f'# {last + 2} "{rel}"\n'
-        cmd = cpp_command(trel)
-        e = cmd.index("-E") + 1
-        defs = build.sh(cmd[:e] + ["-dM"] + cmd[e:])
-        os.remove(tmp)
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".c", dir=work) as f:
+            f.write(head)
+            f.flush()
+            trel = os.path.relpath(f.name, ROOT)
+            # how many newlines cpp leaves after its last marker depends on the last include (a guarded
+            # header emits none); a marker of our own says where the body starts
+            out = re.sub(r"\n+\Z", "\n", build.sh(cpp_command(trel))).replace(f'"{trel}"', f'"{rel}"')
+            out += f'# {last + 2} "{rel}"\n'
+            cmd = cpp_command(trel)
+            e = cmd.index("-E") + 1
+            defs = build.sh(cmd[:e] + ["-dM"] + cmd[e:])
         macros = set(re.findall(r"^#define (\w+)", defs, re.M)) | _DYNAMIC
         files = sorted({f for f in re.findall(r'^# \d+ "([^"<][^"]*)"', out, re.M) if os.path.exists(os.path.join(ROOT, f))})
         h = _HEADS[head] = (out, macros, [(f, os.path.getmtime(os.path.join(ROOT, f))) for f in files])
@@ -4359,10 +4366,7 @@ def code_status():
                 files[known[n]] = rel
     if new != old:
         os.makedirs(CACHE, exist_ok=True)
-        tmp = f"{path}.{os.getpid()}"  # the process's own: two commands at once raced on one .tmp
-        with open(tmp, "wb") as f:
-            pickle.dump(new, f)
-        os.replace(tmp, path)
+        write_cache(path, new)
     return status, files
 
 
