@@ -5,27 +5,14 @@
 #include "scene_actor_placement.h"
 #include "game_state.h"
 #ifdef NONMATCHING
-// fuzzy: 66.7%
-// Remaining: register allocation. The ROM keeps the PRE'd &flags2D4 in sl (the
-// draft gives sl to &velocity and spills &flags2D4), the frame is 0x44 (draft
-// 0x40), and in the palette branches the ROM derives &paletteOffset from
-// &paletteBank's constant (adds r7, #8). Structure that now matches: union table
-// view (loop.c keeps the load in the pass), count-up loop (dbra reversal places
-// the counter), effectOrigin re-read per field, a goto loop (nothing hoisted out
-// of the outer loop) and inline flag helpers (constant-offset forms that gcse
-// shares).
+// fuzzy: 80.1%
+// Guarded until its allocation and the ordering of the PRE-created stack slots are exact.
 void Heap_Free(void *);
 
 static inline u8 Removed(struct SceneActorRegistryActor *p)
 {
     u32 mask = 0x1000;
     if (mask & p->flags2D6)
-        return 1;
-    return 0;
-}
-static inline u8 MissingObject(struct SceneActorRegistryActor *p)
-{
-    if (!p->object)
         return 1;
     return 0;
 }
@@ -63,16 +50,21 @@ static inline u8 Stopped(void)
         value = 1;
     return value;
 }
+static inline u32 NextParticleSample(const u16 *table)
+{
+    u16 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return table[index];
+}
 static inline void UpdateActors_SpawnContactParts(struct SceneActorRegistryActor *actor)
 {
     union SceneActorRegistryPackedPosition velocity, bounds, position;
     s32 i;
     for (i = 0; i < 3; i++) {
         union RandomTableView table = {gRandomTable};
-        const struct ContactPosition *origin;
-        velocity.packed.x = (SceneActorEffects_NextSample(table.samples) & 15) - 7;
-        velocity.packed.y = (SceneActorEffects_NextSample(table.samples) & 31) - 16;
-        velocity.packed.z = (SceneActorEffects_NextSample(table.samples) & 15) - 7;
+        velocity.packed.x = (NextParticleSample(table.samples) & 15) - 7;
+        velocity.packed.y = ((s8)NextParticleSample(table.samples) & 31) - 16;
+        velocity.packed.z = ((s8)NextParticleSample(table.samples) & 15) - 7;
         bounds.packed.x = 5;
         bounds.packed.y = 10;
         bounds.packed.z = 5;
@@ -116,10 +108,6 @@ static inline void ClearDrawableFlags(struct SceneActorRegistryActor *actor, u32
         ClearTileFlags(tile, bits);
     }
 }
-static inline u16 ReadFlags2D4(struct SceneActorRegistryActor *p)
-{
-    return p->flags2D4;
-}
 static inline void ClearField2B8(struct SceneActorRegistryActor *p)
 {
     p->field2B8 = 0;
@@ -128,10 +116,6 @@ static inline void SetFlags2CC(struct SceneActorRegistryActor *p, u32 bits)
 {
     p->flags2CC |= bits;
 }
-static inline void ClearFlags2D4(struct SceneActorRegistryActor *p, u32 bits)
-{
-    p->flags2D4 &= ~bits;
-}
 static inline u32 DefaultPalette(struct SceneActorRegistryActor *actor)
 {
     u16 *base = &actor->basePaletteBank;
@@ -139,10 +123,24 @@ static inline u32 DefaultPalette(struct SceneActorRegistryActor *actor)
     return *base + *offset;
 }
 // confidence=low: registry callback traversal, regional deactivation and palette transitions.
+
+static inline u32 ReadMotionFlags(u16 *motion, u32 mask)
+{
+    return *motion & mask;
+}
+static inline u8 MissingObject(struct SceneActorRegistryActor *actor, u16 **motion)
+{
+    *motion = &actor->flags2D4;
+    if (!actor->object)
+        return 1;
+    return 0;
+}
+
 void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
 {
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor;
+    u16 *motion;
     if (!node)
         return;
     actor = node->actor;
@@ -159,9 +157,9 @@ next:
         goto next;
     }
     {
-        Callback_InvokeActor(actor->context, actor->update);
-        if (!MissingObject(actor) && !Paused() &&
-            !SceneActorPlacement_ReadFlags16((void *)actor, 0x4000) &&
+        void **update = &actor->update;
+        Callback_InvokeActor(actor->context, *update);
+        if (!MissingObject(actor, &motion) && !Paused() && !ReadMotionFlags(motion, 0x4000) &&
             !SceneActorPlacement_ReadFlags32((void *)actor, 8) && actor->enabled &&
             !ReadFlags2CC(actor, 2) && (gGameState->flags868 & 2) && CurrentRegion(actor) &&
             !SceneActorPlacement_IsUnavailable((void *)actor) && gGameState->unk876 > 0 &&
@@ -170,12 +168,12 @@ next:
             ClearField2B8(actor);
             ClearDrawableFlags(actor, 1);
             actor->health = 0;
-            if (ReadFlags2D4(actor) & 0x2000)
+            if (ReadMotionFlags(motion, 0x2000))
                 UpdateActors_SpawnContactParts(actor);
-            ClearFlags2D4(actor, 0x2000);
+            *motion &= ~0x2000;
             SetFlags2CC(actor, 0x1000);
         }
-        if (!SceneActorPlacement_ReadFlags16((void *)actor, 0x4000) && TransitionEnabled(manager)) {
+        if (!ReadMotionFlags(motion, 0x4000) && TransitionEnabled(manager)) {
             s32 category = actor->category;
             if (category == 10 || category == 23) {
                 if (!ReadFlags2CC(actor, 0x02008000)) {

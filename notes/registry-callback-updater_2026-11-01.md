@@ -1,0 +1,5 @@
+SceneActorRegistry_UpdateActors remains guarded. Stock agbcc scores 80.1%, up from the incoming draft's 66.7%. The incoming scope comparison had 157 ROM and 163 draft instructions different. The revised comparison has 109 and 111. Its 1,168 bytes include four more bytes than the ROM.
+
+Checking for a missing object also captures the motion-flag address, which is needed on both paths through the region and palette checks. The callback address is taken before its context is loaded. The particle loop masks a 16-bit sample index and treats the Y and Z draws as signed bytes before masking. These choices change the allocator without changing the samples.
+
+The frame is 0x44 bytes in both binaries. The revised source reproduces four upper spill slots. Scope still puts the motion-flag address in the stack slot at sp+0x2c and the particle counter at sp+0x30. The ROM holds the flag address in sl, uses sp+0x2c for the counter and stashes the velocity address at sp+0x30. Compare `scope.py ... frame` and the reload at 0807120E when testing flag-pointer and particle-loop forms.
