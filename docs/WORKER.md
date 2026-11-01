@@ -107,9 +107,10 @@ best draft of the current function and write its note.
    `make format` and checks the unit, and refuses a match that adds pins or barriers
    unless given `--allow-pins` (then it adds the concession marker). Commit one
    function per commit (`Match FUNC`).
-7. Pins in an existing match (phase 3): `scope.py FILE.c pins` gives the cost of
-   removing each; `tools/depin.py FILE --write` drops the free ones. Removing the last
-   pin of a unit also removes its concession marker.
+7. Pins in an existing match (phase 3): `scope.py FILE.c pins FUNC` gives the cost of
+   removing each, alone and grouped, and writes `FUNC.no_pins.c` with all of them gone;
+   rematch from that draft with the loop above (the free removals `tools/depin.py` made
+   are used up). Removing the last pin of a unit also removes its concession marker.
 
 The compiler facts scope has established are in [tools/scope/README.md](../tools/scope/README.md),
 section "agbcc facts established with scope": grep it when a difference looks familiar.

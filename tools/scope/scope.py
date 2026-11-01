@@ -13,7 +13,8 @@
                                 equivalence class and the canonical-register decision, with C lines
   scope.py FILE.c life NAME...  the insns flow counts toward a value's live length, by C line
   scope.py A.c vs B.c [FUNC]    two drafts' register allocation side by side (rank, priority, refs/live)
-  scope.py FILE.c pins          cost of removing each register pin / asm barrier; greedy free removal
+  scope.py FILE.c pins [FUNC]   cost of removing each pin / asm barrier of FUNC and its inline helpers, alone
+                                and grouped (all, per helper, per variable); writes FUNC.no_pins.c
   scope.py census [CALLEE]      every pin/barrier in matched code grouped by the call it serves, with
                                 clean and draft sites of the same call: missing helpers show up as groups
   scope.py rom FUNC|ADDR        FUNC's ROM listing with calls and literal symbols named (no draft needed)
@@ -57,6 +58,7 @@ Everything is kept in build/scope/FUNC/ for follow-up queries:
 """
 import collections
 import difflib
+import glob
 import json
 import os
 import pickle
@@ -2705,10 +2707,60 @@ def sole_definitions(lines, i):
     return sole
 
 
+def function_reach(text, func):
+    """{name: (start, end)} of FUNC's definition in TEXT and of the inline helpers defined in TEXT that it
+    reaches by calls, transitively. Only these can change FUNC's code: agbcc -O2 inlines only functions
+    declared inline, and every other definition is compiled on its own. Definitions inside an
+    `#ifdef NONMATCHING` draft are left out (the build compiles the INCLUDE_ASM branch)."""
+    drafts = []
+    for m in re.finditer(r"^#\s*ifdef\s+NONMATCHING\b.*?^#\s*endif\b", text, re.M | re.S):
+        drafts.append((m.start(), m.end()))
+    defs = {}
+    for (a, b), (name, t) in zip(top_level_spans(text), item_names(text)):
+        if not name or not t.rstrip().endswith("}") or any(x <= a < y for x, y in drafts):
+            continue
+        head = t[:t.index("{")]
+        if not re.search(r"\b%s\s*\(" % re.escape(name), head):
+            continue
+        inline = bool(re.search(r"\b(?:inline|__inline|__inline__)\b", head))
+        defs[name] = (a, b, inline)
+    if func not in defs:
+        return {}
+    reach, todo = {}, [func]
+    while todo:
+        n = todo.pop()
+        if n in reach:
+            continue
+        a, b, _ = defs[n]
+        reach[n] = (a, b)
+        body = text[a:b]
+        body = body[body.index("{"):]
+        for c in set(re.findall(r"\b(\w+)\s*\(", body)):
+            if c in defs and defs[c][2] and c not in reach:
+                todo.append(c)
+    return reach
+
+
+def site_variables(line):
+    """C variable names a concession site names: a pin's declarator and a barrier's operands."""
+    out = set()
+    m = re.search(r"(\w+)\s+(?:asm|__asm__)\s*\(\s*\"", line)
+    if m and "register" in line:
+        out.add(m.group(1))
+    if re.match(r"\s*(?:asm|__asm__)\b", line):
+        out |= set(re.findall(r"\"[^\"]*\"\s*\(\s*(\w+)\s*\)", line))
+    return out
+
+
 def cmd_pins(src, func, env):
-    """Phase 3 helper: remove each concession (register pin or empty asm barrier) in turn and report the
-    cost, then greedily remove every one that does not add differences, and write the result."""
+    """Phase 3 helper: the concessions (register pins and empty asm barriers) that can change FUNC's
+    code, i.e. those in FUNC's definition and in the inline helpers of the unit it reaches. Each is
+    removed alone and in groups (all of FUNC's together, each helper's together, a pin with the
+    barriers on the same variable), then a greedy pass removes every single or group that adds no
+    differences. Writes FUNC.no_pins.c (every reachable concession removed: the draft to work from)
+    and FUNC.fewer_pins.c (the greedy result)."""
     pins_dir = os.path.join(ROOT, "build", "scope", "drafts", ".pins", os.environ.get("SCOPE_RUN", ""))
+    out_dir = os.path.join(ROOT, "build", "scope", "drafts", os.environ.get("SCOPE_RUN", ""))
     memo, compiles, counts = {}, [0], {}
 
     def run(text, tag):
@@ -2729,57 +2781,135 @@ def cmd_pins(src, func, env):
     def show(n):
         return "compile fails" if n is None else f"{n} rows ({counts.get(n, '?')})"
     text = open(os.path.join(ROOT, src)).read()
-    sites = concession_sites(text)
+    lines = text.split("\n")
+    reach = function_reach(text, func)
+    starts = [0]
+    for ln in lines:
+        starts.append(starts[-1] + len(ln) + 1)
+
+    def owner(i):
+        return next((n for n, (a, b) in reach.items() if a <= starts[i] < b), None)
+    every = concession_sites(text)
+    sites = [s for s in every if owner(s[0])] if reach else every
+    others = len(every) - len(sites)
+    note_others = (f"; {others} more in other functions of the unit, which cannot change {func}'s code"
+                   if others else "")
     if not sites:
-        print(f"{src}: no register pins or empty asm barriers")
+        print(f"{src}: no register pins or empty asm barriers in {func} or the inline helpers it reaches"
+              + note_others)
+        header_pins(text, reach, func)
         return 0
     base = run(text, "base")
     print(f"{func}: {show(base)} with all {len(sites)} concessions"
-          f" ({sum(k == 'pin' for _, k, _ in sites)} pins, {sum(k == 'barrier' for _, k, _ in sites)} barriers)")
-    lines = text.split("\n")
-    cost = []
-    for n, (i, kind, rm) in enumerate(sites):
-        sole = sole_definitions(lines, i) if kind == "barrier" else []
-        if sole:  # never offered: without it the variable is read with no value
-            cost.append(None)
-            print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> kept: the only definition of"
-                  f" {', '.join(sole)} (write the value it should hold, then remove it)")
-            continue
-        r = run("\n".join(rm(lines)), f"one{n}")
-        cost.append(r)
-        d = "compile fails" if r is None else f"{show(r)}, {r - base:+d}"
-        print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> {d}")
-    ls = lines
-    for i, kind, rm in sorted(sites, key=lambda t: -t[0]):
-        if not (kind == "barrier" and sole_definitions(lines, i)):
-            ls = rm(ls)
-    r = run("\n".join(ls), "none")
-    print(f"  all removed: {show(r)}")
-    # greedy: cheapest first, keep a removal if the count does not grow; remove from the bottom up so
-    # earlier line numbers stay valid
-    order = sorted(range(len(sites)), key=lambda n: (cost[n] is None, cost[n] if cost[n] is not None else 0))
-    keep_out, cur, best = set(), lines, base
-    tryall = "--all" in sys.argv  # by default only removals that are free alone join the greedy pass
-    for n in order:
-        if cost[n] is None or (not tryall and base is not None and cost[n] > base):
-            continue
-        trial = set(keep_out) | {n}
+          f" ({sum(k == 'pin' for _, k, _ in sites)} pins, {sum(k == 'barrier' for _, k, _ in sites)} barriers"
+          f" in {', '.join(n for n in reach if any(owner(s[0]) == n for s in sites))}){note_others}")
+    sole = {n: (sole_definitions(lines, i) if kind == "barrier" else []) for n, (i, kind, _) in enumerate(sites)}
+    removable = [n for n in range(len(sites)) if not sole[n]]
+
+    def without(ns):
         ls = lines
-        for m in sorted(trial, key=lambda m: -sites[m][0]):
+        for m in sorted(ns, key=lambda m: -sites[m][0]):  # bottom up, so earlier line numbers stay valid
             ls = sites[m][2](ls)
-        r = run("\n".join(ls), f"greedy{n}")
+        return "\n".join(ls)
+    cost = {}
+    for n, (i, kind, rm) in enumerate(sites):
+        where = owner(i)
+        where = "" if where == func else f" [{where}]"
+        if sole[n]:  # never offered: without it the variable is read with no value
+            print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> kept: the only definition of"
+                  f" {', '.join(sole[n])} (write the value it should hold, then remove it){where}")
+            continue
+        r = run(without([n]), f"one{n}")
+        cost[(n,)] = r
+        d = "compile fails" if r is None else f"{show(r)}, {r - base:+d}"
+        print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> {d}{where}")
+    # groups: removals that only work together
+    groups = {}
+    for n in removable:
+        for v in site_variables(lines[sites[n][0]]):
+            groups.setdefault(f"variable {v}", []).append(n)
+    for name in reach:
+        groups[f"all in {name}"] = [n for n in removable if owner(sites[n][0]) == name]
+    groups = {k: tuple(sorted(set(v))) for k, v in groups.items() if len(set(v)) > 1}
+    seen = set()
+    for k, g in sorted(groups.items(), key=lambda kv: (len(kv[1]), kv[0])):
+        if g in seen:
+            continue
+        seen.add(g)
+        r = run(without(g), "group_" + re.sub(r"\W+", "_", k))
+        cost[g] = r
+        d = "compile fails" if r is None else f"{show(r)}, {r - base:+d}"
+        print(f"  group {k} ({len(g)} sites, lines {', '.join(str(sites[n][0] + 1) for n in g)}) -> {d}")
+    allg = tuple(removable)
+    r = cost.get(allg)
+    if r is None and allg not in cost:
+        r = run(without(allg), "none")
+        cost[allg] = r
+    no_pins = os.path.join(out_dir, f"{func}.no_pins.c")
+    os.makedirs(out_dir, exist_ok=True)
+    open(no_pins, "w").write(without(allg))
+    print(f"  all {len(allg)} removed: {show(r)}; written to {os.path.relpath(no_pins, ROOT)}"
+          " (the draft to work from: `scope.py` on it gives the hunks, `why` their causes)")
+    if any(owner(sites[n][0]) != func for n in allg):
+        used = {}
+        for n, (a, b) in function_reach_all(text).items():
+            for h in reach:
+                if h != func and n != h and re.search(r"\b%s\s*\(" % re.escape(h), text[a:b]):
+                    used.setdefault(h, []).append(n)
+        for h, users in sorted(used.items()):
+            users = [u for u in users if u != func]
+            if users:
+                print(f"  helper {h} is also used by {', '.join(sorted(users))}: check those after changing it,"
+                      " or give the pin-free spelling a new helper")
+    # greedy: cheapest first, singles and groups; keep a removal if the count does not grow
+    tryall = "--all" in sys.argv  # by default only removals that are free alone join the greedy pass
+    order = sorted(cost, key=lambda g: (cost[g] is None, cost[g] if cost[g] is not None else 0, -len(g)))
+    keep_out, cur, best = set(), text, base
+    for g in order:
+        if cost[g] is None or set(g) <= keep_out or (not tryall and base is not None and cost[g] > base):
+            continue
+        trial = keep_out | set(g)
+        t = without(trial)
+        r = run(t, "greedy" + "_".join(map(str, sorted(trial)))[:60])
         if r is not None and r <= best:
-            keep_out, cur, best = trial, ls, r
-    out = os.path.join(ROOT, "build", "scope", "drafts", os.environ.get("SCOPE_RUN", ""), f"{func}.fewer_pins.c")
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    open(out, "w").write("\n".join(cur))
+            keep_out, cur, best = trial, t, r
+    out = os.path.join(out_dir, f"{func}.fewer_pins.c")
+    open(out, "w").write(cur)
     left = len(sites) - len(keep_out)
     print(f"  greedy: removed {len(keep_out)} of {len(sites)} with no added differences -> {best} differ,"
           f" {left} concessions left; written to {os.path.relpath(out, ROOT)}  [{compiles[0]} compiles;"
           f" {'every removal tried' if tryall else 'only removals free alone tried greedily; --all tries the rest'}]")
     print("  A removal that costs instructions shows where the C's shape still differs: ask `why` on the"
           f" first new difference in that variant ({os.path.relpath(pins_dir, ROOT)}/).")
+    header_pins(text, reach, func)
     return 0
+
+
+def function_reach_all(text):
+    """{name: (start, end)} of every function definition in TEXT outside NONMATCHING drafts."""
+    out = {}
+    for (a, b), (name, t) in zip(top_level_spans(text), item_names(text)):
+        if name and t.rstrip().endswith("}") and re.search(r"\b%s\s*\(" % re.escape(name), t[:t.find("{")]):
+            out[name] = (a, b)
+    return out
+
+
+def header_pins(text, reach, func):
+    """Say which inline helpers from include/ that FUNC calls carry pins: those need a header edit
+    (and a check of every unit including the header), which `pins` does not try."""
+    bodies = "".join(text[a:b] for a, b in reach.values())
+    called = set(re.findall(r"\b(\w+)\s*\(", bodies))
+    hits = []
+    for h in sorted(glob.glob(os.path.join(ROOT, "include", "**", "*.h"), recursive=True)):
+        ht = open(h, errors="replace").read()
+        if not PIN_RE.search(ht) and "asm(\"\"" not in ht.replace(" ", ""):
+            continue
+        for name, (a, b) in function_reach_all(ht).items():
+            if name in called and concession_sites(ht[a:b]):
+                hits.append(f"{name} ({os.path.relpath(h, ROOT)})")
+    if hits:
+        print(f"  {func} calls header helpers with concessions: {', '.join(hits)}; removing those is a"
+              " header change: check every unit that includes the header")
 
 
 def cmd_calls(src, func, env):
