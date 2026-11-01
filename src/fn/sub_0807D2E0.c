@@ -56,6 +56,12 @@ static inline void SetReactionState(struct SceneActorRegistryResetView *a, u32 s
 // function-level locals, as the ROM's early stack slots show. Remaining: the
 // zero's slot (ROM sp+0x10, allocated before the burst loop's unions), two
 // spilled pseudos the ROM has at sp+0x60/0x64, mask-first flag tests.
+// `scope.py frame`: sp+0x60 is the spark table (gRandomTable, stored once and
+// reloaded six times), sp+0x64 is &a->body.position. With no equivalence
+// (AGBCC_NOEQUIV) the table takes sb instead, so the ROM's table keeps the
+// doubled live length of a constant set but loses the equivalence (fact 20: a
+// later non-constant set), and the ROM keeps the spark spread 4 in sl like
+// 20/2/1, so the helper likely names it as a variable too.
 void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactPosition *position,
                                          u32 p3, u32 flip, u32 p5)
 {
