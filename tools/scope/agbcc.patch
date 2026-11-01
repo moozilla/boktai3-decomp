@@ -1803,7 +1803,7 @@
    while (1)
      {
        i1 = prev_nonnote_insn (i1);
-@@ -2825,11 +2867,19 @@
+@@ -2825,11 +2867,20 @@
  	  /* Ok, this insn is potentially includable in a cross-jump here.  */
  	  afterlast1 = last1, afterlast2 = last2;
  	  last1 = i1, last2 = i2, --minimum;
@@ -1815,9 +1815,10 @@
    if (minimum <= 0 && last1 != 0 && last1 != e1)
 -    *f1 = last1, *f2 = last2;
 +    {
++      extern char *current_function_name;
 +      if (getenv ("AGBCC_CROSS_TRACE"))
-+        fprintf (stderr, "CROSS jump %d target %d: share %d with %d\n",
-+                 INSN_UID (e1), INSN_UID (e2),
++        fprintf (stderr, "CROSS %s jump %d target %d: share %d with %d\n",
++                 current_function_name, INSN_UID (e1), INSN_UID (e2),
 +                 INSN_UID (last1), INSN_UID (last2));
 +      *f1 = last1, *f2 = last2;
 +    }
