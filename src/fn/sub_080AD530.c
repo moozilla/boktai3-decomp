@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
+#include "debug.h"
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
 // confidence=low: after the action delay, restores a reaction or reroutes toward the player.
@@ -17,12 +17,30 @@ static inline u16 ReactionFlagMask(u16 flag)
 {
     return flag;
 }
+struct VornRouteGroup {
+    u8 pad[0x1FC];
+    void *mesh;
+    struct ContactPosition *destination;
+    u8 pad204[4];
+    void *control;
+    u8 pad20C[0x18];
+    void *failure;
+};
+static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
+{
+    if (actor->field2B2) {
+        actor->field2B2 = 0;
+        return 1;
+    }
+    return 0;
+}
 void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct VornRouteGroup *group = (void *)&actor->group.common;
     u8 *context = actor->context;
-    if (actor->field2B2)
-        actor->field2B2 = 0;
+    if (TakePrepared(actor)) {
+        DEBUG_PRINT();
+    }
     {
         u32 mask = ReactionFlagMask(16);
         actor->flags2D6 = mask | actor->flags2D6;
@@ -33,11 +51,7 @@ void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 f
     if (Motion(actor, 2)) {
         u32 mask;
         Chase_SetState(actor, 3, 0, 0);
-        {
-            u8 *base = group;
-            asm("" : "+r"(base));
-            Chase_SetCtl(actor, *(void **)(base + 0x208), 7);
-        }
+        Chase_SetCtl(actor, group->control, 7);
         mask = ~0x983;
         actor->flags2D6 = mask & actor->flags2D6;
     } else if (ContextFlags(context, 0x1D))
@@ -48,11 +62,11 @@ void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 f
             u32 mask = 16;
             actor->flags2CC |= mask;
         }
-        (*(struct ContactPosition **)(group + 0x200))->pad = 0;
+        group->destination->pad = 0;
         if (!Skeleton_RerouteToTarget(actor) &&
-            !Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position,
+            !Chase_TryRoute(actor, group->mesh, &actor->body.position,
                             &actor->tracking.target->position)) {
-            Callback_InvokeActor(actor, *(void **)(group + 0x224));
+            Callback_InvokeActor(actor, group->failure);
             return;
         }
         Chase_SetCtl(actor, actor->entryTarget228, 1);
