@@ -115,9 +115,10 @@ static inline u8 *Cell(s32 i)
         return cell + 4;
     return gTerrainMap->cells + 12 + i * 4;
 }
-static inline void StepAnimation(struct ProjectileSlot *cursor, struct DisplaySequenceState *state,
-                                 struct ProjectileSprite *sprite)
+static inline void StepAnimation(struct ProjectileSlot *cursor, void *obj)
 {
+    struct ProjectileSprite *sprite = obj;
+    struct DisplaySequenceState *state = &cursor->sequence;
     const u16 *command;
     u32 flags;
     {
@@ -127,7 +128,7 @@ static inline void StepAnimation(struct ProjectileSlot *cursor, struct DisplaySe
     }
     sprite->frame = *command >> 6;
     {
-        u32 input = cursor->sequence.flags;
+        u32 input = state->flags;
         u32 first = 1;
         u32 bit = 1;
         first &= input;
@@ -187,124 +188,128 @@ static inline void StepAnimation(struct ProjectileSlot *cursor, struct DisplaySe
 // confidence=low: updates ten scripted projectile slots and their launch delays.
 #define SceneProjectile_UpdatePool sub_081FCA44
 
-#ifdef NONMATCHING
-// fuzzy: 74.5%
-// scope shape 110 (differences once low registers are set aside)
 s32 SceneProjectile_UpdatePool(struct ProjectilePool *pool)
 {
-    struct ProjectileSlot *p, *cursor;
+    struct ProjectileSlot *p;
     s32 i;
-    p = pool->slots;
-    i = 0;
-    cursor = p;
-    do {
+    struct ProjectileSprite *geometry;
+    struct ProjectileCollider *collider;
+    struct ProjectileSprite *animationSprite;
+    struct SceneVec *terrainPosition;
+    for (p = pool->slots, i = 0; i <= 9; i++, p++) {
         struct ProjectileSprite *sprite = &p->sprite;
-        struct SceneVec *terrainPosition = &p->sprite.position;
         struct ProjectileLaunch *launch = &p->launch;
-        if (pool->used & (1 << i)) {
-            struct ProjectileControl *control = &p->control;
+        u32 active = pool->used & (1 << i);
+        terrainPosition = &p->sprite.position;
+        if (active) {
+            struct ProjectileControl *control;
             struct SceneVec *position, *d;
-            struct ProjectileCollider *collider = &p->attack;
-            struct ProjectileSprite *animationSprite;
-            s32 result = sub_08249240(p, (void *)i, cursor->control.update);
+            s32 result;
+            geometry = sprite;
+            collider = &p->attack;
+            control = &p->control;
+            result = sub_08249240(p, (void *)i, control->update);
             animationSprite = sprite;
-            if (result == 1)
-                goto release;
-            sprite->flags &= ~0x200;
-            if (control->timer > -10) {
-                cursor->flags &= ~2;
-                if (control->timer == 120) {
-                    cursor->flags |= 1;
-                    control->speed = 0;
-                }
-                if (control->timer > Div(120, 2)) {
-                    Shrink(launch, &p->launch.scale, sprite);
-                }
-                if (control->timer == Div(120, 2)) {
-                    if (AttackExtent(sprite) == 16)
-                        cursor->age = control->word2A;
-                    else if (Ratatosk_GetSelectedPointIndex() >= 0) {
-                        sprite->position = *SunOrb_GetPosition();
-                        sprite->position.y += 128;
-                        launch->scale = 64;
-                        sprite->scaleX = 64;
-                        sprite->scaleY = 64;
-                        control->word2C = 120;
-                        RisingActorManager_BeginRaise(Ratatosk_GetSelectedPointIndex());
-                    }
-                }
-                animationSprite->flags |= 0x200;
-                if ((u16)(control->timer - 31) <= 58)
-                    animationSprite->flags |= 1;
-                else if (control->timer <= 29)
-                    animationSprite->flags &= ~1;
-                if (control->timer == 1) {
-                    if (AttackExtent(sprite) == 16) {
-                        struct SceneVec *target = Player_GetEffectivePosition(0);
-                        s32 direction = Math_Atan2(target->x - sprite->position.x,
-                                                   target->z - sprite->position.z);
-                        u32 random;
-                        p->control.direction = direction;
-                        gRandomIndex = (gRandomIndex + 1) & 1023;
-                        random = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
-                        p->control.direction = direction - 8 + (random & 15);
-                        control->word2C = 0;
-                        control->speed = 18;
-                    } else {
-                        struct SceneVec *target = Ratatosk_GetPosition();
-                        p->control.direction = Math_Atan2(target->x - sprite->position.x,
-                                                          target->z - sprite->position.z);
-                        cursor->control.target = Ratatosk_GetPosition();
-                        control->speed = launch->speed;
-                        control->byte2F = launch->mode;
-                    }
-                    cursor->flags |= 1;
-                    cursor->age = 0;
-                }
-                control->timer--;
-            }
-            d = &p->delta;
-            if (cursor->flags & 1)
-                Polar(d, control);
-            position = &sprite->position;
-            sprite->position.x = cursor->delta.x + sprite->position.x;
-            position->y = d->y + position->y;
-            position->z = d->z + position->z;
-            if (control->homing) {
-                s32 dx = control->target->x - sprite->position.x,
-                    dz = control->target->z - sprite->position.z;
-                u32 height;
-                if (dx * dx + dz * dz <= 1023)
-                    goto release;
-                height = (*Cell(CellIndex(terrainPosition)) & 15) << 8;
-                if (height > (u32)sprite->position.y)
-                    goto release;
+            if (result == 1) {
+                SceneProjectile_ReleaseSlot(pool, p, i);
             } else {
-                p->body.flags |= 4;
-                if (cursor->flags & 2) {
-                    Collider_SetPosition(collider, position, 0);
-                    Collider_Refresh(collider);
-                    if (control->collisionMode == 2) {
-                        collider = &p->body;
+                sprite->flags &= ~0x200;
+                if (control->timer > -10) {
+                    {
+                        u32 mask = ~2;
+                        p->flags &= mask;
+                    }
+                    if (control->timer == 120) {
+                        p->flags |= 1;
+                        control->speed = 0;
+                    }
+                    if (control->timer > Div(120, 2)) {
+                        Shrink(launch, &p->launch.scale, sprite);
+                    }
+                    if (control->timer == Div(120, 2)) {
+                        if (AttackExtent(sprite) == 16)
+                            p->age = control->word2A;
+                        else if (Ratatosk_GetSelectedPointIndex() >= 0) {
+                            sprite->position = *SunOrb_GetPosition();
+                            sprite->position.y += 128;
+                            launch->scale = 64;
+                            sprite->scaleX = 64;
+                            sprite->scaleY = 64;
+                            control->word2C = 120;
+                            RisingActorManager_BeginRaise(Ratatosk_GetSelectedPointIndex());
+                        }
+                    }
+                    animationSprite->flags |= 0x200;
+                    if ((u16)(control->timer - 31) <= 58)
+                        animationSprite->flags |= 1;
+                    else if (control->timer <= 29)
+                        animationSprite->flags &= ~1;
+                    if (control->timer == 1) {
+                        if (AttackExtent(sprite) == 16) {
+                            struct SceneVec *target = Player_GetEffectivePosition(0);
+                            s32 direction = Math_Atan2(target->x - sprite->position.x,
+                                                       target->z - sprite->position.z);
+                            u32 random;
+                            s32 aim;
+                            p->control.direction = direction;
+                            gRandomIndex = (gRandomIndex + 1) & 1023;
+                            random = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+                            aim = direction + ((random & 15) - 8);
+                            p->control.direction = aim;
+                            control->word2C = 0;
+                            control->speed = 18;
+                        } else {
+                            struct SceneVec *target = Ratatosk_GetPosition();
+                            p->control.direction = Math_Atan2(target->x - sprite->position.x,
+                                                              target->z - sprite->position.z);
+                            p->control.target = Ratatosk_GetPosition();
+                            control->speed = launch->speed;
+                            control->byte2F = launch->mode;
+                        }
+                        p->flags |= 1;
+                        p->age = 0;
+                    }
+                    control->timer--;
+                }
+                if (p->flags & 1)
+                    Polar(&p->delta, control);
+                d = &p->delta;
+                position = &geometry->position;
+                geometry->position.x += p->delta.x;
+                position->y += d->y;
+                position->z += d->z;
+                if (control->homing) {
+                    s32 dx = control->target->x - sprite->position.x,
+                        dz = control->target->z - sprite->position.z;
+                    u32 height;
+                    if (dx * dx + dz * dz <= 1023)
+                        goto release;
+                    height = (*Cell(CellIndex(terrainPosition)) & 15) << 8;
+                    if (height > (u32)sprite->position.y) {
+                    release:
+                        SceneProjectile_ReleaseSlot(pool, p, i);
+                        continue;
+                    }
+                } else {
+                    u32 mask;
+                    p->body.flags |= 4;
+                    mask = 2;
+                    if (p->flags & mask) {
                         Collider_SetPosition(collider, position, 0);
-                        collider->flags &= 0xFFFB;
+                        Collider_Refresh(collider);
+                        if (p->control.collisionMode == 2) {
+                            collider = &p->body;
+                            Collider_SetPosition(collider, position, 0);
+                            collider->flags &= 0xFFFB;
+                        }
                     }
                 }
+                if (p->control.animate)
+                    StepAnimation(p, animationSprite);
+                p->age++;
             }
-            if (cursor->control.animate)
-                StepAnimation(cursor, &p->sequence, animationSprite);
-            cursor->age++;
-            goto next;
-        release:
-            SceneProjectile_ReleaseSlot(pool, p, i);
         }
-    next:
-        i++;
-        cursor++;
-        p++;
-    } while (i <= 9);
+        terrainPosition = &p->sprite.position;
+    }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081FCA44);
-#endif
