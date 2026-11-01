@@ -29,4 +29,3 @@ void TileTrigger_StepPress(struct TileTrigger *p)
         p->frame = 0;
     }
 }
-

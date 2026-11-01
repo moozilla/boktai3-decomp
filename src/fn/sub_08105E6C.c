@@ -50,4 +50,3 @@ void RegionActor_UpdateBehaviorAnimation(struct RegionSprite *input)
         }
     }
 }
-
