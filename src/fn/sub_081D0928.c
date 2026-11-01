@@ -49,12 +49,6 @@ static inline s32 Truncate(s32 v)
     return -((-v) >> 12);
 }
 
-/* Capture the horizontal sine sample before scaling either axis. */
-#define READ_HORIZONTAL_SINE(out, table, angle)                                                    \
-    do {                                                                                           \
-        (out) = (table)[((angle) + 0xa0) & 255];                                                   \
-    } while (0)
-
 static inline u32 IsEmissionFrame(u8 frame, u32 mask)
 {
     if ((frame & mask) != 0)
@@ -140,7 +134,6 @@ s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
                         struct ContactPosition *velocity;
                         s32 spread, magnitude, angle, speed, product, life, zero;
                         s32 horizontalScale, verticalScale;
-                        const s16 *sine;
                         origin.value =
                             (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
                         table = (const u16 *)RANDOM_TABLE_ADDR;
@@ -149,13 +142,12 @@ s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
                         velocity = &velocityStorage;
                         angle = spread + 0x60;
                         speed = magnitude + 2;
-                        sine = gUnk_086149C4;
-                        READ_HORIZONTAL_SINE(horizontalScale, sine, spread);
+                        horizontalScale = gUnk_086149C4[(spread + 0xa0) & 255];
                         product = horizontalScale * speed;
                         saved = origin;
                         velocityArgument = velocity;
                         velocity->x = Truncate(product);
-                        verticalScale = sine[angle];
+                        verticalScale = gUnk_086149C4[angle];
                         velocity->y = Truncate(verticalScale * speed);
                         zero = 0;
                         velocity->z = zero;
