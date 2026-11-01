@@ -1557,8 +1557,11 @@ def hard_of(wd):
     return out
 
 
-def alloc_records(wd, func):
-    """pseudo -> ('G', rank, priority, refs, live, calls, hard) or ('L', block, priority, birth, death, refs, hard)."""
+def alloc_records(wd, func, *, global_order=False):
+    """Pseudo allocation records. Request global_order to retain the G record of a locally placed pseudo.
+
+    G: rank, priority, refs, live, calls, hard. L: block, priority, birth, death, refs, hard.
+    """
     func = dump_func(wd, func)
     out = {}
     path = os.path.join(wd, "names.txt")
@@ -1569,7 +1572,7 @@ def alloc_records(wd, func):
             if out.get(int(p[2]), ("G",))[0] != "L":
                 out[int(p[2])] = ("G", rank, int(p[3]), int(p[4]), int(p[5]), int(p[6]), int(p[7]))
             rank += 1
-        elif p[0] == "L" and p[1] == func and int(p[10]) >= 0:
+        elif not global_order and p[0] == "L" and p[1] == func and int(p[10]) >= 0:
             # local alloc runs first; a pseudo it placed also shows up in the G list, so L wins
             out[int(p[3])] = ("L", int(p[2]), int(p[5]), int(p[6]), int(p[7]), int(p[8]), int(p[10]))
     return out
@@ -1877,7 +1880,7 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
     pass0 = (f["sofar"] - f["used1"] - f["someone"]) & lo
     found = f"found {rname(f['first'])} in pass {f['passno']}" if f["first"] >= 0 else "found nothing"
     print(f"    find_reg (global.c) for {nm(pseudo)}: conflicts {regset(used)}; pass 0 may reuse registers"
-          f" already in use {regset(f['sofar'] & lo)} minus conflicts and those a later conflicting pseudo"
+          f" already in use {regset(f['sofar'] & lo)} minus conflicts and those a lower-ranked conflicting pseudo"
           f" prefers {regset(f['someone'] & lo)}, leaving {regset(pass0)}; it {found}"
           + (f", then its preference moved it to {rname(f['final'])}" if f["final"] != f["first"] else "") + ".")
     if want in f["used1"]:
@@ -1886,18 +1889,23 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
     if want in f["pref"] | f["cpref"]:
         return True
     if want in f["someone"]:
-        print(f"      {rname(want)} is held back in pass 0 because a conflicting pseudo allocated later prefers it.")
+        print(f"      {rname(want)} is held back in pass 0 by a lower-ranked conflicting preference.")
         prefs = preferences(wd)
         pc = conflicts(wd).get(pseudo, (set(), set()))[0]
+        # prune_preferences follows allocno_order even when local_alloc already placed a pseudo.
+        order = alloc_records(wd, func, global_order=True)
         later = sorted((x for x in pc if want in prefs.get(x, []) and
-                        recs.get(x, ("L",))[0] == "G" and recs[x][1] > rec[1]),
-                       key=lambda x: recs[x][1])
+                        x in order and order[x][1] > rec[1]), key=lambda x: order[x][1])
         for x in later[:4]:
-            xr = recs[x]
-            placed = xr[6]
-            result = f"gets {rname(placed)}" if placed >= 0 else "spills"
-            print(f"        {nm(x)} prefers {rname(want)}: allocated {xr[1] + 1}, priority {xr[2]},"
-                  f" {xr[3]} refs, live {xr[4]}; it ultimately {result}."
+            xr = order[x]
+            allocation = recs[x]
+            placed = allocation[6]
+            if allocation[0] == "L":
+                result = f"local allocation already placed it in {rname(placed)}"
+            else:
+                result = f"it ultimately gets {rname(placed)}" if placed >= 0 else "it ultimately spills"
+            print(f"        {nm(x)} prefers {rname(want)}: global rank {xr[1] + 1}, priority {xr[2]},"
+                  f" {xr[3]} refs, live {xr[4]}; {result}."
                   + mention_lines(wd, x))
         return True
     if want not in f["sofar"]:
