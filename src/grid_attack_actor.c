@@ -1787,34 +1787,33 @@ void CameraFollow_Initialize(void *, void *, void *, u32);
 void *ContactSequencePool_Create(s32, u32, s32, u32, u32);
 void *OrbitContactActor_Create(const struct ContactPosition *, u32);
 
-// Sets the mode fields for the scripted start states (shared tail of the switch cases).
-static inline void Sub0802BFAC_ResetMode(struct GridAttackActor *p)
+static inline void GridAttack_SetCameraLimits(struct CameraTracking *camera, s32 min, s32 max)
 {
-    p->timer = 0;
-    p->changed = 1;
-    p->stateReset = 0;
-    p->pending = 0;
+    camera->minimum = min;
+    camera->maximum = max;
 }
-
-#ifdef NONMATCHING
-// fuzzy: 53.3%
-// scope shape 243 (differences once low registers are set aside)
-// confidence=low: builds a grid attack actor from its script keywords and starts its idle state.
-s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
+s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
 {
-    struct GridAttackActor *p = arg0;
+    struct GridAttackActor *actor = p;
     struct GridAttackPacked pk;
-    u32 ctx = arg1;
+
     s32 kind;
-    s32 count;
     s32 i;
+    u32 count;
+    u32 targetIndex;
     s32 health;
     u8 facing;
     s32 poolHealth;
     s32 poolValue;
     s32 poolResource;
     s32 orbitValue;
-    u8 *base;
+    struct ContactPosition *position;
+    u8 *locked;
+    u8 (**tryUpdate)(void *);
+    u8 (**reset)(void *);
+    struct SceneVec **positions;
+    u32 *dst;
+    const u8 *palette;
 
     kind = Script_GetKeywordValue(0x74, 3);
     if (kind != 3)
@@ -1823,31 +1822,36 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
     p->locked = Script_GetKeywordValue(0x69, 0);
     count = Script_GetKeywordValue(0x50, 1);
     p->targetCount = count;
-    {
-        u32 *target = (u32 *)&p->targetPositions[0];
-        u32 *slot = (u32 *)p->players;
-        for (i = 0; i < count; i++) {
-            u32 value = (u32)gPlayers[i];
-            if (value) {
-                *slot = value;
-                value += 0x30;
-            } else
-                *slot = value;
-            *target = value;
-            target++;
-            slot++;
-        }
+    targetIndex = 0;
+    positions = p->targetPositions;
+    locked = &p->locked;
+    tryUpdate = &p->tryUpdate;
+    reset = &p->reset;
+    position = &p->transform.coordinates;
+    if (targetIndex < count) {
+        u32 targetCount = count;
+        do {
+            struct Player *player = gPlayers[targetIndex];
+            if (player) {
+                actor->players[targetIndex] = player;
+                positions[targetIndex] = &player->position;
+            } else {
+                actor->players[targetIndex] = 0;
+                positions[targetIndex] = 0;
+            }
+            targetIndex++;
+        } while (targetIndex < targetCount);
     }
 
     if (Script_SeekToKeyword(0x70)) {
         pk.x = Script_GetValue();
         pk.y = Script_GetValue();
         pk.z = Script_GetValue();
-        facing = ((Script_GetValue() & 7) << 5) + 0xA0;
+        facing = ((u32)Script_GetValue() << 5) + 0xA0;
     } else {
-        pk.x = *(u16 *)((u8 *)gGameState + 0x30);
-        pk.y = *(u16 *)((u8 *)gGameState + 0x32);
-        pk.z = *(u16 *)((u8 *)gGameState + 0x34);
+        pk.x = (u16)gGameState->positionX;
+        pk.y = (u16)gGameState->positionY;
+        pk.z = (u16)gGameState->positionZ;
         facing = 0x40;
     }
 
@@ -1892,134 +1896,121 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
         poolResource = 50;
     }
 
-    SceneActors_Initialize(p, ctx, kind, &pk, facing);
+    SceneActors_Initialize(actor, ctx, kind, &pk, facing);
     AnimData_Load(&p->animData, 0x4147);
     Sprite_Init(&p->drawable, &p->animData, 1);
-    p->drawable.flags &= ~2;
-    *(struct ContactPosition *)&p->drawable.position = *(struct ContactPosition *)&pk;
+    p->drawable.flags &= ~1;
+    p->drawable.position = *(struct ContactPosition *)&pk;
     p->drawable.priority = 1;
     p->resource = ScriptProc_Start(0x922E, 0xC5E2);
     Anim_SetSequence(&p->animation, p->resource, 2, 0, 0);
 
-    if (p->locked) {
+    if (*locked) {
         switch (Script_GetKeywordValue(0x44, 0)) {
             case 0:
-                p->active = 2;
-                p->actionReset = 0;
-                p->action = 1;
-                p->actionTimer = 0;
-                p->entered = 1;
-                p->state = 10;
-                p->callback = (void (*)(void *))GridAttack_UpdateIdleState;
-                Sub0802BFAC_ResetMode(p);
+                GridAttack_StartActionMode(actor, 2, 0, 1);
+                GridAttack_SetState(actor, (void *)GridAttack_UpdateIdleState, 10);
                 break;
             case 1:
-                p->active = 2;
-                p->actionReset = 0;
-                p->action = 0;
-                p->actionTimer = 0;
-                p->entered = 1;
-                p->state = 9;
-                p->callback = (void (*)(void *))GridAttack_UpdateHiddenState;
-                Sub0802BFAC_ResetMode(p);
+                GridAttack_StartActionMode(actor, 2, 0, 0);
+                GridAttack_SetState(actor, (void *)GridAttack_UpdateHiddenState, 9);
                 break;
             case 2:
-                p->active = 2;
-                p->actionReset = 0;
-                p->action = 4;
-                p->actionTimer = 0;
-                p->entered = 1;
-                p->state = 13;
-                p->callback = (void (*)(void *))GridAttack_UpdateAlternateIdleState;
-                Sub0802BFAC_ResetMode(p);
+                GridAttack_StartActionMode(actor, 2, 0, 4);
+                GridAttack_SetState(actor, (void *)GridAttack_UpdateAlternateIdleState, 13);
                 break;
             case 3:
-                p->active = 2;
-                p->actionReset = 0;
-                p->action = 3;
-                p->actionTimer = 0;
-                p->entered = 1;
-                p->state = 12;
-                p->callback = (void (*)(void *))GridAttack_UpdateAnimationElevenState;
-                Sub0802BFAC_ResetMode(p);
+                GridAttack_StartActionMode(actor, 2, 0, 3);
+                GridAttack_SetState(actor, (void *)GridAttack_UpdateAnimationElevenState, 12);
                 break;
         }
     } else {
-        p->active = 0;
-        p->actionReset = 0;
-        p->action = 0;
-        p->actionTimer = 0;
-        p->entered = 1;
-        p->actionDuration = 90;
-        p->state = 1;
-        p->callback = (void (*)(void *))GridAttackActor_UpdateIdle;
-        p->stateReset = 0;
-        Sub0802BFAC_ResetMode(p);
+        u16 duration = 90;
+        GridAttack_StartActionMode(p, 0, 0, 0);
+        p->actionDuration = duration;
+        GridAttack_SetState(actor, (void *)GridAttackActor_UpdateIdle, 1);
     }
 
-    p->tryUpdate = (void *)GridAttack_ApplyPendingDamage;
-    p->reset = (void *)GridAttack_ApplyRequestedState;
-    SceneActors_SetHealthLimits(p, health, health, p->bodyMode);
+    *tryUpdate = (void *)GridAttack_ApplyPendingDamage;
+    *reset = (void *)GridAttack_ApplyRequestedState;
+    SceneActors_SetHealthLimits(actor, health, health, p->bodyMode);
     GridAttackActor_InitBodyCollider(p);
     GridAttackActor_InitDamageCollider(p, p->bodyMode);
 
     if (Script_SeekToKeyword(0x63)) {
-        s32 a = Script_GetValue();
-        s32 b = Script_GetValue();
-        SceneActors_SetEventScripts(p, a, b);
+        s32 first = Script_GetValue();
+        s32 second = Script_GetValue();
+        SceneActors_SetEventScripts(actor, first, second);
         ctx = Script_GetValue();
     } else {
-        SceneActors_SetEventScripts(p, 0, 0);
+        SceneActors_SetEventScripts(actor, 0, 0);
         ctx = 0;
     }
 
     if (Script_SeekToKeyword(0x41)) {
         for (i = 0; i <= 3 && Script_GetPc() != 0; i++)
-            p->scriptArgs[i] = Script_GetValue();
+            actor->scriptArgs[i] = Script_GetValue();
     }
 
     p->contactReward = Script_GetKeywordValue(0x53, 0);
 
-    base = gPaletteBankData;
-    for (i = 0; i < 16; i++)
-        CpuSet(base + 0x2BA0 + i * 0x20, p->palette + i * 0x20, 0x04000008);
-    base = gPaletteBankData;
-    for (i = 0; i < 16; i++)
-        CpuSet(base + 0x3240, p->normalDamageGraphics + i * 0x20, 0x04000008);
-    base = gPaletteBankData;
-    for (i = 0; i < 16; i++)
-        CpuSet(base + 0x3240, p->specialDamageGraphics + i * 0x20, 0x04000008);
+    {
+        u8 **bank = &gPaletteBankData;
+        u32 off;
+        dst = (u32 *)p->palette;
+        off = 0x2BA0;
+        i = 15;
+        do {
+            palette = *bank + off;
+            CpuSet(palette, dst, 0x04000008);
+            dst += 8;
+            off += 0x20;
+        } while (--i >= 0);
+    }
+    {
+        palette = gPaletteBankData + 0x3240;
+        dst = (u32 *)p->normalDamageGraphics;
+        i = 15;
+        do {
+            CpuSet(palette, dst, 0x04000008);
+            dst += 8;
+        } while (--i >= 0);
+    }
+    {
+        palette = gPaletteBankData + 0x3240;
+        dst = (u32 *)p->specialDamageGraphics;
+        i = 15;
+        do {
+            CpuSet(palette, dst, 0x04000008);
+            dst += 8;
+        } while (--i >= 0);
+    }
 
-    *(u8 **)((u8 *)p + 0x878) = p->palette;
+    p->animData.palette = p->palette;
     p->effectMode = 0;
     p->effectId = 0x15D;
     p->effectVariant = 0;
     p->effectDuration = 5;
 
-    *(struct ContactPosition *)&p->shadowPosition =
-        *(struct ContactPosition *)&p->drawable.position;
-    CameraFollow_Initialize(&p->camera, p->targetPositions[0], &p->shadowPosition, 1);
-    p->camera.minimum = 0;
-    p->camera.maximum = 0x8C;
+    p->shadowPosition = p->drawable.position;
+    CameraFollow_Initialize(&p->camera, positions[0], &p->shadowPosition, 1);
+    GridAttack_SetCameraLimits(&p->camera, 0, 0x8C);
 
-    SceneActors_SetDamageCallback(p, (u8 *)p + 0x818, (void *)GridAttackActor_OnDamage, 0);
+    SceneActors_SetDamageCallback(actor, &p->damageCollider, (void *)GridAttackActor_OnDamage, 0);
     if (Script_GetKeywordValue(0x43, 1) != 0)
-        p->projectedDisplay = ProjectedDisplay_Create(&p->transform.coordinates);
+        p->projectedDisplay = ProjectedDisplay_Create(position);
     else
         p->projectedDisplay = 0;
 
     p->contactPool =
         ContactSequencePool_Create(poolHealth, poolValue, poolResource, ctx, (s16)p->contactReward);
-    p->orbitContact = OrbitContactActor_Create(&p->transform.coordinates, orbitValue);
-    p->contactBurst = ContactBurst_Create((struct ContactPosition *)&p->drawable.position);
+    p->orbitContact = OrbitContactActor_Create(position, orbitValue);
+    p->contactBurst = ContactBurst_Create(&p->drawable.position);
     p->linkedActorId = Script_GetKeywordValue(0x54, 0);
     p->linkedActorPhase = 0;
     p->phaseTimer = 0;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", GridAttackActor_Initialize);
-#endif
 
 struct GridAttackActor *GridAttackActor_Create(u32 a)
 {
