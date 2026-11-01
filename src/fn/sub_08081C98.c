@@ -1,6 +1,5 @@
 #include "global.h"
 // confidence=low: runs a timed reaction burst and restores actor control on expiry.
-#define SceneActorReaction_UpdateTimedBurst sub_08081C98
 #ifdef NONMATCHING
 // fuzzy: 68.3%
 // Complete timing, palette and particle paths; loop allocation and field lifetimes differ.
@@ -142,5 +141,5 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
 }
 
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08081C98);
+INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateTimedBurst);
 #endif

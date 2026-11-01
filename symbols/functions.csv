@@ -2936,6 +2936,7 @@ addr,name,mode,confidence,source,notes
 0808148C,SceneActorReaction_PlayStaggerBurst,thumb,low,src-alias,
 0808170C,SceneActorReaction_SettleDisplacement,thumb,low,src-alias,Settles the reaction displacement and restores actor control.
 08081B9C,SceneActorReaction_ResumeAfterAnimation,thumb,low,src-alias,
+08081C98,SceneActorReaction_UpdateTimedBurst,thumb,low,src-alias,Updates a timed part burst and restores control when the reaction expires.
 08082184,SceneActorReaction_TryResumeRoute,thumb,low,src-alias,
 08082444,SceneActorReaction_RestoreAfterTurns,thumb,low,src-alias,
 080829C0,SceneActorControl_ApplyContactPowerFloor,thumb,low,src-alias,
