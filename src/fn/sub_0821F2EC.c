@@ -1,198 +1,172 @@
 #include "engine.h"
-#include "contact_actor.h"
+#include "nav_mesh.h"
 
-// confidence=low: links the point pair into the navigation graph; returns 0, 1 or 2 and records the result in the state.
-struct S0821F2EC_Edge {
-    u8 x0, z0, x1, z1;
-    u8 nodes[12];
-};
-
-struct S0821F2EC_Node {
-    u16 x, z;
-    u16 unk4;
-    u8 links[6];
-};
-
-struct S0821F2EC_Region {
-    u16 count, stride;
-    u32 unk4;
-    u32 edgesOffset;
-    u32 nodesOffset;
-    u32 distOffset;
-};
-
-struct S0821F2EC_Table {
-    u16 count, unk2;
-    u32 offsets[1];
-};
-
-struct S0821F2EC_State {
+struct NavMeshRoute {
     u16 status;
     u8 unk2[2];
+    u16 mesh;
     u16 region;
-    u16 edge;
-    u16 bestA;
-    u16 bestB;
-    struct ContactPosition a;
-    struct ContactPosition b;
-    struct ContactPosition c;
+    u16 targetNode;
+    u16 waypointNode;
+    struct ContactPosition destination;
+    struct ContactPosition origin;
+    struct ContactPosition waypoint;
 };
 
-u32 NavMesh_IsPointInsideRegion(void *, const struct ContactPosition *, u32);
-u16 PairTable_Lookup(u16 *table, u16 stride, s32 a, s32 b);
-
-static inline s32 S0821F2EC_Dist2(const struct ContactPosition *from,
-                                  const struct S0821F2EC_Node *node)
-{
-    s32 dx = from->x - node->x;
-    s32 dz = from->z - node->z;
-    return dx * dx + dz * dz;
-}
-
 #ifdef NONMATCHING
-// fuzzy: 27.9%
-// scope shape 366 (differences once low registers are set aside)
-// confidence=low: links the point pair into the navigation graph; returns 0, 1 or 2 and records the result in the state.
-u32 sub_0821F2EC(void *arg0, void *arg1, void *arg2)
+// fuzzy: 89.9%
+// confidence=low: regions the point pair into the navigation graph; returns 0, 1 or 2 and records the result in the state.
+u32 NavMesh_FindRoute(void *arg0, void *arg1, void *arg2)
 {
-    struct S0821F2EC_State *state = arg0;
+    struct NavMeshRoute *state = arg0;
     const struct ContactPosition *from = arg1;
     const struct ContactPosition *to = arg2;
-    struct S0821F2EC_Table *table;
-    struct S0821F2EC_Region *region = 0;
-    struct S0821F2EC_Edge *edges = 0;
-    struct S0821F2EC_Edge *edgeA;
-    struct S0821F2EC_Edge *edgeB;
-    struct S0821F2EC_Node *nodes;
+    struct NavMeshResource *table;
+    struct NavMeshGraph *mesh;
+    struct NavMeshRegion *regions;
+    struct NavMeshRegion *destinationRegion;
+    struct NavMeshNode *nodes;
     u16 *dist;
-    u16 listA[6];
-    u16 listB[6];
-    s32 countA, countB;
-    s32 foundRegion, foundEdge;
-    s32 i, j, k, m, t, u, v;
-    u32 bestDist, bestA, bestB;
+    struct NavMeshRegion *originRegion;
+    u16 destinationRegions[6];
+    u16 originRegions[6];
+    u32 shortest, waypointNode, targetNode;
+    u16 destinationCount, originCount;
+    s32 meshId, regionId;
+    s32 i, j, k, t, u, v;
 
-    if (state->a.x == to->x && state->a.z == to->z && state->b.x == from->x &&
-        state->b.z == from->z)
+    if (state->destination.x == to->x && state->destination.z == to->z &&
+        state->origin.x == from->x && state->origin.z == from->z)
         return 2;
-    state->a.x = to->x;
-    state->a.z = to->z;
-
     table = gTerrainMap->navigation;
-    foundRegion = 0xFF;
-    foundEdge = 0xFF;
+    state->destination.x = to->x;
+    state->destination.z = to->z;
+
+    meshId = 0xFF;
+    regionId = 0xFF;
+    mesh = 0;
+    regions = 0;
     for (i = 0; i < table->count; i++) {
-        region = (void *)((u8 *)table + table->offsets[i]);
-        edges = (void *)((u8 *)region + region->edgesOffset);
-        for (k = 0; k < region->count; k++) {
-            if (NavMesh_IsPointInsideRegion(edges, to, k)) {
-                foundRegion = i;
-                foundEdge = k;
+        u32 shift = i << 2;
+        u32 *offsets = table->offsets;
+        mesh = (void *)((u8 *)table + *(u32 *)((u32)offsets + shift));
+        regions = (void *)((u8 *)mesh + mesh->regionOffset);
+        for (k = 0; k < mesh->count; k++) {
+            if (NavMesh_IsPointInsideRegion(regions, to, k)) {
+                meshId = i;
+                regionId = k;
+                /* Stop at the first region containing the destination. */
+                i = table->count;
+                k = mesh->count;
             }
         }
-        if (foundRegion == i)
-            break;
     }
-    if (foundEdge == 0xFF) {
+    if (regionId == 0xFF) {
         state->status = 0;
         return 0;
     }
-    if (state->region != foundRegion) {
+    if (state->mesh != meshId) {
         state->status = 0;
         return 0;
     }
-    if (state->edge == foundEdge) {
-        state->a = *to;
-        state->b = *from;
-        state->c = *to;
+    if (state->region == regionId) {
+        state->waypoint = state->destination = *to;
+        state->origin = *from;
         state->status = 6;
         return 1;
     }
-    if (region == 0 || edges == 0)
+    if (mesh == 0 || regions == 0)
         return 0;
 
-    nodes = (void *)((u8 *)region + region->nodesOffset);
-    dist = (void *)((u8 *)region + region->distOffset);
-    for (t = 0; t < 6; t++) {
-        listA[t] = 0xFF;
-        listB[t] = 0xFF;
-    }
+    nodes = (void *)((u8 *)mesh + mesh->nodeOffset);
+    dist = (void *)((u8 *)mesh + mesh->distanceOffset);
+    for (t = 0; t < 6; t++)
+        destinationRegions[t] = 0xFF;
 
-    listA[0] = foundEdge;
-    countA = 1;
-    edgeA = &edges[foundEdge];
-    for (j = 0; j <= 11 && edgeA->nodes[j] != 0xFF && countA <= 5; j++) {
-        struct S0821F2EC_Node *node = &nodes[edgeA->nodes[j]];
-        for (m = 0; m <= 5 && node->links[m] != 0xFF && countA <= 5; m++) {
-            u8 link = node->links[m];
-            if (link != listA[0] && NavMesh_IsPointInsideRegion(edges, to, link)) {
+    destinationRegion = &regions[regionId];
+    destinationRegions[0] = regionId;
+    destinationCount = 1;
+    for (i = 0; i <= 11 && destinationRegion->nodes[i] != 0xFF && destinationCount <= 5; i++) {
+        struct NavMeshNode *node = &nodes[destinationRegion->nodes[i]];
+        for (j = 0; j <= 5 && node->regions[j] != 0xFF && destinationCount <= 5; j++) {
+            if (node->regions[j] != destinationRegions[0] &&
+                NavMesh_IsPointInsideRegion(regions, to, node->regions[j])) {
                 s32 isNew = 1;
-                for (t = 0; t < countA; t++) {
-                    if (listA[t] == link)
+                for (t = 0; t < destinationCount; t++) {
+                    if (destinationRegions[t] == node->regions[j])
                         isNew = 0;
                 }
                 if (isNew) {
-                    listA[countA] = link;
-                    countA++;
+                    destinationRegions[destinationCount] = node->regions[j];
+                    destinationCount++;
                 }
             }
         }
     }
 
-    listB[0] = state->edge;
-    countB = 1;
-    edgeB = &edges[state->edge];
-    for (j = 0; j <= 11 && edgeB->nodes[j] != 0xFF && countB <= 5; j++) {
-        struct S0821F2EC_Node *node = &nodes[edgeB->nodes[j]];
-        for (m = 0; m <= 5 && node->links[m] != 0xFF && countB <= 5; m++) {
-            u8 link = node->links[m];
-            if (link != listB[0] && NavMesh_IsPointInsideRegion(edges, from, link)) {
+    {
+        u16 current = state->region;
+        for (t = 0; t < 6; t++)
+            originRegions[t] = 0xFF;
+        originRegion = &regions[current];
+        originRegions[0] = current;
+    }
+    originCount = 1;
+    for (i = 0; i <= 11 && originRegion->nodes[i] != 0xFF && originCount <= 5; i++) {
+        struct NavMeshNode *node = &nodes[originRegion->nodes[i]];
+        for (j = 0; j <= 5 && node->regions[j] != 0xFF && originCount <= 5; j++) {
+            if (node->regions[j] != originRegions[0] &&
+                NavMesh_IsPointInsideRegion(regions, from, node->regions[j])) {
                 s32 isNew = 1;
-                for (t = 0; t < countB; t++) {
-                    if (listB[t] == link)
+                for (t = 0; t < originCount; t++) {
+                    if (originRegions[t] == node->regions[j])
                         isNew = 0;
                 }
                 if (isNew) {
-                    listB[countB] = link;
-                    countB++;
+                    originRegions[originCount] = node->regions[j];
+                    originCount++;
                 }
             }
         }
     }
 
-    for (i = 0; i < countB; i++) {
-        for (j = 0; j < countA; j++) {
-            if (listB[i] == listA[j]) {
-                state->a = *to;
-                state->b = *from;
-                state->c = *to;
+    for (i = 0; i < originCount; i++) {
+        for (j = 0; j < destinationCount; j++) {
+            if (originRegions[i] == destinationRegions[j]) {
+                state->waypoint = state->destination = *to;
+                state->origin = *from;
                 state->status = 6;
                 return 1;
             }
         }
     }
 
-    bestDist = 0xFFFF;
-    bestA = 0xFF;
-    bestB = 0xFF;
-    for (i = 0; i < countB; i++) {
-        edgeB = &edges[listB[i]];
-        for (j = 0; j < countA; j++) {
-            edgeA = &edges[listA[j]];
-            for (u = 0; u <= 11 && edgeA->nodes[u] != 0xFF; u++) {
-                for (v = 0; v <= 11 && edgeB->nodes[v] != 0xFF; v++) {
-                    u32 nodeA = edgeA->nodes[u];
-                    u32 nodeB = edgeB->nodes[v];
-                    u32 d = PairTable_Lookup(dist, region->stride, nodeA, nodeB);
-                    if (d < bestDist) {
-                        bestDist = d;
-                        bestB = nodeB;
-                        bestA = nodeA;
-                    } else if (d == bestDist && bestDist != 0xFFFF) {
-                        if (S0821F2EC_Dist2(from, &nodes[nodeB]) <
-                            S0821F2EC_Dist2(from, &nodes[bestB])) {
-                            bestB = nodeB;
-                            bestA = nodeA;
+    shortest = 0xFFFF;
+    waypointNode = 0xFF;
+    targetNode = 0xFF;
+    for (i = 0; i < originCount; i++) {
+        originRegion = &regions[originRegions[i]];
+        for (j = 0; j < destinationCount; j++) {
+            destinationRegion = &regions[destinationRegions[j]];
+            for (u = 0; u <= 11 && destinationRegion->nodes[u] != 0xFF; u++) {
+                for (v = 0; v <= 11 && originRegion->nodes[v] != 0xFF; v++) {
+                    u32 d = PairTable_Lookup(dist, mesh->nodeCount, destinationRegion->nodes[u],
+                                             originRegion->nodes[v]);
+                    if (d < shortest) {
+                        shortest = d;
+                        waypointNode = originRegion->nodes[v];
+                        targetNode = destinationRegion->nodes[u];
+                    } else if (d == shortest && shortest != 0xFFFF) {
+                        s32 dx, dz, candidateDistance, previousDistance;
+                        dx = from->x - nodes[originRegion->nodes[v]].x;
+                        dz = from->z - nodes[originRegion->nodes[v]].z;
+                        candidateDistance = dx * dx + dz * dz;
+                        dx = from->x - nodes[waypointNode].x;
+                        dz = from->z - nodes[waypointNode].z;
+                        previousDistance = dx * dx + dz * dz;
+                        if (candidateDistance < previousDistance) {
+                            waypointNode = originRegion->nodes[v];
+                            targetNode = destinationRegion->nodes[u];
                         }
                     }
                 }
@@ -200,15 +174,14 @@ u32 sub_0821F2EC(void *arg0, void *arg1, void *arg2)
         }
     }
 
-    if (bestDist <= 0xFFFE) {
-        state->bestA = bestA;
-        state->bestB = bestB;
-        state->a = *to;
-        state->b = *from;
-        state->c = *to;
-        state->c.x = nodes[bestB].x;
-        state->c.y = 0;
-        state->c.z = nodes[bestB].z;
+    if (shortest <= 0xFFFE) {
+        state->targetNode = targetNode;
+        state->destination = *to;
+        state->origin = *from;
+        state->waypointNode = waypointNode;
+        state->waypoint.x = nodes[waypointNode].x;
+        state->waypoint.y = 0;
+        state->waypoint.z = nodes[waypointNode].z;
         state->status = 3;
         return 1;
     }
@@ -216,5 +189,5 @@ u32 sub_0821F2EC(void *arg0, void *arg1, void *arg2)
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0821F2EC);
+INCLUDE_ASM("asm/nonmatching", NavMesh_FindRoute);
 #endif

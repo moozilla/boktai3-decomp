@@ -5,7 +5,7 @@ struct Pos {
     u16 x, pad2, z;
 };
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-int sub_0821F2EC(u16 *, void *, void *);
+int NavMesh_FindRoute(u16 *, void *, void *);
 
 int Terrain_ApplyBlocked(u16 *out, void *arg, struct Pos *pos)
 {
@@ -33,5 +33,5 @@ int Terrain_ApplyBlocked(u16 *out, void *arg, struct Pos *pos)
         *out = z;
         return z;
     }
-    return sub_0821F2EC(out, arg, pos);
+    return NavMesh_FindRoute(out, arg, pos);
 }

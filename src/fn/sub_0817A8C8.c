@@ -9,11 +9,11 @@ struct ActorPathState {
     u8 pathContext[1];
 };
 s32 Nav_IsPositionInMesh(void *, struct ActorPathPosition *, struct ActorPathPosition *);
-u32 sub_0821F2EC(void *, void *, void *);
+u32 NavMesh_FindRoute(void *, void *, void *);
 s32 ActorPosition_TestPath(struct ActorPathState *p, struct ActorPathPosition *destination)
 {
     if (Nav_IsPositionInMesh(p->pathContext, &p->position, destination) &&
-        sub_0821F2EC(p->pathContext, &p->position, destination))
+        NavMesh_FindRoute(p->pathContext, &p->position, destination))
         return 1;
     return 0;
 }

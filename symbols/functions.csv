@@ -9210,6 +9210,7 @@ addr,name,mode,confidence,source,notes
 0821F18C,NavMesh_IsPointInsideRegion,thumb,low,src-alias,Tests fixed-point coordinates against an indexed region's half-open bounds
 0821F1C4,PairTable_Lookup,thumb,low,src-alias,
 0821F204,Nav_IsPositionInMesh,thumb,low,src-alias,
+0821F2EC,NavMesh_FindRoute,thumb,low,matching,Selects a direct route or the nearest viable waypoint pair for two positions
 0821F7A8,Terrain_ApplyBlocked,thumb,low,src-alias,
 0821F840,NavMesh_ConsumeProbeEvent,thumb,low,src-alias,Tests and clears probe flag bit one to consume a pending navigation event tentatively
 0821F998,NavMesh_StepTowardTarget,thumb,low,src-alias,
