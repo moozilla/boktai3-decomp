@@ -1,5 +1,4 @@
 #include "scene_actor_reset.h"
-// MATCHING_CONCESSION: register-pinning
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 extern const s16 gUnk_086149C4[];
 void sub_080A9DB0(void *, s32, s32);
@@ -28,6 +27,15 @@ static inline void SetControl(struct SceneActorRegistryResetView *p, void *contr
     }
     p->word104 = zero;
 }
+static inline void SetState(struct SceneActorRegistryResetView *p, u32 b)
+{
+    u32 behavior = b;
+    p->state2A8 = 0;
+    p->phase2A9 = 0;
+    p->behavior2AA = behavior;
+    p->counter2AC = 0;
+    p->field2B1 = 1;
+}
 static inline s32 Scale(s32 x)
 {
     if (x >= 0)
@@ -39,19 +47,15 @@ void TentacleActor_UpdateKnockback(struct SceneActorRegistryResetView *p)
     if (TakeEntry(p)) {
         struct ContactPosition *velocity;
         u32 angle;
+        u32 factor = 4;
         u8 *direction;
         SetControl(p, FIELD(p, 0x22c, void *), 0);
         direction = &p->body.direction;
         velocity = (void *)((u8 *)p + 0x2ec);
         angle = *direction;
-        velocity->x = Scale(gUnk_086149C4[(angle + 64) & 255] * 4);
+        velocity->x = Scale(gUnk_086149C4[(angle + 64) & 255] * factor);
         velocity->y = 0;
-        {
-            s32 value = gUnk_086149C4[angle];
-            s32 factor = 4;
-            asm("" : "+r"(factor));
-            velocity->z = Scale(factor * value);
-        }
+        velocity->z = Scale(gUnk_086149C4[angle] * factor);
         FIELD(p, 0x2ee, u16) = 0;
         FIELD(p, 0x2e8, u16) = 2;
     }
@@ -61,27 +65,9 @@ void TentacleActor_UpdateKnockback(struct SceneActorRegistryResetView *p)
         if (p->flags2D0 & mask) {
             TentacleActor_SelectWanderRoute(p);
             SetControl(p, p->entryTarget228, 1);
-            {
-                u32 phase = 2;
-                register u32 offset asm("r2") = 0x2a8;
-                *((u8 *)p + offset) = 0;
-                offset++;
-                *((u8 *)p + offset) = 0;
-                offset++;
-                *((u8 *)p + offset) = phase;
-                p->counter2AC = 0;
-                offset += 7;
-                {
-                    register u8 *out asm("r0") = (u8 *)p + offset;
-                    *out = 1;
-                }
-            }
+            SetState(p, 2);
         } else {
-            register u32 offset asm("r0") = 0x2ac;
-            register u32 *counter asm("r1");
-            asm("" : "+r"(offset));
-            counter = (void *)((u8 *)p + offset);
-            (*counter)++;
+            p->counter2AC++;
         }
     }
 }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_reset.h"
@@ -49,10 +48,14 @@ void TentacleBody_UpdateSpreadRelease(void);
 static inline void SetBodyFlag(struct TentacleBodyView *body, u32 input)
 {
     u32 mask = input;
-    u16 *f;
-    asm("" : "+r"(mask));
-    f = (void *)((u8 *)body + 0x8D0);
-    *f = mask | *f;
+    u16 *f = (void *)((u8 *)body + 0x8D0);
+    mask |= *f;
+    *f = mask;
+}
+static inline void Fill(void *dst, u32 *tmp, u32 v)
+{
+    *tmp = v;
+    CpuSet(tmp, dst, 0x05000002);
 }
 // confidence=low: winds up a segment-spread attack while backing away from the target.
 void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
@@ -75,12 +78,7 @@ void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
     {
         struct ContactPosition *destination = &actor->secondaryMotion;
         zero = 0;
-        params.zero = zero;
-        {
-            u32 *source = &params.zero;
-            asm("" : "+r"(source));
-            CpuSet(source, destination, 0x05000002);
-        }
+        Fill(destination, &params.zero, zero);
     }
     {
         u32 count = ((u8 *)body)[0x8EA];
@@ -123,15 +121,17 @@ void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
                         body->segments[i].posX =
                             *(u16 *)((u8 *)actor + 0x5C) -
                             Shift(gUnk_086149C4[(actor->body.direction + 64) & 255] * 54, 12);
-                        body->segments[i].posZ = *(u16 *)((u8 *)actor + 0x60) -
-                                                 Shift(gUnk_086149C4[actor->body.direction] * 54, 12);
+                        body->segments[i].posZ =
+                            *(u16 *)((u8 *)actor + 0x60) -
+                            Shift(gUnk_086149C4[actor->body.direction] * 54, 12);
                         break;
                     case 1:
                         body->segments[i].posX =
                             *(u16 *)((u8 *)actor + 0x5C) -
                             Shift(gUnk_086149C4[(actor->body.direction + 64) & 255] * 20, 12);
-                        body->segments[i].posZ = *(u16 *)((u8 *)actor + 0x60) -
-                                                 Shift(gUnk_086149C4[actor->body.direction] * 20, 12);
+                        body->segments[i].posZ =
+                            *(u16 *)((u8 *)actor + 0x60) -
+                            Shift(gUnk_086149C4[actor->body.direction] * 20, 12);
                         break;
                     default:
                         body->segments[i].posX = *(u16 *)((u8 *)actor + 0x5C);

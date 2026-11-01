@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -126,6 +125,11 @@ static inline u8 Turned(s32 angle)
         r = 1;
     return r;
 }
+static inline void Fill(void *dst, u32 *tmp, u32 v)
+{
+    *tmp = v;
+    CpuSet(tmp, dst, 0x05000002);
+}
 // confidence=low: spirals with decreasing speed and restores the saved facing direction.
 void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
 {
@@ -145,11 +149,7 @@ void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
     {
         u8 *dst = (u8 *)actor + 0x2EC;
         zero = 0;
-        {
-            u32 *zp = &zero;
-            asm("" : "+r"(zp));
-            CpuSet(zp, dst, 0x05000002);
-        }
+        Fill(dst, &zero, zero);
     }
     if ((s32)actor->counter2AC > 115) {
         s32 angle = *((u8 *)actor + 0xE9) - actor->body.direction;

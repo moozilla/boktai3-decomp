@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
 #include "scene_actor_control_phase.h"
@@ -88,10 +87,14 @@ static inline u32 GetFlags(struct SceneActorRegistryResetView *a, u32 mask, u32 
     *out = p;
     return v;
 }
+struct SpiderGroupView {
+    u8 pad[0x1FC];
+    void *mesh;
+};
 void Spider_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
 {
     struct SpiderProbeContext *ctx = actor->context;
-    register u8 *nav asm("r4") = (u8 *)actor + 0x3D4;
+    struct SpiderGroupView *group = (void *)&actor->group.common;
     s32 speed;
     u32 *flags;
     u16 *scale;
@@ -121,10 +124,9 @@ void Spider_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
         Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
     if (!GetFlags(actor, 0x4000, &flags) && !HasFlag(actor->context, 4))
         Spider_UpdateWanderGoal(actor);
-    nav += 0x1FC;
-    probe = NavMesh_ConsumeProbeEvent(FIELD(nav, 0, void *));
+    probe = NavMesh_ConsumeProbeEvent(group->mesh);
     if (!probe) {
-        void *descriptor = FIELD(nav, 0, void *);
+        void *descriptor = group->mesh;
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, descriptor, 32, 32, speed)) {
             State(actor, 5);
             {
@@ -135,7 +137,7 @@ void Spider_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
             return;
         }
     } else {
-        void *descriptor = FIELD(nav, 0, void *);
+        void *descriptor = group->mesh;
         if (SceneActorBehavior_RequestDescriptorTurn(actor, descriptor, 32, 32, speed))
             State(actor, 6);
     }

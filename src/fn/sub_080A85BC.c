@@ -1,5 +1,4 @@
 #include "scene_actor_reset.h"
-// MATCHING_CONCESSION: register-pinning
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 extern const s16 gUnk_086149C4[];
 void sub_080A9DB0(void *, s32, s32);
@@ -27,6 +26,15 @@ static inline void SetControl(struct SceneActorRegistryResetView *p, void *contr
         *flags &= mask;
     }
     p->word104 = zero;
+}
+static inline void SetState(struct SceneActorRegistryResetView *p, u32 b)
+{
+    u32 behavior = b;
+    p->state2A8 = 0;
+    p->phase2A9 = 0;
+    p->behavior2AA = behavior;
+    p->counter2AC = 0;
+    p->field2B1 = 1;
 }
 static inline s32 Scale(s32 x)
 {
@@ -59,28 +67,10 @@ void TentacleActor_UpdateKnockbackSlide(struct SceneActorRegistryResetView *p)
         if (p->flags2D0 & mask) {
             TentacleActor_SelectWanderRoute(p);
             SetControl(p, p->entryTarget228, 1);
-            {
-                u32 phase = 2;
-                register u32 offset asm("r2") = 0x2a8;
-                *((u8 *)p + offset) = 0;
-                offset++;
-                *((u8 *)p + offset) = 0;
-                offset++;
-                *((u8 *)p + offset) = phase;
-                p->counter2AC = 0;
-                offset += 7;
-                {
-                    register u8 *out asm("r0") = (u8 *)p + offset;
-                    *out = 1;
-                }
-                Sound_PlaySong(983);
-            }
+            SetState(p, 2);
+            Sound_PlaySong(983);
         } else {
-            register u32 offset asm("r0") = 0x2ac;
-            register u32 *counter asm("r1");
-            asm("" : "+r"(offset));
-            counter = (void *)((u8 *)p + offset);
-            (*counter)++;
+            p->counter2AC++;
         }
     }
 }

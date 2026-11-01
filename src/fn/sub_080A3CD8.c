@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
@@ -38,18 +37,7 @@ static inline u32 Actor32(struct SceneActorRegistryResetView *a, u32 m)
 static inline u8 Disabled(struct SceneActorRegistryResetView *a)
 {
     if (a) {
-        u32 m = 64;
-        register u32 off asm("r2") = 0x2d4;
-        if (F(a, off, u16) & m)
-            return 1;
-        m = 0x20000;
-        off -= 4;
-        {
-            register u32 *q asm("r0") = (u32 *)((u8 *)a + off);
-            if (*q & m)
-                return 1;
-        }
-        if (F(a, 0x9c, s16) <= 0)
+        if (Actor16(a, 64) || Actor32(a, 0x20000) || F(a, 0x9c, s16) <= 0)
             return 1;
     }
     return 0;
@@ -57,15 +45,16 @@ static inline u8 Disabled(struct SceneActorRegistryResetView *a)
 struct ContactPosition *TetherActor_GetPosition(void);
 s32 Nav_IsPositionInMesh(void *, void *, void *);
 s32 Terrain_ApplyBlocked(void *, void *, void *);
+static inline void ClearBits(u16 *field, u32 bits)
+{
+    *field &= ~bits;
+}
 static inline u8 Route(struct SceneActorRegistryResetView *a, void *nav, void *pos, void *target)
 {
-    register u16 *flags asm("r0");
     s32 r;
-    u32 off;
     if (!Nav_IsPositionInMesh(nav, pos, target)) {
-        off = 0x2d4;
-        flags = (u16 *)((u8 *)a + off);
-        goto clear;
+        ClearBits(&a->flags2D4, 0x200);
+        return 0;
     }
     r = Terrain_ApplyBlocked(nav, pos, target);
     if (r) {
@@ -73,14 +62,7 @@ static inline u8 Route(struct SceneActorRegistryResetView *a, void *nav, void *p
             Memory_Clear((u8 *)a + 0x64, 8);
         return 1;
     }
-    off = 0x2d4;
-    flags = (u16 *)((u8 *)a + off);
-clear: {
-    u32 m = 0xfffffdff;
-    u32 v = *flags;
-    m &= v;
-    *flags = m;
-}
+    ClearBits(&a->flags2D4, 0x200);
     return 0;
 }
 s32 SceneActorPlacement_TriggerTetherAction(struct SceneActorRegistryResetView *a)
