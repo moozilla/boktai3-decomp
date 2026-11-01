@@ -13,3 +13,9 @@ The guarded adaptive tracker sets the entered flag on every transition. The
 old random paths reached a shared store with an uninitialized value. The
 new draft uses the normal entry helper throughout. Its remaining difference
 is tail sharing among the calls that clear the per-state workspace.
+
+The 160-byte player snapshot at 0x0803D430 remains guarded at 85.9%.
+The two position records use a 16-byte stride, but the two region words use
+a four-byte stride. Recording the byte offset explicitly keeps the region
+address calculation inside the loop. Its remaining differences are the
+loop index register, initialization order and operand order.
