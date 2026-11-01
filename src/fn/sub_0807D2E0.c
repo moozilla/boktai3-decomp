@@ -18,16 +18,15 @@ static inline void ClearDamageOffset(u32 *zero, void *dst)
     CpuSet(zero, dst, 0x05000002);
 }
 
-static inline void ShowDamage(struct SceneActorRegistryResetView *a)
+static inline void ShowDamage(struct SceneActorRegistryResetView *a, u32 *zero)
 {
-    u32 zero;
     u32 buffer[2];
     s32 health = a->health;
     u32 max = (u16)a->defaultHealth;
     s32 kind = (s16)a->fieldB2;
     s32 param = (s16)a->field9A;
     SceneHud_SetTimedState(a->body.id, health, max, kind, 0, param);
-    ClearDamageOffset(&zero, buffer);
+    ClearDamageOffset(zero, buffer);
     if (a->reactionSoundVariant || !(a->field2D8 & 0x20000))
         DamageNumberDisplay_Show(&a->colliderA, a->reactionSoundVariant, 0, &a->body.position,
                                  buffer, 1);
@@ -51,13 +50,20 @@ static inline void SetReactionState(struct SceneActorRegistryResetView *a, u32 s
 }
 
 #ifdef NONMATCHING
-// fuzzy: 54.9%
-void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactPosition *position, u32 p3, u32 flip,
-                  u32 p5)
+// fuzzy: 57.7%
+// Accesses the ROM makes through the parameter (sb) go through victim, the rest
+// through a (r7); the collider pointer and the damage-display zero are
+// function-level locals, as the ROM's early stack slots show. Remaining: the
+// zero's slot (ROM sp+0x10, allocated before the burst loop's unions), two
+// spilled pseudos the ROM has at sp+0x60/0x64, mask-first flag tests.
+void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactPosition *position,
+                                         u32 p3, u32 flip, u32 p5)
 {
     struct SceneActorRegistryResetView *a = victim;
     struct SceneActorRegistryControlGroup *group = &a->group.common;
+    struct ContactCollider *collider = &a->colliderA;
     s32 category;
+    u32 zero;
 
     category = a->category;
     a->field2B8 = 0;
@@ -80,11 +86,11 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
     }
     a->flags2D0 |= 4;
     a->flags2CC &= ~0x400000;
-    a->field2C2 = 0x40;
-    group->gate.flags = 0;
-    group->gate.counter = 0;
-    a->flags2D4 &= ~0x380;
-    a->tracking.flags &= ~0x18;
+    ((struct SceneActorRegistryResetView *)victim)->field2C2 = 0x40;
+    ((struct SceneActorRegistryResetView *)victim)->group.common.gate.flags = 0;
+    ((struct SceneActorRegistryResetView *)victim)->group.common.gate.counter = 0;
+    ((struct SceneActorRegistryResetView *)victim)->flags2D4 &= ~0x380;
+    ((struct SceneActorRegistryResetView *)victim)->tracking.flags &= ~0x18;
     if (a->flags2CC & 0x200000) {
         a->flags2D0 &= ~0x1000000;
         a->flags2D4 &= ~0x200;
@@ -113,18 +119,18 @@ mode2:
     if ((s32)flip > 0) {
         a->field2EA = 0;
         a->reactionSoundVariant = a->health;
-        *(s16 *)((u8 *)&a->colliderA + 0x3E) = a->health;
+        *(s16 *)((u8 *)collider + 0x3E) = a->health;
         a->health = 0;
         a->flags2D4 |= 8;
         a->flags2CC |= 0x400;
         a->flags2D0 |= 0xA0000;
-        SceneActorAttachment_ReplaceResponseSlot((u8 *)a, 0, 0x7F, 0);
-        SceneActorAttachment_ReplaceResponseSlot((u8 *)a, 1, 0x7F, 0);
-        SceneActorAttachment_ReplaceResponseSlot((u8 *)a, 3, 0x7F, 0);
-        SceneActorEffects_AdvanceSteps((u8 *)a, 4);
+        SceneActorAttachment_ReplaceResponseSlot(victim, 0, 0x7F, 0);
+        SceneActorAttachment_ReplaceResponseSlot(victim, 1, 0x7F, 0);
+        SceneActorAttachment_ReplaceResponseSlot(victim, 3, 0x7F, 0);
+        SceneActorEffects_AdvanceSteps(victim, 4);
         SetReactionState(a, 3, 0, 0, 0x11, a->deathControl);
         if (SceneActorDamage_ShouldShow(a))
-            ShowDamage(a);
+            ShowDamage(a, &zero);
         if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) && !(a->flags2D0 & 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)a->body.id);
         if (category == 4 || category == 1) {
@@ -150,13 +156,13 @@ mode2:
         s32 half = a->health / 2;
         s32 left;
         a->reactionSoundVariant = half;
-        *(s16 *)((u8 *)&a->colliderA + 0x3E) = half;
+        *(s16 *)((u8 *)collider + 0x3E) = half;
         left = a->health - half;
         if (left <= 0)
             left = 0;
         a->health = left;
         if (SceneActorDamage_ShouldShow(a))
-            ShowDamage(a);
+            ShowDamage(a, &zero);
     }
 }
 #else
