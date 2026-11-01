@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 #include "engine.h"
 #include "ram.h"
@@ -7,7 +6,7 @@ void Bee_UpdateFacingAnimation(struct SceneActorAnimationView *actor);
 static inline u32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
+    return *(const u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR);
 }
 static inline s32 Shift(s32 n, u32 bits)
 {
@@ -18,6 +17,21 @@ static inline s32 Shift(s32 n, u32 bits)
 static inline u16 Mask16(u16 *p, u32 m)
 {
     return *p & m;
+}
+static inline void SetPhase(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
+                            u8 behavior)
+{
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
+}
+static inline void Polar(struct ContactPosition *m, u32 angle, s32 radius)
+{
+    m->x = Shift(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius, 12);
+    m->y = 0;
+    m->z = Shift(gUnk_086149C4[angle] * radius, 12);
 }
 void Bee_UpdateWanderPause(struct SceneActorRegistryResetView *actor)
 {
@@ -46,34 +60,12 @@ void Bee_UpdateWanderPause(struct SceneActorRegistryResetView *actor)
         fp = &actor->tracking.heading;
         angle = (r & 0x1F) + 0x71;
         angle = (angle + *fp) & 0xFF;
-        {
-            struct ContactPosition *m = &actor->secondaryMotion;
-            m->x = Shift(gUnk_086149C4[(angle + 0x40) & 0xFF] * 0x20, 12);
-            m->y = 0;
-            {
-                s32 v = gUnk_086149C4[angle];
-                s32 k = 0x20;
-                asm("" : "+r"(k));
-                m->z = Shift(v * k, 12);
-            }
-        }
+        Polar(&actor->secondaryMotion, angle, 0x20);
     }
     cnt = actor->counter2AC;
     if (cnt > 0x1E) {
-        u8 zero8;
-        u32 zero;
-        asm("" : "+r"(actor));
         actor->flags2D4 = Mask16(&actor->flags2D4, ~0x100);
-        zero8 = 0;
-        zero = 0;
-        {
-            u32 two = 2;
-            actor->state2A8 = zero8;
-            actor->phase2A9 = two;
-            actor->behavior2AA = zero8;
-            actor->counter2AC = zero;
-            actor->field2B1 = 1;
-        }
+        SetPhase(actor, 0, 2, 0);
     } else {
         actor->counter2AC = cnt + 1;
     }
