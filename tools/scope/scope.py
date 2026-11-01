@@ -32,6 +32,7 @@
   scope.py FILE.c put SNIPPET.c [FUNC]   SNIPPET.c (FUNC's definition, with its structs/helpers above) in
                                 place of FUNC's definition, then the score: no hand edits of the unit copy
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
+  scope.py twins [N] [all]      drafts (all: also no C) by their closest matched relative: twins first
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
   scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching] [--allow-pins]   put a matching draft into
                                 src/ (unit merge, or a new src/fn file and the hidden boundary), check the
@@ -6458,6 +6459,19 @@ def cmd_todo(show, order):
                           like_tables(), arm)
 
 
+def cmd_twins(show, everything):
+    """Functions not yet exact, each with its closest matched relative: where a twin's C may carry over."""
+    import structure
+    import progress
+    funcs, sizes = progress.load_functions()
+    status, files = code_status()
+    try:
+        pinned = progress.collect_pinned(funcs, os.path.join(ROOT, "src"))
+    except Exception:  # the pin marks are a convenience; the ranking stands without them
+        pinned = set()
+    return structure.twins(like_index(), status, funcs, sizes, files, pinned, show, everything, like_tables())
+
+
 def cmd_like(target, show):
     import structure
     import progress
@@ -6762,6 +6776,10 @@ def validate_cli(args):
         if len(tail) > 2 or any(a not in ("addr", "prior", "size") and not a.isdigit() for a in tail):
             cli_error("todo [N] [addr|prior|size]")
         return
+    if cmd == "twins":
+        if len(tail) > 2 or any(a != "all" and not a.isdigit() for a in tail):
+            cli_error("twins [N] [all]")
+        return
     if cmd == "uses":
         if not any(a.isdigit() for a in tail):
             cli_error("uses REG... [PASS...] [FUNC]")
@@ -6846,6 +6864,8 @@ def main():
         return cmd_todo(n, order)
     if args[0] == "like":  # like FUNC|ADDR: matched functions whose ROM looks like this one's
         return cmd_like(args[1], int(args[2]) if len(args) > 2 else 8)
+    if args[0] == "twins":  # twins [N] [all]: drafts (all: also no C) by their closest matched relative
+        return cmd_twins(next((int(a) for a in args[1:] if a.isdigit()), 60), "all" in args[1:])
     if args[0] == "census":  # census [CALLEE]: concessions across src/ grouped by the call they serve
         import structure
         return structure.census(ROOT, want=args[1] if len(args) > 1 else None)

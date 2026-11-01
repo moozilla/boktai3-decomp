@@ -1,6 +1,5 @@
 #include "player_3.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 
 /* Tentative role: select an effect flag from actor and global state. */
 
@@ -45,17 +44,39 @@ void Player_LoadVisualParameters(struct Player *p)
     p->visualParameterC = t[1];
 }
 
-void sub_0813C9B4(struct Player *actor, const u16 *input, s32 inputWeightA, s32 weightB, s32 shift)
+static inline u16 Player_BlendColor(const u16 *source, const u16 *base, const u8 *brightnessPtr,
+                                    s32 sourceWeight, s32 baseWeight, s32 shift)
 {
-    register struct Player *p = actor;
-    s32 weightA = inputWeightA;
-    register s32 baseWeight = weightB;
-    register const u16 *source asm("r8");
-    register u16 *base;
+    s32 r, g, b, brightness, red;
+    s32 br, bg, bb;
+    red = *source & 31;
+    brightness = *brightnessPtr;
+    r = red + brightness;
+    if (r > 31)
+        r = 31;
+    g = ((*source >> 5) & 31) + brightness;
+    if (g > 31)
+        g = 31;
+    b = ((*source >> 10) & 31) + brightness;
+    if (b > 31)
+        b = 31;
+    br = (*base) & 31;
+    bg = ((*base) >> 5) & 31;
+    bb = ((*base) >> 10) & 31;
+    r = ((sourceWeight * r) + (baseWeight * br)) >> shift;
+    g = ((g * sourceWeight) + (baseWeight * bg)) >> shift;
+    b = ((sourceWeight * b) + (baseWeight * bb)) >> shift;
+    return ((b << 10) | (g << 5)) | r;
+}
+
+void sub_0813C9B4(struct Player *p, const u16 *input, s32 sourceWeight, s32 baseWeight, s32 shift)
+{
+    const u16 *source;
+    u16 *base;
     s32 i;
-    u8 *brightnessPtr;
-    u8 *alternateBrightness;
-    if (!inputWeightA) {
+    const u8 *brightnessPtr;
+    const u8 *alternateBrightness;
+    if (sourceWeight == 0) {
         if (!p->unk419)
             p->actionVariantResource = (u32)p->visualParameters;
         else
@@ -69,117 +90,28 @@ void sub_0813C9B4(struct Player *actor, const u16 *input, s32 inputWeightA, s32 
         palette = &p->actionVariantResource;
         base = (u16 *)p->visualParameters;
         brightnessPtr = p->unkAC6;
-        for (; i < 16; i++) {
-            if ((((u32)(i - 5)) <= 1) || (i == 13))
-                base[16] = base[0];
-            else {
-                register u32 color;
-                register s32 brightness;
-                register s32 channel asm("r0");
-                register u32 packed;
-                register s32 red;
-                register s32 green asm("r2");
-                s32 blue;
-                u32 channelMask;
-                {
-                    register const u16 *view asm("r4") = source;
-                    color = *view;
-                }
-                channelMask = 31;
-                channel = channelMask;
-                channel &= color;
-                {
-                    register const u8 *brightnessView asm("r3") = brightnessPtr;
-                    asm("" : : "r"(brightnessView));
-                    brightness = *brightnessView;
-                }
-                red = channel + brightness;
-                if (red > 31)
-                    red = 31;
-                packed = color << 16;
-                channel = (packed >> 21) & channelMask;
-                green = channel + brightness;
-                if (green > 31)
-                    green = 31;
-                channel = (packed >> 26) & channelMask;
-                blue = channel + brightness;
-                if (blue > 31)
-                    blue = 31;
-                {
-                    register u32 baseColor = *base;
-                    register s32 baseRed asm("r0");
-                    register s32 baseGreen asm("r3");
-                    baseRed = channelMask;
-                    baseRed &= baseColor;
-                    baseColor <<= 16;
-                    baseGreen = (baseColor >> 21) & channelMask;
-                    baseColor = (baseColor >> 26) & channelMask;
-                    red = ((weightA * red) + (baseWeight * baseRed)) >> shift;
-                    green = ((weightA * green) + (baseWeight * baseGreen)) >> shift;
-                    blue = ((weightA * blue) + (baseWeight * ((s32)baseColor))) >> shift;
-                    base[16] = ((blue << 10) | (green << 5)) | red;
-                }
-            }
+        for (; i <= 15; i++) {
+            if (i == 5 || i == 6 || i == 13)
+                base[16] = *base;
+            else
+                base[16] =
+                    Player_BlendColor(source, base, brightnessPtr, sourceWeight, baseWeight, shift);
             source++;
             base++;
         }
-
         *palette = (u32)(((u8 *)p) + 0x380);
     } else {
-        const u16 *cursor;
         i = 0;
         alternateBrightness = p->unkAC6;
         base = (u16 *)p->visualParameters;
-        cursor = source;
         while (1) {
-            {
-                register u32 color;
-                register s32 brightness;
-                register s32 channel asm("r0");
-                register u32 packed;
-                register s32 red;
-                register s32 green asm("r2");
-                s32 blue;
-                u32 channelMask;
-                asm("" : "+h"(cursor));
-                color = *cursor;
-                channelMask = 31;
-                channel = channelMask;
-                channel &= color;
-                brightness = *alternateBrightness;
-                red = channel + brightness;
-                if (red > 31)
-                    red = 31;
-                packed = color << 16;
-                channel = (packed >> 21) & channelMask;
-                green = channel + brightness;
-                if (green > 31)
-                    green = 31;
-                channel = (packed >> 26) & channelMask;
-                blue = channel + brightness;
-                if (blue > 31)
-                    blue = 31;
-                {
-                    register u32 baseColor = *base;
-                    register s32 baseRed asm("r0");
-                    register s32 baseGreen asm("r3");
-                    baseRed = channelMask;
-                    baseRed &= baseColor;
-                    baseColor <<= 16;
-                    baseGreen = (baseColor >> 21) & channelMask;
-                    baseColor = (baseColor >> 26) & channelMask;
-                    red = ((weightA * red) + (baseWeight * baseRed)) >> shift;
-                    green = ((weightA * green) + (baseWeight * baseGreen)) >> shift;
-                    blue = ((weightA * blue) + (baseWeight * ((s32)baseColor))) >> shift;
-                    base[16] = ((blue << 10) | (green << 5)) | red;
-                }
-            }
-            cursor++;
+            base[16] = Player_BlendColor(source, base, alternateBrightness, sourceWeight,
+                                         baseWeight, shift);
+            source++;
             base++;
-            if ((++i) > 15)
+            if (++i > 15)
                 break;
         }
-
         p->visualObject->parameters = (u32)(((u8 *)p) + 0x380);
     }
 }
