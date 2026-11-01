@@ -11,7 +11,7 @@
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
-void sub_08080BE0(void);
+void SceneActorReaction_SetMotionMode(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void);
@@ -129,7 +129,7 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
-        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, sub_08080BE0);
+        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);

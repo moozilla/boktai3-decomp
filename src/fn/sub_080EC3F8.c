@@ -28,7 +28,7 @@ void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 void SceneActorScript_OnCommand(void);
-void sub_08080BE0(void);
+void SceneActorReaction_SetMotionMode(void);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorBehavior_InitializeShadow(void *);
 u32 Route_GetCurrentPointFacing(void *);
@@ -141,7 +141,7 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
-        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, sub_08080BE0);
+        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);

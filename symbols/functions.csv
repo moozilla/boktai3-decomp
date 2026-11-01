@@ -2914,6 +2914,7 @@ addr,name,mode,confidence,source,notes
 08080868,SceneActorReaction_BeginFadedState,thumb,low,src-alias,
 08080984,SceneActorReaction_BeginReactionSound,thumb,low,src-alias,
 08080AF0,SceneActorReaction_TurnBackToRoute,thumb,low,src-alias,
+08080BE0,SceneActorReaction_SetMotionMode,thumb,low,src-alias,Applies stationary or directional reaction motion to a registered target
 08080FB4,SceneActorReaction_BeginHiddenDefeat,thumb,low,src-alias,
 08081290,SceneActorReaction_SinkAndRemove,thumb,low,src-alias,
 0808148C,SceneActorReaction_PlayStaggerBurst,thumb,low,src-alias,
