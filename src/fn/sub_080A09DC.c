@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_script.h"
 #include "engine.h"
 
@@ -29,8 +28,10 @@ static inline s32 ReadOrZero(void)
         return Script_GetValue();
     return 0;
 }
-static inline u32 CellAt(s32 x, s32 z)
+static inline u32 CellAtPosition(struct ContactPosition *position)
 {
+    s32 x = position->x >> 8;
+    s32 z = position->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return gTerrainMap->rows[z] + x;
@@ -111,8 +112,6 @@ void Crow_ReadSpawnScript(void *input)
     ((struct CrowSpawnState *)actor)->option59 = Script_GetKeywordValue(0x64, 0);
     if (Script_SeekToKeyword(0x70)) {
         u16 *height;
-        u16 *cx;
-        u16 *cz;
         struct Pair8 *copy;
         actor->position.x = ReadOrZero();
         actor->position.y = ReadOrZero();
@@ -128,10 +127,7 @@ void Crow_ReadSpawnScript(void *input)
         }
         copy = &s->position;
         *copy = *((struct Pair8 *)(&actor->position));
-        asm("" : "+r"(copy));
-        cx = (u16 *)copy;
-        cz = cx + 2;
-        actor->cellIndex = CellAt(((s16)(*cx)) >> 8, ((s16)(*cz)) >> 8);
+        actor->cellIndex = CellAtPosition((struct ContactPosition *)&s->position);
         {
             u32 cell = actor->cellIndex;
             s32 gh;
