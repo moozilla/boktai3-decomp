@@ -235,6 +235,14 @@ per free register, from its X record), and the choices next to differing insns
 go first, so the budget is not spent on early choices (Player_GetSmoothedDirection:
 1 compile, was 7; GridAttackActor_OnDamageCollision: 2). A MATCH means the C
 has the right shape and pseudos and only reload's rotation state differs.
+Before searching, `spill` names any low register the ROM reloads into that is
+not in the draft's spill list. `finish_spills` builds that list from every
+register some insn's `find_reg` picked, so a list one register shorter shifts
+nearly every later choice, and no `AGBCC_SPILL` shift can fix it. The line names
+the pseudos that hold the register in the draft. In OrbitEffect_UpdateManager,
+the ROM rotates over r0 to r3, but in the draft a dead field-store zero held r3
+and the list was r0 to r2 (130 / 126 differing). On a matching function,
+`spill` prints the spill list and stops.
 
 The rotation records come from `AGBCC_DUMPPRI`: after each `R` line (choice K,
 insn, register, C line, value) an `X` line gives the index the scan started
@@ -804,6 +812,16 @@ Each was read from the compiler source and confirmed on a live draft.
    ROM never uses its high register ("class: ... prefers STACK_REG and sits in ip"). Fix in
    Slime_EmitDeathDebris: one `u8 *base` that is the actor and then, after `base += 0x5C`,
    the position, so the in-place add and the call arguments give it a low class.
+25. **Zeros between a halfword AND and its store come from a bitfield store.** ROM
+   signature: `ands rA, rB; movs rX, #0; [movs rY, #0;] strh rA, [..]`. Later byte and word
+   zero stores reuse rX/rY, and the second zero often takes r4 and moves a pointer up one
+   register. Typed zero locals cannot give two zeros: cse1's `make_regs_eqv` merges every
+   pair (128 type and order variants tried). Clearing through a bitfield view does:
+   `struct ChaseFlags40 *f = (void *)&x->flags; s32 mask = ~0x40; f->bits &= mask;`; its
+   store expands with the zeros exactly there. A `u16 value : 16` view does the same for
+   `++timer->value`. This depinned Vorn_UpdateApproachRange, Vorn_UpdatePursuitWait and
+   Vorn_RestoreRouteMovement; about 110 functions show the signature, and a pinned one should
+   try this first.
 
 ## Survey: random table as a literal address (2026-10-24)
 
