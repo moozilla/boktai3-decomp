@@ -65,6 +65,23 @@ class PinsScope(unittest.TestCase):
         self.assertEqual(self.scope.site_variables('    asm("" : "+r"(t), "=r"(u));'), {"t", "u"})
         self.assertEqual(self.scope.site_variables('    asm("" ::: "memory");'), set())
 
+    def test_a_function_after_a_continued_define_is_found_with_the_macros_it_uses(self):
+        source = """#define PINNED(v)                                                   \\
+    ({                                                                \\
+        register int m asm("r1") = (v);                               \\
+        m;                                                            \\
+    })
+#define UNUSED(v) ({ register int n asm("r2") = (v); n; })
+int Target(int v)
+{
+    return PINNED(v) + 1;
+}
+"""
+        reach = self.scope.function_reach(source, "Target")
+        self.assertEqual(set(reach), {"Target", "#PINNED"})
+        a, b = reach["#PINNED"]
+        self.assertIn('asm("r1")', source[a:b])
+
 
 if __name__ == "__main__":
     unittest.main()

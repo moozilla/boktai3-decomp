@@ -3018,18 +3018,32 @@ def function_reach(text, func):
         defs[name] = (a, b, inline)
     if func not in defs:
         return {}
+    # Function-like and object-like macros: a concession in a macro body changes the code of every
+    # function that expands it, so a reached function's macros are reached too (keyed `#NAME`).
+    macros = {}
+    for m in re.finditer(r"^#\s*define\s+(\w+)(?:.*\\\n)*.*$", text, re.M):
+        if not any(x <= m.start() < y for x, y in drafts):
+            macros[m.group(1)] = (m.start(), m.end())
     reach, todo = {}, [func]
     while todo:
         n = todo.pop()
         if n in reach:
             continue
-        a, b, _ = defs[n]
-        reach[n] = (a, b)
-        body = text[a:b]
-        body = body[body.index("{"):]
+        if n.startswith("#"):
+            a, b = macros[n[1:]]
+            reach[n] = (a, b)
+            body = text[a:b].split(None, 2)[-1]
+        else:
+            a, b, _ = defs[n]
+            reach[n] = (a, b)
+            body = text[a:b]
+            body = body[body.index("{"):]
         for c in set(re.findall(r"\b(\w+)\s*\(", body)):
             if c in defs and defs[c][2] and c not in reach:
                 todo.append(c)
+        for c in set(re.findall(r"\b(\w+)\b", body)):
+            if c in macros and "#" + c not in reach and c != n[1:]:
+                todo.append("#" + c)
     return reach
 
 
@@ -4948,7 +4962,13 @@ def top_level_spans(text):
     spans, depth, start, brace, i = [], 0, None, None, 0
     while i < len(text):
         c = text[i]
-        if text.startswith("//", i) or (c == "#" and (i == 0 or text[i - 1] == "\n")):
+        if c == "#" and (i == 0 or text[i - 1] == "\n"):  # a directive, with its continued lines
+            j = text.find("\n", i)
+            while j > 0 and text[j - 1] == "\\":
+                j = text.find("\n", j + 1)
+            i = len(text) if j < 0 else j
+            continue
+        if text.startswith("//", i):
             j = text.find("\n", i)
             i = len(text) if j < 0 else j
             continue
