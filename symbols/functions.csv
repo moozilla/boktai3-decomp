@@ -1663,6 +1663,7 @@ addr,name,mode,confidence,source,notes
 080447D4,ContactSwarm_Initialize,thumb,low,src-alias,
 08044814,ContactSwarm_Create,thumb,low,src-alias,
 08044854,ContactSwarm_SpawnCharge,thumb,low,src-alias,
+08044AD4,ContactSwarm_SpawnPairedAdvanceCount,thumb,low,src-alias,Spawns available swarm slots on alternating headings up to the supplied count.
 08044C80,EncodedRecord_WriteBits,thumb,low,src-alias,
 08044CF4,EncodedRecord_ReadBits,thumb,low,src-alias,
 08044D58,EncodedRecord_NextMaskWord,thumb,low,src-alias,
