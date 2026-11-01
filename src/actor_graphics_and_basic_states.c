@@ -3209,24 +3209,23 @@ typedef struct ActorAnimation_08024E18 {
 
 static inline void setFacing_08024E18(ActorAnimation_08024E18 *p, int angle)
 {
+    int shifted;
     u32 value;
-    register int shifted asm("r0");
     p->angle = angle;
     shifted = p->angle + 0x60;
-    asm("" : "+r"(shifted));
     shifted >>= 6;
-    value = 3 & shifted;
+    value = 3;
+    value &= shifted;
     p->facing = value;
     shifted = p->angle + 0x70;
-    asm("" : "+r"(shifted));
     shifted >>= 5;
-    value = 7 & shifted;
+    value = 7;
+    value &= shifted;
     p->facing8 = value;
 }
 
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 
-// MATCHING_CONCESSION: register-pinning
 void SceneActorAnimation_UpdateEightDirectionCallback(ActorAnimation_08024E18 *p)
 {
     if (!p->locked)
