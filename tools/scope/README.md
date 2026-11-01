@@ -989,6 +989,20 @@ Each was read from the compiler source and confirmed on a live draft.
    in one, the value in the other), also when both read `ands r0, r1` with the registers'
    roles swapped (Vanargand_UpdatePartLeap's terrain mask); the opposite case asks for the
    value first.
+34. **A struct halfword `|=` is a field insertion; through a `u16 *` it is not.**
+   `s->f |= mask` on a `u16` struct member expands to 21 RTL insns: the ior, then a store
+   as `(old & 0) | new` with a `(set (reg:HI) (const_int 0))`; through a pointer
+   (`static inline void SetHalfFlags(u16 *flags, u32 input) { u32 mask = input; *flags |= mask; }`)
+   it is 11. Both compile to the same code, but the insertion's zero and second ior reach
+   flow and only combine deletes them, so they count toward every live length that spans
+   them. In SceneActorTarget_TryStimulusRoute two such insns in the tail made `object`'s
+   life 371 against `group`'s 345 (15 vs 14 refs), so group won sb; the helper form made
+   it 369 and the function matched. The same function wanted its masks loaded first
+   (`ldr r1, =0xFFFEBE3F` before the word load, `movs r0, #0x80; lsls` before the halfword
+   load), which a mask that reaches the store as a helper parameter or a block-scoped
+   `u32 mask` set before the call gives: `ClearFlags(&a->flags2CC, ~0x141C0)` and
+   `{ u32 mask = 0x200; SetHalfFlags(&a->flags2D4, mask); }`. `life NAME` flags a
+   halfword field insertion it counted ("deleted by combine").
 
 ## Survey: random table as a literal address (2026-10-24)
 

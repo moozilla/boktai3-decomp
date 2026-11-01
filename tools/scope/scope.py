@@ -1350,6 +1350,31 @@ def cmd_life(names, func):
             for ln in order:
                 print(f"  line {ln:4}: {len(by[ln]):3}  {' '.join(by[ln])}")
             print("  (* = mentions it; compare two drafts by variable name to see which line gained or lost insns)")
+            note = combine_dead_note([u for u, _ in ins], {u for u, _, _ in insn_list(wd, "combine")},
+                                     {u: r for u, _, r in insn_list(wd, "flow")}, lines)
+            if note:
+                print(note)
+
+
+def combine_dead_note(counted, after_combine, flow_rtl, lines):
+    """A struct halfword `|=`/`&=` expands as a field insertion, `(old & 0) | new`; its zero and second
+    ior reach flow, which counts them toward every life that spans them, and combine deletes them
+    after. In a priority swap those insns are life without code (README fact 34). COUNTED: the uids
+    flow counted toward one pseudo's life; AFTER_COMBINE: the uids still in combine's dump; FLOW_RTL:
+    uid -> rtl at flow. Names the lines with such a zero and how many of their counted insns go."""
+    if not after_combine:
+        return ""
+    gone = [u for u in counted if u in flow_rtl and u not in after_combine]
+    zero_lines = []
+    for u in gone:
+        if re.match(r"\(set \(reg:HI \d+\) \(const_int 0\)\)", flow_rtl[u]) and lines.get(u, 0) not in zero_lines:
+            zero_lines.append(lines.get(u, 0))
+    if not zero_lines:
+        return ""
+    per = ", ".join(f"line {ln} ({sum(1 for u in gone if lines.get(u, 0) == ln)})" for ln in zero_lines)
+    return (f"  halfword field insertion counted in this life, deleted by combine: {per}. A struct u16"
+            " `|=`/`&=` stores as `(old & 0) | new`; written through a `u16 *` (a helper's parameter)"
+            " it has none of these insns (README fact 34)")
 
 
 def alloc_table(wd, func):
