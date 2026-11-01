@@ -529,8 +529,8 @@ s32 FallingObjectManager_Update(struct FallingObjectManager *manager)
             continue;
         }
         if (p->animated)
-            p->animationDone = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&p->sprite,
-                                                           (struct DisplaySequenceState *)&p->anim);
+            p->animationDone =
+                PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&p->sprite, &p->anim);
         p->sprite.position = p->position;
         gUnk_08604ACC[p->type][p->state](p);
     }

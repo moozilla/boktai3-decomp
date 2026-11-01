@@ -9,7 +9,7 @@ struct ColliderSpriteObject {
     struct FallingVec position;
     u8 unknown14[0x28];
     struct FallingSprite sprite;
-    struct FallingAnim anim;
+    struct DisplaySequenceState anim;
     u8 unknown78[4];
     struct ColliderSpriteObject *next;
 };
@@ -30,8 +30,8 @@ s32 ColliderSpritePool_Update(struct ColliderSpritePool *pool)
             ColliderSprite_Destroy(p);
             continue;
         }
-        p->animationDone = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&p->sprite,
-                                                       (struct DisplaySequenceState *)&p->anim);
+        p->animationDone =
+            PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&p->sprite, &p->anim);
         p->sprite.position = p->position;
         Callback_InvokeActor(p, gUnk_08E879CC[p->type]);
     }
