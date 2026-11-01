@@ -97,6 +97,37 @@ class PreOrder(unittest.TestCase):
             text = "\n".join(s.pre_order_report(str(wd), "F", [100, 101], "f.c"))
             self.assertIn("already rise in ROM order", text)
 
+    def test_body_offset_loads(self):
+        # The body loads a large offset into a register before the add (two insns); an inline copy's
+        # add (insn/i) has the constant folded in, and small offsets are immediates: neither counts.
+        s = self.scope
+        with tempfile.TemporaryDirectory() as wd:
+            wd = Path(wd)
+            (wd / "u.i.addressof").write_text(
+                ';; Function F\n\n(note 9 8 10 ("f.c") 5)\n\n'
+                "(insn 10 9 11 (set (reg:SI 50)\n        (const_int 682)) -1 (nil)\n"
+                "    (expr_list:REG_EQUAL (const_int 682)\n        (nil)))\n\n"
+                "(insn 11 10 12 (set (reg:SI 51)\n        (plus:SI (reg/v:SI 22)\n"
+                "            (reg:SI 50))) -1 (nil)\n    (nil))\n\n"
+                "(insn/i 12 11 13 (set (reg:SI 52)\n        (const_int 690)) -1 (nil)\n    (nil))\n\n"
+                "(insn/i 13 12 14 (set (reg:SI 53)\n        (plus:SI (reg/v:SI 22)\n"
+                "            (reg:SI 52))) -1 (nil)\n    (nil))\n\n"
+                "(insn 14 13 15 (set (reg:SI 54)\n        (const_int 100)) -1 (nil)\n    (nil))\n\n"
+                "(insn 15 14 16 (set (reg:SI 55)\n        (plus:SI (reg/v:SI 22)\n"
+                "            (reg:SI 54))) -1 (nil)\n    (nil))\n\n"
+                '(note 16 15 17 ("f.c") 7)\n\n'
+                "(insn 17 16 18 (set (reg:SI 56)\n        (const_int 1680)) -1 (nil)\n    (nil))\n\n"
+                "(insn 18 17 19 (set (reg/v:SI 57)\n        (plus:SI (reg/v:SI 25)\n"
+                "            (reg:SI 56))) -1 (nil)\n    (nil))\n\n"
+                "(insn 19 18 20 (set (reg:SI 58)\n        (const_int 4096)) -1 (nil)\n    (nil))\n\n")
+            self.assertEqual(s.body_offset_loads(str(wd), "F"), {("f.c", 5): 1, ("f.c", 7): 1})
+            text = "\n".join(s.pre_n_levers(str(wd), "F", "f.c", 30, (20, 23)))
+            self.assertIn("loads 2 large field offset(s)", text)
+            self.assertIn("7 or more fewer", text)
+            self.assertIn("Lines: 5, 7", text)
+            self.assertEqual(s.pre_n_levers(str(wd), "F", "f.c", 30, (30, 33)), [])  # more insns: no lever
+            self.assertEqual(s.pre_n_levers(str(wd), "F", "g.c", 30, (20, 23)), [])  # another file's lines
+
 
 if __name__ == "__main__":
     unittest.main()
