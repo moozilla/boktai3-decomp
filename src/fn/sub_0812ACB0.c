@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 // scope: write LinkedEffect_FollowTarget here
 #include "global.h"
 #include "engine_globals.h"
@@ -76,14 +75,14 @@ static inline void Polar(struct Vec *out, u32 heading, u32 speed)
 
 static inline u16 RandomByte(void)
 {
-    u32 *seed = &gRandomIndex;
-    const u16 *table;
-    u32 index = (*seed + 1) & 1023;
-    u32 offset;
-    *seed = index;
-    offset = index << 1;
-    table = gRandomTable;
-    return (u8) * (const u16 *)(offset + (u32)table);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return (u8)((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+}
+
+static inline void LinkedEffect_TargetDelta(struct Vec *out, struct Sprite *sprite,
+                                            struct Effect *p)
+{
+    Vec_Subtract(out, &sprite->position, p->target);
 }
 
 void LinkedEffect_FollowTarget(struct Pool *poolArg, struct Effect *p)
@@ -98,12 +97,9 @@ void LinkedEffect_FollowTarget(struct Pool *poolArg, struct Effect *p)
         p->entered = 0;
     }
     if (p->ended) {
-        s32 value = RandomByte();
+        s16 value = RandomByte();
         if (value <= 63) {
-            const u16 *randomTable = gRandomTable;
-            void *resource = pool->resource;
-            asm("" : : "r"(randomTable));
-            Anim_SetSequence(sequence, resource, 21, 0, 0);
+            Anim_SetSequence(sequence, pool->resource, 21, 0, 0);
         } else if (value <= 77)
             Anim_SetSequence(sequence, pool->resource, 22, 0, 0);
         else
@@ -113,14 +109,12 @@ void LinkedEffect_FollowTarget(struct Pool *poolArg, struct Effect *p)
     if (!p->delay) {
         struct Vec delta;
         s32 turn;
-        Vec_Subtract(&delta, &sprite->position, p->target);
+        LinkedEffect_TargetDelta(&delta, sprite, p);
         turn = Math_Atan2(delta.x, delta.z) - p->heading;
         if (turn > 128)
             turn -= 256;
-        else if (turn < (-128)) {
-            register s32 wrap asm("r2") = 128;
-            turn += wrap << 1;
-        }
+        else if (turn < -128)
+            turn += 256;
         if (p->turnTimer) {
             s32 magnitude = turn;
             if (magnitude < 0)
