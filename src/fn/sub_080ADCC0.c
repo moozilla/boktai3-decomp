@@ -1,7 +1,7 @@
 // confidence=low: tentative Vorn behavior inferred from context and neighboring callbacks.
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_chase.h"
+#include "scene_actor_terrain.h"
 // confidence=low: tentative Vorn behavior role.
 // confidence=low: target distance controls approach, idle animation, and a delayed action.
 void Vorn_BroadcastPosition(void *);
@@ -16,21 +16,6 @@ static inline u8 Vorn_TestNear(struct VornPursuitContext *p, u32 mask, u16 **out
 {
     u16 *field = (u16 *)&p->flags;
     u32 value = *field & mask;
-    *out = field;
-    if (value)
-        return 1;
-    return 0;
-}
-static inline u8 Vorn_TestMiddle(struct VornPursuitContext *p, u32 mask, u16 **out)
-{
-    register u32 offset asm("r3");
-    register u16 *field asm("r1");
-    u32 bits = mask;
-    u32 value;
-    offset = 0x6D4;
-    asm("" : "+r"(offset));
-    field = (u16 *)((u8 *)p + offset);
-    value = *field & bits;
     *out = field;
     if (value)
         return 1;
@@ -97,27 +82,26 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
                     return;
                 {
                     struct ChaseTarget *target = (void *)actor->tracking.target;
-                    s32 cell = Chase_CellIndex(target->position.x >> 8, target->position.z >> 8);
-                    struct ContactPosition *p = &center;
-                    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
-                    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
-                    u8 *data;
-                    p->x = (x << 8) + 128;
-                    data = TerrainModifiers_FindCellOverride(cell, 1);
-                    if (data)
-                        data += 4;
-                    else
-                        data = gTerrainMap->cells + (cell * 4 + 12);
-                    p->y = (*data & 15) << 8;
-                    p->z = (z << 8) + 128;
+                    SceneActorTerrain_GetCenter(
+                        Chase_CellIndex(target->position.x >> 8, target->position.z >> 8), &center);
                 }
-                if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, &center))
-                    goto fail;
-                goto arrived;
+                if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position,
+                                    &center)) {
+                    Callback_InvokeActor(actor, *(void **)(group + 0x224));
+                    return;
+                }
+                SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
+                Chase_SetBehavior(actor, 15);
+                {
+                    s32 mask = ~2;
+                    mask &= *flags;
+                    *flags = mask;
+                }
+                context->farTimer = 0;
             }
         }
     } else {
-        near = Vorn_TestMiddle(context, 2, &flags);
+        near = Vorn_TestNear(context, 2, &flags);
         if (near) {
             actor->body.direction = actor->tracking.heading;
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -126,26 +110,14 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
                     return;
                 {
                     struct ChaseTarget *target = (void *)actor->tracking.target;
-                    s32 cell = Chase_CellIndex(target->position.x >> 8, target->position.z >> 8);
-                    struct ContactPosition *p = &center;
-                    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
-                    register s32 z asm("sb") = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
-                    u8 *data;
-                    p->x = (x << 8) + 128;
-                    data = TerrainModifiers_FindCellOverride(cell, 1);
-                    if (data)
-                        data += 4;
-                    else
-                        data = gTerrainMap->cells + (cell * 4 + 12);
-                    p->y = (*data & 15) << 8;
-                    p->z = (z << 8) + 128;
+                    SceneActorTerrain_GetCenter(
+                        Chase_CellIndex(target->position.x >> 8, target->position.z >> 8), &center);
                 }
-                if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, &center)) {
-                fail:
+                if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position,
+                                    &center)) {
                     Callback_InvokeActor(actor, *(void **)(group + 0x224));
                     return;
                 }
-            arrived:
                 SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
                 Chase_SetBehavior(actor, 15);
                 {

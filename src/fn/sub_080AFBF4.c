@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: repeats delayed animations before dispatching a context script.
 extern const u8 gUnk_0824E224[];
@@ -10,20 +9,7 @@ static inline u32 RetryDuration(void)
     u32 value;
     gRandomIndex = index;
     index *= 2;
-    value = *(const u16 *)(index + (u32)gRandomTable);
-    value &= 31;
-    return value + 10;
-}
-static inline u32 NextRetryDuration(void)
-{
-    u32 index = (gRandomIndex + 1) & 1023;
-    u32 value;
-    gRandomIndex = index;
-    index *= 2;
-    {
-        register const u16 *table asm("r2") = gRandomTable;
-        value = *(const u16 *)(index + (u32)table);
-    }
+    value = *(const u16 *)(index + RANDOM_TABLE_ADDR);
     value &= 31;
     return value + 10;
 }
@@ -42,7 +28,7 @@ void Vorn_UpdateAnimationRetries(struct SceneActorRegistryResetView *actor)
         if (*retries) {
             Chase_SetCtl(actor, SceneActor_UpdateDelayedAnimation, 0x24);
             --*retries;
-            context[0x697] = NextRetryDuration();
+            context[0x697] = RetryDuration();
             ++*(u16 *)(context + 0x694);
         } else {
             u16 *flags = (void *)((u8 *)actor->context + 0x6D4);

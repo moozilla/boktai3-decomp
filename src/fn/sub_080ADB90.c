@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 #include "scene_actor_control_phase.h"
 void sub_080B1FA8(void *);
@@ -12,6 +11,17 @@ static inline u8 Pending(u8 *context, u16 **out)
         return 1;
     return 0;
 }
+static inline void SetBehavior(struct SceneActorRegistryResetView *p, u32 b)
+{
+    p->state2A8 = 0;
+    p->phase2A9 = 0;
+    p->behavior2AA = b;
+    p->counter2AC = 0;
+    p->field2B1 = 1;
+}
+struct VornWaitTimer {
+    u16 value : 16;
+};
 // confidence=low: waits for pursuit distance or timeout before restoring behavior 15.
 #define Vorn_UpdatePursuitWait sub_080ADB90
 void Vorn_UpdatePursuitWait(struct SceneActorRegistryResetView *input)
@@ -23,61 +33,26 @@ void Vorn_UpdatePursuitWait(struct SceneActorRegistryResetView *input)
         *(u16 *)(context + 0x69C) = 0;
     } else if (Pending(context, &flags)) {
         if (*(u32 *)((u8 *)a + 0xF0) <= 0x18FFF) {
-            s32 mask;
-            register u8 zero asm("r2");
-            u32 wordZero;
-            u32 behavior;
-            register u32 offset asm("r5");
             sub_080B1FA8(a);
-            mask = ~2;
-            mask &= *flags;
-            zero = 0;
-            wordZero = 0;
-            *flags = mask;
-            behavior = 15;
-            offset = 0x2A8;
-            *((u8 *)a + offset) = zero;
-            offset++;
-            *((u8 *)a + offset) = zero;
-            a->behavior2AA = behavior;
-            offset += 3;
-            *(u32 *)((u8 *)a + offset) = wordZero;
-            asm volatile("" : "+r"(offset));
-            a->field2B1 = 1;
+            {
+                s32 mask = ~2;
+                ((struct ChaseFlags40 *)flags)->bits &= mask;
+            }
+            Chase_SetState(a, 0, 0, 15);
         } else {
-            u16 *timer;
-            u32 wordZero;
-            u8 zero;
-            u32 behavior;
-            {
-                u32 heading = *((u8 *)a + 0xE9);
-                u8 *direction = &a->body.direction;
-                register u32 initial asm("r2") = 0;
-                wordZero = initial;
-                *direction = heading;
-            }
+            struct VornWaitTimer *timer;
+            a->body.direction = *((u8 *)a + 0xE9);
             SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
-            {
-                u32 offset = 0x69C;
-                timer = (void *)(context + offset);
-            }
-            {
-                u32 value = *timer + 1;
-                zero = 0;
-                *timer = value;
-            }
-            if (*timer > 120) {
-                s32 mask;
+            timer = (void *)(context + 0x69C);
+            ++timer->value;
+            if (timer->value > 120) {
                 sub_080B1FA8(a);
-                mask = ~2;
-                *flags = mask & *flags;
-                behavior = 15;
-                a->state2A8 = zero;
-                a->phase2A9 = zero;
-                a->behavior2AA = behavior;
-                a->counter2AC = wordZero;
-                a->field2B1 = 1;
-                *timer = wordZero;
+                {
+                    s32 mask = ~2;
+                    ((struct ChaseFlags40 *)flags)->bits &= mask;
+                }
+                Chase_SetState(a, 0, 0, 15);
+                timer->value = 0;
             }
         }
     } else

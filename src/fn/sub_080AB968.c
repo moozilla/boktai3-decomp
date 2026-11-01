@@ -41,6 +41,15 @@ static inline void SetControl(struct SceneActorRegistryResetView *s, void *contr
     }
     s->word104 = zero;
 }
+static inline void SetState(struct SceneActorRegistryResetView *p, u32 b)
+{
+    u32 behavior = b;
+    p->state2A8 = 0;
+    p->phase2A9 = 0;
+    p->behavior2AA = behavior;
+    p->counter2AC = 0;
+    p->field2B1 = 1;
+}
 static inline s32 Abs(s32 x)
 {
     s32 r = x;
@@ -78,33 +87,10 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
     }
     TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
     if (s->field2B0) {
-        u32 zero;
         TentacleActor_SelectWanderRoute(s);
         SetControl(s, s->entryTarget228, 1);
-        zero = 0;
-        {
-            u32 phase = 2;
-            register u32 offset asm("r2") = 0x2a8;
-            *((u8 *)s + offset) = zero;
-            offset++;
-            *((u8 *)s + offset) = zero;
-            offset++;
-            *((u8 *)s + offset) = phase;
-            s->counter2AC = zero;
-            offset += 7;
-            {
-                register u8 *q asm("r0") = (u8 *)s + offset;
-                *q = 1;
-            }
-        }
+        SetState(s, 2);
     } else {
-        register u32 o asm("r0") = 0x2ac;
-        asm("" : "+r"(o));
-        {
-            register u32 *c asm("r1") = (u32 *)((u8 *)s + o);
-            u32 v = *c;
-            v++;
-            *c = v;
-        }
+        s->counter2AC++;
     }
 }
