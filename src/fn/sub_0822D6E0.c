@@ -1,6 +1,6 @@
-#include "global.h"
-u8 *Inventory_GetEquipmentEntry(void);
-u8 Inventory_GetEquipmentId(void)
+#include "scene_item_values.h"
+
+u32 Inventory_GetEquipmentId(u32 slot)
 {
-    return *Inventory_GetEquipmentEntry();
+    return Inventory_GetEquipmentEntry(slot)->kind;
 }

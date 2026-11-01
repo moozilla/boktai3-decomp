@@ -1,20 +1,9 @@
-#include "global.h"
-struct S {
-    u8 f[0x18];
-    u32 *p;
-    u8 g[0x20];
-    u32 a;
-    u32 b;
-    u32 c;
-    u32 d;
-    u32 e;
-};
-void sub_08110C9C(void *);
-s32 SceneTilemap_Update(struct S *s)
+#include "tilemap_panel.h"
+s32 SceneTilemap_Update(struct TilemapPanel *panel)
 {
-    s->e = s->c;
-    if (s->p != 0 && s->a != 1)
-        s->c = *s->p;
-    sub_08110C9C(s);
+    panel->scroll.previousX = panel->scroll.x;
+    if (panel->scrollSource && panel->atEnd != 1)
+        panel->scroll.x = *panel->scrollSource;
+    TilemapPanel_StreamColumns(panel);
     return 0;
 }

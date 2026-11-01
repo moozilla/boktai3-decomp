@@ -5,7 +5,7 @@
 
 struct ContactCollider {
     struct ContactCollider *next; /* intrusive collider-manager list link */
-    u8 unknown4[2];
+    u16 collisionId;
     u16 flags;
     u8 unknown8[2];
     u16 contactFlags; /* 0xA: bit four enables player cost processing */
@@ -21,7 +21,8 @@ struct ContactCollider {
     u8 costFlags;      /* 0x43: bit three latches quarter-cost adjustment */
     u16 responseValue; /* 0x44: copied to actor response state (tentative) */
     u8 responseFlags;  /* 0x46: edge-triggered player contact gates (tentative) */
-    u8 unknown47[9];
+    u8 unknown47[5];
+    void (*callback)(struct ContactCollider *, struct ContactCollider *, void *);
     void *owner; /* 0x50: callback owner */
 };
 

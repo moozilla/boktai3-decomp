@@ -20,7 +20,7 @@ import sys
 
 from merge_unit import items
 
-DEF = re.compile(r"^(static\s+)?([A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\))\s*\{", re.S)
+DEF = re.compile(r"^((?:inline\s+)?static\s+)?([A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\))\s*\{", re.S)
 
 
 def strip_comments(item):
@@ -76,7 +76,8 @@ def isolate(text, func, out, nonmatching):
             kept.append(m.group(2).strip() + ";")
             continue
         kept.append(item)
-    open(out, "w").write(split_decls("\n".join(kept) + "\n"))
+    with open(out, "w") as stream:
+        stream.write(split_decls("\n".join(kept) + "\n"))
 
 
 def ensure(src, func):

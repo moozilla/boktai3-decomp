@@ -12,13 +12,13 @@ struct ProximityPlayer {
     struct ContactPosition position;
 };
 s32 Nav_IsPositionInMesh(void *, void *, void *);
-u32 sub_0821F2EC(void *, void *, void *);
+u32 NavMesh_FindRoute(void *, void *, void *);
 u32 ProximityVolume_ContainsPlayer(struct ProximityVolume *volume)
 {
     struct ContactPosition *player = &(*(struct ProximityPlayer **)gPlayers)->position;
     void *bounds = volume->bounds;
     struct ContactPosition *position = &volume->position;
-    if (Nav_IsPositionInMesh(bounds, position, player) && sub_0821F2EC(bounds, position, player))
+    if (Nav_IsPositionInMesh(bounds, position, player) && NavMesh_FindRoute(bounds, position, player))
         return 1;
     return 0;
 }

@@ -36,9 +36,9 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
                     else
                         values[0] = 1;
                 } else
-                    values[0] = o->route[2];
-                values[1] = Load(&o->x);
-                values[2] = Load(&o->z);
+                    values[0] = o->route.pointIndex;
+                values[1] = Load(&o->body.position.x);
+                values[2] = Load(&o->body.position.z);
                 args.count = 3;
                 args.values = values;
                 Script_Call(o->script, &args);

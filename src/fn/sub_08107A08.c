@@ -21,7 +21,7 @@ struct TileTrigger {
     u8 forced, frame;
     s32 timer;
 };
-void sub_08106E98(struct TileTrigger *);
+void TileTrigger_ApplyContactEffects(struct TileTrigger *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequenceState *state,
@@ -167,7 +167,7 @@ void TileTrigger_StepActivation(struct TileTrigger *p)
         p->timer = 0;
         return;
     } else if (p->animation.index == 1) {
-        sub_08106E98(p);
+        TileTrigger_ApplyContactEffects(p);
     }
 tick:
     p->timer++;
@@ -200,7 +200,7 @@ void TileTrigger_StepRelease(struct TileTrigger *p)
         p->triggerFlags &= ~0x42;
         return;
     } else {
-        sub_08106E98(p);
+        TileTrigger_ApplyContactEffects(p);
     }
 tick:
     p->timer++;

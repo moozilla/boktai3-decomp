@@ -8,7 +8,7 @@ void Task_Kill(u8 *);
 void SceneCallbackPool_Update(void);
 void NativeEffect_DestroyManager(void);
 
-u8 *NativeEffect_EnsureManager(void)
+struct SceneCallbackPool *NativeEffect_EnsureManager(void)
 {
     u8 *p;
     if (gSceneCallbackPool != 0)
@@ -21,5 +21,5 @@ u8 *NativeEffect_EnsureManager(void)
             return 0;
         }
     }
-    return p;
+    return (struct SceneCallbackPool *)p;
 }

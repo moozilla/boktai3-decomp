@@ -31,7 +31,9 @@ struct BouncingContact {
     u8 unknown14[0x38 - 0x14];
     u32 flags;
 };
-extern void *gUnk_08605B6C[];
+extern const u8 gBouncingObjectBlinkDelays[4];
+typedef void (*BouncingObjectCallback)(struct BouncingPool *, struct BouncingObject *);
+extern BouncingObjectCallback const gBouncingObjectStateCallbacks[3];
 extern u32 gUnk_02000560;
 struct BouncingPool *BouncingObject_EnsurePool(void);
 void Shadow_Initialize(void *, struct ContactPosition *, s32);
@@ -45,4 +47,26 @@ void BouncingObject_ApplyContactImpulse(struct BouncingContact *, struct Bouncin
 void BouncingObject_HandleTimerContact(struct BouncingContact *, void *, struct BouncingObject *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 s32 Math_Atan2(s32, s32);
+
+static inline void BouncingObject_ReleaseSlot(struct BouncingObject *object)
+{
+    s8 *index;
+    {
+        struct BouncingPool *pool = gBouncingPool;
+        s32 id;
+        u32 *used;
+        index = &object->index;
+        id = *index;
+        used = &pool->used;
+        *used &= ~(1U << id);
+    }
+    object->state = 0;
+    Sprite_Remove(object);
+    Shadow_Destroy(object->registration);
+    Collider_Remove(&object->removalCollider);
+    *(u8 *)index = 255;
+    object->flags = 0;
+    object->timer = 0;
+}
+
 #endif

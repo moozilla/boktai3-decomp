@@ -1,23 +1,6 @@
-#include "global.h"
-struct LinkPalTarget {
-    u8 pad0[0xC];
-    u16 *palette;
-};
-struct LinkPlayerPalette {
-    u8 pad0[0xD4];
-    u16 *palette;
-    u8 padD8[0xA0];
-    struct LinkPalTarget *target;
-    u8 pad17C[0x1E4];
-    u16 base[16], work[16];
-    u8 pad3A0[0x79];
-    u8 alternate;
-    u8 pad41A[0x6AC];
-    u8 brightness;
-};
-// confidence=low: blends palette channels, preserving selected entries for the primary form.
-#define LinkPlayer_BlendPalette sub_08239848
-static inline u16 Blend(const u16 *source, const u16 *base, const u8 *brightnessPtr,
+#include "link_player_palette.h"
+
+static inline u16 BlendLinkColor(const u16 *source, const u16 *base, const u8 *brightnessPtr,
                         s32 sourceWeight, s32 baseWeight, s32 shift)
 {
     s32 r, g, b, brightness, red;
@@ -41,7 +24,7 @@ static inline u16 Blend(const u16 *source, const u16 *base, const u8 *brightness
     b = ((sourceWeight * b) + (baseWeight * bb)) >> shift;
     return ((b << 10) | (g << 5)) | r;
 }
-void LinkPlayer_BlendPalette(struct LinkPlayerPalette *p, const u16 *input, s32 sourceWeight,
+void LinkPlayer_BlendPalette(struct LinkPlayerFade *p, const u16 *input, s32 sourceWeight,
                              s32 baseWeight, s32 shift)
 {
     const u16 *source;
@@ -51,9 +34,9 @@ void LinkPlayer_BlendPalette(struct LinkPlayerPalette *p, const u16 *input, s32 
     const u8 *alternateBrightness;
     if (sourceWeight == 0) {
         if (!p->alternate)
-            p->palette = p->base;
+            p->palette = p->basePalette;
         else
-            p->target->palette = p->base;
+            p->target->palette = p->basePalette;
         return;
     }
     source = input;
@@ -61,28 +44,28 @@ void LinkPlayer_BlendPalette(struct LinkPlayerPalette *p, const u16 *input, s32 
         u16 **palette;
         i = 0;
         palette = &p->palette;
-        base = p->base;
+        base = p->basePalette;
         brightnessPtr = &p->brightness;
         for (; i <= 15; i++) {
             if (i == 5 || i == 6 || i == 13)
                 base[16] = *base;
             else
-                base[16] = Blend(source, base, brightnessPtr, sourceWeight, baseWeight, shift);
+                base[16] = BlendLinkColor(source, base, brightnessPtr, sourceWeight, baseWeight, shift);
             source++;
             base++;
         }
-        *palette = p->work;
+        *palette = p->workPalette;
     } else {
         i = 0;
         alternateBrightness = &p->brightness;
-        base = p->base;
+        base = p->basePalette;
         while (1) {
-            base[16] = Blend(source, base, alternateBrightness, sourceWeight, baseWeight, shift);
+            base[16] = BlendLinkColor(source, base, alternateBrightness, sourceWeight, baseWeight, shift);
             source++;
             base++;
             if (++i > 15)
                 break;
         }
-        p->target->palette = p->work;
+        p->target->palette = p->workPalette;
     }
 }
