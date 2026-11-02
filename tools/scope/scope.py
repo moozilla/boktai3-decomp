@@ -14,7 +14,8 @@
   scope.py FILE.c life NAME...  the insns flow counts toward a value's live length, by C line
   scope.py A.c vs B.c [FUNC]    two drafts' register allocation side by side (rank, priority, refs/live)
   scope.py FILE.c pins [FUNC]   cost of removing each pin / asm barrier of FUNC and its inline helpers, alone
-                                and grouped (all, per helper, per variable); writes FUNC.no_pins.c
+                                and grouped (all, per helper, per variable); writes FUNC.no_pins.c; with none,
+                                names the unit's do/while(0) statement macros FUNC uses
   scope.py census [CALLEE]      every pin/barrier in matched code grouped by the call it serves, with
                                 clean and draft sites of the same call: missing helpers show up as groups
   scope.py rom FUNC|ADDR        FUNC's ROM listing with calls and literal symbols named (no draft needed)
@@ -2004,6 +2005,22 @@ def flag_thread_hints(rows):
     return out
 
 
+def statement_macros(text, reach, starts):
+    """[(name, 1-based line)] for each `#define NAME(...) do {` macro the unit defines and uses inside
+    the functions REACH covers (the first use): the single-use statement macros CLAUDE.md counts as
+    a matching concession."""
+    out = []
+    for m in re.finditer(r"^#define\s+(\w+)\([^)]*\)\s*\\?\s*\n?\s*do\s*\{", text, re.M):
+        name = m.group(1)
+        for u in re.finditer(r"\b%s\s*\(" % re.escape(name), text):
+            if u.start() == m.start(1):
+                continue
+            if not reach or any(a <= u.start() < b for a, b in reach.values()):
+                out.append((name, text.count("\n", 0, u.start()) + 1))
+                break
+    return out
+
+
 def cross_merges(stderr, func):
     """[(jump, target, first, first_target)]: jump2's cross-jumps in FUNC, from AGBCC_CROSS_TRACE.
     JUMP's tail from FIRST on is replaced by a jump to FIRST_TARGET, the same code before TARGET
@@ -3568,6 +3585,15 @@ def cmd_pins(src, func, env):
         print(f"{src}: no register pins or empty asm barriers in {func} or the inline helpers it reaches"
               + note_others)
         header_pins(text, reach, func)
+        macros = statement_macros(text, reach, starts)
+        if macros:
+            print("  statement macros (do/while(0) bodies), a concession too: "
+                  + ", ".join(f"{name} (line {use})" for name, use in macros)
+                  + ". Write their statements in place. The loop each makes weights every mention inside it"
+                  " twice in flow's refs (loop_depth), so a value one sets or reads can lose priority without"
+                  " it: `life NAME` counts mentions in a loop, and `FILE.c vs MACRO.c` shows whose rank moved;"
+                  " give that value its extra mention in ordinary C (Spider_BeginPlayerPursuit: its mask clear"
+                  " written in both failure branches)")
         return 0
     base = run(text, "base")
     print(f"{func}: {show(base)} with all {len(sites)} concessions"
@@ -7209,7 +7235,7 @@ def validate_cli(args):
         cli_error("FILE.c [FUNC] [KNOB=V...]")
 
 
-FUNC_LAST_COMMANDS = ("vs", "insn", "uses", "life", "put")
+FUNC_LAST_COMMANDS = ("vs", "insn", "uses", "life", "put", "pins")
 
 
 def func_first_args(args):

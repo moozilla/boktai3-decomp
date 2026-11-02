@@ -134,7 +134,8 @@ python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a
 python3 tools/scope/scope.py FILE.c pre           gcse's PRE replacements by expression: C names, pool values, where
                                                   it is computed and inserted, the lines replaced, AGBCC_NOPRE=k scores
 python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
-python3 tools/scope/scope.py FILE.c pins [FUNC]   FUNC's pins / barriers (and its inline helpers'): each alone, grouped, all; greedy removal
+python3 tools/scope/scope.py FILE.c pins [FUNC]   FUNC's pins / barriers (and its inline helpers'): each alone, grouped, all; greedy removal;
+                                                  with none, the do/while(0) statement macros FUNC uses (their loop doubles flow's refs)
 python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or `try KNOB={a,b}`: one variant per knob value), best first (by shape distance), ~12 ms each
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
