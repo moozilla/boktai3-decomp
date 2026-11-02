@@ -191,8 +191,6 @@ void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)
     p->noise = 0;
 }
 
-// The task callback returns the tilemap loader's r0 (engine.h declares it void).
-extern int BgGfx_LoadTilemapResult(u32, u32, u32, u32, u32) asm("BgGfx_LoadTilemapSimple");
 int StatusScreen_Update(struct StatusScreen *p)
 {
     int zero;
@@ -208,7 +206,7 @@ int StatusScreen_Update(struct StatusScreen *p)
         p->active = next;
     }
     StatusScreen_RefreshDirtyDisplays(p);
-    return BgGfx_LoadTilemapResult(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
 }
 
 // This callback preserves the BIOS wrapper's r0 result on return.
