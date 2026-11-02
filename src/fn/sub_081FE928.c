@@ -1,6 +1,6 @@
-#include "global.h"
+#include "sun_orb_effect.h"
 
-void SunOrb_SetUpdateCallback(u8 *p, u32 a)
+void SunOrb_SetUpdateCallback(struct OrbitEffectParams *params, OrbitEffectCallback callback)
 {
-    *(u32 *)(p + 0x1C) = a;
+    params->callback = callback;
 }
