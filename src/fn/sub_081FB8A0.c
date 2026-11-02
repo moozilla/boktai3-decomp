@@ -4,7 +4,7 @@
 struct Particle {
     u32 age;
     u8 pad4[8];
-    s16 vx, vy, vz, padE;
+    struct ContactPosition velocity;
     u8 pad14[2];
     u16 lifespan;
     u8 pad18[2];
@@ -62,22 +62,22 @@ s32 Ratatosk_UpdateParticlePool(struct ParticlePool *aIn)
             if (sub_08249240(e, (void *)i, *(void **)(cfg + 0x10)) == 1) {
                 RatatoskParticle_Remove(a, e, i);
             } else {
-                u32 active = *(volatile u32 *)&e->flags & 1;
-                s16 *vel = &e->vx;
+                u32 active = e->flags & 1;
+                s16 *vel = &e->velocity.x;
                 if (active) {
-                    s16 *dst = vel;
+                    struct ContactPosition *dst = &e->velocity;
                     s32 angle = *(s8 *)(cfg + 6);
                     s32 speed = *(s32 *)(cfg + 8);
                     s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
                     s32 zero = 0;
-                    dst[0] = x;
-                    dst[1] = zero;
-                    dst[2] = Scale(gUnk_086149C4[angle & 255] * speed);
+                    dst->x = x;
+                    dst->y = zero;
+                    dst->z = Scale(gUnk_086149C4[angle & 255] * speed);
                     ClearFlags(~1, e);
                 }
                 {
                     struct ContactPosition *pos = &sprite->position;
-                    sprite->position.x += e->vx;
+                    sprite->position.x += e->velocity.x;
                     {
                         s16 *v = vel;
                         pos->y += v[1];
