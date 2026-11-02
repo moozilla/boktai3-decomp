@@ -58,13 +58,11 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
             *field = state;
             {
                 register u32 phaseOffset asm("r3") = 0x2A9;
-                asm("" : : "r"(phaseOffset));
                 field = (u8 *)actor + phaseOffset;
             }
             *field = zero;
             {
                 register u32 behaviorOffset asm("r1") = 0x2AA;
-                asm("" : : "r"(behaviorOffset));
                 field = (u8 *)actor + behaviorOffset;
             }
             *field = zero;
