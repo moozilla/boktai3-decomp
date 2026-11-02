@@ -138,7 +138,7 @@ function describe(n: DecompNode): string {
   if (n.fn) {
     const f = n.fn
     const state =
-      f.pct >= 100 ? (f.pinned ? 'matched, register-pinned' : 'matched') : f.pct > 0 ? `draft at ${f.pct}%` : 'not started'
+      f.pinned ? `matched with concessions (${f.pct}% of lines free of them)` : f.pct >= 100 ? 'matched' : f.pct > 0 ? `draft at ${f.pct}%` : 'not started'
     return `${state} · ${fmt(n.bytes)} bytes · 0x${f.address}`
   }
   const left = n.total - n.done
@@ -170,7 +170,7 @@ export const register: Register = on => {
   on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
     const engine = await next(e)
     const { Box, Button } = $.ui.resolve(e)
-    const label = snapshot ? `◔ ${snapshot.pct.toFixed(2)}%` : '◔ decomp'
+    const label = snapshot ? `◔ ${snapshot.cleanPct.toFixed(2)}%` : '◔ decomp'
 
     return (
       <Box flexDirection="row" gap={1} alignItems="center">
@@ -246,7 +246,7 @@ export const register: Register = on => {
               { pct: pinned, color: PINNED },
             ])}
             <Text dimColor wrap="truncate">
-              {`${fmt(snap.fnDone)} of ${fmt(snap.fnTotal)} functions · ${snap.cleanPct.toFixed(1)}% without pins · ${snap.drafts.count} drafts`}
+              {`${fmt(snap.fnDone)} of ${fmt(snap.fnTotal)} functions · ${snap.cleanPct.toFixed(1)}% without concessions · ${snap.drafts.count} drafts`}
             </Text>
           </Box>
           <Box flexDirection="column">
@@ -325,7 +325,7 @@ export const register: Register = on => {
             </Box>
             <Text dimColor wrap="truncate">
               {isFunctions
-                ? 'Green matched · teal pinned · amber drafts · grey assembly. Click one to see its C.'
+                ? 'Green matched · teal matched with concessions · amber drafts · grey assembly. Click one to see its C.'
                 : 'Sized by bytes, blue deepens as it matches, green is done. Click to zoom in.'}
             </Text>
           </Box>

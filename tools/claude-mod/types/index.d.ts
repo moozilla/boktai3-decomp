@@ -47,7 +47,7 @@ export type DecompSnapshot = {
 }
 
 
-/** One function of PROGRESS.json: name, address, bytes, percent, pinned, file, and its name in the C file when that differs. */
+/** One function of PROGRESS.json: name, address, bytes, percent (the decomp.dev score: 100 only with no concession), pinned (matched with concessions), file, and its name in the C file when that differs. */
 export type DecompTreeFunction = [string, string, number, number, number, number, string?]
 
 export type DecompTree = {

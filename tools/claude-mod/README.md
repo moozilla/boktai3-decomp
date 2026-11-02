@@ -1,10 +1,10 @@
 # decomp-progress
 
-A Claude Code mod that puts a small `◔ 66.64%` button in the prompt footer, beside
+A Claude Code mod that puts a small `◔ 84.10%` button (code matched without concessions) in the prompt footer, beside
 the mode labels. Clicking it (or typing `/decomp`) opens a popup with the Boktai 3
 decomp's progress, in three tabs:
 
-* **Overview**: the headline with its bar (clean and register-pinned), then one bar
+* **Overview**: the headline with its bar (without concessions, and with them), then one bar
   per category. Click a category to open it in the treemap.
 * **Treemap**: one level at a time, like decomp.dev: categories, then a category's
   units, then a unit's functions. Tiles are sized by bytes; click one to zoom in, and

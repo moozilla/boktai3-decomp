@@ -292,6 +292,8 @@ def nonmatching_func(src):
     body = m.group(1) if m else text  # a matched file: its last non-inline, non-static definition
     defs = re.findall(r"^[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", body, re.M)
     defs = [d for d in defs if not re.search(r"\b(inline|static)\b.*\b" + d + r"\b", body)]
+    if not m and len(defs) > 1 and last_func() in defs:
+        return last_func()  # a matched unit: the function `scope.py FILE FUNC` looked at last
     return defs[-1] if defs else None
 
 
@@ -3437,7 +3439,7 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
           " removes them")
     print("      a tail that several branches jump to may be one the C writes in each branch (an inline"
           " helper: fact 55 keeps its field addresses apart); jump2 merges the copies after reload, and"
-          " each copy's reload choices still count (README fact 58)")
+          " each copy's reload choices still count (README fact 59)")
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')

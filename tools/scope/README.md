@@ -191,7 +191,9 @@ alone. `transforms/random_table_literal.py` writes `gUnk_0203B400` as the
 integer address (see the literal survey below).
 
 `why UID` recompiles with `CSE_WHY=UID CSE_DEBUG=1 CSE_PATHS=1` and
-`AGBCC_DUMPPRI`, and prints in ~10 lines:
+`AGBCC_DUMPPRI`, and prints in ~10 lines (in a matched
+unit with several functions and no FUNC named, the function `scope.py FILE FUNC` compiled
+last; before, it fell to the file's last definition and explained an unrelated insn):
 
 * the ROM and draft instruction, and which pseudo holds the differing register
   (operands matched by position between the lreg dump and the same insn after
@@ -1379,7 +1381,21 @@ Each was read from the compiler source and confirmed on a live draft.
    kept the test alive. When the ROM tests a value it never uses, write an if whose arms differ
    only in type.
 
-58. **Reload's spill choices come before jump2's cross-jumping, so a merged tail still counts.**
+58. **A store through a pointer local stays `[rN]` only after a join; the arms that feed it need
+   two statements.** cse prefers `(plus p K)` to a register as an address (ARM's ADDRESS_COST
+   rates PLUS cheaper than REG), so `*angle = ...` with `u8 *angle = &p->angle` becomes
+   `strb r0, [r5, #2]` wherever cse's path from the definition reaches it. The three homing
+   drifts store `[r6]`, and both arms of the turn cross-jump into one store, so the original stored
+   once after the clamp's if/else, in a block whose label has two predecessors, where cse starts
+   with an empty table. `u32 next; if (...) next = p->angle + d; else next = p->angle + 4;` is
+   turned by jump.c into `next = p->angle + 4; if (...) next = p->angle + d;` (the
+   conditional-move rewrite of a single set in each arm, born "jump" in scope). A `u8 next`
+   blocks that but adds `lsls/lsrs #24`. `next -= d` after `next = p->angle` keeps a copy. What
+   matched in EffectParticle_UpdateDriftAroundActor, DriftBeforeHoming and Dissipating (8 + 5 + 1
+   pins out) was `if (|d| <= 4) { next = p->angle; next += d; } else next = p->angle + 4;
+   *angle = next;`. A two-insn arm is not a single set, so jump.c leaves the if alone, and combine
+   folds the copy inside its block.
+59. **Reload's spill choices come before jump2's cross-jumping, so a merged tail still counts.**
    Reload hands out spill registers round-robin (fact 8) and jump2 cross-jumps identical tails
    only afterwards. A tail the C writes in two branches leaves one copy in the ROM, but reload
    made the first copy's choices too. In SceneInventory_HandlePageKeys the ROM's R branch takes r2

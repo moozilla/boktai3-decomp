@@ -1,6 +1,7 @@
 #ifndef GUARD_SPRITE_EFFECT_PLAYBACK_H
 #define GUARD_SPRITE_EFFECT_PLAYBACK_H
 #include "sprite_effect_controller.h"
+#include "display_sequence_inline.h"
 /* Packed sequence playback for the two drawable variants. Sequence sprites
  * cache frame weight and clamp zero delay to one; tile sprites do neither. */
 static inline u32 SpriteEffectController_StepDrawable(struct SpriteEffectController *controller,
@@ -11,7 +12,7 @@ static inline u32 SpriteEffectController_StepDrawable(struct SpriteEffectControl
     struct DisplaySequenceState *state = (struct DisplaySequenceState *)prefix;
     struct SpriteEffectDrawablePrefix *drawable = raw;
     const struct SpriteEffectTileResource *graphics;
-    const volatile u16 *command; /* preserve observed packed-command reads */
+    const u16 *command;
     u32 ended;
     if (!sequenceMode)
         graphics = ((struct SpriteEffectTileDrawable *)raw)->graphics;
@@ -74,12 +75,12 @@ static inline u32 SpriteEffectController_StepDrawable(struct SpriteEffectControl
         }
         command = state->commands + state->index;
         if (sequenceMode) {
-            state->frameWeight = *command & 15;
+            state->frameWeight = DisplaySequence_MaskCommand(*command, 15);
             state->duration = (state->frameWeight * (s32)state->speed) >> 6;
             if (state->duration == 0)
                 state->duration = 1;
         } else
-            state->duration = ((*command & 15) * (s32)state->speed) >> 6;
+            state->duration = ((s32)DisplaySequence_MaskCommand(*command, 15) * state->speed) >> 6;
     } else {
         ended = 0;
     }
