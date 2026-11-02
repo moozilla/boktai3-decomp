@@ -149,8 +149,8 @@ that is a scope gap: record it (below) so the tool gets better.
   in `asm()`** and no compiler overrides, ever: scope's knobs (`AGBCC_PRI`, `AGBCC_SPILL`,
   ...) find a mechanism, and the landed C must match without them. Register pins and empty
   `asm("")` barriers only as above, with `--allow-pins`; the unit carries
-  `// MATCHING_CONCESSION: register-pinning` and `progress.py` reports it as
-  Register-pinned. Take pins out of a unit you touch.
+  `// MATCHING_CONCESSION: register-pinning` and `progress.py` reports it under
+  With concessions. Take pins out of a unit you touch.
 * An empty `do { } while (0);`, or `DEBUG_NOP()` (`include/global.h`), which expands to one, counts as a barrier. Its loop notes end the first cse pass
   and weight register refs the way a barrier does. A statement macro wrapped in
   `do { ... } while (0)` with a body is ordinary C only when the original plausibly had
@@ -167,6 +167,20 @@ that is a scope gap: record it (below) so the tool gets better.
   plausibly logged something: the condition is a call or a test worth reporting. An `if`
   with a bare empty body (`{ }` or `;`) is a fence; the tools count it as a barrier and
   land refuses it without `--allow-pins`.
+* `tools/concessions.py` is the list of concession kinds the tools count; `progress.py`,
+  `scope.py land` and decomp.dev all read it. Besides the forms above it counts a volatile local
+  (`volatile u32 zero`, `T *volatile p`, `*(volatile T *)&x`), a second prototype for a
+  function through `extern ... asm("Symbol")`, and a `// CFLAGS:` line other than the default
+  flags. A function with any concession scores the share of its lines without one, so it
+  counts as matched on decomp.dev only when it has none.
+* The judgment-call kinds (`debug-nop`, `empty-loop`, `empty-if`, `single-use-macro`,
+  `volatile`, `alias`, `cflags`) can be excused where the original plausibly had them, like a
+  linter exception: a comment on the same line, or alone on the line above, naming the kind
+  and the reason, e.g. `DEBUG_NOP();  // concession-ok(debug-nop): <evidence the original had
+  a compiled-out hook here>`. Pins and asm barriers can never be excused.
+  tests/test_concessions.py rejects an allow comment with no reason, an unknown kind or
+  nothing to excuse. Give real evidence (the same hook in every twin, a debug string nearby),
+  not "it matches".
 * A `goto` loop is ordinary C, accepted for now where loop.c would rewrite the structured
   form (a counter reversed to count down, for example); phase 4 revisits them. So is a
   non-void function that falls off the end, leaving its argument in r0, when the ROM does

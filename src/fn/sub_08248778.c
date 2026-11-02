@@ -1,3 +1,4 @@
+// concession-ok(cflags): SDK EEPROM driver, built at -O1 as the SDK built its save-memory objects
 // CFLAGS: -O1 -mthumb-interwork
 #include "global.h"
 #include "ram.h"
