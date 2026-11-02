@@ -27,7 +27,7 @@ static inline s32 Player_ScaleForce(s32 value)
 void Player_ApplyDirectionalForce(struct Player *p)
 {
     s32 x, direction;
-    register s32 z asm("r2");
+    s32 z;
     if (p->tetherMode == 4)
         return;
     if (p && Player_IsActiveInSceneFive(p))
@@ -45,11 +45,11 @@ void Player_ApplyDirectionalForce(struct Player *p)
     z = gSineTable[direction & 255];
     {
         s32 scaledX;
-        scaledX = Player_ScaleForce(gPlayerBackgroundState * x);
+        scaledX = Player_ScaleForce(x * gPlayerBackgroundState);
         p->velocityX -= scaledX;
     }
     {
-        s32 scaledZ = Player_ScaleForce(gPlayerBackgroundState * z);
+        s32 scaledZ = Player_ScaleForce(z * gPlayerBackgroundState);
         p->velocityZ -= scaledZ;
     }
 }
