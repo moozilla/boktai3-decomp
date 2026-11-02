@@ -419,7 +419,7 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     COUNT(0x87C);
     COUNT(0x538);
     RecordKill(actor, categoryp);
-    sub_08159164(*(u32 *)((u8 *)actor + 0xAC));
+    sub_08159164(actor->fieldAC);
     Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
     if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->body.id);
