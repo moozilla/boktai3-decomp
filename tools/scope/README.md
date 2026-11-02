@@ -391,6 +391,9 @@ asm barriers to the compiled code (drafts don't count) unless given
 end. Then it adds or removes the concession marker, runs clang-format, and
 checks every C function in the landed file (restoring everything on a
 failure). With `--name` it renames, and with `--rom` it builds the ROM.
+A function that matches already (a phase-3 depin: `land FUNC unit-copy.c`, a copy of its unit with
+FUNC rewritten) lands back in the unit that defines it, replacing its current C; outside FUNC the copy
+must equal the unit as it is now. Before 2026-11-01 such a rewrite went to a new src/fn file.
 `--nonmatching` lands an unfinished draft for phase 1: the definition goes
 under `#ifdef NONMATCHING` with its `// fuzzy:` line (check.py's figure,
 which progress.py reads) and scope's shape distance, and `INCLUDE_ASM` stays
