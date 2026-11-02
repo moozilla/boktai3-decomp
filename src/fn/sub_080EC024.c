@@ -1,7 +1,19 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
+
+/* The target handle starts twelve bytes before the player's position. */
+struct ScenePlayerTargetView {
+    u8 unknown0[0x24];
+    struct {
+        u8 unknown0[0xC];
+        struct ContactPosition position;
+    } target;
+};
+union ScenePlayerSlot {
+    struct Player *player;
+    struct ScenePlayerTargetView *tracking;
+};
 
 extern u8 *gUnknown_02000580[];
 static inline void SubtractPosition(s16 *delta, const struct SceneVec *a,
@@ -18,7 +30,7 @@ void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *acto
 
     u32 flags;
     s16 delta[4];
-    struct Player *volatile *players;
+    union ScenePlayerSlot *players;
     struct ContactPosition *position;
     s32 count;
     u32 excluded;
@@ -37,17 +49,17 @@ void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *acto
     excluded = 0x1000;
     difference = delta;
     position = &actor->body.position;
-    players = gPlayers;
+    players = (union ScenePlayerSlot *)gPlayers;
     count = 0;
     do {
-        struct Player *player = *players;
+        struct Player *player = players->player;
         if (player && !(player->statusFlags & excluded)) {
             s32 distance;
             SubtractPosition(difference, &player->position, position);
             distance = difference[0] * difference[0] + difference[2] * difference[2];
             if (limit > distance) {
                 limit = distance;
-                result = (u8 *)*players + 0x24;
+                result = &players->tracking->target;
             }
         }
         players++;
