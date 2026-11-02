@@ -139,7 +139,7 @@ void SceneCharacter_UpdatePathWaitState(struct Context *m, struct Actor *p)
     int close;
     void *path = p->path;
     int nextState;
-    register int zero asm("r1");
+    int zero;
     if (p->entered) {
         int zero = 0;
         p->entered = zero;
@@ -173,8 +173,8 @@ void SceneCharacter_UpdatePathWaitState(struct Context *m, struct Actor *p)
                 zero = 0;
                 p->state = nextState;
                 p->ticks = zero;
-                asm volatile("" : "+r"(zero) : "r"(nextState));
-                goto entered;
+                p->entered = 1;
+                goto done;
             }
         }
     checkPhase:
@@ -190,9 +190,7 @@ void SceneCharacter_UpdatePathWaitState(struct Context *m, struct Actor *p)
         state13:
             nextState = 13;
             zero = 0;
-            p->state = nextState;
-            p->ticks = zero;
-            goto entered;
+            goto changeState;
         }
     }
 afterPhase:
@@ -205,12 +203,9 @@ afterPhase:
         *dst = state;
         p->state = 10;
         p->ticks = zero;
-    } else
-        goto pathUpdate;
-entered:
-    p->entered = 1;
-    goto done;
-pathUpdate:
+        p->entered = 1;
+        goto done;
+    }
     if (p->pathId >= 0) {
         u16 *timer = &p->nodeId;
         register int count asm("r5") = *timer;
@@ -223,5 +218,10 @@ pathUpdate:
             (*timer)--;
     }
     p->ticks++;
+    goto done;
+changeState:
+    p->state = nextState;
+    p->ticks = zero;
+    p->entered = 1;
 done:;
 }
