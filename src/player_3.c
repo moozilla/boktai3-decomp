@@ -711,9 +711,9 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
                 *resource -= gGameState->unk876;
         }
         mode = 6;
-        *(u16 *)((u8 *)p + 0xAD0) = 64;
+        p->contactFlashTimer = 64;
     } else {
-        u16 *timer = (u16 *)((u8 *)p + 0xAD0);
+        u16 *timer = &p->contactFlashTimer;
         if (*timer) {
             if ((*timer >> 2) & 1)
                 mode = 6;
@@ -725,7 +725,7 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
             case 0:
                 if ((u8)(p->actionMode - 1) <= 1) {
                     p->scriptStatus[0] = 0;
-                    *(u16 *)((u8 *)p + 0xACE) = 0;
+                    p->scriptFlashTimer = 0;
                 } else if (p->scriptStatus[0]) {
                     if (p->kind & 1) {
                         p->scriptStatus[0]--;
@@ -734,9 +734,9 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
                                                     (u8 *)p + 0xAFC);
                     }
                     mode = 2;
-                    *(u16 *)((u8 *)p + 0xACE) = 64;
+                    p->scriptFlashTimer = 64;
                 } else {
-                    u16 *timer = (u16 *)((u8 *)p + 0xACE);
+                    u16 *timer = &p->scriptFlashTimer;
                     if (*timer) {
                         if ((*timer >> 2) & 1)
                             mode = 2;
