@@ -1,20 +1,21 @@
-#include "global.h"
+#include "transient_sprite_pool.h"
 #include "render.h"
 #include "ram.h"
-/* Tentative: allocate a transient sprite from the pool, copy render state into it and link it into the draw list. */
 // MATCHING_CONCESSION: register-pinning
-u8 *SpritePool_CreateSingleton(void);
-u8 *TransientSpritePool_FindFreeSlot(u8 *);
+void *SpritePool_CreateSingleton(void);
 void Sprite_CopyRenderState(void *, void *, void *, void *);
-void Sprite_LinkToList(void *, u32);
+s32 Sprite_LinkToList(void *, u32);
 
-u8 *TransientSprite_Spawn(void *a, void *b, u32 id, u32 flags, s32 palette, u8 *override)
+struct TemporarySpriteSlot *TransientSprite_Spawn(struct DisplaySequenceSprite *source,
+                                                  struct TransientSpriteGraphics *graphics,
+                                                  u32 lifetime, u32 flags, s32 palette,
+                                                  u8 *override)
 {
-    u8 *slot;
-    u8 *sprite;
-    u8 *extra;
-    u8 *q;
-    u8 *pool = gTransientSpritePool;
+    struct TemporarySpriteSlot *slot;
+    struct DisplaySequenceSprite *sprite;
+    struct TransientSpriteGraphics *extra;
+    u8 *colors;
+    struct TemporarySpritePool *pool = (void *)gTransientSpritePool;
     if (pool == 0) {
         pool = SpritePool_CreateSingleton();
         if (pool == 0)
@@ -23,27 +24,27 @@ u8 *TransientSprite_Spawn(void *a, void *b, u32 id, u32 flags, s32 palette, u8 *
     slot = TransientSpritePool_FindFreeSlot(pool);
     if (slot == 0)
         return 0;
-    sprite = slot + 4;
-    extra = slot + 0x30;
-    Sprite_CopyRenderState(sprite, a, extra, b);
-    *(u32 *)sprite |= flags;
+    sprite = &slot->sprite;
+    extra = &slot->graphics;
+    Sprite_CopyRenderState(sprite, source, extra, graphics);
+    sprite->flags |= flags;
     if (palette > 0) {
-        *(u16 *)(extra + 6) = palette;
-        q = override;
-        if (q == 0)
-            q = gPaletteBankData + (palette << 5);
-        *(u8 **)(extra + 0xC) = q;
+        extra->paletteIndex = palette;
+        colors = override;
+        if (colors == 0)
+            colors = gPaletteBankData + (palette << 5);
+        extra->palette = colors;
     }
-    if (*(u32 *)sprite & 0x80)
+    if (sprite->flags & 0x80)
         Sprite_LinkToList(sprite, 1);
     else
         Sprite_LinkToList(sprite, 0);
     {
-        register u16 *ip asm("r1") = (u16 *)&id;
+        register u16 *ip asm("r1") = (u16 *)&lifetime;
         register u16 v asm("r1");
         v = *ip;
-        *(u16 *)(slot + 2) = v;
+        *(u16 *)&slot->lifetime = v;
     }
-    *slot = 1;
+    slot->active = 1;
     return slot;
 }
