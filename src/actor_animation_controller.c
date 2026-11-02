@@ -3246,14 +3246,12 @@ void Actor_UpdateRotatingAnimation3(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation4(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 4;
@@ -3294,8 +3292,7 @@ void Actor_UpdateRotatingAnimation4(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
