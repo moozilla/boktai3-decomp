@@ -7,6 +7,10 @@ Each tests/fix/FUNC.c is a draft as a worker left it (before the edit that
 matched), named after the function. A change to fix.py, spellings.py or
 rewrites.py should keep every one matching; the compile counts show whether
 the search got cheaper or dearer.
+
+A case is a snapshot against the headers of its day. When a later rename leaves it unable to
+compile, the suite reports it as stale: update the draft to today's names or delete it (its
+function already matches on main).
 """
 import glob
 import os
@@ -30,7 +34,8 @@ def main():
         t0 = time.time()
         rc, path, compiles = fix.run(p, func, depth=6, log=lambda *a: None)
         ok += rc == 0
-        print(f"{'MATCH' if rc == 0 else 'no   '} {func:28} {len(path)} edits {compiles:5} compiles "
+        state = "MATCH" if rc == 0 else "stale" if not compiles else "no   "
+        print(f"{state} {func:28} {len(path)} edits {compiles:5} compiles "
               f"{time.time() - t0:5.1f} s  {'; '.join(path)[:90]}")
     print(f"{ok}/{len(paths)} matched")
     return 0 if ok == len(paths) else 1
