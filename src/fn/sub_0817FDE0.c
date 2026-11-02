@@ -1,5 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "game_state.h"
+#include "render.h"
+#include "ram.h"
+#include "player.h"
 
 struct FDE0Header {
     u32 w[8];
@@ -56,12 +59,6 @@ struct CameraSetup {
     u8 pad0[0x10];
     u32 timer;
     u32 distance;
-};
-struct BossContext {
-    u8 pad0[0x30];
-    s16 x, y, z;
-    u8 pad36[0x832];
-    u32 flags;
 };
 struct BossInit {
     u8 pad0[0x48];
@@ -166,12 +163,12 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     } pos;
     s32 mode;
     s32 count;
-    register s32 i asm("r4");
-    s32 sl;
+    s32 i;
+    s32 initialHealth;
     u32 flags;
     u8 *res;
     u32 *dst;
-    u32 *src;
+    struct Player **src;
     u8 *targets;
     u32 *cameraTarget;
     u8 *volumePosition;
@@ -179,8 +176,8 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     struct BossInit *actor = boss;
 
     {
-        struct BossContext *gp = *(struct BossContext **)0x02000710;
-        gp->flags |= 0x400;
+        struct GameState *gp = gGameState;
+        gp->flags868 |= 0x400;
     }
 
     mode = Script_GetKeywordValue(0x74, 2);
@@ -192,15 +189,15 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     count = Script_GetKeywordValue(0x50, 1);
     boss->targetCount = count;
     i = 0;
-    if (i < boss->targetCount) {
+    if (i < count) {
         targets = &boss->targetCount;
         dst = boss->targets;
-        src = (u32 *)0x02000580;
+        src = gPlayers;
         do {
-            if (*src != 0) {
-                u32 value = *src;
-                dst[0] = value;
-                dst[1] = value + 0x30;
+            struct Player *player = *src;
+            if (player) {
+                dst[0] = (u32)player;
+                dst[1] = (u32)&player->position;
             } else {
                 dst[0] = 0;
                 dst[1] = 0;
@@ -223,21 +220,21 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
         pos.z = Script_GetValue();
         flags = ((Script_GetValue() << 29) + 0xA0000000u) >> 24;
     } else {
-        struct BossContext *gp = *(struct BossContext **)0x02000710;
-        pos.x = gp->x;
-        pos.y = gp->y;
-        pos.z = gp->z;
+        struct GameState *gp = gGameState;
+        pos.x = gp->positionX;
+        pos.y = gp->positionY;
+        pos.z = gp->positionZ;
         flags = 0x40;
     }
     boss->floorHeight = pos.y;
 
     if (Script_SeekToKeyword(0x73)) {
-        sl = Script_GetValue();
+        initialHealth = Script_GetValue();
         boss->firstThreshold = Script_GetValue();
         boss->secondThreshold = Script_GetValue();
         boss->damage = Script_GetValue();
     } else {
-        sl = 0x3E8;
+        initialHealth = 0x3E8;
         boss->damage = 0x14;
     }
 
@@ -284,7 +281,7 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     SetDamageCallback(actor, BossSlot2_ApplyPendingDamage);
     SetStateCallback(actor, BossSlot2_InitStateDispatch);
 
-    SceneActors_SetHealthLimits((u8 *)actor, sl, sl, 0);
+    SceneActors_SetHealthLimits((u8 *)actor, initialHealth, initialHealth, 0);
     ActorImpact_InitAttackCollider((u8 *)boss);
     ActorImpact_InitBodyCollider((u8 *)boss, 0);
     ActorImpact_InitCollider((u8 *)boss);
@@ -340,8 +337,9 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     {
         u8 *srcp;
         u8 *dstp;
+        u8 *normalTiles, *specialTiles;
         u32 off;
-        u8 **tiles = (u8 **)0x030042E4;
+        u8 **tiles = &gPaletteBankData;
         dstp = boss->tiles0;
         off = 0x680;
         i = 15;
@@ -351,19 +349,19 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
             dstp += 0x20;
             off += 0x20;
         } while (--i >= 0);
-        srcp = *(u8 **)0x030042E4 + 0x3240;
-        dstp = boss->tiles1;
+        srcp = gPaletteBankData + 0x3240;
+        normalTiles = boss->tiles1;
         i = 15;
         do {
-            CpuSet(srcp, dstp, 0x04000008);
-            dstp += 0x20;
+            CpuSet(srcp, normalTiles, 0x04000008);
+            normalTiles += 0x20;
         } while (--i >= 0);
-        srcp = *(u8 **)0x030042E4 + 0x3240;
-        dstp = boss->tiles2;
+        srcp = gPaletteBankData + 0x3240;
+        specialTiles = boss->tiles2;
         i = 15;
         do {
-            CpuSet(srcp, dstp, 0x04000008);
-            dstp += 0x20;
+            CpuSet(srcp, specialTiles, 0x04000008);
+            specialTiles += 0x20;
         } while (--i >= 0);
         zero = 0;
         CpuSet(srcp, boss->tiles3, 0x04000008);
