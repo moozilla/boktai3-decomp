@@ -5,7 +5,7 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabl
 {
     struct SceneActorRegistryActor *actor = input;
     u32 maskDisabled = disabled;
-    register u32 maskExcluded asm("r9") = excluded;
+    u32 maskExcluded = excluded;
     register u32 offset asm("r1") = 0x2d4;
     u32 value;
     register u32 mask asm("r2");
@@ -37,7 +37,7 @@ void SceneActorRegistry_ResetCategoryControl(void)
     actor = node->actor;
     if (actor) {
         u32 disabled = 0x40;
-        register u32 excluded asm("r9") = 0x20000;
+        u32 excluded = 0x20000;
         u32 five = 5;
         u32 zero = 0;
         u32 one = 1;
