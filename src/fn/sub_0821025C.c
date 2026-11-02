@@ -18,9 +18,9 @@ static inline s32 randomValue(u32 table)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
-static inline void CopyEmitterPosition(struct ContactPosition *out, const struct ActorPosition *in)
+static inline void CopyEmitterPosition(struct ContactPosition *out, const struct ContactPosition *in)
 {
-    *out = *(const struct ContactPosition *)in;
+    *out = *in;
 }
 static inline void raisePosition(struct ContactPosition *p)
 {
