@@ -4000,7 +4000,13 @@ def cmd_probe(src, func, env):
                           " (base[i], base + i * size) instead of walking a pointer, keep one loop"
                           " counter, or make the step not a constant multiple of the counter.",
            "AGBCC_GIV": "the ROM steps this value in its own register each pass; the draft recomputes"
-                        " it. In C walk a pointer (p++ / p += size) instead of indexing.",
+                        " it. In C walk a pointer (p++ / p += size) instead of indexing. If the value"
+                        " is a running offset (`x -= 5` beside the counter, or `base - offset` with"
+                        " `offset += 5`), loop.c scores it benefit 0 and leaves it: write it as a"
+                        " multiple of the counter in its own statement, `u32 left = base - index * 5;`;"
+                        " the multiply gives the giv a positive benefit, so it is reduced, and an invariant"
+                        " base load is hoisted through its pointer, out of cse's reach"
+                        " (DamageNumberDisplay_UpdateLeaving; AGBCC_LOOP_TRACE=1 prints each benefit).",
            "AGBCC_NOMOVE": "loop.c hoisted this invariant out of the loop; the ROM sets it inside each"
                            " pass. In C make the set unmovable (scope.py FILE.c hoist shows why each one"
                            " moved): assign the same variable again in a later block of the body, past a"
