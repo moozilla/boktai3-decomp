@@ -127,8 +127,13 @@ TOPICS = {
         "cse deletes a computation when the same value is already in a register within the extended basic "
         "block (a block plus the jumps it follows or skips). To make agbcc recompute it as the ROM does, the "
         "expression must differ (another type, base, or offset spelling), or the block must end before it "
-        "(see cse-skip, cse-follow). A constant is reused only by an expression of the same machine mode.",
-        [("cse.c", "/* Find the end of INSN's basic block and return its range,", 0, 13)]),
+        "(see cse-skip, cse-follow). A constant is reused only by an expression of the same machine mode. "
+        "A store drops what it may alias, but a field store (an in-struct MEM at a varying address) never "
+        "aliases a global scalar at a fixed address (fixed_scalar_and_varying_struct_p), so a global "
+        "pointer loaded before `G->f = x` is reused after it. A ROM that loads G again stored through a "
+        "pointer (spellings.sp_store_via_ptr, scope README fact 60).",
+        [("cse.c", "/* Find the end of INSN's basic block and return its range,", 0, 13),
+         ("alias.c", "/* Returns MEM1 if and only if MEM1 is a scalar at a fixed address and", 0, 26)]),
     "cse-swap": (
         "swap operand order commutative constant second canonical copy two-operand and orr",
         "fold_rtx puts an operand it knows to be a constant (or a register cse knows holds one) second in a "
