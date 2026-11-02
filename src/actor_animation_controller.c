@@ -866,12 +866,6 @@ s32 Script_GetValue(void);
 
 s32 Script_GetKeywordValue(s32, s32);
 
-static inline u32 mode_bits_v2(u8 *p, u32 mask)
-{
-    register u32 v asm("r1") = *p;
-    return mask & v;
-}
-
 void Actor_BeginScriptedAnimationPhaseNine(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
