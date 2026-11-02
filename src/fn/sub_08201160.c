@@ -32,12 +32,12 @@ s32 sub_08201160(struct PlayerCloneConfiguration *resource, struct ContactPositi
             Memory_Copy(handler, resource, sizeof(*resource));
             zero = 0;
             slot->timer = zero;
-            slot->state = zero;
-            slot->unknown330 = zero;
-            slot->phase = zero;
+            slot->behaviorPhase = zero;
+            slot->paletteTimer = zero;
+            slot->animationIndex = zero;
             display = &slot->animation;
             Anim_LoadKeyframe(display, &slot->resource, 0, 1);
-            slot->behaviorValue = resource->behaviorValue;
+            slot->speed = resource->speed;
             slot->animation.attribute1A = 2;
             slot->animation.position = *pos;
             slot->previousPosition = *pos;
