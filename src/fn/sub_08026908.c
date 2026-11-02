@@ -79,8 +79,10 @@ void SceneActorAnimation_UpdateFlashAlternatingRepeat(ActorAnimation *p, int tic
         int sequence;
         u8 *draw, *resource;
         register u32 zero asm("sb") = 0;
-        asm("" : "+r"(zero));
-        p->changed = zero;
+        {
+            u8 *changed = &p->changed;
+            *changed = zero;
+        }
         sequence = choose(p->mode, 66, 28);
         draw = (u8 *)p + 0x240;
         resource = (u8 *)p + 0x220;
