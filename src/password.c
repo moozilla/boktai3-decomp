@@ -149,11 +149,17 @@ void Password_ApplyDecoded(struct PasswordEntry *m, u8 *output)
         name++;
     }
     *out = 0;
-    /* GameState values08[0..3]: field access compiles 8 bytes shorter, so offsets stay */
-    *(u16 *)((u8 *)gGameState + 8) = 1;
-    *(u16 *)((u8 *)gGameState + 10) = decoded[0];
-    *(u16 *)((u8 *)gGameState + 12) = decoded[1];
-    *(u16 *)((u8 *)gGameState + 14) = decoded[10];
+    {
+        u16 *field;
+        field = &gGameState->values08[0];
+        *field = 1;
+        field = &gGameState->values08[1];
+        *field = decoded[0];
+        field = &gGameState->values08[2];
+        *field = decoded[1];
+        field = &gGameState->values08[3];
+        *field = decoded[10];
+    }
 }
 
 s32 Password_DecodeEntry(u8 *src, s32 tableRef, s32 script, u8 *output)
