@@ -2,27 +2,23 @@
 #include "group_objects.h"
 #include "display_sequence_inline.h"
 
-// MATCHING_CONCESSION: register-pinning
+static inline void BoardPiece_SelectPalette(void *resource)
+{
+    AnimData_SelectPaletteBank(resource, 0x2D3);
+}
 int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int index)
 {
     struct GroupResource *resource;
     struct GroupSprite *sprite;
     struct GroupVec *position;
-    {
-        int zero = 0;
-        asm("" : "+r"(zero));
-        p->state = zero;
-        p->active = 1;
-        p->timer = 0;
-        p->direction = zero;
-    }
+    u16 initialTimer[] = {0};
+    p->state = 0;
+    p->active = 1;
+    p->timer = initialTimer[0];
+    p->direction = 0;
     resource = &p->resource;
     AnimData_Load(resource, 0xDA6D);
-    {
-        void *r = resource;
-        asm("" : "+r"(r));
-        AnimData_SelectPaletteBank(r, 0x2D3);
-    }
+    BoardPiece_SelectPalette(resource);
     resource->palette = owner->palette;
     sprite = &p->sprite;
     Sprite_Init(sprite, resource, 1);
