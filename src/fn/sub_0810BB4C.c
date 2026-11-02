@@ -24,11 +24,10 @@ static inline void LinkResults_SetPositiveByOffset(struct LinkResults *p, s32 by
     *(u16 *)((u8 *)base + byteOffset) = value;
 }
 
-static inline void SetNegative(struct LinkResults *p, s32 offset, u16 v)
+static inline void LinkResults_SetNegativeByOffset(struct LinkResults *p, s32 byteOffset, u16 value)
 {
-    u16 *c = p->negative;
-    c = (u16 *)((u8 *)c + offset);
-    *c = v;
+    u16 *base = p->negative;
+    *(u16 *)((u8 *)base + byteOffset) = value;
 }
 
 // Tentative: increments one side's positive result counter, then caps it at 20.
@@ -47,19 +46,17 @@ void sub_0810BB4C(struct LinkResults *p, s32 i)
     }
 }
 
-// confidence=low: bumps one side's negative result counter, saturating at 20.
 void sub_0810BB90(struct LinkResults *p, s32 i)
 {
-    if ((p != NULL) && Valid(i)) {
-        s32 offset = i * 2;
-        u16 *c = p->negative;
-        register s32 v asm("r3");
-        asm("" : "+r"(offset));
-        c = (u16 *)((u8 *)c + offset);
-        (*c)++;
-        v = *c;
-        if (v > 20)
-            v = 20;
-        SetNegative(p, offset, v);
+    if (p != NULL && Valid(i)) {
+        register s32 byteOffset asm("r2") = i * sizeof(u16);
+        u16 *counter = p->negative;
+        s32 value;
+        counter = (u16 *)((u8 *)counter + byteOffset);
+        (*counter)++;
+        value = *counter;
+        if (value > 20)
+            value = 20;
+        LinkResults_SetNegativeByOffset(p, byteOffset, value);
     }
 }
