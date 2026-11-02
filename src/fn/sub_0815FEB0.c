@@ -20,13 +20,13 @@ void PlayerTransition_StepReveal(struct PlayerTransition *p)
         Sound_PlaySong(0x1b0);
         (*ticks)++;
     }
-    *(u32 *)((u8 *)gPlayers[0] + 0x94) |= 1;
-    ActorShadow_Enable((u8 *)gPlayers[0] + 0x700);
+    gPlayers[0]->animation.flags |= 1;
+    ActorShadow_Enable(gPlayers[0]->shadow);
     if (Anim_Step(p->animation, p->animationData)) {
-        *((u8 *)gPlayers[0] + 0x457) = 0;
-        *((u8 *)gPlayers[0] + 0x3a4) = 5;
-        *((u8 *)gPlayers[0] + 0x3a2) = 3;
-        *((u8 *)gPlayers[0] + 0x3a3) = 1;
+        gPlayers[0]->tetherMode = 0;
+        gPlayers[0]->facing = 5;
+        gPlayers[0]->heading = 3;
+        gPlayers[0]->side = 1;
         PlayerBurst_SetStateCallback(p, PlayerBurst_UpdateShutdown);
     }
 }
