@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "actor_graphics_and_basic_states.h"
 #include "contact_actor.h"
@@ -226,10 +227,10 @@ void SceneActorGraphics_InitializeBody(struct StateActor *p)
         flags = 0;
         if (test)
             flags = 0x40800;
-        /* Not through struct SceneActorGraphics: that CSEs the groundEffect base and
-         * reads the three fields as small offsets off it, unlike the original. */
-        Collider_SetAttackProperties(drawable, *(s16 *)((u8 *)p + 0x35c), *(s16 *)((u8 *)p + 0x35e),
-                                     0, flags, *(s16 *)((u8 *)p + 0x360));
+        Collider_SetAttackProperties(
+            drawable, ((struct SceneGraphicsActor *)p)->graphics.attackWidth0,
+            ((struct SceneGraphicsActor *)p)->graphics.attackHeight0, 0, flags,
+            ((struct SceneGraphicsActor *)p)->graphics.attackDepth0);
     }
 }
 
