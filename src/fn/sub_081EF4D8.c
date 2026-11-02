@@ -39,15 +39,15 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
 {
     *a = v;
 }
-#define SETCB(p, fn) SETCBV(p, fn, 1)
-#define SETCBV(p, fn, v)                                                                           \
-    do {                                                                                           \
-        SetCallback(fn, &(p)->callback);                                                           \
-        (p)->frame = 0;                                                                            \
-        (p)->initialize = (v);                                                                     \
-        (p)->progressFlag = 0;                                                                     \
-        (p)->progress = 0;                                                                         \
-    } while (0)
+
+static inline void StartCallback(struct S7Trans *p, void (*callback)(void))
+{
+    p->callback = callback;
+    p->frame = 0;
+    p->initialize = 1;
+    p->progressFlag = 0;
+    p->progress = 0;
+}
 
 void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
 {
@@ -66,7 +66,7 @@ void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
     switch (q->state) {
         case 0:
             if (p->finished) {
-                SETCB(p, sub_081EEE30);
+                StartCallback(p, sub_081EEE30);
                 {
                     u32 *sp = &q->state;
                     *sp = *sp + 1;
@@ -75,7 +75,7 @@ void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
             break;
         case 1:
             if (p->hp <= 0) {
-                SETCB(p, SceneActors_UpdatePaletteDispersal);
+                StartCallback(p, SceneActors_UpdatePaletteDispersal);
                 {
                     u32 *sp = &q->state;
                     *sp = *sp + 1;
@@ -83,7 +83,7 @@ void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
             }
             if (p->timer > 600) {
                 q->val294 = 0xa0;
-                SETCB(p, SceneMover_InterpolateScreenX);
+                StartCallback(p, SceneMover_InterpolateScreenX);
                 q->state = 3;
             }
         case 2:
@@ -94,13 +94,13 @@ void SingletonSlot7_UpdateEndingTransition(struct S7Trans *p)
             break;
         case 3:
             if (p->finished) {
-                SETCB(p, sub_081EEE30);
+                StartCallback(p, sub_081EEE30);
             }
             break;
         case 4: {
             s32 *cp = &q->counter;
             if (*cp > 8) {
-                SETCB(p, sub_081EEE30);
+                StartCallback(p, sub_081EEE30);
             }
             *cp = *cp + 1;
         } break;
