@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct VanargandEffectVec {
@@ -10,24 +9,26 @@ static inline s32 SignedHalf(s32 value)
         return value >> 1;
     return -(-value >> 1);
 }
+union PackedXY {
+    u32 packed;
+    s16 xy[3];
+};
 void Vanargand_ProjectEffectOffset(struct VanargandEffectVec *out, s16 x, s16 y, s32 height)
 {
-    union {
-        u32 packed;
-        s16 coordinate[3];
-    } point;
-    s16 *base;
-    register s32 a asm("r5");
-    s32 b;
-    {
-        u32 low = (u32)x << 16;
-        u32 high = (u32)y << 16;
-        point.packed = (low >> 16) | high;
-    }
-    base = point.coordinate;
-    a = point.coordinate[0];
-    b = base[1];
-    out->x = SignedHalf(((a + b) << 5) / 3 + height);
+    union PackedXY in;
+    s32 screenX, screenY, projected;
+    s16 *coordinates;
+    u32 low, high;
+    low = (u32)x << 16;
+    high = (u32)y << 16;
+    screenY = (low >> 16) | high;
+    in.packed = screenY;
+    coordinates = in.xy;
+    screenX = in.xy[0];
+    screenY = coordinates[1];
+    projected = (screenX + screenY) * 32 / 3 + height;
+    out->x = SignedHalf(projected);
     out->y = height;
-    out->z = SignedHalf(((b - a) << 5) / 3 + height);
+    projected = (screenY - screenX) * 32 / 3 + height;
+    out->z = SignedHalf(projected);
 }
