@@ -1,6 +1,6 @@
 # Round 11 package D holdouts
 
-Batch 23 leaves 77 of the original 466 package D functions with scored concessions. Since Batch 12, 165 functions covering 68,720 bytes have become concession-free. The build still reproduces the original ROM.
+Batch 24 leaves 71 of the original 466 package D functions with scored concessions. Since Batch 12, 171 functions covering 71,232 bytes have become concession-free. The build still reproduces the original ROM.
 
 The list below contains only functions still open at this checkpoint, in ROM order. The Batch 12 source archive supplies a starting C draft for each. Its instruction and byte differences describe that archived draft. Subsequent compiler or source findings are recorded separately below the affected entry.
 
@@ -39,6 +39,7 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **08138778 · PositionEffectDisplay_UpdateSources**
   An indexed loop using PlayerCue_StepSequenceEnded reproduces the playback body.
   Advance the slot pointer once per iteration for assignment while retaining the index for sequence and stop flags. The retained draft differs in 16 aligned assembly rows.
+  The allocator and updater agree on four 0x60-byte records in a 0x19C-byte display task. The complete layout uses the shared display sprite and sequence records.
 
 - **0813B4C8 · Player_RecalculateDerivedStats**
   The unpinned contiguous stat loops assign different registers to the quotient, cap and destination.
@@ -64,10 +65,7 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   Using packed three-component vectors and the typed player frame removes the burst and latch constraints.
   Model the held key pointer as a player-relative input view, then test the bit through its typed field. The retained draft differs in 32 aligned assembly rows.
   The held-key pointer is Player.inputKeys at +0x348. A signed-byte offset truncates this to +0x48 and reads the wrong field. Use the real input field in both branches. The valid detached draft differs in 32 aligned rows.
-
-- **08156F54 · Player_TestTetherActionInput**
-  The trigger path loads the global tether pointer a second time in the ROM.
-  Classify state 1 and state 0x11 by masking their differing bit before reading the tether status fields. The retained draft differs in 5 aligned assembly rows.
+  The full 1,244 bytes now use Player and the actual charge state. The buffered restart, charge tier and duration are confirmed by adjoining charge readers and writers. Two original held-input address groups remain.
 
 - **08159164 · sub_08159164**
   Removing 1 local constraint changes 21 normalized assembly rows across 6 regions.
@@ -89,14 +87,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   The two sets of flag-accumulation tests require different mask and first-bit registers.
   Walk the 16 action records by their terminal address and compute the returned slot index from the cursor. The retained draft differs in 18 aligned assembly rows.
 
-- **081639E4 · sub_081639E4**
-  Both index/address pins feed table access.
-  Derive both jitter samples from the starting random cursor in one 1024-entry table. The retained draft differs in 41 aligned assembly rows.
-
-- **08164480 · sub_08164480**
-  The pointer read now matches without volatile qualification.
-  Load the HUD owner through its named view member at all three timer tests with a plain pointer. The retained draft differs in 22 aligned assembly rows.
-
 - **08168A0C · SceneHud_RebuildPrimaryOptions**
   The pinned state pointer feeds the initial selected-slot and list accesses.
   Share the selected-slot pointer with the options cursor in the normal branch without caching the game-state base. The retained draft differs in 9 aligned assembly rows.
@@ -117,6 +107,7 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   Removing the table operand changes which address stays live in the six-iteration loop.
   Factor sine projection through an ordinary polar-offset helper, narrow circular heading to a byte, and address the RNG through its global ring. The detached difference fell from 52 to 48 aligned assembly rows.
   Capturing the shared random index and mask across the three draws restores their setup order. A draft retaining just the original sine-table binding differs in the velocity argument at 0817AFB6. The ROM rematerializes the stack address where the draft copies the vector register.
+  The random bank barrier is gone. The emitter shares the halfword table source and index-first reads with the transition spawner, and its actor origin and stack velocity now use ContactPosition. Only the original binding of the Q12 sine table remains.
 
 - **0817BCD4 · ActorDecision_UpdatePulsePhase**
   The actor pointer occupies r4 and its copy occupies r6.
@@ -196,35 +187,24 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **081B66E0 · VanargandEffect_Initialize**
   Removing 1 local constraint changes 2 normalized assembly rows across 1 region.
   Separate field-address and payload lifetimes through typed owner accessors (closest effect_animation_1). The retained draft differs in 2 aligned assembly rows.
-
-- **081B6E90 · ActorEffect_UpdateRadialExpiry**
-  The six-iteration trail loop assigns the index, table, RNG cursor and 1023 mask to four different registers.
-  Separate field-address and payload lifetimes through typed owner accessors (closest effect_entered_0). The retained draft differs in 16 aligned assembly rows.
+  All three callers pass a variant, a delay, and two position-vector pointers to the factory. The factory and update now share the real 0xA0-byte task. The original clobber remains.
 
 - **081BB904 · sub_081BB904**
   Removing 5 local constraints changes 16 normalized assembly rows across 8 regions.
   Separate field-address and payload lifetimes through typed owner accessors (closest panel_unk1D8_1). The retained draft differs in 16 aligned assembly rows.
   The account balance, transfer and repeat fields now come from the actual panel and save data. Four byte-sized repeat masks match without a barrier. In the ordinary draft, three scratch registers rotate on the right-input path. The first right-hand address reload accounts for all eight differing instructions when isolated in the compiler.
 
-- **081BD38C · DarkLoan_BuildDisplay**
-  Removing 1 local constraint changes 77 normalized assembly rows across 21 regions.
-  Separate field-address and payload lifetimes through typed owner accessors (closest p_background_1). The retained draft differs in 77 aligned assembly rows.
-  The closest flag-selection draft emits the expected stack frame and all but one instruction. It reloads the default playback value from the cleared Z coordinate where the game emits an immediate zero. Resource and playback lifetimes remain under investigation.
-
 - **081BDE94 · Storage_BeginSwapTransition**
   Removing 7 local constraints changes 47 normalized assembly rows across 9 regions.
   Separate field-address and payload lifetimes through typed owner accessors (closest widget_flags_1). The retained draft differs in 47 aligned assembly rows.
   The widget initializer and swap transition now share the storage screen layout. The consumable ID must be read as a signed halfword from the save array. A narrowed draft makes the empty-slot test always true and is excluded.
-
-- **081D11E4 · SceneNpc_SpawnTransitionParticle**
-  The ROM pins the random table in r6 across calls to Mod.
-  Separate field-address and payload lifetimes through typed owner accessors (closest effect_particles_1). The retained draft differs in 28 aligned assembly rows.
-  The shared cursor advances modulo 1024 even on the first lifetime draw. A detached candidate narrowed that first index to eight bits and is excluded.
+  A single signed item local now spans the three switch arms, removing all three r2 bindings. The four remaining sites are in the equipment marker, consumable slot and consumable marker address helpers. The valid ordinary draft differs principally in reload register choices.
 
 - **081D3620 · sub_081D3620**
   The cloud loop’s table, coordinate scratch, and random value have different allocation without constraints.
   Separate field-address and payload lifetimes through typed owner accessors (closest p_particles_1). The retained draft differs in 27 aligned assembly rows.
   The original X and Z offsets each add a masked random sample minus 512 to the previous coordinate. A detached numeric-width candidate discards the previous X coordinate and is excluded.
+  The forty-particle cloud record is shared with the initializer. Keeping the X and Z indices separate and using the two-halfword source removed two bindings. The sample value still uses the original r0 binding.
 
 - **081DEE38 · Time_InitializeDateMenu**
   Removing 3 local constraints changes 148 normalized assembly rows across 24 regions.
@@ -258,6 +238,7 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **081EF914 · SingletonSlot7_UpdateEndingScene**
   Removing 7 local constraints changes 122 normalized assembly rows across 86 regions.
   Separate field-address and payload lifetimes through typed owner accessors (closest owner_sprite_1). The retained draft differs in 122 aligned assembly rows.
+  The shared slot-7 entry helper removes the entry-result pin. The ending-scene foreground and sequence flags now use the departure display types, with four prior bindings remaining.
 
 - **081F28C4 · SpriteTrail_CreateFixedEffect**
   Removing 1 local constraint changes 4 normalized assembly rows across 4 regions.
