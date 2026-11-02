@@ -1,14 +1,13 @@
-#include "global.h"
+#include "script_prompt.h"
 #include "render.h"
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void ResourceHeader_Relocate(u8 *, void *);
-void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
+void Widget_InitLinked(struct TextEntryWidget *, u8 *, u32, u32, u32, u32, u32, u32);
 void Menu_StartFadeIn(u32);
-void ScriptPrompt_ResetDisplay(u8 *);
-u32 ScriptPrompt_Initialize(u8 *s)
+s32 ScriptPrompt_Initialize(struct ScriptPromptScreen *s)
 {
     u32 zero;
     u32 value;
@@ -16,13 +15,13 @@ u32 ScriptPrompt_Initialize(u8 *s)
     void *a;
     void *p;
     void *q;
-    u32 old;
+    u16 *old;
     u8 *obj;
     u8 *obj2;
     u8 *obj3;
-    u32 *ptr;
-    u32 *save;
-    u8 *dest;
+    u16 **ptr;
+    u16 **save;
+    u16 *dest;
     Bg_ClearTilemap(0);
     zero = 0;
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
@@ -37,25 +36,25 @@ u32 ScriptPrompt_Initialize(u8 *s)
     CpuSet(p, gBgPaletteBuffer, 0x100);
     bank = 0xCB05;
     q = ScriptProc_Start(bank, 0xE2AB);
-    obj = s + 0x7C;
+    obj = s->widgets[0].resource;
     ResourceHeader_Relocate(obj, q);
-    Widget_InitLinked(s + 0x1C, obj, 0x37, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(&s->widgets[0], obj, 0x37, 0x10, zero, zero, zero, zero);
     q = ScriptProc_Start(bank, 0x530D);
-    obj2 = s + 0x104;
+    obj2 = s->widgets[1].resource;
     ResourceHeader_Relocate(obj2, q);
-    Widget_InitLinked(s + 0xA4, obj2, 0x4B, 0x10, zero, zero, zero, zero);
-    obj3 = s + 0x18C;
+    Widget_InitLinked(&s->widgets[1], obj2, 0x4B, 0x10, zero, zero, zero, zero);
+    obj3 = s->widgets[2].resource;
     ResourceHeader_Relocate(obj3, q);
-    Widget_InitLinked(s + 0x12C, obj3, 0x4C, 0x10, zero, zero, zero, zero);
-    save = (u32 *)(s + 0x1D0);
-    ptr = (u32 *)(s + 0xEC);
+    Widget_InitLinked(&s->widgets[2], obj3, 0x4C, 0x10, zero, zero, zero, zero);
+    save = &s->savedPalette;
+    ptr = &s->widgets[1].palette;
     old = *ptr;
     *save = old;
-    dest = s + 0x1D4;
-    CpuSet((void *)old, dest, 0x10);
-    *ptr = (u32)dest;
-    *(void **)(s + 0x174) = dest;
-    *(u32 *)(s + 0x1C0) = zero;
+    dest = s->colors;
+    CpuSet(old, dest, 0x10);
+    *ptr = dest;
+    s->widgets[2].palette = dest;
+    s->fadeSpeed = zero;
     Menu_StartFadeIn(0);
     ScriptPrompt_ResetDisplay(s);
     return 0;
