@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monster_particle_random.h"
 #include "engine.h"
 #include "ram.h"
 
@@ -35,16 +36,6 @@ static inline s32 Scale(s32 value)
     return -((-value) >> 12);
 }
 
-// The random table's address is assembled from its two halves; the ROM keeps the
-// pointer in a stack slot rather than reloading the constant (as in 081EEECC).
-union HealthRestoreTableSource {
-    const u16 *table;
-    u16 halves[2];
-};
-static inline const u16 *HealthRestore_ReadTable(const union HealthRestoreTableSource *source)
-{
-    return source->table;
-}
 // Initialize the eight outward-moving particles used by the health restore effect.
 void HealthRestoreEffect_StartParticleBurst(struct HealthRestoreEffect *effect)
 {
@@ -54,13 +45,13 @@ void HealthRestoreEffect_StartParticleBurst(struct HealthRestoreEffect *effect)
     const s16 *sine = gUnk_086149C4;
     u32 offset = 0;
     struct FlickerMotion *motion = &effect->particles[0].motion;
-    union HealthRestoreTableSource source;
+    union ParticleRandomTableSource source;
     const u16 *table;
     u32 byteMask = 255;
 
     source.halves[0] = (u16)RANDOM_TABLE_ADDR;
     source.halves[1] = RANDOM_TABLE_ADDR >> 16;
-    table = HealthRestore_ReadTable(&source);
+    table = ParticleRandom_GetTable(&source);
     for (; i < 8; i++) {
         s32 angle, speed;
         motion->x = 16;
