@@ -245,7 +245,7 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
         p->unkAC6[0] = intensity;
         PaletteFade_ApplyBrightenedPalette(p);
     }
-    if (*(u16 *)((u8 *)p + 0xAE4) == 1) {
+    if (p->visualEffectMode == 1) {
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
             {
@@ -282,7 +282,7 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
             p->actionEighteenDuration++;
         }
-    } else if (*(u16 *)((u8 *)p + 0xAE4) == 2) {
+    } else if (p->visualEffectMode == 2) {
         const u16 *source;
         p->actionRequestTimer = 0;
         source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
