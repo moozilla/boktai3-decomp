@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "pursuing_actor.h"
@@ -16,16 +15,12 @@ u32 PursuingActors_ReleaseAll(struct PursuingActorManager *manager)
     s32 i, j;
     for (i = 0; i < 8; i++) {
         if (IsActive(manager, i)) {
-            struct PursuingActor *actor;
-            {
-                register u32 off asm("r5") = i * sizeof(struct PursuingActor) + 0x3c;
-                actor = (void *)((u32)manager + off);
-            }
+            struct PursuingActor *actor = &manager->actors[i];
             Collider_Remove(&actor->secondary);
             Sprite_Remove(actor);
             for (j = 0; j < 2; j++) {
                 if (manager->actors[i].trail[j].active)
-                    Sprite_Remove(&actor->trail[j]);
+                    Sprite_Remove(&manager->actors[i].trail[j]);
             }
         }
     }

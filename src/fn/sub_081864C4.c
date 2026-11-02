@@ -1,44 +1,31 @@
-#include "global.h"
+#include "armor_action.h"
 
-struct S {
-    u8 f[0xB3D];
-    u8 st;
-    u8 sub;
-    u8 g[0xB58 - 0xB3F];
-    u8 obj[4];
-};
 s32 Armor_TryStartAction(void *, s32);
 void Armor_QueueFallingParts(void *);
-void Armor_UpdateAction10Sequence(struct S *p)
+void Armor_UpdateAction10Sequence(struct ArmorActionController *p)
 {
-    u8 *q = &p->st;
-    u8 s = *q;
-    switch (s) {
+    u8 phase = p->phase;
+    switch (phase) {
         case 0:
             if (Armor_TryStartAction(p, 10) != 0) {
-                *q = 1;
-                p->sub = s;
+                p->phase = 1;
+                p->phaseTimer = phase;
             }
             break;
         case 1:
-            if (*(u8 *)((u8 *)p + 0xB40) == 0xff) {
-                {
-                    Armor_QueueFallingParts(p->obj);
-                }
-                {
-                    u32 zero = 0;
-                    *q = 2;
-                    p->sub = zero;
-                }
+            if (p->actionState == 0xff) {
+                Armor_QueueFallingParts(p->parts);
+                p->phase = 2;
+                p->phaseTimer = 0;
             }
             break;
         case 2:
-            if (p->sub > 0x13 && Armor_TryStartAction(p, 12) != 0)
-                *q = 3;
+            if (p->phaseTimer > 0x13 && Armor_TryStartAction(p, 12) != 0)
+                p->phase = 3;
             break;
         case 3:
-            if (*(u8 *)((u8 *)p + 0xB40) == 0xff)
-                *q = 0xff;
+            if (p->actionState == 0xff)
+                p->phase = 0xff;
             break;
     }
 }

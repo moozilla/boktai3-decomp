@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_graphics_actor.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -105,7 +106,8 @@ void SceneActors_UpdateTravelProjectileAttack(ActorAnimation *p, int tick)
                 spawn.y += 300;
                 SceneSteeringActor_CreateTravelActor(
                     &spawn, *(void **)((u8 *)p + 0x110), 2, p->requestedAngle, 90, 4, 20, 3, 25,
-                    *(s16 *)((u8 *)p2 + 0x37c), *(s16 *)((u8 *)p2 + 0x37e), 0x40000, 30);
+                    ((struct SceneGraphicsActor *)p2)->graphics.travelColliderA,
+                    ((struct SceneGraphicsActor *)p2)->graphics.travelColliderB, 0x40000, 30);
             }
             if (*((u8 *)p2 + 0x25d) & 2)
                 p->finished = 1;

@@ -124,7 +124,8 @@ s32 sub_081EBD0C(struct SpDisplay *p)
         p->x210 = 600;
     else
         p->x210 = (*(struct ScreenParams3F8Params *)&gScreenTextParameters).f;
-    if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M == 0 && (*(struct ScreenParams3F8Params *)&gScreenTextParameters).B == 0) {
+    if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M == 0 &&
+        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).B == 0) {
         p->x148 = ScreenParams3F8_SelectValidDataBank(p);
         if (p->x148 == -1)
             p->x108 = 3;
@@ -159,20 +160,30 @@ s32 sub_081EBD0C(struct SpDisplay *p)
         Menu_EraseRect(1, 4, 0x1C, 9);
         if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M != 0) {
             if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M == 1) {
-                Menu_DrawStringRef(1, 4, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 0);
-                Menu_DrawStringRef(1, 7, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 1);
-                Menu_DrawStringRef(1, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
-                Menu_DrawStringRef(1, 13, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 3);
+                Menu_DrawStringRef(
+                    1, 4, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 0);
+                Menu_DrawStringRef(
+                    1, 7, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 1);
+                Menu_DrawStringRef(
+                    1, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
+                Menu_DrawStringRef(
+                    1, 13, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 3);
             } else {
-                Menu_DrawStringRef(1, 4, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 0);
-                Menu_DrawStringRef(1, 7, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
-                Menu_DrawStringRef(1, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 3);
+                Menu_DrawStringRef(
+                    1, 4, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 0);
+                Menu_DrawStringRef(
+                    1, 7, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
+                Menu_DrawStringRef(
+                    1, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 3);
             }
         } else {
-            Menu_DrawStringRef(9, 4, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 0);
-            Menu_DrawStringRef(10, 7, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 1);
+            Menu_DrawStringRef(9, 4,
+                               (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 0);
+            Menu_DrawStringRef(10, 7,
+                               (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 1);
             if (p->x24 == 3)
-                Menu_DrawStringRef(5, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
+                Menu_DrawStringRef(
+                    5, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
         }
         ScrollingDialogue_ClearScript();
         ScrollingDialogue_RequestShow();
@@ -184,8 +195,9 @@ s32 sub_081EBD0C(struct SpDisplay *p)
         }
     } else {
         Menu_EraseRect(1, 6, 0x1C, 6);
-        Menu_DrawStringRef(1, 6, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 3);
-        *(u32 *)((u8 *)p + 0x50) |= 1;
+        Menu_DrawStringRef(1, 6, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock,
+                           3);
+        p->w48.flags |= 1;
     }
     p->x114 = 3;
     Menu_StartFadeIn(3);

@@ -18,7 +18,7 @@ void SequencedSprite_StepAnimation(u8 *owner, struct SequencedSprite *input)
         s->restore = 0;
     }
     if (s->state.index == 1 && s->state.elapsed == 0)
-        *(u16 *)((u8 *)s + 0x1A) += 32;
+        sprite->position.y += 32;
     {
         const u16 *graphics = *(const u16 **)(owner + 0x1C);
         if (SceneParticle_StepSprite(&s->state, sprite, graphics))

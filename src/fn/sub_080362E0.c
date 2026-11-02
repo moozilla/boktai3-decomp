@@ -103,7 +103,7 @@ int Wireless_ExchangeChildNiPacket(struct Engine *argument)
             if (index > 3) {
                 break;
             }
-        } while (!(((*(struct RfuLinkStatus *volatile *)cursor)->connSlotFlag >> index) & bit));
+        } while (!(((*cursor)->connSlotFlag >> index) & bit));
     }
     *slot = index;
     p->mask = (p->mask & 0xFFFE) | 2;

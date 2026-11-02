@@ -1287,13 +1287,9 @@ void TetherActor_ClearExternalStatus(void)
 {
     Inventory_AddItem(43, 0);
     {
+        const s8 cleared = -1;
         s16 *status = &gGameState->unk5AA;
-        register s32 value asm("r2");
-        register s32 half asm("r1");
-        value = -1;
-        asm("" : "+r"(value));
-        half = value;
-        *status = half;
+        *status = cleared;
     }
 }
 
@@ -1958,8 +1954,10 @@ void TetherActor_InitKindFromScript(struct TetherActor *actor, u32 entry)
         kind = Script_GetValue();
     else
         kind = TetherActor_GetConfiguredKind();
-    gGameState->unk5AA = kind;
-    asm("" ::: "memory");
+    {
+        s16 *selectedKind = &gGameState->unk5AA;
+        *selectedKind = kind;
+    }
     actor->kind = gGameState->unk5AA;
     value = Script_SeekToKeyword('c');
     if (value)
@@ -2569,13 +2567,12 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
     {
         register u32 offset asm("r0") = 0x3F0;
         struct DisplayPosition *target;
-        const struct DisplayPosition *source = (const struct DisplayPosition *)&actor->position;
         register u32 first asm("r0");
         u32 second;
         asm("" : "+r"(offset));
         target = (struct DisplayPosition *)((u8 *)actor + offset);
-        first = source->words[0];
-        second = *(u32 *)((u8 *)actor + 0x54);
+        first = ((const struct DisplayPosition *)&actor->position)->words[0];
+        second = ((const struct DisplayPosition *)&actor->position)->words[1];
         target->words[0] = first;
         target->words[1] = second;
     }

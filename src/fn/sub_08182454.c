@@ -34,21 +34,14 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
     s32 mode;
     {
         u32 test = actorFlags & 1;
-        register u32 one asm("r6") = 1;
-        asm("" : "+r"(one));
+        u32 one = 1;
         side = one;
         if (test) {
             u32 zero = 0;
             side = zero;
         }
     }
-    {
-        u32 offset = 0xB38;
-        {
-            u8 *address = (u8 *)s + offset;
-            kind = *address;
-        }
-    }
+    kind = s->variant;
     if (actorFlags & 0x200)
         kind += 4;
     variant = gUnk_0824EB60[kind];
@@ -73,17 +66,16 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
         void *data = s->animationData;
         u32 keyframe = gUnk_0824E920[variant][side][index];
         u32 callMode = mode;
-        register u32 wideFlags asm("r6");
-        register u32 callFlags asm("r4");
+        u32 wideFlags;
+        u32 callFlags;
         asm("" : "+r"(animation), "+r"(data), "+r"(keyframe), "+r"(callMode));
         wideFlags = flags;
-        asm("" : "+r"(wideFlags));
         callFlags = (u16)wideFlags;
         Anim_SetKeyframes(animation, data, keyframe, callMode, callFlags);
     }
     s->animationSpeed = 0x40;
     {
-        register u32 offset asm("r7") = 0xB32;
+        u32 offset = 0xB32;
         *(u16 *)((u8 *)s + offset) &= ~0x20;
     }
 }

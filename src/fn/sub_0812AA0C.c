@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -56,32 +55,30 @@ static inline s32 Truncate(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
-struct UnsignedVector {
-    u16 x, y, z, pad;
-};
+static inline void LinkedEffect_SetTravelOffset(struct Vec *velocity, u8 heading, s32 radius)
+{
+    velocity->x = Truncate(radius * gUnk_086149C4[(heading + 64) & 255]);
+    velocity->y = 0;
+    velocity->z = Truncate(radius * gUnk_086149C4[heading]);
+}
 void LinkedEffect_SetVariant(void *, u32);
 // confidence=low: expands the linked effect while preparing an elevated travel target.
 void LinkedEffect_BeginRisingTravel(struct Pool *pool, struct Effect *p)
 {
     if (p->entered) {
         u32 heading;
-        u32 sample, value;
+        u32 value;
         const u16 *random;
-        register u32 distance asm("r4");
-        struct UnsignedVector *velocity;
+        u32 distance;
+        struct Vec *velocity;
         p->sprite.flags = (p->sprite.flags & ~1) | 2;
         p->ended = 0;
         heading = p->heading;
         random = RandomEntry();
-        sample = 255;
-        value = (u8)*random;
-        /* Keep the random sample separate from the travel distance. */
-        asm("" : "+r"(value));
-        velocity = (void *)&p->velocity;
+        value = *random & 255;
+        velocity = &p->velocity;
         distance = value + 64;
-        velocity->x = Truncate(distance * gUnk_086149C4[(heading + 64) & sample]);
-        velocity->y = 0;
-        velocity->z = Truncate(distance * gUnk_086149C4[heading]);
+        LinkedEffect_SetTravelOffset(velocity, heading, distance);
         {
             struct Vec *destination = (void *)&p->velocity;
             struct Vec *source = (void *)&p->sprite.position;

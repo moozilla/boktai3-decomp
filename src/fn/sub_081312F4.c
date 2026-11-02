@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
@@ -63,23 +62,9 @@ static inline void *SavedControl(u8 *group)
     void **field = (void *)(group + 0x214);
     return *field;
 }
-static inline u32 Finished(struct SceneActorRegistryResetView *a)
-{
-    register u32 offset asm("r3") = 0x2B0;
-    asm("" : "+r"(offset));
-    {
-        register u8 *field asm("r0") = (void *)((u8 *)a + offset);
-        return *field;
-    }
-}
 static inline u32 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
-    register u32 offset asm("r2") = 0x2D4;
-    asm("" : : "r"(offset));
-    {
-        register u16 *field asm("r0") = (void *)((u8 *)a + offset);
-        return *field & mask;
-    }
+    return a->flags2D4 & mask;
 }
 void SceneActorRoute_UpdateReturnEntry(struct SceneActorRegistryResetView *actor)
 {
@@ -92,19 +77,22 @@ void SceneActorRoute_UpdateReturnEntry(struct SceneActorRegistryResetView *actor
     result = sub_0812F3CC(actor);
     if (result)
         return;
-    if (Finished(actor)) {
-        u16 flags = MotionFlags(actor, 0x10);
-        if (flags) {
-            State(actor, 8, result);
-            BeginControl(actor, SavedControl(group), 0x13, result);
-        } else {
-            u32 bits = actor->flags2CC & 0x10;
-            if (bits)
-                State(actor, 7, flags);
-            else
-                State(actor, 2, bits);
-            BeginControlZero(actor, actor->entryTarget228, 1);
-        }
-    } else
-        actor->counter2AC++;
+    {
+        u8 *finished = &actor->field2B0;
+        if (*finished) {
+            u16 flags = MotionFlags(actor, 0x10);
+            if (flags) {
+                State(actor, 8, result);
+                BeginControl(actor, SavedControl(group), 0x13, result);
+            } else {
+                u32 bits = actor->flags2CC & 0x10;
+                if (bits)
+                    State(actor, 7, flags);
+                else
+                    State(actor, 2, bits);
+                BeginControlZero(actor, actor->entryTarget228, 1);
+            }
+        } else
+            actor->counter2AC++;
+    }
 }

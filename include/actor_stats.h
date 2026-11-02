@@ -9,7 +9,9 @@ struct ActorStats {
     s32 amount, amountLimit;
     u8 unknown64[4];
     s32 pendingDamage;
-    u8 unknown6C[0x18];
+    u8 unknown6C[0x12];
+    u16 recoveryValue;
+    u8 unknown80[4];
     s32 rate84, limit88;
     u8 unknown8C[4];
     s32 parameter90, parameter94, scaledParameter98;

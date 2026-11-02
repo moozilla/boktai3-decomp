@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_graphics_actor.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -72,6 +73,7 @@ void SceneActors_UpdateAnimation(void *, void *, void *);
 void BackgroundFlash_BeginAlternating(void *);
 void SceneActorAnimation_UpdateFlashAlternatingRepeat(ActorAnimation *p, int tick)
 {
+    struct SceneGraphicsActor *graphicsActor = (struct SceneGraphicsActor *)p;
     ActorAnimation *p2 = p;
     if (p->changed) {
         int sequence;
@@ -85,10 +87,10 @@ void SceneActorAnimation_UpdateFlashAlternatingRepeat(ActorAnimation *p, int tic
         SceneActors_StartDirectionalAnimation(p, draw, resource, sequence, 2, 1, 0);
         SceneActors_UpdateAnimation(p, draw, resource);
         BackgroundFlash_BeginAlternating(*(void **)((u8 *)p + 0x9dc));
-        if (*(u32 *)((u8 *)p + 0x358) == 1)
+        if (graphicsActor->graphics.stepTableKind == 1)
             Sound_PlaySongChecked(900);
         Sound_PlaySongChecked(886);
-        *(u32 *)((u8 *)p + 0x3c0) = *(u32 *)((u8 *)p + 0x3bc);
+        graphicsActor->graphics.backgroundFlashFlag = graphicsActor->graphics.initialFlashFlag;
         *((u8 *)p + 0x3b9) = zero;
     }
     if (p->tryUpdate(p)) {

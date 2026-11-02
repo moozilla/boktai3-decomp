@@ -4,7 +4,9 @@ s32 __divsi3(s32, s32);
 void OrbitMotion_BeginDistanceWave(void *, void *, void *, u32, u32);
 void ContactImpactEffect_UpdateContact(void);
 struct ContactImpactEffect {
-    u8 unknown0[0x3C];
+    u8 unknown0[0x34];
+    u32 spriteFlags;
+    u8 unknown38[4];
     u8 byte3C, byte3D;
     u8 unknown3E[0x12];
     u16 screenX, screenY, screenZ, screenPad;
@@ -80,7 +82,7 @@ void ContactImpactEffect_BeginTimedPosition(struct ContactImpactEffect *input, s
         } else
             FromScreen((struct Vec *)&effect->worldX, (struct Vec *)&effect->screenX, 0);
         effect->shakeThreshold = duration;
-        *(u32 *)((u8 *)effect + 0x34) &= ~1;
+        effect->spriteFlags &= ~1;
         SetCallback(sub_081C3B04, (void *)((u8 *)effect + 0xF4));
         effect->shakeTimer = 0;
         effect->shakeFlag = 0;

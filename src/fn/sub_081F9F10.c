@@ -25,6 +25,8 @@ struct Ratatosk {
     void (*callback)(void);
     u8 pad104[8];
     u8 *player;
+    u8 unk110[0xE72 - 0x110];
+    u8 reactionDirection;
 };
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void Ratatosk_BeginDirectionalReaction(void);
@@ -67,12 +69,12 @@ s32 Ratatosk_ApplyDamageReaction(struct Ratatosk *p, s32 kind, s32 damage)
             setCallback(p, Ratatosk_UpdateDirectionalRecovery, 17);
             {
                 u32 direction = sprite->direction;
-                *(u8 *)((u8 *)p + 0xe72) = direction;
+                p->reactionDirection = direction;
             }
             break;
         case 1: {
             u32 direction = p->player[0x2d];
-            u8 *dest = (u8 *)p + 0xe72;
+            u8 *dest = &p->reactionDirection;
             u32 zero = 0;
             *dest = direction;
             {

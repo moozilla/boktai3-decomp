@@ -46,7 +46,7 @@ void Player_UpdateSpiralRelease(struct Player *p)
     } else {
         Player_AddControlFlags(p, 0x41);
         p->colliderPosition = p->position;
-        p->colliderPosition.y += *(u8 *)((u8 *)p + 0x466);
+        p->colliderPosition.y += p->colliderHeightOffset;
         if (p->facing > 3) {
             p->heading = (7 - p->facing) >> 1;
             p->side = 1;

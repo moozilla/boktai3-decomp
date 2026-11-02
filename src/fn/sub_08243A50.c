@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
-#include "player.h"
+#include "player_saved_position.h"
 #include "ram.h"
 struct LinkRef {
     u8 unk0[0x18];
@@ -34,10 +34,7 @@ s32 Player_OnCreate(struct Player *p, void *script)
     sub_0823A3CC(p);
     gPlayerSlotStatus[p->slot] = p->kind;
     if (p->slot == LocalPlayer()) {
-        *(u16 *)((u8 *)gGameState + 0x30) = p->position.x;
-        *(u16 *)((u8 *)gGameState + 0x32) = p->position.y;
-        *(u16 *)((u8 *)gGameState + 0x34) = p->position.z;
-        *(u16 *)((u8 *)gGameState + 0x85E) = ((p->facing + 5) & 7) << 5;
+        Player_SavePositionAndFacing(p);
     }
     gPlayers[p->movementRequestBlocked] = p;
     gPlayerCount++;

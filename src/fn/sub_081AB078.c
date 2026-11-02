@@ -1,7 +1,7 @@
 #include "global.h"
 #include "render.h"
+#include "vanargand_stage_colors.h"
 // confidence=low: palette transition accompanies the leap motion track.
-// MATCHING_CONCESSION: register-pinning
 struct VanargandPart {
     u8 pad0[0x10];
     u16 state;
@@ -47,6 +47,7 @@ void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int)
 void Vanargand_SetPendingCue(void *, u16);
 void MotionTrack_Update(void *);
 void Anim_SetFrameDurationScale(void *, u32);
+
 static inline u8 complete(struct Vanargand *p)
 {
     u8 result = 0;
@@ -70,42 +71,6 @@ void VanargandAfterimagePool_Spawn(void *, void *);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
-#define VANARGAND_PALETTE_ADDR 0x03004FC0 /* gBgPaletteBuffer */
-
-static inline s32 Scale8(s32 n)
-{
-    return n >= 0 ? n >> 8 : -((-n) >> 8);
-}
-#define LERP(dst, t, from, to, tag)                                                                \
-    {                                                                                              \
-        if ((t) > 0)                                                                               \
-            goto tag##Upper;                                                                       \
-        dst = (from);                                                                              \
-        goto tag##Store;                                                                           \
-        tag##Upper:                                                                                \
-        {                                                                                          \
-            s32 limit = 3;                                                                         \
-            if ((t) < limit)                                                                       \
-                goto tag##Interp;                                                                  \
-        }                                                                                          \
-        dst = (to);                                                                                \
-        goto tag##Store;                                                                           \
-        tag##Interp:                                                                               \
-        {                                                                                          \
-            s32 k = ((to) - (from)) << 8;                                                          \
-            s32 v = (t) * k;                                                                       \
-            s32 d = 3;                                                                             \
-            s32 result;                                                                            \
-            v = v / d;                                                                             \
-            if (v >= 0)                                                                            \
-                result = v >> 8;                                                                   \
-            else                                                                                   \
-                result = -(-v >> 8);                                                               \
-            dst = result;                                                                          \
-            dst += (from);                                                                         \
-        }                                                                                          \
-        tag##Store :;                                                                              \
-    }
 
 void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
 {
@@ -127,37 +92,10 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
             kind = 0x7F;
         switch (kind) {
             case 0x6F: {
-                s32 t;
-                s32 r, g, b;
 
                 CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000020);
                 CpuSet(p->fadeA, gBgPaletteBuffer, 0x04000068);
-                t = p->transition;
-                LERP(r, t, 7, 0x13, r1)
-                LERP(g, t, 0, 0x12, g1)
-                LERP(b, t, 0, 0x13, b1)
-                r |= g << 5;
-                r |= b << 10;
-                {
-                    u16 color = r;
-                    u16 *pal = gBgPaletteBuffer;
-                    pal[0x56 / 2] = color;
-                    pal[0x10C / 2] = color;
-                }
-                LERP(r, t, 0x15, 0x18, r2)
-                LERP(g, t, 0, 0x1D, g2)
-                LERP(b, t, 0, 0x1F, b2)
-                r |= g << 5;
-                r |= b << 10;
-                {
-                    u16 *pal;
-                    u32 color = (u16)r;
-                    // Keep the second palette address independently rematerializable.
-                    pal = (u16 *)VANARGAND_PALETTE_ADDR;
-                    asm("" : : "r"(pal), "r"(color));
-                    pal[0x5A / 2] = color;
-                    pal[0x10E / 2] = color;
-                }
+                Vanargand_SetStageColors(p->transition);
                 break;
             }
             case 0x82:

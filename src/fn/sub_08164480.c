@@ -56,7 +56,7 @@ static inline u8 *Hud_ReadPlayer(u8 *p, u16 offset)
 {
     register u32 address asm("r0") = offset;
     address += (u32)p;
-    return *(u8 *volatile *)address;
+    return *(u8 **)address;
 }
 void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap)
 {

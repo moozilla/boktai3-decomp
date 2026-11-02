@@ -1,23 +1,32 @@
-#include "global.h"
-struct Q {
-    u8 f[0x10];
-    u16 v;
-    u8 g[0x1C - 0x12];
+#include "contact_swarm_sprite.h"
+
+struct ArcProjectile {
+    u8 unknown0[4];
+    u32 flags;
+    u8 unknown8[0x18 - 8];
+    u16 configFlags, duration;
+    u8 unknown1C[0x8C - 0x1C];
+    struct ContactSwarmSprite sprite;
+    u8 unknownB8[0x17E - 0xB8];
+    s16 limit;
 };
+
 void Projectile_SetUpdateCallback(void *, void (*)(void));
 void TimedEffect_UpdateDeceleration(void);
-static inline void clr(u32 *a, u32 m)
+
+static inline void ClearFlags(u32 *flags, u32 mask)
 {
-    *a = m & *a;
+    *flags = mask & *flags;
 }
-s32 Projectile_InitArcFlight(struct Q *p)
+
+s32 Projectile_InitArcFlight(struct ArcProjectile *projectile)
 {
-    Projectile_SetUpdateCallback((u8 *)p + 0x18, TimedEffect_UpdateDeceleration);
-    (p + 5)->v = 0x19;
-    clr((u32 *)((u8 *)p + 4), ~1);
+    Projectile_SetUpdateCallback(&projectile->configFlags, TimedEffect_UpdateDeceleration);
     {
-        u16 t = *(u16 *)((u8 *)p + 0xaa);
-        *(u16 *)((u8 *)p + 0x17e) = t;
+        struct ContactSwarmSprite *sprite = &projectile->sprite;
+        sprite->frame = 25;
     }
+    ClearFlags(&projectile->flags, ~1);
+    projectile->limit = projectile->sprite.position.y;
     return 0;
 }

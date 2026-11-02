@@ -34,62 +34,42 @@ static inline s32 ScalarApproach_Half(s32 current, s32 target)
         step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> 1));
     return (s32)((u32)current + (u32)step);
 }
-static inline s32 ScalarApproach_Shift2(s32 current, s32 target)
+static inline s32 ScalarApproach_ApplyDelta(s32 current, s32 target, s32 delta, u32 shift)
 {
-    s32 delta = (s32)((u32)target - (u32)current);
     s32 step;
+    u32 threshold = (1u << shift) - 1;
     if (delta != 0) {
-        if (((u32)delta + 3u) <= 6) {
-            s32 minimum = -4;
+        if ((u32)delta + threshold <= 2 * threshold) {
+            s32 minimum = -(1 << shift);
             if (delta > 0)
-                minimum = 4;
+                minimum = 1 << shift;
             delta = minimum;
         }
         if (delta >= 0)
-            step = delta >> 2;
+            step = delta >> shift;
         else
-            step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> 2));
+            step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> shift));
         target = (s32)((u32)current + (u32)step);
     }
     return target;
+}
+static inline s32 ScalarApproach_Shift2(s32 current, s32 target)
+{
+    return ScalarApproach_ApplyDelta(current, target, (s32)((u32)target - (u32)current), 2);
 }
 static inline s32 ScalarApproach_Shift3(s32 current, s32 target)
 {
-    s32 delta = (s32)((u32)target - (u32)current);
-    s32 step;
-    if (delta != 0) {
-        if (((u32)delta + 7u) <= 14) {
-            s32 minimum = -8;
-            if (delta > 0)
-                minimum = 8;
-            delta = minimum;
-        }
-        if (delta >= 0)
-            step = delta >> 3;
-        else
-            step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> 3));
-        target = (s32)((u32)current + (u32)step);
-    }
-    return target;
+    return ScalarApproach_ApplyDelta(current, target, (s32)((u32)target - (u32)current), 3);
 }
 static inline s32 ScalarApproach_Shift4(s32 current, s32 target)
 {
-    s32 delta = (s32)((u32)target - (u32)current);
-    s32 step;
-    if (delta != 0) {
-        if (((u32)delta + 15u) <= 30) {
-            s32 minimum = -16;
-            if (delta > 0)
-                minimum = 16;
-            delta = minimum;
-        }
-        if (delta >= 0)
-            step = delta >> 4;
-        else
-            step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> 4));
-        target = (s32)((u32)current + (u32)step);
-    }
-    return target;
+    return ScalarApproach_ApplyDelta(current, target, (s32)((u32)target - (u32)current), 4);
+}
+static inline void ScalarApproach_AdvanceValue(s16 *value, const s16 *to, u32 shift)
+{
+    s32 target = *to;
+    s32 current = *value;
+    *value = ScalarApproach_ApplyDelta(current, target, target - current, shift);
 }
 static inline s32 ScalarApproach_Linear(s32 current, s32 target, s32 step)
 {

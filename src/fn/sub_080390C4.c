@@ -339,14 +339,14 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
         Inventory_ClearKeyItemSlot(i);
     p->rightMask = 0xFCF;
     {
-        register int zero asm("r2") = 0;
+        int zero = 0;
         int byteZero;
         int one;
         p->v18 = zero;
         byteZero = 0;
         {
-            register u16 half asm("r2") = 0;
-            asm("" : "+r"(half));
+            u16 half = 0;
+
             p->v1c = half;
             p->v1e = half;
         }

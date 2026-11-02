@@ -1,6 +1,8 @@
 #include "global.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
+
+#include "scene_facing.h"
+
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -78,6 +80,16 @@ int Script_GetValue(void);
 int SceneCharacter_GetPathNodeState(struct Actor *);
 void SceneBody_StartRoute(void *, void *, int, int, int);
 void Path_GetPointPosition(void *, void *, int);
+static inline void Actor_SetScriptState(struct Actor *p, u8 state)
+{
+    int zero = 0;
+    p->stage = zero;
+    p->phase = zero;
+    p->state = state;
+    p->ticks = zero;
+    p->entered = 1;
+}
+
 int Actor_BeginScriptControl(void)
 {
     void *m = gSceneActorListManager;
@@ -89,19 +101,9 @@ int Actor_BeginScriptControl(void)
         return -1;
     if (Script_SeekToKeyword(0x64)) {
         int value = Script_GetValue();
-        register int angle asm("r0");
         p->angle = value;
-        angle = (u16)value;
-        {
-            register int shifted asm("r2") = (angle + 112) >> 5;
-            int facing = 7 & shifted;
-            p->facing8 = facing;
-        }
-        angle = (angle + 96) >> 6;
-        {
-            int facing = 3 & angle;
-            p->facing4 = facing;
-        }
+        p->facing8 = SceneFacing_EightWay(value);
+        p->facing4 = SceneFacing_FourWay(value);
     }
     if (Script_SeekToKeyword(0x72)) {
         p->pathId = Script_GetValue();
@@ -125,27 +127,10 @@ int Actor_BeginScriptControl(void)
     }
     if (Script_SeekToKeyword(0x75))
         p->enabled = Script_GetValue();
-    {
-        register int state asm("r0");
-        int zero;
-        if (p->pathId >= 0)
-            state = SceneCharacter_GetPathNodeState(p);
-        else
-            state = 6;
-        zero = 0;
-        p->stage = zero;
-        p->phase = zero;
-        p->state = state;
-        p->ticks = zero;
-        {
-            int one = 1;
-            asm("" : "+r"(one));
-            p->entered = one;
-        }
-        {
-            u8 *controlled = &p->controlled;
-            *controlled = 1;
-        }
-    }
+    if (p->pathId >= 0)
+        Actor_SetScriptState(p, SceneCharacter_GetPathNodeState(p));
+    else
+        Actor_SetScriptState(p, 6);
+    p->controlled = 1;
     return 0;
 }

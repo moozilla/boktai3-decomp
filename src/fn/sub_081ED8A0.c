@@ -1,4 +1,5 @@
 #include "global.h"
+#include "display_sequence_inline.h"
 #include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Frames {
@@ -36,28 +37,23 @@ static inline void step(struct Frames *f, struct Render *r)
     u16 *word = f->data + f->index;
     r->tile = *word >> 6;
     {
-        int settings = f->flags;
-        register int mask asm("r3") = 1;
-        register int mine asm("r1");
-        int bits;
-        mine = mask & settings;
-        bits = (*word & 48) >> 4;
-        bits &= mask;
-        if (mine != bits)
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = f->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*word & 0x30) >> 4) & bit))
             r->flags |= 4;
         else
             r->flags &= ~4;
     }
     {
-        int settings = f->flags;
-        register int mask asm("r3") = 2;
-        register int mine asm("r1");
-        int bits;
-        mine = mask & settings;
-        mine = (u8)mine;
-        bits = (*word & 48) >> 4;
-        bits &= mask;
-        if (mine != bits)
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = f->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*word & 0x30) >> 4) & bit))
             r->flags |= 8;
         else
             r->flags &= ~8;

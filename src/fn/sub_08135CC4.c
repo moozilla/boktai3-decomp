@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 
 // confidence=low: resets reaction state when damage flag 0x4000 is set.
@@ -36,12 +35,8 @@ u32 SceneActorReaction_ResetFlaggedState(struct SceneActorRegistryResetView *act
         bit = 2;
         motionFlags = &actor->flags2D4;
         {
-            u32 flags = *motionFlags;
-            u32 combined;
-            combined = bit;
-            asm("" : "+r"(combined));
-            combined |= flags;
-            *motionFlags = combined;
+            u16 mask = bit;
+            *motionFlags |= mask;
         }
         SetState(actor, 3, 0, 0);
         actor->colliderA.responseValue = 38;

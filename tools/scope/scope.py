@@ -3255,7 +3255,7 @@ def has_knobs(env):
 # means another insn (or none) in the build's own compile (no -g): only these force a -g compile.
 # The others name pseudos (AGBCC_PRI, AGBCC_FORCE, CSE_NOCANON, CSE_KEEP) or count events
 # (AGBCC_SPILL, AGBCC_NOPRE, CSE_NOFOLLOW) and are compiled as the build compiles.
-UID_KNOBS = ("AGBCC_CROSS_LIMIT", "AGBCC_NOCROSS", "AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
+UID_KNOBS = ("AGBCC_CROSS_LIMIT", "AGBCC_NOCROSS", "AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_MOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
 
 
 def needs_g(env):
@@ -7034,7 +7034,14 @@ def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, siz
     fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
     subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", path], cwd=ROOT, check=True)
     bad = []
-    for f in progress.c_functions(path, with_asm=False):
+    names = progress.c_functions(path, with_asm=False)
+    if len(names) > 1 and not nonmatching:
+        import unit_check
+        addresses = dict(funcs)
+        expected = {f: (addresses[rom_name(dest, f)], sizes[rom_name(dest, f)]) for f in names}
+        if unit_check.stock_match(dest, expected, elf_syms(), rom_bytes()):
+            names = []
+    for f in names:
         k, inf = score(dest, f, {})
         if k != 0:
             bad.append(f"{f}: {inf.get('counts')}")

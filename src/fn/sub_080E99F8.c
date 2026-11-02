@@ -69,10 +69,10 @@ void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 fr
             u8 *player = target->owner;
             u32 a3, a4, a5, a6;
             SpriteParticle_SpawnBatch(&actor->body.position, 1, 2, 0, 0x154);
-            a3 = *(u16 *)((u8 *)actor + 0xB4);
-            a4 = *(u16 *)((u8 *)actor + 0xBC);
-            a5 = *(u32 *)((u8 *)actor + 0xCC);
-            a6 = *(u16 *)((u8 *)actor + 0xC4);
+            a3 = actor->attacks.first[0];
+            a4 = actor->attacks.second[0];
+            a5 = actor->attacks.flags[0];
+            a6 = actor->attacks.parameter[0];
             SpriteEffect_SpawnTowardObject((u8 *)actor + 0x50, player + 0x24, a3, a4, a5, a6);
             Sound_PlaySong(0x1E0);
         }

@@ -15,7 +15,7 @@ s32 Lun_PlayResponseAndResetState(struct SceneActorPlacementView *s)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x13E);
-    if (*(u32 *)((u8 *)s + 0x2DC) & 0x40000)
+    if (s->flags2DC & 0x40000)
         SetFlags(s, 0x20);
     {
         const void *control = s->savedControl230;

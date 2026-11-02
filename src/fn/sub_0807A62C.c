@@ -1,36 +1,26 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_update.h"
 void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *);
+static inline u32 SceneActorBehavior_TestMotionFlags(u32 mask, struct SceneActorBehaviorView *p)
+{
+    return p->flags2D4 & mask;
+}
+static inline u32 SceneActorBehavior_TestStatusFlags(u32 mask, struct SceneActorBehaviorView *p)
+{
+    return p->flags2D0 & mask;
+}
 static inline u8 Inactive(struct SceneActorBehaviorView *actor)
 {
-    u32 offset;
     if (!actor)
         return 0;
-    {
-        u32 mask = 0x40;
-        offset = 0x2D4;
-        asm("" : "+r"(offset));
-        if (*(u16 *)((u8 *)actor + offset) & mask)
-            return 1;
-    }
-    {
-        u32 mask = 0x20000;
-        offset -= 4;
-        {
-            u32 flags = *(u32 *)((u8 *)actor + offset);
-            if (flags & mask)
-                return 1;
-        }
-    }
-    if (actor->health <= 0)
+    if (SceneActorBehavior_TestMotionFlags(0x40, actor) ||
+        SceneActorBehavior_TestStatusFlags(0x20000, actor) || actor->health <= 0)
         return 1;
     return 0;
 }
 s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorBehaviorView *actor)
 {
-    register struct SceneActorBehaviorView *updateActor asm("r2") = actor;
+    struct SceneActorBehaviorView *updateActor = actor;
     u32 inactive;
-    /* The caller supplies a valid actor; the inlined availability test retains its null case. */
     actor->counter304 = 0;
     inactive = Inactive(actor);
     if (!inactive) {
@@ -40,55 +30,37 @@ s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorBehaviorView *ac
         {
             u32 mask = 0x2000;
             u32 flags;
-            {
-                /* Retain the initialized control offset across the flag load for allocation. */
-                register u32 offset asm("r2") = 0x3D4;
-                flags = actor->flags2D4;
-                asm("" : "+r"(flags) : "r"(offset));
-            }
+            flags = actor->flags2D4;
             if (flags & mask)
                 control->timer = inactive;
             else {
                 struct SceneActorRegistryActor *base = (void *)actor;
-                register u32 timerOffset asm("r2") = 0x2B8;
-                u16 *timerPtr;
+                u16 *timerPtr = &base->field2B8;
                 s16 timer;
-                asm("" : "+r"(timerOffset));
-                timerPtr = (void *)((u8 *)base + timerOffset);
                 timer = *timerPtr;
                 if (timer) {
                     if (((u16)timer >> 2) & 1) {
                         u32 mask = 0x20;
-                        asm("" : "+r"(mask));
-                        actor->flags2D6 |= mask;
+                        mask |= actor->flags2D6;
+                        actor->flags2D6 = mask;
                     }
                     (*timerPtr)--;
                 }
                 {
-                    register u32 timerOffset asm("r2") = 0x1F6;
-                    u8 *timerPtr;
-                    asm("" : "+r"(timerOffset));
-                    timerPtr = (u8 *)control + timerOffset;
+                    u8 *timerPtr = &control->timer;
                     if (*timerPtr)
                         (*timerPtr)--;
                 }
             }
         }
         {
-            u32 contactOffset = 0x45C;
             struct SceneActorUpdateContact *contact = (void *)actor;
             struct SceneActorContactNode **node;
-            node = (void *)((u8 *)actor + contactOffset);
+            node = &contact->contact;
             if (*node) {
                 u32 registered = (u8)SceneActorContacts_ContainsActiveNode(*node);
                 if (!registered) {
-                    u32 cleanupOffset = 0x618;
-                    void *cleanup;
-                    {
-                        void **cleanupPointer;
-                        cleanupPointer = (void *)((u8 *)contact + cleanupOffset);
-                        cleanup = *cleanupPointer;
-                    }
+                    void *cleanup = contact->cleanup;
                     Callback_InvokeActor(actor, cleanup);
                     *node = (void *)registered;
                 }

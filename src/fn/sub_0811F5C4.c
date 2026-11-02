@@ -45,10 +45,10 @@ s32 ActorAbility_UpdateRecovery(struct ActorAbility *ability)
     palette = CharacterModel_GetPrimaryPaletteIndex(owner + 0x610);
     started = ability->started;
     if (started == 0) {
-        PalFade_Start(stats, 0x386, 0x386, palette, *(u16 *)((u8 *)stats + 0x7e), 15, 4, started);
+        PalFade_Start(stats, 0x386, 0x386, palette, stats->recoveryValue, 15, 4, started);
         ability->started = 1;
     } else if (!(*(u32 *)(owner + 0x8e4) & 1)) {
-        PalFade_Start(stats, 0x386, 0x386, palette, *(u16 *)((u8 *)stats + 0x7e), 15, 4, 1);
+        PalFade_Start(stats, 0x386, 0x386, palette, stats->recoveryValue, 15, 4, 1);
     }
     if (ability->soundTimer == 0)
         ability->soundTimer = 30;

@@ -40,14 +40,14 @@ void Slime_RunPendingActionScript(struct SceneActorRegistryResetView *actor)
         values[0] = actor->body.position.x;
         values[1] = actor->body.position.y;
         values[2] = actor->body.position.z;
-        values[3] = *(s16 *)((u8 *)actor + 0x9C);
+        values[3] = actor->health;
         Polar(&vector, actor->field2B6, 12);
         values[4] = vector.x;
         values[5] = 24;
         values[6] = vector.z;
         values[7] = actor->paletteOffset;
         values[8] = *(u16 *)(body + 0x406);
-        values[9] = *(u16 *)((u8 *)actor + 0xB0);
+        values[9] = (u16)actor->defaultHealth;
         args.count = 10;
         args.values = values;
         Script_Call(*(u16 *)(body + 0x404), &args);

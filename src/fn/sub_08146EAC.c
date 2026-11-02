@@ -42,12 +42,12 @@ void Player_UpdateAlternateFormCue(struct Player *p)
         if (p->actionMode != 2) {
             if (p->statHundredths > 999 || (gEngineFlags & 0x1000) || p->kind == 2)
                 p->statusValue = 4000;
-            V->sprite.position.y = 450 + *(u16 *)((u8 *)gGameState + 0x32);
+            V->sprite.position.y = 450 + (u16)gGameState->positionY;
             V->sprite.position.pad = 1;
             B(0x432) = 2;
             B(0x433) = 1;
         } else {
-            V->sprite.position.y = *(u16 *)((u8 *)gGameState + 0x32) + 220;
+            V->sprite.position.y = (u16)gGameState->positionY + 220;
             V->sprite.position.pad = 0;
             B(0x432) = 0;
             B(0x433) = 1;

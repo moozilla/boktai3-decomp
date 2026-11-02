@@ -1,5 +1,5 @@
-#include "global.h"
-// MATCHING_CONCESSION: register-pinning
+#include "player.h"
+#include "contact_actor.h"
 
 // confidence=low: holding input charges recoil and release advances the tether attack.
 
@@ -13,18 +13,6 @@ void Player_PlayLocalSong(s32 a, u32 b);
 s32 Player_UpdateFacingFromInputHistory(u8 *p);
 void sub_0823B308(u8 *p);
 
-struct BurstA {
-    s32 a;
-    u32 b : 16;
-    u32 c : 16;
-};
-struct BurstB {
-    u32 a : 16;
-    u32 b : 16;
-    u32 c : 16;
-    u32 d : 16;
-};
-
 static inline int scale(int n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
@@ -32,17 +20,17 @@ static inline int scale(int n)
 
 void Player_UpdateChargedTetherStrike(u8 *p)
 {
-    struct BurstA ba;
-    struct BurstB bb;
+    struct ContactPackedVector ba;
+    struct ContactPackedVector bb;
     u16 *t;
     u16 *c;
     u16 *r;
     s32 a, id;
 
-    switch (*(u8 *)(p + 0x458)) {
+    switch (((struct Player *)p)->tetherPhase) {
         case 0:
-            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x23),
-                                         0x40))
+            if (Player_SetAnimationIndex(
+                    p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x23), 0x40))
                 Player_SetTetherMode(p, 3, 1);
             break;
         case 1:
@@ -50,7 +38,8 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             if (*t == 0)
                 Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F7);
             Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x24), 0x40);
+            Player_SetAnimationIndex(
+                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x24), 0x40);
             (*t)++;
             if (*t <= 6)
                 break;
@@ -62,19 +51,20 @@ void Player_UpdateChargedTetherStrike(u8 *p)
                 goto fin;
             }
             *(u16 *)(p + 0xC12) = 0xF;
-            if (**(u16 **)(p + 0x348) & 2) {
+            if (((struct Player *)p)->inputKeys[0] & 2) {
                 Player_SetTetherMode(p, 3, 2);
                 break;
             }
             goto l340;
         case 2:
             Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x24), 0x40);
+            Player_SetAnimationIndex(
+                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x24), 0x40);
             (*(u16 *)(p + 0xC12))++;
             t = (u16 *)(p + 0x45A);
             if (*t == 6)
                 Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F8);
-            if (!(**(u16 **)(p + 0x348) & 2))
+            if (!(((struct Player *)p)->inputKeys[0] & 2))
                 goto l340;
             (*t)++;
             if (*t <= 0x3B)
@@ -100,9 +90,10 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             break;
         case 4:
             Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x24), 0x40);
+            Player_SetAnimationIndex(
+                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x24), 0x40);
             (*(u16 *)(p + 0xC12))++;
-            if (**(u16 **)(p + 0x348) & 2)
+            if (((struct Player *)p)->inputKeys[0] & 2)
                 break;
         l340:
             a = *(s32 *)(p + 0x18);
@@ -113,23 +104,19 @@ void Player_UpdateChargedTetherStrike(u8 *p)
             break;
         case 5: {
             s32 ang, n;
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x25), 0x40);
-            if ((*(u16 **)(p + 0x348))[1] & 2)
+            Player_SetAnimationIndex(
+                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x25), 0x40);
+            if (((struct Player *)p)->inputKeys[1] & 2)
                 *(u8 *)(p + 0xBF6) = 1;
             r = (u16 *)(p + 0x4D2);
             if (*r != 0) {
                 if (*r > 5) {
-                    {
-                        u32 k2 = 0xFFFF0000;
-                        u32 k = 0xFFFF;
-                        asm("" ::"r"(k2));
-                        asm("" ::"r"(k));
-                    }
-                    ba.a = 0;
-                    ba.b = 0;
-                    bb.a = 0x20;
-                    bb.b = 0x20;
-                    bb.c = 0x20;
+                    ba.x = 0;
+                    ba.y = 0;
+                    ba.z = 0;
+                    bb.x = 32;
+                    bb.y = 32;
+                    bb.z = 32;
                     SceneParticleBurst_CreateWhilePaused(p + 0x30, &ba, &bb, 1, 3, 4);
                 }
                 ang = ((*(u8 *)(p + 0x3A4) + 5) & 7) << 5;
@@ -138,35 +125,36 @@ void Player_UpdateChargedTetherStrike(u8 *p)
                 *(s16 *)(p + 0x3C) = -scale(*(u16 *)(p + 0x4D2) * gUnk_086149C4[ang]);
                 *(u16 *)(p + 0x4D2) = (*(u16 *)(p + 0x4D2) * 3) >> 2;
             } else {
-                (*(u16 *)(p + 0x45A))++;
-                if (*(u16 *)(p + 0x45A) > 4)
+                (((struct Player *)p)->tetherFrame)++;
+                if (((struct Player *)p)->tetherFrame > 4)
                     Player_SetTetherMode(p, 3, 6);
             }
             break;
         }
         case 6:
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x24), 0x40);
-            if ((*(u16 **)(p + 0x348))[1] & 2)
+            Player_SetAnimationIndex(
+                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x24), 0x40);
+            if (((struct Player *)p)->inputKeys[1] & 2)
                 *(u8 *)(p + 0xBF6) = 1;
             {
                 u32 released = *(u8 *)(p + 0xBF6);
                 if (released) {
                     *(u8 *)(p + 0xBF6) = 0;
-                    *(u8 *)(p + 0x458) = 1;
+                    ((struct Player *)p)->tetherPhase = 1;
                     break;
                 }
-                (*(u16 *)(p + 0x45A))++;
-                if (*(u16 *)(p + 0x45A) > 0xE) {
-                    register u32 zero asm("r0") = 0;
-                    *(u8 *)(p + 0xBF6) = zero;
+                (((struct Player *)p)->tetherFrame)++;
+                if (((struct Player *)p)->tetherFrame > 0xE) {
+                    *(u8 *)(p + 0xBF6) = 0;
                     Player_SetTetherMode(p, 3, 7);
                 }
             }
             break;
         case 7:
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*(u8 *)(p + 0x418), 0x23), 0x40);
-            (*(u16 *)(p + 0x45A))++;
-            if (*(u16 *)(p + 0x45A) > 4)
+            Player_SetAnimationIndex(
+                p, ActorVariant_GetTableValue(((struct Player *)p)->actionMode, 0x23), 0x40);
+            (((struct Player *)p)->tetherFrame)++;
+            if (((struct Player *)p)->tetherFrame > 4)
                 Player_SetTetherMode(p, 0, 0);
             break;
         default:
@@ -174,7 +162,7 @@ void Player_UpdateChargedTetherStrike(u8 *p)
     }
     c = (u16 *)(p + 0xC12);
     if (*c > 0xE) {
-        if (*(u8 *)(p + 0x418) == 1)
+        if (((struct Player *)p)->actionMode == 1)
             sub_0823B308(p);
         *c = 0;
     }

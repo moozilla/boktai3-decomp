@@ -54,13 +54,14 @@ s32 ScenePanel_CanAcceptPlayer(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
-    if (player->kindValue == 1 && (u8)(player->actionMode - 3) > 2) {
-        asm("" : : : "r3");
-        if (player->tetherMode == 7) {
-            if (ScenePanel_IsWithinHorizontalRadius(&player->position, &panel->approachPosition,
-                                                    100))
-                return 1;
-        }
+    if (player->kindValue != 1)
+        return 0;
+    if ((u8)(player->actionMode - 3) <= 2)
+        return 0;
+    if (player->tetherMode == 7) {
+        if (ScenePanel_IsWithinHorizontalRadius(&player->position, &panel->approachPosition, 100))
+            return 1;
+        return 0;
     }
     return 0;
 }
@@ -125,11 +126,14 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         }
         TetherActor_SetInteractionTarget(&position, direction);
     } else if (frame == 6) {
-        gTetherActor->state = 12;
+        {
+            u8 *state = &gTetherActor->state;
+            *state = 12;
+        }
         gTetherActor->position = panel->center;
         {
             u8 *heading = &gTetherActor->heading;
-            register u32 zero asm("r0");
+            u32 zero;
             zero = 0;
             *heading = zero;
         }
@@ -271,11 +275,9 @@ void ScenePanel_AdvancePlayerArrival(struct ScenePanel *input)
 }
 
 // MATCHING_CONCESSION: register-pinning
-void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
+void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *panel)
 {
-    struct ScenePanel *panel = (void *)input;
     u32 frame;
-    DEBUG_NOP();
     frame = (u16)(++panel->effectFrame);
     if (frame == 30) {
         s32 i = 0;
@@ -613,12 +615,11 @@ void ScenePanel_InitResourceConfiguration(struct ScenePanel *parent)
         gGameState->unk618 = Script_GetValue();
         gGameState->unk61C = Script_GetValue();
     } else {
+        s32 *resource;
         parent->resourceIndex = found;
-        {
-            struct GameState *volatile *slot = &gGameState;
-            (*slot)->unk618 = 6000;
-            (*slot)->unk61C = 6000;
-        }
+        resource = &gGameState->unk618;
+        *resource = 6000;
+        gGameState->unk61C = 6000;
     }
     if (gGameState->unk618 > (gGameState->unk61C >> 2))
         parent->warningStage = 0;

@@ -28,11 +28,11 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
         u32 mask = ~0x141C0;
         *field &= mask;
         control->counter = 0;
-        *(u16 *)((u8 *)control + 0x14) = 0;
+        control->field14 = 0;
         control->timer = 0;
         SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
         Sound_PlaySong(318);
-        *(u16 *)((u8 *)actor + 0x178) = 0;
+        actor->colliderA.responseValue = 0;
         if (actor->drawableKind == 0) {
             u32 *flags = actor->drawable;
             u32 mask = ~1;
@@ -74,7 +74,7 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
         {
             u32 mask = 32;
             asm("" : "+r"(mask));
-            actor->flags2D6 = mask | *(u16 *)((u8 *)actor + 0x2D6);
+            actor->flags2D6 = mask | actor->flags2D6;
         }
     }
     if (context[0xA3C]) {

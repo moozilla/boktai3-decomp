@@ -85,18 +85,18 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     flash = 0;
     if (p->particleEmissionCount) {
         s32 bit = LocalPlayer();
-        if ((*(s16 *)((u8 *)p + 0x54E) >> bit) & 1)
+        if (((s16)p->lastContactFlags >> bit) & 1)
             flash = 1;
     }
     if (p->terrainClampApplied)
         p->particleEmissionCount += Player_BeginTerrainRecovery_0823BA78(p);
-    if (p->positionResetValue == 0 && p->movementModifierKind == 1 && *(u8 *)((u8 *)p + 0x5BB)) {
+    if (p->positionResetValue == 0 && p->movementModifierKind == 1 && p->movementModifierActive) {
         u16 *c;
         u16 n;
         FlagOr(0x200, &p->statusFlags);
-        c = (u16 *)((u8 *)p + 0x4C6);
+        c = &p->terrainDamageTimer;
         n = ++*c;
-        if (n >= Div(0x3c, *(u8 *)((u8 *)p + 0x5BB))) {
+        if (n >= Div(0x3c, p->movementModifierActive)) {
             p->particleEmissionCount += 10;
             *c = 0;
         }

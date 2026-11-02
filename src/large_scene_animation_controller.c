@@ -1222,7 +1222,8 @@ static inline u8 *GetGroupStages(struct Nidhoggr *p)
     return ((struct NidhoggrGroupHealth *)p)->state;
 }
 
-void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c, struct Nidhoggr *input)
+void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c,
+                                 struct Nidhoggr *input)
 {
     struct Nidhoggr *t;
     u32 part;
@@ -3847,8 +3848,11 @@ s32 Nidhoggr_Init(struct Nidhoggr *t, s32 unusedA, s32 unusedB)
     Nidhoggr_InitSuspendedObject(t);
     Nidhoggr_SetBehavior(t, 0);
     t->life = t->maxLife;
-    *(s32 *)((u8 *)gGameState + 0x61c) = (s16)t->maxLife;
-    *(s32 *)((u8 *)gGameState + 0x618) = t->life;
+    {
+        s32 *maximum = &gGameState->unk61C;
+        *maximum = (s16)t->maxLife;
+    }
+    gGameState->unk618 = t->life;
     t->flags[0] = 0;
     t->flags[1] = 0;
     t->attackActive = 0;

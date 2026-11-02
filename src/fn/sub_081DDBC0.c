@@ -1,4 +1,4 @@
-#include "global.h"
+#include "text_entry_widget.h"
 #include "game_state.h"
 #include "ram.h"
 #include "input.h"
@@ -9,7 +9,8 @@
  * the fade, hides the widgets, runs the follow-up script and kills the task. (guess) */
 
 struct NameEntryTask {
-    u8 widgets[0x348];
+    u8 task[0x18];
+    struct TextEntryWidget widgets[6];
     s32 unk348;
     s32 selection; /* 0x34C: keyboard key; 0x55 page toggle, 0x56 End */
     s32 position;  /* 0x350: cursor position in the name */
@@ -138,31 +139,36 @@ void NameEntry_Update(struct NameEntryTask *p)
             {
                 s32 x = p->position << 4;
                 u32 zero;
-                u16 *h = (u16 *)((u8 *)p + 0x1D0);
+                s16 *h = &p->widgets[3].x;
                 zero = 0;
                 *h = x;
-                *(u16 *)((u8 *)p + 0x1D2) = zero;
+                p->widgets[3].y = zero;
             }
             Palette_UpdateHighlightPulse((u8 *)p + 0x3B8, (u8 *)p + 0x3E0);
             Palette_UpdateHighlightPulse((u8 *)p + 0x3D8, (u8 *)p + 0x3E1);
             break;
         case 1:
             if (p->timer > (1 << p->fadeShift) || p->fadeShift == 0) {
-                *(u32 *)((u8 *)p + 0x2C8) |= 1;
-                *(u32 *)((u8 *)p + 0x240) |= 1;
-                *(u32 *)((u8 *)p + 0x1B8) |= 1;
-                *(u32 *)((u8 *)p + 0x130) |= 1;
-                *(u32 *)((u8 *)p + 0xA8) |= 1;
-                *(u32 *)((u8 *)p + 0x20) |= 1;
+                p->widgets[5].flags |= 1;
+                p->widgets[4].flags |= 1;
+                p->widgets[3].flags |= 1;
+                p->widgets[2].flags |= 1;
+                p->widgets[1].flags |= 1;
+                p->widgets[0].flags |= 1;
                 if (p->result == 0) {
                     Script_Call(gNamePlaceholderScript[3], 0);
                 } else {
                     u32 v = gNamePlaceholderScript[4];
                     if (v == 0) {
-                        *(u16 *)((u8 *)gGameState + 8) = v;
-                        *(u16 *)((u8 *)gGameState + 0xA) = v;
-                        *(u16 *)((u8 *)gGameState + 0xC) = v;
-                        *(u16 *)((u8 *)gGameState + 0xE) = v;
+                        u16 *slot;
+                        slot = &gGameState->values08[0];
+                        *slot = v;
+                        slot = &gGameState->values08[1];
+                        *slot = v;
+                        slot = &gGameState->values08[2];
+                        *slot = v;
+                        slot = &gGameState->values08[3];
+                        *slot = v;
                     }
                     Script_Call(gNamePlaceholderScript[2], 0);
                 }

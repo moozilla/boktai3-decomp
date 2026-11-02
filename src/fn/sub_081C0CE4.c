@@ -230,7 +230,7 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
             }
             if (task->timer > 0x3c || (gPadState[1] & 1)) {
                 Menu_EraseRect(0x17, 0xa, 8, 2);
-                v = *(s16 *)((u8 *)gGameState + 0x660);
+                v = gGameState->unk660;
                 switch (v) {
                     case 0:
                         Menu_DrawText(0x17, 0xa, gUnk_0824F960);

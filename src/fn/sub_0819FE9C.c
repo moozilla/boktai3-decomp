@@ -1,6 +1,6 @@
+#include "monster_particle_random.h"
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 #include "engine.h"
 
 // confidence=low: moves a requested player position and eventually restores player control.
@@ -60,13 +60,6 @@ static inline u8 PlayerCanMove(struct Player *p, u32 mask)
 static inline u32 PlayerHasFlag(struct Player *p, u32 mask)
 {
     return p->flags & mask;
-}
-static inline s32 RandomValue(const u16 *table)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)table);
 }
 static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
 {
@@ -208,18 +201,17 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             else {
                 struct Vec delta;
                 const u16 *table = gRandomTable;
-                s32 rawX = RandomValue(table) >> 3;
+                s32 rawX = (s32)ParticleRandom_ReadDirectSample(table) >> 3;
                 u32 smallMask = 31;
                 u8 x = rawX & smallMask;
-                s32 z = (RandomValue(table) >> 3) & smallMask;
-                // Preserve the shared random table across particle setup.
-                asm("" : : "r"(table));
+                s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & smallMask;
                 SetVector(&delta, x - 16, 0, z - 16);
                 actor->velocity = saved->step;
                 saved->step.y--;
                 if (tick & 1)
                     MotionEntry_CreateWithDelta(&saved->renderPosition, &delta,
-                                                (RandomValue(table) >> 5) % 4, 64);
+                                                ((s32)ParticleRandom_ReadSample(table) >> 5) % 4,
+                                                64);
                 actor->velocity.x =
                     Math_ApproachEighth(actor->position.x, saved->target.x) - actor->position.x;
                 actor->velocity.z =
@@ -241,14 +233,13 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             } else {
                 struct Vec delta;
                 const u16 *table = gRandomTable;
-                s32 x = (RandomValue(table) >> 3) & 31;
-                s32 z = (RandomValue(table) >> 3) & 31;
-                // Preserve the shared random table across particle setup.
-                asm("" : : "r"(table));
+                s32 x = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 31;
+                s32 z = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 31;
                 SetVector(&delta, x - 16, 0, z - 16);
                 if (tick & 1)
                     MotionEntry_CreateWithDelta(&saved->renderPosition, &delta,
-                                                (RandomValue(table) >> 5) % 4, 64);
+                                                ((s32)ParticleRandom_ReadSample(table) >> 5) % 4,
+                                                64);
                 actor->velocity = saved->step;
                 saved->step.y--;
             }

@@ -1,10 +1,5 @@
 #include "global.h"
 #include "motion_track.h"
-static inline void MotionTrack_ClearVector(void *destination)
-{
-    volatile u32 zero = 0;
-    CpuSet((const void *)&zero, destination, 0x05000002);
-}
 void MotionTrack_Initialize(struct MotionTrack *track, const void *data,
                             const struct MotionTrackVector *origin,
                             const struct MotionTrackVector *target, u32 mode)
@@ -14,12 +9,12 @@ void MotionTrack_Initialize(struct MotionTrack *track, const void *data,
         if (origin)
             track->origin = *origin;
         else {
-            MotionTrack_ClearVector(&track->origin);
+            ZeroFill8(&track->origin);
         }
         if (target)
             track->target = *target;
         else {
-            MotionTrack_ClearVector(&track->target);
+            ZeroFill8(&track->target);
         }
         track->mode = mode;
         track->active = 1;

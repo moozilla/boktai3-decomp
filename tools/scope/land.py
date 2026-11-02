@@ -301,7 +301,13 @@ def stub_unit(text, asm_name, func, headers=()):
 
 def definition_span(text, name):
     """(start, end) of NAME's definition in TEXT, comment lines directly above included, or None."""
-    m = re.search(r"^[A-Za-z_][^\n;=()]*\b%s\s*\([^;{]*\)\s*\{" % re.escape(name), text, re.M)
+    names = [name]
+    if re.fullmatch(r"sub_[0-9A-Fa-f]{8}", name):
+        # Matching units may still spell the definition with a file-local ROM label alias.
+        names.extend(re.findall(r"^[ \t]*#define[ \t]+(\w+)[ \t]+%s[ \t]*(?://[^\n]*)?$"
+                                % re.escape(name), text, re.M))
+    spellings = "|".join(map(re.escape, names))
+    m = re.search(r"^[A-Za-z_][^\n;=()]*\b(?:%s)\s*\([^;{]*\)\s*\{" % spellings, text, re.M)
     if not m:
         return None
     depth, i = 0, text.index("{", m.start())

@@ -23,7 +23,9 @@ struct DisplayAnimation {
     u32 index;
     u8 variant, flags, finished, unknownB;
     struct DisplayAnimationResource resource;
-    u8 unknown68[0x24];
+    u8 unknown68[0x74 - 0x68];
+    const void *keyframeTileSource;
+    u8 unknown78[0x8C - 0x78];
     struct DisplayPosition *position;
     u32 *displayFlags;
 };

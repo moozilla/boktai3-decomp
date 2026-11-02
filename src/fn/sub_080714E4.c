@@ -62,7 +62,8 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
     }
     actor->body.position.y = height;
     if (!actor->drawableKind)
-        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->body.position;
+        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position =
+            actor->body.position;
     else
         ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->body.position;
     {
@@ -166,5 +167,5 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
         else
             ((u8 *)actor->drawable)[0x3A] = mode;
     }
-    *(u16 *)((u8 *)collider + 0x44) = 0;
+    collider->responseValue = 0;
 }

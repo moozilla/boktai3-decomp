@@ -109,8 +109,8 @@ void Player_UpdateInteractionMovement(struct Player *p)
                 break;
             {
                 u32 enabled = 0;
-                if (!Player_IsStatusBit3ActionActive(*(u16 *)((u8 *)p + 0x292)) &&
-                    p->tetherMode == 1 && (*(u8 *)((u8 *)p + 0x284) & 1))
+                if (!Player_IsStatusBit3ActionActive(p->movementStatus) && p->tetherMode == 1 &&
+                    (p->movementContactFlags & 1))
                     enabled = nonzero(p->facing & 1);
                 if (enabled) {
                     if (++*(u16 *)p->unk4A6 == 5) {

@@ -28,9 +28,12 @@ void SelectionMenu_ApplyConfirmedReward(struct SelectionMenu *p)
         Hud_SetUpdateCallback(p, SelectionMenu_UpdateConfirmInput);
     } else if (result == 1) {
         Sound_PlaySong(0xDD);
-        ((struct GameState *)(u8 *)gGameState)->menuRewardBalance += (p->count - 1) * 50;
-        if (((struct GameState *)(u8 *)gGameState)->menuRewardBalance > 9999)
-            (*(struct GameState *volatile *)&gGameState)->menuRewardBalance = 9999;
+        {
+            s32 *balance = &gGameState->menuRewardBalance;
+            *balance += (p->count - 1) * 50;
+            if (*balance > 9999)
+                gGameState->menuRewardBalance = 9999;
+        }
         p->confirmed = result;
         p->resultMode = 2;
         ScenePanel_BeginAccountExit(p);

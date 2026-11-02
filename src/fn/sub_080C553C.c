@@ -17,7 +17,7 @@ static inline void RecordContact(struct SceneActorRegistryResetView *a,
                                  struct ContactCollider *other)
 {
     if (!Unavailable(a) && (other->contactFlags & 15)) {
-        *(u32 *)((u8 *)a + 0x304) = *(u16 *)((u8 *)other + 4);
+        a->field304 = other->collisionId;
         {
             u32 *p = &a->flags2D0;
             s32 mask = 0xFEFFFFFF;
@@ -108,7 +108,7 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
                     other->responseFlags = mask | other->responseFlags;
                 }
                 {
-                    u16 id = *(u16 *)((u8 *)other + 4);
+                    u16 id = other->collisionId;
                     *(u16 *)(state + 0x634) = id;
                 }
             } else {

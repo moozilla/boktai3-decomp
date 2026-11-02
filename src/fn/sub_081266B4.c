@@ -8,12 +8,20 @@ struct StatusSlot {
     u8 pad2A[2];
     u16 reset, timer;
 };
-static inline u8 PlayerInMode(struct AreaEffectPlayer *p)
+struct StatusPlayer {
+    u8 unknown0[0x448];
+    u32 flags;
+    u8 unknown44C[0x534 - 0x44C];
+    u16 interactionMode;
+    u8 unknown536[2];
+    u16 passageState;
+};
+static inline u8 PlayerInMode(struct StatusPlayer *p)
 {
     if (p) {
-        u32 value = *(u16 *)((u8 *)p + 0x538);
+        u32 value = p->passageState;
         u32 active = 0;
-        if (value && *(u16 *)((u8 *)p + 0x534) == 4)
+        if (value && p->interactionMode == 4)
             active = 1;
         return active;
     }
@@ -43,13 +51,14 @@ void SceneStatusIndicator_UpdateBlink(void *owner, struct StatusSlot *input)
     if (gEngineFlags & 0x800) {
         s32 local;
         if (gLinkSession && (local = gLinkSession->localPlayer) >= 0) {
-            if (!PlayerInMode(gPlayers[local]))
+            if (!PlayerInMode((struct StatusPlayer *)gPlayers[local]))
                 goto checkActive;
             goto show;
         }
     } else {
         if (gWeatherCollisionTimer > 0 ||
-            (gPlayers[0] && TestMask((u32 *)((u8 *)gPlayers[0] + 0x448), 16)) || GlobalMode())
+            (gPlayers[0] && TestMask(&((struct StatusPlayer *)gPlayers[0])->flags, 16)) ||
+            GlobalMode())
             active = 1;
     }
 checkActive:

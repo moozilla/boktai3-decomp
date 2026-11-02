@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "record_menu.h"
 struct RecordList {
@@ -11,20 +10,16 @@ struct RecordList {
     void *spriteProc;
 };
 void *ScriptProc_Start(u16, u16);
-s32 ResourceHeader_Relocate(void *);
+#include "display_resource.h"
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void RecordList_InitializeSprites(struct RecordList *list)
 {
     s32 i;
     struct RecordMenuSprite *sprite;
     void *proc;
-    {
-        register void *t asm("r1") = ScriptProc_Start(0xcb05, 0x1289);
-        asm("" : "+r"(t));
-        proc = t;
-    }
+    proc = ScriptProc_Start(0xcb05, 0x1289);
     list->spriteProc = proc;
-    ResourceHeader_Relocate(list->resource);
+    ResourceHeader_Relocate(list->resource, proc);
     i = 0;
     {
         s32 zero = 0;

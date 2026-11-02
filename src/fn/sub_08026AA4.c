@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_graphics_actor.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -107,9 +108,11 @@ void SceneActors_UpdateRouteProjectileAttack(ActorAnimation *p, int tick)
                 }
                 spawn.y = 256;
                 add(&spawn, (Vec *)((u8 *)p + 0x54));
-                RouteSpriteActor_Create(&spawn, *(void **)((u8 *)p + 0x110), 6, 6,
-                                        *(s16 *)((u8 *)p2 + 0x378), *(s16 *)((u8 *)p2 + 0x37a),
-                                        zeroCall, 20, 20, zeroCall, zeroCall, 3);
+                RouteSpriteActor_Create(
+                    &spawn, *(void **)((u8 *)p + 0x110), 6, 6,
+                    ((struct SceneGraphicsActor *)p2)->graphics.routeProjectileAmount,
+                    ((struct SceneGraphicsActor *)p2)->graphics.routeProjectileKind, zeroCall, 20,
+                    20, zeroCall, zeroCall, 3);
             }
             if (*((u8 *)p2 + 0x25d) & 2)
                 p->finished = 1;

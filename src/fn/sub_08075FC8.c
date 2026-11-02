@@ -1,4 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
+#include "scene_actor_state.h"
 #include "scene_actor_registry.h"
 void SceneActorBehavior_UpdateColliders(struct SceneActorRegistryActor *);
 static inline u32 IsUnavailable(struct SceneActorRegistryActor *actor)
@@ -37,7 +38,7 @@ s32 SceneActorMovement_RequestAvailableAction(struct SceneActorRegistryActor *ac
 {
     u32 unavailable;
     /* The unconditional first store requires a valid actor. */
-    *(u32 *)((u8 *)actor + 0x304) = 0;
+    ((struct SceneActorRegistryResetView *)actor)->field304 = 0;
     unavailable = IsUnavailable(actor);
     asm("" : "+r"(unavailable));
     {

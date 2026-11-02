@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
-#include "player.h"
+#include "player_saved_position.h"
 struct LinkRef {
     u8 unk0[0x18];
     s16 bit;
@@ -42,16 +42,13 @@ s32 Player_UpdateLinkCore(struct Player *p)
     sub_0823A2E4(p);
     gPlayerSlotStatus[p->slot] = p->kind;
     if (p->slot == LocalPlayer()) {
-        *(u16 *)((u8 *)gGameState + 0x30) = p->position.x;
-        *(u16 *)((u8 *)gGameState + 0x32) = p->position.y;
-        *(u16 *)((u8 *)gGameState + 0x34) = p->position.z;
-        *(u16 *)((u8 *)gGameState + 0x85E) = ((p->facing + 5) & 7) << 5;
+        Player_SavePositionAndFacing(p);
     }
-    clearPtr = (u16 *)((u8 *)p + 0x54E);
+    clearPtr = &p->lastContactFlags;
     {
         s32 zero = 0;
         *clearPtr = zero;
-        F(u32, 0x550) = zero;
+        p->lastContactRewardFlags = zero;
     }
     if (p->kind != 8) {
         F(u32, 0x298) = (u32)p + 0x30;

@@ -23,6 +23,6 @@ s32 GameStats_SelectLeadingCounter(void)
             selected = 5;
         }
     }
-    *(s16 *)((u8 *)gGameState + 0x662) = selected;
+    gGameState->unk662 = selected;
     return selected;
 }

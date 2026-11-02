@@ -60,7 +60,7 @@ void Bee_UpdateFlightHeight(struct SceneActorRegistryResetView *actor)
     if ((s16)actor->field2EA <= 259) {
         {
             u32 mask = 1;
-            if (Test(*(volatile u32 *)&state->flags3D4, mask)) {
+            if (Test(state->flags3D4, mask)) {
                 actor->body.position.y = ((struct BeeFlightView *)actor)->ground;
                 return;
             }

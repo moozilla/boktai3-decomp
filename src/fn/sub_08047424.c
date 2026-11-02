@@ -15,10 +15,9 @@ s32 TransientSpriteEffects_Initialize(struct TransientSpriteEffects *pool, void 
     volatile s32 savedIndex;
     gTransientSpriteEffects = pool;
     {
-        u32 zPaddingMask = 0xFFFF0000;
-        asm("" : : "r"(zPaddingMask));
+        u32 zPaddingMask = 0xffff0000;
         position.words.xy = 0;
-        position.bits.z = 0;
+        position.words.zAndPadding &= zPaddingMask;
     }
     index = 0;
     do {

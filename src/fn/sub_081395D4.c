@@ -1,6 +1,8 @@
-#include "global.h"
-void ParticleBurstEffect_SetStateCallback(u32 *p, u32 v)
+#include "particle_effect_state.h"
+
+void ParticleBurstEffect_SetStateCallback(struct BurstEntry *effect,
+                                          void (*update)(struct BurstEntry *))
 {
-    *p = v;
-    *(u8 *)((u8 *)p + 0xcb) = 1;
+    effect->update = update;
+    effect->entered = 1;
 }

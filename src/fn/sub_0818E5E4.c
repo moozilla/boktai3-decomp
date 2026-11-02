@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-// MATCHING_CONCESSION: register-pinning
 extern const u8 gUnk_0824F174[];
 extern const u8 gUnk_0824F17C[];
 void *ScriptProc_Start(u32, u32);
@@ -157,10 +156,9 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
         q->b.b6 = 0;
         q->b.b7 = 0;
         {
-            u32 flags = q->b.b1;
-            u32 active = 1;
-            asm("" : "+r"(active));
-            q->b.b1 = active | flags;
+
+            u8 active = 1;
+            q->b.b1 |= active;
         }
         q->b.owner = p;
         q->h1D4 = 0x14;

@@ -1,10 +1,12 @@
-#include "global.h"
+#include "text_entry_widget.h"
 #include "menu_parameters.h"
 #include "runtime.h"
 #include "input.h"
 
 struct EntryMenu {
-    u8 sprites[0x34C];
+    u8 task[0x18];
+    struct TextEntryWidget widgets[6];
+    u8 unknown348[4];
     s32 selection, position;
     u8 pad354[4];
     u16 verticalHistory, horizontalHistory;
@@ -140,12 +142,12 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
             break;
         case 2:
             if (p->timer > (1 << p->fadeShift) || p->fadeShift == 0) {
-                *(u32 *)((u8 *)p + 0x2C8) |= 1;
-                *(u32 *)((u8 *)p + 0x240) |= 1;
-                *(u32 *)((u8 *)p + 0x1B8) |= 1;
-                *(u32 *)((u8 *)p + 0x130) |= 1;
-                *(u32 *)((u8 *)p + 0xA8) |= 1;
-                *(u32 *)((u8 *)p + 0x20) |= 1;
+                p->widgets[5].flags |= 1;
+                p->widgets[4].flags |= 1;
+                p->widgets[3].flags |= 1;
+                p->widgets[2].flags |= 1;
+                p->widgets[1].flags |= 1;
+                p->widgets[0].flags |= 1;
                 if (p->result == 0) {
                     AnimPanel_ResetSelections(p);
                     Script_Call(gSelectionMenuParameters.c, 0);

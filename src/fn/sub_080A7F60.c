@@ -141,7 +141,7 @@ void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
         Control(actor, *(void **)((u8 *)actor + 0x228), 1);
         {
             u32 m = 0x100000;
-            *(u32 *)((u8 *)actor + 0x2D0) |= m;
+            actor->flags2D0 |= m;
         }
     }
     if (Mod(actor->counter2AC, 48) == 0)
@@ -182,8 +182,8 @@ void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
     dx = Shift(gUnk_086149C4[(actor->body.direction + 64) & 255] * speed, 12);
     dz = Shift(gUnk_086149C4[actor->body.direction] * speed, 12);
     actor->body.direction += turn;
-    *(u16 *)((u8 *)actor + 0x64) += dx;
-    *(u16 *)((u8 *)actor + 0x68) += dz;
+    actor->body.motion.x += dx;
+    actor->body.motion.z += dz;
     sub_080A9DB0(actor, amplitude, rate);
     actor->counter2AC++;
 }

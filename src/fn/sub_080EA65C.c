@@ -175,7 +175,7 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
     target = (void *)actor->tracking.target;
     if (frame == 60 || frame == 90) {
         Show(actor);
-        Palette(actor, *(u16 *)((u8 *)actor + 0x1E2));
+        Palette(actor, actor->paletteAlternateBank);
         {
             u32 eight = 8;
             actor->field1E8 = eight;
@@ -187,10 +187,10 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
         if (target->kind <= 3) {
             u32 request, option;
             player = target->player;
-            request = *(u16 *)((u8 *)actor + 0xB8);
-            option = *(u32 *)((u8 *)actor + 0xD4);
-            Player_BeginPositionRequest(player, (void *)&actor->body.position, 0, 0, 0, 0, 1, request,
-                                        option);
+            request = actor->attacks.first[2];
+            option = actor->attacks.flags[2];
+            Player_BeginPositionRequest(player, (void *)&actor->body.position, 0, 0, 0, 0, 1,
+                                        request, option);
             Sound_PlaySong(0xE6);
         } else if (target->kind & 4) {
             victim = target->player;

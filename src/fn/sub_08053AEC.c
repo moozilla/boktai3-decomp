@@ -17,7 +17,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     u32 frame;
     register u32 priority asm("r5");
     u16 *paletteBase;
-    register u32 resourceId asm("r8");
+    u32 resourceId;
     u32 keyword;
     s32 i;
     u16 *argument;
@@ -193,10 +193,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         destination[1] = hi;
     }
     AnimData_Load(secondaryGraphics, resourceId);
-    {
-        struct ContactSwarmSprite *target = secondary;
-        Sprite_Init(target, secondaryGraphics, 0);
-    }
+    Sprite_Init(secondary, secondaryGraphics, 0);
     secondary->frame = frame;
     {
         u32 tile = *paletteBase;

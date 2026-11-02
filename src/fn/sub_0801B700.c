@@ -103,8 +103,8 @@ void sub_0801B700(struct TfCtx *p)
     Inventory_MarkEquipmentObtained(p->cur.kind);
     k = p->cur.kind;
     if ((s32)k < 0x20)
-        *(u32 *)((u8 *)gGameState + 0x748) |= 1 << k;
+        gGameState->unlockedEquipment[0] |= 1 << k;
     else
-        *(u32 *)((u8 *)gGameState + 0x74c) |= 1 << (k - 0x20);
+        gGameState->unlockedEquipment[1] |= 1 << (k - 0x20);
     GameState_ClearConsumableSlot(p->b8b);
 }

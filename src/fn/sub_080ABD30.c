@@ -1,3 +1,4 @@
+#include "scene_actor_state.h"
 #include "global.h"
 /* TentacleBody_Destroy: Ivy_Destroy shape; removes the tentacle segment sprites first (ported by relatives.py, fixed by hand; provisional name) */
 void Sprite_Remove(void *);
@@ -48,7 +49,7 @@ u32 TentacleBody_Destroy(struct S *s)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = *(u32 *)((u8 *)s + 0x2d0) & m;
+    v = ((struct SceneActorRegistryResetView *)s)->flags2D0 & m;
     q = (u8 *)s + 0x50;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);

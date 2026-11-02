@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_graphics_actor.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -83,8 +84,7 @@ void SceneActors_UpdateExpandingShake(ActorAnimation *p, int time)
         }
         *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
     }
-    *(u32 *)((u8 *)p2 + 0x33c) = 0;
-    *((u8 *)p2 + 0x340) = 0;
+    SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p2);
     {
         u32 mask = 0x1000c;
         p->flags |= mask;

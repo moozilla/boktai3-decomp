@@ -155,7 +155,7 @@ void Golem_UpdateChargeBuildup(struct SceneActorRegistryResetView *actor, s32 fr
     if (TakeFlag(&actor->field2B2)) {
         struct GolemChargeContext *context = actor->context;
         s32 duration;
-        switch (*(u16 *)((u8 *)actor + 0x1E6)) {
+        switch (actor->paletteOffset) {
             case 1:
             case 3:
             case 5:

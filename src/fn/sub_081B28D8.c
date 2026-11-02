@@ -17,10 +17,16 @@ struct VanargandPart {
     struct SceneVec origin;
     struct SceneVec target;
     s16 heading, distance;
-    u8 unknownB0[0xac];
+    s16 burstHeight;
+    u8 unknownB2[0xF0 - 0xB2];
+    u16 fieldF0;
+    u8 unknownF2[0x15C - 0xF2];
     u32 variant, flags, state, timer;
     u8 unknown16C[2];
-    u8 reset, enter, finished;
+    u8 reset, enter, finished, unknown171;
+    u16 savedFieldF0;
+    u8 unknown174[0x19C - 0x174];
+    u32 field19C;
 };
 void MotionTrack_Initialize(void *, const void *, const void *, s32, u32);
 void OrbitMotion_BeginDistanceWave(void *, const void *, const void *, s32, s32);
@@ -160,7 +166,7 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
                     p->target.y = playerY - baseY;
                 }
                 MotionTrack_Initialize(p->motion, &p->origin, &p->target, 0, 1);
-                *(u32 *)((u8 *)p + 0x19c) = 0;
+                p->field19C = 0;
             }
             if (++p->timer > 19) {
                 SetState(p, 3);
@@ -172,8 +178,7 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 Sound_PlaySong(0x1ba);
-                AnimatedParticles_EmitBurst(&p->sprite.position, *(s16 *)((u8 *)p + 0xb0), 0, 64, 4,
-                                            4, 4, 4);
+                AnimatedParticles_EmitBurst(&p->sprite.position, p->burstHeight, 0, 64, 4, 4, 4, 4);
                 SetState(p, 4);
                 p->enter = 1;
             } else if (!(tick & 1))
@@ -195,14 +200,13 @@ void Vanargand_UpdatePartGroundStrike(u8 *boss, struct VanargandPart *p, u32 tic
             if (entering) {
                 *enter = 0;
                 {
-                    u16 saved = *(u16 *)((u8 *)p + 0x172);
-                    *(u16 *)((u8 *)p + 0xf0) = saved;
+                    u16 saved = p->savedFieldF0;
+                    p->fieldF0 = saved;
                 }
-                *(u32 *)((u8 *)p + 0x19c) = 8;
+                p->field19C = 8;
             }
             if (!(p->timer & 15) && p->timer <= 44)
-                AnimatedParticles_EmitBurst(&p->sprite.position, *(s16 *)((u8 *)p + 0xb0), 0, 64, 4,
-                                            4, 4, 4);
+                AnimatedParticles_EmitBurst(&p->sprite.position, p->burstHeight, 0, 64, 4, 4, 4, 4);
             {
                 u32 mask = 128;
                 *flags |= mask;

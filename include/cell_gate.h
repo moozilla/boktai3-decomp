@@ -18,7 +18,9 @@ struct CellGatePlayer {
     u32 flags;
     u8 unknown20[0x10];
     struct ContactPosition position;
-    u8 unknown38[0x3E0];
+    u8 unknown38[0x168 - 0x38];
+    struct ContactPosition colliderPosition; /* Same coordinates as Player.colliderPosition. */
+    u8 unknown170[0x418 - 0x170];
     u8 actionMode;
     u8 unknown419[0x3E];
     u8 transitionMode;

@@ -148,7 +148,8 @@ struct SceneHudState {
     u8 unknown2A60[0x40];
     struct SceneInputWidget motionWidgets[15]; /* 0x2AA0: extent bounded by valueWidgets */
     struct SceneInputWidget valueWidgets[2];   /* 0x3040, 0x30A0: widget indices 75 and 76 */
-    u8 unknown3100[0x240];
+    u8 unknown3100[0xC0];
+    struct SceneInputWidget statusIcons[4]; /* 0x31C0 */
     struct SceneInputWidget comparisonIndicators[2]; /* 0x3340 */
     struct SceneInputWidget statMarkers[3][3];       /* 0x3400: base, bonus, delta */
     u8 unknown3760[0xA80];

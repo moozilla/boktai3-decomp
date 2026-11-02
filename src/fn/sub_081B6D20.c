@@ -2,7 +2,6 @@
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 struct EffectPosition {
     s16 x, y, z, pad;
 };
@@ -44,17 +43,15 @@ void ActorEffect_UpdateApproachLaunch(void *owner, struct PooledEffect *effect, 
     if (effect->entered) {
         s32 angle;
         struct EffectCollider *c;
-        struct EffectPosition *t;
         s32 byte;
         effect->entered = 0;
         c = &effect->healthCollider;
         c->flags |= 4;
         effect->origin = effect->position;
-        t = effect->targetSource;
-        if (!t)
-            t = SceneActors_GetAvailablePosition();
-        effect->target = t;
-        asm("" ::: "memory");
+        if (effect->targetSource)
+            effect->target = effect->targetSource;
+        else
+            effect->target = SceneActors_GetAvailablePosition();
         angle = Math_Atan2(effect->target->x - effect->position.x,
                            effect->target->z - effect->position.z);
         gRandomIndex = (gRandomIndex + 1) & 1023;

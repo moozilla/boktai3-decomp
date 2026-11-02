@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "contact_collider.h"
 #include "ram.h"
 #include "engine_globals.h"
 struct NidhoggrEffectVector {
@@ -85,23 +85,25 @@ void Nidhoggr_CreateOwnedSeekingEffect(u8 *owner, struct NidhoggrEffectVector *a
     *(struct NidhoggrEffectPair *)(collider + 0x1c) = gUnk_0824F2D4;
     *(struct NidhoggrEffectPair *)(collider + 0x14) = gUnk_0824F2DC;
     {
-        u32 flags = *(u16 *)(collider + 6);
-        register u32 collisionMask asm("r5");
+        struct ContactCollider *attack = (void *)collider;
+        u32 collisionMask;
         collisionMask = 4;
-        *(u16 *)(collider + 6) = flags | collisionMask;
+        attack->flags |= collisionMask;
         Collider_SetAttackProperties(collider, 0, 0, 0, zero, zero);
         callback = Nidhoggr_OnEffectCollision;
         Collider_SetCallback(collider, callback, effect);
         {
             u32 bodyOffset = 0x120;
+            struct ContactCollider *body;
             collider = (u8 *)effect + bodyOffset;
             *(struct NidhoggrEffectPair *)(collider + 0x1c) = gUnk_0824F2CC;
             *(struct NidhoggrEffectPair *)(collider + 0x14) = gUnk_0824F2DC;
-            collisionMask = ~collisionMask;
-            asm("" : "+r"(collisionMask));
-            collisionMask &= *(u16 *)(collider + 6);
-            collisionMask |= 0x1008;
-            *(u16 *)(collider + 6) = collisionMask;
+            body = (void *)collider;
+            body->flags &= ~collisionMask;
+            {
+                u32 add = 0x1008;
+                body->flags |= add;
+            }
             Collider_SetBodyProperties(collider, 1, bodyOffset, 16);
         }
     }
