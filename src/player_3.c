@@ -534,7 +534,7 @@ void Player_QueueStatusEffect(struct Player *p, s32 a)
     }
     if (!p->movementModifierActive) {
         p->savedEffectTick = p->facingChangeEffects;
-        *(u16 *)((u8 *)p + 0x4C6) = 0;
+        p->terrainDamageTimer = 0;
     }
 
     if (p->actionMode == 3) {
