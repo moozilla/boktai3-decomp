@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -29,8 +28,8 @@ static inline s32 Clamp(s32 n)
 }
 static inline u8 EaseMotion(struct SceneActorRegistryResetView *actor)
 {
-    s32 x = Quarter(actor->reactionStart.x - *(s16 *)((u8 *)actor + 0x318));
-    s32 z = Quarter(actor->reactionStart.z - *(s16 *)((u8 *)actor + 0x31C));
+    s32 x = Quarter(actor->reactionStart.x - actor->reactionEnd.x);
+    s32 z = Quarter(actor->reactionStart.z - actor->reactionEnd.z);
     if (x > 200)
         x = 200;
     else if (x < -200)
@@ -41,8 +40,8 @@ static inline u8 EaseMotion(struct SceneActorRegistryResetView *actor)
         z = -200;
     actor->body.motion.x += x;
     actor->body.motion.z += z;
-    *(s16 *)((u8 *)actor + 0x318) += x;
-    *(s16 *)((u8 *)actor + 0x31C) += z;
+    actor->reactionEnd.x += x;
+    actor->reactionEnd.z += z;
     if (x == 0 && z == 0)
         return 1;
     return 0;
