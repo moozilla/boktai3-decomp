@@ -27,25 +27,11 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *f
                               u32 zero)
 {
     u8 code = 0x27;
-    {
-        u8 *taken = &actor->field2B2;
-        *taken = 1;
-    }
-    do {
-        u32 field = 0x2B0;
-        do {
-            ((u8 *)actor)[field] = zero8;
-        } while (0);
-        field += 5;
-        ((u8 *)actor)[field] = code;
-        actor->target = fn;
-        field += 0x13;
-        {
-            u16 *q = (u16 *)((u8 *)actor + field);
-            asm("" : "+r"(q), "+r"(field));
-            *q = zero;
-        }
-    } while (0);
+    actor->field2B2 = 1;
+    actor->field2B0 = zero8;
+    actor->field2B5 = code;
+    actor->target = fn;
+    actor->field2C8 = zero;
     {
         u32 *flags = &actor->flags114;
         s32 mask = -2;
