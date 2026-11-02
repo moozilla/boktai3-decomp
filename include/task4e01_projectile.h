@@ -16,7 +16,7 @@ struct Task4E01Params {
     u16 flags, lifetime;
     u8 unknown04[2];
     s8 direction;
-    u8 unknown07;
+    u32 turnSpeed : 8;
     s32 speed;
     u8 unknown0C[8];
     u32 damage[5];
@@ -31,12 +31,17 @@ struct Task4E01Params {
 
 struct Task4E01Projectile {
     u32 frame, flags;
-    u8 unknown08[0x18 - 8];
+    u8 unknown08[8];
+    struct ContactPosition velocity;
     struct Task4E01Params params;
     u8 unknown70[0x8C - 0x70];
     struct ContactSwarmSprite sprite;
     struct Task4E01Collider collider;
-    u8 unknownDC[0x180 - 0xDC];
+    u8 unknownDC[0x160 - 0xDC];
+    struct ContactPosition *target;
+    u8 unknown164[0x174 - 0x164];
+    struct ContactPosition previousPosition;
+    u8 unknown17C[4];
     struct DisplaySequenceState sequence;
     u32 restarted, animation;
     u8 unknown198[4];

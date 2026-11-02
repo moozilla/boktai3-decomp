@@ -1,14 +1,13 @@
-#include "global.h"
+#include "date_entry_menu.h"
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
 void Time_UpdateDateMenu(void);
 void AnimPanel_RemoveAnimations(void);
-s32 Time_InitializeDateMenu(void *);
 
 void *Time_CreateDateMenu(void)
 {
-    void *r = Task_Create(0xb, 0x740);
+    struct DateMenu *r = Task_Create(0xb, sizeof(struct DateMenu));
     if (r != 0) {
         Task_SetCallbacks(r, Time_UpdateDateMenu, AnimPanel_RemoveAnimations);
         if (Time_InitializeDateMenu(r) < 0) {

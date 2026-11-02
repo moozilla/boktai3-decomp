@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monster_particle_random.h"
 #include "engine.h"
 #include "contact_position.h"
 #include "ram.h"
@@ -19,16 +20,6 @@ struct ChargedBurst {
     u8 nextSpark, sparkDelay;
 };
 
-// The random table's address is assembled from its two halves; the ROM keeps the
-// pointer in a stack slot rather than reloading the constant (as in 081EEECC).
-union ChargedBurstTableSource {
-    const u16 *table;
-    u16 halves[2];
-};
-static inline const u16 *ChargedBurst_ReadTable(const union ChargedBurstTableSource *source)
-{
-    return source->table;
-}
 // Emits one spark every second call, cycling through the eight slots. Each spark
 // starts at the burst's position, offset by -127 to +128 on each axis.
 void ChargedBurst_EmitSpark(struct ChargedBurst *p)
@@ -40,7 +31,7 @@ void ChargedBurst_EmitSpark(struct ChargedBurst *p)
     byteMask = 255;
     if ((u8)(delay & byteMask) > 1) {
         const u16 *table;
-        union ChargedBurstTableSource source;
+        union ParticleRandomTableSource source;
         u32 *seed;
         u16 index;
         u32 mask;
@@ -49,7 +40,7 @@ void ChargedBurst_EmitSpark(struct ChargedBurst *p)
         p->sparks[p->nextSpark].position = p->position;
         source.halves[0] = (u16)RANDOM_TABLE_ADDR;
         source.halves[1] = RANDOM_TABLE_ADDR >> 16;
-        table = ChargedBurst_ReadTable(&source);
+        table = ParticleRandom_GetTable(&source);
         seed = &gRandomIndex;
         index = *seed + 1;
         mask = 1023;

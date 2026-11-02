@@ -1,10 +1,16 @@
 #include "transient_sprite_pool.h"
 #include "render.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 void *SpritePool_CreateSingleton(void);
 void Sprite_CopyRenderState(void *, void *, void *, void *);
 s32 Sprite_LinkToList(void *, u32);
+
+static inline u8 *TrailPalette(s32 bank, u8 *override)
+{
+    if (override)
+        return override;
+    return gPaletteBankData + (bank << 5);
+}
 
 struct TemporarySpriteSlot *TransientSprite_Spawn(struct DisplaySequenceSprite *source,
                                                   struct TransientSpriteGraphics *graphics,
@@ -30,21 +36,14 @@ struct TemporarySpriteSlot *TransientSprite_Spawn(struct DisplaySequenceSprite *
     sprite->flags |= flags;
     if (palette > 0) {
         extra->paletteIndex = palette;
-        colors = override;
-        if (colors == 0)
-            colors = gPaletteBankData + (palette << 5);
+        colors = TrailPalette(palette, override);
         extra->palette = colors;
     }
     if (sprite->flags & 0x80)
         Sprite_LinkToList(sprite, 1);
     else
         Sprite_LinkToList(sprite, 0);
-    {
-        register u16 *ip asm("r1") = (u16 *)&lifetime;
-        register u16 v asm("r1");
-        v = *ip;
-        *(u16 *)&slot->lifetime = v;
-    }
+    slot->lifetime = lifetime;
     slot->active = 1;
     return slot;
 }

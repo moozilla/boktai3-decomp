@@ -1,11 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "scene_vec.h"
 #include "engine_globals.h"
 #include "ram.h"
 
-#define gParticleRandomIndex gRandomIndex
 struct PoolParticle {
     u32 flags;
     u8 unknown4[0x14];
@@ -32,11 +30,14 @@ static inline u16 ReadParticleSample(const u16 *table, const u32 *index)
 {
     return table[*index];
 }
+#include "monster_particle_random.h"
 void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct SceneVec *position,
                                         s32 angle, u32 kind)
 {
     s32 i;
     struct PoolParticle *p;
+    union ParticleRandomTableSource randomSource;
+    const u16 *table;
     for (i = 0; i < 16; i++) {
         if (!inPool->particles[i].active) {
             break;
@@ -45,7 +46,7 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
 
     if (i < 16) {
         {
-            register const u16 *randomTable asm("r6");
+
             u32 *randomIndex;
             u32 range;
             u32 mask;
@@ -53,14 +54,16 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
             p = &inPool->particles[i];
             p->flags &= ~1;
             p->position = *position;
-            randomTable = gRandomTable;
+            randomSource.halves[0] = (u16)RANDOM_TABLE_ADDR;
+            randomSource.halves[1] = RANDOM_TABLE_ADDR >> 16;
+            table = ParticleRandom_GetTable(&randomSource);
             randomIndex = &gRandomIndex;
             index = *randomIndex;
             index++;
             mask = 0x3FF;
             index &= mask;
             {
-                u32 random = ReadParticleSample(randomTable, &index);
+                u32 random = table[index];
                 s32 x = (u16)p->position.x;
                 x -= 63;
                 range = 0x7F;
@@ -70,7 +73,7 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
             index = (index + 1) & mask;
             *randomIndex = index;
             {
-                u32 random = randomTable[index];
+                u32 random = ReadParticleSample(table, &index);
                 s32 z = (u16)p->position.z;
                 z -= 63;
                 random &= range;

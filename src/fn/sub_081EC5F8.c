@@ -1,7 +1,6 @@
-#include "global.h"
-void ActorEffect_SpawnBurstAtAnchor(u8 *, s32);
+#include "departure_burst.h"
 
-void sub_081EC5F8(u8 *p, s32 timer)
+void sub_081EC5F8(struct DepartureActor *p, s32 timer)
 {
     if (!(timer & 15))
         ActorEffect_SpawnBurstAtAnchor(p, 0);

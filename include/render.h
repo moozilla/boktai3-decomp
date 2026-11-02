@@ -108,7 +108,7 @@ extern u32 gProjectedSpriteCallback; /* projected-sprite queue callback (functio
 /* 0x030042B8 */
 extern u32 gExtraRenderCallback; /* additional render callback (function pointer) */
 /* 0x030042D8 */
-extern u16 gDynamicTileSum; /* tile count of the dynamic OBJ slots, reset and accumulated each frame */
+extern s16 gDynamicTileSum; /* tile count of the dynamic OBJ slots, reset and accumulated each frame */
 /* 0x030042DC */
 extern u16 gMainSpriteTileSum; /* tile count of the main sprites, reset and accumulated each frame */
 /* 0x030042E0 */
@@ -118,7 +118,7 @@ extern s16 gObjTileCursor; /* OBJ tile allocation cursor (signed loads in the al
 /* 0x030042F0 */
 extern u16 gQueuedObjSlotCount; /* queued dynamic OBJ graphics slot count */
 /* 0x030042F4 */
-extern u16 gStaticTileCount; /* reserved/static OBJ tile count (some files read it signed) */
+extern s16 gStaticTileCount; /* reserved/static OBJ tile count */
 /* 0x030042F8 */
 extern u8 *gAnimResourceSection0C; /* resource-bank base plus header offset +0xC */
 /* 0x030042FC */

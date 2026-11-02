@@ -1,17 +1,17 @@
-#include "global.h"
+#include "contact_collider_manager.h"
 #include "ram.h"
 
 void Collider_ResetManagerLists(void)
 {
-    u8 *p = gColliderManager;
-    if (p != 0) {
-        *(u8 **)(p + 0x18) = p + 0x28;
-        *(u8 **)(p + 0x1c) = p + 0x7c;
-        *(u32 *)(p + 0x28) = 0;
-        *(u32 *)(p + 0x7c) = 0;
-        *(u8 **)(p + 0x20) = p + 0x28;
-        *(u8 **)(p + 0x24) = p + 0x7c;
-        *(u16 *)(p + 0xd0) = 0;
-        *(u16 *)(p + 0xd2) = 0;
+    struct ContactColliderManager *manager = (struct ContactColliderManager *)gColliderManager;
+    if (manager != NULL) {
+        manager->source = &manager->sourceHead;
+        manager->pending = &manager->pendingHead;
+        manager->sourceHead.next = NULL;
+        manager->pendingHead.next = NULL;
+        manager->sourceTail = &manager->sourceHead;
+        manager->pendingTail = &manager->pendingHead;
+        manager->sourceCount = 0;
+        manager->pendingCount = 0;
     }
 }

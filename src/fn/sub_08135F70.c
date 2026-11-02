@@ -1,6 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "scene_actor_contact_response.h"
 #include "scene_actor_palette.h"
 #include "area_effect_link.h"
 #include "render.h"
@@ -10,7 +10,7 @@ u8 SceneActorBehavior_DispatchFlaggedCategory(void *);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorBehavior_PlayReactionSound(void *);
 void SceneActorReaction_RecordDefeat(void *);
-void SceneActorTerrain_ClearCollisionTimers(void *);
+
 void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
 void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
@@ -22,24 +22,6 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-struct DamageMotionOwner {
-    u16 *field;
-};
-// Both statement macros need their do/while (0): written as plain blocks, 20
-// (DAMAGE_MARK_HIT) or 113 (DAMAGE_READ_MASKED_FLAGS) instructions differ.
-#define DAMAGE_MARK_HIT(actor_, mask_, owner_, out_)                                               \
-    do {                                                                                           \
-        u32 value = (mask_);                                                                       \
-        u16 *field = &(actor_)->flags2D4;                                                          \
-        value |= *field;                                                                           \
-        *field = value;                                                                            \
-        (owner_)->field = field;                                                                   \
-        (out_) = value;                                                                            \
-    } while (0)
-#define DAMAGE_READ_MASKED_FLAGS(out_, mask_, value_)                                              \
-    do {                                                                                           \
-        (out_) = (mask_) & (value_);                                                               \
-    } while (0)
 static inline u8 HasPendingHit(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2E6 == 0)
@@ -217,10 +199,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     u32 *flags2D8;
     u32 *flags2CC;
     u32 updated;
-    u32 four;
-    u32 bits;
     u32 strong;
-    u32 c1;
     if (!HasPendingHit(actor)) {
         if (SceneActorReaction_ApplyAreaDamage(actor)) {
             u16 *borrowed = &actor->flags2D4;
@@ -319,18 +298,22 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
         healthOwner.field = health;
     }
     {
-        struct DamageMotionOwner savedMotion;
-        DAMAGE_MARK_HIT(actor, 0x20, &savedMotion, updated);
+        u16 *motion;
+        u16 previous;
+        u32 marked = 0x20;
+        motion = SceneActorContact_MotionField(actor);
+        SCENE_ACTOR_CONTACT_READ_MOTION_FIELD(previous, motion);
+        marked |= previous;
+        *motion = marked;
+        updated = marked;
+
         {
-            u32 v = actor->field2E6;
-            four = 4;
-            c1 = four;
-            DAMAGE_READ_MASKED_FLAGS(bits, c1, v);
+            u32 responseFlags = actor->field2E6 & 4u;
             mode = 1;
-            flags2D4 = savedMotion.field;
+            flags2D4 = motion;
             savedHealth = healthOwner.field;
-            if (bits)
-                mode = c1;
+            if (responseFlags)
+                mode = 4;
         }
     }
     {
@@ -342,7 +325,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
             goto done;
     }
     {
-        if ((mode & four) && (!(updated & four))) {
+        if ((mode & 4) && (!(updated & 4))) {
             SceneActorBehavior_PlayReactionSound(actor);
             *(u16 *)&actor->field30C = 12;
         }
@@ -413,6 +396,6 @@ done: {
 
     SceneActorReaction_RecordDefeat(actor);
     UpdateHitFlagsShared(actor, flags2D4, flags2CC, savedHealth);
-    SceneActorTerrain_ClearCollisionTimers(actor);
+    SceneActorTerrain_ClearCollisionTimers((struct SceneActorTerrainCollisionView *)actor);
     return 1;
 }

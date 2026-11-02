@@ -1,18 +1,18 @@
-#include "global.h"
-u8 *MotionEffectPool_FindFreeEntry(u8 *p, s32 *out)
+#include "sprite_trail.h"
+struct SpriteTrail *MotionEffectPool_FindFreeEntry(struct SpriteTrailPool *p, s32 *out)
 {
     s32 i = 0;
     u32 one = 1;
-    u32 f = *(u32 *)(p + 0x18);
-    u8 *q = p + 0x20;
-    u8 *r;
+    u32 f = p->activeMask;
+    struct SpriteTrail *q = p->entries;
+    struct SpriteTrail *r;
     do {
         if (!((one << i) & f)) {
             *out = i;
             r = q;
             goto end;
         }
-        q += 0x258;
+        q++;
         i++;
     } while (i <= 3);
     r = 0;

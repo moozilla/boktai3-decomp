@@ -1,5 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "game_start_menu.h"
 #include "display_sprite_playback.h"
 #include "game_state.h"
 #include "menu_parameters.h"
@@ -7,17 +6,6 @@
 struct GameStartSeqs {
     u32 seq[3];
 };
-struct GameStartAnim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unk0A, scale, timer;
-};
-struct GameStartSprite {
-    u32 flags;
-    u8 unk04[0xC];
-    u16 frame;
-};
-
 extern const struct GameStartSeqs gUnk_0824FD50;
 extern const u8 gUnk_0824FD5C[];
 extern const u8 gUnk_0824FDBC[];
@@ -37,55 +25,65 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 
-#define W(o)    (*(s32 *)(p + (o)))
-#define GS_H(o) (*(s16 *)((u8 *)gGameState + (o)))
-#define GS_W(o) (*(s32 *)((u8 *)gGameState + (o)))
+enum SavePortrait { SAVE_PORTRAIT_SOLAR, SAVE_PORTRAIT_DARK, SAVE_PORTRAIT_VAMPIRE };
 
-// Tentative: draws the Game Start save summary (name, region, play time, level, labels).
-void GameStart_DrawSaveInfo(u8 *p)
+/* The save screen retains all three portrait assets and the form mapping. */
+static inline u16 SavePortraitForForm(s16 form)
+{
+    if (form == 0)
+        return SAVE_PORTRAIT_SOLAR;
+    if (form == 5)
+        return SAVE_PORTRAIT_DARK;
+    return SAVE_PORTRAIT_VAMPIRE;
+}
+
+/* Draws the name, player portrait and title, play time, and level from a save file. */
+void GameStart_DrawSaveInfo(struct GameStart *p)
 {
     u8 text[0x20];
     struct GameStartSeqs seqs;
-    u8 names[6][16];
+    /* Solar Boy, Dark Boy, and Vampire Boy each occupy two 16-tile strips. */
+    u8 titleTiles[6][16];
     s32 i;
     const u8 *s;
-    u8 *levelRes;
+    struct SceneInputResource *levelRes;
 
     seqs = gUnk_0824FD50;
-    memcpy(names, gUnk_0824FD5C, sizeof(names));
+    memcpy(titleTiles, gUnk_0824FD5C, sizeof(titleTiles));
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
-    if (GS_H(0x86e) != 0) {
+    if ((s16)gGameState->flag86E != 0) {
         u8 misc[10];
         u32 zero;
         u32 *zp;
-        s32 idx;
+        s32 portraitIndex;
         s32 hours, minutes, level;
         u8 *q;
-        u8 *tens, *res;
-        u8 *minuteOnes, *minuteTens, *colon, *levelOnes, *hourOnes;
+        struct SceneInputWidget *tens;
+        struct SceneInputResource *res;
+        struct SceneInputWidget *minuteOnes, *minuteTens, *colon, *levelOnes, *hourOnes;
 
         memcpy(misc, gUnk_0824FDBC, sizeof(misc));
         s = PlayerName_GetBuffer();
         Menu_EraseRect(8, 7, 12, 2);
         Menu_DrawText(8, 7, s);
         {
-            s32 region = GS_H(0x5a8);
-            asm("" : : "r"(region));
+            u16 portrait = SavePortraitForForm(gGameState->form);
+            u16 selected = portrait < 1 ? portrait : SAVE_PORTRAIT_SOLAR;
+            portraitIndex = selected;
         }
-        idx = 0;
-        Anim_SetSequence(p + 0x4bc, *(void **)(p + 0x4ec), seqs.seq[idx], 0, 0);
-        PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)(p + 0x474),
-                                    (struct DisplaySequenceState *)(p + 0x4bc));
-        W(0x474) &= ~1;
+        Anim_SetSequence(&p->cursorSequence, p->cursorResource, seqs.seq[portraitIndex], 0, 0);
+        PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)(&p->cursor),
+                                    (struct DisplaySequenceState *)(&p->cursorSequence));
+        p->cursor.flags &= ~1;
         for (i = 0; i <= 11; i++) {
-            Bg_SetTilemapEntry(3, i + 8, 6, names[idx][i], 0, 2);
+            Bg_SetTilemapEntry(3, i + 8, 6, titleTiles[portraitIndex][i], 0, 2);
             zp = &zero;
-            hourOnes = p + 0x234;
-            minuteOnes = p + 0x354;
-            minuteTens = p + 0x2f4;
-            colon = p + 0x294;
-            levelOnes = p + 0x414;
+            hourOnes = &p->timeDigits[1];
+            minuteOnes = &p->timeDigits[4];
+            minuteTens = &p->timeDigits[3];
+            colon = &p->timeDigits[2];
+            levelOnes = &p->levelDigits[1];
         }
         Menu_EraseRect(3, 10, 24, 2);
         *zp = 0;
@@ -96,50 +94,50 @@ void GameStart_DrawSaveInfo(u8 *p)
         while (*s)
             *q++ = *s++;
         Menu_DrawText(3, 10, text);
-        if (GS_H(0x59e) > 0)
-            W(0xac) &= ~1;
+        if (gGameState->lap > 0)
+            p->decoration.flags &= ~1;
 
-        tens = p + 0x1d4;
-        hours = Div(GS_W(0x614), 0x34bc0);
-        minutes = Div(GS_W(0x614), 0xe10) - hours * 60;
+        tens = &p->timeDigits[0];
+        hours = Div(gGameState->unk614, 0x34bc0);
+        minutes = Div(gGameState->unk614, 0xe10) - hours * 60;
         if (hours > 99) {
             hours = 99;
             minutes = 59;
         }
-        res = p + 0x1b4;
+        res = &p->itemResource;
         Anim_LoadKeyframe(hourOnes, res, (u16)Mod(hours, 10), 0);
         hours = Div(hours, 10);
         Anim_LoadKeyframe(tens, res, (u16)Mod(hours, 10), 0);
-        *(u32 *)(tens + 8) &= ~1;
-        *(u32 *)(tens + 0x68) &= ~1;
+        tens->flags &= ~1;
+        tens[1].flags &= ~1;
         Anim_LoadKeyframe(minuteOnes, res, (u16)Mod(minutes, 10), 0);
         minutes = Div(minutes, 10);
         Anim_LoadKeyframe(minuteTens, res, (u16)Mod(minutes, 10), 0);
-        *(u32 *)(minuteTens + 8) &= ~1;
-        *(u32 *)(minuteOnes + 8) &= ~1;
-        *(u32 *)(colon + 8) &= ~1;
+        minuteTens->flags &= ~1;
+        minuteOnes->flags &= ~1;
+        colon->flags &= ~1;
 
-        if (GS_H(0x5a8) == 6) {
-            level = GS_H(0x40) + 10;
+        if (gGameState->form == 6) {
+            level = gGameState->level + 10;
             if (level > 99)
                 level = 99;
         } else {
-            level = GS_H(0x40);
+            level = gGameState->level;
         }
-        tens = p + 0x3b4;
-        levelRes = p + 0x1b4;
+        tens = &p->levelDigits[0];
+        levelRes = &p->itemResource;
         Anim_LoadKeyframe(levelOnes, levelRes, (u16)Mod(level, 10), 0);
         level = Div(level, 10);
         Anim_LoadKeyframe(tens, levelRes, (u16)Mod(level, 10), 0);
-        *(u32 *)(tens + 8) &= ~1;
-        *(u32 *)(tens + 0x68) &= ~1;
+        tens->flags &= ~1;
+        tens[1].flags &= ~1;
         s = Text_LookupString(Script_ParseStringRef((void *)gListMenuParameters.mBlock) + 3);
         Menu_EraseRect(0x15, 7, 3, 2);
         Menu_DrawText(0x15, 7, s);
     } else {
         for (i = 0; i <= 8; i++)
             Bg_SetTilemapEntry(3, i + 8, 6, 1, 0, 2);
-        W(0x474) |= 1;
+        p->cursor.flags |= 1;
         s = Text_LookupString(Script_ParseStringRef((void *)gListMenuParameters.mBlock) + 2);
         Menu_EraseRect(8, 6, 0x12, 2);
         Menu_DrawText(8, 6, s);

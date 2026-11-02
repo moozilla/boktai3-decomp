@@ -1,8 +1,8 @@
 #include "global.h"
+#include "monster_particle_random.h"
 #include "engine.h"
 #include "ram.h"
 
-// MATCHING_CONCESSION: register-pinning
 #define gEffectRandomIndex gRandomIndex
 struct EffectPosition {
     s16 x, y, z, pad;
@@ -31,13 +31,6 @@ struct EffectOwner;
 s32 Math_Atan2(s32, s32);
 void ActorEffect_UpdateRadialTrail(struct ActorEffect *);
 u32 ActorEffect_RemoveSprites(struct EffectOwner *, struct ActorEffect *, u32);
-static inline s32 NextRandom(u32 *randomIndex, const u16 *table)
-{
-    u32 offset;
-    *randomIndex = (*randomIndex + 1) & 1023;
-    offset = *randomIndex * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
 void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffect *effect,
                                     u32 index)
 {
@@ -56,18 +49,22 @@ void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffec
         {
             u8 *angles;
             u8 *radii;
+            union ParticleRandomTableSource source;
             const u16 *table;
             u32 *randomIndex;
             i = 0;
             angles = effect->angles;
             radii = effect->radii;
-            table = gRandomTable;
+            source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+            source.halves[1] = RANDOM_TABLE_ADDR >> 16;
+            table = ParticleRandom_GetTable(&source);
             randomIndex = &gRandomIndex;
-            for (; i <= 5; i++) {
-                angles[i] = (s16)((NextRandom(randomIndex, table) & 31) + 240) + effect->direction;
-                radii[i] = (NextRandom(randomIndex, table) & 15) + 24;
-                asm("" : : "r"(randomIndex), "r"(table));
-            }
+            do {
+                angles[i] =
+                    (s16)((ParticleRandom_NextSample(table, randomIndex, 1023) & 31) + 240) +
+                    effect->direction;
+                radii[i] = (ParticleRandom_NextSample(table, randomIndex, 1023) & 15) + 24;
+            } while (++i < 6);
         }
     }
     ActorEffect_UpdateRadialTrail(effect);

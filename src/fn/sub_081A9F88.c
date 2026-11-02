@@ -38,12 +38,12 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
     switch (p->phase) {
         case 0:
             if (p->timer == 0) {
-                SceneActors_StartUnmirroredAnimation(p, self->animation, self->drawable, 4, 1, 0);
+                SceneActors_StartUnmirroredAnimation(p, &self->animation, self->drawable, 4, 1, 0);
                 Sound_PlaySong(0x586);
                 p->timer++;
             }
             self->delay = 2;
-            if (p->padA3 > 3) {
+            if (p->action > 3) {
                 p->phase = 1;
                 {
                     u32 zero = 0;

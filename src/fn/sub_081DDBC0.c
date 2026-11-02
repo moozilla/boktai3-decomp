@@ -1,4 +1,4 @@
-#include "text_entry_widget.h"
+#include "name_entry.h"
 #include "game_state.h"
 #include "ram.h"
 #include "input.h"
@@ -8,20 +8,7 @@
  * (type / toggle / confirm); confirming stores the name and fades out. State 1 waits for
  * the fade, hides the widgets, runs the follow-up script and kills the task. (guess) */
 
-struct NameEntryTask {
-    u8 task[0x18];
-    struct TextEntryWidget widgets[6];
-    s32 unk348;
-    s32 selection; /* 0x34C: keyboard key; 0x55 page toggle, 0x56 End */
-    s32 position;  /* 0x350: cursor position in the name */
-    void *bg;
-    u16 verticalHistory, horizontalHistory;
-    s32 verticalRepeat, horizontalRepeat;
-    s16 state, result;
-    s32 timer, fadeShift;
-    u32 slot;      /* 0x370 */
-    u8 name[0x10]; /* 0x374 */
-};
+
 
 s32 Mod(s32, s32);
 void NameEntry_MoveCursorUp(struct NameEntryTask *);
@@ -30,7 +17,6 @@ void NameEntry_MoveCursorRight(struct NameEntryTask *);
 void NameEntry_MoveCursorLeft(struct NameEntryTask *);
 void Sound_PlaySong(s32);
 s32 sub_081DDB44(struct NameEntryTask *);
-void TextEntry_CopyInitialName(struct NameEntryTask *, u8 *);
 void TextEntry_DrawName(u8 *);
 void NameEntry_ToggleCharacterPage(struct NameEntryTask *);
 void NameEntry_UpdateCursor(struct NameEntryTask *);

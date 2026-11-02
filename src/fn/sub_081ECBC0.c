@@ -1,11 +1,8 @@
-#include "global.h"
+#include "sprite_trail.h"
 #include "scene_pool.h"
-struct EffectPosition {
-    s32 x, y, z, unused;
-};
 struct EffectSourceActor {
     u8 pad[0x28];
-    struct EffectPosition position;
+    struct TrailVector position;
 };
 struct OffsetEffectActor {
     u8 pad0[0x268];
@@ -17,40 +14,39 @@ struct OffsetEffectActor {
     u8 pad3A4[0x5CA - 0x3A4];
     s16 parameterA, parameterB;
     u8 pad5CE[0x62C - 0x5CE];
-    u32 effectId;
+    struct SpriteTrailPool *trailPool;
 };
-void SpriteTrail_CreateMotionEffect(u32, struct EffectPosition *, s32 *, u32, s32, s32);
 void Sound_PlaySong(u32);
-static inline void GetSourcePosition(s32 index, s32 *sourcePosition)
+static inline void GetSourcePosition(s32 index, struct TrailVector *sourcePosition)
 {
     if (index > 1) {
-        sourcePosition[0] = 0;
-        sourcePosition[1] = 0;
-        sourcePosition[2] = 0;
+        sourcePosition->x = 0;
+        sourcePosition->y = 0;
+        sourcePosition->z = 0;
         return;
     } else {
         struct EffectSourceActor *other = gParticipantActors[index];
         if (other == 0) {
-            sourcePosition[0] = 0;
-            sourcePosition[1] = 0;
-            sourcePosition[2] = 0;
+            sourcePosition->x = 0;
+            sourcePosition->y = 0;
+            sourcePosition->z = 0;
             return;
         } else {
-            sourcePosition[0] = other->position.x;
-            sourcePosition[1] = other->position.y;
-            sourcePosition[2] = other->position.z;
+            sourcePosition->x = other->position.x;
+            sourcePosition->y = other->position.y;
+            sourcePosition->z = other->position.z;
         }
     }
 }
 u32 ActorEffect_SpawnOffsetEffect(struct OffsetEffectActor *actor)
 {
-    struct EffectPosition position;
-    s32 source[4];
+    struct TrailVector position;
+    struct TrailVector source;
     position.x = actor->x + 0x28000;
     position.y = actor->y - 0x40000;
     position.z = 0x1C000;
-    GetSourcePosition(actor->sourceIndex, source);
-    SpriteTrail_CreateMotionEffect(actor->effectId, &position, source, actor->style,
+    GetSourcePosition(actor->sourceIndex, &source);
+    SpriteTrail_CreateMotionEffect(actor->trailPool, &position, &source, actor->style,
                                    actor->parameterA, actor->parameterB);
     Sound_PlaySong(0x58F);
     /* The original epilogue preserves r0; no explicit result is established. */

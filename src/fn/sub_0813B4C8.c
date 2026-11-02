@@ -2,36 +2,32 @@
 #include "player.h"
 #include "game_state.h"
 
-// MATCHING_CONCESSION: register-pinning
+#define STAT_BONUS_OFFSET ((u32) & ((struct GameState *)0)->statBonuses)
 
 s32 Div(s32, s32);
+
+static inline void RecalculateBaseStats(struct Player *p)
+{
+    struct GameState *state = gGameState;
+    s32 idx;
+    for (idx = 0; idx < 3; idx++) {
+        u16 *out = &p->derivedStats[idx];
+        *out = state->baseStats[idx] + state->statBonuses[idx];
+        if (*out > 120)
+            *out = 120;
+    }
+}
+
 void Player_RecalculateDerivedStats(struct Player *p)
 {
-    register s32 i asm("r3");
-    register u32 offset asm("r1") = 0x418;
-    if (*((u8 *)p + offset) != 6) {
-        struct GameState *state = gGameState;
-        register u16 *dest asm("r2");
-        register u16 *stats asm("r1");
-        register u16 cap asm("r4");
-        offset += 4;
-        dest = (u16 *)((u8 *)p + offset);
-        stats = state->baseStats;
-        cap = 120;
-        i = 2;
-        do {
-            s32 sum = stats[4] + stats[0];
-            *dest = sum;
-            if ((u16)sum > 120)
-                *dest = cap;
-            dest++;
-            stats++;
-        } while (--i >= 0);
+    s32 i;
+    if (p->actionMode != 6) {
+        RecalculateBaseStats(p);
     } else {
         s32 level = gGameState->level + 10;
         s32 remainder, quotient, value;
         u16 *dest;
-        register u16 *stats asm("r2");
+        const u8 *statCursor;
         u16 cap;
         if (level > 99)
             level = 99;
@@ -41,11 +37,10 @@ void Player_RecalculateDerivedStats(struct Player *p)
         remainder -= quotient * 3;
         value = quotient + 10;
         dest = p->derivedStats;
-        stats = (u16 *)gGameState;
+        statCursor = (const u8 *)gGameState;
         cap = 120;
-        i = 2;
-        do {
-            *dest = stats[16] + value;
+        for (i = 0; i < 3; i++) {
+            *dest = *(const u16 *)(statCursor + STAT_BONUS_OFFSET) + value;
             if (remainder > 0) {
                 (*dest)++;
                 remainder--;
@@ -53,7 +48,7 @@ void Player_RecalculateDerivedStats(struct Player *p)
             if (*dest > 120)
                 *dest = cap;
             dest++;
-            stats++;
-        } while (--i >= 0);
+            statCursor += sizeof(u16);
+        }
     }
 }

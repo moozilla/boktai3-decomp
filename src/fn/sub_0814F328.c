@@ -2,8 +2,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_actor.h"
-// confidence=low: role inferred from callers and callback phases.
-// confidence=low: charge tiers and buffered input inferred from phase transitions.
 extern const s16 gUnk_086149C4[];
 void SceneParticleBurst_CreateWhilePaused(void *, void *, void *, u32, u32, u32);
 u32 Player_ConsumeStateEntry(void *);
@@ -18,20 +16,18 @@ s32 Player_SpawnSelectedAttackProjectile(void *);
 void sub_081DAD94(s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
 s32 Player_GetAttackEffectType(u32);
-#define BYTE(o)    (*(u8 *)(p + (o)))
-#define HALF(o)    (*(u16 *)(p + (o)))
-#define HELD       (**(u16 **)(p + 0x348) & 2)
-#define PRESSED    ((*(u16 **)(p + 0x348))[1] & 2)
-#define ANIMATE(n) Player_SetAnimation(p, ActorVariant_GetTableValue(BYTE(0x418), n), 64, 1)
+#define HELD       (p->inputKeys[0] & 2)
+#define PRESSED    (p->inputKeys[1] & 2)
+#define ANIMATE(n) Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, n), 64, 1)
 
 static inline int scale(int n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-static inline void SetChargeParameter(u8 *p)
+static inline void SetChargeParameter(struct Player *p)
 {
-    u16 *target = (u16 *)(p + 0xAD6);
+    u16 *target = &p->actionEighteenParameter;
     u32 value = 0x16E;
     *target = value;
 }
@@ -39,44 +35,41 @@ void Player_ReleaseActionEffectOnExit(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
 void Player_UpdateAttachedEntryPosition(void *);
 s32 Task4E01_GetKind7Value(s32);
-static inline u32 bonus(u8 *p, u32 mask)
+static inline u32 bonus(struct Player *p, u32 mask)
 {
-    u32 offset;
     u32 *field;
     u32 bits;
     if (!p)
         return 0;
-    offset = 0x444;
-    field = (u32 *)(p + offset);
+    field = &p->statBonusFlags;
     bits = mask;
     return *field & bits;
-}
-// confidence=low: attached task tiers and buffered restart define this charge handler.
-void Player_UpdateAttachedAttackCharge(u8 *p)
+} // confidence=low: attached task tiers and buffered restart define this charge handler.
+void Player_UpdateAttachedAttackCharge(struct Player *p)
 {
     struct ContactPackedVector origin;
     struct ContactPackedVector spread;
     u16 *t;
     u16 *r;
     if (Player_ConsumeStateEntry(p)) {
-        u16 *first = (u16 *)(p + 0xC0A);
+        u16 *first = &p->statModifierContext.contactTimer;
         s32 zero = 0;
         *first = zero;
-        *(s32 *)(p + 0xC74) = --zero;
+        p->statModifierContext.attachedEntry = --zero;
         Player_SetPendingCallback(p, Player_ReleaseActionEffectOnExit);
     }
-    switch (BYTE(0x458)) {
+    switch (p->tetherPhase) {
         case 0:
             if (ANIMATE(0x26)) {
-                u16 *duration = (u16 *)(p + 0xC10);
+                u16 *duration = &p->statModifierContext.chargeDuration;
                 u32 zero = 0;
                 *duration = 60;
-                BYTE(0x53A) = zero;
+                p->contactCounted = zero;
                 Player_SetActionPhase(p, 1);
             }
             break;
         case 1:
-            t = (u16 *)(p + 0x45A);
+            t = &p->tetherFrame;
             if (!*t)
                 Sound_PlaySong(0x1F7);
             if (HELD) {
@@ -84,9 +77,12 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
                 ANIMATE(0x27);
             }
             if (++*t > 6) {
-                BYTE(0xC0F) = 0;
-                HALF(0x4D2) = 0;
-                if (HALF(0x428) <= 2) {
+                {
+                    u8 *chargeTier = &p->statModifierContext.chargeTier;
+                    *chargeTier = 0;
+                }
+                p->contactMagnitude = 0;
+                if (p->currentStatB <= 2) {
                     Sound_PlaySong(0xD5);
                     goto release;
                 }
@@ -104,40 +100,46 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
             }
             goto attached;
         case 2:
-            if (++HALF(0x45A) == 6)
+            if (++p->tetherFrame == 6)
                 Sound_PlaySong(0x1F4);
             if (!HELD)
                 goto fire;
-            if (Task4E01_GetKind7Value(*(s32 *)(p + 0xC74)) > 1) {
-                BYTE(0xC0F) = 1;
-                HALF(0x4D2) = 30;
+            if (Task4E01_GetKind7Value(p->statModifierContext.attachedEntry) > 1) {
+                {
+                    u8 *chargeTier = &p->statModifierContext.chargeTier;
+                    *chargeTier = 1;
+                }
+                p->contactMagnitude = 30;
                 SetChargeParameter(p);
-                HALF(0xAD8) = 36;
+                p->actionEighteenDuration = 36;
                 Player_SetActionPhase(p, 3);
             }
             goto face;
         case 3: {
-            register u32 inputOffset asm("r2") = 0x348;
-            register u16 **input asm("r0");
+            register u32 inputOffset asm("r2") = (u32) & ((struct Player *)0)->inputKeys;
+            register const u16 **input asm("r0");
             asm("" : "+r"(inputOffset));
-            input = (u16 **)(p + inputOffset);
+            input = (const u16 **)((u8 *)p + inputOffset);
             if (!(**input & 2))
                 goto fire;
-            if (Task4E01_GetKind7Value(*(s32 *)(p + 0xC74)) > 2) {
-                BYTE(0xC0F) = 1;
-                HALF(0x4D2) = 30;
+            if (Task4E01_GetKind7Value(p->statModifierContext.attachedEntry) > 2) {
+                {
+                    u8 *chargeTier = &p->statModifierContext.chargeTier;
+                    *chargeTier = 1;
+                }
+                p->contactMagnitude = 30;
                 SetChargeParameter(p);
-                HALF(0xAD8) = 36;
+                p->actionEighteenDuration = 36;
                 Sound_PlaySong(0x1F5);
                 Player_SetActionPhase(p, 4);
             }
             goto face;
         }
         case 4: {
-            register u32 inputOffset asm("r2") = 0x348;
-            register u16 **input asm("r0");
+            register u32 inputOffset asm("r2") = (u32) & ((struct Player *)0)->inputKeys;
+            register const u16 **input asm("r0");
             asm("" : "+r"(inputOffset));
-            input = (u16 **)(p + inputOffset);
+            input = (const u16 **)((u8 *)p + inputOffset);
             if (!(**input & 2)) {
             fire:
                 if (Player_SpawnSelectedAttackProjectile(p))
@@ -156,8 +158,8 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
         case 5:
             ANIMATE(0x28);
             if (PRESSED)
-                BYTE(0xBF6) = 1;
-            r = (u16 *)(p + 0x4D2);
+                p->statModifierContext.bufferedAttack = 1;
+            r = &p->contactMagnitude;
             if (*r) {
                 s32 ang, n;
                 if (*r > 5) {
@@ -167,37 +169,37 @@ void Player_UpdateAttachedAttackCharge(u8 *p)
                     spread.x = 32;
                     spread.y = 32;
                     spread.z = 32;
-                    SceneParticleBurst_CreateWhilePaused(p + 0x30, &origin, &spread, 1, 3, 4);
+                    SceneParticleBurst_CreateWhilePaused(&p->position, &origin, &spread, 1, 3, 4);
                 }
-                ang = ((BYTE(0x3A4) + 5) & 7) << 5;
+                ang = ((p->facing + 5) & 7) << 5;
                 n = *r;
-                *(s16 *)(p + 0x38) = -scale(gUnk_086149C4[(ang + 64) & 255] * n);
-                *(s16 *)(p + 0x3C) = -scale(HALF(0x4D2) * gUnk_086149C4[ang]);
-                HALF(0x4D2) = HALF(0x4D2) * 3 >> 2;
-            } else if (++HALF(0x45A) > 4)
+                p->velocityX = -scale(gUnk_086149C4[(ang + 64) & 255] * n);
+                p->velocityZ = -scale(p->contactMagnitude * gUnk_086149C4[ang]);
+                p->contactMagnitude = p->contactMagnitude * 3 >> 2;
+            } else if (++p->tetherFrame > 4)
                 Player_SetActionPhase(p, 6);
             break;
         case 6: {
             u32 pending;
             ANIMATE(0x27);
             if (PRESSED)
-                BYTE(0xBF6) = 1;
-            pending = BYTE(0xBF6);
+                p->statModifierContext.bufferedAttack = 1;
+            pending = p->statModifierContext.bufferedAttack;
             if (pending) {
-                *(s32 *)(p + 0xC74) = -1;
-                BYTE(0xBF6) = 0;
-                BYTE(0x458) = 1;
-            } else if (++((struct Player *)p)->tetherFrame > 14) {
-                BYTE(0xBF6) = 0;
+                p->statModifierContext.attachedEntry = -1;
+                p->statModifierContext.bufferedAttack = 0;
+                p->tetherPhase = 1;
+            } else if (++p->tetherFrame > 14) {
+                p->statModifierContext.bufferedAttack = 0;
                 Player_SetActionPhase(p, 7);
             }
             break;
         }
         case 7:
             ANIMATE(0x26);
-            if (++HALF(0x45A) > 4)
+            if (++p->tetherFrame > 4)
                 ActorSequence_Begin(p, 0, 0);
             break;
     }
-    BYTE(0xAC9) = 4;
+    p->actionVariant = 4;
 }

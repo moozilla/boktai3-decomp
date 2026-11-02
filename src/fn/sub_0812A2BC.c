@@ -19,8 +19,9 @@ static inline s32 TruncateShift(s32 value, u32 shift)
     return -(-value >> shift);
 }
 
+/* Each of the three callers passes -20 as the final argument. */
 void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDiscVec *toArg,
-                           s32 aArg, s32 bArg, s32 c, s32 d, u32 e, s32 speed)
+                           s32 aArg, s32 bArg, s32 c, s32 d, u32 e, s32 speed, s32 unused)
 {
     s32 a = aArg;
     const struct SunDiscVec *to = toArg;

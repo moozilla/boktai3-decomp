@@ -2,11 +2,7 @@
 #define GUARD_DAMAGE_NUMBER_DISPLAY_H
 #include "contact_actor.h"
 #include "render.h"
-/* Show combines this identity halfword with the source address into a key. */
-struct DamageNumberSource {
-    u32 unknown0;
-    u16 id;
-};
+#include "damage_number_source.h"
 /* Tentative floating-number family: four groups, each with four 0x28 glyphs. */
 struct DamageNumberGlyph {
     u32 unknown0;

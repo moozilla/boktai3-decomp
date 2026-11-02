@@ -1,25 +1,19 @@
 #include "global.h"
+#include "scene_actor_components.h"
+#include "scene_facing.h"
+#include "player.h"
 #include "engine.h"
 #include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: charges along the facing axis, turning by a random signed offset on contact.
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Action {
     u8 state, pad[3];
     u32 frame;
 };
-struct Player {
-    u8 pad[0x20];
-    u32 flags;
-};
 struct Hresvelgr {
-    u8 pad0[0x51];
-    u8 heading;
-    u8 pad52[2];
-    struct Vec position, velocity;
-    u8 pad64[0x38];
+    u8 unknown0[0x48];
+    struct SceneActorBody body;
+    u8 unknown90[12];
     u32 flags;
     u8 padA0[8];
     u8 direction4, direction8;
@@ -34,7 +28,7 @@ struct Hresvelgr {
     void *callback;
     u8 pad108[4];
     struct Player *player;
-    struct Vec *target;
+    struct ContactPosition *target;
     u8 pad114[0x60];
     u8 animationData[0x20], animation[0x20];
     u8 pad1B4[0x13c];
@@ -53,24 +47,14 @@ void Actor_SetHeadingVelocity(void *, u32);
 s32 Math_StepTowardTarget(s32, s32, s32);
 static inline void SetHeading(struct Hresvelgr *p, s32 heading)
 {
-    p->heading = heading;
-    {
-        u32 sector = (p->heading + 96) >> 6;
-        u32 mask = 3;
-        mask &= sector;
-        p->direction4 = mask;
-    }
-    {
-        u32 sector = (p->heading + 112) >> 5;
-        u32 mask = 7;
-        mask &= sector;
-        p->direction8 = mask;
-    }
+    p->body.direction = heading;
+    p->direction4 = SceneFacing_FourWay(p->body.direction);
+    p->direction8 = SceneFacing_EightWay(p->body.direction);
 }
 static inline u8 PlayerCanMove(struct Player *p, u32 mask)
 {
     u8 result;
-    u32 flags = p->flags & mask;
+    u32 flags = p->statusFlags & mask;
     result = 0;
     if (!flags)
         result = 1;
@@ -79,7 +63,7 @@ static inline u8 PlayerCanMove(struct Player *p, u32 mask)
 static inline u8 OutsideChargeBounds(struct Hresvelgr *actor)
 {
     u8 result = 0;
-    if (actor->position.x > 0x1400 || actor->position.z > 0x1400)
+    if (actor->body.position.x > 0x1400 || actor->body.position.z > 0x1400)
         result = 1;
     return result;
 }
@@ -90,12 +74,11 @@ static inline s32 RandomValue(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
-static inline void SetFlags(struct Hresvelgr *actor, u32 bits)
+static inline void SetFlags(struct Hresvelgr *p, u32 mask)
 {
-    u32 mask = bits;
     register u8 *address asm("r1");
-    address = (u8 *)actor;
-    address += 0x9c;
+    address = (u8 *)p;
+    address += (u8 *)&p->flags - (u8 *)p;
     *(u32 *)address |= mask;
 }
 void Hresvelgr_UpdateTurningCharge(struct Hresvelgr *actor)
@@ -122,17 +105,17 @@ void Hresvelgr_UpdateTurningCharge(struct Hresvelgr *actor)
                     Actor_SetHeadingVelocity(actor, 32);
                     if (!actor->turn) {
                         u32 side = actor->side;
-                        struct Vec *target = actor->target;
+                        struct ContactPosition *target = actor->target;
                         u32 direction = ((actor->targetHeading + 96) >> 6) & 3;
                         if (!side) {
                             if (direction != 3)
-                                actor->velocity.z +=
-                                    Math_StepTowardTarget(actor->position.z, target->z, 10) -
-                                    actor->position.z;
+                                actor->body.motion.z +=
+                                    Math_StepTowardTarget(actor->body.position.z, target->z, 10) -
+                                    actor->body.position.z;
                         } else if (direction != 0)
-                            actor->velocity.x +=
-                                Math_StepTowardTarget(actor->position.x, target->x, 10) -
-                                actor->position.x;
+                            actor->body.motion.x +=
+                                Math_StepTowardTarget(actor->body.position.x, target->x, 10) -
+                                actor->body.position.x;
                     }
                     if (actor->targetDistance <= 0x3fff) {
                         if (PlayerCanMove(actor->player, 0x40000))
@@ -147,7 +130,7 @@ void Hresvelgr_UpdateTurningCharge(struct Hresvelgr *actor)
                 if (!action->frame) {
                     if (!actor->turn)
                         actor->turn = (((RandomValue() >> 3) % 2) << 5) - 16;
-                    SetHeading(actor, actor->turn + actor->heading);
+                    SetHeading(actor, actor->turn + actor->body.direction);
                     action->frame++;
                 } else if (action->frame > 4)
                     ActionState_SetState(action, 0);

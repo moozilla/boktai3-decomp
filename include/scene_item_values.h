@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_ITEM_VALUES_H
 #define GUARD_SCENE_ITEM_VALUES_H
 #include "engine.h"
+#include "scene_consumable_definition.h"
 /* Tentative inventory-value family: the callers select equipment/item slots. */
 struct SceneValueEquipment {
     u8 kind, unknown1;
@@ -22,11 +23,6 @@ struct SceneValueItemDefinition {
     u16 actionKind; /* 0x2: selected-action dispatch kind */
     u16 conditionKey, unknown6;
     u32 unknown8, baseValue;
-};
-struct SceneValueConsumableDefinition {
-    u8 unknown0[8];
-    s16 baseValue;
-    u8 unknownA[6];
 };
 u32 Inventory_GetEquipmentId(u32 slot);
 u32 Inventory_CanAssignEquipment(u32 slot);

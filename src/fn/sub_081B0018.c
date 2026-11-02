@@ -6,8 +6,9 @@ void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void ActorStatus_InitializeCollider(void *, s32, s32, s32);
 void ActorStatus_InitializeBodyCollider(void *);
-void ActorStatus_BeginTimedState(void);
-void TargetRegistry_RegisterSceneActor(void *, void *, void (*)(void));
+s32 ActorStatus_BeginTimedState(struct ActorStatusOwner *, s32, s32);
+s32 TargetRegistry_RegisterSceneActor(struct PairedHalfTarget *, struct ContactCollider *,
+                                     s32 (*)(struct ActorStatusOwner *, s32, s32));
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void ScaledShadow_SetGraphic(void *, u32, s32);
 void ScaledShadow_Enable(void *);
@@ -73,7 +74,7 @@ void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *half, void *origin,
         half->motion.mode = clearedState;
         track->cursor = zero;
     }
-    TargetRegistry_RegisterSceneActor(half->target, half->damageCollider,
+    TargetRegistry_RegisterSceneActor(&half->target, &half->damageCollider,
                                       ActorStatus_BeginTimedState);
     shadow = half->shadow;
     ScaledShadow_Initialize(shadow, &half->sprite.position, 128, 128, 128, 128, scale, one, 6, zero,
@@ -89,7 +90,7 @@ void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *half, void *origin,
         u16 *specialDamage = &half->specialDamage;
         *specialDamage = zero;
     }
-    half->field186 = clearedState;
+    half->hiddenTimer = clearedState;
     {
         u16 *flashTimer = &half->flashTimer;
         *flashTimer = zero;

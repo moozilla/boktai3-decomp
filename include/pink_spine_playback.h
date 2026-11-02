@@ -1,29 +1,26 @@
 #ifndef GUARD_PINK_SPINE_PLAYBACK_H
 #define GUARD_PINK_SPINE_PLAYBACK_H
-#include "screamer_playback.h"
+#include "display_animation.h"
+#include "contact_collider.h"
 #include "player_cue_sequence.h"
 struct PinkSpineState {
     u8 unknown0[24];
     u32 age;
-    struct ActorPosition initialPosition;
-    struct ScreamerSprite sprite;
+    struct ContactPosition initialPosition;
+    struct DisplaySequenceSprite sprite;
     u8 graphics[0x1c];
-    struct {
-        u8 unknown0[6];
-        u16 flags;
-    } collider;
-    u8 unknown74[76];
+    struct ContactCollider collider;
     u8 body[0x48];
     void *update;
     struct DisplaySequenceState sequence;
     s32 nearRadiusSquared;
     s32 farRadiusSquared;
-    s16 f124;
-    s16 f126;
-    s16 f128;
+    s16 projectilePower;
+    s16 projectileKnockback;
+    s16 projectileImmunity;
     s16 f12A;
     s16 f12C;
-    s16 f12E;
+    s16 projectileSpeed;
     s16 f130;
     s16 f132;
     s16 f134;
@@ -41,6 +38,16 @@ struct PinkSpineState {
     u32 f158;
     void *f15C;
 };
+u32 ProjectileEmitter_EmitAttackFrame(struct PinkSpineState *p);
+void Combat_SpawnDirectionalProjectile(struct PinkSpineState *emitter, u8 direction);
+
+static inline void PinkSpine_ProjectileOrigin(struct ContactPosition *position,
+                                              const struct PinkSpineState *owner)
+{
+    *position = owner->sprite.position;
+    position->y += 0x80;
+}
+
 static inline u32 PinkSpine_StepAnimation(struct PinkSpineState *owner)
 {
     return PlayerCue_StepSequenceEnded(&owner->sprite, &owner->sequence);

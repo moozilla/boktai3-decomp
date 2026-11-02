@@ -1,30 +1,15 @@
-#include "global.h"
+#include "dark_loan_screen.h"
 
-struct ScriptPanel {
-    u8 pad0[0x8E4];
-    void *procedureData;
-    u32 callbackPc;
-    u16 rate;
-    u8 pad8EE[2];
-    s32 valueD;
-    s32 valueE;
-    u8 pad8F8[0xE];
-    u16 displayMode;
-    u8 pad908[7];
-    u8 state;
-    u32 snapshot[8];
-};
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 u32 Script_GetTextSourcePc(void);
 s32 DarkLoan_GetDefaultRate(void);
-void DarkLoan_StartDisplayScript(struct ScriptPanel *);
-void ScriptPanel_InitializeProcedure(struct ScriptPanel *);
-void DarkLoan_BuildDisplay(struct ScriptPanel *, s32);
-void DarkLoan_BeginAlternateOpening(struct ScriptPanel *);
-void DarkLoan_BeginOpening(struct ScriptPanel *);
+void DarkLoan_StartDisplayScript(struct DarkLoanScreen *);
+void ScriptPanel_InitializeProcedure(struct DarkLoanScreen *);
+void DarkLoan_BeginAlternateOpening(struct DarkLoanScreen *);
+void DarkLoan_BeginOpening(struct DarkLoanScreen *);
 
-s32 DarkLoan_InitializeFromScript(struct ScriptPanel *panel)
+s32 DarkLoan_InitializeFromScript(struct DarkLoanScreen *panel)
 {
     u32 callbackPc;
     if (Script_SeekToKeyword(0x52)) {

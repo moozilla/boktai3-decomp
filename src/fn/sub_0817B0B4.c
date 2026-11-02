@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: controls the actor palette fade and repeating pulse sequence
 struct PaletteActor {
     u8 pad0[0x504];
@@ -8,7 +7,7 @@ struct PaletteActor {
     u8 pad508[0x6F8];
     u16 palette[16];
 };
-void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
+void Palette_InterpolateBanks(u16 *, u16 *, u16 *, s32, s32);
 void SceneVolume_ResetPendingSequence(void *);
 static inline s32 Fraction(s32 time, s32 end)
 {
@@ -25,47 +24,60 @@ static inline s32 Fraction(s32 time, s32 end)
         return value >> 8;
     return -(-value >> 8);
 }
+
+static inline void GetFadeBanks(u16 **from, u16 **to, u32 fromOffset, u32 toOffset)
+{
+    u8 *banks = gPaletteBankData;
+
+    *from = (u16 *)(banks + fromOffset);
+    *to = (u16 *)(banks + toOffset);
+}
+
 void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
 {
     switch (p->mode) {
-        case 1:
+        case 1: {
+            u16 *from;
+            u16 *to;
+
             if ((s8)p->timer < 24) {
-                void *a;
-                register void *b asm("r6");
-                register u8 *base asm("r0");
                 p->timer++;
-                base = gPaletteBankData;
-                a = base + 0x2E80;
-                b = base + 0x680;
-                Palette_InterpolateBanks(p->palette, a, b, Fraction((s8)p->timer, 1 << p->shift),
-                                         p->shift);
-            } else
+                GetFadeBanks(&from, &to, 0x2E80, 0x680);
+                Palette_InterpolateBanks(p->palette, from, to,
+                                         Fraction((s8)p->timer, 1 << p->shift), p->shift);
+            } else {
                 SceneVolume_ResetPendingSequence(p);
+            }
             break;
-        case 2:
+        }
+        case 2: {
+            u16 *from;
+            u16 *to;
+
             if ((s8)p->timer < (1 << p->shift)) {
-                void *a;
-                register void *b asm("r7");
                 p->timer++;
-                a = gPaletteBankData + 0x680;
-                b = gPaletteBankData + 0x2DE0;
-                Palette_InterpolateBanks(p->palette, a, b, Fraction((s8)p->timer, 1 << p->shift),
-                                         p->shift);
-            } else
+                GetFadeBanks(&from, &to, 0x680, 0x2DE0);
+                Palette_InterpolateBanks(p->palette, from, to,
+                                         Fraction((s8)p->timer, 1 << p->shift), p->shift);
+            } else {
                 SceneVolume_ResetPendingSequence(p);
+            }
             break;
-        case 3:
+        }
+        case 3: {
+            u16 *from;
+            u16 *to;
+
             if ((s8)p->timer < (1 << p->shift)) {
-                void *a;
-                register void *b asm("r7");
                 p->timer++;
-                a = gPaletteBankData + 0x2DE0;
-                b = gPaletteBankData + 0x680;
-                Palette_InterpolateBanks(p->palette, a, b, Fraction((s8)p->timer, 1 << p->shift),
-                                         p->shift);
-            } else
+                GetFadeBanks(&from, &to, 0x2DE0, 0x680);
+                Palette_InterpolateBanks(p->palette, from, to,
+                                         Fraction((s8)p->timer, 1 << p->shift), p->shift);
+            } else {
                 SceneVolume_ResetPendingSequence(p);
+            }
             break;
+        }
         case 4: {
             s32 half, time, shift;
             p->timer = (p->timer + 1) & ((1 << p->shift) - 1);
@@ -73,13 +85,13 @@ void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
             shift = p->shift - 1;
             half = 1 << shift;
             if (time < half) {
-                void *a = gPaletteBankData + 0x680;
-                void *b = gPaletteBankData + 0x2DE0;
-                Palette_InterpolateBanks(p->palette, a, b, time, shift);
+                u16 *from, *to;
+                GetFadeBanks(&from, &to, 0x680, 0x2DE0);
+                Palette_InterpolateBanks(p->palette, from, to, time, shift);
             } else {
-                void *a = gPaletteBankData + 0x2DE0;
-                void *b = gPaletteBankData + 0x680;
-                Palette_InterpolateBanks(p->palette, a, b, time - half, shift);
+                u16 *from, *to;
+                GetFadeBanks(&from, &to, 0x2DE0, 0x680);
+                Palette_InterpolateBanks(p->palette, from, to, time - half, shift);
             }
             break;
         }

@@ -1,11 +1,12 @@
-#include "global.h"
-void MotionTrack_Update(u8 *);
-void Task_Kill(u8 *);
-void VanargandEffect_UpdateLifetime(u8 *p)
+#include "vanargand_effect.h"
+struct OrbitMotion;
+s32 MotionTrack_Update(struct OrbitMotion *);
+void Task_Kill(void *);
+void VanargandEffect_UpdateLifetime(struct VanargandEffect *p)
 {
-    s16 *c;
-    MotionTrack_Update(p + 0x60);
-    c = (s16 *)(p + 0x9a);
+    u16 *c;
+    MotionTrack_Update((struct OrbitMotion *)&p->motion);
+    c = &p->lifetime;
     if (--*c == 0)
         Task_Kill(p);
 }

@@ -1,5 +1,6 @@
 #include "player_3.h"
 #include "ram.h"
+#include "scene_consumable_definition.h"
 
 /* Tentative role: select an effect flag from actor and global state. */
 
@@ -1742,9 +1743,9 @@ static inline void ReverseResistance(struct Player *p, u32 index)
         value = -value;
     p->cueDefenses[index] = value + 4;
 }
-static inline u32 EquipmentSlot(u8 *current)
+static inline u32 EquipmentSlot(struct SceneValueConsumableDefinition *current)
 {
-    register u32 slot asm("r1") = current[12];
+    register u32 slot asm("r1") = current->slot;
     asm("" : "+r"(slot));
     return slot;
 }
@@ -1752,7 +1753,7 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
                                    s32 alternate)
 {
     s32 i;
-    u8 *override;
+    struct SceneValueConsumableDefinition *override;
     state->special = 0;
     {
         u16 zero = 0;
@@ -1772,32 +1773,34 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
         register s32 choice asm("r1") = alternate;
         asm("" : "+r"(choice));
         if (choice < 0) {
-            register u8 *zero asm("r2") = 0;
+            register struct SceneValueConsumableDefinition *zero asm("r2") = 0;
             asm("" : "+r"(zero));
             override = zero;
         } else
             override = GameState_GetConsumableDescriptor(alternate);
     }
     for (i = 0; i <= 3; i++) {
-        u8 *item;
+        struct SceneValueConsumableDefinition *item;
         s32 effect;
-        register u8 *current asm("r0") = override;
+        register struct SceneValueConsumableDefinition *current asm("r0") = override;
         if (current && i == EquipmentSlot(current))
             item = override;
         else {
-            if (*(s16 *)((u8 *)gGameState + i * 2 + 0x58) < 0)
+            struct GameState *save = gGameState;
+            const s16 *registered = ((struct GameState *)(i * 2 + (u32)save))->party;
+
+            if (*registered < 0)
                 continue;
-            item = GameState_GetConsumableDescriptor(
-                Inventory_GetConsumableId(*(s16 *)((u8 *)gGameState + i * 2 + 0x58)));
+            item = GameState_GetConsumableDescriptor(Inventory_GetConsumableId(*registered));
         }
         for (effect = 0; effect <= 1; effect++) {
             u32 kind, amount;
             if (!effect) {
-                kind = item[1];
-                amount = item[2];
+                kind = item->effects[0].kind;
+                amount = item->effects[0].amount;
             } else {
-                kind = item[3];
-                amount = item[4];
+                kind = item->effects[1].kind;
+                amount = item->effects[1].amount;
             }
             switch (kind) {
                 case 47:
@@ -2012,7 +2015,7 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
                     SetEquipmentFlag(p, 49);
                     break;
                 case 71:
-                    state->bonus[2] += item[2];
+                    state->bonus[2] += item->effects[0].amount;
                     break;
                 case 72:
                     state->special = 1;
@@ -2081,7 +2084,7 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
         SetEquipmentFlag(p, 47);
     }
     if (p) {
-        Collider_SetContactMode((u8 *)p + 0x230, 64);
+        Collider_SetContactMode(&p->collider, 64);
     finish:
         Player_InitVisualResources(p);
         p->savedSpriteResource = -1;

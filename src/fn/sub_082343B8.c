@@ -1,26 +1,36 @@
-// MATCHING_CONCESSION: register-pinning
 #include "spiral_burst.h"
+
+static inline void FirstSpiralParticle(struct SpiralBurst *burst, void **drawable,
+                                       struct SpiralParticleMotion **motion)
+{
+    struct SpiralParticle *first = burst->particles;
+    *drawable = first;
+    *motion = &first->frame.motion;
+}
+
+static inline void GetSpiralUpdateState(struct SpiralBurst *burst, u16 **frame,
+                                        struct SpiralBurst **owner)
+{
+    *owner = burst;
+    *frame = &burst->timer;
+}
 
 void SpiralBurst_UpdateParticles(struct SpiralBurst *p)
 {
     u32 alive = 0;
     s32 i;
-    register void *sprite;
+    void *sprite;
     u32 off;
     struct SpiralParticleMotion *motion;
+    struct SpiralBurst *owner;
+    u16 *initialFrame;
     u16 *timer;
-    {
-        register u32 offset asm("r1") = (u32) & ((struct SpiralBurst *)0)->timer;
-        register u16 *address;
-        address = (void *)((u8 *)p + offset);
-        if (*address <= 11)
-            Collider_Refresh(p->collider);
-    }
-    asm("" : "+r"(p)::"r4");
+    GetSpiralUpdateState(p, &initialFrame, &owner);
+    if (*initialFrame <= 11)
+        Collider_Refresh(owner->collider);
     timer = &p->timer;
     off = 0;
-    sprite = p->particles;
-    motion = &p->particles[0].frame.motion;
+    FirstSpiralParticle(owner, &sprite, &motion);
     i = 7;
     do {
         if (*timer >= motion->lifetime) {
@@ -32,7 +42,7 @@ void SpiralBurst_UpdateParticles(struct SpiralBurst *p)
             motion->position.world.x =
                 p->origin.x +
                 SpiralBurst_ScaleOffset(motion->radius * gUnk_086149C4[(motion->angle + 64) & 255]);
-            asm("" ::: "memory");
+
             motion->position.world.z =
                 p->origin.z +
                 SpiralBurst_ScaleOffset(motion->radius * gUnk_086149C4[motion->angle]);

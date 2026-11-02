@@ -1,13 +1,9 @@
-#include "global.h"
-struct O {
-    u8 p[0x34];
-    u32 f34;
-    u32 f38;
-    u16 f3c;
-};
-void Collider_SetBodyProperties(struct O *o, u16 a, u32 b, u32 c)
+#include "collision_response.h"
+
+void Collider_SetBodyProperties(void *raw, u16 power, u32 reactionFlags, u32 rewardFlags)
 {
-    o->f3c = a;
-    o->f38 = b;
-    o->f34 = c;
+    struct ContactCollider *collider = raw;
+    collider->unknown3C = power;
+    collider->reactionFlags = reactionFlags;
+    collider->statRewardFlags = rewardFlags;
 }

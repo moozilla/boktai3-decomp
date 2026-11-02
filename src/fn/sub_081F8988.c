@@ -1,13 +1,23 @@
-#include "global.h"
-#include "engine.h"
-#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, pad;
+#include "global.h"
+#include "sun_orb_effect.h"
+struct RatatoskOrbTarget {
+    u32 active;
+    struct OrbitEffectPosition position;
+    u32 referenceDistance, playerDistance;
+    u32 reserved;
 };
-struct Actor {
+/* The two selection getters use the last word of the fourth 0x18-byte target. */
+union RatatoskLinkedOrbs {
+    struct RatatoskOrbTarget targets[4];
+    struct {
+        u8 unknown0[0x5C];
+        s16 selectedPoint, selectedTarget;
+    } selection;
+};
+struct RatatoskOrbRelocation {
     u8 pad0[0x54];
-    struct Vec position;
+    struct OrbitEffectPosition position;
     u8 pad5C[0x34];
     u32 counter;
     u8 pad94[0x16];
@@ -23,13 +33,12 @@ struct Actor {
     u8 padCD[0xb3];
     s32 sequence;
     u32 finished;
-    u8 pad188[0xcc4];
-    s16 newSlot;
-    s16 slot;
+    u8 pad188[0xdf0 - 0x188];
+    union RatatoskLinkedOrbs orbs;
     u8 padE50[0xa];
     s16 completion;
-    struct Vec destination;
-    struct Vec target;
+    struct OrbitEffectPosition destination;
+    struct OrbitEffectPosition target;
     s16 duration;
     u8 padE6E[0x6];
     s16 pending;
@@ -50,9 +59,9 @@ struct Actor {
     u8 padEE8[0x26];
     u16 orbParam;
     u8 padF10[0x1c];
-    void *manager;
+    struct OrbitEffectManager *manager;
 };
-static inline u8 ConsumeActivation(struct Actor *p)
+static inline u8 ConsumeActivation(struct RatatoskOrbRelocation *p)
 {
     if (p->active) {
         p->active = 0;
@@ -61,40 +70,20 @@ static inline u8 ConsumeActivation(struct Actor *p)
     }
     return 0;
 }
-static inline u32 Random(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
-}
-static inline u32 RandomByte(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u8 *)(gRandomIndex * 2 + (u32)gRandomTable);
-}
 void Ratatosk_GetPlayerOffsetFarthestFromSelf(void *, void *);
-s32 SunOrb_GetManagerStatus(void);
-s32 Ratatosk_IsPositionOutsideArena(void *);
-s32 Ratatosk_FindPointNearestPlayer(void *, s32);
-void RisingActorConfig_Initialize(void *);
-void SunOrb_SetTargetSource(void *, s32);
-void SunOrb_SetMotionParams(void *, s32, s32, s32, s32);
-s32 SunOrb_CreateAtPosition(void *, void *);
-void RisingActorManager_BeginRaise(s32);
-void SunOrb_FadeOutAll(void *);
+s32 RisingActorManager_BeginRaise(s32);
 s32 Ratatosk_GetSelectedPointIndex(void);
 s32 SunOrb_IsFadingOut(s32);
-struct Vec *SunOrb_GetPosition(s32);
-void SlotController_SetSlotFlag2(s32);
+s32 SlotController_SetSlotFlag2(s32);
 s32 SunOrb_GetSlotState(s32);
 s32 SlotController_IsSlotIdle(s32);
-void sub_081FEC38(void *, s32);
-struct Vec *SunOrb_GetPositionFromManager(void *, s32);
+s32 sub_081FEC38(struct OrbitEffectManager *, s32);
 void Ratatosk_GetPlayerOffsetNearestSelf(void *, void *);
-void Ratatosk_UpdateSunOrbRelocation(struct Actor *p)
+void Ratatosk_UpdateSunOrbRelocation(struct RatatoskOrbRelocation *p)
 {
-    struct Actor *q = p;
-    u8 config[32];
-    struct Vec far, near;
+    struct RatatoskOrbRelocation *q = p;
+    struct OrbitEffectParams config;
+    struct OrbitEffectPosition far, near;
     s32 activated = ConsumeActivation(p);
     if (activated == 1) {
         if (p->orbCreated == 1) {
@@ -148,7 +137,7 @@ void Ratatosk_UpdateSunOrbRelocation(struct Actor *p)
             SlotController_SetSlotFlag2(Ratatosk_GetSelectedPointIndex());
             if (q->input) {
                 {
-                    register u32 offset asm("r2") = 0x180;
+                    register u32 offset asm("r2") = (u8 *)&p->sequence - (u8 *)p;
                     asm("" : "+r"(offset));
                     {
                         register s32 *dest asm("r1") = (s32 *)((u8 *)p + offset);
@@ -163,25 +152,17 @@ void Ratatosk_UpdateSunOrbRelocation(struct Actor *p)
             if (SunOrb_GetSlotState(slot) > 60) {
                 u32 animation = 13;
                 q->animation = animation;
-                {
-                    u32 offset = 0x180;
-                    {
-                        s32 *dest = (s32 *)((u8 *)p + offset);
-                        *dest = 3;
-                    }
-                }
+                p->sequence = 3;
                 p->oldSlot = slot;
-                p->newSlot = -1;
-                RisingActorConfig_Initialize(config);
-                SunOrb_SetTargetSource(config, 1);
+                p->orbs.selection.selectedPoint = -1;
+                RisingActorConfig_Initialize(&config);
+                SunOrb_SetTargetSource(&config, 1);
                 Ratatosk_GetPlayerOffsetFarthestFromSelf(p, &far);
-                slot = SunOrb_CreateAtPosition(config, &far);
+                slot = SunOrb_CreateAtPosition(&config, &far);
                 if (slot >= 0) {
-                    u32 offset = slot * 24;
-                    u32 *flags = (u32 *)((u8 *)p + 0xdf0);
-                    *(u32 *)((u8 *)flags + offset) = 1;
+                    p->orbs.targets[slot].active = 1;
                     RisingActorManager_BeginRaise(slot);
-                    p->newSlot = slot;
+                    p->orbs.selection.selectedPoint = slot;
                 }
             } else {
                 if (p->repeat > 60 || !SlotController_IsSlotIdle(slot)) {
@@ -196,9 +177,10 @@ void Ratatosk_UpdateSunOrbRelocation(struct Actor *p)
         case 3:
             SlotController_SetSlotFlag2(Ratatosk_GetSelectedPointIndex());
             if (q->input) {
-                void **manager = &p->manager;
+                struct OrbitEffectManager **manager = &p->manager;
                 sub_081FEC38(*manager, p->oldSlot);
-                p->position = *SunOrb_GetPositionFromManager(*manager, p->newSlot);
+                p->position =
+                    *SunOrb_GetPositionFromManager(*manager, p->orbs.selection.selectedPoint);
                 {
                     u32 animation = 14;
                     q->animation = animation;

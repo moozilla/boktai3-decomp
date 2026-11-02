@@ -1,29 +1,11 @@
-#include "global.h"
+#include "vanargand_damage_part.h"
 
 #define Vanargand_ApplyPartDamage sub_081A7204
 
 void SceneAnimation_SelectSequence(void *, s32, s32, s32);
-void Sound_PlaySong(s32);
 void AnimData_SelectPaletteBank(void *, s32);
 
-struct Part {
-    u8 pad0[0xFC];
-    u16 damage;
-    u16 contactFlags;
-    u32 flags;
-    u16 animation;
-    u16 breaks;
-    u8 pad108[0x1C];
-    u32 pendingFlags;
-    u16 pendingDamage;
-    u16 accumulatedDamage;
-    u16 flashTimer;
-    u8 pad12E[2];
-    u16 *thresholds;
-    s32 *mode;
-};
-
-void Vanargand_ApplyPartDamage(struct Part *part)
+void Vanargand_ApplyPartDamage(struct VanargandDamagePart *part)
 {
     u32 damage;
     u32 flags;

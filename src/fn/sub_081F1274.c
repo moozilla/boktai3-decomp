@@ -9,7 +9,6 @@ void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
 void SpatialIndex_InsertEntry(void *);
 void Anim_SetDurationScale(void *, u32);
 void ScreenLayers_SelectRandomVariant(void *);
-void ActorDisplay_RefreshScreenLayer(void *);
 void SpriteParticle_InitParams(void *);
 void SpriteParticle_SetMotionParams(void *, u32, u32, u32, u32);
 void SpriteParticle_SetSpriteResource(void *, u32, u32, s32);
