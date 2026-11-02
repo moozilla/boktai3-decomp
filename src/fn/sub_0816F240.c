@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 #include "player.h"
@@ -18,7 +17,7 @@ static inline s32 Panel_RandomPercent(void)
 {
     u32 next = gRandomIndex + 1;
     u16 mask;
-    asm("" ::: "r1");
+
     mask = 0x3FF;
     gRandomIndex = next & mask;
     return Mod(*(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR), 100);
@@ -32,10 +31,8 @@ void ScenePanel_BeginRandomTransition(u8 *s)
     u32 later;
     u32 *flags;
     s32 result;
-    do {
-        kind = s + 0x438A;
-        index = (*kind) + 10;
-    } while (0);
+    kind = s + 0x438A;
+    index = *kind + 10;
     {
         u32 off = index * sizeof(struct SceneInputWidget);
         u8 *base = s + 0x1428;
@@ -50,9 +47,14 @@ void ScenePanel_BeginRandomTransition(u8 *s)
                              ((struct SceneHudState *)s)->categoryWidgets[later].paletteBank, v, w,
                              0x18, 0x10);
     Sound_PlaySong(0x38A);
-    if (((struct SceneHudState *)s)->actionOwner->actionMode == 6 || Panel_RandomPercent() < 20)
+    if (((struct SceneHudState *)s)->actionOwner->actionMode == 6) {
         s[0x4861] = 1;
-    else
+
+    } else if (Panel_RandomPercent() < 20) {
+        s[0x4861] = 1;
+
+    } else {
         s[0x4861] = 0;
+    }
     Hud_SetInteractionCallback(s, SceneHud_AnimateActionResult, 1);
 }
