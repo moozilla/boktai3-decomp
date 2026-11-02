@@ -1946,9 +1946,8 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
             p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
+            u8 one = 1;
+            p->flags |= one;
         }
     }
 }
