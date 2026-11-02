@@ -1,6 +1,6 @@
-#include "global.h"
+#include "wooden_crate.h"
 
-void WoodenCrate_SetFlags(void *p, u16 flags)
+void WoodenCrate_SetFlags(struct WoodenCrate *p, u16 flags)
 {
-    *(u16 *)((u8 *)p + 0xC8) |= flags;
+    p->crateFlags |= flags;
 }
