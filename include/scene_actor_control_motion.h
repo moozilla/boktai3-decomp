@@ -17,7 +17,9 @@ struct SceneActorControlMotionState {
     u8 elapsed, startTick;
     u8 unknown3E8[2];
     u16 previousGround;
-    u8 unknown3EC[0x10];
+    u8 unknown3EC[2];
+    u16 visibilityFrame;
+    u8 unknown3F0[0xC];
     struct ContactPosition curvePosition;
     u8 unknown404[0x18];
     struct ContactPosition vectors[3];
