@@ -3,7 +3,9 @@
 struct ResultDrawing {
     u8 unk0[8];
     u32 flags;
-    u8 unkC[0x54];
+    u8 unkC[0x24 - 0xC];
+    u16 x, y;
+    u8 unk28[0x60 - 0x28];
 };
 struct ResultItem {
     struct ResultDrawing frame;
@@ -155,7 +157,7 @@ int sub_0803B700(int mode, int side, int time0, int time1, int score0, int score
     TextWindow_Refresh(*w, 0xc);
     TextWindow_StartPlayback(*w);
     p->cursor.flags &= ~1;
-    *(u16 *)((u8 *)p + 0x8c) = 0x18;
-    *(u16 *)((u8 *)p + 0x8e) = 0x20;
+    p->cursor.x = 0x18;
+    p->cursor.y = 0x20;
     return 0;
 }
