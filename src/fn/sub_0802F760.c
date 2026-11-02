@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_facing.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -202,20 +203,8 @@ void SceneActorAnimation_UpdateNavigationStep(void *unused, u8 *arg)
                 fromX = savedX;
                 angle = Math_Atan2(x - fromX, DifferenceZ(target, currentZ, fromX));
                 U8(p, 0x65) = angle;
-                {
-                    u16 narrowed = angle;
-                    s32 value = narrowed;
-                    s32 shifted = value + 112;
-                    register s32 mask asm("r1");
-                    shifted >>= 5;
-                    mask = 7;
-                    mask &= shifted;
-                    U8(p, 0x1A) = mask;
-                    value = (value + 96) >> 6;
-                    mask = 3;
-                    mask &= value;
-                    U8(p, 0x19) = mask;
-                }
+                U8(p, 0x1A) = SceneFacing_EightWay(angle);
+                U8(p, 0x19) = SceneFacing_FourWay(angle);
                 Polar(&step, motion->angle);
                 {
                     register u32 delta asm("r0") = (u16)step.x;
@@ -223,12 +212,7 @@ void SceneActorAnimation_UpdateNavigationStep(void *unused, u8 *arg)
                     old = (u16)motion->pos.x;
                     motion->pos.x = delta + old;
                 }
-                {
-                    register u32 delta asm("r0") = (u16)step.z;
-                    register u32 old asm("r3");
-                    old = (u16)motion->pos.z;
-                    motion->pos.z = delta + old;
-                }
+                motion->pos.z += step.z;
             }
         }
         NavMesh_UpdateProbe(probe, savedPos);
