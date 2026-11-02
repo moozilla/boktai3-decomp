@@ -1,7 +1,7 @@
-#include "global.h"
-extern const u8 gUnk_08606494[];
+#include "scene_actor_state.h"
+extern void *gUnk_08606494[];
 
-void Axe_InitEventCallbacks(void *p)
+void Axe_InitEventCallbacks(struct SceneActorRegistryResetView *p)
 {
-    *(u32 *)((u8 *)p + 0x288) = (u32)gUnk_08606494;
+    p->alternateBehaviorCallbacks = gUnk_08606494;
 }
