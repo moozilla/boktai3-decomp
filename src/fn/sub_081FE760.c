@@ -17,9 +17,6 @@ struct Flags6 {
     u8 pad[6];
     u16 flags;
 };
-struct Pos {
-    u32 a, b;
-};
 struct Orb {
     u32 f0;
     u8 pad4[8];
@@ -53,7 +50,7 @@ static inline s32 scale(s32 value)
 }
 #define F(T, off) (*(T *)((u8 *)o + (off)))
 // confidence=low: claims a free sun orb slot, copies the 0x20-byte config and starts it at pos.
-s32 SunOrb_CreateAtPosition(struct OrbitEffectParams *cfg, struct Pos *pos)
+s32 SunOrb_CreateAtPosition(struct OrbitEffectParams *cfg, struct OrbitEffectPosition *pos)
 {
     struct OrbManager *m = gSlotController;
     s32 slot;
@@ -79,8 +76,8 @@ s32 SunOrb_CreateAtPosition(struct OrbitEffectParams *cfg, struct Pos *pos)
         v->z = scale(gUnk_086149C4[angle & 255] * radius);
     }
     zero = 0;
-    F(struct Pos, 0x50) = *pos;
-    F(struct Pos, 0x7C) = *pos;
+    F(struct OrbitEffectPosition, 0x50) = *pos;
+    F(struct OrbitEffectPosition, 0x7C) = *pos;
     o->a.flags = ((o->a.flags | 2) & ~1) | 0x200;
     sa = &o->a;
     Sprite_LinkToList(sa, 0);
