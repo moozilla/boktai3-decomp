@@ -1398,10 +1398,12 @@ void Actor_OnEffectChildPaletteInit(struct ActorAnimController *p, struct ActorC
 
 static inline u8 take(struct ActorAnimController *p)
 {
-    s32 m = 1;
-    register s32 v asm("r1") = p->flags;
-    if (v & m) {
-        p->flags = ~m & v;
+    s32 mask = 1;
+    u32 flags = p->flags;
+    if (flags & mask) {
+        mask = ~mask;
+        mask &= flags;
+        p->flags = mask;
         p->done = 0;
         return 1;
     }
@@ -1450,9 +1452,9 @@ static inline void rotate(struct ActorAnimController *p)
 
 static inline u32 frame_factor(u16 v)
 {
-    register u32 value asm("r1") = v;
     u32 mask = 15;
-    return mask & value;
+    mask &= v;
+    return mask;
 }
 
 // MATCHING_CONCESSION: register-pinning
