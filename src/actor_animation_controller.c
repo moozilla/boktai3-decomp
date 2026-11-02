@@ -1955,7 +1955,6 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -1981,10 +1980,9 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
             p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
+            u8 one = 1;
+            p->flags |= one;
             zero = 0;
-            p->flags = mask | v;
         }
         Anim_SetSequence(&p->anim, p->arg, 0, 4, zero);
     }
@@ -2050,8 +2048,8 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     {
-        register void *h asm("r2") = p->handle;
-        if (h) {
+        if (p->handle) {
+            void *h = p->handle;
             p->handle = 0;
             Script_Call(h, 0);
         }
