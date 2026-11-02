@@ -1,83 +1,45 @@
 #include "global.h"
+#include "player_clone.h"
 #include "ram.h"
-
-// MATCHING_CONCESSION: register-pinning
-#define gPlayerCloneManager gDirectionalSpritePool
-struct ClonePosition {
-    u16 x, y, z, pad;
+struct CloneMotionCursor {
+    s32 speed;
+    u8 unknown4[0x34];
+    struct ContactPosition position;
 };
-struct CloneAnimationState {
-    u32 flags;
-    u8 unknown04[0x34];
-    struct ClonePosition position;
-};
-struct CloneColliderState {
-    u8 unknown00[6];
-    u16 flags;
-};
-struct PlayerCloneReactionSlot {
-    u32 timer;
-    u8 unknown004[0x10];
-    struct ClonePosition position;
-    struct ClonePosition previousPosition;
-    u8 unknown024[0x5c];
-    struct CloneColliderState collider;
-    u8 unknown088[0x118];
-    u32 animationFlags;
-    u8 unknown1a4[0x14];
-    u8 animation[0x20];
-    struct ClonePosition animationPosition;
-    u8 unknown1e0[0x98];
-    u8 resource[0x20];
-    u8 unknown298[0x6c];
-    u32 flags;
-    u32 state;
-    u8 unknown30c[0x10];
-    u32 phase;
-    u8 unknown320[0x24];
-};
-struct PlayerCloneManager {
-    u8 unknown00[0x18];
-    u32 activeSlots;
-    struct PlayerCloneReactionSlot slots[3];
-};
-s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void PlayerClone_BeginActiveReactions(void)
 {
     struct PlayerCloneManager *manager = gDirectionalSpritePool;
-    u32 slotStride = 0x344;
+    u32 slotStride = sizeof(struct PlayerCloneSlot);
     if (manager) {
-        struct PlayerCloneReactionSlot *s = manager->slots;
+        struct PlayerCloneSlot *s = manager->slots;
         s32 i = 0;
-        // Keep the shared reset value separate from the loop index.
-        register u32 resetValue asm("r10") = 0;
+        u32 resetValue = 0;
         u32 *flags = &s->flags;
-        struct CloneAnimationState *animationFlags = (void *)(&s->animationFlags);
+        struct CloneMotionCursor *motion = (void *)(&s->configuration.speed);
         u32 timer = 660;
         do {
-            if (manager->activeSlots & (1 << i)) {
-                s->previousPosition = animationFlags->position;
-                s->position.x = animationFlags->position.x;
-                s->position.y = animationFlags->position.y + 128;
-                s->position.z = animationFlags->position.z;
+            if ((manager->activeSlots & (1 << i)) != 0) {
+                s->previousPosition = motion->position;
+                s->position.x = motion->position.x;
+                s->position.y = motion->position.y + 128;
+                s->position.z = motion->position.z;
                 flags[1] = 5;
-                animationFlags->flags = resetValue;
+                motion->speed = resetValue;
                 {
                     u16 one = 1;
                     *flags |= one;
                 }
                 {
-                    struct CloneColliderState *collider = &s->collider;
+                    struct PlayerCloneCollider *collider = &s->collider;
                     collider->flags |= 4;
                 }
-                flags[6] = resetValue;
-                Anim_LoadKeyframe(s->animation, s->resource, 0, 1);
+                PLAYER_CLONE_START_IDLE(flags[6], resetValue, &s->animation, &s->resource);
                 s->timer = timer;
             }
             timer += 30;
             i++;
             flags = (void *)(((u8 *)flags) + slotStride);
-            animationFlags = (void *)(((u8 *)animationFlags) + slotStride);
+            motion = (void *)(((u8 *)motion) + slotStride);
             s++;
         } while (i <= 2);
     }
