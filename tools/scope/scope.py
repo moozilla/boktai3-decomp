@@ -4402,6 +4402,28 @@ def reg_copy_coalesce(wd, uid, gone, new):
     return None
 
 
+def byte_constant_operand(insns, uid):
+    """(reg, value) when insn UID (in INSNS, [(uid, kind, rtl)] of one pass) is an and/or/xor whose operand
+    is a register set elsewhere to a small constant (0..255) and read again after UID: the constant the
+    ROM keeps in a register and copies (README fact 54). Else None."""
+    rtl = next((r for x, _, r in insns if x == uid), "")
+    m = re.search(r"\(set \(reg(?:/\w)*:SI \d+\) \((?:ior|and|xor):SI (.*)\)\)", rtl)
+    if not m:
+        return None
+    later = False
+    consts = {}
+    for x, _, r in insns:
+        c = re.search(r"\(set \(reg(?:/\w)*:\w+ (\d+)\) \(const_int (-?\d+)\)\)", r)
+        if c and 0 <= int(c.group(2)) < 256:
+            consts[int(c.group(1))] = int(c.group(2))
+    ops = regs_of(m.group(1))
+    after = [r for x, _, r in insns[[x for x, _, _ in insns].index(uid) + 1:]]
+    for reg in ops:
+        if reg in consts and any(re.search(r"\(reg(?:/\w)*:\w+ %d\)" % reg, r) for r in after):
+            return reg, consts[reg]
+    return None
+
+
 def explain_regmove(wd, uid, gone, new, nm, at):
     """regmove merged one pseudo into another at or before insn UID: name the two-address tie that did it,
     what in the C would have kept the ROM's separate copy, and the knob that forbids the tie."""
@@ -4462,6 +4484,14 @@ def explain_regmove(wd, uid, gone, new, nm, at):
               " an HImode pseudo read through a subreg, which regmove does not tie, and cse does not move a"
               " known-constant variable to operand 2 (README fact 37; ActorPalette_UpdateReverseFade's"
               " `(*field & 15) | 0xd0` replaced three pins).")
+        kept = byte_constant_operand(insn_list(wd, "combine"), u)
+        if kept:
+            print(f"    The other operand {nm(kept[0])} is the constant {kept[1]}, read again later. When the ROM"
+                  " copies it into the result (`adds rX, rK, #0` before the op) and reuses rK, declare it a"
+                  f" `u8` local (`u8 one = {kept[1]}; p->flags |= one; ... q->flags |= one;`): a promoted"
+                  " variable, so the narrowed byte op reads its SImode register directly and cse leaves it a"
+                  " register, while the byte load is a subreg regmove does not tie (README fact 54;"
+                  " Actor_TryInteraction).")
     # the same tie in other inlined copies of this code: same pattern up to register numbers
     shape = lambda r: re.sub(r"\(reg(/\w)*:(\w+) \d+\)", r"(reg:\2)", r or "")
     rowline = {}
