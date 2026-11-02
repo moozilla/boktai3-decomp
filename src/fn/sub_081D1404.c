@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -104,17 +103,15 @@ s32 SceneNpc_UpdateTransitionEffect(u8 *p)
         }
     }
     {
-        s32 m = Mod(*(s32 *)(p + 0x68), 3);
-        u32 f;
-        if (m <= 1) {
-            if (m >= 0) {
-                f = 1;
-                asm("" : "+r"(f));
-            } else
-                f = 0;
+        s32 remainder = Mod(*(s32 *)(p + 0x68), 3);
+        u16 *frame = (u16 *)(p + 0x28);
+        if (remainder <= 1) {
+            if (remainder >= 0)
+                *frame = 1;
+            else
+                *frame = 0;
         } else
-            f = 0;
-        *(u16 *)(p + 0x28) = f;
+            *frame = 0;
     }
     SceneNpc_UpdateTransitionParticles(p);
     *(s32 *)(p + 0x68) += 1;
