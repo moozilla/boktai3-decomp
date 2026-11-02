@@ -1395,6 +1395,18 @@ Each was read from the compiler source and confirmed on a live draft.
    pins out) was `if (|d| <= 4) { next = p->angle; next += d; } else next = p->angle + 4;
    *angle = next;`. A two-insn arm is not a single set, so jump.c leaves the if alone, and combine
    folds the copy inside its block.
+59. **Reload's spill choices come before jump2's cross-jumping, so a merged tail still counts.**
+   Reload hands out spill registers round-robin (fact 8) and jump2 cross-jumps identical tails
+   only afterwards. A tail the C writes in two branches leaves one copy in the ROM, but reload
+   made the first copy's choices too. In SceneInventory_HandlePageKeys the ROM's R branch takes r2
+   for `ldr =0x1AB0` where one shared tail after both branches gives r0 (`spill`: one choice
+   missing between the L branch and the R branch). `return SceneInventory_TurnPage(panel);` at
+   the end of each branch, a static inline for the sound, the 0x40 flag and the catalog update,
+   matched: the first copy's `ldr =0x1AA4` is the missing choice, and jump2 merges the copies
+   into the ROM's one tail. Written out twice in the body, the first copy reused the first
+   test's flag address (cse follows the fall-through path), so the copies differed and did not
+   merge; the inline's address is its own (fact 55). When `spill` reports a missing choice and
+   the ROM has a tail that several branches jump to, try the tail in each branch.
 
 ## Survey: random table as a literal address (2026-10-24)
 
