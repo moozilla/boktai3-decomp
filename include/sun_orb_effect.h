@@ -13,7 +13,7 @@ struct OrbitEffectParams {
     s16 kind;
     s8 angle;
     u8 unk_07;
-    u32 movementEnabled;
+    struct OrbitEffectPosition *targetSource;
     u8 unk_0C, unk_0D;
     s16 collisionX, collisionY, collisionZ;
     s16 homing;
@@ -76,6 +76,11 @@ struct OrbitEffectManager {
 typedef char OrbitEffectSizeCheck[sizeof(struct OrbitEffect) == 0x3AC ? 1 : -1];
 typedef char OrbitTrailSpriteSizeCheck[sizeof(struct OrbitTrailSprite) == 0x38 ? 1 : -1];
 
+void RisingActorConfig_Initialize(struct OrbitEffectParams *);
+void SunOrb_SetTargetSource(struct OrbitEffectParams *, u32);
+s32 SunOrb_CreateAtPosition(struct OrbitEffectParams *, struct OrbitEffectPosition *);
+struct OrbitEffectPosition *SunOrb_GetPosition(s32);
+struct OrbitEffectPosition *SunOrb_GetPositionFromManager(struct OrbitEffectManager *, s32);
 void SunOrb_SetUpdateCallback(struct OrbitEffectParams *, OrbitEffectCallback);
 s32 RisingActor_AdvanceHeight(struct OrbitEffect *, s32);
 s32 RisingActor_LowerHeight(struct OrbitEffect *, s32);
