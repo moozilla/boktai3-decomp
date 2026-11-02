@@ -5,7 +5,7 @@
 void Collider_SetAttackProperties(struct ContactCollider *, u32, u32, u32, u32, u32);
 static inline u8 Unavailable(u8 *input)
 {
-    register u8 *p asm("r5") = input;
+    u8 *p = input;
     u32 mask, off;
     if (!p)
         goto no;
@@ -33,7 +33,7 @@ struct BoundsBits {
 };
 static inline void ApplyAttack(u8 *base, struct ContactCollider *input, u32 alternate, u32 mask)
 {
-    register u8 *p asm("r5") = base;
+    u8 *p = base;
     struct ContactCollider *collider = input;
     u32 damage;
     u32 element;
@@ -54,20 +54,19 @@ static inline void ApplyAttack(u8 *base, struct ContactCollider *input, u32 alte
         flags = *(u32 *)(p + 0xCC);
         response = *(u16 *)(p + 0xC4);
     }
-    asm("" : : "r"(p));
     Collider_SetAttackProperties(collider, damage, element, 0, flags, response);
 }
 static inline void SetMotionFlag(u8 *p, u32 mask)
 {
     u32 value = mask;
-    register u16 *flags asm("r2") = (void *)(p + 0x2D6);
+    u16 *flags = (void *)(p + 0x2D6);
     register u32 current asm("r1") = *flags;
     *flags = value | current;
 }
 void Mummy_UpdateAttackCollider(u8 *input)
 {
     struct BoundsBits bounds;
-    register u8 *actor asm("r5") = input;
+    u8 *actor = input;
     register struct ContactCollider *collider asm("r0");
     u32 flags;
     u32 attackBit;
