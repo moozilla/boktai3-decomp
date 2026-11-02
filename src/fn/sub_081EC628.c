@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 struct ScreenLayerPair {
@@ -12,14 +11,13 @@ struct ScreenLayerPair {
 #define ScreenLayers_ShowPair sub_081EC628
 void ScreenLayers_ShowPair(struct ScreenLayerPair *screen)
 {
-    register u32 mask asm("r0");
     screen->firstFlags &= ~1;
     screen->secondFlags &= ~1;
     if (screen->layer != 0) {
-        mask = 1;
+        u16 bits = 1;
+        gDispCntShadow |= bits;
     } else {
-        mask = 3;
+        u16 bits = 3;
+        gDispCntShadow |= bits;
     }
-    mask |= gDispCntShadow;
-    gDispCntShadow = mask;
 }
