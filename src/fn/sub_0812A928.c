@@ -1,12 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_position.h"
 #include "engine.h"
 #include "ram.h"
-
-#define LinkedEffect_CaptureRandomTable(dst)                                                       \
-    do {                                                                                           \
-        (dst) = gRandomTable;                                                                      \
-    } while (0)
+#include "monster_particle_random.h"
 
 u32 SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 
@@ -27,7 +22,7 @@ void LinkedEffect_SetVariant(struct ContactPosition *position, u8 variant)
     s32 angle;
     u32 *cursor;
 
-    LinkedEffect_CaptureRandomTable(table);
+    table = gRandomTable;
     v = &velocity;
     angle = variant + 214;
     cursor = &gRandomIndex;
@@ -51,7 +46,7 @@ void LinkedEffect_SetVariant(struct ContactPosition *position, u8 variant)
         heading = (u8)angle;
         sample = (*cursor + 1) & mask;
         *cursor = sample;
-        sample = table[sample];
+        PARTICLE_RANDOM_READ_SAMPLE(sample, table, sample);
         read.mask = 3;
         speed = (sample & read.mask) + 4;
 
@@ -61,7 +56,7 @@ void LinkedEffect_SetVariant(struct ContactPosition *position, u8 variant)
         v->z = ScaleComponent(projection.sine[heading] * speed);
 
         index = (*cursor + 1) & mask;
-        height = table[index];
+        PARTICLE_RANDOM_READ_SAMPLE(height, table, index);
         projection.heightMask = 15;
         v->y = height & projection.heightMask;
 
