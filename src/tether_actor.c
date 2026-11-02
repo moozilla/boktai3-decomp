@@ -2567,13 +2567,12 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
     {
         register u32 offset asm("r0") = 0x3F0;
         struct DisplayPosition *target;
-        const struct DisplayPosition *source = (const struct DisplayPosition *)&actor->position;
         register u32 first asm("r0");
         u32 second;
         asm("" : "+r"(offset));
         target = (struct DisplayPosition *)((u8 *)actor + offset);
-        first = source->words[0];
-        second = *(u32 *)((u8 *)actor + 0x54);
+        first = ((const struct DisplayPosition *)&actor->position)->words[0];
+        second = ((const struct DisplayPosition *)&actor->position)->words[1];
         target->words[0] = first;
         target->words[1] = second;
     }
