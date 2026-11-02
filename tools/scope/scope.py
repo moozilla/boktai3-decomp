@@ -3435,6 +3435,9 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
     print("      levers: a value moved from a low register to a high one, or to no register (make it a"
           " longer-lived variable set earlier), adds reloads; a pin, or a value already in a low register,"
           " removes them")
+    print("      a tail that several branches jump to may be one the C writes in each branch (an inline"
+          " helper: fact 55 keeps its field addresses apart); jump2 merges the copies after reload, and"
+          " each copy's reload choices still count (README fact 58)")
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
