@@ -1,31 +1,24 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "armor_palette.h"
 
 struct ActorPaletteSource {
     u8 unknown0[0x74];
     u16 banks[3][16];
 };
-struct ActorPaletteOwner {
-    u8 unknown0[0x650];
-    struct {
-        u32 callbacks[2];
-        u16 banks[16][16];
-    } palettes;
-    u8 unknown858[0x282];
-    u8 selected;
-};
 void *ScriptProc_Start(u16, u16);
-void Palette_CopyBank(void *, const void *);
-void ActorPalette_LoadScriptBanks(struct ActorPaletteOwner *p)
+void Palette_CopyBank(u16 *, u16 *);
+void ActorPalette_LoadScriptBanks(struct Armor *p)
 {
-    typeof(p->palettes) *palettes = &p->palettes;
+    struct ArmorPaletteController *rows = &p->paletteController;
     struct ActorPaletteSource *source = ScriptProc_Start(0x92B3, 0xCB8F);
-    const void *bank;
+    u16 *bank;
+    u16 *destination;
     bank = source->banks[0];
-    Palette_CopyBank(palettes->banks[p->selected], bank);
+    destination = rows->palettes[p->paletteController.bank];
+    Palette_CopyBank(destination, bank);
     bank = source->banks[1];
-    Palette_CopyBank(palettes->banks[p->selected + 1], bank);
+    destination = rows->palettes[p->paletteController.bank + 1];
+    Palette_CopyBank(destination, bank);
     bank = source->banks[2];
-    Palette_CopyBank(palettes->banks[p->selected + 2], bank);
-    asm("" ::"r"(palettes));
+    destination = rows->palettes[p->paletteController.bank + 2];
+    Palette_CopyBank(destination, bank);
 }
