@@ -1,11 +1,8 @@
 #include "global.h"
-#include "render.h"
+#include "vanargand_damage_part.h"
+#include "paired_scene_actor.h"
 #include "vanargand_stage_colors.h"
 // MATCHING_CONCESSION: register-pinning
-struct VanargandPart {
-    u8 pad0[0x10];
-    u16 state;
-};
 struct Vanargand {
     u8 pad0[0x54];
     u8 motionData[0x90 - 0x54];
@@ -17,19 +14,20 @@ struct Vanargand {
     u8 phase;
     u8 padA3;
     u32 timer;
-    u8 padA8[0xAF - 0xA8];
+    u8 padA8[3], state, padAC[3];
     u8 finished, entered, pendingAnimation, ready;
-    u8 padB3[0x18C - 0xB3];
-    u8 animation[0x60];
-    u8 drawable[0x3FC - 0x1EC];
-    struct VanargandPart part;
-    u8 pad410[0x500 - 0x410];
-    u16 partActive;
-    u8 pad502[0x534 - 0x502];
+    u8 padB3[0x100 - 0xB3];
+    void (*callback)(void *, s32);
+    u8 pad104[0x18C - 0x104];
+    u8 animation[0x20];
+    struct ContactPosition displayPosition;
+    u8 pad1B4[0x21C - 0x1B4];
+    u8 actionSequence[0x3FC - 0x21C];
+    struct VanargandDamagePart part;
     u8 track[0x29];
     u8 trackState;
     u8 pad55E[0x56C - 0x55E];
-    void *attachment;
+    struct VanargandAttackPair *attachment;
     u8 pad570[0x584 - 0x570];
     u16 pairedMotion;
     u8 pad586[0x59E - 0x586];
@@ -42,7 +40,9 @@ struct Vanargand {
     u16 delay;
     u8 pad5B2[0x5B8 - 0x5B2];
     u16 field5B8, field5BA;
-    u8 pad5BC[0x718 - 0x5BC];
+    u8 pad5BC[0x6C4 - 0x5BC];
+    struct DamageNumberSource damageSource;
+    u8 pad6CC[0x718 - 0x6CC];
     u8 palette[0x918 - 0x718];
     u8 fadeA[0xB18 - 0x918];
     u8 fadeB[0xD18 - 0xB18];
@@ -57,7 +57,6 @@ void Sound_PlaySong(u32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
 
-#define FIELD(type, p, offset) (*(type *)((u8 *)(p) + (offset)))
 void Vanargand_StopActionSequence(void *);
 
 static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
@@ -86,19 +85,19 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
             break;
     }
     Vanargand_ResetPaletteTransition(self);
-    Vanargand_StopActionSequence((u8 *)self + 0x21C);
+    Vanargand_StopActionSequence(self->actionSequence);
 }
-static inline void changeState(struct Vanargand *p, s32 state, void *callback)
+static inline void changeState(struct Vanargand *p, s32 state, void (*callback)(void *, s32))
 {
     struct Vanargand *self = p;
     // Keep the transition owner distinct from the callback installation owner.
-    if (FIELD(u8, p, 0xAB) == 3)
+    if (p->state == 3)
         restorePalette(p, self);
     {
         u32 zero = 0;
-        FIELD(u8, p, 0xAB) = state;
-        FIELD(void *, p, 0x100) = callback;
-        FIELD(u32, p, 0x90) = zero;
+        p->state = state;
+        p->callback = callback;
+        p->actionTimer = zero;
         p->pendingAnimation = 1;
         p->phase = zero;
         p->timer = zero;
@@ -118,24 +117,23 @@ static inline void setPosition(s16 *dst, s32 x, s32 y, s32 z)
 }
 static inline u32 partFlags(struct Vanargand *p)
 {
-    return FIELD(u16, p, 0x4FA);
+    return p->part.contactFlags;
 }
 // confidence=low: distinguishes accumulated body damage from paired-part contact damage.
 void DamageNumberDisplay_ShowWithDefaultScale(void *, s32, s32, void *, s32);
-s32 ScenePair_CountPositiveCounters(void *);
 void Vanargand_UpdatePaletteLeap(void *, s32);
 s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
 {
     struct Vanargand *self = p;
-    void *display = (u8 *)p + 0x6C4;
+    void *display = &p->damageSource;
     s32 damage = p->damage;
     u32 special = (p->hitFlags >> 6) & 1;
     register s32 partDamage asm("sl");
     u32 partSpecial;
     p->damage = 0;
     p->hitFlags = 0;
-    if (FIELD(u32, p, 0x4FC) & 6) {
-        partDamage = FIELD(u16, p, 0x4F8);
+    if (p->part.flags & 6) {
+        partDamage = p->part.damage;
         partSpecial = (partFlags(p) >> 6) & 1;
     } else {
         partDamage = 0;
@@ -149,7 +147,7 @@ s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
             asm("" : "+r"(accumulated));
             *accumulated += damage;
         }
-        DamageNumberDisplay_ShowWithDefaultScale(display, damage, 0, (u8 *)self + 0x1AC, 1);
+        DamageNumberDisplay_ShowWithDefaultScale(display, damage, 0, &self->displayPosition, 1);
         self->flashTimer = 15;
         CpuSet(gPaletteBankData + 0x3240, self->palette, 0x04000008);
         Vanargand_ResetPaletteTransition(self);
@@ -190,14 +188,14 @@ s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
         }
     }
     if (partDamage > 0 || partSpecial) {
-        s16 pos[3];
+        s16 pos[4];
         p->health -= partDamage;
-        setPosition(pos, FIELD(s16, self, 0x418) + 64, FIELD(s16, self, 0x41A),
-                    FIELD(s16, self, 0x41C) + 64);
-        DamageNumberDisplay_ShowWithDefaultScale((u8 *)self + 0x4A4, partDamage, 0, pos, 1);
+        setPosition(pos, self->part.position.x + 64, self->part.position.y,
+                    self->part.position.z + 64);
+        DamageNumberDisplay_ShowWithDefaultScale(&self->part.damageSource, partDamage, 0, pos, 1);
         if (p->health <= 0) {
             setFlags(p, 2);
-        } else if (FIELD(u32, self, 0x4FC) & 4) {
+        } else if (self->part.flags & 4) {
             changeState(p, 20, Vanargand_UpdatePaletteLeap);
             setFlags(p, 0x10000);
             return 1;
