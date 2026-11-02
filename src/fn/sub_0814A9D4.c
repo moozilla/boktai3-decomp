@@ -1,4 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
+#include "player.h"
 #include "global.h"
 #include "player.h"
 // confidence=low: charge phases and orbiting attack collider identify a spinning attack.
@@ -129,7 +129,7 @@ void Player_UpdateSelectedSpinAttack(u8 *p)
                 Player_SetActionPhase(p, 6);
             break;
         case 6: {
-            register u32 pending asm("r0");
+            u32 pending;
             Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 0x24), 0x40, 1);
             if ((*(u16 **)(p + 0x348))[1] & 2)
                 B(0xBF6) = 1;
@@ -137,7 +137,7 @@ void Player_UpdateSelectedSpinAttack(u8 *p)
             if (pending) {
                 B(0xBF6) = 0;
                 B(0x458) = 1;
-            } else if (++H(0x45A) > 14) {
+            } else if (++((struct Player *)p)->tetherFrame > 14) {
                 B(0xBF6) = 0;
                 Player_SetActionPhase(p, 7);
             }
