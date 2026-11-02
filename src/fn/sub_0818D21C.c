@@ -1,8 +1,8 @@
+#include "sword_orbit.h"
 #include "motion_0818.h"
 #include "game_state.h"
 #include "engine_globals.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 extern const s16 gUnk_086149C4[];
 u32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -11,7 +11,7 @@ void Armor_InitPartLunge(struct Motion0818Object *p)
 {
     u8 **player = &gGameState;
     u8 *target;
-    register s32 turn asm("r1");
+
     s32 choice;
     u32 one;
     target = *player;
@@ -25,14 +25,7 @@ void Armor_InitPartLunge(struct Motion0818Object *p)
     }
     one = 1;
     choice &= one;
-    {
-        register s32 negative asm("r3") = -1;
-        asm("" : "+r"(negative));
-        turn = negative;
-    }
-    if (choice)
-        turn = 1;
-    p->turnDirection = turn;
+    p->turnDirection = Sword_OrbitDirection(choice);
     p->done = one;
     p->startX = p->x;
     p->startY = p->y;
