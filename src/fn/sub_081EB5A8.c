@@ -24,7 +24,7 @@ s32 Params3D0_InitDisplay(u8 *p)
     TimeDisplay_InitBackgrounds(p);
     TimeDisplay_InitAnimatedObjects(p);
     if ((s16)gTimeDisplayParameters.silent == 1) {
-        *(s32 *)(p + 0x724) = *(s16 *)((u8 *)gGameState + 0x870);
+        *(s32 *)(p + 0x724) = gGameState->timeDisplaySelection;
         *(u32 *)(p + 0x20) &= ~1;
         *(u32 *)(p + 0x350) &= ~1;
         *(u32 *)(p + 0x3d8) &= ~1;
