@@ -1396,6 +1396,35 @@ Each was read from the compiler source and confirmed on a live draft.
    *angle = next;`. A two-insn arm is not a single set, so jump.c leaves the if alone, and combine
    folds the copy inside its block.
 
+59. **Byte stores share the first zero, the halfword store the second: give the halfword an HImode
+   zero; a constant argument loaded before a register copy wants an inline wrapper.** Every u8 field
+   store in a GroupPiece-like struct expands as an insertion (load, `and` with a QI 0 copied to an SI
+   pseudo, `ior`, fact 34). For a QImode store of a constant, cse_insn looks for a register holding it
+   in the wider modes (HI, then SI) and prefers that `src_related` over a same-mode register on a cost
+   tie. So `p->state = 0; p->active = 1; p->timer = 0; p->direction = 0;` always compiles to
+   `movs r2, #0; strb r2; ...; movs r1, #0; strh r2; strb r1`: state takes the SI zero, direction
+   the timer's own HI pseudo. BoardPiece_Initialize's ROM stores state and direction from one zero and
+   the timer (and ZeroFill8's word) from the insertion's mask. Its twin ContactActor_InitializeSlot
+   matched with `u16 initialFrame[] = {0}; ... slot->stateFrame = initialFrame[0];`, and so did
+   BoardPiece_Initialize (two barriers out): the element read is an HImode register, found first for
+   both byte stores. The same pair has `adds r0, r4, #0` before `ldr r1, =0x2D3` for
+   AnimData_SelectPaletteBank. expand_call copies each argument into a pseudo in order (r0 then the
+   constant), but cse folds the r0 copy into the live r4, so the constant pseudo's set comes first and
+   takes r1. `static inline void SelectSlotPalette(void *graphics) { AnimData_SelectPaletteBank(graphics,
+   0x2D3); }` gives the argument a copy of its own ahead of the constant. scope's default diff names
+   this case ("in argument order; the draft loads a constant argument ahead of it"), separately from
+   fact 35's precomputed conversion.
+
+60. **A register argument goes into an inline uncopied; an address expression comes back as gcse's
+   copy.** expand_inline_function uses a pseudo argument as the parameter itself when the parameter
+   is never assigned, so `Step(savedSprite, state)` reads savedSprite (sb) at every use. The ROM of
+   DisplayTrack_AddFromScript copies it first (`mov r6, sb`) and works on r6. Passing `&track->sprite`
+   instead computes the address again; gcse finds it available from the earlier `sprite =
+   &track->sprite` and turns it into a copy of that pseudo, which the step's uses read and local-alloc
+   puts in r6 (DisplayTrack_StepSequence in display_track.h; four pins and barriers out). When the ROM
+   copies a long-lived pointer into a low register just before an inline's body, pass the expression,
+   not the saved variable.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
