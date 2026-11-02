@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "vanargand_stage_colors.h"
 // MATCHING_CONCESSION: register-pinning
 struct VanargandPart {
     u8 pad0[0x10];
@@ -56,39 +57,9 @@ void Sound_PlaySong(u32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
 
-#define LERP(dst, t, from, to, tag)                                                                \
-    {                                                                                              \
-        if ((t) > 0)                                                                               \
-            goto tag##Upper;                                                                       \
-        dst = (from);                                                                              \
-        goto tag##Store;                                                                           \
-        tag##Upper:                                                                                \
-        {                                                                                          \
-            s32 limit = 3;                                                                         \
-            if ((t) < limit)                                                                       \
-                goto tag##Interp;                                                                  \
-        }                                                                                          \
-        dst = (to);                                                                                \
-        goto tag##Store;                                                                           \
-        tag##Interp:                                                                               \
-        {                                                                                          \
-            s32 k = ((to) - (from)) << 8;                                                          \
-            s32 v = (t) * k;                                                                       \
-            s32 d = 3;                                                                             \
-            s32 result;                                                                            \
-            v = v / d;                                                                             \
-            if (v >= 0)                                                                            \
-                result = v >> 8;                                                                   \
-            else                                                                                   \
-                result = -(-v >> 8);                                                               \
-            dst = result;                                                                          \
-            dst += (from);                                                                         \
-        }                                                                                          \
-        tag##Store :;                                                                              \
-    }
-
 #define FIELD(type, p, offset) (*(type *)((u8 *)(p) + (offset)))
 void Vanargand_StopActionSequence(void *);
+
 static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
 {
     s32 kind = 0x6F;
@@ -96,37 +67,10 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
         kind = 0x7F;
     switch (kind) {
         case 0x6F: {
-            s32 t;
-            s32 r, g, b;
 
             CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000020);
             CpuSet(p->fadeA, gBgPaletteBuffer, 0x04000068);
-            t = p->transition;
-            LERP(r, t, 7, 0x13, r1)
-            LERP(g, t, 0, 0x12, g1)
-            LERP(b, t, 0, 0x13, b1)
-            r |= g << 5;
-            r |= b << 10;
-            {
-                u16 color = r;
-                u16 *pal = gBgPaletteBuffer;
-                pal[0x56 / 2] = color;
-                pal[0x10C / 2] = color;
-            }
-            LERP(r, t, 0x15, 0x18, r2)
-            LERP(g, t, 0, 0x1D, g2)
-            LERP(b, t, 0, 0x1F, b2)
-            r |= g << 5;
-            r |= b << 10;
-            {
-                u16 *pal;
-                u32 color = (u16)r;
-                // Complete packing before materializing the second palette address.
-                asm("" : : "r"(color));
-                pal = gBgPaletteBuffer;
-                pal[0x5A / 2] = color;
-                pal[0x10E / 2] = color;
-            }
+            Vanargand_SetStageColors(p->transition);
             break;
         }
         case 0x82:
