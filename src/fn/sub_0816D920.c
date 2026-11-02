@@ -1,47 +1,30 @@
-#include "global.h"
-// MATCHING_CONCESSION: register-pinning
-struct IconPos {
-    s16 x, y, z, w;
-};
-void SceneHud_GetActionIconPosition(struct IconPos *out, s32 index)
+#include "scene_vec.h"
+
+static inline void SetIconPosition(struct SceneVec *out, s32 x, s32 y)
 {
-    register s32 x asm("r0");
-    s32 y = index;
-    if (y <= 15) {
-        s32 col = y & 3;
-        s32 row = y >> 2;
-        s32 a = col * 24 + 0x70;
-        s32 b = row * 24 + 0x20;
-        s32 z = 0;
-        out->x = a;
-        out->y = b;
-        out->z = z;
-        out->w = z;
+    out->x = x;
+    out->y = y;
+    out->z = 0;
+    out->pad = 0;
+}
+void SceneHud_GetActionIconPosition(struct SceneVec *out, s32 index)
+{
+
+    if (index <= 15) {
+        s32 col = index & 3;
+        s32 row = index >> 2;
+        SetIconPosition(out, col * 24 + 0x70, row * 24 + 0x20);
         return;
     }
-    if (y == 0x27) {
-        x = 0xD8;
-        y = 0x50;
-        goto tail;
-    }
-    if (y == 0x26) {
-        x = 0xD8;
-        y = 0x38;
-        goto tail;
-    }
-    if (y == 0x24 || y == 0x28) {
-        x = 0xD8;
-        y = 0x68;
-        goto tail;
-    }
-    if (y == 0x20) {
-        x = 0xD8;
-    tail:
-        out->x = x;
-        out->y = y;
-        out->z = 0;
-        out->w = 0;
-    } else {
+    if (index == 0x27)
+        SetIconPosition(out, 0xD8, 0x50);
+    else if (index == 0x26)
+        SetIconPosition(out, 0xD8, 0x38);
+    else if (index == 0x24 || index == 0x28)
+        SetIconPosition(out, 0xD8, 0x68);
+    else if (index == 0x20)
+        SetIconPosition(out, 0xD8, 0x20);
+    else {
         out->x = 0x90;
         out->y = 0x20;
     }
