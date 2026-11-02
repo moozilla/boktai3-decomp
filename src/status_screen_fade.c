@@ -209,18 +209,15 @@ int StatusScreen_Update(struct StatusScreen *p)
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
 }
 
-// This callback preserves the BIOS wrapper's r0 result on return.
-extern int CpuSetResult(const void *, void *, u32) asm("CpuSet");
 int StatusScreen_Destroy(struct StatusScreen *p)
 {
     u32 zero = 0;
-    int result = CpuSetResult(&zero, p->rows, 0x05000091);
+    CpuSet(&zero, p->rows, 0x05000091);
     gScanlineDmaSource = p->rows[p->active];
     gScanlineDmaTarget = (void *)0x0400004C;
     gScanlineDmaCount = 1;
     gScanlineDmaMode = 0;
     gStatusScreen = 0;
-    return result;
 }
 
 int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
