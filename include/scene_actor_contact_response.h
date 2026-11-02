@@ -42,12 +42,12 @@ static inline void SceneActorContact_SetTrackingFlags(struct SceneActorContactTr
 }
 static inline u16 SceneActorContact_SavedTargetCell(struct SceneActorRegistryResetView *actor)
 {
-    return *(u16 *)actor->unknown2F8;
+    return actor->savedTargetCell;
 }
 static inline void SceneActorContact_SaveTargetCell(struct SceneActorRegistryResetView *actor,
                                                     u16 cell)
 {
-    *(u16 *)actor->unknown2F8 = cell;
+    actor->savedTargetCell = cell;
 }
 
 static inline u8 SceneActorContact_TestTrackingOwned(struct SceneActorContactTracking *current,
