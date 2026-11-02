@@ -155,13 +155,13 @@ extern u16 gBgAffineMatrixBuffer[]; /* affine coefficients copied from gBgAffine
 /* 0x03004BF8 */
 extern u32 gBgAffineRefX; /* BG affine reference X accumulator */
 /* 0x03004BFC */
-extern u16 gBgAffineScaleY; /* BG affine Y scale */
+extern s16 gBgAffineScaleY; /* BG affine Y scale */
 /* 0x03004C00 */
 extern u32 gBgAffineRefY; /* BG affine reference Y accumulator */
 /* 0x03004C08 */
 extern u16 gBgTileUploadParamB[]; /* per-layer tile-upload parameter (4) */
 /* 0x03004C14 */
-extern u16 gBgAffineScaleX; /* BG affine X scale */
+extern s16 gBgAffineScaleX; /* BG affine X scale */
 /* 0x03004C18 */
 extern u32 gBgAffineRefBuffer[]; /* buffered affine X/Y reference (2) */
 /* 0x03004C20 */
