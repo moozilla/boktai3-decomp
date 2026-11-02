@@ -1,35 +1,14 @@
-// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_availability.h"
 #include "scene_actor_placement.h"
-static inline u8 SceneActorPlacement_TestAndSaveFlags(u32 mask, u16 *source, u16 **saved)
-{
-    u32 bits = *source & mask;
-    *saved = source;
-    if (bits)
-        return 1;
-    return 0;
-}
+
 u32 SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *argument)
 {
     struct SceneActorPlacementView *actor = (void *)argument;
-    u8 unavailable;
-    if (actor) {
-        u32 mask = 0x40;
-        if ((actor->flags2D4 & mask) || SceneActorPlacement_ReadFlags32(actor, 0x20000) ||
-            actor->health <= 0)
-            unavailable = 1;
-        else
-            unavailable = 0;
-    } else
-        unavailable = 0;
-    asm("" : "+r"(unavailable));
+    u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
     if (!unavailable && actor->flags2D6) {
         u8 small;
         u16 *flags;
-        u32 mask = 0x10;
-        u16 *source;
-        asm("" : "+r"(actor) : "r"(mask));
-        source = &actor->flags2D6;
-        small = SceneActorPlacement_TestAndSaveFlags(mask, source, &flags);
+        small = SceneActor_TestPendingFlag((void *)actor, 0x10, &flags);
         if (small) {
             {
                 struct ContactPosition *position;
