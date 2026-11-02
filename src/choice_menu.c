@@ -281,6 +281,7 @@ u8 *Text_FindChar(u8 *, s32);
 u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text)
 {
     u8 *cursor = text;
+    s32 width;
     if (*text != '/') {
         if (!Text_ComparePrefix(text, gUnk_0824DB0C, 5)) {
             READ_WIDTH();
@@ -295,12 +296,12 @@ u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text)
             p->choices[p->count].row = p->rows;
             p->width = 0;
         } else if (!Text_ComparePrefix(text, gUnk_0824DB14, 6)) {
-            register s32 width asm("r1") = MessageWindow_GetStringWidth(READ_NUMBER());
+            width = MessageWindow_GetStringWidth(READ_NUMBER());
             p->width += width;
             p->textX += width;
             cursor = Text_FindChar(cursor, '>');
         } else if (!Text_ComparePrefix(text, gUnk_0824DB1C, 3)) {
-            register s32 width asm("r1") = MessageWindow_GetNumberWidth(READ_NUMBER());
+            width = MessageWindow_GetNumberWidth(READ_NUMBER());
             p->width += width;
             p->textX += width;
             cursor = Text_FindChar(cursor, '>');
