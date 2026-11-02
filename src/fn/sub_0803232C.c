@@ -287,10 +287,12 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
         }
     unknown:
         value = 255;
-    selected:
-        p->selection = value;
+    selected: {
+        s8 *selection = &p->selection;
+        *selection = value;
+    }
         {
-            register int zero asm("r0") = 0;
+            int zero = 0;
             int one = 1;
             p->busy = one;
             one = p->mode;
