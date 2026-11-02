@@ -11,7 +11,7 @@ struct Hud {
 extern const u16 gUnk_08610E78[];
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 PauseMenu_IsEquipmentSelectionEnabled(struct Hud *);
-void Palette_UpdateHighlightPulse(u16 *);
+void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void Hud_LoadConditionalPaletteRows(struct Hud *input)
 {
     struct Hud *hud = input;
@@ -37,10 +37,6 @@ void Hud_LoadConditionalPaletteRows(struct Hud *input)
             source++;
         } while (--j >= 0);
     } while (i <= 3);
-    {
-        u8 *state = &hud->paletteState;
-        register u32 zero asm("r0") = 0;
-        *state = zero;
-    }
-    Palette_UpdateHighlightPulse(gBgPaletteBank13Color2);
+    hud->paletteState = 0;
+    Palette_UpdateHighlightPulse(gBgPaletteBank13Color2, &hud->paletteState);
 }
