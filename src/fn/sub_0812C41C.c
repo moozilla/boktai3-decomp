@@ -2,6 +2,7 @@
 #include "scene_steering_actor.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 extern const s16 gUnk_086149C4[];
 void SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 static inline s32 Truncate(s32 v)
@@ -13,17 +14,18 @@ static inline s32 Truncate(s32 v)
 void FragmentEffect_SpawnRandomParticle(struct ContactPosition *input)
 {
     struct ContactPosition *position = input;
-    /* The original materializes this dead literal across its inlined RNG.
-     * Keep the defined value live only for register-allocation matching. */
-    register u32 opaque asm("r12") = 0x0403b714;
-    const u16 *table = gRandomTable;
+    u32 savedOrigin;
+    register u32 origin asm("r12");
+    const u16 *table;
     struct ContactPosition velocity;
     struct ContactPosition *v;
     s32 angle;
     s32 magnitude;
     register u32 *cursor asm("r3");
     u32 mask;
-    asm volatile("" : "+r"(opaque));
+    origin = PARTICLE_RANDOM_SAMPLE_ORIGIN;
+    asm volatile("" : "+r"(origin));
+    table = gRandomTable;
     {
         register u32 index asm("r0") = ((cursor = &gRandomIndex), *cursor + 1) & 1023;
         const u8 *sample = (void *)(index * 2 + (u32)table);
@@ -44,8 +46,7 @@ void FragmentEffect_SpawnRandomParticle(struct ContactPosition *input)
     {
         register const s16 *sine asm("r1") = gUnk_086149C4;
         s32 product = sine[(angle + 64) & mask] * magnitude;
-        register u32 scratch asm("r5") = opaque;
-        asm volatile("" : : "r"(scratch));
+        PARTICLE_RANDOM_SAVE_ORIGIN(savedOrigin, origin);
         v->x = Truncate(product);
         v->y = 0;
         {
@@ -56,12 +57,12 @@ void FragmentEffect_SpawnRandomParticle(struct ContactPosition *input)
     }
     {
         u32 offset;
-        register const u16 *source asm("r2");
+        const u16 *source;
         *cursor = (*cursor + 1) & 1023;
-        offset = *cursor * 2;
-        source = gRandomTable;
+        offset = savedOrigin + *cursor * 2;
+        source = (const u16 *)RANDOM_TABLE_ADDR;
         {
-            u32 value = *(const u16 *)(offset + (u32)source);
+            u32 value = ParticleRandom_ReadSampleAddress(offset, savedOrigin, source);
             {
                 u32 mask = 63;
                 value &= mask;
