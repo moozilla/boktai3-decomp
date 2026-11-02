@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "large_scene_animation_controller.h"
 #include "game_state.h"
@@ -3357,26 +3356,36 @@ struct RetreatPartExtra {
     u8 unk_08[8];
 };
 
+struct RetreatColliderCursor {
+    s32 firstPart;
+    u32 altFlagsOffset;
+};
+
 void Nidhoggr_UpdateLeftwardRetreat(struct Nidhoggr *t)
 {
     switch (t->state) {
         case 0: {
             s32 i;
             u16 *altFlags;
-            register s32 altOffset asm("r1");
+            struct RetreatColliderCursor cursor;
             s32 stride, extraMask;
-            register s32 colliderMask asm("r4");
+            s32 colliderMask;
+            s32 value;
             u32 flags, altValue;
             u16 x;
             struct SceneVec *base;
+
             t->active = 1;
-            i = 0;
+            cursor = (struct RetreatColliderCursor){0};
+            i = cursor.firstPart;
             stride = sizeof(struct RetreatCollider);
-            colliderMask = 4;
+            value = 4;
+            colliderMask = value;
             extraMask = 1;
-            altOffset = (u8 *)&((struct RetreatCollider *)&t->altColliders[1])->flags - (u8 *)t;
-            asm("" : "+r"(altOffset));
-            altFlags = (u16 *)((u8 *)t + altOffset);
+            cursor.altFlagsOffset =
+                (u8 *)&((struct RetreatCollider *)&t->altColliders[1])->flags - (u8 *)t;
+            altFlags = (u16 *)((u8 *)t + cursor.altFlagsOffset);
+
         disablePart:
             altValue = *altFlags;
             altValue |= colliderMask;
@@ -3389,9 +3398,10 @@ void Nidhoggr_UpdateLeftwardRetreat(struct Nidhoggr *t)
             i++;
             if (i < 26)
                 goto disablePart;
+
             x = t->pos.x - 0x800;
             base = &t->basePos;
-            colliderMask = 0;
+            value = 0;
             base->x = x;
             t->basePos.y = t->pos.y;
             t->basePos.z = t->pos.z;
@@ -3399,7 +3409,7 @@ void Nidhoggr_UpdateLeftwardRetreat(struct Nidhoggr *t)
             t->posOffsetXVelocity = -0xe00;
             t->swayXVelocity = -0x88;
             t->state++;
-            t->timer = colliderMask;
+            t->timer = value;
             break;
         }
         case 1:
