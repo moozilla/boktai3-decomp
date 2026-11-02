@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
 #include "engine.h"
@@ -211,7 +210,10 @@ void Armor_UpdateModeAttackDecision(struct ArmorDecisionActor *p)
                 }
                 if ((s16)p->attackCooldown > 0)
                     goto axisApproach;
-                ARMOR_BRANCH_AXIS_UNALIGNED(dx, dz, axisApproach);
+                if (dx) {
+                    if (dz)
+                        goto axisApproach;
+                }
                 ActorController_SetBehavior(p, 36);
                 p->attackCooldown = 360;
                 break;
