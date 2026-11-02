@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "scene_hud_display.h"
 
 // Remaining differences: loop-counter init is emitted before the hoisted 0xFFFFD000 literal in two loops.
 // confidence=low: transient gauges use two independent countdowns.
@@ -8,54 +9,54 @@ u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Div(s32, s32);
 void StatDisplay_DrawTwoDigitCounter(s32);
 void ResultPanel_ClearFiveTiles(void);
-void Hud_UpdateTransientStatGauge(u8 *p)
+void Hud_UpdateTransientStatGauge(struct SceneHudState *p)
 {
     s32 draw = 0, full = 0, partial = 0, width = 0, foreground = 0, background = 0, tile = 0, n;
     u16 *cell;
-    if (*(u16 *)(p + 0xa74)) {
+    if (p->timedStateTimer) {
         background = 0x39ce;
-        if (p[0xa77]) {
+        if (p->timedStatePhase) {
             foreground = 0x7fff;
-            p[0xa77]--;
+            p->timedStatePhase--;
         } else
             foreground = 0x1f;
-        width = p[0xa76];
+        width = p->timedStateKind;
         partial = width * 8;
-        if (*(u16 *)(p + 0xa70) == 0) {
+        if (p->timedStateStart == 0) {
             full = 0;
             partial = 0;
         } else {
             s32 scale = partial - 1;
-            partial = Div((*(u16 *)(p + 0xa70) - 1) * scale, *(u16 *)(p + 0xa72) - 1) + 1;
+            partial = Div((p->timedStateStart - 1) * scale, p->timedStateValue - 1) + 1;
             full = partial >> 3;
             partial -= full << 3;
         }
         tile = 0x8c;
-        --*(u16 *)(p + 0xa74);
-        p[0xa7f] = 1;
+        --p->timedStateTimer;
+        p->transientGaugeVisible = 1;
         draw = 1;
-        if (*(u16 *)(p + 0xa7c))
-            --*(u16 *)(p + 0xa7c);
-    } else if (*(u16 *)(p + 0xa7c)) {
+        if (p->secondaryGaugeTimer)
+            --p->secondaryGaugeTimer;
+    } else if (p->secondaryGaugeTimer) {
         background = 0x1f;
-        if (p[0xa7e]) {
+        if (p->secondaryGaugeFlashTimer) {
             foreground = 0x7fff;
-            p[0xa7e]--;
+            p->secondaryGaugeFlashTimer--;
         } else
             foreground = 0x3e0;
         width = 10;
-        if (*(u16 *)(p + 0xa78) == 0) {
+        if (p->secondaryGaugeValue == 0) {
             full = 0;
             partial = 0;
         } else {
             s32 scale = 79;
-            partial = Div((*(u16 *)(p + 0xa78) - 1) * scale, *(u16 *)(p + 0xa7a) - 1) + 1;
+            partial = Div((p->secondaryGaugeValue - 1) * scale, p->secondaryGaugeMaximum - 1) + 1;
             full = partial >> 3;
             partial -= full << 3;
         }
         tile = 0x42;
-        p[0xa7f] = 1;
-        --*(u16 *)(p + 0xa7c);
+        p->transientGaugeVisible = 1;
+        --p->secondaryGaugeTimer;
         draw = 1;
     }
     if (draw) {
@@ -67,9 +68,9 @@ void Hud_UpdateTransientStatGauge(u8 *p)
         {
             s32 mk;
             {
-                register s32 t asm("r0") = -0x3000;
-                asm("" : "+r"(t));
-                mk = t;
+                u16 tileAttributes = 0xD000;
+                asm("" : "+r"(tileAttributes));
+                mk = tileAttributes;
             }
             n = 2;
             do {
@@ -89,8 +90,8 @@ void Hud_UpdateTransientStatGauge(u8 *p)
         n++;
         for (; n <= 10; n++)
             *cell-- = 0xd000;
-        StatDisplay_DrawTwoDigitCounter(*(s16 *)(p + 0xa6e));
-    } else if (p[0xa7f]) {
+        StatDisplay_DrawTwoDigitCounter((s16)p->timedStateParameter);
+    } else if (p->transientGaugeVisible) {
         cell = Hud_GetTilemapCell(0, 29, 1);
         {
             u32 z;
@@ -107,10 +108,10 @@ void Hud_UpdateTransientStatGauge(u8 *p)
         }
         ResultPanel_ClearFiveTiles();
         {
-            register u32 off asm("r2") = 0xa7f;
+            register u32 off asm("r2") = (u32) & ((struct SceneHudState *)0)->transientGaugeVisible;
             register u8 *q asm("r1");
             asm("" : "+r"(off));
-            q = p + off;
+            q = (u8 *)p + off;
             *q = 0;
         }
     }
