@@ -30,6 +30,12 @@ struct StateActorTag {
     s32 paletteBlendFrames; /* +0x1C, decremented by 081D25AC. */
 };
 
+struct StateActorOverlay {
+    u8 unknown0[0x5C];
+    s32 horizontalRange; /* +0x5C: the x/z proximity test in 081C8FB0. */
+    u8 unknown60[0x94 - 0x60];
+};
+
 struct StateActor {
     u8 unk0;
     u8 kind; /* 0x01: selects animation variants (cases 4-29) */
@@ -89,7 +95,7 @@ struct StateActor {
     u8 unk128[0x40];
     u8 receiver[0x10];                 /* 0x168: scene message receiver (size tentative). */
     u8 bodyDrawable[0x1CC - 0x178];    /* 0x178: SceneActorGraphics_InitializeBody. */
-    u8 overlayDrawable[0x260 - 0x1CC]; /* 0x1CC: SceneActorGraphics_InitializeOverlay. */
+    struct StateActorOverlay overlayDrawable[1]; /* 0x1CC: SceneActorGraphics_InitializeOverlay. */
     struct StateActorPos
         worldPosition; /* 0x260: render/collider position (distinct from `position`). */
     u8 unk268[0x20];
