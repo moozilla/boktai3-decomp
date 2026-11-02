@@ -1,13 +1,4 @@
-#include "global.h"
-struct TemporarySpriteSlot {
-    u8 active, unknown1;
-    s16 lifetime;
-    u8 sprite[0x48];
-};
-struct TemporarySpritePool {
-    u8 task[0x18];
-    struct TemporarySpriteSlot slots[16];
-};
+#include "transient_sprite_pool.h"
 void Sprite_Remove(void *);
 s32 TemporarySpritePool_Update(struct TemporarySpritePool *pool)
 {
@@ -17,7 +8,7 @@ s32 TemporarySpritePool_Update(struct TemporarySpritePool *pool)
         if (slot->active) {
             --slot->lifetime;
             if (slot->lifetime <= 0) {
-                Sprite_Remove(slot->sprite);
+                Sprite_Remove(&slot->sprite);
                 slot->active = 0;
             }
         }

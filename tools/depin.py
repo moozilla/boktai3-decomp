@@ -18,8 +18,10 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
+from concessions import REGISTER_BINDING
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PIN = r'\bregister\s+[^;=(){}]*?\s+asm\s*\(\s*"[a-z0-9]+"\s*\)'
+PIN = r'\bregister\s+[^;=(){}]*?\s+' + REGISTER_BINDING
 BAR = r'[ \t]*\b(?:__)?asm(?:__)?\s*(?:volatile\s*)?\(\s*""[^;]*\)\s*;[ \t]*\n?'
 # a register name on a declarator without `register` (`s32 x, y asm("r6");`)
 REG = r'[ \t]+asm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)'
@@ -57,7 +59,7 @@ def drop(text, m):
     s = m.group(0)
     if s.lstrip().startswith("register"):
         s = re.sub(r'^register\s+', '', s)
-        s = re.sub(r'\s+asm\s*\(\s*"[a-z0-9]+"\s*\)$', '', s)
+        s = re.sub(r'\s+' + REGISTER_BINDING + '$', '', s)
     elif re.match(REG + "$", s):
         s = ""
     else:

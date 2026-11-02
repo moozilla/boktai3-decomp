@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "vulcan_cannon_worker.h"
 #include "ram.h"
@@ -10,8 +9,8 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
-void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
-void Anim_RestartSequence(void *, void *, u32, u32, u32);
+u8 *Explosion_CreateAt(void *, u32, s32, s32, s32, s32, s32, u32);
+u32 Anim_RestartSequence(struct DisplaySequenceState *, void *, u16, u8, u8);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, s32, s32, s32, s32, s32, s32);
 struct CannonEffectPair {
     s32 lo : 16;
@@ -36,10 +35,6 @@ static inline s32 CannonRandom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
-}
-static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
-{
-    *out = *in;
 }
 static inline void CannonEffectOffset(struct SceneVec *v)
 {
@@ -78,12 +73,13 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             p->aimTimer = 120;
         if (p->hp <= 0) {
             struct SceneVec center, smoke;
+            s32 explosionFrame = 0;
             struct CannonEffectVector velocity, spread;
             const u16 *table;
             p->dead = 1;
             if (p->terrainEnabled)
                 TerrainModifiers_UnregisterCell(p->terrain);
-            CopyPosition(&center, &p->display.spatial.position);
+            SceneVec_Copy(&center, &p->display.spatial.position);
             CannonEffectOffset(&center);
             velocity.a.lo = -4;
             table = (const u16 *)RANDOM_TABLE_ADDR;
@@ -93,53 +89,29 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             spread.a.hi = (CannonRandom(table) & 7) + 3;
             spread.b.lo = 24;
             sub_08014634((CannonRandom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
-            CopyPosition(&smoke, &p->display.spatial.position);
+            SceneVec_Copy(&smoke, &p->display.spatial.position);
             CannonEffectOffset(&smoke);
-            {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, zero);
-            }
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 0);
             smoke.x += 128;
-            {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
-            }
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 2);
             smoke.x -= 128;
             smoke.z += 128;
-            {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
-            }
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 2);
             smoke.z -= 128;
             smoke.x -= 128;
-            {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, zero, 0, zero, 60, zero, 5);
-            }
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 5);
             smoke.x += 128;
             smoke.z -= 128;
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 5);
             {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, 5);
-            }
-            {
-                void *seq, *res;
+                struct DisplaySequenceState *seq;
+                void *res;
                 u32 facing;
                 seq = &p->sequence;
+                res = p->resource;
                 {
-                    u32 off = 0x17c;
-                    {
-                        register u8 *addr asm("r1") = (u8 *)p + off;
-                        res = *(void **)addr;
-                    }
-                }
-                {
-                    register u32 off asm("r3") = 0x132;
-                    asm("" : "+r"(off));
-                    {
-                        register u8 *addr asm("r2") = (u8 *)p + off;
-                        facing = *addr;
-                    }
+                    const u8 *direction = (const u8 *)&p->facing;
+                    facing = *direction;
                 }
                 Anim_RestartSequence(seq, res, 0x13, facing, 0);
             }

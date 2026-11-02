@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-// MATCHING_CONCESSION: register-pinning
 
 struct AtVector {
     s16 x, y, z, pad;
@@ -35,39 +34,33 @@ struct AtUnit {
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void AttachmentSprite_Setup(struct AtUnit *p0, struct AtVector *pos0)
+void AttachmentSprite_Setup(struct AtUnit *owner, const struct AtVector *position)
 {
-    register struct AtUnit *p asm("r5") = p0;
-    struct AtVector *pos = pos0;
-    struct AtSprite *sprite = &p->sprite;
-    u32 kind = p->kind;
-    u32 id;
-    register struct AtAnim *anim asm("r6");
-    u16 *c;
-    u16 *start;
-    u16 *lo;
+    struct AtSprite *sprite;
+    struct AtAnim *anim;
+    u16 *c, *start, *lo;
     u32 fill;
     u8 *flag;
-    u32 v = kind;
-    asm("" : "+r"(v));
-    id = 0xA2;
-    if (kind != 0) {
-        id = 0xAB;
-        if (kind == 1)
-            id = 0xA1;
+    u32 id;
+    u16 frame;
+    sprite = &owner->sprite;
+    frame = owner->kind;
+    if ((u8)frame == 0) {
+        id = 0xa2;
+    } else if ((u8)frame == 1) {
+        id = 0xa1;
+    } else {
+        id = 0xab;
     }
     anim = (struct AtAnim *)((u8 *)sprite + 0x2C);
     AnimData_Load(anim, 0xBA8);
     Sprite_Init(sprite, anim, 0);
-    sprite->f10 = v;
+    sprite->f10 = frame;
     sprite->f07 = 3;
-    {
-        struct AtVector *t = pos;
-        sprite->position = *t;
-    }
-    sprite->position.x += p->offset.x;
-    sprite->position.y += p->offset.y;
-    sprite->position.z += p->offset.z;
+    sprite->position = *position;
+    sprite->position.x += owner->offset.x;
+    sprite->position.y += owner->offset.y;
+    sprite->position.z += owner->offset.z;
     sprite->flags |= 0x400;
     sprite->palette = gPaletteBankData + id * 32;
     fill = 0x3DEF;

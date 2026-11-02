@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
@@ -55,7 +54,9 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
             if (p->phase == 0) {
                 u8 params[0x58];
                 struct OrbitW4 sprites;
-                register u32 dir asm("r4");
+                s32 targetHeading;
+                u32 baseDirection;
+                u8 launchAngle;
                 u32 r;
                 struct OrbitVec *target;
                 struct OrbitVec *pos;
@@ -70,13 +71,11 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
                 r &= 3;
                 target = Player_GetEffectivePosition(0);
                 pos = &p->position;
-                dir = Math_Atan2(target->x - pos->x, target->z - pos->z);
-                asm("" : "+r"(dir));
-                dir = (u8)dir;
-                dir += 0xc0;
-                dir = (u8)(dir + (p->count - 1) * 32);
+                targetHeading = Math_Atan2(target->x - pos->x, target->z - pos->z);
+                baseDirection = (u8)targetHeading + 0xC0;
+                launchAngle = baseDirection + (p->count - 1) * 32;
                 Projectile_InitParameters(params);
-                Projectile_SetLaunchParameters(params, 0, 0xb4, dir, 0x12);
+                Projectile_SetLaunchParameters(params, 0, 0xb4, launchAngle, 0x12);
                 Projectile_SetSpriteParameters(params, 0x5291, sprites.w[r], -1);
                 Projectile_SetCollisionParameters(params, 0, 0, p->a22, p->a24, p->a26);
                 Projectile_SetBehaviorMode(params, 2);

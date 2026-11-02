@@ -1,21 +1,23 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #define Ratatosk_UpdateAnimatedParticlePool sub_081FBF2C
 #include "contact_swarm.h"
 #include "player_cue_sequence.h"
+struct RatatoskParticleConfig {
+    u16 flags, lifespan;
+    u8 unknown4[2];
+    s8 angle;
+    u8 unknown7;
+    s32 speed;
+    u8 unknownC[4];
+    u32 extra;
+    void *callback;
+    u8 unknown18[4];
+};
 struct Particle {
     u32 age;
     u8 pad4[8];
-    s16 vx, vy, vz, padE;
-    u16 configFlags;
-    u16 lifespan;
-    u8 pad18[2];
-    s8 angle;
-    u8 pad1B;
-    s32 speed;
-    u8 pad20[4];
-    u32 extra;
-    u8 pad28[8];
+    struct ContactPosition velocity;
+    struct RatatoskParticleConfig config;
     struct ContactSwarmSprite sprite;
     u32 flags;
     u8 pad5C[4];
@@ -59,36 +61,30 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct ParticlePool *aIn)
     e = a->particles;
     i = 0;
     do {
-        if (TestMask(1 << i, a)) {
-            struct ContactSwarmSprite *sprite = (struct ContactSwarmSprite *)((u8 *)e + 0x30);
-            u8 *cfg = (u8 *)e + 0x14;
-            if (sub_08249240(e, (void *)i, *(void **)(cfg + 0x14)) == 1) {
+        if (TestMask(1u << i, a)) {
+            struct ContactSwarmSprite *sprite = &e->sprite;
+            struct RatatoskParticleConfig *cfg = &e->config;
+            if (sub_08249240(e, (void *)i, cfg->callback) == 1) {
                 Ratatosk_ReleaseAnimatedParticle(a, e, i);
             } else {
-                u32 active = *(volatile u32 *)&e->flags & 1;
-                s16 *vel = &e->vx;
+                u32 active = e->flags & 1;
+                struct ContactPosition *velocity = &e->velocity;
                 if (active) {
-                    s16 *dst = vel;
-                    s32 angle = *(s8 *)(cfg + 6);
-                    s32 speed = *(s32 *)(cfg + 8);
+                    struct ContactPosition *dst = &e->velocity;
+                    s32 angle = cfg->angle;
+                    s32 speed = cfg->speed;
                     s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
                     s32 zero = 0;
-                    dst[0] = x;
-                    dst[1] = zero;
-                    dst[2] = Scale(gUnk_086149C4[angle & 255] * speed);
+                    dst->x = x;
+                    dst->y = zero;
+                    dst->z = Scale(gUnk_086149C4[angle & 255] * speed);
                     ClearFlags(~1, e);
                 }
                 {
                     struct ContactPosition *pos = &sprite->position;
-                    sprite->position.x += e->vx;
-                    {
-                        s16 *v = vel;
-                        pos->y += v[1];
-                    }
-                    {
-                        s16 *v = vel;
-                        pos->z += v[2];
-                    }
+                    sprite->position.x += e->velocity.x;
+                    pos->y += velocity->y;
+                    pos->z += velocity->z;
                     if (e->lift < 0) {
                         s32 magnitude = ~e->lift;
                         magnitude++;
@@ -96,15 +92,15 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct ParticlePool *aIn)
                     } else
                         sprite->position.y -= e->lift >> 12;
                 }
-                if (!(e->configFlags & 0x200)) {
-                    if (e->configFlags & 0x100)
+                if (!(e->config.flags & 0x200)) {
+                    if (e->config.flags & 0x100)
                         e->sequence.flags |= 4;
                     updatePlayback(&e->sequence, sprite);
                 }
                 {
                     u32 age = e->age;
-                    u8 *data = cfg;
-                    if (age >= *(u16 *)(data + 2))
+                    struct RatatoskParticleConfig *data = cfg;
+                    if (age >= data->lifespan)
                         Ratatosk_ReleaseAnimatedParticle(a, e, i);
                 }
                 e->age++;

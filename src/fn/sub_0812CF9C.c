@@ -1,7 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
 #include "engine.h"
 #include "ram.h"
+#include "heap.h"
+#include "resource_registry.h"
 #include "monster_particle_random.h"
 extern const s16 gUnk_086149C4[];
 void SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
@@ -11,65 +12,39 @@ static inline s32 Truncate(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void SceneSlot_EmitPulse(struct ContactPosition *input)
+void SceneSlot_EmitPulse(struct ContactPosition *position)
 {
-    struct ContactPosition *position = input;
-    u32 savedOrigin;
-    register u32 origin asm("r12");
-    const u16 *table;
     struct ContactPosition velocity;
-    struct ContactPosition *v;
-    s32 angle;
-    s32 magnitude;
-    register u32 *cursor asm("r3");
-    u32 mask;
-    origin = PARTICLE_RANDOM_SAMPLE_ORIGIN;
-    asm volatile("" : "+r"(origin));
-    table = gRandomTable;
+    struct ContactPosition *planar;
+    u32 randomOrigin;
+    u32 mask, sampleOrigin;
+    s32 heading;
+    s32 speed, vertical;
+
+    /* The recovered bank origin cancels when converting a sample address to its table offset. */
+    randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
+    mask = 255;
+    heading = ParticleRandom_ReadDirectSample(gRandomTable) & mask;
     {
-        register u32 index asm("r0") = ((cursor = &gRandomIndex), *cursor + 1) & 1023;
-        const u8 *sample = (void *)(index * 2 + (u32)table);
-        mask = 255;
-        angle = *sample;
-        index = (index + 1) & 1023;
-        *cursor = index;
-        {
-            register s32 raw asm("r0") = *(const u16 *)(index * 2 + (u32)table);
-            s32 bitmask = 63;
-            raw &= bitmask;
-            asm("" : "+r"(raw));
-            magnitude = raw;
-        }
-    }
-    v = &velocity;
-    magnitude -= 32;
-    {
-        register const s16 *sine asm("r1") = gUnk_086149C4;
-        s32 product = sine[(angle + 64) & mask] * magnitude;
-        PARTICLE_RANDOM_SAVE_ORIGIN(savedOrigin, origin);
-        v->x = Truncate(product);
-        v->y = 0;
-        {
-            s32 product = sine[angle] * magnitude;
-            asm("" : "+r"(product) : "r"(angle));
-            v->z = Truncate(product);
-        }
+        s32 raw = ParticleRandom_ReadDirectSample(gRandomTable);
+        s32 speedMask = 63;
+        raw &= speedMask;
+        planar = &velocity;
+        speed = raw - 32;
     }
     {
-        u32 offset;
-        const u16 *source;
-        *cursor = (*cursor + 1) & 1023;
-        offset = savedOrigin + *cursor * 2;
-        source = (const u16 *)RANDOM_TABLE_ADDR;
-        {
-            u32 value = ParticleRandom_ReadSampleAddress(offset, savedOrigin, source);
-            {
-                u32 mask = 15;
-                value &= mask;
-            }
-            value += 30;
-            velocity.y = value;
-        }
+        s32 x, zero, rawX;
+        rawX = gUnk_086149C4[(heading + 64) & mask] * speed;
+        sampleOrigin = randomOrigin;
+        x = Truncate(rawX);
+        zero = 0;
+        planar->x = x;
+        planar->y = zero;
+        planar->z = Truncate(gUnk_086149C4[heading] * speed);
     }
+    vertical = ParticleRandom_ReadRelativeSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR);
+    vertical &= 15;
+    vertical += 30;
+    velocity.y = vertical;
     SceneMovingParticle_Create(position, &velocity, 30, 3);
 }

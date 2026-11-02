@@ -1,10 +1,7 @@
 #include "global.h"
+#include "engine_globals.h"
 #include "ram.h"
 
-// MATCHING_CONCESSION: register-pinning
-#define gRandomTableIndex gRandomIndex
-
-extern u32 gRandomTableIndex;
 struct ArmorPart {
     u8 pad0[9];
     s8 stretchY;
@@ -18,10 +15,6 @@ struct ArmorPart {
     u8 pad1DB[4];
     u8 stretchDeltaY;
 };
-static inline void setFlag(u8 *p, u32 mask)
-{
-    *p |= mask;
-}
 void Armor_RetractPartStretch(struct ArmorPart *p)
 {
     s32 stretch = p->stretchY;
@@ -32,28 +25,17 @@ void Armor_RetractPartStretch(struct ArmorPart *p)
     }
     p->stretchY = stretch;
     if (stretch == 64) {
-        u32 r;
-        register s32 d asm("r1");
-        u32 one;
-        gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
-        r = *(const u16 *)((gRandomTableIndex << 1) + (u32)gRandomTable);
+        u32 random;
+        u8 one;
+        u32 offset;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
+        offset = gRandomIndex * 2;
+        random = *(const u16 *)(offset + (u32)gRandomTable);
         one = 1;
-        r &= one;
-        {
-            register s32 negative asm("r2") = -1;
-            asm("" : "+r"(negative));
-            d = negative;
-        }
-        if (r)
-            d = 1;
-        p->direction = d;
+        random &= one;
+        p->direction = random ? 1 : -1;
         p->byte11E = one;
         p->byte11F = one;
-        {
-            u32 flags = p->flags119;
-            u32 value = one;
-            asm("" : "+r"(value) : "r"(flags));
-            p->flags119 = value | flags;
-        }
+        p->flags119 = one | p->flags119;
     }
 }

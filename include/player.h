@@ -4,6 +4,9 @@
 #include "global.h"
 #include "scene_vec.h"
 
+/* Body colliders use a fixed defense in both setup and hit resolution. */
+#define PLAYER_BODY_DEFENSE 0
+
 /*
  * The player actor. gPlayers holds four pointers (one per player slot; slot 0 is the local
  * player, the other slots are used by the multiplayer code, guess). Built from the offsets seen
@@ -54,7 +57,7 @@ struct PlayerStatModifierContext {
     u16 contactExtentA;                           /* owner + 0xC00 */
     u8 unknownBE[2];
     u16 contactExtentB; /* owner + 0xC04 */
-    u8 unknownC2[2];
+    u16 contactExtentC; /* owner + 0xC06: third sweep extent, paired with contactExtentB */
     u16 contactCounter;  /* owner + 0xC08 */
     u16 contactTimer;    /* owner + 0xC0A */
     u8 contactHeading;   /* owner + 0xC0C */
@@ -76,7 +79,8 @@ struct PlayerColliderVector {
 struct PlayerCollider {
     u8 unknown0[6];
     u16 flags;
-    u8 unknown8[0x38];
+    u8 unknown8[0x36];
+    u16 cost; /* 0x3E: contact cost, cleared when restoring a linked player */
 };
 
 struct PlayerCueCollider {
@@ -116,13 +120,11 @@ struct Player {
     u16 unk3A;
     s16 velocityZ;
     u8 unk3E[2];
-    void *followTarget; /* 0x40: active position source for following a named object. */
+    void *followTarget; /* 0x40: active movement source, reset to the player's own contact object. */
     u8 unk44[0x50 - 0x44];
     u32 visualState;
     struct PlayerAnimation *activeAnimation;
-    u8 unk58[0x68 - 0x58];
-    u16 indicatorStep; /* 0x68: cycles 0-11, driven by indicatorUpdateRate; >>2 feeds position.x (tentative) */
-    u8 unk6A[2];
+    u8 unk58[0x6C - 0x58];
     u8 animationData[0x20];           /* 0x6C: keyframe resource */
     struct PlayerAnimation animation; /* 0x8C */
     u16 actionCueCounter;             /* 0x98: zero gates phase-one sound in 08146478 (tentative) */
@@ -240,7 +242,9 @@ struct Player {
     u8 actionPhase488, actionActive489;
     u8 unk48A[2];
     u8 movementVelocityLocked; /* 0x48C: suppresses velocity recalculation */
-    u8 unk48D[0x15];
+    u8 unk48D[0x498 - 0x48D];
+    struct SceneVec resourceStationPosition; /* 0x498: copied by Player_BeginResourceStationInteraction */
+    u16 resourceStationFacing; /* 0x4A0 */
     u16 burstParameter; /* 0x4A2: passed to ActorBurst_Create. */
     u8 actionFourEnabled; /* 0x4A4: permits action 4 in modes 0, 1 and 6 (tentative) */
     u8 coordinateAxis;    /* 0x4A5: 1/5 select X, other values select Z (tentative) */
@@ -283,8 +287,8 @@ struct Player {
     u8 chargeSoundActive; /* 0x4FD (tentative) */
     u8 unk4FE[0x22];
     u16 interactionPromptFlags; /* 0x520: bits OR'd in by ControlPanel based on interactionPromptCategory (tentative) */
-    u16 displaySegmentCount; /* 0x522: tentative, clamped to seven by segment display */
-    u16 indicatorUpdateRate; /* 0x524: divisor for 128/x step size of indicatorStep (tentative) */
+    u16 displaySegmentCount; /* 0x522: input hits in the 32-frame history, clamped to seven for display. */
+    u16 indicatorUpdateRate; /* 0x524: player input animation rate, used as the control panel phase divisor. */
     u8 unk526[8];
     u16 actionAccumulatorBlocked; /* 0x52E: nonzero prevents accumulation */
     u16 scriptStatus[2];          /* 0x530: script keyword s selects a nonzero status */
@@ -295,16 +299,17 @@ struct Player {
     u8 contactThresholdPending,
         contactThresholdReady; /* 0x53B: two-stage threshold event latch (tentative) */
     u8 contactCueDuration;     /* 0x53D: threshold cue duration */
-    u8 unk53E[0xC];
+    u8 unk53E[2];
+    struct SceneVec savedLinkPosition; /* 0x540: set by the linked-player initialization script */
+    u8 savedLinkFacing, unk549;
     u8 catalogSavedOption; /* 0x54A: menu option copied when scriptStatus[1] is zero (tentative) */
-    u8 unk54B[3];
+    u8 linkPositionRestored; /* 0x54B: set after restoring the linked player */
+    u8 unk54C[2];
     u16 lastContactFlags;
     u32 lastContactRewardFlags;
     u8 unk554[0x24];
     u16 interactionPromptCategory; /* 0x578: selects which bit ControlPanel ORs into interactionPromptFlags (tentative) */
-    u8 unk57A[2];
-    u16 indicatorTickCounter; /* 0x57C: wraps 0-9; gates a displaySegmentCount-pitched tick sound (tentative) */
-    u8 unk57E[0xE];
+    u8 unk57A[0x58C - 0x57A];
     void (*triggerAnimationCallback)(struct Player *); /* 0x58C */
     u8 unk590[8];
     u16 recoilSpeed;             /* 0x598: decays by three quarters per update */
@@ -359,7 +364,8 @@ struct Player {
     u8 unkAF0;
     u8 actionRequestState; /* 0xAF1 */
     u16 visualSlowdownTimer;
-    u8 unkAF4[0x10];
+    u8 effectModes[4], effectCounters[4]; /* 0xAF4: per-channel effect reset state */
+    u16 effectLimits[4];
     void *kindTwoAttachment;        /* 0xB04: descriptor-driven attachment, tentative */
     u8 kindTwoAttachmentDescriptor; /* 0xB08 */
     u8 unkB09;

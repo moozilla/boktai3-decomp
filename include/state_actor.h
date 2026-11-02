@@ -16,6 +16,13 @@ struct StateActorPos {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
 
+struct Player;
+struct StateActorTargetContext {
+    u8 unknown0[0x434];
+    struct StateActorPos *target;
+    struct Player *targetPlayer;
+};
+
 struct StateActorTag {
     u8 unknown0[4];
     u16 field4, field6;
@@ -35,6 +42,16 @@ struct StateActorDamageEffect {
     u32 flags;
 };
 
+struct StateActorOverlay {
+    u8 unknown0[0x24];
+    u8 animationStarted; /* 081CC1B4, 081D2318. */
+    u8 unknown25[0x59 - 0x25];
+    u8 savedAngle;
+    u8 unknown5A[2];
+    s32 horizontalRange; /* +0x5C: the x/z proximity test in 081C8FB0. */
+    u8 unknown60[0x94 - 0x60];
+};
+
 struct StateActor {
     u8 unk0;
     u8 kind; /* 0x01: selects animation variants (cases 4-29) */
@@ -45,7 +62,7 @@ struct StateActor {
     u8 done;         /* 0x07: the current state has finished */
     u8 enterCommand; /* 0x08: entry pending (command states) */
     u8 enter;        /* 0x09: entry pending (kind states) */
-    u8 unkA[4];
+    u8 unkA, attachmentEnabled, unkC[2];
     u16 displayFlags;                 /* 0x0E */
     u32 stateFrame;                   /* 0x10 */
     u32 timer;                        /* 0x14 */
@@ -103,12 +120,14 @@ struct StateActor {
     u8 unk164[4];
     u8 receiver[0x10];                 /* 0x168: scene message receiver (size tentative). */
     u8 bodyDrawable[0x1CC - 0x178];    /* 0x178: SceneActorGraphics_InitializeBody. */
-    u8 overlayDrawable[0x260 - 0x1CC]; /* 0x1CC: SceneActorGraphics_InitializeOverlay. */
+    struct StateActorOverlay overlayDrawable[1]; /* 0x1CC: SceneActorGraphics_InitializeOverlay. */
     struct StateActorPos
         worldPosition; /* 0x260: render/collider position (distinct from `position`). */
     u8 unk268[0x20];
     void *palette; /* 0x288: active palette bank, picked by SceneActorGraphics_SelectResource. */
-    u8 unk28C[0x2CC - 0x28C];
+    u8 unk28C[0x2B8 - 0x28C];
+    const u8 *animationTable; /* The leading byte enables facing updates. */
+    u8 unk2BC[0x2CC - 0x2BC];
     void (*stateCallback)(void); /* 0x2CC */
     u8 unk2D0[0x2E4 - 0x2D0];
     s32 (*animationCallback)(struct StateActor *); /* 0x2E4 */

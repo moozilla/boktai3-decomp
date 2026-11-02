@@ -10,71 +10,40 @@ struct ItemDef {
     u8 unknownA[6];
 };
 extern const struct ItemDef gUnk_08E61280[];
-struct ItemUser {
-    u8 pad0[0x30];
-    u8 position[0x230 - 0x30];
-    u8 collider[0x424 - 0x230];
-    u16 health, maxHealth;
-    u8 pad428[0x534 - 0x428];
-    u16 effectValue, effectItem, effectTimer;
-    u8 pad53A[0xAD6 - 0x53A];
-    u16 cooldown, cooldownFrames;
-    u8 padADA[0xAE8 - 0xADA];
-    u8 numberOffset[8];
-};
 s32 Script_GetActorIndex(void);
 s32 Div(s32, s32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
-// confidence=low: script command that applies item 'E' to the actor: kind 5 starts a timed
-// effect (duration from 't' or valueB seconds), kind 1 heals valueA percent of max HP and shows
-// the amount.
-// MATCHING_CONCESSION: register-pinning
-#define ITEM_USER_OFFSET(field) ((u32) & ((struct ItemUser *)0)->field)
+/* Apply item E to the player. Timed effects accept t in frames, and healing displays the amount restored. */
 void sub_0815A73C(void)
 {
-    struct ItemUser *p;
-    s32 item;
-    s32 value;
-    const struct ItemDef *def;
-    const struct ItemDef *table;
     s32 i = Script_GetActorIndex();
-    p = gPlayers[i];
-    if ((p == ((void *)0)) || (!Script_SeekToKeyword(0x45)))
-        return;
-    item = Script_GetValue();
-    table = gUnk_08E61280;
-    def = table + item;
-    if (def->actionKind == 5) {
-        if (Script_SeekToKeyword(0x74))
-            value = Script_GetValue();
-        else
-            value = def->valueB * 60;
-        p->effectValue = gUnk_08E61280[item].valueA;
-        p->effectTimer = value;
-        p->effectItem = item;
-    } else if (def->actionKind == 1) {
-        register u32 maxHealthOffset asm("r1") = ITEM_USER_OFFSET(maxHealth);
-        u16 *maxHealth;
-        u16 *health;
-        register u32 healthOffset asm("r2");
-        s32 amount;
-        // Keep the field offset in its assigned register and the actor live here.
-        asm("" : "+r"(maxHealthOffset) : "r"(p));
-        maxHealth = (u16 *)((u8 *)p + maxHealthOffset);
-        amount = Div((*maxHealth) * def->valueA, 100);
-        healthOffset = ITEM_USER_OFFSET(health);
-        // Preserve the field offset register across address formation.
-        asm("" : "+r"(healthOffset));
-        health = (u16 *)((u8 *)p + healthOffset);
-        if (((*health) + amount) > (*maxHealth)) {
-            amount = (*maxHealth) - (*health);
-            *health = *maxHealth;
-        } else
-            *health = (*health) + amount;
-        if (amount > 0)
-            DamageNumberDisplay_Show(p->collider, amount, 1, p->position, p->numberOffset, 0);
-    } else
-        return;
-    p->cooldown = 0x16E;
-    p->cooldownFrames = 0x30;
+    struct Player *p = gPlayers[i];
+
+    if (p != NULL && Script_SeekToKeyword('E')) {
+        s32 id = Script_GetValue();
+        if (gUnk_08E61280[id].actionKind == 5) {
+            s32 timer =
+                Script_SeekToKeyword('t') ? Script_GetValue() : gUnk_08E61280[id].valueB * 60;
+            p->sceneMode = gUnk_08E61280[id].valueA;
+            p->active = timer;
+            p->unk536 = id;
+            p->actionEighteenParameter = 0x16E;
+            p->actionEighteenDuration = 48;
+        } else if (gUnk_08E61280[id].actionKind == 1) {
+            s32 amount = Div(p->maximumStatA * gUnk_08E61280[id].valueA, 100);
+            s32 hp = p->currentStatA + amount;
+            if (hp > p->maximumStatA) {
+                amount = p->maximumStatA - p->currentStatA;
+                p->currentStatA = p->maximumStatA;
+            } else {
+                p->currentStatA = hp;
+            }
+            if (amount > 0) {
+                DamageNumberDisplay_Show(&p->collider, amount, 1, &p->position,
+                                         &p->movementRequestTarget, 0);
+            }
+            p->actionEighteenParameter = 0x16E;
+            p->actionEighteenDuration = 48;
+        }
+    }
 }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 
@@ -18,13 +17,11 @@ void SceneHud_FillDigitCells(u32, u32, u32, u32);
 void InventoryPanel_SetEntryRow(void *, u32, u32, u32, u32, u32);
 void SceneHud_RefreshEquipmentIcons(void *, int);
 void SceneHud_BeginEquipmentSelection(void *);
-void SceneHud_TickEquipmentToggle(struct SceneHudState *input)
+void SceneHud_TickEquipmentToggle(struct SceneHudState *p)
 {
-    struct SceneHudState *p = input;
     s32 equipped;
     s32 slot;
     void *q;
-    DEBUG_NOP();
     q = p->actionInput;
     if (SceneInput_NavigateGridKeys(q, 0xf0)) {
         SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);

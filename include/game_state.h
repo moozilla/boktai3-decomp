@@ -79,7 +79,8 @@ struct GameState {
     s16 targetFlagBonuses[5]; /* 0x58A: flag 7..11 modifier bonuses, units of 1/64 (tentative) */
     u8 unk594[2];
     s16 flags596; /* (guess) bit mask, bits 0-9 */
-    u8 unk598[0x8];
+    s16 solarBankRate; /* 0x598: daily balance multiplier, in units of 1/64 */
+    u8 unk59A[6];
     s32 region; /* current region/scene id (guess); compared by interactable controllers */
     u32 unk5A4;
     s16 form; /* (guess) selects behavior in TextState_GetPairSpeakerLabel */

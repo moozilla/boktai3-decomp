@@ -1,6 +1,5 @@
 #include "global.h"
 #include "player.h"
-// MATCHING_CONCESSION: register-pinning
 
 extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
@@ -41,21 +40,15 @@ s32 Player_UpdateSweepAction(struct Player *p)
             Player_PlayLocalSong(p->slot, 0x38B);
     }
     if (++q->timer <= q->extentB) {
-        if (p->side != 0)
+        if (p->side) {
             angle = q->heading - q->timer * q->extentA + 0x120;
-        else {
-            u8 *h = &q->heading;
-            angle = q->timer * q->extentA + 0x100;
-            {
-                register s32 sum asm("r0") = angle + *h;
-                angle = sum;
-                asm("" ::"r"(sum));
-            }
-            angle -= 0x20;
-        }
-        {
-            register u32 mask asm("r0") = 0xFF;
-            angle &= mask;
+            angle &= 255;
+        } else {
+            u8 *heading = &q->heading;
+            s32 sum = (q->timer * q->extentA) + 0x100;
+            sum += *heading;
+            angle = sum - 0x20;
+            angle &= 255;
         }
         q->dest.x = q->origin.x + scale(gUnk_086149C4[(angle + 64) & 255] * 160);
         q->dest.y = q->origin.y;

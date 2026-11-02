@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "scene_vec.h"
+#include "player_clone.h"
 
 extern u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
@@ -274,8 +275,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerClone *clone, s32 index)
                     CLONE_DISABLE_COLLIDER(body);
                 }
                 clone->state.blinkTimer = z;
-                clone->state.animation = z;
-                Anim_LoadKeyframe(&clone->anim, clone->resource, 0, 1);
+                PLAYER_CLONE_START_IDLE(clone->state.animation, z, &clone->anim, clone->resource);
             } else {
                 struct SceneVec *playerPosition = Player_GetEffectivePosition(0);
                 struct SceneVec *pos = &clone->anim.drawable.position;

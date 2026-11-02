@@ -1,15 +1,14 @@
-#include "global.h"
+#include "transient_sprite_pool.h"
 
-u8 *TransientSpritePool_FindFreeSlot(u8 *p)
+struct TemporarySpriteSlot *TransientSpritePool_FindFreeSlot(struct TemporarySpritePool *pool)
 {
-    u8 *q = p + 0x18;
+    struct TemporarySpriteSlot *slot = pool->slots;
     s32 i = 0;
     while (i <= 15) {
-        if (q[0] == 0) {
-            return q;
-        }
+        if (!slot->active)
+            return slot;
         i++;
-        q += 0x4C;
+        slot++;
     }
     return 0;
 }

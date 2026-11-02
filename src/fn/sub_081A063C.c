@@ -1,32 +1,28 @@
-#include "global.h"
-struct HresvelgrActor {
-    u8 unknown[0x32c];
-};
+#include "hresvelgr_travel.h"
 s32 Callback_InvokeActor(void *, void *);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
-void Hresvelgr_RefreshTarget(struct HresvelgrActor *);
-s32 Hresvelgr_UpdateTravel(struct HresvelgrActor *);
-void Hresvelgr_UpdateAlternatingMotion(struct HresvelgrActor *actor, s32 ticks)
+s32 Hresvelgr_UpdateTravel(struct HresvelgrTravelActor *);
+void Hresvelgr_UpdateAlternatingMotion(struct HresvelgrTravelActor *actor, s32 ticks)
 {
     u8 *p = (u8 *)actor;
     u32 mask = 0x600048;
-    u32 *flags = (u32 *)(p + 0x9c);
+    u32 *flags = &actor->flags;
     *flags |= mask;
-    if (p[0xb1]) {
-        p[0xb1] = 0;
-        SceneActors_StartUnmirroredAnimation(p, p + 0x194, p + 0x174, 1, 1, 4);
-        p[0x32b] = (p[0x32b] + 1) & 1;
+    if (actor->changed) {
+        actor->changed = 0;
+        SceneActors_StartUnmirroredAnimation(p, actor->animation, actor->animationData, 1, 1, 4);
+        actor->side = (actor->side + 1) & 1;
         Hresvelgr_RefreshTarget(actor);
     }
     {
         u32 mask = 0x200000;
         *flags |= mask;
     }
-    if (p[0xb2])
+    if (actor->pulse)
         Sound_PlaySong(0x3d9);
-    if (!(u8)Callback_InvokeActor(p, *(void **)(p + 0x104))) {
+    if (!(u8)Callback_InvokeActor(p, actor->callback)) {
         if (Hresvelgr_UpdateTravel(actor) || ticks > 0x80)
-            p[0xaf] = 1;
+            actor->finished = 1;
     }
 }

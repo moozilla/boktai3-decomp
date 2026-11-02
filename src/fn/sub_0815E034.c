@@ -1,82 +1,78 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-struct ContactCostCollider {
-    u8 pad0[0x34];
-    u32 vulnerability, reaction;
-    u16 amount, cost;
-    u8 pad40[3], mode;
-};
+#include "contact_collider.h"
+#include "player.h"
 void Collision_AccumulateNearbyResponse(void *, void *, s32);
 void PlayerCue_ApplyColliderScale(void *, void *);
 void Anim_ApplyDurationScales(void *, void *);
-static inline u32 ReadFlags(struct ContactCostCollider *source, u32 mask)
-{
-    u32 flags = source->reaction;
-    asm("" : : "r"(mask & flags));
-    return flags;
-}
-// confidence=low: selects contact response mode and scales cost by one of six player attributes.
+/* Select the elemental response and scale damage by the matching player defense. */
 #define PlayerContact_ComputeCost sub_0815E034
-void PlayerContact_ComputeCost(u8 *player, struct ContactCostCollider *input,
-                               struct ContactCostCollider *inputTarget)
+void PlayerContact_ComputeCost(struct Player *player, struct ContactCollider *input,
+                               struct ContactCollider *inputTarget)
 {
-    register struct ContactCostCollider *source asm("r8") = input;
-    struct ContactCostCollider *target = inputTarget;
-    register u32 damage asm("r2");
-    register u32 flags asm("r1");
-    u32 blocked, vulnerable;
-    register u32 common asm("r6");
+    register struct ContactCollider *source asm("r8") = input;
+    struct ContactCollider *target = inputTarget;
+    u32 damage;
+    u32 flags;
+    s8 blocked, vulnerable;
+    u32 common;
     if (target->cost)
         return;
-    flags = ReadFlags(source, 0x1000);
-    damage = source->amount;
+    {
+        u32 bypassDefense = 0x1000;
+        if (input->reactionFlags & bypassDefense)
+            damage = source->unknown3C;
+        else
+            damage = source->unknown3C - PLAYER_BODY_DEFENSE;
+    }
     if ((s32)damage <= 0)
         damage = 1;
+    flags = input->reactionFlags;
     if (flags & 0x2000)
         blocked = 0;
     else
-        blocked = target->reaction & 63;
-    vulnerable = target->vulnerability;
+        blocked = target->reactionFlags & 63;
+    vulnerable = target->statRewardFlags;
     common = 63;
     vulnerable &= common;
     if (flags & 64) {
         target->cost = 0;
-        target->mode = 1;
+        target->costFlags = 1;
         Collision_AccumulateNearbyResponse(source, target, target->cost);
         return;
     }
     if (flags & common) {
         register u32 offset asm("r1");
         if (vulnerable & flags)
-            target->mode = 4;
+            target->costFlags = 4;
         else if (blocked & flags)
-            target->mode = 2;
+            target->costFlags = 2;
         else
-            target->mode = 1;
+            target->costFlags = 1;
         switch (flags & 127) {
             case 1:
-                offset = 0x450;
+                offset = (u32) & ((struct Player *)0)->cueDefenses[0];
                 break;
             case 2:
-                offset = 0x451;
+                offset = (u32) & ((struct Player *)0)->cueDefenses[1];
                 break;
             case 4:
-                offset = 0x452;
+                offset = (u32) & ((struct Player *)0)->cueDefenses[2];
                 break;
             case 8:
-                offset = 0x453;
+                offset = (u32) & ((struct Player *)0)->cueDefenses[3];
                 break;
             case 16:
-                offset = 0x454;
+                offset = (u32) & ((struct Player *)0)->cueDefenses[4];
                 break;
             case 32:
-                offset = 0x455;
+                offset = (u32) & ((struct Player *)0)->cueDefenses[5];
                 break;
             default:
                 goto apply;
         }
         {
-            register u8 *attribute asm("r0") = player + offset;
+            register u8 *attribute asm("r0") = (u8 *)player + offset;
             s32 factor = 5 - *attribute;
             target->cost = damage + ((damage * 5) >> 5) * factor;
         }
@@ -86,7 +82,7 @@ void PlayerContact_ComputeCost(u8 *player, struct ContactCostCollider *input,
         Anim_ApplyDurationScales(source, target);
     } else {
         target->cost = damage;
-        target->mode = 1;
+        target->costFlags = 1;
         Collision_AccumulateNearbyResponse(source, target, damage);
         PlayerCue_ApplyColliderScale(player, target);
         Anim_ApplyDurationScales(source, target);

@@ -1,6 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define gDirectionSineTable gUnk_086149C4
 
 struct EffectPosition {
     s16 x, y, z, pad;
@@ -43,24 +41,24 @@ static inline void SetPosition(s16 *pos, s32 x, s32 y, s32 z)
     pos[2] = z;
     pos[3] = zero;
 }
-static inline u8 DirectionAngle(struct EffectActor *actor)
+static inline u8 DirectionAngle(struct EffectActor *p)
 {
-    return ((actor->direction + 5) & 7) << 5;
+    s32 direction = p->direction;
+    return ((direction + 5) & 7) << 5;
 }
 void ActorEffect_InitializeOffset(struct EffectActor *p)
 {
     struct EffectActor *actor = p;
     struct EffectPosition pos;
     s32 x;
-    register s32 z asm("r2");
+    s32 z;
     u32 angle;
     Projectile_InitializeParams(p->effect);
     if (p->mode == 2)
         Projectile_SetTypeAndElement(p->effect, 2, 6);
     else
         Projectile_SetTypeAndElement(p->effect, 1, 6);
-    angle = DirectionAngle(actor);
-    Projectile_SetFlightParams(p->effect, 0, 0x3C, angle, 0x18);
+    Projectile_SetFlightParams(p->effect, 0, 0x3C, DirectionAngle(actor), 0x18);
     Projectile_SetDamageParams(p->effect, 0x10, 2, p->parameter, 0x32, 0x28);
     Projectile_SetCollisionSize(p->effect, 0x40, 0x64, 0x40);
     Projectile_SetCollisionMask(p->effect, 0x10);

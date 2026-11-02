@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "terrain_cell_probe.h"
+#include "contact_position.h"
 
 extern const s16 gUnk_086149C4[];
 
@@ -11,6 +11,10 @@ static inline s32 shift12(s32 x)
 }
 
 // confidence=low: state actor rising to terrain height plus 0x80, with a sine bob on entry.
+struct RiseTag {
+    u8 unknown0[6];
+    u16 field6;
+};
 struct StateActorRise {
     u8 pad0[7];
     u8 done, pad8, entered;
@@ -20,65 +24,62 @@ struct StateActorRise {
     u8 pad14[4];
     u8 phase;
     u8 pad19[0x20 - 0x19];
-    u8 pad20[6];
-    u16 clear26;
+    struct RiseTag tag;
     u8 pad28[0x68 - 0x28];
-    s16 px, py, pz, pw;
+    struct Pos16 position;
     u8 pad70[0x160 - 0x70];
-    s16 *shadow;
+    struct ContactPosition *shadow;
 };
 
 void StateActor_UpdateRiseToTerrain(void *ctx, struct StateActorRise *a, s32 tick)
 {
-    u16 *p20 = (u16 *)((u8 *)a + 0x20);
-    register struct Pos16 *pos asm("r6") = (struct Pos16 *)&a->px;
-    s32 h;
+    struct RiseTag *tag = &a->tag;
+    struct Pos16 *pos = &a->position;
+    s32 height;
+    s32 cell;
     {
         s32 cx = (s16)pos->x >> 8;
         s32 cz = (s16)pos->z >> 8;
         if (cx < 0 || cz < 0 || (u32)cx >= gTerrainWidth || (u32)cz >= gTerrainHeight)
-            h = 0;
+            cell = 0;
         else
-            h = gTerrainMap->rows[cz] + cx;
+            cell = gTerrainMap->rows[cz] + cx;
     }
     {
-        u8 *props = cellProps(h);
+        const u8 *props = cellProps(cell);
         u32 type = *props >> 4;
-        s32 t = (*props & 0xf) << 8;
+        s32 baseHeight = (*props & 0xf) << 8;
         switch (type) {
             case 1:
-                t -= (u8)pos->z;
+                baseHeight -= (u8)pos->z;
                 break;
             case 2:
-                t -= (u8)pos->x;
+                baseHeight -= (u8)pos->x;
                 break;
         }
-        h = t;
+        height = baseHeight;
     }
     if (a->entered) {
         a->entered = 0;
         a->done = 0;
-        pos->y = h + (shift12((s32)gUnk_086149C4[(a->angle << 2) & 0xFF] << 4) + 0x80);
+        pos->y = height + (shift12((s32)gUnk_086149C4[(a->angle << 2) & 0xFF] << 4) + 0x80);
         {
             s32 dx = shift12((s32)gUnk_086149C4[(a->angle << 2) & 0xFF] << 4);
-            s16 *sh = a->shadow;
-            s32 v = h + 0x80 + dx;
-            u32 z1 = 0;
-            u32 z2 = 0;
-            asm("" : "+r"(z1), "+r"(z2));
-            sh[1] = v;
-            a->phase = z1;
-            p20[3] = z2;
+            struct ContactPosition *shadow = a->shadow;
+            s32 v = height + 0x80 + dx;
+            shadow->y = v;
+            a->phase = 0;
+            tag->field6 = 0;
         }
     }
     switch (a->phase) {
         case 0: {
             u32 m = 0x400;
             a->flags |= m;
-            if ((s16)pos->y >= h) {
+            if ((s16)pos->y >= height) {
                 pos->y--;
             } else {
-                pos->y = h;
+                pos->y = height;
                 a->phase++;
                 a->angle = 0;
             }

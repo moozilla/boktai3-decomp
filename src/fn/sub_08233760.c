@@ -1,12 +1,12 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "monster_particle_random.h"
 #include "engine.h"
 #include "contact_actor.h"
 
-struct Unk08233760PackedVec {
+struct DebrisVelocity {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-struct Unk08233760Object {
+struct ChargedBurst {
     u8 unknown0[0x18];
     struct ContactPosition position;
     u8 collider[0x6C];
@@ -15,7 +15,7 @@ struct Unk08233760Object {
     u8 unknown90[0x17A];
     u16 timer;
 };
-void sub_0823350C(struct Unk08233760Object *);
+void sub_0823350C(struct ChargedBurst *);
 s32 Collider_Refresh(void *);
 void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
 
@@ -51,39 +51,26 @@ static inline u32 TerrainHeight(struct ContactPosition *position)
     return height;
 }
 
-void ChargedBurst_EmitTerminalDebris(struct Unk08233760Object *object)
+void ChargedBurst_EmitTerminalDebris(struct ChargedBurst *object)
 {
     sub_0823350C(object);
-    Collider_Refresh((u8 *)object + 0x20);
+    Collider_Refresh(object->collider);
     if (++object->timer > 15) {
         u32 height = object->height;
         if (height > TerrainHeight(&object->position)) {
-            struct Unk08233760PackedVec velocity, extent;
+            struct DebrisVelocity velocity, extent;
             const u16 *table = gRandomTable;
-            u32 *seed = &gRandomIndex;
-            register u32 i asm("r2") = *seed + 1;
-            u32 mask = 1023;
-            register u32 low asm("r9");
-            i &= mask;
-            {
-                u32 sample = table[i];
-                low = 15;
-                asm("" : "+r"(low));
-                velocity.x = (sample & low) - 7;
-            }
-            i = (i + 1) & mask;
-            {
-                u32 sample = table[i];
-                u32 mask31 = 31;
-                velocity.y = (sample & mask31) - 16;
-            }
-            i = (i + 1) & mask;
-            *seed = i;
-            velocity.z = (table[i] & low) - 7;
+            u32 sample;
+            sample = ParticleRandom_ReadDirectSample(table);
+            velocity.x = (sample & 15) - 7;
+            sample = ParticleRandom_ReadDirectSample(table);
+            velocity.y = (sample & 31) - 16;
+            sample = ParticleRandom_ReadDirectSample(table);
+            velocity.z = (sample & 15) - 7;
             extent.x = 5;
             extent.y = 10;
             extent.z = 5;
-            sub_08014634(4, 2, (u8 *)object + 0x8C, &velocity, &extent, 60, 60);
+            sub_08014634(4, 2, object->unknown8C, &velocity, &extent, 60, 60);
         }
         Task_Kill(object);
     }

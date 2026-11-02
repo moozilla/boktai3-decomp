@@ -1,6 +1,6 @@
+#include "game_state.h"
 #include "contact_swarm.h"
 #include "player_cue_sequence.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: walking animation alternates footstep sounds and positional effects.
 
 u32 Anim_SetSequence(void *anim, void *data, u32 sequence, u32 row, u32 flags);
@@ -16,7 +16,7 @@ void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
 static inline u8 global_bit(void)
 {
     u32 mask = 1;
-    if (*(u32 *)((u8 *)gGameState + 0x868) & mask)
+    if (gGameState->flags868 & mask)
         return TRUE;
     return FALSE;
 }
@@ -41,17 +41,14 @@ void Player_UpdateWalkFootsteps(u8 *p)
         frame = (u16 *)(p + offset);
         if (*frame == 2) {
             u32 z = *(u16 *)(p + 0x40a);
-            u8 *fx;
             if (z == 0) {
-                fx = p + 0x30;
-                asm("" : "+r"(fx));
-                if (RepeatedEffect_RequestNearby(fx)) {
+                if (RepeatedEffect_RequestNearby(p + 0x30)) {
                     if (p[0x46a]) {
                         p[0x46a] = z;
-                        Player_PlayPositionEffect(p, fx, 1, 1, fx, z, 0x163);
+                        Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, z, 0x163);
                     } else {
                         p[0x46a] = 1;
-                        Player_PlayPositionEffect(p, fx, 1, 1, fx, 0, 0x162);
+                        Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, 0, 0x162);
                     }
                 } else {
                     if (p[0x46a]) {
@@ -62,7 +59,7 @@ void Player_UpdateWalkFootsteps(u8 *p)
                         Sound_PlaySong(0xc8);
                     }
                     if (global_bit())
-                        Player_PlayPositionEffect(p, fx, 1, 2, 0, 0, 0);
+                        Player_PlayPositionEffect(p, p + 0x30, 1, 2, 0, 0, 0);
                 }
             }
         }

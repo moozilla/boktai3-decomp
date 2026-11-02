@@ -1,19 +1,11 @@
-#include "global.h"
-struct O {
-    u8 p[0x34];
-    u32 f34;
-    u32 f38;
-    u16 f3c;
-    u16 pa;
-    u16 f40;
-    u16 pb;
-    u16 f44;
-};
-void Collider_SetAttackProperties(struct O *o, u16 a, u16 b, u32 c, u32 d, u16 e)
+#include "contact_collider.h"
+
+void Collider_SetAttackProperties(struct ContactCollider *collider, s32 power, s32 knockbackPower,
+                                  s32 weakness, u32 attributes, s32 invincibilityFrames)
 {
-    o->f3c = a;
-    o->f40 = b;
-    o->f34 = c;
-    o->f38 = d;
-    o->f44 = e;
+    collider->unknown3C = power;
+    collider->responseParameter = knockbackPower;
+    collider->statRewardFlags = weakness;
+    collider->reactionFlags = attributes;
+    collider->responseValue = invincibilityFrames;
 }

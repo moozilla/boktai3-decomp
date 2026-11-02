@@ -1,8 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-// Box_Overlaps (Box_Overlaps) inlined; the stack box address is kept in a register
-// (pinned: agbcc otherwise folds it into sp-relative adds).
 
 struct HitPoint {
     s32 a, b;
@@ -22,7 +18,7 @@ struct Collider {
 void sub_082203A8(void *a, void *b, struct Collider *o);
 u32 Collider_TestSegmentBounds(void *start, void *end, struct Collider *collider, void *output);
 
-static inline s32 axis(struct Collider *a, struct Collider *b, s32 i)
+static inline s32 Box_OverlapsAxis(struct Collider *a, struct Collider *b, s32 i)
 {
     s32 x = a->ext[i];
     s32 y = b->ext[i];
@@ -37,28 +33,35 @@ static inline s32 axis(struct Collider *a, struct Collider *b, s32 i)
 static inline s32 Box_Overlaps(struct Collider *a, struct Collider *b)
 {
     s32 result = 0;
-    if (axis(a, b, 0) && axis(a, b, 1) && axis(a, b, 2))
+    if (Box_OverlapsAxis(a, b, 0) && Box_OverlapsAxis(a, b, 1) && Box_OverlapsAxis(a, b, 2))
         result = 1;
     return result;
+}
+
+// Replace the segment candidate with its enclosing box for the broad-phase test.
+static inline void BuildSegmentBounds(struct Collider **candidate, struct Collider *storage)
+{
+    struct Collider *segment = *candidate;
+
+    sub_082203A8(segment->pos, segment->offset, storage);
+    *candidate = storage;
 }
 
 u32 sub_082207DC(struct Collider *a, struct Collider *b)
 {
     struct Collider box;
-    struct HitPoint out;
-    struct Collider *bp;
+    struct HitPoint hit;
+    struct Collider *bounds = a;
 
-    sub_082203A8(a->pos, a->offset, &box);
-    bp = &box;
-    DEBUG_NOP();
-    if ((!Box_Overlaps(bp, b)) || (!Collider_TestSegmentBounds(a->pos, a->offset, b, &out))) {
+    BuildSegmentBounds(&bounds, &box);
+    if (!Box_Overlaps(bounds, b) || !Collider_TestSegmentBounds(a->pos, a->offset, b, &hit))
         return 0;
-    }
+
     if (!(b->flags & 2)) {
-        b->hit = out;
-        a->hit = out;
+        b->hit = hit;
+        a->hit = hit;
     } else {
-        b->hit = out;
+        b->hit = hit;
     }
     return 1;
 }

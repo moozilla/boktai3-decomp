@@ -941,10 +941,9 @@ void CgbModVol(struct CgbChannel *chan)
 
 // Boktai 3's SDK revision: chIdx is a volatile stack byte, and channels that
 // the hardware has switched off (NR52 status bit clear) take the echo/off path.
-// The SOUNDBIAS_H read keeps a pinned load/copy pair (r0 -> r1).
-// MATCHING_CONCESSION: register-pinning
 void CgbSound(void)
 {
+    s32 controlValue;
     s32 ch;
     struct CgbChannel *channels;
     s32 evAdd;
@@ -1141,12 +1140,12 @@ void CgbSound(void)
                 }
                 else if ((channels->statusFlags & SOUND_CHANNEL_SF_ENV) == SOUND_CHANNEL_SF_ENV_DECAY)
                 {
-                    int envelopeVolume, sustainGoal;
+                    int envelopeVolume;
 
                     channels->envelopeVolume--;
                     envelopeVolume = (s8)(channels->envelopeVolume & mask);
-                    sustainGoal = (s8)(channels->sustainGoal);
-                    if (envelopeVolume <= sustainGoal)
+                    controlValue = (s8)channels->sustainGoal;
+                    if (envelopeVolume <= controlValue)
                     {
                     envelope_sustain_start:
                         if (channels->sustain == 0)
@@ -1212,12 +1211,11 @@ void CgbSound(void)
         {
             if (ch < 4 && (channels->type & TONEDATA_TYPE_FIX))
             {
-                register u8 raw asm("r0") = REG_SOUNDBIAS_H;
-                register int dac_pwm_rate asm("r1") = raw;
+                controlValue = REG_SOUNDBIAS_H;
 
-                if (dac_pwm_rate < 0x40)        // if PWM rate = 32768 Hz
+                if (controlValue < 0x40)        // if PWM rate = 32768 Hz
                     channels->frequency = (channels->frequency + 2) & 0x7fc;
-                else if (dac_pwm_rate < 0x80)   // if PWM rate = 65536 Hz
+                else if (controlValue < 0x80)   // if PWM rate = 65536 Hz
                     channels->frequency = (channels->frequency + 1) & 0x7fe;
             }
 

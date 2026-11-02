@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #define SceneActorAttachment_UpdatePosition SpriteComponent_Update
@@ -33,13 +32,8 @@ void SpriteComponent_Update(struct SceneActorAttachment *p)
     }
     {
         u32 offset = p->sortOffset;
-        register s32 base asm("r5") = -0x60;
-        s32 order;
-        order = base;
-        asm("" : "+r"(order));
-        order -= offset;
-        asm("" ::"r"(base));
-        p->sortOrder = order;
+        const s8 baseOrder[1] = {-96};
+        p->sortOrder = baseOrder[0] - offset;
     }
     {
         u32 a = p->targetPosition.xy;

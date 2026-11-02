@@ -418,7 +418,12 @@ extern u8 *gGameVariables; /* active 0x400-byte game-variable region */
 /* 0x0200070C */
 extern u8 *gBackupGameState; /* backup main-state region at selected base plus 0xB00 */
 /* 0x0201F400 */
-extern u32 gHeapEndGuard; /* heap-end guard word expected to equal 0x516B92EE */
+extern u32 gHeapEndGuard;
+#define HEAP_END_GUARD_VALUE 0x516B92EEu
+#define HEAP_READ_END_GUARD(result) \
+    do { \
+        (result) = gHeapEndGuard; \
+    } while (0)
 /* 0x02037000 */
 extern u8 gBgMapWorkBuffer[0x2000]; /* background map work buffer, cleared for 0x2000 bytes */
 /* 0x0203C400 */

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -33,7 +32,7 @@ struct VulcanCannon {
     s16 delayCount, delayIndex, delays[1];
 };
 struct SceneVec *Player_GetEffectivePosition(s32);
-void Anim_RestartSequence(void *, void *, u32, u32, u32);
+u32 Anim_RestartSequence(struct DisplaySequenceState *, void *, u16, u8, u8);
 s32 VulcanCannon_HasClearShot(struct VulcanCannon *);
 s32 Math_Atan2(s32, s32);
 void VulcanCannon_UpdateFacingTurn(void);
@@ -53,22 +52,17 @@ static inline s32 TargetDistance(struct SceneVec *player, struct SceneVec *posit
     dz = a->z - b->z;
     return dx * dx + dz * dz;
 }
-static inline s32 TargetAngle(struct SceneVec *player, struct SceneVec *position)
-{
-    register struct SceneVec *a asm("r2") = player;
-    register struct SceneVec *b asm("r3") = position;
-    return Math_Atan2(a->x - b->x, a->z - b->z);
-}
-
 s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
 {
-    register struct SceneVec *player asm("r0") = Player_GetEffectivePosition(0);
+    s32 facingRight = 0;
+    struct SceneVec *player = Player_GetEffectivePosition(0);
     s32 distance = TargetDistance(player, &p->display.spatial.position);
-    struct SceneVec target = *Player_GetEffectivePosition(0);
-    asm("" : "+m"(target));
+    struct SceneVec target;
+
+    SceneVec_Copy(&target, Player_GetEffectivePosition(0));
     if (p->useDelayTable) {
         if (p->timer > p->delays[p->delayIndex]) {
-            if (!p->facing)
+            if (p->facing == facingRight)
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
             else
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 12);
@@ -80,7 +74,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
         }
     } else {
         if (p->timer > p->turnDelay && p->turnDelay != 0) {
-            if (!p->facing)
+            if (p->facing == facingRight)
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
             else
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 12);
@@ -122,13 +116,18 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
         p->targetVisible = 0;
     if (p->aimTimer == 119) {
         u8 angle;
-        register s32 facing asm("r5");
-        player = Player_GetEffectivePosition(0);
-        angle = TargetAngle(player, &p->display.spatial.position);
+        s32 facing;
+        {
+            struct SceneVec *targetPosition, *emitterPosition;
+            targetPosition = Player_GetEffectivePosition(0);
+            emitterPosition = &p->display.spatial.position;
+            angle = Math_Atan2(targetPosition->x - emitterPosition->x,
+                               targetPosition->z - emitterPosition->z);
+        }
         p->timer = 0;
         p->shotCount = 0;
         facing = p->facing;
-        if (!facing) {
+        if (facing == facingRight) {
             if ((u8)(angle - 0x21) <= 0x7e) {
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
                 p->timer = facing;

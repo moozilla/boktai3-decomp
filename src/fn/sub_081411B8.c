@@ -3,16 +3,15 @@
 #include "directional_force.h"
 #include "ram.h"
 
-// MATCHING_CONCESSION: register-pinning
 #define gSineTable gUnk_086149C4
 s32 Player_GetForceDirection(struct Player *);
-static inline u8 Player_IsActiveInSceneFive(struct Player *p)
+static inline u32 Player_IsActiveInSceneFive(struct Player *p)
 {
-    u16 active = p->active;
-    u8 result = 0;
-    if (active && p->sceneMode == 5)
-        result = 1;
-    return result;
+    if (!p)
+        return 0;
+    if (p->active && p->sceneMode == 5)
+        return 1;
+    return 0;
 }
 static inline u32 Player_TestForceBlock(u32 *flags, u32 mask)
 {
@@ -27,12 +26,11 @@ static inline s32 Player_ScaleForce(s32 value)
 void Player_ApplyDirectionalForce(struct Player *p)
 {
     s32 x, direction;
-    register s32 z asm("r2");
+    s32 z;
     if (p->tetherMode == 4)
         return;
-    if (p && Player_IsActiveInSceneFive(p))
+    if (Player_IsActiveInSceneFive(p))
         return;
-    asm("" : "+r"(p));
     if (p && Player_TestForceBlock(&p->statBonusFlags, 0x80))
         return;
     if (gPlayerBackgroundState < gPlayerDirectionLatch)
@@ -45,11 +43,11 @@ void Player_ApplyDirectionalForce(struct Player *p)
     z = gSineTable[direction & 255];
     {
         s32 scaledX;
-        scaledX = Player_ScaleForce(gPlayerBackgroundState * x);
+        scaledX = Player_ScaleForce(x * gPlayerBackgroundState);
         p->velocityX -= scaledX;
     }
     {
-        s32 scaledZ = Player_ScaleForce(gPlayerBackgroundState * z);
+        s32 scaledZ = Player_ScaleForce(z * gPlayerBackgroundState);
         p->velocityZ -= scaledZ;
     }
 }

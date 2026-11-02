@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "player.h"
 #include "engine.h"
 #include "ram.h"
@@ -33,31 +32,16 @@ static inline u32 HasActionFlag(struct Player *p, u32 mask)
         return *flags & bits;
     }
 }
-/* Keep the two input-field address lifetimes separate, as in the ROM. */
 static inline const u16 *InitialInput(struct Player *p)
 {
-    u32 offset = 0x348;
+    s16 offset = (u32) & ((struct Player *)0)->inputKeys;
     const u16 **field;
     field = (const u16 **)((u8 *)p + offset);
     return *field;
 }
 static inline const u16 *ReloadInput(struct Player *p)
 {
-    register u32 offset asm("r5") = 0x348;
-    asm("" : "+r"(offset));
-    {
-        register const u16 **field asm("r0") = (const u16 **)((u8 *)p + offset);
-        return *field;
-    }
-}
-static inline s32 HistoryHead(struct Player *p)
-{
-    u32 offset = 0x34C;
-    u16 *field;
-    s32 v;
-    field = (u16 *)((u8 *)p + offset);
-    v = (s16)field[0];
-    return v;
+    return p->inputKeys;
 }
 static inline u32 IsSceneFive(struct Player *p)
 {
@@ -169,38 +153,23 @@ s32 Player_SelectActionSequence(struct Player *p)
                 if ((InitialInput(p)[1] & 1) &&
                     (u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
                     goto idle;
-                if (HistoryHead(p) == -1)
+                if (((s16)p->directionHistory[0]) == -1)
                     goto idle;
                 if (ReloadInput(p)[0] & 0x100)
                     goto idle;
                 ActorSequence_Begin(p, 1, 0);
                 goto end;
             }
-            {
-                register u32 koff asm("r1") = 0x348;
-                register const u16 **kf asm("r0");
-                asm("" : "+r"(koff));
-                kf = (const u16 **)((u8 *)p + koff);
-                keys = *kf;
-            }
+            keys = p->inputKeys;
             if (keys[1] & 0x200) {
-                register u32 amoff asm("r2") = 0x418;
-                register u8 *amp asm("r0");
                 u32 am;
-                register u32 sgoff asm("r3");
-                register u8 *sgp asm("r0");
                 u32 sg;
-                asm("" : "+r"(amoff));
-                amp = (u8 *)p + amoff;
-                am = *amp;
+                am = p->actionMode;
                 if (am == 6) {
                     ActorSequence_Begin(p, 2, 0);
                     goto end;
                 }
-                sgoff = 0x45D;
-                asm("" : "+r"(sgoff));
-                sgp = (u8 *)p + sgoff;
-                sg = *sgp;
+                sg = p->statGaugeFull;
                 if (sg && (u8)(am - 1) <= 1) {
                     Sound_PlaySong(402);
                     goto end;

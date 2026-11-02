@@ -1,8 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 
-#define gBackgroundVisibility gDispCntShadow
 struct ScreenLayerPair {
     u8 unknown0[0x2C0];
     u32 firstFlags;
@@ -13,20 +11,13 @@ struct ScreenLayerPair {
 };
 void ScreenLayers_HidePair(struct ScreenLayerPair *screen)
 {
-    register s32 mask asm("r1");
-    register u16 *control asm("r0");
     screen->firstFlags |= 1;
     screen->secondFlags |= 1;
     if (screen->layer != 0) {
-        control = &gDispCntShadow;
-        mask = ~1;
+        u16 bits = 1;
+        gDispCntShadow &= ~bits;
     } else {
-        control = &gDispCntShadow;
-        mask = ~3;
-    }
-    {
-        u16 value = *control;
-        mask &= value;
-        *control = mask;
+        u16 bits = 3;
+        gDispCntShadow &= ~bits;
     }
 }

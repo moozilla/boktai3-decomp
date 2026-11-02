@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_sequence.h"
 #include "ram.h"
@@ -41,7 +40,7 @@ void AnimData_SelectPaletteBank(void *, u32);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 static inline void SelectDirection(u32 angle, u8 *row, u8 *flip)
 {
-    u32 quadrant = ((((s32)(angle >> 24)) + 0x60) >> 6) & 3;
+    u8 quadrant = ((((s32)(angle >> 24)) + 0x60) >> 6) & 3;
     if (quadrant > 1) {
         *flip = 1;
         *row = 3 - quadrant;
@@ -54,6 +53,21 @@ static inline void SelectDirection(u32 angle, u8 *row, u8 *flip)
 extern u32 gUnk_02000560;
 struct FeatherPool *FeatherEffectPool_GetOrCreate(void);
 struct Feather *FeatherEffectPool_AllocEntry(struct FeatherPool *);
+static inline u32 FeatherBlockedSlots(u32 mask)
+{
+    u32 bits = gUnk_02000560;
+    bits &= mask;
+    return bits;
+}
+static inline u32 FeatherCreationBlockFlags(void)
+{
+    u32 mask = 0x400;
+    u32 blocked = (gEngineFlags | gScenePauseFlags) & mask;
+    if (blocked)
+        return mask;
+    blocked = FeatherBlockedSlots(4);
+    return blocked;
+}
 // confidence=low: creates a directional feather effect with palette and scatter variants.
 struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 angle, u32 flags,
                                                     u32 variant)
@@ -62,24 +76,13 @@ struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 an
     struct Feather *p;
     struct Feather *sprite;
     u8 row, flip;
-    asm("" : : "r"(angle));
-    asm("" : : "r"(angle));
-    asm("" : : "r"(angle));
     if (!pool) {
         pool = FeatherEffectPool_GetOrCreate();
         if (!pool)
             return 0;
     }
-    {
-        u32 mask = 0x400;
-        if ((gEngineFlags | gScenePauseFlags) & mask)
-            return 0;
-    }
-    {
-        u32 mask = 4;
-        if (gUnk_02000560 & mask)
-            return 0;
-    }
+    if (FeatherCreationBlockFlags())
+        return 0;
     p = FeatherEffectPool_AllocEntry(pool);
     if (!p)
         return 0;

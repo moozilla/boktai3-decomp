@@ -1,14 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
 #include "player.h"
-void Bg_SetPriority(u32, u32);
+#include "scene_hud_display.h"
 extern u8 gUnk_08E60F0C[];
-extern u8 *gGameState;
 void Inventory_InitEquipmentEntryFromDescriptor(u8 *, u8 *);
-u32 Script_SeekToKeyword(u32);
-u32 Script_GetValue(void);
 void SceneHud_ReadScriptOptions(u8 *);
 void SceneHud_ReadPageVisibility(u8 *);
 void Hud_ReadScriptQOption(u8 *);
@@ -27,12 +23,6 @@ void InventoryPanel_InitCallbackGroups(u8 *);
 void SceneHud_RebuildTertiaryOptions(u8 *);
 u32 DarkLoan_CreateHiddenDisplay(u32, u32, u32, u32);
 
-static inline void MinusOne(u8 *base, u32 offset)
-{
-    u8 *p = base + offset;
-    register s32 one asm("r0") = 1;
-    *p = -one;
-}
 // confidence=low: initializes the scene HUD and its script-configured panels.
 #define SceneHud_InitFromScript sub_08178C80
 u32 SceneHud_InitFromScript(u8 *s)
@@ -105,19 +95,20 @@ u32 SceneHud_InitFromScript(u8 *s)
     }
     InventoryPanel_InitCallbackGroups(s);
     {
+        struct SceneHudState *hud = (struct SceneHudState *)s;
         u8 *field = s + 0xB01;
         z = 0;
         *field = 2;
+        hud->previousCueGroup = 255;
+        hud->previousCueSelection = -1;
+        one = 1;
+        offset = 0xA5F;
+        *(s8 *)((u8 *)hud + offset) = -one;
     }
-    s[0xB02] = 0xFF;
-    MinusOne(s, 0xB03);
-    one = 1;
-    offset = 0xA5F;
-    MinusOne(s, offset);
     *(u32 *)(s + 0x4928) = z;
     gFieldHud = s;
     SceneHud_RebuildTertiaryOptions(s);
-    if ((*(u32 *)(gGameState + 0x868) & 0x580) || (gEngineFlags & 0x3800))
+    if ((gGameState->flags868 & 0x580) || (gEngineFlags & 0x3800))
         *(u32 *)(s + 0x48F4) = z;
     else
         *(u32 *)(s + 0x48F4) = DarkLoan_CreateHiddenDisplay(s[0x48E6], *(u32 *)(s + 0x48F0),

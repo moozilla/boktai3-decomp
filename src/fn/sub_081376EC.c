@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_stimulus.h"
@@ -157,20 +156,20 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView 
     best = 0x7FFFFFFF;
     bestTag = 0;
     i = 0;
-    asm("" : : "r"(i));
     position = &actor->body.position;
     for (; i <= 7; i++) {
         u32 tag;
-        s8 next;
-        next = SceneStimulus_FindOverlapFromIndex(actor->body.position.x, actor->body.position.z,
-                                                  GROUP_FIELD(group, 0x4E, u16),
-                                                  GROUP_FIELD(group, 0x57, u8), actor->body.id, (s8)i);
+        s32 next;
+        next = SceneStimulus_FindOverlapFromIndex(
+            actor->body.position.x, actor->body.position.z, GROUP_FIELD(group, 0x4E, u16),
+            GROUP_FIELD(group, 0x57, u8), actor->body.id, (s8)i);
         i = next;
         if (next < 0)
             break;
         tag = sub_081376B4(actor, &candidate, (s8)i);
         if (SceneActorTarget_CanReplaceByDistance(actor, &candidate, tag) &&
-            Nav_IsPositionInMesh(GROUP_FIELD(group, 0x1fc, void *), &actor->body.position, &candidate)) {
+            Nav_IsPositionInMesh(GROUP_FIELD(group, 0x1fc, void *), &actor->body.position,
+                                 &candidate)) {
             s32 distance;
             SceneActorTerrain_Subtract(&delta, &candidate, &actor->body.position);
             distance = delta.x * delta.x + delta.z * delta.z;

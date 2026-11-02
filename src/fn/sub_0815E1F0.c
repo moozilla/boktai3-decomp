@@ -3,7 +3,7 @@
 #include "engine.h"
 #include "player.h"
 #include "contact_actor.h"
-void sub_0815E034(struct Player *, struct ContactCollider *);
+void sub_0815E034(struct Player *, struct ContactCollider *, struct ContactCollider *);
 void SceneActorControl_RequestDeparture(s32);
 s32 Player_RequestTimedReset(struct Player *, u32);
 void Player_EmitQueuedEffects(struct Player *);
@@ -63,7 +63,7 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
     union ResponsePosition velocity;
     target->cost = 0;
     if (contactPower(source) > 0)
-        sub_0815E034(p, source);
+        sub_0815E034(p, source, target);
     else
         target->cost = 0;
     {

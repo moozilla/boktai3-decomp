@@ -1,7 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "pink_spine_playback.h"
 #include "ram.h"
+#include "contact_collider.h"
 #include "player_cue_sequence.h"
 /* Species identity is tentative. The update callback increments age after animation. */
 extern u32 gUnk_02000560;
@@ -16,36 +16,22 @@ static inline u32 TestFlags(u32 bits)
 {
     return gUnk_02000560 & bits;
 }
-static inline u32 PinkSpine_AdvanceDamageSequence(struct PinkSpineState *owner)
-{
-    return PlayerCue_StepSequenceEnded(&owner->sprite, &owner->sequence);
-}
 
 s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
 {
+    struct ContactCollider *collider;
+
     if (PauseFlags(0x400) || TestFlags(4))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;
     if (!p->f134) {
-        struct ColliderView {
-            u8 pad[6];
-            u16 flags;
-        };
-        register struct ColliderView *c asm("r2") = (void *)(&p->collider);
-        {
-            register u32 value = c->flags;
-            u32 mask = 0xFFFB;
-            mask &= value;
-            c->flags = mask;
-        }
-        Collider_SetPosition(c, &p->sprite.position, 0);
+        collider = (struct ContactCollider *)&p->collider;
+        collider->flags &= ~4;
+        Collider_SetPosition(collider, &p->sprite.position, 0);
     } else {
-        struct ColliderView {
-            u8 pad[6];
-            u16 flags;
-        } *c = (void *)(&p->collider);
-        c->flags |= 4;
+        collider = (struct ContactCollider *)&p->collider;
+        collider->flags |= 4;
     }
     if ((p->f130 > 0) && (!p->f134)) {
         p->f136 -= p->f130;
@@ -71,7 +57,7 @@ s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
         AnimData_SelectPaletteBank(p->graphics, 0x1BD);
     {
         u32 ended;
-        ended = PinkSpine_AdvanceDamageSequence(p);
+        ended = PinkSpine_StepAnimation(p);
         if (ended && (p->update == ProjectileEmitter_UpdateAttack))
             Sound_PlaySong(0x521);
     }

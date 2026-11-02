@@ -1,7 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-// Remaining: destination-address reuse, source loads and zero scheduling.
 #include "scene_hud_display.h"
+#include "player.h"
 void SceneHud_GetActionIconPosition(void *, u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 s32 Selection_GetDisplayFrame(s32);
@@ -10,10 +9,9 @@ s32 Div(s32, s32);
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void SceneMenuPanel_FinishResultMotion(void);
-#define H(p, o) (*(u16 *)((u8 *)(p) + (o)))
 struct RatioHud {
     u8 pad[0xa40];
-    u8 *owner;
+    struct Player *owner;
     u8 pad2[0x4868 - 0xa44];
     u16 prevA, nextA, prevB, nextB;
 };
@@ -48,24 +46,18 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
     if (mode == 0) {
         s[0x487f] = 1;
         {
-            register u32 off asm("r4");
-            u16 w;
-            register u8 *o asm("r0");
-            o = OWNER(s);
-            off = 0x424;
-            w = H(o, off);
-            ((struct RatioHud *)s)->prevA = w;
-            o = OWNER(s);
-            off += 4;
-            v = H(o, off);
+            ((struct RatioHud *)s)->prevA = OWNER(s)->currentStatA;
+            v = OWNER(s)->currentStatB;
         }
         target = &((struct RatioHud *)s)->prevB;
         *target = v;
-        ((struct RatioHud *)s)->nextA = Div(H(OWNER(s), 0x426) * *target, H(OWNER(s), 0x42a));
+        ((struct RatioHud *)s)->nextA =
+            Div(OWNER(s)->maximumStatA * *target, OWNER(s)->maximumStatB);
         if (!((struct RatioHud *)s)->nextA && *target)
             ((struct RatioHud *)s)->nextA = 1;
-        ((struct RatioHud *)s)->nextB = Div(
-            H(OWNER(s), 0x42a) * *(target = &((struct RatioHud *)s)->prevA), H(OWNER(s), 0x426));
+        ((struct RatioHud *)s)->nextB =
+            Div(OWNER(s)->maximumStatB * *(target = &((struct RatioHud *)s)->prevA),
+                OWNER(s)->maximumStatA);
         if (!((struct RatioHud *)s)->nextB && *target)
             ((struct RatioHud *)s)->nextB = 1;
         s[0x4861] = 0;
@@ -74,10 +66,10 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
         u8 *q = &s[0x487f];
         zero = 0;
         *q = 2;
-        ((struct RatioHud *)s)->prevA = H(OWNER(s), 0x424);
-        ((struct RatioHud *)s)->prevB = H(OWNER(s), 0x428);
+        ((struct RatioHud *)s)->prevA = OWNER(s)->currentStatA;
+        ((struct RatioHud *)s)->prevB = OWNER(s)->currentStatB;
         ((struct RatioHud *)s)->nextA = zero;
-        ((struct RatioHud *)s)->nextB = H(OWNER(s), 0x42a);
+        ((struct RatioHud *)s)->nextB = OWNER(s)->maximumStatB;
         s[0x4861] = 1;
     }
     Sound_PlaySong(0x38a);

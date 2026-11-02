@@ -1,31 +1,28 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
-struct DirectionActor {
-    u8 pad00[6];
-    u16 flags;
-    u8 pad08[0x1c];
-    s16 x;
-    u16 pad26;
-    s16 y;
-    u8 pad2A[0x18];
-    u8 direction;
-};
+#include "contact_actor.h"
+
 s32 Math_Atan2(s32, s32);
-s32 ActorDirection_ComputeRelativeCardinal(struct DirectionActor *actor,
-                                           struct DirectionActor *target)
+static inline s32 ImpactDirection(s32 angle)
+{
+    return (((angle & 255) >> 6) << 1) + 1;
+}
+
+s32 ActorDirection_ComputeRelativeCardinal(struct ContactCollider *a, struct ContactCollider *b)
 {
     s32 angle;
-    if (actor->flags & 0x100) {
-        angle = actor->direction + 0xe0;
-        asm("" ::: "memory");
+    if (a->flags & 0x100) {
+        u32 t = a->direction;
+        angle = t + 0xe0;
+        return ImpactDirection(angle);
     } else {
-        s32 dx = actor->x - target->x;
-        s32 dy = actor->y - target->y;
-        if (dx == 0 && dy == 0)
-            angle = target->direction + 0xe0;
-        else
-            angle = Math_Atan2(dx, dy) + 0x60;
+        s32 x = a->x - b->x;
+        s32 z = a->z - b->z;
+        if (x == 0 && z == 0) {
+            angle = b->direction + 0xe0;
+            return ImpactDirection(angle);
+        } else {
+            angle = Math_Atan2(x, z) + 0x60;
+        }
     }
-    angle &= 0xff;
-    return (angle >> 6) * 2 + 1;
+    return ImpactDirection(angle);
 }

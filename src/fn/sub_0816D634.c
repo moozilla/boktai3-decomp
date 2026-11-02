@@ -1,5 +1,6 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
+#include "scene_hud_display.h"
+#include "player.h"
 // confidence=low: applies the selected storage item effects and clears its menu slot.
 #define PauseMenu_ApplyItemSlot sub_0816D634
 struct ItemDef {
@@ -13,49 +14,48 @@ struct ItemDef {
 extern const struct ItemDef gUnk_08E61280[];
 extern void *const gUnk_08611BF0[];
 s32 Inventory_GetQuantityByStorage(u32, u32);
-void sub_0813D834(void *, s32, s32);
+void sub_0813D834(struct Player *, s32, u32);
 void sub_08249244(void *, s32, s32, void *);
 void Inventory_ClearItemOverrideFlag(u32);
-void PauseMenu_ClearItemSlot(u8 *, u32);
+void PauseMenu_ClearItemSlot(struct SceneHudState *, u32);
 
-static inline u32 Tst(u32 *a, u32 m)
+static inline u32 Item_HasBonus(u32 *flags, u32 mask)
 {
-    return *a & m;
+    return *flags & mask;
 }
 
-#define OWNER (*(u8 **)(p + 0xa40))
-
-void PauseMenu_ApplyItemSlot(u8 *p, u32 slot)
+void PauseMenu_ApplyItemSlot(struct SceneHudState *p, u32 slot)
 {
-    s32 item = Inventory_GetQuantityByStorage(p[0x4860], slot);
+    s32 item = Inventory_GetQuantityByStorage(p->actionCategory, slot);
     s32 a, b;
-    u8 mode = OWNER[0x418];
+    u8 mode = p->actionOwner->actionMode;
 
     if (mode == 1 || mode == 3 || mode == 4 || mode == 5) {
         if (item == 1 || item == 13 || item == 22 || item == 19 || item == 20 || item == 18 ||
             item == 25 || item == 2 || item == 23 || item == 24) {
-            s32 dur = 0x708;
-            if (OWNER && Tst((u32 *)(OWNER + 0x444), 0x20000))
-                dur <<= 1;
-            sub_0813D834(OWNER, 0, dur);
-            *(u16 *)(p + 0x4866) = 0;
-            asm("" : : "i"(0));
+            s16 *applied;
+            s32 duration = 0x708;
+            if (p->actionOwner && Item_HasBonus(&p->actionOwner->statBonusFlags, 0x20000))
+                duration <<= 1;
+            sub_0813D834(p->actionOwner, 0, duration);
+            applied = &p->appliedStatB;
+            *applied = 0;
             goto clear;
         }
         if (item == 14) {
-            s32 dur = 0x384;
-            if (OWNER && Tst((u32 *)(OWNER + 0x444), 0x20000))
-                dur <<= 1;
-            sub_0813D834(OWNER, 1, dur);
-            *(u16 *)(p + 0x4866) = 0;
+            s32 duration = 0x384;
+            if (p->actionOwner && Item_HasBonus(&p->actionOwner->statBonusFlags, 0x20000))
+                duration <<= 1;
+            sub_0813D834(p->actionOwner, 1, duration);
+            p->appliedStatB = 0;
             goto clear;
         }
     }
     a = gUnk_08E61280[item].valueA;
     b = gUnk_08E61280[item].valueB;
-    if (OWNER[0x418] == 6 && item == 13)
+    if (p->actionOwner->actionMode == 6 && item == 13)
         a = -a;
-    if (OWNER && Tst((u32 *)(OWNER + 0x444), 0x20000)) {
+    if (p->actionOwner && Item_HasBonus(&p->actionOwner->statBonusFlags, 0x20000)) {
         if (item == 1 || item == 13 || item == 2 || item == 14) {
             a <<= 1;
             b <<= 1;

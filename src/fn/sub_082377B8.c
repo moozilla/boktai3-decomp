@@ -1,5 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "scene_facing.h"
 struct GlyphPosition {
     u16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -48,12 +47,7 @@ void ActorGlyphTrail_UpdateAnchor(struct GlyphTrail *p)
         p->position.x += Primary(cosine * 170) - Truncate(sine * 8);
         p->position.z += Primary(sine * 170) + Truncate(cosine * 8);
     }
-    {
-        s32 direction = (angle + 112) >> 5;
-        u32 mask = 7;
-        asm("" : "+r"(mask));
-        p->direction = mask & direction;
-    }
+    p->direction = SceneFacing_EightWay(angle);
     p->motionX = Truncate(gUnk_086149C4[(angle + 64) & 255] * p->speed);
     p->motionZ = Truncate(gUnk_086149C4[angle] * p->speed);
 }

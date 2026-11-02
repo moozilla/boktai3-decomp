@@ -141,6 +141,11 @@ extern void *gBgTileUploadSrc[]; /* per-layer pending tile-upload source (4) */
 extern s16 gBgAffineMatrix[4]; /* BG affine matrix coefficients */
 /* 0x03004BD8 */
 extern u16 gDispCntShadow; /* display control / BG visibility shadow */
+
+static inline void Bg_EnableDisplay(s32 mask)
+{
+    gDispCntShadow |= mask;
+}
 /* 0x03004BE0 */
 extern u16 gBgTileUploadParamA[]; /* per-layer tile-upload parameter (4) */
 /* 0x03004BEC */
@@ -150,13 +155,13 @@ extern u16 gBgAffineMatrixBuffer[]; /* affine coefficients copied from gBgAffine
 /* 0x03004BF8 */
 extern u32 gBgAffineRefX; /* BG affine reference X accumulator */
 /* 0x03004BFC */
-extern u16 gBgAffineScaleY; /* BG affine Y scale */
+extern s16 gBgAffineScaleY; /* BG affine Y scale */
 /* 0x03004C00 */
 extern u32 gBgAffineRefY; /* BG affine reference Y accumulator */
 /* 0x03004C08 */
 extern u16 gBgTileUploadParamB[]; /* per-layer tile-upload parameter (4) */
 /* 0x03004C14 */
-extern u16 gBgAffineScaleX; /* BG affine X scale */
+extern s16 gBgAffineScaleX; /* BG affine X scale */
 /* 0x03004C18 */
 extern u32 gBgAffineRefBuffer[]; /* buffered affine X/Y reference (2) */
 /* 0x03004C20 */

@@ -1,54 +1,44 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-// Remaining differences: amount and step swap r5/r7.
-struct Vec5B {
-    u32 x : 16, y : 16, z : 16;
+#include "game_state.h"
+#include "player.h"
+#include "health_burst.h"
+struct BurstVector {
+    s32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern u8 *gGameState;
-void Collider_Init(u8 *, s32, s32, s32, s32, struct Vec5B *, struct Vec5B *);
-void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
-void Collider_SetCallback(u8 *, void *, u8 *);
-void Collider_SetPosition(u8 *, u8 *, s32);
-void sub_08235B34(u8 *arg)
+void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
+void Collider_SetCallback(void *, void *, void *);
+void Collider_SetPosition(void *, void *, u32);
+void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
+void sub_08235B34(struct HealthBurstTask *p)
 {
-    register u8 *p asm("r4") = arg;
-    struct Vec5B scale, position;
-    u8 *e;
+    struct BurstVector size, offset;
+    void *collider = p->collider;
     s32 amount;
-    u32 flags, step;
-    e = p + 0x94;
-    do {
-        scale.x = 30000;
-        scale.y = 30000;
-        scale.z = 30000;
-        position.x = 0;
-        position.y = 0;
-        position.z = 0;
-        if (*(u16 *)(p + 0x34c) == 0) {
-            u8 *parent = *(u8 **)(p + 0x18);
-            flags = 1U << parent[0x2c];
-            amount = *(u16 *)(parent + 0x426) - *(u16 *)(parent + 0x424);
-        } else {
-            s32 value;
-            if ((*(u8 **)(p + 0x18))[0x418] == 6) {
-                value = *(s16 *)(gGameState + 0x40) + 10;
-                if (value > 99)
-                    value = 99;
-            } else
-                value = *(s16 *)(gGameState + 0x40);
-            /* permuter find: reading uninitialised step steers register allocation */
-            if (step) {
-                flags = 0;
-                amount = value * 8;
-            } else {
-                flags = 0;
-                amount = value * 8;
-            }
-        }
-        step = 0x1000;
-        Collider_Init(e, 0, 0x3001, 0, (u16)flags, &scale, &position);
-        Collider_SetAttackProperties(e, amount, 10, 0, step, 30);
-        Collider_SetCallback(e, 0, p);
-    } while (0);
-    Collider_SetPosition(e, *(u8 **)(p + 0x18) + 0x30, 0);
+    u32 flags, attackFlags;
+    size.x = 30000;
+    size.y = 30000;
+    size.z = 30000;
+    offset.x = 0;
+    offset.y = 0;
+    offset.z = 0;
+    if (!p->kind) {
+        flags = 1u << p->owner->movementRequestBlocked;
+        amount = p->owner->maximumStatA - p->owner->currentStatA;
+        attackFlags = 0x1000;
+    } else {
+        s32 value;
+        if (p->owner->actionMode == 6) {
+            value = gGameState->level + 10;
+            if (value > 99)
+                value = 99;
+        } else
+            value = gGameState->level;
+        flags = 0;
+        amount = value * 8;
+        attackFlags = 0x1000;
+    }
+    Collider_Init(collider, 0, 0x3001, 0, (u16)flags, &size, &offset);
+    Collider_SetAttackProperties(collider, amount, 10, 0, attackFlags, 30);
+    Collider_SetCallback(collider, 0, p);
+    Collider_SetPosition(collider, &p->owner->position, 0);
 }

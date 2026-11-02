@@ -82,7 +82,7 @@ s32 SunOrb_CreateAtPosition(void *, void *);
 void RisingActorManager_BeginRaise(s32);
 void SunOrb_FadeOutAll(void *);
 s32 Ratatosk_GetSelectedPointIndex(void);
-s32 SunOrb_IsFadingOut(void);
+s32 SunOrb_IsFadingOut(s32);
 struct Vec *SunOrb_GetPosition(s32);
 void SlotController_SetSlotFlag2(s32);
 s32 SunOrb_GetSlotState(s32);
@@ -106,7 +106,7 @@ void Ratatosk_UpdateSunOrbRelocation(struct Actor *p)
         } else {
             s32 slot = Ratatosk_GetSelectedPointIndex();
             if (slot >= 0) {
-                if (!SunOrb_IsFadingOut()) {
+                if (!SunOrb_IsFadingOut(slot)) {
                     p->destination = *SunOrb_GetPosition(slot);
                     p->duration = 32;
                     {
@@ -130,7 +130,7 @@ void Ratatosk_UpdateSunOrbRelocation(struct Actor *p)
                 s32 slot = Ratatosk_GetSelectedPointIndex();
                 if (slot < 0)
                     goto fail;
-                if (!SunOrb_IsFadingOut()) {
+                if (!SunOrb_IsFadingOut(slot)) {
                     p->destination = *SunOrb_GetPosition(slot);
                     p->duration = 32;
                     {
