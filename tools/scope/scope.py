@@ -1031,6 +1031,13 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
             print(f"{ln}: the ROM's loop counts its counter down to 0 (loop.c reversed it), the draft's"
                   f" counts up: let nothing but the test read the counter, and end the loop in its test (a"
                   f" do-while condition, or a `break` the loop rotates to its end) (README fact 40)")
+    for i, ln, reg, k, set_line, calls in shared_constant_hints(rows_json)[:2]:
+        print(f"line {ln}: the ROM reads {k} from r{reg}, set near line {set_line} and kept across {calls}"
+              f" call(s); the draft builds {k} again here. A constant held that long for one late use is"
+              f" cse's: the original wrote this statement in every branch that reaches it (each switch case"
+              f" before its `break`, each arm of an if), cse followed the jumps from the earlier {k} into each"
+              f" copy with it known in the same mode (a byte op's constant is QImode) and gave them its"
+              f" register, and jump2 merged the identical copies into this tail (README fact 65)")
     for i, ln in flag_thread_hints(rows_json)[:3]:
         print(f"line {ln}: the ROM keeps a 0/1 flag (`{rows_json[i]['rom']}`, a jump, the other constant,"
               f" `cmp #0`) that the draft's jumps skip: jump.c threads a jump after a constant set past a"
@@ -1994,6 +2001,39 @@ def reversed_loop_hints(rows):
                     break
         if steps == 2:
             out.append((i, r.get("line") or f"at ROM {r['rom_addr']}", "rom"))
+    return out
+
+
+def shared_constant_hints(rows):
+    """[(row index, line, register, constant, line of its set, calls)] where the ROM reads a constant
+    from a call-saved register (r4-r7) that a `movs rH, #K` set before at least one call, and the
+    draft's insn on that row reads a `movs rY, #K` of its own a few insns up. cse gave the late use
+    the register of an earlier one: the original wrote the statement in every branch reaching it,
+    which cse entered by following jumps, and jump2 merged the copies (README fact 65)."""
+    rom = [r["rom"] for r in rows]
+    dr = [r["draft"] for r in rows]
+    out, seen = [], set()
+    for i, r in enumerate(rows):
+        if r["tag"] == "=" or not rom[i] or not dr[i]:
+            continue
+        for h in asm_reads(rom[i]):
+            if not 4 <= h <= 7 or h in seen:
+                continue
+            j = next((k for k in range(i - 1, -1, -1) if rom[k] and asm_dest(rom[k]) == h), None)
+            m = re.match(r"movs r\d+, #(0x[0-9a-f]+|\d+)$", rom[j] or "") if j is not None else None
+            if not m:
+                continue
+            calls = sum(1 for k in range(j + 1, i) if (rom[k] or "").startswith("bl "))
+            if not calls:
+                continue
+            k_text = f"#{m.group(1)}"
+            mine = [k for k in range(max(0, i - 4), i)
+                    if re.match(r"movs (r\d+), %s$" % re.escape(k_text), dr[k] or "")]
+            if not any(reg_nums(dr[k])[0] in asm_reads(dr[i]) for k in mine):
+                continue
+            seen.add(h)
+            set_line = next((rows[k].get("line") for k in list(range(j, len(rows))) if rows[k].get("line")), "?")
+            out.append((i, r.get("line") or "?", h, k_text, set_line, calls))
     return out
 
 

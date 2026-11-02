@@ -48,7 +48,12 @@ TOPICS = {
         "once and a barrier precedes it (the block before ends in a jump or return), carrying what it knew "
         "into the target block. rtlprobe.py follow finds the jump (CSE_NOFOLLOW=K). Values are shared only "
         "within one machine mode: a constant made in QImode by `(u8)(x & 7)` is not reused for an int "
-        "`& 7` (spellings.sp_narrow_mask).",
+        "`& 7` (spellings.sp_narrow_mask). The switch's compare jumps are such jumps (each case label has one "
+        "use), so a statement written in every case is seen with what the code before the switch left in "
+        "registers: a byte test's QImode constant 1 becomes every case's `|= 1` operand, lives across the "
+        "cases' calls in a call-saved register, and jump2 merges the identical case tails into one (README "
+        "fact 65; spellings.sp_tail_into_branches). Written once after the switch, the tail is a join and "
+        "builds its constant again.",
         [("cse.c", "if (follow_jumps && q != 0 && GET_CODE (q) == BARRIER)", -2, 26)]),
     "dead store": (
         "dead store flow alias set strict aliasing deleted store mem_set_list type",
