@@ -10,7 +10,8 @@ void Sound_PlaySong(u32);
 void SceneHud_GetActionIconPosition(struct SceneVec *, s32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 s32 Selection_GetDisplayFrame(s32);
-void SceneHud_BeginIconMotion(u8 *, u32, s32, u32, void *, void *, u32, u32);
+void SceneHud_BeginIconMotion(struct SceneHudState *, u32, u32, u32, struct SceneVec *,
+                              struct SceneVec *, s32, u32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void PauseMenu_OnCharacterSelectionUpdate(void);
 #define NextRandom() (*index = (*index + 1) & 0x3ff, table[*index])
@@ -18,7 +19,7 @@ void PauseMenu_OnCharacterSelectionUpdate(void);
 void sub_0816E570(void *owner)
 {
     struct SceneVec pos;
-    struct SceneInputPackedPosition velocity;
+    struct SceneVec velocity;
     struct SceneHudState *ui = owner;
     u8 *kind;
     u16 speed;
