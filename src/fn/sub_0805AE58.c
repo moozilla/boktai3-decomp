@@ -20,7 +20,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
     }
     asm("" : "+r"(randomIndex));
     {
-        register u32 initialMask asm("r1") = 1023;
+        u16 initialMask = 1023;
         asm("" : "+r"(initialMask));
         indexMask = initialMask;
     }

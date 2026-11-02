@@ -1,3 +1,4 @@
+#include "scene_actor_visibility.h"
 #include "global.h"
 
 #include "scene_actor_reset.h"
@@ -45,21 +46,6 @@ static inline u8 Ghost_IsUnavailable(struct SceneActorRegistryResetView *input)
             actor->health <= 0)
             return 1;
     }
-    return 0;
-}
-static inline u8 Ghost_IsHidden(struct SceneActorRegistryResetView *actor)
-{
-    u32 mask = 1;
-    if (!actor->drawableKind) {
-        if (*(u32 *)actor->drawable & mask)
-            goto hidden;
-        goto visible;
-    }
-    if (!(*(u32 *)((u8 *)actor->drawable + 0x28) & mask))
-        goto visible;
-hidden:
-    return 1;
-visible:
     return 0;
 }
 static inline u8 Ghost_IsLocalPlayerRevealing(void)
@@ -154,7 +140,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
             if (mode)
                 goto hide;
             if (!Ghost_TestVisibilityFlags(ctx, 0x40)) {
-                u32 hidden = Ghost_IsHidden(a);
+                u32 hidden = SceneActorVisibility_IsHidden(a);
                 if (!hidden) {
                     ctx->elapsed = hidden;
                     Ghost_ClearVisibilityFlags(ctx, 0x20);
@@ -164,7 +150,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
         } else {
         hide:
             if (!Ghost_TestVisibilityFlags(ctx, 0x20)) {
-                if ((u8)Ghost_IsHidden(a)) {
+                if ((u8)SceneActorVisibility_IsHidden(a)) {
                     ctx->elapsed = 0;
                     Ghost_ClearVisibilityFlags(ctx, 0x40);
                     Ghost_SetVisibilityFlags(ctx, 0x20);

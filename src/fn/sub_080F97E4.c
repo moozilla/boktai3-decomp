@@ -39,7 +39,7 @@ static inline void SetContext(u8 *p, u32 m)
 }
 static inline void RestoreHistory(struct SceneActorRegistryResetView *a, u16 v)
 {
-    *(u16 *)((u8 *)a + 0x418) = v;
+    a->group.common.gate.counter = v;
 }
 static inline void SetState(struct SceneActorRegistryResetView *a, u8 s, u8 p, u8 b)
 {
@@ -61,14 +61,14 @@ void Axe_ConvergeRecoveryMotion(struct SceneActorRegistryResetView *actor)
         Axe_ResetMovementFlags(actor);
     }
     {
-        s32 current = *(s16 *)((u8 *)actor + 0x310);
+        s32 current = actor->reactionStart.x;
         s16 *field = (void *)((u8 *)actor + 0x318);
         s32 difference = current - *field;
         priorX = field;
         x = Quarter(difference);
     }
     {
-        s32 current = *(s16 *)((u8 *)actor + 0x314);
+        s32 current = actor->reactionStart.z;
         s16 *field = (void *)((u8 *)actor + 0x31C);
         s32 difference = current - *field;
         priorZ = field;
@@ -99,7 +99,7 @@ void Axe_ConvergeRecoveryMotion(struct SceneActorRegistryResetView *actor)
         SetForced(actor, 0x100000);
         Axe_ResetMovementFlags(actor);
         SetContext(context, 0x10);
-        RestoreHistory(actor, *(u16 *)((u8 *)actor + 0x416));
+        RestoreHistory(actor, actor->group.common.gate.duration);
         SetState(actor, 0, 2, 9);
     }
 }

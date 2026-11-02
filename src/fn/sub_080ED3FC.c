@@ -17,7 +17,7 @@ void SceneActorReaction_PlayHiddenCue(struct SceneActorRegistryResetView *actor)
         u8 *drawable = actor->drawable;
         u32 zero = 0;
         drawable[7] = 2;
-        *(u16 *)((u8 *)actor + 0x178) = zero;
+        actor->colliderA.responseValue = zero;
         if (!actor->drawableKind) {
             u32 *flags = actor->drawable;
             u32 clear = ~1;

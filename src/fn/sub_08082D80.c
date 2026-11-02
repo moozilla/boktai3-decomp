@@ -46,7 +46,7 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
     s16 *priorZ;
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         {
-            register u32 mask asm("r0") = 0x20;
+            u16 mask = 0x20;
             u16 *flags = &actor->flags2D4;
             *flags = mask | *flags;
         }

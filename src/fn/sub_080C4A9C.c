@@ -40,8 +40,8 @@ void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
         if (*flags & chasing) {
             u16 *time = (u16 *)((u8 *)actor + 0x418);
             *time += 0x12C;
-            if (*time > *(u16 *)((u8 *)actor + 0x416))
-                *time = *(u16 *)((u8 *)actor + 0x416);
+            if (*time > actor->group.common.gate.duration)
+                *time = actor->group.common.gate.duration;
         }
     } else {
         {

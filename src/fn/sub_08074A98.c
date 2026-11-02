@@ -1,3 +1,4 @@
+#include "scene_actor_state.h"
 #include "scene_actor_registry.h"
 #include "player.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -33,7 +34,7 @@ static inline u8 IsPlayerRelativeCategory(u32 c)
 }
 static inline u8 HasSceneFlag(struct SceneActorRegistryActor *actor, u32 mask)
 {
-    if (*(u16 *)((u8 *)actor + 0x2c0) & mask)
+    if (((struct SceneActorRegistryResetView *)actor)->flags2C0 & mask)
         return 1;
     return 0;
 }
@@ -41,10 +42,11 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
 {
     u32 category = actor->category;
     if (category == 0x16) {
-        u32 height = TerrainHeight(actor, *(u16 *)((u8 *)actor + 0x2f4));
+        u32 height =
+            TerrainHeight(actor, ((struct SceneActorRegistryResetView *)actor)->terrainCell);
         u16 *ground = (void *)((u8 *)actor + 0x2be);
         if (*ground != height) {
-            u16 *displacement = (void *)((u8 *)actor + 0x2ea);
+            u16 *displacement = &((struct SceneActorRegistryResetView *)actor)->field2EA;
             *displacement -= height - *ground;
         }
         *ground = height;
@@ -52,16 +54,17 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
         u32 mask = 0x4000;
         if (!(actor->flags2D4 & mask) && IsPlayerRelativeCategory(category)) {
             u32 height = (u16)gPlayers[0]->position.y;
-            *(u16 *)((u8 *)actor + 0x2be) = height;
+            ((struct SceneActorRegistryResetView *)actor)->groundHeight2BE = height;
         } else {
-            u32 height = TerrainHeight(actor, *(u16 *)((u8 *)actor + 0x2f4));
-            *(u16 *)((u8 *)actor + 0x2be) = height;
+            u32 height =
+                TerrainHeight(actor, ((struct SceneActorRegistryResetView *)actor)->terrainCell);
+            ((struct SceneActorRegistryResetView *)actor)->groundHeight2BE = height;
         }
     }
     if (!HasSceneFlag(actor, 0x20)) {
-        u16 height = *(u16 *)((u8 *)actor + 0x2be);
+        u16 height = ((struct SceneActorRegistryResetView *)actor)->groundHeight2BE;
         actor->position.y = height;
-        actor->position.y = height + *(u16 *)((u8 *)actor + 0x2ea);
+        actor->position.y = height + ((struct SceneActorRegistryResetView *)actor)->field2EA;
     }
     if (actor->drawableKind == 0)
         ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->position;

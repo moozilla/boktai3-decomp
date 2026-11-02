@@ -28,6 +28,17 @@ class LandMatched(unittest.TestCase):
     def test_a_matched_function_lands_in_its_unit(self):
         self.assertEqual(land.where(self.root, "B", 0x08000080), ("unit", "src/unit.c", None))
 
+    def test_existing_rom_label_alias_is_the_definition(self):
+        alias = "#define Weather_Init sub_08018028\n"
+        proto = "int Weather_Init(int);\n"
+        definition = "int Weather_Init(int x)\n{\n    return x;\n}\n"
+        text = alias + proto + definition
+        with open(os.path.join(self.root, "src", "weather.c"), "w") as out:
+            out.write(text)
+        self.assertEqual(land.where(self.root, "sub_08018028", 0x08018028),
+                         ("unit", "src/weather.c", None))
+        self.assertEqual(land.without_definition(text, "sub_08018028"), alias + proto)
+
     def test_an_include_asm_still_wins(self):
         self.assertEqual(land.where(self.root, "sub_08000100", 0x08000100),
                          ("unit", "src/unit.c", "sub_08000100"))

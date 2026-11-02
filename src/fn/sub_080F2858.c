@@ -57,9 +57,8 @@ void ColorPulse_AlignTargetHeading(struct ColorPulse *p)
         u8 *angle = &p->angle;
         s16 *dx = &p->deltaX;
         s16 *dz = &p->deltaZ;
-        struct ColorPulsePart *volatile parts;
-        p = (struct ColorPulse *)((u8 *)p + 0xa8);
-        parts = (struct ColorPulsePart *)p;
+        struct ColorPulsePart *parts;
+        parts = p->parts;
         do {
             if (++*rotation == *angle) {
                 s32 x, z;

@@ -1,5 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_facing.h"
+
 // Provisional name: Actor_OnPathFollowUpdate (tentative)
 struct Vec {
     s16 x, y, z, pad;
@@ -42,23 +43,9 @@ void Actor_OnPathFollowUpdate(void *unused, struct Actor *p)
             struct PathCtx *c3 = ctx;
             u16 *t = c3->target;
             int r = Math_Atan2(t[0] - pos->x, t[1] - pos->z);
-            u16 a;
             U8(p, 0x65) = r;
-            a = r;
-            {
-                register int t1 asm("r2") = a + 112;
-                asm("" : "+r"(t1));
-                t1 >>= 5;
-                U8(p, 0x1a) = t1 & 7;
-            }
-            {
-                int t2 = a + 96;
-                int k;
-                t2 >>= 6;
-                k = 3;
-                k &= t2;
-                U8(p, 0x19) = k;
-            }
+            U8(p, 0x1a) = SceneFacing_EightWay(r);
+            U8(p, 0x19) = SceneFacing_FourWay(r);
         }
         Actor_PlayAnimationEntry(p, 1, 1, 0, 4);
         U8(p, 0x1f0) = zero;

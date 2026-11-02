@@ -426,13 +426,6 @@ s32 Background_FindMapId(struct BackgroundResource *resource, u16 id)
     return 0;
 }
 
-static inline s32 nextShift(void)
-{
-    u8 *p = Script_GetPc();
-    return p ? Script_ReadValue(p) << 7 : 0;
-}
-
-// MATCHING_CONCESSION: register-pinning
 s32 Background_LoadMapsFromScript(void)
 {
     s32 indices[4];
@@ -445,21 +438,12 @@ s32 Background_LoadMapsFromScript(void)
     resource.extra += (u32)base;
     target = Script_GetKeywordValue('t', 1);
     if (Script_SeekToKeyword('o')) {
-        u8 *cursor;
-        x = ({
-            s32 value = nextShift();
-            asm("" : "+r"(value));
-            value;
-        });
+        u8 *cursor = Script_GetPc();
+        x = cursor ? Script_ReadValue(cursor) << 7 : 0;
         cursor = Script_GetPc();
-        if (cursor)
-            y = Script_ReadValue(cursor) << 7;
-        else
-            y = 0;
+        y = cursor ? Script_ReadValue(cursor) << 7 : 0;
     } else {
-        register s32 zero asm("r2") = 0;
-        asm("" : "+r"(zero));
-        x = zero;
+        x = 0;
         y = 0;
     }
     n = Script_GetKeywordValue('n', 1);
@@ -495,9 +479,7 @@ s32 Background_LoadMapsFromScript(void)
         }
     }
     if (base[0] == 'M' && base[1] == 'P') {
-        register s32 drawX asm("r5") = x;
-        asm("" : "+r"(drawX));
-        Bg_SetupLayers(target, 0, base, drawX, y, n, indices);
+        Bg_SetupLayers(target, 0, base, x, y, n, indices);
     }
 }
 

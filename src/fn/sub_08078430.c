@@ -9,7 +9,7 @@ static inline s32 Magnitude(s32 value)
 static inline s32 ScaledComponent(s32 component, s32 inputSpeed)
 {
     s32 product = component;
-    register s32 speed asm("r6") = inputSpeed;
+    s32 speed = inputSpeed;
     product = (u32)product * (u32)speed;
     if (product >= 0)
         product >>= 16;
@@ -53,7 +53,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(
             return 1;
     }
     if (dx || dz) {
-        register s32 preservedSpeed asm("r6");
+        s32 preservedSpeed;
         actor->heading = Math_Atan2(dx, dz);
         {
             const s16 *lookup;
@@ -81,7 +81,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(
             s16 *field = &actor->velocity.x;
             s32 old = *field;
             s32 magnitude = x;
-            asm("" : "+r"(old) : "r"(preservedSpeed));
+
             if (x < 0)
                 magnitude = -x;
             if (magnitude > 10)

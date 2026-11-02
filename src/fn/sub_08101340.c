@@ -37,7 +37,8 @@ void NamedObject_UpdateMovementSound(struct NamedObjectManager *manager)
     s32 i;
     struct NamedObject *o;
     for (i = 0; i < 12; i++) {
-        if (Active(*(u32 *)((u8 *)manager + 0x136C), 1 << i)) {
+        u32 *mask = (u32 *)&manager->used;
+        if (Active(*mask, 1 << i)) {
             o = (struct NamedObject *)(i * (s32)sizeof(*objects) + (u32)objects);
             if ((s16)o->state != 6 && (o->field_E0 & 0x10)) {
                 if ((s16)o->state != 1) {
@@ -57,7 +58,7 @@ void NamedObject_UpdateMovementSound(struct NamedObjectManager *manager)
     }
     if (Player_TestAttachmentFlags(gPlayers[0], 1))
         attached = 1;
-    objects = NamedObject_FindByName(*(u16 *)((u8 *)gPlayers[0] + 0x476));
+    objects = NamedObject_FindByName(gPlayers[0]->tetherStatusTag);
     if (!objects)
         return;
     if (objects->field_E0 & 4)

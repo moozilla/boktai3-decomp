@@ -1,33 +1,13 @@
-#include "global.h"
-struct Obj {
-    u8 pad0[6];
-    u8 rotation;
-    u8 pad7[0x15];
-    s16 x, y, z;
-    u8 pad22[0xf8];
-    u8 angle;
-    u8 pad11B[0x19];
-    u16 endX, endY, endZ, pad13A, startX, startY, startZ, pad142;
-    s16 dx, dy, dz;
-    u16 pad14A;
-    u16 fx, fy, fz, pad152, a, b, c, pad15A;
-    u8 *parent;
-    u8 pad160[0x14];
-    void (*callback)(struct Obj *);
-    u8 padCallback[0xc];
-    s32 timer;
-    u8 pad188[2];
-    s8 multiplier;
-    u8 done, pad18C, byte1DD;
-};
+#include "sword_wave_component.h"
+
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
-void IvyChild_UpdateAfterBob(struct Obj *);
-void Sword_UpdateHorizontalWaveReturn(struct Obj *p)
+void IvyChild_UpdateAfterBob(struct SwordWaveComponent *);
+void Sword_UpdateHorizontalWaveReturn(struct SwordWaveComponent *p)
 {
     s32 wave, position;
     const s16 *table;
-    p->rotation += p->byte1DD;
+    p->rotation += p->rotationStep;
     table = gUnk_086149C4;
     position = p->timer;
     wave = (table[(256 - position) & 255] >> 3) * p->multiplier;
@@ -40,11 +20,11 @@ void Sword_UpdateHorizontalWaveReturn(struct Obj *p)
         do {
             p->rotation = 128;
             one = 1;
-            *(u8 *)((u8 *)p + 0x11e) = one;
+            p->active = one;
         } while (0);
-        *(u8 *)((u8 *)p + 0x11f) = one;
-        one |= *(u8 *)((u8 *)p + 0x119);
-        *(u8 *)((u8 *)p + 0x119) = one;
-        *(void (**)(struct Obj *))((u8 *)p + 0x164) = IvyChild_UpdateAfterBob;
+        p->phase = one;
+        one |= p->flags;
+        p->flags = one;
+        p->update = IvyChild_UpdateAfterBob;
     }
 }

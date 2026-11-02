@@ -54,7 +54,7 @@ void SceneActorControl_UpdateShadowReturnPhase(struct SceneActorRegistryResetVie
         }
         actor->secondaryMotion.y = 10;
     }
-    if (actor->field2B0 && (s16)actor->field2EA < *(u16 *)((u8 *)control + 0x3D8) - 20)
+    if (actor->field2B0 && (s16)actor->field2EA < control->returnHeight - 20)
         SceneActorControl_RestartPositionCurve(actor);
     else
         ++actor->counter2AC;

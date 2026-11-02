@@ -1,4 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
+#include "scene_actor_behavior.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
@@ -76,7 +77,7 @@ void Bat_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             u32 mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;
-            *(u16 *)((u8 *)control + 0x14) = 0;
+            control->field14 = 0;
             control->timer = 0;
         }
         {
@@ -89,8 +90,8 @@ void Bat_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         rangeA.x = 60;
         rangeA.y = 60;
         rangeA.z = 40;
-        SparkParticle_Spawn(&actor->body.position, Random4(), &rangeA, actor->body.direction + 128, 10, 8, 2,
-                            2);
+        SparkParticle_Spawn(&actor->body.position, Random4(), &rangeA, actor->body.direction + 128,
+                            10, 8, 2, 2);
     }
     if (frame <= 0x22)
         *(u16 *)(anim + 0xE) = 0;
@@ -116,31 +117,31 @@ void Bat_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             s32 scale;
             SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x20, 4,
                                 duration = 20, scale = 2, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x40, 4, duration,
-                                scale, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x5E, 4, duration,
-                                scale, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x80, 4, duration,
-                                scale, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0xC4, 4, duration,
-                                scale, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0xF0, 4, duration,
-                                scale, 1);
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x40, 4,
+                                duration, scale, 1);
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x5E, 4,
+                                duration, scale, 1);
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x80, 4,
+                                duration, scale, 1);
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0xC4, 4,
+                                duration, scale, 1);
+            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0xF0, 4,
+                                duration, scale, 1);
         }
         category = actor->category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
             category == 0x18 || category == 0x19)
             Sound_PlaySong(0xE5);
     }
-    script = *(u16 *)((u8 *)actor + 0x1F8);
+    script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
     if (script) {
         values[0] = actor->body.position.x;
         values[1] = actor->body.position.y;
         values[2] = actor->body.position.z;
-        values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-        values[4] = *(s32 *)((u8 *)actor + 0x200);
-        values[5] = *(s32 *)((u8 *)actor + 0x204);
-        values[6] = *(s32 *)((u8 *)actor + 0x2E0);
+        values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+        values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+        values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
+        values[6] = (s32)actor->field2E0;
         values[7] = actor->body.id;
         arguments.count = 8;
         arguments.values = values;

@@ -1,3 +1,4 @@
+#include "scene_actor_state.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -155,17 +156,19 @@ void Ghost_UpdateEnergyDrainAnimation(struct SceneActorAnimationView *actor)
             *p = value;
             *(u16 *)(body + 0x562) = zero;
         }
-        *(u16 *)((u8 *)actor + 0x2C2) = 16;
+        ((struct SceneActorRegistryResetView *)actor)->field2C2 = 16;
     }
     Ghost_GetDirectionalFrame(actor->direction, &variant, &flags);
     selection = entry->value;
     Select(actor, selection, variant, flags);
-    if (*(u16 *)((u8 *)actor + 0x1E6) == 0) {
-        if (Mod(*(u16 *)((u8 *)actor + 0x2CA), body[0x560]) == 0)
-            Player_SubtractEnergy(((u8 **)gPlayers)[0], *(u16 *)((u8 *)actor + 0xB4));
-    } else if (*(u16 *)((u8 *)actor + 0x1E6) == 1) {
-        if (Mod(*(u16 *)((u8 *)actor + 0x2CA), body[0x560]) == 0)
-            Player_SubtractEnergy(((u8 **)gPlayers)[0], *(u16 *)((u8 *)actor + 0xB4));
+    if (((struct SceneActorRegistryResetView *)actor)->paletteOffset == 0) {
+        if (Mod(((struct SceneActorRegistryResetView *)actor)->field2CA, body[0x560]) == 0)
+            Player_SubtractEnergy(((u8 **)gPlayers)[0],
+                                  ((struct SceneActorRegistryResetView *)actor)->attacks.first[0]);
+    } else if (((struct SceneActorRegistryResetView *)actor)->paletteOffset == 1) {
+        if (Mod(((struct SceneActorRegistryResetView *)actor)->field2CA, body[0x560]) == 0)
+            Player_SubtractEnergy(((u8 **)gPlayers)[0],
+                                  ((struct SceneActorRegistryResetView *)actor)->attacks.first[0]);
         if (((u8 **)gPlayers)[0])
             sub_0813D834(((u8 **)gPlayers)[0], 1, 900);
     }

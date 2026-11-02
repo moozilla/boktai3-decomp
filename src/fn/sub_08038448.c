@@ -155,11 +155,11 @@ void WirelessGameMenu_InitEquipmentChoices(struct P *p)
         }
     selected: {
         register u32 *read asm("r1") = random;
-        register u32 *write asm("r3");
-        asm("" : "+r"(read));
+        u32 *write;
+
         index = (*read + 1) & 1023;
         write = random;
-        asm("" : "+r"(write));
+
         *write = index;
     }
         start += Mod(gRandomTable[index], 12);

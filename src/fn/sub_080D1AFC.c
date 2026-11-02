@@ -84,7 +84,7 @@ void Mummy_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 fram
             target = actor->entryTarget228;
             Bat_SetControl(actor, 1, target);
             *(u16 *)(*(u8 **)((u8 *)actor + 0x5D4) + 6) = blocked;
-            *(u16 *)((u8 *)actor + 0x2C2) = Div(64, 3);
+            actor->field2C2 = Div(64, 3);
             {
                 u32 mask = 16;
                 u32 *flags = &actor->flags2CC;

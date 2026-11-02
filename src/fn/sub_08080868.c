@@ -9,7 +9,7 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
         u32 mask = ~0x141C0;
         *field &= mask;
         control->counter = 0;
-        *(u16 *)((u8 *)control + 0x14) = 0;
+        control->field14 = 0;
         control->timer = 0;
         SceneActorAnimation_SelectDirectionFlagsVariant((void *)actor, 3, 1);
         switch (actor->category) {
@@ -32,7 +32,7 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
             flag = 4;
             collider->flags = flag | collider->flags;
             zero = 0;
-            *(u16 *)((u8 *)actor + 0x178) = zero;
+            actor->colliderA.responseValue = zero;
         }
         if (actor->drawableKind == 0) {
             u32 *sequence = actor->drawable;

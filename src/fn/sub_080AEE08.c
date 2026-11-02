@@ -44,10 +44,6 @@ static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
     value &= 3;
     return value + 1;
 }
-#define VORN_STORE_ENTRY_BYTE(field_, value_)                                                      \
-    do {                                                                                           \
-        *(field_) = (value_);                                                                      \
-    } while (0)
 #define VORN_CLEAR_ROUTE_FIELDS(control_, zero_)                                                   \
     do {                                                                                           \
         (control_)->counter = (zero_);                                                             \
@@ -104,10 +100,6 @@ static inline void Vorn_ResetStateEntry(struct SceneActorRegistryResetView *acto
 {
     VORN_RESET_ENTRY_FIELDS(actor, prepared);
 }
-#define VORN_PREPARE_COMPLETED_STATE(state_)                                                       \
-    do {                                                                                           \
-        (state_) = 1;                                                                              \
-    } while (0)
 #define VORN_SET_SPARK_KIND(out_, kind_)                                                           \
     do {                                                                                           \
         (out_) = (kind_);                                                                          \
@@ -136,13 +128,13 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     u32 workValue;
     u32 completedState;
     u32 *cursor = &gRandomIndex;
-    VORN_PREPARE_COMPLETED_STATE(completedState);
+    completedState = 1;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 10);
         {
             u8 *entry = &actor->field2B3;
             workValue = 0;
-            VORN_STORE_ENTRY_BYTE(entry, workValue);
+            *entry = workValue;
         }
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);

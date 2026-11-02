@@ -73,7 +73,7 @@ void Wireless_BeginChildTransfer(struct Engine *p)
                 if (index > 3) {
                     break;
                 }
-            } while (*next != (*(struct RfuLinkStatus *volatile *)cursor)->my.id);
+            } while (*next != (*cursor)->my.id);
         }
     }
     zero = 0;

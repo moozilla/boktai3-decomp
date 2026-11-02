@@ -127,13 +127,15 @@ void StatusScreen_FadeOutPalette(struct StatusScreen *p)
     for (base = 0, bank = 0; bank < 2; base += 16, bank++) {
         for (i = p->start; i < p->end; i++) {
             u16 *source = &p->source[base + i], *dest = &p->buffer[base + i];
-            register int color asm("r1") = *source;
+            int color = *source;
             int r;
             int g;
             int b;
             r = (factor * red + (color & 31) * other) & 0x1F00;
             g = (factor * green + (color & 992) * other) & 0x3E000;
-            b = (factor * blue + (color & 31744) * other) & 0x7C0000;
+            b = 31744;
+            b &= color;
+            b = (factor * blue + b * other) & 0x7C0000;
             *dest = (r | g | b) >> 8;
         }
     }
@@ -191,8 +193,6 @@ void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)
     p->noise = 0;
 }
 
-// The task callback returns the tilemap loader's r0 (engine.h declares it void).
-extern int BgGfx_LoadTilemapResult(u32, u32, u32, u32, u32) asm("BgGfx_LoadTilemapSimple");
 int StatusScreen_Update(struct StatusScreen *p)
 {
     int zero;
@@ -208,21 +208,18 @@ int StatusScreen_Update(struct StatusScreen *p)
         p->active = next;
     }
     StatusScreen_RefreshDirtyDisplays(p);
-    return BgGfx_LoadTilemapResult(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
 }
 
-// This callback preserves the BIOS wrapper's r0 result on return.
-extern int CpuSetResult(const void *, void *, u32) asm("CpuSet");
 int StatusScreen_Destroy(struct StatusScreen *p)
 {
     u32 zero = 0;
-    int result = CpuSetResult(&zero, p->rows, 0x05000091);
+    CpuSet(&zero, p->rows, 0x05000091);
     gScanlineDmaSource = p->rows[p->active];
     gScanlineDmaTarget = (void *)0x0400004C;
     gScanlineDmaCount = 1;
     gScanlineDmaMode = 0;
     gStatusScreen = 0;
-    return result;
 }
 
 int StatusScreen_Initialize(struct StatusScreen *p, u16 id)

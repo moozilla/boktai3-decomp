@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "display_sequence_inline.h"
 #include "engine.h"
 #include "scene_vec.h"
 #include "ram.h"
@@ -117,30 +117,7 @@ void sub_08107EBC(void)
     Anim_SetSequence(&p->frames, manager->animationData, 0, *(u8 *)&p->sequence, 0);
     f = &p->frames;
     frame = &f->data[f->index];
-    sprite->frame = *frame >> 6;
-    {
-        u32 input = f->flags;
-        u32 one = 1;
-        u32 first;
-        asm("" : "=r"(first) : "0"(one));
-        first &= input;
-        if (first != (((*frame & 0x30) >> 4) & one))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        u32 flags = f->flags;
-        u32 two = 2;
-        u32 first;
-        asm("" : "=r"(first) : "0"(two));
-        first &= flags;
-        asm("" : "+r"(first));
-        if ((u8)first != (((*frame & 0x30) >> 4) & two))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
+    DisplaySequence_ApplyFrame((void *)sprite, (void *)f, (const u16 *)frame);
     if (++f->timer >= f->duration) {
         f->timer = 0;
         if (f->flags & 4) {

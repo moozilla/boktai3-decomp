@@ -30,7 +30,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
     if (unavailable)
         return;
     primary = (void *)&actor->primaryCollider;
-    if (*(u16 *)((u8 *)actor + 0x178)) {
+    if (actor->primaryCollider.responseValue) {
         if (actor->mode2E6) {
             destination->remaining = unavailable;
             destination->mode = 0;

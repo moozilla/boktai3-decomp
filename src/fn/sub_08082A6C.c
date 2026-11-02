@@ -29,7 +29,7 @@ void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *inp
             }
         }
     }
-    if (!Mod(*(u16 *)((u8 *)actor + 0x2CA), control->pulseInterval)) {
+    if (!Mod(actor->field2CA, control->pulseInterval)) {
         register u32 offset asm("r3") = 0x188;
         register struct ContactCollider *collider asm("r2") = (void *)((u8 *)actor + offset);
         asm("" : "+r"(collider) : "r"(offset));

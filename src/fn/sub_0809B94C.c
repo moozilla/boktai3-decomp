@@ -78,8 +78,8 @@ static inline void SetMotionFlags(struct SceneActorRegistryResetView *a, u32 inp
 }
 static inline u8 Move(struct SceneActorRegistryResetView *a)
 {
-    s32 x = Quarter(*(s16 *)((u8 *)a + 0x310) - *(s16 *)((u8 *)a + 0x318));
-    s32 z = Quarter(*(s16 *)((u8 *)a + 0x314) - *(s16 *)((u8 *)a + 0x31C));
+    s32 x = Quarter(a->reactionStart.x - a->reactionEnd.x);
+    s32 z = Quarter(a->reactionStart.z - a->reactionEnd.z);
     if (x > 200)
         x = 200;
     else if (x < -200)
@@ -90,8 +90,8 @@ static inline u8 Move(struct SceneActorRegistryResetView *a)
         z = -200;
     a->body.motion.x += x;
     a->body.motion.z += z;
-    *(s16 *)((u8 *)a + 0x318) += x;
-    *(s16 *)((u8 *)a + 0x31C) += z;
+    a->reactionEnd.x += x;
+    a->reactionEnd.z += z;
     if (x == 0 && z == 0)
         return 1;
     return 0;
@@ -130,8 +130,8 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
         range.x = 20;
         range.y = 20;
         range.z = 20;
-        SparkParticle_Spawn(&a->body.position, (Rand() & 3) + 1, &range, a->body.direction + 128, 10, 6, 2,
-                            2);
+        SparkParticle_Spawn(&a->body.position, (Rand() & 3) + 1, &range, a->body.direction + 128,
+                            10, 6, 2, 2);
     }
     SetMotionFlags(a, 0x100000);
     if (Move(a)) {

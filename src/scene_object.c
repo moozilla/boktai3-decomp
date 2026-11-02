@@ -799,12 +799,10 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                     return 1;
                 }
             }
-            default: {
-                /* Preserve the original range normalization for non-flat terrain. */
-                s32 normalized = type - 1;
-                asm("" : : "r"(normalized));
+            default:
+                if (type == 1 || type == 2)
+                    return 0;
                 break;
-            }
         }
     }
     return 0;
@@ -1450,15 +1448,13 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     p->cooldown = clear;
     p->unk23 = 4;
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    p->randomPhase = Mod(({
-                             u32 offset = gRandomIndex * 2;
-                             register u16 *table asm("r2");
-                             asm("" : "+r"(offset));
-                             table = gRandomTable;
-                             asm("" : "+r"(table));
-                             *(u16 *)(offset + (u32)table);
-                         }),
-                         16);
+    {
+        u16 sampleIndex = gRandomIndex;
+        u32 offset = sampleIndex * sizeof(u16);
+        register u16 *table asm("r2") = gRandomTable;
+        asm("" : "+r"(table));
+        p->randomPhase = Mod(*(u16 *)(offset + (u32)table), 16);
+    }
     {
         register s32 initial asm("r3") = basePalette;
         asm("" : "+r"(initial));

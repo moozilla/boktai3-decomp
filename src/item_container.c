@@ -147,13 +147,9 @@ s32 Trigger_RunScript(struct Trigger *input, u32 scriptInput, s32 eventInput)
     }
     {
         register s32 index asm("r2") = actor;
-        register u32 mask asm("r3") = 12;
+        u32 mask = 12;
         u32 flags;
-        flags = ({
-                    register u32 *table asm("r1") = gUnk_02000560;
-                    table[index];
-                }) &
-                mask;
+        flags = gUnk_02000560[index] & mask;
         savedActor = index;
         if (flags)
             goto fail;

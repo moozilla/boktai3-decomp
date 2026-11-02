@@ -63,13 +63,12 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
         register const struct ContactPosition *read asm("r1") = &delta;
         const struct ContactPosition *first = &delta;
         struct ContactCollider *resource;
-        asm("" : "+r"(origin));
         {
             register u32 x asm("r0") = (u16)first->x;
             asm("" : "+r"(x));
             slot->position.x = x + (u16)slot->origin.x;
         }
-        position->y = read->y + origin->y;
+        position->y = origin->y + read->y;
         {
             register u32 z asm("r0") = (u16)read->z;
             {

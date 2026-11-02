@@ -100,7 +100,6 @@ start:
             struct Anim *a;
             register struct Anim *saved asm("r8");
             const u16 *entry;
-            register u16 n asm("r0");
             int done;
             p->active = 1;
             p->pad1 = c->type;
@@ -183,28 +182,8 @@ start:
             asm("" : "+r"(saved));
             a = saved;
             entry = p->anim.data + a->frame;
-            o->frame = *entry >> 6;
-            {
-                u32 input = a->flags;
-                u32 left = 1;
-                u32 mask = 1;
-                left &= input;
-                if (left != (((*entry & 0x30) >> 4) & mask))
-                    o->flags |= 4;
-                else
-                    o->flags &= ~4;
-            }
-            {
-                register u32 input asm("r0") = a->flags;
-                u32 mask = 2;
-                u32 left = (u8)(mask & input);
-                if (left != (((*entry & 0x30) >> 4) & mask))
-                    o->flags |= 8;
-                else
-                    o->flags &= ~8;
-            }
-            n = ++a->timer;
-            if (n >= a->rate) {
+            DisplaySequence_ApplyFrame((void *)o, (void *)a, entry);
+            if (++a->timer >= a->rate) {
                 a->timer = 0;
                 if (a->flags & 4) {
                     if (a->frame == 0) {

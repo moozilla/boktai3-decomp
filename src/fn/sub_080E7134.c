@@ -136,7 +136,7 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
                 Polar((void *)((u8 *)actor + offset), *heading, speed);
             }
         }
-        *(u16 *)((u8 *)actor + 0x2EE) = 24;
+        actor->secondaryMotion.y = 24;
         SceneActorAnimation_SelectEntryFlags((void *)actor, 14,
                                              SceneActor_GetDirectionFlags(actor->body.direction));
         Sound_PlaySong(0x1B2);

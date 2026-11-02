@@ -1,36 +1,18 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
-void Sound_PlaySongChecked(int);
+#include "scene_object_slot.h"
 void SceneObject_UpdateInactiveIdle(void);
-void SceneObject_AnimateInactive(u8 *s)
+void SceneObject_AnimateInactive(struct SceneObjSlot *s)
 {
-    if ((*(u32 *)(s + 0x38) & 0xffff00) == 0x200)
+    if ((*(u32 *)&s->dir & 0xffff00) == 0x200)
         Sound_PlaySongChecked(0xcf);
-    if (++s[0x3a] > 7) {
-        s[0x39]--;
-        s[0x3a] = 0;
-        if (s[0x39] == 0) {
-            s[0x37] = 0;
-            {
-                u16 *flags = (u16 *)(*(u8 **)(s + 0x2c) + 6);
-                int old = *flags;
-                int result;
-                result = 2;
-                result |= old;
-                *flags = result;
-            }
-            asm("" ::: "memory");
-            {
-                u16 *flags = (u16 *)(*(u8 **)(s + 0x2c) + 6);
-                int old = *flags;
-                int result;
-                result = 3;
-                result |= old;
-                *flags = result;
-            }
-            asm("" ::: "memory");
-            (*(u8 **)(s + 0x2c))[4] = ((*(u8 **)(s + 0x2c))[4] & 0xf0) | (s[0x3b] + 1);
-            *(void **)(s + 0x30) = SceneObject_UpdateInactiveIdle;
+    if (++s->b3a > 7) {
+        s->b39--;
+        s->b3a = 0;
+        if (s->b39 == 0) {
+            s->variant = 0;
+            s->block->w6 |= 2;
+            s->block->w6 |= 3;
+            s->block->b4 = (s->block->b4 & 0xf0) | (s->b3b + 1);
+            s->callback = SceneObject_UpdateInactiveIdle;
         }
     }
 }

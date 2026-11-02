@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_graphics_actor.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -67,6 +68,7 @@ static inline void decay(s16 *p)
 }
 void SceneActorAnimation_UpdateLungeAttack(ActorAnimation *p, int tick)
 {
+    struct SceneGraphicsActor *graphicsActor = (struct SceneGraphicsActor *)p;
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;
     if (!p->locked)
@@ -81,7 +83,7 @@ void SceneActorAnimation_UpdateLungeAttack(ActorAnimation *p, int tick)
             p->savedAngle = Math_Atan2(dest[0] - *(s16 *)(position + 12), dest[2] - here[2]);
             setFacing(p, p->savedAngle);
         } else {
-            if (*(u16 *)((u8 *)p + 0x3b4) == 2)
+            if (graphicsActor->graphics.stepTableValuePrev == 2)
                 Sound_PlaySongChecked(889);
             else
                 Sound_PlaySongChecked(888);

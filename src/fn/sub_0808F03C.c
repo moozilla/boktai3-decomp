@@ -42,16 +42,16 @@ void Slime_UpdateLaunch(struct SceneActorRegistryResetView *actor)
         v->x = Shift12(gUnk_086149C4[(heading + 0x40) & 0xFF] * speed);
         v->y = 0;
         v->z = Shift12(gUnk_086149C4[heading] * speed);
-        *(s16 *)((u8 *)actor + 0x2EE) = 0x28;
+        actor->secondaryMotion.y = 0x28;
         d->flags |= 2;
         d->a = 0x40;
         d->b = 0x40;
         Sound_PlaySong(0x3C1);
-        *(u16 *)((u8 *)actor + 0x2E8) = 0;
+        actor->field2E8 = 0;
     }
     if (anim->mode == 3)
         anim->frame = 0;
-    if (*(s16 *)((u8 *)actor + 0x2EE) > 0) {
+    if (actor->secondaryMotion.y > 0) {
         if (d->b <= 0x7E)
             d->b = d->b + 1;
     } else {

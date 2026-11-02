@@ -10,7 +10,7 @@ struct SceneActorTargetLink {
 void SceneActorControl_ResetTargetFlags(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *s = input;
-    struct SceneActorControlState *q = SceneActorControl_GetState(s);
+    struct SceneActorPendingTargetState *q = s->context;
     u16 *hp = &s->flags2D4;
     u32 hm = 0xFFFFFEFF;
     struct SceneActorTargetLink *t;
@@ -23,5 +23,5 @@ void SceneActorControl_ResetTargetFlags(struct SceneActorRegistryResetView *inpu
     t = (void *)((u8 *)s + 0xDC);
     bm = ~8;
     t->flags = t->flags & bm;
-    *(u16 *)((u8 *)q + 0x444) = zero;
+    q->field444 = zero;
 }

@@ -2,6 +2,11 @@
 #define GUARD_IVY_PHASE_H
 #include "scene_actor_control_phase.h"
 
+struct IvyCaptureState {
+    u8 unknown0[0x62C];
+    u32 captureFlags;
+};
+
 /* Restart the vine's phase: clear the phase bytes and the frame count, and
    raise the restart flag. The address comes before the shared zero (source
    evaluation order). */

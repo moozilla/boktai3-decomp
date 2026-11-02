@@ -1,16 +1,14 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "scene_object_slot.h"
 void Camera_RequestShake(int);
-void Script_Call(int, int);
-void SceneObject_UpdateRaised(u8 *s)
+void SceneObject_UpdateRaised(struct SceneObjSlot *s)
 {
-    register int timer asm("r6") = *(s16 *)(s + 0x82);
+    s16 timer = s->timer;
     if (timer) {
-        Camera_RequestShake(timer);
-        (*(u16 *)(s + 0x82))--;
-    } else if (*(int *)(s + 0x60)) {
-        Script_Call(*(int *)(s + 0x60), 0);
-        *(int *)(s + 0x60) = timer;
+        Camera_RequestShake((s16)s->timer);
+        s->timer--;
+    } else if (s->raisedScript) {
+        Script_Call(s->raisedScript, 0);
+        s->raisedScript = timer;
     }
-    s[7] = 2;
+    s->pad0[7] = 2;
 }

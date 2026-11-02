@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_graphics_actor.h"
 #include "render.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
@@ -51,6 +52,7 @@ int SceneActorGraphics_GetResourceId(void *);
 void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
 void SceneActorAnimation_UpdateChargeApproach(ActorAnimation *p, int tick)
 {
+    struct SceneGraphicsActor *graphicsActor = (struct SceneGraphicsActor *)p;
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;
     setFacing(p, p->requestedAngle);
@@ -69,8 +71,8 @@ void SceneActorAnimation_UpdateChargeApproach(ActorAnimation *p, int tick)
                                                      1, 1, 4);
         }
         PolarInterpolation_SetCurrentFromPoint((u8 *)p + 0x30c, (u8 *)p + 0x54);
-        sub_082222BC((u8 *)p + 0x30c, (u8 *)p + 0x9c4, *(u16 *)((u8 *)p + 0x354));
-        if (*(u16 *)((u8 *)p + 0x354) <= 64)
+        sub_082222BC((u8 *)p + 0x30c, (u8 *)p + 0x9c4, graphicsActor->graphics.approachFrames);
+        if (graphicsActor->graphics.approachFrames <= 64)
             Sound_PlaySongChecked(840);
         else
             Sound_PlaySongChecked(841);

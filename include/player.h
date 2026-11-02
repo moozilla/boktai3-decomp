@@ -115,7 +115,9 @@ struct Player {
     s16 velocityX; /* 0x38: direction-derived velocity */
     u16 unk3A;
     s16 velocityZ;
-    u8 unk3E[0x68 - 0x3E];
+    u8 unk3E[2];
+    void *followTarget; /* 0x40: active position source for following a named object. */
+    u8 unk44[0x68 - 0x44];
     u16 indicatorStep; /* 0x68: cycles 0-11, driven by indicatorUpdateRate; >>2 feeds position.x (tentative) */
     u8 unk6A[2];
     u8 animationData[0x20];           /* 0x6C: keyframe resource */
@@ -151,7 +153,8 @@ struct Player {
     u8 unk273;
     u16 positionResetValue; /* 0x274 */
     u8 resetFlags;          /* 0x276: bit one cleared by player reset */
-    u8 unk277[0x11];
+    u8 unk277[0x284 - 0x277];
+    u8 localFollowTarget[4]; /* 0x284: restored when a named object releases the player. */
     u16 storedTerrainCell;   /* 0x288 */
     u16 recoveryTerrainCell; /* 0x28A: terrain cell used for recovery facing */
     u8 unk28C[3];

@@ -16,7 +16,7 @@ static inline void ClearRoute(struct SceneActorRegistryResetView *a)
     u32 mask = ~0x141C0;
     *flags &= mask;
     route->counter = 0;
-    *(u16 *)((u8 *)route + 0x14) = 0;
+    route->field14 = 0;
     route->timer = 0;
 }
 static inline void Show(struct SceneActorRegistryResetView *a)
@@ -83,7 +83,7 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
                 actor->fieldAA = zero;
                 actor->field2B3 = byteZero;
             }
-            *(u16 *)((u8 *)collider + 0x44) = zero;
+            collider->responseValue = zero;
             actor->field2B8 = zero;
         }
         {
