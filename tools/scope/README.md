@@ -391,6 +391,9 @@ asm barriers to the compiled code (drafts don't count) unless given
 end. Then it adds or removes the concession marker, runs clang-format, and
 checks every C function in the landed file (restoring everything on a
 failure). With `--name` it renames, and with `--rom` it builds the ROM.
+A function that matches already (a phase-3 depin: `land FUNC unit-copy.c`, a copy of its unit with
+FUNC rewritten) lands back in the unit that defines it, replacing its current C; outside FUNC the copy
+must equal the unit as it is now. Before 2026-11-01 such a rewrite went to a new src/fn file.
 `--nonmatching` lands an unfinished draft for phase 1: the definition goes
 under `#ifdef NONMATCHING` with its `// fuzzy:` line (check.py's figure,
 which progress.py reads) and scope's shape distance, and `INCLUDE_ASM` stays
@@ -1318,6 +1321,38 @@ Each was read from the compiler source and confirmed on a live draft.
    the coalesced copy from the dumps and prints this lever. The same functions' r4/r5 swap
    (attr 42 refs over 154 against p's 62 over 280) went away by writing the skip test's tail
    out as `p = p->next; continue;`: jump2 merges it into the loop's tail, and p gets 66 refs.
+
+54. **A constant the ROM copies before a byte or comes from a `u8` local.** In
+   `movs r1, #1; ldrb r2, [r3]; adds r0, r1, #0; orrs r0, r2; strb r0, [r3]; ... orrs r1, r0`
+   the 1 stays in r1 for a second or, and the first or copies it instead of tying to the dying
+   load. `p->flags |= 1` gives `ldrb r0; movs r1, #1; orrs r0, r1`: the load ties into the result.
+   A `u32 one` does no better, because c-typeck's convert_to_integer narrows `(u8)(one | f)` to
+   `(u8)one | f`, the `(u8)one` goes through a QImode pseudo, and cse turns that into the constant.
+   `u8 one = 1;` is a promoted variable (PROMOTE_MODE makes it an SImode register whose QImode
+   reads are `SUBREG_PROMOTED_VAR_P`). widen_operand (optabs.c) widens such an operand by returning
+   the SImode register itself, so the widened QImode or reads `one` directly, and cse leaves the
+   register alone. The byte load is a subreg there, which regmove does not tie, so the or copies
+   `one` (fact 41's backward pass) and the second or ties into it. With the callback stored through
+   a local in between (`void (*fn)(void *, void *) = F; q->fn = fn;`, whose literal then loads
+   first), Actor_TryInteraction matched as `u8 one = 1; p->flags |= one; ...; q->flags |= one;`,
+   and so did seven more 0xf5a state changes in src/actor_animation_controller.c whose
+   `register s32 mask asm("r0") = 1` flag pins went. The original's inline had the same spelling.
+   `why` on such a tie prints this lever when the op's other operand is a small constant that is read
+   again later. A related form: `lsls #24; ands #0x07000000; lsrs #24` is a masked u8 local,
+   `u8 d = value; d &= 7;` (Actor_SetFacingAndIdle, where a pin on the shifted value went).
+
+55. **cse does not merge a field address computed in an inline with the same address in the body.**
+   The body reaches gcse with `(plus (reg p) (reg K))` for a large offset, but integrate.c folds the
+   constant in an inline copy (fact 31), giving `(plus (reg p) (const_int K))`. cse does not
+   treat the two as one value, so a field read in the body and written in an inline helper (or
+   the reverse) computes `p + K` twice, as the ROM may show (`ldr r1, =0xF5A; adds r0, r4, r1`, then
+   later `ldr r0, =0xF5A; adds r2, r4, r0`). Written out in the body, the second use reads the
+   first address, which stays live in a low register between them, so reload takes another spill
+   register and later literal reloads rotate (Actor_UpdateIdleWait: r3 joined the spill set, 24
+   insns). `p->savedPhase = p->phase; Actor_SetPhase(p, 5);` matched. The same inline also
+   reorders global allocation: in Actor_BeginScriptedAnimationPhaseNine the body's address pseudo
+   (7 refs over 26 insns) outranked the controller g for r4, and with `Actor_SetState(g, 3, 9)` it
+   did not.
 
 ## Survey: random table as a literal address (2026-10-24)
 
