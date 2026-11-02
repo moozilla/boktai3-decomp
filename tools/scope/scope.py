@@ -149,7 +149,7 @@ except ImportError:  # the project venv has it
 sys.path.insert(0, TOOLS)
 import build  # noqa: E402
 import check  # noqa: E402
-from romlib import ROOT, load_rom, off  # noqa: E402
+from romlib import ROOT, load_rom, off, rom_data_ranges  # noqa: E402
 
 INSTR = os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")  # tools/scope/build_agbcc.sh
 PASSES = ["rtl", "jump", "cse", "addressof", "gcse", "loop", "cse2", "flow", "combine", "regmove",
@@ -643,47 +643,6 @@ def mapping_ranges(obj, start, size):
         if v >= start + size:
             break
     return data
-
-
-def rom_data_ranges(func, addr):
-    """Data ranges of the ROM function, from its generated assembly (labels carry addresses)."""
-    path = os.path.join(ROOT, "build", "asm", "nonmatching", func + ".s")
-    if not os.path.exists(path):
-        return None
-    data, cur = [], addr
-    blobs = []  # (start, end) of .incbin runs: raw bytes the pool scan must classify
-    for ln in open(path):
-        s = ln.split("@")[0].strip()
-        m = re.match(r"(\w+):\s*(.*)", s)
-        if m:
-            lab = re.search(r"_([0-9A-F]{8})$", m.group(1))
-            if lab:
-                cur = int(lab.group(1), 16)
-            s = m.group(2).strip()
-        if not s or s.startswith((".global", ".syntax", "thumb_func", "arm_func", ".thumb", ".type", ".size")):
-            continue
-        if s.startswith(".4byte") or s.startswith(".word"):
-            data.append((cur - addr, cur - addr + 4)); cur += 4
-        elif s.startswith(".2byte") or s.startswith(".hword"):
-            data.append((cur - addr, cur - addr + 2)); cur += 2
-        elif s.startswith(".byte"):
-            data.append((cur - addr, cur - addr + 1)); cur += 1
-        elif s.startswith(".align"):
-            n = 1 << int(s.split()[1].rstrip(","))
-            pad = (-cur) % n
-            if pad:
-                data.append((cur - addr, cur - addr + pad))
-            cur += pad
-        elif s.startswith(".incbin"):
-            m = re.search(r",\s*(0x[0-9A-Fa-f]+|\d+)\s*,\s*(0x[0-9A-Fa-f]+|\d+)", s)
-            if m:
-                n = int(m.group(2), 0)
-                blobs.append((cur - addr, cur - addr + n)); cur += n
-        elif s.startswith("."):
-            continue
-        else:
-            cur += 4 if re.match(r"bl\b", s) else 2
-    return data, blobs
 
 
 def rom_pool_ranges(code, addr, arm=False):

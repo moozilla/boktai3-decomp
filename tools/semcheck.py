@@ -47,7 +47,7 @@ import tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build  # noqa: E402
 import check  # noqa: E402
-from romlib import ROOT, load_rom  # noqa: E402
+from romlib import ROOT, load_rom, rom_data_ranges  # noqa: E402
 
 try:
     import unicorn
@@ -446,7 +446,7 @@ class Oracle:
                                                 *trial_args(t, kinds), arity=self.arity))
                      for t in range(trials)]
         covered = set().union(*(r.blocks for _, r in self.runs)) if self.runs else set()
-        blocks = rom_blocks(self.rom, self.start, self.end)
+        blocks = rom_blocks(self.rom, self.start, self.end, func)
         self.coverage = 100.0 * len(covered & blocks) / max(1, len(blocks))
 
     def check(self, data, addr=None, cstart=None, cend=None, names=None, verbose=False):
@@ -508,22 +508,28 @@ def semcheck(src, funcs, nonmatching, trials, verbose):
     return results
 
 
-def rom_blocks(rom, start, end):
-    """Basic-block starts of the ROM function (entry, branch targets, fall-throughs)."""
+def rom_blocks(rom, start, end, func=None):
+    """Thumb block starts, excluding annotated literal pools and alignment."""
     import capstone
+    from capstone.arm_const import ARM_INS_B, ARM_INS_BL, ARM_INS_BLX
     md = capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB)
     code = rom[start - ROM_BASE:end - ROM_BASE]
-    starts = {start}
-    for ins in md.disasm(code, start):
-        if ins.mnemonic.startswith("b") and ins.mnemonic not in ("bl", "bic", "bics", "bx", "blx"):
-            try:
-                starts.add(int(ins.op_str.lstrip("#"), 16))
-            except ValueError:
-                pass
-            starts.add(ins.address + ins.size)
-        elif ins.mnemonic in ("bl",):
-            starts.add(ins.address + ins.size)
-    return {s for s in starts if start <= s < end}
+    layout = rom_data_ranges(func, start) if func else None
+    data = sorted(layout[0]) if layout else []
+    starts, decoded = {start}, set()
+    offset = 0
+    for lo, hi in data + [(len(code), len(code))]:
+        for ins in md.disasm(code[offset:lo], start + offset):
+            decoded.add(ins.address)
+            if ins.id in (ARM_INS_BL, ARM_INS_BLX):
+                starts.add(ins.address + ins.size)
+            elif ins.id == ARM_INS_B:
+                # Only conditional branches have a fall-through edge.
+                if ins.mnemonic.split(".")[0] != "b":
+                    starts.add(ins.address + ins.size)
+                starts.add(int(ins.op_str[1:], 0))
+        offset = max(offset, hi)
+    return starts & decoded
 
 
 def audit(out, trials):
