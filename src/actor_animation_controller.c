@@ -237,7 +237,6 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *, struct ActorChi
 
 // Tentative: accept a nearby interaction when facing, height and input permit it.
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartner *q)
 {
     s32 dx, dz, xOffset, height, length;
@@ -312,27 +311,22 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             p->mode = mode;
         }
         {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 0x30;
+            *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0x30;
             if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
+                if ((*((u8 *)p + 0xf5a) & 15) == 3) {
                     p->savedFrame = p->anim.frame;
                     p->savedTimer = p->anim.timer;
                 }
             }
         }
         {
-            register u32 one asm("r1") = 1;
-            register u32 flags asm("r2") = p->flags;
-            p->flags = one | flags;
+            u8 one = 1;
+            p->flags |= one;
             {
-                register void (*fn)(void *, void *) = Actor_OnInteractionChildRelease;
+                void (*fn)(void *, void *) = Actor_OnInteractionChildRelease;
                 q->fn = fn;
             }
-            one |= q->flags;
-            q->flags = one;
+            q->flags |= one;
         }
         Actor_SetInteractionControlFlag(p);
     } else {
@@ -342,27 +336,22 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             p->mode = mode;
         }
         {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 0x20;
+            *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0x20;
             if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
+                if ((*((u8 *)p + 0xf5a) & 15) == 3) {
                     p->savedFrame = p->anim.frame;
                     p->savedTimer = p->anim.timer;
                 }
             }
         }
         {
-            register u32 one asm("r1") = 1;
-            register u32 flags asm("r2") = p->flags;
-            p->flags = one | flags;
+            u8 one = 1;
+            p->flags |= one;
             {
-                register void (*fn)(void *, void *) = Actor_OnInteractionChildDelay;
+                void (*fn)(void *, void *) = Actor_OnInteractionChildDelay;
                 q->fn = fn;
             }
-            one |= q->flags;
-            q->flags = one;
+            q->flags |= one;
         }
         Actor_BeginInteractionSoundSequence(p);
     }
