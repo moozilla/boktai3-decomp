@@ -76,7 +76,8 @@ struct PlayerColliderVector {
 struct PlayerCollider {
     u8 unknown0[6];
     u16 flags;
-    u8 unknown8[0x38];
+    u8 unknown8[0x36];
+    u16 cost; /* 0x3E: contact cost, cleared when restoring a linked player */
 };
 
 struct PlayerCueCollider {
@@ -115,7 +116,9 @@ struct Player {
     s16 velocityX; /* 0x38: direction-derived velocity */
     u16 unk3A;
     s16 velocityZ;
-    u8 unk3E[0x50 - 0x3E];
+    u8 unk3E[2];
+    void *movementProbe; /* 0x40: scene body movement probe */
+    u8 unk44[0xC];
     u32 visualState;
     struct PlayerAnimation *activeAnimation;
     u8 unk58[0x68 - 0x58];
@@ -291,9 +294,12 @@ struct Player {
     u8 contactThresholdPending,
         contactThresholdReady; /* 0x53B: two-stage threshold event latch (tentative) */
     u8 contactCueDuration;     /* 0x53D: threshold cue duration */
-    u8 unk53E[0xC];
+    u8 unk53E[2];
+    struct SceneVec savedLinkPosition; /* 0x540: set by the linked-player initialization script */
+    u8 savedLinkFacing, unk549;
     u8 catalogSavedOption; /* 0x54A: menu option copied when scriptStatus[1] is zero (tentative) */
-    u8 unk54B[3];
+    u8 linkPositionRestored; /* 0x54B: set after restoring the linked player */
+    u8 unk54C[2];
     u16 lastContactFlags;
     u32 lastContactRewardFlags;
     u8 unk554[0x24];
