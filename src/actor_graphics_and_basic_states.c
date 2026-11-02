@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "actor_graphics_and_basic_states.h"
 #include "contact_actor.h"
@@ -811,7 +810,7 @@ void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl);
 int SceneActorState_StepTableByKind(struct StateActor *p)
 {
     const u8 *tbl;
-    switch (*(s32 *)((u8 *)p + 0x358)) { /* stepTableKind */
+    switch (((struct SceneGraphicsActor *)p)->graphics.stepTableKind) {
         case 0:
             tbl = gUnk_08604DC4;
             break;
