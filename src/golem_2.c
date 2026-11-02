@@ -5,7 +5,6 @@
 #include "player.h"
 #include "ram.h"
 
-
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(u8 *);
@@ -83,9 +82,9 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         {
             u16 *flags = (u16 *)((u8 *)actor + 0x13A);
             u32 value = *flags;
-            u32 mask = 4;
-            asm("" : "+r"(value), "+r"(mask));
-            *flags = mask | value;
+            u32 m = 4;
+            m |= value;
+            *flags = m;
         }
     }
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
