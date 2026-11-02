@@ -2170,27 +2170,22 @@ extern const s16 gUnk_086149C4[];
 
 static inline void set_direction(s16 angle, u8 *directionOut, u8 *flipOut)
 {
-    register s32 direction asm("r2");
     while (angle < 0)
         angle += 256;
     while (angle > 255)
         angle -= 256;
+    angle = ((angle - 16) >> 5) & 7;
     {
-        register s32 shifted asm("r0") = angle - 16;
-        direction = (shifted >> 5) & 7;
-    }
-    {
-        s32 choice = direction;
+        s32 choice = angle;
         if (choice == 4)
             *directionOut = 0;
         else if (choice == 0)
             *directionOut = 4;
         else if (choice < 4) {
-            *directionOut = 4 - direction;
+            *directionOut = 4 - angle;
             *flipOut = 1;
         } else {
-            register s32 result asm("r0") = direction - 4;
-            *directionOut = result;
+            *directionOut = angle - 4;
             *flipOut = 0;
         }
     }
