@@ -1774,7 +1774,7 @@ DECISIONS = {
     "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "cross-jump": ["sp_param_alias", "rw_copy_var", "sp_copy_uses"],
-    "regmove-copy": ["rw_commute", "sp_inline_decl"],
+    "regmove-copy": ["rw_commute", "sp_inline_decl", "sp_rmw_temp"],
     "local-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
     "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "sp_store_via_ptr", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
