@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorBehaviorView *, u32, u32, u32);
 struct SceneActorBehaviorPlayerSlot {
@@ -21,15 +20,10 @@ static inline void IncrementFirst(u16 *input)
 {
     u16 *counter = input;
     u32 value = *counter;
-    u32 result;
-    if (*(s16 *)counter <= 9998)
-        result = value + 1;
-    else {
-        u32 limit = 9999;
-        asm("" : : "r"(limit));
-        result = limit;
-    }
-    *counter = result;
+    if (*(s16 *)counter <= 9998) {
+        *counter = value + 1;
+    } else
+        *counter = 9999;
 }
 void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *inputActor)
 {
@@ -70,7 +64,7 @@ void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *inputActor)
     {
         u16 *counter;
         u32 value;
-        register u32 result asm("r0");
+        u32 result;
         if (slot == 0) {
             IncrementFirst(CounterAddress(0x884));
             counter = CounterAddress(0x530);
@@ -106,11 +100,7 @@ void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *inputActor)
             return;
         }
         return;
-    capped: {
-        register u32 limit asm("r1") = 9999;
-        asm("" : : "r"(limit));
-        result = limit;
-    }
-        *counter = result;
+    capped:
+        *counter = 9999;
     }
 }
