@@ -51,7 +51,6 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
                 p->phase = 1;
                 {
                     u32 zero = 0;
-                    asm("" : "+r"(zero));
                     p->timer = zero;
                 }
             }
