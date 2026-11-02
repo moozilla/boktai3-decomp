@@ -191,7 +191,9 @@ alone. `transforms/random_table_literal.py` writes `gUnk_0203B400` as the
 integer address (see the literal survey below).
 
 `why UID` recompiles with `CSE_WHY=UID CSE_DEBUG=1 CSE_PATHS=1` and
-`AGBCC_DUMPPRI`, and prints in ~10 lines:
+`AGBCC_DUMPPRI`, and prints in ~10 lines (in a matched
+unit with several functions and no FUNC named, the function `scope.py FILE FUNC` compiled
+last; before, it fell to the file's last definition and explained an unrelated insn):
 
 * the ROM and draft instruction, and which pseudo holds the differing register
   (operands matched by position between the lreg dump and the same insn after
