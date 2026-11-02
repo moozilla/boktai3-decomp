@@ -2757,7 +2757,6 @@ void Actor_UpdateReverseFadeAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateNotifyingAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -2834,8 +2833,8 @@ void Actor_UpdateNotifyingAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     if (done) {
-        register void *h asm("r2") = p->completionHandle;
-        if (h) {
+        if (p->completionHandle) {
+            void *h = p->completionHandle;
             p->completionHandle = 0;
             Script_Call(h, 0);
         }
