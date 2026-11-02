@@ -587,11 +587,10 @@
              if (reg_renumber[regno] < 0 && N_REG_CLASSES > 1)
                find_reg (order, 0, 0, 0, 0);
  
-@@ -582,6 +599,22 @@
-               find_reg (order, 0, 1, 0, 0);
+@@ -583,6 +600,22 @@
          }
      }
-+
+ 
 +    if (agbcc_dump)
 +      for (i = 0; i < (size_t) max_allocno; i++)
 +	fprintf (agbcc_dump, "G %s %d %d %d %d %d %d %s\n", current_function_name,
@@ -607,9 +606,10 @@
 +		 allocno_calls_crossed[allocno_order[i]],
 +		 reg_renumber[allocno_reg[allocno_order[i]]],
 +		 agbcc_pseudo_label (allocno_reg[allocno_order[i]]));
- 
++
      /* Do the reloads now while the allocno data still exist, so that we can
         try to assign new hard regs to any pseudo regs that are spilled.  */
+ 
 @@ -622,6 +655,10 @@
      = (((double) (floor_log2 (allocno_n_refs[v2]) * allocno_n_refs[v2])
  	/ allocno_live_length[v2])
@@ -630,16 +630,16 @@
  
    enum reg_class class = (alt_regs_p
  			  ? reg_alternate_class (allocno_reg[allocno])
-@@ -1013,6 +1052,9 @@
+@@ -1012,6 +1051,9 @@
+ 	    }
  	  }
        }
- 
++
 +  agbcc_first = best_reg;
 +  agbcc_pass = pass - 1;
-+
+ 
    /* See if there is a preferred register with the same class as the register
       we allocated above.  Making this restriction prevents register
-      preferencing from creating worse register allocation.
 @@ -1024,6 +1066,14 @@
       First do this for those register with copy preferences, then all
       preferred registers.  */
@@ -655,11 +655,50 @@
    AND_COMPL_HARD_REG_SET (hard_reg_copy_preferences[allocno], used);
    GO_IF_HARD_REG_SUBSET (hard_reg_copy_preferences[allocno],
  			 reg_class_contents[(int) NO_REGS], no_copy_prefs);
-@@ -1186,6 +1236,28 @@
-     }
+@@ -1136,6 +1186,23 @@
+       /* Let's not bother with multi-reg allocnos.  */
+       && allocno_size[allocno] == 1)
+     {
++      /* Instrumentation: K records every register the scan below may take
++	 over, in its order (r15 down): local-alloc's refs and live length in
++	 it, this allocno's, and whether its own density is higher (the first
++	 such register is taken).  */
++      if (agbcc_dump)
++	for (i = FIRST_PSEUDO_REGISTER - 1; i >= 0; i--)
++	  if (local_reg_n_refs[i] != 0
++	      && ! TEST_HARD_REG_BIT (used2, i)
++	      && HARD_REGNO_MODE_OK (i, mode))
++	    fprintf (agbcc_dump, "K %s %d %d %d %d %d %d %d\n",
++		     current_function_name, pseudo, i,
++		     local_reg_n_refs[i], local_reg_live_length[i],
++		     allocno_n_refs[allocno], allocno_live_length[allocno],
++		     ((double) local_reg_n_refs[i] / local_reg_live_length[i]
++		      < (double) allocno_n_refs[allocno]
++			/ allocno_live_length[allocno]));
++
+       /* Count from the end, to find the least-used ones first.  */
+       for (i = FIRST_PSEUDO_REGISTER - 1; i >= 0; i--)
+ 	{
+@@ -1175,7 +1242,14 @@
+ 			  = r + HARD_REGNO_NREGS (r, PSEUDO_REGNO_MODE (k));
+ 
+ 			if (regno >= r && regno < endregno)
+-			  reg_renumber[k] = -1;
++			  {
++			    /* Instrumentation: E names each local-alloc
++			       pseudo evicted from REGNO.  */
++			    if (agbcc_dump)
++			      fprintf (agbcc_dump, "E %s %d %d %d\n",
++				       current_function_name, pseudo, k, regno);
++			    reg_renumber[k] = -1;
++			  }
+ 		      }
+ 
+ 		  best_reg = regno;
+@@ -1187,6 +1261,28 @@
  
    /* Did we find a register?  */
-+
+ 
 +  /* Instrumentation: F records find_reg's view (masks of hard registers):
 +     used1 = conflicts and class limits, regs_used_so_far, regs_someone_prefers,
 +     copy preferences, preferences, the register the two passes found and in
@@ -681,10 +720,11 @@
 +	       m_sofar, m_someone, agbcc_cpref, agbcc_pref, agbcc_first,
 +	       agbcc_pass, best_reg);
 +    }
- 
++
    if (best_reg >= 0)
      {
-@@ -1221,6 +1293,23 @@
+       register int lim, j;
+@@ -1221,6 +1317,23 @@
      }
  }
  

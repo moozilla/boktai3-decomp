@@ -234,6 +234,15 @@ last; before, it fell to the file's last definition and explained an unrelated i
     is doubled by a REG_EQUIV note (fact 20) and the undoubled life alone would
     win, it says so and gives `AGBCC_NOEQUIV=REG` (the random table in
     sub_080A34BC, sub_082335F0 and sub_08234868);
+  * not yet: find_reg's takeover of a local-alloc register (fact 49). The
+    compiler writes it to names.txt: `K func pseudo reg local_refs local_live
+    refs live wins` for every register the scan may take over, r15 down (the
+    first with wins=1 is taken), and `E func pseudo victim reg` for each local
+    value it evicts. `why` does not read these records yet. On
+    ActorAttachment_BeginPartJitter's natural draft it still says "ip went to a
+    conflicting pseudo allocated earlier: table", when the table only reached
+    ip after index took r5 over from it (`K ... 23 5 4 56 5 63 1`, `E ... 23 45
+    5`);
 * for a reload register (operand not a pseudo before allocation): the reload
   choice number, the spill registers as that choice saw them (free, shared
   with another reload of the insn, holding a named pseudo, taken), the
