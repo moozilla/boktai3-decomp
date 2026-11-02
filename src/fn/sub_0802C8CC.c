@@ -1,5 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_facing.h"
+
 struct Object {
     u8 pad0[9];
     u8 angle;
@@ -27,21 +28,6 @@ struct Collider {
 void Actor_SetFacingAngle(struct Object *p, int angle)
 {
     p->angle = angle;
-    {
-        int converted = (u16)angle;
-        u32 value;
-        {
-            register int shifted asm("r0") = converted + 112;
-            asm("" : "+r"(shifted));
-            shifted >>= 5;
-            value = 7 & shifted;
-        }
-        p->facing8 = value;
-        converted += 96;
-        converted >>= 6;
-        {
-            register u32 value2 asm("r0") = 3 & converted;
-            p->facing = value2;
-        }
-    }
+    p->facing8 = SceneFacing_EightWay(angle);
+    p->facing = SceneFacing_FourWay(angle);
 }
