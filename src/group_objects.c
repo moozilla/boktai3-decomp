@@ -62,13 +62,11 @@ void BoardPiece_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int 
     Anim_SetSequence(&p->anim, m->animation, (u16)index, left, right);
 }
 
-// MATCHING_CONCESSION: register-pinning
 void BoardPiece_UpdateAnimation(struct GroupPiece *p)
 {
     struct GroupSprite *o = &p->sprite;
     struct GroupAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     int done;
     p->sprite.position = p->position;
     a = &p->anim;
@@ -96,8 +94,7 @@ void BoardPiece_UpdateAnimation(struct GroupPiece *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
