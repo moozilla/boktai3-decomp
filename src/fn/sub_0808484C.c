@@ -1,30 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_availability.h"
 #include "scene_actor_control_helpers.h"
-static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
-{
-    u32 mask = inputMask;
-    u32 offset = 0x2D4;
-    u16 *flags;
-    flags = (void *)((u8 *)actor + offset);
-    return *flags & mask;
-}
-static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inputMask)
-{
-    u32 mask = inputMask;
-    u32 offset = 0x2D0;
-    u32 *flags;
-    flags = (void *)((u8 *)actor + offset);
-    return *flags & mask;
-}
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
-{
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
-    if (actor) {
-        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
-            return 1;
-    }
-    return 0;
-}
+
 static inline void Hide(struct SceneActorRegistryResetView *actor)
 {
     u32 one = 1;
@@ -45,13 +21,11 @@ static inline void Hide(struct SceneActorRegistryResetView *actor)
     }
 }
 
-static inline void Show(struct SceneActorRegistryResetView *input)
+static inline void Show(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryResetView *actor = input;
     if (actor->drawableKind == 0) {
         u32 *flags = actor->drawable;
         u32 mask;
-        asm("" ::: "r1");
         mask = ~1;
         *flags &= mask;
     } else {
@@ -68,22 +42,19 @@ static inline void Show(struct SceneActorRegistryResetView *input)
         ActorShadow_Enable((void *)((u8 *)actor + offset));
     }
 }
-void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *input)
+void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *actor)
 {
-    register struct SceneActorRegistryResetView *actor asm("r3") = input;
-    register struct SceneActorControlMotionState *state asm("r5");
-    u32 unavailable = IsUnavailable(actor);
+    struct SceneActorControlMotionState *state;
+    u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
     if (unavailable)
         return;
     {
         u32 offset = 0x3D0;
-        register u32 mask asm("r1");
+        u32 mask;
         u32 active;
-        state = *(void **)((u8 *)actor + offset);
+        state = SceneActorControl_GetMotionState(actor);
         mask = 0x60;
-        asm("" : "+r"(mask));
-        offset += 4;
-        active = SceneActorControl_TestFlags(*(u32 *)((u8 *)state + offset), mask);
+        active = SceneActorControl_TestFlags(state->flags3D4, mask);
         if (!active)
             return;
     }
@@ -91,30 +62,17 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *input)
         u32 counter;
         u32 value;
         {
-            register u32 offset asm("r1") = 0x3EE;
-            register u16 *field asm("r0");
-            asm("" : "+r"(offset));
-            field = (void *)((u8 *)state + offset);
+            u16 *field = &state->visibilityFrame;
             counter = (u32)*field << 16;
         }
         value = counter >> 16;
         if (value <= 19) {
-            if (({
-                    u32 shifted = counter >> 18;
-                    register u32 one asm("r1");
-                    one = 1;
-                    shifted & one;
-                }))
+            if ((u8)(counter >> 18) & 1)
                 Show(actor);
             else
                 Hide(actor);
         } else if (value <= 29) {
-            if (({
-                    u32 shifted = counter >> 17;
-                    register u32 one asm("r1");
-                    one = 1;
-                    shifted & one;
-                }))
+            if ((u8)(counter >> 17) & 1)
                 Show(actor);
             else
                 Hide(actor);
@@ -170,7 +128,7 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *input)
         }
     }
     {
-        register u16 *counter asm("r1") = (void *)((u8 *)state + 0x3EE);
+        u16 *counter = &state->visibilityFrame;
         (*counter)++;
     }
 }
