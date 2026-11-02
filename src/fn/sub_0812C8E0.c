@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
@@ -54,8 +53,6 @@ static inline void FragmentEffect_StepAnimation(struct Fragment *sprite, u32 ini
 // Tentative: shrink the fragment, then release its sprite and pool slot.
 void FragmentEffect_ShrinkAndRemove(struct Pool *pool, struct Fragment *p)
 {
-    s16 *scaleTimer;
-    u16 *timer;
     if (p->entered) {
         p->flags = (p->flags & ~1) | 2;
         p->scaleTimer = 20;
@@ -65,32 +62,22 @@ void FragmentEffect_ShrinkAndRemove(struct Pool *pool, struct Fragment *p)
         p->scaleY = 64;
         p->timer = 0;
     }
-    {
-        u16 *frame = &p->timer;
-        s32 remainder = Mod(*frame, 6);
-        timer = frame;
-        if (!remainder)
-            FragmentEffect_SpawnRandomParticle(&p->position);
-    }
-    {
-        register s16 *initial asm("r0") = &p->scaleTimer;
-        s32 remaining = *initial;
-        scaleTimer = initial;
-        if (remaining > 0) {
-            p->scaleX += Div(1 - p->scaleX, *scaleTimer);
-            p->scaleY += Div(1 - p->scaleY, *scaleTimer);
-            (*scaleTimer)--;
-        }
+    if (!Mod(p->timer, 6))
+        FragmentEffect_SpawnRandomParticle(&p->position);
+    if (p->scaleTimer > 0) {
+        p->scaleX += Div(1 - p->scaleX, p->scaleTimer);
+        p->scaleY += Div(1 - p->scaleY, p->scaleTimer);
+        p->scaleTimer--;
     }
     FragmentEffect_StepAnimation(p, 0);
-    if (*scaleTimer <= 0) {
+    if (p->scaleTimer <= 0) {
         Sprite_Remove(p);
         pool->used &= ~(1 << p->slot);
         p->slot = -1;
         p->state = 0;
         p->entered = 0;
     } else {
-        (*timer)++;
+        p->timer++;
     }
 }
 struct Pool *FragmentEffect_GetOrCreateManager(void);
