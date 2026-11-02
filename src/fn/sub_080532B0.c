@@ -44,21 +44,21 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
     if (present) {
         s32 x, z;
         s32 index;
-        register s16 *worldX asm("r4");
+        register struct StackedActorPosition *world asm("r4");
         register s16 *worldY asm("r5");
         u8 *cell;
         u32 type;
         s32 y;
         u32 value = Script_GetValue();
-        worldX = &actor->world.x;
-        *worldX = value;
+        world = &actor->world;
+        world->x = value;
         value = Script_GetValue();
         worldY = &actor->world.y;
         *worldY = value;
         actor->world.z = Script_GetValue();
-        x = (s16) * (volatile u16 *)worldX >> 8;
-        z = (s16) * (volatile u16 *)((u8 *)worldX + 4) >> 8;
-        cache.world = (void *)worldX;
+        x = world->x >> 8;
+        z = world->z >> 8;
+        cache.world = world;
         if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else {
@@ -77,10 +77,10 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
         y = (*cell & 15) << 8;
         switch (type) {
             case 1:
-                y -= *((u8 *)worldX + 4);
+                y -= (u8)world->z;
                 break;
             case 2:
-                y -= *(u8 *)worldX;
+                y -= (u8)world->x;
                 break;
         }
         *worldY = y;
