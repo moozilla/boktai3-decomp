@@ -1,6 +1,6 @@
-#include "global.h"
-u32 HomingProjectile_UpdateDefaultState(u8 *);
-u32 HomingProjectile_UpdateDefaultBehavior(u8 *p)
+#include "homing_projectile.h"
+
+s32 HomingProjectile_UpdateDefaultBehavior(struct HomingSlot *p, s32 slot)
 {
-    return HomingProjectile_UpdateDefaultState(p);
+    return HomingProjectile_UpdateDefaultState(p, slot);
 }
