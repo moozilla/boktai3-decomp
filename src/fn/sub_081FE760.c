@@ -1,13 +1,6 @@
 #include "global.h"
+#include "sun_orb_effect.h"
 #include "ram.h"
-struct OrbConfig {
-    u8 pad0[6];
-    s8 angle;
-    u8 pad7[0xF];
-    u16 f16;
-    s32 radius;
-    void (*update)(void);
-};
 struct OrbSprite {
     u32 flags;
     u8 pad4[3];
@@ -47,8 +40,6 @@ struct OrbManager {
 extern const s16 gUnk_086149C4[];
 void SunOrb_GetOrCreateManager(void);
 u8 *SunOrb_FindFreeSlot(struct OrbManager *, s32 *);
-void SunOrb_SetUpdateCallback(struct OrbConfig *, void (*)(void));
-void OrbitEffect_UpdateExpansion(void);
 void Memory_Copy(void *, void *, u32);
 void Sprite_LinkToList(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -62,7 +53,7 @@ static inline s32 scale(s32 value)
 }
 #define F(T, off) (*(T *)((u8 *)o + (off)))
 // confidence=low: claims a free sun orb slot, copies the 0x20-byte config and starts it at pos.
-s32 SunOrb_CreateAtPosition(struct OrbConfig *cfg, struct Pos *pos)
+s32 SunOrb_CreateAtPosition(struct OrbitEffectParams *cfg, struct Pos *pos)
 {
     struct OrbManager *m = gSlotController;
     s32 slot;
@@ -82,7 +73,7 @@ s32 SunOrb_CreateAtPosition(struct OrbConfig *cfg, struct Pos *pos)
     {
         struct Vec *v = &o->offset;
         s32 angle = cfg->angle;
-        s32 radius = cfg->radius;
+        s32 radius = cfg->speed;
         v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
         v->y = 0;
         v->z = scale(gUnk_086149C4[angle & 255] * radius);
@@ -120,7 +111,7 @@ s32 SunOrb_CreateAtPosition(struct OrbConfig *cfg, struct Pos *pos)
     m->spawnCount++;
     F(u16, 0xF6) = 5;
     {
-        u16 v = cfg->f16;
+        u16 v = cfg->unk_16;
         F(u16, 0xF8) = v;
     }
     F(u16, 0xFA) = 0;
