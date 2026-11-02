@@ -157,20 +157,10 @@ initialize:
         }
     }
     {
-        int observed = a->flags;
-        register int two asm("r3") = 2;
-        register int side asm("r1");
-        int word;
-        u32 encoded;
-        side = two;
-        side &= observed;
-        side = (u8)side;
-        word = *frame;
-        encoded = 48;
-        encoded &= word;
-        encoded >>= 4;
-        encoded &= two;
-        if (side != encoded)
+        register u32 observed asm("r4") = a->flags;
+        u32 flipMask = 2;
+        u32 side = (u8)(flipMask & observed);
+        if (side != (((*frame & 0x30) >> 4) & flipMask))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
