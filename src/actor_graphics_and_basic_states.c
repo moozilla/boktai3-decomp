@@ -787,15 +787,13 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
 
 void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl)
 {
-    /* Raw offsets into groundEffect's step-table fields (row 0x3B0, col 0x3B1,
-     * value 0x3B2, previous value 0x3B4). */
-    u16 *cur = (u16 *)((u8 *)p + 0x3b2);
+    u16 *cur = &((struct SceneGraphicsActor *)p)->graphics.stepTableValue;
     u16 old = *cur;
     u8 *col;
     u32 row;
-    *(u16 *)((u8 *)p + 0x3b4) = old;
-    row = ((u8 *)p)[0x3b0];
-    col = (u8 *)p + 0x3b1;
+    ((struct SceneGraphicsActor *)p)->graphics.stepTableValuePrev = old;
+    row = ((struct SceneGraphicsActor *)p)->graphics.stepTableRow;
+    col = &((struct SceneGraphicsActor *)p)->graphics.stepTableCol;
     {
         u32 idx = row * 8 + (u32)tbl;
         idx += *col;
