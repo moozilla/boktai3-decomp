@@ -320,7 +320,7 @@ s32 SceneActorGraphics_GetEffectState(struct StateActor *p)
     } else if (AreaEffect_IsPositionCovered(&p->target) == 0) {
         r = 0;
     } else {
-        r = *(s16 *)((u8 *)gGameState + 0x876);
+        r = gGameState->unk876;
     }
     return r;
 }
