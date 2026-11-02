@@ -3,55 +3,8 @@
 #include "engine.h"
 #include "ram.h"
 #include "display_sequence_inline.h"
-#include "scene_vec.h"
-struct ProjSprite {
-    u32 flags;
-    u8 pad4[0xc];
-    u16 frame;
-    u8 pad12[10];
-    struct SceneVec pos;
-    u8 tail[8];
-};
-struct ProjEntry;
-typedef s32 (*ProjectileSlotUpdate)(struct ProjEntry *, s32);
-struct ProjParams {
-    u16 h0, h2, bodyFlag;
-    s8 angle;
-    u8 pad7;
-    s32 speed;
-    u32 bodyId;
-    ProjectileSlotUpdate callback;
-    u8 pad14[0x2c];
-    s32 gravity;
-    s32 velocity;
-    s32 height;
-    u16 baseY;
-    s16 h4e;
-    u32 script;
-    u32 sequence;
-    s16 persist;
-    u8 pad5a[2];
-};
-struct ProjEntry {
-    u32 timer;
-    u32 flags;
-    u8 pad8[8];
-    struct SceneVec vel;
-    struct DisplaySequenceState anim;
-    struct ProjParams params;
-    u8 animData[0x1c];
-    struct ProjSprite sprite;
-    u8 collider[0x54];
-    u32 body;
-    u32 scriptProc;
-};
-struct ProjPool {
-    u8 pad[0x18];
-    u32 mask;
-    struct ProjEntry e[16];
-};
+#include "projectile_pool.h"
 extern u32 gUnk_02000560;
-void ProjectilePool_ReleaseSlot(struct ProjPool *, struct ProjEntry *, s32);
 u8 *TerrainModifiers_FindCellOverride(int, int);
 static inline s32 Truncate(s32 v)
 {
@@ -63,9 +16,9 @@ static inline u32 FrameFactor(u16 v)
 {
     return DisplaySequence_MaskCommand(v, 15);
 }
-static inline void Polar(struct SceneVec *d, struct ProjParams *p)
+static inline void Polar(struct ContactPosition *d, struct ProjectileConfig *p)
 {
-    struct SceneVec *dst = d;
+    struct ContactPosition *dst = d;
     s32 angle = p->angle;
     s32 speed = p->speed;
     dst->x = Truncate(speed * gUnk_086149C4[(angle + 0x40) & 0xff]);
@@ -78,7 +31,7 @@ static inline u32 CommandFlip(u32 command, u32 axis)
     flips &= command;
     return (flips >> 4) & axis;
 }
-static inline struct ProjEntry *Next(struct ProjEntry *e)
+static inline struct ProjectileSlot *Next(struct ProjectileSlot *e)
 {
     return e + 1;
 }
@@ -89,9 +42,9 @@ static inline u8 *CellData(int i)
         return p + 4;
     return gTerrainMap->cells + 12 + i * 4;
 }
-s32 ProjectilePool_Update(struct ProjPool *pool)
+s32 ProjectilePool_Update(struct TimedProjectilePool *pool)
 {
-    struct ProjEntry *cursor, *base;
+    struct ProjectileSlot *cursor, *base;
     s32 i;
     {
         u32 mask = 0x400;
@@ -103,16 +56,16 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
         if (gUnk_02000560 & mask)
             return 0;
     }
-    base = pool->e;
+    base = pool->slots;
     for (i = 0, cursor = base; i <= 15; i++, cursor = Next(cursor), base = Next(base)) {
         u32 live = pool->mask & (1 << i);
         u16 *baseY = &base->params.baseY;
         if (live) {
-            struct ProjSprite *o = &base->sprite;
-            void *c = base->collider;
-            struct ProjParams *p = &base->params;
-            struct SceneVec *v;
-            struct ProjSprite *spr;
+            struct DisplaySequenceSprite *o = &base->sprite;
+            struct ContactCollider *c = &base->collider;
+            struct ProjectileConfig *p = &base->params;
+            struct ContactPosition *v;
+            struct DisplaySequenceSprite *spr;
             {
                 s32 r = cursor->params.callback(base, i);
                 spr = o;
@@ -122,15 +75,15 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
             asm("" ::"r"(o));
             {
                 u32 move = cursor->flags & 1;
-                v = &base->vel;
+                v = &base->velocity;
                 /* Nine uses raise v's allocation priority above cursor. */
                 asm("" ::"r"(v), "r"(v), "r"(v), "r"(v), "r"(v), "r"(v), "r"(v), "r"(v), "r"(v));
                 if (move)
                     Polar(v, p);
             }
             {
-                struct SceneVec *pos = &o->pos;
-                o->pos.x = o->pos.x + cursor->vel.x;
+                struct ContactPosition *pos = &o->position;
+                o->position.x = o->position.x + cursor->velocity.x;
                 pos->y = pos->y + v->y;
                 pos->z = pos->z + v->z;
                 p->velocity -= p->gravity;
@@ -138,18 +91,18 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
                 v = pos;
             }
             if (p->height < 0)
-                o->pos.y = *baseY - ((~p->height + 1) >> 12);
+                o->position.y = *baseY - ((~p->height + 1) >> 12);
             else
-                o->pos.y = (p->height >> 12) + *baseY;
-            if (o->pos.y >= 0) {
-                s32 x = o->pos.x >> 8;
+                o->position.y = (p->height >> 12) + *baseY;
+            if (o->position.y >= 0) {
+                s32 x = o->position.x >> 8;
                 s32 z = v->z >> 8;
                 s32 index;
                 if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                     index = 0;
                 else
                     index = gTerrainMap->rows[z] + x;
-                if ((u32)((*CellData(index) & 0xf) << 8) <= o->pos.y)
+                if ((u32)((*CellData(index) & 0xf) << 8) <= o->position.y)
                     goto alive;
             }
             if (base->params.persist == 0) {
@@ -159,7 +112,7 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
             }
         alive:
             if (cursor->params.script) {
-                struct ProjSprite *s = spr;
+                struct DisplaySequenceSprite *s = spr;
                 struct DisplaySequenceState *a = &base->anim;
                 const u16 *entry = cursor->anim.commands + cursor->anim.index;
 
