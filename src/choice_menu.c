@@ -332,7 +332,6 @@ returnText:
 
 u16 Text_DecodeGlyphEscape(u8 *);
 
-// MATCHING_CONCESSION: register-pinning
 void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
 {
     u8 *text = Text_LookupString(Script_ParseStringRef(window) + p->stringBase);
@@ -377,20 +376,18 @@ void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
         } else {
             if (*text == 31) {
                 u16 value = Text_DecodeGlyphEscape(text);
-                if (value != 65535) {
-                    if (({
-                            u32 mask = 255;
-                            asm("" : "+r"(mask));
-                            mask <<= 8;
-                            mask &= value;
-                            mask;
-                        }))
-                        goto doubleCharacter;
+                if (value == 0xFFFF) {
                     p->width++;
                     p->textX++;
-                    text += 2;
+                    text++;
                     continue;
                 }
+                if (value & 0xFF00)
+                    goto doubleCharacter;
+                p->width++;
+                p->textX++;
+                text += 2;
+                continue;
             }
             p->width++;
             p->textX++;
