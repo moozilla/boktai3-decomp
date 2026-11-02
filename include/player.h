@@ -4,6 +4,9 @@
 #include "global.h"
 #include "scene_vec.h"
 
+/* Body colliders use a fixed defense in both setup and hit resolution. */
+#define PLAYER_BODY_DEFENSE 0
+
 /*
  * The player actor. gPlayers holds four pointers (one per player slot; slot 0 is the local
  * player, the other slots are used by the multiplayer code, guess). Built from the offsets seen
