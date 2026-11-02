@@ -22,11 +22,8 @@ void SceneInventory_BuildUnlockedItemCatalog(struct SceneInventoryScriptCatalog 
         }
     }
     for (; page <= 6; page++) {
-        u32 mask = 0xFF;
-        for (i = 0; i < 8; i++) {
-            u32 value = ((u8 *)p->catalog)[page * 8 + i];
-            p->catalog[page * 8 + i] = value | mask;
-        }
+        for (i = 0; i < 8; i++)
+            p->catalog[page * 8 + i] = -1;
     }
     if (Script_SeekToKeyword(0x69))
         p->itemText = Script_GetTextSourcePc();
