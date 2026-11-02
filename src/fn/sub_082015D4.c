@@ -51,7 +51,7 @@ struct HitActor {
     u32 damageType;
 };
 extern const struct SceneVec gUnk_0824FE44;
-void Collision_CalculateDamageResponse(void *);
+void Collision_CalculateDamageResponse(void *attacker, void *defender);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
@@ -60,7 +60,7 @@ void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResult *hit,
                                         struct HitActor *p)
 {
-    Collision_CalculateDamageResponse(source);
+    Collision_CalculateDamageResponse(source, hit);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;
