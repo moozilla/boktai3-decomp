@@ -763,17 +763,13 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
 
 // MATCHING_CONCESSION: register-pinning
 
-s32 Player_SelectFlashingVisualMode(struct Player *arg, s32 inputMode)
+s32 Player_SelectFlashingVisualMode(struct Player *p, s32 mode)
 {
-    struct Player *p = arg;
-    register s32 mode asm("r2") = inputMode;
-    if (p->movementRequestScale) {
-        if ((--p->movementRequestScale >> 2) & 1)
-            goto flash;
-    }
+    if (!p->movementRequestScale)
+        return mode;
+    if ((--p->movementRequestScale >> 2) & 1)
+        return p->movementRequestParameter;
     return mode;
-flash:
-    return p->movementRequestParameter;
 }
 
 static inline void Player_SetVisualStatusBits(u32 *flags, u32 mask)
