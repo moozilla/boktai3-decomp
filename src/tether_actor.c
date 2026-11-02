@@ -1788,7 +1788,6 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
 {
     struct TetherActor *actor = gTetherActor;
     if (actor) {
-        struct Player *player;
         struct TetherActor *savedActor;
         s32 dx;
         s32 dz;
@@ -1796,14 +1795,16 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
         TetherActor_SetState(actor, 15);
         savedActor = gTetherActor;
         savedActor->directedStep = 16;
-        player = gPlayers[0];
         {
-            s32 playerX = player->position.x;
-            struct ContactPosition *targetPosition = &savedActor->directedTarget;
-            s16 actorX = targetPosition->x;
-            dx = playerX - actorX;
+            struct Player *player = gPlayers[0];
+            {
+                s32 playerX = player->position.x;
+                struct ContactPosition *targetPosition = &savedActor->directedTarget;
+                s16 actorX = targetPosition->x;
+                dx = playerX - actorX;
+            }
+            dz = player->position.z - savedActor->directedTarget.z;
         }
-        dz = player->position.z - savedActor->directedTarget.z;
         if (dx || dz) {
             register s32 angle asm("r0") = Math_Atan2(dx, dz);
             struct TetherActor *target;
@@ -1823,7 +1824,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
                 u32 byteOffset = index << 1;
                 const u16 *table;
                 register u32 sample asm("r0");
-                register u16 *heading asm("r1");
+                u16 *heading;
                 table = (const u16 *)RANDOM_TABLE_ADDR;
                 sample = *(const u16 *)(byteOffset + (u32)table);
                 sample &= 7;
