@@ -28,6 +28,10 @@ static inline s32 TruncatePoolOffset(s32 value)
     return value >= 0 ? value >> 12 : -(-value >> 12);
 }
 #define ParticlePool_SpawnJitteredParticle sub_081639E4
+static inline u16 ReadParticleSample(const u16 *table, const u32 *index)
+{
+    return table[*index];
+}
 void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct SceneVec *position,
                                         s32 angle, u32 kind)
 {
@@ -41,20 +45,22 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
 
     if (i < 16) {
         {
+            register const u16 *randomTable asm("r6");
+            u32 *randomIndex;
             u32 range;
             u32 mask;
-            register u32 index asm("r1");
-            register u16 *table asm("r6");
+            u32 index;
             p = &inPool->particles[i];
             p->flags &= ~1;
             p->position = *position;
-            table = gRandomTable;
-            index = gRandomIndex;
+            randomTable = gRandomTable;
+            randomIndex = &gRandomIndex;
+            index = *randomIndex;
             index++;
             mask = 0x3FF;
             index &= mask;
             {
-                u32 random = table[index];
+                u32 random = ReadParticleSample(randomTable, &index);
                 s32 x = (u16)p->position.x;
                 x -= 63;
                 range = 0x7F;
@@ -62,9 +68,9 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
                 p->position.x = x + random;
             }
             index = (index + 1) & mask;
-            gRandomIndex = index;
+            *randomIndex = index;
             {
-                u32 random = table[index];
+                u32 random = randomTable[index];
                 s32 z = (u16)p->position.z;
                 z -= 63;
                 random &= range;
