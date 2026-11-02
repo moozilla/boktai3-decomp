@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
 #include "engine.h"
@@ -21,16 +20,11 @@ void ActorSequence_Begin(struct Player *, s32, s32);
 void PlayerCue_EnterStandUpdate(struct Player *);
 void PlayerCue_AcknowledgePendingTrigger(struct Player *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-#define H(off)  (*(u16 *)((u8 *)p + (off)))
-#define SH(off) (*(s16 *)((u8 *)p + (off)))
-#define B(off)  (*((u8 *)p + (off)))
-#define W(off)  (*(u32 *)((u8 *)p + (off)))
-#define SPRITE  ((struct ContactSwarmSprite *)((u8 *)p + 0x1D0))
-#define SEQ     ((struct DisplaySequenceState *)((u8 *)p + 0x218))
+#define PLAYER_OFFSET(field) ((u32) & ((struct Player *)0)->field)
 struct AlternateSpriteView {
-    u8 pad[0x1D0];
+    u8 prefix[PLAYER_OFFSET(auxiliarySprite)];
     struct ContactSwarmSprite sprite;
-    u8 pad200[0x218 - 0x1D0 - sizeof(struct ContactSwarmSprite)];
+    u8 pad200[0x48 - sizeof(struct ContactSwarmSprite)];
     struct DisplaySequenceState sequence;
     u32 done;
     const void *resource;
@@ -44,13 +38,13 @@ void Player_UpdateAlternateFormCue(struct Player *p)
                 p->statusValue = 4000;
             V->sprite.position.y = 450 + (u16)gGameState->positionY;
             V->sprite.position.pad = 1;
-            B(0x432) = 2;
-            B(0x433) = 1;
+            p->unk432[0] = 2;
+            p->unk432[1] = 1;
         } else {
             V->sprite.position.y = (u16)gGameState->positionY + 220;
             V->sprite.position.pad = 0;
-            B(0x432) = 0;
-            B(0x433) = 1;
+            p->unk432[0] = 0;
+            p->unk432[1] = 1;
         }
         if (p->statHundredths > 999 && !(gEngineFlags & 0x1000) && p->kind != 2) {
             p->actionEighteenParameter = 0x16E;
@@ -60,17 +54,17 @@ void Player_UpdateAlternateFormCue(struct Player *p)
             p->actionEighteenEnabled = 0;
         Sound_PlaySong(0x306);
         if (p->statHundredths <= 999 && !(gEngineFlags & 0x1000) && p->kind != 2)
-            W(0x1D0) |= 1;
+            V->sprite.flags |= 1;
         else {
-            W(0x1D0) &= ~1;
+            V->sprite.flags &= ~1;
             Anim_SetSequence(&V->sequence, V->resource, 21, 0, 0);
             V->done = 0;
         }
         Player_SetPendingCallback(p, Player_OnMotion11Exit);
         p->actionCountdown = 0;
-        H(0x4E6) = 0;
+        p->formCueParameterA = 0;
         p->terrainRecoveryCounter = 0;
-        H(0x4EA) = 0;
+        p->formCueParameterB = 0;
     }
     if (gEngineFlags & 0x1000)
         Player_AddControlFlags(p, 8);
@@ -82,28 +76,27 @@ void Player_UpdateAlternateFormCue(struct Player *p)
     if (V->done)
         Anim_SetSequence(&V->sequence, V->resource, 21, 0, 0);
     V->done = PlayerCue_StepSequenceEnded(&V->sprite, &V->sequence);
-    if (H(0x222) == 21) {
+    /* Anim_SetSequence records the active sequence ID at +0xA. */
+    if (V->sequence.unknownA == 21) {
         if (V->sprite.position.pad == 1)
             V->sprite.position.y -= 10;
         else
             V->sprite.position.y += 10;
     }
     {
-        u8 *game;
+        struct GameState *game;
         if (V->sprite.position.pad == 1) {
             s16 *height = &V->sprite.position.y;
-            register u8 *volatile *address asm("r2");
-            u8 *base;
             s32 y = *height;
-            address = (u8 *volatile *)&gGameState;
-            base = *address;
-            if (y < *(s16 *)(base + 0x32) + 220)
-                *height = *(u16 *)(base + 0x32) + 220;
-            game = *address;
-        } else
-            game = *(u8 *volatile *)&gGameState;
-        V->sprite.position.x = *(u16 *)(game + 0x30) - 6;
-        V->sprite.position.z = *(u16 *)(game + 0x34) + 6;
+            if (y < gGameState->positionY + 220)
+                *height = (u16)gGameState->positionY + 220;
+            game = gGameState;
+            V->sprite.position.x = (u16)game->positionX - 6;
+            V->sprite.position.z = (u16)game->positionZ + 6;
+        } else {
+            V->sprite.position.x = (u16)gGameState->positionX - 6;
+            V->sprite.position.z = (u16)gGameState->positionZ + 6;
+        }
     }
     switch (p->tetherPhase) {
         case 0: {
@@ -172,7 +165,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
                 if (p->unk536 != 0x15 && p->unk536 != 0x31)
                     p->active = 0;
                 Player_SetActionPhase(p, 4);
-                W(0x1D0) |= 1;
+                V->sprite.flags |= 1;
             }
             break;
         case 3:
@@ -188,8 +181,8 @@ void Player_UpdateAlternateFormCue(struct Player *p)
             p->resetValue6FC = 15;
             p->tetherFrame++;
             if (p->actionMode == 2) {
-                H(0x4E6) = 6;
-                H(0x4EA) = 18;
+                p->formCueParameterA = 6;
+                p->formCueParameterB = 18;
                 Anim_SetKeyframes(&p->animation, p->animationData, 0x1AB, 1, 0);
                 Anim_Step(&p->animation, p->animationData);
             } else {
