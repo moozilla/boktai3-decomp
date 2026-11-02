@@ -13,7 +13,7 @@ struct LinkScorePanel {
     u8 state;
     u8 pad1001[7];
     s32 windows[7];
-    u8 pad1024;
+    u8 redraw;
     u8 pad1025;
     u16 timer;
     u8 pad1028[6];
@@ -34,13 +34,13 @@ void sub_0811048C(struct LinkScorePanel *);
 static inline void SetUpdate(struct LinkScorePanel *p, void (*fp)(struct LinkScorePanel *), u8 st)
 {
     p->update = fp;
-    *((u8 *)p + 0x1024) = 1;
+    p->redraw = 1;
     p->state = st;
 }
 
 void sub_08110650(struct LinkScorePanel *p)
 {
-    u8 *redraw = (u8 *)p + 0x1024;
+    u8 *redraw = &p->redraw;
     u16 *timer;
     if (*redraw) {
         Bg_SetLayerMap(3, p->layerMap, 3);
@@ -80,7 +80,7 @@ void sub_08110650(struct LinkScorePanel *p)
                 p->skip = 1;
             LinkScorePanel_UpdateRollingNumber(p);
             LinkScorePanel_UpdateNumberReveal(p);
-            LinkScorePanel_SetNumber(p, 1, *(s16 *)((u8 *)gGameState + 0x7b2));
+            LinkScorePanel_SetNumber(p, 1, gGameState->clockDisplayValue);
             (*timer)++;
         }
     } else {
