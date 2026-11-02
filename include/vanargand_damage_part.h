@@ -1,7 +1,8 @@
 #ifndef GUARD_VANARGAND_DAMAGE_PART_H
 #define GUARD_VANARGAND_DAMAGE_PART_H
 
-#include "damage_number_display.h"
+#include "contact_position.h"
+#include "damage_number_source.h"
 
 struct VanargandDamagePart {
     u8 unknown0[0x1C];
