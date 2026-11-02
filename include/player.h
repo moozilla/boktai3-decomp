@@ -51,7 +51,8 @@ struct PlayerStatModifierContext {
     struct PlayerActionEntry *actionEntry; /* owner + 0xBF0: descriptor source */
     u8 actionKind;                         /* owner + 0xBF4 */
     u8 statBOverrideEnabled;               /* owner + 0xBF5 */
-    u8 unknownB2[2];
+    u8 bufferedAttack; /* owner + 0xBF6: queues an attack restart during release */
+    u8 unknownB3;
     u16 actionDuration, actionPhase, actionTimer; /* owner + 0xBF8 */
     u16 contactParameter;                         /* owner + 0xBFE */
     u16 contactExtentA;                           /* owner + 0xC00 */
@@ -62,10 +63,13 @@ struct PlayerStatModifierContext {
     u16 contactTimer;    /* owner + 0xC0A */
     u8 contactHeading;   /* owner + 0xC0C */
     s8 savedActionIndex; /* owner + 0xC0D: snapshot from Player_GetActionIndex (tentative) */
-    u8 unknownCA[0xA];
+    u8 unknownCA;
+    u8 chargeTier;     /* owner + 0xC0F: charge attacks select tiers zero through two */
+    u16 chargeDuration; /* owner + 0xC10: initialized to 60 by attached attack setup */
+    u8 unknownCE[6];
     u8 statBOverrideMode;  /* owner + 0xC18: seven selects GameState stat B */
     u8 thresholdSatisfied; /* owner + 0xC19, tentative */
-    u8 unknownD6[2];
+    s16 previousAnimation; /* owner + 0xC1A: -1 requests a fresh attack animation */
     u8 actionSelectionDisplay[0x50]; /* owner +0xC1C: configured by 0814DE0C */
     u8 unknown128[8];
     s32 attachedEntry;              /* owner + 0xC74: negative means absent */
