@@ -5,7 +5,7 @@ void Mummy_ResumeSavedRouteAfterAnimation(void *);
 static inline void StoreHalf(struct SceneActorRegistryResetView *a, u32 v)
 {
     u32 value = v;
-    *(u16 *)((u8 *)a + 0x1EA) = value;
+    a->field1EA = value;
 }
 static inline void SetHalf(struct SceneActorRegistryResetView *a, u16 mask)
 {
