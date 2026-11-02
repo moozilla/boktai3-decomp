@@ -1639,7 +1639,6 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -1729,8 +1728,8 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
     if (done) {
         Actor_SetState(p, 3, 1);
         {
-            register void *h asm("r2") = p->handle;
-            if (h) {
+            if (p->handle) {
+                void *h = p->handle;
                 p->handle = 0;
                 Script_Call(h, 0);
             }
