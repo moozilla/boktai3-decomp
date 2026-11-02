@@ -1,9 +1,6 @@
-#include "global.h"
-struct S {
-    u8 p[0xc];
-    u32 w;
-};
-void HomingProjectile_SetBehaviorCallback(struct S *p, u32 v)
+#include "homing_projectile.h"
+
+void HomingProjectile_SetBehaviorCallback(struct HomingParams *p, HomingBehavior behavior)
 {
-    p->w = v;
+    p->behavior = behavior;
 }
