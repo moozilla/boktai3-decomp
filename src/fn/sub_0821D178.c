@@ -1,13 +1,12 @@
 #include "global.h"
 
-struct Pos {
-    s16 x, y, z, w;
-} __attribute__((aligned(4)));
+#include "contact_position.h"
 s32 Div(s32, s32);
 
-s32 sub_0821D178(struct Pos *out, struct Pos *from, struct Pos *to)
+s32 sub_0821D178(struct ContactPosition *out, struct ContactPosition *from,
+                 struct ContactPosition *to)
 {
-    struct Pos p;
+    struct ContactPosition p;
     s32 x0, z0, x1, z1;
     s32 dx, dz;
     s32 fx, fz, rx, rz;
