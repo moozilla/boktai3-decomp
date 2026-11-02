@@ -424,15 +424,13 @@ void SceneActors_AddHealthCost(int amount)
         p = SceneActors_GetBySlot(0);
         if (p) {
             int remaining, diff;
-            /* Raw offsets into groundEffect (healthCostAccumulator 0x3A0,
-             * healthCostBaseline 0x3A4): a shared SceneActorGraphics pointer
-             * changes register allocation enough to break the match. */
-            *(s32 *)((u8 *)p + 0x3a0) += amount;
-            remaining = p->health - *(s32 *)((u8 *)p + 0x3a0);
+            ((struct SceneGraphicsActor *)p)->graphics.healthCostAccumulator += amount;
+            remaining =
+                p->health - ((struct SceneGraphicsActor *)p)->graphics.healthCostAccumulator;
             if (remaining <= 1)
                 goto stop;
             {
-                diff = remaining - *(s32 *)((u8 *)p + 0x3a4);
+                diff = remaining - ((struct SceneGraphicsActor *)p)->graphics.healthCostBaseline;
                 if (diff < 0)
                     diff = -diff;
                 if (diff > 49) {
