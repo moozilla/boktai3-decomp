@@ -3,6 +3,10 @@
 
 #include "contact_position.h"
 
+struct SceneWidgetPlayback {
+    u8 priority, mode;
+};
+
 struct SceneInputResource {
     u32 words[8];
 };
