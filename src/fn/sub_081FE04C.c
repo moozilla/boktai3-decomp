@@ -15,7 +15,7 @@ struct M {
     u8 pad1a[0xe2 - 0x0];
     void *res;
     struct P p[12];
-    u8 pad[0x3A2 - 0x100 - 12 * 0x38];
+    u16 field3A0, field3A2;
 };
 
 extern void *AnimData_FindEntry(u32);
@@ -30,12 +30,12 @@ void OrbitEffect_InitTrailSprites(struct M *m)
     s16 z;
     struct P *p;
     void **r;
-    *(u16 *)((u8 *)m + 0x3a0) = 0;
-    *(u16 *)((u8 *)m + 0x3a2) = 0;
+    m->field3A0 = 0;
+    m->field3A2 = 0;
     m->res = AnimData_FindEntry(0x1c1e);
     r = &m->res;
     z = 0;
-    p = (struct P *)((u8 *)m + 0x100);
+    p = m->p;
     i = 11;
     do {
         ParticleSprite_Initialize(p, *r, 1);
