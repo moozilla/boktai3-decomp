@@ -22,9 +22,9 @@ void PlayerContact_ComputeCost(u8 *player, struct ContactCostCollider *input,
 {
     register struct ContactCostCollider *source asm("r8") = input;
     struct ContactCostCollider *target = inputTarget;
-    register u32 damage asm("r2");
+    u32 damage;
     register u32 flags asm("r1");
-    u32 blocked, vulnerable;
+    s8 blocked, vulnerable;
     register u32 common asm("r6");
     if (target->cost)
         return;
