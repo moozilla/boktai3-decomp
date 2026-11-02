@@ -1532,7 +1532,6 @@ void Actor_UpdateRotatingAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -1624,10 +1623,9 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
             p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
+            u8 one = 1;
+            p->flags |= one;
             zero = 0;
-            p->flags = mask | v;
         }
         Anim_SetSequence(&p->anim, p->arg, 0, 4, zero);
         if (p->handle) {
