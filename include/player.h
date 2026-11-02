@@ -115,7 +115,10 @@ struct Player {
     s16 velocityX; /* 0x38: direction-derived velocity */
     u16 unk3A;
     s16 velocityZ;
-    u8 unk3E[0x68 - 0x3E];
+    u8 unk3E[0x50 - 0x3E];
+    u32 visualState;
+    struct PlayerAnimation *activeAnimation;
+    u8 unk58[0x68 - 0x58];
     u16 indicatorStep; /* 0x68: cycles 0-11, driven by indicatorUpdateRate; >>2 feeds position.x (tentative) */
     u8 unk6A[2];
     u8 animationData[0x20];           /* 0x6C: keyframe resource */
@@ -312,7 +315,9 @@ struct Player {
     u8 unk5A8[0x10];
     u8 effectGroup; /* 0x5B8: scene effect group context */
     u8 movementModifierKind, unknown5BA, movementModifierActive; /* 0x5B9: tentative */
-    u8 unk5BC[0x134];
+    u8 unk5BC[4];
+    struct SceneVec *visualPosition;
+    u8 unk5C4[0x6F0 - 0x5C4];
     u16 effectPosition[3]; /* 0x6F0 */
     u8 unk6F6[2];
     u16 resetValue6F8, resetValue6FA, resetValue6FC;
