@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 #include "ram.h"
@@ -25,24 +24,13 @@ static inline s32 project(s32 input)
     s32 v = input * 3;
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
-static inline void screen(struct Vec *dst, struct Sprite *sp)
+static inline void screen(struct Vec *dst, struct Vec *src)
 {
-    u32 off = 0x1c;
-    struct Vec *t;
-    struct Vec *src;
     s32 depth, height, y, z;
-    s32 sx, sz;
-    off += (u32)sp;
-    t = (struct Vec *)off;
-    src = t;
-    sx = sp->pos.x;
-    sz = t->z;
+    s32 sx = src->x, sz = src->z;
     dst->x = project(sx - sz);
     depth = project(sx + sz);
-    {
-        struct Vec *q = src;
-        height = project(q->y);
-    }
+    height = project(src->y);
     y = depth - height;
     z = depth + height;
     dst->x = dst->x - gCameraOrigin[0] + 120;
@@ -74,14 +62,10 @@ void Sprite_RenderFlipAwareList(void)
         }
         resource = p->resource;
         if (!(p->flags & 16)) {
-            screen(&pos, p);
-            {
-                struct Vec *out = &pos;
-                DEBUG_NOP();
-                x = out->x;
-                y = out->y;
-                z = out->z;
-            }
+            screen(&pos, &p->pos);
+            x = pos.x;
+            y = pos.y;
+            z = pos.z;
         } else {
             x = p->pos.x;
             y = p->pos.y;
