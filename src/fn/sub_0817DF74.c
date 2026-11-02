@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct TimedEffectActor {
@@ -22,16 +21,17 @@ void SceneActors_ConfigureEffect(void *, unsigned, int, int);
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
+static inline void StartTimedAnimation(struct TimedEffectActor *actor, u8 *animation, u8 *state,
+                                       s32 sequence)
+{
+    u16 id = sequence;
+    SceneActors_StartEightDirectionAnimation(actor, animation, state, id, 3, 1, 4);
+}
 static inline void UpdateSequence(struct TimedEffectActor *p, u32 complete)
 {
     if (complete == 0) {
         if (p->timer == 0) {
-            u16 animation;
-            u8 *a = &p->animation;
-            u8 *st = p->animationState;
-            animation = 0x148;
-            asm("" : "+r"(animation));
-            SceneActors_StartEightDirectionAnimation(p, a, st, animation, 3, 1, 4);
+            StartTimedAnimation(p, &p->animation, p->animationState, 0x148);
         }
         p->timer++;
         if (p->timer > 0xB4) {

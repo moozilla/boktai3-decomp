@@ -86,7 +86,7 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
             *actorFlags &= mask;
             route->counter = zero;
             byteZero = 0;
-            *(u16 *)((u8 *)route + 0x14) = zero;
+            route->field14 = zero;
             route->timer = zero;
         }
         SceneActorReaction_ResetResponseState((u8 *)group + 0x8C, gUnk_0824E114, 0x60D);

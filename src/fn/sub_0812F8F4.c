@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
@@ -11,28 +10,17 @@ static inline u8 SceneActorControl_TakeFlag(u8 *flag)
     }
     return 0;
 }
-static inline u32 HasFinishedControl(struct SceneActorRegistryResetView *actor)
-{
-    register u32 offset asm("r1") = 0x2B0;
-    u8 *field;
-    /* Keep the completion-field address local to this check. */
-    field = (u8 *)actor + offset;
-    return *field;
-}
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
                                 u32 zero)
 {
-    u32 offset;
     {
         u8 *field = &actor->field2B2;
         *field = 1;
     }
-    offset = 0x2B0;
-    *((u8 *)actor + offset) = zero;
+    actor->field2B0 = zero;
     actor->field2B5 = kind;
-    offset -= 0x94;
-    *(void **)((u8 *)actor + offset) = control;
+    actor->target = control;
     actor->field2C8 = zero;
     {
         u32 *flags = &actor->flags114;
@@ -44,18 +32,15 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
 static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
                                     u32 kind)
 {
-    u32 offset;
     u32 zero;
     {
         u8 *field = &actor->field2B2;
         zero = 0;
         *field = 1;
     }
-    offset = 0x2B0;
-    *((u8 *)actor + offset) = zero;
+    actor->field2B0 = zero;
     actor->field2B5 = kind;
-    offset -= 0x94;
-    *(void **)((u8 *)actor + offset) = control;
+    actor->target = control;
     actor->field2C8 = zero;
     {
         u32 *flags = &actor->flags114;
@@ -74,7 +59,7 @@ void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView 
     if (!(u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
         result = sub_0812F3CC(actor);
         if (!result) {
-            if (HasFinishedControl(actor)) {
+            if (actor->field2B0) {
                 SceneActorAnimation_SelectDirectionalEntry(actor, 0);
                 {
                     u32 behavior = 12;

@@ -1,5 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
+#include "player.h"
 #include "global.h"
+#include "contact_actor.h"
 // confidence=low: role inferred from callers and callback phases.
 // confidence=low: charge tiers and buffered input inferred from phase transitions.
 extern const s16 gUnk_086149C4[];
@@ -21,17 +22,6 @@ s32 Player_GetAttackEffectType(u32);
 #define HELD       (**(u16 **)(p + 0x348) & 2)
 #define PRESSED    ((*(u16 **)(p + 0x348))[1] & 2)
 #define ANIMATE(n) Player_SetAnimation(p, ActorVariant_GetTableValue(BYTE(0x418), n), 64, 1)
-struct BurstA {
-    s32 a;
-    u32 b : 16;
-    u32 c : 16;
-};
-struct BurstB {
-    u32 a : 16;
-    u32 b : 16;
-    u32 c : 16;
-    u32 d : 16;
-};
 
 static inline int scale(int n)
 {
@@ -52,8 +42,8 @@ void Player_UpdateAttachedEntryPosition(void *);
 #define Player_UpdateAttachedChargeTiers sub_0814E990
 void Player_UpdateAttachedChargeTiers(u8 *p)
 {
-    struct BurstA ba;
-    struct BurstB bb;
+    struct ContactPackedVector origin;
+    struct ContactPackedVector spread;
     u16 *t;
     u16 *r;
     if (Player_ConsumeStateEntry(p)) {
@@ -79,12 +69,10 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
                 ANIMATE(0x24);
             }
             if (++*t > 6) {
-                register s32 amount asm("r2") = Player_GetSpecialAttackDescriptor(BYTE(0xBF4))[2];
-                register s32 cost asm("r2");
+                s32 cost = Player_GetSpecialAttackDescriptor(BYTE(0xBF4))[2];
                 BYTE(0xC0F) = 0;
                 HALF(0x4D2) = 0;
-                cost = ActorResponse_Apply(p, amount);
-                asm("" : "+r"(cost));
+                cost = ActorResponse_Apply(p, cost);
                 if (HALF(0x428) < cost) {
                     Sound_PlaySong(0xD5);
                     goto entryRelease;
@@ -152,15 +140,13 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
             if (*r) {
                 s32 ang, n;
                 if (*r > 5) {
-                    u32 upper = 0xFFFF0000;
-                    u32 lower = 0xFFFF;
-                    asm("" : : "r"(upper), "r"(lower));
-                    ba.a = 0;
-                    ba.b = 0;
-                    bb.a = 32;
-                    bb.b = 32;
-                    bb.c = 32;
-                    SceneParticleBurst_CreateWhilePaused(p + 0x30, &ba, &bb, 1, 3, 4);
+                    origin.x = 0;
+                    origin.y = 0;
+                    origin.z = 0;
+                    spread.x = 32;
+                    spread.y = 32;
+                    spread.z = 32;
+                    SceneParticleBurst_CreateWhilePaused(p + 0x30, &origin, &spread, 1, 3, 4);
                 }
                 ang = ((BYTE(0x3A4) + 5) & 7) << 5;
                 n = *r;
@@ -173,7 +159,7 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
             }
             break;
         case 6: {
-            register u32 pending asm("r0");
+            u32 pending;
             ANIMATE(0x24);
             if (PRESSED)
                 BYTE(0xBF6) = 1;
@@ -182,7 +168,7 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
                 *(s32 *)(p + 0xC74) = -1;
                 BYTE(0xBF6) = 0;
                 BYTE(0x458) = 1;
-            } else if (++HALF(0x45A) > 14) {
+            } else if (++((struct Player *)p)->tetherFrame > 14) {
                 BYTE(0xBF6) = 0;
                 Player_SetActionPhase(p, 7);
             }

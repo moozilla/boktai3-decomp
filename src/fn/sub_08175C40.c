@@ -1,6 +1,5 @@
 #include "global.h"
 #include "input.h"
-// MATCHING_CONCESSION: register-pinning
 void Sound_PlaySong(u32);
 void MenuSelection_RefreshOptionText(u8 *);
 s32 MenuSelection_ProcessOptionInput(u8 *s)
@@ -57,8 +56,8 @@ vertical:
             *row -= 1;
     } else {
         m = 0x80;
-        asm("" : "+r"(m));
-        if (m & keys) {
+        m &= keys;
+        if (m) {
             row = s + 0x48C0;
             if (*row == 2)
                 *row = up;

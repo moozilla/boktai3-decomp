@@ -1,6 +1,8 @@
-#include "global.h"
-void NativeEffect_SetState(u32 *p, u32 v)
+#include "scene_callback_pool.h"
+
+void NativeEffect_SetState(struct ScenePoolSlot *slot,
+                           void (*callback)(struct ScenePoolSlot *, u32))
 {
-    *p = v;
-    *(u8 *)((u8 *)p + 0xce) = 1;
+    slot->callback = callback;
+    slot->entered = 1;
 }

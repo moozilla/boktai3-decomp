@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #include "render.h"
@@ -52,66 +51,20 @@ void PlayerCue_UpdateSpiralPose(struct PlayerSpiralPose *p)
         Player_PlayLocalSong(p->song, 0x39A);
         SpiralTrail_CreateWithParticles(p, 1, 0, 0x20, 0x38);
     }
-    {
-        register u32 timerOffset asm("r3") = (u32) & ((struct PlayerSpiralPose *)0)->timer;
-        u32 t;
-        register s32 c asm("r1");
-        register u32 low asm("r2");
-        t = *(u16 *)((u8 *)p + timerOffset);
-        asm("" : : "r"(timerOffset));
-        c = 7;
-        low = c;
-        low &= t;
-        if ((s32)low >= (c - (s32)(t >> 2))) {
-            Player_SetSecondaryActionFlags(p, 0x41);
-            p->savedPosition = p->position;
-        }
+    if ((p->timer & 7) >= 7 - (p->timer >> 2)) {
+        Player_SetSecondaryActionFlags(p, 0x41);
+        p->savedPosition = p->position;
     }
     Player_SetAnimationIndex(p, 0x9a, 0x40);
     p->animationResource = ((u32)gPaletteBankData) + 0x2DE0;
-    {
-        register u32 offset asm("r3") = (u32) & ((struct PlayerSpiralPose *)0)->seq;
-        struct DisplaySequenceState *seq;
-        asm("" : "+r"(offset));
-        seq = (struct DisplaySequenceState *)((u8 *)p + offset);
-        Anim_SetSequence(seq, p->resource, 0, p->facing, p->flip);
-        {
-            register u32 spriteOffset asm("r3") = (u32) & ((struct PlayerSpiralPose *)0)->sprite;
-            asm("" : "+r"(spriteOffset));
-            PlayerCue_StepSequence((struct ContactSwarmSprite *)((u8 *)p + spriteOffset), seq);
-        }
-    }
-    {
-        u32 offset = (u32) & ((struct PlayerSpiralPose *)0)->trailResource;
-        u16 *target;
-        u32 resource;
-        target = (u16 *)((u8 *)p + offset);
-        resource = 0x16F;
-        *target = resource;
-    }
-    {
-        u32 window;
-        register u32 mask asm("r2");
-        register u32 temp asm("r3");
-        register u32 windowOffset asm("r3") = (u32) & ((struct PlayerSpiralPose *)0)->trailWindow;
-        u16 *windowField;
-        asm("" : "+r"(windowOffset));
-        windowField = (u16 *)((u8 *)p + windowOffset);
-        window = *windowField + 3;
-        *windowField = window;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        if ((u16)window > 0x20)
-            *windowField = 0x20;
-        {
-            u32 nt = p->timer + 1;
-            p->timer = nt;
-            if ((nt & mask) > 0x1f) {
-                p->completion0 = 1;
-                p->completion1 = 1;
-                Player_SetTetherMode(p, 0, 0);
-            }
-        }
+    Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
+    PlayerCue_StepSequence(&p->sprite, &p->seq);
+    p->trailResource = 0x16f;
+    if ((p->trailWindow += 3) > 32)
+        p->trailWindow = 32;
+    if (++p->timer > 31) {
+        p->completion0 = 1;
+        p->completion1 = 1;
+        Player_SetTetherMode(p, 0, 0);
     }
 }

@@ -128,7 +128,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct SceneActorRegistryResetView *act
             link->flags |= one;
         }
         {
-            void *control = *(void **)((u8 *)actor + 0x234);
+            void *control = actor->deathControl;
             Reaction_SetControl(actor, 17, control);
         }
         {
@@ -234,8 +234,8 @@ u32 SceneActorReaction_DefeatRecordStats(struct SceneActorRegistryResetView *act
                     }
                 }
             }
-            sub_08159164(*(u32 *)((u8 *)actor + 0xAC));
-            Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
+            sub_08159164(actor->fieldAC);
+            Player_RefreshLifeState(actor->field2D8, actor->fieldA1);
         }
     record:
         if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) &&
@@ -245,5 +245,5 @@ u32 SceneActorReaction_DefeatRecordStats(struct SceneActorRegistryResetView *act
     done:
         return 1;
     }
-    return (u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x268));
+    return (u8)Callback_InvokeActor(actor, actor->contactCallback);
 }

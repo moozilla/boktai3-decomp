@@ -28,7 +28,8 @@ struct ChildGroup {
     u16 damage, fieldD7A;
     u8 padD7C[0x1C];
     struct ChildGroupPosition savedPosition;
-    u8 padDA0[0x10];
+    u32 hitTimer;
+    u8 padDA4[0xC];
 };
 struct ChildGroupEvent {
     u8 pad0[0x40];
@@ -53,7 +54,7 @@ s32 ChildGroup_ProcessEvent(struct ChildGroupEvent *event, s32 kind, s32 damage)
     switch (kind) {
         case 0:
             event->timer = 0;
-            *(u32 *)((u8 *)p + 0xDA0) = 10;
+            p->hitTimer = 10;
             if (damage) {
                 p->damage = damage;
                 p->fieldD7A = 1;

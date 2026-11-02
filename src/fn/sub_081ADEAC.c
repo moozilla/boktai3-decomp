@@ -13,11 +13,6 @@ struct VanargandBackgroundAttachment {
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 u8 *sub_08216E54(u16);
 void ScreenPalette_ProjectPosition(s32, void *, s32, s32);
-static inline void Vanargand_ClearBackgroundOffset(void *destination)
-{
-    volatile u32 zero = 0;
-    CpuSet((const void *)&zero, destination, 0x05000002);
-}
 void Vanargand_InitBackgroundAttachment(u8 *owner, struct VanargandBackgroundAttachment *part,
                                         void *coordinates)
 {
@@ -27,7 +22,7 @@ void Vanargand_InitBackgroundAttachment(u8 *owner, struct VanargandBackgroundAtt
     layer = 2;
     Bg_SetupLayers(3, 0, resource, 0, 0, 1, &layer);
     part->coordinates = coordinates;
-    Vanargand_ClearBackgroundOffset(part->offset);
+    ZeroFill8(part->offset);
     part->timer = 0;
     part->enabled = 0;
     part->state = 0;

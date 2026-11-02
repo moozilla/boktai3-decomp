@@ -9,7 +9,7 @@ s32 Inventory_GetEquipmentId(u32);
 s32 Inventory_CanAssignEquipment(u32);
 s32 Inventory_IsEquipmentAssigned(u32);
 void PauseMenu_AddSpriteFlags(void *, u32, u32);
-void PauseMenu_OpenPrompt(u32, u32, u32);
+void PauseMenu_OpenPrompt(const void *, u32, u32);
 void PauseMenu_SetConfirmationIndicator(void *, u32);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -36,7 +36,7 @@ void sub_081740CC(struct SceneHudState *p)
             Sound_PlaySong(0x192);
         } else {
             PauseMenu_AddSpriteFlags(p, 0x3B, 1);
-            PauseMenu_OpenPrompt(*(u32 *)((u8 *)p + 0x5C), 2, 1);
+            PauseMenu_OpenPrompt(p->optionUpperEScript, 2, 1);
             PauseMenu_SetConfirmationIndicator(p, 0);
             MenuDisplay_SetPaletteOverrides(p, 0, 0, 1, assigned);
             Hud_SetInteractionCallback(p, MotionSequence_ResolveAlternateSelection, 1);

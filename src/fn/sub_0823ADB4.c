@@ -26,9 +26,15 @@ s32 sub_0823ADB4(u8 *p)
     u32 v = LinkPlayer_GetSessionPlayerData(p);
     *(u32 *)(p + 0x344) = v;
     *(u32 *)(p + 0x1c) = 1;
-    *(u32 *)((u8 *)gGameState + 0x628) = 0;
+    {
+        u32 *value = &gGameState->f628;
+        *value = 0;
+    }
     gGameState->f62C = 0;
-    *(u16 *)((u8 *)gGameState + 0x610) = 0;
+    {
+        u16 *value = &gGameState->f610;
+        *value = 0;
+    }
     gGameState->f612 = 0;
     LinkPlayer_InitOptionalPlayerState(p);
     LinkPlayer_LoadBaseStats(p);

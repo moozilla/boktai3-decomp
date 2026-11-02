@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "hit_switch.h"
 void SceneBody_Init(struct SceneBody *, u32, struct SceneVec *, u32, u32, struct HitSwitchEntry *);
 void TerrainOverlay_QueueAddActor(struct SceneBody *);
@@ -81,16 +80,19 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
         u32 period = Script_SeekToKeyword('W');
         if (period)
             period = Script_GetValue();
-        entry->bobPeriod = period;
+        {
+            u16 *bobPeriod = &entry->bobPeriod;
+            *bobPeriod = period;
+        }
     }
     HitSwitch_InitCollider(entry);
     {
         u8 *cooldown = &entry->hitCooldown;
-        register u32 zero asm("r0") = 0;
+        u32 zero = 0;
         *cooldown = zero;
     }
     {
-        register u32 found asm("r1") = Script_SeekToKeyword('s');
+        u32 found = Script_SeekToKeyword('s');
         if (found)
             entry->completed = Script_GetValue();
         else

@@ -133,8 +133,8 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
     p->particleEmissionCount += amount;
 done: {
     u16 f = source->contactFlags;
-    *(u16 *)((u8 *)p + 0x54E) = f;
+    p->lastContactFlags = f;
 }
-    *(u32 *)((u8 *)p + 0x550) = source->statRewardFlags;
+    p->lastContactRewardFlags = source->statRewardFlags;
     return amount;
 }

@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Collision {
     u8 pad[6];
     u16 flags;
@@ -28,13 +27,10 @@ void Actor_ClearPendingHit(struct Object *);
 static inline void enable(struct Object *p)
 {
     struct Collision *c = &p->collider;
-    {
-        register u32 old asm("r1") = c->flags;
-        register u32 result asm("r0");
-        result = old | 4;
-        asm("" : "+r"(result));
-        c->flags = result;
-    }
+    u16 old = c->flags;
+    u32 mask = 4;
+    mask |= old;
+    c->flags = mask;
 }
 static inline void disable(struct Object *p)
 {

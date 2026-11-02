@@ -1,7 +1,11 @@
 #include "status_screen.h"
 #include "render.h"
-// MATCHING_CONCESSION: register-pinning
-// The optimization override reproduces BeginClose and Reveal; it is not historical compiler evidence.
+
+static inline void StatusScreen_SetState(struct StatusScreen *p, StatusScreenFn state)
+{
+    p->state = state;
+    p->timer = 0;
+}
 
 void StatusScreen_BeginClose(struct StatusScreen *p)
 {
@@ -15,13 +19,7 @@ void StatusScreen_BeginClose(struct StatusScreen *p)
     }
     if (p->timer++ >= p->times[4]) {
         p->dirty &= ~3;
-        {
-            register void (*state)(struct StatusScreen *) = StatusScreen_Close;
-            do {
-                p->state = state;
-                p->timer = 0;
-            } while (0);
-        }
+        StatusScreen_SetState(p, StatusScreen_Close);
     }
     p->dirty |= 4;
 }
@@ -56,28 +54,16 @@ void sub_0800E974(struct StatusScreen *p)
                 *tiles++ = 0xD000;
         }
     }
-    {
-        register struct StatusScreen *phase asm("r4") = p;
-        if (phase->timer++ >= phase->times[3]) {
-            StatusScreenFn state = StatusScreen_BeginClose;
-            phase->state = state;
-            phase->timer = 0;
-        }
-        phase->dirty |= 15;
-    }
+    if (p->timer++ >= p->times[3])
+        StatusScreen_SetState(p, StatusScreen_BeginClose);
+    p->dirty |= 15;
 }
 
 void StatusScreen_WaitForClose(struct StatusScreen *p)
 {
     if (!StatusScreen_CheckConfirm(p)) {
         if (p->timer++ >= p->times[2]) {
-            {
-                register void (*state)(struct StatusScreen *) = sub_0800E974;
-                do {
-                    p->state = state;
-                    p->timer = 0;
-                } while (0);
-            }
+            StatusScreen_SetState(p, sub_0800E974);
             p->noise = StatusScreen_ClearScanlineNoise;
         }
         p->dirty |= 15;
@@ -100,12 +86,7 @@ void StatusScreen_Reveal(struct StatusScreen *p)
             p->effect = StatusScreen_FadeInPalette;
         }
         if (p->timer++ >= p->times[1]) {
-            {
-                register void (*state)(struct StatusScreen *) = StatusScreen_WaitForReveal;
-                asm("" : "+r"(p) : "r"(state));
-                p->state = state;
-            }
-            p->timer = 0;
+            StatusScreen_SetState(p, StatusScreen_WaitForReveal);
         }
         p->dirty |= 15;
     }
@@ -115,17 +96,9 @@ void StatusScreen_WaitForReveal(struct StatusScreen *p)
 {
     if (!StatusScreen_CheckConfirm(p)) {
         if (p->timer++ >= p->times[0]) {
-            do {
-                p->noise = StatusScreen_ClearScanlineNoise;
-                {
-                    register void (*state)(struct StatusScreen *) = StatusScreen_WaitForClose;
-                    p->state = state;
-                    p->timer = 0;
-                }
-            } while (0);
+            p->noise = StatusScreen_ClearScanlineNoise;
+            StatusScreen_SetState(p, StatusScreen_WaitForClose);
         }
         p->dirty |= 15;
     }
 }
-
-// CFLAGS: -O2 -mthumb-interwork -fno-expensive-optimizations

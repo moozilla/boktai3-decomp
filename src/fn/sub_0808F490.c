@@ -28,11 +28,11 @@ void Bat_UpdateActionScript(struct S *obj)
 {
     u8 *ctx = obj->ctx;
 
-    if (TakeFlag(((u8 *)obj) + 0x2B1)) {
+    if (TakeFlag(&obj->queued)) {
         obj->at59 = obj->atE9;
         SceneActorBehavior_CallActionScript((u8 *)obj);
     }
-    if (*(u8 *)((u8 *)obj + 0x2B0)) {
+    if (obj->done) {
         u32 flag = 4;
         u16 *h = (u16 *)(ctx + 0x40A);
         flag |= *h;

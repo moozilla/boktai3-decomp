@@ -10,8 +10,9 @@ void SceneActorAnimation_SelectDirectionalFlags(struct SceneActorAnimationView *
     u8 *variantPointer = &directionVariant;
     u32 flags;
     register u8 mirrorValue asm("r1");
-    register u8 entryFlags asm("r0");
+    register u16 entryFlags asm("r0");
     u8 *variantReload;
+    u16 variant;
     u32 force;
     u8 *restart;
     {
@@ -26,6 +27,7 @@ void SceneActorAnimation_SelectDirectionalFlags(struct SceneActorAnimationView *
             *variantPointer = quadrant;
         }
     }
+    variant = 0;
     variantReload = &directionVariant;
     mirrorValue = *mirrorPointer;
     entryFlags = entry->flags;
@@ -44,9 +46,7 @@ void SceneActorAnimation_SelectDirectionalFlags(struct SceneActorAnimationView *
             void *sequence = drawable->sequence;
             void *resource = (void *)drawable->resource;
             u32 selected = (u16)selection;
-            register u32 variant asm("r3");
-            variant = 0;
-            Anim_SetSequence(sequence, resource, selected, variant, flags);
+            Anim_SetSequence(sequence, resource, selected, (u8)variant, flags);
         }
         restart = &actor->restart;
     } else {
@@ -73,7 +73,6 @@ void SceneActorAnimation_SelectDirectionalFlags(struct SceneActorAnimationView *
             Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
                               actor->drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
-            asm("" : "+r"(flags));
             if (flags)
                 tile->flags |= mask;
             else

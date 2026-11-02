@@ -99,7 +99,7 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
             // Preserve the original evaluated values without changing the callee's ABI.
             asm volatile("" : "+r"(flags) : "r"(power), "r"(duration));
             Player_RequestTimedReset(p, power + 60);
-            *(u16 *)((u8 *)p + 0x4DA) = 1;
+            p->positionResetCounter = 1;
         }
         if (!p->positionResetRequested && p->positionResetTimer)
             p->positionResetTimer = 0;

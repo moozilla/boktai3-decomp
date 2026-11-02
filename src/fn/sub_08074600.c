@@ -1,20 +1,13 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_profile.h"
-s32 SceneActorProfiles_FindOrAdd(u32 argument, u32 modeArgument)
+s32 SceneActorProfiles_FindOrAdd(u32 category, u32 mode)
 {
-    register u32 category asm("r4") = argument;
-    u32 callCategory = argument;
-    register u32 mode asm("r1") = modeArgument;
     s32 index;
-    if (!mode) {
-        asm("" : "+r"(category));
+    if (mode) {
+        index = SceneActorProfiles_Add(category, mode);
+    } else {
         index = SceneActorProfiles_FindDefaultIndex(category);
-        if (index != -1)
-            goto done;
-        callCategory = category;
-        mode = 0;
+        if (index == -1)
+            index = SceneActorProfiles_Add(category, 0);
     }
-    index = SceneActorProfiles_Add(callCategory, mode);
-done:
     return index;
 }

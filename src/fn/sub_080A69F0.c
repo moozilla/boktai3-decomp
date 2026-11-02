@@ -40,9 +40,8 @@ void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, 
         scale = TentacleSpread_Scale(raw);
         direction = field;
     }
-    *(u16 *)((u8 *)actor + 0x64) +=
-        TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
-    *(u16 *)((u8 *)actor + 0x68) += TentacleSpread_Shift(gUnk_086149C4[angle] * scale, 12);
+    actor->body.motion.x += TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
+    actor->body.motion.z += TentacleSpread_Shift(gUnk_086149C4[angle] * scale, 12);
     body->spin += 12;
     n = 0;
     for (i = 0; i < body->segmentCount; i++) {
@@ -52,23 +51,23 @@ void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, 
             switch (n) {
                 case 0:
                     body->segments[i].position.x =
-                        *(u16 *)((u8 *)actor + 0x5C) -
+                        (u16)actor->body.position.x -
                         TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 54, 12);
                     body->segments[i].position.z =
-                        *(u16 *)((u8 *)actor + 0x60) -
+                        (u16)actor->body.position.z -
                         TentacleSpread_Shift(gUnk_086149C4[*direction] * 54, 12);
                     break;
                 case 1:
                     body->segments[i].position.x =
-                        *(u16 *)((u8 *)actor + 0x5C) -
+                        (u16)actor->body.position.x -
                         TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 20, 12);
                     body->segments[i].position.z =
-                        *(u16 *)((u8 *)actor + 0x60) -
+                        (u16)actor->body.position.z -
                         TentacleSpread_Shift(gUnk_086149C4[*direction] * 20, 12);
                     break;
                 default:
-                    body->segments[i].position.x = *(u16 *)((u8 *)actor + 0x5C);
-                    body->segments[i].position.z = *(u16 *)((u8 *)actor + 0x60);
+                    body->segments[i].position.x = (u16)actor->body.position.x;
+                    body->segments[i].position.z = (u16)actor->body.position.z;
                     break;
             }
             n++;

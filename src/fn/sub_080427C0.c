@@ -7,9 +7,9 @@ s32 DisplayAnimation_SetTileSource(struct DisplayAnimation *p, u32 v)
         return -1;
     }
     if (mode == 1) {
-        *(u32 *)((u8 *)p + 0x18) = v;
+        p->resource.paletteData = (const void *)v;
     } else {
-        *(u32 *)((u8 *)p + 0x74) = v;
+        p->keyframeTileSource = (const void *)v;
     }
     return 0;
 }

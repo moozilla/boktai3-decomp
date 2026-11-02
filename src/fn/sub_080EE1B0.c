@@ -1,4 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
+#include "scene_actor_behavior.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
@@ -310,8 +311,8 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         ClearPos(&vec, (vu32 *)&buf.zero);
         Polar(&vec, actor->field2B6, Rand() & 0x1F);
         vec.y = (Rand() & 0x1F) + 0x30;
-        sub_08127590(&actor->body.position, &vec, 0xD638, 0x99DD, 10, 0x1E, 2, 0, 0x12A, 0, 0, 0, 0, 0,
-                     0);
+        sub_08127590(&actor->body.position, &vec, 0xD638, 0x99DD, 10, 0x1E, 2, 0, 0x12A, 0, 0, 0, 0,
+                     0, 0);
         hidden = actor->field2DC & 0x10;
         if (hidden)
             Sound_PlaySong(0xE5);
@@ -374,18 +375,18 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         range.y = 60;
         range.z = 60;
         table = gRandomTable;
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x20, count,
-                            life, size = 2, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x40, count,
-                            life, size, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x5E, count,
-                            life, size, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x80, count,
-                            life, size, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xC4, count,
-                            life, size, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xF0, count,
-                            life, size, 1);
+        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x20,
+                            count, life, size = 2, 1);
+        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x40,
+                            count, life, size, 1);
+        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x5E,
+                            count, life, size, 1);
+        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x80,
+                            count, life, size, 1);
+        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xC4,
+                            count, life, size, 1);
+        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xF0,
+                            count, life, size, 1);
         category = actor->category;
         categoryp = &actor->category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
@@ -395,15 +396,15 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     *drawable |= 1;
     SceneActorBehavior_CallTerrainScript(actor);
     {
-        u16 script = *(u16 *)((u8 *)actor + 0x1F8);
+        u16 script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
         if (script) {
             struct ScriptUtilityArguments arguments;
             buf.values[0] = actor->body.position.x;
             buf.values[1] = actor->body.position.y;
             buf.values[2] = actor->body.position.z;
-            buf.values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-            buf.values[4] = *(s32 *)((u8 *)actor + 0x200);
-            buf.values[5] = *(s32 *)((u8 *)actor + 0x204);
+            buf.values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+            buf.values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+            buf.values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
             buf.values[6] = actor->field2E0;
             buf.values[7] = actor->body.id;
             arguments.count = 8;
@@ -418,7 +419,7 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     COUNT(0x87C);
     COUNT(0x538);
     RecordKill(actor, categoryp);
-    sub_08159164(*(u32 *)((u8 *)actor + 0xAC));
+    sub_08159164(actor->fieldAC);
     Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
     if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->body.id);

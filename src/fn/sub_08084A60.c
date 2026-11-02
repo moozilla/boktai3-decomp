@@ -1,3 +1,4 @@
+#include "scene_actor_visibility.h"
 #include "scene_actor_control_helpers.h"
 static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
 {
@@ -22,21 +23,6 @@ static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
         if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
             return 1;
     }
-    return 0;
-}
-static inline u8 IsHidden(struct SceneActorRegistryResetView *actor)
-{
-    u32 mask = 1;
-    if (!actor->drawableKind) {
-        if (*(u32 *)actor->drawable & mask)
-            goto hidden;
-        goto visible;
-    }
-    if (!(*(u32 *)((u8 *)actor->drawable + 0x28) & mask))
-        goto visible;
-hidden:
-    return 1;
-visible:
     return 0;
 }
 static inline void Hide(struct SceneActorRegistryResetView *actor)
@@ -91,7 +77,7 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
             savedFlags = flags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (!active) {
-                u32 hidden = IsHidden(actor);
+                u32 hidden = SceneActorVisibility_IsHidden(actor);
                 if (hidden) {
                     {
                         u32 offset = 0x3EE;
@@ -120,7 +106,7 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
             savedFlags = flags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (!active) {
-                u32 hidden = IsHidden(actor);
+                u32 hidden = SceneActorVisibility_IsHidden(actor);
                 if (!hidden) {
                     u32 hiddenZero = hidden;
                     {

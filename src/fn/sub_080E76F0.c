@@ -1,3 +1,5 @@
+#include "scene_actor_registry.h"
+#include "scene_actor_behavior.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -15,7 +17,7 @@ static inline u8 DrawableVisible(struct SceneActorRegistryResetView *actor)
             goto visible;
         goto hidden;
     }
-    if (*(u32 *)((u8 *)actor->drawable + 0x28) & mask)
+    if (((struct SceneActorRegistryTileDrawable *)actor->drawable)->flags & mask)
     visible:
         return 1;
 hidden:
@@ -78,14 +80,14 @@ void Mimic_UpdateDefeatBlink(struct SceneActorRegistryResetView *actor, s32 fram
         *(u32 *)actor->drawable |= 1;
         ActorShadow_Disable((u8 *)actor + 0x320);
         SceneActorBehavior_CallTerrainScript(actor);
-        script = *(u16 *)((u8 *)actor + 0x1F8);
+        script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
         if (script) {
             values[0] = actor->body.position.x;
             values[1] = actor->body.position.y;
             values[2] = actor->body.position.z;
-            values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-            values[4] = *(s32 *)((u8 *)actor + 0x200);
-            values[5] = *(s32 *)((u8 *)actor + 0x204);
+            values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+            values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+            values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
             values[6] = actor->field2E0;
             values[7] = actor->body.id;
             arguments.count = 8;

@@ -182,10 +182,10 @@ u8 sub_080D7568(struct SceneActorRegistryResetView *actor)
         if (!Mummy_TryDirectPursuit(actor))
             return 0;
         if (SceneActorChase_TrackingFlags((void *)target, 8)) {
-            if ((*(u16 *)actor->unknown2F8) != cell) {
+            if ((actor->savedTargetCell) != cell) {
                 SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
                                          &((*target))->position);
-                *(u16 *)actor->unknown2F8 = cell;
+                actor->savedTargetCell = cell;
             }
         } else
             SceneActorTarget_ResetContactResponse(actor);

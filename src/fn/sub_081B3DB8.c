@@ -47,11 +47,6 @@ static inline void AddVector(struct SceneVec *dst, struct SceneVec *a, struct Sc
     dst->y = b->y + a->y;
     dst->z = b->z + a->z;
 }
-static inline void ClearVector(struct SceneVec *dst)
-{
-    volatile u32 zero = 0;
-    CpuSet((const void *)&zero, dst, 0x05000002);
-}
 static inline void SetState(struct VanargandPart *p, u32 state)
 {
     p->control.state = state;
@@ -70,7 +65,7 @@ void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
         u8 *entered;
         p->reset = 0;
         Anim_SetSequence(&p->sequence, *((void **)(boss + 0x4d0)), 10, (u8)p->variant, 0);
-        ClearVector(&velocity);
+        ZeroFill8(&velocity);
         i = 0;
         state = &p->control;
         timer = &state->timer;

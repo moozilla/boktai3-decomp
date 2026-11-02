@@ -10,7 +10,7 @@ struct SpriteEffectDrawablePrefix {
 struct SpriteEffectTileResource {
     u16 unknown0;
     u8 flags, shape;
-    u16 tileBase;
+    u16 tileBase, paletteBank;
 };
 struct SpriteEffectTileDrawable {
     u32 flags;

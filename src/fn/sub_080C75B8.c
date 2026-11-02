@@ -159,7 +159,7 @@ void Golem_UpdateRecoil(struct SceneActorRegistryResetView *actor)
         Golem_SelectAnimation(actor, 8, directionVariant, Golem_MirrorFlags(mirror));
     }
     if (body[0x68D] == 0) {
-        switch (*(u16 *)((u8 *)actor + 0x1E6)) {
+        switch (actor->paletteOffset) {
             case 1:
             case 3:
             case 5:

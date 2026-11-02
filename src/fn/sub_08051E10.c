@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
 static inline void *resourceAt(void **resource)
 {
@@ -31,7 +30,6 @@ void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
         u32 offset = i * sizeof(struct ProximityEmitterParticle);
         u32 particleOffset = offset + 0xC0;
         struct ProximityEmitterParticle *particle;
-        u16 *active;
         particle = (void *)((u8 *)emitter + particleOffset);
         ParticleSprite_Initialize(particle, resourceAt(resource), 0);
         Effect_SetOrigin(particle, scale, scale);
@@ -43,20 +41,11 @@ void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
         }
         ((u8 *)particle)[0x10] = 20;
         particle->flags |= one;
-        active = (u16 *)((u8 *)emitter + offset + 0xF0);
         {
             u32 zero = 0;
-            DEBUG_NOP();
-            *active = zero;
+            emitter->particles[i].active = zero;
         }
     } while (++i <= 7);
-    {
-        u8 *address = &emitter->nextParticle;
-        u32 zero = 0;
-        *address = zero;
-        {
-            u16 *frameAddress = (u16 *)(address + 1);
-            *frameAddress = zero;
-        }
-    }
+    emitter->nextParticle = 0;
+    emitter->particleFrame = 0;
 }

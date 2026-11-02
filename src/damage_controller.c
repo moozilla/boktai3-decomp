@@ -27,9 +27,11 @@ void DamageController_AccumulateHit(struct DamageCollider *attack, struct Damage
 
 s32 DamageController_Update(struct DamageController *controller)
 {
-    /* The original stores these coordinates but passes separate, uninitialized
- * script descriptors. Preserve this apparent original-code bug. */
-    volatile s32 values[3];
+    /* Each script receives its separate descriptor in this block. The original
+     * writes only the hit coordinates, leaving both descriptors uninitialized. */
+    struct {
+        s32 values[3], deathArgs[2], hitArgs[2];
+    } call;
     struct DamageCollider *collider = &controller->collider;
     if (controller->cooldown) {
         controller->cooldown--;
@@ -37,25 +39,25 @@ s32 DamageController_Update(struct DamageController *controller)
     } else
         controller->collider.state &= ~4;
     if (collider->damage) {
-        s32 deathArgs[2], hitArgs[2];
+
         controller->cooldown = controller->delay;
         controller->health -= collider->damage;
         if (controller->health < 0) {
             if (controller->deathScript) {
-                values[0] = controller->hitPosition.x;
-                values[1] = controller->hitPosition.y;
-                values[2] = controller->hitPosition.z;
-                Script_Call(controller->deathScript, deathArgs);
+                call.values[0] = controller->hitPosition.x;
+                call.values[1] = controller->hitPosition.y;
+                call.values[2] = controller->hitPosition.z;
+                Script_Call(controller->deathScript, call.deathArgs);
             }
             if (controller->flags & 1)
                 Task_Kill(controller);
             else
                 controller->health = controller->maximum;
         } else if (controller->hitScript) {
-            values[0] = controller->hitPosition.x;
-            values[1] = controller->hitPosition.y;
-            values[2] = controller->hitPosition.z;
-            Script_Call(controller->hitScript, hitArgs);
+            call.values[0] = controller->hitPosition.x;
+            call.values[1] = controller->hitPosition.y;
+            call.values[2] = controller->hitPosition.z;
+            Script_Call(controller->hitScript, call.hitArgs);
         }
         collider->damage = 0;
     }

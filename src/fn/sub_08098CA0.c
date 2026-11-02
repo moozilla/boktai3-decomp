@@ -104,7 +104,7 @@ void Ghost_FollowPlayerLoop(struct SceneActorRegistryResetView *actor)
     Ghost_EmitAfterimage(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
         actor->body.direction = Math_Atan2(route->points[route->index].x - actor->body.position.x,
-                                      route->points[route->index].z - actor->body.position.z);
+                                           route->points[route->index].z - actor->body.position.z);
         Polar(&delta, actor->body.direction, route->speed);
         actor->body.motion.x += delta.x;
         actor->body.motion.z += delta.z;
@@ -124,7 +124,7 @@ void Ghost_FollowPlayerLoop(struct SceneActorRegistryResetView *actor)
         route->speed >>= 1;
         return;
     }
-    if (*(u16 *)((u8 *)actor + 0x1E6) == 0) {
+    if (actor->paletteOffset == 0) {
         if (Mod(actor->counter2AC, 16) == 0 && route->speed <= 11)
             ++route->speed;
     } else {

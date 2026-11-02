@@ -44,7 +44,9 @@ struct Vanargand {
     void *callback;
     u8 pad108[0x110 - 0x108];
     void *target;
-    u8 pad114[0x534 - 0x114];
+    u8 pad114[0x500 - 0x114];
+    u16 partActive;
+    u8 pad502[0x534 - 0x502];
     struct MotionTrack track;
     struct VanargandPair *pair;
     u8 pad570[0x57C - 0x570];
@@ -227,7 +229,7 @@ void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
                 {
                     struct PartAnimation *part = (struct PartAnimation *)((u8 *)self + 0x3FC);
                     Anim_SetSequence((u8 *)self + 0x444, part->resource, 0, 0, 0);
-                    *(u16 *)((u8 *)self + 0x500) = 1;
+                    self->partActive = 1;
                     part->cursor = 0;
                 }
             }
@@ -375,7 +377,7 @@ void Vanargand_UpdateSweepingProjectileAttack(struct Vanargand *p)
                     struct PartAnimation *part = (struct PartAnimation *)((u8 *)self + 0x3FC);
                     u32 flags = 4;
                     Anim_SetSequence((u8 *)self + 0x444, part->resource, 0, 0, flags);
-                    *(u16 *)((u8 *)self + 0x500) = 1;
+                    self->partActive = 1;
                     part->cursor = 0;
                 }
             }

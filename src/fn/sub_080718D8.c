@@ -492,9 +492,9 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
     }
     {
         u32 offset = ACTOR_OFFSET(colliderA);
-        register struct ContactCollider *collider asm("r2");
-        register u32 previous asm("r1");
-        register u32 value asm("r0");
+        struct ContactCollider *collider;
+        u32 previous;
+        u32 value;
         collider = (struct ContactCollider *)((u8 *)actor + offset);
         previous = collider->flags;
         value = 4;
@@ -504,7 +504,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
     {
         u32 offset = ACTOR_OFFSET(callback248);
         void *callback;
-        register void **address asm("r0");
+        void **address;
         address = (void **)((u8 *)actor + offset);
         callback = *address;
         if (callback)

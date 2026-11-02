@@ -57,7 +57,7 @@ void Crow_StopAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
         Add(p, &actor->body.motion);
         cell = SceneActorTerrain_GetCellIndex(&target);
         height = Height(cell, &target);
-        if (actor->groundHeight2BE + *(s16 *)((u8 *)actor + 0x2ea) < height) {
+        if (actor->groundHeight2BE + (s16)actor->field2EA < height) {
             actor->secondaryMotion.x = 0;
             actor->secondaryMotion.y = 0;
             actor->secondaryMotion.z = 0;

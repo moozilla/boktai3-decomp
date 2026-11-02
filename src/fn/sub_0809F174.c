@@ -28,8 +28,8 @@ static inline s32 Clamp(s32 n)
 }
 static inline u8 EaseMotion(struct SceneActorRegistryResetView *actor)
 {
-    s32 x = Quarter(*(s16 *)((u8 *)actor + 0x310) - *(s16 *)((u8 *)actor + 0x318));
-    s32 z = Quarter(*(s16 *)((u8 *)actor + 0x314) - *(s16 *)((u8 *)actor + 0x31C));
+    s32 x = Quarter(actor->reactionStart.x - actor->reactionEnd.x);
+    s32 z = Quarter(actor->reactionStart.z - actor->reactionEnd.z);
     if (x > 200)
         x = 200;
     else if (x < -200)
@@ -40,8 +40,8 @@ static inline u8 EaseMotion(struct SceneActorRegistryResetView *actor)
         z = -200;
     actor->body.motion.x += x;
     actor->body.motion.z += z;
-    *(s16 *)((u8 *)actor + 0x318) += x;
-    *(s16 *)((u8 *)actor + 0x31C) += z;
+    actor->reactionEnd.x += x;
+    actor->reactionEnd.z += z;
     if (x == 0 && z == 0)
         return 1;
     return 0;
@@ -91,11 +91,11 @@ void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32
     }
     if (EaseMotion(actor) && elapsed > 30) {
         u32 clearedWord;
-        u16 v = *(u16 *)((u8 *)actor + 0x178) + 10;
+        u16 v = actor->colliderA.responseValue + 10;
         u16 initialState[] = {0};
         clearedWord = 0;
 
-        *(u16 *)((u8 *)actor + 0x178) = v;
+        actor->colliderA.responseValue = v;
         actor->field2B0 = 1;
         {
             u16 *field = &actor->flags2D4;

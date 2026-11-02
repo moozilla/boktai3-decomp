@@ -1,4 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
+#include "scene_actor_state.h"
 #include "scene_actor_route.h"
 #include "script_utility.h"
 void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *);
@@ -7,7 +8,7 @@ void SceneActorRoute_AdvanceActorPoint(struct SceneActorRegistryActor *actor,
                                        struct SceneActorRouteCursor *cursor)
 {
     struct SceneActorRouteCursor *embedded = (void *)((u8 *)actor + 0x448);
-    u16 script = *(u16 *)((u8 *)actor + 0x1ec);
+    u16 script = (u16)((struct SceneActorRegistryResetView *)actor)->field1EC;
     u32 mode, near;
     if (script) {
         s32 values[3];

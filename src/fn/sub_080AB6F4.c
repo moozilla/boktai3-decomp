@@ -1,3 +1,4 @@
+#include "scene_actor_state.h"
 #include "global.h"
 #include "scene_actor_collision.h"
 
@@ -34,10 +35,10 @@ void Tentacle_FireSecondaryAttack(struct SceneActorRegistryActor *actor)
             u16 field3C, field40, field44;
             u32 reactionFlags;
             collider->flags &= ~mask;
-            field3C = *(u16 *)((u8 *)actor + 0xB6);
-            field40 = *(u16 *)((u8 *)actor + 0xBE);
-            reactionFlags = *(u32 *)((u8 *)actor + 0xD0);
-            field44 = *(u16 *)((u8 *)actor + 0xC6);
+            field3C = ((struct SceneActorRegistryResetView *)actor)->attacks.first[1];
+            field40 = ((struct SceneActorRegistryResetView *)actor)->attacks.second[1];
+            reactionFlags = ((struct SceneActorRegistryResetView *)actor)->attacks.flags[1];
+            field44 = ((struct SceneActorRegistryResetView *)actor)->attacks.parameter[1];
             Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
             return;
         }
@@ -46,10 +47,10 @@ void Tentacle_FireSecondaryAttack(struct SceneActorRegistryActor *actor)
             u16 field3C, field40, field44;
             u32 reactionFlags;
             collider->flags |= mask;
-            field3C = *(u16 *)((u8 *)actor + 0xB4);
-            field40 = *(u16 *)((u8 *)actor + 0xBC);
-            reactionFlags = *(u32 *)((u8 *)actor + 0xCC);
-            field44 = *(u16 *)((u8 *)actor + 0xC4);
+            field3C = ((struct SceneActorRegistryResetView *)actor)->attacks.first[0];
+            field40 = ((struct SceneActorRegistryResetView *)actor)->attacks.second[0];
+            reactionFlags = ((struct SceneActorRegistryResetView *)actor)->attacks.flags[0];
+            field44 = ((struct SceneActorRegistryResetView *)actor)->attacks.parameter[0];
             Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
         }
     }

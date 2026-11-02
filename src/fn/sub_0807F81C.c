@@ -79,7 +79,7 @@ u8 SceneActorTarget_UpdateTrackedContact(struct SceneActorRegistryResetView *act
                 SceneActorTarget_UpdateContactRoute(actor, savedFlags, group->route,
                                                     &actor->body.position,
                                                     &tracking->tracking.target->position);
-                *(u16 *)actor->unknown2F8 = cell;
+                actor->savedTargetCell = cell;
             }
         } else
             SceneActorTarget_ResetContactResponse(actor);

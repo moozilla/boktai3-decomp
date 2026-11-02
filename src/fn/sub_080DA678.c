@@ -11,7 +11,9 @@ void SceneActorMovement_ResolveRoutePosition(void *);
 struct MummyMotionCounters {
     u8 unknown0[0x6D0];
     u16 counter6D0, counter6D2, counter6D4, counter6D6;
-    u8 unknown6D8[0x1A];
+    u8 unknown6D8[0x6EE - 0x6D8];
+    u16 counter6EE;
+    u8 unknown6F0[2];
     u16 counter6F2;
 };
 
@@ -24,7 +26,7 @@ void Mummy_ResetRevivalMotion(struct SceneActorRegistryResetView *actor)
     body->counter6D6 = 0;
     body->counter6F2 = 0;
     actor->group.field5C4 = 0;
-    *(u16 *)((u8 *)body + 0x6EE) = 0;
+    body->counter6EE = 0;
     Mummy_ResetMotionState(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorMovement_ResolveRoutePosition(actor);

@@ -68,7 +68,7 @@ void PauseMenu_UpdateQuantityInput(struct SceneHudState *p)
             MessageWindow_ShowMessage(4);
             p->balanceLimitShown = 0;
         } else {
-            *(u32 *)((u8 *)p + 0x4008) |= 1;
+            WIDGET(p, 117).flags |= 1;
             for (i = 0; i <= 3; i++) {
                 WIDGET(p, i + 113).flags |= 1;
                 WIDGET(p, i + 118).flags |= 1;

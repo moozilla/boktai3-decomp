@@ -82,14 +82,14 @@ void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick)
         }
     }
     {
-        s32 current = *(s16 *)((u8 *)actor + 0x310);
+        s32 current = actor->reactionStart.x;
         s16 *field = (void *)((u8 *)actor + 0x318);
         s32 difference = current - *field;
         priorX = field;
         x = Quarter(difference);
     }
     {
-        s32 current = *(s16 *)((u8 *)actor + 0x314);
+        s32 current = actor->reactionStart.z;
         s16 *field = (void *)((u8 *)actor + 0x31C);
         s32 difference = current - *field;
         priorZ = field;

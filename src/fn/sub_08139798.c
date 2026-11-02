@@ -1,34 +1,13 @@
-#include "global.h"
+#include "particle_effect_state.h"
 
 /* tentative: per-frame active state: counts down, re-arms the collider and restarts the animation */
 
 #include "player_cue_sequence.h"
 #include "background_controller.h"
 
-struct BurstPos {
-    s32 x, y, z, w;
-};
 struct BurstCamera {
     u8 pad[0x44];
     s32 x;
-};
-struct BurstEntry {
-    u8 pad0[4];
-    u8 collider[0x5c];
-    struct ContactSwarmSprite sprite;
-    struct DisplaySequenceState anim;
-    void *data;
-    struct BurstPos position;
-    u8 padB0[0x10];
-    u32 yOffset;
-    u8 padC4[4];
-    u16 duration;
-    u8 active;
-    u8 dirty;
-    u16 id;
-    u8 timer;
-    u8 state;
-    u32 value;
 };
 extern const u8 gUnk_086108E8[];
 void Memory_Clear(void *, s32);
@@ -41,10 +20,10 @@ void SpriteEffect_HideWithScatterBurst(struct BurstEntry *);
 void ParticleBurstEffect_TickActive(struct BurstEntry *p)
 {
     s32 level;
-    if (p->dirty) {
+    if (p->entered) {
         p->sprite.flags &= ~1;
-        p->dirty = 0;
-        Memory_Clear(p->padB0, 0x10);
+        p->entered = 0;
+        Memory_Clear(p->velocity, sizeof(p->velocity));
         Collider_SetFixedPositionWithYOffset(p->collider, &p->position, p->yOffset);
     }
     if (p->timer) {
@@ -65,7 +44,7 @@ void ParticleBurstEffect_TickActive(struct BurstEntry *p)
 skip: {
     struct BurstPos *pos = &p->position;
     struct ContactPosition *dst = &p->sprite.position;
-    u32 yOff = p->yOffset;
+    u32 yOff = (u32)p->yOffset;
     dst->x = (pos->x >> 12) - ((struct BurstCamera *)gSceneCamera)->x;
     dst->y = ((s32)(pos->z + (pos->y + yOff)) >> 12) + 0x60;
     dst->z = pos->z >> 12;

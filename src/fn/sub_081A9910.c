@@ -3,39 +3,7 @@
 #include "engine_globals.h"
 #include "ram.h"
 // confidence=low: paired commands 3/4/5 repeat a synchronized attack before selected halves recover.
-struct Pair {
-    u8 pad0[0x205];
-    u8 first;
-    u8 pad206[0x421 - 0x206];
-    u8 second;
-};
-struct Vanargand {
-    u8 pad0[0x9C];
-    u32 flags;
-    u8 padA0[2];
-    u8 phase;
-    u8 padA3;
-    u32 timer;
-    u8 padA8[7];
-    u8 finished;
-    u8 entered;
-    u8 pending;
-    u8 padB2[0x104 - 0xB2];
-    void *callback;
-    u8 pad108[0x18C - 0x108];
-    u8 animation[0x60];
-    u8 drawable[0x56C - 0x1EC];
-    struct Pair *pair;
-    u8 pad570[0x580 - 0x570];
-    u32 selected;
-    u16 parameter584;
-    u16 parameter;
-    u16 parameter588;
-    u8 pad58A[0x5B4 - 0x58A];
-    s16 repeats;
-    u8 pad5B6[0x5C2 - 0x5B6];
-    s16 mode;
-};
+#include "vanargand_pair_attack.h"
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
@@ -49,9 +17,9 @@ static inline s32 RandomValue(void)
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 s32 ScenePair_CountPositiveCounters(void *);
-void Vanargand_UpdateSynchronizedPairAttack(struct Vanargand *p)
+void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
 {
-    struct Vanargand *self = p;
+    struct VanargandPairAttack *self = p;
     u8 result;
     {
         u32 mask = 0x40;
@@ -108,7 +76,7 @@ void Vanargand_UpdateSynchronizedPairAttack(struct Vanargand *p)
                 PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 5);
                 p->timer++;
             } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
-                struct Pair *pair;
+                struct VanargandAttackPair *pair;
                 register u32 a asm("r4");
                 u32 b;
                 asm("" : "+r"(self));
@@ -116,7 +84,7 @@ void Vanargand_UpdateSynchronizedPairAttack(struct Vanargand *p)
                 a = pair->first;
                 b = pair->second;
                 if (ScenePair_CountPositiveCounters(pair) == 2 && a == 5 && b == 5)
-                    *(u16 *)((u8 *)self + 0xF3C) = 60;
+                    self->flash = 60;
                 if (++self->repeats <= 2) {
                     p->phase = 3;
                     p->timer = 0;

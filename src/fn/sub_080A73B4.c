@@ -1,3 +1,4 @@
+#include "scene_actor_behavior.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -107,8 +108,8 @@ void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 fr
         range.x = 60;
         range.y = 60;
         range.z = 40;
-        SparkParticle_Spawn(&actor->body.position, Random4(), &range, actor->body.direction + 128, 10, 8, 2,
-                            2);
+        SparkParticle_Spawn(&actor->body.position, Random4(), &range, actor->body.direction + 128,
+                            10, 8, 2, 2);
     }
     TentacleBody_UpdateSegmentMotion(actor, frame);
     if (!Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30))
@@ -121,14 +122,14 @@ void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 fr
         if (!(actor->flags2CC & mask))
             SceneActorBehavior_CallTerrainScript((void *)actor);
     }
-    script = *(u16 *)((u8 *)actor + 0x1F8);
+    script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
     if (script) {
         values[0] = actor->body.position.x;
         values[1] = actor->body.position.y;
         values[2] = actor->body.position.z;
-        values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-        values[4] = *(s32 *)((u8 *)actor + 0x200);
-        values[5] = *(s32 *)((u8 *)actor + 0x204);
+        values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+        values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+        values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
         values[6] = actor->field2E0;
         values[7] = actor->body.id;
         arguments.count = 8;

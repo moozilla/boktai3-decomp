@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_graphics_actor.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -69,7 +69,6 @@ static inline void effect(u8 *p, int id, int mode, int duration)
         u8 *dst = p + 0x38c;
         u32 zero;
         zero = 0;
-        asm("" : "+r"(zero));
         *dst = zero;
     }
 }
@@ -77,6 +76,7 @@ void SceneActors_UpdateAnimation(void *, void *, void *);
 void SceneActors_StopBackgroundFlash(void *);
 void SceneActorAnimation_UpdateFlashPulse(ActorAnimation *p, int tick)
 {
+    struct SceneGraphicsActor *graphicsActor = (struct SceneGraphicsActor *)p;
     ActorAnimation *p2 = p;
     if (p->changed) {
         int sequence;
@@ -86,7 +86,7 @@ void SceneActorAnimation_UpdateFlashPulse(ActorAnimation *p, int tick)
         draw = (u8 *)p + 0x240;
         resource = (u8 *)p + 0x220;
         SceneActors_StartDirectionalAnimation(p, draw, resource, sequence, 2, 1, 0);
-        *(u16 *)((u8 *)p + 0x254) = 2;
+        graphicsActor->animationField254 = 2;
         SceneActors_UpdateAnimation(p, draw, resource);
         effect((u8 *)p, 826, 2, 5);
         SceneActors_StopBackgroundFlash(p2);

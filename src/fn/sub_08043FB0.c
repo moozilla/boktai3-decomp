@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 void Shadow_Initialize(void *, void *, s32);
 void ContactSwarm_ApplyHealthContact(struct ContactCollider *, struct ContactCollider *,
@@ -7,11 +6,15 @@ void ContactSwarm_IgnoreResourceContact(struct ContactCollider *, struct Contact
                                         struct ContactSwarmSlot *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
+static inline void selectSwarmSlotPalette(struct ContactSwarmGraphics *graphics)
+{
+    AnimData_SelectPaletteBank(graphics, 0x2D3);
+}
 u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSlot *slot)
 {
     struct ContactPackedVector bounds;
     struct ContactPackedVector offset;
-    void *graphics;
+    struct ContactSwarmGraphics *graphics;
     struct ContactSwarmSprite *sprite;
     void *shadow;
     struct ContactCollider *collider;
@@ -23,11 +26,7 @@ u32 ContactSwarm_InitializeSlot(struct ContactSwarm *pool, struct ContactSwarmSl
     slot->stateFrame = 0;
     graphics = &slot->display.animation.draw.graphics;
     AnimData_Load(graphics, 0xDA6D);
-    {
-        void *argument = graphics;
-        asm("" : "+r"(argument));
-        AnimData_SelectPaletteBank(argument, 0x2D3);
-    }
+    selectSwarmSlotPalette(graphics);
     sprite = &slot->display.animation.draw.sprite;
     Sprite_Init(sprite, graphics, 1);
     sprite->priority = 2;

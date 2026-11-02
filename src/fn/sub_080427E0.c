@@ -8,7 +8,7 @@ u32 DisplayAnimation_GetTileIndex(struct DisplayAnimation *p)
         return 0;
     }
     if (mode == 1) {
-        return *(u16 *)((u8 *)p + 0x12);
+        return p->resource.paletteIndex;
     }
     q = (u8 *)p + 0x2c;
     return *(u16 *)(q + 0x3a);

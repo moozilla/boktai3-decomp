@@ -42,7 +42,7 @@ static inline s32 Contains(struct TrapPosition *position, struct TerrainTrap *tr
     return 0;
 }
 
-static inline s32 Append(struct TrapProbe *p, s32 count, const u32 *serial, volatile s32 *index)
+static inline s32 Append(struct TrapProbe *p, s32 count, const u32 *serial, s32 *index)
 {
     s32 i;
     for (i = 0; i < count; i++)
@@ -56,7 +56,7 @@ static inline s32 Append(struct TrapProbe *p, s32 count, const u32 *serial, vola
     *index = count;
     return 0;
 }
-static inline s32 Remove(struct TrapProbe *p, s32 count, const u32 *serial, volatile s32 *index)
+static inline s32 Remove(struct TrapProbe *p, s32 count, const u32 *serial, s32 *index)
 {
     s32 i;
     for (i = 0; i < count; i++) {
@@ -78,7 +78,7 @@ static inline s32 Remove(struct TrapProbe *p, s32 count, const u32 *serial, vola
 }
 // confidence=low: reconciles a probe's ten tracked trap serials and dispatches enter/stay/leave events.
 #define Trap_UpdateProbeContacts sub_0821DE30
-inline static s32 Append_0821DE30(u32 *serials, s32 count, const u32 *serial, volatile s32 *index)
+inline static s32 Append_0821DE30(u32 *serials, s32 count, const u32 *serial, s32 *index)
 {
     s32 i;
     for (i = 0; i < count; i++)
@@ -98,7 +98,7 @@ inline static s32 Append_0821DE30(u32 *serials, s32 count, const u32 *serial, vo
 
 void Trap_UpdateProbeContacts(struct TrapProbe *probe)
 {
-    volatile s32 index = 0;
+    s32 index = 0;
     s32 count;
     s32 i;
     gTrapDispatchStarted = 1;

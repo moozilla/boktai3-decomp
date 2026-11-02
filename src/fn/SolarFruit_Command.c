@@ -14,7 +14,7 @@ void SolarFruit_Command(void)
         SolarFruit_SetInventorySlot(i, -1);
     for (i = 0; i <= 7; i++)
         FRUIT_SLOT(i) = -1;
-    *(u16 *)((u8 *)gGameState + 0x54) = 0;
+    gGameState->actionAuxiliarySlot = 0;
     if (Script_SeekToKeyword('n'))
         count = Script_GetValue();
     else

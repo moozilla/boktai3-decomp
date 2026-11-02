@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_control_motion.h"
@@ -60,8 +59,9 @@ static inline u32 Flags(struct SceneActorRegistryResetView *a, u32 mask)
 }
 void SceneActorRoute_UpdateAdvancePhase(struct SceneActorRegistryResetView *actor)
 {
-    register u8 *group asm("r5") = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 speed, event;
+    void **routeField;
     u16 *scale;
     if (SceneActorControl_TakeFlag(&actor->field2B1))
         BeginControlZero(actor, actor->entryTarget228, 1);
@@ -86,16 +86,17 @@ void SceneActorRoute_UpdateAdvancePhase(struct SceneActorRegistryResetView *acto
         Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
     else
         Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
-    group += 0x1FC;
-    event = NavMesh_ConsumeProbeEvent(*(void **)group);
+
+    routeField = &group->route;
+    event = NavMesh_ConsumeProbeEvent(*routeField);
     if (!event) {
-        void *descriptor = *(void **)group;
+        void *descriptor = *routeField;
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, descriptor, 32, 32, speed)) {
             State(actor, event, event, event, event);
             return;
         }
     } else {
-        void *descriptor = *(void **)group;
+        void *descriptor = *routeField;
         if (SceneActorBehavior_RequestDescriptorTurn(actor, descriptor, 32, 32, speed))
             TurnState(actor, 6);
     }

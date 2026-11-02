@@ -1,3 +1,4 @@
+#include "scene_actor_state.h"
 #include "global.h"
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
@@ -42,7 +43,7 @@ u32 Bee_Destroy(struct S *s)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = *(u32 *)((u8 *)s + 0x2d0) & m;
+    v = ((struct SceneActorRegistryResetView *)s)->flags2D0 & m;
     q = (u8 *)s + 0x50;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);

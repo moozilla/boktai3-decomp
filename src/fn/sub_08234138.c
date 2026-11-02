@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -63,9 +62,9 @@ void sub_08234138(struct S *p)
         SpriteDrawable_SelectTileFrame(e, p->frames, 7);
         Effect_SetPalette(e, 1);
         {
-            register const u16 *t asm("r5") = gRandomTable;
-            p->e[i].angle = (seed + i * 32 + (rand16t(t) & 15)) & 255;
-            p->e[i].radius = (rand16t(t) & 0x1ff) + 256;
+            union RandomTableView t = {gRandomTable};
+            p->e[i].angle = (seed + i * 32 + (rand16t(t.samples) & 15)) & 255;
+            p->e[i].radius = (rand16t(t.samples) & 0x1ff) + 256;
         }
         e->x = p->x + scale(p->e[i].radius * gUnk_086149C4[(p->e[i].angle + 64) & 255]);
         e->y = 300 + p->y;

@@ -1,3 +1,5 @@
+#include "scene_actor_registry.h"
+#include "scene_actor_behavior.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -26,7 +28,7 @@ static inline u8 Hidden(struct SceneActorRegistryResetView *a)
         else
             goto no;
     } else {
-        if (*(u32 *)((u8 *)a->drawable + 0x28) & mask)
+        if (((struct SceneActorRegistryTileDrawable *)a->drawable)->flags & mask)
             goto yes;
         else
             goto no;
@@ -45,7 +47,7 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
-        *(u16 *)((u8 *)actor + 0x2BC) = 60;
+        actor->defeatTimer = 60;
         {
             u32 index = (gRandomIndex + 1) & 1023;
             u32 value;
@@ -102,9 +104,9 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             values[0] = actor->body.position.x;
             values[1] = actor->body.position.y;
             values[2] = actor->body.position.z;
-            values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-            values[4] = *(s32 *)((u8 *)actor + 0x200);
-            values[5] = *(s32 *)((u8 *)actor + 0x204);
+            values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+            values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+            values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
             values[6] = actor->field2E0;
             values[7] = actor->body.id;
             arguments.count = 8;

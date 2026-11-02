@@ -1,3 +1,4 @@
+#include "scene_actor_contact_response.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_contact_list.h"
 #include "scene_actor_behavior.h"
@@ -57,7 +58,7 @@ s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *ac
         } else {
             cell = gTerrainMap->rows[z] + x;
         }
-        *(u16 *)((u8 *)owner + 0x2F8) = cell;
+        SceneActorContact_SaveTargetCell(owner, cell);
         {
             struct Delta *out = &delta;
             struct ContactPosition *source = &owner->body.position;

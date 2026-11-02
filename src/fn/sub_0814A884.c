@@ -37,9 +37,12 @@ void Player_AccumulateContactCost(struct PlayerContactSource *source,
             if ((Test32(&contact->reactionFlags, 0xF80)) && !p->contactCounted) {
                 s32 total, count, threshold;
                 s32 *counter;
-                (*(s32 *)((u8 *)gGameState + 0x600))++;
-                counter = (s32 *)((u8 *)gGameState + 0x600);
-                total = *(s32 *)((u8 *)gGameState + 0x604);
+                {
+                    s32 *count = (s32 *)&gGameState->unk600;
+                    (*count)++;
+                }
+                counter = (s32 *)&gGameState->unk600;
+                total = gGameState->contactThreshold;
                 threshold = total * 3 >> 2;
                 count = *counter;
                 if (count == threshold) {

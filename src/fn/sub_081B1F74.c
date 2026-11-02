@@ -1,6 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: coordinates a part strike with its opposite part.
 #include "contact_swarm.h"
 #include "scene_vec.h"
@@ -59,18 +58,6 @@ static inline void SetState(struct VanargandPart *p, u32 state)
 {
     p->state = state;
     p->timer = 0;
-}
-/* Retain the field offsets in these registers through the stores. This keeps
- * them out of reload's round-robin choices before the following burst. */
-static inline void SetRecoveryState(struct VanargandPart *p, u32 state)
-{
-    register u32 stateOffset asm("r3");
-    register u32 timerOffset asm("r6");
-    stateOffset = (u32) & ((struct VanargandPart *)0)->state;
-    p->state = state;
-    timerOffset = (u32) & ((struct VanargandPart *)0)->timer;
-    p->timer = 0;
-    asm volatile("" : : "r"(stateOffset), "r"(timerOffset));
 }
 static inline u32 ReadEnter(u8 *flag, u8 **saved)
 {
@@ -162,7 +149,9 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
                     AddVector(&position, &p->target, p->base);
                     AnimatedParticles_EmitBurst(&position, *((s16 *)(((u8 *)p) + 0xb0)), 0, 64, 4,
                                                 4, 4, 4);
-                    SetRecoveryState(p, 6);
+                    SetState(p, 6);
+                    p->enter = 1;
+                    p->finished = 1;
                 } else {
                     Sound_PlaySong(0x3d9);
                     {
@@ -171,9 +160,10 @@ void Vanargand_UpdatePartPairedStrike(u8 *boss, struct VanargandPart *p, u32 tic
                         AnimatedParticles_EmitBurst(position, heading, 0, 64, 4, 4, 4, 4);
                     }
                     SetState(p, 6);
+                    p->enter = 1;
+                    p->finished = 1;
                 }
-                p->enter = 1;
-                p->finished = 1;
+
             } else if (!(tick & 1))
                 Vanargand_EmitPartTrail(p);
             break;

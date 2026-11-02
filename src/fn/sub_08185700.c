@@ -1,23 +1,16 @@
-#include "global.h"
-struct S {
-    u8 f[0xB3D];
-    u8 st;
-    u8 g[0xB40 - 0xB3E];
-};
+#include "armor_action.h"
+
 s32 Armor_TryStartAction(void *, s32);
-void ActorController_ForceAction(void *, s32);
-void DirectionalActor_TryBeginState(void *, s32);
-void Armor_UpdateAction8(struct S *p)
+void Armor_UpdateAction8(struct ArmorActionController *p)
 {
-    u8 *q = &p->st;
-    switch (*q) {
+    switch (p->phase) {
         case 0:
             if (Armor_TryStartAction(p, 8) != 0)
-                *q = 1;
+                p->phase = 1;
             break;
         case 1:
-            if (*(u8 *)((u8 *)p + 0xB40) == 0xff)
-                *q = 0xff;
+            if (p->actionState == 0xff)
+                p->phase = 0xff;
             break;
     }
 }

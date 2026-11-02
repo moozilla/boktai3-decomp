@@ -58,6 +58,5 @@ void Ratatosk_InitFrontCollider(struct Ratatosk *p)
     }
     Collider_SetPosition(collider, &pos, 0);
     Collider_SetCallback(collider, Ratatosk_OnFrontCollision, p);
-    Collider_SetAttackProperties(collider, *(s16 *)((u8 *)p + 0xea2), *(s16 *)((u8 *)p + 0xea4), 0,
-                                 0x40000, *(s16 *)((u8 *)p + 0xea6));
+    Collider_SetAttackProperties(collider, p->attack, p->damage, 0, 0x40000, p->attackKind);
 }

@@ -43,10 +43,7 @@ static inline u32 Flag(u32 *p, u32 mask)
 }
 static inline s32 PlayerKind(void)
 {
-    u8 *player = gPlayers[0];
-    register u32 offset asm("r1") = 0x457;
-    asm("" ::"r"(offset));
-    return player[offset];
+    return gPlayers[0]->tetherMode;
 }
 // confidence=low: highlights the nearest eligible actor and invokes its script on input.
 // The mask as an inline argument matches (found by tools/fix.py).
@@ -74,11 +71,8 @@ void SceneActorAnimation_UpdateInteractionCue(struct Context *input)
         goto disableInput;
     if (playerKind != 11)
         goto inputReady;
-disableInput: {
-    register s32 zero asm("r6") = 0;
-    asm("" ::"r"(zero));
-    pressed = zero;
-}
+disableInput:
+    pressed = 0;
 inputReady:;
     {
         register u8 *rawTarget asm("r0") = context->targetActor;
@@ -147,7 +141,7 @@ selected:
             index = kind;
             cue = base + index;
             blockedMask = 0x2000;
-            asm("" ::"r"(cue), "r"(blockedMask));
+
             do {
                 if (actor == nearest && !(nearest->flags & blockedMask)) {
                     if (!nearest->cue) {

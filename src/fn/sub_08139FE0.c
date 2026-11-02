@@ -1,28 +1,11 @@
-#include "global.h"
+#include "particle_effect_state.h"
 #include "actor_attachment_state.h"
 #include "background_controller.h"
 #include "player_cue_sequence.h"
 
-struct FollowingPosition {
-    s32 x, y, z, w;
-};
 struct FollowingCamera {
     u8 unk_00[0x44];
     s32 x;
-};
-struct FollowingEffect {
-    void (*update)(struct FollowingEffect *);
-    u8 collider[0x5c];                /* 0x04 */
-    struct ContactSwarmSprite sprite; /* 0x60 */
-    struct DisplaySequenceState anim; /* 0x8c */
-    void *sequence;
-    struct FollowingPosition *anchor;  /* 0xa0 */
-    struct FollowingPosition position; /* 0xa4 */
-    u8 unk_B4[0x10];
-    s32 *height; /* 0xc4 */
-    u8 unk_C8[4];
-    u16 duration;
-    u8 active, entered;
 };
 s32 Div(s32, s32);
 void Collider_SetFixedPositionWithYOffset(void *, struct FollowingPosition *, s32);

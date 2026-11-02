@@ -19,7 +19,7 @@ void SceneActor_CallContextScriptB(struct SceneActorBehaviorView *actor)
             return;
     }
     context = ((struct SceneActorRegistryActor *)actor)->context;
-    if (!*(u16 *)((u8 *)actor + 0x1F4))
+    if (!(u16)actor->script1F4)
         return;
     values[0] = actor->position.x;
     values[1] = actor->position.y;

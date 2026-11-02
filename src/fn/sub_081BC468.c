@@ -1,8 +1,21 @@
 #include "global.h"
+struct DarkLoanWidget {
+    u8 unknown0[8];
+    u32 flags;
+    u8 unknownC[0x60 - 0xC];
+};
+struct DarkLoanAdjustment {
+    u8 task[0x18];
+    u8 resource[0x418 - 0x18];
+    struct DarkLoanWidget digits[4], separator, amountDigits[4];
+    u8 unknown778[0x8EC - 0x778];
+    u16 amountPerStep, selectedSteps;
+};
 s32 Div(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
-void DarkLoan_UpdateAdjustmentDigits(u8 *p)
+void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanAdjustment *display)
 {
+    u8 *p = (u8 *)display;
     s32 digits[4];
     s32 value, remaining, i;
     s32 *digit, *quantityDigit;
@@ -10,10 +23,10 @@ void DarkLoan_UpdateAdjustmentDigits(u8 *p)
     u8 *base, *anim;
     u32 *flags;
 
-    value = *(u16 *)(p + 0x8EE);
+    value = display->selectedSteps;
     if (value == 0) {
         base = p + 0x60;
-        data = p + 0x18;
+        data = display->resource;
         {
             s32 zero = 0;
             s32 *clear = &digits[3];
@@ -29,10 +42,10 @@ void DarkLoan_UpdateAdjustmentDigits(u8 *p)
         digits[2] = Div(value, 10);
         digits[3] = value - digits[2] * 10;
         base = p + 0x60;
-        data = p + 0x18;
+        data = display->resource;
     }
     digit = digits;
-    anim = p + 0x418;
+    anim = (u8 *)display->digits;
     flags = (u32 *)(base + 0x3C0);
     i = 3;
     do {
@@ -41,8 +54,8 @@ void DarkLoan_UpdateAdjustmentDigits(u8 *p)
         anim += 0x60;
         flags = (void *)((u8 *)flags + 0x60);
     } while (--i >= 0);
-    *(u32 *)((u8 *)p + 0x5A0) &= ~1;
-    value = *(u16 *)(p + 0x8EE) * *(u16 *)(p + 0x8EC);
+    display->separator.flags &= ~1;
+    value = display->selectedSteps * display->amountPerStep;
     if (value == 0) {
         {
             s32 zero = 0;
@@ -60,7 +73,7 @@ void DarkLoan_UpdateAdjustmentDigits(u8 *p)
         digits[3] = value - digits[2] * 10;
     }
     quantityDigit = digits;
-    anim = p + 0x5F8;
+    anim = (u8 *)display->amountDigits;
     flags = (u32 *)(base + 0x5A0);
     i = 3;
     do {

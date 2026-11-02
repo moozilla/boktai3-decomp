@@ -1,6 +1,7 @@
+#include "engine.h"
 #include "global.h"
 struct Engine {
-    u8 pad0[0x18];
+    struct Task task;
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
     u16 mask;
     s8 scroll;
@@ -27,7 +28,6 @@ struct Engine {
     u8 message[0x204];
     void *head, *tail;
 };
-void Memory_Clear(void *, int);
 #include "rfu_compat.h"
 #include "ram.h"
 #include "engine_globals.h"
@@ -39,12 +39,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->pending = 1;
 }
 void Solar_PauseMeasurement(void);
-void *Heap_Alloc(int);
-void Memory_Clear(void *, int);
-int SunClock_GetSecond(void);
 int Wireless_InitControllerFromScript(struct Engine *);
-void Task_SetCallbacks(void *, int, int);
-void Task_LinkToPriorityList(void *);
 void Heap_Free(void *);
 struct Engine *Wireless_CreateController(void)
 {
@@ -95,9 +90,9 @@ struct Engine *Wireless_CreateController(void)
         int one;
         Task_SetCallbacks(p, 0, 0);
         one = 1;
-        ((u8 *)p)[0x14] = one;
+        p->task.list = one;
         ((u8 *)p)[0x16] = one;
-        *(u16 *)((u8 *)p + 0x10) = (u32)existing;
+        p->task.id = 0;
         Task_LinkToPriorityList(p);
         gClockSynced = one;
         *singleton = p;

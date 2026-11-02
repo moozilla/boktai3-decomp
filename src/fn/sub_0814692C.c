@@ -48,7 +48,7 @@ void Player_UpdateEnergyBurst(struct Player *p)
                 Sound_PlaySong(0x2E4);
                 p->actionEighteenParameter = 0x16F;
                 p->actionEighteenDuration = 2;
-                ActorBurst_Create(p, &p->position, &p->actionOrigin, 1, *(u16 *)((u8 *)p + 0x4A2));
+                ActorBurst_Create(p, &p->position, &p->actionOrigin, 1, p->burstParameter);
             }
             ActorSequence_Begin(p, 9, 1);
             break;
@@ -61,7 +61,7 @@ void Player_UpdateEnergyBurst(struct Player *p)
             p->resetValue6FC = 15;
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 8), 64, 1)) {
                 Sound_PlaySong(0xCB);
-                if (p->actionEighteenEnabled && !*(u16 *)((u8 *)p + 0x4A2))
+                if (p->actionEighteenEnabled && !p->burstParameter)
                     gPlayerSolarActionPending = 1;
                 ActorSequence_Begin(p, 9, 2);
             }

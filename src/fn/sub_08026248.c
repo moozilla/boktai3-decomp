@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_graphics_actor.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -80,8 +81,7 @@ void SceneActorAnimation_UpdateImpactFinish(ActorAnimation *p, int tick)
         Sound_PlaySongChecked(838);
         Sound_PlaySongChecked(1334);
     }
-    *(u32 *)((u8 *)p2 + 0x33c) = 0;
-    *((u8 *)p2 + 0x340) = 0;
+    SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p2);
     {
         u32 mask = 12;
         p->flags |= mask;

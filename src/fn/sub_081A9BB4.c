@@ -18,7 +18,9 @@ struct Vanargand {
     u8 finished;
     u8 entered;
     u8 pending;
-    u8 padB2[0x104 - 0xB2];
+    u8 padB2[0xCC - 0xB2];
+    u8 requestedAngle;
+    u8 padCD[0x104 - 0xCD];
     void *callback;
     u8 pad108[0x18C - 0x108];
     u8 animation[0x60];
@@ -54,7 +56,7 @@ s32 ScenePair_CountPositiveCounters(void *);
 u32 PairedSceneActor_GetActiveMask(void *);
 static inline u8 preferSecond(struct Vanargand *p)
 {
-    u32 direction = *(u8 *)((u8 *)p + 0xCC) - 32;
+    u32 direction = p->requestedAngle - 32;
     u8 result = 1;
     if (direction <= 127)
         result = 0;

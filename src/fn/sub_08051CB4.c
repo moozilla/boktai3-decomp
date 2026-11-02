@@ -11,10 +11,12 @@ void ProximityEmitter_TickRise(struct ProximityEmitter *input)
         frame = previous + 1;
         *frameAddress = frame;
         if ((u16)frame > 14) {
-            emitter->primary.sprite.position.y = emitter->position.y + 30;
+            {
+                s16 *spriteY = &emitter->primary.sprite.position.y;
+                *spriteY = emitter->position.y + 30;
+            }
             {
                 u32 zero = 0;
-                asm("" : "+r"(zero));
                 *frameAddress = zero;
             }
             emitter->update = ProximityEmitter_TickActive;

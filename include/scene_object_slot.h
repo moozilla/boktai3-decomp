@@ -11,7 +11,8 @@ struct ObjSprite {
     u32 a, b;
 };
 struct ObjBlock {
-    u8 pad0[4];
+    u16 flags;
+    u8 pad2[2];
     u8 b4;
     u8 pad5;
     u16 w6;
@@ -34,10 +35,19 @@ struct SceneObjSlot {
     u8 pad46[2];
     s32 pad48;
     s32 value;
-    u8 pad50[0x18];
+    u8 pad50[0x10];
+    s32 raisedScript, loweredScript;
     struct Pos16 pos;
-    u32 q0, q1;
-    u32 r0, r1;
+    union {
+        struct Pair words;
+        struct Pos16 position;
+    } q0, r0; /* display and base positions, also copied as pairs of words */
+    u16 lift, timer;
+    u32 loweredPose;
+    u16 maxLift;
+    u8 pad8A[2];
 };
+
+typedef char SceneObjSlotSizeCheck[sizeof(struct SceneObjSlot) == 0x8c ? 1 : -1];
 
 #endif

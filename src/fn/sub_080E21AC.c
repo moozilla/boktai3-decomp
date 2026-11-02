@@ -1,3 +1,4 @@
+#include "scene_actor_behavior.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -51,7 +52,7 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
             *field &= mask;
             zero = 0;
             control->counter = zero;
-            *(u16 *)((u8 *)control + 0x14) = zero;
+            control->field14 = zero;
             control->timer = zero;
         }
         {
@@ -74,14 +75,14 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
         if (instant) {
             actor->field2B0 = 1;
             SceneActorControl_CallContextScript(actor);
-            script = *(u16 *)((u8 *)actor + 0x1F8);
+            script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
             if (script) {
                 values[0] = actor->body.position.x;
                 values[1] = actor->body.position.y;
                 values[2] = actor->body.position.z;
-                values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-                values[4] = *(s32 *)((u8 *)actor + 0x200);
-                values[5] = *(s32 *)((u8 *)actor + 0x204);
+                values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+                values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+                values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
                 values[6] = actor->field2E0;
                 values[7] = actor->body.id;
                 arguments.count = 8;

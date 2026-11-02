@@ -3,7 +3,9 @@
 #include "player_cue_sequence.h"
 
 struct P {
-    u8 pad0[0x14C];
+    u8 pad0[0x30];
+    struct SceneVec position;
+    u8 pad38[0x14C - 0x38];
     struct ContactSwarmSprite sprite;
     u8 pad1[0x3A2 - 0x14C - sizeof(struct ContactSwarmSprite)];
     u8 facing, flip, dir;
@@ -83,8 +85,8 @@ void PlayerCue_UpdateTerrainSlide(struct P *p)
                 s32 dx, dz;
                 a47c = (u8 *)p + o47c;
                 target = *(s16 **)a47c;
-                dx = target[0] - *(s16 *)((u8 *)p + 0x30);
-                dz = target[2] - *(s16 *)((u8 *)p + 0x34);
+                dx = target[0] - p->position.x;
+                dz = target[2] - p->position.z;
                 H(0x38) = Scale3(dx);
                 H(0x3C) = Scale3(dz);
                 {

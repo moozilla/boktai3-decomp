@@ -1,5 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_facing.h"
+
 #include "engine_globals.h"
 
 // 32 differing instruction runs; size +4 bytes; first diff at +0xA (adds r5, r1, #0 vs adds r4, r1, #0)
@@ -129,21 +130,8 @@ void SceneActorAnimation_UpdateWalkToPosition(void *unused, struct Actor *arg)
                 u8 *out = savedAngle;
 
                 *out = value;
-                {
-                    register s32 shifted asm("r2") = value + 112;
-                    s32 mask;
-                    asm("" : "+r"(shifted));
-                    shifted >>= 5;
-                    mask = 7;
-                    p->facing8 = mask & shifted;
-                }
-                {
-                    s32 mask;
-                    s32 shifted = (value + 96) >> 6;
-                    mask = 3;
-                    mask &= shifted;
-                    p->facing4 = mask;
-                }
+                p->facing8 = SceneFacing_EightWay(value);
+                p->facing4 = SceneFacing_FourWay(value);
             }
             Actor_PlayAnimationEntry(p, 1, 1, 0, 1);
         }

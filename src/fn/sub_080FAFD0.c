@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
@@ -19,28 +18,14 @@ struct AxeCooldownActor {
     struct AxeCooldownState *state;
 };
 
-#define TRUNCATE_QUARTER(out, input)                                                               \
-    do {                                                                                           \
-        s16 value = (input);                                                                       \
-        if (value >= 0)                                                                            \
-            (out) = value >> 2;                                                                    \
-        else                                                                                       \
-            (out) = -(-value >> 2);                                                                \
-    } while (0)
-
-static inline s32 HealthThreshold(u16 health, s16 original)
-{
-    s32 quarter;
-    TRUNCATE_QUARTER(quarter, health);
-    return original - quarter;
-}
-
 void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor)
 {
     struct AxeCooldownState *state = actor->state;
     s32 i;
-    int zero;
+    s32 health, quarter;
+    s16 value;
     s16 *healthField;
+    s32 zero;
     if (Script_SeekToKeyword(0x50) != 0) {
         for (i = 0; i <= 3; i++) {
             state->lengths[i] = Script_GetPc() ? Script_GetValue() : 0;
@@ -48,10 +33,18 @@ void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor)
     }
     healthField = &actor->health;
     zero = 0;
-    for (i = 3; i >= 0; i--)
+    for (i = 3;; --i) {
+        if (i < 0) {
+            quarter = *healthField;
+            health = quarter;
+            break;
+        }
         state->timers[i] = zero;
-    {
-        s32 health = *healthField;
-        state->healthThreshold = HealthThreshold(health, *healthField);
     }
+    value = quarter;
+    if (value >= 0)
+        quarter = value >> 2;
+    else
+        quarter = -(-value >> 2);
+    state->healthThreshold = health - quarter;
 }

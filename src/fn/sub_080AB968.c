@@ -69,16 +69,16 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
     struct SceneActorRegistryResetView *s = input;
     if (TakeEntry((u8 *)s)) {
         SetControl(s, TentacleBody_UpdateChargeSpread, 0x23);
-        *(u16 *)((u8 *)s + 0x2e8) = 8;
+        s->field2E8 = 8;
     }
     {
-        s32 x = *(s16 *)((u8 *)s + 0x2ec);
+        s32 x = s->secondaryMotion.x;
         s32 ax = x;
         s32 z;
         s32 az;
         if (x < 0)
             ax = -x;
-        z = *(s16 *)((u8 *)s + 0x2f0);
+        z = s->secondaryMotion.z;
         az = z;
         if (z < 0)
             az = -z;

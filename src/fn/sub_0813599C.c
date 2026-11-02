@@ -1,7 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 /* SceneActorReaction_ApplyEscalatingHit: for category-1 actors flagged 4 at +0x2DC, applies a hit whose damage doubles per stored hit count (+0x47E), shows HUD/damage numbers, restarts the route and flashes the palette; returns 1 when applied (provisional) */
 #include "scene_actor_reset.h"
+#include "scene_actor_chase_types.h"
 #include "area_effect_link.h"
 #include "render.h"
 #include "scene_actor_damage_visibility.h"
@@ -50,11 +50,10 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
                 u32 mask = ~2;
                 *flags2D0 &= mask;
             }
-            asm("" : "+r"(flags2D0));
             {
-                u16 *flags = &actor->flags2D6;
+                struct SceneActorChaseFlags16 *flags = (void *)&actor->flags2D6;
                 s32 mask = ~0x9CB;
-                *flags &= mask;
+                flags->value &= mask;
             }
             {
                 u32 mask = ~0x4000;

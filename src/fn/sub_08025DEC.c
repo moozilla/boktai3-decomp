@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_graphics_actor.h"
 #include "engine_globals.h"
 #include "ram.h"
 typedef struct ActorAnimation {
@@ -133,7 +134,7 @@ void SceneActorAnimation_UpdateChargeShotRelease(ActorAnimation *p, int tick)
             vector((s16 *)&spawn, (p->facing * 64) - 64, 110);
         add(&spawn, (Vec *)(position + 12));
         spawn.y += 300;
-        power = *(s16 *)((u8 *)p2 + 0x36c);
+        power = ((struct SceneGraphicsActor *)p2)->graphics.chargeShotPower;
         direction = turn(p->requestedAngle, position[9]);
         gRandomIndex = (gRandomIndex + 1) & 1023;
         {

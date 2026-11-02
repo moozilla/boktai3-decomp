@@ -96,9 +96,9 @@ static inline void ActorStatus_StoreByte(u8 *field, u8 value)
 static inline void ActorStatus_SetPalette(struct SceneActorRegistryResetView *actor, u32 idx)
 {
     if (actor->drawableKind == 0)
-        AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, idx);
+        AnimData_SelectPaletteBank(((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->animation, idx);
     else
-        *(u8 **)((u8 *)actor->drawable + 0x68) = gPaletteBankData + (idx << 5);
+        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette = gPaletteBankData + (idx << 5);
 }
 
 static inline u8 ActorStatus_IsDown(void *object)
@@ -177,7 +177,7 @@ static inline struct SceneEnvironmentSnapshot SceneEnvironment_Read(void)
 {
     struct SceneEnvironmentSnapshot result;
     result.linkMode = SceneActorChase_Test(gEngineFlags, 0x4800);
-    result.solarLevel = *(s16 *)((u8 *)gGameState + 0x876);
+    result.solarLevel = gGameState->unk876;
     return result;
 }
 

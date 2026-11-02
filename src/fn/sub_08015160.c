@@ -62,7 +62,6 @@ int AnimatedParticleManager_Update(struct Manager *m)
             struct Obj *o = sprites;
             struct Anim *a;
             const u16 *entry;
-            register u16 n asm("r0");
             int done;
             if (cursor->timer >= cursor->horizontalStart) {
                 p->horizontalScale = scale8(cursor->horizontalScale, cursor->horizontalDecay);
@@ -81,11 +80,12 @@ int AnimatedParticleManager_Update(struct Manager *m)
             entry = a->data + a->frame;
             o->frame = *entry >> 6;
             {
-                u32 input = a->flags;
-                register u32 left asm("r2") = 1;
-                u32 mask = 1;
-                left &= input;
-                if (left != (((*entry & 0x30) >> 4) & mask))
+                union DisplaySequenceControl control;
+                u32 bit, first;
+                control.raw = a->flags;
+                bit = 1;
+                first = (u8)(control.raw & bit);
+                if (first != (((*entry & 0x30) >> 4) & bit))
                     o->flags |= 4;
                 else
                     o->flags &= ~4;
@@ -99,8 +99,7 @@ int AnimatedParticleManager_Update(struct Manager *m)
                 else
                     o->flags &= ~8;
             }
-            n = ++a->timer;
-            if (n >= a->rate) {
+            if (++a->timer >= a->rate) {
                 a->timer = 0;
                 if (a->flags & 4) {
                     if (a->frame == 0) {

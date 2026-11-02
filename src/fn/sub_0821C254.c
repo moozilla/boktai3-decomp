@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
@@ -22,9 +21,14 @@ u32 sub_0821BF5C(struct Pos *from, struct Pos *to, u8 kind);
 #define LO(v) (((v) << 8) + 1)
 #define HI(v) ((((v) + 1) << 8) - 1)
 
+static inline u32 AcceptPosition(struct Pos *destination, const struct Pos *candidate)
+{
+    *destination = *candidate;
+    return 1;
+}
 u32 sub_0821C254(struct SurfaceTrack *t, struct Pos *from, struct Pos *destination, u32 kindArg)
 {
-    register struct Pos *to asm("r5") = destination;
+    struct Pos *to = destination;
     u8 kind = kindArg;
     struct Pos p;
     struct TerrainGrid *grid;
@@ -60,11 +64,11 @@ u32 sub_0821C254(struct SurfaceTrack *t, struct Pos *from, struct Pos *destinati
                 p = *to;
                 p.x = (Mod(t->cell, grid->width) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
-                    goto copy;
+                    return AcceptPosition(to, &p);
                 p = *to;
                 p.z = (Div(t->cell, grid->width) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
-                    goto copy;
+                    return AcceptPosition(to, &p);
                 to->x = (Mod(t->cell, grid->width) << 8) + 1;
                 to->z = (Div(t->cell, grid->width) << 8) + 1;
                 break;
@@ -72,11 +76,11 @@ u32 sub_0821C254(struct SurfaceTrack *t, struct Pos *from, struct Pos *destinati
                 p = *to;
                 p.z = (Div(t->cell, grid->width) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
-                    goto copy;
+                    return AcceptPosition(to, &p);
                 p = *to;
                 p.x = (Mod(t->cell, grid->width) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
-                    goto copy;
+                    return AcceptPosition(to, &p);
                 to->x = (Mod(t->cell, grid->width) << 8) + 1;
                 to->z = (Div(t->cell, grid->width) << 8) + 1;
                 break;
@@ -92,11 +96,11 @@ u32 sub_0821C254(struct SurfaceTrack *t, struct Pos *from, struct Pos *destinati
                 p = *to;
                 p.x = ((Mod(t->cell, grid->width) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind))
-                    goto copy;
+                    return AcceptPosition(to, &p);
                 p = *to;
                 p.z = (Div(t->cell, grid->width) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
-                    goto copy;
+                    return AcceptPosition(to, &p);
                 to->x = ((Mod(t->cell, grid->width) + 1) << 8) - 1;
                 to->z = (Div(t->cell, grid->width) << 8) + 1;
                 break;
@@ -104,11 +108,11 @@ u32 sub_0821C254(struct SurfaceTrack *t, struct Pos *from, struct Pos *destinati
                 p = *to;
                 p.z = (Div(t->cell, grid->width) << 8) + 1;
                 if (sub_0821BF5C(from, &p, kind))
-                    goto copy;
+                    return AcceptPosition(to, &p);
                 p = *to;
                 p.x = ((Mod(t->cell, grid->width) + 1) << 8) - 1;
                 if (sub_0821BF5C(from, &p, kind))
-                    goto copy;
+                    return AcceptPosition(to, &p);
                 to->x = ((Mod(t->cell, grid->width) + 1) << 8) - 1;
                 to->z = (Div(t->cell, grid->width) << 8) + 1;
                 break;

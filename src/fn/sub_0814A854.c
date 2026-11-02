@@ -1,16 +1,15 @@
-#include "global.h"
-
-// MATCHING_CONCESSION: register-pinning
+#include "player.h"
 u32 Callback_InvokeActor(void *, void *);
-u32 ActorFlags_GetResponseBits(u8 *p)
+u32 ActorFlags_GetResponseBits(struct Player *p)
 {
     u32 result = 0;
-    register s32 i asm("r6") = 0;
-    void **callback = (void **)(p + 0xC8C);
-    do {
+    s32 i = 0;
+    void **callback = p->flagCallbacks;
+    for (;;) {
         if (*callback)
             result |= Callback_InvokeActor(p, *callback);
-        ++callback;
-    } while (++i <= 2);
-    return result;
+        callback++;
+        if (++i > 2)
+            return result;
+    }
 }
