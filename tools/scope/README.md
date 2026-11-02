@@ -134,7 +134,8 @@ python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a
 python3 tools/scope/scope.py FILE.c pre           gcse's PRE replacements by expression: C names, pool values, where
                                                   it is computed and inserted, the lines replaced, AGBCC_NOPRE=k scores
 python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
-python3 tools/scope/scope.py FILE.c pins [FUNC]   FUNC's pins / barriers (and its inline helpers'): each alone, grouped, all; greedy removal
+python3 tools/scope/scope.py FILE.c pins [FUNC]   FUNC's pins / barriers (and its inline helpers'): each alone, grouped, all; greedy removal;
+                                                  with none, the do/while(0) statement macros FUNC uses (their loop doubles flow's refs)
 python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or `try KNOB={a,b}`: one variant per knob value), best first (by shape distance), ~12 ms each
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
@@ -1238,7 +1239,6 @@ Each was read from the compiler source and confirmed on a live draft.
    for a sample address where the draft has `adds rD, rT, rD`. An array read used directly as
    a memory operand (`samples_[index_]`) is index first already (expand_expr's EXPAND_SUM
    path puts a multiplication first).
-
 50. **gcse moves a computation that follows an inner loop to before that loop.** agbcc's PRE
    uses the old block-based lazy code motion (lcm.c: EARLY, DELAY, LATE, ISOLATED). DELAY is
    a minimal fixpoint (DELAYOUT starts at zero), so the delay of an insertion stops at every
@@ -1259,6 +1259,19 @@ Each was read from the compiler source and confirmed on a live draft.
    * by the equations, also when x is set in the block before the loop or inside it (not
      checked on a draft).
    `pre` flags each such move ("moved above a loop").
+51. **A 0/1 flag survives only when its test reads a different REG from its sets.** For
+   `if (c) x = 1; else x = 0; if (x) ...` jump.c (the cc0 branch of jump_optimize, in both jump
+   passes) redirects a simple jump whose previous insn sets a register to a constant past a
+   following `tst` of the same register rtx, to wherever that constant sends it; cse's path
+   following then removes the fall-through test too, and the listing loses `movs rX, #1; b;
+   movs rX, #0; cmp rX, #0`. The test must be a pointer-equal REG, so a copy at the join is no
+   cure: combine folds it back, and after reload a pseudo's hard REG is still its own rtx. A
+   predicate inline returning u8 (`static inline u8 IsX(...) { if (c) return 1; return 0; }`,
+   used as `if (IsX(...))`) keeps the ROM's blocks: the caller tests a QImode subreg, which
+   combine reduces with nonzero_bits but which after reload is a fresh `(reg:QI)`, so neither
+   pass sees the same register. A wider return (u32, s32) threads like the plain variable.
+   SceneActorMovement_UpdateHeight has two such flags (category in a set, and a status bit),
+   both formerly kept by empty asm barriers.
 
 ## Survey: random table as a literal address (2026-10-24)
 

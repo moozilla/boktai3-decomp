@@ -14,7 +14,8 @@
   scope.py FILE.c life NAME...  the insns flow counts toward a value's live length, by C line
   scope.py A.c vs B.c [FUNC]    two drafts' register allocation side by side (rank, priority, refs/live)
   scope.py FILE.c pins [FUNC]   cost of removing each pin / asm barrier of FUNC and its inline helpers, alone
-                                and grouped (all, per helper, per variable); writes FUNC.no_pins.c
+                                and grouped (all, per helper, per variable); writes FUNC.no_pins.c; with none,
+                                names the unit's do/while(0) statement macros FUNC uses
   scope.py census [CALLEE]      every pin/barrier in matched code grouped by the call it serves, with
                                 clean and draft sites of the same call: missing helpers show up as groups
   scope.py rom FUNC|ADDR        FUNC's ROM listing with calls and literal symbols named (no draft needed)
@@ -42,6 +43,7 @@
   scope.py like FUNC|ADDR [N]   matched functions whose ROM shares the most rare 3-insn windows with
                                 FUNC's, with the calls and constants they share: whose C to read first
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
+                                (FILE.c FUNC insn/uses/life/vs/put ... also works: FUNC moves last)
   scope.py uses REG... [PASS...] [FUNC]   insns (uid@C line) using each pseudo after each pass
 
 One compile with the instrumented agbcc (-g -dp -da) gives the code, the C line of every
@@ -1060,6 +1062,12 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
             print(f"{ln}: the ROM's loop counts its counter down to 0 (loop.c reversed it), the draft's"
                   f" counts up: let nothing but the test read the counter, and end the loop in its test (a"
                   f" do-while condition, or a `break` the loop rotates to its end) (README fact 40)")
+    for i, ln in flag_thread_hints(rows_json)[:3]:
+        print(f"line {ln}: the ROM keeps a 0/1 flag (`{rows_json[i]['rom']}`, a jump, the other constant,"
+              f" `cmp #0`) that the draft's jumps skip: jump.c threads a jump after a constant set past a"
+              f" test of the same register. Return the flag from an inline predicate typed u8"
+              f" (`static inline u8 IsX(...) {{ if (c) return 1; return 0; }}`, tested as `if (IsX(...))`):"
+              f" its test reads a QImode subreg, a different register after reload (README fact 51)")
     try:
         cross = cross_jump_hints(rows_json, cross_merges(open(os.path.join(wd, "stderr.txt")).read(),
                                                          info["obj_name"]),
@@ -1973,6 +1981,43 @@ def reversed_loop_hints(rows):
                     break
         if steps == 2:
             out.append((i, r.get("line") or f"at ROM {r['rom_addr']}", "rom"))
+    return out
+
+
+def flag_thread_hints(rows):
+    """[(row index, line)] where the ROM keeps a materialized 0/1 flag the draft has lost: on the
+    ROM side `movs rX, #A`, `b`, (pool words), `movs rX, #B`, `cmp rX, #0` with {A, B} = {0, 1},
+    and at least one of those insns missing from the draft. jump.c threaded the draft's jumps past
+    the test (README fact 51)."""
+    seq = [(i, r["rom"]) for i, r in enumerate(rows)
+           if r["rom"] and not r["rom"].startswith(".") and r["rom"] != "movs r0, r0"]
+    out = []
+    for k in range(len(seq) - 3):
+        (i0, a), (_, b), (_, c), (i3, d) = seq[k:k + 4]
+        m1, m2 = re.match(r"movs (r\d), #([01])$", a), re.match(r"movs (r\d), #([01])$", c)
+        if not (m1 and m2 and b.startswith("b ") and m1.group(1) == m2.group(1)
+                and m1.group(2) != m2.group(2) and d == f"cmp {m1.group(1)}, #0"):
+            continue
+        if any(rows[j]["tag"] == "-" for j in range(i0, i3 + 1)):
+            line = next((rows[j].get("line") for j in list(range(i3, len(rows))) + list(range(i0, -1, -1))
+                         if rows[j].get("line")), "?")
+            out.append((i0, line))
+    return out
+
+
+def statement_macros(text, reach, starts):
+    """[(name, 1-based line)] for each `#define NAME(...) do {` macro the unit defines and uses inside
+    the functions REACH covers (the first use): the single-use statement macros CLAUDE.md counts as
+    a matching concession."""
+    out = []
+    for m in re.finditer(r"^#define\s+(\w+)\([^)]*\)\s*\\?\s*\n?\s*do\s*\{", text, re.M):
+        name = m.group(1)
+        for u in re.finditer(r"\b%s\s*\(" % re.escape(name), text):
+            if u.start() == m.start(1):
+                continue
+            if not reach or any(a <= u.start() < b for a, b in reach.values()):
+                out.append((name, text.count("\n", 0, u.start()) + 1))
+                break
     return out
 
 
@@ -3540,6 +3585,15 @@ def cmd_pins(src, func, env):
         print(f"{src}: no register pins or empty asm barriers in {func} or the inline helpers it reaches"
               + note_others)
         header_pins(text, reach, func)
+        macros = statement_macros(text, reach, starts)
+        if macros:
+            print("  statement macros (do/while(0) bodies), a concession too: "
+                  + ", ".join(f"{name} (line {use})" for name, use in macros)
+                  + ". Write their statements in place. The loop each makes weights every mention inside it"
+                  " twice in flow's refs (loop_depth), so a value one sets or reads can lose priority without"
+                  " it: `life NAME` counts mentions in a loop, and `FILE.c vs MACRO.c` shows whose rank moved;"
+                  " give that value its extra mention in ordinary C (Spider_BeginPlayerPursuit: its mask clear"
+                  " written in both failure branches)")
         return 0
     base = run(text, "base")
     print(f"{func}: {show(base)} with all {len(sites)} concessions"
@@ -4331,7 +4385,11 @@ def explain_regmove(wd, uid, gone, new, nm, at):
               f" {a} is still used after insn {u} (so it does not die there), or {a} or {b} is read between"
               f" {a}'s set and insn {u}, or a label, branch or call separates them, or {a} is a constant set in"
               " another block. Levers: use the value again later, compute it in its own statement before an"
-              " if, or give the result its own variable that is read before the operation.")
+              " if, or give the result its own variable that is read before the operation. For a"
+              " byte read and masked (`u8` flags), read it into a byte union and narrow the and:"
+              " `control.raw = a->flags; first = (u8)(control.raw & bit);` (DisplaySequence_ApplyFrame,"
+              " include/display_sequence_inline.h; it matched AnimatedTile_TickAlternateAnimation where"
+              " `u8 left`/`u8 input` did not).")
     # the same tie in other inlined copies of this code: same pattern up to register numbers
     shape = lambda r: re.sub(r"\(reg(/\w)*:(\w+) \d+\)", r"(reg:\2)", r or "")
     rowline = {}
@@ -7207,11 +7265,28 @@ def validate_cli(args):
         cli_error("FILE.c [FUNC] [KNOB=V...]")
 
 
+FUNC_LAST_COMMANDS = ("vs", "insn", "uses", "life", "put", "pins")
+
+
+def func_first_args(args):
+    """FILE.c FUNC insn UID (likewise vs/uses/life/put): these subcommands take FUNC last;
+    accept it before the subcommand too, as why/probe/frame do, by moving it to the end."""
+    words = [i for i, a in enumerate(args) if "=" not in a]
+    if (len(words) >= 3 and args[0].endswith(".c") and words[0] == 0
+            and args[words[2]] in FUNC_LAST_COMMANDS
+            and re.fullmatch(r"[A-Za-z_]\w*", args[words[1]])
+            and args[words[1]] not in FUNC_LAST_COMMANDS):
+        func = args[words[1]]
+        return [a for i, a in enumerate(args) if i != words[1]] + [func]
+    return args
+
+
 def main():
     args = sys.argv[1:]
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
         return 0
+    args = func_first_args(args)
     validate_cli(args)
     if args[0] == "fields":  # fields OFF... [STRUCT]: which structs have members at these offsets
         offs, names = [], []
