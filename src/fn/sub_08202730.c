@@ -70,7 +70,7 @@ static inline u32 FrameFactor(u16 v)
 }
 static inline void Polar(struct ProjPos *d, struct ProjParams *p)
 {
-    register struct ProjPos *dst asm("r5") = d;
+    struct ProjPos *dst = d;
     s32 angle = p->angle;
     s32 speed = p->speed;
     dst->x = Truncate(speed * gUnk_086149C4[(angle + 0x40) & 0xff]);
@@ -149,13 +149,10 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
                 s32 x = o->pos.x >> 8;
                 s32 z = v->z >> 8;
                 s32 index;
-                register u32 dummy asm("r5");
-                asm("" : "=r"(dummy));
                 if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                     index = 0;
                 else
                     index = gTerrainMap->rows[z] + x;
-                asm("" ::"r"(dummy));
                 if ((u32)((*CellData(index) & 0xf) << 8) <= o->pos.y)
                     goto alive;
             }
@@ -166,7 +163,7 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
             }
         alive:
             if (cursor->params.script) {
-                register struct ProjSprite *s asm("r4") = spr;
+                struct ProjSprite *s = spr;
                 struct ProjAnim *a = &base->anim;
                 const u16 *entry = cursor->anim.data + cursor->anim.frame;
 
