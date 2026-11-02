@@ -59,7 +59,8 @@ void Storage_BeginSwapTransition(u8 *p)
     u32 enabled[2];
     u32 frames[2];
     u32 attributes[2];
-    s32 mode = ((struct StorageScreen *)p)->categoryKinds[((struct StorageScreen *)p)->category] >> 1;
+    s32 mode =
+        ((struct StorageScreen *)p)->categoryKinds[((struct StorageScreen *)p)->category] >> 1;
     u8 *slots;
     u32 *enabledBase;
     u32 *frameBase;
@@ -71,6 +72,7 @@ void Storage_BeginSwapTransition(u8 *p)
          i < 2; i++) {
         u32 selected;
         u32 frame;
+        s32 item;
         slots = ((struct StorageScreen *)p)->slots;
         if (i == 0)
             selected = ((struct StorageScreen *)p)->savedSelection;
@@ -79,26 +81,24 @@ void Storage_BeginSwapTransition(u8 *p)
         ((struct SwapFlags *)p)->widgets[selected + 8].flags |= 1;
         switch (mode) {
             case 0: {
-                register s32 id asm("r2") = Inventory_GetItemId(slots[selected]);
-                enabledBase[i] = id >= 0;
-                frame = Selection_GetDisplayFrame(id);
+                item = Inventory_GetItemId(slots[selected]);
+                enabledBase[i] = item >= 0;
+                frame = Selection_GetDisplayFrame(item);
                 break;
             }
 
             case 1: {
                 s32 slot = Storage_FindEquippedItemSlot(p, slots[selected]);
-                register s32 id asm("r2");
                 if (slot >= 0)
                     Storage_EquipmentWidget(p, slot)->flags |= mode;
-                id = Inventory_GetEquipmentId(slots[selected]);
-                enabledBase[i] = id != 255;
-                frame = id + 0xF0;
+                item = Inventory_GetEquipmentId(slots[selected]);
+                enabledBase[i] = item != 255;
+                frame = item + 0xF0;
                 break;
             }
 
             case 2: {
                 s32 slot;
-                register s32 id asm("r2");
                 u8 *consumables;
                 struct SwapFlagWidget *widget;
                 for (slot = 0, consumables = Storage_ConsumableSlots(p),
@@ -114,9 +114,9 @@ void Storage_BeginSwapTransition(u8 *p)
                     }
                 }
 
-                id = *(((struct GameState *)gGameState)->table160 + Storage_SlotTable(p, SWAP_OFFSET(slots))[selected]);
-                enabledBase[i] = id >= 0;
-                frame = id + 0x121;
+                item = *(gGameState->table160 + Storage_SlotTable(p, SWAP_OFFSET(slots))[selected]);
+                enabledBase[i] = item >= 0;
+                frame = item + 0x121;
                 break;
             }
             default:
