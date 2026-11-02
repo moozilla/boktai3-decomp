@@ -17,6 +17,10 @@ struct TerrainMotion {
 s32 Terrain_GetCellClearance(struct MotionPosition *);
 s32 Terrain_GetCellHighByte(struct MotionPosition *);
 void Memory_Clear(void *, u32);
+static inline u32 TerrainCell_FlagBits(u32 raw, u32 mask)
+{
+    return raw & mask;
+}
 static inline s32 Abs(s32 x)
 {
     if (x < 0)
@@ -76,11 +80,10 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
     {
         u32 source = bits;
         register u32 mask asm("r3");
-        asm("" : "+r"(source));
         flags = source;
         mask = 0xF00;
         asm("" : "+r"(mask));
-        mask &= flags;
+        mask = TerrainCell_FlagBits(flags, mask);
         asm("" : "+r"(mask));
         shape = mask;
         flags &= 0xF000;
