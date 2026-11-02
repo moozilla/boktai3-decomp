@@ -141,6 +141,11 @@ extern void *gBgTileUploadSrc[]; /* per-layer pending tile-upload source (4) */
 extern s16 gBgAffineMatrix[4]; /* BG affine matrix coefficients */
 /* 0x03004BD8 */
 extern u16 gDispCntShadow; /* display control / BG visibility shadow */
+
+static inline void Bg_EnableDisplay(s32 mask)
+{
+    gDispCntShadow |= mask;
+}
 /* 0x03004BE0 */
 extern u16 gBgTileUploadParamA[]; /* per-layer tile-upload parameter (4) */
 /* 0x03004BEC */
