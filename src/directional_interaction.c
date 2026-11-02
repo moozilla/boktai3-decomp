@@ -167,14 +167,6 @@ static inline u8 facingAllowed(u32 facing, s32 a, s32 b, s32 c)
     return allowed;
 }
 
-static inline s32 facingAllowedR2(u32 facing, s32 a, s32 b, s32 c)
-{
-    register u32 yes asm("r2") = 1;
-    if (a == facing || b == facing || c == facing)
-        return yes;
-    return 0;
-}
-
 s32 DirectionalController_CheckApproach(struct DirectionalManager *manager,
                                         struct DirectionalController *p)
 {
@@ -302,7 +294,7 @@ s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
                 }
                 if (a == direction || b == direction || c == direction) {
                     u32 facing = manager->actor->facing;
-                    if (facingAllowedR2(facing, a, b, c))
+                    if (facingAllowed(facing, a, b, c))
                         return angle;
                 }
             }
