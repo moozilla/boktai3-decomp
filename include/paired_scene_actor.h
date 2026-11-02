@@ -54,6 +54,9 @@ static inline u8 PairedSceneHalf_IsAlive(const struct PairedSceneHalf *half)
         alive = 1;
     return alive;
 }
+s32 PairedSceneActor_ApplyToSelectedHalves(struct VanargandAttackPair *, u32 mask, u32 value);
+u32 PairedSceneActor_AreSelectedHalvesFinished(struct VanargandAttackPair *);
+u32 ScenePair_CountPositiveCounters(struct VanargandAttackPair *);
 void Vanargand_ResetState(struct PairedSceneHalf *, s32);
 void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *, void *, s32);
 s32 sub_081B5EA4(struct VanargandAttackPair *, void *origin, u16 (*palettes)[16], s32 mode);
