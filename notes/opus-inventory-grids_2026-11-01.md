@@ -1,18 +1,43 @@
-# SceneInventory_Populate{Equipment,Item,Consumable}Grid: still pinned; a goto outer loop is needed
+# SceneInventory_Populate{Equipment,Item,Consumable}Grid: item grid matched pin-free; a goto outer loop is needed
 
-Tags: #loop-reduction #goto #reload-rotation #inventory
+Tags: #loop-reduction #goto #reload-rotation #inventory #spilled-locals
 
-**Not depinned.** All three units (0805FD20, 0805FF38, 080600DC) still match
-only in their pinned form. I gave each the two or three tries the queue
-allowed. The best pin-free drafts:
+**PopulateItemGrid (0805FF38) matches with no pins** (commit 3f28b7dd2,
+`src/fn/sub_0805FF38.c`). The other two units still match only in their
+pinned form. Best pin-free drafts:
 
 | Unit | Best pin-free draft | Differing (ROM / draft) | Shape |
 |---|---|---|---|
-| PopulateItemGrid 0805FF38 | goto outer loop, local struct, base temporaries (below) | 26 / 26 | 2 |
+| PopulateItemGrid 0805FF38 | **MATCH** (plain spilled locals, `slot` as the hide-loop counter, goto outer loop) | 0 | 0 |
 | PopulateConsumableGrid 080600DC | goto outer loop, plain locals | 67 / 67 | 68 |
 | PopulateEquipmentGrid 0805FD20 | `do` / `while` loops with goto exits | 72 / 76 | 68 |
 
-## What decided it so far: the first section's outer loop is invisible to loop.c
+## What decided the item grid
+
+* `nextRow`, `flagsBase` and `rowBytes` are plain locals that reload spills,
+  declared in that order: spill slots follow pseudo order, so they land at
+  sp+0, sp+4 and sp+8 as in the ROM. Any other declaration order swaps slots
+  (6 to 10 differing). In memory (a local struct or `volatile`), CSE stores
+  `row`'s register for `rowBytes = 0` (`str r7`) where the ROM loads a fresh
+  zero. That was the pinned unit's `register u32 zero asm("r1")`.
+* The closing hide loop counts with the function's `slot`
+  (`for (slot = 0; slot < 8; slot++)`), not a counter of its own. A fresh
+  `i` is set first from a constant, so update_equiv_regs doubles its live
+  length (fact 20). It came out at priority 7777 and lost r1 to the entry
+  pointer (27000). `slot`'s first set is `rowSlot + column`, so there is no
+  doubling, and its refs from all three sections add up (17 refs over 16
+  insns, 42500). This one change took the struct draft from 26 to 7
+  differing, and with it the plain-locals form matches outright. The
+  earlier plain-locals draft, with `i`, was 34 differing, its reload
+  rotation one step off at `column = 0`; `scope.py spill` had already said
+  that rotation alone did not explain it.
+* The second section's loop can be `for (row = 0; row <= 1; row = nextRow)`
+  and the first `if (++row <= 3) goto primaryRow;` with the label inside the
+  section's block. Both are the same RTL.
+* Still required: per-section column variables (one shared `column` is 15
+  differing) and the base temporaries below.
+
+## Why a goto outer loop: the first section's outer loop is invisible to loop.c
 
 In all three ROMs, the first section recomputes the flag-entry offset
 `(rowSlot + 5) * 0x60` (`(slotBase + 5) * 0x60` in the consumable grid) from
@@ -47,16 +72,6 @@ the row on every row. As C this is `entry = (void *)((rowSlot + 5) * 0x60 +
   global-alloc's priority order and takes sb.
 * For the closing hide loop, `u32 mask = 1;` declared before `entry` puts
   `movs r3, #1` first, as in the ROM.
-* What remains (26 insns):
-  * In memory (a local struct or `volatile`), `rowBytes = 0` stores
-    `row`'s register (`str r7`). CSE replaces the zero with the pseudo that
-    already holds 0, where the ROM has `movs r1, #0`. The pinned unit uses
-    `register u32 zero asm("r1")` for this.
-  * As plain (spilled) locals, `rowBytes = 0` matches. Reload's spill
-    rotation is then one step off at `column = 0`. `scope.py spill` reports
-    that the rotation alone does not explain it: 34 differing at best.
-  * The rest are low-register choices (r0/r1/r2) in reloads and local
-    allocation.
 
 ## Consumable grid notes
 
@@ -77,99 +92,3 @@ the row on every row. As C this is `entry = (void *)((rowSlot + 5) * 0x60 +
   ROM has the reverse.
 * Not tried there yet: the item grid's base temporaries and per-section
   variables.
-
-## Best item grid draft (26 / 26, shape 2)
-
-```c
-#include "scene_inventory_panel.h"
-void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *panel)
-{
-    struct {
-        s32 nextRow;
-        struct SceneInventoryWidgetFlags *flagsBase;
-        u32 rowBytes;
-    } v;
-    s32 column;
-    s32 rowSlot;
-    s32 row;
-    s32 slot;
-    s32 kind;
-    Anim_SelectWidgetGlyph(&panel->display.heading, &panel->display.widgetResource, 0x63);
-    row = 0;
-    v.flagsBase = ((struct SceneInventoryFlagsView *)(void *)panel)->widgets;
-    v.rowBytes = 0;
-primaryRow: {
-        struct SceneInputWidget *widget;
-        struct SceneInventoryWidgetFlags *entry;
-        column = 0;
-        rowSlot = row * 4;
-        {
-            struct SceneInputWidget *base = panel->display.primary;
-            widget = (void *)(v.rowBytes + (u32)base);
-        }
-        entry = (void *)((rowSlot + 5) * 0x60 + (u32)v.flagsBase);
-        do {
-            slot = rowSlot + column;
-            kind = Inventory_GetItemId(slot);
-            if (kind >= 0) {
-                entry->flags &= ~1;
-                Anim_LoadKeyframe(widget, &panel->display.gridResource, (u16)Selection_GetDisplayFrame(kind), 1);
-            } else
-                entry->flags |= 1;
-            SceneHud_SetKeyframePaletteBank(widget, 0x373);
-            widget++;
-            entry++;
-            column++;
-        } while (column <= 3);
-        v.rowBytes += 0x180;
-        row++;
-        if (row <= 3)
-            goto primaryRow;
-    }
-    for (row = 0; row <= 1;) {
-        s32 column2;
-        struct SceneInputWidget *widget;
-        struct SceneInventoryWidgetFlags *entry;
-        u32 flagIndex;
-        u32 offset;
-        column2 = 0;
-        rowSlot = row * 4;
-        v.nextRow = row + 1;
-        flagIndex = rowSlot + 21;
-        offset = ((row << 3) + rowSlot) << 5;
-        {
-            struct SceneInputWidget *base = panel->display.secondary;
-            widget = (void *)(offset + (u32)base);
-        }
-        entry = (void *)(flagIndex * 0x60 + (u32)v.flagsBase);
-        do {
-            slot = rowSlot + column2;
-            kind = panel->catalog[slot + panel->page * 8];
-            if (kind >= 0) {
-                s32 currency;
-                entry->flags &= ~1;
-                Anim_LoadKeyframe(widget, &panel->display.gridResource, (u16)Selection_GetDisplayFrame(kind), 1);
-                currency = gGameState->unk7B0;
-                if (currency < (s32)SceneItemValue_GetItemBaseValue(kind))
-                    SceneHud_SetKeyframePaletteBank(widget, 0x374);
-                else
-                    SceneHud_SetKeyframePaletteBank(widget, 0x373);
-            } else
-                entry->flags |= 1;
-            entry++;
-            widget++;
-            column2++;
-        } while (column2 <= 3);
-        row = v.nextRow;
-    }
-    {
-        u32 mask = 1;
-        struct SceneInventoryWidgetFlags *entry = &v.flagsBase[41];
-        s32 i;
-        for (i = 0; i < 8; i++) {
-            entry->flags |= mask;
-            entry++;
-        }
-    }
-}
-```
