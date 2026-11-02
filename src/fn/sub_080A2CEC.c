@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "scene_actor_behavior.h"
 #include "scene_actor_control_phase.h"
@@ -48,7 +47,7 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
-        *(u16 *)((u8 *)actor + 0x2BC) = 60;
+        actor->defeatTimer = 60;
         {
             u32 index = (gRandomIndex + 1) & 1023;
             u32 value;
