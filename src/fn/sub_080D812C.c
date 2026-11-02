@@ -252,7 +252,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
             damageCollider = initial;
             damageFlags = flags;
             if (!masked) {
-                u16 bank = *(u16 *)((u8 *)actor + 0x1E2);
+                u16 bank = actor->paletteAlternateBank;
                 {
                     struct SceneActorRegistryResetView *p = actor;
                     if (p->drawableKind == 0)
@@ -274,9 +274,9 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
                     u32 zero;
                     u32 buffer[2];
                     s32 health = CurrentHealth(actor);
-                    u32 max = *(u16 *)((u8 *)actor + 0xB0);
-                    s32 type = *(s16 *)((u8 *)actor + 0xB2);
-                    s32 param = *(s16 *)((u8 *)actor + 0x9A);
+                    u32 max = (u16)actor->defaultHealth;
+                    s32 type = (s16)actor->fieldB2;
+                    s32 param = (s16)actor->field9A;
                     SceneHud_SetTimedState(actor->body.id, health, max, type, 0, param);
                     Fill(&zero, buffer);
                     if (actor->reactionSoundVariant || !(*damageFlags & 0x20000))
