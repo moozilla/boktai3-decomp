@@ -13,6 +13,11 @@ static inline s32 NormalizeAngle(s32 angle)
         result += 256;
     return result;
 }
+static inline s32 RotationPhase_HeadingDistance(s32 heading, s32 direction)
+{
+    s32 difference = NormalizeAngle(heading - direction);
+    return difference < 0 ? -difference : difference;
+}
 static inline u32 RotationPhase_Mask(u32 *p, u32 mask)
 {
     return *p & mask;
