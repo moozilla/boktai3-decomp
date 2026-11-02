@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -28,8 +29,8 @@ static inline s32 Clamp(s32 n)
 }
 static inline u8 EaseMotion(struct SceneActorRegistryResetView *actor)
 {
-    s32 x = Quarter(*(s16 *)((u8 *)actor + 0x310) - *(s16 *)((u8 *)actor + 0x318));
-    s32 z = Quarter(*(s16 *)((u8 *)actor + 0x314) - *(s16 *)((u8 *)actor + 0x31C));
+    s32 x = Quarter(actor->reactionStart.x - *(s16 *)((u8 *)actor + 0x318));
+    s32 z = Quarter(actor->reactionStart.z - *(s16 *)((u8 *)actor + 0x31C));
     if (x > 200)
         x = 200;
     else if (x < -200)
@@ -91,11 +92,11 @@ void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32
     }
     if (EaseMotion(actor) && elapsed > 30) {
         u32 clearedWord;
-        u16 v = *(u16 *)((u8 *)actor + 0x178) + 10;
+        u16 v = actor->colliderA.responseValue + 10;
         u16 initialState[] = {0};
         clearedWord = 0;
 
-        *(u16 *)((u8 *)actor + 0x178) = v;
+        actor->colliderA.responseValue = v;
         actor->field2B0 = 1;
         {
             u16 *field = &actor->flags2D4;
