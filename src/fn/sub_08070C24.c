@@ -15,10 +15,9 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
     struct ContactPosition origin, difference, bestDifference;
     if (actor->category == 10) {
         u32 mask = 0x4000000;
-        register u32 offset asm("r3") = 0x2d0;
+        u32 offset = 0x2d0;
         register u32 *field asm("r0");
         u32 value;
-        asm("" : "+r"(offset) : "r"(mask));
         field = (void *)((u8 *)actor + offset);
         value = *field;
         value &= mask;
@@ -31,13 +30,12 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
         register u32 offset asm("r3");
         u8 *field;
         u32 first;
-        asm("" : "+r"(firstOffset));
-        field = (u8 *)actor + firstOffset;
-        first = *field;
+        u8 *controlField = (u8 *)actor + firstOffset;
+        first = *controlField;
         offset = 0x45a;
         asm("" : "+r"(offset));
-        field = (u8 *)actor + offset;
-        Path_GetPointPositionById((u16 *)&origin, first, *field);
+        controlField = (u8 *)actor + offset;
+        Path_GetPointPositionById((u16 *)&origin, first, *controlField);
     }
     {
         s32 index = 0;
