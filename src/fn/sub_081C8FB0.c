@@ -1,13 +1,8 @@
 #include "global.h"
 #include "state_actor.h"
+#include "player.h"
 
 s32 Math_Atan2(s32 x, s32 z); // include/directional_interaction.h
-
-struct Context {
-    u8 pad[0x434];
-    struct StateActorPos *target;
-    struct StateActor *targetActor;
-};
 
 static inline s32 near(struct StateActor *p, struct StateActorPos *a, struct StateActorPos *b)
 {
@@ -41,12 +36,12 @@ done:
     return result;
 }
 
-s32 sub_081C8FB0(struct Context *ctx, struct StateActor *p, s32 checkAngle)
+s32 sub_081C8FB0(struct StateActorTargetContext *ctx, struct StateActor *p, s32 checkAngle)
 {
     s32 facing;
     s32 result;
     if (ctx->target != 0)
-        facing = ((u8 *)ctx->targetActor)[0x2d];
+        facing = (u8)ctx->targetPlayer->unk2D;
     else
         facing = 0;
     if (!near(p, &p->position, ctx->target))
