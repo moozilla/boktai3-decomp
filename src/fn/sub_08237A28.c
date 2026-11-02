@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 struct GlyphPosition {
@@ -47,22 +46,25 @@ static inline s32 WidenAngle(s32 offset)
 void ActorGlyphTrail_EmitParticle(struct GlyphTrail *p)
 {
     s32 angle;
-    register s32 radius asm("r2");
     const u16 *table;
     p->slots[p->index].active = 1;
     p->slots[p->index].flags &= ~1;
     p->slots[p->index].timer = 0;
-    table = (const u16 *)RANDOM_TABLE_ADDR;
+    table = gRandomTable;
     p->slots[p->index].radius = ((RandomValue(table) >> 3) & 127) + 64;
     p->slots[p->index].angle = Mod(RandomValue(table), 96) - 48;
     angle = ((p->direction + 5) & 7) << 5;
     angle += WidenAngle(p->slots[p->index].angle);
     angle &= 255;
     p->slots[p->index].position = p->position;
-    radius = p->slots[p->index].radius;
-    p->slots[p->index].position.x += Truncate(gUnk_086149C4[(angle + 64) & 255] * radius);
-    radius = p->slots[p->index].radius;
-    p->slots[p->index].position.z += Truncate(gUnk_086149C4[angle] * radius);
+    {
+        s32 radiusX = p->slots[p->index].radius;
+        p->slots[p->index].position.x += Truncate(gUnk_086149C4[(angle + 64) & 255] * radiusX);
+    }
+    {
+        s32 radiusZ = p->slots[p->index].radius;
+        p->slots[p->index].position.z += Truncate(gUnk_086149C4[angle] * radiusZ);
+    }
     p->index++;
     if (p->index > 3)
         p->index = 0;
