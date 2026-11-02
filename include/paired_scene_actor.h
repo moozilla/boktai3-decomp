@@ -3,6 +3,7 @@
 
 #include "contact_collider.h"
 #include "contact_swarm_sprite.h"
+#include "display_sequence.h"
 #include "motion_track.h"
 #include "scene_input_widget.h"
 
@@ -11,7 +12,8 @@ struct PairedHalfGraphics {
     u16 paletteIndex;
     u8 unknown8[4];
     u16 *palette;
-    u8 unknown10[0x1C];
+    u8 unknown10[0xC];
+    struct DisplaySequenceState sequence;
 };
 struct ActorStatusOwner;
 struct PairedHalfTarget {
@@ -32,7 +34,7 @@ struct PairedSceneHalf {
     struct ContactCollider bodyCollider, damageCollider;
     s32 mode;
     u32 actionFlags, actionCounters[2];
-    u8 state, requestedState, entered, unknown16F, finished, unknown171;
+    u8 state, requestedState, entered, actionEntered, finished, unknown171;
     u16 active;
     s16 health, maxHealth;
     u32 stateTimer, hitFlags;
@@ -61,6 +63,7 @@ static inline u8 PairedSceneHalf_IsAlive(const struct PairedSceneHalf *half)
         alive = 1;
     return alive;
 }
+s32 PairedSceneActor_ApplyToActiveHalf(struct VanargandAttackPair *, u32 value);
 s32 PairedSceneActor_ApplyToSelectedHalves(struct VanargandAttackPair *, u32 mask, u32 value);
 u32 PairedSceneActor_AreSelectedHalvesFinished(struct VanargandAttackPair *);
 u32 ScenePair_CountPositiveCounters(struct VanargandAttackPair *);
