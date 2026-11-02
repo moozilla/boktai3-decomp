@@ -1,20 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "engine.h"
 #include "render.h"
+#include "scene_input_widget.h"
 
-struct IbRes {
-    u32 w[8];
-};
-struct IbPos {
-    u16 x, y, z, pad;
-};
-struct IbWidget {
-    u8 b0[8];
-    u32 flags;
-    u8 restC[0x14];
-    struct IbPos position;
-    u8 rest28[0x38];
-};
 struct IbHalfword {
     u16 value;
 };
@@ -25,31 +12,25 @@ struct IbSprite {
     u8 padA[6];
     u16 style;
     u8 pad12[10];
-    struct IbPos position;
+    struct ContactPosition position;
 };
-struct IbRes *ScriptProc_Start(u32, u32);
-s32 ResourceHeader_Relocate(void *, void *);
-s32 Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+s32 Widget_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPosition *);
 s32 ForgingBook_IsCategoryComplete(void *, s32);
 s32 Mod(s32, s32);
-s32 AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
 void *ActorDebris_Create(void *, void *, void *);
 void *PlayerAttackEffect_Create(void *, void *, void *);
 u32 ForgingBook_InitSprites(u8 *p)
 {
-    struct IbRes *res;
-    struct IbPos pos;
+    struct SceneInputResource *res;
+    struct ContactPosition pos;
     s32 i;
     struct IbSprite *sprite;
     void *animation;
     u16 coordinate;
     u32 zero;
-    u32 loopZero;
-    register struct IbPos *posPtr asm("r4");
-    struct IbWidget *w;
+
     res = ScriptProc_Start(0xcb05, 0xe2ab);
-    *((struct IbRes *)(p + 0x24)) = *res;
+    *((struct SceneInputResource *)(p + 0x24)) = *res;
     ResourceHeader_Relocate(p + 0x24, res);
     Widget_InitLinked(p + 0x64, p + 0x24, 0x49, 0x10, 0, 0, 0, 0);
     Widget_InitLinked(p + 0x124, p + 0x24, 0x3e, 0x10, 0, 0, 0, 0);
@@ -59,7 +40,8 @@ u32 ForgingBook_InitSprites(u8 *p)
     pos.y = 0x68;
     pos.z = 0;
     for (i = 0; i < 4; i++) {
-        Widget_InitLinked((p + 0x1e4) + (i * 0x60), p + 0x24, 0, 0x10, 0, 0, 0, &pos);
+        Widget_InitLinked((u8 *)((struct SceneInputWidget *)(p + 0x1e4) + i), p + 0x24, 0, 0x10, 0,
+                          0, 0, &pos);
         pos.x += 8;
         if (i == 1)
             pos.x += 8;
@@ -67,32 +49,33 @@ u32 ForgingBook_InitSprites(u8 *p)
 
     Widget_InitLinked(p + 0x184, p + 0x24, 0x4c, 0x10, 0, 0, 0, 0);
     res = ScriptProc_Start(0xcb05, 0x530d);
-    *((struct IbRes *)(p + 0x44)) = *res;
+    *((struct SceneInputResource *)(p + 0x44)) = *res;
     ResourceHeader_Relocate(p + 0x44, res);
     pos.x = 0x58;
     pos.y = 0x18;
     pos.z = 0;
     Widget_InitLinked(p + 0xc4, p + 0x44, 0x4d, 0x10, 0, 0, 0, &pos);
     res = ScriptProc_Start(0xcb05, 0x5d04);
-    *((struct IbRes *)(p + 0x388)) = *res;
+    *((struct SceneInputResource *)(p + 0x388)) = *res;
     ResourceHeader_Relocate(p + 0x388, res);
     pos.x = 0x58;
     pos.y = 0x18;
-    for (i = 0, loopZero = 0, posPtr = &pos, w = (void *)(p + 0x3a8); i < 18; i++) {
-        Widget_InitLinked(w, p + 0x388, (u16)(0xf0 + i), 0x10, loopZero, loopZero, loopZero,
-                          loopZero);
-        w->position.x = posPtr->x;
-        w->position.y = posPtr->y;
-        w->position.z = loopZero;
-        if (Mod(i, 6) == 5) {
-            posPtr->x = 0x58;
-            posPtr->y += 0x18;
-        } else {
-            posPtr->x += 0x18;
+    {
+        struct SceneInputWidget *cells = (void *)(p + 0x3a8);
+        for (i = 0; i < 18; i++) {
+            struct ContactPosition *cellPosition = &cells[i].position;
+            Widget_InitLinked((u8 *)&cells[i], p + 0x388, (u16)(0xf0 + i), 0x10, 0, 0, 0, 0);
+            cellPosition->x = pos.x;
+            cellPosition->y = pos.y;
+            cellPosition->z = 0;
+            if (Mod(i, 6) == 5) {
+                pos.x = 0x58;
+                pos.y += 0x18;
+            } else {
+                pos.x += 0x18;
+            }
         }
-        ++w;
     }
-
     zero = 0;
     {
         u32 *r5 = (u32 *)(p + 0x10c);
@@ -101,10 +84,10 @@ u32 ForgingBook_InitSprites(u8 *p)
         ((struct IbHalfword *)(p + 0xfe))->value = 0xe010;
     }
     {
-        struct IbRes *objectRes = ScriptProc_Start(0xcb05, 0xde23);
+        struct SceneInputResource *objectRes = ScriptProc_Start(0xcb05, 0xde23);
         ResourceHeader_Relocate(p + 0xa68, objectRes);
     }
-    Widget_InitLinked(p + 0xa88, p + 0xa68, zero, zero, zero, 1, zero, zero);
+    Widget_InitLinked(p + 0xa88, p + 0xa68, zero, zero, zero, 1, zero, 0);
     *((u32 *)(p + 0xa90)) &= ~1;
     *((u8 *)(p + 0xaa2)) = 2;
     {
