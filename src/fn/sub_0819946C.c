@@ -1,7 +1,7 @@
 #include "global.h"
 #include "game_state.h"
-#include "render.h"
 #include "scene_actor_registry.h"
+#include "scene_effect_projection.h"
 
 struct Message {
     u32 id : 16;
@@ -10,37 +10,6 @@ struct Message {
     s16 *values;
 };
 void MessageQueue_PostMessage(struct Message *);
-
-static inline s32 ScaleProjection(s32 v)
-{
-    return v >= 0 ? v >> 5 : -((-v) >> 5);
-}
-
-#define SET_PROJECTED_EFFECT_SIDE(position, side)                                                  \
-    do {                                                                                           \
-        struct ContactPosition projected;                                                          \
-        s32 rightSide;                                                                             \
-        struct ContactPosition *output;                                                            \
-        const struct ContactPosition *input;                                                       \
-        s32 x, z, sum, screenY, height, depth;                                                     \
-        output = &projected;                                                                       \
-        input = (position);                                                                        \
-        x = input->x;                                                                              \
-        z = input->z;                                                                              \
-        output->x = ScaleProjection(3 * (x - z));                                                  \
-        sum = ScaleProjection(3 * (x + z));                                                        \
-        height = ScaleProjection(3 * input->y);                                                    \
-        screenY = sum - height;                                                                    \
-        rightSide = 0;                                                                             \
-        depth = sum + height;                                                                      \
-        output->x = output->x - gCameraOrigin[0] + 120;                                            \
-        output->y = screenY - gCameraOrigin[1] + 80;                                               \
-        output->z = depth - gCameraOrigin[2];                                                      \
-        if (projected.x > 120)                                                                     \
-            (side) = rightSide;                                                                    \
-        else                                                                                       \
-            (side) = 1;                                                                            \
-    } while (0)
 
 static inline void PostSceneEffect(s32 value, u32 type)
 {
