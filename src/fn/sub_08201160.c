@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "scene_input.h"
 // 4 differing instruction runs; first diff at +0x1C (mov r0, r8 vs bl #0x820112c)
 struct Pair {
     u32 a, b;
@@ -12,8 +13,6 @@ struct Pos {
     u16 x, y, z, pad;
 };
 u8 *PlayerClone_FindFreeSlot(void *, s32 *);
-void Memory_Copy(void *, void *, u32);
-void Anim_LoadKeyframe(void *, void *, u32, u32);
 u8 *Player_GetEffectivePosition(u32);
 void PlayerClone_SetBehaviorCallback(void *, void *);
 void PlayerClone_UpdateBehavior(void);
@@ -37,7 +36,7 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
         u8 *obj = PlayerClone_FindFreeSlot(((struct Pool *)pool)->data, &scratch.index);
         if (obj) {
             void *handler = obj + 0x198;
-            void *display;
+            struct SceneInputWidget *display;
             u32 zero;
             u8 *tmp;
             Memory_Copy(handler, resource, 0x20);
@@ -46,7 +45,7 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
             *(u32 *)(obj + 0x308) = zero;
             *(u16 *)(obj + 0x330) = zero;
             *(u32 *)(obj + 0x31c) = zero;
-            display = obj + 0x1b8;
+            display = (void *)(obj + 0x1b8);
             Anim_LoadKeyframe(display, obj + 0x278, 0, 1);
             *(u32 *)(obj + 0x324) = *(u32 *)(resource + 8);
             obj[0x1d2] = 2;
@@ -62,7 +61,7 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
                 scratch.fill = zero;
                 CpuSetW(&scratch.fill, target, 0x05000002);
             }
-            *(u32 *)((u8 *)display + 8) |= 1;
+            display->flags |= 1;
             PlayerClone_SetBehaviorCallback(handler, PlayerClone_UpdateBehavior);
             *(u32 *)(pool + 0x18) |= 1 << scratch.index;
             (*(u32 *)(pool + 0x9e8))++;
