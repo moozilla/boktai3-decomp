@@ -1262,7 +1262,7 @@ void EffectParticle_UpdateDissipating(struct EffectManager *manager, struct Effe
     struct EffectParticle *p = &effect->particles[index];
     struct EffectVec *origin = &p->origin;
     struct EffectSprite *sprite = &p->sprite, *o;
-    register u8 *angle asm("r6") = &p->angle;
+    u8 *angle = &p->angle;
     struct EffectAnim *a;
     const u16 *entry;
     s32 difference;
@@ -1270,18 +1270,28 @@ void EffectParticle_UpdateDissipating(struct EffectManager *manager, struct Effe
         difference =
             Math_Atan2(origin->x - sprite->position.x, origin->z - sprite->position.z) - p->angle;
         if (p->drift < 0) {
-            if ((difference < 0 ? -difference : difference) <= 4)
-                *angle = p->angle + difference;
-            else
-                *angle = p->angle + 4;
+            {
+                u32 next;
+                if ((difference < 0 ? -difference : difference) <= 4) {
+                    next = p->angle;
+                    next += difference;
+                } else
+                    next = p->angle + 4;
+                *angle = next;
+            }
             p->drift++;
             if (!p->drift)
                 p->drift = (randomValue(0) & 63) + 64;
         } else {
-            if ((difference < 0 ? -difference : difference) <= 4)
-                *angle = p->angle - difference;
-            else
-                *angle = p->angle - 4;
+            {
+                u32 next;
+                if ((difference < 0 ? -difference : difference) <= 4) {
+                    next = p->angle;
+                    next -= difference;
+                } else
+                    next = p->angle - 4;
+                *angle = next;
+            }
             p->drift--;
             if (!p->drift)
                 p->drift = -(randomValue(1) & 63) - 64;
