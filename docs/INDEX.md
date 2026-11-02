@@ -429,7 +429,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round10b-fan-cannon.md](../notes/round10b-fan-cannon.md) | FanCannon_UpdateActive (08209704) | #matching #fan-cannon #rng #gcse #register-allocation | 1 |
 | [notes/round10b-skeleton-rise.md](../notes/round10b-skeleton-rise.md) | Skeleton_UpdateRiseRecovery (080BF0E4) | #matching #skeleton #global-alloc #pre #stack-slots | 1 |
 | [notes/round11-c-holdouts.md](../notes/round11-c-holdouts.md) | Round 11-C holdouts |  | 64 |
-| [notes/round11-d-holdouts.md](../notes/round11-d-holdouts.md) | Round 11 package D holdouts |  | 28 |
+| [notes/round11-d-holdouts.md](../notes/round11-d-holdouts.md) | Round 11 package D holdouts |  | 23 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
 | [notes/round2-sol.md](../notes/round2-sol.md) | Sol production round 2 |  | 5 |
