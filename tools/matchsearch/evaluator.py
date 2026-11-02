@@ -521,6 +521,7 @@ class Evaluator:
         extra_headers = self._freeze_include_inputs(project_headers)
         deps = [*project_headers, *extra_headers,
                 self.repo / "asm" / "macros.inc", self.repo / "tools" / "build.py",
+                self.repo / "tools" / "romlib.py",
                 self.repo / "tools" / "scope" / "fast.py",
                 self.repo / "tools" / "scope" / "scope.py",
                 self.repo / "tools" / "scope" / "agbcc.patch",

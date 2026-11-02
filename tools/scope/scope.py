@@ -151,7 +151,7 @@ except ImportError:  # the project venv has it
 sys.path.insert(0, TOOLS)
 import build  # noqa: E402
 import check  # noqa: E402
-from romlib import ROOT, load_rom, off  # noqa: E402
+from romlib import ROOT, load_rom, off, rom_data_ranges  # noqa: E402
 
 INSTR = os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")  # tools/scope/build_agbcc.sh
 PASSES = ["rtl", "jump", "cse", "addressof", "gcse", "loop", "cse2", "flow", "combine", "regmove",
@@ -645,47 +645,6 @@ def mapping_ranges(obj, start, size):
         if v >= start + size:
             break
     return data
-
-
-def rom_data_ranges(func, addr):
-    """Data ranges of the ROM function, from its generated assembly (labels carry addresses)."""
-    path = os.path.join(ROOT, "build", "asm", "nonmatching", func + ".s")
-    if not os.path.exists(path):
-        return None
-    data, cur = [], addr
-    blobs = []  # (start, end) of .incbin runs: raw bytes the pool scan must classify
-    for ln in open(path):
-        s = ln.split("@")[0].strip()
-        m = re.match(r"(\w+):\s*(.*)", s)
-        if m:
-            lab = re.search(r"_([0-9A-F]{8})$", m.group(1))
-            if lab:
-                cur = int(lab.group(1), 16)
-            s = m.group(2).strip()
-        if not s or s.startswith((".global", ".syntax", "thumb_func", "arm_func", ".thumb", ".type", ".size")):
-            continue
-        if s.startswith(".4byte") or s.startswith(".word"):
-            data.append((cur - addr, cur - addr + 4)); cur += 4
-        elif s.startswith(".2byte") or s.startswith(".hword"):
-            data.append((cur - addr, cur - addr + 2)); cur += 2
-        elif s.startswith(".byte"):
-            data.append((cur - addr, cur - addr + 1)); cur += 1
-        elif s.startswith(".align"):
-            n = 1 << int(s.split()[1].rstrip(","))
-            pad = (-cur) % n
-            if pad:
-                data.append((cur - addr, cur - addr + pad))
-            cur += pad
-        elif s.startswith(".incbin"):
-            m = re.search(r",\s*(0x[0-9A-Fa-f]+|\d+)\s*,\s*(0x[0-9A-Fa-f]+|\d+)", s)
-            if m:
-                n = int(m.group(2), 0)
-                blobs.append((cur - addr, cur - addr + n)); cur += n
-        elif s.startswith("."):
-            continue
-        else:
-            cur += 4 if re.match(r"bl\b", s) else 2
-    return data, blobs
 
 
 def rom_pool_ranges(code, addr, arm=False):
@@ -2409,7 +2368,13 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
     view = find_reg_view(wd, func).get(pseudo)
     if not view or not rec or rec[0] != "G":
         return False
-    f = view[0]
+    f = next((entry for entry in view if not entry["retrying"] and entry["final"] >= 0), view[0])
+    if f["first"] < 0 and f["final"] >= 0:
+        print(f"    find_reg (global.c) found no free register for {nm(pseudo)}. It took"
+              f" {rname(f['final'])} from local allocation: its references per live instruction"
+              " exceed the aggregate for the locals placed there. All their assignments are"
+              " cleared, including locals in other blocks.")
+        return True
     lo = set(range(8))
     used = f["used1"] & lo
     pass0 = (f["sofar"] - f["used1"] - f["someone"]) & lo
@@ -2659,6 +2624,15 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
               f" it got {rname(got)}, the ROM has {rname(want)}.")
+        if rec[6] != got:
+            for owner, attempts in find_reg_view(wd, func).items():
+                if any(not f["retrying"] and f["first"] < 0 and f["final"] == rec[6] for f in attempts):
+                    print(f"    local allocation first placed {nm(pseudo)} in {rname(rec[6])}."
+                          f" Global allocation took that register for {nm(owner)}, evicting"
+                          " every value local allocation had placed there.")
+                    if want == rec[6]:
+                        return
+                    break
         note = small_sort_note(wd, func, blk)
         if note:
             print(note)
@@ -6002,15 +5976,17 @@ def union_view_variant(rows, ln, name):
 def frame_slot_pairs(rows):
     """(ROM sp offset -> draft sp offset, the physical pairing or None, every ROM offset used). The
     physical pairing holds when the listings agree everywhere but in SP displacements; otherwise each
-    ROM slot pairs with the draft slot most often aligned with it."""
+    ROM slot pairs with the draft slot most often aligned with it, breaking ties by how often the
+    complete instruction agrees apart from the displacement."""
     off = lambda t: [int(m.group(1) or "0", 0) for m in SP_SLOT.finditer(t or "")]
     votes, rom_seen = {}, set()
     for r in rows:
         a, b = off(r["rom"]), off(r["draft"])
         rom_seen.update(a)
         if len(a) == 1 and len(b) == 1:
-            votes.setdefault(a[0], {}).setdefault(b[0], 0)
-            votes[a[0]][b[0]] += 1
+            counts = votes.setdefault(a[0], {}).setdefault(b[0], [0, 0])
+            counts[0] += 1
+            counts[1] += SP_SLOT.sub("[sp]", r["rom"]) == SP_SLOT.sub("[sp]", r["draft"])
     physical = physical_frame_slot_pairs(rows)
     pair = physical if physical is not None else {a: max(v, key=v.get) for a, v in votes.items()}
     return pair, physical, rom_seen
