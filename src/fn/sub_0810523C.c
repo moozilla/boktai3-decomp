@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 struct Position {
     s16 x, y, z, pad;
 };
@@ -36,10 +35,11 @@ void ActorGroup_EmitRemovalDebris(struct Actor *p)
 {
     struct Position v;
     {
+        struct Position *velocity = &v;
         s32 angle = Rand() & 255;
-        struct Position *vec = &v;
-        asm("" : : "r"(angle), "r"(vec));
-        Polar(angle, vec, 10);
+        s32 direction = angle;
+        struct Position *selected = velocity;
+        Polar(direction, selected, 10);
     }
     v.y = 64;
     sub_08127590(&p->position, &v, 0x9385, 0x74C9, 1, 30, 2, 0, 490, 0, 0, 0, 0, 0, 0);
