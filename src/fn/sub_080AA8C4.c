@@ -51,10 +51,10 @@ static inline s32 Height(s32 cell, struct ContactPosition *position)
     height = mask << 8;
     switch (kind) {
         case 1:
-            height -= ((u8 *)p)[4];
+            height -= (u8)p->z;
             break;
         case 2:
-            height -= ((u8 *)p)[0];
+            height -= (u8)p->x;
             break;
     }
     return height;
@@ -86,13 +86,11 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
     for (i = 0; i < trail->segmentCount; i++) {
         struct TrailSegment *segment = &trail->segments[i];
         if (TestSegment(segment, 2) && (!TestSegment(segment, 1))) {
-            s32 rawHeight = Height(
-                SceneActorTerrain_GetCellIndex(&segment->position),
-                (struct ContactPosition *)((u8 *)trail + i * sizeof(struct TrailSegment) + (u32) &
-                                           ((struct TentacleTrail *)0)->segments[0].position));
+            s32 rawHeight = Height(SceneActorTerrain_GetCellIndex(&segment->position),
+                                   &trail->segments[i].position);
             s32 height = rawHeight;
             s16 y;
-            asm("" : "+r"(height), "+r"(rawHeight));
+            asm("" : "+r"(height));
             y = segment->position.y;
             if (y != height) {
                 if (y < height) {
