@@ -1,4 +1,4 @@
-#include "global.h"
+#include "contact_collider_manager.h"
 #include "ram.h"
 
 u8 *Task_Create(u32, u32);
@@ -12,7 +12,7 @@ u8 *sub_08220ADC(void)
     u8 *p;
     if (gColliderManager != 0)
         return gColliderManager;
-    p = Task_Create(0xb, 0xd4);
+    p = Task_Create(0xb, sizeof(struct ContactColliderManager));
     if (p != 0) {
         Task_SetCallbacks(p, PositionQueue_FlushPending, Collider_OnManagerDestroy);
         gColliderManager = p;
