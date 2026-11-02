@@ -1,25 +1,14 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
-void Sound_PlaySong(int);
+#include "scene_object_slot.h"
 void SceneObject_UpdateLowering(void);
-void SceneObject_BeginLowering(u8 *s)
+void SceneObject_BeginLowering(struct SceneObjSlot *s)
 {
     Sound_PlaySong(0x152);
-    s[0x39] = 0;
-    s[0x3a] = 0;
-    {
-        u16 *flags = (u16 *)(*(u8 **)(s + 0x2c) + 6);
-        int old = *flags;
-        {
-            int result = 2;
-            result |= old;
-            *flags = result;
-        }
-    }
-    asm("" ::: "memory");
-    *(u16 *)(*(u8 **)(s + 0x2c) + 6) |= 3;
-    s[0x37] = 3;
-    (*(u8 **)(s + 0x2c))[4] = ((*(u8 **)(s + 0x2c))[4] & 0xf0) | (s[0x3b] + 1);
-    *(u16 *)(*(u8 **)(s + 0x2c)) &= ~1;
-    *(void **)(s + 0x30) = SceneObject_UpdateLowering;
+    s->b39 = 0;
+    s->b3a = 0;
+    s->block->w6 |= 2;
+    s->block->w6 |= 3;
+    s->variant = 3;
+    s->block->b4 = (s->block->b4 & 0xf0) | (s->b3b + 1);
+    s->block->flags &= ~1;
+    s->callback = SceneObject_UpdateLowering;
 }
