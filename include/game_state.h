@@ -115,7 +115,9 @@ struct GameState {
     u32 flags730;
     u8 unk734[0x10];
     u16 unk744;
-    u8 unk746[0x12];
+    u8 unk746[2];
+    u32 unlockedEquipment[2]; /* 0x748 (guess): bit per equipment id the shop catalog offers */
+    u32 unlockedItems[2]; /* 0x750 (guess): bit per item id the shop offers; a sale sets it */
     s16 unk758;
     s16 unk75A;
     u8 unk75C[2];
