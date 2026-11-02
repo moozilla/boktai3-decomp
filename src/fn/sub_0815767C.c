@@ -1,8 +1,7 @@
 #include "global.h"
+#include "player.h"
 #include "engine_globals.h"
 #include "ram.h"
-
-// MATCHING_CONCESSION: register-pinning
 
 struct Drawable {
     u32 a, b, flags;
@@ -31,15 +30,9 @@ static inline u8 *offsetR2(u8 *p, u32 off)
     u32 offset = off;
     return p + offset;
 }
-static inline void setCollider(u8 *p)
-{
-    u16 *ptr = (u16 *)(p + 0x236);
-    register u32 value asm("r1") = *ptr;
-    register u32 mask asm("r0") = 4;
-    *ptr = mask | value;
-}
 void Player_ApplyControlPresentation(u8 *p)
 {
+
     u32 value = H(0x474);
     if (value == 0) {
         if (Player_GetControlFlags(p, 16))
@@ -52,11 +45,11 @@ void Player_ApplyControlPresentation(u8 *p)
     }
     Obj_StepPosition(p + 0x24);
     sub_0802E04C(p + 0x24);
-    if (Player_GetControlFlags(p, 8))
-        setCollider(p);
-    else {
-        H(0x236) &= ~4;
-        Collider_SetPosition(p + 0x230, p + 0x30, 0);
+    if (Player_GetControlFlags(p, 8)) {
+        ((struct Player *)p)->collider.flags |= 4;
+    } else {
+        ((struct Player *)p)->collider.flags &= ~4;
+        Collider_SetPosition(&((struct Player *)p)->collider, &((struct Player *)p)->position, 0);
     }
     if (Player_GetControlFlags(p, 1))
         ((struct Drawable *)(p + 0x8C))->flags |= 1;
