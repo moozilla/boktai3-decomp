@@ -6,8 +6,6 @@ void SceneHud_SetKeyframePaletteBank(void *, u32);
 void Storage_InitWidgets(u8 *p)
 {
     struct ContactPackedVector pos;
-    u32 zero;
-    u32 *zeroPtr = &zero;
     struct SceneInputResource *r;
     s32 i;
     r = ScriptProc_Start(0xCB05, 0x5D04);
@@ -26,12 +24,7 @@ void Storage_InitWidgets(u8 *p)
     Widget_InitLinked(p + 0x78, p + 0x1518, 0x41, 0x30, 0, 0, 60, &pos);
     pos.x += 8;
     Widget_InitLinked(p + 0xD8, p + 0x1518, 0x42, 0x30, 0, 0, 60, &pos);
-    zero = 0;
-    {
-        register u32 *source asm("r0") = zeroPtr;
-        register void *target asm("r1") = &pos;
-        CpuSet(source, target, 0x05000002);
-    }
+    ZeroFill8(&pos);
     Widget_InitLinked(p + 0x138, p + 0x1518, 0x40, 0x30, 0, 0, 60, &pos);
     Widget_InitLinked(p + 0x198, p + 0x1518, 0xD3, 0x30, 0, 0, 60, &pos);
     Widget_InitLinked(p + 0x1F8, p + 0x1518, 0x63, 0x30, 0, 0, 60, &pos);
