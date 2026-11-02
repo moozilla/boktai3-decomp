@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
+#include "game_state.h"
 struct Vec16 {
     s16 x, y, z;
 };
@@ -54,7 +54,7 @@ static inline s32 optionalValue(void)
 }
 static inline u8 FloorSwitch_InCurrentRegion(struct FloorSwitch *e)
 {
-    if (*(s32 *)((u8 *)gGameState + 0x5A0) == e->region)
+    if (gGameState->region == e->region)
         return TRUE;
     return FALSE;
 }
@@ -117,7 +117,7 @@ void FloorSwitch_Create(void)
         AnimData_SelectPaletteBank(e->anim, 0x16C);
     }
     {
-        register struct SceneObject *o asm("r4");
+        struct SceneObject *o;
         struct Vec16 *d;
         if (SceneBody_GetRegistry())
             goto scan;
@@ -136,7 +136,10 @@ void FloorSwitch_Create(void)
             if (!(o->flags & 2)) {
                 struct Vec16 *op = (struct Vec16 *)&o->x;
                 struct Vec16 *ep = (struct Vec16 *)&e->x;
-                d->x = o->x - ep->x;
+                {
+                    s16 *deltaX = &d->x;
+                    *deltaX = o->x - ep->x;
+                }
                 d->y = op->y - ep->y;
                 d->z = op->z - ep->z;
                 if ((u16)d->x <= 0x100 && d->y <= 0x20 && d->y >= 0 && d->z <= 0x100 && d->z >= 0)
