@@ -65,6 +65,11 @@ static inline void PopRequest(struct SceneEffectQueue *p)
         p->readIndex = next;
     }
 }
+static inline void RunSlotCallback(void *slot, void *callback)
+{
+    if (callback)
+        Callback_InvokeActor(slot, callback);
+}
 s32 SceneEffectQueue_UpdateEffects(struct SceneEffectQueue *p)
 {
     struct EffectMessage *message;
@@ -92,9 +97,8 @@ s32 SceneEffectQueue_UpdateEffects(struct SceneEffectQueue *p)
     }
     actor = p->actors;
     for (bit = 1, i = 1; i > 0; i--, actor++, bit <<= 1) {
-        if (actor->update)
-            Callback_InvokeActor(actor, actor->update);
-        if (!*(void *volatile *)&actor->update) {
+        RunSlotCallback(actor, actor->update);
+        if (!actor->update) {
             p->actorsUsed &= ~bit;
             if (!PeekRequest(p)->remaining)
                 PopRequest(p);
@@ -103,9 +107,8 @@ s32 SceneEffectQueue_UpdateEffects(struct SceneEffectQueue *p)
     }
     ring = p->rings;
     for (bit = 1, i = 4; i > 0; i--, ring++, bit <<= 1) {
-        if (ring->update)
-            Callback_InvokeActor(ring, ring->update);
-        if (!*(void *volatile *)&ring->update)
+        RunSlotCallback(ring, ring->update);
+        if (!ring->update)
             p->ringsUsed &= ~bit;
         else
             ring->finished = PlayerCue_StepSequenceEnded(&ring->sprite, &ring->sequence);
