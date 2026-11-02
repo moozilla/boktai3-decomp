@@ -1,9 +1,8 @@
 #include "terrain_cell_probe.h"
 #include "contact_position.h"
 
-// MATCHING_CONCESSION: register-pinning
 s32 sub_0821D178(struct ContactPosition *out, struct ContactPosition *from,
-                 struct ContactPosition *target);
+                 struct ContactPosition *target, s32 previousStep);
 
 static inline u32 cellHeightAt(struct ContactPosition *pos, s32 cell)
 {
@@ -26,25 +25,22 @@ static inline u32 cellHeightAt(struct ContactPosition *pos, s32 cell)
 s32 sub_0821D4F0(struct ContactPosition *start, struct ContactPosition *target, s32 steps,
                  s32 maxRise)
 {
-    s32 initialStep = 0;
     struct ContactPosition cur, next;
-    s32 i, cell, r;
+    s32 i, cell, stepResult;
 
     if (gTerrainMap->cells == NULL)
         return 0;
-    r = 0;
+    stepResult = 0;
     cur = *start;
     cell = cellIndexAt((struct Pos16 *)&cur);
-    /* Keep the initial status and cell index live together during setup. */
-    asm("" : "+r"(cell) : "r"(r));
-    for (i = initialStep; i < steps; i++) {
+    for (i = 0; i < steps; i++) {
         struct ContactPosition *nextPos = &next;
-        r = sub_0821D178(nextPos, &cur, target);
-        if (r > 1)
+        stepResult = sub_0821D178(nextPos, &cur, target, stepResult);
+        if (stepResult > 1)
             cell = cellIndexAt((struct Pos16 *)nextPos);
         if ((s32)(cellHeightAt(&next, cell) - start->y) >= maxRise)
             return 0;
-        if (r == 1)
+        if (stepResult == 1)
             return 1;
         cur = next;
     }
