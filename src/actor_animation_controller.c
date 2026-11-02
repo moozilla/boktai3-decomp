@@ -2239,13 +2239,11 @@ static inline void set_direction(s16 angle, u8 *directionOut, u8 *flipOut)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->timer = 0;
@@ -2298,8 +2296,7 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
