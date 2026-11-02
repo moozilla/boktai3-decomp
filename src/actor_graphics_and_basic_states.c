@@ -668,10 +668,8 @@ void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
 
 void SceneActors_StopBackgroundFlash(struct StateActor *p)
 {
-    /* Raw offsets (backgroundFlash 0x9DC, backgroundFlashFlag 0x3C0): a
-     * shared SceneActorGraphics pointer breaks the match. */
-    BackgroundFlash_BeginDisappearance(*(struct BackgroundFlashController **)((u8 *)p + 0x9dc));
-    *(u32 *)((u8 *)p + 0x3c0) = 0;
+    BackgroundFlash_BeginDisappearance(((struct SceneGraphicsActor *)p)->graphics.backgroundFlash);
+    ((struct SceneGraphicsActor *)p)->graphics.backgroundFlashFlag = 0;
 }
 
 struct ReactionActor {
