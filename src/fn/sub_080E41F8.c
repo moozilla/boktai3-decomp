@@ -26,7 +26,7 @@ void Dog_UpdateLeapAttack(struct SceneActorRegistryResetView *a)
 {
     struct DogAttackContext *context = a->context;
     if (Chase_TakeArrived(a)) {
-        u32 zero8;
+        u8 zero8;
         register u32 zero asm("r4");
         {
             register u32 offset asm("r0") = 0x678;
@@ -36,11 +36,11 @@ void Dog_UpdateLeapAttack(struct SceneActorRegistryResetView *a)
         }
         {
             u32 bit = 0x100;
-            register u16 *flags asm("r2") = &a->flags2D4;
+            u16 *flags = &a->flags2D4;
             register u32 value asm("r1") = *flags;
             zero8 = 0;
             zero = 0;
-            asm("" : "+r"(zero8), "+r"(zero), "+r"(bit), "+r"(flags), "+r"(value));
+            asm("" : "+r"(zero));
             *flags = bit | value;
         }
         {
@@ -54,16 +54,13 @@ void Dog_UpdateLeapAttack(struct SceneActorRegistryResetView *a)
             And32(&a->flags114, ~1);
             a->word104 = zero;
         }
-        And32((u32 *)((u8 *)a->context + 0x678), ~2);
+        And32(&((struct DogAttackContext *)a->context)->flags, ~2);
         {
             void *collider = context->collider;
             u32 damage = a->attacks.first[1];
             u32 response = a->attacks.second[1];
-            u8 *p = (u8 *)a + 0xD0;
-            u32 power = *(u32 *)p;
-            u32 extra;
-            p -= 10;
-            extra = *(u16 *)p;
+            u32 power = a->attacks.flags[1];
+            u32 extra = a->attacks.parameter[1];
             Collider_SetAttackProperties(collider, damage, response, 0, power, extra);
         }
         context->emitted = zero8;
