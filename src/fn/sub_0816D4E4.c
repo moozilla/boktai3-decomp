@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
@@ -16,23 +15,10 @@ static inline s32 GetTimedCounter(u32 slot)
     struct GameState *entry = (struct GameState *)(slot * 4 + (u32)state);
     return entry->counters628[0];
 }
-static inline s32 InventoryPresent(s16 *p)
-{
-    if (*p >= 0)
-        return 1;
-    return 0;
-}
-static inline struct SceneValueEquipment *GetEquipment(s16 *p)
-{
-    asm("" ::: "memory");
-    return Inventory_GetEquipmentEntry(*p);
-}
 u32 SceneHud_CanApplySelectedAction(u32 action)
 {
     struct Player *p = gPlayers[0];
     s32 i;
-    struct GameState *entry;
-    s16 *inventory;
     if (!p)
         return 0;
     if (action == 26) {
@@ -74,12 +60,13 @@ u32 SceneHud_CanApplySelectedAction(u32 action)
             if (GetTimedCounter(p->timedEventSlot) > 0 && (gUnk_08E61280[action].unknown6 & 8))
                 return 1;
             break;
-        case 5:
-            entry = (struct GameState *)((s16)gGameState->unk50 * 2 + (u32)gGameState);
-            inventory = (s16 *)entry->inventory;
-            if (InventoryPresent(inventory))
-                GetEquipment(inventory);
-            break;
+        case 5: {
+            s16 *selected =
+                ((struct GameState *)((s16)gGameState->unk50 * 2 + (u32)gGameState))->inventory;
+            if (*selected < 0)
+                return 0;
+            Inventory_GetEquipmentEntry(*selected);
+        } break;
     }
     return 0;
 }
