@@ -331,23 +331,26 @@ struct Player {
     u16 movementDuration;                               /* 0xA9C */
     u8 unkA9E[0x10];
     u16 actionResetCounter;  /* 0xAAE: reset when starting a variant action (tentative) */
-    u16 menuStatusValues[7]; /* 0xAB0: panel selects indices 0, 2 or 6 (tentative) */
-    u8 unkABE[4];
+    u16 menuStatusValues[8]; /* 0xAB0: panel selects indices 0, 2 or 6 (tentative) */
+    u8 unkAC0[2];
     u16 baseSpriteResource, savedSpriteResource; /* 0xAC2 */
     u8 unkAC6[2];
     u8 baseActionVariant; /* 0xAC8: copied to actionVariant */
     u8 actionVariant;     /* 0xAC9: zero or saved action index plus one (tentative) */
     u16 savedVisualMode;  /* 0xACA */
     s16 visualFlashTimer; /* 0xACC */
-    u8 unkACE[4];
+    u16 scriptFlashTimer, contactFlashTimer;
     u16 movementRequestParameter, movementRequestScale;  /* 0xAD2: tentative */
     u16 actionEighteenParameter, actionEighteenDuration; /* 0xAD6: tentative */
     u16 actionRequestHold, actionRequestTimer;           /* 0xADA */
-    u8 unkADE[0xA];
+    u8 unkADE[6];
+    u16 visualEffectMode;
+    u8 unkAE6[2];
     struct SceneVec movementRequestTarget; /* 0xAE8 */
     u8 unkAF0;
     u8 actionRequestState; /* 0xAF1 */
-    u8 unkAF2[0x12];
+    u16 visualSlowdownTimer;
+    u8 unkAF4[0x10];
     void *kindTwoAttachment;        /* 0xB04: descriptor-driven attachment, tentative */
     u8 kindTwoAttachmentDescriptor; /* 0xB08 */
     u8 unkB09;
