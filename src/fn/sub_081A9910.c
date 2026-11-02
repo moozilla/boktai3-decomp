@@ -107,9 +107,9 @@ void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
             break;
         case 4:
             if (p->timer == 0) {
-                if (self->pair->first == 5)
+                if (self->pair->halves[0].requestedState == 5)
                     PairedSceneActor_ApplyToSelectedHalves(self->pair, 1, 6);
-                if (self->pair->second == 5)
+                if (self->pair->halves[1].requestedState == 5)
                     PairedSceneActor_ApplyToSelectedHalves(self->pair, 2, 6);
                 Vanargand_SetPairedMotionParameter(self->pair, self->parameter584);
                 p->timer++;
