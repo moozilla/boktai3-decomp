@@ -1,42 +1,35 @@
 // MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "date_entry_menu.h"
 #include "render.h"
 #include "menu_parameters.h"
 
-struct ResourceHeader {
-    u32 words[8];
-};
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, u32);
-void sub_081DE630(void *);
+s32 ResourceHeader_Relocate(void *, void *);
+s32 Widget_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPosition *);
 void Password_LoadDate(void *);
 void AnimPanel_UpdateDigits(void *);
 void Menu_StartFadeIn(u32);
-s32 Time_InitializeDateMenu(u8 *s)
+s32 Time_InitializeDateMenu(struct DateMenu *menu)
 {
     u32 zero;
     register u32 one asm("r10");
-    u32 bank;
-    register void *resource asm("r6");
-    register u8 *first asm("r4");
-    u8 *second;
-    u8 *obj;
-    u32 value;
+    u32 resourceBank;
+    void *resource;
+    register void *cursorResource asm("r6");
+    u8 *firstGraphics;
+    u8 *secondGraphics;
+    u8 *cursorGraphics;
+    u32 layer;
     void *bg;
-    u32 *palette;
-    u8 *copy;
-    u16 bits;
-    u16 *half;
-    u32 off1;
-    u32 off2;
-    u32 off3;
-    u32 off5;
-    *(u32 *)(s + 0x6E4) = zero = 0;
-    *(u32 *)(s + 0x6D8) = zero;
+    u16 **firstPalette;
+    u16 *colors;
+    u16 firstPaletteBank;
+    u16 *paletteBank;
+    menu->state = zero = 0;
+    menu->selection = zero;
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
     Bg_ClearTilemap(2);
@@ -44,59 +37,54 @@ s32 Time_InitializeDateMenu(u8 *s)
     Bg_ClearTilemap(3);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     bg = ScriptProc_Start(0xC091, 0x3536);
-    value = 2;
-    Bg_SetupLayers(2, 0, bg, 0, zero, one = 1, &value);
+    layer = 2;
+    Bg_SetupLayers(2, 0, bg, 0, zero, one = 1, &layer);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
-    bank = 0xCB05;
-    resource = ScriptProc_Start(bank, 0xE2AB);
-    first = s + 0x78;
-    ResourceHeader_Relocate(first, resource);
-    *(struct ResourceHeader *)(s + 0x6B8) = *(struct ResourceHeader *)first;
-    Widget_InitLinked(s + 0x18, first, 0x34, 0x10, zero, zero, zero, zero);
-    second = s + 0x100;
-    ResourceHeader_Relocate(second, resource);
-    Widget_InitLinked(s + 0xA0, second, 0x26, 0x10, zero, zero, zero, zero);
-    first = s + 0x188;
-    ResourceHeader_Relocate(first, resource);
-    Widget_InitLinked(s + 0x128, first, 0x27, 0x10, zero, zero, zero, zero);
-    *(u32 *)(s + 0xA8) |= one;
-    *(u32 *)(s + 0x130) |= one;
+
+    resourceBank = 0xCB05;
+    resource = ScriptProc_Start(resourceBank, 0xE2AB);
+    firstGraphics = menu->widgets[0].resource;
+    ResourceHeader_Relocate(firstGraphics, resource);
+    menu->digitResource = *(struct SceneInputResource *)firstGraphics;
+    Widget_InitLinked((u8 *)&menu->widgets[0], firstGraphics, 0x34, 0x10, zero, zero, zero, NULL);
+    secondGraphics = menu->widgets[1].resource;
+    ResourceHeader_Relocate(secondGraphics, resource);
+    Widget_InitLinked((u8 *)&menu->widgets[1], secondGraphics, 0x26, 0x10, zero, zero, zero, NULL);
+
+    ResourceHeader_Relocate(menu->widgets[2].resource, resource);
+    Widget_InitLinked((u8 *)&menu->widgets[2], menu->widgets[2].resource, 0x27, 0x10, zero, zero,
+                      zero, NULL);
+    menu->widgets[1].flags |= one;
+    menu->widgets[2].flags |= one;
     {
-        u32 *save = (u32 *)(s + 0x718);
-        u32 old;
-        palette = (u32 *)(s + 0xE8);
-        old = *palette;
-        *save = old;
-        off1 = 0x71C;
-        copy = s + off1;
-        CpuSet((void *)old, copy, 0x10);
-        *palette = (u32)copy;
+        u16 **savedPalette = &menu->savedPalette;
+        u16 *sourcePalette;
+        firstPalette = &menu->widgets[1].palette;
+        sourcePalette = *firstPalette;
+        *savedPalette = sourcePalette;
+        colors = menu->colors;
+        CpuSet(sourcePalette, colors, 0x10);
+        *firstPalette = colors;
     }
-    off2 = 0x170;
-    *(void **)(s + off2) = copy;
-    half = (u16 *)(s + 0xDA);
-    bits = 0xE000;
-    *half = bits;
-    off3 = 0x162;
-    half = (u16 *)(s + off3);
-    *half = bits + 1;
-    resource = ScriptProc_Start(bank, 0x530D);
-    off5 = 0x210;
-    obj = s + off5;
-    ResourceHeader_Relocate(obj, resource);
-    off1 = 0x1B0;
-    Widget_InitLinked(s + off1, obj, 0x80, 0x10, zero, zero, zero, zero);
-    sub_081DE630(s);
-    Password_LoadDate(s);
-    AnimPanel_UpdateDigits(s);
+    menu->widgets[2].palette = colors;
+    paletteBank = &menu->widgets[1].paletteBank;
+    firstPaletteBank = 0xE000;
+    *paletteBank = firstPaletteBank;
+    paletteBank = &menu->widgets[2].paletteBank;
+    *paletteBank = firstPaletteBank + 1;
+    cursorResource = ScriptProc_Start(resourceBank, 0x530D);
+    cursorGraphics = menu->widgets[3].resource;
+    ResourceHeader_Relocate(cursorGraphics, cursorResource);
+    Widget_InitLinked((u8 *)&menu->widgets[3], cursorGraphics, 0x80, 0x10, zero, zero, zero, NULL);
+    sub_081DE630(menu);
+    Password_LoadDate(menu);
+    AnimPanel_UpdateDigits(menu);
     if (gDateMenuParameters.flag == 1) {
-        off3 = 0x6E0;
-        *(u32 *)(s + off3) = zero;
+        menu->fadeShift = zero;
     } else {
-        u32 offset = 0x6E0;
-        *(u32 *)(s + offset) = 3;
+        menu->fadeShift = 3;
     }
-    Menu_StartFadeIn(*(u32 *)(s + 0x6E0));
+    Menu_StartFadeIn(menu->fadeShift);
     return 0;
 }
