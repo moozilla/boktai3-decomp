@@ -1714,7 +1714,6 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -1724,16 +1723,14 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
     u8 done;
     if (take(p)) {
         u16 *first = (u16 *)((u8 *)p + 0xed0);
-        s32 savedZero;
-        register s32 zero asm("r2");
-        savedZero = 0;
-        zero = 0;
+        u16 initialPhase[] = {0};
+        s32 zero = 0;
         *first = 25;
         *(u16 *)((u8 *)p + 0xed2) = 102;
-        *(u16 *)((u8 *)p + 0xed4) = zero;
+        *(u16 *)((u8 *)p + 0xed4) = initialPhase[0];
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
-        *((u8 *)p + 0xf77) = savedZero;
+        *((u8 *)p + 0xf77) = zero;
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
@@ -1822,7 +1819,6 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -1832,16 +1828,14 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
     u8 done;
     if (take(p)) {
         u16 *first = (u16 *)((u8 *)p + 0xed0);
-        s32 savedZero;
-        register s32 zero asm("r2");
-        savedZero = 0;
-        zero = 0;
+        u16 initialPhase[] = {0};
+        s32 zero = 0;
         *first = 25;
         *(u16 *)((u8 *)p + 0xed2) = 102;
-        *(u16 *)((u8 *)p + 0xed4) = zero;
+        *(u16 *)((u8 *)p + 0xed4) = initialPhase[0];
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
-        *((u8 *)p + 0xf77) = savedZero;
+        *((u8 *)p + 0xf77) = zero;
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
