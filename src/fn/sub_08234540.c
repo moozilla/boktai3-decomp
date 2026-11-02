@@ -14,20 +14,24 @@ static inline u32 randomValue(const u16 *table, u32 mask)
 // MATCHING_CONCESSION: register-pinning
 void SpiralBurst_InitParticles(struct SpiralBurst *burst)
 {
-    register u32 mask asm("sb");
+    u32 mask;
     s32 i;
-    u32 base;
+    union {
+        const u16 *samples;
+        u32 phase;
+    } work;
     void *sprite;
     register const u16 *table asm("r5");
     register const u16 *randomTable asm("r6");
     struct SpiralParticleFrame *frame;
     {
         u32 next;
-        table = gRandomTable;
+        work.samples = gRandomTable;
+        table = work.samples;
         next = gRandomIndex + 1;
         mask = 1023;
         gRandomIndex = next & mask;
-        base = (u8)table[gRandomIndex];
+        work.phase = *(const u8 *)((gRandomIndex * sizeof(*table)) + (u32)table);
     }
     burst->resource = AnimData_FindEntry(0x1C1E);
     i = 0;
@@ -38,7 +42,7 @@ void SpiralBurst_InitParticles(struct SpiralBurst *burst)
         ParticleSprite_Initialize(sprite, burst->resource, 0);
         Effect_SetOrigin(sprite, -4, -4);
         Effect_SetPalette(sprite, 1);
-        frame->motion.angle = base + (i << 5) + (randomValue(randomTable, mask) & 15);
+        frame->motion.angle = work.phase + (i << 5) + (randomValue(randomTable, mask) & 15);
         frame->motion.riseRate = ((i & 3) << 1) + 3;
         frame->motion.radius = (randomValue(randomTable, mask) & 31) + 64;
         frame->motion.riseDelay = (randomValue(randomTable, mask) & 15) + 12;
