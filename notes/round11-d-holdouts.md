@@ -1,16 +1,12 @@
 # Round 11 package D holdouts
 
-Batch 15 leaves 185 of the original 466 package D functions with scored concessions. Since Batch 12, 57 functions covering 19,848 bytes have become concession-free. The build still reproduces the original ROM.
+Batch 16 leaves 165 of the original 466 package D functions with scored concessions. Since Batch 12, 77 functions covering 30,108 bytes have become concession-free. The build still reproduces the original ROM.
 
 The list below contains only functions still open at this checkpoint, in ROM order. The Batch 12 source archive supplies a starting C draft for each. Its instruction and byte differences describe that archived draft. Subsequent compiler or source findings are recorded separately below the affected entry.
 
 - **0810E9D4 · TimerDisplay_DrawRecord**
   The two returned tile pointers coalesce with r0.
   Write both record delimiters through a tile-row cursor that advances after each store. The retained draft differs in 6 aligned assembly rows.
-
-- **0810F348 · RecordMenu_UpdateSelection**
-  The left/right mask, glyph pointer, choice pointer and zero compete across the animation call.
-  Give left and right selection changes separate sound and cursor animation call sites before the shared exit. The retained draft differs in 16 aligned assembly rows.
 
 - **0810FDDC · sub_0810FDDC**
   Indexed widget access improves on keeping separate doubled and base indices.
@@ -35,18 +31,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **0812A660 · ActorEffect_InitColliders**
   The two relative collider pointers conflict with the power/value call arguments.
   Give the body collider its own base-relative address independently of the attack collider. The retained draft differs in 35 aligned assembly rows.
-
-- **0812C41C · FragmentEffect_SpawnRandomParticle**
-  The three sin/cos samples compete with the loop-carried random table and the outgoing call arguments.
-  Carry the signed radius through the two horizontal components, then use direct random-table indexing for height. The detached difference fell from 60 to 46 aligned assembly rows.
-
-- **0812CF9C · SceneSlot_EmitPulse**
-  The emitter twin reuses the same sampled angles as 0812C41C.
-  Carry the signed radius through the two horizontal components, then use direct random-table indexing for height. The detached difference fell from 60 to 46 aligned assembly rows.
-
-- **0812D064 · LargeFragmentEffect_SpawnRandomParticle**
-  Only constrained subsets reproduce the random-table addressing and velocity setup.
-  Use the same typed random cursor reader for both vertical velocity and particle lifetime. The detached difference fell from 16 to 15 aligned assembly rows.
 
 - **081301C4 · SceneActorReaction_UpdateRouteRecovery**
   After depinning, the signed height copies from ROM r1 to r0 and the stack-address scratch changes from r0 to r1.
@@ -104,10 +88,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   The active/input checks merge differently without the barrier on the player pointer, and the scaled Z sample no longer occupies the original register.
   Fold the two force-block checks into a single player validity region and evaluate the vertical sine sample at the point of its product. The retained draft differs in 27 aligned assembly rows.
 
-- **0814159C · Player_UpdateCameraOffset**
-  Splitting input-plus-one from its mask leaves the history sample, camera angle and mode allocated differently across the clamp calls.
-  Fold the direction-history sample into its phase by wrapping an 8-bit angle, removing the index mask. The retained draft differs in 22 aligned assembly rows.
-
 - **081432DC · Player_UpdateHeldInteraction**
   Removing 3 local constraints changes 23 normalized assembly rows across 8 regions.
   Compute the facing sector from the low angle byte before storing it, instead of shifting a full unsigned halfword. The retained draft differs in 23 aligned assembly rows.
@@ -139,10 +119,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **08156F54 · Player_TestTetherActionInput**
   The trigger path loads the global tether pointer a second time in the ROM.
   Classify state 1 and state 0x11 by masking their differing bit before reading the tether status fields. The retained draft differs in 5 aligned assembly rows.
-
-- **08156FE0 · Player_SelectActionSequence**
-  The selector has six pins, including shared helper state.
-  Read held keys and action mode via the typed input and action-mode fields before the alternate-selector tests. The retained draft differs in 24 aligned assembly rows.
 
 - **08158C14 · sub_08158C14**
   Four independently computed counters lose their joint address lifetimes when the operand barrier is removed.
@@ -203,10 +179,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **08164DC0 · Hud_UpdateTransientStatGauge**
   Two fill loops load a mask directly into the register where the ROM first copies it.
   Write the gauge decoration tiles and blank row through a descending halfword cursor with an end pointer. The retained draft differs in 7 aligned assembly rows.
-
-- **08165D10 · SceneHud_TickPaletteBlend**
-  A byte-exact permutation introduced an empty loop between forming the red-channel mask and applying it. Sixteen ordinary RGB555 unpackers were also tried. The prior two-row draft remains closest.
-  Extract red by discarding the high eleven bits of the 16-bit value via a narrowed left shift. The retained draft differs in 2 aligned assembly rows.
 
 - **081680F4 · Hud_LoadConditionalPaletteRows**
   The unpinned index and final zero change how the loop and palette stores allocate temporaries.
@@ -276,14 +248,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **0817EBB4 · BossSlot2_UpdateSummonSpinSequence**
   Removing 3 local constraints changes 20 normalized assembly rows across 9 regions.
   Apply the newly upstream four-way and eight-way helpers independently to spin setup and both repeated animation branch tails. The retained draft differs in 20 aligned assembly rows.
-
-- **0817F9C0 · BossSlot2_UpdatePresentation**
-  Removing 1 local constraint changes 21 normalized assembly rows across 8 regions.
-  Move shadow enabling into each grounded branch or a typed owner helper so field formation occurs inside the call expression. The retained draft differs in 21 aligned assembly rows.
-
-- **08180730 · ProximityVolume_Update**
-  Removing 1 local constraint changes 23 normalized assembly rows across 19 regions.
-  Use the nav-probe position vector consistently for both coordinates and separate the inactive-emitter return from proximity motion. The retained draft differs in 23 aligned assembly rows.
 
 - **08181634 · ArmorPalette_CopyKindBanks**
   Removing 4 local constraints changes 11 normalized assembly rows across 9 regions.
@@ -454,11 +418,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   Removing 1 local constraint changes 2 normalized assembly rows across 2 regions.
   Use one lifetime for the segment multiplier and resulting triangular step, including reciprocal operand order and nonnegative half division. The retained draft differs in 2 aligned assembly rows.
 
-- **081C2570 · ControlPanel_InitializeFromScript**
-  Removing 2 local constraints changes 72 normalized assembly rows across 48 regions.
-  Reconstruct the three 0x4c-spaced sprite/animation pairs through one resource initializer and independently release the shared sprite and animation registers. The retained draft differs in 72 aligned assembly rows.
-  The three display entries have a 0x4C-byte stride. Each has a position at +0x1C and graphics at +0x2C. The middle entry’s animation variant is at +0x4A. Replacing the layout alone does not reproduce both cursor registers.
-
 - **081C4708 · sub_081C4708**
   Removing 1 local constraint changes 5 normalized assembly rows across 3 regions.
   Treat the script result as a typed tile resource and fold the first-tile load into its consuming call or into a small resource-load helper. The retained draft differs in 5 aligned assembly rows.
@@ -470,10 +429,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **081C62B4 · sub_081C62B4**
   Removing 1 local constraint changes 6 normalized assembly rows across 5 regions.
   Walk distinct digit and coordinate arrays with their native strides. The retained draft differs in 6 aligned assembly rows.
-
-- **081C74F0 · StateActor_UpdateDashAnimation13**
-  Removing 1 local constraint changes 36 normalized assembly rows across 31 regions.
-  Separate dash-tag access from the actor entry switch and carry the position owner through an accessor or its real member. The detached difference fell from 36 to 19 aligned assembly rows.
 
 - **081C7934 · StateActor_UpdateAnimation16State**
   Removing 1 local constraint changes 11 normalized assembly rows across 7 regions.
@@ -492,11 +447,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   Removing 10 local constraints changes 32 normalized assembly rows across 18 regions.
   Map MenuState and MenuKind to the established Player.sceneMode and Player.tetherMode fields and release the original field constraints independently. The retained draft differs in 32 aligned assembly rows.
 
-- **081CF398 · sub_081CF398**
-  An ordinary palette interpolation call with the two bank addresses in locals changes five assembly regions.
-  Replace the fade macro by an ordinary palette helper/direct call and test bank addresses and tick bounds at the fade site. The retained draft differs in 7 aligned assembly rows.
-  The 081CF264 sibling confirms the fade timing and palette banks. Sharing a fade macro across those two callers changes the sibling’s bytes. The current stock-matching function still uses its local macro.
-
 - **081D0864 · sub_081D0864**
   Removing 2 local constraints changes 17 normalized assembly rows across 9 regions.
   Separate field-address and payload lifetimes through typed owner accessors (closest npc_sub20_1). The retained draft differs in 17 aligned assembly rows.
@@ -508,18 +458,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **081D2318 · TaggedSceneNpc_UpdateTargetFacing**
   Removing 1 local constraint changes 20 normalized assembly rows across 10 regions.
   Separate field-address and payload lifetimes through typed owner accessors (closest p_position_1). The detached difference fell from 20 to 2 aligned assembly rows.
-
-- **081D2D78 · sub_081D2D78**
-  Removing 2 local constraints changes 18 normalized assembly rows across 14 regions.
-  Separate field-address and payload lifetimes through typed owner accessors (closest slot_position_1). The retained draft differs in 18 aligned assembly rows.
-
-- **081D3094 · sub_081D3094**
-  Removing 2 local constraints changes 6 normalized assembly rows across 4 regions.
-  Separate field-address and payload lifetimes through typed owner accessors (closest p_graphics_1). The retained draft differs in 6 aligned assembly rows.
-
-- **081D31EC · sub_081D31EC**
-  Removing 2 local constraints changes 12 normalized assembly rows across 6 regions.
-  Separate field-address and payload lifetimes through typed owner accessors (closest src_position_0). The retained draft differs in 12 aligned assembly rows.
 
 - **081D3620 · sub_081D3620**
   The cloud loop’s table, coordinate scratch, and random value have different allocation without constraints.
@@ -650,10 +588,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   Removing 8 local constraints changes 38 normalized assembly rows across 20 regions.
   Reconstructed the Vulcan damage animation call as an inline restart using the resource and facing in both parameter orders. The retained draft differs in 38 aligned assembly rows.
 
-- **08208498 · CannonTurret_FireAimedVolley**
-  The projectile spread needs a particular captured table address across the jitter and speed sample.
-  Separated jitter and speed samples into individual narrow values, and retried the random table as a symbol and a constant-address pointer. The retained draft differs in 13 aligned assembly rows.
-
 - **0820EE34 · OrangeSpine_ApplyHitReaction**
   The damage handler’s empty outputs are consumed only by empty operands.
   Tested direct reaction and HUD member stores, a separately evaluated spark guard, and named RNG storage through the Orange Spine damage and spark paths. The retained draft differs in 74 aligned assembly rows.
@@ -710,10 +644,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   Removing the digit-loop index pin changes allocation across all eight digit extractions.
   Compared arithmetic and boolean leading-zero suppression after digit extraction. The retained draft differs in 54 aligned assembly rows.
 
-- **08227FEC · sub_08227FEC**
-  Naming the guard value and checking it with the reset pointer live gives the correct registers, but agbcc moves the magic literal load ahead of the load from the guard.
-  Used the validated-guard predicate from the adjacent heap routine with separate read, compare and write branches and both literal evaluation orders. The retained draft differs in 5 aligned assembly rows.
-
 - **08229440 · Clock_CheckRtcStatus**
   The SDK returns u8. A two-word scratch object reproduced the bytes, but no caller or driver data supports the extra word. The archived version uses the SDK prototype and direct status decoding.
   Compared direct status checks, SDK-style packed status and error nibble records, and independent decoding around Clock_EndRtcAccess. The retained draft differs in 5 aligned assembly rows.
@@ -737,15 +667,3 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **082356E4 · sub_082356E4**
   Removing 1 local constraint changes 8 normalized assembly rows across 3 regions.
   Tested the incremented timer, stored halfword, and explicit early returns for the two shake strengths and task expiry. The retained draft differs in 8 aligned assembly rows.
-
-- **08236FF4 · AttachmentSprite_Setup**
-  Removing 3 local constraints changes 41 normalized assembly rows across 11 regions.
-  Reconstructed the attachment animation pointer relative to the sprite or parent and varied the ID selection for the two attachment kinds. The detached difference fell from 41 to 5 aligned assembly rows.
-
-- **08237A28 · sub_08237A28**
-  The ROM reloads radius in r2 and keeps the glyph angle in r4 while writing packed positions.
-  Compared a captured glyph-slot pointer with separate per-axis lookups while reloading the radius for the second trig product. The retained draft differs in 23 aligned assembly rows.
-
-- **0823C930 · Player_UpdateTerrainSidestep**
-  The early 08142194 sibling computes a shifted probe position with two scaled sine samples, then tests the terrain.
-  Reconstructed both trigonometric sidestep samples as a short-lived probe and reused the typed terrain helpers. The retained draft differs in 17 aligned assembly rows.
