@@ -41,7 +41,7 @@ void AnimData_SelectPaletteBank(void *, u32);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 static inline void SelectDirection(u32 angle, u8 *row, u8 *flip)
 {
-    u32 quadrant = ((((s32)(angle >> 24)) + 0x60) >> 6) & 3;
+    u8 quadrant = ((((s32)(angle >> 24)) + 0x60) >> 6) & 3;
     if (quadrant > 1) {
         *flip = 1;
         *row = 3 - quadrant;
@@ -62,8 +62,6 @@ struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 an
     struct Feather *p;
     struct Feather *sprite;
     u8 row, flip;
-    asm("" : : "r"(angle));
-    asm("" : : "r"(angle));
     asm("" : : "r"(angle));
     if (!pool) {
         pool = FeatherEffectPool_GetOrCreate();
