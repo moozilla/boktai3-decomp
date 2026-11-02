@@ -1,6 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct ArmorBody {
@@ -27,41 +26,37 @@ struct ArmorPart {
     u16 timer;
     u8 pad1D8;
     u8 angle;
-    u8 direction;
+    s8 direction;
 };
+
+static inline void SetPartState(struct ArmorPart *p, u32 state)
+{
+    u8 active = 1;
+    p->byte11E = active;
+    p->byte11F = state;
+    p->flags119 |= active;
+}
+
 void Armor_UpdatePartOrbit(struct ArmorPart *p)
 {
     struct ArmorBody *parent = p->parent;
-    u8 *angle = &p->angle;
     const s16 *sine;
-    s32 radius;
-    s32 scale;
-    s32 state;
-    s32 zero;
-    u8 a = *angle + p->direction;
-    zero = 0;
-    asm("" : "+r"(zero));
-    *angle = a;
+
+    p->angle += (u8)p->direction;
     sine = gUnk_086149C4;
-    p->x = parent->orbitX + Div(sine[(*angle + 64) & 255] * 200, 4096);
-    p->z = parent->orbitZ + Div(sine[*angle] * 200, 4096);
+    p->x = parent->orbitX + Div(sine[(p->angle + 64) & 255] * 200, 4096);
+    p->z = parent->orbitZ + Div(sine[p->angle] * 200, 4096);
     if (--p->timer == 0) {
-        state = parent->state;
-        if (state == 3)
-            goto change;
-        if (state <= 3) {
-            if (state == 2)
-                goto change;
-            return;
+        switch (parent->state) {
+            case 2:
+                SetPartState(p, 2);
+                break;
+            case 3:
+                SetPartState(p, 3);
+                break;
+            case 4:
+                SetPartState(p, 4);
+                break;
         }
-        if (state != 4)
-            return;
-    change: {
-        u8 one = 1;
-        p->byte11E = one;
-        p->byte11F = state;
-        p->flags119 |= one;
     }
-    }
-    asm("" ::"r"(zero));
 }
