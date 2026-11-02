@@ -582,6 +582,16 @@ void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct W
     p->timer++;
 }
 
+static inline void WirelessGameItem_ResetOutgoing(struct WirelessGameItem *p, u8 state, u16 ticks)
+{
+    p->state = state;
+    p->entered = state;
+    p->timer = ticks;
+    ticks = p->timer;
+    p->count = ticks;
+    p->pendingFlag = ticks;
+}
+
 // MATCHING_CONCESSION: register-pinning
 void WirelessGameItems_UpdateOutgoingItem(struct WirelessGameItems *owner,
                                           struct WirelessGameItem *p, int index)
@@ -589,42 +599,28 @@ void WirelessGameItems_UpdateOutgoingItem(struct WirelessGameItems *owner,
     struct WirelessGameSprite *sprite = &p->sprite;
     struct WirelessGameDrawing *drawing;
     int choice;
-    {
-        /* Existing pinned offset; derive it from the shared layout. */
-        register int offset asm("r2") = (u32) & ((struct WirelessGameItem *)0)->drawing;
-        struct WirelessGameDrawing *initial;
-        asm("" : "+r"(offset));
-        initial = (struct WirelessGameDrawing *)(offset + (u32)p);
-        drawing = initial;
-    }
+    drawing = &p->drawing;
     if (p->entered) {
-        int zero = 0;
-        struct WirelessGameVector *vector;
-        register int y asm("r6");
-        const u16 *table;
+        struct WirelessGameVector *start, *end;
         const u16 *entry;
-        p->entered = zero;
-        vector = &p->start;
-        y = 128;
-        if (index > 7)
-            y = 144;
-        table = gUnk_0824DE8C;
-        entry = (const u16 *)((index & 3) * 2 + (u32)table);
-        p->start.x = *entry + 80;
-        vector->y = y;
-        vector->z = zero;
-        vector = &p->end;
-        y = 272;
-        asm("" : "+r"(vector), "+r"(y));
+        p->entered = 0;
+        start = &p->start;
         {
-            register int x asm("r0") = y;
-            int value;
-            asm("" : "+r"(x));
-            value = *entry;
-            p->end.x = x + value;
+            int y = 128;
+            if (index > 7)
+                y = 144;
+            {
+                const u16 *offsets = gUnk_0824DE8C;
+                entry = &offsets[index & 3];
+            }
+            p->start.x = *entry + 80;
+            start->y = y;
+            start->z = 0;
         }
-        vector->y = 32;
-        vector->z = zero;
+        end = &p->end;
+        p->end.x = 272 + *entry;
+        end->y = 32;
+        end->z = 0;
         WirelessGameItem_SetRandomNegativeArcVelocity(p, 32, 15);
     }
     p->sprite.value = p->count;
@@ -644,23 +640,11 @@ void WirelessGameItems_UpdateOutgoingItem(struct WirelessGameItems *owner,
         Vec16_Lerp(position, &p->start, &p->end, p->timer, 5);
         WirelessGameItems_ApplyMotionWave(position, p->timer, p->arcVelocity);
     }
-    {
-        register struct WirelessGameDrawing *source asm("r2") = drawing;
-        u32 x = source->position.words.x;
-        u32 y = source->position.words.y;
-        register struct WirelessGameSprite *dest asm("r6") = sprite;
-        dest->x = x;
-        dest->y = y;
-    }
+    *(struct WirelessGamePair *)&sprite->x = drawing->position.words;
     if (p->timer > 31) {
-        register int one asm("r1") = 1;
-        int zero = 0;
-        asm("" : "+r"(one), "+r"(zero));
-        p->state = one;
-        p->entered = one;
-        p->timer = zero;
-        p->count = zero;
-        p->pendingFlag = zero;
+        u8 state = 1;
+        u16 ticks = 0;
+        WirelessGameItem_ResetOutgoing(p, state, ticks);
     }
     p->timer++;
 }
