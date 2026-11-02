@@ -106,17 +106,14 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
         if (!(keys & 0x10))
             goto select;
         {
-            register u32 choiceOffset asm("r3") =
-                (u32) & ((struct RecordMenuSelectionView *)0)->choice;
+            u32 choiceOffset = (u32) & ((struct RecordMenuSelectionView *)0)->choice;
             register u8 *choice;
             register u32 zero asm("r1");
             choice = (u8 *)menu + choiceOffset;
             if (*choice == 0)
                 goto done;
             {
-                register u32 glyphOffset asm("r0") =
-                    (u32) & ((struct RecordMenuSelectionView *)0)->cursorGlyph;
-                asm("" : "+r"(glyphOffset));
+                u32 glyphOffset = (u32) & ((struct RecordMenuSelectionView *)0)->cursorGlyph;
                 glyph = (u16 *)((u8 *)menu + glyphOffset);
             }
             zero = 0;
