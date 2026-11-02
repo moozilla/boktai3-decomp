@@ -5,7 +5,6 @@
 #include "render.h"
 
 // confidence=low: chooses the nearest visible list entry within a fixed squared-distance limit.
-// MATCHING_CONCESSION: register-pinning
 #define Player_FindNearestVisibleTarget sub_0814C248
 struct TargetPosition {
     s16 x, y, z;
@@ -23,34 +22,28 @@ struct MotionTargets {
     u8 unknown[0x18];
     struct MotionTarget *first;
 };
-static inline s32 Project(s32 input)
+static inline s32 ProjectScale(s32 value)
 {
-    s32 value = input * 3;
     if (value >= 0)
-        value >>= 5;
-    else
-        value = -((-value) >> 5);
-    return value;
+        return value >> 5;
+    return -((-value) >> 5);
 }
-static inline void ProjectPosition(struct TargetPosition *src, struct TargetPosition *dst)
+static inline void ProjectPosition(struct TargetPosition *screen,
+                                   const struct TargetPosition *world)
 {
-    s32 x;
-    s32 z;
-    s32 depth;
-    s32 height;
-    s32 y;
-    s32 projectedZ;
-    asm("" : "+r"(src));
-    x = src->x;
-    z = src->z;
-    dst->x = Project(x - z);
-    depth = Project(x + z);
-    height = Project(src->y);
-    y = depth - height;
-    projectedZ = depth + height;
-    dst->x = (dst->x - gCameraOrigin[0]) + 120;
-    dst->y = (y - gCameraOrigin[1]) + 80;
-    dst->z = projectedZ - gCameraOrigin[2];
+    s32 x = world->x;
+    s32 z = world->z;
+    s32 sum, vertical, y, depth;
+    s32 scaledSum;
+    screen->x = ProjectScale(3 * (x - z));
+    scaledSum = ProjectScale(3 * (x + z));
+    sum = scaledSum;
+    vertical = ProjectScale(3 * world->y);
+    y = sum - vertical;
+    depth = sum + vertical;
+    screen->x = (u16)screen->x - gCameraOrigin[0] + 120;
+    screen->y = y - gCameraOrigin[1] + 80;
+    screen->z = depth - gCameraOrigin[2];
 }
 
 struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
@@ -76,7 +69,6 @@ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
                 if (flags & 16) {
                     body = entry->body;
                     x = body->pos.x - p->position.x;
-                    asm("" : "+r"(body));
                     z = body->pos.z - p->position.z;
                 } else {
                     body = entry->body;
@@ -85,23 +77,25 @@ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
                 }
                 square = (x * x) + (z * z);
                 if (square < distance) {
-                    if (!(gEngineFlags & 0x1000)) {
+                    if (gEngineFlags & 0x1000) {
+                        distance = square;
+                        best = entry;
+                    } else {
                         struct TargetPosition screen;
-                        {
-                            u32 relative = flags & 16;
-                            asm("" : "+r"(square) : "r"(relative));
+                        const struct TargetPosition *world;
+                        if (flags & 16)
+                            world = &entry->body->pos;
+                        else
+                            world = &entry->body->pos;
+                        ProjectPosition(&screen, world);
+                        if ((((u16)(screen.x - 1)) <= 238) && (((u16)(screen.y - 1)) <= 158)) {
+                            distance = square;
+                            best = entry;
                         }
-                        ProjectPosition(&body->pos, &screen);
-                        if ((((u16)(screen.x - 1)) > 238) || (((u16)(screen.y - 1)) > 158))
-                            goto next;
                     }
-                    distance = square;
-                    best = entry;
                 }
             }
-        next:
             entry = entry->next;
-
         } while (entry);
     return best;
 }

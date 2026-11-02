@@ -1056,6 +1056,15 @@ Each was read from the compiler source and confirmed on a live draft.
    constant lives on (a later and reads it, or reload loads it there as a spilled pseudo),
    scope's hint names this fact instead.
 
+   The same lever works the other way round, when the ROM copies the constant
+   (`adds r0, r2, #0; ands r0, r1`, the 15 kept in r2 for a later test) and the draft ties the
+   dying load. In ActorPalette_UpdateReverseFade, `u32 raw = *field; u32 mask = 15;
+   (mask & raw)` gave cse a variable known to hold 15, which fold_rtx moves to operand 2; regmove
+   then tied the and to the load in operand 1. Writing `(*field & 15) | 0xd0` and
+   `(*(u8 *)field & 15) == 3` keeps the 15 an HImode pseudo read through a subreg in both ands;
+   regmove ties neither operand, so reload copies the constant, and three pins went. `why`'s
+   regmove lever says so.
+
 38. **Exactly three local quantities in a block are not sorted by priority.** block_alloc
    (local-alloc.c) sorts two or three qtys by hand, but its `qty_compare (0, 1)` and
    `qty_compare (1, 2)` compare qty numbers (birth order), not the `qty_order` entries it
@@ -1259,6 +1268,13 @@ Each was read from the compiler source and confirmed on a live draft.
    * by the equations, also when x is set in the block before the loop or inside it (not
      checked on a draft).
    `pre` flags each such move ("moved above a loop").
+   The same insertion serves two paths when both arms of an if compute an expression:
+   EffectGroup_Spawn's kind == 2 arm and its else arm each loop over `group->parts[i].flags`,
+   so `group + 0x1c` is anticipatable above the if and PRE computed it once before the spawn
+   loop (an asm barrier on `group` in one arm had kept the arms apart; `AGBCC_NOPRE=1,2`
+   matches). `parts = group->parts; parts[i].flags` in one arm makes the two expressions
+   different and matched without the barrier. `why` on such an insertion names the shared
+   replacements and this lever.
 51. **A 0/1 flag survives only when its test reads a different REG from its sets.** For
    `if (c) x = 1; else x = 0; if (x) ...` jump.c (the cc0 branch of jump_optimize, in both jump
    passes) redirects a simple jump whose previous insn sets a register to a constant past a
@@ -1272,6 +1288,36 @@ Each was read from the compiler source and confirmed on a live draft.
    pass sees the same register. A wider return (u32, s32) threads like the plain variable.
    SceneActorMovement_UpdateHeight has two such flags (category in a set, and a status bit),
    both formerly kept by empty asm barriers.
+52. **A value that both arms of an if compute can be gcse's copy, not a variable.** When the
+   ROM keeps one register for an address from an if/else to a later use, and one arm ends in
+   `adds rX, rY, #0` while the other computes it into rX directly, the original likely wrote
+   the address in each arm (in that arm's own variable) and again at the use. gcse's PRE sees
+   it available on both paths and makes a new pseudo, copied in each arm; it is ranked with its
+   own refs and life. One C variable assigned in both arms is a single pseudo with every mention
+   and the whole life, and can rank below a rival: ScriptCombatActor_UpdateState's collider
+   pointer (6 refs over 53 insns, against dp's 2941) needed a pin until the arms took
+   `&p->col` separately and the damage-number call named `&p->col` again. `why` prints this
+   lever for a pseudo with two or more sets, one a register copy.
+   Two related levers from the same run: in Player_SelectNearestMotionTarget, a dead
+   `ands rX, rFlags` before shared code was what remained of `if (flags & 16) A else A'`
+   whose arms jump2 cross-jumped; giving the arms back (each re-reading `&entry->body->pos`)
+   also made the pointer arrive through a join, so cse stopped folding its first load into
+   `body + 12`. Writing `distance = square; best = entry;` in both the flag-set branch and
+   the on-screen branch (jump2 shares the tails) gave square the refs a barrier had supplied.
+
+53. **`ldr r0; adds r1, r0, #0; adds r0, #1` is a post-increment of a temp that outlives the
+   copy.** The ROM loads a counter, keeps the old value in another register and increments the
+   loaded one in place. Two passes stand in the way. cse makes the copy's destination the class
+   head when its last use is later than the loaded temp's (make_regs_eqv), so `t + 1` reads
+   `matrix`; `why` names that takeover and its lever. Then regmove's optimize_reg_copy_1
+   (which does not log) sees `matrix = t` with t dying at the add and no label, jump or set
+   between, and rewrites the add to read `matrix` too. SpriteOam_QueueProjectedSprites and its
+   two siblings needed `tmp = *count; matrix = tmp++; *count = tmp;` with `tmp` a loop temp
+   reused later for the halved depth: the later use keeps tmp the head, the in-place `tmp++`
+   is a set between the copy and the death, which stops optimize_reg_copy_1. `why` now finds
+   the coalesced copy from the dumps and prints this lever. The same functions' r4/r5 swap
+   (attr 42 refs over 154 against p's 62 over 280) went away by writing the skip test's tail
+   out as `p = p->next; continue;`: jump2 merges it into the loop's tail, and p gets 66 refs.
 
 ## Survey: random table as a literal address (2026-10-24)
 

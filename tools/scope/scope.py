@@ -1170,6 +1170,36 @@ def cmd_insn(uid, func):
             last = cur
 
 
+def hard_reg_arg(arg):
+    """Hard register number for an argument spelled r0..r12, sb, sl, fp or ip; None otherwise."""
+    m = re.fullmatch(r"r(\d{1,2})", arg)
+    if m and int(m.group(1)) < 13:
+        return int(m.group(1))
+    return REG_ALIASES.get(arg) if arg in ("sb", "sl", "fp", "ip") else None
+
+
+def cmd_uses_hard(hard, func):
+    """`uses rN`: the pseudos the draft placed in hard register N, with how they were placed (local
+    alloc in which block, or global rank and priority) and the C lines of their mentions, so a value
+    that keeps a register from another can be found by name."""
+    func = dumped_function(func)
+    wd = workdir(func)
+    recs = alloc_records(wd, func)
+    names = pseudo_names(wd, func)
+    placed = sorted(x for x, h in hard_of(wd).items() if h == hard)
+    print(f"{rname(hard)} in {func}: {len(placed)} pseudo(s)")
+    lines = uid_lines(wd)
+    for x in placed:
+        rec = recs.get(x)
+        how = ("local, block %d, priority %d" % (rec[1], rec[2]) if rec and rec[0] == "L" else
+               "global #%d, priority %d (%d refs / live %d)" % (rec[1], rec[2], rec[3], rec[4]) if rec else
+               "no allocation record")
+        uids = [u for u, _, r in insn_list(wd, "lreg") if re.search(r"\(reg(?:/[a-z]+)*:\w+ %d\)" % x, r or "")]
+        where = sorted({lines.get(u) for u in uids if isinstance(lines.get(u), int)})
+        span = f", C lines {where[0]}-{where[-1]}" if where else ""
+        print(f"  {x} ({names.get(x, '-')}): {how}{span}")
+
+
 def cmd_uses(regs, func, passes):
     """For each pseudo, the insns (uid@C line) that mention it after each pass."""
     func = dumped_function(func)
@@ -2432,6 +2462,15 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
     return False
 
 
+def copy_joined(wd, reg):
+    """True when pseudo REG is set by two or more insns before allocation and one of those sets copies
+    another pseudo: a variable joined from two paths, the shape gcse's PRE copy takes on its own."""
+    sets = [r for _, _, r in insn_list(wd, "regmove")
+            if re.match(r"\(set \(reg(?:/\w)*:SI %d\) " % reg, r or "")]
+    copies = [r for r in sets if re.match(r"\(set \(reg(?:/\w)*:SI %d\) \(reg(?:/\w)*:SI \d+\)\)$" % reg, r)]
+    return len(sets) >= 2 and bool(copies)
+
+
 def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
     """What would let LO outrank HI in global alloc: LO's uses or life, or HI's. Lives are given as flow
     counts them in the source; a constant register's is doubled before allocation (see life_note)."""
@@ -2464,6 +2503,12 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
         r = next((r for r in range(hrefs - 1, 0, -1) if g_priority(r, hlive) < lpri), None)
         if r:
             out.append(f"{nm(hi)} with {r} refs instead of {hrefs}" + (mention_lines(wd, hi) if wd else ""))
+    if wd and copy_joined(wd, lo):
+        out.append(f"{nm(lo)} is set in more than one place, one of them a plain register copy: if it holds"
+                   " the same address on each path (an if/else that both take `&p->field`), give each arm its"
+                   " own variable and name the address again at the later use; gcse then makes the"
+                   " long-lived copy, a new pseudo ranked on its own (ScriptCombatActor_UpdateState's"
+                   " collider)")
     lever = macro_lever(wd, lo, lo_rec, hi, hi_rec) if wd else None
     if lever:
         a, b, nl, nh = lever
@@ -3985,7 +4030,13 @@ def cmd_probe(src, func, env):
                           " (base[i], base + i * size) instead of walking a pointer, keep one loop"
                           " counter, or make the step not a constant multiple of the counter.",
            "AGBCC_GIV": "the ROM steps this value in its own register each pass; the draft recomputes"
-                        " it. In C walk a pointer (p++ / p += size) instead of indexing.",
+                        " it. In C walk a pointer (p++ / p += size) instead of indexing. If the value"
+                        " is a running offset (`x -= 5` beside the counter, or `base - offset` with"
+                        " `offset += 5`), loop.c scores it benefit 0 and leaves it: write it as a"
+                        " multiple of the counter in its own statement, `u32 left = base - index * 5;`;"
+                        " the multiply gives the giv a positive benefit, so it is reduced, and an invariant"
+                        " base load is hoisted through its pointer, out of cse's reach"
+                        " (DamageNumberDisplay_UpdateLeaving; AGBCC_LOOP_TRACE=1 prints each benefit).",
            "AGBCC_NOMOVE": "loop.c hoisted this invariant out of the loop; the ROM sets it inside each"
                            " pass. In C make the set unmovable (scope.py FILE.c hoist shows why each one"
                            " moved): assign the same variable again in a later block of the body, past a"
@@ -4321,6 +4372,36 @@ def regmove_fixes(wd):
     return out
 
 
+def reg_copy_coalesce(wd, uid, gone, new):
+    """regmove's optimize_reg_copy_1 (regmove.c) does not log. Find its footprint before regmove: a copy
+    `(set NEW GONE)` earlier in insn UID's block (no label, jump or call between) with GONE dying at UID
+    and neither register set between. Returns (copy uid, NEW, GONE) or None."""
+    path = os.path.join(wd, "u.i.combine")
+    if not os.path.exists(path):
+        return None
+    forms = [(m.group(1), int(m.group(2)), one_line(m.group(0)), m.group(0)) for m in re.finditer(
+        r"^\((insn|jump_insn|call_insn|code_label|barrier|note)(?:/\w)* (\d+) .*?(?=^\(|\Z)",
+        open(path).read(), re.S | re.M)]
+    at = next((i for i, f in enumerate(forms) if f[1] == uid and f[0] == "insn"), None)
+    if at is None:
+        return None
+    reg = lambda n: r"\(reg(?:/\w)*:\w+ %d\)" % n
+    for g in gone:
+        if not re.search(r"REG_DEAD\s+" + reg(g), forms[at][3]):
+            continue
+        for kind, u, rtl, _ in reversed(forms[:at]):
+            if kind in ("code_label", "jump_insn", "call_insn", "barrier"):
+                break
+            if kind != "insn":
+                continue
+            m = re.match(r"\(set \(reg(?:/\w)*:\w+ (\d+)\) \(reg(?:/\w)*:\w+ (\d+)\)\)", rtl)
+            if m and int(m.group(2)) == g and int(m.group(1)) in new:
+                return u, int(m.group(1)), g
+            if re.match(r"\(set " + reg(g), rtl) or any(re.match(r"\(set " + reg(n), rtl) for n in new):
+                break
+    return None
+
+
 def explain_regmove(wd, uid, gone, new, nm, at):
     """regmove merged one pseudo into another at or before insn UID: name the two-address tie that did it,
     what in the C would have kept the ROM's separate copy, and the knob that forbids the tie."""
@@ -4331,8 +4412,21 @@ def explain_regmove(wd, uid, gone, new, nm, at):
           [f for f in fixes if any(re.search(r"\(reg(?:/\w)*:\w+ %d\)" % r, pats.get(f[1], "")) for r in regs)]
     regs = regs  # noqa: keeps the search above readable
     if not hit:
-        print("    (the regmove log names no tie that touches these registers: a copy coalesced by"
-              " optimize_reg_copy, which does not log)")
+        copy = reg_copy_coalesce(wd, uid, gone, new)
+        if copy:
+            cu, d, s = copy
+            print(f"    regmove's optimize_reg_copy_1 coalesced the copy {nm(d)} = {nm(s)} at {at(cu)}: {nm(s)}"
+                  f" died at {at(uid)} with no label, jump, call or set of either register between, so regmove"
+                  f" made the insns between read {nm(d)} and moved {nm(s)}'s death to the copy.")
+            bare = lambda r: (re.search(r"\((\w+)\)$", nm(r)) or [None, f"v{r}"])[1]
+            print(f"    If the ROM keeps reading {nm(s)} here, its C sets {bare(s)} in place between the copy and"
+                  f" this use (`{bare(d)} = {bare(s)}++;` rather than `{bare(d)} = {bare(s)};` then"
+                  f" `{bare(s)} + 1`), or uses {bare(s)} again past a branch so it does not die here"
+                  " (SpriteOam_QueueProjectedSprites:"
+                  " `matrix = tmp++; *count = tmp;`).")
+            return
+        print("    (the regmove log names no tie that touches these registers, and no copy that"
+              " optimize_reg_copy could have coalesced was found before this insn)")
         return
     kind, u, op = hit[0]
     # operand by operand, before and after regmove: which pseudo took which one's place
@@ -4363,7 +4457,11 @@ def explain_regmove(wd, uid, gone, new, nm, at):
               " byte read and masked (`u8` flags), read it into a byte union and narrow the and:"
               " `control.raw = a->flags; first = (u8)(control.raw & bit);` (DisplaySequence_ApplyFrame,"
               " include/display_sequence_inline.h; it matched AnimatedTile_TickAlternateAnimation where"
-              " `u8 left`/`u8 input` did not).")
+              " `u8 left`/`u8 input` did not). For a u16/u8 field masked by a constant, write the and"
+              " on the read itself, `(*field & K)`, not through u32 variables: the constant then sits in"
+              " an HImode pseudo read through a subreg, which regmove does not tie, and cse does not move a"
+              " known-constant variable to operand 2 (README fact 37; ActorPalette_UpdateReverseFade's"
+              " `(*field & 15) | 0xd0` replaced three pins).")
     # the same tie in other inlined copies of this code: same pattern up to register numbers
     shape = lambda r: re.sub(r"\(reg(/\w)*:(\w+) \d+\)", r"(reg:\2)", r or "")
     rowline = {}
@@ -4532,12 +4630,35 @@ def explain_substitution(wd, p, uid, gone, nm, at, func=None):
 
 def explain_pre(wd, func, uid):
     """The PRE decisions insn UID takes part in (replaced, inserted by gcse, or a copy into a reaching register)."""
-    for r in pre_records(wd, func):
+    recs = pre_records(wd, func)
+    shared = []
+    for r in recs:
         role = ("was replaced" if uid == r["redundant"] else "is gcse's own computation" if uid in r["inserted"]
                 else "copies the value" if uid in (c for c, _ in r["copies"]) else None)
         if role:
             print(f"    insn {uid} {role}: " + pre_text(wd, func, r)
                   + f". AGBCC_NOPRE={r['k']} undoes it; `pre` scores every PRE decision")
+            shared.append(r)
+    lever = pre_shared_insertion(recs, shared)
+    if lever:
+        ks = ",".join(str(r["k"]) for r in lever)
+        print(f"    PRE replacements {ks} share one insertion: the expression is computed on separate paths"
+              " (both arms of an if, or two loops), so it is anticipatable above them and gcse computes it"
+              f" once there (what-if: AGBCC_NOPRE={ks}). If the ROM computes it on each path, write one path"
+              " through a different base, such as a local pointer to the array (`parts = group->parts;"
+              " parts[i].flags`), so the two are different expressions (EffectGroup_Spawn, README fact 50).")
+
+
+def pre_shared_insertion(recs, shown):
+    """The PRE records among RECS that reuse one gcse insertion together with a record in SHOWN (two or
+    more paths merged into a single computation); [] when there is no such group."""
+    for r in shown:
+        if not r["inserted"]:
+            continue
+        group = [x for x in recs if x["expr"] == r["expr"] and x["inserted"] == r["inserted"]]
+        if len({x["redundant"] for x in group}) > 1:
+            return group
+    return []
 
 
 def relative_order(wd, u, p):
@@ -7258,7 +7379,8 @@ def validate_cli(args):
             cli_error("FILE.c insn UID [FUNC]")
         cli_number(rest[1], "FILE.c insn UID [FUNC]")
     elif rest and rest[0] in ("life", "uses"):
-        if len(rest) < 2 or rest[0] == "uses" and not any(a.isdigit() for a in rest[1:]):
+        if len(rest) < 2 or rest[0] == "uses" and not any(a.isdigit() or hard_reg_arg(a) is not None
+                                                           for a in rest[1:]):
             cli_error("FILE.c " + rest[0] + " NAME|REG... [FUNC]")
     elif rest and rest[0] == "vs":
         if len(rest) not in (2, 3):
@@ -7383,7 +7505,8 @@ def main():
             explicit = params[1] if len(params) > 1 else None
             params = params[:1]
         elif rest[0] == "uses":
-            if params and not params[-1].isdigit() and params[-1] not in PASSES:
+            if params and not params[-1].isdigit() and params[-1] not in PASSES \
+                    and hard_reg_arg(params[-1]) is None:
                 explicit = params.pop()
         elif params:
             import land
@@ -7404,8 +7527,12 @@ def main():
             cmd_life(rest[1:], func)
         else:
             names = [a for a in rest[1:] if not a.isdigit()]
-            cmd_uses([int(a) for a in rest[1:] if a.isdigit()], func,
-                     [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"])
+            for a in names:
+                if hard_reg_arg(a) is not None:
+                    cmd_uses_hard(hard_reg_arg(a), func)
+            pseudos = [int(a) for a in rest[1:] if a.isdigit()]
+            if pseudos:
+                cmd_uses(pseudos, func, [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"])
         return 0
     if rest and rest[0] == "put":  # FILE.c put SNIPPET.c [FUNC]: the snippet's C in place of FUNC's, then the score
         if len(rest) < 2:

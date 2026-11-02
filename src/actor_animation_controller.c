@@ -134,7 +134,6 @@ static inline u32 mode_bits(u8 *p, u32 mask)
 
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 
-// MATCHING_CONCESSION: register-pinning
 void ActorPalette_UpdateReverseFade(struct ActorAnimController *p)
 {
     s32 i;
@@ -162,16 +161,11 @@ void ActorPalette_UpdateReverseFade(struct ActorAnimController *p)
             u32 mode = 2;
             p->mode = mode;
         }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 0xd0;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
+        *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0xd0;
+        if (p->oldMode == 3) {
+            if ((*((u8 *)p + 0xf5a) & 15) == 3) {
+                p->savedFrame = p->anim.frame;
+                p->savedTimer = p->anim.timer;
             }
         }
         {
