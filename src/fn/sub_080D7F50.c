@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 #include "scene_actor_chase_shared.h"
 // confidence=low: selects attack bounds and properties from mummy movement flags.
@@ -55,11 +54,10 @@ static inline void ApplyAttack(struct SceneActorRegistryResetView *actor,
     }
     Collider_SetAttackProperties(collider, damage, element, 0, flags, response);
 }
-void Mummy_UpdateAttackCollider(u8 *input)
+void Mummy_UpdateAttackCollider(struct SceneActorRegistryResetView *actor)
 {
     struct BoundsBits bounds;
-    struct SceneActorRegistryResetView *actor = (void *)input;
-    register struct ContactCollider *collider asm("r0");
+
     u32 flags;
     u32 attackBit;
 
@@ -75,6 +73,7 @@ void Mummy_UpdateAttackCollider(u8 *input)
     }
     attackBit = 16;
     if (flags & attackBit) {
+        struct ContactCollider *collider;
 
         bounds.x = 64;
         bounds.y = 100;
@@ -86,6 +85,7 @@ void Mummy_UpdateAttackCollider(u8 *input)
         ApplyAttack(actor, collider, 1, 0x200004);
         SceneActorChase_SetReactionFlags(actor, 0x4000);
     } else if (flags & 0x100) {
+        struct ContactCollider *collider;
         ((struct ContactPosition *)&bounds)->x = 32;
         ((struct ContactPosition *)&bounds)->y = 100;
         ((struct ContactPosition *)&bounds)->z = 32;
@@ -95,6 +95,7 @@ void Mummy_UpdateAttackCollider(u8 *input)
         collider->flags = 0x2201;
         ApplyAttack(actor, collider, 1, 0x20000);
     } else {
+        struct ContactCollider *collider;
         ((struct ContactPosition *)&bounds)->x = 32;
         ((struct ContactPosition *)&bounds)->y = 100;
         ((struct ContactPosition *)&bounds)->z = 32;
