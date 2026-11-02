@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_contact_response.h"
@@ -23,10 +22,6 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-#define DAMAGE_READ_MASKED_FLAGS(out_, mask_, value_)                                              \
-    do {                                                                                           \
-        (out_) = (mask_) & (value_);                                                               \
-    } while (0)
 static inline u8 HasPendingHit(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2E6 == 0)
@@ -204,10 +199,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     u32 *flags2D8;
     u32 *flags2CC;
     u32 updated;
-    u32 four;
-    u32 bits;
     u32 strong;
-    u32 c1;
     if (!HasPendingHit(actor)) {
         if (SceneActorReaction_ApplyAreaDamage(actor)) {
             u16 *borrowed = &actor->flags2D4;
@@ -316,15 +308,12 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
         updated = marked;
 
         {
-            u32 v = actor->field2E6;
-            four = 4;
-            c1 = four;
-            DAMAGE_READ_MASKED_FLAGS(bits, c1, v);
+            u32 responseFlags = actor->field2E6 & 4u;
             mode = 1;
             flags2D4 = motion;
             savedHealth = healthOwner.field;
-            if (bits)
-                mode = c1;
+            if (responseFlags)
+                mode = 4;
         }
     }
     {
@@ -336,7 +325,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
             goto done;
     }
     {
-        if ((mode & four) && (!(updated & four))) {
+        if ((mode & 4) && (!(updated & 4))) {
             SceneActorBehavior_PlayReactionSound(actor);
             *(u16 *)&actor->field30C = 12;
         }
