@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "game_start_menu.h"
 #include "display_sprite_playback.h"
 #include "game_state.h"
@@ -26,6 +25,18 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 
+enum SavePortrait { SAVE_PORTRAIT_SOLAR, SAVE_PORTRAIT_DARK, SAVE_PORTRAIT_VAMPIRE };
+
+/* The save screen retains all three portrait assets and the form mapping. */
+static inline u16 SavePortraitForForm(s16 form)
+{
+    if (form == 0)
+        return SAVE_PORTRAIT_SOLAR;
+    if (form == 5)
+        return SAVE_PORTRAIT_DARK;
+    return SAVE_PORTRAIT_VAMPIRE;
+}
+
 /* Draws the name, player portrait and title, play time, and level from a save file. */
 void GameStart_DrawSaveInfo(struct GameStart *p)
 {
@@ -45,7 +56,7 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
         u8 misc[10];
         u32 zero;
         u32 *zp;
-        s32 idx;
+        s32 portraitIndex;
         s32 hours, minutes, level;
         u8 *q;
         struct SceneInputWidget *tens;
@@ -57,17 +68,16 @@ void GameStart_DrawSaveInfo(struct GameStart *p)
         Menu_EraseRect(8, 7, 12, 2);
         Menu_DrawText(8, 7, s);
         {
-            /* The game reads player form here, then displays the first portrait and title. */
-            s32 playerForm = gGameState->form;
-            asm("" : : "r"(playerForm));
+            u16 portrait = SavePortraitForForm(gGameState->form);
+            u16 selected = portrait < 1 ? portrait : SAVE_PORTRAIT_SOLAR;
+            portraitIndex = selected;
         }
-        idx = 0;
-        Anim_SetSequence(&p->cursorSequence, p->cursorResource, seqs.seq[idx], 0, 0);
+        Anim_SetSequence(&p->cursorSequence, p->cursorResource, seqs.seq[portraitIndex], 0, 0);
         PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)(&p->cursor),
                                     (struct DisplaySequenceState *)(&p->cursorSequence));
         p->cursor.flags &= ~1;
         for (i = 0; i <= 11; i++) {
-            Bg_SetTilemapEntry(3, i + 8, 6, titleTiles[idx][i], 0, 2);
+            Bg_SetTilemapEntry(3, i + 8, 6, titleTiles[portraitIndex][i], 0, 2);
             zp = &zero;
             hourOnes = &p->timeDigits[1];
             minuteOnes = &p->timeDigits[4];
