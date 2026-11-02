@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // confidence=low: periodically retargets the part beside the player for 64 ticks.
@@ -37,35 +36,8 @@ static inline void Difference(struct SceneVec *dst, struct SceneVec *a, struct S
 }
 static inline void SetState(struct VanargandPart *p, u32 state)
 {
-    register u32 so asm("r3") = 0x164;
-    register u32 *sp asm("r0");
-    u32 *tp;
-    asm("" : "+r"(so));
-    sp = (u32 *)((u8 *)p + so);
-    *sp = state;
-    {
-        u32 to = 0x168;
-        tp = (u32 *)((u8 *)p + to);
-        *tp = 0;
-    }
-}
-static inline void Offset(struct SceneVec *v, s32 x, s32 z)
-{
-    s16 *component = &v->x;
-    register s32 first asm("r2");
-    register s32 second asm("r3");
-    register s32 value asm("r0");
-    asm("" : "+r"(component));
-    first = x;
-    asm("" : "+r"(first));
-    value = first;
-    asm("" : "+r"(value));
-    v->x = value + (u16)*component;
-    second = z;
-    asm("" : "+r"(second));
-    value = second;
-    asm("" : "+r"(value));
-    v->z = value + (u16)v->z;
+    p->state = state;
+    p->timer = 0;
 }
 void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
 {
@@ -83,19 +55,18 @@ void Vanargand_UpdatePartTracking(u8 *boss, struct VanargandPart *p)
         case 0:
             if (!(p->timer & 15)) {
                 Difference(&delta, Player_GetEffectivePosition(0), p->base);
-                if (p->variant == 1)
-                    Offset(&delta, 512, -512);
-                else
-                    Offset(&delta, -512, 512);
+                if (p->variant == 1) {
+                    delta.x += 512;
+                    delta.z -= 512;
+                } else {
+                    delta.x -= 512;
+                    delta.z += 512;
+                }
                 MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
             }
             MotionTrack_Update(p->motion);
             {
-                register u32 off asm("r2") = 0x168;
-                u32 *t, v;
-                t = (u32 *)((u8 *)p + off);
-                v = ++*t;
-                asm("" : : "r"(off));
+                u32 v = ++p->timer;
                 if (v & 64) {
                     SetState(p, 1);
                     p->enter = 1;
