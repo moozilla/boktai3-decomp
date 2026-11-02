@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -55,6 +54,7 @@ static inline s32 TargetDistance(struct SceneVec *player, struct SceneVec *posit
 }
 s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
 {
+    s32 facingRight = 0;
     struct SceneVec *player = Player_GetEffectivePosition(0);
     s32 distance = TargetDistance(player, &p->display.spatial.position);
     struct SceneVec target;
@@ -62,7 +62,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
     SceneVec_Copy(&target, Player_GetEffectivePosition(0));
     if (p->useDelayTable) {
         if (p->timer > p->delays[p->delayIndex]) {
-            if (!p->facing)
+            if (p->facing == facingRight)
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
             else
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 12);
@@ -74,7 +74,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
         }
     } else {
         if (p->timer > p->turnDelay && p->turnDelay != 0) {
-            if (!p->facing)
+            if (p->facing == facingRight)
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
             else
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 12);
@@ -116,7 +116,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
         p->targetVisible = 0;
     if (p->aimTimer == 119) {
         u8 angle;
-        register s32 facing asm("r5");
+        s32 facing;
         {
             struct SceneVec *targetPosition, *emitterPosition;
             targetPosition = Player_GetEffectivePosition(0);
@@ -127,7 +127,7 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
         p->timer = 0;
         p->shotCount = 0;
         facing = p->facing;
-        if (!facing) {
+        if (facing == facingRight) {
             if ((u8)(angle - 0x21) <= 0x7e) {
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
                 p->timer = facing;
