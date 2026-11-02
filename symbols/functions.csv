@@ -3537,6 +3537,7 @@ addr,name,mode,confidence,source,notes
 080BCF34,Skeleton_UpdateTargetTransition,thumb,low,src-alias,
 080BD004,SceneActorReaction_SinkThenDefeat,thumb,low,src-alias,
 080BD1F0,Skeleton_UpdateDefeat,thumb,low,src-alias,
+080BF0E4,Skeleton_UpdateRiseRecovery,thumb,low,src-alias,Tentative: plays a category-specific directional rise animation; then resumes or redirects the skeleton route.
 080C0658,Skeleton_SetAttackControlTable,thumb,low,src-alias,Installs the table at actor offset 0x288 during initialization; attack role tentative
 080C0668,SceneActorApproach_RunCategoryAction,thumb,low,src-alias,
 080C0750,SceneActorApproach_RunTimedAction,thumb,low,src-alias,
