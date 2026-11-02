@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_facing.h"
 #include "render.h"
 #include "player.h"
 typedef struct {
@@ -95,26 +95,14 @@ static inline void setFacing(struct SceneNpc *npc, u32 a)
 
 static inline u32 setInitialFacing(struct SceneNpc *npc, u32 input)
 {
-    u32 angle = input;
-    register u8 *dest asm("r2");
-    register u32 zero asm("r3");
-    asm("" : "+r"(angle));
+    u8 angle = input;
+    u8 *dest;
+    u32 zero;
     dest = &npc->motion.angle;
     zero = 0;
-    asm("" : : "r"(zero));
     *dest = angle;
-    {
-        s32 t = (s32)(angle + 0x70) >> 5;
-        u32 m = 7;
-        m &= t;
-        npc->facing8 = m;
-    }
-    {
-        s32 t = (s32)(angle + 0x60) >> 6;
-        u32 m = 3;
-        m &= t;
-        npc->facing4 = m;
-    }
+    npc->facing8 = SceneFacing_EightWay(input);
+    npc->facing4 = SceneFacing_FourWay(input);
     return zero;
 }
 static inline void setInitialState(struct SceneNpc *npc, u32 state, u32 zero)
