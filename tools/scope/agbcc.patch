@@ -1290,19 +1290,20 @@
    n = expr_hash_table_size * sizeof (struct expr *);
    expr_hash_table = (struct expr **) gmalloc (n);
  }
-@@ -4508,6 +4512,11 @@
+@@ -4508,6 +4512,12 @@
  pre_delete ()
  {
    int i, bb, changed;
-+  /* Instrumentation: AGBCC_NOPRE=K keeps the K-th redundant computation
++  /* Instrumentation: AGBCC_NOPRE=K[,K...] keeps the K-th redundant computation
 +     (counted from 1 in deletion order) instead of replacing it with a copy
 +     of the reaching register; AGBCC_PRE_TRACE=1 lists them to stderr.  */
 +  int pre_count = 0;
 +  char *nopre = getenv ("AGBCC_NOPRE");
++  extern int agbcc_list_has ();
  
    /* Compute the expressions which are redundant and need to be replaced by
       copies from the reaching reg to the target reg.  */
-@@ -4556,7 +4565,11 @@
+@@ -4556,7 +4566,11 @@
  		     contain clobbers of scratch regs.  This may cause the
  		     insn created by validate_change to not patch any pattern
  		     and thus cause validate_change to fail.   */
@@ -1310,7 +1311,7 @@
 +		  if (getenv ("AGBCC_PRE_TRACE"))
 +		    fprintf (stderr, "pre k=%d insn=%d expr=%d\n", pre_count, INSN_UID (insn), indx);
  		  if (TEST_BIT (temp_bitmap[bb], indx)
-+		      && ! (nopre && atoi (nopre) == pre_count)
++		      && ! (nopre && agbcc_list_has ("AGBCC_NOPRE", pre_count))
  		      && validate_change (insn, &SET_SRC (set),
  					  expr->reaching_reg, 0))
  		    {
