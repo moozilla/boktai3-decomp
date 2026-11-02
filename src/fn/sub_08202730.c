@@ -72,10 +72,11 @@ static inline void Polar(struct SceneVec *d, struct ProjParams *p)
     dst->y = 0;
     dst->z = Truncate(speed * gUnk_086149C4[angle & 0xff]);
 }
-static inline u32 FlipBits(u32 c)
+static inline u32 CommandFlip(u32 command, u32 axis)
 {
-    u32 x = (0x30 & c) >> 4;
-    return x;
+    u32 flips = 0x30;
+    flips &= command;
+    return (flips >> 4) & axis;
 }
 static inline struct ProjEntry *Next(struct ProjEntry *e)
 {
@@ -168,16 +169,14 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
                     u32 left = 1;
                     u32 mask = 1;
                     left &= input;
-                    if (left != (((*entry & 0x30) >> 4) & mask))
+                    if (left != CommandFlip(DisplaySequence_ReadCommand(entry), mask))
                         s->flags |= 4;
                     else
                         s->flags &= ~4;
                 }
                 {
                     u32 left = (u8)(a->flags & 2);
-                    register u32 cmd asm("r2") = *entry;
-                    asm("" : "+r"(cmd));
-                    if (left != (FlipBits(cmd) & 2))
+                    if (left != CommandFlip(DisplaySequence_ReadCommand(entry), 2))
                         s->flags |= 8;
                     else
                         s->flags &= ~8;
