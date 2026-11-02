@@ -46,6 +46,7 @@ struct TimedProjectilePool {
     struct ProjectileSlot slots[16];
 };
 
+s32 Projectile_SpawnFromConfig(struct ProjectileConfig *params, struct ContactPosition *pos);
 void ProjectilePool_ReleaseSlot(struct TimedProjectilePool *pool, struct ProjectileSlot *slot,
                                 u32 index);
 struct ProjectileSlot *ProjectilePool_FindFreeSlot(struct TimedProjectilePool *pool, s32 *index);
