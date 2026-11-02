@@ -4630,12 +4630,35 @@ def explain_substitution(wd, p, uid, gone, nm, at, func=None):
 
 def explain_pre(wd, func, uid):
     """The PRE decisions insn UID takes part in (replaced, inserted by gcse, or a copy into a reaching register)."""
-    for r in pre_records(wd, func):
+    recs = pre_records(wd, func)
+    shared = []
+    for r in recs:
         role = ("was replaced" if uid == r["redundant"] else "is gcse's own computation" if uid in r["inserted"]
                 else "copies the value" if uid in (c for c, _ in r["copies"]) else None)
         if role:
             print(f"    insn {uid} {role}: " + pre_text(wd, func, r)
                   + f". AGBCC_NOPRE={r['k']} undoes it; `pre` scores every PRE decision")
+            shared.append(r)
+    lever = pre_shared_insertion(recs, shared)
+    if lever:
+        ks = ",".join(str(r["k"]) for r in lever)
+        print(f"    PRE replacements {ks} share one insertion: the expression is computed on separate paths"
+              " (both arms of an if, or two loops), so it is anticipatable above them and gcse computes it"
+              f" once there (what-if: AGBCC_NOPRE={ks}). If the ROM computes it on each path, write one path"
+              " through a different base, such as a local pointer to the array (`parts = group->parts;"
+              " parts[i].flags`), so the two are different expressions (EffectGroup_Spawn, README fact 50).")
+
+
+def pre_shared_insertion(recs, shown):
+    """The PRE records among RECS that reuse one gcse insertion together with a record in SHOWN (two or
+    more paths merged into a single computation); [] when there is no such group."""
+    for r in shown:
+        if not r["inserted"]:
+            continue
+        group = [x for x in recs if x["expr"] == r["expr"] and x["inserted"] == r["inserted"]]
+        if len({x["redundant"] for x in group}) > 1:
+            return group
+    return []
 
 
 def relative_order(wd, u, p):

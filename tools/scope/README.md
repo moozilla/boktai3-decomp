@@ -1268,6 +1268,13 @@ Each was read from the compiler source and confirmed on a live draft.
    * by the equations, also when x is set in the block before the loop or inside it (not
      checked on a draft).
    `pre` flags each such move ("moved above a loop").
+   The same insertion serves two paths when both arms of an if compute an expression:
+   EffectGroup_Spawn's kind == 2 arm and its else arm each loop over `group->parts[i].flags`,
+   so `group + 0x1c` is anticipatable above the if and PRE computed it once before the spawn
+   loop (an asm barrier on `group` in one arm had kept the arms apart; `AGBCC_NOPRE=1,2`
+   matches). `parts = group->parts; parts[i].flags` in one arm makes the two expressions
+   different and matched without the barrier. `why` on such an insertion names the shared
+   replacements and this lever.
 51. **A 0/1 flag survives only when its test reads a different REG from its sets.** For
    `if (c) x = 1; else x = 0; if (x) ...` jump.c (the cc0 branch of jump_optimize, in both jump
    passes) redirects a simple jump whose previous insn sets a register to a constant past a
