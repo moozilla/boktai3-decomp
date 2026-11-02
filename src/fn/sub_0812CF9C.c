@@ -27,7 +27,7 @@ void SceneSlot_EmitPulse(struct ContactPosition *input)
     asm volatile("" : "+r"(origin));
     table = gRandomTable;
     {
-        register u32 index asm("r0") = ((cursor = &gRandomIndex), *cursor + 1) & 1023;
+        u16 index = ((cursor = &gRandomIndex), *cursor + 1) & 1023;
         const u8 *sample = (void *)(index * 2 + (u32)table);
         mask = 255;
         angle = *sample;
