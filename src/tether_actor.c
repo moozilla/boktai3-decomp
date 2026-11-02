@@ -1800,7 +1800,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
         {
             s32 playerX = player->position.x;
             struct ContactPosition *targetPosition = &savedActor->directedTarget;
-            s32 actorX = targetPosition->x;
+            s16 actorX = targetPosition->x;
             dx = playerX - actorX;
         }
         dz = player->position.z - savedActor->directedTarget.z;
@@ -1828,8 +1828,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
                 sample = *(const u16 *)(byteOffset + (u32)table);
                 sample &= 7;
                 {
-                    register u32 offset asm("r2") = 0x46C;
-                    asm("" : "+r"(offset));
+                    u32 offset = 0x46C;
                     heading = (u16 *)((u8 *)savedActor + offset);
                 }
                 *heading = sample;
@@ -1837,9 +1836,8 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
         }
         {
             register u8 *target asm("r0") = (u8 *)gTetherActor;
-            register u32 offset asm("r3");
+            u32 offset;
             offset = 0x46A;
-            asm("" : "+r"(offset));
             *(u16 *)((u8 *)target + offset) = 29;
         }
     }
