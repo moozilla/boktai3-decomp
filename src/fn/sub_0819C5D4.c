@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
 struct BurstVector {
     s16 x, y, z, pad;
@@ -33,21 +34,14 @@ static inline void add(struct BurstVector *d, struct BurstVector *a, struct Burs
     d->y = b->y + a->y;
     d->z = b->z + a->z;
 }
-static inline s32 randomValue(const u16 *table)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
-// MATCHING_CONCESSION: register-pinning
+
 void Hresvelgr_GetTravelTarget(struct BurstActor *object, struct BurstVector *out)
 {
     struct BurstActor *actor = object;
     if (out) {
-        register const u16 *table asm("r4") = gRandomTable;
-        s32 radius = (randomValue(table) >> 3) % 512 + 256;
-        s32 sample = randomValue(table);
+        const u16 *table = gRandomTable;
+        s32 radius = ((s32)ParticleRandom_ReadSample(table) >> 3) % 512 + 256;
+        s32 sample = ParticleRandom_ReadDirectSample(table);
         s32 base = actor->side << 6;
         s32 offset = (sample >> 3) % 32 + 112;
         s32 angle = base + offset;
