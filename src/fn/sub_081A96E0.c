@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -16,6 +15,11 @@ static inline s32 RandomValue(void)
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
 s32 ScenePair_CountPositiveCounters(void *);
+static inline void SetFinalPhase(struct VanargandPairAttack *owner, u32 phase)
+{
+    owner->phase = phase;
+    owner->timer = 0;
+}
 void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
 {
     struct VanargandPairAttack *self = p;
@@ -74,13 +78,12 @@ void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
                 p->timer++;
             } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 struct VanargandAttackPair *pair;
-                register u32 a asm("r4");
-                u32 b;
-                asm("" : "+r"(self));
-                pair = self->pair;
-                a = pair->first;
-                b = pair->second;
-                if (ScenePair_CountPositiveCounters(pair) == 2 && a == 5 && b == 5)
+                u32 firstState, secondState;
+                pair = Vanargand_GetAttackPair(self);
+                firstState = Vanargand_HalfState(pair, 0);
+                secondState = Vanargand_HalfState(pair, 1);
+                if (ScenePair_CountPositiveCounters(pair) == 2 && firstState == 5 &&
+                    secondState == 5)
                     self->flash = 60;
                 {
                     u8 next = 3;
@@ -92,21 +95,13 @@ void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
             break;
         case 3:
             if (p->timer == 0) {
-                if (self->pair->first == 5)
+                if (Vanargand_HalfState(self->pair, 0) == 5)
                     PairedSceneActor_ApplyToSelectedHalves(self->pair, 1, 6);
-                if (self->pair->second == 5)
+                if (Vanargand_HalfState(self->pair, 1) == 5)
                     PairedSceneActor_ApplyToSelectedHalves(self->pair, 2, 6);
                 p->timer++;
-            } else if (PairedSceneActor_AreSelectedHalvesFinished(({
-                           asm("" : : "r"(p));
-                           self->pair;
-                       }))) {
-                {
-                    u8 next = 4;
-                    u32 zero = 0;
-                    p->phase = next;
-                    p->timer = zero;
-                }
+            } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
+                SetFinalPhase(p, 4);
             }
             break;
         case 4:
