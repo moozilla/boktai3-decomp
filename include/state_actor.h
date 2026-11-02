@@ -81,7 +81,10 @@ struct StateActor {
     u32 actionTimer; /* 0xC4: reset to 0 on transition, incremented each call otherwise. */
     u8 unkC8[4];
     u8 requestedAngle; /* 0xCC */
-    u8 unkCD[0x37];
+    u8 unkCD[0x1B];
+    u32 firstEventScript, secondEventScript;
+    s32 eventArguments[4];
+    u8 unk100[4];
     u8 (*actionTryUpdate)(void *); /* 0x104 */
     void (*actionReset)(void *);   /* 0x108 */
     u8 unk10C[0xC];
