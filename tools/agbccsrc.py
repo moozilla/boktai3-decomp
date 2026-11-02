@@ -147,6 +147,21 @@ TOPICS = {
         "the insn, regmove (or reload) copies it first (`adds rD, rX, #0`). Which operand is operand 1 was "
         "fixed earlier (see cse-swap); whether a copy is needed depends on operand 1 dying here.",
         [("regmove.c", "/* Now scan through the operands looking for a source operand", 0, 22)]),
+    "member-store": (
+        "member store byte halfword array field bit-field store_bit_field ldrb orrs strb 0xff -1 direct_store",
+        "Thumb has no QImode or HImode move with an sp or fp address, so init_expr_once leaves "
+        "direct_store[QImode] and [HImode] at 0, and store_field sends every byte or halfword member store "
+        "(`p->a = v`, `p->arr[i] = v`) through store_bit_field. That reads the old value, ands it, and ors "
+        "the new one in; for an all-ones constant it only ors. combine folds this back to a plain store "
+        "when the constant is set in the same block, but in a loop loop.c hoists the 0xFF first, so "
+        "`p->arr[i] = -1` is `ldrb; orrs rK; strb` (`ldrh; orrs; strh`), and the extra read changes the "
+        "loop's givs. A store through pointer arithmetic (`*(p->arr + i) = v`, `q[i]`) is an ordinary MEM, "
+        "where movqi takes -1 as a QImode pseudo (`movs #1; rsbs; adds`, scope README facts 28 and 63; "
+        "spellings.sp_member_index).",
+        [("expr.c", "/* If the structure is in a register or if the component", 0, 14),
+         ("expmed.c", "/* Now clear the chosen bits in OP0,", 0, 20),
+         ("expr.c", "/* Try indexing by frame ptr and try by stack ptr.", 0, 4),
+         ("thumb.h", "/* Although it is not incorrect, we don't accept QImode and HImode", 0, 16)]),
     "regmove-tie": (
         "regmove tie tied same register output input match",
         "regmove gives an insn's output the register of the input it must match, by rewriting the insn that "
