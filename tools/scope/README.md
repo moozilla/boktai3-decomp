@@ -1268,6 +1268,13 @@ Each was read from the compiler source and confirmed on a live draft.
    * by the equations, also when x is set in the block before the loop or inside it (not
      checked on a draft).
    `pre` flags each such move ("moved above a loop").
+   The same insertion serves two paths when both arms of an if compute an expression:
+   EffectGroup_Spawn's kind == 2 arm and its else arm each loop over `group->parts[i].flags`,
+   so `group + 0x1c` is anticipatable above the if and PRE computed it once before the spawn
+   loop (an asm barrier on `group` in one arm had kept the arms apart; `AGBCC_NOPRE=1,2`
+   matches). `parts = group->parts; parts[i].flags` in one arm makes the two expressions
+   different and matched without the barrier. `why` on such an insertion names the shared
+   replacements and this lever.
 51. **A 0/1 flag survives only when its test reads a different REG from its sets.** For
    `if (c) x = 1; else x = 0; if (x) ...` jump.c (the cc0 branch of jump_optimize, in both jump
    passes) redirects a simple jump whose previous insn sets a register to a constant past a
@@ -1297,6 +1304,20 @@ Each was read from the compiler source and confirmed on a live draft.
    also made the pointer arrive through a join, so cse stopped folding its first load into
    `body + 12`. Writing `distance = square; best = entry;` in both the flag-set branch and
    the on-screen branch (jump2 shares the tails) gave square the refs a barrier had supplied.
+
+53. **`ldr r0; adds r1, r0, #0; adds r0, #1` is a post-increment of a temp that outlives the
+   copy.** The ROM loads a counter, keeps the old value in another register and increments the
+   loaded one in place. Two passes stand in the way. cse makes the copy's destination the class
+   head when its last use is later than the loaded temp's (make_regs_eqv), so `t + 1` reads
+   `matrix`; `why` names that takeover and its lever. Then regmove's optimize_reg_copy_1
+   (which does not log) sees `matrix = t` with t dying at the add and no label, jump or set
+   between, and rewrites the add to read `matrix` too. SpriteOam_QueueProjectedSprites and its
+   two siblings needed `tmp = *count; matrix = tmp++; *count = tmp;` with `tmp` a loop temp
+   reused later for the halved depth: the later use keeps tmp the head, the in-place `tmp++`
+   is a set between the copy and the death, which stops optimize_reg_copy_1. `why` now finds
+   the coalesced copy from the dumps and prints this lever. The same functions' r4/r5 swap
+   (attr 42 refs over 154 against p's 62 over 280) went away by writing the skip test's tail
+   out as `p = p->next; continue;`: jump2 merges it into the loop's tail, and p gets 66 refs.
 
 ## Survey: random table as a literal address (2026-10-24)
 

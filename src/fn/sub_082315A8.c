@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 #include "render.h"
@@ -119,9 +118,9 @@ s32 EffectGroup_Spawn(struct Unk082315A8Group *group, u32 kind, u32 parameter,
         }
     }
     if (group->kind == 2) {
-        asm("" : "+r"(group));
+        struct Unk082315A8Part *parts = group->parts;
         for (i = 0; i <= 3; i++)
-            group->parts[i].flags |= 0x200;
+            parts[i].flags |= 0x200;
     } else {
         for (i = 0; i <= 3; i++)
             group->parts[i].flags &= ~0x200;

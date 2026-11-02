@@ -3,7 +3,6 @@
 #include "ram.h"
 #include "runtime.h"
 // confidence=low: flag 0x1000 selects this sprite staging pass.
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z;
 };
@@ -30,9 +29,18 @@ static inline s32 project(s32 input)
     s32 v = input * 3;
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
-static inline s32 divide2(s32 input)
+static inline void screen(struct Vec *dst, struct Vec *src)
 {
-    return input >= 0 ? input >> 1 : -((-input) >> 1);
+    s32 depth, height, y, z;
+    s32 sx = src->x, sz = src->z;
+    dst->x = project(sx - sz);
+    depth = project(sx + sz);
+    height = project(src->y);
+    y = depth - height;
+    z = depth + height;
+    dst->x = dst->x - gCameraOrigin[0] + 120;
+    dst->y = y - gCameraOrigin[1] + 80;
+    dst->z = z - gCameraOrigin[2];
 }
 void SpriteOam_QueueFlaggedProjectedSprites(void)
 {
@@ -54,27 +62,17 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
         u32 attr;
         s32 depth;
         s32 ox, oy;
+        s32 tmp;
         u32 initialFlags = p->flags;
-        if (initialFlags & skip)
-            goto next;
+        if (initialFlags & skip) {
+            p = p->next;
+            continue;
+        }
         if (!(initialFlags & 0x1000))
             goto next;
 
         if (!(initialFlags & 16)) {
-            {
-                register struct Vec *out asm("r5") = &pos;
-                struct Vec *in = &p->pos;
-                s32 depth, height, y, z;
-                s32 sx = p->pos.x, sz = in->z;
-                out->x = project(sx - sz);
-                depth = project(sx + sz);
-                height = project(in->y);
-                y = depth - height;
-                z = depth + height;
-                out->x = out->x - gCameraOrigin[0] + 120;
-                out->y = y - gCameraOrigin[1] + 80;
-                out->z = z - gCameraOrigin[2];
-            }
+            screen(&pos, &p->pos);
             x = pos.x;
             y = pos.y;
             z = pos.z;
@@ -125,12 +123,9 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
                 gSpriteAffineParams[*count].angle = angle;
                 gSpriteAffineParams[*count].scaleX = sx;
                 gSpriteAffineParams[*count].scaleY = sy;
-                {
-                    register s32 old asm("r0") = *count;
-                    matrix = old;
-                    ++old;
-                    *count = old;
-                }
+                tmp = *count;
+                matrix = tmp++;
+                *count = tmp;
             }
             attr |= matrix << 25;
             flags = p->flags;
@@ -156,7 +151,8 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
         } else {
             s32 tile, n;
             u32 priority;
-            depth = divide2(depth);
+            tmp = depth >= 0 ? depth >> 1 : -((-depth) >> 1);
+            depth = tmp;
             if (depth < -128)
                 depth = -128;
             else if (depth > 127)
