@@ -2,7 +2,6 @@
 #include "record_menu.h"
 #include "area_effect_link.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 u32 Script_GetPc(void);
@@ -30,19 +29,12 @@ static inline u8 *GetChoices(void)
     result = (u32)state->outgoingChoices;
     return (u8 *)result;
 }
-static inline s32 SetSelection(struct RecordMenu *menu, s32 value)
+static inline u8 LimitSelection(u8 value, s32 min, s32 max)
 {
-    u8 *field = &menu->selection;
-    s32 zero = 0;
-    /* Keep the cleared flag available throughout initialization. */
-    asm("" : "+r"(zero));
-    *field = value;
-    return zero;
-}
-static inline s32 LimitSelection(s32 value)
-{
-    if (value > 5)
-        value = 5;
+    if (value > max)
+        value = max;
+    else if (value < min)
+        value = min;
     return value;
 }
 s32 RecordMenu_Initialize(struct RecordMenu *menu)
@@ -74,9 +66,11 @@ s32 RecordMenu_Initialize(struct RecordMenu *menu)
         u8 *field = &menu->selection;
         *field = choice - 5;
     }
-    selection = LimitSelection(menu->selection);
+    selection = LimitSelection(menu->selection, 0, 5);
     {
-        zero = SetSelection(menu, selection);
+        u8 *field = &menu->selection;
+        zero = 0;
+        *field = selection;
         Bg_ClearTilemap(3);
         Bg_ClearTilemap(2);
         Bg_ClearTilemap(1);

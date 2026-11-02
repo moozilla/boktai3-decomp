@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #define gNidhoggrEffectPhaseDurations gUnk_0824F292
@@ -18,29 +17,31 @@ struct NidhoggrDistanceEffect {
 };
 extern const u8 gUnk_0824F292[], gUnk_0824F28C[];
 s32 Callback_InvokeActor(void *, void *);
+static inline void Nidhoggr_EndDistanceEffect(struct NidhoggrDistanceEffect *effect)
+{
+    effect->update = 0;
+    if (effect->destroy) {
+        Callback_InvokeActor(effect, effect->destroy);
+        effect->destroy = 0;
+    }
+}
+
 void Nidhoggr_UpdateDistanceLimitedEffect(struct NidhoggrDistanceEffect *effect)
 {
-    if (effect->x - effect->startX <= 0x1000) {
-        asm("" ::: "r3");
-        if (effect->phase > 5 && effect->speed > 8)
-            effect->speed--;
-        if (effect->phaseTimer < gNidhoggrEffectPhaseDurations[effect->phase])
-            return;
-        if (effect->phase <= 5)
-            goto advance;
-    }
-    {
-        effect->update = 0;
-        if (effect->destroy) {
-            Callback_InvokeActor(effect, effect->destroy);
-            effect->destroy = 0;
-        }
+    if (effect->x - effect->startX > 0x1000) {
+        Nidhoggr_EndDistanceEffect(effect);
         return;
     }
-advance: {
+    if (effect->phase > 5 && effect->speed > 8)
+        effect->speed--;
+    if (effect->phaseTimer < gNidhoggrEffectPhaseDurations[effect->phase])
+        return;
+    if (effect->phase > 5) {
+        Nidhoggr_EndDistanceEffect(effect);
+        return;
+    }
     effect->phase++;
     if (effect->phase <= 5)
         effect->frame = gNidhoggrEffectPhaseFrames[effect->phase];
     effect->phaseTimer = 0;
-}
 }

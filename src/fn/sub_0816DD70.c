@@ -21,7 +21,7 @@ void SceneHud_FinishRandomActionReturn(struct SceneHudState *s)
     if (SceneHud_TickIconMotion(s, 0)) {
         if (SceneItem_GetSlotItem(s->actionSelection) == 31)
             Sound_PlaySong(0x123);
-        *(u32 *)((u8 *)s + 0x2aa8) |= 1;
+        s->motionWidgets[0].flags |= 1;
         SceneHud_RefreshActionIcons(s);
         Hud_SetInteractionCallback(s, SceneHud_UpdateActionSelection, 1);
         input = s->actionInput;

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player_cue_sequence.h"
 struct V8 {
@@ -79,38 +78,12 @@ void Player_UpdateChargeSpin(struct PRecover *p)
         p->f_ad8 = 0x20;
     Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
     Step(&p->sprite, &p->seq);
+    AnimData_SelectPaletteBank(p->sprite.palette, 0x16F);
     {
-        register u32 off asm("r2") = 0x178;
-        void *pal;
-        s32 bank;
-        asm("" : "+r"(off));
-        {
-            register u8 *a asm("r0") = (u8 *)p + off;
-            pal = *(void **)a;
-        }
-        bank = 0x16F;
-        AnimData_SelectPaletteBank(pal, bank);
-    }
-    {
-        register u32 ot asm("r0") = 0x45A;
-        u16 *tp;
-        register u32 t asm("r0");
-        asm("" : "+r"(ot));
-        tp = (u16 *)((u8 *)p + ot);
-        t = *tp + 1;
-        *tp = t;
-        t = (u16)t;
-        if (t > 0x1F) {
-            u32 o1 = 0x464, o2;
-            u8 *a1;
-            register u32 v asm("r0");
-            a1 = (u8 *)p + o1;
-            v = 1;
-            *a1 = v;
-            o2 = 0x465;
-            a1 = (u8 *)p + o2;
-            v = 4;
-            *a1 = v;
+        u16 *timer = &p->timer;
+        if (++*timer > 31) {
+            p->f464 = 1;
+            p->f465 = 4;
             Player_SetTetherMode(p, 0, 0);
         }
     }

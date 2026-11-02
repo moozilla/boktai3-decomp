@@ -39,6 +39,14 @@ class LandMatched(unittest.TestCase):
                          ("unit", "src/weather.c", None))
         self.assertEqual(land.without_definition(text, "sub_08018028"), alias + proto)
 
+    def test_local_alias_locates_and_replaces_only_its_definition(self):
+        alias = "#define ResetState sub_08135CC4\n"
+        body = "void ResetState(void)\n{\n}\n"
+        with open(os.path.join(self.root, "src", "unit.c"), "a") as unit:
+            unit.write(alias + body)
+        self.assertEqual(land.where(self.root, "sub_08135CC4", 0x08135CC4), ("unit", "src/unit.c", None))
+        self.assertEqual(land.without_definition(UNIT + alias + body, "sub_08135CC4"), UNIT + alias)
+
     def test_an_include_asm_still_wins(self):
         self.assertEqual(land.where(self.root, "sub_08000100", 0x08000100),
                          ("unit", "src/unit.c", "sub_08000100"))

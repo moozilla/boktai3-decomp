@@ -1,12 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "player_cue_sequence.h"
 #include "engine.h"
 #include "scene_vec.h"
-struct Frames {
-    u16 *data;
-    u8 flags, count, multiplier, duration;
-    u16 index, padA, rate, timer;
-};
 struct ScriptSprite {
     u32 flags;
     u8 pad4[3];
@@ -22,7 +16,7 @@ struct ScriptResource {
     u8 unknown8[4];
     const void *paletteData;
     u8 unknown10[0xC];
-    struct Frames frames;
+    struct DisplaySequenceState frames;
     u16 palette[16];
 };
 struct SceneScriptObject {
@@ -62,8 +56,7 @@ static inline s32 PaletteIndex(s32 state, s32 parameter)
 s32 sub_081B866C(struct SceneScriptObject *p, u32 caller)
 {
     struct ScriptSprite *sprite = &p->sprite;
-    struct Frames *f;
-    const vu16 *frame;
+    struct DisplaySequenceState *f;
     p->caller = caller;
     if (Script_SeekToKeyword('r'))
         p->reveal = Script_GetValue();
@@ -107,57 +100,7 @@ s32 sub_081B866C(struct SceneScriptObject *p, u32 caller)
     } else {
         f = &p->resource.frames;
         Anim_SetSequence(f, p->proc, (u16)p->state, 0, (u8)p->reveal);
-        frame = &f->data[f->index];
-        sprite->frame = *frame >> 6;
-        {
-            u32 input = f->flags;
-            u32 one = 1;
-            u32 first;
-            asm("" : "=r"(first) : "0"(one));
-            first &= input;
-            if (first != (((*frame & 0x30) >> 4) & one))
-                sprite->flags |= 4;
-            else
-                sprite->flags &= ~4;
-        }
-        {
-            u32 flags = f->flags;
-            u32 two = 2;
-            u32 first;
-            asm("" : "=r"(first) : "0"(two));
-            first &= flags;
-            asm("" : "+r"(first));
-            if ((u8)first != (((*frame & 0x30) >> 4) & two))
-                sprite->flags |= 8;
-            else
-                sprite->flags &= ~8;
-        }
-        if (++f->timer >= f->duration) {
-            f->timer = 0;
-            if (f->flags & 4) {
-                u32 index = f->index;
-                if (index == 0) {
-                    if (f->flags & 8) {
-                        f->timer = f->duration;
-                        goto next;
-                    }
-                    index = f->count;
-                }
-                f->index = index - 1;
-            } else if (++f->index >= f->count) {
-                if ((u8)(f->flags & 8)) {
-                    f->timer = f->duration;
-                    f->index = f->count - 1;
-                } else
-                    f->index = 0;
-            }
-        next:
-            frame = &f->data[f->index];
-            f->multiplier = *frame & 0xF;
-            f->duration = (f->multiplier * f->rate) >> 6;
-            if (!f->duration)
-                f->duration = 1;
-        }
+        PlayerCue_StepSequence((void *)sprite, f);
     }
     p->resource.paletteIndex = PaletteIndex(p->state, p->parameter);
     p->resource.paletteData = p->resource.palette;

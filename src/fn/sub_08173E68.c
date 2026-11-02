@@ -52,8 +52,8 @@ void SceneHud_TickEquipmentSwap(struct SceneHudState *p)
         }
     } else {
         two = 2;
-        asm("" : "+r"(two));
-        if (two & keys) {
+        two &= keys;
+        if (two) {
             Hud_SetInteractionCallback(p, sub_08173D2C, 1);
             p->categoryWidgets[6].flags |= one;
             Hud_RestoreGridSelection(q);

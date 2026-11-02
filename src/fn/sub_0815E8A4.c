@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: consumes pending damage and selects terrain/death reactions.
 #include "engine.h"
 #include "player.h"
@@ -41,8 +40,6 @@ static inline u32 playerFlag(struct Player *p, u32 offset, u32 mask)
 s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
 {
     s32 cell, skip;
-    s32 sequence;
-    register struct Player *hazardPlayer asm("r0");
     u8 *properties;
     {
         s32 x = p->position.x >> 8, z = p->position.z >> 8;
@@ -56,21 +53,16 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
         properties += 4;
     else
         properties = gTerrainMap->cells + 12 + cell * 4;
-    if ((*(u32 *)properties >> 16 & 0x40) && !p->tetherStatusFlags) {
+    if (((*(u32 *)properties >> 16 & 0x40) && !p->tetherStatusFlags)) {
         if (sceneFlag()) {
-            hazardPlayer = p;
-            sequence = 0x22;
-        } else {
-            hazardPlayer = p;
-            sequence = 0x21;
+            ActorSequence_Begin(p, 0x22, 0);
+            return 1;
         }
-        goto hazard;
+        ActorSequence_Begin(p, 0x21, 0);
+        return 1;
     }
     if (gGameState->playerParticleRate > 4999) {
-        hazardPlayer = p;
-        sequence = 0x23;
-    hazard:
-        ActorSequence_Begin(hazardPlayer, sequence, 0);
+        ActorSequence_Begin(p, 0x23, 0);
         return 1;
     }
     skip = 0;

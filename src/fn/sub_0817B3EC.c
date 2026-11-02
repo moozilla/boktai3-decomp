@@ -38,11 +38,12 @@ static inline u8 enter_idle(struct EffectScriptActor *actor)
 }
 void ActorEffect_UpdateIdleScript(struct EffectScriptActor *actor)
 {
-    /* The ROM writes values but passes an uninitialized descriptor, as in
-     * DamageController_Update. Retain the observed original behavior. */
     struct EffectScriptActor *scriptsActor = actor;
-    volatile s32 values[8];
-    struct EffectScriptArgs args;
+    /* This path fills the argument slots and passes the adjacent uninitialized descriptor. */
+    struct {
+        s32 values[8];
+        struct EffectScriptArgs args;
+    } call;
     if (enter_idle(actor)) {
         actor->direction = actor->defaultDirection;
         {
@@ -58,11 +59,11 @@ void ActorEffect_UpdateIdleScript(struct EffectScriptActor *actor)
                 s16 *position = &actor->x;
                 u32 mask = 4;
                 if (!(gUnk_02000560 & mask)) {
-                    values[0] = position[0];
-                    values[1] = position[1];
-                    values[2] = position[2];
-                    values[3] = argument;
-                    Script_Call(script, &args);
+                    call.values[0] = position[0];
+                    call.values[1] = position[1];
+                    call.values[2] = position[2];
+                    call.values[3] = argument;
+                    Script_Call(script, &call.args);
                 }
                 scriptsActor->scripts[scriptsActor->scriptIndex] = busy;
             }

@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #define Ratatosk_UpdateAnimatedParticlePool sub_081FBF2C
 #include "contact_swarm.h"
@@ -6,7 +7,7 @@ struct Particle {
     u32 age;
     u8 pad4[8];
     s16 vx, vy, vz, padE;
-    u8 pad14[2];
+    u16 configFlags;
     u16 lifespan;
     u8 pad18[2];
     s8 angle;
@@ -95,8 +96,8 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct ParticlePool *aIn)
                     } else
                         sprite->position.y -= e->lift >> 12;
                 }
-                if (!(*(u16 *)((u8 *)e + 0x14) & 0x200)) {
-                    if (*(u16 *)((u8 *)e + 0x14) & 0x100)
+                if (!(e->configFlags & 0x200)) {
+                    if (e->configFlags & 0x100)
                         e->sequence.flags |= 4;
                     updatePlayback(&e->sequence, sprite);
                 }

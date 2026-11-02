@@ -15,8 +15,14 @@ void SceneCatalog_SaveOptions(struct SceneCatalog *s)
     s32 mapped;
     gGameState->values08[4] = s->optionA;
     mapped = SceneCatalog_MapSelectionMask(s->optionB);
-    *(u16 *)((u8 *)gGameState + 0x12) = mapped;
-    *(u16 *)((u8 *)gGameState + 0x14) = s->optionC;
+    {
+        u16 *option = &gGameState->unk12;
+        *option = mapped;
+    }
+    {
+        s16 *option = &gGameState->unk14;
+        *option = s->optionC;
+    }
     GameState_BackupRegionRange(&gGameState->values08[4], 2);
     GameState_BackupRegionRange(&gGameState->unk12, 2);
     GameState_BackupRegionRange(&gGameState->unk14, 2);

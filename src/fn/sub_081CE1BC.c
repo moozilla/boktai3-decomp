@@ -25,7 +25,9 @@ struct Motion {
     u8 pad3A[0x3E];
 };
 struct Display {
-    u8 pad[0x68];
+    u8 pad0[0x5A];
+    u16 paletteBank;
+    u8 pad5C[0xC];
     u16 *palette;
 };
 struct SceneNpc {
@@ -173,7 +175,7 @@ void SceneCharacter_PlaceFromScript(void)
                 struct Display *d = &npc->display;
                 d->palette = (u16 *)npc->colors;
             }
-            *(u16 *)((u8 *)npc + 0x13A) = palette;
+            npc->display.paletteBank = palette;
         } else {
             Actor_SetDefaultPaletteBank(npc, palette);
         }

@@ -1,4 +1,4 @@
-#include "global.h"
+#include "text_entry_widget.h"
 #include "render.h"
 #include "menu_parameters.h"
 #include "input.h"
@@ -6,7 +6,9 @@
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
 struct Display {
-    u8 sprites[0x724];
+    u8 task[0x18];
+    struct TextEntryWidget widgets[6];
+    u8 unknown348[0x724 - 0x348];
     s32 selection, count;
     u32 state;
     s32 result, counter, fadeShift, idleTimer, unused740, unused744, stateTimer;
@@ -271,7 +273,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
             Anim_LoadKeyframe((u8 *)p + 0x1B0, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
             FLAGS(0x1B8) &= ~1;
             {
-                s16 *destination = (s16 *)((u8 *)p + 0x1D0);
+                s16 *destination = &p->widgets[3].x;
                 s32 zero = 0;
                 *destination = 144;
                 p->velocity = zero;
@@ -284,15 +286,15 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 Anim_LoadKeyframe((u8 *)p + 0x2C0, (u8 *)p + 0x4E0, 6, 0);
             }
             p->velocity -= 2;
-            position = *(u16 *)((u8 *)p + 0x1D0) + p->velocity;
-            *(u16 *)((u8 *)p + 0x1D0) = position;
+            position = p->widgets[3].x + p->velocity;
+            p->widgets[3].x = position;
             {
                 s32 y = (s16)position - 144;
-                *(s16 *)((u8 *)p + 0x148) = y;
+                p->widgets[2].x = y;
             }
             if ((s16)position <= 0) {
                 Anim_LoadKeyframe((u8 *)p + 0x128, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
-                *(s16 *)((u8 *)p + 0x148) = 0;
+                p->widgets[2].x = 0;
                 FLAGS(0x1B8) |= 1;
                 p->state = 8;
             }
@@ -301,7 +303,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
             Anim_LoadKeyframe((u8 *)p + 0x1B0, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
             FLAGS(0x1B8) &= ~1;
             {
-                u16 *destination = (u16 *)((u8 *)p + 0x1D0);
+                u16 *destination = (u16 *)&p->widgets[3].x;
                 s32 zero = 0;
                 {
                     s32 initialY = 0xFF70;
@@ -317,15 +319,15 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 Anim_LoadKeyframe((u8 *)p + 0x238, (u8 *)p + 0x4E0, 10, 0);
             }
             p->velocity += 2;
-            position = *(u16 *)((u8 *)p + 0x1D0) + p->velocity;
-            *(u16 *)((u8 *)p + 0x1D0) = position;
+            position = p->widgets[3].x + p->velocity;
+            p->widgets[3].x = position;
             {
                 s32 y = (s16)position + 144;
-                *(s16 *)((u8 *)p + 0x148) = y;
+                p->widgets[2].x = y;
             }
             if ((s16)position >= 0) {
                 Anim_LoadKeyframe((u8 *)p + 0x128, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
-                *(s16 *)((u8 *)p + 0x148) = 0;
+                p->widgets[2].x = 0;
                 FLAGS(0x1B8) |= 1;
                 p->state = 8;
             }

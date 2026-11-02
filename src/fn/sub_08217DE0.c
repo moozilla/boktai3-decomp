@@ -1,11 +1,13 @@
 #include "global.h"
 #include "level_advance_display.h"
 #include "render.h"
+#include "sprite_effect_controller.h"
 
 u32 Palette_CacheReservedObjectBank(u32, void *);
 s32 Effect_LinkToList(struct LevelAdvanceParticle *, u32);
 void ParticleSprite_Initialize(struct LevelAdvanceParticle *sprite, void *resource, u32 flags)
 {
+    const struct SpriteEffectTileResource *tiles = resource;
     u32 zero = sprite->queued;
     if (!zero) {
         sprite->flags = flags;
@@ -18,7 +20,7 @@ void ParticleSprite_Initialize(struct LevelAdvanceParticle *sprite, void *resour
         Effect_SetOrigin(sprite, 0, 0);
         SpriteDrawable_SelectTileFrame(sprite, resource, 0);
         sprite->paletteSlot = Palette_CacheReservedObjectBank(
-            *(u16 *)((u8 *)resource + 6), gPaletteBankData + (*(u16 *)((u8 *)resource + 6) << 5));
+            tiles->paletteBank, gPaletteBankData + (tiles->paletteBank << 5));
         {
             u32 queue = (u32)(-(flags & 0x80)) >> 31;
             sprite->previous = (void *)zero;

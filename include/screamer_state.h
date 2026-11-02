@@ -23,7 +23,9 @@ struct ScreamerState {
     u8 attackCollider[0x54];
     u8 bodyCollider[6];
     u16 colliderFlags;
-    u8 unknownC8[82];
+    u8 unknownC8[0x104 - 0xC8];
+    u16 blinkTimer;
+    u8 unknown106[0x11A - 0x106];
     u16 contactFlags;
     u8 unknown11C[76];
     u8 body[0x48];

@@ -27,7 +27,7 @@ void Player_PlayActionCueSound(struct Player *p, s32 quiet)
         return;
     if (p && ((p->active && p->sceneMode == 0) || MaskFlags(&p->actionFlags, 4)))
         return;
-    if (Player_IsFlaggedWithoutGlobalModifiers(*(u16 *)&p->unk290[2]) && !(p && IsModeFive(p))) {
+    if (Player_IsFlaggedWithoutGlobalModifiers(p->movementStatus) && !(p && IsModeFive(p))) {
         if (p->actionCueFlags == 0)
             Player_EmitPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x194);
         else

@@ -77,8 +77,8 @@ u8 SceneActorReaction_BeginTargetRecovery(struct SceneActorRegistryResetView *ac
     Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
     (*(struct ContactPosition **)(group + 0x200))->pad = 1;
     actor->field2C2 = 64;
-    *(u16 *)((u8 *)actor + 0x414) = 0;
-    *(u16 *)((u8 *)actor + 0x418) = 0;
+    actor->group.common.gate.flags = 0;
+    actor->group.common.gate.counter = 0;
     {
         u16 *field = &actor->flags2D4;
         u32 mask = ~0x380;

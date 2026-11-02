@@ -2,11 +2,19 @@
 #include "contact_swarm.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
+struct ParticleConfig {
+    u8 pad0[6];
+    s8 angle;
+    u8 pad7;
+    s32 speed;
+    u8 pad0C[8];
+    u32 kind;
+};
 struct Particle {
     u32 age;
     u8 pad4[8];
     s16 vx, vy, vz, padE;
-    u8 config[0x18];
+    struct ParticleConfig config;
     struct ContactSwarmSprite sprite;
     u32 flags;
     u32 pad5C;
@@ -18,14 +26,8 @@ struct ParticlePool {
     u32 mask;
     u8 pad1C[0x1c];
     struct Particle particles[24];
-};
-struct ParticleConfig {
-    u8 pad0[6];
-    s8 angle;
-    u8 pad7;
-    s32 speed;
-    u8 pad0C[8];
-    u32 kind;
+    void *sequence;
+    u32 activeCount;
 };
 extern void *const gUnk_08613F60[];
 extern const s16 gUnk_086149C4[];
@@ -52,7 +54,7 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
     if (!e)
         return -1;
     Ratatosk_SetParticleUpdateCallback(config, gUnk_08613F60[config->kind]);
-    Memory_Copy(e->config, config, 0x18);
+    Memory_Copy(&e->config, config, 0x18);
     e->age = 0;
     e->pad5C = 0;
     e->lift = 0;
@@ -72,12 +74,12 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
     }
     {
         u32 zero = zero2;
-        *(struct ContactPosition *)((u8 *)e + 0x48) = *position;
+        e->sprite.position = *position;
         {
-            if (*(u32 *)((u8 *)e + 0x28) != 2)
-                Anim_SetSequence(&e->sequence, *(void **)((u8 *)pool + 0xb18), 4, 0, zero);
+            if (e->config.kind != 2)
+                Anim_SetSequence(&e->sequence, pool->sequence, 4, 0, zero);
             else
-                Anim_RestartSequence(&e->sequence, *(void **)((u8 *)pool + 0xb18), 5, 0, zero);
+                Anim_RestartSequence(&e->sequence, pool->sequence, 5, 0, zero);
             PlayerCue_StepSequence(&e->sprite, &e->sequence);
             e->sprite.flags &= ~1;
             Sprite_LinkToList(&e->sprite, 0);
@@ -88,6 +90,6 @@ s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct Contact
         }
     }
     pool->mask |= 1 << slot;
-    *(u32 *)((u8 *)pool + 0xb1c) += 1;
+    pool->activeCount += 1;
     return slot;
 }

@@ -1,23 +1,8 @@
 #include "global.h"
 #include "ram.h"
-struct AnimBox {
-    u8 pad0[8];
-    u32 flags;
-};
-struct OptionData {
-    u8 pad0[0x428];
-    u16 a428;
-    u16 a42A;
-};
-struct OptionHud {
-    u8 pad0[0xA40];
-    struct OptionData *data;
-    u8 pad_a44[0x15];
-    u8 flagA59;
-    u8 pad_a5a[0x42];
-    u8 anim[0x10];
-    u16 pad_aac[0];
-};
+#include "scene_hud_display.h"
+#include "player.h"
+
 void Hud_LoadConditionalPaletteRows(void *);
 void sub_08168850(void *);
 void SceneHud_UpdateSecondaryWidgets(void *);
@@ -32,7 +17,7 @@ void Hud_SetUpdateCallback(void *, void (*)(void));
 void SceneHud_UpdateOptionControls(void);
 void SceneHud_EnterOptionControls(void)
 {
-    struct OptionHud *p = gFieldHud;
+    struct SceneHudState *p = (void *)gFieldHud;
     if (p) {
         Hud_LoadConditionalPaletteRows(p);
         sub_08168850(p);
@@ -40,16 +25,16 @@ void SceneHud_EnterOptionControls(void)
         SceneHud_RebuildPrimaryOptions(p);
         PauseMenu_RefreshEquipmentSlotIcons(p);
         sub_08168214(p);
-        p->flagA59 = 0;
+        p->auxiliaryToggle = 0;
         if (WirelessGame_IsItemToggleEnabled()) {
-            struct AnimBox *box = (struct AnimBox *)((u8 *)p + 0xA9C);
+            struct SceneHudControlAnimation *box = &p->controlAnimation;
             box->flags &= ~1;
-            Anim_LoadKeyframe(box, (u8 *)p + 0x144, 0x1C, 1);
+            Anim_LoadKeyframe(box, p->controlAnimationResource, 0x1C, 1);
         }
-        p->data->a428 = p->data->a42A;
-        sub_08164480(p, 0, 4, 2, p->data->a428, p->data->a42A, 1);
+        p->actionOwner->currentStatB = p->actionOwner->maximumStatB;
+        sub_08164480(p, 0, 4, 2, p->actionOwner->currentStatB, p->actionOwner->maximumStatB, 1);
         Sound_PlaySong(0x10C);
-        *(u16 *)((u8 *)p + 0xA80) = 0;
+        p->pulseFrame = 0;
         Hud_SetUpdateCallback(p, SceneHud_UpdateOptionControls);
     }
 }

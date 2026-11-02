@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -15,21 +14,12 @@ void SceneHud_RefreshActionIcons(void *);
 void SceneHud_UpdateActionSelection(void);
 void SceneHud_FinishStatBRefill(struct SceneHudState *s)
 {
-    u16 frame;
     u8 *input;
-    s32 seven;
     Anim_Step(&s->motionWidgets[14], s->actionResultResources[s->actionTransferBonus]);
-    frame = s->actionTransferDelay;
-    seven = 7;
-    asm("" : "+r"(seven));
-    {
-        s32 m = seven;
-        m &= frame;
-        if (m < seven - (frame >> 3))
-            s->motionWidgets[14].flags &= ~1;
-        else
-            s->motionWidgets[14].flags |= 1;
-    }
+    if ((s->actionTransferDelay & 7) < 7 - (s->actionTransferDelay >> 3))
+        s->motionWidgets[14].flags &= ~1;
+    else
+        s->motionWidgets[14].flags |= 1;
     if (++s->actionTransferDelay > 55) {
         PauseMenu_ClearItemSlot(s, s->actionSelection);
         SceneHud_RefreshActionIcons(s);

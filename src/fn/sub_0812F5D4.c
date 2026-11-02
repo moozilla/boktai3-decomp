@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monster_particle_random.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_turn.h"
@@ -60,10 +61,6 @@ static inline u16 ContactRoute_RandomSampleBits(u16 sample, u16 mask)
     return sample & mask;
 }
 
-#define CONTACT_ROUTE_READ_RANDOM_SAMPLE(out_, samples_, index_)                                   \
-    do {                                                                                           \
-        (out_) = (samples_)[index_];                                                               \
-    } while (0)
 #define ContactRoute_NextSample(table_, seed_, wrap_, bits_)                                       \
     ({                                                                                             \
         const struct SceneActorChaseRandomTable *table_view_ = (table_);                           \
@@ -74,7 +71,7 @@ static inline u16 ContactRoute_RandomSampleBits(u16 sample, u16 mask)
         u16 index_ = ContactRoute_AdvanceRandomCursor(cursor_, wrap_mask_);                        \
         u16 sample_;                                                                               \
         /* The cursor helper stores the wrapped value. */                                          \
-        CONTACT_ROUTE_READ_RANDOM_SAMPLE(sample_, samples_, index_);                               \
+        PARTICLE_RANDOM_READ_SAMPLE(sample_, samples_, index_);                                    \
         sample_ = ContactRoute_RandomSampleBits(sample_, result_mask_);                            \
         sample_;                                                                                   \
     })

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "area_effect_link.h"
+#include "game_state.h"
 #include "ram.h"
 
 s32 Script_SeekToKeyword(u32);
@@ -58,9 +59,9 @@ s32 sub_08110894(u8 *p)
     RecordList_InitializeSprites(p);
     LinkMenu_LoadSelectionSprite(p);
     sub_0810FADC(p);
-    sub_0810FDDC(p, 0, *(s16 *)((u8 *)gGameState + 0x7b6));
-    sub_0810FDDC(p, 1, *(s16 *)((u8 *)gGameState + 0x7fa));
-    sub_0810FDDC(p, 2, *(s16 *)((u8 *)gGameState + 0x7fc));
+    sub_0810FDDC(p, 0, gGameState->linkScoreFirstRow);
+    sub_0810FDDC(p, 1, gGameState->linkScoreOtherRows[0]);
+    sub_0810FDDC(p, 2, gGameState->linkScoreOtherRows[1]);
     ModifierMenu_InitSelectionSnapshot(p + 0x770, *(void **)(p + 0x20));
     LinkScorePanel_CreateTextWindows(p);
     LinkScorePanel_RefreshPlayerName(p);

@@ -22,7 +22,7 @@ void SceneHud_BeginRandomActionReturn(struct SceneHudState *s)
     u32 later;
     s32 keyframe;
     *flags |= 1;
-    *(u32 *)((u8 *)s + 0x2aa8) &= ~1;
+    s->motionWidgets[0].flags &= ~1;
     from.x = 16;
     from.y = 48;
     from.z = 0;

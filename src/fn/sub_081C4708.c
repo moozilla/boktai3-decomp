@@ -3,6 +3,10 @@
 // MATCHING_CONCESSION: register-pinning
 #define gDisplayControlShadow gDispCntShadow
 
+struct BgTileResource {
+    u8 unknown0[0xA];
+    u16 firstTile;
+};
 struct S {
     u8 pad[0x18];
     u8 *resource;
@@ -18,7 +22,7 @@ void sub_081C4708(struct S *p)
 {
     u8 *resource;
     u32 value;
-    register void *script asm("r2");
+    register struct BgTileResource *script asm("r2");
     u16 cmd;
     u16 field;
     void *sun;
@@ -40,9 +44,9 @@ void sub_081C4708(struct S *p)
     Bg_SetPriority(3, 3);
     script = ScriptProc_Start(0xceef, 0x8e32);
     {
-        void *s = script;
+        struct BgTileResource *tiles = script;
         cmd = 0xd759;
-        field = *(u16 *)((u8 *)s + 0xa);
+        field = tiles->firstTile;
     }
     sub_08215D40(2, script, 1, &cmd, field);
     sun = SceneTransition_StartSunScript();

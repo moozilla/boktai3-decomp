@@ -2,20 +2,11 @@
 // confidence=low: approaches screen X and periodically emits offset effects.
 #include "scene_vec.h"
 #include "ram.h"
-#include "player_cue_sequence.h"
+#include "scene_departure_display.h"
 // confidence=low: action role inferred from movement and effect calls.
-struct P {
-    u8 pad0[0x2c0];
-    struct ContactSwarmSprite sprite;
-    struct DisplaySequenceState seq;
-};
 extern const u16 gUnk_086141BC[];
-void ActorDisplay_UpdateScreenAnchor(struct P *);
-void ActorDisplay_UpdateForegroundSprite(struct P *);
-void ActorDisplay_UpdateAccentSprite(struct P *);
-void SceneActors_EmitPeriodicParticles(struct P *, s32);
-s32 SceneMover_ApproachScreenX(struct P *, s32);
-s32 SceneMover_StepPastScreenX(struct P *, s32, s32);
+s32 SceneMover_ApproachScreenX(struct DepartureActor *, s32);
+s32 SceneMover_StepPastScreenX(struct DepartureActor *, s32, s32);
 s32 Player_GetHorizontalVelocity(void *);
 void Player_GetWorldPosition(s32, struct SceneVec *);
 void Anim_RestartSequence(struct DisplaySequenceState *, const void *, u16, s32, s32);
@@ -30,7 +21,7 @@ static inline u32 RandomValue(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 #define RandomBits(mask) (RandomValue() & (mask))
-static inline void Update(struct P *p, s32 time)
+static inline void Update(struct DepartureActor *p, s32 time)
 {
     ActorDisplay_UpdateScreenAnchor(p);
     ActorDisplay_UpdateForegroundSprite(p);
@@ -45,13 +36,13 @@ static inline void SetHeldFlag(u8 *flags)
     *flags = mask;
 }
 
-void ActorEffect_SpawnOffsetEffect(struct P *);
+void ActorEffect_SpawnOffsetEffect(struct DepartureActor *);
 // confidence=low: sequence-one action periodically spawns offset effects.
-void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
+void SceneActors_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 ticks)
 {
-    struct P *input = arg;
+    struct DepartureActor *input = arg;
     s32 time = ticks;
-    struct P *p = input;
+    struct DepartureActor *p = input;
     u32 one;
     {
         u32 random = RandomBits(0xFFFFFFFF);
@@ -62,17 +53,17 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
     {
         u8 *entry = (u8 *)input + 0xb1;
         if (*entry) {
-            struct ContactSwarmSprite *sprite;
+            struct DepartureDrawable *foreground;
             u32 zero = 0;
             *entry = zero;
-            sprite = &input->sprite;
+            foreground = &input->foreground;
             W(0x298) = 0;
             W(0x290) = 0;
-            *(s32 *)((u8 *)sprite + 0x3c) = one;
+            foreground->sequenceId = one;
             {
-                struct DisplaySequenceState *state = &input->seq;
+                struct DisplaySequenceState *state = &foreground->sequence;
                 Anim_SetSequence(state, PTR(0x390), 1, 0, 0);
-                PlayerCue_StepSequenceEndedWithFirstFlipMask(sprite, state, one);
+                PlayerCue_StepSequenceEndedWithFirstFlipMask(&foreground->sprite, state, one);
             }
             W(0x598) = 0;
             W(0x398) = 0;
@@ -84,8 +75,8 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
     switch (W(0x398)) {
         case 0:
             if (time > 30) {
-                W(0x2fc) = 1;
-                Anim_SetSequence(&p->seq, PTR(0x390), 1, 0, 0);
+                p->foreground.sequenceId = 1;
+                Anim_SetSequence(&p->foreground.sequence, PTR(0x390), 1, 0, 0);
                 W(0x398) = 1;
                 if (W(0x2b4) <= 0x3fff) {
                     W(0x2b8) += 2;
@@ -111,18 +102,19 @@ void SceneActors_UpdatePeriodicEffectAction(struct P *arg, s32 ticks)
             }
             if (time >= W(0x2bc) * W(0x2b8) + 90) {
                 W(0x304) = 0;
-                W(0x2fc) = 1;
-                SetHeldFlag(&p->seq.flags);
-                Anim_RestartSequence(&p->seq, PTR(0x390), H(0x2fc), 0, 0);
+                p->foreground.sequenceId = 1;
+                SetHeldFlag(&p->foreground.sequence.flags);
+                Anim_RestartSequence(&p->foreground.sequence, PTR(0x390),
+                                     (u16)p->foreground.sequenceId, 0, 0);
                 W(0x398) = 2;
                 W(0x290) = 0;
             }
             break;
         case 2:
-            SetHeldFlag(&p->seq.flags);
+            SetHeldFlag(&p->foreground.sequence.flags);
             Update(input, time);
             if (W(0x300)) {
-                p->seq.flags &= ~4;
+                p->foreground.sequence.flags &= ~4;
                 *((u8 *)input + 0xaf) = 1;
             }
             break;

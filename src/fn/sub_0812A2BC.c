@@ -1,26 +1,11 @@
 #include "global.h"
 #include "ram.h"
 
-struct SunDiscVec {
-    u16 x, y, z, pad;
-};
-struct SunDiscDelta {
-    s16 x, y, z, pad;
-};
-struct SunDiscSprite {
-    u32 flags;
-    u8 active, unknown5, unknown6, priority;
-    u8 pad8[0x14];
-    struct SunDiscVec position;
-    u8 pad24[8];
-    u8 anim[0x58];
-    struct SunDiscVec target;
-    s16 velX, velY, velZ, pad92;
-};
+#include "sun_disc.h"
 
 extern const s16 gUnk_086149C4[];
-u8 *SunDiscPool_GetOrCreate(void);
-u32 *SunDiscPool_AllocSprite(u8 *);
+struct SunDiscPool *SunDiscPool_GetOrCreate(void);
+struct SunDiscSprite *SunDiscPool_AllocSprite(struct SunDiscPool *);
 void Sprite_Init(void *, void *, s32);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -42,7 +27,7 @@ void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDis
     s32 b = bArg;
     u32 zero;
     struct SunDiscSprite *sprite;
-    u8 *pool = gSunDiscPool;
+    struct SunDiscPool *pool = (void *)gSunDiscPool;
     struct SunDiscSprite *s;
     struct SunDiscDelta delta;
     s32 angle;
@@ -51,24 +36,24 @@ void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDis
         if (!pool)
             return;
     }
-    zero = *(u32 *)(pool + 0xC0C);
+    zero = pool->suspended;
     if (zero != 0)
         return;
-    s = (struct SunDiscSprite *)SunDiscPool_AllocSprite(pool);
+    s = SunDiscPool_AllocSprite(pool);
     if (!s)
         return;
-    *((u8 *)s + 0xF2) = 1;
-    *(u16 *)((u8 *)s + 0xF0) = zero;
-    *((u8 *)s + 0xF9) = e;
+    s->state = 1;
+    s->age = zero;
+    s->timer = e;
     {
         struct SunDiscVec *t = &s->target;
         *t = *to;
     }
-    *((u8 *)s + 0xF8) = 1;
+    s->resetPending = 1;
     sprite = s;
-    Sprite_Init(s, pool + 0x18, 0);
-    Anim_SetSequence((u8 *)s + 0x2C, *(void **)(pool + 0x34), 0, 0, zero);
-    AnimData_SelectPaletteBank(*(void **)((u8 *)s + 0xC), 1);
+    Sprite_Init(s, pool->graphics, 0);
+    Anim_SetSequence(s->anim, pool->sequenceResource, 0, 0, zero);
+    AnimData_SelectPaletteBank(s->graphics, 1);
     {
         const struct SunDiscVec *src = fromArg;
         s->position = *src;
@@ -99,7 +84,7 @@ void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDis
                                 }))),
                                 12);
     }
-    *(u16 *)((u8 *)s + 0x8E) = 0;
+    s->velY = 0;
     {
         struct SunDiscSprite *t = sprite;
         t->flags |= 1;

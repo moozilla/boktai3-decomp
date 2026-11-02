@@ -26,8 +26,7 @@ struct SingletonSlot7Origin {
     s32 x;
 };
 extern struct SingletonSlot7Origin *gSceneCamera;
-/* The checker ELF predates this callee's promoted name. */
-void *SceneActors_GetBySlot(u32) __asm__("SceneActors_GetBySlot");
+void *SceneActors_GetBySlot(u32);
 s32 Script_GetKeywordValue(u32, s32);
 
 void SingletonSlot7_SetMotionModeFromScript(void)

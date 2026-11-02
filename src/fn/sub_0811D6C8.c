@@ -1,6 +1,7 @@
 // Tentative names: PalFade_Start sets up a timed fade between two 16-colour palette rows.
 #include "global.h"
 #include "render.h"
+#include "modifier_list.h"
 s32 Div(s32, s32);
 void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 flags, s32 mode);
 struct PalFade {
@@ -16,7 +17,8 @@ struct PalFadeRenderer {
     u8 unknown4C[0x60 - 0x4C];
 };
 struct PalFadeOwner {
-    u8 unknown0[0x80];
+    u8 unknown0[0x7E];
+    u16 recoveryValue;
     struct PalFadeRenderer *renderers;
     u8 unknown84[0x348 - 0x84];
     struct PalFade fade;
@@ -25,7 +27,6 @@ static inline s32 Trunc5(s32 v)
 {
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
-#define PAL(o) ((struct PalFade *)((u8 *)(o) + 0x348))
 void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 flags, s32 mode)
 {
     struct PalFade *f = &((struct PalFadeOwner *)self)->fade;
@@ -102,7 +103,7 @@ void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32
 // PalFade_Update steps an active fade by one frame; returns 1 when the fade finishes or restarts.
 u32 PalFade_Update(void *self)
 {
-    struct PalFade *f = PAL(self);
+    struct PalFade *f = &((struct PalFadeOwner *)self)->fade;
     s32 j, k;
     u16 *out;
 
@@ -110,16 +111,18 @@ u32 PalFade_Update(void *self)
         return 0;
     if (f->timer == 0) {
         if (f->flags & 2) {
-            if ((f->flags & 8) && f->p4 == *(u16 *)((u8 *)self + 0x7E))
+            if ((f->flags & 8) && f->p4 == ((struct PalFadeOwner *)self)->recoveryValue)
                 f->flags = 1;
             PalFade_Start(self, f->p3, f->p4, f->p1, f->p2, f->duration, f->flags, 0);
         } else {
             if (!(f->flags & 4)) {
-                u8 *q = *(u8 **)((u8 *)self + 0x80);
-                u8 *v = q + 0x210;
+                struct CharacterPreviewModel *model =
+                    (void *)((struct PalFadeOwner *)self)->renderers;
+                struct ModifierDisplayObject *part = model->view.parts;
+                u16 *palette = model->activePalette;
                 for (k = 4; k >= 0; k--) {
-                    *(u8 **)(q + 0x48) = v;
-                    q += 0x60;
+                    part->palette = palette;
+                    part++;
                 }
             }
             f->flags = 0;

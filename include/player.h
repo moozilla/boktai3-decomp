@@ -117,7 +117,10 @@ struct Player {
     s16 velocityZ;
     u8 unk3E[2];
     void *followTarget; /* 0x40: active position source for following a named object. */
-    u8 unk44[0x68 - 0x44];
+    u8 unk44[0x50 - 0x44];
+    u32 visualState;
+    struct PlayerAnimation *activeAnimation;
+    u8 unk58[0x68 - 0x58];
     u16 indicatorStep; /* 0x68: cycles 0-11, driven by indicatorUpdateRate; >>2 feeds position.x (tentative) */
     u8 unk6A[2];
     u8 animationData[0x20];           /* 0x6C: keyframe resource */
@@ -153,13 +156,17 @@ struct Player {
     u8 unk273;
     u16 positionResetValue; /* 0x274 */
     u8 resetFlags;          /* 0x276: bit one cleared by player reset */
-    u8 unk277[0x284 - 0x277];
-    u8 localFollowTarget[4]; /* 0x284: restored when a named object releases the player. */
+    u8 unk277[0xD];
+    /* 0x284: bit zero enables facing-dependent movement. Its address is also the player's own
+       position source, which followTarget gets back when a named object releases the player. */
+    u8 movementContactFlags;
+    u8 unk285[3];
     u16 storedTerrainCell;   /* 0x288 */
     u16 recoveryTerrainCell; /* 0x28A: terrain cell used for recovery facing */
     u8 unk28C[3];
     u8 velocityScaleAxis; /* 0x28F: asymmetric X/Z velocity scaling */
-    u8 unk290[4];
+    u16 unk290;
+    u16 movementStatus; /* 0x292: tested before updating tether movement. */
     u8 positionTracker[4];            /* 0x294: refreshed after player update */
     struct SceneVec *trackedPosition; /* 0x298 */
     u8 unk29C[0x4C];
@@ -169,7 +176,7 @@ struct Player {
     u8 actionFlagState[4];     /* 0x32C: refreshed after action modifiers */
     u16 movementLoadPercent;   /* 0x330: reduces base movement speed (tentative) */
     u16 menuSnapshotValues[3]; /* 0x332: copied to menu panel +0x48B0 (tentative) */
-    u8 unk338[4];
+    u32 bodyCollisionFlags; /* 0x338: combined with the current collision category. */
     u8 thresholdMode; /* 0x33C: values 6 through 11 qualify for the scene threshold */
     u8 actionEnabled; /* 0x33D: zero bypasses action mode filtering */
     u8 actionSelectionStamp,
@@ -218,7 +225,10 @@ struct Player {
     u8 actionRequestRestricted; /* 0x460: rejects action requests one and two */
     u8 unk461[3];
     u8 actionLatch464, actionLatch465;
-    u8 unk466[0xC];
+    u8 colliderHeightOffset; /* 0x466: added to the spiral collider Y position. */
+    u8 unk467[4];
+    u8 movementMode46B;
+    u8 unk46C[6];
     u8 timedEventSlot; /* 0x472: index into GameState counters620/counters628 */
     u8 unk473;
     u16 tetherStatusFlags,
@@ -230,7 +240,8 @@ struct Player {
     u8 actionPhase488, actionActive489;
     u8 unk48A[2];
     u8 movementVelocityLocked; /* 0x48C: suppresses velocity recalculation */
-    u8 unk48D[0x17];
+    u8 unk48D[0x15];
+    u16 burstParameter; /* 0x4A2: passed to ActorBurst_Create. */
     u8 actionFourEnabled; /* 0x4A4: permits action 4 in modes 0, 1 and 6 (tentative) */
     u8 coordinateAxis;    /* 0x4A5: 1/5 select X, other values select Z (tentative) */
     u8 unk4A6[2];
@@ -244,7 +255,8 @@ struct Player {
     u8 positionResetState;       /* 0x4BE */
     u8 unk4BF[3];
     u16 contactActionTag; /* 0x4C2: terrain recovery sets 0x191 */
-    u8 unk4C4[4];
+    u8 unk4C4[2];
+    u16 terrainDamageTimer; /* 0x4C6: frames accumulated under a terrain modifier. */
     u16 actionAccumulator;       /* 0x4C8: wraps by 100 and triggers Player_EmitPeriodicEffect */
     u16 particleIntervalCounter; /* 0x4CA: periodic particle emission */
     u8 unk4CC[4];
@@ -285,7 +297,10 @@ struct Player {
     u8 contactCueDuration;     /* 0x53D: threshold cue duration */
     u8 unk53E[0xC];
     u8 catalogSavedOption; /* 0x54A: menu option copied when scriptStatus[1] is zero (tentative) */
-    u8 unk54B[0x2D];
+    u8 unk54B[3];
+    u16 lastContactFlags;
+    u32 lastContactRewardFlags;
+    u8 unk554[0x24];
     u16 interactionPromptCategory; /* 0x578: selects which bit ControlPanel ORs into interactionPromptFlags (tentative) */
     u8 unk57A[2];
     u16 indicatorTickCounter; /* 0x57C: wraps 0-9; gates a displaySegmentCount-pitched tick sound (tentative) */
@@ -304,7 +319,9 @@ struct Player {
     u8 unk5A8[0x10];
     u8 effectGroup; /* 0x5B8: scene effect group context */
     u8 movementModifierKind, unknown5BA, movementModifierActive; /* 0x5B9: tentative */
-    u8 unk5BC[0x134];
+    u8 unk5BC[4];
+    struct SceneVec *visualPosition;
+    u8 unk5C4[0x6F0 - 0x5C4];
     u16 effectPosition[3]; /* 0x6F0 */
     u8 unk6F6[2];
     u16 resetValue6F8, resetValue6FA, resetValue6FC;
@@ -323,23 +340,26 @@ struct Player {
     u16 movementDuration;                               /* 0xA9C */
     u8 unkA9E[0x10];
     u16 actionResetCounter;  /* 0xAAE: reset when starting a variant action (tentative) */
-    u16 menuStatusValues[7]; /* 0xAB0: panel selects indices 0, 2 or 6 (tentative) */
-    u8 unkABE[4];
+    u16 menuStatusValues[8]; /* 0xAB0: panel selects indices 0, 2 or 6 (tentative) */
+    u8 unkAC0[2];
     u16 baseSpriteResource, savedSpriteResource; /* 0xAC2 */
     u8 unkAC6[2];
     u8 baseActionVariant; /* 0xAC8: copied to actionVariant */
     u8 actionVariant;     /* 0xAC9: zero or saved action index plus one (tentative) */
     u16 savedVisualMode;  /* 0xACA */
     s16 visualFlashTimer; /* 0xACC */
-    u8 unkACE[4];
+    u16 scriptFlashTimer, contactFlashTimer;
     u16 movementRequestParameter, movementRequestScale;  /* 0xAD2: tentative */
     u16 actionEighteenParameter, actionEighteenDuration; /* 0xAD6: tentative */
     u16 actionRequestHold, actionRequestTimer;           /* 0xADA */
-    u8 unkADE[0xA];
+    u8 unkADE[6];
+    u16 visualEffectMode;
+    u8 unkAE6[2];
     struct SceneVec movementRequestTarget; /* 0xAE8 */
     u8 unkAF0;
     u8 actionRequestState; /* 0xAF1 */
-    u8 unkAF2[0x12];
+    u16 visualSlowdownTimer;
+    u8 unkAF4[0x10];
     void *kindTwoAttachment;        /* 0xB04: descriptor-driven attachment, tentative */
     u8 kindTwoAttachmentDescriptor; /* 0xB08 */
     u8 unkB09;

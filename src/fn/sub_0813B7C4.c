@@ -29,18 +29,18 @@ void Player_RefreshBodyCollision(struct Player *p)
         if (level > 99)
             level = 99;
         amount = level * 0;
-        flags = *(u32 *)((u8 *)p + 0x338) | 2;
+        flags = p->bodyCollisionFlags | 2;
         category = 1;
     } else if (p->actionMode == 0) {
         amount = 0;
-        flags = *(u32 *)((u8 *)p + 0x338) | 1;
+        flags = p->bodyCollisionFlags | 1;
         category = 2;
     } else {
         amount = 0;
-        flags = *(u32 *)((u8 *)p + 0x338) | 2;
+        flags = p->bodyCollisionFlags | 2;
         category = 1;
     }
-    if ((p && IsSpecialScene(p)) || *(u32 *)((u8 *)p + 0x338) == 0x40)
+    if ((p && IsSpecialScene(p)) || p->bodyCollisionFlags == 0x40)
         flags = 0x40;
     asm("" : : "r"(amount));
     Collider_SetBodyProperties(&p->collider, 0, flags, category);

@@ -56,7 +56,7 @@ void Player_UpdateTetherRecoil(struct Player *p)
     {
         u16 *magnitude = &p->directionFrame;
         if (*magnitude) {
-            if (*(u8 *)((u8 *)p + 0x479)) {
+            if (p->terrainClampBlocked) {
                 s32 dx = p->terrainTarget->x - p->position.x;
                 s32 dz = p->terrainTarget->z - p->position.z;
                 p->velocityX = scale3(dx);
@@ -74,7 +74,7 @@ void Player_UpdateTetherRecoil(struct Player *p)
             p->directionFrame = (p->directionFrame * 3) >> 2;
         } else {
             *magnitude = 0;
-            *(u8 *)((u8 *)p + 0x479) = 0;
+            p->terrainClampBlocked = 0;
             if (p->movementModifierKind == 3 && p->movementModifierActive)
                 Player_SetTetherMode(p, 0x16, 0);
             else if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x2A),

@@ -1,6 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
+#include "monster_particle_random.h"
 #include "global.h"
-// Open: temporary register choices only (constant 1 and rand address regs); pointer roles match.
+// Open: temporary choices only (constant 1 and rand address regs); pointer roles match.
 #include "level_advance_display.h"
 #include "engine.h"
 #include "ram.h"
@@ -28,11 +28,6 @@ struct InventoryPanel {
 extern const s16 gUnk_086149C4[];
 void *AnimData_FindEntry(s32);
 u32 MenuParticle_UpdateMotion(void *);
-static inline s32 NextRandom(u32 table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return *(const u16 *)(gRandomIndex * 2 + table);
-}
 static inline s32 Scale(s32 value)
 {
     if (value >= 0)
@@ -55,24 +50,24 @@ void InventoryPanel_StartCallbackBurst(struct InventoryPanel *panel, s32 index, 
     group->active = 1;
     i = 0;
     {
-        register u32 table asm("r8") = 0x0203B400;
+        const u16 *table = gRandomTable;
         metadata = (struct InventoryPanelCallbackMetadata *)(((u8 *)group) + 0x40);
         particle = &group->entries[0].particle;
         entry = (struct InventoryPanelCallback *)particle;
         for (; i < 8; i++) {
             s32 angle;
             s32 scale;
-            register u32 flags asm("r2") = entry->particle.flags & (~1);
+            u32 flags = entry->particle.flags & (~1);
             entry->particle.flags = flags;
-            if (((u8)NextRandom(table)) & 1)
+            if ((u8)ParticleRandom_ReadSample(table) & 1)
                 flags |= 4;
             else
                 flags &= ~4;
             entry->particle.flags = flags;
             SpriteDrawable_SelectTileFrame(particle, group->context, 0x15);
             Effect_SetPalette(particle, 0);
-            angle = ((i * 32) + ((NextRandom(table) >> 3) & 0xf)) - 8;
-            scale = ((NextRandom(table) >> 3) & 1) + 3;
+            angle = ((i * 32) + (((s32)ParticleRandom_ReadSample(table) >> 3) & 0xf)) - 8;
+            scale = (((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 1) + 3;
             entry->particle.velocityX = Scale(gUnk_086149C4[Arg1(0x40, angle) & 0xff] * scale);
             entry->particle.velocityY = Scale(gUnk_086149C4[angle & 0xff] * scale) - 2;
             entry->particle.position.world.x = entry->particle.velocityX + x;

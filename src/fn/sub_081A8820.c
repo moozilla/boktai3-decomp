@@ -35,7 +35,7 @@ void ActorSoundPhase_UpdateConditionalStop(struct ActorSoundPhase *p)
 {
     struct ActorSoundPhase *q = p;
     if (chk(p)) {
-        u32 v = SelectPhase(*(s16 *)((u8 *)p + 0x5c2));
+        u32 v = SelectPhase(p->variant);
         do {
             Vanargand_StopActionSequence((u8 *)q + 0x21C);
             q->st = v;

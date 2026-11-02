@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
+#include "monster_particle_random.h"
 struct ReactionVector {
     s16 x, y, z, pad;
 };
@@ -43,13 +43,7 @@ static inline void AddReactionVector(struct ReactionVector *out, struct Reaction
     out->y = a->y + b->y;
     out->z = a->z + b->z;
 }
-static inline s32 RandomReactionValue(const u16 *table)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
+
 void Hresvelgr_UpdateRandomVolleyPhase(struct ActorReaction *actor, s32 frame)
 {
     struct ReactionVector pos;
@@ -75,9 +69,9 @@ void Hresvelgr_UpdateRandomVolleyPhase(struct ActorReaction *actor, s32 frame)
             AddReactionVector(&pos, &actor->position, &actor->offsets[actor->variant]);
             pos.y = actor->ground->y + 128;
             table = gRandomTable;
-            asm("" : "+r"(table));
-            a = (RandomReactionValue(table) >> 3) % 32 + 64;
-            b = (RandomReactionValue(table) >> 3) % 64 + 96;
+
+            a = ((s32)ParticleRandom_ReadSample(table) >> 3) % 32 + 64;
+            b = ((s32)ParticleRandom_ReadDirectSample(table) >> 3) % 64 + 96;
             DirectionBurst_EmitOffset(&pos, frame, actor->variant, a, frame + 12, b);
             if (frame == 4)
                 actor->finished = 1;

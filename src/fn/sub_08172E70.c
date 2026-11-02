@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_hud_display.h"
 #include "input.h"
 u32 SceneInput_NavigateGridKeys(void *, u32);
@@ -40,18 +39,16 @@ void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
         if (p->actionInput[1] <= 1) {
             current = *selected;
             source = &p->actionSelection;
-            if (!PauseMenu_CanSwapCategoryEntries(p, current, *source, 0))
-                goto invalid;
+            if (!PauseMenu_CanSwapCategoryEntries(p, current, *source, 0)) {
+                Sound_PlaySong(0x192);
+                return;
+            }
             Sound_PlaySong(0x38a);
             {
                 s32 slot = SolarFruit_GetInventorySlot(*source);
-                register s32 negative asm("r7");
-                asm("" : "=r"(negative));
-                negative = 1;
-                negative = -negative;
-                if (slot != negative)
+                if (slot != -1)
                     SceneHud_LoadActionMotion(p, 0, *source, *selected, 0);
-                if (SolarFruit_GetInventorySlot(*selected) != negative)
+                if (SolarFruit_GetInventorySlot(*selected) != -1)
                     SceneHud_LoadActionMotion(p, 1, *selected, *source, 0);
                 sub_0816676C(p, 0);
             }
@@ -59,7 +56,6 @@ void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
             current = *selected;
             source = &p->actionSelection;
             if (!PauseMenu_CanSwapCategoryEntries(p, current, *source, 1)) {
-            invalid:
                 Sound_PlaySong(0x192);
                 return;
             }

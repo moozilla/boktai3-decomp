@@ -60,7 +60,7 @@ void Player_UpdateCameraOffset(struct Player *p)
                 p->heading = q;
                 p->side = 0;
             }
-        } else if (mode != 5 || p->unk466[5] == 5)
+        } else if (mode != 5 || p->movementMode46B == 5)
             Player_UpdateFacingSide(p);
     }
 }

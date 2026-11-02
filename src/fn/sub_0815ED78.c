@@ -40,9 +40,9 @@ void Player_ApplyLatchedActionMode(struct Player *p)
         else
             ApplyActionMode(p, 1, 0x16F);
         p->unk419 = 0;
-        *(void **)((u8 *)p + 0x54) = &p->animation;
-        *(u32 *)((u8 *)p + 0x50) = 0;
-        *(void **)((u8 *)p + 0x5C0) = &p->previousPosition;
+        p->activeAnimation = &p->animation;
+        p->visualState = 0;
+        p->visualPosition = &p->previousPosition;
         Player_InitVisualResources(p);
         p->savedSpriteResource = 0xFFFF;
         enchantment = Player_GetUsableEnchantment(p) + 1;

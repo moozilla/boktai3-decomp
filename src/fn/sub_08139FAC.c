@@ -1,6 +1,8 @@
-#include "global.h"
-void FollowingSpriteEffect_SetStateCallback(u32 *p, u32 v)
+#include "particle_effect_state.h"
+
+void FollowingSpriteEffect_SetStateCallback(struct FollowingEffect *effect,
+                                            void (*update)(struct FollowingEffect *))
 {
-    *p = v;
-    *(u8 *)((u8 *)p + 0xcf) = 1;
+    effect->update = update;
+    effect->entered = 1;
 }

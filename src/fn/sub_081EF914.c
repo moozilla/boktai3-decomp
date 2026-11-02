@@ -45,14 +45,14 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
 {
     *a = v;
 }
-#define SETCB(p)                                                                                   \
-    do {                                                                                           \
-        SetCallback(SceneMover_InterpolateScreenX, (void (**)(void))((p) + 0x100));                \
-        *(u32 *)((p) + 0x90) = 0;                                                                  \
-        *((p) + 0xB1) = 1;                                                                         \
-        *((p) + 0xA2) = 0;                                                                         \
-        *(u32 *)((p) + 0xA4) = 0;                                                                  \
-    } while (0)
+static inline void StartEndingMotion(u8 *p)
+{
+    SetCallback(SceneMover_InterpolateScreenX, (void (**)(void))(p + 0x100));
+    *(u32 *)(p + 0x90) = 0;
+    *(p + 0xB1) = 1;
+    *(p + 0xA2) = 0;
+    *(u32 *)(p + 0xA4) = 0;
+}
 
 void SingletonSlot7_UpdateEndingScene(u8 *p)
 {
@@ -70,7 +70,7 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
         Anim_SetSequence(state, *(void **)(p + 0x390), 2, 0, 0);
         asm("" : "+r"(flag));
         StepPlaybackOne(foreground, state, flag);
-        SETCB(context);
+        StartEndingMotion(context);
         *(u32 *)(p + 0x39C) = 0;
     }
     switch (*(u32 *)(p + 0x39C)) {

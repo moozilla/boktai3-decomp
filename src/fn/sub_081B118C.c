@@ -6,7 +6,9 @@
 #include "player_cue_sequence.h"
 // confidence=low: positions player before setting release phase
 struct Status {
-    u8 pad[0x160];
+    u8 pad[0x15C];
+    u8 animationVariant;
+    u8 unknown15D[3];
     u32 flags, state, timer;
     u8 a, b, entered, phase, done;
 };
@@ -26,7 +28,7 @@ void ActorStatus_BeginPlayerRelease(u8 *owner, struct Status *s)
             Player_ApplyPositionRequest((*(void **)gPlayers), (u8 *)s + 0x1c, 80, 32, 128, 0, 0, 0);
             {
                 void *data = *(void **)(owner + 0x4d0);
-                Anim_SetSequence((u8 *)s + 0x48, data, 9, *(u8 *)((u8 *)s + 0x15c), 0);
+                Anim_SetSequence((u8 *)s + 0x48, data, 9, s->animationVariant, 0);
             }
             PlayerCue_StepSequence((struct ContactSwarmSprite *)s,
                                    (struct DisplaySequenceState *)((u8 *)s + 0x48));

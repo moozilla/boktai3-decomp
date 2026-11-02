@@ -1,29 +1,34 @@
 #include "global.h"
-struct T {
-    void (*cb)(void);
-    u32 b;
-    u8 pad[0x8b8 - 8];
-    u16 c;
+struct ArmorPaletteController {
+    void (*update)(struct ArmorPaletteController *);
+    void (*completion)(struct ArmorPaletteController *);
+    u8 unknown8[0x488 - 8];
+    u16 restoreTimer;
 };
-struct S {
-    u8 f[0x650];
-    struct T t;
+
+struct ArmorPaletteOwner {
+    u8 unknown0[0x650];
+    struct ArmorPaletteController palette;
+    u8 unknownADC[0xB38 - 0xADC];
+    u8 kind;
 };
-void Palette_UpdatePulseFade(void);
-void Armor_StartAccentPaletteFade(u8 *s)
+
+void Palette_UpdatePulseFade(struct ArmorPaletteController *);
+
+void Armor_StartAccentPaletteFade(struct ArmorPaletteOwner *owner)
 {
-    struct T *t = (struct T *)(s + 0x650);
-    switch (*(u8 *)(s + 0xb38)) {
+    struct ArmorPaletteController *palette = &owner->palette;
+    switch (owner->kind) {
         case 3:
         case 5:
         case 7:
         case 9:
         case 0xd:
         case 0xf:
-            if (t->cb == 0) {
-                t->cb = Palette_UpdatePulseFade;
-                t->b = 0;
-                *(u16 *)((u8 *)t + 0x488) = 0;
+            if (palette->update == 0) {
+                palette->update = Palette_UpdatePulseFade;
+                palette->completion = 0;
+                palette->restoreTimer = 0;
             }
             break;
         default:

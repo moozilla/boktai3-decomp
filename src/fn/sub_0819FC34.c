@@ -53,19 +53,19 @@ void Actor_SetHeadingVelocity(void *, u32);
 s32 Math_StepTowardTarget(s32, s32, s32);
 static inline void SetHeading(struct Hresvelgr *p, s32 heading)
 {
-    s32 shifted;
-    register u32 mask asm("r1");
     p->heading = heading;
-    shifted = (p->heading + 96) >> 6;
-    mask = 3;
-    mask &= shifted;
-    asm("" : "+r"(mask));
-    p->direction4 = mask;
-    shifted = (p->heading + 112) >> 5;
-    mask = 7;
-    mask &= shifted;
-    asm("" : "+r"(mask));
-    p->direction8 = mask;
+    {
+        u32 sector = (p->heading + 96) >> 6;
+        u32 mask = 3;
+        mask &= sector;
+        p->direction4 = mask;
+    }
+    {
+        u32 sector = (p->heading + 112) >> 5;
+        u32 mask = 7;
+        mask &= sector;
+        p->direction8 = mask;
+    }
 }
 static inline u8 PlayerCanMove(struct Player *p, u32 mask)
 {

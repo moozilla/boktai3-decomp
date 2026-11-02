@@ -24,9 +24,9 @@ void SceneNpc_UpdateBlinkPhase(void *unused, struct SceneNpc *npc)
         else {
             if (npc->phase & 1) {
                 u32 mask = 0x100;
-                *(u16 *)((u8 *)npc + 0xE) = mask | *(u16 *)((u8 *)npc + 0xE);
+                npc->flags = mask | npc->flags;
             }
-            if (npc->frame > *((u8 *)npc + 0x18)) {
+            if (npc->frame > npc->phase) {
                 npc->frame = 0;
                 npc->phase = npc->phase + 1;
             }

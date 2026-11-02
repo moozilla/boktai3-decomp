@@ -32,12 +32,12 @@ void Player_UpdatePoseRecovery(struct Player *p)
             Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 2, p->heading,
                              p->side);
             Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC), 1, 1);
-            if (*(u16 *)((u8 *)p + 0x4EC) <= 30) {
-                *(u16 *)((u8 *)p + 0x4EC) = 0;
+            if (p->actionCountdown <= 30) {
+                p->actionCountdown = 0;
                 Sound_PlaySong(0x1B0);
                 *((u8 *)p + 0x458) = 1;
             } else
-                *(u16 *)((u8 *)p + 0x4EC) -= 30;
+                p->actionCountdown -= 30;
             break;
         case 1:
             Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 3, p->heading,

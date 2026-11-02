@@ -54,7 +54,7 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
         if (p->f1E4 <= 0) {
             const u16 *randomTable;
             p->f1E0 = 1;
-            *(u16 *)((u8 *)p + 0x104) = 0;
+            p->blinkTimer = 0;
 
             emitted = 0;
 
@@ -104,7 +104,7 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
     } else {
         AnimData_SelectPaletteBank(p->graphics, 0x1C4);
     }
-    blink = (u16 *)(((u8 *)p) + 0x104);
+    blink = &p->blinkTimer;
     if ((*blink) && (!p->f1E0)) {
         (*blink)--;
         if (((*blink) >> 2) & 1)

@@ -48,13 +48,12 @@ void SpriteOam_QueueCameraRelativeSprites(void)
     do {
         s32 x, y;
         s32 z;
-        register u32 flags asm("r6");
+        u32 flags;
         register u32 attr asm("r5");
         s32 depth;
         s32 ox, oy;
-        register u32 initialFlags asm("r1") = p->flags;
+        u32 initialFlags = p->flags;
         u32 t = initialFlags;
-        asm("" : "+r"(t));
         t &= skip;
         flags = initialFlags;
         if (t)
@@ -62,10 +61,7 @@ void SpriteOam_QueueCameraRelativeSprites(void)
 
         x = divide8(p->pos.x - gCamera.position.x) + 120;
         y = divide8(p->pos.y - gCamera.position.y) + 80;
-        {
-            register s32 result asm("r0") = p->pos.z - gCamera.position.z;
-            z = result;
-        }
+        z = p->pos.z - gCamera.position.z;
         {
             u32 cull = flags & 64;
             ox = p->offsetX;

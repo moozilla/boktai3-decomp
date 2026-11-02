@@ -245,7 +245,7 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
         p->unkAC6[0] = intensity;
         PaletteFade_ApplyBrightenedPalette(p);
     }
-    if (*(u16 *)((u8 *)p + 0xAE4) == 1) {
+    if (p->visualEffectMode == 1) {
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
             {
@@ -282,7 +282,7 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
             p->actionEighteenDuration++;
         }
-    } else if (*(u16 *)((u8 *)p + 0xAE4) == 2) {
+    } else if (p->visualEffectMode == 2) {
         const u16 *source;
         p->actionRequestTimer = 0;
         source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
@@ -430,7 +430,7 @@ void Player_InitVisualResources(void *actor)
     p->menuStatusValues[4] = 0x171;
     p->menuStatusValues[5] = 0x2C;
     p->menuStatusValues[6] = 0x2E;
-    *(u16 *)((u8 *)p + 0xABE) = 0x2B;
+    p->menuStatusValues[7] = 0x2B;
 }
 
 void Player_InitVisualState(struct Player *p)
@@ -534,7 +534,7 @@ void Player_QueueStatusEffect(struct Player *p, s32 a)
     }
     if (!p->movementModifierActive) {
         p->savedEffectTick = p->facingChangeEffects;
-        *(u16 *)((u8 *)p + 0x4C6) = 0;
+        p->terrainDamageTimer = 0;
     }
 
     if (p->actionMode == 3) {
@@ -711,9 +711,9 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
                 *resource -= gGameState->unk876;
         }
         mode = 6;
-        *(u16 *)((u8 *)p + 0xAD0) = 64;
+        p->contactFlashTimer = 64;
     } else {
-        u16 *timer = (u16 *)((u8 *)p + 0xAD0);
+        u16 *timer = &p->contactFlashTimer;
         if (*timer) {
             if ((*timer >> 2) & 1)
                 mode = 6;
@@ -725,7 +725,7 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
             case 0:
                 if ((u8)(p->actionMode - 1) <= 1) {
                     p->scriptStatus[0] = 0;
-                    *(u16 *)((u8 *)p + 0xACE) = 0;
+                    p->scriptFlashTimer = 0;
                 } else if (p->scriptStatus[0]) {
                     if (p->kind & 1) {
                         p->scriptStatus[0]--;
@@ -734,9 +734,9 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
                                                     (u8 *)p + 0xAFC);
                     }
                     mode = 2;
-                    *(u16 *)((u8 *)p + 0xACE) = 64;
+                    p->scriptFlashTimer = 64;
                 } else {
-                    u16 *timer = (u16 *)((u8 *)p + 0xACE);
+                    u16 *timer = &p->scriptFlashTimer;
                     if (*timer) {
                         if ((*timer >> 2) & 1)
                             mode = 2;
@@ -763,17 +763,13 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
 
 // MATCHING_CONCESSION: register-pinning
 
-s32 Player_SelectFlashingVisualMode(struct Player *arg, s32 inputMode)
+s32 Player_SelectFlashingVisualMode(struct Player *p, s32 mode)
 {
-    struct Player *p = arg;
-    register s32 mode asm("r2") = inputMode;
-    if (p->movementRequestScale) {
-        if ((--p->movementRequestScale >> 2) & 1)
-            goto flash;
-    }
+    if (!p->movementRequestScale)
+        return mode;
+    if ((--p->movementRequestScale >> 2) & 1)
+        return p->movementRequestParameter;
     return mode;
-flash:
-    return p->movementRequestParameter;
 }
 
 static inline void Player_SetVisualStatusBits(u32 *flags, u32 mask)
@@ -788,7 +784,7 @@ static inline void Player_StoreVisualSpeeds(u8 *speeds, s32 speed)
 }
 static inline void Player_DecayVisualSlowdown(struct Player *p, u32 zero)
 {
-    u16 *timer = (u16 *)((u8 *)p + 0xAF2);
+    u16 *timer = &p->visualSlowdownTimer;
     if (*timer) {
         s32 speed;
         u8 *sound = (u8 *)p + 0x4E1;
@@ -812,10 +808,10 @@ static inline void Player_DecayVisualSlowdown(struct Player *p, u32 zero)
 void Player_UpdateStatusVisuals(void *actor)
 {
     struct Player *p = actor;
-    u32 remaining = *(u16 *)((u8 *)p + 0x538);
+    u32 remaining = p->active;
     if (remaining) {
-        if (*(u16 *)((u8 *)p + 0x534) == 5) {
-            u16 *timer = (u16 *)((u8 *)p + 0xAF2);
+        if (p->sceneMode == 5) {
+            u16 *timer = &p->visualSlowdownTimer;
             if (*timer < 64) {
                 if (*timer == 0) {
                     Sound_PlaySong(0x1EE);
@@ -825,7 +821,7 @@ void Player_UpdateStatusVisuals(void *actor)
             }
             p->animation.flags |= 2;
             {
-                s32 speed = 64 - (*(u16 *)((u8 *)p + 0xAF2) >> 1);
+                s32 speed = 64 - (p->visualSlowdownTimer >> 1);
                 p->movementSpeedScale = speed;
                 p->secondarySpeedScale = speed;
             }
@@ -833,14 +829,14 @@ void Player_UpdateStatusVisuals(void *actor)
         } else {
             Player_DecayVisualSlowdown(p, 0);
         }
-        if (*(u16 *)((u8 *)p + 0x534) == 6 || VisualActionFlag(p, 8)) {
+        if (p->sceneMode == 6 || VisualActionFlag(p, 8)) {
             p->animation.flags |= 0x200;
             Player_SetVisualStatusBits(&p->statusFlags, 0x20000);
         } else {
             p->animation.flags &= ~0x200;
         }
         if (p->kind & 1)
-            --*(u16 *)((u8 *)p + 0x538);
+            --p->active;
     } else {
         Player_DecayVisualSlowdown(p, remaining);
         if (VisualActionFlag(p, 8)) {
@@ -1775,7 +1771,7 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
             ClearEquipmentFlag(p, bit);
     }
     if (p) {
-        if (p->actionMode == 6 || *(u32 *)((u8 *)p + 0x18))
+        if (p->actionMode == 6 || p->slot)
             goto finish;
     }
     {
@@ -2235,9 +2231,14 @@ static inline void SetModeFlag(struct Player *p)
 
 s32 Player_SelectRequestedActionMode(struct Player *p)
 {
-    register struct PlayerActionRequest *request asm("r2") =
-        (struct PlayerActionRequest *)&p->thresholdMode;
-    if (request->kind >= 0 && request->enabled && !request->blocked) {
+    struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
+    if (request->kind < 0)
+        return p->tetherMode;
+    if (!request->enabled)
+        return p->tetherMode;
+    if (request->blocked)
+        return p->tetherMode;
+    {
         u8 *mode = &p->tetherMode;
         if (*mode > 1)
             return *mode;

@@ -1,34 +1,13 @@
-#include "global.h"
+#include "particle_effect_state.h"
 
 /* tentative: falls under gravity, lands with a sound and switches to the active state */
 
 #include "player_cue_sequence.h"
 #include "background_controller.h"
 
-struct BurstPos {
-    s32 x, y, z, w;
-};
 struct BurstCamera {
     u8 pad[0x44];
     s32 x;
-};
-struct BurstEntry {
-    u8 pad0[4];
-    u8 collider[0x5c];
-    struct ContactSwarmSprite sprite;
-    struct DisplaySequenceState anim;
-    void *data;
-    struct BurstPos position;
-    s32 velocity[4];
-    s32 yOffset;
-    u8 padC4[4];
-    u16 duration;
-    u8 active;
-    u8 dirty;
-    u16 id;
-    u8 timer;
-    u8 state;
-    u32 value;
 };
 void Memory_Clear(void *, s32);
 void Sound_PlaySong(u32);
@@ -39,10 +18,10 @@ void ParticleBurstEffect_TickActive(struct BurstEntry *);
 
 void ParticleBurstEffect_UpdateFalling(struct BurstEntry *p)
 {
-    if (p->dirty) {
+    if (p->entered) {
         p->sprite.flags &= ~1;
-        p->dirty = 0;
-        Memory_Clear(p->velocity, 0x10);
+        p->entered = 0;
+        Memory_Clear(p->velocity, sizeof(p->velocity));
     }
     p->velocity[1] += 0x200;
     p->yOffset += p->velocity[1];

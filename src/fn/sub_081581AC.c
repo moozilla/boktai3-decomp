@@ -7,8 +7,8 @@ u32 Player_IsStatusBit4ActionActive(u32);
 
 s32 Player_TestMovementPosition(struct PlayerColliderVector *v)
 {
-    s32 x = *(s16 *)v >> 8;
-    s32 z = *(s16 *)((u8 *)v + 4) >> 8;
+    s32 x = (s16)v->x >> 8;
+    s32 z = (s16)v->z >> 8;
     s32 cell;
     u8 *data;
     u32 flags;

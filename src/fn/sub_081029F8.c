@@ -87,7 +87,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
         }
         {
             manager->playerName = 0;
-            gPlayers[0]->followTarget = gPlayers[0]->localFollowTarget;
+            gPlayers[0]->followTarget = &gPlayers[0]->movementContactFlags;
             Player_ClearAttachmentFlags(gPlayers[0], 5);
             clearFlag16(8, &object->flags);
             ((u8 *)gPlayers[0])[0x701] &= 0xFE;

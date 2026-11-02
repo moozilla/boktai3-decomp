@@ -1,9 +1,9 @@
 #include "global.h"
 #include "render.h"
+#include "vanargand_stage_colors.h"
 #include "input.h"
 #include "engine_globals.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: applies camera, collision, palette and shake presentation effects.
 #define Vanargand_UpdatePresentation sub_081AD564
 #define RANDOM_TABLE_ADDR            0x0203B400
@@ -84,6 +84,7 @@ void Vanargand_ResetPaletteTransition(void *);
 void Vanargand_UpdatePaletteTransition(void *);
 s32 ScalarApproach_StepSixteenth(s32, s32);
 void ScreenPalette_UpdateState(void *);
+
 static inline s32 Scale(s32 value)
 {
     if (value >= 0)
@@ -95,20 +96,6 @@ static inline void Direction(struct PresentationVec *v, s32 angle, s32 length)
     v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * length);
     v->y = 0;
     v->z = Scale(gUnk_086149C4[angle] * length);
-}
-static inline s32 Blend(s32 t, s32 first, s32 last, s32 duration)
-{
-    s32 value;
-    if (t <= 0)
-        return first;
-    if (t >= duration)
-        return last;
-    value = t * ((last - first) << 8) / duration;
-    if (value >= 0)
-        value >>= 8;
-    else
-        value = -(-value >> 8);
-    return value + first;
 }
 static inline s32 RandomValue(void)
 {
@@ -123,16 +110,6 @@ static inline u32 TestActorFlag(u32 mask, struct VanargandPresentation *self)
 static inline void ClearColliderFlag(u32 mask, struct PresentationCollider *c)
 {
     c->flags &= ~mask;
-}
-static inline void StorePalettePair(u32 value)
-{
-    u16 color = value;
-    u16 *palette;
-    /* Preserve the packed color before computing the palette addresses. */
-    asm("" : "+r"(color));
-    palette = gBgPaletteBuffer;
-    palette[0x5A / 2] = color;
-    palette[0x10E / 2] = color;
 }
 static inline void SetAnimationFlag(struct PresentationAnimation *a)
 {
@@ -240,30 +217,9 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
                 kind = 0x7F;
             switch (kind) {
                 case 0x6F: {
-                    s32 r;
-                    s32 g;
-                    s32 b;
-                    s32 t;
                     CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x4000020);
                     CpuSet(p->fadeA, gBgPaletteBuffer, 0x4000068);
-                    t = p->transition;
-                    r = Blend(t, 7, 19, 3);
-                    g = Blend(t, 0, 18, 3);
-                    b = Blend(t, 0, 19, 3);
-                    r |= g << 5;
-                    r |= b << 10;
-                    {
-                        u16 color = r;
-                        u16 *palette = gBgPaletteBuffer;
-                        palette[0x56 / 2] = color;
-                        palette[0x10C / 2] = color;
-                    }
-                    r = Blend(t, 21, 24, 3);
-                    g = Blend(t, 0, 29, 3);
-                    b = Blend(t, 0, 31, 3);
-                    r |= g << 5;
-                    r |= b << 10;
-                    StorePalettePair((u16)r);
+                    Vanargand_SetStageColors(p->transition);
                     break;
                 }
 

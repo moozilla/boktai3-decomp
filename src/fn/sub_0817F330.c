@@ -38,8 +38,8 @@ void sub_0817F330(A *p)
 {
     A *p2 = p;
     u8 *position = (u8 *)p + 0x48;
-    if (*(u8 *)((u8 *)p + 0xb1)) {
-        *(u8 *)((u8 *)p + 0xb1) = 0;
+    if (p->changed) {
+        p->changed = 0;
         SceneActors_StartEightDirectionAnimation(p, p->animation, p->animationState, 0xF4, 1, 1, 4);
     } else {
         SceneActors_StartEightDirectionAnimation(p, p->animation, p->animationState, 0xF4, 1, 1, 1);

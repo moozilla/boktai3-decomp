@@ -20,24 +20,18 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 static inline void SetState(struct SceneActorRegistryResetView *actor)
 {
     u32 behavior = 6;
-    register u32 offset asm("r4");
-    u8 *field;
     actor->state2A8 = 0;
-    offset = 0x2A9;
-    field = (u8 *)actor + offset;
-    *field = 0;
+    actor->phase2A9 = 0;
     actor->behavior2AA = behavior;
-    offset += 3;
-    field = (u8 *)actor + offset;
-    *(u32 *)field = 0;
+    actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
 static inline void BeginRouteSelection(struct SceneActorRegistryResetView *actor, u8 *nav)
 {
-    register u32 behaviorOffset asm("r4");
+    u32 behaviorOffset;
     void *control;
     u32 stateOffset = 0x2A8;
-    register u32 controlOffset asm("r1");
+    u32 controlOffset;
     u32 kind;
     u8 *field;
     u32 behavior = 8;
@@ -64,21 +58,13 @@ static inline void BeginRouteSelection(struct SceneActorRegistryResetView *actor
     controlOffset -= 0x94;
     field = (u8 *)actor + controlOffset;
     *(void **)field = control;
-    {
-        register u32 timerOffset asm("r2") = 0x2C8;
-        asm("" : : "r"(timerOffset));
-        field = (u8 *)actor + timerOffset;
-        *(u16 *)field = 0;
-    }
+    actor->field2C8 = 0;
     {
         u32 *flags = &actor->flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    behaviorOffset = 0x104;
-    asm("" : : "r"(behaviorOffset));
-    field = (u8 *)actor + behaviorOffset;
-    *(u32 *)field = 0;
+    actor->word104 = 0;
 }
 
 s32 Mod(s32, s32);
@@ -110,14 +96,9 @@ void SceneActorControl_UpdateRouteApproach(struct SceneActorRegistryResetView *a
     speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
     {
         u32 mask = 0xA02F;
-        register u32 flagOffset asm("r4") = 0x2D4;
-        register u16 *flagAddress asm("r0");
-        asm("" : : "r"(flagOffset));
-        flagAddress = (void *)((u8 *)actor + flagOffset);
+        u16 *flagAddress = &actor->flags2D4;
         if (*flagAddress & mask) {
-            u32 scaleOffset = 0x2C2;
-            u16 *p;
-            p = (void *)((u8 *)actor + scaleOffset);
+            u16 *p = &actor->field2C2;
             *p = 0x40;
             scale = p;
         } else {

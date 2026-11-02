@@ -53,6 +53,6 @@ s32 Boss_FinalExplosions(struct Boss *self)
     Explosion_Create(&pos, 1, 0, 0, in->f18, 0x3c, in->f4c, 10);
     POS(2) = *(u16 *)(c + 0x20) + 0x80;
     Explosion_Create(&pos, 1, 0, 0, in->f18, 0x3c, in->f4c, 10);
-    SceneStimulus_AddTagged(*(s16 *)src, *(s16 *)((u8 *)self + 0xac), 0x400, 0, 1, 0xB546);
+    SceneStimulus_AddTagged(*(s16 *)src, (s16)self->cz, 0x400, 0, 1, 0xB546);
     return 2;
 }
