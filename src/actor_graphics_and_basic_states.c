@@ -448,7 +448,7 @@ void SceneActors_AddResourceCost(int amount)
     if (amount > 0) {
         p = SceneActors_GetBySlot(0);
         if (p)
-            *(int *)((u8 *)p + 0x39c) += amount; /* resourceCostAccumulator */
+            ((struct SceneGraphicsActor *)p)->graphics.resourceCostAccumulator += amount;
     }
 }
 
