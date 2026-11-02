@@ -4385,7 +4385,11 @@ def explain_regmove(wd, uid, gone, new, nm, at):
               f" {a} is still used after insn {u} (so it does not die there), or {a} or {b} is read between"
               f" {a}'s set and insn {u}, or a label, branch or call separates them, or {a} is a constant set in"
               " another block. Levers: use the value again later, compute it in its own statement before an"
-              " if, or give the result its own variable that is read before the operation.")
+              " if, or give the result its own variable that is read before the operation. For a"
+              " byte read and masked (`u8` flags), read it into a byte union and narrow the and:"
+              " `control.raw = a->flags; first = (u8)(control.raw & bit);` (DisplaySequence_ApplyFrame,"
+              " include/display_sequence_inline.h; it matched AnimatedTile_TickAlternateAnimation where"
+              " `u8 left`/`u8 input` did not).")
     # the same tie in other inlined copies of this code: same pattern up to register numbers
     shape = lambda r: re.sub(r"\(reg(/\w)*:(\w+) \d+\)", r"(reg:\2)", r or "")
     rowline = {}
