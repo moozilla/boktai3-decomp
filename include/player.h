@@ -211,7 +211,7 @@ struct Player {
     u16 currentStatA, maximumStatA;             /* 0x424: tentative health-like stat */
     u16 currentStatB, maximumStatB;             /* 0x428: tentative energy-like stat */
     u16 statHundredths, statWhole, statusValue; /* 0x42C */
-    u8 unk432[2];
+    u8 unk432[2]; /* 0x432: pending action mode and its valid flag, consumed by 08156FE0. */
     u16 statScale; /* 0x434: initialized to 64 by 0813B67C */
     u8 unk436[0xC];
     u16 particleEmissionCount; /* 0x442 */
@@ -274,9 +274,10 @@ struct Player {
     u16 positionResetTimer, positionResetCounter; /* 0x4D8 */
     u8 unk4DC[4];
     u8 cueVariant; /* 0x4E0: copied by 0815B404, tentative */
-    u8 unk4E1[7];
+    u8 unk4E1[5];
+    u16 formCueParameterA; /* 0x4E6: set to 6 for form two, cleared when its cue exits. */
     u16 terrainRecoveryCounter; /* 0x4E8 */
-    u8 unk4EA[2];
+    u16 formCueParameterB; /* 0x4EA: paired with formCueParameterA. */
     u16 actionCountdown;      /* 0x4EC: mode phase subtracts thirty per update */
     u8 actionEighteenEnabled; /* 0x4EE: selects phase one and refreshes action parameters */
     u8 unk4EF[3];
