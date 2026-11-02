@@ -363,7 +363,8 @@ struct Player {
     u8 unkAF0;
     u8 actionRequestState; /* 0xAF1 */
     u16 visualSlowdownTimer;
-    u8 unkAF4[0x10];
+    u8 effectModes[4], effectCounters[4]; /* 0xAF4: per-channel effect reset state */
+    u16 effectLimits[4];
     void *kindTwoAttachment;        /* 0xB04: descriptor-driven attachment, tentative */
     u8 kindTwoAttachmentDescriptor; /* 0xB08 */
     u8 unkB09;
