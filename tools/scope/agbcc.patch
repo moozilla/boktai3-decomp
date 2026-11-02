@@ -1674,7 +1674,7 @@
  	      m->lifetime += m1->lifetime;
  	      m->savings += m1->savings;
  	      m1->done = 1;
-@@ -1828,7 +1871,16 @@
+@@ -1828,7 +1871,17 @@
  	  /* It is also desirable to move if it can be moved at no
  	     extra cost because something else was already moved.  */
  
@@ -1690,6 +1690,7 @@
 +	    ;  /* scope what-if: leave this invariant in the loop */
 +	  else if (already_moved[regno]
  	      || flag_move_all_movables
++	      || uid_listed (getenv ("AGBCC_MOVE"), INSN_UID (p))  /* scope what-if: hoist it */
  	      || (threshold * savings * m->lifetime) >=
  		 (moved_once[regno] ? insn_count * 2 : insn_count)
 @@ -4533,6 +4585,12 @@
