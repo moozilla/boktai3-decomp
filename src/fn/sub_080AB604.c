@@ -62,7 +62,7 @@ s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
         own = (const s16 *)&s->body.position;
         t = sensor2->target;
         other = (const s16 *)&t->position;
-        delta.x = *(s16 *)((u8 *)t + 0xc) - own[0];
+        delta.x = t->position.x - own[0];
         out->y = other[1] - own[1];
         out->z = other[2] - own[2];
     }
