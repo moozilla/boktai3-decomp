@@ -125,10 +125,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             {
                 void *seq, *res;
                 u32 facing;
-                {
-                    register u32 off asm("r4") = 0x10c;
-                    seq = (u8 *)p + off;
-                }
+                seq = &p->sequence;
                 {
                     u32 off = 0x17c;
                     {
