@@ -74,7 +74,7 @@ s32 OrbitEffect_UpdateManager(struct OrbitEffectManager *manager)
                 Polar(&effect->velocity, params);
                 ClearFlags(&effect->flags, ~1);
             }
-            if (effect->params.movementEnabled && !TestFlags(&effect->flags, 2)) {
+            if (effect->params.targetSource && !TestFlags(&effect->flags, 2)) {
                 AddPosition(&sprite->position, &effect->velocity);
                 if (effect->params.homing == 0) {
                     if (sprite->position.x > 0xCDA)
