@@ -284,21 +284,19 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                         AnimData_SelectPaletteBank(cache.graphics, tile);
                     }
                     {
-                        register struct StackedActorSprite *target asm("r1") = savedShadow;
+                        struct StackedActorSprite *target = savedShadow;
                         target->flags |= one;
                     }
                     {
-                        register u32 offset asm("r2") = 0x1C0;
-                        register u16 *destination asm("r1");
-                        asm("" : : "r"(offset));
+                        u32 offset = 0x1C0;
+                        u16 *destination;
                         destination = (void *)((u8 *)actor + offset);
                         *destination = 7;
                     }
                     StackedActor_UpdateSegments(actor);
                     {
-                        register u32 offset asm("r3") = 0x1C6;
-                        register u16 *destination asm("r1");
-                        asm("" : : "r"(offset));
+                        u32 offset = 0x1C6;
+                        u16 *destination;
                         destination = (void *)((u8 *)actor + offset);
                         *destination = 8;
                     }
