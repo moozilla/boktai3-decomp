@@ -301,7 +301,10 @@ def stub_unit(text, asm_name, func, headers=()):
 
 def definition_span(text, name):
     """(start, end) of NAME's definition in TEXT, comment lines directly above included, or None."""
-    m = re.search(r"^[A-Za-z_][^\n;=()]*\b%s\s*\([^;{]*\)\s*\{" % re.escape(name), text, re.M)
+    names = [name]
+    names.extend(re.findall(r"^#define[ \t]+(\w+)[ \t]+%s[ \t]*(?://[^\n]*)?$" % re.escape(name), text, re.M))
+    pattern = r"^[A-Za-z_][^\n;=()]*\b(?:%s)\s*\([^;{]*\)\s*\{" % "|".join(map(re.escape, names))
+    m = re.search(pattern, text, re.M)
     if not m:
         return None
     depth, i = 0, text.index("{", m.start())
