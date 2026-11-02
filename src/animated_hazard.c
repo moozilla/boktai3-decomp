@@ -484,7 +484,6 @@ int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int delay, int hold)
 {
     struct AnimatedHazardManager *m = AnimatedHazard_GetManager();
@@ -530,10 +529,7 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
     }
     effect = p->collider;
     Collider_SetPosition(effect, pos, 0);
-    {
-        register int d asm("r9") = damage;
-        Collider_SetAttackProperties(effect, d, 50, 0, 8, 30);
-    }
+    Collider_SetAttackProperties(effect, damage, 50, 0, 8, 30);
     AnimatedHazard_SetState(m, p, 1);
     Anim_SetSequence(&p->anim, m->script, 0, 0, zero);
     {
@@ -603,7 +599,6 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
     AnimData_SelectPaletteBank(m->animData, 0x33F);
     p->timer = 0;
     p->hold = hold;
-    asm("" : "+r"(delay));
     p->duration = delay;
     p->active = 1;
     return 0;
