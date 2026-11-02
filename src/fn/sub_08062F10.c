@@ -1,87 +1,32 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_catalog.h"
 extern const s8 gUnk_0824DF6C[];
-struct SceneInventoryUnlockView {
-    u8 unknown0[0x750];
-    u32 low, high;
-};
-void SceneInventory_BuildUnlockedItemCatalog(struct SceneInventoryScriptCatalog *input)
+void SceneInventory_BuildUnlockedItemCatalog(struct SceneInventoryScriptCatalog *p)
 {
-    struct SceneInventoryScriptCatalog *p = input;
     s32 page;
-    s32 next;
-    s32 count;
-    s8 *destination;
-    const s8 *source;
-    struct GameState **location;
-    register u32 one asm("r8");
-    u8 *pageCount;
-    s8 *volatile base;
-    u8 *initialCount;
+    s32 i;
     p->page = 0;
-    initialCount = &p->pageCount;
-    *initialCount = 2;
-    page = 0;
-    location = &gGameState;
-    one = 1;
-    base = p->catalog;
-    pageCount = initialCount;
-    do {
-        s32 offset = page * 8;
-        next = page + 1;
-        {
-            register s8 *baseLoad asm("r1") = base;
-            destination = (s8 *)((u32)offset + (u32)baseLoad);
-        }
-        source = (s8 *)((u32)offset + (u32)gUnk_0824DF6C);
-        count = 7;
-        do {
-            s32 kind = *source;
+    p->pageCount = 2;
+    for (page = 0; page < p->pageCount; page++) {
+        for (i = 0; i < 8; i++) {
+            s32 kind = gUnk_0824DF6C[page * 8 + i];
             u32 enabled;
-            *(u8 *)destination = 0xFF;
+            ((u8 *)p->catalog)[page * 8 + i] = 0xFF;
             if (kind >= 0) {
-                if (kind <= 31) {
-                    u32 *flags = (u32 *)*location;
-                    register u32 offset asm("r0");
-                    offset = 0x750;
-                    flags = (u32 *)((u8 *)flags + offset);
-                    offset = one << kind;
-                    enabled = *flags & offset;
-                } else {
-                    struct GameState **copy = location;
-                    u32 *flags;
-                    u32 offset;
-                    flags = (u32 *)*copy;
-                    offset = 0x754;
-                    flags = (u32 *)((u8 *)flags + offset);
-                    enabled = kind - 32;
-                    offset = one << enabled;
-                    enabled = *flags & offset;
-                }
+                if (kind < 32)
+                    enabled = gGameState->unlockedItems[0] & (1 << kind);
+                else
+                    enabled = gGameState->unlockedItems[1] & (1 << (kind - 32));
                 if (enabled)
-                    *destination = kind;
+                    p->catalog[page * 8 + i] = kind;
             }
-            destination++;
-            source++;
-        } while (--count >= 0);
-        page = next;
-    } while (page < *pageCount);
-    if (page <= 6) {
+        }
+    }
+    for (; page <= 6; page++) {
         u32 mask = 0xFF;
-        s8 *fillBase = p->catalog;
-        do {
-            s32 offset = page * 8;
-            s8 *cursor;
-            next = page + 1;
-            cursor = (s8 *)((u32)offset + (u32)fillBase);
-            count = 7;
-            do {
-                u32 value = *(u8 *)cursor;
-                value |= mask;
-                *cursor++ = value;
-            } while (--count >= 0);
-            page = next;
-        } while (page <= 6);
+        for (i = 0; i < 8; i++) {
+            u32 value = ((u8 *)p->catalog)[page * 8 + i];
+            p->catalog[page * 8 + i] = value | mask;
+        }
     }
     if (Script_SeekToKeyword(0x69))
         p->itemText = Script_GetTextSourcePc();
