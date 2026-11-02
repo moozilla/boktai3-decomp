@@ -1,9 +1,30 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_state.h"
 #include "scene_actor_route.h"
 #include "script_utility.h"
 void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *);
 extern const u8 gUnk_08610814[];
+static inline u8 *SceneActorRoute_BehaviorField(struct SceneActorRegistryActor *actor)
+{
+    return &actor->behavior2AA;
+}
+
+static inline void SceneActorRoute_StartWait(struct SceneActorRegistryActor *actor)
+{
+    u32 behavior = 2;
+    u8 *field;
+    u32 zero;
+    field = &actor->state2A8;
+    zero = 0;
+    *field = zero;
+
+    actor->phase2A9 = zero;
+
+    *SceneActorRoute_BehaviorField(actor) = behavior;
+    actor->counter2AC = zero;
+
+    actor->field2B1 = 1;
+}
+
 void SceneActorRoute_AdvanceActorPoint(struct SceneActorRegistryActor *actor,
                                        struct SceneActorRouteCursor *cursor)
 {
@@ -26,42 +47,8 @@ void SceneActorRoute_AdvanceActorPoint(struct SceneActorRegistryActor *actor,
     near = (u8)SceneActorRoute_IsOutsidePointBounds(cursor, &actor->position, 32, 32);
     if (near) {
         SceneActorMovement_ResolveRoutePosition(actor);
-        {
-            u32 behavior = 2;
-            u32 offset = 0x2a8;
-            register u8 *field asm("r0");
-            u32 zero;
-            register u32 phase asm("r3");
-            field = (u8 *)actor + offset;
-            zero = 0;
-            *field = zero;
-            phase = 0x2a9;
-            field = (u8 *)actor + phase;
-            *field = zero;
-            phase++;
-            field = (u8 *)actor + phase;
-            *field = behavior;
-            {
-                u32 counter = 0x2ac;
-                field = (u8 *)actor + counter;
-                *(u32 *)field = zero;
-            }
-            phase += 7;
-            {
-                register u8 *entry asm("r1") = (u8 *)actor + phase;
-                u32 one = 1;
-                *entry = one;
-            }
-            {
-                register u32 settingOffset asm("r0") = 0x2c2;
-                u16 *setting;
-                register u32 value asm("r0");
-                asm("" : "+r"(settingOffset));
-                setting = (void *)((u8 *)actor + settingOffset);
-                value = 64;
-                *setting = value;
-            }
-        }
+        SceneActorRoute_StartWait(actor);
+        actor->field2C2 = 64;
     } else if (gUnk_08610814[mode] == 1) {
         actor->state2A8 = 0;
         actor->phase2A9 = 0;
