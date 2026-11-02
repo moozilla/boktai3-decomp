@@ -182,9 +182,13 @@ class Run:
         map_rom(uc, image, overlay)
         uc.mem_map(SENTINEL, PAGE, unicorn.UC_PROT_ALL)
         uc.mem_write(SENTINEL, b"\x70\x47" * (PAGE // 2))   # bx lr
-        lo, hi = STACK_LO & ~(PAGE - 1), (STACK_TOP + PAGE) & ~(PAGE - 1)
+        lo, hi = STACK_LO & ~(PAGE - 1), (STACK_TOP + PAGE - 1) & ~(PAGE - 1)
         uc.mem_map(lo, hi - lo, unicorn.UC_PROT_ALL)
-        uc.mem_write(lo, bytes(hi - lo))
+        # Unicorn zero-fills the stack. Bytes sharing its edge pages are ordinary RAM.
+        if lo < STACK_LO:
+            uc.mem_write(lo, page_bytes(seed, lo)[:STACK_LO - lo])
+        if STACK_TOP < hi:
+            uc.mem_write(STACK_TOP, page_bytes(seed, hi - PAGE)[STACK_TOP - (hi - PAGE):])
         uc.hook_add(unicorn.UC_HOOK_MEM_UNMAPPED, self.on_unmapped)
         uc.hook_add(unicorn.UC_HOOK_MEM_WRITE, self.on_write)
         uc.hook_add(unicorn.UC_HOOK_MEM_READ, self.on_read)
