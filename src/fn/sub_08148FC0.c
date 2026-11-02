@@ -1,6 +1,6 @@
+#include "game_state.h"
 #include "contact_swarm.h"
 #include "player_cue_sequence.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: walking animation alternates footstep sounds and positional effects.
 
 u32 Anim_SetSequence(void *anim, void *data, u32 sequence, u32 row, u32 flags);
@@ -16,7 +16,7 @@ void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
 static inline u8 global_bit(void)
 {
     u32 mask = 1;
-    if (*(u32 *)((u8 *)gGameState + 0x868) & mask)
+    if (gGameState->flags868 & mask)
         return TRUE;
     return FALSE;
 }
