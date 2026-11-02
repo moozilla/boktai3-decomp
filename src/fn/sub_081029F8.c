@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "ram.h"
@@ -11,7 +12,10 @@ struct NamedObject {
     s16 flags;
     u8 padBA[0x22];
     u32 name;
-    u8 padE0[0x2C];
+    u32 field_E0;
+    u8 padE4[0xF3 - 0xE4];
+    u8 kind;
+    u8 padF4[0x10C - 0xF4];
     struct SceneVec position;
 };
 struct NamedObjectManager {
@@ -73,7 +77,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
             *p = v;
         }
     } else if (manager->playerName == object->name) {
-        if (*((u8 *)object + 0xF3) == 1 && !(*(u32 *)((u8 *)object + 0xE0) & 8)) {
+        if (object->kind == 1 && !(object->field_E0 & 8)) {
             if (IN_BOUNDS(gUnk_086064BC)) {
                 NamedObject_UpdatePlayerFollowFlags(object);
                 return;
