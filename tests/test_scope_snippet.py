@@ -30,6 +30,17 @@ class Snippet(unittest.TestCase):
     def test_no_includes_is_a_snippet(self):
         self.assertTrue(scope.is_snippet(BASE, "int F(struct S *s) { return 0; }\n", "F"))
 
+    def test_put_takes_the_function_the_snippet_defines(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            unit, snip = Path(d) / "u.c", Path(d) / "s.c"
+            unit.write_text("\n".join(BASE) + "\n")
+            snip.write_text("static inline int H(struct S *s) { return 2; }\n"
+                            "int Keep(struct S *s)\n{\n    return H(s);\n}\n")
+            self.assertEqual(scope.snippet_function(str(unit), str(snip)), "Keep")
+            snip.write_text("int Missing(struct S *s) { return 0; }\n")
+            self.assertIsNone(scope.snippet_function(str(unit), str(snip)))
+
 
 if __name__ == "__main__":
     unittest.main()

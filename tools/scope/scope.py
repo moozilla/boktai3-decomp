@@ -1008,7 +1008,15 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
                  ("Load the value, then write the constant first: `u32 v = x; u32 m = K; m |= v; x = m;`"
                   if tied == "constant" else "Write the value first: `m = v | K;`"))
               + " (README fact 33)")
-    for i, ln, reg in arg_order_hints(rows_json):
+    for i, ln, reg, kind in arg_order_hints(rows_json):
+        if kind == "constant":
+            print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, in argument order; the"
+                  f" draft loads a constant argument ahead of it. expand_call put the constant in a pseudo"
+                  f" before the earlier arguments' copies, and cse turned the argument into a register"
+                  f" already live: give that argument a pseudo of its own set before the constant, e.g. an"
+                  f" inline wrapper whose parameter is the argument (`static inline void F(void *p)"
+                  f" {{ Call(p, K); }}`) (README fact 59)")
+            continue
         print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
               f" precomputes an argument that needs converting to its parameter's type: declare that"
               f" parameter narrower (`u8`) or cast the argument (README fact 35)")
@@ -1897,9 +1905,14 @@ def and_tie_hints(rows):
 
 
 def arg_order_hints(rows):
-    """[(row index of the bl, line, register)] where the ROM sets argument register rN first in
-    the setup of a call and the draft sets it later: expand_call precomputed that argument, which
-    it does for one that needs a conversion to the parameter's type (README fact 35)."""
+    """[(row index of the bl, line, register, kind)] where the ROM sets argument register rN first in
+    the setup of a call and the draft sets it later. kind "precomputed": the ROM pulled rN ahead of
+    the others, so expand_call precomputed that argument, which it does for one that needs a
+    conversion to the parameter's type (README fact 35). kind "constant": the ROM sets the
+    registers in ascending order and the draft loads a constant argument (`ldr rX, =K`,
+    `movs rX, #K`) ahead of them, so the draft's constant pseudo was set before the argument
+    copies; an argument set into a fresh pseudo before the constant (an inline wrapper's parameter)
+    gives the ROM's order (README fact 59)."""
     out = []
     for i, r in enumerate(rows):
         if not (r["rom"] or "").startswith("bl ") or not (r["draft"] or "").startswith("bl "):
@@ -1922,7 +1935,16 @@ def arg_order_hints(rows):
             continue
         first = ro[0]
         if do.index(first) > 0 and [x for x in ro if x != first] == [x for x in do if x != first]:
-            out.append((i, r.get("line") or "", first))
+            kind = "precomputed"
+            if ro == sorted(ro):
+                early = do[0]
+                for j in range(i - 1, max(-1, i - 13), -1):
+                    t = rows[j]["draft"]
+                    if t is not None and asm_dest(t) == early:
+                        if re.match(r"(ldr r\d+, =|movs r\d+, #)", t):
+                            kind = "constant"
+                        break
+            out.append((i, r.get("line") or "", first, kind))
     return out
 
 
@@ -5589,6 +5611,22 @@ def pseudo_value(wd, pseudo):
     return None, None
 
 
+def snippet_function(src, snippet):
+    """The function a put SNIPPET.c replaces when no FUNC is given: the last function the snippet
+    defines (not a static inline helper) that SRC defines too. None when there is none, so the
+    usual default (the file's `scope:` line, the last function used) applies."""
+    import land
+    try:
+        text = open(snippet).read()
+    except OSError:
+        return None
+    unit = open(os.path.join(ROOT, src) if not os.path.isabs(src) else src).read()
+    names = [m.group(1) for m in re.finditer(r"^(?!static\b)[A-Za-z_][\w \t\*]*?\b(\w+)\s*\([^;{]*\)\s*\{",
+                                              text, re.M)]
+    found = [n for n in names if land.definition_span(unit, n)]
+    return found[-1] if found else None
+
+
 def put_definition(src, snippet, func):
     """FILE.c with SNIPPET.c in place of FUNC's definition (the stub `new` wrote, or a draft). The snippet
     is FUNC's definition and whatever it needs above it (structs, prototypes, inline helpers); its
@@ -7577,7 +7615,7 @@ def main():
     if rest and rest[0] == "put":  # FILE.c put SNIPPET.c [FUNC]: the snippet's C in place of FUNC's, then the score
         if len(rest) < 2:
             cli_error("FILE.c put SNIPPET.c [FUNC]")
-        func = source_function(src, rest[2] if len(rest) > 2 else None)
+        func = source_function(src, rest[2] if len(rest) > 2 else snippet_function(src, rest[1]))
         put_definition(src, rest[1], func)
         rest = [func]
     if rest and rest[0] == "pins":  # FILE.c pins: cost of removing each pin / barrier, greedy removal

@@ -1,5 +1,6 @@
 #ifndef GUARD_BOUNCING_OBJECT_H
 #define GUARD_BOUNCING_OBJECT_H
+#include "display_sequence_inline.h"
 #include "contact_swarm.h"
 #include "ram.h"
 /* Separate twelve-slot family; not the preceding anchored-particle pool. */
@@ -31,6 +32,73 @@ struct BouncingContact {
     u8 unknown14[0x38 - 0x14];
     u32 flags;
 };
+/* The spawn-time sequence step: the frame and first flip go through the object, the second
+ * flip through the caller's second view of the same sprite. */
+static inline u32 BouncingObject_StepSequence(struct BouncingObject *object,
+                                              struct ContactSwarmSprite *second,
+                                              struct DisplaySequenceState *state, u32 firstFlipMask)
+{
+    const u16 *command = state->commands + state->index;
+    u32 ended;
+    object->sprite.frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = firstFlipMask;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            object->sprite.flags |= 4;
+        else
+            object->sprite.flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            second->flags |= 8;
+        else
+            second->flags &= ~8;
+    }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+                ended = 1;
+            } else {
+                state->index--;
+                ended = 0;
+            }
+        } else {
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+                ended = 1;
+            } else {
+                ended = 0;
+            }
+        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
+    }
+    return ended;
+}
 extern const u8 gBouncingObjectBlinkDelays[4];
 typedef void (*BouncingObjectCallback)(struct BouncingPool *, struct BouncingObject *);
 extern BouncingObjectCallback const gBouncingObjectStateCallbacks[3];
