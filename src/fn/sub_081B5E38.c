@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 
@@ -26,11 +25,13 @@ void Vanargand_DestroyPartController(u8 *controller)
         ScaledShadow_Destroy(shadow);
         SceneLink_RemoveNode(node);
         {
-            register u32 stride asm("r0") = 0x21c;
-            node += stride;
-            shadow += stride;
-            collider += stride;
-            sprite += stride;
+            union VanargandPartStride {
+                u32 bytes;
+            } stride = {0x21c};
+            node += stride.bytes;
+            shadow += stride.bytes;
+            collider += stride.bytes;
+            sprite += stride.bytes;
         }
     } while (--i >= 0);
     {
