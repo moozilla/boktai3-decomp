@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
 #include "scene_actor_style.h"
@@ -58,20 +57,31 @@ valid:
     return 1;
 }
 
-// Tentative: initializes the Glove actor's style, stats, and modifier effects.
-
+static inline struct AreaEffectLinkState *ReadGloveStyleSession(struct Glove *glove,
+                                                                s32 *participant)
+{
+    s32 index = glove->participant;
+    struct AreaEffectLinkState *session;
+    *participant = index;
+    session = gLinkSession;
+    if (!session || session->unavailable != 1)
+        return NULL;
+    return session;
+}
 void Glove_InitializeStyleModifiers(struct Glove *p)
 {
     struct GloveMotion *self = &p->motion;
     u32 mask = 0x800;
     if ((gEngineFlags | gScenePauseFlags) & mask) {
-        s32 player = p->participant;
-        register struct AreaEffectLinkState *link asm("r1") = gLinkSession;
+        s32 player;
+        struct AreaEffectLinkState *link;
         struct LinkStylePayload *payload;
         s32 i;
-        if (!link || link->unavailable != 1 || !ValidParticipant(player))
+        link = ReadGloveStyleSession(p, &player);
+        if (!link || !ValidParticipant(player))
             return;
-        payload = (struct LinkStylePayload *)(link->incomingPayload + player * 0x24);
+        payload = (struct LinkStylePayload *)(link->incomingPayload +
+                                              player * sizeof(struct LinkStylePayload));
         if (!payload)
             return;
         self->style.adjustedA = payload->style.adjustedA;
