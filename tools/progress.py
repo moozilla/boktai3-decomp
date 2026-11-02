@@ -267,9 +267,9 @@ def _bodies(text):
             bodies[m.group(1)] = (True, item)
             continue
         code = re.sub(r"^(\s*(//[^\n]*|/\*.*?\*/)\s*)+", "", item, flags=re.S)  # leading comments
-        m = re.match(r"(static\s+)?[A-Za-z_][\w\s\*]*?\b(\w+)\s*\([^;{]*\)\s*\{", code, re.S)
+        m = re.match(r"([A-Za-z_][\w\s\*]*?)\b(\w+)\s*\([^;{]*\)\s*\{", code, re.S)
         if m:
-            bodies[m.group(2)] = (bool(m.group(1)), item)
+            bodies[m.group(2)] = ("static" in m.group(1).split(), item)
     # "#define Name sub_XXXXXXXX" aliases, as split.c_functions reports them
     for name, label in re.findall(r"^#define\s+(\w+)\s+(sub_[0-9A-F]{8})\s*$", text, re.M):
         if name in bodies:

@@ -10,6 +10,16 @@ import progress
 
 
 class ProgressTests(unittest.TestCase):
+    def test_inline_static_helper_concessions_reach_caller(self):
+        for qualifiers in ("static inline", "inline static"):
+            with self.subTest(qualifiers=qualifiers):
+                src = (f"{qualifiers} int get_value(int value) {{\n"
+                       '    asm("" : "+r"(value));\n'
+                       "    return value;\n"
+                       "}\n"
+                       "int wrapper(int value) { return get_value(value); }\n")
+                self.assertIn("wrapper", progress.unit_scores(src, ["wrapper"]))
+
     def test_library_groups_preserve_function_and_byte_credit(self):
         funcs = [('before', 0x08000100), ('one', 0x08000104),
                  ('two', 0x08000108), ('after', 0x08000110)]
