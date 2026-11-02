@@ -1,6 +1,5 @@
 #include "global.h"
-#include "motion_track.h"
-#include "contact_swarm_sprite.h"
+#include "paired_scene_actor.h"
 
 // confidence=low: initializes a half's sprite, origin, collision, target registration and shadow.
 void AnimData_Load(void *, u32);
@@ -17,30 +16,6 @@ static inline void FillOffset(void *destination, u32 value)
     CpuSet(&value, destination, 0x05000002);
 }
 
-struct PairedSceneHalf {
-    struct ContactSwarmSprite sprite;
-    u8 graphics[0x2C];
-    struct MotionTrack motion;
-    void *origin;
-    u8 unknown94[8];
-    struct ContactPosition offset;
-    u8 unknownA4[8];
-    u16 heading, scale, fieldB0, fieldB2;
-    u8 unknownB4[0x54];
-    u8 damageCollider[0x54];
-    s32 mode;
-    u8 unknown160[0xC];
-    u8 state, requestedState, entered, unknown16F, finished, unknown171;
-    u16 active, health, maxHealth;
-    u32 stateTimer, hitFlags;
-    u16 damage, specialDamage, flashTimer;
-    u8 field186, field187;
-    u16 field188;
-    u8 unknown18A[0x12];
-    u32 shake;
-    u8 shadow[0x6C];
-    u8 target[0x10];
-};
 void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *half, void *origin, s32 mode)
 {
     struct PairedSceneHalf *part = half;
@@ -52,7 +27,7 @@ void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *half, void *origin,
     u32 one;
     u32 initialFrame;
     part->mode = mode;
-    data = part->graphics;
+    data = &part->graphics;
     AnimData_Load(data, 0x89CA);
     Sprite_Init(half, data, 0);
     initialFrame = 0;
