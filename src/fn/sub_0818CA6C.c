@@ -1,3 +1,4 @@
+#include "sword_orbit.h"
 #include "global.h"
 #include "ram.h"
 
@@ -33,20 +34,13 @@ void Armor_RetractPartStretch(struct ArmorPart *p)
     p->stretchY = stretch;
     if (stretch == 64) {
         u32 r;
-        register s32 d asm("r1");
+
         u32 one;
         gRandomTableIndex = (gRandomTableIndex + 1) & 1023;
         r = *(const u16 *)((gRandomTableIndex << 1) + (u32)gRandomTable);
         one = 1;
         r &= one;
-        {
-            register s32 negative asm("r2") = -1;
-            asm("" : "+r"(negative));
-            d = negative;
-        }
-        if (r)
-            d = 1;
-        p->direction = d;
+        p->direction = Sword_OrbitDirection(r);
         p->byte11E = one;
         p->byte11F = one;
         {
