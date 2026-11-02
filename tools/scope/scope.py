@@ -1170,6 +1170,36 @@ def cmd_insn(uid, func):
             last = cur
 
 
+def hard_reg_arg(arg):
+    """Hard register number for an argument spelled r0..r12, sb, sl, fp or ip; None otherwise."""
+    m = re.fullmatch(r"r(\d{1,2})", arg)
+    if m and int(m.group(1)) < 13:
+        return int(m.group(1))
+    return REG_ALIASES.get(arg) if arg in ("sb", "sl", "fp", "ip") else None
+
+
+def cmd_uses_hard(hard, func):
+    """`uses rN`: the pseudos the draft placed in hard register N, with how they were placed (local
+    alloc in which block, or global rank and priority) and the C lines of their mentions, so a value
+    that keeps a register from another can be found by name."""
+    func = dumped_function(func)
+    wd = workdir(func)
+    recs = alloc_records(wd, func)
+    names = pseudo_names(wd, func)
+    placed = sorted(x for x, h in hard_of(wd).items() if h == hard)
+    print(f"{rname(hard)} in {func}: {len(placed)} pseudo(s)")
+    lines = uid_lines(wd)
+    for x in placed:
+        rec = recs.get(x)
+        how = ("local, block %d, priority %d" % (rec[1], rec[2]) if rec and rec[0] == "L" else
+               "global #%d, priority %d (%d refs / live %d)" % (rec[1], rec[2], rec[3], rec[4]) if rec else
+               "no allocation record")
+        uids = [u for u, _, r in insn_list(wd, "lreg") if re.search(r"\(reg(?:/[a-z]+)*:\w+ %d\)" % x, r or "")]
+        where = sorted({lines.get(u) for u in uids if isinstance(lines.get(u), int)})
+        span = f", C lines {where[0]}-{where[-1]}" if where else ""
+        print(f"  {x} ({names.get(x, '-')}): {how}{span}")
+
+
 def cmd_uses(regs, func, passes):
     """For each pseudo, the insns (uid@C line) that mention it after each pass."""
     func = dumped_function(func)
@@ -7283,7 +7313,8 @@ def validate_cli(args):
             cli_error("FILE.c insn UID [FUNC]")
         cli_number(rest[1], "FILE.c insn UID [FUNC]")
     elif rest and rest[0] in ("life", "uses"):
-        if len(rest) < 2 or rest[0] == "uses" and not any(a.isdigit() for a in rest[1:]):
+        if len(rest) < 2 or rest[0] == "uses" and not any(a.isdigit() or hard_reg_arg(a) is not None
+                                                           for a in rest[1:]):
             cli_error("FILE.c " + rest[0] + " NAME|REG... [FUNC]")
     elif rest and rest[0] == "vs":
         if len(rest) not in (2, 3):
@@ -7408,7 +7439,8 @@ def main():
             explicit = params[1] if len(params) > 1 else None
             params = params[:1]
         elif rest[0] == "uses":
-            if params and not params[-1].isdigit() and params[-1] not in PASSES:
+            if params and not params[-1].isdigit() and params[-1] not in PASSES \
+                    and hard_reg_arg(params[-1]) is None:
                 explicit = params.pop()
         elif params:
             import land
@@ -7429,8 +7461,12 @@ def main():
             cmd_life(rest[1:], func)
         else:
             names = [a for a in rest[1:] if not a.isdigit()]
-            cmd_uses([int(a) for a in rest[1:] if a.isdigit()], func,
-                     [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"])
+            for a in names:
+                if hard_reg_arg(a) is not None:
+                    cmd_uses_hard(hard_reg_arg(a), func)
+            pseudos = [int(a) for a in rest[1:] if a.isdigit()]
+            if pseudos:
+                cmd_uses(pseudos, func, [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"])
         return 0
     if rest and rest[0] == "put":  # FILE.c put SNIPPET.c [FUNC]: the snippet's C in place of FUNC's, then the score
         if len(rest) < 2:
