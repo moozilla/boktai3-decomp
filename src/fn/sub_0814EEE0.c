@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #define B(o)       (*(u8 *)(p + (o)))
 #define H(o)       (*(u16 *)(p + (o)))
@@ -43,16 +42,14 @@ void Player_UpdateSustainedSpinAttack(u8 *p)
     switch (B(0x458)) {
         case 0:
             if (ANIMATE(0x23)) {
-                s32 amount;
-                register s32 cost asm("r1");
+                s32 cost;
                 H(0xC10) = 30;
                 Player_GetSpecialAttackDescriptor(B(0xBF4));
                 if (B(0xC18) == 1)
-                    amount = 0;
+                    cost = 0;
                 else
-                    amount = Player_GetSpecialAttackDescriptor(B(0xBF4))[2];
-                cost = ActorResponse_Apply(p, amount);
-                asm("" : "+r"(cost));
+                    cost = Player_GetSpecialAttackDescriptor(B(0xBF4))[2];
+                cost = ActorResponse_Apply(p, cost);
                 if (H(0x428) < cost || B(0xC18) == 6) {
                     Player_SetActionPhase(p, 5);
                     Sound_StopSong(0xD5);
@@ -78,17 +75,16 @@ void Player_UpdateSustainedSpinAttack(u8 *p)
                 enough = 0;
                 desc = Player_GetSpecialAttackDescriptor(B(0xBF4));
                 if (!(H(0x45A) & 1)) {
-                    s32 amount;
-                    register s32 cost asm("r1");
+                    s32 cost;
                     if (B(0xC18) == 1)
-                        amount = 0;
+                        cost = 0;
                     else
-                        amount = Player_GetSpecialAttackDescriptor(B(0xBF4))[2];
-                    cost = ActorResponse_Apply(p, amount);
+                        cost = Player_GetSpecialAttackDescriptor(B(0xBF4))[2];
+                    cost = ActorResponse_Apply(p, cost);
                     if (H(0x428) < cost)
                         H(0x428) = 0;
                     else {
-                        register s32 remaining asm("r0") = H(0x428) - cost;
+                        s32 remaining = H(0x428) - cost;
                         H(0x428) = remaining;
                         enough = 1;
                     }
