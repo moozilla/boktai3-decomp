@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_terrain.h"
 // confidence=low: state actor kind 28 dash with decreasing speed and height above terrain.
 struct NpcTag {
@@ -42,47 +41,22 @@ void StateActor_UpdateDashAnimation13(void *ctx, struct Npc *npc, s32 tick)
 {
     struct NpcTag *tag = &npc->tag;
     u32 anim;
-    asm("" : "+r"(npc));
     if (npc->entered) {
         npc->entered = 0;
         npc->done = 0;
         switch (npc->kind) {
             case 4:
-                anim = 0;
-                break;
             case 5:
-                anim = 0;
-                break;
             case 6:
-                anim = 0;
-                break;
             case 7:
-                anim = 0;
-                break;
             case 8:
-                anim = 0;
-                break;
             case 9:
-                anim = 0;
-                break;
             case 10:
-                anim = 0;
-                break;
             case 11:
-                anim = 0;
-                break;
             case 12:
-                anim = 0;
-                break;
             case 13:
-                anim = 0;
-                break;
             case 14:
-                anim = 0;
-                break;
             case 15:
-                anim = 0;
-                break;
             case 16:
                 anim = 0;
                 break;
@@ -145,41 +119,17 @@ void StateActor_UpdateDashAnimation13(void *ctx, struct Npc *npc, s32 tick)
             if (npc->timer > 3) {
                 switch (npc->kind) {
                     case 4:
-                        anim = 0;
-                        break;
                     case 5:
-                        anim = 0;
-                        break;
                     case 6:
-                        anim = 0;
-                        break;
                     case 7:
-                        anim = 0;
-                        break;
                     case 8:
-                        anim = 0;
-                        break;
                     case 9:
-                        anim = 0;
-                        break;
                     case 10:
-                        anim = 0;
-                        break;
                     case 11:
-                        anim = 0;
-                        break;
                     case 12:
-                        anim = 0;
-                        break;
                     case 13:
-                        anim = 0;
-                        break;
                     case 14:
-                        anim = 0;
-                        break;
                     case 15:
-                        anim = 0;
-                        break;
                     case 16:
                         anim = 0;
                         break;
@@ -249,41 +199,17 @@ void StateActor_UpdateDashAnimation13(void *ctx, struct Npc *npc, s32 tick)
                 npc->phase++;
                 switch (npc->kind) {
                     case 4:
-                        anim = 0;
-                        break;
                     case 5:
-                        anim = 0;
-                        break;
                     case 6:
-                        anim = 0;
-                        break;
                     case 7:
-                        anim = 0;
-                        break;
                     case 8:
-                        anim = 0;
-                        break;
                     case 9:
-                        anim = 0;
-                        break;
                     case 10:
-                        anim = 0;
-                        break;
                     case 11:
-                        anim = 0;
-                        break;
                     case 12:
-                        anim = 0;
-                        break;
                     case 13:
-                        anim = 0;
-                        break;
                     case 14:
-                        anim = 0;
-                        break;
                     case 15:
-                        anim = 0;
-                        break;
                     case 16:
                         anim = 0;
                         break;
