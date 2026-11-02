@@ -34,7 +34,7 @@ struct AtUnit {
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 
-void AttachmentSprite_Setup(struct AtUnit *p0, const struct AtVector *pos0)
+void AttachmentSprite_Setup(struct AtUnit *owner, const struct AtVector *position)
 {
     struct AtSprite *sprite;
     struct AtAnim *anim;
@@ -43,9 +43,8 @@ void AttachmentSprite_Setup(struct AtUnit *p0, const struct AtVector *pos0)
     u8 *flag;
     u32 id;
     u16 frame;
-    u32 kind;
-    sprite = &p0->sprite;
-    frame = p0->kind;
+    sprite = &owner->sprite;
+    frame = owner->kind;
     if ((u8)frame == 0) {
         id = 0xa2;
     } else if ((u8)frame == 1) {
@@ -58,10 +57,10 @@ void AttachmentSprite_Setup(struct AtUnit *p0, const struct AtVector *pos0)
     Sprite_Init(sprite, anim, 0);
     sprite->f10 = frame;
     sprite->f07 = 3;
-    sprite->position = *pos0;
-    sprite->position.x += p0->offset.x;
-    sprite->position.y += p0->offset.y;
-    sprite->position.z += p0->offset.z;
+    sprite->position = *position;
+    sprite->position.x += owner->offset.x;
+    sprite->position.y += owner->offset.y;
+    sprite->position.z += owner->offset.z;
     sprite->flags |= 0x400;
     sprite->palette = gPaletteBankData + id * 32;
     fill = 0x3DEF;
