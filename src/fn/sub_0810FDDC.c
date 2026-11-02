@@ -1,19 +1,12 @@
-#include "global.h"
+#include "scene_input.h"
 // MATCHING_CONCESSION: register-pinning
 
-struct DigitSlot {
-    u8 pad0[8];
-    u32 flags;
-    u8 padC[0x60 - 0xC];
-};
 struct ScoreDigits {
-    u8 pad0[0x24];
-    struct DigitSlot slots[(0x704 - 0x24) / 0x60];
-    u8 pad[0x704 - 0x24 - ((0x704 - 0x24) / 0x60) * 0x60];
-    u8 glyphs[1];
+    u8 taskAndResources[0x24];
+    struct SceneInputWidget slots[18];
+    u8 unknown6E4[0x20];
+    struct SceneInputResource glyphs;
 };
-
-void Anim_SelectWidgetGlyph(void *, void *, u16);
 
 static inline void SetDigitVisible(struct ScoreDigits *p, s32 idx, s32 glyph)
 {
@@ -23,7 +16,7 @@ static inline void SetDigitVisible(struct ScoreDigits *p, s32 idx, s32 glyph)
         p->slots[idx].flags &= ~1;
 }
 
-// confidence=low: draws a three-digit number into a row of digit widgets, hiding leading zeros.
+// Slots 9 through 17 hold the three rows of digits positioned by sub_0810FADC.
 void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
 {
     s32 base = (row * 3) + 9;
@@ -39,8 +32,9 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
     index = base;
     asm("" : "+r"(index) : : "r0");
     SetDigitVisible(p, index, glyph);
-    Anim_SelectWidgetGlyph((u8 *)p->slots + ((index << 1) + base) * (sizeof(struct DigitSlot) / 3),
-                           p->glyphs, glyph);
+    Anim_SelectWidgetGlyph((u8 *)p->slots +
+                               ((index << 1) + base) * (sizeof(struct SceneInputWidget) / 3),
+                           &p->glyphs, (u16)glyph);
     glyph = 0x3e;
     {
         register s32 tens asm("r0") = base + 1;
@@ -52,8 +46,8 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
 
         SetDigitVisible(p, tens, glyph);
         Anim_SelectWidgetGlyph((u8 *)&p->slots[1] +
-                                   ((index << 1) + base) * (sizeof(struct DigitSlot) / 3),
-                               p->glyphs, glyph);
+                                   ((index << 1) + base) * (sizeof(struct SceneInputWidget) / 3),
+                               &p->glyphs, (u16)glyph);
         glyph = 0x3e;
         while (n > 0) {
             glyph++;
@@ -61,6 +55,6 @@ void sub_0810FDDC(struct ScoreDigits *p, s32 row, s32 n)
         }
 
         ones = base + 2;
-        Anim_SelectWidgetGlyph(&p->slots[ones], p->glyphs, glyph);
+        Anim_SelectWidgetGlyph(&p->slots[ones], &p->glyphs, (u16)glyph);
     }
 }
