@@ -1067,7 +1067,7 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
               f" `cmp #0`) that the draft's jumps skip: jump.c threads a jump after a constant set past a"
               f" test of the same register. Return the flag from an inline predicate typed u8"
               f" (`static inline u8 IsX(...) {{ if (c) return 1; return 0; }}`, tested as `if (IsX(...))`):"
-              f" its test reads a QImode subreg, a different register after reload (README fact 50)")
+              f" its test reads a QImode subreg, a different register after reload (README fact 51)")
     try:
         cross = cross_jump_hints(rows_json, cross_merges(open(os.path.join(wd, "stderr.txt")).read(),
                                                          info["obj_name"]),
@@ -1988,7 +1988,7 @@ def flag_thread_hints(rows):
     """[(row index, line)] where the ROM keeps a materialized 0/1 flag the draft has lost: on the
     ROM side `movs rX, #A`, `b`, (pool words), `movs rX, #B`, `cmp rX, #0` with {A, B} = {0, 1},
     and at least one of those insns missing from the draft. jump.c threaded the draft's jumps past
-    the test (README fact 50)."""
+    the test (README fact 51)."""
     seq = [(i, r["rom"]) for i, r in enumerate(rows)
            if r["rom"] and not r["rom"].startswith(".") and r["rom"] != "movs r0, r0"]
     out = []
