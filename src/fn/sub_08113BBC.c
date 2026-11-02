@@ -4,12 +4,6 @@
 #include "ram.h"
 #include "background_controller.h"
 #include "player_cue_sequence.h"
-static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
-                                             struct DisplaySequenceState *state)
-{
-    return PlayerCue_StepSequenceEnded(sprite, state);
-}
-
 struct Vec {
     s32 x, y, z, w;
 };
@@ -95,7 +89,7 @@ void NativeEffect_UpdateRotatingFlight(struct Effect *p)
     p->timer++;
     Project(&projected, &p->position, p->height);
     *(struct Packed *)&p->sprite.position = projected;
-    ActorAttachment_StepSprite(&p->sprite, &p->anim);
+    PlayerCue_StepSequenceEnded(&p->sprite, &p->anim);
     {
         void *c = p->collider;
         s32 *hp = &p->height;

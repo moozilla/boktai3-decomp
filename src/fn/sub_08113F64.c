@@ -3,12 +3,6 @@
 #include "ram.h"
 #include "background_controller.h"
 #include "player_cue_sequence.h"
-static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
-                                             struct DisplaySequenceState *state)
-{
-    return PlayerCue_StepSequenceEnded(sprite, state);
-}
-
 struct Vec {
     s32 x, y, z, w;
 };
@@ -108,7 +102,7 @@ void NativeEffect_UpdateTurningTrail(struct Effect *p)
         NativeParticle_CreateWithFlag(&p->sprite.position, 0, &offset, 1, 1, 0x200, 0);
     }
     p->timer++;
-    ActorAttachment_StepSprite(&p->sprite, &p->anim);
+    PlayerCue_StepSequenceEnded(&p->sprite, &p->anim);
     Collider_SetFixedPositionWithYOffset(p->collider, &p->position, p->height);
     SpatialIndex_InsertEntry(p->collider);
     if (SceneGroundEffect_IsBelowGround(p, 0)) {
