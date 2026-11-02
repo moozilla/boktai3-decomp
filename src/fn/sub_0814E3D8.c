@@ -71,10 +71,8 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
                 ANIMATE(0x24);
             }
             if (++*t > 6) {
-                register s32 amount asm("r2") = Player_GetSpecialAttackDescriptor(BYTE(0xBF4))[2];
-                register s32 cost asm("r2");
-                cost = ActorResponse_Apply(p, amount);
-                asm("" : "+r"(cost));
+                s32 cost = Player_GetSpecialAttackDescriptor(BYTE(0xBF4))[2];
+                cost = ActorResponse_Apply(p, cost);
                 BYTE(0xC0F) = 0;
                 HALF(0x4D2) = 0;
                 if (HALF(0x428) < cost) {
