@@ -64,8 +64,7 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
                         if (i > 3) {
                             break;
                         }
-                    } while (
-                        !(((*((struct RfuLinkStatus *volatile *)links))->connSlotFlag >> i) & 1));
+                    } while (!(((*links)->connSlotFlag >> i) & 1));
                 }
                 r = p->rows;
                 Memory_Clear(name, 24);
