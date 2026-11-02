@@ -277,25 +277,11 @@ struct PanelSprite {
     u8 pad12[10];
     s16 x, y;
 };
-void sub_0801A218(struct SelectionMenu *m)
+// Show the sequence's current frame and flips on the panel, then advance it.
+static inline void SelectionMenu_StepPanel(struct SceneInputPanelDrawable *s,
+                                           struct DisplaySequenceState *st)
 {
-    struct DisplaySequenceState a;
-    long long attr;
-    struct DisplaySequenceState *st;
-    void *res;
-    register struct SceneInputPanelDrawable *s asm("r6");
-    const u16 *entry;
-    ZeroFill8(&attr);
-    Widget_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &attr);
-    Widget_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &attr);
-    res = ScriptProc_Start(0x922E, 0x4BBF);
-    AnimData_Load(m->panel.graphics, 0x593A);
-    AnimData_SelectPaletteBank(m->panel.graphics, 0x1F7);
-    s = &m->panel;
-    Sprite_Init(s, m->panel.graphics, 0x30);
-    Anim_RestartSequence(&a, res, 6, 0, 0);
-    st = &a;
-    entry = st->commands + st->index;
+    const u16 *entry = st->commands + st->index;
     s->frame = *entry >> 6;
     {
         union DisplaySequenceControl control;
@@ -326,6 +312,22 @@ void sub_0801A218(struct SelectionMenu *m)
         if (!st->duration)
             st->duration = 1;
     }
+}
+
+void sub_0801A218(struct SelectionMenu *m)
+{
+    struct DisplaySequenceState a;
+    long long attr;
+    void *res;
+    ZeroFill8(&attr);
+    Widget_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &attr);
+    Widget_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &attr);
+    res = ScriptProc_Start(0x922E, 0x4BBF);
+    AnimData_Load(m->panel.graphics, 0x593A);
+    AnimData_SelectPaletteBank(m->panel.graphics, 0x1F7);
+    Sprite_Init(&m->panel, m->panel.graphics, 0x30);
+    Anim_RestartSequence(&a, res, 6, 0, 0);
+    SelectionMenu_StepPanel(&m->panel, &a);
     m->panel.priority = 0;
     m->panel.position.x = 8;
     m->panel.position.y = 0x50;
