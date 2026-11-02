@@ -84,7 +84,7 @@ void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
         {
             const s16 *table = gUnk_086149C4;
             s32 vx = Shift(table[angle], 6);
-            *(s16 *)((u8 *)actor + 0x2EC) = vx;
+            actor->secondaryMotion.x = vx;
         }
         {
             const s16 *table = gUnk_086149C4;
@@ -93,7 +93,7 @@ void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
             s32 vz;
             index &= mask;
             vz = Shift(table[index], 6);
-            *(s16 *)((u8 *)actor + 0x2F0) = vz;
+            actor->secondaryMotion.z = vz;
         }
     }
     motion = (struct ContactPosition *)((u8 *)actor + 0x2EC);

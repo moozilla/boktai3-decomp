@@ -20,7 +20,7 @@ void Player_RestoreLinkedActionState(struct Player *p)
     p->position = p->savedLinkPosition;
     cell = &p->movementContactFlags;
     CellObject_Init(cell, &p->position);
-    p->movementProbe = cell;
+    p->followTarget = cell;
     p->collider.cost = 0;
     p->directionFrame = 0;
     p->terrainClampBlocked = 0;

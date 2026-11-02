@@ -9,7 +9,7 @@ void SceneActorReaction_UpdateAnimationGate(struct SceneActorRegistryResetView *
     asm("" : "+r"(group));
     if (actor->field2B2)
         actor->field2B2 = 0;
-    if (*(u32 *)((u8 *)actor + 0xF0) <= 0xFFFFF) {
+    if (actor->tracking.distance <= 0xFFFFF) {
         field = &group->gate.flags;
         mask = 1;
         mask |= *field;

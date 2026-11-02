@@ -25,10 +25,10 @@ void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
         c->contactFlags = 0x20;
         c->flags = 0x2001;
         {
-            u16 power = *(u16 *)((u8 *)a + 0xB8);
-            u16 response = *(u16 *)((u8 *)a + 0xC0);
-            u32 reaction = *(u32 *)((u8 *)a + 0xD4) | 0x200004;
-            u16 value = *(u16 *)((u8 *)a + 0xC8);
+            u16 power = a->attacks.first[2];
+            u16 response = a->attacks.second[2];
+            u32 reaction = a->attacks.flags[2] | 0x200004;
+            u16 value = a->attacks.parameter[2];
             Collider_SetAttackProperties(c, power, response, 0, reaction, value);
         }
         goto active;
@@ -46,8 +46,8 @@ void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
             scale = 20;
         else if (scale < 10)
             scale = 10;
-        power = Div(*(u16 *)((u8 *)a + 0xB6) * scale, 10);
-        response = Div(*(u16 *)((u8 *)a + 0xBE) * (scale >> 1), 10);
+        power = Div(a->attacks.first[1] * scale, 10);
+        response = Div(a->attacks.second[1] * (scale >> 1), 10);
         c = (void *)((u8 *)a + 0x188);
         {
             u32 flags = 0x2301;
@@ -55,8 +55,8 @@ void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
             c->contactFlags = 0;
         }
         {
-            u32 reaction = *(u32 *)((u8 *)a + 0xD0) | 0x40000;
-            u16 value = *(u16 *)((u8 *)a + 0xC6);
+            u32 reaction = a->attacks.flags[1] | 0x40000;
+            u16 value = a->attacks.parameter[1];
             Collider_SetAttackProperties(c, power, response, 0x400, reaction, value);
         }
         {
@@ -78,10 +78,10 @@ void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
         c->flags = 0x2001;
         c->contactFlags = 0x10;
         {
-            u16 power = *(u16 *)((u8 *)a + 0xB4);
-            u16 response = *(u16 *)((u8 *)a + 0xBC);
-            u32 reaction = *(u32 *)((u8 *)a + 0xCC);
-            u16 value = *(u16 *)((u8 *)a + 0xC4);
+            u16 power = a->attacks.first[0];
+            u16 response = a->attacks.second[0];
+            u32 reaction = a->attacks.flags[0];
+            u16 value = a->attacks.parameter[0];
             Collider_SetAttackProperties(c, power, response, 0, reaction, value);
         }
         return;

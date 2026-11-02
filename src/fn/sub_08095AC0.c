@@ -1,3 +1,4 @@
+#include "scene_actor_state.h"
 #include "scene_actor_animation.h"
 static inline u8 TakeFlag(u8 *p)
 {
@@ -62,7 +63,7 @@ void Ghost_UpdateDirectionalPoseB(struct SceneActorAnimationView *actor)
     struct SceneActorProfileEntry *entry;
     u32 variant, flags, selection;
     if (TakeFlag(&actor->directionalEntryFlag))
-        *(u16 *)((u8 *)actor + 0x2C2) = 0x40;
+        ((struct SceneActorRegistryResetView *)actor)->field2C2 = 0x40;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     Ghost_GetDirectionalFrame(actor->direction, &variant, &flags);
     entry = (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);

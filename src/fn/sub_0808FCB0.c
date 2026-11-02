@@ -45,7 +45,7 @@ u32 Slime_TryEnrage(struct SceneActorRegistryResetView *actor)
         dy = -dy;
     if (dy > 0x200)
         return 0;
-    if (*(u32 *)((u8 *)actor + 0xF0) > *(u32 *)((u8 *)actor + 0xF8))
+    if (actor->tracking.distance > actor->tracking.limit)
         return 0;
     if (actor->health < q->threshold || Slime_TestContext(q)) {
         Slime_SetFlags2D6(actor, 0x80);

@@ -117,8 +117,8 @@ struct Player {
     u16 unk3A;
     s16 velocityZ;
     u8 unk3E[2];
-    void *movementProbe; /* 0x40: scene body movement probe */
-    u8 unk44[0xC];
+    void *followTarget; /* 0x40: active movement source, reset to the player's own contact object. */
+    u8 unk44[0x50 - 0x44];
     u32 visualState;
     struct PlayerAnimation *activeAnimation;
     u8 unk58[0x68 - 0x58];
@@ -158,7 +158,9 @@ struct Player {
     u16 positionResetValue; /* 0x274 */
     u8 resetFlags;          /* 0x276: bit one cleared by player reset */
     u8 unk277[0xD];
-    u8 movementContactFlags; /* 0x284: bit zero enables facing-dependent movement. */
+    /* 0x284: bit zero enables facing-dependent movement. Its address is also the player's own
+       position source, which followTarget gets back when a named object releases the player. */
+    u8 movementContactFlags;
     u8 unk285[3];
     u16 storedTerrainCell;   /* 0x288 */
     u16 recoveryTerrainCell; /* 0x28A: terrain cell used for recovery facing */

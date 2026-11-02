@@ -226,10 +226,10 @@ void SceneActorGraphics_InitializeBody(struct StateActor *p)
         flags = 0;
         if (test)
             flags = 0x40800;
-        /* Not through struct SceneActorGraphics: that CSEs the groundEffect base and
-         * reads the three fields as small offsets off it, unlike the original. */
-        Collider_SetAttackProperties(drawable, *(s16 *)((u8 *)p + 0x35c), *(s16 *)((u8 *)p + 0x35e),
-                                     0, flags, *(s16 *)((u8 *)p + 0x360));
+        Collider_SetAttackProperties(
+            drawable, ((struct SceneGraphicsActor *)p)->graphics.attackWidth0,
+            ((struct SceneGraphicsActor *)p)->graphics.attackHeight0, 0, flags,
+            ((struct SceneGraphicsActor *)p)->graphics.attackDepth0);
     }
 }
 
@@ -252,36 +252,35 @@ void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
     Collider_Refresh(drawable);
 }
 
-/* Raw offsets throughout: routing any of this through struct StateActor /
- * SceneActorGraphics changes register allocation enough to break the match
- * (tried: `p->actionFlags`, `p->bodyDrawable`, struct-field attack properties). */
-
 void SceneActorGraphics_UpdateVariant(struct StateActor *p)
 {
-    u8 *drawable = (u8 *)p + 0x178;
+    u8 *drawable = p->bodyDrawable;
     {
         u32 mask = 0x40000;
-        if (*(u32 *)((u8 *)p + 0x9c) & mask)
-            ((u8 *)p)[0x3b6] = 1;
+        if (p->actionFlags & mask)
+            ((struct SceneGraphicsActor *)p)->graphics.variantToggle = 1;
         else
-            ((u8 *)p)[0x3b6] = 0;
+            ((struct SceneGraphicsActor *)p)->graphics.variantToggle = 0;
     }
-    if (((u8 *)p)[0x3b6] != ((u8 *)p)[0x3b7]) {
-        switch (((u8 *)p)[0x3b6]) {
+    if (((struct SceneGraphicsActor *)p)->graphics.variantToggle !=
+        ((struct SceneGraphicsActor *)p)->graphics.variantTogglePrev) {
+        switch (((struct SceneGraphicsActor *)p)->graphics.variantToggle) {
             case 0:
-                Collider_SetAttackProperties(drawable, *(s16 *)((u8 *)p + 0x35c),
-                                             *(s16 *)((u8 *)p + 0x35e), 0, 0,
-                                             *(s16 *)((u8 *)p + 0x360));
+                Collider_SetAttackProperties(
+                    drawable, ((struct SceneGraphicsActor *)p)->graphics.attackWidth0,
+                    ((struct SceneGraphicsActor *)p)->graphics.attackHeight0, 0, 0,
+                    ((struct SceneGraphicsActor *)p)->graphics.attackDepth0);
                 break;
             case 1:
-                Collider_SetAttackProperties(drawable, *(s16 *)((u8 *)p + 0x362),
-                                             *(s16 *)((u8 *)p + 0x364), 0, 0x60000,
-                                             *(s16 *)((u8 *)p + 0x366));
+                Collider_SetAttackProperties(
+                    drawable, ((struct SceneGraphicsActor *)p)->graphics.attackWidth1,
+                    ((struct SceneGraphicsActor *)p)->graphics.attackHeight1, 0, 0x60000,
+                    ((struct SceneGraphicsActor *)p)->graphics.attackDepth1);
                 break;
         }
         {
-            int value = ((u8 *)p)[0x3b6];
-            ((u8 *)p)[0x3b7] = value;
+            int value = ((struct SceneGraphicsActor *)p)->graphics.variantToggle;
+            ((struct SceneGraphicsActor *)p)->graphics.variantTogglePrev = value;
         }
     }
 }
@@ -320,7 +319,7 @@ s32 SceneActorGraphics_GetEffectState(struct StateActor *p)
     } else if (AreaEffect_IsPositionCovered(&p->target) == 0) {
         r = 0;
     } else {
-        r = *(s16 *)((u8 *)gGameState + 0x876);
+        r = gGameState->unk876;
     }
     return r;
 }
@@ -424,15 +423,13 @@ void SceneActors_AddHealthCost(int amount)
         p = SceneActors_GetBySlot(0);
         if (p) {
             int remaining, diff;
-            /* Raw offsets into groundEffect (healthCostAccumulator 0x3A0,
-             * healthCostBaseline 0x3A4): a shared SceneActorGraphics pointer
-             * changes register allocation enough to break the match. */
-            *(s32 *)((u8 *)p + 0x3a0) += amount;
-            remaining = p->health - *(s32 *)((u8 *)p + 0x3a0);
+            ((struct SceneGraphicsActor *)p)->graphics.healthCostAccumulator += amount;
+            remaining =
+                p->health - ((struct SceneGraphicsActor *)p)->graphics.healthCostAccumulator;
             if (remaining <= 1)
                 goto stop;
             {
-                diff = remaining - *(s32 *)((u8 *)p + 0x3a4);
+                diff = remaining - ((struct SceneGraphicsActor *)p)->graphics.healthCostBaseline;
                 if (diff < 0)
                     diff = -diff;
                 if (diff > 49) {
@@ -450,7 +447,7 @@ void SceneActors_AddResourceCost(int amount)
     if (amount > 0) {
         p = SceneActors_GetBySlot(0);
         if (p)
-            *(int *)((u8 *)p + 0x39c) += amount; /* resourceCostAccumulator */
+            ((struct SceneGraphicsActor *)p)->graphics.resourceCostAccumulator += amount;
     }
 }
 
@@ -670,10 +667,8 @@ void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
 
 void SceneActors_StopBackgroundFlash(struct StateActor *p)
 {
-    /* Raw offsets (backgroundFlash 0x9DC, backgroundFlashFlag 0x3C0): a
-     * shared SceneActorGraphics pointer breaks the match. */
-    BackgroundFlash_BeginDisappearance(*(struct BackgroundFlashController **)((u8 *)p + 0x9dc));
-    *(u32 *)((u8 *)p + 0x3c0) = 0;
+    BackgroundFlash_BeginDisappearance(((struct SceneGraphicsActor *)p)->graphics.backgroundFlash);
+    ((struct SceneGraphicsActor *)p)->graphics.backgroundFlashFlag = 0;
 }
 
 struct ReactionActor {
@@ -728,7 +723,8 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
     switch (kind) {
         case 0: {
             s32 shown = damage;
-            if (*(u32 *)((u8 *)p + 0x358) == 1 && (*(u8 **)gPlayers)[0x418] != 2) {
+            if (((struct SceneGraphicsActor *)p)->graphics.stepTableKind == 1 &&
+                (*(u8 **)gPlayers)[0x418] != 2) {
                 shown = 0;
                 result = 0;
             }
@@ -749,9 +745,9 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
             if (gEngineFlags & 0x1000) {
                 u8 *position = sprite + 0xc;
                 if (WirelessGame_TryAddCyclingItem(position)) {
-                    s32 d = actor[0x20e] -
-                            Math_Atan2(*(s16 *)(sprite + 0xc) - *(s16 *)((u8 *)gGameState + 0x30),
-                                       *(s16 *)(sprite + 0x10) - *(s16 *)((u8 *)gGameState + 0x34));
+                    s32 d =
+                        actor[0x20e] - Math_Atan2(*(s16 *)(sprite + 0xc) - gGameState->positionX,
+                                                  *(s16 *)(sprite + 0x10) - gGameState->positionZ);
                     if (d < 0)
                         d = -d;
                     if (d <= 0x20)
@@ -790,15 +786,13 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
 
 void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl)
 {
-    /* Raw offsets into groundEffect's step-table fields (row 0x3B0, col 0x3B1,
-     * value 0x3B2, previous value 0x3B4). */
-    u16 *cur = (u16 *)((u8 *)p + 0x3b2);
+    u16 *cur = &((struct SceneGraphicsActor *)p)->graphics.stepTableValue;
     u16 old = *cur;
     u8 *col;
     u32 row;
-    *(u16 *)((u8 *)p + 0x3b4) = old;
-    row = ((u8 *)p)[0x3b0];
-    col = (u8 *)p + 0x3b1;
+    ((struct SceneGraphicsActor *)p)->graphics.stepTableValuePrev = old;
+    row = ((struct SceneGraphicsActor *)p)->graphics.stepTableRow;
+    col = &((struct SceneGraphicsActor *)p)->graphics.stepTableCol;
     {
         u32 idx = row * 8 + (u32)tbl;
         idx += *col;
@@ -816,7 +810,7 @@ void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl);
 int SceneActorState_StepTableByKind(struct StateActor *p)
 {
     const u8 *tbl;
-    switch (*(s32 *)((u8 *)p + 0x358)) { /* stepTableKind */
+    switch (((struct SceneGraphicsActor *)p)->graphics.stepTableKind) {
         case 0:
             tbl = gUnk_08604DC4;
             break;

@@ -1,4 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
+#include "scene_actor_behavior.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
@@ -128,9 +129,9 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
     do {                                                                                           \
         struct ContactPosition vec;                                                                \
         struct ContactPosition pos;                                                                \
-        u32 angle = (actor->body.direction + 0x80) & 0xFF;                                              \
+        u32 angle = (actor->body.direction + 0x80) & 0xFF;                                         \
         Polar(&vec, angle, 10);                                                                    \
-        pos = actor->body.position;                                                                     \
+        pos = actor->body.position;                                                                \
         pos.y += 200;                                                                              \
         vec.y = 54;                                                                                \
         sub_08127590(&pos, &vec, 0xD45E, 0x1DC3, kind, 0x1A, 2, 0, 0x13C, 0, 0, 0, 0, 0, 0);       \
@@ -295,7 +296,7 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             u32 mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;
-            *(u16 *)((u8 *)control + 0x14) = 0;
+            control->field14 = 0;
             control->timer = 0;
         }
         actor->colliderA.flags |= 4;
@@ -322,15 +323,15 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             goto notHidden;
     }
     {
-        u16 script = *(u16 *)((u8 *)actor + 0x1F8);
+        u16 script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
         if (script) {
             struct ScriptUtilityArguments arguments;
             values[0] = actor->body.position.x;
             values[1] = actor->body.position.y;
             values[2] = actor->body.position.z;
-            values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-            values[4] = *(s32 *)((u8 *)actor + 0x200);
-            values[5] = *(s32 *)((u8 *)actor + 0x204);
+            values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+            values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+            values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
             values[6] = actor->field2E0;
             values[7] = actor->body.id;
             arguments.count = 8;
@@ -430,15 +431,15 @@ notHidden:
             }
         }
         if (context->rank > 19999) {
-            u16 script = *(u16 *)((u8 *)actor + 0x1F8);
+            u16 script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
             if (script) {
                 struct ScriptUtilityArguments arguments;
                 values[0] = actor->body.position.x;
                 values[1] = actor->body.position.y;
                 values[2] = actor->body.position.z;
-                values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-                values[4] = *(s32 *)((u8 *)actor + 0x200);
-                values[5] = *(s32 *)((u8 *)actor + 0x204);
+                values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+                values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+                values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
                 values[6] = actor->field2E0;
                 values[7] = actor->body.id;
                 arguments.count = 8;
@@ -470,15 +471,15 @@ notHidden:
         }
         SceneActorBehavior_CallTerrainScript(actor);
         {
-            u16 script = *(u16 *)((u8 *)actor + 0x1F8);
+            u16 script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
             if (script) {
                 struct ScriptUtilityArguments arguments;
                 values[0] = actor->body.position.x;
                 values[1] = actor->body.position.y;
                 values[2] = actor->body.position.z;
-                values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-                values[4] = *(s32 *)((u8 *)actor + 0x200);
-                values[5] = *(s32 *)((u8 *)actor + 0x204);
+                values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+                values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+                values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
                 values[6] = actor->field2E0;
                 values[7] = actor->body.id;
                 arguments.count = 8;

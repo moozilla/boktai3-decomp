@@ -1,5 +1,4 @@
 #include "effect_emitter.h"
-// MATCHING_CONCESSION: register-pinning
 
 void EffectEmitter_ReceiveHit(struct EmitterAttack *attack, void *unused,
                               struct EffectEmitter *object)
@@ -27,17 +26,11 @@ void EffectEmitter_ReceiveHit(struct EmitterAttack *attack, void *unused,
     }
 }
 
-static inline s32 isVisible(void *scene)
+static inline u8 isVisible(void *scene)
 {
-    void *saved = scene;
-    s32 result;
-    if ((void *)gGameState->region == saved) {
-        result = 1;
-        asm("" : : "r"(result));
-    } else {
-        result = 0;
-    }
-    return result;
+    if ((void *)gGameState->region == scene)
+        return 1;
+    return 0;
 }
 static inline void setFrame(struct EmitterSprite *sprite, u16 frame)
 {

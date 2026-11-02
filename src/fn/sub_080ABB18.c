@@ -54,7 +54,7 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
         g->flags = bit;
     }
     g->timer = 240;
-    *(u16 *)((u8 *)p + 0x178) += 30;
+    p->colliderA.responseValue += 30;
     g->flashTimer = 16;
     clearWord(&p->flags2D0, 0xffefffff);
     clearHalf(flags, -2);

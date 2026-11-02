@@ -3,7 +3,7 @@
 
 void SceneActorControl_TickPendingTarget(struct SceneActorRegistryResetView *actor)
 {
-    void *context = *(void **)((u8 *)actor + 0x3D0);
+    struct SceneActorPendingTargetState *context = actor->context;
 
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
         actor->body.direction = *((u8 *)actor + 0xE9);
@@ -34,10 +34,10 @@ void SceneActorControl_TickPendingTarget(struct SceneActorRegistryResetView *act
             actor->field2B1 = 1;
             {
                 u32 mask = 8;
-                u32 *flags = (u32 *)((u8 *)context + 0x3D4);
+                u32 *flags = &context->control.flags3D4;
                 *flags |= mask;
             }
-            *(u8 *)((u8 *)context + 0x42A) = 60;
+            context->pendingTargetDelay = 60;
         } else {
             *counter = *counter + 1;
         }

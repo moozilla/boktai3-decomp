@@ -1,3 +1,4 @@
+#include "tentacle_segment_animation.h"
 #include "global.h"
 
 struct Pos080A9988 {
@@ -70,7 +71,7 @@ void TentacleActor_ShiftSegmentTrail(struct Body080A9988 *p)
     if (Mod(p->f2CA, *((u8 *)g + 0x874)))
         return;
     carry = *(struct Pos080A9988 *)(p->obj + 0x1c);
-    for (i = 0; i < *(s16 *)((u8 *)g + 0x8da); i++) {
+    for (i = 0; i < ((struct TentacleBodyAnimationView *)g)->segmentCount; i++) {
         if (TestMask(&g->entries[i], 2) && !TestMask(&g->entries[i], 1)) {
             struct Pos080A9988 t = g->entries[i].pos;
             g->entries[i].prev = carry;

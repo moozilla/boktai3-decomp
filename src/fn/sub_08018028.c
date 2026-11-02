@@ -77,7 +77,7 @@ s32 Weather_Initialize(struct WeatherState *p)
             gStormTimer += Mod(RAND(), p->delayRange);
     }
     if (Script_SeekToKeyword(0x63))
-        *(s32 *)((u8 *)gGameState + 0x630) = Script_GetValue();
+        gGameState->counters628[2] = Script_GetValue();
     if (Script_SeekToKeyword(0x74)) {
         p->duration = Script_GetValue();
         p->durationRange = Script_GetValue();
@@ -94,17 +94,20 @@ s32 Weather_Initialize(struct WeatherState *p)
         s32 storm;
         sensor = (void *)(base + offset);
         storm = *sensor;
-        *(s32 *)((u8 *)gGameState + 0x630) += storm >> 2;
+        {
+            s32 *timer = &gGameState->counters628[2];
+            *timer += storm >> 2;
+        }
     }
-    if (*(s32 *)((u8 *)gGameState + 0x630) >= gWeatherCooldownBase)
-        *(s32 *)((u8 *)gGameState + 0x630) = gWeatherCooldownBase;
+    if (gGameState->counters628[2] >= gWeatherCooldownBase)
+        gGameState->counters628[2] = gWeatherCooldownBase;
     phase = 0;
     if (gGameState->unk876 == 0) {
         if (gStormTimer > 0) {
             if (gStormTimer <= 99)
                 gStormTimer = 100;
             phase = 3;
-        } else if (*(s32 *)((u8 *)gGameState + 0x630) == 0) {
+        } else if (gGameState->counters628[2] == 0) {
             s32 volume = Weather_GetStormVolume(p);
             if ((RAND() & 0x3F) < volume)
                 phase = 3;

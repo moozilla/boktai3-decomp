@@ -1,3 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
+#include "player.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
@@ -134,7 +136,7 @@ static inline void ClearHeld(struct OctopusContext *context)
 
 static inline u8 IsIdle(struct Player *player)
 {
-    if (*(u16 *)((u8 *)player + 0x424) == 0)
+    if (player->currentStatA == 0)
         return 1;
     return 0;
 }
@@ -271,7 +273,7 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
             {
                 u32 status = Octopus_GetAnimationStatus(actor);
                 u32 request = actor->attacks.first[1];
-                u32 option = *(u32 *)((u8 *)actor + 0xD0);
+                u32 option = actor->attacks.flags[1];
                 Player_BeginPositionRequest(player, (struct SceneVec *)&position, 0, status, flip,
                                             0, 0, request, option);
             }

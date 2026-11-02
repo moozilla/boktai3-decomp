@@ -215,11 +215,6 @@ static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int
 }
 
 void *BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
-static inline void GridAttack_ClearPoint(const void *source, struct ContactPosition *dest)
-{
-    CpuSet(source, dest, 0x05000002);
-}
-
 static inline u32 GridAttack_RandomValue(void)
 {
     const u16 *table = gRandomTable;
@@ -239,16 +234,14 @@ static inline void GridAttack_OffsetCoordinate(volatile s16 *coordinate, u32 ran
 void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
                                              struct ContactPosition *point, int kind)
 {
-    volatile u32 zero;
     struct ContactPosition velocity;
     struct SceneVec position;
     struct ContactPosition target;
     struct ContactPosition original;
     struct ContactPosition *vel = &velocity;
-    volatile s16 *pos;
-    zero = 0;
-    GridAttack_ClearPoint((const void *)&zero, vel);
-    pos = (volatile s16 *)&position;
+    s16 *pos;
+    ZeroFill8(vel);
+    pos = (s16 *)&position;
     original = *point;
     *(struct ContactPosition *)&position = original;
     GridAttack_OffsetCoordinate(&pos[0], GridAttack_RandomValue());
@@ -401,20 +394,18 @@ void GridAttackActor_NotifyLinkedActorLatePhase(struct GridAttackActor *p)
     }
 }
 
-static inline void GridAttack_SetFacingPinned(struct GridAttackActor *p, int angle)
+static inline void GridAttack_SetFacing(struct GridAttackActor *p, int angle)
 {
     u32 value;
-    register int shifted asm("r0");
+    s32 shifted;
     p->transform.angle = angle;
-    shifted = p->transform.angle + 0x60;
-    asm("" : "+r"(shifted));
-    shifted >>= 6;
-    value = 3 & shifted;
+    shifted = (p->transform.angle + 96) >> 6;
+    value = 3;
+    value &= shifted;
     p->facing = value;
-    shifted = p->transform.angle + 0x70;
-    asm("" : "+r"(shifted));
-    shifted >>= 5;
-    value = 7 & shifted;
+    shifted = (p->transform.angle + 112) >> 5;
+    value = 7;
+    value &= shifted;
     p->facing8 = value;
 }
 
@@ -423,11 +414,11 @@ static inline void GridAttack_SetFacingPinned(struct GridAttackActor *p, int ang
 void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
 {
     if (!p->locked)
-        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
+        GridAttack_SetFacing(p, p->requestedAngles[0]);
     if (p->changed) {
         p->changed = 0;
         if (p->locked)
-            GridAttack_SetFacingPinned(p, p->savedAngle);
+            GridAttack_SetFacing(p, p->savedAngle);
         GridAttackActor_SetAnimation(p, 2, 1, 0);
     }
     if (!p->tryUpdate(p)) {
@@ -443,7 +434,7 @@ void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
+        GridAttack_SetFacing(p, p->requestedAngles[0]);
         GridAttackActor_ResetAttackAnimationHistory(p);
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         Sound_PlaySongChecked(1355);
@@ -473,7 +464,7 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
     if (p->changed) {
         int zero = 0;
         p->changed = zero;
-        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
+        GridAttack_SetFacing(p, p->requestedAngles[0]);
         GridAttackActor_SetAnimation(p, 3, 1, 8);
         p->stage = zero;
         p->counter = zero;
@@ -567,7 +558,7 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     struct GridAttackActor *base = p;
     if (p->changed) {
         p->changed = 0;
-        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
+        GridAttack_SetFacing(p, p->requestedAngles[0]);
         GridAttackActor_ResetAttackAnimationHistory(p);
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;

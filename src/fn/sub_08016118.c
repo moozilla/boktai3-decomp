@@ -63,7 +63,6 @@ int FadingParticleGroup_Update(struct Group *g)
             if (*life) {
                 struct Anim *a;
                 const u16 *entry;
-                register u16 n asm("r0");
                 u8 *resource;
                 u32 frame;
                 alive++;
@@ -80,26 +79,28 @@ int FadingParticleGroup_Update(struct Group *g)
                 p->sprite.tile = *(u16 *)(resource + 4) +
                                  (p->sprite.width >> 3) * (p->sprite.height >> 3) * frame;
                 {
-                    u32 input = a->flags;
-                    u32 left = 1;
-                    u32 mask = 1;
-                    left &= input;
-                    if (left != (((*entry & 0x30) >> 4) & mask))
+                    union DisplaySequenceControl control;
+                    u32 bit, first;
+                    control.raw = a->flags;
+                    bit = 1;
+                    first = (u8)(control.raw & bit);
+                    if (first != (((*entry & 0x30) >> 4) & bit))
                         p->sprite.flags |= 4;
                     else
                         p->sprite.flags &= ~4;
                 }
                 {
-                    register u32 input asm("r0") = a->flags;
-                    u32 mask = 2;
-                    u32 left = (u8)(mask & input);
-                    if (left != (((*entry & 0x30) >> 4) & mask))
+                    union DisplaySequenceControl control;
+                    u32 bit, first;
+                    control.raw = a->flags;
+                    bit = 2;
+                    first = (u8)(control.raw & bit);
+                    if (first != (((*entry & 0x30) >> 4) & bit))
                         p->sprite.flags |= 8;
                     else
                         p->sprite.flags &= ~8;
                 }
-                n = ++a->timer;
-                if (n >= a->rate) {
+                if (++a->timer >= a->rate) {
                     a->timer = 0;
                     if (a->flags & 4) {
                         if (a->frame == 0) {

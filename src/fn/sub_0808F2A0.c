@@ -1,3 +1,5 @@
+#include "scene_actor_registry.h"
+#include "scene_actor_behavior.h"
 #include "scene_actor_control_phase.h"
 /* SceneActorControl_CompleteScriptedResponse_0809F368: SceneActorControl_CompleteScriptedResponse with other constants (ported by relatives.py, fixed by hand; provisional name) */
 #include "scene_actor_reaction.h"
@@ -26,7 +28,7 @@ static inline u8 Hidden(struct SceneActorRegistryResetView *a)
         else
             goto no;
     } else {
-        if (*(u32 *)((u8 *)a->drawable + 0x28) & mask)
+        if (((struct SceneActorRegistryTileDrawable *)a->drawable)->flags & mask)
             goto yes;
         else
             goto no;
@@ -63,14 +65,14 @@ void Bat_RunDefeatScript(struct SceneActorRegistryResetView *actor, s32 frame)
 
     if (Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30)) {
         actor->field2B0 = 1;
-        script = *(u16 *)((u8 *)actor + 0x1F8);
+        script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
         if (script) {
             values[0] = actor->body.position.x;
             values[1] = actor->body.position.y;
             values[2] = actor->body.position.z;
-            values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-            values[4] = *(s32 *)((u8 *)actor + 0x200);
-            values[5] = *(s32 *)((u8 *)actor + 0x204);
+            values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+            values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+            values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
             values[6] = actor->field2E0;
             values[7] = actor->body.id;
             arguments.count = 8;

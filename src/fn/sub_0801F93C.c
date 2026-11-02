@@ -73,7 +73,7 @@ static inline s32 Obj1F_Abs(s32 n)
 }
 static inline u8 Obj1F_SceneMatches(u16 *scene)
 {
-    if (*(u32 *)((u8 *)gGameState + 0x5a0) == *scene)
+    if ((u32)gGameState->region == *scene)
         return 1;
     return 0;
 }
@@ -311,7 +311,7 @@ s32 sub_0801F93C(struct Obj1FController *self)
             case 15: {
                 struct Obj1FPos delta;
                 SceneObject_UpdatePoseA((u8 *)o);
-                if (*(s16 *)((u8 *)gGameState + 0x876) <= 2)
+                if (gGameState->unk876 <= 2)
                     break;
                 delta = o->position;
                 delta.x -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->x;

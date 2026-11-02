@@ -7,7 +7,12 @@ struct Entry {
 struct Packet {
     u8 pad, type;
     u8 pad2[2];
-    s32 word;
+    union {
+        s32 word;
+        struct {
+            u16 low, high;
+        } halves;
+    } payload;
 };
 struct P {
     u8 pad[0x20];
@@ -39,10 +44,10 @@ void WirelessExchange_OnPacketReceived(struct Packet *p)
     e = &s->entries[1];
     switch (p->type) {
         case 0:
-            e->a = p->word;
-            e->b = (u32)p->word >> 8;
+            e->a = p->payload.word;
+            e->b = (u32)p->payload.word >> 8;
             shift = 16;
-            value = p->word;
+            value = p->payload.word;
             i = 0;
             do {
                 e->bytes[i] = (value >> shift) & 15;
@@ -57,11 +62,11 @@ void WirelessExchange_OnPacketReceived(struct Packet *p)
         case 2:
             shift = 0;
             {
-                register u32 v asm("r0") = *(volatile u16 *)((u8 *)p + 6);
+                register u32 v asm("r0") = p->payload.halves.high;
                 v &= 1;
                 e->flag = v;
             }
-            value = p->word;
+            value = p->payload.word;
             i = 0;
             do {
                 e->bytes[i] = (value >> shift) & 15;
@@ -74,9 +79,9 @@ void WirelessExchange_OnPacketReceived(struct Packet *p)
             mask = 32;
             goto flags;
         case 4:
-            e->timer = *(u16 *)&p->word;
+            e->timer = *(u16 *)&p->payload.word;
             {
-                register u32 v asm("r0") = (*(volatile u16 *)((u8 *)p + 6)) & 3;
+                register u32 v asm("r0") = (p->payload.halves.high) & 3;
                 u32 z;
                 e->kind = v;
                 z = 0;
@@ -89,7 +94,7 @@ void WirelessExchange_OnPacketReceived(struct Packet *p)
             goto flags;
         case 5:
             if (!Wireless_IsSessionActive())
-                s->mode = p->word & 3;
+                s->mode = p->payload.word & 3;
             mask = 512;
         flags:
             s->flags |= mask;

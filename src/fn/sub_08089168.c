@@ -73,14 +73,14 @@ void Ghoul_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
                             actor->body.direction + 128, 10, 6, 2, 2);
     }
     {
-        s32 current = *(s16 *)((u8 *)actor + 0x310);
+        s32 current = actor->reactionStart.x;
         s16 *field = (void *)((u8 *)actor + 0x318);
         s32 difference = current - *field;
         x = field;
         dx = Quarter(difference);
     }
     {
-        s32 current = *(s16 *)((u8 *)actor + 0x314);
+        s32 current = actor->reactionStart.z;
         s16 *field = (void *)((u8 *)actor + 0x31C);
         s32 difference = current - *field;
         z = field;

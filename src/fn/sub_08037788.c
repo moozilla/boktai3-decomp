@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Row {
     u8 pad0[0x58];
@@ -58,14 +57,12 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
                 draw = ((u8 *)p) + 0x2d8;
                 if (!bit) {
                     struct RfuLinkStatus **links = &gRfuLinkStatus;
-                    /* do-while(0) only keeps agbcc's block layout */
                     do {
                         i++;
                         if (i > 3) {
                             break;
                         }
-                    } while (
-                        !(((*((struct RfuLinkStatus *volatile *)links))->connSlotFlag >> i) & 1));
+                    } while (!(((*links)->connSlotFlag >> i) & 1));
                 }
                 r = p->rows;
                 Memory_Clear(name, 24);
@@ -79,7 +76,6 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
                     u32 mask = ~1;
                     struct Row *cursor = r;
                     i = 4;
-                    /* do-while(0) only keeps agbcc's block layout */
                     do {
                         cursor->flags &= mask;
                         cursor++;
@@ -95,7 +91,6 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
                 u32 mask = 1;
                 struct Row *cursor = r;
                 i = 4;
-                /* do-while(0) only keeps agbcc's block layout */
                 do {
                     cursor->flags |= mask;
                     cursor++;
@@ -106,8 +101,6 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
     }
     if ((gPadState[1] & 1) && connected) {
         Wireless_RequestAdvanceConnection();
-    }
-    if (!r) {
     }
     if (gPadState[1] & 2) {
         if (connected) {

@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#include "global.h"
-u8 *ResourceRegistry_GetResource(int);
-int Script_SeekToKeyword(int);
-int Script_GetValue(void);
+#include "scene_object_slot.h"
 void SceneObject_UpdateLowered(void);
 int SceneObjects_ScriptLower(void)
 {
@@ -43,11 +40,11 @@ int SceneObjects_ScriptLower(void)
                     clear = 0;
                     *out = clear;
                 }
-                *(u16 *)(*(u8 **)(s + 0x2c) + 6) &= ~2;
+                ((struct SceneObjSlot *)s)->block->w6 &= ~2;
+                ((struct SceneObjSlot *)s)->block->w6 |= 3;
                 asm("" ::: "memory");
-                *(u16 *)(*(u8 **)(s + 0x2c) + 6) |= 3;
-                asm("" ::: "memory");
-                (*(u8 **)(s + 0x2c))[4] = ((*(u8 **)(s + 0x2c))[4] & 0xf0) | (s[0x3b] + 1);
+                ((struct SceneObjSlot *)s)->block->b4 =
+                    (((struct SceneObjSlot *)s)->block->b4 & 0xf0) | (s[0x3b] + 1);
                 *(u16 *)(s + 0x80) = zero;
                 *(u16 *)(s + 0x1e) = *(u16 *)(s + 0x72);
                 found = 1;

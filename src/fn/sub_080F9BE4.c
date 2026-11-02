@@ -1,3 +1,4 @@
+#include "scene_actor_behavior.h"
 #include "global.h"
 
 #include "scene_actor_control_phase.h"
@@ -121,14 +122,14 @@ void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         return;
     actor->field2B0 = 1;
     SceneActorBehavior_CallTerrainScript((void *)actor);
-    script = *(u16 *)((u8 *)actor + 0x1F8);
+    script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
     if (script) {
         buf.values[0] = actor->body.position.x;
         buf.values[1] = actor->body.position.y;
         buf.values[2] = actor->body.position.z;
-        buf.values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-        buf.values[4] = *(s32 *)((u8 *)actor + 0x200);
-        buf.values[5] = *(s32 *)((u8 *)actor + 0x204);
+        buf.values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
+        buf.values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+        buf.values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
         buf.values[6] = actor->field2E0;
         buf.values[7] = actor->body.id;
         arguments.count = 8;
