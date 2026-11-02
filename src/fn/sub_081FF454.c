@@ -1,84 +1,20 @@
 // MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "homing_projectile.h"
 #include "engine_globals.h"
 #include "ram.h"
-// fix.py best after the inlined-insn fix
-struct HomingVec {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
 struct LocalVec {
     s16 x, y, z;
 } __attribute__((aligned(4)));
-struct HomingParams {
-    u8 unknown0[2];
-    u16 delay;
-    u8 unknown4[2];
-    s8 angle;
-    u8 variant;
-    s32 speed;
-    void *behavior;
-    s16 attack, element, attackFlags, body;
-    s16 shotA, shotB, shotC;
-    u8 unknown1E[2];
-};
-struct HomingCollider {
-    u8 unknown0[6];
-    u16 flags;
-    u8 unknown8[0x4c];
-};
-struct HomingSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
-struct HomingSprite {
-    u32 flags;
-    u8 unknown4[3], priority;
-    u8 unknown8[8];
-    u16 frame;
-    u8 unknown12[0xa];
-    struct HomingVec position;
-    u8 unknown24[8];
-};
-struct HomingSlot {
-    u32 lifetime;
-    u8 unknown04[8];
-    struct HomingVec velocity;
-    struct HomingVec origin;
-    struct HomingVec target;
-    struct HomingCollider secondaryCollider;
-    struct HomingCollider primaryCollider;
-    u8 animData[0x1c];
-    void *resource;
-    struct HomingParams params;
-    struct HomingSprite sprite;
-    u32 unknown138;
-    s32 state;
-    struct HomingSequence sequence;
-    u8 unknown150[0xc];
-    s16 flashTimer;
-    s16 blinkTimer;
-};
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
-struct HomingVec *Player_GetEffectivePosition(s32);
+struct ContactPosition *Player_GetEffectivePosition(s32);
 s32 Math_Atan2(s32, s32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
-void SunDiscPool_SpawnDisc(void *, void *, s32, s32, s32, s32, s32, s32, s32);
+u32 Anim_SetSequence(struct DisplaySequenceState *, u8 *, u16, u8, u8);
+void SunDiscPool_SpawnDisc(void *, void *, s32, s32, s32, s32, u32, s32, s32);
 void BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
 u16 Sqrt(u32);
 s32 Div(s32, s32);
-u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
-
-static inline void SpawnTrail(struct HomingSlot *p)
-{
-    u32 seed, t;
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    seed = gRandomIndex;
-    t = *(u8 *)&gRandomTable[seed];
-    SpriteParticle_CreateDefaultVariant4384(&p->origin, 0x28, 0x20, 0xc, 4, 0x18, t, 0x20, 0x20, 3,
-                                            2, 0x200);
-}
+s32 Sprite_BlinkUntilExpired(u32 *, s32, s32, s32);
 
 static inline void Face(struct HomingSlot *p, struct HomingParams *params, u32 sequence, u32 one)
 {
@@ -101,7 +37,7 @@ static inline void Face(struct HomingSlot *p, struct HomingParams *params, u32 s
         *second = 1;
     else
         *second = 0;
-    Anim_SetSequence(&p->sequence, p->resource, (u16)sequence, flips[0], *saved);
+    Anim_SetSequence(&p->sequence, p->graphics.resource, (u16)sequence, flips[0], *saved);
 }
 
 static inline void FaceFinal(struct HomingSlot *p, struct HomingParams *params, u32 sequence,
@@ -127,36 +63,33 @@ static inline void FaceFinal(struct HomingSlot *p, struct HomingParams *params, 
     else
         *second = 0;
     asm("" : : "r"(saved) : "r5");
-    Anim_SetSequence(&p->sequence, p->resource, (u16)sequence, flips[0], *saved);
+    Anim_SetSequence(&p->sequence, p->graphics.resource, (u16)sequence, flips[0], *saved);
 }
 
 static inline void Aim(struct HomingSlot *p, struct HomingParams *params)
 {
-    struct HomingVec *player = Player_GetEffectivePosition(0);
-    struct HomingVec *position = &p->sprite.position;
+    struct ContactPosition *player = Player_GetEffectivePosition(0);
+    struct ContactPosition *position = &p->sprite.position;
     params->angle = Math_Atan2(player->x - position->x, player->z - position->z);
 }
 
 static inline void SetRiseHeight(struct HomingSlot *p, u16 height)
 {
-    register u32 offset = 0x12a;
-    {
-        register s16 *dest asm("r2") = (void *)((u8 *)p + offset);
-        *dest = height;
-    }
+    register s16 *dest asm("r2") = &p->sprite.position.y;
+    *dest = height;
 }
-inline static void SpawnTrail_UpdateDefaultState(struct HomingSlot *p)
+static inline void SpawnTrail(struct HomingSlot *p)
 {
     u32 seed;
     u32 t;
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     seed = gRandomIndex;
-    t = *((u8 *)(&(*((typeof(gRandomTable) *)0x0203B400))[seed]));
+    t = *((u8 *)(RANDOM_TABLE_ADDR + sizeof(*gRandomTable) * seed));
     SpriteParticle_CreateDefaultVariant4384(&p->origin, 0x28, 0x20, 0xc, 4, 0x18, t, 0x20, 0x20, 3,
                                             2, 0x200);
 }
 
-u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
+s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
 {
     struct HomingParams *params = &p->params;
     s32 *state = &p->state;
@@ -168,7 +101,7 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
             one = 1;
             asm("" : "+r"(one));
             if (time & one)
-                SpawnTrail_UpdateDefaultState(p);
+                SpawnTrail(p);
             p->sprite.flags |= 0x400;
             p->sprite.position.y = p->target.y - ((30 - p->lifetime) * 2);
             if (p->lifetime > 30) {
@@ -258,28 +191,15 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
 
         case 3:
             if (p->lifetime & 1)
-                SpawnTrail_UpdateDefaultState(p);
+                SpawnTrail(p);
             {
                 s32 limit = slot * 30;
                 u32 elapsed = p->lifetime - 200;
                 SetRiseHeight(p, p->target.y - ((30 - (limit - elapsed)) * 2));
             }
-            {
-                register u32 spriteOffset;
-                register u32 timerOffset;
-                register struct HomingSprite *sprite;
-                register s16 *timer;
-                spriteOffset = 0x10c;
-                sprite = (void *)(((u8 *)p) + spriteOffset);
-                timerOffset = 0x15e;
-                timer = (void *)(((u8 *)p) + timerOffset);
-                {
-                    s32 timerValue = *timer;
-                    if (Sprite_BlinkUntilExpired(sprite, timerValue, 0x2d, 0x5a))
-                        return 1;
-                    (*timer)++;
-                }
-            }
+            if ((u8)Sprite_BlinkUntilExpired(&p->sprite.flags, p->blinkTimer, 0x2d, 0x5a))
+                return 1;
+            p->blinkTimer++;
             break;
     }
 

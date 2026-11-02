@@ -1,31 +1,17 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, w;
-};
-struct Obj {
-    u32 flags;
-    u8 pad4[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Anim {
-    const volatile u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-struct Slot {
-    struct Obj sprite;
-    struct Anim anim;
-    const struct Vec *source;
+#include "display_animation.h"
+struct PlayerSlotDisplaySlot {
+    u8 resource[0x1C];
+    struct DisplaySequenceSprite sprite;
+    struct DisplaySequenceState sequence;
+    const struct ContactPosition *source;
     u16 stopOnEnd, active;
-    u8 pad44[0x1c];
 };
-struct Manager {
-    u8 pad[0x34];
-    struct Slot slots[4];
+struct PlayerSlotDisplay {
+    u8 task[0x18];
+    struct PlayerSlotDisplaySlot slots[4];
+    void *sequenceResource;
 };
 static inline u32 frame_factor(u16 v)
 {
@@ -33,39 +19,38 @@ static inline u32 frame_factor(u16 v)
     u32 mask = 15;
     return mask & value;
 }
-int PositionEffectDisplay_UpdateSources(struct Manager *m)
+int PositionEffectDisplay_UpdateSources(struct PlayerSlotDisplay *m)
 {
-    struct Cursor {
+    struct SlotFrameCursor {
         u16 frame;
-        u8 pad2[10];
-        struct Vec position;
+        u8 unknown2[10];
+        struct ContactPosition position;
         u8 tail[8];
-        struct Anim anim;
-        const struct Vec *source;
+        struct DisplaySequenceState anim;
+        const struct ContactPosition *source;
         u16 stopOnEnd, active;
-        u8 pad34[0x2c];
+        u8 nextFrame[0x2C];
     };
-    struct Manager *owner = m;
-    register struct Manager *base asm("r12") = owner;
+    struct PlayerSlotDisplay *owner = m;
+    register struct PlayerSlotDisplay *base asm("r12") = owner;
     s32 offset = 0;
-    struct Cursor *cursor = (void *)((u8 *)owner + 0x44);
-    struct Anim *sequence = (void *)((u8 *)owner + 0x60);
-    struct Obj *sprites = (void *)((u8 *)owner + 0x34);
+    struct SlotFrameCursor *cursor = (void *)&owner->slots[0].sprite.frame;
+    struct DisplaySequenceState *sequence = &owner->slots[0].sequence;
+    struct DisplaySequenceSprite *sprites = &owner->slots[0].sprite;
     do {
         if (cursor->active) {
-            struct Manager *p = base;
-            struct Obj *o;
-            struct Anim *a;
+            struct DisplaySequenceSprite *o;
+            struct DisplaySequenceState *a;
             const volatile u16 *entry;
             u32 elapsed;
             int done;
             {
-                u8 *address = (u8 *)owner + 0x70;
-                cursor->position = **(const struct Vec **)(address + offset);
+                u8 *address = (u8 *)&owner->slots[0].source;
+                cursor->position = **(const struct ContactPosition **)(address + offset);
             }
             o = sprites;
             a = sequence;
-            entry = cursor->anim.data + cursor->anim.frame;
+            entry = cursor->anim.commands + cursor->anim.index;
             cursor->frame = *entry >> 6;
             {
                 u32 input = a->flags;
@@ -73,7 +58,7 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
                 u32 mask = 1;
                 left &= input;
                 if (left != (((*entry & 0x30) >> 4) & mask)) {
-                    register struct Manager *write asm("r2") = base;
+                    register struct PlayerSlotDisplay *write asm("r2") = base;
                     write->slots[0].sprite.flags |= 4;
                 } else
                     o->flags &= ~4;
@@ -87,48 +72,48 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
                 else
                     o->flags &= ~8;
             }
-            elapsed = ++a->timer;
-            if (a->timer >= a->rate) {
-                a->timer = 0;
+            elapsed = ++a->elapsed;
+            if ((u16)elapsed >= a->duration) {
+                a->elapsed = 0;
                 if (a->flags & 4) {
-                    if (a->frame == 0) {
+                    if (a->index == 0) {
                         if (a->flags & 8) {
-                            a->timer = a->rate;
+                            a->elapsed = a->duration;
                         } else {
-                            a->frame = a->count - 1;
+                            a->index = a->frameCount - 1;
                         }
                         done = 1;
                     } else {
-                        a->frame--;
+                        a->index--;
                         done = 0;
                     }
                 } else {
-                    if (++a->frame >= a->count) {
+                    if (++a->index >= a->frameCount) {
                         if ((u8)(a->flags & 8)) {
-                            a->timer = a->rate;
-                            a->frame = a->count - 1;
+                            a->elapsed = a->duration;
+                            a->index = a->frameCount - 1;
                         } else {
-                            a->frame = 0;
+                            a->index = 0;
                         }
                         done = 1;
                     } else
                         done = 0;
                 }
-                entry = a->data + a->frame;
-                a->factor = frame_factor(*entry);
-                a->rate = (a->factor * a->scale) >> 6;
-                if (!a->rate) {
+                entry = a->commands + a->index;
+                a->frameWeight = frame_factor(*entry);
+                a->duration = (a->frameWeight * a->speed) >> 6;
+                if (!a->duration) {
                     u32 one = 1;
-                    a->rate = one;
+                    a->duration = one;
                 }
             } else
                 done = 0;
 
             if (done && cursor->stopOnEnd) {
                 {
-                    u8 *address = (u8 *)owner + 0x34;
+                    u8 *address = (u8 *)&owner->slots[0].sprite;
                     {
-                        struct Obj *dst = (void *)(address + offset);
+                        struct DisplaySequenceSprite *dst = (void *)(address + offset);
                         dst->flags |= 1;
                     }
                 }
@@ -136,12 +121,11 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
                 cursor->active = 0;
             }
         }
-        base = (void *)((u8 *)base + 0x60);
-        offset += 0x60;
+        base = (void *)((u8 *)base + sizeof(struct PlayerSlotDisplaySlot));
+        offset += sizeof(struct PlayerSlotDisplaySlot);
         cursor++;
-        sequence++;
-        sequence = (void *)((u8 *)sequence + 0x50);
-        sprites = (void *)((u8 *)sprites + 0x60);
-    } while ((s32)base <= (s32)((u8 *)owner + 0x120));
+        sequence = (void *)((u8 *)sequence + sizeof(struct PlayerSlotDisplaySlot));
+        sprites = (void *)((u8 *)sprites + sizeof(struct PlayerSlotDisplaySlot));
+    } while ((s32)base <= (s32)((u8 *)owner + 3 * sizeof(struct PlayerSlotDisplaySlot)));
     return 0;
 }

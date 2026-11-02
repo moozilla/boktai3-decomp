@@ -283,7 +283,8 @@ extern u32 gSceneProjectilePool; /* scene projectile pool (SceneProjectile_*) */
 /* 0x020005F0 */
 extern u32 gSpriteParticleManager; /* sprite particle manager (SpriteParticle_*) */
 /* 0x020005FC */
-extern u32 gProjectilePool; /* projectile pool (ProjectilePool_*) */
+struct TimedProjectilePool;
+extern struct TimedProjectilePool *gProjectilePool;
 /* 0x02000604 */
 extern u32 gEnemyParticlePool; /* enemy particle pool (EnemyParticle_*) */
 /* 0x02000608 */

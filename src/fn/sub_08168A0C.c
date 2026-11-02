@@ -4,16 +4,6 @@
 #include "game_state.h"
 #include "player.h"
 
-/* Four primary records occupy the space before the primary widgets. */
-struct PrimaryOption {
-    u8 value, icon;
-    u8 unk_02[2];
-};
-struct PrimaryOptionsView {
-    u8 unk_00[0xC78];
-    struct PrimaryOption options[4];
-};
-
 void SceneHud_RebuildPrimaryOptions(struct SceneHudState *p)
 {
     /* Keep the shared-state reads at the point where each choice is tested. */
@@ -22,7 +12,7 @@ void SceneHud_RebuildPrimaryOptions(struct SceneHudState *p)
     s32 count = 0;
     s32 i;
     s32 j;
-    struct PrimaryOption *option;
+    struct SceneHudPrimaryOption *option;
 
     p->primarySelection = -1;
     if (p->actionOwner->actionMode != 6) {
@@ -38,7 +28,7 @@ void SceneHud_RebuildPrimaryOptions(struct SceneHudState *p)
         flags = &gEngineFlags;
         selection = &p->primarySelection;
         slots = state->slots88;
-        option = ((struct PrimaryOptionsView *)p)->options;
+        option = p->primaryOptions;
         for (; i < 4; i++) {
             if (*slots >= 0) {
                 option->value = i;
@@ -56,7 +46,7 @@ void SceneHud_RebuildPrimaryOptions(struct SceneHudState *p)
         gameState = &gGameState;
         flags = &gEngineFlags;
         for (; i < 2; i++) {
-            option = &((struct PrimaryOptionsView *)p)->options[count];
+            option = &p->primaryOptions[count];
             option->value = i;
             if (i == 0)
                 option->icon = 4;
@@ -69,14 +59,14 @@ void SceneHud_RebuildPrimaryOptions(struct SceneHudState *p)
     }
     p->primaryVisible = count;
     for (; count < 4; count++) {
-        option = &((struct PrimaryOptionsView *)p)->options[count];
-        option->value |= 0xFF;
-        option->icon |= 0xFF;
+        option = &p->primaryOptions[count];
+        option->value |= 0xFFu;
+        option->icon |= 0xFFu;
     }
     for (i = 3; i >= 0; i--) {
     }
     if ((*flags & 0x1000) && p->primarySelection < 0) {
-        *p->primarySelectionOutput = (s8)((struct PrimaryOptionsView *)p)->options[0].value;
+        *p->primarySelectionOutput = (s8)p->primaryOptions[0].value;
         p->primarySelection = 0;
     }
     if (p->primaryVisible && p->primarySelection < 0) {
@@ -88,8 +78,7 @@ void SceneHud_RebuildPrimaryOptions(struct SceneHudState *p)
             if (((struct GameState *)address)->slots88[0] >= 0) {
                 *p->primarySelectionOutput = (*p->primarySelectionOutput + i) & 3;
                 for (j = 0; j < 4; j++) {
-                    if ((s8)((struct PrimaryOptionsView *)p)->options[j].value ==
-                        *p->primarySelectionOutput)
+                    if ((s8)p->primaryOptions[j].value == *p->primarySelectionOutput)
                         p->primarySelection = j;
                 }
                 break;

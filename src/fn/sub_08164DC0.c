@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 #include "scene_hud_display.h"
@@ -9,6 +8,8 @@ u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Div(s32, s32);
 void StatDisplay_DrawTwoDigitCounter(s32);
 void ResultPanel_ClearFiveTiles(void);
+enum { GAUGE_TILE_PALETTE = 13 << 12 };
+
 void Hud_UpdateTransientStatGauge(struct SceneHudState *p)
 {
     s32 draw = 0, full = 0, partial = 0, width = 0, foreground = 0, background = 0, tile = 0, n;
@@ -65,18 +66,10 @@ void Hud_UpdateTransientStatGauge(struct SceneHudState *p)
         if ((&gBgPaletteBank13Color14)[-1] != foreground)
             (&gBgPaletteBank13Color14)[-1] = foreground;
         cell = Hud_GetTilemapCell(0, 29, 1);
-        {
-            s32 mk;
-            {
-                u16 tileAttributes = 0xD000;
-                asm("" : "+r"(tileAttributes));
-                mk = tileAttributes;
-            }
-            n = 2;
-            do {
-                *cell-- = tile | mk;
-                tile--;
-            } while (--n >= 0);
+        for (n = 0; n < 3; n++) {
+            *cell = tile | (s16)GAUGE_TILE_PALETTE;
+            cell--;
+            tile--;
         }
         for (n = 0; n < full; n++)
             *cell-- = 0xd089;
@@ -93,26 +86,11 @@ void Hud_UpdateTransientStatGauge(struct SceneHudState *p)
         StatDisplay_DrawTwoDigitCounter((s16)p->timedStateParameter);
     } else if (p->transientGaugeVisible) {
         cell = Hud_GetTilemapCell(0, 29, 1);
-        {
-            u32 z;
-            {
-                register u32 t asm("r1") = 0xd000;
-                asm("" : "+r"(t));
-                z = t;
-            }
-            asm("" : "+r"(z));
-            n = 13;
-            do {
-                *cell-- = z;
-            } while (--n >= 0);
+        for (n = 0; n < 14; n++) {
+            *cell = GAUGE_TILE_PALETTE;
+            cell--;
         }
         ResultPanel_ClearFiveTiles();
-        {
-            register u32 off asm("r2") = (u32) & ((struct SceneHudState *)0)->transientGaugeVisible;
-            register u8 *q asm("r1");
-            asm("" : "+r"(off));
-            q = (u8 *)p + off;
-            *q = 0;
-        }
+        p->transientGaugeVisible = 0;
     }
 }

@@ -9,19 +9,21 @@ struct ContactCollider {
     u16 flags;
     u8 unknown8[2];
     u16 contactFlags; /* 0xA: bit four enables player cost processing */
-    u8 unknownC[8];
+    struct ContactPosition position;
     struct ContactPosition offset, bounds;
     s16 x, y, z;
     u8 unknown2A[0xA];
     u32 statRewardFlags; /* 0x34: selects player hundredths gain on contact (tentative) */
     u32 reactionFlags;
-    u16 unknown3C, cost;
+    u16 unknown3C, cost; /* 0x3C: base power, 0x3E: calculated damage */
     u16 responseParameter; /* 0x40: copied to actor response state (tentative) */
     u8 direction;
     u8 costFlags;      /* 0x43: bit three latches quarter-cost adjustment */
-    u16 responseValue; /* 0x44: copied to actor response state (tentative) */
+    u16 responseValue; /* 0x44: incoming hit-immunity duration, decremented by the defending actor */
     u8 responseFlags;  /* 0x46: edge-triggered player contact gates (tentative) */
-    u8 unknown47[5];
+    u8 unknown47;
+    s8 damageScale; /* 0x48: signed damage multiplier in sixty-fourths */
+    u8 unknown49[3];
     void (*callback)(struct ContactCollider *, struct ContactCollider *, void *);
     void *owner; /* 0x50: callback owner */
 };

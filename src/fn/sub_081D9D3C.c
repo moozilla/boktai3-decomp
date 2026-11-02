@@ -1,44 +1,16 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "monster_particle_random.h"
-#include "contact_position.h"
+#include "task4e01_projectile.h"
 
-struct ProjectileParams {
-    u16 flags, lifetime;
-    u8 unk_04[2];
-    s8 direction;
-    u8 unk_07;
-    s32 speed;
-    u8 unk_0C[0x44 - 0xC];
-    s32 graphics;
-    u32 type, element;
-    u8 unk_50[8];
-};
-struct ProjectileEntry {
-    u8 unk_00[0x10];
-    struct ContactPosition velocity;
-    struct ProjectileParams params;
-    u8 unk_70[0xA8 - 0x70];
-    struct ContactPosition position;
-    u8 unk_B0[0x174 - 0xB0];
-    struct ContactPosition previousPosition;
-};
 void Sound_PlaySong(u32);
-void Projectile_InitializeParams(struct ProjectileParams *);
-void Projectile_SetFlightParams(struct ProjectileParams *, u32, u32, s32, s32);
-void Projectile_SetTypeAndElement(struct ProjectileParams *, u32, u32);
-void Projectile_SetSpriteParams(struct ProjectileParams *, u32, u32, s32);
-s32 Projectile_Spawn(struct ProjectileParams *, struct ContactPosition *);
+void Projectile_InitializeParams(struct Task4E01Params *);
+void Projectile_SetFlightParams(struct Task4E01Params *, u32, u32, s32, s32);
+void Projectile_SetTypeAndElement(struct Task4E01Params *, u32, u32);
+void Projectile_SetSpriteParams(struct Task4E01Params *, u32, u32, s32);
+s32 Projectile_Spawn(struct Task4E01Params *, struct ContactPosition *);
 s32 Task4E01_SelectTerrainTurn(struct ContactPosition *, struct ContactPosition *, s32);
 void SceneStimulus_AddUntagged(s32, s32, s32, s32, s32);
-
-#define INIT_IMPACT_RANDOM(cursor, ringMask, samples)                                              \
-    do {                                                                                           \
-        (cursor) = &gRandomIndex;                                                                  \
-        (ringMask) = 1023;                                                                         \
-        (samples) = gRandomTable;                                                                  \
-    } while (0)
 
 static inline s32 ReadSample(const u16 *table, u32 *rng, u32 mask)
 {
@@ -63,34 +35,35 @@ static inline void SubPosition(struct ContactPosition *a, struct ContactPosition
     a->z -= b->z;
 }
 
-s32 Projectile_SpawnImpactPair(struct ProjectileEntry *entry)
+s32 Projectile_SpawnImpactPair(struct Task4E01Projectile *entry)
 {
-    struct ProjectileParams params;
+    struct Task4E01Params params;
     struct ContactPosition origin;
-    struct ProjectileParams *source = &entry->params;
+    struct Task4E01Params *source = &entry->params;
     s32 i;
     u16 jitterMask;
     u32 sectorMask;
     struct ContactPosition *childPosition;
-    struct ProjectileParams *out;
+    struct Task4E01Params *out;
     u32 *rng;
     u32 mask;
     const u16 *table;
 
     if ((source->flags & 0xA0) && !(source->flags & 0x2000)) {
-        CopyPosition(&origin, &entry->position);
+        CopyPosition(&origin, &entry->sprite.position);
         SubPosition(&origin, &entry->velocity);
         Sound_PlaySong(0x147);
 
         i = 0;
-        childPosition = &entry->position;
+        childPosition = &entry->sprite.position;
         out = &params;
-        INIT_IMPACT_RANDOM(rng, mask, table);
         jitterMask = 63;
         sectorMask = 7;
-
-        for (; i < 2; i++) {
+        do {
             u8 first, second;
+            rng = &gRandomIndex;
+            mask = 1023;
+            table = gRandomTable;
             Projectile_InitializeParams(&params);
             out->flags |= 0x3000;
             if (DirectionSector(source->direction, sectorMask) & 1) {
@@ -114,10 +87,10 @@ s32 Projectile_SpawnImpactPair(struct ProjectileEntry *entry)
             Projectile_SetTypeAndElement(&params, source->type, source->element);
             Projectile_SetSpriteParams(&params, 0x2112,
                                        (ReadSample(table, rng, mask) & 1) == 0 ? 23 : 24,
-                                       source->graphics);
+                                       source->sprite[2]);
             Projectile_Spawn(&params, childPosition);
             SceneStimulus_AddUntagged(origin.x, origin.z, 0x400, 0, 1);
-        }
+        } while (++i < 2);
     }
     return 2;
 }

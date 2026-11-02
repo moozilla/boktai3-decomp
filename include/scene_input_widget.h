@@ -3,6 +3,10 @@
 
 #include "contact_position.h"
 
+struct SceneWidgetPlayback {
+    u8 priority, mode;
+};
+
 struct SceneInputResource {
     u32 words[8];
 };
@@ -17,7 +21,9 @@ struct SceneInputWidget {
     u8 attribute1A, attribute1B;
     u8 unknown1C[4];
     struct ContactPosition position;
-    u8 unknown28[0x12];
+    u8 unknown28[0xE];
+    u16 rotation; /* 0x36: angle copied by the thrown HUD icon. */
+    u8 unknown38[2];
     u16 paletteBank;
     u8 unknown3C[0xC];
     u16 *palette;

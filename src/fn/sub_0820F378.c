@@ -1,4 +1,6 @@
-#include "global.h"
+#include "orange_spine.h"
+#include "damage_number_display.h"
+#include "scene_hud_display.h"
 #include "display_sequence_inline.h"
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -9,63 +11,12 @@
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
-void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
-void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 void OrangeSpine_UpdateDefeatEffect(u8 *);
 void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
-struct OrangeSpineCollider {
-    u8 pad[6];
-    u16 flags;
-};
-union OrangeSpineSprite {
-    struct DisplaySequenceSprite display;
-    struct {
-        u8 unknown0[0x1C];
-        struct SceneVec position;
-        u8 unknown24[8];
-    } coordinates;
-};
-struct OrangeSpineActor {
-    u8 unknown0[0x18];
-    u32 age;
-    struct SceneVec initialPosition;
-    union OrangeSpineSprite sprite;
-    u8 graphics[0x1c];
-    struct OrangeSpineCollider collider;
-    u8 unknown74[0x4];
-    struct SceneVec damagePosition;
-    struct SceneVec damageOffset;
-    u8 unknown88[0x27];
-    u8 direction;
-    u16 invulnerability;
-    u8 unknownB2[0x56];
-    void *update;
-    struct DisplaySequenceState sequence;
-    u8 unknown11C[0xA];
-    s16 health;
-    s16 damage;
-    s16 hitReaction;
-    u8 unknown12C[0x2];
-    s16 defeated;
-    s16 flashTimer;
-    u8 facing;
-    u8 unknown133[0x5];
-    s16 maxHealth;
-    u8 unknown13A[0x6];
-    s16 hudStyle;
-    u8 unknown142[0x6];
-    s16 hudTime;
-    u8 unknown14A[0x2];
-    void *hud;
-    u32 reactionFlags;
-    u32 pendingReaction;
-    u8 unknown158[0x18];
-    void *resource;
-};
 struct OrangeSpineEffectPair {
     s32 lo : 16;
     u32 hi : 16;
@@ -169,19 +120,19 @@ static inline void OrangeSpine_BeginDefeat(s16 *state, u16 *blink)
 }
 s32 OrangeSpine_UpdateDamageState(struct OrangeSpineActor *p)
 {
-    struct OrangeSpineCollider *collider;
+    struct ContactCollider *collider;
     if (OrangeSpine_TestEitherFlags(0x400, &gEngineFlags, &gScenePauseFlags) ||
         OrangeSpine_TestFlag(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.display.flags &= ~1;
     if (p->defeated == 0) {
-        struct OrangeSpineCollider *c = &p->collider;
+        struct ContactCollider *c = &p->collider;
         c->flags &= ~4;
         Collider_SetPosition(c, &p->sprite.coordinates.position, 0);
         collider = c;
     } else {
-        struct OrangeSpineCollider *c = &p->collider;
+        struct ContactCollider *c = &p->collider;
         c->flags |= 4;
         collider = c;
     }
@@ -190,16 +141,16 @@ s32 OrangeSpine_UpdateDamageState(struct OrangeSpineActor *p)
         p->reactionFlags = p->pendingReaction;
         Sound_PlaySong(0x13e);
         if (p->damage > 0) {
-            DamageNumberDisplay_Show(collider, p->damage, 0, &p->damagePosition, &p->damageOffset,
-                                     1);
-            SceneHud_SetTimedState(p->hud, p->health, p->maxHealth, p->hudStyle, p->direction == 4,
-                                   p->hudTime);
+            DamageNumberDisplay_Show((struct DamageNumberSource *)collider, p->damage, 0,
+                                     &p->collider.position, &p->collider.offset, 1);
+            SceneHud_SetTimedState((u32)p->hud, p->health, p->maxHealth, p->hudStyle,
+                                   p->collider.costFlags == 4, p->hudTime);
         }
         if (p->health <= 0) {
             struct SceneVec center, smoke;
             struct OrangeSpineEffectVector velocity, spread;
             const u16 *table;
-            OrangeSpine_BeginDefeat(&p->defeated, &p->invulnerability);
+            OrangeSpine_BeginDefeat(&p->defeated, &p->collider.responseValue);
             {
                 struct SceneVec *centerPosition = &center;
                 *centerPosition = p->sprite.coordinates.position;
@@ -251,9 +202,9 @@ s32 OrangeSpine_UpdateDamageState(struct OrangeSpineActor *p)
         p->flashTimer--;
     } else
         AnimData_SelectPaletteBank(p->graphics, 0x1c1);
-    if (p->invulnerability) {
-        p->invulnerability--;
-        if ((p->invulnerability >> 2) & 1)
+    if (p->collider.responseValue) {
+        p->collider.responseValue--;
+        if ((p->collider.responseValue >> 2) & 1)
             p->sprite.display.flags |= 1;
         else
             p->sprite.display.flags &= ~1;

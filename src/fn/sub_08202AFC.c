@@ -1,19 +1,11 @@
-#include "global.h"
-struct E {
-    u8 p[0x128];
-};
-struct A {
-    u8 p0[0x18];
-    u32 w18;
-    u8 p1[0x1c - 0x1c];
-    struct E e[16];
-};
-struct E *ProjectilePool_FindFreeSlot(struct A *a, s32 *out)
+#include "projectile_pool.h"
+
+struct ProjectileSlot *ProjectilePool_FindFreeSlot(struct TimedProjectilePool *pool, s32 *out)
 {
-    struct E *e = a->e;
+    struct ProjectileSlot *e = pool->slots;
     s32 i = 0;
     u32 m = 1;
-    u32 w = a->w18;
+    u32 w = pool->mask;
     do {
         if ((m << i & w) != 0) {
             i++;

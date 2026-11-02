@@ -51,7 +51,8 @@ struct PlayerStatModifierContext {
     struct PlayerActionEntry *actionEntry; /* owner + 0xBF0: descriptor source */
     u8 actionKind;                         /* owner + 0xBF4 */
     u8 statBOverrideEnabled;               /* owner + 0xBF5 */
-    u8 unknownB2[2];
+    u8 bufferedAttack; /* owner + 0xBF6: queues an attack restart during release */
+    u8 unknownB3;
     u16 actionDuration, actionPhase, actionTimer; /* owner + 0xBF8 */
     u16 contactParameter;                         /* owner + 0xBFE */
     u16 contactExtentA;                           /* owner + 0xC00 */
@@ -62,10 +63,13 @@ struct PlayerStatModifierContext {
     u16 contactTimer;    /* owner + 0xC0A */
     u8 contactHeading;   /* owner + 0xC0C */
     s8 savedActionIndex; /* owner + 0xC0D: snapshot from Player_GetActionIndex (tentative) */
-    u8 unknownCA[0xA];
+    u8 unknownCA;
+    u8 chargeTier;     /* owner + 0xC0F: charge attacks select tiers zero through two */
+    u16 chargeDuration; /* owner + 0xC10: initialized to 60 by attached attack setup */
+    u8 unknownCE[6];
     u8 statBOverrideMode;  /* owner + 0xC18: seven selects GameState stat B */
     u8 thresholdSatisfied; /* owner + 0xC19, tentative */
-    u8 unknownD6[2];
+    s16 previousAnimation; /* owner + 0xC1A: -1 requests a fresh attack animation */
     u8 actionSelectionDisplay[0x50]; /* owner +0xC1C: configured by 0814DE0C */
     u8 unknown128[8];
     s32 attachedEntry;              /* owner + 0xC74: negative means absent */
@@ -207,7 +211,7 @@ struct Player {
     u16 currentStatA, maximumStatA;             /* 0x424: tentative health-like stat */
     u16 currentStatB, maximumStatB;             /* 0x428: tentative energy-like stat */
     u16 statHundredths, statWhole, statusValue; /* 0x42C */
-    u8 unk432[2];
+    u8 unk432[2]; /* 0x432: pending action mode and its valid flag, consumed by 08156FE0. */
     u16 statScale; /* 0x434: initialized to 64 by 0813B67C */
     u8 unk436[0xC];
     u16 particleEmissionCount; /* 0x442 */
@@ -270,9 +274,10 @@ struct Player {
     u16 positionResetTimer, positionResetCounter; /* 0x4D8 */
     u8 unk4DC[4];
     u8 cueVariant; /* 0x4E0: copied by 0815B404, tentative */
-    u8 unk4E1[7];
+    u8 unk4E1[5];
+    u16 formCueParameterA; /* 0x4E6: set to 6 for form two, cleared when its cue exits. */
     u16 terrainRecoveryCounter; /* 0x4E8 */
-    u8 unk4EA[2];
+    u16 formCueParameterB; /* 0x4EA: paired with formCueParameterA. */
     u16 actionCountdown;      /* 0x4EC: mode phase subtracts thirty per update */
     u8 actionEighteenEnabled; /* 0x4EE: selects phase one and refreshes action parameters */
     u8 unk4EF[3];

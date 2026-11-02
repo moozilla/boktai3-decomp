@@ -4,6 +4,30 @@
 #include "ram.h"
 #include "engine_globals.h"
 
+/* Several effects build this fixed RAM pointer a halfword at a time. */
+union ParticleRandomTableSource {
+    const u16 *table;
+    u16 halves[2];
+};
+static inline const u16 *ParticleRandom_GetTable(const union ParticleRandomTableSource *source)
+{
+    return source->table;
+}
+
+static inline const u16 *ParticleRandom_SampleAddress(const u16 *table, u32 index)
+{
+    return (const u16 *)(index * sizeof(*table) + (u32)table);
+}
+static inline u32 ParticleRandom_NextSample(const u16 *table, u32 *seed, u32 mask)
+{
+    u32 index = (*seed + 1) & mask;
+    const u16 *sample;
+    *seed = index;
+    sample = ParticleRandom_SampleAddress(table, *seed);
+    return *sample;
+}
+
+
 /* The original draw code retains this numeric origin before rebasing to the sample table. */
 #define PARTICLE_RANDOM_SAVE_ORIGIN(out_, origin_)                                                 \
     do {                                                                                           \

@@ -1,4 +1,4 @@
-#include "global.h"
+#include "vanargand_effect.h"
 // confidence=low: action role inferred from local animation, motion and effects.
 #include "contact_swarm.h"
 #include "display_sequence_inline.h"
@@ -21,10 +21,7 @@ struct VanargandPart {
     u8 unknown17C[0x20];
     u32 flashTimer;
 };
-void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
-void MotionTrack_Update(void *);
 extern const s16 gUnk_086149C4[];
-void *VanargandEffect_Create(s32, s32, void *, void *, u32);
 void ActorStatus_Deactivate(void *, void *);
 void Sound_PlaySong(u32);
 void CpuSet(const void *, void *, u32);
@@ -32,14 +29,14 @@ static inline s32 Scale(s32 x)
 {
     return x >= 0 ? x >> 12 : -((-x) >> 12);
 }
-static inline void Vector(struct ContactPosition *v, s32 angle, s32 scale)
+static inline void Vector(struct MotionTrackVector *v, s32 angle, s32 scale)
 {
     v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * scale);
     v->y = 0;
     v->z = Scale(gUnk_086149C4[angle & 255] * scale);
 }
-static inline void Add(struct ContactPosition *v, struct ContactPosition *a,
-                       struct ContactPosition *b)
+static inline void Add(struct MotionTrackVector *v, const struct ContactPosition *a,
+                       struct MotionTrackVector *b)
 {
     v->x = b->x + a->x;
     v->y = b->y + a->y;
@@ -134,8 +131,8 @@ void Vanargand_EmitRadialPartEffects(struct VanargandPartOwner *boss, struct Van
     p->flags |= mask;
     p->flags |= 128;
     if (p->reset) {
-        struct ContactPosition zero;
-        struct ContactPosition point;
+        struct MotionTrackVector zero;
+        struct MotionTrackVector point;
         u32 *state;
         u32 *timer;
         s32 i;

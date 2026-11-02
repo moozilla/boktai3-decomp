@@ -1,29 +1,26 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-extern u8 *gGameState;
+#include "game_state.h"
 s32 Div(s32, s32);
-static inline u32 Bonus(u8 *p, u32 mask)
+static inline u32 Bonus(struct Player *p, u32 mask)
 {
-    u32 offset;
     u32 *field;
     u32 bits;
     if (!p)
         return 0;
-    offset = 0x444;
-    field = (u32 *)(p + offset);
+    field = &p->statBonusFlags;
     bits = mask;
     return *field & bits;
 }
-static inline u32 Both(u8 *p)
+static inline u32 Both(struct Player *p)
 {
     u32 *field;
     register u32 bits asm("r0");
     u32 value;
     if (!p)
         return 1;
-    bits = 0x444;
-    field = (u32 *)(p + bits);
+    field = &p->statBonusFlags;
     bits = 0x8000;
     value = *field;
     bits &= value;
@@ -39,7 +36,8 @@ static inline u32 Both(u8 *p)
 void Player_AddExperience(s32 input)
 {
     s32 amount = input;
-    if (*(s16 *)(gGameState + 0x5A8) == 6)
+    struct GameState *save = gGameState;
+    if (save->form == 6)
         return;
     if (!Both(gPlayers[0])) {
         if (Bonus(gPlayers[0], 0x8000))
@@ -48,9 +46,10 @@ void Player_AddExperience(s32 input)
             amount = Div(amount, 2);
     }
     {
-        s32 total = *(s32 *)(gGameState + 0x48) + amount;
-        *(s32 *)(gGameState + 0x48) = total;
+        s32 *reward = &gGameState->rewardTotal;
+        s32 total = *reward + amount;
+        *reward = total;
         if (total > 999998)
-            *(s32 *)(gGameState + 0x48) = 999999;
+            gGameState->rewardTotal = 999999;
     }
 }

@@ -43,6 +43,15 @@ struct SceneHudSecondaryOption {
     s8 value;
     u8 unknown1[7];
 };
+struct SceneHudNavigationPage {
+    u8 map;
+    u8 unknown1, focusX, focusY, widthTiles, heightTiles;
+    s8 neighbors[4];
+    u8 solidLinks;
+    s8 alternate[4];
+    u8 message;
+};
+
 /* Scene HUD owner: offsets established by 081651B0, 081658C8 and its initializer 08178FC8. */
 struct SceneHudState {
     u8 unknown0[0x18];
@@ -82,7 +91,8 @@ struct SceneHudState {
     u16 initializationState; /* 0xA5C */
     u8 controlMode;          /* 0xA5E: modes above two suppress controls */
     s8 previousPage;         /* 0xA5F: initialized to -1 */
-    u8 unknownA60[4];
+    u8 unknownA60[2];
+    u16 energyMeterBlinkTimer; /* 0xA62: advances while the energy meter flashes */
     u16 meterPulseFrame; /* 0xA64: 60-frame HUD meter pulse */
     u8 unknownA66[8];
     u16 timedStateParameter;            /* 0xA6E: sixth argument to 081781B4 */
@@ -96,7 +106,9 @@ struct SceneHudState {
     u16 pulseFrame; /* 0xA80: wraps at 128 */
     u8 unknownA82[0x12];
     u8 panelInitialized; /* 0xA94: cleared during gameplay HUD resource setup (tentative) */
-    u8 unknownA95[7];
+    u8 unknownA95[4];
+    u8 energyTimerVisible; /* 0xA99: set after drawing the four energy timer digits */
+    u8 unknownA9A[2];
     struct SceneHudControlAnimation controlAnimation; /* 0xA9C */
     u8 unknownABC[0x41];
     u8 actionRefreshRequested; /* 0xAFD */
@@ -109,8 +121,7 @@ struct SceneHudState {
     s8 primarySelection;         /* 0xC72 */
     u8 primaryBlinkTimer;        /* 0xC73: 60-frame icon blink */
     s16 *primarySelectionOutput; /* 0xC74 */
-    struct SceneHudPrimaryOption primaryOptions[3];
-    u8 unknownC84[4];
+    struct SceneHudPrimaryOption primaryOptions[4];
     struct SceneInputWidget primaryWidgets[3]; /* 0xC88 */
     s8 secondaryFirstValue;  /* 0xDA8: first value of stride-eight option records */
     s8 secondaryUnlockIndex; /* 0xDA9: indexed with stride eight */
@@ -154,7 +165,9 @@ struct SceneHudState {
     struct SceneInputWidget statusIcons[4]; /* 0x31C0 */
     struct SceneInputWidget comparisonIndicators[2]; /* 0x3340 */
     struct SceneInputWidget statMarkers[3][3];       /* 0x3400: base, bonus, delta */
-    u8 unknown3760[0xA80];
+    u8 unknown3760[0x300];
+    struct SceneInputWidget navigationArrows[4]; /* 0x3A60: up, down, left, right. */
+    u8 unknown3BE0[0x600];
     struct SceneInputWidget transferWidgets[2]; /* 0x41E0: hidden after action transfer */
     u8 statusRefreshRequested;                  /* 0x42A0 */
     u8 pageRepeatTimer;                         /* 0x42A1: held shoulder-button repeat */
@@ -199,7 +212,15 @@ struct SceneHudState {
     u16 valueRate;         /* 0x48EA */
     u16 balanceLimitTimer; /* 0x48EC: frames left of the over-limit warning */
     u16 balanceLimitShown; /* 0x48EE: over-limit message already shown */
-    u8 unknown48F0[0x4988 - 0x48F0];
+    u8 unknown48F0[8];
+    struct SceneHudNavigationPage *navigationPages; /* 0x48F8 */
+    u8 unknown48FC[8];
+    u8 navigationPage, showAllMapLinks;
+    u8 unknown4906[2];
+    s8 navigationDestinations[4]; /* -1 when there is no displayed link. */
+    u8 unknown490C[0x10];
+    u16 currentMapPage; /* 0x491C */
+    u8 unknown491E[0x4988 - 0x491E];
     struct SceneInputWidget ownerWidgets[2]; /* 0x4988: removed by owner destructor */
     u8 unknown4A48[0x28];
     struct SceneInputWidget ownerAuxWidgets[6]; /* 0x4A70 */

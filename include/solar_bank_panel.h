@@ -5,6 +5,9 @@ struct SolarBankDigit {
     u32 flags;
     u8 unkC[0x54];
 };
+struct SolarBankIndicatorAnimation {
+    u8 data[0x1C];
+};
 struct SolarBankPanel {
     u8 unk0[0x18];
     u8 labelData[0x20];
@@ -15,11 +18,13 @@ struct SolarBankPanel {
     u8 unk1D8[0x60];
     struct SolarBankDigit balanceDigits[4];
     struct SolarBankDigit transferDigits[4];
-    u8 unk538[0x1b0];
+    u8 unk538[0x6B0 - 0x538];
+    struct SolarBankIndicatorAnimation indicators[2];
     void *layerMap;
     u8 unk6EC[8];
     s32 transferAmount;
     s32 balance;
-    u8 unk6FC[0xe];
+    u8 unk6FC[4];
+    u16 blinkPhase, holdFrames, repeatSpeed, animationTimer, transferDirection;
     u16 selection;
 };

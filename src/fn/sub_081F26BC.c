@@ -1,23 +1,14 @@
 /* Tentative family and field names, based on static accesses. */
-#include "global.h"
-struct SpriteGroupSlot {
-    u8 resetRequested, state, unknown2[0x256];
-};
-struct SpriteGroup {
-    u8 unknown0[0x18];
-    u32 activeSlots;
-    u8 unknown1C[4];
-    struct SpriteGroupSlot slots[4];
-};
+#include "sprite_trail.h"
 extern void *gUnk_08613E08[];
 #define gSpriteGroupSlotCallbacks gUnk_08613E08
 void sub_08249244(void *, void *, s32, void *);
-u32 SpriteGroup_UpdateSlots(struct SpriteGroup *p)
+u32 SpriteGroup_UpdateSlots(struct SpriteTrailPool *p)
 {
-    struct SpriteGroupSlot *slot = p->slots;
+    struct SpriteTrail *slot = p->entries;
     s32 i = 0;
     do {
-        if (p->activeSlots & (1 << i))
+        if (p->activeMask & (1 << i))
             sub_08249244(p, slot, i, gUnk_08613E08[slot->state]);
         i++;
         slot++;

@@ -1,19 +1,18 @@
-#include "global.h"
-struct Pair3B {
-    u32 a, b;
-};
-u8 *Task_Create(u32, u32);
-void Task_SetCallbacks(u8 *, void (*)(u8 *), void (*)(u8 *));
-void Task_Kill(u8 *);
-void VanargandEffect_Update(u8 *);
-void VanargandEffect_Destroy(u8 *);
-s32 VanargandEffect_Initialize(u8 *, struct Pair3B *, u32, u32, u32, u32);
-u8 *VanargandEffect_Create(struct Pair3B *p, u32 a, u32 b, u32 c, u32 d)
+#include "vanargand_effect.h"
+void *Task_Create(u32, u32);
+void Task_SetCallbacks(struct VanargandEffect *, void (*)(struct VanargandEffect *),
+                       void (*)(struct VanargandEffect *));
+void Task_Kill(void *);
+
+struct VanargandEffect *VanargandEffect_Create(s32 variant, s32 delay,
+                                               const struct MotionTrackVector *position,
+                                               const struct MotionTrackVector *target,
+                                               u32 alternate)
 {
-    u8 *obj = Task_Create(8, 0xA0);
+    struct VanargandEffect *obj = Task_Create(8, sizeof(*obj));
     if (obj) {
         Task_SetCallbacks(obj, VanargandEffect_Update, VanargandEffect_Destroy);
-        if (VanargandEffect_Initialize(obj, p, a, b, c, d) < 0) {
+        if (VanargandEffect_Initialize(obj, variant, delay, position, target, alternate) < 0) {
             Task_Kill(obj);
             return 0;
         }

@@ -80,7 +80,8 @@ struct GameState {
     u8 unk594[2];
     s16 flags596; /* (guess) bit mask, bits 0-9 */
     s16 solarBankRate; /* 0x598: daily balance multiplier, in units of 1/64 */
-    u8 unk59A[6];
+    u8 unk59A[4];
+    s16 lap; /* Extra-playthrough indicator on the save summary. */
     s32 region; /* current region/scene id (guess); compared by interactable controllers */
     u32 unk5A4;
     s16 form; /* (guess) selects behavior in TextState_GetPairSpeakerLabel */

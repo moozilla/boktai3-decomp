@@ -1,13 +1,7 @@
-#include "global.h"
+#include "date_entry_menu.h"
 #include "menu_parameters.h"
 #include "input.h"
 
-struct DateMenu {
-    u8 graphics[0x6D8];
-    s32 selection, timer, fadeShift, state, result;
-    s32 year, month, day, hour, minute;
-    s32 oldYear, oldMonth, oldDay, oldHour, oldMinute;
-};
 extern u8 gSunClock[];
 void Sound_PlaySong(s32);
 void AnimPanel_HandleClockInput(void *);
@@ -54,7 +48,7 @@ void Time_UpdateDateMenu(struct DateMenu *p)
                 p->result = 1;
             }
             Password_UpdateCursorPanel(p);
-            Palette_UpdateHighlightPulse((u8 *)p + 0x734, (u8 *)p + 0x73C);
+            Palette_UpdateHighlightPulse(&p->colors[12], p->pulseState);
             break;
         case 1:
             if (p->timer > (1 << p->fadeShift)) {
