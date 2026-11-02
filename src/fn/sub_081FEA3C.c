@@ -1,9 +1,9 @@
-#include "global.h"
-u8 *SunOrb_GetPositionFromManager(u8 *p, s32 i)
+#include "sun_orb_effect.h"
+struct OrbitEffectPosition *SunOrb_GetPositionFromManager(struct OrbitEffectManager *p, s32 i)
 {
-    u8 *r;
+    struct OrbitEffectPosition *r;
     if (p != 0)
-        r = (u8 *)(i * 0x3ac + (u32)p) + 0x88;
+        r = &p->slots[i].sprite.position;
     else
         r = 0;
     return r;
