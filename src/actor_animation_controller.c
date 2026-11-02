@@ -3833,7 +3833,6 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingGrowth(struct ActorAnimController *p)
 {
     s32 x, y;
@@ -3855,7 +3854,6 @@ void Actor_UpdateRotatingGrowth(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingShrink(struct ActorAnimController *p)
 {
     s32 x, y;
