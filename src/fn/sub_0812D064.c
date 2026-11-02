@@ -2,6 +2,7 @@
 #include "scene_indicator.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
 extern const s16 gUnk_086149C4[];
 void SpriteEffectController_Create(void *, const void *, s32, u32, u32, u32, u32, u32, u32, u32,
@@ -24,9 +25,9 @@ static inline u32 Random(const u16 *table)
 
 void LargeFragmentEffect_SpawnRandomParticle(struct Vec *position)
 {
-    /* The inlined random helper retains this unused address. */
-    register u32 opaque asm("r12") = 0x0403B714;
-    const u16 *table = gRandomTable;
+    u32 savedOrigin;
+    register u32 origin asm("r12");
+    const u16 *table;
     struct Vec velocity;
     struct Vec *v;
     u32 *cursor;
@@ -36,7 +37,9 @@ void LargeFragmentEffect_SpawnRandomParticle(struct Vec *position)
     s32 radius, lifetime;
     const u16 *source;
     const u8 *sample;
-    asm volatile("" : "+r"(opaque));
+    origin = PARTICLE_RANDOM_SAMPLE_ORIGIN;
+    asm volatile("" : "+r"(origin));
+    table = gRandomTable;
     index = ((cursor = &gRandomIndex), *cursor + 1) & 1023;
     sample = (const u8 *)(index * 2 + (u32)table);
     mask = 255;
@@ -52,8 +55,7 @@ void LargeFragmentEffect_SpawnRandomParticle(struct Vec *position)
     }
     {
         s32 product = gUnk_086149C4[(angle + 64) & mask] * radius;
-        register u32 scratch asm("r5") = opaque;
-        asm volatile("" : : "r"(scratch));
+        PARTICLE_RANDOM_SAVE_ORIGIN(savedOrigin, origin);
         v->x = Truncate(product);
     }
     v->y = 0;
@@ -63,9 +65,9 @@ void LargeFragmentEffect_SpawnRandomParticle(struct Vec *position)
         asm("" : : "r"(angle));
         v->z = Truncate(product);
     }
-    source = (const u16 *)0x0203B400;
-    velocity.y = (Random(source) & 31) + 12;
-    lifetime = (Random(source) & 63) + 20;
+    source = (const u16 *)RANDOM_TABLE_ADDR;
+    velocity.y = (ParticleRandom_ReadRelativeSample(savedOrigin, source) & 31) + 12;
+    lifetime = (ParticleRandom_ReadRelativeSample(savedOrigin, source) & 63) + 20;
     SpriteEffectController_Create(position, &velocity, 0x1C1A, 0xD1B8, 3, 0, 0x31, 0, 2, 0, 0,
                                   lifetime, 4, 1, 0x200004, 30, 8, 8);
 }
