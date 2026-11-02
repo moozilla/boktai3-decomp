@@ -227,6 +227,21 @@ def context_key(text):
     return "".join(t for t in tokens if not t.isspace())
 
 
+def only_additions(now, draft):
+    """The number of non-blank lines DRAFT adds to NOW when every other line of NOW is kept in order
+    (whitespace ignored), else None: a draft that only adds a helper or declaration outside FUNC."""
+    import difflib
+    a = [ln.strip() for ln in now.splitlines() if ln.strip()]
+    b = [ln.strip() for ln in draft.splitlines() if ln.strip()]
+    added = 0
+    for op, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
+        if op == "insert":
+            added += j2 - j1
+        elif op != "equal":
+            return None
+    return added
+
+
 def merge(current, base, draft):
     """Three-way merge of a unit: the draft was made from BASE; CURRENT is the file now. None on conflict."""
     if current == base:

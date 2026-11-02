@@ -46,6 +46,15 @@ class LandMatched(unittest.TestCase):
         self.assertIn("void A(void)", rest)
         self.assertIn("INCLUDE_ASM", rest)
 
+    def test_only_additions_counts_a_new_helper(self):
+        helper = "static inline int H(void)\n{\n    return 1;\n}\n\n"
+        self.assertEqual(land.only_additions(UNIT, helper + UNIT), 4)
+        self.assertEqual(land.only_additions(UNIT, UNIT.replace("    ", "\t")), 0)
+
+    def test_only_additions_refuses_a_changed_line(self):
+        self.assertIsNone(land.only_additions(UNIT, UNIT.replace("void A(void)", "void A(int)")))
+        self.assertIsNone(land.only_additions(UNIT, UNIT.replace('#include "global.h"\n', "")))
+
 
 if __name__ == "__main__":
     unittest.main()
