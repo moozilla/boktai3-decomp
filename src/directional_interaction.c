@@ -159,12 +159,12 @@ u32 DirectionalController_ReleaseTarget(struct DirectionalManager *manager, s32 
     manager->pending = 1;
 }
 
-static inline s32 facingAllowed(u32 facing, s32 a, s32 b, s32 c)
+static inline u8 facingAllowed(u32 facing, s32 a, s32 b, s32 c)
 {
-    register u32 yes asm("r1") = 1;
-    if (a == facing || b == facing || c == facing)
-        return yes;
-    return 0;
+    u8 allowed = 1;
+    if (a != facing && b != facing && c != facing)
+        allowed = 0;
+    return allowed;
 }
 
 static inline s32 facingAllowedR2(u32 facing, s32 a, s32 b, s32 c)
