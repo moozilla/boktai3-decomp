@@ -152,13 +152,6 @@ void ActorPalette_BeginReverseFade(struct ActorAnimController *p)
 
 // Provisional name: ActorPalette_UpdateReverseFade
 
-static inline u32 mode_bits(u8 *p, u32 mask)
-{
-    register u32 v asm("r1") = *p;
-    u32 result = mask & v;
-    return result;
-}
-
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 
 void ActorPalette_UpdateReverseFade(struct ActorAnimController *p)
