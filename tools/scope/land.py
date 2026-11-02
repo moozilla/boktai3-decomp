@@ -163,16 +163,20 @@ def single_use_macros(text, path=None):
 
 
 def concessions(text, path=None):
-    pins = len(re.findall(r'\basm\("r\d+"\)|\basm\("(?:sb|sl|fp|ip)"\)', text))
-    bars = len(re.findall(r'\basm(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', text))
-    # an empty `do { } while (0)` acts as a barrier: its loop notes end cse blocks and weight refs
-    bars += len(re.findall(r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)|\bDEBUG_NOP\s*\(\s*\)', text))  # DEBUG_NOP() is one
-    # a do { ... } while (0) macro used at only one site is a priority knob, so a barrier too:
-    # a statement macro is ordinary C only when several functions share it
-    bars += len(single_use_macros(text, path))
-    # as does an if with nothing in its body (one whose body is DEBUG_PRINT(), include/debug.h, is plain C)
-    bars += len(re.findall(r'\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{\s*\}|;)',
-                           re.sub(r"//[^\n]*|/\*.*?\*/", "", text, flags=re.S)))
+    """(TEXT with its MATCHING_CONCESSION marker brought up to date, pins, other concessions):
+    the kinds in tools/concessions.py, less the ones a concession-ok comment excuses. A statement
+    macro used at only one site in the tree counts as one; PATH is the file TEXT replaces."""
+    tools = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    import concessions as kinds
+    rel = os.path.relpath(path, os.path.dirname(tools)) if path else None
+    found = kinds.counted(kinds.sites(text, rel, single_use=frozenset(single_use_macros(text, path)),
+                                      kinds=kinds.SCORED))
+    flags = kinds.cflags(text, rel)
+    found += kinds.counted([flags] if flags else [])
+    pins = sum(s.kind == "pin" for s in found)
+    bars = len(found) - pins + sum(not ok for ok in kinds.aliases(text, rel).values())
     if (pins or bars) and MARKER not in text:
         text = MARKER + "\n" + text
     if not (pins or bars) and MARKER in text:
@@ -210,14 +214,15 @@ def added_concessions(before, after, path=None):
 
 def pin_refusal(func, pins, bars, unit):
     what = " and ".join(x for x in (f"{pins} register pin{'s' * (pins != 1)}" if pins else "",
-                                    f"{bars} asm barrier{'s' * (bars != 1)}" if bars else "") if x)
+                                    f"{bars} other concession{'s' * (bars != 1)} (asm barriers, empty "
+                                    "bodies, volatile locals, ...; tools/concessions.py)" if bars else "") if x)
     return (f"{func}: not landed: this match adds {what}.\n"
             "Pins are a last resort: the project is removing them (phase 3), so each one is work to undo later,\n"
             "and the C that gives the same allocation has usually turned out easier to find than it looked.\n"
             f"  scope.py {unit} pins       what removing each one costs, and the free ones\n"
             "  docs/WORKER.md \"Stay on a function until it matches\"   the approaches to try first\n"
             "If you have tried those and the function still needs them, land it anyway with --allow-pins:\n"
-            "the unit gets the MATCHING_CONCESSION marker and counts as Register-pinned. Say why in its note.")
+            "the unit gets the MATCHING_CONCESSION marker and counts under With concessions. Say why in its note.")
 
 
 def context_key(text):

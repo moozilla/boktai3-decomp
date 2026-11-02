@@ -1,10 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_control.h"
 s32 SceneInventory_ClassifyItemMove(struct SceneInventoryControlView *panel)
 {
+    s32 second;
     if (panel->grid.savedSelection <= 15) {
         s32 first = Inventory_GetItemId(panel->grid.savedSelection);
-        s32 second = Inventory_GetItemId(panel->grid.selection);
+        second = Inventory_GetItemId(panel->grid.selection);
         if (panel->grid.savedSelection == panel->grid.selection)
             return 0;
         if (first < 0 && second < 0)
@@ -17,8 +17,7 @@ s32 SceneInventory_ClassifyItemMove(struct SceneInventoryControlView *panel)
             return 4;
         }
         if (panel->grid.selection <= 15) {
-            register s32 second asm("r1") = Inventory_GetItemId(panel->grid.selection);
-            asm("" : "+r"(second));
+            second = Inventory_GetItemId(panel->grid.selection);
             if (second < 0)
                 return 4;
         }

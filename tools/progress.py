@@ -254,12 +254,6 @@ def check_tails(elf, source_root=Path(ROOT) / "src"):
 
 
 MARK = "// MATCHING_CONCESSION: register-pinning"
-# an empty `do { } while (0)` counts too: its loop notes end cse blocks and weight refs like a barrier
-EMPTY_LOOP = r'\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)|\bDEBUG_NOP\s*\(\s*\)'  # DEBUG_NOP() expands to one
-# so does an if with nothing in its body; one whose body is DEBUG_PRINT() (include/debug.h) is ordinary C
-EMPTY_IF = r'\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{(?:\s|/\*.*?\*/|//[^\n]*)*\}|;)'
-HINT = re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*(?:volatile\s*)?\(\s*""'
-                  r'|\basm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)|' + EMPTY_LOOP + '|' + EMPTY_IF)
 
 
 def _bodies(text):
@@ -283,73 +277,108 @@ def _bodies(text):
     return bodies
 
 
-def _hinted_helpers(bodies, known=frozenset()):
-    """Static helpers/macros that use hints, directly or via another such helper."""
+def _calls(body, helpers):
+    """Lines of BODY (1-based) that call one of HELPERS."""
+    if not helpers:
+        return set()
+    import concessions
+    code = concessions.strip(body)
+    ok = concessions.allows(body)  # a single-use macro's site can carry its own concession-ok
+    rx = re.compile(r"\b(" + "|".join(map(re.escape, sorted(helpers))) + r")\s*\(")
+    lines = {code.count("\n", 0, m.start()) + 1 for m in rx.finditer(code)}
+    return {ln for ln in lines if not {"single-use-macro", "alias"} & set(ok.get(ln, {}))}
+
+
+def concession_lines(body, path=None, helpers=frozenset()):
+    """The lines of BODY that hold a scored concession (tools/concessions.py) or call a helper
+    that does."""
+    import concessions
+    found = concessions.counted(concessions.sites(body, path, kinds=concessions.SCORED))
+    return {s.line for s in found} | _calls(body, helpers)
+
+
+def _hinted_helpers(bodies, known=frozenset(), path=None):
+    """Static helpers/macros with a concession, directly or via another such helper."""
     helpers = set(known)
     while True:
-        uses = re.compile(r"\b(" + "|".join(map(re.escape, helpers)) + r")\s*\(") if helpers else None
         more = {n for n, (static, body) in bodies.items() if static and n not in helpers and
-                (HINT.search(body) or (uses and uses.search(body)))}
+                concession_lines(body, path, helpers)}
         if not more:
             return helpers
         helpers |= more
 
 
 def header_helpers(roots=("include", "src")):
-    """Hinted static inline helpers and macros defined in headers, plus every statement macro
-    used at only one site in the tree (tools/statement_macros.py): a single-use
-    `do { ... } while (0)` wrapper is a priority knob, so it counts as a barrier."""
+    """Static inline helpers and macros defined in headers that hold a concession, plus every
+    statement macro used at only one site in the tree (tools/statement_macros.py): a single-use
+    `do { ... } while (0)` wrapper is a priority knob, so it counts as one too."""
     from statement_macros import single_use_names
-    bodies = {}
+    helpers = set(single_use_names(Path(ROOT)))
     for root in roots:
         for path in sorted((Path(ROOT) / root).rglob("*.h")):
-            bodies.update(_bodies(path.read_text()))
-    return _hinted_helpers(bodies, frozenset(single_use_names(Path(ROOT))))
+            helpers = _hinted_helpers(_bodies(path.read_text()), frozenset(helpers),
+                                      path.relative_to(ROOT))
+    return helpers
 
 
-def hinted_functions(text, names, shared=frozenset()):
-    """Functions of a unit that use register pins or asm barriers, directly or
-    through a static helper (in the unit or a header) that does."""
+def unit_helpers(text, path=None, shared=frozenset()):
+    """Names whose calls are concessions in this unit: SHARED, the unit's static helpers that
+    hold one, and functions it declares under a second prototype with an unexcused asm("Symbol")."""
+    import concessions
+    alias = {n for n, excused in concessions.aliases(text, path).items() if not excused}
+    return _hinted_helpers(_bodies(text), frozenset(shared) | alias, path)
+
+
+def unit_scores(text, names, path=None, shared=frozenset()):
+    """{name: progress percent} for the functions of a unit that hold a concession
+    (tools/concessions.py score: the share of the function's lines without one)."""
+    import concessions
     bodies = _bodies(text)
-    helpers = _hinted_helpers(bodies, shared)
-    uses = re.compile(r"\b(" + "|".join(map(re.escape, helpers)) + r")\s*\(") if helpers else None
-    return [n for n in names if n in bodies and (HINT.search(bodies[n][1]) or
-                                               (uses and uses.search(bodies[n][1])))]
+    helpers = unit_helpers(text, path, shared)
+    flags = concessions.cflags(text, path)
+    extra = int(bool(flags and not flags.excused))  # a compiler override touches every function
+    scores = {}
+    for n in names:
+        if n in bodies:
+            lines = len(concession_lines(bodies[n][1], path, helpers)) + extra
+            if lines:
+                scores[n] = concessions.score(bodies[n][1], lines)
+    return scores
 
 
-HINT_KINDS = [
-    ("pin", re.compile(r'\bregister\b[^;]*\basm\s*\(\s*"\w+"\s*\)|\basm\s*\(\s*"(?:r\d+|sl|fp|ip|sb|lr)"\s*\)')),
-    ("clobber", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""[^;]*:\s*"(?:r\d+|sl|fp|ip|lr)"')),
-    ("operand", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*:[^;:]*\(')),
-    ("barrier", re.compile(r'\basm\s*(?:volatile\s*)?\(\s*""\s*(?:\)|:\s*:\s*:\s*"memory")')),
-    ("empty-loop", re.compile(EMPTY_LOOP)),
-    ("empty-if", re.compile(EMPTY_IF)),
-]
+def hinted_functions(text, names, shared=frozenset(), path=None):
+    """Functions of a unit that hold a concession, directly or through a helper that does."""
+    return [n for n in names if n in unit_scores(text, names, path, shared)]
 
 
-def hint_kinds(text):
+def hint_kinds(text, path=None):
+    """The scored concession kinds TEXT holds, in tools/concessions.py order."""
+    import concessions
     from statement_macros import single_use_names
-    kinds = [k for k, r in HINT_KINDS if r.search(text)]
-    once = single_use_names(Path(ROOT))
-    if once and re.search(r"\b(" + "|".join(map(re.escape, sorted(once))) + r")\s*\(", text):
-        kinds.append("single-use-macro")
-    return kinds
+    once = frozenset(single_use_names(Path(ROOT)))
+    found = {s.kind for s in concessions.counted(concessions.sites(text, path, single_use=once))}
+    return [k for k in concessions.SCORED if k in found]
 
 
-def collect_pinned(funcs, source_root):
-    """Matched functions that rely on register pins or empty asm() hints
-    (barriers, "+r"/"r" operands, "rN"/"memory" clobbers), directly or through
-    a static helper or macro in the unit or a header. Detected from the source
-    itself, outside NONMATCHING drafts, so a missing MATCHING_CONCESSION marker
-    does not hide one."""
+def concession_scores(funcs, source_root):
+    """{name: percent} for the matched functions that hold a concession, directly or through a
+    helper, a second prototype or the unit's compiler flags. Detected from the source itself,
+    outside NONMATCHING drafts, so a missing MATCHING_CONCESSION marker does not hide one."""
     aliases = {f"sub_{a:08X}": n for n, a in funcs}
     shared = header_helpers()
-    pinned = set()
+    scores = {}
     for path in Path(source_root).rglob("*.c"):
         text, _ = split_nonmatching(path.read_text())
         names = c_functions(path, with_asm=False)
-        pinned.update(aliases.get(n, n) for n in hinted_functions(text, names, shared))
-    return pinned
+        rel = path.resolve().relative_to(Path(ROOT).resolve()) if path.is_absolute() else path
+        for n, s in unit_scores(text, names, rel, shared).items():
+            scores[aliases.get(n, n)] = s
+    return scores
+
+
+def collect_pinned(funcs, source_root):
+    """Matched functions that hold a concession (see concession_scores)."""
+    return set(concession_scores(funcs, source_root))
 
 
 def list_pinned(funcs, sizes, pinned, source_root):
@@ -511,13 +540,21 @@ def collect_fuzzy(funcs, source_root):
 
 
 def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems=(), fuzzy=None, areas=None,
-                asm_ranges=(), categories=None):
+                asm_ranges=(), categories=None, concession=None):
     """objdiff v2 report. With categories, every unit is named Category/Unit, belongs
     to one top-level category, and units are listed category by category, so
-    decomp.dev's treemap shows each category as one region."""
+    decomp.dev's treemap shows each category as one region.
+
+    A function counts as matched (100) only when it compiles byte for byte with no concession.
+    CONCESSION maps the matched functions that hold one to their score (concession_scores:
+    the share of their lines without one), so decomp.dev's matched code is the concession-free
+    code and its fuzzy measure shows how close the rest is. A pinned function missing from
+    CONCESSION keeps 100."""
     fuzzy = fuzzy or {}
     areas = areas or {}
-    score = lambda n: 100 if n in done else fuzzy.get(n, 0)
+    concession = concession or {}
+    score = lambda n: concession.get(n, 100) if n in done else fuzzy.get(n, 0)
+    clean = {n for n in done if score(n) == 100}
     asm = intentional_asm(funcs, done, asm_ranges)
     counted = [(n, a) for n, a in funcs if n not in asm]
     libraries = sorted([*libraries, *subsystems], key=lambda group: group["start"])
@@ -578,11 +615,11 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
     for unit in units:
         unit.pop("_first")
     categories_out = []
-    for cid, label in [("no_register_pinning", "No register pinning"), ("register_pinned", "Register-pinned")]:
+    for cid, label in [("no_register_pinning", "Without concessions"), ("register_pinned", "With concessions")]:
         members = [n for n, _ in counted if (n in pinned) == (cid == "register_pinned")]
         if not members:
             continue
-        matched = [n for n in members if n in done]
+        matched = [n for n in members if n in clean]
         selected = [u for u in units if cid in u["metadata"]["progress_categories"]]
         categories_out.append({"id": cid, "name": label, "measures": measures(
             sum(sizes[n] for n in members), sum(sizes[n] for n in matched),
@@ -606,7 +643,7 @@ def make_report(funcs, sizes, done, libraries=(), pinned=frozenset(), subsystems
             fuzzy_b=sum(u["measures"]["fuzzy_match_percent"] * int(u["measures"]["total_code"]) / 100 for u in selected))})
     counted_units = [u for u in units if not u["name"].endswith(ASM_SUFFIX)]
     return {"version": 2, "categories": categories_out, "measures": measures(sum(sizes[n] for n, _ in counted),
-            sum(sizes[n] for n in done), len(counted), len(done), units=len(counted_units),
+            sum(sizes[n] for n in clean), len(counted), len(clean), units=len(counted_units),
             complete_units=sum(u["metadata"]["complete"] for u in counted_units),
             fuzzy_b=sum(sizes[n] * score(n) / 100 for n, _ in counted)), "units": units}
 
@@ -626,7 +663,8 @@ def main():
               + ", ".join(f"{a:08X}" for a in split), file=sys.stderr)
     funcs, sizes = load_functions(args.inventory, extra=split)
     done = collect_done(funcs, Path(ROOT) / "src")
-    pinned = collect_pinned(funcs, Path(ROOT) / "src") & done
+    concession = {n: s for n, s in concession_scores(funcs, Path(ROOT) / "src").items() if n in done}
+    pinned = set(concession)
     if args.list_pinned:
         list_pinned(funcs, sizes, pinned, Path(ROOT) / "src")
         return
@@ -638,7 +676,7 @@ def main():
     print(f"code bytes: {done_b}/{total_b} ({100 * done_b / total_b:.3f}%)")
     print(f"intentional assembly (not counted above): {len(asm)} functions, {sum(sizes[n] for n in asm)} bytes")
     pinned_b = sum(sizes[n] for n in pinned)
-    print(f"register-pinned: {100 * pinned_b / total_b:.3f}% of total code; no register pinning: {100 * (done_b - pinned_b) / total_b:.3f}%")
+    print(f"with concessions: {100 * pinned_b / total_b:.3f}% of total code; without: {100 * (done_b - pinned_b) / total_b:.3f}%")
     fuzzy = {n: p for n, p in collect_fuzzy(funcs, Path(ROOT) / "src").items() if n not in done}
     draft_b = sum(sizes[n] for n in fuzzy)
     print(f"nonmatching drafts: {len(fuzzy)} functions, {draft_b} bytes ({100 * draft_b / total_b:.3f}% of code)")
@@ -647,7 +685,7 @@ def main():
         libraries = load_libraries(funcs, sizes)
         subsystems = load_groups(funcs, sizes, SUBSYSTEMS, "game")
         report = make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas(),
-                             load_asm_ranges(), categories)
+                             load_asm_ranges(), categories, concession)
         ram = data_measures()
         print(f"RAM data: {ram['matched_data']}/{ram['total_data']} bytes in a shared header "
               f"({ram['matched_data_percent']:.2f}%), {ram['complete_data']} complete")
@@ -657,9 +695,10 @@ def main():
               f"({m['matched_data_percent']:.2f}%)")
     if args.markdown:
         write_markdown(args.markdown, counted, sizes, done, total_b, done_b, pinned_b, fuzzy, report, categories,
-                       asm_b=sum(sizes[n] for n in asm), ram=ram)
+                       asm_b=sum(sizes[n] for n in asm), ram=ram,
+                       concession_counts=concession_counts(Path(ROOT) / "src"))
         write_tree(Path(args.markdown).with_suffix(".json"), report, {a for n, a in funcs if n in pinned},
-                   Path(ROOT) / "src")
+                   Path(ROOT) / "src", {a for n, a in funcs if n in done})
     if args.json:
         Path(args.json).write_text(json.dumps(report, indent=2) + "\n")
 
@@ -683,10 +722,11 @@ def source_files(source_root):
     return files
 
 
-def write_tree(out, report, pinned_addrs, source_root):
+def write_tree(out, report, pinned_addrs, source_root, done_addrs=None):
     """Compact category -> unit -> function JSON: each function is
     [name, address, bytes, percent, pinned, file], plus the name in the C file
-    when that differs. Percent is 100 when matched, else the NONMATCHING
+    when that differs. Percent is 100 when the function compiles byte for byte
+    (pinned says whether it needs a concession for that), else the NONMATCHING
     draft's fuzzy score or 0. File indexes `files`; -1 means
     src/fn/sub_<address>.c and -2 that no C unit holds it yet."""
     files = source_files(source_root)
@@ -701,7 +741,8 @@ def write_tree(out, report, pinned_addrs, source_root):
         for f in unit["functions"]:
             a = int(f["metadata"]["virtual_address"])
             path, defined = files.get(a, (None, None))
-            fn = [f["name"], f"{a:08X}", int(f["size"]), round(f["fuzzy_match_percent"], 1),
+            percent = 100 if done_addrs is not None and a in done_addrs else round(f["fuzzy_match_percent"], 1)
+            fn = [f["name"], f"{a:08X}", int(f["size"]), percent,
                   int(a in pinned_addrs), -2 if path is None else index.get(path, -1)]
             if defined and defined not in (f["name"], f"sub_{a:08X}"):
                 fn.append(defined)
@@ -760,6 +801,7 @@ def subsystem_lines(report, categories):
     lines = ["", "## By subsystem", "",
              "Sections group the report categories; inside each category, units sharing a first word "
              "form a family. The same units (category -> unit -> function) are on decomp.dev.", "",
+             "Matched here means without concessions, as on decomp.dev.", "",
              "| Section / category | Functions | Bytes matched | |", "|---|---:|---:|---|"]
     body = []
     for section, cids in sections:
@@ -786,7 +828,7 @@ def subsystem_lines(report, categories):
             remaining = [(name, f) for name, unit in units for f in unit["functions"]
                          if f["fuzzy_match_percent"] != 100]
             if remaining:
-                body += ["", f"Still to match ({len(remaining)}):", ""]
+                body += ["", f"With concessions ({len(remaining)}; score in brackets):", ""]
                 for name, unit in units:
                     left = [f for f in unit["functions"] if f["fuzzy_match_percent"] != 100]
                     if left:
@@ -806,8 +848,37 @@ def subsystem_lines(report, categories):
     return lines + body
 
 
+def concession_counts(source_root):
+    """{kind: (sites, excused)} across the tree (tools/concessions.py), tracked kinds included."""
+    import concessions
+    from statement_macros import single_use_names
+    once = frozenset(single_use_names(Path(ROOT)))
+    counts = {}
+    for path in sorted([*Path(source_root).rglob("*.c"), *(Path(ROOT) / "include").rglob("*.h")]):
+        text, _ = split_nonmatching(path.read_text())
+        rel = path.relative_to(ROOT)
+        found = concessions.sites(text, rel, single_use=once)
+        flags = concessions.cflags(text, rel)
+        found += [flags] if flags else []
+        found += [concessions.Site(0, "alias", ok) for ok in concessions.aliases(text, rel).values()]
+        for s in found:
+            n, ok = counts.get(s.kind, (0, 0))
+            counts[s.kind] = (n + (not s.excused), ok + s.excused)
+    return counts
+
+
+def concession_lines_md(counts):
+    if not counts:
+        return []
+    import concessions
+    cell = lambda k: f"{counts.get(k, (0, 0))[0]:,}" + (f" (+{counts[k][1]:,} excused)" if counts.get(k, (0, 0))[1] else "")
+    return ["| Concession sites | |", "|---|---:|",
+            *[f"| `{k}` | {cell(k)} |" for k in concessions.SCORED if k in counts],
+            *[f"| `{k}` (tracked, not scored) | {cell(k)} |" for k in concessions.TRACKED if k in counts], ""]
+
+
 def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=None, report=None,
-                   categories=None, asm_b=0, ram=None):
+                   categories=None, asm_b=0, ram=None, concession_counts=None):
     fuzzy = fuzzy or {}
     draft_b = sum(sizes[n] for n in fuzzy)
     mean = sum(sizes[n] * p for n, p in fuzzy.items()) / draft_b if draft_b else 0
@@ -820,8 +891,12 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=N
              "`PROGRESS.json` (the category -> unit -> function tree the `tools/claude-mod` popup reads).", "",
              f"**Code matched in C: {100 * done_b / total_b:.2f}%** "
              f"({done_b:,} / {total_b:,} bytes) — **{len(done)} / {len(funcs)} functions**", "",
-             f"Without register pinning: **{100 * (done_b - pinned_b) / total_b:.3f}%**. "
-             f"Register-pinned: **{100 * pinned_b / total_b:.3f}%** of total code (included above).", "",
+             f"Without concessions: **{100 * (done_b - pinned_b) / total_b:.3f}%**. "
+             f"With concessions (register pins, asm barriers and the other kinds in `tools/concessions.py`): "
+             f"**{100 * pinned_b / total_b:.3f}%** of total code (included above). decomp.dev counts only "
+             "concession-free functions as matched; the rest score the share of their lines without one, "
+             "and the tables below follow decomp.dev.", "",
+             *concession_lines_md(concession_counts),
              f"Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **{len(fuzzy)} functions**, "
              f"{100 * draft_b / total_b:.3f}% of code, mean fuzzy match {mean:.1f}%.", "",
              f"Intentional assembly (GBA header, crt0, SDK assembly; not counted above): {asm_b:,} bytes.", "",

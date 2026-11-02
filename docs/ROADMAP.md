@@ -12,11 +12,10 @@ function, write it the way it will finally be.
 
 1. **Draft** (done). Every function in the game has C: an exact match, or a guarded
    `#ifdef NONMATCHING` draft with a fuzzy score.
-2. **Match** (nearly done, about 96% of code). Every function compiles byte for byte to the ROM.
+2. **Match** (done, 2026-11-01). Every function compiles byte for byte to the ROM: all 11,810.
    Register pins and empty `asm("")` barriers were allowed in this phase as a stopgap, and about
-   a quarter of matched code still has them (the Register-pinned category in PROGRESS.md). The
-   last drafts aim for matches without them; a pin is now a last resort for the hardest
-   functions (`land --allow-pins`), and phase 3 work for later.
+   16% of code still has them (the Register-pinned category in PROGRESS.md). A new pin is a
+   last resort (`land --allow-pins`).
 3. **No concessions** (current). Every match is ordinary C: no register pins, no barriers, no
    compiler overrides, no `*(u16 *)((u8 *)p + 0x172)` access where a struct field fits.
    `progress.py --list-pinned` is the queue; `scope.py FILE.c pins FUNC` gives the cost of removing

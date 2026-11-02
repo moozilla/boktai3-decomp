@@ -61,5 +61,5 @@ Every batch integration PR regenerates the checked-in report in the same commit:
 commit them.
 
 Units with pins carry `// MATCHING_CONCESSION: register-pinning` and are reported in
-the Register-pinned category; removing those pins is phase 3 work. Hand-written
+the With concessions category (tools/concessions.py); removing those pins is phase 3 work. Hand-written
 instruction bodies and compiler overrides are never allowed.

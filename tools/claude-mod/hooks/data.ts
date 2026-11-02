@@ -27,7 +27,7 @@ export function parseProgress(md: string): Omit<DecompSnapshot, 'prs' | 'fetched
     /Code matched in C: ([\d.]+)%\*\* \(([\d,]+) \/ ([\d,]+) bytes\)[^*]*\*\*(\d+) \/ (\d+) functions/,
   )
   if (!head) throw new Error('PROGRESS.md has no headline')
-  const clean = md.match(/Without register pinning: \*\*([\d.]+)%\*\*\. Register-pinned: \*\*([\d.]+)%/)
+  const clean = md.match(/Without (?:register pinning|concessions): \*\*([\d.]+)%\*\*\. (?:Register-pinned|With concessions[^*]*): \*\*([\d.]+)%/)
   const drafts = md.match(/\*\*(\d+) functions\*\*, ([\d.]+)% of code, mean fuzzy match ([\d.]+)%/)
   const asm = md.match(/Intentional assembly[^:]*: ([\d,]+) bytes/)
 

@@ -1,19 +1,16 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_panel.h"
 void SceneInventory_ShowConsumableDescription(struct SceneInventoryPanel *panel)
 {
     s32 item;
-    register const u8 *selectionPtr asm("r1") = &panel->selection;
-    register u32 selection asm("r0") = *selectionPtr;
-    if (selection <= 15) {
-        struct GameState *state = gGameState;
-        struct GameState *indexed;
-        indexed = (void *)(selection * 2 + (u32)state);
-        item = indexed->table160[0];
-    } else if (selection <= 23) {
+    if (panel->selection <= 15) {
+        item = ((struct GameState *)((u8 *)gGameState + panel->selection * 2))->table160[0];
+    } else if (panel->selection <= 23) {
         s32 offset = panel->page * 8;
         offset -= 16;
-        offset += *selectionPtr;
+        {
+            u32 selected = panel->selection;
+            offset += selected;
+        }
         item = panel->catalog[offset];
     } else
         item = -1;
