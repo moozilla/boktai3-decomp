@@ -1,4 +1,5 @@
 #include "global.h"
+
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: initializes a half's sprite, origin, collision, target registration and shadow.
 void AnimData_Load(void *, u32);
@@ -11,6 +12,11 @@ void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, 
 void ScaledShadow_SetGraphic(void *, u32, s32);
 void ScaledShadow_Enable(void *);
 #define FIELD(t, p, off) (*(t *)((u8 *)(p) + (off)))
+static inline void FillOffset(void *destination, u32 value)
+{
+    CpuSet(&value, destination, 0x05000002);
+}
+
 void PairedSceneActor_InitializeHalf(u8 *half, void *origin, s32 mode)
 {
     void *data;
@@ -29,13 +35,7 @@ void PairedSceneActor_InitializeHalf(u8 *half, void *origin, s32 mode)
     if (mode == 1)
         FIELD(u32, half, 0) |= 4;
     FIELD(u32, half, 0) |= 1;
-    {
-        void *offset = half + 0x9C;
-        u32 value = zero;
-        register void *source asm("r0") = &value;
-        asm("" : : "r"(source));
-        CpuSet(source, offset, 0x05000002);
-    }
+    FillOffset(half + 0x9C, zero);
     FIELD(void *, half, 0x90) = origin;
     if (mode == 0)
         FIELD(u16, half, 0xAC) = 64;
