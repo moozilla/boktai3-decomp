@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "ivy_phase.h"
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
@@ -25,10 +26,9 @@ static inline u8 Test(u32 value, u32 mask)
     return 0;
 }
 
-static inline u32 ContextFlag(void *context, u32 input)
+static inline u32 ContextFlag(struct IvyCaptureState *context, u32 input)
 {
-    u32 mask = input;
-    return *(u32 *)((u8 *)context + 0x62C) & mask;
+    return context->captureFlags & input;
 }
 
 void sub_080ED328(void *source, void *target, struct SceneActorRegistryResetView *actor)
