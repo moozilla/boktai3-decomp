@@ -3,17 +3,16 @@
 #include "display_sequence_inline.h"
 // confidence=low: prefix follows the neighboring creator; species identity remains tentative.
 void ProjectileEmitter_WaitForPlayerApproach(void);
-void ProjectileEmitter_EmitAttackFrame(void);
 s32 PinkSpine_InitCollider(struct PinkSpineState *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-static inline void PinkSpine_GetSpriteFlags(u32 **out, struct ScreamerSprite *sprite)
+static inline void PinkSpine_GetSpriteFlags(u32 **out, struct DisplaySequenceSprite *sprite)
 {
     *out = &sprite->flags;
 }
 static inline u32 PinkSpine_StepSequence(u32 *flipFlags, struct PinkSpineState *actor,
-                                         struct ScreamerSprite *owner,
+                                         struct DisplaySequenceSprite *owner,
                                          struct DisplaySequenceState *state)
 {
     const u16 *command;
