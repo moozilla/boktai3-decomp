@@ -1291,16 +1291,16 @@ void Actor_OnControllerIdle(void *controller, void *child)
 
 static inline u8 child_take(struct ActorChildSlot *c)
 {
+    union DisplaySequenceControl control;
     s32 mask = 1;
-    register s32 v asm("r1") = c->control;
-    if (v & mask) {
-        c->control = v & ~mask;
+    control.raw = c->control;
+    if (control.raw & mask) {
+        c->control = control.raw & ~mask;
         return 1;
     }
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_OnInteractionChildUpdate(struct ActorAnimController *input, struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
@@ -1312,23 +1312,11 @@ void Actor_OnInteractionChildUpdate(struct ActorAnimController *input, struct Ac
 
 /* Tentative role: Wait through a child-triggered delay, then enter mode 2 / phase 4. */
 
-static inline u8 child_take_v2(struct ActorChildSlot *c)
-{
-    s32 mask = 1;
-    u8 *flags = &c->control;
-    register s32 v asm("r1") = *flags;
-    if (v & mask) {
-        *flags = v & ~mask;
-        return 1;
-    }
-    return 0;
-}
-
 void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
-    if (child_take_v2(c)) {
+    if (child_take(c)) {
         p->timer = 10;
         if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4)
             *((u8 *)p + 0xf6f) = 1;
@@ -1346,45 +1334,31 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct Act
 
 /* Tentative role: Release the owner effect and reset this child callback. */
 
-static inline u8 child_take_v3(struct ActorChildSlot *c)
-{
-    s32 mask = 1;
-    register u8 *flags asm("r2") = &c->control;
-    register s32 v asm("r1") = *flags;
-    if (v & mask) {
-        *flags = v & ~mask;
-        return 1;
-    }
-    return 0;
-}
-
-// MATCHING_CONCESSION: register-pinning
 void Actor_OnInteractionChildRelease(struct ActorAnimController *input,
                                      struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
     struct ActorAnimController *p = input;
-    if (child_take_v3(c)) {
-        register void *h asm("r2") = p->handle;
+    if (child_take(c)) {
+        void **handle = &p->handle;
+        void *h = *handle;
         if (h) {
-            p->handle = 0;
+            *handle = 0;
             Script_Call(h, 0);
         }
         {
-            register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
+            void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
+            s32 mask;
             c->fn = fn;
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = c->control;
-            c->control = mask | v;
+            mask = 1;
+            mask |= c->control;
+            c->control = mask;
         }
     }
 }
 
 /* Tentative role: Select a child sprite effect and clear its hidden flag. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_OnEffectChildPaletteInit(struct ActorAnimController *p, struct ActorChildSlot *c)
 {
     if (child_take(c)) {

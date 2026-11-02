@@ -127,12 +127,21 @@ def topics_for(st, e):
     if e["kind"] == "frame":
         return ts
     if e["kind"] == "order":
+        # only a constant is out of order: the ROM made it at an earlier use of the same constant, which
+        # cse carried into this statement's copies in each branch (agbccsrc cse-follow, README fact 65)
+        if e["cand"] and all(re.match(r"movs r\d+, #", t) for _, t in e["cand"]):
+            ts.append("cse-follow")
         ts.append("order")
     if e["note"] and "two-operand" in e["note"]:
         ts += ["cse-swap", "regmove-copy"]
     # store_bit_field's read-and-or of a byte or halfword member store (agbccsrc member-store)
     if any(re.search(r"\((?:and|ior):SI \(subreg:SI \(reg:[QH]I \d+\) 0\)", ev[3] or "") for ev in e["evs"]):
         ts.append("member-store")
+    # the ROM reads a call-saved register where the draft builds a constant: cse carried the constant
+    # from an earlier use into each branch's copy of the statement (agbccsrc cse-follow, README fact 65)
+    if any(re.match(r"(orrs|ands|eors|bics|adds) r[0-7], r[4-7]$", t) for _, t in e["orig"]) and \
+            any(re.match(r"movs r[0-3], #", t) for _, t in e["cand"]):
+        ts.append("cse-follow")
     for u, p, k, text in sorted(e["evs"], key=lambda ev: step.PASS_RANK.get(ev[1], 99)):
         if k == "swap":
             ts.append("cse-swap" if p in ("cse", "cse2") else "combine")
