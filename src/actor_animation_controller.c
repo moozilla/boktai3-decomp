@@ -381,13 +381,12 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
 
 // Select the closest eligible interaction target and animate its selection marker.
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_SelectNearestInteraction(struct ActorAnimController *p)
 {
     s32 i;
     struct InteractionPartner *q;
     s32 dx, dz, xOffset, zOffset, length;
-    register s32 height asm("r0");
+    s32 height;
     u32 radius;
     u32 a, b, c;
     u32 sector;
@@ -423,7 +422,7 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
         }
         {
             u32 angle = (u8)(Math_Atan2(dx, dz) - 16);
-            register s32 first asm("r1") = (s8)a;
+            s32 first = (s8)a;
             sector = angle >> 5;
             if (first != sector && (s8)b != sector && (s8)c != sector) {
                 c = 255;
@@ -434,10 +433,10 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
         if ((s8)a != *(s16 *)(gGameState + 0x85e) && (s8)b != *(s16 *)(gGameState + 0x85e) &&
             (s8)c != *(s16 *)(gGameState + 0x85e))
             continue;
-        height = q->worldY;
         {
+            s32 y = q->worldY;
             u8 *parent = *(u8 **)((u8 *)p + 0x18);
-            height -= *(s16 *)(parent + 0x32);
+            height = y - *(s16 *)(parent + 0x32);
         }
         if (height < 0)
             height = -height;
@@ -458,9 +457,10 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
     for (i = 0; i < 16; i++) {
         q = (struct InteractionPartner *)((u8 *)p + 0x1c + i * 0xdc);
         if (i == p->group) {
-            if (++q->timer > 10) {
+            u8 *timer = &q->timer;
+            if (++*timer > 10) {
                 AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource);
-                q->timer = 10;
+                *timer = 10;
             } else
                 AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource + 1);
         } else {
@@ -1714,7 +1714,6 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -1724,16 +1723,14 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
     u8 done;
     if (take(p)) {
         u16 *first = (u16 *)((u8 *)p + 0xed0);
-        s32 savedZero;
-        register s32 zero asm("r2");
-        savedZero = 0;
-        zero = 0;
+        u16 initialPhase[] = {0};
+        s32 zero = 0;
         *first = 25;
         *(u16 *)((u8 *)p + 0xed2) = 102;
-        *(u16 *)((u8 *)p + 0xed4) = zero;
+        *(u16 *)((u8 *)p + 0xed4) = initialPhase[0];
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
-        *((u8 *)p + 0xf77) = savedZero;
+        *((u8 *)p + 0xf77) = zero;
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
@@ -1822,7 +1819,6 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -1832,16 +1828,14 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
     u8 done;
     if (take(p)) {
         u16 *first = (u16 *)((u8 *)p + 0xed0);
-        s32 savedZero;
-        register s32 zero asm("r2");
-        savedZero = 0;
-        zero = 0;
+        u16 initialPhase[] = {0};
+        s32 zero = 0;
         *first = 25;
         *(u16 *)((u8 *)p + 0xed2) = 102;
-        *(u16 *)((u8 *)p + 0xed4) = zero;
+        *(u16 *)((u8 *)p + 0xed4) = initialPhase[0];
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
-        *((u8 *)p + 0xf77) = savedZero;
+        *((u8 *)p + 0xf77) = zero;
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
@@ -2134,7 +2128,6 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_HideAndResetChildren(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -2150,18 +2143,17 @@ void Actor_HideAndResetChildren(struct ActorAnimController *p)
         Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
-            register void (*fn)(void *, void *) asm("r4") = Actor_OnInteractionChildUpdate;
+            void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
             u32 reset = 1;
             struct ActorChildCallbackView *child =
                 (struct ActorChildCallbackView *)((u8 *)p + 0xc8);
             s32 i = 15;
             do {
-                u32 v = child->flags;
-                if (active & v) {
-                    register u32 flags asm("r0");
+                union DisplaySequenceControl control;
+                control.raw = child->flags;
+                if (active & control.raw) {
                     child->fn = fn;
-                    flags = reset | v;
-                    child->flags = flags;
+                    child->flags = reset | control.raw;
                 }
                 child++;
             } while (--i >= 0);
@@ -2178,27 +2170,22 @@ extern const s16 gUnk_086149C4[];
 
 static inline void set_direction(s16 angle, u8 *directionOut, u8 *flipOut)
 {
-    register s32 direction asm("r2");
     while (angle < 0)
         angle += 256;
     while (angle > 255)
         angle -= 256;
+    angle = ((angle - 16) >> 5) & 7;
     {
-        register s32 shifted asm("r0") = angle - 16;
-        direction = (shifted >> 5) & 7;
-    }
-    {
-        s32 choice = direction;
+        s32 choice = angle;
         if (choice == 4)
             *directionOut = 0;
         else if (choice == 0)
             *directionOut = 4;
         else if (choice < 4) {
-            *directionOut = 4 - direction;
+            *directionOut = 4 - angle;
             *flipOut = 1;
         } else {
-            register s32 result asm("r0") = direction - 4;
-            *directionOut = result;
+            *directionOut = angle - 4;
             *flipOut = 0;
         }
     }
@@ -2326,7 +2313,6 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -2425,15 +2411,10 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
             s32 y = Div(p->deltaY * p->timer, 32);
             s32 sine = gUnk_086149C4[(p->timer * 4) & 255];
             s32 bend = p->bend;
-            register s32 product asm("r0") = bend * 30;
+            s32 product = bend * 30;
             product *= sine;
-            {
-                register s32 curve asm("r2") = product >= 0 ? product >> 12 : -((-product) >> 12);
-                {
-                    s32 result = (u16)p->startY + y + curve;
-                    p->obj.y = result;
-                }
-            }
+            sine = product >= 0 ? product >> 12 : -((-product) >> 12);
+            p->obj.y = (u16)p->startY + y + sine;
         }
     }
 }
@@ -3852,7 +3833,6 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingGrowth(struct ActorAnimController *p)
 {
     s32 x, y;
@@ -3874,7 +3854,6 @@ void Actor_UpdateRotatingGrowth(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingShrink(struct ActorAnimController *p)
 {
     s32 x, y;
