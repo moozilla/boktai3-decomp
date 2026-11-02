@@ -4,6 +4,7 @@
  * Reconstructed from B3 instructions; SIIRTC correspondence: docs/RTC.md.
  * The packed union makes the alarm buffer BLKmode, so agbcc forces its
  * address into a register before evaluating each bitfield store. */
+// concession-ok(cflags): SDK RTC driver (SIIRTC), built unoptimized as the SDK built siirtc.c
 // CFLAGS: -O0 -mthumb-interwork
 u32 Rtc_WriteCommandByte(u8);
 u32 Rtc_WriteDataByte(u8);

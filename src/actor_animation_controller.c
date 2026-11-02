@@ -1398,10 +1398,12 @@ void Actor_OnEffectChildPaletteInit(struct ActorAnimController *p, struct ActorC
 
 static inline u8 take(struct ActorAnimController *p)
 {
-    s32 m = 1;
-    register s32 v asm("r1") = p->flags;
-    if (v & m) {
-        p->flags = ~m & v;
+    s32 mask = 1;
+    u32 flags = p->flags;
+    if (flags & mask) {
+        mask = ~mask;
+        mask &= flags;
+        p->flags = mask;
         p->done = 0;
         return 1;
     }
@@ -1450,19 +1452,17 @@ static inline void rotate(struct ActorAnimController *p)
 
 static inline u32 frame_factor(u16 v)
 {
-    register u32 value asm("r1") = v;
     u32 mask = 15;
-    return mask & value;
+    mask &= v;
+    return mask;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     take(p);
     rotate(p);
@@ -1492,8 +1492,7 @@ void Actor_UpdateRotatingAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -1533,14 +1532,12 @@ void Actor_UpdateRotatingAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 1;
@@ -1582,8 +1579,7 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -1627,10 +1623,9 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
             p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
+            u8 one = 1;
+            p->flags |= one;
             zero = 0;
-            p->flags = mask | v;
         }
         Anim_SetSequence(&p->anim, p->arg, 0, 4, zero);
         if (p->handle) {
@@ -1644,14 +1639,12 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         u16 *first = (u16 *)((u8 *)p + 0xed0);
@@ -1697,8 +1690,7 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -1736,8 +1728,8 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
     if (done) {
         Actor_SetState(p, 3, 1);
         {
-            register void *h asm("r2") = p->handle;
-            if (h) {
+            if (p->handle) {
+                void *h = p->handle;
                 p->handle = 0;
                 Script_Call(h, 0);
             }
@@ -1755,7 +1747,6 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         u16 *first = (u16 *)((u8 *)p + 0xed0);
@@ -1806,8 +1797,7 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -1849,9 +1839,8 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
             p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
+            u8 one = 1;
+            p->flags |= one;
         }
     }
 }
@@ -1866,7 +1855,6 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         u16 *first = (u16 *)((u8 *)p + 0xed0);
@@ -1916,8 +1904,7 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -1959,9 +1946,8 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
             p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
+            u8 one = 1;
+            p->flags |= one;
         }
     }
 }
@@ -1969,14 +1955,12 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         s32 zero;
@@ -1996,10 +1980,9 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
             p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
+            u8 one = 1;
+            p->flags |= one;
             zero = 0;
-            p->flags = mask | v;
         }
         Anim_SetSequence(&p->anim, p->arg, 0, 4, zero);
     }
@@ -2029,8 +2012,7 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -2066,8 +2048,8 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     {
-        register void *h asm("r2") = p->handle;
-        if (h) {
+        if (p->handle) {
+            void *h = p->handle;
             p->handle = 0;
             Script_Call(h, 0);
         }
@@ -2077,14 +2059,12 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         s32 zero;
@@ -2101,10 +2081,9 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
             p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
+            u8 one = 1;
+            p->flags |= one;
             zero = 0;
-            p->flags = mask | v;
         }
         Anim_SetSequence(&p->anim, p->arg, 0, 4, zero);
     }
@@ -2134,8 +2113,7 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -2171,8 +2149,8 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     {
-        register void *h asm("r2") = p->handle;
-        if (h) {
+        if (p->handle) {
+            void *h = p->handle;
             p->handle = 0;
             Script_Call(h, 0);
         }
@@ -2252,13 +2230,11 @@ static inline void set_direction(s16 angle, u8 *directionOut, u8 *flipOut)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->timer = 0;
@@ -2311,8 +2287,7 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -2383,7 +2358,6 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->timer = 0;
@@ -2425,8 +2399,7 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -2620,14 +2593,12 @@ void Actor_MoveTowardTarget(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateFadeAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 11;
@@ -2663,8 +2634,7 @@ void Actor_UpdateFadeAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -2706,14 +2676,12 @@ void Actor_UpdateFadeAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateReverseFadeAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 19;
@@ -2749,8 +2717,7 @@ void Actor_UpdateReverseFadeAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -2790,14 +2757,12 @@ void Actor_UpdateReverseFadeAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateNotifyingAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 18;
@@ -2832,8 +2797,7 @@ void Actor_UpdateNotifyingAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -2869,8 +2833,8 @@ void Actor_UpdateNotifyingAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     if (done) {
-        register void *h asm("r2") = p->completionHandle;
-        if (h) {
+        if (p->completionHandle) {
+            void *h = p->completionHandle;
             p->completionHandle = 0;
             Script_Call(h, 0);
         }
@@ -2882,14 +2846,12 @@ void Actor_UpdateNotifyingAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_InitPaletteEffectPose(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 12;
@@ -2921,8 +2883,7 @@ void Actor_InitPaletteEffectPose(struct ActorAnimController *p)
             else
                 o->flags &= ~8;
         }
-        n = ++a->timer;
-        if (n >= a->rate) {
+        if (++a->timer >= a->rate) {
             a->timer = 0;
             if (a->flags & 4) {
                 if (a->frame == 0) {
@@ -2976,7 +2937,6 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 13;
@@ -3008,8 +2968,7 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             else
                 o->flags &= ~8;
         }
-        n = ++a->timer;
-        if (n >= a->rate) {
+        if (++a->timer >= a->rate) {
             a->timer = 0;
             if (a->flags & 4) {
                 if (a->frame == 0) {
@@ -3105,14 +3064,12 @@ void sub_081E8370(void)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation2(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 2;
@@ -3127,27 +3084,33 @@ void Actor_UpdateRotatingAnimation2(struct ActorAnimController *p)
     o = &p->obj;
     a = &p->anim;
     entry = a->data + a->frame;
-    o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        u32 frame = *entry >> 6;
+        o->frame = frame;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -3187,14 +3150,12 @@ void Actor_UpdateRotatingAnimation2(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation3(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 3;
@@ -3209,27 +3170,33 @@ void Actor_UpdateRotatingAnimation3(struct ActorAnimController *p)
     o = &p->obj;
     a = &p->anim;
     entry = a->data + a->frame;
-    o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        u32 frame = *entry >> 6;
+        o->frame = frame;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -3269,14 +3236,12 @@ void Actor_UpdateRotatingAnimation3(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation4(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 4;
@@ -3291,27 +3256,33 @@ void Actor_UpdateRotatingAnimation4(struct ActorAnimController *p)
     o = &p->obj;
     a = &p->anim;
     entry = a->data + a->frame;
-    o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        u32 frame = *entry >> 6;
+        o->frame = frame;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -3351,14 +3322,12 @@ void Actor_UpdateRotatingAnimation4(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation5(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 5;
@@ -3373,27 +3342,33 @@ void Actor_UpdateRotatingAnimation5(struct ActorAnimController *p)
     o = &p->obj;
     a = &p->anim;
     entry = a->data + a->frame;
-    o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        u32 frame = *entry >> 6;
+        o->frame = frame;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -3453,14 +3428,12 @@ static inline void rotate_v2(struct ActorAnimController *p)
         (*(u16 *)&p->obj.y) += p->delta;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation6(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 6;
@@ -3474,27 +3447,33 @@ void Actor_UpdateRotatingAnimation6(struct ActorAnimController *p)
     o = &p->obj;
     a = &p->anim;
     entry = a->data + a->frame;
-    o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        u32 frame = *entry >> 6;
+        o->frame = frame;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -3534,14 +3513,12 @@ void Actor_UpdateRotatingAnimation6(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation7(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 7;
@@ -3556,27 +3533,33 @@ void Actor_UpdateRotatingAnimation7(struct ActorAnimController *p)
     o = &p->obj;
     a = &p->anim;
     entry = a->data + a->frame;
-    o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        u32 frame = *entry >> 6;
+        o->frame = frame;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -3616,14 +3599,12 @@ void Actor_UpdateRotatingAnimation7(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation8(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 8;
@@ -3638,27 +3619,33 @@ void Actor_UpdateRotatingAnimation8(struct ActorAnimController *p)
     o = &p->obj;
     a = &p->anim;
     entry = a->data + a->frame;
-    o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        u32 frame = *entry >> 6;
+        o->frame = frame;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -3698,14 +3685,12 @@ void Actor_UpdateRotatingAnimation8(struct ActorAnimController *p)
 /* Tentative role: initialize and advance a rotating animated effect.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateRotatingAnimation9(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 9;
@@ -3720,27 +3705,33 @@ void Actor_UpdateRotatingAnimation9(struct ActorAnimController *p)
     o = &p->obj;
     a = &p->anim;
     entry = a->data + a->frame;
-    o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        u32 frame = *entry >> 6;
+        o->frame = frame;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -3787,7 +3778,6 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 10;
@@ -3821,8 +3811,7 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -3933,14 +3922,12 @@ void Actor_UpdateRotatingShrink(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void sub_081E99EC(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 11;
@@ -3976,8 +3963,7 @@ void sub_081E99EC(struct ActorAnimController *p)
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {

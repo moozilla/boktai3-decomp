@@ -1,4 +1,5 @@
 // COMPILER: old_agbcc
+// concession-ok(cflags): libgcc routine, built at -O2 without interworking as libgcc itself was
 // CFLAGS: -O2
 /* More subroutines needed by GCC output code on some machines.  */
 /* Compile this one with gcc.  */

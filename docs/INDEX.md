@@ -212,7 +212,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 4 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 13 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 14 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
 | [docs/tasks/script_targets.md](../docs/tasks/script_targets.md) | Decomp targets: the code the scripts call | *#scripts #assets #tooling* | 2 |
@@ -384,7 +384,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/opus-golem-charge-pursuit_2026-11-01.md](../notes/opus-golem-charge-pursuit_2026-11-01.md) | Golem_UpdateChargePursuit (080CCD7C): matched in ordinary C | #matching #golem #pre #stack-slots #gcse #integrate #cross-jump #reload | 4 |
 | [notes/opus-golem-displacement-recovery_2026-11-01.md](../notes/opus-golem-displacement-recovery_2026-11-01.md) | Golem_ResumeBehaviorAfterDisplacement (080C8774): matched in ordinary C | #matching #golem #random-table #reg-equiv #pre #stack-slots #gcse | 4 |
 | [notes/opus-health-restore-burst_2026-11-01.md](../notes/opus-health-restore-burst_2026-11-01.md) | HealthRestoreEffect_StartParticleBurst (08234868): matched (2026-11-01) | #matching #health-restore #random-table #compiler #loop #local-alloc #reload | 10 |
-| [notes/opus-inventory-grids_2026-11-01.md](../notes/opus-inventory-grids_2026-11-01.md) | SceneInventory_Populate{Equipment,Item,Consumable}Grid: item grid matched pin-free; a goto outer loop is needed | #loop-reduction #goto #reload-rotation #inventory #spilled-locals | 12 |
+| [notes/opus-inventory-grids_2026-11-01.md](../notes/opus-inventory-grids_2026-11-01.md) | SceneInventory_Populate{Equipment,Item,Consumable}Grid: all three grids matched pin-free | #loop-reduction #goto #reload-rotation #inventory #spilled-locals #giv #incremented-index #live-length | 12 |
 | [notes/opus-link-blend-palette_2026-11-01.md](../notes/opus-link-blend-palette_2026-11-01.md) | LinkPlayer_BlendPalette (08239848) and its Player twin sub_0813C9B4: matched without pins | #matching #twin #depin #palette #himode-narrowing #reload | 3 |
 | [notes/opus-nidhoggr-init-parts_2026-10-31.md](../notes/opus-nidhoggr-init-parts_2026-10-31.md) | Nidhoggr_InitParts (081940F8): holdout | #matching #nidhoggr #compiler #cse #combine #local-alloc #loop #scope-gap | 7 |
 | [notes/opus-orbit-effect-manager_2026-10-31.md](../notes/opus-orbit-effect-manager_2026-10-31.md) | OrbitEffect_UpdateManager (081FE2C4): exact match | #matching #orbit-effect #compiler #loop #giv #gcse #pre #reload | 7 |

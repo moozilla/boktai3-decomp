@@ -42,7 +42,7 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Build | `make` rebuilds the ROM byte-identical (`build/boktai3.gba: OK`, SHA-1 `2651c5e6…`) |
 | Phase 1 | complete: every function has C |
 | Phase 2 | the last guarded drafts (PROGRESS.md "Nonmatching drafts"): GPT-6 Pro's round 9 queue (scene actors 1, 2 and 4, misc) and 17 round 8 holdouts, which an Opus worker is retrying |
-| Phase 3 | the Register-pinned share in PROGRESS.md; `scope.py FILE.c pins` and `tools/depin.py` remove them |
+| Phase 3 | the With concessions share in PROGRESS.md (tools/concessions.py; decomp.dev counts only concession-free code as matched); `scope.py FILE.c pins` and `tools/depin.py` remove them |
 | Phase 4 | names, shared types, a real source tree and a self-placing build ([ROADMAP.md](ROADMAP.md)); so far the [EWRAM shared declarations](../notes/ewram-layout_2026-10-27.md) and naming as functions match |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data that round-trips through an editable form (`tools/data_roundtrip.py`), by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
