@@ -1511,6 +1511,25 @@ Each was read from the compiler source and confirmed on a live draft.
    statement after a switch (or an if/else) into each branch, and fix.py tries it for cse-follow
    and cross-jump differences.
 
+66. **Read a byte into `union DisplaySequenceControl` to stop regmove tying a u8 AND/OR result to
+   the loaded value.** `s32 v = c->control; if (v & 1) c->control = v & ~1;` gives `ands r1, r0;
+   strb r1`: v dies at the AND, so regmove (fixup_match_1) ties the output to it, while the ROM
+   writes the constant's register (`ands r0, r1; strb r0`). Reading through the union
+   (`control.raw = c->control; ... c->control = control.raw & ~mask;`) keeps the result in the
+   constant's register, with no other change. Type and operand-order sweeps of the plain local
+   don't. It matched child_take (four callers) and Actor_HideAndResetChildren's
+   `child->flags = reset | control.raw` (src/actor_animation_controller.c), both pins removed.
+
+67. **The reverse of fact 61: a `u16 x[] = {0}` set first keeps the SI zero for a later byte
+   store.** With `s32 a = 0, b = 0;`, a halfword store of b and a byte store of a after a call,
+   cse merges the two zeros. The byte store's wider-mode lookup then finds the halfword store's
+   HImode copy (HI before SI), which is set late and lives across the call. The ROM sets the
+   long-lived zero first (r4) and the halfword's zero second (r2). Declaring
+   `u16 initialPhase[] = {0};` first (a one-element u16 array is an HImode register) gives the
+   halfword store its own HImode zero, and the byte store keeps the SI one. This matched
+   Actor_UpdateProjectedEntryAnimation and its Silent twin without pins. Declaring the array
+   second doesn't help, and neither does a u8 array.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
