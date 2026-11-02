@@ -79,12 +79,10 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
                 ANIMATE(0x24);
             }
             if (++*t > 6) {
-                register s32 amount asm("r2") = Player_GetSpecialAttackDescriptor(BYTE(0xBF4))[2];
-                register s32 cost asm("r2");
+                s32 cost = Player_GetSpecialAttackDescriptor(BYTE(0xBF4))[2];
                 BYTE(0xC0F) = 0;
                 HALF(0x4D2) = 0;
-                cost = ActorResponse_Apply(p, amount);
-                asm("" : "+r"(cost));
+                cost = ActorResponse_Apply(p, cost);
                 if (HALF(0x428) < cost) {
                     Sound_PlaySong(0xD5);
                     goto entryRelease;
