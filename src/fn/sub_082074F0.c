@@ -2,6 +2,7 @@
 #include "global.h"
 #include "vulcan_cannon_worker.h"
 #include "ram.h"
+#include "contact_collider.h"
 extern u32 gUnk_02000560;
 void VulcanCannon_UpdateTargeting(void);
 void VulcanCannon_UpdateDefeatEffects(void);
@@ -70,7 +71,8 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             DamageNumberDisplay_Show(collider, p->damage, 0, p->collider + 0xc, p->collider + 0x14,
                                      1);
             SceneHud_SetTimedState(p->owner, p->hp, p->maxHp, p->hudStyle,
-                                   *(u8 *)((u8 *)p + 0xf7) == 4, p->hudDuration);
+                                   ((struct ContactCollider *)p->collider)->costFlags == 4,
+                                   p->hudDuration);
         }
         if (p->state == VulcanCannon_UpdateTargeting)
             p->aimTimer = 120;
@@ -182,8 +184,8 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
         p->flash--;
     } else
         AnimData_SelectPaletteBank(p->graphics, 0x1be);
-    if (*(u16 *)((u8 *)p + 0xf8)) {
-        u16 n = --*(u16 *)((u8 *)p + 0xf8);
+    if (((struct ContactCollider *)p->collider)->responseValue) {
+        u16 n = --((struct ContactCollider *)p->collider)->responseValue;
         if ((n >> 2) & 1)
             p->display.sprite.flags |= 1;
         else
