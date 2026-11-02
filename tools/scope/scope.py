@@ -4363,7 +4363,11 @@ def explain_regmove(wd, uid, gone, new, nm, at):
               " byte read and masked (`u8` flags), read it into a byte union and narrow the and:"
               " `control.raw = a->flags; first = (u8)(control.raw & bit);` (DisplaySequence_ApplyFrame,"
               " include/display_sequence_inline.h; it matched AnimatedTile_TickAlternateAnimation where"
-              " `u8 left`/`u8 input` did not).")
+              " `u8 left`/`u8 input` did not). For a u16/u8 field masked by a constant, write the and"
+              " on the read itself, `(*field & K)`, not through u32 variables: the constant then sits in"
+              " an HImode pseudo read through a subreg, which regmove does not tie, and cse does not move a"
+              " known-constant variable to operand 2 (README fact 37; ActorPalette_UpdateReverseFade's"
+              " `(*field & 15) | 0xd0` replaced three pins).")
     # the same tie in other inlined copies of this code: same pattern up to register numbers
     shape = lambda r: re.sub(r"\(reg(/\w)*:(\w+) \d+\)", r"(reg:\2)", r or "")
     rowline = {}

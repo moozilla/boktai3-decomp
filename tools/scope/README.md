@@ -1056,6 +1056,15 @@ Each was read from the compiler source and confirmed on a live draft.
    constant lives on (a later and reads it, or reload loads it there as a spilled pseudo),
    scope's hint names this fact instead.
 
+   The same lever works the other way round, when the ROM copies the constant
+   (`adds r0, r2, #0; ands r0, r1`, the 15 kept in r2 for a later test) and the draft ties the
+   dying load. In ActorPalette_UpdateReverseFade, `u32 raw = *field; u32 mask = 15;
+   (mask & raw)` gave cse a variable known to hold 15, which fold_rtx moves to operand 2; regmove
+   then tied the and to the load in operand 1. Writing `(*field & 15) | 0xd0` and
+   `(*(u8 *)field & 15) == 3` keeps the 15 an HImode pseudo read through a subreg in both ands;
+   regmove ties neither operand, so reload copies the constant, and three pins went. `why`'s
+   regmove lever says so.
+
 38. **Exactly three local quantities in a block are not sorted by priority.** block_alloc
    (local-alloc.c) sorts two or three qtys by hand, but its `qty_compare (0, 1)` and
    `qty_compare (1, 2)` compare qty numbers (birth order), not the `qty_order` entries it
