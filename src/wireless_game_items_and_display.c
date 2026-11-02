@@ -675,7 +675,6 @@ void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
     sprite = &p->sprite;
     if (p->entered) {
         int choice;
-        int y;
         void *draw;
         void *resource;
         p->entered = 0;
@@ -695,38 +694,25 @@ void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
         Anim_LoadKeyframe(draw, resource, gUnk_0824DE7C[choice], 0);
         p->drawing.flags &= ~1;
         {
-            struct WirelessGameVector *start = &p->start;
+            struct WirelessGameVector *start, *end;
             const u16 *entry;
-            int x;
-            int zero;
-            struct WirelessGameVector *end;
-            int y;
+            start = &p->start;
             {
                 const u16 *table = gUnk_0824DE8C;
-                int offset;
-                offset = (index & 3) * 2;
-                entry = (const u16 *)(offset + (u32)table);
+                entry = &table[index & 3];
             }
-            {
-                register int initial asm("r1") = 272;
-                asm("" : "+r"(initial));
-                x = initial;
-            }
-            {
-                register int value asm("r1") = *entry;
-                x += value;
-            }
-            zero = 0;
-            p->start.x = x;
+            p->start.x = 272 + *entry;
             start->y = 32;
-            start->z = zero;
+            start->z = 0;
             end = &p->end;
-            y = 128;
-            if (index > 7)
-                y = 144;
-            p->end.x = *entry + 80;
-            end->y = y;
-            end->z = zero;
+            {
+                int y = 128;
+                if (index > 7)
+                    y = 144;
+                p->end.x = *entry + 80;
+                end->y = y;
+                end->z = 0;
+            }
         }
         WirelessGameItem_SetRandomNegativeArcVelocity(p, 32, 15);
     }
