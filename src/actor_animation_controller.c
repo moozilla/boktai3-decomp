@@ -1,4 +1,5 @@
 #include "global.h"
+#include "display_sequence.h"
 #include "actor_animation_controller.h"
 #include "display_sprite_playback.h"
 #include "render.h"
@@ -3750,19 +3751,23 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -3807,28 +3812,7 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
         if (*((u8 *)p + 0xf76))
             ScriptUtility_ClearControlFlag();
         p->obj.flags |= 1;
-        p->oldMode = p->mode;
-        {
-            u32 mode = 1;
-            p->mode = mode;
-        }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 32;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
-        }
+        Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
             register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
