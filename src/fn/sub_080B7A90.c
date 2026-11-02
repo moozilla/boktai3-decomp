@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 /* Skeleton variant of SceneActorTarget_ResolvePendingObject that also clears state bits 0x300 */
+#include "scene_actor_contact_response.h"
 #include "global.h"
 // confidence=low: resolves the pending contact object and clears Skeleton context state bits.
 #include "scene_actor_reset.h"
@@ -70,7 +71,7 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryReset
         } else {
             cell = gTerrainMap->rows[z] + x;
         }
-        *(u16 *)((u8 *)owner + 0x2F8) = cell;
+        SceneActorContact_SaveTargetCell(owner, cell);
         {
             struct Delta *out = &delta;
             struct ContactPosition *source = &owner->body.position;
