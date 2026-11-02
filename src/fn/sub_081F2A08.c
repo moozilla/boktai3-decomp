@@ -1,8 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "sprite_trail.h"
 #include "background_controller.h"
-// MATCHING_CONCESSION: register-pinning
 struct Camera {
-    u8 pad0[0x44];
+    u8 unknown0[0x44];
     s32 x;
 };
 void Vector3_CopyComponents(struct TrailVector *, struct TrailVector *);
@@ -11,12 +11,10 @@ void AnimData_SelectPaletteBank(void *, int);
 s32 SpriteTrail_CreateMotionEffect(struct SpriteTrailPool *pool, struct TrailVector *start,
                                    struct TrailVector *end, u32 style, s32 argA, s32 argB)
 {
-    s32 index, i;
+    s32 index;
     struct SpriteTrail *p = MotionEffectPool_FindFreeEntry(pool, &index);
-    register struct TrailVector *position asm("r5");
-    struct ContactSwarmSprite *head, *tail, *sprite;
-    struct TrailVector *history;
-    register struct TrailVector *saved asm("sl");
+    register struct TrailVector *renderOrigin asm("sl");
+    struct TrailVector *position;
     if (!p)
         return -1;
     p->state = 0;
@@ -32,43 +30,49 @@ s32 SpriteTrail_CreateMotionEffect(struct SpriteTrailPool *pool, struct TrailVec
     p->collisionArg0 = argA;
     p->collisionArg1 = argB;
     p->historyIndex = 0;
-    head = p->head;
-    tail = p->tail;
-    saved = position;
-    sprite = head;
-    history = p->history;
-    for (i = 3; i >= 0;) {
-        Vector3_CopyComponents(history, position);
-        sprite->position.x = (p->position.x >> 12) - gSceneCamera->x;
-        {
-            s32 y = position->y;
-            s32 z = position->z;
-            sprite->position.y = ((z + y) >> 12) + 96;
+    {
+        struct TrailVector *origin = position;
+        s32 i;
+        struct ContactSwarmSprite *head, *tail, *sprite;
+        struct TrailVector *history;
+        head = p->head;
+        tail = p->tail;
+        renderOrigin = origin;
+        sprite = head;
+        history = p->history;
+        for (i = 3; i >= 0;) {
+            Vector3_CopyComponents(history, origin);
+            sprite->position.x = (p->position.x >> 12) - gSceneCamera->x;
+            {
+                s32 y = origin->y;
+                s32 z = origin->z;
+                sprite->position.y = ((z + y) >> 12) + 96;
+            }
+            sprite->position.z = origin->z >> 12;
+            sprite->flags &= ~1;
+            Sprite_LinkToList(head, 0);
+            history++;
+            i--;
+            sprite++;
+            head++;
         }
-        sprite->position.z = position->z >> 12;
-        sprite->flags &= ~1;
-        Sprite_LinkToList(head, 0);
-        history++;
-        i--;
-        sprite++;
-        head++;
-    }
-    position = saved;
-    i = 2;
-    sprite = tail;
-    for (; i >= 0;) {
-        sprite->position.x = (p->position.x >> 12) - gSceneCamera->x;
-        {
-            s32 y = position->y;
-            s32 z = position->z;
-            sprite->position.y = ((z + y) >> 12) + 96;
+        origin = renderOrigin;
+        i = 2;
+        sprite = tail;
+        for (; i >= 0;) {
+            sprite->position.x = (p->position.x >> 12) - gSceneCamera->x;
+            {
+                s32 y = origin->y;
+                s32 z = origin->z;
+                sprite->position.y = ((z + y) >> 12) + 96;
+            }
+            sprite->position.z = origin->z >> 12;
+            sprite->flags &= ~1;
+            Sprite_LinkToList(tail, 0);
+            i--;
+            sprite++;
+            tail++;
         }
-        sprite->position.z = position->z >> 12;
-        sprite->flags &= ~1;
-        Sprite_LinkToList(tail, 0);
-        i--;
-        sprite++;
-        tail++;
     }
     AnimData_SelectPaletteBank(p->graphics, 485);
     SpriteTrail_InitRenderCollider(p);
