@@ -7,7 +7,7 @@
 struct SceneActorControlState {
     u8 unknown0[0x3D4];
     u32 flags3D4;
-    u8 unknown3D8[2];
+    u16 returnHeight; /* Reference height in SceneActorControl_UpdateShadowReturnPhase. */
     u8 pulseInterval, unknown3DB;
     u8 maxElapsed, savedDirection;
     u8 unknown3DE[8];
