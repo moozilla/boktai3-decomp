@@ -38,15 +38,6 @@ static inline s32 Tentacle_Cardinal(u8 direction)
     do {                                                                                           \
         (value_) = *(cell_);                                                                       \
     } while (0)
-#define TENTACLE_BEGIN_CARDINAL_SCAN(mask_, remaining_)                                            \
-    do {                                                                                           \
-        (mask_) = 3;                                                                               \
-        (remaining_) = 3;                                                                          \
-    } while (0)
-#define TENTACLE_BEGIN_ROUTE_SCAN(cursor_, cells_)                                                 \
-    do {                                                                                           \
-        (cursor_) = (cells_);                                                                      \
-    } while (0)
 
 static inline void Tentacle_AdvanceDirection(s32 *direction, const u32 *mask)
 {
@@ -131,7 +122,8 @@ void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
         state->preferred = ((actor->tracking.heading + 32) & 255) >> 6;
         state->attempts = 0;
     }
-    TENTACLE_BEGIN_CARDINAL_SCAN(scan.mask, n);
+    scan.mask = 3;
+    n = 3;
     for (; n >= 0;) {
         if ((Tentacle_Abs(dir - state->preferred) != 2) && (Tentacle_Abs(dir - facing) != 2)) {
             cell = SceneActorTerrain_GetNeighborCell(actor, dir);
@@ -149,7 +141,7 @@ void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
     if (count) {
         i = 0;
         if (i < count) {
-            TENTACLE_BEGIN_ROUTE_SCAN(scan.cell, cells);
+            scan.cell = cells;
             do {
                 TENTACLE_READ_ROUTE_CELL(currentCell, scan.cell);
                 if (!TentacleActor_HasVisitedRoute(actor, currentCell)) {
