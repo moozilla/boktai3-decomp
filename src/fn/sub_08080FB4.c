@@ -1,3 +1,4 @@
+#include "scene_actor_behavior.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "runtime.h"
@@ -76,7 +77,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
             *field &= mask;
             zero = 0;
             control->counter = zero;
-            *(u16 *)((u8 *)control + 0x14) = zero;
+            control->field14 = zero;
             control->timer = zero;
         }
         /* Frame127 releases attachments without consuming offset outputs. */
@@ -96,7 +97,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
         }
     }
     actor->field2B0 = 1;
-    script = *(u16 *)((u8 *)actor + 0x1F8);
+    script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
     if (script) {
         u32 offset = 0;
         values[0] = *(s16 *)((u8 *)&actor->body.position + offset);
@@ -104,8 +105,8 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
         values[2] = actor->body.position.z;
         offset = 0x1FC;
         values[3] = *((s32 *)(((u8 *)actor) - (-offset)));
-        values[4] = *(s32 *)((u8 *)actor + 0x200);
-        values[5] = *(s32 *)((u8 *)actor + 0x204);
+        values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
+        values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
         offset += 0xE4;
         values[6] = *(s32 *)((u8 *)actor + offset);
         values[7] = actor->body.id;
