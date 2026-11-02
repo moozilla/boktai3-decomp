@@ -62,38 +62,39 @@ void BoardPiece_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int 
     Anim_SetSequence(&p->anim, m->animation, (u16)index, left, right);
 }
 
-// MATCHING_CONCESSION: register-pinning
 void BoardPiece_UpdateAnimation(struct GroupPiece *p)
 {
     struct GroupSprite *o = &p->sprite;
     struct GroupAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     int done;
     p->sprite.position = p->position;
     a = &p->anim;
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             p->sprite.flags |= 4;
         else
             p->sprite.flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
