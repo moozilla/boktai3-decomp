@@ -62,7 +62,7 @@ void WirelessExchange_OnPacketReceived(struct Packet *p)
         case 2:
             shift = 0;
             {
-                register u32 v asm("r0") = p->payload.halves.high;
+                u32 v = p->payload.halves.high;
                 v &= 1;
                 e->flag = v;
             }
