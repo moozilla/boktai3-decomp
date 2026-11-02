@@ -1,11 +1,8 @@
-#include "global.h"
-struct P {
-    u8 f[0x930];
-    u32 a;
-};
-void Callback_InvokeActor(void *, u32);
-s32 DarkLoan_OnUpdate(struct P *p)
+#include "dark_loan_screen.h"
+#include "engine.h"
+
+s32 DarkLoan_OnUpdate(struct DarkLoanScreen *p)
 {
-    Callback_InvokeActor(p, p->a);
+    Callback_InvokeActor(p, p->callback);
     return 0;
 }
