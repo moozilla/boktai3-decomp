@@ -1,66 +1,78 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_input.h"
 void Storage_GetSlotPosition(void *, s32);
 void SceneHud_SetKeyframePaletteBank(void *, u32);
-void Storage_InitWidgets(u8 *p)
+struct StorageScreen {
+    u8 task[0x18];
+    struct SceneInputWidget controls[8];
+    struct SceneInputWidget firstSlots[16], secondSlots[16];
+    struct SceneInputWidget indicators[5];
+    struct SceneInputWidget categorySlots[8];
+    struct SceneInputWidget labels[3];
+    struct SceneInputResource commonResource, storageResource;
+    struct SceneInputPair markers, glyphs;
+};
+void Storage_InitWidgets(struct StorageScreen *p)
 {
-    struct ContactPackedVector pos;
+    struct SceneInputPosition pos;
     struct SceneInputResource *r;
+    struct SceneWidgetPlayback labelPlayback;
+    u8 labelPriority;
     s32 i;
     r = ScriptProc_Start(0xCB05, 0x5D04);
-    *(struct SceneInputResource *)(p + 0x1538) = *r;
-    ResourceHeader_Relocate(p + 0x1538, r);
+    p->storageResource = *r;
+    ResourceHeader_Relocate(&p->storageResource, r);
     r = ScriptProc_Start(0xCB05, 0x530D);
-    *(struct SceneInputResource *)(p + 0x1518) = *r;
-    ResourceHeader_Relocate(p + 0x1518, r);
+    p->commonResource = *r;
+    ResourceHeader_Relocate(&p->commonResource, r);
+    labelPlayback.priority = 0;
+    labelPlayback.mode = 0;
     pos.x = 0;
     pos.y = 0;
     pos.z = 0;
-    {
-        register u32 blank asm("r1") = 0;
-        Widget_InitLinked(p + 0x18, p + 0x1518, 0xD2, 0x30, blank, blank, 60, &pos);
-    }
-    Widget_InitLinked(p + 0x78, p + 0x1518, 0x41, 0x30, 0, 0, 60, &pos);
+    labelPriority = labelPlayback.priority;
+    Widget_InitLinked(&p->controls[0], &p->commonResource, 0xD2, 0x30, labelPriority,
+                      labelPlayback.mode, 60, &pos);
+    Widget_InitLinked(&p->controls[1], &p->commonResource, 0x41, 0x30, 0, 0, 60, &pos);
     pos.x += 8;
-    Widget_InitLinked(p + 0xD8, p + 0x1518, 0x42, 0x30, 0, 0, 60, &pos);
+    Widget_InitLinked(&p->controls[2], &p->commonResource, 0x42, 0x30, 0, 0, 60, &pos);
     ZeroFill8(&pos);
-    Widget_InitLinked(p + 0x138, p + 0x1518, 0x40, 0x30, 0, 0, 60, &pos);
-    Widget_InitLinked(p + 0x198, p + 0x1518, 0xD3, 0x30, 0, 0, 60, &pos);
-    Widget_InitLinked(p + 0x1F8, p + 0x1518, 0x63, 0x30, 0, 0, 60, &pos);
+    Widget_InitLinked(&p->controls[3], &p->commonResource, 0x40, 0x30, 0, 0, 60, &pos);
+    Widget_InitLinked(&p->controls[4], &p->commonResource, 0xD3, 0x30, 0, 0, 60, &pos);
+    Widget_InitLinked(&p->controls[5], &p->commonResource, 0x63, 0x30, 0, 0, 60, &pos);
     for (i = 0; i < 16; i++) {
         Storage_GetSlotPosition(&pos, i);
-        Widget_InitLinked(p + 0x318 + i * 0x60, p + 0x1538, 0x151, 0x30, 0, 0, 60, &pos);
+        Widget_InitLinked(&p->firstSlots[i], &p->storageResource, 0x151, 0x30, 0, 0, 60, &pos);
         Storage_GetSlotPosition(&pos, i + 16);
-        Widget_InitLinked(p + 0x918 + i * 0x60, p + 0x1538, 0x151, 0x30, 0, 0, 60, &pos);
+        Widget_InitLinked(&p->secondSlots[i], &p->storageResource, 0x151, 0x30, 0, 0, 60, &pos);
     }
     pos.x = 0;
     pos.y = 128;
-    Widget_InitLinked(p + 0x1098, p + 0x1538, 0xCF, 0x30, 0, 0, 60, &pos);
+    Widget_InitLinked(&p->indicators[4], &p->storageResource, 0xCF, 0x30, 0, 0, 60, &pos);
     pos.x = 216;
     pos.y = 104;
-    Widget_InitLinked(p + 0xF18, p + 0x1538, 0x190, 0x30, 0, 0, 60, &pos);
-    SceneHud_SetKeyframePaletteBank(p + 0xF18, 0x373);
+    Widget_InitLinked(&p->indicators[0], &p->storageResource, 0x190, 0x30, 0, 0, 60, &pos);
+    SceneHud_SetKeyframePaletteBank(&p->indicators[0], 0x373);
     pos.x = 216;
     pos.y = 80;
-    Widget_InitLinked(p + 0xFD8, p + 0x1538, 0x191, 0x30, 0, 0, 60, &pos);
-    SceneHud_SetKeyframePaletteBank(p + 0xFD8, 0x373);
+    Widget_InitLinked(&p->indicators[2], &p->storageResource, 0x191, 0x30, 0, 0, 60, &pos);
+    SceneHud_SetKeyframePaletteBank(&p->indicators[2], 0x373);
     pos.x = 216;
     pos.y = 56;
-    Widget_InitLinked(p + 0x1038, p + 0x1538, 0x192, 0x30, 0, 0, 60, &pos);
-    SceneHud_SetKeyframePaletteBank(p + 0x1038, 0x373);
+    Widget_InitLinked(&p->indicators[3], &p->storageResource, 0x192, 0x30, 0, 0, 60, &pos);
+    SceneHud_SetKeyframePaletteBank(&p->indicators[3], 0x373);
     for (i = 0; i < 8; i++) {
         Storage_GetSlotPosition(&pos, i);
-        Widget_InitLinked(p + 0x10F8 + i * 0x60, p + 0x1518, 0x50, 0x31, 0, 0, 60, &pos);
+        Widget_InitLinked(&p->categorySlots[i], &p->commonResource, 0x50, 0x31, 0, 0, 60, &pos);
     }
-    Widget_InitLinked(p + 0x14B8, p + 0x1518, 0x4E, 0x31, 0, 0, 60, &pos);
+    Widget_InitLinked(&p->labels[2], &p->commonResource, 0x4E, 0x31, 0, 0, 60, &pos);
     pos.x = 144;
     pos.y = 32;
-    Widget_InitLinked(p + 0x1458, p + 0x1518, 0x4D, 0x30, 0, 0, 60, &pos);
-    Widget_InitLinked(p + 0x13F8, p + 0x1518, 0x4D, 0x31, 0, 0, 60, &pos);
+    Widget_InitLinked(&p->labels[1], &p->commonResource, 0x4D, 0x30, 0, 0, 60, &pos);
+    Widget_InitLinked(&p->labels[0], &p->commonResource, 0x4D, 0x31, 0, 0, 60, &pos);
     pos.x = 0;
     pos.y = 0;
-    Widget_InitLinked(p + 0x258, p + 0x1518, 0x4B, 0x11, 0, 0, 60, &pos);
-    SceneInput_InitMarkerPair((void *)(p + 0x1558));
-    SceneInput_InitGlyphPair((void *)(p + 0x164C));
+    Widget_InitLinked(&p->controls[6], &p->commonResource, 0x4B, 0x11, 0, 0, 60, &pos);
+    SceneInput_InitMarkerPair(&p->markers);
+    SceneInput_InitGlyphPair(&p->glyphs);
 }
