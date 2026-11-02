@@ -1,4 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
+#include "player.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
@@ -135,7 +136,7 @@ static inline void ClearHeld(struct OctopusContext *context)
 
 static inline u8 IsIdle(struct Player *player)
 {
-    if (*(u16 *)((u8 *)player + 0x424) == 0)
+    if (player->currentStatA == 0)
         return 1;
     return 0;
 }
