@@ -110,15 +110,15 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
             p->f13A = 1;
     }
     if (Script_SeekToKeyword('a')) {
-        p->f124 = Script_GetValue();
-        p->f126 = Script_GetValue();
-        p->f128 = Script_GetValue();
-        p->f12E = Script_GetValue();
+        p->projectilePower = Script_GetValue();
+        p->projectileKnockback = Script_GetValue();
+        p->projectileImmunity = Script_GetValue();
+        p->projectileSpeed = Script_GetValue();
     } else {
-        p->f124 = 30;
-        p->f126 = 0;
-        p->f128 = 30;
-        p->f12E = 24;
+        p->projectilePower = 30;
+        p->projectileKnockback = 0;
+        p->projectileImmunity = 30;
+        p->projectileSpeed = 24;
     }
     if (Script_SeekToKeyword('S'))
         p->f138 = Script_GetValue();
