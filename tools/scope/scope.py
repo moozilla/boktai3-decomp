@@ -1061,6 +1061,12 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
             print(f"{ln}: the ROM's loop counts its counter down to 0 (loop.c reversed it), the draft's"
                   f" counts up: let nothing but the test read the counter, and end the loop in its test (a"
                   f" do-while condition, or a `break` the loop rotates to its end) (README fact 40)")
+    for i, ln in flag_thread_hints(rows_json)[:3]:
+        print(f"line {ln}: the ROM keeps a 0/1 flag (`{rows_json[i]['rom']}`, a jump, the other constant,"
+              f" `cmp #0`) that the draft's jumps skip: jump.c threads a jump after a constant set past a"
+              f" test of the same register. Return the flag from an inline predicate typed u8"
+              f" (`static inline u8 IsX(...) {{ if (c) return 1; return 0; }}`, tested as `if (IsX(...))`):"
+              f" its test reads a QImode subreg, a different register after reload (README fact 50)")
     try:
         cross = cross_jump_hints(rows_json, cross_merges(open(os.path.join(wd, "stderr.txt")).read(),
                                                          info["obj_name"]),
@@ -1974,6 +1980,27 @@ def reversed_loop_hints(rows):
                     break
         if steps == 2:
             out.append((i, r.get("line") or f"at ROM {r['rom_addr']}", "rom"))
+    return out
+
+
+def flag_thread_hints(rows):
+    """[(row index, line)] where the ROM keeps a materialized 0/1 flag the draft has lost: on the
+    ROM side `movs rX, #A`, `b`, (pool words), `movs rX, #B`, `cmp rX, #0` with {A, B} = {0, 1},
+    and at least one of those insns missing from the draft. jump.c threaded the draft's jumps past
+    the test (README fact 50)."""
+    seq = [(i, r["rom"]) for i, r in enumerate(rows)
+           if r["rom"] and not r["rom"].startswith(".") and r["rom"] != "movs r0, r0"]
+    out = []
+    for k in range(len(seq) - 3):
+        (i0, a), (_, b), (_, c), (i3, d) = seq[k:k + 4]
+        m1, m2 = re.match(r"movs (r\d), #([01])$", a), re.match(r"movs (r\d), #([01])$", c)
+        if not (m1 and m2 and b.startswith("b ") and m1.group(1) == m2.group(1)
+                and m1.group(2) != m2.group(2) and d == f"cmp {m1.group(1)}, #0"):
+            continue
+        if any(rows[j]["tag"] == "-" for j in range(i0, i3 + 1)):
+            line = next((rows[j].get("line") for j in list(range(i3, len(rows))) + list(range(i0, -1, -1))
+                         if rows[j].get("line")), "?")
+            out.append((i0, line))
     return out
 
 

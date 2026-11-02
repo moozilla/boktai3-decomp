@@ -1234,6 +1234,19 @@ Each was read from the compiler source and confirmed on a live draft.
    for a sample address where the draft has `adds rD, rT, rD`. An array read used directly as
    a memory operand (`samples_[index_]`) is index first already (expand_expr's EXPAND_SUM
    path puts a multiplication first).
+50. **A 0/1 flag survives only when its test reads a different REG from its sets.** For
+   `if (c) x = 1; else x = 0; if (x) ...` jump.c (the cc0 branch of jump_optimize, in both jump
+   passes) redirects a simple jump whose previous insn sets a register to a constant past a
+   following `tst` of the same register rtx, to wherever that constant sends it; cse's path
+   following then removes the fall-through test too, and the listing loses `movs rX, #1; b;
+   movs rX, #0; cmp rX, #0`. The test must be a pointer-equal REG, so a copy at the join is no
+   cure: combine folds it back, and after reload a pseudo's hard REG is still its own rtx. A
+   predicate inline returning u8 (`static inline u8 IsX(...) { if (c) return 1; return 0; }`,
+   used as `if (IsX(...))`) keeps the ROM's blocks: the caller tests a QImode subreg, which
+   combine reduces with nonzero_bits but which after reload is a fresh `(reg:QI)`, so neither
+   pass sees the same register. A wider return (u32, s32) threads like the plain variable.
+   SceneActorMovement_UpdateHeight has two such flags (category in a set, and a status bit),
+   both formerly kept by empty asm barriers.
 
 ## Survey: random table as a literal address (2026-10-24)
 
