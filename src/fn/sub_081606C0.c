@@ -1,4 +1,5 @@
 #include "global.h"
+#include "display_sequence_inline.h"
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: allocates one of sixteen attack particle slots and initializes its animation.
@@ -39,14 +40,12 @@ inline static u32 Step_1(struct ContactSwarmSprite *sprite, struct ContactSwarmS
             sprite->flags &= ~4;
     }
     {
-        u32 input = state->flags;
-        register u32 bit asm("r3");
-        register u32 first asm("r1");
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
         bit = 2;
-        first = bit;
-        first &= input;
-        first = (u8)first;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
