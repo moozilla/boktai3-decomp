@@ -1,42 +1,25 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
 
-#define EN_OFF ((u32) & ((struct Player *)0)->statModifierContext.statBOverrideEnabled)
-#define LOADB(var, reg, off, p)                                                                    \
-    {                                                                                              \
-        register u32 o asm(reg) = off;                                                             \
-        register u8 *q asm("r0");                                                                  \
-        asm("" : "+r"(o));                                                                         \
-        q = (u8 *)(p) + o;                                                                         \
-        var = *q;                                                                                  \
-    }
 void Player_SubtractStatB(struct Player *p, s32 amount)
 {
     s32 value;
-    u32 en, mode;
-    LOADB(en, "r2", EN_OFF, p);
-    if (en) {
-        mode = p->statModifierContext.statBOverrideMode;
-        if (mode == 7) {
-            value = gGameState->unk77C;
-            goto have;
-        }
-    }
-    value = p->currentStatB;
-have:
+    if (!p->statModifierContext.statBOverrideEnabled)
+        value = p->currentStatB;
+    else if (p->statModifierContext.statBOverrideMode == 7)
+        value = gGameState->unk77C;
+    else
+        value = p->currentStatB;
     if (value < amount)
         value = 0;
     else
         value -= amount;
-    LOADB(en, "r1", EN_OFF, p);
-    if (en) {
-        mode = p->statModifierContext.statBOverrideMode;
-        if (mode == 7) {
-            gGameState->unk77C = value;
-            return;
-        }
-    }
-    p->currentStatB = value;
+
+    if (!p->statModifierContext.statBOverrideEnabled)
+        p->currentStatB = value;
+    else if (p->statModifierContext.statBOverrideMode == 7)
+        gGameState->unk77C = value;
+    else
+        p->currentStatB = value;
 }
