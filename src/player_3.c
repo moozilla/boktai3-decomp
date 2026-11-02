@@ -775,29 +775,25 @@ static inline void Player_SetVisualStatusBits(u32 *flags, u32 mask)
     u32 m = mask;
     *flags |= m;
 }
-static inline void Player_StoreVisualSpeeds(u8 *speeds, s32 speed)
-{
-    *speeds++ = speed;
-    *speeds = speed;
-}
 static inline void Player_DecayVisualSlowdown(struct Player *p, u32 zero)
 {
-    u16 *timer = &p->visualSlowdownTimer;
-    if (*timer) {
-        s32 speed;
-        u8 *sound = (u8 *)p + 0x4E1;
-        if (*sound) {
+    if (p->visualSlowdownTimer != 0) {
+        u8 *chime = &p->unk4E1[0];
+        if (*chime != 0) {
             Sound_PlaySong(0x336);
-            *sound = zero;
+            *chime = zero;
         }
-        if (--*timer == 0) {
+        p->visualSlowdownTimer -= 1;
+        if (p->visualSlowdownTimer == 0) {
             p->animation.flags &= ~2;
-            Player_StoreVisualSpeeds(&p->movementSpeedScale, 64);
+            p->movementSpeedScale = 0x40;
+            p->secondarySpeedScale = 0x40;
         } else {
+            s32 speed;
             p->animation.flags |= 2;
-            asm("" ::: "memory");
-            speed = 64 - (*timer >> 1);
-            Player_StoreVisualSpeeds(&p->movementSpeedScale, speed);
+            speed = 0x40 - (p->visualSlowdownTimer >> 1);
+            p->movementSpeedScale = speed;
+            p->secondarySpeedScale = speed;
         }
     }
 }
@@ -813,7 +809,7 @@ void Player_UpdateStatusVisuals(void *actor)
             if (*timer < 64) {
                 if (*timer == 0) {
                     Sound_PlaySong(0x1EE);
-                    *((u8 *)p + 0x4E1) = 1;
+                    p->unk4E1[0] = 1;
                 }
                 ++*timer;
             }
