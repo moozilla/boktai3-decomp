@@ -1,7 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
 
+extern u8 *gUnknown_02000580[];
 static inline void SubtractPosition(s16 *delta, const struct SceneVec *a,
                                     const struct ContactPosition *b)
 {
@@ -22,8 +24,7 @@ void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *acto
     u32 excluded;
     s16 *difference;
     {
-        struct Player *volatile *g0 = (struct Player **)0x02000580;
-        struct Player *initial = g0[0];
+        struct Player *initial = (struct Player *)gUnknown_02000580[0];
         u32 mask = 0x10000;
         flags = initial->statusFlags;
         if (flags & mask) {
