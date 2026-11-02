@@ -1,65 +1,14 @@
 #include "global.h"
-#include "vanargand_damage_part.h"
-#include "paired_scene_actor.h"
+#include "vanargand_pair_attack.h"
 #include "vanargand_stage_colors.h"
 // MATCHING_CONCESSION: register-pinning
-struct Vanargand {
-    u8 pad0[0x54];
-    u8 motionData[0x90 - 0x54];
-    u32 actionTimer;
-    s16 health;
-    u8 pad96[6];
-    u32 flags;
-    u8 padA0[2];
-    u8 phase;
-    u8 padA3;
-    u32 timer;
-    u8 padA8[3], state, padAC[3];
-    u8 finished, entered, pendingAnimation, ready;
-    u8 padB3[0x100 - 0xB3];
-    void (*callback)(void *, s32);
-    u8 pad104[0x18C - 0x104];
-    u8 animation[0x20];
-    struct ContactPosition displayPosition;
-    u8 pad1B4[0x21C - 0x1B4];
-    u8 actionSequence[0x3FC - 0x21C];
-    struct VanargandDamagePart part;
-    u8 track[0x29];
-    u8 trackState;
-    u8 pad55E[0x56C - 0x55E];
-    struct VanargandAttackPair *attachment;
-    u8 pad570[0x584 - 0x570];
-    u16 pairedMotion;
-    u8 pad586[0x59E - 0x586];
-    u16 thresholds[3];
-    u32 hitFlags;
-    s16 damage;
-    u8 pad5AA[2];
-    s16 accumulatedDamage;
-    u16 flashTimer;
-    u16 delay;
-    u8 pad5B2[0x5B8 - 0x5B2];
-    u16 field5B8, field5BA;
-    u8 pad5BC[0x6C4 - 0x5BC];
-    struct DamageNumberSource damageSource;
-    u8 pad6CC[0x718 - 0x6CC];
-    u8 palette[0x918 - 0x718];
-    u8 fadeA[0xB18 - 0x918];
-    u8 fadeB[0xD18 - 0xB18];
-    u8 fadeC[0xF24 - 0xD18];
-    u32 variant;
-    u8 padF28[0xF34 - 0xF28];
-    s32 transition;
-    u8 padF38[0xF44 - 0xF38];
-    void *afterimages;
-};
 void Sound_PlaySong(u32);
-void Vanargand_ResetPaletteTransition(struct Vanargand *);
+void Vanargand_ResetPaletteTransition(struct VanargandPairAttack *);
 void CpuSet(const void *, void *, u32);
 
 void Vanargand_StopActionSequence(void *);
 
-static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
+static inline void restorePalette(struct VanargandPairAttack *p, struct VanargandPairAttack *self)
 {
     s32 kind = 0x6F;
     if (!p->variant)
@@ -67,44 +16,45 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
     switch (kind) {
         case 0x6F: {
 
-            CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000020);
+            CpuSet(gPaletteBankData + 0xDE0, p->palettes, 0x04000020);
             CpuSet(p->fadeA, gBgPaletteBuffer, 0x04000068);
             Vanargand_SetStageColors(p->transition);
             break;
         }
         case 0x82:
-            CpuSet(gPaletteBankData + 0x1040, p->palette, 0x04000020);
+            CpuSet(gPaletteBankData + 0x1040, p->palettes, 0x04000020);
             CpuSet(p->fadeB, gBgPaletteBuffer, 0x04000068);
             break;
         case 0x7F:
-            CpuSet(gPaletteBankData + 0xFE0, p->palette, 0x04000018);
+            CpuSet(gPaletteBankData + 0xFE0, p->palettes, 0x04000018);
             CpuSet(p->fadeC, gBgPaletteBuffer, 0x04000068);
             break;
         default:
-            CpuSet(gPaletteBankData + 0x3240, self->palette, 0x04000008);
+            CpuSet(gPaletteBankData + 0x3240, self->palettes, 0x04000008);
             break;
     }
     Vanargand_ResetPaletteTransition(self);
     Vanargand_StopActionSequence(self->actionSequence);
 }
-static inline void changeState(struct Vanargand *p, s32 state, void (*callback)(void *, s32))
+static inline void changeState(struct VanargandPairAttack *p, s32 state,
+                               void (*callback)(void *, s32))
 {
-    struct Vanargand *self = p;
+    struct VanargandPairAttack *self = p;
     // Keep the transition owner distinct from the callback installation owner.
     if (p->state == 3)
         restorePalette(p, self);
     {
         u32 zero = 0;
         p->state = state;
-        p->callback = callback;
+        p->stateCallback = callback;
         p->actionTimer = zero;
-        p->pendingAnimation = 1;
+        p->pending = 1;
         p->phase = zero;
         p->timer = zero;
     }
 }
 
-static inline void setFlags(struct Vanargand *p, u32 mask)
+static inline void setFlags(struct VanargandPairAttack *p, u32 mask)
 {
     p->flags |= mask;
 }
@@ -115,16 +65,23 @@ static inline void setPosition(s16 *dst, s32 x, s32 y, s32 z)
     dst[1] = y;
     dst[2] = z;
 }
-static inline u32 partFlags(struct Vanargand *p)
+static inline u32 partFlags(struct VanargandPairAttack *p)
 {
     return p->part.contactFlags;
 }
 // confidence=low: distinguishes accumulated body damage from paired-part contact damage.
 void DamageNumberDisplay_ShowWithDefaultScale(void *, s32, s32, void *, s32);
 void Vanargand_UpdatePaletteLeap(void *, s32);
-s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
+static inline s16 ReadAccumulatedDamage(struct VanargandPairAttack *actor, s16 **field)
 {
-    struct Vanargand *self = p;
+    *field = &actor->accumulatedDamage;
+    return **field;
+}
+
+s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
+{
+    s16 *hitTotal;
+    struct VanargandPairAttack *self = p;
     void *display = &p->damageSource;
     s32 damage = p->damage;
     u32 special = (p->hitFlags >> 6) & 1;
@@ -142,14 +99,10 @@ s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
     asm("" : "+r"(partDamage));
     if (damage > 0 || special) {
         p->health -= damage;
-        {
-            s16 *accumulated = &self->accumulatedDamage;
-            asm("" : "+r"(accumulated));
-            *accumulated += damage;
-        }
-        DamageNumberDisplay_ShowWithDefaultScale(display, damage, 0, &self->displayPosition, 1);
+        self->accumulatedDamage += damage;
+        DamageNumberDisplay_ShowWithDefaultScale(display, damage, 0, &self->animation.position, 1);
         self->flashTimer = 15;
-        CpuSet(gPaletteBankData + 0x3240, self->palette, 0x04000008);
+        CpuSet(gPaletteBankData + 0x3240, self->palettes, 0x04000008);
         Vanargand_ResetPaletteTransition(self);
         {
             u32 song = 0x13E;
@@ -163,24 +116,24 @@ s32 Vanargand_ApplyPendingDamage(struct Vanargand *p)
             return 1;
         }
         {
-            s32 accumulated = self->accumulatedDamage;
+            s32 accumulated = ReadAccumulatedDamage(self, &hitTotal);
             s32 transition = self->transition;
             if (transition > 2)
                 transition = 2;
             if (accumulated >= self->thresholds[transition]) {
-                s32 count = ScenePair_CountPositiveCounters(self->attachment);
+                s32 count = ScenePair_CountPositiveCounters(self->pair);
                 if (count == 0) {
                     {
                         register u32 mask asm("r2") = 1;
                         setFlags(p, mask);
                     }
-                    self->accumulatedDamage = count;
+                    *hitTotal = count;
                     return 1;
                 } else {
                     s32 transition = self->transition;
                     if (transition > 2)
                         transition = 2;
-                    self->accumulatedDamage = self->thresholds[transition] - 1;
+                    *hitTotal = self->thresholds[transition] - 1;
                 }
             } else {
                 self->delay += 6;
