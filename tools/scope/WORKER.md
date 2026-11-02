@@ -120,7 +120,7 @@ mod the number of spill registers, and `why` prints the D that gives the ROM's r
 `CSE_KEEP=PSEUDO` (keep a register canonical in cse).
 
 Knobs compile as the build does (no `-g`), except those that name insn uids
-(`AGBCC_NOMOVE`, `AGBCC_NOGIV`, `AGBCC_GIV`, `AGBCC_NOTIE`, `CSE_NOFOLLOW_JUMP`):
+(`AGBCC_NOMOVE`, `AGBCC_MOVE`, `AGBCC_NOGIV`, `AGBCC_GIV`, `AGBCC_NOTIE`, `CSE_NOFOLLOW_JUMP`):
 uids exist only in the `-g` compile. When `-g` changes a function's code
 (scope prints a note), their results are marked `[-g compile]` and a MATCH
 there is not the build's.

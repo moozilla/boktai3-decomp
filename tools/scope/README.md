@@ -300,7 +300,8 @@ sub_0803D430's worker asked for a strength-reduction explainer, where NOGIV=66 a
 address, which the ROM *does* step, so the gain came from allocation side effects; a probe hit on
 a giv says the decision matters, not which side the ROM is on: check the ROM listing for a
 post-increment or a stepped register before writing C; it reached 24/25 by C, not a match),
-`AGBCC_NOMOVE=U1,U2` (loop.c: leave the invariant set by insn U in the loop; with
+`AGBCC_NOMOVE=U1,U2` (loop.c: leave the invariant set by insn U in the loop; `AGBCC_MOVE=U`
+is the reverse, hoisting a `kept` invariant whatever its threshold test says; with
 `AGBCC_LOOP_TRACE=1` the trace also prints `loopopt fn=` once per loop pass, a `cand` line
 for every pseudo set in each loop (may_not_optimize, maybe_never, used_before, in_block,
 set_in_loop, invariant), a `move` line with the threshold arithmetic and a `match` line
