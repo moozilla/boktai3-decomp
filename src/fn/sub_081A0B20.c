@@ -1,6 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
+/* Tentative Hresvelgr layout and behavior names, inferred from static consumers. */
 typedef struct HresvelgrPosition {
     s16 x, y, z, pad;
 } HresvelgrPosition;
@@ -27,32 +26,29 @@ void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 int Hresvelgr_UpdateTravel(HresvelgrActor *);
 int Path_SnapToNearestPoint(HresvelgrPosition *, HresvelgrPosition *, int);
-void Hresvelgr_PlayNearestPointTravel(HresvelgrActor *p)
+void Hresvelgr_PlayNearestPointTravel(HresvelgrActor *body)
 {
+    HresvelgrActor *actor = body;
     HresvelgrPosition target, nearest;
-    HresvelgrActor *actor = p;
-    register u32 zero asm("r6");
-    asm("" : "+r"(actor));
     {
         u32 mask = 0x200040;
-        p->flags |= mask;
+        body->flags |= mask;
     }
-    if (p->changed) {
-        zero = 0;
-        asm("" : "+r"(zero));
-        p->changed = zero;
-        Hresvelgr_GetTravelTarget(p, &target);
-        if (Path_SnapToNearestPoint(&nearest, &target, 0) < 0)
-            goto done;
-        ColliderActor_SetTargetPosition(p, &nearest);
-        Hresvelgr_SetAnimation(p, p->animation, p->animationData, 0, 1, zero);
+    if (body->changed) {
+        body->changed = 0;
+        Hresvelgr_GetTravelTarget(body, &target);
+        if (Path_SnapToNearestPoint(&nearest, &target, 0) < 0) {
+            body->finished = 1;
+            return;
+        }
+        ColliderActor_SetTargetPosition(body, &nearest);
+        Hresvelgr_SetAnimation(body, body->animation, body->animationData, 0, 1, 0);
     }
-    if (!(u8)Callback_InvokeActor(p, p->callback)) {
-        if (p->pulse)
+    if (!(u8)Callback_InvokeActor(body, body->callback)) {
+        if (body->pulse)
             Sound_PlaySong(0x3d9);
-        if (Hresvelgr_UpdateTravel(actor) || p->tick > 128) {
-        done:
-            p->finished = 1;
+        if (Hresvelgr_UpdateTravel(actor) || body->tick > 128) {
+            body->finished = 1;
         }
     }
 }
