@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "player.h"
@@ -195,40 +194,31 @@ void Player_UpdateTerrainSidestep(u8 *p)
                     effect.y += 68;
                     effect.z += 44;
                 }
-                {
-                    const s16 *base = gUnk_086149C4;
-                    s32 first;
-                    s32 sample;
-                    u32 mask;
-                    register u32 offset asm("r3");
-                    u32 angle;
-                    u8 *heading;
-                    offset = 0x4A5;
-                    heading = p + offset;
-                    angle = *heading + 1;
-                    mask = 7;
-                    angle &= mask;
-                    sample = base[((angle << 5) + 64) & 255];
-                    first = 50;
-                    first *= sample;
-                    trig = base;
-                    asm("" : "+r"(p) : "r"(first), "r"(trig) : "r2", "r3", "memory");
-                }
-                {
-                    s32 second;
-                    s32 sample;
-                    register u32 mask asm("r1");
-                    u32 offset = 0x4A5;
-                    u32 angle;
-                    u8 *heading;
-                    heading = p + offset;
-                    angle = *heading + 1;
-                    mask = 7;
-                    angle &= mask;
-                    sample = trig[angle << 5];
-                    second = 50;
-                    second *= sample;
-                    asm("" : : "r"(second));
+                { /* The object-push variant uses this position for its effect terrain test. */
+                    struct PackedVec probe;
+                    probe = *(struct PackedVec *)(p + 0x30);
+                    {
+                        const s16 *base = gUnk_086149C4;
+                        u32 angle;
+                        u8 *heading;
+                        s32 sample, product;
+                        heading = p + 0x4a5;
+                        angle = (*heading + 1) & 7;
+                        sample = base[((angle << 5) + 64) & 255];
+                        product = sample * 50;
+                        trig = base;
+                        probe.x -= Scale(product);
+                    }
+                    {
+                        u32 angle;
+                        u8 *heading;
+                        s32 sample, product;
+                        heading = p + 0x4a5;
+                        angle = (*heading + 1) & 7;
+                        sample = trig[angle << 5];
+                        product = sample * 50;
+                        probe.z -= Scale(product);
+                    }
                 }
                 Player_EmitPositionEffect(p, p + 0x30, 256, 1, &effect, 0, 236);
                 Player_SetTetherMode(p, 4, 1);
