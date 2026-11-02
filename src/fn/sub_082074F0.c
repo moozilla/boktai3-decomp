@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "vulcan_cannon_worker.h"
 #include "ram.h"
@@ -74,6 +73,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             p->aimTimer = 120;
         if (p->hp <= 0) {
             struct SceneVec center, smoke;
+            s32 explosionFrame = 0;
             struct CannonEffectVector velocity, spread;
             const u16 *table;
             p->dead = 1;
@@ -91,33 +91,18 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             sub_08014634((CannonRandom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
             SceneVec_Copy(&smoke, &p->display.spatial.position);
             CannonEffectOffset(&smoke);
-            {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, zero);
-            }
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 0);
             smoke.x += 128;
-            {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
-            }
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 2);
             smoke.x -= 128;
             smoke.z += 128;
-            {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, 0, 0, zero, 60, zero, 2);
-            }
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 2);
             smoke.z -= 128;
             smoke.x -= 128;
-            {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, zero, 0, zero, 60, zero, 5);
-            }
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 5);
             smoke.x += 128;
             smoke.z -= 128;
-            {
-                s32 zero = 0;
-                Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, 5);
-            }
+            Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 5);
             {
                 struct DisplaySequenceState *seq;
                 void *res;
@@ -125,7 +110,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
                 seq = &p->sequence;
                 res = p->resource;
                 {
-                    register const u8 *direction asm("r2") = (const u8 *)&p->facing;
+                    const u8 *direction = (const u8 *)&p->facing;
                     facing = *direction;
                 }
                 Anim_RestartSequence(seq, res, 0x13, facing, 0);
