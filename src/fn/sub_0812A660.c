@@ -13,7 +13,6 @@ struct ActorEffect {
     struct ContactCollider colliders[2];
 };
 
-// MATCHING_CONCESSION: register-pinning
 struct Packed {
     s32 x : 16;
     s32 y : 16;
@@ -30,19 +29,18 @@ union Vector {
     struct Vec halves;
 };
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
-void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
+void Collider_SetAttackProperties(struct ContactCollider *, s32 power, s32 knockbackPower,
+                                  s32 weakness, u32 attributes, s32 invincibilityFrames);
 void Collider_SetBodyProperties(void *, u16, u32, u32);
 void Collider_SetCallback(void *, void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void ActorEffect_OrientFromPositions(void);
 void LinkedEffect_ApplyVariant(void);
-void ActorEffect_InitColliders(struct ActorEffect *arg, u32 arg1, u32 arg2, u32 arg3, u32 extra)
+void ActorEffect_InitColliders(struct ActorEffect *arg, s32 attackPower, s32 knockbackPower,
+                               u32 attributes, s32 invincibilityFrames)
 {
     struct ActorEffect **actorReference;
     struct ActorEffect *p = arg;
-    u32 kind = arg1;
-    register u32 power asm("r9") = arg2;
-    register u32 value asm("r8") = arg3;
     union Vector size;
     u32 colliderValue;
     union Vector offset;
@@ -52,14 +50,15 @@ void ActorEffect_InitColliders(struct ActorEffect *arg, u32 arg1, u32 arg2, u32 
     size.bits.x = 64;
     size.bits.y = 128;
     actorReference = &p;
-    colliderValue = 16;
     size.bits.z = 64;
+    colliderValue = 16;
     offset.bits.x = 0;
     offset.bits.y = 0;
     offset.bits.z = 0;
     primary = &p->colliders[0];
     Collider_Init(primary, 0, 0x2001, 0, colliderValue, &size, &offset);
-    Collider_SetAttackProperties(primary, kind, power, 0, value, extra);
+    Collider_SetAttackProperties(primary, attackPower, knockbackPower, 0, attributes,
+                                 invincibilityFrames);
     Collider_SetCallback(primary, ActorEffect_OrientFromPositions, p);
     position = &(*actorReference)->position;
     Collider_SetPosition(primary, position, 0);
