@@ -1,4 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
+#include "game_state.h"
 #include "repeated_effect.h"
 void RepeatedEffect_TickNeutral(struct RepeatedEffect *effect)
 {
@@ -39,7 +40,7 @@ void RepeatedEffect_TickNeutral(struct RepeatedEffect *effect)
         }
     }
     {
-        s32 intensity = *(s16 *)((u8 *)gGameState + 0x876);
+        s32 intensity = gGameState->unk876;
         if (intensity == 0) {
             if (effect->behaviorFlags & 2) {
                 effect->balance--;
