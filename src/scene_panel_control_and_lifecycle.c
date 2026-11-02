@@ -125,11 +125,14 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         }
         TetherActor_SetInteractionTarget(&position, direction);
     } else if (frame == 6) {
-        gTetherActor->state = 12;
+        {
+            u8 *state = &gTetherActor->state;
+            *state = 12;
+        }
         gTetherActor->position = panel->center;
         {
             u8 *heading = &gTetherActor->heading;
-            register u32 zero asm("r0");
+            u32 zero;
             zero = 0;
             *heading = zero;
         }
