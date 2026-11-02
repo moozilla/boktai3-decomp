@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "display_sequence_inline.h"
 #include "engine_globals.h"
 #include "ram.h"
 // confidence=low: moves one frost particle, steps playback and hides it on expiry.
@@ -193,16 +194,10 @@ void FrostEmitter_UpdateParticle(struct FrostParticle *input)
                     table = state->commands;
                     command = (const volatile u16 *)((u32)table + offset);
                 }
-                state->weight = *command & 15;
-                {
-                    register s32 weight asm("r1") = state->weight;
-                    s32 speed;
-                    speed = state->speed;
-                    speed = (speed * weight) >> 6;
-                    state->duration = speed;
-                    if (!(u8)speed)
-                        state->duration = 1;
-                }
+                state->weight = DisplaySequence_MaskCommand(*command, 15);
+                state->duration = (state->weight * (s32)state->speed) >> 6;
+                if (!state->duration)
+                    state->duration = 1;
             } else {
                 ended = 0;
             }
