@@ -2472,29 +2472,31 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
         struct DisplayPosition **slot = &actor->display.animation.position;
         u16 *display = (u16 *)*slot;
         register u32 value asm("r0");
-        register u32 coordinate asm("r3");
+        u32 coordinate;
         position = &actor->position;
         offset = 0x37E;
         value = (u16)actor->shakeX;
         coordinate = (u16)position->x;
         display[0] = value + coordinate;
         asm("" ::: "memory");
-        display = (u16 *)*slot;
         {
-            u16 *axis = (u16 *)&actor->position.y;
-            offset += 2;
-            value = *(u16 *)((u8 *)actor + offset);
-            coordinate = *axis;
-            display[1] = value + coordinate;
-        }
-        asm("" ::: "memory");
-        display = (u16 *)*slot;
-        {
-            u16 *axis = (u16 *)&actor->position.z;
-            value = (u16)actor->shakeZ;
+            u16 *worldDisplay = (u16 *)*slot;
             {
-                u32 z = *axis;
-                display[2] = value + z;
+                u16 *axis = (u16 *)&actor->position.y;
+                offset += 2;
+                value = *(u16 *)((u8 *)actor + offset);
+                coordinate = *axis;
+                worldDisplay[1] = value + coordinate;
+            }
+            asm("" ::: "memory");
+            worldDisplay = (u16 *)*slot;
+            {
+                u16 *axis = (u16 *)&actor->position.z;
+                value = (u16)actor->shakeZ;
+                {
+                    u32 z = *axis;
+                    worldDisplay[2] = value + z;
+                }
             }
         }
         offset = 0x130;
