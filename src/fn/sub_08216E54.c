@@ -2,32 +2,24 @@
 #include "render.h"
 #include "heap.h"
 
-// MATCHING_CONCESSION: register-pinning
 void *ScriptProc_Start(u16 key, u16 context);
 void LZ77UnCompWram(const void *src, void *dest);
 
 void *sub_08216E54(u16 id)
 {
-    void *result;
+    u8 *anchor, *heapBase;
     u32 key = id;
     u8 *res = ScriptProc_Start(0xC091, key);
     if (res == NULL)
         return NULL;
     if ((res[0] == 'M' && res[1] == 'P') || *(u32 *)res == 0x005E8CC5)
         return res;
-    if (gBgMapCacheKey != key) {
-        u8 *anchor, *heapBase;
-        gBgMapCacheKey = key;
-        /* The cache payload follows its four-byte header in the heap-relative buffer. */
-        anchor = ((u8 *)&gHeapHead) + 0x0201F400;
-        heapBase = ((u8 *)&gHeapHead);
-        LZ77UnCompWram(res, (void *)0x02020400);
-        anchor -= (u32)heapBase;
-        anchor += 0x1004;
-        asm("" : : "r"(anchor));
-        result = anchor;
-    } else {
-        result = (void *)0x02020404;
-    }
-    return result;
+    if (gBgMapCacheKey == key)
+        return (void *)0x02020404;
+    gBgMapCacheKey = key;
+    /* The cache payload follows its four-byte header in the heap-relative buffer. */
+    anchor = ((u8 *)&gHeapHead) + 0x0201F400;
+    heapBase = ((u8 *)&gHeapHead);
+    LZ77UnCompWram(res, (void *)0x02020400);
+    return (void *)(anchor - heapBase + 0x1004);
 }
