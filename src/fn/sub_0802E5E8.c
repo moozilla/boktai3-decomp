@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 struct Vec {
@@ -105,18 +104,16 @@ int Actor_EndScriptControl(void)
                     break;
 
                 case 0:
-                    /* if (1) only keeps agbcc's block layout */
-                    if (1) {
-                    }
-                    {
-                        int one = 1;
-                        (*alias)->stage = command;
-                        (*alias)->phase = command;
-                        p->state = one;
-                        p->ticks = command;
-                        p->entered = one;
-                        break;
-                    }
+
+                {
+                    int one = 1;
+                    (*alias)->stage = command;
+                    (*alias)->phase = command;
+                    p->state = one;
+                    p->ticks = command;
+                    p->entered = one;
+                    break;
+                }
 
                 case 1:
                     (*alias)->stage = zero;
