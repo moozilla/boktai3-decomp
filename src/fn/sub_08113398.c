@@ -1,16 +1,13 @@
-#include "global.h"
+#include "scene_debris.h"
 #include "render.h"
 #include "ram.h"
-struct DebrisPos {
-    s16 x, y, z, pad;
-};
 struct DebrisVisual {
     u8 unknown0[0x68];
     void *palette;
 };
 struct Debris {
     struct DebrisVisual *visual;
-    struct DebrisPos position, velocity;
+    struct ContactPosition position, velocity;
     u32 timer;
     u8 restitution, active, entered, visualType;
     void (*update)(struct Debris *);
@@ -26,7 +23,7 @@ void AnimData_SelectPaletteBank(void *, s32);
 void SceneDebris_UpdateAnimatedMotion(struct Debris *);
 void SceneDebris_UpdateBouncingMotion(struct Debris *);
 // confidence=low: claims a free debris slot, copies position/velocity, builds its panel sprite and picks the motion callback.
-s32 sub_08113398(struct DebrisPos *pos, struct DebrisPos *velocity, u32 a2, u32 a3, u32 a4,
+s32 sub_08113398(const struct ContactPosition *pos, const struct ContactPosition *velocity, u32 a2, u32 a3, u32 a4,
                  u32 keyframe, u32 a6, u32 a7, s32 palette, u32 timer, u32 motion, u32 a11, u32 a12,
                  u32 restitution)
 {
