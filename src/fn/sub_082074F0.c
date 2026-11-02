@@ -10,8 +10,8 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void TerrainModifiers_UnregisterCell(void *);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
-void Explosion_CreateAt(void *, s32, s32, s32, s32, s32, s32, s32);
-void Anim_RestartSequence(void *, void *, u32, u32, u32);
+u8 *Explosion_CreateAt(void *, u32, s32, s32, s32, s32, s32, u32);
+u32 Anim_RestartSequence(struct DisplaySequenceState *, void *, u16, u8, u8);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, s32, s32, s32, s32, s32, s32);
 struct CannonEffectPair {
     s32 lo : 16;
@@ -123,16 +123,11 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
                 Explosion_CreateAt(&smoke, 16, 0, zero, zero, 60, zero, 5);
             }
             {
-                void *seq, *res;
+                struct DisplaySequenceState *seq;
+                void *res;
                 u32 facing;
                 seq = &p->sequence;
-                {
-                    u32 off = 0x17c;
-                    {
-                        register u8 *addr asm("r1") = (u8 *)p + off;
-                        res = *(void **)addr;
-                    }
-                }
+                res = p->resource;
                 {
                     register u32 off asm("r3") = 0x132;
                     asm("" : "+r"(off));
