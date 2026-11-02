@@ -5650,6 +5650,26 @@ def pre_text(wd, func, r, srclines=None):
     return s
 
 
+def pre_moved_above_loop(wd, r):
+    """Whether PRE record R moved its computation above a whole loop: a loop begins and ends between an
+    insertion gcse made and the insn it replaced, in the gcse dump's insn order (fact 50). A replaced
+    insn inside the loop (a loop invariant PRE hoisted) does not count."""
+    path = os.path.join(wd, "u.i.gcse")
+    if not os.path.exists(path) or not r["inserted"]:
+        return False
+    text = open(path).read()
+    end = text.find(f"(insn {r['redundant']} ")
+    if end < 0:
+        return False
+    # the insertion that reaches it: the nearest one before it
+    start = max((text.rfind(f"(insn {u} ", 0, end) for u in r["inserted"]), default=-1)
+    if start < 0:
+        return False
+    seg = text[start:end]
+    beg = seg.find("NOTE_INSN_LOOP_BEG")
+    return beg >= 0 and seg.find("NOTE_INSN_LOOP_END", beg) >= 0
+
+
 def cmd_pre(src, func, env):
     """gcse's PRE decisions in C terms, one block per expression, each replacement scored with AGBCC_NOPRE=k
     (the function without that one replacement)."""
@@ -5691,6 +5711,12 @@ def cmd_pre(src, func, env):
             print(f"    gcse inserted its own computation at the end of the block of:"
                   f" {', '.join(at(u) for u in group[0]['inserted'])} (before the block's final compare or"
                   " jump, after any C there: fact 1)")
+            hoisted = [r for r in group if pre_moved_above_loop(wd, r)]
+            if hoisted:
+                print(f"    moved above a loop: {', '.join(at(r['redundant']) for r in hoisted)} comes after a loop"
+                      " that starts after the insertion (the old LCM stops delaying at every loop header, fact"
+                      " 50). To keep it after the loop: an increment Thumb cannot encode inline, the same"
+                      " expression again on every later path, or its operand set inside the loop")
         for r in group:
             m, counts = scores[r["k"]]
             touched = differing & {r["redundant"], *r["inserted"], *(c for c, _ in r["copies"])}
