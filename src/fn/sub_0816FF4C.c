@@ -9,7 +9,7 @@ void Hud_SaveGridSelection(void *);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 int SceneHud_CanApplySelectedAction(s32);
 void PauseMenu_AddSpriteFlags(void *, int, int);
-void PauseMenu_OpenPrompt(s32, s32, s32);
+void PauseMenu_OpenPrompt(const void *, s32, s32);
 u32 PauseMenu_CanUseSelectedItem(void *);
 void PauseMenu_SetConfirmationIndicator(void *, s32);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
@@ -33,7 +33,7 @@ void SceneHud_UpdateActionSelection(struct SceneHudState *p)
         index = Inventory_GetQuantityByStorage(p->actionCategory, p->actionSelection);
         if (SceneHud_CanApplySelectedAction(index) && index != -1) {
             PauseMenu_AddSpriteFlags(p, 59, 1);
-            PauseMenu_OpenPrompt(*(s32 *)((u8 *)p + 0x5c), 3, 1);
+            PauseMenu_OpenPrompt(p->optionUpperEScript, 3, 1);
             PauseMenu_SetConfirmationIndicator(p, PauseMenu_CanUseSelectedItem(p));
             MenuDisplay_SetPaletteOverrides(p, 0, 0, 1, result);
             PauseMenu_HidePromptIcons(p);
