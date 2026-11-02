@@ -1785,10 +1785,12 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
         if (current && i == EquipmentSlot(current))
             item = override;
         else {
-            if (*(s16 *)((u8 *)gGameState + i * 2 + 0x58) < 0)
+            struct GameState *save = gGameState;
+            const s16 *registered = ((struct GameState *)(i * 2 + (u32)save))->party;
+
+            if (*registered < 0)
                 continue;
-            item = GameState_GetConsumableDescriptor(
-                Inventory_GetConsumableId(*(s16 *)((u8 *)gGameState + i * 2 + 0x58)));
+            item = GameState_GetConsumableDescriptor(Inventory_GetConsumableId(*registered));
         }
         for (effect = 0; effect <= 1; effect++) {
             u32 kind, amount;
@@ -2081,7 +2083,7 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
         SetEquipmentFlag(p, 47);
     }
     if (p) {
-        Collider_SetContactMode((u8 *)p + 0x230, 64);
+        Collider_SetContactMode(&p->collider, 64);
     finish:
         Player_InitVisualResources(p);
         p->savedSpriteResource = -1;
