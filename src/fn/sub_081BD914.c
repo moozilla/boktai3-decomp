@@ -1,12 +1,8 @@
-#include "global.h"
+#include "dark_loan_screen.h"
 
-struct ScriptPanel {
-    u8 pad0[0x930];
-    void (*callback)(void);
-};
 void sub_081BCB14(void);
 
-s32 ScriptPanel_IsCallbackActive(struct ScriptPanel *panel)
+s32 ScriptPanel_IsCallbackActive(struct DarkLoanScreen *panel)
 {
     if (panel->callback == sub_081BCB14)
         return 1;
