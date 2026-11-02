@@ -15,6 +15,15 @@ struct SceneActorControlState {
     u8 unknown3E8[5];
     u8 randomDelay3ED;
 };
+/* Additional control fields touched by the pending-target handlers. */
+struct SceneActorPendingTargetState {
+    struct SceneActorControlState control;
+    u8 unknown3F0[0x42A - 0x3F0];
+    u8 pendingTargetDelay;
+    u8 unknown42B[0x444 - 0x42B];
+    u16 field444;
+};
+
 struct SceneActorControlPhaseView {
     u8 unknown0[0x3D0];
     struct SceneActorControlState *control;
