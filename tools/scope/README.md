@@ -1379,6 +1379,21 @@ Each was read from the compiler source and confirmed on a live draft.
    kept the test alive. When the ROM tests a value it never uses, write an if whose arms differ
    only in type.
 
+58. **A store through a pointer local stays `[rN]` only after a join; the arms that feed it need
+   two statements.** cse prefers `(plus p K)` to a register as an address (ARM's ADDRESS_COST
+   rates PLUS cheaper than REG), so `*angle = ...` with `u8 *angle = &p->angle` becomes
+   `strb r0, [r5, #2]` wherever cse's path from the definition reaches it. The three homing
+   drifts store `[r6]`, and both arms of the turn cross-jump into one store, so the original stored
+   once after the clamp's if/else, in a block whose label has two predecessors, where cse starts
+   with an empty table. `u32 next; if (...) next = p->angle + d; else next = p->angle + 4;` is
+   turned by jump.c into `next = p->angle + 4; if (...) next = p->angle + d;` (the
+   conditional-move rewrite of a single set in each arm, born "jump" in scope). A `u8 next`
+   blocks that but adds `lsls/lsrs #24`. `next -= d` after `next = p->angle` keeps a copy. What
+   matched in EffectParticle_UpdateDriftAroundActor, DriftBeforeHoming and Dissipating (8 + 5 + 1
+   pins out) was `if (|d| <= 4) { next = p->angle; next += d; } else next = p->angle + 4;
+   *angle = next;`. A two-insn arm is not a single set, so jump.c leaves the if alone, and combine
+   folds the copy inside its block.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
