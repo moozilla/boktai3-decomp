@@ -1,10 +1,14 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
-struct MotionPosition {
+struct PackedMotionPosition {
     u32 x : 16;
     s32 y : 16;
     u32 z : 16;
+};
+union MotionSample {
+    struct PackedMotionPosition bits;
+    s16 coordinates[4];
 };
 struct TerrainMotion {
     u32 previousCellFlags, previousShape, cellFlags, shape;
@@ -14,8 +18,8 @@ struct TerrainMotion {
     s32 verticalOffset, previousOffset;
     u32 collision;
 };
-s32 Terrain_GetCellClearance(struct MotionPosition *);
-s32 Terrain_GetCellHighByte(struct MotionPosition *);
+s32 Terrain_GetCellClearance(s16 *);
+s32 Terrain_GetCellHighByte(s16 *);
 void Memory_Clear(void *, u32);
 static inline u32 TerrainCell_FlagBits(u32 raw, u32 mask)
 {
@@ -27,9 +31,9 @@ static inline s32 Abs(s32 x)
         x = -x;
     return x;
 }
-static inline s32 Query(struct MotionPosition *p)
+static inline s32 Query(union MotionSample *p)
 {
-    register s32 result asm("r1") = Terrain_GetCellClearance(p);
+    register s32 result asm("r1") = Terrain_GetCellClearance(p->coordinates);
     asm("" : "+r"(result));
     return result;
 }
@@ -41,42 +45,42 @@ static inline s32 Offset(s32 z)
 // confidence=low: resolves glove and actor motion against terrain clearance and depth limits.
 void Terrain_ResolveActorMotion(struct TerrainMotion *p)
 {
-    struct MotionPosition old, next;
+    union MotionSample old, next;
     s32 y, floor, difference;
     u32 bits;
     u32 shape, flags;
     p->collision = 0;
     p->previousOffset = p->verticalOffset;
-    old.x = (p->x << 4) >> 16;
-    old.y = ((p->y + p->verticalOffset) << 4) >> 16;
-    old.z = (p->z << 4) >> 16;
-    next.x = ((p->x + p->deltaX) << 4) >> 16;
-    next.y = ((p->y + p->verticalOffset + p->deltaY) << 4) >> 16;
-    next.z = ((p->z + p->deltaZ) << 4) >> 16;
-    if ((s16)next.z < 6) {
-        next.z = 6;
+    old.bits.x = (p->x << 4) >> 16;
+    old.bits.y = ((p->y + p->verticalOffset) << 4) >> 16;
+    old.bits.z = (p->z << 4) >> 16;
+    next.bits.x = ((p->x + p->deltaX) << 4) >> 16;
+    next.bits.y = ((p->y + p->verticalOffset + p->deltaY) << 4) >> 16;
+    next.bits.z = ((p->z + p->deltaZ) << 4) >> 16;
+    if ((s16)next.bits.z < 6) {
+        next.bits.z = 6;
         p->z = 6 << 12;
         p->deltaZ = 0;
         p->collision = 2;
-    } else if ((s16)next.z > 60) {
-        next.z = 60;
+    } else if ((s16)next.bits.z > 60) {
+        next.bits.z = 60;
         p->z = 60 << 12;
         p->deltaZ = 0;
         p->collision = 2;
     }
-    Terrain_GetCellClearance(&old);
+    Terrain_GetCellClearance(old.coordinates);
     floor = Query(&next);
-    y = (s16)next.y;
-    floor -= Offset((s16)next.z);
+    y = (s16)next.bits.y;
+    floor -= Offset((s16)next.bits.z);
     if (floor - y < -8) {
-        next.z = p->z >> 12;
+        next.bits.z = p->z >> 12;
         p->deltaZ = 0;
         p->collision |= 2;
         floor = Query(&next);
-        y = (s16)next.y;
-        floor -= Offset((s16)next.z);
+        y = (s16)next.bits.y;
+        floor -= Offset((s16)next.bits.z);
     }
-    bits = Terrain_GetCellHighByte(&next);
+    bits = Terrain_GetCellHighByte(next.coordinates);
     {
         u32 source = bits;
         register u32 mask asm("r3");
@@ -88,8 +92,7 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
         shape = mask;
         flags &= 0xF000;
     }
-    difference = floor - y;
-    asm("" : "+r"(difference));
+    difference = floor - (s16)y;
     if (y >= floor) {
         p->y = floor << 12;
         if (Abs(p->verticalOffset >> 8) > 8)
