@@ -37,9 +37,8 @@ void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void sub_08236790(void);
 
-void OrbitEffect_Initialize(struct OrbitEffect *p, struct OrbitPosition *pos0)
+void OrbitEffect_Initialize(struct OrbitEffect *p, struct OrbitPosition *position)
 {
-    struct OrbitPosition *pos = pos0;
     struct OrbitSpriteGroup *g = &p->group;
     u32 firstPalette;
     u32 secondPalette;
@@ -67,7 +66,7 @@ void OrbitEffect_Initialize(struct OrbitEffect *p, struct OrbitPosition *pos0)
     AnimData_SelectPaletteBank(anim, firstPalette + 0x4B);
     g->a.f07 = 2;
     g->a.flags |= one;
-    g->a.position = *pos0;
+    g->a.position = *position;
     s2 = &g->b;
     anim = g->animB;
     AnimData_Load(anim, 0x8639);
