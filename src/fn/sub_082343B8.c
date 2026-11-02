@@ -1,6 +1,14 @@
 // MATCHING_CONCESSION: register-pinning
 #include "spiral_burst.h"
 
+static inline void FirstSpiralParticle(struct SpiralBurst *burst, void **drawable,
+                                       struct SpiralParticleMotion **motion)
+{
+    struct SpiralParticle *first = burst->particles;
+    *drawable = first;
+    *motion = &first->frame.motion;
+}
+
 void SpiralBurst_UpdateParticles(struct SpiralBurst *p)
 {
     u32 alive = 0;
@@ -19,8 +27,7 @@ void SpiralBurst_UpdateParticles(struct SpiralBurst *p)
     asm("" : "+r"(p)::"r4");
     timer = &p->timer;
     off = 0;
-    sprite = p->particles;
-    motion = &p->particles[0].frame.motion;
+    FirstSpiralParticle(p, &sprite, &motion);
     i = 7;
     do {
         if (*timer >= motion->lifetime) {
@@ -32,7 +39,7 @@ void SpiralBurst_UpdateParticles(struct SpiralBurst *p)
             motion->position.world.x =
                 p->origin.x +
                 SpiralBurst_ScaleOffset(motion->radius * gUnk_086149C4[(motion->angle + 64) & 255]);
-            asm("" ::: "memory");
+
             motion->position.world.z =
                 p->origin.z +
                 SpiralBurst_ScaleOffset(motion->radius * gUnk_086149C4[motion->angle]);
