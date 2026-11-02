@@ -1,6 +1,5 @@
 #include "global.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -208,14 +207,16 @@ afterPhase:
     }
     if (p->pathId >= 0) {
         u16 *timer = &p->nodeId;
-        register int count asm("r5") = *timer;
-        if (!count) {
+        s32 ticks = *timer;
+        u16 remaining = ticks;
+        if (!remaining) {
             Route_AdvancePoint(path);
             p->state = SceneCharacter_GetPathNodeState(p);
-            p->ticks = count;
+            p->ticks = remaining;
             p->entered = 1;
-        } else
-            (*timer)--;
+        } else {
+            *timer = ticks - 1;
+        }
     }
     p->ticks++;
     goto done;
