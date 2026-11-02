@@ -1,4 +1,6 @@
 #include "global.h"
+#include "ram.h"
+#include "hit_spark_random.h"
 #include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -72,10 +74,7 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         target->damageType = source->type;
         {
             u16 reaction;
-            {
-                u32 d;
-                reaction = source->reaction;
-            }
+            reaction = source->reaction;
             {
                 register u32 d asm("r0");
                 asm("" : "=r"(d));
@@ -83,30 +82,15 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 asm("" : : "r"(d));
             }
         }
-        {
-            u32 flags = source->flags;
-            {
-                u32 t = 0x40;
-                m40 = t;
-            }
-            hitFlags = flags;
-        }
+        hitFlags = source->flags;
+        m40 = 0x40;
         if (hitFlags & m40) {
-            {
-                u32 off = 0x130;
-                {
-                    u8 *addr = (u8 *)target + off;
-                    *(u16 *)addr = 8;
-                }
-            }
+            target->flash = 8;
             Sound_PlaySong(0x211);
             {
                 s32 damage;
                 void *col = target->collider;
-                {
-                    u32 d;
-                    damage = target->damage;
-                }
+                damage = target->damage;
                 DamageNumberDisplay_Show(col, damage, 0, &target->displayPosition,
                                          (u8 *)target + 0x80, 1);
             }
@@ -114,17 +98,8 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 void *hud;
                 s32 health;
                 s32 a, b, direction;
-                {
-                    u32 off = 0x14c;
-                    {
-                        u8 *addr = (u8 *)target + off;
-                        hud = *(void **)addr;
-                    }
-                }
-                {
-                    u32 d;
-                    health = target->health;
-                }
+                hud = target->hud;
+                health = target->health;
                 {
                     register u32 d asm("r1");
                     asm("" : "=r"(d));
@@ -143,44 +118,40 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         PlayerStats_AddContactHundredths(source, hit, 0);
     sparks:
         if (source->flags & target->sparkMask) {
-            register s32 i asm("r6");
+            s32 i;
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
             u32 *index = &gRandomIndex;
+            u32 limit = 0x3ff;
             u32 mask = 0x7f;
             i = 2;
             do {
-                register u32 random asm("r1");
-                register const u16 *table asm("r3");
+                u32 random;
+                u32 value;
                 u32 sample;
                 u32 x;
                 frame.velocity = gUnk_0824FEAC;
                 frame.position = target->position;
-                table = (const u16 *)RANDOM_TABLE_ADDR;
-                {
-                    u32 *cursor = index;
-                    random = (*cursor + 1) & 0x3ff;
-                }
-                sample = table[random];
+                value = (u32)gRandomTable;
+                random = HitSpark_NextIndex(*index, limit);
+                sample = HitSpark_Sample(value, random);
                 x = pos->x - 0x40;
                 sample &= mask;
                 x += sample;
                 pos->x = x;
-                random = (random + 1) & 0x3ff;
-                pos->y += (u8)table[random];
-                random = (random + 1) & 0x3ff;
+                random = HitSpark_NextIndex(random, limit);
+                pos->y += (u8)HitSpark_Sample(value, random);
+                random = HitSpark_NextIndex(random, limit);
+                *index = random;
                 {
-                    u32 *cursor = index;
-                    *cursor = random;
-                }
-                {
-                    u32 last = table[random];
+                    u32 last = HitSpark_Sample(value, random);
                     x = pos->z - 0x40;
                     last &= mask;
                     x += last;
                     pos->z = x;
                 }
-                SparkParticle_Spawn(&frame.position, 1, vel, 0, 3, 8, 2, 2);
+                value = 0;
+                SparkParticle_Spawn(&frame.position, 1, vel, value, 3, 8, 2, 2);
                 i--;
             } while (i >= 0);
         }
