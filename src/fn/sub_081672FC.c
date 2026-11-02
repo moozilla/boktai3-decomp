@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
 #include "player.h"
@@ -10,15 +9,13 @@ static inline u32 Offset(u32 base, u32 off)
     u32 sum = base + off;
     return sum;
 }
-#define PLACE(p, n, pos)                                                                           \
-    do {                                                                                           \
-        u32 off = ((n) + STATUS_WIDGET) * 96;                                                      \
-        {                                                                                          \
-            register u32 *flagAddr asm("r1") = (u32 *)Offset((u32)(p) + 0x1428, off);              \
-            *flagAddr &= ~1;                                                                       \
-        }                                                                                          \
-        *(struct SceneInputPackedPosition *)Offset((u32)(p) + 0x1440, off) = pos;                  \
-    } while (0)
+static inline void PlaceStatusIcon(struct SceneHudState *p, s32 n,
+                                   struct SceneInputPackedPosition pos)
+{
+    u32 off = (n + STATUS_WIDGET) * sizeof(struct SceneInputWidget);
+    *(u32 *)Offset((u32)&p->categoryWidgets[0].flags, off) &= ~1;
+    *(struct SceneInputPackedPosition *)Offset((u32)&p->categoryWidgets[0].position, off) = pos;
+}
 void InventoryPanel_ShowStatusIcons(struct SceneHudState *p)
 {
     struct SceneInputPackedPosition pos;
@@ -41,18 +38,18 @@ void InventoryPanel_ShowStatusIcons(struct SceneHudState *p)
             Anim_LoadKeyframe(&p->statusIcons[n], p->widgetResource, 0x5b, 1);
         else
             Anim_LoadKeyframe(&p->statusIcons[n], p->widgetResource, 0x5d, 1);
-        PLACE(p, n, pos);
+        PlaceStatusIcon(p, n, pos);
         pos.x += 0xd;
         n++;
     } else if (p->actionOwner->scriptStatus[0]) {
         Anim_LoadKeyframe(&p->statusIcons[n], p->widgetResource, 0x5f, 1);
-        PLACE(p, n, pos);
+        PlaceStatusIcon(p, n, pos);
         pos.x += 0xd;
         n++;
     }
     if (p->actionOwner->scriptStatus[1]) {
         Anim_LoadKeyframe(&p->statusIcons[n], p->widgetResource, 0x60, 1);
-        PLACE(p, n, pos);
+        PlaceStatusIcon(p, n, pos);
         n++;
     }
     for (; n <= 3; n++)
