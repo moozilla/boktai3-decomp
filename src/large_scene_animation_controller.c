@@ -1982,15 +1982,6 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
 struct PartExtraView {
     u32 pad, flags;
 };
-struct CopyPair {
-    u32 a, b;
-};
-struct PartColliderView {
-    u8 pad[6];
-    u16 flags;
-    u8 pad8[12];
-    struct CopyPair first, second;
-};
 extern const struct NidhoggrPartVector gUnk_0824F544, gUnk_0824F54C, gUnk_0824F554, gUnk_0824F55C;
 static inline void SetExtra(struct PartExtraView *p, u32 mask)
 {
@@ -2031,49 +2022,39 @@ void Nidhoggr_RestoreFirstPartRanges(struct Nidhoggr *p)
     }
 }
 
-/* Companion to sub_08194858 (part index 0); same shape, operating on parts 1/0 and
- * colliders[0]/[1] respectively. See sub_08194858's note. */
-
-extern const struct CopyPair gUnk_0824F564, gUnk_0824F56C, gUnk_0824F574, gUnk_0824F57C;
+extern const struct NidhoggrPartVector gUnk_0824F564, gUnk_0824F56C, gUnk_0824F574, gUnk_0824F57C;
 // confidence=low: restores second-part collider ranges after the completion state.
 #define Nidhoggr_RestoreSecondPartRanges sub_0819494C
 void Nidhoggr_RestoreSecondPartRanges(struct Nidhoggr *p)
 {
-    struct PartColliderView *c;
-    register const struct CopyPair *a asm("r4");
-    const struct CopyPair *b;
+    struct NidhoggrPartCollider *collider;
+    const struct NidhoggrPartVector *bounds, *offset;
     if (p->bgMode) {
         if (Nidhoggr_ChangeCompletedPartState(p, 1, 0x35)) {
-            c = (void *)((u8 *)p + 0x66D8);
-            a = &gUnk_0824F56C;
-            c->second = *a;
-            b = &gUnk_0824F564;
-            c->first = *b;
-            c = (void *)((u8 *)p + 0x5E50);
+            collider = (void *)&p->colliders[0];
+            NIDHOGGR_LOAD_PART_RANGES(collider, bounds, offset, gUnk_0824F56C, gUnk_0824F564);
+            collider = (void *)&p->altColliders[1];
             goto copy;
         }
     } else {
         if (Nidhoggr_ChangeCompletedPartState(p, 1, 0x14)) {
-            c = (void *)((u8 *)p + 0x672C);
-            a = &gUnk_0824F57C;
-            c->second = *a;
-            b = &gUnk_0824F574;
-            c->first = *b;
-            c = (void *)((u8 *)p + 0x5EA4);
+            collider = (void *)&p->colliders[1];
+            NIDHOGGR_LOAD_PART_RANGES(collider, bounds, offset, gUnk_0824F57C, gUnk_0824F574);
+            collider = (void *)&p->altColliders[2];
         copy:
-            c->second = *a;
-            c->first = *b;
+            collider->bounds = *bounds;
+            collider->offset = *offset;
         }
     }
     if (p->active) {
-        ((struct PartColliderView *)((u8 *)p + 0x672C))->flags |= 4;
-        ((struct PartColliderView *)((u8 *)p + 0x5EA4))->flags |= 4;
-        SetExtra((void *)((u8 *)p + 0x6F70), 1);
+        ((struct NidhoggrPartCollider *)&p->colliders[1])->flags |= 4;
+        ((struct NidhoggrPartCollider *)&p->altColliders[2])->flags |= 4;
+        SetExtra((void *)&p->partExtra[1], 1);
     } else {
-        struct PartColliderView *first = (void *)((u8 *)p + 0x672C);
+        struct NidhoggrPartCollider *first = (void *)&p->colliders[1];
         s32 mask = ~4;
         first->flags &= mask;
-        ((struct PartColliderView *)((u8 *)p + 0x5EA4))->flags &= mask;
+        ((struct NidhoggrPartCollider *)&p->altColliders[2])->flags &= mask;
     }
 }
 
