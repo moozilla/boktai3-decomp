@@ -1357,9 +1357,11 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     p->kind = 0;
     AnimData_Load(&p->animationData, animationResource);
     draw = &p->draw;
-    asm("" : "+r"(draw));
     Sprite_Init(draw, &p->animationData, 0);
-    draw->mode = drawMode;
+    {
+        s16 *mode = &draw->mode;
+        *mode = drawMode;
+    }
     p->center.x = (position->x & ~255) + 128;
     p->center.y = position->y & ~255;
     p->center.z = (position->z & ~255) + 128;
@@ -1457,7 +1459,6 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     }
     {
         register s32 initial asm("r3") = basePalette;
-        asm("" : "+r"(initial));
         if (initial >= 0)
             p->basePalette = initial;
         else
