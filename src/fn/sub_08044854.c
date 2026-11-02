@@ -11,7 +11,7 @@ s32 ContactSwarm_SpawnCharge(struct ContactSwarm *poolInput,
     register u32 speed asm("r10") = speedInput;
     register u32 direction asm("r2") = directionInput;
     struct ContactSwarmSlot *slot = pool->slots;
-    register struct ContactCollider *health asm("r6");
+    struct ContactCollider *health;
     struct ContactPosition *destination;
     register s32 index asm("r0");
     register u32 one asm("r1");
@@ -39,7 +39,7 @@ s32 ContactSwarm_SpawnCharge(struct ContactSwarm *poolInput,
             }
             AnimData_SelectPaletteBank(&slot->display.animation.draw.graphics, 0x2D3);
             {
-                register struct ContactSwarmColliderAnimation *display asm("r6") = (void *)health;
+                struct ContactSwarmColliderAnimation *display = (void *)health;
                 display->animation.draw.sprite.flags &= ~1;
             }
             ContactSwarm_SetDirectionalSequence(pool, slot, 0);
