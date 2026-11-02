@@ -1,6 +1,7 @@
 #include "global.h"
+#include "motion_track.h"
+#include "contact_swarm_sprite.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: initializes a half's sprite, origin, collision, target registration and shadow.
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
@@ -11,78 +12,116 @@ void TargetRegistry_RegisterSceneActor(void *, void *, void (*)(void));
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void ScaledShadow_SetGraphic(void *, u32, s32);
 void ScaledShadow_Enable(void *);
-#define FIELD(t, p, off) (*(t *)((u8 *)(p) + (off)))
 static inline void FillOffset(void *destination, u32 value)
 {
     CpuSet(&value, destination, 0x05000002);
 }
 
-void PairedSceneActor_InitializeHalf(u8 *half, void *origin, s32 mode)
+struct PairedSceneHalf {
+    struct ContactSwarmSprite sprite;
+    u8 graphics[0x2C];
+    struct MotionTrack motion;
+    void *origin;
+    u8 unknown94[8];
+    struct ContactPosition offset;
+    u8 unknownA4[8];
+    u16 heading, scale, fieldB0, fieldB2;
+    u8 unknownB4[0x54];
+    u8 damageCollider[0x54];
+    s32 mode;
+    u8 unknown160[0xC];
+    u8 state, requestedState, entered, unknown16F, finished, unknown171;
+    u16 active, health, maxHealth;
+    u32 stateTimer, hitFlags;
+    u16 damage, specialDamage, flashTimer;
+    u8 field186, field187;
+    u16 field188;
+    u8 unknown18A[0x12];
+    u32 shake;
+    u8 shadow[0x6C];
+    u8 target[0x10];
+};
+void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *half, void *origin, s32 mode)
 {
+    struct PairedSceneHalf *part = half;
     void *data;
     void *shadow;
-    register u32 zero asm("r4");
-    u32 byteZero;
+    u16 zero;
+    u16 clearedState;
     u32 scale;
     u32 one;
-    FIELD(s32, half, 0x15C) = mode;
-    data = half + 0x2C;
+    u32 initialFrame;
+    part->mode = mode;
+    data = part->graphics;
     AnimData_Load(data, 0x89CA);
     Sprite_Init(half, data, 0);
-    zero = 0;
-    FIELD(u16, half, 0x10) = zero;
-    half[7] = 2;
+    initialFrame = 0;
+    part->sprite.frame = initialFrame;
+    part->sprite.priority = 2;
     if (mode == 1)
-        FIELD(u32, half, 0) |= 4;
-    FIELD(u32, half, 0) |= 1;
-    FillOffset(half + 0x9C, zero);
-    FIELD(void *, half, 0x90) = origin;
+        part->sprite.flags |= 4;
+    part->sprite.flags |= 1;
+    FillOffset(&part->offset, initialFrame);
+    part->origin = origin;
     if (mode == 0)
-        FIELD(u16, half, 0xAC) = 64;
+        part->heading = 64;
     else
-        FIELD(u16, half, 0xAC) = zero;
+        part->heading = initialFrame;
     {
-        u16 *size = (u16 *)(half + 0xAE);
-        byteZero = 0;
-        zero = 0;
+        u16 *size = &half->scale;
+        clearedState = 0;
+        zero = initialFrame;
         scale = 1024;
         *size = scale;
     }
-    FIELD(u16, half, 0xB0) = 3;
     {
-        u16 *active = (u16 *)(half + 0x172);
+        u16 *fieldB0 = &half->fieldB0;
+        *fieldB0 = 3;
+    }
+    {
+        u16 *active = &half->active;
         one = 1;
         *active = one;
     }
     ActorStatus_InitializeCollider(half, 30, 128, 60);
     ActorStatus_InitializeBodyCollider(half);
-    FIELD(u16, half, 0x188) = zero;
-    half[0x16C] = byteZero;
-    half[0x16D] = byteZero;
     {
-        u8 *track = half + 0x58;
-        FIELD(u32, track, 0) = zero;
-        half[0x81] = byteZero;
-        half[0x80] = byteZero;
-        FIELD(u32, track, 0x34) = zero;
+        u16 *field188 = &half->field188;
+        *field188 = zero;
     }
-    TargetRegistry_RegisterSceneActor(half + 0x20C, half + 0x108, ActorStatus_BeginTimedState);
-    shadow = half + 0x1A0;
-    ScaledShadow_Initialize(shadow, half + 0x1C, 128, 128, 128, 128, scale, one, 6, zero, zero);
+    half->state = clearedState;
+    half->requestedState = clearedState;
+    {
+        struct MotionTrack *track = &half->motion;
+        track->data = (void *)(u32)zero;
+        half->motion.active = clearedState;
+        half->motion.mode = clearedState;
+        track->cursor = zero;
+    }
+    TargetRegistry_RegisterSceneActor(half->target, half->damageCollider,
+                                      ActorStatus_BeginTimedState);
+    shadow = half->shadow;
+    ScaledShadow_Initialize(shadow, &half->sprite.position, 128, 128, 128, 128, scale, one, 6, zero,
+                            zero);
     ScaledShadow_SetGraphic(shadow, 0x1C1B, 7);
     ScaledShadow_Enable(shadow);
-    FIELD(u16, half, 0x180) = zero;
-    FIELD(u32, half, 0x17C) = zero;
-    FIELD(u16, half, 0x182) = zero;
-    half[0x186] = byteZero;
-    FIELD(u16, half, 0x184) = zero;
-    half[0x187] = byteZero;
-    FIELD(u32, half, 0x19C) = zero;
-    FIELD(u16, half, 0xB2) = one;
     {
-        u32 offset = 0x176;
-        u16 *duration = (u16 *)(half + offset);
-        *duration = offset - 0x4A;
+        u16 *damage = &half->damage;
+        *damage = zero;
     }
-    FIELD(u16, half, 0x174) = zero;
+    half->hitFlags = zero;
+    {
+        u16 *specialDamage = &half->specialDamage;
+        *specialDamage = zero;
+    }
+    half->field186 = clearedState;
+    {
+        u16 *flashTimer = &half->flashTimer;
+        *flashTimer = zero;
+    }
+    half->field187 = clearedState;
+    half->shake = zero;
+    half->fieldB2 = one;
+    half->maxHealth = 300;
+    half->health = zero;
 }
