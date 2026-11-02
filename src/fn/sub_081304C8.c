@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -55,8 +54,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
 }
 static inline void SetFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    u32 value = mask;
-    asm("" : "+r"(value));
+    u16 value = mask;
     value |= actor->flags2D4;
     actor->flags2D4 = value;
 }

@@ -38,16 +38,15 @@ struct TimedSpritePool {
 void TimedSprite_BlinkAndRemove(struct TimedSpritePool *, struct Projectile *);
 static inline u8 *SelectDirection(u8 *angle, u8 *row, u8 *flip)
 {
-    register u8 *t0 asm("r0") = flip;
     u8 *f;
     u32 quadrant;
     quadrant = ((*angle + 0x60) >> 6) & 3;
-    f = t0;
+    f = flip;
     if (quadrant > 1) {
-        *f = 1;
+        *flip = 1;
         *row = 3 - quadrant;
     } else {
-        *f = 0;
+        *flip = 0;
         *row = quadrant;
     }
     return f;

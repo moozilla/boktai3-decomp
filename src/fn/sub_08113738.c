@@ -3,12 +3,6 @@
 #include "ram.h"
 #include "background_controller.h"
 #include "player_cue_sequence.h"
-static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
-                                             struct DisplaySequenceState *state)
-{
-    return PlayerCue_StepSequenceEnded(sprite, state);
-}
-
 struct Vec {
     s32 x, y, z, w;
 };
@@ -73,7 +67,7 @@ void NativeEffect_UpdateLinearFlight(struct Effect *p)
     p->position.z += p->velocity.z;
     Project(&projected, &p->position, p->height);
     *(struct Packed *)&p->sprite.position = projected;
-    ActorAttachment_StepSprite(&p->sprite, &p->anim);
+    PlayerCue_StepSequenceEnded(&p->sprite, &p->anim);
     Collider_SetFixedPositionWithYOffset(p->collider, &p->position, p->height);
     SpatialIndex_InsertEntry(p->collider);
     if (SceneGroundEffect_IsBelowGround(p, 8)) {
