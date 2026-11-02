@@ -1,31 +1,28 @@
 #include "global.h"
+#include "scene_object.h"
+#include "contact_collider.h"
 #include "ram.h"
-
+struct MotionTarget {
+    union {
+        struct SceneBody *actor;
+        struct ContactCollider *collider;
+    } target;
+    u32 flags;
+    void (*onTarget)(void);
+    struct MotionTarget *next;
+};
+struct MotionTargets {
+    u8 task[0x18];
+    struct MotionTarget *first;
+};
 // MATCHING_CONCESSION: register-pinning
 
-struct TargetBody {
-    u32 actorId;
-    u16 sceneActorId;
-};
-
-struct TargetEntry {
-    struct TargetBody *body;
-    u32 flags;
-    u32 unk_08;
-    struct TargetEntry *next;
-};
-
-struct TargetRegistry {
-    u8 unk_00[0x18];
-    struct TargetEntry *head;
-};
-
-struct TargetEntry *TargetRegistry_FindById(u32 id)
+struct MotionTarget *TargetRegistry_FindById(u32 id)
 {
     register u32 requestedId asm("r3") = id;
-    struct TargetRegistry *registry = gSceneLinkList;
+    struct MotionTargets *registry = gSceneLinkList;
     if (registry) {
-        struct TargetEntry *entry = registry->head;
+        struct MotionTarget *entry = registry->first;
         /* An ID mismatch repeats the same entry, as in the original routine. */
         if (entry) {
             do {
@@ -35,7 +32,7 @@ struct TargetEntry *TargetRegistry_FindById(u32 id)
                 u32 disabled = flags & 1;
                 if (!sceneActor)
                     goto actorId;
-                entryId = entry->body->sceneActorId;
+                entryId = entry->target.collider->collisionId;
             compareId:
                 if (entryId != requestedId)
                     continue;
@@ -43,7 +40,7 @@ struct TargetEntry *TargetRegistry_FindById(u32 id)
                     return entry;
                 break;
             actorId:
-                entryId = entry->body->actorId;
+                entryId = entry->target.actor->id;
                 goto compareId;
             } while (entry);
         }
