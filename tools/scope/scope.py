@@ -292,6 +292,8 @@ def nonmatching_func(src):
     body = m.group(1) if m else text  # a matched file: its last non-inline, non-static definition
     defs = re.findall(r"^[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", body, re.M)
     defs = [d for d in defs if not re.search(r"\b(inline|static)\b.*\b" + d + r"\b", body)]
+    if not m and len(defs) > 1 and last_func() in defs:
+        return last_func()  # a matched unit: the function `scope.py FILE FUNC` looked at last
     return defs[-1] if defs else None
 
 
