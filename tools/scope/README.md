@@ -1452,6 +1452,33 @@ Each was read from the compiler source and confirmed on a live draft.
    copies a long-lived pointer into a low register just before an inline's body, pass the expression,
    not the saved variable.
 
+63. **A byte or halfword member store reads the old value first; a store through pointer arithmetic
+   does not.** Before reload, Thumb accepts no QImode or HImode address based on sp or the frame
+   pointer (thumb.h GO_IF_LEGITIMATE_ADDRESS), so init_expr_once's probe leaves direct_store[QImode]
+   and [HImode] at 0. store_field (expr.c) therefore sends every `p->a = v` and `p->arr[i] = v` on a
+   byte or halfword member through store_bit_field, which loads the old value, ands it and ors v in
+   (for an all-ones constant it only ors). combine folds this back to a plain store when the
+   constant is set in the same block, which is why an s8 member's -1 is `movs #0xff; strb`, never the
+   `movs #1; rsbs` of a store through a pointer. In a small loop, loop.c hoists the 0xFF before
+   combine runs, so `p->catalog[page * 8 + i] = -1;` stays `ldrb r0, [r1]; orrs r0, r3; strb r0, [r1]`
+   with `movs r3, #0xff` before the loop (SceneInventory_BuildUnlockedEquipmentCatalog and
+   BuildUnlockedItemCatalog, whose `u32 value | mask` temporaries this replaced). The extra load and
+   and/or also count in loop.c's giv analysis and insn counts: in SceneInventory_ReadScriptCatalog
+   the member form gave 32 differing instructions, and the script loops lost the pointer giv the ROM
+   steps. `*(p->catalog + n) = -1` and `*(p->catalog + n) = Script_GetValue()` are ordinary MEM
+   stores, the -1 a QImode pseudo reloaded as in fact 28, and match. spellings.sp_member_index
+   rewrites one form into the other (fix.py tries it when a difference shows the and/or of a byte
+   subreg); `agbccsrc.py member-store` has the source.
+
+64. **A loop the compiler reversed sets its new count after the hoisted invariants and before its
+   reduced pointers.** strength_reduce calls check_dbra_loop before it reduces the givs, so a
+   reversed counter's start value (`movs r5, #0x37` for `n < 56`) is emitted at the loop start after
+   what move_movables put there, and each reduced giv's start (`p + 0x1AEA`) follows it. A counter
+   initialized in the C comes before the hoisted invariants instead. So a ROM whose preheader reads
+   hoisted constant, count, pointer was written counting up over an index, not with a pointer and a
+   count-down: SceneInventory_ReadScriptCatalog's `for (n = 0; n < 56; n++) *(p->catalog + n) = -1;`
+   becomes a count-down from 55 with a pointer stepping down from p->catalog + 55, in the ROM's order.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

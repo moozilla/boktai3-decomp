@@ -130,6 +130,9 @@ def topics_for(st, e):
         ts.append("order")
     if e["note"] and "two-operand" in e["note"]:
         ts += ["cse-swap", "regmove-copy"]
+    # store_bit_field's read-and-or of a byte or halfword member store (agbccsrc member-store)
+    if any(re.search(r"\((?:and|ior):SI \(subreg:SI \(reg:[QH]I \d+\) 0\)", ev[3] or "") for ev in e["evs"]):
+        ts.append("member-store")
     for u, p, k, text in sorted(e["evs"], key=lambda ev: step.PASS_RANK.get(ev[1], 99)):
         if k == "swap":
             ts.append("cse-swap" if p in ("cse", "cse2") else "combine")

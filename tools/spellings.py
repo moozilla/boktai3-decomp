@@ -1124,6 +1124,45 @@ def sp_store_via_ptr(fn):
         yield f"store every global field through a pointer ({count})", f2
 
 
+def sp_member_index(fn):
+    """X->arr[i]  ->  *(X->arr + i), and back, at one site or at every site (SceneInventory_
+    ReadScriptCatalog: `*(p->catalog + n) = -1;`; the catalog builders' `p->catalog[k] = -1;`).
+    Thumb has no QImode or HImode move with an sp or fp address, so init_expr_once (expr.c) leaves
+    direct_store[QImode] and [HImode] at 0, and store_field sends every byte or halfword member store
+    through store_bit_field. That reads the old value and writes an all-ones constant as an or into
+    it: combine folds the or back to a plain store within a block, but in a loop loop.c hoists the
+    0xFF first and `ldrb; orrs rK; strb` survives, and the extra read changes the loop's givs.
+    Through pointer arithmetic the store is an ordinary MEM, and movqi takes -1 as a QImode pseudo
+    (README facts 28 and 63). The same C either way."""
+    def member(n, p, s):
+        return isinstance(n, ca.ArrayRef) and isinstance(n.name, ca.StructRef)
+
+    def pointer(n, p, s):
+        return (isinstance(n, ca.UnaryOp) and n.op == "*" and isinstance(n.expr, ca.BinaryOp)
+                and n.expr.op == "+" and isinstance(n.expr.left, ca.StructRef))
+
+    def to_pointer(n, par, slot):
+        set_child(par, slot, ca.UnaryOp("*", ca.BinaryOp("+", n.name, n.subscript)))
+
+    def to_member(n, par, slot):
+        set_child(par, slot, ca.ArrayRef(n.expr.left, n.expr.right))
+
+    for pred, rewrite, form in ((member, to_pointer, "*(X + i)"), (pointer, to_member, "X[i]")):
+        count = sites(fn, pred)
+        for k in range(count):
+            f2 = copy.deepcopy(fn)
+            n, par, slot = nth(f2, pred, k)
+            before = text(n)
+            rewrite(n, par, slot)
+            yield f"{before[:28]} as {form}", f2
+        if count > 1:
+            f2 = copy.deepcopy(fn)
+            # innermost first, so a rewritten parent never holds a stale child
+            for n, par, slot in reversed([x for x in walk(f2) if pred(*x)]):
+                rewrite(n, par, slot)
+            yield f"every member index as {form} ({count})", f2
+
+
 def _after(fn, node):
     """Statements that can run after NODE finishes: the items after it and after each enclosing
     statement in their blocks (an if's other branch is not among them). None inside a loop."""
@@ -1748,7 +1787,7 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_outline_setter, sp_loop_normal, sp_ptr_deinduct,
              sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy, sp_const_literal,
-             sp_param_alias, sp_compound_assign, sp_store_via_ptr]
+             sp_param_alias, sp_compound_assign, sp_store_via_ptr, sp_member_index]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
@@ -1766,10 +1805,11 @@ DECISIONS = {
     "order": ["sp_compound_assign", "sp_helper_arg", "sp_specialize", "sp_local_to_arg", "sp_arg_to_local", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
               "sp_offset_local", "sp_const_local", "sp_load_local", "sp_outline_store", "sp_outline_setter", "sp_rmw_temp", "sp_chain_assign", "sp_fresh_var", "sp_member_ptr",
               "rw_commute", "rw_temp_rvalue", "rw_hoist_args", "rw_swap_stmts", "rw_decl_order", "rw_scoped_const"],
-    "loop-invariant": ["sp_goto_loop", "sp_into_loop", "sp_inline_decl", "sp_ptr_walk", "sp_ptr_index"],
+    "loop-invariant": ["sp_goto_loop", "sp_into_loop", "sp_inline_decl", "sp_ptr_walk", "sp_ptr_index", "sp_member_index"],
     "strength-reduce": ["sp_goto_loop", "sp_into_loop", "perm_loop_form", "sp_ptr_walk", "sp_ptr_index",
-                        "sp_count_up", "sp_count_down", "sp_loop_normal", "sp_ptr_deinduct"],
+                        "sp_count_up", "sp_count_down", "sp_loop_normal", "sp_ptr_deinduct", "sp_member_index"],
     "cse-skip": ["sp_arg_to_local", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
+    "member-store": ["sp_member_index"],
     "cse-reuse": ["sp_narrow_mask", "sp_arg_to_local", "sp_store_via_ptr", "sp_member_ptr", "sp_symbol_literal", "sp_load_local", "sp_split_offset", "sp_flag_take", "sp_inline_decl", "rw_copy_var", "rw_reuse_stored"],
     "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
