@@ -41,4 +41,14 @@ struct VanargandPairAttack {
     u16 flash;
 };
 
+static inline struct VanargandAttackPair *Vanargand_GetAttackPair(struct VanargandPairAttack *owner)
+{
+    return owner->pair;
+}
+
+static inline u32 Vanargand_HalfState(const struct VanargandAttackPair *pair, u32 half)
+{
+    return half ? pair->second : pair->first;
+}
+
 #endif
