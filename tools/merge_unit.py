@@ -22,31 +22,39 @@ from split import c_functions  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+# Ignore punctuation inside literals and comments when measuring C nesting.
+_NONCODE = re.compile(r""""(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|/\*.*?\*/|//(?:\\\n|[^\n])*""", re.S)
+
+
 def items(text):
     """Top-level items: preprocessor lines, comments and declarations/definitions."""
     out, cur, depth = [], [], 0
     lines = text.split("\n")
+    code_lines = _NONCODE.sub(lambda m: " " + "\n" * m[0].count("\n"), text).split("\n")
     i = 0
+    has_code = False
     while i < len(lines):
-        line = lines[i]
+        line, code = lines[i], code_lines[i]
         i += 1
         while line.rstrip().endswith("\\") and i < len(lines):  # one logical line
             line += "\n" + lines[i]
+            code += "\n" + code_lines[i]
             i += 1
         if not cur and not line.strip():
             continue
-        if not cur and line.startswith("#"):
+        if not cur and code.lstrip().startswith("#"):
             out.append(line)
             continue
         cur.append(line)
-        if line.lstrip().startswith("#"):
+        if code.lstrip().startswith("#"):
             continue  # a directive inside a definition doesn't change nesting
-        code = re.sub(r"//.*|\"(\\.|[^\"])*\"|'(\\.|[^'])*'", "", line)
         depth += code.count("{") + code.count("(") - code.count("}") - code.count(")")
-        s = code.strip()
-        if depth == 0 and (s.endswith(";") or s.endswith("}") or line.lstrip().startswith("//") or s.endswith("*/")):
+        has_code = has_code or bool(code.strip())
+        comment_end = not has_code and (line.lstrip().startswith("//") or line.rstrip().endswith("*/"))
+        if depth == 0 and (code.rstrip().endswith((";", "}")) or comment_end):
             out.append("\n".join(cur))
             cur = []
+            has_code = False
     if cur:
         out.append("\n".join(cur))
     return out
