@@ -1,14 +1,8 @@
 #ifndef GUARD_VANARGAND_PAIR_ATTACK_H
 #define GUARD_VANARGAND_PAIR_ATTACK_H
 
-#include "global.h"
+#include "paired_scene_actor.h"
 
-struct VanargandAttackPair {
-    u8 pad0[0x205];
-    u8 first;
-    u8 pad206[0x421 - 0x206];
-    u8 second;
-};
 struct VanargandPairAttack {
     u8 pad0[0x9C];
     u32 flags;
@@ -48,7 +42,7 @@ static inline struct VanargandAttackPair *Vanargand_GetAttackPair(struct Vanarga
 
 static inline u32 Vanargand_HalfState(const struct VanargandAttackPair *pair, u32 half)
 {
-    return half ? pair->second : pair->first;
+    return half ? pair->halves[1].requestedState : pair->halves[0].requestedState;
 }
 
 #endif
