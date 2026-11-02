@@ -527,7 +527,11 @@ in the patch.
     by cse's REG_EQUAL note: HealthRestoreEffect_StartParticleBurst's `FlickerParticle_UpdateMotion`),
     where gcse inserted its own computation (end of a block, fact 1), the C lines it replaced and
     each replacement's `AGBCC_NOPRE=k` score. `probe` describes NOPRE candidates the same way, and
-    `why` on an insn gcse replaced or created names the PRE decision.
+    `why` on an insn gcse replaced or created names the PRE decision. `AGBCC_NOPRE` takes a list
+    (`AGBCC_NOPRE=1,2` keeps both computations). Until 2026-11-01 the compiler read only the first
+    number, so a hand-written list, and `pre` run under an `AGBCC_NOPRE=` knob, silently tested the
+    first one alone; rebuild an older scope compiler with `tools/scope/build_agbcc.sh`. `pre` also
+    says when a replacement moved a computation above a whole loop (fact 50).
   * `why all` scores each concrete what-if it suggests (`-> 312 ROM / 319 draft (no change: not
     this decision, or not alone)`); sub_08176F70's suggested CSE_NOCANON knobs did nothing, which
     the worker found by hand. Reload what-ifs are concrete now (below), so they are scored too.
@@ -1234,6 +1238,27 @@ Each was read from the compiler source and confirmed on a live draft.
    for a sample address where the draft has `adds rD, rT, rD`. An array read used directly as
    a memory operand (`samples_[index_]`) is index first already (expand_expr's EXPAND_SUM
    path puts a multiplication first).
+
+50. **gcse moves a computation that follows an inner loop to before that loop.** agbcc's PRE
+   uses the old block-based lazy code motion (lcm.c: EARLY, DELAY, LATE, ISOLATED). DELAY is
+   a minimal fixpoint (DELAYOUT starts at zero), so the delay of an insertion stops at every
+   loop header. An `x += c` after an inner loop that does not set x is anticipatable before
+   the loop. Unless the original computation is "isolated", gcse computes it into a new
+   pseudo at the end of the block before the loop and turns the original into a copy. Spilled,
+   that pseudo takes another stack slot. In SceneInventory_PopulateConsumableGrid's goto draft,
+   `saveByteOffset += 8` and `slotBase += 4` at the end of each row moved above the column
+   loop (frame 0x1c for 0x18): 67 differing, 37 with `AGBCC_NOPRE=2`, 25 with both kept
+   (`AGBCC_NOPRE=1,2`). The computation stays after the loop when:
+   * c is not an add immediate. The constant is loaded into a register first, so the add is
+     not anticipatable at its block's start: `rowBytes += 0x180` in both inventory grids.
+   * the same expression is computed again on every later path, so the original computation
+     is isolated. The item grid's first-section `++row` stays because the second section
+     computes `row + 1` again. A second-section `row++` with nothing after it moves (the item
+     grid as `for (...; row++)`: 43 / 47, against a match with an explicit `nextRow = row + 1`
+     that the ROM computes earlier in the block than gcse would).
+   * by the equations, also when x is set in the block before the loop or inside it (not
+     checked on a draft).
+   `pre` flags each such move ("moved above a loop").
 
 ## Survey: random table as a literal address (2026-10-24)
 
