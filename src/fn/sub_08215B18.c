@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 
@@ -8,16 +7,16 @@ extern const s16 gUnk_086149C4[];
 
 s32 __divsi3(s32, s32);
 
-static inline s16 SignedScaleQuotient(s32 dividend, s16 scale)
-{
-    return __divsi3(dividend, scale);
-}
-
-/* The 8.8 reciprocal is narrowed before its matrix multiplication. */
+/* The 8.8 reciprocal is narrowed before multiplication by the wave sample. */
 static inline s16 FixedDivide(s32 numerator, s16 scale)
 {
-    register s32 dividend asm("r0") = numerator << 8;
-    return SignedScaleQuotient(dividend, scale);
+    union {
+        s32 dividend;
+        s32 reciprocal;
+    } value;
+    value.dividend = numerator << 8;
+    value.reciprocal = __divsi3(value.dividend, scale);
+    return value.reciprocal;
 }
 /* Division by 256 rounds negative products toward zero. */
 static inline s16 FixedMultiply(s32 a, s32 b)
