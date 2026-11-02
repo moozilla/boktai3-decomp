@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_actions.h"
 struct SceneInventoryRestoreView {
     u8 unknown0[0x1AEC];
@@ -8,8 +7,8 @@ struct SceneInventoryRestoreView {
 };
 s32 SceneInventory_ClassifyEquipmentMove(struct SceneInventoryActionView *panel)
 {
-    u32 saved = panel->savedSelection;
-    register u32 current asm("r5");
+    u8 saved = panel->savedSelection;
+    u32 current;
     if (saved <= 15) {
         s32 oldKind, newKind;
         current = panel->selection;
@@ -23,22 +22,19 @@ s32 SceneInventory_ClassifyEquipmentMove(struct SceneInventoryActionView *panel)
             return 1;
     } else {
         struct SceneInventoryRestoreView *restore = (void *)panel;
-        register u8 *selection asm("r2") = &panel->selection;
-        u32 selected;
-        selected = *selection;
-        if (selected == saved) {
+        if (panel->selection == saved) {
             u32 fallback = restore->fallbackSelection;
             u32 column;
-            *selection = fallback;
+            panel->selection = fallback;
             column = 3;
             column &= fallback;
             restore->cursorX = column + 4;
-            restore->cursorY = *selection >> 2;
+            restore->cursorY = panel->selection >> 2;
             return 4;
         }
-        if (selected <= 15) {
-            register u32 reread asm("r5") = *(volatile u8 *)selection;
-            if (Inventory_GetEquipmentId(reread) == 255)
+        if (panel->selection <= 15) {
+            current = panel->selection;
+            if (Inventory_GetEquipmentId(current) == 255)
                 return 4;
         }
     }
