@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "date_entry_menu.h"
 #include "render.h"
 #include "menu_parameters.h"
@@ -12,13 +11,18 @@ s32 Widget_InitLinked(u8 *, void *, u16, u32, u8, u8, u8, const struct ContactPo
 void Password_LoadDate(void *);
 void AnimPanel_UpdateDigits(void *);
 void Menu_StartFadeIn(u32);
+static inline void RelocateDateCursor(struct DateMenu *menu, void *source, u8 **graphics)
+{
+    *graphics = menu->widgets[3].resource;
+    ResourceHeader_Relocate(*graphics, source);
+}
+
 s32 Time_InitializeDateMenu(struct DateMenu *menu)
 {
     u32 zero;
-    register u32 one asm("r10");
+    u32 one;
     u32 resourceBank;
     void *resource;
-    register void *cursorResource asm("r6");
     u8 *firstGraphics;
     u8 *secondGraphics;
     u8 *cursorGraphics;
@@ -73,9 +77,8 @@ s32 Time_InitializeDateMenu(struct DateMenu *menu)
     *paletteBank = firstPaletteBank;
     paletteBank = &menu->widgets[2].paletteBank;
     *paletteBank = firstPaletteBank + 1;
-    cursorResource = ScriptProc_Start(resourceBank, 0x530D);
-    cursorGraphics = menu->widgets[3].resource;
-    ResourceHeader_Relocate(cursorGraphics, cursorResource);
+    resource = ScriptProc_Start(resourceBank, 0x530D);
+    RelocateDateCursor(menu, resource, &cursorGraphics);
     Widget_InitLinked((u8 *)&menu->widgets[3], cursorGraphics, 0x80, 0x10, zero, zero, zero, NULL);
     sub_081DE630(menu);
     Password_LoadDate(menu);
