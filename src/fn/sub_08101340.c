@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "named_object.h"
 #include "player.h"
@@ -57,7 +58,7 @@ void NamedObject_UpdateMovementSound(struct NamedObjectManager *manager)
     }
     if (Player_TestAttachmentFlags(gPlayers[0], 1))
         attached = 1;
-    objects = NamedObject_FindByName(*(u16 *)((u8 *)gPlayers[0] + 0x476));
+    objects = NamedObject_FindByName(gPlayers[0]->tetherStatusTag);
     if (!objects)
         return;
     if (objects->field_E0 & 4)
