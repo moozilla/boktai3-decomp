@@ -13,9 +13,11 @@ Scored kinds, in two groups:
   (an `if` with nothing in its body), `single-use-macro` (a statement macro used at one site,
   tools/statement_macros.py), `volatile` (a volatile local, a `T *volatile` or a
   `(volatile T *)&x` cast), `alias` (an `extern ... asm("Symbol")` declaration that gives a
-  function a second prototype) and `cflags` (a `// CFLAGS:` line other than the default flags,
-  outside src/lib). Each is a concession unless a comment on the same line, or alone on the line
-  above, says why the original plausibly had it:
+  function a second prototype), `cflags` (a `// CFLAGS:` line other than the default flags,
+  outside src/lib) and `raw-offset` (`*(u16 *)((u8 *)p + 0x172)`: a constant byte offset where
+  a struct field belongs; the original's C named its fields, and the form can steer cse the way
+  a field access doesn't). Each is a concession unless a comment on the same line, or alone on
+  the line above, says why the original plausibly had it:
 
       DEBUG_NOP();  // concession-ok(debug-nop): the release build kept this debug hook
 
@@ -23,8 +25,8 @@ Scored kinds, in two groups:
   with an unknown or never-excusable kind, no reason, or nothing to excuse.
 
 Tracked kinds are counted for the record (PROGRESS.md) but don't lower a function's score:
-`goto` (accepted until phase 4 cleanup) and `raw-offset` (`*(u16 *)((u8 *)p + 0x172)` where a
-struct field may fit).
+`goto` (accepted until phase 4 cleanup). A byte offset that varies (`(u8 *)table + offset`) is
+ordinary C and isn't counted.
 
 Library sources (src/lib, the SDK's own code) are exempt from the judgment-call kinds.
 """
@@ -34,9 +36,9 @@ import re
 from dataclasses import dataclass
 
 HARD = ("pin", "operand", "clobber", "barrier")
-EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatile", "alias", "cflags")
+EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatile", "alias", "cflags", "raw-offset")
 SCORED = HARD + EXCUSABLE
-TRACKED = ("goto", "raw-offset")
+TRACKED = ("goto",)
 LIBRARY = ("src/lib/", "include/gba/")
 DEFAULT_CFLAGS = {"-O2", "-mthumb-interwork"}
 
