@@ -35,11 +35,6 @@
     do {                                                                                           \
         (out) = (target) - (actor);                                                                \
     } while (0)
-#define ARMOR_BRANCH_AXIS_UNALIGNED(x, z, label)                                                   \
-    do {                                                                                           \
-        if ((x) != 0 && (z) != 0)                                                                  \
-            goto label;                                                                            \
-    } while (0)
 
 /* Grid-cell deltas from actor to target: x and z rounded to 256-unit cells, with each
  * component's magnitude (y is left unrounded). */
