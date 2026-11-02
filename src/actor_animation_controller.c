@@ -1122,10 +1122,9 @@ void Actor_SetFacingAndIdle(void)
     }
     H(0xf8a) = Script_GetValue();
     {
-        register u32 shifted asm("r0") = Script_GetKeywordValue(0x64, 0) << 24;
+        u8 direction = Script_GetKeywordValue(0x64, 0);
         u32 flip = 0;
-        u32 mask = 0x07000000;
-        u8 direction = (mask & shifted) >> 24;
+        direction &= 7;
         B(0xf68) = direction;
         if (direction > 4) {
             direction = 8 - direction;
