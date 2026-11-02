@@ -1,12 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "display_sprite_playback.h"
 #include "engine.h"
 #include "ram.h"
-struct Frames {
-    u16 *data;
-    u8 flags, count, multiplier, duration;
-    u16 index, padA, rate, timer;
-};
 struct AnimatedTile {
     u32 flags;
     u8 pad4[3];
@@ -17,7 +12,7 @@ struct AnimatedTile {
     u8 pad12[0xA];
     s16 x, y, z;
     u8 pad22[0xA];
-    struct Frames frames;
+    struct DisplaySequenceState frames;
     u8 pad3C[0x1C];
     s32 name, field5C;
     u16 field60;
@@ -40,10 +35,7 @@ void AnimatedTile_CreateFromScript(void)
     struct AnimatedTile *e;
     struct AnimatedTile *slot;
     s32 palette;
-    u32 two;
-    struct Frames *fr;
-    struct Frames *f;
-    const vu16 *frame;
+    struct DisplaySequenceState *fr;
     u32 one;
     if (!manager) {
         manager = AnimatedTile_CreateManager();
@@ -71,57 +63,5 @@ void AnimatedTile_CreateFromScript(void)
     AnimData_SelectPaletteBank(e->anim, palette + 0x304);
     fr = &e->frames;
     Anim_SetSequence(fr, manager->sequences, 0, 0, e->sequence);
-    f = fr;
-    frame = &f->data[f->index];
-    e->field10 = *frame >> 6;
-    {
-        u32 input = f->flags;
-        u32 first = one;
-        asm("" : "+r"(first));
-        first &= input;
-        if (first != (((*frame & 0x30) >> 4) & one))
-            e->flags |= 4;
-        else
-            e->flags &= ~4;
-    }
-    {
-        u32 flags = f->flags;
-        register u32 first asm("r1");
-        two = 2;
-        asm("" : "+r"(two));
-        first = two;
-        first &= flags;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*frame & 0x30) >> 4) & two))
-            e->flags |= 8;
-        else
-            e->flags &= ~8;
-    }
-    if (++f->timer >= f->duration) {
-        f->timer = 0;
-        if (f->flags & 4) {
-            u32 index = f->index;
-            if (index == 0) {
-                if (f->flags & 8) {
-                    f->timer = f->duration;
-                    goto next;
-                }
-                index = f->count;
-            }
-            f->index = index - 1;
-        } else if (++f->index >= f->count) {
-            if ((u8)(f->flags & 8)) {
-                f->timer = f->duration;
-                f->index = f->count - 1;
-            } else
-                f->index = 0;
-        }
-    next:
-        frame = &f->data[f->index];
-        f->multiplier = *frame & 0xF;
-        f->duration = (f->multiplier * f->rate) >> 6;
-        if (!f->duration)
-            f->duration = 1;
-    }
+    PlayerCue_StepSequenceEndedWithFirstFlipMask((void *)e, &e->frames, one);
 }
