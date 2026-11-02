@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "record_menu.h"
@@ -46,28 +45,22 @@ struct RecordMenuSelectionView {
     u16 inputDelay;
 };
 
-#define RM_FIELD(member)                                                                           \
-    (*(typeof(((struct RecordMenuSelectionView *)0)->member)                                       \
-           *)((u8 *)menu + (u32) & ((struct RecordMenuSelectionView *)0)->member))
-
 static inline void RecordMenu_SetRedraw(struct RecordMenu *menu, u16 offset)
 {
     *((u8 *)menu + offset) = 1;
 }
 
-// scope shape 59 (differences once low registers are set aside)
 // confidence=low: record menu cursor input, confirm/cancel and redraw handling
-static inline void RecordMenu_PlayChoiceChange(struct RecordMenu *menu, u16 *glyph)
+static inline void RecordMenu_PlayChoiceChange(struct RecordMenuSelectionView *view, u16 *glyph)
 {
     Sound_PlaySong(0xDC);
-    Anim_SelectWidgetGlyph(&RM_FIELD(cursor), &RM_FIELD(cursorResource), *glyph);
+    Anim_SelectWidgetGlyph(&view->cursor, &view->cursorResource, *glyph);
 }
 void RecordMenu_UpdateSelection(struct RecordMenu *menu)
 {
     u32 layer;
     u8 *redraw = &menu->redraw;
-    register u16 keys asm("r1");
-    register u16 *glyph asm("r4");
+    struct RecordMenuSelectionView *view = (void *)menu;
 
     if (*redraw) {
         LinkLobbyPanel_ClearTextWindows(menu);
@@ -79,75 +72,62 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
         layer = 3;
         Bg_SetupLayers(2, 0, menu->otherMap, 0, 0, 1, &layer);
         BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-        TextWindow_SetBounds(RM_FIELD(textWindow), 1, 6, 0x1c, 6);
-        TextWindow_SetScript(RM_FIELD(textWindow), RM_FIELD(titleScript));
-        TextWindow_Refresh(RM_FIELD(textWindow), 7);
-        TextWindow_StartPlayback(RM_FIELD(textWindow));
-        RM_FIELD(cursor.flags) &= ~1;
-        RM_FIELD(choice) = 1;
+        TextWindow_SetBounds(view->textWindow, 1, 6, 0x1c, 6);
+        TextWindow_SetScript(view->textWindow, view->titleScript);
+        TextWindow_Refresh(view->textWindow, 7);
+        TextWindow_StartPlayback(view->textWindow);
+        view->cursor.flags &= ~1;
+        view->choice = 1;
         menu->inputDelay = 0;
         *redraw = 0;
     }
 
-    Palette_UpdateHighlightPulse(&RM_FIELD(palettePulse), &RM_FIELD(pulsePhase));
-    keys = gPadState[1];
+    Palette_UpdateHighlightPulse(&view->palettePulse, &view->pulsePhase);
     {
-        u32 left = 0x20;
-        left &= keys;
-        if (left) {
-            if (RM_FIELD(choice) != 0)
+        if (gPadState[1] & 0x20) {
+            if (view->choice != 0)
                 goto done;
-            glyph = &RM_FIELD(cursorGlyph);
-            *glyph = 0x4B;
-            RM_FIELD(choice) = 1;
-            RecordMenu_PlayChoiceChange(menu, glyph);
+            view->cursorGlyph = 0x4B;
+            view->choice = 1;
+            RecordMenu_PlayChoiceChange(view, &view->cursorGlyph);
             goto done;
         }
-        if (!(keys & 0x10))
+        if (!(gPadState[1] & 0x10))
             goto select;
         {
-            u32 choiceOffset = (u32) & ((struct RecordMenuSelectionView *)0)->choice;
-            register u8 *choice;
-            register u32 zero asm("r1");
-            choice = (u8 *)menu + choiceOffset;
-            if (*choice == 0)
+            if (view->choice == 0)
                 goto done;
-            {
-                u32 glyphOffset = (u32) & ((struct RecordMenuSelectionView *)0)->cursorGlyph;
-                glyph = (u16 *)((u8 *)menu + glyphOffset);
-            }
-            zero = 0;
-            *glyph = 0x4C;
-            *choice = zero;
+            view->cursorGlyph = 0x4C;
+            view->choice = 0;
         }
-        RecordMenu_PlayChoiceChange(menu, glyph);
+        RecordMenu_PlayChoiceChange(view, &view->cursorGlyph);
         goto done;
     select:
-        if (1 & keys) {
-            RM_FIELD(cursor.flags) |= 1;
-            Registry1745_SetSelectionResponse(RM_FIELD(choice));
+        if (gPadState[1] & 1) {
+            view->cursor.flags |= 1;
+            Registry1745_SetSelectionResponse(view->choice);
             {
                 void (*callback)(struct RecordMenu *) = SceneTask_UpdateTextDelay;
                 u32 leaving = 2;
                 menu->update = callback;
                 RecordMenu_SetRedraw(menu, (u32) & ((struct RecordMenuSelectionView *)0)->redraw);
-                RM_FIELD(leaving) = leaving;
+                view->leaving = leaving;
             }
-            if (RM_FIELD(choice) != 0)
+            if (view->choice != 0)
                 Sound_PlaySong(0xDD);
             else
                 Sound_PlaySong(0xDE);
             goto done;
         }
-        if (2 & keys) {
-            RM_FIELD(cursor.flags) |= 1;
+        if (gPadState[1] & 2) {
+            view->cursor.flags |= 1;
             Registry1745_SetSelectionResponse(0);
             {
                 void (*callback)(struct RecordMenu *) = SceneTask_UpdateTextDelay;
                 u32 leaving = 2;
                 menu->update = callback;
                 RecordMenu_SetRedraw(menu, (u32) & ((struct RecordMenuSelectionView *)0)->redraw);
-                RM_FIELD(leaving) = leaving;
+                view->leaving = leaving;
             }
             Sound_PlaySong(0xDE);
         }
