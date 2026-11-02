@@ -1,7 +1,11 @@
-SceneActorRegistry_UpdateActors remains guarded at 88.4% with stock agbcc, up from 66.7% in the incoming draft. Scope finds 69 ROM and 63 draft instructions different, down from 157 and 163. The draft is twelve bytes shorter than the 1,164-byte ROM function.
+# SceneActorRegistry_UpdateActors
 
-Taking the update-callback address before loading its context fixes the invocation sequence. The missing-object test is evaluated before capturing the motion flags. The regional deactivation path and the palette transition path both use the motion and adjacent state words.
+Stock agbcc matches all 1,164 bytes at `0x08070FA8`. The guarded C started at 66.7% in the incoming round-10 kit and reached 88.4% when the particle loop's field-address spills lined up. The final function uses ordinary C.
 
-The two 0x4000 motion tests return an explicit 8-bit predicate. This increases the number of instructions entering partial redundancy elimination from 485 to 497, changing its hash table from 243 to 249 buckets. All decoded stack slots now pair with the ROM in the 0x44-byte frame, including the field addresses at sp+0x34 and sp+0x38. The ROM recomputes the flags2D4 address in r7 after the pause test, then moves it to sl. The draft keeps the earlier computation. Reproducing these two definitions while retaining the current spills is the next allocation target.
+The update callback reads the actor's callback slot before loading its context. Both the missing-object check and the engine-pause check then capture the motion field at actor+0x2D4. The ROM keeps this pointer in `sl` across the particle loop. Narrowing each velocity component to a signed halfword before writing its packed field gives the compiler the required register allocation. Naming the first horizontal mask reproduces the subsequent random-index reloads.
 
-Both binaries returned identically over 32 bounded-list emulations covering 50 of 72 ROM blocks. Null heads, sentinel-only lists and chains of one to five actors exercised update and destroy callbacks, particle emission, and palette changes. The stock random-memory trial 0 enters a six-node cycle via address 0x6 and exhausts the emulator's instruction cap.
+The particle check and manager palette check share the 0x2000 mask. The action-word address at actor+0x2CC stays in the final spill slot at sp+0x40. Reusing the flag-field pointer across halfword motion tests and word palette updates preserves that spill and lets the two palette branches compute actor+0x2D0 locally. The regional flags test, region comparison and regional counter access share the game-state getter.
+
+The stock checker verified the full function extent. Differential execution on 160 bounded actor lists reached all 92 ROM blocks. The cases cover an empty list, removal during traversal, individual regional-deactivation gates, particle emission and both palette directions. Run the companion `round10a-registry-fixtures.py` from a provisioned checkout to repeat the comparison.
+
+Tags: 08070FA8 SceneActorRegistry_UpdateActors agbcc register-allocation palette particle

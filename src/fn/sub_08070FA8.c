@@ -4,37 +4,38 @@
 #include "ram.h"
 #include "scene_actor_placement.h"
 #include "game_state.h"
-#ifdef NONMATCHING
-// fuzzy: 88.4%
-// The action and motion flag reads span the regional-deactivation and palette branches.
 void Heap_Free(void *);
 
-static inline u8 Removed(struct SceneActorRegistryActor *p)
+static inline u8 RemovalRequested(struct SceneActorRegistryActor *p)
 {
     u32 mask = 0x1000;
     if (mask & p->flags2D6)
         return 1;
     return 0;
 }
-static inline u8 Paused(void)
+static inline u8 UpdatesPaused(void)
 {
     if (gEngineFlags & 0x4800)
         return 1;
     return 0;
 }
+static inline struct GameState *RegistryCurrentGame(void)
+{
+    struct GameState *game;
+    do {
+        game = gGameState;
+    } while (0);
+    return game;
+}
+
 static inline u8 CurrentRegion(struct SceneActorRegistryActor *p)
 {
     u16 region = p->regionId;
-    if (gGameState->region == region)
+    if (RegistryCurrentGame()->region == region)
         return 1;
     return 0;
 }
-static inline u8 TransitionEnabled(struct SceneActorRegistryManager *p)
-{
-    if (p->flags & 0x2000)
-        return 1;
-    return 0;
-}
+
 static inline u8 TransitionComplete(struct SceneActorRegistryManager *p)
 {
     u32 mask = 0x20000;
@@ -42,7 +43,7 @@ static inline u8 TransitionComplete(struct SceneActorRegistryManager *p)
         return 1;
     return 0;
 }
-static inline u8 Stopped(void)
+static inline u8 PlayerActionPending(void)
 {
     u16 pending = gPlayerActionPending;
     u32 value = 0;
@@ -59,12 +60,17 @@ static inline u32 NextParticleSample(const u16 *table)
 static inline void UpdateActors_SpawnContactParts(struct SceneActorRegistryActor *actor)
 {
     union SceneActorRegistryPackedPosition velocity, bounds, position;
+    u32 horizontalMask = 15;
     s32 i;
     for (i = 0; i < 3; i++) {
         union RandomTableView table = {gRandomTable};
-        velocity.packed.x = (NextParticleSample(table.samples) & 15) - 7;
-        velocity.packed.y = ((s8)NextParticleSample(table.samples) & 31) - 16;
-        velocity.packed.z = ((s8)NextParticleSample(table.samples) & 15) - 7;
+        s16 velocityComponent;
+        velocityComponent = (NextParticleSample(table.samples) & horizontalMask) - 7;
+        velocity.packed.x = velocityComponent;
+        velocityComponent = ((s8)NextParticleSample(table.samples) & 31) - 16;
+        velocity.packed.y = velocityComponent;
+        velocityComponent = ((s8)NextParticleSample(table.samples) & 15) - 7;
+        velocity.packed.z = velocityComponent;
         bounds.packed.x = 5;
         bounds.packed.y = 10;
         bounds.packed.z = 5;
@@ -121,21 +127,6 @@ static inline u8 ActorCategory(struct SceneActorRegistryActor *p)
     return p->category;
 }
 
-/* The motion and state words are adjoining members of the same registry actor. */
-static inline u32 ReadStateFlags(const u16 *motion, u32 mask)
-{
-    u32 motionOffset = (u32) & ((struct SceneActorRegistryActor *)0)->flags2D4;
-    const struct SceneActorRegistryActor *actor = (const void *)((const u8 *)motion - motionOffset);
-    return actor->flags2D0 & mask;
-}
-static inline u8 CanUpdate(struct SceneActorRegistryActor *p, u16 *flags)
-{
-    if (p) {
-        if ((*flags & 0x40) || ReadStateFlags(flags, 0x20000) || p->health <= 0)
-            return 0;
-    }
-    return 1;
-}
 static inline u32 DefaultPalette(struct SceneActorRegistryActor *actor)
 {
     u16 *base = &actor->basePaletteBank;
@@ -161,20 +152,63 @@ static inline u8 MissingObject(struct SceneActorRegistryActor *p)
     return 0;
 }
 
-// confidence=low: registry callback traversal, regional deactivation and palette transitions.
+static inline u32 ReadActorStateFlags(struct SceneActorRegistryActor *p, u32 mask)
+{
+    return p->flags2D0 & mask;
+}
+static inline u8 ActorUnavailable(struct SceneActorRegistryActor *p, u16 *flags)
+{
+    u32 mask = 0x40;
+    if (p) {
+        if ((mask & *flags) || SceneActorPlacement_ReadFlags32((void *)p, 0x20000) ||
+            p->health <= 0)
+            return 1;
+    }
+    return 0;
+}
+
+static inline u32 *StateAddress(struct SceneActorRegistryActor *p)
+{
+    return &p->flags2D0;
+}
+
+static inline u32 ClearMaskedValue(u32 flags, u32 bits)
+{
+    u32 mask = ~bits;
+    mask &= flags;
+    return mask;
+}
+
+static inline u8 ManagerFlagSet(struct SceneActorRegistryManager *m, u32 mask)
+{
+    u32 flags = m->flags;
+    if (flags & mask)
+        return 1;
+    return 0;
+}
+
+union RegistryFlagField {
+    u32 word;
+    u16 halfword;
+};
+
+// confidence=high: walks the registry, runs actor callbacks and updates palette transitions.
 void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
 {
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor;
+    void *draw;
+    u32 category;
+    u32 partMask = 0x2000;
     u16 *motion;
-    u32 *state;
+    union RegistryFlagField *flagField;
     if (!node)
         return;
     actor = node->actor;
 next:
     if (!actor)
         return;
-    if (Removed(actor)) {
+    if (RemovalRequested(actor)) {
         void *context;
         node = node->next;
         context = actor->context;
@@ -186,34 +220,48 @@ next:
     {
         s32 (**update)(void *) = &actor->update;
         void *context = actor->context;
-        u8 missing;
+        u8 missing, paused;
         Callback_InvokeActor(context, *update);
         missing = MissingObject(actor);
         motion = &actor->flags2D4;
-        if (!missing && !Paused() && !MotionFlagSet(motion, 0x4000) && !ReadStateFlags(motion, 8) &&
-            actor->enabled && !ReadFlags2CC(actor, 2) && (gGameState->flags868 & 2) &&
-            CurrentRegion(actor) && CanUpdate(actor, motion) && gGameState->unk876 > 0 &&
-            !Stopped()) {
+        if (missing)
+            goto palette;
+        paused = UpdatesPaused();
+        motion = &actor->flags2D4;
+        if (paused)
+            goto palette;
+        flagField = (void *)motion;
+        if (!MotionFlagSet(&flagField->halfword, 0x4000) && !ReadActorStateFlags(actor, 8) &&
+            actor->enabled && !ReadFlags2CC(actor, 2) && (RegistryCurrentGame()->flags868 & 2) &&
+            CurrentRegion(actor) && !ActorUnavailable(actor, motion) &&
+            RegistryCurrentGame()->unk876 > 0 && !PlayerActionPending()) {
             actor->field178 = 0;
             ClearField2B8(actor);
             ClearDrawableFlags(actor, 1);
-            actor->health = 0;
-            if (ReadMotionFlags(motion, 0x2000))
+            {
+                s16 zero = 0;
+                actor->health = zero;
+            }
+            if (ReadMotionFlags(motion, partMask))
                 UpdateActors_SpawnContactParts(actor);
-            *motion &= ~0x2000;
+            *motion = ClearMaskedValue(*motion, 0x2000);
             SetFlags2CC(actor, 0x1000);
         }
-        motion = &actor->flags2D4;
-        if (!MotionFlagSet(motion, 0x4000) && TransitionEnabled(manager)) {
-            s32 category = ActorCategory(actor);
-            state = &actor->flags2D0;
+    palette:
+
+        flagField = (void *)motion;
+        if (!MotionFlagSet(&flagField->halfword, 0x4000) && ManagerFlagSet(manager, partMask)) {
+            category = ActorCategory(actor);
             if (category == 10 || category == 23) {
                 if (!ReadFlags2CC(actor, 0x02008000)) {
-                    if (actor->drawableKind == 0)
-                        ((struct SceneActorPaletteSequenceView *)actor->drawable)->paletteOffset =
+                    if (actor->drawableKind == 0) {
+                        draw = actor->drawable;
+                        ((struct SceneActorPaletteSequenceView *)draw)->paletteOffset =
                             actor->paletteBank;
-                    else {
-                        struct UpdateActorsTile *tile = (void *)((u8 *)actor->drawable + 0x20);
+                    } else {
+                        struct UpdateActorsTile *tile;
+                        draw = actor->drawable;
+                        tile = (void *)((u8 *)draw + 0x20);
                         tile->paletteOffset = actor->paletteOffset;
                     }
                 }
@@ -221,23 +269,29 @@ next:
                     if (TransitionComplete(manager)) {
                         u32 bank;
                         manager->flags &= 0xFFFDDFFF;
-                        ClearWordFlags(state, 0x200000);
+                        flagField = (void *)&actor->flags2D0;
+                        ClearWordFlags(&flagField->word, 0x200000);
                         bank = DefaultPalette(actor);
                         if (actor->drawableKind == 0)
                             AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
                         else
                             ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette =
                                 gPaletteBankData + (bank << 5);
-                    } else if ((*state & 0x200000)) {
-                        SceneActorPalette_BeginTransition(
-                            actor->paletteBank, actor->basePaletteBank + actor->paletteOffset, 0,
-                            category, 0);
-                        ClearWordFlags(state, 0x200000);
                     } else {
-                        SceneActorPalette_BeginTransition(actor->basePaletteBank +
-                                                              actor->paletteOffset,
-                                                          actor->paletteBank, 0, category, 0);
-                        *state |= 0x200000;
+                        u32 tested, bit;
+                        bit = 0x200000;
+                        tested = SceneActorPlacement_ReadFlags32((void *)actor, bit);
+                        flagField = (void *)StateAddress(actor);
+                        if (tested) {
+                            u16 bank = actor->paletteBank;
+                            SceneActorPalette_BeginTransition(bank, DefaultPalette(actor), 0,
+                                                              category, 0);
+                            ClearWordFlags(&flagField->word, 0x200000);
+                        } else {
+                            SceneActorPalette_BeginTransition(DefaultPalette(actor),
+                                                              actor->paletteBank, 0, category, 0);
+                            flagField->word |= bit;
+                        }
                     }
                 }
             }
@@ -247,6 +301,3 @@ next:
     }
     goto next;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorRegistry_UpdateActors);
-#endif
