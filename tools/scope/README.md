@@ -460,7 +460,9 @@ How (2026-10-24):
   each request, up to 12 KB), and the main file's name in cpp's line
   markers is canonical. Before this, every variant that edited a helper, or
   was saved under another path, parsed all headers again; past 8 prefixes the
-  servers were flushed.
+  servers were flushed. Set `SCOPE_PREFIX_SERVERS=1` to keep one compiler prefix
+  resident per target in memory-limited parallel searches. The default is 8.
+  The least recently used prefix is evicted when the cache is full.
 * **Checked**: `scope.py fastcheck N` compiles N units both ways and compares
   each path's bytes with ld's (148/148 identical; the full report was
   identical on 40 drafts). Run it after changing fast.py or the patch.
