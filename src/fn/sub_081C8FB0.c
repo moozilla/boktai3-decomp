@@ -1,7 +1,6 @@
 #include "global.h"
 #include "state_actor.h"
 
-// foundry draft (worker best 82.4%); what differs is mostly register allocation and instruction order
 s32 Math_Atan2(s32 x, s32 z); // include/directional_interaction.h
 
 struct Context {
@@ -15,7 +14,7 @@ static inline s32 near(struct StateActor *p, struct StateActorPos *a, struct Sta
     s32 limit;
     s32 x;
     s32 result;
-    limit = *(s32 *)((u8 *)p + 0x228);
+    limit = p->overlayDrawable[0].horizontalRange;
     x = b->x - a->x;
     if (x < 0)
         x = -x;
