@@ -4,7 +4,7 @@
 s32 Div(s32, s32);
 
 s32 sub_0821D178(struct ContactPosition *out, struct ContactPosition *from,
-                 struct ContactPosition *to)
+                 struct ContactPosition *to, s32 previousStep)
 {
     struct ContactPosition p;
     s32 x0, z0, x1, z1;
