@@ -275,11 +275,9 @@ void ScenePanel_AdvancePlayerArrival(struct ScenePanel *input)
 }
 
 // MATCHING_CONCESSION: register-pinning
-void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
+void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *panel)
 {
-    struct ScenePanel *panel = (void *)input;
     u32 frame;
-    DEBUG_NOP();
     frame = (u16)(++panel->effectFrame);
     if (frame == 30) {
         s32 i = 0;
