@@ -48,7 +48,9 @@ struct DepartureActor {
     struct ScenePoolVec32 position;
     struct SceneVec screen;
     s32 velocity, acceleration, jitter, unknown28C, displacement, targetX, displacementTimer;
-    u8 unknown29C[0x10];
+    u8 unknown29C[4];
+    s32 screenLimit;
+    u8 unknown2A4[8];
     s32 fixedZ;
     u8 unknown2B0[0x10];
     struct DepartureDrawable foreground, accent;
@@ -80,7 +82,8 @@ struct DepartureActor {
     s16 shakeStrength, phaseTimer2;
     u16 alternateLayer;
     s16 shakeX, shakeZ, blinkFrame, blinkActive;
-    u16 cameraActive, healthSeventh, healthTenth;
+    s16 cameraActive;
+    u16 healthSeventh, healthTenth;
     u32 foregroundFrom, foregroundTo, foregroundBank, accentFrom, accentTo, accentBank;
     union {
         struct {
@@ -91,9 +94,10 @@ struct DepartureActor {
     void *effectPool;
 };
 
-void ActorDisplay_UpdateScreenAnchor(void *);
-void ActorDisplay_UpdateForegroundSprite(void *);
-void ActorDisplay_UpdateAccentSprite(void *);
+void ActorDisplay_UpdateScreenAnchor(struct DepartureActor *);
+void ActorDisplay_UpdateForegroundSprite(struct DepartureActor *);
+void ActorDisplay_UpdateAccentSprite(struct DepartureActor *);
+void ActorDisplay_RefreshScreenLayer(struct DepartureActor *);
 void SceneActors_EmitPeriodicParticles(void *, s32);
 
 static inline void DepartureActor_StartPhase(struct DepartureActor *actor, u32 state, u32 substate,
