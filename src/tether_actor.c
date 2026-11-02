@@ -1958,8 +1958,10 @@ void TetherActor_InitKindFromScript(struct TetherActor *actor, u32 entry)
         kind = Script_GetValue();
     else
         kind = TetherActor_GetConfiguredKind();
-    gGameState->unk5AA = kind;
-    asm("" ::: "memory");
+    {
+        s16 *selectedKind = &gGameState->unk5AA;
+        *selectedKind = kind;
+    }
     actor->kind = gGameState->unk5AA;
     value = Script_SeekToKeyword('c');
     if (value)
