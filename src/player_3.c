@@ -784,7 +784,7 @@ static inline void Player_StoreVisualSpeeds(u8 *speeds, s32 speed)
 }
 static inline void Player_DecayVisualSlowdown(struct Player *p, u32 zero)
 {
-    u16 *timer = (u16 *)((u8 *)p + 0xAF2);
+    u16 *timer = &p->visualSlowdownTimer;
     if (*timer) {
         s32 speed;
         u8 *sound = (u8 *)p + 0x4E1;
@@ -808,10 +808,10 @@ static inline void Player_DecayVisualSlowdown(struct Player *p, u32 zero)
 void Player_UpdateStatusVisuals(void *actor)
 {
     struct Player *p = actor;
-    u32 remaining = *(u16 *)((u8 *)p + 0x538);
+    u32 remaining = p->active;
     if (remaining) {
-        if (*(u16 *)((u8 *)p + 0x534) == 5) {
-            u16 *timer = (u16 *)((u8 *)p + 0xAF2);
+        if (p->sceneMode == 5) {
+            u16 *timer = &p->visualSlowdownTimer;
             if (*timer < 64) {
                 if (*timer == 0) {
                     Sound_PlaySong(0x1EE);
@@ -821,7 +821,7 @@ void Player_UpdateStatusVisuals(void *actor)
             }
             p->animation.flags |= 2;
             {
-                s32 speed = 64 - (*(u16 *)((u8 *)p + 0xAF2) >> 1);
+                s32 speed = 64 - (p->visualSlowdownTimer >> 1);
                 p->movementSpeedScale = speed;
                 p->secondarySpeedScale = speed;
             }
@@ -829,14 +829,14 @@ void Player_UpdateStatusVisuals(void *actor)
         } else {
             Player_DecayVisualSlowdown(p, 0);
         }
-        if (*(u16 *)((u8 *)p + 0x534) == 6 || VisualActionFlag(p, 8)) {
+        if (p->sceneMode == 6 || VisualActionFlag(p, 8)) {
             p->animation.flags |= 0x200;
             Player_SetVisualStatusBits(&p->statusFlags, 0x20000);
         } else {
             p->animation.flags &= ~0x200;
         }
         if (p->kind & 1)
-            --*(u16 *)((u8 *)p + 0x538);
+            --p->active;
     } else {
         Player_DecayVisualSlowdown(p, remaining);
         if (VisualActionFlag(p, 8)) {
