@@ -78,15 +78,16 @@ static inline void SetFlags(u32 *field, u32 mask)
     *field = bits | *field;
 }
 // confidence=low: terrain probes select sideways motion along the coordinate axis.
-void Player_UpdateTerrainSidestep(u8 *p)
+void Player_UpdateTerrainSidestep(struct Player *player)
 {
+    u8 *p = (u8 *)player;
     struct PackedVec pt;
     struct PackedVec effect;
     s32 anim, direction, a, b;
     s32 height, index, speed;
     const s16 *trig;
-    B(0x457) = 4;
-    if (B(0x458) == 1 && (*(u16 **)(p + 0x348))[1] & 1)
+    player->tetherMode = 4;
+    if (B(0x458) == 1 && player->inputKeys[1] & 1)
         Player_SetTetherMode(p, 4, 2);
     switch (B(0x458)) {
         case 0:
