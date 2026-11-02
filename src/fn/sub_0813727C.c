@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
@@ -15,8 +14,7 @@ void SceneActorReaction_RestoreAfterDelay(void *);
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {
     u32 mask = input;
-    return offset == 0x2D4 ? *(u16 *)((u8 *)actor + offset) & mask
-                           : *(u32 *)((u8 *)actor + offset) & mask;
+    return offset == 0x2D4 ? actor->flags2D4 & mask : actor->flags2D0 & mask;
 }
 
 static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
@@ -127,10 +125,12 @@ struct ReactionGroup {
 };
 
 static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *shape,
-                        struct ContactPosition *position, void *destination, u16 *flags,
-                        u32 blocked)
+                        struct ContactPosition *position, void *destination,
+                        u16 *const *motionFlags, u32 blocked)
 {
+    u16 *flags = *motionFlags;
     s32 result;
+
     if (!Nav_IsPositionInMesh(shape, position, destination)) {
         *flags &= ~blocked;
         return 0;
@@ -263,10 +263,10 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     }
     bit = 0x200;
     group->destination->pad = 1;
-    if (!MoveTo(actor, group->shape, &actor->body.position, group->destination, flagsp, bit)) {
+    if (!MoveTo(actor, group->shape, &actor->body.position, group->destination, &flagsp, bit)) {
         Callback_InvokeActor(actor, group->failureCallback);
     } else {
-        register u16 *resetFlags asm("r3");
+        u16 *resetFlags;
         group->control.counter = 0;
         group->control.recoveryTimer = 0;
         actor->field2C2 = 0x40;
@@ -284,7 +284,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
             motion->flags &= mask;
         }
         ResetControl(actor, ActorFlags(actor, 0x200000), resetFlags);
-        ClearHalfFlags(flagsp, ~0x400);
+        ClearHalfFlags(resetFlags, ~0x400);
         actor->group.turn.turnsRemaining = 0xFF;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
         SceneActorAnimation_SelectDirectionalEntry(actor, 0);
