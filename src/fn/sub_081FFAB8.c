@@ -2,54 +2,7 @@
 #include "display_animation.h"
 #include "engine.h"
 #include "ram.h"
-#include "contact_position.h"
-struct HomingSlot;
-typedef s32 (*HomingBehavior)(struct HomingSlot *, s32);
-struct HomingCollider {
-    u8 unknown0[6];
-    u16 flags;
-    u8 unknown8[0x4c];
-};
-struct HomingGraphics {
-    u8 unknown0[6];
-    u16 paletteMode;
-    u8 unknown8[4];
-    void *palette;
-    u8 unknown10[0x10];
-};
-struct HomingParams {
-    u8 unknown0[6];
-    s8 angle;
-    u8 variant;
-    s32 speed;
-    HomingBehavior behavior;
-    u8 unknown10[0x10];
-};
-struct HomingSprite {
-    u32 flags;
-    u8 unknown4[0xc];
-    u16 frame;
-    u8 unknown12[0xa];
-    struct ContactPosition position;
-    u8 unknown24[8];
-};
-struct HomingSlot {
-    u32 lifetime;
-    u8 unknown04[8];
-    struct ContactPosition velocity;
-    u8 unknown14[0x24 - 0x14];
-    struct HomingCollider secondaryCollider;
-    struct HomingCollider primaryCollider;
-    struct HomingGraphics graphics;
-    struct HomingParams params;
-    struct HomingSprite sprite;
-    u32 state;
-    u8 unknown13C[4];
-    struct DisplaySequenceState sequence;
-    u8 unknown150[0xc];
-    s16 flashTimer;
-    u8 unknown15E[2];
-};
+#include "homing_projectile.h"
 struct HomingManager {
     u8 task[0x18];
     u32 activeMask;
@@ -82,8 +35,8 @@ static inline void Vector(struct ContactPosition *v, s32 angle, s32 scale)
 
 static inline u32 BeginMotion(struct HomingSlot *p, struct ContactPosition **velocity, u32 **flags)
 {
-    u32 moving = p->state & 1;
-    *flags = &p->state;
+    u32 moving = p->motionFlags & 1;
+    *flags = &p->motionFlags;
     *velocity = &p->velocity;
     return moving;
 }
