@@ -41,6 +41,8 @@ struct Orb {
 struct OrbManager {
     u8 pad0[0x18];
     u32 mask;
+    u8 unk1C[0xEEC - 0x1C];
+    u32 activeCount, spawnCount;
 };
 extern const s16 gUnk_086149C4[];
 void SunOrb_GetOrCreateManager(void);
@@ -114,8 +116,8 @@ s32 SunOrb_CreateAtPosition(struct OrbConfig *cfg, struct Pos *pos)
         s32 mask = ~4;
         c->flags = mask & c->flags;
     }
-    (*(u32 *)((u8 *)m + 0xEEC))++;
-    (*(u32 *)((u8 *)m + 0xEF0))++;
+    m->activeCount++;
+    m->spawnCount++;
     F(u16, 0xF6) = 5;
     {
         u16 v = cfg->f16;
