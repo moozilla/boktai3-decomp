@@ -2432,6 +2432,15 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
     return False
 
 
+def copy_joined(wd, reg):
+    """True when pseudo REG is set by two or more insns before allocation and one of those sets copies
+    another pseudo: a variable joined from two paths, the shape gcse's PRE copy takes on its own."""
+    sets = [r for _, _, r in insn_list(wd, "regmove")
+            if re.match(r"\(set \(reg(?:/\w)*:SI %d\) " % reg, r or "")]
+    copies = [r for r in sets if re.match(r"\(set \(reg(?:/\w)*:SI %d\) \(reg(?:/\w)*:SI \d+\)\)$" % reg, r)]
+    return len(sets) >= 2 and bool(copies)
+
+
 def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
     """What would let LO outrank HI in global alloc: LO's uses or life, or HI's. Lives are given as flow
     counts them in the source; a constant register's is doubled before allocation (see life_note)."""
@@ -2464,6 +2473,12 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
         r = next((r for r in range(hrefs - 1, 0, -1) if g_priority(r, hlive) < lpri), None)
         if r:
             out.append(f"{nm(hi)} with {r} refs instead of {hrefs}" + (mention_lines(wd, hi) if wd else ""))
+    if wd and copy_joined(wd, lo):
+        out.append(f"{nm(lo)} is set in more than one place, one of them a plain register copy: if it holds"
+                   " the same address on each path (an if/else that both take `&p->field`), give each arm its"
+                   " own variable and name the address again at the later use; gcse then makes the"
+                   " long-lived copy, a new pseudo ranked on its own (ScriptCombatActor_UpdateState's"
+                   " collider)")
     lever = macro_lever(wd, lo, lo_rec, hi, hi_rec) if wd else None
     if lever:
         a, b, nl, nh = lever
@@ -4363,7 +4378,11 @@ def explain_regmove(wd, uid, gone, new, nm, at):
               " byte read and masked (`u8` flags), read it into a byte union and narrow the and:"
               " `control.raw = a->flags; first = (u8)(control.raw & bit);` (DisplaySequence_ApplyFrame,"
               " include/display_sequence_inline.h; it matched AnimatedTile_TickAlternateAnimation where"
-              " `u8 left`/`u8 input` did not).")
+              " `u8 left`/`u8 input` did not). For a u16/u8 field masked by a constant, write the and"
+              " on the read itself, `(*field & K)`, not through u32 variables: the constant then sits in"
+              " an HImode pseudo read through a subreg, which regmove does not tie, and cse does not move a"
+              " known-constant variable to operand 2 (README fact 37; ActorPalette_UpdateReverseFade's"
+              " `(*field & 15) | 0xd0` replaced three pins).")
     # the same tie in other inlined copies of this code: same pattern up to register numbers
     shape = lambda r: re.sub(r"\(reg(/\w)*:(\w+) \d+\)", r"(reg:\2)", r or "")
     rowline = {}

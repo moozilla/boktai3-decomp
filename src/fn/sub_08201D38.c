@@ -3,7 +3,6 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "display_sprite_playback.h"
-// MATCHING_CONCESSION: register-pinning
 struct ActorColliderView {
     u8 pad[6];
     u16 flags;
@@ -70,7 +69,6 @@ u32 ScriptCombatActor_UpdateDefeatEffect(void *);
 #define ScriptCombatActor_UpdateState sub_08201D38
 u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
 {
-    register struct ActorColliderView *c asm("r4");
     u32 m = 0x400;
     if ((gEngineFlags | gScenePauseFlags) & m)
         return 0;
@@ -82,30 +80,29 @@ u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
     Callback_InvokeActor(p, p->fn15c);
     p->spr.flags &= ~1;
     if (p->dead == 0) {
-        c = &p->col;
-        {
-            register u32 flags asm("r1") = c->flags;
-            c->flags = 0xfffb & flags;
-        }
+        struct ActorColliderView *c = &p->col;
+        u32 flags = c->flags;
+        u32 mask = 0xfffb;
+        mask &= flags;
+        c->flags = mask;
         Collider_SetPosition(c, &p->spr.position, 0);
     } else {
-        register struct ActorColliderView *disabled asm("r2") = &p->col;
+        struct ActorColliderView *disabled = &p->col;
         disabled->flags |= 4;
         p->ptr5c = gPaletteBankData + 0x36e0;
-        c = disabled;
     }
     {
         u32 off = 0x180;
         s16 *dp = (s16 *)((u8 *)p + off);
         u16 d = *dp;
-        if (*dp > 0 && *(s16 *)((u8 *)p + off + 6) == 0) {
+        if (*dp > 0 && *(s16 *)((u8 *)p + (off + 6)) == 0) {
             u16 *hpp = &p->hp;
             *hpp -= d;
             p->w1b4 = p->w1b8;
             Sound_PlaySong(0x13e);
             if (*dp > 0) {
                 u32 off2 = 0x19e;
-                DamageNumberDisplay_Show(c, *dp, 0, &p->dmgA, &p->dmgB, 1);
+                DamageNumberDisplay_Show(&p->col, *dp, 0, &p->dmgA, &p->dmgB, 1);
                 SceneHud_SetTimedState(p->w1ac, (s16)*hpp, p->w198, *(s16 *)((u8 *)p + off2),
                                        *((u8 *)p + off2 - 0x9b) == 4, p->w1a2);
             }
