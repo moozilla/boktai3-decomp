@@ -99,13 +99,14 @@ int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kin
         int observed = a->flags;
         register int one asm("r3");
         register int side asm("r1");
-        register int word asm("r2");
+        int word;
         u32 encoded;
         one = 1;
         side = one;
         side &= observed;
         word = *frame;
-        encoded = word & 48;
+        encoded = 48;
+        encoded &= word;
         encoded >>= 4;
         encoded &= one;
         if (side != encoded) {
@@ -129,13 +130,14 @@ int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kin
         register int observed asm("r4") = a->flags;
         register int two asm("r3") = 2;
         register int side asm("r1");
-        register int word asm("r2");
+        int word;
         u32 encoded;
         side = two;
         side &= observed;
         side = (u8)side;
         word = *frame;
-        encoded = word & 48;
+        encoded = 48;
+        encoded &= word;
         encoded >>= 4;
         encoded &= two;
         if (side != encoded)
@@ -197,14 +199,14 @@ int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kin
         int index = a->frame << 1;
         const u16 *table;
         register int word asm("r1");
-        register int value asm("r0");
+        int value;
         table = a->frames;
         frame = (const u16 *)((u32)table + index);
         word = *frame;
-        value = word & 15;
+        value = 15;
+        value &= word;
         a->duration = value;
         value = a->duration * a->speed;
-        asm("" : "+r"(value));
         value >>= 6;
         a->period = value;
         value = (u32)value << 24;
@@ -245,8 +247,10 @@ int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kin
     {
         register int zero asm("r0") = 0;
         struct PeerPanel *write = p;
-        asm("" : "+r"(zero));
-        write->active = zero;
+        {
+            u8 *active = &write->active;
+            *active = zero;
+        }
         {
             u8 *name = p->name;
             *name = zero;
