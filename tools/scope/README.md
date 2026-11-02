@@ -1482,6 +1482,26 @@ Each was read from the compiler source and confirmed on a live draft.
    count-down: SceneInventory_ReadScriptCatalog's `for (n = 0; n < 56; n++) *(p->catalog + n) = -1;`
    becomes a count-down from 55 with a pointer stepping down from p->catalog + 55, in the ROM's order.
 
+65. **A constant kept in a call-saved register for one use in a merged tail was written in every
+   branch.** In ActorAttachment_NotifySourceState the ROM sets `movs r5, #1` between the flag test's
+   `ldrb` and its own `movs r0, #1; ands r0, r1`, keeps r5 across three calls, and reads it once,
+   in the tail after the switch (`ldrb r0, [r4]; orrs r0, r5; strb r0, [r4]`). No C variable gives
+   that: cse ties a `one = 1` set before the test to the test's constant (one class per mode), and
+   update_equiv_regs moves a constant set once and used once in another block down to its use. The
+   original set the flag in each case: `case 4: Sound_PlaySong(0xEE); slot->flags32 |= 1; break;`
+   and so on. The byte test `slot->flags32 & 1` and each case's byte `|= 1` force their 1 into a
+   QImode pseudo (expand_binop under preserve_subexpressions_p, since an and or or with a constant
+   costs more than 2). cse follows the switch's compare jumps into each case (each case label has one
+   use and a barrier before it, agbccsrc cse-follow), still knowing the test's QImode pseudo holds 1,
+   and makes each case's constant use it: the test's register now lives into every case, across the
+   calls, so global alloc gives it r5, and the test's and copies it into an SImode pseudo that cse
+   folds back to `movs r0, #1`. jump2 then finds three identical `ldrb; orrs r0, r5; strb` tails
+   and merges them into one. Written once after the switch, the tail is a join cse never enters,
+   and it builds its 1 again. scope prints this when a ROM insn reads a constant from r4-r7 set before
+   a call and the draft builds the same constant next to it; spellings.sp_tail_into_branches moves a
+   statement after a switch (or an if/else) into each branch, and fix.py tries it for cse-follow
+   and cross-jump differences.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
