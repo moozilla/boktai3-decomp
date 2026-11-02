@@ -1968,12 +1968,16 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
     }
 }
 
-/* Companion to sub_0819494C (part index 1): on bgMode, calls Nidhoggr_ChangeCompletedPartState for
- * part 0 or 1, copies two 8-byte blobs from gUnk_0824F544/4C or gUnk_0824F554/5C into collider and
- * altCollider fields +0x14/+0x1c (unknown collider sub-fields), then unconditionally sets or clears
- * a flag bit on colliders[0]/altColliders[0]/partExtra[0] based on `active`. First attempt (literal
- * translation of the disassembly) was far off (33% fuzzy) -- the shared-tail code the two branches
- * jump into, and the collider's internal field layout, need more investigation than fits this pass. */
+/* Restore a completed part's body and attack colliders from the same bounds and offset.
+ * The background mode selects which part's pair is copied. The active flag controls
+ * the collision flags on the part tracked by each callback. */
+#define NIDHOGGR_LOAD_PART_RANGES(collider, boundsOut, offsetOut, boundsData, offsetData)          \
+    do {                                                                                           \
+        (boundsOut) = &(boundsData);                                                               \
+        (collider)->bounds = *(boundsOut);                                                         \
+        (offsetOut) = &(offsetData);                                                               \
+        (collider)->offset = *(offsetOut);                                                         \
+    } while (0)
 
 struct PartExtraView {
     u32 pad, flags;
@@ -1987,7 +1991,7 @@ struct PartColliderView {
     u8 pad8[12];
     struct CopyPair first, second;
 };
-extern const struct CopyPair gUnk_0824F544, gUnk_0824F54C, gUnk_0824F554, gUnk_0824F55C;
+extern const struct NidhoggrPartVector gUnk_0824F544, gUnk_0824F54C, gUnk_0824F554, gUnk_0824F55C;
 static inline void SetExtra(struct PartExtraView *p, u32 mask)
 {
     p->flags |= mask;
@@ -1996,41 +2000,34 @@ static inline void SetExtra(struct PartExtraView *p, u32 mask)
 #define Nidhoggr_RestoreFirstPartRanges sub_08194858
 void Nidhoggr_RestoreFirstPartRanges(struct Nidhoggr *p)
 {
-    struct PartColliderView *c;
-    register const struct CopyPair *a asm("r4");
-    const struct CopyPair *b;
+    struct NidhoggrPartCollider *collider;
+    const struct NidhoggrPartVector *bounds, *offset;
     if (p->bgMode) {
         if (Nidhoggr_ChangeCompletedPartState(p, 0, 0x37)) {
-            c = (void *)((u8 *)p + 0x672C);
-            a = &gUnk_0824F54C;
-            c->second = *a;
-            b = &gUnk_0824F544;
-            c->first = *b;
-            c = (void *)((u8 *)p + 0x5EA4);
+            collider = (void *)&p->colliders[1];
+            NIDHOGGR_LOAD_PART_RANGES(collider, bounds, offset, gUnk_0824F54C, gUnk_0824F544);
+            collider = (void *)&p->altColliders[2];
             goto copy;
         }
     } else {
         if (Nidhoggr_ChangeCompletedPartState(p, 0, 0x12)) {
-            c = (void *)((u8 *)p + 0x66D8);
-            a = &gUnk_0824F55C;
-            c->second = *a;
-            b = &gUnk_0824F554;
-            c->first = *b;
-            c = (void *)((u8 *)p + 0x5E50);
+            collider = (void *)&p->colliders[0];
+            NIDHOGGR_LOAD_PART_RANGES(collider, bounds, offset, gUnk_0824F55C, gUnk_0824F554);
+            collider = (void *)&p->altColliders[1];
         copy:
-            c->second = *a;
-            c->first = *b;
+            collider->bounds = *bounds;
+            collider->offset = *offset;
         }
     }
     if (p->active) {
-        ((struct PartColliderView *)((u8 *)p + 0x66D8))->flags |= 4;
-        ((struct PartColliderView *)((u8 *)p + 0x5E50))->flags |= 4;
-        SetExtra((void *)((u8 *)p + 0x6F60), 1);
+        ((struct NidhoggrPartCollider *)&p->colliders[0])->flags |= 4;
+        ((struct NidhoggrPartCollider *)&p->altColliders[1])->flags |= 4;
+        SetExtra((void *)&p->partExtra[0], 1);
     } else {
-        struct PartColliderView *first = (void *)((u8 *)p + 0x66D8);
+        struct NidhoggrPartCollider *first = (void *)&p->colliders[0];
         s32 mask = ~4;
         first->flags &= mask;
-        ((struct PartColliderView *)((u8 *)p + 0x5E50))->flags &= mask;
+        ((struct NidhoggrPartCollider *)&p->altColliders[1])->flags &= mask;
     }
 }
 
