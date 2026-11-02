@@ -57,6 +57,11 @@ static inline void RecordMenu_SetRedraw(struct RecordMenu *menu, u16 offset)
 
 // scope shape 59 (differences once low registers are set aside)
 // confidence=low: record menu cursor input, confirm/cancel and redraw handling
+static inline void RecordMenu_PlayChoiceChange(struct RecordMenu *menu, u16 *glyph)
+{
+    Sound_PlaySong(0xDC);
+    Anim_SelectWidgetGlyph(&RM_FIELD(cursor), &RM_FIELD(cursorResource), *glyph);
+}
 void RecordMenu_UpdateSelection(struct RecordMenu *menu)
 {
     u32 layer;
@@ -95,7 +100,8 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
             glyph = &RM_FIELD(cursorGlyph);
             *glyph = 0x4B;
             RM_FIELD(choice) = 1;
-            goto anim;
+            RecordMenu_PlayChoiceChange(menu, glyph);
+            goto done;
         }
         if (!(keys & 0x10))
             goto select;
@@ -104,7 +110,6 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
                 (u32) & ((struct RecordMenuSelectionView *)0)->choice;
             register u8 *choice;
             register u32 zero asm("r1");
-            asm("" : "+r"(choiceOffset));
             choice = (u8 *)menu + choiceOffset;
             if (*choice == 0)
                 goto done;
@@ -118,9 +123,7 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
             *glyph = 0x4C;
             *choice = zero;
         }
-    anim:
-        Sound_PlaySong(0xDC);
-        Anim_SelectWidgetGlyph(&RM_FIELD(cursor), &RM_FIELD(cursorResource), *glyph);
+        RecordMenu_PlayChoiceChange(menu, glyph);
         goto done;
     select:
         if (1 & keys) {
