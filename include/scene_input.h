@@ -5,9 +5,6 @@
 #include "scene_input_widget.h"
 #include "input.h"
 
-struct SceneWidgetPlayback {
-    u8 priority, mode;
-};
 struct SceneInputPosition {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
