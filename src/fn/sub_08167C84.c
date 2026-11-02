@@ -1,9 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
 #include "render.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
 static inline void SetVector(struct SceneVec *v, s32 x, s32 y, s32 z, s32 pad)
 {
@@ -30,10 +30,11 @@ void Sound_PlaySong(u32);
 
 static inline s32 Random(const u16 *table, u32 *index)
 {
+    u16 sample;
     *index = (*index + 1) & 1023;
-    return table[*index];
+    PARTICLE_RANDOM_READ_SAMPLE(sample, table, *index);
+    return sample;
 }
-#define NextRandom() Random(table, index)
 
 // Tentative role: updates the HUD prompt before equipment selection.
 void Hud_UpdateEquipmentPrompt(struct SceneHudPrompt *hud)
@@ -44,28 +45,28 @@ void Hud_UpdateEquipmentPrompt(struct SceneHudPrompt *hud)
     u32 resource = 0xD43F;
     if (hud->effectCountdown) {
         if (hud->effectCountdown > 30) {
-            register const u16 *table asm("r6") = gRandomTable;
+            const u16 *table = gRandomTable;
             u32 *index = &gRandomIndex;
             s32 x, y, z;
             s32 px, py, life;
             struct SceneVec *v;
             s32 zero;
-            x = (NextRandom() >> 4) & 1;
-            y = (NextRandom() >> 4) & 1;
-            z = (NextRandom() >> 4) & 1;
+            x = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1;
+            y = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1;
+            z = ((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1;
             v = &velocity;
             zero = 0;
             v->x = x;
             v->y = y;
             v->z = z;
-            if ((NextRandom() >> 4) & 1)
+            if (((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1)
                 v->x = v->x * -1;
-            if ((NextRandom() >> 4) & 1)
+            if (((s32)ParticleRandom_ReadDirectSample(table) >> 4) & 1)
                 v->y = v->y * -1;
-            px = Mod(NextRandom(), 80);
-            py = Mod(NextRandom(), 8);
+            px = Mod(Random(table, index), 80);
+            py = Mod(Random(table, index), 8);
             SetVector(&position, px + 16, py + 16, zero, zero);
-            life = ((NextRandom() >> 4) & 7) + 1;
+            life = ((Random(table, index) >> 4) & 7) + 1;
             SpriteEffectController_Create(&position, &velocity, effectType, resource, zero, 16, 17,
                                           1, zero, 1, zero, life, zero, zero, zero, zero, -4, -4);
         }
