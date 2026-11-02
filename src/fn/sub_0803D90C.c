@@ -1,20 +1,15 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 void Modifier_StartDrainIfAboveThreshold(struct ScenePoolActor *);
 static inline void ApplyMotionControls(struct ScenePoolEntry *entry, struct ScenePoolActor *actor)
 {
     u32 controls;
     s32 blocked, vertical;
-    {
-        struct ScenePoolEntry *arg = entry;
-        entry = arg;
-    }
     controls = actor->controlFlags;
     vertical = actor->verticalSpeed;
     blocked = 1;
     if (vertical >= 0) {
-        register s32 value asm("r1") = actor->restrictionMetric >> 12;
-        blocked = (u32)(value | -value) >> 31;
+        s32 value = actor->restrictionMetric >> 12;
+        blocked = (u32)(-value | value) >> 31;
     }
     if (!blocked) {
         if (controls & 0x200) {
