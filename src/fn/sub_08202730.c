@@ -159,7 +159,7 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
                 if ((u32)((*CellData(index) & 0xf) << 8) <= o->pos.y)
                     goto alive;
             }
-            if (((struct ProjParams *)((u8 *)baseY - 0x4c))->persist == 0) {
+            if (base->params.persist == 0) {
             release:
                 ProjectilePool_ReleaseSlot(pool, base, i);
                 continue;
@@ -169,7 +169,7 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
                 register struct ProjSprite *s asm("r4") = spr;
                 struct ProjAnim *a = &base->anim;
                 const u16 *entry = cursor->anim.data + cursor->anim.frame;
-                register u16 n asm("r0");
+
                 s->frame = *entry >> 6;
                 {
                     u32 input = cursor->anim.flags;
@@ -190,8 +190,7 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
                     else
                         s->flags &= ~8;
                 }
-                n = ++a->timer;
-                if (n >= a->rate) {
+                if (++a->timer >= a->rate) {
                     a->timer = 0;
                     if (a->flags & 4) {
                         if (a->frame == 0) {
