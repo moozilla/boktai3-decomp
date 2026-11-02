@@ -32,7 +32,7 @@ void Vorn_UpdatePursuitWait(struct SceneActorRegistryResetView *input)
     if (SceneActorControl_TakeFlag(&a->field2B2)) {
         *(u16 *)(context + 0x69C) = 0;
     } else if (Pending(context, &flags)) {
-        if (*(u32 *)((u8 *)a + 0xF0) <= 0x18FFF) {
+        if (a->tracking.distance <= 0x18FFF) {
             sub_080B1FA8(a);
             {
                 s32 mask = ~2;
