@@ -1,179 +1,84 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_inventory_panel.h"
-void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
+void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *panel)
 {
-    struct SceneInventoryPanel *panel = input;
-    volatile s32 column;
-    volatile s32 nextRow;
-    struct SceneInventoryWidgetFlags *volatile flagsBase;
-    volatile u32 rowBytes;
+    s32 column;
+    s32 nextRow;
+    struct SceneInventoryWidgetFlags *flagsBase;
+    u32 rowBytes;
     s32 rowSlot;
     s32 row;
     s32 slot;
+    s32 kind;
     Anim_SelectWidgetGlyph(&panel->display.heading, &panel->display.widgetResource, 0x65);
     row = 0;
-    {
-        register struct SceneInventoryWidgetFlags *initial asm("r1") =
-            ((struct SceneInventoryFlagsView *)(void *)panel)->widgets;
-        flagsBase = initial;
-    }
+    flagsBase = ((struct SceneInventoryFlagsView *)(void *)panel)->widgets;
     rowBytes = 0;
     do {
-        register struct SceneInputWidget *widget asm("r6");
-        register struct SceneInventoryWidgetFlags *entry asm("r4");
+        struct SceneInputWidget *widget;
+        s32 flagIndex;
+        column = 0;
+        rowSlot = row * 4;
         {
-            register u32 zero asm("r1") = 0;
-            column = zero;
+            struct SceneInputWidget *base = panel->display.primary;
+            widget = (void *)(rowBytes + (u32)base);
         }
-        {
-            u32 shifted = row;
-            asm("" : "+r"(shifted));
-            shifted *= 4;
-            rowSlot = shifted;
-        }
-        {
-            register struct SceneInputWidget *base asm("r0") = panel->display.primary;
-            {
-                register u32 offset asm("r1");
-                offset = rowBytes;
-                widget = (void *)(offset + (u32)base);
-            }
-        }
-        {
-            u32 index = rowSlot + 5;
-            register u32 scaled asm("r0");
-            register struct SceneInventoryWidgetFlags *base asm("r1");
-            scaled = index * 0x60;
-            base = flagsBase;
-            entry = (void *)(scaled + (u32)base);
-        }
+        flagIndex = rowSlot + 5;
         do {
-            register s32 kind asm("r5");
-            slot = column;
-            slot += rowSlot;
+            slot = column + rowSlot;
             kind = Inventory_GetEquipmentId(slot);
             if (kind != 255) {
-                entry->flags &= ~1;
-                {
-                    u32 frame = kind;
-                    frame = (u16)(frame + 240);
-                    {
-                        struct SceneInputWidget *argument = widget;
-                        Anim_LoadKeyframe(argument, &panel->display.gridResource, frame, 1);
-                    }
-                }
+                flagsBase[flagIndex].flags &= ~1;
+                Anim_LoadKeyframe(widget, &panel->display.gridResource, (u16)(kind + 240), 1);
             } else
-                entry->flags |= 1;
+                flagsBase[flagIndex].flags |= 1;
             if (Inventory_CanAssignEquipment(slot))
                 SceneHud_SetKeyframePaletteBank(widget, 0x373);
             else
                 SceneHud_SetKeyframePaletteBank(widget, 0x374);
             widget++;
-            entry++;
-            {
-                s32 next = column + 1;
-                column = next;
-                if (next > 3)
-                    break;
-            }
-        } while (1);
-        {
-            register u32 offset asm("r1") = rowBytes;
-            u32 step = 0x180;
-            rowBytes = offset + step;
-        }
+            flagIndex++;
+            column++;
+        } while (column <= 3);
+        rowBytes += 0x180;
     } while (++row <= 3);
-    row = 0;
-    do {
+    for (row = 0; row <= 1; row = nextRow) {
         struct SceneInputWidget *widget;
-        struct SceneInventoryWidgetFlags *entry;
-        {
-            u32 zero = 0;
-            column = zero;
-        }
-        {
-            register u32 shifted asm("r1") = row;
-            asm("" : "+r"(shifted));
-            shifted *= 4;
-            rowSlot = shifted;
-        }
+        u32 flagIndex;
+        u32 offset;
+        column = 0;
+        rowSlot = row * 4;
         nextRow = row + 1;
+        flagIndex = rowSlot + 21;
+        offset = ((row << 3) + rowSlot) << 5;
         {
-            u32 flagIndex = rowSlot + 21;
-            u32 offset;
-            struct SceneInputWidget *base;
-            offset = ((row << 3) + rowSlot) << 5;
-            base = panel->display.secondary;
+            struct SceneInputWidget *base = panel->display.secondary;
             widget = (void *)(offset + (u32)base);
-            offset = flagIndex * 0x60;
-            {
-                struct SceneInventoryWidgetFlags *flags = flagsBase;
-                entry = (void *)(offset + (u32)flags);
-            }
         }
         do {
-            s32 kind;
-            {
-                register u32 offset asm("r0");
-                const s8 *catalog;
-                slot = column;
-                slot += rowSlot;
-                offset = panel->page * 8;
-                offset = slot + offset;
-                catalog = panel->catalog;
-                catalog += offset;
-                kind = *catalog;
-            }
+            slot = column + rowSlot;
+            kind = panel->catalog[slot + panel->page * 8];
             if (kind >= 0) {
                 struct SceneValueEquipmentDefinition *definition = Equipment_GetDefinition(kind);
-                entry->flags &= ~1;
-                {
-                    u32 frame = kind;
-                    frame = (u16)(frame + 240);
-                    {
-                        struct SceneInputWidget *argument = widget;
-                        Anim_LoadKeyframe(argument, &panel->display.gridResource, frame, 1);
-                    }
-                }
+                flagsBase[flagIndex].flags &= ~1;
+                Anim_LoadKeyframe(widget, &panel->display.gridResource, (u16)(kind + 240), 1);
                 if (gGameState->unk7B0 < definition->baseValue)
                     SceneHud_SetKeyframePaletteBank(widget, 0x374);
                 else
                     SceneHud_SetKeyframePaletteBank(widget, 0x373);
             } else
-                entry->flags |= 1;
-            entry++;
+                flagsBase[flagIndex].flags |= 1;
+            flagIndex++;
             widget++;
-            {
-                register s32 next asm("r1") = column + 1;
-                column = next;
-                if (next > 3)
-                    break;
-            }
-        } while (1);
-        {
-            s32 next = nextRow;
-            row = next;
-            if (next > 1)
-                break;
-        }
-    } while (1);
+            column++;
+        } while (column <= 3);
+    }
     {
-        struct GameState *state = gGameState;
-        const s16 *materials;
-        struct ContactPosition *position;
-        struct SceneInventoryWidgetFlags *entry;
-        s32 remaining;
-        materials = state->inventory;
-        position = &panel->display.digits[0].position;
-        {
-            struct SceneInventoryWidgetFlags *base = flagsBase;
-            u32 offset = 41 * 0x60;
-            asm("" ::"r"(base), "r"(offset));
-            entry = (void *)((u32)base + offset);
-        }
-        remaining = 7;
-        do {
-            u32 packed = *(const u16 *)materials;
+        const s16 *materials = gGameState->inventory;
+        struct ContactPosition *position = &panel->display.digits[0].position;
+        struct SceneInventoryWidgetFlags *entry = &flagsBase[41];
+        s32 i;
+        for (i = 0; i < 8; i++) {
+            u16 packed = *materials;
             if (*materials < 0)
                 entry->flags |= 1;
             else {
@@ -184,7 +89,6 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
             materials++;
             position = (void *)((u8 *)position + 0x60);
             entry++;
-            remaining--;
-        } while (remaining >= 0);
+        }
     }
 }
