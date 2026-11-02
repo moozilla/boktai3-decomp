@@ -1,4 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
+#include "scene_actor_registry.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
@@ -15,7 +16,7 @@ static inline void ClearRoute(struct SceneActorRegistryResetView *a, u8 *group)
     u32 mask = ~0x141C0;
     *flags &= mask;
     route->counter = 0;
-    *(u16 *)((u8 *)route + 0x14) = 0;
+    route->field14 = 0;
     route->timer = 0;
 }
 void SceneActorReaction_PlayStaggerBurst(struct SceneActorRegistryResetView *input, s32 inputFrame)
@@ -102,15 +103,15 @@ void SceneActorReaction_PlayStaggerBurst(struct SceneActorRegistryResetView *inp
             index *= 2;
             mode = *(const u16 *)((u32)gRandomTable + index) & randomMask;
             mode += 1;
-            SparkParticle_Spawn(&actor->body.position, mode, &range.position, actor->body.direction + 128, 10,
-                                6, 2, 2);
+            SparkParticle_Spawn(&actor->body.position, mode, &range.position,
+                                actor->body.direction + 128, 10, 6, 2, 2);
         }
     }
     if (!actor->drawableKind) {
         u8 *sequence = (u8 *)actor->drawable + 0x48;
         *(u16 *)(sequence + 0xE) = 0;
     } else
-        *(u16 *)((u8 *)actor->drawable + 0x2C) = 0;
+        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->state2C = 0;
     if (frame > 15) {
         u32 mask = 2;
         u32 flagOffset = 0x2D4;
