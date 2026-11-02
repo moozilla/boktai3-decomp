@@ -37,10 +37,10 @@ void SceneActorControl_EnterTimedState(struct SceneActorRegistryResetView *actor
         DEBUG_PRINT();
     }
     bit = 0x20;
-    masked = *(u16 *)((u8 *)actor + 0x2d4) & bit;
+    masked = actor->flags2D4 & bit;
     flags = (u16)masked;
     zero = flags;
     if ((bit = zero) == 0)
-        Enter(*(&actor), zero);
+        Enter(actor, zero);
     actor->counter2AC++;
 }
