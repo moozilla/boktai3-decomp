@@ -137,24 +137,23 @@ static inline s32 LocalPlayer(void)
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
     if (Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->field2E0;
-        register u32 mask asm("r2") = *owner;
+        u32 mask = actor->field2E0;
         if (!(mask & 0x20) && mask) {
             switch (LocalPlayer()) {
                 case 0:
-                    if (*owner != 1)
+                    if (actor->field2E0 != 1)
                         return 0;
                     break;
                 case 1:
-                    if (*owner != 2)
+                    if (actor->field2E0 != 2)
                         return 0;
                     break;
                 case 2:
-                    if (*owner != 4)
+                    if (actor->field2E0 != 4)
                         return 0;
                     break;
                 case 3:
-                    if (*owner != 8)
+                    if (actor->field2E0 != 8)
                         return 0;
                     break;
             }
@@ -172,6 +171,10 @@ static inline s32 CurrentHealth(struct SceneActorRegistryResetView *actor)
 {
     s16 *health = (void *)&actor->health;
     return *health;
+}
+static inline void OrStatus(u16 status, u16 *flags)
+{
+    *flags |= status;
 }
 // confidence=low: timer-driven damage and defeat recording; the status is tentatively burn.
 #define Mummy_UpdateBurnDamage sub_080D812C
@@ -204,27 +207,16 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
         burn->timer = 0;
         return;
     }
-    {
-        register u32 status asm("r0");
-        if (burn->intensity > 2) {
-            if (Mod(burn->timer, 16) == 0) {
-                Sound_PlaySong(0x121);
-                status = 0x10;
-                goto setStatus;
-            }
-        } else {
-            if (Mod(burn->timer, 48) == 0) {
-                Sound_PlaySong(0x121);
-                status = 0x20;
-                goto setStatus;
-            }
+    if (burn->intensity > 2) {
+        if (Mod(burn->timer, 16) == 0) {
+            Sound_PlaySong(0x121);
+            OrStatus(0x10, &actor->flags2D6);
         }
-        goto statusDone;
-    setStatus: {
-        register u16 *flags asm("r2") = &actor->flags2D6;
-        *flags = status | *flags;
-    }
-    statusDone:;
+    } else {
+        if (Mod(burn->timer, 48) == 0) {
+            Sound_PlaySong(0x121);
+            OrStatus(0x20, &actor->flags2D6);
+        }
     }
     if (burn->count) {
         for (i = 0; i < burn->count; i++) {
