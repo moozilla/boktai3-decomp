@@ -7,7 +7,7 @@ void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 static inline void *SlotSpritePosition(struct ContactActor *slot)
 {
-    return slot->sprite.unknown1C;
+    return &slot->sprite.position;
 }
 
 static inline void SelectSlotPalette(void *graphics)
@@ -37,7 +37,7 @@ u32 ContactActor_InitializeSlot(struct ContactActorPool *pool, struct ContactAct
     sprite->priority = 2;
     ZeroFill8(SlotSpritePosition(slot));
     shadow = slot->shadow;
-    Shadow_Initialize(shadow, slot->sprite.unknown1C, 0);
+    Shadow_Initialize(shadow, &slot->sprite.position, 0);
     ActorShadow_Disable(shadow);
     collider = &slot->healthCollider;
     bounds.x = 32;

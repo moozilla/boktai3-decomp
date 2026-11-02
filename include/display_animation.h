@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "display_sequence.h"
 #include "display_keyframe.h"
+#include "contact_position.h"
 struct DisplayAnimationResource {
     u8 unknown0[6];
     u16 paletteIndex;
@@ -35,6 +36,7 @@ struct DisplaySequenceSprite {
     u16 frame;
     u8 frameIndex, elapsed, width, height, offsetX, offsetY;
     u32 attributes;
-    u8 unknown1C[0x10];
+    struct ContactPosition position;
+    u8 unknown24[8];
 };
 #endif
