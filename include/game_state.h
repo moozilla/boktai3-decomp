@@ -95,7 +95,7 @@ struct GameState {
     u32 unk600;
     s32 contactThreshold; /* 0x604: randomized 200..299 after player threshold event (tentative) */
     u32 statHundredths;   /* 0x608: restored by player initialization */
-    u8 unk60C[4];
+    u32 playerStatusValue; /* 0x60C: synchronized by Player_ClampStatsAndSyncStatus. */
     u16 unk610;
     s16 unk612;
     s32 unk614;
@@ -130,11 +130,11 @@ struct GameState {
     s16 unk7B0;
     s16 clockDisplayValue; /* 0x7B2: printed below base hour/minute, tentative */
     s16 unk7B4;
-    u8 unk7B6[2];
+    s16 linkScoreFirstRow; /* 0x7B6: first number on the link score panel. */
     u32 unk7B8[4];
     s32 unk7C8[12];
     s16 unk7F8;
-    u8 unk7FA[0x4];
+    s16 linkScoreOtherRows[2]; /* 0x7FA: second and third numbers on the panel. */
     u16 styleParameterE; /* 0x7FE: copied by SceneActorStyle initializer. */
     s16 unk800[13];
     s16 unk81A;
