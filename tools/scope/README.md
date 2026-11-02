@@ -1369,6 +1369,16 @@ Each was read from the compiler source and confirmed on a live draft.
    shows a value `local` in the draft where the ROM gives it a high register, look for a pointer
    that should die at an inline's parameter copy.
 
+57. **A test whose result is never used is an if whose two identical arms jump2 merged.** The ROM
+   of SpriteEffectController_FadeAndDestroy computes `ldrh r1, [r7]; movs r0, #8; ands r0, r1`
+   and then overwrites r0 with `ldr r0, [r6]` (the drawable). flow deletes dead sets, so the and
+   was live when flow ran: it fed a branch. jump2 runs after reload and flow, cross-jumps two
+   identical arms into one, deletes the branch and its compare, and nothing deletes the and.
+   `if (*flags & 8) blink = (struct SpriteEffectSequenceDrawable *)c->drawable; else blink =
+   (struct SpriteEffectTileDrawable *)c->drawable;` matched, replacing an `asm volatile` that
+   kept the test alive. When the ROM tests a value it never uses, write an if whose arms differ
+   only in type.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
