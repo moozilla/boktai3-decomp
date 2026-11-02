@@ -3,13 +3,14 @@
 Tags: #loop-reduction #goto #reload-rotation #inventory #spilled-locals
 
 **PopulateItemGrid (0805FF38) matches with no pins** (commit 3f28b7dd2,
-`src/fn/sub_0805FF38.c`). The other two units still match only in their
-pinned form. Best pin-free drafts:
+`src/fn/sub_0805FF38.c`). The consumable grid is a holdout: gcse moves two
+row-end increments above the column loop (README fact 50). The equipment grid
+is below. Best pin-free drafts:
 
 | Unit | Best pin-free draft | Differing (ROM / draft) | Shape |
 |---|---|---|---|
 | PopulateItemGrid 0805FF38 | **MATCH** (plain spilled locals, `slot` as the hide-loop counter, goto outer loop) | 0 | 0 |
-| PopulateConsumableGrid 080600DC | goto outer loop, plain locals | 67 / 67 | 68 |
+| PopulateConsumableGrid 080600DC | goto outer loop, plain locals (25 / 25 with `AGBCC_NOPRE=1,2`) | 67 / 67 | 68 |
 | PopulateEquipmentGrid 0805FD20 | `do` / `while` loops with goto exits | 72 / 76 | 68 |
 
 ## What decided the item grid
@@ -73,16 +74,167 @@ the row on every row. As C this is `entry = (void *)((rowSlot + 5) * 0x60 +
 * For the closing hide loop, `u32 mask = 1;` declared before `entry` puts
   `movs r3, #1` first, as in the ROM.
 
-## Consumable grid notes
+## Consumable grid (080600DC): holdout, gcse moves two row-end increments above the column loop
 
-* The function-start stores take r0, r1, r2 and r3, then reuse r0 for
-  `rowBytes = 0`. That is reload inheritance, so its stack variables are
-  spilled pseudos, not memory.
-* The hidden-flags loop counts 4..7 upward in the ROM. A goto exit keeps it
-  that way (README fact 40), so the pinned unit's `asm("" : "+r"(slot))` is
-  not needed. `slot = 4;` goes before the `mask`/`hidden` block.
-* What remains is section 1's allocation. `panel` gets sb instead of r8, and
-  one variable gets r8 instead of a stack slot (frame 0x1c for 0x18).
+**Not depinned.** The best pin-free draft is still the goto outer loop with explicit row
+counters (below): 67 / 67, shape 68. What stops it is now known.
+
+* gcse's PRE moves `saveByteOffset += 8` and `slotBase += 4` from the end of each row to the
+  end of the block before the column loop, into two new pseudos, and the row-end adds become
+  copies. The frame grows to 0x1c (0x18 in the ROM). Why: README fact 50 (the old LCM stops
+  delaying at a loop header). `scope.py pre` shows both as "moved above a loop".
+* With both kept (`AGBCC_NOPRE=1,2`, a list since commit d29d55a9c) the draft is 25 / 25, and
+  every remaining difference is one swap: `panel` in sb and `cursor` in r8, where the ROM has
+  `panel` in r8 and `cursor` in sb. `AGBCC_NOPRE=2` alone gives 37 / 40.
+* `rowBytes += 0x180` is not moved (0x180 is loaded into a register first, so the add is not
+  anticipatable), and `row++` is not moved (the second section computes `row + 1` again, so the
+  row-end computation is isolated).
+* No C found that keeps the two adds at the row end in the goto form. Fact 50's conditions need
+  an increment Thumb cannot encode inline, the same expression again on every later path, or
+  the operand set in the column loop or in the block before it. The ROM shows none of these.
+* The other reading: the ROM's three row-end adds are loop.c's own giv steps. They sit right
+  before `row++`, where loop.c puts giv steps, and their slots come after `nextRow`'s, which
+  fits compiler-made pseudos (it also fits the declaration order). That means a real outer loop with the counters derived from `row` (`slot = row * 4 +
+  column`, `&panel->display.primary[row * 4]`, `gGameState->table160[slot]`). loop.c runs
+  after gcse, so nothing moves them. But loop.c then also reduces the entry offset
+  `(row * 4 + 5) * 0x60`, which the ROM recomputes each row from `slotBase`: adjusted benefit
+  9, threshold 15 (`(3 + 12)`, a loop with a call), life 1 is 135 against the loop's 75 to 119
+  insns. Drafts this way (`build/scope/drafts/cg/h*.c`): per-row pointers 116 / 112 to 125 /
+  122; per-column indexing (`widget = &panel->display.primary[slot]`, `entry =
+  &flagsBase[slot + 5]`) 62 / 59. There every per-column init is reduced again in the outer
+  loop's second pass (x4, x8, x12, x384 givs).
+* Earlier findings still hold. The function-start stores take r0, r1, r2 and r3, then r0 again
+  for `rowBytes = 0` (reload reuses the register that still holds 0). So these are spilled
+  pseudos, not memory: in memory, CSE would store one zero register everywhere, as it did in
+  the item grid's struct draft. The
+  hidden-flags loop counts 4..7 upward with a goto exit (fact 40).
+* For a stronger model: find why the ROM's loop.c leaves the entry offset alone (or which C
+  makes it a non-giv while `row * 4`, `row * 8` and `row * 0x180` are still reduced). Or find
+  a goto-form spelling whose row-end adds gcse leaves in place. Then fix the panel / cursor
+  priority order (in the item grid, panel got r8 once the rest matched).
+
+Best pin-free draft (67 / 67; 25 / 25 under `AGBCC_NOPRE=1,2`):
+
+```c
+#include "scene_inventory_panel.h"
+void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *panel)
+{
+    s32 row;
+    struct SceneInventoryWidgetFlags *flagsBase;
+    s32 nextRow;
+    u32 saveByteOffset;
+    u32 slotBase;
+    u32 rowBytes;
+    u32 cursor;
+    s32 column;
+    s32 slot;
+    s32 kind;
+    Anim_SelectWidgetGlyph(&panel->display.heading, &panel->display.widgetResource, 0x66);
+    row = 0;
+    flagsBase = ((struct SceneInventoryFlagsView *)(void *)panel)->widgets;
+    saveByteOffset = 0;
+    slotBase = 0;
+    rowBytes = 0;
+primaryRow: {
+        struct SceneInputWidget *widget;
+        struct SceneInventoryWidgetFlags *entry;
+        column = 0;
+        {
+            struct SceneInputWidget *base = panel->display.primary;
+            widget = (void *)(rowBytes + (u32)base);
+        }
+        cursor = saveByteOffset;
+        entry = (void *)((slotBase + 5) * 0x60 + (u32)flagsBase);
+        do {
+            slot = slotBase + column;
+            kind = ((struct GameState *)((u8 *)gGameState + cursor))->table160[0];
+            if (kind >= 0) {
+                entry->flags &= ~1;
+                Anim_LoadKeyframe(widget, &panel->display.gridResource, (u16)(kind + 289), 1);
+            } else
+                entry->flags |= 1;
+            if (!gUnk_08E60F80[kind].baseValue || GameState_IsConsumableSlotEquipped(slot))
+                SceneHud_SetKeyframePaletteBank(widget, 0x374);
+            else
+                SceneHud_SetKeyframePaletteBank(widget, 0x373);
+            widget++;
+            cursor += 2;
+            entry++;
+            column++;
+        } while (column <= 3);
+        saveByteOffset += 8;
+        slotBase += 4;
+        rowBytes += 0x180;
+        row++;
+        if (row <= 3)
+            goto primaryRow;
+    }
+    for (row = 0; row <= 1;) {
+        struct SceneInputWidget *widget;
+        struct SceneInventoryWidgetFlags *entry;
+        u32 flagIndex;
+        u32 offset;
+        column = 0;
+        cursor = row * 4;
+        nextRow = row + 1;
+        flagIndex = cursor + 21;
+        offset = ((row << 3) + cursor) << 5;
+        {
+            struct SceneInputWidget *base = panel->display.secondary;
+            widget = (void *)(offset + (u32)base);
+        }
+        entry = (void *)(flagIndex * 0x60 + (u32)flagsBase);
+        do {
+            slot = cursor + column;
+            kind = panel->catalog[slot + panel->page * 8];
+            if (kind >= 0) {
+                entry->flags &= ~1;
+                Anim_LoadKeyframe(widget, &panel->display.gridResource, (u16)(kind + 289), 1);
+                if (gGameState->unk7B0 < gUnk_08E60F80[kind].baseValue)
+                    SceneHud_SetKeyframePaletteBank(widget, 0x374);
+                else
+                    SceneHud_SetKeyframePaletteBank(widget, 0x373);
+            } else
+                entry->flags |= 1;
+            entry++;
+            widget++;
+            column++;
+        } while (column <= 3);
+        row = nextRow;
+    }
+    {
+        struct ContactPosition *position = &panel->display.digits[0].position;
+        struct SceneInventoryWidgetFlags *entry = &flagsBase[41];
+        const s16 *party = gGameState->party;
+        for (slot = 0; slot < 4; slot++) {
+            s32 packed = *party;
+            if (packed < 0)
+                entry->flags |= 1;
+            else {
+                entry->flags &= ~1;
+                position->x = (packed & 3) * 24 + 112;
+                position->y = (packed >> 2) * 24 + 32;
+            }
+            position = (void *)((u8 *)position + 0x60);
+            entry++;
+            party++;
+        }
+    }
+    slot = 4;
+    {
+        u32 mask = 1;
+        struct SceneInventoryWidgetFlags *hidden = &flagsBase[45];
+        do {
+            hidden->flags |= mask;
+            hidden++;
+            slot++;
+            if (slot > 7)
+                goto hiddenDone;
+        } while (1);
+    hiddenDone:;
+    }
+}
+```
 
 ## Equipment grid notes
 
