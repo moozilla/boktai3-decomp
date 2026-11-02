@@ -1091,11 +1091,9 @@ void Actor_BeginCurveToRest(void)
 
 /* Script command: configure the singleton animation controller. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_BeginScriptedCurve(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
@@ -1109,27 +1107,7 @@ void Actor_BeginScriptedCurve(void)
         H(0xed2) = 0;
         H(0xed0) = 0;
     }
-    g->oldMode = g->mode;
-    {
-        u32 mode = 2;
-        g->mode = mode;
-    }
-    {
-        register u32 raw asm("r1") = *(u16 *)((u8 *)g + 0xf5a);
-        register u32 mask asm("r2") = 15;
-        *(u16 *)((u8 *)g + 0xf5a) = (mask & raw) | 0x90;
-        if (g->oldMode == 3) {
-            register u32 bits asm("r0") = mode_bits_v2((u8 *)g + 0xf5a, mask);
-            if (bits == 3) {
-                g->savedFrame = g->anim.frame;
-                g->savedTimer = g->anim.timer;
-            }
-        }
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    Actor_SetState(g, 2, 9);
 }
 
 /* Script command: configure the singleton animation controller. */
