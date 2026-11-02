@@ -89,8 +89,10 @@ static inline void publishInputs(struct Engine *p)
 }
 int Wireless_UpdateParentUniSession(struct Engine *p)
 {
+    volatile u8 *busy;
     p->flag31 = 0;
-    while (*(volatile u8 *)&gWirelessSessionState == 1)
+    busy = &gWirelessSessionState;
+    while (*busy == 1)
         ;
     sub_08223BC0(0);
     {
