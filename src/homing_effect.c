@@ -764,7 +764,6 @@ void EffectParticle_UpdateDriftBeforeHoming(struct EffectManager *manager, struc
     register u8 *angle asm("r6") = &p->angle;
     struct EffectAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     s32 difference;
     if ((index & 1) == phase) {
         difference =
@@ -848,8 +847,7 @@ void EffectParticle_UpdateDriftBeforeHoming(struct EffectManager *manager, struc
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
