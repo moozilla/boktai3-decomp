@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
 #include "contact_position.h"
@@ -86,8 +85,12 @@ void Armor_SelectAlignedAttack(struct ArmorSelection *p)
                 break;
 
             case 1:
-                if ((p->attackCooldown <= 0) || (x && z))
-                    ARMOR_CLEAR_DECISION(decision);
+                if (p->attackCooldown <= 0) {
+                    *decision = 0;
+                    break;
+                }
+                if (x && z)
+                    *decision = 0;
                 else {
                     u32 action = p->behavior;
                     if ((((u8)(action - 10)) > 1) && (action != 13))
