@@ -724,7 +724,8 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
     switch (kind) {
         case 0: {
             s32 shown = damage;
-            if (*(u32 *)((u8 *)p + 0x358) == 1 && (*(u8 **)gPlayers)[0x418] != 2) {
+            if (((struct SceneGraphicsActor *)p)->graphics.stepTableKind == 1 &&
+                (*(u8 **)gPlayers)[0x418] != 2) {
                 shown = 0;
                 result = 0;
             }
@@ -745,9 +746,9 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
             if (gEngineFlags & 0x1000) {
                 u8 *position = sprite + 0xc;
                 if (WirelessGame_TryAddCyclingItem(position)) {
-                    s32 d = actor[0x20e] -
-                            Math_Atan2(*(s16 *)(sprite + 0xc) - *(s16 *)((u8 *)gGameState + 0x30),
-                                       *(s16 *)(sprite + 0x10) - *(s16 *)((u8 *)gGameState + 0x34));
+                    s32 d =
+                        actor[0x20e] - Math_Atan2(*(s16 *)(sprite + 0xc) - gGameState->positionX,
+                                                  *(s16 *)(sprite + 0x10) - gGameState->positionZ);
                     if (d < 0)
                         d = -d;
                     if (d <= 0x20)
