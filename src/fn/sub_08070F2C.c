@@ -5,7 +5,7 @@ struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableAfterId(u32);
 static inline u32 IsUnavailable(struct SceneActorRegistryActor *actor, u32 disabled, u32 excluded)
 {
     {
-        register u32 savedExcluded asm("r6") = excluded;
+        u32 savedExcluded = excluded;
         register struct SceneActorRegistryActor *owner asm("r1") = actor;
         if (owner) {
             u32 offset = 0x2d4;
@@ -39,7 +39,7 @@ success:
     return 1;
 initialize: {
     u32 disabled = 0x40;
-    register u32 excluded asm("r6") = 0x20000;
+    u32 excluded = 0x20000;
     do {
         if (actor->category == category) {
             u32 unavailable = IsUnavailable(actor, disabled, excluded);
