@@ -43,6 +43,22 @@ static inline void Actor_SetPhase(struct ActorAnimController *p, u32 phase)
     }
 }
 
+// Enter MODE at PHASE, keeping the previous mode, and flag the state change.
+static inline void Actor_SetState(struct ActorAnimController *g, u32 mode, u32 phase)
+{
+    g->oldMode = g->mode;
+    g->mode = mode;
+    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | (phase << 4);
+    if (g->oldMode == 3 && g->mode == 3) {
+        g->savedFrame = g->anim.frame;
+        g->savedTimer = g->anim.timer;
+    }
+    {
+        u8 one = 1;
+        g->flags |= one;
+    }
+}
+
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 
 void ActorPalette_UpdateFade(struct ActorAnimController *p)
@@ -856,37 +872,15 @@ static inline u32 mode_bits_v2(u8 *p, u32 mask)
     return mask & v;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_BeginScriptedAnimationPhaseNine(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0)
         return;
     B(0xf76) = Script_GetKeywordValue(0x70, 0);
     if (W(0xddc) & 1)
         return;
-    g->oldMode = g->mode;
-    {
-        u32 mode = 3;
-        g->mode = mode;
-    }
-    {
-        register u32 raw asm("r1") = *(u16 *)((u8 *)g + 0xf5a);
-        register u32 mask asm("r2") = 15;
-        *(u16 *)((u8 *)g + 0xf5a) = (mask & raw) | 0x90;
-        if (g->oldMode == 3) {
-            register u32 bits asm("r0") = mode_bits_v2((u8 *)g + 0xf5a, mask);
-            if (bits == 3) {
-                g->savedFrame = g->anim.frame;
-                g->savedTimer = g->anim.timer;
-            }
-        }
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    Actor_SetState(g, 3, 9);
 }
 
 /* Actor_SetAnimationPhase: Requests and saves the supplied phase with special cases for playing sound and clearing control */
@@ -4595,21 +4589,6 @@ void Actor_ConfigureInteractionChildFromScript(void)
 
 // Provisional name: Actor_ConfigureFromScript
 
-static inline void state(struct ActorAnimController *g, u32 mode, u32 phase)
-{
-    g->oldMode = g->mode;
-    g->mode = mode;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | (phase << 4);
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.frame;
-        g->savedTimer = g->anim.timer;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
-}
-
 void Actor_ConfigureFromScript(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
@@ -4662,22 +4641,22 @@ void Actor_ConfigureFromScript(void)
     *(u32 *)((u8 *)g + 0xddc) |= 1;
     switch (g->phaseSelect) {
         case 0:
-            state(g, 0, 0);
+            Actor_SetState(g, 0, 0);
             break;
         case 1:
-            state(g, 2, 1);
+            Actor_SetState(g, 2, 1);
             break;
         case 2:
-            state(g, 2, 2);
+            Actor_SetState(g, 2, 2);
             break;
         case 3:
-            state(g, 2, 3);
+            Actor_SetState(g, 2, 3);
             break;
         case 4:
-            state(g, 2, 5);
+            Actor_SetState(g, 2, 5);
             break;
         case 5:
-            state(g, 2, 6);
+            Actor_SetState(g, 2, 6);
             break;
     }
 }
