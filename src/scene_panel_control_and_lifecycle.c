@@ -613,12 +613,11 @@ void ScenePanel_InitResourceConfiguration(struct ScenePanel *parent)
         gGameState->unk618 = Script_GetValue();
         gGameState->unk61C = Script_GetValue();
     } else {
+        s32 *resource;
         parent->resourceIndex = found;
-        {
-            struct GameState *volatile *slot = &gGameState;
-            (*slot)->unk618 = 6000;
-            (*slot)->unk61C = 6000;
-        }
+        resource = &gGameState->unk618;
+        *resource = 6000;
+        gGameState->unk61C = 6000;
     }
     if (gGameState->unk618 > (gGameState->unk61C >> 2))
         parent->warningStage = 0;
