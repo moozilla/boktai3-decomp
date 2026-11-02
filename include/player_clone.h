@@ -2,10 +2,18 @@
 #define GUARD_PLAYER_CLONE_H
 #include "scene_input.h"
 
+/* Reset the base animation and start its idle keyframe. */
+#define PLAYER_CLONE_START_IDLE(index_, base_, sprite_, resource_) \
+    do { \
+        (index_) = (base_); \
+        Anim_LoadKeyframe((sprite_), (resource_), 0, 1); \
+    } while (0)
+
+
 struct PlayerCloneConfiguration {
     u16 flags, lifetime;
     u8 unknown4[2], angle, variant;
-    u32 behaviorValue;
+    s32 speed;
     void *callback;
     s16 primaryCollider[3];
     u16 unknown16;
@@ -30,11 +38,13 @@ struct PlayerCloneSlot {
     u8 unknown218[0x60];
     struct SceneInputResource resource;
     u8 unknown298[0x6C];
-    u32 flags, state;
+    u32 flags, behaviorPhase;
     u8 unknown30C[0x10];
-    u32 phase, unknown320, behaviorValue;
+    s32 animationIndex;
+    u32 unknown320;
+    s32 speed;
     u8 unknown328[8];
-    u16 unknown330;
+    s16 paletteTimer;
     u8 unknown332[0x12];
 };
 
