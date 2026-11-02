@@ -82,7 +82,8 @@ struct SceneHudState {
     u16 initializationState; /* 0xA5C */
     u8 controlMode;          /* 0xA5E: modes above two suppress controls */
     s8 previousPage;         /* 0xA5F: initialized to -1 */
-    u8 unknownA60[4];
+    u8 unknownA60[2];
+    u16 energyMeterBlinkTimer; /* 0xA62: advances while the energy meter flashes */
     u16 meterPulseFrame; /* 0xA64: 60-frame HUD meter pulse */
     u8 unknownA66[8];
     u16 timedStateParameter;            /* 0xA6E: sixth argument to 081781B4 */
@@ -96,7 +97,9 @@ struct SceneHudState {
     u16 pulseFrame; /* 0xA80: wraps at 128 */
     u8 unknownA82[0x12];
     u8 panelInitialized; /* 0xA94: cleared during gameplay HUD resource setup (tentative) */
-    u8 unknownA95[7];
+    u8 unknownA95[4];
+    u8 energyTimerVisible; /* 0xA99: set after drawing the four energy timer digits */
+    u8 unknownA9A[2];
     struct SceneHudControlAnimation controlAnimation; /* 0xA9C */
     u8 unknownABC[0x41];
     u8 actionRefreshRequested; /* 0xAFD */
