@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "nav_steering.h"
 
 // Steers a nav probe: when the probe lies to the side of `angle` (relative to `target`),
