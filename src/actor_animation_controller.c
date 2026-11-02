@@ -2313,7 +2313,6 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -2412,15 +2411,10 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
             s32 y = Div(p->deltaY * p->timer, 32);
             s32 sine = gUnk_086149C4[(p->timer * 4) & 255];
             s32 bend = p->bend;
-            register s32 product asm("r0") = bend * 30;
+            s32 product = bend * 30;
             product *= sine;
-            {
-                register s32 curve asm("r2") = product >= 0 ? product >> 12 : -((-product) >> 12);
-                {
-                    s32 result = (u16)p->startY + y + curve;
-                    p->obj.y = result;
-                }
-            }
+            sine = product >= 0 ? product >> 12 : -((-product) >> 12);
+            p->obj.y = (u16)p->startY + y + sine;
         }
     }
 }
