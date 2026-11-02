@@ -20,12 +20,6 @@ struct SessionScores {
     struct SessionResults results;
 };
 s32 LinkSession_CountPlayerKind(s32 kind);
-static inline void MarkAbsent(u16 *entry, u32 mask)
-{
-    u32 value = *entry;
-    value |= mask;
-    *entry = value;
-}
 
 void Registry1745_UpdateParticipantScores(struct SessionScores *session)
 {
@@ -45,15 +39,9 @@ void Registry1745_UpdateParticipantScores(struct SessionScores *session)
         else
             session->totals[i] = total;
     }
-    if (i <= 3) {
-        register u32 initialMask asm("r1") = 0xFFFF;
-        u32 mask;
-        asm("" : "+r"(initialMask));
-        mask = initialMask;
-        do {
-            MarkAbsent((u16 *)&session->points[i], mask);
-            MarkAbsent((u16 *)&session->totals[i], mask);
-        } while (++i <= 3);
+    for (; i < 4; i++) {
+        session->points[i] |= 0xFFFFu;
+        session->totals[i] |= 0xFFFFu;
     }
 }
 s32 Div(s32, s32);
