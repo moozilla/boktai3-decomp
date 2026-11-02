@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 #include "player.h"
 void ContactActor_InitializeSlot(struct ContactActorPool *, struct ContactActor *, s32);
@@ -6,39 +5,37 @@ void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 s32 ContactActorPool_Initialize(struct ContactActorPool *pool, u32 mode, u32 resourceId,
                                 u32 healthId)
 {
-    struct ContactActor *slot;
-    register s32 index asm("r5");
-    u32 hide = 0;
-    u32 zero;
-    asm("" : "+r"(hide));
-    zero = 0;
-    pool->resourceColliderId = resourceId;
-    pool->healthColliderId = healthId;
-    pool->hideRequested = hide;
-    pool->state = zero;
-    pool->mode = mode;
-    pool->sequenceResource = ScriptProc_Start(0x922E, 0x5BB7);
+    union {
+        struct ContactActor *slot;
+        struct ContactActorPool *pool;
+    } cursor;
+    s32 index;
+    cursor.pool = pool;
+    cursor.pool->resourceColliderId = resourceId;
+    cursor.pool->healthColliderId = healthId;
+    cursor.pool->hideRequested = 0;
+    cursor.pool->state = 0;
+    cursor.pool->mode = mode;
+    cursor.pool->sequenceResource = ScriptProc_Start(0x922E, 0x5BB7);
     {
-        u8 *bank = gPaletteBankData;
-        void *first = bank + 0x5A60;
-        void *second = bank + 0x5AA0;
-        Palette_InterpolateBanks((u8 *)pool + 0x1700, first, second, 64, 6);
+        void *first = gPaletteBankData + 0x5A60;
+        void *second = gPaletteBankData + 0x5AA0;
+        Palette_InterpolateBanks(cursor.pool->tileData, first, second, 64, 6);
     }
-    slot = &pool->slots[0];
+    cursor.slot = cursor.pool->slots;
     index = 0;
     do {
-        ContactActor_InitializeSlot(pool, slot, index);
+        ContactActor_InitializeSlot(pool, cursor.slot, index);
         index++;
-        slot++;
+        cursor.slot = (void *)((u8 *)cursor.slot + sizeof(*cursor.slot));
     } while (index <= 15);
     index = 0;
     if (index < pool->mode) {
         const struct ContactPosition **target = pool->targets;
         struct Player **player = gPlayers;
         do {
-            *target++ = (const void *)((u8 *)*player++ + 0x30);
-            index++;
-        } while (index < pool->mode);
+            *target++ = (const struct ContactPosition *)&(*player++)->position;
+        } while (++index < pool->mode);
     }
     return 0;
 }

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
@@ -23,54 +22,27 @@ static inline void ClearFlags(u16 *p, u32 mask)
 {
     *p &= mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *fn, u8 zero8,
-                              u32 zero)
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *fn)
 {
     u8 code = 0x2B;
-    {
-        u8 *taken = &actor->field2B2;
-        *taken = 1;
-    }
-    do {
-        u32 field = 0x2B0;
-        do {
-            ((u8 *)actor)[field] = zero8;
-        } while (0);
-        field += 5;
-        ((u8 *)actor)[field] = code;
-        actor->target = fn;
-        field += 0x13;
-        {
-            u16 *q = (u16 *)((u8 *)actor + field);
-            asm("" : "+r"(q), "+r"(field));
-            *q = zero;
-        }
-    } while (0);
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = code;
+    actor->target = fn;
+    actor->field2C8 = 0;
     {
         u32 *flags = &actor->flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->word104 = 0;
 }
 void SceneActorApproach_RunAlternateTimedAction(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorApproachActionContext *context = actor->context;
     if (TakeReady(actor)) {
-        register u8 zero8 asm("r3");
-        register u32 zero asm("r5");
-        u32 flags = 0x100;
-        u32 off = 0x2D4;
-        register u16 *flagptr asm("r2");
-        u32 value;
-        flagptr = (u16 *)((u8 *)actor + off);
-        value = *flagptr;
-        zero8 = 0;
-        zero = 0;
-        asm("" : "+r"(zero8), "+r"(zero));
-        flags |= value;
-        *flagptr = flags;
-        SetControl(actor, SceneActorReaction_TickMultiHitAnimation, zero8, zero);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->flags2D4);
+        SetControl(actor, SceneActorReaction_TickMultiHitAnimation);
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 3);
     }

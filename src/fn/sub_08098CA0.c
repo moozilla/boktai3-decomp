@@ -1,5 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_route_sample.h"
+#include "monster_particle_random.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
 #include "player.h"
@@ -33,6 +34,7 @@ static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
     out->y = 0;
     out->z = Scale(gUnk_086149C4[angle & 255] * speed);
 }
+
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
                          const struct ContactPosition *to)
 {
@@ -53,15 +55,6 @@ static inline u16 Random(void)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
-static inline u16 RandomMotion(void)
-{
-    u32 offset;
-    const u16 *table;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    table = gRandomTable;
-    return *(const u16 *)(offset + (u32)table);
-}
 static inline u32 Facing(u32 value, u8 *direction)
 {
     return (value & 63) + *direction;
@@ -72,7 +65,7 @@ void Ghost_FollowPlayerLoop(struct SceneActorRegistryResetView *actor)
     struct GhostRoute *route = actor->context;
     struct ContactPosition delta, target;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        register u32 observed asm("r4");
+        u32 origin, savedOrigin;
         u32 angle;
         void *callback = *(void **)((u8 *)actor + 0x228);
         u32 one = 1;
@@ -89,14 +82,17 @@ void Ghost_FollowPlayerLoop(struct SceneActorRegistryResetView *actor)
         actor->word104 = 0;
         route->index = 0;
         target = (*(struct GhostPlayer **)gPlayers)->position;
-        observed = 0x0403B714;
+        origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
         angle = RandomFirst(255);
-        Polar(&delta, angle, 512);
-        asm volatile("" ::"r"(observed));
+        SceneRoute_ProjectRandomOffset(&delta, angle, 512, origin, &savedOrigin);
         target.x += delta.x;
         target.z += delta.z;
         Delta(&delta, &actor->body.position, &target);
-        Polar(&route->motion, Facing(RandomMotion(), &actor->tracking.heading) & 255, 32);
+        Polar(&route->motion,
+              Facing(ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR),
+                     &actor->tracking.heading) &
+                  255,
+              32);
         sub_08098344(actor, &target);
         route->speed = 1;
     }

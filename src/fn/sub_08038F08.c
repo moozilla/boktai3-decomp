@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "runtime.h"
 struct Menu {
@@ -19,26 +18,23 @@ struct Save {
 int Save_WriteHeader(void);
 void TextWindow_Refresh(int, int);
 void Sound_PlaySong(int);
+static inline s32 WirelessTradeMenu_ClampScore(s32 score)
+{
+    if (score > 9999)
+        score = 9999;
+    else if (score < 0)
+        score = 0;
+    return score;
+}
 void WirelessTradeMenu_UpdateSaveResult(struct Menu *p)
 {
     int *window = &p->window;
     if (p->entered) {
-        struct Save **save;
-        int score;
-        int delta;
+        s32 score;
         p->entered = 0;
-        save = &gSessionState;
-        score = (*save)->score;
-        delta = p->delta;
-        score += delta;
-        {
-            register int maximum asm("r3") = 9999;
-            if (score > maximum)
-                score = maximum;
-            else if (score < 0)
-                score = 0;
-            (*save)->score = score;
-        }
+        score = ((struct Save *)gSessionState)->score;
+        score += p->delta;
+        ((struct Save *)gSessionState)->score = WirelessTradeMenu_ClampScore(score);
     }
     if (p->timer == 60) {
         p->result = Save_WriteHeader();

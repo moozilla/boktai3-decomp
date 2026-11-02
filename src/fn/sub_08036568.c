@@ -72,10 +72,10 @@ static inline void publishInputs(struct Engine *p)
         }
         history = p->history;
         do {
-            register int value asm("r2") = *history;
+            int value = *history;
             int test = valid;
             int result;
-            if (value & test) {
+            if (test & value) {
                 result = mask;
                 result &= value;
             } else
@@ -89,8 +89,10 @@ static inline void publishInputs(struct Engine *p)
 }
 int Wireless_UpdateParentUniSession(struct Engine *p)
 {
+    volatile u8 *busy;
     p->flag31 = 0;
-    while (*(volatile u8 *)&gWirelessSessionState == 1)
+    busy = &gWirelessSessionState;
+    while (*busy == 1)
         ;
     sub_08223BC0(0);
     {

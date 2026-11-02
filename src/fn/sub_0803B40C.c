@@ -133,13 +133,14 @@ initialize:
         int observed = a->flags;
         register int one asm("r3");
         register int side asm("r1");
-        register int word asm("r2");
+        int word;
         u32 encoded;
         one = 1;
         side = one;
         side &= observed;
         word = *frame;
-        encoded = word & 48;
+        encoded = 48;
+        encoded &= word;
         encoded >>= 4;
         encoded &= one;
         if (side != encoded) {
@@ -156,19 +157,10 @@ initialize:
         }
     }
     {
-        int observed = a->flags;
-        register int two asm("r3") = 2;
-        register int side asm("r1");
-        register int word asm("r2");
-        u32 encoded;
-        side = two;
-        side &= observed;
-        side = (u8)side;
-        word = *frame;
-        encoded = word & 48;
-        encoded >>= 4;
-        encoded &= two;
-        if (side != encoded)
+        register u32 observed asm("r4") = a->flags;
+        u32 flipMask = 2;
+        u32 side = (u8)(flipMask & observed);
+        if (side != (((*frame & 0x30) >> 4) & flipMask))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
@@ -215,8 +207,8 @@ initialize:
             next &= limit;
             if (next < (u32)length)
                 goto recalculate;
-            next = flags & 8;
-            asm("" : "+r"(next));
+            next = 8;
+            next &= flags;
             next = (u8)next;
             if (next) {
                 a->timer = initialPeriod;
@@ -228,14 +220,14 @@ initialize:
         int index = a->frame << 1;
         const u16 *table;
         register int word asm("r1");
-        register int value asm("r0");
+        int value;
         table = a->frames;
         frame = (const u16 *)((u32)table + index);
         word = *frame;
-        value = word & 15;
+        value = 15;
+        value &= word;
         a->duration = value;
         value = a->duration * a->speed;
-        asm("" : "+r"(value));
         value >>= 6;
         a->period = value;
         value = (u32)value << 24;
@@ -244,7 +236,6 @@ initialize:
     }
     animationDone:;
     }
-
     {
         int zero = 0;
         {

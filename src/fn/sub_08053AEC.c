@@ -84,24 +84,24 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
             u32 graphicsOffset = 0x94;
             u8 *address0;
             register u8 *address1 asm("r1");
-            register u8 *address2 asm("r2");
-            asm("" : "+r"(graphicsOffset));
+            u8 *address2;
             graphicsOffset += (u32)marker;
-            address0 = (void *)graphicsOffset;
-            graphics = (void *)address0;
-            address1 = (u8 *)&marker->primary.sprite;
-            primary = (void *)address1;
-            address2 = &marker->primary.sprite.priority;
-            asm("" : "+r"(address2));
-            primaryPriority = address2;
-            address0 = (u8 *)&marker->primary.sprite.position;
-            primaryPosition = (void *)address0;
-            address1 += 0x7C;
-            secondaryGraphics = (void *)address1;
-            address2 = (u8 *)&marker->secondary.sprite;
-            secondary = (void *)address2;
-            address0 += 0x3B;
-            secondaryPriority = address0;
+            {
+                u8 *spriteAddress = (void *)graphicsOffset;
+                graphics = (void *)spriteAddress;
+                address1 = (u8 *)&marker->primary.sprite;
+                primary = (void *)address1;
+                address2 = &marker->primary.sprite.priority;
+                primaryPriority = address2;
+                spriteAddress = (u8 *)&marker->primary.sprite.position;
+                primaryPosition = (void *)spriteAddress;
+                address1 += 0x7C;
+                secondaryGraphics = (void *)address1;
+                address2 = (u8 *)&marker->secondary.sprite;
+                secondary = (void *)address2;
+                spriteAddress += 0x3B;
+                secondaryPriority = spriteAddress;
+            }
             address1 -= 0x10;
             secondaryPosition = (void *)address1;
         }

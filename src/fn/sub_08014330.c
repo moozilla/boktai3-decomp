@@ -46,11 +46,10 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
         u8 *q;
         u32 fl;
         type = ({
-            register u32 z asm("r0") = g->type;
+            u8 z = g->type;
             asm("" : "+r"(z));
             z;
         });
-
         if (type <= 0x14)
             e = (struct PEntry *)m->small;
         else

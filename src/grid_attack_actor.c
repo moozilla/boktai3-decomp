@@ -1,3 +1,4 @@
+#include "hit_spark_random.h"
 #include "grid_attack_actor.h"
 #include "player_cue_sequence.h"
 #include "player.h"
@@ -336,28 +337,29 @@ void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
     struct GridAttackPacked size;
     int i;
     for (i = 0; i < 2; i++) {
-        int angle, speed;
-        int count;
-        register u32 index asm("r1");
+        u32 angle, count;
+        u32 index;
         u32 *indexPtr;
         u32 mask;
-        int smallMask;
-        register u16 *table asm("r4");
+        u32 smallMask;
+        u32 value;
+        u32 speed;
         size.x = 164;
         size.y = 16;
         size.z = 164;
         indexPtr = &gRandomIndex;
         mask = 1023;
         smallMask = 3;
-        table = gRandomTable;
-        index = (*indexPtr + 1) & mask;
-        angle = (u8)table[index];
-        index = (index + 1) & mask;
-        count = (table[index] & smallMask) + 2;
-        index = (index + 1) & mask;
+        value = (u32)gRandomTable;
+        index = HitSpark_NextIndex(*indexPtr, mask);
+        angle = (u8)HitSpark_Sample(value, index);
+        index = HitSpark_NextIndex(index, mask);
+        count = (HitSpark_Sample(value, index) & smallMask) + 2;
+        index = HitSpark_NextIndex(index, mask);
         *indexPtr = index;
-        speed = (table[index] & smallMask) + 20;
-        SparkParticle_Spawn(&graphics->position, 3, &size, angle, count, speed, 2, 2);
+        speed = (HitSpark_Sample(value, index) & smallMask) + 20;
+        value = 3;
+        SparkParticle_Spawn(&graphics->position, value, &size, angle, count, speed, 2, 2);
     }
 }
 

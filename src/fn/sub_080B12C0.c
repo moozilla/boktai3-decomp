@@ -1,9 +1,9 @@
 #include "global.h"
 #include "route_sprite_actor.h"
+#include "scene_actor_route.h"
 #include "engine.h"
 #include "ram.h"
 
-#define Route_GetPoints Path_GetPointData
 struct SceneActorRouteSelection {
     u8 unknown0[0x2be];
     u16 groundHeight;
@@ -23,13 +23,18 @@ static inline s32 randomValue(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
+union RouteSelectionCandidate {
+    struct RouteSpriteRoute route;
+    struct SceneActorRouteCursor actor;
+};
+
 void SceneActor_SelectDistantRoutePoint(struct SceneActorRouteSelection *p,
                                         struct ContactPosition *out, struct ContactPosition *origin,
                                         s32 limit)
 {
     struct SceneActorRouteSelection *actor = p;
     struct RouteSpriteRoute route;
-    volatile struct RouteSpriteRoute candidate;
+    union RouteSelectionCandidate candidate;
     struct RouteSelectionPosition delta;
     s32 best;
     s32 selected;
@@ -41,14 +46,15 @@ void SceneActor_SelectDistantRoutePoint(struct SceneActorRouteSelection *p,
     i = 0;
     for (; i < route.resource->pointCount; i++) {
         s32 distance;
-        candidate.current = (struct RouteSpriteRoutePoint *)Path_GetPointData(route.resource) + i;
+        candidate.route.current =
+            (struct RouteSpriteRoutePoint *)Path_GetPointData(route.resource) + i;
         *(struct ContactPosition *)&delta = *origin;
         {
-            u16 x = candidate.current->x - ((struct ContactPosition *)&delta)->x;
+            u16 x = candidate.actor.point->x - ((struct ContactPosition *)&delta)->x;
             ((u32 *)&delta)[0] = (((u32 *)&delta)[0] & 0xffff0000) | x;
         }
         {
-            u16 z = candidate.current->z - ((struct ContactPosition *)&delta)->z;
+            u16 z = candidate.actor.point->z - ((struct ContactPosition *)&delta)->z;
             ((u32 *)&delta)[1] = (((u32 *)&delta)[1] & 0xffff0000) | z;
         }
         distance = ((struct ContactPosition *)&delta)->x * ((struct ContactPosition *)&delta)->x +
@@ -68,13 +74,7 @@ void SceneActor_SelectDistantRoutePoint(struct SceneActorRouteSelection *p,
     {
         struct ContactPosition *dest = out;
         dest->x = route.current->x;
-        {
-            struct SceneActorRouteSelection *a = actor;
-            u32 c = 0x2be;
-            u16 *q;
-            q = (u16 *)((u32)a + c);
-            dest->y = *q;
-        }
+        dest->y = actor->groundHeight;
         dest->z = route.current->z;
     }
 }

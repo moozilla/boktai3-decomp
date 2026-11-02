@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "game_state.h"
 #include "repeated_effect.h"
 void RepeatedEffect_TickNeutral(struct RepeatedEffect *effect)
@@ -12,30 +11,22 @@ void RepeatedEffect_TickNeutral(struct RepeatedEffect *effect)
             effect->stateFrame &= 15;
     }
     if (effect->flashing) {
-        u32 frame = effect->stateFrame + 1;
-        effect->stateFrame = frame;
-        if ((u16)frame > 95) {
+        u16 frame = ++effect->stateFrame;
+        if (frame > 95) {
             effect->sprite.frame = 2;
             effect->flashing = 0;
             effect->stateFrame = 0;
         } else {
-            u32 displayedFrame;
-            asm("" : "+r"(frame));
-            if ((u16)frame <= 63) {
-                if ((frame & 15) > 7)
-                    goto frameTwo;
-                displayedFrame = 1;
-                goto storeFrame;
+            if (effect->stateFrame <= 63) {
+                if ((effect->stateFrame & 15) <= 7)
+                    effect->sprite.frame = 1;
+                else
+                    effect->sprite.frame = 2;
             } else {
-                if ((frame & 31) > 15)
-                    goto frameTwo;
-                displayedFrame = 1;
-                asm("" : "+r"(displayedFrame));
-                goto storeFrame;
-            frameTwo:
-                displayedFrame = 2;
-            storeFrame:
-                effect->sprite.frame = displayedFrame;
+                if ((effect->stateFrame & 31) <= 15)
+                    effect->sprite.frame = 1;
+                else
+                    effect->sprite.frame = 2;
             }
         }
     }

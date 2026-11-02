@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 #include "area_effect_link.h"
@@ -18,12 +17,6 @@ struct PanelSequence {
     u8 pad140D[5];
     u16 option;
 };
-struct PanelSelection {
-    u8 pad0[0x53];
-    u8 type;
-    u8 pad54[0x1BC];
-    u8 count;
-};
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 s32 Script_GetPc(void);
@@ -41,12 +34,15 @@ void PanelSequence_UpdateDelay(struct PanelSequence *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline u8 *GetSelectionCount(void)
 {
-    struct PanelSelection *p = gLinkSession;
-    if (p && (p->type == 1))
-        goto ret1;
-    return 0;
-ret1:
-    return &p->count;
+    struct AreaEffectLinkState *state = gLinkSession;
+    u32 result;
+    if (!state)
+        return 0;
+    result = state->unavailable;
+    if (result != 1)
+        return 0;
+    result = (u32)state->outgoingChoices;
+    return (u8 *)result;
 }
 
 static inline void PanelSequence_SetUpdate(struct PanelSequence *s,
@@ -54,16 +50,20 @@ static inline void PanelSequence_SetUpdate(struct PanelSequence *s,
 {
     s->update = update;
 }
-static inline u8 PanelSequence_ClampSelectionCount(u8 value, s32 max)
+static inline u8 PanelSequence_ClampSelectionCount(u8 value, s32 min, s32 max)
 {
-    register s32 result asm("r1") = value;
-    if (result > max)
-        return max;
-    return result;
+    if (value > max)
+        value = max;
+    else if (value < min)
+        value = min;
+    return value;
 }
+
 s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
 {
     u8 *count;
+    s32 selection;
+
     if (Script_SeekToKeyword('s')) {
         s->source = Script_GetTextSourcePc();
         if (!s->source)
@@ -84,7 +84,10 @@ s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
     if (!count)
         return -1;
     s->count = *count;
-    s->count = PanelSequence_ClampSelectionCount(s->count, 10);
+    selection = PanelSequence_ClampSelectionCount(s->count, 0, 10);
+    {
+        s->count = selection;
+    }
     Bg_ClearTilemap(3);
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(1);

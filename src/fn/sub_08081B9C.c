@@ -1,139 +1,31 @@
-// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_terrain_reaction.h"
 #include "scene_actor_reaction.h"
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
-{
-    register u32 offset asm("r2") = 0x2B2;
-    u8 *flag;
-    asm("" : : "r"(offset));
-    flag = (u8 *)actor + offset;
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
+
 void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView *actor,
                                              s32 unusedFrame)
 {
-    u8 *group = (u8 *)actor + 0x3D4;
-    u32 phaseOffset;
-    if (TakePrepared(actor)) {
+    struct SceneActorChaseGroup *group = &actor->group;
+    if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
         SceneActorTerrain_ClearCollisionTimers((void *)actor);
         {
-            register u32 offset asm("r3") = 0x2D4;
-            register u16 *flags asm("r0");
-            u32 mask;
-            asm("" : : "r"(offset));
-            flags = (u16 *)((u8 *)actor + offset);
-            mask = ~2;
-            {
-                register u32 value asm("r2") = *flags;
-                *flags = mask & value;
-            }
+            u16 *flags = &actor->flags2D4;
+            s32 mask = ~2;
+            *flags &= mask;
         }
     }
-    {
-        u32 completedOffset = 0x2B3;
-        u8 *completed;
-        completed = (u8 *)actor + completedOffset;
-        if (*completed) {
-            u32 zeroWord;
-            u32 zeroByte;
-            u32 one;
-            u16 *valueAA = &actor->fieldAA;
-            zeroByte = 0;
-            asm("" : "+r"(zeroByte));
-            zeroWord = 0;
-            *valueAA = zeroWord;
-            {
-                register u32 offset asm("r2") = 0x2B0;
-                register u8 *field asm("r0");
-                asm("" : : "r"(offset));
-                field = (u8 *)actor + offset;
-                one = 1;
-                *field = one;
-            }
-            {
-                u32 mask = 0x10;
-                register u32 offset asm("r3") = 0x2CC;
-                register u32 *flags asm("r1");
-                asm("" : : "r"(offset));
-                flags = (u32 *)((u8 *)actor + offset);
-                *flags |= mask;
-            }
-            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            {
-                register u32 state asm("r1") = 3;
-                u32 stateOffset = 0x2A8;
-                register u8 *field asm("r0");
-                field = (u8 *)actor + stateOffset;
-                *field = state;
-                phaseOffset = 0x2A9;
-                {
-                    field = (u8 *)actor + phaseOffset;
-                }
-                *field = one;
-                {
-                    u32 offset = 0x2AA;
-                    field = (u8 *)actor + offset;
-                }
-                *field = zeroByte;
-                {
-                    register u32 *counter asm("r0");
-                    stateOffset += 4;
-                    counter = (u32 *)((u8 *)actor + stateOffset);
-                    *counter = zeroWord;
-                }
-                phaseOffset += 8;
-                field = (u8 *)actor + phaseOffset;
-                *field = one;
-            }
-            {
-                register void *control asm("r2") = *(void **)(group + 0x210);
-                register u32 kind asm("r1") = 15;
-                {
-                    u8 *field;
-                    phaseOffset += 1;
-                    field = (u8 *)actor + phaseOffset;
-                    *field = one;
-                }
-                {
-                    u8 *field;
-                    phaseOffset -= 2;
-                    field = (u8 *)actor + phaseOffset;
-                    *field = zeroByte;
-                }
-                {
-                    register u8 *field asm("r0");
-                    phaseOffset += 5;
-                    field = (u8 *)actor + phaseOffset;
-                    *field = kind;
-                }
-                actor->target = control;
-                {
-                    register u32 offset asm("r2") = 0x2C8;
-                    register u16 *field asm("r0");
-                    asm("" : : "r"(offset));
-                    field = (u16 *)((u8 *)actor + offset);
-                    *field = zeroWord;
-                }
-                {
-                    register u32 offset asm("r3") = 0x114;
-                    register u32 *flags asm("r2");
-                    u32 mask;
-                    asm("" : : "r"(offset));
-                    flags = (u32 *)((u8 *)actor + offset);
-                    mask = ~1;
-                    *flags &= mask;
-                }
-                {
-                    u32 offset = 0x104;
-                    u32 *field;
-                    field = (u32 *)((u8 *)actor + offset);
-                    *field = zeroWord;
-                }
-            }
+    if (actor->field2B3) {
+        actor->fieldAA = 0;
+        actor->field2B0 = 1;
+        {
+            u32 mask = 16;
+            actor->flags2CC |= mask;
+        }
+        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+        SceneActorTerrain_EnterState(actor, 3, 1, 0);
+        {
+            void *control = group->field5E4;
+            SceneActorTerrain_InstallControl(actor, control, 15);
         }
     }
 }

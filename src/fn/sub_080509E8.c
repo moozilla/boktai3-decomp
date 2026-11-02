@@ -120,7 +120,7 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                     background->radius = (background->radius * 3 + 300) >> 2;
             }
             {
-                register u32 loadedFrame asm("r0") = background->blendFrame;
+                u16 loadedFrame = background->blendFrame;
                 u32 frame;
                 asm("" : "+r"(loadedFrame));
                 frame = loadedFrame;

@@ -291,6 +291,9 @@ class Fast:
         self.rom_syms, self.address, self.workdir = rom_syms, address, workdir
         self.fixup = fixup or (lambda text: text)
         self.servers = {}
+        self.server_limit = int(os.environ.get("SCOPE_PREFIX_SERVERS", 8))
+        if self.server_limit < 1:
+            raise ValueError("SCOPE_PREFIX_SERVERS must be at least one")
 
     def server(self, prefix):
         stamp = os.stat(self.compiler).st_mtime_ns
@@ -298,13 +301,15 @@ class Fast:
             self.close()
         self.stamp = stamp
         key = hashlib.sha1(prefix.encode()).hexdigest()
-        s = self.servers.get(key)
-        if s is None or s.proc.poll() is not None:
-            if len(self.servers) >= 8:
-                for old in self.servers.values():
-                    old.close()
-                self.servers.clear()
-            s = self.servers[key] = Server(self.compiler, self.flags, prefix, self.workdir)
+        s = self.servers.pop(key, None)
+        if s is not None and s.proc.poll() is not None:
+            s.close()
+            s = None
+        if s is None:
+            if len(self.servers) >= self.server_limit:
+                self.servers.pop(next(iter(self.servers))).close()
+            s = Server(self.compiler, self.flags, prefix, self.workdir)
+        self.servers[key] = s
         return s
 
     def bytes(self, pre, own, env=None):

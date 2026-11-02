@@ -2,7 +2,6 @@
 #include "engine.h"
 #include "ram.h"
 #include "area_effect_link.h"
-// MATCHING_CONCESSION: register-pinning
 struct PreviewPosition {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -18,7 +17,15 @@ void CharacterPreview_PositionParts(void *, void *, void *, s32);
 void CharacterModel_SetAnimationFlags(u8 *, u32);
 void CharacterModel_SetComponentRenderMode(void *, s32);
 void SceneActorStyle_InitializeFromGameState(void *);
-void SelectionPanel_InitPreview(u8 *p)
+struct SelectionPreview {
+    u8 beforeParts[0x494];
+    u8 parts[0x48];
+    u8 kind, variant, form, palette, extra;
+    u8 afterStyle[0xCDE - 0x4E1];
+    u8 owner;
+};
+
+void SelectionPanel_InitPreview(struct SelectionPreview *menu)
 {
     struct PreviewPosition pos;
     u8 *base, *sprite;
@@ -26,42 +33,26 @@ void SelectionPanel_InitPreview(u8 *p)
     u32 mask = 0x800;
     u32 flags = (gEngineFlags | gScenePauseFlags) & mask;
     if (flags) {
-        register u32 offset asm("r4");
         struct PreviewSource *source = gLinkSession;
         u8 *values;
-        u8 value;
-        u8 zero;
-        u8 *dest;
         if (!source || source->active != 1)
             return;
         values = source->values;
         if (!values)
             return;
-        base = p + 0x494;
-        value = values[0];
-        dest = p + 0x4dc;
-        zero = 0;
-        *dest = value;
-        value = values[2];
-        offset = 0x4de;
-        p[offset] = value;
-        value = values[1];
-        offset--;
-        p[offset] = value;
-        value = values[4];
-        offset += 3;
-        p[offset] = value;
-        value = values[3];
-        offset--;
-        p[offset] = value;
-        asm("" ::"r"(offset));
+        base = menu->parts;
+        menu->kind = values[0];
+        menu->form = values[2];
+        menu->variant = values[1];
+        menu->extra = values[4];
+        menu->palette = values[3];
         frame = values[3];
-        p[0xcde] = zero;
+        menu->owner = 0;
     } else {
-        base = p + 0x494;
-        SceneActorStyle_InitializeFromGameState(p + 0x4dc);
-        frame = p[0x4df];
-        p[0xcde] = flags;
+        base = menu->parts;
+        SceneActorStyle_InitializeFromGameState(&menu->kind);
+        frame = menu->palette;
+        menu->owner = flags;
     }
     pos.x = 0x30;
     pos.y = 0x50;

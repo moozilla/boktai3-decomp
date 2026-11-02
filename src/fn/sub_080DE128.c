@@ -1,50 +1,28 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
+#include "rotation_phase.h"
 // confidence=low: chooses response 0x75/0x82/0x87 from target range, heading, and action timers.
+struct DogAwareness {
+    u8 unknown0[0x678];
+    u32 flags;
+    u32 nearRange;
+    u32 farRange;
+    u8 unknown684[0x14];
+    u16 nearTimer;
+    u16 farTimer;
+};
 #define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 extern const u8 gUnk_0824E2A8[];
 void Dog_SelectRetreatOrChase(void *);
-static inline u8 Flag(u8 *context, u32 mask)
+static inline u8 Dog_HasAwarenessFlag(struct DogAwareness *context, u32 mask)
 {
-    if (FIELD(context, 0x678, u32) & mask)
+    u32 value = context->flags;
+    if (value & mask)
         return 1;
-    return 0;
-}
-static inline u8 FarFlag(u8 *context, u32 mask)
-{
-    u32 bit = mask;
-    register u32 offset asm("r3") = 0x678;
-    asm("" : "+r"(offset));
-    {
-        register u32 *field asm("r0") = (u32 *)(context + offset);
-        if (*field & bit)
-            return 1;
-    }
-    return 0;
-}
-static inline u8 OutsideFlag(u8 *context, u32 mask)
-{
-    u32 bit = mask;
-    u32 offset = 0x678;
-    {
-        u32 *field = (u32 *)(context + offset);
-        if (*field & bit)
-            return 1;
-    }
     return 0;
 }
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    u32 bit = mask;
-    asm("" : "+r"(bit));
-    return actor->flags2D4 & bit;
-}
-static inline s32 Absolute(s32 value)
-{
-    s32 result = value;
-    if (result < 0)
-        result = -result;
-    return result;
+    return actor->flags2D4 & mask;
 }
 static inline void Response(struct SceneActorRegistryResetView *actor, u8 *nav, u32 behavior,
                             u32 response)
@@ -55,55 +33,52 @@ static inline void Response(struct SceneActorRegistryResetView *actor, u8 *nav, 
 }
 void Dog_SelectTargetAction(struct SceneActorRegistryResetView *actor)
 {
-    u8 *context = actor->context;
+    struct DogAwareness *context = actor->context;
     u8 *nav = (u8 *)&actor->group.common;
     if (ActorFlag(actor, 0x100))
         return;
     if (actor->tracking.distance < actor->tracking.range) {
         struct ContactPosition delta;
-        s32 difference, angle;
+        s32 angle;
         {
             struct ContactPosition *out = &delta;
             struct ContactPosition *from = &actor->body.position;
             struct ContactPosition *to = &((struct ChaseTarget *)actor->tracking.target)->position;
             SceneActorTerrain_Subtract(out, to, from);
         }
-        difference = Math_Atan2(delta.x, delta.z) - actor->body.direction;
-        if (difference > 128)
-            difference -= 256;
-        else if (difference < -128)
-            difference += 256;
-        angle = Absolute(difference);
+        angle = RotationPhase_HeadingDistance(Math_Atan2(delta.x, delta.z), actor->body.direction);
         if (angle <= 23) {
             u32 mode = FIELD(actor, 0x1E6, u16);
             if (mode == 0 || mode == 2) {
-                if (actor->tracking.distance < FIELD(context, 0x67C, u32) && !FIELD(context, 0x698, u16)) {
+                if (actor->tracking.distance < context->nearRange && !context->nearTimer) {
                     Response(actor, nav, 0, 0x75);
                     return;
                 }
-            fallback:
-                if (Flag(context, 8))
+
+                if (Dog_HasAwarenessFlag(context, 8))
                     return;
                 goto move;
             } else {
-                if (actor->tracking.distance < FIELD(context, 0x67C, u32) && !FIELD(context, 0x698, u16)) {
+                if (actor->tracking.distance < context->nearRange && !context->nearTimer) {
                     Response(actor, nav, 0, 0x82);
                     return;
                 }
-                if (actor->tracking.distance < FIELD(context, 0x680, u32) && angle <= 5 &&
-                    !FIELD(context, 0x69A, u16)) {
+                if (actor->tracking.distance < context->farRange && angle <= 5 &&
+                    !context->farTimer) {
                     Response(actor, nav, 1, 0x87);
                     return;
                 }
-                goto fallback;
+                if (Dog_HasAwarenessFlag(context, 8))
+                    return;
+                goto move;
             }
         }
-        if (!FarFlag(context, 8)) {
+        if (!Dog_HasAwarenessFlag(context, 8)) {
         move:
             Dog_SelectRetreatOrChase(actor);
         }
     } else {
-        if (!OutsideFlag(context, 8))
+        if (!Dog_HasAwarenessFlag(context, 8))
             Dog_SelectRetreatOrChase(actor);
     }
 }

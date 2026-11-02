@@ -4,10 +4,9 @@
 #include "engine_globals.h"
 #include "ram.h"
 
-// MATCHING_CONCESSION: register-pinning
 #define CallbackPool_RunSpawnScript ProximityActor_SetState
 #define gShakeRandomIndex           gRandomIndex
-static inline u32 NextRandom(u16 *table)
+static inline u32 ProximityActor_NextSpawnSample(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     return *(u16 *)((gRandomIndex << 1) + (u32)table);
@@ -21,21 +20,21 @@ void ProximityActor_SetState(struct CallbackPoolEntry *entry, s32 count)
         args.count = 4;
         args.values = values;
         for (i = 0; i < count; i++) {
-            register u16 *table asm("r3") = gRandomTable;
+            union RandomTableView table = {gRandomTable};
             {
-                u32 random = NextRandom(table);
+                u32 random = ProximityActor_NextSpawnSample(table.samples);
                 s32 position = entry->position.x - 64;
                 random &= 127;
                 values[0] = position + random;
             }
             {
-                u32 random = NextRandom(table);
+                u32 random = ProximityActor_NextSpawnSample(table.samples);
                 s32 position = entry->position.y - 64;
                 random &= 127;
                 values[1] = position + random;
             }
             {
-                u32 random = NextRandom(table);
+                u32 random = ProximityActor_NextSpawnSample(table.samples);
                 s32 position = entry->position.z - 64;
                 random &= 127;
                 values[2] = position + random;

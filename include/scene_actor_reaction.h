@@ -27,6 +27,15 @@ struct SceneActorReactionTail {
 void SceneActorControl_OnIdle(void);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
+struct SceneActorReactionMotionFlags {
+    s16 bits : 16;
+};
+static inline void SceneActorReaction_EnableMotionFlags(u32 mask, u16 *field)
+{
+    struct SceneActorReactionMotionFlags *flags = (void *)field;
+    flags->bits |= mask;
+}
+
 static inline u8 SceneActorReaction_TakePrepared(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2B2) {

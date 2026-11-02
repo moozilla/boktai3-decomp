@@ -15,14 +15,12 @@ s32 OrbitContactActor_Update(struct OrbitContactActor *actor)
     if (actor->state) {
         {
             u32 spriteOffset = 0x9C;
-            asm("" : "+r"(spriteOffset));
             lowSprite = (struct ContactSwarmSprite *)(spriteOffset + (u32)actor);
             sprite = lowSprite;
         }
         position = &actor->sprite.position;
         angle = actor->angle;
         radius = actor->radius;
-        asm("" : : "r"(lowSprite));
         sine = gUnk_086149C4;
         value = sine[(angle + 64) & 255] * radius;
         if (value >= 0)

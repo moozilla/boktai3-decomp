@@ -82,6 +82,7 @@ void MessageWindow_Clear(void);
 // MATCHING_CONCESSION: register-pinning
 s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
 {
+    u32 rowStart;
     p->leftCursor.flags &= ~1;
     p->rightCursor.flags &= ~1;
     if (p->selected < 0) {
@@ -171,10 +172,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
                 if (selection > limit)
                     goto clampSelection;
             } else if (held & 64) {
-                s32 column = currentSelection - ({
-                                 u32 value = p->rowStart[choice->row];
-                                 value;
-                             });
+                s32 column = currentSelection - (rowStart = p->rowStart[choice->row]);
                 s32 row = ChoiceMenu_FindSelectableRow(p, choice->row, -1);
                 if (choice->row == row)
                     selection = p->selected;
@@ -191,11 +189,8 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
                            bits &= held;
                            bits;
                        })) {
-                register s32 column asm("r6") = currentSelection - ({
-                                                    register u32 value asm("r0") =
-                                                        p->rowStart[choice->row];
-                                                    value;
-                                                });
+                register s32 column asm("r6") =
+                    currentSelection - (rowStart = p->rowStart[choice->row]);
                 s32 row = ChoiceMenu_FindSelectableRow(p, choice->row, 1);
                 if (choice->row == row)
                     selection = p->selected;

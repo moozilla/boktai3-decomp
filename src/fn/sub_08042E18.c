@@ -35,9 +35,11 @@ void ContactActor_UpdateTracking(struct ContactActorPool *poolInput, struct Cont
             }
         }
     }
-    targetIndex = slot->targetIndex;
+    {
+        s8 *field = &slot->targetIndex;
+        targetIndex = *field;
+    }
     position = &slot->position;
-    asm("" : "+r"(position), "+r"(targetIndex) : : "memory");
     if (targetIndex >= 0) {
         const struct ContactPosition *target;
         s32 dx, dz;

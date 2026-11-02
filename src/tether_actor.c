@@ -1788,7 +1788,6 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
 {
     struct TetherActor *actor = gTetherActor;
     if (actor) {
-        struct Player *player;
         struct TetherActor *savedActor;
         s32 dx;
         s32 dz;
@@ -1796,14 +1795,16 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
         TetherActor_SetState(actor, 15);
         savedActor = gTetherActor;
         savedActor->directedStep = 16;
-        player = gPlayers[0];
         {
-            s32 playerX = player->position.x;
-            struct ContactPosition *targetPosition = &savedActor->directedTarget;
-            s32 actorX = targetPosition->x;
-            dx = playerX - actorX;
+            struct Player *player = gPlayers[0];
+            {
+                s32 playerX = player->position.x;
+                struct ContactPosition *targetPosition = &savedActor->directedTarget;
+                s16 actorX = targetPosition->x;
+                dx = playerX - actorX;
+            }
+            dz = player->position.z - savedActor->directedTarget.z;
         }
-        dz = player->position.z - savedActor->directedTarget.z;
         if (dx || dz) {
             register s32 angle asm("r0") = Math_Atan2(dx, dz);
             struct TetherActor *target;
@@ -1823,13 +1824,12 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
                 u32 byteOffset = index << 1;
                 const u16 *table;
                 register u32 sample asm("r0");
-                register u16 *heading asm("r1");
+                u16 *heading;
                 table = (const u16 *)RANDOM_TABLE_ADDR;
                 sample = *(const u16 *)(byteOffset + (u32)table);
                 sample &= 7;
                 {
-                    register u32 offset asm("r2") = 0x46C;
-                    asm("" : "+r"(offset));
+                    u32 offset = 0x46C;
                     heading = (u16 *)((u8 *)savedActor + offset);
                 }
                 *heading = sample;
@@ -1837,9 +1837,8 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
         }
         {
             register u8 *target asm("r0") = (u8 *)gTetherActor;
-            register u32 offset asm("r3");
+            u32 offset;
             offset = 0x46A;
-            asm("" : "+r"(offset));
             *(u16 *)((u8 *)target + offset) = 29;
         }
     }
@@ -2473,29 +2472,31 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
         struct DisplayPosition **slot = &actor->display.animation.position;
         u16 *display = (u16 *)*slot;
         register u32 value asm("r0");
-        register u32 coordinate asm("r3");
+        u32 coordinate;
         position = &actor->position;
         offset = 0x37E;
         value = (u16)actor->shakeX;
         coordinate = (u16)position->x;
         display[0] = value + coordinate;
         asm("" ::: "memory");
-        display = (u16 *)*slot;
         {
-            u16 *axis = (u16 *)&actor->position.y;
-            offset += 2;
-            value = *(u16 *)((u8 *)actor + offset);
-            coordinate = *axis;
-            display[1] = value + coordinate;
-        }
-        asm("" ::: "memory");
-        display = (u16 *)*slot;
-        {
-            u16 *axis = (u16 *)&actor->position.z;
-            value = (u16)actor->shakeZ;
+            u16 *worldDisplay = (u16 *)*slot;
             {
-                u32 z = *axis;
-                display[2] = value + z;
+                u16 *axis = (u16 *)&actor->position.y;
+                offset += 2;
+                value = *(u16 *)((u8 *)actor + offset);
+                coordinate = *axis;
+                worldDisplay[1] = value + coordinate;
+            }
+            asm("" ::: "memory");
+            worldDisplay = (u16 *)*slot;
+            {
+                u16 *axis = (u16 *)&actor->position.z;
+                value = (u16)actor->shakeZ;
+                {
+                    u32 z = *axis;
+                    worldDisplay[2] = value + z;
+                }
             }
         }
         offset = 0x130;

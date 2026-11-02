@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "render.h"
@@ -10,7 +9,7 @@ struct Reg1745Run {
     u8 pad0[0x1c];
     u8 state;
     u8 field1D;
-    u8 field1E;
+    u8 shutdownRequested;
     u8 field1F;
     u8 pad20[0x10];
     s32 counter30;
@@ -19,6 +18,10 @@ struct Reg1745Run {
     u32 field40;
     s32 field44;
     s32 field48;
+    u8 pad4C[0xB0 - 0x4C];
+    void *callback;
+    u8 padB4[0xCC - 0xB4];
+    u32 shutdownScript;
 };
 struct Reg1745Hdr {
     u8 pad0[0x18];
@@ -39,6 +42,29 @@ static inline void FlagSet(u32 m)
 static inline void FlagClear(u32 m)
 {
     gEnginePauseFlags &= ~m;
+}
+
+static inline u8 Registry1745_FinishIfRequested(struct Reg1745Run *p)
+{
+    gLinkSessionStep = 14;
+    if (p->shutdownRequested) {
+        Task_Kill(p);
+        if (p->state == 0) {
+            gLinkSessionStep = 15;
+            System_ShutdownAndSoftReset();
+        } else {
+            u32 cb = p->shutdownScript;
+            if (cb) {
+                gLinkSessionStep = 16;
+                Script_Call(cb, 0);
+            } else {
+                gLinkSessionStep = 17;
+                System_ShutdownAndSoftReset();
+            }
+        }
+        return 1;
+    }
+    return 0;
 }
 
 u32 Registry1745_RunSession(struct Reg1745Run *p)
@@ -86,32 +112,9 @@ u32 Registry1745_RunSession(struct Reg1745Run *p)
         }
     }
     gLinkSessionStep = 12;
-    Callback_InvokeActor(p, *(void **)((u32)q + 0xb0));
+    Callback_InvokeActor(p, q->callback);
     q->counter30++;
-    gLinkSessionStep = 14;
-    if (!({
-            s32 done;
-            if (p->field1E) {
-                Task_Kill(p);
-                if (p->state == 0) {
-                    gLinkSessionStep = 15;
-                    System_ShutdownAndSoftReset();
-                } else {
-                    u32 cb = *(u32 *)((u32)p + 0xcc);
-                    if (cb) {
-                        gLinkSessionStep = 16;
-                        Script_Call(cb, 0);
-                    } else {
-                        gLinkSessionStep = 17;
-                        System_ShutdownAndSoftReset();
-                    }
-                }
-                done = 1;
-            } else
-                done = 0;
-            asm("" : "+r"(done));
-            done;
-        }))
+    if (!Registry1745_FinishIfRequested(p))
         gLinkSessionStep = 18;
     return 0;
 }
