@@ -381,13 +381,12 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
 
 // Select the closest eligible interaction target and animate its selection marker.
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_SelectNearestInteraction(struct ActorAnimController *p)
 {
     s32 i;
     struct InteractionPartner *q;
     s32 dx, dz, xOffset, zOffset, length;
-    register s32 height asm("r0");
+    s32 height;
     u32 radius;
     u32 a, b, c;
     u32 sector;
@@ -423,7 +422,7 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
         }
         {
             u32 angle = (u8)(Math_Atan2(dx, dz) - 16);
-            register s32 first asm("r1") = (s8)a;
+            s32 first = (s8)a;
             sector = angle >> 5;
             if (first != sector && (s8)b != sector && (s8)c != sector) {
                 c = 255;
@@ -434,10 +433,10 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
         if ((s8)a != *(s16 *)(gGameState + 0x85e) && (s8)b != *(s16 *)(gGameState + 0x85e) &&
             (s8)c != *(s16 *)(gGameState + 0x85e))
             continue;
-        height = q->worldY;
         {
+            s32 y = q->worldY;
             u8 *parent = *(u8 **)((u8 *)p + 0x18);
-            height -= *(s16 *)(parent + 0x32);
+            height = y - *(s16 *)(parent + 0x32);
         }
         if (height < 0)
             height = -height;
@@ -458,9 +457,10 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
     for (i = 0; i < 16; i++) {
         q = (struct InteractionPartner *)((u8 *)p + 0x1c + i * 0xdc);
         if (i == p->group) {
-            if (++q->timer > 10) {
+            u8 *timer = &q->timer;
+            if (++*timer > 10) {
                 AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource);
-                q->timer = 10;
+                *timer = 10;
             } else
                 AnimData_SelectPaletteBank((u8 *)q + 0x2c, q->resource + 1);
         } else {
