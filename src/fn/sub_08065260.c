@@ -29,7 +29,6 @@ void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
         {
             struct ActorAttachmentSlotView *view = slot;
             s32 radius, wave;
-            asm("" : "+l"(view) : : "r0", "r1");
             radius = view->counters[0] >> 1;
             wave = gUnk_086149C4[slot->phase[0]];
             slot->jitter[0].x = (wave * radius) >> 12;
