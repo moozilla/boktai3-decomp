@@ -1078,6 +1078,52 @@ def sp_alias_read(fn):
         yield f"read {text(n.expr)[:28]} as {t} (alias set)", f2
 
 
+def _own_names(fn):
+    """The names FN declares: its parameters and its locals."""
+    names = {n.name for n, _, _ in walk(fn.body) if isinstance(n, ca.Decl) and n.name}
+    args = getattr(fn.decl.type, "args", None)
+    names |= {a.name for a in (args.params if args else []) if getattr(a, "name", None)}
+    return names
+
+
+def sp_store_via_ptr(fn):
+    """G->f op= E;  ->  { T *q = &G->f; *q op= E; }  for a global pointer G, at one site or at every
+    site (SceneInventory_TickSaleTransition: `funds = &gGameState->unk7B0; *funds += value;`, then
+    `if (gGameState->unk7B0 > 9999)` reads gGameState again). cse keeps a loaded global across a
+    field store: alias.c's fixed_scalar_and_varying_struct_p rules out an in-struct MEM at a varying
+    address against a scalar at a fixed address. A store through a pointer has neither flag and
+    drops the global, so a ROM that loads G again right after the store stored through a pointer
+    (README fact 60)."""
+    own = _own_names(fn)
+
+    def pred(n, p, s):
+        # a call in E may change G, and agbcc makes the call before it computes the address
+        return (isinstance(n, ca.Assignment) and isinstance(p, ca.Compound) and isinstance(n.lvalue, ca.StructRef)
+                and n.lvalue.type == "->" and isinstance(n.lvalue.name, ca.ID) and n.lvalue.name.name not in own
+                and not any(isinstance(x, ca.FuncCall) for x, _, _ in walk(n.rvalue)))
+
+    def rewrite(f2, n, par, slot):
+        q = new_name(f2, "q")
+        decl = ca.Decl(name=q, quals=[], align=[], storage=[], funcspec=[], gcc_attributes=[],
+                       type=ca.PtrDecl([], ca.TypeDecl(q, [], None, ca.Typeof(copy.deepcopy(n.lvalue)))),
+                       init=ca.UnaryOp("&", copy.deepcopy(n.lvalue)), bitsize=None, asmlabel=None)
+        store = ca.Assignment(n.op, ca.UnaryOp("*", ca.ID(q)), n.rvalue)
+        set_child(par, slot, ca.Compound([decl, store]))
+
+    count = sites(fn, pred)
+    for k in range(count):
+        f2 = copy.deepcopy(fn)
+        n, par, slot = nth(f2, pred, k)
+        lv = text(n.lvalue)
+        rewrite(f2, n, par, slot)
+        yield f"store {lv[:28]} through a pointer", f2
+    if count > 1:
+        f2 = copy.deepcopy(fn)
+        for n, par, slot in [x for x in walk(f2) if pred(*x)]:
+            rewrite(f2, n, par, slot)
+        yield f"store every global field through a pointer ({count})", f2
+
+
 def _after(fn, node):
     """Statements that can run after NODE finishes: the items after it and after each enclosing
     statement in their blocks (an if's other branch is not among them). None inside a loop."""
@@ -1702,7 +1748,7 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_outline_setter, sp_loop_normal, sp_ptr_deinduct,
              sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy, sp_const_literal,
-             sp_param_alias, sp_compound_assign]
+             sp_param_alias, sp_compound_assign, sp_store_via_ptr]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
@@ -1724,13 +1770,13 @@ DECISIONS = {
     "strength-reduce": ["sp_goto_loop", "sp_into_loop", "perm_loop_form", "sp_ptr_walk", "sp_ptr_index",
                         "sp_count_up", "sp_count_down", "sp_loop_normal", "sp_ptr_deinduct"],
     "cse-skip": ["sp_arg_to_local", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
-    "cse-reuse": ["sp_narrow_mask", "sp_arg_to_local", "sp_member_ptr", "sp_symbol_literal", "sp_load_local", "sp_split_offset", "sp_flag_take", "sp_inline_decl", "rw_copy_var", "rw_reuse_stored"],
+    "cse-reuse": ["sp_narrow_mask", "sp_arg_to_local", "sp_store_via_ptr", "sp_member_ptr", "sp_symbol_literal", "sp_load_local", "sp_split_offset", "sp_flag_take", "sp_inline_decl", "rw_copy_var", "rw_reuse_stored"],
     "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "cross-jump": ["sp_param_alias", "rw_copy_var", "sp_copy_uses"],
     "regmove-copy": ["rw_commute", "sp_inline_decl"],
     "local-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
-    "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
+    "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "sp_store_via_ptr", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
     "reload-mode": ["sp_corpus_helper", "sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
     "reload": ["sp_compound_assign", "sp_corpus_helper", "sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",

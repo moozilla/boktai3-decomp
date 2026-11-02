@@ -1408,6 +1408,21 @@ Each was read from the compiler source and confirmed on a live draft.
    merge; the inline's address is its own (fact 55). When `spill` reports a missing choice and
    the ROM has a tail that several branches jump to, try the tail in each branch.
 
+60. **A store through a field keeps a loaded global pointer; a store through a pointer drops it.**
+   cse forgets the memory a store may alias (cse.c `invalidate`, alias.c `true_dependence`), and
+   alias.c's `fixed_scalar_and_varying_struct_p` rules out an in-struct MEM at a varying address
+   (`gGameState->unk7B0 += value`, `/s` in the dumps) against a scalar at a fixed address (the
+   `gGameState` load, `/f`). So the next `gGameState->...` reuses the pointer and the stored value.
+   A store through a pointer (`s16 *funds = &gGameState->unk7B0; *funds += value;`) has neither
+   flag and may alias the global, so the next access loads gGameState and the field again. The ROM
+   of SceneInventory_TickSaleTransition loads gGameState again for its 9999 clamp, which the pinned
+   version forced with a volatile read. Two more things decided its registers. The update is
+   written out in each case: in an inline helper, try_constants folds 0x7B0 into both adds
+   (fact 31), no pseudo holds it, and gGameState took r2 and value r3. And `funds` is declared per
+   case, so local-alloc ties it to the loaded pointer (r1); the constant's pseudo then takes r2,
+   gGameState r3, and value moves to r5. `spellings.sp_store_via_ptr` makes the edit at one site
+   or at all of them; fix.py tries it for cse reuse and allocation differences.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
