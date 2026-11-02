@@ -2231,9 +2231,14 @@ static inline void SetModeFlag(struct Player *p)
 
 s32 Player_SelectRequestedActionMode(struct Player *p)
 {
-    register struct PlayerActionRequest *request asm("r2") =
-        (struct PlayerActionRequest *)&p->thresholdMode;
-    if (request->kind >= 0 && request->enabled && !request->blocked) {
+    struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
+    if (request->kind < 0)
+        return p->tetherMode;
+    if (!request->enabled)
+        return p->tetherMode;
+    if (request->blocked)
+        return p->tetherMode;
+    {
         u8 *mode = &p->tetherMode;
         if (*mode > 1)
             return *mode;
