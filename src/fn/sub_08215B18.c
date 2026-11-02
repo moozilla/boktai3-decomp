@@ -9,17 +9,17 @@ extern const s16 gUnk_086149C4[];
 s32 __divsi3(s32, s32);
 
 /* Signed 8.8 division; the reciprocal is narrowed before multiplication. */
-static inline s16 FixedDivide(s32 numerator, u16 denominator)
+static inline s16 FixedDivide(s32 numerator, s16 denominator)
 {
     register s32 dividend asm("r0") = numerator << 8;
-    return __divsi3(dividend, (s16)denominator);
+    return __divsi3(dividend, denominator);
 }
 
 /* Divide using the initial scale passed to the transform. */
-static inline s16 FixedDivideInitialScale(s32 numerator, u16 denominator)
+static inline s16 FixedDivideInitialScale(s32 numerator, s16 denominator)
 {
     register s32 dividend asm("r0") = numerator << 8;
-    register s32 divisor asm("r3") = (s16)denominator;
+    register s32 divisor asm("r3") = denominator;
     return __divsi3(dividend, divisor);
 }
 
