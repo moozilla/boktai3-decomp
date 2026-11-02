@@ -1,17 +1,20 @@
-# SceneInventory_Populate{Equipment,Item,Consumable}Grid: item grid matched pin-free; a goto outer loop is needed
+# SceneInventory_Populate{Equipment,Item,Consumable}Grid: item and equipment grids matched pin-free
 
-Tags: #loop-reduction #goto #reload-rotation #inventory #spilled-locals
+Tags: #loop-reduction #goto #reload-rotation #inventory #spilled-locals #giv #incremented-index
 
 **PopulateItemGrid (0805FF38) matches with no pins** (commit 3f28b7dd2,
-`src/fn/sub_0805FF38.c`). The consumable grid is a holdout: gcse moves two
-row-end increments above the column loop (README fact 50). The equipment grid
-is below. Best pin-free drafts:
+`src/fn/sub_0805FF38.c`). **PopulateEquipmentGrid (0805FD20) matches with no
+pins and real loops** (commit 40eb582e0, `src/fn/sub_0805FD20.c`): the flags
+are indexed with a variable that the column loop increments, so the outer loop
+cannot reduce the per-row flag offset (equipment section below). The
+consumable grid is a holdout: gcse moves two row-end increments above the
+column loop (README fact 50). Best pin-free drafts:
 
 | Unit | Best pin-free draft | Differing (ROM / draft) | Shape |
 |---|---|---|---|
 | PopulateItemGrid 0805FF38 | **MATCH** (plain spilled locals, `slot` as the hide-loop counter, goto outer loop) | 0 | 0 |
 | PopulateConsumableGrid 080600DC | goto outer loop, plain locals (25 / 25 with `AGBCC_NOPRE=1,2`) | 67 / 67 | 68 |
-| PopulateEquipmentGrid 0805FD20 | `do` / `while` loops with goto exits | 72 / 76 | 68 |
+| PopulateEquipmentGrid 0805FD20 | **MATCH** (real loops, `flagsBase[flagIndex]` with `flagIndex++`, `u16 packed`) | 0 | 0 |
 
 ## What decided the item grid
 
@@ -54,6 +57,11 @@ the row on every row. As C this is `entry = (void *)((rowSlot + 5) * 0x60 +
   The rerun of loop (-frerun-loop-opt) sees the init insns that the inner
   loop's reduction emitted as ordinary pseudos, and reduces them in the
   outer loop. You can see it in `u.i.loop`'s second pass.
+* An index that the column loop increments does help, and it allows real
+  loops: `flagIndex = rowSlot + 5;` per row, `flagsBase[flagIndex].flags` and
+  `flagIndex++` per column. `flagIndex` is set twice inside the outer loop,
+  so neither it nor the chain built on it is a giv there, in either pass.
+  This is what matched the equipment grid (section below).
 * A label plus `if (++row <= 3) goto primaryRow;` outer loop has no loop notes,
   so loop.c leaves it alone. The multiply then comes out per row as in the
   ROM. Consumable grid: 67 / 67 that way against 101 / 105 with `do`/`for`.
@@ -236,11 +244,55 @@ primaryRow: {
 }
 ```
 
-## Equipment grid notes
+## Equipment grid (0805FD20): matched pin-free with real loops
 
-* The `do`/`while` form (goto inner exits) is 72 / 76. The outer loop
-  reduces the entry offset, and column and rowSlot swap sl and the stack.
-* The goto outer loop is 99 / 101: panel gets r8 and row gets sb, where the
-  ROM has the reverse.
-* Not tried there yet: the item grid's base temporaries and per-section
-  variables.
+**Matches with no pins** (commit 40eb582e0). Both row sections are
+`do`/`while` (first) and `for (row = 0; row <= 1; row = nextRow)` (second)
+loops. Both index the flags as `flagsBase[flagIndex].flags` with `flagIndex =
+rowSlot + 5` (or `+ 21`) per row and `flagIndex++` per column. The closing
+loop's `packed` is a `u16` local. The unit's volatiles, register pins, asm
+barriers and concession marker are all gone.
+
+* The flag pointer that the ROM steps by 0x60 in the column loop is loop.c's
+  reduction of `flagsBase[flagIndex]` (a DEST_ADDR giv of the biv
+  `flagIndex`). In pass 1 the column loop goes first. Its setup goes in just
+  before the column loop as `flagIndex * 0x60 + flagsBase`, which is
+  emit_iv_add_mult's shift-add form, exactly the ROM's `(rowSlot + 5)`, `* 3`,
+  `<< 5`, `+ flagsBase`. It uses new pseudos, which the outer loop cannot take
+  as givs in pass 1. In pass 2, `flagIndex` is set twice in the outer loop (the
+  per-row set and the column loop's `++`), so it is not a giv. So the chain on
+  it is not a giv either, and nothing reduces it. Flow later deletes the
+  `flagIndex++`, since nothing but the increment itself reads it.
+* With an explicit `entry` pointer (`entry = (void *)((rowSlot + 5) * 0x60 +
+  (u32)flagsBase)`, `entry++`), the outer loop reduces the chain. Its last
+  giv has benefit 11, life 1 and threshold 15, which gives 165 against a
+  60-insn loop. This was the e5 draft: 52 / 54 with no knob, 7 / 7 with
+  `AGBCC_NOGIV=59,58,57,54`. No condition in loop.c skips it: rowSlot can
+  derive (no label between it and the chain), and `row` is a plain biv.
+* The real loops are what the allocation needs. Their depth weights give the
+  first section's flag pointer r4, slot r7 and widget r6 as in the ROM. The
+  goto outer loop was 84 / 82 with everything else equal (e2).
+* Closing loop: `u16 packed = *materials;` in place of `u32 packed = *(const
+  u16 *)materials;`. This adds two insns where materials is live and packed
+  is not. The materials pointer's live length goes from 44 to 46 (11 refs),
+  so its priority drops from 7500 to 7173, below packed's 7272 (4 refs over
+  11 insns). packed then takes r3 and materials r4, as in the ROM. The pinned
+  unit got the same two insns from a volatile flagsBase load plus an asm
+  barrier.
+* The second section matches with either the flagIndex form or an explicit
+  `entry` pointer, because `row = nextRow` keeps `row` from being a biv
+  there. The unit uses flagIndex in both sections. The closing loop needs
+  the explicit pointer: `flagIndex = 41` there is 1 / 1.
+
+Ruled out (drafts in `build/scope/drafts/eg/`):
+
+* `&panel->display.primary[rowSlot]` without `rowBytes` (w2): loop.c folds
+  0x288 into the reduced register, 6 / 4.
+* `&panel->display.secondary[rowSlot]` in the second section (w4): 51 / 51.
+* A goto closing loop with an explicit countdown (g1): 12 / 12. The depth-1
+  weights drop packed further.
+* With `u32 packed`: `(s16)packed < 0`, `% 4`, constant-first sums and a
+  `(s16)` cast on y all stay at 7 / 7. `/ 4` for `>> 2` is 3 / 7.
+* Earlier: `do`/`while` with goto inner exits 72 / 76; goto outer loop 99 /
+  101; indexed `widget` and `entry` together (e8) 53 / 55;
+  `flagsBase[slot + 5]` recomputed per column (e10) 54 / 58.
