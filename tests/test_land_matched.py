@@ -58,6 +58,18 @@ class LandMatched(unittest.TestCase):
     def test_an_unknown_function_is_plain(self):
         self.assertEqual(land.where(self.root, "D", 0x08000300), ("plain", "src/fn/sub_08000300.c", None))
 
+    def test_multiline_pointer_return_is_part_of_the_definition(self):
+        before = "struct Entry;\nstruct Entry *Find(int);\n#define ENABLED 1\n"
+        definition = "static inline\nstruct Entry *\nFind(int value)\n{\n    return 0;\n}\n"
+        after = "int Next(void) { return 3; }\n"
+        source = before + definition + after
+        self.assertEqual(land.definition_span(source, "Find"),
+                         (len(before), len(before) + len(definition)))
+        self.assertEqual(land.without_definition(source, "Find"), before + after)
+        with open(os.path.join(self.root, "src", "lookup.c"), "w") as out:
+            out.write(source)
+        self.assertEqual(land.where(self.root, "Find", 0x08000120), ("unit", "src/lookup.c", None))
+
     def test_without_definition_cuts_the_comments_above(self):
         rest = land.without_definition(UNIT, "B")
         self.assertNotIn("Comment above B", rest)
