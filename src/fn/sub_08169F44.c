@@ -41,7 +41,7 @@ void PauseMenu_RefreshPriceDigits(struct SceneHudState *p)
         WIDGET(p, i + 113).flags &= ~1;
         Anim_LoadKeyframe(&WIDGET(p, i + 113), data, (u16)(*digit++ + 10), 1);
     }
-    *(u32 *)((u8 *)p + 0x4008) &= ~1;
+    WIDGET(p, 117).flags &= ~1;
     value = p->valueRate * p->selectedQuantity;
     if (value == 0) {
         {
