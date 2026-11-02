@@ -15,7 +15,7 @@ void SceneSlot_EmitPulse(struct ContactPosition *input)
 {
     struct ContactPosition *position = input;
     u32 savedOrigin;
-    register u32 origin asm("r12");
+    u32 origin;
     const u16 *table;
     struct ContactPosition velocity;
     struct ContactPosition *v;
@@ -34,15 +34,13 @@ void SceneSlot_EmitPulse(struct ContactPosition *input)
         index = (index + 1) & 1023;
         *cursor = index;
         {
-            register s32 raw asm("r0") = *(const u16 *)(index * 2 + (u32)table);
-            s32 bitmask = 63;
-            raw &= bitmask;
-            asm("" : "+r"(raw));
-            magnitude = raw;
+            s32 sample = table[index];
+            s32 mask = 63;
+            sample &= mask;
+            v = &velocity;
+            magnitude = sample - 32;
         }
     }
-    v = &velocity;
-    magnitude -= 32;
     {
         register const s16 *sine asm("r1") = gUnk_086149C4;
         s32 product = sine[(angle + 64) & mask] * magnitude;
@@ -51,7 +49,6 @@ void SceneSlot_EmitPulse(struct ContactPosition *input)
         v->y = 0;
         {
             s32 product = sine[angle] * magnitude;
-            asm("" : "+r"(product) : "r"(angle));
             v->z = Truncate(product);
         }
     }
