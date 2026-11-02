@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "tentacle_spread.h"
 
 // confidence=low: spreads the body's segments out from the actor's position, then releases.
@@ -57,7 +56,7 @@ void TentacleBody_UpdateSpreadRelease(struct SceneActorRegistryResetView *actor,
             n++;
         }
     }
-    if (frame > *(u16 *)((u8 *)body + 0x8E6)) {
+    if (frame > body->releaseFrame) {
         actor->field2B0 = 1;
         {
             u16 *p = (u16 *)((u8 *)actor + 0x2E8);
