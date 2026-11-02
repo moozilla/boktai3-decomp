@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_hud_display.h"
 
@@ -32,9 +31,10 @@ void SceneHud_BeginIconMotion(struct SceneHudState *hud, u32 index, u32 keyframe
     motion->from = *from;
     motion->to = *to;
     if (bend != 0) {
-        s32 angle = (Math_Atan2(to->x - from->x, to->y - from->y) + 0x40) & 255;
+        s32 angle = Math_Atan2(to->x - from->x, to->y - from->y);
+        angle += 64;
+        angle &= 255;
         motion->bendX = BendCosine(angle, bend);
-        asm("" : "+r"(angle));
         motion->bendY = BendSine(angle, bend);
     } else {
         motion->bendX = bend;
