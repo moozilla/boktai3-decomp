@@ -1330,7 +1330,6 @@ static inline u8 child_take_v2(struct ActorChildSlot *c)
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
@@ -1347,28 +1346,7 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct Act
         }
     }
     if (--p->timer == -1) {
-        p->oldMode = p->mode;
-        {
-            u32 mode = 2;
-            p->mode = mode;
-        }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 64;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
-        }
+        Actor_SetState(p, 2, 4);
     }
 }
 
