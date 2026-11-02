@@ -8,10 +8,6 @@
         if ((value) < 0)                                                                           \
             (magnitude) = -(value);                                                                \
     } while (0)
-#define ARMOR_CLEAR_DECISION(field)                                                                \
-    do {                                                                                           \
-        *(field) = 0;                                                                              \
-    } while (0)
 #define ARMOR_BRANCH_OUTSIDE_GRID(magnitude, maximum, label)                                       \
     do {                                                                                           \
         if ((magnitude) > (maximum))                                                               \
