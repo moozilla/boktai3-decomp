@@ -430,7 +430,7 @@ void Player_InitVisualResources(void *actor)
     p->menuStatusValues[4] = 0x171;
     p->menuStatusValues[5] = 0x2C;
     p->menuStatusValues[6] = 0x2E;
-    *(u16 *)((u8 *)p + 0xABE) = 0x2B;
+    p->menuStatusValues[7] = 0x2B;
 }
 
 void Player_InitVisualState(struct Player *p)
