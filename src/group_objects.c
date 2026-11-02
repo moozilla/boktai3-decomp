@@ -369,7 +369,7 @@ int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     struct GroupActor *actor;
     s32 duration;
     struct GroupVec position;
-    int remaining;
+    int i;
     struct GroupPiece *p;
     u32 *index;
     u32 mask;
@@ -379,47 +379,29 @@ int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         return -1;
     position = actor->position;
     duration = (s16)cmd->originY;
-    {
-        register int enabled asm("r8");
-        m->timer = 0;
-        index = &gRandomIndex;
-        mask = 1023;
-        remaining = 15;
-        p = m->pieces;
-    loop: {
+    m->timer = 0;
+    index = &gRandomIndex;
+    mask = 1023;
+    for (i = 15, p = m->pieces; i >= 0; i--, p++) {
         int angle;
-        int zero;
-        const u16 *table;
+        int random;
         p->state = 3;
-        do {
-            enabled = 1;
-            p->active = enabled;
-        } while (0);
-        zero = 0;
-        p->timer = zero;
+        p->active = 1;
+        p->timer = 0;
         p->target = position;
-        asm("" : : "r"(zero), "r"(index), "r"(mask));
         angle = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
         p->direction = angle;
-        table = gRandomTable;
         {
-            register int random asm("r3") = BoardPieces_NextRandomValue(table, index, mask);
+            union RandomTableView table = {gRandomTable};
+            random = BoardPieces_NextRandomValue(table.samples, index, mask);
             angle -= 16;
-            random &= 31;
-            angle += random;
-            p->direction = angle;
+            p->direction = angle + (random & 31);
+            p->duration = duration;
+            p->speed = (BoardPieces_NextRandomValue(table.samples, index, mask) & 7) + 7;
         }
-        p->duration = duration;
-        p->speed = (BoardPieces_NextRandomValue(table, index, mask) & 7) + 7;
-        remaining--;
-        p++;
-        if (remaining >= 0)
-            goto loop;
     }
-
-        m->active = enabled;
-        return 0;
-    }
+    m->active = 1;
+    return 0;
 }
 
 static inline int count(struct GroupQueue *q)
