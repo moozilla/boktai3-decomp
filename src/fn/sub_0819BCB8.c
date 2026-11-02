@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "monster_particle_random.h"
 #include "ram.h"
 
 /* Tentative: emit a motion entry from a randomized point ahead or behind the actor. */
@@ -48,14 +49,6 @@ static inline s32 RandomValue(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + table);
 }
-static inline s32 RandomMode(void)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + 0x0203B400);
-}
-
 u16 Sqrt(u32);
 s32 Div(s32, s32);
 static inline void MotionPolar(struct BurstVector *out, s32 angle, s32 radius)
@@ -83,29 +76,30 @@ static inline void Normalize(struct BurstVector *v, s32 speed)
 
 void Hresvelgr_EmitFacingMotion(struct ActorReaction *input)
 {
-    register struct ActorReaction *actor asm("r6") = input;
+    struct ActorReaction *actor = input;
     struct ActorReaction *saved = actor;
     struct BurstVector position;
     struct BurstVector velocity;
     /* The inlined RNG retains this setup address across its first two samples. */
-    register u32 opaque asm("r12") = 0x0403B714;
+    u32 origin = PARTICLE_RANDOM_SAMPLE_ORIGIN;
+    u32 savedOrigin;
     u32 sideSample;
     s32 side;
     s32 facing;
     s32 radius;
-    register s32 direction;
+    s32 direction;
     sideSample = RandomValue() >> 3;
     side = sideSample - sideSample / 2 * 2;
     facing = actor->side;
     radius = RandomValue() >> 3;
     {
         register s32 quotient asm("r1");
-        register u32 scratch asm("r9");
+
         struct BurstVector *out;
-        register s32 angle;
+        s32 angle;
         quotient = radius;
         asm("" : : "r"(quotient));
-        scratch = opaque;
+        savedOrigin = origin;
         quotient = quotient / 1024 * 1024;
         out = &position;
         side <<= 7;
@@ -118,13 +112,16 @@ void Hresvelgr_EmitFacingMotion(struct ActorReaction *input)
         angle &= 255;
         direction = angle << 1;
         out->z = Scale(*(const s16 *)((u32)gUnk_086149C4 + direction) * radius);
-        asm("" : : "r"(scratch));
     }
     Add(&position, &saved->position, &position);
     direction = actor->side;
     Polar(&velocity, direction << 6, 128);
-    asm("" : : "r"(actor));
-    MotionEntry_CreateWithDelta(&position, &velocity, (RandomMode() >> 3) % 4, 32);
+
+    MotionEntry_CreateWithDelta(
+        &position, &velocity,
+        ((s32)ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR) >> 3) %
+            4,
+        32);
 }
 #define Hresvelgr_SetPartApproachMotion sub_0819BE28
 /* Tentative: choose an offset from one part, then set a normalized movement vector. */
