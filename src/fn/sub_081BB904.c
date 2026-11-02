@@ -1,12 +1,7 @@
 #include "global.h"
 #include "solar_bank_panel.h"
 #include "input.h"
-
-struct Keys {
-    u16 held;
-    u16 pressed;
-};
-extern u8 *gGameState;
+#include "game_state.h"
 
 s32 Anim_LoadKeyframe(void *, void *, u16, u32);
 void Anim_Step(void *, void *);
@@ -16,55 +11,44 @@ void SolarBank_BeginClosing(struct SolarBankPanel *);
 void SolarBank_BeginSelection(struct SolarBankPanel *);
 void SolarBank_RefreshAmountDigits(struct SolarBankPanel *);
 
-#define FIELD(T, off) (*(T *)((u8 *)panel + (off)))
-#define TRANSFER      FIELD(u32, 0x6F4)
-#define BALANCE       FIELD(u32, 0x6F8)
-#define BLINK         FIELD(u16, 0x700)
-#define HOLD          FIELD(u16, 0x702)
-#define SPEED         FIELD(u16, 0x704)
-#define TIMER         FIELD(u16, 0x706)
-#define DIRECTION     FIELD(u16, 0x708)
-
 // MATCHING_CONCESSION: register-pinning
-static inline u32 MaskHold(u32 value, u32 mask)
-{
-    asm("" : "+r"(mask));
-    return mask & value;
-}
 #define SolarBank_UpdateTransferInput sub_081BB904
 void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
 {
     s32 v;
     u16 t;
+    u8 repeatMask;
 
-    if ((*(struct Keys *)gPadState).pressed & 1) {
-        *(u32 *)(gGameState + 0x77C) = BALANCE;
-        *(u16 *)(gGameState + 0x7B0) = TRANSFER;
+    if (gPadState[1] & 1) {
+        {
+            *((u32 *)&gGameState->unk77C) = panel->balance;
+            *((u16 *)&gGameState->unk7B0) = panel->transferAmount;
+        }
         Sound_PlaySong(0xdd);
         SolarBank_BeginClosing(panel);
         goto step;
     }
-    if ((*(struct Keys *)gPadState).pressed & 2) {
+    if (gPadState[1] & 2) {
         Sound_PlaySong(0xde);
         SolarBank_BeginSelection(panel);
         goto step;
     }
-    if ((*(struct Keys *)gPadState).held & 0x20) {
-        u32 *bal = &BALANCE;
+    if (gPadState[0] & 0x20) {
+        u32 *bal = (u32 *)&panel->balance;
         u32 *xfer;
         u16 *hold;
         u16 *timer;
         u16 h;
         if (*bal > 9998)
             goto reset;
-        xfer = &TRANSFER;
+        xfer = (u32 *)&panel->transferAmount;
         if (*xfer == 0)
             goto reset;
-        if (HOLD == 0)
-            SPEED = 0;
-        hold = &HOLD;
-        DIRECTION = 0;
-        timer = &TIMER;
+        if (panel->holdFrames == 0)
+            panel->repeatSpeed = 0;
+        hold = &panel->holdFrames;
+        panel->transferDirection = 0;
+        timer = &panel->animationTimer;
         *timer = 16;
         h = *hold;
         if (*hold > 0x7f) {
@@ -86,27 +70,31 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
                 *xfer -= room;
             }
             SolarBank_RefreshAmountDigits(panel);
-            SPEED = 2;
-            TIMER = 4;
+            panel->repeatSpeed = 2;
+            panel->animationTimer = 4;
         } else if (*hold > 0x3f) {
-            if (!(MaskHold(h, 3)))
+            repeatMask = 3;
+            repeatMask &= h;
+            if (!repeatMask)
                 Sound_PlaySong(0x37d);
             (*bal)++;
             (*xfer)--;
             SolarBank_RefreshAmountDigits(panel);
-            SPEED = 1;
+            panel->repeatSpeed = 1;
             *timer = 4;
             (*hold)++;
         } else {
             *hold = h + 1;
-            if (!(MaskHold(h, 7))) {
+            repeatMask = 7;
+            repeatMask &= h;
+            if (!repeatMask) {
                 Sound_PlaySong(0x37d);
                 (*bal)++;
                 (*xfer)--;
                 SolarBank_RefreshAmountDigits(panel);
             }
         }
-    } else if ((t = (*(struct Keys *)gPadState).held & 0x10) != 0) {
+    } else if ((t = gPadState[0] & 0x10) != 0) {
         register u32 balOffset asm("r1") = 0x6F8;
         u32 *bal;
         u32 *xfer;
@@ -124,11 +112,11 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
         }
         if (*xfer > 9998)
             goto reset;
-        if (HOLD == 0)
-            SPEED = 0;
-        hold = &HOLD;
-        DIRECTION = 1;
-        timer = &TIMER;
+        if (panel->holdFrames == 0)
+            panel->repeatSpeed = 0;
+        hold = &panel->holdFrames;
+        panel->transferDirection = 1;
+        timer = &panel->animationTimer;
         *timer = 16;
         h = *hold;
         if (*hold > 0x7f) {
@@ -150,20 +138,24 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
                 *bal -= room;
             }
             SolarBank_RefreshAmountDigits(panel);
-            SPEED = 2;
-            TIMER = 4;
+            panel->repeatSpeed = 2;
+            panel->animationTimer = 4;
         } else if (*hold > 0x3f) {
-            if (!(MaskHold(h, 3)))
+            repeatMask = 3;
+            repeatMask &= h;
+            if (!repeatMask)
                 Sound_PlaySong(0x37d);
             (*xfer)++;
             (*bal)--;
             SolarBank_RefreshAmountDigits(panel);
-            SPEED = 1;
+            panel->repeatSpeed = 1;
             *timer = 4;
             (*hold)++;
         } else {
             *hold = h + 1;
-            if (!(MaskHold(h, 7))) {
+            repeatMask = 7;
+            repeatMask &= h;
+            if (!repeatMask) {
                 Sound_PlaySong(0x37d);
                 (*xfer)++;
                 (*bal)--;
@@ -175,28 +167,28 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
     }
     goto blink;
 reset:
-    HOLD = 0;
+    panel->holdFrames = 0;
     goto blink;
 zero:
-    HOLD = t;
+    panel->holdFrames = t;
 blink:
-    if (TIMER) {
-        if (SPEED == 2)
-            BLINK += 4;
-        else if (SPEED == 1)
-            BLINK += 2;
+    if (panel->animationTimer) {
+        if (panel->repeatSpeed == 2)
+            panel->blinkPhase += 4;
+        else if (panel->repeatSpeed == 1)
+            panel->blinkPhase += 2;
         else
-            BLINK += 1;
-        TIMER--;
+            panel->blinkPhase += 1;
+        panel->animationTimer--;
     } else {
-        BLINK = 0;
+        panel->blinkPhase = 0;
     }
-    if (BLINK == 0) {
-        AnimData_SelectPaletteBank((u8 *)panel + 0x6B0, 0x1AE);
-        AnimData_SelectPaletteBank((u8 *)panel + 0x6CC, 0x1B1);
+    if (panel->blinkPhase == 0) {
+        AnimData_SelectPaletteBank(&panel->indicators[0], 0x1AE);
+        AnimData_SelectPaletteBank(&panel->indicators[1], 0x1B1);
         Anim_LoadKeyframe(panel->unk1D8, panel->labelData, 0x12, 1);
     } else {
-        switch ((BLINK & 0x1f) >> 3) {
+        switch ((panel->blinkPhase & 0x1f) >> 3) {
             case 1:
                 v = 2;
                 break;
@@ -208,9 +200,10 @@ blink:
                 v = 0;
                 break;
         }
-        AnimData_SelectPaletteBank((u8 *)panel + 0x6B0, 0x1AE + v);
-        AnimData_SelectPaletteBank((u8 *)panel + 0x6CC, 0x1B1 + v);
-        Anim_LoadKeyframe(panel->unk1D8, panel->labelData, DIRECTION * 3 + 0x13 + v, 1);
+        AnimData_SelectPaletteBank(&panel->indicators[0], 0x1AE + v);
+        AnimData_SelectPaletteBank(&panel->indicators[1], 0x1B1 + v);
+        Anim_LoadKeyframe(panel->unk1D8, panel->labelData, panel->transferDirection * 3 + 0x13 + v,
+                          1);
     }
 step:
     Anim_Step(&panel->label, panel->labelData);
