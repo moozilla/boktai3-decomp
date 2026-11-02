@@ -49,8 +49,30 @@ def where(root, name, addr, index=None):
     hit = include_asm_file(root, names, index) or include_asm_file(root, names, include_asm_index(root, True))
     if hit:
         return "unit", hit[0], hit[1]
+    # a function that matches already (phase 3: a depinned rewrite) lands back in the unit defining it
+    defined = defining_unit(root, names)
+    if defined:
+        return "unit", defined, None
     path = f"src/fn/sub_{addr:08X}.c"
     return "plain", path, None
+
+
+def defining_unit(root, names):
+    """The src/ C file that defines one of NAMES outside a NONMATCHING draft, or None."""
+    for path in sorted(glob.glob(os.path.join(root, "src", "**", "*.c"), recursive=True)):
+        text = open(path).read()
+        if not any(n in text for n in names):
+            continue
+        plain = without_drafts(text)
+        if any(definition_span(plain, n) for n in names):
+            return os.path.relpath(path, root)
+    return None
+
+
+def without_definition(text, name):
+    """TEXT with NAME's definition (and the comment lines directly above it) cut out."""
+    sp = definition_span(text, name)
+    return text[:sp[0]] + text[sp[1]:] if sp else text
 
 
 def csv_rows(root):
@@ -203,6 +225,21 @@ def context_key(text):
     text = re.sub(r"^// scope: (?:write|put) .*\n", "", text, flags=re.M)
     tokens = re.findall(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|\s+|.', text, re.S)
     return "".join(t for t in tokens if not t.isspace())
+
+
+def only_additions(now, draft):
+    """The number of non-blank lines DRAFT adds to NOW when every other line of NOW is kept in order
+    (whitespace ignored), else None: a draft that only adds a helper or declaration outside FUNC."""
+    import difflib
+    a = [ln.strip() for ln in now.splitlines() if ln.strip()]
+    b = [ln.strip() for ln in draft.splitlines() if ln.strip()]
+    added = 0
+    for op, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
+        if op == "insert":
+            added += j2 - j1
+        elif op != "equal":
+            return None
+    return added
 
 
 def merge(current, base, draft):

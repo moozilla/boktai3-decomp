@@ -6862,12 +6862,17 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         if not os.path.exists(base):
             # no record of the unit the draft started from: take the draft whole only if, outside
             # FUNC, it is the unit as it is now (else it would undo neighbors that landed since)
-            sp = land.definition_span(text, name)
-            rest = text[:sp[0]] + text[sp[1]:] if sp else text
+            rest = land.without_definition(text, name)
             now = re.sub(r'^INCLUDE_ASM\("[^"]*", %s\);\n' % re.escape(asm_name or name), "", cur, flags=re.M)
+            if asm_name is None:  # FUNC matches already (a depin): its current C is what the draft replaces
+                now = land.without_definition(now, name)
             if land.context_key(rest) != land.context_key(now):
-                sys.exit(f"{name}: no workspace base for {rel}, and outside {name} it differs from {dest};"
-                         " land by hand (or reopen with `new`)")
+                added = land.only_additions(now, rest)
+                if added is None:
+                    sys.exit(f"{name}: no workspace base for {rel}, and outside {name} it differs from {dest};"
+                             " land by hand (or reopen with `new`)")
+                print(f"{name}: the draft adds {added} line(s) outside {name} (a new helper or declaration);"
+                      " everything else there is the unit as it is now")
         merged = land.merge(cur, open(base).read() if os.path.exists(base) else cur, text)
         if merged is None:
             sys.exit(f"{name}: {dest} changed since `new` in a way that conflicts with the draft; land by hand")
