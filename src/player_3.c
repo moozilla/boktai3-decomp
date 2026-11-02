@@ -231,7 +231,6 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
 
 void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
 {
-    register u32 mode asm("r4") = requestedMode;
     s32 intensity;
     s32 weight;
     if (p->actionVariant != p->baseActionVariant) {
@@ -239,8 +238,8 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
         Player_LoadVisualParameters(p);
     }
     intensity = Player_GetVisualEffectFlags(p);
-    if ((s16)p->savedSpriteResource != mode || p->unkAC6[0] != intensity) {
-        p->savedSpriteResource = mode;
+    if ((s16)p->savedSpriteResource != requestedMode || p->unkAC6[0] != intensity) {
+        p->savedSpriteResource = requestedMode;
         p->unkAC6[0] = intensity;
         PaletteFade_ApplyBrightenedPalette(p);
     }
