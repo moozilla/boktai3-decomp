@@ -4372,6 +4372,36 @@ def regmove_fixes(wd):
     return out
 
 
+def reg_copy_coalesce(wd, uid, gone, new):
+    """regmove's optimize_reg_copy_1 (regmove.c) does not log. Find its footprint before regmove: a copy
+    `(set NEW GONE)` earlier in insn UID's block (no label, jump or call between) with GONE dying at UID
+    and neither register set between. Returns (copy uid, NEW, GONE) or None."""
+    path = os.path.join(wd, "u.i.combine")
+    if not os.path.exists(path):
+        return None
+    forms = [(m.group(1), int(m.group(2)), one_line(m.group(0)), m.group(0)) for m in re.finditer(
+        r"^\((insn|jump_insn|call_insn|code_label|barrier|note)(?:/\w)* (\d+) .*?(?=^\(|\Z)",
+        open(path).read(), re.S | re.M)]
+    at = next((i for i, f in enumerate(forms) if f[1] == uid and f[0] == "insn"), None)
+    if at is None:
+        return None
+    reg = lambda n: r"\(reg(?:/\w)*:\w+ %d\)" % n
+    for g in gone:
+        if not re.search(r"REG_DEAD\s+" + reg(g), forms[at][3]):
+            continue
+        for kind, u, rtl, _ in reversed(forms[:at]):
+            if kind in ("code_label", "jump_insn", "call_insn", "barrier"):
+                break
+            if kind != "insn":
+                continue
+            m = re.match(r"\(set \(reg(?:/\w)*:\w+ (\d+)\) \(reg(?:/\w)*:\w+ (\d+)\)\)", rtl)
+            if m and int(m.group(2)) == g and int(m.group(1)) in new:
+                return u, int(m.group(1)), g
+            if re.match(r"\(set " + reg(g), rtl) or any(re.match(r"\(set " + reg(n), rtl) for n in new):
+                break
+    return None
+
+
 def explain_regmove(wd, uid, gone, new, nm, at):
     """regmove merged one pseudo into another at or before insn UID: name the two-address tie that did it,
     what in the C would have kept the ROM's separate copy, and the knob that forbids the tie."""
@@ -4382,8 +4412,21 @@ def explain_regmove(wd, uid, gone, new, nm, at):
           [f for f in fixes if any(re.search(r"\(reg(?:/\w)*:\w+ %d\)" % r, pats.get(f[1], "")) for r in regs)]
     regs = regs  # noqa: keeps the search above readable
     if not hit:
-        print("    (the regmove log names no tie that touches these registers: a copy coalesced by"
-              " optimize_reg_copy, which does not log)")
+        copy = reg_copy_coalesce(wd, uid, gone, new)
+        if copy:
+            cu, d, s = copy
+            print(f"    regmove's optimize_reg_copy_1 coalesced the copy {nm(d)} = {nm(s)} at {at(cu)}: {nm(s)}"
+                  f" died at {at(uid)} with no label, jump, call or set of either register between, so regmove"
+                  f" made the insns between read {nm(d)} and moved {nm(s)}'s death to the copy.")
+            bare = lambda r: (re.search(r"\((\w+)\)$", nm(r)) or [None, f"v{r}"])[1]
+            print(f"    If the ROM keeps reading {nm(s)} here, its C sets {bare(s)} in place between the copy and"
+                  f" this use (`{bare(d)} = {bare(s)}++;` rather than `{bare(d)} = {bare(s)};` then"
+                  f" `{bare(s)} + 1`), or uses {bare(s)} again past a branch so it does not die here"
+                  " (SpriteOam_QueueProjectedSprites:"
+                  " `matrix = tmp++; *count = tmp;`).")
+            return
+        print("    (the regmove log names no tie that touches these registers, and no copy that"
+              " optimize_reg_copy could have coalesced was found before this insn)")
         return
     kind, u, op = hit[0]
     # operand by operand, before and after regmove: which pseudo took which one's place
