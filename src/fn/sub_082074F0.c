@@ -37,10 +37,6 @@ static inline s32 CannonRandom(const u16 *table)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }
-static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
-{
-    *out = *in;
-}
 static inline void CannonEffectOffset(struct SceneVec *v)
 {
     v->y += 128;
@@ -83,7 +79,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             p->dead = 1;
             if (p->terrainEnabled)
                 TerrainModifiers_UnregisterCell(p->terrain);
-            CopyPosition(&center, &p->display.spatial.position);
+            SceneVec_Copy(&center, &p->display.spatial.position);
             CannonEffectOffset(&center);
             velocity.a.lo = -4;
             table = (const u16 *)RANDOM_TABLE_ADDR;
@@ -93,7 +89,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             spread.a.hi = (CannonRandom(table) & 7) + 3;
             spread.b.lo = 24;
             sub_08014634((CannonRandom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
-            CopyPosition(&smoke, &p->display.spatial.position);
+            SceneVec_Copy(&smoke, &p->display.spatial.position);
             CannonEffectOffset(&smoke);
             {
                 s32 zero = 0;
@@ -129,12 +125,8 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
                 seq = &p->sequence;
                 res = p->resource;
                 {
-                    register u32 off asm("r3") = 0x132;
-                    asm("" : "+r"(off));
-                    {
-                        register u8 *addr asm("r2") = (u8 *)p + off;
-                        facing = *addr;
-                    }
+                    register const u8 *direction asm("r2") = (const u8 *)&p->facing;
+                    facing = *direction;
                 }
                 Anim_RestartSequence(seq, res, 0x13, facing, 0);
             }
