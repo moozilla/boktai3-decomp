@@ -596,7 +596,6 @@ void Sound_PlaySong(s32);
 
 void ActorShadow_Enable(void *);
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
 {
     if (*(s32 *)gPadState) {
@@ -614,23 +613,14 @@ void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
             u32 mode = 3;
             p->mode = mode;
         }
-        {
-            register u32 shifted asm("r3") = phase << 4;
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | shifted;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
+        p->phase = phase;
+        if (p->oldMode == 3 && p->mode == 3) {
+            p->savedFrame = p->anim.frame;
+            p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
+            u8 one = 1;
+            p->flags |= one;
         }
     }
 }
