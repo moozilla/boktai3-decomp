@@ -33,6 +33,16 @@ void ActorPalette_BeginFade(struct ActorAnimController *p)
 
 s32 Div(s32, s32);
 
+// Set the phase; a controller leaving mode 3 for mode 3 keeps its animation frame.
+static inline void Actor_SetPhase(struct ActorAnimController *p, u32 phase)
+{
+    p->phase = phase;
+    if (p->oldMode == 3 && p->mode == 3) {
+        p->savedFrame = p->anim.frame;
+        p->savedTimer = p->anim.timer;
+    }
+}
+
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 
 void ActorPalette_UpdateFade(struct ActorAnimController *p)
@@ -522,7 +532,6 @@ void Actor_ArmRestIdleTransition(struct ActorAnimController *p)
 
 void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *);
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateIdleWait(struct ActorAnimController *p)
 {
     if (*(s32 *)gPadState) {
@@ -535,28 +544,8 @@ void Actor_UpdateIdleWait(struct ActorAnimController *p)
     if (++p->timer > p->delay) {
         if (p->done) {
             p->interrupted = 0;
-            {
-                register u32 offset asm("r1") = 0xF5A;
-                u16 *field = (void *)((u8 *)p + offset);
-                p->savedPhase = *field >> 4;
-            }
-            {
-                u32 offset = 0xF5A;
-                u16 *field;
-                register u32 raw asm("r1");
-                register u32 mask asm("r3");
-                field = (void *)((u8 *)p + offset);
-                raw = *field;
-                mask = 15;
-                *field = (mask & raw) | 0x50;
-                if (p->oldMode == 3) {
-                    register u32 bits asm("r0") = mode_bits((u8 *)field, mask);
-                    if (bits == 3) {
-                        p->savedFrame = p->anim.frame;
-                        p->savedTimer = p->anim.timer;
-                    }
-                }
-            }
+            p->savedPhase = p->phase;
+            Actor_SetPhase(p, 5);
             {
                 u32 one = 1;
                 u32 zero;
