@@ -87,10 +87,9 @@ inline static u32 Step_1(struct ContactSwarmSprite *sprite, struct ContactSwarmS
                 state->index = index;
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
+                    endFlag = 8;
+                    endFlag &= flags;
+                    if ((u8)endFlag) {
                         state->elapsed = duration;
                         {
                             u32 lastIndex = frameCount - 1;
@@ -110,16 +109,9 @@ inline static u32 Step_1(struct ContactSwarmSprite *sprite, struct ContactSwarmS
                 table = state->commands;
                 command = (const volatile u16 *)(((u32)table) + offset);
             }
-            state->frameWeight = (*command) & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!((u8)speed))
-                    state->duration = 1;
-            }
+            DisplaySequence_UpdateWeight(state, (const u16 *)command);
+            if (!state->duration)
+                state->duration = 1;
         } else {
             ended = 0;
         }
