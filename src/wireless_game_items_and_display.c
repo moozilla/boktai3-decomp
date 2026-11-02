@@ -1351,21 +1351,22 @@ void WirelessGameDisplay_UpdateStaticNotice(struct WirelessGameDisplay *p)
 // MATCHING_CONCESSION: register-pinning
 void WirelessGameDisplay_UpdateAlternatingNotice(struct WirelessGameDisplay *p)
 {
+    struct WirelessGameDrawing *drawing;
+
     if (p->entered) {
-        struct WirelessGameDrawing *q;
         p->entered = 0;
-        q = p->drawings;
-        Anim_LoadKeyframe(q, &p->resource, 25, 0);
-        q->flags &= ~1;
+        drawing = p->drawings;
+        Anim_LoadKeyframe(drawing, &p->resource, 25, 0);
+        drawing->flags &= ~1;
     }
     {
         u32 phase = p->timer & 127;
         if (phase == 63) {
-            register struct WirelessGameDrawing *q asm("r4") = p->drawings;
-            Anim_LoadKeyframe(q, &p->resource, 24, 0);
+            drawing = p->drawings;
+            Anim_LoadKeyframe(drawing, &p->resource, 24, 0);
         } else if (phase == 127) {
-            register struct WirelessGameDrawing *q asm("r4") = p->drawings;
-            Anim_LoadKeyframe(q, &p->resource, 25, 0);
+            drawing = p->drawings;
+            Anim_LoadKeyframe(drawing, &p->resource, 25, 0);
         }
     }
     if (p->finished) {
