@@ -14,6 +14,15 @@ def kinds(text, path=None, **kw):
 
 
 class Kinds(unittest.TestCase):
+    def test_macro_parameter_can_supply_a_hard_register(self):
+        import depin
+        source = '#define READ(out, reg) register unsigned tmp __asm__(reg) = 4; out = tmp'
+        self.assertEqual(kinds(source), ["pin"])
+        hint, = depin.hints(source)
+        self.assertEqual(depin.drop(source, hint),
+                         '#define READ(out, reg) unsigned tmp = 4; out = tmp')
+        self.assertEqual(kinds('register unsigned normal; asm(SAVE_CONTEXT);'), [])
+
     def test_asm_forms(self):
         self.assertEqual(kinds('void f(void) { register int x asm("r4"); }'), ["pin"])
         self.assertEqual(kinds('void f(void) { register int x asm("ip") = 0; }'), ["pin"])
