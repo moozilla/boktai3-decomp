@@ -44,7 +44,7 @@ static inline void Hide(struct SceneActorRegistryResetView *a)
 void SceneActorReaction_EndHitCheckDefeat(struct SceneActorRegistryResetView *actor)
 {
     {
-        u16 *timer = (u16 *)((u8 *)actor + 0x174);
+        u16 *timer = &actor->colliderA.responseParameter;
         u32 zero = 0;
         *timer = zero;
         actor->field2B8 = zero;
@@ -62,10 +62,10 @@ void SceneActorReaction_EndHitCheckDefeat(struct SceneActorRegistryResetView *ac
     if (actor->health > 0)
         return;
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
-    *(u16 *)((u8 *)actor + 0x178) = 0;
+    actor->colliderA.responseValue = 0;
     Hide(actor);
     {
-        void *control = *(void **)((u8 *)actor + 0x234);
+        void *control = actor->deathControl;
         Reaction_SetControl(actor, 17, control);
     }
     {
