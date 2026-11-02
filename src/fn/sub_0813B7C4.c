@@ -28,15 +28,15 @@ void Player_RefreshBodyCollision(struct Player *p)
         s32 level = gGameState->level + 10;
         if (level > 99)
             level = 99;
-        defense = 0;
+        defense = PLAYER_BODY_DEFENSE;
         flags = p->bodyCollisionFlags | 2;
         category = 1;
     } else if (p->actionMode == 0) {
-        defense = 0;
+        defense = PLAYER_BODY_DEFENSE;
         flags = p->bodyCollisionFlags | 1;
         category = 2;
     } else {
-        defense = 0;
+        defense = PLAYER_BODY_DEFENSE;
         flags = p->bodyCollisionFlags | 2;
         category = 1;
     }
@@ -44,5 +44,5 @@ void Player_RefreshBodyCollision(struct Player *p)
         flags = 0x40;
     if (defense > 99)
         defense = 99;
-    Collider_SetBodyProperties(&p->collider, 0, flags, category);
+    Collider_SetBodyProperties(&p->collider, PLAYER_BODY_DEFENSE, flags, category);
 }
