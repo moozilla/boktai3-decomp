@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
@@ -135,7 +134,7 @@ static inline void ClearHeld(struct IvyContext *context)
 
 static inline u8 IsIdle(struct Player *player)
 {
-    if (*(u16 *)((u8 *)player + 0x424) == 0)
+    if (player->currentStatA == 0)
         return 1;
     return 0;
 }
@@ -187,7 +186,7 @@ static inline void ReportDrain(struct SceneActorRegistryResetView *victim)
         s32 health = victim->health;
         u32 max = (u16)victim->defaultHealth;
         s32 kind = (s16)victim->fieldB2;
-        s32 parameter = *(s16 *)((u8 *)victim + 0x9A);
+        s32 parameter = (s16)victim->field9A;
         SceneHud_SetTimedState(victim->body.id, health, max, kind, 0, parameter);
         ClearVector(&range);
         if (victim->reactionSoundVariant || !(victim->field2D8 & 0x20000))
@@ -253,7 +252,7 @@ void Ivy_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
             goto animate;
         {
             s32 health = victim->health;
-            *(s16 *)((u8 *)victim + 0x172) = health;
+            victim->colliderA.cost = health;
             victim->reactionSoundVariant = health;
             victim->health = 0;
         }
