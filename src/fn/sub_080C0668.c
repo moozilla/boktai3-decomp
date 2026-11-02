@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
@@ -24,52 +23,32 @@ static inline void ClearFlags(u16 *p, u32 mask)
 {
     *p &= mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *fn, u32 zero,
-                              u8 zero8)
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *fn)
 {
     u8 code = 3;
-    {
-        u8 *taken = &actor->field2B2;
-        *taken = 1;
-    }
-    do {
-        u32 field = 0x2B0;
-        do {
-            ((u8 *)actor)[field] = zero8;
-        } while (0);
-        field += 5;
-        ((u8 *)actor)[field] = code;
-        actor->target = fn;
-        field += 0x13;
-        {
-            u16 *q = (u16 *)((u8 *)actor + field);
-            asm("" : "+r"(q), "+r"(field));
-            *q = zero;
-        }
-    } while (0);
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = code;
+    actor->target = fn;
+    actor->field2C8 = 0;
     {
         u32 *flags = &actor->flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->word104 = 0;
 }
 void SceneActorApproach_RunCategoryAction(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorApproachActionContext *context = actor->context;
     if (TakeReady(actor)) {
-        u32 flags = 0x100;
-        u16 *flagptr = &actor->flags2D4;
-        u32 value = *flagptr;
-        u8 zero8 = 0;
-        u32 zero = 0;
-        asm("" : "+r"(zero));
-        flags |= value;
-        *flagptr = flags;
-        if (actor->category == 7)
-            SetControl(actor, SceneActorReaction_TickQueuedContact, zero, zero8);
-        else
-            SetControl(actor, SceneActorReaction_TickContactAnimation, zero, zero8);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->flags2D4);
+        {
+            if (actor->category == 7)
+                SetControl(actor, SceneActorReaction_TickQueuedContact);
+            else
+                SetControl(actor, SceneActorReaction_TickContactAnimation);
+        }
         Vorn_SpawnHazard(actor, 1);
         context->timer = context->duration;
     }
