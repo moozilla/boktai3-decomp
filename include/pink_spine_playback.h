@@ -15,12 +15,12 @@ struct PinkSpineState {
     struct DisplaySequenceState sequence;
     s32 nearRadiusSquared;
     s32 farRadiusSquared;
-    s16 f124;
-    s16 f126;
-    s16 f128;
+    s16 projectilePower;
+    s16 projectileKnockback;
+    s16 projectileImmunity;
     s16 f12A;
     s16 f12C;
-    s16 f12E;
+    s16 projectileSpeed;
     s16 f130;
     s16 f132;
     s16 f134;
@@ -39,6 +39,14 @@ struct PinkSpineState {
     void *f15C;
 };
 u32 ProjectileEmitter_EmitAttackFrame(struct PinkSpineState *p);
+void Combat_SpawnDirectionalProjectile(struct PinkSpineState *emitter, u8 direction);
+
+static inline void PinkSpine_ProjectileOrigin(struct ContactPosition *position,
+                                              const struct PinkSpineState *owner)
+{
+    *position = owner->sprite.position;
+    position->y += 0x80;
+}
 
 static inline u32 PinkSpine_StepAnimation(struct PinkSpineState *owner)
 {
