@@ -215,11 +215,6 @@ static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int
 }
 
 void *BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
-static inline void GridAttack_ClearPoint(const void *source, struct ContactPosition *dest)
-{
-    CpuSet(source, dest, 0x05000002);
-}
-
 static inline u32 GridAttack_RandomValue(void)
 {
     const u16 *table = gRandomTable;
@@ -239,16 +234,14 @@ static inline void GridAttack_OffsetCoordinate(volatile s16 *coordinate, u32 ran
 void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
                                              struct ContactPosition *point, int kind)
 {
-    volatile u32 zero;
     struct ContactPosition velocity;
     struct SceneVec position;
     struct ContactPosition target;
     struct ContactPosition original;
     struct ContactPosition *vel = &velocity;
-    volatile s16 *pos;
-    zero = 0;
-    GridAttack_ClearPoint((const void *)&zero, vel);
-    pos = (volatile s16 *)&position;
+    s16 *pos;
+    ZeroFill8(vel);
+    pos = (s16 *)&position;
     original = *point;
     *(struct ContactPosition *)&position = original;
     GridAttack_OffsetCoordinate(&pos[0], GridAttack_RandomValue());
