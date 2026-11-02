@@ -1242,7 +1242,6 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
                 int b;
                 register int one asm("r0");
                 int zero;
-                asm("" : "+r"(slot));
                 address = first + slot;
                 a = *address;
                 address = second + slot;
@@ -1260,7 +1259,10 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
                         value = 10;
                     clear = 0;
                     asm("" : "+r"(clear));
-                    current->count = value;
+                    {
+                        u8 *itemCount = &current->count;
+                        *itemCount = value;
+                    }
                     value = 0;
                     current->pendingFlag = value;
                     target->count = clear;
