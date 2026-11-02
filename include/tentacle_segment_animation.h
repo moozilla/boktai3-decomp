@@ -45,6 +45,8 @@ struct TentacleBodyAnimationView {
     u8 spin;
     u8 unknown876[0x8DA - 0x876];
     s16 segmentCount;
+    u8 unknown8DC[0x8E6 - 0x8DC];
+    u16 releaseFrame; /* Spread release begins after this frame. */
 };
 
 static inline void *TentacleSegment_ScriptAt(struct TentacleBodyAnimationView *body, s32 offset)
