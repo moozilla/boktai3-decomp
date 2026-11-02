@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
 #include "ram.h"
@@ -69,9 +68,8 @@ void Nidhoggr_UpdateOwnedSeekingEffect(struct NidhoggrAnimatedSlot *owner)
 {
     struct EffectDelta delta;
     s32 dx, dy, dz, angle;
-    register u32 random asm("r5");
     u8 *stateAddress;
-    register u32 stateOffset;
+    u32 stateOffset;
     StepSequence(owner);
     stateOffset = (u32) & ((struct NidhoggrAnimatedSlot *)0)->state;
     stateAddress = (u8 *)owner + stateOffset;
@@ -124,10 +122,11 @@ void Nidhoggr_UpdateOwnedSeekingEffect(struct NidhoggrAnimatedSlot *owner)
         delta.x = gUnk_086149C4[(angle + 64) & 255] >> 9;
         delta.y = 0;
         delta.z = gUnk_086149C4[angle & 255] >> 9;
-    spread:
-        random = 255 & RandomValue();
-        delta.x += gUnk_086149C4[(random + 64) & 255] >> 10;
-        delta.z += gUnk_086149C4[random & 255] >> 10;
+    spread: {
+        angle = 255 & RandomValue();
+        delta.x += gUnk_086149C4[(angle + 64) & 255] >> 10;
+        delta.z += gUnk_086149C4[angle & 255] >> 10;
+    }
         owner->motion = *(struct NidhoggrEffectVector *)&delta;
         if (owner->age == 0)
             owner->state++;
