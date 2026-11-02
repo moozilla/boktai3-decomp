@@ -1015,7 +1015,7 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
                   f" before the earlier arguments' copies, and cse turned the argument into a register"
                   f" already live: give that argument a pseudo of its own set before the constant, e.g. an"
                   f" inline wrapper whose parameter is the argument (`static inline void F(void *p)"
-                  f" {{ Call(p, K); }}`) (README fact 59)")
+                  f" {{ Call(p, K); }}`) (README fact 61)")
             continue
         print(f"line {ln}: the ROM sets r{reg} first for `{rows_json[i]['rom']}`, the draft later. expand_call"
               f" precomputes an argument that needs converting to its parameter's type: declare that"
@@ -1912,7 +1912,7 @@ def arg_order_hints(rows):
     registers in ascending order and the draft loads a constant argument (`ldr rX, =K`,
     `movs rX, #K`) ahead of them, so the draft's constant pseudo was set before the argument
     copies; an argument set into a fresh pseudo before the constant (an inline wrapper's parameter)
-    gives the ROM's order (README fact 59)."""
+    gives the ROM's order (README fact 61)."""
     out = []
     for i, r in enumerate(rows):
         if not (r["rom"] or "").startswith("bl ") or not (r["draft"] or "").startswith("bl "):

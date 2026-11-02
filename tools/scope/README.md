@@ -1423,7 +1423,7 @@ Each was read from the compiler source and confirmed on a live draft.
    gGameState r3, and value moves to r5. `spellings.sp_store_via_ptr` makes the edit at one site
    or at all of them; fix.py tries it for cse reuse and allocation differences.
 
-59. **Byte stores share the first zero, the halfword store the second: give the halfword an HImode
+61. **Byte stores share the first zero, the halfword store the second: give the halfword an HImode
    zero; a constant argument loaded before a register copy wants an inline wrapper.** Every u8 field
    store in a GroupPiece-like struct expands as an insertion (load, `and` with a QI 0 copied to an SI
    pseudo, `ior`, fact 34). For a QImode store of a constant, cse_insn looks for a register holding it
@@ -1442,7 +1442,7 @@ Each was read from the compiler source and confirmed on a live draft.
    this case ("in argument order; the draft loads a constant argument ahead of it"), separately from
    fact 35's precomputed conversion.
 
-60. **A register argument goes into an inline uncopied; an address expression comes back as gcse's
+62. **A register argument goes into an inline uncopied; an address expression comes back as gcse's
    copy.** expand_inline_function uses a pseudo argument as the parameter itself when the parameter
    is never assigned, so `Step(savedSprite, state)` reads savedSprite (sb) at every use. The ROM of
    DisplayTrack_AddFromScript copies it first (`mov r6, sb`) and works on r6. Passing `&track->sprite`
