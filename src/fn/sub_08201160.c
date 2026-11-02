@@ -1,73 +1,63 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
-#include "scene_input.h"
-// 4 differing instruction runs; first diff at +0x1C (mov r0, r8 vs bl #0x820112c)
-struct Pair {
-    u32 a, b;
-};
-struct Pool {
-    u8 data[0x9ec];
-};
-struct Pos {
-    u16 x, y, z, pad;
-};
-u8 *PlayerClone_FindFreeSlot(void *, s32 *);
-u8 *Player_GetEffectivePosition(u32);
+#include "player_clone.h"
+
+struct PlayerCloneSlot *PlayerClone_FindFreeSlot(struct PlayerCloneManager *, s32 *);
+struct ContactPosition *Player_GetEffectivePosition(u32);
 void PlayerClone_SetBehaviorCallback(void *, void *);
 void PlayerClone_UpdateBehavior(void);
-void PlayerClone_CreatePool(void);
-static inline void CpuSetW(const void *src, void *dest, u32 control)
+void *PlayerClone_CreatePool(void);
+static inline void PlayerClone_ClearVelocity(const u32 *zero, struct ContactPosition *velocity)
 {
-    CpuSet(src, dest, control);
+    CpuSet(zero, velocity, 0x05000002);
 }
-s32 sub_08201160(u8 *resource, struct Pos *pos)
+s32 sub_08201160(struct PlayerCloneConfiguration *resource, struct ContactPosition *pos)
 {
-    u8 *t;
     struct {
         u32 fill;
         s32 index;
     } scratch;
-    u8 *pool;
-    t = gDirectionalSpritePool;
-    pool = t;
-    asm("" : "+r"(pool));
-    if (t) {
-        u8 *obj = PlayerClone_FindFreeSlot(((struct Pool *)pool)->data, &scratch.index);
-        if (obj) {
-            void *handler = obj + 0x198;
+    struct PlayerCloneManager *pool;
+    struct PlayerCloneSlot *slot;
+    pool = gDirectionalSpritePool;
+    if (!pool) {
+        PlayerClone_CreatePool();
+    } else {
+        slot = PlayerClone_FindFreeSlot(pool, &scratch.index);
+        if (slot) {
+            struct PlayerCloneConfiguration *handler = &slot->configuration;
             struct SceneInputWidget *display;
             u32 zero;
-            u8 *tmp;
-            Memory_Copy(handler, resource, 0x20);
+            struct ContactPosition *tmp;
+            Memory_Copy(handler, resource, sizeof(*resource));
             zero = 0;
-            *(u32 *)obj = zero;
-            *(u32 *)(obj + 0x308) = zero;
-            *(u16 *)(obj + 0x330) = zero;
-            *(u32 *)(obj + 0x31c) = zero;
-            display = (void *)(obj + 0x1b8);
-            Anim_LoadKeyframe(display, obj + 0x278, 0, 1);
-            *(u32 *)(obj + 0x324) = *(u32 *)(resource + 8);
-            obj[0x1d2] = 2;
-            *(struct Pair *)(obj + 0x1d8) = *(struct Pair *)pos;
-            *(struct Pair *)(obj + 0x1c) = *(struct Pair *)pos;
-            *(u16 *)(obj + 0x14) = pos->x;
-            *(u16 *)(obj + 0x16) = pos->y + 0x80;
-            *(u16 *)(obj + 0x18) = pos->z;
+            slot->timer = zero;
+            slot->state = zero;
+            slot->unknown330 = zero;
+            slot->phase = zero;
+            display = &slot->animation;
+            Anim_LoadKeyframe(display, &slot->resource, 0, 1);
+            slot->behaviorValue = resource->behaviorValue;
+            slot->animation.attribute1A = 2;
+            slot->animation.position = *pos;
+            slot->previousPosition = *pos;
+            slot->position.x = pos->x;
+            slot->position.y = pos->y + 0x80;
+            slot->position.z = pos->z;
             tmp = Player_GetEffectivePosition(0);
-            *(struct Pair *)(obj + 0x24) = *(struct Pair *)tmp;
+            slot->targetPosition = *tmp;
             {
-                void *target = obj + 0xc;
+                struct ContactPosition *target = &slot->velocity;
                 scratch.fill = zero;
-                CpuSetW(&scratch.fill, target, 0x05000002);
+                PlayerClone_ClearVelocity(&scratch.fill, target);
             }
             display->flags |= 1;
             PlayerClone_SetBehaviorCallback(handler, PlayerClone_UpdateBehavior);
-            *(u32 *)(pool + 0x18) |= 1 << scratch.index;
-            (*(u32 *)(pool + 0x9e8))++;
+            pool->activeSlots |= 1 << scratch.index;
+            pool->count++;
             return scratch.index;
         }
-    } else
-        PlayerClone_CreatePool();
+        return -1;
+    }
     return -1;
 }
