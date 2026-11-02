@@ -1779,6 +1779,79 @@ def sp_result_into_arg(fn, helpers):
                     desc = f"{v} = {text(arg)[:24]}; {v} = {call.name.name}({v}, ...){where}"
                     yield desc, ((t2, []) if tname is None else (copy.deepcopy(fn), [t2]))
 
+def sp_tail_into_branches(fn):
+    """S; T;  ->  S with T written at the end of each of its branches: before every `break` of a
+    switch that has a default and whose cases all end in break or return, or at the end of both
+    arms of an if/else (an arm that ends in a jump keeps none). cse follows the jumps into each
+    branch knowing what the code before S left in registers, such as a test's constant, so every
+    copy of T reuses that register, and jump2 merges the copies back into one tail. T after S is a
+    join cse never enters: it builds its constants again (README fact 65;
+    ActorAttachment_NotifySourceState, where a `|= 1` after the switch rebuilt the 1 the ROM keeps
+    in r5 from the flag test)."""
+    simple = (ca.Assignment, ca.FuncCall, ca.UnaryOp)
+    jumps = (ca.Return, ca.Break, ca.Continue, ca.Goto)
+
+    def own_breaks(node):
+        """(break, parent, slot) for the breaks that leave NODE's switch: none in a nested loop or switch."""
+        for name, child in node.children():
+            if isinstance(child, ca.Break):
+                yield child, node, name
+            elif not isinstance(child, (ca.For, ca.While, ca.DoWhile, ca.Switch)):
+                yield from own_breaks(child)
+
+    def ends(stmts):
+        return bool(stmts) and isinstance(stmts[-1], (ca.Break, ca.Return))
+
+    def switch_ok(sw):
+        body = sw.stmt
+        if not isinstance(body, ca.Compound) or not body.block_items:
+            return False
+        groups = body.block_items
+        if not all(isinstance(g, (ca.Case, ca.Default)) for g in groups) or not any(
+                isinstance(g, ca.Default) for g in groups):
+            return False
+        return all(ends(g.stmts) for g in groups if g.stmts) and ends(groups[-1].stmts)
+
+    def pred(n, p, s):
+        if not isinstance(p, ca.Compound) or not (s or "").startswith("block_items["):
+            return False
+        i = int(s[len("block_items["):-1])
+        if i + 1 >= len(p.block_items) or not isinstance(p.block_items[i + 1], simple):
+            return False
+        if isinstance(n, ca.Switch):
+            return switch_ok(n)
+        return isinstance(n, ca.If) and n.iffalse is not None
+
+    def put_before(b, bp, bs, tail):
+        lst = bp.block_items if isinstance(bp, ca.Compound) else bp.stmts if isinstance(bp, (ca.Case, ca.Default)) else None
+        if lst is None:
+            set_child(bp, bs, ca.Compound([copy.deepcopy(tail), b]))
+        else:
+            lst.insert(next(j for j, x in enumerate(lst) if x is b), copy.deepcopy(tail))
+
+    def append(n, arm, tail):
+        st = getattr(n, arm)
+        if isinstance(st, ca.Compound):
+            if not (st.block_items and isinstance(st.block_items[-1], jumps)):
+                st.block_items = (st.block_items or []) + [copy.deepcopy(tail)]
+        elif not isinstance(st, jumps):
+            setattr(n, arm, ca.Compound([st, copy.deepcopy(tail)]))
+
+    for k in range(sites(fn, pred)):
+        f2 = copy.deepcopy(fn)
+        n, par, slot = nth(f2, pred, k)
+        i = int(slot[len("block_items["):-1])
+        tail = par.block_items[i + 1]
+        if isinstance(n, ca.Switch):
+            for b, bp, bs in list(own_breaks(n.stmt)):
+                put_before(b, bp, bs, tail)
+        else:
+            append(n, "iftrue", tail)
+            append(n, "iffalse", tail)
+        del par.block_items[i + 1]
+        yield f"{text(tail)[:28]} into each {'case' if isinstance(n, ca.Switch) else 'arm'}", f2
+
+
 SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take, sp_addr_then_const,
              sp_inline_decl, sp_scoped_operand, sp_nonvoid, sp_index_local, sp_helper_arg,
              sp_split_offset, sp_addr_local, sp_goto_loop,
@@ -1787,7 +1860,7 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_outline_setter, sp_loop_normal, sp_ptr_deinduct,
              sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy, sp_const_literal,
-             sp_param_alias, sp_compound_assign, sp_store_via_ptr, sp_member_index]
+             sp_param_alias, sp_compound_assign, sp_store_via_ptr, sp_member_index, sp_tail_into_branches]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
@@ -1811,9 +1884,9 @@ DECISIONS = {
     "cse-skip": ["sp_arg_to_local", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "member-store": ["sp_member_index"],
     "cse-reuse": ["sp_narrow_mask", "sp_arg_to_local", "sp_store_via_ptr", "sp_member_ptr", "sp_symbol_literal", "sp_load_local", "sp_split_offset", "sp_flag_take", "sp_inline_decl", "rw_copy_var", "rw_reuse_stored"],
-    "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
+    "cse-follow": ["sp_tail_into_branches", "sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
-    "cross-jump": ["sp_param_alias", "rw_copy_var", "sp_copy_uses"],
+    "cross-jump": ["sp_param_alias", "rw_copy_var", "sp_copy_uses", "sp_tail_into_branches"],
     "regmove-copy": ["rw_commute", "sp_inline_decl", "sp_rmw_temp"],
     "local-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
     "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "sp_store_via_ptr", "rw_width", "rw_decl_order", "rw_copy_var"],
