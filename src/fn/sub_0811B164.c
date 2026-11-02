@@ -2,8 +2,6 @@
 #include "ram.h"
 #include "background_controller.h"
 
-// MATCHING_CONCESSION: register-pinning
-
 struct SpatialEntry {
     u32 flags;
     u32 mask, category;
@@ -32,14 +30,23 @@ struct SpatialCamera {
 s32 Div(s32, s32);
 u8 SpatialIndex_RemoveEntry(struct SpatialEntry *);
 void SpatialIndex_InsertEntry(struct SpatialEntry *);
+static inline s8 ReadAttachedBucket(struct SpatialEntry *entry, s8 **bucketField)
+{
+    s8 *field = &entry->bucket;
+    s8 current = *field;
+    *bucketField = field;
+    return current;
+}
 static inline u8 NeedsReinsert(struct SpatialEntry *entry, s32 bucket)
 {
-    s8 *bucketField;
-    if (!(entry->registrationFlags & 1) || (entry->flags & 8))
+    s8 *field;
+    s8 previous;
+    if (!(entry->registrationFlags & 1))
         return 0;
-    bucketField = &entry->bucket;
-    asm("" : : : "r0");
-    if (*bucketField < 0 || bucket == entry->bucket || !SpatialIndex_RemoveEntry(entry))
+    if (entry->flags & 8)
+        return 0;
+    previous = ReadAttachedBucket(entry, &field);
+    if (previous < 0 || bucket == *field || !SpatialIndex_RemoveEntry(entry))
         return 0;
     return 1;
 }
