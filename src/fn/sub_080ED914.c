@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
@@ -184,8 +185,8 @@ static inline void ReportDrain(struct SceneActorRegistryResetView *victim)
     struct ContactPackedVector range;
     if (MayCount(victim)) {
         s32 health = victim->health;
-        u32 max = *(u16 *)((u8 *)victim + 0xB0);
-        s32 kind = *(s16 *)((u8 *)victim + 0xB2);
+        u32 max = (u16)victim->defaultHealth;
+        s32 kind = (s16)victim->fieldB2;
         s32 parameter = *(s16 *)((u8 *)victim + 0x9A);
         SceneHud_SetTimedState(victim->body.id, health, max, kind, 0, parameter);
         ClearVector(&range);
@@ -294,7 +295,7 @@ void Ivy_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
             {
                 u32 status = Ivy_GetAnimationStatus(actor);
                 u32 request = actor->attacks.first[1];
-                u32 option = *(u32 *)((u8 *)actor + 0xD0);
+                u32 option = actor->attacks.flags[1];
                 Player_BeginPositionRequest(player, (struct SceneVec *)&position, 0, status, flip,
                                             0, 0, request, option);
             }
