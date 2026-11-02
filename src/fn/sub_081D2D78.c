@@ -1,24 +1,7 @@
-#include "global.h"
-#include "engine_globals.h"
-#include "ram.h"
-#include "player_cue_sequence.h"
+#include "frost_emitter.h"
+#include "engine.h"
 #include "monster_particle_random.h"
 #define FrostEmitter_SpawnParticle sub_081D2D78
-struct FrostParticle {
-    struct ContactSwarmSprite sprite;
-    struct DisplaySequenceState sequence;
-    struct ContactPosition velocity;
-    u16 lifetime, unknown46;
-};
-struct FrostEmitter {
-    u8 unknown0[0x18];
-    u8 graphics[0x1C];
-    void *resource;
-    struct ContactPosition *source;
-    u32 emitting;
-    struct FrostParticle particles[12];
-    u32 enabled, age;
-};
 extern const s16 gUnk_086149C4[];
 
 static inline s32 ShiftRandom(u16 value, s32 shift)
