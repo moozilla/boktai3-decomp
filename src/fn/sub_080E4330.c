@@ -26,7 +26,7 @@ void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
 {
     struct DogAttackContext *context = a->context;
     if (Chase_TakeArrived(a)) {
-        u32 zero8;
+        u8 zero8;
         register u32 zero asm("r4");
         {
             register u32 offset asm("r0") = 0x678;
@@ -36,11 +36,11 @@ void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
         }
         {
             u32 bit = 0x100;
-            register u16 *flags asm("r2") = &a->flags2D4;
+            u16 *flags = &a->flags2D4;
             register u32 value asm("r1") = *flags;
             zero8 = 0;
             zero = 0;
-            asm("" : "+r"(zero8), "+r"(zero), "+r"(bit), "+r"(flags), "+r"(value));
+            asm("" : "+r"(zero));
             *flags = bit | value;
         }
         {
