@@ -1,9 +1,9 @@
 #include "global.h"
 #include "render.h"
+#include "gba/gba.h"
 #include "runtime.h"
 // MATCHING_CONCESSION: register-pinning
 // VBlank handler: sound, BG scroll/affine registers, HBlank DMA, link/clock ticks.
-// mode, count and affine are pinned (register-pinning concession).
 struct Dma {
     vu32 src, dest, control;
 };
@@ -40,16 +40,11 @@ void sub_08213FD8(void)
             regs++;
             *regs = offset[7];
         } else {
-            register vu16 *affine asm("r2") = (vu16 *)0x04000020;
-            u16 *matrix = gBgAffineMatrixBuffer;
             u32 *xy;
-            *affine = matrix[0];
-            affine++;
-            *affine = matrix[1];
-            affine++;
-            *affine = matrix[2];
-            affine++;
-            *affine = matrix[3];
+            REG_BG2PA = gBgAffineMatrixBuffer[0];
+            REG_BG2PB = gBgAffineMatrixBuffer[1];
+            REG_BG2PC = gBgAffineMatrixBuffer[2];
+            REG_BG2PD = gBgAffineMatrixBuffer[3];
             {
                 vu16 *ref = (vu16 *)0x04000028;
                 xy = gBgAffineRefBuffer;
@@ -64,15 +59,23 @@ void sub_08213FD8(void)
         }
         mode = gScanlineDmaMode;
         if (mode) {
-            register u32 count asm("r1");
-            *(vu32 *)0x040000b8 = 0;
-            *(vu32 *)0x040000b0 = (u32)gScanlineDmaSource;
-            *(vu32 *)0x040000b4 = (u32)gScanlineDmaTarget;
-            count = gScanlineDmaCount;
-            if (mode != 1)
-                *(vu32 *)0x040000b8 = 0xa6600000 | count;
-            else
-                *(vu32 *)0x040000b8 = 0xa2600000 | count;
+            u32 count;
+            REG_DMA0CNT = 0;
+            REG_DMA0SAD = (u32)gScanlineDmaSource;
+            REG_DMA0DAD = (u32)gScanlineDmaTarget;
+            {
+                u32 ctrl;
+                count = gScanlineDmaCount;
+                if (mode != 1) {
+                    ctrl = 0xa6600000;
+                    ctrl |= count;
+                    REG_DMA0CNT = ctrl;
+                } else {
+                    ctrl = 0xa2600000;
+                    ctrl |= count;
+                    REG_DMA0CNT = ctrl;
+                }
+            }
         } else {
             struct Dma *dma = (struct Dma *)0x040000b0;
             dma->src = mode;
