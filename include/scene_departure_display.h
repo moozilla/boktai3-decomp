@@ -57,7 +57,7 @@ struct DepartureActor {
     void *sequenceResource;
     u32 unknown394;
     s32 motionState;
-    u32 unknown39C;
+    u32 endingPhase;
     s32 playerIndex;
     u32 unknown3A4;
     u16 flashPalette[16], foregroundPalette[16], accentPalette[16];
@@ -69,13 +69,14 @@ struct DepartureActor {
     u8 unknown5A4, effectEnabled;
     s16 effectStyle;
     s32 fadeFrame, fadeShift;
-    u8 unknown5B0[0x10];
+    u8 unknown5B0[0xC];
+    u32 endingFinished;
     s16 pendingDamage, slowdownTimer;
     s16 parameterA, parameterB, unknown5C8, parameterC, parameterD, unknown5CE;
     u16 invincibilityTimer, targetMode;
     u8 unknown5D4[4];
     s16 burstX, burstY, burstTimer;
-    u16 unknown5DE;
+    u16 endingTimer;
     s16 shakeStrength, phaseTimer2;
     u16 alternateLayer;
     s16 shakeX, shakeZ, blinkFrame, blinkActive;
