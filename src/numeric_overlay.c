@@ -98,12 +98,9 @@ void NumericOverlay_RefreshDisplay(struct NumericOverlay *s)
     s->dirty = z;
 }
 
-// Returns the (unchanged) r0 of NumericOverlay_RefreshDisplay.
-extern u32
-NumericOverlay_RefreshResult(struct NumericOverlay *) asm("NumericOverlay_RefreshDisplay");
 u32 NumericOverlay_Update(struct NumericOverlay *p)
 {
-    return NumericOverlay_RefreshResult(p);
+    NumericOverlay_RefreshDisplay(p);
 }
 
 u32 NumericOverlay_Destroy(void)
