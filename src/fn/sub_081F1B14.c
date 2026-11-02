@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_pool.h"
 
-// MATCHING_CONCESSION: register-pinning
-
 struct SingletonSlot7Actor {
     u8 pad0[0x90];
     u32 callbackTimer;
@@ -30,17 +28,12 @@ struct SingletonSlot7Player {
 struct SingletonSlot7Scroll {
     u32 a, b, c, d;
 };
-/* Declaration aliases support the checker's ELF from before name promotion. */
-s32 Player_GetHorizontalVelocity(s32) __asm__("Player_GetHorizontalVelocity");
-void Player_GetWorldPosition(s32, s32 *) __asm__("Player_GetWorldPosition");
-void SceneTilemap_CopyScrollSourceState(struct SingletonSlot7Scroll *) __asm__(
-    "SceneTilemap_CopyScrollSourceState");
-void SingletonSlot7_ResetDisplayState(struct SingletonSlot7Actor *) __asm__(
-    "SingletonSlot7_ResetDisplayState");
-void SingletonSlot7_DispatchUpdateCallback(struct SingletonSlot7Actor *) __asm__(
-    "SingletonSlot7_DispatchUpdateCallback");
-void SceneActors_TickStateCallback(struct SingletonSlot7Actor *) __asm__(
-    "SceneActors_TickStateCallback");
+s32 Player_GetHorizontalVelocity(s32);
+void Player_GetWorldPosition(s32, s32 *);
+void SceneTilemap_CopyScrollSourceState(struct SingletonSlot7Scroll *);
+void SingletonSlot7_ResetDisplayState(struct SingletonSlot7Actor *);
+void SingletonSlot7_DispatchUpdateCallback(struct SingletonSlot7Actor *);
+void SceneActors_TickStateCallback(struct SingletonSlot7Actor *);
 void SceneActors_UpdateTargetMetrics(struct SingletonSlot7Actor *);
 void SceneActors_UpdateEffects(struct SingletonSlot7Actor *);
 void Sound_StopSong(u32);
@@ -58,14 +51,18 @@ static inline u8 PlayerHasFlag(void)
     return 0;
 }
 
+static inline void (*SingletonSlot7_GetCallback(struct SingletonSlot7Actor *owner))(void)
+{
+    return owner->callback;
+}
 s32 SingletonSlot7_Update(void *arg)
 {
     struct SingletonSlot7Actor *actor = arg;
-    register struct SingletonSlot7Actor *p asm("r5") = actor;
+    struct SingletonSlot7Actor *p = actor;
     struct SingletonSlot7Scroll scroll[2];
     if (actor->motionMode == 0) {
         u32 flagged = PlayerHasFlag();
-        if (flagged == 1 && p->callback != SceneActors_UpdateIdleDisplay) {
+        if (flagged == 1 && SingletonSlot7_GetCallback(p) != SceneActors_UpdateIdleDisplay) {
             p->callback = SceneActors_UpdateIdleDisplay;
             p->callbackTimer = 0;
             p->callbackEntered = flagged;
