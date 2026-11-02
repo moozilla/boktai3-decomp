@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 struct PanelEffectSlot {
     void *update, *onComplete;
     u8 unknown8[0x64];
@@ -37,11 +36,31 @@ static inline void ScenePanelEffect_InvokeCallback(void *slot, void *callback)
     if (callback)
         Callback_InvokeActor(slot, callback);
 }
-static inline u32 ScenePanelEffect_MaskIndex(u32 k_, s32 index)
-{
-    return index & k_;
-}
 
+static inline void RefreshCollisionSlots(struct PanelCollisionSlot *large,
+                                         struct SceneVec *position, s32 remaining)
+{
+    if (!((gSceneEffectPalettePhase ^ remaining) & 1)) {
+        Collider_SetPosition(large->colliderCC, position, 0);
+        Collider_SetPosition(large->collider120, position, 0);
+        Collider_Refresh(large->colliderCC);
+    }
+}
+static inline struct SceneVec *UpdatePosition(struct PanelCollisionSlot *large,
+                                              struct PanelMotion *motion, struct SceneVec *position)
+{
+    struct SceneVec *anchor = motion->anchor;
+    if (anchor) {
+        position->x = anchor->x + motion->delta.x;
+        position->y = anchor->y + motion->delta.y;
+        position->z = anchor->z + motion->delta.z;
+        return &large->position;
+    }
+    position->x += motion->delta.x;
+    position->y += motion->delta.y;
+    position->z += motion->delta.z;
+    return &large->position;
+}
 void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
 {
     struct PanelEffectSlot *small = pool->small;
@@ -69,26 +88,11 @@ void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
         ScenePanelEffect_InvokeCallback(large, large->update);
         if (!large->update) {
             s32 word = index >> 5;
-            s32 bit = ScenePanelEffect_MaskIndex(31, index);
+            s32 bit = (index & 31);
             pool->largeMask[word] &= ~(1 << bit);
         } else {
-            struct SceneVec *anchor = motion->anchor;
-            register struct SceneVec *colliderPosition asm("r5");
-            if (anchor) {
-                position->x = anchor->x + motion->delta.x;
-                position->y = anchor->y + motion->delta.y;
-                position->z = anchor->z + motion->delta.z;
-            } else {
-                position->x = position->x + motion->delta.x;
-                position->y = position->y + motion->delta.y;
-                position->z = position->z + motion->delta.z;
-            }
-            colliderPosition = &large->position;
-            if (!((gSceneEffectPalettePhase ^ remaining) & 1)) {
-                Collider_SetPosition(large->colliderCC, colliderPosition, 0);
-                Collider_SetPosition(large->collider120, colliderPosition, 0);
-                Collider_Refresh(large->colliderCC);
-            }
+            struct SceneVec *updated = UpdatePosition(large, motion, position);
+            RefreshCollisionSlots(large, updated, remaining);
             motion->tick++;
         }
         remaining--;
