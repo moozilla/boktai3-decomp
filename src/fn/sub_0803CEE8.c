@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
+#include "scene_actor_style.h"
 
 struct Sub0803CEE8Actor {
     u8 unk00[4];
@@ -13,7 +13,8 @@ struct Sub0803CEE8Actor {
     s32 heightB;
     u32 flags40;
     u8 unk44[4];
-    u8 styleBytes[0x20];
+    struct SceneActorStyle style;
+    u8 unk64[4];
     u8 unk68[0x58];
     s32 forwardBias;
     u8 unkC4[0x4E8];
@@ -55,16 +56,16 @@ void Terrain_ResolveActorMotion(void *);
 void Actor_ClampMovementSpeed(void *);
 void ScenePool_UpdateActorDrawablePosition(void *);
 
-static inline void Wireless_SetStyle(u32 c1, u32 c2, u32 c3, u32 c4, struct Sub0803CEE8Actor *a)
+static inline void Wireless_SetStyle(u8 adjustedA, u8 adjustedC, u8 adjustedB, u8 parameterE,
+                                     struct Sub0803CEE8Actor *a)
 {
-    register u8 *p asm("r0") = a->styleBytes;
-    *p = c1;
-    p += 2;
-    *p = c2;
-    p -= 1;
-    *p = c3;
-    p += 3;
-    *p = c4;
+    a->style.adjustedA = adjustedA;
+    a->style.adjustedC = adjustedC;
+    a->style.adjustedB = adjustedB;
+    {
+        u8 *styleParameter = &a->style.parameterE;
+        *styleParameter = parameterE;
+    }
 }
 // confidence=low: wireless scene actor setup; initializes model, style and drain state, steps the impulse decay, derives heading and a terrain bounce, then clears the index.
 int sub_0803CEE8(void *unused, struct Sub0803CEE8Actor *a)
@@ -149,7 +150,7 @@ int sub_0803CEE8(void *unused, struct Sub0803CEE8Actor *a)
     ActorStats_ConfigureScaledParameters(a, 0x1000, 0x2000, 0xFFFFE000, 0x2000, 0, 0x4000);
     CharacterModel_SetPrimaryAppearance(a->model, &a->position);
     ActorMarkerPool_HideMarker(a->marker);
-    SceneActorStyle_Initialize(a->styleBytes, 0, 0, 0, 0, 0, 0, 0x64, 0x64);
+    SceneActorStyle_Initialize(&a->style, 0, 0, 0, 0, 0, 0, 0x64, 0x64);
     ActorAction_InitializeMode(a, a, 0);
     CharacterPreview_InitializePalette(&a->unk68, a->model, 1);
     a->index = -1;
