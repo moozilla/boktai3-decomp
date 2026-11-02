@@ -104,8 +104,8 @@ void Player_UpdateLinkKind(struct Player *p)
             if (p != NULL && IsScene5(p))
                 break;
             cond = 0;
-            if (!Player_IsFlaggedWithGlobalModifier08(*(u16 *)((u8 *)p + 0x292)) &&
-                p->tetherMode == 1 && (*(u8 *)((u8 *)p + 0x284) & p->tetherMode))
+            if (!Player_IsFlaggedWithGlobalModifier08(p->movementStatus) && p->tetherMode == 1 &&
+                (p->movementContactFlags & p->tetherMode))
                 cond = (p->facing & p->tetherMode) != 0;
             if (cond) {
                 struct PackedVec pt;
