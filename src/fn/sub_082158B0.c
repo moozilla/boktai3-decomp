@@ -13,8 +13,14 @@ void Bg_UpdateScrollShadow(void)
     if (!gBgAffineMode) {
         dst[4] = mask & ((u16)src[2].x);
         dst[5] = mask & ((u16)src[2].y);
-        dst[6] = mask & *(u16 *)((u8 *)src + 0xb0);
-        dst[7] = mask & *(u16 *)((u8 *)src + 0xb2);
+        {
+            u16 *scroll = (u16 *)&src[3].x;
+            dst[6] = mask & (u16)*scroll;
+        }
+        {
+            u16 *scroll = (u16 *)&src[3].y;
+            dst[7] = mask & (u16)*scroll;
+        }
     } else {
         u16 *a = gBgAffineMatrixBuffer, *b = gBgAffineMatrix;
         u32 *c;
