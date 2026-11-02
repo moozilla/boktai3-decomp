@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_graphics_actor.h"
 typedef struct ActorAnimation {
@@ -70,7 +69,6 @@ static inline void effect(u8 *p, int id, int mode, int duration)
         u8 *dst = p + 0x38c;
         u32 zero;
         zero = 0;
-        asm("" : "+r"(zero));
         *dst = zero;
     }
 }
