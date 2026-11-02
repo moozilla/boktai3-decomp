@@ -1,7 +1,5 @@
-#include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 91.3%
 #include "scene_actor_part_burst.h"
+#include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain_reaction.h"
 
@@ -16,6 +14,13 @@ void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(u8 *, s32);
 
+static inline u8 HitResponse_Test(u32 value)
+{
+    u8 matches = 0;
+    if (value)
+        matches = 1;
+    return matches;
+}
 static inline void ClearDamageOffset(vu32 *zero, void *dst)
 {
     *zero = 0;
@@ -60,10 +65,6 @@ static inline u32 ReadStatus(struct SceneActorRegistryResetView *actor, u32 bits
 {
     return actor->flags2D0 & bits;
 }
-static inline u8 GetResponseKind(struct SceneActorRegistryResetView *a)
-{
-    return a->field2B5;
-}
 static inline void SelectAnimationState(struct SceneActorRegistryResetView *a, u8 state, u8 phase,
                                         u8 behavior)
 {
@@ -84,10 +85,6 @@ static inline u32 ReadControlFlag(struct SceneActorRegistryResetView *a, u32 mas
 {
     return a->flags2CC & mask;
 }
-static inline struct SceneActorRegistryControl *GetControl(struct SceneActorRegistryResetView *a)
-{
-    return &a->group.common.control;
-}
 union HitSparkTable {
     const u16 *table;
     struct {
@@ -96,16 +93,22 @@ union HitSparkTable {
         u8 region;
     } encoded;
 };
-static inline const u16 *ReadSparkTable(const union HitSparkTable *source)
+static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
 {
-    return source->table;
+    return r->table;
 }
 
 static inline s32 HitResponse_HalfHealth(s16 health)
 {
-    if (health >= 0)
+    if (HitResponse_Test(health >= 0))
         return health >> 1;
     return -((-health) >> 1);
+}
+
+static inline struct SceneActorChaseTracking *
+ContactTracking(struct SceneActorRegistryResetView *actor)
+{
+    return &actor->tracking;
 }
 
 void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactPosition *position,
@@ -116,67 +119,74 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
     struct ContactCollider *collider = &a->colliderA;
     s32 category;
     vu32 zero;
-
-    u32 flag;
-    u32 *status;
+    struct HitMotionFlags *motion;
+    u32 partFlag;
     struct SceneActorRegistryControl *control;
     category = a->category;
     a->field2B8 = 0;
 
-    flag = 0x2000;
-    if (a->flags2D4 & flag)
+    partFlag = 0x2000;
+    if (HitResponse_Test(a->flags2D4 & partFlag))
         SceneActorEffects_SpawnContactParts((void *)a);
     {
         struct HitMotionFlags *field = (void *)MotionFlags(a);
         s32 bits = ~0x2000;
         field->bits &= bits;
+        motion = field;
     }
     switch ((s32)mode) {
         case 0:
-        case 1:
-            status = &a->flags2D0;
-            if (GetResponseKind(a) != 0x15) {
+        case 1: {
+            struct SceneActorRegistryResetView *state = victim;
+            if (a->field2B5 != 0x15) {
                 SceneActorTerrain_EnterState(a, 3, 0, 0);
                 SceneActorTerrain_InstallControl(a, group->field5FC, 0x15);
                 a->field2B8 = 0;
                 {
                     u32 mask = 0x20000;
-                    *status = mask | *status;
+                    *StatusFlags(a) |= mask;
                 }
             }
             {
                 u32 mask = 4;
-                *status = mask | *status;
+                *StatusFlags(a) |= mask;
             }
             MaskContactFlags(&a->flags2CC, ~0x400000);
-            ((struct SceneActorRegistryResetView *)victim)->field2C2 = 0x40;
-            ((struct SceneActorRegistryResetView *)victim)->group.common.gate.flags = 0;
-            ((struct SceneActorRegistryResetView *)victim)->group.common.gate.counter = 0;
+            state->field2C2 = 0x40;
+            state->group.common.gate.flags = 0;
+            state->group.common.gate.counter = 0;
             {
+                u16 *flags = &state->flags2D4;
                 u32 mask = ~0x380;
-                ((struct SceneActorRegistryResetView *)victim)->flags2D4 =
-                    mask & ((struct SceneActorRegistryResetView *)victim)->flags2D4;
+                *flags = mask & *flags;
             }
-            ((struct SceneActorRegistryResetView *)victim)->tracking.flags &= ~0x18;
+            {
+                struct SceneActorChaseTracking *tracking = ContactTracking(victim);
+                u32 mask = ~0x18;
+                tracking->flags = mask & tracking->flags;
+            }
 
+            control = &state->group.common.control;
             if (ReadControlFlag(victim, 0x200000)) {
-                *StatusFlags(victim) &= ~0x1000000;
+                {
+                    u32 *status = StatusFlags(victim);
+                    u32 mask = ~0x1000000;
+                    *status = mask & *status;
+                }
                 {
                     u32 mask = ~0x200;
-                    ((struct SceneActorRegistryResetView *)victim)->flags2D4 =
-                        mask & ((struct SceneActorRegistryResetView *)victim)->flags2D4;
+                    state->flags2D4 = mask & state->flags2D4;
                 }
-                control = GetControl(victim);
+
                 control->mode = 0;
                 control->counter = 0;
                 control->timer = 0;
             }
             {
                 u32 mask = ~0x400;
-                ((struct SceneActorRegistryResetView *)victim)->flags2D4 =
-                    mask & ((struct SceneActorRegistryResetView *)victim)->flags2D4;
+                state->flags2D4 = mask & state->flags2D4;
             }
-            ((struct SceneActorRegistryResetView *)victim)->group.turn.turnsRemaining = 0xFF;
+            state->group.turn.turnsRemaining = 0xFF;
             a->body.position = *position;
             a->body.position.y += heightOffset;
             if (a->drawableKind == 0)
@@ -188,9 +198,12 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 a->flags2D6 = mask | a->flags2D6;
             }
             break;
+        }
         case 2: {
-            u32 mask = 4;
-            *StatusFlags(a) |= mask;
+            {
+                u32 mask = 4;
+                *StatusFlags(a) |= mask;
+            }
             ActorShadow_Disable(a->shadow);
             {
                 u32 mask = 1;
@@ -209,7 +222,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                     a->reactionSoundVariant = damage;
                 }
                 a->health = 0;
-                MarkHitFlag(8, (void *)&a->flags2D4);
+                MarkHitFlag(8, motion);
                 {
                     u32 mask = 0x400;
                     a->flags2CC = mask | a->flags2CC;
@@ -221,7 +234,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 SceneActorAttachment_ReplaceResponseSlot(victim, 0, 0x7F, 0);
                 SceneActorAttachment_ReplaceResponseSlot(victim, 1, 0x7F, 0);
                 SceneActorAttachment_ReplaceResponseSlot(victim, 3, 0x7F, 0);
-                SceneActorEffects_AdvanceSteps(victim, 4);
+                SceneActorEffects_AdvanceSteps((u8 *)victim, 4);
                 SceneActorTerrain_InstallControl(a, a->deathControl, 0x11);
                 SelectAnimationState(a, 3, 0, 0);
                 ResetEntry(a, 1);
@@ -268,6 +281,3 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyHitResponse);
-#endif
