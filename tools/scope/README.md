@@ -1354,6 +1354,21 @@ Each was read from the compiler source and confirmed on a live draft.
    (7 refs over 26 insns) outranked the controller g for r4, and with `Actor_SetState(g, 3, 9)` it
    did not.
 
+56. **A call's result in r8 while r6/r7 are free means it was global: an inline's parameter copy
+   can make the other pointer local.** local-alloc (one basic block, one death) runs before
+   global-alloc and gives its qtys the first call-saved registers (r4, r5, r6, then r8; r7 comes
+   last). In sub_0801A218 the ROM keeps ScriptProc_Start's result in r8 across three calls and the
+   panel pointer `&m->panel` in r6, which it also uses for the frame and flip stores after them.
+   Written as one variable `s` the pointer spans blocks and is global, so the local result took
+   r6 first (`vs` shows `res  local pri 588 -> r6`), and only a pin on s fixed it. Moving the
+   playback into `static inline void SelectionMenu_StepPanel(s, st)` called as
+   `Sprite_Init(&m->panel, ...); SelectionMenu_StepPanel(&m->panel, &a);` matched without pins:
+   cse reuses the first `&m->panel` for the argument, so that pseudo dies at the parameter copy
+   inside the first block and becomes local. It outranks the result (more refs), takes r6, the
+   result gets r8, and the global parameter pseudo is tied to r6 through the copy. When `vs`
+   shows a value `local` in the draft where the ROM gives it a high register, look for a pointer
+   that should die at an inline's parameter copy.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
