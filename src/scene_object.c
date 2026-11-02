@@ -799,12 +799,10 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                     return 1;
                 }
             }
-            default: {
-                /* Preserve the original range normalization for non-flat terrain. */
-                s32 normalized = type - 1;
-                asm("" : : "r"(normalized));
+            default:
+                if (type == 1 || type == 2)
+                    return 0;
                 break;
-            }
         }
     }
     return 0;
