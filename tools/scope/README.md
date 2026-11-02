@@ -1281,6 +1281,22 @@ Each was read from the compiler source and confirmed on a live draft.
    pass sees the same register. A wider return (u32, s32) threads like the plain variable.
    SceneActorMovement_UpdateHeight has two such flags (category in a set, and a status bit),
    both formerly kept by empty asm barriers.
+52. **A value that both arms of an if compute can be gcse's copy, not a variable.** When the
+   ROM keeps one register for an address from an if/else to a later use, and one arm ends in
+   `adds rX, rY, #0` while the other computes it into rX directly, the original likely wrote
+   the address in each arm (in that arm's own variable) and again at the use. gcse's PRE sees
+   it available on both paths and makes a new pseudo, copied in each arm; it is ranked with its
+   own refs and life. One C variable assigned in both arms is a single pseudo with every mention
+   and the whole life, and can rank below a rival: ScriptCombatActor_UpdateState's collider
+   pointer (6 refs over 53 insns, against dp's 2941) needed a pin until the arms took
+   `&p->col` separately and the damage-number call named `&p->col` again. `why` prints this
+   lever for a pseudo with two or more sets, one a register copy.
+   Two related levers from the same run: in Player_SelectNearestMotionTarget, a dead
+   `ands rX, rFlags` before shared code was what remained of `if (flags & 16) A else A'`
+   whose arms jump2 cross-jumped; giving the arms back (each re-reading `&entry->body->pos`)
+   also made the pointer arrive through a join, so cse stopped folding its first load into
+   `body + 12`. Writing `distance = square; best = entry;` in both the flag-set branch and
+   the on-screen branch (jump2 shares the tails) gave square the refs a barrier had supplied.
 
 ## Survey: random table as a literal address (2026-10-24)
 
