@@ -33,7 +33,7 @@ struct VulcanCannon {
     s16 delayCount, delayIndex, delays[1];
 };
 struct SceneVec *Player_GetEffectivePosition(s32);
-void Anim_RestartSequence(void *, void *, u32, u32, u32);
+u32 Anim_RestartSequence(struct DisplaySequenceState *, void *, u16, u8, u8);
 s32 VulcanCannon_HasClearShot(struct VulcanCannon *);
 s32 Math_Atan2(s32, s32);
 void VulcanCannon_UpdateFacingTurn(void);
@@ -57,8 +57,9 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
 {
     struct SceneVec *player = Player_GetEffectivePosition(0);
     s32 distance = TargetDistance(player, &p->display.spatial.position);
-    struct SceneVec target = *Player_GetEffectivePosition(0);
-    asm("" : "+m"(target));
+    struct SceneVec target;
+
+    SceneVec_Copy(&target, Player_GetEffectivePosition(0));
     if (p->useDelayTable) {
         if (p->timer > p->delays[p->delayIndex]) {
             if (!p->facing)
