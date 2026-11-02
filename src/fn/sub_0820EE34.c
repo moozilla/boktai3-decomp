@@ -48,7 +48,7 @@ struct Target {
     u32 damageType;
 };
 extern const struct Vec gUnk_0824FEAC;
-void Collision_CalculateDamageResponse(void *);
+void Collision_CalculateDamageResponse(void *attacker, void *defender);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
@@ -65,7 +65,7 @@ void OrangeSpine_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
     struct Hit *hit = input;
     struct Target *target = targetInput;
     u32 m40, hitFlags;
-    Collision_CalculateDamageResponse(source);
+    Collision_CalculateDamageResponse(source, hit);
     if (hit->blocked) {
         hit->damage = 0;
         hit->state = 0;
