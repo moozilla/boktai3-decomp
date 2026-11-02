@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_track.h"
-#include "display_sprite_playback.h"
 
 void DisplayTrack_Update(struct DisplayTrack *track)
 {
@@ -184,7 +183,7 @@ void DisplayTrack_Update(struct DisplayTrack *track)
         }
     }
     if (track->flags & 8) {
-        u32 done = PlayerCue_StepSequenceEnded(&track->sprite, &track->sequenceState);
+        u32 done = DisplayTrack_StepSequence(track, &track->sprite, &track->sequenceState);
         if (done && track->sequenceEvent) {
             track->flags &= ~8;
             if (track->sequenceEventValue)
