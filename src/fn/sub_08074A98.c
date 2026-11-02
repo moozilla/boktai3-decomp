@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_state.h"
 #include "scene_actor_registry.h"
 #include "player.h"
@@ -47,7 +46,7 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
             TerrainHeight(actor, ((struct SceneActorRegistryResetView *)actor)->terrainCell);
         u16 *ground = (void *)((u8 *)actor + 0x2be);
         if (*ground != height) {
-            u16 *displacement = (void *)((u8 *)actor + 0x2ea);
+            u16 *displacement = &((struct SceneActorRegistryResetView *)actor)->field2EA;
             *displacement -= height - *ground;
         }
         *ground = height;
@@ -65,7 +64,7 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
     if (!HasSceneFlag(actor, 0x20)) {
         u16 height = ((struct SceneActorRegistryResetView *)actor)->groundHeight2BE;
         actor->position.y = height;
-        actor->position.y = height + *(u16 *)((u8 *)actor + 0x2ea);
+        actor->position.y = height + ((struct SceneActorRegistryResetView *)actor)->field2EA;
     }
     if (actor->drawableKind == 0)
         ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->position;
