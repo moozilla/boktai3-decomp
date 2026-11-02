@@ -6,11 +6,11 @@ void StackedActor_InitFallingParticle(struct StackedActorParticle *particle,
     particle->position = *position;
     {
         u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-        register u32 *rng asm("r9") = &gRandomIndex;
+        u32 *rng = &gRandomIndex;
         register u32 index asm("r3") = *rng + 1;
         u32 mask = 1023;
         u32 mask31;
-        register u32 zero asm("r8");
+        u32 zero;
         u32 sample;
         register u32 coordinate asm("r1");
         u16 *sampleAddress;
