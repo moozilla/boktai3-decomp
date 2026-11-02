@@ -1771,7 +1771,7 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
             ClearEquipmentFlag(p, bit);
     }
     if (p) {
-        if (p->actionMode == 6 || *(u32 *)((u8 *)p + 0x18))
+        if (p->actionMode == 6 || p->slot)
             goto finish;
     }
     {
