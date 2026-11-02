@@ -1,51 +1,41 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
-extern u8 *gGameState;
+#include "game_state.h"
+#include "state_actor.h"
 void Camera_RequestShake(int);
 void SceneActors_SpawnAmbientParticle(void *);
-typedef struct {
-    int unknown;
-    u32 flags;
-} Damage;
-void SceneActors_UpdateEffects(u8 *p)
+void SceneActors_UpdateEffects(struct StateActor *p)
 {
-    Damage *damage;
-    if (*(s16 *)(p + 0x94) > 0)
-        *(int *)(gGameState + 0x618) = *(s16 *)(p + 0x94);
+    struct StateActorDamageEffect *damage;
+    if (p->health > 0)
+        gGameState->unk618 = p->health;
     else
-        *(int *)(gGameState + 0x618) = 0;
-    if (p[0xb4]) {
-        Camera_RequestShake(p[0xb5]);
-        p[0xb4]--;
+        gGameState->unk618 = 0;
+    if (p->shakeFrames) {
+        Camera_RequestShake(p->shakeStrength);
+        p->shakeFrames--;
     }
-    if (p[0x154] && (*(int *)(p + 0xe4) & 3) == 0)
+    if (p->ambientParticle && (p->effectTimer & 3) == 0)
         SceneActors_SpawnAmbientParticle(p);
-    if (p[0x155] && (*(u32 *)(p + 0xe4) & 3) <= 1) {
-        u32 m = 0x10;
-        asm("" : : "r"(m));
-        *(u32 *)(p + 0x9c) |= 0x10;
+    if (p->intermittentEffect && (p->effectTimer & 3) <= 1) {
+        u32 effectFlag = 0x10;
+        p->actionFlags = effectFlag | p->actionFlags;
     }
-    if (p[0x156]) {
-        u32 m = 0x10;
-        asm("" : : "r"(m));
-        *(u32 *)(p + 0x9c) |= 0x10;
+    if (p->continuousEffect) {
+        u32 effectFlag = 0x10;
+        p->actionFlags = effectFlag | p->actionFlags;
     }
     {
-        u32 m = 0x40;
-        asm("" : : "r"(m));
-        if (*(u32 *)(p + 0x9c) & 0x40) {
-            damage = (Damage *)(p + 0x15c);
+        u32 disableDamage = 0x40;
+        if (disableDamage & p->actionFlags) {
+            damage = &p->damageEffect;
             {
-                u32 m = ~1u;
-                asm("" : : "r"(m));
-                damage->flags &= ~1;
+                u32 clear = ~1u;
+                damage->flags = clear & damage->flags;
             }
         } else {
-            damage = (Damage *)(p + 0x15c);
+            damage = &p->damageEffect;
             {
-                u32 m = 1;
-                asm("" : : "r"(m));
-                damage->flags |= 1;
+                u32 set = 1;
+                damage->flags = set | damage->flags;
             }
         }
     }

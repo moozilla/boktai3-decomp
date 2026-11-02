@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_route_sample.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
 #include "player.h"
@@ -69,9 +69,9 @@ void Axe_FollowAcceleratingRoute(struct SceneActorRegistryResetView *actor)
     struct AxeRoute *route = actor->context;
     struct ContactPosition delta, target;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        register u32 observed asm("r4");
+        u32 origin, savedOrigin;
         u32 angle;
-        void *callback = *(void **)((u8 *)actor + 0x228);
+        void *callback = actor->entryTarget228;
         u32 one = 1;
         actor->field2B2 = one;
         actor->field2B0 = 0;
@@ -86,14 +86,17 @@ void Axe_FollowAcceleratingRoute(struct SceneActorRegistryResetView *actor)
         actor->word104 = 0;
         route->index = 0;
         target = (*(struct AxePlayer **)gPlayers)->position;
-        observed = 0x0403B714;
+        origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
         angle = RandomFirst(255);
-        Polar(&delta, angle, 512);
-        asm volatile("" ::"r"(observed));
+        SceneRoute_ProjectRandomOffset(&delta, angle, 512, origin, &savedOrigin);
         target.x += delta.x;
         target.z += delta.z;
         Delta(&delta, &actor->body.position, &target);
-        Polar(&route->motion, Facing(RandomMotion(), &actor->tracking.heading) & 255, 32);
+        Polar(&route->motion,
+              Facing(ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR),
+                     &actor->tracking.heading) &
+                  255,
+              32);
         route->speed = 1;
     }
     Delta(&delta, &actor->body.position, &route->points[route->index]);

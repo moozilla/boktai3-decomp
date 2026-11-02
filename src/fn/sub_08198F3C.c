@@ -1,12 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "contact_collider.h"
 
 struct RingVector {
     u32 x, y;
-};
-struct RingCollider {
-    u8 pad[0x14];
-    struct RingVector size, offset;
 };
 struct SceneEffectRing {
     void (*update)(void *);
@@ -16,10 +12,7 @@ struct SceneEffectRing {
     struct RingVector position;
     u8 pad48[8];
     u8 sequence[0x10];
-    struct RingCollider collider;
-    u8 pad84[0x1e];
-    u8 flags;
-    u8 padA3[0x11];
+    struct ContactCollider collider;
     u8 mode, age;
 };
 struct RingOwner {
@@ -35,26 +28,14 @@ void Collider_Init(void *, u16, u32, u32, u32, const void *, const void *);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void SceneEffectRing_Update(void *);
 void SceneEffect_DestroyRing(void *);
-extern const struct RingVector gUnk_0824F6B8, gUnk_0824F6C0;
-
-static inline u8 Ring_SetMode(struct SceneEffectRing *ring, u32 mode)
-{
-    if (mode) {
-        ring->mode = 0x10;
-        return 0x60;
-    } else {
-        ring->mode = 0;
-        return 0xe0;
-    }
-}
+extern const struct ContactPosition gUnk_0824F6B8, gUnk_0824F6C0;
 
 void SceneEffect_InitializeRing(struct RingOwner *owner, struct SceneEffectRing *ring,
                                 struct RingVector *pos, u32 mode)
 {
-    register u8 flags asm("r0");
     u32 animation = SceneEffect_LoadRingAnimation();
     void *data = ring->animation;
-    struct RingCollider *collider;
+    struct ContactCollider *collider;
     void (*update)(void *);
     void (*destroy)(void *);
     AnimData_Load(data, 0x856e);
@@ -66,10 +47,21 @@ void SceneEffect_InitializeRing(struct RingOwner *owner, struct SceneEffectRing 
     collider = &ring->collider;
     Collider_Init(collider, 0, 0x2101, 0, 0x10, &gUnk_0824F6B8, &gUnk_0824F6B8);
     Collider_SetAttackProperties(collider, owner->attack, owner->element, 0x10, 0x80000, 0);
-    collider->size = gUnk_0824F6B8;
-    collider->offset = gUnk_0824F6C0;
-    flags = Ring_SetMode(ring, mode);
-    ring->flags = flags;
+    collider->offset = gUnk_0824F6B8;
+    collider->bounds = gUnk_0824F6C0;
+    if (mode) {
+        ring->mode = 0x10;
+        {
+            u8 facing = 0x60;
+            collider->direction = facing;
+        }
+    } else {
+        ring->mode = 0;
+        {
+            u8 facing = 0xe0;
+            collider->direction = facing;
+        }
+    }
     update = SceneEffectRing_Update;
     destroy = SceneEffect_DestroyRing;
     ring->update = update;

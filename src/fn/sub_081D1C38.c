@@ -1,7 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: SceneActorAnimation_UpdateWalkToPosition (sub_0802EA90) at a fixed speed of 8,
 // stopping within 10 units, for a tagged scene NPC.
 #include "global.h"
+#include "scene_facing.h"
 #include "engine_globals.h"
 
 struct Vec {
@@ -130,21 +130,8 @@ void sub_081D1C38(void *unused, struct Actor *arg)
                 u8 *out = savedAngle;
 
                 *out = value;
-                {
-                    register s32 shifted asm("r2") = value + 112;
-                    s32 mask;
-                    asm("" : "+r"(shifted));
-                    shifted >>= 5;
-                    mask = 7;
-                    p->facing8 = mask & shifted;
-                }
-                {
-                    s32 mask;
-                    s32 shifted = (value + 96) >> 6;
-                    mask = 3;
-                    mask &= shifted;
-                    p->facing4 = mask;
-                }
+                p->facing8 = SceneFacing_EightWay(value);
+                p->facing4 = SceneFacing_FourWay(value);
             }
             TaggedSceneNpc_PlayTaggedAnimation(p, 3, 1, 0, 5);
         }

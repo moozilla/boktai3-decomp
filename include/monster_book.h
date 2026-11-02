@@ -13,12 +13,15 @@ struct BookSprite {
 };
 
 struct MonsterBook {
-    u8 unk0[0x24];
+    u8 unk0[0x20];
+    u32 frame;
     u8 mode;
     u8 category;
     u8 entry;
     u8 unk27;
-    s32 windows[9];
+    s32 windows[8];
+    u8 selectedRow;
+    u8 unknown49[3];
     u8 animData[0x20];
     struct BookSprite s6C;
     struct BookSprite sCC;
@@ -31,9 +34,13 @@ struct MonsterBook {
     struct BookSprite sA8C[2];
     struct BookSprite sB4C;
     struct BookSprite sBAC[2];
-    u8 unkC6C[0xD50 - 0xC6C];
+    u8 unkC6C[0xD4E - 0xC6C];
+    u16 transitionFlags;
     const u8 *script;
-    u8 unkD54[0xF1C - 0xD54];
+    u8 unkD54[0xDA7 - 0xD54];
+    u8 pendingExit;
+    u8 unkDA8[0xF18 - 0xDA8];
+    void *closeScript;
     void *display;
 };
 

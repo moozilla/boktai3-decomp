@@ -1,6 +1,7 @@
 #include "global.h"
+#include "ram.h"
+#include "hit_spark_random.h"
 
-// MATCHING_CONCESSION: register-pinning
 #include "scene_vec.h"
 #include "engine.h"
 
@@ -50,42 +51,19 @@ struct HitActor {
     u32 damageType;
 };
 extern const struct SceneVec gUnk_0824FE44;
-void Collision_CalculateDamageResponse(void *);
+void Collision_CalculateDamageResponse(void *attacker, void *defender);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
-static inline void AdjustCoordinate(u16 *coordinate, u32 sample)
-{
-    u32 base = *coordinate - 64;
-    *coordinate = base + (sample & 127);
-}
-static inline void RandomizePosition(struct SceneVec *v, const u16 *table)
-{
-    u16 *x = (u16 *)&v->x, *y = (u16 *)&v->y, *z = (u16 *)&v->z;
-    register u32 index asm("r1");
-    u32 sample, base;
-    index = gRandomIndex;
-    index++;
-    index &= 1023;
-    sample = table[index];
-    base = *x - 64;
-    *x = base + (sample & 127);
-    index = (index + 1) & 1023;
-    *y = *y + (u8)table[index];
-    index = (index + 1) & 1023;
-    gRandomIndex = index;
-    AdjustCoordinate(z, table[index]);
-}
 void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResult *hit,
                                         struct HitActor *p)
 {
-    Collision_CalculateDamageResponse(source);
+    Collision_CalculateDamageResponse(source, hit);
     if (hit->blocked) {
-        register u32 zero asm("r0") = 0;
         hit->damage = 0;
-        hit->state = zero;
+        hit->state = 0;
     } else {
         p->damage = hit->damage;
         p->damageType = source->damageType;
@@ -96,9 +74,16 @@ void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResu
             Sound_PlaySong(0x211);
             DamageNumberDisplay_Show(p->display, p->damage, 0, &p->origin, &p->offset, 1);
             {
-                register void *hud asm("r8") = p->hud;
-                SceneHud_SetTimedState(hud, p->hudValue, p->hudX, p->hudY, p->mode == 4,
-                                       p->hudTime);
+                void *hud;
+                s32 health, hudX, hudY, mode;
+                hud = p->hud;
+                health = p->hudValue;
+                hudX = p->hudX;
+                hudY = p->hudY;
+                mode = 0;
+                if (p->mode == 4)
+                    mode = 1;
+                SceneHud_SetTimedState(hud, health, hudX, hudY, mode, p->hudTime);
             }
             if (source->flags & 0x40)
                 goto sparks;
@@ -106,16 +91,45 @@ void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResu
         PlayerStats_AddContactHundredths(source, hit, 0);
     sparks:
         if (source->flags & p->damageFlags) {
-            struct SceneVec velocity, position;
+            struct {
+                struct SceneVec position, velocity;
+            } frame;
             s32 i;
-            for (i = 0; i < 3; ++i) {
-                register const u16 *table asm("r3");
-                velocity = gUnk_0824FE44;
-                position = p->position;
-                table = (const u16 *)RANDOM_TABLE_ADDR;
-                RandomizePosition(&position, table);
-                SparkParticle_Spawn(&position, 1, &velocity, 0, 3, 8, 2, 2);
-            }
+            struct SceneVec *vel = &frame.velocity;
+            struct SceneVec *pos = &frame.position;
+            u32 *index = &gRandomIndex;
+            u32 limit = 0x3ff;
+            u32 mask = 0x7f;
+            i = 2;
+            do {
+                u32 random;
+                u32 value;
+                u32 sample;
+                u32 x;
+                frame.velocity = gUnk_0824FE44;
+                frame.position = p->position;
+                value = (u32)gRandomTable;
+                random = HitSpark_NextIndex(*index, limit);
+                sample = HitSpark_Sample(value, random);
+                x = (u16)pos->x - 64;
+                sample &= mask;
+                x += sample;
+                pos->x = x;
+                random = HitSpark_NextIndex(random, limit);
+                pos->y += (u8)HitSpark_Sample(value, random);
+                random = HitSpark_NextIndex(random, limit);
+                *index = random;
+                {
+                    u32 last = HitSpark_Sample(value, random);
+                    x = (u16)pos->z - 64;
+                    last &= mask;
+                    x += last;
+                    pos->z = x;
+                }
+                value = 0;
+                SparkParticle_Spawn(&frame.position, 1, vel, value, 3, 8, 2, 2);
+                i--;
+            } while (i >= 0);
         }
     }
 }

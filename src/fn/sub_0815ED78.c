@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "player.h"
 #include "engine.h"
 
@@ -11,19 +10,19 @@ s32 Player_GetUsableEnchantment(struct Player *);
 s32 Player_IsEnchantmentAvailable(struct Player *, s32);
 static inline void ApplyActionMode(struct Player *p, u32 mode, u32 resource)
 {
-    u32 offset = 0x418;
-    u8 *action;
-    asm("" : "+r"(offset));
-    action = (u8 *)p + offset;
-    if (*action != 5) {
+    if (p->actionMode != 5) {
         p->actionEighteenParameter = resource;
         p->actionEighteenDuration = 32;
     }
-    *action = mode;
+    p->actionMode = mode;
     if (gEngineFlags & 0x1000)
         p->updateCallback = Player_UpdateLinkModeMovement;
     else
         p->updateCallback = Player_UpdateActionModeMovement;
+    p->unk419 = 0;
+    p->activeAnimation = &p->animation;
+    p->visualState = 0;
+    p->visualPosition = &p->previousPosition;
 }
 void Player_ApplyLatchedActionMode(struct Player *p)
 {
@@ -39,10 +38,6 @@ void Player_ApplyLatchedActionMode(struct Player *p)
             ApplyActionMode(p, mode, 0x2A);
         else
             ApplyActionMode(p, 1, 0x16F);
-        p->unk419 = 0;
-        p->activeAnimation = &p->animation;
-        p->visualState = 0;
-        p->visualPosition = &p->previousPosition;
         Player_InitVisualResources(p);
         p->savedSpriteResource = 0xFFFF;
         enchantment = Player_GetUsableEnchantment(p) + 1;

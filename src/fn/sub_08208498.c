@@ -1,6 +1,6 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_vec.h"
+#include "monster_particle_random.h"
 #include "engine_globals.h"
 struct CannonTurret {
     u8 pad00[0x40];
@@ -20,11 +20,6 @@ void Sound_PlaySong(u32);
 void sub_0820843C(void);
 void SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                    s32, s32, u32, s32, u32, u32);
-static inline u32 RandomFrom(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return table[gRandomIndex];
-}
 static inline s32 Scale(s32 x)
 {
     if (x >= 0)
@@ -47,6 +42,7 @@ u32 CannonTurret_FireAimedVolley(struct CannonTurret *p)
     struct SceneVec *pos, *vel, *player, *origin;
     u8 angle;
     s32 half, speed, range;
+    const u16 *sampleOrigin;
     u32 effectMask = 0x400000;
     u32 effectKind = 0xb6;
     if (Mod(p->fireTimer, 10) == 0 && p->fireTimer > 45) {
@@ -57,14 +53,13 @@ u32 CannonTurret_FireAimedVolley(struct CannonTurret *p)
         player = Player_GetEffectivePosition(0);
         angle = Math_Atan2(player->x - origin->x, player->z - origin->z);
         {
-            const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
-            asm("" : "+r"(table));
-            angle = angle + (RandomFrom(table) & 31) - 16;
+            PARTICLE_RANDOM_SAVE_ORIGIN(sampleOrigin, gRandomTable);
+            angle = angle + (ParticleRandom_ReadDirectSample(sampleOrigin) & 31) - 16;
             half = p->speed >> 1;
             range = p->speed - half;
             speed = half;
             if (range != 0)
-                speed += Mod(RandomFrom(table), range);
+                speed += Mod(ParticleRandom_ReadDirectSample(gRandomTable), range);
         }
         Polar(&velocity, angle, speed);
         vel = &velocity;

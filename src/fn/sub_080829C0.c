@@ -1,38 +1,16 @@
-// MATCHING_CONCESSION: register-pinning
-#include "scene_actor_control_phase.h"
+#include "scene_actor_availability.h"
+#include "scene_actor_control_motion.h"
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorView *);
-static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
-{
-    register u32 mask asm("r1");
-    u32 offset;
-    if (actor) {
-        mask = 0x40;
-        offset = 0x2D4;
-        asm("" : "+r"(mask), "+r"(offset));
-        if (*(u16 *)((u8 *)actor + offset) & mask)
-            return 1;
-        mask = 0x20000;
-        offset -= 4;
-        {
-            u32 value = *(u32 *)((u8 *)actor + offset);
-            if (value & mask)
-                return 1;
-        }
-        if (actor->health <= 0)
-            return 1;
-    }
-    return 0;
-}
+
 void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactView *source,
                                               struct SceneActorBehaviorContactView *destination,
                                               struct SceneActorRegistryResetView *actor)
 {
-    u32 index;
     s32 power;
     u32 sample;
-    if (Unavailable(actor))
+    if (SceneActor_ActionsBlocked((void *)actor))
         return;
     {
         u32 mask = 0x800;
@@ -40,15 +18,13 @@ void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactVi
             return;
     }
     SceneActorBehavior_ApplyContactReaction(source, destination, (void *)actor);
-    index = (gRandomIndex + 1) & 1023;
-    gRandomIndex = index;
-    index *= 2;
     {
-        register const u16 *table asm("r2") = gRandomTable;
-        {
-            u16 *entry = (void *)(index + (u32)table);
-            sample = *entry;
-        }
+        union RandomTableView table = {(const u16 *)RANDOM_TABLE_ADDR};
+        u32 *cursor = &gRandomIndex;
+        u32 next = *cursor + 1;
+        u32 mask = 1023;
+        *cursor = next & mask;
+        sample = table.samples[*cursor];
     }
     {
         s32 old = destination->power;
@@ -58,12 +34,8 @@ void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactVi
     power = power < 20 ? 20 : power;
     destination->power = power;
     {
-        struct SceneActorControlState *control = SceneActorControl_GetState(actor);
-        register u32 offset asm("r2");
-        u32 *flags;
-        offset = 0x3D4;
-        flags = (void *)((u8 *)control + offset);
-        asm("" : "+r"(flags) : "r"(offset));
+        struct SceneActorControlMotionState *control = SceneActorControl_GetMotionState(actor);
+        u32 *flags = &control->flags3D4;
         {
             u32 mask = ~8;
             *flags &= mask;

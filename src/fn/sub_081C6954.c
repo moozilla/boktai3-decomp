@@ -1,8 +1,5 @@
 #include "global.h"
 #include "engine.h"
-#define B(o) (*(u8 *)((u8 *)npc + (o)))
-#define H(o) (*(u16 *)((u8 *)npc + (o)))
-#define W(o) (*(u32 *)((u8 *)npc + (o)))
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -10,28 +7,28 @@ struct PackedVec {
     u32 pad : 16;
 };
 struct SceneNpc {
-    u8 pad0[2];
-    u8 field2;
-    u8 field3;
-    u8 mode;
-    u8 pad5;
-    u8 state;
-    u8 pad7;
-    u8 field8;
-    u8 field9;
-    u8 padA[6];
-    u32 field10;
-    u32 field14;
-    u8 field18;
-    u8 facing4;
-    u8 facing8;
-    u8 field1B;
-    u8 pad1C[0x2CC - 0x1C];
-    void *update;
-    void *callbacks[6];
+    u8 unknown0[2];
+    u8 field2, field3, state, nextState, prevState, done, enterCommand, enter;
+    u8 unknownA[6];
+    u32 stateFrame, timer;
+    u8 phase, facing4, facing8;
+    u8 unknown1B[0x65 - 0x1B];
+    u8 motionAngle;
+    u8 unknown66[0x160 - 0x66];
+    u32 shadow;
+    u8 unknown164[4];
+    u8 receiver[0x10];
+    u8 unknown178[0x1EC - 0x178];
+    u8 behavior, enabled;
+    u16 behaviorValue;
+    u8 unknown1F0[0x21C - 0x1F0];
+    u32 parameter21C, parameter220;
+    u8 unknown224[0x2CC - 0x224];
+    void (*update)(void);
+    void (*callbacks[6])(void);
 };
 
-static inline void setHandler(void *fn, void **slot)
+static inline void setHandler(void (*fn)(void), void (**slot)(void))
 {
     *slot = fn;
 }
@@ -52,7 +49,6 @@ void StateActor_OnUnregisterReceiver(void);
 void Actor_OnHiddenIdleUpdate(void);
 void sub_0802F298(void);
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: creates a state actor from script keywords (k variant, p position, d angle, b, i behavior).
 s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
 {
@@ -82,9 +78,9 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
         return fail;
     if (Actor_InitDrawable(npc, 2, model, 0, 0) < 0)
         return fail;
-    Actor_InitShadow(npc, W(0x160), 1, 0, 0x40);
-    SceneMessages_RegisterReceiver((u8 *)npc + 0x168, name, 5);
-    B(0x65) = angle;
+    Actor_InitShadow(npc, npc->shadow, 1, 0, 0x40);
+    SceneMessages_RegisterReceiver(npc->receiver, name, 5);
+    npc->motionAngle = angle;
     {
         u16 a = angle;
         {
@@ -104,86 +100,58 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
             npc->facing4 = m;
         }
     }
-    {
-        register u32 o6 asm("r6");
-        u32 o2;
-        {
-            register void *h asm("r1");
-            h = StateActor_EnterPendingState;
-            o6 = 0x2E4;
-            *(void **)((u8 *)npc + o6) = h;
-            h = StateActor_OnUpdateDisplay;
-            o2 = 0x2D0;
-            *(void **)((u8 *)npc + o2) = h;
-            h = StateActor_OnCommand;
-            o6 -= 0x10;
-            *(void **)((u8 *)npc + o6) = h;
-            h = StateActor_OnUpdateState;
-            o2 += 8;
-            *(void **)((u8 *)npc + o2) = h;
-            h = StateActor_OnRender;
-            o6 += 8;
-            *(void **)((u8 *)npc + o6) = h;
-            h = StateActor_OnUnregisterReceiver;
-            o2 += 8;
-            *(void **)((u8 *)npc + o2) = h;
-            asm("" ::"r"(o2));
-        }
-        if (Script_SeekToKeyword('b')) {
-            *(u8 *)((u8 *)npc + (o6 -= 0xF0)) = Script_GetValue();
-            B(0x1ED) = Script_GetValue();
-            *(u16 *)((u8 *)npc + (o6 += 2)) = Script_GetValue();
-            asm("" ::"r"(o6));
-        } else {
-            u32 offset = 0x1EC;
-            *(u8 *)((u8 *)npc + offset) = 0;
-            asm("" ::"r"(offset));
-            o6 = 0x1ED;
-            *(u8 *)((u8 *)npc + o6) = 1;
-            offset = 0x1EE;
-            *(u16 *)((u8 *)npc + offset) = 0;
-            asm("" ::"r"(offset));
-        }
+    setHandler(StateActor_EnterPendingState, &npc->callbacks[5]);
+    setHandler(StateActor_OnUpdateDisplay, &npc->callbacks[0]);
+    setHandler(StateActor_OnCommand, &npc->callbacks[1]);
+    setHandler(StateActor_OnUpdateState, &npc->callbacks[2]);
+    setHandler(StateActor_OnRender, &npc->callbacks[3]);
+    setHandler(StateActor_OnUnregisterReceiver, &npc->callbacks[4]);
+    if (Script_SeekToKeyword('b')) {
+        npc->behavior = Script_GetValue();
+        npc->enabled = Script_GetValue();
+        npc->behaviorValue = Script_GetValue();
+    } else {
+        npc->behavior = 0;
+        npc->enabled = 1;
+        npc->behaviorValue = 0;
     }
+
     Actor_InitResources(manager, npc, model, 0);
     Actor_LinkToManager(manager, npc);
     switch (Script_GetKeywordValue('i', 0)) {
         case 0: {
-            register u32 o6 asm("r6") = 0x21C;
             u8 one;
             u32 ten;
             void (*fn)(void);
-            *(u32 *)((u8 *)npc + o6) = 0x400;
-            W(0x220) = 0x1000;
+            npc->parameter21C = 0x400;
+            npc->parameter220 = 0x1000;
             ten = 0xA;
             npc->field2 = 0;
             npc->field3 = 0;
-            npc->mode = ten;
-            npc->field14 = 0;
-            one = 1;
-            npc->field8 = one;
-            fn = sub_0802F298;
             npc->state = ten;
-            o6 += 0xB0;
-            *(void **)((u8 *)npc + o6) = fn;
-            asm("" ::"r"(o6));
-            npc->field10 = 0;
-            npc->field9 = one;
-            npc->field18 = 0;
+            npc->timer = 0;
+            one = 1;
+            npc->enterCommand = one;
+            fn = sub_0802F298;
+            npc->prevState = ten;
+            npc->update = fn;
+            npc->stateFrame = 0;
+            npc->enter = one;
+            npc->phase = 0;
         } break;
         case 1: {
             void (*fn)(void);
             npc->field2 = 0;
             npc->field3 = 0;
-            npc->mode = 0;
-            npc->field14 = 0;
-            npc->field8 = 1;
+            npc->state = 0;
+            npc->timer = 0;
+            npc->enterCommand = 1;
             fn = Actor_OnHiddenIdleUpdate;
-            npc->state = 1;
+            npc->prevState = 1;
             npc->update = fn;
-            npc->field10 = 0;
-            npc->field9 = 1;
-            npc->field18 = 0;
+            npc->stateFrame = 0;
+            npc->enter = 1;
+            npc->phase = 0;
         } break;
     }
 }

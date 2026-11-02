@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -7,8 +6,6 @@
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
-void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
-s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 static inline s32 RandomValue(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
@@ -16,7 +13,6 @@ static inline s32 RandomValue(void)
 }
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
-s32 ScenePair_CountPositiveCounters(void *);
 void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
 {
     struct VanargandPairAttack *self = p;
@@ -77,13 +73,12 @@ void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
                 p->timer++;
             } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 struct VanargandAttackPair *pair;
-                register u32 a asm("r4");
-                u32 b;
-                asm("" : "+r"(self));
-                pair = self->pair;
-                a = pair->first;
-                b = pair->second;
-                if (ScenePair_CountPositiveCounters(pair) == 2 && a == 5 && b == 5)
+                u32 firstState, secondState;
+                pair = Vanargand_GetAttackPair(self);
+                firstState = Vanargand_HalfState(pair, 0);
+                secondState = Vanargand_HalfState(pair, 1);
+                if (ScenePair_CountPositiveCounters(pair) == 2 && firstState == 5 &&
+                    secondState == 5)
                     self->flash = 60;
                 if (++self->repeats <= 2) {
                     p->phase = 3;
@@ -109,9 +104,9 @@ void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
             break;
         case 4:
             if (p->timer == 0) {
-                if (self->pair->first == 5)
+                if (self->pair->halves[0].requestedState == 5)
                     PairedSceneActor_ApplyToSelectedHalves(self->pair, 1, 6);
-                if (self->pair->second == 5)
+                if (self->pair->halves[1].requestedState == 5)
                     PairedSceneActor_ApplyToSelectedHalves(self->pair, 2, 6);
                 Vanargand_SetPairedMotionParameter(self->pair, self->parameter584);
                 p->timer++;

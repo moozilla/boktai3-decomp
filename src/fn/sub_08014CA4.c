@@ -63,7 +63,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
     struct Group *g;
     register struct Group *base asm("r8");
     u16 *speeds;
-    register u32 *rng asm("sb");
+    u32 *rng;
     s32 i;
     u8 *animation;
     u8 *cursor;
@@ -118,7 +118,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
                         out = life;
                         *out = value;
                     } else {
-                        register u32 *seed asm("r2") = rng;
+                        u32 *seed = rng;
                         u32 index;
                         s32 random, value;
                         index = (*seed + 1) & 1023;

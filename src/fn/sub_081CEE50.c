@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_facing.h"
 #include "engine.h"
 
 struct SceneNpc081CEE50 {
@@ -28,7 +28,6 @@ s32 DisplayAnimation_TestFinished(void *);
 s32 Callback_InvokeActor(void *, void *);
 void Actor_OnIdleUpdate(void);
 
-// a pinned to r2; the shift temp and mask registers still swap
 void sub_081CEE50(void *ctx, struct SceneNpc081CEE50 *npc)
 {
     typeof(npc->sub20) *sub = &npc->sub20;
@@ -40,20 +39,9 @@ void sub_081CEE50(void *ctx, struct SceneNpc081CEE50 *npc)
         npc->entered = 0;
         npc->done = 0;
         a = npc->angle;
-        asm("" : "+r"(a));
         npc->angle65 = a;
-        {
-            register s32 t asm("r1") = (a + 0x70) >> 5;
-            u32 m = 7;
-            npc->bit2 = m & t;
-        }
-        {
-            s32 t = (a + 0x60) >> 6;
-            u32 m;
-            m = 3;
-            m &= t;
-            npc->bit1 = m;
-        }
+        npc->bit2 = SceneFacing_EightWay(a);
+        npc->bit1 = SceneFacing_FourWay(a);
         Actor_PlayAnimationEntry(npc, 4, 2, 0, 4);
         two = 2;
         f = npc->flagsC;

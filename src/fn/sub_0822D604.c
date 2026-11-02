@@ -1,22 +1,29 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-// The two barriers preserve distinct addition tails for the first two ranges.
 s32 Selection_GetDisplayFrame(s32 selection)
 {
-    if (selection <= 29) {
-        selection += 0x151;
-        asm("" : "+r"(selection));
-    } else if (selection <= 31) {
+    s32 result;
+    if (selection <= 29)
+        return selection + 0x151;
+    if (selection <= 31) {
         selection += 0x152;
-        asm("" : "+r"(selection) : "i"(0));
-    } else if (selection <= 35)
-        selection = 0x173;
-    else if (selection <= 38)
-        selection = 0x172;
-    else if (selection > 54)
-        selection = 0x151;
-    else
-        selection += 0x14D;
+        goto done;
+    }
+    if (selection <= 35) {
+        result = 0x173;
+        goto resultDone;
+    }
+    if (selection <= 38) {
+        result = 0x172;
+        goto resultDone;
+    }
+    if (selection > 54) {
+        result = 0x151;
+        goto resultDone;
+    }
+    selection += 0x14d;
+done:
     return selection;
+resultDone:
+    return result;
 }

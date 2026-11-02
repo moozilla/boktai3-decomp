@@ -1,7 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-// foundry draft (worker best 97.4%); what differs is mostly register allocation and instruction order
 u8 *Player_GetSpecialAttackDescriptor(s32 idx);
 s32 Player_GetAttackElementType(u32 x);
 void Projectile_InitializeParams(u8 *);
@@ -22,21 +20,15 @@ void Player_ConfigureActionSelectionDisplay(struct Player *p)
     if (!p->statModifierContext.statBOverrideEnabled) {
         if (p->actionMode == 6)
             goto mode6;
-        if (p) {
-            u32 flags;
-            {
-                u32 off;
-                u32 *fp;
-                asm("" ::: "r1");
-                off = 0x444;
-                fp = (u32 *)((u8 *)p + off);
-                flags = DisplayFlags(fp, 0x10000000);
-            }
+        if (!p) {
+            selection = 1;
+        } else {
+            u32 flags = DisplayFlags(&p->statBonusFlags, 0x10000000);
             selection = 7;
             if (flags)
                 goto selected;
+            selection = 1;
         }
-        selection = 1;
     selected:
         Projectile_SetVariant(p->statModifierContext.actionSelectionDisplay, 1);
     } else {
@@ -56,7 +48,7 @@ void Player_ConfigureActionSelectionDisplay(struct Player *p)
             p->statModifierContext.actionSelectionDisplay, selection,
             Player_GetAttackElementType(p->statModifierContext.statBOverrideMode));
     {
-        u8 value = ((u8 *)gPlayers[0])[0x2D];
+        u8 value = (u8)gPlayers[0]->unk2D;
         Projectile_SetFlightParams(p->statModifierContext.actionSelectionDisplay, 0, 60, value, 24);
     }
     Projectile_SetCollisionSize(p->statModifierContext.actionSelectionDisplay, 16, 100, 16);

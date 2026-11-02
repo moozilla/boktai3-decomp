@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "orbit_motion.h"
 s32 ScalarApproach_StepHalf(s32, s32);
 s32 ScalarApproach_StepQuarter(s32, s32);
@@ -57,12 +56,17 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
             out->y = ScalarApproach_StepSixteenth(out->y, target->y);
             out->z = ScalarApproach_StepSixteenth(out->z, target->z);
             break;
+        case 5: {
+            s16 value;
+            out->x = Math_StepTowardTarget(out->x, target->x, step->x);
+            value = Math_StepTowardTarget(out->y, target->y, step->y);
+            out->y = value;
+            out->z = Math_StepTowardTarget(out->z, target->z, step->z);
+            break;
+        }
         case 6: {
-            /* Reserve the scratch register across the signed coordinate load. */
-            register s32 scratch asm("r3");
             s32 current;
             current = out->y;
-            asm volatile("" : : "r"(scratch));
             out->y = ScalarApproach_StepEighth(current, target->y);
             return SceneMover_SteerXZ(p);
         }
@@ -74,14 +78,14 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
             return OrbitMotion_UpdateCrossedSines(p);
         case 10:
             OrbitMotion_UpdateAbsoluteSines(p);
-        case 5: {
-            s16 value;
-            out->x = Math_StepTowardTarget(out->x, target->x, step->x);
-            value = Math_StepTowardTarget(out->y, target->y, step->y);
-            out->y = value;
-            out->z = Math_StepTowardTarget(out->z, target->z, step->z);
-            break;
-        }
+            {
+                s16 value;
+                out->x = Math_StepTowardTarget(out->x, target->x, step->x);
+                value = Math_StepTowardTarget(out->y, target->y, step->y);
+                out->y = value;
+                out->z = Math_StepTowardTarget(out->z, target->z, step->z);
+                break;
+            }
         case 12:
             return OrbitMotion_InterpolatePosition(p);
     }

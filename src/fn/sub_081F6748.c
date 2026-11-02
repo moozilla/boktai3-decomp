@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #define gSceneAngleSineTable gUnk_086149C4
@@ -38,30 +37,27 @@ void SceneActors_FireTrackingProjectileSpread(SpreadProjectileActor *p,
     ProjectilePosition delta;
     ProjectilePosition spawn;
     u8 angle;
-    u8 facing;
-    register u16 step asm("r8");
+    u32 facing;
+    u16 step;
     int speed;
     u32 rawFacing;
     int count;
-    s16 *velocity;
+    ProjectilePosition *velocity;
     ProjectilePosition *target;
     ProjectilePosition *spawnPtr;
     target = &p->target;
     angle = (u8)Math_Atan2(target->x - position->x, target->z - position->z);
     step = 16;
-    // Keep the wrapped facing angle in the high byte until the vector is addressed.
     rawFacing = ((u32)p->facing << 30) + 0xc0000000;
-    asm("" : "+r"(rawFacing));
-    velocity = (s16 *)&delta;
+    velocity = &delta;
     facing = rawFacing >> 24;
     speed = 180;
     {
         int x = trunc12(gUnk_086149C4[(facing + 64) & 255] * speed);
-        int zero = 0;
-        velocity[0] = x;
-        velocity[1] = zero;
+        velocity->x = x;
+        velocity->y = 0;
     }
-    velocity[2] = trunc12(gUnk_086149C4[facing] * speed);
+    velocity->z = trunc12(gUnk_086149C4[facing] * speed);
     sum(&spawn, &delta, position);
     spawn.y += 200;
     angle = (u8)(angle - step);

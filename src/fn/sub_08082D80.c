@@ -76,14 +76,9 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
         x = Quarter(difference);
     }
     {
-        register u32 offset asm("r4") = 0x314;
-        s32 current = *(s16 *)((u8 *)actor + offset);
-        register s16 *field asm("r1");
-        s32 difference;
-        offset += 8;
-        asm("" : "+r"(offset));
-        field = (void *)((u8 *)actor + offset);
-        difference = current - *field;
+        s32 current = actor->reactionStart.z;
+        s16 *field = &actor->reactionEnd.z;
+        s32 difference = current - *field;
         priorZ = field;
         z = Quarter(difference);
     }
@@ -133,26 +128,12 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
                 SceneActorControl_StartPositionCurve(actor, &gPlayers[0]->position);
                 {
                     u32 phase = 2;
-                    register u32 offset asm("r2") = 0x2A8;
-                    register u32 phaseOffset asm("r3");
-                    u32 behaviorOffset;
-                    u8 *field = (u8 *)actor + offset;
-                    *field = stateTest;
-                    phaseOffset = 0x2A9;
-                    *((u8 *)actor + phaseOffset) = phase;
-                    behaviorOffset = 0x2AA;
-                    *((u8 *)actor + behaviorOffset) = stateTest;
-                    offset += 4;
-                    asm("" : "+r"(offset));
-                    {
-                        register u32 *field asm("r0") = (void *)((u8 *)actor + offset);
-                        *field = zeroWord;
-                    }
-                    phaseOffset += 8;
-                    {
-                        register u8 *field asm("r1") = (u8 *)actor + phaseOffset;
-                        *field = 1;
-                    }
+                    u8 *first = &actor->state2A8;
+                    *first = stateTest;
+                    actor->phase2A9 = phase;
+                    actor->behavior2AA = stateTest;
+                    actor->counter2AC = zeroWord;
+                    actor->field2B1 = 1;
                 }
                 SceneActorControl_ResetCollisionPhase(actor);
             } else {

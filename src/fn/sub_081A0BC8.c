@@ -1,13 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-// confidence=low: spawns projectiles while traversing the arena boundary.
-
-// MATCHING_CONCESSION: register-pinning
-// The two remaining hints stand in for longer lives: without them `state` outranks the
-// flags pointer in global allocation (state needs a life of 49+ insns, it has 41), and
-// the 0x3FF mask is re-placed in sl instead of ip once reload evicts it from r5.
 #include "engine.h"
-// confidence=low: traverses a boundary, spawning falling projectiles over valid terrain.
 struct Vec {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -51,19 +45,29 @@ void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 void Actor_SetHeadingVelocity(void *, u32);
 void Hresvelgr_SpawnProjectile(void *, u32, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
+static inline s32 FacingSector4(s16 angle)
+{
+    return (angle + 96) >> 6;
+}
+static inline s32 FacingSector8(s16 angle)
+{
+    return (angle + 112) >> 5;
+}
 static inline void SetHeading(struct Hresvelgr *p, s32 heading)
 {
-    s32 shifted;
-    u32 mask;
     p->heading = heading;
-    shifted = (p->heading + 96) >> 6;
-    mask = 3;
-    mask &= shifted;
-    p->direction4 = mask;
-    shifted = (p->heading + 112) >> 5;
-    mask = 7;
-    mask &= shifted;
-    p->direction8 = mask;
+    {
+        s32 sector = FacingSector4(p->heading);
+        u32 mask = 3;
+        mask &= sector;
+        p->direction4 = mask;
+    }
+    {
+        s32 sector = FacingSector8(p->heading);
+        u32 mask = 7;
+        mask &= sector;
+        p->direction8 = mask;
+    }
 }
 static inline s32 RandomValue(const u16 *table)
 {
@@ -120,11 +124,11 @@ static inline void SetCollisionMask(struct Hresvelgr *actor, u32 mask)
 // confidence=low: traverses a boundary and spawns falling projectiles over valid terrain.
 void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
 {
-    u32 aoff = 0x2f0;
-    struct Action *action = (struct Action *)((u8 *)actor + aoff);
+    u32 normalCollisionMask = 0x2f0;
+    struct Action *action = &actor->action;
     struct Vec *target = actor->target;
     u32 *flags;
-    register s32 state asm("r5");
+    s32 state;
     if (actor->pending) {
         actor->pending = 0;
         ActionState_Reset(action);
@@ -153,7 +157,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             if (!action->frame) {
                 action->frame = state;
                 SetHeading(actor, actor->targetHeading);
-                Hresvelgr_SetAnimation(actor, actor->animation, (u8 *)actor + 0x174, 2, state, 0);
+                Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 2, state, 0);
                 SetCollisionMask(actor, 0xd000);
                 actor->collisionBounds = actor->boundsHigh;
                 Sound_PlaySong(0x4d0);
@@ -191,7 +195,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             }
             break;
         case 2:
-            actor->collisionMask = aoff;
+            actor->collisionMask = normalCollisionMask;
             actor->collisionBounds = actor->boundsLow;
             {
                 u32 mask = 16;
@@ -200,5 +204,5 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             actor->finished = 1;
             break;
     }
-    asm("" ::"r"(aoff));
+    asm("" ::"r"(normalCollisionMask));
 }

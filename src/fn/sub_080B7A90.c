@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 /* Skeleton variant of SceneActorTarget_ResolvePendingObject that also clears state bits 0x300 */
 #include "scene_actor_contact_response.h"
 #include "global.h"
@@ -12,28 +11,18 @@ struct SceneActorTargetLink {
     u8 flags;
 };
 void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *);
-static inline u8 TargetHasFlag(struct SceneActorTargetLink *state,
-                               struct SceneActorTargetLink **saved)
+static inline u8 BoolOf(u32 v)
 {
-    register struct SceneActorTargetLink *input asm("r2") = state;
-    u32 mask = 2;
-    u32 value;
-    value = input->flags & mask;
-    {
-        register struct SceneActorTargetLink *copy asm("r4") = input;
-        asm("" : "+r"(copy), "+r"(value));
-        *saved = copy;
-    }
-    if (value)
+    if (v)
         return 1;
     return 0;
 }
 s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryResetView *owner = actor;
+    struct SceneActorTargetLink *state;
     s32 *pendingId = (void *)((u8 *)owner + 0x304);
     if (*pendingId > 0) {
-        struct SceneActorTargetLink *state;
         struct Delta {
             s16 x, y, z, pad;
         } delta;
@@ -101,8 +90,11 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryReset
         }
         return 1;
     } else {
-        struct SceneActorTargetLink *state = (void *)((u8 *)owner + 0xDC);
-        if (TargetHasFlag(state, &state)) {
+        struct SceneActorTargetLink *link = (void *)&owner->tracking;
+        u32 mask = 2;
+        u32 pending = link->flags & mask;
+        state = link;
+        if (BoolOf(pending)) {
             u32 mask = ~0x10;
             mask &= state->flags;
             state->flags = mask;

@@ -8,4 +8,9 @@ struct SceneVec {
     s16 pad;
 };
 
+static inline void SceneVec_Copy(struct SceneVec *out, const struct SceneVec *in)
+{
+    *out = *in;
+}
+
 #endif

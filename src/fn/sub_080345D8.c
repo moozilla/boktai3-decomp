@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 #include "rfu_manager.h"
@@ -118,8 +117,7 @@ begin:
     reset(p, 5, key);
     goto done;
 addBits: {
-    register int incoming asm("r1") = gRfuLinkManager.event.bytes.bits;
-    p->bits = p->bits | incoming;
+    p->bits |= (u8)gRfuLinkManager.event.param[0];
 }
     goto done;
 reset5:
@@ -134,10 +132,7 @@ mode: {
 }
     goto done;
 selectedAdd: {
-    u8 *slot = &p->selected;
-    register int incoming asm("r1");
-    incoming = gRfuLinkManager.event.bytes.bits;
-    *slot = *slot | incoming;
+    p->selected |= (u8)gRfuLinkManager.event.param[0];
 }
     goto done;
 selectedRemove: {
@@ -148,45 +143,27 @@ selectedRemove: {
 }
     goto done;
 release: {
-    register struct RfuLinkManager *message asm("r2") = &gRfuLinkManager;
+    struct RfuLinkManager *message = &gRfuLinkManager;
     u8 *selected;
-    int incoming;
-    incoming = message->event.bytes.bits;
-    p->bits &= ~incoming;
+    int remaining;
+    p->bits &= ~(u8)message->event.param[0];
     selected = &p->selected;
-    incoming = message->event.bytes.bits;
-    *selected &= ~incoming;
-    {
-        int zero = p->bits;
-        if (!zero) {
-            int op = 11;
-            p->flag = zero;
-            p->operation = op;
-            p->ticks = zero;
-            p->pending = 1;
-        }
-    }
+    *selected &= ~(u8)message->event.param[0];
+    remaining = p->bits;
+    if (!remaining)
+        reset(p, 11, remaining);
 }
     goto done;
 releaseOther: {
-    register struct RfuLinkManager *message asm("r2") = &gRfuLinkManager;
+    struct RfuLinkManager *message = &gRfuLinkManager;
     u8 *selected;
-    int incoming;
-    incoming = message->event.bytes.bits;
-    p->bits &= ~incoming;
+    int remaining;
+    p->bits &= ~(u8)message->event.param[0];
     selected = &p->selected;
-    incoming = message->event.bytes.bits;
-    *selected &= ~incoming;
-    {
-        int zero = p->bits;
-        if (!zero) {
-            int op = 11;
-            p->flag = zero;
-            p->operation = op;
-            p->ticks = zero;
-            p->pending = 1;
-        }
-    }
+    *selected &= ~(u8)message->event.param[0];
+    remaining = p->bits;
+    if (!remaining)
+        reset(p, 11, remaining);
 }
     goto done;
 reset32:

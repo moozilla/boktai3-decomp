@@ -1,24 +1,21 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
-int ResultTutorial_AnimateLevel(u8 *p)
+#include "result_tutorial.h"
+int ResultTutorial_AnimateLevel(struct ResultTutorialLevel *tutorial)
 {
-    switch (p[0xaf]) {
+    switch (tutorial->phase) {
         case 0:
-            p[0xaf] = 1;
-            *(u16 *)(p + 0xaa) = 0;
+            tutorial->phase = 1;
+            tutorial->timer = 0;
             break;
         case 1:
-            *(int *)(p + 0x50) = (*(s16 *)(p + 0xaa) >> 4) + 3;
-            asm("" ::: "memory");
-            if (++*(s16 *)(p + 0xaa) > 94) {
-                ++p[0xaf];
-                *(u16 *)(p + 0xaa) = 0;
+            tutorial->level = (tutorial->timer >> 4) + 3;
+            if (++tutorial->timer > 94) {
+                ++tutorial->phase;
+                tutorial->timer = 0;
             }
             break;
         case 2:
-            *(int *)(p + 0x50) = 8 - (*(s16 *)(p + 0xaa) >> 4);
-            asm("" ::: "memory");
-            if (++*(s16 *)(p + 0xaa) > 78)
+            tutorial->level = 8 - (tutorial->timer >> 4);
+            if (++tutorial->timer > 78)
                 return 1;
             break;
     }

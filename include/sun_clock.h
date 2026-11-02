@@ -10,7 +10,7 @@
 struct SunClock {
     u32 stamp;               /* 0x00: Clock_PackDate */
     u8 baseHour, baseMinute; /* 0x04 */
-    u8 extra6, extra7;       /* 0x06 */
+    u8 extra6, extra7;       /* 0x06: extra6 is the base second */
     u8 field8;               /* 0x08: Clock_CalculateWeekday */
     u8 pad9;
     u8 hourA, minuteA;         /* 0x0A */
@@ -28,6 +28,7 @@ struct SunClock {
 extern struct SunClock gSunClock;
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);
+u32 SunClock_GetSecond(void);
 s32 Div(s32, s32);
 u8 SunClock_GetPhase(void);
 void Clock_SyncFromRtc(void);

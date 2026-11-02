@@ -68,7 +68,6 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
         foreground->unknown3C = 2;
         state = (struct DisplaySequenceState *)(p + 0x2EC);
         Anim_SetSequence(state, *(void **)(p + 0x390), 2, 0, 0);
-        asm("" : "+r"(flag));
         StepPlaybackOne(foreground, state, flag);
         StartEndingMotion(context);
         *(u32 *)(p + 0x39C) = 0;

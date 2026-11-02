@@ -1,8 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
 #include "player.h"
+#include "scene_object.h"
+#include "player_cue.h"
 
 struct LinkRef {
     u8 unk0[0x18];
@@ -39,17 +40,13 @@ static inline u32 FlagSet(u32 v, u32 m)
     return v & m;
 }
 
-static inline u32 FlagTest(u32 m, u32 *pv)
+static inline u8 TerrainDamage_UsesAlternateReaction(void)
 {
-    u32 r;
-    if (*pv & m) {
-        r = 1;
-        asm("" : "+r"(r));
-    } else
-        r = 0;
-    return r;
+    u32 mask = 0x4000;
+    if (gGameState->flags868 & mask)
+        return 1;
+    return 0;
 }
-
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
@@ -74,8 +71,8 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
         data += 4;
     else
         data = gTerrainMap->cells + (cell * 4 + 12);
-    if (FlagSet(*(u16 *)(data + 2), 0x40) && p->tetherStatusFlags == 0) {
-        if (FlagTest(0x4000, &gGameState->flags868))
+    if (FlagSet(((struct SceneCell *)data)->flags, 0x40) && p->tetherStatusFlags == 0) {
+        if (TerrainDamage_UsesAlternateReaction())
             Player_SetTetherMode(p, 0x22, 0);
         else
             Player_SetTetherMode(p, 0x21, 0);
@@ -103,7 +100,7 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     }
     if (p->particleEmissionCount) {
         if (p == 0 || !Busy(p)) {
-            DamageNumberDisplay_Show((u8 *)p + 0x230, p->particleEmissionCount, 0, &p->position,
+            DamageNumberDisplay_Show(&p->collider, p->particleEmissionCount, 0, &p->position,
                                      &p->movementRequestTarget, 0);
             if (p->currentStatA < p->particleEmissionCount)
                 p->currentStatA = 0;
@@ -113,8 +110,8 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     }
     p->particleEmissionCount = 0;
     if (flash)
-        SceneHud_SetTimedState(*(u32 *)((u8 *)p + 0x24), p->currentStatA, p->maximumStatA, 10, 0,
-                               -1);
+        SceneHud_SetTimedState(PlayerCue_Messages(p)->receiverIdentifier, p->currentStatA,
+                               p->maximumStatA, 10, 0, -1);
     if (p->currentStatA != 0)
         return 0;
 one:

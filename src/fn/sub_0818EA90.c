@@ -1,37 +1,6 @@
-#include "global.h"
+#include "armor_part_queue.h"
 #include "game_state.h"
 
-// MATCHING_CONCESSION: register-pinning
-
-/* Partial views of the three embedded Armor parts. */
-struct ArmorLaunchPosition {
-    s16 x, y, z, pad;
-};
-struct ArmorLaunchPart {
-    u8 unk_00[0x1C];
-    struct ArmorLaunchPosition position;
-    u8 unk_24[0x119 - 0x24];
-    u8 flags;
-    u8 unk_11A[4];
-    u8 active, action;
-    u8 unk_120[0x134 - 0x120];
-    struct ArmorLaunchPosition target;
-    u8 unk_13C[0x1E4 - 0x13C];
-};
-struct ArmorLaunchState {
-    u8 flags, unk_01[4], active, action;
-    u8 unk_07[0x1E4 - 7];
-};
-struct ArmorLaunchPositionSlot {
-    struct ArmorLaunchPosition position;
-    u8 unk_08[0x1E4 - 8];
-};
-struct ArmorLaunchGroup {
-    struct ArmorLaunchPart parts[3];
-    struct ArmorLaunchPosition position;
-    u8 unk_5B4[0x5C3 - 0x5B4];
-    u8 count, activeCount;
-};
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 
@@ -45,11 +14,13 @@ void Armor_QueueFallingParts(void *arg0)
 {
     struct ArmorLaunchGroup *group = arg0;
     s32 x, y, z, stepX, targetY, stepZ, angle;
-    register s32 i asm("r8");
+    s32 i;
     struct ArmorLaunchState *state;
     struct ArmorLaunchPositionSlot *position;
     struct ArmorLaunchPart *part;
     u8 *activeCount;
+    u32 active;
+    active = 1;
     x = gGameState->positionX - group->position.x;
     targetY = gGameState->positionY + 128;
     z = gGameState->positionZ - group->position.z;
@@ -81,13 +52,7 @@ void Armor_QueueFallingParts(void *arg0)
             x += stepX;
             y += 256;
             z += stepZ;
-            {
-                s32 one = 1;
-                state->active = one;
-            }
-            state->action = 6;
-            state->flags = 1 | state->flags;
-            (*activeCount)++;
+            ARMOR_QUEUE_PART_ACTION(state, 6, active, 1, activeCount);
         }
         state++;
         position++;

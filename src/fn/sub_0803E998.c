@@ -42,6 +42,7 @@ static inline u32 *PrepareFirst(struct ScenePoolEntry *entry)
 s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                               struct ScenePoolEntry *entry)
 {
+    s32 level;
     struct ScenePoolVec32 velocity;
     u8 *kindAddress;
     u32 fire;
@@ -89,33 +90,25 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
     if (fire) {
         switch (*kindAddress) {
             case 2: {
-                register s32 level asm("r5");
                 u32 zero;
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
                 zero = 0;
                 velocity.y = zero;
                 velocity.z = zero;
-                {
-                    register s32 height asm("r0") = actor->restrictionMetric;
-                    level = height - 0x16000;
-                }
+                level = actor->restrictionMetric - 0x16000;
                 NativeEffect_CreateFromProfile(&actor->position, level, &velocity,
                                                actor->emissionProfile, 5, zero, 3, zero);
                 break;
             }
             case 3: {
-                register s32 level asm("r5");
-                register struct ScenePoolVec32 *position asm("r9");
-                register void *profile asm("r10");
+                struct ScenePoolVec32 *position;
+                void *profile;
                 u32 zero;
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
                 zero = 0;
                 velocity.y = zero;
                 velocity.z = zero;
-                {
-                    register s32 height asm("r0") = actor->restrictionMetric;
-                    level = height - 0x8000;
-                }
+                level = actor->restrictionMetric - 0x8000;
                 position = &actor->position;
                 profile = actor->emissionProfile;
                 NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 1, 4, zero);

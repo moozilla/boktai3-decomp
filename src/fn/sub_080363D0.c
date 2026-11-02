@@ -62,7 +62,7 @@ void Wireless_PollChildNiSend(struct Engine *p)
                 u8 *original = &send->bmSlotOrg;
                 register int old asm("r3") = *original;
                 {
-                    register int current asm("r0") = send->bmSlot;
+                    u8 current = send->bmSlot;
                     asm("" : "+r"(current));
                     lost = current;
                     lost ^= old;

@@ -90,7 +90,9 @@ struct SceneHudState {
     u16 timedStateValue;                /* 0xA72 */
     u16 timedStateTimer;                /* 0xA74: initialized to 300 */
     u8 timedStateKind, timedStatePhase; /* 0xA76: phase zero or six */
-    u8 unknownA78[8];
+    u16 secondaryGaugeValue, secondaryGaugeMaximum; /* 0xA78 and 0xA7A */
+    u16 secondaryGaugeTimer; /* 0xA7C: frames left on the second gauge */
+    u8 secondaryGaugeFlashTimer, transientGaugeVisible; /* 0xA7E and 0xA7F */
     u16 pulseFrame; /* 0xA80: wraps at 128 */
     u8 unknownA82[0x12];
     u8 panelInitialized; /* 0xA94: cleared during gameplay HUD resource setup (tentative) */

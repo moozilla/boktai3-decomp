@@ -2,7 +2,6 @@
 #include "render.h"
 #include "ram.h"
 #include "runtime.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z;
 };
@@ -32,6 +31,15 @@ static inline s32 divide2(s32 input)
 {
     return input >= 0 ? input >> 1 : -((-input) >> 1);
 }
+static inline s32 SpriteOam_AllocateAffineMatrix(u8 angle, s8 sx, s8 sy, s32 *count)
+{
+    if (*count > 31)
+        return 0;
+    gSpriteAffineParams[*count].angle = angle;
+    gSpriteAffineParams[*count].scaleX = sx;
+    gSpriteAffineParams[*count].scaleY = sy;
+    return (*count)++;
+}
 void SpriteOam_QueueCameraRelativeSprites(void)
 {
 
@@ -49,15 +57,17 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         s32 x, y;
         s32 z;
         u32 flags;
-        register u32 attr asm("r5");
+        u32 attr;
         s32 depth;
         s32 ox, oy;
         u32 initialFlags = p->flags;
         u32 t = initialFlags;
         t &= skip;
         flags = initialFlags;
-        if (t)
-            goto next;
+        if (t) {
+            p = p->next;
+            continue;
+        }
 
         x = divide8(p->pos.x - gCamera.position.x) + 120;
         y = divide8(p->pos.y - gCamera.position.y) + 80;
@@ -69,8 +79,10 @@ void SpriteOam_QueueCameraRelativeSprites(void)
             if (!cull) {
                 u32 width = p->width, height = p->height;
                 s32 left = x + ox, top = y + oy;
-                if (left > 240 || top > 160 || left + (s32)width < 0 || top + (s32)height < 0)
-                    goto next;
+                if (left > 240 || top > 160 || left + (s32)width < 0 || top + (s32)height < 0) {
+                    p = p->next;
+                    continue;
+                }
             }
         }
         x += ox;
@@ -95,20 +107,7 @@ void SpriteOam_QueueCameraRelativeSprites(void)
             angle = p->angle;
             sx = (s8)p->scaleX;
             sy = (s8)p->scaleY;
-            if (*matrixCount > 31)
-                matrix = 0;
-            else {
-                s32 *count = matrixCount;
-                gSpriteAffineParams[*count].angle = angle;
-                gSpriteAffineParams[*count].scaleX = sx;
-                gSpriteAffineParams[*count].scaleY = sy;
-                {
-                    register s32 old asm("r0") = *count;
-                    matrix = old;
-                    ++old;
-                    *count = old;
-                }
-            }
+            matrix = SpriteOam_AllocateAffineMatrix(angle, sx, sy, &gAffineRequestCount);
             attr |= matrix << 25;
             flags = p->flags;
         }

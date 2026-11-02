@@ -1,41 +1,49 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "scene_input.h"
 #include "menu_parameters.h"
 // confidence=low: background, labels, animations and menu selection initialization.
-// fix.py best (sweep after the inlined-insn fix)
-struct Rect {
+struct OptionsTextRect {
     u16 x, y, width, height;
 };
-void Bg_ClearTilemap(s32);
-void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
-void *ScriptProc_Start(s32, s32);
 void Bg_SetupLayers(s32, s32, void *, s32, s32, s32, void *);
-void CpuSet(const void *, void *, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, s32);
 void Menu_SetTextRect(void *, void *);
 void Menu_EraseRect(s32, s32, s32, s32);
-void Menu_DrawStringRef(s32, s32, u32, s32);
+void Menu_DrawStringRef(s32, s32, const u8 *, s32);
 void Menu_StartFadeIn(s32);
-struct OptionsHalfword {
-    u16 value;
+struct OptionsWidget {
+    struct SceneInputWidget sprite;
+    struct SceneInputResource graphics;
+    u8 unknown80[8];
 };
-#define W(o) (*(u32 *)(p + (o)))
-s32 Options_InitScreen(u8 *arg)
+struct OptionsScreen {
+    u8 task[0x1C];
+    s32 selection, choice;
+    struct OptionsWidget background, menu, cursor, leftArrow, rightArrow;
+    u8 unknown2CC[0xC];
+    u32 fade;
+    u16 *originalPalette;
+    u16 highlightPalette[16];
+};
+s32 Options_InitScreen(struct OptionsScreen *screen)
 {
-    u8 *p = arg;
-    u32 zero;
+    struct SceneInputResource *backgroundGraphics;
+    struct SceneInputResource *cursorGraphics;
+    struct SceneInputResource *leftArrowGraphics;
+    struct SceneInputResource *menuGraphics;
+    struct SceneInputWidget *leftArrow;
+    struct SceneInputWidget *rightArrow;
+    u16 *highlightPalette;
+    u16 *originalPalette;
+    s32 layer;
+    struct OptionsScreen *state;
+    struct OptionsTextRect rect;
     u32 one;
-    void *resource;
+    u32 zero;
     void *background;
     void *palette;
-    register void *graphics asm("r4");
-    void *sprite;
-    void *sprite2;
-    void *tiles;
-    s32 layer;
-    struct Rect rect;
+    void *resource;
+    state = screen;
     Bg_ClearTilemap(0);
     zero = 0;
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
@@ -49,53 +57,53 @@ s32 Options_InitScreen(u8 *arg)
     palette = ScriptProc_Start(0x92B3, 0x204);
     CpuSet(((u8 *)palette) + 0x14, gBgPaletteBuffer, 0x100);
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
-    graphics = p + 0x84;
-    ResourceHeader_Relocate(graphics, resource);
-    Widget_InitLinked(p + 0x24, graphics, 0x3A, 0x10, zero, zero, zero, zero);
+    backgroundGraphics = &screen->background.graphics;
+    ResourceHeader_Relocate(backgroundGraphics, resource);
+    Widget_InitLinked(&screen->background.sprite, backgroundGraphics, 0x3A, 0x10, zero, zero, zero,
+                      0);
     resource = ScriptProc_Start(0xCB05, 0x530D);
-    graphics = p + 0x10C;
-    ResourceHeader_Relocate(graphics, resource);
-    Widget_InitLinked(p + 0xAC, graphics, 0x8A, 0x10, zero, zero, zero, zero);
-    graphics = p + 0x194;
-    ResourceHeader_Relocate(graphics, resource);
-    Widget_InitLinked(p + 0x134, graphics, 0x47, 0x10, zero, zero, zero, zero);
-    graphics = p + 0x21C;
-    ResourceHeader_Relocate(graphics, resource);
-    sprite = p + 0x1BC;
-    Widget_InitLinked(sprite, graphics, 0x45, 0x10, zero, zero, zero, zero);
+    menuGraphics = &screen->menu.graphics;
+    ResourceHeader_Relocate(menuGraphics, resource);
+    Widget_InitLinked(&screen->menu.sprite, menuGraphics, 0x8A, 0x10, zero, zero, zero, 0);
+    cursorGraphics = &screen->cursor.graphics;
+    ResourceHeader_Relocate(cursorGraphics, resource);
+    Widget_InitLinked(&screen->cursor.sprite, cursorGraphics, 0x47, 0x10, zero, zero, zero, 0);
+    leftArrowGraphics = &screen->leftArrow.graphics;
+    ResourceHeader_Relocate(leftArrowGraphics, resource);
+    leftArrow = &screen->leftArrow.sprite;
+    Widget_InitLinked(leftArrow, leftArrowGraphics, 0x45, 0x10, zero, zero, zero, 0);
     rect.x = 0x40;
     rect.y = 0x60;
     rect.width = 0;
-    Menu_SetTextRect(sprite, &rect);
-    graphics = p + 0x2A4;
-    ResourceHeader_Relocate(p + 0x2A4, resource);
-    sprite2 = p + 0x244;
-    Widget_InitLinked(sprite2, p + 0x2A4, 0x46, 0x10, zero, zero, zero, zero);
+    Menu_SetTextRect(leftArrow, &rect);
+    ResourceHeader_Relocate(&screen->rightArrow.graphics, resource);
+    rightArrow = &screen->rightArrow.sprite;
+    Widget_InitLinked(rightArrow, &screen->rightArrow.graphics, 0x46, 0x10, zero, zero, zero, 0);
     rect.x = 0xD8;
     rect.y = 0x60;
     rect.width = 0;
-    Menu_SetTextRect(sprite2, &rect);
-    *((u32 *)(p + 0x13C)) |= one;
-    *((u32 *)(p + 0x1C4)) |= one;
-    *((u32 *)(p + 0x24C)) |= one;
-    tiles = (void *)(*((u32 *)(p + 0x2DC)) = *((u32 *)(p + 0x17C)));
-    graphics = p + 0x2E0;
-    CpuSet(tiles, graphics, 0x10);
-    *((u32 *)(p + 0x17C)) = (u32)graphics;
-    ((struct OptionsHalfword *)(p + 0x16E))->value = 0xE010;
+    Menu_SetTextRect(rightArrow, &rect);
+    screen->cursor.sprite.flags |= one;
+    screen->leftArrow.sprite.flags |= one;
+    screen->rightArrow.sprite.flags |= one;
+    originalPalette = screen->originalPalette = screen->cursor.sprite.palette;
+    highlightPalette = screen->highlightPalette;
+    CpuSet(originalPalette, highlightPalette, 0x10);
+    screen->cursor.sprite.palette = highlightPalette;
+    screen->cursor.sprite.paletteBank = 0xE010;
     Menu_EraseRect(4, 4, 24, 6);
     Menu_EraseRect(4, 12, 4, 2);
     Menu_DrawStringRef(4, 4, gChoiceMenuParameters.mBlock, 0);
     Menu_DrawStringRef(4, 8, gChoiceMenuParameters.mBlock, 1);
     Menu_DrawStringRef(4, 12, gChoiceMenuParameters.mBlock, 2);
-    *((u32 *)(p + 0x20)) = gChoiceMenuParameters.n2;
+    screen->choice = gChoiceMenuParameters.n2;
     Menu_EraseRect(9, 12, 18, 2);
-    Menu_DrawStringRef(9, 12, gChoiceMenuParameters.eBlock, *((u32 *)(p + 0x20)));
+    Menu_DrawStringRef(9, 12, gChoiceMenuParameters.eBlock, screen->choice);
     if ((gChoiceMenuParameters.b == 0) || (gChoiceMenuParameters.n == 2))
-        *((u32 *)(p + 0x2D8)) = 3;
+        state->fade = 3;
     else
-        *((u32 *)(p + 0x2D8)) = zero;
-    Menu_StartFadeIn(*((u32 *)(p + 0x2D8)));
-    *((u32 *)(p + 0x1C)) = gChoiceMenuParameters.n;
+        state->fade = zero;
+    Menu_StartFadeIn(state->fade);
+    state->selection = gChoiceMenuParameters.n;
     return 0;
 }

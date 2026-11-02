@@ -1,11 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
-void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *argument)
+static inline void SceneActorRegistry_ResetRouteState(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryResetView *actor = (void *)argument;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     struct SceneActorRegistryRoute *route = &actor->group.homeRoute;
-    register struct ContactCollider *collider asm("r9") = &actor->colliderA;
+    struct ContactCollider *collider = &actor->colliderA;
     struct ContactPosition *cachedPosition;
     struct ContactPosition *position;
     struct SceneActorRegistryControl *control;
@@ -101,7 +99,7 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
                 value &= clearMask;
                 *renderFlags = value;
                 offset = 0x2D4;
-                shortFlags = (u16 *)((u8 *)actor + offset);
+                shortFlags = &actor->flags2D4;
                 mask0 = 0xFFFFFDFF;
                 mask0 &= *shortFlags;
                 *shortFlags = mask0;
@@ -112,16 +110,13 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
         }
     }
     {
-        register u32 fieldOffset asm("r1") = 0x1E0;
+        u32 fieldOffset = 0x1E0;
         const u16 *base;
         const u16 *offset;
-        register u32 bank asm("r1");
-        asm("" : "+r"(fieldOffset));
+        u32 bank;
         base = (const u16 *)((u8 *)actor + fieldOffset);
-        fieldOffset += 6;
-        offset = (const u16 *)((u8 *)actor + fieldOffset);
+        offset = &actor->paletteOffset;
         bank = *base;
-        asm("" : "+r"(bank));
         bank += *offset;
         if (!actor->drawableKind)
             AnimData_SelectPaletteBank(
@@ -137,15 +132,14 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
         *renderFlags &= mask;
     }
     {
-        register u32 offset asm("r2") = 0x188;
-        asm("" : "+r"(offset));
-        Collider_SetPosition((u8 *)actor + offset, cachedPosition, 0);
+        u32 offset = 0x188;
+        Collider_SetPosition(&actor->colliderB, cachedPosition, 0);
     }
     Collider_SetPosition(collider, cachedPosition, 0);
     {
         u32 offset;
-        register u32 zero asm("r1");
-        register u16 *address asm("r0");
+        u32 zero;
+        u16 *address;
         struct ContactCollider *lowCollider = collider;
         u32 savedFlags = lowCollider->flags;
         u32 value;
@@ -154,10 +148,10 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
         zero = 0;
         collider->flags = value;
         offset = 0x1EA;
-        address = (u16 *)((u8 *)actor + offset);
+        address = &actor->field1EA;
         *address = zero;
         offset -= 2;
-        address = (u16 *)((u8 *)actor + offset);
+        address = &actor->field1E8;
         *address = zero;
     }
     {
@@ -168,4 +162,9 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
             ((u8 *)actor->drawable)[0x3A] = mode;
     }
     collider->responseValue = 0;
+}
+
+void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *argument)
+{
+    SceneActorRegistry_ResetRouteState((void *)argument);
 }

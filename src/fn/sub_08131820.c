@@ -1,8 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
 #include "scene_actor_control_phase.h"
+#include "scene_actor_chase_shared.h"
 #include "engine.h"
 #include "ram.h"
 u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
@@ -15,8 +15,6 @@ u32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-#define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
-
 static inline void SetState(struct SceneActorRegistryResetView *actor)
 {
     u32 behavior = 6;
@@ -26,38 +24,24 @@ static inline void SetState(struct SceneActorRegistryResetView *actor)
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-static inline void BeginRouteSelection(struct SceneActorRegistryResetView *actor, u8 *nav)
+static inline void BeginRouteSelection(struct SceneActorRegistryResetView *actor,
+                                       struct SceneActorChaseGroup *nav)
 {
-    u32 behaviorOffset;
     void *control;
-    u32 stateOffset = 0x2A8;
-    u32 controlOffset;
     u32 kind;
-    u8 *field;
     u32 behavior = 8;
     actor->state2A8 = 0;
     actor->phase2A9 = 0;
-    behaviorOffset = 0x2AA;
-    field = (u8 *)actor + behaviorOffset;
-    *field = behavior;
+    actor->behavior2AA = behavior;
     actor->counter2AC = 0;
-    stateOffset += 9;
-    field = (u8 *)actor + stateOffset;
-    *field = 1;
+    actor->field2B1 = 1;
     /* The route callback is installed after the reset fields. */
-    control = FIELD(nav, 0x214, void *);
+    control = nav->routeChoiceControl;
     kind = 0x13;
-    behaviorOffset += 8;
-    field = (u8 *)actor + behaviorOffset;
-    *field = 1;
-    controlOffset = 0x2B0;
-    FIELD(actor, controlOffset, u8) = 0;
-    behaviorOffset += 3;
-    field = (u8 *)actor + behaviorOffset;
-    *field = kind;
-    controlOffset -= 0x94;
-    field = (u8 *)actor + controlOffset;
-    *(void **)field = control;
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->target = control;
     actor->field2C8 = 0;
     {
         u32 *flags = &actor->flags114;
@@ -66,19 +50,7 @@ static inline void BeginRouteSelection(struct SceneActorRegistryResetView *actor
     }
     actor->word104 = 0;
 }
-
-s32 Mod(s32, s32);
 void SceneActorMovement_ResolveRoutePosition(void *);
-struct RoutePoints {
-    u8 count, unknown1;
-    u16 offset;
-};
-struct RouteSelection {
-    u8 unknown0[2];
-    u8 index, phase;
-    struct RoutePoints *points;
-    void *current;
-};
 static inline u8 InLinkMode(u32 value, u32 mask)
 {
     if (value & mask)
@@ -87,13 +59,13 @@ static inline u8 InLinkMode(u32 value, u32 mask)
 }
 void SceneActorControl_UpdateRouteApproach(struct SceneActorRegistryResetView *actor)
 {
-    u8 *nav = (u8 *)actor + 0x3D4;
+    struct SceneActorChaseGroup *nav = &actor->group;
     s32 speed;
     u32 event;
     u16 *scale;
     if (actor->field2B1)
         actor->field2B1 = 0;
-    speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
+    speed = Callback_InvokeActor(actor, actor->animationQuery.opaque);
     {
         u32 mask = 0xA02F;
         u16 *flagAddress = &actor->flags2D4;
@@ -110,52 +82,24 @@ void SceneActorControl_UpdateRouteApproach(struct SceneActorRegistryResetView *a
         }
     }
     if (actor->drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
+        Anim_SetDurationScale(
+            ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
-    event = NavMesh_ConsumeProbeEvent(FIELD(nav, 0x1FC, void *));
+        Anim_SetFrameDurationScale(
+            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *scale);
+    event = NavMesh_ConsumeProbeEvent(nav->route);
     if (event) {
-        if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(nav, 0x1FC, void *), 0x20, 0x20,
-                                                     speed)) {
+        if (SceneActorBehavior_RequestDescriptorTurn(actor, nav->route, 0x20, 0x20, speed)) {
             SetState(actor);
         }
-    } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(nav, 0x1FC, void *), 0x20,
-                                                             0x20, speed)) {
+    } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, nav->route, 0x20, 0x20,
+                                                             speed)) {
         BeginRouteSelection(actor, nav);
         if (!InLinkMode(gEngineFlags, 0x4800)) {
-            struct RouteSelection *route = actor->body.currentRoute;
-            u8 choice;
-            {
-                u32 index = (gRandomIndex + 1) & 1023;
-                s32 value;
-                gRandomIndex = index;
-                index *= 2;
-                value = *(const u16 *)((u32)gRandomTable + index);
-                value >>= 3;
-                choice = Mod(value, route->points->count);
-            }
-            {
-                register u32 previous asm("r2") = route->index;
-                asm("" : : "r"(previous));
-                if (choice == previous)
-                    choice = Mod(choice + 1, route->points->count);
-            }
-            route->index = choice;
-            route->phase = 0;
-            {
-                u8 *base = *(void **)((u8 *)gTerrainMap + 0x10);
-                base += route->points->offset;
-                route->current = base + route->index * 8;
-            }
+            SceneActorChase_ChooseRoute(actor);
             SceneActorMovement_ResolveRoutePosition(actor);
         }
         return;
     }
-    {
-        register u32 offset asm("r3") = 0x2AC;
-        register u32 *counter asm("r1");
-        asm("" : : "r"(offset));
-        counter = (void *)((u8 *)actor + offset);
-        ++*counter;
-    }
+    actor->counter2AC++;
 }

@@ -1,53 +1,59 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "contact_actor.h"
+#include "contact_collider.h"
 
-void Collision_CalculateDamageResponse(void *);
-void PlayerStats_AddContactHundredths(void *, void *, u32);
-s32 Math_Atan2(s32, s32);
-struct ActorImpact {
-    u8 pad[0xbc];
-    u32 valuebc, valuec0;
-    u8 padc4[0x1e];
-    u8 kind;
-    u8 pade3[0x387];
-    u16 value46a;
-    u32 flags46c;
-    u8 active, direction, value472;
-    u8 pad473[0x7b];
-    u16 value4ee;
+struct BossContact {
+    u8 unknown0[0xBC];
+    u32 rewardMask, hitAttributes;
+    u8 unknownC4[0xE2 - 0xC4];
+    u8 damageBonus;
 };
-void ActorImpact_CopyContact(struct ContactCollider *a, struct ContactCollider *b,
-                             struct ActorImpact *c)
+struct ImpactActor {
+    struct BossContact base;
+    u8 unknownE4[0x46A - 0xE4];
+    u16 damage;
+    u32 hitAttributes;
+    u8 hitByLight, hitDirection, hitParameter;
+    u8 unknown473[0x4EE - 0x473];
+    u16 response;
+};
+void Collision_CalculateDamageResponse(struct ContactCollider *, struct ContactCollider *);
+void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
+s32 Math_Atan2(s32, s32);
+static inline void SetRewardMask(struct BossContact *boss, u32 value)
 {
-    u8 *d = (u8 *)c;
-    u8 *q;
-    u32 v;
-    int mask;
-    Collision_CalculateDamageResponse(a);
-    ((struct ActorImpact *)c)->value46a = b->cost;
-    mask = 0x100;
-    if (a->flags & mask)
-        ((struct ActorImpact *)c)->direction = a->direction;
+    boss->rewardMask = value;
+}
+static inline void SetHitAttributes(struct BossContact *boss, u32 value)
+{
+    boss->hitAttributes = value;
+}
+void ActorImpact_CopyContact(struct ContactCollider *attack, struct ContactCollider *defense,
+                             struct ImpactActor *actor)
+{
+    struct BossContact *boss = &actor->base;
+    u32 rewardMask;
+    u32 attributes;
+    u16 angleFlag;
+    Collision_CalculateDamageResponse(attack, defense);
+    actor->damage = defense->cost;
+    angleFlag = 0x100;
+    if (attack->flags & angleFlag)
+        actor->hitDirection = attack->direction;
     else
-        ((struct ActorImpact *)c)->direction = Math_Atan2(b->x - a->x, b->z - a->z);
-    ((struct ActorImpact *)c)->value472 = a->responseParameter;
-    v = a->statRewardFlags;
-    q = d + 0xbc;
-    *(u32 *)q = v;
-    asm("" : "+r"(q));
-    v = a->reactionFlags;
-    q += 4;
-    *(u32 *)q = v;
-    q += 0x22;
-    PlayerStats_AddContactHundredths(a, b, *q);
+        actor->hitDirection = Math_Atan2(defense->x - attack->x, defense->z - attack->z);
+    actor->hitParameter = attack->responseParameter;
+    rewardMask = attack->statRewardFlags;
+    SetRewardMask(boss, rewardMask);
+    attributes = attack->reactionFlags;
+    SetHitAttributes(boss, attributes);
+    PlayerStats_AddContactHundredths(attack, defense, boss->damageBonus);
     {
         u32 one = 1;
-        if (a->reactionFlags & one)
-            ((struct ActorImpact *)c)->active = one;
+        if (attack->reactionFlags & one)
+            actor->hitByLight = one;
     }
-    v = a->reactionFlags;
-    ((struct ActorImpact *)c)->flags46c = v;
-    ((struct ActorImpact *)c)->value4ee = a->responseValue;
-    PlayerStats_AddContactHundredths(a, b, 12);
+    attributes = attack->reactionFlags;
+    actor->hitAttributes = attributes;
+    actor->response = attack->responseValue;
+    PlayerStats_AddContactHundredths(attack, defense, 12);
 }

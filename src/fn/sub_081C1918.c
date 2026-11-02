@@ -1,57 +1,43 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "player.h"
 
+struct ControlPanelGauge {
+    u8 unknown0[0x30];
+    s16 frame;
+    u8 unknown32[0x68 - 0x32];
+    u16 phase;
+    u8 unknown6A[0x57C - 0x6A];
+    u16 soundTicks;
+};
 s32 Div(s32, s32);
-void Sound_PlaySong(u32 song);
+void Sound_PlaySong(u32);
 
-void ControlPanel_UpdateGaugeIndicator(struct Player *p)
+void ControlPanel_UpdateGaugeIndicator(struct ControlPanelGauge *gauge)
 {
-    register u32 v asm("r0");
-    s32 inc;
-    {
-        register u8 *b asm("r0") = (u8 *)gPlayers[0];
-        u32 off;
-        register u16 *q asm("r1");
-        off = 0x524;
-        q = (u16 *)(b + off);
-        v = *q;
+    s32 increment;
+    if (gPlayers[0]->indicatorUpdateRate) {
+        increment = Div(128, gPlayers[0]->indicatorUpdateRate);
+        if (increment <= 0)
+            increment = 1;
+    } else {
+        increment = 1;
     }
-
-    if (v != 0) {
-        {
-            u32 a = v;
-            inc = Div(0x80, a);
-        }
-        if (inc <= 0)
-            inc = 1;
-    } else
-        inc = 1;
-
-    p->indicatorStep = p->indicatorStep + inc;
-    if (p->indicatorStep > 0xb)
-        p->indicatorStep = p->indicatorStep - 0xc;
-    p->position.x = p->indicatorStep >> 2;
-
-    if (p->indicatorTickCounter == 0) {
-        u32 seg;
-        {
-            u8 *b = (u8 *)gPlayers[0];
-            u32 off;
-            off = 0x522;
-            seg = *(u16 *)(b + off);
-        }
-        if (seg <= 1)
+    gauge->phase += increment;
+    if (gauge->phase > 11)
+        gauge->phase -= 12;
+    gauge->frame = gauge->phase >> 2;
+    if (!gauge->soundTicks) {
+        u16 taps = gPlayers[0]->displaySegmentCount;
+        if (taps <= 1)
             Sound_PlaySong(0x23A);
-        else if (seg <= 3)
+        else if (taps <= 3)
             Sound_PlaySong(0x23B);
-        else if (seg <= 5)
-            Sound_PlaySong(0x8f << 2);
+        else if (taps <= 5)
+            Sound_PlaySong(0x23C);
         else
             Sound_PlaySong(0x23D);
     }
-
-    p->indicatorTickCounter = p->indicatorTickCounter + 1;
-    if (p->indicatorTickCounter > 9)
-        p->indicatorTickCounter = 0;
+    gauge->soundTicks++;
+    if (gauge->soundTicks > 9)
+        gauge->soundTicks = 0;
 }

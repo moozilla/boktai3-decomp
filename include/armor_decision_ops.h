@@ -8,10 +8,6 @@
         if ((value) < 0)                                                                           \
             (magnitude) = -(value);                                                                \
     } while (0)
-#define ARMOR_CLEAR_DECISION(field)                                                                \
-    do {                                                                                           \
-        *(field) = 0;                                                                              \
-    } while (0)
 #define ARMOR_BRANCH_OUTSIDE_GRID(magnitude, maximum, label)                                       \
     do {                                                                                           \
         if ((magnitude) > (maximum))                                                               \
@@ -34,11 +30,6 @@
 #define ARMOR_CAPTURE_COMPONENT_DELTA(out, target, actor)                                          \
     do {                                                                                           \
         (out) = (target) - (actor);                                                                \
-    } while (0)
-#define ARMOR_BRANCH_AXIS_UNALIGNED(x, z, label)                                                   \
-    do {                                                                                           \
-        if ((x) != 0 && (z) != 0)                                                                  \
-            goto label;                                                                            \
     } while (0)
 
 /* Grid-cell deltas from actor to target: x and z rounded to 256-unit cells, with each

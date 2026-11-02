@@ -1,54 +1,36 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
-struct PairE7 {
-    u32 a, b;
-};
-u32 Player_GetConfiguredActionPower(u8 *);
-u32 Player_CollectCallbackFlags(u8 *);
-void Player_ConsumeActionResource(u8 *);
-void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
-void sub_0823E704(u8 *p)
+#include "player.h"
+u32 Player_GetConfiguredActionPower(struct Player *);
+u32 Player_CollectCallbackFlags(struct Player *);
+void Player_ConsumeActionResource(struct Player *);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
+void sub_0823E704(struct Player *p)
 {
-    u8 *q = p + 0xb44;
+    struct PlayerStatModifierContext *q = &p->statModifierContext;
     u32 resource, flags;
-    *(struct PairE7 *)(p + 0xbe8) = *(struct PairE7 *)(p + 0x30);
-    *(u16 *)(p + 0xbea) += 230;
-    {
-        u32 x = p[0x3a4] + 5;
-        u32 m = 7;
-        u32 v;
-        asm("" : "+r"(m));
-        v = (x & m) << 5;
-        p[0xc0c] = v;
-    }
+    q->contactOrigin = p->position;
+    q->contactOrigin.y += 230;
+    q->contactHeading = ((p->facing + 5) & 7) << 5;
     resource = Player_GetConfiguredActionPower(p);
     flags = Player_CollectCallbackFlags(p);
-    if (p[0x418] == 1) {
-        *(u16 *)(p + 0xc00) = 29;
-        *(u16 *)(p + 0xc08) = 7;
-        *(u16 *)(p + 0xc04) = 4;
-        *(u16 *)(p + 0xc06) = 6;
+    if (p->actionMode == 1) {
+        q->contactExtentA = 29;
+        q->contactCounter = 7;
+        q->contactExtentB = 4;
+        q->contactExtentC = 6;
         flags |= 0x40000;
     } else {
-        *(u16 *)(p + 0xc00) = 19;
-        *(u16 *)(p + 0xc08) = 11;
-        *(u16 *)(p + 0xc04) = 6;
-        *(u16 *)(p + 0xc06) = 9;
+        q->contactExtentA = 19;
+        q->contactCounter = 11;
+        q->contactExtentB = 6;
+        q->contactExtentC = 9;
     }
-    {
-        s8 *bp = (s8 *)(q + 0xc9);
-        if (*bp >= 0) {
-            flags |= 1U << *bp;
-            Player_ConsumeActionResource(p);
-        }
+    if (q->savedActionIndex >= 0) {
+        flags |= 1u << q->savedActionIndex;
+        Player_ConsumeActionResource(p);
     }
-    Collider_SetAttackProperties(q + 0x48, resource, *(u16 *)(q + 0xb8), 4, flags,
-                                 *(u16 *)(q + 0xba));
-    {
-        u8 h = q[0xc8];
-        u8 *d = q + 0x8a;
-        u16 z = 0;
-        *d = h;
-        *(u16 *)(q + 0xc6) = z;
-    }
+    Collider_SetAttackProperties(&q->drain, resource, q->actionTimer, 4, flags,
+                                 q->contactParameter);
+    q->contactDirection = q->contactHeading;
+    q->contactTimer = 0;
 }

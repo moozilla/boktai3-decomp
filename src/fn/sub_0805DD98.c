@@ -1,16 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_hud_map.h"
-void SceneHud_DrawDecimal(s32 value, s32 divisor, u32 x, u32 y, s32 style)
+static inline void DrawDecimalDigits(u16 *cell, s32 value, s32 divisor, s32 style)
 {
-    u16 *cell;
-    s32 base;
-    {
-        register s32 initial asm("r5") = value;
-        asm("" : "+r"(initial));
-        value = initial;
-    }
-    cell = SceneHud_GetMapCell(0, x, y);
-    base = (style << 4) + 0x21;
+    s32 base = (style << 4) + 0x21;
     if (divisor > 0) {
         do {
             s32 digit = Div(value, divisor);
@@ -20,4 +11,9 @@ void SceneHud_DrawDecimal(s32 value, s32 divisor, u32 x, u32 y, s32 style)
             divisor = Div(divisor, 10);
         } while (divisor > 0);
     }
+}
+void SceneHud_DrawDecimal(s32 value, s32 divisor, u32 x, u32 y, s32 style)
+{
+    u16 *cell = SceneHud_GetMapCell(0, x, y);
+    DrawDecimalDigits(cell, value, divisor, style);
 }

@@ -1,10 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
 
-#define MapMenu_GetMarkerKind    MapScreen_GetMarkerType
-#define MapMenu_GetMarkerVariant MapScreen_GetMarkerFlipFlags
-#define MapMenu_GetTileAddress   Hud_GetTilemapCell
 struct MapMenuMarker {
     u8 type, page, x, y;
 };
@@ -18,28 +14,18 @@ struct MapMenu {
 u32 MapScreen_GetMarkerType(u32);
 s32 MapScreen_GetMarkerFlipFlags(s32);
 u16 *Hud_GetTilemapCell(u32, s32, s32);
-static inline s32 MapMenu_MarkerAttributes(s32 variant)
+static inline s16 MapMenu_MarkerAttributes(s32 flip, s32 normal, s32 flipped)
 {
-    if (variant) {
-        register s32 attributes asm("r2") = (s16)0xE400;
-        asm("" : "+r"(attributes));
-        return attributes;
-    } else {
-        register s32 attributes asm("r1") = (s16)0xE000;
-        asm("" : "+r"(attributes));
-        return attributes;
-    }
-}
-static inline struct MapMenuMarker *MarkerAt(struct MapMenuMarker **array, s32 index)
-{
-    register s32 offset asm("r1") = index * 4;
-    register struct MapMenuMarker *base asm("r0") = *array;
-    return (struct MapMenuMarker *)((u8 *)base + offset);
+    if (flip)
+        return flipped;
+    return normal;
 }
 void MapMenu_DrawActiveMarkers(struct MapMenu *menu, s32 left, s32 top)
 {
+    s32 normal = (s16)0xE000;
+    s32 flipped = (s16)0xE400;
     s32 i;
-    register struct MapMenuMarker *marker asm("r6");
+    struct MapMenuMarker *marker;
     u32 kind;
     u32 tile;
     u16 *dest;
@@ -47,13 +33,13 @@ void MapMenu_DrawActiveMarkers(struct MapMenu *menu, s32 left, s32 top)
     if (menu->markers == 0)
         return;
     for (i = 0; i <= 31; i++) {
-        marker = MarkerAt(&menu->markers, i);
+        marker = &menu->markers[i];
         kind = MapScreen_GetMarkerType(marker->type);
         if (kind == 0)
             break;
         if (marker->page != menu->page)
             continue;
-        if (!((*(s32 *)((u8 *)gGameState + (s16)gGameState->savedX * 4 + 0x5C0) >> i) & 1))
+        if (!((((s32 *)gGameState->unk5C0)[(s16)gGameState->savedX] >> i) & 1))
             continue;
         x = marker->x;
         y = marker->y;
@@ -78,11 +64,7 @@ void MapMenu_DrawActiveMarkers(struct MapMenu *menu, s32 left, s32 top)
                 break;
         }
         dest = Hud_GetTilemapCell(1, x, y);
-        {
-            register s32 attributes asm("r0") =
-                MapMenu_MarkerAttributes(MapScreen_GetMarkerFlipFlags(marker->type));
-            asm("" : "+r"(attributes));
-            *dest = tile | attributes;
-        }
+        *dest = tile | MapMenu_MarkerAttributes(MapScreen_GetMarkerFlipFlags(marker->type), normal,
+                                                flipped);
     }
 }

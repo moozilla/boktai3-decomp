@@ -20,10 +20,6 @@ void sub_08215AC4(s32 bg, s32 mode);
 void Bg_SetTileUpload(s32 bg, u32 tiles, s32 offset, u16 size);
 void Text_ClearGlyphCache(void);
 void *Video_GetBackgroundMap(u32);
-static inline void enableBg(s32 bits)
-{
-    gDispCntShadow |= bits;
-}
 /* Sets up the background layers of a map resource for one of eight layer
    modes: picks the BGs (sub_08215AC4) and DISPCNT bits, loads the tiles
    (Bg_SetTileUpload) and fills each layer's gBgRecords entry from the map
@@ -45,59 +41,59 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgResource *res, u16 x, u16
             bgs[0] = 0;
             n = 1;
             offset = 0x8000;
-            enableBg(0x100);
+            Bg_EnableDisplay(0x100);
             sub_08215AC4(0, 2);
             break;
         case 1:
             sub_08215AC4(bgs[0] = 2, 0);
             if (count == 2) {
-                enableBg(0x800);
+                Bg_EnableDisplay(0x800);
                 sub_08215AC4(bgs[1] = 3, 0);
                 n = 2;
             } else
                 n = 1;
             offset = hdr.size << 5;
-            enableBg(0x400);
+            Bg_EnableDisplay(0x400);
             break;
         case 2:
             sub_08215AC4(bgs[0] = 3, 0);
             n = 1;
             offset = hdr.size << 5;
-            enableBg(0x800);
+            Bg_EnableDisplay(0x800);
             break;
         case 3:
             sub_08215AC4(bgs[0] = 1, 0);
             n = 1;
             offset = hdr.size << 5;
-            enableBg(0x200);
+            Bg_EnableDisplay(0x200);
             break;
         case 4:
             sub_08215AC4(bgs[0] = 1, 0);
             if (count == 2) {
-                enableBg(0x800);
+                Bg_EnableDisplay(0x800);
                 sub_08215AC4(bgs[1] = 3, 0);
                 n = 2;
             } else
                 n = 1;
             offset = hdr.size << 5;
-            enableBg(0x200);
+            Bg_EnableDisplay(0x200);
             break;
         case 5:
             sub_08215AC4(bgs[0] = 2, 0);
             if (count == 2) {
-                enableBg(0x200);
+                Bg_EnableDisplay(0x200);
                 sub_08215AC4(bgs[1] = 1, 0);
                 n = 2;
             } else
                 n = 1;
             offset = hdr.size << 5;
-            enableBg(0x400);
+            Bg_EnableDisplay(0x400);
             break;
         case 6:
             sub_08215AC4(bgs[0] = 1, 2);
             n = 1;
             offset = 0x8000;
-            enableBg(0x200);
+            Bg_EnableDisplay(0x200);
             break;
         case 7:
             n = 3;
@@ -108,9 +104,9 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgResource *res, u16 x, u16
             sub_08215AC4(3, 0);
             sub_08215AC4(1, 0);
             {
-                enableBg(0x200);
-                enableBg(0x400);
-                enableBg(0x800);
+                Bg_EnableDisplay(0x200);
+                Bg_EnableDisplay(0x400);
+                Bg_EnableDisplay(0x800);
             }
             offset = hdr.size << 5;
             break;

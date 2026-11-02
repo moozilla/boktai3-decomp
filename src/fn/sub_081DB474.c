@@ -1,10 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "menu_parameters.h"
 #include "input.h"
 struct Rect {
-    u32 xy;
-    u16 width, height;
+    u32 x : 16, y : 16;
+    u32 z : 16, w : 16;
 };
 struct Message {
     u32 count : 16;
@@ -90,10 +89,9 @@ void Options_UpdateScreen(u8 *p)
                 gChoiceMenuParameters.n2 = W(0x20);
             }
             {
-                u32 mask = 0xFFFF0000;
-                asm volatile("" : : "r"(mask));
-                rect.xy = (W(0x1C) << 21) + 0x200000;
-                rect.width = 0;
+                rect.x = 0;
+                rect.y = W(0x1C) * 32 + 32;
+                rect.z = 0;
             }
             Menu_SetTextRect(p + 0x134, &rect);
             W(0x13C) &= ~1;

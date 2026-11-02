@@ -87,12 +87,7 @@ void Hresvelgr_UpdateAlternatingVolley(struct Hresvelgr *actor)
                 register s32 speed asm("r2");
                 s32 duration;
                 angle &= 255;
-                {
-                    register u32 mask asm("r3");
-                    localIndex++;
-                    mask = 1023;
-                    localIndex &= mask;
-                }
+                localIndex = (localIndex + 1) & 1023;
                 *index = localIndex;
                 {
                     s32 sample = RandomAt(table, localIndex) >> 3;
@@ -107,17 +102,7 @@ void Hresvelgr_UpdateAlternatingVolley(struct Hresvelgr *actor)
                 }
                 DirectionBurst_Emit(&pos, angle, speed, duration);
             }
-            {
-                s32 minus = -1;
-                register s32 test asm("r1");
-                asm("" : "+r"(minus));
-                i += minus;
-                test = i;
-                asm("" : "+r"(test));
-                if (test < 0)
-                    break;
-            }
-        } while (1);
+        } while (--i >= 0);
         if (gHresvelgrVolleyCount > 15) {
             actor->finished = 1;
             Anim_SetFrameDurationScale(saved->animation, 64);

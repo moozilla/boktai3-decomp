@@ -71,6 +71,7 @@ s32 Background_ApplyQueuedCommands(struct Background *p)
 // MATCHING_CONCESSION: register-pinning
 s32 Background_Update(struct Background *p)
 {
+    s32 remaining;
     s32 x, y;
     s32 tileX, tileY;
 
@@ -128,7 +129,7 @@ s32 Background_Update(struct Background *p)
     } else {
         if (p->flags & 4) {
             if (p->scrollDuration) {
-                s32 remaining = p->scrollDuration - p->scrollTime;
+                remaining = p->scrollDuration - p->scrollTime;
                 asm("" : "+r"(remaining));
                 p->scrollSpeedX =
                     Div(p->scrollStartX * remaining + p->scrollTargetX * p->scrollTime,
@@ -151,7 +152,7 @@ s32 Background_Update(struct Background *p)
             p->y = p->scrollDistY + p->baseY;
         } else if (p->moveActive == 1) {
             if (p->moveDuration) {
-                register s32 remaining asm("r5") = p->moveDuration - p->moveTime;
+                remaining = p->moveDuration - p->moveTime;
                 p->x =
                     Div(p->moveOriginX * remaining + p->moveTargetX * p->moveTime, p->moveDuration);
                 p->y =

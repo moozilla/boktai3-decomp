@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
@@ -35,6 +34,11 @@ static inline s32 TerrainCell_GetIndex(struct TerrainPos *pos)
             cell = &((struct TerrainCellList *)gTerrainMap->cells)->cells[index];                  \
     }
 
+static inline void TerrainCell_MoveToPreviousRow(s32 *cellIndex)
+{
+    *cellIndex -= gTerrainWidth;
+}
+/* Check whether the two terrain cells connect along their stair axes. */
 u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
 {
     u16 toIndex;
@@ -45,8 +49,8 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
     u16 toFlags;
     u32 mask;
     s32 limit;
-    register s32 diff asm("r2");
-    s32 n;
+    s32 cellDelta;
+    s32 neighborIndex;
     u32 fromKind;
     u32 toKind;
     toIndex = TerrainCell_GetIndex(to);
@@ -66,9 +70,9 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
         limit = 100;
     }
     if (toFlags & mask)
-        goto ret1;
+        goto blocked;
     if (sub_0821BE3C(from, to) > limit)
-        goto ret1;
+        goto blocked;
     fromIndex = TerrainCell_GetIndex(from);
     {
         u8 *found = TerrainModifiers_FindCellOverride(fromIndex, 1);
@@ -79,98 +83,99 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
     };
     fromKind = fromCell->shapeAndHeight >> 4;
     toKind = toCell->shapeAndHeight >> 4;
-    diff = toIndex - fromIndex;
+    cellDelta = toIndex - fromIndex;
     if (fromKind == 1) {
-        if ((diff != 1) && (diff != (-1)))
+        if ((cellDelta != 1) && (cellDelta != (-1)))
             return 1;
         if ((gGameState->flags868 & 0x10) && (toFlags & 0x80))
-            goto ret1;
+            goto blocked;
         if (toKind != 0)
             return 1;
         if ((to->z & 0xFF) <= 0x7F) {
-            n = toIndex - gTerrainWidth;
-            CELL_AT(cell, n);
+            neighborIndex = toIndex;
+            TerrainCell_MoveToPreviousRow(&neighborIndex);
+            CELL_AT(cell, neighborIndex);
         } else {
-            n = toIndex + gTerrainWidth;
-            CELL_AT(cell, n);
+            neighborIndex = toIndex + gTerrainWidth;
+            CELL_AT(cell, neighborIndex);
         }
         {
             u32 cellHeight, referenceHeight;
             if (cell->shapeAndHeight >> 4)
-                goto ret1;
+                goto blocked;
             cellHeight = cell->shapeAndHeight & 15;
             referenceHeight = toCell->shapeAndHeight & 15;
             if (cellHeight != referenceHeight)
-                goto ret1;
+                goto blocked;
             if (!(cell->flags & mask))
                 goto success;
-            goto ret1;
+            goto blocked;
         }
     } else if (fromKind == 2) {
-        if ((diff != gTerrainWidth) && (diff != (-gTerrainWidth)))
+        if ((cellDelta != gTerrainWidth) && (cellDelta != (-gTerrainWidth)))
             return 1;
         if ((gGameState->flags868 & 0x10) && (toFlags & 0x80))
-            goto ret1;
+            goto blocked;
         if (toKind != 0)
             return 1;
         if ((to->x & 0xFF) <= 0x7F) {
-            n = toIndex - 1;
-            CELL_AT(cell, n);
+            neighborIndex = toIndex - 1;
+            CELL_AT(cell, neighborIndex);
         } else {
-            n = toIndex + 1;
-            CELL_AT(cell, n);
+            neighborIndex = toIndex + 1;
+            CELL_AT(cell, neighborIndex);
         }
         {
             u32 cellHeight, referenceHeight;
             if (cell->shapeAndHeight >> 4)
-                goto ret1;
+                goto blocked;
             cellHeight = cell->shapeAndHeight & 15;
             referenceHeight = toCell->shapeAndHeight & 15;
             if (cellHeight != referenceHeight)
-                goto ret1;
+                goto blocked;
             if (!(cell->flags & mask))
                 goto success;
-            goto ret1;
+            goto blocked;
         }
     } else {
-        n = fromIndex;
-        if ((diff == gTerrainWidth) || (diff == (-gTerrainWidth))) {
+        neighborIndex = fromIndex;
+        if ((cellDelta == gTerrainWidth) || (cellDelta == (-gTerrainWidth))) {
             if (toKind != 2)
                 return 1;
             if ((to->x & 0xFF) <= 0x7F) {
-                n--;
-                goto lookup;
+                neighborIndex--;
+                goto lookupNeighbor;
             } else {
-                n++;
-                goto lookup;
+                neighborIndex++;
+                goto lookupNeighbor;
             }
-        } else if ((diff == 1) || (diff == (-1))) {
+        } else if ((cellDelta == 1) || (cellDelta == (-1))) {
             if (toKind != 1)
                 return 1;
             if ((to->z & 0xFF) <= 0x7F) {
-                n -= gTerrainWidth;
-            lookup:
-                CELL_AT(cell, n);
+                TerrainCell_MoveToPreviousRow(&neighborIndex);
+            lookupNeighbor:
+                CELL_AT(cell, neighborIndex);
             } else {
-                n += gTerrainWidth;
-                CELL_AT(cell, n);
+                neighborIndex += gTerrainWidth;
+                CELL_AT(cell, neighborIndex);
             }
         } else
             return 1;
         {
             u32 cellHeight, referenceHeight;
             if (cell->shapeAndHeight >> 4)
-                goto ret1;
+                goto blocked;
             cellHeight = cell->shapeAndHeight & 15;
             referenceHeight = fromCell->shapeAndHeight & 15;
             if (cellHeight != referenceHeight)
-                goto ret1;
+                goto blocked;
             if (!(cell->flags & mask))
                 goto success;
-            goto ret1;
+            goto blocked;
         }
     }
-ret1:
+blocked:
     return 0;
 success:
     return 1;

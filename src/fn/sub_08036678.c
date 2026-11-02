@@ -72,10 +72,10 @@ static inline void publishInputs(struct Engine *p)
         }
         history = p->history;
         do {
-            register int value asm("r2") = *history;
+            int value = *history;
             int test = valid;
             int result;
-            if (value & test) {
+            if (test & value) {
                 result = mask;
                 result &= value;
             } else

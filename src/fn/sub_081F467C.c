@@ -1,6 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-// MATCHING_CONCESSION: register-pinning
+#include "scene_facing.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -45,25 +46,19 @@ struct Actor {
     u16 motion;
     u8 motionFlag, padE71, targetAngle, phaseTimer;
     s16 hitTimer, terrainTimer;
+    u8 padE78[0x36];
+    s16 collisionA, collisionB, collisionC;
+    u8 padEB4[0x46];
+    u16 shotsFired;
 };
-#define H(o) (*(s16 *)((u8 *)p2 + (o)))
-#define U(o) (*(u16 *)((u8 *)p2 + (o)))
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 u8 Callback_InvokeActor(void *, void *);
 static inline void facing(struct Actor *p, s32 angle)
 {
-    u32 v;
-    s32 shift;
     p->angle = angle;
-    shift = (p->angle + 0x60) >> 6;
-    v = 3;
-    v &= shift;
-    p->facing = v;
-    shift = (p->angle + 0x70) >> 5;
-    v = 7;
-    v &= shift;
-    p->facing8 = v;
+    p->facing = SceneFacing_FourWay(p->angle);
+    p->facing8 = SceneFacing_EightWay(p->angle);
 }
 static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
 {
@@ -73,11 +68,11 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
 }
 // confidence=low: fires a player-homing projectile at a facing-dependent offset.
 void Projectile_InitParameters(void *);
-void Projectile_SetLaunchParameters(void *, u16, u32, u8, u32);
+void Projectile_SetLaunchParameters(void *, u16, u16, u8, u32);
 void Projectile_SetHomingParameters(void *, s32, void *, s32);
 void Projectile_SetSpriteParameters(void *, u32, u32, u32);
 void Projectile_SetScriptProcedure(void *, u32, u16);
-void Projectile_SetCollisionParameters(void *, s32, u32, s32, s32, s32);
+void Projectile_SetCollisionParameters(void *, u32, u32, u32, u32, u32);
 void Projectile_SetBehaviorMode(void *, u16);
 void Projectile_SpawnAtPosition(void *, struct Vec *);
 void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
@@ -105,12 +100,13 @@ void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
         }
         Projectile_InitParameters(params);
         Projectile_SetLaunchParameters(params, 0, 180, (direction + 5) << 5, 24);
-        Projectile_SetHomingParameters(params, 180, (*(u8 **)gPlayers) + 0x30, 4);
+        Projectile_SetHomingParameters(params, 180, &gPlayers[0]->position, 4);
         Projectile_SetSpriteParameters(params, 0x8e5a, 0, 499);
         Projectile_SetScriptProcedure(params, 0x4363, 3);
-        Projectile_SetCollisionParameters(params, 0, 0x80000, H(0xeae), H(0xeb0), H(0xeb2));
+        Projectile_SetCollisionParameters(params, 0, 0x80000, p2->collisionA, p2->collisionB,
+                                          p2->collisionC);
         Projectile_SetBehaviorMode(params, 0);
-        U(0xefa)++;
+        p2->shotsFired++;
         switch (p->facing) {
             case 0:
                 offset.x = 96;

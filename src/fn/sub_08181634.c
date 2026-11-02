@@ -1,22 +1,21 @@
-#include "global.h"
-// MATCHING_CONCESSION: register-pinning
-void Palette_CopyBank(void *, void *);
-void ArmorPalette_CopyKindBanks(u8 *s0, u8 *dst0, u32 i0, u32 j0)
+#include "armor_palette.h"
+void Palette_CopyBank(u16 *, u16 *);
+void ArmorPalette_CopyKindBanks(struct ArmorPaletteController *p, void *data, u32 first, u32 extra)
 {
-    register u8 *s asm("r6") = s0;
-    register u8 *dst asm("r8") = dst0;
-    register u32 i asm("r4") = i0;
-    register u32 j asm("r9") = j0;
-    u8 *d;
-    u8 *bank;
-    d = dst + i * 32;
-    bank = s + 0x48A;
-    Palette_CopyBank(s + (*bank * 32 + 8), d);
-    d = dst + (i + 1) * 32;
-    Palette_CopyBank(s + (*bank * 32 + 0x28), d);
-    d = dst + (i + 2) * 32;
-    Palette_CopyBank(s + (*bank * 32 + 0x48), d);
-    j <<= 5;
-    d = dst + j;
-    Palette_CopyBank(s + (s[0x48B] * 32 + 8), d);
+    u16 *from;
+    u16 *to;
+    u8 *index;
+    from = (u16 *)((u8 *)data + (first << 5));
+    index = &p->bank;
+    to = p->palettes[*index];
+    Palette_CopyBank(to, from);
+    from = (u16 *)((u8 *)data + ((first + 1) << 5));
+    to = p->palettes[*index + 1];
+    Palette_CopyBank(to, from);
+    from = (u16 *)((u8 *)data + ((first + 2) << 5));
+    to = p->palettes[*index + 2];
+    Palette_CopyBank(to, from);
+    from = (u16 *)((u8 *)data + (extra << 5));
+    to = p->palettes[p->otherBank];
+    Palette_CopyBank(to, from);
 }

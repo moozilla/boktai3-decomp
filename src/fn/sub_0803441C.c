@@ -50,7 +50,7 @@ run:
     if (p->operation == 9 && !(bits & 0x210))
         p->mask = 0x205 | bits;
     {
-        register int value asm("r0") = p->bits;
+        u8 value = p->bits;
         int previous = p->pad1a;
         int current;
         asm("" : "+r"(value), "+r"(previous));

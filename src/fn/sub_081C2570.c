@@ -1,16 +1,28 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
-struct VecWords {
-    u32 a, b;
+struct PanelPosition {
+    s16 x, y, z, pad;
+} __attribute__((aligned(4)));
+
+struct PanelDisplay {
+    u8 unknown0[0x10];
+    s16 sort;
+    u8 unknown12[0xA];
+    struct PanelPosition position;
+    u8 unknown24[8];
+    u8 graphics[0x1E];
+    s16 variant;
 };
 struct Panel {
-    u8 pad[0x3C];
-    s16 x, y, z;
-    u8 pad42[0x588 - 0x42];
-    s16 unknown588, thresholds[3], unknown590;
-    u8 pad592[0x5B2 - 0x592];
-    s16 duration;
+    u8 unknown0[0x20];
+    struct PanelDisplay display[3];
+    u8 unknown104[0x578 - 0x104];
+    u16 start, cooldown, unknown57C, timer;
+    u8 unknown580[8];
+    u16 sustainedInput, thresholds[3], multiplier;
+    u8 unknown592[2];
+    u32 ticks, tickLimit, total, totalLimit, multiplierScript, limitScript, endScript;
+    u16 accumulator, duration;
 };
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
@@ -24,58 +36,61 @@ void sub_081C24D0(void *);
 void IconRow_Init(void *);
 void ControlPanel_HideInteractionDisplay(void *);
 void Sound_PlaySong(u32);
-s32 ControlPanel_InitializeFromScript(u8 *input)
+s32 ControlPanel_InitializeFromScript(struct Panel *p)
 {
-    u8 *p = input;
-    register u8 *anim asm("r5");
-    register u8 *sprite asm("r4");
+    void *anim;
+    struct PanelDisplay *sprite;
+    void *middleGraphics;
+    struct PanelDisplay *middleSprite;
+    void *lastGraphics;
+    struct PanelDisplay *lastSprite;
     s32 zero;
     s32 value = Script_SeekToKeyword('p');
     if (value)
-        *(s16 *)(p + 0x578) = Script_GetValue();
+        p->start = Script_GetValue();
     else
-        *(s16 *)(p + 0x578) = value;
+        p->start = value;
     {
         s32 firstZero;
-        anim = p + 0x4C;
+        anim = p->display[0].graphics;
         AnimData_Load(anim, 0xC046);
-        sprite = p + 0x20;
+        sprite = &p->display[0];
         Sprite_Init(sprite, anim, 0);
         firstZero = 0;
-        *(s16 *)(sprite + 0x10) = firstZero;
-        ((struct Panel *)p)->x = 0x380;
-        ((struct Panel *)p)->y = firstZero;
-        ((struct Panel *)p)->z = 0x52C;
-        anim += 0x4C;
-        AnimData_Load(anim, 0xC046);
-        sprite += 0x4C;
-        Sprite_Init(sprite, anim, 0);
-        *(s16 *)(sprite + 0x10) = firstZero;
-        *(struct VecWords *)(p + 0x88) = *(struct VecWords *)(p + 0x3C);
-        *(s16 *)(p + 0x8C) += 0x300;
+        sprite->sort = firstZero;
+        p->display[0].position.x = 0x380;
+        p->display[0].position.y = firstZero;
+        p->display[0].position.z = 0x52C;
+        middleGraphics = p->display[1].graphics;
+        AnimData_Load(middleGraphics, 0xC046);
+        middleSprite = &p->display[1];
+        Sprite_Init(middleSprite, middleGraphics, 0);
+        middleSprite->sort = firstZero;
+        p->display[1].position = p->display[0].position;
+        p->display[1].position.z += 0x300;
     }
     if (Script_SeekToKeyword('N')) {
         switch (Script_GetValue()) {
             case 4:
-                *(s16 *)(p + 0xB6) = 1;
+                p->display[1].variant = 1;
                 break;
             case 3:
-                *(s16 *)(p + 0xB6) = 4;
+                p->display[1].variant = 4;
                 break;
             case 0:
             default:
-                *(s16 *)(p + 0xB6) = 2;
+                p->display[1].variant = 2;
                 break;
         }
     } else
-        *(s16 *)(p + 0xB6) = 2;
-    anim = p + 0xE4;
-    AnimData_Load(anim, 0xC046);
-    sprite = p + 0xB8;
-    Sprite_Init(sprite, anim, 0);
-    *(s16 *)(sprite + 0x10) = 0;
-    *(struct VecWords *)(p + 0xD4) = *(struct VecWords *)(p + 0x3C);
-    *(s16 *)(p + 0xD8) += -0x300;
+        p->display[1].variant = 2;
+    lastGraphics = p->display[2].graphics;
+    AnimData_Load(lastGraphics, 0xC046);
+    lastSprite = &p->display[2];
+    Sprite_Init(lastSprite, lastGraphics, 0);
+    lastSprite->sort = 0;
+    p->display[2].position = p->display[0].position;
+    p->display[2].position.z += -0x300;
     sub_081C2334(p);
     ControlPanel_ShowRewardBalanceDigits(p);
     ControlPanel_SetUpdate(p, ControlPanel_UpdateIdle);
@@ -83,44 +98,44 @@ s32 ControlPanel_InitializeFromScript(u8 *input)
     IconRow_Init(p);
     ControlPanel_HideInteractionDisplay(p);
     if (Script_SeekToKeyword('r'))
-        ((struct Panel *)p)->duration = Script_GetValue();
+        p->duration = Script_GetValue();
     else
-        ((struct Panel *)p)->duration = 300;
+        p->duration = 300;
     if (Script_SeekToKeyword('t')) {
-        ((struct Panel *)p)->thresholds[0] = Script_GetValue();
-        ((struct Panel *)p)->thresholds[1] = Script_GetValue();
-        ((struct Panel *)p)->thresholds[2] = Script_GetValue();
+        p->thresholds[0] = Script_GetValue();
+        p->thresholds[1] = Script_GetValue();
+        p->thresholds[2] = Script_GetValue();
     } else {
-        ((struct Panel *)p)->thresholds[0] = 180;
-        ((struct Panel *)p)->thresholds[1] = 300;
-        ((struct Panel *)p)->thresholds[2] = 600;
+        p->thresholds[0] = 180;
+        p->thresholds[1] = 300;
+        p->thresholds[2] = 600;
     }
     value = Script_SeekToKeyword('b');
     if (value)
-        *(u32 *)(p + 0x5A4) = Script_GetValue();
+        p->multiplierScript = Script_GetValue();
     else
-        *(u32 *)(p + 0x5A4) = value;
+        p->multiplierScript = value;
     {
-        s16 *flag = (s16 *)(p + 0x590);
+        u16 *flag = &p->multiplier;
         zero = 0;
         *flag = 1;
     }
-    *(s16 *)(p + 0x588) = zero;
+    p->sustainedInput = zero;
     if (Script_SeekToKeyword('e'))
-        *(u32 *)(p + 0x5AC) = Script_GetValue();
+        p->endScript = Script_GetValue();
     if (Script_SeekToKeyword('a')) {
-        *(u32 *)(p + 0x598) = Script_GetValue();
-        *(u32 *)(p + 0x5A0) = Script_GetValue();
-        *(u32 *)(p + 0x5A8) = Script_GetValue();
+        p->tickLimit = Script_GetValue();
+        p->totalLimit = Script_GetValue();
+        p->limitScript = Script_GetValue();
     }
     {
-        u32 *counter = (u32 *)(p + 0x594);
+        u32 *counter = &p->ticks;
         *counter = zero;
-        *(u32 *)(p + 0x59C) = zero;
+        p->total = zero;
         Sound_PlaySong(0x23E);
-        *(s16 *)(p + 0x57E) = zero;
+        p->timer = zero;
         *counter = zero;
     }
-    gSegmentDisplay = p;
+    gSegmentDisplay = (void *)p;
     return 0;
 }

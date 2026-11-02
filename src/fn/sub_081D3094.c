@@ -1,52 +1,16 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
-#include "engine_globals.h"
-#include "ram.h"
+#include "engine.h"
+#include "frost_emitter.h"
+
 #define FrostEmitter_Initialize sub_081D3094
-struct FrostVec {
-    u16 x, y, z, pad;
-};
-struct FrostSequence {
-    const u16 *commands;
-    u8 flags, count, weight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
-struct FrostParticle {
-    u32 flags;
-    u8 unknown4[3], priority;
-    u8 unknown8[8];
-    u16 frame;
-    u8 unknown12[10];
-    struct FrostVec position;
-    u8 unknown24[8];
-    struct FrostSequence sequence;
-    struct FrostVec velocity;
-    u16 active, unknown46;
-};
-struct FrostEmitter {
-    u8 unknown0[0x18];
-    u8 graphics[0x1C];
-    void *resource;
-    struct FrostVec *source;
-    u32 emitting;
-    struct FrostParticle particles[12];
-    u32 enabled, age;
-};
-extern const s16 gUnk_086149C4[];
-void Anim_SetSequence(void *, void *, u16, u8, u8);
-void AnimData_Load(void *, u32);
-void AnimData_SelectPaletteBank(void *, s32);
-void *ScriptProc_Start(u32, u16);
-void Sprite_Init(void *, void *, u32);
 s32 FrostEmitter_Initialize(struct FrostEmitter *p)
 {
     void *graphics = p->graphics;
     void *spriteGraphics;
     struct FrostParticle *slot;
-    u16 *active;
-    u32 *enabled;
-    register u32 *age asm("sl");
-    register u32 zero asm("r0");
+    u16 *lifetime;
+    struct FrostEmitterStatus *state;
+    u32 *enabled, *age;
+    u32 zero;
     u32 one;
     s32 i;
     AnimData_Load(graphics, 0x4384);
@@ -56,28 +20,26 @@ s32 FrostEmitter_Initialize(struct FrostEmitter *p)
         return -1;
     i = 0;
     spriteGraphics = graphics;
-    enabled = &p->enabled;
-    {
-        u32 offset = 0x3A4;
-        age = (void *)(offset + (u32)p);
-    }
+    state = &p->runtime;
+    enabled = &state->enabled;
+    age = &state->age;
     one = 1;
-    active = &p->particles[0].active;
+    lifetime = &p->particles[0].lifetime;
     slot = p->particles;
     do {
         u32 flags;
         Sprite_Init(slot, spriteGraphics, 0);
-        flags = slot->flags | one;
-        slot->flags = flags;
+        flags = slot->sprite.flags | one;
+        slot->sprite.flags = flags;
         if (i & one)
             flags |= 0x200;
         else
             flags |= 0x400;
-        slot->flags = flags;
+        slot->sprite.flags = flags;
         zero = 0;
-        *active = zero;
-        slot->priority = one;
-        active += 0x24;
+        *lifetime = zero;
+        slot->sprite.priority = one;
+        lifetime = (u16 *)((u32)lifetime + sizeof(*slot));
         slot++;
         i++;
     } while (i <= 11);

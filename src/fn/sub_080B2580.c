@@ -101,7 +101,7 @@ static inline void Vorn_CellCenter(s32 cell, struct ContactPosition *position)
     s32 centeredZ;
     s32 x = Mod(cell, SceneActorChase_MapWidth(SceneActorChase_CurrentMap()));
     s32 z = Div(cell, SceneActorChase_MapWidth(SceneActorChase_CurrentMap()));
-    position->x = SceneActorChase_CellCenterCoordinate(x);
+    VORN_CENTER_COORDINATE(position->x, x);
     Vorn_WriteHeight(&position->y,
                      Vorn_HeightFromAttributes(SceneActorChase_CellProperties(cell)->attributes));
     VORN_CENTER_COORDINATE(centeredZ, z);

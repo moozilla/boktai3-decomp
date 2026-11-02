@@ -1,4 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
+#include "display_sequence_inline.h"
 #include "global.h"
 
 // Tentative layouts for the wireless peer panel and its initial animation.
@@ -10,12 +10,6 @@ struct Sprite {
     u8 pad12[10];
     u16 x, y;
     u8 pad20[12];
-};
-
-struct Animation {
-    const u16 *frames;
-    u8 flags, length, duration, period;
-    u16 frame, base, speed, timer;
 };
 
 struct PeerPanel {
@@ -47,19 +41,56 @@ void Sprite_Init(void *, void *, int);
 void Anim_RestartSequence(void *, void *, int, int, int);
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 
+static inline void WirelessPeerPanel_StepSprite(struct Sprite *sprite,
+                                                struct DisplaySequenceState *a)
+{
+    const u16 *frame;
+    frame = a->commands + a->index;
+    sprite->tile = *frame >> 6;
+
+    // Combine the animation and frame orientation flags for the sprite.
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*frame & 0x30) >> 4) & bit))
+            sprite->flags |= 4;
+        else
+            sprite->flags &= ~4;
+    }
+
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*frame & 0x30) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
+    }
+
+    if (++a->elapsed >= a->duration) {
+        DisplaySequence_SelectNext(a);
+        frame = a->commands + a->index;
+        DisplaySequence_UpdateWeight(a, frame);
+        if (!a->duration)
+            a->duration = 1;
+    }
+}
 int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kind)
 {
-    register struct PeerPanel *p asm("r9") = panel;
+    struct PeerPanel *p = panel;
     int type = kind;
     void *resource;
     void *glyph;
     const struct PeerStyle *style;
     struct Sprite *sprite;
     struct Sprite *initialSprite;
-    struct Animation animation;
-    const u16 *frame;
-    struct Animation *a;
-    int flags;
+    struct DisplaySequenceState animation;
 
     resource = ScriptProc_Start(0x922E, 0x4BBF);
     glyph = p->glyph;
@@ -85,134 +116,7 @@ int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kin
     Sprite_Init(initialSprite, glyph, style->priority | 48);
     Anim_RestartSequence(&animation, resource, style->animation, 0, 0);
     sprite = initialSprite;
-    a = &animation;
-    {
-        int offset = a->frame << 1;
-        const u16 *table;
-        table = animation.frames;
-        frame = (const u16 *)((u32)table + offset);
-    }
-    sprite->tile = *frame >> 6;
-
-    // Combine the animation and frame orientation flags for the sprite.
-    {
-        int observed = a->flags;
-        register int one asm("r3");
-        register int side asm("r1");
-        register int word asm("r2");
-        u32 encoded;
-        one = 1;
-        side = one;
-        side &= observed;
-        word = *frame;
-        encoded = word & 48;
-        encoded >>= 4;
-        encoded &= one;
-        if (side != encoded) {
-            register struct PeerPanel *write asm("r3") = p;
-            int value = write->sprite.flags;
-            value |= 4;
-            write->sprite.flags = value;
-        } else {
-            register struct PeerPanel *read asm("r1") = p;
-            int value;
-            int mask;
-            register struct PeerPanel *write asm("r2");
-            value = read->sprite.flags;
-            mask = -5;
-            value &= mask;
-            write = p;
-            write->sprite.flags = value;
-        }
-    }
-    {
-        register int observed asm("r4") = a->flags;
-        register int two asm("r3") = 2;
-        register int side asm("r1");
-        register int word asm("r2");
-        u32 encoded;
-        side = two;
-        side &= observed;
-        side = (u8)side;
-        word = *frame;
-        encoded = word & 48;
-        encoded >>= 4;
-        encoded &= two;
-        if (side != encoded)
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-        flags = observed;
-    }
-    {
-        u32 elapsed = a->timer + 1;
-        u32 limit;
-        register u32 initialPeriod asm("r1");
-        register int savedPeriod asm("r6");
-        register int bits asm("r2");
-        a->timer = elapsed;
-        {
-            register u32 constant asm("r1") = 65535;
-            asm("" : "+r"(constant));
-            limit = constant;
-        }
-        initialPeriod = a->period;
-        elapsed = (u16)elapsed;
-        savedPeriod = initialPeriod;
-        if (elapsed < initialPeriod)
-            goto animationDone;
-        a->timer = 0;
-        bits = flags;
-        if (bits & 4) {
-            int previous;
-            previous = a->frame;
-            if (previous)
-                goto decrementFrame;
-            if (bits & 8) {
-                a->timer = savedPeriod;
-                goto recalculate;
-            }
-            previous = a->length;
-        decrementFrame:
-            previous--;
-            a->frame = previous;
-            goto recalculate;
-        } else {
-            u32 next = a->frame + 1;
-            int length;
-            a->frame = next;
-            length = a->length;
-            next &= limit;
-            if (next < (u32)length)
-                goto recalculate;
-            next = flags & 8;
-            next = (u8)next;
-            if (next) {
-                a->timer = initialPeriod;
-                next = length - 1;
-            }
-            a->frame = next;
-        }
-    recalculate: {
-        int index = a->frame << 1;
-        const u16 *table;
-        register int word asm("r1");
-        register int value asm("r0");
-        table = a->frames;
-        frame = (const u16 *)((u32)table + index);
-        word = *frame;
-        value = word & 15;
-        a->duration = value;
-        value = a->duration * a->speed;
-        asm("" : "+r"(value));
-        value >>= 6;
-        a->period = value;
-        value = (u32)value << 24;
-        if (!value)
-            a->period = 1;
-    }
-    animationDone:;
-    }
+    WirelessPeerPanel_StepSprite(sprite, &animation);
     {
         int one = 1;
         struct PeerPanel *write;
@@ -242,18 +146,8 @@ int WirelessPeerPanel_Init(struct Owner *owner, struct PeerPanel *panel, int kin
             drawing += 0x60;
         } while (--count >= 0);
     }
-    {
-        register int zero asm("r0") = 0;
-        struct PeerPanel *write = p;
-        asm("" : "+r"(zero));
-        write->active = zero;
-        {
-            u8 *name = p->name;
-            *name = zero;
-        }
-        {
-            u8 *changed = &p->changed;
-            *changed = zero;
-        }
-    }
+    p->active = 0;
+    p->name[0] = 0;
+    p->changed = 0;
+    return 0;
 }

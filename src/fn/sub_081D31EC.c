@@ -1,14 +1,16 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-struct CloudPair {
-    u32 x, z;
+union CloudPosition {
+    u32 words[2];
+    struct {
+        u16 x, y, z, pad;
+    } coordinates;
 };
 struct CloudSource {
     u8 pad0[0x20];
     u32 flags;
     u8 pad24[0xC];
-    struct CloudPair position;
+    union CloudPosition position;
 };
 struct CloudParticle {
     u8 kind;
@@ -20,14 +22,14 @@ struct CloudParticle {
 struct CloudTask {
     u8 pad0[0x18];
     u32 ticks;
-    u8 pad1C;
-    u8 pad1D;
-    u8 pad1E;
+    u16 mode;
+    u8 spawnInterval;
     u8 stopFlag;
     u32 frameBase;
-    u32 pad24[2];
+    union CloudPosition position;
     u32 sheet;
-    u8 pad30[0x48 * 40];
+    struct CloudParticle particles[40];
+    struct CloudSource *source;
 };
 extern u8 *gGameState;
 extern const u16 gUnk_086126C8[];
@@ -35,64 +37,70 @@ extern const u32 gUnk_086126BC[];
 void SpriteDrawable_SelectTileFrame(void *, u32, u32);
 void sub_08249240(void *, void *, u32);
 void Task_Kill(void *);
-u32 sub_081D31EC(u8 *p)
+static inline u32 CloudParticle_NextFrame(struct CloudParticle *p)
 {
+    return p->frame + 1;
+}
+u32 sub_081D31EC(struct CloudTask *task)
+{
+    u8 *p = (u8 *)task;
     struct CloudParticle *e;
     s32 i;
-    switch (*(u16 *)(p + 0x1c)) {
+    switch (task->mode) {
         case 1: {
-            struct CloudSource *src = *(struct CloudSource **)(p + 0xb70);
-            *(struct CloudPair *)(p + 0x24) = src->position;
-            *(u16 *)(p + 0x26) += 0x80;
+            struct CloudSource *src = task->source;
+            task->position = src->position;
+            task->position.coordinates.y += 0x80;
         } break;
         case 2: {
-            struct CloudSource *src = *(struct CloudSource **)(p + 0xb70);
+            struct CloudSource *src = task->source;
             u32 bit = 0x80;
             if (src->flags & bit) {
-                *(struct CloudPair *)(p + 0x24) = src->position;
+                task->position = src->position;
                 if (*(s16 *)(gGameState + 0x85e) == 0) {
-                    *(u16 *)(p + 0x24) += 0x14;
-                    *(u16 *)(p + 0x26) += 0x1e0;
-                    *(u16 *)(p + 0x28) -= 0x14;
+                    task->position.coordinates.x += 0x14;
+                    task->position.coordinates.y += 0x1e0;
+                    task->position.coordinates.z -= 0x14;
                 } else {
-                    *(u16 *)(p + 0x24) -= 0x14;
-                    *(u16 *)(p + 0x26) += 0x1e0;
-                    *(u16 *)(p + 0x28) += 0x14;
+                    task->position.coordinates.x -= 0x14;
+                    task->position.coordinates.y += 0x1e0;
+                    task->position.coordinates.z += 0x14;
                 }
                 p[0x1e] = 6;
             } else {
-                *(struct CloudPair *)(p + 0x24) = src->position;
-                *(u16 *)(p + 0x26) += 0x80;
+                task->position = src->position;
+                task->position.coordinates.y += 0x80;
                 p[0x1e] = 4;
             }
         } break;
         case 3: {
-            struct CloudSource *src = *(struct CloudSource **)(p + 0xb70);
-            *(struct CloudPair *)(p + 0x24) = src->position;
+            struct CloudSource *src = task->source;
+            task->position = src->position;
             if (*(s16 *)(gGameState + 0x85e) == 0) {
-                *(u16 *)(p + 0x24) += 0x14;
-                *(u16 *)(p + 0x26) += 0x1e0;
-                *(u16 *)(p + 0x28) -= 0x14;
+                task->position.coordinates.x += 0x14;
+                task->position.coordinates.y += 0x1e0;
+                task->position.coordinates.z -= 0x14;
             } else {
-                *(u16 *)(p + 0x24) -= 0x14;
-                *(u16 *)(p + 0x26) += 0x1e0;
-                *(u16 *)(p + 0x28) += 0x14;
+                task->position.coordinates.x -= 0x14;
+                task->position.coordinates.y += 0x1e0;
+                task->position.coordinates.z += 0x14;
             }
             p[0x1e] = 4;
         } break;
     }
     e = (struct CloudParticle *)(p + 0x30);
-    for (i = 39; i >= 0; i--, e = (struct CloudParticle *)((u8 *)e + 0x48)) {
+    for (i = 39; i >= 0; i--, e++) {
         if (e->kind) {
-            register u32 value asm("r0") = e->timer + 1;
-            u32 zero;
-            register u32 mask asm("r3");
+            u32 value, mask, frame;
+            u8 zero;
+            value = e->timer + 1;
             zero = 0;
             e->timer = value;
-            mask = 0xff;
-            if ((u8)value >= gUnk_086126C8[e->frame]) {
+            mask = 255;
+            frame = e->frame;
+            if ((u8)value >= gUnk_086126C8[frame & mask]) {
                 e->timer = zero;
-                value = e->frame + 1;
+                value = CloudParticle_NextFrame(e);
                 e->frame = value;
                 if ((value & mask) > 1)
                     e->frame = zero;

@@ -1,248 +1,145 @@
 #include "global.h"
+#include "scene_facing.h"
+#include "player.h"
 #include "engine.h"
-// MATCHING_CONCESSION: register-pinning
-struct S {
-    u8 f0;
-    u8 b1;
-    u8 f2[5];
-    u8 b7;
-    u8 f8;
-    u8 b9;
-    u8 fa[4];
-    u16 flags;
-    u8 g[0x2e4 - 0x10];
-    void *cb;
-};
-s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
-s32 Callback_InvokeActor(void *, void *);
-s32 sub_081C8FB0(void *, void *, s32);
-#define B(p, o) (*(u8 *)((u8 *)(p) + (o)))
-#define H(p, o) (*(u16 *)((u8 *)(p) + (o)))
-#define W(p, o) (*(u32 *)((u8 *)(p) + (o)))
-struct Position {
-    s16 x, y, z, pad;
-};
+#include "state_actor.h"
+
 s32 Math_Atan2(s32, s32);
-extern u32 gUnk_02000560;
-void *TetherActor_GetPosition(void);
-void Actor_SetAttachmentEffect(void *, u32, u32, u32);
-static inline u32 MaskWord(u32 *p, u32 mask)
+void Actor_SetAttachmentEffect(void *, u32, s32, s32);
+
+struct ContactPosition *TetherActor_GetPosition(void);
+s32 sub_081C8FB0(struct StateActorTargetContext *, struct StateActor *, s32);
+static inline u32 Flag(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-static inline u32 Event(u32 mask)
+
+static inline s32 PlayerAllowsFacing(struct Player *p)
 {
-    return gUnk_02000560 & mask;
+    if ((u8)(p->actionMode - 3) <= 2)
+        return 0;
+    if (Flag(&p->statusFlags, 0x100000))
+        return 0;
+    if (p->active && (u16)(p->sceneMode - 5) <= 1)
+        return 0;
+    {
+        u8 mode = p->tetherMode;
+        u8 allow = 1;
+        if (mode > 1 && mode != 7)
+            allow = 0;
+        return allow;
+    }
 }
-static inline u32 Tethered(void *a)
+
+static inline void SetHeading(struct StateActor *p, s32 heading)
 {
-    register u32 pointerOffset asm("r1") = 0x438;
-    u8 *target;
-    u32 kindOffset;
-    u32 result;
-    target = *(u8 **)((u8 *)a + pointerOffset);
-    asm("" ::"r"(pointerOffset));
-    kindOffset = 0x457;
-    if (target[kindOffset] == 6) {
+    p->angle = heading;
+    p->facing8 = SceneFacing_EightWay(heading);
+    p->facing4 = SceneFacing_FourWay(heading);
+}
+
+static inline u32 PlayerIsTethered(struct StateActorTargetContext *ctx)
+{
+    if (ctx->targetPlayer->tetherMode == 6) {
         void *position = TetherActor_GetPosition();
-        result = 1;
         if (position)
-            goto done;
+            return 1;
     }
-    result = 0;
-done:
-    return result;
+    return 0;
 }
-static inline u16 MenuState(u8 *target)
+
+static inline u32 HasPlayerEvent(u32 mask)
 {
-    asm("" ::: "r3");
-    {
-        register u32 offset asm("r3") = 0x534;
-        u16 value;
-        value = H(target, offset);
-        asm("" ::"r"(offset));
-        return value;
-    }
+    return gPlayerSlotStatus[0] & mask;
 }
-static inline u8 MenuKind(u8 *target)
-{
-    register u32 offset asm("r5") = 0x457;
-    {
-        u8 value = target[offset];
-        asm("" ::"r"(offset));
-        return value;
-    }
-}
-static inline void *CurrentCallback(struct S *p)
-{
-    u32 offset = 0x2E4;
-    {
-        void *callback = *(void **)((u8 *)p + offset);
-        return callback;
-    }
-}
-// confidence=low: turns toward a scene target and refreshes its attachment animation.
-#define StateActor_UpdateTargetTurn sub_081CC1B4
-void StateActor_UpdateTargetTurn(void *a, struct S *p)
+
+static inline u32 TurnAnimation(u8 kind)
 {
     u32 r;
-    u8 hit;
-    {
-        struct Position *target = *(struct Position **)((u8 *)a + 0x434);
-        if (target) {
-            struct Position *position = (struct Position *)((u8 *)p + 0x68);
-            s32 desired = Math_Atan2(target->x - position->x, target->z - position->z);
-            if (**(u8 **)((u8 *)p + 0x2B8)) {
-                register u8 *angle asm("r2") = (u8 *)p + 0x65;
-                s32 difference = (s8)(desired - *angle);
-                register s32 next asm("r1");
-                if (difference > 8) {
-                    next = *angle + 8;
-                    *angle = next;
-                } else {
-                    if (difference < -8)
-                        next = *angle - 8;
-                    else
-                        next = *angle + difference;
-                    *angle = next;
-                    next = (u16)next;
-                }
-                {
-                    s32 t = (next + 0x70) >> 5;
-                    u32 mask = 7;
-                    mask &= t;
-                    B(p, 0x1A) = mask;
-                }
-                {
-                    s32 t = (next + 0x60) >> 6;
-                    u32 mask = 3;
-                    mask &= t;
-                    B(p, 0x19) = mask;
-                }
-            }
+    switch (kind) {
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+            r = 0;
+            break;
+        case 17:
+        case 18:
+        case 19:
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+            r = 0;
+            break;
+        case 29:
+            r = 0xb;
+            break;
+        default:
+            r = 0;
+            break;
+    }
+    return r;
+}
+
+static inline void SetDisplayFlag(struct StateActor *p, u32 mask)
+{
+    p->displayFlags = mask | p->displayFlags;
+}
+
+/* Turn toward the tracked player and select the attachment on state entry. */
+#define StateActor_UpdateTargetTurn sub_081CC1B4
+void StateActor_UpdateTargetTurn(struct StateActorTargetContext *ctx, struct StateActor *p)
+{
+    u32 r;
+    struct StateActorPos *target = ctx->target;
+    if (target) {
+        struct StateActorPos *position = &p->position;
+        s32 desired = Math_Atan2(target->x - position->x, target->z - position->z);
+        if (*p->animationTable) {
+            s32 diff = (s8)(desired - p->angle);
+            if (diff > 8)
+                SetHeading(p, p->angle + 8);
+            else if (diff < -8)
+                SetHeading(p, p->angle - 8);
+            else
+                SetHeading(p, p->angle + diff);
         }
     }
-    if (p->b9 != 0) {
-        p->b9 = 0;
-        p->b7 = 0;
-        switch (p->b1) {
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-            case 15:
-            case 16:
-                r = 0;
-                break;
-            case 17:
-            case 18:
-            case 19:
-            case 20:
-            case 21:
-            case 22:
-            case 23:
-            case 24:
-            case 25:
-            case 26:
-            case 27:
-            case 28:
-                r = 0;
-                break;
-            case 29:
-                r = 0xb;
-                break;
-            default:
-                r = 0;
-                break;
-        }
+    if (p->enter) {
+        p->enter = 0;
+        p->done = 0;
+        r = TurnAnimation(p->kind);
         Actor_PlayAnimationEntry(p, r, 1, 0, 4);
-        B(p, 0x1F0) = 1;
-        {
-            u8 angle = B(p, 0x65);
-            B(p, 0x225) = angle;
+        p->overlayDrawable[0].animationStarted = 1;
+        p->overlayDrawable[0].savedAngle = p->angle;
+        if (ctx->targetPlayer && !PlayerAllowsFacing(ctx->targetPlayer) &&
+            !(gEngineFlags & 0x200) && p->attachmentEnabled) {
+            if (PlayerIsTethered(ctx) || HasPlayerEvent(4))
+                Actor_SetAttachmentEffect(p, 0, 0, 0);
+            else
+                Actor_SetAttachmentEffect(p, 3, 0, 0);
         }
-        {
-            register u8 *rawTarget asm("r0") = *(u8 **)((u8 *)a + 0x438);
-            u8 *target;
-            if (!rawTarget)
-                goto attachmentDone;
-            target = rawTarget;
-            if ((u8)(target[0x418] - 3) > 2 && !MaskWord((u32 *)(target + 0x20), 0x100000) &&
-                (!H(target, 0x538) || (u16)(MenuState(target) - 5) > 1)) {
-                u8 kind = MenuKind(target);
-                u8 allow = 1;
-                if (kind > 1 && kind != 7)
-                    allow = 0;
-                if (!allow)
-                    goto restricted;
-                goto attachmentDone;
-            }
-        restricted:
-            if (!(gEngineFlags & 0x200) && B(p, 0xB)) {
-                if (Tethered(a) || Event(4))
-                    Actor_SetAttachmentEffect(p, 0, 0, 0);
-                else
-                    Actor_SetAttachmentEffect(p, 3, 0, 0);
-            }
-        }
-    attachmentDone:;
     } else {
-        switch (p->b1) {
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-            case 15:
-            case 16:
-                r = 0;
-                break;
-            case 17:
-            case 18:
-            case 19:
-            case 20:
-            case 21:
-            case 22:
-            case 23:
-            case 24:
-            case 25:
-            case 26:
-            case 27:
-            case 28:
-                r = 0;
-                break;
-            case 29:
-                r = 0xb;
-                break;
-            default:
-                r = 0;
-                break;
-        }
+        r = TurnAnimation(p->kind);
         Actor_PlayAnimationEntry(p, r, 1, 0, 1);
     }
-    {
-        u32 m = 0x1000;
-        p->flags = m | p->flags;
-    }
-    hit = 0;
-    if ((u8)Callback_InvokeActor(p, CurrentCallback(p)) != 1 && sub_081C8FB0(a, p, 0)) {
-        hit = 1;
-        {
-            u32 m = 0x800;
-            p->flags = m | p->flags;
-        }
+    SetDisplayFlag(p, 0x1000);
+    if ((u8)Callback_InvokeActor(p, p->animationCallback) != 1 && sub_081C8FB0(ctx, p, 0)) {
+        SetDisplayFlag(p, 0x800);
     }
 }

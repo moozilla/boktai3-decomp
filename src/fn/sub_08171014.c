@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct HudPos {
     s16 x, y, z, pad;
@@ -35,17 +34,19 @@ static inline void SetPos(struct HudPos *pos, s32 x, s32 y)
     pos->y = y;
     pos->z = 0;
 }
-static inline void Show(struct HudSprite *s)
+static inline void Show(struct HudSprite *s, s32 *mask)
 {
     u32 flags = s->flags;
-    register u32 mask asm("r2") = ~1;
-    s->flags = flags & mask;
+    *mask = ~1;
+    s->flags = flags & *mask;
 }
 void SceneHud_DrawComparisonBars(struct HudPanel *p, s32 col, s32 row, s16 *diff)
 {
     s32 i, j;
+    s32 showMask;
     u16 *cell;
     for (i = 0; i <= 2; i++) {
+        showMask = ~1;
         p->shown[i] = p->stats->values[i] + p->stats->bonus[i];
         if (p->shown[i] > 120)
             p->shown[i] = 120;
@@ -60,9 +61,9 @@ void SceneHud_DrawComparisonBars(struct HudPanel *p, s32 col, s32 row, s16 *diff
         SetPos(&p->numbers[i * 3 + 2].pos, col * 8 + 16, (row + i) * 8);
         {
             struct HudPanel *q = (struct HudPanel *)(i * 0x120 + (u32)p);
-            Show(&q->numbers[0]);
-            Show(&q->numbers[1]);
-            Show(&q->numbers[2]);
+            Show(&q->numbers[0], &showMask);
+            Show(&q->numbers[1], &showMask);
+            Show(&q->numbers[2], &showMask);
         }
     }
 }

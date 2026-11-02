@@ -57,7 +57,7 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
             struct Obj *o;
             struct Anim *a;
             const volatile u16 *entry;
-            register u16 n asm("r0");
+            u32 elapsed;
             int done;
             {
                 u8 *address = (u8 *)owner + 0x70;
@@ -87,8 +87,8 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
                 else
                     o->flags &= ~8;
             }
-            n = ++a->timer;
-            if (n >= a->rate) {
+            elapsed = ++a->timer;
+            if (a->timer >= a->rate) {
                 a->timer = 0;
                 if (a->flags & 4) {
                     if (a->frame == 0) {

@@ -1,20 +1,18 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "contact_collider.h"
 
 struct Pair {
     u32 a, b;
 };
 struct SceneEffectInitActor {
-    void *update;
-    void *destroy;
+    void (*update)(void *);
+    void (*destroy)(void *);
     u8 resource[0x20];
     u8 anim[8];
     u32 flags;
     u8 pad34[0x88 - 0x34];
     u8 shadow[0xf4 - 0x88];
-    u8 collider[0x136 - 0xf4];
-    u8 facing;
-    u8 pad137[0x148 - 0x137];
+    struct ContactCollider collider;
     u8 pad148[0x154 - 0x148];
     u8 entered, timer, done, state;
 };
@@ -36,13 +34,6 @@ void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void SceneEffect_UpdateActor(void *);
 void SceneEffect_DestroyActor(void *);
 
-static inline u8 Facing(s32 flip)
-{
-    if (flip)
-        return 0x60;
-    return 0xe0;
-}
-
 void SceneEffect_InitActor(struct SceneEffectInitActor *a, s32 mode, s32 flip)
 {
     void *res = ScriptProc_Start(0xCB05, 0x658);
@@ -52,7 +43,8 @@ void SceneEffect_InitActor(struct SceneEffectInitActor *a, s32 mode, s32 flip)
     u8 *col0;
     u16 k2;
     s16 k3;
-    void *update, *destroy;
+    void (*update)(void *);
+    void (*destroy)(void *);
     ResourceHeader_Relocate(anim, res);
     widget = (u8 *)a + 0x28;
     Widget_InitLinked(widget, anim, 0, 0, 2, 0, 0x3c, &gUnk_0824F6A0);
@@ -102,9 +94,12 @@ void SceneEffect_InitActor(struct SceneEffectInitActor *a, s32 mode, s32 flip)
             *(struct Pair *)(col + 0x1c) = gUnk_0824F6B0;
             break;
     }
-    {
-        register u8 f asm("r0") = Facing(flip);
-        a->facing = f;
+    if (flip) {
+        u8 facing = 0x60;
+        a->collider.direction = facing;
+    } else {
+        u8 facing = 0xe0;
+        a->collider.direction = facing;
     }
     update = SceneEffect_UpdateActor;
     destroy = SceneEffect_DestroyActor;

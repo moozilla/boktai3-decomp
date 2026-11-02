@@ -1,168 +1,80 @@
 #include "global.h"
-#include "display_sequence_inline.h"
+
+#include "contact_swarm.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
-struct Frames {
-    u16 *data;
-    u8 flags, count, multiplier, duration;
-    u16 index, pad, rate, timer;
+#include "player_cue_sequence.h"
+
+// Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
+struct Drawable {
+    struct ContactSwarmSprite sprite;
+    struct DisplaySequenceState sequence;
+    u32 unknown3C;
+    s32 ended;
+    u32 mode;
 };
-struct Render {
-    u32 flags;
-    u8 pad[12];
-    u16 tile;
+
+struct SceneMovementDisplay {
+    u8 unknown0[0xAF];
+    u8 finished, unknownB0, entered;
+    u8 unknownB2[0x284 - 0xB2];
+    s32 action, variation, unknown28C, unknown290, targetX, unknown298;
+    u8 unknown29C[0x2C0 - 0x29C];
+    struct Drawable foreground, accent;
+    u8 unknown350[0x390 - 0x350];
+    void *animation;
 };
-int Anim_SetSequence(struct Frames *, void *, u32, int, int);
-int Anim_RestartSequence(struct Frames *, void *, u16, int, int);
-void Sound_PlaySong(int);
-void SceneMover_ApproachScreenX(void *, int);
 void ActorDisplay_UpdateScreenAnchor(void *);
 void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
-void SceneActors_EmitPeriodicParticles(void *, int);
-int SceneMover_StepPastScreenX(void *, int, int);
-int Player_GetHorizontalVelocity(void *);
-void Player_GetWorldPosition(int, void *);
+s32 SceneMover_StepPastScreenX(void *, s32, s32);
+void SceneActors_EmitPeriodicParticles(void *, s32);
 extern const u16 gUnk_086141BC[];
-#define W(p, o) (*(s32 *)((u8 *)(p) + (o)))
-#define H(p, o) (*(s16 *)((u8 *)(p) + (o)))
-#define B(p, o) (*((u8 *)(p) + (o)))
-static inline int randomValue(void)
+void SceneActors_UpdateDelayedMovement(u8 *p, s32 time)
 {
-    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
-    return gUnk_086141BC[gEffectRandomTableIndex];
-}
-static inline void step(struct Frames *f, struct Render *r)
-{
-    u16 *word = f->data + f->index;
-    r->tile = *word >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = f->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*word & 0x30) >> 4) & bit))
-            r->flags |= 4;
-        else
-            r->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = f->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*word & 0x30) >> 4) & bit))
-            r->flags |= 8;
-        else
-            r->flags &= ~8;
-    }
-    {
-        u32 mask;
-        int duration;
-        register int savedDuration asm("r3");
-        u32 timer = f->timer + 1;
-        f->timer = timer;
-        {
-            register u32 initialMask asm("r1") = 65535;
-            asm("" : "+r"(initialMask));
-            mask = initialMask;
-        }
-        duration = f->duration;
-        timer = (u16)timer;
-        savedDuration = duration;
-        if (timer >= (u32)duration) {
-            register int flags asm("r1");
-            int index;
-            f->timer = 0;
-            flags = f->flags;
-            if (flags & 4) {
-                index = f->index;
-                if (!index) {
-                    if (flags & 8) {
-                        f->timer = savedDuration;
-                        goto update;
-                    }
-                    index = f->count;
-                }
-                index--;
-                goto storeIndex;
-            } else {
-                int count;
-                index = f->index + 1;
-                f->index = index;
-                count = f->count;
-                if ((index & mask) < count)
-                    goto update;
-                index = (u8)(flags & 8);
-                if (index) {
-                    f->timer = duration;
-                    index = count - 1;
-                }
-            }
-        storeIndex:
-            f->index = index;
-        update:
-            word = f->data + f->index;
-            {
-                u32 value = *word;
-                u32 low = 15;
-                low &= value;
-                f->multiplier = low;
-            }
-            f->duration = (f->multiplier * f->rate) >> 6;
-            if (!f->duration)
-                f->duration = 1;
-        }
-    }
-}
-
-void ActorMotion_AdvanceTowardScreenTarget(void *, int);
-// confidence=low: paired render animations and movement are observed statically.
-void SceneActors_UpdateDelayedMovement(void *arg, int time)
-{
-    void *p = arg;
-    int tick = time;
-    int result = 0;
-    void *base = p;
+    s32 savedTime;
+    s32 completed;
+    u8 *context;
     u8 *enter;
-    enter = (u8 *)p + 0xb1;
+    struct SceneMovementDisplay *actor = (void *)p;
+    struct SceneMovementDisplay *owner;
+    savedTime = time;
+    completed = 0;
+    context = p;
+    owner = (void *)context;
+    enter = &actor->entered;
     if (*enter) {
-        int zero = 0;
-        struct Render *r;
-        struct Render *r2;
-        struct Frames *f;
+        struct Drawable *foreground;
+        struct Drawable *accent;
+        struct DisplaySequenceState *state;
+        u32 zero;
+        zero = 0;
         *enter = zero;
-        r = (void *)((u8 *)p + 0x2c0);
-        r2 = (void *)((u8 *)p + 0x308);
-        W(p, 0x298) = zero;
-        W(p, 0x290) = zero;
-        W((u8 *)r + 0x3c, 0) = zero;
-        f = (void *)((u8 *)p + 0x2ec);
-        Anim_SetSequence(f, (void *)W(p, 0x390), zero, 0, zero);
-        step(f, r);
-        W((u8 *)r2 + 0x3c, 0) = 4;
-        f = (void *)((u8 *)r2 + 0x2c);
-        Anim_SetSequence(f, (void *)W(base, 0x390), 4, 0, 0);
-        step(f, r2);
+        foreground = &actor->foreground;
+        accent = &actor->accent;
+        actor->unknown298 = zero;
+        actor->unknown290 = zero;
+        foreground->unknown3C = zero;
+        state = &actor->foreground.sequence;
+        Anim_SetSequence(state, actor->animation, zero, 0, zero);
+        PlayerCue_StepSequence(&foreground->sprite, state);
+        accent->unknown3C = 4;
+        Anim_SetSequence(&accent->sequence, *(void **)(context + 0x390), 4, 0, 0);
+        PlayerCue_StepSequence(&accent->sprite, &accent->sequence);
     }
+    if (savedTime > 120)
+        completed = SceneMover_StepPastScreenX(p, *(s32 *)(context + 0x294), 0x6000);
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     {
-        int t = tick;
-        asm("" : "+r"(t));
-        if (t > 120)
-            result = SceneMover_StepPastScreenX(p, W(base, 0x294), 0x6000);
+        u32 value = gUnk_086141BC[gEffectRandomTableIndex];
+        u32 *offset = (u32 *)(context + 0x288);
+        *offset = value & 1;
     }
-    W(base, 0x288) = (randomValue() & 1);
     ActorDisplay_UpdateScreenAnchor(p);
     ActorDisplay_UpdateForegroundSprite(p);
     ActorDisplay_UpdateAccentSprite(p);
-    SceneActors_EmitPeriodicParticles(p, tick);
-    {
-        int test = result;
-        if (test) {
-            B(p, 0xaf) = 1;
-            W(base, 0x284) = 16;
-        }
+    SceneActors_EmitPeriodicParticles(p, savedTime);
+    if (completed) {
+        p[0xAF] = 1;
+        *(u32 *)(context + 0x284) = 16;
     }
 }

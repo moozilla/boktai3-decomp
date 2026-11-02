@@ -1,7 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "monster_book.h"
 #include "input.h"
+#include "gba/io_reg.h"
 
 s32 Bestiary_GetCategoryFirstEntry(u32);
 s32 Bestiary_GetCategoryEntryCount(u32);
@@ -60,8 +60,8 @@ static inline void MonsterBook_HideGroupDigits(struct MonsterBook *p)
     s32 j;
 
     for (j = 0; j < 2; j++) {
-        ((struct BookSprite *)((u8 *)p + 0xA8C))[j].flags |= 1;
-        ((struct BookSprite *)((u8 *)p + 0xBAC))[j].flags |= 1;
+        (&p->sA8C[0])[j].flags |= 1;
+        (&p->sBAC[0])[j].flags |= 1;
     }
     Sprite_Hide(&p->sB4C);
 }
@@ -192,29 +192,26 @@ void Script_Call(void *, u32);
 void ThresholdTrack_SelectInterval(void *);
 void MonsterBook_UpdateHighlightPulse(void *);
 void ScrollingDialogue_Step(void *);
-#define BOOK_FIELD(p, off, type) (*(type *)((u8 *)(p) + (off)))
-// confidence=low: processes list/detail navigation and page-close input.
+
+static inline u8 MonsterBook_CurrentEntry(struct MonsterBook *owner)
+{
+    return owner->entry;
+}
 #define MonsterBook_UpdateNavigation sub_081D61C0
 u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
 {
     u32 changed = 0;
     u32 moved = 0;
-    // Preserve the compiler PRE table ordering for the long-lived page pointers.
-    asm("");
-    asm("");
-    asm("");
-    asm("");
-    asm("");
     switch (p->mode) {
         case 0:
-            if (gPadState[1] & 0x200) {
+            if (gPadState[1] & L_BUTTON) {
                 if (p->category)
                     p->category--;
                 else
                     p->category = 13;
                 Sound_PlaySong(0x10A);
                 goto categoryChanged;
-            } else if (gPadState[1] & 0x100) {
+            } else if (gPadState[1] & R_BUTTON) {
                 if (p->category <= 12)
                     p->category++;
                 else
@@ -225,7 +222,8 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
             if (moved) {
             categoryChanged:
                 p->entry = Bestiary_GetCategoryFirstEntry(p->category);
-                BOOK_FIELD(p, 0x48, u8) = 0;
+
+                p->selectedRow = 0;
                 changed = 1;
                 DrawListWindows(p);
                 DrawCategoryBadge(p);
@@ -233,21 +231,21 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
                 DrawGroupCounts(p);
                 BestiaryFlags_Update(p);
             }
-            if ((gPadState[1] & 0x40) && p->entry) {
-                u8 *selection = (u8 *)p + 0x48;
+            if ((gPadState[1] & DPAD_UP) && MonsterBook_CurrentEntry(p)) {
+                u8 *selection = &p->selectedRow;
                 if (*selection) {
                     p->entry--;
                     (*selection)--;
                 } else {
                     *selection = Bestiary_GetCategoryEntryCount(p->category) - 1;
-                    p->entry = Bestiary_GetCategoryFirstEntry(p->category) + *selection;
+                    p->entry = Bestiary_GetCategoryFirstEntry(p->category) + (*selection);
                 }
                 Sound_PlaySong(0xDC);
                 goto selectionChanged;
-            } else if ((gPadState[1] & 0x80) && p->entry <= 0x51) {
-                u8 *selection = (u8 *)p + 0x48;
+            } else if ((gPadState[1] & DPAD_DOWN) && (MonsterBook_CurrentEntry(p) <= 0x51)) {
+                u8 *selection = &p->selectedRow;
                 s32 current = *selection;
-                if (current < Bestiary_GetCategoryEntryCount(p->category) - 1) {
+                if (current < (Bestiary_GetCategoryEntryCount(p->category) - 1)) {
                     p->entry++;
                     (*selection)++;
                 } else {
@@ -259,30 +257,31 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
             }
             if (changed) {
             selectionChanged:
-                p->s6C.y = BOOK_FIELD(p, 0x48, u8) << 4;
+                p->s6C.y = p->selectedRow << 4;
             }
-            if (gPadState[1] & 1) {
+            if (gPadState[1] & A_BUTTON) {
                 MonsterBook_SetPage(p, 1);
                 BestiaryFlags_Update(p);
                 Sound_PlaySong(0xDD);
             }
-            if (gPadState[1] & 2) {
-                void *script = BOOK_FIELD(p, 0xF18, void *);
+            if (gPadState[1] & B_BUTTON) {
+                void *script = p->closeScript;
                 if (script)
                     Script_Call(script, 0);
                 Sound_PlaySong(0x119);
                 p->mode = 2;
             }
             break;
+
         case 1:
-            if (gPadState[1] & 0x40) {
+            if (gPadState[1] & DPAD_UP) {
                 if (p->unk27)
                     p->unk27--;
                 else
                     p->unk27 = 3;
                 Sound_PlaySong(0xDC);
                 goto tabChanged;
-            } else if (gPadState[1] & 0x80) {
+            } else if (gPadState[1] & DPAD_DOWN) {
                 if (p->unk27 <= 2)
                     p->unk27++;
                 else
@@ -293,17 +292,18 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
             if (changed) {
             tabChanged:
                 p->sCC.y = p->unk27 << 4;
+
                 BestiaryDisplay_DrawEntryDetails(p);
             }
-            if (gPadState[1] & 0x100) {
-                if (p->entry <= 0x51)
+            if (gPadState[1] & R_BUTTON) {
+                if (MonsterBook_CurrentEntry(p) <= 0x51)
                     p->entry++;
                 else
                     p->entry = 0;
                 Sound_PlaySong(0x10A);
                 goto entryChanged;
-            } else if (gPadState[1] & 0x200) {
-                if (p->entry)
+            } else if (gPadState[1] & L_BUTTON) {
+                if (MonsterBook_CurrentEntry(p))
                     p->entry--;
                 else
                     p->entry = 0x52;
@@ -313,40 +313,44 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
             if (moved) {
             entryChanged:
                 BestiaryDisplay_DrawEntryDetails(p);
+
                 DrawDetailNumber(p);
-                if (GameState_IsEventFlagSet(p->entry)) {
+                if (GameState_IsEventFlagSet(MonsterBook_CurrentEntry(p))) {
                     BestiaryDisplay_Show(p->display);
-                    BestiaryDisplay_SetEntry(p->display, p->entry);
+                    BestiaryDisplay_SetEntry(p->display, MonsterBook_CurrentEntry(p));
                 } else
                     BestiaryDisplay_Hide(p->display);
                 BestiaryFlags_Update(p);
             }
             {
-                u8 *pending = (u8 *)p + 0xDA7;
+                u8 *pending = &p->pendingExit;
                 switch (*pending) {
-                    case 0:
-                        if (gPadState[1] & 2) {
-                            BOOK_FIELD(p, 0xD4E, u16) |= 1;
-                            ThresholdTrack_SelectInterval(p);
-                            p->s6C.y = BOOK_FIELD(p, 0x48, u8) << 4;
-                            *pending = 1;
-                        }
-                        break;
                     default:
                         MonsterBook_SetPage(p, 0);
                         BestiaryFlags_Update(p);
                         Sound_PlaySong(0xDE);
                         break;
+
+                    case 0:
+                        if (gPadState[1] & B_BUTTON) {
+                            u16 *flags = &p->transitionFlags;
+                            *flags |= 1;
+                            ThresholdTrack_SelectInterval(p);
+                            p->s6C.y = p->selectedRow << 4;
+                            *pending = 1;
+                        }
+                        break;
                 }
-                asm("");
             }
             break;
+
         case 2:
             return 0;
     }
+
     BestiaryFlags_Update(p);
     MonsterBook_UpdateHighlightPulse(p);
     ScrollingDialogue_Step(p);
-    BOOK_FIELD(p, 0x20, u32)++;
+    p->frame++;
     return 0;
 }

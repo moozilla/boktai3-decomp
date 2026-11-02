@@ -260,7 +260,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/bouncing-object-active-round9.md](../notes/bouncing-object-active-round9.md) | BouncingObject_TickActive | #matching #round9b #bouncing-object | 1 |
 | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
 | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
-| [notes/cgb.md](../notes/cgb.md) | CgbSound (0x08230AC8) - matched (register-pinning concession) | *#sound* | 3 |
+| [notes/cgb.md](../notes/cgb.md) | CgbSound (0x08230AC8) | *#sound* | 3 |
 | [notes/cloud-08084F44.md](../notes/cloud-08084F44.md) | Cloud task 08084F44 (Bat, unassigned functions) | #matching #cloud | 1 |
 | [notes/cloud-080B7C10.md](../notes/cloud-080B7C10.md) | Cloud task 080B7C10 (Skeleton states) |  | 1 |
 | [notes/cloud-080BFCC4.md](../notes/cloud-080BFCC4.md) | Cloud task 080BFCC4 | *#actors* | 1 |
@@ -428,8 +428,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round1-sol.md](../notes/round1-sol.md) | Production matching round 1 — Sol | *#matching* | 4 |
 | [notes/round10b-fan-cannon.md](../notes/round10b-fan-cannon.md) | FanCannon_UpdateActive (08209704) | #matching #fan-cannon #rng #gcse #register-allocation | 1 |
 | [notes/round10b-skeleton-rise.md](../notes/round10b-skeleton-rise.md) | Skeleton_UpdateRiseRecovery (080BF0E4) | #matching #skeleton #global-alloc #pre #stack-slots | 1 |
-| [notes/round11-c-holdouts.md](../notes/round11-c-holdouts.md) | Round 11-C holdouts |  | 92 |
-| [notes/round11-d-holdouts.md](../notes/round11-d-holdouts.md) | Round 11 package D holdouts |  | 73 |
+| [notes/round11-c-holdouts.md](../notes/round11-c-holdouts.md) | Round 11-C holdouts |  | 64 |
+| [notes/round11-d-holdouts.md](../notes/round11-d-holdouts.md) | Round 11 package D holdouts |  | 28 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
 | [notes/round2-sol.md](../notes/round2-sol.md) | Sol production round 2 |  | 5 |

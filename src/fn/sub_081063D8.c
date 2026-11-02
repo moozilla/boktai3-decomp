@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
@@ -40,21 +39,17 @@ union SparkPosition {
     } packed;
 };
 // confidence=low: emits periodic sparkles around the origin while the transition animation plays.
+
 void RegionActor_AnimateSparkleTransition(struct RegionSprite *p)
 {
     struct RegionSpriteManager *manager = gRegionActorPool;
     u32 done;
     if (manager) {
         if (p->entered) {
-            u32 offset;
             sub_0810638C(p);
-            offset = 0x10E;
             {
-                u16 *frames = (void *)((u8 *)p + offset);
-                u32 zero = 0;
-                asm("" : "+r"(zero));
-                *frames = 0;
-                p->entered = zero;
+                p->frames = 0;
+                p->entered = 0;
             }
         }
         done = PlayerCue_StepSequenceEnded(&p->sprite, &p->sequence);

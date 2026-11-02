@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "input.h"
@@ -109,15 +108,14 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
                         }
                         p->duration = 128;
                         {
-                            register s32 value asm("r4");
-                            value = RandomModulo(2230);
-                            asm("" : "+r"(value));
-                            value += 1060;
-                            p->x = value;
-                            value = RandomModulo(1710);
-                            asm("" : "+r"(value));
-                            value += 1320;
-                            p->z = value;
+                            s32 x = 1060;
+                            x += RandomModulo(2230);
+                            p->x = x;
+                        }
+                        {
+                            s32 z = 1320;
+                            z += RandomModulo(1710);
+                            p->z = z;
                         }
                     } else {
                         p->duration = 32;

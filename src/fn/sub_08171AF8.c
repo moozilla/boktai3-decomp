@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_hud_display.h"
-// MATCHING_CONCESSION: register-pinning
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 u32 PauseMenu_CanSwapCategoryEntries(void *, u32, u32, u32);
 void MenuDisplay_UpdateActionPrompt(void *, int);
@@ -18,20 +17,12 @@ void PauseInventory_UpdateConsumableOptionSelection(void);
 void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
 {
     u8 *input = p->actionInput;
-    u16 one;
-    u32 keys;
-    u32 confirm;
     if (SceneInput_NavigateGridKeys(input, 0xF0)) {
         SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
         PauseInventory_RefreshConsumableDescription(p);
         MenuDisplay_UpdateActionPrompt(p, 3);
     }
-    keys = gPadState[1];
-    one = 1;
-    confirm = one;
-    asm("" : "+r"(confirm));
-    confirm &= keys;
-    if (confirm) {
+    if (gPadState[1] & 1) {
         u8 *cursor = &p->actionCursor;
         u32 current = *cursor;
         u8 *selection = &p->actionSelection;
@@ -44,17 +35,13 @@ void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
             SceneHud_PrepareActionTransferToSlot(p, 0, *selection, *cursor);
         if (Inventory_GetConsumableId(*cursor) >= 0)
             SceneHud_PrepareActionTransferToSlot(p, 1, *cursor, *selection);
-        p->categoryWidgets[*selection + 10].flags |= one;
-        p->categoryWidgets[*cursor + 10].flags |= one;
+        p->categoryWidgets[*selection + 10].flags |= 1;
+        p->categoryWidgets[*cursor + 10].flags |= 1;
         sub_0816676C(p, 3);
         Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableSwapAnimation, 1);
-    } else {
-        u32 two = 2;
-        two &= keys;
-        if (!two)
-            return;
+    } else if (gPadState[1] & 2) {
         Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableOptionSelection, 1);
-        p->categoryWidgets[6].flags |= one;
+        p->categoryWidgets[6].flags |= 1;
         Hud_RestoreGridSelection(input);
         Hud_SetGridPosition(input, p->actionInput[1], p->actionInput[2]);
         PauseInventory_GetConsumableCursorPosition(&p->categoryWidgets[5].position, input);

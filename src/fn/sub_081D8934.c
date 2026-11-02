@@ -1,20 +1,12 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "task4e01_projectile.h"
 #include "input.h"
 void *ResourceRegistry_GetResource(u16);
 void Task4E01_ClearTrailSprites(void *);
 void Task4E01_SpawnTrailSprite(void *, void *);
-void Projectile_SetCollisionSize(void *, s32, s32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
-void Sound_PlaySong(u32);
 void Task4E01_UpdateTrailSprites(void *, void *);
 void Task4E01_UpdateTimedSprite(void);
 
-struct ImpactSprite {
-    u32 flags;
-    u8 pad4[0xC];
-    u16 frame;
-};
 struct ImpactConfig {
     u8 pad0[6];
     s8 direction;
@@ -27,16 +19,14 @@ struct ImpactConfig {
 struct Pos8 {
     u32 a, b;
 };
-struct Impact {
-    u32 tick;
-    u32 flags;
-    u8 pad8[0x10];
-    struct ImpactConfig config;
+struct TrailImpact {
+    struct Task4E01Projectile projectile;
+    s16 timer;
 };
-
-s32 Task4E01_UpdateTrailImpact(u8 *p)
+s32 Task4E01_UpdateTrailImpact(struct TrailImpact *impact)
 {
-    struct ImpactConfig *config = (struct ImpactConfig *)(p + 0x18);
+    u8 *p = (u8 *)impact;
+    struct ImpactConfig *config = (struct ImpactConfig *)&impact->projectile.params;
     void *group;
     u32 mask;
     group = ResourceRegistry_GetResource(0x4E01);
@@ -51,7 +41,7 @@ s32 Task4E01_UpdateTrailImpact(u8 *p)
         }
     }
     {
-        struct ImpactSprite *sprite = (struct ImpactSprite *)(p + 0x8c);
+        struct ContactSwarmSprite *sprite = (struct ContactSwarmSprite *)(p + 0x8c);
         u32 t;
         s32 v;
         sprite->flags &= ~1;
@@ -75,13 +65,13 @@ s32 Task4E01_UpdateTrailImpact(u8 *p)
         u32 f = *(u32 *)(p + 4);
         *(u32 *)(p + 4) = f & clr;
     }
-    mask = (*(u16 *)gPadState) & 2;
+    mask = gPadState[0] & 2;
     if (mask == 0) {
         s16 *timer = (s16 *)(p + 0x1a4);
         u8 *collider;
         {
-            register s32 w asm("r3") = *timer * 4 + 8;
-            Projectile_SetCollisionSize(config, w, 0x50);
+            s32 width = *timer * 4 + 8;
+            Projectile_SetCollisionSize(config, width, 0x50, width);
         }
         collider = p + 0xb8;
         *(struct Pos8 *)(collider + 0x1c) = *(struct Pos8 *)&config->f28;

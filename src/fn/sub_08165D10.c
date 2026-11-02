@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 struct PaletteBlendHud {
@@ -11,9 +10,8 @@ struct PaletteBlendHud {
     u8 active;
 };
 s32 Div(s32, s32);
-s32 SceneHud_TickPaletteBlend(struct PaletteBlendHud *p0)
+s32 SceneHud_TickPaletteBlend(struct PaletteBlendHud *p)
 {
-    struct PaletteBlendHud *p = p0;
     u16 *fromPalette;
     u16 *toPalette;
     s32 colorIndex;
@@ -21,6 +19,7 @@ s32 SceneHud_TickPaletteBlend(struct PaletteBlendHud *p0)
     u8 *framep;
     u8 *durp;
     u32 channelShift = 5;
+    u32 channelMask = 31;
     if (!p->active)
         return 1;
     fromPalette = (u16 *)(((u8 *)gPaletteBankData) + (p->from << channelShift));
@@ -46,7 +45,7 @@ s32 SceneHud_TickPaletteBlend(struct PaletteBlendHud *p0)
             u8 *framep = &p->frame;
             u8 *durp = &p->duration;
             {
-                if ((colorIndex != 5) && (colorIndex != 13)) {
+                if (colorIndex != 5 && colorIndex != 13) {
                     u32 fromColor = *fromPalette;
                     u32 fromRed;
                     u32 fromGreen;
@@ -55,22 +54,18 @@ s32 SceneHud_TickPaletteBlend(struct PaletteBlendHud *p0)
                     u32 toRed;
                     u32 toGreen;
                     u32 toBlue;
-                    u32 mask;
                     s32 red;
                     s32 green;
                     s32 blue;
-                    fromRed = 31;
+                    fromRed = channelMask;
                     fromRed &= fromColor;
                     fromGreen = (fromColor << 16) >> 21;
-                    mask = 31;
-                    fromGreen &= mask;
-                    fromBlue = ((fromColor << 16) >> 26) & mask;
+                    fromGreen &= channelMask;
+                    fromBlue = ((fromColor << 16) >> 26) & channelMask;
                     toColor = *toPalette;
-                    toRed = 31;
-                    asm("" : "+r"(toRed));
-                    toRed &= toColor;
-                    toGreen = ((toColor << 16) >> 21) & mask;
-                    toBlue = ((toColor << 16) >> 26) & mask;
+                    toRed = toColor & 31;
+                    toGreen = ((toColor << 16) >> 21) & channelMask;
+                    toBlue = ((toColor << 16) >> 26) & channelMask;
                     red = Div((fromRed * remainingFrames) + (toRed * (*framep)), *durp);
                     green = Div((fromGreen * remainingFrames) + (toGreen * (*framep)), *durp);
                     blue = Div((fromBlue * remainingFrames) + (toBlue * (*framep)), *durp);

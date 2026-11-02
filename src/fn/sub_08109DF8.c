@@ -1,8 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-// The original copies p at entry (adds r5, r4) and uses the copy only in the
-// retry branch; r5 is reused for 0xFFFF in the init loop. A plain `q = p` copy
-// gets r7 and swaps roles, so q is pinned to r5.
 
 struct PollPanel {
     u8 pad0[0x1d];
@@ -49,12 +45,12 @@ s32 ScriptPanel_PollSelection(struct PollPanel *p)
     s32 i;
     s32 role;
     if (Registry1745_ConsumeStateEntry(p)) {
-        DEBUG_NOP();
         SerialLink_InitMultiplayer();
-        for (i = 0; i <= 1; i++) {
+        i = 0;
+        do {
             p->buttons[i] = 0;
             p->masks[i] |= 0xffff;
-        }
+        } while (++i <= 1);
         p->f3e = 0;
         p->retryTimer = 0;
         return 0;

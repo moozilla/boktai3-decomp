@@ -43,10 +43,12 @@ LIBRARY = ("src/lib/", "include/gba/")
 DEFAULT_CFLAGS = {"-O2", "-mthumb-interwork"}
 
 _REG = r"(?:r\d+|sl|fp|ip|sb|lr)"
+# A register declaration can name its register through a function-like macro parameter.
+REGISTER_BINDING = r'\b(?:asm|__asm__)\s*\(\s*(?:"\w+"|[A-Za-z_]\w*)\s*\)'
 # an asm("") statement; its operands decide the kind
 _ASM_EMPTY = re.compile(r'\b(?:asm|__asm__)\s*(?:volatile\s*|__volatile__\s*)?\(\s*""\s*(?P<rest>(?:[^;()]|\([^()]*\))*)\)')
 _REGEX = {
-    "pin": re.compile(r'\bregister\b[^;]*\b(?:asm|__asm__)\s*\(\s*"\w+"\s*\)|\b(?:asm|__asm__)\s*\(\s*"%s"\s*\)' % _REG),
+    "pin": re.compile(r'\bregister\b[^;{}]*?' + REGISTER_BINDING + r'|\b(?:asm|__asm__)\s*\(\s*"%s"\s*\)' % _REG),
     "debug-nop": re.compile(r"\bDEBUG_NOP\s*\(\s*\)"),
     "empty-loop": re.compile(r"\bdo\s*\{\s*\}\s*while\s*\(\s*0\s*\)"),
     # an if with nothing in its body; one whose body is DEBUG_PRINT() (include/debug.h) is ordinary C

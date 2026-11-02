@@ -2,13 +2,10 @@
 #include "engine_globals.h"
 #include "ram.h"
 // confidence=low: paired commands and positive-counter checks appear to gate a charged attack.
-// MATCHING_CONCESSION: register-pinning
 #include "vanargand_pair_attack.h"
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
-void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
-s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 static inline s32 RandomValue(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
@@ -16,7 +13,6 @@ static inline s32 RandomValue(void)
 }
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
-s32 ScenePair_CountPositiveCounters(void *);
 void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
 {
     struct VanargandPairAttack *self = p;
@@ -74,13 +70,12 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
             }
             if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 struct VanargandAttackPair *pair;
-                register u32 a asm("r4");
-                u32 b;
-                asm("" : "+r"(self));
-                pair = self->pair;
-                a = pair->first;
-                b = pair->second;
-                if (ScenePair_CountPositiveCounters(pair) == 2 && a == 0xC && b == 0xC)
+                u32 firstState, secondState;
+                pair = Vanargand_GetAttackPair(self);
+                firstState = Vanargand_HalfState(pair, 0);
+                secondState = Vanargand_HalfState(pair, 1);
+                if (ScenePair_CountPositiveCounters(pair) == 2 && firstState == 0xC &&
+                    secondState == 0xC)
                     self->flash = 60;
                 {
                     u8 next = 3;

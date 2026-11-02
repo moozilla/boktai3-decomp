@@ -1,5 +1,5 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
+#include "scene_facing.h"
 #include "player.h"
 #include "engine.h"
 struct Vec {
@@ -63,6 +63,12 @@ static inline s32 AllowsFacing(struct Player *p)
 }
 // confidence=low: turns toward a conversation target and marks nearby facing agreement.
 
+static inline void TaggedNpc_SetHeading(struct Npc *p, s32 heading)
+{
+    p->angle = heading;
+    p->facing8 = SceneFacing_EightWay(heading);
+    p->facing4 = SceneFacing_FourWay(heading);
+}
 void TaggedSceneNpc_UpdateTargetFacing(struct Context *ctx, struct Npc *p)
 {
     struct Vec *pos = &p->position;
@@ -72,38 +78,12 @@ void TaggedSceneNpc_UpdateTargetFacing(struct Context *ctx, struct Npc *p)
         s32 angle = Math_Atan2(target->x - pos->x, target->z - pos->z);
         {
             s32 diff = (s8)(angle - p->angle);
-            s32 value;
-            register s32 octant asm("r2");
-            s32 mask;
-            s32 quadrantMask;
-            if (diff > 8) {
-                value = p->angle;
-                value += 8;
-                p->angle = value;
-            } else {
-                if (diff < -8) {
-                    value = p->angle;
-                    value -= 8;
-                } else {
-                    value = p->angle;
-                    value += diff;
-                }
-                p->angle = value;
-                /* Retain the low halfword before deriving the facing indices. */
-                value = (u32)value << 16;
-                value = (u32)value >> 16;
-            }
-            octant = value;
-            octant += 112;
-            octant >>= 5;
-            mask = 7;
-            mask &= octant;
-            p->facing8 = mask;
-            value += 96;
-            value >>= 6;
-            quadrantMask = 3;
-            quadrantMask &= value;
-            p->facing4 = quadrantMask;
+            if (diff > 8)
+                TaggedNpc_SetHeading(p, p->angle + 8);
+            else if (diff < -8)
+                TaggedNpc_SetHeading(p, p->angle - 8);
+            else
+                TaggedNpc_SetHeading(p, p->angle + diff);
         }
         /* The target actor stores its heading in this byte. */
         facing = (u8)ctx->targetActor->unk2D;

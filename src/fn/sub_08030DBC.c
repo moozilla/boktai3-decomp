@@ -1,6 +1,5 @@
 #include "global.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 struct State {
     u8 pad0[15];
     u8 fresh;
@@ -67,83 +66,63 @@ static inline u8 getMode(struct Actor *p, u32 offset)
 int MessageWindow_ShowMessage(int index)
 {
     struct Actor *p = gMessageWindow;
-    if (p) {
-        void *script = p->script;
-        struct State *state = &p->state;
-        asm("" : "+r"(state) : "r"(script) : "r1");
-        if (script) {
-            TextWindow_BlankRect(p->x, p->y, p->width, p->height);
-            TextState_SetBounds(state, p->x, p->y, p->width, p->height);
-            p->scriptIndex = index;
+    void *script;
+    struct State *state;
+    if (!p)
+        return 0;
+    script = p->script;
+    state = &p->state;
+    if (!script)
+        return 0;
+    TextWindow_BlankRect(p->x, p->y, p->width, p->height);
+    TextState_SetBounds(state, p->x, p->y, p->width, p->height);
+    p->scriptIndex = index;
+    state->pc = MessageWindow_GetStringAtOffset(p, p->scriptIndex);
+
+    {
+        u8 mode;
+        {
+            u32 offset = 0x182;
+            u8 *ptr;
+            ptr = (u8 *)p + offset;
+            mode = *ptr;
+        }
+        if (!mode) {
             {
-                void *pc = MessageWindow_GetStringAtOffset(p, p->scriptIndex);
-                struct State *dst = state;
-                dst->pc = pc;
+                void *fn = sub_080316A4;
+                void **dst;
+                u32 offset = 0x2cc;
+                dst = (void **)((u8 *)p + offset);
+                *dst = fn;
             }
             {
-                u8 mode;
-                {
-                    u32 offset = 0x182;
-                    u8 *ptr;
-                    ptr = (u8 *)p + offset;
-                    mode = *ptr;
-                }
-                if (!mode) {
-                    {
-                        void *fn = sub_080316A4;
-                        void **dst;
-                        u32 offset = 0x2cc;
-                        dst = (void **)((u8 *)p + offset);
-                        *dst = fn;
-                    }
-                    {
-                        u32 offset = 0x187;
-                        u8 *mode;
-                        mode = (u8 *)p + offset;
-                        *mode = 3;
-                    }
-                } else {
-                    {
-                        u32 offset = 0x19c;
-                        u32 *counter;
-                        counter = (u32 *)((u8 *)p + offset);
-                        {
-                            u32 zero = 0;
-                            *counter = zero;
-                        }
-                    }
-                    {
-                        void *fn = MessageWindow_UpdateImmediatePlayback;
-                        u32 offset;
-                        void **dst;
-                        offset = 0x2cc;
-                        dst = (void **)((u8 *)p + offset);
-                        *dst = fn;
-                    }
-                }
+                u32 offset = 0x187;
+                u8 *mode;
+                mode = (u8 *)p + offset;
+                *mode = 3;
             }
-            TextState_Reset(state);
+        } else {
             {
-                u32 offset = 0x196;
-                u16 *wait;
-                wait = (u16 *)((u8 *)p + offset);
+                u32 offset = 0x19c;
+                u32 *counter;
+                counter = (u32 *)((u8 *)p + offset);
                 {
-                    u32 value = 65535;
-                    *wait = value;
+                    u32 zero = 0;
+                    *counter = zero;
                 }
             }
             {
-                u32 offset = 0x218;
-                u32 *flags;
-                flags = (u32 *)((u8 *)p + offset);
-                {
-                    u32 value = *flags;
-                    u32 mask = 1;
-                    value |= mask;
-                    *flags = value;
-                }
+                void *fn = MessageWindow_UpdateImmediatePlayback;
+                u32 offset;
+                void **dst;
+                offset = 0x2cc;
+                dst = (void **)((u8 *)p + offset);
+                *dst = fn;
             }
         }
     }
+    TextState_Reset(state);
+    p->wait = 0xFFFF;
+    p->flags |= 1;
     return 0;
 }

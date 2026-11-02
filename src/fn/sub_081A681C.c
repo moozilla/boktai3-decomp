@@ -1,6 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "gba/defines.h"
 
 struct ScreenPaletteTransition {
     u8 unknown0[4];
@@ -15,6 +15,7 @@ void Palette_InterpolateBanks(void *, void *, void *, int, int);
 
 void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *s)
 {
+    s32 sourceBank;
     u8 *palettes = s->palettes;
     if (s->phase) {
         if (s->variant == 1 && s->phase > 64)
@@ -23,17 +24,16 @@ void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *s)
             Blend_SetAlpha(1, 16, 16);
     }
     if (s->phase <= 32) {
-        s32 a = s->variant * 3 + 11;
-        Palette_InterpolateBanks(gBgPaletteBank9, palettes + a * 32,
-                                 palettes + (s->variant * 3 + 10) * 32, s->phase, 5);
+        sourceBank = s->variant * 3 + 11;
+        Palette_InterpolateBanks(gBgPaletteBank9, palettes + sourceBank * PLTT_SIZE_4BPP,
+                                 palettes + (s->variant * 3 + 10) * PLTT_SIZE_4BPP, s->phase, 5);
     } else if (s->phase <= 64) {
-        s32 a = s->variant * 3 + 10;
-        Palette_InterpolateBanks(gBgPaletteBank9, palettes + a * 32,
-                                 palettes + (s->variant * 3 + 9) * 32, s->phase - 32, 5);
+        sourceBank = s->variant * 3 + 10;
+        Palette_InterpolateBanks(gBgPaletteBank9, palettes + sourceBank * PLTT_SIZE_4BPP,
+                                 palettes + (s->variant * 3 + 9) * PLTT_SIZE_4BPP, s->phase - 32,
+                                 5);
     } else {
-        u32 v = s->variant;
-        register u32 index asm("r0") = v * 3;
-        u32 bank = index + 9;
-        CpuSet(s->palettes + (bank << 5), gBgPaletteBank9, 0x04000008);
+        sourceBank = s->variant * 3 + 9;
+        CpuSet(s->palettes + (sourceBank * PLTT_SIZE_4BPP), gBgPaletteBank9, 0x04000008);
     }
 }
