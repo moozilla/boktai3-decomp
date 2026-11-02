@@ -55,11 +55,11 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
             return;
     }
     {
-        register u16 *flags asm("r5");
+        u16 *flags;
         u32 ownership;
         u32 inputMask = 0x1000;
         u32 *actorFlags;
-        register u32 byteZero asm("r8");
+        u32 byteZero;
         ownership = inputMask;
         {
             u32 flagOffset = 0x2D4;
