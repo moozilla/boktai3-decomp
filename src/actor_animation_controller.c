@@ -2128,7 +2128,6 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_HideAndResetChildren(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -2144,18 +2143,17 @@ void Actor_HideAndResetChildren(struct ActorAnimController *p)
         Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
-            register void (*fn)(void *, void *) asm("r4") = Actor_OnInteractionChildUpdate;
+            void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
             u32 reset = 1;
             struct ActorChildCallbackView *child =
                 (struct ActorChildCallbackView *)((u8 *)p + 0xc8);
             s32 i = 15;
             do {
-                u32 v = child->flags;
-                if (active & v) {
-                    register u32 flags asm("r0");
+                union DisplaySequenceControl control;
+                control.raw = child->flags;
+                if (active & control.raw) {
                     child->fn = fn;
-                    flags = reset | v;
-                    child->flags = flags;
+                    child->flags = reset | control.raw;
                 }
                 child++;
             } while (--i >= 0);
