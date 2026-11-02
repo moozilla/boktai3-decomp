@@ -1,11 +1,21 @@
 # FanCannon_UpdateActive (08209704)
 
-Tags: #matching #fan-cannon #rng #combine #register-allocation
+Tags: #matching #fan-cannon #rng #gcse #register-allocation
 
-The guarded C draft scores 84.5% over the 820-byte ROM extent. The stock compiler emits the correct 820 bytes. On the same toolchain the previous 804-byte draft scores 72.0%. The realigned instruction distance falls from 125 to 69, or from 51 to 32 with registers ignored. The assembly fallback still matches all 820 bytes.
+All 820 bytes match in the normal stock agbcc build, including the literal
+pools. The function SHA-256 is
+`cc51d5c5997b91229c37ebc45a29b525330357df5a47c671848b344ee3646a00`.
 
-Both directional branches capture the numeric particle sample origin before the jitter draw. Both jitter and frame read relative to that origin. Narrowing the signed jitter sample to its low byte after loading the coordinate preserves the two early origin literals and the cursor handoff. The second jitter draw uses the physical table constant. The first uses its symbol, at the same address. Copying the origin for the frame draw changes when the compiler rematerializes it. The position uses the signed scene vector used by the nearby cannon turret. Both polar projections use byte angles, a signed 32-bit radius and signed halfword sine-table samples.
+Each directional jitter draw and the later frame draw compute the same
+symbol-relative particle sample origin. This reproduces the otherwise dead
+0x0403B714 loads and the copies after the reverse-flag reads. The origin uses
+the existing random table and the same address delta as the matched particle
+routine at 081D0928. Reading the unsigned coordinate before narrowing the
+sample to its low byte preserves the order of the halfword and byte loads.
 
-The ROM copies the origin from r3 to r6 after reading the reverse flag, then copies the index pointer from r2 to r3. In the two-local experiment, the origin copies survive GCSE. CSE2 attaches a constant-equivalence note. Flow marks the source dead, and combine substitutes its literal into the copy. Keeping that source with the diagnostic `AGBCC_COMBKEEP=35` restores both r3 loads and both r3-to-r6 moves, with the moves still before the reverse-flag loads. The retained draft uses the stock compiler.
-
-A second difference is the position lifetime. The ROM retains the position in r9 across seven calls, then copies it into r2 for the final y/z additions. Separating the position from a paired velocity/offset workspace reproduces that register usage and both direct stack roots, with the three vectors in a different stack order. Pairing parameters with position and retaining the velocity/offset pair restores the original stack offsets as well. The experimental grouped form still allocates the offset to the wrong register. On the symmetric 824-byte predecessor, forcing only the position to r9 and the range table to r5 gives 820 bytes and reduces scope’s register-blind distance to 27. A controlled sweep of descriptor layouts and inline helper argument lists produced 112 distinct machine bodies without improving the retained draft.
+One source pointer is reused for the range samples, the projected offset and
+the last pair of particle flag draws. Its allocation leaves the emission
+position in r9 across calls while the final vector addition can use r2.
+In the reverse branch the range sample is evaluated before the output pointer
+is selected for the projection. This places the move after the stack-address
+calculation, removing the final instruction-order difference.
