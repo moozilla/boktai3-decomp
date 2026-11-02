@@ -3018,28 +3018,7 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 256, 60, duration, 3, duration, 5, 60, duration);
             ActorShadow_Disable(p->p2);
             p->obj.flags |= 1;
-            p->oldMode = p->mode;
-            {
-                u32 mode = 1;
-                p->mode = mode;
-            }
-            {
-                register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-                register u32 mask asm("r2") = 15;
-                *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 32;
-                if (p->oldMode == 3) {
-                    register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                    if (bits == 3) {
-                        p->savedFrame = p->anim.frame;
-                        p->savedTimer = p->anim.timer;
-                    }
-                }
-            }
-            {
-                register s32 mask asm("r0") = 1;
-                register s32 v asm("r1") = p->flags;
-                p->flags = mask | v;
-            }
+            Actor_SetState(p, 1, 2);
             {
                 u32 active = 4;
                 register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
