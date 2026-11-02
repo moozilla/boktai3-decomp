@@ -42,6 +42,7 @@
   scope.py like FUNC|ADDR [N]   matched functions whose ROM shares the most rare 3-insn windows with
                                 FUNC's, with the calls and constants they share: whose C to read first
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
+                                (FILE.c FUNC insn/uses/life/vs/put ... also works: FUNC moves last)
   scope.py uses REG... [PASS...] [FUNC]   insns (uid@C line) using each pseudo after each pass
 
 One compile with the instrumented agbcc (-g -dp -da) gives the code, the C line of every
@@ -7181,11 +7182,28 @@ def validate_cli(args):
         cli_error("FILE.c [FUNC] [KNOB=V...]")
 
 
+FUNC_LAST_COMMANDS = ("vs", "insn", "uses", "life", "put")
+
+
+def func_first_args(args):
+    """FILE.c FUNC insn UID (likewise vs/uses/life/put): these subcommands take FUNC last;
+    accept it before the subcommand too, as why/probe/frame do, by moving it to the end."""
+    words = [i for i, a in enumerate(args) if "=" not in a]
+    if (len(words) >= 3 and args[0].endswith(".c") and words[0] == 0
+            and args[words[2]] in FUNC_LAST_COMMANDS
+            and re.fullmatch(r"[A-Za-z_]\w*", args[words[1]])
+            and args[words[1]] not in FUNC_LAST_COMMANDS):
+        func = args[words[1]]
+        return [a for i, a in enumerate(args) if i != words[1]] + [func]
+    return args
+
+
 def main():
     args = sys.argv[1:]
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
         return 0
+    args = func_first_args(args)
     validate_cli(args)
     if args[0] == "fields":  # fields OFF... [STRUCT]: which structs have members at these offsets
         offs, names = [], []
