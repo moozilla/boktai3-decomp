@@ -395,7 +395,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
                 }
             }
         }
-        sub_08159164(*(u32 *)((u8 *)actor + 0xAC));
+        sub_08159164(actor->fieldAC);
         Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
     }
 
