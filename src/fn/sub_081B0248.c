@@ -1,28 +1,27 @@
-#include "global.h"
-#include "scene_vec.h"
+#include "vanargand_effect.h"
 #include "engine.h"
 #include "monster_particle_random.h"
 
 struct VanargandPart {
     u8 unk_00[0x90];
-    struct SceneVec *basePosition;
+    struct MotionTrackVector *basePosition;
     u8 unk_94[0x15c - 0x94];
     u32 variant;
 };
 extern const s16 gUnk_086149C4[];
-void *VanargandEffect_Create(s32, s32, struct SceneVec *, struct SceneVec *, u32);
 
 static inline s32 Scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
-static inline void Vector(struct SceneVec *out, s32 angle, s32 radius)
+static inline void Vector(struct MotionTrackVector *out, s32 angle, s32 radius)
 {
     out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     out->y = 0;
     out->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
-static inline void Add(struct SceneVec *out, struct SceneVec *base, struct SceneVec *offset)
+static inline void Add(struct MotionTrackVector *out, struct MotionTrackVector *base,
+                       struct MotionTrackVector *offset)
 {
     out->x = offset->x + base->x;
     out->y = offset->y + base->y;
@@ -32,8 +31,8 @@ static inline void Add(struct SceneVec *out, struct SceneVec *base, struct Scene
 void Vanargand_SpawnPartEmergenceEffects(void *arg0)
 {
     struct VanargandPart *part = arg0;
-    struct SceneVec position;
-    struct SceneVec velocity;
+    struct MotionTrackVector position;
+    struct MotionTrackVector velocity;
     s32 i;
     for (i = 0; i < 4; i++) {
         s32 angle;
