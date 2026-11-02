@@ -1,4 +1,4 @@
-#include "global.h"
+#include "dark_loan_screen.h"
 
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
@@ -9,7 +9,7 @@ void DarkLoan_OnDestroy(void);
 
 void *DarkLoan_Create(void)
 {
-    void *r = Task_Create(0xb, 2356);
+    void *r = Task_Create(0xb, sizeof(struct DarkLoanScreen));
     if (r != 0) {
         Task_SetCallbacks(r, DarkLoan_OnUpdate, DarkLoan_OnDestroy);
         if (DarkLoan_InitializeFromScript(r) < 0) {
