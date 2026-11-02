@@ -54,7 +54,7 @@ struct PlayerStatModifierContext {
     u16 contactExtentA;                           /* owner + 0xC00 */
     u8 unknownBE[2];
     u16 contactExtentB; /* owner + 0xC04 */
-    u8 unknownC2[2];
+    u16 contactExtentC; /* owner + 0xC06: third sweep extent, paired with contactExtentB */
     u16 contactCounter;  /* owner + 0xC08 */
     u16 contactTimer;    /* owner + 0xC0A */
     u8 contactHeading;   /* owner + 0xC0C */
