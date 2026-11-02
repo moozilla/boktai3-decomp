@@ -1026,11 +1026,9 @@ void sub_081E4D14(void)
 
 #define OWNER_V(o) (*(u16 *)(*(u8 *volatile *)((u8 *)g + 0x18) + (o)))
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_BeginCurveToPosition(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
@@ -1060,27 +1058,7 @@ void Actor_BeginCurveToPosition(void)
     }
     B(0xf67) = Script_GetKeywordValue(0x64, -1);
     W(0xf50) = Script_GetKeywordValue(0x70, 0);
-    g->oldMode = g->mode;
-    {
-        u32 mode = 2;
-        g->mode = mode;
-    }
-    {
-        register u32 raw asm("r1") = *(u16 *)((u8 *)g + 0xf5a);
-        register u32 mask asm("r2") = 15;
-        *(u16 *)((u8 *)g + 0xf5a) = (mask & raw) | 0xa0;
-        if (g->oldMode == 3) {
-            register u32 bits asm("r0") = mode_bits_v2((u8 *)g + 0xf5a, mask);
-            if (bits == 3) {
-                g->savedFrame = g->anim.frame;
-                g->savedTimer = g->anim.timer;
-            }
-        }
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    Actor_SetState(g, 2, 10);
 }
 
 /* Script command: configure the singleton animation controller. */
