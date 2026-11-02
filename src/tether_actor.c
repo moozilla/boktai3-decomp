@@ -1287,13 +1287,9 @@ void TetherActor_ClearExternalStatus(void)
 {
     Inventory_AddItem(43, 0);
     {
+        const s8 cleared = -1;
         s16 *status = &gGameState->unk5AA;
-        register s32 value asm("r2");
-        register s32 half asm("r1");
-        value = -1;
-        asm("" : "+r"(value));
-        half = value;
-        *status = half;
+        *status = cleared;
     }
 }
 
