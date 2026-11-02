@@ -82,7 +82,8 @@ struct SceneActorRegistryResetView {
     u8 field2B0, field2B1, field2B2, field2B3;
     u8 enabled, field2B5, field2B6, animationIndex;
     u16 field2B8;
-    u8 unknown2BA[4];
+    u8 unknown2BA[2];
+    u16 defeatTimer; /* 0x2BC: set to 60 on entry to Spider_UpdateDefeat. */
     u16 groundHeight2BE;
     u16 flags2C0, field2C2;
     u32 profileMode;
