@@ -1,62 +1,53 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define ActorDecision_SetTransition SceneVolume_BeginPhase
-struct ActorDecisionPosition {
-    u32 a, b;
+#include "actor_state.h"
+#include "actor_spatial_query.h"
+
+union PulseActor {
+    struct ActorStateOwner owner;
+    struct MovementReachActor movement;
+    struct SceneVolumeSearch volume;
 };
-struct ActorDecisionState {
-    u8 unknown0[0xAA];
-    u8 phase, unknownAB[3], selection, pending, reset;
-    u8 unknownB1[0x13];
-    u32 timer;
-    u8 unknownC8[0x3B8];
-    struct ActorDecisionPosition position;
-    u8 unknown488[0x58];
-    u8 mode, unknown4E1, phaseFlag, unknown4E3[3];
-    u16 timeout;
-    u8 transition, savedSelection, unknown4EA, reason;
-    u8 unknown4EC[0x734];
-    struct ActorDecisionPosition savedPosition;
-};
-s32 ActorMovement_CanReachTarget(struct ActorDecisionState *);
-s32 SceneVolume_FindNearbyPosition(struct ActorDecisionState *);
-s32 SceneVolume_GetActivityState(struct ActorDecisionState *);
-s32 SceneVolume_ConsumePendingEvent(struct ActorDecisionState *);
-void SceneVolume_BeginPhase(struct ActorDecisionState *, s32);
-s32 ActorEffect_StepTurn(struct ActorDecisionState *, u32, s32, s32, s32);
-static inline u8 consumeReset(struct ActorDecisionState *p)
+
+s32 SceneVolume_GetActivityState(struct ActorState *);
+void SceneVolume_BeginPhase(struct ActorState *, s32);
+s32 ActorEffect_StepTurn(struct ActorState *, u32, s32, s32, s32);
+
+static inline s32 GetPulseTrigger(struct ActorStateOwner *owner, u8 **trigger)
 {
-    if (p->reset) {
-        p->reset = 0;
-        p->pending = 0;
-        return 1;
-    }
-    return 0;
+    *trigger = &owner->actor.triggered;
+    return **trigger;
 }
-void ActorDecision_UpdatePulsePhase(struct ActorDecisionState *p)
+
+void ActorDecision_UpdatePulsePhase(union PulseActor *input)
 {
+    struct ActorStateOwner *owner = &input->owner;
+    union PulseActor *actor;
+    u8 *trigger;
     s32 result;
-    struct ActorDecisionState *s = p;
-    asm("" : "+r"(s));
-    consumeReset(p);
-    if (ActorMovement_CanReachTarget(s))
-        SceneVolume_BeginPhase(p, 1);
-    else if (SceneVolume_GetActivityState(p))
-        SceneVolume_BeginPhase(p, 2);
-    else if (p->timer > 60 && SceneVolume_FindNearbyPosition(s) == 1)
-        SceneVolume_BeginPhase(p, 3);
-    else if (p->timer > 210) {
-        p->savedSelection = p->selection;
-        p->transition = 1;
-        p->reason = 0;
+    actor = input;
+    if (GetPulseTrigger(owner, &trigger)) {
+        actor = (union PulseActor *)(trigger - ((u8 *)&owner->actor.triggered - (u8 *)owner));
+        actor->owner.actor.triggered = 0;
+        owner->actor.pending = 0;
     }
-    if (s->unknown4EA == 2)
-        result = ActorEffect_StepTurn(p, p->timer, 30, 30, 1);
+    if (ActorMovement_CanReachTarget(&actor->movement))
+        SceneVolume_BeginPhase(&owner->actor, 1);
+    else if (SceneVolume_GetActivityState(&owner->actor))
+        SceneVolume_BeginPhase(&owner->actor, 2);
+    else if (owner->actor.timer > 60 && SceneVolume_FindNearbyPosition(&actor->volume) == 1)
+        SceneVolume_BeginPhase(&owner->actor, 3);
+    else if (owner->actor.timer > 210) {
+        owner->actor.requestedVariant = owner->actor.variant;
+        owner->actor.request = 1;
+        owner->actor.requestPhase = 0;
+    }
+    if (actor->owner.actor.requestMode == 2)
+        result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 30, 1);
     else
-        result = ActorEffect_StepTurn(p, p->timer, 30, 30, 0);
+        result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 30, 0);
     if (result) {
         u32 phase = 6;
-        p->phase = phase;
+        owner->actor.state = phase;
     }
-    p->timer++;
+    owner->actor.timer++;
 }
