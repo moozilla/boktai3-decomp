@@ -1,6 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
-#define FIELD_OFFSET(type, field) ((u32) & ((type *)0)->field)
 // confidence=low: BossSlot2 late per-frame update: collider/shadow/camera flags and shake counters.
 #define H(o) (*(s16 *)(q + (o)))
 #define U(o) (*(u16 *)(q + (o)))
@@ -148,19 +146,15 @@ void BossSlot2_UpdatePresentation(u8 *p)
         {
             struct A *shadowActor = (struct A *)q;
             u32 val = *(u8 *)(p + 0xb3);
-            u8 *shadow;
             grounded = p + 0xb3;
-            if (val)
-                shadow = &shadowActor->shadow;
-            else {
-                u32 shadowOffset = FIELD_OFFSET(struct A, shadow);
-                /* Keep this offset out of reload; r0 holds the resulting address. */
-                asm("" : "+r"(shadowOffset) : : "r0");
-                shadow = q + shadowOffset;
+            if (val) {
+                ActorShadow_Enable(&shadowActor->shadow);
+                clearCameraFlags((struct Camera *)(q + 0xc30), 1);
+            } else {
+                ActorShadow_Enable(&shadowActor->shadow);
+                clearCameraFlags((struct Camera *)(q + 0xc30), 1);
             }
-            ActorShadow_Enable(shadow);
         }
-        clearCameraFlags((struct Camera *)(q + 0xc30), 1);
         if (TestFlags(flags, 0x20))
             ((struct Collider *)(q + 0x1cc))->flags |= 8;
         else
