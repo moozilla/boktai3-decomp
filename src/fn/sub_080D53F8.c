@@ -15,7 +15,7 @@ struct MummyNavigationContext {
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
-u8 sub_0807AF94(void *);
+u8 SceneActorRoute_TryRecoveryDetour(void *);
 u8 Mummy_RequestStraightRoute(void *);
 
 static inline u32 Mummy_MotionBits(struct SceneActorRegistryResetView *actor, u32 mask)
@@ -102,7 +102,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
         if (!SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 32, 32, speed))
             goto increment;
         if (!SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
-            if (sub_0807AF94(actor))
+            if (SceneActorRoute_TryRecoveryDetour(actor))
                 return;
             if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 1)) {
                 u32 saved = ((actor->unknown3CD[0] + 5) & 7) << 5;

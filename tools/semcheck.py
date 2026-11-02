@@ -47,7 +47,7 @@ import tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build  # noqa: E402
 import check  # noqa: E402
-from romlib import ROOT, load_rom  # noqa: E402
+from romlib import ROOT, load_rom, rom_data_ranges  # noqa: E402
 
 try:
     import unicorn
@@ -182,9 +182,13 @@ class Run:
         map_rom(uc, image, overlay)
         uc.mem_map(SENTINEL, PAGE, unicorn.UC_PROT_ALL)
         uc.mem_write(SENTINEL, b"\x70\x47" * (PAGE // 2))   # bx lr
-        lo, hi = STACK_LO & ~(PAGE - 1), (STACK_TOP + PAGE) & ~(PAGE - 1)
+        lo, hi = STACK_LO & ~(PAGE - 1), (STACK_TOP + PAGE - 1) & ~(PAGE - 1)
         uc.mem_map(lo, hi - lo, unicorn.UC_PROT_ALL)
-        uc.mem_write(lo, bytes(hi - lo))
+        # Unicorn zero-fills the stack. Bytes sharing its edge pages are ordinary RAM.
+        if lo < STACK_LO:
+            uc.mem_write(lo, page_bytes(seed, lo)[:STACK_LO - lo])
+        if STACK_TOP < hi:
+            uc.mem_write(STACK_TOP, page_bytes(seed, hi - PAGE)[STACK_TOP - (hi - PAGE):])
         uc.hook_add(unicorn.UC_HOOK_MEM_UNMAPPED, self.on_unmapped)
         uc.hook_add(unicorn.UC_HOOK_MEM_WRITE, self.on_write)
         uc.hook_add(unicorn.UC_HOOK_MEM_READ, self.on_read)
@@ -318,23 +322,37 @@ def compare(rom, cand, check_r0, arity=None):
                     f"{_byte(wa.get(addr), a[3][1].get(addr))} in ROM, {_byte(wb.get(addr), b[3][1].get(addr))} in draft")
     if len(rom.calls) != len(cand.calls):
         more = rom if len(rom.calls) > len(cand.calls) else cand
-        who = "ROM" if more is rom else "draft"
-        extra = more.calls[min(len(rom.calls), len(cand.calls))][0]
-        return f"{who} makes {abs(len(rom.calls) - len(cand.calls))} more call(s), first {extra}"
-    for addr in sorted(set(rom.writes) | set(cand.writes)):
+        shorter = cand if more is rom else rom
+        if shorter.status != "step limit":
+            who = "ROM" if more is rom else "draft"
+            extra = more.calls[min(len(rom.calls), len(cand.calls))][0]
+            return f"{who} makes {abs(len(rom.calls) - len(cand.calls))} more call(s), first {extra}"
+    rom_limited = rom.status == "step limit"
+    cand_limited = cand.status == "step limit"
+    if rom_limited and cand_limited:
+        return None  # only the shared call prefix is synchronized
+    # A partial run can still prove it touched an address the other run never
+    # touched. Values at shared addresses can change in the unobserved suffix.
+    if rom_limited:
+        comparable = rom.writes.keys() - cand.writes.keys()
+    elif cand_limited:
+        comparable = cand.writes.keys() - rom.writes.keys()
+    else:
+        comparable = rom.writes.keys() | cand.writes.keys()
+    for addr in sorted(comparable):
         a, b = rom.writes.get(addr), cand.writes.get(addr)
         if a != b:
             return (f"memory 0x{addr:08X}: {_byte(a, rom.writer.get(addr))} in ROM, "
                     f"{_byte(b, cand.writer.get(addr))} in draft")
     extra = sorted(set(cand.reads) - set(rom.reads))
-    if extra:
+    if extra and not rom_limited:
         return (f"the draft reads 0x{extra[0]:08X} (at 0x{cand.reads[extra[0]]:08X}), which the ROM does not"
                 + (f" ({len(extra)} such addresses)" if len(extra) > 1 else ""))
     missing = sorted(set(rom.reads) - set(cand.reads))
-    if missing:
+    if missing and not cand_limited:
         return (f"the ROM reads 0x{missing[0]:08X} (at 0x{rom.reads[missing[0]]:08X}), which the draft does not"
                 + (f" ({len(missing)} such addresses)" if len(missing) > 1 else ""))
-    if check_r0 and rom.r0 != cand.r0:
+    if check_r0 and not (rom_limited or cand_limited) and rom.r0 != cand.r0:
         return f"return value 0x{rom.r0:08X} in ROM, 0x{cand.r0:08X} in draft"
     return None
 
@@ -428,7 +446,7 @@ class Oracle:
                                                 *trial_args(t, kinds), arity=self.arity))
                      for t in range(trials)]
         covered = set().union(*(r.blocks for _, r in self.runs)) if self.runs else set()
-        blocks = rom_blocks(self.rom, self.start, self.end)
+        blocks = rom_blocks(self.rom, self.start, self.end, func)
         self.coverage = 100.0 * len(covered & blocks) / max(1, len(blocks))
 
     def check(self, data, addr=None, cstart=None, cend=None, names=None, verbose=False):
@@ -442,7 +460,7 @@ class Oracle:
             c = Run(self.rom, cstart, cend, names or self.names, seed, regs, overlay=(addr, data),
                     arity=self.arity)
             diff = compare(r, c, self.check_r0 and r.status == "ok", self.arity)
-            if r.status != c.status:
+            if r.status != c.status and "step limit" not in (r.status, c.status):
                 diff = (diff + "; " if diff else "") + f"ROM run: {r.status}, draft run: {c.status}"
             if verbose:
                 print(f"  trial {seed - 1000}: {len(r.calls)} calls, {len(r.writes)} bytes written, "
@@ -450,8 +468,10 @@ class Oracle:
             if diff:
                 args = ", ".join(f"0x{v:X}" for v in regs)
                 return "DIFFERENT", f"trial {seed - 1000} (args {args}): {diff}"
-            if r.status != "ok":
+            if r.status != "ok" or c.status != "ok":
                 verdict = "INCOMPLETE"
+                if detail is None:
+                    detail = f"trial {seed - 1000}: ROM run: {r.status}, draft run: {c.status}"
         return verdict, detail
 
 
@@ -488,22 +508,28 @@ def semcheck(src, funcs, nonmatching, trials, verbose):
     return results
 
 
-def rom_blocks(rom, start, end):
-    """Basic-block starts of the ROM function (entry, branch targets, fall-throughs)."""
+def rom_blocks(rom, start, end, func=None):
+    """Thumb block starts, excluding annotated literal pools and alignment."""
     import capstone
+    from capstone.arm_const import ARM_INS_B, ARM_INS_BL, ARM_INS_BLX
     md = capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB)
     code = rom[start - ROM_BASE:end - ROM_BASE]
-    starts = {start}
-    for ins in md.disasm(code, start):
-        if ins.mnemonic.startswith("b") and ins.mnemonic not in ("bl", "bic", "bics", "bx", "blx"):
-            try:
-                starts.add(int(ins.op_str.lstrip("#"), 16))
-            except ValueError:
-                pass
-            starts.add(ins.address + ins.size)
-        elif ins.mnemonic in ("bl",):
-            starts.add(ins.address + ins.size)
-    return {s for s in starts if start <= s < end}
+    layout = rom_data_ranges(func, start) if func else None
+    data = sorted(layout[0]) if layout else []
+    starts, decoded = {start}, set()
+    offset = 0
+    for lo, hi in data + [(len(code), len(code))]:
+        for ins in md.disasm(code[offset:lo], start + offset):
+            decoded.add(ins.address)
+            if ins.id in (ARM_INS_BL, ARM_INS_BLX):
+                starts.add(ins.address + ins.size)
+            elif ins.id == ARM_INS_B:
+                # Only conditional branches have a fall-through edge.
+                if ins.mnemonic.split(".")[0] != "b":
+                    starts.add(ins.address + ins.size)
+                starts.add(int(ins.op_str[1:], 0))
+        offset = max(offset, hi)
+    return starts & decoded
 
 
 def audit(out, trials):

@@ -48,6 +48,19 @@ class PreOrder(unittest.TestCase):
         self.assertNotIn((1, 1, 13), res["cuts"])
         self.assertFalse(any(c == 0 for c, _, _ in res["cuts"]))  # the parameter's number is fixed
 
+    def test_receiver_shift_moves_every_field_of_one_owner(self):
+        # The category bucket must move before both turn fields. Bucket 1 is allowed
+        # because its discovery index follows the first field. Bucket 4 is excluded
+        # because its discovery index follows the first turn field as well.
+        items = [(1, 0, 0), (6, 2, 1), (4, 1, 2), (5, 3, 2), (7, 4, 0)]
+        self.assertEqual(self.scope.pre_receiver_shifts(items, 11), {1: [6, 7, 8]})
+        room_after = [(1, 0, 0), (7, 1, 1), (3, 2, 2), (4, 3, 2), (9, 4, 0)]
+        self.assertEqual(self.scope.pre_receiver_shifts(room_after, 11)[2], [4, 5])
+        self.assertEqual(self.scope.pre_receiver_shifts([(1, 0, 0), (2, 1, 0)], 11), {})
+        # Two disjoint inverted pairs cannot both be repaired by changing one owner.
+        self.assertEqual(self.scope.pre_receiver_shifts(
+            [(4, 0, 0), (1, 1, 1), (8, 2, 2), (5, 3, 3)], 11), {})
+
     def test_equal_buckets_fall_back_to_the_index(self):
         s = self.scope
         a, b = (raw(30, 0), 5, 0), (raw(30, 0) + 13, 2, 0)  # the same bucket at T 13

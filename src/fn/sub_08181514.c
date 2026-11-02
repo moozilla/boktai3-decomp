@@ -2,6 +2,10 @@
 #include "engine.h"
 #include "ram.h"
 
+/* Two facing rows of nine fragment displacements. */
+struct ActorMarkerFragmentOffset {
+    s16 x, y, z, pad;
+};
 struct ActorMarkerFragment {
     u8 unk_00[0x24];
     u16 position[3];
@@ -19,22 +23,26 @@ struct ActorMarker {
     u8 unk_650[0xb39 - 0x650];
     u8 direction;
 };
-/* Two facing rows, each containing nine four-halfword fragment offsets. */
-extern const u16 gUnk_0824E818[];
+extern const struct ActorMarkerFragmentOffset gUnk_0824E818[18];
 void ActorMarker_InitBouncingParticles(struct ActorMarker *);
 void Sound_PlaySongChecked(u32);
+static inline u16 NextFragmentLift(const u16 *table, u32 *index)
+{
+    u32 value = 1 + *index;
+    u32 mask = 0x3ff;
+    value &= mask;
+    *index = value;
+    value = table[value];
+    mask = 31;
+    return value & mask;
+}
 
-/* Tentative: launch the nine embedded fragments during an actor break-apart sequence. */
-#ifdef NONMATCHING
-// fuzzy: 90.1%
 void ActorMarker_LaunchFragments(struct ActorMarker *p, u32 fast)
 {
     s32 row = 0;
     s32 i;
-    u32 mask;
-    u32 value;
-    const u16 *offset;
-    const u16 *table;
+    const struct ActorMarkerFragmentOffset *rowStart;
+    const struct ActorMarkerFragmentOffset *table;
     s32 row8;
     const u16 *randomTable;
     u32 *randomIndex;
@@ -62,45 +70,23 @@ void ActorMarker_LaunchFragments(struct ActorMarker *p, u32 fast)
     table = gUnk_0824E818;
     randomTable = gRandomTable;
     randomIndex = &gRandomIndex;
-    offset = table + (row8 + row) * 4;
-    do {
+    rowStart = table + (row8 + row);
+    /* Index the immutable offset table relative to the selected row. */
+    for (; i < 9; i++) {
         struct ActorMarkerFragment *fragment = &p->fragments[i];
-        u16 x, y, z;
         fragment->state = 0;
-        x = offset[0];
-        fragment->position[0] = x + *posX;
-        y = offset[1];
-        fragment->position[1] = y + *posY;
-        z = offset[2];
-        fragment->position[2] = z + *posZ;
+        fragment->position[0] = *posX + gUnk_0824E818[(rowStart + i) - table].x;
+        fragment->position[1] = *posY + gUnk_0824E818[(rowStart + i) - table].y;
+        fragment->position[2] = *posZ + gUnk_0824E818[(rowStart + i) - table].z;
         if (fast) {
-            fragment->velocity[0] = (s16)x >> 3;
-            value = *randomIndex + 1;
-            mask = 0x3ff;
-            value &= mask;
-            *randomIndex = value;
-            value = randomTable[value];
-            mask = 0x1f;
-            value &= mask;
-            fragment->velocity[1] = value;
-            fragment->velocity[2] = (s16)z >> 3;
+            fragment->velocity[0] = gUnk_0824E818[(rowStart + i) - table].x >> 3;
+            fragment->velocity[1] = NextFragmentLift(randomTable, randomIndex);
+            fragment->velocity[2] = gUnk_0824E818[(rowStart + i) - table].z >> 3;
         } else {
-            fragment->velocity[0] = (s16)x >> 5;
-            value = *randomIndex + 1;
-            mask = 0x3ff;
-            value &= mask;
-            *randomIndex = value;
-            value = randomTable[value];
-            mask = 0x1f;
-            value &= mask;
-            fragment->velocity[1] = value;
-            fragment->velocity[2] = (s16)z >> 5;
+            fragment->velocity[0] = gUnk_0824E818[(rowStart + i) - table].x >> 5;
+            fragment->velocity[1] = NextFragmentLift(randomTable, randomIndex);
+            fragment->velocity[2] = gUnk_0824E818[(rowStart + i) - table].z >> 5;
         }
-        offset += 4;
-        i++;
-    } while (i <= 8);
+    }
     Sound_PlaySongChecked(0xc4);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorMarker_LaunchFragments);
-#endif

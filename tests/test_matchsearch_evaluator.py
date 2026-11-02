@@ -243,9 +243,12 @@ class TargetClassificationTests(unittest.TestCase):
         # ROM or a compiler installation, and without changing shared build files.
         import ast
         import re
-        tree = ast.parse((ROOT / 'tools' / 'scope' / 'scope.py').read_text())
         names = {'rom_data_ranges', 'rom_pool_ranges', 'rom_data'}
-        functions = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name in names]
+        functions = []
+        for path in ('romlib.py', 'scope/scope.py'):
+            tree = ast.parse((ROOT / 'tools' / path).read_text())
+            functions.extend(node for node in tree.body
+                             if isinstance(node, ast.FunctionDef) and node.name in names)
         cls.scope_code = compile(ast.Module(body=functions, type_ignores=[]), 'scope-rom-data', 'exec')
         cls.scope_globals = {'os': os, 're': re}
 

@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "scene_actor_part_burst.h"
 #include "scene_actor_behavior.h"
 #include "scene_actor_placement.h"
@@ -16,18 +17,6 @@ static inline u8 Test(u32 value, u32 mask)
     if (value & mask)
         return 1;
     return 0;
-}
-static inline u32 Unavailable(struct SceneActorRegistryResetView *actor)
-{
-    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
-}
-static inline u32 Motion(struct SceneActorRegistryResetView *actor, u32 mask)
-{
-    return SceneActorPlacement_ReadFlags16((struct SceneActorPlacementView *)actor, mask);
-}
-static inline u16 *MotionFlags(struct SceneActorRegistryResetView *actor)
-{
-    return &actor->flags2D4;
 }
 static inline u8 TestControl(struct SceneActorRegistryResetView *actor, u32 mask)
 {
@@ -102,15 +91,60 @@ static inline void ExtendContactTimer(struct SceneActorRegistryResetView *actor)
     if (actor->group.common.gate.counter > actor->group.common.gate.duration)
         actor->group.common.gate.counter = actor->group.common.gate.duration;
 }
-#ifdef NONMATCHING
-// fuzzy: 93.5%
-// 47 insns differ; with AGBCC_PRI=source:+36 (source in sb, as the ROM has it) 20 do.
-// The ROM starts with a dead `ldr r0, [r6]` (actor->object) and no null check:
-// delete_null_pointer_checks removed IsUnavailable's `if (actor)` after a dereference, yet that load
-// survived flow. The ROM also keeps IsUnavailable's flags2D4 address for every later flag test (sl),
-// which LCM only does when that occurrence is upward-exposed in its block; here `motion` is assigned
-// first instead, so the 0x40 mask loads after the address and source and motion swap sb/sl. The
-// rest are PRE stack slots: preorder wants N 808..811 (+3..+6) at gcse.
+static inline u8 IsPrimary(struct SceneActorRegistryResetView *actor)
+{
+    if (actor->object == (void *)1)
+        return 1;
+    return 0;
+}
+static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor, u16 **motion)
+{
+    u16 *flags;
+    u32 mask;
+    u32 disabled;
+    mask = 0x40;
+    flags = &actor->flags2D4;
+    disabled = *flags & mask;
+    *motion = flags;
+    if (disabled)
+        goto unavailable;
+    if (SceneActorPlacement_ReadFlags32((void *)actor, 0x20000))
+        goto unavailable;
+    if (actor->health > 0)
+        goto available;
+unavailable:
+    return 1;
+available:
+    return 0;
+}
+static inline void SpawnContactParts(struct SceneActorRegistryActor *actor)
+{
+    union SceneActorRegistryPackedPosition velocity, bounds, position;
+    s32 i;
+    for (i = 0; i < 3; i++) {
+        union RandomTableView table = {gRandomTable};
+        const struct ContactPosition *origin;
+        velocity.packed.x = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
+        velocity.packed.y = (SceneActorEffects_NextSample(table.samples) & 31) - 16;
+        velocity.packed.z = ((s8)SceneActorEffects_NextSample(table.samples) & 15) - 7;
+        bounds.packed.x = 5;
+        bounds.packed.y = 10;
+        bounds.packed.z = 5;
+        origin = actor->effectOrigin;
+        position.packed.x = origin->x;
+        position.packed.y = origin->y + 128;
+        position.packed.z = origin->z;
+        EffectGroup_SpawnPart((void *)actor->effectConfig, 3, &position.position,
+                              &velocity.position, &bounds.position, 40, 40);
+    }
+    actor->fieldAA = 0;
+    actor->field2B8 = 0;
+}
+
+static inline void SetContactResult(struct SceneActorRegistryResetView *actor, u16 value)
+{
+    actor->reactionSoundVariant = value;
+}
 void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactView *source,
                                               struct SceneActorBehaviorContactView *destination,
                                               struct SceneActorRegistryResetView *actor)
@@ -118,10 +152,13 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     struct ContactCollider *primary;
     u16 *motion;
     u32 unavailable;
-    u32 sourceFlags;
+    u16 sourceFlags;
     s32 power;
-    motion = MotionFlags(actor);
-    unavailable = Unavailable(actor);
+
+    if (IsPrimary(actor)) {
+        DEBUG_PRINT();
+    }
+    unavailable = IsUnavailable(actor, &motion);
     if (unavailable)
         return;
     primary = &actor->colliderA;
@@ -172,11 +209,15 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                     }
                 }
                 destination->remaining = 0;
-                actor->reactionSoundVariant = 0;
+                SetContactResult(actor, 0);
                 SelectContactTarget(source, actor);
+                if (TestMotion(motion, 0x80))
+                    ExtendContactTimer(actor);
+                actor->field2E6 = 1;
+                return;
             } else {
                 destination->remaining = attack;
-                actor->reactionSoundVariant = attack;
+                SetContactResult(actor, attack);
                 SelectContactTarget(source, actor);
             }
             if (TestMotion(motion, 0x80))
@@ -215,16 +256,13 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
         u32 mask = 0x800;
         if (Test(gGameState->flags868, mask) || ReadReactionFlags(0x40, source)) {
             destination->remaining = 0;
-            actor->reactionSoundVariant = 0;
+            SetContactResult(actor, 0);
             actor->field2E6 = 1;
         }
     }
     if (TestMotion(motion, 0x2000))
-        SceneActorEffects_SpawnContactParts((void *)actor);
+        SpawnContactParts((void *)actor);
     actor->reactionSoundVariant = destination->remaining;
     PlayerStats_AddContactHundredths(source, destination, actor->fieldA0);
     MarkContact(actor, 0x2000);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_HandleColliderContact);
-#endif

@@ -47,6 +47,15 @@ class FrameCorrespondence(unittest.TestCase):
                 self.assertEqual(self.scope.cmd_frame("synthetic.c", "Target", {}), 1)
             return output.getvalue()
 
+    def test_aligned_vote_tie_favors_the_same_access_register(self):
+        rom = ["str r4, [sp, #4]", "ldr r2, [sp, #4]", "ldr r0, [sp, #8]"]
+        draft = ["str r5, [sp, #4]", "ldr r2, [sp, #8]", "ldr r0, [sp, #4]"]
+        rows = [{"rom_addr": f"{0x08001000 + 2 * i:08X}", "draft_off": 2 * i,
+                 "rom": a, "draft": b} for i, (a, b) in enumerate(zip(rom, draft))]
+        pair, physical, _ = self.scope.frame_slot_pairs(rows)
+        self.assertIsNone(physical)
+        self.assertEqual(pair, {4: 8, 8: 4})
+
     def test_repeated_loads_and_stores_use_physical_offsets(self):
         rows = self.rows(*self.repeated_accesses())
         self.assertTrue(any(row["rom"] and row["draft"]

@@ -1,13 +1,9 @@
-#ifdef NONMATCHING
-// fuzzy: 97.1%
-#include "contact_actor.h"
+#include "contact_swarm.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
-struct ContactStartSprite {
-    u8 prefix[0x1C];
-    struct ContactPosition position;
-    u8 unknown24[0x14];
-    const void *tileData;
+union ContactRandomSource {
+    const u16 *table;
+    u16 halves[2];
 };
 static inline s32 TruncateShift12(s32 value)
 {
@@ -15,30 +11,36 @@ static inline s32 TruncateShift12(s32 value)
         return value >> 12;
     return -((-value) >> 12);
 }
-static inline u32 NextRandom(const u16 *table)
+static inline u32 NextSampleIndex(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
+    return index;
+}
+static inline u32 NextRandom(const u16 *table)
+{
+    u32 index = NextSampleIndex();
     return table[index];
 }
+static inline u32 BeginRandomSamples(const u16 **sampleTable,
+                                     const union ContactRandomSource *source)
+{
+    u32 index = NextSampleIndex();
+    *sampleTable = source->table;
+    return (*sampleTable)[index];
+}
 // confidence=low: initializes and scatters sixteen contact actors around a supplied position.
-// Remaining difference: the ROM's random table is a loop-invariant hoisted in loop pass 2 (after
-// the healthCollider giv) that gets r8 ahead of gRandomIndex, so it has no REG_EQUIV and no doubled
-// live length. A plain table is doubled and loses r8; sharing `work` with fadeMode gives r8 but
-// hoists it in pass 1 and routes fadeMode through r8. AGBCC_NOEQUIV on a pass-2 table (fadeMode
-// stored directly) leaves 2 insns. A hoisted copy of a `samples` local has no note in loop, but
-// cse2 adds REG_EQUAL because the pre-loop code is one block (see notes on 082335F0).
 s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPosition *position,
                            const struct ContactPosition *center, u32 speed, u32 parameter)
 {
     struct ContactActor *slot;
     s32 index;
-    void *work;
+    union ContactRandomSource source;
+    const u16 *table;
     pool->hideRequested = 0;
     pool->clearRequested = 0;
     pool->lifetime = 0;
-    work = (void *)&pool->fadeMode;
-    *(s8 *)work = 1;
+    pool->fadeMode = 1;
     pool->fadeLevel = 63;
     {
         u8 *bank = gPaletteBankData;
@@ -46,12 +48,14 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         void *second = bank + 0x5AA0;
         Palette_InterpolateBanks(pool->tileData, first, second, 63, 6);
     }
+    source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+    source.halves[1] = RANDOM_TABLE_ADDR >> 16;
     pool->retreatCenter = *center;
     slot = &pool->slots[0];
     index = 0;
-    work = gRandomTable;
     do {
-        struct ContactStartSprite *sprite;
+        struct ContactSwarmColliderAnimation *display;
+        struct ContactSwarmSprite *sprite;
         struct ContactPosition *actorPosition;
         struct ContactCollider *health;
         u32 radius;
@@ -59,10 +63,11 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         slot->state = 0;
         slot->enter = 1;
         slot->stateFrame = 0;
-        slot->direction = (index * 32) + (NextRandom((const u16 *)work) & 31);
+        slot->direction = (index * 32) + (BeginRandomSamples(&table, &source) & 31);
         slot->speed = speed;
         slot->unknown12 = parameter;
-        sprite = (void *)(&slot->sprite);
+        display = (void *)&slot->healthCollider;
+        sprite = &display->animation.draw.sprite;
         if (pool->mode == 2) {
             if (index <= 7)
                 slot->targetIndex = 1;
@@ -70,24 +75,23 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
                 slot->targetIndex = 0;
         } else if (pool->mode == 1)
             slot->targetIndex = 0;
-        else {
+        else
             slot->targetIndex = -1;
-        }
         slot->retargetTimer = 0;
-        radius = (NextRandom((const u16 *)work) & 31) + 16;
+        radius = (NextRandom(table) & 31) + 16;
         slot->desiredHeight = position->y;
-        slot->targetHeight = position->y + (NextRandom((const u16 *)work) & 511);
+        slot->targetHeight = position->y + (NextRandom(table) & 511);
         slot->position.x =
             position->x + TruncateShift12(gUnk_086149C4[(slot->direction + 64) & 255] * radius);
         slot->position.y = slot->targetHeight;
         slot->position.z = TruncateShift12(gUnk_086149C4[slot->direction] * radius) + position->z;
-        slot->steeringTimer = (NextRandom((const u16 *)work) & 7) + 7;
+        slot->steeringTimer = (NextRandom(table) & 7) + 7;
         actorPosition = &slot->position;
         sprite->position = slot->position;
-        slot->sprite.flags &= ~1;
+        display->animation.draw.sprite.flags &= ~1;
         ContactActor_SetDirectionalSequence(pool, slot, 0);
         AnimData_SelectPaletteBank(slot->graphics, 0x2D3);
-        sprite->tileData = pool->tileData;
+        display->animation.draw.graphics.paletteData = pool->tileData;
         ActorShadow_Enable(slot->shadow);
         Collider_SetPosition(&slot->resourceCollider, actorPosition, 0);
         health = &slot->healthCollider;
@@ -99,7 +103,3 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
     pool->state = 1;
     return 0;
 }
-#else
-#include "global.h"
-INCLUDE_ASM("asm/nonmatching", ContactActorPool_Start);
-#endif
