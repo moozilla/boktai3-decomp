@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 /* Sinks the actor into the ground after frame 6, then starts the hidden defeat. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
@@ -40,8 +39,10 @@ static inline void Show(struct SceneActorRegistryResetView *a)
         tile->flags &= mask;
     }
 }
+
 void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
 {
+    u32 state;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         ClearRoute(actor, group);
@@ -58,38 +59,21 @@ void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor
         }
         Show(actor);
         {
-            register u32 state asm("r1") = 3;
-            u8 *field = &actor->state2A8;
-            u32 zero = 0;
-            *field = state;
-            {
-                u32 phaseOffset = 0x2A9;
-                field = (u8 *)actor + phaseOffset;
-            }
-            *field = zero;
-            {
-                u32 behaviorOffset = 0x2AA;
-                field = (u8 *)actor + behaviorOffset;
-            }
-            *field = zero;
-            {
-                u32 *counter = &actor->counter2AC;
-                *counter = zero;
-            }
-            {
-                u32 readyOffset = 0x2B1;
-                u8 *ready;
-                ready = (u8 *)actor + readyOffset;
-                *ready = 1;
-            }
-            {
-                u32 byteZero = 0;
-                actor->fieldAA = zero;
-                actor->field2B3 = byteZero;
-            }
-            actor->colliderA.responseValue = zero;
-            actor->field2B8 = zero;
+            u32 zero;
+            u8 *first;
+            state = 3;
+            first = &actor->state2A8;
+            zero = 0;
+            *first = state;
+            actor->phase2A9 = zero;
+            actor->behavior2AA = zero;
+            actor->counter2AC = zero;
+            actor->field2B1 = 1;
         }
+        actor->fieldAA = 0;
+        actor->field2B3 = 0;
+        actor->colliderA.responseValue = 0;
+        actor->field2B8 = 0;
         {
             u32 mask = 0x20000;
             u32 *flags = &actor->flags2D0;
@@ -104,14 +88,16 @@ void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor
             *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->body.position;
         if (frame > 8) {
             u32 zeroWord = 0;
-            u32 zeroByte = 0;
-            asm("" : "+r"(zeroWord));
-            asm("" : "+r"(zeroByte));
-            actor->health = zeroWord;
+            u8 zeroByte = 0;
             {
-                register u32 mask asm("r0") = 8;
-                u16 *flags = &actor->flags2D4;
-                *flags = mask | *flags;
+                s16 health = zeroWord;
+                actor->health = health;
+            }
+            {
+                u32 mask = 8;
+                u16 *field = &actor->flags2D4;
+                mask |= *field;
+                *field = mask;
             }
             {
                 u32 mask = 0x400;

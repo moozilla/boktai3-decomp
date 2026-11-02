@@ -1,6 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#include "scene_actor_chase_shared.h"
 // confidence=low: recoil callback selects animation 15 and completes after sixty ticks.
 void Ghost_UpdateRecoilAnimation(struct SceneActorRegistryResetView *actor, s32 tick)
 {
@@ -8,10 +8,7 @@ void Ghost_UpdateRecoilAnimation(struct SceneActorRegistryResetView *actor, s32 
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 15);
     }
     if (tick <= 29) {
-        u32 mask = 0x20;
-        u16 *flags = &actor->flags2D6;
-        DEBUG_NOP();
-        *flags = mask | *flags;
+        SceneActorChase_SetReactionFlags(actor, 32);
     }
     if (tick > 59) {
         actor->field2B0 = 1;

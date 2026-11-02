@@ -11,7 +11,7 @@ void StageIconDisplay_TickShake(struct StageIconDisplay *display)
         register u32 index asm("r1") = *rng + 1;
         u32 mask = 1023;
         const u16 *random;
-        register u32 sample asm("r0");
+        u32 sample;
         u32 mask3;
         index &= mask;
         *rng = index;
@@ -23,9 +23,12 @@ void StageIconDisplay_TickShake(struct StageIconDisplay *display)
         index = (index + 1) & mask;
         *rng = index;
         index = index * 2 + (u32)random;
-        sample = *(u16 *)index;
-        sample &= mask3;
-        display->icon.position.y = sample - 2;
+        {
+            u32 verticalSample = *(u16 *)index;
+            verticalSample &= mask3;
+            display->icon.position.y = verticalSample - 2;
+        }
+
     } else if (display->stateFrame == 8) {
         display->icon.position.x = 0;
         display->icon.position.y = 0;

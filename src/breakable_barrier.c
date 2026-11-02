@@ -146,6 +146,10 @@ static inline void enable(struct SceneCollider *c)
     c->state = mask & c->state;
 }
 
+static inline void BreakableBarrier_NextRandomIndex(u32 cursor, u32 *next)
+{
+    *next = (cursor + 1) & 1023;
+}
 // MATCHING_CONCESSION: register-pinning
 void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
 {
@@ -172,7 +176,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             u32 *indexPtr;
             u32 mask;
             u32 smallMask;
-            register u32 index asm("r0");
+            u32 index;
             size.x = 164;
             size.y = 16;
             size.z = 164;
@@ -191,10 +195,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             *indexPtr = index;
             speed = (table[index] & smallMask) + 20;
             SparkParticle_Spawn(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
-            {
-                u32 *ptr = indexPtr;
-                index = (*ptr + 1) & mask;
-            }
+            BreakableBarrier_NextRandomIndex(*indexPtr, &index);
             angle = (u8)table[index];
             index = (index + 1) & mask;
             count = (table[index] & smallMask) + 2;

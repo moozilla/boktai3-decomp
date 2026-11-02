@@ -113,7 +113,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                 }
 
                 {
-                    register u32 code asm("r1") = 16;
+                    u32 code = 16;
                     u32 offset = 0x2b2;
                     u32 substateOffset;
                     u8 *field;
@@ -123,58 +123,60 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                         *field = entry;
                     }
                     offset -= 2;
-                    field = (u8 *)actor + offset;
-                    *field = zero;
-                    substateOffset = 0x2b5;
-                    field = (u8 *)actor + substateOffset;
-                    *field = code;
                     {
-                        u32 controlOffset = 0x21c;
-                        field = (u8 *)actor + controlOffset;
+                        u8 *controlField = (u8 *)actor + offset;
+                        *controlField = zero;
+                        substateOffset = 0x2b5;
+                        controlField = (u8 *)actor + substateOffset;
+                        *controlField = code;
                         {
-                            const void *control = defaultControl;
-                            *(const void **)field = control;
+                            u32 controlOffset = 0x21c;
+                            controlField = (u8 *)actor + controlOffset;
+                            {
+                                const void *control = defaultControl;
+                                *(const void **)controlField = control;
+                            }
                         }
-                    }
-                    substateOffset += 0x13;
-                    field = (u8 *)actor + substateOffset;
-                    *(u16 *)field = zero;
-                    {
-                        u32 *flags114 = &actor->flags114;
-                        u32 mask = ~1;
-                        u32 value;
-                        value = *flags114;
-                        value &= mask;
-                        *flags114 = value;
-                    }
-                    {
-                        u32 fieldOffset = 0x104;
-                        field = (u8 *)actor + fieldOffset;
-                        *(u32 *)field = zero;
-                    }
-                    {
-                        register u32 state asm("r1") = 3;
-                        offset = 0x2a8;
-                        field = (u8 *)actor + offset;
-                        *field = state;
-                    }
-                    substateOffset -= 0x1f;
-                    field = (u8 *)actor + substateOffset;
-                    *field = zero;
-                    {
-                        register u32 behaviorOffset asm("r1") = 0x2aa;
-                        asm("" : "+r"(behaviorOffset));
-                        field = (u8 *)actor + behaviorOffset;
-                        *field = zero;
-                    }
-                    offset += 4;
-                    field = (u8 *)actor + offset;
-                    *(u32 *)field = zero;
-                    substateOffset += 8;
-                    field = (u8 *)actor + substateOffset;
-                    {
-                        register u32 entry asm("r1") = one;
-                        *field = entry;
+                        substateOffset += 0x13;
+                        controlField = (u8 *)actor + substateOffset;
+                        *(u16 *)controlField = zero;
+                        {
+                            u32 *flags114 = &actor->flags114;
+                            u32 mask = ~1;
+                            u32 value;
+                            value = *flags114;
+                            value &= mask;
+                            *flags114 = value;
+                        }
+                        {
+                            u32 fieldOffset = 0x104;
+                            controlField = (u8 *)actor + fieldOffset;
+                            *(u32 *)controlField = zero;
+                        }
+                        {
+                            register u32 state asm("r1") = 3;
+                            offset = 0x2a8;
+                            controlField = (u8 *)actor + offset;
+                            *controlField = state;
+                        }
+                        substateOffset -= 0x1f;
+                        controlField = (u8 *)actor + substateOffset;
+                        *controlField = zero;
+                        {
+                            register u32 behaviorOffset asm("r1") = 0x2aa;
+                            asm("" : "+r"(behaviorOffset));
+                            controlField = (u8 *)actor + behaviorOffset;
+                            *controlField = zero;
+                        }
+                        offset += 4;
+                        controlField = (u8 *)actor + offset;
+                        *(u32 *)controlField = zero;
+                        substateOffset += 8;
+                        controlField = (u8 *)actor + substateOffset;
+                        {
+                            register u32 entry asm("r1") = one;
+                            *controlField = entry;
+                        }
                     }
                 }
                 SceneActorTerrain_DisableCollision(actor);

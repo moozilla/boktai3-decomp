@@ -1,5 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
+static inline s32 ScenePanelRig_ContactDepth(const struct ScenePanelRig *rig)
+{
+    return rig->position.z - rig->origin.z - 64;
+}
+
 void ScenePanelRig_CheckContactTransition(struct ScenePanelRig *rig)
 {
     u32 state = rig->state;
@@ -14,11 +18,9 @@ void ScenePanelRig_CheckContactTransition(struct ScenePanelRig *rig)
     } else if (state == 7) {
         if ((s32)ScenePanelRig_GetParentMode(rig) > 0) {
             s32 dx = rig->position.x;
-            register s32 dz asm("r0");
+            s32 dz;
             dx -= rig->origin.x;
-            dz = rig->position.z;
-            dz -= rig->origin.z;
-            dz -= 64;
+            dz = ScenePanelRig_ContactDepth(rig);
             dx -= 64;
             if (dx < 0)
                 dx = -dx;

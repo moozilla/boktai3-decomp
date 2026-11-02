@@ -57,8 +57,10 @@ static inline void requestUpdate(struct Engine *p)
     value = mask;
     value |= flags;
     value |= 1;
-    asm("" : "+r"(value));
-    p->mask = value;
+    {
+        u16 *updateMask = &p->mask;
+        *updateMask = value;
+    }
 }
 static inline void requestUpdateB(struct Engine *p, int flags)
 {
@@ -68,8 +70,10 @@ static inline void requestUpdateB(struct Engine *p, int flags)
     value = mask;
     value |= flags;
     value |= 1;
-    asm("" : "+r"(value));
-    p->mask = value;
+    {
+        u16 *updateMask = &p->mask;
+        *updateMask = value;
+    }
 }
 static inline void finish(struct Engine *p, int operation, u8 byteZero, u32 wordZero)
 {

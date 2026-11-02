@@ -46,6 +46,7 @@ void WirelessExchange_ClearPeerCounts(struct Menu *, int);
 void *Script_GetTextSourcePc(void);
 int WirelessTradeMenu_InitFromScript(struct Menu *arg)
 {
+    u32 mask;
     register struct Menu *p asm("r6") = arg;
     u16 *leftBase;
     u16 *rightBase;
@@ -152,7 +153,6 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
             if ((u32)j < count)
                 do {
                     int index;
-                    register u32 mask asm("r1");
                     item = Equipment_GetDefinition(leftBase[j]);
                     if (!*item) {
                         index = 0;
@@ -250,7 +250,6 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
                 }
                 do {
                     int index;
-                    u32 mask;
                     if (*q == 1) {
                         index = 0;
                         mask = p->extraMask;

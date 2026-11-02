@@ -86,13 +86,6 @@ static inline void Ghost_SetState(struct SceneActorRegistryResetView *a, u8 phas
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
-static inline void Ghost_AddPosition(struct ContactPosition *out,
-                                     const struct ContactPosition *from)
-{
-    out->x = out->x + from->x;
-    out->y = out->y + from->y;
-    out->z = out->z + from->z;
-}
 static inline s32 Ghost_QuarterDistance(s32 n)
 {
     if (n >= 0)
@@ -145,6 +138,14 @@ static inline s32 Ghost_LengthSquared(const struct ContactPosition *position)
     do {                                                                                           \
         GHOST_WRITE_COMPONENT(out_, y, height_);                                                   \
     } while (0)
+static inline void Ghost_AddPosition(struct ContactPosition *out,
+                                     const struct ContactPosition *from)
+{
+    out->x = out->x + from->x;
+    GHOST_SET_VERTICAL(out, out->y + from->y);
+    out->z = out->z + from->z;
+}
+
 static inline void Ghost_MakeRetreatOffset(struct ContactPosition *out, u32 angle)
 {
     s32 x, z;

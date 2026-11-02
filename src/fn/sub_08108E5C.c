@@ -1,6 +1,6 @@
 #include "global.h"
 #include "input.h"
-// MATCHING_CONCESSION: register-pinning
+#include "gba/io_reg.h"
 struct CallbackTask {
     u8 pad0[0x1C];
     u32 cancellable;
@@ -18,23 +18,22 @@ struct CallbackTask {
     void *context;
 };
 u8 CallbackTask_Finish(struct CallbackTask *);
+
+static inline void CallbackTask_Cancel(struct CallbackTask *task)
+{
+    task->completed = 1;
+    task->arg2 = 1;
+    task->result = FALSE;
+}
+
 s32 CallbackTask_Update(struct CallbackTask *task)
 {
     if (CallbackTask_Finish(task))
         return 0;
     task->update(task);
-    if (!task->cancellable)
+    if (!task->cancellable || task->completed)
         return 0;
-    if (task->completed)
-        return 0;
-    {
-        register u32 r asm("r2") = task->result;
-        if (r)
-            return 0;
-    }
-    if (gPadState[1] & 2) {
-        task->completed = 1;
-        task->arg2 = 1;
-    }
+    if (!task->result && (gPadState[1] & B_BUTTON))
+        CallbackTask_Cancel(task);
     return 0;
 }

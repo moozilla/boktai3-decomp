@@ -33,16 +33,14 @@ static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
         return 1;
     return 0;
 }
-struct BeeVec {
-    s16 x, y, z;
-};
-static inline void Diff(struct BeeVec *d, struct BeeVec *a, struct BeeVec *b)
+static inline void Diff(struct ContactPosition *d, const struct ContactPosition *a,
+                        const struct ContactPosition *b)
 {
     d->x = b->x - a->x;
     d->y = b->y - a->y;
     d->z = b->z - a->z;
 }
-static inline void Polar(struct BeeVec *out, u16 angle, s32 radius)
+static inline void Polar(struct ContactPosition *out, u16 angle, s32 radius)
 {
     out->x = Shift(gUnk_086149C4[(angle + 0x40) & 255] * radius, 12);
     out->y = 0;
@@ -80,7 +78,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 state, u32 p
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
-inline static void Add_StartMoveToBody(struct BeeVec *a, struct BeeVec *b)
+inline static void Add_StartMoveToBody(struct ContactPosition *a, struct ContactPosition *b)
 {
     a->x = a->x + b->x;
     a->y = a->y + b->y;
@@ -89,7 +87,7 @@ inline static void Add_StartMoveToBody(struct BeeVec *a, struct BeeVec *b)
 
 struct BeeMoveTarget {
     u8 unknown0[0xC];
-    struct BeeVec position;
+    struct ContactPosition position;
 };
 /* Tentative context view for body-directed movement. */
 struct BeeMoveContext {
@@ -103,12 +101,18 @@ struct BeeMoveContext {
     u8 unknown444[0x3C];
     struct ContactPosition motion;
 };
+static inline s32 Bearing(const struct ContactPosition *delta)
+{
+    return Math_Atan2(delta->x, delta->z);
+}
 void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
 {
     struct BeeMoveContext *body;
-    volatile u32 fill;
-    struct BeeVec delta;
-    struct BeeVec offset;
+    struct {
+        u32 fill;
+        struct ContactPosition delta;
+    } work;
+    struct ContactPosition offset;
     u32 angle;
 
     u16 parameter;
@@ -125,15 +129,15 @@ void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
     parameter = args[2];
     body->parameter = parameter;
     body->state = 0;
-    Diff(&delta, (struct BeeVec *)(&actor->body.position), &body->target->position);
-    actor->tracking.heading = Math_Atan2(delta.x, delta.z);
+    Diff(&work.delta, &actor->body.position, &body->target->position);
+    actor->tracking.heading = Bearing(&work.delta);
     angle = ((Rand() & 0x3F) + actor->tracking.heading) & 0xFF;
     Polar(&offset, angle, 0x200);
     body->distance = 0x500;
-    Add_StartMoveToBody(&offset, (struct BeeVec *)(&actor->body.position));
+    Add_StartMoveToBody(&offset, &actor->body.position);
     sub_0809345C(actor, &offset);
     Bee_SubVector(actor, &actor->body.position, &offset);
-    Clear(&fill, &body->motion);
+    Clear(&work.fill, &body->motion);
     State(actor, 2, 0, 10);
     Control(actor, actor->entryTarget228, 1);
 }

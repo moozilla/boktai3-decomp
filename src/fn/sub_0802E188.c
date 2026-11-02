@@ -1,7 +1,6 @@
 #include "global.h"
 #include "input.h"
 #include "player.h"
-// MATCHING_CONCESSION: register-pinning
 struct Position {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -30,7 +29,7 @@ struct Context {
     struct Actor *head;
     u8 pad20[0x434 - 0x20];
     struct Position *target;
-    u8 *targetActor;
+    struct Player *targetActor;
 };
 s32 Scene_CanOpenMenu(void);
 void Actor_SetAttachmentEffect(void *, s32, s32, s32);
@@ -52,6 +51,23 @@ static inline u32 ActorFlag(u32 mask, struct Actor *actor)
     return actor->flags & mask;
 }
 #define SceneActorAnimation_UpdateInteractionCue sub_0802E188
+static inline s32 TargetAllowsInteraction(struct Player *p)
+{
+    if ((u8)(p->actionMode - 3) <= 2)
+        return 0;
+    if (Flag(&p->statusFlags, 0x100000))
+        return 0;
+    if (p->active && (u16)(p->sceneMode - 5) <= 1)
+        return 0;
+    {
+        u8 mode = p->tetherMode;
+        u8 allow = 1;
+        if (mode > 1 && mode != 7)
+            allow = 0;
+        return allow;
+    }
+}
+
 void SceneActorAnimation_UpdateInteractionCue(struct Context *input)
 {
     struct Context *context = input;
@@ -75,27 +91,12 @@ disableInput:
     pressed = 0;
 inputReady:;
     {
-        register u8 *rawTarget asm("r0") = context->targetActor;
-        u8 *target;
-        if (!rawTarget)
+        if (!context->targetActor)
             goto blocked;
-        target = rawTarget;
-        if ((u8)(target[0x418] - 3) <= 2)
-            goto blocked;
-        if (Flag((u32 *)(target + 0x20), 0x100000))
-            goto blocked;
-        if (U16(target, 0x538) && (u16)(U16(target, 0x534) - 5) <= 1)
+        if (!TargetAllowsInteraction(context->targetActor))
             goto blocked;
         {
-            u8 mode = target[0x457];
-            u8 allow = 1;
-            if (mode > 1 && mode != 7)
-                allow = 0;
-            if (!allow)
-                goto blocked;
-        }
-        {
-            u8 state = context->targetActor[0x418];
+            u8 state = context->targetActor->actionMode;
             kind = 0;
             if (state == 0)
                 goto selected;

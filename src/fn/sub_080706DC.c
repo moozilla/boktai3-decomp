@@ -1,31 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
-static inline u8 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabled, u32 excluded)
+static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u32 disabled, u32 excluded)
 {
-    struct SceneActorRegistryActor *actor = input;
-    u32 maskDisabled = disabled;
-    register u32 maskExcluded asm("r9") = excluded;
-    register u32 offset asm("r1") = 0x2d4;
-    u32 value;
-    register u32 mask asm("r2");
-    value = *(u16 *)((u8 *)actor + offset);
-    mask = maskDisabled;
-    value &= mask;
-    if (value)
-        return 1;
-    offset -= 4;
-    {
-        register u32 *field asm("r0") = (void *)((u8 *)actor + offset);
-        value = *field;
-    }
-    mask = maskExcluded;
-    asm("" : "+r"(mask));
-    value &= mask;
-    if (value || actor->health <= 0)
+    if ((actor->flags2D4 & disabled) || (actor->flags2D0 & excluded) || actor->health <= 0)
         return 1;
     return 0;
 }
+
 /* Reset the observed control/state fields for eligible categories4,1,3.
  * Behavior3 and substate5 remain numeric: their game roles are unconfirmed. */
 void SceneActorRegistry_ResetCategoryControl(void)
@@ -37,7 +19,7 @@ void SceneActorRegistry_ResetCategoryControl(void)
     actor = node->actor;
     if (actor) {
         u32 disabled = 0x40;
-        register u32 excluded asm("r9") = 0x20000;
+        u32 excluded = 0x20000;
         u32 five = 5;
         u32 zero = 0;
         u32 one = 1;

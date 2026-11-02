@@ -1,8 +1,6 @@
 #include "global.h"
 #include "ram.h"
 #include "player.h"
-// Register allocation and a few load/order choices still differ.
-// MATCHING_CONCESSION: register-pinning
 struct ActorGroupMember {
     u32 flags;
     u8 pad4[2];
@@ -33,26 +31,6 @@ static inline s32 Scale(s32 x)
         return x >> 12;
     return -((-x) >> 12);
 }
-static inline s32 Half(s32 x)
-{
-    if (x >= 0)
-        return x >> 1;
-    return -((-x) >> 1);
-}
-static inline s32 ScaleTemp(s32 x)
-{
-    register s32 result asm("r0") = Scale(x);
-    asm("" : : "r"(result));
-    return result;
-}
-static inline s32 WrapAngle(s32 x)
-{
-    if (x > 128)
-        x -= 256;
-    else if (x < -128)
-        x += 256;
-    return x;
-}
 u8 ProximityActor_IsPlayerInsideOriginRange(void *);
 void ActorGroup_UpdateMemberSway(struct ActorGroupMember *);
 void Sound_PlaySong(u32);
@@ -61,11 +39,25 @@ static inline void Clear(void *p)
     u32 zero = 0;
     CpuSet(&zero, p, 0x05000002);
 }
+static inline s32 ActorGroup_ProjectComponent(s32 x)
+{
+    s32 result;
+    if (x >= 0)
+        result = x >> 12;
+    else
+        result = -((-x) >> 12);
+    return result;
+}
+
+static inline u32 ActorGroup_TestPlayerFlag(const struct Player *player, u8 mask)
+{
+    return mask & player->statusFlags;
+}
 // confidence=low: starts a sway and advances the group member when the nearby player moves.
 void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
 {
     if (p->started) {
-        register s32 x asm("r6");
+        s32 x;
         s32 z;
         p->frame = 0;
         p->flags = (p->flags & ~1) | 2;
@@ -73,30 +65,22 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
         Clear(&p->radiusX);
         p->radiusX = 41;
         p->radiusZ = 148;
-        x = ScaleTemp(p->radiusX * gUnk_086149C4[(p->angle + 64) & 255]);
-        x += Scale(p->radiusZ * gUnk_086149C4[p->angle]);
-        z = ScaleTemp(-(p->radiusX * gUnk_086149C4[p->angle]));
-        {
-            s32 t = Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
-            p->x = p->originX + x;
-            p->z = (z + t) + p->originZ;
-            asm("" : : "r"(t), "r"(z));
-        }
+        x = ActorGroup_ProjectComponent(p->radiusX * gUnk_086149C4[(p->angle + 64) & 255]) +
+            Scale(p->radiusZ * gUnk_086149C4[p->angle]);
+        z = ActorGroup_ProjectComponent(-(p->radiusX * gUnk_086149C4[p->angle])) +
+            Scale(p->radiusZ * gUnk_086149C4[(p->angle + 64) & 255]);
+        p->x = p->originX + x;
+        p->z = z + p->originZ;
     }
     if (p->frame & 1) {
         if (ProximityActor_IsPlayerInsideOriginRange(p)) {
-            u32 m8 = 8;
-            u8 *b8 = ((u8 **)gPlayers)[0];
-            u32 fl;
-            asm("" : "+r"(m8));
-            fl = *(u32 *)(b8 + 0x20);
-            if (!(fl & m8)) {
+            if (!ActorGroup_TestPlayerFlag(gPlayers[0], 8)) {
                 s32 active;
                 if (gPlayerPassageState && !gPlayerInteractionMode)
                     active = 1;
                 else
                     active = 0;
-                if (!active && ((u8 **)gPlayers)[0][0x418] != 3) {
+                if (!active && gPlayers[0]->actionMode != 3) {
                     if (p->previousDistanceSquared != p->distanceSquared && p->turnStep == 0) {
                         p->turnStep = 4;
                         p->health--;

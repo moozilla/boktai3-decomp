@@ -1,42 +1,20 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
-static inline u32 TakeEntry(struct SceneActorRegistryResetView *actor)
+
+void SceneActorControl_ConsumePendingEntry(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-void SceneActorControl_ConsumePendingEntry(struct SceneActorRegistryResetView *input)
-{
-    struct SceneActorRegistryResetView *actor = input;
-    u32 entered = TakeEntry(actor);
-    asm("" : "+r"(entered));
-    if (entered) {
-        void *target = *(void **)((u8 *)actor + 0x228);
+    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+        void *fn = actor->entryTarget228;
         u32 one = 1;
-        u32 offset = 0x2B2;
-        register u8 *field asm("r0") = (u8 *)actor + offset;
-        u32 zero;
-        zero = 0;
-        *field = one;
-        {
-            register u32 offset asm("r5") = 0x2B0;
-            field = (u8 *)actor + offset;
-            *field = zero;
-            offset += 5;
-            field = (u8 *)actor + offset;
-            *field = one;
-            field = (u8 *)actor + 0x21C;
-            *(void **)field = target;
-            offset += 0x13;
-            field = (u8 *)actor + offset;
-            *(u16 *)field = zero;
-        }
+        u8 *taken = &actor->field2B2;
+        u32 zero = 0;
+        *taken = one;
+        actor->field2B0 = zero;
+        actor->field2B5 = one;
+        actor->target = fn;
+        actor->field2C8 = zero;
         {
             u32 *flags = &actor->flags114;
-            u32 mask = ~1;
+            s32 mask = -2;
             *flags &= mask;
         }
         actor->word104 = zero;
@@ -50,10 +28,6 @@ void SceneActorControl_ConsumePendingEntry(struct SceneActorRegistryResetView *i
         }
     }
     {
-        register u32 offset asm("r5") = 0x2AC;
-        register u32 *counter asm("r1");
-        asm("" : "+r"(offset));
-        counter = (void *)((u8 *)actor + offset);
-        (*counter)++;
+        actor->counter2AC++;
     }
 }

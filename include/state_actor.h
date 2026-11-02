@@ -37,6 +37,11 @@ struct StateActorTag {
     s32 paletteBlendFrames; /* +0x1C, decremented by 081D25AC. */
 };
 
+struct StateActorDamageEffect {
+    u32 unknown0;
+    u32 flags;
+};
+
 struct StateActorOverlay {
     u8 unknown0[0x24];
     u8 animationStarted; /* 081CC1B4, 081D2318. */
@@ -94,16 +99,25 @@ struct StateActor {
     u8 actionChanged;   /* 0xB1: unconfirmed, position only. */
     u8 unkB2;
     u8 locked; /* 0xB3: SceneActorAnimation_Update{Directional,EightDirection}Callback. */
-    u8 unkB4[0x10];
+    u8 shakeFrames, shakeStrength;
+    u8 unkB6[0xE];
     u32 actionTimer; /* 0xC4: reset to 0 on transition, incremented each call otherwise. */
     u8 unkC8[4];
     u8 requestedAngle; /* 0xCC */
-    u8 unkCD[0x37];
+    u8 unkCD[0x17];
+    u32 effectTimer;
+    u32 firstEventScript, secondEventScript;
+    s32 eventArguments[4];
+    u8 unk100[4];
     u8 (*actionTryUpdate)(void *); /* 0x104 */
     void (*actionReset)(void *);   /* 0x108 */
     u8 unk10C[0xC];
     u8 receiver2[0x10]; /* 0x118: a second scene message receiver (size tentative). */
-    u8 unk128[0x40];
+    u8 unk128[0x2C];
+    u8 ambientParticle, intermittentEffect, continuousEffect;
+    u8 unk157[5];
+    struct StateActorDamageEffect damageEffect;
+    u8 unk164[4];
     u8 receiver[0x10];                 /* 0x168: scene message receiver (size tentative). */
     u8 bodyDrawable[0x1CC - 0x178];    /* 0x178: SceneActorGraphics_InitializeBody. */
     struct StateActorOverlay overlayDrawable[1]; /* 0x1CC: SceneActorGraphics_InitializeOverlay. */

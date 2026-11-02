@@ -1,4 +1,5 @@
 #include "scene_actor_animation.h"
+#include "scene_actor_state.h"
 
 // confidence=low: turns one octant toward the requested direction on animation ticks.
 
@@ -109,7 +110,6 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
 {
     u8 *direction = ((u8 *)actor) + 0x50;
     u8 *sequence;
-    u16 *scale;
     if (Take(&actor->directionalEntryFlag)) {
         s32 current = ((actor->direction + 0x70) >> 5) & 7;
         s32 target = ((actor->nextDirection + 0x70) >> 5) & 7;
@@ -132,23 +132,31 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
             }
         }
     }
-    sequence = ((u8 *)actor->drawable) + 0x48;
-    if (Arg1(0xA02F, actor)) {
-        u16 *p = &(*((u16 *)(((u8 *)actor) + 0x2C2)));
-        *p = 0x40;
-        scale = p;
-    } else {
-        u16 *p = &(*((u16 *)(((u8 *)actor) + 0x2C2)));
-        u16 v = *p;
-        scale = p;
-        if (!v)
-            *scale = 0x40;
+    {
+        struct SceneActorRegistryResetView *state = (void *)actor;
+        sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
+        {
+            u32 mask = 0xA02F;
+            u16 *scale;
+            if (state->flags2D4 & mask) {
+                state->field2C2 = 64;
+                scale = &state->field2C2;
+            } else {
+                u16 *p = &state->field2C2;
+                u16 value = *p;
+                scale = p;
+                if (!value)
+                    *scale = 64;
+            }
+            if (!actor->drawableKind)
+                Anim_SetDurationScale(
+                    ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence,
+                    *scale);
+            else
+                Anim_SetFrameDurationScale(
+                    &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *scale);
+        }
     }
-    if (!actor->drawableKind)
-        Anim_SetDurationScale(((u8 *)(*((void *volatile *)(((u8 *)actor) + 4)))) + 0x48, *scale);
-    else
-        Anim_SetFrameDurationScale(((u8 *)(*((void *volatile *)(((u8 *)actor) + 4)))) + 0x20,
-                                   *scale);
     if (events & 4) {
         struct SceneActorProfileEntry *entry =
             (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);

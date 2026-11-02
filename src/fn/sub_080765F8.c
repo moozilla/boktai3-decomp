@@ -1,11 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
-void SceneActorAnimation_SelectExplicitVariant(struct SceneActorAnimationView *actor, s32 index,
-                                               u32 variant, u32 flags)
+static inline void
+SceneActorAnimation_ApplyDirectionalSelection(struct SceneActorAnimationView *actor, u32 flags,
+                                              u32 selection, u32 variant)
 {
-    struct SceneActorProfileEntry *entry =
-        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
-    u32 selection = entry->value;
     u32 force;
     u8 *restart;
     if (flags & 0x10) {
@@ -13,7 +10,6 @@ void SceneActorAnimation_SelectExplicitVariant(struct SceneActorAnimationView *a
         flags &= ~0x10;
     } else
         force = 0;
-    asm("" : : "r"(flags), "r"(flags), "r"(flags));
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->selection = selection;
@@ -51,4 +47,14 @@ void SceneActorAnimation_SelectExplicitVariant(struct SceneActorAnimationView *a
         }
     }
     *restart = 0;
+}
+void SceneActorAnimation_SelectExplicitVariant(struct SceneActorAnimationView *actor, s32 index,
+                                               u32 variant, u32 flags)
+{
+
+    struct SceneActorProfileEntry *entry =
+        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
+    u32 selection = entry->value;
+
+    SceneActorAnimation_ApplyDirectionalSelection(actor, flags, selection, variant);
 }

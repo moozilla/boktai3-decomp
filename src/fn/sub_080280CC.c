@@ -1,5 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
-#include "global.h"
+#include "scene_actor_charge_offset.h"
 #include "engine_globals.h"
 #include "ram.h"
 typedef struct ActorAnimation {
@@ -43,9 +43,8 @@ static inline void setFacing(ActorAnimation *p, int angle)
     p->facing8 = value;
 }
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
-void Sound_PlaySongChecked(int);
+void Sound_PlaySongChecked(u32);
 int Math_Atan2(int, int);
-extern s16 gUnk_086149C4[];
 static inline int choose(u32 mode, int normal, int alternate)
 {
     int test = mode & 1;
@@ -55,37 +54,7 @@ static inline int choose(u32 mode, int normal, int alternate)
         result = alternate;
     return result;
 }
-static inline int trunc12(int x)
-{
-    return x >= 0 ? x >> 12 : -(-x >> 12);
-}
-void ContactSwarm_SpawnCharge(void *, void *, int, int, int, int, int);
-static inline void vector(s16 *dst, int direction, int length)
-{
-    s16 *velocity;
-    register u32 angle asm("r4");
-    int speed;
-    {
-        register u32 converted asm("r0") = direction << 24;
-        velocity = dst;
-        angle = converted >> 24;
-    }
-    speed = length;
-    {
-        int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-        int zero = 0;
-        velocity[0] = x;
-        velocity[1] = zero;
-    }
-    {
-        register s16 *entry asm("r0") = &gUnk_086149C4[angle];
-        velocity[2] = trunc12(*entry * speed);
-    }
-}
-typedef struct {
-    s16 x, y, z;
-} Vec;
-static inline int add(Vec *a, Vec *b)
+static inline int add(struct ContactPosition *a, struct ContactPosition *b)
 {
     int zero;
     a->x += b->x;
@@ -111,7 +80,7 @@ void SceneActors_UpdateSwarmAttack(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
     u8 *position = (u8 *)p + 0x48;
-    Vec spawn;
+    struct ContactPosition spawn;
     if (p->changed) {
         int sequence;
         p->changed = 0;
@@ -131,10 +100,10 @@ void SceneActors_UpdateSwarmAttack(ActorAnimation *p, int tick)
         int zero;
         int direction;
         if (p->facing == 0 || p->facing == 3)
-            vector((s16 *)&spawn, (p->facing * 64) - 64, 180);
+            SceneActor_SetChargeOffset((p->facing * 64) - 64, &spawn, 180);
         else
-            vector((s16 *)&spawn, (p->facing * 64) - 64, 110);
-        zero = add(&spawn, (Vec *)(position + 12));
+            SceneActor_SetChargeOffset((p->facing * 64) - 64, &spawn, 110);
+        zero = add(&spawn, (struct ContactPosition *)(position + 12));
         spawn.y += 300;
         direction = *((u8 *)p2 + 0x3ba);
         gRandomIndex = (gRandomIndex + 1) & 1023;

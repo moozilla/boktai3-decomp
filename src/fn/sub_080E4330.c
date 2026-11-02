@@ -1,5 +1,4 @@
 #include "scene_actor_chase.h"
-// MATCHING_CONCESSION: register-pinning
 struct DogAttackContext {
     u8 unknown0[0x624];
     u8 collider[0x54];
@@ -22,45 +21,34 @@ static inline void Or16(u16 *p, u32 mask)
     value |= *p;
     *p = value;
 }
+
+static inline void Dog_SetContextFlags(struct DogAttackContext *context, u32 mask)
+{
+    context->flags |= mask;
+}
+
 void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
 {
     struct DogAttackContext *context = a->context;
     if (Chase_TakeArrived(a)) {
-        u32 zero8;
-        register u32 zero asm("r4");
-        {
-            register u32 offset asm("r0") = 0x678;
-            u32 *p;
-            p = (u32 *)((u8 *)context + offset);
-            And32(p, ~8);
-        }
-        {
-            u32 bit = 0x100;
-            register u16 *flags asm("r2") = &a->flags2D4;
-            register u32 value asm("r1") = *flags;
-            zero8 = 0;
-            zero = 0;
-            asm("" : "+r"(zero8), "+r"(zero), "+r"(bit), "+r"(flags), "+r"(value));
-            *flags = bit | value;
-        }
+        And32(&context->flags, ~8);
+        SceneActorReaction_EnableMotionFlags(0x100, &a->flags2D4);
         {
             void *callback = SceneActorAnimation_EmitDirectionalTrail;
             u32 kind = 37;
             a->field2B2 = 1;
-            a->field2B0 = zero8;
+            a->field2B0 = 0;
             a->field2B5 = kind;
             a->target = callback;
-            a->field2C8 = zero;
-            And32(&a->flags114, ~1);
-            a->word104 = zero;
+            a->field2C8 = 0;
+            {
+                u32 *flags = &a->flags114;
+                s32 mask = -2;
+                *flags &= mask;
+            }
+            a->word104 = 0;
         }
-        {
-            u8 *ctx = a->context;
-            u32 bit = 2;
-            u32 *p;
-            p = (void *)(ctx + 0x678);
-            *p |= bit;
-        }
+        Dog_SetContextFlags(a->context, 2);
         {
             void *collider = context->collider;
             u32 damage = a->attacks.first[2];
@@ -72,7 +60,7 @@ void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
             extra = *(u16 *)p;
             Collider_SetAttackProperties(collider, damage, response, 0, power, extra);
         }
-        context->emitted = zero8;
+        context->emitted = 0;
     }
     if (a->field2B0) {
         context->timer69A = context->timer69E;

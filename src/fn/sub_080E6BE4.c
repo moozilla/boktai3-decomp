@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 // confidence=low: resolves the shadowless approach against the saved context position.
 void SceneActor_EnterShadowlessPhase(void);
@@ -37,10 +36,8 @@ void Dog_UpdateShadowlessApproach(struct SceneActorRegistryResetView *actor)
         if (active) {
             if (context->terrainCell == actor->terrainCell) {
                 u32 bit = 1;
-                u32 mask = ~bit;
-                /* Keep the bit and its complement available for the flag update. */
-                asm("" : "+r"(bit), "+r"(mask) : : "r0", "r3");
-                ((struct ChaseFlags40 *)flags)->bits &= mask;
+
+                ((struct ChaseFlags40 *)flags)->bits &= ~bit;
                 actor->state2A8 = 0;
                 actor->phase2A9 = 0;
                 actor->behavior2AA = 0;

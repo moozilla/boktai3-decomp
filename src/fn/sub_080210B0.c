@@ -1,35 +1,29 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 void ColorFade_QueueCommand(int, int, void *);
+static inline u32 SceneCommands_PaletteBankMask(const s16 *args)
+{
+    u32 mask = 0;
+    if (args[5])
+        mask = 0xFFF;
+    if (args[6])
+        mask = (u16)mask | 0x1000;
+    if (args[7])
+        mask = (u16)mask | 0xE000;
+    return mask;
+}
+
 void SceneCommands_FadePalette(void *p, void *unused, u8 *message)
 {
     s16 *args = (s16 *)(message + 8);
     int out[7], mode;
-    register int mask asm("r3") = 0;
-    if (args[5])
-        mask = 0xfff;
-    if (args[6]) {
-        register int value asm("r1") = 0x1000;
-        register int copied asm("r0");
-        asm("" : "+r"(value));
-        copied = value;
-        asm("" : "+r"(copied));
-        mask |= copied;
-    }
-    if (args[7]) {
-        register int value asm("r1") = 0xe000;
-        register int copied asm("r0");
-        asm("" : "+r"(value));
-        copied = value;
-        asm("" : "+r"(copied));
-        mask |= copied;
-    }
+    u32 mask = 0;
+    mask = SceneCommands_PaletteBankMask(args);
     out[0] = 1;
     out[1] = args[1];
     out[2] = args[2];
     out[3] = args[3];
     out[4] = args[4];
-    out[5] = mask;
+    out[5] = (u16)mask;
     out[6] = 0;
     if (!out[2] && !out[3] && !out[4]) {
         out[2] = 4;

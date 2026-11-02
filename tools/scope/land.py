@@ -307,7 +307,10 @@ def definition_span(text, name):
         names.extend(re.findall(r"^[ \t]*#define[ \t]+(\w+)[ \t]+%s[ \t]*(?://[^\n]*)?$"
                                 % re.escape(name), text, re.M))
     spellings = "|".join(map(re.escape, names))
-    m = re.search(r"^[A-Za-z_][^\n;=()]*\b(?:%s)\s*\([^;{]*\)\s*\{" % spellings, text, re.M)
+    # clang-format can put a pointer return type on the preceding line. Only
+    # declaration words and pointer stars may cross a line boundary here.
+    head = r"^[A-Za-z_](?:[^\n;=()]*|[\w \t*]*\n[\w \t*\n]*)"
+    m = re.search(head + r"\b(?:%s)\s*\([^;{]*\)\s*\{" % spellings, text, re.M)
     if not m:
         return None
     depth, i = 0, text.index("{", m.start())
