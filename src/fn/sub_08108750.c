@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
 struct AnimatedTile {
@@ -29,24 +28,23 @@ static inline u32 Step(struct AnimatedTile *crate)
     }
     crate->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        u32 mask = 1;
-        u32 left;
-        asm("" : "+r"(input), "+r"(mask));
-        left = mask & input;
-        asm("" : "+r"(left));
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             crate->flags |= 4;
         else
             crate->flags &= ~4;
     }
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 2;
-        register u32 left asm("r1");
-        left = mask & input;
-        left = (u8)left;
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             crate->flags |= 8;
         else
             crate->flags &= ~8;
