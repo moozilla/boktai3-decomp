@@ -3,7 +3,6 @@
 #include "display_sequence.h"
 /* CollisionController_ClearGlobal: Zeroes gCollisionManager; matches the ClearGlobal pattern already used by EffectManager_ClearGlobal and is hinted by the file's own #define. */
 #define CollisionController_ClearGlobal sub_08009E30
-// MATCHING_CONCESSION: register-pinning
 
 #define CollisionController_ClearGlobal sub_08009E30
 void CollisionController_ClearGlobal(void)
@@ -100,17 +99,13 @@ static inline s32 globalMode(void)
     return yes;
 }
 
-static inline u32 randomDelay(u32 restart)
+static inline u32 randomDelay(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
         u32 offset = gRandomIndex * 2;
         u32 value;
-        if (restart) {
-            register u16 *table asm("r2") = gRandomTable;
-            value = *(u16 *)(offset + (u32)table);
-        } else
-            value = *(u16 *)((u8 *)gRandomTable + offset);
+        value = *(u16 *)(offset + RANDOM_TABLE_ADDR);
         value &= 127;
         value += 120;
         return value;
@@ -129,17 +124,17 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
         SpriteDrawable_SelectTileFrame(&p->sprite, manager->animationGraphics, 0);
         Anim_SetSequence(&p->anim, manager->idleResource, 8, 0, 0);
         p->sprite.flags &= ~1;
-        p->delay = randomDelay(0);
+        p->delay = randomDelay();
     }
     {
         u32 flags = p->sprite.flags;
-        register u32 low asm("r2") = 1;
+        u32 low = 1;
         u32 firstMask;
         firstMask = low;
         if (flags & low) {
             if (p->timer++ > p->delay) {
                 p->timer = 0;
-                p->delay = randomDelay(1);
+                p->delay = randomDelay();
                 Effect_SetOrigin(&p->sprite, -4, -4);
                 SpriteDrawable_SelectTileFrame(&p->sprite, manager->animationGraphics, 0);
                 Anim_SetSequence(&p->anim, manager->idleResource, 8, 0, 0);
