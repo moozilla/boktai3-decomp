@@ -1,39 +1,26 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
+#include "player_cue_sequence.h"
+#include "monster_particle_random.h"
 #define FrostEmitter_SpawnParticle sub_081D2D78
-struct FrostVec {
-    u16 x, y, z, pad;
-};
-struct FrostSequence {
-    const u16 *commands;
-    u8 flags, count, weight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
 struct FrostParticle {
-    u32 flags;
-    u8 unknown4[3], priority;
-    u8 unknown8[8];
-    u16 frame;
-    u8 unknown12[10];
-    struct FrostVec position;
-    u8 unknown24[8];
-    struct FrostSequence sequence;
-    struct FrostVec velocity;
-    u16 active, unknown46;
+    struct ContactSwarmSprite sprite;
+    struct DisplaySequenceState sequence;
+    struct ContactPosition velocity;
+    u16 lifetime, unknown46;
 };
 struct FrostEmitter {
     u8 unknown0[0x18];
     u8 graphics[0x1C];
     void *resource;
-    struct FrostVec *source;
+    struct ContactPosition *source;
     u32 emitting;
     struct FrostParticle particles[12];
     u32 enabled, age;
 };
 extern const s16 gUnk_086149C4[];
-void Anim_SetSequence(void *, void *, u16, u8, u8);
+
 static inline s32 ShiftRandom(u16 value, s32 shift)
 {
     return value >> shift;
@@ -45,17 +32,17 @@ static inline s32 Scale(s32 n)
 
 void FrostEmitter_SpawnParticle(struct FrostEmitter *input)
 {
-    register struct FrostEmitter *p asm("r6") = input;
+    struct FrostEmitter *p = input;
     struct FrostParticle *slot = 0;
     s32 i;
     for (i = 0; i < 12; i++) {
-        if (!p->particles[i].active) {
+        if (!p->particles[i].lifetime) {
             slot = &p->particles[i];
             break;
         }
     }
     if (slot) {
-        u32 observed;
+        u32 sampleOrigin;
         const u16 *table;
         u32 index;
         u32 secondIndex;
@@ -63,14 +50,15 @@ void FrostEmitter_SpawnParticle(struct FrostEmitter *input)
         s32 magnitude;
         s32 mask;
         s32 sample;
-        struct FrostVec *velocity;
-        slot->position = *p->source;
-        /* Retain the unused hardware address from the inlined random generator. */
-        observed = 0x0403B714;
+        struct ContactPosition *velocity;
+        struct FrostEmitter *animationOwner;
+        slot->sprite.position = *p->source;
+        PARTICLE_RANDOM_CAPTURE_ORIGIN(sampleOrigin);
         table = gRandomTable;
         index = (gRandomIndex + 1) & 1023;
         angle = ShiftRandom(table[index], 4);
         mask = 63;
+        animationOwner = p;
         secondIndex = (index + 1) & 1023;
         gRandomIndex = secondIndex;
         sample = ShiftRandom(table[secondIndex], 4) & 1;
@@ -80,11 +68,13 @@ void FrostEmitter_SpawnParticle(struct FrostEmitter *input)
         velocity->x = Scale(gUnk_086149C4[(angle + 64) & 255] * magnitude);
         velocity->y = 0;
         velocity->z = Scale(gUnk_086149C4[angle] * magnitude);
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        asm volatile("" : "+r"(observed));
-        slot->velocity.y = (ShiftRandom(((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 4) & 3) + 4;
-        slot->active = 60;
-        Anim_SetSequence(&slot->sequence, p->resource, 0, 0, 4);
-        slot->flags &= ~1;
+        {
+            s32 lift = ShiftRandom(
+                ParticleRandom_ReadRelativeSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR), 4);
+            slot->velocity.y = (lift & 3) + 4;
+        }
+        slot->lifetime = 60;
+        Anim_SetSequence(&slot->sequence, animationOwner->resource, 0, 0, 4);
+        slot->sprite.flags &= ~1;
     }
 }
