@@ -6,8 +6,6 @@
 void Vanargand_SetPendingCue(void *, u16);
 u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
-void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
-s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 static inline s32 RandomValue(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
@@ -15,7 +13,6 @@ static inline s32 RandomValue(void)
 }
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
 void Sound_PlaySong(u32);
-s32 ScenePair_CountPositiveCounters(void *);
 void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
 {
     struct VanargandPairAttack *self = p;
