@@ -245,6 +245,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/actor-damage-particle-bursts.md](../notes/actor-damage-particle-bursts.md) | Hit reaction particle bursts | #scene-actors #matching | 1 |
 | [notes/actor-glyph-trail_2026-11-01.md](../notes/actor-glyph-trail_2026-11-01.md) | Actor glyph trail | *#actors* | 0 |
 | [notes/actor-interaction-child-recovery.md](../notes/actor-interaction-child-recovery.md) | Actor_ConfigureInteractionChildFromScript | *#scripts #assets* | 1 |
+| [notes/actor-marker-launch-fragments_2026-11-01.md](../notes/actor-marker-launch-fragments_2026-11-01.md) | ActorMarker_LaunchFragments (08181514) | #matching #actor-marker #compiler | 1 |
 | [notes/actor-move-toward-target-round9.md](../notes/actor-move-toward-target-round9.md) | Actor_MoveTowardTarget | *#animation #assets* | 0 |
 | [notes/actor-region-children-round9.md](../notes/actor-region-children-round9.md) | Actor_UpdateRegionChildren | *#assets* | 0 |
 | [notes/actor_animation_controller.md](../notes/actor_animation_controller.md) | Actor animation controller (081E34D0-081EAB64) | *#actors #animation #assets #tooling* | 8 |
@@ -375,6 +376,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/named-object-create-round9.md](../notes/named-object-create-round9.md) | NamedObject_CreateFromScript | #matching #round9b #named-object | 1 |
 | [notes/native-effect-profile-round9.md](../notes/native-effect-profile-round9.md) | NativeEffect_CreateFromProfile |  | 1 |
 | [notes/nav-mesh-route-round9.md](../notes/nav-mesh-route-round9.md) | NavMesh_FindRoute |  | 1 |
+| [notes/nidhoggr-init-parts-match.md](../notes/nidhoggr-init-parts-match.md) | Nidhoggr_InitParts (081940F8) | #matching #nidhoggr #cse #reload | 1 |
+| [notes/nidhoggr-restored-collider-ranges.md](../notes/nidhoggr-restored-collider-ranges.md) | Nidhoggr restored collider ranges | #matching #nidhoggr #register-allocation | 1 |
 | [notes/opus-actor-marker-fragments_2026-10-31.md](../notes/opus-actor-marker-fragments_2026-10-31.md) | ActorMarker_LaunchFragments (08181514): holdout | #matching #actor-marker #compiler #reload #local-alloc #combine #scope-gap | 8 |
 | [notes/opus-armor-part-damage_2026-11-01.md](../notes/opus-armor-part-damage_2026-11-01.md) | Armor_OnPartDamageCollision (0818C6F8): matched in ordinary C | #matching #armor #twin #random-table #cross-jump | 2 |
 | [notes/opus-charged-burst-spark_2026-10-31.md](../notes/opus-charged-burst-spark_2026-10-31.md) | ChargedBurst_EmitSpark (082335F0): matched (2026-11-01) | #matching #charged-burst #random-table #compiler #local-alloc #reload #combine #global-alloc | 13 |
@@ -413,6 +416,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/push20-mid.md](../notes/push20-mid.md) | Push20 mid-range worker | *#text* | 10 |
 | [notes/push20-root.md](../notes/push20-root.md) | Push toward 20%: parent matches |  | 8 |
 | [notes/region-actor-behavior-round9.md](../notes/region-actor-behavior-round9.md) | RegionActor_UpdateBehaviorAnimation | *#animation #assets* | 0 |
+| [notes/registry-callback-updater_2026-11-01.md](../notes/registry-callback-updater_2026-11-01.md) | SceneActorRegistry_UpdateActors | *#particles* | 2 |
 | [notes/registry-particle-burst.md](../notes/registry-particle-burst.md) | Registry update and contact particles | #scene-actors #matching | 0 |
 | [notes/registry_terrain_reactions.md](../notes/registry_terrain_reactions.md) | Registered actor terrain reactions | #matching #scene-actors | 0 |
 | [notes/repeated-effect_2026-10-14.md](../notes/repeated-effect_2026-10-14.md) | Contiguous repeated effect cohort (Sol, 2026-10-14) |  | 5 |
@@ -422,6 +426,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round1-luna-a.md](../notes/round1-luna-a.md) | Luna A production round |  | 2 |
 | [notes/round1-luna-b.md](../notes/round1-luna-b.md) | Production matching round 1 — Luna B | *#matching* | 1 |
 | [notes/round1-sol.md](../notes/round1-sol.md) | Production matching round 1 — Sol | *#matching* | 4 |
+| [notes/round10b-fan-cannon.md](../notes/round10b-fan-cannon.md) | FanCannon_UpdateActive (08209704) | #matching #fan-cannon #rng #gcse #register-allocation | 1 |
+| [notes/round10b-skeleton-rise.md](../notes/round10b-skeleton-rise.md) | Skeleton_UpdateRiseRecovery (080BF0E4) | #matching #skeleton #global-alloc #pre #stack-slots | 1 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
 | [notes/round2-sol.md](../notes/round2-sol.md) | Sol production round 2 |  | 5 |
@@ -501,20 +507,28 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/s4.md](../notes/s4.md) | s4 notes |  | 21 |
 | [notes/s5.md](../notes/s5.md) | s5 notes | *#assets* | 13 |
 | [notes/saved-position-marker_2026-10-14.md](../notes/saved-position-marker_2026-10-14.md) | Saved-position marker, 08053D8C–08054294 |  | 2 |
+| [notes/scene-actor-apply-hit-response.md](../notes/scene-actor-apply-hit-response.md) | SceneActorReaction_ApplyHitResponse | *#actors #particles* | 1 |
+| [notes/scene-actor-collider-contact_2026-11-01.md](../notes/scene-actor-collider-contact_2026-11-01.md) | scene-actor-collider-contact_2026-11-01.md | *#actors #scene* | 1 |
 | [notes/scene-actor-components_2026-10-30.md](../notes/scene-actor-components_2026-10-30.md) | Canonical scene actor components | #ram #structs #monster #matching | 6 |
 | [notes/scene-actor-contact-route-probe.md](../notes/scene-actor-contact-route-probe.md) | Contact route probe | #scene-actors #matching | 0 |
+| [notes/scene-actor-defeat-burst_2026-11-01.md](../notes/scene-actor-defeat-burst_2026-11-01.md) | Defeat burst at 08080494 | #scene-actors #matching #compiler | 1 |
+| [notes/scene-actor-evaluate-candidate.md](../notes/scene-actor-evaluate-candidate.md) | SceneActorContacts_EvaluateCandidate |  | 1 |
 | [notes/scene-actor-groups_2026-10-30.md](../notes/scene-actor-groups_2026-10-30.md) | Canonical scene actor groups and routes | #structs #ram #monster #matching | 4 |
 | [notes/scene-actor-position-curve.md](../notes/scene-actor-position-curve.md) | Scene actor position curve | #scene-actors #matching | 0 |
 | [notes/scene-actor-pursuit-recovery.md](../notes/scene-actor-pursuit-recovery.md) | Pursuit after contact release | #scene-actors #matching | 0 |
+| [notes/scene-actor-recovery-route.md](../notes/scene-actor-recovery-route.md) | SceneActorRoute_TryRecoveryDetour | *#actors* | 1 |
 | [notes/scene-actor-retreat-route.md](../notes/scene-actor-retreat-route.md) | Scene actor retreat route | #scene-actors #terrain #matching | 0 |
+| [notes/scene-actor-timed-burst_2026-11-01.md](../notes/scene-actor-timed-burst_2026-11-01.md) | Timed reaction burst | #scene-actor #matching #compiler | 1 |
 | [notes/scene-actor-twenty_2026-10-12.md](../notes/scene-actor-twenty_2026-10-12.md) | Scene actors and dialogue: reaching 20% | *#actors #scene* | 3 |
 | [notes/scene-arc-effects_2026-10-13.md](../notes/scene-arc-effects_2026-10-13.md) | Scene arc slots and projected ground effects (tentative) | *#scene* | 4 |
+| [notes/scene-contact-pool-start_2026-11-01.md](../notes/scene-contact-pool-start_2026-11-01.md) | scene-contact-pool-start_2026-11-01.md | *#scene #assets* | 0 |
 | [notes/scene-departure-display_2026-11-01.md](../notes/scene-departure-display_2026-11-01.md) | Scene departure display | *#scene* | 1 |
 | [notes/scene-panel-background_2026-10-14.md](../notes/scene-panel-background_2026-10-14.md) | Scene panel background effects and overlay setup | *#scene #panel* | 2 |
 | [notes/scene-panel-rig-states_2026-10-14.md](../notes/scene-panel-rig-states_2026-10-14.md) | Scene panel rig states and animation (tentative identities) | *#scene #panel #animation* | 6 |
 | [notes/scene-panel-rig_2026-10-14.md](../notes/scene-panel-rig_2026-10-14.md) | Scene panel rig and contact/movement contracts (tentative) | *#scene #panel #assets* | 4 |
 | [notes/scene-panel-schedule_2026-10-14.md](../notes/scene-panel-schedule_2026-10-14.md) | Scene panel scheduled actions (tentative) | *#scene #panel* | 2 |
 | [notes/scene-panel-states_2026-10-14.md](../notes/scene-panel-states_2026-10-14.md) | Scene panel state and background controls (tentative) | *#scene #panel* | 2 |
+| [notes/scene-pool-manager_2026-11-01.md](../notes/scene-pool-manager_2026-11-01.md) | scene-pool-manager_2026-11-01.md | *#scene* | 0 |
 | [notes/scene-pool-states_2026-10-13.md](../notes/scene-pool-states_2026-10-13.md) | Scene pool state family: second contiguous batch | *#scene* | 6 |
 | [notes/scene-pool_2026-10-13.md](../notes/scene-pool_2026-10-13.md) | Scene pool and actor controls, 0803CDF0–0803EE58 | *#actors #scene #tooling* | 5 |
 | [notes/scene_actor_animation_route_walk.md](../notes/scene_actor_animation_route_walk.md) | Scene actor route walk | #matching #scene-actors | 0 |

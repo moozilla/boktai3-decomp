@@ -1,8 +1,9 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.1%
+// confidence=low: emits a defeat burst, runs the optional script and restores idle control.
 #include "scene_actor_reaction.h"
-#include "scene_actor_part_burst.h"
+#include "monster_particle_random.h"
+#include "spark_particle.h"
+#include "scene_actor_record.h"
 #include "scene_actor_behavior.h"
 #include "script_utility.h"
 #include "runtime.h"
@@ -10,7 +11,7 @@ void SceneActorPlacement_PlayCategoryEventSound(void *);
 void ActorParticles_SpawnWideBurst(void *);
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
-#include "scene_actor_record.h"
+
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -23,6 +24,7 @@ static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput,
     u32 mask = maskInput;
     return off == 0x2D4 ? actor->flags2D4 & mask : actor->flags2D0 & mask;
 }
+
 static inline void ResetMotionControl(struct SceneActorRegistryResetView *actor)
 {
     actor->field2C8 = 0;
@@ -33,6 +35,7 @@ static inline void ResetMotionControl(struct SceneActorRegistryResetView *actor)
     }
     actor->word104 = 0;
 }
+
 static inline void InstallIdleControl(struct SceneActorRegistryResetView *actor, void *callback,
                                       u32 kind, u32 prepared)
 {
@@ -42,6 +45,7 @@ static inline void InstallIdleControl(struct SceneActorRegistryResetView *actor,
     actor->target = callback;
     ResetMotionControl(actor);
 }
+
 static inline void SelectState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                                u8 behavior)
 {
@@ -49,47 +53,55 @@ static inline void SelectState(struct SceneActorRegistryResetView *actor, u8 sta
     actor->phase2A9 = phase;
     actor->behavior2AA = behavior;
 }
+
 static inline void ResetStateEntry(struct SceneActorRegistryResetView *actor, u32 prepared)
 {
     actor->counter2AC = 0;
     actor->field2B1 = prepared;
 }
-// Remaining (scope 14/16): the tail matches once a `completedState = 1` set
-// before TakePrepared feeds all three entry fields (as in Vorn_UpdateDefeat):
-// the long-lived constant gets no register and is rebuilt at each store. Open:
-// (1) the group pointer is r2 in the ROM and r4 here (the union with the table
-// makes it one global pseudo); (2) in the sparks the ROM reloads the
-// gRandomIndex address before each sample and keeps 20 in sl, while the
-// cse-merged index pseudo (13 refs) takes sl here. A `u32 *cursor =
-// &gRandomIndex;` at the top with a cursor-taking count helper fixes (2), and
-// without the union (1) too (build/match/w/bdb/e7.c, scope 76/77); what is left
-// there is local-alloc order in the spark block: AGBCC_PRI=table:+600 plus
-// position:+10 leaves 8 insns (the phase-0 pseudo r4 vs r5 in the tail). The
-// ROM's table (REG_EQUIV gRandomTable, 7 refs, priority ~680) must outrank the
-// range pointer (9 refs, 1134), so it needs two more refs (9 refs -> 1184),
-// which a single-set constant cannot have; position (8 refs, 1132) also needs
-// one fewer insn of life or one more ref. Dropping the table's equivalence
-// alone (AGBCC_NOEQUIV, the fix ContactActor_UpdateRoaming needed) is not
-// enough here: the order is decided in local-alloc, whose priority (679) does
-// not depend on the equivalence (scope 45/46 with the knob).
+
+static inline u8 NextSparkCount(const u16 *table)
+{
+    return (ParticleRandom_ReadSample(table) & 3) + 1;
+}
+
+static inline void SpawnDefeatSparks(struct SceneActorRegistryResetView *actor,
+                                     const struct ContactPosition *range, const u16 *table,
+                                     u8 firstCount, s16 height, s16 kind, s16 priority)
+{
+    SparkParticle_Spawn(&actor->body.position, firstCount, range, 32, 4, height, kind, priority);
+    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 64, 4, height, kind,
+                        priority);
+    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 94, 4, height, kind,
+                        priority);
+    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 128, 4, height, kind,
+                        priority);
+    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 196, 4, height, kind,
+                        priority);
+    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 240, 4, height, kind,
+                        priority);
+}
+
 void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *actor)
 {
+    struct SceneActorRegistryControlGroup *group;
     union {
-        struct SceneActorRegistryControlGroup *group;
-        const u16 *table;
+        const u16 *samples;
+        const u8 *category;
     } source;
     struct ContactPosition range;
     s32 values[8];
     struct ScriptUtilityArguments arguments;
     u16 script;
+    s16 sparkHeight, sparkKind, sparkPriority;
     void *drawable;
     u32 completedState;
-    source.group = &actor->group.common;
+    group = &actor->group.common;
     completedState = 1;
     if (!SceneActorReaction_TakePrepared(actor))
         return;
     {
-        struct SceneActorRegistryControl *control = &source.group->control;
+        struct SceneActorRegistryControl *control = &group->control;
 
         u32 *field;
         u32 mask;
@@ -128,6 +140,9 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
             drawable = p;
         }
     }
+    sparkHeight = 20;
+    sparkKind = 2;
+    sparkPriority = 1;
     if (actor->drawableKind == 0) {
         u32 mask = ~2;
         *(u32 *)drawable &= mask;
@@ -148,10 +163,9 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     range.x = 80;
     range.y = 60;
     range.z = 60;
-    source.table = (const u16 *)RANDOM_TABLE_ADDR;
-    SceneActorEffects_SpawnDefeatSparks(
-        actor, &range, source.table,
-        SceneActorEffects_NextSparkCount((const u16 *)RANDOM_TABLE_ADDR));
+    source.samples = gRandomTable;
+    SpawnDefeatSparks(actor, &range, source.samples, NextSparkCount(source.samples), sparkHeight,
+                      sparkKind, sparkPriority);
     if (actor->category == 4 || actor->category == 1 || actor->category == 5 ||
         actor->category == 7 || actor->category == 6 || actor->category == 24 ||
         actor->category == 25)
@@ -173,9 +187,10 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         arguments.values = values;
         Script_Call(script, &arguments);
     }
-    if (!Flag(actor, 0x4000, 0x2D4) && (u32)(actor->category - 11) > 2)
+    source.category = &actor->category;
+    if (!Flag(actor, 0x4000, 0x2D4) && (u32)(*source.category - 11) > 2)
         GameState_SetEventFlag(
-            BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+            BestiaryDisplay_GetEntryForActor(*source.category, actor->paletteOffset));
     InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
     SelectState(actor, completedState, 0, 2);
     ResetStateEntry(actor, completedState);
@@ -183,6 +198,3 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->body.id);
     ActorShadow_Disable(actor->shadow);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorReaction_BeginDefeatBurst);
-#endif

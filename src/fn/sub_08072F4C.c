@@ -1,5 +1,3 @@
-#ifdef NONMATCHING
-// fuzzy: 98.6%
 #include "scene_actor_init_actor.h"
 #include "scene_actor_contact_list.h"
 #include "scene_actor_adjacent_cell.h"
@@ -59,14 +57,6 @@ static inline struct SceneActorChaseTracking *TrackingOf(struct SceneActorRegist
 {
     return &self->tracking;
 }
-static inline void WriteDelta(struct ContactPosition *delta, const struct ContactPosition *target,
-                              const struct ContactPosition *source)
-{
-    s16 *components = (s16 *)delta;
-    components[0] = target->x - source->x;
-    components[1] = target->y - source->y;
-    components[2] = target->z - source->z;
-}
 static inline s32 AngleSeparation(s32 angle)
 {
     if (angle > 128)
@@ -86,7 +76,7 @@ static inline s32 PlayerSlot(struct SceneActorContactSample *p)
 static inline u8 EvaluateSample(struct SceneActorRegistryResetView *base,
                                 struct SceneActorContactSample *sample, u32 kind, s32 *bestDistance)
 {
-    struct SceneActorRegistryResetView *self;
+    struct SceneActorRegistryResetView *self = base;
     struct SceneActorChaseGroup *group = &base->group;
     struct ContactPosition difference;
     struct ContactPosition *delta = &difference;
@@ -94,10 +84,12 @@ static inline u8 EvaluateSample(struct SceneActorRegistryResetView *base,
     struct ContactPosition *position = &sample->position;
     s32 dist, angle, limit, threshold, transition, cell;
     u32 facing;
-    WriteDelta(delta, position, own);
+    difference.x = position->x - own->x;
+    difference.y = position->y - own->y;
+    difference.z = position->z - own->z;
     dist = SquareDistance(&difference);
-    self = base;
-    if ((u8)SceneActorTerrain_IsFacingPosition((void *)self, position)) {
+
+    if ((u8)SceneActorTerrain_IsFacingPosition((void *)base, position)) {
         *bestDistance = dist;
         SceneActorContacts_SetDistanceGate((void *)base, (void *)&base->tracking, dist, 0, 0, kind);
         return 1;
@@ -182,7 +174,6 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
 {
 
     struct SceneActorContactSample copy;
-    struct SceneActorContactSample *sample;
     int tries;
     switch (node->kind) {
         case 1:
@@ -216,8 +207,8 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
                 if (SceneActorContacts_TestPlayerCondition(candidate, 1, 0x21000))
                     break;
             }
-            sample = node->object;
-            if (EvaluateSample((void *)base, sample, node->kind, distance) &&
+
+            if (EvaluateSample((void *)base, node->object, node->kind, distance) &&
                 Nav_IsPositionInMesh(((struct SceneActorRegistryResetView *)base)->group.route,
                                      &base->position,
                                      &((struct SceneActorContactSample *)node->object)->position))
@@ -226,8 +217,3 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
     }
     return 0;
 }
-
-#else
-#include "global.h"
-INCLUDE_ASM("asm/nonmatching", SceneActorContacts_EvaluateCandidate);
-#endif
