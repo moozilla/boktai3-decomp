@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-// MATCHING_CONCESSION: register-pinning
 
 struct Vec {
     u32 x : 16;
@@ -96,7 +95,7 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
         if ((u16)(D(0x14) - 2) > 2)
             goto done;
         {
-            register s32 angle asm("r9");
+            s32 angle;
             s32 a64;
             s32 pitch, distance;
             angle = ((*P(0x58C) + 5) & 7) * 32;
@@ -110,13 +109,13 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
                 a64 = temporary;
                 b.v.x = D(0x20) + shift12(product) - 16;
             }
-            b.v.z = D(0x24) + shift12(distance * gUnk_086149C4[angle]) + 16;
+            b.v.z = D(0x24) + shift12(distance * SIN(angle)) + 16;
             sub_081606C0(p, &b.v, 5, p + 0x18, 0, 0);
             pitch = (311 - W(0x584) * 10) & 255;
             b.h.y = D(0x22) + shift12(I(0xC0) * SIN(pitch)) + 190;
             distance = shift_distance(I(0xC0) * SIN(pitch + 64));
             b.h.x = D(0x20) + shift12(SIN(a64) * distance) - 16;
-            b.h.z = D(0x24) + shift12(distance * gUnk_086149C4[angle]) + 16;
+            b.h.z = D(0x24) + shift12(distance * SIN(angle)) + 16;
             sub_081606C0(p, &b.v, 5, p + 0x18, 0, 0);
         }
         W(0x584)++;
