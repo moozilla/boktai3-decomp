@@ -8,7 +8,7 @@ struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay 
     entry = &display->entries[index];
     if (index == 1) {
         struct ContactPosition *destination = &entry->position;
-        register struct ContactPosition *world asm("r8");
+        struct ContactPosition *world;
         struct ContactPosition *worldLow;
         u32 worldOffset;
         s32 x;
@@ -16,7 +16,6 @@ struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay 
         s32 sum, vertical, y, depth;
         s32 scaledSum;
         worldOffset = (u8 *)&display->world - (u8 *)display;
-        asm("" : "+r"(worldOffset));
         worldLow = (void *)(worldOffset + (u32)display);
         world = worldLow;
         x = display->world.x;
