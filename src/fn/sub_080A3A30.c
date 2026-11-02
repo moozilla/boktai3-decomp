@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 #include "player.h"
 
@@ -58,33 +57,10 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *callb
     }
     a->word104 = 0;
 }
-static inline void ClearMotion(struct SceneActorRegistryResetView *a, u32 mask)
-{
-    a->flags2D4 &= ~mask;
-}
 static inline void SetFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     a->flags2CC = mask | a->flags2CC;
 }
-inline static void ClearMotion_BeginPlayerPursuit(struct SceneActorRegistryResetView *a, u32 mask)
-{
-    {
-        s32 v1 = (~mask) & a->flags2D4;
-        a->flags2D4 = v1;
-    }
-}
-
-#define SPIDER_CAPTURE_PURSUIT_MOTION_MASK(out_)                                                   \
-    do {                                                                                           \
-        (out_) = 0x200;                                                                            \
-    } while (0)
-
-#define SPIDER_START_PURSUIT(context_)                                                             \
-    do {                                                                                           \
-        (context_)->flags |= 2;                                                                    \
-        (context_)->timer = 0;                                                                     \
-    } while (0)
-
 void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
 {
     struct PursuitContext *ctx;
@@ -108,7 +84,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     mesh = &((struct SpiderPursuitGroup *)group)->mesh;
     if (!Nav_IsPositionInMesh(*mesh, &a->body.position, (*(u8 **)gPlayers) + 0x30))
         return;
-    SPIDER_CAPTURE_PURSUIT_MOTION_MASK(motionMask);
+    motionMask = 0x200;
     point = &((struct SpiderPursuitGroup *)group)->point;
     *(*point) = a->body.position;
     (*point)->pad = ready;
@@ -117,14 +93,19 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     SetControl(a, a->entryTarget228, 1);
     terrain = *mesh;
     dest = &a->tracking.target->position;
-    if (Nav_IsPositionInMesh(terrain, &a->body.position, dest) &&
-        (result = Terrain_ApplyBlocked(terrain, &a->body.position, dest))) {
-        if (result != 2)
-            Memory_Clear(&a->body.motion, 8);
+    if (!Nav_IsPositionInMesh(terrain, &a->body.position, dest)) {
+        a->flags2D4 &= ~motionMask;
     } else {
-        ClearMotion_BeginPlayerPursuit(a, motionMask);
+        result = Terrain_ApplyBlocked(terrain, &a->body.position, dest);
+        if (result) {
+            if (result != 2)
+                Memory_Clear(&a->body.motion, 8);
+        } else {
+            a->flags2D4 &= ~motionMask;
+        }
     }
     SetFlags(a, 0x4010);
     a->field2C2 = Div(64, 3);
-    SPIDER_START_PURSUIT(ctx);
+    ctx->flags |= 2;
+    ctx->timer = 0;
 }
