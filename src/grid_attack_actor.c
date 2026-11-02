@@ -394,20 +394,18 @@ void GridAttackActor_NotifyLinkedActorLatePhase(struct GridAttackActor *p)
     }
 }
 
-static inline void GridAttack_SetFacingPinned(struct GridAttackActor *p, int angle)
+static inline void GridAttack_SetFacing(struct GridAttackActor *p, int angle)
 {
     u32 value;
-    register int shifted asm("r0");
+    s32 shifted;
     p->transform.angle = angle;
-    shifted = p->transform.angle + 0x60;
-    asm("" : "+r"(shifted));
-    shifted >>= 6;
-    value = 3 & shifted;
+    shifted = (p->transform.angle + 96) >> 6;
+    value = 3;
+    value &= shifted;
     p->facing = value;
-    shifted = p->transform.angle + 0x70;
-    asm("" : "+r"(shifted));
-    shifted >>= 5;
-    value = 7 & shifted;
+    shifted = (p->transform.angle + 112) >> 5;
+    value = 7;
+    value &= shifted;
     p->facing8 = value;
 }
 
@@ -416,11 +414,11 @@ static inline void GridAttack_SetFacingPinned(struct GridAttackActor *p, int ang
 void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
 {
     if (!p->locked)
-        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
+        GridAttack_SetFacing(p, p->requestedAngles[0]);
     if (p->changed) {
         p->changed = 0;
         if (p->locked)
-            GridAttack_SetFacingPinned(p, p->savedAngle);
+            GridAttack_SetFacing(p, p->savedAngle);
         GridAttackActor_SetAnimation(p, 2, 1, 0);
     }
     if (!p->tryUpdate(p)) {
@@ -436,7 +434,7 @@ void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
 {
     if (p->changed) {
         p->changed = 0;
-        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
+        GridAttack_SetFacing(p, p->requestedAngles[0]);
         GridAttackActor_ResetAttackAnimationHistory(p);
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         Sound_PlaySongChecked(1355);
@@ -466,7 +464,7 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
     if (p->changed) {
         int zero = 0;
         p->changed = zero;
-        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
+        GridAttack_SetFacing(p, p->requestedAngles[0]);
         GridAttackActor_SetAnimation(p, 3, 1, 8);
         p->stage = zero;
         p->counter = zero;
@@ -560,7 +558,7 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     struct GridAttackActor *base = p;
     if (p->changed) {
         p->changed = 0;
-        GridAttack_SetFacingPinned(p, p->requestedAngles[0]);
+        GridAttack_SetFacing(p, p->requestedAngles[0]);
         GridAttackActor_ResetAttackAnimationHistory(p);
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
