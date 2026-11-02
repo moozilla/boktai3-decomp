@@ -794,6 +794,7 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
 // MATCHING_CONCESSION: register-pinning
 void SelectionMenu_Choose(struct SelectionMenu *p)
 {
+    u16 *cursorY;
     int index;
     switch (p->choiceCount) {
 
@@ -815,14 +816,12 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
                          * coordinate stores coalesce the two address additions. */
                         register int offset asm("r3");
                         offset = 0x1b4;
-                        asm("" : "+r"(offset));
+
                         *(u16 *)((u8 *)p + offset) = x;
                         x = (index >> 2) * 24 + 32;
                         offset += 2;
-                        {
-                            register u16 *out asm("r1") = (u16 *)((u8 *)p + offset);
-                            *out = x;
-                        }
+                        cursorY = (u16 *)((u8 *)p + offset);
+                        *cursorY = x;
                     }
                     p->selectedSlot = index;
                     Sound_PlaySong(0xdc);
@@ -863,14 +862,12 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
                          * coordinate stores coalesce the two address additions. */
                             register int offset asm("r3");
                             offset = 0x1b4;
-                            asm("" : "+r"(offset));
+
                             *(u16 *)((u8 *)p + offset) = x;
                             x = (index >> 2) * 24 + 32;
                             offset += 2;
-                            {
-                                register u16 *out asm("r1") = (u16 *)((u8 *)p + offset);
-                                *out = x;
-                            }
+                            cursorY = (u16 *)((u8 *)p + offset);
+                            *cursorY = x;
                         }
                         p->selectedSlot = index;
                         Sound_PlaySong(0xdc);
