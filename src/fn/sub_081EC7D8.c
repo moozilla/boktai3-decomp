@@ -3,9 +3,8 @@
 #include "scene_departure_display.h"
 #include "player_cue_sequence.h"
 
-void ActorDisplay_UpdateForegroundSprite(void *input)
+void ActorDisplay_UpdateForegroundSprite(struct DepartureActor *actor)
 {
-    struct DepartureActor *actor = input;
     struct DepartureDrawable *draw = &actor->foreground;
     u16 *origin;
     register u16 *screen;
