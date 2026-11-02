@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "ram.h"
@@ -88,7 +87,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
         }
         {
             manager->playerName = 0;
-            *(u32 *)((u8 *)gPlayers[0] + 0x40) = (u32)gPlayers[0] + 0x284;
+            gPlayers[0]->followTarget = gPlayers[0]->localFollowTarget;
             Player_ClearAttachmentFlags(gPlayers[0], 5);
             clearFlag16(8, &object->flags);
             ((u8 *)gPlayers[0])[0x701] &= 0xFE;
