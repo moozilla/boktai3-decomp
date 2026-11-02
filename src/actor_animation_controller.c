@@ -33,6 +33,32 @@ void ActorPalette_BeginFade(struct ActorAnimController *p)
 
 s32 Div(s32, s32);
 
+// Set the phase; a controller leaving mode 3 for mode 3 keeps its animation frame.
+static inline void Actor_SetPhase(struct ActorAnimController *p, u32 phase)
+{
+    p->phase = phase;
+    if (p->oldMode == 3 && p->mode == 3) {
+        p->savedFrame = p->anim.frame;
+        p->savedTimer = p->anim.timer;
+    }
+}
+
+// Enter MODE at PHASE, keeping the previous mode, and flag the state change.
+static inline void Actor_SetState(struct ActorAnimController *g, u32 mode, u32 phase)
+{
+    g->oldMode = g->mode;
+    g->mode = mode;
+    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | (phase << 4);
+    if (g->oldMode == 3 && g->mode == 3) {
+        g->savedFrame = g->anim.frame;
+        g->savedTimer = g->anim.timer;
+    }
+    {
+        u8 one = 1;
+        g->flags |= one;
+    }
+}
+
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 
 void ActorPalette_UpdateFade(struct ActorAnimController *p)
@@ -237,7 +263,6 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *, struct ActorChi
 
 // Tentative: accept a nearby interaction when facing, height and input permit it.
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartner *q)
 {
     s32 dx, dz, xOffset, height, length;
@@ -312,27 +337,22 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             p->mode = mode;
         }
         {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 0x30;
+            *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0x30;
             if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
+                if ((*((u8 *)p + 0xf5a) & 15) == 3) {
                     p->savedFrame = p->anim.frame;
                     p->savedTimer = p->anim.timer;
                 }
             }
         }
         {
-            register u32 one asm("r1") = 1;
-            register u32 flags asm("r2") = p->flags;
-            p->flags = one | flags;
+            u8 one = 1;
+            p->flags |= one;
             {
-                register void (*fn)(void *, void *) = Actor_OnInteractionChildRelease;
+                void (*fn)(void *, void *) = Actor_OnInteractionChildRelease;
                 q->fn = fn;
             }
-            one |= q->flags;
-            q->flags = one;
+            q->flags |= one;
         }
         Actor_SetInteractionControlFlag(p);
     } else {
@@ -342,27 +362,22 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             p->mode = mode;
         }
         {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 0x20;
+            *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0x20;
             if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
+                if ((*((u8 *)p + 0xf5a) & 15) == 3) {
                     p->savedFrame = p->anim.frame;
                     p->savedTimer = p->anim.timer;
                 }
             }
         }
         {
-            register u32 one asm("r1") = 1;
-            register u32 flags asm("r2") = p->flags;
-            p->flags = one | flags;
+            u8 one = 1;
+            p->flags |= one;
             {
-                register void (*fn)(void *, void *) = Actor_OnInteractionChildDelay;
+                void (*fn)(void *, void *) = Actor_OnInteractionChildDelay;
                 q->fn = fn;
             }
-            one |= q->flags;
-            q->flags = one;
+            q->flags |= one;
         }
         Actor_BeginInteractionSoundSequence(p);
     }
@@ -533,7 +548,6 @@ void Actor_ArmRestIdleTransition(struct ActorAnimController *p)
 
 void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *);
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateIdleWait(struct ActorAnimController *p)
 {
     if (*(s32 *)gPadState) {
@@ -546,28 +560,8 @@ void Actor_UpdateIdleWait(struct ActorAnimController *p)
     if (++p->timer > p->delay) {
         if (p->done) {
             p->interrupted = 0;
-            {
-                register u32 offset asm("r1") = 0xF5A;
-                u16 *field = (void *)((u8 *)p + offset);
-                p->savedPhase = *field >> 4;
-            }
-            {
-                u32 offset = 0xF5A;
-                u16 *field;
-                register u32 raw asm("r1");
-                register u32 mask asm("r3");
-                field = (void *)((u8 *)p + offset);
-                raw = *field;
-                mask = 15;
-                *field = (mask & raw) | 0x50;
-                if (p->oldMode == 3) {
-                    register u32 bits asm("r0") = mode_bits((u8 *)field, mask);
-                    if (bits == 3) {
-                        p->savedFrame = p->anim.frame;
-                        p->savedTimer = p->anim.timer;
-                    }
-                }
-            }
+            p->savedPhase = p->phase;
+            Actor_SetPhase(p, 5);
             {
                 u32 one = 1;
                 u32 zero;
@@ -618,7 +612,6 @@ void Sound_PlaySong(s32);
 
 void ActorShadow_Enable(void *);
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
 {
     if (*(s32 *)gPadState) {
@@ -636,23 +629,14 @@ void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
             u32 mode = 3;
             p->mode = mode;
         }
-        {
-            register u32 shifted asm("r3") = phase << 4;
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | shifted;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
+        p->phase = phase;
+        if (p->oldMode == 3 && p->mode == 3) {
+            p->savedFrame = p->anim.frame;
+            p->savedTimer = p->anim.timer;
         }
         {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
+            u8 one = 1;
+            p->flags |= one;
         }
     }
 }
@@ -882,43 +866,15 @@ s32 Script_GetValue(void);
 
 s32 Script_GetKeywordValue(s32, s32);
 
-static inline u32 mode_bits_v2(u8 *p, u32 mask)
-{
-    register u32 v asm("r1") = *p;
-    return mask & v;
-}
-
-// MATCHING_CONCESSION: register-pinning
 void Actor_BeginScriptedAnimationPhaseNine(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0)
         return;
     B(0xf76) = Script_GetKeywordValue(0x70, 0);
     if (W(0xddc) & 1)
         return;
-    g->oldMode = g->mode;
-    {
-        u32 mode = 3;
-        g->mode = mode;
-    }
-    {
-        register u32 raw asm("r1") = *(u16 *)((u8 *)g + 0xf5a);
-        register u32 mask asm("r2") = 15;
-        *(u16 *)((u8 *)g + 0xf5a) = (mask & raw) | 0x90;
-        if (g->oldMode == 3) {
-            register u32 bits asm("r0") = mode_bits_v2((u8 *)g + 0xf5a, mask);
-            if (bits == 3) {
-                g->savedFrame = g->anim.frame;
-                g->savedTimer = g->anim.timer;
-            }
-        }
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    Actor_SetState(g, 3, 9);
 }
 
 /* Actor_SetAnimationPhase: Requests and saves the supplied phase with special cases for playing sound and clearing control */
@@ -1064,11 +1020,9 @@ void sub_081E4D14(void)
 
 #define OWNER_V(o) (*(u16 *)(*(u8 *volatile *)((u8 *)g + 0x18) + (o)))
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_BeginCurveToPosition(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
@@ -1098,27 +1052,7 @@ void Actor_BeginCurveToPosition(void)
     }
     B(0xf67) = Script_GetKeywordValue(0x64, -1);
     W(0xf50) = Script_GetKeywordValue(0x70, 0);
-    g->oldMode = g->mode;
-    {
-        u32 mode = 2;
-        g->mode = mode;
-    }
-    {
-        register u32 raw asm("r1") = *(u16 *)((u8 *)g + 0xf5a);
-        register u32 mask asm("r2") = 15;
-        *(u16 *)((u8 *)g + 0xf5a) = (mask & raw) | 0xa0;
-        if (g->oldMode == 3) {
-            register u32 bits asm("r0") = mode_bits_v2((u8 *)g + 0xf5a, mask);
-            if (bits == 3) {
-                g->savedFrame = g->anim.frame;
-                g->savedTimer = g->anim.timer;
-            }
-        }
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    Actor_SetState(g, 2, 10);
 }
 
 /* Script command: configure the singleton animation controller. */
@@ -1151,11 +1085,9 @@ void Actor_BeginCurveToRest(void)
 
 /* Script command: configure the singleton animation controller. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_BeginScriptedCurve(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
@@ -1169,36 +1101,14 @@ void Actor_BeginScriptedCurve(void)
         H(0xed2) = 0;
         H(0xed0) = 0;
     }
-    g->oldMode = g->mode;
-    {
-        u32 mode = 2;
-        g->mode = mode;
-    }
-    {
-        register u32 raw asm("r1") = *(u16 *)((u8 *)g + 0xf5a);
-        register u32 mask asm("r2") = 15;
-        *(u16 *)((u8 *)g + 0xf5a) = (mask & raw) | 0x90;
-        if (g->oldMode == 3) {
-            register u32 bits asm("r0") = mode_bits_v2((u8 *)g + 0xf5a, mask);
-            if (bits == 3) {
-                g->savedFrame = g->anim.frame;
-                g->savedTimer = g->anim.timer;
-            }
-        }
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    Actor_SetState(g, 2, 9);
 }
 
 /* Script command: configure the singleton animation controller. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_SetFacingAndIdle(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
@@ -1206,10 +1116,9 @@ void Actor_SetFacingAndIdle(void)
     }
     H(0xf8a) = Script_GetValue();
     {
-        register u32 shifted asm("r0") = Script_GetKeywordValue(0x64, 0) << 24;
+        u8 direction = Script_GetKeywordValue(0x64, 0);
         u32 flip = 0;
-        u32 mask = 0x07000000;
-        u8 direction = (mask & shifted) >> 24;
+        direction &= 7;
         B(0xf68) = direction;
         if (direction > 4) {
             direction = 8 - direction;
@@ -1219,27 +1128,7 @@ void Actor_SetFacingAndIdle(void)
         B(0xf6b) = flip;
     }
     Anim_SetSequence((u8 *)g + 0xe24, W(0xe74), 0, B(0xf66), B(0xf6b));
-    g->oldMode = g->mode;
-    {
-        u32 mode = 2;
-        g->mode = mode;
-    }
-    {
-        register u32 raw asm("r1") = *(u16 *)((u8 *)g + 0xf5a);
-        register u32 mask asm("r2") = 15;
-        *(u16 *)((u8 *)g + 0xf5a) = (mask & raw) | 0;
-        if (g->oldMode == 3) {
-            register u32 bits asm("r0") = mode_bits_v2((u8 *)g + 0xf5a, mask);
-            if (bits == 3) {
-                g->savedFrame = g->anim.frame;
-                g->savedTimer = g->anim.timer;
-            }
-        }
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    Actor_SetState(g, 2, 0);
 }
 
 void Actor_BeginFadeAnimation(void)
@@ -1314,11 +1203,9 @@ void Actor_BeginHide(void)
 
 /* Script command: configure the singleton animation controller. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_BeginPositionedEffect(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
-    u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
@@ -1342,27 +1229,7 @@ void Actor_BeginPositionedEffect(void)
             H(0xdfc) = value;
         }
     }
-    g->oldMode = g->mode;
-    {
-        u32 mode = 2;
-        g->mode = mode;
-    }
-    {
-        register u32 raw asm("r1") = *(u16 *)((u8 *)g + 0xf5a);
-        register u32 mask asm("r2") = 15;
-        *(u16 *)((u8 *)g + 0xf5a) = (mask & raw) | 0xe0;
-        if (g->oldMode == 3) {
-            register u32 bits asm("r0") = mode_bits_v2((u8 *)g + 0xf5a, mask);
-            if (bits == 3) {
-                g->savedFrame = g->anim.frame;
-                g->savedTimer = g->anim.timer;
-            }
-        }
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
+    Actor_SetState(g, 2, 14);
 }
 
 void Actor_BeginRadialBurst(void)
@@ -4627,21 +4494,6 @@ void Actor_ConfigureInteractionChildFromScript(void)
 
 // Provisional name: Actor_ConfigureFromScript
 
-static inline void state(struct ActorAnimController *g, u32 mode, u32 phase)
-{
-    g->oldMode = g->mode;
-    g->mode = mode;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | (phase << 4);
-    if (g->oldMode == 3 && g->mode == 3) {
-        g->savedFrame = g->anim.frame;
-        g->savedTimer = g->anim.timer;
-    }
-    {
-        u8 one = 1;
-        g->flags |= one;
-    }
-}
-
 void Actor_ConfigureFromScript(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
@@ -4694,22 +4546,22 @@ void Actor_ConfigureFromScript(void)
     *(u32 *)((u8 *)g + 0xddc) |= 1;
     switch (g->phaseSelect) {
         case 0:
-            state(g, 0, 0);
+            Actor_SetState(g, 0, 0);
             break;
         case 1:
-            state(g, 2, 1);
+            Actor_SetState(g, 2, 1);
             break;
         case 2:
-            state(g, 2, 2);
+            Actor_SetState(g, 2, 2);
             break;
         case 3:
-            state(g, 2, 3);
+            Actor_SetState(g, 2, 3);
             break;
         case 4:
-            state(g, 2, 5);
+            Actor_SetState(g, 2, 5);
             break;
         case 5:
-            state(g, 2, 6);
+            Actor_SetState(g, 2, 6);
             break;
     }
 }
