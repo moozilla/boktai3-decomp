@@ -1,8 +1,5 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
-#define gArmorAnimationVariants  gUnk_0824EB60
-#define gArmorAnimationKeyframes gUnk_0824E920
 struct ArmorActor {
     u8 pad0[0x94];
     u8 animationData[0x20];
@@ -22,27 +19,23 @@ struct ArmorAnimationRequest {
 };
 extern const u8 gUnk_0824EB60[];
 extern const u16 gUnk_0824E920[][2][36];
-void Anim_SetKeyframes(void *, void *, u32, u32, u32);
+void Anim_SetKeyframes(void *, void *, u16, u16, u16);
 void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationRequest *request,
                                   u32 flags)
 {
     u32 index = request->index;
-    register u32 side asm("ip");
-    s32 variant;
+    u32 side;
+    s16 variant;
     s32 kind;
-    register u16 actorFlags asm("r4") = s->flags;
-    s32 mode;
+    s8 mode;
     {
-        u32 test = actorFlags & 1;
-        u32 one = 1;
-        side = one;
-        if (test) {
-            u32 zero = 0;
-            side = zero;
-        }
+        u32 facing = s->flags & 1;
+        side = 1;
+        if (facing)
+            side = 0;
     }
     kind = s->variant;
-    if (actorFlags & 0x200)
+    if (s->flags & 0x200)
         kind += 4;
     variant = gUnk_0824EB60[kind];
     switch ((s32)request->mode) {
@@ -61,21 +54,8 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
         s->renderFlags |= 4;
     else
         s->renderFlags &= ~4;
-    {
-        void *animation = s->animation;
-        void *data = s->animationData;
-        u32 keyframe = gUnk_0824E920[variant][side][index];
-        u32 callMode = mode;
-        u32 wideFlags;
-        u32 callFlags;
-        asm("" : "+r"(animation), "+r"(data), "+r"(keyframe), "+r"(callMode));
-        wideFlags = flags;
-        callFlags = (u16)wideFlags;
-        Anim_SetKeyframes(animation, data, keyframe, callMode, callFlags);
-    }
+    Anim_SetKeyframes(s->animation, s->animationData, gUnk_0824E920[variant][side][index], mode,
+                      (u16)flags);
     s->animationSpeed = 0x40;
-    {
-        u32 offset = 0xB32;
-        *(u16 *)((u8 *)s + offset) &= ~0x20;
-    }
+    s->flags &= ~0x20;
 }
