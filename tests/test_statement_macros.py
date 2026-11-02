@@ -46,6 +46,16 @@ class StatementMacros(unittest.TestCase):
         self.assertNotIn("DELTAS", names)  # shared by two functions
         self.assertNotIn("COPY", names)  # library code is the original authors'
 
+    def test_warm_counts_follow_an_added_edited_and_removed_call(self):
+        path = self.root / "src/fn/extra.c"
+        self.assertIn("BUMP", sm.single_use_names(self.root))
+        path.write_text("void t(void) { BUMP(x); }")
+        self.assertNotIn("BUMP", sm.single_use_names(self.root))
+        path.write_text("void t(void) { CALL(x); }")
+        self.assertIn("BUMP", sm.single_use_names(self.root))
+        path.unlink()
+        self.assertIn("BUMP", sm.single_use_names(self.root))
+
     def test_draft_replacing_its_own_file(self):
         path = self.root / "src/fn/once.c"
         self.assertEqual(sm.single_use_in(ONCE, exclude=path, root=self.root), ["BUMP"])

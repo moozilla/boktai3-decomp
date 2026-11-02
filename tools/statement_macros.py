@@ -40,43 +40,54 @@ def scan(text: str) -> tuple[set[str], dict[str, int]]:
     return defs, uses
 
 
-@functools.lru_cache(maxsize=None)
-def _scan_file(path: str, mtime: float) -> tuple[frozenset[str], tuple[tuple[str, int], ...]]:
+@functools.lru_cache(maxsize=16384)
+def _scan_file(path: str, mtime_ns: int, ctime_ns: int, size: int):
     defs, uses = scan(Path(path).read_text(errors="replace"))
     return frozenset(defs), tuple(uses.items())
 
 
-def corpus(root: Path = ROOT, exclude: Path | None = None) -> tuple[set[str], dict[str, int]]:
-    """Statement macros defined and all call-like uses across ROOT's src/ and include/."""
-    skip = Path(exclude).resolve() if exclude else None
+def _sources(root: Path, exclude: Path | None):
+    """File identities for the live tree. A long-running search can see additions and edits."""
+    root = root.resolve()
+    skip = os.fspath(Path(exclude).resolve()) if exclude else None
+    for sub in ROOTS:
+        for directory, _, files in os.walk(root / sub):
+            folder = os.path.realpath(directory)
+            library = Path(directory).relative_to(root).as_posix() + "/"
+            count_defs = not any(library.startswith(lib + "/") for lib in LIBRARY)
+            for name in sorted(files):
+                if not name.endswith((".c", ".h")):
+                    continue
+                path = os.path.join(folder, name)
+                if skip and (path == skip or os.path.islink(path) and os.path.realpath(path) == skip):
+                    continue
+                stat = os.stat(path)
+                yield path, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, count_defs
+
+
+@functools.lru_cache(maxsize=2)
+def _counts(sources):
     defs: set[str] = set()
     uses: dict[str, int] = {}
-    for sub in ROOTS:
-        for dirpath, _, files in os.walk(Path(root) / sub):
-            for f in files:
-                if not f.endswith((".c", ".h")):
-                    continue
-                path = Path(dirpath, f)
-                if skip and path.resolve() == skip:
-                    continue
-                d, u = _scan_file(str(path), path.stat().st_mtime)
-                rel = path.relative_to(root).as_posix()
-                if not any(rel.startswith(lib + "/") for lib in LIBRARY):
-                    defs |= d
-                for name, n in u:
-                    uses[name] = uses.get(name, 0) + n
+    for path, mtime_ns, ctime_ns, size, count_defs in sources:
+        defined, calls = _scan_file(path, mtime_ns, ctime_ns, size)
+        if count_defs:
+            defs.update(defined)
+        for name, count in calls:
+            uses[name] = uses.get(name, 0) + count
     return defs, uses
 
 
-@functools.lru_cache(maxsize=None)
-def _single_use_names(root: str) -> frozenset[str]:
-    defs, uses = corpus(Path(root))
-    return frozenset(name for name in defs if uses.get(name, 0) == 1)
+def corpus(root: Path = ROOT, exclude: Path | None = None) -> tuple[set[str], dict[str, int]]:
+    """Statement macros defined and all call-like uses across ROOT's src/ and include/."""
+    defs, uses = _counts(tuple(_sources(Path(root), exclude)))
+    return defs.copy(), uses.copy()
 
 
 def single_use_names(root: Path = ROOT) -> frozenset[str]:
-    """Statement macros used at exactly one site across the whole tree (one scan per process)."""
-    return _single_use_names(str(Path(root).resolve()))
+    """Statement macros used at exactly one site across the current tree."""
+    defs, uses = corpus(Path(root))
+    return frozenset(name for name in defs if uses.get(name, 0) == 1)
 
 
 def single_use_in(text: str, exclude: Path | None = None, root: Path = ROOT) -> list[str]:
