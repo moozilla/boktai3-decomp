@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 extern s16 gUnk_086149C4[];
@@ -30,27 +29,14 @@ static inline s32 scale12(s32 v)
         v = -((-v) >> 12);
     return v;
 }
-#define HEALTH_RESTORE_CAPTURE_TICK(timer_, tick_, next_, scale_)                                  \
-    do {                                                                                           \
-        (tick_).incremented = *(timer_);                                                           \
-        (tick_).incremented++;                                                                     \
-        (next_) = (tick_).incremented;                                                             \
-        (scale_) = (next_);                                                                        \
-    } while (0)
-
 // confidence=low: the 16-frame entry of the health restore effect. Stops the music, then slides
 // the sprite from its start to its target position with a sine bob; afterwards it starts the
 // shake.
 void sub_08234DC8(struct HealthRestoreEntry *p)
 {
-    u16 *timer;
     s32 y;
-    u32 scaleTimer;
-    u32 value;
-    union {
-        u32 incremented;
-        u16 stored;
-    } tick;
+    long long scaleTimer;
+    s32 nextFrame;
     if (p->timer == 0) {
         MusicSlots_StopAllAndRetainResumable();
         {
@@ -61,15 +47,13 @@ void sub_08234DC8(struct HealthRestoreEntry *p)
         Sound_PlaySong(0xE6);
         p->spriteFlags &= ~1;
     }
-    timer = &p->timer;
-    HEALTH_RESTORE_CAPTURE_TICK(timer, tick, value, scaleTimer);
-    *timer = value;
-    tick.stored = *timer;
-    if (tick.stored > 15) {
+    nextFrame = p->timer + 1;
+    scaleTimer = nextFrame;
+    if ((p->timer = nextFrame) > 15) {
         p->spriteFlags &= ~2;
         HealthRestoreEffect_StartParticleBurst((u8 *)p);
         p->callback = HealthRestoreEffect_UpdateShake;
-        *timer = 0;
+        p->timer = 0;
         Sound_PlaySong(0x284);
         return;
     }
@@ -78,7 +62,7 @@ void sub_08234DC8(struct HealthRestoreEntry *p)
         p->scale[1] = v;
         p->scale[0] = v;
     }
-    p->screenX = Div((p->targetX * (*timer)) + (p->startX * (16 - (*timer))), 16);
-    y = Div((p->targetY * (*timer)) + (p->startY * (16 - (*timer))), 16);
-    p->screenY = y - scale12(gUnk_086149C4[Div((*timer) << 7, 20) & 0xFF] << 4);
+    p->screenX = Div((p->targetX * p->timer) + (p->startX * (16 - p->timer)), 16);
+    y = Div((p->targetY * p->timer) + (p->startY * (16 - p->timer)), 16);
+    p->screenY = y - scale12(gUnk_086149C4[Div(p->timer << 7, 20) & 0xFF] << 4);
 }
