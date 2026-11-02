@@ -1,4 +1,5 @@
 #include "global.h"
+#include "display_sequence.h"
 #include "actor_animation_controller.h"
 #include "display_sprite_playback.h"
 #include "render.h"
@@ -150,13 +151,6 @@ void ActorPalette_BeginReverseFade(struct ActorAnimController *p)
 }
 
 // Provisional name: ActorPalette_UpdateReverseFade
-
-static inline u32 mode_bits(u8 *p, u32 mask)
-{
-    register u32 v asm("r1") = *p;
-    u32 result = mask & v;
-    return result;
-}
 
 // Interpolate the actor palette over fifty updates, then restore its asset palette.
 
@@ -1330,7 +1324,6 @@ static inline u8 child_take_v2(struct ActorChildSlot *c)
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct ActorChildSlot *child)
 {
     struct ActorChildSlot *c = child;
@@ -1347,28 +1340,7 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct Act
         }
     }
     if (--p->timer == -1) {
-        p->oldMode = p->mode;
-        {
-            u32 mode = 2;
-            p->mode = mode;
-        }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 64;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
-        }
+        Actor_SetState(p, 2, 4);
     }
 }
 
@@ -1499,19 +1471,23 @@ void Actor_UpdateRotatingAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -1585,19 +1561,23 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -1696,19 +1676,23 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -1750,28 +1734,7 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     if (done) {
-        p->oldMode = p->mode;
-        {
-            u32 mode = 3;
-            p->mode = mode;
-        }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 16;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
-        }
+        Actor_SetState(p, 3, 1);
         {
             register void *h asm("r2") = p->handle;
             if (h) {
@@ -1822,19 +1785,23 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -1928,19 +1895,23 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -2037,19 +2008,23 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -2138,19 +2113,23 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -2216,28 +2195,7 @@ void Actor_HideAndResetChildren(struct ActorAnimController *p)
         ScriptUtility_ClearControlFlag();
         ActorShadow_Disable(p->p2);
         p->obj.flags |= 1;
-        p->oldMode = p->mode;
-        {
-            u32 mode = 1;
-            p->mode = mode;
-        }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 32;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
-        }
+        Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
             register void (*fn)(void *, void *) asm("r4") = Actor_OnInteractionChildUpdate;
@@ -2332,19 +2290,23 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -2388,28 +2350,7 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
     if (p->timer++ > 31) {
         p->obj.x = p->targetX;
         p->obj.y = p->targetY;
-        p->oldMode = p->mode;
-        {
-            u32 mode = 3;
-            p->mode = mode;
-        }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 16;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
-        }
+        Actor_SetState(p, 3, 1);
         if (p->handle) {
             void *handle = p->handle;
             p->handle = 0;
@@ -2463,19 +2404,23 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -2519,28 +2464,7 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
     if (p->timer++ > 31) {
         p->obj.x = p->targetX;
         p->obj.y = p->targetY;
-        p->oldMode = p->mode;
-        {
-            u32 mode = 3;
-            p->mode = mode;
-        }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 16;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
-        }
+        Actor_SetState(p, 3, 1);
         if (p->handle) {
             void *handle = p->handle;
             p->handle = 0;
@@ -2718,19 +2642,23 @@ void Actor_UpdateFadeAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -2800,19 +2728,23 @@ void Actor_UpdateReverseFadeAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -2879,19 +2811,23 @@ void Actor_UpdateNotifyingAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -2964,19 +2900,23 @@ void Actor_InitPaletteEffectPose(struct ActorAnimController *p)
         entry = a->data + a->frame;
         o->frame = *entry >> 6;
         {
-            u32 input = a->flags;
-            register u32 mask asm("r3") = 1;
-            register u32 left asm("r1") = (u8)(input & mask);
-            if (left != (((*entry & 0x30) >> 4) & mask))
+            union DisplaySequenceControl control;
+            u32 bit, first;
+            control.raw = a->flags;
+            bit = 1;
+            first = (u8)(control.raw & bit);
+            if (first != (((*entry & 0x30) >> 4) & bit))
                 o->flags |= 4;
             else
                 o->flags &= ~4;
         }
         {
-            register u32 input asm("r0") = a->flags;
-            u32 mask = 2;
-            u32 left = (u8)(mask & input);
-            if (left != (((*entry & 0x30) >> 4) & mask))
+            union DisplaySequenceControl control;
+            u32 bit, first;
+            control.raw = a->flags;
+            bit = 2;
+            first = (u8)(control.raw & bit);
+            if (first != (((*entry & 0x30) >> 4) & bit))
                 o->flags |= 8;
             else
                 o->flags &= ~8;
@@ -3047,19 +2987,23 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
         entry = a->data + a->frame;
         o->frame = *entry >> 6;
         {
-            u32 input = a->flags;
-            register u32 mask asm("r3") = 1;
-            register u32 left asm("r1") = (u8)(input & mask);
-            if (left != (((*entry & 0x30) >> 4) & mask))
+            union DisplaySequenceControl control;
+            u32 bit, first;
+            control.raw = a->flags;
+            bit = 1;
+            first = (u8)(control.raw & bit);
+            if (first != (((*entry & 0x30) >> 4) & bit))
                 o->flags |= 4;
             else
                 o->flags &= ~4;
         }
         {
-            register u32 input asm("r0") = a->flags;
-            u32 mask = 2;
-            u32 left = (u8)(mask & input);
-            if (left != (((*entry & 0x30) >> 4) & mask))
+            union DisplaySequenceControl control;
+            u32 bit, first;
+            control.raw = a->flags;
+            bit = 2;
+            first = (u8)(control.raw & bit);
+            if (first != (((*entry & 0x30) >> 4) & bit))
                 o->flags |= 8;
             else
                 o->flags &= ~8;
@@ -3124,28 +3068,7 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             sub_080148CC(1, 3, (u8 *)p + 0xdf8, 256, 60, duration, 3, duration, 5, 60, duration);
             ActorShadow_Disable(p->p2);
             p->obj.flags |= 1;
-            p->oldMode = p->mode;
-            {
-                u32 mode = 1;
-                p->mode = mode;
-            }
-            {
-                register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-                register u32 mask asm("r2") = 15;
-                *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 32;
-                if (p->oldMode == 3) {
-                    register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                    if (bits == 3) {
-                        p->savedFrame = p->anim.frame;
-                        p->savedTimer = p->anim.timer;
-                    }
-                }
-            }
-            {
-                register s32 mask asm("r0") = 1;
-                register s32 v asm("r1") = p->flags;
-                p->flags = mask | v;
-            }
+            Actor_SetState(p, 1, 2);
             {
                 u32 active = 4;
                 register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
@@ -3877,19 +3800,23 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
@@ -3934,28 +3861,7 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
         if (*((u8 *)p + 0xf76))
             ScriptUtility_ClearControlFlag();
         p->obj.flags |= 1;
-        p->oldMode = p->mode;
-        {
-            u32 mode = 1;
-            p->mode = mode;
-        }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 32;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
-        }
+        Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
             register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
@@ -4049,19 +3955,23 @@ void sub_081E99EC(struct ActorAnimController *p)
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 4;
         else
             o->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
