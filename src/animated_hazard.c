@@ -103,13 +103,11 @@ static inline u32 frame_factor(u16 v)
     return DisplaySequence_MaskCommand(v, 15);
 }
 
-// MATCHING_CONCESSION: register-pinning
 void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
     struct HazardSprite *o;
     struct HazardAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     int done;
     if (AnimatedHazard_ConsumeEntered(m, p)) {
         p->sprite.flags &= ~1;
@@ -142,8 +140,7 @@ void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct Animat
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -181,13 +178,11 @@ void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct Animat
     Collider_Refresh(p->collider);
 }
 
-// MATCHING_CONCESSION: register-pinning
 void AnimatedHazard_AnimateHold(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
     struct HazardSprite *o;
     struct HazardAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     int done;
     if (AnimatedHazard_ConsumeEntered(m, p)) {
         Anim_SetSequence(&p->anim, m->script, 1, 0, 0);
@@ -197,25 +192,28 @@ void AnimatedHazard_AnimateHold(struct AnimatedHazardManager *m, struct Animated
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             p->sprite.flags |= 4;
         else
             p->sprite.flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -255,13 +253,11 @@ void AnimatedHazard_AnimateHold(struct AnimatedHazardManager *m, struct Animated
 
 void AnimatedHazard_Deactivate(void *, struct AnimatedHazard *);
 
-// MATCHING_CONCESSION: register-pinning
 void AnimatedHazard_AnimateRetraction(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
     struct HazardSprite *o;
     struct HazardAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     int done;
     if (AnimatedHazard_ConsumeEntered(m, p)) {
         Anim_SetSequence(&p->anim, m->script, 2, 0, 0);
@@ -271,25 +267,28 @@ void AnimatedHazard_AnimateRetraction(struct AnimatedHazardManager *m, struct An
     entry = a->data + a->frame;
     o->frame = *entry >> 6;
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             p->sprite.flags |= 4;
         else
             p->sprite.flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -485,7 +484,6 @@ int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int delay, int hold)
 {
     struct AnimatedHazardManager *m = AnimatedHazard_GetManager();
@@ -531,41 +529,40 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
     }
     effect = p->collider;
     Collider_SetPosition(effect, pos, 0);
-    {
-        register int d asm("r9") = damage;
-        Collider_SetAttackProperties(effect, d, 50, 0, 8, 30);
-    }
+    Collider_SetAttackProperties(effect, damage, 50, 0, 8, 30);
     AnimatedHazard_SetState(m, p, 1);
     Anim_SetSequence(&p->anim, m->script, 0, 0, zero);
     {
         struct HazardSprite *o = &p->sprite;
         struct HazardAnim *a;
         const u16 *entry;
-        register u16 n asm("r0");
         int done;
         a = &p->anim;
         entry = a->data + a->frame;
         o->frame = *entry >> 6;
         {
-            u32 input = a->flags;
-            register u32 mask asm("r3") = 1;
-            register u32 left asm("r1") = (u8)(input & mask);
-            if (left != (((*entry & 0x30) >> 4) & mask))
+            union DisplaySequenceControl control;
+            u32 bit, first;
+            control.raw = a->flags;
+            bit = 1;
+            first = (u8)(control.raw & bit);
+            if (first != (((*entry & 0x30) >> 4) & bit))
                 p->sprite.flags |= 4;
             else
                 p->sprite.flags &= ~4;
         }
         {
-            register u32 input asm("r0") = a->flags;
-            u32 mask = 2;
-            u32 left = (u8)(mask & input);
-            if (left != (((*entry & 0x30) >> 4) & mask))
+            union DisplaySequenceControl control;
+            u32 bit, first;
+            control.raw = a->flags;
+            bit = 2;
+            first = (u8)(control.raw & bit);
+            if (first != (((*entry & 0x30) >> 4) & bit))
                 o->flags |= 8;
             else
                 o->flags &= ~8;
         }
-        n = ++a->timer;
-        if (n >= a->rate) {
+        if (++a->timer >= a->rate) {
             a->timer = 0;
             if (a->flags & 4) {
                 if (a->frame == 0) {
@@ -602,7 +599,6 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
     AnimData_SelectPaletteBank(m->animData, 0x33F);
     p->timer = 0;
     p->hold = hold;
-    asm("" : "+r"(delay));
     p->duration = delay;
     p->active = 1;
     return 0;
