@@ -1,6 +1,6 @@
 # Round 11 package D holdouts
 
-Batch 20 leaves 105 of the original 466 package D functions with scored concessions. Since Batch 12, 137 functions covering 55,920 bytes have become concession-free. The build still reproduces the original ROM.
+Batch 21 leaves 95 of the original 466 package D functions with scored concessions. Since Batch 12, 147 functions covering 58,868 bytes have become concession-free. The build still reproduces the original ROM.
 
 The list below contains only functions still open at this checkpoint, in ROM order. The Batch 12 source archive supplies a starting C draft for each. Its instruction and byte differences describe that archived draft. Subsequent compiler or source findings are recorded separately below the affected entry.
 
@@ -28,10 +28,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   After depinning, the signed height copies from ROM r1 to r0 and the stack-address scratch changes from r0 to r1.
   Assign the route height through a position-to-position helper while preserving route X/Z. The retained draft differs in 3 aligned assembly rows.
 
-- **08131820 · SceneActorControl_UpdateRouteApproach**
-  The state-entry setup and timer stores now match without their nine old constraints.
-  Use the stored previous route index as the repeated-choice operand for modulo. The retained draft differs in 5 aligned assembly rows.
-
 - **08135F70 · SceneActorReaction_ResolveDamage**
   Forming the updated hit value at its halfword store improved the reaction draft substantially. The retained ordinary source also removes both local damage macros.
   Return the hit flag address together with the updated halfword, then read the reaction-mode bit via its field. The detached difference fell from 114 to 14 aligned assembly rows.
@@ -43,10 +39,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **081381CC · LinkSession_UpdatePlayerValueAverage**
   A typed selection-bits accessor restores the session pointer to r1.
   Compute the selection byte index in a halfword before taking the pointer to the two four-participant pages. The detached difference fell from 3 to 2 aligned assembly rows.
-
-- **081383E0 · Registry1745_UpdateParticipantScores**
-  The fill loop loses the copy of the 0xffff mask into r2.
-  Copy the absent halfword from the just-written points slot into the corresponding total. The retained draft differs in 2 aligned assembly rows.
 
 - **081384A0 · sub_081384A0**
   The pin-free selection sort changes the inner-loop induction values.
@@ -83,10 +75,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **08156F54 · Player_TestTetherActionInput**
   The trigger path loads the global tether pointer a second time in the ROM.
   Classify state 1 and state 0x11 by masking their differing bit before reading the tether status fields. The retained draft differs in 5 aligned assembly rows.
-
-- **08158C14 · sub_08158C14**
-  Four independently computed counters lose their joint address lifetimes when the operand barrier is removed.
-  Store the four reset counters together through chains of halfword assignments in the same order. The retained draft differs in 20 aligned assembly rows.
 
 - **08159164 · sub_08159164**
   Removing 1 local constraint changes 21 normalized assembly rows across 6 regions.
@@ -189,10 +177,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   The relative sample helper recovers the real use of the apparent 0x0403B714 dead literal.
   Separate field-address and payload lifetimes through typed owner accessors (closest out_x_1). The retained draft differs in 53 aligned assembly rows.
 
-- **0819CA38 · Hresvelgr_RefreshTarget**
-  Removing the final travel-result pin changes the square temporary and lets the halfword store use the return register directly.
-  Separate field-address and payload lifetimes through typed owner accessors (closest out_x_2). The retained draft differs in 7 aligned assembly rows.
-
 - **0819F788 · Hresvelgr_UpdateAlternatingVolley**
   The alternating volley computes three wrapped indices across a call.
   Separate field-address and payload lifetimes through typed owner accessors (closest out_x_1). The retained draft differs in 60 aligned assembly rows.
@@ -217,10 +201,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   With the other constraints retained, deleting just the Y sample operand changes one instruction from asr to lsr.
   Separate field-address and payload lifetimes through typed owner accessors (closest actor_action_1). The detached difference fell from 90 to 58 aligned assembly rows.
 
-- **081A4DF0 · sub_081A4DF0**
-  The ROM leaves the last Anim_SetKeyframes result in r0 while clearing the final projectile entry and active field.
-  Separate field-address and payload lifetimes through typed owner accessors (closest pool_parameterA_2). The retained draft differs in 14 aligned assembly rows.
-
 - **081A8E08 · sub_081A8E08**
   The capture-setup helper returns its Y coordinate for later use as an animation parameter.
   Separate field-address and payload lifetimes through typed owner accessors (closest out_x_1). The retained draft differs in 12 aligned assembly rows.
@@ -228,14 +208,6 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **081A93A0 · sub_081A93A0**
   The attack controller has both a switch-state allocation and helper-level constraints on vector operations.
   Separate field-address and payload lifetimes through typed owner accessors (closest a_y_1). The detached difference fell from 102 to 71 aligned assembly rows.
-
-- **081A95A8 · Vanargand_UpdatePairedAttack**
-  The ROM holds the phase across calls and resets the timer from r4 in case zero.
-  Separate field-address and payload lifetimes through typed owner accessors (closest p_flags_1). The retained draft differs in 26 aligned assembly rows.
-
-- **081AA178 · Vanargand_UpdateRepeatedPairAttack**
-  Exactly one immediate-zero load disappears when resetting the sixth repeat.
-  Separate field-address and payload lifetimes through typed owner accessors (closest p_mode_0). The retained draft differs in 2 aligned assembly rows.
 
 - **081AA330 · sub_081AA330**
   The sole remaining mismatch is r1 instead of r2 for the 0x56c offset of the selected-halves object.
@@ -277,18 +249,9 @@ The list below contains only functions still open at this checkpoint, in ROM ord
   Removing 7 local constraints changes 47 normalized assembly rows across 9 regions.
   Separate field-address and payload lifetimes through typed owner accessors (closest widget_flags_1). The retained draft differs in 47 aligned assembly rows.
 
-- **081C58BC · sub_081C58BC**
-  Removing 1 local constraint changes 2 normalized assembly rows across 1 region.
-  Recover the adjacent packed triplet and selection as a two-field object, and compare a field accessor/base pointer around the rank lookup. The retained draft differs in 2 aligned assembly rows.
-
 - **081C62B4 · sub_081C62B4**
   Removing 1 local constraint changes 6 normalized assembly rows across 5 regions.
   Walk distinct digit and coordinate arrays with their native strides. The retained draft differs in 6 aligned assembly rows.
-
-- **081CB294 · StateActor_UpdateRiseToTerrain**
-  Removing 2 local constraints changes 33 normalized assembly rows across 22 regions.
-  Read the rise position through owner versus position-view fields and release the sine-delta operand and saved-position binding separately. The retained draft differs in 33 aligned assembly rows.
-  A typed position and tag reduce the ordinary draft to 11 differing rows. The terrain slope loads and two independently materialized zeros for the phase and tag resets still differ.
 
 - **081D0864 · sub_081D0864**
   Removing 2 local constraints changes 17 normalized assembly rows across 9 regions.
@@ -422,7 +385,3 @@ The list below contains only functions still open at this checkpoint, in ROM ord
 - **08234540 · SpiralBurst_InitParticles**
   The spiral emitter uses a separate mask and two table aliases across its loop.
   Compared captured and direct random-table pointers across the spiral loop, with narrow angle state and alternative slot cursor advancement. The detached difference fell from 81 to 59 aligned assembly rows.
-
-- **082356E4 · sub_082356E4**
-  Removing 1 local constraint changes 8 normalized assembly rows across 3 regions.
-  Tested the incremented timer, stored halfword, and explicit early returns for the two shake strengths and task expiry. The retained draft differs in 8 aligned assembly rows.
