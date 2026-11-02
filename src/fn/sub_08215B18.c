@@ -8,21 +8,17 @@ extern const s16 gUnk_086149C4[];
 
 s32 __divsi3(s32, s32);
 
-/* Signed 8.8 division; the reciprocal is narrowed before multiplication. */
-static inline s16 FixedDivide(s32 numerator, s16 denominator)
+static inline s16 SignedScaleQuotient(s32 dividend, s16 scale)
 {
-    register s32 dividend asm("r0") = numerator << 8;
-    return __divsi3(dividend, denominator);
+    return __divsi3(dividend, scale);
 }
 
-/* Divide using the initial scale passed to the transform. */
-static inline s16 FixedDivideInitialScale(s32 numerator, s16 denominator)
+/* The 8.8 reciprocal is narrowed before its matrix multiplication. */
+static inline s16 FixedDivide(s32 numerator, s16 scale)
 {
     register s32 dividend asm("r0") = numerator << 8;
-    register s32 divisor asm("r3") = denominator;
-    return __divsi3(dividend, divisor);
+    return SignedScaleQuotient(dividend, scale);
 }
-
 /* Division by 256 rounds negative products toward zero. */
 static inline s16 FixedMultiply(s32 a, s32 b)
 {
@@ -40,7 +36,7 @@ void Bg_SetAffineTransform(s32 x, s32 y, s32 angle, u16 scaleX, s32 scaleY)
     gBgAffineScaleY = scaleY;
     /* The table uses 12 fractional bits; the affine matrix uses eight. */
     gBgAffineMatrix[0] = FixedMultiply((gUnk_086149C4[(gBgAffineAngle + 64) & 255] >> 4),
-                                       FixedDivideInitialScale(256, gBgAffineScaleX));
+                                       FixedDivide(256, gBgAffineScaleX));
     gBgAffineMatrix[1] = FixedMultiply((gUnk_086149C4[gBgAffineAngle & 255] >> 4),
                                        FixedDivide(256, gBgAffineScaleX));
     gBgAffineMatrix[2] = FixedMultiply((-gUnk_086149C4[gBgAffineAngle & 255] >> 4),
