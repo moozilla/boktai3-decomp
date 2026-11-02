@@ -1,18 +1,30 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 // confidence=low: starts the target-pursuit route and resets pursuit timers and callbacks.
-#define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 void sub_080B1FA8(void *);
 void Vorn_UpdatePursuitDistance(void);
-static inline u8 Test(volatile u16 *p, u32 bits)
+struct VornResponseFlags {
+    s16 bits : 16;
+};
+static inline u8 Vorn_HasPursuitFlag(struct VornResponseFlags *const *cursor, u16 mask)
 {
-    register u32 value asm("r0") = *p;
-    value &= bits;
+    u16 value = (*cursor)->bits;
+    value &= mask;
     if (value)
         return 1;
     return 0;
+}
+static inline u8 Vorn_TestResponseFlags(struct VornResponseFlags *flags, u32 mask)
+{
+    u16 value = flags->bits;
+    if (value & mask)
+        return 1;
+    return 0;
+}
+static inline void Vorn_SetResponseFlags(struct VornResponseFlags *flags, u16 bits)
+{
+    flags->bits |= bits;
 }
 static inline void SetFlags(u16 bit, u16 *field)
 {
@@ -23,14 +35,6 @@ static inline void SetFlags(u16 bit, u16 *field)
     p->bits |= bit;
 }
 
-static inline void ClearFlags(u16 *field, u32 bit)
-{
-    struct Flags {
-        s16 bits : 16;
-    };
-    struct Flags *p = (void *)field;
-    p->bits &= ~bit;
-}
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 behavior)
 {
     actor->state2A8 = 0;
@@ -67,28 +71,24 @@ static inline void StartRoute(void *body, void *path, u8 *group)
     u8 *routes = group + 0x81;
     SceneBody_StartRoute(body, path, routes[index], 0, 0);
 }
-struct PursuitContext {
-    u8 pad000[0x6ac];
-    u16 cooldown;
-};
 u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
 {
-    u8 *context = actor->context;
-    u8 *group = context + 0x3d4;
-    u16 *flags;
-    if (*((u16 *)(((u8 *)context) + 0x6ac)))
+    struct SceneActorRegistryResetView *context = actor->context;
+    u8 *group = (void *)&context->group.common;
+    struct VornResponseFlags *flags;
+    if (context->field6AC)
         return 0;
-    flags = (void *)(context + 0x6d4);
-    if (((reset != 1) && Test(flags, 4)) && (!Test(flags, 2)))
+    flags = (struct VornResponseFlags *)&context->flags6D4;
+    if (reset != 1 && Vorn_HasPursuitFlag(&flags, 4) && !Vorn_TestResponseFlags(flags, 2))
         return 0;
-    ((struct PursuitContext *)context)->cooldown = 60;
+    context->field6AC = 60;
     {
-        SetFlags(4, flags);
-        ClearFlags(flags, 2);
+        Vorn_SetResponseFlags(flags, 4);
+        flags->bits &= ~2;
     }
     *((u16 *)(((u8 *)context) + 0x6ec)) = 60;
     if (reset == 1)
-        StartRoute(((u8 *)actor) + 0x50, group + 0x74, group);
+        StartRoute(&actor->body.id, group + 0x74, group);
     sub_080B1FA8(actor);
     {
         u32 *field = &actor->flags2CC;
@@ -100,14 +100,14 @@ u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
     SetMotion(actor, Vorn_UpdatePursuitDistance, 37);
     {
         u16 bit = 4;
-        u16 *field = (void *)(((u8 *)actor) + 0x414);
+        u16 *field = &actor->group.common.gate.flags;
         bit |= *field;
         *field = bit;
     }
     SetFlags(0x80, &actor->flags2D4);
     {
-        u32 timer = *((u16 *)(((u8 *)actor) + 0x416));
-        *((u16 *)(((u8 *)actor) + 0x418)) = timer;
+        u32 timer = actor->group.common.gate.duration;
+        actor->group.common.gate.counter = timer;
     }
     {
         u8 *field = ((u8 *)actor) + 0xdc;
