@@ -1,18 +1,15 @@
 #ifndef GUARD_PINK_SPINE_PLAYBACK_H
 #define GUARD_PINK_SPINE_PLAYBACK_H
-#include "screamer_playback.h"
+#include "display_animation.h"
+#include "contact_collider.h"
 #include "player_cue_sequence.h"
 struct PinkSpineState {
     u8 unknown0[24];
     u32 age;
-    struct ActorPosition initialPosition;
-    struct ScreamerSprite sprite;
+    struct ContactPosition initialPosition;
+    struct DisplaySequenceSprite sprite;
     u8 graphics[0x1c];
-    struct {
-        u8 unknown0[6];
-        u16 flags;
-    } collider;
-    u8 unknown74[76];
+    struct ContactCollider collider;
     u8 body[0x48];
     void *update;
     struct DisplaySequenceState sequence;
@@ -41,6 +38,8 @@ struct PinkSpineState {
     u32 f158;
     void *f15C;
 };
+u32 ProjectileEmitter_EmitAttackFrame(struct PinkSpineState *p);
+
 static inline u32 PinkSpine_StepAnimation(struct PinkSpineState *owner)
 {
     return PlayerCue_StepSequenceEnded(&owner->sprite, &owner->sequence);
