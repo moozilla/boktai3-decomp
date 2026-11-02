@@ -93,7 +93,7 @@ int AnimatedParticleManager_Update(struct Manager *m)
             {
                 register u32 input asm("r0") = a->flags;
                 u32 mask = 2;
-                register u32 left asm("r1") = (u8)(mask & input);
+                u32 left = (u8)(mask & input);
                 if (left != (((*entry & 0x30) >> 4) & mask))
                     o->flags |= 8;
                 else
