@@ -121,9 +121,7 @@ struct Player {
     u8 unk44[0x50 - 0x44];
     u32 visualState;
     struct PlayerAnimation *activeAnimation;
-    u8 unk58[0x68 - 0x58];
-    u16 indicatorStep; /* 0x68: cycles 0-11, driven by indicatorUpdateRate; >>2 feeds position.x (tentative) */
-    u8 unk6A[2];
+    u8 unk58[0x6C - 0x58];
     u8 animationData[0x20];           /* 0x6C: keyframe resource */
     struct PlayerAnimation animation; /* 0x8C */
     u16 actionCueCounter;             /* 0x98: zero gates phase-one sound in 08146478 (tentative) */
@@ -241,7 +239,9 @@ struct Player {
     u8 actionPhase488, actionActive489;
     u8 unk48A[2];
     u8 movementVelocityLocked; /* 0x48C: suppresses velocity recalculation */
-    u8 unk48D[0x15];
+    u8 unk48D[0x498 - 0x48D];
+    struct SceneVec resourceStationPosition; /* 0x498: copied by Player_BeginResourceStationInteraction */
+    u16 resourceStationFacing; /* 0x4A0 */
     u16 burstParameter; /* 0x4A2: passed to ActorBurst_Create. */
     u8 actionFourEnabled; /* 0x4A4: permits action 4 in modes 0, 1 and 6 (tentative) */
     u8 coordinateAxis;    /* 0x4A5: 1/5 select X, other values select Z (tentative) */
@@ -284,8 +284,8 @@ struct Player {
     u8 chargeSoundActive; /* 0x4FD (tentative) */
     u8 unk4FE[0x22];
     u16 interactionPromptFlags; /* 0x520: bits OR'd in by ControlPanel based on interactionPromptCategory (tentative) */
-    u16 displaySegmentCount; /* 0x522: tentative, clamped to seven by segment display */
-    u16 indicatorUpdateRate; /* 0x524: divisor for 128/x step size of indicatorStep (tentative) */
+    u16 displaySegmentCount; /* 0x522: input hits in the 32-frame history, clamped to seven for display. */
+    u16 indicatorUpdateRate; /* 0x524: player input animation rate, used as the control panel phase divisor. */
     u8 unk526[8];
     u16 actionAccumulatorBlocked; /* 0x52E: nonzero prevents accumulation */
     u16 scriptStatus[2];          /* 0x530: script keyword s selects a nonzero status */
@@ -306,9 +306,7 @@ struct Player {
     u32 lastContactRewardFlags;
     u8 unk554[0x24];
     u16 interactionPromptCategory; /* 0x578: selects which bit ControlPanel ORs into interactionPromptFlags (tentative) */
-    u8 unk57A[2];
-    u16 indicatorTickCounter; /* 0x57C: wraps 0-9; gates a displaySegmentCount-pitched tick sound (tentative) */
-    u8 unk57E[0xE];
+    u8 unk57A[0x58C - 0x57A];
     void (*triggerAnimationCallback)(struct Player *); /* 0x58C */
     u8 unk590[8];
     u16 recoilSpeed;             /* 0x598: decays by three quarters per update */
