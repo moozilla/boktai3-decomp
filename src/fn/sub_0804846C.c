@@ -1,9 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "wireless_link_indicator.h"
-void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *input)
+void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *indicator)
 {
-    struct WirelessLinkIndicator *indicator = input;
-    DEBUG_NOP();
     if (!Wireless_GetStatus()) {
         s32 strength = 255;
         if (Wireless_IsSessionConnected()) {
