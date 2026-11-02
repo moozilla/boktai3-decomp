@@ -170,11 +170,12 @@ that is a scope gap: record it (below) so the tool gets better.
 * `tools/concessions.py` is the list of concession kinds the tools count; `progress.py`,
   `scope.py land` and decomp.dev all read it. Besides the forms above it counts a volatile local
   (`volatile u32 zero`, `T *volatile p`, `*(volatile T *)&x`), a second prototype for a
-  function through `extern ... asm("Symbol")`, and a `// CFLAGS:` line other than the default
-  flags. A function with any concession scores the share of its lines without one, so it
+  function through `extern ... asm("Symbol")`, a `// CFLAGS:` line other than the default
+  flags, and a constant byte offset where a struct field belongs (`*(u16 *)((u8 *)p + 0x172)`;
+  give the struct the field instead). A function with any concession scores the share of its lines without one, so it
   counts as matched on decomp.dev only when it has none.
 * The judgment-call kinds (`debug-nop`, `empty-loop`, `empty-if`, `single-use-macro`,
-  `volatile`, `alias`, `cflags`) can be excused where the original plausibly had them, like a
+  `volatile`, `alias`, `cflags`, `raw-offset`) can be excused where the original plausibly had them, like a
   linter exception: a comment on the same line, or alone on the line above, naming the kind
   and the reason, e.g. `DEBUG_NOP();  // concession-ok(debug-nop): <evidence the original had
   a compiled-out hook here>`. Pins and asm barriers can never be excused.

@@ -234,9 +234,11 @@ export function stripLayout<T>(
   })
 }
 
-/** A function's colour at the function level: green done, teal pinned, amber drafts, grey nothing yet. */
+/** A function's colour at the function level: green matched with no concession, teal matched
+ * with concessions (its pct is then the share of its lines without one), amber drafts, grey nothing yet. */
 export function fnShade(pct: number, pinned: boolean): string {
-  if (pct >= 100) return pinned ? '#2f7f78' : '#3f9b4f'
+  if (pinned) return '#2f7f78'
+  if (pct >= 100) return '#3f9b4f'
   if (pct <= 0) return '#3a3a3a'
   const t = Math.max(0, Math.min(1, (pct - 50) / 50))
   const mix = (a: number, b: number) => Math.round(a + (b - a) * t)

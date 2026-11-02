@@ -38,9 +38,13 @@ class Kinds(unittest.TestCase):
         self.assertEqual(kinds('void f(void) { /* asm("") */ g(); } // DEBUG_NOP()'), [])
 
     def test_tracked_kinds_are_not_counted(self):
-        text = "void f(u8 *p) { again: *(u16 *)((u8 *)p + 0x172) = 1; goto again; }"
+        text = "void f(u8 *p) { again: g(); goto again; }"
         self.assertEqual(kinds(text), [])
-        self.assertEqual(sorted(s.kind for s in c.sites(text)), ["goto", "raw-offset"])
+        self.assertEqual([s.kind for s in c.sites(text)], ["goto"])
+
+    def test_constant_raw_offsets_count_and_variable_ones_do_not(self):
+        self.assertEqual(kinds("void f(struct A *p) { *(u16 *)((u8 *)p + 0x172) = 1; }"), ["raw-offset"])
+        self.assertEqual(kinds("u16 f(const u16 *t, u32 o) { return *(const u16 *)((const u8 *)t + o); }"), [])
 
     def test_single_use_macro_site(self):
         text = "#define ONCE(x) do { g(x); } while (0)\nvoid f(int x) { ONCE(x); }"

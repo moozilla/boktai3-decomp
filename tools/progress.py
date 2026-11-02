@@ -698,7 +698,7 @@ def main():
                        asm_b=sum(sizes[n] for n in asm), ram=ram,
                        concession_counts=concession_counts(Path(ROOT) / "src"))
         write_tree(Path(args.markdown).with_suffix(".json"), report, {a for n, a in funcs if n in pinned},
-                   Path(ROOT) / "src", {a for n, a in funcs if n in done})
+                   Path(ROOT) / "src")
     if args.json:
         Path(args.json).write_text(json.dumps(report, indent=2) + "\n")
 
@@ -722,12 +722,12 @@ def source_files(source_root):
     return files
 
 
-def write_tree(out, report, pinned_addrs, source_root, done_addrs=None):
+def write_tree(out, report, pinned_addrs, source_root):
     """Compact category -> unit -> function JSON: each function is
     [name, address, bytes, percent, pinned, file], plus the name in the C file
-    when that differs. Percent is 100 when the function compiles byte for byte
-    (pinned says whether it needs a concession for that), else the NONMATCHING
-    draft's fuzzy score or 0. File indexes `files`; -1 means
+    when that differs. Percent is the decomp.dev score: 100 when the function
+    matches with no concession; a match with concessions (pinned = 1) scores the
+    share of its lines without one; otherwise the NONMATCHING draft's fuzzy score or 0. File indexes `files`; -1 means
     src/fn/sub_<address>.c and -2 that no C unit holds it yet."""
     files = source_files(source_root)
     paths = sorted({p for a, (p, _) in files.items() if p != f"src/fn/sub_{a:08X}.c"})
@@ -741,8 +741,7 @@ def write_tree(out, report, pinned_addrs, source_root, done_addrs=None):
         for f in unit["functions"]:
             a = int(f["metadata"]["virtual_address"])
             path, defined = files.get(a, (None, None))
-            percent = 100 if done_addrs is not None and a in done_addrs else round(f["fuzzy_match_percent"], 1)
-            fn = [f["name"], f"{a:08X}", int(f["size"]), percent,
+            fn = [f["name"], f"{a:08X}", int(f["size"]), round(f["fuzzy_match_percent"], 1),
                   int(a in pinned_addrs), -2 if path is None else index.get(path, -1)]
             if defined and defined not in (f["name"], f"sub_{a:08X}"):
                 fn.append(defined)
