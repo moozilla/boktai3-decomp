@@ -1,17 +1,21 @@
-# Defeat burst
+# Defeat burst at 08080494
 
 Tags: #scene-actors #matching #compiler
 
-`08080494` SceneActorReaction_BeginDefeatBurst is still guarded. Stock agbcc produces the correct
-980-byte extent and a 99.0% fuzzy score. One instruction is out of place. Reproduce it with
-`python3 tools/scope/scope.py src/fn/sub_08080494.c`.
+`SceneActorReaction_BeginDefeatBurst` matches all 980 bytes with stock agbcc.
+The six sparks draw consecutive random counts and use the same range, height,
+kind and priority. The function then handles the category sound, optional wide
+burst and script, bestiary update and return to idle.
 
-The six spark calls use the existing particle sample and origin capture idioms. The random table
-gets r4, the origin r5, the spread r6 and the vertical range sl. A function-lifetime cursor
-rematerializes from its literal at each sample. The group setup and script arguments match too.
+The earlier guarded version set the zero phase before the optional bestiary
+call. The ROM first sets r5 to zero at `080807A8`, immediately before the
+halfword timer store from r3. A literal zero phase gives the right instruction
+order. Register allocation for the earlier sparks determines which register
+the compiler gives that zero.
 
-The state-entry byte stores keep the zero phase in r5 while the halfword timer is cleared from r3.
-The draft sets r5 at `08080750` before the optional bestiary call. The ROM sets it at `080807A8`,
-immediately before the timer store. The scope diff pairs every other instruction after accounting
-for the resulting PC-relative shifts. Replacing the phase argument with literal zero changes
-local allocation: the halfword zero starts out in r4.
+The sample table and the category pointer used by the bestiary check share a
+local union. In the allocation trace, that variable takes r4 and displaces both
+the random cursor address in the spark block and the phase zero in the idle
+block. The cursor then reloads from its literal at each sample and the phase
+zero gets r5. Passing the three signed halfword spark settings through the
+inline emitter keeps priority 1 in r8, kind 2 in r9 and height 20 in sl.
