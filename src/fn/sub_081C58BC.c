@@ -1,53 +1,48 @@
-#include "global.h"
-#include "engine.h"
-// MATCHING_CONCESSION: register-pinning
-struct ChallengePosition {
-    s16 x, y;
-};
-struct ChallengeWidget {
-    u8 unknown0[8];
-    u32 flags;
-    u8 unknownC[0x14];
-    s16 x, y;
-};
-void Palette_UpdateHighlightPulse(u16 *, u8 *);
-s32 GameState_GetPackedTripletValue(u32, s32);
-s32 ChallengeMenu_GetRankKeyframe(s32);
+#include "challenge_menu.h"
 
-s32 sub_081C58BC(u8 *p)
+s32 GameState_GetPackedTripletValue(s32, s32);
+s32 ChallengeMenu_GetRankKeyframe(s32);
+void Palette_UpdateHighlightPulse(u16 *, u8 *);
+
+static inline void ShowWidget(struct SceneInputWidget *widget)
 {
-    s32 *selection = (s32 *)(p + 0x300);
+    widget->flags &= ~1;
+}
+
+static inline void HideWidget(struct SceneInputWidget *widget)
+{
+    widget->flags |= 1;
+}
+
+s32 sub_081C58BC(struct ChallengeMenu *menu)
+{
+    s32 *selection = &menu->selection;
+    struct ContactPosition *position;
     s32 rank;
-    struct ChallengePosition *position;
+
     if (*selection == 0) {
-        Anim_LoadKeyframe(p + 0xd8, p + 0x38, 0x55, 0);
-        position = (struct ChallengePosition *)(p + 0xf8);
+        Anim_LoadKeyframe(&menu->widgets[1], &menu->resources[1], 0x55, 0);
+        position = &menu->widgets[1].position;
         position->x = 0;
         position->y = 0;
     } else if (*selection <= 3) {
-        Anim_LoadKeyframe(p + 0xd8, p + 0x38, 0x56, 0);
-        position = (struct ChallengePosition *)(p + 0xf8);
+        Anim_LoadKeyframe(&menu->widgets[1], &menu->resources[1], 0x56, 0);
+        position = &menu->widgets[1].position;
         position->x = 0;
         position->y = (*selection - 1) << 4;
     }
-    Palette_UpdateHighlightPulse((u16 *)(p + 0x2d8), p + 0x2e0);
-    ((struct ChallengeWidget *)(p + 0x198))->flags &= ~1;
-    {
-        u32 selectionOffset = 0x300;
-        s32 selectionValue = *(s32 *)(p + selectionOffset);
-        if (selectionValue != 0) {
-            // Keep the selection offset distinct from the packed-triplet offset.
-            asm volatile("" : "+r"(selectionOffset));
-            if (selectionValue > 3)
-                return;
-            rank = ChallengeMenu_GetRankKeyframe(
-                GameState_GetPackedTripletValue(*(u32 *)(p + 0x2fc), selectionValue - 1));
-            if (rank >= 0) {
-                Anim_LoadKeyframe(p + 0x138, p + 0x38, (u16)rank, 0);
-                ((struct ChallengeWidget *)(p + 0x138))->flags &= ~1;
-                return;
-            }
+    Palette_UpdateHighlightPulse(menu->highlightPalette, &menu->highlightPhase);
+    ShowWidget(&menu->widgets[3]);
+    if (menu->selection == 0) {
+        HideWidget(&menu->widgets[2]);
+    } else if (menu->selection <= 3) {
+        rank = ChallengeMenu_GetRankKeyframe(
+            GameState_GetPackedTripletValue(menu->group, menu->selection - 1));
+        if (rank >= 0) {
+            Anim_LoadKeyframe(&menu->widgets[2], &menu->resources[1], (u16)rank, 0);
+            ShowWidget(&menu->widgets[2]);
+        } else {
+            HideWidget(&menu->widgets[2]);
         }
     }
-    ((struct ChallengeWidget *)(p + 0x138))->flags |= 1;
 }
