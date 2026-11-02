@@ -114,5 +114,8 @@ early.
    `pointers.txt` or teach a walker like `tools/m4a.py`).
 
 Units with pins are marked `// MATCHING_CONCESSION: register-pinning` and reported
-in the Register-pinned category. Take the pins out of a unit you touch
+in the With concessions category. `tools/concessions.py` lists every kind the tools count
+(pins, barriers, empty bodies, single-use macros, volatile locals, `asm("Symbol")` aliases,
+CFLAGS overrides); a judgment-call kind can be excused with `// concession-ok(kind): reason`
+(`docs/WORKER.md`). decomp.dev counts a function as matched only with no concession left. Take the pins out of a unit you touch
 (`scope.py FILE.c pins`, `tools/depin.py`); the marker goes when the last one does.

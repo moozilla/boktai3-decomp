@@ -37,7 +37,7 @@ with this project.
 | | |
 |---|---|
 | Matching | **every function matches**: all 11,810 compile from C to the original bytes, and the ROM rebuilds byte-identical ([PROGRESS.md](PROGRESS.md)) |
-| Concessions | about 16% of code still matches only with register pins or `asm("")` barriers; removing them is the current work |
+| Concessions | about 16% of code still matches only with register pins, `asm("")` barriers or another concession ([tools/concessions.py](tools/concessions.py)); removing them is the current work, and decomp.dev counts a function as matched only once it has none |
 | Data | every ROM pointer is a symbol, so all data can move or grow ([shiftability](docs/SHIFTABILITY.md)) |
 | Scripts | the scene scripts are compiled GCL, Konami's scripting language (documented by the Metal Gear Solid reverse-engineering community: [KCEJ wiki](https://github.com/metalgeardev/KCEJ_Wiki/tree/master/common/gcl), [mgs_reversing](https://github.com/FoxdieTeam/mgs_reversing/tree/master/source/libgcl)); bytecode, interpreter and recovered names in [gcl/](gcl/README.md) |
 | Assets | text bank, font, sprites, maps, palettes, terrain and stage scripts decoded ([docs/ASSETS.md](docs/ASSETS.md)) |
