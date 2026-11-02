@@ -7034,7 +7034,14 @@ def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, siz
     fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
     subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", path], cwd=ROOT, check=True)
     bad = []
-    for f in progress.c_functions(path, with_asm=False):
+    names = progress.c_functions(path, with_asm=False)
+    if len(names) > 1 and not nonmatching:
+        import unit_check
+        addresses = dict(funcs)
+        expected = {f: (addresses[rom_name(dest, f)], sizes[rom_name(dest, f)]) for f in names}
+        if unit_check.stock_match(dest, expected, elf_syms(), rom_bytes()):
+            names = []
+    for f in names:
         k, inf = score(dest, f, {})
         if k != 0:
             bad.append(f"{f}: {inf.get('counts')}")
