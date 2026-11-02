@@ -1,10 +1,9 @@
-#include "global.h"
+#include "name_entry.h"
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
 void NameEntry_Update(void);
 void NameEntry_Destroy(void);
-s32 NameEntry_Initialize(void *);
 
 void *NameEntry_Create(void)
 {
