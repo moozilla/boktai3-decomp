@@ -2,9 +2,6 @@
 #include "global.h"
 #include "render.h"
 
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining: constant/register materialization order in the tail, widget loop base address.
 struct IbRes {
     u32 w[8];
 };
@@ -31,11 +28,11 @@ struct IbSprite {
     struct IbPos position;
 };
 struct IbRes *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
+s32 ResourceHeader_Relocate(void *, void *);
+s32 Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 s32 ForgingBook_IsCategoryComplete(void *, s32);
 s32 Mod(s32, s32);
-void AnimData_Load(void *, u32);
+s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ActorDebris_Create(void *, void *, void *);
 void *PlayerAttackEffect_Create(void *, void *, void *);
