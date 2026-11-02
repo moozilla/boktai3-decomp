@@ -103,13 +103,11 @@ static inline u32 frame_factor(u16 v)
     return DisplaySequence_MaskCommand(v, 15);
 }
 
-// MATCHING_CONCESSION: register-pinning
 void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
     struct HazardSprite *o;
     struct HazardAnim *a;
     const u16 *entry;
-    register u16 n asm("r0");
     int done;
     if (AnimatedHazard_ConsumeEntered(m, p)) {
         p->sprite.flags &= ~1;
@@ -142,8 +140,7 @@ void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct Animat
         else
             o->flags &= ~8;
     }
-    n = ++a->timer;
-    if (n >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
