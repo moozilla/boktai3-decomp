@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct OrbitEffectPosition {
@@ -34,10 +33,10 @@ void OrbitEffect_AdjustHeading(struct OrbitEffect *p)
             heading += 0x40;
             params->direction = heading;
         } else {
-            register u32 current asm("r2") = (u8)params->direction;
-            s32 signedHeading = (s8)desired;
+            s32 current = (u8)params->direction;
+            s8 signedHeading = (s8)desired;
             s32 delta;
-            register s32 limit asm("r0");
+            s32 limit;
             delta = (s8)(signedHeading - current);
             limit = params->turnSpeed;
             if (delta > limit) {
