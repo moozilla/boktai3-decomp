@@ -43,6 +43,15 @@ struct SceneHudSecondaryOption {
     s8 value;
     u8 unknown1[7];
 };
+struct SceneHudNavigationPage {
+    u8 map;
+    u8 unknown1, focusX, focusY, widthTiles, heightTiles;
+    s8 neighbors[4];
+    u8 solidLinks;
+    s8 alternate[4];
+    u8 message;
+};
+
 /* Scene HUD owner: offsets established by 081651B0, 081658C8 and its initializer 08178FC8. */
 struct SceneHudState {
     u8 unknown0[0x18];
@@ -156,7 +165,9 @@ struct SceneHudState {
     struct SceneInputWidget statusIcons[4]; /* 0x31C0 */
     struct SceneInputWidget comparisonIndicators[2]; /* 0x3340 */
     struct SceneInputWidget statMarkers[3][3];       /* 0x3400: base, bonus, delta */
-    u8 unknown3760[0xA80];
+    u8 unknown3760[0x300];
+    struct SceneInputWidget navigationArrows[4]; /* 0x3A60: up, down, left, right. */
+    u8 unknown3BE0[0x600];
     struct SceneInputWidget transferWidgets[2]; /* 0x41E0: hidden after action transfer */
     u8 statusRefreshRequested;                  /* 0x42A0 */
     u8 pageRepeatTimer;                         /* 0x42A1: held shoulder-button repeat */
@@ -201,7 +212,15 @@ struct SceneHudState {
     u16 valueRate;         /* 0x48EA */
     u16 balanceLimitTimer; /* 0x48EC: frames left of the over-limit warning */
     u16 balanceLimitShown; /* 0x48EE: over-limit message already shown */
-    u8 unknown48F0[0x4988 - 0x48F0];
+    u8 unknown48F0[8];
+    struct SceneHudNavigationPage *navigationPages; /* 0x48F8 */
+    u8 unknown48FC[8];
+    u8 navigationPage, showAllMapLinks;
+    u8 unknown4906[2];
+    s8 navigationDestinations[4]; /* -1 when there is no displayed link. */
+    u8 unknown490C[0x10];
+    u16 currentMapPage; /* 0x491C */
+    u8 unknown491E[0x4988 - 0x491E];
     struct SceneInputWidget ownerWidgets[2]; /* 0x4988: removed by owner destructor */
     u8 unknown4A48[0x28];
     struct SceneInputWidget ownerAuxWidgets[6]; /* 0x4A70 */
