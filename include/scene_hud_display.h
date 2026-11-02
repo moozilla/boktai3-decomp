@@ -109,8 +109,7 @@ struct SceneHudState {
     s8 primarySelection;         /* 0xC72 */
     u8 primaryBlinkTimer;        /* 0xC73: 60-frame icon blink */
     s16 *primarySelectionOutput; /* 0xC74 */
-    struct SceneHudPrimaryOption primaryOptions[3];
-    u8 unknownC84[4];
+    struct SceneHudPrimaryOption primaryOptions[4];
     struct SceneInputWidget primaryWidgets[3]; /* 0xC88 */
     s8 secondaryFirstValue;  /* 0xDA8: first value of stride-eight option records */
     s8 secondaryUnlockIndex; /* 0xDA9: indexed with stride eight */
