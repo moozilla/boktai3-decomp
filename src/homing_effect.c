@@ -632,7 +632,7 @@ void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct
     struct EffectParticle *p = &effect->particles[index];
     struct EffectVec *origin = &p->origin;
     struct EffectSprite *sprite = &p->sprite, *o;
-    register u8 *angle asm("r6") = &p->angle;
+    u8 *angle = &p->angle;
     struct EffectAnim *a;
     const u16 *entry;
     s32 difference;
@@ -640,18 +640,28 @@ void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct
         difference =
             Math_Atan2(origin->x - sprite->position.x, origin->z - sprite->position.z) - p->angle;
         if (p->drift < 0) {
-            if ((difference < 0 ? -difference : difference) <= 4)
-                *angle = p->angle + difference;
-            else
-                *angle = p->angle + 4;
+            {
+                u32 next;
+                if ((difference < 0 ? -difference : difference) <= 4) {
+                    next = p->angle;
+                    next += difference;
+                } else
+                    next = p->angle + 4;
+                *angle = next;
+            }
             p->drift++;
             if (!p->drift)
                 p->drift = (randomValue(0) & 63) + 64;
         } else {
-            if ((difference < 0 ? -difference : difference) <= 4)
-                *angle = p->angle - difference;
-            else
-                *angle = p->angle - 4;
+            {
+                u32 next;
+                if ((difference < 0 ? -difference : difference) <= 4) {
+                    next = p->angle;
+                    next -= difference;
+                } else
+                    next = p->angle - 4;
+                *angle = next;
+            }
             p->drift--;
             if (!p->drift)
                 p->drift = -(randomValue(1) & 63) - 64;
@@ -661,8 +671,8 @@ void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct
     } else if (!effect->timer) {
         project(&projected, &p->sprite.position);
         {
-            register u32 mask asm("r8");
-            register u32 m asm("r1") = 4;
+            u32 mask;
+            u32 m = 4;
             u32 paused;
             mask = m;
             paused = gUnk_02000560 & m;
@@ -701,19 +711,23 @@ void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct
         }
     }
     {
-        u32 input = a->flags;
-        register u32 mask asm("r3") = 1;
-        register u32 left asm("r1") = (u8)(input & mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             p->sprite.flags |= 4;
         else
             p->sprite.flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        register u32 mask asm("r3") = 2;
-        register u32 left asm("r1") = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = a->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*entry & 0x30) >> 4) & bit))
             o->flags |= 8;
         else
             o->flags &= ~8;
