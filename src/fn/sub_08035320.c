@@ -15,7 +15,9 @@ struct Engine {
     u8 pad4c[0x58];
     u32 number;
     u8 work[16];
-    u8 padb8[0x34];
+    u8 padb8[0xE0 - 0xB8];
+    u32 ackWaitFrames;
+    u8 padE4[3], acknowledgedSlots, waitingForAck, padE9[3];
     u16 flags, backup, history[5];
     u8 changed, padfb[5];
     u16 diff[5];
@@ -40,7 +42,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 }
 void Wireless_UpdateUniAcknowledgedSlots(struct Engine *p)
 {
-    u8 *seen = (u8 *)p + 0xE7;
+    u8 *seen = &p->acknowledgedSlots;
     int bits = (gRfuLinkManager.parentAck_flag << 1) | *seen;
     int zero = 0;
     int offset;
@@ -52,12 +54,12 @@ void Wireless_UpdateUniAcknowledgedSlots(struct Engine *p)
         expected = *required;
     }
     if ((bits & expected) == expected) {
-        u8 *waiting = (u8 *)p + 0xE8;
+        u8 *waiting = &p->waitingForAck;
         *waiting = zero;
         p->flag36 = zero;
     } else {
-        u8 *waiting = (u8 *)p + 0xE8;
+        u8 *waiting = &p->waitingForAck;
         *waiting = 1;
-        (*(u32 *)((u8 *)p + 0xE0))++;
+        p->ackWaitFrames++;
     }
 }
