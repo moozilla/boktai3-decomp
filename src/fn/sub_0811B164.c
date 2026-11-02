@@ -6,7 +6,9 @@
 
 struct SpatialEntry {
     u32 flags;
-    u8 unknown4[12];
+    u32 mask, category;
+    u8 unknownC[3];
+    u8 registrationFlags;
     s16 x, y, z;
     u8 unknown16[10];
     s16 offsetX;
@@ -33,7 +35,7 @@ void SpatialIndex_InsertEntry(struct SpatialEntry *);
 static inline u8 NeedsReinsert(struct SpatialEntry *entry, s32 bucket)
 {
     s8 *bucketField;
-    if (!(*((u8 *)entry + 15) & 1) || (entry->flags & 8))
+    if (!(entry->registrationFlags & 1) || (entry->flags & 8))
         return 0;
     bucketField = &entry->bucket;
     asm("" : : : "r0");
