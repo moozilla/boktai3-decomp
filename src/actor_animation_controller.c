@@ -2947,7 +2947,6 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
     struct ActorAnim *a;
     const u16 *entry;
     u32 flag;
-    register u16 n asm("r0");
     u8 done;
     if (take(p)) {
         p->state = 13;
@@ -2979,8 +2978,7 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             else
                 o->flags &= ~8;
         }
-        n = ++a->timer;
-        if (n >= a->rate) {
+        if (++a->timer >= a->rate) {
             a->timer = 0;
             if (a->flags & 4) {
                 if (a->frame == 0) {
