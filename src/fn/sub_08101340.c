@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "named_object.h"
 #include "player.h"
@@ -38,7 +37,8 @@ void NamedObject_UpdateMovementSound(struct NamedObjectManager *manager)
     s32 i;
     struct NamedObject *o;
     for (i = 0; i < 12; i++) {
-        if (Active(*(u32 *)((u8 *)manager + 0x136C), 1 << i)) {
+        u32 *mask = (u32 *)&manager->used;
+        if (Active(*mask, 1 << i)) {
             o = (struct NamedObject *)(i * (s32)sizeof(*objects) + (u32)objects);
             if ((s16)o->state != 6 && (o->field_E0 & 0x10)) {
                 if ((s16)o->state != 1) {
