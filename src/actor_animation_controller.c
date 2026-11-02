@@ -1728,28 +1728,7 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     if (done) {
-        p->oldMode = p->mode;
-        {
-            u32 mode = 3;
-            p->mode = mode;
-        }
-        {
-            register u32 raw asm("r1") = *(u16 *)((u8 *)p + 0xf5a);
-            register u32 mask asm("r2") = 15;
-            *(u16 *)((u8 *)p + 0xf5a) = (mask & raw) | 16;
-            if (p->oldMode == 3) {
-                register u32 bits asm("r0") = mode_bits((u8 *)p + 0xf5a, mask);
-                if (bits == 3) {
-                    p->savedFrame = p->anim.frame;
-                    p->savedTimer = p->anim.timer;
-                }
-            }
-        }
-        {
-            register s32 mask asm("r0") = 1;
-            register s32 v asm("r1") = p->flags;
-            p->flags = mask | v;
-        }
+        Actor_SetState(p, 3, 1);
         {
             register void *h asm("r2") = p->handle;
             if (h) {
