@@ -253,36 +253,35 @@ void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
     Collider_Refresh(drawable);
 }
 
-/* Raw offsets throughout: routing any of this through struct StateActor /
- * SceneActorGraphics changes register allocation enough to break the match
- * (tried: `p->actionFlags`, `p->bodyDrawable`, struct-field attack properties). */
-
 void SceneActorGraphics_UpdateVariant(struct StateActor *p)
 {
-    u8 *drawable = (u8 *)p + 0x178;
+    u8 *drawable = p->bodyDrawable;
     {
         u32 mask = 0x40000;
-        if (*(u32 *)((u8 *)p + 0x9c) & mask)
-            ((u8 *)p)[0x3b6] = 1;
+        if (p->actionFlags & mask)
+            ((struct SceneGraphicsActor *)p)->graphics.variantToggle = 1;
         else
-            ((u8 *)p)[0x3b6] = 0;
+            ((struct SceneGraphicsActor *)p)->graphics.variantToggle = 0;
     }
-    if (((u8 *)p)[0x3b6] != ((u8 *)p)[0x3b7]) {
-        switch (((u8 *)p)[0x3b6]) {
+    if (((struct SceneGraphicsActor *)p)->graphics.variantToggle !=
+        ((struct SceneGraphicsActor *)p)->graphics.variantTogglePrev) {
+        switch (((struct SceneGraphicsActor *)p)->graphics.variantToggle) {
             case 0:
-                Collider_SetAttackProperties(drawable, *(s16 *)((u8 *)p + 0x35c),
-                                             *(s16 *)((u8 *)p + 0x35e), 0, 0,
-                                             *(s16 *)((u8 *)p + 0x360));
+                Collider_SetAttackProperties(
+                    drawable, ((struct SceneGraphicsActor *)p)->graphics.attackWidth0,
+                    ((struct SceneGraphicsActor *)p)->graphics.attackHeight0, 0, 0,
+                    ((struct SceneGraphicsActor *)p)->graphics.attackDepth0);
                 break;
             case 1:
-                Collider_SetAttackProperties(drawable, *(s16 *)((u8 *)p + 0x362),
-                                             *(s16 *)((u8 *)p + 0x364), 0, 0x60000,
-                                             *(s16 *)((u8 *)p + 0x366));
+                Collider_SetAttackProperties(
+                    drawable, ((struct SceneGraphicsActor *)p)->graphics.attackWidth1,
+                    ((struct SceneGraphicsActor *)p)->graphics.attackHeight1, 0, 0x60000,
+                    ((struct SceneGraphicsActor *)p)->graphics.attackDepth1);
                 break;
         }
         {
-            int value = ((u8 *)p)[0x3b6];
-            ((u8 *)p)[0x3b7] = value;
+            int value = ((struct SceneGraphicsActor *)p)->graphics.variantToggle;
+            ((struct SceneGraphicsActor *)p)->graphics.variantTogglePrev = value;
         }
     }
 }
