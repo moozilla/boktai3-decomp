@@ -1,61 +1,64 @@
 #include "global.h"
 #include "render.h"
+#include "game_state.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: gauge source is the save-state counter at 0x618.
-extern u8 *gGameState;
 extern u16 gUnk_0300517A;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Div(s32, s32);
 void StatDisplay_DrawTwoDigitCounter(s32);
-void Hud_DrawStoredEnergyGauge(u8 *p, s32 mode)
+struct StoredEnergyGauge {
+    u8 padding[0xa88];
+    s16 stored;
+    u16 timer;
+    u16 flash;
+};
+void Hud_DrawStoredEnergyGauge(struct StoredEnergyGauge *hud, s32 mode)
 {
     s32 background, foreground, full, partial, n, amount;
     u16 *cell;
-    int new_var;
+    int paletteChanged;
     s32 stored;
-    u8 *g;
+    struct GameState *g;
     if (mode == 1) {
         background = 0x1f;
-        if (*(s16 *)(p + 0xa88) < *(s32 *)(gGameState + 0x618)) {
-            u16 *timer = (u16 *)(p + 0xa8a);
+        if (hud->stored < gGameState->unk618) {
+            u16 *timer = &hud->timer;
             s32 bit;
             ++*timer;
             bit = (*timer >> 2) & 1;
             foreground = 0x7fff;
             if (bit)
                 foreground = 0x3e0;
-        } else if (*(u16 *)(p + 0xa8c)) {
+        } else if (hud->flash) {
             foreground = 0x7fff;
-            --*(u16 *)(p + 0xa8c);
+            --hud->flash;
         } else
             foreground = 0x3e0;
     } else {
         background = 0x39ce;
-        if (*(u16 *)(p + 0xa8c)) {
+        if (hud->flash) {
             amount = 0x7fff;
             foreground = amount;
-            --*(u16 *)(p + 0xa8c);
+            --hud->flash;
         } else
             foreground = 0x1f;
     }
-    new_var = gBgPaletteBank13Color14 != background;
-    if (new_var)
+    paletteChanged = gBgPaletteBank13Color14 != background;
+    if (paletteChanged)
         gBgPaletteBank13Color14 = background;
     if ((&gBgPaletteBank13Color14)[-1] != foreground)
         (&gBgPaletteBank13Color14)[-1] = foreground;
     g = gGameState;
-    cell = (u16 *)&*(s32 *)(g + 0x618);
-    stored = *(s32 *)cell;
-    *(u16 *)(p + 0xa88) = stored;
-    asm("" ::: "memory");
-    amount = *(s32 *)(g + 0x618);
+    stored = g->unk618;
+    hud->stored = stored;
+    amount = g->unk618;
     if (amount <= 0) {
         full = 0;
         partial = 0;
-    } else if (*(s32 *)(g + 0x61c) > 1) {
+    } else if (g->unk61C > 1) {
         s32 scale = 79;
-        partial = Div((amount - 1) * scale, *(s32 *)(g + 0x61c) - 1) + 1;
+        partial = Div((amount - 1) * scale, g->unk61C - 1) + 1;
         full = partial >> 3;
         partial -= full << 3;
     } else {
