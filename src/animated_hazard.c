@@ -540,7 +540,6 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
         struct HazardSprite *o = &p->sprite;
         struct HazardAnim *a;
         const u16 *entry;
-        register u16 n asm("r0");
         int done;
         a = &p->anim;
         entry = a->data + a->frame;
@@ -567,8 +566,7 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
             else
                 o->flags &= ~8;
         }
-        n = ++a->timer;
-        if (n >= a->rate) {
+        if (++a->timer >= a->rate) {
             a->timer = 0;
             if (a->flags & 4) {
                 if (a->frame == 0) {
