@@ -27,7 +27,10 @@ static inline int trunc12(int n)
 }
 static inline void sum(ProjectilePosition *dst, ProjectilePosition *a, ProjectilePosition *b)
 {
-    dst->x = b->x + a->x;
+    {
+        s16 value = b->x + a->x;
+        dst->x = value;
+    }
     dst->y = b->y + a->y;
     dst->z = b->z + a->z;
 }
@@ -39,7 +42,7 @@ void SceneActors_FireTrackingProjectileSpread(SpreadProjectileActor *p,
     ProjectilePosition spawn;
     u8 angle;
     u8 facing;
-    register u16 step asm("r8");
+    u16 step;
     int speed;
     u32 rawFacing;
     int count;
