@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monster_particle_random.h"
 #include "engine_globals.h"
 #include "ram.h"
 #include "player.h"
@@ -31,19 +32,6 @@ void ParticleSprite_Initialize(void *, void *, s32);
 void Effect_SetOrigin(void *, s32, s32);
 void Effect_SetPalette(void *, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
-#define BURST_READ_SAMPLE(out, table, offset)                                                      \
-    do {                                                                                           \
-        (out) = *(const u16 *)((offset) + (u32)(table));                                           \
-    } while (0)
-static inline s32 RandomValue(const u16 *table, u32 *index, u32 mask)
-{
-    u32 offset;
-    u32 result;
-    *index = (*index + 1) & mask;
-    offset = *index * 2;
-    BURST_READ_SAMPLE(result, table, offset);
-    return result;
-}
 struct RandomCursorBits {
     u32 index : 10;
 };
@@ -68,9 +56,7 @@ void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
     const u16 *table = gRandomTable;
     u32 initial = RandomByte(table);
     const u16 *randomTable;
-    u32 *index;
     void **sheet;
-    u32 mask;
     struct BurstRecord *particle;
     struct BurstData *data;
     u32 phase;
@@ -81,19 +67,17 @@ void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
     phase = 0;
     data = &p->particles[0].data;
     particle = p->particles;
-    index = &gRandomIndex;
-    mask = 1023;
     for (; i <= 15; i++) {
         const s16 *cosineTable;
         const s16 *sineTable;
         ParticleSprite_Initialize(particle, *sheet, 0);
         Effect_SetOrigin(particle, -4, -4);
         Effect_SetPalette(particle, 1);
-        data->angle = (initial + phase) + (RandomValue(randomTable, index, mask) & 7);
-        data->period = (RandomValue(randomTable, index, mask) & 3) + 7;
-        data->radius = ((RandomValue(randomTable, index, mask) >> 3) & 0x5F) + 0x60;
+        data->angle = (initial + phase) + (ParticleRandom_ReadSample(randomTable) & 7);
+        data->period = (ParticleRandom_ReadSample(randomTable) & 3) + 7;
+        data->radius = (((s32)ParticleRandom_ReadSample(randomTable) >> 3) & 0x5F) + 0x60;
         data->variant = ((i & 3) << 1) + 1;
-        data->speed = (RandomValue(randomTable, index, mask) & 31) + 8;
+        data->speed = (ParticleRandom_ReadSample(randomTable) & 31) + 8;
         {
             s32 radius = data->radius;
             cosineTable = gUnk_086149C4;
@@ -110,7 +94,7 @@ void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
         particle->priority = 2;
         data->attribute = 0xEC;
         {
-            u16 sample = RandomValue(randomTable, index, mask);
+            u16 sample = ParticleRandom_ReadSample(randomTable);
             u32 frame = sample & 7;
             data->frame = frame;
             if (frame <= 3)
@@ -120,7 +104,7 @@ void PlayerBurst_InitializeParticles(struct PlayerBurstTask *p)
         }
         data->frame = 0;
         data->timer = 0;
-        data->lifetime = (RandomValue(randomTable, index, mask) & 15) + 56;
+        data->lifetime = (ParticleRandom_ReadSample(randomTable) & 15) + 56;
         data->active = 1;
         phase += 16;
         data = (struct BurstData *)((u8 *)data + sizeof(*particle));
