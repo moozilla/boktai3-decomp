@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -26,7 +25,7 @@ struct Engine {
     u8 pad11a[0x1A];
     u8 scratch[64];
     u8 message[0x204];
-    void *head, *tail;
+    void *head, *tail, *sendFailure;
 };
 void Memory_Clear(void *, int);
 #include "rfu_compat.h"
@@ -48,33 +47,18 @@ void Wireless_PollChildNiSend(struct Engine *p)
         u8 *slot = &p->index;
         int state = slots[*slot]->send.state;
         if (state == 0x26) {
-            void *callback = p->head;
-            if (callback)
-                Callback_InvokeActor((u8 *)p + 0xB8, callback);
+            if (p->head)
+                Callback_InvokeActor((u8 *)p + 0xB8, p->head);
             rfu_clearSlot(4, *slot);
-            p->mask &= 0xFFFD;
+            p->mask &= ~2;
         } else if (state == 0x27) {
-            void *callback = *(void **)((u8 *)p + 0x380);
-            if (callback)
-                sub_08249238(callback);
-            {
-                struct NIComm *send = &slots[*slot]->send;
-                u8 *original = &send->bmSlotOrg;
-                register int old asm("r3") = *original;
-                {
-                    u8 current = send->bmSlot;
-                    asm("" : "+r"(current));
-                    lost = current;
-                    lost ^= old;
-                }
-            }
+            if (p->sendFailure)
+                sub_08249238(p->sendFailure);
+            lost = slots[*slot]->send.bmSlotOrg ^ slots[*slot]->send.bmSlot;
             rfu_clearSlot(4, *slot);
             p->mask = 0;
         }
-        if (lost) {
-            lost |= p->flag35;
-            asm("" : "+r"(lost));
-            p->flag35 = lost;
-        }
+        if (lost)
+            p->flag35 |= lost;
     }
 }
