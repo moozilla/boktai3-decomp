@@ -88,16 +88,13 @@ s32 Weather_Initialize(struct WeatherState *p)
     Weather_SetRandomDuration(p);
     p->unknown20 = Script_GetKeywordValue(0x61, 1);
     {
+        // One offset variable walks unk876 then counters628[2]: reassigned, it holds no
+        // constant cse could hand to the later unk876 read, which reloads 0x876 as in the ROM.
         u8 *base = (u8 *)gGameState;
-        register u32 offset asm("r4") = 0x876;
-        s16 *sensor;
-        s32 storm;
-        sensor = (void *)(base + offset);
-        storm = *sensor;
-        {
-            s32 *timer = &gGameState->counters628[2];
-            *timer += storm >> 2;
-        }
+        u32 offset = 0x876;
+        s32 storm = *(s16 *)(base + offset);
+        offset = 0x630;
+        *(s32 *)(base + offset) += storm >> 2;
     }
     if (gGameState->counters628[2] >= gWeatherCooldownBase)
         gGameState->counters628[2] = gWeatherCooldownBase;
