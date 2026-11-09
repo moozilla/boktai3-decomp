@@ -2279,7 +2279,22 @@ def life_note(wd, x, live):
                     f" The doubling goes away only if the non-constant set comes first in the code]")
         return (f" [flow measured {fl}; doubled because it always holds a constant (REG_EQUIV):"
                 f" update_equiv_regs, local-alloc.c, halves constant registers' priority]")
+    k = equiv_sets(wd, x)
+    if k >= 2 and live == fl << k:
+        return (f" [flow measured {fl}; update_equiv_regs (local-alloc.c) doubled it once for each of its"
+                f" {k} sets with a REG_EQUIV note (x{1 << k}), so its priority fell to 1/{1 << k}."
+                f" Setting it to the constant once (one set) doubles it only once]")
     return f" [flow measured {fl}; regmove changed it while rewriting copies]"
+
+
+def equiv_sets(wd, x):
+    """How many sets of pseudo X carry a REG_EQUIV note in the lreg dump: update_equiv_regs doubles a
+    register's live length once per such set (REG_LIVE_LENGTH (regno) *= 2 in its insn walk)."""
+    path = os.path.join(wd, "u.i.lreg")
+    if not os.path.exists(path):
+        return 0
+    return sum(1 for b in re.split(r"\n\n", open(path).read())
+               if re.search(rf"\(set \(reg(?:/\w)*:\w+ {x}\)", b) and "REG_EQUIV" in b)
 
 
 def has_equiv_note(wd, x):
