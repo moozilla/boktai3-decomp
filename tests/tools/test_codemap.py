@@ -125,6 +125,21 @@ class StaleIndexTests(unittest.TestCase):
             self.assertIs(codemap.load(wait=True), new)
 
 
+class TypeTests(unittest.TestCase):
+    def test_definitions_comments_and_typedefs(self):
+        with tempfile.TemporaryDirectory() as d:
+            h = Path(d) / 'foo.h'
+            h.write_text('#pragma once\n// A foo.\n// Two lines.\nstruct Foo {\n    u8 a;\n    union {\n        u16 b;\n    } c;\n};\n'
+                         'typedef struct Bar {\n    int x;\n} BarT;\ntypedef struct Foo FooT;\n')
+            with patch.object(codemap, '_headers', lambda: [str(h)]), patch.dict(codemap._HELPERS, {}, clear=True):
+                t = codemap.types()
+        self.assertEqual(sorted(t['defs']), ['Bar', 'Foo'])
+        self.assertEqual(t['defs']['Foo']['line'], 4)
+        self.assertTrue(t['defs']['Foo']['text'].startswith('// A foo.\n// Two lines.\nstruct Foo {'))
+        self.assertTrue(t['defs']['Foo']['text'].endswith('} c;\n};'))
+        self.assertEqual(t['aliases'], {'BarT': 'Bar', 'FooT': 'Foo'})
+
+
 class CommittedProgressTests(unittest.TestCase):
     def test_fallback_reads_progress_json(self):
         tree, report, kinds = codemap._committed_progress()

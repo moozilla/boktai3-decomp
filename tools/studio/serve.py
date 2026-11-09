@@ -158,6 +158,7 @@ def codemap_warm():
     import codemap
     codemap.load()
     codemap._shared_helpers()
+    codemap.layouts()  # struct layouts measure in the background
 
 
 def size_text(n):
@@ -427,10 +428,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/codemap":
             import codemap
             self.send(200, codemap.summary())
-        elif self.path.startswith(("/api/codemap/fn/", "/api/codemap/ram/")):
-            import codemap  # /api/codemap/fn/NAME|ADDR, /api/codemap/ram/NAME|ADDR
+        elif self.path.startswith(("/api/codemap/fn/", "/api/codemap/ram/", "/api/codemap/type/")):
+            import codemap  # /api/codemap/fn/NAME|ADDR, /api/codemap/ram/NAME|ADDR, /api/codemap/type/NAME
             what, arg = self.path.split("/")[3:5]
-            d = (codemap.function if what == "fn" else codemap.ram_object)(urllib.parse.unquote(arg))
+            d = {"fn": codemap.function, "ram": codemap.ram_object, "type": codemap.type_info}[what](urllib.parse.unquote(arg))
             self.send(200 if d else 404, d or {"error": "not found"})
         elif self.path.startswith("/api/code/"):
             try:
