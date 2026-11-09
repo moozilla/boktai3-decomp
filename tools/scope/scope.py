@@ -6979,14 +6979,22 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
             now = re.sub(r'^INCLUDE_ASM\("[^"]*", %s\);\n' % re.escape(asm_name or name), "", cur, flags=re.M)
             if asm_name is None:  # FUNC matches already (a depin): its current C is what the draft replaces
                 now = land.without_definition(now, name)
-            if land.context_key(rest) != land.context_key(now):
+            import split
+            alone = split.c_functions(path) == [name] and split.c_functions(os.path.abspath(draft)) == [name]
+            if alone and land.context_key(rest) != land.context_key(now):
+                # a unit that holds FUNC alone (a src/fn file): no neighbor can be undone, so a depin
+                # draft that also rewrote the file's helpers, types or marker lands whole
+                print(f"{name}: {dest} holds {name} alone; the draft replaces the whole file")
+            elif land.context_key(rest) != land.context_key(now):
                 added = land.only_additions(now, rest)
                 if added is None:
                     sys.exit(f"{name}: no workspace base for {rel}, and outside {name} it differs from {dest};"
                              " land by hand (or reopen with `new`)")
                 print(f"{name}: the draft adds {added} line(s) outside {name} (a new helper or declaration);"
                       " everything else there is the unit as it is now")
-        merged = land.merge(cur, open(base).read() if os.path.exists(base) else cur, text)
+        else:
+            alone = False
+        merged = text if alone else land.merge(cur, open(base).read() if os.path.exists(base) else cur, text)
         if merged is None:
             sys.exit(f"{name}: {dest} changed since `new` in a way that conflicts with the draft; land by hand")
         text = merged
