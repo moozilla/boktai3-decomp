@@ -143,6 +143,7 @@ let wantFrame = null, wantArg = null;  // #tab/key/frame; for pool and maps the 
 function route() {
   const [t, s, f] = (location.hash.slice(1) || 'sprites').split('/');
   tab = views[t] ? t : 'sprites';
+  if (!views[t] && location.hash) history.replaceState(null, '', '#sprites');  // an unknown view: say which one shows
   wantFrame = f !== undefined && f !== '' && /^\d+$/.test(f) ? +f : null;
   wantArg = (location.hash.slice(1).split('/')[t === 'maps' ? 3 : 2]) || null;
   markNav();
