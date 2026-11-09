@@ -181,7 +181,33 @@ def concessions(text, path=None):
         text = MARKER + "\n" + text
     if not (pins or bars) and MARKER in text:
         text = re.sub(r"^// MATCHING_CONCESSION: register-pinning\n", "", text, flags=re.M)
+    if pins or bars:
+        text = refresh_function_markers(text, rel)
     return text, pins, bars
+
+
+def refresh_function_markers(text, rel=None):
+    """TEXT without the per-function MATCHING_CONCESSION markers (tools/merge_unit.py puts one
+    above each pinned function of a merged unit) whose function holds no concession any more,
+    directly or through a helper (tools/progress.py unit_scores decides)."""
+    # comments, blank lines and macro definitions may stand between the marker and its function
+    between = r"(?:[ \t]*(?://[^\n]*|/\*.*?\*/[ \t]*|#[ \t]*define(?:[^\n]*\\\n)*[^\n]*)?\n)*?"
+    marker = re.compile(r"^%s\n(?=%s[A-Za-z_][^\n;=(#]*?\b(\w+)\s*\([^;{]*\)\s*\{)" % (re.escape(MARKER), between),
+                        re.M | re.S)
+    found = [(m.start(), m.end(), m.group(1)) for m in marker.finditer(text)]
+    if not found:
+        return text
+    tools = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    from progress import header_helpers, unit_scores
+    scores = unit_scores(without_drafts(text), [n for _, _, n in found], rel, header_helpers())
+    for start, end, name in reversed(found):
+        if name not in scores:
+            text = text[:start] + text[end:]
+    # a unit-level concession (a single-use macro, a CFLAGS override) is not in unit_scores: the unit
+    # keeps one marker while concessions() counts any
+    return text if MARKER in text else MARKER + "\n" + text
 
 
 def without_drafts(text):
