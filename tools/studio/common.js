@@ -236,8 +236,22 @@ const palFromBytes = (b, off = 0) => Array.from({ length: 256 }, (_, i) => rgb(l
 const resCache = new Map();
 function res(label, hash) {
   const k = label + '/' + hash;
-  if (!resCache.has(k)) resCache.set(k, fetch(`/api/res/${label}/${hash}`).then(r => { if (!r.ok) throw new Error('no ' + k); return r.arrayBuffer(); }).then(b => new Uint8Array(b)));
+  if (!resCache.has(k)) {
+    // one retry for a dropped connection; a failure isn't cached, so the next call tries again
+    const get = () => fetch(`/api/res/${label}/${hash}`).then(r => { if (!r.ok) throw new Error('no ' + k); return r.arrayBuffer(); });
+    resCache.set(k, get().catch(e => e.message.startsWith('no ') ? Promise.reject(e) : get())
+      .then(b => new Uint8Array(b)).catch(e => { resCache.delete(k); throw e; }));
+  }
   return resCache.get(k);
+}
+// Map `fn` over `items` with at most `n` calls in flight (the browser drops sockets past a few dozen).
+async function pmap(items, fn, n = 8) {
+  const out = new Array(items.length);
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => {
+    while (next < items.length) { const i = next++; out[i] = await fn(items[i], i); }
+  }));
+  return out;
 }
 
 // Draw one 4bpp 8x8 tile into ImageData at (x, y).

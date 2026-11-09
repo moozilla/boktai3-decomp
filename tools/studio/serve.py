@@ -46,7 +46,7 @@ log = logging.getLogger("studio")
 # for it instead of building the same index alongside.
 WARM = threading.Lock()
 SLOW = ("/api/atlas", "/api/codemap", "/api/search/", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
-        "/api/code/", "/api/learned", "/api/stages", "/api/areas")
+        "/api/code/", "/api/learned", "/api/stages", "/api/areas", "/api/text/uses/")
 # polled by the live view several times a second; logged only when slow or failing
 POLLED = ("/api/live", "/api/live/player")
 
@@ -179,7 +179,8 @@ def stage_meta():
 
 def world():
     """Scenes grouped into areas by their doors (tools/assets/areas.py), with
-    which scenes the stage survey captured."""
+    which scenes the stage survey captured, and the areas grouped into places
+    (tools/studio/places.py)."""
     import areas
     import gclfiles
     w = areas.build(json.loads(stage_meta()))
@@ -190,7 +191,46 @@ def world():
         if i in w["scenes"]:
             w["scenes"][i]["shot"] = info["shot"]
             w["scenes"][i]["map"] = w["scenes"][i]["map"] or info["map"]
+    import places
+    rows = csv.DictReader(open(os.path.join(ROOT, "data", "labels", "areas.csv"), encoding="utf-8"))
+    order = {int(r["area"]): int(r["story_order"] or 0) for r in rows}
+    for a in w["areas"]:
+        a["story_order"] = order.get(a["area"], 0)
+    w["places"] = places.assign(w)
     return w
+
+
+_TEXT_USES = {}
+
+
+def text_uses(n):
+    """The script procedures that show text-bank string N (their text#N operands)."""
+    if not _TEXT_USES:
+        import gclview
+        names = {int(p): r.get("name") for p, r in gclview.names().procs.items()}
+        uses = {}
+        for cid, p in actors.procs().items():
+            for t in set(p["texts"]):
+                uses.setdefault(t, []).append({"id": cid, "name": names.get(cid) or ""})
+        _TEXT_USES.update(uses or {-1: []})
+    procs = [dict(p) for p in _TEXT_USES.get(n, [])]
+    if procs:
+        # where each one runs: its scene file's entry scene, placed in the world
+        import gclfiles
+        entry = {c: f["entry"] for f in gclfiles.files() if f["kind"] == "scene" for c in f["procs"]}
+        w = world()
+        for p in procs:
+            sc = entry.get(p["id"])
+            a = w["areas"][w["scene_area"][sc]] if sc is not None and sc in w["scene_area"] else None
+            label = (w["scenes"].get(sc) or {}).get("label") if sc is not None else None
+            place = a["place"] if a else None
+            if label:  # the scene's own label, led by its place unless it already names it
+                where = label if not place or label.startswith(place) else f"{place} · {label}"
+            else:
+                where = " · ".join(x for x in (place, a["detail"]) if x) if place else None
+            p["scene"], p["place"] = sc, where
+            p["area"] = a["area"] if a else None
+    return {"procs": procs}
 
 
 def hp_data(h):
@@ -350,6 +390,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/strings":
             orig = self.server.original
             self.send(200, [dict(s, edited=orig.get(s["id"]) != s["text"]) for s in read_strings()])
+        elif self.path.startswith("/api/text/uses/"):
+            self.send(200, text_uses(int(self.path.rsplit("/", 1)[1])))
         elif self.path == "/api/original":
             self.send(200, self.server.original)
         elif self.path == "/api/english":
@@ -424,7 +466,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
             sm = codemap.summary()
             self.send(200, {k: sm[k] for k in ("measures", "concession_kinds", "missing", "updating")} |
                       {"ram": len(sm["ram"]), "functions_with_concessions": sum(
-                          1 for c in sm["categories"] for u in c["units"] for f in u["functions"] if f[4])})
+                          1 for c in sm["categories"] for u in c["units"] for f in u["functions"] if f[4]),
+                       "drafts": sum(1 for c in sm["categories"] if c["name"] != codemap.INTENTIONAL_ASM
+                                     for u in c["units"] for f in u["functions"] if f[3] < 100 and not f[4])})
+        elif self.path == "/api/codemap/history":
+            import codemap
+            self.send(200, codemap.history())
         elif self.path == "/api/codemap":
             import codemap
             self.send(200, codemap.summary())
