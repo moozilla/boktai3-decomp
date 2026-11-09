@@ -230,6 +230,16 @@ concessions removed). Two separate problems:
   gives 7 / 3 but still no copy back. Without a separate `saved` it is 101 / 124 again, so
   the second pointer is real.
 
+### FadingParticleGroup_Spawn (src/fn/sub_08015F60.c, 08015F60): deferred
+
+Draft: `notes/phase3-drafts/field-effects/FadingParticleGroup_Spawn.c` (57 ROM / 59 draft; with
+the two pins simply removed it is 64 / 66). The random read goes through
+PARTICLE_RANDOM_READ_SAMPLE (shared header), as in ParticleRandom_ReadSample. Open: the table
+(ROM r6) loses to `rng` (3401 vs 2975; both are REG_EQUIV constants with doubled live
+lengths; `AGBCC_PRI=table:+427` gives 43 / 45), and the sine table pointer wants r2
+(`AGBCC_FORCE=sine:2` gives 43 / 43). Moving the `rng` set, or dropping `rng` for the header's
+ReadSample/ReadDirectSample, is no better.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
