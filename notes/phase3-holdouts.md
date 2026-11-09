@@ -534,6 +534,21 @@ with center (r8), and keeps a spill slot (sp #0xc against #8). `AGBCC_PRI=positi
 gets to 55 / 55. Next: find which draws use the relative read (it decides origin's live
 range), then the position/slot order.
 
+### ContactSwarm_UpdateTracking (src/fn/sub_08044290.c, 08044290): deferred
+
+Draft: `notes/phase3-drafts/actors/ContactSwarm_UpdateTracking.c` (25 / 27, the pinned file
+with plain `jitter = *(const u16 *)(RANDOM_TABLE_ADDR + i * 2) & 15`). The pinned file's
+single pin (`mask` in r2) is what keeps the jitter's `movs r2, #0xf` fresh. Without it, cse
+pass 1 replaces that 15 with the pseudo that `stateFrame & 15` / `index &= 15` set in the first
+block. Its path runs from there with the phase block skipped (AROUND, cse.c
+cse_end_of_basic_block), the Collider block next, then the `blo` not taken. The pseudo then
+crosses three calls and takes r8, so the prologue and everything after differ. A path break
+needs a label with a use inside the phase block (the scan stops at the join) or a second jump to
+the join; the ROM's phase block has neither. Tried: the shift form `(x << 28) >> 28` (combine
+keeps the shifts, 2 / 2), `% 16`, ParticleRandom_ReadSample (do/while), and swapping the
+frame test's arms (worse). Next: a mask whose bits combine narrows to 15 through nonzero_bits
+(the 15 would be a new const after cse).
+
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 
 ### SceneGrid_ScanColumns (src/fn/sub_0806E7CC.c, 0806E7CC): deferred
