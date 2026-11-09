@@ -190,6 +190,7 @@ async function poll() {
   if (document.activeElement !== $('suboff') && st.offset != null) { $('suboff').value = st.offset; $('suboffv').textContent = st.offset + ' px'; }
   renderNow(d, st);
   const mapNote = st.map && noteOf('map', st.map)?.label;
+  pageTitle(st.scene == null ? '' : sceneWhere(st.scene)?.text || 'scene ' + st.scene, 'Live');
   $('game').innerHTML = [
     ['Map', st.map ? `${peekLink(gfxHref('map', st.map), esc(st.map))}${mapNote ? ` · ${esc(mapNote)}` : ''}` : '—'],
     ['Scene', st.scene == null ? '—' : sceneWhere(st.scene) ? `${st.scene} · ${peekLink(sceneWhere(st.scene).href, esc(sceneWhere(st.scene).text))}` : st.scene],
