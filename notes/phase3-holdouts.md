@@ -631,3 +631,15 @@ it at least 8 refs over 126 insns. Things that changed nothing or made it worse:
 - assigning source late.
 Next: look for a local pseudo that takes r8 before global alloc (pass 0 reuses registers already
 in use, README fact 13), so that source picks r8 without being last.
+
+### PlayerContact_ApplyResponse (sub_0815E1F0), 1 pin and 1 operand barrier kept
+Draft: notes/phase3-drafts/monsters-bosses/PlayerContact_ApplyResponse.c (13 ROM / 22 draft differ).
+In the 0x80000 contact branch the ROM computes `r3 = power + 60` and `gEngineFlags & 0x1000` and
+uses neither, then calls Player_RequestTimedReset(p, power + 60). The flags test is the fact-57
+pattern: an if whose two identical arms jump2 merged. The draft's two arms (each a call plus the
+positionResetCounter store) differ after reload only in the register the 0x4DA offset gets (r2
+vs r4, reload rotation), so cross-jumping merges just the store. The dead `duration` set in r3
+is still unexplained: every arm pairing of `duration` and `power + 60` scores worse. So does a
+DEBUG_PRINT body, which flow deletes together with the test.
+Next: find a duration use that survives flow and goes away after reload (a no-op move as in
+fact 81, or a REG_EQUIV substitution), then fix the rotation with `spill`.
