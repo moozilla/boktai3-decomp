@@ -268,6 +268,20 @@ main's 3 pins and 3 barriers came out). It has no pins and no barriers.
   Reload's cse would copy r4 only within one block, so look for C that keeps 0x40C in name's
   block, or for a PRE copy placed after name's set (pre_optimal there).
 
+### TextWindow_Destroy (08033778, src/fn/sub_08033778.c)
+
+Draft: `notes/phase3-menus-link/TextWindow_Destroy.c` (3 ROM / 5 draft, no pins or barriers).
+It reads `next = w->next; nextSlot = &w->next;` (the ROM's `adds r3, r0, #0` copy), and both arms
+end in `prevSlot = &w->previous;`. jump2 cross-jumps the arms' identical `prevSlot = temp` copies
+into the join, which gives the ROM's `adds r2, r1, #0` there.
+* Left: in the `next` arm, local-alloc ties the `w + 456` temp to the dying 456 constant (r0);
+  the ROM keeps the temp in r1, so its copy matches the other arm's and merges. `AGBCC_NOTIE=87`
+  matches.
+* Tried: natural `w->next->previous = w->previous` arms (13-16 differences); prevSlot set first
+  in each arm (9); a global prevSlot set directly in arm 1 plus a `last` copy at the join
+  (6, next in r1 vs r2; `AGBCC_FORCE=next:2` gives 4); `last` copies (cprop/cse fold them).
+* Next: C that makes the arm-1 temp global or keeps the constant alive past the add.
+
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
 tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
