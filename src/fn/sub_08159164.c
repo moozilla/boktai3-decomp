@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
@@ -16,18 +15,16 @@ static inline u32 Bonus(struct Player *p, u32 mask)
 static inline u32 Both(struct Player *p)
 {
     u32 *field;
-    register u32 bits asm("r0");
+    u32 bits;
     u32 value;
     if (!p)
         return 1;
     field = &p->statBonusFlags;
     bits = 0x8000;
     value = *field;
-    bits &= value;
-    if (!bits)
+    if (!(bits & value))
         return 0;
-    bits = 0x10000;
-    if (!(value & bits))
+    if (!(value & 0x10000))
         return 0;
     return 1;
 }

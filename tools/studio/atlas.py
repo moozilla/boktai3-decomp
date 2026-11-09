@@ -52,7 +52,7 @@ INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "data/sprite_palettes.csv", "data/labels/areas.csv", "data/labels/scenes.csv",
           "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "tools/assets/gclroles.py", "gcl/names/chara.csv",
           "gcl/names/files.csv", "symbols/functions.csv", "symbols/progress_subsystems.csv",
-          "symbols/progress_categories.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
+          "symbols/progress_categories.csv", "tools/studio/atlas.py", "tools/studio/places.py", "tools/assets/actors.py",
           "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py",
           "tools/assets/cutscenes.py", "tools/mgba/scenes.py", "tools/assets/gclfiles.py",
           "tools/assets/areas.py", "tools/assets/stages.py", "tools/assets/story.py",
@@ -147,10 +147,14 @@ def notes():
     return out
 
 
-def location(place):
-    """("Ancient Tree", "Side room") from "Ancient Tree (side room)"."""
-    m = re.match(r"(.+?)(?: \((.+)\)| / (.+)| (route transition.*))?$", place)
-    loc, sub = m.group(1).strip(), next((g for g in m.groups()[1:] if g), "")
+def location(place, _cache={}):
+    """("Ancient Tree", "Side room") from "Ancient Tree (side room)": the
+    place World uses (tools/studio/places.py) and the rest, capitalized."""
+    if not _cache:
+        import places
+        rows = csv.DictReader(open(os.path.join(ROOT, "data", "labels", "areas.csv"), encoding="utf-8"))
+        _cache.update(places.split([r["place"] for r in rows]))
+    loc, sub = _cache.get(place) or (place, "")
     return loc, (sub[:1].upper() + sub[1:]) if sub else "Main area"
 
 
@@ -334,7 +338,8 @@ def build():
         row = area_rows.get(i, {})
         order = int(row.get("story_order") or 0)
         place = row.get("place") or ar.get("label") or f"Area {i}"
-        loc, short = location(place)
+        # unlabeled areas share one group, as on the World page
+        loc, short = location(place) if row.get("place") or ar.get("label") else ("Unlabeled areas", place)
         node_rank["Places/" + loc] = min(node_rank.get("Places/" + loc, 999), order or 900)
         add(f"area:{i}", "Places/" + loc, kind="area", key=str(i), title=place, short=short, location=loc, order=i,
             confidence=row.get("confidence", ""), scenes=[f"scene:{s}" for s in ar["scenes"]], maps=ar.get("maps", []),
@@ -602,7 +607,8 @@ def build():
     T = tilesets.load()
     for t in T["tilesets"]:
         place = t["areas"][0]["place"] if t["areas"] else ""
-        loc = location(place)[0] if place else ("Not loaded by a scene" if t["maps"] else "Not loaded by a script")
+        loc = ("Unlabeled areas" if re.fullmatch(r"Area \d+", place) else location(place)[0]) if place else (
+            "Not loaded by a scene" if t["maps"] else "Not loaded by a script")
         node_rank.setdefault("Tiles/Tilesets/" + loc, node_rank.get("Places/" + loc, 900))
         add(f"tileset:{t['id']}", "Tiles/Tilesets/" + loc, kind="tileset", key=t["id"], order=t["order"],
             title=f"Tileset {t['id']}", place=place, tiles=t["tiles"], new_count=t["new_count"],

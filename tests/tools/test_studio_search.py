@@ -21,7 +21,8 @@ CODE = {'categories': [{'name': 'Monsters', 'units': [{'name': 'Ghoul', 'functio
 
 class SearchTests(unittest.TestCase):
     def setUp(self):
-        for name, value in (('_atlas', lambda: ATLAS), ('_code', lambda: CODE), ('_procs', lambda: {12: 'spawn_ghoul'})):
+        for name, value in (('_atlas', lambda: ATLAS), ('_code', lambda: CODE), ('_procs', lambda: {12: 'spawn_ghoul'}),
+                            ('_places', lambda: [{'name': 'Ancient Tree', 'areas': [4, 5], 'scenes': 14}])):
             context = patch.object(search, name, value)
             context.start()
             self.addCleanup(context.stop)
@@ -38,6 +39,11 @@ class SearchTests(unittest.TestCase):
     def test_address_and_other_fields(self):
         self.assertEqual(search.search('0x0808e3')[0]['url'], '/code#0808E300')
         self.assertEqual(search.search('player_create')[0]['url'], '/atlas#actor:F5EB')
+
+    def test_places_link_to_the_world_view(self):
+        hit = search.search('ancient')[0]
+        self.assertEqual(hit, {'kind': 'place', 'title': 'Ancient Tree', 'sub': '2 areas · 14 scenes',
+                               'url': '/world#place=Ancient%20Tree'})
 
     def test_text_bank(self):
         strings = [{'id': 7, 'text': 'グールだ'}, {'id': 8, 'text': 'ほかの'}]
