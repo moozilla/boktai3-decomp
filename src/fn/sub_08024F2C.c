@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
@@ -46,10 +45,15 @@ static inline int chooseMasked(u32 mode, u32 mask, int normal, int alternate)
         result = alternate;
     return result;
 }
+static inline void startEight(ActorAnimation *p, ActorAnimation *a, u32 mode, int variant)
+{
+    int sequence = chooseMasked(mode, variant, 38, 0);
+    SceneActors_StartEightDirectionAnimation(p, (u8 *)a + 0x240, (u8 *)a + 0x220, sequence, 2,
+                                             variant, 4);
+}
 void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
-    int eightMode;
     int variant;
     if (p->changed) {
         p->changed = 0;
@@ -94,32 +98,18 @@ void SceneActorAnimation_TransitionVariant(ActorAnimation *p, int tick)
     if (variant == 1) {
         int sequence;
         if (tick > 9) {
-            eightMode = p2->mode;
-            goto eightSelection;
+            startEight(p, p2, p2->mode, variant);
         } else {
-            register int offset asm("r1") = 0x344;
-            asm("" ::"r"(offset));
-            {
-                register s16 *scale asm("r0") = (s16 *)((u8 *)p2 + offset);
-                if (*scale > 319)
-                    sequence = chooseMasked(p2->mode, variant, 47, 9);
-                else
-                    sequence = chooseMasked(p2->mode, variant, 45, 7);
-            }
+            if (p2->scale > 319)
+                sequence = chooseMasked(p2->mode, variant, 47, 9);
+            else
+                sequence = chooseMasked(p2->mode, variant, 45, 7);
             SceneActors_StartDirectionalAnimation(p, (u8 *)p2 + 0x240, (u8 *)p2 + 0x220, sequence,
                                                   2, 1, 1);
         }
     } else if (p2->scale > 319) {
         int sequence;
-        eightMode = p2->mode;
-        variant = 1;
-    eightSelection:
-        sequence = chooseMasked(eightMode, variant, 38, 0);
-        {
-            int offset = 0x240;
-            SceneActors_StartEightDirectionAnimation(p, (u8 *)p2 + offset, (u8 *)p2 + 0x220,
-                                                     sequence, 2, variant, 4);
-        }
+        startEight(p, p2, p2->mode, 1);
     } else {
         int sequence;
         if (p2->scale > 79)
