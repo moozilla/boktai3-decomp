@@ -537,3 +537,13 @@ negation (11/11, shape 0) but puts both in one register. The original's C must h
 `neg` from cse (the pinned version did that with `asm("" : "+r"(offset))`). (2) The high-byte
 result and shape sit one register higher (r3/r4, ROM r2/r3), because offset's pseudo takes r2.
 Fixing (1) probably fixes (2).
+
+### sub_0813D834 (src/player_3.c, 0813D834): 2 pins, one cse follow from a match
+
+Draft `sub_0813D834.c` (no pins) is 17/15. Every difference comes from cse following the
+switch's `beq` into case 1 (`probe`: `CSE_NOFOLLOW=2` matches). cse then knows kind == 1 and folds
+the timers path's `kind * 2` into `ldr =0x532`, where the ROM computes `lsls r0, r3, #1` (kind
+kept in r3). cse_end_of_basic_block follows a jump only to a label with LABEL_NUSES == 1 that is
+preceded by a BARRIER, so the original's case 1 label must have had a second use or no barrier
+before it. No effect: an if/else chain (worse), `u32 kind`, computing from `inputKind`, a
+`goto` to the timers block from the flags test.
