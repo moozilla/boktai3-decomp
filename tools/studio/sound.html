@@ -170,7 +170,7 @@ function describeVoice(mem, addr) {
 async function showSong(s) {
   stop();
   CUR = s; renderList(); document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
-  document.title = 'Boktai 3 Sound · ' + titleOf(s);
+  pageTitle(titleOf(s), 'Sound');
   const test = positionsOf(s).map(p => `<span class="badge">${TEST[p.list]} No. ${p.no}</span>`).join(' ');
   if (s.empty) {
     $('view').innerHTML = `<div class="page"><h1 class="t">Empty slot ${s.n}</h1><div class="sub">Song table entry ${s.n} points at the shared 0-track header <span class="mono">${s.addr}</span> (${s.shared} entries do).</div>${test}</div>`;
@@ -281,7 +281,7 @@ addEventListener('resize', () => { ROLLBG = null; drawRoll(); });
 async function showVoicegroup(addr) {
   stop(); CUR = null; renderList();
   const vg = C.voicegroups.find(v => v.addr === addr);
-  document.title = 'Boktai 3 Sound · voicegroup ' + addr;
+  pageTitle('voicegroup ' + addr, 'Sound');
   $('view').innerHTML = `<div class="page"><h1 class="t">Voicegroup <span class="mono">${addr}</span></h1>
     <div class="sub">128 voices · used by ${vg ? vg.songs.length : 0} songs</div>
     <h3>Songs</h3><div class="chips">${(vg?.songs || []).map(n => `<a class="chip" href="#${n}">${esc(titleOf(SONGS[n]))} <small>${n}</small></a>`).join('') || '<span class="empty">None.</span>'}</div>
@@ -301,7 +301,7 @@ async function showVoicegroup(addr) {
 // ---------- a sample ----------
 async function showSample(addr) {
   stop(); CUR = null; renderList();
-  document.title = 'Boktai 3 Sound · sample ' + addr;
+  pageTitle('sample ' + addr, 'Sound');
   const sm = C.samples.find(x => x.addr === addr);
   const data = await fetch('/api/sound/sample/' + addr).then(r => r.json());
   const mem = new MP2K.Mem(data.chunks), w = MP2K.wave(mem, parseInt(addr, 16));

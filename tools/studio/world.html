@@ -324,6 +324,7 @@ function placeCard(p) {
 }
 function showWorld() {
   sel = null; selScene = null; selPlace = null; drawWorld();
+  pageTitle('', 'World');
   const q = $('q').value.trim().toUpperCase();
   const places = PLACES.filter(p => !q || p.name.toUpperCase().includes(q) || p.areas.some(i => areaMatches(W.areas[i], q)));
   const loose = W.areas.filter(a => !a.place && (!q || areaMatches(a, q)));
@@ -338,6 +339,7 @@ function showWorld() {
 function showPlace(name) {
   const p = PLACES.find(x => x.name === name); if (!p) return showWorld();
   sel = null; selScene = null; selPlace = name;
+  pageTitle(name, 'World');
   if (p.areas.some(i => !pos[i])) { $('lonely').checked = true; relayout(); }
   drawWorld(); focusAreas(mainGroup(p.areas));
   const fam = Object.entries(p.enemies).sort((x, y) => y[1] - x[1]).map(([f, k]) => `${esc(f)} ×${k}`).join(', ');
@@ -365,6 +367,7 @@ function wireHover() {
 function showArea(n, scene) {
   const a = W.areas[n]; if (!a) return;
   sel = n; selScene = scene ?? null; selPlace = null;
+  pageTitle([a.place, a.detail].filter(Boolean).join(' · ') || a.label || 'Area ' + n, 'World');
   if (!pos[n]) relayout();  // a room without links is laid out once it is open
   drawWorld();
   if (!inView(n)) focusAreas(a.place ? mainGroup(PLACES.find(p => p.name === a.place).areas, n) : [n]);

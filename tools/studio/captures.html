@@ -99,6 +99,7 @@ $('showscenes').onchange = renderList;
 let insp = null;
 async function show(name) {
   sel = name;
+  pageTitle(name, 'Captures');
   document.querySelectorAll('.cap').forEach(d => d.classList.toggle('on', d.dataset.name === name));
   document.querySelector('.cap.on')?.scrollIntoView({ block: 'nearest' });
   const c = caps.find(x => x.name === name) || { name };

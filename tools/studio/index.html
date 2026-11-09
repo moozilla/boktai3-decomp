@@ -195,6 +195,7 @@ function select(id) {
   cur = id;
   const s = byId.get(id);
   $('title').textContent = `#${id}`;
+  pageTitle(`#${id}${fan[id] ? ' ' + fan[id].replace(/\s+/g, ' ').trim().slice(0, 40) : ''}`, 'Text');
   $('sub').textContent = s.edited ? 'edited' : '';
   $('orig').textContent = original[id] ?? '';
   $('fan').textContent = fan[id] ?? '(no translation)';

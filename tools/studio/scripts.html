@@ -141,6 +141,7 @@ async function showFile(fid) {
   if (F.length) renderSide();
   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
   const f = F.find(x => x.id === fid), v = $('view');
+  pageTitle(f ? fileTitle(f) : fid, 'Scripts');
   if (!f) { v.innerHTML = `<div class="empty">No file ${esc(fid)}.</div>`; return; }
   const d = await fetch(`/api/file/${fid}${inline ? '/inline' : ''}${readable ? '' : '/raw'}${english ? '/en' : ''}`).then(r => r.json());
   const sc = f.entry ? scenes[f.entry] : null;
@@ -244,6 +245,7 @@ async function show(id) {
   const spawns = {};
   for (const s of d.spawns) (spawns[s.key] ||= { ...s, n: 0, args: [] }).n++, s.arg && spawns[s.key].args.push(s.arg);
   lastD = d;
+  pageTitle(procNames[id] || 'proc ' + id, 'Scripts');
   v.innerHTML = `<h2>Procedure ${id}${procNames[id] ? ' · <code>' + esc(procNames[id]) + '</code>' : ''}${d.scene ? ' · scene entry' : ''}</h2>
     <div class="meta">${d.file ? `in file <a href="#file=${d.file}">${esc(file?.title || d.file)}</a>${where ? ' (' + peekLink(where.href, esc(where.text)) + ')' : ''} · ` : ''}flag ${d.flag} · ${d.lines.length} lines · printed as <code>proc ${id - 1}</code> by <code>gcx.py dis</code>${d.scene && sc?.map ? ` · loads map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${d.scene && sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(id).padStart(4, '0'), 'stage survey capture') : ''}</div>
     <div id="ned"></div>

@@ -62,6 +62,12 @@ function markNav() {
   }
 }
 window.addEventListener('hashchange', () => { if (location.pathname === '/gfx') markNav(); });
+// Every page's title has one form, the thing shown first so tabs stay apart:
+// "Ghoul · Boktai 3 Browse", or "Boktai 3 Browse" for the view itself.
+function pageTitle(thing, view) {
+  view ||= document.title.replace(/^.* · /, '').replace(/^Boktai 3 /, '') || 'Studio';
+  document.title = (thing ? thing + ' · ' : '') + 'Boktai 3 ' + view;
+}
 
 // ---------- search (⌘K on every page: tools/studio/search.py) ----------
 let SRCH = { hits: [], i: 0, seq: 0 };

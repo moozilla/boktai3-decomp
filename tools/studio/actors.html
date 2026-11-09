@@ -136,6 +136,7 @@ async function show(key) {
   if (key === 'player-animations') return showPlayerAnimations();
   if (navKey === 'tables') return showNumericTables(...key.split(':').slice(1));
   const a = byKey[key], v = $('view');
+  pageTitle(a ? title(a) : key, 'Actors');
   if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
   // one page per object, Browse's (tools/studio/atlas.html), shown here beside the registry list
   v.classList.add('frame');
