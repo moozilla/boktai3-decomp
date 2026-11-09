@@ -1,6 +1,7 @@
 #include "render.h"
 // MATCHING_CONCESSION: register-pinning
 #include "background_flash.h"
+#include "monster_particle_random.h"
 void BackgroundFlash_UpdateScrolling(struct BackgroundFlashController *controller)
 {
     s32 cameraX = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;
@@ -8,23 +9,9 @@ void BackgroundFlash_UpdateScrolling(struct BackgroundFlashController *controlle
     register u32 frame asm("r1");
     s32 x, y, tileX, tileY;
     if (!controller->retargetTimer) {
-        const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
-        register u32 index asm("r0");
-        u32 mask;
-        u32 sample;
-        index = gRandomIndex + 1;
-        mask = 1023;
-        index &= mask;
-        sample = table[index];
-        sample &= 127;
-        sample += 128;
-        controller->retargetTimer = sample;
-        index = (index + 1) & mask;
-        gRandomIndex = index;
-        index = table[index];
-        index &= 7;
-        index -= 1;
-        controller->targetSpeed = index;
+        const u16 *table = gRandomTable;
+        controller->retargetTimer = (ParticleRandom_ReadDirectSample(table) & 127) + 128;
+        controller->targetSpeed = (ParticleRandom_ReadDirectSample(table) & 7) - 1;
     } else {
         --controller->retargetTimer;
     }
