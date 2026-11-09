@@ -213,7 +213,24 @@ def text_uses(n):
             for t in set(p["texts"]):
                 uses.setdefault(t, []).append({"id": cid, "name": names.get(cid) or ""})
         _TEXT_USES.update(uses or {-1: []})
-    return {"procs": _TEXT_USES.get(n, [])}
+    procs = [dict(p) for p in _TEXT_USES.get(n, [])]
+    if procs:
+        # where each one runs: its scene file's entry scene, placed in the world
+        import gclfiles
+        entry = {c: f["entry"] for f in gclfiles.files() if f["kind"] == "scene" for c in f["procs"]}
+        w = world()
+        for p in procs:
+            sc = entry.get(p["id"])
+            a = w["areas"][w["scene_area"][sc]] if sc is not None and sc in w["scene_area"] else None
+            label = (w["scenes"].get(sc) or {}).get("label") if sc is not None else None
+            place = a["place"] if a else None
+            if label:  # the scene's own label, led by its place unless it already names it
+                where = label if not place or label.startswith(place) else f"{place} · {label}"
+            else:
+                where = " · ".join(x for x in (place, a["detail"]) if x) if place else None
+            p["scene"], p["place"] = sc, where
+            p["area"] = a["area"] if a else None
+    return {"procs": procs}
 
 
 def hp_data(h):
