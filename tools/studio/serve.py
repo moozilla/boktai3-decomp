@@ -345,9 +345,10 @@ def write_string(sid, text):
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
-    def send(self, code, body, ctype="application/json", etag=None):
+    def send(self, code, body, ctype="application/json", etag=None, max_age=600):
         """etag: the body is a file that rarely changes; the browser may keep it
-        a few minutes and then revalidate it (304) instead of downloading it."""
+        max_age seconds (0: always ask) and then revalidate it (304) instead of
+        downloading it again."""
         if etag and self.headers.get("If-None-Match") == etag:
             self.status, self.size = 304, 0
             self.send_response(304)
@@ -363,7 +364,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
         if etag:
-            self.send_header("Cache-Control", "max-age=600")
+            self.send_header("Cache-Control", f"max-age={max_age}" if max_age else "no-cache")
             self.send_header("ETag", etag)
         else:
             self.send_header("Cache-Control", "no-store")
@@ -420,8 +421,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "atlas.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/atlas":
             import atlas
-            ix = atlas.load()
-            self.send(200, {"tree": ix["tree"], "entities": ix["entities"]})
+            ix = atlas.load()  # rebuilt when an input changes; the tag is the cache file's
+            st = os.stat(atlas.CACHE) if os.path.exists(atlas.CACHE) else None
+            tag = f'"{st.st_mtime_ns:x}-{st.st_size:x}"' if st else None
+            self.send(200, b"" if tag and self.headers.get("If-None-Match") == tag else {"tree": ix["tree"], "entities": ix["entities"]},
+                      etag=tag, max_age=0)
         elif self.path in ("/rom", "/rom.html"):
             self.send(200, open(os.path.join(HERE, "rom.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/rommap":
