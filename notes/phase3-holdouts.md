@@ -87,6 +87,30 @@ giv of i (`view = &manager->effects[i]`) delays the reversal to pass 2 and fixes
 but then the giv's increment lands before i's increment, after `p++`. Next idea: a counter that
 check_dbra_loop can only reverse in pass 2 while view stays a giv of p.
 
+### ScanlinePresentation_UpdateNoise (src/scanline_presentation.c, 0800D874): deferred
+
+Draft: `notes/phase3-drafts/field-effects/ScanlinePresentation_UpdateNoise.c`. It is the plain
+three-loop form, with `amplitude = &p->amplitude; delta = &p->delta;` after `i = p->start`, the
+ROM's order. Score 75 ROM / 71 draft. With `AGBCC_FORCE=<loop 1's zero>:12` it is 31 / 27.
+Diagnosis (fact 92):
+* In the ROM, p is in r4 because its preferred class is LO_REGS. In the draft it is STACK_REG
+  (`AGBCC_REGCLASS_TRACE=22`: LO_REGS 26 against STACK_REG 24), so global alloc takes p from
+  the all-register alternate class, and pass 0 picks ip. That knocks loop 1's zero (the ROM's
+  ip) and everything after it out of place.
+* The ROM's adds of p are the draft's plus one: the noise loop's `p + 726` (p->amplitude),
+  hoisted into ip at 0x68. In the draft, cse2 rewrites that hoisted add into a copy of
+  `amplitude`, so p loses an odd-offset vote.
+* With the pointers set at the top of the function (before loop 1), cse2 doesn't merge them,
+  and p is LO_REGS (43 / 45). But the ROM computes them after `i = p->start`.
+* The ROM's 726 constants are single-use (`ldr r1, =0x2D6; adds r1, r1, r4`, reload's
+  pattern). The draft shares one constant pseudo (`adds r7, r4, r3`).
+* The pinned version's per-iteration `end = p + endOffset` also gets the ROM's in-loop
+  `p + r8` and the r8 constant.
+
+Next idea: C in which amplitude's address and the loop's `p->amplitude` don't share a cse
+equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
+add survives.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
@@ -188,6 +212,39 @@ matches, so this is the only decision left.
   ip, but the vertical read then uses the top's symbol register r1 instead of the ip copy (2/2).
 * Also tried: 128 combinations of held vs gPadState for each of the nine pad reads, re-setting
   `held` between the tests, and inline vertical/horizontal helpers.
+
+### ResultGame_UpdatePlayerMarker (0801C6CC, src/fn/sub_0801C6CC.c)
+
+Draft: `notes/phase3-menus-link/ResultGame_UpdatePlayerMarker.c` (11 ROM / 11 draft, only key
+and counter swapping r2/r3). The draft keeps velocity set in each arm, `u8 *counter` and
+`u8 *table = gUnk_0824DB64;` before the index read (that order gives the ROM's load order), and
+no asm.
+* key (`1 & gPadState[1]`, also the zero for the else-arm stores) must be allocated before
+  counter, whose priority is 5000 (4 refs, 16 insns). key has 7 refs, but its life is
+  24 -> 50. regmove ties the and to the constant 1's pseudo, which carries a REG_EQUIV, so
+  update_equiv_regs doubles it (fact 20's first-set doubling), and key's priority drops to 2800.
+  Without the doubling it would be about 5600. `AGBCC_PRI=key:+2201` matches.
+* Tried: `x & 1` vs `1 & x`, u8/u16/s32 key, no key variable (literal zeros), `p[0xb2]`
+  instead of counter in the compare and/or the increment, and `AGBCC_NOTIE=22` (r3 still).
+* Next: a spelling that keeps key from inheriting the constant's REG_EQUIV set, or that adds
+  2 refs to key.
+
+### sub_0803198C (0803198C, src/fn/sub_0803198C.c): message window open
+
+Draft: `notes/phase3-menus-link/sub_0803198C.c` (2 ROM / 2 draft: the callback constant in r0
+instead of r1). It has no pin; it keeps `(void)*(volatile u8 *)&p->mode;`.
+* The ROM keeps a dead `ldrb` of p->mode (0x182) before ScriptProc_Start. Only a volatile read
+  survives flow, so the original had volatile there too. A `vu8 mode` field changes the earlier
+  `p->mode = 0` store (it adds a load), so the cast stays local to the read.
+* `ldr r1, =MessageWindow_ClearTextCompletion; str r1, [r4]`: pseudo 261 is local to block 17,
+  born after the `strh` that kills r0 (0xFFFF) and r1 (the wait address). It has no copy
+  suggestion, so find_free_reg takes r0. `AGBCC_FORCE=261:1` matches. Spill rules out a reload
+  (the reload rotation goes r2 -> r3 across it).
+* Tried: a direct `p->fnDone =` store (worse: the fnSlot hoist is what gives the ROM's `r4`),
+  the store before `p->wait`, `p->wait = -1`, a callback local set before the if or in each arm
+  (global, gets r6), casts and `fnSlot[0]`, a `vu8` field with a bare `p->mode;`.
+* Next: find what makes r0 busy (or suggests r1) across the store in the original block, e.g. a
+  value that lives from the `strh` past the store.
 
 ### Inline `do { ... } while (0)` fences (for phase 4)
 

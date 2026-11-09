@@ -28,6 +28,13 @@ class EquivLifeTest(unittest.TestCase):
     def test_one_equiv_set_doubles(self):
         self.assertIn("always holds a constant", self.note(1, 96))
 
+    def test_a_tied_in_constant_doubles_the_merged_length(self):
+        with tempfile.TemporaryDirectory() as wd:
+            Path(wd, "u.i.flow").write_text(FLOW)
+            Path(wd, "u.i.lreg").write_text("(insn 17 13 18 (set (reg/v:SI 70)\n        (const_int 1)) 1 (nil)\n    (nil))\n")
+            note = scope.life_note(wd, 70, 2 * 49)
+        self.assertIn("tie merged a constant", note)
+
     def test_other_changes_stay_regmove(self):
         self.assertIn("regmove", self.note(2, 100))
 

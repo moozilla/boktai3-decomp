@@ -1,7 +1,7 @@
 """One search over everything the Studio knows (the ⌘K palette on every page,
 tools/studio/common.js): the game index (tools/studio/atlas.py: monsters,
-characters, places, items, sprites, songs, scripts ...), code (functions, units
-and RAM objects, tools/studio/codemap.py), named script procedures and the text
+characters, places, items, sprites, songs, scripts ...), code (functions, units,
+struct types and RAM objects, tools/studio/codemap.py), named script procedures and the text
 bank. Each hit links to the page that shows it.
 
   python3 tools/studio/search.py QUERY
@@ -22,7 +22,7 @@ ATLAS_KIND = {"package": "sprite", "actor": "object", "monster": "monster", "cha
 # how a tie between equally good matches is broken: the things people look for first
 RANK = {"monster": 9, "character": 8, "object": 8, "item": 7, "area": 6, "story": 5, "scene": 5, "cutscene": 4,
         "sprite": 4, "function": 4, "song": 3, "script": 3, "procedure": 3, "tileset": 2, "map tiles": 2,
-        "RAM": 3, "unit": 3, "subsystem": 1, "text": 1}
+        "RAM": 3, "unit": 3, "type": 3, "subsystem": 1, "text": 1}
 
 
 def score(q, title, *others):
@@ -101,6 +101,8 @@ def search(q, strings=None, english=None, limit=50):
                     add(s, "function", name, u["name"], "/code#" + addr)
         for r in code["ram"]:
             add(score(q, r["name"], r["addr"]), "RAM", r["name"], r["addr"], "/code#ram:" + r["name"])
+        for t in code.get("types", []):
+            add(score(q, t), "type", t, "struct", "/code#type:" + t)
     for pid, name in _procs().items():
         add(score(q, name, str(pid)), "procedure", name, f"proc {pid}", f"/scripts#{pid}")
     if strings and len(q) >= 2:
@@ -108,7 +110,7 @@ def search(q, strings=None, english=None, limit=50):
         for s in strings:
             en = english.get(s["id"]) or english.get(str(s["id"])) or ""
             if q in s["text"].lower() or q in en.lower() or q == str(s["id"]):
-                hits.append((30, 0, "text", en or s["text"], f"#{s['id']}" + (f" · {s['text']}" if en else ""), f"/#{s['id']}"))
+                hits.append((30, 0, "text", en or s["text"], f"#{s['id']}" + (f" · {s['text']}" if en else ""), f"/text#{s['id']}"))
                 n += 1
                 if n >= 15:
                     break

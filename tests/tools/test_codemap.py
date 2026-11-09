@@ -108,6 +108,56 @@ class IndexTests(unittest.TestCase):
         self.assertTrue(any('gen/code.s' in m for m in ix['missing']))
 
 
+class StaleIndexTests(unittest.TestCase):
+    def test_a_stale_index_is_served_while_the_new_one_builds(self):
+        old, started = {'functions': {}}, []
+        with patch.dict(codemap._INDEX, {'mtime': 1.0, 'data': old, 'checked': 0}), \
+                patch.object(codemap, '_newest', return_value=2.0), \
+                patch.object(codemap, '_rebuild_in_background', side_effect=started.append):
+            self.assertIs(codemap.load(), old)
+        self.assertEqual(started, [2.0])
+
+    def test_wait_blocks_for_the_new_index(self):
+        new = {'functions': {'x': 1}}
+        with patch.dict(codemap._INDEX, {'mtime': 1.0, 'data': {}, 'checked': 0}), \
+                patch.object(codemap, '_newest', return_value=2.0), \
+                patch.object(codemap, '_rebuild', return_value=new):
+            self.assertIs(codemap.load(wait=True), new)
+
+
+class TypeTests(unittest.TestCase):
+    def test_definitions_comments_and_typedefs(self):
+        with tempfile.TemporaryDirectory() as d:
+            h = Path(d) / 'foo.h'
+            h.write_text('#pragma once\n// A foo.\n// Two lines.\nstruct Foo {\n    u8 a;\n    union {\n        u16 b;\n    } c;\n};\n'
+                         'typedef struct Bar {\n    int x;\n} BarT;\ntypedef struct Foo FooT;\n')
+            with patch.object(codemap, '_headers', lambda: [str(h)]), patch.dict(codemap._HELPERS, {}, clear=True):
+                t = codemap.types()
+        self.assertEqual(sorted(t['defs']), ['Bar', 'Foo'])
+        self.assertEqual(t['defs']['Foo']['line'], 4)
+        self.assertTrue(t['defs']['Foo']['text'].startswith('// A foo.\n// Two lines.\nstruct Foo {'))
+        self.assertTrue(t['defs']['Foo']['text'].endswith('} c;\n};'))
+        self.assertEqual(t['aliases'], {'BarT': 'Bar', 'FooT': 'Foo'})
+
+
+class IntentionalAsmTests(unittest.TestCase):
+    def test_hand_written_units_get_their_own_category(self):
+        tree = {'files': [], 'categories': [{'name': 'Libraries', 'units': [
+            {'name': 'MP2K (m4a)', 'functions': [['m4aSoundInit', '0822F000', 64, 100, 0, -2]]}]}]}
+        report = {'units': [
+            {'name': 'Libraries/MP2K (m4a)', 'metadata': {'progress_categories': ['libraries']},
+             'functions': [{'name': 'm4aSoundInit', 'size': '64', 'fuzzy_match_percent': 100,
+                            'metadata': {'virtual_address': str(0x0822F000)}}]},
+            {'name': 'Libraries/MP2K (m4a) (assembly)', 'metadata': {'progress_categories': ['intentional_asm']},
+             'functions': [{'name': 'SoundMain', 'size': '1058', 'fuzzy_match_percent': 0,
+                            'metadata': {'virtual_address': str(0x0822F1C4)}}]}]}
+        cats = codemap._with_intentional_asm(tree, report)['categories']
+        self.assertEqual([c['name'] for c in cats], ['Libraries', 'Intentional assembly'])
+        self.assertEqual(cats[1]['units'], [{'name': 'MP2K (m4a) (assembly)',
+                                             'functions': [['SoundMain', '0822F1C4', 1058, 0, 0, -2]]}])
+        self.assertIs(codemap._with_intentional_asm(tree, {}), tree)
+
+
 class CommittedProgressTests(unittest.TestCase):
     def test_fallback_reads_progress_json(self):
         tree, report, kinds = codemap._committed_progress()

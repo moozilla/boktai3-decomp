@@ -14,7 +14,7 @@ const NAV = [
   ['Browse', '/atlas', 'Everything in the game as one tree'],
   ['Code', '/code', 'Every function: C, disassembly, concessions, cross-references'],
   ['ROM', '/rom', 'The ROM as a treemap'],
-  ['Text', '/', 'Every string, with the fan translation'],
+  ['Text', '/text', 'Every string, with the fan translation'],
   ['Scripts', '/scripts', 'Script procedures and files (GCL)'],
   ['Actors', '/actors', 'Objects scripts create'],
   ['Graphics', [['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Palettes', '/gfx#palettes'], ['Sprite palettes', '/gfx#pool'],
@@ -24,7 +24,7 @@ const NAV = [
   ['Live', [['Live', '/live'], ['Captures', '/captures']]],
 ];
 const navHere = () => {
-  const here = location.pathname === '/index.html' ? '/' : location.pathname.replace(/\.html$/, '');
+  const here = ['/', '/index.html'].includes(location.pathname) ? '/text' : location.pathname.replace(/\.html$/, '');
   const tab = (location.hash.slice(1) || '').split('/')[0] || (here === '/gfx' ? 'sprites' : '');
   return u => { const [p, t] = u.split('#'); return p === here && (!t || t === tab); };
 };
@@ -53,7 +53,14 @@ function studioHeader(tools = '') {
 function closeMenus() { document.querySelectorAll('#top .navgrp.open').forEach(g => g.classList.remove('open')); }
 document.addEventListener('click', e => { if (!e.target.closest('#top .navgrp')) closeMenus(); });
 // pages that switch views by hash (gfx.html) call this after each switch
-function markNav() { const n = document.querySelector('#top nav'); if (n) n.innerHTML = navHTML(); }
+function markNav() {
+  const n = document.querySelector('#top nav');
+  if (n) n.innerHTML = navHTML();
+  if (location.pathname === '/gfx') {  // one page, several views: the title names the one shown
+    const on = navHere(), cur = NAV.flatMap(([, u]) => Array.isArray(u) ? u : []).find(([, x]) => on(x));
+    if (cur) document.title = 'Boktai 3 ' + cur[0];
+  }
+}
 window.addEventListener('hashchange', () => { if (location.pathname === '/gfx') markNav(); });
 
 // ---------- search (⌘K on every page: tools/studio/search.py) ----------
@@ -164,7 +171,7 @@ const peekLink = (href, text) => `<a href="${href}" data-peek>${text}</a>`;
 const codeHref = addr => '/code#' + ((parseInt(addr, 16) & ~1) >>> 0).toString(16).toUpperCase().padStart(8, '0');
 const codeLink = (addr, text) => peekLink(codeHref(addr), esc(text || addr));
 const procLink = (id, text) => peekLink('/scripts#' + id, esc(text || 'proc ' + id));
-const stringLink = (id, text) => peekLink('/#' + id, esc(text || '#' + id));
+const stringLink = (id, text) => peekLink('/text#' + id, esc(text || '#' + id));
 const actorLink = (key, text) => peekLink('/actors#' + key, esc(text || key));
 const gfxHref = (kind, hash, frame) => ({ spr: '/gfx#sprites/', big: '/gfx#big/', bigspr: '/gfx#big/', map: '/gfx#maps/', pal: '/gfx#palettes/' }[kind] || '/gfx#tiles/') + hash + (frame != null ? '/' + frame : '');
 

@@ -22,6 +22,9 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 button, input { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
 main { display: grid; grid-template-columns: 300px 1fr; height: calc(100vh - 53px); }
+/* ?embed=1&bare=1: one page without the tree, for views that show it beside their own list */
+body.bare main { grid-template-columns: 1fr; }
+body.bare #side { display: none; }
 #side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: var(--panel); }
 #side .tools { padding: 10px; border-bottom: 1px solid var(--line); }
 #side .tools input { width: 100%; }
@@ -51,11 +54,22 @@ h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
 .lede { font-size: 15px; margin: 12px 0 0; max-width: 760px; }
 .empty { color: var(--muted); }
 .mono, code { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+.gcl { margin: 4px 0 8px; }
+.gcl.alt { opacity: .8; }
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0 32px; }
 .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .chip { font-size: 12.5px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); white-space: nowrap; color: var(--ink); }
 a.chip:hover { border-color: var(--accent); text-decoration: none; }
 .chip small { color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 18px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 10px 14px; color: var(--ink); }
+a.stat:hover { border-color: var(--accent); text-decoration: none; }
+.stat b { display: block; font-size: 22px; font-weight: 650; }
+.stat span { color: var(--muted); font-size: 12.5px; }
+.views { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.view { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
+.view:hover { border-color: var(--accent); text-decoration: none; }
+.view small { color: var(--muted); font-size: 12px; line-height: 1.35; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .card { display: flex; flex-direction: column; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); min-height: 64px; }
 .card:hover { border-color: var(--accent); text-decoration: none; }
@@ -123,6 +137,7 @@ const ICON = { package: '▤', actor: '◆', monster: '☠', char: '☺', item: 
 const KIND = { package: 'sprite', actor: 'object', monster: 'monster', char: 'character', item: 'item', area: 'area', scene: 'scene', file: 'script', sprite: 'sprite', unit: 'code', tileset: 'tileset', bgtiles: 'map tiles', song: 'song', cut: 'cutscene', beat: 'story beat' };
 const href = id => '#' + id;
 const link = (id, text) => E[id] ? `<a href="${href(id)}">${esc(text ?? E[id].title)}</a>` : esc(text ?? id);
+if (new URLSearchParams(location.search).has('bare')) document.body.classList.add('bare');
 const chip = (id, text, extra = '') => E[id] ? `<a class="chip" href="${href(id)}">${esc(text ?? E[id].title)}${extra}</a>` : '';
 const label = e => e.short && e.kind === 'area' ? e.short : e.title;
 
@@ -206,6 +221,15 @@ function crumbs(path) {
   if (!path) return '';
   const parts = path.split('/');
   return `<div class="crumbs">${parts.map((p, i) => `<a href="#node:${esc(parts.slice(0, i + 1).join('/'))}">${esc(p)}</a>`).join(' › ')}</div>`;
+}
+// the original GCL name behind the registry key (gcl/names/chara.csv): the
+// best reading, how sure it is and why, and other names with the same hash
+function gclNames(e) {
+  const g = e.gcl || [];
+  const row = (x, alt) => `<div class="gcl${alt ? ' alt' : ''}"><b>${esc(x.name)}</b>${x.english ? ` <span class="muted">${esc(x.english)}</span>` : ''}
+    ${x.confidence ? badge(esc(x.confidence)) : ''}${alt ? ' <span class="muted">another name with the same hash</span>' : ''}${x.evidence ? `<div class="muted">${esc(x.evidence)}</div>` : ''}</div>`;
+  return `<h3>GCL name <span class="n">the 16-bit hash of the script's name for it, as EUC-JP</span></h3>
+    ${g.length ? g.map((x, i) => row(x, i > 0)).join('') : `<div class="empty">Not recovered yet for key <span class="mono">${esc(e.key)}</span> (<code>tools/assets/gclnames.py crack chara</code> lists leads).</div>`}`;
 }
 function head(e, sub = '', badges = []) {
   return `${crumbs(e.path || (E[e.area]?.path ? E[e.area].path + '/' + E[e.area].short : ''))}<h1 class="t">${esc(e.title)}</h1>${sub ? `<div class="sub">${sub}</div>` : ''}${badges.length ? `<div class="badges">${badges.join('')}</div>` : ''}`;
@@ -369,6 +393,9 @@ const PAGES = {
       ${resources(e)}
       <div class="grid2"><div><h3>Placed in <span class="n">${e.nscenes} scenes</span></h3>${placement(e)}</div>
       <div><h3>Created by <span class="n">${e.procs.length} procedures</span></h3>${e.procs.length ? `<div class="chips">${e.procs.map(p => `<a class="chip" href="/scripts#${p.id}" data-peek>${esc(p.name || 'proc ' + p.id)}</a>`).join('')}</div>` : '<div class="empty">No script creates it.</div>'}</div></div>
+      ${gclNames(e)}
+      ${e.command_tables?.length ? `<h3>Command tables <span class="n">${e.command_tables.length}</span></h3><div class="chips">${e.command_tables.map(t =>
+        `<a class="chip" href="/actors#commands:${t.table}" data-peek title="loaded by ${esc(t.in.join(', '))}">${esc(t.title)} <small class="mono">${t.table}</small></a>`).join('')}</div>` : ''}
       <h3>Code</h3><div class="muted" style="margin-bottom:8px">Entry ${codeLink(e.callback, e.fname)}${e.loader ? ` → ${codeLink(e.loader, e.loader_name)}` : ''}, and everything it calls or installs.</div><div id="code"></div>
       <h3>Notes</h3><div id="ned"></div></div>`;
   },
@@ -535,8 +562,47 @@ function route() {
   document.title = 'Boktai 3 ' + (e ? e.title : id.startsWith('node:') ? id.split('/').pop() : 'Browse');
   renderTree();
 }
+// The Studio's front page: what this is, the numbers, the game's tree and the other views.
+const VIEWS = [
+  ['Code', '/code', 'Every function: its C beside the disassembly, concessions left, what it calls and touches'],
+  ['Text', '/text', 'Every string with the fan translation, in the game font; build a mod ROM'],
+  ['Scripts', '/scripts', 'The scene scripts (Konami GCL) in a readable form, with recovered names'],
+  ['Sprites', '/gfx#sprites', 'Sprite packages and large sprites, every frame and animation'],
+  ['Maps', '/gfx#maps', 'Stages with doors, items, enemies and patrol paths'],
+  ['World', '/world', 'How the rooms connect, area by area'],
+  ['Sound', '/sound', 'Every song, played from the ROM\'s own sequences and samples'],
+  ['Live', '/live', 'The game running in mGBA, every sprite and text box matched to its resource'],
+  ['ROM', '/rom', 'The whole ROM as a treemap, by kind or by how well it is understood'],
+];
 function home() {
-  return `<div class="page"><h1 class="t">Boktai 3</h1><div class="cards" style="margin-top:16px">${T.map(n => folderCard(n.title)).join('')}</div></div>`;
+  const count = k => Object.values(E).filter(e => e.kind === k).length.toLocaleString();
+  setTimeout(homeStats, 0);
+  return `<div class="page">
+    <h1 class="t">Boktai 3 Studio</h1>
+    <p class="lede">Boktai 3 (<span lang="ja">新・ボクらの太陽 逆襲のサバタ</span>, Game Boy Advance, 2005), decompiled: the game's
+      characters, monsters, places, story, scripts, graphics, sound and code in one place. Start from a group below, or press
+      <span class="kbd">⌘K</span> to search everything. Links to other views open in a side panel.</p>
+    <div class="stats" id="hstats">
+      <div class="stat"><b>${count('beat')}</b><span>story beats</span></div>
+      <div class="stat"><b>${count('monster')}</b><span>monsters</span></div>
+      <div class="stat"><b>${count('scene')}</b><span>scenes in ${count('area')} areas</span></div>
+      <div class="stat"><b>${count('song')}</b><span>songs</span></div>
+      <div class="stat" id="hcode"><b>…</b><span>functions</span></div>
+    </div>
+    <h3>The game</h3>
+    <div class="cards">${T.map(n => folderCard(n.title)).join('')}</div>
+    <h3>Views</h3>
+    <div class="views">${VIEWS.map(([n, u, d]) => `<a class="view" href="${u}"><b>${n}</b><small>${d}</small></a>`).join('')}</div>
+  </div>`;
+}
+async function homeStats() {
+  const s = await fetch('/api/codemap/stats').then(r => r.ok ? r.json() : null).catch(() => null);
+  const el = $('hcode');
+  if (!el) return;
+  if (!s) { el.innerHTML = '<b>—</b><span>code index unavailable</span>'; return; }
+  const m = s.measures;
+  el.outerHTML = `<a class="stat" href="/code"><b>${Number(m.total_functions).toLocaleString()}</b><span>functions, all matching</span></a>
+    <a class="stat" href="/code"><b>${m.complete_code_percent.toFixed(1)}%</b><span>of code without concessions</span></a>`;
 }
 
 

@@ -32,6 +32,8 @@ main { display: grid; grid-template-columns: 300px 1fr; height: calc(100vh - 53p
 .row small { display: block; color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .row.special { font-weight: 500; color: var(--accent); }
 #view { overflow: auto; padding: 14px 20px 40px; min-width: 0; }
+#view.frame { padding: 0; overflow: hidden; }
+#view iframe.obj { display: block; width: 100%; height: 100%; border: 0; }
 h2 { font-size: 16px; margin: 0 0 4px; }
 h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; font-weight: 600; }
 .meta { color: var(--muted); font-size: 13px; }
@@ -117,13 +119,9 @@ function renderList() {
   }));
 }
 
-const sceneChip = s => {
-  const sc = scenes[s] || {};
-  return `<span class="chip">${sc.shot ? peekLink('/captures#scene_' + String(s).padStart(4, '0'), 'scene ' + s) : 'scene ' + s}${sc.map ? ' · ' + peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map)) : ''} · ${procLink(s, '▸')}</span>`;
-};
-
 async function show(key) {
   sel = key;
+  $('view').classList.remove('frame');
   const navKey = key.startsWith('commands:') ? 'commands' : key.startsWith('tables:') ? 'tables' : key;
   document.querySelectorAll('.row').forEach(d => d.classList.toggle('on', d.dataset.key === navKey));
   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
@@ -133,47 +131,11 @@ async function show(key) {
   if (navKey === 'tables') return showNumericTables(...key.split(':').slice(1));
   const a = byKey[key], v = $('view');
   if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
-  const names = a.names.map(n => `${stringLink(n.id)} ${esc(n.jp)}${en[n.id] ? ` <span class="cand">(${esc(en[n.id])})</span>` : ''}`).join('<br>');
-  const procs = a.procs, unreached = procs.length && !a.scenes.length;
-  const gcl = a.gcl.map((g, i) => `<div${i ? ' class="cand"' : ''}><b>${esc(g.name)}</b>${g.english ? ` <span class="cand">(${esc(g.english)})</span>` : ''} <span class="conf conf-${esc(g.confidence)}">${esc(g.confidence)}</span>${i ? ' <span class="cand">alternative with the same hash</span>' : ''}<div class="cand">${esc(g.evidence)}</div></div>`).join('');
-  v.innerHTML = `<h2></h2><div class="meta">Registry key <code>${a.key}</code>: the 16-bit hash of the original GCL name, hashed as EUC-JP (gcl/names/chara.csv)</div>
-    <div id="ned"></div>
-    <dl>
-      <dt>GCL name</dt><dd>${gcl || '<span class="empty">not recovered yet (<code>tools/assets/gclnames.py crack chara</code> lists leads)</span>'}</dd>
-      <dt>Callback</dt><dd>${codeLink(a.callback, a.callback_name)} <span class="mono meta">${a.callback}</span></dd>
-      <dt>Loader</dt><dd>${a.loader ? `${codeLink(a.loader, a.loader_name)} <span class="mono meta">${a.loader}</span> <span class="meta">(the function the callback hands its new actor to)</span>` : '<span class="empty">none (the callback does not allocate an actor and pass it on)</span>'}</dd>
-      <dt>Names</dt><dd>${names || '<span class="empty">no name from the game linked yet</span>'}${a.names.length ? `<div class="cand">Candidates from the monster list (string 9838 on), linked through the sprite by its look in captures (docs/ASSETS.md); not from the game's own index, which is not found yet.</div>` : ''}</dd>
-    </dl>
-    ${commandReferences(a)}
-    <h3>Sprites</h3>${a.sprites.length ? `<div class="sprites" id="sprites"></div><div class="meta" style="margin-top:6px">16-bit literals in the callback, the loader and their nearby callees that name a sprite package (CB05) or a large sprite (98F5).</div>` : '<div class="empty">No sprite named in the callback or loader.</div>'}
-    <h3>Created by scripts (${a.spawns} time${a.spawns === 1 ? '' : 's'}, ${procs.length} procedure${procs.length === 1 ? '' : 's'})</h3>
-    ${procs.length ? `<div class="chips">${procs.map(p => `<span class="chip">${procLink(p)}</span>`).join('')}</div>` : '<div class="empty">No script creates it (engine-only, or created by code).</div>'}
-    <h3>Scenes (${a.scenes.length})</h3>
-    ${a.scenes.length ? `<div class="chips">${a.scenes.map(sceneChip).join('')}</div><div class="meta" style="margin-top:6px">Scenes whose entry procedure reaches one of these procedures through calls.</div>`
-      : unreached ? '<div class="empty">None found: these procedures have no script callers (they are started by the engine or stage data, not by a call).</div>' : '<div class="empty">None.</div>'}`;
-  v.querySelector('h2').textContent = title(a);
-  $('ned').replaceWith(noteEditor('actor', a.key, () => { v.querySelector('h2').textContent = title(a); renderList(); }));
-  const box = $('sprites');
-  for (const s of a.sprites) {
-    const el = document.createElement('a'); el.className = 'spr'; el.href = gfxHref(s.kind, s.hash); el.dataset.peek = '';
-    el.innerHTML = `<div class="pic"></div><span class="mono">${s.hash}</span><small>${s.kind === 'big' ? 'large sprite' : 'sprite package'} · in ${esc(s.in)}</small>`;
-    const lab = noteOf(s.kind === 'big' ? 'big' : 'spr', s.hash)?.label;
-    if (lab) el.insertAdjacentHTML('beforeend', `<small>${esc(lab)}</small>`);
-    box.appendChild(el);
-    spriteThumb(s.kind, s.hash, 64).then(cv => cv && el.querySelector('.pic').appendChild(cv)).catch(() => {});
-  }
-}
-
-function commandReferences(a) {
-  const refs = (a.command_tables || []).filter(r => commandTables[r.table]);
-  if (!refs.length) return '';
-  return `<h3>Referenced command tables</h3>
-    <table><tr><th>Table</th><th>Entries</th><th>Referenced in</th></tr>${refs.map(r => {
-      const t = commandTables[r.table];
-      return `<tr><td><a href="#commands:${t.addr}">${esc(t.description || t.name)}</a> <span class="mono meta">${t.addr}</span></td>
-        <td>${t.entries.length}</td><td>${r.in.map(f => codeLink(f.addr, f.name)).join(', ')}</td></tr>`;
-    }).join('')}</table>
-    <div class="meta">Decoded tables named in this callback or loader. Initialization can replace a table after installing the common defaults.</div>`;
+  // one page per object, Browse's (tools/studio/atlas.html), shown here beside the registry list
+  v.classList.add('frame');
+  const f = v.querySelector('iframe.obj');
+  if (f) f.contentWindow.location.hash = 'actor:' + a.key;
+  else v.innerHTML = `<iframe class="obj" src="/atlas?embed=1&bare=1#actor:${a.key}" title="${esc(title(a))}"></iframe>`;
 }
 
 function showCommandTables(addr) {
