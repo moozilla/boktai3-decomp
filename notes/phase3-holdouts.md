@@ -60,6 +60,35 @@ Draft: `notes/phase3-menus-link/StatusScreen_DrawClock.c` (4 ROM / 4 draft insns
 * Next: a form where shift lives two insns less (or the pointer two more) without moving the
   `out = dst` copy; or what made the original's `values` denser.
 
+### StatusScreen_FadeAndExit (0800EC0C, src/status_screen_fade.c)
+
+Draft: `notes/phase3-menus-link/StatusScreen_FadeAndExit.c` (3 ROM / 1 draft insns). The
+`int index = i; i = index;` block in main's version is not needed; only DEBUG_NOP is.
+* What blocks it: `int blue = color & blueMask;` (blueMask hoisted to sl). color dies at that AND,
+  so regmove's fixup_match_1 ties the output to color (`ands r1, r0`). The ROM keeps the output
+  apart (`mov r0, sl; ands r0, r1; adds r1, r0, #0; muls r1, r5, r1`). fixup_match_1's forward
+  scan stops at a CODE_LABEL, a JUMP_INSN or a NOTE_INSN_LOOP_BEG/END. DEBUG_NOP's empty loop sits
+  between the AND and the multiply, and that is what matches now. `AGBCC_NOTIE=89` on the draft
+  matches.
+* The same fence, right after the last channel mask, is in StatusScreen_FadeInPalette (an inline
+  do/while(0) around r, g and `b = color & 31744`) and Palette_BlendRange
+  (`do { fromG = greenMask & from; } while (0);`). The original probably had one construct
+  we don't know yet. Solving it would likely free all three.
+* Close but not right:
+  - `int b = 31744; b &= color;` (FadeOutPalette's spelling) gives the ROM's AND and multiply,
+    but b is set twice, so loop.c doesn't hoist 31744 into sl (17/13).
+  - `int mask = 31744, b = mask; b &= color;` hoists it, but cse propagates the copy, which
+    gives the tie again (3/1).
+  - `color = b * factor;` reuses color: no tie, but color then has two deaths and becomes
+    global, so r1 goes to the r product (20/20 registers).
+  - A clamp `if (blue < 0) blue = 0;`: combine folds it and leaves a label, so there is no tie,
+    but the multiply then ties (15/15).
+* Also tried: narrow types (u16/s16/u32 blue, mask or color), casts on the AND input, operand
+  order, the blue statement first, `continue`/`while`/DEBUG_PRINT clamps.
+* Next: a C form where cse keeps a per-iteration copy of the hoisted mask (make_regs_eqv makes
+  the new register the class head when it lives past cse_basic_block_end), or the construct
+  the three siblings share.
+
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
 tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
