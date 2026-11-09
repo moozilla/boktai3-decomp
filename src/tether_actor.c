@@ -1138,14 +1138,12 @@ static inline u32 NeighborHeight(s32 cell)
 inline static void slopePush_AdjustSlopeMovement(struct TetherActor *actor, s32 octant)
 {
     s32 angle = octant;
-    register const s16 *table asm("r2") = gUnk_086149C4;
+    const s16 *table = gUnk_086149C4;
     s32 cosine;
     s32 sine;
     cosine = table[(angle + 64) & 255];
     sine = table[angle & 255];
-    do {
-        actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
-    } while (0);
+    actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
     actor->movementDelta.z -= scaleOffset(gPlayerBackgroundState * sine);
 }
 
