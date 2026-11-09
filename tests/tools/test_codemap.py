@@ -140,6 +140,24 @@ class TypeTests(unittest.TestCase):
         self.assertEqual(t['aliases'], {'BarT': 'Bar', 'FooT': 'Foo'})
 
 
+class IntentionalAsmTests(unittest.TestCase):
+    def test_hand_written_units_get_their_own_category(self):
+        tree = {'files': [], 'categories': [{'name': 'Libraries', 'units': [
+            {'name': 'MP2K (m4a)', 'functions': [['m4aSoundInit', '0822F000', 64, 100, 0, -2]]}]}]}
+        report = {'units': [
+            {'name': 'Libraries/MP2K (m4a)', 'metadata': {'progress_categories': ['libraries']},
+             'functions': [{'name': 'm4aSoundInit', 'size': '64', 'fuzzy_match_percent': 100,
+                            'metadata': {'virtual_address': str(0x0822F000)}}]},
+            {'name': 'Libraries/MP2K (m4a) (assembly)', 'metadata': {'progress_categories': ['intentional_asm']},
+             'functions': [{'name': 'SoundMain', 'size': '1058', 'fuzzy_match_percent': 0,
+                            'metadata': {'virtual_address': str(0x0822F1C4)}}]}]}
+        cats = codemap._with_intentional_asm(tree, report)['categories']
+        self.assertEqual([c['name'] for c in cats], ['Libraries', 'Intentional assembly'])
+        self.assertEqual(cats[1]['units'], [{'name': 'MP2K (m4a) (assembly)',
+                                             'functions': [['SoundMain', '0822F1C4', 1058, 0, 0, -2]]}])
+        self.assertIs(codemap._with_intentional_asm(tree, {}), tree)
+
+
 class CommittedProgressTests(unittest.TestCase):
     def test_fallback_reads_progress_json(self):
         tree, report, kinds = codemap._committed_progress()

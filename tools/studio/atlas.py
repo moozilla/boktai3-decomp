@@ -31,7 +31,7 @@ and func (a code function). The tree groups them:
 rom_tree() is the ROM as nested blocks for tools/studio/rom.html.
 
 Built from the existing tools (actors.py, stages, areas.py, bigpalettes.py,
-paltrace.py families, script_targets.progress) and cached in
+paltrace.py families, the code explorer's index) and cached in
 build/cache/atlas.json until an input changes.
 """
 import collections
@@ -163,8 +163,8 @@ def build():
     import bigpalettes
     import gclfiles
     import gclview
+    import codemap
     import paltrace
-    import script_targets
 
     jp, en = english_names()
     N = notes()
@@ -176,7 +176,7 @@ def build():
             tree_items[path].append(eid)
         return E[eid]
 
-    prog = script_targets.progress()
+    prog = codemap.progress_by_address()
     an = paltrace.addr_names()
     byname = {v: k for k, v in an.items()}
     funcinfo = {}
@@ -919,7 +919,7 @@ def rom_segments():
     the ROM's regions (docs/ROM_MAP.md), every function and every archive
     resource, in address order. ref is a Browse id or a Studio link."""
     import archive
-    import script_targets
+    import codemap
     from romlib import load_rom
     rom = load_rom()
     regions = []
@@ -930,7 +930,9 @@ def rom_segments():
             label = re.sub(r"\*\*|`", "", m.group(3)).strip()
             regions.append([a, b + 1, region_kind(label), label])
     items = []
-    for a, (size, matched, name, unit) in script_targets.progress().items():
+    # match state from the code explorer's index (tools/studio/codemap.py), which
+    # already holds tools/progress.py's report rather than running it again
+    for a, (size, matched, name, unit) in codemap.progress_by_address().items():
         if size:
             items.append([a, size, "code" if matched else "asm", name, f"/code#{a:08X}"])
     known = set()
@@ -949,12 +951,21 @@ def rom_segments():
 
 
 def rom_load():
-    newest = max(os.path.getmtime(os.path.join(ROOT, p)) for p in ("docs/ROM_MAP.md", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/tilesets.py"))
+    import codemap
+    codemap.load()  # the match state comes from its index; a newer index means a newer map
+    newest = max(os.path.getmtime(os.path.join(ROOT, p)) for p in ("docs/ROM_MAP.md", "symbols/functions.csv", "tools/studio/atlas.py",
+                                                                    "tools/assets/tilesets.py", codemap.CACHE) if os.path.exists(os.path.join(ROOT, p)))
     if os.path.exists(ROMCACHE) and os.path.getmtime(ROMCACHE) >= newest:
-        return json.load(open(ROMCACHE))
+        try:
+            with open(ROMCACHE) as f:
+                return json.load(f)
+        except ValueError:  # cut short; build it again
+            pass
     out = rom_segments()
     os.makedirs(os.path.dirname(ROMCACHE), exist_ok=True)
-    json.dump(out, open(ROMCACHE, "w"))
+    with open(ROMCACHE + ".tmp", "w") as f:
+        json.dump(out, f)
+    os.replace(ROMCACHE + ".tmp", ROMCACHE)
     return out
 
 
