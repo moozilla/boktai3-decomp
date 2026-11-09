@@ -20,6 +20,7 @@ The server listens on localhost only.
 """
 import argparse
 import csv
+import html
 import http.server
 import json
 import logging
@@ -344,6 +345,19 @@ def write_string(sid, text):
     return raw
 
 
+
+# a page the Studio doesn't have: the header and search still work
+NOT_FOUND_PAGE = """<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Boktai 3 Studio</title>
+<link rel="stylesheet" href="/static/common.css">
+<style>body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, sans-serif; }
+main { padding: 40px 32px; max-width: 640px; } a { color: var(--accent); }</style></head>
+<body><header id="top"></header>
+<main><h1>No page at {path}</h1><p class="empty">Pick a view above, or press ⌘K to search everything.
+<a href="/atlas">Browse</a> is the way in.</p></main>
+<script src="/static/common.js"></script><script>studioHeader();</script></body></html>
+"""
+
 class Handler(http.server.BaseHTTPRequestHandler):
     def send(self, code, body, ctype="application/json", etag=None, max_age=600):
         """etag: the body is a file that rarely changes; the browser may keep it
@@ -594,6 +608,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                           "application/octet-stream", etag=tag)
             else:
                 self.send(404, {"error": "no such resource"})
+        elif not self.path.startswith("/api/"):
+            self.send(404, NOT_FOUND_PAGE.replace("{path}", html.escape(self.path)), "text/html; charset=utf-8")
         else:
             self.send(404, {"error": "not found"})
 
