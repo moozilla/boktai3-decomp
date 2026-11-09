@@ -158,6 +158,7 @@ def codemap_warm():
     import codemap
     codemap.load()
     codemap._shared_helpers()
+    codemap.layouts()  # struct layouts measure in the background
 
 
 def size_text(n):
@@ -344,7 +345,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.timed("POST", self.post)
 
     def get(self):
-        if self.path in ("/", "/index.html"):
+        if self.path in ("/", "/index.html", "/text"):
             self.send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/strings":
             orig = self.server.original
@@ -418,13 +419,19 @@ class Handler(http.server.BaseHTTPRequestHandler):
             import search  # the ⌘K palette on every page (common.js)
             q = urllib.parse.unquote(self.path[len("/api/search/"):])
             self.send(200, search.search(q, self.server.strings(), self.server.display_en))
+        elif self.path == "/api/codemap/stats":
+            import codemap  # the home page's numbers, without the tree
+            sm = codemap.summary()
+            self.send(200, {k: sm[k] for k in ("measures", "concession_kinds", "missing", "updating")} |
+                      {"ram": len(sm["ram"]), "functions_with_concessions": sum(
+                          1 for c in sm["categories"] for u in c["units"] for f in u["functions"] if f[4])})
         elif self.path == "/api/codemap":
             import codemap
             self.send(200, codemap.summary())
-        elif self.path.startswith(("/api/codemap/fn/", "/api/codemap/ram/")):
-            import codemap  # /api/codemap/fn/NAME|ADDR, /api/codemap/ram/NAME|ADDR
+        elif self.path.startswith(("/api/codemap/fn/", "/api/codemap/ram/", "/api/codemap/type/")):
+            import codemap  # /api/codemap/fn/NAME|ADDR, /api/codemap/ram/NAME|ADDR, /api/codemap/type/NAME
             what, arg = self.path.split("/")[3:5]
-            d = (codemap.function if what == "fn" else codemap.ram_object)(urllib.parse.unquote(arg))
+            d = {"fn": codemap.function, "ram": codemap.ram_object, "type": codemap.type_info}[what](urllib.parse.unquote(arg))
             self.send(200 if d else 404, d or {"error": "not found"})
         elif self.path.startswith("/api/code/"):
             try:

@@ -172,7 +172,7 @@ class Inspector {
   }
   tip(ev, html) { const t = $('itip'); t.innerHTML = html; t.style.display = 'block'; t.style.left = ev.clientX + 14 + 'px'; t.style.top = ev.clientY + 14 + 'px'; }
   untip() { $('itip').style.display = 'none'; }
-  openText(id) { (this.opts.onText || (i => peek('/#' + i)))(id); }
+  openText(id) { (this.opts.onText || (i => peek('/text#' + i)))(id); }
 
   drawBoxes() {
     const sc = this.el.querySelector('.screen');

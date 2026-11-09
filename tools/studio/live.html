@@ -299,7 +299,7 @@ function renderNow(d, st) {
   const sig = JSON.stringify(list.map(x => [x.id, x.en, x.pos])) + fallback;
   if (sig === nowSig) return; nowSig = sig;
   $('now').innerHTML = list.length ? list.map(t => `<div class="line"><div class="sub-en">${esc(t.en || '(no translation)')}</div>${t.jp ? `<div class="sub-jp">${esc(t.jp)}</div>` : ''}
-    <div class="sub-meta">string <a href="/#${t.id}" data-peek>#${t.id}</a>${t.pos ? ` · tiles ${t.pos.x0},${t.pos.y0}–${t.pos.x1},${t.pos.y1}` : ' · last fetched (no glyphs on screen)'}</div></div>`).join('')
+    <div class="sub-meta">string <a href="/text#${t.id}" data-peek>#${t.id}</a>${t.pos ? ` · tiles ${t.pos.x0},${t.pos.y0}–${t.pos.x1},${t.pos.y1}` : ' · last fetched (no glyphs on screen)'}</div></div>`).join('')
     : `<div class="empty">${d.connected ? 'No text on screen.' : ''}</div>`;
 }
 

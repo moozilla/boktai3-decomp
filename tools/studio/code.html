@@ -43,6 +43,7 @@ h1.t .step { font: 13px system-ui, sans-serif; color: var(--muted); font-weight:
 .badge { font-size: 12px; padding: 1px 9px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); background: var(--panel); white-space: nowrap; }
 .badge.ok { border-color: var(--ok); color: var(--ok); background: var(--ok-bg); }
 .badge.warn { border-color: var(--warn); color: var(--warn); background: var(--warn-bg); }
+a.badge:hover { border-color: var(--accent); text-decoration: none; }
 .badge.mono { font-family: var(--mono); font-size: 11.5px; }
 h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 26px 0 10px; font-weight: 650; display: flex; align-items: baseline; gap: 8px; }
 h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
@@ -64,6 +65,7 @@ table.t td.r, table.t th.r { text-align: right; font-variant-numeric: tabular-nu
 table.t tr.link { cursor: pointer; }
 table.t tr.link:hover td { background: var(--sel); }
 .kinds { display: grid; grid-template-columns: max-content 1fr max-content; gap: 6px 12px; align-items: center; max-width: 760px; font-size: 13px; }
+.kinds a { color: var(--ink); }
 .kinds .kb { height: 8px; border-radius: 4px; background: var(--warn); }
 .strip { display: flex; height: 22px; border-radius: 5px; overflow: hidden; border: 1px solid var(--line); margin: 14px 0 4px; }
 .strip a { display: block; height: 100%; background: var(--ok); border-right: 1px solid var(--panel); min-width: 2px; }
@@ -80,6 +82,7 @@ table.t tr.link:hover td { background: var(--sel); }
 .src { overflow: auto; max-height: 72vh; font: 12.5px/1.55 var(--mono); padding: 6px 0; }
 .src .l { display: flex; white-space: pre; padding-right: 12px; }
 .src .l .g { color: var(--muted); opacity: .7; text-align: right; flex: none; width: 4.2em; padding-right: 12px; user-select: none; }
+.src .l .off { color: var(--syn-num); opacity: .8; flex: none; width: 5.2em; padding-right: 8px; text-align: right; user-select: none; }
 .src .l.cx { background: var(--warn-bg); box-shadow: inset 3px 0 var(--warn); }
 .src .l.cx .g { color: var(--warn); opacity: 1; }
 .src .k { color: var(--syn-kw); }
@@ -115,7 +118,7 @@ a.chip:hover { border-color: var(--accent); text-decoration: none; }
 <header id="top"></header>
 <main>
   <section id="side">
-    <div class="tools"><input id="q" type="search" placeholder="Find a function, unit or RAM object" autocomplete="off"></div>
+    <div class="tools"><input id="q" type="search" placeholder="Find a function, unit, type or RAM object" autocomplete="off"></div>
     <div id="tree"></div>
   </section>
   <section id="view"><div class="page empty">Loading the code index… (the first visit after a source change runs tools/progress.py, about half a minute)</div></section>
@@ -157,6 +160,10 @@ const bar = (clean, total) => `<span class="bar" title="${fmtPct(pct(clean, tota
 // ---------- index ----------
 async function load() {
   S = await fetch('/api/codemap').then(r => r.ok ? r.json() : Promise.reject(r.status));
+  for (const k of Object.keys(FN)) delete FN[k];
+  for (const k of Object.keys(BYNAME)) delete BYNAME[k];
+  for (const k of Object.keys(UNIT)) delete UNIT[k];
+  RAMS.length = 0; ramNames.s = null; typeNames.s = null;
   for (const c of S.categories) {
     c.size = 0; c.clean = 0; c.nfn = 0; c.ncx = 0;
     for (const u of c.units) {
@@ -191,6 +198,8 @@ function renderTree() {
     out.push(`<a class="tn ${cls}${SEL === hash ? ' on' : ''}" style="--d:${d}" href="${hash}" data-key="${esc(hash)}">${tw}${dot ?? ''}<span class="tl">${label}</span>${count != null ? `<span class="tc">${count}</span>` : ''}</a>`);
   row(0, 'top', '#', '<span class="tw">◎</span>', 'Overview');
   row(0, 'top', '#ram', '<span class="tw">▦</span>', 'RAM objects', num(S.ram.length));
+  row(0, 'top', '#types', '<span class="tw">{}</span>', 'Types', num((S.types || []).length));
+  row(0, 'top', '#left', '<span class="tw">◆</span>', 'Concessions left', num(Object.values(FN).filter(f => f.kinds.length).length));
   for (const c of S.categories) {
     const ck = catHref(c.name), co = open.has(ck);
     row(0, 'd0', ck, `<span class="tw" data-tog="${esc(ck)}">${co ? '▾' : '▸'}</span>`, esc(c.name), num(c.nfn));
@@ -212,10 +221,12 @@ function renderResults(q) {
   const units = Object.values(UNIT).filter(u => hit(u.name)).slice(0, 40);
   const fns = Object.values(FN).filter(f => hit(f.name) || f.addr.toLowerCase().includes(q.replace(/^0x|^sub_/, ''))).slice(0, 300);
   const rams = S.ram.filter(r => hit(r.name) || r.addr.toLowerCase().includes(q)).slice(0, 60);
+  const types = (S.types || []).filter(hit).slice(0, 40);
   const r = (k, href, label, path, dot = '') => out.push(`<a class="r" href="${href}"><span class="k">${k}</span>${dot}<span class="mono">${label}</span><span class="p">${esc(path)}</span></a>`);
   for (const u of units) r('unit', unitHref(u.cat, u.name), esc(u.name), u.cat);
   for (const f of fns) r('fn', fnHref(f.addr), esc(f.name), f.unit.name, `<span class="dot${f.kinds.length ? ' warn' : ''}"></span>`);
   for (const x of rams) r('ram', ramHref(x.name), esc(x.name), x.addr);
+  for (const t of types) r('type', typeHref(t), esc(t), 'struct');
   $('tree').innerHTML = `<div class="results">${out.join('') || '<div class="empty" style="padding:8px 12px">Nothing matches.</div>'}</div>`;
 }
 $('q').oninput = renderTree;
@@ -239,6 +250,7 @@ function overview() {
       ordinary C with no matching concession; the rest still steers the compiler with a register pin, an empty <code>asm("")</code> or one of the other
       kinds below, and removing those is the current work. Pick a category, a unit or a function, or search on the left.</p>
     ${(S.missing || []).map(x => `<div class="notice">Not available here: ${esc(x)}.</div>`).join('')}
+    ${S.updating ? '<div class="notice">The sources changed: a new index is building (about half a minute); this page updates when it is ready.</div>' : ''}
     <div class="tiles">
       <div class="tile"><b>${num(nfn)}</b><span>functions, all matching</span></div>
       <div class="tile"><b>${kb(total)}</b><span>of code in ${num(m.total_units ?? Object.keys(UNIT).length)} units</span></div>
@@ -250,8 +262,8 @@ function overview() {
     <table class="t"><tr><th>Category</th><th class="r">Units</th><th class="r">Functions</th><th class="r">Code</th><th style="width:30%">Without concessions</th><th class="r"></th></tr>
     ${S.categories.map(c => `<tr class="link" data-href="${catHref(c.name)}"><td><a href="${catHref(c.name)}">${esc(c.name)}</a></td><td class="r">${c.units.length}</td><td class="r">${num(c.nfn)}</td>
       <td class="r">${kb(c.size)}</td><td>${bar(c.clean, c.size)}</td><td class="r">${fmtPct(pct(c.clean, c.size))}</td></tr>`).join('')}</table>
-    ${kinds.length ? `<h3>Concessions left, by kind <span class="n">functions</span></h3><div class="kinds">${kinds.map(([k, n]) =>
-      `<span title="${esc(KIND_HELP[k] || '')}">${esc(kindLabel(k))}</span><span class="kb" style="width:${100 * n / kmax}%"></span><span class="mono">${n}</span>`).join('')}</div>
+    ${kinds.length ? `<h3>Concessions left, by kind <span class="n">functions · <a href="#left">list them all</a></span></h3><div class="kinds">${kinds.map(([k, n]) =>
+      `<a href="#left:${esc(k)}" title="${esc(KIND_HELP[k] || '')}">${esc(kindLabel(k))}</a><span class="kb" style="width:${100 * n / kmax}%"></span><span class="mono">${n}</span>`).join('')}</div>
       <p class="muted" style="font-size:12.5px;max-width:760px">The kinds are defined in <code>tools/concessions.py</code>; decomp.dev counts a function as matched only once it has none.
       A function can hold more than one kind.</p>` : ''}
   </div>`;
@@ -296,6 +308,8 @@ function unitPage(key) {
 const C_KW = new Set('if else for while do switch case default break continue return goto sizeof static const volatile extern register struct union enum typedef inline asm'.split(' '));
 const C_TY = new Set('void char short int long unsigned signed float double bool u8 u16 u32 u64 s8 s16 s32 s64 vu8 vu16 vu32 vs8 vs16 vs32 bool8 bool16 bool32 fx16 fx32 f32'.split(' '));
 const ramNames = () => (ramNames.s ??= new Set(S.ram.map(r => r.name)));
+const typeNames = () => (typeNames.s ??= new Set(S.types || []));
+const typeHref = n => '#type:' + encodeURIComponent(n);
 // tokens -> lines of HTML, keeping each span inside its line
 function linesOf(tokens) {
   const lines = [[]];
@@ -311,9 +325,10 @@ function linesOf(tokens) {
 }
 function cTokens(src, self) {
   const rx = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')|(\b0x[0-9A-Fa-f]+[uUlL]*\b|\b\d+[uUlL]*\b)|(^[ \t]*#[^\n]*)|([A-Za-z_]\w*)|([\s\S])/gm;
-  const out = []; let m;
+  const out = []; let m, prev = '';
   while ((m = rx.exec(src))) {
     const [t, com, str, n, pp, id] = m;
+    const after = prev; if (id) prev = id; else if (t.trim()) prev = '';
     if (com) out.push(['c', t]);
     else if (str) out.push(['s', t]);
     else if (n) out.push(['nu', t]);
@@ -321,6 +336,7 @@ function cTokens(src, self) {
     else if (id) {
       if (C_KW.has(id)) out.push(['k', id]);
       else if (C_TY.has(id)) out.push(['ty', id]);
+      else if ((after === 'struct' || after === 'union') && typeNames().has(id)) out.push(['ty', id, typeHref(id), 'struct layout']);
       else if (BYNAME[id] && id !== self) out.push(['', id, fnHref(BYNAME[id].addr), BYNAME[id].unit.name]);
       else if (ramNames().has(id)) out.push(['ram', id, ramHref(id), 'RAM object']);
       else out.push(['', id]);
@@ -361,10 +377,10 @@ function asmTokens(src) {
   }
   return out;
 }
-function pane(title, meta, lines, first = 1, marks = {}) {
+function pane(title, meta, lines, first = 1, marks = {}, side = null) {
   return `<div class="pane"><div class="ph"><b>${title}</b>${meta}</div><div class="src">${lines.map((l, i) => {
     const k = marks[i + 1];
-    return `<div class="l${k ? ' cx' : ''}"${k ? ` title="${esc(k.map(kindLabel).join(', '))}"` : ''}><span class="g">${k ? '◆' : first + i}</span><span>${l || ' '}</span></div>`;
+    return `<div class="l${k ? ' cx' : ''}"${k ? ` title="${esc(k.map(kindLabel).join(', '))}"` : ''}><span class="g">${k ? '◆' : first + i}</span>${side ? `<span class="off">${side[i] || ''}</span>` : ''}<span>${l || ' '}</span></div>`;
   }).join('')}</div></div>`;
 }
 
@@ -431,6 +447,68 @@ async function ramPage(name) {
         `<a class="chip mono${x.kinds.length ? ' warn' : ''}" href="${fnHref(x.addr)}">${esc(x.name)}${x.offsets.some(v => v) ? ` <small>${x.offsets.filter(v => v).map(v => '+0x' + v.toString(16)).join(' ')}</small>` : ''}</a>`).join('')}</div></div>`; }).join('') || '<div class="empty">No function loads its address directly (it may be reached through a pointer).</div>'}
   </div>`;
 }
+// the functions that still hold a concession (all, or one kind), smallest first: phase 3's queue
+function leftPage(kind) {
+  const fns = Object.values(FN).filter(f => f.kinds.length && (!kind || f.kinds.includes(kind))).sort((a, b) => a.size - b.size || a.addr.localeCompare(b.addr));
+  const bytes = fns.reduce((s, f) => s + f.size, 0);
+  const kinds = Object.keys(S.concession_kinds).sort((a, b) => S.concession_kinds[b] - S.concession_kinds[a]);
+  return `<div class="page">${crumbs('Concessions left')}
+    <h1 class="t">${kind ? esc(kindLabel(kind)) : 'Concessions left'}</h1>
+    <p class="lede">${num(fns.length)} functions (${kb(bytes)}) still match only with ${kind ? `a ${esc(kindLabel(kind))}${KIND_HELP[kind] ? ` (${esc(KIND_HELP[kind])})` : ''}` : 'a concession'}, smallest first.
+      <code>tools/progress.py --list-pinned</code> is the same list.</p>
+    <div class="badges"><a class="badge${kind ? '' : ' warn'}" href="#left">all</a>${kinds.map(k => `<a class="badge${k === kind ? ' warn' : ''}" href="#left:${esc(k)}">${esc(kindLabel(k))} ${S.concession_kinds[k]}</a>`).join('')}</div>
+    <table class="t" style="margin-top:14px"><tr><th>Function</th><th class="r">Bytes</th><th>Kinds</th><th>Unit</th><th>Source</th></tr>
+    ${fns.map(f => `<tr class="link" data-href="${fnHref(f.addr)}"><td class="mono"><a href="${fnHref(f.addr)}">${esc(f.name)}</a></td><td class="r">${f.size}</td>
+      <td><div class="badges" style="margin:0">${status(f.kinds)}</div></td><td><a href="${unitHref(f.unit.cat, f.unit.name)}">${esc(f.unit.name)}</a></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
+}
+async function typePage(name) {
+  const d = await fetch('/api/codemap/type/' + encodeURIComponent(name)).then(r => r.ok ? r.json() : null);
+  if (!d) return notFound(`No struct or union ${name} in include/.`);
+  document.title = d.name + ' · Boktai 3 Code';
+  const by = {};
+  for (const u of d.users) (by[`${u.category}/${u.unit}`] ||= []).push(u);
+  const hex = n => '0x' + n.toString(16).toUpperCase();
+  const fields = d.fields ? `<table class="t" style="max-width:640px"><tr><th class="r">Offset</th><th class="r">Size</th><th>Member</th></tr>${d.fields.map(([o, sz, m]) =>
+    `<tr><td class="r mono">${hex(o)}</td><td class="r mono">${sz}</td><td class="mono">${esc(m)}</td></tr>`).join('')}</table>`
+    : `<div class="empty">${d.measuring ? 'Measuring the layouts with agbcc (a few seconds); reload to see the offsets.' : 'No layout measured for this one (it may only compile with other headers).'}</div>`;
+  return `<div class="page">${crumbs('<a href="#types">Types</a>')}
+    <h1 class="t mono">${d.kind} ${esc(d.name)}</h1>
+    <div class="badges">${d.size != null ? `<span class="badge">${d.size} bytes (${hex(d.size)})</span>` : ''}<span class="badge mono">${esc(d.file)}:${d.line}</span>
+      ${d.aliases.map(a => `<span class="badge mono">typedef ${esc(a)}</span>`).join('')}<span class="badge">${d.users.length} functions use it</span></div>
+    <div class="panes" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
+      ${pane('Definition', `<span class="mono">${esc(d.file)}</span>${d.fields ? '<span class="sp"></span><span>offsets from agbcc</span>' : ''}`, linesOf(cTokens(d.text)),
+        d.line - (d.text.slice(0, d.text.indexOf(d.kind + ' ' + d.name)).split('\n').length - 1), {}, d.fields ? offsetsByLine(d.text, d.fields) : null)}
+      <div><h3 style="margin-top:0">Layout <span class="n">offsetof and sizeof as agbcc compiles them</span></h3>${fields}</div>
+    </div>
+    <h3>Used by <span class="n">${d.users.length} functions in ${Object.keys(by).length} units</span></h3>
+    ${Object.entries(by).map(([k, us]) => { const [c, ...rest] = k.split('/'); const un = rest.join('/');
+      return `<div style="margin-bottom:12px"><div style="margin-bottom:4px"><a href="${unitHref(c, un)}">${esc(un)}</a> <span class="muted">· ${esc(c)}</span></div><div class="refs">${us.map(x =>
+        `<a class="chip mono${x.kinds.length ? ' warn' : ''}" href="${fnHref(x.addr)}">${esc(x.name)}</a>`).join('')}</div></div>`; }).join('') || '<div class="empty">No function names it.</div>'}
+  </div>`;
+}
+// each top-level member's offset, beside the line that declares it
+function offsetsByLine(text, fields) {
+  const out = [], lines = text.split('\n');
+  let j = 0, depth = 0;
+  lines.forEach((ln, i) => {
+    const code = ln.replace(/\/\/.*|\/\*.*?\*\//g, '');
+    if (depth === 1 && j < fields.length) {
+      const hit = [];
+      while (j < fields.length && new RegExp('\\b' + fields[j][2] + '\\b').test(code)) { hit.push(fields[j]); j++; }
+      if (hit.length) out[i] = '+0x' + hit[0][0].toString(16).toUpperCase();
+    }
+    for (const c of code) depth += (c === '{') - (c === '}');
+    // a nested union or struct's own members aren't listed: its name on the closing line is
+    if (depth === 1 && /^\s*\}\s*\w+/.test(code) && j < fields.length && new RegExp('\\b' + fields[j][2] + '\\b').test(code)) { out[i] = '+0x' + fields[j][0].toString(16).toUpperCase(); j++; }
+  });
+  return out;
+}
+function typeList() {
+  return `<div class="page">${crumbs('Types')}
+    <h1 class="t">Types</h1>
+    <p class="lede">The structs and unions shared through <code>include/</code>, ${num((S.types || []).length)} of them. Each page shows the definition, the layout agbcc gives it and the functions that use it.</p>
+    <div class="refs" style="margin-top:14px">${(S.types || []).map(t => `<a class="chip mono" href="${typeHref(t)}">${esc(t)}</a>`).join('')}</div></div>`;
+}
 const notFound = msg => `<div class="page"><div class="empty">${esc(msg)}</div></div>`;
 
 // ---------- routing ----------
@@ -443,6 +521,9 @@ async function route() {
   let html;
   if (!h) { SEL = '#'; html = overview(); }
   else if (h === 'ram') html = ramList();
+  else if (h === 'types') html = typeList();
+  else if (h.startsWith('type:')) html = await typePage(h.slice(5));
+  else if (h === 'left' || h.startsWith('left:')) { html = leftPage(h.slice(5)); document.title = 'Concessions left · Boktai 3 Code'; }
   else if (h.startsWith('ram:')) html = await ramPage(h.slice(4));
   else if (h.startsWith('cat:')) { open.add(location.hash); html = categoryPage(h.slice(4)); document.title = h.slice(4) + ' · Boktai 3 Code'; }
   else if (h.startsWith('unit:')) {
@@ -461,7 +542,13 @@ $('view').addEventListener('click', e => {
   if (tr && !e.target.closest('a')) location.hash = tr.dataset.href;
 });
 window.onhashchange = route;
-load().then(route).catch(err => { $('view').innerHTML = notFound(`The code index failed to load (${err}). Check the Studio's terminal.`); });
+// after a source change the server rebuilds in the background; pick up the new index when it lands
+async function watchUpdate() {
+  if (!S?.updating) return;
+  const t = await fetch('/api/codemap').then(r => r.json()).catch(() => null);
+  if (t && !t.updating) { await load(); route(); } else setTimeout(watchUpdate, 5000);
+}
+load().then(() => { route(); setTimeout(watchUpdate, 5000); }).catch(err => { $('view').innerHTML = notFound(`The code index failed to load (${err}). Check the Studio's terminal.`); });
 </script>
 </body>
 </html>

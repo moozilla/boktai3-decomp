@@ -108,6 +108,38 @@ class IndexTests(unittest.TestCase):
         self.assertTrue(any('gen/code.s' in m for m in ix['missing']))
 
 
+class StaleIndexTests(unittest.TestCase):
+    def test_a_stale_index_is_served_while_the_new_one_builds(self):
+        old, started = {'functions': {}}, []
+        with patch.dict(codemap._INDEX, {'mtime': 1.0, 'data': old, 'checked': 0}), \
+                patch.object(codemap, '_newest', return_value=2.0), \
+                patch.object(codemap, '_rebuild_in_background', side_effect=started.append):
+            self.assertIs(codemap.load(), old)
+        self.assertEqual(started, [2.0])
+
+    def test_wait_blocks_for_the_new_index(self):
+        new = {'functions': {'x': 1}}
+        with patch.dict(codemap._INDEX, {'mtime': 1.0, 'data': {}, 'checked': 0}), \
+                patch.object(codemap, '_newest', return_value=2.0), \
+                patch.object(codemap, '_rebuild', return_value=new):
+            self.assertIs(codemap.load(wait=True), new)
+
+
+class TypeTests(unittest.TestCase):
+    def test_definitions_comments_and_typedefs(self):
+        with tempfile.TemporaryDirectory() as d:
+            h = Path(d) / 'foo.h'
+            h.write_text('#pragma once\n// A foo.\n// Two lines.\nstruct Foo {\n    u8 a;\n    union {\n        u16 b;\n    } c;\n};\n'
+                         'typedef struct Bar {\n    int x;\n} BarT;\ntypedef struct Foo FooT;\n')
+            with patch.object(codemap, '_headers', lambda: [str(h)]), patch.dict(codemap._HELPERS, {}, clear=True):
+                t = codemap.types()
+        self.assertEqual(sorted(t['defs']), ['Bar', 'Foo'])
+        self.assertEqual(t['defs']['Foo']['line'], 4)
+        self.assertTrue(t['defs']['Foo']['text'].startswith('// A foo.\n// Two lines.\nstruct Foo {'))
+        self.assertTrue(t['defs']['Foo']['text'].endswith('} c;\n};'))
+        self.assertEqual(t['aliases'], {'BarT': 'Bar', 'FooT': 'Foo'})
+
+
 class CommittedProgressTests(unittest.TestCase):
     def test_fallback_reads_progress_json(self):
         tree, report, kinds = codemap._committed_progress()
