@@ -17,10 +17,6 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
     for (; bank < 2; bank++) {
         for (i = 0; i < 16; i++) {
             {
-                int index = i;
-                i = index;
-            }
-            {
                 u16 *out = &buffer[bank * 16 + i];
                 int color = *out;
                 int r = ((color & 31) * factor) & 0x7C0;
