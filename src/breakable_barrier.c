@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "breakable_barrier.h"
 
 void BreakableBarrier_SetState(struct BreakableBarrier *s, u8 v)
@@ -21,37 +20,22 @@ u32 BreakableBarrier_ConsumeEntered(struct BreakableBarrier *p)
     return r;
 }
 
-// MATCHING_CONCESSION: register-pinning
 struct BreakableBarrier *BreakableBarrier_SetPosition(struct BreakableBarrier *input,
                                                       struct SceneVec *position, int orientation)
 {
-    register struct BreakableBarrier *temp asm("r3") = input;
-    register struct BreakableBarrier *p asm("r4");
-    register u32 x asm("r5");
-    register u32 y asm("r3");
-    register u32 value asm("r1");
-    asm("" : : "r"(temp));
-    p = temp;
-    x = (u16)position->x;
-    p->sprite.position.x = x;
-    y = (u16)position->y;
-    p->sprite.position.y = y;
-    value = (u16)position->z;
-    p->sprite.position.z = value;
-    if (orientation) {
-        value -= 128;
-        p->sprite.position.z = value;
-    } else {
-        value = x - 128;
-        p->sprite.position.x = value;
-    }
-    value = (u16)p->sprite.position.x + 60;
-    p->sprite.position.x = value;
-    value = (u16)p->sprite.position.z + 60;
-    p->sprite.position.z = value;
-    value = (u16)p->sprite.position.y + 20;
-    p->sprite.position.y = value;
-    return input;
+    // No return statement: the ROM leaves the caller's r0 in place, and the implicit use of the
+    // return register keeps it live, so `p` is a second pseudo that cse prefers (fact 95).
+    struct BreakableBarrier *p = input;
+    p->sprite.position.x = position->x;
+    p->sprite.position.y = position->y;
+    p->sprite.position.z = position->z;
+    if (orientation)
+        p->sprite.position.z -= 128;
+    else
+        p->sprite.position.x -= 128;
+    p->sprite.position.x += 60;
+    p->sprite.position.z += 60;
+    p->sprite.position.y += 20;
 }
 
 void BreakableBarrier_OnColliderHit(u32 a, u32 b, struct BreakableBarrier *p)
@@ -150,7 +134,6 @@ static inline void BreakableBarrier_NextRandomIndex(u32 cursor, u32 *next)
 {
     *next = (cursor + 1) & 1023;
 }
-// MATCHING_CONCESSION: register-pinning
 void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
 {
     struct BarrierExtent size;
