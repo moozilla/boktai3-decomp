@@ -140,6 +140,22 @@ matches, so this is the only decision left.
 * Also tried: 128 combinations of held vs gPadState for each of the nine pad reads, re-setting
   `held` between the tests, and inline vertical/horizontal helpers.
 
+### ResultGame_UpdatePlayerMarker (0801C6CC, src/fn/sub_0801C6CC.c)
+
+Draft: `notes/phase3-menus-link/ResultGame_UpdatePlayerMarker.c` (11 ROM / 11 draft, only key
+and counter swapping r2/r3). The draft keeps velocity set in each arm, `u8 *counter` and
+`u8 *table = gUnk_0824DB64;` before the index read (that order gives the ROM's load order), and
+no asm.
+* key (`1 & gPadState[1]`, also the zero for the else-arm stores) must be allocated before
+  counter, whose priority is 5000 (4 refs, 16 insns). key has 7 refs, but its life is
+  24 -> 50. regmove ties the and to the constant 1's pseudo, which carries a REG_EQUIV, so
+  update_equiv_regs doubles it (fact 20's first-set doubling), and key's priority drops to 2800.
+  Without the doubling it would be about 5600. `AGBCC_PRI=key:+2201` matches.
+* Tried: `x & 1` vs `1 & x`, u8/u16/s32 key, no key variable (literal zeros), `p[0xb2]`
+  instead of counter in the compare and/or the increment, and `AGBCC_NOTIE=22` (r3 still).
+* Next: a spelling that keeps key from inheriting the constant's REG_EQUIV set, or that adds
+  2 refs to key.
+
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
 tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
