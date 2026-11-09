@@ -2604,6 +2604,13 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
                    " own variable and name the address again at the later use; gcse then makes the"
                    " long-lived copy, a new pseudo ranked on its own (ScriptCombatActor_UpdateState's"
                    " collider)")
+    for jl, stmt, paths, nl, nh, pl, ph in (join_lever(wd, lo, lo_rec, hi, hi_rec) if wd else []):
+        out.append(f"line{'s' if len(stmt) > 1 else ''} {', '.join(map(str, stmt))}, right after a join of"
+                   f" {paths} paths (line {jl}), written again at the end of each arm that reaches it: jump2"
+                   f" cross-jumps the copies back into one (fact 27, the same code), but flow counts each copy,"
+                   f" giving {nm(lo)} {nl} refs ({pl}) against {nm(hi)}'s {nh} ({ph}). A value the copies set"
+                   f" that later code reads can stay assigned in the arms and read once after the join, so its"
+                   f" own refs don't rise (fact 91)")
     lever = macro_lever(wd, lo, lo_rec, hi, hi_rec) if wd else None
     if lever:
         a, b, nl, nh = lever
@@ -2706,6 +2713,91 @@ def macro_lever(wd, lo, lo_rec, hi, hi_rec, mentions=None, lines=None):
                 best = (a, b, nl, nh)
                 break
     return best
+
+
+def join_items(wd, regs, dump="regmove"):
+    """[(kind, uid, targets, {reg: mentions})] for the insns, jumps and labels of a dump in order (notes
+    dropped): what join_lever walks. TARGETS are a jump's label_ref uids."""
+    path = os.path.join(wd, "u.i." + dump)
+    t = open(path).read() if os.path.exists(path) else ""
+    out = []
+    for m in re.finditer(r"^\((insn|jump_insn|call_insn|code_label|barrier)(?:/\w)* (\d+) ", t, re.M):
+        kind, uid = m.group(1), int(m.group(2))
+        if kind in ("code_label", "barrier"):
+            out.append((kind, uid, (), {}))
+            continue
+        i = m.end()
+        while i < len(t) and t[i] in " \n\t0123456789":
+            i += 1
+        pat = t[i:_sexp_end(t, i)]
+        targets = tuple(int(x) for x in re.findall(r"\(label_ref (\d+)\)", pat)) if kind == "jump_insn" else ()
+        out.append((kind, uid, targets,
+                    {r: len(re.findall(r"\(reg(?:/\w)*:\w+ %d\)" % r, pat)) for r in regs}))
+    return out
+
+
+def join_lever(wd, lo, lo_rec, hi, hi_rec, items=None, lines=None):
+    """[(join line, statement lines, paths, lo refs, hi refs)]: statements right after a join (a label that
+    two or more paths reach) whose copy at the end of one more arm would let LO outrank HI. jump2
+    cross-jumps the copies back into one (fact 27), so the code is the same, but flow counted each copy's
+    refs and insns (EffectParticle_UpdateDissipating: the frame step's `entry = a->data + a->frame` in each
+    arm gave `a` the refs to outrank `p`)."""
+    if items is None:
+        items = join_items(wd, (lo, hi))
+    if lines is None:
+        lines = uid_lines(wd) if wd else {}
+    lrefs, llive = lo_rec[3], lo_rec[4]
+    hrefs, hlive = hi_rec[3], hi_rec[4]
+    preds = {}
+    for k, (kind, uid, targets, _) in enumerate(items):
+        for x in targets:
+            preds[x] = preds.get(x, 0) + 1
+        if kind == "code_label" and k and items[k - 1][0] != "barrier":
+            preds[uid] = preds.get(uid, 0) + 1
+
+    def span(reg):
+        at = [k for k, it in enumerate(items) if it[3].get(reg)]
+        return (at[0], at[-1]) if at else (-1, -1)
+
+    lsp, hsp = span(lo), span(hi)
+    found = []
+    for k, (kind, uid, _, _) in enumerate(items):
+        if kind != "code_label" or (k and items[k - 1][0] == "code_label"):
+            continue
+        group = [uid]
+        while k + len(group) < len(items) and items[k + len(group)][0] == "code_label":
+            group.append(items[k + len(group)][1])
+        # labels in a row are one join: the falls between them aren't paths of their own
+        paths = sum(preds.get(x, 0) for x in group) - (len(group) - 1)
+        if paths < 2:
+            continue
+        run = []
+        for it in items[k + len(group):]:
+            if it[0] != "insn":
+                break
+            run.append(it)
+        dl = dh = n = 0
+        stmt = []
+        for j, it in enumerate(run):
+            dl += it[3].get(lo, 0)
+            dh += it[3].get(hi, 0)
+            n += 1
+            ln = lines.get(it[1])
+            if ln is not None and ln not in stmt:
+                stmt.append(ln)
+            if j + 1 < len(run) and lines.get(run[j + 1][1]) == ln:
+                continue  # a statement's insns go together
+            if not dl:
+                continue
+            nl = lrefs + dl
+            nh = hrefs + dh
+            ll = llive + (n if lsp[0] < k < lsp[1] else 0)
+            hl = hlive + (n if hsp[0] < k < hsp[1] else 0)
+            if g_priority(nl, ll) > g_priority(nh, hl):
+                found.append((lines.get(uid), list(stmt), paths, nl, nh, g_priority(nl, ll), g_priority(nh, hl)))
+                break
+    found.sort(key=lambda f: len(f[1]))
+    return found[:3]
 
 
 def mention_lines(wd, reg):

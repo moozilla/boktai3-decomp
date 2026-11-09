@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "group_objects.h"
 #include "display_sequence_inline.h"
+#include "monster_particle_random.h"
 
 static inline void BoardPiece_SelectPalette(void *resource)
 {
@@ -151,26 +152,13 @@ static inline void addPositionAt(struct GroupVec *d, struct GroupVec *dst, struc
     dst->z += src->z;
 }
 
-#define GROUP_RANDOM_READ(table, offset, result)                                                   \
-    do {                                                                                           \
-        const u16 *sample = (const u16 *)((offset) + (u32)(table));                                \
-        (result) = *sample;                                                                        \
-    } while (0)
-
-#define GROUP_RANDOM_NEXT(result)                                                                  \
-    do {                                                                                           \
-        u32 offset;                                                                                \
-        const u16 *table;                                                                          \
-        gRandomIndex = (gRandomIndex + 1) & 1023;                                                  \
-        table = gRandomTable;                                                                      \
-        offset = gRandomIndex * 2;                                                                 \
-        GROUP_RANDOM_READ(table, offset, result);                                                  \
-    } while (0)
-
 static inline int BoardPieces_RandomValue(void)
 {
     int result;
-    GROUP_RANDOM_NEXT(result);
+    const u16 *table;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    table = gRandomTable;
+    PARTICLE_RANDOM_READ_SAMPLE(result, table, gRandomIndex);
     return result;
 }
 
