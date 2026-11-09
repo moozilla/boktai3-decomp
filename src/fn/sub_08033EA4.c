@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 #include "ram.h"
@@ -51,34 +50,21 @@ fail:
 parameters:
     if (Script_SeekToKeyword(116)) {
         int i;
-        int sentinel;
-        s16 *delay;
-        u16 *fadeIn;
         p->entries = sub_08227E9C();
         Script_SetPc(p->entries);
-        i = 0;
-        sentinel = -1;
-        delay = p->delays;
-        fadeIn = p->fadeIn;
-        do {
-            int offset = i;
-            int value = Script_GetValue();
-            asm("" : : "r"(offset << 1));
-            *delay = value;
-            p->x[offset] = Script_GetValue();
-            p->y[offset] = Script_GetValue();
-            p->width[offset] = Script_GetValue();
-            p->height[offset] = Script_GetValue();
-            *fadeIn = Script_GetValue();
-            p->fadeOut[offset] = Script_GetValue();
-            if (i >= p->index && *delay == sentinel) {
+        for (i = 0; i <= 63; i++) {
+            p->delays[i] = Script_GetValue();
+            p->x[i] = Script_GetValue();
+            p->y[i] = Script_GetValue();
+            p->width[i] = Script_GetValue();
+            p->height[i] = Script_GetValue();
+            p->fadeIn[i] = Script_GetValue();
+            p->fadeOut[i] = Script_GetValue();
+            if (i >= p->index && p->delays[i] == -1) {
                 p->lastIndex = i - 1;
-                goto ready;
+                break;
             }
-            delay++;
-            fadeIn++;
-            i++;
-        } while (i <= 63);
+        }
     }
 ready: {
     int procedure = Script_GetKeywordValue(101, 0);
