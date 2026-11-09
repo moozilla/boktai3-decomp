@@ -82,6 +82,15 @@ class IndexTests(unittest.TestCase):
         self.assertEqual(ix['ram_users']['gPause'], ['08001000'])
         self.assertEqual(ix['concession_kinds'], {'pin': 1})
 
+    def test_concession_kinds_found_under_the_c_name(self):
+        tree = {'version': 1, 'files': [], 'categories': [{'name': 'Engine core', 'units': [{'name': 'Foo', 'functions': [
+            ['Foo_Update', '08001000', 32, 95.5, 1, -1, 'Foo_UpdateAll'], ['Foo_Helper', '08001020', 32, 90.0, 1, -1]]}]}]}
+        report = {'measures': {}, 'categories': []}
+        with patch.object(codemap, '_progress', lambda: (tree, report, {'Foo_UpdateAll': ['operand']})):
+            fns = codemap.build()['functions']
+        self.assertEqual(fns['08001000']['kinds'], ['operand'])
+        self.assertEqual(fns['08001020']['kinds'], ['concession'])  # pinned, but no kind listed
+
     def test_summary_and_lookups(self):
         s = codemap.summary()
         fns = s['categories'][0]['units'][0]['functions']

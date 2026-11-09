@@ -220,10 +220,12 @@ def build():
     for ci, c in enumerate(tree["categories"]):
         for ui, u in enumerate(c["units"]):
             for row in u["functions"]:
+                # --list-pinned names a function as its C does (row[6], when that differs)
                 name, addr, size, pct, pinned, file = row[:6]
                 fns[addr] = {"name": name, "addr": addr, "size": size, "pct": pct, "cat": ci, "unit": ui,
                              "file": f"src/fn/sub_{addr}.c" if file == -1 else None if file == -2 else tree["files"][file],
-                             "defined": row[6] if len(row) > 6 else None, "kinds": (kinds.get(name) or ["concession"]) if pinned else []}
+                             "defined": row[6] if len(row) > 6 else None, "kinds": (kinds.get(name) or kinds.get(row[6] if len(row) > 6 else None)
+                                                 or ["concession"]) if pinned else []}
     ram_users, data_users, ptr_users = collections.defaultdict(list), collections.defaultdict(list), collections.defaultdict(list)
     for a, d in x.items():
         h = f"{a:08X}"
