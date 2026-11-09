@@ -1956,25 +1956,13 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
 
 void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
 {
-    struct {
-        u32 zero;
-        struct DisplayPosition position;
-    } packet;
+    struct DisplayPosition position;
     struct DisplayAnimation *display;
-    u32 zero;
     struct DisplayPosition *initialPosition;
-    u16 *paletteIndex = &actor->paletteIndex;
     u32 value;
-    zero = 0;
-    *paletteIndex = 10;
-    initialPosition = &packet.position;
-    packet.zero = zero;
-    {
-        register u32 *fill asm("r0") = &packet.zero;
-        register struct DisplayPosition *destination asm("r1");
-        destination = initialPosition;
-        CpuSet(fill, destination, 0x5000002);
-    }
+    actor->paletteIndex = 10;
+    initialPosition = &position;
+    ZeroFill8(initialPosition);
     if (actor->kind == 9) {
         display = &actor->display.animation;
         DisplayAnimation_InitializeKeyframes(display, 0x35E3, 0, initialPosition);
@@ -1988,7 +1976,7 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
         asm("" : "+r"(display));
         DisplayAnimation_InitializeSequence(display, 0x2499, 0x3D95, 0, initialPosition);
         TetherActor_SetEntry(actor, 0);
-        actor->appliedPalette = *paletteIndex;
+        actor->appliedPalette = actor->paletteIndex;
         DisplayAnimation_SelectPaletteBank(display, actor->appliedPalette + 0x283);
         if (display->kind == 2)
             palette = actor->display.colors.keyframePalette;
