@@ -616,3 +616,18 @@ reloads in the slot loop follow. Writing the actionMode/slot test as separate if
 `mode` local or pointer, `!= 0`, or a `u32 slot` local changes nothing, and neither does a
 ternary for override (worse). Next: find the ROM's hidden reload (a pseudo with a MEM REG_EQUIV
 replaced at its use, or a copy deleted after reload).
+
+### sub_0815E034 (PlayerContact_ComputeCost), 3 pins kept
+Draft: notes/phase3-drafts/monsters-bosses/PlayerContact_ComputeCost.c (the matched form with the
+pins removed: 24 ROM / 22 draft differ). The ROM has common (63) in r6, player in r7 and source in r8.
+The what-if `AGBCC_PRI=source:-1500` (source 2142 -> 642, below player's 689) fixes every
+difference except one: in the cueDefenses switch, the offset constant takes r0 where the ROM has
+r1. So source must be the lowest-priority long-lived pseudo, but its six visible uses
+(unknown3C, three Accumulate calls, two Anim calls, plus the dead-`ands` arm pair, fact 57) give
+it at least 8 refs over 126 insns. Things that changed nothing or made it worse:
+- per-case `player->cueDefenses[k]` (player then outranks common, so common lands in ip);
+- an inline helper for the two arm tails (its parameter copies are propagated away);
+- every input/source split over the seven uses (128 variants);
+- assigning source late.
+Next: look for a local pseudo that takes r8 before global alloc (pass 0 reuses registers already
+in use, README fact 13), so that source picks r8 without being last.
