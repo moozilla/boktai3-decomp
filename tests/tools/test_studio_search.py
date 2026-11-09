@@ -42,7 +42,7 @@ class SearchTests(unittest.TestCase):
     def test_text_bank(self):
         strings = [{'id': 7, 'text': 'グールだ'}, {'id': 8, 'text': 'ほかの'}]
         hits = search.search('a ghoul', strings=strings, english={7: 'A ghoul!'})
-        self.assertEqual([h['url'] for h in hits if h['kind'] == 'text'], ['/#7'])
+        self.assertEqual([h['url'] for h in hits if h['kind'] == 'text'], ['/text#7'])
 
     def test_empty_query(self):
         self.assertEqual(search.search('  '), [])

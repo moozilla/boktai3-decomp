@@ -25,6 +25,8 @@ import re
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -227,6 +229,8 @@ def build():
 
 
 _INDEX = {"mtime": None, "data": None}
+_LOCK = threading.Lock()
+_LAYOUT_LOCK = threading.Lock()
 
 
 def _read_json(path):
@@ -234,27 +238,57 @@ def _read_json(path):
         return json.load(f)
 
 
-def load():
-    """The index, rebuilt when an input is newer than the cache (or the cache was built
-    without some of its inputs)."""
+def _rebuild(newest):
+    data = build()
+    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+    tmp = CACHE + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(data, f, separators=(",", ":"))
+    os.replace(tmp, CACHE)
+    data = _read_json(CACHE)  # the same shape the cached path returns (str keys)
+    _INDEX.update(mtime=newest, data=data)
+    return data
+
+
+def _rebuild_in_background(newest):
+    def run():
+        try:
+            _rebuild(newest)
+        finally:
+            _LOCK.release()
+    if _LOCK.acquire(blocking=False):
+        threading.Thread(target=run, daemon=True).start()
+
+
+def updating():
+    """True while a rebuild runs behind the index being served."""
+    return _LOCK.locked()
+
+
+def load(wait=False):
+    """The index. When an input is newer than it (a source edit, a merge), the old one is
+    served while a new one builds in the background (about half a minute, tools/progress.py);
+    only the first build, or WAIT, blocks."""
+    now = time.time()
+    if _INDEX["data"] is not None and now - _INDEX.get("checked", 0) < 2:
+        return _INDEX["data"]
+    _INDEX["checked"] = now
     newest = _newest()
     if _INDEX["data"] is not None and _INDEX["mtime"] >= newest:
         return _INDEX["data"]
-    data = None
-    if os.path.exists(CACHE) and os.path.getmtime(CACHE) >= newest:
+    if _INDEX["data"] is None and os.path.exists(CACHE):
         data = _read_json(CACHE)
-        if data.get("missing"):
-            data = None
-    if data is None:
-        data = build()
-        os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-        tmp = CACHE + ".tmp"
-        with open(tmp, "w") as f:
-            json.dump(data, f, separators=(",", ":"))
-        os.replace(tmp, CACHE)
-        data = _read_json(CACHE)  # the same shape the cached path returns (str keys)
-    _INDEX.update(mtime=newest, data=data)
-    return data
+        if not data.get("missing"):
+            _INDEX.update(mtime=os.path.getmtime(CACHE), data=data)
+            if _INDEX["mtime"] >= newest:
+                return data
+    if _INDEX["data"] is not None and not wait:
+        _rebuild_in_background(newest)
+        return _INDEX["data"]
+    with _LOCK:
+        if _INDEX["data"] is not None and _INDEX["mtime"] >= newest:
+            return _INDEX["data"]
+        return _rebuild(newest)
 
 
 def summary():
@@ -262,7 +296,7 @@ def summary():
     overview and search: [category -> [unit -> [function rows]]]."""
     ix = load()
     if _INDEX.get("summary_of") is ix:
-        return _INDEX["summary"]
+        return dict(_INDEX["summary"], updating=updating())
     cats = [{"name": c["name"], "measures": c["measures"], "units": [{"name": u, "functions": []} for u in c["units"]]}
             for c in ix["categories"]]
     for f in ix["functions"].values():
@@ -271,12 +305,14 @@ def summary():
     for c in cats:
         for u in c["units"]:
             u["functions"].sort(key=lambda r: r[1])
-    out = {"measures": ix["measures"], "missing": ix.get("missing", []), "concession_kinds": ix["concession_kinds"],
+    t = types()
+    out = {"measures": ix["measures"], "missing": ix.get("missing", []), "updating": False,
+           "types": sorted(set(t["defs"]) | {a for a, tag in t["aliases"].items() if tag in t["defs"]}), "concession_kinds": ix["concession_kinds"],
            "categories": cats,
            "ram": [{k: r.get(k) for k in ("addr", "name", "size", "header")} | {"users": len(ix["ram_users"].get(r["name"], []))}
                    for r in ix["ram"]]}
     _INDEX.update(summary=out, summary_of=ix)
-    return out
+    return dict(out, updating=updating())
 
 
 def _source(f):
@@ -418,6 +454,137 @@ def ram_object(name):
     rows.sort(key=lambda r: r["addr"])
     region = next((n for lo, hi, n in RAM_RANGES if r and lo <= int(r["addr"], 16) < hi), None)
     return {"object": r or {"name": key, "addr": key}, "region": region, "users": rows}
+
+
+# ---------- types: struct and union definitions, with their layout as agbcc measures it ----------
+
+_TYPE_DEF = re.compile(r"^(?:typedef\s+)?(struct|union)\s+(\w+)\s*\{", re.M)
+_TYPEDEF = re.compile(r"^typedef\s+(struct|union)\s+(\w+)\s+(\w+)\s*;", re.M)
+_TYPEDEF_BODY = re.compile(r"\}\s*(\w+)\s*;")
+
+
+def _headers():
+    import glob
+    return sorted(glob.glob(os.path.join(ROOT, "include", "**", "*.h"), recursive=True))
+
+
+def types():
+    """{"defs": {tag: {kind, file, line, text}}, "aliases": {typedef name: tag}} for the shared
+    headers (include/); cached per process until a header changes."""
+    heads = _headers()
+    key = max((os.path.getmtime(h) for h in heads), default=0)
+    if _HELPERS.get("types_key") == key:
+        return _HELPERS["types"]
+    defs, aliases = {}, {}
+    for h in heads:
+        rel = os.path.relpath(h, ROOT)
+        with open(h, encoding="utf-8", errors="replace") as f:
+            text = f.read()
+        for m in _TYPE_DEF.finditer(text):
+            i, depth = m.end(), 1
+            while i < len(text) and depth:
+                depth += (text[i] == "{") - (text[i] == "}")
+                i += 1
+            end = text.find(";", i)
+            body = text[m.start():end + 1 if end >= 0 else i]
+            start = m.start()
+            while True:  # the comment block above the definition belongs to it
+                prev = text.rfind("\n", 0, start - 1)
+                ln = text[prev + 1:start].strip()
+                if start and ln.startswith(("//", "/*", "*")):
+                    start = prev + 1
+                else:
+                    break
+            defs.setdefault(m.group(2), {"kind": m.group(1), "file": rel, "line": text.count("\n", 0, m.start()) + 1,
+                                         "text": text[start:m.start()] + body})
+            t = _TYPEDEF_BODY.match(text, i - 1) if m.group(0).startswith("typedef") else None
+            if t:
+                aliases[t.group(1)] = m.group(2)
+        for m in _TYPEDEF.finditer(text):
+            aliases[m.group(3)] = m.group(2)
+    out = {"defs": defs, "aliases": aliases}
+    _HELPERS.update(types=out, types_key=key)
+    return out
+
+
+def layouts(wait=False):
+    """{tag: {size, header, fields: [(offset, size, member)]}} measured by compiling offsetof tables
+    with agbcc (tools/scope/structure.py, in scope's own cache, so `scope.py fields` shares it). The
+    first measure takes a while; until it lands this returns None and measures in the background."""
+    if "layouts" in _HELPERS and _HELPERS.get("layouts_key") == max(map(os.path.getmtime, _headers()), default=0):
+        return _HELPERS["layouts"]
+    if not wait:
+        if _LAYOUT_LOCK.acquire(blocking=False):
+            def run():
+                try:
+                    _measure_layouts()
+                except Exception:
+                    _HELPERS["layouts"] = {}
+                finally:
+                    _LAYOUT_LOCK.release()
+            threading.Thread(target=run, daemon=True).start()
+        return _HELPERS.get("layouts")
+    with _LAYOUT_LOCK:
+        return _measure_layouts()
+
+
+def _measure_layouts():
+    sys.path.insert(0, os.path.join(ROOT, "tools", "scope"))
+    import build as buildtool
+    import scope
+    import structure
+    heads = _headers()
+
+    def compile_c(text):  # as scope.py fields compiles its tables
+        r = subprocess.run(buildtool.CPP + ["-nostdinc", "-undef"] + buildtool.DEFINES + ["-I", "include", "-"],
+                           input=text, capture_output=True, text=True, cwd=ROOT)
+        if r.returncode:
+            return None
+        a = subprocess.run([buildtool.AGBCC] + buildtool.CFLAGS + ["-o", "-"], input=r.stdout, capture_output=True,
+                           text=True, cwd=ROOT)
+        return a.stdout if a.returncode == 0 and "error" not in a.stderr else None
+    lay = scope.cached("struct_layouts", heads, lambda: structure.layouts(ROOT, compile_c))
+    _HELPERS.update(layouts=lay, layouts_key=max(map(os.path.getmtime, heads), default=0))
+    return lay
+
+
+def type_info(name):
+    """A struct or union: its definition, its layout and the functions whose C names it."""
+    t = types()
+    tag = t["aliases"].get(name, name)
+    d = t["defs"].get(tag)
+    if not d:
+        return None
+    lay = (layouts() or {}).get(tag)
+    names = {tag} | {a for a, x in t["aliases"].items() if x == tag}
+    rx = re.compile(r"\b(?:struct|union)\s+" + re.escape(tag) + r"\b|\b(?:" + "|".join(map(re.escape, sorted(names))) + r")\b")
+    ix = load()
+    by_file = collections.defaultdict(list)
+    for f in ix["functions"].values():
+        if f["file"]:
+            by_file[f["file"]].append(f)
+    users = []
+    import progress
+    from split import split_nonmatching
+    for path, fs in by_file.items():
+        try:
+            with open(os.path.join(ROOT, path), encoding="utf-8", errors="replace") as fh:
+                raw = fh.read()
+        except OSError:
+            continue
+        if not rx.search(raw):
+            continue
+        bodies = progress._bodies(split_nonmatching(raw)[0]) if len(fs) > 1 else None
+        for f in fs:
+            body = bodies.get(f["defined"] or f["name"], (0, ""))[1] if bodies is not None else raw
+            if rx.search(body):
+                users.append({"addr": f["addr"], "name": f["name"], "kinds": f["kinds"],
+                              "unit": ix["categories"][f["cat"]]["units"][f["unit"]],
+                              "category": ix["categories"][f["cat"]]["name"]})
+    users.sort(key=lambda u: u["addr"])
+    return {"name": tag, "kind": d["kind"], "file": d["file"], "line": d["line"], "text": d["text"],
+            "aliases": sorted(names - {tag}), "size": lay and lay["size"], "fields": lay and lay["fields"],
+            "measuring": lay is None and _LAYOUT_LOCK.locked(), "users": users}
 
 
 def main():
