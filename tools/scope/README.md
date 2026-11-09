@@ -1631,6 +1631,19 @@ Each was read from the compiler source and confirmed on a live draft.
    `PARTICLE_RANDOM_READ_SAMPLE` do/while counts the table's use twice, gives it 4 refs (2000)
    and r3. Both draws through that sampler overshoot (gRandomIndex's 1818 loses r2); one is
    enough. `why all` names the shared macro when it flips an order.
+111. **A cross-jump strips the kept copy's REG_EQUAL/REG_EQUIV notes unless the deleted copy
+   carries the same rtx, so a later jump can no longer match it through the notes.**
+   find_cross_jump lets two sets with different sources match when both carry an equal constant
+   note (the "G++ cleanups" branch): reload's move2add `adds r1, #0xff` (REG_EQUIV 256, because r1
+   held 1) matches a plain `movs r1, #0x80; lsls r1, #1` (REG_EQUIV 256). But do_cross_jump then
+   removes every note of the kept insn that `find_reg_note` can't find on the deleted one, and
+   find_reg_note compares pointers. Only const_ints in -64..64 are shared rtx (MAX_SAVED_CONST_INT),
+   so a 256 note always goes. In ScenePool_StateLaunchArc (own Memory_Clear calls, case 3's state
+   1 ending in its own `return 0`, the final `return 0` after an if/else) case 1's plain
+   `r1 = 256` cross-jumps into case 3 state 2's call first and drops its note; case 2 state 1,
+   processed next, has the `adds r1, #0xff` form and keeps its call, where the ROM shares it. Its
+   jump2 dump shows the kept `(set r1 256)` without its note. So a ROM that shares a call between a
+   plain copy and a move2add copy did the move2add copy first, or shared that call in source.
 
 80. **A multi-set variable whose first set (in insn order) is a constant gets its live length
    doubled, even though the equivalence is dropped at the next set.** cse puts a REG_EQUAL note on
