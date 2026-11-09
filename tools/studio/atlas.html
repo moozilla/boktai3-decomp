@@ -61,6 +61,7 @@ h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
 a.chip:hover { border-color: var(--accent); text-decoration: none; }
 .chip small { color: var(--muted); }
 .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 18px; }
+.latest { color: var(--muted); font-size: 13px; margin-top: 10px; }
 .stat { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 10px 14px; color: var(--ink); }
 a.stat:hover { border-color: var(--accent); text-decoration: none; }
 .stat b { display: block; font-size: 22px; font-weight: 650; }
@@ -591,6 +592,7 @@ function home() {
       <div class="stat"><b>${count('song')}</b><span>songs</span></div>
       <div class="stat" id="hcode"><b>…</b><span>functions</span></div>
     </div>
+    <div class="latest" id="hlatest"></div>
     <h3>The game</h3>
     <div class="cards">${T.map(n => folderCard(n.title)).join('')}</div>
     <h3>Views</h3>
@@ -605,6 +607,13 @@ async function homeStats() {
   const m = s.measures;
   el.outerHTML = `<a class="stat" href="/code"><b>${Number(m.total_functions - (s.drafts || 0)).toLocaleString()}</b><span>${s.drafts ? `of ${Number(m.total_functions).toLocaleString()} functions matching` : 'functions, all matching'}</span></a>
     <a class="stat" href="/code"><b>${m.complete_code_percent.toFixed(1)}%</b><span>of code without concessions</span></a>`;
+  // the latest merge that changed what matches (Code's "Recent updates")
+  const c = (await fetch('/api/codemap/changes').then(r => r.ok ? r.json() : []).catch(() => [])).find(e => e.clean.length + e.concession.length + e.draft.length);
+  const box = $('hlatest');
+  if (!c || !box) return;
+  const parts = [c.clean.length && `${c.clean.length} function${c.clean.length > 1 ? 's' : ''} lost their last concession`,
+    c.concession.length && `${c.concession.length} gained one`, c.draft.length && `${c.draft.length} stopped matching`].filter(Boolean).join(', ');
+  box.innerHTML = `Latest: ${esc(c.subject)} · ${parts} · ${new Date(c.t * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · <a href="/code">all recent updates</a>`;
 }
 
 
