@@ -2,7 +2,7 @@
 #include "render.h"
 #include "ram.h"
 #include "engine_globals.h"
-// MATCHING_CONCESSION: register-pinning
+#include "monster_particle_random.h"
 // confidence=low: checks light, cooldown, and random volume before entering storm phase one.
 #define Weather_UpdateStormTrigger sub_08017A6C
 struct Weather {
@@ -13,7 +13,6 @@ struct Weather {
     u8 enabled, flags;
 };
 extern u8 *gGameState;
-#define RANDOM_TABLE ((u16 *)0x0203B400)
 void Palette_SetBrightnessMode(s32);
 u32 Weather_TestFlags(u32, u32);
 s32 Weather_GetStormVolume(struct Weather *);
@@ -33,12 +32,6 @@ static inline u32 IsPaused(u32 mask)
 {
     return (gEngineFlags | gScenePauseFlags) & mask;
 }
-static inline s32 Random(void)
-{
-    u32 n = (gRandomIndex + 1) & 0x3ff;
-    gRandomIndex = n;
-    return RANDOM_TABLE[n];
-}
 static inline s32 *StormTimer(u8 *base)
 {
     u32 offset = 0x630;
@@ -47,12 +40,6 @@ static inline s32 *StormTimer(u8 *base)
     timer = (void *)(base + offset);
     return timer;
 }
-#define RandomAt(table)                                                                            \
-    ({                                                                                             \
-        u32 n = (gRandomIndex + 1) & 0x3ff;                                                        \
-        gRandomIndex = n;                                                                          \
-        (table)[n];                                                                                \
-    })
 s32 Weather_UpdateStormTrigger(struct Weather *p)
 {
     if (p->entered) {
@@ -77,17 +64,16 @@ s32 Weather_UpdateStormTrigger(struct Weather *p)
             } else {
                 s32 *timer = StormTimer(gGameState);
                 if (!*timer) {
-                    u16 *table = RANDOM_TABLE;
-                    asm("" : : "r"(table));
+                    const u16 *table = gRandomTable;
                     {
-                        s32 sample = RandomAt(table);
+                        s32 sample = ParticleRandom_ReadSample(table);
                         sample &= 63;
                         if (sample < volume)
                             goto beginStorm;
                     }
                     *timer = gWeatherCooldownBase;
                     if (gWeatherCooldownRange > 0) {
-                        s32 random = Mod(RandomAt(table), gWeatherCooldownRange);
+                        s32 random = Mod(ParticleRandom_ReadSample(table), gWeatherCooldownRange);
                         s32 *last = StormTimer(gGameState);
                         *last += random;
                     }

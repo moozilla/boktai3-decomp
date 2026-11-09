@@ -1,9 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "projected_display.h"
 #include "render.h"
+// No return statement: the ROM returns the caller's r0 (display) untouched (fact 95).
 struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay *display, s32 index)
 {
-    register struct ProjectedDisplay *result asm("r0") = display;
     struct ProjectedDisplayEntry *entry = &display->entries[index];
     if (index == 1) {
         struct ContactPosition *destination = &entry->position;
@@ -36,18 +35,5 @@ struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay 
         struct ProjectedDisplayEntry *view = entry;
         view->position = copy;
     }
-    {
-        const s32 *table;
-        s32 offset;
-        const s32 *word;
-        s32 bias;
-        register struct ProjectedDisplayEntry *view asm("r3");
-        table = gUnk_0860594C;
-        offset = index << 2;
-        word = (void *)(offset + (u32)table);
-        bias = *word;
-        view = entry;
-        view->position.z += bias;
-    }
-    return result;
+    entry->position.z += gUnk_0860594C[index];
 }

@@ -52,6 +52,11 @@ Draft: `notes/phase3-drafts/field-effects/Trigger_RunScript.c` (11 ROM / 9 draft
    refs and fixes the allocation, but the ROM does that RMW through sp (`ldr r0, [sp, #0x28]`).
 Next idea: find refs for argsPtr that cse later folds back to sp, or the label/loop structure
 that ends cse's block between the actor copy and its uses.
+Tried monsters-bosses' class-head lever (Hresvelgr_UpdateRisingProjectile, an early mention of
+the copy): an early `savedActor = 0`/`-1` or `index = 0` at the top, `savedActor = actor` then
+`index = savedActor`, or saving through `s32 *saved = &savedActor`. All stay at 11/9 or get worse. The
+extended block starts at function entry, so no mention can come before it; the copy needs a last
+use past the block end (the loop label at `active`), and that use would merge the r5 copy instead.
 
 ### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): deferred
 
@@ -150,6 +155,105 @@ Next idea: the original probably had the constant inside the "first sample" rand
 (all three functions load it just before a sample read from the literal table address). Find a
 form where the constant isn't a REG_EQUIV (so the live length isn't multiplied), or where angle's
 priority drops below setup's.
+
+### sub_0801404C (ParticleGroup_UpdateBouncing, src/fn/sub_0801404C.c): deferred
+
+Draft: `notes/phase3-drafts/field-effects/sub_0801404C.c` (38 ROM / 40 draft; with the four
+barriers simply removed it is 45 / 51). `ParticleRandom_ReadSample(table)` in place of
+`ReadDirectSample` puts the table in sl as the ROM has it (the direct form leaves the
+REG_EQUIV table unallocated and rematerialized). Still open, in order:
+* `scope.py ... probe`: PRE reuses the CellIndex load of position.x for the line-88 update
+  (`AGBCC_NOPRE=1` gives 34 / 38). The barrier's "memory" clobber hid it. A pointer local for
+  the update (`pos->x += ...`) is much worse (65 / 85).
+* `resource` is r8 in the draft and caller-saved r3 in the ROM (spilled around the call);
+  `sprite` (g + 20) is a stack slot in the draft and sb in the ROM; gRandomIndex's address is
+  sb in the draft and r8 in the ROM (`AGBCC_PRI=144:+517` helps).
+
+### ParticleGroup_UpdateFrozen (src/fn/sub_08014330.c, 08014330): deferred, one zero-extend
+
+Draft: `notes/phase3-drafts/field-effects/ParticleGroup_UpdateFrozen.c` (3 ROM / 1 draft). There
+is no `type` variable: plain `g->type` reads at the top and in the late test. gcse PRE then
+produces the ROM's shape by itself: the top copy (`ldrb r0` / `adds r3, r0`) and the
+`ldrb r3` it inserts at the end of the two arms that call FindCellOverride (`scope.py ... pre`).
+The one difference: the ROM zero-extends the PRE register before `cmp #8`, while combine drops
+the extension in the draft because every set of the QImode reaching register is a load or a copy
+of one (nonzero_bits 0xFF). The ROM's register must have had a set with unknown upper bits (a
+lowpart subreg of an SImode value counts, since ARM has WORD_REGISTER_OPERATIONS). A u8/u32/int
+local at the top is worse (it changes the expression, so PRE stops), and so are casts on either
+test.
+
+### sub_08014634 (ParticleGroup_SpawnBouncing, src/fn/sub_08014634.c): deferred, rewrite started
+
+The pinned source imitates register pressure: a `struct SpawnArgs` copy of count, options and
+position with an `asm("" : "+m")`, plus 15 pins. In the ROM those three arguments are simply
+spilled pseudos. `str r0/r1/r2, [sp, #0/4/8]` at entry, and `mov r1, sp; ldrb r1, [r1, #4]` is
+reload reading the low byte of spilled `options` for `g->type = options`. Draft:
+`notes/phase3-drafts/field-effects/sub_08014634.c`, plain C with ordinary arguments (132 / 116,
+mostly register shifts). The inner loop counts down in the ROM (loop.c reversed `i`, then reloads
+`count` as i's final value). Open: in the draft `options` stays in r6 and gcse hoists
+`options * 4` for `gUnk_08604B90[options]` (the ROM recomputes it from the stack slot each
+pass); the ROM keeps both `pool` (spilled, sp+0x10) and `g` (r6) and holds velocity in r8;
+`rng` is caller-saved r3 around sub_08217E40.
+
+### AnimatedParticleManager_Update (src/fn/sub_08015160.c, 08015160): deferred, priority tie
+
+Draft: `notes/phase3-drafts/field-effects/AnimatedParticleManager_Update.c` (32 ROM / 32 draft),
+the whole unit on the shared types (DisplaySequenceSprite, DisplaySequenceState) and
+`DisplaySequence_StepSprite` from include/display_sequence_sprite.h. The helper's `command`
+plays the old `entry` role exactly, and indexed loop forms are worse (37-49 rows). Only allocation is left: `p` (48 refs over 245 insns, priority 9795) loses
+r5 to `entry` (12 refs over 36 insns, 10000). `AGBCC_PRI=p:+206` matches. `entry` needs 9 to 11
+refs: with its second set (the frame step's `entry = a->data + a->frame`) in a separate local it
+has 8 and falls under `o` (7531), which then takes r6 (27 / 27). A `command = *entry` local
+doesn't change the counts (cse). `scope.py why 35` lists the fact 91 levers (duplicate
+`p->timer++` or the vertical-scale test into the arms before it); neither looks like original
+code.
+
+### AnimatedParticle_PriorityFromFlags (src/fn/sub_080154D0.c, 080154D0): deferred, DEBUG_NOP
+
+Without the `DEBUG_NOP()` it is 7 ROM / 5 draft. regmove ties `flags & 0xf000` to the
+constant's register instead of to `flags` (`AGBCC_NOTIE=13` matches). The empty loop's notes
+after the AND make the AND's result live across a block boundary, which changes that tie.
+Tried with no change: the value or the constant first (fact 33), `flags &= 0xf000`, a separate
+`priority`, u32 parameter and casts, a ternary, `p >= 1 && p <= 4`, `p < 4`, a switch (worse),
+and `result = 2` before or after.
+Next idea: real code between the AND and the shift that ends the block (a test the original
+had), or evidence for `concession-ok(debug-nop)` from a twin with the same compiled-out check.
+
+### AnimatedParticles_Create (src/fn/sub_080154EC.c, 080154EC): deferred
+
+Draft: `notes/phase3-drafts/field-effects/AnimatedParticles_Create.c` (6 ROM / 2 draft, all four
+concessions removed). Two separate problems:
+* jump2 cross-jumps the `movs r3, #0; bl Anim_SetSequence` tails of the type 5 and 6 arms into
+  the type 7 arm's copy. The ROM keeps all three (arms 5 and 6 are even identical except for
+  the palette bank). The pinned source keeps them apart with `asm("" : : "r"(a), "i"(N))`.
+  The original's tails must have differed in RTL (a different call or argument form) or
+  jumped to different labels at jump2 time.
+* After the arms the ROM copies the state pointer to r8 and back (`mov r8, r4; mov r4, r8`):
+  a second pseudo for the step. DisplaySequence_StepSprite is not this step: it reads
+  `state->commands` where this function reads `p->anim.data` (`ldr r1, [r5, #0x68]`), and
+  using it gives 101 / 124. A local inline step with a parameter copy, called with `saved`,
+  gives 7 / 3 but still no copy back. Without a separate `saved` it is 101 / 124 again, so
+  the second pointer is real.
+
+### FadingParticleGroup_Spawn (src/fn/sub_08015F60.c, 08015F60): deferred
+
+Draft: `notes/phase3-drafts/field-effects/FadingParticleGroup_Spawn.c` (57 ROM / 59 draft; with
+the two pins simply removed it is 64 / 66). The random read goes through
+PARTICLE_RANDOM_READ_SAMPLE (shared header), as in ParticleRandom_ReadSample. Open: the table
+(ROM r6) loses to `rng` (3401 vs 2975; both are REG_EQUIV constants with doubled live
+lengths; `AGBCC_PRI=table:+427` gives 43 / 45), and the sine table pointer wants r2
+(`AGBCC_FORCE=sine:2` gives 43 / 43). Moving the `rng` set, or dropping `rng` for the header's
+ReadSample/ReadDirectSample, is no better.
+
+### FadingParticleGroup_Update (src/fn/sub_08016118.c, 08016118): deferred
+
+Draft: `notes/phase3-drafts/field-effects/FadingParticleGroup_Update.c` (the memory barrier
+removed: 43 ROM / 43 draft; the `raw` pin is still in it). Without the barrier, cse2 reuses the
+`p->velocity.y` loaded for `position.y += velocity.y` in `p->velocity.y -= 2` (insn 177), where
+the ROM loads it again. The position stores go through the same base at other offsets, so cse
+sees no alias. A pointer local for the position or velocity (fact 60's lever) changes
+allocation across the whole loop (87 / 89), and one only for the `-= 2` is no better (43 / 43).
+The rest is allocation and one reload rotation (`AGBCC_SPILL=8:1` helps).
 
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 

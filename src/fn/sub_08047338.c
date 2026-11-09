@@ -28,19 +28,14 @@ s32 TransientSpriteEffects_Update(struct TransientSpriteEffects *pool)
                 slot->velocity.z = effectScale(slot->velocity.z * drag);
             }
             {
-                u32 zero;
-                u32 x = (u16)slot->velocity.x;
-                register u32 delta asm("r1") = (u16)sprite->position.vector.x;
-                x += delta;
-                zero = 0;
-                sprite->position.vector.x = x;
+                sprite->position.vector.x += (u16)slot->velocity.x;
                 sprite->position.vector.y += (u16)slot->velocity.y;
                 if (!(sprite->flags & 16))
                     sprite->position.vector.z += (u16)slot->velocity.z;
                 sprite->frame = slot->age >> 2;
                 ++slot->age;
                 if (slot->age > 24) {
-                    slot->active = zero;
+                    slot->active = 0;
                     Sprite_Remove(sprite);
                 }
             }
