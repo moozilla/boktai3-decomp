@@ -326,6 +326,14 @@ jump cse follows), `CSE_NOFOLLOW=K` (refuse the K-th follow),
 `AGBCC_DUMPPRI`, `AGBCC_SPILL` (local-alloc / reload; see the sources for
 syntax). Added in this thread (in `tools/scope/agbcc.patch`):
 
+* `AGBCC_REGCLASS=1`: regclass.c prints, for each pseudo and pass, its
+  preferred and alternate class and the cost of every class
+  (`R func pseudo passN pref=... alt=... mem=... LO_REGS=... STACK_REG=...`).
+  `AGBCC_REGCLASS_TRACE=N` prints what each insn adds to pseudo N's costs
+  (`RI N passN uid U ...`). A pointer whose `pref` is STACK_REG is allocated
+  from its alternate class, which includes ip: on Thumb `p + imm` with imm a
+  multiple of 4 votes for STACK_REG (`add rd, sp, #imm`), any other imm and
+  `p + reg` vote for LO_REGS (fact 92).
 * `CSE_WHY=UID`: for each SET of insn UID, every time cse processes it, print
   the candidates (`src`, `src_folded`, `src_eqv`, `src_related`) with costs
   and the equivalence class in order, each member tagged with the insn at
@@ -1669,6 +1677,18 @@ Each was read from the compiler source and confirmed on a live draft.
    priority needs: the rate line that reads `entry` stayed after the join, since copying it too
    raised `entry` over `o` and swapped those two. `why` now lists such statements among the ways to
    flip an order (join_lever in scope.py).
+
+92. **A pointer's register class is a vote of its adds, and a STACK_REG winner lands in ip.**
+   regclass sums, over every insn, what each class would cost. On Thumb `p + imm` with imm a
+   multiple of 4 (up to 1020) costs nothing in STACK_REG (`add rd, sp, #imm`) and 2 in LO_REGS;
+   any other imm costs LO_REGS 2 and STACK_REG 4; `p + reg` costs LO_REGS 0 and STACK_REG 2;
+   insns in a loop count four times. When STACK_REG wins, global alloc uses the alternate class,
+   all registers, and find_reg's pass 0 takes ip: call-clobbered registers count as already used,
+   so it never reaches the first free r4. In ScanlinePresentation_UpdateNoise the pin-free draft
+   scored LO_REGS 26 against STACK_REG 24 for p and put it in ip. The ROM has one more odd-offset
+   add (`p + 726`, hoisted out of the noise loop), and with it the tie gives BASE_REGS and then
+   LO_REGS: in the draft cse2 had turned that hoisted add into a copy of `amplitude = &p->amplitude`.
+   `AGBCC_REGCLASS=1` and `AGBCC_REGCLASS_TRACE=N` show the votes.
 
 ## Survey: random table as a literal address (2026-10-24)
 
