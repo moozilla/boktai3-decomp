@@ -68,7 +68,7 @@ window.addEventListener('hashchange', () => { if (location.pathname === '/gfx') 
 // "Ghoul · Boktai 3 Browse", or "Boktai 3 Browse" for the view itself.
 function pageTitle(thing, view) {
   view ||= document.title.replace(/^.* · /, '').replace(/^Boktai 3 /, '') || 'Studio';
-  document.title = (thing ? thing + ' · ' : '') + 'Boktai 3 ' + view;
+  document.title = (thing && thing !== view ? thing + ' · ' : '') + 'Boktai 3 ' + view;
 }
 
 // ---------- search (⌘K on every page: tools/studio/search.py) ----------
@@ -254,11 +254,21 @@ function sceneWhere(scene) {
 }
 
 const resCache = new Map();
+// At most 12 resource downloads in flight from a page, the rest queued: a view
+// that previews hundreds of palettes at once otherwise runs the browser out of
+// sockets (ERR_SOCKET_NOT_CONNECTED).
+const resSlots = { busy: 0, queue: [] };
+function limited(fn) {
+  return new Promise((ok, no) => {
+    const run = () => { resSlots.busy++; fn().then(ok, no).finally(() => { resSlots.busy--; resSlots.queue.shift()?.(); }); };
+    resSlots.busy < 12 ? run() : resSlots.queue.push(run);
+  });
+}
 function res(label, hash) {
   const k = label + '/' + hash;
   if (!resCache.has(k)) {
     // one retry for a dropped connection; a failure isn't cached, so the next call tries again
-    const get = () => fetch(`/api/res/${label}/${hash}`).then(r => { if (!r.ok) throw new Error('no ' + k); return r.arrayBuffer(); });
+    const get = () => limited(() => fetch(`/api/res/${label}/${hash}`).then(r => { if (!r.ok) throw new Error('no ' + k); return r.arrayBuffer(); }));
     resCache.set(k, get().catch(e => e.message.startsWith('no ') ? Promise.reject(e) : get())
       .then(b => new Uint8Array(b)).catch(e => { resCache.delete(k); throw e; }));
   }
