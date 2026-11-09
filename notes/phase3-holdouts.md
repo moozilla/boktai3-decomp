@@ -164,3 +164,25 @@ the loop; the draft hoists it. `hoist`: in loop pass 2 the address (insn 148) mo
 37, after pass 1 moved the mask 1 (as the ROM does too). Tried `--trail->activeCount`,
 `activeCount--`, a pointer local and `= activeCount - 1`; all are hoisted. Next: a form whose pass-2
 threshold or lifetime fails, or a count address that is not invariant (derived from the segment).
+
+### TentacleActor_AlignSegmentsToTerrain (src/fn/sub_080AA8C4.c, 080AA8C4): deferred
+
+Draft: `TentacleActor_AlignSegmentsToTerrain.c`, 36/38 differ, all of it allocation. It passes
+`&segment->position` to Height (the landed code passes `&trail->segments[i].position`, which costs
+recomputation). Left: the ROM copies Height's result (`adds r2, r1, #0` at the switch join) and
+keeps Height's `p` in r6 copied from r7 before the override call. The draft coalesces the result
+and strength-reduces the copy (insn 703, tagged loop). `why all`: 234 vs p allocation order
+(`AGBCC_PRI=234:+1636` gives 28/30).
+
+### Six-spark burst family: Bat_UpdateDefeat, TentacleActor_SpawnSparkBurst (080AB294), Vorn_UpdateDefeat
+
+All three spawn six sparks from `gRandomTable` kept in a callee-saved register. The ROM's table
+pseudo has no REG_EQUIV; the C pins it or uses an asm barrier. In SpawnSparkBurst the halves union
+(`TentacleActor_SpawnSparkBurst.c`) already gives the ROM's allocation (table in r7), 4/10 differ:
+only the half insertions are left unfolded. The `struct VAB v` bitfield writes before it leave
+0xFFFF0000 and 0xFFFF in cse-shared pseudos, so the insertions' `and` has a register operand and
+combine has no constant to simplify. Ruled out here: the two-statement offset form
+(`off = (u8 *)gRandomTable + k; table = (u16 *)(off - k);`, sub_08000430), where cse still
+records REG_EQUIV (const (plus sym k)) and the result is worse, and halves placed before the vector
+writes. Next: a table source that cse does not see as constant and combine folds, with no mask
+constant in common with a bitfield write in the same block.
