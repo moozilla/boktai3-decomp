@@ -1690,6 +1690,19 @@ Each was read from the compiler source and confirmed on a live draft.
    LO_REGS: in the draft cse2 had turned that hoisted add into a copy of `amplitude = &p->amplitude`.
    `AGBCC_REGCLASS=1` and `AGBCC_REGCLASS_TRACE=N` show the votes.
 
+93. **A union local's initializer keeps its load inside a loop.**
+   `union U u = {x};` expands to `(clobber (reg u))` and then the set. loop.c's
+   count_loop_regs_set counts the clobber as a set, so the pseudo is set twice in the loop and
+   is marked may_not_optimize: it is never hoisted, however long it lives. A plain
+   `T *t = x;` with the same uses is a single set, and when its life is long enough
+   (threshold x savings x lifetime >= insns) loop.c moves it to the preheader. In
+   BoardPieces_StartConvergence the ROM loads gRandomTable in the loop and keeps it for two
+   samples; the plain local lived 25 insns and was hoisted at threshold 7, while
+   `union RandomTableView table = {gRandomTable};` (the matched sibling sub_08010298's form)
+   stayed in place and matched. `scope.py FILE.c FUNC hoist` reports it as `set 2 times in the
+   loop ... (may_not_optimize)`. Use it when a loop-invariant load must stay in the body and a
+   real union type exists for the value.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
