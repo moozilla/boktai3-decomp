@@ -3519,6 +3519,12 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
     print("      a tail that several branches jump to may be one the C writes in each branch (an inline"
           " helper: fact 55 keeps its field addresses apart); jump2 merges the copies after reload, and"
           " each copy's reload choices still count (README fact 59)")
+    rnd = [n for n in cl if 0 < n <= len(text) and re.search(r"gRandomTable|gUnk_0203B400", text[n - 1])]
+    if rnd:
+        print(f"      the random table is read here (line {', '.join(map(str, rnd))}): reading it through"
+              " RANDOM_TABLE_ADDR (`*(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1))`, or"
+              " SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py) changes the reloads around the"
+              " table address (ScenePool_UpdateSpeedPulse, _ScheduleSpeedControl)")
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
