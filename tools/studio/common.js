@@ -70,7 +70,7 @@ function searchOpen() {
   let d = $('gsearchbox');
   if (!d) {
     d = document.createElement('div'); d.id = 'gsearchbox';
-    d.innerHTML = `<div class="box"><input id="gsq" placeholder="Search everything: a monster, place, item, function, RAM object, script, line of text…" autocomplete="off"><div id="gsres"></div>
+    d.innerHTML = `<div class="box"><input id="gsq" placeholder="Search everything: a monster, place, item, function, script, line of text, ROM address…" autocomplete="off"><div id="gsres"></div>
       <div class="foot"><span class="kbd">↑↓</span> move <span class="kbd">↵</span> open <span class="kbd">⌘↵</span> new tab <span class="kbd">esc</span> close</div></div>`;
     document.body.appendChild(d);
     let timer;

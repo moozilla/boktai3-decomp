@@ -24,7 +24,7 @@ ATLAS_KIND = {"package": "sprite", "actor": "object", "monster": "monster", "cha
 # how a tie between equally good matches is broken: the things people look for first
 RANK = {"monster": 9, "character": 8, "object": 8, "item": 7, "area": 6, "story": 5, "scene": 5, "cutscene": 4,
         "sprite": 4, "function": 4, "song": 3, "script": 3, "procedure": 3, "tileset": 2, "map tiles": 2,
-        "RAM": 3, "unit": 3, "type": 3, "subsystem": 1, "text": 1, "place": 6, "map": 4, "palette": 3}
+        "RAM": 3, "unit": 3, "type": 3, "subsystem": 1, "text": 1, "place": 6, "map": 4, "palette": 3, "ROM": 5}
 
 
 def score(q, title, *others):
@@ -80,6 +80,41 @@ def _resources():
         return serve.resource_index()
     except Exception:
         return {}
+
+
+_ROM = {"key": None, "leaves": []}
+
+
+def _rom_leaves():
+    """[(start, end, title, path, ref)] for every leaf block of the ROM view's
+    treemap (tools/studio/atlas.py rom_tree), sorted by address, so an address
+    finds what holds it; rebuilt when the ROM map changes."""
+    try:
+        import atlas
+        key = os.path.getmtime(atlas.ROMCACHE) if os.path.exists(atlas.ROMCACHE) else None
+        if _ROM["key"] != key or not _ROM["leaves"]:
+            out = []
+
+            def walk(n, path):
+                if n.get("c"):
+                    for c in n["c"]:
+                        walk(c, path + [n["t"]])
+                else:
+                    out.append((n["s"], n["s"] + n["n"], n["t"], path, n.get("r")))
+            for top in atlas.rom_tree()["children"]:
+                walk(top, [])
+            _ROM.update(key=key, leaves=sorted(out))
+        return _ROM["leaves"]
+    except Exception:
+        return []
+
+
+def rom_at(addr):
+    """The leaf block holding ROM address ADDR, or None."""
+    import bisect
+    leaves = _rom_leaves()
+    i = bisect.bisect_right(leaves, (addr, float("inf"))) - 1
+    return leaves[i] if i >= 0 and leaves[i][0] <= addr < leaves[i][1] else None
 
 
 def _procs():
@@ -142,6 +177,18 @@ def search(q, strings=None, english=None, limit=50):
         e = atlas.get(f"scene:{int(m.group(1))}")
         if e:
             add(95, "scene", e.get("title") or f"Scene {m.group(1)}", scene_sub(e), "/atlas#" + e["id"])
+    # a ROM address ("0858A1C0", "0x0858A1C0") finds the block that holds it
+    m = re.fullmatch(r"(?:0x)?(0?8[0-9a-f]{6})", q)
+    if m:
+        a = int(m.group(1), 16)
+        hit = rom_at(a)
+        if hit:
+            start, _, title, path, ref = hit
+            url = (ref if ref.startswith("/") else "/atlas#" + ref) if ref else \
+                "/rom#kind/" + "/".join(urllib.parse.quote(t) for t in path)
+            where = " › ".join(path) or "ROM"
+            if not any(h[5] == url for h in hits):  # a function's own address already found it
+                add(92, "ROM", title, f"{where} · +0x{a - start:X}" if a > start else where, url)
     if re.fullmatch(r"[0-9a-f]{4}", q):
         for label, kind, url in (("map", "map", "/gfx#maps/"), ("t92B3", "palette", "/gfx#palettes/")):
             if any(h == q.upper() for h, _ in _resources().get(label, [])):

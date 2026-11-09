@@ -25,7 +25,10 @@ class SearchTests(unittest.TestCase):
     def setUp(self):
         for name, value in (('_atlas', lambda: ATLAS), ('_code', lambda: CODE), ('_procs', lambda: {12: 'spawn_ghoul'}),
                             ('_places', lambda: [{'name': 'Ancient Tree', 'areas': [4, 5], 'scenes': 14}]),
-                            ('_resources', lambda: {'map': [['7EFB', 900]], 't92B3': [['081B', 512]]})):
+                            ('_resources', lambda: {'map': [['7EFB', 900]], 't92B3': [['081B', 512]]}),
+                            ('_rom_leaves', lambda: [(0x0808E1D4, 0x0808E238, 'Ghoul_Create', ['Code', 'Ghoul'], '/code#0808E1D4'),
+                                                     (0x085897F4, 0x0858A000, 'song 18', ['Sound (MP2K)', 'Songs'], 'song:18'),
+                                                     (0x08700000, 0x08800000, 'free', [], None)])):
             context = patch.object(search, name, value)
             context.start()
             self.addCleanup(context.stop)
@@ -59,6 +62,15 @@ class SearchTests(unittest.TestCase):
         self.assertEqual(search.search('ghoul corridor')[0]['sub'], 'scene 2719 · Sealed Prison')
         self.assertEqual(search.search('7efb')[0], {'kind': 'map', 'title': 'Map 7EFB', 'sub': 'resource map', 'url': '/gfx#maps/7EFB'})
         self.assertEqual(search.search('081b')[0]['url'], '/gfx#palettes/081B')
+
+    def test_rom_address_finds_what_holds_it(self):
+        self.assertEqual(search.search('0858980c')[0], {'kind': 'ROM', 'title': 'song 18', 'sub': 'Sound (MP2K) › Songs · +0x18',
+                                                        'url': '/atlas#song:18'})
+        self.assertEqual(search.search('0x0808E1E0')[0]['url'], '/code#0808E1D4')  # inside a function
+        self.assertEqual(search.search('0808e1d4')[0]['kind'], 'function')  # its own address: no second hit
+        self.assertEqual(len([h for h in search.search('0808e1d4') if h['url'] == '/code#0808E1D4']), 1)
+        self.assertEqual(search.search('08700010')[0]['sub'], 'ROM · +0x10')
+        self.assertEqual([h for h in search.search('08900000') if h['kind'] == 'ROM'], [])
 
     def test_empty_query(self):
         self.assertEqual(search.search('  '), [])
