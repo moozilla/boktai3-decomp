@@ -2279,12 +2279,26 @@ def life_note(wd, x, live):
                     f" The doubling goes away only if the non-constant set comes first in the code]")
         return (f" [flow measured {fl}; doubled because it always holds a constant (REG_EQUIV):"
                 f" update_equiv_regs, local-alloc.c, halves constant registers' priority]")
+    if live % 2 == 0 and 0 < abs(live // 2 - fl) <= 2 and constant_set(wd, x):
+        return (f" [flow measured {fl}; regmove's tie merged a constant's register into it (its set"
+                f" `(set reg {x} (const_int ...))`, now {live // 2} insns), and update_equiv_regs (local-alloc.c)"
+                f" doubled that at the constant set before the second set dropped the equivalence (fact 20):"
+                f" {live}. Untied, or with the non-constant set first, it would not be doubled]")
     k = equiv_sets(wd, x)
     if k >= 2 and live == fl << k:
         return (f" [flow measured {fl}; update_equiv_regs (local-alloc.c) doubled it once for each of its"
                 f" {k} sets with a REG_EQUIV note (x{1 << k}), so its priority fell to 1/{1 << k}."
                 f" Setting it to the constant once (one set) doubles it only once]")
     return f" [flow measured {fl}; regmove changed it while rewriting copies]"
+
+
+def constant_set(wd, x):
+    """Pseudo X is set to a constant somewhere in the lreg dump (as after regmove ties a constant's
+    register into it)."""
+    path = os.path.join(wd, "u.i.lreg")
+    if not os.path.exists(path):
+        return False
+    return re.search(rf"\(set \(reg(?:/\w)*:\w+ {x}\)\s*\(const_int -?\d+\)\)", open(path).read()) is not None
 
 
 def equiv_sets(wd, x):
