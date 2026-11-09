@@ -156,3 +156,11 @@ Same family as TentacleBody_RefreshDirectionalAnimations: the same Step helper a
 `frame` stack struct and segment loop. With Refresh's draft Step and ordinary body C, Reset scores
 54/52 (`TentacleBody_ResetDirectionalAnimations.c`); Restart is not tried yet. Solve Refresh first,
 then move the shared Step into `include/tentacle_segment_animation.h` and port it to all three.
+
+### TentacleActor_RemoveSegmentColliders (src/fn/sub_080AA688.c, 080AA688): deferred
+
+Draft: `sub_080AA688.c` (`--trail->activeCount;`, 25/24 differ). The ROM rebuilds `trail + 0x8EA` in
+the loop; the draft hoists it. `hoist`: in loop pass 2 the address (insn 148) moves at 13 x 1 x 3 >=
+37, after pass 1 moved the mask 1 (as the ROM does too). Tried `--trail->activeCount`,
+`activeCount--`, a pointer local and `= activeCount - 1`; all are hoisted. Next: a form whose pass-2
+threshold or lifetime fails, or a count address that is not invariant (derived from the segment).
