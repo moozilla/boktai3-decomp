@@ -248,12 +248,22 @@ function drawWorld() {
     const e = el('line', { x1: pos[l.a].x, y1: pos[l.a].y, x2: pos[l.b].x, y2: pos[l.b].y, class: 'edge' + (one ? ' oneway' : '') + (l.a === sel || l.b === sel ? ' hi' : ''), 'stroke-width': Math.min(1 + Math.sqrt(l.doors), 6) }, ge);
     el('title', {}, e).textContent = `area ${l.a} ↔ area ${l.b}: ${l.doors} door${l.doors > 1 ? 's' : ''}${one ? ' (one way)' : ''}`;
   }
-  // one name per place and connected group, above its rooms
-  for (const comp of comps) {
+  // one name per place and connected group, above its rooms; a lone room of a
+  // place that has a bigger group elsewhere goes by its color, so a row of
+  // loose rooms doesn't stack up copies of the name
+  const groups = comps.map(comp => {
     const by = {};
     comp.forEach(i => { const a = W.areas[i]; if (a.place) (by[a.place] ||= []).push(a); });
+    return by;
+  });
+  const biggest = {};
+  for (const by of groups) for (const [name, as] of Object.entries(by)) biggest[name] = Math.max(biggest[name] || 0, as.length);
+  const named = new Set();
+  for (const by of groups) {
     for (const [name, as] of Object.entries(by)) {
       if (as[0].hue == null) continue;  // a one-room place is named under its circle instead
+      if (as.length === 1 && (biggest[name] > 1 || named.has(name))) continue;
+      named.add(name);
       const xs = as.map(a => pos[a.area].x), y = Math.min(...as.map(a => pos[a.area].y - a.r));
       const t = el('text', { class: 'plab' + (as[0].hue == null ? ' plain' : '') + (selPlace === name ? ' on' : ''), x: (Math.min(...xs) + Math.max(...xs)) / 2, y: y - 6, style: placeStyle(as[0].hue) }, gp);
       t.textContent = name;
@@ -286,6 +296,14 @@ function zoomed(vb) {
 }
 const inView = i => { const b = view.box(), q = pos[i]; return q && q.x > b[0] && q.x < b[0] + b[2] && q.y > b[1] && q.y < b[1] + b[3]; };
 function fitWorld() { view.reset(bounds(pos, Object.keys(pos), 30)); }
+// a place's areas in its biggest connected group (and AREA's group, when given):
+// fitting the view to every loose room of a place would show the whole world
+function mainGroup(ids, area) {
+  const of = ids.map(i => comps.find(c => c.includes(i))).filter(Boolean);
+  const best = of.reduce((x, y) => (y.length > x.length ? y : x), of[0] || []);
+  const keep = new Set([...best, ...(area != null ? comps.find(c => c.includes(area)) || [] : [])]);
+  return ids.filter(i => keep.has(i));
+}
 function focusAreas(ids) {
   ids = ids.filter(i => pos[i]);
   if (ids.length) view.reset(bounds(pos, ids, 70));
@@ -322,7 +340,7 @@ function showPlace(name) {
   const p = PLACES.find(x => x.name === name); if (!p) return showWorld();
   sel = null; selScene = null; selPlace = name;
   if (p.areas.some(i => !pos[i])) { $('lonely').checked = true; relayout(); }
-  drawWorld(); focusAreas(p.areas);
+  drawWorld(); focusAreas(mainGroup(p.areas));
   const fam = Object.entries(p.enemies).sort((x, y) => y[1] - x[1]).map(([f, k]) => `${esc(f)} ×${k}`).join(', ');
   const areaCard = i => {
     const a = W.areas[i], shot = a.scenes.find(s => W.scenes[s].shot);
@@ -350,7 +368,7 @@ function showArea(n, scene) {
   sel = n; selScene = scene ?? null; selPlace = null;
   if (!pos[n]) relayout();  // a room without links is laid out once it is open
   drawWorld();
-  if (!inView(n)) focusAreas(a.place ? PLACES.find(p => p.name === a.place).areas : [n]);
+  if (!inView(n)) focusAreas(a.place ? mainGroup(PLACES.find(p => p.name === a.place).areas, n) : [n]);
   const nb = [...new Set([...Object.keys(a.out), ...Object.keys(a.in)].map(Number))].sort((x, y) => x - y);
   const chip = b => `<a class="chip" href="#area=${b}" title="${esc(areaLabel(W.areas[b]))}">${b} · ${esc(short(W.areas[b].label, 30) || 'unlabeled')} <small>${a.out[b] || 0}→ ${a.in[b] || 0}←</small></a>`;
   const fam = Object.entries(a.enemies).map(([f, k]) => `${esc(f)} ×${k}`).join(', ');
