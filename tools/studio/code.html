@@ -43,6 +43,7 @@ h1.t .step { font: 13px system-ui, sans-serif; color: var(--muted); font-weight:
 .badge { font-size: 12px; padding: 1px 9px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); background: var(--panel); white-space: nowrap; }
 .badge.ok { border-color: var(--ok); color: var(--ok); background: var(--ok-bg); }
 .badge.warn { border-color: var(--warn); color: var(--warn); background: var(--warn-bg); }
+a.badge:hover { border-color: var(--accent); text-decoration: none; }
 .badge.mono { font-family: var(--mono); font-size: 11.5px; }
 h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 26px 0 10px; font-weight: 650; display: flex; align-items: baseline; gap: 8px; }
 h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
@@ -64,6 +65,7 @@ table.t td.r, table.t th.r { text-align: right; font-variant-numeric: tabular-nu
 table.t tr.link { cursor: pointer; }
 table.t tr.link:hover td { background: var(--sel); }
 .kinds { display: grid; grid-template-columns: max-content 1fr max-content; gap: 6px 12px; align-items: center; max-width: 760px; font-size: 13px; }
+.kinds a { color: var(--ink); }
 .kinds .kb { height: 8px; border-radius: 4px; background: var(--warn); }
 .strip { display: flex; height: 22px; border-radius: 5px; overflow: hidden; border: 1px solid var(--line); margin: 14px 0 4px; }
 .strip a { display: block; height: 100%; background: var(--ok); border-right: 1px solid var(--panel); min-width: 2px; }
@@ -195,6 +197,7 @@ function renderTree() {
     out.push(`<a class="tn ${cls}${SEL === hash ? ' on' : ''}" style="--d:${d}" href="${hash}" data-key="${esc(hash)}">${tw}${dot ?? ''}<span class="tl">${label}</span>${count != null ? `<span class="tc">${count}</span>` : ''}</a>`);
   row(0, 'top', '#', '<span class="tw">◎</span>', 'Overview');
   row(0, 'top', '#ram', '<span class="tw">▦</span>', 'RAM objects', num(S.ram.length));
+  row(0, 'top', '#left', '<span class="tw">◆</span>', 'Concessions left', num(Object.values(FN).filter(f => f.kinds.length).length));
   for (const c of S.categories) {
     const ck = catHref(c.name), co = open.has(ck);
     row(0, 'd0', ck, `<span class="tw" data-tog="${esc(ck)}">${co ? '▾' : '▸'}</span>`, esc(c.name), num(c.nfn));
@@ -255,8 +258,8 @@ function overview() {
     <table class="t"><tr><th>Category</th><th class="r">Units</th><th class="r">Functions</th><th class="r">Code</th><th style="width:30%">Without concessions</th><th class="r"></th></tr>
     ${S.categories.map(c => `<tr class="link" data-href="${catHref(c.name)}"><td><a href="${catHref(c.name)}">${esc(c.name)}</a></td><td class="r">${c.units.length}</td><td class="r">${num(c.nfn)}</td>
       <td class="r">${kb(c.size)}</td><td>${bar(c.clean, c.size)}</td><td class="r">${fmtPct(pct(c.clean, c.size))}</td></tr>`).join('')}</table>
-    ${kinds.length ? `<h3>Concessions left, by kind <span class="n">functions</span></h3><div class="kinds">${kinds.map(([k, n]) =>
-      `<span title="${esc(KIND_HELP[k] || '')}">${esc(kindLabel(k))}</span><span class="kb" style="width:${100 * n / kmax}%"></span><span class="mono">${n}</span>`).join('')}</div>
+    ${kinds.length ? `<h3>Concessions left, by kind <span class="n">functions · <a href="#left">list them all</a></span></h3><div class="kinds">${kinds.map(([k, n]) =>
+      `<a href="#left:${esc(k)}" title="${esc(KIND_HELP[k] || '')}">${esc(kindLabel(k))}</a><span class="kb" style="width:${100 * n / kmax}%"></span><span class="mono">${n}</span>`).join('')}</div>
       <p class="muted" style="font-size:12.5px;max-width:760px">The kinds are defined in <code>tools/concessions.py</code>; decomp.dev counts a function as matched only once it has none.
       A function can hold more than one kind.</p>` : ''}
   </div>`;
@@ -436,6 +439,20 @@ async function ramPage(name) {
         `<a class="chip mono${x.kinds.length ? ' warn' : ''}" href="${fnHref(x.addr)}">${esc(x.name)}${x.offsets.some(v => v) ? ` <small>${x.offsets.filter(v => v).map(v => '+0x' + v.toString(16)).join(' ')}</small>` : ''}</a>`).join('')}</div></div>`; }).join('') || '<div class="empty">No function loads its address directly (it may be reached through a pointer).</div>'}
   </div>`;
 }
+// the functions that still hold a concession (all, or one kind), smallest first: phase 3's queue
+function leftPage(kind) {
+  const fns = Object.values(FN).filter(f => f.kinds.length && (!kind || f.kinds.includes(kind))).sort((a, b) => a.size - b.size || a.addr.localeCompare(b.addr));
+  const bytes = fns.reduce((s, f) => s + f.size, 0);
+  const kinds = Object.keys(S.concession_kinds).sort((a, b) => S.concession_kinds[b] - S.concession_kinds[a]);
+  return `<div class="page">${crumbs('Concessions left')}
+    <h1 class="t">${kind ? esc(kindLabel(kind)) : 'Concessions left'}</h1>
+    <p class="lede">${num(fns.length)} functions (${kb(bytes)}) still match only with ${kind ? `a ${esc(kindLabel(kind))}${KIND_HELP[kind] ? ` (${esc(KIND_HELP[kind])})` : ''}` : 'a concession'}, smallest first.
+      <code>tools/progress.py --list-pinned</code> is the same list.</p>
+    <div class="badges"><a class="badge${kind ? '' : ' warn'}" href="#left">all</a>${kinds.map(k => `<a class="badge${k === kind ? ' warn' : ''}" href="#left:${esc(k)}">${esc(kindLabel(k))} ${S.concession_kinds[k]}</a>`).join('')}</div>
+    <table class="t" style="margin-top:14px"><tr><th>Function</th><th class="r">Bytes</th><th>Kinds</th><th>Unit</th><th>Source</th></tr>
+    ${fns.map(f => `<tr class="link" data-href="${fnHref(f.addr)}"><td class="mono"><a href="${fnHref(f.addr)}">${esc(f.name)}</a></td><td class="r">${f.size}</td>
+      <td><div class="badges" style="margin:0">${status(f.kinds)}</div></td><td><a href="${unitHref(f.unit.cat, f.unit.name)}">${esc(f.unit.name)}</a></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
+}
 const notFound = msg => `<div class="page"><div class="empty">${esc(msg)}</div></div>`;
 
 // ---------- routing ----------
@@ -448,6 +465,7 @@ async function route() {
   let html;
   if (!h) { SEL = '#'; html = overview(); }
   else if (h === 'ram') html = ramList();
+  else if (h === 'left' || h.startsWith('left:')) { html = leftPage(h.slice(5)); document.title = 'Concessions left · Boktai 3 Code'; }
   else if (h.startsWith('ram:')) html = await ramPage(h.slice(4));
   else if (h.startsWith('cat:')) { open.add(location.hash); html = categoryPage(h.slice(4)); document.title = h.slice(4) + ' · Boktai 3 Code'; }
   else if (h.startsWith('unit:')) {
