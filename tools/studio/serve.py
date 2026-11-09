@@ -488,6 +488,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/codemap/history":
             import codemap
             self.send(200, codemap.history())
+        elif self.path == "/api/codemap/changes":
+            import codemap
+            self.send(200, codemap.changes())
         elif self.path == "/api/codemap":
             import codemap
             self.send(200, codemap.summary())

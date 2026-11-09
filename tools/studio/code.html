@@ -53,6 +53,17 @@ h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
 .mono { font-family: var(--mono); font-size: 12.5px; }
 .notice { border: 1px solid var(--warn); background: var(--warn-bg); color: var(--ink); border-radius: 8px; padding: 8px 12px; margin: 12px 0; font-size: 13px; }
 
+/* recent updates */
+.changes { max-width: 980px; font-size: 13px; }
+.changes details { border-bottom: 1px solid var(--line); }
+.changes summary { display: grid; grid-template-columns: 9.5em minmax(0, 1fr) auto; gap: 12px; padding: 5px 0; cursor: pointer; list-style: none; }
+.changes summary::-webkit-details-marker { display: none; }
+.changes details.none summary { cursor: default; color: var(--muted); }
+.changes .when { color: var(--muted); font-variant-numeric: tabular-nums; }
+.changes .what { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.changes .ok { color: var(--ok); } .changes .warn { color: var(--warn); } .changes .bad { color: var(--accent); }
+.changes .lab { font-size: 11.5px; color: var(--muted); margin: 6px 0 4px; }
+.changes .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
 /* history graph */
 .hist { max-width: 760px; }
 .hist svg { width: 100%; height: auto; display: block; font-size: 10.5px; }
@@ -293,6 +304,7 @@ function overview() {
       <div class="tile"><b>${num(S.ram.length)}</b><span>named RAM objects</span></div>
     </div>
     <h3>Over time <span class="n">from each committed PROGRESS.md</span></h3><div id="hist" class="hist"><span class="empty">Loading the history…</span></div>
+    <h3>Recent updates <span class="n">what each merge changed, from PROGRESS.json</span></h3><div id="changes" class="changes"><span class="empty">Loading…</span></div>
     <h3>Categories <span class="n">${S.categories.length}</span></h3>
     <table class="t"><tr><th>Category</th><th class="r">Units</th><th class="r">Functions</th><th class="r">Code</th><th style="width:30%">Without concessions</th><th class="r"></th></tr>
     ${S.categories.map(c => `<tr class="link" data-href="${catHref(c.name)}"><td><a href="${catHref(c.name)}">${esc(c.name)}</a></td><td class="r">${c.units.length}</td><td class="r">${num(c.nfn)}</td>
@@ -302,6 +314,21 @@ function overview() {
       <p class="muted" style="font-size:12.5px;max-width:760px">The kinds are defined in <code>tools/concessions.py</code>; decomp.dev counts a function as matched only once it has none.
       A function can hold more than one kind.</p>` : ''}
   </div>`;
+}
+// the last updates of PROGRESS.json: functions that became concession-free, gained one or stopped matching
+async function drawChanges() {
+  const box = $('changes'), C = await fetch('/api/codemap/changes').then(r => r.json()).catch(() => []);
+  if (!box || !box.isConnected) return;
+  if (!C.length) { box.innerHTML = '<span class="empty">No history: PROGRESS.json has fewer than two commits here.</span>'; return; }
+  const when = t => new Date(t * 1000).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const chips = fs => `<div class="chips">${fs.map(([n, a]) => `<a class="chip mono" href="${fnHref(a)}">${esc(n)}</a>`).join('')}</div>`;
+  const part = (fs, cls, what) => fs.length ? `<span class="${cls}">${num(fs.length)} ${what}</span>` : '';
+  box.innerHTML = C.map(e => {
+    const n = e.clean.length + e.concession.length + e.draft.length;
+    const sum = [part(e.clean, 'ok', 'concession-free'), part(e.concession, 'warn', 'with a concession'), part(e.draft, 'bad', 'stopped matching')].filter(Boolean).join(' · ') || '<span class="muted">no function changed state</span>';
+    return `<details${n ? '' : ' class="none"'}><summary><span class="when">${when(e.t)}</span><span class="what">${esc(e.subject)}</span><span class="sum">${sum}</span></summary>
+      ${e.clean.length ? `<div class="lab">Now concession-free</div>${chips(e.clean)}` : ''}${e.concession.length ? `<div class="lab">Now with a concession</div>${chips(e.concession)}` : ''}${e.draft.length ? `<div class="lab">Stopped matching</div>${chips(e.draft)}` : ''}</details>`;
+  }).join('');
 }
 // decomp.dev's history graph: code matched in C, and (once PROGRESS.md reports it) without concessions
 async function drawHistory() {
@@ -612,7 +639,7 @@ async function route() {
   v.innerHTML = html;
   v.scrollTop = 0;
   renderTree();
-  if (!h) drawHistory();
+  if (!h) { drawHistory(); drawChanges(); }
 }
 $('view').addEventListener('click', e => {
   const tr = e.target.closest('tr.link');

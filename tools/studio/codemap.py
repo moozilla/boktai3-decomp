@@ -382,19 +382,11 @@ def history():
     if cached and cached.get("head") == key:
         out = cached["points"]
     else:
-        blobs = "".join(f"{h}:PROGRESS.md\n" for h, _ in commits)
-        raw = subprocess.run(["git", "cat-file", "--batch"], cwd=ROOT, input=blobs.encode(),
-                             capture_output=True, timeout=120).stdout
-        out, pos = [], 0
-        for h, t in commits:
-            nl = raw.index(b"\n", pos)
-            head = raw[pos:nl].split()
-            if len(head) < 3 or head[1] != b"blob":
-                pos = nl + 1
+        out = []
+        for (h, t), blob in zip(commits, _blobs([f"{h}:PROGRESS.md" for h, _ in commits])):
+            if blob is None:
                 continue
-            size = int(head[2])
-            text = raw[nl + 1:nl + 1 + min(size, 4000)].decode("utf-8", "replace")
-            pos = nl + 1 + size + 1
+            text = blob[:4000].decode("utf-8", "replace")
             m = HEADLINE.search(text)
             if not m:
                 continue
@@ -411,6 +403,82 @@ def history():
         except OSError:
             pass
     _INDEX.update(history=out, history_of=key)
+    return out
+
+
+def _blobs(specs):
+    """The contents of each "rev:path" in SPECS (None where missing), in one git cat-file call."""
+    raw = subprocess.run(["git", "cat-file", "--batch"], cwd=ROOT, input="".join(x + "\n" for x in specs).encode(),
+                         capture_output=True, timeout=120).stdout
+    out, pos = [], 0
+    for _ in specs:
+        nl = raw.index(b"\n", pos)
+        head = raw[pos:nl].split()
+        if len(head) < 3 or head[1] != b"blob":
+            out.append(None)
+            pos = nl + 1
+            continue
+        size = int(head[2])
+        out.append(raw[nl + 1:nl + 1 + size])
+        pos = nl + 1 + size + 1
+    return out
+
+
+def _states(blob):
+    """{addr: (name, state)} from a PROGRESS.json; state is "clean", "concession" or "draft"."""
+    try:
+        d = json.loads(blob)
+    except (TypeError, ValueError):
+        return None
+    out = {}
+    for c in d.get("categories", []):
+        for u in c["units"]:
+            for r in u["functions"]:
+                name = r[6] if len(r) > 6 and isinstance(r[6], str) and r[6] else r[0]  # the C name, when it differs
+                out[r[1]] = (name, "concession" if r[4] else "clean" if r[3] >= 100 else "draft")
+    return out
+
+
+def changes(limit=12):
+    """What each of the last LIMIT updates of PROGRESS.json (first-parent
+    history: on main, one per merged PR) changed: [{t, subject, clean: [[name,
+    addr]], concession: [...], draft: [...]}], newest first. clean lists the
+    functions that became concession-free, concession the ones that gained a
+    concession (or went from draft to a match with one), draft the ones that
+    stopped matching."""
+    try:
+        log = subprocess.run(["git", "log", "--first-parent", f"-{limit + 1}", "--format=%H %ct %s", "--", "PROGRESS.json"],
+                             cwd=ROOT, capture_output=True, text=True, timeout=30).stdout.splitlines()
+    except (OSError, subprocess.SubprocessError):
+        return []
+    commits = [line.split(" ", 2) for line in log if line]
+    if len(commits) < 2:
+        return []
+    key = commits[0][0] + str(limit)
+    if _INDEX.get("changes_of") == key:
+        return _INDEX["changes"]
+    states = [_states(b) for b in _blobs([f"{h}:PROGRESS.json" for h, _, _ in commits])]
+    out = []
+    for (h, t, subject), new, old in zip(commits, states, states[1:]):
+        if new is None or old is None:
+            continue
+        pr = re.compile(r"Merge pull request (#\d+) from [^/]+/(\S+)")
+        m = pr.match(subject)
+        if m:
+            subject = f"PR {m.group(1)} ({m.group(2)})"
+        elif subject.startswith("Merge "):  # a merge of main into a branch: name the PRs it brought in
+            inner = subprocess.run(["git", "log", "--first-parent", "--format=%s", f"{h}^1..{h}^2"],
+                                   cwd=ROOT, capture_output=True, text=True, timeout=30).stdout.splitlines()
+            prs = [f"PR {x.group(1)} ({x.group(2)})" for x in map(pr.match, inner) if x]
+            if prs:
+                subject = ", ".join(reversed(prs))
+        e = {"commit": h[:9], "t": int(t), "subject": subject,
+             "clean": [], "concession": [], "draft": []}
+        for addr, (name, st) in new.items():
+            if old.get(addr, (None, None))[1] != st:
+                e[st].append([name, addr])
+        out.append(e)
+    _INDEX.update(changes=out, changes_of=key)
     return out
 
 
