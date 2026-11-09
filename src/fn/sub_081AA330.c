@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "vanargand_pair_attack.h"
 #include "engine.h"
 #include "ram.h"
@@ -10,7 +9,7 @@ extern const struct T gUnk_0824F790;
 static inline s32 rnd(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return *(u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
+    return *(u16 *)(gRandomIndex * 2 + RANDOM_TABLE_ADDR);
 }
 void Vanargand_SetPendingCue(void *, u16);
 u32 PairedSceneActor_GetActiveMask(struct VanargandAttackPair *);
@@ -45,13 +44,7 @@ void sub_081AA330(struct VanargandPairAttack *p)
                             break;
                     }
                     p->timer++;
-                } else if (({
-                               register u32 off asm("r2") = 0x56c;
-                               register u8 *q asm("r0");
-                               asm("" : "+r"(off));
-                               q = (u8 *)p + off;
-                               PairedSceneActor_AreSelectedHalvesFinished(*(struct VanargandAttackPair **)q);
-                           }) != 0) {
+                } else if (PairedSceneActor_AreSelectedHalvesFinished(p->pair)) {
                     p->phase = 1;
                     p->timer = 0;
                 }
