@@ -91,6 +91,11 @@ class IndexTests(unittest.TestCase):
         self.assertEqual(fns['08001000']['kinds'], ['operand'])
         self.assertEqual(fns['08001020']['kinds'], ['concession'])  # pinned, but no kind listed
 
+    def test_concession_functions_are_c_though_scored_below_full(self):
+        # Foo_Helper matches with a pin: the report scores it 80%, but it is C
+        self.assertEqual(codemap.concession_addresses(), {0x08001020})
+        self.assertFalse(codemap.progress_by_address()[0x08001020][1])
+
     def test_summary_and_lookups(self):
         s = codemap.summary()
         fns = s['categories'][0]['units'][0]['functions']
