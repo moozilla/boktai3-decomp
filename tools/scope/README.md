@@ -1610,6 +1610,19 @@ Each was read from the compiler source and confirmed on a live draft.
    direction-2 copy) at its stateEntered store, while the random branch's if/else + return keeps
    state 4's call. ScenePool_SelectRepeatOrExit used the same return-after-inner-if/else. Both
    replaced a barrier and an r0 pin.
+110. **Read a field fresh at each range test to get gcse's copy before the compare; a sampler's
+   statement macro lifts the random table above the masks.** ScenePool_StateScheduleMotion's ROM
+   loads `entry->direction` into r0 for the first folded range test and copies it to r3
+   (`adds r3, r0, #0`) between the bound's load and the `cmp`, then tests r3 twice more. A
+   `metric` local gives one register and no copy; writing `entry->direction` in all three tests
+   (and in the `-0x50000 < d < 0x50000` test above) lets gcse make the later reads a copy inserted
+   at the end of the first block, before the cc0 setter, so the first read stays block-local
+   (r0). In the same function the table pseudo (`=gRandomTable`, 3 refs, live doubled by its
+   REG_EQUIV) ranks below the 255 mask (1176) and lands in ip; drawing the first sample through
+   the shared `ParticleRandom_ReadSample` (monster_particle_random.h), whose
+   `PARTICLE_RANDOM_READ_SAMPLE` do/while counts the table's use twice, gives it 4 refs (2000)
+   and r3. Both draws through that sampler overshoot (gRandomIndex's 1818 loses r2); one is
+   enough. `why all` names the shared macro when it flips an order.
 
 ## Survey: random table as a literal address (2026-10-24)
 
