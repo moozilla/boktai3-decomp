@@ -607,7 +607,8 @@ def build():
     T = tilesets.load()
     for t in T["tilesets"]:
         place = t["areas"][0]["place"] if t["areas"] else ""
-        loc = location(place)[0] if place else ("Not loaded by a scene" if t["maps"] else "Not loaded by a script")
+        loc = ("Unlabeled areas" if re.fullmatch(r"Area \d+", place) else location(place)[0]) if place else (
+            "Not loaded by a scene" if t["maps"] else "Not loaded by a script")
         node_rank.setdefault("Tiles/Tilesets/" + loc, node_rank.get("Places/" + loc, 900))
         add(f"tileset:{t['id']}", "Tiles/Tilesets/" + loc, kind="tileset", key=t["id"], order=t["order"],
             title=f"Tileset {t['id']}", place=place, tiles=t["tiles"], new_count=t["new_count"],
