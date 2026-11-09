@@ -77,3 +77,19 @@ Draft: `notes/phase3-drafts/field-effects/Trigger_RunScript.c` (11 ROM / 9 draft
    refs and fixes the allocation, but the ROM does that RMW through sp (`ldr r0, [sp, #0x28]`).
 Next idea: find refs for argsPtr that cse later folds back to sp, or the label/loop structure
 that ends cse's block between the actor copy and its uses.
+
+### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): deferred
+
+Draft: `notes/phase3-drafts/field-effects/DirectionalController_CheckRemaining.c` (41 ROM / 43
+draft). In the ROM, Math_Atan2's result stays in hard r0 from the call to the `bne` that jumps
+straight to the epilogue, and every local temp in between (the u16 copy, the field loads, the
+facing tests) uses r1-r5. local-alloc avoids r0 only when hard r0 is live across those blocks,
+which the C gets only from the pin (`register s32 angle asm("r0")`): a pseudo for angle crosses
+several blocks, so it is global, and local-alloc has already put temps in r0 by the time global
+runs. `AGBCC_FORCE=angle:0` does not help (the temps clobber it). The ROM's `adds r1, r0` then
+in-place `lsls r1, r1, #16` also says the narrowing reads a copy that combine left alone, which
+is what a copy straight from the hard return register gives. Spellings tried: plain
+`(u16)angle`, a `u16 heading` local, an assignment inside the expression. Next idea: a form in
+which the RTL keeps the call's hard r0 as the returned value (no pseudo between the call and the
+return), for example the call's result returned through an inline whose result the caller
+returns, or a matched relative with the same "return the angle when facing" shape.
