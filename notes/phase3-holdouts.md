@@ -177,6 +177,19 @@ lowpart subreg of an SImode value counts, since ARM has WORD_REGISTER_OPERATIONS
 local at the top is worse (it changes the expression, so PRE stops), and so are casts on either
 test.
 
+### sub_08014634 (ParticleGroup_SpawnBouncing, src/fn/sub_08014634.c): deferred, rewrite started
+
+The pinned source imitates register pressure: a `struct SpawnArgs` copy of count, options and
+position with an `asm("" : "+m")`, plus 15 pins. In the ROM those three arguments are simply
+spilled pseudos. `str r0/r1/r2, [sp, #0/4/8]` at entry, and `mov r1, sp; ldrb r1, [r1, #4]` is
+reload reading the low byte of spilled `options` for `g->type = options`. Draft:
+`notes/phase3-drafts/field-effects/sub_08014634.c`, plain C with ordinary arguments (132 / 116,
+mostly register shifts). The inner loop counts down in the ROM (loop.c reversed `i`, then reloads
+`count` as i's final value). Open: in the draft `options` stays in r6 and gcse hoists
+`options * 4` for `gUnk_08604B90[options]` (the ROM recomputes it from the stack slot each
+pass); the ROM keeps both `pool` (spilled, sp+0x10) and `g` (r6) and holds velocity in r8;
+`rng` is caller-saved r3 around sub_08217E40.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
