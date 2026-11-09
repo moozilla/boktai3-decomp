@@ -983,3 +983,19 @@ Passing `sprite` or `&base->anim` instead changes loop's lead giv (base+0x18) an
 A single `base` pointer, a per-iteration `cursor = base` copy, and `&pool->e[i]` are all worse (41-116).
 Next: work out whether r8 is a cursor biv or loop's reduced giv (try `hoist`), then the C that puts sprite/state on the base side
 while the reads stay on r8.
+
+### OrangeSpine_ApplyHitReaction (src/fn/sub_0820EE34.c, 0820EE34): deferred
+
+Landed: 2 pins and 4 barriers (r0 and r1 dummies around two statements).
+Draft: `notes/phase3-drafts/monsters-bosses/OrangeSpine_ApplyHitReaction.c` (36 ROM / 34 draft).
+It is the matched DragonPuppy_ApplyHitReaction (0820AD84) form, which covers 193 of 196 insns.
+That relative stores `reaction = 0x26` inside the 0x40 branch; OrangeSpine doesn't.
+The ROM keeps r0 and r1 busy across `target->collider.responseValue = source->responseValue`:
+the value goes to r2, the address to r1, and the 0x40 mask reload to r3.
+So r3 joins reload's spill set (ROM r0-r3 plus r7; draft r0, r1, r2, r7), and every later choice rotates.
+`AGBCC_FORCE=62:2` fixes the value register only; the spill set still lacks r3.
+Tried:
+- a `u16 reaction` temp
+- a mask local
+- `!= 0`
+Next: find what the original kept live in r0 and r1 across that store. The pinned dummies stand in for it.
