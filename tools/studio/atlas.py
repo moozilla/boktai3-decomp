@@ -941,9 +941,10 @@ def rom_segments():
     items = []
     # match state from the code explorer's index (tools/studio/codemap.py), which
     # already holds tools/progress.py's report rather than running it again
+    held = codemap.concession_addresses()
     for a, (size, matched, name, unit) in codemap.progress_by_address().items():
         if size:
-            items.append([a, size, "code" if matched else "asm", name, f"/code#{a:08X}"])
+            items.append([a, size, "code" if matched or a in held else "asm", name, f"/code#{a:08X}", a in held])
     known = set()
     for label, _, _, ents in archive.archives(rom):
         kind = ARCHIVE_KINDS.get(label, "data")
@@ -980,7 +981,7 @@ def rom_load():
 
 
 # understanding levels, best first (tools/studio/rom.html colors and totals)
-LEVELS = ["named", "decoded", "decompiled", "located", "assembly", "unmapped", "free"]
+LEVELS = ["named", "decoded", "decompiled", "concession", "located", "assembly", "unmapped", "free"]
 DECODED = {"sprite", "map", "tiles", "palette", "font", "animation", "text", "script", "sound"}
 
 
@@ -1033,17 +1034,18 @@ def rom_tree():
 
     tops = []
     code = collections.OrderedDict()
-    for a, size, kind, name, ref in seg["items"]:
+    for a, size, kind, name, ref, *held in seg["items"]:
         if kind in ("code", "asm"):
             sub = unit_of.get(an_rev.get(f"{a:08X}", ""), "Unsorted")
-            code.setdefault(sub, []).append(leaf(a, size, kind, name, ref, "decompiled" if kind == "code" else "assembly"))
+            level = "assembly" if kind == "asm" else "concession" if held and held[0] else "decompiled"
+            code.setdefault(sub, []).append(leaf(a, size, kind, name, ref, level))
     code_children = [{"s": fs[0]["s"], "n": sum(f["n"] for f in fs), "k": "code", "t": sub, "r": f"unit:{sub}", "c": fs}
                      for sub, fs in code.items()]
     code_children.sort(key=lambda x: x["s"])
     if code_children:
         tops.append({"s": code_children[0]["s"], "n": sum(c["n"] for c in code_children), "k": "code", "t": "Code", "c": code_children})
     archives = collections.OrderedDict()
-    for a, size, kind, name, ref in seg["items"]:
+    for a, size, kind, name, ref, *_ in seg["items"]:
         if kind in ("code", "asm"):
             continue
         label, _, h = name.partition(" ")

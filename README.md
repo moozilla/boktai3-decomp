@@ -139,7 +139,8 @@ concession or stopped matching; a function's page says which merge made it
 match and which made it concession-free. The index is
 `tools/studio/codemap.py`, built from `tools/progress.py` and
 `tools/concessions.py`. **ROM** (`/rom`) is the ROM as a treemap in address
-order, colored by kind or by how well each byte is understood.
+order, colored by kind or by how well each byte is understood (C, C with a
+concession, decoded data, data only located, assembly).
 
 | | |
 |---|---|

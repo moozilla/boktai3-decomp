@@ -47,15 +47,15 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointe
 // code by subsystem and function, each asset archive by resource, sound,
 // text, scripts, other data, unmapped gaps and free space. Click a block to
 // go into it; click a resource or function to open it. Color by kind, or by
-// how well it is understood (decompiled; decoded and named, decoded; located
-// but not decoded; assembly only; unmapped).
+// how well it is understood (decompiled; decompiled with a concession; decoded
+// and named, decoded; located but not decoded; assembly only; unmapped).
 studioHeader();
 const KIND = { code: '#3f9a63', asm: '#8a6d3b', sound: '#8e5bb5', graphics: '#3f7fbf', sprite: '#4aa3d9', map: '#2f6aa8', tiles: '#5b8fc9',
   palette: '#d0628f', font: '#c9a227', text: '#e07a3b', script: '#d4b53a', animation: '#5fb8b0', collision: '#7a8f99', data: '#6e665c', unknown: '#7a1f2b', free: '#2a2622' };
 const KNAME = { code: 'code', asm: 'code (assembly)', sound: 'sound', graphics: 'graphics', sprite: 'sprites', map: 'maps', tiles: 'tilesets', palette: 'palettes',
   font: 'fonts', text: 'text', script: 'scripts', animation: 'animation', collision: 'collision', data: 'other data', unknown: 'unmapped', free: 'free' };
-const LEVEL = { decompiled: '#4caf6a', named: '#8fd99c', decoded: '#3d8f8a', located: '#c9a227', assembly: '#b5583a', unmapped: '#8a2433', free: '#2a2622' };
-const LNAME = { decompiled: 'code decompiled to C', named: 'data decoded and named', decoded: 'data decoded', located: 'data located, format not decoded', assembly: 'code in assembly only', unmapped: 'unmapped', free: 'free space' };
+const LEVEL = { decompiled: '#4caf6a', concession: '#9cbf4a', named: '#8fd99c', decoded: '#3d8f8a', located: '#c9a227', assembly: '#b5583a', unmapped: '#8a2433', free: '#2a2622' };
+const LNAME = { decompiled: 'code decompiled to C', concession: 'code in C with a concession (pin, barrier, ...)', named: 'data decoded and named', decoded: 'data decoded', located: 'data located, format not decoded', assembly: 'code in assembly only', unmapped: 'unmapped', free: 'free space' };
 let T = null, mode = 'kind', focus = [], rects = [];
 try { mode = localStorage.getItem('rom.mode') || 'kind'; } catch (e) {}
 

@@ -332,6 +332,14 @@ def progress_by_address():
     return out
 
 
+def concession_addresses():
+    """Addresses of functions that match only with a concession in their C (a pin,
+    a barrier, ...). The report scores them below 100%, as decomp.dev does not
+    count them as matched yet, but they are C rather than assembly."""
+    ix = load(wait=True)
+    return {int(a, 16) for a, f in ix["functions"].items() if f["kinds"]}
+
+
 def summary():
     """The tree without per-function cross-references, for the explorer's sidebar,
     overview and search: [category -> [unit -> [function rows]]]."""
