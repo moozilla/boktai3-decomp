@@ -693,6 +693,17 @@ inline moves N (e3: 263) but changes the code. Next: a structural difference tha
 remove (jump threading of a second null test, a return-label shape). Or a shared inline with
 CreateSpriteSlot / the other Create* slots once they are matched.
 
+### ActorAttachment_CreateSinglePartSlot (src/fn/sub_08066278.c, 08066278): PRE slot order only
+
+Draft: `notes/phase3-drafts/actors/ActorAttachment_CreateSinglePartSlot.c` (24 / 24, pin-free,
+every difference a PRE stack slot). It is the same family as CreateValueSpriteSlot: a tail inline
+`ActorAttachment_SetupPart` (const-form 0x134 / 0x10E / 0x104 hoisted above the clearing loop),
+`parts = slot->parts` read before the null check, and the SDK `CpuFill32(0, offset, 8)` macro.
+Its `vu32 tmp` gets a slot at declaration, below the inline's addressof'd xOffset / zOffset as in
+the ROM, so it needs a `concession-ok(volatile)` note citing the SDK macro. Left: `preorder` wants
+slot's pseudo +4 (r34/r35, by declaration order) together with N 184..187 (T 93). The draft has
+N = 182, and the loop forms and declaration orders tried all keep it.
+
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 
 ### SceneGrid_ScanColumns (src/fn/sub_0806E7CC.c, 0806E7CC): deferred
