@@ -192,9 +192,10 @@ pass); the ROM keeps both `pool` (spilled, sp+0x10) and `g` (r6) and holds veloc
 
 ### AnimatedParticleManager_Update (src/fn/sub_08015160.c, 08015160): deferred, priority tie
 
-Draft: `notes/phase3-drafts/field-effects/AnimatedParticleManager_Update.c` (32 ROM / 32 draft).
-The second flip test is now the union DisplaySequenceControl form its matched siblings in
-homing_effect.c use. Only allocation is left: `p` (48 refs over 245 insns, priority 9795) loses
+Draft: `notes/phase3-drafts/field-effects/AnimatedParticleManager_Update.c` (32 ROM / 32 draft),
+the whole unit on the shared types (DisplaySequenceSprite, DisplaySequenceState) and
+`DisplaySequence_StepSprite` from include/display_sequence_sprite.h. The helper's `command`
+plays the old `entry` role exactly, and indexed loop forms are worse (37-49 rows). Only allocation is left: `p` (48 refs over 245 insns, priority 9795) loses
 r5 to `entry` (12 refs over 36 insns, 10000). `AGBCC_PRI=p:+206` matches. `entry` needs 9 to 11
 refs: with its second set (the frame step's `entry = a->data + a->frame`) in a separate local it
 has 8 and falls under `o` (7531), which then takes r6 (27 / 27). A `command = *entry` local
