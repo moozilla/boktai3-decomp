@@ -1680,6 +1680,30 @@ Each was read from the compiler source and confirmed on a live draft.
    stays in a call-saved register from entry and the compare reads `[r6 + 0x44]`. That matched
    Mummy_WaitReplaceResponse without its `asm("" : "+r"(group))` barrier.
 
+84. **A ROM countdown `3..0` with `bge` may be a count-up `for (i = 0; i < 4; i++)` that loop.c
+   reversed, and the reversed counter's init comes after the hoisted invariants.** With
+   `i = 3; do { ... } while (--i >= 0);` the `i = 3` set precedes the preheader movables, so i
+   lives through them. In Hresvelgr_UpdateAlternatingVolley that made it 6 insns longer than
+   the hoisted 1023 mask (priority 1111 vs 1166). The mask then took sl and i went to the stack.
+   Written as a count-up loop whose body never reads i, loop.c's dbra reversal emits the new
+   `i = 3` after the movables, as the ROM orders it (`mov r8, &gRandomIndex` before
+   `movs r1, #3; mov sl, r1`). The counter's life shortens, it outranks the mask (which then
+   gets no register and is rematerialized at each use), and the function matches with no pins.
+   When the ROM sets a countdown counter after the loop's hoisted values, try the count-up loop.
+
+85. **Take a field's address before the statements that name the other pointer, so a copy
+   `q = p` stays out of the class head.** make_regs_eqv (fact 4) compares last mentions in
+   reg_scan's insn order. Hresvelgr_UpdateRisingProjectile copies `saved = actor`; the ROM keeps
+   actor (r6) for the motion stores and saved (r7) for the final `flags |= 12`, so saved's
+   mention came last and cse1 made it head (`CSE_NOCANON=23` matched). The tail
+   `{ u32 *flags = &saved->flags; actor->motion[0..3] = 0; { u32 mask = 12; *flags |= mask; } }`
+   mentions saved before the motion stores, which leaves actor as head. The RMW still runs last,
+   and gcse's PRE still turns the address into the copy of case 1's address. Neither the dead
+   trailing mentions tried (an unused local, an inline's ignored return value) nor returning
+   the value changes reg_scan's order. `return actor;` matches up to one `adds r0` and is a quick
+   way to test this lever. A bare `*flags |= 12` loads the 12 before the `ldr`; the
+   `mask` local loads it after.
+
 90. **In a two-value block, local-alloc goes by priority; a pointer variable set in each arm leaves
    the value alone in the block.** An arm `UpdateFn callback = F; p->update = callback;` at offset
    0x1A4 holds two local qtys: the callback (load, add, store: life 4, priority 5000) and the

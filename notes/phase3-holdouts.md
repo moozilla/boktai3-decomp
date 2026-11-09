@@ -970,3 +970,135 @@ The ROM needs a table pseudo that cse never sees as constant in the first sample
 the preheader, and that gcse does not treat as redundant for the later samples.
 Next: a matchsearch store over where the table is set and what type it has (symbol vs integer
 address, the 512 offset applied at the call site or in the helper).
+
+### Hresvelgr_UpdateTurningCharge (src/fn/sub_0819FC34.c, 0819FC34): deferred
+
+Pin: `register u8 *address asm("r1")` in the SetFlags helper, which ORs a mask into `flags` (+0x9c).
+It is used twice: unconditionally after the `pending` block, and again under `PlayerCanMove` in case 0.
+Draft: `notes/phase3-drafts/monsters-bosses/Hresvelgr_UpdateTurningCharge.c` (`p->flags |= mask;`),
+16 ROM / 14 draft. The only difference is gcse's PRE: expression `(plus actor 156)` is fully redundant
+at the second site, so the second site becomes a copy of the first (`adds r7, r4, #0` inserted before
+the callback test), and the first address lives in r4 rather than r1. `scope.py pre`:
+`AGBCC_NOPRE=1` gives an exact MATCH. The ROM computes `actor + 0x9c` again at both sites.
+The offset is below 256, so fact 55's body/inline split (`(plus p (reg K))` against
+`(plus p (const_int K))`) does not apply. Every spelling reaches gcse as the same expression:
+a local address that is set twice, `q = p` inside the inline, a `u32` cast, `OrFlags(mask, &p->flags)`, and value/mask locals.
+cse and cprop fold the copies back to `actor`. The coordinator's displaced-address form (`end = (u8 *)&actor->flags + 4; *(u32 *)(end - 4)`)
+does not help either. If both statements are in one block, cse1 folds them back into
+`(plus actor 156)`, and PRE copies it again. If `end` is set in an earlier block (top of the
+function, or the start of case 0's else), gcse no longer merges the address and the first site
+matches, but the round trip then stays as `adds r7, r5, #0xa0` ... `subs r0, r7, #4` (7/9).
+Next: find a base the original might have used
+that gcse sees as another operand at one site (a multi-set pointer, or a pointer from a call
+or a load), or show that actor is reassigned in the original.
+
+### Hresvelgr_PlayDescent (src/fn/sub_081A09C4.c, 081A09C4): deferred
+
+Concession: `asm("" : "+r"(actor))` right after `actor = p`. The ROM keeps both: p in r7 (used
+only by the last `Hresvelgr_RefreshTarget(p)`), the copy actor in r6 for the body, tick in r8.
+Draft without the barrier: `notes/phase3-drafts/monsters-bosses/Hresvelgr_PlayDescent.c`
+(11 ROM / 5 draft). cse merges actor into p (fact 4): p's last use is the else-if call, after
+every use of actor in insn order, so actor never becomes the class head. This is the same family as
+Trigger_RunScript's actor copy (field-effects). Tried: the body as an inline taking the actor
+(`Descend(p)` returning whether it landed, or a void inline with `actor = p` inside), and a
+loop-scoped copy. None keeps two registers. Next: find a form where the copy's uses
+sit in a cse block that the copy does not reach and cprop leaves alone (cprop propagates a copy
+that dominates its uses), or a reason the original's p was not a plain pseudo.
+Fact 85 (RisingProjectile) does not carry over: there the ROM's copy is used only outside cse1's
+path, but here the copy (r6) is used from the first block on, which needs it to be head. Being head
+needs its last mention after the final `Hresvelgr_RefreshTarget(p)`, and the ROM places that call
+last (the else arm follows the then arm).
+
+### Hresvelgr_UpdateBoundaryBarrage (src/fn/sub_081A0BC8.c, 081A0BC8): deferred
+
+Concession: `asm("" ::"r"(normalCollisionMask));` at the end, which keeps the 0x2f0 mask (sl) live
+through case 1. Draft without it: `notes/phase3-drafts/monsters-bosses/Hresvelgr_UpdateBoundaryBarrage.c`,
+2 ROM / 2 draft. Only the random index mask 0x3FF (pseudo 220) differs: ROM ip, draft sl. Global alloc
+first gives 220 r5, but reload needs r5 for spills and re-places it with retry_global_alloc. In pass 0,
+sl is in use and does not conflict with 220 (the mask's only use is in case 2, so it is dead in case 1),
+so 220 takes sl. The ROM's pass 0 found sl busy (a conflict, or a conflicting pseudo that prefers sl),
+and pass 1 took ip. Tried: the literal 0x2f0 in case 2 with no variable; `action` computed from
+the mask (the ROM shares the 0x2f0 constant between `&actor->action` and the mask); the case-2 store
+through SetCollisionMask. None changes it. Next: find a pseudo live in case 1's random block
+that prefers sl, or a reason the mask is live after the switch in the original.
+
+### sub_081A14FC (src/fn/sub_081A14FC.c, 081A14FC, 1764 bytes): deferred
+
+Pins: `table` in r6, `sampleY` in r3 and `rawY` in r0 in case 1's random spray, plus an
+`asm("" : : "r"(valueY))` barrier. Draft: `notes/phase3-drafts/monsters-bosses/sub_081A14FC.c`
+(86 ROM / 82 draft). With the cast-constant table (`(const u16 *)RANDOM_TABLE_ADDR`) every sample
+reloads 0x203B400, and 0x3FF becomes a pseudo in ip (80/80). With
+`union RandomTableView view = {gRandomTable}`, the table is a pseudo and 0x3FF is reloaded at each
+use, as in the ROM. But the table (view, 7 refs over 164 insns, priority 853) ranks below
+&gRandomIndex (8 refs over 208, priority 1153), so they swap r6 and r8. Separately, the ROM's frame is one word
+larger (`sub sp, #0x64` against 0x60), so every PRE spill slot from line 120 on is 8 bytes higher:
+the ROM spills one more pseudo, probably the one the table pin displaces from r6.
+`AGBCC_PRI=view:+400` swaps the pair but makes the rest worse. Next: fix the table/index ranking
+(fact 110's double-counted sampler use, or fewer &gRandomIndex refs), then find the ROM's extra
+spill.
+
+### Vanargand_UpdateCaptureSetup (src/fn/sub_081A8E08.c, 081A8E08): deferred
+
+Pin: `register s32 height asm("r4") = y;` in SetPositionAndGetHeight. The ROM has two zeros. One is
+the pending-store zero (`movs r0, #0; mov ip, r0`), which is also case 2's sixth argument (ip). The
+other is the position's y (`movs r4, #0` right after `movs r1, #0x80`), which is the sixth argument
+in cases 0 and 1 (r4). Draft with literal zeros:
+`notes/phase3-drafts/monsters-bosses/Vanargand_UpdateCaptureSetup.c`, 13 ROM / 9 draft. cse1 puts
+every zero (14 pseudos) in the class of const 0, whose first member is the pending zero (pseudo 47),
+so one register serves all of them (r4, 6 refs). Fact 85's lever does not apply: the zeros are
+equal through the constant class, not through a copy. Tried: `u32 zero` / `u8 zero` locals, a
+literal `p->pending = 0`, `animationFlags = 0` passed in as y, the inline returning `out->y`, and a
+separate `height` local (with or without the `zero` argument). Next: a second zero that cse1 cannot
+see as const 0 in SImode (a halfword-mode value, or a bitfield store's zero, as in fact 25), but
+that still folds to `movs r4, #0` later.
+
+### Vanargand_ApplyPendingDamage (src/fn/sub_081ACC24.c, 081ACC24): deferred
+
+Pins: `partDamage` in sl, plus a barrier after it, and `mask` (1) in r2 for the count == 0 setFlags.
+Draft: `notes/phase3-drafts/monsters-bosses/Vanargand_ApplyPendingDamage.c` (7 ROM / 7 draft).
+partDamage takes sl without the pin. The barrier only added one insn to damage's live range: damage
+(5 refs over 47 insns) and the health address (5 over 48) were 2127 against 2083, and the ROM gives
+the health address r4. `if ((u8)p->part.flags & 6)` (or `(u16)`) adds that insn naturally and fixes
+the pair (18 → 7). Plain spellings (`& (2 | 4)`, `!= 0`, an inline test) do not.
+What remains: cse1 replaces the setFlags mask with pseudo 107, the display call's stack argument
+`1` (line 101). Its path runs from line 98 through every skip down to the count == 0 block. 107 then
+gets no register (priority 238), so the mask is reloaded after the `ldr` (r3, since count is in r2).
+The ROM has a block-local mask in r2 loaded before the address, with count in r3. Tried: mask
+locals before the call, after it, before the accumulated block, and `return mask`. Next: break cse1's
+path between line 101 and the count block, or find a mask spelling that is not in const 1's class.
+
+### PlayerParticleCloud_ScatterAnchors (src/fn/sub_081D3620.c, 081D3620): deferred
+
+Pin: `register u32 random asm("r0")` in the loop.
+Draft: `notes/phase3-drafts/monsters-bosses/PlayerParticleCloud_ScatterAnchors.c` (12 ROM / 12 draft, swap only).
+Both scatter blocks sit in one basic block, so random and coordinate are local-alloc pseudos.
+random has 8 refs (4 mentions, doubled by the loop) over 8 insns, which gives priority 30000.
+coordinate has 12 refs over 8 insns, which gives 45000. coordinate is allocated first and takes r0.
+`AGBCC_PRI=random:+15000,random#1:+15000` matches. A tie is enough, because random has the lower qty.
+So random needs 6 mentions, or coordinate needs 4, with the same lives.
+`(u16)origin + bias` still expands into two sets of coordinate.
+Tried without effect:
+- one-line sums, `ParticleRandom_NextSample`, the READ_SAMPLE macro
+- u16/s32/u32 random, u16/u32 coordinate
+- `coordinate += random & mask`, `random = *sample & mask`
+- storing `coordinate + random` directly (a temp pseudo then takes r0)
+- an inline helper returning the sum
+Next: find a spelling where random's value passes through one more set before the add, without a new pseudo.
+
+### Ratatosk_UpdateSunOrbRelocation (src/fn/sub_081F8988.c, 081F8988): deferred
+
+Pins: an offset in r2 with a barrier and a `dest` pointer in r1, used for case 1's `p->sequence = 2`.
+Draft: `notes/phase3-drafts/monsters-bosses/Ratatosk_UpdateSunOrbRelocation.c` (plain `p->sequence = 2;`,
+8 ROM / 8 draft). It is only reload's rotation: `AGBCC_SPILL=15:1` matches.
+The records (`R`/`X` lines in names.txt) show choice 13 (case 0's `sequence = 1`, r0).
+Choice 14 is case 0's fading copy `p->finished = 1` (=388 in r2, with r1 held by the address pseudo).
+Choice 15 is case 1's `sequence = 2`, which starts after r2 and takes r0. The ROM's copy also has r2 there.
+So the ROM made one more choice, taking r0, between that copy and case 1's store, with identical output.
+The candidates are the copy's stored `1`, or case 1's `q->input` address (now local pseudo 167 in r0).
+Either one would have to be a reload rather than an allocated pseudo.
+Tried:
+- `goto fail` for the fading copy: the rotation is fixed, but the ROM keeps the copy.
+- an inline copy for `slot < 0`
+- inverting the fading test
+- `goto done` before `++p->elapsed`
+Next: find a spelling where one of those two values reaches reload unallocated.
