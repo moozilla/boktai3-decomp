@@ -9,27 +9,103 @@ const post = (url, body) => fetch(url, { method: 'POST', headers: { 'Content-Typ
 function localStore(k, v) { try { if (v === undefined) return localStorage.getItem('studio.' + k); localStorage.setItem('studio.' + k, v); } catch (e) { return null; } }
 
 // ---------- header ----------
+// The views, grouped: a group opens a menu; its label names the view shown.
 const NAV = [
-  ['Browse', '/atlas'], ['ROM', '/rom'], ['Text', '/'], ['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Maps', '/gfx#maps'], ['Palettes', '/gfx#palettes'],
-  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Actors', '/actors'], ['Scripts', '/scripts'], ['Sound', '/sound'], ['World', '/world'], ['Dungeons', '/gfx#dungeon'], ['Live', '/live'], ['Captures', '/captures'],
+  ['Browse', '/atlas', 'Everything in the game as one tree'],
+  ['Code', '/code', 'Every function: C, disassembly, concessions, cross-references'],
+  ['ROM', '/rom', 'The ROM as a treemap'],
+  ['Text', '/', 'Every string, with the fan translation'],
+  ['Scripts', '/scripts', 'Script procedures and files (GCL)'],
+  ['Actors', '/actors', 'Objects scripts create'],
+  ['Graphics', [['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Palettes', '/gfx#palettes'], ['Sprite palettes', '/gfx#pool'],
+    ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data']]],
+  ['Maps', [['Maps', '/gfx#maps'], ['World', '/world'], ['Dungeons', '/gfx#dungeon']]],
+  ['Sound', '/sound', 'Every song, playable'],
+  ['Live', [['Live', '/live'], ['Captures', '/captures']]],
 ];
+const navHere = () => {
+  const here = location.pathname === '/index.html' ? '/' : location.pathname.replace(/\.html$/, '');
+  const tab = (location.hash.slice(1) || '').split('/')[0] || (here === '/gfx' ? 'sprites' : '');
+  return u => { const [p, t] = u.split('#'); return p === here && (!t || t === tab); };
+};
+function navHTML() {
+  const on = navHere();
+  return NAV.map(([n, u, tip]) => {
+    if (typeof u === 'string') return `<a href="${u}" class="${on(u) ? 'on' : ''}"${tip ? ` title="${tip}"` : ''}>${n}</a>`;
+    const cur = u.find(([, x]) => on(x));
+    return `<span class="navgrp${cur ? ' on' : ''}"><button type="button" aria-haspopup="true">${cur && cur[0] !== n ? `${n} · ${cur[0]}` : n} <span class="caret">▾</span></button>
+      <span class="navmenu">${u.map(([m, x]) => `<a href="${x}" class="${on(x) ? 'on' : ''}">${m}</a>`).join('')}</span></span>`;
+  }).join('');
+}
 // Fills <header id="top">; `tools` is HTML for the right-hand side.
 function studioHeader(tools = '') {
   const h = $('top');
   if (!h) return;
   if (EMBED) { h.remove(); document.body.classList.add('embed'); keepEmbed(); return; }
-  const here = location.pathname === '/index.html' ? '/' : location.pathname;
-  const tab = (location.hash.slice(1) || '').split('/')[0];
-  h.innerHTML = `<h1>Boktai 3 Studio</h1><nav>${NAV.map(([n, u]) => {
-    const [p, t] = u.split('#');
-    const on = p === here && (!t || t === tab || (here === '/gfx' && !tab && t === 'sprites'));
-    return `<a href="${u}"${t ? ` data-tab="${t}"` : ''} class="${on ? 'on' : ''}">${n}</a>`;
-  }).join('')}</nav><span class="sp"></span>${tools}`;
+  h.innerHTML = `<a class="brand" href="/atlas" title="Browse: the way in">Boktai 3 Studio</a><nav>${navHTML()}</nav><span class="sp"></span>${tools}
+    <button type="button" id="gsearch" title="Search everything (⌘K or /)">Search <span class="kbd">⌘K</span></button>`;
+  h.querySelector('nav').addEventListener('click', e => {
+    const b = e.target.closest('.navgrp > button');
+    if (b) { const g = b.parentElement, was = g.classList.contains('open'); closeMenus(); g.classList.toggle('open', !was); e.stopPropagation(); }
+  });
+  $('gsearch').onclick = () => searchOpen();
 }
-function markNav() {
-  const tab = (location.hash.slice(1) || 'sprites').split('/')[0];
-  document.querySelectorAll('#top nav a[data-tab]').forEach(a => a.classList.toggle('on', location.pathname === '/gfx' && a.dataset.tab === tab));
+function closeMenus() { document.querySelectorAll('#top .navgrp.open').forEach(g => g.classList.remove('open')); }
+document.addEventListener('click', e => { if (!e.target.closest('#top .navgrp')) closeMenus(); });
+// pages that switch views by hash (gfx.html) call this after each switch
+function markNav() { const n = document.querySelector('#top nav'); if (n) n.innerHTML = navHTML(); }
+window.addEventListener('hashchange', () => { if (location.pathname === '/gfx') markNav(); });
+
+// ---------- search (⌘K on every page: tools/studio/search.py) ----------
+let SRCH = { hits: [], i: 0, seq: 0 };
+function searchOpen() {
+  if (EMBED) return;
+  let d = $('gsearchbox');
+  if (!d) {
+    d = document.createElement('div'); d.id = 'gsearchbox';
+    d.innerHTML = `<div class="box"><input id="gsq" placeholder="Search everything: a monster, place, item, function, RAM object, script, line of text…" autocomplete="off"><div id="gsres"></div>
+      <div class="foot"><span class="kbd">↑↓</span> move <span class="kbd">↵</span> open <span class="kbd">⌘↵</span> new tab <span class="kbd">esc</span> close</div></div>`;
+    document.body.appendChild(d);
+    let timer;
+    $('gsq').oninput = () => { clearTimeout(timer); timer = setTimeout(searchRun, 120); };
+    $('gsq').onkeydown = e => {
+      if (e.key === 'ArrowDown') { SRCH.i = Math.min(SRCH.hits.length - 1, SRCH.i + 1); searchDraw(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') { SRCH.i = Math.max(0, SRCH.i - 1); searchDraw(); e.preventDefault(); }
+      else if (e.key === 'Enter' && SRCH.hits[SRCH.i]) searchGo(SRCH.hits[SRCH.i], e.metaKey || e.ctrlKey);
+      else if (e.key === 'Escape') searchClose();
+    };
+    $('gsres').onclick = e => { const r = e.target.closest('.r[data-i]'); if (r) searchGo(SRCH.hits[+r.dataset.i], e.metaKey || e.ctrlKey); };
+    d.onclick = e => { if (e.target === d) searchClose(); };
+  }
+  d.classList.add('on');
+  $('gsq').select(); $('gsq').focus();
+  searchDraw();
 }
+function searchClose() { $('gsearchbox')?.classList.remove('on'); }
+async function searchRun() {
+  const q = $('gsq').value.trim(), seq = ++SRCH.seq;
+  if (!q) { SRCH.hits = []; searchDraw(); return; }
+  const hits = await fetch('/api/search/' + encodeURIComponent(q)).then(r => r.ok ? r.json() : []).catch(() => []);
+  if (seq !== SRCH.seq) return;  // a newer query answered first
+  SRCH.hits = hits; SRCH.i = 0; searchDraw();
+}
+function searchDraw() {
+  const q = $('gsq').value.trim();
+  $('gsres').innerHTML = SRCH.hits.map((h, i) => `<div class="r${i === SRCH.i ? ' on' : ''}" data-i="${i}"><span class="k">${esc(h.kind)}</span><span class="t">${esc(h.title)}</span><span class="p">${esc(h.sub || '')}</span></div>`).join('')
+    || `<div class="r muted">${q ? 'No matches.' : 'Search monsters, characters, places, items, sprites, songs, scripts, functions, RAM objects and text.'}</div>`;
+  document.querySelector('#gsres .r.on')?.scrollIntoView({ block: 'nearest' });
+}
+function searchGo(h, newTab) {
+  if (newTab) { window.open(h.url, '_blank'); return; }
+  searchClose();
+  const u = new URL(h.url, location.href);
+  if (u.pathname === location.pathname) location.hash = u.hash; else location.href = h.url;
+}
+document.addEventListener('keydown', e => {
+  if (EMBED) return;
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); searchOpen(); }
+  else if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && !document.activeElement.isContentEditable) { e.preventDefault(); searchOpen(); }
+});
 
 // ---------- peek panel ----------
 // Inside a panel, links to other Studio pages keep ?embed=1, so the page they

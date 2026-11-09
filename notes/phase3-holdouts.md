@@ -1,7 +1,10 @@
 # Phase 3 holdouts
 
-One section per worker. Each entry: the best pin-free draft, what blocks it, the knob that
-matches (when one does) and the next idea.
+Tags: #matching #phase3 #holdouts
+
+One section per worker. Each row: the function, its best pin-free draft (a snippet to
+`scope.py FILE.c put`), the differing instructions, the mechanism and the knob that matches,
+what was tried, and the next idea.
 
 ## field-effects
 
@@ -32,11 +35,57 @@ line 773 remain. The draft still has statement expressions and plain `register` 
 pinned form; strip them once the shape is right. The ROM's dead `subs r0, r7, #1` tail comes from
 `type == 1 || type == 2` with both arms returning 0 (fact 57-style cross-jump).
 
-Tags: #matching #phase3 #holdouts
+### Trigger_RunScript (src/item_container.c, 08006F00): deferred
 
-One section per worker. Each row: the function, its best pin-free draft (a snippet to
-`scope.py FILE.c put`), the differing instructions, the mechanism and the knob that matches,
-what was tried, and the next idea.
+Draft: `notes/phase3-drafts/field-effects/Trigger_RunScript.c` (11 ROM / 9 draft, two mechanisms).
+1. The ROM keeps two copies of the actor index: `ldrsb r1` (compared with -1), `adds r2, r1` (the
+   table index) and `adds r5, r2` (saved for values[8]). cse merges the draft's `index = actor` into
+   actor (make_regs_eqv: index does not live past the extended block, which runs to cuid 73 with
+   jump following), so the draft has one register. A copy survives only if the new register
+   becomes the class head (its last use past the block end, or its first mention before the block
+   start), which none of the spellings tried gives: s8/u8/s16 actor, an inline `PlayerMask`, a
+   nested `if (actor != -1)` form, separate `index` and `savedActor` blocks. `CSE_KEEP`/
+   `CSE_NOCANON` on the pseudos change nothing (the head test fails before them).
+2. `&args` must be a pointer variable set before `source = p->arguments` and allocated before
+   `out`, so it takes r2. With 3 refs over 22 insns its priority (1363) is below out's (3000):
+   `AGBCC_PRI=argsPtr:+2000` fixes it. Routing the count's word RMW through the pointer gives it 5
+   refs and fixes the allocation, but the ROM does that RMW through sp (`ldr r0, [sp, #0x28]`).
+Next idea: find refs for argsPtr that cse later folds back to sp, or the label/loop structure
+that ends cse's block between the actor copy and its uses.
+
+### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): deferred
+
+Draft: `notes/phase3-drafts/field-effects/DirectionalController_CheckRemaining.c` (41 ROM / 43
+draft). In the ROM, Math_Atan2's result stays in hard r0 from the call to the `bne` that jumps
+straight to the epilogue, and every local temp in between (the u16 copy, the field loads, the
+facing tests) uses r1-r5. local-alloc avoids r0 only when hard r0 is live across those blocks,
+which the C gets only from the pin (`register s32 angle asm("r0")`): a pseudo for angle crosses
+several blocks, so it is global, and local-alloc has already put temps in r0 by the time global
+runs. `AGBCC_FORCE=angle:0` does not help (the temps clobber it). The ROM's `adds r1, r0` then
+in-place `lsls r1, r1, #16` also says the narrowing reads a copy that combine left alone, which
+is what a copy straight from the hard return register gives. Spellings tried: plain
+`(u16)angle`, a `u16 heading` local, an assignment inside the expression. Next idea: a form in
+which the RTL keeps the call's hard r0 as the returned value (no pseudo between the call and the
+return), for example the call's result returned through an inline whose result the caller
+returns, or a matched relative with the same "return the angle when facing" shape.
+
+### EffectManager_UpdateAll (src/homing_effect.c, 0800A8E4): deferred, one insn from a match
+
+Draft: `notes/phase3-drafts/field-effects/EffectManager_UpdateAll.c` (1 ROM / 1 draft: one
+instruction in another place). Diagnosis: the 0x148 stride for `view` and `p` is not a register
+in the ROM. `AGBCC_NOREG=<the stride pseudo>` on the depin draft (two explicit `view++; p++;`)
+gives an exact match: reload loads 0x148 for the first add, the second add inherits it, and the
+reload rotation then gives the ROM's r2 for -1 and r0 for i. In plain C, cse1 merges the two
+`(set (reg) (const_int 328))` that the addsi3 expander makes. The constant stays two
+single-use pseudos (which combine folds back into each add, so reload loads it) only when one
+increment is loop.c's: `view = p;` at the top of the body makes view a giv of p, and its reduced
+increment lands before `p++` as in the ROM. What is left is the giv's initialization: loop.c
+emits it just before NOTE_INSN_LOOP_BEG, after `i = 5`, and the ROM has `mov r7, r8` before
+`movs r2, #5`. A reversed up-counter (`for (i = 0; i < 6; i++)`) does not help: check_dbra_loop
+reverses it in pass 1 before the giv is reduced, so its `i = 5` comes first again. Making view a
+giv of i (`view = &manager->effects[i]`) delays the reversal to pass 2 and fixes the init order,
+but then the giv's increment lands before i's increment, after `p++`. Next idea: a counter that
+check_dbra_loop can only reverse in pass 2 while view stays a giv of p.
 
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 

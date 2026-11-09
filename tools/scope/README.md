@@ -1598,6 +1598,32 @@ Each was read from the compiler source and confirmed on a live draft.
    `*current = value;` mentions also raised current's refs (7 -> 8, priority 7368 -> 12631) above
    diff. When `why` says a global pseudo conflicts with r0/r1 that only block-local pseudos hold,
    try this.
+79. **Plan the returns to place each cross-jump: jump2 tries other jumps last first, and a label
+   lowers the minimum.** For a jump, find_cross_jump first tries the code that falls into its
+   label (one shared insn is enough), then every other jump to that label, starting with the last
+   one in insn order (jump_chain is built by prepending). Two shared insns are needed; `use` insns
+   don't count. A label in the jumping tail ends the compare and lowers the minimum by one, so a
+   call that falls into a `return 1` label (the else arm of an if/else followed by one return)
+   keeps its call (flow's nop) and gives only its `r0 = 1` to a later return. In
+   ScenePool_SelectDirectionOrRepeat the four states are written in full: both forward copies and
+   the direction-2 state end in `return 1`, so both forward tails merge into the last one (the
+   direction-2 copy) at its stateEntered store, while the random branch's if/else + return keeps
+   state 4's call. ScenePool_SelectRepeatOrExit used the same return-after-inner-if/else. Both
+   replaced a barrier and an r0 pin.
+
+90. **In a two-value block, local-alloc goes by priority; a pointer variable set in each arm leaves
+   the value alone in the block.** An arm `UpdateFn callback = F; p->update = callback;` at offset
+   0x1A4 holds two local qtys: the callback (load, add, store: life 4, priority 5000) and the
+   address `p + 420` (life 2, 10000). The address takes r0 and the callback r1; the ROM has the
+   callback in r0. With three qtys fact 38's quirk would give the first-born callback r0, but here
+   there are only two. Declaring `UpdateFn *slot;` at function scope and writing
+   `slot = &p->update; *slot = callback;` in each arm makes the address a two-set, non-local pseudo
+   (fact 42): local-alloc places only the callback (r0), global then gives the slot r1, and
+   reload's 420 lands in r2. That matched SceneObjects_CreateObject. Two more levers in the same
+   function: `draw->mode = drawMode;` (not `s16 *mode = &draw->mode`, which cse folds to `p + 0xA0`)
+   gives draw its fourth ref, and a function-scope `u16 *table = gRandomTable;` is a REG_EQUIV
+   pseudo left without a register, so reload loads the table at its use and the reload rotation
+   moves one step.
 
 ## Survey: random table as a literal address (2026-10-24)
 

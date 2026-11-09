@@ -1320,10 +1320,7 @@ s32 TerrainOverlay_QueueAddActor(struct SceneBody *);
 
 static inline void initializeCell(void *cell, s32 index, s32 height)
 {
-    TerrainModifiers_RegisterCell(cell, index, 0, height, 255, ({
-                                      register s32 zero asm("r2") = 0;
-                                      zero;
-                                  }));
+    TerrainModifiers_RegisterCell(cell, index, 0, height, 255, 0);
 }
 
 static inline void setStepFlags(struct SceneCollider *c)
@@ -1345,12 +1342,14 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     struct SceneExtent size, offset;
     struct SceneObjectManager *manager = gSceneObjectManager;
     struct SceneObject *p;
-    register struct SceneDraw *draw asm("r5");
-    register struct SceneVec *pos asm("r9");
+    struct SceneDraw *draw;
+    struct SceneVec *pos;
     s32 x, z, index, height;
     u32 clear;
     u8 *dynamic;
     struct SceneCell *cell;
+    UpdateFn *slot;
+    u16 *table = gRandomTable;
     if (!manager || !(p = SceneObjects_FindFreeSlot(manager)))
         return -1;
     Memory_Clear(p, 0x1A8);
@@ -1364,10 +1363,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     AnimData_Load(&p->animationData, animationResource);
     draw = &p->draw;
     Sprite_Init(draw, &p->animationData, 0);
-    {
-        s16 *mode = &draw->mode;
-        *mode = drawMode;
-    }
+    draw->mode = drawMode;
     p->center.x = (position->x & ~255) + 128;
     p->center.y = position->y & ~255;
     p->center.z = (position->z & ~255) + 128;
@@ -1386,27 +1382,22 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     p->direction = 0;
     if (flags16(p, 4)) {
         {
-            register void (*callback)(struct SceneObject *) asm("r0") = Scene_UpdateObjectFlash;
-            asm("" : "+r"(callback));
-            p->update = callback;
+            UpdateFn callback = Scene_UpdateObjectFlash;
+            slot = &p->update;
+            *slot = callback;
         }
         p->timer = 0;
     } else {
         {
-            register void (*callback)(struct SceneObject *) asm("r0") = Scene_UpdateObjectIdle;
-            asm("" : "+r"(callback));
-            p->update = callback;
+            UpdateFn callback = Scene_UpdateObjectIdle;
+            slot = &p->update;
+            *slot = callback;
         }
         p->timer = 0;
     }
     p->entered = 1;
     x = p->body.position.x >> 8;
-    z = ({
-            register struct SceneVec *coords asm("r1") = pos;
-            asm("" : "+r"(coords));
-            coords->z;
-        }) >>
-        8;
+    z = pos->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else
@@ -1420,16 +1411,8 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     if (height < 15)
         height++;
     initializeCell(&p->cellRef, index, height);
-    {
-        register u32 y asm("r0") = height << 8;
-        asm("" : "+r"(y));
-        clear = ({
-            register u32 zero asm("r3") = 0;
-            asm("" : "+r"(zero));
-            zero;
-        });
-        p->targetY = y;
-    }
+    clear = 0;
+    p->targetY = height << 8;
     size.x = 130;
     size.y = 128;
     size.z = 130;
@@ -1459,17 +1442,12 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     {
         u16 sampleIndex = gRandomIndex;
         u32 offset = sampleIndex * sizeof(u16);
-        register u16 *table asm("r2") = gRandomTable;
-        asm("" : "+r"(table));
         p->randomPhase = Mod(*(u16 *)(offset + (u32)table), 16);
     }
-    {
-        register s32 initial asm("r3") = basePalette;
-        if (initial >= 0)
-            p->basePalette = initial;
-        else
-            p->basePalette = p->animationData.paletteIndex;
-    }
+    if (basePalette >= 0)
+        p->basePalette = basePalette;
+    else
+        p->basePalette = p->animationData.paletteIndex;
     AnimData_SelectPaletteBank(&p->animationData, p->basePalette);
     p->animation = animation;
     p->link.id = p->body.id;
