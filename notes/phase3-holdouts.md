@@ -186,3 +186,14 @@ combine has no constant to simplify. Ruled out here: the two-statement offset fo
 records REG_EQUIV (const (plus sym k)) and the result is worse, and halves placed before the vector
 writes. Next: a table source that cse does not see as constant and combine folds, with no mask
 constant in common with a bitfield write in the same block.
+
+### TentacleActor_UpdateRetraction (src/fn/sub_080AB968.c, 080AB968): deferred
+
+The ROM computes |secondaryMotion.x| and |secondaryMotion.z| (`adds r3, r1, #0; ...; rsbs r3, r1, #0`)
+and never uses them. The landed C keeps them with a volatile asm. So in the original they fed
+something deleted after flow. Draft `TentacleActor_UpdateRetraction.c`: `if (ax > az) Advance(...);
+else Advance(...);` (7/12). The compare survives, because reload materializes 0x6400 differently in
+the two arms and jump2 cannot cross-jump them. Tried: an empty `if` with DEBUG_PRINT (flow deletes
+the abs, 20/2), branching inside Advance, and a `speed` variable set before the branch. Next: two
+arms that stay identical after reload (all arguments set before the branch), or a switch on the
+abs values.
