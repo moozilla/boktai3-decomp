@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
 typedef struct ActorAnimation {
@@ -65,10 +64,13 @@ void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
 typedef struct {
     u32 a, b;
 } Point;
+static inline void setFlags(ActorAnimation *p, u32 flags)
+{
+    p->flags |= flags;
+}
 void SceneActorAnimation_UpdateHomingLunge(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
-    u32 *savedFlags;
     u8 *position = (u8 *)p + 0x48;
     if (p->changed) {
         int sequence;
@@ -78,47 +80,23 @@ void SceneActorAnimation_UpdateHomingLunge(ActorAnimation *p, int tick)
                                               4);
         Sound_PlaySongChecked(842);
     }
-    {
-        register u32 mask asm("r2");
-        if (p2->type == 1)
-            mask = 8;
-        else
-            mask = 0x40000;
-        {
-            register u32 *flags asm("r1") = &p->flags;
-            *flags |= mask;
-            savedFlags = flags;
-        }
-    }
+    if (p2->type == 1)
+        setFlags(p, 8);
+    else
+        setFlags(p, 0x40000);
     if (p->tryUpdate(p))
         return;
-    {
-        u32 mask = 64;
-        *savedFlags |= mask;
-    }
+    setFlags(p, 0x40);
     if (p->reset(p))
         return;
     if (!(tick & 3)) {
         if (!p2->type) {
             int id = SceneActorGraphics_GetResourceId(p2);
             u8 *data = gPaletteBankData + id * 32;
-            {
-                register int offset asm("r4") = 0x240;
-                asm("" ::"r"(offset));
-                TemporaryAnimationPool_CreateEntry((u8 *)p2 + offset, 8, 0x200, 0x9000, data);
-            }
+            TemporaryAnimationPool_CreateEntry((u8 *)p2 + 0x240, 8, 0x200, 0x9000, data);
         } else {
-            int offset;
-            u8 *data;
-            data = gPaletteBankData;
-            offset = 0x6740;
-            asm("" ::"r"(offset));
-            data += offset;
-            {
-                register int drawOffset asm("r2") = 0x240;
-                asm("" ::"r"(drawOffset));
-                TemporaryAnimationPool_CreateEntry((u8 *)p2 + drawOffset, 8, 0x200, 0x9000, data);
-            }
+            u8 *data = gPaletteBankData + 0x6740;
+            TemporaryAnimationPool_CreateEntry((u8 *)p2 + 0x240, 8, 0x200, 0x9000, data);
         }
     }
     if (p->locked) {

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_charge_offset.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -63,19 +62,6 @@ static inline int add(struct ContactPosition *a, struct ContactPosition *b)
     a->z += b->z;
     return zero;
 }
-static inline int turn(int target, int current)
-{
-    int angle = current;
-    int delta = target - angle;
-    if (delta > 32)
-        delta = 32;
-    else {
-        int lower = -32;
-        if (delta < lower)
-            delta = lower;
-    }
-    return angle + delta;
-}
 void SceneActors_UpdateSwarmAttack(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
@@ -108,11 +94,7 @@ void SceneActors_UpdateSwarmAttack(ActorAnimation *p, int tick)
         direction = *((u8 *)p2 + 0x3ba);
         gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 random = gRandomIndex * 2;
-            u16 *table;
-            table = gRandomTable;
-            random += (u32)table;
-            random = *(u16 *)random;
+            u32 random = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
             direction -= 8;
             random &= 15;
             direction += random;
@@ -122,9 +104,7 @@ void SceneActors_UpdateSwarmAttack(ActorAnimation *p, int tick)
         Sound_PlaySongChecked(234);
     }
     if (*((u8 *)p2 + 0x25d) & 2) {
-        register int elapsed asm("r3") = tick;
-        asm("" : "+r"(elapsed));
-        if (elapsed > 40)
+        if (tick > 40)
             p->finished = 1;
     }
 }

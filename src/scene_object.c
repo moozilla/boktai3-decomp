@@ -406,28 +406,34 @@ s32 Scene_ActivateTypeOneObjects(void)
 s32 Scene_StopSelectedObject(void)
 {
     struct SceneObjectManager *manager = gSceneObjectManager;
-    register u32 id asm("r6");
+    u32 id;
     struct SceneObject *p;
-    register s32 i asm("r5");
-    register s32 count asm("r4");
+    s32 i, count;
     if (!manager || !(id = Script_GetKeywordValue(0x6E, 0)))
         return -1;
     p = manager->objects;
     i = 0;
     count = manager->count;
-    for (; i < count; p++, i++) {
-        if (!p->active)
+    for (; i < count; i++) {
+        if (!p->active) {
+            p++;
             continue;
-        if (p->type == 1)
+        }
+        if (p->type == 1) {
+            p++;
             continue;
-        if (p->kind)
+        }
+        if (p->kind) {
+            p++;
             continue;
+        }
         if (p->body.id == id) {
             p->health = 0;
             p->mode = 3;
             p->update = 0;
             return 1;
         }
+        p++;
     }
     return 0;
 }

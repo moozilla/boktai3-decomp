@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 typedef struct {
     s16 x, y, z, pad;
@@ -11,16 +10,15 @@ void Terrain_GetBoxMinPosition(u16, void *);
 int SceneObjects_Append(void *, u16, void *, int, u8, u8, u8, int, int, int, int, void *, u8, int);
 int SceneObjects_ScriptAppend(void)
 {
-    int data[4];
+    int args[4];
     Vec position;
     void *p;
     u16 id;
     int value;
     u8 kind, variant, orientation;
-    int type, field45, field88;
-    u8 field44;
-    int flags, field41, i, found;
-    register int *out asm("r5");
+    int type, b45, maxLift;
+    u8 b44;
+    int hasArgs, b41, i, found;
     p = ResourceRegistry_GetResource(0x85e6);
     if (!p)
         return -1;
@@ -30,22 +28,17 @@ int SceneObjects_ScriptAppend(void)
     variant = Script_GetKeywordValue(0x73, 0);
     orientation = Script_GetKeywordValue(0x72, 0);
     type = Script_GetKeywordValue(0x76, 0);
-    field45 = Script_GetKeywordValue(0x63, 0);
-    field88 = Script_GetKeywordValue(0x68, 400);
-    field44 = Script_GetKeywordValue(0x6d, 0);
+    b45 = Script_GetKeywordValue(0x63, 0);
+    maxLift = Script_GetKeywordValue(0x68, 400);
+    b44 = Script_GetKeywordValue(0x6d, 0);
     if (Script_SeekToKeyword(0x6b)) {
-        flags = Script_GetValue();
-        field41 = Script_GetValue();
-        {
-            register Vec *pos asm("r6") = &position;
-            asm("" : : "r"(pos));
-        }
-        out = data;
-        for (i = 3; i >= 0; i--)
-            *out++ = Script_GetValue();
+        hasArgs = Script_GetValue();
+        b41 = Script_GetValue();
+        for (i = 0; i < 4; i++)
+            args[i] = Script_GetValue();
     } else {
-        flags = 0;
-        field41 = 0;
+        hasArgs = 0;
+        b41 = 0;
     }
     if (Script_SeekToKeyword(0x74))
         Terrain_GetBoxMinPosition(Script_GetValue(), &position);
@@ -61,6 +54,6 @@ int SceneObjects_ScriptAppend(void)
             position.z = found;
         }
     }
-    return SceneObjects_Append(p, id, &position, value, kind, variant, orientation, type, field88,
-                               flags, field41, data, field44, field45);
+    return SceneObjects_Append(p, id, &position, value, kind, variant, orientation, type, maxLift,
+                               hasArgs, b41, args, b44, b45);
 }

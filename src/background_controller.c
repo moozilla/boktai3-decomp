@@ -6,8 +6,6 @@
 /* ScrollingBackground_ClearSlots: Zeroes all four ScrollingBackground slots in gScrollingBackgrounds, unlike the single-slot clear done by the destroy callback ScrollingBackground_Destroy */
 #define ScrollingBackground_ClearSlots sub_08002284
 
-/* Functions marked MATCHING_CONCESSION keep local register hints made with
- * empty asm constraints; these emit no handwritten instructions. */
 s32 Background_ApplyQueuedCommands(struct Background *p)
 {
     u32 i;
@@ -68,18 +66,16 @@ s32 Background_ApplyQueuedCommands(struct Background *p)
     return p->queue.count = 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 s32 Background_Update(struct Background *p)
 {
     s32 remaining;
     s32 x, y;
     s32 tileX, tileY;
+    s32 cx, cy;
 
     Background_ApplyQueuedCommands(p);
     tileY = 0;
     if (p->flags & 2) {
-        s32 cx, cy;
-        register s32 bottom asm("r5");
         if (!gCamera.mode) {
             cx = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;
             cy = ((s16 *)gCameraOrigin)[1] + gCamera.offsetY;
@@ -95,42 +91,21 @@ s32 Background_Update(struct Background *p)
             cx += p->driftX;
             cy += p->driftY;
         }
-        {
-            s32 cyHint = cy;
-            cy = cyHint;
-        }
         if (p->rateX == 128)
-            x = cx;
+            x = cx - 120;
         else
-            x = ({
-                s32 delta = cx - p->centerX;
-                register s32 result asm("r0") = truncate7(delta * p->rateX) + p->centerX;
-                asm("" : "+r"(result));
-                result;
-            });
-        x -= 120;
+            x = truncate7((cx - p->centerX) * p->rateX) + p->centerX - 120;
         if (p->rateY == 128)
-            y = cy;
+            y = cy - 80;
         else
-            y = ({
-                s32 delta = cy - p->centerY;
-                register s32 result asm("r0") = truncate7(delta * p->rateY) + p->centerY;
-                asm("" : "+r"(result));
-                result;
-            });
-        y -= 80;
-        bottom = y + 80;
+            y = truncate7((cy - p->centerY) * p->rateY) + p->centerY - 80;
+        cy = y + 80;
         tileX = truncate3(x - 8);
-        {
-            s32 value = truncate3(bottom - 128);
-            s32 mask = -2;
-            tileY = mask & value;
-        }
+        tileY = truncate3(cy - 128) & ~1;
     } else {
         if (p->flags & 4) {
             if (p->scrollDuration) {
                 remaining = p->scrollDuration - p->scrollTime;
-                asm("" : "+r"(remaining));
                 p->scrollSpeedX =
                     Div(p->scrollStartX * remaining + p->scrollTargetX * p->scrollTime,
                         p->scrollDuration) /
@@ -165,33 +140,22 @@ s32 Background_Update(struct Background *p)
                 p->y = p->moveTargetY;
             }
         }
-        x = ({
-            register s32 value asm("r3") = truncate7(p->x);
-            asm("" : "+r"(value));
-            value;
-        });
-        y = ({
-            s32 value = truncate7(p->y);
-            value;
-        });
+        x = truncate7(p->x);
+        y = truncate7(p->y);
         if (p->flags & 32) {
             x += ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;
             y += ((s16 *)gCameraOrigin)[1] + gCamera.offsetY;
         }
-        {
-            register s32 rowY asm("r5") = y;
-            if (x < 0)
-                tileX = ~((-x) >> 3);
-            else
-                tileX = x >> 3;
-            if (rowY < 0) {
-                register s32 negative asm("r0") = ~((-rowY) >> 3);
-                asm("" : "+r"(negative));
-                tileY = negative;
-            } else
-                tileY = rowY >> 3;
-            tileY &= ~1;
-        }
+        cy = y;
+        if (x < 0)
+            tileX = ~((-x) >> 3);
+        else
+            tileX = x >> 3;
+        if (cy < 0)
+            tileY = ~((-cy) >> 3);
+        else
+            tileY = cy >> 3;
+        tileY &= ~1;
     }
     BgGfx_LoadTilemapSimple(p->layer, tileX, tileY, x, y);
     if (p->fadeActive == 1) {
@@ -225,7 +189,6 @@ static inline u8 modeFlag(struct Background *p)
     return p->flags & 16;
 }
 
-// MATCHING_CONCESSION: register-pinning
 s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig *c)
 {
     struct BackgroundLayer *layer;
@@ -411,7 +374,6 @@ void *Background_CreateFromScript(u32 id)
     return Background_Create(id, &c);
 }
 
-// MATCHING_CONCESSION: register-pinning
 s32 Background_FindMapId(struct BackgroundResource *resource, u16 id)
 {
     struct BackgroundMapEntry *entry = (struct BackgroundMapEntry *)resource->maps;
@@ -571,7 +533,6 @@ done:
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)
 {
     u32 commandType = type;
