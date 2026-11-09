@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -29,13 +28,8 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-// The original caller saw an int-width prototype for rfu_clearSlot (u8, u8 in
-// the SDK header): its argument order only matches with int parameters.
-#define rfu_clearSlot rfu_clearSlot_sdk
 #include "rfu_compat.h"
 #include "ram.h"
-#undef rfu_clearSlot
-u16 rfu_clearSlot(int connTypeFlag, int slotStatusIndex);
 void WirelessController_PollPeerRosterSend(struct Engine *p)
 {
     int changed = 0;
@@ -43,44 +37,27 @@ void WirelessController_PollPeerRosterSend(struct Engine *p)
         struct RfuSlotStatusNI **slots = gRfuSlotStatusNI;
         int slot = p->mode;
         struct NIComm *s = &slots[slot]->send;
-        {
-            int state;
-            state = s->state;
-            if (state == 0x26) {
-                int original = s->bmSlotOrg;
-                int current = s->bmSlot;
-                DEBUG_NOP();
-                changed = current ^ original;
-                rfu_clearSlot(4, slot);
-                p->mask &= ~2;
-                if (p->mask & 16) {
-                    p->mask |= 128;
-                }
-                if (p->mask & 8) {
-                    p->mask = (p->mask & ~8) | 32;
-                }
-            } else if (state == 0x27) {
-                int original = s->bmSlotOrg;
-                int current = s->bmSlot;
-                DEBUG_NOP();
-                changed = current ^ original;
-                rfu_clearSlot(4, slot);
-                {
-                    int zero = 0;
-                    p->mask = zero;
-                    if (p->operation == 9) {
-                        int op = 7;
-                        int byteZero = 0;
-                        p->flag = byteZero;
-                        p->operation = op;
-                        p->ticks = zero;
-                        p->pending = 1;
-                    }
-                }
+        if (s->state == 0x26) {
+            changed = s->bmSlotOrg ^ s->bmSlot;
+            rfu_clearSlot(4, p->mode);
+            p->mask &= ~2;
+            if (p->mask & 16)
+                p->mask |= 128;
+            if (p->mask & 8)
+                p->mask = (p->mask & ~8) | 32;
+        } else if (s->state == 0x27) {
+            changed = s->bmSlotOrg ^ s->bmSlot;
+            rfu_clearSlot(4, p->mode);
+            p->mask = 0;
+            if (p->operation == 9) {
+                int next = 7;
+                p->flag = 0;
+                p->operation = next;
+                p->ticks = 0;
+                p->pending = 1;
             }
         }
-        if (changed) {
+        if (changed)
             p->flag35 |= changed;
-        }
     }
 }
