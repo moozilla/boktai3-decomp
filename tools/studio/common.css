@@ -1,4 +1,26 @@
-/* Shared by the studio pages (see common.js): header, peek panel, notes. */
+/* Shared by the studio pages (see common.js): theme, header, peek panel, notes.
+   A page may add its own tokens; the shared ones below are the Studio's palette. */
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
+  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --ok: #2f7d4f; --warn: #a0661c; --soft: #efe9de;
+  --warn-bg: #f8ead2; --ok-bg: #e3f0e6;
+  --syn-kw: #5a5fa8; --syn-type: #2f7d6f; --syn-num: #a0521c; --syn-str: #7a5a1e; --syn-com: #9a9083; --syn-fn: #b5462f;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --ok: #6cc596; --warn: #e0b060; --soft: #2b2723;
+    --warn-bg: #3a2f1c; --ok-bg: #1f3227;
+    --syn-kw: #9da3f0; --syn-type: #6cc5b4; --syn-num: #e6a070; --syn-str: #d8b878; --syn-com: #857b6f; --syn-fn: #e0745a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+  --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --ok: #6cc596; --warn: #e0b060; --soft: #2b2723;
+  --warn-bg: #3a2f1c; --ok-bg: #1f3227;
+  --syn-kw: #9da3f0; --syn-type: #6cc5b4; --syn-num: #e6a070; --syn-str: #d8b878; --syn-com: #857b6f; --syn-fn: #e0745a;
+}
 a { color: var(--accent); }
 #top { display: flex; align-items: center; gap: 14px; padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; min-height: 53px; }
 #top h1 { font-size: 16px; margin: 0; letter-spacing: .02em; white-space: nowrap; }

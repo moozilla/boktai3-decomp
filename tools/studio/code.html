@@ -6,78 +6,462 @@
 <title>Boktai 3 Code</title>
 <link rel="stylesheet" href="/static/common.css">
 <style>
-:root {
-  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
-  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --ok: #2f7d4f; --warn: #a0661c;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
-    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --ok: #6cc596; --warn: #e0b060;
-  }
-}
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
-input { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
-main { padding: 14px 20px 40px; max-width: 1100px; height: auto !important; }
-h2 { font-size: 16px; margin: 0 0 4px; font-family: ui-monospace, Menlo, monospace; }
-h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 6px; font-weight: 600; }
-.meta { color: var(--muted); font-size: 13px; }
-.st { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; border: 1px solid var(--line); }
-.st.ok { color: var(--ok); border-color: var(--ok); }
-.st.nm { color: var(--warn); border-color: var(--warn); }
-pre { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; overflow: auto; font: 12px/1.5 ui-monospace, Menlo, monospace; margin: 0; }
-pre a { text-decoration: none; }
-.refs { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 12px ui-monospace, Menlo, monospace; }
-.empty { color: var(--muted); }
-#go { width: 12em; font-family: ui-monospace, Menlo, monospace; }
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+input { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; }
+main { display: grid; grid-template-columns: 300px 1fr; height: calc(100vh - 53px); }
+body.embed main { grid-template-columns: 1fr; }
+body.embed #side { display: none; }
+#side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: var(--panel); }
+#side .tools { padding: 10px; border-bottom: 1px solid var(--line); }
+#side .tools input { width: 100%; }
+#tree { overflow-y: auto; flex: 1; padding: 6px 0 30px; font-size: 13.5px; }
+.tn { display: flex; align-items: center; gap: 5px; padding: 2px 10px 2px calc(8px + var(--d) * 14px); cursor: pointer; white-space: nowrap; user-select: none; color: var(--ink); }
+.tn:hover { background: var(--sel); text-decoration: none; }
+.tn.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
+.tn .tw { width: 12px; color: var(--muted); font-size: 10px; flex: none; text-align: center; }
+.tn .tl { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.tn .tc { color: var(--muted); font-size: 11px; }
+.tn.fn .tl { font-family: var(--mono); font-size: 12.5px; }
+.tn.top > .tl { font-weight: 600; }
+.tn.d0 > .tl { font-weight: 600; }
+.tn .sec { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding-top: 8px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--ok); }
+.dot.warn { background: var(--warn); }
+.dot.none { background: transparent; }
+#view { overflow: auto; min-width: 0; }
+.page { padding: 18px 28px 60px; max-width: 1400px; }
+.crumbs { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.crumbs a { color: var(--muted); }
+h1.t { font-size: 24px; margin: 0; font-weight: 650; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+h1.t.mono { font-family: var(--mono); font-size: 21px; letter-spacing: 0; }
+h1.t .step { font: 13px system-ui, sans-serif; color: var(--muted); font-weight: 400; }
+.lede { font-size: 15px; margin: 10px 0 0; max-width: 820px; }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+.badge { font-size: 12px; padding: 1px 9px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); background: var(--panel); white-space: nowrap; }
+.badge.ok { border-color: var(--ok); color: var(--ok); background: var(--ok-bg); }
+.badge.warn { border-color: var(--warn); color: var(--warn); background: var(--warn-bg); }
+.badge.mono { font-family: var(--mono); font-size: 11.5px; }
+h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 26px 0 10px; font-weight: 650; display: flex; align-items: baseline; gap: 8px; }
+h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
+.muted, .empty { color: var(--muted); }
+.mono { font-family: var(--mono); font-size: 12.5px; }
+.notice { border: 1px solid var(--warn); background: var(--warn-bg); color: var(--ink); border-radius: 8px; padding: 8px 12px; margin: 12px 0; font-size: 13px; }
+
+/* stat tiles and bars */
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-top: 18px; }
+.tile { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 12px 14px; }
+.tile b { display: block; font-size: 24px; font-weight: 650; letter-spacing: -.01em; }
+.tile span { color: var(--muted); font-size: 12.5px; }
+.bar { height: 8px; border-radius: 4px; background: var(--warn); overflow: hidden; width: 100%; min-width: 80px; display: block; }
+.bar > i { display: block; height: 100%; background: var(--ok); }
+table.t { border-collapse: collapse; font-size: 13px; width: 100%; }
+table.t td, table.t th { padding: 5px 14px 5px 0; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.t th { color: var(--muted); font-weight: 500; font-size: 12px; }
+table.t td.r, table.t th.r { text-align: right; font-variant-numeric: tabular-nums; }
+table.t tr.link { cursor: pointer; }
+table.t tr.link:hover td { background: var(--sel); }
+.kinds { display: grid; grid-template-columns: max-content 1fr max-content; gap: 6px 12px; align-items: center; max-width: 760px; font-size: 13px; }
+.kinds .kb { height: 8px; border-radius: 4px; background: var(--warn); }
+.strip { display: flex; height: 22px; border-radius: 5px; overflow: hidden; border: 1px solid var(--line); margin: 14px 0 4px; }
+.strip a { display: block; height: 100%; background: var(--ok); border-right: 1px solid var(--panel); min-width: 2px; }
+.strip a.warn { background: var(--warn); }
+.strip a.sel { outline: 2px solid var(--ink); outline-offset: -2px; }
+
+/* source panes */
+.panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-top: 18px; }
+@media (max-width: 1100px) { .panes { grid-template-columns: minmax(0, 1fr); } }
+.pane { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); min-width: 0; display: flex; flex-direction: column; }
+.pane .ph { display: flex; align-items: baseline; gap: 8px; padding: 7px 12px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.pane .ph b { color: var(--ink); font-weight: 600; font-size: 12.5px; }
+.pane .ph .sp { flex: 1; }
+.src { overflow: auto; max-height: 72vh; font: 12.5px/1.55 var(--mono); padding: 6px 0; }
+.src .l { display: flex; white-space: pre; padding-right: 12px; }
+.src .l .g { color: var(--muted); opacity: .7; text-align: right; flex: none; width: 4.2em; padding-right: 12px; user-select: none; }
+.src .l.cx { background: var(--warn-bg); box-shadow: inset 3px 0 var(--warn); }
+.src .l.cx .g { color: var(--warn); opacity: 1; }
+.src .k { color: var(--syn-kw); }
+.src .ty { color: var(--syn-type); }
+.src .nu { color: var(--syn-num); }
+.src .s { color: var(--syn-str); }
+.src .c { color: var(--syn-com); font-style: italic; }
+.src .op { color: var(--syn-kw); font-weight: 550; }
+.src .rg { color: var(--syn-type); }
+.src .lb { color: var(--ink); font-weight: 600; }
+.src a { color: var(--syn-fn); }
+.src a.ram { color: var(--syn-type); text-decoration: underline dotted; }
+.src .ann { color: var(--muted); }
+.legend { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.legend .sw { display: inline-block; width: 10px; height: 10px; background: var(--warn-bg); box-shadow: inset 2px 0 var(--warn); vertical-align: -1px; margin-right: 4px; }
+
+/* cross-references */
+.xr { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 4px 28px; }
+.refs { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { font-size: 12.5px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); white-space: nowrap; color: var(--ink); }
+.chip.mono { font-family: var(--mono); font-size: 12px; }
+a.chip:hover { border-color: var(--accent); text-decoration: none; }
+.chip small { color: var(--muted); }
+.chip.warn { border-color: var(--warn); }
+.results .r { display: flex; gap: 8px; align-items: baseline; padding: 3px 10px; cursor: pointer; color: var(--ink); }
+.results .r:hover { background: var(--sel); text-decoration: none; }
+.results .r .k { font-size: 10.5px; color: var(--muted); width: 34px; flex: none; text-transform: uppercase; letter-spacing: .04em; }
+.results .r .p { margin-left: auto; color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } .page { padding: 14px 16px 40px; } }
 </style>
 </head>
 <body>
 <header id="top"></header>
 <main>
-  <div id="view"><div class="empty">Loading…</div></div>
+  <section id="side">
+    <div class="tools"><input id="q" type="search" placeholder="Find a function, unit or RAM object" autocomplete="off"></div>
+    <div id="tree"></div>
+  </section>
+  <section id="view"><div class="page empty">Loading the code index… (the first visit after a source change runs tools/progress.py, about half a minute)</div></section>
 </main>
 <script src="/static/common.js"></script>
 <script>
-// One function: the generated disassembly (gen/code.s, as tools/asmat.py
-// prints it) and, when src/ has it, the C. Opened as /code#ADDRESS.
-studioHeader('<input id="go" placeholder="Address or name" autocomplete="off">');
-const go = $('go');
-if (go) go.onkeydown = e => { if (e.key === 'Enter') { const v = go.value.trim().replace(/^0x/i, '').replace(/^sub_/, ''); if (/^[0-9a-f]{7,8}$/i.test(v)) location.hash = v.toUpperCase().padStart(8, '0'); } };
+// The code explorer: every function by category and unit (the report tree that
+// PROGRESS.json and decomp.dev show), its C next to its disassembly, the
+// concessions it still holds, and what it touches (tools/studio/codemap.py).
+// Routes: #ADDRESS or #fn:NAME, #cat:CATEGORY, #unit:CATEGORY/UNIT, #ram, #ram:NAME.
+studioHeader();
+let S = null;                       // /api/codemap
+const FN = {}, BYNAME = {}, UNIT = {}, RAMS = [];
+const open = new Set();
+const KIND_LABEL = { pin: 'register pin', operand: 'asm operand', clobber: 'asm clobber', barrier: 'asm barrier', 'debug-nop': 'debug nop',
+  'empty-loop': 'empty loop', 'empty-if': 'empty if', 'single-use-macro': 'single-use macro', volatile: 'volatile', alias: 'asm alias',
+  cflags: 'compiler flags', 'raw-offset': 'raw offset', helper: 'through a helper', concession: 'concession' };
+const KIND_HELP = { pin: 'register T x asm("rN"): forces a register choice', operand: 'asm("" : "+r"(x)): an empty asm that pins a value in a register',
+  clobber: 'asm("" ::: "rN"): an empty asm that blocks a register', barrier: 'asm(""): an empty asm that stops an optimization',
+  'debug-nop': 'DEBUG_NOP(): a stand-in for compiled-out debug code', 'raw-offset': '*(u16 *)((u8 *)p + 0x172) where a struct field belongs',
+  helper: 'calls a static helper or macro that holds one', volatile: 'a volatile local or cast that steers the compiler',
+  'single-use-macro': 'a statement macro used at one site', 'empty-loop': 'do { } while (0)', 'empty-if': 'an if with an empty body',
+  alias: 'a second prototype through asm("Symbol")', cflags: 'a // CFLAGS: override' };
+const kindLabel = k => KIND_LABEL[k] || k;
+const num = n => Number(n).toLocaleString();
+const kb = n => n >= 10240 ? `${num(Math.round(n / 1024))} KB` : `${num(n)} B`;
+const pct = (a, b) => b ? 100 * a / b : 100;
+const fmtPct = p => (p >= 99.95 && p < 100 ? '99.9' : p.toFixed(p >= 10 ? 1 : 2)) + '%';
+const unitKey = (c, u) => `${c}/${u}`;
+const fnHref = a => '#' + a;
+const unitHref = (c, u) => '#unit:' + encodeURIComponent(unitKey(c, u));
+const catHref = c => '#cat:' + encodeURIComponent(c);
+const ramHref = n => '#ram:' + encodeURIComponent(n);
+const status = kinds => kinds.length
+  ? kinds.map(k => `<span class="badge warn" title="${esc(KIND_HELP[k] || '')}">${esc(kindLabel(k))}</span>`).join('')
+  : '<span class="badge ok">no concessions</span>';
+const bar = (clean, total) => `<span class="bar" title="${fmtPct(pct(clean, total))} of the bytes without concessions"><i style="width:${pct(clean, total)}%"></i></span>`;
 
-async function show(addr) {
-  const v = $('view');
-  const d = await fetch('/api/code/' + addr).then(r => r.ok ? r.json() : null);
-  if (!d) { v.innerHTML = `<div class="empty">No function at ${esc(addr)}.</div>`; return; }
-  document.title = d.name + ' · Boktai 3 Code';
-  const status = d.c ? (d.c.nonmatching ? '<span class="st nm">NONMATCHING draft</span>' : '<span class="st ok">matched C</span>') : '<span class="st">not decompiled (INCLUDE_ASM)</span>';
-  const byName = Object.fromEntries(d.calls.map(c => [c.name, c.addr]));
-  const genName = {};  // gen/code.s names the callees by sub_ address
-  for (const c of d.calls) genName['sub_' + c.addr] = c.addr;
-  // link bl targets and local branch labels in the listing
-  const asm = esc(d.asm).replace(/\b(bl|b[a-z]{0,2}) (\w+)/g, (m, op, t) => {
-    const a = byName[t] || genName[t];
-    if (op === 'bl' && a) return `${op} <a href="${codeHref(a)}">${t}</a>`;
-    return m;
-  });
-  v.innerHTML = `<h2>${esc(d.name)}</h2>
-    <div class="meta">${d.addr} · ${d.mode}${d.name !== d.gen_name ? ' · ' + esc(d.gen_name) : ''}${d.confidence ? ' · name confidence ' + esc(d.confidence) : ''} · ${status}</div>
-    ${d.notes ? `<p>${esc(d.notes)}</p>` : ''}
-    <h3>Called by (${d.callers.length})</h3><div class="refs">${d.callers.map(c => `<a href="${codeHref(c.addr)}">${esc(c.name)}</a>`).join('') || '<span class="empty">no direct calls (a callback, table entry or entry point)</span>'}</div>
-    <h3>Calls (${d.calls.length})</h3><div class="refs">${d.calls.map(c => `<a href="${codeHref(c.addr)}">${esc(c.name)}</a>`).join('') || '<span class="empty">none</span>'}</div>
-    ${d.c ? `<h3>C · <code style="text-transform:none;letter-spacing:0">${esc(d.c.file)}:${d.c.line}</code></h3><pre>${esc(d.c.text)}</pre>` : ''}
-    <h3>Disassembly · gen/code.s</h3><pre>${asm}</pre>`;
+// ---------- index ----------
+async function load() {
+  S = await fetch('/api/codemap').then(r => r.ok ? r.json() : Promise.reject(r.status));
+  for (const c of S.categories) {
+    c.size = 0; c.clean = 0; c.nfn = 0; c.ncx = 0;
+    for (const u of c.units) {
+      u.cat = c.name; u.size = 0; u.clean = 0; u.ncx = 0; u.files = new Set();
+      for (const [name, addr, size, p, kinds, file] of u.functions) {
+        const f = { name, addr, size, pct: p, kinds, file, unit: u };
+        FN[addr] = f; BYNAME[name] = f;
+        u.size += size; if (!kinds.length) u.clean += size; else u.ncx++;
+        if (file) u.files.add(file);
+      }
+      UNIT[unitKey(c.name, u.name)] = u;
+      c.size += u.size; c.clean += u.clean; c.nfn += u.functions.length; c.ncx += u.ncx;
+    }
+  }
+  for (const r of S.ram) RAMS.push({ ...r, start: parseInt(r.addr, 16) });
+  RAMS.sort((a, b) => a.start - b.start);
 }
-// links inside this page stay in it (embedded or not)
-document.addEventListener('click', e => {
-  const a = e.target.closest && e.target.closest('a[href^="/code#"]');
-  if (!a || e.metaKey || e.ctrlKey) return;
-  e.preventDefault(); e.stopPropagation(); location.hash = a.getAttribute('href').split('#')[1];
-}, true);
-const fromHash = () => (location.hash.slice(1) || '').toUpperCase();
-window.onhashchange = () => { if (fromHash()) show(fromHash()); window.scrollTo(0, 0); };
-if (fromHash()) show(fromHash()); else $('view').innerHTML = '<div class="empty">Open a function as /code#ADDRESS, or type one above.</div>';
+// the RAM object holding an address, for the disassembly's literal pools
+function ramAt(a) {
+  let lo = 0, hi = RAMS.length - 1, best = null;
+  while (lo <= hi) { const m = (lo + hi) >> 1; if (RAMS[m].start <= a) { best = RAMS[m]; lo = m + 1; } else hi = m - 1; }
+  return best && a < best.start + Math.max(best.size, 1) ? best : null;
+}
+
+// ---------- sidebar ----------
+let SEL = '';
+function renderTree() {
+  const q = $('q').value.trim().toLowerCase();
+  if (q) return renderResults(q);
+  const out = [];
+  const row = (d, cls, hash, tw, label, count, dot) =>
+    out.push(`<a class="tn ${cls}${SEL === hash ? ' on' : ''}" style="--d:${d}" href="${hash}" data-key="${esc(hash)}">${tw}${dot ?? ''}<span class="tl">${label}</span>${count != null ? `<span class="tc">${count}</span>` : ''}</a>`);
+  row(0, 'top', '#', '<span class="tw">◎</span>', 'Overview');
+  row(0, 'top', '#ram', '<span class="tw">▦</span>', 'RAM objects', num(S.ram.length));
+  for (const c of S.categories) {
+    const ck = catHref(c.name), co = open.has(ck);
+    row(0, 'd0', ck, `<span class="tw" data-tog="${esc(ck)}">${co ? '▾' : '▸'}</span>`, esc(c.name), num(c.nfn));
+    if (!co) continue;
+    for (const u of c.units) {
+      const uk = unitHref(c.name, u.name), uo = open.has(uk);
+      row(1, '', uk, `<span class="tw" data-tog="${esc(uk)}">${uo ? '▾' : '▸'}</span>`, esc(u.name), u.functions.length,
+        `<span class="dot${u.ncx ? ' warn' : ''}" title="${u.ncx ? u.ncx + ' with concessions' : 'no concessions'}"></span>`);
+      if (!uo) continue;
+      for (const [name, addr, , , kinds] of u.functions)
+        row(2, 'fn', fnHref(addr), '<span class="tw"></span>', esc(name), null, `<span class="dot${kinds.length ? ' warn' : ''}"></span>`);
+    }
+  }
+  $('tree').innerHTML = out.join('');
+  document.querySelector('#tree .tn.on')?.scrollIntoView({ block: 'nearest' });
+}
+function renderResults(q) {
+  const out = [], hit = s => s.toLowerCase().includes(q);
+  const units = Object.values(UNIT).filter(u => hit(u.name)).slice(0, 40);
+  const fns = Object.values(FN).filter(f => hit(f.name) || f.addr.toLowerCase().includes(q.replace(/^0x|^sub_/, ''))).slice(0, 300);
+  const rams = S.ram.filter(r => hit(r.name) || r.addr.toLowerCase().includes(q)).slice(0, 60);
+  const r = (k, href, label, path, dot = '') => out.push(`<a class="r" href="${href}"><span class="k">${k}</span>${dot}<span class="mono">${label}</span><span class="p">${esc(path)}</span></a>`);
+  for (const u of units) r('unit', unitHref(u.cat, u.name), esc(u.name), u.cat);
+  for (const f of fns) r('fn', fnHref(f.addr), esc(f.name), f.unit.name, `<span class="dot${f.kinds.length ? ' warn' : ''}"></span>`);
+  for (const x of rams) r('ram', ramHref(x.name), esc(x.name), x.addr);
+  $('tree').innerHTML = `<div class="results">${out.join('') || '<div class="empty" style="padding:8px 12px">Nothing matches.</div>'}</div>`;
+}
+$('q').oninput = renderTree;
+$('q').onkeydown = e => { if (e.key === 'Enter') { const a = document.querySelector('#tree .r'); if (a) location.hash = a.getAttribute('href'); } };
+$('tree').addEventListener('click', e => {
+  const t = e.target.closest('[data-tog]');
+  if (!t) return;
+  e.preventDefault();
+  const k = t.dataset.tog; open.has(k) ? open.delete(k) : open.add(k); renderTree();
+});
+
+// ---------- pages ----------
+const crumbs = (...parts) => `<div class="crumbs"><a href="#">Code</a>${parts.map(p => ' › ' + p).join('')}</div>`;
+function overview() {
+  const m = S.measures, total = +m.total_code, clean = +m.complete_code, nfn = m.total_functions;
+  const ncx = Object.values(FN).filter(f => f.kinds.length).length, kinds = Object.entries(S.concession_kinds).sort((a, b) => b[1] - a[1]);
+  const kmax = Math.max(1, ...kinds.map(k => k[1]));
+  return `<div class="page">${crumbs()}
+    <h1 class="t">Every function matches</h1>
+    <p class="lede">All ${num(nfn)} functions in the ROM compile from C to the original bytes. ${fmtPct(m.complete_code_percent)} of the code is also
+      ordinary C with no matching concession; the rest still steers the compiler with a register pin, an empty <code>asm("")</code> or one of the other
+      kinds below, and removing those is the current work. Pick a category, a unit or a function, or search on the left.</p>
+    ${(S.missing || []).map(x => `<div class="notice">Not available here: ${esc(x)}.</div>`).join('')}
+    <div class="tiles">
+      <div class="tile"><b>${num(nfn)}</b><span>functions, all matching</span></div>
+      <div class="tile"><b>${kb(total)}</b><span>of code in ${num(m.total_units ?? Object.keys(UNIT).length)} units</span></div>
+      <div class="tile"><b>${fmtPct(m.complete_code_percent)}</b><span>of the code without concessions</span></div>
+      <div class="tile"><b>${num(ncx)}</b><span>functions still with a concession (${kb(total - clean)})</span></div>
+      <div class="tile"><b>${num(S.ram.length)}</b><span>named RAM objects</span></div>
+    </div>
+    <h3>Categories <span class="n">${S.categories.length}</span></h3>
+    <table class="t"><tr><th>Category</th><th class="r">Units</th><th class="r">Functions</th><th class="r">Code</th><th style="width:30%">Without concessions</th><th class="r"></th></tr>
+    ${S.categories.map(c => `<tr class="link" data-href="${catHref(c.name)}"><td><a href="${catHref(c.name)}">${esc(c.name)}</a></td><td class="r">${c.units.length}</td><td class="r">${num(c.nfn)}</td>
+      <td class="r">${kb(c.size)}</td><td>${bar(c.clean, c.size)}</td><td class="r">${fmtPct(pct(c.clean, c.size))}</td></tr>`).join('')}</table>
+    ${kinds.length ? `<h3>Concessions left, by kind <span class="n">functions</span></h3><div class="kinds">${kinds.map(([k, n]) =>
+      `<span title="${esc(KIND_HELP[k] || '')}">${esc(kindLabel(k))}</span><span class="kb" style="width:${100 * n / kmax}%"></span><span class="mono">${n}</span>`).join('')}</div>
+      <p class="muted" style="font-size:12.5px;max-width:760px">The kinds are defined in <code>tools/concessions.py</code>; decomp.dev counts a function as matched only once it has none.
+      A function can hold more than one kind.</p>` : ''}
+  </div>`;
+}
+function categoryPage(name) {
+  const c = S.categories.find(c => c.name === name);
+  if (!c) return notFound(`No category ${name}.`);
+  return `<div class="page">${crumbs()}
+    <h1 class="t">${esc(c.name)}</h1>
+    <div class="badges"><span class="badge">${c.units.length} units</span><span class="badge">${num(c.nfn)} functions</span><span class="badge">${kb(c.size)}</span>
+      ${c.ncx ? `<span class="badge warn">${c.ncx} with concessions</span>` : '<span class="badge ok">no concessions</span>'}</div>
+    ${strip(c.units.flatMap(u => u.functions.map(f => FN[f[1]])))}
+    <h3>Units <span class="n">in ROM order</span></h3>
+    <table class="t"><tr><th>Unit</th><th class="r">Functions</th><th class="r">Code</th><th style="width:26%">Without concessions</th><th class="r"></th><th>Source</th></tr>
+    ${c.units.map(u => `<tr class="link" data-href="${unitHref(c.name, u.name)}"><td><a href="${unitHref(c.name, u.name)}">${esc(u.name)}</a></td><td class="r">${u.functions.length}</td>
+      <td class="r">${kb(u.size)}</td><td>${bar(u.clean, u.size)}</td><td class="r">${u.ncx ? `<span style="color:var(--warn)">${u.ncx} left</span>` : '<span style="color:var(--ok)">✓</span>'}</td>
+      <td class="muted mono" style="font-size:11.5px">${esc(fileSummary(u))}</td></tr>`).join('')}</table></div>`;
+}
+const fileSummary = u => { const fs = [...u.files], one = fs.filter(f => !f.startsWith('src/fn/')); return one.length ? one.join(', ') + (fs.length > one.length ? ` + ${fs.length - one.length} in src/fn` : '') : fs.length ? `${fs.length} files in src/fn` : ''; };
+// a strip of the functions, each as wide as its bytes, colored by status
+function strip(fns, sel) {
+  const total = fns.reduce((s, f) => s + f.size, 0) || 1;
+  return `<div class="strip">${fns.map(f => `<a href="${fnHref(f.addr)}" class="${f.kinds.length ? 'warn' : ''}${f.addr === sel ? ' sel' : ''}" style="flex:${f.size / total}" title="${esc(f.name)} · ${f.size} B${f.kinds.length ? ' · ' + f.kinds.map(kindLabel).join(', ') : ''}"></a>`).join('')}</div>
+    <div class="legend">Each function as wide as its code: <span style="color:var(--ok)">■</span> no concessions <span style="color:var(--warn)">■</span> with concessions</div>`;
+}
+function unitPage(key) {
+  const u = UNIT[key];
+  if (!u) return notFound(`No unit ${key}.`);
+  const fns = u.functions.map(f => FN[f[1]]);
+  return `<div class="page">${crumbs(`<a href="${catHref(u.cat)}">${esc(u.cat)}</a>`)}
+    <h1 class="t">${esc(u.name)}</h1>
+    <div class="badges"><span class="badge">${fns.length} functions</span><span class="badge">${kb(u.size)}</span><span class="badge mono">${fns[0].addr}–${(parseInt(fns.at(-1).addr, 16) + fns.at(-1).size).toString(16).toUpperCase().padStart(8, '0')}</span>
+      ${u.ncx ? `<span class="badge warn">${u.ncx} with concessions</span>` : '<span class="badge ok">no concessions</span>'}</div>
+    ${strip(fns)}
+    <h3>Functions <span class="n">in ROM order</span></h3>
+    <table class="t"><tr><th>Function</th><th>Address</th><th class="r">Bytes</th><th>Status</th><th>Source</th></tr>
+    ${fns.map(f => `<tr class="link" data-href="${fnHref(f.addr)}"><td class="mono"><a href="${fnHref(f.addr)}">${esc(f.name)}</a></td><td class="mono muted">${f.addr}</td><td class="r">${f.size}</td>
+      <td><div class="badges" style="margin:0">${status(f.kinds)}</div></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
+}
+
+// ---------- syntax ----------
+const C_KW = new Set('if else for while do switch case default break continue return goto sizeof static const volatile extern register struct union enum typedef inline asm'.split(' '));
+const C_TY = new Set('void char short int long unsigned signed float double bool u8 u16 u32 u64 s8 s16 s32 s64 vu8 vu16 vu32 vs8 vs16 vs32 bool8 bool16 bool32 fx16 fx32 f32'.split(' '));
+const ramNames = () => (ramNames.s ??= new Set(S.ram.map(r => r.name)));
+// tokens -> lines of HTML, keeping each span inside its line
+function linesOf(tokens) {
+  const lines = [[]];
+  for (const [cls, text, href, title] of tokens) {
+    text.split('\n').forEach((part, i) => {
+      if (i) lines.push([]);
+      if (!part) return;
+      const t = esc(part);
+      lines.at(-1).push(href ? `<a href="${href}"${cls ? ` class="${cls}"` : ''}${title ? ` title="${esc(title)}"` : ''}>${t}</a>` : cls ? `<span class="${cls}">${t}</span>` : t);
+    });
+  }
+  return lines.map(l => l.join(''));
+}
+function cTokens(src, self) {
+  const rx = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')|(\b0x[0-9A-Fa-f]+[uUlL]*\b|\b\d+[uUlL]*\b)|(^[ \t]*#[^\n]*)|([A-Za-z_]\w*)|([\s\S])/gm;
+  const out = []; let m;
+  while ((m = rx.exec(src))) {
+    const [t, com, str, n, pp, id] = m;
+    if (com) out.push(['c', t]);
+    else if (str) out.push(['s', t]);
+    else if (n) out.push(['nu', t]);
+    else if (pp) out.push(['k', t]);
+    else if (id) {
+      if (C_KW.has(id)) out.push(['k', id]);
+      else if (C_TY.has(id)) out.push(['ty', id]);
+      else if (BYNAME[id] && id !== self) out.push(['', id, fnHref(BYNAME[id].addr), BYNAME[id].unit.name]);
+      else if (ramNames().has(id)) out.push(['ram', id, ramHref(id), 'RAM object']);
+      else out.push(['', id]);
+    } else out.push(['', t]);
+  }
+  return out;
+}
+function asmTokens(src) {
+  const out = [];
+  for (const line of src.split('\n')) {
+    let m;
+    if ((m = line.match(/^(\w+):(.*)$/))) { out.push(['lb', m[1] + ':'], ['c', m[2]], ['', '\n']); continue; }
+    const [code, ...rest] = line.split(' @ ');
+    const cm = rest.join(' @ ');
+    const im = code.match(/^(\s*)(\.?[\w.]+)(.*)$/);
+    if (!im) { out.push(['', code + '\n']); continue; }
+    out.push(['', im[1]], [im[2].startsWith('.') ? 'k' : 'op', im[2]]);
+    const ops = im[3];
+    const rx = /(\b(?:r\d+|sp|lr|pc|sl|fp|ip|sb)\b)|(#-?(?:0x[0-9a-fA-F]+|\d+))|(0x[0-9A-Fa-f]+)|([A-Za-z_]\w*)|([\s\S])/g;
+    let t;
+    while ((t = rx.exec(ops))) {
+      if (t[1]) out.push(['rg', t[1]]);
+      else if (t[2] || t[3]) out.push(['nu', t[0]]);
+      else if (t[4] && BYNAME[t[4]]) out.push(['', t[4], fnHref(BYNAME[t[4]].addr), BYNAME[t[4]].unit.name]);
+      else out.push(['', t[0]]);
+    }
+    if (cm) {
+      const lit = cm.match(/^=(0x[0-9A-Fa-f]+|\w+)$/);
+      if (lit && BYNAME[lit[1]]) out.push(['c', ' @ ='], ['', lit[1], fnHref(BYNAME[lit[1]].addr)]);
+      else if (lit && lit[1].startsWith('0x')) {
+        const v = parseInt(lit[1], 16), r = ramAt(v), f = FN[((v & ~1) >>> 0).toString(16).toUpperCase().padStart(8, '0')];
+        out.push(['c', ' @ =' + lit[1]]);
+        if (r) out.push(['ann', '  '], ['ram', r.name + (v > r.start ? `+0x${(v - r.start).toString(16)}` : ''), ramHref(r.name), 'RAM object']);
+        else if (f) out.push(['ann', '  '], ['', f.name, fnHref(f.addr)]);
+      } else out.push(['c', ' @ ' + cm]);
+    }
+    out.push(['', '\n']);
+  }
+  return out;
+}
+function pane(title, meta, lines, first = 1, marks = {}) {
+  return `<div class="pane"><div class="ph"><b>${title}</b>${meta}</div><div class="src">${lines.map((l, i) => {
+    const k = marks[i + 1];
+    return `<div class="l${k ? ' cx' : ''}"${k ? ` title="${esc(k.map(kindLabel).join(', '))}"` : ''}><span class="g">${k ? '◆' : first + i}</span><span>${l || ' '}</span></div>`;
+  }).join('')}</div></div>`;
+}
+
+async function functionPage(q) {
+  const d = await fetch('/api/codemap/fn/' + encodeURIComponent(q)).then(r => r.ok ? r.json() : null);
+  if (!d) return notFound(`No function ${q}.`);
+  const f = FN[d.addr];
+  const u = f?.unit;
+  document.title = d.name + ' · Boktai 3 Code';
+  SEL = '#' + d.addr;
+  if (u) { open.add(catHref(u.cat)); open.add(unitHref(u.cat, u.name)); }
+  const chips = (list, empty) => list.length ? `<div class="refs">${list.map(r => `<a class="chip mono${FN[r.addr]?.kinds.length ? ' warn' : ''}" href="${fnHref(r.addr)}">${esc(r.name)}</a>`).join('')}</div>` : `<div class="empty">${empty}</div>`;
+  const marks = d.c ? Object.fromEntries(Object.entries(d.c.marks).map(([k, v]) => [+k, v])) : {};
+  const cPane = d.c ? pane('C', `<span class="mono">${esc(d.c.file)}:${d.c.line ?? ''}</span>${Object.keys(marks).length ? '<span class="sp"></span><span><span class="legend"><span class="sw"></span>concession</span></span>' : ''}`,
+    linesOf(cTokens(d.c.text, d.name)), 1, marks) : `<div class="pane"><div class="ph"><b>C</b></div><div class="src empty" style="padding:12px">The C for this function wasn't found in its unit${f?.file ? ' (' + esc(f.file) + ')' : ''}.</div></div>`;
+  const asmPane = d.asm ? pane('Disassembly', `<span>${esc(d.mode)} · ${d.size} bytes · gen/code.s</span>`, linesOf(asmTokens(d.asm)))
+    : '<div class="pane"><div class="ph"><b>Disassembly</b></div><div class="src empty" style="padding:12px">Not available: run <code>make disasm</code> to generate gen/code.s.</div></div>';
+  const game = d.game.length ? `<h3>In the game <span class="n">objects and script routines whose code includes it</span></h3><div class="refs">${d.game.map(g =>
+    `<a class="chip" href="/atlas#${esc(g.id)}" data-peek>${esc(g.title)} <small>${g.direct ? 'entry point' : esc(g.kind === 'actor' ? 'object' : g.kind)}</small></a>`).join('')}</div>` : '';
+  const ram = d.ram.length ? `<div class="refs">${d.ram.map(r => `<a class="chip mono" href="${r.named ? ramHref(r.name) : '#ram:' + r.addr}" title="${esc(r.decl || r.addr)}">${esc(r.name)}${r.offsets.some(o => o) ? ` <small>${r.offsets.filter(o => o).map(o => '+0x' + o.toString(16)).join(' ')}</small>` : ''}</a>`).join('')}</div>` : '<div class="empty">none loaded directly</div>';
+  const data = d.data.length ? `<div class="refs">${d.data.map(r => `<span class="chip mono" title="${esc(r.notes || '')}">${esc(r.name)}${r.addr ? ` <small>${r.addr}</small>` : ''}</span>`).join('')}</div>` : '<div class="empty">none</div>';
+  return `<div class="page">${crumbs(u ? `<a href="${catHref(u.cat)}">${esc(u.cat)}</a>` : esc(d.category), u ? `<a href="${unitHref(u.cat, u.name)}">${esc(u.name)}</a>` : esc(d.unit))}
+    <h1 class="t mono">${esc(d.name)} <span class="step">${d.prev ? `<a href="${fnHref(d.prev.addr)}" title="${esc(d.prev.name)}">‹ previous</a>` : ''}${d.prev && d.next ? ' · ' : ''}${d.next ? `<a href="${fnHref(d.next.addr)}" title="${esc(d.next.name)}">next ›</a>` : ''}</span></h1>
+    <div class="badges"><span class="badge mono">${d.addr}</span><span class="badge">${d.size} bytes</span>${d.mode ? `<span class="badge">${esc(d.mode)}</span>` : ''}
+      <span class="badge ok">matches</span>${status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}</div>
+    ${d.notes ? `<p class="lede" style="font-size:14px">${esc(d.notes)}</p>` : ''}
+    ${u ? strip(u.functions.map(x => FN[x[1]]), d.addr) : ''}
+    <div class="panes">${cPane}${asmPane}</div>
+    ${game}
+    <div class="xr">
+      <div><h3>Calls <span class="n">${d.calls.length}</span></h3>${chips(d.calls, 'none')}</div>
+      <div><h3>Called by <span class="n">${d.callers.length}</span></h3>${chips(d.callers, d.ptr_users.length ? 'no direct calls; see below' : 'no direct calls (an entry point or a table entry)')}</div>
+      ${d.ptr_users.length ? `<div><h3>Address taken by <span class="n">${d.ptr_users.length} · callbacks</span></h3>${chips(d.ptr_users, '')}</div>` : ''}
+      ${d.ptrs.length ? `<div><h3>Takes the address of <span class="n">${d.ptrs.length}</span></h3>${chips(d.ptrs, '')}</div>` : ''}
+      <div><h3>RAM objects <span class="n">${d.ram.length}</span></h3>${ram}</div>
+      <div><h3>ROM data <span class="n">${d.data.length}</span></h3>${data}</div>
+    </div></div>`;
+}
+function ramList() {
+  const by = {};
+  for (const r of S.ram) (by[r.header || '(no header)'] ||= []).push(r);
+  return `<div class="page">${crumbs('RAM objects')}
+    <h1 class="t">RAM objects</h1>
+    <p class="lede">The game's named EWRAM and IWRAM objects (<code>symbols/ram.csv</code>), each with the functions that load its address. Grouped by the header that declares it.</p>
+    ${Object.entries(by).sort().map(([h, rs]) => `<h3>${esc(h)} <span class="n">${rs.length}</span></h3>
+      <table class="t"><tr><th>Object</th><th>Address</th><th class="r">Size</th><th class="r">Used by</th></tr>${rs.map(r =>
+        `<tr class="link" data-href="${ramHref(r.name)}"><td class="mono"><a href="${ramHref(r.name)}">${esc(r.name)}</a></td><td class="mono muted">${r.addr}</td><td class="r">${r.size ? num(r.size) : ''}</td><td class="r">${r.users || '<span class="muted">0</span>'}</td></tr>`).join('')}</table>`).join('')}</div>`;
+}
+async function ramPage(name) {
+  const d = await fetch('/api/codemap/ram/' + encodeURIComponent(name)).then(r => r.ok ? r.json() : null);
+  if (!d) return notFound(`No RAM object ${name}.`);
+  const o = d.object, by = {};
+  for (const u of d.users) (by[`${u.category}/${u.unit}`] ||= []).push(u);
+  document.title = o.name + ' · Boktai 3 Code';
+  return `<div class="page">${crumbs('<a href="#ram">RAM objects</a>')}
+    <h1 class="t mono">${esc(o.name)}</h1>
+    <div class="badges"><span class="badge mono">${esc(o.addr)}</span>${d.region ? `<span class="badge">${d.region}</span>` : ''}${o.size ? `<span class="badge">${num(o.size)} bytes</span>` : ''}
+      ${o.header ? `<span class="badge mono">${esc(o.header)}</span>` : ''}${o.confidence && /low|provisional/.test(o.confidence) ? '<span class="badge">provisional name</span>' : ''}</div>
+    ${o.decl ? `<div class="pane" style="margin-top:14px"><div class="src" style="padding:8px 12px">${linesOf(cTokens(o.decl)).join('<br>')}</div></div>` : ''}
+    ${o.notes ? `<p class="lede" style="font-size:14px">${esc(o.notes)}</p>` : ''}
+    <h3>Used by <span class="n">${d.users.length} functions in ${Object.keys(by).length} units</span></h3>
+    ${Object.entries(by).map(([k, us]) => { const [c, ...rest] = k.split('/'); const un = rest.join('/');
+      return `<div style="margin-bottom:12px"><div style="margin-bottom:4px"><a href="${unitHref(c, un)}">${esc(un)}</a> <span class="muted">· ${esc(c)}</span></div><div class="refs">${us.map(x =>
+        `<a class="chip mono${x.kinds.length ? ' warn' : ''}" href="${fnHref(x.addr)}">${esc(x.name)}${x.offsets.some(v => v) ? ` <small>${x.offsets.filter(v => v).map(v => '+0x' + v.toString(16)).join(' ')}</small>` : ''}</a>`).join('')}</div></div>`; }).join('') || '<div class="empty">No function loads its address directly (it may be reached through a pointer).</div>'}
+  </div>`;
+}
+const notFound = msg => `<div class="page"><div class="empty">${esc(msg)}</div></div>`;
+
+// ---------- routing ----------
+async function route() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  const v = $('view');
+  SEL = '#' + location.hash.slice(1);
+  document.title = 'Boktai 3 Code';
+  const slow = setTimeout(() => { v.innerHTML = `<div class="page empty">Loading ${esc(h)}…</div>`; }, 150);
+  let html;
+  if (!h) { SEL = '#'; html = overview(); }
+  else if (h === 'ram') html = ramList();
+  else if (h.startsWith('ram:')) html = await ramPage(h.slice(4));
+  else if (h.startsWith('cat:')) { open.add(location.hash); html = categoryPage(h.slice(4)); document.title = h.slice(4) + ' · Boktai 3 Code'; }
+  else if (h.startsWith('unit:')) {
+    const u = UNIT[h.slice(5)];
+    if (u) { open.add(catHref(u.cat)); open.add(location.hash); document.title = u.name + ' · Boktai 3 Code'; }
+    html = unitPage(h.slice(5));
+  } else html = await functionPage(h.startsWith('fn:') ? h.slice(3) : h);
+  clearTimeout(slow);
+  if (decodeURIComponent(location.hash.slice(1)) !== h) return;  // a newer route is on its way
+  v.innerHTML = html;
+  v.scrollTop = 0;
+  renderTree();
+}
+$('view').addEventListener('click', e => {
+  const tr = e.target.closest('tr.link');
+  if (tr && !e.target.closest('a')) location.hash = tr.dataset.href;
+});
+window.onhashchange = route;
+load().then(route).catch(err => { $('view').innerHTML = notFound(`The code index failed to load (${err}). Check the Studio's terminal.`); });
 </script>
 </body>
 </html>

@@ -4,8 +4,9 @@ the game font, then build a modified ROM; browse sprites, palettes, the font and
 raw tiles from the resource archives (/gfx); and a live view of the game
 running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643); the
 script actor registry (/actors), script procedures (/scripts), how the rooms
-connect (/world, tools/assets/areas.py), any function's disassembly and C
-(/code), from tools/assets/actors.py, and every MP2K song, playable in the
+connect (/world, tools/assets/areas.py), the code explorer: every function's C
+and disassembly by category and unit, its concessions and cross-references
+(/code, tools/studio/codemap.py), and every MP2K song, playable in the
 browser (/sound, tools/studio/sound.py and mp2k.js).
 
   python3 tools/studio/serve.py [--port 8642] [--link-port 8643]    then open http://localhost:8642
@@ -27,6 +28,7 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -43,7 +45,7 @@ log = logging.getLogger("studio")
 # Held while the startup preload builds an index; requests that use one wait
 # for it instead of building the same index alongside.
 WARM = threading.Lock()
-SLOW = ("/api/atlas", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
+SLOW = ("/api/atlas", "/api/codemap", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
         "/api/code/", "/api/learned", "/api/stages", "/api/areas")
 # polled by the live view several times a second; logged only when slow or failing
 POLLED = ("/api/live", "/api/live/player")
@@ -137,7 +139,8 @@ def preload():
     import gclview
     steps = [("atlas index", atlas.load), ("actors", actors.actors),
              ("script procedures", lambda: (actors.proc_list(), gclview.callee_names(), gclview.names())),
-             ("disassembly", actors.code), ("sprite palettes", learned), ("stage loads", stages)]
+             ("disassembly", actors.code), ("code explorer", codemap_warm), ("sprite palettes", learned),
+             ("stage loads", stages)]
     start = time.time()
     for name, fn in steps:
         t = time.time()
@@ -149,6 +152,12 @@ def preload():
                 continue
         log.info("preload: %s (%.1fs)", name, time.time() - t)
     log.info("preload: done in %.1fs", time.time() - start)
+
+
+def codemap_warm():
+    import codemap
+    codemap.load()
+    codemap._shared_helpers()
 
 
 def size_text(n):
@@ -405,6 +414,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             lines = gclfiles.render(fid, inline="inline" in opts, readable="raw" not in opts, english="en" in opts)
             self.send(200 if lines is not None else 404,
                       {"lines": lines, "inlined": sorted(gclfiles.inlinable(fid))} if lines is not None else {"error": "no such file"})
+        elif self.path == "/api/codemap":
+            import codemap
+            self.send(200, codemap.summary())
+        elif self.path.startswith(("/api/codemap/fn/", "/api/codemap/ram/")):
+            import codemap  # /api/codemap/fn/NAME|ADDR, /api/codemap/ram/NAME|ADDR
+            what, arg = self.path.split("/")[3:5]
+            d = (codemap.function if what == "fn" else codemap.ram_object)(urllib.parse.unquote(arg))
+            self.send(200 if d else 404, d or {"error": "not found"})
         elif self.path.startswith("/api/code/"):
             try:
                 d = actors.code_info(int(os.path.basename(self.path), 16))
