@@ -1736,6 +1736,20 @@ Each was read from the compiler source and confirmed on a live draft.
    bottom test is only the classification, and the tag, plain and wide code follow in source order.
    The old draft needed gotos and three memory barriers for the same layout.
 
+103. **An `orrs rX, rZero` between the or and the and of a u16 field update, with rZero a `movs #0`
+   from an earlier block, is two statements: `f |= A; f &= ~B;` (or `f = f | A; f = f & ~B;`).**
+   agbcc expands each store to a u16 struct field as a field insert, `f = (f & 0) | value`, with
+   the 0 a fresh HImode register. One combined `f = (f | A) & ~B;` keeps that insert in one block,
+   and combine folds it away. With two statements, cse carries the first stored value into the
+   second, folds `old & 0` to 0 and hands it the zero register held since the entry block. The or
+   reads it as a paradoxical subreg, which `equiv_constant` does not look through, so cse keeps it.
+   combine has no LOG_LINK back to the entry block, so the `orrs` survives. flow drops the first
+   store. WirelessController_BuildPeerRosterPacket (`mask |= 8; mask &= ~0x100;`, after a
+   `CpuFill16(0, ...)` that set the zero register) had needed an opaque `"+r"(zero)` barrier.
+   Hresvelgr_UpdateCollisionPresentation (`c->flags |= 4; c->flags &= ~8;`) and Ivy_UpdateDefeat
+   show the same `orr 8/4; orr zero; and` shape. A second update after a join (cse knows nothing
+   there) loses the zero: the same two statements give a plain `orr; and`.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
