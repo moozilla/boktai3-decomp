@@ -876,3 +876,18 @@ flags through actor (37/27, saved then ranks below action), and a dead trailing 
 through an inline's ignored return value (not expanded). Next: find a form where actor's last mention
 in reg_scan comes after the flags RMW with no code, or where `saved` is not a copy that cse1 sees
 at line 88. This is the same family as Hresvelgr_PlayDescent and Trigger_RunScript.
+
+### sub_081A14FC (src/fn/sub_081A14FC.c, 081A14FC, 1764 bytes): deferred
+
+Pins: `table` in r6, `sampleY` in r3 and `rawY` in r0 in case 1's random spray, plus an
+`asm("" : : "r"(valueY))` barrier. Draft: `notes/phase3-drafts/monsters-bosses/sub_081A14FC.c`
+(86 ROM / 82 draft). With the cast-constant table (`(const u16 *)RANDOM_TABLE_ADDR`) every sample
+reloads 0x203B400, and 0x3FF becomes a pseudo in ip (80/80). With
+`union RandomTableView view = {gRandomTable}`, the table is a pseudo and 0x3FF is reloaded at each
+use, as in the ROM. But the table (view, 7 refs over 164 insns, priority 853) ranks below
+&gRandomIndex (8 refs over 208, priority 1153), so they swap r6 and r8. Separately, the ROM's frame is one word
+larger (`sub sp, #0x64` against 0x60), so every PRE spill slot from line 120 on is 8 bytes higher:
+the ROM spills one more pseudo, probably the one the table pin displaces from r6.
+`AGBCC_PRI=view:+400` swaps the pair but makes the rest worse. Next: fix the table/index ranking
+(fact 110's double-counted sampler use, or fewer &gRandomIndex refs), then find the ROM's extra
+spill.
