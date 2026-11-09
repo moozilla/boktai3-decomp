@@ -711,7 +711,7 @@ def build():
         ar = E.get(sc["area"]) if sc else None
         # a one-room story scene with no label of its own (a boss room, a
         # story event) belongs to the chapter of the beat before it
-        loc = ar["location"] if ar and not ar["location"].startswith("Area ") else prev_loc
+        loc = ar["location"] if ar and ar["location"] != "Unlabeled areas" else prev_loc
         prev_loc = loc
         cut = E.get(f"cut:{s0['cutscene']}") if s0 and s0["cutscene"] is not None else None
         line = clean(re.sub(r'^[^:"「]{1,24}:\s*', "", en.get(s0["text"], ""))).strip().strip('"').split("\n")[0] if s0 and s0.get("text") is not None else ""
