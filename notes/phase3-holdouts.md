@@ -951,3 +951,19 @@ Tried:
 - inverting the fading test
 - `goto done` before `++p->elapsed`
 Next: find a spelling where one of those two values reaches reload unallocated.
+
+### VulcanCannon_UpdateFacingTurn (src/fn/sub_08207350.c, 08207350): deferred, one cse merge left
+
+Landed: 12 concessions, a hand-unrolled step routine and VC_* selector macros for `vulcan_cannon_worker.h`.
+Draft: `notes/phase3-drafts/monsters-bosses/VulcanCannon_UpdateFacingTurn.c` (5 ROM / 3 draft).
+The draft is plain C: the shared `DisplaySequence_StepSprite` inline and `if (!p->facing) p->facing = 1; else ...`.
+Everything matches from the step routine to the end.
+What remains: `if (!p->allowTurn)` records allowTurn's pseudo (27) as equal to 0 on the fall-through.
+cse1 (and cse2 again, so `CSE_NOCANON=27` alone does nothing) then stores the call's fifth argument `0` from 27.
+That keeps 27 alive into r4. The ROM loads allowTurn into r1, lets it die at the `cmp`, and stores a fresh `movs r2, #0`.
+Any non-equality test (`allowed <= 0` on an s32) avoids the merge but branches with `bgt`.
+Tried:
+- `(u8)allowed`, `& 0xFF`, `== FALSE`
+- a zero local set before the test (it becomes r8 or folds back)
+- a restart inline helper, and a result variable
+Next: an EQ test whose operand cse cannot record, or a label in front of the not-allowed block (it starts a new EBB).
