@@ -151,6 +151,32 @@ Next idea: the original probably had the constant inside the "first sample" rand
 form where the constant isn't a REG_EQUIV (so the live length isn't multiplied), or where angle's
 priority drops below setup's.
 
+### sub_0801404C (ParticleGroup_UpdateBouncing, src/fn/sub_0801404C.c): deferred
+
+Draft: `notes/phase3-drafts/field-effects/sub_0801404C.c` (38 ROM / 40 draft; with the four
+barriers simply removed it is 45 / 51). `ParticleRandom_ReadSample(table)` in place of
+`ReadDirectSample` puts the table in sl as the ROM has it (the direct form leaves the
+REG_EQUIV table unallocated and rematerialized). Still open, in order:
+* `scope.py ... probe`: PRE reuses the CellIndex load of position.x for the line-88 update
+  (`AGBCC_NOPRE=1` gives 34 / 38). The barrier's "memory" clobber hid it. A pointer local for
+  the update (`pos->x += ...`) is much worse (65 / 85).
+* `resource` is r8 in the draft and caller-saved r3 in the ROM (spilled around the call);
+  `sprite` (g + 20) is a stack slot in the draft and sb in the ROM; gRandomIndex's address is
+  sb in the draft and r8 in the ROM (`AGBCC_PRI=144:+517` helps).
+
+### ParticleGroup_UpdateFrozen (src/fn/sub_08014330.c, 08014330): deferred, one zero-extend
+
+Draft: `notes/phase3-drafts/field-effects/ParticleGroup_UpdateFrozen.c` (3 ROM / 1 draft). There
+is no `type` variable: plain `g->type` reads at the top and in the late test. gcse PRE then
+produces the ROM's shape by itself: the top copy (`ldrb r0` / `adds r3, r0`) and the
+`ldrb r3` it inserts at the end of the two arms that call FindCellOverride (`scope.py ... pre`).
+The one difference: the ROM zero-extends the PRE register before `cmp #8`, while combine drops
+the extension in the draft because every set of the QImode reaching register is a load or a copy
+of one (nonzero_bits 0xFF). The ROM's register must have had a set with unknown upper bits (a
+lowpart subreg of an SImode value counts, since ARM has WORD_REGISTER_OPERATIONS). A u8/u32/int
+local at the top is worse (it changes the expression, so PRE stops), and so are casts on either
+test.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
