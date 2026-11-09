@@ -94,6 +94,7 @@ function draw() {
   cv.width = W * dpr; cv.height = H * dpr;
   const g = cv.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
   const node = focus.length ? focus[focus.length - 1] : { c: T.children, t: 'ROM', n: T.size };
+  pageTitle(focus.length ? node.t : '', 'ROM');
   rects = [];
   const fill = (n, x, y, w, h, depth) => {
     if (w < .5 || h < .5) return;
