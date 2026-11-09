@@ -1762,6 +1762,41 @@ Each was read from the compiler source and confirmed on a live draft.
    Hresvelgr_UpdateCollisionPresentation (`c->flags |= 4; c->flags &= ~8;`) and Ivy_UpdateDefeat
    show the same `orr 8/4; orr zero; and` shape. A second update after a join (cse knows nothing
    there) loses the zero: the same two statements give a plain `orr; and`.
+93. **A union local's initializer keeps its load inside a loop.**
+   `union U u = {x};` expands to `(clobber (reg u))` and then the set. loop.c's
+   count_loop_regs_set counts the clobber as a set, so the pseudo is set twice in the loop and
+   is marked may_not_optimize: it is never hoisted, however long it lives. A plain
+   `T *t = x;` with the same uses is a single set, and when its life is long enough
+   (threshold x savings x lifetime >= insns) loop.c moves it to the preheader. In
+   BoardPieces_StartConvergence the ROM loads gRandomTable in the loop and keeps it for two
+   samples; the plain local lived 25 insns and was hoisted at threshold 7, while
+   `union RandomTableView table = {gRandomTable};` (the matched sibling sub_08010298's form)
+   stayed in place and matched. `scope.py FILE.c FUNC hoist` reports it as `set 2 times in the
+   loop ... (may_not_optimize)`. Use it when a loop-invariant load must stay in the body and a
+   real union type exists for the value.
+
+94. **A dead constant load in the ROM can come from a use that combine folded after flow.**
+   flow deletes dead sets once, before combine. If a pseudo's only use sits in another basic
+   block in an expression that combine simplifies through nonzero_bits (`x & 3` when every set
+   of x is a constant with those bits clear, `x >> 27` when the top bits are clear), the use
+   disappears but the set stays and is still allocated a register: the ROM shows a literal
+   load into a register nothing reads. cse can't fold the use first when the value reaches it
+   over a join (sets in both arms of an if). Each constant set also gets REG_EQUIV, and
+   update_equiv_regs doubles the live length once per set (local-alloc.c), so such a pseudo has
+   a very low global priority. sub_08012B34's `ldr r3, =0x0403B714` in both arms comes back
+   with `setup` set in each arm and `| (setup & 3)` on the v->z line, but its priority is 93
+   against angle's 3000 (`AGBCC_PRI=setup:+2908` matches).
+
+95. **A non-void function with no return statement keeps the incoming r0 live to the end.**
+   expand_function_end emits a use of the return register, and nothing in the body sets it, so
+   flow sees the hard r0 (the first argument) live from entry to exit: the body never allocates
+   r0, and the parameter's pseudo is a copy out of it. In the ROM this looks like a function that
+   "returns its first argument" without a final move, and never touches r0. It also changes cse:
+   make_regs_eqv makes a newer register the class's canonical one when it outlives the current
+   first register and the cse block. With `return input;` the parameter outlives `p = input` and
+   cse rewrites p's uses to the parameter. Without the return the parameter dies at the copy,
+   so p wins and keeps its own register. BreakableBarrier_SetPosition (five pins and a barrier)
+   matched once its `return input;` was dropped. The caller ignores the value.
 
 ## Survey: random table as a literal address (2026-10-24)
 

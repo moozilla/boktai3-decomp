@@ -1044,6 +1044,11 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
               f" (not `f = (f | A) & ~B;`): each field store is an insert `(f & 0) | v`, and cse gives the"
               f" second one's 0 the held zero register, which combine cannot fold across blocks (README"
               f" fact 103)")
+    if untouched_r0_hint(rows_json):
+        print("the ROM never writes r0 and calls nothing, the draft does: the caller's r0 (the first argument)"
+              " stays live to the end. A non-void function with no return statement does that (its"
+              " implicit use of the return register); try dropping `return x;`, or a void function if no"
+              " caller reads the value (README fact 95)")
     for i, ln in flag_thread_hints(rows_json)[:3]:
         print(f"line {ln}: the ROM keeps a 0/1 flag (`{rows_json[i]['rom']}`, a jump, the other constant,"
               f" `cmp #0`) that the draft's jumps skip: jump.c threads a jump after a constant set past a"
@@ -2091,6 +2096,28 @@ def flag_thread_hints(rows):
     return out
 
 
+R0_NO_WRITE = ("str", "cmp", "cmn", "tst", "b", "push", "pop", "bx", "svc", "swi", ".")
+
+
+def writes_r0(text):
+    """True when the Thumb instruction TEXT writes r0 (its first operand, for an op that writes it)."""
+    op, _, rest = text.partition(" ")
+    if op.startswith(R0_NO_WRITE) or op == "movs" and rest == "r0, r0":
+        return op.startswith("pop") and "r0" in rest
+    return rest.split(",")[0].strip() == "r0"
+
+
+def untouched_r0_hint(rows):
+    """True when the ROM body reads r0, never writes it and calls nothing, while the draft writes r0:
+    a non-void function with no return statement keeps the incoming r0 live (README fact 95)."""
+    rom = [r["rom"] for r in rows if r.get("rom") and not r["rom"].startswith(".")]
+    draft = [r["draft"] for r in rows if r.get("draft") and not r["draft"].startswith(".")]
+    if not rom or any(t.partition(" ")[0] in ("bl", "blx") for t in rom):
+        return False
+    reads = any(re.search(r"\br0\b", t.partition(" ")[2]) for t in rom)
+    return reads and not any(writes_r0(t) for t in rom) and any(writes_r0(t) for t in draft)
+
+
 def statement_macros(text, reach, starts):
     """[(name, 1-based line)] for each `#define NAME(...) do {` macro the unit defines and uses inside
     the functions REACH covers (the first use): the single-use statement macros CLAUDE.md counts as
@@ -3096,6 +3123,20 @@ def spill_shifts(x, want):
     if x.get("rotate") is False or (x["start"] < 0 and x.get("rotate") is not True):
         return []
     return [d for d in range(1, n) if spill_pick(x, (x["start"] + d) % n) == want]
+
+
+def spill_options(x, got):
+    """[(D, register)] for reload choice X: one AGBCC_SPILL shift per register other than GOT that the
+    shift makes it take. The first normal choice records start=-1 with rotate=1, and AGBCC_SPILL still
+    shifts it; only a forced group (rotate=0, or an old trace without the field) ignores the rotation."""
+    out, seen = [], {got}
+    movable = x["start"] >= 0 or x.get("rotate") is True
+    for d in range(1, len(x["regs"])) if movable else []:
+        g = spill_pick(x, (x["start"] + d) % len(x["regs"]))
+        if g not in seen:
+            seen.add(g)
+            out.append((d, g))
+    return out
 
 
 def spill_word(code, nm):
@@ -4161,13 +4202,7 @@ def cmd_spill(src, func, env):
         x = xs.get(k)
         if not x:
             return [(d, None) for d in range(1, 8)]
-        out, seen = [], {got}
-        for d in range(1, len(x["regs"])) if x["start"] >= 0 else []:
-            g = spill_pick(x, (x["start"] + d) % len(x["regs"]))
-            if g not in seen:
-                seen.add(g)
-                out.append((d, g))
-        return out
+        return spill_options(x, got)
 
     def near(uid):  # the choice serves a differing insn (its own, or one of the few after it)
         p = pos.get(uid)
