@@ -100,8 +100,11 @@ python3 tools/studio/serve.py    # http://localhost:8642 opens Browse
 One local app over the game and the decomp. The header groups every view;
 **⌘K** (or `/`) on any page searches everything at once: monsters,
 characters, places, items, sprites, songs, scripts, functions, RAM objects
-and lines of text (`tools/studio/search.py`). Links to other views open in a
-side panel with its own history.
+and lines of text, or a scene number or resource hash (`tools/studio/search.py`).
+Links to other views open in a side panel with its own history. Every view
+names places the same way: World's places (`tools/studio/places.py`, from
+`data/labels/areas.csv`), so a scene file, capture, song or palette says
+where in the game it belongs.
 
 **Browse** (`/atlas`) is the way in: everything in the game as one tree
 (the story, beat by beat; characters, the monster list in the game's order,
