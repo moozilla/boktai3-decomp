@@ -197,3 +197,12 @@ the two arms and jump2 cannot cross-jump them. Tried: an empty `if` with DEBUG_P
 the abs, 20/2), branching inside Advance, and a `speed` variable set before the branch. Next: two
 arms that stay identical after reload (all arguments set before the branch), or a switch on the
 abs values.
+
+### TentacleActor_RecoverFromSegmentLoss (src/fn/sub_080ABB18.c, 080ABB18): deferred
+
+The ROM computes 15 field addresses of p before the segment-removal loop's first test and spills
+most of them to the stack. That looks like loop.c hoisting the invariants of a loop that contains
+the final stores. Draft `sub_080ABB18.c` (stores inside a `for (;;)` exit branch, 139/107) has
+loop.c hoist only a few of them (savings threshold). The landed C precomputes the pointers by hand,
+with 5 pins and 2 barriers (all removed: 107/107). Next: decide between the two shapes with
+`hoist` (which addresses the ROM's loop moved), then match the allocation.
