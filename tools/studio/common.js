@@ -107,7 +107,7 @@ async function searchRun() {
 function searchDraw() {
   const q = $('gsq').value.trim();
   $('gsres').innerHTML = SRCH.hits.map((h, i) => `<div class="r${i === SRCH.i ? ' on' : ''}" data-i="${i}"><span class="k">${esc(h.kind)}</span><span class="t">${esc(h.title)}</span><span class="p">${esc(h.sub || '')}</span></div>`).join('')
-    || `<div class="r muted">${q ? 'No matches.' : 'Search monsters, characters, places, items, sprites, songs, scripts, functions, RAM objects and text.'}</div>`;
+    || `<div class="r muted">${q ? 'No matches.' : 'Search monsters, characters, places, scenes, items, sprites, songs, scripts, functions, RAM objects and text, or type a ROM address (08xxxxxx).'}</div>`;
   document.querySelector('#gsres .r.on')?.scrollIntoView({ block: 'nearest' });
 }
 function searchGo(h, newTab) {
