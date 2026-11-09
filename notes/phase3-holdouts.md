@@ -106,6 +106,22 @@ the earlier blocks' sb pseudos, which takes priority of about 1250. Notes:
 * Next: a fourth ref, or about 6 fewer live insns, for the per-block `values`; or a set that
   doesn't get a REG_EQUIV note (3/23 = 1304 without the doubling).
 
+### Presentation_SetItemGraphic (08019ECC, src/selection_menu.c)
+
+Draft: `notes/phase3-menus-link/Presentation_SetItemGraphic.c` (6 ROM / 6 draft insns).
+* The ROM keeps the 0x121 apart from the byte it is added to: `ldr r0, =0x121; adds r2, r0, #0;
+  ldrb r3, [r3]; adds r2, r2, r3`. That needs a constant set, a copy and a register add that
+  survive to reload. Every pin-free form tried lets combine fold the constant into
+  `(plus tile 289)`, so the ldrb comes first and reload adds the literal (`ldrb r2; ldr r0;
+  adds r2, r2, r0`). The pinned version gets there with `asm("" : "+r")` on base and on
+  resource.
+* Tried: the constant in the call or in its own statement, `base` then `resource = base`,
+  u16/s16/u32 types, a `u8 *entry` with offset, and an inline helper modeled on its sibling
+  Presentation_SetActorIconFrame (`*r + 0xf0`).
+* Next: what stops combine from folding a constant into an add while keeping the set and the
+  copy. A `scope` knob that forbids one combine (like AGBCC_NOTIE) would show whether that alone
+  is enough.
+
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
 tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
