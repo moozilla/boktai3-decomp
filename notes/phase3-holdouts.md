@@ -521,3 +521,19 @@ counts twice), and so would three fewer insns in context's range outside it. Tri
 effect: local temps for angle/zero/speed/one, a shadow pointer, a struct copy through pointers,
 inline helpers for the ED6/ED4 stores (constant parameters are substituted), and simpler
 mask forms (those change the code).
+
+### Terrain_ResolveActorMotion (src/fn/sub_0811AE9C.c, 0811AE9C): 6 concessions, pin-free draft 10/10
+
+Draft `Terrain_ResolveActorMotion.c` (no concessions) rewrites the middle part:
+`clearance = Terrain_GetCellClearance(next.coordinates); y = next.coordinates[1];
+floor = clearance - Offset(next.coordinates[2]);` (the Offset inline keeps `z + 96` from being
+reassociated into `clearance - 96 - z`), and `shape = 0xF00; shape &= flags; flags &= 0xF000;`.
+That also removes the z-clamp cross-jump difference: both arms now keep their own deltaZ store.
+Two differences are left. (1) In the else arm the ROM negates a copy of offset for
+`Abs(offset) >> 12`. cse's fold_rtx turns `-x`, with x known to be `-(difference << 12)`, back
+into the shift's pseudo, so the draft keeps the shift alive in r2 and the ROM's local r0/r1
+pair is lost. Splitting it as `offset = difference << 12; offset = -offset;` gives the right
+negation (11/11, shape 0) but puts both in one register. The original's C must hide the
+`neg` from cse (the pinned version did that with `asm("" : "+r"(offset))`). (2) The high-byte
+result and shape sit one register higher (r3/r4, ROM r2/r3), because offset's pseudo takes r2.
+Fixing (1) probably fixes (2).
