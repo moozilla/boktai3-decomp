@@ -47,7 +47,7 @@ log = logging.getLogger("studio")
 # for it instead of building the same index alongside.
 WARM = threading.Lock()
 SLOW = ("/api/atlas", "/api/codemap", "/api/search/", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
-        "/api/code/", "/api/learned", "/api/stages", "/api/areas", "/api/text/uses/")
+        "/api/code/", "/api/learned", "/api/stages", "/api/areas", "/api/text/uses/", "/api/text/places")
 # polled by the live view several times a second; logged only when slow or failing
 POLLED = ("/api/live", "/api/live/player")
 
@@ -204,8 +204,8 @@ def world():
 _TEXT_USES = {}
 
 
-def text_uses(n):
-    """The script procedures that show text-bank string N (their text#N operands)."""
+def _text_uses():
+    """{string id: [{id, name}]}: the script procedures with a text#N operand for it."""
     if not _TEXT_USES:
         import gclview
         names = {int(p): r.get("name") for p, r in gclview.names().procs.items()}
@@ -214,24 +214,61 @@ def text_uses(n):
             for t in set(p["texts"]):
                 uses.setdefault(t, []).append({"id": cid, "name": names.get(cid) or ""})
         _TEXT_USES.update(uses or {-1: []})
-    procs = [dict(p) for p in _TEXT_USES.get(n, [])]
+    return _TEXT_USES
+
+
+def _scene_where(sc, w):
+    """(area, place, where) of scene SC in world W: where is the scene's own label,
+    led by its place unless it already names it, else the area's place and detail."""
+    a = w["areas"][w["scene_area"][sc]] if sc is not None and sc in w["scene_area"] else None
+    label = (w["scenes"].get(sc) or {}).get("label") if sc is not None else None
+    place = a["place"] if a else None
+    if label:
+        where = label if not place or label.startswith(place) else f"{place} · {label}"
+    else:
+        where = " · ".join(x for x in (place, a["detail"]) if x) if place else None
+    return a, place, where
+
+
+def _proc_scenes():
+    """{procedure: the entry scene of the scene file it is in}."""
+    import gclfiles
+    return {c: f["entry"] for f in gclfiles.files() if f["kind"] == "scene" for c in f["procs"]}
+
+
+def text_uses(n):
+    """The script procedures that show text-bank string N (their text#N operands),
+    each with the scene it runs in and where that is."""
+    procs = [dict(p) for p in _text_uses().get(n, [])]
     if procs:
-        # where each one runs: its scene file's entry scene, placed in the world
-        import gclfiles
-        entry = {c: f["entry"] for f in gclfiles.files() if f["kind"] == "scene" for c in f["procs"]}
-        w = world()
+        entry, w = _proc_scenes(), world()
         for p in procs:
             sc = entry.get(p["id"])
-            a = w["areas"][w["scene_area"][sc]] if sc is not None and sc in w["scene_area"] else None
-            label = (w["scenes"].get(sc) or {}).get("label") if sc is not None else None
-            place = a["place"] if a else None
-            if label:  # the scene's own label, led by its place unless it already names it
-                where = label if not place or label.startswith(place) else f"{place} · {label}"
-            else:
-                where = " · ".join(x for x in (place, a["detail"]) if x) if place else None
-            p["scene"], p["place"] = sc, where
-            p["area"] = a["area"] if a else None
+            a, _, where = _scene_where(sc, w)
+            p["scene"], p["place"], p["area"] = sc, where, a["area"] if a else None
     return {"procs": procs}
+
+
+_TEXT_PLACES = {"key": None, "data": {}}
+
+
+def text_places():
+    """{string id: "Place, Place"}: the places whose scene scripts show each
+    string, for the Text view's list and filter."""
+    key = os.path.getmtime(STAGEMETA) if os.path.exists(STAGEMETA) else 0
+    if _TEXT_PLACES["key"] != key:
+        entry, w = _proc_scenes(), world()
+        out = {}
+        for t, procs in _text_uses().items():
+            ps = []
+            for p in procs:
+                place = _scene_where(entry.get(p["id"]), w)[1]
+                if place and place not in ps:
+                    ps.append(place)
+            if ps:
+                out[t] = ", ".join(ps)
+        _TEXT_PLACES.update(key=key, data=out)
+    return _TEXT_PLACES["data"]
 
 
 def hp_data(h):
@@ -417,6 +454,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/strings":
             orig = self.server.original
             self.send(200, [dict(s, edited=orig.get(s["id"]) != s["text"]) for s in read_strings()])
+        elif self.path == "/api/text/places":
+            self.send(200, text_places())
         elif self.path.startswith("/api/text/uses/"):
             self.send(200, text_uses(int(self.path.rsplit("/", 1)[1])))
         elif self.path == "/api/original":
