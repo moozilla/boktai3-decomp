@@ -523,7 +523,7 @@ function drawStageOverlay(svg, hp, scene, opt) {
   const dr = g('doors');
   for (const grp of grouped(scene.doors, d => d.box ?? `${d.x},${d.z}`)) {
     const d = grp[0], dests = [...new Map(grp.map(d => [`${d.scene}.${d.entrance}`, d])).values()];
-    const tip = grp.map(d => `door ${d.box ?? ''} → scene ${d.scene}, entrance ${d.entrance} (proc_${d.proc})${condText(d)}`).join('\n\n') + '\n\nclick to go there';
+    const tip = grp.map(d => `door ${d.box ?? ''} → scene ${d.scene}${sceneWhere(d.scene) ? ` (${sceneWhere(d.scene).text})` : ''}, entrance ${d.entrance} (proc_${d.proc})${condText(d)}`).join('\n\n') + '\n\nclick to go there';
     const a = svgEl('g', { class: 'door', style: 'cursor:pointer' }, tip);
     let lx, ly;
     if (d.rect) { a.appendChild(svgEl('polygon', { points: rectPoints(hp, ...d.rect, d.y ?? 0), fill: 'rgba(255,150,40,.55)', stroke: '#ffb347', 'stroke-width': 1.2 })); [lx, ly] = proj(hp, d.x, d.y ?? 0, d.z); }
@@ -551,7 +551,7 @@ views.maps = {
     if (!stageList) stageList = await fetch('/api/stages').then(r => r.json());
     await loadStageMeta();
     // each stage under the place its scenes are in (tools/studio/places.py), in story order
-    const W = await fetch('/api/areas').then(r => r.json()).catch(() => null);
+    const W = await loadWorld();
     const firstScene = {}, where = {};
     for (const x of stageMeta || []) {
       const k = stageKey(x.stage); if (!k) continue;
@@ -742,7 +742,7 @@ views.dungeon = {
   free: true,
   async init() {
     await loadPtn(); await loadStageMeta();
-    areasData ||= await fetch('/api/areas').then(r => r.json());
+    areasData ||= await loadWorld();
     // grouped by place in story order, as on the World page
     const rank = Object.fromEntries(areasData.places.map((p, i) => [p.name, i]));
     items = areasData.areas.filter(a => a.scenes.length > 1)
@@ -967,7 +967,7 @@ views.palettes = {
   async init() {
     // the places whose stages load each palette (stage meta, World's places)
     await loadStageMeta();
-    areasData ||= await fetch('/api/areas').then(r => r.json()).catch(() => null);
+    areasData ||= await loadWorld();
     const by = {};
     for (const s of stageMeta) if (s.palette) {
       const a = areasData?.areas[areasData.scene_area[s.scene]], u = by[s.palette] ||= { places: new Set(), scenes: 0 };
