@@ -52,6 +52,11 @@ Draft: `notes/phase3-drafts/field-effects/Trigger_RunScript.c` (11 ROM / 9 draft
    refs and fixes the allocation, but the ROM does that RMW through sp (`ldr r0, [sp, #0x28]`).
 Next idea: find refs for argsPtr that cse later folds back to sp, or the label/loop structure
 that ends cse's block between the actor copy and its uses.
+Tried monsters-bosses' class-head lever (Hresvelgr_UpdateRisingProjectile, an early mention of
+the copy): an early `savedActor = 0`/`-1` or `index = 0` at the top, `savedActor = actor` then
+`index = savedActor`, or saving through `s32 *saved = &savedActor`. All stay at 11/9 or get worse. The
+extended block starts at function entry, so no mention can come before it; the copy needs a last
+use past the block end (the loop label at `active`), and that use would merge the r5 copy instead.
 
 ### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): deferred
 
