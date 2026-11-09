@@ -900,3 +900,18 @@ literal `p->pending = 0`, `animationFlags = 0` passed in as y, the inline return
 separate `height` local (with or without the `zero` argument). Next: a second zero that cse1 cannot
 see as const 0 in SImode (a halfword-mode value, or a bitfield store's zero, as in fact 25), but
 that still folds to `movs r4, #0` later.
+
+### Vanargand_ApplyPendingDamage (src/fn/sub_081ACC24.c, 081ACC24): deferred
+
+Pins: `partDamage` in sl, plus a barrier after it, and `mask` (1) in r2 for the count == 0 setFlags.
+Draft: `notes/phase3-drafts/monsters-bosses/Vanargand_ApplyPendingDamage.c` (7 ROM / 7 draft).
+partDamage takes sl without the pin. The barrier only added one insn to damage's live range: damage
+(5 refs over 47 insns) and the health address (5 over 48) were 2127 against 2083, and the ROM gives
+the health address r4. `if ((u8)p->part.flags & 6)` (or `(u16)`) adds that insn naturally and fixes
+the pair (18 → 7). Plain spellings (`& (2 | 4)`, `!= 0`, an inline test) do not.
+What remains: cse1 replaces the setFlags mask with pseudo 107, the display call's stack argument
+`1` (line 101). Its path runs from line 98 through every skip down to the count == 0 block. 107 then
+gets no register (priority 238), so the mask is reloaded after the `ldr` (r3, since count is in r2).
+The ROM has a block-local mask in r2 loaded before the address, with count in r3. Tried: mask
+locals before the call, after it, before the accumulated block, and `return mask`. Next: break cse1's
+path between line 101 and the count block, or find a mask spelling that is not in const 1's class.
