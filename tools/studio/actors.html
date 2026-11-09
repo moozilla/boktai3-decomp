@@ -131,6 +131,8 @@ async function show(key) {
   const navKey = key.startsWith('commands:') ? 'commands' : key.startsWith('tables:') ? 'tables' : key;
   document.querySelectorAll('.row').forEach(d => d.classList.toggle('on', d.dataset.key === navKey));
   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
+  const special = { names: 'Name lists', commands: 'Command tables', tables: 'Numeric tables', 'player-animations': 'Player animation variants' }[navKey];
+  if (special) pageTitle(special, 'Actors');
   if (key === 'names') return showNames();
   if (navKey === 'commands') return showCommandTables(key.split(':')[1]);
   if (key === 'player-animations') return showPlayerAnimations();

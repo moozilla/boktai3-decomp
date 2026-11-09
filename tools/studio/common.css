@@ -39,7 +39,7 @@ main > * { min-width: 0; }
 #top nav .navmenu a { padding: 6px 10px; }
 #top nav .navmenu a.on { color: var(--ink); background: var(--sel); }
 #top .sp { flex: 1; }
-#top #gsearch { font: inherit; font-size: 13px; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 4px 8px 4px 10px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+#top #gsearch { margin-left: auto; font: inherit; font-size: 13px; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 4px 8px 4px 10px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
 #top #gsearch:hover { color: var(--ink); border-color: var(--muted); }
 .kbd { font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; color: var(--muted); font-family: system-ui, sans-serif; }
 #gsearchbox { position: fixed; inset: 0; background: rgba(0,0,0,.28); display: none; align-items: flex-start; justify-content: center; padding-top: 11vh; z-index: 70; font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; color: var(--ink); }
