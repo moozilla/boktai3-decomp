@@ -157,8 +157,8 @@ concession, decoded data, data only located, assembly).
 | ![Screen inspector](docs/img/studio-captures.png) | **Screen inspector** (Live and Captures): every sprite, text box, layer and palette on screen, matched to its resource. Live mode connects to mGBA through [Centaur](docs/CENTAUR.md). |
 
 Also: palette (with the places that load each), font and tile viewers, dungeons stitched from their rooms, and **Sound** (`/sound`): every song in
-the song table with its tracks, voices and the scripts, scenes and code that
-start it, played in the browser by a small MP2K player (`tools/studio/mp2k.js`)
+the song table with the places it plays in, its tracks, voices and the scripts,
+scenes and code that start it, played in the browser by a small MP2K player (`tools/studio/mp2k.js`)
 from the ROM's own sequence and sample data. `python3 tools/studio/shots.py`
 retakes these screenshots from a running Studio.
 
