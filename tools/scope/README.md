@@ -1577,6 +1577,19 @@ Each was read from the compiler source and confirmed on a live draft.
    against 833 for the gBgRecords constants). One set doubles it once. `life_note` names this case.
    When a parser returns its text pointer from every path (`text = ...; return text;`), text and the
    scan cursor stay in separate registers (ChoiceMenu_ParseTag).
+90. **In a two-value block, local-alloc goes by priority; a pointer variable set in each arm leaves
+   the value alone in the block.** An arm `UpdateFn callback = F; p->update = callback;` at offset
+   0x1A4 holds two local qtys: the callback (load, add, store: life 4, priority 5000) and the
+   address `p + 420` (life 2, 10000). The address takes r0 and the callback r1; the ROM has the
+   callback in r0. With three qtys fact 38's quirk would give the first-born callback r0, but here
+   there are only two. Declaring `UpdateFn *slot;` at function scope and writing
+   `slot = &p->update; *slot = callback;` in each arm makes the address a two-set, non-local pseudo
+   (fact 42): local-alloc places only the callback (r0), global then gives the slot r1, and
+   reload's 420 lands in r2. That matched SceneObjects_CreateObject. Two more levers in the same
+   function: `draw->mode = drawMode;` (not `s16 *mode = &draw->mode`, which cse folds to `p + 0xA0`)
+   gives draw its fourth ref, and a function-scope `u16 *table = gRandomTable;` is a REG_EQUIV
+   pseudo left without a register, so reload loads the table at its use and the reload rotation
+   moves one step.
 
 ## Survey: random table as a literal address (2026-10-24)
 
