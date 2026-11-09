@@ -192,6 +192,10 @@ def world():
             w["scenes"][i]["shot"] = info["shot"]
             w["scenes"][i]["map"] = w["scenes"][i]["map"] or info["map"]
     import places
+    rows = csv.DictReader(open(os.path.join(ROOT, "data", "labels", "areas.csv"), encoding="utf-8"))
+    order = {int(r["area"]): int(r["story_order"] or 0) for r in rows}
+    for a in w["areas"]:
+        a["story_order"] = order.get(a["area"], 0)
     w["places"] = places.assign(w)
     return w
 

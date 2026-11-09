@@ -30,6 +30,13 @@ class PlaceTests(unittest.TestCase):
                          ['hall', 'entrance', 'side room', '', 'optional challenge / Black Knight', '', 'gate'])
         self.assertIsNone(w['areas'][5]['place'])
 
+    def test_story_order_comes_before_scene_ids(self):
+        w = {'areas': [area(0, 'Menu / bike setup', [5]), area(1, 'Prologue', [90]), area(2, 'Sealed Prison', [20])],
+             'scenes': {}}
+        w['areas'][1]['story_order'] = 1
+        w['areas'][2]['story_order'] = 2  # 0 or missing: unknown, after the rest
+        self.assertEqual([p['name'] for p in places.assign(w)], ['Prologue', 'Sealed Prison', 'Menu'])
+
 
 if __name__ == '__main__':
     unittest.main()
