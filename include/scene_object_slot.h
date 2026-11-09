@@ -30,7 +30,7 @@ union SceneObjArgs {
 };
 struct SceneObjSlot {
     u8 pad0[0x1c];
-    u32 a, b; /* 0x1c: also sprite fields */
+    union SceneObjPos spritePos; /* 0x1c: the sprite's position */
     u8 pad24[8];
     struct ObjBlock *block;
     void *callback;

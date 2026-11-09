@@ -83,14 +83,14 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
     obj->b3a = 0;
     sprite = obj;
     Sprite_Init(sprite, mgr + (obj->value * 28 + 0xc8), 0);
-    *(struct Pair *)&obj->a = obj->r0.words;
+    obj->spritePos.words = obj->r0.words;
     if (!(*dir & 1)) {
-        *(u16 *)&obj->b += 0x80;
+        obj->spritePos.position.z += 0x80;
     } else {
-        *(u16 *)&obj->a += 0x80;
+        obj->spritePos.position.x += 0x80;
         *(u32 *)obj |= 4;
     }
-    obj->q0.words = *(struct Pair *)&sprite->a;
+    obj->q0.words = sprite->spritePos.words;
     if (obj->variant == 0)
         obj->callback = SceneObject_UpdateLowered;
     else if (obj->variant == 1)

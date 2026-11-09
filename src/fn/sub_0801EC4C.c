@@ -73,16 +73,16 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
                 Sprite_Init(sprite, mgr + (obj->value * 28 + 0x384), 0);
                 break;
         }
-        *(struct Pair *)&sprite->a = *(struct Pair *)&obj->r0;
+        sprite->spritePos.words = obj->r0.words;
         if (!(*dir & 1)) {
-            *(u16 *)&sprite->a -= 0x20;
-            *(u16 *)&sprite->b += 0x20;
+            sprite->spritePos.position.x -= 0x20;
+            sprite->spritePos.position.z += 0x20;
         } else {
-            *(u16 *)&sprite->a += 0x20;
-            *(u16 *)&sprite->b -= 0x20;
+            sprite->spritePos.position.x += 0x20;
+            sprite->spritePos.position.z -= 0x20;
             *(u32 *)sprite |= 4;
         }
-        *(struct Pair *)&obj->q0 = *(struct Pair *)&sprite->a;
+        obj->q0.words = sprite->spritePos.words;
         t = obj->variant;
         if (t == 0) {
             obj->callback = SceneObject_UpdateInactiveIdle;
