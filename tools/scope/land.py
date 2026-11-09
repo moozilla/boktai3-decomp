@@ -190,10 +190,12 @@ def refresh_function_markers(text, rel=None):
     """TEXT without the per-function MATCHING_CONCESSION markers (tools/merge_unit.py puts one
     above each pinned function of a merged unit) whose function holds no concession any more,
     directly or through a helper (tools/progress.py unit_scores decides)."""
-    marker = re.compile(r"^%s\n(?=(?://[^\n]*\n)*[A-Za-z_][^\n;=(]*?\b(\w+)\s*\()" % re.escape(MARKER), re.M)
+    # comments, blank lines and macro definitions may stand between the marker and its function
+    between = r"(?:[ \t]*(?://[^\n]*|/\*.*?\*/[ \t]*|#[ \t]*define(?:[^\n]*\\\n)*[^\n]*)?\n)*?"
+    marker = re.compile(r"^%s\n(?=%s[A-Za-z_][^\n;=(#]*?\b(\w+)\s*\([^;{]*\)\s*\{)" % (re.escape(MARKER), between),
+                        re.M | re.S)
     found = [(m.start(), m.end(), m.group(1)) for m in marker.finditer(text)]
-    if not found or (len(found) == 1 and found[0][0] == 0 and not text[found[0][1]:].lstrip().startswith(
-            tuple("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"))):
+    if not found:
         return text
     tools = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if tools not in sys.path:

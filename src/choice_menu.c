@@ -219,36 +219,59 @@ s32 MessageWindow_GetNumberWidth(s32);
 
 u8 *Text_FindChar(u8 *, s32);
 
-// MATCHING_CONCESSION: register-pinning
+/* Reads a tag's `=N` argument from CURSOR (up to the closing '>', or past a NUL) into OUT; 0 when
+   it has none. */
+#define CHOICE_READ_TAG_VALUE(p, cursor, out)                                                      \
+    {                                                                                              \
+        s32 found = 0, length = 0;                                                                 \
+        while (*cursor != '>') {                                                                   \
+            if (!*cursor) {                                                                        \
+                cursor++;                                                                          \
+                break;                                                                             \
+            }                                                                                      \
+            if (*cursor == '=')                                                                    \
+                found = 1;                                                                         \
+            else if (found)                                                                        \
+                p->scratch[length++] = *cursor;                                                    \
+            cursor++;                                                                              \
+        }                                                                                          \
+        p->scratch[length] = 0;                                                                    \
+        if (found && length)                                                                       \
+            out = Text_ParseDecimal(p->scratch, length);                                           \
+        else                                                                                       \
+            out = 0;                                                                               \
+    }
+
 u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text)
 {
     u8 *cursor = text;
     s32 width;
     if (*text != '/') {
         if (!Text_ComparePrefix(text, gUnk_0824DB0C, 5)) {
-            READ_WIDTH();
+            CHOICE_READ_TAG_VALUE(p, cursor, p->explicitWidth);
             cursor = Text_FindChar(cursor, '>');
-            p->choices[p->count].x = (p->left + ({
-                                          register u8 *x asm("r4") = &p->textX;
-                                          asm("" : : "r"(x));
-                                          *x;
-                                      }))
-                                     << 3;
+            p->choices[p->count].x = (p->left + p->textX) << 3;
             p->choices[p->count].y = (p->top << 3) + (p->rows << 4);
             p->choices[p->count].row = p->rows;
             p->width = 0;
         } else if (!Text_ComparePrefix(text, gUnk_0824DB14, 6)) {
-            width = MessageWindow_GetStringWidth(READ_NUMBER());
+            s32 value;
+            CHOICE_READ_TAG_VALUE(p, cursor, value);
+            width = MessageWindow_GetStringWidth(value);
             p->width += width;
             p->textX += width;
             cursor = Text_FindChar(cursor, '>');
         } else if (!Text_ComparePrefix(text, gUnk_0824DB1C, 3)) {
-            width = MessageWindow_GetNumberWidth(READ_NUMBER());
+            s32 value;
+            CHOICE_READ_TAG_VALUE(p, cursor, value);
+            width = MessageWindow_GetNumberWidth(value);
             p->width += width;
             p->textX += width;
             cursor = Text_FindChar(cursor, '>');
-        } else
-            goto unknown;
+        } else {
+            text = Text_FindChar(text, '>');
+            return text;
+        }
     } else if (!Text_ComparePrefix(text, gUnk_0824DB20, 6)) {
         cursor = Text_FindChar(text, '>');
         if (p->explicitWidth)
@@ -258,18 +281,11 @@ u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text)
         p->count++;
         p->width = 0;
         p->rowCount[p->rows]++;
-    } else
-        goto unknown;
-    goto matchedTag;
-unknown: {
-    u8 *result = Text_FindChar(text, '>');
-    register u8 *saved asm("r4") = result;
-    asm("" : : "r"(saved));
-    return result;
-}
-matchedTag:
+    } else {
+        text = Text_FindChar(text, '>');
+        return text;
+    }
     text = cursor + 1;
-returnText:
     return text;
 }
 
