@@ -967,3 +967,19 @@ Tried:
 - a zero local set before the test (it becomes r8 or folds back)
 - a restart inline helper, and a result variable
 Next: an EQ test whose operand cse cannot record, or a label in front of the not-allowed block (it starts a new EBB).
+
+### EnemyParticle_UpdatePool (src/fn/sub_0820D2C4.c, 0820D2C4): deferred, StepSprite draft 12/16
+
+Landed: 8 concessions in a hand-unrolled sequence step.
+Draft: `notes/phase3-drafts/monsters-bosses/EnemyParticle_UpdatePool.c` (12 ROM / 16 draft).
+It calls `DisplaySequence_StepSprite(&cursor->sprite, &cursor->anim)` and has no concessions in the step.
+The ROM has three long-lived pointers: base in sb, an add-0 pointer in r8, and `ground` (base+0x54) in sl.
+pool sits at [sp], i at [sp+4], and the `sprite = o` copy at [sp+8].
+Inside the step, the first flag block and the command reads go through r8.
+`sprite->frame` and the second block go through the spilled `sprite` (r6) and through base+0x18 (r4).
+The draft's reads through r8 match, but its step pointer values come from a spilled `cursor`
+(it takes [sp+4], which pushes i to [sp+8]), and `sprite` is dead.
+Passing `sprite` or `&base->anim` instead changes loop's lead giv (base+0x18) and the whole allocation (29-72).
+A single `base` pointer, a per-iteration `cursor = base` copy, and `&pool->e[i]` are all worse (41-116).
+Next: work out whether r8 is a cursor biv or loop's reduced giv (try `hoist`), then the C that puts sprite/state on the base side
+while the reads stay on r8.
