@@ -654,3 +654,13 @@ ROM keeps the collider tail and sends the actor load back to it with `b`. That h
 if/else, with a goto to an actor label after `break`, and with an early collider block.
 Next: find the arm layout in which the actor tail is the one replaced (it would have to fall
 into, or come before, the label the collider tail jumps to), or another source of two id refs.
+
+### SpriteColliderGroup_ActivateParts (sub_0818E9B8), stride pin and r8 clobber kept
+Draft: notes/phase3-drafts/monsters-bosses/SpriteColliderGroup_ActivateParts.c. Without pins, every insn
+matches except the r8 save and restore: the ROM pushes r8 and never uses it. Some pseudo got r8
+in allocation and lost all its uses afterwards. An explicit `zero` byte for the action store is
+the nearest form so far: it takes r7, which pushes count to ip and the stride to r8. In the ROM,
+count is in r7, the stride in ip, and the store takes cse's jump-equivalence zero (the loaded
+`active` byte, r0). What is needed is a pseudo that sorts last (gets r8) and whose set and use
+disappear after reload (reload_cse, a no-op move, or a substituted equivalence). None of these
+help: u32 active, p->count instead of the count pointer, do/while, or indexing p->parts[i].
