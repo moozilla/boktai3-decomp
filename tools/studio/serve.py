@@ -344,7 +344,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.timed("POST", self.post)
 
     def get(self):
-        if self.path in ("/", "/index.html"):
+        if self.path in ("/", "/index.html", "/text"):
             self.send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/strings":
             orig = self.server.original

@@ -266,7 +266,7 @@ function frameStrip(n, imgAt, pick, kind, hash) {
     const fn = $('framenote');
     if (fn) {
       const its = ITEM_FRAMES[`${hash}/${i}`] || [];
-      fn.innerHTML = `<div class="meta" style="margin:6px 0 0">Frame ${i}${its.length ? ' · icon of ' + its.map(x => `${x.category} ${x.id} <b>${esc(x.name)}</b> (${esc(x.jp)}, string ${peekLink('/#' + x.string, '#' + x.string)})`).join(', ') : ''}</div>`; fn.appendChild(noteEditor(kind, `${hash}/${i}`, () => caption(cells[i], i)));
+      fn.innerHTML = `<div class="meta" style="margin:6px 0 0">Frame ${i}${its.length ? ' · icon of ' + its.map(x => `${x.category} ${x.id} <b>${esc(x.name)}</b> (${esc(x.jp)}, string ${peekLink('/text#' + x.string, '#' + x.string)})`).join(', ') : ''}</div>`; fn.appendChild(noteEditor(kind, `${hash}/${i}`, () => caption(cells[i], i)));
     }
   };
   const add = upto => {

@@ -108,7 +108,7 @@ def search(q, strings=None, english=None, limit=50):
         for s in strings:
             en = english.get(s["id"]) or english.get(str(s["id"])) or ""
             if q in s["text"].lower() or q in en.lower() or q == str(s["id"]):
-                hits.append((30, 0, "text", en or s["text"], f"#{s['id']}" + (f" · {s['text']}" if en else ""), f"/#{s['id']}"))
+                hits.append((30, 0, "text", en or s["text"], f"#{s['id']}" + (f" · {s['text']}" if en else ""), f"/text#{s['id']}"))
                 n += 1
                 if n >= 15:
                     break

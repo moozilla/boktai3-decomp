@@ -94,7 +94,7 @@ and see why it differs, then `make`. The workflow and compiler notes are in
 ## Studio
 
 ```sh
-python3 tools/studio/serve.py    # http://localhost:8642
+python3 tools/studio/serve.py    # http://localhost:8642 opens Browse
 ```
 
 One local app over the game and the decomp. The header groups every view;
@@ -135,7 +135,7 @@ order, colored by kind or by how well each byte is understood.
 | ![Code](docs/img/studio-code.png) | **Code**: a function's C and disassembly side by side, with its concessions, the RAM it touches and where the game reaches it. |
 | ![Code overview](docs/img/studio-code-overview.png) | **Code overview**: what matches, what is free of concessions, by category, and which concession kinds are left. |
 | ![Browse](docs/img/studio-browse.png) | **Browse**: a monster with its family, every palette its sprites are drawn in, and the scenes that place it. |
-| ![Text](docs/img/studio-text.png) | **Text**: every string with the fan translation, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
+| ![Text](docs/img/studio-text.png) | **Text** (`/text`): every string with the fan translation, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
 | ![Sprites](docs/img/studio-sprites.png) | **Sprites**: sprite packages and large sprites with every frame and animation, in their in-game palettes. |
 | ![Maps](docs/img/studio-map.png) | **Maps**: stages with captured palettes, doors, entrances, items, enemies and patrol paths from the stage scripts. |
 | ![Scripts](docs/img/studio-scripts.png) | **Scripts**: procedures in a readable view with recovered names, the developers' debug messages and their translations. |
