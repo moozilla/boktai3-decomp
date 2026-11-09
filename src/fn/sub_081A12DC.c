@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: launches a moving projectile and approaches the elevated rest position.
 struct Vec {
     s16 x, y, z, pad;
@@ -42,7 +41,7 @@ void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
 void ActionState_AdvanceState(void *);
 s32 Math_StepTowardTarget(s32, s32, s32);
-static inline u8 *SetHeading(struct Hresvelgr *p, s32 heading)
+static inline void SetHeading(struct Hresvelgr *p, s32 heading)
 {
     s32 shifted;
     u32 value;
@@ -55,7 +54,6 @@ static inline u8 *SetHeading(struct Hresvelgr *p, s32 heading)
     value = 7;
     value &= shifted;
     p->direction8 = value;
-    return &p->direction4;
 }
 static inline s32 SignedShift(s32 value, u32 shift)
 {
@@ -87,18 +85,17 @@ void Hresvelgr_UpdateRisingProjectile(struct Hresvelgr *actor)
 {
     struct Hresvelgr *saved = actor;
     struct Action *action = &actor->action;
-    register u8 *direction asm("r5");
     if (actor->pending) {
         struct Vec position, delta;
         actor->pending = 0;
-        direction = SetHeading(actor, actor->targetHeading);
+        SetHeading(actor, actor->targetHeading);
         Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 25, 2, 4);
         Anim_SetFrameDurationScale(actor->animation, 112);
         CopyVector(&position, &actor->renderPosition);
         ((s16 *)&position)[1] += 512;
         PolarVector(&delta, ((actor->side << 6) + 128) & 255, 4);
         delta.y = 48;
-        Hresvelgr_CreateMovingProjectile(&position, &delta, 1 - (*direction >> 1));
+        Hresvelgr_CreateMovingProjectile(&position, &delta, 1 - (actor->direction4 >> 1));
         Sound_PlaySong(0x46e);
         ActionState_Reset(action);
         ActionState_SetState(action, 0);
@@ -126,12 +123,15 @@ void Hresvelgr_UpdateRisingProjectile(struct Hresvelgr *actor)
             }
             break;
     }
-    actor->motion[0] = 0;
-    actor->motion[1] = 0;
-    actor->motion[2] = 0;
-    actor->motion[3] = 0;
     {
-        u32 mask = 12;
-        saved->flags |= mask;
+        u32 *flags = &saved->flags;
+        actor->motion[0] = 0;
+        actor->motion[1] = 0;
+        actor->motion[2] = 0;
+        actor->motion[3] = 0;
+        {
+            u32 mask = 12;
+            *flags |= mask;
+        }
     }
 }
