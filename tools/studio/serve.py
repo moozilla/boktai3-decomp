@@ -590,6 +590,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             except ValueError:
                 d = None
             self.send(200 if d else 404, d or {"error": "no such " + what})
+        elif self.path in ("/favicon.ico", "/static/favicon.svg"):  # a sun, the game's sunlight sensor
+            self.send(200, open(os.path.join(HERE, "favicon.svg"), "rb").read(), "image/svg+xml", etag='"sun1"', max_age=86400)
         elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js", "/static/mp2k.js"):
             ctype = "text/javascript" if self.path.endswith(".js") else "text/css"
             self.send(200, open(os.path.join(HERE, os.path.basename(self.path)), "rb").read(), ctype + "; charset=utf-8")

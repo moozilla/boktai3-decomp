@@ -39,6 +39,8 @@ function navHTML() {
 }
 // Fills <header id="top">; `tools` is HTML for the right-hand side.
 function studioHeader(tools = '') {
+  if (!document.querySelector('link[rel=icon]'))
+    document.head.insertAdjacentHTML('beforeend', '<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">');
   const h = $('top');
   if (!h) return;
   if (EMBED) { h.remove(); document.body.classList.add('embed'); keepEmbed(); return; }
