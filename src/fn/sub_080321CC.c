@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Vm {
     u8 pad[0x1C];
@@ -25,22 +24,14 @@ loop:
     }
     if (c == 0x1F) {
         u32 code = (u16)Text_DecodeGlyphEscape(s);
-        if (code != 0xFFFF) {
-            {
-                u32 mask = 0xFF;
-                register u32 bits asm("r1");
-                asm("" : "+r"(mask));
-                mask <<= 8;
-                asm("" : "+r"(mask));
-                bits = mask;
-                mask = code;
-                mask &= bits;
-                if (mask)
-                    goto wide;
-            }
+        if (code == 0xFFFF) {
             n++;
-            goto nextWide;
+            goto next;
         }
+        if ((u16)(code & 0xFF00))
+            goto wide;
+        n++;
+        goto nextWide;
     }
     n++;
 next:
