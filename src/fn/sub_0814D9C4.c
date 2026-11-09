@@ -1,7 +1,6 @@
 #include "global.h"
 #include "player.h"
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: table-driven weapon cue and combo phases drive the attack collider.
 #define Player_UpdateWeaponCueCombo sub_0814D9C4
 struct PlayerActionCueInfo {
@@ -49,6 +48,7 @@ void Player_UpdateWeaponCueCombo(struct Player *p)
 {
     struct PlayerActionCueInfo info;
     const struct WeaponCueRecord *record;
+    const struct WeaponCuePhase *phase;
     s32 forced = 0;
     ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &info);
     record = &gUnk_08E5FA6C[info.cueIndex];
@@ -78,9 +78,7 @@ void Player_UpdateWeaponCueCombo(struct Player *p)
             break;
 
         case 2: {
-            register u32 offset asm("r0") = p->actionResetCounter * sizeof(struct WeaponCuePhase);
-            register const struct WeaponCuePhase *phase asm("r6") =
-                (const struct WeaponCuePhase *)((u8 *)record->phases + offset);
+            phase = &record->phases[p->actionResetCounter];
             Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2);
             if ((++(p->tetherFrame)) > (phase->delay)) {
                 InvalidatePreviousAnimation(p);
@@ -93,9 +91,7 @@ void Player_UpdateWeaponCueCombo(struct Player *p)
         }
 
         case 3: {
-            u32 offset = p->actionResetCounter * sizeof(struct WeaponCuePhase);
-            const struct WeaponCuePhase *phase =
-                (const struct WeaponCuePhase *)((u8 *)record->phases + offset);
+            phase = &record->phases[p->actionResetCounter];
             if (!(p->tetherFrame)) {
                 s32 cost = Player_UpdateStatThreshold(p);
                 if ((p->currentStatB) <= cost)
@@ -123,9 +119,7 @@ void Player_UpdateWeaponCueCombo(struct Player *p)
         }
 
         case 4: {
-            register u32 offset asm("r0") = p->actionResetCounter * sizeof(struct WeaponCuePhase);
-            register const struct WeaponCuePhase *phase asm("r6") =
-                (const struct WeaponCuePhase *)((u8 *)record->phases + offset);
+            phase = &record->phases[p->actionResetCounter];
             ++(p->tetherFrame);
             Player_SetAnimation(p, Player_SelectActionCue(p), phase->speed, 2);
             if ((p->tetherFrame) > (phase->releaseDuration))
