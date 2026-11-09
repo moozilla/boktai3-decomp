@@ -643,3 +643,14 @@ is still unexplained: every arm pairing of `duration` and `power + 60` scores wo
 DEBUG_PRINT body, which flow deletes together with the test.
 Next: find a duration use that survives flow and goes away after reload (a no-op move as in
 fact 81, or a REG_EQUIV substitution), then fix the rotation with `spill`.
+
+### TargetRegistry_FindById (sub_0815F5B4), 1 pin kept
+Draft: notes/phase3-drafts/monsters-bosses/TargetRegistry_FindById.c (5 ROM / 5 draft differ). With the r3 pin
+removed, requestedId (3 refs: the copy plus one compare weighted 2 in the loop, live 22, priority
+1363) sorts below the hoisted sceneActor mask (3846), so the two swap r3/r4. Giving each arm its
+own compare (refs 5, priority 4347) puts every register where the ROM has it. But jump2 then
+cross-jumps the wrong way: the collider arm's tail jumps into the actor arm's copy, while the
+ROM keeps the collider tail and sends the actor load back to it with `b`. That happens with
+if/else, with a goto to an actor label after `break`, and with an early collider block.
+Next: find the arm layout in which the actor tail is the one replaced (it would have to fall
+into, or come before, the label the collider tail jumps to), or another source of two id refs.
