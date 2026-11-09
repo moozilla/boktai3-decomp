@@ -55,10 +55,10 @@ void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
             {
                 u32 chasing = 0x80;
                 if (actor->flags2D4 & chasing) {
-                    u16 *time = (u16 *)((u8 *)actor + 0x418);
+                    u16 *time = &actor->group.common.gate.counter;
                     *time += 0x12C;
-                    if (*time > *(u16 *)((u8 *)actor + 0x416))
-                        *time = *(u16 *)((u8 *)actor + 0x416);
+                    if (*time > actor->group.common.gate.duration)
+                        *time = actor->group.common.gate.duration;
                 }
             }
             return;
