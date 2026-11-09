@@ -111,6 +111,24 @@ Next idea: C in which amplitude's address and the loop's `p->amplitude` don't sh
 equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
 add survives.
 
+### sub_08010C10 (src/group_objects.c, 08010C10): deferred, reload rotation only
+
+Draft: `notes/phase3-drafts/field-effects/sub_08010C10.c` (2 ROM / 2 draft), the pinned
+source without the `d` pin and barrier. The only difference is the scratch for the first
+`ldrsh` of `-p->offset.x` (ROM r2, draft r1). `scope.py FILE.c sub_08010C10 spill` (fixed in
+ea1d04af5 to shift a function's first choice) matches with `AGBCC_SPILL=0:1`: the ldrsh's
+constant reload is the function's first reload choice, the spill set is {r1, r2}, and the ROM's
+rotation is one step on, so the original made an odd number of reload choices before line 679
+(or had r1 live there, which is what the pin imitated). The draft has none before it: m sits in
+r8, but `m->actor` reloads share r0. Tried with no change or worse (on top of the depin worker's
+~40 spellings): an `actor` local, no `active` local, `-offset->x` and mixes, `0 - x`, s32
+casts, x and z locals, `ZeroFill8(&p->offset)`, union RandomTableView, the else branch first,
+and `addPosition`/`addPositionN` for the offset step.
+
+Next idea: find C before line 679 whose RTL needs one reload choice and still emits the same
+code (a copy that jump2 merges after reload, fact 59), or that keeps a value live in r1 across
+the first ldrsh.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
