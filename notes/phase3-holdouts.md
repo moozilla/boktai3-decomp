@@ -127,3 +127,13 @@ REG_EQUIV, as in Bat_UpdateDefeat. `AGBCC_NOEQUIV=31,32` (table, indexAddress) g
 shape 16, and the rest is the order of input, transform, table and heading. The halves union cannot
 help here either: the target packing reuses 0xFFFF0000. Next: a general way to set a constant pointer
 without a REG_EQUAL note at function entry; this is the same blocker as Bat.
+
+### TentacleActor_SelectWanderRoute (src/fn/sub_080A8904.c, 080A8904): deferred
+
+Draft: `TentacleActor_SelectWanderRoute.c`, every do/while(0) macro written out (46/48 differ, all
+allocation). The macros put their statements one loop level deeper, and flow weights REG_N_REFS by
+loop depth. So with them the scan mask constant has 21 refs (14 without), i 13 (11), n 9 (7) and
+currentCell 10 (8). That reorders global allocation: the ROM has facing r8, count sb, the 3 mask r6.
+The draft gives facing r6 and count r8. Next: C that really nests those statements (a loop the
+original had, for example the neighbor scan as an inner loop) or other refs that raise the mask
+and n by the same amount.
