@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -42,7 +41,6 @@ int WirelessController_ConsumePeerRefreshRequest(struct Engine *);
 int WirelessController_ConsumeAdvanceRequest(struct Engine *);
 int Wireless_UpdatePeerHandshake(struct Engine *p)
 {
-    int bits;
     if (p->pending) {
         p->pending = 0;
         p->entered = 0;
@@ -50,53 +48,30 @@ int Wireless_UpdatePeerHandshake(struct Engine *p)
     }
     if (WirelessController_ConsumePeerRefreshRequest(p)) {
         if (!p->scratch[1] && !(p->mask & 0x238))
-            p->mask = 0x105 | p->mask;
+            p->mask |= 0x105;
         p->entered = 0;
     }
-    bits = p->mask;
-    if (!(bits & 64))
-        goto receive;
-    if (bits & 0x338)
-        goto receive;
-    {
-        register int literal asm("r3") = 0x105;
-        register int value asm("r1");
-        asm("" : "+r"(literal));
-        value = literal;
-        value |= bits;
-        p->mask = value;
+    if (p->mask & 64) {
+        if (!(p->mask & 0x338))
+            p->mask |= 0x105;
     }
-receive:;
     if (gRfuSlotStatusNI[p->mode]->recv.state == 0x46) {
-        u8 *base = (u8 *)p + p->mode * 4;
-        u8 *message;
-        message = base + 0xA8;
+        u8 *message = (u8 *)p + p->mode * 4 + 0xA8;
         if (*message) {
             *message = 0;
             p->mask |= 64;
         }
         rfu_clearSlot(8, p->mode);
     }
-    bits = p->mask;
-    if ((bits & 96) == 96) {
-        int mask = 0xFFDF;
-        int second;
-        mask &= bits;
-        second = 0xFFBF;
-        mask &= second;
-        p->mask = mask;
+    if ((p->mask & 96) == 96) {
+        p->mask &= ~0x20;
+        p->mask &= ~0x40;
         p->flag35 |= gRfuLinkStatus->connSlotFlag | gRfuLinkStatus->linkLossSlotFlag;
         return 0;
-    } else {
-        int connected = p->bits;
-        if (connected) {
-            int blocked = bits & 0x168;
-            if (!blocked && connected == gRfuLinkStatus->connSlotFlag) {
-                if (WirelessController_ConsumeAdvanceRequest(p)) {
-                    setOperation(p, 9, blocked);
-                    return 0;
-                }
-            }
-        }
+    }
+    if (p->bits && !(p->mask & 0x168) && p->bits == gRfuLinkStatus->connSlotFlag &&
+        WirelessController_ConsumeAdvanceRequest(p)) {
+        setOperation(p, 9, 0);
+        return 0;
     }
 }
