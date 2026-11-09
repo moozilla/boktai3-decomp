@@ -59,3 +59,21 @@ Draft: `notes/phase3-menus-link/StatusScreen_DrawClock.c` (4 ROM / 4 draft insns
   the shift in the for init, operand orders of the add.
 * Next: a form where shift lives two insns less (or the pointer two more) without moving the
   `out = dst` copy; or what made the original's `values` denser.
+
+### Trigger_RunScript (src/item_container.c, 08006F00): deferred
+
+Draft: `notes/phase3-drafts/field-effects/Trigger_RunScript.c` (11 ROM / 9 draft, two mechanisms).
+1. The ROM keeps two copies of the actor index: `ldrsb r1` (compared with -1), `adds r2, r1` (the
+   table index) and `adds r5, r2` (saved for values[8]). cse merges the draft's `index = actor` into
+   actor (make_regs_eqv: index does not live past the extended block, which runs to cuid 73 with
+   jump following), so the draft has one register. A copy survives only if the new register
+   becomes the class head (its last use past the block end, or its first mention before the block
+   start), which none of the spellings tried gives: s8/u8/s16 actor, an inline `PlayerMask`, a
+   nested `if (actor != -1)` form, separate `index` and `savedActor` blocks. `CSE_KEEP`/
+   `CSE_NOCANON` on the pseudos change nothing (the head test fails before them).
+2. `&args` must be a pointer variable set before `source = p->arguments` and allocated before
+   `out`, so it takes r2. With 3 refs over 22 insns its priority (1363) is below out's (3000):
+   `AGBCC_PRI=argsPtr:+2000` fixes it. Routing the count's word RMW through the pointer gives it 5
+   refs and fixes the allocation, but the ROM does that RMW through sp (`ldr r0, [sp, #0x28]`).
+Next idea: find refs for argsPtr that cse later folds back to sp, or the label/loop structure
+that ends cse's block between the actor copy and its uses.
