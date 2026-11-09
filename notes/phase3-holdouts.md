@@ -137,3 +137,15 @@ currentCell 10 (8). That reorders global allocation: the ROM has facing r8, coun
 The draft gives facing r6 and count r8. Next: C that really nests those statements (a loop the
 original had, for example the neighbor scan as an inner loop) or other refs that raise the mask
 and n by the same amount.
+
+### TentacleBody_RefreshDirectionalAnimations (src/fn/sub_080A8F38.c, 080A8F38): deferred
+
+Draft: `TentacleBody_RefreshDirectionalAnimations.c` (41/37 differ, against 83/79 for the plain
+no-pin draft). Step is written as the shared DisplaySequenceState playback, with the flip tests
+from SpriteEffectController_StepDrawable and ordinary `frame.profile[frame.kind * four]` /
+`++frame.i` in the body. Remaining: loop.c hoists the constant 1, because three equal sets
+(TestMask's `& 1`, the first flip bit and `duration = 1`) are combined in combine_movables;
+`AGBCC_NOMOVE=99` keeps it in the loop. The register order is the other part: the ROM puts body in
+sb, offset in sl and the segment pointer in r8 (seven saved registers); the draft uses r8/sb/r7.
+Next: find what holds r7 in the ROM (another long-lived value the draft lacks, maybe a kept
+`&body->speed` or a `four` constant), then split the 1s.
