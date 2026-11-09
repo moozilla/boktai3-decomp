@@ -1,10 +1,11 @@
 import { expect, mock, test } from 'claude-code/testing'
+import { cellSizes } from '../hooks/data'
 
 const PROGRESS = `# Decompilation progress
 
 **Code matched in C: 64.50%** (1,554,878 / 2,410,598 bytes) — **10578 / 11780 functions**
 
-Without register pinning: **47.570%**. Register-pinned: **16.932%** of total code (included above).
+Without concessions: **47.570%**. With concessions (register pins, asm barriers and the other kinds in \`tools/concessions.py\`): **16.932%** of total code (included above). decomp.dev counts only concession-free functions as matched.
 
 Nonmatching drafts (\`#ifdef NONMATCHING\`, not counted above): **475 functions**, 14.542% of code, mean fuzzy match 87.7%.
 
@@ -102,7 +103,6 @@ test('the popup shows PROGRESS.md, the treemap and recent PRs', async ($, on) =>
   mock.store(on)
   on('command.register', () => ({ value: { command: 'decomp' } }))
   on('ui.open', () => ({ value: { isPlaced: true } }))
-  on('ui.panes', () => ({ value: [] }))
   on('clock.every', () => ({ value: undefined }))
   on('http.fetch', (_, e) => ({ value: { status: 200, ok: true, headers: {}, text: fetchAnswer(e.url) } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
@@ -111,7 +111,8 @@ test('the popup shows PROGRESS.md, the treemap and recent PRs', async ($, on) =>
 
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ ...PANE, surface })
-    expect((await ui.find({ type: 'Text', text: /Code matched in C/ }))?.text).toBe('Code matched in C')
+    expect((await ui.find({ type: 'Text', text: /Matched without concessions/ }))?.text).toBe('Matched without concessions')
+    expect((await ui.find({ type: 'Text', text: /47\.57%/ }))?.text).toBe('47.57%')
     expect(await ui.find({ type: 'Text', text: /10,578 of 11,780 functions/ })).toBeDefined()
 
     // A category opens the treemap there; a unit zooms to its functions.
@@ -139,6 +140,13 @@ test('the popup shows PROGRESS.md, the treemap and recent PRs', async ($, on) =>
     await ui.press({ key: 'tab-overview' })
     await ui.unmount()
   }
+})
+
+test('treemap tiles are whole cells that fill each row exactly', () => {
+  expect(cellSizes([3, 1], 10)).toEqual([8, 2])
+  expect(cellSizes([1, 1, 1], 10).reduce((s, x) => s + x, 0)).toBe(10)
+  expect(cellSizes([0.4, 0.3, 0.3], 7)).toEqual([3, 2, 2])
+  expect(cellSizes([], 10)).toEqual([])
 })
 
 test('the footer button shows the headline', async ($, on) => {
