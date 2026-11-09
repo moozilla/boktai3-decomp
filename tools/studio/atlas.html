@@ -282,8 +282,11 @@ function nodePage(path) {
   const n = nodes[path]; if (!n) return `<div class="page empty">No such group.</div>`;
   const kids = n.children.map(c => folderCard(path + '/' + c.title)).join('');
   const items = n.items.map(cardFor).join('');
+  // a place: its map of rooms is on the World page
+  const world = /^Places\/[^/]+$/.test(path) && n.title !== 'Unlabeled areas'
+    ? `<div class="meta">${peekLink('/world#place=' + encodeURIComponent(n.title), 'how its rooms connect, on the World page')}</div>` : '';
   return `<div class="page">${crumbs(path.split('/').slice(0, -1).join('/'))}<h1 class="t">${esc(n.title)} <span class="muted" style="font-size:15px;font-weight:400">${n.count}</span></h1>
-    ${kids ? `<h3>Groups</h3><div class="cards">${kids}</div>` : ''}${items ? `<h3>${n.children.length ? 'Here' : 'Contents'} <span class="n">${n.items.length}</span></h3><div class="cards">${items}</div>` : ''}</div>`;
+    ${world}${kids ? `<h3>Groups</h3><div class="cards">${kids}</div>` : ''}${items ? `<h3>${n.children.length ? 'Here' : 'Contents'} <span class="n">${n.items.length}</span></h3><div class="cards">${items}</div>` : ''}</div>`;
 }
 
 // who loads a tileset or a map's tiles: stages (script proc_884 calls), areas, scenes
