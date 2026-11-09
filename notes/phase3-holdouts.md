@@ -87,6 +87,30 @@ giv of i (`view = &manager->effects[i]`) delays the reversal to pass 2 and fixes
 but then the giv's increment lands before i's increment, after `p++`. Next idea: a counter that
 check_dbra_loop can only reverse in pass 2 while view stays a giv of p.
 
+### ScanlinePresentation_UpdateNoise (src/scanline_presentation.c, 0800D874): deferred
+
+Draft: `notes/phase3-drafts/field-effects/ScanlinePresentation_UpdateNoise.c`. It is the plain
+three-loop form, with `amplitude = &p->amplitude; delta = &p->delta;` after `i = p->start`, the
+ROM's order. Score 75 ROM / 71 draft. With `AGBCC_FORCE=<loop 1's zero>:12` it is 31 / 27.
+Diagnosis (fact 92):
+* In the ROM, p is in r4 because its preferred class is LO_REGS. In the draft it is STACK_REG
+  (`AGBCC_REGCLASS_TRACE=22`: LO_REGS 26 against STACK_REG 24), so global alloc takes p from
+  the all-register alternate class, and pass 0 picks ip. That knocks loop 1's zero (the ROM's
+  ip) and everything after it out of place.
+* The ROM's adds of p are the draft's plus one: the noise loop's `p + 726` (p->amplitude),
+  hoisted into ip at 0x68. In the draft, cse2 rewrites that hoisted add into a copy of
+  `amplitude`, so p loses an odd-offset vote.
+* With the pointers set at the top of the function (before loop 1), cse2 doesn't merge them,
+  and p is LO_REGS (43 / 45). But the ROM computes them after `i = p->start`.
+* The ROM's 726 constants are single-use (`ldr r1, =0x2D6; adds r1, r1, r4`, reload's
+  pattern). The draft shares one constant pseudo (`adds r7, r4, r3`).
+* The pinned version's per-iteration `end = p + endOffset` also gets the ROM's in-loop
+  `p + r8` and the r8 constant.
+
+Next idea: C in which amplitude's address and the loop's `p->amplitude` don't share a cse
+equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
+add survives.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
@@ -188,6 +212,39 @@ matches, so this is the only decision left.
   ip, but the vertical read then uses the top's symbol register r1 instead of the ip copy (2/2).
 * Also tried: 128 combinations of held vs gPadState for each of the nine pad reads, re-setting
   `held` between the tests, and inline vertical/horizontal helpers.
+
+### ResultGame_UpdatePlayerMarker (0801C6CC, src/fn/sub_0801C6CC.c)
+
+Draft: `notes/phase3-menus-link/ResultGame_UpdatePlayerMarker.c` (11 ROM / 11 draft, only key
+and counter swapping r2/r3). The draft keeps velocity set in each arm, `u8 *counter` and
+`u8 *table = gUnk_0824DB64;` before the index read (that order gives the ROM's load order), and
+no asm.
+* key (`1 & gPadState[1]`, also the zero for the else-arm stores) must be allocated before
+  counter, whose priority is 5000 (4 refs, 16 insns). key has 7 refs, but its life is
+  24 -> 50. regmove ties the and to the constant 1's pseudo, which carries a REG_EQUIV, so
+  update_equiv_regs doubles it (fact 20's first-set doubling), and key's priority drops to 2800.
+  Without the doubling it would be about 5600. `AGBCC_PRI=key:+2201` matches.
+* Tried: `x & 1` vs `1 & x`, u8/u16/s32 key, no key variable (literal zeros), `p[0xb2]`
+  instead of counter in the compare and/or the increment, and `AGBCC_NOTIE=22` (r3 still).
+* Next: a spelling that keeps key from inheriting the constant's REG_EQUIV set, or that adds
+  2 refs to key.
+
+### sub_0803198C (0803198C, src/fn/sub_0803198C.c): message window open
+
+Draft: `notes/phase3-menus-link/sub_0803198C.c` (2 ROM / 2 draft: the callback constant in r0
+instead of r1). It has no pin; it keeps `(void)*(volatile u8 *)&p->mode;`.
+* The ROM keeps a dead `ldrb` of p->mode (0x182) before ScriptProc_Start. Only a volatile read
+  survives flow, so the original had volatile there too. A `vu8 mode` field changes the earlier
+  `p->mode = 0` store (it adds a load), so the cast stays local to the read.
+* `ldr r1, =MessageWindow_ClearTextCompletion; str r1, [r4]`: pseudo 261 is local to block 17,
+  born after the `strh` that kills r0 (0xFFFF) and r1 (the wait address). It has no copy
+  suggestion, so find_free_reg takes r0. `AGBCC_FORCE=261:1` matches. Spill rules out a reload
+  (the reload rotation goes r2 -> r3 across it).
+* Tried: a direct `p->fnDone =` store (worse: the fnSlot hoist is what gives the ROM's `r4`),
+  the store before `p->wait`, `p->wait = -1`, a callback local set before the if or in each arm
+  (global, gets r6), casts and `fnSlot[0]`, a `vu8` field with a bare `p->mode;`.
+* Next: find what makes r0 busy (or suggests r1) across the store in the original block, e.g. a
+  value that lives from the `strh` past the store.
 
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
@@ -483,3 +540,79 @@ the final stores. Draft `sub_080ABB18.c` (stores inside a `for (;;)` exit branch
 loop.c hoist only a few of them (savings threshold). The landed C precomputes the pointers by hand,
 with 5 pins and 2 barriers (all removed: 107/107). Next: decide between the two shapes with
 `hoist` (which addresses the ROM's loop moved), then match the allocation.
+
+### Vorn_SelectReactionControl (src/fn/sub_080B197C.c, 080B197C): one barrier left
+
+Landed c725f2610: the value pin is gone (`mask &= value` in HasFlag). The `asm("" : : "r"(active))`
+remains. Without it (draft `sub_080B197C.c`, 26/26, an r4/r5 swap only) a (18 refs / 94 live, pri
+7659) outranks active (8 / 33, 7272). `AGBCC_PRI=active:+400` matches. Passing `active - 1` to
+SceneActor_DispatchContextAction fixes the allocation but changes the code. `!active` and
+`active == 0` fold before regclass counts. Next: a ninth natural ref of active, or two insns less
+of its life.
+
+### Ivy_UpdateDefeat (src/fn/sub_080EE1B0.c, 080EE1B0): table pin, one load position from a match
+
+Six-spark family, but here the table is a local-alloc qty, not a REG_EQUIV spill. Block 24's
+call-saved qtys (AGBCC_DUMPPRI L records) in priority order: =gRandomIndex 2010 r4, a pointer
+1163 r5, =1#2 769 r6, size 760 r8, then the position `&actor->body.position` (7 refs, life
+58-252, 721) and the table (7 refs, 36-236, 700). The ROM has the table in sb and the position in
+sl, so the table must come first: its life must be 185-193, or the position's over 200.
+Draft `Ivy_UpdateDefeat.c` (5/5, no table variable): a `NextRandom(wrap, bits)` helper that reads
+`gRandomTable` itself gives the constant pseudo its birth at the first `add` (48, pri 744), and
+the allocation is the ROM's. The only difference left is that the `ldr =gRandomTable; mov sb`
+pair comes after the index computation instead of before the gRandomIndex load. Next: a form that
+sets the table before the first index but ends its life (or its refs) as the helper form does.
+Passing gRandomTable straight to RandomFrom (no variable) gives the same 14/14 as the pinned-out
+draft; the union RandomTableView forms are no better.
+
+### Axe_UpdateDamageSpin (src/fn/sub_080F9974.c, 080F9974): pin and one barrier left
+
+Landed: the flags2D6 `mask` barrier is gone (`OrStatus(0x20, &actor->flags2D6)`, an inline
+whose constant parameter is set before the address). Draft `Axe_UpdateDamageSpin.c` has no
+concessions: `state[0xED6] = 1; *(u16 *)(state + 0xED4) = 0;` gives the ROM's code, including
+reload's `subs r1, #2` (move2add). It is 11/11, with one swap left: context (7 refs / 170 live,
+pri 823) and the constant 1 (4 refs, flow life 48, doubled by REG_EQUIV to 96, pri 833) take r8
+and sb the wrong way round. `AGBCC_PRI=context:+20` matches. One more flow-time insn inside the
+1's range (SetState's field2B1 store to the ED6 store) would flip it (both lives grow, the 1's
+counts twice), and so would three fewer insns in context's range outside it. Tried without
+effect: local temps for angle/zero/speed/one, a shadow pointer, a struct copy through pointers,
+inline helpers for the ED6/ED4 stores (constant parameters are substituted), and simpler
+mask forms (those change the code).
+
+### Terrain_ResolveActorMotion (src/fn/sub_0811AE9C.c, 0811AE9C): 6 concessions, pin-free draft 10/10
+
+Draft `Terrain_ResolveActorMotion.c` (no concessions) rewrites the middle part:
+`clearance = Terrain_GetCellClearance(next.coordinates); y = next.coordinates[1];
+floor = clearance - Offset(next.coordinates[2]);` (the Offset inline keeps `z + 96` from being
+reassociated into `clearance - 96 - z`), and `shape = 0xF00; shape &= flags; flags &= 0xF000;`.
+That also removes the z-clamp cross-jump difference: both arms now keep their own deltaZ store.
+Two differences are left. (1) In the else arm the ROM negates a copy of offset for
+`Abs(offset) >> 12`. cse's fold_rtx turns `-x`, with x known to be `-(difference << 12)`, back
+into the shift's pseudo, so the draft keeps the shift alive in r2 and the ROM's local r0/r1
+pair is lost. Splitting it as `offset = difference << 12; offset = -offset;` gives the right
+negation (11/11, shape 0) but puts both in one register. The original's C must hide the
+`neg` from cse (the pinned version did that with `asm("" : "+r"(offset))`). (2) The high-byte
+result and shape sit one register higher (r3/r4, ROM r2/r3), because offset's pseudo takes r2.
+Fixing (1) probably fixes (2).
+
+### sub_0813D834 (src/player_3.c, 0813D834): 2 pins, one cse follow from a match
+
+Draft `sub_0813D834.c` (no pins) is 17/15. Every difference comes from cse following the
+switch's `beq` into case 1 (`probe`: `CSE_NOFOLLOW=2` matches). cse then knows kind == 1 and folds
+the timers path's `kind * 2` into `ldr =0x532`, where the ROM computes `lsls r0, r3, #1` (kind
+kept in r3). cse_end_of_basic_block follows a jump only to a label with LABEL_NUSES == 1 that is
+preceded by a BARRIER, so the original's case 1 label must have had a second use or no barrier
+before it. No effect: an if/else chain (worse), `u32 kind`, computing from `inputKind`, a
+`goto` to the timers block from the flags test.
+
+### PlayerAction_RefreshFlagState (src/player_3.c, 0813EDDC): 7 concessions, pin-free draft 8/8
+
+Draft `PlayerAction_RefreshFlagState.c` drops all seven (`if (alternate < 0) override = 0; else
+override = GameState_GetConsumableDescriptor(alternate);` and `override->slot` read directly).
+What is left is reload rotation: `scope.py spill` matches with `AGBCC_SPILL=5:1`. Between reload
+4 (the 0x418 actionMode offset, r2) and reload 5 (alternate from r8 for `cmp`), the ROM made one
+more reload choice that took r0 and left no visible insn. Reload 5 then got r1, and override's
+reloads in the slot loop follow. Writing the actionMode/slot test as separate ifs, through a
+`mode` local or pointer, `!= 0`, or a `u32 slot` local changes nothing, and neither does a
+ternary for override (worse). Next: find the ROM's hidden reload (a pseudo with a MEM REG_EQUIV
+replaced at its use, or a copy deleted after reload).

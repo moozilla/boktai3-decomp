@@ -1259,10 +1259,7 @@ void EffectParticle_UpdateDissipating(struct EffectManager *manager, struct Effe
     sprite->position.z = sprite->position.z + p->velocity.z;
     o = &p->sprite;
     {
-        register struct EffectManager *m asm("r4") = manager;
-        struct EffectGraphics *graphics;
-        asm("" : : "r"(m));
-        graphics = m->graphics;
+        struct EffectGraphics *graphics = manager->graphics;
         a = &p->anim;
         entry = a->data + a->frame;
         {
@@ -1304,6 +1301,7 @@ void EffectParticle_UpdateDissipating(struct EffectManager *manager, struct Effe
             } else {
                 a->frame--;
             }
+            entry = a->data + a->frame;
         } else {
             if (++a->frame >= a->count) {
                 if ((u8)(a->flags & 8)) {
@@ -1313,8 +1311,8 @@ void EffectParticle_UpdateDissipating(struct EffectManager *manager, struct Effe
                     a->frame = 0;
                 }
             }
+            entry = a->data + a->frame;
         }
-        entry = a->data + a->frame;
         a->rate = ((*entry & 15) * a->scale) >> 6;
     }
     if (p->speed > 5)
