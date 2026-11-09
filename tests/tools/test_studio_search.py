@@ -11,7 +11,9 @@ import search
 
 ATLAS = {
     'monster:9858': {'id': 'monster:9858', 'kind': 'monster', 'key': '9858', 'title': 'グール', 'jp': 'グール', 'path': 'Bestiary'},
-    'scene:2719': {'id': 'scene:2719', 'kind': 'scene', 'key': '2719', 'title': 'Ghoul corridor', 'path': 'Places'},
+    'scene:2719': {'id': 'scene:2719', 'kind': 'scene', 'key': '2719', 'title': 'Ghoul corridor', 'path': None, 'area': 'area:1'},
+    'area:1': {'id': 'area:1', 'kind': 'area', 'key': '1', 'title': 'Sealed Prison (opening tutorial dungeon)',
+               'location': 'Sealed Prison', 'path': 'Places/Sealed Prison'},
     'actor:F5EB': {'id': 'actor:F5EB', 'kind': 'actor', 'key': 'F5EB', 'title': 'Django', 'fname': 'Player_Create', 'path': 'Objects'},
 }
 CODE = {'categories': [{'name': 'Monsters', 'units': [{'name': 'Ghoul', 'functions': [
@@ -54,6 +56,7 @@ class SearchTests(unittest.TestCase):
     def test_scene_number_and_resource_hashes(self):
         self.assertEqual(search.search('scene 2719')[0]['url'], '/atlas#scene:2719')
         self.assertEqual(search.search('2719')[0]['url'], '/atlas#scene:2719')
+        self.assertEqual(search.search('ghoul corridor')[0]['sub'], 'scene 2719 · Sealed Prison')
         self.assertEqual(search.search('7efb')[0], {'kind': 'map', 'title': 'Map 7EFB', 'sub': 'resource map', 'url': '/gfx#maps/7EFB'})
         self.assertEqual(search.search('081b')[0]['url'], '/gfx#palettes/081B')
 

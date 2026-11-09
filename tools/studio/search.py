@@ -103,7 +103,15 @@ def search(q, strings=None, english=None, limit=50):
             hits.append((s, RANK.get(kind, 0), kind, title, sub, url))
 
     english = english or {}
-    for e in _atlas().values():
+    atlas = _atlas()
+
+    def scene_sub(e):
+        """A scene's number and the place it is in (its area's location)."""
+        a = atlas.get(e.get("area") or "")
+        where = a and (a.get("location") or a.get("title"))
+        return f"scene {e['key']}" + (f" · {where}" if where and where != "Unlabeled areas" else "")
+
+    for e in atlas.values():
         kind = ATLAS_KIND.get(e["kind"], e["kind"])
         names = " ".join(f"{n.get('jp', '')} {n.get('en', '')}" for n in e.get("names") or [])
         title = e.get("title") or e["id"]
@@ -111,8 +119,8 @@ def search(q, strings=None, english=None, limit=50):
             en = english.get(int(e["key"])) or english.get(e["key"])  # their titles are string ids' Japanese
             if en:
                 title, names = en, names + " " + title
-        add(score(q, title, e.get("key"), e.get("jp"), e.get("fname"), names), kind, title,
-            e.get("jp") if e.get("jp") and e.get("jp") != title else e.get("path") or "", "/atlas#" + e["id"])
+        sub = scene_sub(e) if e["kind"] == "scene" else e.get("jp") if e.get("jp") and e.get("jp") != title else e.get("path") or ""
+        add(score(q, title, e.get("key"), e.get("jp"), e.get("fname"), names), kind, title, sub, "/atlas#" + e["id"])
     code = _code()
     if code:
         hexq = re.sub(r"^(0x|sub_)", "", q)
@@ -131,9 +139,9 @@ def search(q, strings=None, english=None, limit=50):
     # a scene by number ("2712", "scene 2712") and a map or palette by its resource hash ("7EFB")
     m = re.fullmatch(r"(?:scene\s*)?(\d{1,5})", q)
     if m:
-        e = _atlas().get(f"scene:{int(m.group(1))}")
+        e = atlas.get(f"scene:{int(m.group(1))}")
         if e:
-            add(95, "scene", e.get("title") or f"Scene {m.group(1)}", f"scene {int(m.group(1))}", "/atlas#" + e["id"])
+            add(95, "scene", e.get("title") or f"Scene {m.group(1)}", scene_sub(e), "/atlas#" + e["id"])
     if re.fullmatch(r"[0-9a-f]{4}", q):
         for label, kind, url in (("map", "map", "/gfx#maps/"), ("t92B3", "palette", "/gfx#palettes/")):
             if any(h == q.upper() for h, _ in _resources().get(label, [])):
