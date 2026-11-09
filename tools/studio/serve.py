@@ -139,7 +139,7 @@ def preload():
     import gclview
     steps = [("atlas index", atlas.load), ("actors", actors.actors),
              ("script procedures", lambda: (actors.proc_list(), gclview.callee_names(), gclview.names())),
-             ("disassembly", actors.code), ("code explorer", codemap_warm), ("ROM map", atlas.rom_tree), ("sprite palettes", learned),
+             ("disassembly", actors.code), ("code explorer", codemap_warm), ("function history", lambda: __import__("codemap").function_history()), ("ROM map", atlas.rom_tree), ("sprite palettes", learned),
              ("stage loads", stages)]
     start = time.time()
     for name, fn in steps:
@@ -491,6 +491,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/codemap/changes":
             import codemap
             self.send(200, codemap.changes())
+        elif self.path.startswith("/api/codemap/fnhistory/"):
+            import codemap
+            self.send(200, codemap.function_history().get(self.path.rsplit("/", 1)[1].upper(), {}))
         elif self.path == "/api/codemap":
             import codemap
             self.send(200, codemap.summary())

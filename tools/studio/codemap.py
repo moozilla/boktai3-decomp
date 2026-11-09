@@ -439,6 +439,33 @@ def _states(blob):
     return out
 
 
+PR = re.compile(r"Merge pull request (#\d+) from [^/]+/(\S+)")
+
+
+def _progress_log(limit=None):
+    """[(hash, time, subject)] of the first-parent commits that changed PROGRESS.json, newest first."""
+    try:
+        log = subprocess.run(["git", "log", "--first-parent", *([f"-{limit}"] if limit else []), "--format=%H %ct %s",
+                              "--", "PROGRESS.json"], cwd=ROOT, capture_output=True, text=True, timeout=30).stdout.splitlines()
+    except (OSError, subprocess.SubprocessError):
+        return []
+    return [(h, int(t), subject) for h, t, subject in (line.split(" ", 2) for line in log if line.count(" ") >= 2)]
+
+
+def _describe(h, subject):
+    """"PR #N (branch)" for a PR merge; a merge of main into a branch is named by the PRs it brought in."""
+    m = PR.match(subject)
+    if m:
+        return f"PR {m.group(1)} ({m.group(2)})"
+    if subject.startswith("Merge "):
+        inner = subprocess.run(["git", "log", "--first-parent", "--format=%s", f"{h}^1..{h}^2"],
+                               cwd=ROOT, capture_output=True, text=True, timeout=30).stdout.splitlines()
+        prs = [f"PR {x.group(1)} ({x.group(2)})" for x in map(PR.match, inner) if x]
+        if prs:
+            return ", ".join(reversed(prs))
+    return subject
+
+
 def changes(limit=12):
     """What each of the last LIMIT updates of PROGRESS.json (first-parent
     history: on main, one per merged PR) changed: [{t, subject, clean: [[name,
@@ -446,12 +473,7 @@ def changes(limit=12):
     functions that became concession-free, concession the ones that gained a
     concession (or went from draft to a match with one), draft the ones that
     stopped matching."""
-    try:
-        log = subprocess.run(["git", "log", "--first-parent", f"-{limit + 1}", "--format=%H %ct %s", "--", "PROGRESS.json"],
-                             cwd=ROOT, capture_output=True, text=True, timeout=30).stdout.splitlines()
-    except (OSError, subprocess.SubprocessError):
-        return []
-    commits = [line.split(" ", 2) for line in log if line]
+    commits = _progress_log(limit + 1)
     if len(commits) < 2:
         return []
     key = commits[0][0] + str(limit)
@@ -462,23 +484,66 @@ def changes(limit=12):
     for (h, t, subject), new, old in zip(commits, states, states[1:]):
         if new is None or old is None:
             continue
-        pr = re.compile(r"Merge pull request (#\d+) from [^/]+/(\S+)")
-        m = pr.match(subject)
-        if m:
-            subject = f"PR {m.group(1)} ({m.group(2)})"
-        elif subject.startswith("Merge "):  # a merge of main into a branch: name the PRs it brought in
-            inner = subprocess.run(["git", "log", "--first-parent", "--format=%s", f"{h}^1..{h}^2"],
-                                   cwd=ROOT, capture_output=True, text=True, timeout=30).stdout.splitlines()
-            prs = [f"PR {x.group(1)} ({x.group(2)})" for x in map(pr.match, inner) if x]
-            if prs:
-                subject = ", ".join(reversed(prs))
-        e = {"commit": h[:9], "t": int(t), "subject": subject,
-             "clean": [], "concession": [], "draft": []}
+        e = {"commit": h[:9], "t": t, "subject": _describe(h, subject), "clean": [], "concession": [], "draft": []}
         for addr, (name, st) in new.items():
             if old.get(addr, (None, None))[1] != st:
                 e[st].append([name, addr])
         out.append(e)
     _INDEX.update(changes=out, changes_of=key)
+    return out
+
+
+def function_history():
+    """{addr: {"matched": [t, subject], "clean": [t, subject]}}: the update of
+    PROGRESS.json (since it was first committed) where each function last
+    started matching and last became concession-free; subject is None for
+    the first PROGRESS.json (it already was by then). Built once per new
+    PROGRESS.json commit (several seconds) and cached in build/cache."""
+    commits = _progress_log()
+    if not commits:
+        return {}
+    key = commits[0][0]
+    if _INDEX.get("fnhist_of") == key:
+        return _INDEX["fnhist"]
+    path = os.path.join(ROOT, "build", "cache", "function_history.json")
+    cached = _read_json(path) if os.path.exists(path) else None
+    if cached and cached.get("head") == key:
+        out = cached["functions"]
+    else:
+        out, prev = {}, {}
+        commits = commits[::-1]  # oldest first
+        for i in range(0, len(commits), 40):  # a batch of blobs at a time keeps memory down
+            chunk = commits[i:i + 40]
+            for (h, t, subject), blob in zip(chunk, _blobs([f"{h}:PROGRESS.json" for h, _, _ in chunk])):
+                st = _states(blob)
+                if st is None:
+                    continue
+                for addr, (name, s) in st.items():
+                    was = prev.get(addr)
+                    if s != was:
+                        e = out.setdefault(addr, {})
+                        if s != "draft" and was in (None, "draft"):
+                            e["matched"] = [t, h]
+                        if s == "clean":
+                            e["clean"] = [t, h]
+                        elif "clean" in e:
+                            del e["clean"]
+                prev = {a: s for a, (_, s) in st.items()}
+        names = {commits[0][0]: None}  # the first PROGRESS.json: "already by then", no PR to name
+        for e in out.values():
+            for k in e:
+                h = e[k][1]
+                if h not in names:
+                    names[h] = _describe(h, next(sub for c, _, sub in commits if c == h))
+                e[k] = [e[k][0], names[h]]
+        try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path + ".tmp", "w") as f:
+                json.dump({"head": key, "functions": out}, f)
+            os.replace(path + ".tmp", path)
+        except OSError:
+            pass
+    _INDEX.update(fnhist=out, fnhist_of=key)
     return out
 
 

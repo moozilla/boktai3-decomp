@@ -315,6 +315,16 @@ function overview() {
       A function can hold more than one kind.</p>` : ''}
   </div>`;
 }
+// when a function started matching and became concession-free (committed PROGRESS.json, tools/studio/codemap.py)
+async function fillFnHistory() {
+  const b = $('fnhist'); if (!b) return;
+  const e = await fetch('/api/codemap/fnhistory/' + b.dataset.addr).then(r => r.json()).catch(() => ({}));
+  if (!b.isConnected) return;
+  const day = t => new Date(t * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const since = ([t, by]) => by ? `since ${by}, ${day(t)}` : `since ${day(t)} or earlier`;
+  const text = e.clean ? 'concession-free ' + since(e.clean) : e.matched ? 'matching ' + since(e.matched) : '';
+  if (text) { b.textContent = text; b.title = (e.matched ? `matching ${since(e.matched)}` : '') + ' (from the committed PROGRESS.json history)'; b.hidden = false; }
+}
 // the last updates of PROGRESS.json: functions that became concession-free, gained one or stopped matching
 async function drawChanges() {
   const box = $('changes'), C = await fetch('/api/codemap/changes').then(r => r.json()).catch(() => []);
@@ -493,7 +503,7 @@ async function functionPage(q) {
     <div class="badges"><span class="badge mono">${d.addr}</span><span class="badge">${d.size} bytes</span>${d.mode ? `<span class="badge">${esc(d.mode)}</span>` : ''}
       ${!f ? '' : f.state === 'asm' ? '<span class="badge" title="tools/progress.py: reviewed SDK assembly ranges">hand-written assembly</span>'
         : f.state === 'draft' ? `<span class="badge warn" title="a NONMATCHING draft; the build uses the INCLUDE_ASM branch">not matched yet${f.pct ? ' · draft at ' + fmtPct(f.pct) : ''}</span>`
-        : '<span class="badge ok">matches</span>' + status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}</div>
+        : '<span class="badge ok">matches</span>' + status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}<span class="badge" id="fnhist" data-addr="${d.addr}" hidden></span></div>
     ${d.notes ? `<p class="lede" style="font-size:14px">${esc(d.notes)}</p>` : ''}
     ${u ? strip(u.functions.map(x => FN[x[1]]), d.addr) : ''}
     <div class="panes">${cPane}${asmPane}</div>
@@ -640,6 +650,7 @@ async function route() {
   v.scrollTop = 0;
   renderTree();
   if (!h) { drawHistory(); drawChanges(); }
+  fillFnHistory();
 }
 $('view').addEventListener('click', e => {
   const tr = e.target.closest('tr.link');

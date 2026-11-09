@@ -217,6 +217,11 @@ class ChangesTests(unittest.TestCase):
                 git('commit', '-q', '-m', msg)
             with patch.object(codemap, 'ROOT', d), patch.dict(codemap._INDEX, clear=True):
                 c = codemap.changes()
+                h = codemap.function_history()
+        self.assertEqual(h['08000001']['matched'][1], None)  # matching already in the first PROGRESS.json
+        self.assertEqual(h['08000001']['clean'][1], 'PR #7 (round-1)')
+        self.assertEqual(h['08000002']['matched'][1], 'PR #7 (round-1)')
+        self.assertNotIn('clean', h['08000002'])
         self.assertEqual(len(c), 1)
         self.assertEqual(c[0]['subject'], 'PR #7 (round-1)')
         self.assertEqual(c[0]['clean'], [['Foo_Init', '08000001']])  # by its C name
