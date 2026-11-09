@@ -1,66 +1,28 @@
-// MATCHING_CONCESSION: register-pinning
 #include "orbit_contact_actor.h"
 extern void (*const gUnk_086059B4[])(struct OrbitContactActor *);
+static inline s32 scaleOrbit(s32 value)
+{
+    if (value >= 0)
+        return value >> 12;
+    return -((-value) >> 12);
+}
 s32 OrbitContactActor_Update(struct OrbitContactActor *actor)
 {
-    struct ContactPosition *position;
-    register struct ContactSwarmSprite *sprite asm("r12");
-    struct ContactSwarmSprite *lowSprite;
-    u32 angle;
-    s32 radius;
-    register const s16 *sine asm("r2");
-    s32 value;
-    s32 x;
-    Callback_InvokeActor(actor, (void *)gUnk_086059B4[actor->state]);
+    gUnk_086059B4[actor->state](actor);
     if (actor->state) {
-        {
-            u32 spriteOffset = 0x9C;
-            lowSprite = (struct ContactSwarmSprite *)(spriteOffset + (u32)actor);
-            sprite = lowSprite;
-        }
-        position = &actor->sprite.position;
-        angle = actor->angle;
-        radius = actor->radius;
-        sine = gUnk_086149C4;
-        value = sine[(angle + 64) & 255] * radius;
-        if (value >= 0)
-            x = value >> 12;
-        else {
-            value = -value;
-            value >>= 12;
-            x = -value;
-        }
-        {
-            u32 zero = 0;
-            position->x = x;
-            position->y = zero;
-        }
-        value = sine[angle] * radius;
-        asm("" : : "r"(x));
-        if (value >= 0)
-            position->z = value >> 12;
-        else
-            position->z = -((-value) >> 12);
+        struct ContactSwarmSprite *sprite = &actor->sprite;
+        struct ContactPosition *position = &actor->sprite.position;
+        u32 angle = actor->angle;
+        s32 radius = actor->radius;
+        position->x = scaleOrbit(gUnk_086149C4[(angle + 64) & 255] * radius);
+        position->y = 0;
+        position->z = scaleOrbit(gUnk_086149C4[angle] * radius);
         {
             struct ContactPosition *destination = &sprite->position;
-            struct ContactPosition *center = &actor->center;
-            register u32 coordinate asm("r0");
-            register struct ContactSwarmSprite *firstSprite asm("r3");
-            u32 delta;
-            register struct ContactSwarmSprite *storeSprite asm("r5");
-            register u32 lastDelta asm("r5");
-            coordinate = (u16)actor->center.x;
-            firstSprite = sprite;
-            delta = (u16)firstSprite->position.x;
-            coordinate += delta;
-            storeSprite = sprite;
-            storeSprite->position.x = coordinate;
-            coordinate = (u16)center->y;
-            delta = (u16)destination->y;
-            destination->y = coordinate + delta;
-            coordinate = (u16)center->z;
-            lastDelta = (u16)destination->z;
-            destination->z = coordinate + lastDelta;
+            const struct ContactPosition *center = &actor->center;
+            sprite->position.x += actor->center.x;
+            destination->y += center->y;
+            destination->z += center->z;
             Collider_SetPosition(&actor->collider, destination, 0);
             Collider_Refresh(&actor->collider);
         }
