@@ -424,7 +424,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             sm = codemap.summary()
             self.send(200, {k: sm[k] for k in ("measures", "concession_kinds", "missing", "updating")} |
                       {"ram": len(sm["ram"]), "functions_with_concessions": sum(
-                          1 for c in sm["categories"] for u in c["units"] for f in u["functions"] if f[4])})
+                          1 for c in sm["categories"] for u in c["units"] for f in u["functions"] if f[4]),
+                       "drafts": sum(1 for c in sm["categories"] if c["name"] != codemap.INTENTIONAL_ASM
+                                     for u in c["units"] for f in u["functions"] if f[3] < 100 and not f[4])})
         elif self.path == "/api/codemap":
             import codemap
             self.send(200, codemap.summary())

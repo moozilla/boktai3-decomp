@@ -569,7 +569,7 @@ const VIEWS = [
   ['Scripts', '/scripts', 'The scene scripts (Konami GCL) in a readable form, with recovered names'],
   ['Sprites', '/gfx#sprites', 'Sprite packages and large sprites, every frame and animation'],
   ['Maps', '/gfx#maps', 'Stages with doors, items, enemies and patrol paths'],
-  ['World', '/world', 'How the rooms connect, area by area'],
+  ['World', '/world', 'How the rooms connect: places, their areas and the doors between them'],
   ['Sound', '/sound', 'Every song, played from the ROM\'s own sequences and samples'],
   ['Live', '/live', 'The game running in mGBA, every sprite and text box matched to its resource'],
   ['ROM', '/rom', 'The whole ROM as a treemap, by kind or by how well it is understood'],
@@ -601,7 +601,7 @@ async function homeStats() {
   if (!el) return;
   if (!s) { el.innerHTML = '<b>—</b><span>code index unavailable</span>'; return; }
   const m = s.measures;
-  el.outerHTML = `<a class="stat" href="/code"><b>${Number(m.total_functions).toLocaleString()}</b><span>functions, all matching</span></a>
+  el.outerHTML = `<a class="stat" href="/code"><b>${Number(m.total_functions - (s.drafts || 0)).toLocaleString()}</b><span>${s.drafts ? `of ${Number(m.total_functions).toLocaleString()} functions matching` : 'functions, all matching'}</span></a>
     <a class="stat" href="/code"><b>${m.complete_code_percent.toFixed(1)}%</b><span>of code without concessions</span></a>`;
 }
 
