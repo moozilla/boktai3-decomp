@@ -1,6 +1,7 @@
 #include "tether_actor.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
 #define TetherActor_GetStatusTag sub_08049F54
 
@@ -747,62 +748,24 @@ void TetherActor_EmitRingEffects(struct TetherActor *actor)
     } while (index <= 7);
 }
 
-union TetherPointPacket {
-    struct ContactPackedVector bits;
-    u32 words[2];
-};
-
-// MATCHING_CONCESSION: register-pinning
 
 void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const void *config)
 {
-    union TetherPointPacket position;
-    const u16 *table;
-    u32 *state;
-    u32 *savedState;
-    register u32 index asm("r3");
-    u32 indexMask;
-    s32 sampleX;
-    s32 sampleZ;
-    s32 sampleY;
-    register u32 jitterMask asm("r9");
-    register u32 upperMask asm("r10");
-    register u32 xy asm("r5");
-    s32 x;
-    register s32 z asm("r1");
-    s32 y;
-    u32 highY;
-    position.bits = *source;
-    table = (const u16 *)RANDOM_TABLE_ADDR;
-    state = &gRandomIndex;
-    savedState = state;
-    index = *state + 1;
-    indexMask = 1023;
-    index &= indexMask;
-    sampleX = table[index];
-    x = (u16)position.bits.x - 15;
-    jitterMask = 31;
-    asm("" : "+r"(jitterMask));
-    x += sampleX & jitterMask;
-    x = (u16)x;
-    upperMask = 0xFFFF0000;
-    xy = (position.words[0] & upperMask) | x;
-    position.words[0] = xy;
-    index = (index + 1) & indexMask;
-    sampleZ = table[index];
-    z = (u16)position.bits.z - 15;
-    z += sampleZ & jitterMask;
-    z = (u16)z;
-    asm volatile("" : "+r"(upperMask) : "r"(z) : "memory");
-    position.words[1] = (position.words[1] & upperMask) | (u16)z;
-    index = (index + 1) & indexMask;
-    *savedState = index;
-    sampleY = table[index];
-    y = ((s32)xy >> 16) - 16;
-    sampleY &= 63;
-    y -= sampleY;
-    highY = (u32)y << 16;
-    position.words[0] = (xy & 0xFFFF) | highY;
+    struct ContactPackedVector position = *source;
+    const u16 *table = gRandomTable;
+    {
+        s32 x;
+        u32 sample = ParticleRandom_ReadDirectSample(table);
+        x = (u16)position.x - 15;
+        position.x = x + (sample & 31);
+    }
+    {
+        s32 z;
+        u32 sample = ParticleRandom_ReadDirectSample(table);
+        z = (u16)position.z - 15;
+        position.z = z + (sample & 31);
+    }
+    position.y = position.y - 16 - (ParticleRandom_ReadDirectSample(table) & 63);
     AnimatedParticles_Create(1, &position, config);
 }
 
@@ -1175,14 +1138,12 @@ static inline u32 NeighborHeight(s32 cell)
 inline static void slopePush_AdjustSlopeMovement(struct TetherActor *actor, s32 octant)
 {
     s32 angle = octant;
-    register const s16 *table asm("r2") = gUnk_086149C4;
+    const s16 *table = gUnk_086149C4;
     s32 cosine;
     s32 sine;
     cosine = table[(angle + 64) & 255];
     sine = table[angle & 255];
-    do {
-        actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
-    } while (0);
+    actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
     actor->movementDelta.z -= scaleOffset(gPlayerBackgroundState * sine);
 }
 
@@ -1542,40 +1503,35 @@ u32 TetherActor_CanStartInteraction(void)
 void TetherActor_StartInteractionEffect(void)
 {
     struct TetherActor *actor = gTetherActor;
-    u32 state;
-    u32 savedState;
     register u32 zero asm("r3");
-    u16 *cooldown;
-    register u32 delay asm("r0");
     if (!actor)
-        goto done;
-    state = actor->state;
-    savedState = state;
-    asm("" : "+r"(savedState));
-    if (savedState == 1) {
+        return;
+    if (actor->state == 1) {
         TetherActor_UpdatePendingEffect(actor);
         {
             u16 *lock = &actor->interactionLock;
             zero = 0;
-            *lock = savedState;
+            *lock = 1;
         }
-        cooldown = &actor->interactionCooldown;
-        delay = 300;
+        actor->interactionCooldown = 300;
     } else {
-        if (savedState != 0 && savedState != 2 && ((u8)(state - 3) > 1 || !actor->chargeReady))
-            goto done;
+        if (actor->state != 0 && actor->state != 2
+            && ((u8)(actor->state - 3) > 1 || !actor->chargeReady))
+            return;
         TetherActor_UpdatePendingEffect(actor);
         TetherActor_SelectInteractionState(actor);
-        cooldown = &actor->interactionCooldown;
-        zero = 0;
-        delay = 600;
+        {
+            u16 *cooldown = &actor->interactionCooldown;
+            u32 delay;
+            zero = 0;
+            delay = 600;
+            *cooldown = delay;
+        }
     }
-    *cooldown = delay;
     actor->effectValue = zero;
     actor->pendingEffectHandle =
         ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig, 1,
                                              zero, &actor->effectValue, 200, 250, 330);
-done:;
 }
 
 u32 TetherActor_IsStateOne(void)
@@ -1806,17 +1762,8 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
             dz = player->position.z - savedActor->directedTarget.z;
         }
         if (dx || dz) {
-            register s32 angle asm("r0") = Math_Atan2(dx, dz);
-            struct TetherActor *target;
-            angle = (angle + 16) & 255;
-            asm("" : "+r"(angle));
-            angle >>= 5;
-            target = gTetherActor;
-            angle = (angle + 7) & 7;
-            {
-                u32 offset = 0x46C;
-                target->directedHeading = angle;
-            }
+            s32 angle = ((Math_Atan2(dx, dz) + 16) & 255) >> 5;
+            gTetherActor->directedHeading = (angle + 7) & 7;
         } else {
             u32 index = (gRandomIndex + 1) & 1023;
             gRandomIndex = index;
@@ -1835,12 +1782,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
                 *heading = sample;
             }
         }
-        {
-            register u8 *target asm("r0") = (u8 *)gTetherActor;
-            u32 offset;
-            offset = 0x46A;
-            *(u16 *)((u8 *)target + offset) = 29;
-        }
+        gTetherActor->directedTimer = 29;
     }
 }
 
@@ -2014,25 +1956,13 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
 
 void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
 {
-    struct {
-        u32 zero;
-        struct DisplayPosition position;
-    } packet;
+    struct DisplayPosition position;
     struct DisplayAnimation *display;
-    u32 zero;
     struct DisplayPosition *initialPosition;
-    u16 *paletteIndex = &actor->paletteIndex;
     u32 value;
-    zero = 0;
-    *paletteIndex = 10;
-    initialPosition = &packet.position;
-    packet.zero = zero;
-    {
-        register u32 *fill asm("r0") = &packet.zero;
-        register struct DisplayPosition *destination asm("r1");
-        destination = initialPosition;
-        CpuSet(fill, destination, 0x5000002);
-    }
+    actor->paletteIndex = 10;
+    initialPosition = &position;
+    ZeroFill8(initialPosition);
     if (actor->kind == 9) {
         display = &actor->display.animation;
         DisplayAnimation_InitializeKeyframes(display, 0x35E3, 0, initialPosition);
@@ -2046,7 +1976,7 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
         asm("" : "+r"(display));
         DisplayAnimation_InitializeSequence(display, 0x2499, 0x3D95, 0, initialPosition);
         TetherActor_SetEntry(actor, 0);
-        actor->appliedPalette = *paletteIndex;
+        actor->appliedPalette = actor->paletteIndex;
         DisplayAnimation_SelectPaletteBank(display, actor->appliedPalette + 0x283);
         if (display->kind == 2)
             palette = actor->display.colors.keyframePalette;

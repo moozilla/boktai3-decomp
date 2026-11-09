@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: alternates side-specific sequences and emits four directional shots per pulse.
 struct Vec {
     s16 x, y, z, pad;
@@ -32,9 +31,12 @@ void Sound_PlaySong(u32);
 void DirectionBurst_Emit(void *, u32, s32, s32);
 s32 sub_08249350(s32, s32) __attribute__((const));
 s32 Callback_InvokeActor(void *, void *);
-static inline s32 RandomAt(const u16 *table, u32 index)
+static inline s32 NextRandom(const u16 *table)
 {
-    return *(const u16 *)((index * 2) + (u32)table);
+    u32 offset;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
+    return *(u16 *)(offset + (u32)table);
 }
 static inline void AddOffset(struct Vec *out, struct Hresvelgr *actor, u32 side, struct Vec *origin)
 {
@@ -62,47 +64,19 @@ void Hresvelgr_UpdateAlternatingVolley(struct Hresvelgr *actor)
     if (actor->pulse) {
         struct Vec pos;
         s32 i;
-        register u32 *index asm("r8");
         AddOffset(&pos, actor, actor->side, &actor->position);
         Sound_PlaySong(0x3e2);
-        index = &gRandomIndex;
-        i = 3;
-        do {
-            register const u16 *table asm("r6") = gRandomTable;
-            register u32 *firstIndex asm("r3") = index;
-            register u32 localIndex asm("r4");
-            s32 random;
-            u32 firstMask;
-            localIndex = *firstIndex;
-            localIndex++;
-            firstMask = 1023;
-            asm("" : "+r"(firstMask));
-            localIndex &= firstMask;
-            *firstIndex = localIndex;
-            random = RandomAt(table, localIndex);
-            {
-                s32 base = saved->side << 6;
-                s32 variation = (sub_08249350(random >> 3, 9) << 4) - 64;
-                register s32 angle asm("r1") = base + variation;
-                register s32 speed asm("r2");
-                s32 duration;
-                angle &= 255;
-                localIndex = (localIndex + 1) & 1023;
-                *index = localIndex;
-                {
-                    s32 sample = RandomAt(table, localIndex) >> 3;
-                    register s32 residue asm("r0") = sample % 16;
-                    speed = residue + 8;
-                }
-                {
-                    register u32 next asm("r0") = localIndex + 1;
-                    next &= 1023;
-                    *index = next;
-                    duration = (RandomAt(table, next) >> 3) % 64 + 96;
-                }
-                DirectionBurst_Emit(&pos, angle, speed, duration);
-            }
-        } while (--i >= 0);
+        for (i = 0; i < 4; i++) {
+            union RandomTableView table = {gRandomTable};
+            s32 random = NextRandom(table.samples);
+            s32 base = saved->side << 6;
+            s32 variation = (sub_08249350(random >> 3, 9) << 4) - 64;
+            s32 angle, speed, duration;
+            angle = (base + variation) & 255;
+            speed = (NextRandom(table.samples) >> 3) % 16 + 8;
+            duration = (NextRandom(table.samples) >> 3) % 64 + 96;
+            DirectionBurst_Emit(&pos, angle, speed, duration);
+        }
         if (gHresvelgrVolleyCount > 15) {
             actor->finished = 1;
             Anim_SetFrameDurationScale(saved->animation, 64);
@@ -112,12 +86,5 @@ void Hresvelgr_UpdateAlternatingVolley(struct Hresvelgr *actor)
             gHresvelgrVolleyCount++;
         }
     }
-    {
-        u32 callbackOffset = 0x104;
-        void **slot;
-        void *callback;
-        slot = (void **)((u8 *)actor + callbackOffset);
-        callback = *slot;
-        Callback_InvokeActor(actor, callback);
-    }
+    Callback_InvokeActor(actor, actor->callback);
 }

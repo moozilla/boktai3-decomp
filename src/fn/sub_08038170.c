@@ -1,7 +1,6 @@
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
-// MATCHING_CONCESSION: register-pinning
 // Tentative panel/save fields for selecting two available entries in each group.
 struct P {
     u8 pad[0x64];
@@ -9,9 +8,9 @@ struct P {
 };
 struct Save {
     u8 pad[0x50];
-    s16 leftSelected, rightSelected, extraSelected;
+    s16 selected[3];
     u8 pad2[0x12];
-    s16 leftRows[16];
+    s16 leftRows[8], extraRows[8];
 };
 struct ItemInfo {
     u8 enabled;
@@ -23,332 +22,95 @@ void Inventory_GetEquippedDescriptor(int, struct ItemInfo *);
 int GameState_GetUnlockEntry(int);
 void GameState_MoveSlotEntry(int, int);
 void SolarFruit_ClearEquippedSlot(int);
-void WirelessGameMenu_InitItemChoices(struct P *input)
+static inline u32 Random_Bits(u32 mask)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return ((u16 *)RANDOM_TABLE_ADDR)[index] & mask;
+}
+void WirelessGameMenu_InitItemChoices(struct P *p)
 {
     struct ItemInfo info;
+    int start, i, n, item, range, other;
     int missing, usable;
-    register struct P *p asm("r10") = input;
-    int start;
-    int i;
     u32 mask;
-    int offset;
-    register int moduloMask asm("r9");
     int count = p->count;
-    int other;
-    register u32 *seed asm("r5");
+
     if (!count || !p->rightCount)
         return;
     i = 0;
     start = count;
-    do {
-        *(s16 *)((u8 *)gGameState + i * 2 + 0x68) = -1;
-        i++;
-    } while (i <= 7);
+    for (; i <= 7; i++)
+        *(gGameState->leftRows + i) = -1;
     start = Mod(gSceneEffectPalettePhase, start);
     missing = 0;
     usable = 0;
     mask = p->leftMask;
     i = 0;
-    {
-        register int t asm("r1") = 15;
-        asm("" : "+r"(t));
-        moduloMask = t;
-    }
-    {
-        register int t asm("r2") = 0;
-        asm("" : "+r"(t));
-        offset = t;
-    }
-    do {
-        int n = start;
-        register struct Save **slot asm("r12");
-        int limit;
-        int index;
-        {
-            struct Save **t = &gGameState;
-            slot = t;
-        }
-        limit = start + 16;
-        if (start < limit) {
-            int item = start;
-            int mod = moduloMask;
-            u32 bit;
-            item &= mod;
-            bit = 1 << item;
-            if (({
-                    u32 available = mask;
-                    available & bit;
-                })) {
-                {
-                    register struct Save **t asm("r2") = slot;
-                    *(s16 *)((u8 *)*t + offset + 0x68) = item;
-                }
-                mask &= ~bit;
-                goto selected16;
-            }
-            while (1) {
-                n++;
-                if (n >= limit)
-                    break;
-                item = n;
-                mod = moduloMask;
-                item &= mod;
-                bit = 1 << item;
-                if (({
-                        u32 available = mask;
-                        available & bit;
-                    })) {
-                    {
-                        register struct Save **t asm("r4") = slot;
-                        *(s16 *)((u8 *)*t + offset + 0x68) = item;
-                    }
-                    mask &= ~bit;
-                    start = n;
-                    break;
-                }
+    range = 15;
+    for (; i <= 1; i++) {
+        for (n = start; n < start + 16; n++) {
+            item = n & range;
+            if (mask & (1 << item)) {
+                *(gGameState->leftRows + i) = item;
+                mask &= ~(1 << item);
+                start = n;
+                break;
             }
         }
-    selected16:
-        if (*(s16 *)((u8 *)gGameState + offset + 0x68) < 0) {
-            int t = 1;
-            missing = t;
-        } else {
+        if (*(gGameState->leftRows + i) < 0)
+            missing = 1;
+        else {
             Inventory_GetEquippedDescriptor(i, &info);
-            if (!info.enabled) {
-                int t = 1;
-                usable = t;
-            }
+            if (!info.enabled)
+                usable = 1;
         }
-        index = (gRandomIndex + 1) & 1023;
-        gRandomIndex = index;
-        {
-            int off = index * 2;
-            register int m asm("r2");
-            off = *(u16 *)((u8 *)gRandomTable + off);
-            m = moduloMask;
-            asm("" : "+r"(m));
-            start += off & m;
-        }
-        {
-            int two = 2;
-            asm("" : "+r"(two));
-            offset += two;
-        }
-        i++;
-    } while (i <= 1);
-    {
-        register struct P *t asm("r1") = p;
-        other = t->rightCount;
+        start += Random_Bits(range);
     }
-    {
-        register struct Save **fallback asm("r12");
-        {
-            register struct Save **t asm("r2") = &gGameState;
-            asm("" : "+r"(t));
-            fallback = t;
-        }
-        seed = &gSceneEffectPalettePhase;
-        if (({
-                register int t asm("r0") = missing;
-                asm("" : "+r"(t));
-                t;
-            }) &&
-            !({
-                int t = usable;
-                t;
-            })) {
-            i = 0;
-            {
-                register struct Save **t asm("r2") = fallback;
-                struct Save *save;
-                s16 *row;
-                save = *t;
-                row = (s16 *)((u8 *)save + 0x68);
-                if (*row < 0)
-                    *row = i;
-                else {
-                    while (1) {
-                        s16 *row;
-                        i++;
-                        if (i > 1)
-                            break;
-                        {
-                            register struct Save **t asm("r1") = fallback;
-                            struct Save *save;
-                            save = *t;
-                            row = (s16 *)(i * 2 + (u32)save + 0x68);
-                        }
-                        if (*row < 0) {
-                            {
-                                u16 zero = 0;
-                                asm("" : "+r"(zero));
-                                *row = zero;
-                            }
-                            break;
-                        }
-                    }
-                }
+    other = p->rightCount;
+    if (missing && !usable) {
+        for (i = 0; i <= 1; i++) {
+            if (*(gGameState->leftRows + i) < 0) {
+                *(gGameState->leftRows + i) = 0;
+                break;
             }
         }
     }
-    i = 0;
-    do {
-        *(s16 *)((u8 *)gGameState + i * 2 + 0x78) = -1;
-        i++;
-    } while (i <= 7);
-    start = Mod(*seed, other);
+    for (i = 0; i <= 7; i++)
+        *(gGameState->extraRows + i) = -1;
+    start = Mod(gSceneEffectPalettePhase, other);
     missing = 0;
     usable = 0;
     mask = p->extraMask;
     i = 0;
-    {
-        register int t asm("r1") = 7;
-        asm("" : "+r"(t));
-        moduloMask = t;
-    }
-    {
-        register int t asm("r2") = 0;
-        asm("" : "+r"(t));
-        offset = t;
-    }
-    do {
-        int n = start;
-        register struct Save **slot asm("r12");
-        register int limit asm("r6");
-        int index;
-        {
-            struct Save **t = &gGameState;
-            slot = t;
-        }
-        limit = start + 8;
-        asm("" : "+r"(limit), "+r"(i));
-        if (start < limit) {
-            int item = start;
-            int mod = moduloMask;
-            u32 bit;
-            item &= mod;
-            bit = 1 << item;
-            if (({
-                    u32 available = mask;
-                    available & bit;
-                })) {
-                {
-                    register struct Save **t asm("r2") = slot;
-                    *(s16 *)((u8 *)*t + offset + 0x78) = item;
-                }
-                mask &= ~bit;
-                goto selected8;
-            }
-            while (1) {
-                n++;
-                if (n >= limit)
-                    break;
-                item = n;
-                mod = moduloMask;
-                item &= mod;
-                bit = 1 << item;
-                if (({
-                        u32 available = mask;
-                        asm("" : "+r"(available)::"r10");
-                        available & bit;
-                    })) {
-                    {
-                        register struct Save **t asm("r4") = slot;
-                        *(s16 *)((u8 *)*t + offset + 0x78) = item;
-                    }
-                    mask &= ~bit;
-                    start = n;
-                    break;
-                }
+    range = 7;
+    for (; i <= 1; i++) {
+        for (n = start; n < start + 8; n++) {
+            item = n & range;
+            if (mask & (1 << item)) {
+                *(gGameState->extraRows + i) = item;
+                mask &= ~(1 << item);
+                start = n;
+                break;
             }
         }
-    selected8: {
-        struct Save **t = &gGameState;
-        s16 *row;
-        row = (s16 *)((u8 *)*t + offset + 0x78);
-        if (*row < 0)
+        if (*(gGameState->extraRows + i) < 0)
             missing = 1;
-        else if (GameState_GetUnlockEntry(*row) == 1) {
-            int t = 1;
-            usable = t;
-        }
+        else if (GameState_GetUnlockEntry(*(gGameState->extraRows + i)) == 1)
+            usable = 1;
+        start += Random_Bits(range);
     }
-        index = (gRandomIndex + 1) & 1023;
-        gRandomIndex = index;
-        {
-            int off = index * 2;
-            register int m asm("r2");
-            off = *(u16 *)((u8 *)gRandomTable + off);
-            m = moduloMask;
-            asm("" : "+r"(m));
-            start += off & m;
-        }
-        {
-            int two = 2;
-            asm("" : "+r"(two));
-            offset += two;
-        }
-        i++;
-    } while (i <= 1);
-    {
-        register struct Save **fallback asm("r12");
-        {
-            struct Save **t = &gGameState;
-            fallback = t;
-        }
-        if (({
-                int t = missing;
-                t;
-            }) &&
-            !({
-                register int t asm("r4") = usable;
-                asm("" : "+r"(t));
-                t;
-            })) {
-            i = 0;
-            {
-                register struct Save **t asm("r1") = fallback;
-                struct Save *save;
-                s16 *row;
-                save = *t;
-                row = (s16 *)((u8 *)save + 0x78);
-                if (*row < 0)
-                    *row = i;
-                else {
-                    while (1) {
-                        s16 *row;
-                        i++;
-                        if (i > 1)
-                            break;
-                        {
-                            register struct Save **t asm("r4") = fallback;
-                            struct Save *save;
-                            save = *t;
-                            row = (s16 *)(i * 2 + (u32)save + 0x78);
-                        }
-                        if (*row < 0) {
-                            {
-                                u16 zero = 0;
-                                asm("" : "+r"(zero));
-                                *row = zero;
-                            }
-                            break;
-                        }
-                    }
-                }
+    if (missing && !usable) {
+        for (i = 0; i <= 1; i++) {
+            if (*(gGameState->extraRows + i) < 0) {
+                *(gGameState->extraRows + i) = 0;
+                break;
             }
         }
-        {
-            register struct Save **t asm("r4") = fallback;
-            (*t)->leftSelected = 0;
-        }
     }
-    asm("" ::: "r1");
+    *gGameState->selected = 0;
     GameState_MoveSlotEntry(0, 0);
-    i = 1;
-    do {
+    for (i = 1; i <= 7; i++)
         SolarFruit_ClearEquippedSlot(i);
-        i++;
-    } while (i <= 7);
-    gGameState->extraSelected = 0;
+    gGameState->selected[2] = 0;
 }

@@ -1,16 +1,12 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
-void ContactActor_UpdateTracking(struct ContactActorPool *poolInput, struct ContactActor *slotInput,
-                                 s32 indexInput)
+static inline struct ContactPosition *ContactActor_GetPosition(struct ContactActor *slot)
 {
-    register struct ContactActorPool *pool asm("r8") = poolInput;
-    s32 index;
-    register struct ContactActor *slot asm("r4");
-    struct ContactPosition *position;
-    s32 targetIndex;
-    slot = slotInput;
-    index = indexInput;
+    return &slot->position;
+}
+void ContactActor_UpdateTracking(struct ContactActorPool *pool, struct ContactActor *slot,
+                                 s32 index)
+{
     if (slot->enter) {
         slot->enter = 0;
         {
@@ -21,114 +17,60 @@ void ContactActor_UpdateTracking(struct ContactActorPool *poolInput, struct Cont
             Collider_SetPosition(collider, &slot->position, 0);
         }
     }
-    {
-        register const struct ContactActorPool *current asm("r1") = pool;
-        if (current->clearRequested) {
-            {
-                u32 state = 6;
-                u32 zero;
-                zero = 0;
-                slot->state = state;
-                slot->enter = 1;
-                slot->stateFrame = zero;
-                goto done;
-            }
-        }
+    if (pool->clearRequested) {
+        u32 state = 6;
+        u32 frame = 0;
+        slot->state = state;
+        slot->enter = 1;
+        slot->stateFrame = frame;
+        return;
     }
-    {
-        s8 *field = &slot->targetIndex;
-        targetIndex = *field;
-    }
-    position = &slot->position;
-    if (targetIndex >= 0) {
-        const struct ContactPosition *target;
-        s32 dx, dz;
-        u32 frame = slot->stateFrame;
-        u32 phase;
-        register s32 secondIndex asm("r2");
-        s32 savedIndex;
-        const struct ContactPosition **targets;
-        phase = 7;
-        phase &= frame;
-        secondIndex = slot->targetIndex;
-        savedIndex = secondIndex;
-        targets = pool->targets;
+    if (slot->targetIndex >= 0) {
+        u32 phase = slot->stateFrame & 7;
         if (!phase) {
-            register s32 distanceX asm("r2");
-            s32 distanceZ;
-            {
-                const struct ContactPosition **address = &targets[secondIndex];
-                target = *address;
-                distanceX = target->x;
-                asm("" : "+r"(address), "+r"(distanceX));
-            }
-            distanceX -= slot->position.x;
-            distanceZ = target->z;
-            distanceZ -= position->z;
-            if (distanceX * distanceX + distanceZ * distanceZ > 0x22E24) {
+            const struct ContactPosition *target;
+            s32 dx, dz;
+            target = pool->targets[slot->targetIndex];
+            dx = target->x - slot->position.x;
+            dz = target->z - ContactActor_GetPosition(slot)->z;
+            if (dx * dx + dz * dz > 0x22E24) {
                 slot->state = 1;
                 slot->enter = 1;
                 slot->stateFrame = phase;
-                goto done;
+                return;
             }
         }
         {
-            const struct ContactPosition **address = &targets[savedIndex];
-            const struct ContactPosition *secondTarget;
-            secondTarget = *address;
-            dx = secondTarget->x - slot->position.x;
-            dz = secondTarget->z - position->z;
-            slot->direction = Math_Atan2(dx, dz);
+            const struct ContactPosition *target = pool->targets[slot->targetIndex];
+            slot->direction = Math_Atan2(target->x - slot->position.x,
+                                         target->z - ContactActor_GetPosition(slot)->z);
         }
     }
-    Collider_SetPosition(&slot->healthCollider, position, 0);
+    Collider_SetPosition(&slot->healthCollider, &slot->position, 0);
     ContactActor_SetDirectionalSequence(pool, slot, 0);
     if (slot->stateFrame > 63) {
         u32 state = 4;
-        u32 zero;
-        zero = 0;
+        u32 frame = 0;
         slot->state = state;
         slot->enter = 1;
-        slot->stateFrame = zero;
+        slot->stateFrame = frame;
     }
-    {
-        register u32 timer asm("r0") = slot->retargetTimer;
-        if (timer) {
-            register u32 remaining asm("r1");
-            register u32 mode asm("r0");
-            timer--;
-            slot->retargetTimer = timer;
-            timer <<= 24;
-            remaining = timer >> 24;
-            if (!remaining) {
-                {
-                    const struct ContactActorPool *current = pool;
-                    mode = current->mode;
-                    asm("" : "+r"(current), "+r"(mode) : : "r2", "r3", "r5", "r6");
-                }
-                if (mode == 2) {
-                    {
-                        s32 slotIndex = index;
-                        if (slotIndex > 7)
-                            goto zeroTarget;
-                    }
-                    mode = 1;
-                    goto storeTarget;
-                }
-                if (mode != 1)
-                    goto minusTarget;
-            zeroTarget:
+    if (slot->retargetTimer) {
+        u32 remaining = (u8)--slot->retargetTimer;
+        if (!remaining) {
+            u32 mode = pool->mode;
+            if (mode == 2) {
+                if (index > 7)
+                    slot->targetIndex = remaining;
+                else
+                    slot->targetIndex = 1;
+            } else if (mode == 1)
                 slot->targetIndex = remaining;
-                goto incrementFrame;
-            minusTarget:
+            else {
                 mode = 255;
-            storeTarget:
                 slot->targetIndex = mode;
-                goto incrementFrame;
             }
         }
     }
-incrementFrame:
     slot->stateFrame++;
-done:;
 }
