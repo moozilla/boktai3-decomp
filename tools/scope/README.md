@@ -1704,6 +1704,26 @@ Each was read from the compiler source and confirmed on a live draft.
    way to test this lever. A bare `*flags |= 12` loads the 12 before the `ldr`; the
    `mask` local loads it after.
 
+86. **A count copied into a second register before a down-counting do-while (`ldrh r2, [count];
+   cmp r2, #0; beq; ... adds r1, r2, #0; loop: ... subs r1, #1; bne`) is loop.c reversing
+   `for (i = 0; i < gCount; i++)`.** sub_0821537C's draft wrote the shape the ROM shows
+   (`n = gQueuedObjSlotCount; if (n) { i = n; do ... while (--i); }`) and needed a barrier.
+   Without the barrier, global-alloc ranked the three hoisted global addresses differently:
+   `&gDynamicTileSum` took r7, where the ROM has it in ip. The plain count-up loop
+   (`for (i = 0; i < gQueuedObjSlotCount; i++)` with `DmaCopy32(3, src, dest, bytes)` inside)
+   matches. The entry test and the count copy come from the reversal, which leaves the address
+   pseudos with the ROM's lives. Together with fact 84: a down counter that the body never reads
+   is usually a count-up `for` in the source.
+
+87. **cse puts an operand known to equal a constant second in a commutative op.** In
+   GameState_SelectRamBase, `u8 *base = gGameStateStorage; base += (timer & 127) * 8;` becomes
+   `(plus off base)` in cse1, because base is equivalent to the symbol. The add prints as
+   `adds r1, r0, r1`; the ROM has `adds r1, r1, r0`, and only a hard-register pin of base
+   (which cse doesn't track) gives the ROM order. Writing the symbol straight into the sum
+   (`gGameStateStorage + off`) moves the literal load late instead. When an `adds rD, rA, rB`
+   has its operands swapped and one of them was set from a constant (a symbol address), this
+   is the swap. The C still has to keep base out of the constant's equivalence (open).
+
 90. **In a two-value block, local-alloc goes by priority; a pointer variable set in each arm leaves
    the value alone in the block.** An arm `UpdateFn callback = F; p->update = callback;` at offset
    0x1A4 holds two local qtys: the callback (load, add, store: life 4, priority 5000) and the
