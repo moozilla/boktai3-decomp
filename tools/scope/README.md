@@ -1612,6 +1612,16 @@ Each was read from the compiler source and confirmed on a live draft.
    pseudo left without a register, so reload loads the table at its use and the reload rotation
    moves one step.
 
+91. **A statement after a join, written again at the end of each arm, adds refs that jump2 later
+   removes.** flow counts refs and live length before jump2 cross-jumps identical tails (fact 27), so
+   `if (c) { ...; entry = a->data + a->frame; } else { ...; entry = a->data + a->frame; }` compiles to
+   the same code as one copy after the if, but `a` gets two more refs. In
+   EffectParticle_UpdateDissipating that lifted the anim pointer `a` (24 refs, live 150, 6400) over
+   the particle `p` (40 refs, live 306, 6535), which had taken r4 first. Duplicate only what the
+   priority needs: the rate line that reads `entry` stayed after the join, since copying it too
+   raised `entry` over `o` and swapped those two. `why` now lists such statements among the ways to
+   flip an order (join_lever in scope.py).
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
