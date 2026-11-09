@@ -692,3 +692,19 @@ The ROM needs a table pseudo that cse never sees as constant in the first sample
 the preheader, and that gcse does not treat as redundant for the later samples.
 Next: a matchsearch store over where the table is set and what type it has (symbol vs integer
 address, the 512 offset applied at the call site or in the helper).
+
+### Hresvelgr_UpdateTurningCharge (src/fn/sub_0819FC34.c, 0819FC34): deferred
+
+Pin: `register u8 *address asm("r1")` in the SetFlags helper, which ORs a mask into `flags` (+0x9c).
+It is used twice: unconditionally after the `pending` block, and again under `PlayerCanMove` in case 0.
+Draft: `notes/phase3-drafts/monsters-bosses/Hresvelgr_UpdateTurningCharge.c` (`p->flags |= mask;`),
+16 ROM / 14 draft. The only difference is gcse's PRE: expression `(plus actor 156)` is fully redundant
+at the second site, so the second site becomes a copy of the first (`adds r7, r4, #0` inserted before
+the callback test), and the first address lives in r4 rather than r1. `scope.py pre`:
+`AGBCC_NOPRE=1` gives an exact MATCH. The ROM computes `actor + 0x9c` again at both sites.
+The offset is below 256, so fact 55's body/inline split (`(plus p (reg K))` against
+`(plus p (const_int K))`) does not apply. Every spelling reaches gcse as the same expression:
+a local address that is set twice, `q = p` inside the inline, a `u32` cast, `OrFlags(mask, &p->flags)`, and value/mask locals.
+cse and cprop fold the copies back to `actor`. Next: find a base the original might have used
+that gcse sees as another operand at one site (a multi-set pointer, or a pointer from a call
+or a load), or show that actor is reassigned in the original.
