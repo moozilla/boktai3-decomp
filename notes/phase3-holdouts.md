@@ -835,3 +835,16 @@ a local address that is set twice, `q = p` inside the inline, a `u32` cast, `OrF
 cse and cprop fold the copies back to `actor`. Next: find a base the original might have used
 that gcse sees as another operand at one site (a multi-set pointer, or a pointer from a call
 or a load), or show that actor is reassigned in the original.
+
+### Hresvelgr_PlayDescent (src/fn/sub_081A09C4.c, 081A09C4): deferred
+
+Concession: `asm("" : "+r"(actor))` right after `actor = p`. The ROM keeps both: p in r7 (used
+only by the last `Hresvelgr_RefreshTarget(p)`), the copy actor in r6 for the body, tick in r8.
+Draft without the barrier: `notes/phase3-drafts/monsters-bosses/Hresvelgr_PlayDescent.c`
+(11 ROM / 5 draft). cse merges actor into p (fact 4): p's last use is the else-if call, after
+every use of actor in insn order, so actor never becomes the class head. This is the same family as
+Trigger_RunScript's actor copy (field-effects). Tried: the body as an inline taking the actor
+(`Descend(p)` returning whether it landed, or a void inline with `actor = p` inside), and a
+loop-scoped copy. None keeps two registers. Next: find a form where the copy's uses
+sit in a cse block that the copy does not reach and cprop leaves alone (cprop propagates a copy
+that dominates its uses), or a reason the original's p was not a plain pseudo.
