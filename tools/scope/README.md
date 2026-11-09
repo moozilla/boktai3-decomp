@@ -1691,6 +1691,19 @@ Each was read from the compiler source and confirmed on a live draft.
    gets no register and is rematerialized at each use), and the function matches with no pins.
    When the ROM sets a countdown counter after the loop's hoisted values, try the count-up loop.
 
+85. **Take a field's address before the statements that name the other pointer, so a copy
+   `q = p` stays out of the class head.** make_regs_eqv (fact 4) compares last mentions in
+   reg_scan's insn order. Hresvelgr_UpdateRisingProjectile copies `saved = actor`; the ROM keeps
+   actor (r6) for the motion stores and saved (r7) for the final `flags |= 12`, so saved's
+   mention came last and cse1 made it head (`CSE_NOCANON=23` matched). The tail
+   `{ u32 *flags = &saved->flags; actor->motion[0..3] = 0; { u32 mask = 12; *flags |= mask; } }`
+   mentions saved before the motion stores, which leaves actor as head. The RMW still runs last,
+   and gcse's PRE still turns the address into the copy of case 1's address. Neither the dead
+   trailing mentions tried (an unused local, an inline's ignored return value) nor returning
+   the value changes reg_scan's order. `return actor;` matches up to one `adds r0` and is a quick
+   way to test this lever. A bare `*flags |= 12` loads the 12 before the `ldr`; the
+   `mask` local loads it after.
+
 90. **In a two-value block, local-alloc goes by priority; a pointer variable set in each arm leaves
    the value alone in the block.** An arm `UpdateFn callback = F; p->update = callback;` at offset
    0x1A4 holds two local qtys: the callback (load, add, store: life 4, priority 5000) and the

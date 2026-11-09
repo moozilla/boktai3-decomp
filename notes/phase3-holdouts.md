@@ -862,21 +862,6 @@ the mask (the ROM shares the 0x2f0 constant between `&actor->action` and the mas
 through SetCollisionMask. None changes it. Next: find a pseudo live in case 1's random block
 that prefers sl, or a reason the mask is live after the switch in the original.
 
-### Hresvelgr_UpdateRisingProjectile (src/fn/sub_081A12DC.c, 081A12DC): deferred
-
-Pin: `register u8 *direction asm("r5")` (SetHeading returns `&p->direction4`, which is read again for
-the projectile argument). Best pin-free draft: `notes/phase3-drafts/monsters-bosses/Hresvelgr_UpdateRisingProjectile.c`
-(SetHeading returns void; the argument reads `actor->direction4`): 38 ROM / 40 draft, and
-`CSE_NOCANON=23` gives an exact MATCH. cse1 makes the copy `saved` (pseudo 23) the class head over
-the parameter `actor`, because saved's last mention (the final `saved->flags |= 12`, which the ROM
-also does through saved: gcse's PRE copy in r4) comes after actor's last mention (the motion
-stores). The ROM's register use requires actor to stay head. Other forms tried: a pointer variable
-for the direction (set before or after SetHeading, inside the inline, through `u8 **`), the final
-flags through actor (37/27, saved then ranks below action), and a dead trailing mention of actor
-through an inline's ignored return value (not expanded). Next: find a form where actor's last mention
-in reg_scan comes after the flags RMW with no code, or where `saved` is not a copy that cse1 sees
-at line 88. This is the same family as Hresvelgr_PlayDescent and Trigger_RunScript.
-
 ### sub_081A14FC (src/fn/sub_081A14FC.c, 081A14FC, 1764 bytes): deferred
 
 Pins: `table` in r6, `sampleY` in r3 and `rawY` in r0 in case 1's random spray, plus an
