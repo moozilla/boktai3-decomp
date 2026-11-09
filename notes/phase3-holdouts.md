@@ -1025,3 +1025,13 @@ Tried, all with the same result:
 - `= gGameStateStorage + off` and `&arr[off]` (worse: the base load moves late)
 - `u32` arithmetic, `off + base`, `<< 3`, `% 128`, an offset local
 Next: a first set of base that is not a constant equivalence, or a form cse leaves in order.
+
+### Hresvelgr_EmitFacingMotion (src/fn/sub_0819BCB8.c, 0819BCB8): deferred
+
+Pins: `quotient` in r1 with a barrier, and `angle` in r3 inside `Polar`.
+`Polar` is shared with MotionPolar's users, and `Add` with Hresvelgr_SetPartApproachMotion.
+Draft: `notes/phase3-drafts/monsters-bosses/Hresvelgr_EmitFacingMotion.c` (the pin-free landed form, 48 ROM / 43 draft).
+A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`, `Add`, `% 4`.
+The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
+and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
+Not worked on further this session.
