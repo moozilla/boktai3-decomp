@@ -1703,6 +1703,39 @@ Each was read from the compiler source and confirmed on a live draft.
    LO_REGS: in the draft cse2 had turned that hoisted add into a copy of `amplitude = &p->amplitude`.
    `AGBCC_REGCLASS=1` and `AGBCC_REGCLASS_TRACE=N` show the votes.
 
+100. **A label before a constant load stops move2add from deriving it from a known register; a
+   then-arm with its own exit makes that label.** reload's move2add rewrites `movs r0, #K` as
+   `subs r0, #d` when r0 is known to hold K + d, but only after the last label. In
+   TextState_MeasureTextColumns, `if (code != 0xFFFF) { if (code & 0xFF00) ... }` falls straight
+   from `ldr r0, =0xFFFF; cmp` into the mask test and gives `subs r0, #0xff`. Written as
+   `if (code == 0xFFFF) { n++; goto next; }` followed by the mask test, the test starts after the
+   if's end label, and the ROM's `movs r0, #0xff; lsls r0, #8` comes back. Then
+   `if ((u16)(code & 0xFF00))` gave its two copies (the mask into r1, code into r0, `ands r0, r1`),
+   where `if (code & 0xFF00)` ties the and to the constant.
+
+101. **Tails cross-jumped into code before a label end on a new label that has no jump chain,
+   so they don't merge with each other; a jump to an existing user label lets them merge.**
+   jump2's cross-jumping first matches an unconditional jump's tail against the code just before
+   its target label (a 1-insn minimum). When that succeeds, do_cross_jump reuses the label right
+   before the matched code, or creates a new one. Later passes look for other jumps to the same
+   label only when `INSN_UID (label) < max_uid`, so jumps to a label created in this pass are
+   never compared. With a user label, the next pass compares `movs r0, #2; b L` against another
+   `movs r0, #2; b L`. That is only one insn, but the jump-around rule (the insn before is a
+   conditional jump around this one) lowers the minimum, and they merge. TextState_ProcessTag
+   went from 21 to 3 differing insns once each arm got its own `p->palette = N;
+   end = Text_FindChar(...)` and `goto done` instead of `paletteValue = N; goto palette;`.
+   `AGBCC_CROSS_TRACE=1` lists every merge (`jump J target T: share A with B`).
+
+102. **expand_end_loop rotates the loop's first part, through the last `break` it finds, to the
+   bottom; a `return` is not a loop exit, so it marks where rotation stops.** It scans from the
+   loop top and records each conditional jump to the loop's end label, stopping 30 counted insns
+   after the first one; everything up to the last recorded exit moves to the bottom test (calls
+   don't count). In TextState_RenderNextGlyph, `while (1) { classify; if (c == '<') { s++;
+   if (!*s) break; s = TextState_ProcessTag(p, s); if (p->padE) break; ... } }` rotated the
+   tag call to the bottom too. Writing the later exits as `return s;` kept the ROM's split: the
+   bottom test is only the classification, and the tag, plain and wide code follow in source order.
+   The old draft needed gotos and three memory barriers for the same layout.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
