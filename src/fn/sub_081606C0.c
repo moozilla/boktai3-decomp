@@ -1,6 +1,5 @@
 #include "global.h"
-#include "display_animation.h"
-#include "display_sequence_inline.h"
+#include "display_sequence_sprite.h"
 
 // Allocate an attack particle and initialize its sequence when requested.
 #define PlayerAttackEffect_AllocateParticle sub_081606C0
@@ -27,69 +26,6 @@ struct AttackParticleEffect {
 s32 Math_Atan2(s32, s32);
 void Sprite_ApplyAnimation(struct DisplaySequenceSprite *, const u8 *);
 u32 Anim_RestartSequence(u8 *, u32, u16, u8, u8);
-static inline u32 AdvanceParticleSequence(struct DisplaySequenceSprite *sprite,
-                                          struct DisplaySequenceState *frames)
-{
-    struct DisplaySequenceState *state = frames;
-    const u16 *command;
-    u32 ended;
-    command = state->commands + state->index;
-    sprite->frame = *command >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-    if (++state->elapsed >= state->duration) {
-        state->elapsed = 0;
-        if (state->flags & 4) {
-            if (state->index == 0) {
-                if (state->flags & 8)
-                    state->elapsed = state->duration;
-                else
-                    state->index = state->frameCount - 1;
-                ended = 1;
-            } else {
-                state->index--;
-                ended = 0;
-            }
-        } else if (++state->index >= state->frameCount) {
-            if ((u8)(state->flags & 8)) {
-                state->elapsed = state->duration;
-                state->index = state->frameCount - 1;
-                ended = 1;
-            } else {
-                state->index = 0;
-                ended = 1;
-            }
-        } else
-            ended = 0;
-        command = state->commands + state->index;
-        DisplaySequence_UpdateWeight(state, command);
-        if (!state->duration)
-            state->duration = 1;
-    } else
-        ended = 0;
-    return ended;
-}
-
 s32 PlayerAttackEffect_AllocateParticle(struct AttackParticleEffect *effect,
                                         struct ContactPosition *position, s32 lifetime,
                                         void *animation, s32 sequence, s32 mode)
@@ -119,7 +55,7 @@ s32 PlayerAttackEffect_AllocateParticle(struct AttackParticleEffect *effect,
             if (mode == 1) {
                 Anim_RestartSequence((u8 *)state, (u32)effect->sequenceResource, (u16)sequence, 0,
                                      0);
-                AdvanceParticleSequence(&effect->sprites[i], state);
+                DisplaySequence_StepSprite(&effect->sprites[i], state);
             }
             return 1;
         }
