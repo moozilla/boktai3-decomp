@@ -1762,17 +1762,8 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
             dz = player->position.z - savedActor->directedTarget.z;
         }
         if (dx || dz) {
-            register s32 angle asm("r0") = Math_Atan2(dx, dz);
-            struct TetherActor *target;
-            angle = (angle + 16) & 255;
-            asm("" : "+r"(angle));
-            angle >>= 5;
-            target = gTetherActor;
-            angle = (angle + 7) & 7;
-            {
-                u32 offset = 0x46C;
-                target->directedHeading = angle;
-            }
+            s32 angle = ((Math_Atan2(dx, dz) + 16) & 255) >> 5;
+            gTetherActor->directedHeading = (angle + 7) & 7;
         } else {
             u32 index = (gRandomIndex + 1) & 1023;
             gRandomIndex = index;
@@ -1791,12 +1782,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
                 *heading = sample;
             }
         }
-        {
-            register u8 *target asm("r0") = (u8 *)gTetherActor;
-            u32 offset;
-            offset = 0x46A;
-            *(u16 *)((u8 *)target + offset) = 29;
-        }
+        gTetherActor->directedTimer = 29;
     }
 }
 
