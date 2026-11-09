@@ -1,7 +1,10 @@
 # Phase 3 holdouts
 
-One section per worker. Each entry: the best pin-free draft, what blocks it, the knob that
-matches (when one does) and the next idea.
+Tags: #matching #phase3 #holdouts
+
+One section per worker. Each row: the function, its best pin-free draft (a snippet to
+`scope.py FILE.c put`), the differing instructions, the mechanism and the knob that matches,
+what was tried, and the next idea.
 
 ## field-effects
 
@@ -31,12 +34,6 @@ cell r6, type r7, direction r8; the draft gives mask r8 (pri 1875, 6 refs / 64),
 line 773 remain. The draft still has statement expressions and plain `register` locals from the
 pinned form; strip them once the shape is right. The ROM's dead `subs r0, r7, #1` tail comes from
 `type == 1 || type == 2` with both arms returning 0 (fact 57-style cross-jump).
-
-Tags: #matching #phase3 #holdouts
-
-One section per worker. Each row: the function, its best pin-free draft (a snippet to
-`scope.py FILE.c put`), the differing instructions, the mechanism and the knob that matches,
-what was tried, and the next idea.
 
 ### Trigger_RunScript (src/item_container.c, 08006F00): deferred
 
