@@ -521,6 +521,20 @@ Not drafted separately: its kind switch ends in the same shared Memory_Clear tai
 (cases 0, 1 and case 2's state 1 jump to case 3 state 2's `movs r1, #0x80`; case 3's state 1
 keeps `adds r1, #0xff`). The front half (the bursts) is ordinary. Do it after LaunchArc.
 
+### ContactActor_UpdateRetreat (src/fn/sub_0804373C.c, 0804373C): deferred
+
+Draft: `notes/phase3-drafts/actors/ContactActor_UpdateRetreat.c` (the pinned file with its pins
+and the asm volatile removed; 104 ROM / 99 draft). The blocker is the ROM's dead
+`ldr r3, =0x0403B714; mov r8, r3` right before the enter block's first random draw. The pinned
+file forces it with an asm volatile. The same dead literal sits just before a random draw in 48
+functions in build/asm (ActorParticles_SpawnBurst, sub_08012B34, Axe_FollowAcceleratingRoute,
+...), so it comes from the original random macro or inline, not from this function. Scope README
+fact 94 has the only known mechanism: a constant set whose use combine folds through
+nonzero_bits after flow. Here the pseudo crosses calls (r8), so its folded use sits after
+Math_Atan2. Without the literal the frame grows a spill slot (sp #0xc) and center moves from sl
+to r8. Next: recover the random macro from one of the 48 (a short one such as
+SceneSteeringActor_EmitRandomParticle), then reuse it here.
+
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 
 ### SceneGrid_ScanColumns (src/fn/sub_0806E7CC.c, 0806E7CC): deferred
