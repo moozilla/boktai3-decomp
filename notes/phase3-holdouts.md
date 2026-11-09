@@ -1,7 +1,10 @@
 # Phase 3 holdouts
 
-One section per worker. Each entry: the best pin-free draft, what blocks it, the knob that
-matches (when one does) and the next idea.
+Tags: #matching #phase3 #holdouts
+
+One section per worker. Each row: the function, its best pin-free draft (a snippet to
+`scope.py FILE.c put`), the differing instructions, the mechanism and the knob that matches,
+what was tried, and the next idea.
 
 ## field-effects
 
@@ -32,11 +35,57 @@ line 773 remain. The draft still has statement expressions and plain `register` 
 pinned form; strip them once the shape is right. The ROM's dead `subs r0, r7, #1` tail comes from
 `type == 1 || type == 2` with both arms returning 0 (fact 57-style cross-jump).
 
-Tags: #matching #phase3 #holdouts
+### Trigger_RunScript (src/item_container.c, 08006F00): deferred
 
-One section per worker. Each row: the function, its best pin-free draft (a snippet to
-`scope.py FILE.c put`), the differing instructions, the mechanism and the knob that matches,
-what was tried, and the next idea.
+Draft: `notes/phase3-drafts/field-effects/Trigger_RunScript.c` (11 ROM / 9 draft, two mechanisms).
+1. The ROM keeps two copies of the actor index: `ldrsb r1` (compared with -1), `adds r2, r1` (the
+   table index) and `adds r5, r2` (saved for values[8]). cse merges the draft's `index = actor` into
+   actor (make_regs_eqv: index does not live past the extended block, which runs to cuid 73 with
+   jump following), so the draft has one register. A copy survives only if the new register
+   becomes the class head (its last use past the block end, or its first mention before the block
+   start), which none of the spellings tried gives: s8/u8/s16 actor, an inline `PlayerMask`, a
+   nested `if (actor != -1)` form, separate `index` and `savedActor` blocks. `CSE_KEEP`/
+   `CSE_NOCANON` on the pseudos change nothing (the head test fails before them).
+2. `&args` must be a pointer variable set before `source = p->arguments` and allocated before
+   `out`, so it takes r2. With 3 refs over 22 insns its priority (1363) is below out's (3000):
+   `AGBCC_PRI=argsPtr:+2000` fixes it. Routing the count's word RMW through the pointer gives it 5
+   refs and fixes the allocation, but the ROM does that RMW through sp (`ldr r0, [sp, #0x28]`).
+Next idea: find refs for argsPtr that cse later folds back to sp, or the label/loop structure
+that ends cse's block between the actor copy and its uses.
+
+### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): deferred
+
+Draft: `notes/phase3-drafts/field-effects/DirectionalController_CheckRemaining.c` (41 ROM / 43
+draft). In the ROM, Math_Atan2's result stays in hard r0 from the call to the `bne` that jumps
+straight to the epilogue, and every local temp in between (the u16 copy, the field loads, the
+facing tests) uses r1-r5. local-alloc avoids r0 only when hard r0 is live across those blocks,
+which the C gets only from the pin (`register s32 angle asm("r0")`): a pseudo for angle crosses
+several blocks, so it is global, and local-alloc has already put temps in r0 by the time global
+runs. `AGBCC_FORCE=angle:0` does not help (the temps clobber it). The ROM's `adds r1, r0` then
+in-place `lsls r1, r1, #16` also says the narrowing reads a copy that combine left alone, which
+is what a copy straight from the hard return register gives. Spellings tried: plain
+`(u16)angle`, a `u16 heading` local, an assignment inside the expression. Next idea: a form in
+which the RTL keeps the call's hard r0 as the returned value (no pseudo between the call and the
+return), for example the call's result returned through an inline whose result the caller
+returns, or a matched relative with the same "return the angle when facing" shape.
+
+### EffectManager_UpdateAll (src/homing_effect.c, 0800A8E4): deferred, one insn from a match
+
+Draft: `notes/phase3-drafts/field-effects/EffectManager_UpdateAll.c` (1 ROM / 1 draft: one
+instruction in another place). Diagnosis: the 0x148 stride for `view` and `p` is not a register
+in the ROM. `AGBCC_NOREG=<the stride pseudo>` on the depin draft (two explicit `view++; p++;`)
+gives an exact match: reload loads 0x148 for the first add, the second add inherits it, and the
+reload rotation then gives the ROM's r2 for -1 and r0 for i. In plain C, cse1 merges the two
+`(set (reg) (const_int 328))` that the addsi3 expander makes. The constant stays two
+single-use pseudos (which combine folds back into each add, so reload loads it) only when one
+increment is loop.c's: `view = p;` at the top of the body makes view a giv of p, and its reduced
+increment lands before `p++` as in the ROM. What is left is the giv's initialization: loop.c
+emits it just before NOTE_INSN_LOOP_BEG, after `i = 5`, and the ROM has `mov r7, r8` before
+`movs r2, #5`. A reversed up-counter (`for (i = 0; i < 6; i++)`) does not help: check_dbra_loop
+reverses it in pass 1 before the giv is reduced, so its `i = 5` comes first again. Making view a
+giv of i (`view = &manager->effects[i]`) delays the reversal to pass 2 and fixes the init order,
+but then the giv's increment lands before i's increment, after `p++`. Next idea: a counter that
+check_dbra_loop can only reverse in pass 2 while view stays a giv of p.
 
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
@@ -362,3 +411,117 @@ insertion before rangeB, raising or lowering the constants' priorities (AGBCC_PR
 Next: a first set without a note that ends up in sl alone. That could be the relative
 SceneActorReaction_BeginDefeatBurst's union reuse, if the ROM allows one more sl use, or
 another rangeB write form that keeps the masks out of cse.
+
+### Lun_HandlePlayerContact (src/fn/sub_0809AE0C.c, 0809AE0C): deferred
+
+The landed version uses two do/while(0) statement macros (LUN_FINISH_SPEED_CONTACT is used once).
+The ROM keeps two dead reads of `context->flags3D4 & phase` (`ldr; ldr; ands r0, r7` with the
+result unused) before each Lun_ApplyContactFlag, and Apply's mask is a fresh `movs r2, #2`.
+Drafts: `Lun_HandlePlayerContact.c` (no macros, `if (Lun_ReadContextFlags(actor, phase))
+DEBUG_PRINT();`, 29/25 differ) and `.macro.c` (only the two-use read macro, 4/4: the palette
+pointer copy `adds r3, r0, #0`). Without the macros, cse2 replaces Apply's mask (2) with phase,
+which is still known to be the constant 2 (`why 562`). phase's reassignments by the reads are gone
+before cse2, and phase's set sinks to its first use. In the macro version the do/while keeps the
+reassignment alive until flow. Tried: `phase = Read(...)` plain or inside the `if`, a separate
+`contact` variable, u32 phase, a u32 mask parameter for Read, Apply with `|= 2`, and u8/u16/s8 masks
+(those go to the stack). Next: a form where phase really changes (the read's result reused) or
+some other reason the ROM's mask is a separate constant.
+
+### Spider_UpdateWanderGoal (src/fn/sub_080A4018.c, 080A4018): deferred
+
+Draft: `Spider_UpdateWanderGoal.c` (the no-pin draft, 58/62 differ). The ROM's allocation is input r4,
+transform r5, table r6, heading r7, ctx r8, mask (0x3FF) sb, &gRandomIndex sl, with distance and
+&input->0x3D4 spilled to the stack. sb's 0x3FF comes from reload's move2add (`adds r1, #0x2f` on the
+r1 that held 0x3D0), so mask has to get sb. Two constant pointers have to be in registers with no
+REG_EQUIV, as in Bat_UpdateDefeat. `AGBCC_NOEQUIV=31,32` (table, indexAddress) gives 58/58 with
+shape 16, and the rest is the order of input, transform, table and heading. The halves union cannot
+help here either: the target packing reuses 0xFFFF0000. Next: a general way to set a constant pointer
+without a REG_EQUAL note at function entry; this is the same blocker as Bat.
+
+### TentacleActor_SelectWanderRoute (src/fn/sub_080A8904.c, 080A8904): deferred
+
+Draft: `TentacleActor_SelectWanderRoute.c`, every do/while(0) macro written out (46/48 differ, all
+allocation). The macros put their statements one loop level deeper, and flow weights REG_N_REFS by
+loop depth. So with them the scan mask constant has 21 refs (14 without), i 13 (11), n 9 (7) and
+currentCell 10 (8). That reorders global allocation: the ROM has facing r8, count sb, the 3 mask r6.
+The draft gives facing r6 and count r8. Next: C that really nests those statements (a loop the
+original had, for example the neighbor scan as an inner loop) or other refs that raise the mask
+and n by the same amount.
+
+### TentacleBody_RefreshDirectionalAnimations (src/fn/sub_080A8F38.c, 080A8F38): deferred
+
+Draft: `TentacleBody_RefreshDirectionalAnimations.c` (41/37 differ, against 83/79 for the plain
+no-pin draft). Step is written as the shared DisplaySequenceState playback, with the flip tests
+from SpriteEffectController_StepDrawable and ordinary `frame.profile[frame.kind * four]` /
+`++frame.i` in the body. Remaining: loop.c hoists the constant 1, because three equal sets
+(TestMask's `& 1`, the first flip bit and `duration = 1`) are combined in combine_movables;
+`AGBCC_NOMOVE=99` keeps it in the loop. The register order is the other part: the ROM puts body in
+sb, offset in sl and the segment pointer in r8 (seven saved registers); the draft uses r8/sb/r7.
+Next: find what holds r7 in the ROM (another long-lived value the draft lacks, maybe a kept
+`&body->speed` or a `four` constant), then split the 1s.
+
+### TentacleBody_ResetDirectionalAnimations (080A915C) and TentacleBody_RestartSegmentAnimations (080A93F4): deferred with Refresh
+
+Same family as TentacleBody_RefreshDirectionalAnimations: the same Step helper and the same
+`frame` stack struct and segment loop. With Refresh's draft Step and ordinary body C, Reset scores
+54/52 (`TentacleBody_ResetDirectionalAnimations.c`); Restart is not tried yet. Solve Refresh first,
+then move the shared Step into `include/tentacle_segment_animation.h` and port it to all three.
+
+### TentacleActor_RemoveSegmentColliders (src/fn/sub_080AA688.c, 080AA688): deferred
+
+Draft: `sub_080AA688.c` (`--trail->activeCount;`, 25/24 differ). The ROM rebuilds `trail + 0x8EA` in
+the loop; the draft hoists it. `hoist`: in loop pass 2 the address (insn 148) moves at 13 x 1 x 3 >=
+37, after pass 1 moved the mask 1 (as the ROM does too). Tried `--trail->activeCount`,
+`activeCount--`, a pointer local and `= activeCount - 1`; all are hoisted. Next: a form whose pass-2
+threshold or lifetime fails, or a count address that is not invariant (derived from the segment).
+
+### TentacleActor_AlignSegmentsToTerrain (src/fn/sub_080AA8C4.c, 080AA8C4): deferred
+
+Draft: `TentacleActor_AlignSegmentsToTerrain.c`, 36/38 differ, all of it allocation. It passes
+`&segment->position` to Height (the landed code passes `&trail->segments[i].position`, which costs
+recomputation). Left: the ROM copies Height's result (`adds r2, r1, #0` at the switch join) and
+keeps Height's `p` in r6 copied from r7 before the override call. The draft coalesces the result
+and strength-reduces the copy (insn 703, tagged loop). `why all`: 234 vs p allocation order
+(`AGBCC_PRI=234:+1636` gives 28/30).
+
+### Six-spark burst family: Bat_UpdateDefeat, TentacleActor_SpawnSparkBurst (080AB294), Vorn_UpdateDefeat
+
+All three spawn six sparks from `gRandomTable` kept in a callee-saved register. The ROM's table
+pseudo has no REG_EQUIV; the C pins it or uses an asm barrier. In SpawnSparkBurst the halves union
+(`TentacleActor_SpawnSparkBurst.c`) already gives the ROM's allocation (table in r7), 4/10 differ:
+only the half insertions are left unfolded. The `struct VAB v` bitfield writes before it leave
+0xFFFF0000 and 0xFFFF in cse-shared pseudos, so the insertions' `and` has a register operand and
+combine has no constant to simplify. Ruled out here: the two-statement offset form
+(`off = (u8 *)gRandomTable + k; table = (u16 *)(off - k);`, sub_08000430), where cse still
+records REG_EQUIV (const (plus sym k)) and the result is worse, and halves placed before the vector
+writes. Next: a table source that cse does not see as constant and combine folds, with no mask
+constant in common with a bitfield write in the same block.
+
+### TentacleActor_UpdateRetraction (src/fn/sub_080AB968.c, 080AB968): deferred
+
+The ROM computes |secondaryMotion.x| and |secondaryMotion.z| (`adds r3, r1, #0; ...; rsbs r3, r1, #0`)
+and never uses them. The landed C keeps them with a volatile asm. So in the original they fed
+something deleted after flow. Draft `TentacleActor_UpdateRetraction.c`: `if (ax > az) Advance(...);
+else Advance(...);` (7/12). The compare survives, because reload materializes 0x6400 differently in
+the two arms and jump2 cannot cross-jump them. Tried: an empty `if` with DEBUG_PRINT (flow deletes
+the abs, 20/2), branching inside Advance, and a `speed` variable set before the branch. Next: two
+arms that stay identical after reload (all arguments set before the branch), or a switch on the
+abs values.
+
+### TentacleActor_RecoverFromSegmentLoss (src/fn/sub_080ABB18.c, 080ABB18): deferred
+
+The ROM computes 15 field addresses of p before the segment-removal loop's first test and spills
+most of them to the stack. That looks like loop.c hoisting the invariants of a loop that contains
+the final stores. Draft `sub_080ABB18.c` (stores inside a `for (;;)` exit branch, 139/107) has
+loop.c hoist only a few of them (savings threshold). The landed C precomputes the pointers by hand,
+with 5 pins and 2 barriers (all removed: 107/107). Next: decide between the two shapes with
+`hoist` (which addresses the ROM's loop moved), then match the allocation.
+
+### Vorn_SelectReactionControl (src/fn/sub_080B197C.c, 080B197C): one barrier left
+
+Landed c725f2610: the value pin is gone (`mask &= value` in HasFlag). The `asm("" : : "r"(active))`
+remains. Without it (draft `sub_080B197C.c`, 26/26, an r4/r5 swap only) a (18 refs / 94 live, pri
+7659) outranks active (8 / 33, 7272). `AGBCC_PRI=active:+400` matches. Passing `active - 1` to
+SceneActor_DispatchContextAction fixes the allocation but changes the code. `!active` and
+`active == 0` fold before regclass counts. Next: a ninth natural ref of active, or two insns less
+of its life.

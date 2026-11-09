@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Boktai 3 Studio</title>
+<title>Boktai 3 Text</title>
 <link rel="stylesheet" href="/static/common.css">
 <style>
 :root {
@@ -103,6 +103,10 @@ pre#log { background: var(--panel); border: 1px solid var(--line); border-radius
       Strings may grow: later data moves automatically. Characters must exist in the game font (<code>data/charmap.tsv</code>); ASCII uses the half-width font.</p>
   </section>
 </main>
+<script>
+// / is the Studio's front door: it opens Browse. The text editor is /text, and /#ID still opens a string.
+if (location.pathname === '/' && !location.hash) location.replace('/atlas');
+</script>
 <script src="/static/common.js"></script>
 <script>
 studioHeader($('top').innerHTML);
