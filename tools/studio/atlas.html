@@ -252,7 +252,7 @@ function cardFor(id) {
   if (e.kind === 'area') small = `${e.scenes.length} scene${e.scenes.length > 1 ? 's' : ''}`;
   if (e.kind === 'scene') small = E[e.area]?.title || '';
   if (e.kind === 'file') small = `${e.nprocs} procedures`;
-  if (e.kind === 'unit') small = `${e.funcs.length} functions · ${e.size ? Math.round(100 * e.matched / e.size) : 0}% matched`;
+  if (e.kind === 'unit') small = `${e.funcs.length} functions · ${e.size ? Math.floor(100 * e.matched / e.size) : 0}% without concessions`;
   if (e.kind === 'char') small = e.jp + (e.lines ? ` · ${e.lines} lines` : '');
   if (e.kind === 'tileset') small = `${e.tiles} tiles · ${e.maps.length ? 'map ' + e.maps.map(m => m.map).join(', ') : 'no stage'}`;
   if (e.kind === 'song') small = `song ${e.key} · ${e.ntracks} track${e.ntracks > 1 ? 's' : ''}${e.scenes.length ? ` · ${e.scenes.length} scene${e.scenes.length > 1 ? 's' : ''}` : ''}`;
@@ -300,9 +300,10 @@ function codeTable(names, el) {
   funcs().then(fi => {
     const rows = names.map(n => fi[n]).filter(Boolean);
     const size = rows.reduce((s, f) => s + f.size, 0), done = rows.reduce((s, f) => s + (f.matched ? f.size : 0), 0);
-    const pct = size ? Math.round(100 * done / size) : 0;
-    el.innerHTML = rows.length ? `<div style="margin-bottom:8px"><span class="bar"><i style="width:${pct}%"></i></span> <b>${pct}%</b> <span class="muted">decompiled · ${rows.filter(f => f.matched).length} of ${rows.length} functions · ${size.toLocaleString()} bytes</span></div>
-      <table class="t"><tr><th>Function</th><th>Address</th><th>Bytes</th><th>Source</th><th></th></tr>${rows.map(f => `<tr><td>${codeLink(f.addr, f.name)}</td><td class="mono muted">${f.addr}</td><td>${f.size}</td><td class="muted">${esc(f.unit.startsWith('functions/') ? '' : f.unit.replace(/^game\//, ''))}</td><td>${f.matched ? '<span class="ok">✓ C</span>' : '<span class="muted">asm</span>'}</td></tr>`).join('')}</table>` : '<div class="empty">No functions traced.</div>';
+    const pct = size ? Math.floor(100 * done / size) : 0;
+    const unitHref = u => '/code#unit:' + encodeURIComponent(u);
+    el.innerHTML = rows.length ? `<div style="margin-bottom:8px"><span class="bar"><i style="width:${pct}%"></i></span> <b>${pct}%</b> <span class="muted">without concessions · all ${rows.length} functions match · ${size.toLocaleString()} bytes</span></div>
+      <table class="t"><tr><th>Function</th><th>Address</th><th>Bytes</th><th>Unit</th><th></th></tr>${rows.map(f => `<tr><td>${codeLink(f.addr, f.name)}</td><td class="mono muted">${f.addr}</td><td>${f.size}</td><td class="muted">${f.unit.includes('/') ? peekLink(unitHref(f.unit), esc(f.unit.split('/').slice(1).join('/'))) : ''}</td><td>${f.matched ? '<span class="ok">✓</span>' : '<span style="color:var(--warn)" title="matches with a concession (tools/concessions.py)">concession</span>'}</td></tr>`).join('')}</table>` : '<div class="empty">No functions traced.</div>';
   });
 }
 
@@ -512,7 +513,7 @@ const PAGES = {
       <h3>Notes</h3><div id="ned"></div></div>`;
   },
   unit(e) {
-    return `<div class="page">${head(e, `${e.funcs.length} functions · ${e.size.toLocaleString()} bytes${e.tentative ? ' · tentative grouping' : ''}`)}
+    return `<div class="page">${head(e, `${e.funcs.length} functions · ${e.size.toLocaleString()} bytes${e.tentative ? ' · tentative grouping' : ''}${e.unit ? ` · <a href="/code#unit:${encodeURIComponent(e.unit)}" data-peek>open in the code explorer</a>` : ''}`)}
       ${e.objects?.length ? `<h3>Registry entries <span class="n">${e.objects.length}</span></h3><div class="cards">${e.objects.map(cardFor).join('')}</div>` : ''}<h3>Functions</h3><div id="code"></div></div>`;
   },
 };
