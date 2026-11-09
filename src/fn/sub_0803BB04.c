@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_pool.h"
-// MATCHING_CONCESSION: register-pinning
 struct Blob {
     u32 words[11];
 };
@@ -31,23 +30,23 @@ void ScenePool_InitActorBounds(struct P *p, struct Item *item)
                 if (!item->flag) {
                     okay = 1;
                     z = 1024;
+                    x = z;
                 } else {
                     okay = 1;
                     z = 1024;
-                    asm("" : "+r"(z), "+r"(okay));
+                    x = z;
                 }
-                x = z;
                 break;
             case 1:
                 if (!item->flag) {
                     okay = 1;
                     z = 1024;
+                    x = z;
                 } else {
                     okay = 1;
                     z = 1024;
-                    asm("" : "+r"(z), "+r"(okay)::"memory");
+                    x = z;
                 }
-                x = z;
                 break;
             case 2:
                 okay = 1;
