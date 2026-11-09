@@ -933,3 +933,21 @@ Tried without effect:
 - storing `coordinate + random` directly (a temp pseudo then takes r0)
 - an inline helper returning the sum
 Next: find a spelling where random's value passes through one more set before the add, without a new pseudo.
+
+### Ratatosk_UpdateSunOrbRelocation (src/fn/sub_081F8988.c, 081F8988): deferred
+
+Pins: an offset in r2 with a barrier and a `dest` pointer in r1, used for case 1's `p->sequence = 2`.
+Draft: `notes/phase3-drafts/monsters-bosses/Ratatosk_UpdateSunOrbRelocation.c` (plain `p->sequence = 2;`,
+8 ROM / 8 draft). It is only reload's rotation: `AGBCC_SPILL=15:1` matches.
+The records (`R`/`X` lines in names.txt) show choice 13 (case 0's `sequence = 1`, r0).
+Choice 14 is case 0's fading copy `p->finished = 1` (=388 in r2, with r1 held by the address pseudo).
+Choice 15 is case 1's `sequence = 2`, which starts after r2 and takes r0. The ROM's copy also has r2 there.
+So the ROM made one more choice, taking r0, between that copy and case 1's store, with identical output.
+The candidates are the copy's stored `1`, or case 1's `q->input` address (now local pseudo 167 in r0).
+Either one would have to be a reload rather than an allocated pseudo.
+Tried:
+- `goto fail` for the fading copy: the rotation is fixed, but the ROM keeps the copy.
+- an inline copy for `slot < 0`
+- inverting the fading test
+- `goto done` before `++p->elapsed`
+Next: find a spelling where one of those two values reaches reload unallocated.
