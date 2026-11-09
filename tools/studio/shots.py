@@ -34,6 +34,7 @@ SHOTS = [
     ("text", "/text#7542", 900),
     ("sprites", "/gfx#sprites/DE23", 900),
     ("map", "/gfx#maps/EBA7", 1000),
+    ("world", "/world", 900),
     ("scripts", "/scripts#5757", 1250),
     ("actors", "/actors#C3BC", 900),
     ("captures", "/captures#12_field", 900),
