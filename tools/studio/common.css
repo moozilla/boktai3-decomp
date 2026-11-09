@@ -22,6 +22,9 @@
   --syn-kw: #9da3f0; --syn-type: #6cc5b4; --syn-num: #e6a070; --syn-str: #d8b878; --syn-com: #857b6f; --syn-fn: #e0745a;
 }
 a { color: var(--accent); }
+/* a view's grid columns never grow past the window for wide content (a long
+   line, a big preview): the panel scrolls instead, and phones get no sideways page */
+main > * { min-width: 0; }
 #top { display: flex; align-items: center; gap: 14px; padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; min-height: 53px; position: relative; z-index: 40; font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
 #top .brand { font-size: 16px; font-weight: 700; margin: 0 6px 0 0; letter-spacing: .02em; white-space: nowrap; color: var(--ink); text-decoration: none; }
 #top h1 { font-size: 16px; margin: 0; letter-spacing: .02em; white-space: nowrap; }
