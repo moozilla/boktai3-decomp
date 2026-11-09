@@ -132,7 +132,8 @@ out, and the functions that use it. **Concessions left** lists every function
 still holding a pin, barrier or other concession, by kind, and the overview
 graphs progress over time from every committed `PROGRESS.md` and lists what
 each recent merge changed: the functions that became concession-free, gained a
-concession or stopped matching. The index is
+concession or stopped matching; a function's page says which merge made it
+match and which made it concession-free. The index is
 `tools/studio/codemap.py`, built from `tools/progress.py` and
 `tools/concessions.py`. **ROM** (`/rom`) is the ROM as a treemap in address
 order, colored by kind or by how well each byte is understood.
