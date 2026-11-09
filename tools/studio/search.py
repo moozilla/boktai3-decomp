@@ -28,7 +28,8 @@ RANK = {"monster": 9, "character": 8, "object": 8, "item": 7, "area": 6, "story"
 
 
 def score(q, title, *others):
-    """100 exact, 80 prefix, 70 word start, 60 inside the title; 40 inside another field."""
+    """100 exact, 80 prefix, 70 word start, 60 inside the title, 50 every word of
+    Q in the title in any order; 40 inside another field, 30 every word somewhere."""
     t = (title or "").lower()
     if t == q:
         return 100
@@ -38,8 +39,13 @@ def score(q, title, *others):
         return 70
     if q in t:
         return 60
+    words = q.split()
+    if len(words) > 1 and all(w in t for w in words):  # every word, in any order
+        return 50
     if any(q in (o or "").lower() for o in others):
         return 40
+    if len(words) > 1 and all(any(w in (f or "").lower() for f in (title, *others)) for w in words):
+        return 30
     return 0
 
 
@@ -155,7 +161,9 @@ def search(q, strings=None, english=None, limit=50):
             if en:
                 title, names = en, names + " " + title
         sub = scene_sub(e) if e["kind"] == "scene" else e.get("jp") if e.get("jp") and e.get("jp") != title else e.get("path") or ""
-        add(score(q, title, e.get("key"), e.get("jp"), e.get("fname"), names), kind, title, sub, "/atlas#" + e["id"])
+        # a scene is also found by its place ("sealed ghoul": Ghoul corridor in the Sealed Prison)
+        add(score(q, title, e.get("key"), e.get("jp"), e.get("fname"), names, sub if e["kind"] == "scene" else None),
+            kind, title, sub, "/atlas#" + e["id"])
     code = _code()
     if code:
         hexq = re.sub(r"^(0x|sub_)", "", q)

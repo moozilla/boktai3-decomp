@@ -102,10 +102,11 @@ One local app over the game and the decomp. The header groups every view;
 characters, places, items, sprites, songs, scripts, functions, RAM objects
 and lines of text, or a scene number, a resource hash or a ROM address (what
 holds it; `tools/studio/search.py`).
-Links to other views open in a side panel with its own history. Every view
-names places the same way: World's places (`tools/studio/places.py`, from
-`data/labels/areas.csv`), so a scene file, capture, song or palette says
-where in the game it belongs.
+Links to other views open in a side panel with its own history; every
+page's address and tab title name what it shows, so a view can be linked to
+and found again among tabs. Every view names places the same way: World's places (`tools/studio/places.py`, from
+`data/labels/areas.csv`), so a scene file, capture, song, object or palette
+says where in the game it belongs.
 
 **Browse** (`/atlas`) is the way in: everything in the game as one tree
 (the story, beat by beat; characters, the monster list in the game's order,

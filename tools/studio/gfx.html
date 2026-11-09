@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Boktai 3 Studio</title>
+<title>Boktai 3 Graphics</title>
 <link rel="stylesheet" href="/static/common.css">
 <style>
 :root {
@@ -143,6 +143,7 @@ let wantFrame = null, wantArg = null;  // #tab/key/frame; for pool and maps the 
 function route() {
   const [t, s, f] = (location.hash.slice(1) || 'sprites').split('/');
   tab = views[t] ? t : 'sprites';
+  if (!views[t] && location.hash) history.replaceState(null, '', '#sprites');  // an unknown view: say which one shows
   wantFrame = f !== undefined && f !== '' && /^\d+$/.test(f) ? +f : null;
   wantArg = (location.hash.slice(1).split('/')[t === 'maps' ? 3 : 2]) || null;
   markNav();
@@ -184,9 +185,10 @@ function select(key, scroll) {
 async function refresh() {
   clearInterval(timer); timer = null;
   if (sel === undefined) return;
+  const view = NAV.flatMap(([, u]) => Array.isArray(u) ? u : []).find(([, x]) => x === '/gfx#' + tab)?.[0];
+  if (view) pageTitle('', view);  // the view's name while its item loads
   await views[tab].show(sel, tab === 'pool' ? wantArg : undefined);
   const h = $('view').querySelector('h2');
-  const view = NAV.flatMap(([, u]) => Array.isArray(u) ? u : []).find(([, x]) => x === '/gfx#' + tab)?.[0];
   if (view) pageTitle(h?.textContent.trim(), view);
   if (h && NOTE_KIND[tab] && sel && !LIVE) h.after(noteEditor(NOTE_KIND[tab], noteKeyOf(sel), renderList));
   wantFrame = null;
@@ -590,7 +592,9 @@ views.maps = {
     const own = m.tiles !== 0;
     const tsList = Object.keys(ptn.sets).sort();
     const savedTs = localStore('mapts.' + mh);
-    v.innerHTML = `<h2>Map ${mh}${st ? ` · stage` : ''}${it?.group && st ? ` · ${esc(it.group)}${it.place ? ' (' + esc(it.place) + ')' : ''}` : ''}</h2>
+    // a stage reads as World names its place (Place · detail), then the map
+    const placed = st && it.group && it.group !== 'Stages no scene loads';
+    v.innerHTML = `<h2>${placed ? `${esc([it.group, it.place].filter(Boolean).join(' · '))} · stage map ${mh}` : `Map ${mh}${st ? ' · stage' : ''}`}</h2>
       <div class="meta">${m.count} layer${m.count > 1 ? 's' : ''} · ${m.nmeta} metatiles · ${own ? m.ntiles + ' own tiles' : 'tiles from ptn tileset (' + m.ntiles + ' used)'}${st ? ` · loaded by script procs ${st.procs.join(', ')} with HP data ${st.hp}` : ''}</div>
       <div class="controls">
         ${m.count > 1 ? 'Layer <select id="lay"><option value="-1">all, layer 0 in front</option>' + m.ents.map((e, i) => `<option value="${i}">${i}: ${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
@@ -756,7 +760,8 @@ views.dungeon = {
     if (!a) { v.textContent = 'No such area.'; return; }
     const byScene = Object.fromEntries(stageMeta.map(s => [s.scene, s]));
     const rooms = a.scenes.map(n => byScene[n]).filter(s => s && s.stage);
-    v.innerHTML = `<h2>Area ${a.area}${a.label ? ' · ' + esc(a.label) : ''}</h2><div class="meta">${rooms.length} rooms with a stage · placed by their doors (a door in one room lines up with the entrance it leads to in the next) · <a href="/world#area=${a.area}">World page</a></div>
+    const wa = WORLD?.areas[a.area], aname = wa?.place ? [wa.place, wa.detail].filter(Boolean).join(' · ') : a.label;  // as World names it
+    v.innerHTML = `<h2>Area ${a.area}${aname ? ' · ' + esc(aname) : ''}</h2><div class="meta">${rooms.length} rooms with a stage · placed by their doors (a door in one room lines up with the entrance it leads to in the next) · <a href="/world#area=${a.area}">World page</a></div>
       <div class="controls">Zoom <select id="dz"><option>0.25</option><option selected>0.5</option><option>1</option></select> <label><input type="checkbox" id="dlab" checked> room labels</label> <span id="dstat" class="meta">rendering…</span></div>
       <div id="dbox" style="position:relative;overflow:auto;max-height:calc(100vh - 190px);border:1px solid var(--line);border-radius:8px;background:#111"></div>`;
     const hps = {}, canv = {};
