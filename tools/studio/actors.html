@@ -92,6 +92,14 @@ let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, com
 const label = a => noteOf('actor', a.key)?.label;
 const gclTitle = a => a.gcl.length ? a.gcl[0].name + (a.gcl[0].english ? ` (${a.gcl[0].english})` : '') : '';
 const title = a => label(a) || gclTitle(a) || (a.names.length ? a.names.map(n => n.jp).join(' / ') + '?' : a.callback_name);
+// its name in Browse (tools/studio/atlas.py): the species it creates, or what it is
+let browseTitles = {};
+// (left out when it only spells out the callback's name or the key, as for script routines)
+const letters = t => (t || '').toLowerCase().replace(/[^a-z]/g, '');
+const browseTitle = a => {
+  const b = browseTitles[a.key];
+  return b && !title(a).includes(b) && !letters(a.callback_name).startsWith(letters(b)) && !/^Routine [0-9A-F]{4}$/.test(b) ? b : '';
+};
 // the places whose scenes place it (World's places, tools/studio/places.py), most scenes first
 const placesOf = a => {
   const n = {};
@@ -103,7 +111,7 @@ const placeText = a => { const ps = placesOf(a); return ps.length > 2 ? `${ps.sl
 function renderList() {
   const q = $('q').value.trim().toUpperCase(), fs = $('fspr').checked, fu = $('fused').checked, fg = $('fgcl').checked;
   const hits = A.filter(a => (!fs || a.sprites.length) && (!fu || a.procs.length) && (!fg || a.gcl.length) &&
-    (!q || [a.key, label(a), a.callback_name, a.loader_name, ...a.sprites.map(s => s.hash), ...a.names.map(n => n.jp + ' ' + (en[n.id] || '')), ...a.gcl.map(g => g.name + ' ' + g.english), ...placesOf(a)].some(x => (x || '').toUpperCase().includes(q))));
+    (!q || [a.key, label(a), a.callback_name, a.loader_name, ...a.sprites.map(s => s.hash), ...a.names.map(n => n.jp + ' ' + (en[n.id] || '')), ...a.gcl.map(g => g.name + ' ' + g.english), browseTitles[a.key], ...placesOf(a)].some(x => (x || '').toUpperCase().includes(q))));
   $('count').textContent = `${hits.length} of ${A.length} registry entries`;
   const special = (key, text) => {
     const d = document.createElement('div');
@@ -118,7 +126,7 @@ function renderList() {
     const d = document.createElement('div'); d.className = 'row' + (a.key === sel ? ' on' : ''); d.dataset.key = a.key;
     d.innerHTML = `<code>${a.key}</code><b></b><small></small>`;
     d.querySelector('b').textContent = title(a);
-    d.querySelector('small').textContent = [a.callback_name !== title(a) && a.callback_name, a.sprites.length && 'sprite ' + a.sprites.map(s => s.hash).join(','),
+    d.querySelector('small').textContent = [browseTitle(a), a.callback_name !== title(a) && a.callback_name, a.sprites.length && 'sprite ' + a.sprites.map(s => s.hash).join(','),
       a.procs.length && `${a.procs.length} proc${a.procs.length > 1 ? 's' : ''}`, a.scenes.length && `${a.scenes.length} scene${a.scenes.length > 1 ? 's' : ''}${placeText(a) ? ' in ' + placeText(a) : ''}`].filter(Boolean).join(' · ');
     d.onclick = () => { location.hash = a.key; };
     return d;
@@ -138,7 +146,7 @@ async function show(key) {
   if (key === 'player-animations') return showPlayerAnimations();
   if (navKey === 'tables') return showNumericTables(...key.split(':').slice(1));
   const a = byKey[key], v = $('view');
-  pageTitle(a ? title(a) : key, 'Actors');
+  pageTitle(a ? browseTitle(a) || title(a) : key, 'Actors');
   if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
   // one page per object, Browse's (tools/studio/atlas.html), shown here beside the registry list
   v.classList.add('frame');
@@ -234,7 +242,7 @@ window.onhashchange = () => { const k = routeKey(location.hash.slice(1)); if (k 
 (async () => {
   await Promise.all([loadNotes(), loadWorld()]);
   const [d, e] = await Promise.all([fetch('/api/actors').then(r => r.json()), fetch('/api/english').then(r => r.json()).catch(() => ({}))]);
-  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {}; numericTables = d.numeric_tables || {}; playerAnimations = d.player_animations || null;
+  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {}; numericTables = d.numeric_tables || {}; playerAnimations = d.player_animations || null; browseTitles = d.titles || {};
   byKey = Object.fromEntries(A.map(a => [a.key, a]));
   renderList();
   const k = routeKey(location.hash.slice(1)) || A.find(a => a.loader && a.sprites.length)?.key;
