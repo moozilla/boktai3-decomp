@@ -567,17 +567,20 @@ function route() {
   document.title = 'Boktai 3 ' + (e ? e.title : id.startsWith('node:') ? id.split('/').pop() : 'Browse');
   renderTree();
 }
-// The Studio's front page: what this is, the numbers, the game's tree and the other views.
+// The Studio's front page: what this is, the numbers, the game's tree and the other views
+// (in the header's order).
 const VIEWS = [
   ['Code', '/code', 'Every function: its C beside the disassembly, concessions left, what it calls and touches'],
+  ['ROM', '/rom', 'The whole ROM as a treemap, by kind or by how well it is understood'],
   ['Text', '/text', 'Every string with the fan translation, in the game font; build a mod ROM'],
   ['Scripts', '/scripts', 'The scene scripts (Konami GCL) in a readable form, with recovered names'],
+  ['Actors', '/actors', 'The script registry: every object a script can create, with its sprites and places'],
   ['Sprites', '/gfx#sprites', 'Sprite packages and large sprites, every frame and animation'],
   ['Maps', '/gfx#maps', 'Stages with doors, items, enemies and patrol paths'],
   ['World', '/world', 'How the rooms connect: places, their areas and the doors between them'],
   ['Sound', '/sound', 'Every song, played from the ROM\'s own sequences and samples'],
   ['Live', '/live', 'The game running in mGBA, every sprite and text box matched to its resource'],
-  ['ROM', '/rom', 'The whole ROM as a treemap, by kind or by how well it is understood'],
+  ['Captures', '/captures', 'Saved screens from the game, each sprite, layer and palette matched to its resource'],
 ];
 function home() {
   const count = k => Object.values(E).filter(e => e.kind === k).length.toLocaleString();
