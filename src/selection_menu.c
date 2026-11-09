@@ -890,7 +890,6 @@ void SelectionMenu_AnimateChoice(struct SelectionMenu *p)
         (p->frame)++;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void SelectionMenu_ReviewChoice(struct SelectionMenu *p)
 {
     struct SceneInputWidget *g;
@@ -928,25 +927,21 @@ void SelectionMenu_ReviewChoice(struct SelectionMenu *p)
         }
     } else {
         SelectionMenu_HandleHorizontalInput(p);
-        {
-            int keys = gPadState[1], mask;
-            mask = 1;
-            asm("" : "+r"(mask));
-            if (mask & keys) {
-                if (!p->horizontalChoice) {
-                    Sound_PlaySong(0xdd);
-                    SelectionMenu_SetCallback(p, SelectionMenu_Confirm);
-                    return;
-                }
-                goto back;
-            } else if (2 & keys) {
-            back:
-                (&p->icons[18])->flags |= mask;
-                p->cursors[2].flags |= mask;
-                SelectionMenu_Back(p);
+        if (gPadState[1] & 1) {
+            if (!p->horizontalChoice) {
+                Sound_PlaySong(0xdd);
+                SelectionMenu_SetCallback(p, SelectionMenu_Confirm);
                 return;
             }
-            asm("" ::"r"(keys));
+            (&p->icons[18])->flags |= 1;
+            p->cursors[2].flags |= 1;
+            SelectionMenu_Back(p);
+            return;
+        } else if (gPadState[1] & 2) {
+            (&p->icons[18])->flags |= 1;
+            p->cursors[2].flags |= 1;
+            SelectionMenu_Back(p);
+            return;
         }
     }
     (p->frame)++;
