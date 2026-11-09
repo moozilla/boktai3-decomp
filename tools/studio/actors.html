@@ -70,7 +70,7 @@ body.embed main { grid-template-columns: 1fr; }
 <main>
   <section id="side">
     <div class="tools">
-      <input id="q" type="search" placeholder="Filter: key, label, name, function, sprite" autocomplete="off">
+      <input id="q" type="search" placeholder="Filter: key, label, name, function, sprite, place" autocomplete="off">
       <label class="chk"><input type="checkbox" id="fgcl"> with a GCL name</label>
       <label class="chk"><input type="checkbox" id="fspr"> with a sprite</label>
       <label class="chk"><input type="checkbox" id="fused"> created by a script</label>
@@ -92,11 +92,18 @@ let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, com
 const label = a => noteOf('actor', a.key)?.label;
 const gclTitle = a => a.gcl.length ? a.gcl[0].name + (a.gcl[0].english ? ` (${a.gcl[0].english})` : '') : '';
 const title = a => label(a) || gclTitle(a) || (a.names.length ? a.names.map(n => n.jp).join(' / ') + '?' : a.callback_name);
+// the places whose scenes place it (World's places, tools/studio/places.py), most scenes first
+const placesOf = a => {
+  const n = {};
+  for (const sc of a.scenes) { const p = WORLD?.areas[WORLD.scene_area[sc]]?.place; if (p) n[p] = (n[p] || 0) + 1; }
+  return Object.keys(n).sort((x, y) => n[y] - n[x]);
+};
+const placeText = a => { const ps = placesOf(a); return ps.length > 2 ? `${ps.slice(0, 2).join(', ')} +${ps.length - 2}` : ps.join(', '); };
 
 function renderList() {
   const q = $('q').value.trim().toUpperCase(), fs = $('fspr').checked, fu = $('fused').checked, fg = $('fgcl').checked;
   const hits = A.filter(a => (!fs || a.sprites.length) && (!fu || a.procs.length) && (!fg || a.gcl.length) &&
-    (!q || [a.key, label(a), a.callback_name, a.loader_name, ...a.sprites.map(s => s.hash), ...a.names.map(n => n.jp + ' ' + (en[n.id] || '')), ...a.gcl.map(g => g.name + ' ' + g.english)].some(x => (x || '').toUpperCase().includes(q))));
+    (!q || [a.key, label(a), a.callback_name, a.loader_name, ...a.sprites.map(s => s.hash), ...a.names.map(n => n.jp + ' ' + (en[n.id] || '')), ...a.gcl.map(g => g.name + ' ' + g.english), ...placesOf(a)].some(x => (x || '').toUpperCase().includes(q))));
   $('count').textContent = `${hits.length} of ${A.length} registry entries`;
   const special = (key, text) => {
     const d = document.createElement('div');
@@ -112,7 +119,7 @@ function renderList() {
     d.innerHTML = `<code>${a.key}</code><b></b><small></small>`;
     d.querySelector('b').textContent = title(a);
     d.querySelector('small').textContent = [a.callback_name !== title(a) && a.callback_name, a.sprites.length && 'sprite ' + a.sprites.map(s => s.hash).join(','),
-      a.procs.length && `${a.procs.length} proc${a.procs.length > 1 ? 's' : ''}`, a.scenes.length && `${a.scenes.length} scenes`].filter(Boolean).join(' · ');
+      a.procs.length && `${a.procs.length} proc${a.procs.length > 1 ? 's' : ''}`, a.scenes.length && `${a.scenes.length} scene${a.scenes.length > 1 ? 's' : ''}${placeText(a) ? ' in ' + placeText(a) : ''}`].filter(Boolean).join(' · ');
     d.onclick = () => { location.hash = a.key; };
     return d;
   }));
@@ -129,6 +136,7 @@ async function show(key) {
   if (key === 'player-animations') return showPlayerAnimations();
   if (navKey === 'tables') return showNumericTables(...key.split(':').slice(1));
   const a = byKey[key], v = $('view');
+  pageTitle(a ? title(a) : key, 'Actors');
   if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
   // one page per object, Browse's (tools/studio/atlas.html), shown here beside the registry list
   v.classList.add('frame');
@@ -222,7 +230,7 @@ listKeys(() => $('list'), '.row');
 const routeKey = hash => hash.toLowerCase() === 'names' ? 'names' : hash.toLowerCase() === 'player-animations' ? 'player-animations' : /^commands(?::|$)/i.test(hash) ? 'commands' + hash.slice(8).toUpperCase() : /^tables(?::|$)/i.test(hash) ? 'tables' + hash.slice(6).toUpperCase() : hash.toUpperCase();
 window.onhashchange = () => { const k = routeKey(location.hash.slice(1)); if (k && k !== sel) show(k); };
 (async () => {
-  await loadNotes();
+  await Promise.all([loadNotes(), loadWorld()]);
   const [d, e] = await Promise.all([fetch('/api/actors').then(r => r.json()), fetch('/api/english').then(r => r.json()).catch(() => ({}))]);
   A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {}; numericTables = d.numeric_tables || {}; playerAnimations = d.player_animations || null;
   byKey = Object.fromEntries(A.map(a => [a.key, a]));

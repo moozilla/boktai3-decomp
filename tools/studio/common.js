@@ -39,6 +39,8 @@ function navHTML() {
 }
 // Fills <header id="top">; `tools` is HTML for the right-hand side.
 function studioHeader(tools = '') {
+  if (!document.querySelector('link[rel=icon]'))
+    document.head.insertAdjacentHTML('beforeend', '<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">');
   const h = $('top');
   if (!h) return;
   if (EMBED) { h.remove(); document.body.classList.add('embed'); keepEmbed(); return; }
@@ -62,6 +64,12 @@ function markNav() {
   }
 }
 window.addEventListener('hashchange', () => { if (location.pathname === '/gfx') markNav(); });
+// Every page's title has one form, the thing shown first so tabs stay apart:
+// "Ghoul · Boktai 3 Browse", or "Boktai 3 Browse" for the view itself.
+function pageTitle(thing, view) {
+  view ||= document.title.replace(/^.* · /, '').replace(/^Boktai 3 /, '') || 'Studio';
+  document.title = (thing && thing !== view ? thing + ' · ' : '') + 'Boktai 3 ' + view;
+}
 
 // ---------- search (⌘K on every page: tools/studio/search.py) ----------
 let SRCH = { hits: [], i: 0, seq: 0 };
@@ -70,7 +78,7 @@ function searchOpen() {
   let d = $('gsearchbox');
   if (!d) {
     d = document.createElement('div'); d.id = 'gsearchbox';
-    d.innerHTML = `<div class="box"><input id="gsq" placeholder="Search everything: a monster, place, item, function, RAM object, script, line of text…" autocomplete="off"><div id="gsres"></div>
+    d.innerHTML = `<div class="box"><input id="gsq" placeholder="Search everything: a monster, place, item, function, script, line of text, ROM address…" autocomplete="off"><div id="gsres"></div>
       <div class="foot"><span class="kbd">↑↓</span> move <span class="kbd">↵</span> open <span class="kbd">⌘↵</span> new tab <span class="kbd">esc</span> close</div></div>`;
     document.body.appendChild(d);
     let timer;
@@ -233,12 +241,34 @@ function learnedPalette(c) {
 // 256 RGB triples from 512 bytes of GBA palette data at `off`.
 const palFromBytes = (b, off = 0) => Array.from({ length: 256 }, (_, i) => rgb(le(b, off + i * 2)));
 
+// Where a scene is in the world (/api/areas: World's places, tools/studio/places.py).
+// sceneWhere(n) -> {text, href} once loadWorld() has resolved: the scene's own
+// label led by its place, else its area's place and detail.
+let WORLD = null;
+async function loadWorld() { return WORLD ||= await fetch('/api/areas').then(r => r.json()).catch(() => null); }
+function sceneWhere(scene) {
+  const s = WORLD?.scenes[scene], a = WORLD && WORLD.areas[WORLD.scene_area[scene]];
+  if (!s || !a) return null;
+  const text = s.label ? (!a.place || s.label.startsWith(a.place) ? s.label : `${a.place} · ${s.label}`) : [a.place, a.detail].filter(Boolean).join(' · ');
+  return text ? { text, href: `/world#area=${a.area}/scene=${scene}` } : null;
+}
+
 const resCache = new Map();
+// At most 12 resource downloads in flight from a page, the rest queued: a view
+// that previews hundreds of palettes at once otherwise runs the browser out of
+// sockets (ERR_SOCKET_NOT_CONNECTED).
+const resSlots = { busy: 0, queue: [] };
+function limited(fn) {
+  return new Promise((ok, no) => {
+    const run = () => { resSlots.busy++; fn().then(ok, no).finally(() => { resSlots.busy--; resSlots.queue.shift()?.(); }); };
+    resSlots.busy < 12 ? run() : resSlots.queue.push(run);
+  });
+}
 function res(label, hash) {
   const k = label + '/' + hash;
   if (!resCache.has(k)) {
     // one retry for a dropped connection; a failure isn't cached, so the next call tries again
-    const get = () => fetch(`/api/res/${label}/${hash}`).then(r => { if (!r.ok) throw new Error('no ' + k); return r.arrayBuffer(); });
+    const get = () => limited(() => fetch(`/api/res/${label}/${hash}`).then(r => { if (!r.ok) throw new Error('no ' + k); return r.arrayBuffer(); }));
     resCache.set(k, get().catch(e => e.message.startsWith('no ') ? Promise.reject(e) : get())
       .then(b => new Uint8Array(b)).catch(e => { resCache.delete(k); throw e; }));
   }

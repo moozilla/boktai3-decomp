@@ -100,8 +100,12 @@ python3 tools/studio/serve.py    # http://localhost:8642 opens Browse
 One local app over the game and the decomp. The header groups every view;
 **⌘K** (or `/`) on any page searches everything at once: monsters,
 characters, places, items, sprites, songs, scripts, functions, RAM objects
-and lines of text (`tools/studio/search.py`). Links to other views open in a
-side panel with its own history.
+and lines of text, or a scene number, a resource hash or a ROM address (what
+holds it; `tools/studio/search.py`).
+Links to other views open in a side panel with its own history. Every view
+names places the same way: World's places (`tools/studio/places.py`, from
+`data/labels/areas.csv`), so a scene file, capture, song or palette says
+where in the game it belongs.
 
 **Browse** (`/atlas`) is the way in: everything in the game as one tree
 (the story, beat by beat; characters, the monster list in the game's order,
@@ -130,30 +134,36 @@ reach it. A RAM object's page lists every function that uses it; a struct
 type's page shows its definition with each member's offset, as agbcc lays it
 out, and the functions that use it. **Concessions left** lists every function
 still holding a pin, barrier or other concession, by kind, and the overview
-graphs progress over time from every committed `PROGRESS.md`. The index is
+graphs progress over time from every committed `PROGRESS.md` and lists what
+each recent merge changed: the functions that became concession-free, gained a
+concession or stopped matching; a function's page says which merge made it
+match and which made it concession-free. The index is
 `tools/studio/codemap.py`, built from `tools/progress.py` and
 `tools/concessions.py`. **ROM** (`/rom`) is the ROM as a treemap in address
-order, colored by kind or by how well each byte is understood.
+order, colored by kind or by how well each byte is understood (C, C with a
+concession, decoded data, data only located, assembly); its address names
+the block in view, and each Code unit links to its own.
 
 | | |
 |---|---|
 | ![Code](docs/img/studio-code.png) | **Code**: a function's C and disassembly side by side, with its concessions, the RAM it touches and where the game reaches it. |
 | ![Code overview](docs/img/studio-code-overview.png) | **Code overview**: what matches, what is free of concessions, by category, which concession kinds are left, and progress over time. |
 | ![Code type](docs/img/studio-code-type.png) | **Types**: a struct's definition with each member's offset as agbcc lays it out, and the functions that use it. |
+| ![ROM](docs/img/studio-rom.png) | **ROM** (`/rom`): the whole ROM as a treemap in address order, here colored by how well each byte is understood: code in C, code in C still holding a concession, data decoded and named, data only located. |
 | ![Browse](docs/img/studio-browse.png) | **Browse**: a monster with its family, every palette its sprites are drawn in, and the scenes that place it. |
 | ![Text](docs/img/studio-text.png) | **Text** (`/text`): every string with the fan translation and the scripts that show it (and where they run), previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
 | ![Sprites](docs/img/studio-sprites.png) | **Sprites**: sprite packages and large sprites with every frame and animation, in their in-game palettes. |
 | ![Maps](docs/img/studio-map.png) | **Maps**: stages grouped by place in story order, with captured palettes, doors, entrances, items, enemies and patrol paths from the stage scripts. |
 | ![World](docs/img/studio-world.png) | **World** (`/world`): how the rooms connect. Scenes grouped into areas by their doors, areas into places by their labels, each place with its rooms, captures and enemies. |
 | ![Scripts](docs/img/studio-scripts.png) | **Scripts**: script files and procedures in a readable view with recovered names, each scene file's place, the developers' debug messages and their translations. |
-| ![Actors](docs/img/studio-actors.png) | **Actors**: the script registry, every object a script can create, filterable by GCL name, sprite or use, each shown with its Browse page; plus the decoded command and parameter tables. |
+| ![Actors](docs/img/studio-actors.png) | **Actors**: the script registry, every object a script can create, filterable by GCL name, sprite, place or use, each shown with its Browse page; plus the decoded command and parameter tables. |
 | ![Screen inspector](docs/img/studio-captures.png) | **Screen inspector** (Live and Captures): every sprite, text box, layer and palette on screen, matched to its resource. Live mode connects to mGBA through [Centaur](docs/CENTAUR.md). |
+| ![Sound](docs/img/studio-sound.png) | **Sound** (`/sound`): every song in the song table with the places it plays in, its tracks and voices, played in the browser from the ROM's own sequences and samples. |
 
-Also: palette (with the places that load each), font and tile viewers, dungeons stitched from their rooms, and **Sound** (`/sound`): every song in
-the song table with its tracks, voices and the scripts, scenes and code that
-start it, played in the browser by a small MP2K player (`tools/studio/mp2k.js`)
-from the ROM's own sequence and sample data. `python3 tools/studio/shots.py`
-retakes these screenshots from a running Studio.
+Also: palette (with the places that load each), font and tile viewers, and
+dungeons stitched from their rooms. Sound lists the scripts, scenes and code
+that start each song; its player is a small MP2K engine (`tools/studio/mp2k.js`).
+`python3 tools/studio/shots.py` retakes these screenshots from a running Studio.
 
 ## Layout
 
