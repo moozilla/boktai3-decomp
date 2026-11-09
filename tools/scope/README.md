@@ -1552,6 +1552,18 @@ Each was read from the compiler source and confirmed on a live draft.
    once `q = &pt` exists the store is a plain `strh`. Writing `pt.x = pt.x op ...` directly also
    narrows to `strh`, while going through a temp (`t = pt.x op ...; pt.x = t;`) keeps the RMW.
    A struct of u16 fields always gives `strh`. (Probed for Scene_SpawnDirectionalDust.)
+72. **A copy loop whose stores may alias the load keeps that load after the loop (no PRE
+   hoist).** agbcc has strict aliasing on (c_get_alias_set). Fact 50's gcse PRE moves a load that
+   follows a loop above it only when no store in the loop can alias it. A store through a union
+   member (alias set 0), a char or a struct element of the load's type may alias it, so the load
+   stays after the loop. SceneObjects_Append matched once its argument words were stored into
+   `union SceneObjArgs { s32 words[4]; u8 bytes[16]; }` instead of a plain `s32[4]` member.
+73. **A value pinned to r1-r3 across a call is often a missing argument.** Actor_InitDrawable
+   pinned `p + 0x100` to r1 before `SceneBody_SetKeyframeDisplay(p->motion)`. The callee
+   (`str r1, [r0, #0x30]`) takes two arguments. Passing the pointer as the second one keeps it in
+   r1 with no pin, since local-alloc prefers the argument register for a value copied into it.
+   `calls` and `pins` now name every callee that reads more argument registers at its entry than
+   the draft declares it with. A ROM-only scan of all pinned units found no other case.
 
 ## Survey: random table as a literal address (2026-10-24)
 
