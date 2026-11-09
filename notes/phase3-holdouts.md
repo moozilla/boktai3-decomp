@@ -492,3 +492,18 @@ remains. Without it (draft `sub_080B197C.c`, 26/26, an r4/r5 swap only) a (18 re
 SceneActor_DispatchContextAction fixes the allocation but changes the code. `!active` and
 `active == 0` fold before regclass counts. Next: a ninth natural ref of active, or two insns less
 of its life.
+
+### Ivy_UpdateDefeat (src/fn/sub_080EE1B0.c, 080EE1B0): table pin, one load position from a match
+
+Six-spark family, but here the table is a local-alloc qty, not a REG_EQUIV spill. Block 24's
+call-saved qtys (AGBCC_DUMPPRI L records) in priority order: =gRandomIndex 2010 r4, a pointer
+1163 r5, =1#2 769 r6, size 760 r8, then the position `&actor->body.position` (7 refs, life
+58-252, 721) and the table (7 refs, 36-236, 700). The ROM has the table in sb and the position in
+sl, so the table must come first: its life must be 185-193, or the position's over 200.
+Draft `Ivy_UpdateDefeat.c` (5/5, no table variable): a `NextRandom(wrap, bits)` helper that reads
+`gRandomTable` itself gives the constant pseudo its birth at the first `add` (48, pri 744), and
+the allocation is the ROM's. The only difference left is that the `ldr =gRandomTable; mov sb`
+pair comes after the index computation instead of before the gRandomIndex load. Next: a form that
+sets the table before the first index but ends its life (or its refs) as the helper form does.
+Passing gRandomTable straight to RandomFrom (no variable) gives the same 14/14 as the pinned-out
+draft; the union RandomTableView forms are no better.
