@@ -507,7 +507,7 @@ def compile_draft_g(src, func, env=None):
     # size_of_line_info); its truncated unit then breaks the line reader.
     r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-ffix-debug-line", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
                        cwd=wd, capture_output=True, text=True,
-                       env=dict(os.environ, AGBCC_DUMPPRI=names, AGBCC_CROSS_TRACE="1", **(env or {})))
+                       env={**os.environ, "AGBCC_DUMPPRI": names, "AGBCC_CROSS_TRACE": "1", **(env or {})})
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
     uninit = []
     for blk in re.split(r"(?m)^(?=.*In function `)", r.stderr):
