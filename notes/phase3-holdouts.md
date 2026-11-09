@@ -93,3 +93,21 @@ is what a copy straight from the hard return register gives. Spellings tried: pl
 which the RTL keeps the call's hard r0 as the returned value (no pseudo between the call and the
 return), for example the call's result returned through an inline whose result the caller
 returns, or a matched relative with the same "return the angle when facing" shape.
+
+### EffectManager_UpdateAll (src/homing_effect.c, 0800A8E4): deferred, one insn from a match
+
+Draft: `notes/phase3-drafts/field-effects/EffectManager_UpdateAll.c` (1 ROM / 1 draft: one
+instruction in another place). Diagnosis: the 0x148 stride for `view` and `p` is not a register
+in the ROM. `AGBCC_NOREG=<the stride pseudo>` on the depin draft (two explicit `view++; p++;`)
+gives an exact match: reload loads 0x148 for the first add, the second add inherits it, and the
+reload rotation then gives the ROM's r2 for -1 and r0 for i. In plain C, cse1 merges the two
+`(set (reg) (const_int 328))` that the addsi3 expander makes. The constant stays two
+single-use pseudos (which combine folds back into each add, so reload loads it) only when one
+increment is loop.c's: `view = p;` at the top of the body makes view a giv of p, and its reduced
+increment lands before `p++` as in the ROM. What is left is the giv's initialization: loop.c
+emits it just before NOTE_INSN_LOOP_BEG, after `i = 5`, and the ROM has `mov r7, r8` before
+`movs r2, #5`. A reversed up-counter (`for (i = 0; i < 6; i++)`) does not help: check_dbra_loop
+reverses it in pass 1 before the giv is reduced, so its `i = 5` comes first again. Making view a
+giv of i (`view = &manager->effects[i]`) delays the reversal to pass 2 and fixes the init order,
+but then the giv's increment lands before i's increment, after `p++`. Next idea: a counter that
+check_dbra_loop can only reverse in pass 2 while view stays a giv of p.
