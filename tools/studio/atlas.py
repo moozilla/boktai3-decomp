@@ -348,6 +348,9 @@ def build():
     area_rows = {int(r["area"]): r for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "areas.csv"), encoding="utf-8"))}
     scene_rows = {int(r["scene"]): r for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "scenes.csv"), encoding="utf-8"))}
     st = {s["scene"]: s for s in areas.load_stages()}
+    # scenes the stage survey photographed (build/centaur/captures/scene_NNNN), as on World
+    cap = os.path.join(ROOT, "build", "centaur", "captures")
+    shot = lambda s: os.path.exists(os.path.join(cap, f"scene_{s:04d}", "screen.png"))
     for ar in stage["areas"]:
         i = ar["area"]
         row = area_rows.get(i, {})
@@ -359,11 +362,11 @@ def build():
         add(f"area:{i}", "Places/" + loc, kind="area", key=str(i), title=place_title(place) if loc != "Unlabeled areas" else place,
             label=place, short=short, location=loc, order=i,
             confidence=row.get("confidence", ""), scenes=[f"scene:{s}" for s in ar["scenes"]], maps=ar.get("maps", []),
-            enemies=ar.get("enemies", {}))
+            enemies=ar.get("enemies", {}), shot=next((s for s in ar["scenes"] if shot(s)), None))
         for s in ar["scenes"]:
             r = scene_rows.get(s, {})
             sd = st.get(s, {})
-            add(f"scene:{s}", None, kind="scene", key=str(s), title=r.get("label") or f"Scene {s}", area=f"area:{i}",
+            add(f"scene:{s}", None, kind="scene", key=str(s), title=r.get("label") or f"Scene {s}", area=f"area:{i}", shot=shot(s),
                 floor=r.get("floor", ""), stage=sd.get("stage"), palette=sd.get("palette"),
                 doors=[{"scene": d.get("scene"), "entrance": d.get("entrance"), "cond": d.get("cond", [])} for d in sd.get("doors", [])],
                 items=[{"category": x.get("category"), "item": x.get("item"), "name": x.get("name"), "chest": x.get("chest")} for x in sd.get("items", [])],
