@@ -679,3 +679,16 @@ r0-r4 were busy. Things that changed nothing or scored worse:
 - p->count read directly.
 Next: find what keeps combine from folding the load (a second live use of total that goes away
 later) or the ROM insn with four busy low registers.
+
+### sub_0819BB18 (Hresvelgr facing motion burst), 4 operand barriers kept
+Draft: notes/phase3-drafts/monsters-bosses/sub_0819BB18.c (`union RandomTableView` re-set in the loop, no
+barriers: 24 ROM / 23 draft differ). In the ROM the base 0x0203B000 stays in r7 for the whole loop.
+The first sample's `table + 512` is computed as `r7 + 0x400` and hoisted to the stack, not folded
+to 0x0203B400. The second and third samples recompute `r7 + 0x400` in the loop (one `adds`).
+- Union re-set in the loop: cse folds the first sample (same block as the set) to the literal.
+- Plain pointer set before the loop: cse2 folds the hoisted copy, and gcse reuses it for the
+  later samples (28/22).
+The ROM needs a table pseudo that cse never sees as constant in the first sample's block or in
+the preheader, and that gcse does not treat as redundant for the later samples.
+Next: a matchsearch store over where the table is set and what type it has (symbol vs integer
+address, the 512 offset applied at the call site or in the helper).
