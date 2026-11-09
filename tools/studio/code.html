@@ -125,7 +125,7 @@ a.chip:hover { border-color: var(--accent); text-decoration: none; }
     <div class="tools"><input id="q" type="search" placeholder="Find a function, unit, type or RAM object" autocomplete="off"></div>
     <div id="tree"></div>
   </section>
-  <section id="view"><div class="page empty">Loading the code index… (the first visit after a source change runs tools/progress.py, about half a minute)</div></section>
+  <section id="view"><div class="page empty">Loading the code index…</div></section>
 </main>
 <script src="/static/common.js"></script>
 <script>
@@ -588,7 +588,9 @@ async function watchUpdate() {
   const t = await fetch('/api/codemap').then(r => r.json()).catch(() => null);
   if (t && !t.updating) { await load(); route(); } else setTimeout(watchUpdate, 5000);
 }
-load().then(() => { route(); setTimeout(watchUpdate, 5000); }).catch(err => { $('view').innerHTML = notFound(`The code index failed to load (${err}). Check the Studio's terminal.`); });
+// only a first build is slow (tools/progress.py, about half a minute); say so if this is one
+const slowNote = setTimeout(() => { const v = $('view').querySelector('.page.empty'); if (v && !S) v.textContent += ' The first visit after a source change runs tools/progress.py, about half a minute.'; }, 2500);
+load().finally(() => clearTimeout(slowNote)).then(() => { route(); setTimeout(watchUpdate, 5000); }).catch(err => { $('view').innerHTML = notFound(`The code index failed to load (${err}). Check the Studio's terminal.`); });
 </script>
 </body>
 </html>
