@@ -394,6 +394,30 @@ timer and lift, swapped stores, `lift = timer`, chained `timer = lift = zero`, a
 out of the loop preheader (a different spelling of the timer member, or the slot struct the
 siblings ScriptRaise/Append use, written as one HI store), or find the source of the tie.
 
+### ScenePool_StateLaunchArc (src/fn/sub_0803E5F4.c, 0803E5F4): deferred
+
+Drafts: `notes/phase3-drafts/actors/ScenePool_StateLaunchArc_owncalls.c` (5 ROM / 2 draft: every
+state block written in full with its own Memory_Clear, break, `return 0` after the switch) and
+`notes/phase3-drafts/actors/ScenePool_StateLaunchArc.c` (13 / 7, but the ROM's layout: a
+`history` set in each case, one shared `Memory_Clear(history, 0x100)` after the switch, case 3's
+state 1 behind a goto after it). In both, the random read (`RANDOM_TABLE_ADDR` literal, fact 21)
+and the launch half match. The ROM: cases 0, 1 and case 2's state 1 keep their own stores
+(`strb r1, [r0]; adds r0, #8`) and jump to the `movs r1, #0x80` of case 3's state 2. Case 3's
+state 1 keeps its own call with `adds r1, #0xff` (reload's move2add). Two blockers:
+(1) With own calls, move2add (which runs before jump2) turns case 2 state 1's `r1 = 256` into
+`r1 += 255` because r1 = 1 there. Its tail then equals case 3's state 1, so jump2 can't share
+the call at 190 as the ROM does. Case 0 has the same problem once its 1 lands in r1. So at
+reload_cse time the ROM had no `r1 = 256` in those blocks, or a label before it: the call
+was shared before reload.
+(2) With a shared call, those three blocks end in identical `[strb r1, [r0]; adds r0, #8]`
+tails that jump to the same label, and jump2 merges them. The ROM keeps them apart, so their
+jumps must have targeted labels with separate jump chains. One idea, not yet built: two labels
+around the `r0 = history` copy, which delete_noop_moves removes only after mark_all_labels has
+canonicalized labels. Case 2 state 1's 1 lands in r0 because its block has exactly three local
+qtys (fact 38); `AGBCC_FORCE=151:1` on the shared draft shows the merges that follow.
+Next: try that label shape, or derive the original helper (the pinned file's
+Prepare/PrepareFirst/PrepareZero inlines suggest a state-setting helper that returns history).
+
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 
 ### SceneGrid_ScanColumns (src/fn/sub_0806E7CC.c, 0806E7CC): deferred
