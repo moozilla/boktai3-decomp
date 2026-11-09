@@ -56,6 +56,15 @@ h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
 .chip { font-size: 12.5px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); white-space: nowrap; color: var(--ink); }
 a.chip:hover { border-color: var(--accent); text-decoration: none; }
 .chip small { color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 18px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 10px 14px; color: var(--ink); }
+a.stat:hover { border-color: var(--accent); text-decoration: none; }
+.stat b { display: block; font-size: 22px; font-weight: 650; }
+.stat span { color: var(--muted); font-size: 12.5px; }
+.views { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.view { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
+.view:hover { border-color: var(--accent); text-decoration: none; }
+.view small { color: var(--muted); font-size: 12px; line-height: 1.35; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .card { display: flex; flex-direction: column; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); min-height: 64px; }
 .card:hover { border-color: var(--accent); text-decoration: none; }
@@ -535,8 +544,47 @@ function route() {
   document.title = 'Boktai 3 ' + (e ? e.title : id.startsWith('node:') ? id.split('/').pop() : 'Browse');
   renderTree();
 }
+// The Studio's front page: what this is, the numbers, the game's tree and the other views.
+const VIEWS = [
+  ['Code', '/code', 'Every function: its C beside the disassembly, concessions left, what it calls and touches'],
+  ['Text', '/', 'Every string with the fan translation, in the game font; build a mod ROM'],
+  ['Scripts', '/scripts', 'The scene scripts (Konami GCL) in a readable form, with recovered names'],
+  ['Sprites', '/gfx#sprites', 'Sprite packages and large sprites, every frame and animation'],
+  ['Maps', '/gfx#maps', 'Stages with doors, items, enemies and patrol paths'],
+  ['World', '/world', 'How the rooms connect, area by area'],
+  ['Sound', '/sound', 'Every song, played from the ROM\'s own sequences and samples'],
+  ['Live', '/live', 'The game running in mGBA, every sprite and text box matched to its resource'],
+  ['ROM', '/rom', 'The whole ROM as a treemap, by kind or by how well it is understood'],
+];
 function home() {
-  return `<div class="page"><h1 class="t">Boktai 3</h1><div class="cards" style="margin-top:16px">${T.map(n => folderCard(n.title)).join('')}</div></div>`;
+  const count = k => Object.values(E).filter(e => e.kind === k).length.toLocaleString();
+  setTimeout(homeStats, 0);
+  return `<div class="page">
+    <h1 class="t">Boktai 3 Studio</h1>
+    <p class="lede">Boktai 3 (<span lang="ja">新・ボクらの太陽 逆襲のサバタ</span>, Game Boy Advance, 2005), decompiled: the game's
+      characters, monsters, places, story, scripts, graphics, sound and code in one place. Start from a group below, or press
+      <span class="kbd">⌘K</span> to search everything. Links to other views open in a side panel.</p>
+    <div class="stats" id="hstats">
+      <div class="stat"><b>${count('beat')}</b><span>story beats</span></div>
+      <div class="stat"><b>${count('monster')}</b><span>monsters</span></div>
+      <div class="stat"><b>${count('scene')}</b><span>scenes in ${count('area')} areas</span></div>
+      <div class="stat"><b>${count('song')}</b><span>songs</span></div>
+      <div class="stat" id="hcode"><b>…</b><span>functions</span></div>
+    </div>
+    <h3>The game</h3>
+    <div class="cards">${T.map(n => folderCard(n.title)).join('')}</div>
+    <h3>Views</h3>
+    <div class="views">${VIEWS.map(([n, u, d]) => `<a class="view" href="${u}"><b>${n}</b><small>${d}</small></a>`).join('')}</div>
+  </div>`;
+}
+async function homeStats() {
+  const s = await fetch('/api/codemap/stats').then(r => r.ok ? r.json() : null).catch(() => null);
+  const el = $('hcode');
+  if (!el) return;
+  if (!s) { el.innerHTML = '<b>—</b><span>code index unavailable</span>'; return; }
+  const m = s.measures;
+  el.outerHTML = `<a class="stat" href="/code"><b>${Number(m.total_functions).toLocaleString()}</b><span>functions, all matching</span></a>
+    <a class="stat" href="/code"><b>${m.complete_code_percent.toFixed(1)}%</b><span>of code without concessions</span></a>`;
 }
 
 

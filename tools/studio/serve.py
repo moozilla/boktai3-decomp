@@ -418,6 +418,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
             import search  # the ⌘K palette on every page (common.js)
             q = urllib.parse.unquote(self.path[len("/api/search/"):])
             self.send(200, search.search(q, self.server.strings(), self.server.display_en))
+        elif self.path == "/api/codemap/stats":
+            import codemap  # the home page's numbers, without the tree
+            sm = codemap.summary()
+            self.send(200, {k: sm[k] for k in ("measures", "concession_kinds", "missing", "updating")} |
+                      {"ram": len(sm["ram"]), "functions_with_concessions": sum(
+                          1 for c in sm["categories"] for u in c["units"] for f in u["functions"] if f[4])})
         elif self.path == "/api/codemap":
             import codemap
             self.send(200, codemap.summary())
