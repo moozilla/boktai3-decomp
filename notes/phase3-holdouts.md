@@ -87,6 +87,30 @@ giv of i (`view = &manager->effects[i]`) delays the reversal to pass 2 and fixes
 but then the giv's increment lands before i's increment, after `p++`. Next idea: a counter that
 check_dbra_loop can only reverse in pass 2 while view stays a giv of p.
 
+### ScanlinePresentation_UpdateNoise (src/scanline_presentation.c, 0800D874): deferred
+
+Draft: `notes/phase3-drafts/field-effects/ScanlinePresentation_UpdateNoise.c`. It is the plain
+three-loop form, with `amplitude = &p->amplitude; delta = &p->delta;` after `i = p->start`, the
+ROM's order. Score 75 ROM / 71 draft. With `AGBCC_FORCE=<loop 1's zero>:12` it is 31 / 27.
+Diagnosis (fact 92):
+* In the ROM, p is in r4 because its preferred class is LO_REGS. In the draft it is STACK_REG
+  (`AGBCC_REGCLASS_TRACE=22`: LO_REGS 26 against STACK_REG 24), so global alloc takes p from
+  the all-register alternate class, and pass 0 picks ip. That knocks loop 1's zero (the ROM's
+  ip) and everything after it out of place.
+* The ROM's adds of p are the draft's plus one: the noise loop's `p + 726` (p->amplitude),
+  hoisted into ip at 0x68. In the draft, cse2 rewrites that hoisted add into a copy of
+  `amplitude`, so p loses an odd-offset vote.
+* With the pointers set at the top of the function (before loop 1), cse2 doesn't merge them,
+  and p is LO_REGS (43 / 45). But the ROM computes them after `i = p->start`.
+* The ROM's 726 constants are single-use (`ldr r1, =0x2D6; adds r1, r1, r4`, reload's
+  pattern). The draft shares one constant pseudo (`adds r7, r4, r3`).
+* The pinned version's per-iteration `end = p + endOffset` also gets the ROM's in-loop
+  `p + r8` and the r8 constant.
+
+Next idea: C in which amplitude's address and the loop's `p->amplitude` don't share a cse
+equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
+add survives.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
