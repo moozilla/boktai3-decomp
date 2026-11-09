@@ -1014,3 +1014,14 @@ Tried:
 - `ObjectFade_SourceBank(i)`
 - inline copy wrappers (worse: the base address is no longer hoisted)
 Next: C where bank does not die in the r0 copy (or is not a plain copy), so it gets no suggestion.
+
+### GameState_SelectRamBase (src/script_virtual_machine.c, 0821B084): deferred, one operand order
+
+Pin: `base` in r1.
+Draft: `notes/phase3-drafts/monsters-bosses/GameState_SelectRamBase.c` (1 ROM / 1 draft).
+cse swaps `base += off` to `(plus off base)`, so the draft prints `adds r1, r0, r1`; the ROM has `adds r1, r1, r0`.
+update_equiv_regs doubles base's refs (its first set is a constant).
+Tried, all with the same result:
+- `= gGameStateStorage + off` and `&arr[off]` (worse: the base load moves late)
+- `u32` arithmetic, `off + base`, `<< 3`, `% 128`, an offset local
+Next: a first set of base that is not a constant equivalence, or a form cse leaves in order.
