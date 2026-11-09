@@ -63,7 +63,9 @@ struct GameState {
     u8 unk524[0x12];
     s16 unk536;
     u16 counter538; /* (guess) capped at 9999 */
-    u8 unk53A[0x28];
+    u8 unk53A[0x24];
+    u16 counter55E; /* (guess) capped at 9999 */
+    u8 unk560[0x2];
     u16 counter562; /* (guess) capped at 9999 */
     u8 unk564[0x2];
     u16 counter566; /* (guess) capped at 9999 */
