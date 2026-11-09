@@ -1530,6 +1530,31 @@ Each was read from the compiler source and confirmed on a live draft.
    Actor_UpdateProjectedEntryAnimation and its Silent twin without pins. Declaring the array
    second doesn't help, and neither does a u8 array.
 
+72. **Read a pad word fresh at each test to keep regmove from tying it.** `u16 held = gPadState[0];`
+   then `held & K` in several tests makes held die in the AND, and regmove's fixup_match_1 ties the
+   AND's output to it, so one register holds both. Writing `gPadState[0] & K` at each test gives
+   each AND its own load and the ROM's separate registers; gcse's PRE then copies the shared
+   address (`adds r3, r1, #0`). This matched ChoiceMenu_HandleInput without pins.
+
+73. **A store in each arm of an if keeps flow from making a post-increment.** flow's find_auto_inc
+   joins `*p = v; p++;` into `stmia`/post-increment only when the store and the increment are in
+   the same basic block. `if (c) { ...; *p = x; } else *p = x; p++;` puts the store in both arms;
+   jump2's cross-jumping merges the two stores back into one, so the ROM shows a plain `str` and a
+   separate `adds`. ChoiceMenu_CreateFromScript.
+
+74. **`*(&value) = f();` keeps a loop invariant inside the loop.** Taking the address makes value an
+   ADDRESSOF during cse1; purge_addressof turns it back into a register but leaves extra insns, which
+   raise the loop's insn_count past loop.c's `threshold * savings * lifetime` test, so the invariant
+   stays where the ROM computes it. The same spelling matched DirectionalController_ScriptCreate
+   and ChoiceMenu_CreateFromScript.
+
+75. **update_equiv_regs doubles a constant register's live length once per set.** local-alloc.c does
+   `REG_LIVE_LENGTH (regno) *= 2` for each insn whose set carries a REG_EQUIV note, so a pointer set
+   to the same symbol in two places is weighted x4 (StatusScreen_DrawClock: 48 -> 192, priority 625
+   against 833 for the gBgRecords constants). One set doubles it once. `life_note` names this case.
+   When a parser returns its text pointer from every path (`text = ...; return text;`), text and the
+   scan cursor stay in separate registers (ChoiceMenu_ParseTag).
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
