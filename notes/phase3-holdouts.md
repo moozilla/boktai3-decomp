@@ -507,3 +507,17 @@ pair comes after the index computation instead of before the gRandomIndex load. 
 sets the table before the first index but ends its life (or its refs) as the helper form does.
 Passing gRandomTable straight to RandomFrom (no variable) gives the same 14/14 as the pinned-out
 draft; the union RandomTableView forms are no better.
+
+### Axe_UpdateDamageSpin (src/fn/sub_080F9974.c, 080F9974): pin and one barrier left
+
+Landed: the flags2D6 `mask` barrier is gone (`OrStatus(0x20, &actor->flags2D6)`, an inline
+whose constant parameter is set before the address). Draft `Axe_UpdateDamageSpin.c` has no
+concessions: `state[0xED6] = 1; *(u16 *)(state + 0xED4) = 0;` gives the ROM's code, including
+reload's `subs r1, #2` (move2add). It is 11/11, with one swap left: context (7 refs / 170 live,
+pri 823) and the constant 1 (4 refs, flow life 48, doubled by REG_EQUIV to 96, pri 833) take r8
+and sb the wrong way round. `AGBCC_PRI=context:+20` matches. One more flow-time insn inside the
+1's range (SetState's field2B1 store to the ED6 store) would flip it (both lives grow, the 1's
+counts twice), and so would three fewer insns in context's range outside it. Tried without
+effect: local temps for angle/zero/speed/one, a shadow pointer, a struct copy through pointers,
+inline helpers for the ED6/ED4 stores (constant parameters are substituted), and simpler
+mask forms (those change the code).
