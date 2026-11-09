@@ -22,7 +22,8 @@ CODE = {'categories': [{'name': 'Monsters', 'units': [{'name': 'Ghoul', 'functio
 class SearchTests(unittest.TestCase):
     def setUp(self):
         for name, value in (('_atlas', lambda: ATLAS), ('_code', lambda: CODE), ('_procs', lambda: {12: 'spawn_ghoul'}),
-                            ('_places', lambda: [{'name': 'Ancient Tree', 'areas': [4, 5], 'scenes': 14}])):
+                            ('_places', lambda: [{'name': 'Ancient Tree', 'areas': [4, 5], 'scenes': 14}]),
+                            ('_resources', lambda: {'map': [['7EFB', 900]], 't92B3': [['081B', 512]]})):
             context = patch.object(search, name, value)
             context.start()
             self.addCleanup(context.stop)
@@ -49,6 +50,12 @@ class SearchTests(unittest.TestCase):
         strings = [{'id': 7, 'text': 'グールだ'}, {'id': 8, 'text': 'ほかの'}]
         hits = search.search('a ghoul', strings=strings, english={7: 'A ghoul!'})
         self.assertEqual([h['url'] for h in hits if h['kind'] == 'text'], ['/text#7'])
+
+    def test_scene_number_and_resource_hashes(self):
+        self.assertEqual(search.search('scene 2719')[0]['url'], '/atlas#scene:2719')
+        self.assertEqual(search.search('2719')[0]['url'], '/atlas#scene:2719')
+        self.assertEqual(search.search('7efb')[0], {'kind': 'map', 'title': 'Map 7EFB', 'sub': 'resource map', 'url': '/gfx#maps/7EFB'})
+        self.assertEqual(search.search('081b')[0]['url'], '/gfx#palettes/081B')
 
     def test_empty_query(self):
         self.assertEqual(search.search('  '), [])

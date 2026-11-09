@@ -24,7 +24,7 @@ ATLAS_KIND = {"package": "sprite", "actor": "object", "monster": "monster", "cha
 # how a tie between equally good matches is broken: the things people look for first
 RANK = {"monster": 9, "character": 8, "object": 8, "item": 7, "area": 6, "story": 5, "scene": 5, "cutscene": 4,
         "sprite": 4, "function": 4, "song": 3, "script": 3, "procedure": 3, "tileset": 2, "map tiles": 2,
-        "RAM": 3, "unit": 3, "type": 3, "subsystem": 1, "text": 1, "place": 6}
+        "RAM": 3, "unit": 3, "type": 3, "subsystem": 1, "text": 1, "place": 6, "map": 4, "palette": 3}
 
 
 def score(q, title, *others):
@@ -74,6 +74,14 @@ def _places():
         return []
 
 
+def _resources():
+    try:
+        import serve
+        return serve.resource_index()
+    except Exception:
+        return {}
+
+
 def _procs():
     try:
         import gclview
@@ -120,6 +128,16 @@ def search(q, strings=None, english=None, limit=50):
             add(score(q, r["name"], r["addr"]), "RAM", r["name"], r["addr"], "/code#ram:" + r["name"])
         for t in code.get("types", []):
             add(score(q, t), "type", t, "struct", "/code#type:" + t)
+    # a scene by number ("2712", "scene 2712") and a map or palette by its resource hash ("7EFB")
+    m = re.fullmatch(r"(?:scene\s*)?(\d{1,5})", q)
+    if m:
+        e = _atlas().get(f"scene:{int(m.group(1))}")
+        if e:
+            add(95, "scene", e.get("title") or f"Scene {m.group(1)}", f"scene {int(m.group(1))}", "/atlas#" + e["id"])
+    if re.fullmatch(r"[0-9a-f]{4}", q):
+        for label, kind, url in (("map", "map", "/gfx#maps/"), ("t92B3", "palette", "/gfx#palettes/")):
+            if any(h == q.upper() for h, _ in _resources().get(label, [])):
+                add(90, kind, f"{kind.capitalize()} {q.upper()}", "resource " + label, url + q.upper())
     for p in _places():
         add(score(q, p["name"]), "place", p["name"], f"{len(p['areas'])} area{'s' * (len(p['areas']) != 1)} · {p['scenes']} scene{'s' * (p['scenes'] != 1)}",
             "/world#place=" + urllib.parse.quote(p["name"]))
