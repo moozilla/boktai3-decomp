@@ -672,6 +672,27 @@ keeps the shifts, 2 / 2), `% 16`, ParticleRandom_ReadSample (do/while), and swap
 frame test's arms (worse). Next: a mask whose bits combine narrows to 15 through nonzero_bits
 (the 15 would be a new const after cse).
 
+### ActorAttachment_CreateValueSpriteSlot (src/fn/sub_08065FD0.c, 08065FD0): PRE slot order only
+
+Draft: `notes/phase3-drafts/actors/ActorAttachment_CreateValueSpriteSlot.c` (15 / 15, every
+difference a PRE stack slot; `AGBCC_GCSE_T=127` or `=133` gives MATCH). Three levers got it
+from 126 there:
+(1) The sprite tail (Sprite_Init .. `placed->position`) is an inline helper. integrate.c folds
+the large offsets 0x134 / 0x10E / 0x104 to const form there (fact 55), so gcse hoists them above
+the frame loop as the ROM does.
+(2) The frame-select loop is a label/goto loop. With while/for/do, NOTE_LOOP_BEG keeps the else
+label and the loop label apart in jump1, so LCM inserts into the else block and loop.c hoists
+`4` and the copies.
+(3) The burst pointer starts after Mod and steps inside the body, with the draw written as
+`*(u16 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2)`.
+Left: N = 258 real insns into gcse (T 129). The ROM's order (action, resourceKind, active,
+sprite, sequences, unknownA) needs N 252..255 or 264..267 (`preorder`). About 30
+code-preserving spellings keep N at exactly 258: the switches, IsAlternateMode, the goto
+shapes, found/i types, burst loop forms, inline boundaries and dead results. A manager-fetch
+inline moves N (e3: 263) but changes the code. Next: a structural difference that later passes
+remove (jump threading of a second null test, a return-label shape). Or a shared inline with
+CreateSpriteSlot / the other Create* slots once they are matched.
+
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 
 ### SceneGrid_ScanColumns (src/fn/sub_0806E7CC.c, 0806E7CC): deferred
