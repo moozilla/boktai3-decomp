@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "temporary_animation_pool.h"
 struct TemporaryAnimationPool *TemporaryAnimationPool_Create(void);
 struct TemporaryAnimationSlot *TemporaryAnimationPool_FindInactive(struct TemporaryAnimationPool *);
@@ -23,21 +22,17 @@ struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, 
     Widget_CopyMasked(animation, sequence, 27);
     animation->flags |= flags;
     if (paletteIndex > 0) {
-        const void *palette;
         animation->paletteIndex = paletteIndex;
-        palette = paletteData;
-        if (!palette)
-            palette = gPaletteBankData + paletteIndex * 32;
-        animation->paletteData = palette;
+        if (paletteData)
+            animation->paletteData = paletteData;
+        else
+            animation->paletteData = gPaletteBankData + paletteIndex * 32;
     }
     if (animation->flags & 128)
         Anim_LinkToList(animation, 1);
     else
         Anim_LinkToList(animation, 0);
-    {
-        register u32 frames asm("r1") = lifetime;
-        slot->lifetime = frames;
-    }
+    slot->lifetime = lifetime;
     slot->active = 1;
     return slot;
 }
