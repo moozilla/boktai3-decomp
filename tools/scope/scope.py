@@ -1067,7 +1067,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         print("  To keep a tail apart: end it in `return` (it shares only its r0 set with the last return, then"
               " jumps to a new label with no jump chain), or let its call fall into a label, as an if/else"
               " chain's last branch before shared code does: flow puts a (use 0) nop after that call, which no"
-              " jumping tail matches. To share one, let it jump to that label (README fact 39)")
+              " jumping tail matches. When two arms of an inner if/else merge, put a `return` right after that"
+              " if/else (inside the enclosing branch): the else arm's call then falls into the return's label"
+              " (ScenePool_SelectRepeatOrExit). To share one, let it jump to that label (README fact 39)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -3517,6 +3519,12 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
     print("      a tail that several branches jump to may be one the C writes in each branch (an inline"
           " helper: fact 55 keeps its field addresses apart); jump2 merges the copies after reload, and"
           " each copy's reload choices still count (README fact 59)")
+    rnd = [n for n in cl if 0 < n <= len(text) and re.search(r"gRandomTable|gUnk_0203B400", text[n - 1])]
+    if rnd:
+        print(f"      the random table is read here (line {', '.join(map(str, rnd))}): reading it through"
+              " RANDOM_TABLE_ADDR (`*(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1))`, or"
+              " SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py) changes the reloads around the"
+              " table address (ScenePool_UpdateSpeedPulse, _ScheduleSpeedControl)")
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
