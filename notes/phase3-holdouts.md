@@ -549,3 +549,70 @@ remains. Without it (draft `sub_080B197C.c`, 26/26, an r4/r5 swap only) a (18 re
 SceneActor_DispatchContextAction fixes the allocation but changes the code. `!active` and
 `active == 0` fold before regclass counts. Next: a ninth natural ref of active, or two insns less
 of its life.
+
+### Ivy_UpdateDefeat (src/fn/sub_080EE1B0.c, 080EE1B0): table pin, one load position from a match
+
+Six-spark family, but here the table is a local-alloc qty, not a REG_EQUIV spill. Block 24's
+call-saved qtys (AGBCC_DUMPPRI L records) in priority order: =gRandomIndex 2010 r4, a pointer
+1163 r5, =1#2 769 r6, size 760 r8, then the position `&actor->body.position` (7 refs, life
+58-252, 721) and the table (7 refs, 36-236, 700). The ROM has the table in sb and the position in
+sl, so the table must come first: its life must be 185-193, or the position's over 200.
+Draft `Ivy_UpdateDefeat.c` (5/5, no table variable): a `NextRandom(wrap, bits)` helper that reads
+`gRandomTable` itself gives the constant pseudo its birth at the first `add` (48, pri 744), and
+the allocation is the ROM's. The only difference left is that the `ldr =gRandomTable; mov sb`
+pair comes after the index computation instead of before the gRandomIndex load. Next: a form that
+sets the table before the first index but ends its life (or its refs) as the helper form does.
+Passing gRandomTable straight to RandomFrom (no variable) gives the same 14/14 as the pinned-out
+draft; the union RandomTableView forms are no better.
+
+### Axe_UpdateDamageSpin (src/fn/sub_080F9974.c, 080F9974): pin and one barrier left
+
+Landed: the flags2D6 `mask` barrier is gone (`OrStatus(0x20, &actor->flags2D6)`, an inline
+whose constant parameter is set before the address). Draft `Axe_UpdateDamageSpin.c` has no
+concessions: `state[0xED6] = 1; *(u16 *)(state + 0xED4) = 0;` gives the ROM's code, including
+reload's `subs r1, #2` (move2add). It is 11/11, with one swap left: context (7 refs / 170 live,
+pri 823) and the constant 1 (4 refs, flow life 48, doubled by REG_EQUIV to 96, pri 833) take r8
+and sb the wrong way round. `AGBCC_PRI=context:+20` matches. One more flow-time insn inside the
+1's range (SetState's field2B1 store to the ED6 store) would flip it (both lives grow, the 1's
+counts twice), and so would three fewer insns in context's range outside it. Tried without
+effect: local temps for angle/zero/speed/one, a shadow pointer, a struct copy through pointers,
+inline helpers for the ED6/ED4 stores (constant parameters are substituted), and simpler
+mask forms (those change the code).
+
+### Terrain_ResolveActorMotion (src/fn/sub_0811AE9C.c, 0811AE9C): 6 concessions, pin-free draft 10/10
+
+Draft `Terrain_ResolveActorMotion.c` (no concessions) rewrites the middle part:
+`clearance = Terrain_GetCellClearance(next.coordinates); y = next.coordinates[1];
+floor = clearance - Offset(next.coordinates[2]);` (the Offset inline keeps `z + 96` from being
+reassociated into `clearance - 96 - z`), and `shape = 0xF00; shape &= flags; flags &= 0xF000;`.
+That also removes the z-clamp cross-jump difference: both arms now keep their own deltaZ store.
+Two differences are left. (1) In the else arm the ROM negates a copy of offset for
+`Abs(offset) >> 12`. cse's fold_rtx turns `-x`, with x known to be `-(difference << 12)`, back
+into the shift's pseudo, so the draft keeps the shift alive in r2 and the ROM's local r0/r1
+pair is lost. Splitting it as `offset = difference << 12; offset = -offset;` gives the right
+negation (11/11, shape 0) but puts both in one register. The original's C must hide the
+`neg` from cse (the pinned version did that with `asm("" : "+r"(offset))`). (2) The high-byte
+result and shape sit one register higher (r3/r4, ROM r2/r3), because offset's pseudo takes r2.
+Fixing (1) probably fixes (2).
+
+### sub_0813D834 (src/player_3.c, 0813D834): 2 pins, one cse follow from a match
+
+Draft `sub_0813D834.c` (no pins) is 17/15. Every difference comes from cse following the
+switch's `beq` into case 1 (`probe`: `CSE_NOFOLLOW=2` matches). cse then knows kind == 1 and folds
+the timers path's `kind * 2` into `ldr =0x532`, where the ROM computes `lsls r0, r3, #1` (kind
+kept in r3). cse_end_of_basic_block follows a jump only to a label with LABEL_NUSES == 1 that is
+preceded by a BARRIER, so the original's case 1 label must have had a second use or no barrier
+before it. No effect: an if/else chain (worse), `u32 kind`, computing from `inputKind`, a
+`goto` to the timers block from the flags test.
+
+### PlayerAction_RefreshFlagState (src/player_3.c, 0813EDDC): 7 concessions, pin-free draft 8/8
+
+Draft `PlayerAction_RefreshFlagState.c` drops all seven (`if (alternate < 0) override = 0; else
+override = GameState_GetConsumableDescriptor(alternate);` and `override->slot` read directly).
+What is left is reload rotation: `scope.py spill` matches with `AGBCC_SPILL=5:1`. Between reload
+4 (the 0x418 actionMode offset, r2) and reload 5 (alternate from r8 for `cmp`), the ROM made one
+more reload choice that took r0 and left no visible insn. Reload 5 then got r1, and override's
+reloads in the slot loop follow. Writing the actionMode/slot test as separate ifs, through a
+`mode` local or pointer, `!= 0`, or a `u32 slot` local changes nothing, and neither does a
+ternary for override (worse). Next: find the ROM's hidden reload (a pseudo with a MEM REG_EQUIV
+replaced at its use, or a copy deleted after reload).
