@@ -650,8 +650,8 @@ async function route() {
   const slow = setTimeout(() => { v.innerHTML = `<div class="page empty">Loading ${esc(h)}…</div>`; }, 150);
   let html;
   if (!h) { SEL = '#'; html = overview(); }
-  else if (h === 'ram') html = ramList();
-  else if (h === 'types') html = typeList();
+  else if (h === 'ram') { html = ramList(); document.title = 'RAM objects · Boktai 3 Code'; }
+  else if (h === 'types') { html = typeList(); document.title = 'Types · Boktai 3 Code'; }
   else if (h.startsWith('type:')) html = await typePage(h.slice(5));
   else if (h === 'left' || h.startsWith('left:')) { html = leftPage(h.slice(5)); document.title = 'Concessions left · Boktai 3 Code'; }
   else if (h.startsWith('ram:')) html = await ramPage(h.slice(4));
