@@ -59,3 +59,20 @@ Draft: `notes/phase3-menus-link/StatusScreen_DrawClock.c` (4 ROM / 4 draft insns
   the shift in the for init, operand orders of the add.
 * Next: a form where shift lives two insns less (or the pointer two more) without moving the
   `out = dst` copy; or what made the original's `values` denser.
+
+## actors
+
+### SceneObjects_ScriptLower (src/fn/sub_0801E998.c, 0801E998): deferred
+
+Draft: `notes/phase3-drafts/actors/SceneObjects_ScriptLower.c` (3 ROM / 3 draft insns differ,
+allocation only; a whole-file unit copy). Shape: a do-while inside `if (found < count)`, with
+`slots`, `int zero = 0` and `int one = 1` set inside the if, and the callback pointer
+`fn = SceneObject_UpdateLowered` at the top. The ROM keeps the constant 1 (variant store) in sb;
+the draft gives sb the timer's HImode insertion-mask zero (facts 61/63; priority 306), which the
+`b3a = 0` byte store then reuses through the wider-mode lookup. `one` scores 300 because the
+hoisted `=0` set lengthens its life by one insn; the pinned original won on a tie (283 vs 283).
+Tried without effect or worse: u8/u16 `one`/`zero`, a `u16 *` for the timer store, plain `0` for
+timer and lift, swapped stores, `lift = timer`, chained `timer = lift = zero`, and more refs to
+`one` (`found = one`, `b3b + one`) or `zero` (`b3a = zero`). Next idea: keep the timer's HI zero
+out of the loop preheader (a different spelling of the timer member, or the slot struct the
+siblings ScriptRaise/Append use, written as one HI store), or find the source of the tie.

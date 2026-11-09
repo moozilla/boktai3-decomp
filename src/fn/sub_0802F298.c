@@ -1,6 +1,5 @@
 #include "global.h"
 #include "engine.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -59,30 +58,32 @@ void SceneActorAnimation_UpdateTargetFacing(struct Context *ctx, u8 *p)
         struct Vec *target = ctx->target;
         s32 angle = Math_Atan2(target->x - pos->x, target->z - pos->z);
         if (*(*((u8 **)(((u8 *)p) + 0x2B8)))) {
-            register u8 *current asm("r2") = ((u8 *)p) + 0x65;
+            u8 *current = ((u8 *)p) + 0x65;
             s32 diff = (s8)(angle - (*current));
             s32 value;
-            register s32 octant asm("r2");
+            s32 octant;
             s32 mask;
             s32 quadrantMask;
             if (diff > 8) {
                 value = *current;
                 value += 8;
                 *current = value;
-            } else {
-                if (diff < -8) {
-                    value = *current;
-                    value -= 8;
-                } else {
-                    value = *current;
-                    value += diff;
-                }
+                octant = value + 112;
+            } else if (diff < -8) {
+                value = *current;
+                value -= 8;
                 *current = value;
                 value = (u32)value << 16;
                 value = (u32)value >> 16;
+                octant = value + 112;
+            } else {
+                value = *current;
+                value += diff;
+                *current = value;
+                value = (u32)value << 16;
+                value = (u32)value >> 16;
+                octant = value + 112;
             }
-            octant = value;
-            octant += 112;
             octant >>= 5;
             mask = 7;
             mask &= octant;

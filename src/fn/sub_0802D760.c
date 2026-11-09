@@ -1,7 +1,11 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Part {
     u8 pad[6];
+    u16 frames;
+};
+/* Keyframe display state handed to SceneBody_SetKeyframeDisplay (kind 2). */
+struct Keyframes {
+    u8 pad[0x3a];
     u16 frames;
 };
 struct Object {
@@ -16,36 +20,29 @@ struct Object {
     struct Part part;
     u8 pade8[0x14];
     u8 transform[4];
-    u8 pad100[0x3a];
-    u16 modelFrames;
+    struct Keyframes keyframes;
 };
 int DisplayAnimation_InitializeKeyframes(void *, int, int, void *);
 int DisplayAnimation_InitializeSequence(void *, int, int, int, void *);
-void SceneBody_SetKeyframeDisplay(void *);
+void SceneBody_SetKeyframeDisplay(void *, void *);
 void SceneBody_SetSprite(void *, void *);
 int DisplayAnimation_SetPriority(void *, int);
-struct Model {
-    u8 pad[0x3a];
-    u16 frames;
-};
 int Actor_InitDrawable(struct Object *p, int kind, int a, int b, int c)
 {
     void *d = &p->drawable;
     int status = -1;
     int result;
     if (kind == 2) {
+        struct Keyframes *keyframes;
         status = DisplayAnimation_InitializeKeyframes(d, a, c, p->pos);
-        {
-            register struct Model *m asm("r1") = (struct Model *)p->pad100;
-            p->frames = m->frames;
-        }
-        SceneBody_SetKeyframeDisplay(p->motion);
+        keyframes = &p->keyframes;
+        p->frames = keyframes->frames;
+        SceneBody_SetKeyframeDisplay(p->motion, keyframes);
     } else if (kind == 1) {
+        struct Part *part;
         status = DisplayAnimation_InitializeSequence(d, a, b, c, p->pos);
-        {
-            struct Part *part = &p->part;
-            p->frames = part->frames;
-        }
+        part = &p->part;
+        p->frames = part->frames;
         SceneBody_SetSprite(p->motion, p->transform);
     }
     p->savedFrames = p->frames;
