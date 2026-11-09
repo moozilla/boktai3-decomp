@@ -3067,6 +3067,20 @@ def spill_shifts(x, want):
     return [d for d in range(1, n) if spill_pick(x, (x["start"] + d) % n) == want]
 
 
+def spill_options(x, got):
+    """[(D, register)] for reload choice X: one AGBCC_SPILL shift per register other than GOT that the
+    shift makes it take. The first normal choice records start=-1 with rotate=1, and AGBCC_SPILL still
+    shifts it; only a forced group (rotate=0, or an old trace without the field) ignores the rotation."""
+    out, seen = [], {got}
+    movable = x["start"] >= 0 or x.get("rotate") is True
+    for d in range(1, len(x["regs"])) if movable else []:
+        g = spill_pick(x, (x["start"] + d) % len(x["regs"]))
+        if g not in seen:
+            seen.add(g)
+            out.append((d, g))
+    return out
+
+
 def spill_word(code, nm):
     if code.startswith("L"):
         return f"holds pseudo {nm(int(code[1:]))}"
@@ -4130,13 +4144,7 @@ def cmd_spill(src, func, env):
         x = xs.get(k)
         if not x:
             return [(d, None) for d in range(1, 8)]
-        out, seen = [], {got}
-        for d in range(1, len(x["regs"])) if x["start"] >= 0 else []:
-            g = spill_pick(x, (x["start"] + d) % len(x["regs"]))
-            if g not in seen:
-                seen.add(g)
-                out.append((d, g))
-        return out
+        return spill_options(x, got)
 
     def near(uid):  # the choice serves a differing insn (its own, or one of the few after it)
         p = pos.get(uid)
