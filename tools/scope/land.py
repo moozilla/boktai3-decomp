@@ -205,7 +205,9 @@ def refresh_function_markers(text, rel=None):
     for start, end, name in reversed(found):
         if name not in scores:
             text = text[:start] + text[end:]
-    return text
+    # a unit-level concession (a single-use macro, a CFLAGS override) is not in unit_scores: the unit
+    # keeps one marker while concessions() counts any
+    return text if MARKER in text else MARKER + "\n" + text
 
 
 def without_drafts(text):
