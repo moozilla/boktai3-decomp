@@ -79,141 +79,88 @@ s32 ChoiceMenu_FindSelectableRow(struct ChoiceMenu *p, s32 a, s32 d)
 
 void MessageWindow_Clear(void);
 
-// MATCHING_CONCESSION: register-pinning
 s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
 {
-    u32 rowStart;
     p->leftCursor.flags &= ~1;
     p->rightCursor.flags &= ~1;
     if (p->selected < 0) {
-        if (((*(struct ChoiceKeys *)gPadState).pressed & 240) ||
-            (!p->wakeDelay && ((*(struct ChoiceKeys *)gPadState).pressed & 3))) {
+        if (gPadState[1] & 0xF0 || (!p->wakeDelay && gPadState[1] & 3)) {
             ChoiceMenu_Select(p, p->initial);
             Sound_PlaySong(263);
         } else if (p->wakeDelay)
             p->wakeDelay--;
-    } else if (p->wakeDelay)
+        return 0;
+    }
+    if (p->wakeDelay) {
         p->wakeDelay--;
-    else {
-        struct ChoiceKeys *initialKeys = &(*(struct ChoiceKeys *)gPadState);
-        struct ChoiceKeys *keys;
-        u8 *repeat;
-        u32 pressed;
-        u32 sameDirection;
-        sameDirection = ({
-            u32 held = initialKeys->held;
-            u32 mask = p->held;
-            mask &= held;
-            mask;
-        });
-        keys = initialKeys;
-        if (sameDirection) {
-            u8 *ptr = &p->repeatDelay;
-            u32 delay = *ptr;
-            repeat = ptr;
-            if (delay) {
-                u32 value = delay - 1;
-                {
-                    u8 *destination = repeat;
-                    *destination = value;
-                }
-            }
+        return 0;
+    }
+    if (p->held & gPadState[0]) {
+        if (p->repeatDelay)
+            p->repeatDelay--;
+    } else
+        p->repeatDelay = 0;
+    p->held = gPadState[0] & 0xF0;
+    if (gPadState[1] & 2) {
+        if (p->allowCancel) {
+            Sound_PlaySong(222);
+            MessageWindow_Clear();
+            ChoiceMenu_DispatchSelection(p, -1);
+            p->leftCursor.flags |= 1;
+            p->rightCursor.flags |= 1;
+            Task_Kill(p);
+            return 1;
+        }
+    } else if (gPadState[1] & 1) {
+        Sound_PlaySong(221);
+        MessageWindow_Clear();
+        ChoiceMenu_DispatchSelection(p, p->selected);
+        p->leftCursor.flags |= 1;
+        p->rightCursor.flags |= 1;
+        Task_Kill(p);
+        return 1;
+    }
+    if (p->repeatDelay == 0) {
+        s32 current = p->selected;
+        struct Choice *choice = &p->choices[current];
+        s32 selection, limit, column, row;
+        if (gPadState[0] & 0x20) {
+            selection = current - 1;
+            limit = p->rowStart[choice->row];
+            if (selection < limit)
+                selection = limit;
+        } else if (gPadState[0] & 0x10) {
+            selection = current + 1;
+            limit = p->rowEnd[choice->row];
+            if (selection > limit)
+                selection = limit;
+        } else if (gPadState[0] & 0x40) {
+            column = current - p->rowStart[choice->row];
+            row = ChoiceMenu_FindSelectableRow(p, choice->row, -1);
+            if (choice->row == row)
+                selection = p->selected;
+            else
+                selection = p->rowStart[row] + column;
+            if (selection < p->rowStart[row])
+                selection = p->rowStart[row];
+            else if (selection > p->rowEnd[row])
+                selection = p->rowEnd[row];
+        } else if (!(gPadState[0] & 0x80)) {
+            return 0;
         } else {
-            p->repeatDelay = sameDirection;
-            repeat = &p->repeatDelay;
+            column = current - p->rowStart[choice->row];
+            row = ChoiceMenu_FindSelectableRow(p, choice->row, 1);
+            if (choice->row == row)
+                selection = p->selected;
+            else
+                selection = p->rowStart[row] + column;
+            if (selection < p->rowStart[row])
+                selection = p->rowStart[row];
+            else if (selection > p->rowEnd[row])
+                selection = p->rowEnd[row];
         }
-        p->held = keys->held & 240;
-        pressed = keys->pressed;
-        if (pressed & 2) {
-            if (p->allowCancel) {
-                Sound_PlaySong(222);
-                MessageWindow_Clear();
-                ChoiceMenu_DispatchSelection(p, -1);
-                p->leftCursor.flags |= 1;
-                p->rightCursor.flags |= 1;
-                Task_Kill(p);
-                return 1;
-            }
-        } else {
-            u32 one = 1;
-            if (({
-                    u32 bits = one;
-                    bits &= pressed;
-                    asm("" : : "r"(bits));
-                    bits;
-                })) {
-                Sound_PlaySong(221);
-                MessageWindow_Clear();
-                ChoiceMenu_DispatchSelection(p, p->selected);
-                p->leftCursor.flags |= one;
-                p->rightCursor.flags |= one;
-                Task_Kill(p);
-                return 1;
-            }
-        }
-        if (!({
-                u8 *ptr = repeat;
-                *ptr;
-            })) {
-            register s32 currentSelection asm("r2") = p->selected;
-            struct Choice *choice = &p->choices[currentSelection];
-            s32 selection, limit;
-            u32 held = keys->held;
-            if (held & 32) {
-                selection = currentSelection - 1;
-                limit = p->rowStart[choice->row];
-                if (selection >= limit)
-                    goto applySelection;
-                else
-                    goto clampSelection;
-            } else if (held & 16) {
-                selection = currentSelection + 1;
-                limit = p->rowEnd[choice->row];
-                if (selection > limit)
-                    goto clampSelection;
-            } else if (held & 64) {
-                s32 column = currentSelection - (rowStart = p->rowStart[choice->row]);
-                s32 row = ChoiceMenu_FindSelectableRow(p, choice->row, -1);
-                if (choice->row == row)
-                    selection = p->selected;
-                else
-                    selection = p->rowStart[row] + column;
-                limit = p->rowStart[row];
-                if (selection < limit)
-                    goto clampSelection;
-                limit = p->rowEnd[row];
-                if (selection > limit)
-                    goto clampSelection;
-            } else if (({
-                           u32 bits = 128;
-                           bits &= held;
-                           bits;
-                       })) {
-                register s32 column asm("r6") =
-                    currentSelection - (rowStart = p->rowStart[choice->row]);
-                s32 row = ChoiceMenu_FindSelectableRow(p, choice->row, 1);
-                if (choice->row == row)
-                    selection = p->selected;
-                else
-                    selection = p->rowStart[row] + column;
-                limit = p->rowStart[row];
-                if (selection < limit)
-                    goto clampSelection;
-                limit = p->rowEnd[row];
-                if (selection > limit)
-                    goto clampSelection;
-            } else
-                return 0;
-            goto applySelection;
-        clampSelection:
-            selection = limit;
-        applySelection:
-            ChoiceMenu_Select(p, selection);
-            {
-                u32 delay = 30;
-                *repeat = delay;
-            }
-        }
+        ChoiceMenu_Select(p, selection);
+        p->repeatDelay = 30;
     }
     return 0;
 }
@@ -272,36 +219,59 @@ s32 MessageWindow_GetNumberWidth(s32);
 
 u8 *Text_FindChar(u8 *, s32);
 
-// MATCHING_CONCESSION: register-pinning
+/* Reads a tag's `=N` argument from CURSOR (up to the closing '>', or past a NUL) into OUT; 0 when
+   it has none. */
+#define CHOICE_READ_TAG_VALUE(p, cursor, out)                                                      \
+    {                                                                                              \
+        s32 found = 0, length = 0;                                                                 \
+        while (*cursor != '>') {                                                                   \
+            if (!*cursor) {                                                                        \
+                cursor++;                                                                          \
+                break;                                                                             \
+            }                                                                                      \
+            if (*cursor == '=')                                                                    \
+                found = 1;                                                                         \
+            else if (found)                                                                        \
+                p->scratch[length++] = *cursor;                                                    \
+            cursor++;                                                                              \
+        }                                                                                          \
+        p->scratch[length] = 0;                                                                    \
+        if (found && length)                                                                       \
+            out = Text_ParseDecimal(p->scratch, length);                                           \
+        else                                                                                       \
+            out = 0;                                                                               \
+    }
+
 u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text)
 {
     u8 *cursor = text;
     s32 width;
     if (*text != '/') {
         if (!Text_ComparePrefix(text, gUnk_0824DB0C, 5)) {
-            READ_WIDTH();
+            CHOICE_READ_TAG_VALUE(p, cursor, p->explicitWidth);
             cursor = Text_FindChar(cursor, '>');
-            p->choices[p->count].x = (p->left + ({
-                                          register u8 *x asm("r4") = &p->textX;
-                                          asm("" : : "r"(x));
-                                          *x;
-                                      }))
-                                     << 3;
+            p->choices[p->count].x = (p->left + p->textX) << 3;
             p->choices[p->count].y = (p->top << 3) + (p->rows << 4);
             p->choices[p->count].row = p->rows;
             p->width = 0;
         } else if (!Text_ComparePrefix(text, gUnk_0824DB14, 6)) {
-            width = MessageWindow_GetStringWidth(READ_NUMBER());
+            s32 value;
+            CHOICE_READ_TAG_VALUE(p, cursor, value);
+            width = MessageWindow_GetStringWidth(value);
             p->width += width;
             p->textX += width;
             cursor = Text_FindChar(cursor, '>');
         } else if (!Text_ComparePrefix(text, gUnk_0824DB1C, 3)) {
-            width = MessageWindow_GetNumberWidth(READ_NUMBER());
+            s32 value;
+            CHOICE_READ_TAG_VALUE(p, cursor, value);
+            width = MessageWindow_GetNumberWidth(value);
             p->width += width;
             p->textX += width;
             cursor = Text_FindChar(cursor, '>');
-        } else
-            goto unknown;
+        } else {
+            text = Text_FindChar(text, '>');
+            return text;
+        }
     } else if (!Text_ComparePrefix(text, gUnk_0824DB20, 6)) {
         cursor = Text_FindChar(text, '>');
         if (p->explicitWidth)
@@ -311,18 +281,11 @@ u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text)
         p->count++;
         p->width = 0;
         p->rowCount[p->rows]++;
-    } else
-        goto unknown;
-    goto matchedTag;
-unknown: {
-    u8 *result = Text_FindChar(text, '>');
-    register u8 *saved asm("r4") = result;
-    asm("" : : "r"(saved));
-    return result;
-}
-matchedTag:
+    } else {
+        text = Text_FindChar(text, '>');
+        return text;
+    }
     text = cursor + 1;
-returnText:
     return text;
 }
 
@@ -486,7 +449,6 @@ void *Script_GetTextSourcePc(void);
 
 s32 MessageWindow_GetTextBounds(s32 *);
 
-// MATCHING_CONCESSION: register-pinning
 struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
 {
     s32 options[7], arguments[4], defaults[4];
@@ -494,7 +456,7 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
     s32 stringBase, script;
     struct ChoiceMenu *p;
     s32 i;
-    s32 *argumentBase;
+    s32 *base;
     if (gChoiceMenu)
         return 0;
     if (Script_SeekToKeyword('r'))
@@ -526,25 +488,22 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
     }
     if (Script_SeekToKeyword('A')) {
         s32 *arg;
-        argumentBase = arguments;
-        arg = argumentBase;
+        base = arguments;
+        arg = base;
         do {
             s32 value = Script_GetPc();
-            if (value)
-                value = Script_GetValue();
-            *arg = value;
-            asm("" : : "r"(arg));
+            if (value) {
+                *(&value) = Script_GetValue();
+                *arg = value;
+            } else
+                *arg = value;
             arg++;
-        } while ((s32)arg <= ({
-                     register s32 limit asm("r0") = (s32)argumentBase;
-                     limit + 12;
-                 }));
+        } while ((s32)arg <= (s32)(base + 3));
     } else {
-        s32 *arg;
+        s32 *arg, *begin;
         s32 zero;
-        s32 *begin;
-        argumentBase = arguments;
-        begin = argumentBase;
+        base = arguments;
+        begin = base;
         zero = 0;
         arg = arguments + 3;
         do {
@@ -557,12 +516,8 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
         Task_SetCallbacks(p, ChoiceMenu_Update, ChoiceMenu_Destroy);
         p->useScript = 1;
         p->script = script;
-        {
-            s32 *source = argumentBase;
-            u32 *destination = p->arguments;
-            for (i = 3; i >= 0; i--)
-                *destination++ = *source++;
-        }
+        for (i = 0; i < 4; i++)
+            p->arguments[i] = base[i];
         if (ChoiceMenu_Initialize(p, window, stringBase, options) < 0) {
             Task_Kill(p);
             return 0;
