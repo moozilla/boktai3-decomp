@@ -1,6 +1,7 @@
 #include "tether_actor.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
 #define TetherActor_GetStatusTag sub_08049F54
 
@@ -747,62 +748,24 @@ void TetherActor_EmitRingEffects(struct TetherActor *actor)
     } while (index <= 7);
 }
 
-union TetherPointPacket {
-    struct ContactPackedVector bits;
-    u32 words[2];
-};
-
-// MATCHING_CONCESSION: register-pinning
 
 void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const void *config)
 {
-    union TetherPointPacket position;
-    const u16 *table;
-    u32 *state;
-    u32 *savedState;
-    register u32 index asm("r3");
-    u32 indexMask;
-    s32 sampleX;
-    s32 sampleZ;
-    s32 sampleY;
-    register u32 jitterMask asm("r9");
-    register u32 upperMask asm("r10");
-    register u32 xy asm("r5");
-    s32 x;
-    register s32 z asm("r1");
-    s32 y;
-    u32 highY;
-    position.bits = *source;
-    table = (const u16 *)RANDOM_TABLE_ADDR;
-    state = &gRandomIndex;
-    savedState = state;
-    index = *state + 1;
-    indexMask = 1023;
-    index &= indexMask;
-    sampleX = table[index];
-    x = (u16)position.bits.x - 15;
-    jitterMask = 31;
-    asm("" : "+r"(jitterMask));
-    x += sampleX & jitterMask;
-    x = (u16)x;
-    upperMask = 0xFFFF0000;
-    xy = (position.words[0] & upperMask) | x;
-    position.words[0] = xy;
-    index = (index + 1) & indexMask;
-    sampleZ = table[index];
-    z = (u16)position.bits.z - 15;
-    z += sampleZ & jitterMask;
-    z = (u16)z;
-    asm volatile("" : "+r"(upperMask) : "r"(z) : "memory");
-    position.words[1] = (position.words[1] & upperMask) | (u16)z;
-    index = (index + 1) & indexMask;
-    *savedState = index;
-    sampleY = table[index];
-    y = ((s32)xy >> 16) - 16;
-    sampleY &= 63;
-    y -= sampleY;
-    highY = (u32)y << 16;
-    position.words[0] = (xy & 0xFFFF) | highY;
+    struct ContactPackedVector position = *source;
+    const u16 *table = gRandomTable;
+    {
+        s32 x;
+        u32 sample = ParticleRandom_ReadDirectSample(table);
+        x = (u16)position.x - 15;
+        position.x = x + (sample & 31);
+    }
+    {
+        s32 z;
+        u32 sample = ParticleRandom_ReadDirectSample(table);
+        z = (u16)position.z - 15;
+        position.z = z + (sample & 31);
+    }
+    position.y = position.y - 16 - (ParticleRandom_ReadDirectSample(table) & 63);
     AnimatedParticles_Create(1, &position, config);
 }
 
