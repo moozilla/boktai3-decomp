@@ -27,6 +27,8 @@ class TextUsesTests(unittest.TestCase):
                                                                 'place': 'Ancient Tree · Bat ambush', 'area': 0}]})
             self.assertEqual([(p['id'], p['place']) for p in serve.text_uses(7543)['procs']], [(5010, 'Ancient Tree · Bat ambush'), (5011, None)])
             self.assertEqual(serve.text_uses(1), {'procs': []})
+            with patch.dict(serve._TEXT_PLACES, {'key': None, 'data': {}}):
+                self.assertEqual(serve.text_places(), {7542: 'Ancient Tree', 7543: 'Ancient Tree'})
 
 
 if __name__ == '__main__':

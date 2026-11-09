@@ -47,20 +47,21 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointe
 // code by subsystem and function, each asset archive by resource, sound,
 // text, scripts, other data, unmapped gaps and free space. Click a block to
 // go into it; click a resource or function to open it. Color by kind, or by
-// how well it is understood (decompiled; decoded and named, decoded; located
-// but not decoded; assembly only; unmapped).
+// how well it is understood (decompiled; decompiled with a concession; decoded
+// and named, decoded; located but not decoded; assembly only; unmapped).
 studioHeader();
 const KIND = { code: '#3f9a63', asm: '#8a6d3b', sound: '#8e5bb5', graphics: '#3f7fbf', sprite: '#4aa3d9', map: '#2f6aa8', tiles: '#5b8fc9',
   palette: '#d0628f', font: '#c9a227', text: '#e07a3b', script: '#d4b53a', animation: '#5fb8b0', collision: '#7a8f99', data: '#6e665c', unknown: '#7a1f2b', free: '#2a2622' };
 const KNAME = { code: 'code', asm: 'code (assembly)', sound: 'sound', graphics: 'graphics', sprite: 'sprites', map: 'maps', tiles: 'tilesets', palette: 'palettes',
   font: 'fonts', text: 'text', script: 'scripts', animation: 'animation', collision: 'collision', data: 'other data', unknown: 'unmapped', free: 'free' };
-const LEVEL = { decompiled: '#4caf6a', named: '#8fd99c', decoded: '#3d8f8a', located: '#c9a227', assembly: '#b5583a', unmapped: '#8a2433', free: '#2a2622' };
-const LNAME = { decompiled: 'code decompiled to C', named: 'data decoded and named', decoded: 'data decoded', located: 'data located, format not decoded', assembly: 'code in assembly only', unmapped: 'unmapped', free: 'free space' };
+const LEVEL = { decompiled: '#4caf6a', concession: '#9cbf4a', named: '#8fd99c', decoded: '#3d8f8a', located: '#c9a227', assembly: '#b5583a', unmapped: '#8a2433', free: '#2a2622' };
+const LNAME = { decompiled: 'code decompiled to C', concession: 'code in C with a concession (pin, barrier, ...)', named: 'data decoded and named', decoded: 'data decoded', located: 'data located, format not decoded', assembly: 'code in assembly only', unmapped: 'unmapped', free: 'free space' };
 let T = null, mode = 'kind', focus = [], rects = [];
 try { mode = localStorage.getItem('rom.mode') || 'kind'; } catch (e) {}
 
 const color = n => mode === 'kind' ? (KIND[n.k] || KIND.data) : (LEVEL[n.u] || '#555');
 const hex = a => '0x' + (a >>> 0).toString(16).toUpperCase().padStart(8, '0');
+const pct = f => f > 0 && f < 0.0005 ? '&lt;0.1%' : (100 * f).toFixed(1) + '%';  // a sliver still shows
 const size = n => n >= 1048576 ? (n / 1048576).toFixed(2) + ' MB' : n >= 1024 ? (n / 1024).toFixed(1) + ' KB' : n + ' B';
 
 // ordered strip treemap: children keep their (address) order, laid out in
@@ -93,6 +94,7 @@ function draw() {
   cv.width = W * dpr; cv.height = H * dpr;
   const g = cv.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
   const node = focus.length ? focus[focus.length - 1] : { c: T.children, t: 'ROM', n: T.size };
+  pageTitle(focus.length ? node.t : '', 'ROM');
   rects = [];
   const fill = (n, x, y, w, h, depth) => {
     if (w < .5 || h < .5) return;
@@ -121,7 +123,7 @@ function draw() {
   leaves(node, l => { const k = mode === 'kind' ? l.k : l.u; tot[k] = (tot[k] || 0) + l.n; all += l.n; });
   const names = mode === 'kind' ? KNAME : LNAME, cols = mode === 'kind' ? KIND : LEVEL;
   const order = mode === 'kind' ? Object.keys(KIND) : T.levels;
-  $('legend').innerHTML = order.filter(k => tot[k]).map(k => `<span><i style="background:${cols[k]}"></i>${names[k]} <b>${(100 * tot[k] / all).toFixed(1)}%</b></span>`).join('');
+  $('legend').innerHTML = order.filter(k => tot[k]).map(k => `<span><i style="background:${cols[k]}"></i>${names[k]} <b>${pct(tot[k] / all)}</b></span>`).join('');
   $('crumbs').innerHTML = ['ROM', ...focus.map(f => f.t)].map((t, i) => i === focus.length ? `<b>${esc(t)}</b>` : `<a data-i="${i}">${esc(t)}</a>`).join(' › ');
 }
 function under(e) {
@@ -143,17 +145,34 @@ $('cv').onclick = e => {
   // function opens (code in the side panel, game things in Browse)
   const chain = under(e); if (!chain.length) return;
   const group = chain.find(p => p[0].c);
-  if (group) { focus.push(group[0]); draw(); return; }
+  if (group) { focus.push(group[0]); go(); return; }
   const h = hrefOf(chain[chain.length - 1][0].r);
   if (h) h.startsWith('/atlas') ? (location.href = h) : peek(h);
 };
-$('crumbs').onclick = e => { const a = e.target.closest('a[data-i]'); if (a) { focus = focus.slice(0, +a.dataset.i); draw(); } };
-document.addEventListener('keydown', e => { if ((e.key === 'Backspace' || e.key === 'Escape') && !$('peek')?.classList.contains('on') && focus.length) { focus.pop(); draw(); } });
-const setMode = m => { mode = m; try { localStorage.setItem('rom.mode', m); } catch (e) {} $('mkind').classList.toggle('on', m === 'kind'); $('mlevel').classList.toggle('on', m === 'level'); if (T) draw(); };
+$('crumbs').onclick = e => { const a = e.target.closest('a[data-i]'); if (a) { focus = focus.slice(0, +a.dataset.i); go(); } };
+document.addEventListener('keydown', e => { if ((e.key === 'Backspace' || e.key === 'Escape') && !$('peek')?.classList.contains('on') && focus.length) { focus.pop(); go(); } });
+const setMode = (m, fromUrl) => { mode = m; try { localStorage.setItem('rom.mode', m); } catch (e) {} $('mkind').classList.toggle('on', m === 'kind'); $('mlevel').classList.toggle('on', m === 'level'); if (T && !fromUrl) { history.replaceState(null, '', hashOf()); draw(); } };
 $('mkind').onclick = () => setMode('kind'); $('mlevel').onclick = () => setMode('level');
 addEventListener('resize', () => T && draw());
+// the URL holds the mode and the block in view (#level/Code/Monsters), so a
+// view can be linked to; draw() keeps it current
+const hashOf = () => '#' + [mode, ...focus.map(f => encodeURIComponent(f.t))].join('/');
+function fromHash() {
+  const [m, ...path] = location.hash.slice(1).split('/');
+  if (m === 'kind' || m === 'level') setMode(m, true);
+  focus = [];
+  let n = T;
+  for (const t of path.map(decodeURIComponent)) {
+    n = (n.c || n.children || []).find(c => c.t === t && c.c);
+    if (!n) break;
+    focus.push(n);
+  }
+}
+// a step into or out of a block is a history entry (Back goes back out)
+function go() { if (location.hash !== hashOf()) history.pushState(null, '', hashOf()); draw(); }
+addEventListener('hashchange', () => { if (T && location.hash !== hashOf()) { fromHash(); draw(); } });
 setMode(mode);
-(async () => { T = await fetch('/api/romtree').then(r => r.json()); $('loading').remove(); draw(); })();
+(async () => { T = await fetch('/api/romtree').then(r => r.json()); $('loading').remove(); fromHash(); history.replaceState(null, '', hashOf()); draw(); })();
 </script>
 </body>
 </html>

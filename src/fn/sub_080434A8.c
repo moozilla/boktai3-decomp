@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
@@ -12,6 +11,7 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
     struct ContactPosition delta;
     u32 zero;
     u32 frame;
+    u32 speed;
     if (slot->enter) {
         struct ContactPosition *position;
         slot->enter = 0;
@@ -36,46 +36,27 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
         slot->stateFrame = zeroFrame;
         return;
     }
-    frame = slot->stateFrame;
-    asm("" : "+r"(frame) : : "memory");
-    if (frame > 15)
-        frame = 32 - slot->stateFrame;
+    if (slot->stateFrame <= 15)
+        speed = slot->stateFrame * 16;
+    else
+        speed = (32 - slot->stateFrame) * 16;
     {
-        u32 speed = frame * 16;
         struct ContactPosition *write = &delta;
-        register u32 direction asm("r5") = slot->direction;
+        u32 direction = slot->direction;
         write->x = truncateShift12(gUnk_086149C4[(direction + 64) & 255] * speed);
         write->y = 0;
-        {
-            register const s16 *entry asm("r0") = gUnk_086149C4 + direction;
-            {
-                s32 z = truncateShift12(*entry * speed);
-                register u32 lowZero asm("r3") = 0;
-                asm("" : "+r"(lowZero));
-                zero = lowZero;
-                write->z = z;
-            }
-        }
+        write->z = truncateShift12(gUnk_086149C4[direction] * speed);
     }
+    zero = 0;
     {
         struct ContactPosition *position = &slot->position;
-        register const struct ContactPosition *origin asm("r2") = &slot->origin;
-        register const struct ContactPosition *read asm("r1") = &delta;
+        const struct ContactPosition *origin = &slot->origin;
+        const struct ContactPosition *read = &delta;
         const struct ContactPosition *first = &delta;
         struct ContactCollider *resource;
-        {
-            register u32 x asm("r0") = (u16)first->x;
-            asm("" : "+r"(x));
-            slot->position.x = x + (u16)slot->origin.x;
-        }
+        slot->position.x = slot->origin.x + first->x;
         position->y = origin->y + read->y;
-        {
-            register u32 z asm("r0") = (u16)read->z;
-            {
-                register u32 baseZ asm("r2") = (u16)origin->z;
-                position->z = z + baseZ;
-            }
-        }
+        position->z = origin->z + read->z;
         resource = &slot->resourceCollider;
         Collider_SetPosition(resource, position, 0);
         Collider_SetPosition(&slot->healthCollider, position, 0);
@@ -88,30 +69,19 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
         slot->stateFrame = 0;
     } else {
         if (slot->retargetTimer && !--slot->retargetTimer) {
-            register u32 mode asm("r0") = pool->mode;
+            u32 mode = pool->mode;
             if (mode == 2) {
-                s32 slotIndex = index;
-                if (slotIndex > 7)
-                    goto zeroMode2;
-                mode = 1;
-                goto storeTarget;
-            zeroMode2:
-                mode = zero;
-                goto storeTarget;
+                if (index <= 7)
+                    slot->targetIndex = 1;
+                else
+                    slot->targetIndex = zero;
+            } else if (mode == 1)
+                slot->targetIndex = zero;
+            else {
+                mode = 255;
+                slot->targetIndex = mode;
             }
-            if (mode != 1)
-                goto minusTarget;
-            {
-                register u32 value asm("r1") = zero;
-                slot->targetIndex = value;
-                goto incrementFrame;
-            }
-        minusTarget:
-            mode = 255;
-        storeTarget:
-            slot->targetIndex = mode;
         }
-    incrementFrame:
         slot->stateFrame++;
     }
 }

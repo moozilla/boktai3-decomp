@@ -64,7 +64,6 @@ int OrbitingParticles_Update(struct OrbitingParticles *m)
         do {
             int angle, radius;
             struct SceneVec *out;
-            register const s16 *table asm("r2");
             struct OrbitingParticle *arg = cursor;
             asm("" : "+r"(arg));
             if (!p->state)
@@ -74,10 +73,9 @@ int OrbitingParticles_Update(struct OrbitingParticles *m)
             out = position;
             angle = p->angle;
             radius = p->radius;
-            table = gUnk_086149C4;
-            out->x = scale(table[(angle + 64) & 255] * radius);
+            out->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
             out->y = 0;
-            out->z = scale(table[angle] * radius);
+            out->z = scale(gUnk_086149C4[angle] * radius);
             p->sprite.position.y += p->rise;
             p->sprite.position.x += m->position.x;
             p->sprite.position.y += m->position.y;

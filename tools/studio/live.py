@@ -414,8 +414,10 @@ def remember_stage_palette(map_hash, tileset, pal):
     if os.path.exists(STAGE_PALS):
         for r in csv.DictReader(open(STAGE_PALS)):
             rows[r["map"]] = {"map": r["map"], "palette": r["palette"], "evidence": r.get("evidence", "")}
-    rows[map_hash] = {"map": map_hash, "palette": pal,
-                      "evidence": "BG palette RAM matched in a centaur capture"}
+    row = {"map": map_hash, "palette": pal, "evidence": "BG palette RAM matched in a centaur capture"}
+    if rows.get(map_hash, {}).get("palette") == pal:
+        return  # known already: leave the file, its evidence and the indexes built from it alone
+    rows[map_hash] = row
     with open(STAGE_PALS, "w", newline="") as f:
         w = csv.DictWriter(f, ["map", "palette", "evidence"])
         w.writeheader()

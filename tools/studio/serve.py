@@ -20,6 +20,7 @@ The server listens on localhost only.
 """
 import argparse
 import csv
+import html
 import http.server
 import json
 import logging
@@ -46,7 +47,7 @@ log = logging.getLogger("studio")
 # for it instead of building the same index alongside.
 WARM = threading.Lock()
 SLOW = ("/api/atlas", "/api/codemap", "/api/search/", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
-        "/api/code/", "/api/learned", "/api/stages", "/api/areas", "/api/text/uses/")
+        "/api/code/", "/api/learned", "/api/stages", "/api/areas", "/api/text/uses/", "/api/text/places")
 # polled by the live view several times a second; logged only when slow or failing
 POLLED = ("/api/live", "/api/live/player")
 
@@ -139,7 +140,7 @@ def preload():
     import gclview
     steps = [("atlas index", atlas.load), ("actors", actors.actors),
              ("script procedures", lambda: (actors.proc_list(), gclview.callee_names(), gclview.names())),
-             ("disassembly", actors.code), ("code explorer", codemap_warm), ("ROM map", atlas.rom_tree), ("sprite palettes", learned),
+             ("disassembly", actors.code), ("code explorer", codemap_warm), ("function history", lambda: __import__("codemap").function_history()), ("ROM map", lambda: __import__("search")._rom_leaves()), ("sprite palettes", learned),
              ("stage loads", stages)]
     start = time.time()
     for name, fn in steps:
@@ -203,8 +204,8 @@ def world():
 _TEXT_USES = {}
 
 
-def text_uses(n):
-    """The script procedures that show text-bank string N (their text#N operands)."""
+def _text_uses():
+    """{string id: [{id, name}]}: the script procedures with a text#N operand for it."""
     if not _TEXT_USES:
         import gclview
         names = {int(p): r.get("name") for p, r in gclview.names().procs.items()}
@@ -213,24 +214,61 @@ def text_uses(n):
             for t in set(p["texts"]):
                 uses.setdefault(t, []).append({"id": cid, "name": names.get(cid) or ""})
         _TEXT_USES.update(uses or {-1: []})
-    procs = [dict(p) for p in _TEXT_USES.get(n, [])]
+    return _TEXT_USES
+
+
+def _scene_where(sc, w):
+    """(area, place, where) of scene SC in world W: where is the scene's own label,
+    led by its place unless it already names it, else the area's place and detail."""
+    a = w["areas"][w["scene_area"][sc]] if sc is not None and sc in w["scene_area"] else None
+    label = (w["scenes"].get(sc) or {}).get("label") if sc is not None else None
+    place = a["place"] if a else None
+    if label:
+        where = label if not place or label.startswith(place) else f"{place} · {label}"
+    else:
+        where = " · ".join(x for x in (place, a["detail"]) if x) if place else None
+    return a, place, where
+
+
+def _proc_scenes():
+    """{procedure: the entry scene of the scene file it is in}."""
+    import gclfiles
+    return {c: f["entry"] for f in gclfiles.files() if f["kind"] == "scene" for c in f["procs"]}
+
+
+def text_uses(n):
+    """The script procedures that show text-bank string N (their text#N operands),
+    each with the scene it runs in and where that is."""
+    procs = [dict(p) for p in _text_uses().get(n, [])]
     if procs:
-        # where each one runs: its scene file's entry scene, placed in the world
-        import gclfiles
-        entry = {c: f["entry"] for f in gclfiles.files() if f["kind"] == "scene" for c in f["procs"]}
-        w = world()
+        entry, w = _proc_scenes(), world()
         for p in procs:
             sc = entry.get(p["id"])
-            a = w["areas"][w["scene_area"][sc]] if sc is not None and sc in w["scene_area"] else None
-            label = (w["scenes"].get(sc) or {}).get("label") if sc is not None else None
-            place = a["place"] if a else None
-            if label:  # the scene's own label, led by its place unless it already names it
-                where = label if not place or label.startswith(place) else f"{place} · {label}"
-            else:
-                where = " · ".join(x for x in (place, a["detail"]) if x) if place else None
-            p["scene"], p["place"] = sc, where
-            p["area"] = a["area"] if a else None
+            a, _, where = _scene_where(sc, w)
+            p["scene"], p["place"], p["area"] = sc, where, a["area"] if a else None
     return {"procs": procs}
+
+
+_TEXT_PLACES = {"key": None, "data": {}}
+
+
+def text_places():
+    """{string id: "Place, Place"}: the places whose scene scripts show each
+    string, for the Text view's list and filter."""
+    key = os.path.getmtime(STAGEMETA) if os.path.exists(STAGEMETA) else 0
+    if _TEXT_PLACES["key"] != key:
+        entry, w = _proc_scenes(), world()
+        out = {}
+        for t, procs in _text_uses().items():
+            ps = []
+            for p in procs:
+                place = _scene_where(entry.get(p["id"]), w)[1]
+                if place and place not in ps:
+                    ps.append(place)
+            if ps:
+                out[t] = ", ".join(ps)
+        _TEXT_PLACES.update(key=key, data=out)
+    return _TEXT_PLACES["data"]
 
 
 def hp_data(h):
@@ -344,8 +382,30 @@ def write_string(sid, text):
     return raw
 
 
+
+# a page the Studio doesn't have: the header and search still work
+NOT_FOUND_PAGE = """<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Boktai 3 Studio</title>
+<link rel="stylesheet" href="/static/common.css">
+<style>body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, sans-serif; }
+main { padding: 40px 32px; max-width: 640px; } a { color: var(--accent); }</style></head>
+<body><header id="top"></header>
+<main><h1>No page at {path}</h1><p class="empty">Pick a view above, or press ⌘K to search everything.
+<a href="/atlas">Browse</a> is the way in.</p></main>
+<script src="/static/common.js"></script><script>studioHeader();</script></body></html>
+"""
+
 class Handler(http.server.BaseHTTPRequestHandler):
-    def send(self, code, body, ctype="application/json"):
+    def send(self, code, body, ctype="application/json", etag=None, max_age=600):
+        """etag: the body is a file that rarely changes; the browser may keep it
+        max_age seconds (0: always ask) and then revalidate it (304) instead of
+        downloading it again."""
+        if etag and self.headers.get("If-None-Match") == etag:
+            self.status, self.size = 304, 0
+            self.send_response(304)
+            self.send_header("ETag", etag)
+            self.end_headers()
+            return
         if isinstance(body, (dict, list)):
             body = json.dumps(body, ensure_ascii=False)
         if isinstance(body, str):
@@ -354,7 +414,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
+        if etag:
+            self.send_header("Cache-Control", f"max-age={max_age}" if max_age else "no-cache")
+            self.send_header("ETag", etag)
+        else:
+            self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
 
@@ -390,6 +454,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/strings":
             orig = self.server.original
             self.send(200, [dict(s, edited=orig.get(s["id"]) != s["text"]) for s in read_strings()])
+        elif self.path == "/api/text/places":
+            self.send(200, text_places())
         elif self.path.startswith("/api/text/uses/"):
             self.send(200, text_uses(int(self.path.rsplit("/", 1)[1])))
         elif self.path == "/api/original":
@@ -408,8 +474,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(200, open(os.path.join(HERE, "atlas.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/atlas":
             import atlas
-            ix = atlas.load()
-            self.send(200, {"tree": ix["tree"], "entities": ix["entities"]})
+            ix = atlas.load()  # rebuilt when an input changes; the tag is the cache file's
+            st = os.stat(atlas.CACHE) if os.path.exists(atlas.CACHE) else None
+            tag = f'"{st.st_mtime_ns:x}-{st.st_size:x}"' if st else None
+            self.send(200, b"" if tag and self.headers.get("If-None-Match") == tag else {"tree": ix["tree"], "entities": ix["entities"]},
+                      etag=tag, max_age=0)
         elif self.path in ("/rom", "/rom.html"):
             self.send(200, open(os.path.join(HERE, "rom.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/rommap":
@@ -472,6 +541,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/codemap/history":
             import codemap
             self.send(200, codemap.history())
+        elif self.path == "/api/codemap/changes":
+            import codemap
+            self.send(200, codemap.changes())
+        elif self.path == "/api/codemap/fnhistory":
+            import codemap
+            self.send(200, codemap.function_history())
+        elif self.path.startswith("/api/codemap/fnhistory/"):
+            import codemap
+            self.send(200, codemap.function_history().get(self.path.rsplit("/", 1)[1].upper(), {}))
         elif self.path == "/api/codemap":
             import codemap
             self.send(200, codemap.summary())
@@ -512,6 +590,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             except ValueError:
                 d = None
             self.send(200 if d else 404, d or {"error": "no such " + what})
+        elif self.path in ("/favicon.ico", "/static/favicon.svg"):  # a sun, the game's sunlight sensor
+            self.send(200, open(os.path.join(HERE, "favicon.svg"), "rb").read(), "image/svg+xml", etag='"sun1"', max_age=86400)
         elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js", "/static/mp2k.js"):
             ctype = "text/javascript" if self.path.endswith(".js") else "text/css"
             self.send(200, open(os.path.join(HERE, os.path.basename(self.path)), "rb").read(), ctype + "; charset=utf-8")
@@ -566,9 +646,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path.startswith("/api/res/"):
             f = resource_file(*self.path[len("/api/res/"):].split("/")[:2])
             if f:
-                self.send(200, open(f, "rb").read(), "application/octet-stream")
+                st = os.stat(f)
+                tag = f'"{st.st_mtime_ns:x}-{st.st_size:x}"'
+                self.send(200, b"" if self.headers.get("If-None-Match") == tag else open(f, "rb").read(),
+                          "application/octet-stream", etag=tag)
             else:
                 self.send(404, {"error": "no such resource"})
+        elif not self.path.startswith("/api/"):
+            self.send(404, NOT_FOUND_PAGE.replace("{path}", html.escape(self.path)), "text/html; charset=utf-8")
         else:
             self.send(404, {"error": "not found"})
 

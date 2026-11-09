@@ -1,8 +1,8 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #define Weather_Initialize sub_08018028
 #include "background_controller.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 struct WeatherState {
     u8 task[0x20];
     u8 unknown20, flags;
@@ -88,16 +88,13 @@ s32 Weather_Initialize(struct WeatherState *p)
     Weather_SetRandomDuration(p);
     p->unknown20 = Script_GetKeywordValue(0x61, 1);
     {
+        // One offset variable walks unk876 then counters628[2]: reassigned, it holds no
+        // constant cse could hand to the later unk876 read, which reloads 0x876 as in the ROM.
         u8 *base = (u8 *)gGameState;
-        register u32 offset asm("r4") = 0x876;
-        s16 *sensor;
-        s32 storm;
-        sensor = (void *)(base + offset);
-        storm = *sensor;
-        {
-            s32 *timer = &gGameState->counters628[2];
-            *timer += storm >> 2;
-        }
+        u32 offset = 0x876;
+        s32 storm = *(s16 *)(base + offset);
+        offset = 0x630;
+        *(s32 *)(base + offset) += storm >> 2;
     }
     if (gGameState->counters628[2] >= gWeatherCooldownBase)
         gGameState->counters628[2] = gWeatherCooldownBase;
@@ -129,24 +126,9 @@ s32 Weather_Initialize(struct WeatherState *p)
     p->f58 = Script_GetKeywordValue(0x4F, 0);
     {
         const u16 *table = gRandomTable;
-        u32 *seed = &gRandomIndex;
-        register u32 index asm("r1");
-        u32 mask;
-        register u32 sampleMask asm("r2");
-        u32 sample;
-        index = *seed + 1;
-        mask = 0x3ff;
-        index &= mask;
-        sample = table[index];
-        sampleMask = 127;
-        p->f4C = (sample & sampleMask) + 128;
-        index = (index + 1) & mask;
-        sample = table[index];
-        sampleMask = 7;
-        p->f44 = (sample & sampleMask) - 2;
-        index = (index + 1) & mask;
-        *seed = index;
-        p->f48 = (table[index] & sampleMask) - 2;
+        p->f4C = (ParticleRandom_ReadDirectSample(table) & 127) + 128;
+        p->f44 = (ParticleRandom_ReadDirectSample(table) & 7) - 2;
+        p->f48 = (ParticleRandom_ReadDirectSample(table) & 7) - 2;
     }
 
     sub_08017684(p);

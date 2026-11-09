@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "scene_facing.h"
@@ -63,7 +62,7 @@ static inline void facing(struct Actor *p, s32 angle)
 static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
 {
     d->x = b->x + a->x;
-    d->y = a->y + b->y;
+    d->y = b->y + a->y;
     d->z = b->z + a->z;
 }
 // confidence=low: fires a player-homing projectile at a facing-dependent offset.
@@ -134,21 +133,7 @@ void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
         Projectile_SpawnAtPosition(params, &spawn);
         Sound_PlaySong(0x56a);
     }
-    {
-        register s32 frame asm("r1") = tick;
-        asm("" : "+r"(frame));
-        if (frame > 30)
-            p->finished = 1;
-    }
-    {
-        register u32 offset asm("r2") = 0x104;
-        asm("" : "+r"(offset));
-        {
-            register void **address asm("r0") = (void **)((u8 *)p + offset);
-            {
-                void *callback = *address;
-                Callback_InvokeActor(p, callback);
-            }
-        }
-    }
+    if (tick > 30)
+        p->finished = 1;
+    Callback_InvokeActor(p, p->callback);
 }

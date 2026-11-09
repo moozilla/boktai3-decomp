@@ -53,6 +53,17 @@ h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
 .mono { font-family: var(--mono); font-size: 12.5px; }
 .notice { border: 1px solid var(--warn); background: var(--warn-bg); color: var(--ink); border-radius: 8px; padding: 8px 12px; margin: 12px 0; font-size: 13px; }
 
+/* recent updates */
+.changes { max-width: 980px; font-size: 13px; }
+.changes details { border-bottom: 1px solid var(--line); }
+.changes summary { display: grid; grid-template-columns: 9.5em minmax(0, 1fr) auto; gap: 12px; padding: 5px 0; cursor: pointer; list-style: none; }
+.changes summary::-webkit-details-marker { display: none; }
+.changes details.none summary { cursor: default; color: var(--muted); }
+.changes .when { color: var(--muted); font-variant-numeric: tabular-nums; }
+.changes .what { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.changes .ok { color: var(--ok); } .changes .warn { color: var(--warn); } .changes .bad { color: var(--accent); }
+.changes .lab { font-size: 11.5px; color: var(--muted); margin: 6px 0 4px; }
+.changes .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
 /* history graph */
 .hist { max-width: 760px; }
 .hist svg { width: 100%; height: auto; display: block; font-size: 10.5px; }
@@ -133,7 +144,7 @@ a.chip:hover { border-color: var(--accent); text-decoration: none; }
 <header id="top"></header>
 <main>
   <section id="side">
-    <div class="tools"><input id="q" type="search" placeholder="Find a function, unit, type or RAM object" autocomplete="off"></div>
+    <div class="tools"><input id="q" type="search" placeholder="Filter: function, unit, type, RAM object" title="Find a function, unit, struct type or RAM object by name or address" autocomplete="off"></div>
     <div id="tree"></div>
   </section>
   <section id="view"><div class="page empty">Loading the code index…</div></section>
@@ -282,7 +293,7 @@ function overview() {
     <p class="lede">${drafts ? `${num(nfn - drafts)} of the ${num(nfn)} functions in the ROM compile from C to the original bytes; the other
       ${drafts} are <a href="#left:draft">drafts</a> still built from their assembly.` : `All ${num(nfn)} functions in the ROM compile from C to the original bytes.`} ${fmtPct(m.complete_code_percent)} of the code is also
       ordinary C with no matching concession; the rest still steers the compiler with a register pin, an empty <code>asm("")</code> or one of the other
-      kinds below, and removing those is the current work. Pick a category, a unit or a function, or search on the left.</p>
+      kinds below, and removing those is the current work. Pick a category, a unit or a function, or search on the left; the <a href="/rom#level/Code">ROM map</a> shows all of it as a treemap.</p>
     ${(S.missing || []).map(x => `<div class="notice">Not available here: ${esc(x)}.</div>`).join('')}
     ${S.updating ? '<div class="notice">The sources changed: a new index is building (about half a minute); this page updates when it is ready.</div>' : ''}
     <div class="tiles">
@@ -293,6 +304,7 @@ function overview() {
       <div class="tile"><b>${num(S.ram.length)}</b><span>named RAM objects</span></div>
     </div>
     <h3>Over time <span class="n">from each committed PROGRESS.md</span></h3><div id="hist" class="hist"><span class="empty">Loading the history…</span></div>
+    <h3>Recent updates <span class="n">what each merge changed, from PROGRESS.json</span></h3><div id="changes" class="changes"><span class="empty">Loading…</span></div>
     <h3>Categories <span class="n">${S.categories.length}</span></h3>
     <table class="t"><tr><th>Category</th><th class="r">Units</th><th class="r">Functions</th><th class="r">Code</th><th style="width:30%">Without concessions</th><th class="r"></th></tr>
     ${S.categories.map(c => `<tr class="link" data-href="${catHref(c.name)}"><td><a href="${catHref(c.name)}">${esc(c.name)}</a></td><td class="r">${c.units.length}</td><td class="r">${num(c.nfn)}</td>
@@ -302,6 +314,46 @@ function overview() {
       <p class="muted" style="font-size:12.5px;max-width:760px">The kinds are defined in <code>tools/concessions.py</code>; decomp.dev counts a function as matched only once it has none.
       A function can hold more than one kind.</p>` : ''}
   </div>`;
+}
+// the Since column of a unit's functions: when each became concession-free (or matched)
+let FNHIST = null;
+async function fillSince() {
+  const cells = document.querySelectorAll('td.since[data-a]');
+  if (!cells.length) return;
+  FNHIST ||= await fetch('/api/codemap/fnhistory').then(r => r.json()).catch(() => ({}));
+  const day = t => new Date(t * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  for (const td of cells) {
+    const e = FNHIST[td.dataset.a] || {}, x = e.clean || e.matched;
+    if (!x) continue;
+    const pr = x[1]?.match(/PR (#\d+)/g);
+    td.textContent = `${day(x[0])}${x[1] ? ' · ' + (pr ? pr.at(-1).slice(3) : x[1]) : ' or earlier'}`;
+    td.title = (e.clean ? 'concession-free' : 'matching') + (x[1] ? ' since ' + x[1] : ' since the first PROGRESS.json');
+  }
+}
+// when a function started matching and became concession-free (committed PROGRESS.json, tools/studio/codemap.py)
+async function fillFnHistory() {
+  const b = $('fnhist'); if (!b) return;
+  const e = await fetch('/api/codemap/fnhistory/' + b.dataset.addr).then(r => r.json()).catch(() => ({}));
+  if (!b.isConnected) return;
+  const day = t => new Date(t * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const since = ([t, by]) => by ? `since ${by}, ${day(t)}` : `since ${day(t)} or earlier`;
+  const text = e.clean ? 'concession-free ' + since(e.clean) : e.matched ? 'matching ' + since(e.matched) : '';
+  if (text) { b.textContent = text; b.title = (e.matched ? `matching ${since(e.matched)}` : '') + ' (from the committed PROGRESS.json history)'; b.hidden = false; }
+}
+// the last updates of PROGRESS.json: functions that became concession-free, gained one or stopped matching
+async function drawChanges() {
+  const box = $('changes'), C = await fetch('/api/codemap/changes').then(r => r.json()).catch(() => []);
+  if (!box || !box.isConnected) return;
+  if (!C.length) { box.innerHTML = '<span class="empty">No history: PROGRESS.json has fewer than two commits here.</span>'; return; }
+  const when = t => new Date(t * 1000).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const chips = fs => `<div class="chips">${fs.map(([n, a]) => `<a class="chip mono" href="${fnHref(a)}">${esc(n)}</a>`).join('')}</div>`;
+  const part = (fs, cls, what) => fs.length ? `<span class="${cls}">${num(fs.length)} ${what}</span>` : '';
+  box.innerHTML = C.map(e => {
+    const n = e.clean.length + e.concession.length + e.draft.length;
+    const sum = [part(e.clean, 'ok', 'concession-free'), part(e.concession, 'warn', 'with a concession'), part(e.draft, 'bad', 'stopped matching')].filter(Boolean).join(' · ') || '<span class="muted">no function changed state</span>';
+    return `<details${n ? '' : ' class="none"'}><summary><span class="when">${when(e.t)}</span><span class="what">${esc(e.subject)}</span><span class="sum">${sum}</span></summary>
+      ${e.clean.length ? `<div class="lab">Now concession-free</div>${chips(e.clean)}` : ''}${e.concession.length ? `<div class="lab">Now with a concession</div>${chips(e.concession)}` : ''}${e.draft.length ? `<div class="lab">Stopped matching</div>${chips(e.draft)}` : ''}</details>`;
+  }).join('');
 }
 // decomp.dev's history graph: code matched in C, and (once PROGRESS.md reports it) without concessions
 async function drawHistory() {
@@ -348,6 +400,8 @@ function strip(fns, sel) {
   return `<div class="strip">${fns.map(f => `<a href="${fnHref(f.addr)}" class="${f.state}${f.addr === sel ? ' sel' : ''}" style="flex:${f.size / total}" title="${esc(f.name)} · ${f.size} B · ${STATE_TITLE[f.state]}${f.kinds.length ? ': ' + f.kinds.map(kindLabel).join(', ') : ''}"></a>`).join('')}</div>
     <div class="legend">Each function as wide as its code: <span style="color:var(--ok)">■</span> no concessions <span style="color:var(--warn)">■</span> with concessions <span style="color:var(--warn-bg);text-shadow:0 0 1px var(--warn)">■</span> not matched yet${fns.some(f => f.state === 'asm') ? ' <span class="muted">■</span> assembly' : ''}</div>`;
 }
+// the unit's block in the ROM view (rom.html groups code by the same units)
+const romHref = u => '/rom#level/Code/' + encodeURIComponent(u.name);
 function unitPage(key) {
   const u = UNIT[key];
   if (!u) return notFound(`No unit ${key}.`);
@@ -355,12 +409,12 @@ function unitPage(key) {
   return `<div class="page">${crumbs(`<a href="${catHref(u.cat)}">${esc(u.cat)}</a>`)}
     <h1 class="t">${esc(u.name)}</h1>
     <div class="badges"><span class="badge">${fns.length} functions</span><span class="badge">${kb(u.size)}</span><span class="badge mono">${fns[0].addr}–${(parseInt(fns.at(-1).addr, 16) + fns.at(-1).size).toString(16).toUpperCase().padStart(8, '0')}</span>
-      ${groupBadges(u)}</div>
+      ${groupBadges(u)}<a class="badge" href="${romHref(u)}" title="this unit in the ROM treemap, colored by how well each function is understood">ROM map ↗</a></div>
     ${strip(fns)}
     <h3>Functions <span class="n">in ROM order</span></h3>
-    <table class="t"><tr><th>Function</th><th>Address</th><th class="r">Bytes</th><th>Status</th><th>Source</th></tr>
+    <table class="t"><tr><th>Function</th><th>Address</th><th class="r">Bytes</th><th>Status</th><th title="the merge that last made it concession-free (or made it match), from the committed PROGRESS.json">Since</th><th>Source</th></tr>
     ${fns.map(f => `<tr class="link" data-href="${fnHref(f.addr)}"><td class="mono"><a href="${fnHref(f.addr)}">${esc(f.name)}</a></td><td class="mono muted">${f.addr}</td><td class="r">${f.size}</td>
-      <td><div class="badges" style="margin:0">${fnBadges(f)}</div></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
+      <td><div class="badges" style="margin:0">${fnBadges(f)}</div></td><td class="since muted" data-a="${f.addr}"></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
 }
 
 // ---------- syntax ----------
@@ -466,7 +520,7 @@ async function functionPage(q) {
     <div class="badges"><span class="badge mono">${d.addr}</span><span class="badge">${d.size} bytes</span>${d.mode ? `<span class="badge">${esc(d.mode)}</span>` : ''}
       ${!f ? '' : f.state === 'asm' ? '<span class="badge" title="tools/progress.py: reviewed SDK assembly ranges">hand-written assembly</span>'
         : f.state === 'draft' ? `<span class="badge warn" title="a NONMATCHING draft; the build uses the INCLUDE_ASM branch">not matched yet${f.pct ? ' · draft at ' + fmtPct(f.pct) : ''}</span>`
-        : '<span class="badge ok">matches</span>' + status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}</div>
+        : '<span class="badge ok">matches</span>' + status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}<span class="badge" id="fnhist" data-addr="${d.addr}" hidden></span></div>
     ${d.notes ? `<p class="lede" style="font-size:14px">${esc(d.notes)}</p>` : ''}
     ${u ? strip(u.functions.map(x => FN[x[1]]), d.addr) : ''}
     <div class="panes">${cPane}${asmPane}</div>
@@ -596,8 +650,8 @@ async function route() {
   const slow = setTimeout(() => { v.innerHTML = `<div class="page empty">Loading ${esc(h)}…</div>`; }, 150);
   let html;
   if (!h) { SEL = '#'; html = overview(); }
-  else if (h === 'ram') html = ramList();
-  else if (h === 'types') html = typeList();
+  else if (h === 'ram') { html = ramList(); document.title = 'RAM objects · Boktai 3 Code'; }
+  else if (h === 'types') { html = typeList(); document.title = 'Types · Boktai 3 Code'; }
   else if (h.startsWith('type:')) html = await typePage(h.slice(5));
   else if (h === 'left' || h.startsWith('left:')) { html = leftPage(h.slice(5)); document.title = 'Concessions left · Boktai 3 Code'; }
   else if (h.startsWith('ram:')) html = await ramPage(h.slice(4));
@@ -612,7 +666,8 @@ async function route() {
   v.innerHTML = html;
   v.scrollTop = 0;
   renderTree();
-  if (!h) drawHistory();
+  if (!h) { drawHistory(); drawChanges(); }
+  fillFnHistory(); fillSince();
 }
 $('view').addEventListener('click', e => {
   const tr = e.target.closest('tr.link');

@@ -91,6 +91,11 @@ class IndexTests(unittest.TestCase):
         self.assertEqual(fns['08001000']['kinds'], ['operand'])
         self.assertEqual(fns['08001020']['kinds'], ['concession'])  # pinned, but no kind listed
 
+    def test_concession_functions_are_c_though_scored_below_full(self):
+        # Foo_Helper matches with a pin: the report scores it 80%, but it is C
+        self.assertEqual(codemap.concession_addresses(), {0x08001020})
+        self.assertFalse(codemap.progress_by_address()[0x08001020][1])
+
     def test_summary_and_lookups(self):
         s = codemap.summary()
         fns = s['categories'][0]['units'][0]['functions']
@@ -198,6 +203,35 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual([(p['matched'], p['clean'], p['clean_of'], p['functions']) for p in h],
                          [(10.0, None, None, 2), (50.0, 40.0, 'pins', 10), (100.0, 90.5, 'all', 20)])
         self.assertLess(h[0]['t'], h[1]['t'])
+
+
+class ChangesTests(unittest.TestCase):
+    def test_changes_lists_functions_that_changed_state(self):
+        import subprocess
+        def tree(*rows):
+            return json.dumps({'version': 1, 'files': [], 'categories': [{'name': 'C', 'units': [{'name': 'U', 'functions': list(rows)}]}]})
+        with tempfile.TemporaryDirectory() as d:
+            git = lambda *a: subprocess.run(['git', '-c', 'user.name=t', '-c', 'user.email=t@t', *a], cwd=d, check=True, capture_output=True)
+            git('init', '-q')
+            states = [(tree(['sub_1', '08000001', 4, 100, 1, 0], ['Foo_Draw', '08000002', 4, 50, 0, 0]), 'start'),
+                      (tree(['sub_1', '08000001', 4, 100, 0, 0, 'Foo_Init'], ['Foo_Draw', '08000002', 4, 100, 1, 0]),
+                       'Merge pull request #7 from someone/round-1')]
+            for text, msg in states:
+                Path(d, 'PROGRESS.json').write_text(text)
+                git('add', 'PROGRESS.json')
+                git('commit', '-q', '-m', msg)
+            with patch.object(codemap, 'ROOT', d), patch.dict(codemap._INDEX, clear=True):
+                c = codemap.changes()
+                h = codemap.function_history()
+        self.assertEqual(h['08000001']['matched'][1], None)  # matching already in the first PROGRESS.json
+        self.assertEqual(h['08000001']['clean'][1], 'PR #7 (round-1)')
+        self.assertEqual(h['08000002']['matched'][1], 'PR #7 (round-1)')
+        self.assertNotIn('clean', h['08000002'])
+        self.assertEqual(len(c), 1)
+        self.assertEqual(c[0]['subject'], 'PR #7 (round-1)')
+        self.assertEqual(c[0]['clean'], [['Foo_Init', '08000001']])  # by its C name
+        self.assertEqual(c[0]['concession'], [['Foo_Draw', '08000002']])
+        self.assertEqual(c[0]['draft'], [])
 
 if __name__ == '__main__':
     unittest.main()

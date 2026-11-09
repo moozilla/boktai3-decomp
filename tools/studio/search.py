@@ -24,7 +24,7 @@ ATLAS_KIND = {"package": "sprite", "actor": "object", "monster": "monster", "cha
 # how a tie between equally good matches is broken: the things people look for first
 RANK = {"monster": 9, "character": 8, "object": 8, "item": 7, "area": 6, "story": 5, "scene": 5, "cutscene": 4,
         "sprite": 4, "function": 4, "song": 3, "script": 3, "procedure": 3, "tileset": 2, "map tiles": 2,
-        "RAM": 3, "unit": 3, "type": 3, "subsystem": 1, "text": 1, "place": 6}
+        "RAM": 3, "unit": 3, "type": 3, "subsystem": 1, "text": 1, "place": 6, "map": 4, "palette": 3, "ROM": 5}
 
 
 def score(q, title, *others):
@@ -74,6 +74,49 @@ def _places():
         return []
 
 
+def _resources():
+    try:
+        import serve
+        return serve.resource_index()
+    except Exception:
+        return {}
+
+
+_ROM = {"key": None, "leaves": []}
+
+
+def _rom_leaves():
+    """[(start, end, title, path, ref)] for every leaf block of the ROM view's
+    treemap (tools/studio/atlas.py rom_tree), sorted by address, so an address
+    finds what holds it; rebuilt when the ROM map changes."""
+    try:
+        import atlas
+        key = os.path.getmtime(atlas.ROMCACHE) if os.path.exists(atlas.ROMCACHE) else None
+        if _ROM["key"] != key or not _ROM["leaves"]:
+            out = []
+
+            def walk(n, path):
+                if n.get("c"):
+                    for c in n["c"]:
+                        walk(c, path + [n["t"]])
+                else:
+                    out.append((n["s"], n["s"] + n["n"], n["t"], path, n.get("r")))
+            for top in atlas.rom_tree()["children"]:
+                walk(top, [])
+            _ROM.update(key=key, leaves=sorted(out))
+        return _ROM["leaves"]
+    except Exception:
+        return []
+
+
+def rom_at(addr):
+    """The leaf block holding ROM address ADDR, or None."""
+    import bisect
+    leaves = _rom_leaves()
+    i = bisect.bisect_right(leaves, (addr, float("inf"))) - 1
+    return leaves[i] if i >= 0 and leaves[i][0] <= addr < leaves[i][1] else None
+
+
 def _procs():
     try:
         import gclview
@@ -95,7 +138,15 @@ def search(q, strings=None, english=None, limit=50):
             hits.append((s, RANK.get(kind, 0), kind, title, sub, url))
 
     english = english or {}
-    for e in _atlas().values():
+    atlas = _atlas()
+
+    def scene_sub(e):
+        """A scene's number and the place it is in (its area's location)."""
+        a = atlas.get(e.get("area") or "")
+        where = a and (a.get("location") or a.get("title"))
+        return f"scene {e['key']}" + (f" · {where}" if where and where != "Unlabeled areas" else "")
+
+    for e in atlas.values():
         kind = ATLAS_KIND.get(e["kind"], e["kind"])
         names = " ".join(f"{n.get('jp', '')} {n.get('en', '')}" for n in e.get("names") or [])
         title = e.get("title") or e["id"]
@@ -103,8 +154,8 @@ def search(q, strings=None, english=None, limit=50):
             en = english.get(int(e["key"])) or english.get(e["key"])  # their titles are string ids' Japanese
             if en:
                 title, names = en, names + " " + title
-        add(score(q, title, e.get("key"), e.get("jp"), e.get("fname"), names), kind, title,
-            e.get("jp") if e.get("jp") and e.get("jp") != title else e.get("path") or "", "/atlas#" + e["id"])
+        sub = scene_sub(e) if e["kind"] == "scene" else e.get("jp") if e.get("jp") and e.get("jp") != title else e.get("path") or ""
+        add(score(q, title, e.get("key"), e.get("jp"), e.get("fname"), names), kind, title, sub, "/atlas#" + e["id"])
     code = _code()
     if code:
         hexq = re.sub(r"^(0x|sub_)", "", q)
@@ -120,6 +171,28 @@ def search(q, strings=None, english=None, limit=50):
             add(score(q, r["name"], r["addr"]), "RAM", r["name"], r["addr"], "/code#ram:" + r["name"])
         for t in code.get("types", []):
             add(score(q, t), "type", t, "struct", "/code#type:" + t)
+    # a scene by number ("2712", "scene 2712") and a map or palette by its resource hash ("7EFB")
+    m = re.fullmatch(r"(?:scene\s*)?(\d{1,5})", q)
+    if m:
+        e = atlas.get(f"scene:{int(m.group(1))}")
+        if e:
+            add(95, "scene", e.get("title") or f"Scene {m.group(1)}", scene_sub(e), "/atlas#" + e["id"])
+    # a ROM address ("0858A1C0", "0x0858A1C0") finds the block that holds it
+    m = re.fullmatch(r"(?:0x)?(0?8[0-9a-f]{6})", q)
+    if m:
+        a = int(m.group(1), 16)
+        hit = rom_at(a)
+        if hit:
+            start, _, title, path, ref = hit
+            url = (ref if ref.startswith("/") else "/atlas#" + ref) if ref else \
+                "/rom#kind/" + "/".join(urllib.parse.quote(t) for t in path)
+            where = " › ".join(path) or "ROM"
+            if not any(h[5] == url for h in hits):  # a function's own address already found it
+                add(92, "ROM", title, f"{where} · +0x{a - start:X}" if a > start else where, url)
+    if re.fullmatch(r"[0-9a-f]{4}", q):
+        for label, kind, url in (("map", "map", "/gfx#maps/"), ("t92B3", "palette", "/gfx#palettes/")):
+            if any(h == q.upper() for h, _ in _resources().get(label, [])):
+                add(90, kind, f"{kind.capitalize()} {q.upper()}", "resource " + label, url + q.upper())
     for p in _places():
         add(score(q, p["name"]), "place", p["name"], f"{len(p['areas'])} area{'s' * (len(p['areas']) != 1)} · {p['scenes']} scene{'s' * (p['scenes'] != 1)}",
             "/world#place=" + urllib.parse.quote(p["name"]))
@@ -130,7 +203,7 @@ def search(q, strings=None, english=None, limit=50):
         for s in strings:
             en = english.get(s["id"]) or english.get(str(s["id"])) or ""
             if q in s["text"].lower() or q in en.lower() or q == str(s["id"]):
-                hits.append((30, 0, "text", en or s["text"], f"#{s['id']}" + (f" · {s['text']}" if en else ""), f"/text#{s['id']}"))
+                hits.append((30, 0, "text", (en or s["text"]).strip(), f"#{s['id']}" + (f" · {s['text'].strip()}" if en else ""), f"/text#{s['id']}"))
                 n += 1
                 if n >= 15:
                     break

@@ -247,7 +247,7 @@ extern struct Actor *gMessageWindow; /* message window (MessageWindow_*) */
 /* 0x020000E0 */
 extern struct Window *gScrollingDialogue; /* scrolling dialogue window (ScrollingDialogue_*) */
 /* 0x020000EC */
-extern u8 gWirelessSessionState; /* wireless session state byte (Wireless_*) */
+extern volatile u8 gWirelessSessionState; /* wireless session state byte (Wireless_*) */ // concession-ok(volatile): the session code busy-waits on it (`while (state == 1);`)
 /* 0x020000FC */
 extern u32 gWirelessTradeMenu; /* wireless trade/exchange menu (WirelessTradeMenu_*) */
 /* 0x02000108 */

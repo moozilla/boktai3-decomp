@@ -66,7 +66,7 @@ body.embed main { grid-template-columns: 1fr; }
   <section id="side">
     <div class="tools">
       <div class="mode"><button id="mfiles">Files</button><button id="mprocs">Procedures</button></div>
-      <input id="q" type="search" placeholder="Filter: proc number, label, actor key" autocomplete="off">
+      <input id="q" type="search" placeholder="Filter: proc number, label, place, actor key" autocomplete="off">
       <div class="chks" id="pchks">
         <label class="chk"><input type="checkbox" id="fscene"> scene entries</label>
         <label class="chk"><input type="checkbox" id="fspawn"> create actors</label>
@@ -106,15 +106,7 @@ function procRow(id) {
   d.onclick = e => { e.stopPropagation(); location.hash = id; };
   return d;
 }
-// where a scene is in the world (World's places, tools/studio/places.py): its own label, else its area's place
-let W = null;
-function whereOf(scene) {
-  const s = W?.scenes[scene], a = W && W.areas[W.scene_area[scene]];
-  if (!s || !a) return null;
-  // the scene's own label, led by its place unless it already names it
-  const text = s.label ? (!a.place || s.label.startsWith(a.place) ? s.label : `${a.place} · ${s.label}`) : [a.place, a.detail].filter(Boolean).join(' · ');
-  return text ? { text, href: `/world#area=${a.area}/scene=${scene}` } : null;
-}
+const whereOf = sceneWhere;
 // a scene file by its entry's name (gcl/names/proc.csv, else tools/assets/gclroles.py)
 const fileTitle = f => f.kind === 'scene' && procNames[f.entry] ? `${procNames[f.entry]}` : f.title;
 const hitFile = (f, q) => [f.id, f.title, fileTitle(f), f.description, f.category, whereOf(f.entry)?.text].some(x => (x || '').toUpperCase().includes(q));
@@ -149,6 +141,7 @@ async function showFile(fid) {
   if (F.length) renderSide();
   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
   const f = F.find(x => x.id === fid), v = $('view');
+  pageTitle(f ? fileTitle(f) : fid, 'Scripts');
   if (!f) { v.innerHTML = `<div class="empty">No file ${esc(fid)}.</div>`; return; }
   const d = await fetch(`/api/file/${fid}${inline ? '/inline' : ''}${readable ? '' : '/raw'}${english ? '/en' : ''}`).then(r => r.json());
   const sc = f.entry ? scenes[f.entry] : null;
@@ -248,11 +241,13 @@ async function show(id) {
   const d = await fetch('/api/proc/' + id).then(r => r.ok ? r.json() : null);
   if (!d) { v.innerHTML = `<div class="empty">No procedure ${id}.</div>`; return; }
   const sc = scenes[id];
+  const file = d.file && F.find(f => f.id === d.file), where = file?.kind === 'scene' ? whereOf(file.entry) : null;
   const spawns = {};
   for (const s of d.spawns) (spawns[s.key] ||= { ...s, n: 0, args: [] }).n++, s.arg && spawns[s.key].args.push(s.arg);
   lastD = d;
+  pageTitle(procNames[id] || 'proc ' + id, 'Scripts');
   v.innerHTML = `<h2>Procedure ${id}${procNames[id] ? ' · <code>' + esc(procNames[id]) + '</code>' : ''}${d.scene ? ' · scene entry' : ''}</h2>
-    <div class="meta">${d.file ? `in file <a href="#file=${d.file}">${esc(F.find(f => f.id === d.file)?.title || d.file)}</a> · ` : ''}flag ${d.flag} · ${d.lines.length} lines · printed as <code>proc ${id - 1}</code> by <code>gcx.py dis</code>${d.scene && sc?.map ? ` · loads map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${d.scene && sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(id).padStart(4, '0'), 'stage survey capture') : ''}</div>
+    <div class="meta">${d.file ? `in file <a href="#file=${d.file}">${esc(file?.title || d.file)}</a>${where ? ' (' + peekLink(where.href, esc(where.text)) + ')' : ''} · ` : ''}flag ${d.flag} · ${d.lines.length} lines · printed as <code>proc ${id - 1}</code> by <code>gcx.py dis</code>${d.scene && sc?.map ? ` · loads map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${d.scene && sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(id).padStart(4, '0'), 'stage survey capture') : ''}</div>
     <div id="ned"></div>
     <h3>Called by (${d.callers.length})</h3>${d.callers.length ? `<div class="chips">${d.callers.map(c => `<span class="chip"><a href="#${c}">proc ${c}</a></span>`).join('')}</div>`
       : `<div class="empty">No script calls it${d.scene ? ' (a scene: entered with load)' : d.flag ? ' (the engine or stage data starts it)' : ''}.</div>`}
@@ -283,8 +278,7 @@ function route() {
 window.onhashchange = route;
 (async () => {
   await loadNotes();
-  const [d, a, fl, w] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json()), fetch('/api/files').then(r => r.json()), fetch('/api/areas').then(r => r.json()).catch(() => null)]);
-  W = w;
+  const [d, a, fl] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json()), fetch('/api/files').then(r => r.json()), loadWorld()]);
   F = fl.files; fileOf = Object.fromEntries(F.flatMap(f => f.procs.map(c => [c, f.id])));
   P = d.procs; scenes = d.scenes; byId = Object.fromEntries(P.map(p => [p.id, p]));
   callees = d.callees || {}; procOfName = d.procnames || {};

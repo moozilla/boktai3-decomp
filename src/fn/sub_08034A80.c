@@ -37,6 +37,7 @@ void Memory_Clear(void *, int);
 #include "game_state.h"
 #include "ram.h"
 #include "engine_globals.h"
+#include "monster_particle_random.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -44,7 +45,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-// MATCHING_CONCESSION: register-pinning
 int Wireless_CheckAdapterReady(void);
 int Script_ParseStringRef(const void *);
 const u8 *Text_LookupString(int);
@@ -56,53 +56,42 @@ struct Game {
     u8 pad[0x780];
     u8 playerName[8];
 };
+static inline u16 Random_Next(const u16 *table)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return table[index];
+}
 int WirelessController_UpdateAdapterSetup(struct Engine *p)
 {
-    u8 *pending = &p->pending;
-    u8 *timer;
-    register int read asm("r0");
-    int zero;
-    if (*pending)
-        *pending = 0;
-    timer = &p->flag3c;
-    read = *timer;
-    zero = read;
-    if (zero) {
-        read--;
-        *timer = read;
-        goto done;
+    if (p->pending)
+        p->pending = 0;
+    if (p->flag3c) {
+        p->flag3c--;
+        return 0;
     }
     switch (Wireless_CheckAdapterReady()) {
         case -1:
-            setOperation(p, 27, zero);
+            setOperation(p, 27, 0);
             break;
         case 0:
-            *timer = 60;
+            p->flag3c = 60;
             break;
         case 1: {
-            int three = 3;
             int base;
-            u32 position;
-            u16 *table;
-            register u32 mask asm("r4");
-            u32 *randomIndex;
             int offset;
             int chance;
+            const u16 *table;
+            union ParticleRandomTableSource source;
             const u8 *name;
             u8 *userName;
             u8 *gameName;
-            p->flag = zero;
-            p->operation = three;
-            p->ticks = zero;
-            *pending = 1;
+            setOperation(p, 3, 0);
             base = Script_ParseStringRef(p->script);
-            table = gRandomTable;
-            randomIndex = &gRandomIndex;
-            position = *randomIndex + 1;
-            mask = 1023;
-            position &= mask;
-            *randomIndex = position;
-            chance = ((u8 *)table)[position * 2];
+            source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+            source.halves[1] = RANDOM_TABLE_ADDR >> 16;
+            table = ParticleRandom_GetTable(&source);
+            chance = (u8)Random_Next(table);
             if (chance <= 63) {
                 u32 form = SunClock_GetPhase();
                 int stage = SunClock_GetBaseHour();
@@ -115,11 +104,8 @@ int WirelessController_UpdateAdapterSetup(struct Engine *p)
                     if (stage <= 11)
                         offset = 2;
                 }
-            } else {
-                u32 next = (position + 1) & mask;
-                *randomIndex = next;
-                offset = (table[next] & three) + 4;
-            }
+            } else
+                offset = (Random_Next(table) & 3) + 4;
             name = Text_LookupString(base + offset);
             WirelessText_EncodeString(gGameState->playerName, p->userName, 8);
             userName = p->userName;
@@ -140,6 +126,5 @@ int WirelessController_UpdateAdapterSetup(struct Engine *p)
         default:
             break;
     }
-done:
     return 0;
 }
