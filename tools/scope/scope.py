@@ -1067,7 +1067,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         print("  To keep a tail apart: end it in `return` (it shares only its r0 set with the last return, then"
               " jumps to a new label with no jump chain), or let its call fall into a label, as an if/else"
               " chain's last branch before shared code does: flow puts a (use 0) nop after that call, which no"
-              " jumping tail matches. To share one, let it jump to that label (README fact 39)")
+              " jumping tail matches. When two arms of an inner if/else merge, put a `return` right after that"
+              " if/else (inside the enclosing branch): the else arm's call then falls into the return's label"
+              " (ScenePool_SelectRepeatOrExit). To share one, let it jump to that label (README fact 39)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
