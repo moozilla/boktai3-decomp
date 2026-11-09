@@ -38,5 +38,20 @@ class PlaceTests(unittest.TestCase):
         self.assertEqual([p['name'] for p in places.assign(w)], ['Prologue', 'Sealed Prison', 'Menu'])
 
 
+
+class BrowseNamesTests(unittest.TestCase):
+    def test_browse_names_an_area_as_world_does(self):
+        """tools/studio/atlas.py names areas by places.split, place first."""
+        from unittest.mock import patch
+        for d in (ROOT / 'tools', ROOT / 'tools' / 'assets'):
+            sys.path.insert(0, str(d))
+        import atlas
+        labels = ['Sealed Prison (opening tutorial dungeon)', 'Sealed Prison', 'Ancient Tree']
+        with patch.dict(atlas._SPLIT, places.split(labels), clear=True):
+            self.assertEqual(atlas.place_title('Sealed Prison (opening tutorial dungeon)'), 'Sealed Prison · opening tutorial dungeon')
+            self.assertEqual(atlas.place_title('Ancient Tree'), 'Ancient Tree')
+            self.assertEqual(atlas.location('Sealed Prison (opening tutorial dungeon)'), ('Sealed Prison', 'Opening tutorial dungeon'))
+            self.assertEqual(atlas.location('Ancient Tree'), ('Ancient Tree', 'Main area'))
+
 if __name__ == '__main__':
     unittest.main()

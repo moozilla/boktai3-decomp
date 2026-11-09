@@ -672,6 +672,38 @@ keeps the shifts, 2 / 2), `% 16`, ParticleRandom_ReadSample (do/while), and swap
 frame test's arms (worse). Next: a mask whose bits combine narrows to 15 through nonzero_bits
 (the 15 would be a new const after cse).
 
+### ActorAttachment_CreateValueSpriteSlot (src/fn/sub_08065FD0.c, 08065FD0): PRE slot order only
+
+Draft: `notes/phase3-drafts/actors/ActorAttachment_CreateValueSpriteSlot.c` (15 / 15, every
+difference a PRE stack slot; `AGBCC_GCSE_T=127` or `=133` gives MATCH). Three levers got it
+from 126 there:
+(1) The sprite tail (Sprite_Init .. `placed->position`) is an inline helper. integrate.c folds
+the large offsets 0x134 / 0x10E / 0x104 to const form there (fact 55), so gcse hoists them above
+the frame loop as the ROM does.
+(2) The frame-select loop is a label/goto loop. With while/for/do, NOTE_LOOP_BEG keeps the else
+label and the loop label apart in jump1, so LCM inserts into the else block and loop.c hoists
+`4` and the copies.
+(3) The burst pointer starts after Mod and steps inside the body, with the draw written as
+`*(u16 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2)`.
+Left: N = 258 real insns into gcse (T 129). The ROM's order (action, resourceKind, active,
+sprite, sequences, unknownA) needs N 252..255 or 264..267 (`preorder`). About 30
+code-preserving spellings keep N at exactly 258: the switches, IsAlternateMode, the goto
+shapes, found/i types, burst loop forms, inline boundaries and dead results. A manager-fetch
+inline moves N (e3: 263) but changes the code. Next: a structural difference that later passes
+remove (jump threading of a second null test, a return-label shape). Or a shared inline with
+CreateSpriteSlot / the other Create* slots once they are matched.
+
+### ActorAttachment_CreateSinglePartSlot (src/fn/sub_08066278.c, 08066278): PRE slot order only
+
+Draft: `notes/phase3-drafts/actors/ActorAttachment_CreateSinglePartSlot.c` (24 / 24, pin-free,
+every difference a PRE stack slot). It is the same family as CreateValueSpriteSlot: a tail inline
+`ActorAttachment_SetupPart` (const-form 0x134 / 0x10E / 0x104 hoisted above the clearing loop),
+`parts = slot->parts` read before the null check, and the SDK `CpuFill32(0, offset, 8)` macro.
+Its `vu32 tmp` gets a slot at declaration, below the inline's addressof'd xOffset / zOffset as in
+the ROM, so it needs a `concession-ok(volatile)` note citing the SDK macro. Left: `preorder` wants
+slot's pseudo +4 (r34/r35, by declaration order) together with N 184..187 (T 93). The draft has
+N = 182, and the loop forms and declaration orders tried all keep it.
+
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 
 ### SceneGrid_ScanColumns (src/fn/sub_0806E7CC.c, 0806E7CC): deferred
@@ -1102,3 +1134,87 @@ Tried:
 - inverting the fading test
 - `goto done` before `++p->elapsed`
 Next: find a spelling where one of those two values reaches reload unallocated.
+### AreaEffect_AddSpriteFromScript (field-effects, open)
+Plain draft without concessions in notes/phase3-drafts/field-effects/AreaEffect_AddSpriteFromScript.c:
+19 insns differ, all register choice. Global alloc runs manager (priority 1604: 10 refs, live 187)
+before the 0xA8 stride constant (1600). manager needs a live length of 188+ insns, or the stride
+needs a 5th ref. With the item_container-style groundHeight/cellIndex inlines, the barrier is not
+needed, and gcse puts &manager->count in r8 without the pin.
+
+### TetherActor_UpdateBounceReturn (field-effects, partial)
+19 -> 4 pins. Left: the incremented frame is zero-extended twice in the ROM (in plain C cse shares
+the two; switch and mixed cast/memory forms don't help), and r6 holds 0x380 in the falling arm.
+
+### VulcanCannon_UpdateFacingTurn (src/fn/sub_08207350.c, 08207350): deferred, one cse merge left
+
+Landed: 12 concessions, a hand-unrolled step routine and VC_* selector macros for `vulcan_cannon_worker.h`.
+Draft: `notes/phase3-drafts/monsters-bosses/VulcanCannon_UpdateFacingTurn.c` (5 ROM / 3 draft).
+The draft is plain C: the shared `DisplaySequence_StepSprite` inline and `if (!p->facing) p->facing = 1; else ...`.
+Everything matches from the step routine to the end.
+What remains: `if (!p->allowTurn)` records allowTurn's pseudo (27) as equal to 0 on the fall-through.
+cse1 (and cse2 again, so `CSE_NOCANON=27` alone does nothing) then stores the call's fifth argument `0` from 27.
+That keeps 27 alive into r4. The ROM loads allowTurn into r1, lets it die at the `cmp`, and stores a fresh `movs r2, #0`.
+Any non-equality test (`allowed <= 0` on an s32) avoids the merge but branches with `bgt`.
+Tried:
+- `(u8)allowed`, `& 0xFF`, `== FALSE`
+- a zero local set before the test (it becomes r8 or folds back)
+- a restart inline helper, and a result variable
+Next: an EQ test whose operand cse cannot record, or a label in front of the not-allowed block (it starts a new EBB).
+
+### EnemyParticle_UpdatePool (src/fn/sub_0820D2C4.c, 0820D2C4): deferred, StepSprite draft 12/16
+
+Landed: 8 concessions in a hand-unrolled sequence step.
+Draft: `notes/phase3-drafts/monsters-bosses/EnemyParticle_UpdatePool.c` (12 ROM / 16 draft).
+It calls `DisplaySequence_StepSprite(&cursor->sprite, &cursor->anim)` and has no concessions in the step.
+The ROM has three long-lived pointers: base in sb, an add-0 pointer in r8, and `ground` (base+0x54) in sl.
+pool sits at [sp], i at [sp+4], and the `sprite = o` copy at [sp+8].
+Inside the step, the first flag block and the command reads go through r8.
+`sprite->frame` and the second block go through the spilled `sprite` (r6) and through base+0x18 (r4).
+The draft's reads through r8 match, but its step pointer values come from a spilled `cursor`
+(it takes [sp+4], which pushes i to [sp+8]), and `sprite` is dead.
+Passing `sprite` or `&base->anim` instead changes loop's lead giv (base+0x18) and the whole allocation (29-72).
+A single `base` pointer, a per-iteration `cursor = base` copy, and `&pool->e[i]` are all worse (41-116).
+Next: work out whether r8 is a cursor biv or loop's reduced giv (try `hoist`), then the C that puts sprite/state on the base side
+while the reads stay on r8.
+
+### OrangeSpine_ApplyHitReaction (src/fn/sub_0820EE34.c, 0820EE34): deferred
+
+Landed: 2 pins and 4 barriers (r0 and r1 dummies around two statements).
+Draft: `notes/phase3-drafts/monsters-bosses/OrangeSpine_ApplyHitReaction.c` (36 ROM / 34 draft).
+It is the matched DragonPuppy_ApplyHitReaction (0820AD84) form, which covers 193 of 196 insns.
+That relative stores `reaction = 0x26` inside the 0x40 branch; OrangeSpine doesn't.
+The ROM keeps r0 and r1 busy across `target->collider.responseValue = source->responseValue`:
+the value goes to r2, the address to r1, and the 0x40 mask reload to r3.
+So r3 joins reload's spill set (ROM r0-r3 plus r7; draft r0, r1, r2, r7), and every later choice rotates.
+`AGBCC_FORCE=62:2` fixes the value register only; the spill set still lacks r3.
+Tried:
+- a `u16 reaction` temp
+- a mask local
+- `!= 0`
+Next: find what the original kept live in r0 and r1 across that store. The pinned dummies stand in for it.
+
+### sub_08217430 (src/fn/sub_08217430.c, 08217430): deferred
+
+Landed: a `bank` pin in r3 and a barrier keeping `offset`/`base` live.
+Draft: `notes/phase3-drafts/monsters-bosses/sub_08217430.c`
+(`u8 *bank = gPaletteBankData + (gObjPaletteKeys[i] << 5);`, 8 ROM / 6 draft).
+The copy `r0 = bank` before CpuFastSet gives bank (pseudo 33) a copy suggestion of r0.
+Local-alloc's first pass hands it r0 ahead of the higher-priority `=gObjPaletteBuffer` temp (44), which then takes r2.
+The ROM has bank in r3, the temp in r0, and `adds r0, r3, #0` before the call.
+`AGBCC_FORCE=33:3` gives 2/2. What remains is the offset/base pair (global 39 in r1, ROM r0).
+Tried:
+- the expression inline in the call, `(u16 *)`, a separate dst local
+- `ObjectFade_SourceBank(i)`
+- inline copy wrappers (worse: the base address is no longer hoisted)
+Next: C where bank does not die in the r0 copy (or is not a plain copy), so it gets no suggestion.
+
+### GameState_SelectRamBase (src/script_virtual_machine.c, 0821B084): deferred, one operand order
+
+Pin: `base` in r1.
+Draft: `notes/phase3-drafts/monsters-bosses/GameState_SelectRamBase.c` (1 ROM / 1 draft).
+cse swaps `base += off` to `(plus off base)`, so the draft prints `adds r1, r0, r1`; the ROM has `adds r1, r1, r0`.
+update_equiv_regs doubles base's refs (its first set is a constant).
+Tried, all with the same result:
+- `= gGameStateStorage + off` and `&arr[off]` (worse: the base load moves late)
+- `u32` arithmetic, `off + base`, `<< 3`, `% 128`, an offset local
+Next: a first set of base that is not a constant equivalence, or a form cse leaves in order.

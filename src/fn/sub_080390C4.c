@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
 #include "engine_globals.h"
@@ -27,10 +26,6 @@ struct Menu {
     u16 weights[5];
     u8 padea[2], vec;
 };
-struct Save {
-    u8 pad[0x58];
-    s16 values[4];
-};
 void *Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 void *Script_GetPc(void);
@@ -44,167 +39,48 @@ void Inventory_ClearItemSlot(int);
 void Inventory_ClearKeyItemSlot(int);
 void WirelessExchange_ClearPeerCounts(struct Menu *, int);
 void *Script_GetTextSourcePc(void);
-int WirelessTradeMenu_InitFromScript(struct Menu *arg)
+int WirelessTradeMenu_InitFromScript(struct Menu *p)
 {
-    u32 mask;
-    register struct Menu *p asm("r6") = arg;
-    u16 *leftBase;
-    u16 *rightBase;
-    struct Locals {
-        u8 *vec, *state, *entered, *v2b, *v2c, *v2d, *enabled, *v33, *counts;
-    } local;
-    int i;
+    int i, j, r, index;
     u8 *item;
-    u16 *cursor;
+
     gWirelessTradeMenu = p;
     p->listener = Script_GetKeywordValue(101, 0);
     p->secondListener = Script_GetKeywordValue(114, 0);
     p->count = 0;
     p->leftMask = 0;
     if (Script_SeekToKeyword(119)) {
-        leftBase = p->left;
-        {
-            register u32 offset asm("r1") = 0xBC;
-            asm("" : "+r"(offset));
-            rightBase = (u16 *)(offset + (u32)p);
-        }
-        {
-            register u8 *a asm("r3") = &p->v2b;
-            u8 *b;
-            u8 *c;
-            local.v2b = a;
-            b = &p->v2c;
-            local.v2c = b;
-            c = &p->v2d;
-            local.v2d = c;
-            a += 8;
-            local.v33 = a;
-            b += 0xc0;
-            local.vec = b;
-            c += 5;
-            local.enabled = c;
-            a -= 11;
-            local.state = a;
-            b -= 0xc3;
-            local.entered = b;
-            c += 6;
-            local.counts = c;
-        }
-        cursor = leftBase;
-        do {
+        for (i = 0; i <= 15; i++) {
             if (Script_GetPc()) {
-                *cursor = Script_GetValue();
+                p->left[i] = Script_GetValue();
                 p->count++;
             } else
-                *cursor = 0;
-            cursor++;
-            asm("" : "+r"(leftBase));
-        } while ((s32)cursor <= (s32)(leftBase + 15));
+                p->left[i] = 0;
+        }
     } else {
-        {
-            register u32 offset asm("r3") = 0x7C;
-            asm("" : "+r"(offset));
-            leftBase = (u16 *)(offset + (u32)p);
-        }
-        {
-            u32 offset = 0xBC;
-            rightBase = (u16 *)(offset + (u32)p);
-        }
-        {
-            u8 *a = &p->v2b;
-            register u8 *b asm("r3");
-            u8 *c;
-            local.v2b = a;
-            b = &p->v2c;
-            local.v2c = b;
-            c = &p->v2d;
-            local.v2d = c;
-            a += 8;
-            local.v33 = a;
-            b += 0xc0;
-            local.vec = b;
-            c += 5;
-            local.enabled = c;
-            a -= 11;
-            local.state = a;
-            b -= 0xc3;
-            local.entered = b;
-            c += 6;
-            local.counts = c;
-            {
-                u16 *end = leftBase;
-                int zero = 0;
-                register u16 *cursor asm("r0");
-                cursor = (u16 *)(c + 0x62);
-                do {
-                    *cursor = zero;
-                    cursor--;
-                } while ((s32)cursor >= (s32)end);
-            }
-        }
+        for (i = 0; i <= 15; i++)
+            p->left[i] = 0;
     }
-    {
-        register u32 count asm("r1") = p->count;
-        if (count) {
-            int r;
-            register int j asm("r5");
-            r = (*(u8 *)&gSceneEffectPalettePhase);
-            j = 0;
-            if ((u32)j < count)
-                do {
-                    int index;
-                    item = Equipment_GetDefinition(leftBase[j]);
-                    if (!*item) {
-                        index = 0;
-                        mask = p->leftMask;
-                    } else {
-                        index = 15;
-                        index &= r;
-                        if (!index)
-                            index = 1;
-                        {
-                            u32 bit = 1 << index;
-                            mask = p->leftMask;
-                            if (bit & mask) {
-                                register int small asm("r8");
-                                int one;
-                                u32 used;
-                                {
-                                    register int x asm("r3") = 15;
-                                    asm("" : "+r"(x));
-                                    small = x;
-                                }
-                                {
-                                    int x = 1;
-                                    one = x;
-                                }
-                                used = mask;
-                                do {
-                                    index = r;
-                                    index &= small;
-                                    if (!index)
-                                        index = 1;
-                                    r++;
-                                } while ((one << index) & used);
-                            }
-                        }
-                    }
-                    p->leftMask = (1 << index) | mask;
-                    Inventory_SetEquipmentEntry(index, item);
-                    {
-                        register u32 *read asm("r1") = &gRandomIndex;
-                        register u32 *write asm("r3");
-                        u32 x;
-                        u8 *table;
-                        x = (*read + 1) & 1023;
-                        write = &gRandomIndex;
-                        *write = x;
-                        x <<= 1;
-                        table = gRandomTable;
-                        r += *(u8 *)(x + (u32)table);
-                    }
-                    j++;
-                } while ((u32)j < p->count);
+    if (p->count) {
+        r = (u8)gSceneEffectPalettePhase;
+        for (i = 0; i < p->count; i++) {
+            item = Equipment_GetDefinition(p->left[i]);
+            if (*item == 0)
+                index = 0;
+            else {
+                index = r & 15;
+                if (!index)
+                    index = 1;
+                while ((1 << index) & p->leftMask) {
+                    index = r & 15;
+                    if (!index)
+                        index = 1;
+                    r++;
+                }
+            }
+            p->leftMask |= 1 << index;
+            Inventory_SetEquipmentEntry(index, item);
+            r += (u8)gRandomTable[gRandomIndex = (gRandomIndex + 1) & 1023];
         }
     }
     item = Equipment_GetDefinition(0);
@@ -212,124 +88,44 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
     p->rightCount = 0;
     p->extraMask = 0;
     if (Script_SeekToKeyword(103)) {
-        cursor = rightBase;
-        do {
+        for (i = 0; i <= 7; i++) {
             if (Script_GetPc()) {
-                *cursor = Script_GetValue();
+                p->right[i] = Script_GetValue();
                 p->rightCount++;
             } else
-                *cursor = 0;
-            cursor++;
-            asm("" : "+r"(rightBase));
-        } while ((s32)cursor <= (s32)(rightBase + 7));
+                p->right[i] = 0;
+        }
     } else {
-        u16 *end = rightBase;
-        int zero = 0;
-        u16 *cursor;
-        cursor = rightBase + 7;
-        do {
-            *cursor = zero;
-            cursor--;
-        } while ((s32)cursor >= (s32)end);
+        for (i = 0; i <= 7; i++)
+            p->right[i] = 0;
     }
-    {
-        register u32 count asm("r1") = p->rightCount;
-        if (count) {
-            register int r asm("r4");
-            register int j asm("r5");
-            u16 *q;
-            u32 *random;
-            r = (*(u8 *)&gSceneEffectPalettePhase);
-            j = 0;
-            if ((u32)j < count) {
-                q = rightBase;
-                {
-                    register u32 *x asm("r3") = &gRandomIndex;
-                    asm("" : "+r"(x));
-                    random = x;
+    if (p->rightCount) {
+        r = (u8)gSceneEffectPalettePhase;
+        for (i = 0; i < p->rightCount; i++) {
+            if (p->right[i] == 1)
+                index = 0;
+            else {
+                index = r & 7;
+                if (!index)
+                    index = 1;
+                while ((1 << index) & p->extraMask) {
+                    index = r & 7;
+                    if (!index)
+                        index = 1;
+                    r++;
                 }
-                do {
-                    int index;
-                    if (*q == 1) {
-                        index = 0;
-                        mask = p->extraMask;
-                    } else {
-                        index = 7;
-                        index &= r;
-                        if (!index)
-                            index = 1;
-                        {
-                            u32 bit = 1 << index;
-                            mask = p->extraMask;
-                            if (bit & mask) {
-                                int small;
-                                register int one asm("r8");
-                                u32 used;
-                                {
-                                    int x = 7;
-                                    small = x;
-                                }
-                                {
-                                    register int x asm("r3") = 1;
-                                    asm("" : "+r"(x));
-                                    one = x;
-                                }
-                                used = mask;
-                                do {
-                                    index = r;
-                                    asm("" : "+r"(index));
-                                    index &= small;
-                                    if (!index)
-                                        index = 1;
-                                    r++;
-                                } while ((one << index) & used);
-                            }
-                        }
-                    }
-                    p->extraMask = (1 << index) | mask;
-                    asm("" : "+r"(q));
-                    GameState_SetUnlockSlot(index, *q);
-                    {
-                        register u32 *read asm("r1") = random;
-                        register u32 *write asm("r3");
-                        u32 x;
-                        u8 *table;
-                        asm("" : "+r"(read));
-                        x = (*read + 1) & 1023;
-                        write = random;
-                        asm("" : "+r"(write));
-                        *write = x;
-                        x <<= 1;
-                        table = gRandomTable;
-                        r += *(u8 *)(x + (u32)table);
-                    }
-                    q++;
-                    j++;
-                } while ((u32)j < p->rightCount);
             }
+            p->extraMask |= 1 << index;
+            GameState_SetUnlockSlot(index, p->right[i]);
+            r += (u8)gRandomTable[gRandomIndex = (gRandomIndex + 1) & 1023];
         }
     }
     GameState_SetUnlockSlot(0, 1);
     SolarFruit_SetInventorySlot(0, 0);
     for (i = 1; i <= 7; i++)
         SolarFruit_SetInventorySlot(i, -1);
-    {
-        struct Save **slot;
-        register int minus asm("r0");
-        register int value asm("r2");
-        i = 0;
-        slot = &gGameState;
-        minus = -1;
-        asm("" : "+r"(slot), "+r"(minus));
-        value = minus;
-        do {
-            register struct Save *save asm("r1") = *slot;
-            int offset = i << 1;
-            asm("" : "+r"(offset));
-            *(s16 *)(offset + (u32)save + 0x58) = value;
-            i++;
-        } while (i <= 3);
-    }
+    for (i = 0; i <= 3; i++)
+        *(gGameState->party + i) = -1;
     for (i = 0; i <= 15; i++)
         Inventory_SetConsumableEntry(i, -1);
     for (i = 0; i <= 15; i++)
@@ -337,111 +133,45 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
     for (i = 0; i <= 15; i++)
         Inventory_ClearKeyItemSlot(i);
     p->rightMask = 0xFCF;
-    {
-        int zero = 0;
-        int byteZero;
-        int one;
-        p->v18 = zero;
-        byteZero = 0;
-        {
-            u16 half = 0;
-
-            p->v1c = half;
-            p->v1e = half;
-        }
-        p->flags = zero;
-        {
-            register u8 *q asm("r1") = local.v2b;
-            *q = byteZero;
-        }
-        {
-            register u8 *q asm("r3") = local.v2c;
-            *q = byteZero;
-        }
-        {
-            register u8 *q asm("r1") = local.v2d;
-            *q = byteZero;
-        }
-        {
-            register u8 *q asm("r3") = local.v33;
-            *q = byteZero;
-        }
-        {
-            register u8 *q asm("r1") = local.vec;
-            *q = byteZero;
-        }
-        one = 1;
-        {
-            register u8 *q asm("r3") = local.enabled;
-            *q = one;
-        }
-        {
-            register u8 *q asm("r3") = local.state;
-            *q = byteZero;
-        }
-        {
-            u8 *q = local.entered;
-            *q = one;
-        }
-        p->timer = zero;
+    p->v18 = 0;
+    p->v1c = 0;
+    p->v1e = 0;
+    p->flags = 0;
+    p->v2b = 0;
+    p->v2c = 0;
+    p->v2d = 0;
+    p->v33 = 0;
+    p->vec = 0;
+    p->enabled = 1;
+    p->state = 0;
+    p->entered = 1;
+    p->timer = 0;
+    for (i = 0; i <= 1; i++) {
+        struct Slot *s = &p->slots[i];
+        for (j = 0; j <= 3; j++)
+            s->counts[i] = 0;
+        s->a = 100;
+        s->b = 100;
+        s->flag = 0;
+        s->kind = 0;
+        s->timer = 0;
     }
-    asm("" : "+r"(p));
-    {
-        struct Tail {
-            u8 a, b, flag, kind;
-            u32 timer;
-        };
-        register int j asm("r5") = 0;
-        int zero = 0;
-        int hundred = 100;
-        struct Tail *tail = (struct Tail *)&p->slots[0].a;
-        u8 *bytes = p->slots[0].counts;
-        do {
-            register u8 *destination asm("r2") = bytes + j;
-            register int k asm("r0") = 3;
-            // The original repeats this same per-slot byte store four times.
-            do {
-                *destination = zero;
-            } while (--k >= 0);
-            *((u8 *)tail) = hundred;
-            *((u8 *)tail + 1) = hundred;
-            *((u8 *)tail + 2) = zero;
-            *((u8 *)tail + 3) = zero;
-            tail->timer = zero;
-            asm("" : "+r"(tail), "+r"(bytes));
-            tail = (struct Tail *)((u8 *)tail + 12);
-            bytes += 12;
-            j++;
-        } while (j <= 1);
-    }
-    {
-        u8 *base = local.counts;
-        int zero = 0;
-        u8 *c;
-        c = base + 3;
-        do {
-            *c = zero;
-            c--;
-        } while ((s32)c >= (s32)base);
-    }
+    for (i = 0; i <= 3; i++)
+        p->counts[i] = 0;
     WirelessExchange_ClearPeerCounts(p, 0);
     WirelessExchange_ClearPeerCounts(p, 1);
-    if (Script_SeekToKeyword(115)) {
-        void *resource = Script_GetTextSourcePc();
-        p->resource = resource;
-        if (resource) {
-            asm("" : "+r"(p));
-            p->delta = 0;
-            p->weights[0] = (int)Script_GetKeywordValue(77, 11);
-            if (Script_SeekToKeyword(112)) {
-                cursor = p->weights + 1;
-                for (i = 3; i >= 0; i--) {
-                    *cursor = Script_GetValue();
-                    cursor++;
-                }
-                return 0;
-            }
-        }
+    if (!Script_SeekToKeyword(115))
+        return -1;
+    p->resource = Script_GetTextSourcePc();
+    if (!p->resource)
+        return -1;
+    p->delta = 0;
+    p->weights[0] = (int)Script_GetKeywordValue(77, 11);
+    if (Script_SeekToKeyword(112)) {
+        u16 *w = &p->weights[1];
+        for (i = 0; i <= 3; i++)
+            *w++ = Script_GetValue();
+        return 0;
     }
     return -1;
 }

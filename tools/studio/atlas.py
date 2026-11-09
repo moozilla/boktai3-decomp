@@ -147,15 +147,30 @@ def notes():
     return out
 
 
-def location(place, _cache={}):
-    """("Ancient Tree", "Side room") from "Ancient Tree (side room)": the
-    place World uses (tools/studio/places.py) and the rest, capitalized."""
-    if not _cache:
+_SPLIT = {}
+
+
+def _split(place):
+    """(place, detail) for an area label, by World's rule (tools/studio/places.py)."""
+    if not _SPLIT:
         import places
         rows = csv.DictReader(open(os.path.join(ROOT, "data", "labels", "areas.csv"), encoding="utf-8"))
-        _cache.update(places.split([r["place"] for r in rows]))
-    loc, sub = _cache.get(place) or (place, "")
+        _SPLIT.update(places.split([r["place"] for r in rows]))
+    return _SPLIT.get(place) or (place, "")
+
+
+def location(place):
+    """("Ancient Tree", "Side room") from "Ancient Tree (side room)": the
+    place World uses (tools/studio/places.py) and the rest, capitalized."""
+    loc, sub = _split(place)
     return loc, (sub[:1].upper() + sub[1:]) if sub else "Main area"
+
+
+def place_title(place):
+    """An area's name as World writes it, place first: "Sealed Prison · opening
+    tutorial dungeon" for the label "Sealed Prison (opening tutorial dungeon)"."""
+    loc, sub = _split(place)
+    return f"{loc} · {sub}" if sub else loc
 
 
 node_rank = {}
@@ -333,6 +348,9 @@ def build():
     area_rows = {int(r["area"]): r for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "areas.csv"), encoding="utf-8"))}
     scene_rows = {int(r["scene"]): r for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "scenes.csv"), encoding="utf-8"))}
     st = {s["scene"]: s for s in areas.load_stages()}
+    # scenes the stage survey photographed (build/centaur/captures/scene_NNNN), as on World
+    cap = os.path.join(ROOT, "build", "centaur", "captures")
+    shot = lambda s: os.path.exists(os.path.join(cap, f"scene_{s:04d}", "screen.png"))
     for ar in stage["areas"]:
         i = ar["area"]
         row = area_rows.get(i, {})
@@ -341,13 +359,14 @@ def build():
         # unlabeled areas share one group, as on the World page
         loc, short = location(place) if row.get("place") or ar.get("label") else ("Unlabeled areas", place)
         node_rank["Places/" + loc] = min(node_rank.get("Places/" + loc, 999), order or 900)
-        add(f"area:{i}", "Places/" + loc, kind="area", key=str(i), title=place, short=short, location=loc, order=i,
+        add(f"area:{i}", "Places/" + loc, kind="area", key=str(i), title=place_title(place) if loc != "Unlabeled areas" else place,
+            label=place, short=short, location=loc, order=i,
             confidence=row.get("confidence", ""), scenes=[f"scene:{s}" for s in ar["scenes"]], maps=ar.get("maps", []),
-            enemies=ar.get("enemies", {}))
+            enemies=ar.get("enemies", {}), shot=next((s for s in ar["scenes"] if shot(s)), None))
         for s in ar["scenes"]:
             r = scene_rows.get(s, {})
             sd = st.get(s, {})
-            add(f"scene:{s}", None, kind="scene", key=str(s), title=r.get("label") or f"Scene {s}", area=f"area:{i}",
+            add(f"scene:{s}", None, kind="scene", key=str(s), title=r.get("label") or f"Scene {s}", area=f"area:{i}", shot=shot(s),
                 floor=r.get("floor", ""), stage=sd.get("stage"), palette=sd.get("palette"),
                 doors=[{"scene": d.get("scene"), "entrance": d.get("entrance"), "cond": d.get("cond", [])} for d in sd.get("doors", [])],
                 items=[{"category": x.get("category"), "item": x.get("item"), "name": x.get("name"), "chest": x.get("chest")} for x in sd.get("items", [])],

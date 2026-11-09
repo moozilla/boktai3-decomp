@@ -1645,6 +1645,28 @@ Each was read from the compiler source and confirmed on a live draft.
    jump2 dump shows the kept `(set r1 256)` without its note. So a ROM that shares a call between a
    plain copy and a move2add copy did the move2add copy first, or shared that call in source.
 
+112. **The order of a loop's reduced givs follows their insns: a pointer local at the loop top
+   can reorder them.** record_giv prepends, so loop.c's giv list runs in reverse insn order.
+   combine_givs picks the rep with the highest total_benefit, and a tie goes to the earliest list
+   entry, which is the latest insn. Reduction, the init in the preheader and the increment after
+   the body then follow list order: reps reduced first get the lower pseudo numbers and come
+   first. In ActorAttachment_TickDetachedParts a `sprite = &parts[i]` local at the top of the body
+   put the ROM's two increments the other way round. Writing `parts[i]` at each use gave the
+   ROM's order. In a counted loop with a pointer step, `i--, position++` against
+   `position++` at the end of the body (ActorAttachment_CreateValueSpriteSlot's burst loop) is the
+   same lever. `giv` lists each value's benefit and the rep chosen.
+
+113. **A while/for/do loop that starts an else arm keeps a separate else block before gcse; a
+   label/goto loop does not.** jump1's mark_jump_label redirects a jump to a following label
+   only across plain notes, and stops at NOTE_INSN_LOOP_BEG (when not cross-jumping). So in
+   `if (a) x; else while (--i > 0) ...` the else label and the loop label stay two blocks through
+   gcse. LCM delays its insertions into that empty else block and the then arm, rather than the
+   compare block, and loop.c hoists the loop's constants into it. A ROM whose PRE copies all sit
+   before the compare, and whose loop keeps `movs r0, #4` inside, had no loop notes there:
+   `loop: if (--i > 0) { if (v < t * i) goto loop; ... }` matched both
+   (ActorAttachment_CreateValueSpriteSlot, from 110 to 94 differing insns). `pre` reports the
+   else-block insertion as "moved above a loop", and `hoist` lists what loop.c took.
+
 80. **A multi-set variable whose first set (in insn order) is a constant gets its live length
    doubled, even though the equivalence is dropped at the next set.** cse puts a REG_EQUAL note on
    every constant set. update_equiv_regs (local-alloc.c) accepts the first one it meets (no

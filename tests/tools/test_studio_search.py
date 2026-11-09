@@ -72,6 +72,11 @@ class SearchTests(unittest.TestCase):
         self.assertEqual(search.search('08700010')[0]['sub'], 'ROM · +0x10')
         self.assertEqual([h for h in search.search('08900000') if h['kind'] == 'ROM'], [])
 
+    def test_words_in_any_order(self):
+        self.assertEqual(search.search('corridor ghoul')[0]['url'], '/atlas#scene:2719')
+        self.assertEqual(search.search('create player')[0]['url'], '/atlas#actor:F5EB')  # Django's fname
+        self.assertEqual(search.search('sealed ghoul')[0]['url'], '/atlas#scene:2719')  # a scene by its place
+
     def test_empty_query(self):
         self.assertEqual(search.search('  '), [])
 
