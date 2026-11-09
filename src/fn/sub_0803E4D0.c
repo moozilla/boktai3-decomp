@@ -1,12 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-static inline u32 *Prepare(struct ScenePoolEntry *entry, u32 state)
-{
-    entry->state = state;
-    entry->stateFrame = 0;
-    entry->stateEntered = 1;
-    return entry->history;
-}
 s32 ScenePool_StateLateralWeave(void *manager, struct ScenePoolActor *actor,
                                 struct ScenePoolEntry *entry)
 {
@@ -30,43 +22,44 @@ s32 ScenePool_StateLateralWeave(void *manager, struct ScenePoolActor *actor,
             actor->controlFlags |= 0x40;
     }
     if (entry->stateFrame > 59) {
-        s32 kind;
-        u32 *arg;
         entry->turnStep = 0x200;
-        kind = entry->kind;
-        switch (kind) {
+        switch (entry->kind) {
             case 0:
             case 1:
-                arg = Prepare(entry, 0);
-                goto clear;
-            case 2:
-                if (entry->direction > 0)
-                    goto first;
-                arg = Prepare(entry, kind);
-                asm("" : "+r"(arg));
-                goto clear;
-            case 3:
-                if (entry->direction <= 0)
-                    goto second;
-            first: {
-                u32 one = 1;
-                register u8 *entered asm("r0");
-                entry->state = one;
+                entry->state = 0;
                 entry->stateFrame = 0;
-                entered = &entry->stateEntered;
-                *entered = one;
-                arg = (u32 *)(entered + 8);
-            }
-            clear:
-                Memory_Clear(arg, 0x100);
-                goto done;
-            second:
-                Memory_Clear(Prepare(entry, 2), 0x100);
-                asm volatile("");
-                goto done;
+                entry->stateEntered = 1;
+                Memory_Clear(entry->history, 0x100);
+                break;
+            case 2:
+                if (entry->direction > 0) {
+                    entry->state = 1;
+                    entry->stateFrame = 0;
+                    entry->stateEntered = 1;
+                    Memory_Clear(entry->history, 0x100);
+                } else {
+                    entry->state = 2;
+                    entry->stateFrame = 0;
+                    entry->stateEntered = 1;
+                    Memory_Clear(entry->history, 0x100);
+                }
+                break;
+            case 3:
+                if (entry->direction > 0) {
+                    entry->state = 1;
+                    entry->stateFrame = 0;
+                    entry->stateEntered = 1;
+                    Memory_Clear(entry->history, 0x100);
+                } else {
+                    entry->state = 2;
+                    entry->stateFrame = 0;
+                    entry->stateEntered = 1;
+                    Memory_Clear(entry->history, 0x100);
+                }
+                break;
         }
-    } else
-        entry->stateFrame++;
-done:
+        return 0;
+    }
+    entry->stateFrame++;
     return 0;
 }
