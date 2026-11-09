@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -43,47 +42,28 @@ void WirelessController_RebuildAvailablePeerList(struct Engine *);
 int RfuManager_StartChildConnect(int, int);
 int Wireless_SelectParentFromInput(struct Engine *p)
 {
-    u8 *count;
     if (p->pending)
         p->pending = 0;
     WirelessController_RebuildAvailablePeerList(p);
-    {
-        u8 *initial = &p->count;
-        int available = *initial;
-        {
-            u8 *savedCount = initial;
-            count = savedCount;
+    if (p->count) {
+        int old = p->scroll;
+        if (gPadState[1] & 64)
+            p->scroll--;
+        else if (gPadState[1] & 128)
+            p->scroll++;
+        if (old != p->scroll) {
+            if (p->scroll > 7)
+                p->scroll = 7;
+            else if (p->scroll < 0)
+                p->scroll = 0;
         }
-        if (available) {
-            s8 *scroll = &p->scroll;
-            int old = *scroll;
-            register u16 *buttons asm("r2") = gPadState;
-            register int pressed asm("r5");
-            int current;
-            int index;
-            int n;
-            pressed = buttons[1];
-            if (pressed & 64)
-                (*scroll)--;
-            else if (pressed & 128)
-                (*scroll)++;
-            current = *scroll;
-            if (old != current) {
-                if (current > 7)
-                    *scroll = 7;
-                else if (current < 0)
-                    *scroll = 0;
-            }
-            index = (s8)(u8)*scroll;
-            n = *count;
-            if ((buttons[1] & 1) && index < n) {
-                int parentIndex = p->ids[index];
-                struct RfuLinkStatus *link;
-                int status;
-                link = gRfuLinkStatus;
-                status = (u8)RfuManager_StartChildConnect(link->partner[parentIndex].id, 0);
-                if (!status) {
-                    setOperation(p, 10, status);
+        {
+            int index = p->scroll;
+            int n = p->count;
+            if ((gPadState[1] & 1) && index < n) {
+                int parent = p->ids[index];
+                if (!(u8)RfuManager_StartChildConnect(gRfuLinkStatus->partner[parent].id, 0)) {
+                    setOperation(p, 10, 0);
                     return 0;
                 }
             }
