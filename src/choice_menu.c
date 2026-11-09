@@ -449,7 +449,6 @@ void *Script_GetTextSourcePc(void);
 
 s32 MessageWindow_GetTextBounds(s32 *);
 
-// MATCHING_CONCESSION: register-pinning
 struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
 {
     s32 options[7], arguments[4], defaults[4];
@@ -457,7 +456,7 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
     s32 stringBase, script;
     struct ChoiceMenu *p;
     s32 i;
-    s32 *argumentBase;
+    s32 *base;
     if (gChoiceMenu)
         return 0;
     if (Script_SeekToKeyword('r'))
@@ -489,25 +488,22 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
     }
     if (Script_SeekToKeyword('A')) {
         s32 *arg;
-        argumentBase = arguments;
-        arg = argumentBase;
+        base = arguments;
+        arg = base;
         do {
             s32 value = Script_GetPc();
-            if (value)
-                value = Script_GetValue();
-            *arg = value;
-            asm("" : : "r"(arg));
+            if (value) {
+                *(&value) = Script_GetValue();
+                *arg = value;
+            } else
+                *arg = value;
             arg++;
-        } while ((s32)arg <= ({
-                     register s32 limit asm("r0") = (s32)argumentBase;
-                     limit + 12;
-                 }));
+        } while ((s32)arg <= (s32)(base + 3));
     } else {
-        s32 *arg;
+        s32 *arg, *begin;
         s32 zero;
-        s32 *begin;
-        argumentBase = arguments;
-        begin = argumentBase;
+        base = arguments;
+        begin = base;
         zero = 0;
         arg = arguments + 3;
         do {
@@ -520,12 +516,8 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
         Task_SetCallbacks(p, ChoiceMenu_Update, ChoiceMenu_Destroy);
         p->useScript = 1;
         p->script = script;
-        {
-            s32 *source = argumentBase;
-            u32 *destination = p->arguments;
-            for (i = 3; i >= 0; i--)
-                *destination++ = *source++;
-        }
+        for (i = 0; i < 4; i++)
+            p->arguments[i] = base[i];
         if (ChoiceMenu_Initialize(p, window, stringBase, options) < 0) {
             Task_Kill(p);
             return 0;
