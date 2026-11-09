@@ -36,6 +36,9 @@ main { display: grid; grid-template-columns: 260px 1fr; height: calc(100vh - 53p
 .row:hover { background: var(--sel); }
 .row.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
 .row code { font-size: 12px; }
+/* a row with a name: the name on its own line, the key and notes under it */
+.row { flex-wrap: wrap; row-gap: 1px; }
+.row .lab { flex-basis: 100%; order: -1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .row .n { color: var(--muted); font-size: 12px; margin-left: auto; }
 .row .note { color: var(--accent); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #view { overflow: auto; padding: 16px 20px; min-width: 0; }
@@ -129,7 +132,7 @@ async function boot() {
 // Notes (data/notes.csv) per tab: kind and key of the selected item.
 const NOTE_KIND = { sprites: 'spr', big: 'big', maps: 'map', palettes: 'pal', tiles: 'tiles', data: 'res' };
 const noteKeyOf = key => tab === 'maps' ? key.split('-')[0] : key;
-const labelOf = i => NOTE_KIND[tab] && noteOf(NOTE_KIND[tab], noteKeyOf(i.key))?.label;
+const labelOf = i => (NOTE_KIND[tab] && noteOf(NOTE_KIND[tab], noteKeyOf(i.key))?.label) || i.place;
 // labels of a package's frames, for searching ("Healing Potion" finds 5D04)
 const frameLabels = i => (tab === 'sprites' || tab === 'big') ? Object.values(NOTES_DB).filter(n => n.kind === (tab === 'big' ? 'bigframe' : 'sprframe') && n.key.startsWith(i.key + '/')).map(n => n.label).concat(tab === 'sprites' ? Object.entries(ITEM_FRAMES).filter(([k]) => k.startsWith(i.key + '/')).flatMap(([, l]) => l.map(x => x.name + ' ' + x.jp)) : []).join(' ') : '';
 // ?bare=1 (with embed): only the picture, for pages that embed a map
@@ -151,12 +154,12 @@ function route() {
 }
 function renderList() {
   const q = $('q').value.trim().toUpperCase();
-  const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q) || (labelOf(i) || '').toUpperCase().includes(q) || frameLabels(i).toUpperCase().includes(q));
+  const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q) || (i.group || '').toUpperCase().includes(q) || (labelOf(i) || '').toUpperCase().includes(q) || frameLabels(i).toUpperCase().includes(q));
   $('count').textContent = `${hits.length} of ${items.length}`;
   let group = null;
   $('list').replaceChildren(...hits.flatMap(i => {
     const d = document.createElement('div'), out = [d];
-    if (i.group && i.group !== group && typeof TILE_GROUPS !== 'undefined') {
+    if (i.group && i.group !== group) {
       group = i.group;
       const g = document.createElement('div'); g.className = 'ghead'; g.textContent = TILE_GROUPS[group] || group;
       out.unshift(g);
@@ -546,10 +549,33 @@ views.maps = {
     await loadPtn();
     if (!stageList) stageList = await fetch('/api/stages').then(r => r.json());
     await loadStageMeta();
+    // each stage under the place its scenes are in (tools/studio/places.py), in story order
+    const W = await fetch('/api/areas').then(r => r.json()).catch(() => null);
+    const firstScene = {}, where = {};
+    for (const x of stageMeta || []) {
+      const k = stageKey(x.stage); if (!k) continue;
+      if (firstScene[k] == null || x.scene < firstScene[k]) {
+        firstScene[k] = x.scene;
+        const a = W?.areas[W.scene_area[x.scene]];
+        const sl = W?.scenes[x.scene]?.label;  // the scene's own label is the most specific
+        where[k] = a && { place: a.place || 'Unlabeled areas', detail: sl || a.detail || (a.place ? '' : `area ${a.area}`) };
+      }
+    }
     const staged = new Set(stageList.map(s => s.map));
+    const stages = stageList.map(s => {
+      const key = `${s.map}-${s.tileset}-${s.hp}`, w = where[key];
+      // no note: the key is MAP-TILESET-HP already
+      return { key, note: '', n: s.procs.length + '×', stage: s,
+               group: w?.place || 'Stages no scene loads', place: w?.detail || '', order: firstScene[key] ?? 1e9 };
+    });
+    // a place's stages stay together, the places in the order the story reaches them
+    const placeOrder = {};
+    (W?.places || []).forEach((p, i) => { placeOrder[p.name] = i; });
+    for (const it of stages) placeOrder[it.group] ??= 1e6 + (it.group === 'Unlabeled areas' ? 0 : 1);
+    stages.sort((a, b) => placeOrder[a.group] - placeOrder[b.group] || a.group.localeCompare(b.group) || a.order - b.order);
     items = [
-      ...stageList.map(s => ({ key: `${s.map}-${s.tileset}-${s.hp}`, note: `stage · tiles ${s.tileset} · hp ${s.hp}`, n: s.procs.length + '×', stage: s })),
-      ...(index.map || []).filter(([h]) => !staged.has(h)).map(([h, n]) => ({ key: h, note: 'map', n: (n / 1024).toFixed(0) + ' KB' })),
+      ...stages,
+      ...(index.map || []).filter(([h]) => !staged.has(h)).map(([h, n]) => ({ key: h, note: 'map', n: (n / 1024).toFixed(0) + ' KB', group: 'Maps without a stage' })),
     ];
   },
   async show(key) {
@@ -558,7 +584,7 @@ views.maps = {
     const own = m.tiles !== 0;
     const tsList = Object.keys(ptn.sets).sort();
     const savedTs = localStore('mapts.' + mh);
-    v.innerHTML = `<h2>Map ${mh}${st ? ` · stage` : ''}</h2>
+    v.innerHTML = `<h2>Map ${mh}${st ? ` · stage` : ''}${it?.group && st ? ` · ${esc(it.group)}${it.place ? ' (' + esc(it.place) + ')' : ''}` : ''}</h2>
       <div class="meta">${m.count} layer${m.count > 1 ? 's' : ''} · ${m.nmeta} metatiles · ${own ? m.ntiles + ' own tiles' : 'tiles from ptn tileset (' + m.ntiles + ' used)'}${st ? ` · loaded by script procs ${st.procs.join(', ')} with HP data ${st.hp}` : ''}</div>
       <div class="controls">
         ${m.count > 1 ? 'Layer <select id="lay"><option value="-1">all, layer 0 in front</option>' + m.ents.map((e, i) => `<option value="${i}">${i}: ${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
