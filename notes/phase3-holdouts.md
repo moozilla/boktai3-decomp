@@ -149,3 +149,10 @@ from SpriteEffectController_StepDrawable and ordinary `frame.profile[frame.kind 
 sb, offset in sl and the segment pointer in r8 (seven saved registers); the draft uses r8/sb/r7.
 Next: find what holds r7 in the ROM (another long-lived value the draft lacks, maybe a kept
 `&body->speed` or a `four` constant), then split the 1s.
+
+### TentacleBody_ResetDirectionalAnimations (080A915C) and TentacleBody_RestartSegmentAnimations (080A93F4): deferred with Refresh
+
+Same family as TentacleBody_RefreshDirectionalAnimations: the same Step helper and the same
+`frame` stack struct and segment loop. With Refresh's draft Step and ordinary body C, Reset scores
+54/52 (`TentacleBody_ResetDirectionalAnimations.c`); Restart is not tried yet. Solve Refresh first,
+then move the shared Step into `include/tentacle_segment_animation.h` and port it to all three.
