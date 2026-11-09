@@ -101,3 +101,18 @@ insertion before rangeB, raising or lowering the constants' priorities (AGBCC_PR
 Next: a first set without a note that ends up in sl alone. That could be the relative
 SceneActorReaction_BeginDefeatBurst's union reuse, if the ROM allows one more sl use, or
 another rangeB write form that keeps the masks out of cse.
+
+### Lun_HandlePlayerContact (src/fn/sub_0809AE0C.c, 0809AE0C): deferred
+
+The landed version uses two do/while(0) statement macros (LUN_FINISH_SPEED_CONTACT is used once).
+The ROM keeps two dead reads of `context->flags3D4 & phase` (`ldr; ldr; ands r0, r7` with the
+result unused) before each Lun_ApplyContactFlag, and Apply's mask is a fresh `movs r2, #2`.
+Drafts: `Lun_HandlePlayerContact.c` (no macros, `if (Lun_ReadContextFlags(actor, phase))
+DEBUG_PRINT();`, 29/25 differ) and `.macro.c` (only the two-use read macro, 4/4: the palette
+pointer copy `adds r3, r0, #0`). Without the macros, cse2 replaces Apply's mask (2) with phase,
+which is still known to be the constant 2 (`why 562`). phase's reassignments by the reads are gone
+before cse2, and phase's set sinks to its first use. In the macro version the do/while keeps the
+reassignment alive until flow. Tried: `phase = Read(...)` plain or inside the `if`, a separate
+`contact` variable, u32 phase, a u32 mask parameter for Read, Apply with `|= 2`, and u8/u16/s8 masks
+(those go to the stack). Next: a form where phase really changes (the read's result reused) or
+some other reason the ROM's mask is a separate constant.
