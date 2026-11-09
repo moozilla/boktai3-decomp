@@ -1529,6 +1529,29 @@ Each was read from the compiler source and confirmed on a live draft.
    halfword store its own HImode zero, and the byte store keeps the SI one. This matched
    Actor_UpdateProjectedEntryAnimation and its Silent twin without pins. Declaring the array
    second doesn't help, and neither does a u8 array.
+68. **cse's `(set REG0 REG1)` rewrite, and how a Thumb two-operand subtract undoes it.** When an
+   insn copies REG1 into REG0 and REG0 is the head of its equivalence class, cse.c (about line
+   7617) rewrites the previous insn to set REG0 directly and deletes the copy. A label or another
+   insn between the two blocks it, and so does REG0 not being the class head. In
+   Background_Update the ROM keeps the copy: writing `x = sum - 120;` in each arm of the
+   `rateX == 128` test makes each arm end in a three-operand subtract that Thumb only has as
+   `subs rd, #imm8`, so reload copies first, and jump2 then cross-jumps the identical tails.
+   (`why` reported "no class-head takeover found" for this; it doesn't model the rewrite yet.)
+69. **A call in each if/else arm computes its argument straight into the argument register.**
+   `if (c) r = f(p, a); else r = f(p, g(b));` lets jump2 merge the call tails, and each arm
+   computes its last argument into r1 directly, where one call after the if goes through a
+   pseudo. TerrainOverlay_Initialize matched this way (with `String_Hash` returning u16).
+70. **`p++` at each `continue` adds refs to a hoisted stride constant.** loop.c's
+   combine_movables merges equal hoisted constants, so every increment site counts as a ref of
+   the one hoisted register. A REG_EQUIV constant's priority is halved (fact on global.c), and
+   the extra refs bring it back up to the ROM's rank. Scene_StopSelectedObject matched with
+   `p++` before each of its three `continue`s and once after the id test.
+71. **A `u32 f:16` bitfield store is an SImode read-modify-write only while the struct is
+   ADDRESSOF.** With a struct of `u32 x:16, z:16` in a local, `pt.x = t;` compiles to
+   `ldr; and; orr; str` as long as the struct's address is never stored in a pointer variable;
+   once `q = &pt` exists the store is a plain `strh`. Writing `pt.x = pt.x op ...` directly also
+   narrows to `strh`, while going through a temp (`t = pt.x op ...; pt.x = t;`) keeps the RMW.
+   A struct of u16 fields always gives `strh`. (Probed for Scene_SpawnDirectionalDust.)
 
 ## Survey: random table as a literal address (2026-10-24)
 
