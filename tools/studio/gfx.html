@@ -363,7 +363,7 @@ views.big = {
     frameStrip(imgs.length, k => imgs[k], wantFrame, 'bigframe', h);
     const grid = $('all'), poolColors = {};
     if (!grid) return;
-    await Promise.all(big.recs.map(async rr => { poolColors[rr.hash] = await packageColors(null, rr.pal); }));
+    await pmap(big.recs, async rr => { poolColors[rr.hash] = await packageColors(null, rr.pal); });
     big.recs.forEach((rr, k) => {
       const c = document.createElement('div'); c.className = 'cell' + (k === i ? ' on' : ''); c.title = (NOTES[rr.hash] || '') + ' ' + rr.hash;
       const f = big.frames(k)[0], img = f ? compose(big.parts(f), poolColors[rr.hash] || colors) : null;
@@ -753,15 +753,11 @@ views.dungeon = {
       <div class="controls">Zoom <select id="dz"><option>0.25</option><option selected>0.5</option><option>1</option></select> <label><input type="checkbox" id="dlab" checked> room labels</label> <span id="dstat" class="meta">rendering…</span></div>
       <div id="dbox" style="position:relative;overflow:auto;max-height:calc(100vh - 190px);border:1px solid var(--line);border-radius:8px;background:#111"></div>`;
     const hps = {}, canv = {};
-    let done = 0, next = 0;  // four at a time: a burst of requests drops sockets
-    const worker = async () => {
-      while (next < rooms.length) {
-        const r = rooms[next++];
-        hps[r.scene] = await loadHP(r.stage.hp).catch(() => null); canv[r.scene] = await renderStage(r.stage, r.palette);
-        $('dstat').textContent = `rendering ${++done}/${rooms.length}…`;
-      }
-    };
-    await Promise.all([worker(), worker(), worker(), worker()]);
+    let done = 0;
+    await pmap(rooms, async r => {
+      hps[r.scene] = await loadHP(r.stage.hp).catch(() => null); canv[r.scene] = await renderStage(r.stage, r.palette);
+      $('dstat').textContent = `rendering ${++done}/${rooms.length}…`;
+    }, 4);
     const pos = {}, misfit = [];
     const placeFrom = start => {
       pos[start] ||= [0, 0];
@@ -831,12 +827,12 @@ views.pool = {
     // data, and the variants the game selects: data/sprite_palettes.csv)
     const users = {};
     const add = (i, u) => (users[i] ||= []).push(u);
-    await Promise.all((index.tCB05 || []).map(async ([h]) => {
+    await pmap(index.tCB05 || [], async ([h]) => {
       const b = await res('tCB05', h), pkg = parsePackage(b), base = le(b, 0);
       let banks = 1;
       for (const f of pkg.frames) for (const p of pkg.parts(f)) banks = Math.max(banks, p.bank + 1);
       for (let k = 0; k < banks; k++) add(base + k, { kind: 'spr', hash: h, bank: k });
-    }));
+    });
     if (!big) { const e = index.t98F5[0][0]; big = parseBig(await res('t98F5', e)); }
     big.recs.forEach(r => {
       const vs = (learned.bigpools || {})[r.hash] || [r.pal];
