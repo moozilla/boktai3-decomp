@@ -756,7 +756,8 @@ views.dungeon = {
     if (!a) { v.textContent = 'No such area.'; return; }
     const byScene = Object.fromEntries(stageMeta.map(s => [s.scene, s]));
     const rooms = a.scenes.map(n => byScene[n]).filter(s => s && s.stage);
-    v.innerHTML = `<h2>Area ${a.area}${a.label ? ' · ' + esc(a.label) : ''}</h2><div class="meta">${rooms.length} rooms with a stage · placed by their doors (a door in one room lines up with the entrance it leads to in the next) · <a href="/world#area=${a.area}">World page</a></div>
+    const wa = WORLD?.areas[a.area], aname = wa?.place ? [wa.place, wa.detail].filter(Boolean).join(' · ') : a.label;  // as World names it
+    v.innerHTML = `<h2>Area ${a.area}${aname ? ' · ' + esc(aname) : ''}</h2><div class="meta">${rooms.length} rooms with a stage · placed by their doors (a door in one room lines up with the entrance it leads to in the next) · <a href="/world#area=${a.area}">World page</a></div>
       <div class="controls">Zoom <select id="dz"><option>0.25</option><option selected>0.5</option><option>1</option></select> <label><input type="checkbox" id="dlab" checked> room labels</label> <span id="dstat" class="meta">rendering…</span></div>
       <div id="dbox" style="position:relative;overflow:auto;max-height:calc(100vh - 190px);border:1px solid var(--line);border-radius:8px;background:#111"></div>`;
     const hps = {}, canv = {};
