@@ -25,7 +25,8 @@ and func (a code function). The tree groups them:
   and the maps that carry their own tiles (tools/assets/tilesets.py);
 * Sound: the MP2K songs by the music player the song table assigns them
   (player 10 is the BGM player), from tools/studio/sound.py;
-* Code: subsystems in ROM order, with their functions and decomp status.
+* Code: the report's categories and units in ROM order (tools/progress.py), with their
+  functions and how much is free of matching concessions; /code explores them.
 
 rom_tree() is the ROM as nested blocks for tools/studio/rom.html.
 
@@ -50,7 +51,8 @@ CACHE = os.path.join(ROOT, "build", "cache", "atlas.json")
 INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
           "data/sprite_palettes.csv", "data/labels/areas.csv", "data/labels/scenes.csv",
           "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "tools/assets/gclroles.py", "gcl/names/chara.csv",
-          "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
+          "gcl/names/files.csv", "symbols/functions.csv", "symbols/progress_subsystems.csv",
+          "symbols/progress_categories.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
           "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py",
           "tools/assets/cutscenes.py", "tools/mgba/scenes.py", "tools/assets/gclfiles.py",
           "tools/assets/areas.py", "tools/assets/stages.py", "tools/assets/story.py",
@@ -131,7 +133,7 @@ def clean(t):
 
 def english_names():
     import serve
-    jp, en = serve.display_strings(os.path.join(os.path.dirname(ROOT), "boktai3trans"))
+    jp, en = serve.display_strings(serve.default_trans())  # ../boktai3trans, also from a worktree
     return jp, {k: nice(v) for k, v in en.items()}
 
 
@@ -193,12 +195,12 @@ def build():
     order_a = sorted(a for a in prog if a in an)
 
     def unit_sub(u):
+        # report units are "Category/Unit" (tools/progress.py); the unit is the subsystem
         top, _, sub = (u or "").partition("/")
-        if top == "game":
-            return re.sub(r"/register-pinned$", "", sub)
-        if top == "libraries":
-            return "Library: " + re.sub(r"/register-pinned$", "", sub)
-        return None
+        if not sub:
+            return None
+        sub = re.sub(r"/register-pinned$", "", sub)
+        return "Library: " + sub if top.lower() == "libraries" else sub
     named = [unit_sub(prog[a][3]) for a in order_a]
     subsys = {}
     prev = [None] * len(order_a)
@@ -762,14 +764,25 @@ def build():
     # subsystems in ROM order (the source files' order)
     groups = collections.defaultdict(list)
     for name in funcinfo:
-        groups[subsys.get(name, "Unsorted")].append(name)
+        if not funcinfo[name]["unit"]:
+            continue  # a name the palette traces know but the report doesn't (not a function start)
+        groups[subsys.get(name) or unit_sub(funcinfo[name]["unit"]) or "Unsorted"].append(name)
+    # categories in the report's order (tools/progress.py), as PROGRESS.json lists them
+    cat_order = {}
+    for _, _, _, u in prog.values():
+        cat_order.setdefault(u.split("/", 1)[0] if "/" in u else "Other", len(cat_order))
     for sub, fs in groups.items():
         size = sum(funcinfo[f]["size"] for f in fs)
+        # "matched" is decomp.dev's measure: matching with no concession left (every function matches)
         done = sum(funcinfo[f]["size"] for f in fs if funcinfo[f]["matched"])
         objs = sorted(e["id"] for e in E.values() if e["kind"] == "actor" and e["subsystem"] == sub)
-        node_rank[f"Code/{sub}"] = subsys_start.get(sub, 0)
-        add(f"unit:{sub}", "Code", kind="unit", key=sub, title=sub.replace(" (tentative)", ""), order=subsys_start.get(sub, 0),
-            tentative="(tentative)" in sub, funcs=sorted(fs, key=lambda f: funcinfo[f]["addr"]), size=size, matched=done, objects=objs)
+        units = collections.Counter(funcinfo[f]["unit"] for f in fs)
+        unit = units.most_common(1)[0][0] if units else ""
+        cat = unit.split("/", 1)[0] if "/" in unit else "Other"
+        node_rank[f"Code/{cat}"] = cat_order.get(cat, 99)
+        add(f"unit:{sub}", f"Code/{cat}", kind="unit", key=sub, title=sub.replace(" (tentative)", ""), order=subsys_start.get(sub, 0),
+            tentative="(tentative)" in sub, funcs=sorted(fs, key=lambda f: funcinfo[f]["addr"]), size=size, matched=done,
+            objects=objs, category=cat, unit=unit)
 
     # a species drawn in a palette labeled with its name (data/labels/palettes.csv)
     for e in E.values():

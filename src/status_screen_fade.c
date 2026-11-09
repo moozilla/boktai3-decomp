@@ -17,10 +17,6 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
     for (; bank < 2; bank++) {
         for (i = 0; i < 16; i++) {
             {
-                int index = i;
-                i = index;
-            }
-            {
                 u16 *out = &buffer[bank * 16 + i];
                 int color = *out;
                 int r = ((color & 31) * factor) & 0x7C0;
@@ -49,24 +45,14 @@ void StatusScreen_WaitForStart(struct StatusScreen *p)
     u32 mask = 256;
     gDispCntShadow &= ~mask;
     if (!StatusScreen_CheckConfirm(p)) {
-        u32 old = p->delay;
-        p->delay = old + 65535;
-        asm("" : "+r"(old));
-        if ((u16)old == 0) {
-            {
-                register int flags asm("r1") = gDispCntShadow;
-                {
-                    int result = mask;
-                    gDispCntShadow = result | flags;
-                }
-            }
+        u16 old = p->delay--;
+        if (old == 0) {
+            gDispCntShadow = mask | gDispCntShadow;
             {
                 struct StatusScreen *target = gStatusScreen;
-                {
-                    register void (*state)(struct StatusScreen *) = StatusScreen_Reveal;
-                    target->state = state;
-                    target->timer = 0;
-                }
+                StatusScreenFn state = StatusScreen_Reveal;
+                target->state = state;
+                target->timer = 0;
             }
         }
     }

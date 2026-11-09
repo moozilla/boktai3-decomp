@@ -1,7 +1,10 @@
 # Phase 3 holdouts
 
-One section per worker. Each entry: the best pin-free draft, what blocks it, the knob that
-matches (when one does) and the next idea.
+Tags: #matching #phase3 #holdouts
+
+One section per worker. Each row: the function, its best pin-free draft (a snippet to
+`scope.py FILE.c put`), the differing instructions, the mechanism and the knob that matches,
+what was tried, and the next idea.
 
 ## field-effects
 
@@ -32,11 +35,57 @@ line 773 remain. The draft still has statement expressions and plain `register` 
 pinned form; strip them once the shape is right. The ROM's dead `subs r0, r7, #1` tail comes from
 `type == 1 || type == 2` with both arms returning 0 (fact 57-style cross-jump).
 
-Tags: #matching #phase3 #holdouts
+### Trigger_RunScript (src/item_container.c, 08006F00): deferred
 
-One section per worker. Each row: the function, its best pin-free draft (a snippet to
-`scope.py FILE.c put`), the differing instructions, the mechanism and the knob that matches,
-what was tried, and the next idea.
+Draft: `notes/phase3-drafts/field-effects/Trigger_RunScript.c` (11 ROM / 9 draft, two mechanisms).
+1. The ROM keeps two copies of the actor index: `ldrsb r1` (compared with -1), `adds r2, r1` (the
+   table index) and `adds r5, r2` (saved for values[8]). cse merges the draft's `index = actor` into
+   actor (make_regs_eqv: index does not live past the extended block, which runs to cuid 73 with
+   jump following), so the draft has one register. A copy survives only if the new register
+   becomes the class head (its last use past the block end, or its first mention before the block
+   start), which none of the spellings tried gives: s8/u8/s16 actor, an inline `PlayerMask`, a
+   nested `if (actor != -1)` form, separate `index` and `savedActor` blocks. `CSE_KEEP`/
+   `CSE_NOCANON` on the pseudos change nothing (the head test fails before them).
+2. `&args` must be a pointer variable set before `source = p->arguments` and allocated before
+   `out`, so it takes r2. With 3 refs over 22 insns its priority (1363) is below out's (3000):
+   `AGBCC_PRI=argsPtr:+2000` fixes it. Routing the count's word RMW through the pointer gives it 5
+   refs and fixes the allocation, but the ROM does that RMW through sp (`ldr r0, [sp, #0x28]`).
+Next idea: find refs for argsPtr that cse later folds back to sp, or the label/loop structure
+that ends cse's block between the actor copy and its uses.
+
+### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): deferred
+
+Draft: `notes/phase3-drafts/field-effects/DirectionalController_CheckRemaining.c` (41 ROM / 43
+draft). In the ROM, Math_Atan2's result stays in hard r0 from the call to the `bne` that jumps
+straight to the epilogue, and every local temp in between (the u16 copy, the field loads, the
+facing tests) uses r1-r5. local-alloc avoids r0 only when hard r0 is live across those blocks,
+which the C gets only from the pin (`register s32 angle asm("r0")`): a pseudo for angle crosses
+several blocks, so it is global, and local-alloc has already put temps in r0 by the time global
+runs. `AGBCC_FORCE=angle:0` does not help (the temps clobber it). The ROM's `adds r1, r0` then
+in-place `lsls r1, r1, #16` also says the narrowing reads a copy that combine left alone, which
+is what a copy straight from the hard return register gives. Spellings tried: plain
+`(u16)angle`, a `u16 heading` local, an assignment inside the expression. Next idea: a form in
+which the RTL keeps the call's hard r0 as the returned value (no pseudo between the call and the
+return), for example the call's result returned through an inline whose result the caller
+returns, or a matched relative with the same "return the angle when facing" shape.
+
+### EffectManager_UpdateAll (src/homing_effect.c, 0800A8E4): deferred, one insn from a match
+
+Draft: `notes/phase3-drafts/field-effects/EffectManager_UpdateAll.c` (1 ROM / 1 draft: one
+instruction in another place). Diagnosis: the 0x148 stride for `view` and `p` is not a register
+in the ROM. `AGBCC_NOREG=<the stride pseudo>` on the depin draft (two explicit `view++; p++;`)
+gives an exact match: reload loads 0x148 for the first add, the second add inherits it, and the
+reload rotation then gives the ROM's r2 for -1 and r0 for i. In plain C, cse1 merges the two
+`(set (reg) (const_int 328))` that the addsi3 expander makes. The constant stays two
+single-use pseudos (which combine folds back into each add, so reload loads it) only when one
+increment is loop.c's: `view = p;` at the top of the body makes view a giv of p, and its reduced
+increment lands before `p++` as in the ROM. What is left is the giv's initialization: loop.c
+emits it just before NOTE_INSN_LOOP_BEG, after `i = 5`, and the ROM has `mov r7, r8` before
+`movs r2, #5`. A reversed up-counter (`for (i = 0; i < 6; i++)`) does not help: check_dbra_loop
+reverses it in pass 1 before the giv is reduced, so its `i = 5` comes first again. Making view a
+giv of i (`view = &manager->effects[i]`) delays the reversal to pass 2 and fixes the init order,
+but then the giv's increment lands before i's increment, after `p++`. Next idea: a counter that
+check_dbra_loop can only reverse in pass 2 while view stays a giv of p.
 
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
@@ -59,6 +108,234 @@ Draft: `notes/phase3-menus-link/StatusScreen_DrawClock.c` (4 ROM / 4 draft insns
   the shift in the for init, operand orders of the add.
 * Next: a form where shift lives two insns less (or the pointer two more) without moving the
   `out = dst` copy; or what made the original's `values` denser.
+
+### StatusScreen_FadeAndExit (0800EC0C, src/status_screen_fade.c)
+
+Draft: `notes/phase3-menus-link/StatusScreen_FadeAndExit.c` (3 ROM / 1 draft insns). The
+`int index = i; i = index;` block in main's version is not needed; only DEBUG_NOP is.
+* What blocks it: `int blue = color & blueMask;` (blueMask hoisted to sl). color dies at that AND,
+  so regmove's fixup_match_1 ties the output to color (`ands r1, r0`). The ROM keeps the output
+  apart (`mov r0, sl; ands r0, r1; adds r1, r0, #0; muls r1, r5, r1`). fixup_match_1's forward
+  scan stops at a CODE_LABEL, a JUMP_INSN or a NOTE_INSN_LOOP_BEG/END. DEBUG_NOP's empty loop sits
+  between the AND and the multiply, and that is what matches now. `AGBCC_NOTIE=89` on the draft
+  matches.
+* The same fence, right after the last channel mask, is in StatusScreen_FadeInPalette (an inline
+  do/while(0) around r, g and `b = color & 31744`) and Palette_BlendRange
+  (`do { fromG = greenMask & from; } while (0);`). The original probably had one construct
+  we don't know yet. Solving it would likely free all three.
+* Close but not right:
+  - `int b = 31744; b &= color;` (FadeOutPalette's spelling) gives the ROM's AND and multiply,
+    but b is set twice, so loop.c doesn't hoist 31744 into sl (17/13).
+  - `int mask = 31744, b = mask; b &= color;` hoists it, but cse propagates the copy, which
+    gives the tie again (3/1).
+  - `color = b * factor;` reuses color: no tie, but color then has two deaths and becomes
+    global, so r1 goes to the r product (20/20 registers).
+  - A clamp `if (blue < 0) blue = 0;`: combine folds it and leaves a label, so there is no tie,
+    but the multiply then ties (15/15).
+* Also tried: narrow types (u16/s16/u32 blue, mask or color), casts on the AND input, operand
+  order, the blue statement first, `continue`/`while`/DEBUG_PRINT clamps.
+* Next: a C form where cse keeps a per-iteration copy of the hoisted mask (make_regs_eqv makes
+  the new register the class head when it lives past cse_basic_block_end), or the construct
+  the three siblings share.
+
+### sub_0800F4EC (0800F4EC, src/numeric_overlay.c): StatusScreen_DrawClock's twin
+
+Draft: `notes/phase3-menus-link/sub_0800F4EC.c` (4 ROM / 4 draft insns, only `mov ip, sp` /
+`mov rN, ip` as sb). Same blocker as DrawClock: the pinned `values` (ip) must be allocated before
+the earlier blocks' sb pseudos, which takes priority of about 1250. Notes:
+* One `int *values = digits;` per block (each set once, so it is doubled only once) gives 652
+  and 600 (3 refs over 46 and 50). `AGBCC_PRI=values:+600,values#1:+600` matches.
+* Pointer form with `digit = digits` per row: loop.c doesn't hoist the frame address, which
+  gives `mov r6, sp` (4/2).
+* Indexed `digits[col]`: the giv base is hoisted into ip as in the ROM, but its init comes after
+  the `out = dst` copy, and the r3/r6 roles swap (8/8).
+* Indexed `dst[col]` and `digits[col]` in one statement: a stack slot spills.
+* Extra mentions of values in the row loop (end test `digit < values + 2`, `values[col]`)
+  change the loop (60+ insns).
+* Next: a fourth ref, or about 6 fewer live insns, for the per-block `values`; or a set that
+  doesn't get a REG_EQUIV note (3/23 = 1304 without the doubling).
+
+### Presentation_SetItemGraphic (08019ECC, src/selection_menu.c)
+
+Draft: `notes/phase3-menus-link/Presentation_SetItemGraphic.c` (6 ROM / 6 draft insns).
+* The ROM keeps the 0x121 apart from the byte it is added to: `ldr r0, =0x121; adds r2, r0, #0;
+  ldrb r3, [r3]; adds r2, r2, r3`. That needs a constant set, a copy and a register add that
+  survive to reload. Every pin-free form tried lets combine fold the constant into
+  `(plus tile 289)`, so the ldrb comes first and reload adds the literal (`ldrb r2; ldr r0;
+  adds r2, r2, r0`). The pinned version gets there with `asm("" : "+r")` on base and on
+  resource.
+* Tried: the constant in the call or in its own statement, `base` then `resource = base`,
+  u16/s16/u32 types, a `u8 *entry` with offset, and an inline helper modeled on its sibling
+  Presentation_SetActorIconFrame (`*r + 0xf0`).
+* Next: what stops combine from folding a constant into an add while keeping the set and the
+  copy. A `scope` knob that forbids one combine (like AGBCC_NOTIE) would show whether that alone
+  is enough.
+
+### SelectionMenu_NavigateGrid (0801ACB8, src/selection_menu.c)
+
+Draft: `notes/phase3-menus-link/SelectionMenu_NavigateGrid.c`: main's C without the
+`asm("" ::: "memory")`, 2 ROM / 0 draft insns. The ROM reloads `*held` for the horizontal
+tests (`mov r0, ip; ldrh r1, [r0]`). gcse's PRE finds that load fully redundant with the
+vertical tests' load and deletes it, and cse2 then merges the copy. `AGBCC_NOPRE=1` on the draft
+matches, so this is the only decision left.
+* gcse's expr_equiv_p compares only code, mode and operands (MEM is "e0"), so alias sets and
+  the /s flag don't separate the two loads. To survive, they need a different address register
+  or a different mode.
+* Different mode: `u32 h = *held;` for the horizontal tests keeps the load, but h dies in the
+  last and, which ties (`ands r1, r0`, 2/2). A u32 for the vertical tests unties them but
+  breaks their const-copy ands (5/5).
+* Different address: a fresh `u16 *pad = gPadState;` or direct `gPadState[0]` keeps the load in
+  ip, but the vertical read then uses the top's symbol register r1 instead of the ip copy (2/2).
+* Also tried: 128 combinations of held vs gPadState for each of the nine pad reads, re-setting
+  `held` between the tests, and inline vertical/horizontal helpers.
+
+### Inline `do { ... } while (0)` fences (for phase 4)
+
+tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
+inline `do { ... } while (0)` with a body. Its loop notes still stop regmove's fixup_match_1 scan
+(it breaks at NOTE_INSN_LOOP_BEG/END, regmove.c), so it works as a fence the way DEBUG_NOP does.
+The coordinator said to leave the scoring alone for now. These are the ones in src/ on
+2026-11-09, 161 blocks in 122 files (`function:line`):
+
+* `src/actor_animation_controller.c`: Actor_ConfigureInteractionChildFromScript:4331
+* `src/background_controller.c`: Background_FindMapId:385
+* `src/fn/sub_080192FC.c`: ClockEvents_Update:37
+* `src/fn/sub_0801F4C4.c`: SceneObject_UpdateLowering:51
+* `src/fn/sub_0801F5B8.c`: SceneObject_UpdateLowered:9, SceneObject_UpdateLowered:13
+* `src/fn/sub_08020A60.c`: SceneMessages_RunScript:24
+* `src/fn/sub_0802141C.c`: SceneActors_FindAvailable:21, SceneActors_FindAvailable:22
+* `src/fn/sub_0802FCA8.c`: Actor_SelectPathNodeAction:93
+* `src/fn/sub_08035958.c`: Wireless_OnParentUniSendComplete:48
+* `src/fn/sub_08035F5C.c`: Wireless_TryStartParentNiSend:56
+* `src/fn/sub_080362E0.c`: Wireless_ExchangeChildNiPacket:90
+* `src/fn/sub_08038838.c`: WirelessGameMenu_UpdateSelectionExchange:42
+* `src/fn/sub_08038AD4.c`: WirelessGameMenu_UpdateActiveRound:103
+* `src/fn/sub_0803D8A8.c`: ScenePool_ResumeAfterIdle:9
+* `src/fn/sub_080427FC.c`: ContactActor_ApplyHealthContact:33
+* `src/fn/sub_080478A4.c`: BackgroundFlash_UpdateAppearing:18
+* `src/fn/sub_080479B0.c`: BackgroundFlash_UpdateDisappearing:10, BackgroundFlash_UpdateDisappearing:17
+* `src/fn/sub_08047F68.c`: ContactBurst_OnContact:16
+* `src/fn/sub_080480A4.c`: ContactBurst_Update:70
+* `src/fn/sub_0805386C.c`: InteractionMarker_TickIdle:27
+* `src/fn/sub_08053DF8.c`: SavedPositionMarker_TickIdle:27
+* `src/fn/sub_08054DC4.c`: DisplayTrack_SetSequenceFromScript:16
+* `src/fn/sub_08055C04.c`: StageIconDisplay_TickReveal:4
+* `src/fn/sub_08055DD4.c`: StageIconDisplay_InitAnimations:26, StageIconDisplay_InitAnimations:31
+* `src/fn/sub_08056D24.c`: ScriptUtility_SetFlag800:8, ScriptUtility_SetFlag800:9, ScriptUtility_SetFlag800:10
+* `src/fn/sub_0805DDE8.c`: SceneHud_DrawCenteredMeter:18
+* `src/fn/sub_0805E270.c`: SceneInput_InitGlyphPair:26
+* `src/fn/sub_0805E394.c`: SceneInput_GetGridPosition:17
+* `src/fn/sub_0805E7D8.c`: SceneInput_GetNavigationKeys:14
+* `src/fn/sub_08060A70.c`: SceneInventory_BeginConsumableSwapPair:39
+* `src/fn/sub_0806B8DC.c`: SpriteEffectController_UpdatePool:17, SpriteEffectController_UpdatePool:18
+* `src/fn/sub_0806E130.c`: RouteSpritePool_Tick:33
+* `src/fn/sub_08070FA8.c`: RegistryCurrentGame:25
+* `src/fn/sub_08072E50.c`: SceneActorContacts_SetDistanceGate:27
+* `src/fn/sub_080764C8.c`: SceneActorAnimation_SelectDirectionFlagsVariant:29
+* `src/fn/sub_080838AC.c`: SceneActorControl_TickGroundBob:82
+* `src/fn/sub_08086A2C.c`: Ghoul_UpdateDyingState:57
+* `src/fn/sub_08089800.c`: Ghoul_UpdateScriptedAction:32, Ghoul_UpdateScriptedAction:34
+* `src/fn/sub_0808CE50.c`: Ghoul_UpdateSpecialActionControl:61, Ghoul_UpdateSpecialActionControl:63
+* `src/fn/sub_0808CF54.c`: Ghoul_UpdateAnimationElevenControl:61, Ghoul_UpdateAnimationElevenControl:63
+* `src/fn/sub_0808D058.c`: Ghoul_UpdateAttackControl:61, Ghoul_UpdateAttackControl:63
+* `src/fn/sub_080A8144.c`: SceneActorPlacement_UpdateFlaggedResponse:27, SceneActorPlacement_UpdateFlaggedResponse:29
+* `src/fn/sub_080AA8C4.c`: TentacleActor_AlignSegmentsToTerrain:81
+* `src/fn/sub_080B713C.c`: SceneActorTerrain_FindOpenNeighborDirection:11
+* `src/fn/sub_080BB4DC.c`: Skeleton_UpdateDownedState:57
+* `src/fn/sub_080C61AC.c`: Golem_UpdateDying:57
+* `src/fn/sub_080D48F4.c`: Mummy_UpdateScriptedAction:60, Mummy_UpdateScriptedAction:62
+* `src/fn/sub_080DA5C8.c`: Mummy_ResetResponseState:30
+* `src/fn/sub_080E0390.c`: Dog_UpdateDefeatDelay:57
+* `src/fn/sub_080E3790.c`: Dog_UpdateScriptedAction:60, Dog_UpdateScriptedAction:62
+* `src/fn/sub_080F34C8.c`: ChildGroup_WaitForInactiveMembers:45
+* `src/fn/sub_080F3B60.c`: ChildGroup_UpdateTrailingMembers:95
+* `src/fn/sub_080F4FA8.c`: Sword_UpdateHorizontalWaveReturn:20
+* `src/fn/sub_080F508C.c`: Sword_UpdateDepthWaveReturn:20
+* `src/fn/sub_080F5B68.c`: TargetMotion_AdvanceFollowSegment:41
+* `src/fn/sub_080F645C.c`: Sword_UpdateDamage:56, Sword_UpdateDamage:74
+* `src/fn/sub_080FC894.c`: Axe_CopyAuxiliaryVector:15
+* `src/fn/sub_081004F8.c`: FloorSwitch_Release:43
+* `src/fn/sub_081029F8.c`: NamedObject_UpdatePlayerAttachment:73
+* `src/fn/sub_08103110.c`: NamedObject_CreateFromScript:209
+* `src/fn/sub_08109040.c`: SelectionSlots_ClearValue:23
+* `src/fn/sub_0810B3BC.c`: SceneMenu_UpdateRecords:45
+* `src/fn/sub_0810D60C.c`: PanelText_DrawDecimal:17
+* `src/fn/sub_0811A030.c`: MotionActor_DispatchRequestedState:72
+* `src/fn/sub_0811B094.c`: Collider_ScheduleUpdates:49
+* `src/fn/sub_0811BD30.c`: Actor_UpdateShadowSpriteParts:84, Actor_UpdateShadowSpriteParts:88
+* `src/fn/sub_0811D270.c`: PanelText_DrawDigits:17
+* `src/fn/sub_0811E728.c`: StatModifier_ScaleForGlobalMode:12, StatModifier_ScaleForGlobalMode:18
+* `src/fn/sub_0811E77C.c`: StatModifier_AddForGlobalMode:11, StatModifier_AddForGlobalMode:17
+* `src/fn/sub_0811E7C8.c`: StatModifier_AddForOwnerMode:11, StatModifier_AddForOwnerMode:17
+* `src/fn/sub_08121110.c`: ActorAction_RunActiveCallbacks:31
+* `src/fn/sub_081296D0.c`: FeatherEffectPool_UpdateTask:36
+* `src/fn/sub_0812F3CC.c`: SceneActorReaction_BeginContactResponse:86
+* `src/fn/sub_08136F58.c`: sub_08136F58:95
+* `src/fn/sub_0813BAD8.c`: sub_0813BAD8:132
+* `src/fn/sub_0813C5B4.c`: ConvergingEffects_EmitFarParticle:57
+* `src/fn/sub_0813FE30.c`: sub_0813FE30:50
+* `src/fn/sub_08140F40.c`: Player_GetForceDirection:93, Player_GetForceDirection:94
+* `src/fn/sub_081559A4.c`: Player_UpdateTimedChargeAction:95
+* `src/fn/sub_08165488.c`: SceneHud_DrawDecimalDigits:16
+* `src/fn/sub_0816F6B4.c`: PauseMenu_BeginTypeThirteenItemUse:33
+* `src/fn/sub_0816F8AC.c`: PauseMenu_BeginTypeFourteenItemUse:33
+* `src/fn/sub_08173C0C.c`: SceneHud_TickEquipmentToggle:37
+* `src/fn/sub_08175008.c`: Presentation_UpdateAllocationSelection:150
+* `src/fn/sub_0817A57C.c`: SceneActors_SpawnConvergingParticle:57
+* `src/fn/sub_0817B5E4.c`: update_facing:13
+* `src/fn/sub_081A55D4.c`: Vanargand_BlendPaletteBanks:16
+* `src/fn/sub_081A8820.c`: ActorSoundPhase_UpdateConditionalStop:39
+* `src/fn/sub_081B9BC0.c`: Registry2388_BlendPaletteBanks:18
+* `src/fn/sub_081BD854.c`: DarkLoan_CreateHiddenDisplay:19
+* `src/fn/sub_081C0478.c`: ScenePaletteFade_BlendPaletteBanks:16
+* `src/fn/sub_081C6094.c`: sub_081C6094:24
+* `src/fn/sub_081D010C.c`: sub_081D010C:76
+* `src/fn/sub_081D07D8.c`: SceneNpc_EnterProjectedIdle:59
+* `src/fn/sub_081D58B4.c`: MonsterBook_UpdateHighlightPulse:7
+* `src/fn/sub_081D71CC.c`: ScreenTransition_FadeBlendOut:26
+* `src/fn/sub_081EB8E0.c`: sub_081EB8E0:180
+* `src/fn/sub_08210C5C.c`: Collection_UpdateHighlightPulse:7
+* `src/fn/sub_0821211C.c`: ForgingBook_UpdateHighlightPulse:7
+* `src/fn/sub_08213294.c`: ForgingBook_UpdateCursorPulse:7
+* `src/fn/sub_08214B44.c`: Sprite_RenderScaledList:54
+* `src/fn/sub_08214D20.c`: sub_08214D20:43, sub_08214D20:44
+* `src/fn/sub_08217430.c`: sub_08217430:86
+* `src/fn/sub_08219C40.c`: Heap_Alloc:16
+* `src/fn/sub_0821A184.c`: ResourceRegistry_AllocateEntry:8, ResourceRegistry_AllocateEntry:10
+* `src/fn/sub_082210B8.c`: Random_InitValueTable:10
+* `src/fn/sub_08221D40.c`: ScalarApproach_ApplyProfileArray:13
+* `src/fn/sub_082237A0.c`: RfuManager_StartChildConnect:46
+* `src/fn/sub_08228DB8.c`: SunClock_GetPhase:52, SunClock_GetPhase:62, SunClock_GetPhase:99, SunClock_GetPhase:109
+* `src/fn/sub_082392E8.c`: sub_082392E8:70, sub_082392E8:73
+* `src/fn/sub_08239480.c`: Player_EmitConvergingParticle:57
+* `src/fn/sub_0823A028.c`: ActorEffect_SelectFlashingValue:15
+* `src/fn/sub_0824AC74.c`: Libgcc_MultiplyInt64:61
+* `src/golem_2.c`: Golem_UpdateScriptedAction:393, Golem_UpdateScriptedAction:395
+* `src/group_objects.c`: BoardPiece_Wander:493, BoardPiece_Wander:494, BoardPiece_Wander:495, BoardPiece_Wander:496
+* `src/modifier_selection_and_stat_previews.c`: ModifierMenu_DrawSecondSourceStats:697, ModifierMenu_DrawSecondSourceStats:716, ModifierMenu_DrawBackground:863
+* `src/palette_controller.c`: Palette_BlendRange:69, Palette_InitializeFromScript:461, Palette_SetBrightnessFromScript:709
+* `src/password.c`: Text_CopyWithoutTags:9, Password_DecodeEntry:174
+* `src/status_screen.c`: NumericDisplay_DrawPair:22, NumericDisplay_DrawStatusValues:68
+* `src/status_screen_fade.c`: StatusScreen_FadeInPalette:98
+* `src/tether_actor.c`: TetherActor_BeginAuxiliaryState:1122, slopePush_AdjustSlopeMovement:1183, TetherActor_UpdateWanderingState:3125
+* `src/wireless_game_items_and_display.c`: WirelessGameItems_UpdateTemporaryItem:887, WirelessGameItems_StartOutgoingItems:1292
+
+## actors
+
+### SceneObjects_ScriptLower (src/fn/sub_0801E998.c, 0801E998): deferred
+
+Draft: `notes/phase3-drafts/actors/SceneObjects_ScriptLower.c` (3 ROM / 3 draft insns differ,
+allocation only; a whole-file unit copy). Shape: a do-while inside `if (found < count)`, with
+`slots`, `int zero = 0` and `int one = 1` set inside the if, and the callback pointer
+`fn = SceneObject_UpdateLowered` at the top. The ROM keeps the constant 1 (variant store) in sb;
+the draft gives sb the timer's HImode insertion-mask zero (facts 61/63; priority 306), which the
+`b3a = 0` byte store then reuses through the wider-mode lookup. `one` scores 300 because the
+hoisted `=0` set lengthens its life by one insn; the pinned original won on a tie (283 vs 283).
+Tried without effect or worse: u8/u16 `one`/`zero`, a `u16 *` for the timer store, plain `0` for
+timer and lift, swapped stores, `lift = timer`, chained `timer = lift = zero`, and more refs to
+`one` (`found = one`, `b3b + one`) or `zero` (`b3a = zero`). Next idea: keep the timer's HI zero
+out of the loop preheader (a different spelling of the timer member, or the slot struct the
+siblings ScriptRaise/Append use, written as one HI store), or find the source of the tie.
 
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 

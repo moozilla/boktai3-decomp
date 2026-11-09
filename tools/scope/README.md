@@ -1552,7 +1552,6 @@ Each was read from the compiler source and confirmed on a live draft.
    once `q = &pt` exists the store is a plain `strh`. Writing `pt.x = pt.x op ...` directly also
    narrows to `strh`, while going through a temp (`t = pt.x op ...; pt.x = t;`) keeps the RMW.
    A struct of u16 fields always gives `strh`. (Probed for Scene_SpawnDirectionalDust.)
-
 72. **Read a pad word fresh at each test to keep regmove from tying it.** `u16 held = gPadState[0];`
    then `held & K` in several tests makes held die in the AND, and regmove's fixup_match_1 ties the
    AND's output to it, so one register holds both. Writing `gPadState[0] & K` at each test gives
@@ -1577,6 +1576,54 @@ Each was read from the compiler source and confirmed on a live draft.
    against 833 for the gBgRecords constants). One set doubles it once. `life_note` names this case.
    When a parser returns its text pointer from every path (`text = ...; return text;`), text and the
    scan cursor stay in separate registers (ChoiceMenu_ParseTag).
+76. **A copy loop whose stores may alias the load keeps that load after the loop (no PRE
+   hoist).** agbcc has strict aliasing on (c_get_alias_set). Fact 50's gcse PRE moves a load that
+   follows a loop above it only when no store in the loop can alias it. A store through a union
+   member (alias set 0), a char or a struct element of the load's type may alias it, so the load
+   stays after the loop. SceneObjects_Append matched once its argument words were stored into
+   `union SceneObjArgs { s32 words[4]; u8 bytes[16]; }` instead of a plain `s32[4]` member.
+77. **A value pinned to r1-r3 across a call is often a missing argument.** Actor_InitDrawable
+   pinned `p + 0x100` to r1 before `SceneBody_SetKeyframeDisplay(p->motion)`. The callee
+   (`str r1, [r0, #0x30]`) takes two arguments. Passing the pointer as the second one keeps it in
+   r1 with no pin, since local-alloc prefers the argument register for a value copied into it.
+   `calls` and `pins` now name every callee that reads more argument registers at its entry than
+   the draft declares it with. A ROM-only scan of all pinned units found no other case.
+78. **Write a join's first statement in each branch to make its variable a global pseudo.**
+   local-alloc takes a pseudo used in one basic block and gives it the lowest free register
+   before global-alloc runs, so a long-lived global value that spans that block then conflicts with
+   r0/r1 and moves up. In sub_0802F298 (UpdateTargetFacing) `octant = value + 112;` after the
+   turn if/else was local (r0), pushing value to r2. Writing the store, zero-extend and
+   `octant = value + 112;` at the end of every branch (jump2 cross-jumps the copies back into one
+   tail) makes octant global: value takes r1 first, octant r2, as in the ROM. The extra
+   `*current = value;` mentions also raised current's refs (7 -> 8, priority 7368 -> 12631) above
+   diff. When `why` says a global pseudo conflicts with r0/r1 that only block-local pseudos hold,
+   try this.
+79. **Plan the returns to place each cross-jump: jump2 tries other jumps last first, and a label
+   lowers the minimum.** For a jump, find_cross_jump first tries the code that falls into its
+   label (one shared insn is enough), then every other jump to that label, starting with the last
+   one in insn order (jump_chain is built by prepending). Two shared insns are needed; `use` insns
+   don't count. A label in the jumping tail ends the compare and lowers the minimum by one, so a
+   call that falls into a `return 1` label (the else arm of an if/else followed by one return)
+   keeps its call (flow's nop) and gives only its `r0 = 1` to a later return. In
+   ScenePool_SelectDirectionOrRepeat the four states are written in full: both forward copies and
+   the direction-2 state end in `return 1`, so both forward tails merge into the last one (the
+   direction-2 copy) at its stateEntered store, while the random branch's if/else + return keeps
+   state 4's call. ScenePool_SelectRepeatOrExit used the same return-after-inner-if/else. Both
+   replaced a barrier and an r0 pin.
+
+90. **In a two-value block, local-alloc goes by priority; a pointer variable set in each arm leaves
+   the value alone in the block.** An arm `UpdateFn callback = F; p->update = callback;` at offset
+   0x1A4 holds two local qtys: the callback (load, add, store: life 4, priority 5000) and the
+   address `p + 420` (life 2, 10000). The address takes r0 and the callback r1; the ROM has the
+   callback in r0. With three qtys fact 38's quirk would give the first-born callback r0, but here
+   there are only two. Declaring `UpdateFn *slot;` at function scope and writing
+   `slot = &p->update; *slot = callback;` in each arm makes the address a two-set, non-local pseudo
+   (fact 42): local-alloc places only the callback (r0), global then gives the slot r1, and
+   reload's 420 lands in r2. That matched SceneObjects_CreateObject. Two more levers in the same
+   function: `draw->mode = drawMode;` (not `s16 *mode = &draw->mode`, which cse folds to `p + 0xA0`)
+   gives draw its fourth ref, and a function-scope `u16 *table = gRandomTable;` is a REG_EQUIV
+   pseudo left without a register, so reload loads the table at its use and the reload rotation
+   moves one step.
 
 ## Survey: random table as a literal address (2026-10-24)
 

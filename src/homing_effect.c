@@ -1,8 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "homing_effect.h"
 #include "display_sequence.h"
 /* EffectManager_ClearGlobal: sets the global EffectManager pointer to 0; matches an existing vetted proposal and the body's single store */
 #define EffectManager_ClearGlobal sub_0800A800
-// MATCHING_CONCESSION: register-pinning
 
 #define EffectManager_ClearGlobal sub_0800A800
 void EffectManager_ClearGlobal(void)
@@ -214,22 +214,15 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
     for (i = 0; i < 6; i++) {
         struct Effect *effect = &manager->effects[i];
         effect->active = 0;
-        {
-            register s32 next asm("r7") = i + 1;
-        }
-        sprite = &effect->particles[0].sprite;
-        for (j = 3; j >= 0;
-             sprite = (struct EffectSprite *)((u8 *)sprite + sizeof(struct EffectParticle)), j--) {
+        for (j = 0; j < 4; j++) {
+            sprite = &effect->particles[j].sprite;
             Effect_Initialize(sprite, manager->graphics, 1);
             Effect_SetPalette(sprite, 1);
         }
     }
     manager->counter = 0;
     {
-        struct Player *actor = ({
-            struct Player *a = gPlayers[0];
-            a;
-        });
+        struct Player *actor = gPlayers[0];
         manager->actor = actor;
         if (!actor)
             return -1;
@@ -922,25 +915,17 @@ static inline u32 pausedMode(void)
     return gUnk_02000560 & mask;
 }
 void EffectParticle_UpdateHomingWide(struct EffectManager *manager, struct Effect *effect,
-                                     s32 index, s32 phase, u32 phaseMask,
-                                     struct EffectContext *context)
+                                     s32 index, s32 phase, u32 phaseMask, struct EffectContext *ctx)
 {
-    register struct EffectContext *ctx asm("r10") = context;
     struct EffectParticle *p = &effect->particles[index];
     struct EffectSprite *sprite = &p->sprite, *o;
     struct EffectAnim *a;
     const u16 *entry;
     s32 dx, dy, dz;
     if ((index & 1) == phase) {
-        {
-            register struct EffectContext *c asm("r2") = ctx;
-            dx = c->world.x - sprite->position.x;
-        }
-        {
-            register struct EffectContext *c asm("r3") = ctx;
-            dy = c->world.y - sprite->position.y + 164;
-            dz = c->world.z - sprite->position.z;
-        }
+        dx = ctx->world.x - sprite->position.x;
+        dy = ctx->world.y - sprite->position.y + 164;
+        dz = ctx->world.z - sprite->position.z;
         p->angle = Math_Atan2(dx, dz);
         p->velocity.x = (gUnk_086149C4[(p->angle + 64) & 255] * p->speed) >> 12;
         p->velocity.z = (gUnk_086149C4[p->angle] * p->speed) >> 12;
@@ -963,29 +948,18 @@ void EffectParticle_UpdateHomingWide(struct EffectManager *manager, struct Effec
     }
     sprite->position.x = sprite->position.x + p->velocity.x;
     {
-        s32 height;
-        register struct EffectContext *c asm("r2") = ctx;
-        height = c->world.y - sprite->position.y;
+        s32 height = ctx->world.y - sprite->position.y;
         if (height > 16)
             sprite->position.y += 16;
         else if (height < -16)
             sprite->position.y -= 16;
-        else {
-            register struct EffectContext *c asm("r3") = ctx;
-            sprite->position.y = c->world.y;
-        }
+        else
+            sprite->position.y = ctx->world.y;
     }
-    {
-        u16 velocity = p->velocity.z;
-        u16 position = sprite->position.z;
-        sprite->position.z = velocity + position;
-    }
+    sprite->position.z = sprite->position.z + p->velocity.z;
     o = &p->sprite;
     {
-        register struct EffectManager *m asm("r2") = manager;
-        struct EffectGraphics *graphics;
-        asm("" : : "r"(m));
-        graphics = m->graphics;
+        struct EffectGraphics *graphics = manager->graphics;
         a = &p->anim;
         entry = a->data + a->frame;
         {
@@ -1053,24 +1027,17 @@ void EffectParticle_UpdateHomingWide(struct EffectManager *manager, struct Effec
 }
 
 void EffectParticle_UpdateHoming(struct EffectManager *manager, struct Effect *effect, s32 index,
-                                 s32 phase, u32 phaseMask, struct EffectContext *context)
+                                 s32 phase, u32 phaseMask, struct EffectContext *ctx)
 {
-    register struct EffectContext *ctx asm("r10") = context;
     struct EffectParticle *p = &effect->particles[index];
     struct EffectSprite *sprite = &p->sprite, *o;
     struct EffectAnim *a;
     const u16 *entry;
     s32 dx, dy, dz;
     if ((index & 1) == phase) {
-        {
-            register struct EffectContext *c asm("r2") = ctx;
-            dx = c->world.x - sprite->position.x;
-        }
-        {
-            register struct EffectContext *c asm("r3") = ctx;
-            dy = c->world.y - sprite->position.y + 128;
-            dz = c->world.z - sprite->position.z;
-        }
+        dx = ctx->world.x - sprite->position.x;
+        dy = ctx->world.y - sprite->position.y + 128;
+        dz = ctx->world.z - sprite->position.z;
         p->angle = Math_Atan2(dx, dz);
         p->velocity.x = (gUnk_086149C4[(p->angle + 64) & 255] * p->speed) >> 12;
         p->velocity.z = (gUnk_086149C4[p->angle] * p->speed) >> 12;
@@ -1093,29 +1060,18 @@ void EffectParticle_UpdateHoming(struct EffectManager *manager, struct Effect *e
     }
     sprite->position.x = sprite->position.x + p->velocity.x;
     {
-        s32 height;
-        register struct EffectContext *c asm("r2") = ctx;
-        height = c->world.y - sprite->position.y;
+        s32 height = ctx->world.y - sprite->position.y;
         if (height > 16)
             sprite->position.y += 16;
         else if (height < -16)
             sprite->position.y -= 16;
-        else {
-            register struct EffectContext *c asm("r3") = ctx;
-            sprite->position.y = c->world.y;
-        }
+        else
+            sprite->position.y = ctx->world.y;
     }
-    {
-        u16 velocity = p->velocity.z;
-        u16 position = sprite->position.z;
-        sprite->position.z = velocity + position;
-    }
+    sprite->position.z = sprite->position.z + p->velocity.z;
     o = &p->sprite;
     {
-        register struct EffectManager *m asm("r2") = manager;
-        struct EffectGraphics *graphics;
-        asm("" : : "r"(m));
-        graphics = m->graphics;
+        struct EffectGraphics *graphics = manager->graphics;
         a = &p->anim;
         entry = a->data + a->frame;
         {

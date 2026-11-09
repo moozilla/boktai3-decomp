@@ -1067,7 +1067,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         print("  To keep a tail apart: end it in `return` (it shares only its r0 set with the last return, then"
               " jumps to a new label with no jump chain), or let its call fall into a label, as an if/else"
               " chain's last branch before shared code does: flow puts a (use 0) nop after that call, which no"
-              " jumping tail matches. To share one, let it jump to that label (README fact 39)")
+              " jumping tail matches. When two arms of an inner if/else merge, put a `return` right after that"
+              " if/else (inside the enclosing branch): the else arm's call then falls into the return's label"
+              " (ScenePool_SelectRepeatOrExit). To share one, let it jump to that label (README fact 39)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -3517,6 +3519,12 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
     print("      a tail that several branches jump to may be one the C writes in each branch (an inline"
           " helper: fact 55 keeps its field addresses apart); jump2 merges the copies after reload, and"
           " each copy's reload choices still count (README fact 59)")
+    rnd = [n for n in cl if 0 < n <= len(text) and re.search(r"gRandomTable|gUnk_0203B400", text[n - 1])]
+    if rnd:
+        print(f"      the random table is read here (line {', '.join(map(str, rnd))}): reading it through"
+              " RANDOM_TABLE_ADDR (`*(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1))`, or"
+              " SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py) changes the reloads around the"
+              " table address (ScenePool_UpdateSpeedPulse, _ScheduleSpeedControl)")
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
@@ -3781,6 +3789,7 @@ def cmd_pins(src, func, env):
     print("  A removal that costs instructions shows where the C's shape still differs: ask `why` on the"
           f" first new difference in that variant ({os.path.relpath(pins_dir, ROOT)}/).")
     header_pins(text, reach, func)
+    missing_args(src, rom_callees(rom_name(src, func)))
     return 0
 
 
@@ -3859,7 +3868,97 @@ def cmd_calls(src, func, env):
             print(f"  missing  ROM +0x{o:X}  {n}  (after {before})")
         for o, n in dr[j1:j2]:
             print(f"  extra    draft +0x{o:X}  {n}  (after {before})")
+    missing_args(src, {n for _, n in rom})
     return 0
+
+
+def entry_arg_regs(rows):
+    """The argument registers (r0-r3) a function reads before writing them, walking its code in order
+    from the entry until the first call, return or unconditional branch: a lower bound on how many
+    register arguments it takes (a register read only on a path past a branch is missed)."""
+    read, written = set(), set()
+    for _, _, text, _, _ in rows:
+        m = re.match(r"(\w+)\s*(.*)$", text or "")
+        if not m:
+            continue
+        op, rest = m.group(1), m.group(2)
+        regs = [int(r[1:]) for r in re.findall(r"\br[0-7]\b", rest)]
+        if op in ("bl", "blx", "b", "pop") or (op == "bx"):
+            for r in regs if op in ("bx", "blx") else ():
+                if r not in written:
+                    read.add(r)
+            break
+        if op.startswith("b") and op != "bics":
+            continue  # a conditional branch: keep walking the fall-through path
+        if op.startswith("str") or op in ("cmp", "cmn", "tst", "push") or op.startswith("stm"):
+            srcs, dsts = regs, []
+        elif op.startswith("ldm"):
+            srcs, dsts = regs[:1], regs[1:]
+        else:
+            ops = [o.strip() for o in rest.split(",")]
+            two = len(ops) == 2 and not op.startswith("ldr") and op not in ("mov", "movs", "mvns", "negs")
+            srcs, dsts = (regs if two else regs[1:]), regs[:1]
+        for r in srcs:
+            if r not in written:
+                read.add(r)
+        written.update(dsts)
+    return {r for r in read if r <= 3}
+
+
+def rom_callees(name):
+    """The names of the functions NAME's ROM code calls with `bl` (a far branch into itself left out)."""
+    by_label, addrs, sizes = inventory()
+    code = load_rom(verify=False)[off(addrs[name]):off(addrs[name]) + sizes[name]]
+    names = {}
+    for n, a in addrs.items():
+        names.setdefault(a, n)
+    out = set()
+    for _, _, text, _, _ in decode(code, addrs[name], rom_data(name, addrs[name], code)):
+        m = re.match(r"bl #(0x[0-9a-f]+)$", text or "")
+        if m:
+            t = int(m.group(1), 16)
+            n = names.get(t, names.get(t | 1))
+            if n and n != name:
+                out.add(n)
+    return out
+
+
+def missing_args(src, callees):
+    """Print each callee that reads more argument registers at its entry than SRC declares it with:
+    the ROM passes another argument there (a value pinned to r1-r3 across the call is the usual sign
+    of the missing one). Returns how many it printed."""
+    by_label, addrs, sizes = inventory()
+    text, found = open(os.path.join(ROOT, src)).read(), 0
+    for callee in sorted(set(callees) & set(sizes)):
+        try:
+            code = load_rom(verify=False)[off(addrs[callee]):off(addrs[callee]) + sizes[callee]]
+            used = entry_arg_regs(decode(code, addrs[callee], rom_data(callee, addrs[callee], code)))
+        except Exception:
+            continue
+        have = declared_params(text, callee)
+        if used and have is not None and max(used) + 1 > have:
+            found += 1
+            print(f"  {callee} reads r{max(used)} at its entry, but the draft declares {have} parameter(s):"
+                  f" the ROM likely passes {max(used) + 1} (declare it and pass the value the ROM leaves in"
+                  f" r{max(used)}; a pin on that register around the call is this missing argument)")
+    return found
+
+
+def declared_params(text, name):
+    """How many parameters the source declares NAME with (its prototype or definition), or None."""
+    for m in re.finditer(r"\b" + re.escape(name) + r"\s*\(([^;{}()]*(?:\([^()]*\)[^;{}()]*)*)\)\s*[;{]", text):
+        params = m.group(1).strip()
+        if params == "void":
+            return 0
+        if params == "" or "..." in params:
+            return None  # unprototyped `f()` or variadic: the count is open
+        depth, n = 0, 1
+        for ch in params:
+            depth += ch == "("
+            depth -= ch == ")"
+            n += ch == "," and depth == 0
+        return n
+    return None
 
 
 def spill_list_gap(wd, func, rows, regs):
@@ -4104,7 +4203,10 @@ def cmd_probe(src, func, env):
            "AGBCC_NOPRE": "gcse found this computation redundant and reused the reaching register (computed"
                           " where it says). The ROM recomputed it: make the occurrences different expressions"
                           " to gcse (another base pointer; an offset Thumb encodes inline vs one loaded from"
-                          " the pool, fact 2) or read the value from a variable set once. `pre` lists every"
+                          " the pool, fact 2; a load in another mode, as a u32 copy's zero_extend; type,"
+                          " alias set and volatile-free MEM flags don't count, since expr_equiv_p compares"
+                          " only code, mode and operands) or read the value from a variable set once. `pre`"
+                          " lists every"
                           " PRE decision with its C lines and score.",
            "AGBCC_NOGIV": "loop.c turned this per-iteration computation into its own register stepped"
                           " each pass (strength reduction; often a post-increment address). First check"
@@ -4369,7 +4471,10 @@ def why_all_details(src, func, env, rng=None):
                   " agbcc has no C construct that emits it. Not a register or order problem: no knob applies.")
         else:
             print("  Find the C that produces them (a missing statement, a different expression shape); a"
-                  " draft-only row that is alignment padding follows from the size change.")
+                  " draft-only row that is alignment padding follows from the size change. A load or"
+                  " computation the draft lacks is often one cse or gcse removed as redundant (PRE, a"
+                  " followed jump): probe flips each such decision:")
+            cmd_probe(src, func, env)
         return 1
     print(f"{func}: {count_text(rows)} differ; per hunk: moved insns, then why on the first insn left\n")
     wd = info["wd"]
