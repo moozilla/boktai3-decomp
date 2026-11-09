@@ -116,3 +116,14 @@ reassignment alive until flow. Tried: `phase = Read(...)` plain or inside the `i
 `contact` variable, u32 phase, a u32 mask parameter for Read, Apply with `|= 2`, and u8/u16/s8 masks
 (those go to the stack). Next: a form where phase really changes (the read's result reused) or
 some other reason the ROM's mask is a separate constant.
+
+### Spider_UpdateWanderGoal (src/fn/sub_080A4018.c, 080A4018): deferred
+
+Draft: `Spider_UpdateWanderGoal.c` (the no-pin draft, 58/62 differ). The ROM's allocation is input r4,
+transform r5, table r6, heading r7, ctx r8, mask (0x3FF) sb, &gRandomIndex sl, with distance and
+&input->0x3D4 spilled to the stack. sb's 0x3FF comes from reload's move2add (`adds r1, #0x2f` on the
+r1 that held 0x3D0), so mask has to get sb. Two constant pointers have to be in registers with no
+REG_EQUIV, as in Bat_UpdateDefeat. `AGBCC_NOEQUIV=31,32` (table, indexAddress) gives 58/58 with
+shape 16, and the rest is the order of input, transform, table and heading. The halves union cannot
+help here either: the target packing reuses 0xFFFF0000. Next: a general way to set a constant pointer
+without a REG_EQUAL note at function entry; this is the same blocker as Bat.
