@@ -832,7 +832,12 @@ the callback test), and the first address lives in r4 rather than r1. `scope.py 
 The offset is below 256, so fact 55's body/inline split (`(plus p (reg K))` against
 `(plus p (const_int K))`) does not apply. Every spelling reaches gcse as the same expression:
 a local address that is set twice, `q = p` inside the inline, a `u32` cast, `OrFlags(mask, &p->flags)`, and value/mask locals.
-cse and cprop fold the copies back to `actor`. Next: find a base the original might have used
+cse and cprop fold the copies back to `actor`. The coordinator's displaced-address form (`end = (u8 *)&actor->flags + 4; *(u32 *)(end - 4)`)
+does not help either. If both statements are in one block, cse1 folds them back into
+`(plus actor 156)`, and PRE copies it again. If `end` is set in an earlier block (top of the
+function, or the start of case 0's else), gcse no longer merges the address and the first site
+matches, but the round trip then stays as `adds r7, r5, #0xa0` ... `subs r0, r7, #4` (7/9).
+Next: find a base the original might have used
 that gcse sees as another operand at one site (a multi-set pointer, or a pointer from a call
 or a load), or show that actor is reassigned in the original.
 
@@ -848,6 +853,10 @@ Trigger_RunScript's actor copy (field-effects). Tried: the body as an inline tak
 loop-scoped copy. None keeps two registers. Next: find a form where the copy's uses
 sit in a cse block that the copy does not reach and cprop leaves alone (cprop propagates a copy
 that dominates its uses), or a reason the original's p was not a plain pseudo.
+Fact 85 (RisingProjectile) does not carry over: there the ROM's copy is used only outside cse1's
+path, but here the copy (r6) is used from the first block on, which needs it to be head. Being head
+needs its last mention after the final `Hresvelgr_RefreshTarget(p)`, and the ROM places that call
+last (the else arm follows the then arm).
 
 ### Hresvelgr_UpdateBoundaryBarrage (src/fn/sub_081A0BC8.c, 081A0BC8): deferred
 
