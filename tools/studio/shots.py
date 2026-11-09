@@ -30,6 +30,7 @@ SHOTS = [
     ("browse", "/atlas#monster:9858", 900),
     ("code", "/code#0804A15C", 1000),
     ("code-overview", "/code", 900),
+    ("code-type", "/code#type:TetherActor", 900),
     ("text", "/text#7542", 900),
     ("sprites", "/gfx#sprites/DE23", 900),
     ("map", "/gfx#maps/EBA7", 1000),

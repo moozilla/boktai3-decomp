@@ -125,7 +125,10 @@ with its C next to its disassembly. Lines that still hold a matching
 concession are marked, and identifiers link through: calls, callers, the
 callbacks that take a function's address, the RAM objects (`symbols/ram.csv`)
 and ROM data it loads, and the objects and script routines in the game that
-reach it. A RAM object's page lists every function that uses it. The index is
+reach it. A RAM object's page lists every function that uses it; a struct
+type's page shows its definition with each member's offset, as agbcc lays it
+out, and the functions that use it. **Concessions left** lists every function
+still holding a pin, barrier or other concession, by kind. The index is
 `tools/studio/codemap.py`, built from `tools/progress.py` and
 `tools/concessions.py`. **ROM** (`/rom`) is the ROM as a treemap in address
 order, colored by kind or by how well each byte is understood.
@@ -134,6 +137,7 @@ order, colored by kind or by how well each byte is understood.
 |---|---|
 | ![Code](docs/img/studio-code.png) | **Code**: a function's C and disassembly side by side, with its concessions, the RAM it touches and where the game reaches it. |
 | ![Code overview](docs/img/studio-code-overview.png) | **Code overview**: what matches, what is free of concessions, by category, and which concession kinds are left. |
+| ![Code type](docs/img/studio-code-type.png) | **Types**: a struct's definition with each member's offset as agbcc lays it out, and the functions that use it. |
 | ![Browse](docs/img/studio-browse.png) | **Browse**: a monster with its family, every palette its sprites are drawn in, and the scenes that place it. |
 | ![Text](docs/img/studio-text.png) | **Text** (`/text`): every string with the fan translation, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
 | ![Sprites](docs/img/studio-sprites.png) | **Sprites**: sprite packages and large sprites with every frame and animation, in their in-game palettes. |
