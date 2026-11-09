@@ -1598,6 +1598,18 @@ Each was read from the compiler source and confirmed on a live draft.
    `*current = value;` mentions also raised current's refs (7 -> 8, priority 7368 -> 12631) above
    diff. When `why` says a global pseudo conflicts with r0/r1 that only block-local pseudos hold,
    try this.
+79. **Plan the returns to place each cross-jump: jump2 tries other jumps last first, and a label
+   lowers the minimum.** For a jump, find_cross_jump first tries the code that falls into its
+   label (one shared insn is enough), then every other jump to that label, starting with the last
+   one in insn order (jump_chain is built by prepending). Two shared insns are needed; `use` insns
+   don't count. A label in the jumping tail ends the compare and lowers the minimum by one, so a
+   call that falls into a `return 1` label (the else arm of an if/else followed by one return)
+   keeps its call (flow's nop) and gives only its `r0 = 1` to a later return. In
+   ScenePool_SelectDirectionOrRepeat the four states are written in full: both forward copies and
+   the direction-2 state end in `return 1`, so both forward tails merge into the last one (the
+   direction-2 copy) at its stateEntered store, while the random branch's if/else + return keeps
+   state 4's call. ScenePool_SelectRepeatOrExit used the same return-after-inner-if/else. Both
+   replaced a barrier and an r0 pin.
 
 ## Survey: random table as a literal address (2026-10-24)
 

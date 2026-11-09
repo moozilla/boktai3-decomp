@@ -18,7 +18,11 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from romlib import ROOT  # noqa: E402
 
-GCC = os.path.join(ROOT, "build", "agbcc-instr", "gcc")
+# the instrumented fork when built; otherwise the plain agbcc source tools/setup.sh fetched (a
+# worktree's build/tools links to the main checkout's), where the anchors outside the knobs match
+GCC = next((d for d in (os.path.join(ROOT, "build", "agbcc-instr", "gcc"),
+                        os.path.join(ROOT, "build", "tools", "agbcc", "gcc")) if os.path.isdir(d)),
+           os.path.join(ROOT, "build", "agbcc-instr", "gcc"))
 
 # key: (keywords, rule, [(file, anchor, lines before, lines after)])
 TOPICS = {
