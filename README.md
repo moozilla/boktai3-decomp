@@ -140,7 +140,7 @@ order, colored by kind or by how well each byte is understood.
 | ![Code overview](docs/img/studio-code-overview.png) | **Code overview**: what matches, what is free of concessions, by category, and which concession kinds are left. |
 | ![Code type](docs/img/studio-code-type.png) | **Types**: a struct's definition with each member's offset as agbcc lays it out, and the functions that use it. |
 | ![Browse](docs/img/studio-browse.png) | **Browse**: a monster with its family, every palette its sprites are drawn in, and the scenes that place it. |
-| ![Text](docs/img/studio-text.png) | **Text** (`/text`): every string with the fan translation, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
+| ![Text](docs/img/studio-text.png) | **Text** (`/text`): every string with the fan translation and the scripts that show it, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
 | ![Sprites](docs/img/studio-sprites.png) | **Sprites**: sprite packages and large sprites with every frame and animation, in their in-game palettes. |
 | ![Maps](docs/img/studio-map.png) | **Maps**: stages with captured palettes, doors, entrances, items, enemies and patrol paths from the stage scripts. |
 | ![World](docs/img/studio-world.png) | **World** (`/world`): how the rooms connect. Scenes grouped into areas by their doors, areas into places by their labels, each place with its rooms, captures and enemies. |
