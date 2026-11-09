@@ -664,3 +664,18 @@ count is in r7, the stride in ip, and the store takes cse's jump-equivalence zer
 `active` byte, r0). What is needed is a pseudo that sorts last (gets r8) and whose set and use
 disappear after reload (reload_cse, a no-op move, or a substituted equivalence). None of these
 help: u32 active, p->count instead of the count pointer, do/while, or indexing p->parts[i].
+
+### SpriteColliderGroup_ResetActiveParts (sub_0818EA3C), total pin kept
+Draft: notes/phase3-drafts/monsters-bosses/SpriteColliderGroup_ResetActiveParts.c (2 ROM / 2 draft: the first
+count load uses r6, the ROM r5). Without the pin, combine folds `total` (a zero_extend of p->count)
+into the compare as `(subreg:SI (mem:QI))`. Before reload, register_operand accepts a SUBREG of a
+MEM. Reload then loads it into its next spill register. The draft's spill set is {r0, r4, r6}, so
+after r4 (the 0x5C3 constant) it takes r6. The ROM's set also holds r5, so either total is a real
+pseudo there (sharing r5 with count, as the pin forces) or some ROM insn needed a reload while
+r0-r4 were busy. Things that changed nothing or scored worse:
+- the types s32, u32 and u8;
+- `total > i`, an assignment inside the condition, or a second use of total;
+- for/while loops with hoisted constants;
+- p->count read directly.
+Next: find what keeps combine from folding the load (a second live use of total that goes away
+later) or the ROM insn with four busy low registers.
