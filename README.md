@@ -122,7 +122,8 @@ place it; a scene opened from there marks it on the map.
 **Code** (`/code`) shows the finished decomp: every function by category and
 unit (the same tree as [PROGRESS.json](PROGRESS.json) and decomp.dev), each
 with its C next to its disassembly. Lines that still hold a matching
-concession are marked, and identifiers link through: calls, callers, the
+concession are marked, as are the drafts that don't match yet and the SDK's
+own hand-written assembly, and identifiers link through: calls, callers, the
 callbacks that take a function's address, the RAM objects (`symbols/ram.csv`)
 and ROM data it loads, and the objects and script routines in the game that
 reach it. A RAM object's page lists every function that uses it; a struct
