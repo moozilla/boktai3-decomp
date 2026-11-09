@@ -547,3 +547,15 @@ kept in r3). cse_end_of_basic_block follows a jump only to a label with LABEL_NU
 preceded by a BARRIER, so the original's case 1 label must have had a second use or no barrier
 before it. No effect: an if/else chain (worse), `u32 kind`, computing from `inputKind`, a
 `goto` to the timers block from the flags test.
+
+### PlayerAction_RefreshFlagState (src/player_3.c, 0813EDDC): 7 concessions, pin-free draft 8/8
+
+Draft `PlayerAction_RefreshFlagState.c` drops all seven (`if (alternate < 0) override = 0; else
+override = GameState_GetConsumableDescriptor(alternate);` and `override->slot` read directly).
+What is left is reload rotation: `scope.py spill` matches with `AGBCC_SPILL=5:1`. Between reload
+4 (the 0x418 actionMode offset, r2) and reload 5 (alternate from r8 for `cmp`), the ROM made one
+more reload choice that took r0 and left no visible insn. Reload 5 then got r1, and override's
+reloads in the slot loop follow. Writing the actionMode/slot test as separate ifs, through a
+`mode` local or pointer, `!= 0`, or a `u32 slot` local changes nothing, and neither does a
+ternary for override (worse). Next: find the ROM's hidden reload (a pseudo with a MEM REG_EQUIV
+replaced at its use, or a copy deleted after reload).
