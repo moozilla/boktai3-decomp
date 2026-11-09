@@ -3668,7 +3668,9 @@ def cmd_pins(src, func, env):
 
     def show(n):
         return "compile fails" if n is None else f"{n} rows ({counts.get(n, '?')})"
-    text = open(os.path.join(ROOT, src)).read()
+    # clang-format breaks a long pin as `register T *x asm(\n "ip");`: join it so the line scan sees it
+    text = re.sub(r'(\b(?:asm|__asm__)\s*\()\s*\n\s*("(?:r\d+|sb|sl|fp|ip|lr)"\s*\))', r'\1\2',
+                  open(os.path.join(ROOT, src)).read())
     lines = text.split("\n")
     reach = function_reach(text, func)
     starts = [0]
