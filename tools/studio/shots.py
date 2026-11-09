@@ -38,6 +38,8 @@ SHOTS = [
     ("scripts", "/scripts#5757", 1250),
     ("actors", "/actors#C3BC", 900),
     ("captures", "/captures#12_field", 900),
+    ("rom", "/rom#level", 800),
+    ("sound", "/sound#18", 900),
 ]
 READY = ("(() => { const t = document.body.innerText;"
          " return !/Loading/.test(t) && t.length > 300 && !document.querySelector('#view .empty:only-child'); })()")
