@@ -17,6 +17,7 @@ import {
   rawUrl,
   shade,
   stripLayout,
+  cellSizes,
   totalOf,
   treeLevel,
 } from './data'
@@ -128,8 +129,6 @@ async function openSource($: EngineInterface, node: DecompNode, where: string[])
 }
 
 const fmt = (n: number) => n.toLocaleString('en-US')
-/** A percent share as flexGrow, which surfaces take only up to 10000. */
-const grow = (p: number) => Math.max(0.01, Math.round(p * 100) / 100)
 /** A share as a Box size: whole percent steps are all a surface takes. */
 const share = (p: number) => `${Math.max(0, Math.min(100, Math.round(p)))}%`
 const pct1 = (p: number) => `${p.toFixed(p >= 100 || p === 0 ? 0 : 1)}%`
@@ -240,13 +239,13 @@ export const register: Register = on => {
       body = (
         <Box flexDirection="column" gap={1}>
           <Box flexDirection="column">
-            {spread(<Text>Code matched in C</Text>, <Text bold>{snap.pct.toFixed(2)}%</Text>)}
+            {spread(<Text>Matched without concessions</Text>, <Text bold>{`${snap.cleanPct.toFixed(2)}%`}</Text>)}
             {bar([
               { pct: snap.cleanPct, color: BLUE },
               { pct: pinned, color: PINNED },
             ])}
             <Text dimColor wrap="truncate">
-              {`${fmt(snap.fnDone)} of ${fmt(snap.fnTotal)} functions · ${snap.cleanPct.toFixed(1)}% without concessions · ${snap.drafts.count} drafts`}
+              {`${snap.pct.toFixed(snap.pct >= 100 ? 0 : 2)}% matched in C (${fmt(snap.fnDone)} of ${fmt(snap.fnTotal)} functions) · ${pinned.toFixed(1)}% with concessions`}
             </Text>
           </Box>
           <Box flexDirection="column">
@@ -273,6 +272,7 @@ export const register: Register = on => {
         const rows = Math.max(14, Math.min(40, e.props.scroll.bodyRows - 9))
         // Cells are about 2.3 times as tall as wide.
         const layout = stripLayout(level.map(n => ({ item: n, size: n.bytes })), cols / (rows * 2.3))
+        const heights = cellSizes(layout.map(row => row.size), rows)
         const crumbs = ['All', ...zoom]
         body = (
           <Box flexDirection="column" gap={1}>
@@ -291,37 +291,45 @@ export const register: Register = on => {
             <Text dimColor wrap="truncate">
               {describe(here)}
             </Text>
-            <Box flexDirection="column" height={rows} width="100%">
-              {layout.map((row, r) => (
-                <Box flexDirection="row" height={0} flexGrow={grow(row.height)} flexShrink={1} width="100%">
-                  {row.tiles.map(({ item: n, width }) => {
-                    const color = n.fn ? fnShade(n.fn.pct, n.fn.pinned) : shade(pctOf(n))
-                    const showPct = (width / 100) * cols > n.name.length + 6
-                    return (
-                      <Box
-                        key={`tile-${r}-${n.name}`}
-                        width={0}
-                        flexGrow={grow(width)}
-                        flexShrink={1}
-                        height="100%"
-                        backgroundColor={color}
-                        borderStyle="single"
-                        borderColor="#1b1b1b"
-                        overflow="hidden"
-                        flexDirection="column"
-                        hover={{ borderColor: '#f0f0f0' }}
-                      >
-                        <Button
-                          key={`open-${n.name}`}
-                          plain
-                          label={showPct ? `${n.name} ${pct1(pctOf(n))}` : n.name}
-                          onPress={() => (isFunctions ? openSource($, n, zoom) : zoomTo($, [...zoom, n.name]))}
-                        />
-                      </Box>
-                    )
-                  })}
-                </Box>
-              ))}
+            <Box flexDirection="column" height={rows} width={cols} overflow="hidden">
+              {layout.map((row, r) => {
+                // Whole cells that add up exactly: shares and percent sizes left gaps and overlaps.
+                const tall = heights[r]!
+                if (tall <= 0) return null
+                const widths = cellSizes(row.tiles.map(t => t.size), cols)
+                return (
+                  <Box key={`row-${r}`} flexDirection="row" height={tall} width={cols} overflow="hidden">
+                    {row.tiles.map(({ item: n }, t) => {
+                      const w = widths[t]!
+                      if (w <= 0) return null
+                      const color = n.fn ? fnShade(n.fn.pct, n.fn.pinned) : shade(pctOf(n))
+                      // A border needs a cell on each side of the label; a thin tile is colour alone.
+                      const framed = w >= 4 && tall >= 3
+                      const room = framed ? w - 2 : w
+                      const label = room > n.name.length + 6 ? `${n.name} ${pct1(pctOf(n))}` : n.name.slice(0, room)
+                      return (
+                        <Box
+                          key={`tile-${r}-${n.name}`}
+                          width={w}
+                          height={tall}
+                          flexShrink={0}
+                          backgroundColor={color}
+                          overflow="hidden"
+                          flexDirection="column"
+                          {...(framed ? { borderStyle: 'single', borderColor: '#1b1b1b', hover: { borderColor: '#f0f0f0' } } : {})}
+                        >
+                          <Button
+                            key={`open-${n.name}`}
+                            plain
+                            label={label || ' '}
+                            onPress={() => (isFunctions ? openSource($, n, zoom) : zoomTo($, [...zoom, n.name]))}
+                          />
+                        </Box>
+                      )
+                    })}
+                  </Box>
+                )
+              })}
             </Box>
             <Text dimColor wrap="truncate">
               {isFunctions
