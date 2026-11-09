@@ -45,6 +45,15 @@ class LandPins(unittest.TestCase):
         self.assertIn("--allow-pins", text)
         self.assertIn("scope.py src/fn/f.c pins", text)
 
+    def test_a_function_marker_goes_when_its_function_is_clean(self):
+        mark = land.MARKER + "\n"
+        text = (mark + "int F(void)\n{\n    return 0;\n}\n\n"
+                + mark + 'int G(void)\n{\n    register int y asm("r5");\n    return y;\n}\n')
+        out, pins, bars = land.concessions(text)
+        self.assertEqual((pins, bars), (1, 0))
+        self.assertEqual(out.count(land.MARKER), 1)
+        self.assertLess(out.index("int F"), out.index(land.MARKER))
+
 
 if __name__ == "__main__":
     unittest.main()
