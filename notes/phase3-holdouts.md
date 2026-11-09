@@ -129,6 +129,28 @@ Next idea: find C before line 679 whose RTL needs one reload choice and still em
 code (a copy that jump2 merges after reload, fact 59), or that keeps a value live in r1 across
 the first ldrsh.
 
+### sub_08012B34 (src/debris_particles.c, 08012B34): deferred, the dead 0x0403B714 load
+
+Draft: `notes/phase3-drafts/field-effects/sub_08012B34.c` (20 ROM / 20 draft). The ROM loads
+0x0403B714 (PARTICLE_RANDOM_SAMPLE_ORIGIN) into r3 in both arms and never uses it. The same dead
+constant is pinned in sub_0804373C (`rngSetup`) and sub_08059C48 (`observed`).
+* How a dead load survives in plain C: set an ordinary local to the constant and use it in a
+  later basic block in an expression that combine folds through nonzero_bits, e.g.
+  `v->z = Debris_Scale(...) | (setup & 3);` (0x0403B714 & 3 is 0). flow has already run, so
+  the set is never deleted and still gets a register. With the use after the v->z line,
+  `AGBCC_PRI=setup:+2908` matches (GPT-6 Pro's knob, now without the barrier).
+* Why it doesn't get r3: global priority. setup has 3 refs over 80 insns, and each of its
+  two constant sets gets REG_EQUIV, and update_equiv_regs doubles the live length per set
+  (x4, local-alloc.c). That gives priority 93. angle (6 refs over 39 insns) is at 3000, so
+  angle is allocated first and takes r3, the head of the Thumb REG_ALLOC_ORDER (r3, r2, r1, r0, ...).
+  Beating 3000 at live 320 needs about 25 refs. Moving the use earlier shortens the life but
+  changes the v->y store order (the use must emit nothing).
+
+Next idea: the original probably had the constant inside the "first sample" random inline
+(all three functions load it just before a sample read from the literal table address). Find a
+form where the constant isn't a REG_EQUIV (so the live length isn't multiplied), or where angle's
+priority drops below setup's.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
