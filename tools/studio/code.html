@@ -315,6 +315,21 @@ function overview() {
       A function can hold more than one kind.</p>` : ''}
   </div>`;
 }
+// the Since column of a unit's functions: when each became concession-free (or matched)
+let FNHIST = null;
+async function fillSince() {
+  const cells = document.querySelectorAll('td.since[data-a]');
+  if (!cells.length) return;
+  FNHIST ||= await fetch('/api/codemap/fnhistory').then(r => r.json()).catch(() => ({}));
+  const day = t => new Date(t * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  for (const td of cells) {
+    const e = FNHIST[td.dataset.a] || {}, x = e.clean || e.matched;
+    if (!x) continue;
+    const pr = x[1]?.match(/PR (#\d+)/g);
+    td.textContent = `${day(x[0])}${x[1] ? ' · ' + (pr ? pr.at(-1).slice(3) : x[1]) : ' or earlier'}`;
+    td.title = (e.clean ? 'concession-free' : 'matching') + (x[1] ? ' since ' + x[1] : ' since the first PROGRESS.json');
+  }
+}
 // when a function started matching and became concession-free (committed PROGRESS.json, tools/studio/codemap.py)
 async function fillFnHistory() {
   const b = $('fnhist'); if (!b) return;
@@ -395,9 +410,9 @@ function unitPage(key) {
       ${groupBadges(u)}</div>
     ${strip(fns)}
     <h3>Functions <span class="n">in ROM order</span></h3>
-    <table class="t"><tr><th>Function</th><th>Address</th><th class="r">Bytes</th><th>Status</th><th>Source</th></tr>
+    <table class="t"><tr><th>Function</th><th>Address</th><th class="r">Bytes</th><th>Status</th><th title="the merge that last made it concession-free (or made it match), from the committed PROGRESS.json">Since</th><th>Source</th></tr>
     ${fns.map(f => `<tr class="link" data-href="${fnHref(f.addr)}"><td class="mono"><a href="${fnHref(f.addr)}">${esc(f.name)}</a></td><td class="mono muted">${f.addr}</td><td class="r">${f.size}</td>
-      <td><div class="badges" style="margin:0">${fnBadges(f)}</div></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
+      <td><div class="badges" style="margin:0">${fnBadges(f)}</div></td><td class="since muted" data-a="${f.addr}"></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
 }
 
 // ---------- syntax ----------
@@ -650,7 +665,7 @@ async function route() {
   v.scrollTop = 0;
   renderTree();
   if (!h) { drawHistory(); drawChanges(); }
-  fillFnHistory();
+  fillFnHistory(); fillSince();
 }
 $('view').addEventListener('click', e => {
   const tr = e.target.closest('tr.link');

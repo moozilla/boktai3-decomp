@@ -505,6 +505,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/codemap/changes":
             import codemap
             self.send(200, codemap.changes())
+        elif self.path == "/api/codemap/fnhistory":
+            import codemap
+            self.send(200, codemap.function_history())
         elif self.path.startswith("/api/codemap/fnhistory/"):
             import codemap
             self.send(200, codemap.function_history().get(self.path.rsplit("/", 1)[1].upper(), {}))
