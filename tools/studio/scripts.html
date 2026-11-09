@@ -95,7 +95,7 @@ function fileRow(f) {
   const d = document.createElement('div');
   d.className = 'row' + (f.id === selFile ? ' on' : '') + (f.kind === 'shared' ? ' shared' : '');
   const range = f.procs.length > 1 ? `${f.procs[0]}–${f.procs[f.procs.length - 1]}` : `${f.procs[0]}`;
-  const ml = f.entry && scenes[f.entry]?.map ? noteOf('map', scenes[f.entry].map)?.label : '';
+  const ml = (f.entry && scenes[f.entry]?.map ? noteOf('map', scenes[f.entry].map)?.label : '') || whereOf(f.entry)?.text;
   d.innerHTML = `<b>${esc(fileTitle(f))}</b>${ml ? `<span class="lab">${esc(ml)}</span>` : ''}<small>${[`${f.procs.length} procs`, range, f.kind === 'scene' ? '' : f.description].filter(Boolean).map(esc).join(' · ')}</small>`;
   d.onclick = () => { location.hash = 'file=' + f.id; };
   return d;
@@ -106,9 +106,17 @@ function procRow(id) {
   d.onclick = e => { e.stopPropagation(); location.hash = id; };
   return d;
 }
+// where a scene is in the world (World's places, tools/studio/places.py): its own label, else its area's place
+let W = null;
+function whereOf(scene) {
+  const s = W?.scenes[scene], a = W && W.areas[W.scene_area[scene]];
+  if (!s || !a) return null;
+  const text = s.label || [a.place, a.detail].filter(Boolean).join(' · ');
+  return text ? { text, href: `/world#area=${a.area}/scene=${scene}` } : null;
+}
 // a scene file by its entry's name (gcl/names/proc.csv, else tools/assets/gclroles.py)
 const fileTitle = f => f.kind === 'scene' && procNames[f.entry] ? `${procNames[f.entry]}` : f.title;
-const hitFile = (f, q) => [f.id, f.title, fileTitle(f), f.description, f.category].some(x => (x || '').toUpperCase().includes(q));
+const hitFile = (f, q) => [f.id, f.title, fileTitle(f), f.description, f.category, whereOf(f.entry)?.text].some(x => (x || '').toUpperCase().includes(q));
 const hitProc = (c, q) => String(c) === q || (procNames[c] || '').toUpperCase().includes(q) || (label(byId[c] || { id: c }) || '').toUpperCase().includes(q);
 function renderFiles() {
   const q = $('q').value.trim().toUpperCase();
@@ -144,7 +152,7 @@ async function showFile(fid) {
   const d = await fetch(`/api/file/${fid}${inline ? '/inline' : ''}${readable ? '' : '/raw'}${english ? '/en' : ''}`).then(r => r.json());
   const sc = f.entry ? scenes[f.entry] : null;
   v.innerHTML = `<h2>${esc(fileTitle(f))}</h2>
-    <div class="meta">${esc(f.category)} · ${f.procs.length} procedures (${f.procs[0]}–${f.procs[f.procs.length - 1]}) · ${f.kind === 'scene' ? `entry <a href="#${f.entry}">proc ${f.entry}</a>` : `used by ${f.scenes} scenes`}${sc?.map ? ` · map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(f.entry).padStart(4, '0'), 'capture') : ''}${f.kind !== 'scene' && f.description ? ' · ' + esc(f.description) : ''}</div>
+    <div class="meta">${esc(f.category)} · ${f.procs.length} procedures (${f.procs[0]}–${f.procs[f.procs.length - 1]}) · ${f.kind === 'scene' ? `entry <a href="#${f.entry}">proc ${f.entry}</a>` : `used by ${f.scenes} scenes`}${whereOf(f.entry) ? ' · ' + peekLink(whereOf(f.entry).href, esc(whereOf(f.entry).text)) : ''}${sc?.map ? ` · map ${peekLink(gfxHref('map', sc.map), esc(noteOf('map', sc.map)?.label || sc.map))}` : ''}${sc?.shot ? ' · ' + peekLink('/captures#scene_' + String(f.entry).padStart(4, '0'), 'capture') : ''}${f.kind !== 'scene' && f.description ? ' · ' + esc(f.description) : ''}</div>
     <h3>Source <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="readable"${readable ? ' checked' : ''}> readable</label>
       <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="inline"${inline ? ' checked' : ''}${readable ? '' : ' disabled'}> inline single-use helpers (${d.inlined.length})</label>
       <label class="chk" style="text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="english"${english ? ' checked' : ''}${readable ? '' : ' disabled'}> English text</label></h3>
@@ -274,7 +282,8 @@ function route() {
 window.onhashchange = route;
 (async () => {
   await loadNotes();
-  const [d, a, fl] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json()), fetch('/api/files').then(r => r.json())]);
+  const [d, a, fl, w] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json()), fetch('/api/files').then(r => r.json()), fetch('/api/areas').then(r => r.json()).catch(() => null)]);
+  W = w;
   F = fl.files; fileOf = Object.fromEntries(F.flatMap(f => f.procs.map(c => [c, f.id])));
   P = d.procs; scenes = d.scenes; byId = Object.fromEntries(P.map(p => [p.id, p]));
   callees = d.callees || {}; procOfName = d.procnames || {};
