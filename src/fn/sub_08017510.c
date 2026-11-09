@@ -28,18 +28,10 @@ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
         sample &= mask;                                                                            \
         sample;                                                                                    \
     })
-static inline u32 ReadAlternate(u8 *pointer, u8 **saved)
-{
-    u32 value = *pointer;
-    asm("" : "+r"(value));
-    *saved = pointer;
-    return value;
-}
 void Weather_UpdateTilemapScroll(struct Weather *p)
 {
     s32 x;
     s32 y;
-    u8 *alternate;
     s32 pixelX, pixelY, tileX, tileY;
     p->scroll += SceneTilemap_GetScrollDelta();
     x = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX + p->scroll;
@@ -49,21 +41,19 @@ void Weather_UpdateTilemapScroll(struct Weather *p)
         register u32 *cursor asm("r4") = &gRandomIndex;
         asm("" : : "r"(table), "r"(cursor));
         p->timer = Random(table, cursor, 127) + 128;
-        if (ReadAlternate(&p->alternate, &alternate))
+        if (p->alternate)
             p->target = Random(table, cursor, 3) - 1;
         else
             p->target = Random(table, cursor, 7) - 1;
-    } else {
+    } else
         p->timer--;
-        alternate = &p->alternate;
-    }
     if (!(p->frame & 15)) {
         if (p->drift < p->target)
             p->drift++;
         else if (p->drift > p->target)
             p->drift--;
     }
-    if (*alternate) {
+    if (p->alternate) {
         if (p->frame & 1) {
             p->x[0] += 2;
             p->x[0] += p->drift;
