@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Boktai 3 Studio</title>
+<title>Boktai 3 Graphics</title>
 <link rel="stylesheet" href="/static/common.css">
 <style>
 :root {
@@ -184,9 +184,10 @@ function select(key, scroll) {
 async function refresh() {
   clearInterval(timer); timer = null;
   if (sel === undefined) return;
+  const view = NAV.flatMap(([, u]) => Array.isArray(u) ? u : []).find(([, x]) => x === '/gfx#' + tab)?.[0];
+  if (view) pageTitle('', view);  // the view's name while its item loads
   await views[tab].show(sel, tab === 'pool' ? wantArg : undefined);
   const h = $('view').querySelector('h2');
-  const view = NAV.flatMap(([, u]) => Array.isArray(u) ? u : []).find(([, x]) => x === '/gfx#' + tab)?.[0];
   if (view) pageTitle(h?.textContent.trim(), view);
   if (h && NOTE_KIND[tab] && sel && !LIVE) h.after(noteEditor(NOTE_KIND[tab], noteKeyOf(sel), renderList));
   wantFrame = null;
