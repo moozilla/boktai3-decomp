@@ -17,31 +17,40 @@ struct ObjBlock {
     u8 pad5;
     u16 w6;
 };
+/* A position, also copied as a pair of words. */
+union SceneObjPos {
+    struct Pair words;
+    struct Pos16 position;
+};
+/* Four script argument words. The copy in SceneObjects_Append goes through the union: its stores
+   may alias the pool's u16 count, so gcse leaves the count's load after the copy loop. */
+union SceneObjArgs {
+    s32 words[4];
+    u8 bytes[16];
+};
 struct SceneObjSlot {
     u8 pad0[0x1c];
     u32 a, b; /* 0x1c: also sprite fields */
     u8 pad24[8];
     struct ObjBlock *block;
     void *callback;
-    u8 pad34[2];
-    u8 pad36;
+    u16 id;
+    u8 kind;
     u8 variant;
     u8 dir;
     u8 b39, b3a, b3b;
     u16 cellA, cellB;
     u8 type;
-    u8 pad41[4];
+    u8 b41;
+    u16 region; /* Region_FindContaining(position) */
+    u8 b44;
     u8 b45;
     u8 pad46[2];
-    s32 pad48;
+    s32 hasArgs; /* the script gave the four argument words */
     s32 value;
-    u8 pad50[0x10];
+    union SceneObjArgs args;
     s32 raisedScript, loweredScript;
-    struct Pos16 pos;
-    union {
-        struct Pair words;
-        struct Pos16 position;
-    } q0, r0; /* display and base positions, also copied as pairs of words */
+    union SceneObjPos pos, q0, r0; /* position, display and base positions */
     u16 lift, timer;
     u32 loweredPose;
     u16 maxLift;

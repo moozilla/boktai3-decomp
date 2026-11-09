@@ -7,7 +7,7 @@ void SceneObject_UpdateIdleB(void);
 // confidence=low: places a newly appended scene object on its terrain cell and starts its idle state.
 void SceneObject_InitSlotPlacement(u8 *mgr, struct SceneObjSlot *obj)
 {
-    s32 cell = cellIndexAt(&obj->pos);
+    s32 cell = cellIndexAt(&obj->pos.position);
     u8 *dir;
     u8 *cellField;
     u32 t;
@@ -18,22 +18,22 @@ void SceneObject_InitSlotPlacement(u8 *mgr, struct SceneObjSlot *obj)
         case 0:
             obj->cellA = cell - 1;
             obj->cellB = cell;
-            obj->pos.z += 0x80;
+            obj->pos.position.z += 0x80;
             break;
         case 1:
             obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
             obj->cellB = cell;
-            obj->pos.x += 0x80;
+            obj->pos.position.x += 0x80;
             break;
         case 2:
             obj->cellA = cell;
             obj->cellB = cell - 1;
-            obj->pos.z += 0x80;
+            obj->pos.position.z += 0x80;
             break;
         case 3:
             obj->cellA = cell;
             obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
-            obj->pos.x += 0x80;
+            obj->pos.position.x += 0x80;
             break;
     }
     {
