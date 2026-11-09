@@ -26,15 +26,15 @@ a { color: var(--accent); }
 #top .brand { font-size: 16px; font-weight: 700; margin: 0 6px 0 0; letter-spacing: .02em; white-space: nowrap; color: var(--ink); text-decoration: none; }
 #top h1 { font-size: 16px; margin: 0; letter-spacing: .02em; white-space: nowrap; }
 #top nav { display: flex; gap: 2px; flex-wrap: wrap; align-items: center; }
-#top nav a, #top nav .grp > button { color: var(--muted); text-decoration: none; padding: 5px 9px; border-radius: 6px; white-space: nowrap; font: inherit; background: none; border: 0; cursor: pointer; }
-#top nav a:hover, #top nav .grp > button:hover { color: var(--ink); background: var(--soft); }
-#top nav > a.on, #top nav .grp.on > button { background: var(--sel); color: var(--ink); }
+#top nav a, #top nav .navgrp > button { color: var(--muted); text-decoration: none; padding: 5px 9px; border-radius: 6px; white-space: nowrap; font: inherit; background: none; border: 0; cursor: pointer; }
+#top nav a:hover, #top nav .navgrp > button:hover { color: var(--ink); background: var(--soft); }
+#top nav > a.on, #top nav .navgrp.on > button { background: var(--sel); color: var(--ink); }
 #top nav .caret { font-size: 9px; opacity: .7; }
-#top nav .grp { position: relative; }
-#top nav .menu { display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 170px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 4px; z-index: 45; }
-#top nav .grp.open .menu { display: flex; flex-direction: column; }
-#top nav .menu a { padding: 6px 10px; }
-#top nav .menu a.on { color: var(--ink); background: var(--sel); }
+#top nav .navgrp { position: relative; }
+#top nav .navmenu { display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 170px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 4px; z-index: 45; }
+#top nav .navgrp.open .navmenu { display: flex; flex-direction: column; }
+#top nav .navmenu a { padding: 6px 10px; }
+#top nav .navmenu a.on { color: var(--ink); background: var(--sel); }
 #top .sp { flex: 1; }
 #top #gsearch { font: inherit; font-size: 13px; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 4px 8px 4px 10px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
 #top #gsearch:hover { color: var(--ink); border-color: var(--muted); }

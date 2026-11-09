@@ -33,8 +33,8 @@ function navHTML() {
   return NAV.map(([n, u, tip]) => {
     if (typeof u === 'string') return `<a href="${u}" class="${on(u) ? 'on' : ''}"${tip ? ` title="${tip}"` : ''}>${n}</a>`;
     const cur = u.find(([, x]) => on(x));
-    return `<span class="grp${cur ? ' on' : ''}"><button type="button" aria-haspopup="true">${cur && cur[0] !== n ? `${n} · ${cur[0]}` : n} <span class="caret">▾</span></button>
-      <span class="menu">${u.map(([m, x]) => `<a href="${x}" class="${on(x) ? 'on' : ''}">${m}</a>`).join('')}</span></span>`;
+    return `<span class="navgrp${cur ? ' on' : ''}"><button type="button" aria-haspopup="true">${cur && cur[0] !== n ? `${n} · ${cur[0]}` : n} <span class="caret">▾</span></button>
+      <span class="navmenu">${u.map(([m, x]) => `<a href="${x}" class="${on(x) ? 'on' : ''}">${m}</a>`).join('')}</span></span>`;
   }).join('');
 }
 // Fills <header id="top">; `tools` is HTML for the right-hand side.
@@ -45,13 +45,13 @@ function studioHeader(tools = '') {
   h.innerHTML = `<a class="brand" href="/atlas" title="Browse: the way in">Boktai 3 Studio</a><nav>${navHTML()}</nav><span class="sp"></span>${tools}
     <button type="button" id="gsearch" title="Search everything (⌘K or /)">Search <span class="kbd">⌘K</span></button>`;
   h.querySelector('nav').addEventListener('click', e => {
-    const b = e.target.closest('.grp > button');
+    const b = e.target.closest('.navgrp > button');
     if (b) { const g = b.parentElement, was = g.classList.contains('open'); closeMenus(); g.classList.toggle('open', !was); e.stopPropagation(); }
   });
   $('gsearch').onclick = () => searchOpen();
 }
-function closeMenus() { document.querySelectorAll('#top .grp.open').forEach(g => g.classList.remove('open')); }
-document.addEventListener('click', e => { if (!e.target.closest('#top .grp')) closeMenus(); });
+function closeMenus() { document.querySelectorAll('#top .navgrp.open').forEach(g => g.classList.remove('open')); }
+document.addEventListener('click', e => { if (!e.target.closest('#top .navgrp')) closeMenus(); });
 // pages that switch views by hash (gfx.html) call this after each switch
 function markNav() { const n = document.querySelector('#top nav'); if (n) n.innerHTML = navHTML(); }
 window.addEventListener('hashchange', () => { if (location.pathname === '/gfx') markNav(); });

@@ -133,7 +133,7 @@ def clean(t):
 
 def english_names():
     import serve
-    jp, en = serve.display_strings(os.path.join(os.path.dirname(ROOT), "boktai3trans"))
+    jp, en = serve.display_strings(serve.default_trans())  # ../boktai3trans, also from a worktree
     return jp, {k: nice(v) for k, v in en.items()}
 
 

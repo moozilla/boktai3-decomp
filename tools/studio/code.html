@@ -379,7 +379,7 @@ async function functionPage(q) {
   const chips = (list, empty) => list.length ? `<div class="refs">${list.map(r => `<a class="chip mono${FN[r.addr]?.kinds.length ? ' warn' : ''}" href="${fnHref(r.addr)}">${esc(r.name)}</a>`).join('')}</div>` : `<div class="empty">${empty}</div>`;
   const marks = d.c ? Object.fromEntries(Object.entries(d.c.marks).map(([k, v]) => [+k, v])) : {};
   const cPane = d.c ? pane('C', `<span class="mono">${esc(d.c.file)}:${d.c.line ?? ''}</span>${Object.keys(marks).length ? '<span class="sp"></span><span><span class="legend"><span class="sw"></span>concession</span></span>' : ''}`,
-    linesOf(cTokens(d.c.text, d.name)), 1, marks) : `<div class="pane"><div class="ph"><b>C</b></div><div class="src empty" style="padding:12px">The C for this function wasn't found in its unit${f?.file ? ' (' + esc(f.file) + ')' : ''}.</div></div>`;
+    linesOf(cTokens(d.c.text, d.name)), d.c.line || 1, marks) : `<div class="pane"><div class="ph"><b>C</b></div><div class="src empty" style="padding:12px">The C for this function wasn't found in its unit${f?.file ? ' (' + esc(f.file) + ')' : ''}.</div></div>`;
   const asmPane = d.asm ? pane('Disassembly', `<span>${esc(d.mode)} · ${d.size} bytes · gen/code.s</span>`, linesOf(asmTokens(d.asm)))
     : '<div class="pane"><div class="ph"><b>Disassembly</b></div><div class="src empty" style="padding:12px">Not available: run <code>make disasm</code> to generate gen/code.s.</div></div>';
   const game = d.game.length ? `<h3>In the game <span class="n">objects and script routines whose code includes it</span></h3><div class="refs">${d.game.map(g =>
