@@ -1067,7 +1067,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         print("  To keep a tail apart: end it in `return` (it shares only its r0 set with the last return, then"
               " jumps to a new label with no jump chain), or let its call fall into a label, as an if/else"
               " chain's last branch before shared code does: flow puts a (use 0) nop after that call, which no"
-              " jumping tail matches. To share one, let it jump to that label (README fact 39)")
+              " jumping tail matches. When two arms of an inner if/else merge, put a `return` right after that"
+              " if/else (inside the enclosing branch): the else arm's call then falls into the return's label"
+              " (ScenePool_SelectRepeatOrExit). To share one, let it jump to that label (README fact 39)")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -3609,6 +3611,12 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
     print("      a tail that several branches jump to may be one the C writes in each branch (an inline"
           " helper: fact 55 keeps its field addresses apart); jump2 merges the copies after reload, and"
           " each copy's reload choices still count (README fact 59)")
+    rnd = [n for n in cl if 0 < n <= len(text) and re.search(r"gRandomTable|gUnk_0203B400", text[n - 1])]
+    if rnd:
+        print(f"      the random table is read here (line {', '.join(map(str, rnd))}): reading it through"
+              " RANDOM_TABLE_ADDR (`*(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1))`, or"
+              " SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py) changes the reloads around the"
+              " table address (ScenePool_UpdateSpeedPulse, _ScheduleSpeedControl)")
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
@@ -4287,7 +4295,10 @@ def cmd_probe(src, func, env):
            "AGBCC_NOPRE": "gcse found this computation redundant and reused the reaching register (computed"
                           " where it says). The ROM recomputed it: make the occurrences different expressions"
                           " to gcse (another base pointer; an offset Thumb encodes inline vs one loaded from"
-                          " the pool, fact 2) or read the value from a variable set once. `pre` lists every"
+                          " the pool, fact 2; a load in another mode, as a u32 copy's zero_extend; type,"
+                          " alias set and volatile-free MEM flags don't count, since expr_equiv_p compares"
+                          " only code, mode and operands) or read the value from a variable set once. `pre`"
+                          " lists every"
                           " PRE decision with its C lines and score.",
            "AGBCC_NOGIV": "loop.c turned this per-iteration computation into its own register stepped"
                           " each pass (strength reduction; often a post-increment address). First check"
@@ -4552,7 +4563,10 @@ def why_all_details(src, func, env, rng=None):
                   " agbcc has no C construct that emits it. Not a register or order problem: no knob applies.")
         else:
             print("  Find the C that produces them (a missing statement, a different expression shape); a"
-                  " draft-only row that is alignment padding follows from the size change.")
+                  " draft-only row that is alignment padding follows from the size change. A load or"
+                  " computation the draft lacks is often one cse or gcse removed as redundant (PRE, a"
+                  " followed jump): probe flips each such decision:")
+            cmd_probe(src, func, env)
         return 1
     print(f"{func}: {count_text(rows)} differ; per hunk: moved insns, then why on the first insn left\n")
     wd = info["wd"]

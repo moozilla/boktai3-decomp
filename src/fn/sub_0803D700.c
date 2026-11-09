@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 static inline void ScenePool_ClearHistory(u32 bytes, u32 *ptr)
 {
@@ -16,20 +15,19 @@ s32 ScenePool_SelectRepeatOrExit(void *owner, struct ScenePoolEntry *entry)
                 entry->stateFrame = mode;
                 entry->stateEntered = 1;
                 ScenePool_ClearHistory(sizeof(entry->history), history);
-                asm volatile("");
             } else {
                 entry->state = 9;
                 entry->stateFrame = mode;
                 entry->stateEntered = 1;
                 ScenePool_ClearHistory(sizeof(entry->history), history);
             }
-        } else {
-            entry->state = 4;
-            entry->stateFrame = 0;
-            entry->stateEntered = 1;
-            Memory_Clear(entry->history, 0x100);
-            entry->repetitions++;
+            return 1;
         }
+        entry->state = 4;
+        entry->stateFrame = 0;
+        entry->stateEntered = 1;
+        Memory_Clear(entry->history, 0x100);
+        entry->repetitions++;
         return 1;
     }
     return 0;

@@ -1598,6 +1598,54 @@ Each was read from the compiler source and confirmed on a live draft.
    `*current = value;` mentions also raised current's refs (7 -> 8, priority 7368 -> 12631) above
    diff. When `why` says a global pseudo conflicts with r0/r1 that only block-local pseudos hold,
    try this.
+79. **Plan the returns to place each cross-jump: jump2 tries other jumps last first, and a label
+   lowers the minimum.** For a jump, find_cross_jump first tries the code that falls into its
+   label (one shared insn is enough), then every other jump to that label, starting with the last
+   one in insn order (jump_chain is built by prepending). Two shared insns are needed; `use` insns
+   don't count. A label in the jumping tail ends the compare and lowers the minimum by one, so a
+   call that falls into a `return 1` label (the else arm of an if/else followed by one return)
+   keeps its call (flow's nop) and gives only its `r0 = 1` to a later return. In
+   ScenePool_SelectDirectionOrRepeat the four states are written in full: both forward copies and
+   the direction-2 state end in `return 1`, so both forward tails merge into the last one (the
+   direction-2 copy) at its stateEntered store, while the random branch's if/else + return keeps
+   state 4's call. ScenePool_SelectRepeatOrExit used the same return-after-inner-if/else. Both
+   replaced a barrier and an r0 pin.
+
+80. **A multi-set variable whose first set (in insn order) is a constant gets its live length
+   doubled, even though the equivalence is dropped at the next set.** cse puts a REG_EQUAL note on
+   every constant set. update_equiv_regs (local-alloc.c) accepts the first one it meets (no
+   replacement recorded yet), turns the note into REG_EQUIV and does `REG_LIVE_LENGTH *= 2`. The
+   next set with another constant calls no_equiv, which deletes the REG_EQUIV note but leaves the
+   length doubled. In the lreg dump the first set shows no note at all and
+   `Register N used R times across 2L insns` has twice flow's length. A `switch` that sets a
+   count to 1/2/3 before a `for (; count != 0; count--)` is the common shape (jump puts the
+   default arm first). Copying into a loop counter (`i = count; for (; i != 0; i--)`) makes the
+   counter's first set a register copy, so no_equiv runs first and nothing is doubled.
+   AGBCC_NOEQUIV=PSEUDO confirms it. Matched Mummy_FireAcceleratingVolley (a count pin).
+
+81. **A copy that repeats a value already in the other register survives only after a label, and
+   cross-jumping can supply one.** jump2 starts with delete_noop_moves, which deletes `r0 = r4`
+   when find_equiv_reg finds an earlier `r4 = r0` with neither register changed in between.
+   find_equiv_reg stops at a CODE_LABEL, so the ROM's `bl Div; adds r4, r0, #0; adds r0, r4, #0`
+   (a call result, then `absolute = speed`) has a label between the two moves. Calling the
+   function in both arms (`if (ax > az) speed = Div(x, d); else speed = Div(z, d);`) gives the
+   label: delete_noop_moves runs before cross-jumping merges the two calls, so the join label is
+   still there and the copy stays. This replaced an `asm("" : "+r")` barrier.
+
+82. **Global-alloc priority ties go to the lower pseudo number, so declare the variable early and
+   assign it in the loop.** allocno_compare returns `v1 - v2` when the priorities are equal. A
+   pointer declared inside a loop body (`T *p = &local;`, hoisted by loop.c) is numbered after
+   every function-scope variable and loses a tie to one of them. Declaring it with the other
+   locals and assigning it at the top of the loop body keeps the hoist (and its order: the first
+   movable is hoisted first) and gives it the lower number.
+
+83. **An inlined `if (*flag) { *flag = 0; return 1; } return 0;` adds a join that keeps a struct
+   pointer computed at entry.** With a plain `if (a->f) a->f = 0;`, a group pointer
+   `&actor->group.common` used once later is folded into `actor + 0x418`. Written as the helper
+   (`if (Chase_TakeArrived(actor)) { DEBUG_PRINT(); }`, as the matched relatives do), the pointer
+   stays in a call-saved register from entry and the compare reads `[r6 + 0x44]`. That matched
+   Mummy_WaitReplaceResponse without its `asm("" : "+r"(group))` barrier.
+
 90. **In a two-value block, local-alloc goes by priority; a pointer variable set in each arm leaves
    the value alone in the block.** An arm `UpdateFn callback = F; p->update = callback;` at offset
    0x1A4 holds two local qtys: the callback (load, add, store: life 4, priority 5000) and the

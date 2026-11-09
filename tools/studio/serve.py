@@ -4,8 +4,9 @@ the game font, then build a modified ROM; browse sprites, palettes, the font and
 raw tiles from the resource archives (/gfx); and a live view of the game
 running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643); the
 script actor registry (/actors), script procedures (/scripts), how the rooms
-connect (/world, tools/assets/areas.py), any function's disassembly and C
-(/code), from tools/assets/actors.py, and every MP2K song, playable in the
+connect (/world, tools/assets/areas.py), the code explorer: every function's C
+and disassembly by category and unit, its concessions and cross-references
+(/code, tools/studio/codemap.py), and every MP2K song, playable in the
 browser (/sound, tools/studio/sound.py and mp2k.js).
 
   python3 tools/studio/serve.py [--port 8642] [--link-port 8643]    then open http://localhost:8642
@@ -27,6 +28,7 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -43,7 +45,7 @@ log = logging.getLogger("studio")
 # Held while the startup preload builds an index; requests that use one wait
 # for it instead of building the same index alongside.
 WARM = threading.Lock()
-SLOW = ("/api/atlas", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
+SLOW = ("/api/atlas", "/api/codemap", "/api/search/", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
         "/api/code/", "/api/learned", "/api/stages", "/api/areas")
 # polled by the live view several times a second; logged only when slow or failing
 POLLED = ("/api/live", "/api/live/player")
@@ -137,7 +139,8 @@ def preload():
     import gclview
     steps = [("atlas index", atlas.load), ("actors", actors.actors),
              ("script procedures", lambda: (actors.proc_list(), gclview.callee_names(), gclview.names())),
-             ("disassembly", actors.code), ("sprite palettes", learned), ("stage loads", stages)]
+             ("disassembly", actors.code), ("code explorer", codemap_warm), ("sprite palettes", learned),
+             ("stage loads", stages)]
     start = time.time()
     for name, fn in steps:
         t = time.time()
@@ -149,6 +152,13 @@ def preload():
                 continue
         log.info("preload: %s (%.1fs)", name, time.time() - t)
     log.info("preload: done in %.1fs", time.time() - start)
+
+
+def codemap_warm():
+    import codemap
+    codemap.load()
+    codemap._shared_helpers()
+    codemap.layouts()  # struct layouts measure in the background
 
 
 def size_text(n):
@@ -335,7 +345,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.timed("POST", self.post)
 
     def get(self):
-        if self.path in ("/", "/index.html"):
+        if self.path in ("/", "/index.html", "/text"):
             self.send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/strings":
             orig = self.server.original
@@ -405,6 +415,24 @@ class Handler(http.server.BaseHTTPRequestHandler):
             lines = gclfiles.render(fid, inline="inline" in opts, readable="raw" not in opts, english="en" in opts)
             self.send(200 if lines is not None else 404,
                       {"lines": lines, "inlined": sorted(gclfiles.inlinable(fid))} if lines is not None else {"error": "no such file"})
+        elif self.path.startswith("/api/search/"):
+            import search  # the ⌘K palette on every page (common.js)
+            q = urllib.parse.unquote(self.path[len("/api/search/"):])
+            self.send(200, search.search(q, self.server.strings(), self.server.display_en))
+        elif self.path == "/api/codemap/stats":
+            import codemap  # the home page's numbers, without the tree
+            sm = codemap.summary()
+            self.send(200, {k: sm[k] for k in ("measures", "concession_kinds", "missing", "updating")} |
+                      {"ram": len(sm["ram"]), "functions_with_concessions": sum(
+                          1 for c in sm["categories"] for u in c["units"] for f in u["functions"] if f[4])})
+        elif self.path == "/api/codemap":
+            import codemap
+            self.send(200, codemap.summary())
+        elif self.path.startswith(("/api/codemap/fn/", "/api/codemap/ram/", "/api/codemap/type/")):
+            import codemap  # /api/codemap/fn/NAME|ADDR, /api/codemap/ram/NAME|ADDR, /api/codemap/type/NAME
+            what, arg = self.path.split("/")[3:5]
+            d = {"fn": codemap.function, "ram": codemap.ram_object, "type": codemap.type_info}[what](urllib.parse.unquote(arg))
+            self.send(200 if d else 404, d or {"error": "not found"})
         elif self.path.startswith("/api/code/"):
             try:
                 d = actors.code_info(int(os.path.basename(self.path), 16))
@@ -529,11 +557,25 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(404, {"error": "not found"})
 
 
+def default_trans():
+    """../boktai3trans beside the checkout, or beside the main checkout when this is a worktree."""
+    here = os.path.join(os.path.dirname(ROOT), "boktai3trans")
+    if os.path.isdir(here):
+        return here
+    try:
+        common = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=ROOT,
+                                capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return here
+    main = os.path.join(os.path.dirname(os.path.dirname(common)), "boktai3trans")
+    return main if os.path.isdir(main) else here
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8642)
     ap.add_argument("--link-port", type=int, default=8643, help="port Centaur connects to (its CENTAUR_LINK_PORT)")
-    ap.add_argument("--trans", default=os.path.join(os.path.dirname(ROOT), "boktai3trans"))
+    ap.add_argument("--trans", default=default_trans())
     ap.add_argument("--no-preload", action="store_true", help="build each index on first use instead of at startup")
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
@@ -543,6 +585,7 @@ def main():
     srv.live = live.Live(a.link_port)
     srv.trans = a.trans
     srv.display_jp, srv.display_en = display_strings(a.trans)
+    srv.strings = read_strings
     log.info("studio: http://localhost:%d (Centaur link on port %d)", a.port, a.link_port)
     if not a.no_preload:
         threading.Thread(target=preload, daemon=True).start()
