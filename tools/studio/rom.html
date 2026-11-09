@@ -143,17 +143,34 @@ $('cv').onclick = e => {
   // function opens (code in the side panel, game things in Browse)
   const chain = under(e); if (!chain.length) return;
   const group = chain.find(p => p[0].c);
-  if (group) { focus.push(group[0]); draw(); return; }
+  if (group) { focus.push(group[0]); go(); return; }
   const h = hrefOf(chain[chain.length - 1][0].r);
   if (h) h.startsWith('/atlas') ? (location.href = h) : peek(h);
 };
-$('crumbs').onclick = e => { const a = e.target.closest('a[data-i]'); if (a) { focus = focus.slice(0, +a.dataset.i); draw(); } };
-document.addEventListener('keydown', e => { if ((e.key === 'Backspace' || e.key === 'Escape') && !$('peek')?.classList.contains('on') && focus.length) { focus.pop(); draw(); } });
-const setMode = m => { mode = m; try { localStorage.setItem('rom.mode', m); } catch (e) {} $('mkind').classList.toggle('on', m === 'kind'); $('mlevel').classList.toggle('on', m === 'level'); if (T) draw(); };
+$('crumbs').onclick = e => { const a = e.target.closest('a[data-i]'); if (a) { focus = focus.slice(0, +a.dataset.i); go(); } };
+document.addEventListener('keydown', e => { if ((e.key === 'Backspace' || e.key === 'Escape') && !$('peek')?.classList.contains('on') && focus.length) { focus.pop(); go(); } });
+const setMode = (m, fromUrl) => { mode = m; try { localStorage.setItem('rom.mode', m); } catch (e) {} $('mkind').classList.toggle('on', m === 'kind'); $('mlevel').classList.toggle('on', m === 'level'); if (T && !fromUrl) { history.replaceState(null, '', hashOf()); draw(); } };
 $('mkind').onclick = () => setMode('kind'); $('mlevel').onclick = () => setMode('level');
 addEventListener('resize', () => T && draw());
+// the URL holds the mode and the block in view (#level/Code/Monsters), so a
+// view can be linked to; draw() keeps it current
+const hashOf = () => '#' + [mode, ...focus.map(f => encodeURIComponent(f.t))].join('/');
+function fromHash() {
+  const [m, ...path] = location.hash.slice(1).split('/');
+  if (m === 'kind' || m === 'level') setMode(m, true);
+  focus = [];
+  let n = T;
+  for (const t of path.map(decodeURIComponent)) {
+    n = (n.c || n.children || []).find(c => c.t === t && c.c);
+    if (!n) break;
+    focus.push(n);
+  }
+}
+// a step into or out of a block is a history entry (Back goes back out)
+function go() { if (location.hash !== hashOf()) history.pushState(null, '', hashOf()); draw(); }
+addEventListener('hashchange', () => { if (T && location.hash !== hashOf()) { fromHash(); draw(); } });
 setMode(mode);
-(async () => { T = await fetch('/api/romtree').then(r => r.json()); $('loading').remove(); draw(); })();
+(async () => { T = await fetch('/api/romtree').then(r => r.json()); $('loading').remove(); fromHash(); history.replaceState(null, '', hashOf()); draw(); })();
 </script>
 </body>
 </html>

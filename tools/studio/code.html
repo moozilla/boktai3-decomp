@@ -293,7 +293,7 @@ function overview() {
     <p class="lede">${drafts ? `${num(nfn - drafts)} of the ${num(nfn)} functions in the ROM compile from C to the original bytes; the other
       ${drafts} are <a href="#left:draft">drafts</a> still built from their assembly.` : `All ${num(nfn)} functions in the ROM compile from C to the original bytes.`} ${fmtPct(m.complete_code_percent)} of the code is also
       ordinary C with no matching concession; the rest still steers the compiler with a register pin, an empty <code>asm("")</code> or one of the other
-      kinds below, and removing those is the current work. Pick a category, a unit or a function, or search on the left.</p>
+      kinds below, and removing those is the current work. Pick a category, a unit or a function, or search on the left; the <a href="/rom#level/Code">ROM map</a> shows all of it as a treemap.</p>
     ${(S.missing || []).map(x => `<div class="notice">Not available here: ${esc(x)}.</div>`).join('')}
     ${S.updating ? '<div class="notice">The sources changed: a new index is building (about half a minute); this page updates when it is ready.</div>' : ''}
     <div class="tiles">
@@ -400,6 +400,8 @@ function strip(fns, sel) {
   return `<div class="strip">${fns.map(f => `<a href="${fnHref(f.addr)}" class="${f.state}${f.addr === sel ? ' sel' : ''}" style="flex:${f.size / total}" title="${esc(f.name)} · ${f.size} B · ${STATE_TITLE[f.state]}${f.kinds.length ? ': ' + f.kinds.map(kindLabel).join(', ') : ''}"></a>`).join('')}</div>
     <div class="legend">Each function as wide as its code: <span style="color:var(--ok)">■</span> no concessions <span style="color:var(--warn)">■</span> with concessions <span style="color:var(--warn-bg);text-shadow:0 0 1px var(--warn)">■</span> not matched yet${fns.some(f => f.state === 'asm') ? ' <span class="muted">■</span> assembly' : ''}</div>`;
 }
+// the unit's block in the ROM view (rom.html), whose code groups name library units "Library: X"
+const romHref = u => '/rom#level/Code/' + encodeURIComponent((['Libraries', 'Intentional assembly'].includes(u.cat) ? 'Library: ' : '') + u.name);
 function unitPage(key) {
   const u = UNIT[key];
   if (!u) return notFound(`No unit ${key}.`);
@@ -407,7 +409,7 @@ function unitPage(key) {
   return `<div class="page">${crumbs(`<a href="${catHref(u.cat)}">${esc(u.cat)}</a>`)}
     <h1 class="t">${esc(u.name)}</h1>
     <div class="badges"><span class="badge">${fns.length} functions</span><span class="badge">${kb(u.size)}</span><span class="badge mono">${fns[0].addr}–${(parseInt(fns.at(-1).addr, 16) + fns.at(-1).size).toString(16).toUpperCase().padStart(8, '0')}</span>
-      ${groupBadges(u)}</div>
+      ${groupBadges(u)}<a class="badge" href="${romHref(u)}" title="this unit in the ROM treemap, colored by how well each function is understood">ROM map ↗</a></div>
     ${strip(fns)}
     <h3>Functions <span class="n">in ROM order</span></h3>
     <table class="t"><tr><th>Function</th><th>Address</th><th class="r">Bytes</th><th>Status</th><th title="the merge that last made it concession-free (or made it match), from the committed PROGRESS.json">Since</th><th>Source</th></tr>
