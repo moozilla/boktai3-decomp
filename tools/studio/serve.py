@@ -139,7 +139,7 @@ def preload():
     import gclview
     steps = [("atlas index", atlas.load), ("actors", actors.actors),
              ("script procedures", lambda: (actors.proc_list(), gclview.callee_names(), gclview.names())),
-             ("disassembly", actors.code), ("code explorer", codemap_warm), ("sprite palettes", learned),
+             ("disassembly", actors.code), ("code explorer", codemap_warm), ("ROM map", atlas.rom_tree), ("sprite palettes", learned),
              ("stage loads", stages)]
     start = time.time()
     for name, fn in steps:

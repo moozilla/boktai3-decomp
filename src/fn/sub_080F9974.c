@@ -16,6 +16,10 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
+static inline void OrStatus(u16 status, u16 *flags)
+{
+    *flags |= status;
+}
 // confidence=low: spins the auxiliary axe after damage and releases it after 30 frames.
 void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
 {
@@ -71,11 +75,7 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
     }
     if (*(u16 *)(context + 0xED4)) {
         --*(u16 *)(context + 0xED4);
-        {
-            u32 mask = 32;
-            asm("" : "+r"(mask));
-            actor->flags2D6 = mask | actor->flags2D6;
-        }
+        OrStatus(0x20, &actor->flags2D6);
     }
     if (context[0xA3C]) {
         u32 previous = context[0xA34];
