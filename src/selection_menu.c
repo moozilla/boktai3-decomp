@@ -600,7 +600,6 @@ void SelectionMenu_AdvanceChoice(struct SelectionMenu *p)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 void SelectionMenu_DrawStatistics(struct SelectionMenu *p)
 {
     s16 k2 = 10;
@@ -791,10 +790,8 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
     return index;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void SelectionMenu_Choose(struct SelectionMenu *p)
 {
-    u16 *cursorY;
     int index;
     switch (p->choiceCount) {
 
@@ -810,19 +807,8 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
             } else {
                 index = SelectionMenu_NavigateGrid(p);
                 if (index != p->selectedSlot) {
-                    {
-                        register int x asm("r0") = (index & 3) * 24 + 144;
-                        /* Retain the existing pinned byte-offset calculation: typed
-                         * coordinate stores coalesce the two address additions. */
-                        register int offset asm("r3");
-                        offset = 0x1b4;
-
-                        *(u16 *)((u8 *)p + offset) = x;
-                        x = (index >> 2) * 24 + 32;
-                        offset += 2;
-                        cursorY = (u16 *)((u8 *)p + offset);
-                        *cursorY = x;
-                    }
+                    p->cursors[0].position.x = (index & 3) * 24 + 144;
+                    p->cursors[0].position.y = (index >> 2) * 24 + 32;
                     p->selectedSlot = index;
                     Sound_PlaySong(0xdc);
                     Presentation_UpdateActorGraphic(p, 0);
@@ -852,28 +838,14 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
                 }
             } else {
                 index = SelectionMenu_NavigateGrid(p);
-                {
-                    register int old asm("r3") = p->selectedSlot;
-                    asm("" : "+r"(old));
-                    if (index != old) {
-                        {
-                            register int x asm("r0") = (index & 3) * 24 + 144;
-                            /* Retain the existing pinned byte-offset calculation: typed
-                         * coordinate stores coalesce the two address additions. */
-                            register int offset asm("r3");
-                            offset = 0x1b4;
-
-                            *(u16 *)((u8 *)p + offset) = x;
-                            x = (index >> 2) * 24 + 32;
-                            offset += 2;
-                            cursorY = (u16 *)((u8 *)p + offset);
-                            *cursorY = x;
-                        }
-                        p->selectedSlot = index;
-                        Sound_PlaySong(0xdc);
-                        Presentation_UpdateItemGraphic(p, 0);
-                    }
+                if (index != p->selectedSlot) {
+                    p->cursors[0].position.x = (index & 3) * 24 + 144;
+                    p->cursors[0].position.y = (index >> 2) * 24 + 32;
+                    p->selectedSlot = index;
+                    Sound_PlaySong(0xdc);
+                    Presentation_UpdateItemGraphic(p, 0);
                 }
+
                 if (gPadState[1] & 1) {
                     if (Inventory_GetConsumableId(p->selectedSlot) >= 0) {
                         int selected = p->selectedSlot;
@@ -1073,7 +1045,6 @@ u32 SelectionMenu_Destroy(struct SelectionMenu *p)
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 int SelectionMenu_Initialize(struct SelectionMenu *p, void *a, void *b)
 {
     struct SceneInputResource *resource = ScriptProc_Start(0xcb05, 0x530d);
