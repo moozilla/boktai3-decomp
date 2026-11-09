@@ -590,7 +590,9 @@ views.maps = {
     const own = m.tiles !== 0;
     const tsList = Object.keys(ptn.sets).sort();
     const savedTs = localStore('mapts.' + mh);
-    v.innerHTML = `<h2>Map ${mh}${st ? ` · stage` : ''}${it?.group && st ? ` · ${esc(it.group)}${it.place ? ' (' + esc(it.place) + ')' : ''}` : ''}</h2>
+    // a stage reads as World names its place (Place · detail), then the map
+    const placed = st && it.group && it.group !== 'Stages no scene loads';
+    v.innerHTML = `<h2>${placed ? `${esc([it.group, it.place].filter(Boolean).join(' · '))} · stage map ${mh}` : `Map ${mh}${st ? ' · stage' : ''}`}</h2>
       <div class="meta">${m.count} layer${m.count > 1 ? 's' : ''} · ${m.nmeta} metatiles · ${own ? m.ntiles + ' own tiles' : 'tiles from ptn tileset (' + m.ntiles + ' used)'}${st ? ` · loaded by script procs ${st.procs.join(', ')} with HP data ${st.hp}` : ''}</div>
       <div class="controls">
         ${m.count > 1 ? 'Layer <select id="lay"><option value="-1">all, layer 0 in front</option>' + m.ents.map((e, i) => `<option value="${i}">${i}: ${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
