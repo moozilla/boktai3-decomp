@@ -1,8 +1,8 @@
+// MATCHING_CONCESSION: register-pinning
 #include "homing_effect.h"
 #include "display_sequence.h"
 /* EffectManager_ClearGlobal: sets the global EffectManager pointer to 0; matches an existing vetted proposal and the body's single store */
 #define EffectManager_ClearGlobal sub_0800A800
-// MATCHING_CONCESSION: register-pinning
 
 #define EffectManager_ClearGlobal sub_0800A800
 void EffectManager_ClearGlobal(void)
@@ -214,22 +214,15 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
     for (i = 0; i < 6; i++) {
         struct Effect *effect = &manager->effects[i];
         effect->active = 0;
-        {
-            register s32 next asm("r7") = i + 1;
-        }
-        sprite = &effect->particles[0].sprite;
-        for (j = 3; j >= 0;
-             sprite = (struct EffectSprite *)((u8 *)sprite + sizeof(struct EffectParticle)), j--) {
+        for (j = 0; j < 4; j++) {
+            sprite = &effect->particles[j].sprite;
             Effect_Initialize(sprite, manager->graphics, 1);
             Effect_SetPalette(sprite, 1);
         }
     }
     manager->counter = 0;
     {
-        struct Player *actor = ({
-            struct Player *a = gPlayers[0];
-            a;
-        });
+        struct Player *actor = gPlayers[0];
         manager->actor = actor;
         if (!actor)
             return -1;
