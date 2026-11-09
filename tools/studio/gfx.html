@@ -742,14 +742,18 @@ views.dungeon = {
   async init() {
     await loadPtn(); await loadStageMeta();
     areasData ||= await fetch('/api/areas').then(r => r.json());
-    items = areasData.areas.filter(a => a.scenes.length > 1).map(a => ({ key: String(a.area), note: a.label || `scenes ${a.scenes[0]}–${a.scenes[a.scenes.length - 1]}`, n: a.scenes.length + ' rooms' }));
+    // grouped by place in story order, as on the World page
+    const rank = Object.fromEntries(areasData.places.map((p, i) => [p.name, i]));
+    items = areasData.areas.filter(a => a.scenes.length > 1)
+      .map(a => ({ key: String(a.area), group: a.place || 'Unlabeled areas', note: a.place ? a.detail || a.place : `scenes ${a.scenes[0]}–${a.scenes[a.scenes.length - 1]}`, n: a.scenes.length + ' rooms' }))
+      .sort((x, y) => (rank[x.group] ?? 1e6) - (rank[y.group] ?? 1e6) || x.key - y.key);
   },
   async show(key) {
     const a = areasData.areas.find(x => String(x.area) === String(key)), v = $('view');
     if (!a) { v.textContent = 'No such area.'; return; }
     const byScene = Object.fromEntries(stageMeta.map(s => [s.scene, s]));
     const rooms = a.scenes.map(n => byScene[n]).filter(s => s && s.stage);
-    v.innerHTML = `<h2>Area ${a.area}${a.label ? ' · ' + esc(a.label) : ''}</h2><div class="meta">${rooms.length} rooms with a stage · placed by their doors (a door in one room lines up with the entrance it leads to in the next) · <a href="/world#${a.area}">World page</a></div>
+    v.innerHTML = `<h2>Area ${a.area}${a.label ? ' · ' + esc(a.label) : ''}</h2><div class="meta">${rooms.length} rooms with a stage · placed by their doors (a door in one room lines up with the entrance it leads to in the next) · <a href="/world#area=${a.area}">World page</a></div>
       <div class="controls">Zoom <select id="dz"><option>0.25</option><option selected>0.5</option><option>1</option></select> <label><input type="checkbox" id="dlab" checked> room labels</label> <span id="dstat" class="meta">rendering…</span></div>
       <div id="dbox" style="position:relative;overflow:auto;max-height:calc(100vh - 190px);border:1px solid var(--line);border-radius:8px;background:#111"></div>`;
     const hps = {}, canv = {};
