@@ -1,5 +1,4 @@
 #include "player.h"
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_actor.h"
 extern const s16 gUnk_086149C4[];
@@ -30,6 +29,17 @@ static inline void SetChargeParameter(struct Player *p)
     u16 *target = &p->actionEighteenParameter;
     u32 value = 0x16E;
     *target = value;
+}
+static inline void FireCharge(struct Player *p)
+{
+    if (Player_SpawnSelectedAttackProjectile(p))
+        Sound_PlaySong(0x1F6);
+    Player_SetActionPhase(p, 5);
+}
+static inline void FaceCharge(struct Player *p)
+{
+    Player_UpdateAttackFacing(p);
+    ANIMATE(0x27);
 }
 void Player_ReleaseActionEffectOnExit(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
@@ -103,58 +113,53 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
             if (++p->tetherFrame == 6)
                 Sound_PlaySong(0x1F4);
             if (!HELD)
-                goto fire;
-            if (Task4E01_GetKind7Value(p->statModifierContext.attachedEntry) > 1) {
-                {
-                    u8 *chargeTier = &p->statModifierContext.chargeTier;
-                    *chargeTier = 1;
+                FireCharge(p);
+            else {
+                if (Task4E01_GetKind7Value(p->statModifierContext.attachedEntry) > 1) {
+                    {
+                        u8 *chargeTier = &p->statModifierContext.chargeTier;
+                        *chargeTier = 1;
+                    }
+                    p->contactMagnitude = 30;
+                    SetChargeParameter(p);
+                    p->actionEighteenDuration = 36;
+                    Player_SetActionPhase(p, 3);
                 }
-                p->contactMagnitude = 30;
-                SetChargeParameter(p);
-                p->actionEighteenDuration = 36;
-                Player_SetActionPhase(p, 3);
+                FaceCharge(p);
             }
-            goto face;
-        case 3: {
-            register u32 inputOffset asm("r2") = (u32) & ((struct Player *)0)->inputKeys;
-            register const u16 **input asm("r0");
-            asm("" : "+r"(inputOffset));
-            input = (const u16 **)((u8 *)p + inputOffset);
-            if (!(**input & 2))
-                goto fire;
-            if (Task4E01_GetKind7Value(p->statModifierContext.attachedEntry) > 2) {
-                {
-                    u8 *chargeTier = &p->statModifierContext.chargeTier;
-                    *chargeTier = 1;
+            Player_UpdateAttachedEntryPosition(p);
+            break;
+        case 3:
+            if (!HELD)
+                FireCharge(p);
+            else {
+                if (Task4E01_GetKind7Value(p->statModifierContext.attachedEntry) > 2) {
+                    {
+                        u8 *chargeTier = &p->statModifierContext.chargeTier;
+                        *chargeTier = 1;
+                    }
+                    p->contactMagnitude = 30;
+                    SetChargeParameter(p);
+                    p->actionEighteenDuration = 36;
+                    Sound_PlaySong(0x1F5);
+                    Player_SetActionPhase(p, 4);
                 }
-                p->contactMagnitude = 30;
-                SetChargeParameter(p);
-                p->actionEighteenDuration = 36;
-                Sound_PlaySong(0x1F5);
-                Player_SetActionPhase(p, 4);
+                FaceCharge(p);
             }
-            goto face;
-        }
-        case 4: {
-            register u32 inputOffset asm("r2") = (u32) & ((struct Player *)0)->inputKeys;
-            register const u16 **input asm("r0");
-            asm("" : "+r"(inputOffset));
-            input = (const u16 **)((u8 *)p + inputOffset);
-            if (!(**input & 2)) {
-            fire:
+            Player_UpdateAttachedEntryPosition(p);
+            break;
+        case 4:
+            if (!HELD) {
                 if (Player_SpawnSelectedAttackProjectile(p))
                     Sound_PlaySong(0x1F6);
             release:
                 Player_SetActionPhase(p, 5);
             } else {
-            face:
-                Player_UpdateAttackFacing(p);
-                ANIMATE(0x27);
+                FaceCharge(p);
             }
         attached:
             Player_UpdateAttachedEntryPosition(p);
             break;
-        }
         case 5:
             ANIMATE(0x28);
             if (PRESSED)

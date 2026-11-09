@@ -743,3 +743,79 @@ reloads in the slot loop follow. Writing the actionMode/slot test as separate if
 `mode` local or pointer, `!= 0`, or a `u32 slot` local changes nothing, and neither does a
 ternary for override (worse). Next: find the ROM's hidden reload (a pseudo with a MEM REG_EQUIV
 replaced at its use, or a copy deleted after reload).
+
+### sub_0815E034 (PlayerContact_ComputeCost), 3 pins kept
+Draft: notes/phase3-drafts/monsters-bosses/PlayerContact_ComputeCost.c (the matched form with the
+pins removed: 24 ROM / 22 draft differ). The ROM has common (63) in r6, player in r7 and source in r8.
+The what-if `AGBCC_PRI=source:-1500` (source 2142 -> 642, below player's 689) fixes every
+difference except one: in the cueDefenses switch, the offset constant takes r0 where the ROM has
+r1. So source must be the lowest-priority long-lived pseudo, but its six visible uses
+(unknown3C, three Accumulate calls, two Anim calls, plus the dead-`ands` arm pair, fact 57) give
+it at least 8 refs over 126 insns. Things that changed nothing or made it worse:
+- per-case `player->cueDefenses[k]` (player then outranks common, so common lands in ip);
+- an inline helper for the two arm tails (its parameter copies are propagated away);
+- every input/source split over the seven uses (128 variants);
+- assigning source late.
+Next: look for a local pseudo that takes r8 before global alloc (pass 0 reuses registers already
+in use, README fact 13), so that source picks r8 without being last.
+
+### PlayerContact_ApplyResponse (sub_0815E1F0), 1 pin and 1 operand barrier kept
+Draft: notes/phase3-drafts/monsters-bosses/PlayerContact_ApplyResponse.c (13 ROM / 22 draft differ).
+In the 0x80000 contact branch the ROM computes `r3 = power + 60` and `gEngineFlags & 0x1000` and
+uses neither, then calls Player_RequestTimedReset(p, power + 60). The flags test is the fact-57
+pattern: an if whose two identical arms jump2 merged. The draft's two arms (each a call plus the
+positionResetCounter store) differ after reload only in the register the 0x4DA offset gets (r2
+vs r4, reload rotation), so cross-jumping merges just the store. The dead `duration` set in r3
+is still unexplained: every arm pairing of `duration` and `power + 60` scores worse. So does a
+DEBUG_PRINT body, which flow deletes together with the test.
+Next: find a duration use that survives flow and goes away after reload (a no-op move as in
+fact 81, or a REG_EQUIV substitution), then fix the rotation with `spill`.
+
+### TargetRegistry_FindById (sub_0815F5B4), 1 pin kept
+Draft: notes/phase3-drafts/monsters-bosses/TargetRegistry_FindById.c (5 ROM / 5 draft differ). With the r3 pin
+removed, requestedId (3 refs: the copy plus one compare weighted 2 in the loop, live 22, priority
+1363) sorts below the hoisted sceneActor mask (3846), so the two swap r3/r4. Giving each arm its
+own compare (refs 5, priority 4347) puts every register where the ROM has it. But jump2 then
+cross-jumps the wrong way: the collider arm's tail jumps into the actor arm's copy, while the
+ROM keeps the collider tail and sends the actor load back to it with `b`. That happens with
+if/else, with a goto to an actor label after `break`, and with an early collider block.
+Next: find the arm layout in which the actor tail is the one replaced (it would have to fall
+into, or come before, the label the collider tail jumps to), or another source of two id refs.
+
+### SpriteColliderGroup_ActivateParts (sub_0818E9B8), stride pin and r8 clobber kept
+Draft: notes/phase3-drafts/monsters-bosses/SpriteColliderGroup_ActivateParts.c. Without pins, every insn
+matches except the r8 save and restore: the ROM pushes r8 and never uses it. Some pseudo got r8
+in allocation and lost all its uses afterwards. An explicit `zero` byte for the action store is
+the nearest form so far: it takes r7, which pushes count to ip and the stride to r8. In the ROM,
+count is in r7, the stride in ip, and the store takes cse's jump-equivalence zero (the loaded
+`active` byte, r0). What is needed is a pseudo that sorts last (gets r8) and whose set and use
+disappear after reload (reload_cse, a no-op move, or a substituted equivalence). None of these
+help: u32 active, p->count instead of the count pointer, do/while, or indexing p->parts[i].
+
+### SpriteColliderGroup_ResetActiveParts (sub_0818EA3C), total pin kept
+Draft: notes/phase3-drafts/monsters-bosses/SpriteColliderGroup_ResetActiveParts.c (2 ROM / 2 draft: the first
+count load uses r6, the ROM r5). Without the pin, combine folds `total` (a zero_extend of p->count)
+into the compare as `(subreg:SI (mem:QI))`. Before reload, register_operand accepts a SUBREG of a
+MEM. Reload then loads it into its next spill register. The draft's spill set is {r0, r4, r6}, so
+after r4 (the 0x5C3 constant) it takes r6. The ROM's set also holds r5, so either total is a real
+pseudo there (sharing r5 with count, as the pin forces) or some ROM insn needed a reload while
+r0-r4 were busy. Things that changed nothing or scored worse:
+- the types s32, u32 and u8;
+- `total > i`, an assignment inside the condition, or a second use of total;
+- for/while loops with hoisted constants;
+- p->count read directly.
+Next: find what keeps combine from folding the load (a second live use of total that goes away
+later) or the ROM insn with four busy low registers.
+
+### sub_0819BB18 (Hresvelgr facing motion burst), 4 operand barriers kept
+Draft: notes/phase3-drafts/monsters-bosses/sub_0819BB18.c (`union RandomTableView` re-set in the loop, no
+barriers: 24 ROM / 23 draft differ). In the ROM the base 0x0203B000 stays in r7 for the whole loop.
+The first sample's `table + 512` is computed as `r7 + 0x400` and hoisted to the stack, not folded
+to 0x0203B400. The second and third samples recompute `r7 + 0x400` in the loop (one `adds`).
+- Union re-set in the loop: cse folds the first sample (same block as the set) to the literal.
+- Plain pointer set before the loop: cse2 folds the hoisted copy, and gcse reuses it for the
+  later samples (28/22).
+The ROM needs a table pseudo that cse never sees as constant in the first sample's block or in
+the preheader, and that gcse does not treat as redundant for the later samples.
+Next: a matchsearch store over where the table is set and what type it has (symbol vs integer
+address, the 512 offset applied at the call site or in the helper).
