@@ -1,6 +1,7 @@
 """One search over everything the Studio knows (the ⌘K palette on every page,
 tools/studio/common.js): the game index (tools/studio/atlas.py: monsters,
-characters, places, items, sprites, songs, scripts ...), code (functions, units,
+characters, places, items, sprites, songs, scripts ...), the World view's places
+(tools/studio/places.py), code (functions, units,
 struct types and RAM objects, tools/studio/codemap.py), named script procedures and the text
 bank. Each hit links to the page that shows it.
 
@@ -9,6 +10,7 @@ bank. Each hit links to the page that shows it.
 import os
 import re
 import sys
+import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -22,7 +24,7 @@ ATLAS_KIND = {"package": "sprite", "actor": "object", "monster": "monster", "cha
 # how a tie between equally good matches is broken: the things people look for first
 RANK = {"monster": 9, "character": 8, "object": 8, "item": 7, "area": 6, "story": 5, "scene": 5, "cutscene": 4,
         "sprite": 4, "function": 4, "song": 3, "script": 3, "procedure": 3, "tileset": 2, "map tiles": 2,
-        "RAM": 3, "unit": 3, "type": 3, "subsystem": 1, "text": 1}
+        "RAM": 3, "unit": 3, "type": 3, "subsystem": 1, "text": 1, "place": 6}
 
 
 def score(q, title, *others):
@@ -55,6 +57,21 @@ def _code():
         return codemap.summary()
     except Exception:
         return None
+
+
+_PLACES = {"key": None, "data": []}
+
+
+def _places():
+    """[{name, areas, scenes}] from the World view, rebuilt when the stage data changes."""
+    try:
+        import serve
+        key = os.path.getmtime(serve.STAGEMETA)
+        if _PLACES["key"] != key:
+            _PLACES.update(key=key, data=serve.world()["places"])
+        return _PLACES["data"]
+    except Exception:
+        return []
 
 
 def _procs():
@@ -103,6 +120,9 @@ def search(q, strings=None, english=None, limit=50):
             add(score(q, r["name"], r["addr"]), "RAM", r["name"], r["addr"], "/code#ram:" + r["name"])
         for t in code.get("types", []):
             add(score(q, t), "type", t, "struct", "/code#type:" + t)
+    for p in _places():
+        add(score(q, p["name"]), "place", p["name"], f"{len(p['areas'])} areas · {p['scenes']} scenes",
+            "/world#place=" + urllib.parse.quote(p["name"]))
     for pid, name in _procs().items():
         add(score(q, name, str(pid)), "procedure", name, f"proc {pid}", f"/scripts#{pid}")
     if strings and len(q) >= 2:

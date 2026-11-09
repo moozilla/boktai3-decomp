@@ -179,7 +179,8 @@ def stage_meta():
 
 def world():
     """Scenes grouped into areas by their doors (tools/assets/areas.py), with
-    which scenes the stage survey captured."""
+    which scenes the stage survey captured, and the areas grouped into places
+    (tools/studio/places.py)."""
     import areas
     import gclfiles
     w = areas.build(json.loads(stage_meta()))
@@ -190,6 +191,8 @@ def world():
         if i in w["scenes"]:
             w["scenes"][i]["shot"] = info["shot"]
             w["scenes"][i]["map"] = w["scenes"][i]["map"] or info["map"]
+    import places
+    w["places"] = places.assign(w)
     return w
 
 
