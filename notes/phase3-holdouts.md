@@ -222,6 +222,28 @@ instead of r1). It has no pin; it keeps `(void)*(volatile u8 *)&p->mode;`.
 * Next: find what makes r0 busy (or suggests r1) across the store in the original block, e.g. a
   value that lives from the `strh` past the store.
 
+### TextState_ProcessTag (0803232C, src/fn/sub_0803232C.c): one register copy left
+
+Draft: `notes/phase3-menus-link/TextState_ProcessTag.c` (3 ROM / 3 draft, from 21 / 14 once
+main's 3 pins and 3 barriers came out). It has no pins and no barriers.
+* What closed most of it: each arm has its own store, `Text_FindChar` and `goto done`
+  (or `goto findS`) instead of shared push/findAdvance/palette labels, and every close-path arm
+  has its own `p->palette = 0;`. jump2 then cross-jumps each tail into the code before a label.
+  do_cross_jump puts a new label there, and jumps to a new label are never searched in
+  jump_chain (`INSN_UID < max_uid`), so the ROM's `movs r0,#2; b L` pairs stay apart. Jumping to
+  an existing user label (`palette:`) let them merge, because of the jump-around rule that
+  lowers the minimum.
+* Left: the ROM copies `name` (r4) into r6 at 0x40C and uses r6 for the GARIGARIKUN (DDB8) and
+  FUTARI (DDC4) compares, then r4 again for PLAYER (DDCC). The draft uses r4 for all three.
+* Tried: `p->text` vs `name` for NONE, HATENA, DDB8, DDC4 and DDCC in all 32 combinations. With
+  `p->text` at DDB8, gcse PRE inserts its reaching register at the end of the NONE block (copy at
+  line 158, not 0x40C); `AGBCC_NOPRE=1` gives `adds r6, r5, #0x38` at 0x40C, the right place but
+  computed instead of copied. Also tried an alias local set before the hasValue checks, after
+  `name`, or in a scope before DDB8; an inline helper for the two tags; `name` assigned earlier.
+* Next: find what gives a fresh pseudo at 0x40C that is a copy of name, not a recomputation.
+  Reload's cse would copy r4 only within one block, so look for C that keeps 0x40C in name's
+  block, or for a PRE copy placed after name's set (pre_optimal there).
+
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
 tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
