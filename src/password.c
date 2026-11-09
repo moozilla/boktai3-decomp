@@ -1,7 +1,5 @@
 #include "password.h"
 
-// MATCHING_CONCESSION: register-pinning
-
 int Text_CopyWithoutTags(u8 *dst, u8 *src, int limit)
 {
     int tag = 0, count = 0;
@@ -76,35 +74,24 @@ s32 Password_EncodeSymbols(struct PasswordEntry *s)
 
 int sub_080115DC(struct PasswordEntry *e)
 {
-    int nameIndex;
-    u8 *nameByte;
-    for (nameIndex = 0, nameByte = e->name; nameIndex < 5; nameByte++, nameIndex++) {
-        if (*nameByte != 0) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        if (e->name[i] != 0) {
             int found = 0;
-            int tableIndex = 0;
-            int *scriptRef = &e->script;
-            register u8 *currentName asm("r5") = nameByte;
-            for (; tableIndex < 2; tableIndex++) {
-                u8 *glyphs =
-                    Text_LookupString(Script_ParseStringRef((void *)*scriptRef) + tableIndex);
-                u32 firstByte = glyphs[0];
-                goto checkGlyph;
-                while (1) {
-                    glyphs += 2;
-                    firstByte = glyphs[0];
-                checkGlyph:
-                    if (!firstByte)
-                        break;
-                    if (glyphs[1] == *currentName) {
+            int t;
+            for (t = 0; t < 2; t++) {
+                u8 *glyphs = Text_LookupString(Script_ParseStringRef((void *)e->script) + t);
+                for (; *glyphs; glyphs += 2) {
+                    if (glyphs[1] == e->name[i]) {
                         found = 1;
                         break;
                     }
                 }
             }
             if (found == 0) {
-                if (*nameByte != 0xFF)
+                if (e->name[i] != 0xFF)
                     return 1;
-                *nameByte = 0xF0;
+                e->name[i] = 0xF0;
             }
         }
     }
