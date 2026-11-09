@@ -79,141 +79,88 @@ s32 ChoiceMenu_FindSelectableRow(struct ChoiceMenu *p, s32 a, s32 d)
 
 void MessageWindow_Clear(void);
 
-// MATCHING_CONCESSION: register-pinning
 s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
 {
-    u32 rowStart;
     p->leftCursor.flags &= ~1;
     p->rightCursor.flags &= ~1;
     if (p->selected < 0) {
-        if (((*(struct ChoiceKeys *)gPadState).pressed & 240) ||
-            (!p->wakeDelay && ((*(struct ChoiceKeys *)gPadState).pressed & 3))) {
+        if (gPadState[1] & 0xF0 || (!p->wakeDelay && gPadState[1] & 3)) {
             ChoiceMenu_Select(p, p->initial);
             Sound_PlaySong(263);
         } else if (p->wakeDelay)
             p->wakeDelay--;
-    } else if (p->wakeDelay)
+        return 0;
+    }
+    if (p->wakeDelay) {
         p->wakeDelay--;
-    else {
-        struct ChoiceKeys *initialKeys = &(*(struct ChoiceKeys *)gPadState);
-        struct ChoiceKeys *keys;
-        u8 *repeat;
-        u32 pressed;
-        u32 sameDirection;
-        sameDirection = ({
-            u32 held = initialKeys->held;
-            u32 mask = p->held;
-            mask &= held;
-            mask;
-        });
-        keys = initialKeys;
-        if (sameDirection) {
-            u8 *ptr = &p->repeatDelay;
-            u32 delay = *ptr;
-            repeat = ptr;
-            if (delay) {
-                u32 value = delay - 1;
-                {
-                    u8 *destination = repeat;
-                    *destination = value;
-                }
-            }
+        return 0;
+    }
+    if (p->held & gPadState[0]) {
+        if (p->repeatDelay)
+            p->repeatDelay--;
+    } else
+        p->repeatDelay = 0;
+    p->held = gPadState[0] & 0xF0;
+    if (gPadState[1] & 2) {
+        if (p->allowCancel) {
+            Sound_PlaySong(222);
+            MessageWindow_Clear();
+            ChoiceMenu_DispatchSelection(p, -1);
+            p->leftCursor.flags |= 1;
+            p->rightCursor.flags |= 1;
+            Task_Kill(p);
+            return 1;
+        }
+    } else if (gPadState[1] & 1) {
+        Sound_PlaySong(221);
+        MessageWindow_Clear();
+        ChoiceMenu_DispatchSelection(p, p->selected);
+        p->leftCursor.flags |= 1;
+        p->rightCursor.flags |= 1;
+        Task_Kill(p);
+        return 1;
+    }
+    if (p->repeatDelay == 0) {
+        s32 current = p->selected;
+        struct Choice *choice = &p->choices[current];
+        s32 selection, limit, column, row;
+        if (gPadState[0] & 0x20) {
+            selection = current - 1;
+            limit = p->rowStart[choice->row];
+            if (selection < limit)
+                selection = limit;
+        } else if (gPadState[0] & 0x10) {
+            selection = current + 1;
+            limit = p->rowEnd[choice->row];
+            if (selection > limit)
+                selection = limit;
+        } else if (gPadState[0] & 0x40) {
+            column = current - p->rowStart[choice->row];
+            row = ChoiceMenu_FindSelectableRow(p, choice->row, -1);
+            if (choice->row == row)
+                selection = p->selected;
+            else
+                selection = p->rowStart[row] + column;
+            if (selection < p->rowStart[row])
+                selection = p->rowStart[row];
+            else if (selection > p->rowEnd[row])
+                selection = p->rowEnd[row];
+        } else if (!(gPadState[0] & 0x80)) {
+            return 0;
         } else {
-            p->repeatDelay = sameDirection;
-            repeat = &p->repeatDelay;
+            column = current - p->rowStart[choice->row];
+            row = ChoiceMenu_FindSelectableRow(p, choice->row, 1);
+            if (choice->row == row)
+                selection = p->selected;
+            else
+                selection = p->rowStart[row] + column;
+            if (selection < p->rowStart[row])
+                selection = p->rowStart[row];
+            else if (selection > p->rowEnd[row])
+                selection = p->rowEnd[row];
         }
-        p->held = keys->held & 240;
-        pressed = keys->pressed;
-        if (pressed & 2) {
-            if (p->allowCancel) {
-                Sound_PlaySong(222);
-                MessageWindow_Clear();
-                ChoiceMenu_DispatchSelection(p, -1);
-                p->leftCursor.flags |= 1;
-                p->rightCursor.flags |= 1;
-                Task_Kill(p);
-                return 1;
-            }
-        } else {
-            u32 one = 1;
-            if (({
-                    u32 bits = one;
-                    bits &= pressed;
-                    asm("" : : "r"(bits));
-                    bits;
-                })) {
-                Sound_PlaySong(221);
-                MessageWindow_Clear();
-                ChoiceMenu_DispatchSelection(p, p->selected);
-                p->leftCursor.flags |= one;
-                p->rightCursor.flags |= one;
-                Task_Kill(p);
-                return 1;
-            }
-        }
-        if (!({
-                u8 *ptr = repeat;
-                *ptr;
-            })) {
-            register s32 currentSelection asm("r2") = p->selected;
-            struct Choice *choice = &p->choices[currentSelection];
-            s32 selection, limit;
-            u32 held = keys->held;
-            if (held & 32) {
-                selection = currentSelection - 1;
-                limit = p->rowStart[choice->row];
-                if (selection >= limit)
-                    goto applySelection;
-                else
-                    goto clampSelection;
-            } else if (held & 16) {
-                selection = currentSelection + 1;
-                limit = p->rowEnd[choice->row];
-                if (selection > limit)
-                    goto clampSelection;
-            } else if (held & 64) {
-                s32 column = currentSelection - (rowStart = p->rowStart[choice->row]);
-                s32 row = ChoiceMenu_FindSelectableRow(p, choice->row, -1);
-                if (choice->row == row)
-                    selection = p->selected;
-                else
-                    selection = p->rowStart[row] + column;
-                limit = p->rowStart[row];
-                if (selection < limit)
-                    goto clampSelection;
-                limit = p->rowEnd[row];
-                if (selection > limit)
-                    goto clampSelection;
-            } else if (({
-                           u32 bits = 128;
-                           bits &= held;
-                           bits;
-                       })) {
-                register s32 column asm("r6") =
-                    currentSelection - (rowStart = p->rowStart[choice->row]);
-                s32 row = ChoiceMenu_FindSelectableRow(p, choice->row, 1);
-                if (choice->row == row)
-                    selection = p->selected;
-                else
-                    selection = p->rowStart[row] + column;
-                limit = p->rowStart[row];
-                if (selection < limit)
-                    goto clampSelection;
-                limit = p->rowEnd[row];
-                if (selection > limit)
-                    goto clampSelection;
-            } else
-                return 0;
-            goto applySelection;
-        clampSelection:
-            selection = limit;
-        applySelection:
-            ChoiceMenu_Select(p, selection);
-            {
-                u32 delay = 30;
-                *repeat = delay;
-            }
-        }
+        ChoiceMenu_Select(p, selection);
+        p->repeatDelay = 30;
     }
     return 0;
 }
