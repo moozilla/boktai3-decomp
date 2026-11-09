@@ -21,6 +21,7 @@ import collections
 import csv
 import json
 import os
+import pickle
 import re
 import subprocess
 import sys
@@ -176,6 +177,29 @@ def xrefs(funcs, names, ram_rows, data_layers):
     return out
 
 
+INTENTIONAL_ASM = "Intentional assembly"
+
+
+def _with_intentional_asm(tree, report):
+    """The compact tree leaves out the SDK's hand-written assembly (crt0, the
+    MP2K mixer, libgcc's division; tools/progress.py load_asm_ranges); the
+    full report keeps those units. Add them as their own category so every
+    function in the ROM has a place."""
+    have = {row[1] for c in tree["categories"] for u in c["units"] for row in u["functions"]}
+    units = []
+    for u in report.get("units", []):
+        if "intentional_asm" not in u.get("metadata", {}).get("progress_categories", []):
+            continue
+        rows = [[f["name"], f"{int(f['metadata']['virtual_address']):08X}", int(f["size"]),
+                 f.get("fuzzy_match_percent", 0), 0, -2] for f in u["functions"]]
+        rows = [r for r in rows if r[1] not in have]
+        if rows:
+            units.append({"name": u["name"].split("/", 1)[-1], "functions": sorted(rows, key=lambda r: r[1])})
+    if not units:
+        return tree
+    return dict(tree, categories=tree["categories"] + [{"name": INTENTIONAL_ASM, "units": units}])
+
+
 def build():
     import actors
     tree, report, kinds = _progress()
@@ -190,6 +214,7 @@ def build():
         data_by_name.update({r["name"]: r for r in rows})
     calls = {a: sorted({names[m.group(1)] for ln in f["lines"] if (m := _BL.match(ln)) and m.group(1) in names} - {a})
              for a, f in funcs.items()}
+    tree = _with_intentional_asm(tree, report)
     # functions in report order, with their place in the tree
     fns = {}
     for ci, c in enumerate(tree["categories"]):
@@ -198,7 +223,7 @@ def build():
                 name, addr, size, pct, pinned, file = row[:6]
                 fns[addr] = {"name": name, "addr": addr, "size": size, "pct": pct, "cat": ci, "unit": ui,
                              "file": f"src/fn/sub_{addr}.c" if file == -1 else None if file == -2 else tree["files"][file],
-                             "defined": row[6] if len(row) > 6 else None, "kinds": kinds.get(name, []) if pinned else []}
+                             "defined": row[6] if len(row) > 6 else None, "kinds": (kinds.get(name) or ["concession"]) if pinned else []}
     ram_users, data_users, ptr_users = collections.defaultdict(list), collections.defaultdict(list), collections.defaultdict(list)
     for a, d in x.items():
         h = f"{a:08X}"
@@ -289,6 +314,20 @@ def load(wait=False):
         if _INDEX["data"] is not None and _INDEX["mtime"] >= newest:
             return _INDEX["data"]
         return _rebuild(newest)
+
+
+def progress_by_address():
+    """{address: (size, matched, name, "Category/Unit")}, the shape of
+    tools/assets/script_targets.progress(), from this index instead of another
+    run of tools/progress.py (Browse and the ROM map use it)."""
+    ix = load(wait=True)
+    cats = [c["name"] for c in ix["categories"]]
+    out = {}
+    for addr, f in ix["functions"].items():
+        c = cats[f["cat"]]
+        top = "Libraries" if c == INTENTIONAL_ASM else c  # where the report files them
+        out[int(addr, 16)] = (f["size"], f["pct"] == 100, f["name"], f"{top}/{ix['categories'][f['cat']]['units'][f['unit']]}")
+    return out
 
 
 def summary():
@@ -529,9 +568,10 @@ def layouts(wait=False):
 
 
 def _measure_layouts():
+    # not tools/scope/scope.py itself: without capstone it re-executes the
+    # whole process under build/venv, which would restart the Studio
     sys.path.insert(0, os.path.join(ROOT, "tools", "scope"))
     import build as buildtool
-    import scope
     import structure
     heads = _headers()
 
@@ -543,7 +583,19 @@ def _measure_layouts():
         a = subprocess.run([buildtool.AGBCC] + buildtool.CFLAGS + ["-o", "-"], input=r.stdout, capture_output=True,
                            text=True, cwd=ROOT)
         return a.stdout if a.returncode == 0 and "error" not in a.stderr else None
-    lay = scope.cached("struct_layouts", heads, lambda: structure.layouts(ROOT, compile_c))
+    key = "|".join(f"{p}:{os.stat(p).st_mtime_ns}:{os.stat(p).st_size}" for p in heads)
+    path = os.path.join(os.path.dirname(CACHE), "struct_layouts.pickle")
+    try:
+        with open(path, "rb") as f:
+            k, lay = pickle.load(f)
+        if k != key:
+            raise ValueError
+    except (OSError, ValueError, EOFError, pickle.UnpicklingError):
+        lay = structure.layouts(ROOT, compile_c)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path + ".tmp", "wb") as f:
+            pickle.dump((key, lay), f)
+        os.replace(path + ".tmp", path)
     _HELPERS.update(layouts=lay, layouts_key=max(map(os.path.getmtime, heads), default=0))
     return lay
 

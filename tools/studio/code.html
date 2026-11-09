@@ -30,6 +30,8 @@ body.embed #side { display: none; }
 .tn .sec { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding-top: 8px; }
 .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--ok); }
 .dot.warn { background: var(--warn); }
+.dot.draft { background: transparent; box-shadow: inset 0 0 0 1.5px var(--warn); }
+.dot.asm { background: var(--muted); }
 .dot.none { background: transparent; }
 #view { overflow: auto; min-width: 0; }
 .page { padding: 18px 28px 60px; max-width: 1400px; }
@@ -70,6 +72,8 @@ table.t tr.link:hover td { background: var(--sel); }
 .strip { display: flex; height: 22px; border-radius: 5px; overflow: hidden; border: 1px solid var(--line); margin: 14px 0 4px; }
 .strip a { display: block; height: 100%; background: var(--ok); border-right: 1px solid var(--panel); min-width: 2px; }
 .strip a.warn { background: var(--warn); }
+.strip a.draft { background: var(--warn-bg); }
+.strip a.asm { background: var(--muted); }
 .strip a.sel { outline: 2px solid var(--ink); outline-offset: -2px; }
 
 /* source panes */
@@ -121,7 +125,7 @@ a.chip:hover { border-color: var(--accent); text-decoration: none; }
     <div class="tools"><input id="q" type="search" placeholder="Find a function, unit, type or RAM object" autocomplete="off"></div>
     <div id="tree"></div>
   </section>
-  <section id="view"><div class="page empty">Loading the code index… (the first visit after a source change runs tools/progress.py, about half a minute)</div></section>
+  <section id="view"><div class="page empty">Loading the code index…</div></section>
 </main>
 <script src="/static/common.js"></script>
 <script>
@@ -155,6 +159,19 @@ const ramHref = n => '#ram:' + encodeURIComponent(n);
 const status = kinds => kinds.length
   ? kinds.map(k => `<span class="badge warn" title="${esc(KIND_HELP[k] || '')}">${esc(kindLabel(k))}</span>`).join('')
   : '<span class="badge ok">no concessions</span>';
+// a function's state: matches without concessions (ok), matches with some (warn; its
+// percent is decomp.dev's share of lines without one), not matched yet: a NONMATCHING
+// draft or nothing (draft), or SDK assembly that stays assembly (asm)
+const ASM_CAT = 'Intentional assembly';
+const stateOf = f => f.unit?.cat === ASM_CAT ? 'asm' : f.kinds.length ? 'warn' : f.pct < 100 ? 'draft' : 'ok';
+const STATE_TITLE = { ok: 'matches, no concessions', warn: 'matches with concessions', draft: 'not matched yet', asm: 'hand-written assembly' };
+const fdot = f => `<span class="dot ${f.state}" title="${STATE_TITLE[f.state]}"></span>`;
+// the badges for a category or unit: drafts, concessions, or neither
+const groupBadges = g => g.cat === ASM_CAT || g.name === ASM_CAT ? '<span class="badge">hand-written assembly</span>'
+  : (g.ndraft ? `<span class="badge warn">${g.ndraft} not matched yet</span>` : '') + (g.ncx ? `<span class="badge warn">${g.ncx} with concessions</span>` : '')
+  || '<span class="badge ok">no concessions</span>';
+const fnBadges = f => f.state === 'asm' ? '<span class="badge">assembly</span>'
+  : f.state === 'draft' ? `<span class="badge warn">${f.pct ? 'draft · ' + fmtPct(f.pct) : 'not started'}</span>` : status(f.kinds);
 const bar = (clean, total) => `<span class="bar" title="${fmtPct(pct(clean, total))} of the bytes without concessions"><i style="width:${pct(clean, total)}%"></i></span>`;
 
 // ---------- index ----------
@@ -165,17 +182,20 @@ async function load() {
   for (const k of Object.keys(UNIT)) delete UNIT[k];
   RAMS.length = 0; ramNames.s = null; typeNames.s = null;
   for (const c of S.categories) {
-    c.size = 0; c.clean = 0; c.nfn = 0; c.ncx = 0;
+    c.size = 0; c.clean = 0; c.nfn = 0; c.ncx = 0; c.ndraft = 0;
     for (const u of c.units) {
-      u.cat = c.name; u.size = 0; u.clean = 0; u.ncx = 0; u.files = new Set();
+      u.cat = c.name; u.size = 0; u.clean = 0; u.ncx = 0; u.ndraft = 0; u.files = new Set();
       for (const [name, addr, size, p, kinds, file] of u.functions) {
         const f = { name, addr, size, pct: p, kinds, file, unit: u };
+        f.state = stateOf(f);
         FN[addr] = f; BYNAME[name] = f;
-        u.size += size; if (!kinds.length) u.clean += size; else u.ncx++;
+        u.size += size; if (f.state === 'ok') u.clean += size;
+        if (kinds.length) u.ncx++;
+        if (f.state === 'draft') u.ndraft++;
         if (file) u.files.add(file);
       }
       UNIT[unitKey(c.name, u.name)] = u;
-      c.size += u.size; c.clean += u.clean; c.nfn += u.functions.length; c.ncx += u.ncx;
+      c.size += u.size; c.clean += u.clean; c.nfn += u.functions.length; c.ncx += u.ncx; c.ndraft += u.ndraft;
     }
   }
   for (const r of S.ram) RAMS.push({ ...r, start: parseInt(r.addr, 16) });
@@ -207,10 +227,11 @@ function renderTree() {
     for (const u of c.units) {
       const uk = unitHref(c.name, u.name), uo = open.has(uk);
       row(1, '', uk, `<span class="tw" data-tog="${esc(uk)}">${uo ? '▾' : '▸'}</span>`, esc(u.name), u.functions.length,
-        `<span class="dot${u.ncx ? ' warn' : ''}" title="${u.ncx ? u.ncx + ' with concessions' : 'no concessions'}"></span>`);
+        u.cat === ASM_CAT ? '<span class="dot asm" title="hand-written assembly"></span>'
+          : `<span class="dot${u.ndraft ? ' draft' : u.ncx ? ' warn' : ''}" title="${[u.ndraft && u.ndraft + ' not matched yet', u.ncx && u.ncx + ' with concessions'].filter(Boolean).join(', ') || 'no concessions'}"></span>`);
       if (!uo) continue;
-      for (const [name, addr, , , kinds] of u.functions)
-        row(2, 'fn', fnHref(addr), '<span class="tw"></span>', esc(name), null, `<span class="dot${kinds.length ? ' warn' : ''}"></span>`);
+      for (const [, addr] of u.functions)
+        row(2, 'fn', fnHref(addr), '<span class="tw"></span>', esc(FN[addr].name), null, fdot(FN[addr]));
     }
   }
   $('tree').innerHTML = out.join('');
@@ -224,7 +245,7 @@ function renderResults(q) {
   const types = (S.types || []).filter(hit).slice(0, 40);
   const r = (k, href, label, path, dot = '') => out.push(`<a class="r" href="${href}"><span class="k">${k}</span>${dot}<span class="mono">${label}</span><span class="p">${esc(path)}</span></a>`);
   for (const u of units) r('unit', unitHref(u.cat, u.name), esc(u.name), u.cat);
-  for (const f of fns) r('fn', fnHref(f.addr), esc(f.name), f.unit.name, `<span class="dot${f.kinds.length ? ' warn' : ''}"></span>`);
+  for (const f of fns) r('fn', fnHref(f.addr), esc(f.name), f.unit.name, fdot(f));
   for (const x of rams) r('ram', ramHref(x.name), esc(x.name), x.addr);
   for (const t of types) r('type', typeHref(t), esc(t), 'struct');
   $('tree').innerHTML = `<div class="results">${out.join('') || '<div class="empty" style="padding:8px 12px">Nothing matches.</div>'}</div>`;
@@ -242,17 +263,19 @@ $('tree').addEventListener('click', e => {
 const crumbs = (...parts) => `<div class="crumbs"><a href="#">Code</a>${parts.map(p => ' › ' + p).join('')}</div>`;
 function overview() {
   const m = S.measures, total = +m.total_code, clean = +m.complete_code, nfn = m.total_functions;
+  const drafts = Object.values(FN).filter(f => f.state === 'draft').length;
   const ncx = Object.values(FN).filter(f => f.kinds.length).length, kinds = Object.entries(S.concession_kinds).sort((a, b) => b[1] - a[1]);
   const kmax = Math.max(1, ...kinds.map(k => k[1]));
   return `<div class="page">${crumbs()}
-    <h1 class="t">Every function matches</h1>
-    <p class="lede">All ${num(nfn)} functions in the ROM compile from C to the original bytes. ${fmtPct(m.complete_code_percent)} of the code is also
+    <h1 class="t">${drafts ? `${num(nfn - drafts)} of ${num(nfn)} functions match` : 'Every function matches'}</h1>
+    <p class="lede">${drafts ? `${num(nfn - drafts)} of the ${num(nfn)} functions in the ROM compile from C to the original bytes; the other
+      ${drafts} are <a href="#left:draft">drafts</a> still built from their assembly.` : `All ${num(nfn)} functions in the ROM compile from C to the original bytes.`} ${fmtPct(m.complete_code_percent)} of the code is also
       ordinary C with no matching concession; the rest still steers the compiler with a register pin, an empty <code>asm("")</code> or one of the other
       kinds below, and removing those is the current work. Pick a category, a unit or a function, or search on the left.</p>
     ${(S.missing || []).map(x => `<div class="notice">Not available here: ${esc(x)}.</div>`).join('')}
     ${S.updating ? '<div class="notice">The sources changed: a new index is building (about half a minute); this page updates when it is ready.</div>' : ''}
     <div class="tiles">
-      <div class="tile"><b>${num(nfn)}</b><span>functions, all matching</span></div>
+      <div class="tile"><b>${num(nfn)}</b><span>${drafts ? `functions, ${drafts} not matched yet` : 'functions, all matching'}</span></div>
       <div class="tile"><b>${kb(total)}</b><span>of code in ${num(m.total_units ?? Object.keys(UNIT).length)} units</span></div>
       <div class="tile"><b>${fmtPct(m.complete_code_percent)}</b><span>of the code without concessions</span></div>
       <div class="tile"><b>${num(ncx)}</b><span>functions still with a concession (${kb(total - clean)})</span></div>
@@ -261,7 +284,7 @@ function overview() {
     <h3>Categories <span class="n">${S.categories.length}</span></h3>
     <table class="t"><tr><th>Category</th><th class="r">Units</th><th class="r">Functions</th><th class="r">Code</th><th style="width:30%">Without concessions</th><th class="r"></th></tr>
     ${S.categories.map(c => `<tr class="link" data-href="${catHref(c.name)}"><td><a href="${catHref(c.name)}">${esc(c.name)}</a></td><td class="r">${c.units.length}</td><td class="r">${num(c.nfn)}</td>
-      <td class="r">${kb(c.size)}</td><td>${bar(c.clean, c.size)}</td><td class="r">${fmtPct(pct(c.clean, c.size))}</td></tr>`).join('')}</table>
+      <td class="r">${kb(c.size)}</td>${c.name === ASM_CAT ? '<td class="muted" colspan="2">the SDK\'s own assembly, kept as assembly</td>' : `<td>${bar(c.clean, c.size)}</td><td class="r">${fmtPct(pct(c.clean, c.size))}</td>`}</tr>`).join('')}</table>
     ${kinds.length ? `<h3>Concessions left, by kind <span class="n">functions · <a href="#left">list them all</a></span></h3><div class="kinds">${kinds.map(([k, n]) =>
       `<a href="#left:${esc(k)}" title="${esc(KIND_HELP[k] || '')}">${esc(kindLabel(k))}</a><span class="kb" style="width:${100 * n / kmax}%"></span><span class="mono">${n}</span>`).join('')}</div>
       <p class="muted" style="font-size:12.5px;max-width:760px">The kinds are defined in <code>tools/concessions.py</code>; decomp.dev counts a function as matched only once it has none.
@@ -274,20 +297,20 @@ function categoryPage(name) {
   return `<div class="page">${crumbs()}
     <h1 class="t">${esc(c.name)}</h1>
     <div class="badges"><span class="badge">${c.units.length} units</span><span class="badge">${num(c.nfn)} functions</span><span class="badge">${kb(c.size)}</span>
-      ${c.ncx ? `<span class="badge warn">${c.ncx} with concessions</span>` : '<span class="badge ok">no concessions</span>'}</div>
+      ${groupBadges(c)}</div>
     ${strip(c.units.flatMap(u => u.functions.map(f => FN[f[1]])))}
     <h3>Units <span class="n">in ROM order</span></h3>
     <table class="t"><tr><th>Unit</th><th class="r">Functions</th><th class="r">Code</th><th style="width:26%">Without concessions</th><th class="r"></th><th>Source</th></tr>
     ${c.units.map(u => `<tr class="link" data-href="${unitHref(c.name, u.name)}"><td><a href="${unitHref(c.name, u.name)}">${esc(u.name)}</a></td><td class="r">${u.functions.length}</td>
-      <td class="r">${kb(u.size)}</td><td>${bar(u.clean, u.size)}</td><td class="r">${u.ncx ? `<span style="color:var(--warn)">${u.ncx} left</span>` : '<span style="color:var(--ok)">✓</span>'}</td>
+      <td class="r">${kb(u.size)}</td><td>${bar(u.clean, u.size)}</td><td class="r">${u.cat === ASM_CAT ? '<span class="muted">assembly</span>' : u.ndraft + u.ncx ? `<span style="color:var(--warn)">${u.ndraft + u.ncx} left</span>` : '<span style="color:var(--ok)">✓</span>'}</td>
       <td class="muted mono" style="font-size:11.5px">${esc(fileSummary(u))}</td></tr>`).join('')}</table></div>`;
 }
 const fileSummary = u => { const fs = [...u.files], one = fs.filter(f => !f.startsWith('src/fn/')); return one.length ? one.join(', ') + (fs.length > one.length ? ` + ${fs.length - one.length} in src/fn` : '') : fs.length ? `${fs.length} files in src/fn` : ''; };
 // a strip of the functions, each as wide as its bytes, colored by status
 function strip(fns, sel) {
   const total = fns.reduce((s, f) => s + f.size, 0) || 1;
-  return `<div class="strip">${fns.map(f => `<a href="${fnHref(f.addr)}" class="${f.kinds.length ? 'warn' : ''}${f.addr === sel ? ' sel' : ''}" style="flex:${f.size / total}" title="${esc(f.name)} · ${f.size} B${f.kinds.length ? ' · ' + f.kinds.map(kindLabel).join(', ') : ''}"></a>`).join('')}</div>
-    <div class="legend">Each function as wide as its code: <span style="color:var(--ok)">■</span> no concessions <span style="color:var(--warn)">■</span> with concessions</div>`;
+  return `<div class="strip">${fns.map(f => `<a href="${fnHref(f.addr)}" class="${f.state}${f.addr === sel ? ' sel' : ''}" style="flex:${f.size / total}" title="${esc(f.name)} · ${f.size} B · ${STATE_TITLE[f.state]}${f.kinds.length ? ': ' + f.kinds.map(kindLabel).join(', ') : ''}"></a>`).join('')}</div>
+    <div class="legend">Each function as wide as its code: <span style="color:var(--ok)">■</span> no concessions <span style="color:var(--warn)">■</span> with concessions <span style="color:var(--warn-bg);text-shadow:0 0 1px var(--warn)">■</span> not matched yet${fns.some(f => f.state === 'asm') ? ' <span class="muted">■</span> assembly' : ''}</div>`;
 }
 function unitPage(key) {
   const u = UNIT[key];
@@ -296,12 +319,12 @@ function unitPage(key) {
   return `<div class="page">${crumbs(`<a href="${catHref(u.cat)}">${esc(u.cat)}</a>`)}
     <h1 class="t">${esc(u.name)}</h1>
     <div class="badges"><span class="badge">${fns.length} functions</span><span class="badge">${kb(u.size)}</span><span class="badge mono">${fns[0].addr}–${(parseInt(fns.at(-1).addr, 16) + fns.at(-1).size).toString(16).toUpperCase().padStart(8, '0')}</span>
-      ${u.ncx ? `<span class="badge warn">${u.ncx} with concessions</span>` : '<span class="badge ok">no concessions</span>'}</div>
+      ${groupBadges(u)}</div>
     ${strip(fns)}
     <h3>Functions <span class="n">in ROM order</span></h3>
     <table class="t"><tr><th>Function</th><th>Address</th><th class="r">Bytes</th><th>Status</th><th>Source</th></tr>
     ${fns.map(f => `<tr class="link" data-href="${fnHref(f.addr)}"><td class="mono"><a href="${fnHref(f.addr)}">${esc(f.name)}</a></td><td class="mono muted">${f.addr}</td><td class="r">${f.size}</td>
-      <td><div class="badges" style="margin:0">${status(f.kinds)}</div></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
+      <td><div class="badges" style="margin:0">${fnBadges(f)}</div></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
 }
 
 // ---------- syntax ----------
@@ -394,8 +417,8 @@ async function functionPage(q) {
   if (u) { open.add(catHref(u.cat)); open.add(unitHref(u.cat, u.name)); }
   const chips = (list, empty) => list.length ? `<div class="refs">${list.map(r => `<a class="chip mono${FN[r.addr]?.kinds.length ? ' warn' : ''}" href="${fnHref(r.addr)}">${esc(r.name)}</a>`).join('')}</div>` : `<div class="empty">${empty}</div>`;
   const marks = d.c ? Object.fromEntries(Object.entries(d.c.marks).map(([k, v]) => [+k, v])) : {};
-  const cPane = d.c ? pane('C', `<span class="mono">${esc(d.c.file)}:${d.c.line ?? ''}</span>${Object.keys(marks).length ? '<span class="sp"></span><span><span class="legend"><span class="sw"></span>concession</span></span>' : ''}`,
-    linesOf(cTokens(d.c.text, d.name)), d.c.line || 1, marks) : `<div class="pane"><div class="ph"><b>C</b></div><div class="src empty" style="padding:12px">The C for this function wasn't found in its unit${f?.file ? ' (' + esc(f.file) + ')' : ''}.</div></div>`;
+  const cPane = d.c ? pane('C', `<span class="mono">${esc(d.c.file)}:${d.c.line ?? ''}</span>${f?.state === 'draft' ? '<span style="color:var(--warn)">draft, inside #ifdef NONMATCHING</span>' : ''}${Object.keys(marks).length ? '<span class="sp"></span><span><span class="legend"><span class="sw"></span>concession</span></span>' : ''}`,
+    linesOf(cTokens(d.c.text, d.name)), d.c.line || 1, marks) : `<div class="pane"><div class="ph"><b>C</b></div><div class="src empty" style="padding:12px">${f?.state === 'asm' ? 'The original SDK wrote this in assembly (crt0, the MP2K mixer, libgcc and BIOS calls), so it stays assembly; <code>tools/progress.py</code> keeps the reviewed ranges.' : `The C for this function wasn't found in its unit${f?.file ? ' (' + esc(f.file) + ')' : ''}.`}</div></div>`;
   const asmPane = d.asm ? pane('Disassembly', `<span>${esc(d.mode)} · ${d.size} bytes · gen/code.s</span>`, linesOf(asmTokens(d.asm)))
     : '<div class="pane"><div class="ph"><b>Disassembly</b></div><div class="src empty" style="padding:12px">Not available: run <code>make disasm</code> to generate gen/code.s.</div></div>';
   const game = d.game.length ? `<h3>In the game <span class="n">objects and script routines whose code includes it</span></h3><div class="refs">${d.game.map(g =>
@@ -405,7 +428,9 @@ async function functionPage(q) {
   return `<div class="page">${crumbs(u ? `<a href="${catHref(u.cat)}">${esc(u.cat)}</a>` : esc(d.category), u ? `<a href="${unitHref(u.cat, u.name)}">${esc(u.name)}</a>` : esc(d.unit))}
     <h1 class="t mono">${esc(d.name)} <span class="step">${d.prev ? `<a href="${fnHref(d.prev.addr)}" title="${esc(d.prev.name)}">‹ previous</a>` : ''}${d.prev && d.next ? ' · ' : ''}${d.next ? `<a href="${fnHref(d.next.addr)}" title="${esc(d.next.name)}">next ›</a>` : ''}</span></h1>
     <div class="badges"><span class="badge mono">${d.addr}</span><span class="badge">${d.size} bytes</span>${d.mode ? `<span class="badge">${esc(d.mode)}</span>` : ''}
-      <span class="badge ok">matches</span>${status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}</div>
+      ${!f ? '' : f.state === 'asm' ? '<span class="badge" title="tools/progress.py: reviewed SDK assembly ranges">hand-written assembly</span>'
+        : f.state === 'draft' ? `<span class="badge warn" title="a NONMATCHING draft; the build uses the INCLUDE_ASM branch">not matched yet${f.pct ? ' · draft at ' + fmtPct(f.pct) : ''}</span>`
+        : '<span class="badge ok">matches</span>' + status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}</div>
     ${d.notes ? `<p class="lede" style="font-size:14px">${esc(d.notes)}</p>` : ''}
     ${u ? strip(u.functions.map(x => FN[x[1]]), d.addr) : ''}
     <div class="panes">${cPane}${asmPane}</div>
@@ -449,6 +474,8 @@ async function ramPage(name) {
 }
 // the functions that still hold a concession (all, or one kind), smallest first: phase 3's queue
 function leftPage(kind) {
+  const drafts = Object.values(FN).filter(f => f.state === 'draft');
+  if (kind === 'draft') return draftPage(drafts);
   const fns = Object.values(FN).filter(f => f.kinds.length && (!kind || f.kinds.includes(kind))).sort((a, b) => a.size - b.size || a.addr.localeCompare(b.addr));
   const bytes = fns.reduce((s, f) => s + f.size, 0);
   const kinds = Object.keys(S.concession_kinds).sort((a, b) => S.concession_kinds[b] - S.concession_kinds[a]);
@@ -456,10 +483,23 @@ function leftPage(kind) {
     <h1 class="t">${kind ? esc(kindLabel(kind)) : 'Concessions left'}</h1>
     <p class="lede">${num(fns.length)} functions (${kb(bytes)}) still match only with ${kind ? `a ${esc(kindLabel(kind))}${KIND_HELP[kind] ? ` (${esc(KIND_HELP[kind])})` : ''}` : 'a concession'}, smallest first.
       <code>tools/progress.py --list-pinned</code> is the same list.</p>
-    <div class="badges"><a class="badge${kind ? '' : ' warn'}" href="#left">all</a>${kinds.map(k => `<a class="badge${k === kind ? ' warn' : ''}" href="#left:${esc(k)}">${esc(kindLabel(k))} ${S.concession_kinds[k]}</a>`).join('')}</div>
+    ${leftBadges(kind, drafts.length)}
     <table class="t" style="margin-top:14px"><tr><th>Function</th><th class="r">Bytes</th><th>Kinds</th><th>Unit</th><th>Source</th></tr>
     ${fns.map(f => `<tr class="link" data-href="${fnHref(f.addr)}"><td class="mono"><a href="${fnHref(f.addr)}">${esc(f.name)}</a></td><td class="r">${f.size}</td>
       <td><div class="badges" style="margin:0">${status(f.kinds)}</div></td><td><a href="${unitHref(f.unit.cat, f.unit.name)}">${esc(f.unit.name)}</a></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
+}
+const leftBadges = (kind, ndraft) => `<div class="badges"><a class="badge${kind ? '' : ' warn'}" href="#left">all</a>${Object.keys(S.concession_kinds).sort((a, b) => S.concession_kinds[b] - S.concession_kinds[a])
+  .map(k => `<a class="badge${k === kind ? ' warn' : ''}" href="#left:${esc(k)}">${esc(kindLabel(k))} ${S.concession_kinds[k]}</a>`).join('')}${ndraft ? `<a class="badge${kind === 'draft' ? ' warn' : ''}" href="#left:draft">not matched yet ${ndraft}</a>` : ''}</div>`;
+function draftPage(fns) {
+  fns = [...fns].sort((a, b) => a.addr.localeCompare(b.addr));
+  return `<div class="page">${crumbs('<a href="#left">Concessions left</a>')}
+    <h1 class="t">Not matched yet</h1>
+    <p class="lede">${num(fns.length)} functions (${kb(fns.reduce((s, f) => s + f.size, 0))}) don't match yet. Their C is a draft inside
+      <code>#ifdef NONMATCHING</code>, scored by how close it comes, and the build uses the <code>INCLUDE_ASM</code> branch. In ROM order.</p>
+    ${leftBadges('draft', fns.length)}
+    <table class="t" style="margin-top:14px"><tr><th>Function</th><th class="r">Bytes</th><th>Draft</th><th>Unit</th><th>Source</th></tr>
+    ${fns.map(f => `<tr class="link" data-href="${fnHref(f.addr)}"><td class="mono"><a href="${fnHref(f.addr)}">${esc(f.name)}</a></td><td class="r">${f.size}</td>
+      <td><div class="badges" style="margin:0">${fnBadges(f)}</div></td><td><a href="${unitHref(f.unit.cat, f.unit.name)}">${esc(f.unit.name)}</a></td><td class="mono muted" style="font-size:11.5px">${esc(f.file || '')}</td></tr>`).join('')}</table></div>`;
 }
 async function typePage(name) {
   const d = await fetch('/api/codemap/type/' + encodeURIComponent(name)).then(r => r.ok ? r.json() : null);
@@ -548,7 +588,9 @@ async function watchUpdate() {
   const t = await fetch('/api/codemap').then(r => r.json()).catch(() => null);
   if (t && !t.updating) { await load(); route(); } else setTimeout(watchUpdate, 5000);
 }
-load().then(() => { route(); setTimeout(watchUpdate, 5000); }).catch(err => { $('view').innerHTML = notFound(`The code index failed to load (${err}). Check the Studio's terminal.`); });
+// only a first build is slow (tools/progress.py, about half a minute); say so if this is one
+const slowNote = setTimeout(() => { const v = $('view').querySelector('.page.empty'); if (v && !S) v.textContent += ' The first visit after a source change runs tools/progress.py, about half a minute.'; }, 2500);
+load().finally(() => clearTimeout(slowNote)).then(() => { route(); setTimeout(watchUpdate, 5000); }).catch(err => { $('view').innerHTML = notFound(`The code index failed to load (${err}). Check the Studio's terminal.`); });
 </script>
 </body>
 </html>
