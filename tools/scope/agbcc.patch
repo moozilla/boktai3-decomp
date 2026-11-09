@@ -1902,3 +1902,50 @@
    /* Verify that I2 and I1 are valid for combining.  */
    if (! can_combine_p (i2, i3, i1, NULL_RTX, &i2dest, &i2src)
        || (i1 && ! can_combine_p (i1, i3, NULL_RTX, i2, &i1dest, &i1src)))
+--- a/regclass.c
++++ b/regclass.c
+@@ -1005,7 +1005,26 @@
+ 
+       for (insn = f; insn; insn = NEXT_INSN (insn))
+ 	{
++	  /* Instrumentation: AGBCC_REGCLASS_TRACE=N prints what each insn adds to pseudo N's costs.  */
++	  static int trace_reg = -2;
++	  struct costs before;
++	  int uid = INSN_UID (insn);
++	  if (trace_reg == -2)
++	    trace_reg = getenv ("AGBCC_REGCLASS_TRACE") ? atoi (getenv ("AGBCC_REGCLASS_TRACE")) : -1;
++	  if (trace_reg >= FIRST_PSEUDO_REGISTER && trace_reg < nregs)
++	    before = costs[trace_reg];
+ 	  insn = scan_one_insn (insn, pass);
++	  if (trace_reg >= FIRST_PSEUDO_REGISTER && trace_reg < nregs
++	      && memcmp (&before, &costs[trace_reg], sizeof before))
++	    {
++	      static const char *const rt_names[] = REG_CLASS_NAMES;
++	      int c;
++	      fprintf (stderr, "RI %d pass%d uid %d mem+%d", trace_reg, pass, uid,
++		       costs[trace_reg].mem_cost - before.mem_cost);
++	      for (c = 1; c < N_REG_CLASSES; c++)
++		fprintf (stderr, " %s+%d", rt_names[c], costs[trace_reg].cost[c] - before.cost[c]);
++	      fprintf (stderr, "\n");
++	    }
+ 	}
+       
+       /* Now for each register look at how desirable each class is
+@@ -1073,6 +1092,17 @@
+ 	  /* We cast to (int) because (char) hits bugs in some compilers.  */
+ 	  prefclass[i] = (int) best;
+ 	  altclass[i] = (int) alt;
++	  if (getenv ("AGBCC_REGCLASS") && REG_N_REFS (i) > 0)
++	    {
++	      static const char *const rc_names[] = REG_CLASS_NAMES;
++	      extern char *current_function_name;
++	      int c;
++	      fprintf (stderr, "R %s %d pass%d pref=%s alt=%s mem=%d", current_function_name, i, pass,
++		       rc_names[(int) best], rc_names[(int) alt], p->mem_cost);
++	      for (c = 1; c < N_REG_CLASSES; c++)
++		fprintf (stderr, " %s=%d", rc_names[c], p->cost[c]);
++	      fprintf (stderr, "\n");
++	    }
+ 	}
+     }
+ #endif /* REGISTER_CONSTRAINTS */

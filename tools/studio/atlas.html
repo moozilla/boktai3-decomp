@@ -22,6 +22,9 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 button, input { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
 main { display: grid; grid-template-columns: 300px 1fr; height: calc(100vh - 53px); }
+/* ?embed=1&bare=1: one page without the tree, for views that show it beside their own list */
+body.bare main { grid-template-columns: 1fr; }
+body.bare #side { display: none; }
 #side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: var(--panel); }
 #side .tools { padding: 10px; border-bottom: 1px solid var(--line); }
 #side .tools input { width: 100%; }
@@ -51,6 +54,8 @@ h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
 .lede { font-size: 15px; margin: 12px 0 0; max-width: 760px; }
 .empty { color: var(--muted); }
 .mono, code { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+.gcl { margin: 4px 0 8px; }
+.gcl.alt { opacity: .8; }
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0 32px; }
 .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .chip { font-size: 12.5px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); white-space: nowrap; color: var(--ink); }
@@ -132,6 +137,7 @@ const ICON = { package: '▤', actor: '◆', monster: '☠', char: '☺', item: 
 const KIND = { package: 'sprite', actor: 'object', monster: 'monster', char: 'character', item: 'item', area: 'area', scene: 'scene', file: 'script', sprite: 'sprite', unit: 'code', tileset: 'tileset', bgtiles: 'map tiles', song: 'song', cut: 'cutscene', beat: 'story beat' };
 const href = id => '#' + id;
 const link = (id, text) => E[id] ? `<a href="${href(id)}">${esc(text ?? E[id].title)}</a>` : esc(text ?? id);
+if (new URLSearchParams(location.search).has('bare')) document.body.classList.add('bare');
 const chip = (id, text, extra = '') => E[id] ? `<a class="chip" href="${href(id)}">${esc(text ?? E[id].title)}${extra}</a>` : '';
 const label = e => e.short && e.kind === 'area' ? e.short : e.title;
 
@@ -215,6 +221,15 @@ function crumbs(path) {
   if (!path) return '';
   const parts = path.split('/');
   return `<div class="crumbs">${parts.map((p, i) => `<a href="#node:${esc(parts.slice(0, i + 1).join('/'))}">${esc(p)}</a>`).join(' › ')}</div>`;
+}
+// the original GCL name behind the registry key (gcl/names/chara.csv): the
+// best reading, how sure it is and why, and other names with the same hash
+function gclNames(e) {
+  const g = e.gcl || [];
+  const row = (x, alt) => `<div class="gcl${alt ? ' alt' : ''}"><b>${esc(x.name)}</b>${x.english ? ` <span class="muted">${esc(x.english)}</span>` : ''}
+    ${x.confidence ? badge(esc(x.confidence)) : ''}${alt ? ' <span class="muted">another name with the same hash</span>' : ''}${x.evidence ? `<div class="muted">${esc(x.evidence)}</div>` : ''}</div>`;
+  return `<h3>GCL name <span class="n">the 16-bit hash of the script's name for it, as EUC-JP</span></h3>
+    ${g.length ? g.map((x, i) => row(x, i > 0)).join('') : `<div class="empty">Not recovered yet for key <span class="mono">${esc(e.key)}</span> (<code>tools/assets/gclnames.py crack chara</code> lists leads).</div>`}`;
 }
 function head(e, sub = '', badges = []) {
   return `${crumbs(e.path || (E[e.area]?.path ? E[e.area].path + '/' + E[e.area].short : ''))}<h1 class="t">${esc(e.title)}</h1>${sub ? `<div class="sub">${sub}</div>` : ''}${badges.length ? `<div class="badges">${badges.join('')}</div>` : ''}`;
@@ -378,6 +393,9 @@ const PAGES = {
       ${resources(e)}
       <div class="grid2"><div><h3>Placed in <span class="n">${e.nscenes} scenes</span></h3>${placement(e)}</div>
       <div><h3>Created by <span class="n">${e.procs.length} procedures</span></h3>${e.procs.length ? `<div class="chips">${e.procs.map(p => `<a class="chip" href="/scripts#${p.id}" data-peek>${esc(p.name || 'proc ' + p.id)}</a>`).join('')}</div>` : '<div class="empty">No script creates it.</div>'}</div></div>
+      ${gclNames(e)}
+      ${e.command_tables?.length ? `<h3>Command tables <span class="n">${e.command_tables.length}</span></h3><div class="chips">${e.command_tables.map(t =>
+        `<a class="chip" href="/actors#commands:${t.table}" data-peek title="loaded by ${esc(t.in.join(', '))}">${esc(t.title)} <small class="mono">${t.table}</small></a>`).join('')}</div>` : ''}
       <h3>Code</h3><div class="muted" style="margin-bottom:8px">Entry ${codeLink(e.callback, e.fname)}${e.loader ? ` → ${codeLink(e.loader, e.loader_name)}` : ''}, and everything it calls or installs.</div><div id="code"></div>
       <h3>Notes</h3><div id="ned"></div></div>`;
   },
