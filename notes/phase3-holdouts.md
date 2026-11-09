@@ -214,6 +214,22 @@ and `result = 2` before or after.
 Next idea: real code between the AND and the shift that ends the block (a test the original
 had), or evidence for `concession-ok(debug-nop)` from a twin with the same compiled-out check.
 
+### AnimatedParticles_Create (src/fn/sub_080154EC.c, 080154EC): deferred
+
+Draft: `notes/phase3-drafts/field-effects/AnimatedParticles_Create.c` (6 ROM / 2 draft, all four
+concessions removed). Two separate problems:
+* jump2 cross-jumps the `movs r3, #0; bl Anim_SetSequence` tails of the type 5 and 6 arms into
+  the type 7 arm's copy. The ROM keeps all three (arms 5 and 6 are even identical except for
+  the palette bank). The pinned source keeps them apart with `asm("" : : "r"(a), "i"(N))`.
+  The original's tails must have differed in RTL (a different call or argument form) or
+  jumped to different labels at jump2 time.
+* After the arms the ROM copies the state pointer to r8 and back (`mov r8, r4; mov r4, r8`):
+  a second pseudo for the step. DisplaySequence_StepSprite is not this step: it reads
+  `state->commands` where this function reads `p->anim.data` (`ldr r1, [r5, #0x68]`), and
+  using it gives 101 / 124. A local inline step with a parameter copy, called with `saved`,
+  gives 7 / 3 but still no copy back. Without a separate `saved` it is 101 / 124 again, so
+  the second pointer is real.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
