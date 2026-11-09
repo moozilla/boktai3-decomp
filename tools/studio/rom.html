@@ -61,6 +61,7 @@ try { mode = localStorage.getItem('rom.mode') || 'kind'; } catch (e) {}
 
 const color = n => mode === 'kind' ? (KIND[n.k] || KIND.data) : (LEVEL[n.u] || '#555');
 const hex = a => '0x' + (a >>> 0).toString(16).toUpperCase().padStart(8, '0');
+const pct = f => f > 0 && f < 0.0005 ? '&lt;0.1%' : (100 * f).toFixed(1) + '%';  // a sliver still shows
 const size = n => n >= 1048576 ? (n / 1048576).toFixed(2) + ' MB' : n >= 1024 ? (n / 1024).toFixed(1) + ' KB' : n + ' B';
 
 // ordered strip treemap: children keep their (address) order, laid out in
@@ -121,7 +122,7 @@ function draw() {
   leaves(node, l => { const k = mode === 'kind' ? l.k : l.u; tot[k] = (tot[k] || 0) + l.n; all += l.n; });
   const names = mode === 'kind' ? KNAME : LNAME, cols = mode === 'kind' ? KIND : LEVEL;
   const order = mode === 'kind' ? Object.keys(KIND) : T.levels;
-  $('legend').innerHTML = order.filter(k => tot[k]).map(k => `<span><i style="background:${cols[k]}"></i>${names[k]} <b>${(100 * tot[k] / all).toFixed(1)}%</b></span>`).join('');
+  $('legend').innerHTML = order.filter(k => tot[k]).map(k => `<span><i style="background:${cols[k]}"></i>${names[k]} <b>${pct(tot[k] / all)}</b></span>`).join('');
   $('crumbs').innerHTML = ['ROM', ...focus.map(f => f.t)].map((t, i) => i === focus.length ? `<b>${esc(t)}</b>` : `<a data-i="${i}">${esc(t)}</a>`).join(' › ');
 }
 function under(e) {
