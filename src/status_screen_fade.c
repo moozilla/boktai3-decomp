@@ -45,24 +45,14 @@ void StatusScreen_WaitForStart(struct StatusScreen *p)
     u32 mask = 256;
     gDispCntShadow &= ~mask;
     if (!StatusScreen_CheckConfirm(p)) {
-        u32 old = p->delay;
-        p->delay = old + 65535;
-        asm("" : "+r"(old));
-        if ((u16)old == 0) {
-            {
-                register int flags asm("r1") = gDispCntShadow;
-                {
-                    int result = mask;
-                    gDispCntShadow = result | flags;
-                }
-            }
+        u16 old = p->delay--;
+        if (old == 0) {
+            gDispCntShadow = mask | gDispCntShadow;
             {
                 struct StatusScreen *target = gStatusScreen;
-                {
-                    register void (*state)(struct StatusScreen *) = StatusScreen_Reveal;
-                    target->state = state;
-                    target->timer = 0;
-                }
+                StatusScreenFn state = StatusScreen_Reveal;
+                target->state = state;
+                target->timer = 0;
             }
         }
     }
