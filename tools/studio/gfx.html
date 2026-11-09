@@ -36,6 +36,9 @@ main { display: grid; grid-template-columns: 260px 1fr; height: calc(100vh - 53p
 .row:hover { background: var(--sel); }
 .row.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
 .row code { font-size: 12px; }
+/* a row with a name: the name on its own line, the key and notes under it */
+.row { flex-wrap: wrap; row-gap: 1px; }
+.row .lab { flex-basis: 100%; order: -1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .row .n { color: var(--muted); font-size: 12px; margin-left: auto; }
 .row .note { color: var(--accent); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #view { overflow: auto; padding: 16px 20px; min-width: 0; }
@@ -56,6 +59,7 @@ canvas { image-rendering: pixelated; display: block; }
 .palcard { border: 1px solid var(--line); border-radius: 8px; padding: 8px; cursor: pointer; background: var(--panel); }
 .palcard.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .palcard code { font-size: 12px; }
+.palcard .use { display: block; color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0 4px; }
 .palgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
 #tip { position: fixed; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 13px; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
 .legend { display: flex; gap: 12px; font-size: 12px; color: var(--muted); margin: 8px 0; flex-wrap: wrap; }
@@ -77,7 +81,7 @@ body.embed main { grid-template-columns: 1fr; }
     <div class="tools"><input id="q" type="search" placeholder="Filter by hash or note" autocomplete="off"><div class="count" id="count"></div></div>
     <div id="list"></div>
   </section>
-  <section id="view"></section>
+  <section id="view"><div class="empty">Loading graphics…</div></section>
 </main>
 <div id="tip"></div>
 <script src="/static/common.js"></script>
@@ -114,7 +118,7 @@ async function boot() {
   learned = await fetch('/api/learned').then(r => r.json()).catch(() => learned);
   tagList = await fetch('/api/tags').then(r => r.json()).catch(() => []);
   const ps = index.t92B3 || [];
-  palettes = await Promise.all(ps.map(async ([h]) => ({ hash: h, data: await res('t92B3', h) })));
+  palettes = (await pmap(ps, async ([h]) => ({ hash: h, data: await res('t92B3', h).catch(() => null) }))).filter(p => p.data);
   $('palSel').innerHTML = '<option value="">Greyscale</option>' + palettes.map((p, i) => `<option value="${i}">${p.hash}</option>`).join('');
   const saved = localStore('pal');
   $('palSel').value = saved ?? String(palettes.findIndex(p => p.hash === '081B'));
@@ -129,7 +133,7 @@ async function boot() {
 // Notes (data/notes.csv) per tab: kind and key of the selected item.
 const NOTE_KIND = { sprites: 'spr', big: 'big', maps: 'map', palettes: 'pal', tiles: 'tiles', data: 'res' };
 const noteKeyOf = key => tab === 'maps' ? key.split('-')[0] : key;
-const labelOf = i => NOTE_KIND[tab] && noteOf(NOTE_KIND[tab], noteKeyOf(i.key))?.label;
+const labelOf = i => (NOTE_KIND[tab] && noteOf(NOTE_KIND[tab], noteKeyOf(i.key))?.label) || i.place;
 // labels of a package's frames, for searching ("Healing Potion" finds 5D04)
 const frameLabels = i => (tab === 'sprites' || tab === 'big') ? Object.values(NOTES_DB).filter(n => n.kind === (tab === 'big' ? 'bigframe' : 'sprframe') && n.key.startsWith(i.key + '/')).map(n => n.label).concat(tab === 'sprites' ? Object.entries(ITEM_FRAMES).filter(([k]) => k.startsWith(i.key + '/')).flatMap(([, l]) => l.map(x => x.name + ' ' + x.jp)) : []).join(' ') : '';
 // ?bare=1 (with embed): only the picture, for pages that embed a map
@@ -151,12 +155,12 @@ function route() {
 }
 function renderList() {
   const q = $('q').value.trim().toUpperCase();
-  const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q) || (labelOf(i) || '').toUpperCase().includes(q) || frameLabels(i).toUpperCase().includes(q));
+  const hits = items.filter(i => !q || i.key.includes(q) || (i.note || '').toUpperCase().includes(q) || (i.group || '').toUpperCase().includes(q) || (labelOf(i) || '').toUpperCase().includes(q) || frameLabels(i).toUpperCase().includes(q));
   $('count').textContent = `${hits.length} of ${items.length}`;
   let group = null;
   $('list').replaceChildren(...hits.flatMap(i => {
     const d = document.createElement('div'), out = [d];
-    if (i.group && i.group !== group && typeof TILE_GROUPS !== 'undefined') {
+    if (i.group && i.group !== group) {
       group = i.group;
       const g = document.createElement('div'); g.className = 'ghead'; g.textContent = TILE_GROUPS[group] || group;
       out.unshift(g);
@@ -360,7 +364,7 @@ views.big = {
     frameStrip(imgs.length, k => imgs[k], wantFrame, 'bigframe', h);
     const grid = $('all'), poolColors = {};
     if (!grid) return;
-    await Promise.all(big.recs.map(async rr => { poolColors[rr.hash] = await packageColors(null, rr.pal); }));
+    await pmap(big.recs, async rr => { poolColors[rr.hash] = await packageColors(null, rr.pal); });
     big.recs.forEach((rr, k) => {
       const c = document.createElement('div'); c.className = 'cell' + (k === i ? ' on' : ''); c.title = (NOTES[rr.hash] || '') + ' ' + rr.hash;
       const f = big.frames(k)[0], img = f ? compose(big.parts(f), poolColors[rr.hash] || colors) : null;
@@ -546,10 +550,36 @@ views.maps = {
     await loadPtn();
     if (!stageList) stageList = await fetch('/api/stages').then(r => r.json());
     await loadStageMeta();
+    // each stage under the place its scenes are in (tools/studio/places.py), in story order
+    const W = await fetch('/api/areas').then(r => r.json()).catch(() => null);
+    const firstScene = {}, where = {};
+    for (const x of stageMeta || []) {
+      const k = stageKey(x.stage); if (!k) continue;
+      if (firstScene[k] == null || x.scene < firstScene[k]) {
+        firstScene[k] = x.scene;
+        const a = W?.areas[W.scene_area[x.scene]];
+        // the scene's own label is the most specific, without the place it repeats
+        let sl = W?.scenes[x.scene]?.label;
+        const rest = sl && a?.place && sl.startsWith(a.place) ? sl.slice(a.place.length) : null;
+        if (rest != null && /^\s*([(:·-]|$)/.test(rest)) sl = rest.replace(/^\s*(\([^)]*\))?\s*[:·-]?\s*/, '') || rest.replace(/^\s*\(|\)\s*$/g, '');
+        where[k] = a && { place: a.place || 'Unlabeled areas', detail: sl || a.detail || (a.place ? '' : `area ${a.area}`) };
+      }
+    }
     const staged = new Set(stageList.map(s => s.map));
+    const stages = stageList.map(s => {
+      const key = `${s.map}-${s.tileset}-${s.hp}`, w = where[key];
+      // no note: the key is MAP-TILESET-HP already
+      return { key, note: '', n: s.procs.length + '×', stage: s,
+               group: w?.place || 'Stages no scene loads', place: w?.detail || '', order: firstScene[key] ?? 1e9 };
+    });
+    // a place's stages stay together, the places in the order the story reaches them
+    const placeOrder = {};
+    (W?.places || []).forEach((p, i) => { placeOrder[p.name] = i; });
+    for (const it of stages) placeOrder[it.group] ??= 1e6 + (it.group === 'Unlabeled areas' ? 0 : 1);
+    stages.sort((a, b) => placeOrder[a.group] - placeOrder[b.group] || a.group.localeCompare(b.group) || a.order - b.order);
     items = [
-      ...stageList.map(s => ({ key: `${s.map}-${s.tileset}-${s.hp}`, note: `stage · tiles ${s.tileset} · hp ${s.hp}`, n: s.procs.length + '×', stage: s })),
-      ...(index.map || []).filter(([h]) => !staged.has(h)).map(([h, n]) => ({ key: h, note: 'map', n: (n / 1024).toFixed(0) + ' KB' })),
+      ...stages,
+      ...(index.map || []).filter(([h]) => !staged.has(h)).map(([h, n]) => ({ key: h, note: 'map', n: (n / 1024).toFixed(0) + ' KB', group: 'Maps without a stage' })),
     ];
   },
   async show(key) {
@@ -558,7 +588,7 @@ views.maps = {
     const own = m.tiles !== 0;
     const tsList = Object.keys(ptn.sets).sort();
     const savedTs = localStore('mapts.' + mh);
-    v.innerHTML = `<h2>Map ${mh}${st ? ` · stage` : ''}</h2>
+    v.innerHTML = `<h2>Map ${mh}${st ? ` · stage` : ''}${it?.group && st ? ` · ${esc(it.group)}${it.place ? ' (' + esc(it.place) + ')' : ''}` : ''}</h2>
       <div class="meta">${m.count} layer${m.count > 1 ? 's' : ''} · ${m.nmeta} metatiles · ${own ? m.ntiles + ' own tiles' : 'tiles from ptn tileset (' + m.ntiles + ' used)'}${st ? ` · loaded by script procs ${st.procs.join(', ')} with HP data ${st.hp}` : ''}</div>
       <div class="controls">
         ${m.count > 1 ? 'Layer <select id="lay"><option value="-1">all, layer 0 in front</option>' + m.ents.map((e, i) => `<option value="${i}">${i}: ${e.hash} (${e.w}×${e.h})</option>`).join('') + '</select>' : ''}
@@ -707,32 +737,32 @@ async function renderStage(st, palHash) {
   }
   return toCanvas(img, 1);
 }
-let areasData = null;
+let areasData = null, palUse = {};
 views.dungeon = {
   free: true,
   async init() {
     await loadPtn(); await loadStageMeta();
     areasData ||= await fetch('/api/areas').then(r => r.json());
-    items = areasData.areas.filter(a => a.scenes.length > 1).map(a => ({ key: String(a.area), note: a.label || `scenes ${a.scenes[0]}–${a.scenes[a.scenes.length - 1]}`, n: a.scenes.length + ' rooms' }));
+    // grouped by place in story order, as on the World page
+    const rank = Object.fromEntries(areasData.places.map((p, i) => [p.name, i]));
+    items = areasData.areas.filter(a => a.scenes.length > 1)
+      .map(a => ({ key: String(a.area), group: a.place || 'Unlabeled areas', note: a.place ? a.detail || a.place : `scenes ${a.scenes[0]}–${a.scenes[a.scenes.length - 1]}`, n: a.scenes.length + ' rooms' }))
+      .sort((x, y) => (rank[x.group] ?? 1e6) - (rank[y.group] ?? 1e6) || x.key - y.key);
   },
   async show(key) {
     const a = areasData.areas.find(x => String(x.area) === String(key)), v = $('view');
     if (!a) { v.textContent = 'No such area.'; return; }
     const byScene = Object.fromEntries(stageMeta.map(s => [s.scene, s]));
     const rooms = a.scenes.map(n => byScene[n]).filter(s => s && s.stage);
-    v.innerHTML = `<h2>Area ${a.area}${a.label ? ' · ' + esc(a.label) : ''}</h2><div class="meta">${rooms.length} rooms with a stage · placed by their doors (a door in one room lines up with the entrance it leads to in the next) · <a href="/world#${a.area}">World page</a></div>
+    v.innerHTML = `<h2>Area ${a.area}${a.label ? ' · ' + esc(a.label) : ''}</h2><div class="meta">${rooms.length} rooms with a stage · placed by their doors (a door in one room lines up with the entrance it leads to in the next) · <a href="/world#area=${a.area}">World page</a></div>
       <div class="controls">Zoom <select id="dz"><option>0.25</option><option selected>0.5</option><option>1</option></select> <label><input type="checkbox" id="dlab" checked> room labels</label> <span id="dstat" class="meta">rendering…</span></div>
       <div id="dbox" style="position:relative;overflow:auto;max-height:calc(100vh - 190px);border:1px solid var(--line);border-radius:8px;background:#111"></div>`;
     const hps = {}, canv = {};
-    let done = 0, next = 0;  // four at a time: a burst of requests drops sockets
-    const worker = async () => {
-      while (next < rooms.length) {
-        const r = rooms[next++];
-        hps[r.scene] = await loadHP(r.stage.hp).catch(() => null); canv[r.scene] = await renderStage(r.stage, r.palette);
-        $('dstat').textContent = `rendering ${++done}/${rooms.length}…`;
-      }
-    };
-    await Promise.all([worker(), worker(), worker(), worker()]);
+    let done = 0;
+    await pmap(rooms, async r => {
+      hps[r.scene] = await loadHP(r.stage.hp).catch(() => null); canv[r.scene] = await renderStage(r.stage, r.palette);
+      $('dstat').textContent = `rendering ${++done}/${rooms.length}…`;
+    }, 4);
     const pos = {}, misfit = [];
     const placeFrom = start => {
       pos[start] ||= [0, 0];
@@ -802,12 +832,12 @@ views.pool = {
     // data, and the variants the game selects: data/sprite_palettes.csv)
     const users = {};
     const add = (i, u) => (users[i] ||= []).push(u);
-    await Promise.all((index.tCB05 || []).map(async ([h]) => {
+    await pmap(index.tCB05 || [], async ([h]) => {
       const b = await res('tCB05', h), pkg = parsePackage(b), base = le(b, 0);
       let banks = 1;
       for (const f of pkg.frames) for (const p of pkg.parts(f)) banks = Math.max(banks, p.bank + 1);
       for (let k = 0; k < banks; k++) add(base + k, { kind: 'spr', hash: h, bank: k });
-    }));
+    });
     if (!big) { const e = index.t98F5[0][0]; big = parseBig(await res('t98F5', e)); }
     big.recs.forEach(r => {
       const vs = (learned.bigpools || {})[r.hash] || [r.pal];
@@ -934,7 +964,18 @@ views.data = {
 };
 
 views.palettes = {
-  async init() { items = palettes.map((p, i) => ({ key: p.hash, i })); },
+  async init() {
+    // the places whose stages load each palette (stage meta, World's places)
+    await loadStageMeta();
+    areasData ||= await fetch('/api/areas').then(r => r.json()).catch(() => null);
+    const by = {};
+    for (const s of stageMeta) if (s.palette) {
+      const a = areasData?.areas[areasData.scene_area[s.scene]], u = by[s.palette] ||= { places: new Set(), scenes: 0 };
+      u.scenes++; if (a?.place) u.places.add(a.place);
+    }
+    palUse = by;
+    items = palettes.map((p, i) => ({ key: p.hash, i, note: [...(by[p.hash]?.places || [])].join(', '), n: by[p.hash] ? by[p.hash].scenes + ' sc' : '' }));
+  },
   async show(h) {
     const v = $('view');
     v.innerHTML = `<h2>Palettes</h2><div class="meta">${palettes.length} resources of 256 colors (16 banks). Sprites choose a bank per part; which palette the game loads for a sprite is set at runtime (scripts, stage data), so pick one here. Click a palette to use it everywhere.</div><div class="palgrid" id="pg"></div>`;
@@ -942,7 +983,8 @@ views.palettes = {
     palettes.forEach((p, i) => {
       const card = document.createElement('div'); card.className = 'palcard' + (curPal === p ? ' on' : '');
       const cols = palColors(p);
-      card.innerHTML = `<code>${p.hash}</code><div class="pal">${cols.map(([r, g, b]) => `<i style="background:rgb(${r},${g},${b})"></i>`).join('')}</div>`;
+      const u = palUse[p.hash];
+      card.innerHTML = `<code>${p.hash}</code><small class="use"${u ? ` title="${esc([...u.places].join(', '))}"` : ''}>${u ? `${esc([...u.places].join(', ') || 'unlabeled areas')} · ${u.scenes} scene${u.scenes > 1 ? 's' : ''}` : 'no stage loads it'}</small><div class="pal">${cols.map(([r, g, b]) => `<i style="background:rgb(${r},${g},${b})"></i>`).join('')}</div>`;
       card.onclick = () => { $('palSel').value = i; curPal = p; localStore('pal', i); pg.querySelectorAll('.palcard').forEach(x => x.classList.toggle('on', x === card)); };
       if (p.hash === h) setTimeout(() => card.scrollIntoView({ block: 'center' }), 0);
       pg.appendChild(card);

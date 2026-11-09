@@ -507,7 +507,7 @@ def compile_draft_g(src, func, env=None):
     # size_of_line_info); its truncated unit then breaks the line reader.
     r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-ffix-debug-line", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
                        cwd=wd, capture_output=True, text=True,
-                       env=dict(os.environ, AGBCC_DUMPPRI=names, AGBCC_CROSS_TRACE="1", **(env or {})))
+                       env={**os.environ, "AGBCC_DUMPPRI": names, "AGBCC_CROSS_TRACE": "1", **(env or {})})
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
     uninit = []
     for blk in re.split(r"(?m)^(?=.*In function `)", r.stderr):
@@ -1038,6 +1038,12 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
               f" before its `break`, each arm of an if), cse followed the jumps from the earlier {k} into each"
               f" copy with it known in the same mode (a byte op's constant is QImode) and gave them its"
               f" register, and jump2 merged the identical copies into this tail (README fact 65)")
+    for i, ln, z in zero_orr_hints(rows_json)[:2]:
+        print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` ors in r{z}, a zero set in an earlier block;"
+              f" the draft has no such or. It is a u16 field updated in two statements, `f |= A; f &= ~B;`"
+              f" (not `f = (f | A) & ~B;`): each field store is an insert `(f & 0) | v`, and cse gives the"
+              f" second one's 0 the held zero register, which combine cannot fold across blocks (README"
+              f" fact 103)")
     if untouched_r0_hint(rows_json):
         print("the ROM never writes r0 and calls nothing, the draft does: the caller's r0 (the first argument)"
               " stays live to the end. A non-void function with no return statement does that (its"
@@ -2041,6 +2047,31 @@ def shared_constant_hints(rows):
             seen.add(h)
             set_line = next((rows[k].get("line") for k in list(range(j, len(rows))) if rows[k].get("line")), "?")
             out.append((i, r.get("line") or "?", h, k_text, set_line, calls))
+    return out
+
+
+def zero_orr_hints(rows):
+    """[(row index, line, zero register)] where the ROM has an `orrs rX, rZ` the draft lacks, rZ set
+    by a `movs rZ, #0` earlier with a branch between (another basic block). Two statements updating a
+    u16 field, `f |= A; f &= ~B;`, leave the field insert's cleared part as that zero register
+    (README fact 103)."""
+    out = []
+    rom = [r["rom"] for r in rows]
+    for i, r in enumerate(rows):
+        if r["tag"] != "-":
+            continue
+        m = re.match(r"orrs r\d+, r(\d+)$", rom[i] or "")
+        if not m:
+            continue
+        z = int(m.group(1))
+        j = next((k for k in range(i - 1, -1, -1) if rom[k] and asm_dest(rom[k]) == z), None)
+        if j is None or not re.match(r"movs r\d+, #0$", rom[j]):
+            continue
+        if not any(re.match(r"b[a-z]{2} ", rom[k] or "") for k in range(j + 1, i)):
+            continue
+        line = next((rows[k].get("line") for k in list(range(i, len(rows))) + list(range(i, -1, -1))
+                     if rows[k].get("line")), "?")
+        out.append((i, line, z))
     return out
 
 

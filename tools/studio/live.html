@@ -71,6 +71,7 @@ th { color: var(--muted); font-weight: 500; }
 .empty { color: var(--muted); font-size: 13px; }
 code { font-size: 12px; }
 .howto { font-size: 13px; color: var(--muted); }
+#howto { font-size: 13.5px; line-height: 1.6; color: var(--ink); border-color: var(--accent); }
 .howto code { background: var(--sel); padding: 1px 4px; border-radius: 4px; color: var(--ink); }
 .tagrow input { width: 100%; }
 </style>
@@ -117,14 +118,15 @@ code { font-size: 12px; }
       <div id="scenevars"></div>
       <details style="margin-top:8px"><summary style="cursor:pointer;color:var(--muted);font-size:13px">Event flags · GameState+0x720–0x733</summary><div id="evflags" style="margin-top:6px"></div></details>
     </div>
-    <div class="card howto" id="howto">
-      <h2>Connect mGBA</h2>
-      Start the studio (<code>python3 tools/studio/serve.py</code>), then run mGBA with Centaur:<br>
-      <code>tools/mgba/play.sh</code> (builds the subtitle data and starts the bundled mGBA 0.11 build),
-      or load <code>tools/mgba/centaur.lua</code> from Tools › Scripting. The game connects here by itself.
-    </div>
   </section>
   <section>
+    <div class="card howto" id="howto">
+      <h2>Connect mGBA</h2>
+      This page shows the game while it runs. Start mGBA with Centaur:
+      <code>tools/mgba/play.sh</code> (builds the subtitle data and starts the bundled mGBA 0.11 build),
+      or load <code>tools/mgba/centaur.lua</code> from Tools › Scripting; the game connects here by itself.
+      Without the game running, <a href="/captures">Captures</a> shows saved screens the same way.
+    </div>
     <div class="card">
       <h2>Screen <span class="sp"></span><button id="snap">Refresh</button><label class="aside"><input type="checkbox" id="follow"> follow (every 2 s)</label></h2>
       <div id="screenview"><div class="empty">Connect mGBA, then Refresh to see every sprite, text, layer and palette on screen.</div></div>
