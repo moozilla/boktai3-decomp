@@ -3436,7 +3436,6 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
                 u32 height = (7 - incremented) << 4;
                 register u32 heightOffset asm("r6") = 0x380;
                 register u16 *destination asm("r1");
-                asm("" : "+r"(heightOffset));
                 destination = (u16 *)((u8 *)actor + heightOffset);
                 *destination = height;
             }
@@ -3444,74 +3443,24 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
             actor->displayOffsetY = zero;
     }
     {
-        u16 *counter;
-        u32 offset = 0x256;
-        register u16 *counterAddress asm("r2");
-        asm("" : "+r"(offset));
-        counterAddress = (u16 *)(offset + (u32)actor);
-        counter = counterAddress;
-        if (*counterAddress <= 11) {
-            register const u16 *rawTable asm("r6") = (const u16 *)RANDOM_TABLE_ADDR;
-            register const u16 *table asm("r12");
-            u32 *randomIndex;
-            register u32 index asm("r1");
-            u32 mask;
-            register u32 amplitudeMask asm("r4");
-            register u32 shakeOffset asm("r6");
-            asm("" : "+r"(rawTable));
-            table = rawTable;
-            randomIndex = &gRandomIndex;
-            index = *randomIndex + 1;
-            mask = 1023;
-            index &= mask;
-            {
-                u32 sample = table[index];
-                s16 *shake;
-                amplitudeMask = 31;
-                sample &= amplitudeMask;
-                sample -= 16;
-                shakeOffset = 0x37E;
-                shake = (s16 *)((u8 *)actor + shakeOffset);
-                *shake = sample;
-            }
-            index = (index + 1) & mask;
-            *randomIndex = index;
-            actor->shakeZ = (table[index] & amplitudeMask) - 16;
-            asm("" : : "r"(shakeOffset));
+        u16 *counter = &actor->stateFrame;
+        if (*counter <= 11) {
+            const u16 *table = gRandomTable;
+            actor->shakeX = (ParticleRandom_ReadDirectSample(table) & 31) - 16;
+            actor->shakeZ = (ParticleRandom_ReadDirectSample(table) & 31) - 16;
         }
-        {
-            register u16 *frameAlias asm("r6") = counter;
-            asm("" : "+r"(frameAlias));
-            if (*frameAlias == 2)
-                TetherActor_EmitRingEffects(actor);
-        }
-        {
-            u16 *frameAlias = counter;
-            if (*frameAlias > 29) {
-                register u16 *charge asm("r2");
-                void **handle;
-                TetherActor_SetState(actor, 0);
-                {
-                    u32 readyOffset = 0x384;
-                    u16 *ready;
-                    ready = &actor->chargeReady;
-                    *ready = 1;
-                }
-                {
-                    register u32 chargeOffset asm("r6") = 0x386;
-                    u32 value;
-                    asm("" : "+r"(chargeOffset));
-                    charge = (u16 *)((u8 *)actor + chargeOffset);
-                    value = 287;
-                    *charge = value;
-                    handle = &actor->pendingEffectHandle;
-                    *handle = ActorAttachment_UpdateFromDescriptor(*handle, &actor->bodyConfig, 1,
-                                                                   0, charge, value, 250, 290);
-                }
-            }
+        if (*counter == 2)
+            TetherActor_EmitRingEffects(actor);
+        if (*counter > 29) {
+            TetherActor_SetState(actor, 0);
+            actor->chargeReady = 1;
+            actor->charge = 287;
+            actor->pendingEffectHandle = ActorAttachment_UpdateFromDescriptor(
+                actor->pendingEffectHandle, &actor->bodyConfig, 1, 0, &actor->charge, 287, 250, 290);
         }
     }
 }
+
 
 void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
 {
