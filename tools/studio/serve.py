@@ -46,7 +46,7 @@ log = logging.getLogger("studio")
 # for it instead of building the same index alongside.
 WARM = threading.Lock()
 SLOW = ("/api/atlas", "/api/codemap", "/api/search/", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
-        "/api/code/", "/api/learned", "/api/stages", "/api/areas")
+        "/api/code/", "/api/learned", "/api/stages", "/api/areas", "/api/text/uses/")
 # polled by the live view several times a second; logged only when slow or failing
 POLLED = ("/api/live", "/api/live/player")
 
@@ -194,6 +194,22 @@ def world():
     import places
     w["places"] = places.assign(w)
     return w
+
+
+_TEXT_USES = {}
+
+
+def text_uses(n):
+    """The script procedures that show text-bank string N (their text#N operands)."""
+    if not _TEXT_USES:
+        import gclview
+        names = {int(p): r.get("name") for p, r in gclview.names().procs.items()}
+        uses = {}
+        for cid, p in actors.procs().items():
+            for t in set(p["texts"]):
+                uses.setdefault(t, []).append({"id": cid, "name": names.get(cid) or ""})
+        _TEXT_USES.update(uses or {-1: []})
+    return {"procs": _TEXT_USES.get(n, [])}
 
 
 def hp_data(h):
@@ -353,6 +369,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/strings":
             orig = self.server.original
             self.send(200, [dict(s, edited=orig.get(s["id"]) != s["text"]) for s in read_strings()])
+        elif self.path.startswith("/api/text/uses/"):
+            self.send(200, text_uses(int(self.path.rsplit("/", 1)[1])))
         elif self.path == "/api/original":
             self.send(200, self.server.original)
         elif self.path == "/api/english":

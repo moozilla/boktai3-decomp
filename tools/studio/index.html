@@ -38,7 +38,13 @@ input[type=search] { width: 100%; padding: 7px 10px; border-radius: 6px; border:
 .row:hover { background: var(--sel); }
 .row.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
 .row .id { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 3.4em; font-size: 12px; padding-top: 1px; }
-.row .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.row .t { overflow: hidden; flex: 1; min-width: 0; }
+.row .t > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .t .en { color: var(--muted); font-size: 12.5px; }
+.uses { display: flex; gap: 6px; flex-wrap: wrap; }
+.uses a { font-size: 12px; padding: 2px 8px; border-radius: 10px; background: var(--sel); color: var(--ink); text-decoration: none; }
+.uses a:hover { outline: 1px solid var(--accent); }
+.uses .none { color: var(--muted); font-size: 12px; }
 .row .e { color: var(--edited); font-size: 11px; }
 #edit { padding: 16px 20px; overflow-y: auto; min-width: 0; }
 #edit h2 { font-size: 15px; margin: 0 0 10px; display: flex; gap: 10px; align-items: baseline; }
@@ -76,6 +82,9 @@ pre#log { background: var(--panel); border: 1px solid var(--line); border-radius
       <label style="margin:0;display:flex;gap:6px;align-items:center;color:var(--ink);font-size:13px">
         <input id="onlyEdited" type="checkbox"> Edited only
       </label>
+      <label style="margin:0;display:flex;gap:6px;align-items:center;color:var(--ink);font-size:13px">
+        <input id="hideEmpty" type="checkbox" checked> Hide empty strings (only line breaks)
+      </label>
       <div id="count"></div>
     </div>
     <div id="list"></div>
@@ -86,6 +95,8 @@ pre#log { background: var(--panel); border: 1px solid var(--line); border-radius
     <div class="orig" id="orig"></div>
     <label>Fan translation (boktai3trans)</label>
     <div class="orig" id="fan" style="font-family:system-ui,sans-serif"></div>
+    <label>Shown by <span style="font-weight:normal">(script procedures with a <code>text#</code> operand for it; code can show strings too)</span></label>
+    <div class="uses" id="uses"><span class="none">Pick a string on the left.</span></div>
     <label for="ed">Text <span style="font-weight:normal">(escapes: <code>\n</code> newline, <code>{XXXX}</code> glyph code)</span></label>
     <textarea id="ed" spellcheck="false" disabled></textarea>
     <label>Preview (game font; tags not drawn, &lt;WEIGHT&gt; in red; wraps at
@@ -127,15 +138,19 @@ async function load() {
   render();
   const h = parseInt(location.hash.slice(1));
   if (byId.has(h)) select(h);
+  else if (!EMBED) { const first = strings.find(s => !isEmpty(s)); if (first) select(first.id); }
   window.addEventListener('hashchange', () => { const n = parseInt(location.hash.slice(1)); if (byId.has(n)) select(n); });
 }
 
 function plain(t) { return t.replace(/<[^>]*>/g, '').replace(/\\n/g, ' ⏎ '); }
+// nothing but line breaks, tags and spaces: placeholders the game never shows
+const isEmpty = s => !plain(s.text).replace(/[⏎\s]/g, '');
 
 function render() {
-  const q = $('q').value.trim(), only = $('onlyEdited').checked;
+  const q = $('q').value.trim(), only = $('onlyEdited').checked, hide = $('hideEmpty').checked;
   let hits = strings;
   if (only) hits = hits.filter(s => s.edited);
+  if (hide && !q.startsWith('#')) hits = hits.filter(s => s.id === cur || !isEmpty(s));
   if (q.startsWith('#')) {
     const n = parseInt(q.slice(1));
     hits = isNaN(n) ? hits : hits.filter(s => String(s.id).startsWith(String(n)));
@@ -150,8 +165,10 @@ function render() {
     const d = document.createElement('div');
     d.className = 'row' + (cur === s.id ? ' on' : '');
     d.dataset.id = s.id;
-    d.innerHTML = `<span class="id">#${s.id}</span><span class="t"></span>${s.edited ? '<span class="e">edited</span>' : ''}`;
-    d.querySelector('.t').textContent = plain(s.text) || '(empty)';
+    d.innerHTML = `<span class="id">#${s.id}</span><span class="t"><span class="jp"></span><span class="en"></span></span>${s.edited ? '<span class="e">edited</span>' : ''}`;
+    d.querySelector('.jp').textContent = plain(s.text) || '(empty)';
+    const en = fan[s.id];
+    if (en && en !== s.text) d.querySelector('.en').textContent = plain(en); else d.querySelector('.en').remove();
     frag.appendChild(d);
   }
   $('list').replaceChildren(frag);
@@ -165,6 +182,7 @@ $('list').addEventListener('click', e => {
 $('q').addEventListener('input', render);
 listKeys(() => $('list'), '.row');
 $('onlyEdited').addEventListener('change', render);
+$('hideEmpty').addEventListener('change', render);
 
 function select(id) {
   cur = id;
@@ -179,6 +197,15 @@ function select(id) {
   history.replaceState(null, '', '#' + id);
   for (const r of document.querySelectorAll('.row')) r.classList.toggle('on', +r.dataset.id === id);
   preview();
+  showUses(id);
+}
+async function showUses(id) {
+  $('uses').innerHTML = '<span class="none">…</span>';
+  const u = await fetch('/api/text/uses/' + id).then(r => r.ok ? r.json() : null).catch(() => null);
+  if (cur !== id) return;
+  $('uses').innerHTML = !u ? '<span class="none">unavailable</span>' : u.procs.length
+    ? u.procs.map(p => peekLink('/scripts#' + p.id, esc(p.name || 'proc ' + p.id))).join('')
+    : '<span class="none">no script names it directly</span>';
 }
 
 // Same token rules as tools/datafmt/text_bank.py encode_string.
