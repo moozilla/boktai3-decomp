@@ -345,7 +345,15 @@ def write_string(sid, text):
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
-    def send(self, code, body, ctype="application/json"):
+    def send(self, code, body, ctype="application/json", etag=None):
+        """etag: the body is a file that rarely changes; the browser may keep it
+        a few minutes and then revalidate it (304) instead of downloading it."""
+        if etag and self.headers.get("If-None-Match") == etag:
+            self.status, self.size = 304, 0
+            self.send_response(304)
+            self.send_header("ETag", etag)
+            self.end_headers()
+            return
         if isinstance(body, (dict, list)):
             body = json.dumps(body, ensure_ascii=False)
         if isinstance(body, str):
@@ -354,7 +362,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
+        if etag:
+            self.send_header("Cache-Control", "max-age=600")
+            self.send_header("ETag", etag)
+        else:
+            self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
 
@@ -566,7 +578,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path.startswith("/api/res/"):
             f = resource_file(*self.path[len("/api/res/"):].split("/")[:2])
             if f:
-                self.send(200, open(f, "rb").read(), "application/octet-stream")
+                st = os.stat(f)
+                tag = f'"{st.st_mtime_ns:x}-{st.st_size:x}"'
+                self.send(200, b"" if self.headers.get("If-None-Match") == tag else open(f, "rb").read(),
+                          "application/octet-stream", etag=tag)
             else:
                 self.send(404, {"error": "no such resource"})
         else:
