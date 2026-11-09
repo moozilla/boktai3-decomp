@@ -157,6 +157,10 @@ const bar = (clean, total) => `<span class="bar" title="${fmtPct(pct(clean, tota
 // ---------- index ----------
 async function load() {
   S = await fetch('/api/codemap').then(r => r.ok ? r.json() : Promise.reject(r.status));
+  for (const k of Object.keys(FN)) delete FN[k];
+  for (const k of Object.keys(BYNAME)) delete BYNAME[k];
+  for (const k of Object.keys(UNIT)) delete UNIT[k];
+  RAMS.length = 0; ramNames.s = null;
   for (const c of S.categories) {
     c.size = 0; c.clean = 0; c.nfn = 0; c.ncx = 0;
     for (const u of c.units) {
@@ -239,6 +243,7 @@ function overview() {
       ordinary C with no matching concession; the rest still steers the compiler with a register pin, an empty <code>asm("")</code> or one of the other
       kinds below, and removing those is the current work. Pick a category, a unit or a function, or search on the left.</p>
     ${(S.missing || []).map(x => `<div class="notice">Not available here: ${esc(x)}.</div>`).join('')}
+    ${S.updating ? '<div class="notice">The sources changed: a new index is building (about half a minute); this page updates when it is ready.</div>' : ''}
     <div class="tiles">
       <div class="tile"><b>${num(nfn)}</b><span>functions, all matching</span></div>
       <div class="tile"><b>${kb(total)}</b><span>of code in ${num(m.total_units ?? Object.keys(UNIT).length)} units</span></div>
@@ -461,7 +466,13 @@ $('view').addEventListener('click', e => {
   if (tr && !e.target.closest('a')) location.hash = tr.dataset.href;
 });
 window.onhashchange = route;
-load().then(route).catch(err => { $('view').innerHTML = notFound(`The code index failed to load (${err}). Check the Studio's terminal.`); });
+// after a source change the server rebuilds in the background; pick up the new index when it lands
+async function watchUpdate() {
+  if (!S?.updating) return;
+  const t = await fetch('/api/codemap').then(r => r.json()).catch(() => null);
+  if (t && !t.updating) { await load(); route(); } else setTimeout(watchUpdate, 5000);
+}
+load().then(() => { route(); setTimeout(watchUpdate, 5000); }).catch(err => { $('view').innerHTML = notFound(`The code index failed to load (${err}). Check the Studio's terminal.`); });
 </script>
 </body>
 </html>

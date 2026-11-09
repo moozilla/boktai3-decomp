@@ -25,6 +25,8 @@ import re
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -227,6 +229,7 @@ def build():
 
 
 _INDEX = {"mtime": None, "data": None}
+_LOCK = threading.Lock()
 
 
 def _read_json(path):
@@ -234,27 +237,57 @@ def _read_json(path):
         return json.load(f)
 
 
-def load():
-    """The index, rebuilt when an input is newer than the cache (or the cache was built
-    without some of its inputs)."""
+def _rebuild(newest):
+    data = build()
+    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+    tmp = CACHE + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(data, f, separators=(",", ":"))
+    os.replace(tmp, CACHE)
+    data = _read_json(CACHE)  # the same shape the cached path returns (str keys)
+    _INDEX.update(mtime=newest, data=data)
+    return data
+
+
+def _rebuild_in_background(newest):
+    def run():
+        try:
+            _rebuild(newest)
+        finally:
+            _LOCK.release()
+    if _LOCK.acquire(blocking=False):
+        threading.Thread(target=run, daemon=True).start()
+
+
+def updating():
+    """True while a rebuild runs behind the index being served."""
+    return _LOCK.locked()
+
+
+def load(wait=False):
+    """The index. When an input is newer than it (a source edit, a merge), the old one is
+    served while a new one builds in the background (about half a minute, tools/progress.py);
+    only the first build, or WAIT, blocks."""
+    now = time.time()
+    if _INDEX["data"] is not None and now - _INDEX.get("checked", 0) < 2:
+        return _INDEX["data"]
+    _INDEX["checked"] = now
     newest = _newest()
     if _INDEX["data"] is not None and _INDEX["mtime"] >= newest:
         return _INDEX["data"]
-    data = None
-    if os.path.exists(CACHE) and os.path.getmtime(CACHE) >= newest:
+    if _INDEX["data"] is None and os.path.exists(CACHE):
         data = _read_json(CACHE)
-        if data.get("missing"):
-            data = None
-    if data is None:
-        data = build()
-        os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-        tmp = CACHE + ".tmp"
-        with open(tmp, "w") as f:
-            json.dump(data, f, separators=(",", ":"))
-        os.replace(tmp, CACHE)
-        data = _read_json(CACHE)  # the same shape the cached path returns (str keys)
-    _INDEX.update(mtime=newest, data=data)
-    return data
+        if not data.get("missing"):
+            _INDEX.update(mtime=os.path.getmtime(CACHE), data=data)
+            if _INDEX["mtime"] >= newest:
+                return data
+    if _INDEX["data"] is not None and not wait:
+        _rebuild_in_background(newest)
+        return _INDEX["data"]
+    with _LOCK:
+        if _INDEX["data"] is not None and _INDEX["mtime"] >= newest:
+            return _INDEX["data"]
+        return _rebuild(newest)
 
 
 def summary():
@@ -262,7 +295,7 @@ def summary():
     overview and search: [category -> [unit -> [function rows]]]."""
     ix = load()
     if _INDEX.get("summary_of") is ix:
-        return _INDEX["summary"]
+        return dict(_INDEX["summary"], updating=updating())
     cats = [{"name": c["name"], "measures": c["measures"], "units": [{"name": u, "functions": []} for u in c["units"]]}
             for c in ix["categories"]]
     for f in ix["functions"].values():
@@ -271,12 +304,12 @@ def summary():
     for c in cats:
         for u in c["units"]:
             u["functions"].sort(key=lambda r: r[1])
-    out = {"measures": ix["measures"], "missing": ix.get("missing", []), "concession_kinds": ix["concession_kinds"],
+    out = {"measures": ix["measures"], "missing": ix.get("missing", []), "updating": False, "concession_kinds": ix["concession_kinds"],
            "categories": cats,
            "ram": [{k: r.get(k) for k in ("addr", "name", "size", "header")} | {"users": len(ix["ram_users"].get(r["name"], []))}
                    for r in ix["ram"]]}
     _INDEX.update(summary=out, summary_of=ix)
-    return out
+    return dict(out, updating=updating())
 
 
 def _source(f):
