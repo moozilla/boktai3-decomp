@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_charge_offset.h"
 #include "scene_graphics_actor.h"
 #include "engine_globals.h"
@@ -61,18 +60,13 @@ static inline void add(struct ContactPosition *a, struct ContactPosition *b)
     a->y += b->y;
     a->z += b->z;
 }
-static inline int turn(int target, int current)
+static inline int clampTurn(int delta)
 {
-    register int angle asm("r0") = current;
-    int delta = target - angle;
     if (delta > 32)
         delta = 32;
-    else {
-        register int lower asm("r3") = -32;
-        if (delta < lower)
-            delta = lower;
-    }
-    return angle + delta;
+    else if (delta < -32)
+        delta = -32;
+    return delta;
 }
 void SceneActorAnimation_UpdateChargeShotRelease(ActorAnimation *p, int tick)
 {
@@ -104,14 +98,10 @@ void SceneActorAnimation_UpdateChargeShotRelease(ActorAnimation *p, int tick)
         add(&spawn, (struct ContactPosition *)(position + 12));
         spawn.y += 300;
         power = ((struct SceneGraphicsActor *)p2)->graphics.chargeShotPower;
-        direction = turn(p->requestedAngle, position[9]);
+        direction = position[9] + clampTurn(p->requestedAngle - position[9]);
         gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 random = gRandomIndex * 2;
-            register u16 *table asm("r3");
-            table = gRandomTable;
-            random += (u32)table;
-            random = *(u16 *)random;
+            u32 random = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
             direction -= 8;
             random &= 15;
             direction += random;
@@ -120,9 +110,7 @@ void SceneActorAnimation_UpdateChargeShotRelease(ActorAnimation *p, int tick)
         Sound_PlaySongChecked(234);
     }
     if (*((u8 *)p2 + 0x25d) & 2) {
-        register int elapsed asm("r0") = tick;
-        asm("" : "+r"(elapsed));
-        if (elapsed > 40)
+        if (tick > 40)
             p->finished = 1;
     }
 }

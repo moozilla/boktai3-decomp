@@ -7,7 +7,7 @@ void SceneObject_UpdateActiveIdle(void);
 // confidence=low: places a newly appended scene object on its terrain cell and starts its idle state.
 void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
 {
-    s32 cell = cellIndexAt(&obj->pos);
+    s32 cell = cellIndexAt(&obj->pos.position);
     u8 *dir;
     u8 *cellField;
     u32 t;
@@ -18,22 +18,22 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
         case 0:
             obj->cellA = cell - 1;
             obj->cellB = cell;
-            obj->pos.z += 0x80;
+            obj->pos.position.z += 0x80;
             break;
         case 1:
             obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
             obj->cellB = cell;
-            obj->pos.x += 0x80;
+            obj->pos.position.x += 0x80;
             break;
         case 2:
             obj->cellA = cell;
             obj->cellB = cell - 1;
-            obj->pos.z += 0x80;
+            obj->pos.position.z += 0x80;
             break;
         case 3:
             obj->cellA = cell;
             obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
-            obj->pos.x += 0x80;
+            obj->pos.position.x += 0x80;
             break;
     }
     {
@@ -73,16 +73,16 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
                 Sprite_Init(sprite, mgr + (obj->value * 28 + 0x384), 0);
                 break;
         }
-        *(struct Pair *)&sprite->a = *(struct Pair *)&obj->r0;
+        sprite->spritePos.words = obj->r0.words;
         if (!(*dir & 1)) {
-            *(u16 *)&sprite->a -= 0x20;
-            *(u16 *)&sprite->b += 0x20;
+            sprite->spritePos.position.x -= 0x20;
+            sprite->spritePos.position.z += 0x20;
         } else {
-            *(u16 *)&sprite->a += 0x20;
-            *(u16 *)&sprite->b -= 0x20;
+            sprite->spritePos.position.x += 0x20;
+            sprite->spritePos.position.z -= 0x20;
             *(u32 *)sprite |= 4;
         }
-        *(struct Pair *)&obj->q0 = *(struct Pair *)&sprite->a;
+        obj->q0.words = sprite->spritePos.words;
         t = obj->variant;
         if (t == 0) {
             obj->callback = SceneObject_UpdateInactiveIdle;

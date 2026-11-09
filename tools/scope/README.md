@@ -1529,6 +1529,54 @@ Each was read from the compiler source and confirmed on a live draft.
    halfword store its own HImode zero, and the byte store keeps the SI one. This matched
    Actor_UpdateProjectedEntryAnimation and its Silent twin without pins. Declaring the array
    second doesn't help, and neither does a u8 array.
+68. **cse's `(set REG0 REG1)` rewrite, and how a Thumb two-operand subtract undoes it.** When an
+   insn copies REG1 into REG0 and REG0 is the head of its equivalence class, cse.c (about line
+   7617) rewrites the previous insn to set REG0 directly and deletes the copy. A label or another
+   insn between the two blocks it, and so does REG0 not being the class head. In
+   Background_Update the ROM keeps the copy: writing `x = sum - 120;` in each arm of the
+   `rateX == 128` test makes each arm end in a three-operand subtract that Thumb only has as
+   `subs rd, #imm8`, so reload copies first, and jump2 then cross-jumps the identical tails.
+   (`why` reported "no class-head takeover found" for this; it doesn't model the rewrite yet.)
+69. **A call in each if/else arm computes its argument straight into the argument register.**
+   `if (c) r = f(p, a); else r = f(p, g(b));` lets jump2 merge the call tails, and each arm
+   computes its last argument into r1 directly, where one call after the if goes through a
+   pseudo. TerrainOverlay_Initialize matched this way (with `String_Hash` returning u16).
+70. **`p++` at each `continue` adds refs to a hoisted stride constant.** loop.c's
+   combine_movables merges equal hoisted constants, so every increment site counts as a ref of
+   the one hoisted register. A REG_EQUIV constant's priority is halved (fact on global.c), and
+   the extra refs bring it back up to the ROM's rank. Scene_StopSelectedObject matched with
+   `p++` before each of its three `continue`s and once after the id test.
+71. **A `u32 f:16` bitfield store is an SImode read-modify-write only while the struct is
+   ADDRESSOF.** With a struct of `u32 x:16, z:16` in a local, `pt.x = t;` compiles to
+   `ldr; and; orr; str` as long as the struct's address is never stored in a pointer variable;
+   once `q = &pt` exists the store is a plain `strh`. Writing `pt.x = pt.x op ...` directly also
+   narrows to `strh`, while going through a temp (`t = pt.x op ...; pt.x = t;`) keeps the RMW.
+   A struct of u16 fields always gives `strh`. (Probed for Scene_SpawnDirectionalDust.)
+
+72. **Read a pad word fresh at each test to keep regmove from tying it.** `u16 held = gPadState[0];`
+   then `held & K` in several tests makes held die in the AND, and regmove's fixup_match_1 ties the
+   AND's output to it, so one register holds both. Writing `gPadState[0] & K` at each test gives
+   each AND its own load and the ROM's separate registers; gcse's PRE then copies the shared
+   address (`adds r3, r1, #0`). This matched ChoiceMenu_HandleInput without pins.
+
+73. **A store in each arm of an if keeps flow from making a post-increment.** flow's find_auto_inc
+   joins `*p = v; p++;` into `stmia`/post-increment only when the store and the increment are in
+   the same basic block. `if (c) { ...; *p = x; } else *p = x; p++;` puts the store in both arms;
+   jump2's cross-jumping merges the two stores back into one, so the ROM shows a plain `str` and a
+   separate `adds`. ChoiceMenu_CreateFromScript.
+
+74. **`*(&value) = f();` keeps a loop invariant inside the loop.** Taking the address makes value an
+   ADDRESSOF during cse1; purge_addressof turns it back into a register but leaves extra insns, which
+   raise the loop's insn_count past loop.c's `threshold * savings * lifetime` test, so the invariant
+   stays where the ROM computes it. The same spelling matched DirectionalController_ScriptCreate
+   and ChoiceMenu_CreateFromScript.
+
+75. **update_equiv_regs doubles a constant register's live length once per set.** local-alloc.c does
+   `REG_LIVE_LENGTH (regno) *= 2` for each insn whose set carries a REG_EQUIV note, so a pointer set
+   to the same symbol in two places is weighted x4 (StatusScreen_DrawClock: 48 -> 192, priority 625
+   against 833 for the gBgRecords constants). One set doubles it once. `life_note` names this case.
+   When a parser returns its text pointer from every path (`text = ...; return text;`), text and the
+   scan cursor stay in separate registers (ChoiceMenu_ParseTag).
 
 ## Survey: random table as a literal address (2026-10-24)
 

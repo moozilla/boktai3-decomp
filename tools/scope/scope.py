@@ -2279,7 +2279,22 @@ def life_note(wd, x, live):
                     f" The doubling goes away only if the non-constant set comes first in the code]")
         return (f" [flow measured {fl}; doubled because it always holds a constant (REG_EQUIV):"
                 f" update_equiv_regs, local-alloc.c, halves constant registers' priority]")
+    k = equiv_sets(wd, x)
+    if k >= 2 and live == fl << k:
+        return (f" [flow measured {fl}; update_equiv_regs (local-alloc.c) doubled it once for each of its"
+                f" {k} sets with a REG_EQUIV note (x{1 << k}), so its priority fell to 1/{1 << k}."
+                f" Setting it to the constant once (one set) doubles it only once]")
     return f" [flow measured {fl}; regmove changed it while rewriting copies]"
+
+
+def equiv_sets(wd, x):
+    """How many sets of pseudo X carry a REG_EQUIV note in the lreg dump: update_equiv_regs doubles a
+    register's live length once per such set (REG_LIVE_LENGTH (regno) *= 2 in its insn walk)."""
+    path = os.path.join(wd, "u.i.lreg")
+    if not os.path.exists(path):
+        return 0
+    return sum(1 for b in re.split(r"\n\n", open(path).read())
+               if re.search(rf"\(set \(reg(?:/\w)*:\w+ {x}\)", b) and "REG_EQUIV" in b)
 
 
 def has_equiv_note(wd, x):
@@ -3653,7 +3668,9 @@ def cmd_pins(src, func, env):
 
     def show(n):
         return "compile fails" if n is None else f"{n} rows ({counts.get(n, '?')})"
-    text = open(os.path.join(ROOT, src)).read()
+    # clang-format breaks a long pin as `register T *x asm(\n "ip");`: join it so the line scan sees it
+    text = re.sub(r'(\b(?:asm|__asm__)\s*\()\s*\n\s*("(?:r\d+|sb|sl|fp|ip|lr)"\s*\))', r'\1\2',
+                  open(os.path.join(ROOT, src)).read())
     lines = text.split("\n")
     reach = function_reach(text, func)
     starts = [0]
@@ -6979,14 +6996,22 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
             now = re.sub(r'^INCLUDE_ASM\("[^"]*", %s\);\n' % re.escape(asm_name or name), "", cur, flags=re.M)
             if asm_name is None:  # FUNC matches already (a depin): its current C is what the draft replaces
                 now = land.without_definition(now, name)
-            if land.context_key(rest) != land.context_key(now):
+            import split
+            alone = split.c_functions(path) == [name] and split.c_functions(os.path.abspath(draft)) == [name]
+            if alone and land.context_key(rest) != land.context_key(now):
+                # a unit that holds FUNC alone (a src/fn file): no neighbor can be undone, so a depin
+                # draft that also rewrote the file's helpers, types or marker lands whole
+                print(f"{name}: {dest} holds {name} alone; the draft replaces the whole file")
+            elif land.context_key(rest) != land.context_key(now):
                 added = land.only_additions(now, rest)
                 if added is None:
                     sys.exit(f"{name}: no workspace base for {rel}, and outside {name} it differs from {dest};"
                              " land by hand (or reopen with `new`)")
                 print(f"{name}: the draft adds {added} line(s) outside {name} (a new helper or declaration);"
                       " everything else there is the unit as it is now")
-        merged = land.merge(cur, open(base).read() if os.path.exists(base) else cur, text)
+        else:
+            alone = False
+        merged = text if alone else land.merge(cur, open(base).read() if os.path.exists(base) else cur, text)
         if merged is None:
             sys.exit(f"{name}: {dest} changed since `new` in a way that conflicts with the draft; land by hand")
         text = merged

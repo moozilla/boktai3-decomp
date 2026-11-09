@@ -215,9 +215,9 @@ class SemanticExecution(unittest.TestCase):
 class SemanticIsolation(unittest.TestCase):
     @unittest.skipUnless(os.name == 'posix', 'POSIX signal regression')
     def test_actual_native_signal_preserves_parent_and_frozen_contract_metadata(self):
-        command = [sys.executable, '-c',
-                   'import os,signal,resource;resource.setrlimit(resource.RLIMIT_CORE,(0,0));'
-                   'os.kill(os.getpid(),signal.SIGILL)']
+        # SIGKILL, not a fault signal: macOS shows a "Python quit unexpectedly" dialog for SIGILL,
+        # SIGSEGV and the like, one per test run, and SIGKILL takes the same path in the parent.
+        command = [sys.executable, '-c', 'import os,signal;os.kill(os.getpid(),signal.SIGKILL)']
         evaluator, _ = semantic_evaluator()
         run = _run_semantic_process
 
@@ -228,7 +228,7 @@ class SemanticIsolation(unittest.TestCase):
         with patch('matchsearch.evaluator._run_semantic_process', side_effect=crash):
             result = evaluator._semantic(BASELINE, thumb_call(), 1)
         self.assertEqual(result['verdict'], 'unavailable')
-        self.assertEqual(result['isolation']['signal'], signal.SIGILL)
+        self.assertEqual(result['isolation']['signal'], signal.SIGKILL)
         self.assertEqual(result['trials'], 0)
         self.assertFalse(result['proof'])
         self.assertEqual(result['call_contracts']['known_addresses'], 2)

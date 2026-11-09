@@ -234,6 +234,22 @@ export function stripLayout<T>(
   })
 }
 
+/** Whole cells for each share (any scale) of TOTAL cells, summing to TOTAL: largest remainder. */
+export function cellSizes(shares: number[], total: number): number[] {
+  const sum = shares.reduce((s, x) => s + x, 0)
+  if (!sum || total <= 0) return shares.map(() => 0)
+  const exact = shares.map(x => (x / sum) * total)
+  const out = exact.map(Math.floor)
+  let left = total - out.reduce((s, x) => s + x, 0)
+  const order = exact.map((x, i) => [x - Math.floor(x), i] as const).sort((a, b) => b[0] - a[0])
+  for (const [, i] of order) {
+    if (left <= 0) break
+    out[i]! += 1
+    left--
+  }
+  return out
+}
+
 /** A function's colour at the function level: green matched with no concession, teal matched
  * with concessions (its pct is then the share of its lines without one), amber drafts, grey nothing yet. */
 export function fnShade(pct: number, pinned: boolean): string {
