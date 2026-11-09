@@ -122,6 +122,24 @@ Draft: `notes/phase3-menus-link/Presentation_SetItemGraphic.c` (6 ROM / 6 draft 
   copy. A `scope` knob that forbids one combine (like AGBCC_NOTIE) would show whether that alone
   is enough.
 
+### SelectionMenu_NavigateGrid (0801ACB8, src/selection_menu.c)
+
+Draft: `notes/phase3-menus-link/SelectionMenu_NavigateGrid.c`: main's C without the
+`asm("" ::: "memory")`, 2 ROM / 0 draft insns. The ROM reloads `*held` for the horizontal
+tests (`mov r0, ip; ldrh r1, [r0]`). gcse's PRE finds that load fully redundant with the
+vertical tests' load and deletes it, and cse2 then merges the copy. `AGBCC_NOPRE=1` on the draft
+matches, so this is the only decision left.
+* gcse's expr_equiv_p compares only code, mode and operands (MEM is "e0"), so alias sets and
+  the /s flag don't separate the two loads. To survive, they need a different address register
+  or a different mode.
+* Different mode: `u32 h = *held;` for the horizontal tests keeps the load, but h dies in the
+  last and, which ties (`ands r1, r0`, 2/2). A u32 for the vertical tests unties them but
+  breaks their const-copy ands (5/5).
+* Different address: a fresh `u16 *pad = gPadState;` or direct `gPadState[0]` keeps the load in
+  ip, but the vertical read then uses the top's symbol register r1 instead of the ip copy (2/2).
+* Also tried: 128 combinations of held vs gPadState for each of the nine pad reads, re-setting
+  `held` between the tests, and inline vertical/horizontal helpers.
+
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
 tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
