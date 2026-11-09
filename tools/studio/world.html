@@ -296,13 +296,12 @@ function zoomed(vb) {
 }
 const inView = i => { const b = view.box(), q = pos[i]; return q && q.x > b[0] && q.x < b[0] + b[2] && q.y > b[1] && q.y < b[1] + b[3]; };
 function fitWorld() { view.reset(bounds(pos, Object.keys(pos), 30)); }
-// a place's areas in its biggest connected group (and AREA's group, when given):
+// a place's areas in its biggest connected group, or in AREA's group when given:
 // fitting the view to every loose room of a place would show the whole world
 function mainGroup(ids, area) {
   const of = ids.map(i => comps.find(c => c.includes(i))).filter(Boolean);
-  const best = of.reduce((x, y) => (y.length > x.length ? y : x), of[0] || []);
-  const keep = new Set([...best, ...(area != null ? comps.find(c => c.includes(area)) || [] : [])]);
-  return ids.filter(i => keep.has(i));
+  const best = (area != null && comps.find(c => c.includes(area))) || of.reduce((x, y) => (y.length > x.length ? y : x), of[0] || []);
+  return ids.filter(i => best.includes(i));
 }
 function focusAreas(ids) {
   ids = ids.filter(i => pos[i]);
