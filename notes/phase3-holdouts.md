@@ -915,3 +915,21 @@ gets no register (priority 238), so the mask is reloaded after the `ldr` (r3, si
 The ROM has a block-local mask in r2 loaded before the address, with count in r3. Tried: mask
 locals before the call, after it, before the accumulated block, and `return mask`. Next: break cse1's
 path between line 101 and the count block, or find a mask spelling that is not in const 1's class.
+
+### PlayerParticleCloud_ScatterAnchors (src/fn/sub_081D3620.c, 081D3620): deferred
+
+Pin: `register u32 random asm("r0")` in the loop.
+Draft: `notes/phase3-drafts/monsters-bosses/PlayerParticleCloud_ScatterAnchors.c` (12 ROM / 12 draft, swap only).
+Both scatter blocks sit in one basic block, so random and coordinate are local-alloc pseudos.
+random has 8 refs (4 mentions, doubled by the loop) over 8 insns, which gives priority 30000.
+coordinate has 12 refs over 8 insns, which gives 45000. coordinate is allocated first and takes r0.
+`AGBCC_PRI=random:+15000,random#1:+15000` matches. A tie is enough, because random has the lower qty.
+So random needs 6 mentions, or coordinate needs 4, with the same lives.
+`(u16)origin + bias` still expands into two sets of coordinate.
+Tried without effect:
+- one-line sums, `ParticleRandom_NextSample`, the READ_SAMPLE macro
+- u16/s32/u32 random, u16/u32 coordinate
+- `coordinate += random & mask`, `random = *sample & mask`
+- storing `coordinate + random` directly (a temp pseudo then takes r0)
+- an inline helper returning the sum
+Next: find a spelling where random's value passes through one more set before the add, without a new pseudo.
