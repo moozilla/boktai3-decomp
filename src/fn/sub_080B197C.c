@@ -6,7 +6,8 @@ void sub_080B3110(void *, u32, const void *, u32);
 u8 SceneActor_DispatchContextAction(void *, u32);
 static inline u8 HasFlag(u32 value, u32 mask)
 {
-    if (value & mask)
+    mask &= value;
+    if (mask)
         return 1;
     return 0;
 }
@@ -39,7 +40,7 @@ void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
 {
     u8 *ctx = a->context;
     u16 *flags = (void *)(ctx + 0x6D4);
-    register u32 value asm("r1") = ~8;
+    u32 value = ~8;
     value &= *flags;
     *flags = value;
     if (ShouldReact(ctx, value)) {
@@ -51,7 +52,8 @@ void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
         }
     } else {
         u32 active = MotionFlag((void *)&a->tracking.target, 8);
-        /* Keep the motion test result available before selecting its control. */
+        /* Phase 3: without this, a (18 refs / 94) outranks active (8 / 33); active needs one more
+         * ref or two fewer insns of life (AGBCC_PRI=active:+400). */
         asm("" : : "r"(active));
         if (active)
             SceneActor_DispatchContextAction(ctx, 0);
