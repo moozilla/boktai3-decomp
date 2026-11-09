@@ -40,7 +40,7 @@ void WirelessController_ResetSession(struct Engine *p)
     int zero = 0;
     int i;
     u8 *ids;
-    u8 *global;
+    volatile u8 *global;
     int byteZero;
     int secondZero, secondByteZero, one, clearZero;
     u8 *active;
