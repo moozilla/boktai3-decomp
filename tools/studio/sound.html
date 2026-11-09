@@ -178,6 +178,7 @@ async function showSong(s) {
   }
   $('view').innerHTML = `<div class="page"><div class="full">
     <h1 class="t" id="title">${esc(titleOf(s))}</h1>
+    ${songPlace(s) ? `<div class="sub">Plays in ${esc(songPlace(s))}</div>` : ''}
     <div class="sub">Song ${s.n} · header <span class="mono">${s.addr}</span> · ${playerName(s.player)} (${s.player_tracks} tracks) · ${s.tracks.length} track${s.tracks.length > 1 ? 's' : ''} · ${kb(s.size)} · voicegroup <a class="mono" href="#vg=${s.voicegroup}">${s.voicegroup}</a></div>
     <div class="badges">${test}<span class="badge">priority ${s.priority}</span>${s.reverb & 0x7f ? `<span class="badge">reverb ${s.reverb & 0x7f}</span>` : ''}<a class="badge" href="/atlas#song:${s.n}" target="_top">Browse ↗</a></div>
     <div id="ned" style="margin-top:10px"></div></div>
