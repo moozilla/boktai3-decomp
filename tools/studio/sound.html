@@ -139,6 +139,7 @@ function renderList() {
   $('count').textContent = `${rows.length} of ${choices.length} ${menu ? 'menu positions' : 'song table entries'}`;
 }
 $('list').onclick = e => { const r = e.target.closest('.row'); if (r) location.hash = r.dataset.n; };
+listKeys(() => $('list'), '.row');
 ['q', 'grp', 'used', 'empties'].forEach(id => $(id).addEventListener('input', renderList));
 
 // ---------- a song ----------
