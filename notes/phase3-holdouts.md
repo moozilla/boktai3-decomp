@@ -523,17 +523,16 @@ keeps `adds r1, #0xff`). The front half (the bursts) is ordinary. Do it after La
 
 ### ContactActor_UpdateRetreat (src/fn/sub_0804373C.c, 0804373C): deferred
 
-Draft: `notes/phase3-drafts/actors/ContactActor_UpdateRetreat.c` (the pinned file with its pins
-and the asm volatile removed; 104 ROM / 99 draft). The blocker is the ROM's dead
-`ldr r3, =0x0403B714; mov r8, r3` right before the enter block's first random draw. The pinned
-file forces it with an asm volatile. The same dead literal sits just before a random draw in 48
-functions in build/asm (ActorParticles_SpawnBurst, sub_08012B34, Axe_FollowAcceleratingRoute,
-...), so it comes from the original random macro or inline, not from this function. Scope README
-fact 94 has the only known mechanism: a constant set whose use combine folds through
-nonzero_bits after flow. Here the pseudo crosses calls (r8), so its folded use sits after
-Math_Atan2. Without the literal the frame grows a spill slot (sp #0xc) and center moves from sl
-to r8. Next: recover the random macro from one of the 48 (a short one such as
-SceneSteeringActor_EmitRandomParticle), then reuse it here.
+Draft: `notes/phase3-drafts/actors/ContactActor_UpdateRetreat.c` (95 / 95, no pins). The ROM's
+dead `ldr r3, =0x0403B714; mov r8, r3` before the enter block's first random draw is the
+project's known random origin: `PARTICLE_RANDOM_CAPTURE_ORIGIN(origin)` plus a
+`ParticleRandom_ReadRelativeSample(origin, table)` draw (monster_particle_random.h; scope
+README fact 94; 48 functions in build/asm show the literal). The draft reads the steering timer
+that way, and the literal comes back. Left is call-crossing allocation: the ROM has slot r7,
+center sl, origin r8, position r6. The draft has slot r6 and position r7, swaps origin (sl)
+with center (r8), and keeps a spill slot (sp #0xc against #8). `AGBCC_PRI=position:+4000`
+gets to 55 / 55. Next: find which draws use the relative read (it decides origin's live
+range), then the position/slot order.
 
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 

@@ -1,4 +1,5 @@
 #include "contact_actor.h"
+#include "monster_particle_random.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 truncateShift12(s32 value)
@@ -59,6 +60,7 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
     if (slot->enter) {
         struct ContactPosition *center;
         struct ContactPosition *entryDestination;
+        u32 origin;
         const u16 *table;
         const u16 *earlyTable;
         u32 angle;
@@ -74,6 +76,7 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         }
         center = &pool->retreatCenter;
         pool->retreatCenter.y = terrainHeight(center, cellIndex(center));
+        PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
         earlyTable = (const u16 *)0x0203B400;
         angle = nextRandom(earlyTable);
         angleMask = 255;
@@ -92,7 +95,7 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
                                      entryDestination->z - slot->position.z);
         jitter = (nextRandom(table) & 15) - 8;
         slot->direction += jitter;
-        slot->steeringTimer = (nextRandom(table) & 7) + 8;
+        slot->steeringTimer = (ParticleRandom_ReadRelativeSample(origin, table) & 7) + 8;
         slot->speed = 16;
     }
     if (!slot->steeringTimer) {
