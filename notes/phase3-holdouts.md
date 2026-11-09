@@ -415,8 +415,35 @@ jumps must have targeted labels with separate jump chains. One idea, not yet bui
 around the `r0 = history` copy, which delete_noop_moves removes only after mark_all_labels has
 canonicalized labels. Case 2 state 1's 1 lands in r0 because its block has exactly three local
 qtys (fact 38); `AGBCC_FORCE=151:1` on the shared draft shows the merges that follow.
-Next: try that label shape, or derive the original helper (the pinned file's
-Prepare/PrepareFirst/PrepareZero inlines suggest a state-setting helper that returns history).
+Later session: the label shape can't work, since reload already deletes the `r0 = history`
+noop copy (only move2add's own `(set r r)` noops reach jump2). Third draft,
+`notes/phase3-drafts/actors/ScenePool_StateLaunchArc_returnsplit.c` (16 / 2): own calls, case 3's
+state 1 ends in `return 0` while every other block breaks, and the function ends
+`} else entry->stateFrame++; return 0;`. With that split, case 3's state 1 is out of the break
+label's jump chain, so case 1 and case 2's state 2 now share exactly as the ROM does, and case 3
+keeps both blocks. Left: (a) case 0's 1 and address swap registers (fact 38), so case 0 merges
+8 insns into case 3 state 2; (b) case 2 state 1 keeps its call: its `adds r1, #0xff` can match
+case 3 state 2's `r1 = 256` only through the REG_EQUIV notes, and case 1's cross-jump has already
+stripped that note (scope README fact 111). In ROM order the plain copies go first, so the ROM
+had no move2add copy in case 2 state 1: its call was shared in source. But a source-shared call
+there is jumped to by the redirected case 0/1 jumps too (do_cross_jump reuses the label), and
+case 1 then merges into case 2 state 1. The pinned file's empty asm in case 1 is what separates
+them. Next: find what else besides an asm makes case 1's tail end differently at jump2 (a USE or
+CLOBBER insn stops the compare), or a helper that returns history (the pinned file's
+Prepare/PrepareFirst/PrepareZero inlines).
+
+### ScenePool_StateLaunchShortArc (src/fn/sub_0803E7B4.c, 0803E7B4): deferred
+
+Draft: `notes/phase3-drafts/actors/ScenePool_StateLaunchShortArc.c` (the LaunchArc own-calls
+form; kind in r8, the fire logic and the launch half match). Its switch tail is byte for byte
+the LaunchArc one and has the same residual (5 ROM / 2 draft). Solve LaunchArc first; then the
+return-split shape carries over.
+
+### ScenePool_StateEmitBursts (src/fn/sub_0803E998.c, 0803E998): deferred
+
+Not drafted separately: its kind switch ends in the same shared Memory_Clear tail as LaunchArc
+(cases 0, 1 and case 2's state 1 jump to case 3 state 2's `movs r1, #0x80`; case 3's state 1
+keeps `adds r1, #0xff`). The front half (the bursts) is ordinary. Do it after LaunchArc.
 
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 
