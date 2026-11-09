@@ -121,7 +121,7 @@ def search(q, strings=None, english=None, limit=50):
         for t in code.get("types", []):
             add(score(q, t), "type", t, "struct", "/code#type:" + t)
     for p in _places():
-        add(score(q, p["name"]), "place", p["name"], f"{len(p['areas'])} areas · {p['scenes']} scenes",
+        add(score(q, p["name"]), "place", p["name"], f"{len(p['areas'])} area{'s' * (len(p['areas']) != 1)} · {p['scenes']} scene{'s' * (p['scenes'] != 1)}",
             "/world#place=" + urllib.parse.quote(p["name"]))
     for pid, name in _procs().items():
         add(score(q, name, str(pid)), "procedure", name, f"proc {pid}", f"/scripts#{pid}")
