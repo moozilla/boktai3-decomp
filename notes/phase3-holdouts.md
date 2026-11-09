@@ -521,6 +521,34 @@ Not drafted separately: its kind switch ends in the same shared Memory_Clear tai
 (cases 0, 1 and case 2's state 1 jump to case 3 state 2's `movs r1, #0x80`; case 3's state 1
 keeps `adds r1, #0xff`). The front half (the bursts) is ordinary. Do it after LaunchArc.
 
+### ContactActor_UpdateRetreat (src/fn/sub_0804373C.c, 0804373C): deferred
+
+Draft: `notes/phase3-drafts/actors/ContactActor_UpdateRetreat.c` (95 / 95, no pins). The ROM's
+dead `ldr r3, =0x0403B714; mov r8, r3` before the enter block's first random draw is the
+project's known random origin: `PARTICLE_RANDOM_CAPTURE_ORIGIN(origin)` plus a
+`ParticleRandom_ReadRelativeSample(origin, table)` draw (monster_particle_random.h; scope
+README fact 94; 48 functions in build/asm show the literal). The draft reads the steering timer
+that way, and the literal comes back. Left is call-crossing allocation: the ROM has slot r7,
+center sl, origin r8, position r6. The draft has slot r6 and position r7, swaps origin (sl)
+with center (r8), and keeps a spill slot (sp #0xc against #8). `AGBCC_PRI=position:+4000`
+gets to 55 / 55. Next: find which draws use the relative read (it decides origin's live
+range), then the position/slot order.
+
+### ContactSwarm_UpdateTracking (src/fn/sub_08044290.c, 08044290): deferred
+
+Draft: `notes/phase3-drafts/actors/ContactSwarm_UpdateTracking.c` (25 / 27, the pinned file
+with plain `jitter = *(const u16 *)(RANDOM_TABLE_ADDR + i * 2) & 15`). The pinned file's
+single pin (`mask` in r2) is what keeps the jitter's `movs r2, #0xf` fresh. Without it, cse
+pass 1 replaces that 15 with the pseudo that `stateFrame & 15` / `index &= 15` set in the first
+block. Its path runs from there with the phase block skipped (AROUND, cse.c
+cse_end_of_basic_block), the Collider block next, then the `blo` not taken. The pseudo then
+crosses three calls and takes r8, so the prologue and everything after differ. A path break
+needs a label with a use inside the phase block (the scan stops at the join) or a second jump to
+the join; the ROM's phase block has neither. Tried: the shift form `(x << 28) >> 28` (combine
+keeps the shifts, 2 / 2), `% 16`, ParticleRandom_ReadSample (do/while), and swapping the
+frame test's arms (worse). Next: a mask whose bits combine narrows to 15 through nonzero_bits
+(the 15 would be a new const after cse).
+
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 
 ### SceneGrid_ScanColumns (src/fn/sub_0806E7CC.c, 0806E7CC): deferred

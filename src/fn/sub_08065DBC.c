@@ -1,210 +1,113 @@
-// MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-static inline u8 Any(u32 bits)
-{
-    if (bits)
-        return TRUE;
-    return FALSE;
-}
-static inline u8 AlternateMode(void)
+static inline u8 ActorAttachment_IsAlternateMode(void)
 {
     u32 bit = 0x80;
     if (gGameState->flags868 & bit)
         return TRUE;
     return FALSE;
 }
+static inline void *ActorAttachment_GetSpriteGraphics(struct ActorAttachmentManagerView *manager, s32 kind)
+{
+    switch (kind) {
+        case 0:
+            return ((struct ActorAttachmentManagerResources *)manager)->graphicsA;
+        case 1:
+        case 4:
+        case 5:
+            return ((struct ActorAttachmentManagerResources *)manager)->graphicsB;
+        default:
+            return NULL;
+    }
+}
+static inline struct ActorAttachmentFollowView *ActorAttachment_GetFollow(struct ActorAttachmentSlotView *slot)
+{
+    return slot->followActor;
+}
 struct ActorAttachmentSlotView *
 ActorAttachment_CreateSpriteSlot(u32 frame, struct ContactPosition *anchor, void *update, s32 y,
                                  s32 z, u32 action, void *source,
                                  struct ActorAttachmentFollowView *follow)
 {
-    void *savedUpdate;
-    s32 savedY;
     struct ActorAttachmentManagerView *existing;
     struct ActorAttachmentManagerView *manager;
     struct ActorAttachmentSlotView *slot;
-    u32 startFrame;
-    register struct ActorAttachmentFollowView *savedFollow asm("r5");
-    u8 *framePointer, *activePointer;
-    u8 *frameLow;
-    u8 *activeLow;
-    u8 *kindPointer;
-    u8 *actionPointer;
-    u8 *savedKind;
-    u8 *savedAction;
     struct ContactSwarmSprite *sprite;
-    struct ContactSwarmSprite *savedSprite;
-    u8 *resourcePointer;
     void *graphics;
     void *sequence;
     s32 xOffset, zOffset;
-    savedUpdate = update;
-    savedY = y;
-    savedFollow = follow;
-    startFrame = (u8)frame;
+    u8 startFrame = frame;
+    u8 alternate;
     existing = gActorAttachmentManager;
     if (!existing) {
         manager = ActorAttachment_CreateManager();
-        if (manager)
-            goto gotManager;
-    failed:
-        return 0;
+        if (!manager)
+            return NULL;
     } else
         manager = existing;
-gotManager:
-    if (!savedFollow)
-        goto failed;
+    if (!follow)
+        return NULL;
     slot = ActorAttachment_AllocateSlotHeader(manager);
     if (!slot)
-        goto failed;
-    slot->followActor = savedFollow;
-    frameLow = &slot->frame;
-    {
-        u32 zero = 0;
-        *frameLow = startFrame;
-        slot->flags31 = 1;
-        kindPointer = &slot->kind;
-        *kindPointer = zero;
-        actionPointer = &slot->action;
-        *actionPointer = action;
-        slot->unknown34 = zero;
-    }
-    slot->update = savedUpdate;
-    slot->position.y = savedY;
+        return NULL;
+    slot->followActor = follow;
+    slot->frame = startFrame;
+    slot->flags31 = 1;
+    slot->kind = 0;
+    slot->action = action;
+    slot->unknown34 = 0;
+    slot->update = update;
+    slot->position.y = y;
     slot->position.z = z;
     slot->status[0] = 1;
     slot->timer = 10;
-    {
-        u32 mask = 0x80;
-        u32 bits;
-        bits = gGameState->flags868 & mask;
-        framePointer = frameLow;
-        savedKind = kindPointer;
-        savedAction = actionPointer;
-        {
-            u32 alternate = Any(bits);
-            if (alternate) {
-                u8 *low = &slot->resourceKind;
-                *low = 6;
-                resourcePointer = low;
-            } else {
-                u8 *low = &slot->resourceKind;
-                *low = alternate;
-                resourcePointer = low;
-            }
-        }
-    }
-    activeLow = &slot->active48;
-    {
-        u32 zero = 0;
-        *activeLow = 1;
-        slot->anchor = anchor;
-        slot->source = source;
-        zOffset = zero;
-        xOffset = zero;
-    }
+    alternate = ActorAttachment_IsAlternateMode();
+    if (alternate)
+        slot->resourceKind = 6;
+    else
+        slot->resourceKind = alternate;
+    slot->active48 = 1;
+    slot->anchor = anchor;
+    slot->source = source;
+    zOffset = 0;
+    xOffset = 0;
     sprite = &slot->sprite;
-    {
-        u8 *lowKind = savedKind;
-        s32 kind = *lowKind;
-        s32 copy;
-        copy = kind;
-        activePointer = activeLow;
-        savedSprite = sprite;
-        if (kind == 1)
-            goto graphicsB;
-        if (kind > 1)
-            goto graphicsRange;
-        if (kind == 0)
-            goto graphicsA;
-        goto graphicsNone;
-    graphicsRange:
-        switch (copy) {
-            case 4:
-            case 5:
-                goto graphicsB;
-            default:
-                goto graphicsNone;
-        }
-    graphicsA:
-        graphics = ((struct ActorAttachmentManagerResources *)manager)->graphicsA;
-        goto graphicsReady;
-    graphicsB:
-        graphics = ((struct ActorAttachmentManagerResources *)manager)->graphicsB;
-        goto graphicsReady;
-    graphicsNone:
-        graphics = 0;
-    graphicsReady:;
-    }
+    graphics = ActorAttachment_GetSpriteGraphics(manager, slot->kind);
     Sprite_Init(sprite, graphics, 0);
-    {
-        register u8 *lowAction asm("r2") = savedAction;
-        {
-            u32 actionValue = *lowAction;
-            asm("" : "+r"(actionValue), "+r"(lowAction));
-            if (actionValue == 255) {
-                register u32 offset asm("r3") = 0x134;
-                register struct ActorAttachmentFollowView **target asm("r0");
-                asm("" : "+r"(offset));
-                target = (struct ActorAttachmentFollowView **)((u32)slot + offset);
-                slot->offset = (*target)->offset;
-            } else {
-                u32 resourceKind = *resourcePointer;
-                lowAction = savedAction;
-                ActorAttachment_GetActionOffset(
-                    resourceKind, *lowAction,
-                    ((struct ActorAttachmentFollowView *)slot->followActor)->direction, &xOffset,
-                    &zOffset, slot->source);
-                slot->offset.x = xOffset;
-                slot->offset.y = 0;
-                slot->offset.z = zOffset;
-            }
-        }
+    if (slot->action == 255) {
+        slot->offset = ActorAttachment_GetFollow(slot)->offset;
+    } else {
+        ActorAttachment_GetActionOffset(slot->resourceKind, slot->action,
+                                        ((struct ActorAttachmentFollowView *)slot->followActor)->direction,
+                                        &xOffset, &zOffset, slot->source);
+        slot->offset.x = xOffset;
+        slot->offset.y = 0;
+        slot->offset.z = zOffset;
     }
     sprite->flags |= 1;
-    if (AlternateMode())
+    if (ActorAttachment_IsAlternateMode())
         sprite->flags |= 0x10;
     sprite->priority = 1;
     slot->sequences[0].unknownA = 255;
-    {
-        u8 *lowKind = savedKind;
-        switch (*lowKind) {
-            case 0:
-                sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceA;
-                break;
-            case 2:
-            case 3:
-                sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceB;
-                break;
-            case 1:
-            case 4:
-            case 5:
-            default:
-                sequence = 0;
-                break;
-        }
+    switch (slot->kind) {
+        case 0:
+            sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceA;
+            break;
+        case 2:
+        case 3:
+            sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceB;
+            break;
+        case 1:
+        case 4:
+        case 5:
+        default:
+            sequence = NULL;
+            break;
     }
+    Anim_SetSequence(&slot->sequences[0], sequence, slot->frame, 0, 0);
     {
-        u32 offset = 0x104;
-        struct DisplaySequenceState *state;
-        state = (struct DisplaySequenceState *)((u32)slot + offset);
-        Anim_SetSequence(state, sequence, *framePointer, 0, 0);
+        struct ContactSwarmSprite *placed = &slot->sprite;
+        placed->position = *anchor;
     }
-    {
-        struct ContactPosition *lowAnchor = anchor;
-        {
-            struct ContactPosition position = *lowAnchor;
-            {
-                struct ContactSwarmSprite *lowSprite = savedSprite;
-                lowSprite->position = position;
-            }
-        }
-    }
-    {
-        u32 one = 1;
-        u8 *lowActive;
-        lowActive = activePointer;
-        *lowActive = one;
-    }
+    slot->active48 = 1;
     return slot;
 }
