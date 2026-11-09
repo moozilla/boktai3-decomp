@@ -38,7 +38,6 @@ void TerrainOverlay_RemoveActor(struct TerrainOverlay *s, u16 id)
 
 struct TerrainOverlay *ResourceRegistry_GetResource(u16);
 
-// MATCHING_CONCESSION: register-pinning
 s32 TerrainOverlay_QueueCommand(u32 type, u32 id)
 {
     struct TerrainOverlay *p = ResourceRegistry_GetResource(0x7BE3);
@@ -255,7 +254,7 @@ test:
 
 extern const u8 gUnk_0824DAFC[];
 
-s32 String_Hash(const u8 *);
+u16 String_Hash(const u8 *);
 
 void Sprite_InitUnlinked(struct TerrainOverlayDrawable *, void *, s32);
 
@@ -265,44 +264,25 @@ void Video_SetBlendAlpha(s32, s32);
 
 void ResourceRegistry_RegisterResource(u16, void *, s32);
 
-// MATCHING_CONCESSION: register-pinning
 s32 TerrainOverlay_Initialize(struct TerrainOverlay *p, u32 id, u32 resource)
 {
-    u8 *model;
-    u8 *loadedModel;
-    s32 key, i;
+    s32 i;
+    s32 result;
     p->id = id;
     p->resource = resource;
     p->initialized = 0;
     p->count = 0;
     if (Script_SeekToKeyword('m')) {
-        key = Script_GetValue();
-        model = p->model;
-    } else {
-        model = p->model;
-        key = ({
-            register s32 value asm("r1") = String_Hash(gUnk_0824DAFC);
-            asm("" : "+r"(value));
-            (u16) value;
-        });
-    }
-    {
-        s32 result = AnimData_Load(model, key);
-        loadedModel = model;
-        if (!result)
-            return -1;
-    }
-    i = 0;
-    if (i < p->drawableCount) {
-        register struct TerrainOverlayDrawable **drawables asm("r8") = &p->drawables;
-        do {
-            register u32 offset asm("r0") = sizeof(struct TerrainOverlayDrawable) * i;
-            struct TerrainOverlayDrawable *d;
-            d = (struct TerrainOverlayDrawable *)((u32)*drawables + offset);
-            Sprite_InitUnlinked(d, loadedModel, 1);
-            d->drawFlags |= 0x400;
-            i++;
-        } while (i < p->drawableCount);
+        s32 key = Script_GetValue();
+        result = AnimData_Load(p->model, key);
+    } else
+        result = AnimData_Load(p->model, String_Hash(gUnk_0824DAFC));
+    if (!result)
+        return -1;
+    for (i = 0; i < p->drawableCount; i++) {
+        struct TerrainOverlayDrawable *d = &p->drawables[i];
+        Sprite_InitUnlinked(d, p->model, 1);
+        d->drawFlags |= 0x400;
     }
     Video_SetBlendControl(2, 12, 44);
     Video_SetBlendAlpha(0, 16);
