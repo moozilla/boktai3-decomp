@@ -240,6 +240,16 @@ lengths; `AGBCC_PRI=table:+427` gives 43 / 45), and the sine table pointer wants
 (`AGBCC_FORCE=sine:2` gives 43 / 43). Moving the `rng` set, or dropping `rng` for the header's
 ReadSample/ReadDirectSample, is no better.
 
+### FadingParticleGroup_Update (src/fn/sub_08016118.c, 08016118): deferred
+
+Draft: `notes/phase3-drafts/field-effects/FadingParticleGroup_Update.c` (the memory barrier
+removed: 43 ROM / 43 draft; the `raw` pin is still in it). Without the barrier, cse2 reuses the
+`p->velocity.y` loaded for `position.y += velocity.y` in `p->velocity.y -= 2` (insn 177), where
+the ROM loads it again. The position stores go through the same base at other offsets, so cse
+sees no alias. A pointer local for the position or velocity (fact 60's lever) changes
+allocation across the whole loop (87 / 89), and one only for the `-= 2` is no better (43 / 43).
+The rest is allocation and one reload rotation (`AGBCC_SPILL=8:1` helps).
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
