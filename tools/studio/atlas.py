@@ -223,6 +223,7 @@ def build():
 
     # ---- registry entries ----
     A = actors.actors()
+    ctables = actors.command_tables()
     procnames = {int(p): r["name"] for p, r in gclview.names().procs.items()}
     fams = paltrace.families()
     sprite_owner = collections.defaultdict(list)
@@ -302,14 +303,16 @@ def build():
                 sprites.append(s["hash"])
                 sprite_owner[s["hash"]].append(a["key"])
         add(f"actor:{a['key']}", path, kind="actor", key=a["key"], order=int(a["callback"], 16) & ~1,
-            title=title or f"{'Object' if a['loader'] else 'Routine'} {a['key']}", fname=fname, gcl=a["gcl"][:1],
+            title=title or f"{'Object' if a['loader'] else 'Routine'} {a['key']}", fname=fname, gcl=a["gcl"],
             subsystem=sub, allocates=bool(a["loader"]),
             names=[{"id": n["id"], "jp": n["jp"], "en": en.get(n["id"], "")} for n in a["names"]],
             callback=a["callback"], loader=a["loader"], loader_name=a["loader_name"],
             sprites=sprites, effects=[], small=[s["hash"] for s in a["sprites"] if s["kind"] != "big"],
             procs=[{"id": p, "name": procnames.get(p, "")} for p in a["procs"]], spawns=a["spawns"],
             areas={str(k): v for k, v in by_area.items()}, nscenes=len(scenes), shared=shared,
-            reach=len(a["scenes"]), code=code)
+            reach=len(a["scenes"]), code=code,
+            command_tables=[{"table": r["table"], "title": ctables[r["table"]]["description"] or ctables[r["table"]]["name"],
+                             "in": [f["name"] for f in r["in"]]} for r in a.get("command_tables", []) if r["table"] in ctables])
 
     # ---- the game's monster and character lists ----
     for n in actors.name_list(*actors.ENEMY_NAMES):

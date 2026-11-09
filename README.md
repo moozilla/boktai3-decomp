@@ -145,7 +145,7 @@ order, colored by kind or by how well each byte is understood.
 | ![Maps](docs/img/studio-map.png) | **Maps**: stages with captured palettes, doors, entrances, items, enemies and patrol paths from the stage scripts. |
 | ![World](docs/img/studio-world.png) | **World** (`/world`): how the rooms connect. Scenes grouped into areas by their doors, areas into places by their labels, each place with its rooms, captures and enemies. |
 | ![Scripts](docs/img/studio-scripts.png) | **Scripts**: procedures in a readable view with recovered names, the developers' debug messages and their translations. |
-| ![Actors](docs/img/studio-actors.png) | **Actors**: every object a script can create, with its GCL name, code, sprites and scenes. |
+| ![Actors](docs/img/studio-actors.png) | **Actors**: the script registry, every object a script can create, filterable by GCL name, sprite or use, each shown with its Browse page; plus the decoded command and parameter tables. |
 | ![Screen inspector](docs/img/studio-captures.png) | **Screen inspector** (Live and Captures): every sprite, text box, layer and palette on screen, matched to its resource. Live mode connects to mGBA through [Centaur](docs/CENTAUR.md). |
 
 Also: palette, font and tile viewers, and **Sound** (`/sound`): every song in
