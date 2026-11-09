@@ -326,6 +326,14 @@ jump cse follows), `CSE_NOFOLLOW=K` (refuse the K-th follow),
 `AGBCC_DUMPPRI`, `AGBCC_SPILL` (local-alloc / reload; see the sources for
 syntax). Added in this thread (in `tools/scope/agbcc.patch`):
 
+* `AGBCC_REGCLASS=1`: regclass.c prints, for each pseudo and pass, its
+  preferred and alternate class and the cost of every class
+  (`R func pseudo passN pref=... alt=... mem=... LO_REGS=... STACK_REG=...`).
+  `AGBCC_REGCLASS_TRACE=N` prints what each insn adds to pseudo N's costs
+  (`RI N passN uid U ...`). A pointer whose `pref` is STACK_REG is allocated
+  from its alternate class, which includes ip: on Thumb `p + imm` with imm a
+  multiple of 4 votes for STACK_REG (`add rd, sp, #imm`), any other imm and
+  `p + reg` vote for LO_REGS (fact 92).
 * `CSE_WHY=UID`: for each SET of insn UID, every time cse processes it, print
   the candidates (`src`, `src_folded`, `src_eqv`, `src_related`) with costs
   and the equivalence class in order, each member tagged with the insn at
@@ -1610,6 +1618,19 @@ Each was read from the compiler source and confirmed on a live draft.
    direction-2 copy) at its stateEntered store, while the random branch's if/else + return keeps
    state 4's call. ScenePool_SelectRepeatOrExit used the same return-after-inner-if/else. Both
    replaced a barrier and an r0 pin.
+110. **Read a field fresh at each range test to get gcse's copy before the compare; a sampler's
+   statement macro lifts the random table above the masks.** ScenePool_StateScheduleMotion's ROM
+   loads `entry->direction` into r0 for the first folded range test and copies it to r3
+   (`adds r3, r0, #0`) between the bound's load and the `cmp`, then tests r3 twice more. A
+   `metric` local gives one register and no copy; writing `entry->direction` in all three tests
+   (and in the `-0x50000 < d < 0x50000` test above) lets gcse make the later reads a copy inserted
+   at the end of the first block, before the cc0 setter, so the first read stays block-local
+   (r0). In the same function the table pseudo (`=gRandomTable`, 3 refs, live doubled by its
+   REG_EQUIV) ranks below the 255 mask (1176) and lands in ip; drawing the first sample through
+   the shared `ParticleRandom_ReadSample` (monster_particle_random.h), whose
+   `PARTICLE_RANDOM_READ_SAMPLE` do/while counts the table's use twice, gives it 4 refs (2000)
+   and r3. Both draws through that sampler overshoot (gRandomIndex's 1818 loses r2); one is
+   enough. `why all` names the shared macro when it flips an order.
 
 80. **A multi-set variable whose first set (in insn order) is a constant gets its live length
    doubled, even though the equivalence is dropped at the next set.** cse puts a REG_EQUAL note on
@@ -1659,6 +1680,28 @@ Each was read from the compiler source and confirmed on a live draft.
    gives draw its fourth ref, and a function-scope `u16 *table = gRandomTable;` is a REG_EQUIV
    pseudo left without a register, so reload loads the table at its use and the reload rotation
    moves one step.
+
+91. **A statement after a join, written again at the end of each arm, adds refs that jump2 later
+   removes.** flow counts refs and live length before jump2 cross-jumps identical tails (fact 27), so
+   `if (c) { ...; entry = a->data + a->frame; } else { ...; entry = a->data + a->frame; }` compiles to
+   the same code as one copy after the if, but `a` gets two more refs. In
+   EffectParticle_UpdateDissipating that lifted the anim pointer `a` (24 refs, live 150, 6400) over
+   the particle `p` (40 refs, live 306, 6535), which had taken r4 first. Duplicate only what the
+   priority needs: the rate line that reads `entry` stayed after the join, since copying it too
+   raised `entry` over `o` and swapped those two. `why` now lists such statements among the ways to
+   flip an order (join_lever in scope.py).
+
+92. **A pointer's register class is a vote of its adds, and a STACK_REG winner lands in ip.**
+   regclass sums, over every insn, what each class would cost. On Thumb `p + imm` with imm a
+   multiple of 4 (up to 1020) costs nothing in STACK_REG (`add rd, sp, #imm`) and 2 in LO_REGS;
+   any other imm costs LO_REGS 2 and STACK_REG 4; `p + reg` costs LO_REGS 0 and STACK_REG 2;
+   insns in a loop count four times. When STACK_REG wins, global alloc uses the alternate class,
+   all registers, and find_reg's pass 0 takes ip: call-clobbered registers count as already used,
+   so it never reaches the first free r4. In ScanlinePresentation_UpdateNoise the pin-free draft
+   scored LO_REGS 26 against STACK_REG 24 for p and put it in ip. The ROM has one more odd-offset
+   add (`p + 726`, hoisted out of the noise loop), and with it the tie gives BASE_REGS and then
+   LO_REGS: in the draft cse2 had turned that hoisted add into a copy of `amplitude = &p->amplitude`.
+   `AGBCC_REGCLASS=1` and `AGBCC_REGCLASS_TRACE=N` show the votes.
 
 ## Survey: random table as a literal address (2026-10-24)
 

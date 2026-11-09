@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
 #include "render.h"
@@ -181,13 +180,12 @@ static inline void OrStatus(u16 status, u16 *flags)
 void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
 {
     struct BurnState *burn = (void *)&actor->group.common;
-    register u16 *flags2C0 asm("r6");
+    u16 *flags2C0;
     u8 *category;
     u8 *collider;
     u8 *hit;
     u32 kind;
     s32 i;
-    struct ContactCollider *damageCollider;
     u32 *damageFlags;
     if (Blocked(actor))
         return;
@@ -249,7 +247,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
             }
             flags = &actor->field2D8;
             masked = *flags & 0x20000;
-            damageCollider = initial;
+            collider = (u8 *)initial;
             damageFlags = flags;
             if (!masked) {
                 u16 bank = actor->paletteAlternateBank;
@@ -280,7 +278,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
                     SceneHud_SetTimedState(actor->body.id, health, max, type, 0, param);
                     Fill(&zero, buffer);
                     if (actor->reactionSoundVariant || !(*damageFlags & 0x20000))
-                        DamageNumberDisplay_Show(damageCollider, actor->reactionSoundVariant, 0,
+                        DamageNumberDisplay_Show((struct ContactCollider *)collider, actor->reactionSoundVariant, 0,
                                                  &actor->body.position, buffer, 1);
                 }
             }

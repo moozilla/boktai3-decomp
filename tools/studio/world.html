@@ -38,16 +38,29 @@ svg { display: block; width: 100%; height: 100%; user-select: none; }
 .edge { stroke: var(--edge); fill: none; }
 .edge.oneway { stroke-dasharray: 4 3; }
 .edge.hi { stroke: var(--accent); }
+/* a place's hue is --h; light and dark set how it is drawn */
+#world { --pl: 42%; --pf: 90%; --pt: 34%; }
+:root[data-theme="dark"] #world { --pl: 62%; --pf: 24%; --pt: 72%; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #world { --pl: 62%; --pf: 24%; --pt: 72%; } }
 .anode { cursor: pointer; }
-.anode circle { fill: var(--node); stroke-width: 2.5; }
-.anode.c-medium circle, .anode.c-high circle { stroke: var(--med); }
-.anode.c-low circle { stroke: var(--low); }
-.anode.c-none circle { stroke: var(--none); }
-.anode.on circle { fill: var(--sel); stroke-width: 4; }
-.anode.dim { opacity: .25; }
+.anode circle { fill: hsl(var(--h) 45% var(--pf)); stroke: hsl(var(--h) 55% var(--pl)); stroke-width: 2.5; }
+.anode.plain circle { fill: var(--node); stroke: var(--none); }
+.anode.unsure circle { stroke-dasharray: 3 2; }
+.anode.on circle, .anode.inplace circle { stroke-width: 4; }
+.anode.on circle { stroke: var(--accent); }
+.anode.dim, .hov .anode:not(.hl) { opacity: .2; }
 .anode .num { font-size: 10px; font-weight: 600; fill: var(--ink); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
-.anode .lab { font-size: 9px; fill: var(--muted); text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
-.anode.on .lab, .anode:hover .lab { fill: var(--ink); }
+.anode .lab { font-size: calc(11px * var(--s, 1)); fill: var(--muted); text-anchor: middle; dominant-baseline: hanging; pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: calc(3px * var(--s, 1)); }
+.anode.on .lab, .anode.inplace .lab, .anode:hover .lab { fill: var(--ink); }
+.far .anode:not(.on):not(:hover):not(.inplace) .lab { display: none; }
+.plab { font-size: calc(13px * var(--s, 1)); font-weight: 650; fill: hsl(var(--h, 0) var(--sat, 50%) var(--pt)); text-anchor: middle; cursor: pointer; paint-order: stroke; stroke: var(--bg); stroke-width: calc(4px * var(--s, 1)); }
+.plab.plain { fill: var(--muted); font-weight: 500; font-size: calc(11px * var(--s, 1)); }
+.plab:hover, .plab.on { text-decoration: underline; }
+.crumbs { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+.crumbs a { color: inherit; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: 0; background: hsl(var(--h, 0) var(--sat, 55%) 55%); }
+a.card { color: inherit; text-decoration: none; display: block; }
+a.card:hover { outline: 2px solid var(--accent); }
 .legend { position: absolute; left: 10px; bottom: 8px; font-size: 11px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; display: flex; gap: 10px; flex-wrap: wrap; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 2.5px solid; vertical-align: -1px; margin-right: 3px; }
 #view { position: relative; overflow: auto; padding: 14px 18px 40px; min-width: 0; }
@@ -69,7 +82,7 @@ a.chip:hover { outline: 1px solid var(--accent); }
 .sedge { stroke: var(--edge); }
 .sedge.oneway { stroke-dasharray: 3 2; }
 .sedge.ext { stroke: var(--ext); opacity: .6; }
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
 .card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); overflow: hidden; }
 .card.on { outline: 2px solid var(--accent); }
 .card img, .card .noimg { width: 100%; aspect-ratio: 3/2; object-fit: cover; image-rendering: pixelated; background: var(--stage); display: block; }
@@ -97,7 +110,7 @@ a.chip:hover { outline: 1px solid var(--accent); }
       <span class="count" id="count"></span>
     </div>
     <svg id="world"></svg>
-    <div class="legend"><span><i style="border-color:var(--med)"></i>vision label (medium/high)</span><span><i style="border-color:var(--low)"></i>low</span><span><i style="border-color:var(--none)"></i>none</span><span>dashed: one-way doors · circle size: scenes</span></div>
+    <div class="legend"><span>color: place</span><span>dashed circle: low-confidence label</span><span>dashed line: one-way doors</span><span>circle size: scenes</span><span>scroll to zoom, drag to pan</span></div>
   </section>
   <section id="view"><div class="empty">Loading…</div></section>
 </main>
@@ -108,7 +121,7 @@ a.chip:hover { outline: 1px solid var(--accent); }
 // pass (data/vision/areas_*.csv) and data/notes.csv (kind=script).
 studioHeader();
 const NS = 'http://www.w3.org/2000/svg';
-let W = null, pos = {}, sel = null, selScene = null, view = null;
+let W = null, pos = {}, comps = [], sel = null, selScene = null, selPlace = null, view = null, PLACES = [];
 const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 const short = (s, n = 26) => !s ? '' : (s = s.replace(/\s*\(.*$/, '').replace(/[;:].*$/, '')).length > n ? s.slice(0, n - 1) + '…' : s;
 const pad4 = i => String(i).padStart(4, '0');
@@ -148,9 +161,9 @@ function layout(nodes, edges, w, h, iters = 500, seed = 1, kf = 0.75) {
 }
 
 // Pan (drag) and zoom (wheel) by editing the viewBox.
-function panZoom(svg, box) {
+function panZoom(svg, box, onchange) {
   let vb = [...box], drag = null;
-  const set = () => svg.setAttribute('viewBox', vb.join(' '));
+  const set = () => { svg.setAttribute('viewBox', vb.join(' ')); if (onchange) onchange(vb); };
   set();
   svg.onwheel = e => {
     e.preventDefault();
@@ -170,7 +183,7 @@ function panZoom(svg, box) {
   const up = () => { if (drag?.moved) svg.dataset.dragged = '1'; drag = null; svg.classList.remove('drag'); };
   svg.onpointerup = up; svg.onpointerleave = up;
   svg.addEventListener('click', e => { if (svg.dataset.dragged) { delete svg.dataset.dragged; e.stopPropagation(); } }, true);
-  return { reset: b => { vb = [...b]; set(); } };
+  return { reset: b => { vb = [...b]; set(); }, box: () => vb };
 }
 const bounds = (p, ids, pad) => {
   const xs = ids.map(i => p[i].x), ys = ids.map(i => p[i].y);
@@ -179,58 +192,202 @@ const bounds = (p, ids, pad) => {
   return [x0 - Math.max(0, mw - w) / 2, y0 - Math.max(0, mh - h) / 2, Math.max(w, mw), Math.max(h, mh)];
 };
 
-// ---------- the area graph ----------
+// ---------- places: what the areas' labels say they belong to ----------
+// An area labeled "Ancient Tree (candle-switch room)" belongs to the place
+// "Ancient Tree"; "Lifeless Town route transition / ..." too, to "Lifeless Town".
+const baseOf = l => (l || '').replace(/\s*\(.*$/, '').trim();
+function assignPlaces() {
+  const bases = [...new Set(W.areas.map(a => baseOf(a.label)).filter(Boolean))].sort((x, y) => x.length - y.length);
+  const placeOf = b => bases.find(m => b === m || (b.startsWith(m + ' ') && /^[a-z]/.test(b.slice(m.length + 1)))) || b;
+  const P = new Map();
+  for (const a of W.areas) {
+    const b = baseOf(a.label);
+    a.place = b ? placeOf(b) : null;
+    a.detail = !a.label ? '' : a.label.startsWith(a.place + ' (') ? a.label.slice(a.place.length + 2).replace(/\)$/, '')
+      : a.label === a.place ? '' : a.label.slice(a.place.length).replace(/^[\s/–-]+/, '');
+    if (!a.place) continue;
+    if (!P.has(a.place)) P.set(a.place, { name: a.place, areas: [], scenes: 0, enemies: {} });
+    const p = P.get(a.place);
+    p.areas.push(a.area); p.scenes += a.scenes.length;
+    for (const [f, k] of Object.entries(a.enemies)) p.enemies[f] = (p.enemies[f] || 0) + k;
+  }
+  // story order: by the lowest scene id, which follows the game's progression closely enough
+  const places = [...P.values()].sort((x, y) => Math.min(...x.areas.map(i => W.areas[i].scenes[0])) - Math.min(...y.areas.map(i => W.areas[i].scenes[0])));
+  // the big places get a hue each; one-area places stay neutral
+  let h = 0;
+  for (const p of places) {
+    p.hue = p.areas.length > 1 || p.scenes >= 10 ? (20 + 137.5 * h++) % 360 : null;
+    const best = p.areas.map(i => W.areas[i]).sort((x, y) => y.scenes.length - x.scenes.length);
+    p.shot = best.flatMap(a => a.scenes).find(i => W.scenes[i].shot) ?? null;
+    p.areas.forEach(i => { W.areas[i].hue = p.hue; });
+  }
+  return places;
+}
+const placeStyle = hue => hue == null ? '--h:0;--sat:0%' : `--h:${hue}`;
+
+// ---------- the area graph: each connected group laid out on its own, then packed ----------
+function packLayout(areas, links) {
+  const ids = new Set(areas.map(a => a.area)), up = {};
+  const find = x => up[x] === x ? x : (up[x] = find(up[x]));
+  ids.forEach(i => up[i] = i);
+  const L = links.filter(l => ids.has(l.a) && ids.has(l.b));
+  L.forEach(l => { up[find(l.a)] = find(l.b); });
+  const groups = {};
+  areas.forEach(a => (groups[find(a.area)] ||= []).push(a));
+  const comps = Object.values(groups).sort((x, y) => y.length - x.length || x[0].area - y[0].area);
+  const boxes = comps.map((nodes, n) => {
+    const set = new Set(nodes.map(a => a.area));
+    const E = L.filter(l => set.has(l.a)).map(l => [l.a, l.b, l.doors]);
+    const s = 70 * Math.sqrt(nodes.length) + 40;
+    const p = nodes.length === 1 ? { [nodes[0].area]: { x: 0, y: 0 } } : layout(nodes, E, s, s, 600, 3 + n, 0.7);
+    const xs = nodes.map(a => p[a.area].x), ys = nodes.map(a => p[a.area].y), pad = 46;
+    const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - 30;
+    return { nodes, p, x0, y0, w: Math.max(...xs) + pad - x0, h: Math.max(...ys) + 40 - y0 };
+  });
+  const maxW = Math.max(700, Math.sqrt(boxes.reduce((t, b) => t + b.w * b.h, 0)) * 1.45);
+  const out = {}; let x = 0, y = 0, rowH = 0;
+  for (const b of boxes) {
+    if (x > 0 && x + b.w > maxW) { x = 0; y += rowH + 16; rowH = 0; }
+    b.nodes.forEach(a => { out[a.area] = { x: b.p[a.area].x - b.x0 + x, y: b.p[a.area].y - b.y0 + y }; });
+    b.comp = b.nodes.map(a => a.area);
+    x += b.w + 16; rowH = Math.max(rowH, b.h);
+  }
+  return { pos: out, comps: boxes.map(b => b.comp) };
+}
+
 function areaMatches(a, q) {
   if (!q) return true;
   const sc = a.scenes.map(i => W.scenes[i]);
   return [a.label, a.evidence, String(a.area), ...a.maps, ...Object.keys(a.enemies), ...sc.map(s => s.label), ...a.scenes.map(String)]
     .some(x => (x || '').toUpperCase().includes(q));
 }
+const linkedSet = () => new Set(W.links.flatMap(l => [l.a, l.b]));
+const shownAreas = () => { const linked = linkedSet(); return W.areas.filter(a => $('lonely').checked || linked.has(a.area) || a.area === sel); };
+function relayout() {
+  const r = packLayout(shownAreas(), W.links);
+  pos = r.pos; comps = r.comps;
+}
 function drawWorld() {
-  const svg = $('world'); svg.replaceChildren();
-  const lonely = $('lonely').checked;
-  const linked = new Set(W.links.flatMap(l => [l.a, l.b]));
-  const shown = W.areas.filter(a => lonely || linked.has(a.area) || a.area === sel);
-  const ids = shown.map(a => a.area);
-  const ge = el('g', {}, svg), gn = el('g', {}, svg);
+  const svg = $('world'); svg.replaceChildren(); svg.classList.remove('hov');
+  const shown = shownAreas().filter(a => pos[a.area]);
+  const ids = new Set(shown.map(a => a.area));
+  const ge = el('g', {}, svg), gp = el('g', {}, svg), gn = el('g', {}, svg);
   const dir = new Set(W.areas.flatMap(a => Object.keys(a.out).map(b => `${a.area}>${b}`)));
   for (const l of W.links) {
-    if (!pos[l.a] || !pos[l.b] || !ids.includes(l.a) || !ids.includes(l.b)) continue;
+    if (!ids.has(l.a) || !ids.has(l.b)) continue;
     const one = !(dir.has(`${l.a}>${l.b}`) && dir.has(`${l.b}>${l.a}`));
     const e = el('line', { x1: pos[l.a].x, y1: pos[l.a].y, x2: pos[l.b].x, y2: pos[l.b].y, class: 'edge' + (one ? ' oneway' : '') + (l.a === sel || l.b === sel ? ' hi' : ''), 'stroke-width': Math.min(1 + Math.sqrt(l.doors), 6) }, ge);
     el('title', {}, e).textContent = `area ${l.a} ↔ area ${l.b}: ${l.doors} door${l.doors > 1 ? 's' : ''}${one ? ' (one way)' : ''}`;
   }
+  // one name per place and connected group, above its rooms
+  for (const comp of comps) {
+    const by = {};
+    comp.forEach(i => { const a = W.areas[i]; if (a.place) (by[a.place] ||= []).push(a); });
+    for (const [name, as] of Object.entries(by)) {
+      if (as[0].hue == null) continue;  // a one-room place is named under its circle instead
+      const xs = as.map(a => pos[a.area].x), y = Math.min(...as.map(a => pos[a.area].y - a.r));
+      const t = el('text', { class: 'plab' + (as[0].hue == null ? ' plain' : '') + (selPlace === name ? ' on' : ''), x: (Math.min(...xs) + Math.max(...xs)) / 2, y: y - 6, style: placeStyle(as[0].hue) }, gp);
+      t.textContent = name;
+      t.onclick = () => { location.hash = 'place=' + encodeURIComponent(name); };
+    }
+  }
   const q = $('q').value.trim().toUpperCase();
   let hits = 0;
   for (const a of shown) {
-    const p = pos[a.area]; if (!p) continue;
+    const p = pos[a.area];
     const m = areaMatches(a, q); hits += m;
-    const g = el('g', { class: `anode c-${a.confidence || 'none'}${a.area === sel ? ' on' : ''}${m ? '' : ' dim'}`, transform: `translate(${p.x},${p.y})` }, gn);
+    const inPlace = selPlace && a.place === selPlace;
+    const g = el('g', { class: `anode${a.hue == null ? ' plain' : ''}${a.confidence === 'low' ? ' unsure' : ''}${a.area === sel ? ' on' : ''}${inPlace ? ' inplace' : ''}${m ? '' : ' dim'}`, transform: `translate(${p.x},${p.y})`, style: placeStyle(a.hue) }, gn);
+    g.dataset.place = a.place || '';
     el('circle', { r: a.r }, g);
     el('text', { class: 'num' }, g).textContent = a.area;
-    el('text', { class: 'lab', y: a.r + 10 }, g).textContent = short(a.label);
+    el('text', { class: 'lab', y: a.r + 3 }, g).textContent = short(a.hue == null ? a.label : a.detail, 24);
     el('title', {}, g).textContent = `area ${a.area}: ${areaLabel(a)}${a.confidence ? ` (${a.confidence})` : ''}\n${a.scenes.length} scene${a.scenes.length > 1 ? 's' : ''}, ${a.maps.length} map${a.maps.length !== 1 ? 's' : ''}`;
     g.onclick = () => { location.hash = 'area=' + a.area; };
   }
   $('count').textContent = `${shown.length} of ${W.areas.length} areas · ${W.links.length} links${q ? ` · ${hits} match` : ''}`;
-  if (!view) view = panZoom(svg, bounds(pos, ids, 60));
+  if (!view) view = panZoom(svg, bounds(pos, Object.keys(pos), 30), zoomed);
+  else zoomed(view.box());
 }
-function fitWorld() {
-  const linked = new Set(W.links.flatMap(l => [l.a, l.b]));
-  const ids = W.areas.filter(a => $('lonely').checked || linked.has(a.area)).map(a => a.area);
-  view.reset(bounds(pos, ids, 60));
+// labels keep their size on screen as the graph zooms; room names appear once there is room for them
+function zoomed(vb) {
+  const svg = $('world'), s = vb[2] / (svg.clientWidth || 1);
+  svg.style.setProperty('--s', s);
+  svg.classList.toggle('far', s > 0.75);
+}
+const inView = i => { const b = view.box(), q = pos[i]; return q && q.x > b[0] && q.x < b[0] + b[2] && q.y > b[1] && q.y < b[1] + b[3]; };
+function fitWorld() { view.reset(bounds(pos, Object.keys(pos), 30)); }
+function focusAreas(ids) {
+  ids = ids.filter(i => pos[i]);
+  if (ids.length) view.reset(bounds(pos, ids, 70));
+}
+function hoverPlace(name) {
+  const svg = $('world');
+  svg.classList.toggle('hov', !!name);
+  svg.querySelectorAll('.anode').forEach(g => g.classList.toggle('hl', g.dataset.place === name));
+}
+
+// ---------- the world: every place, in story order ----------
+function placeCard(p) {
+  const top = Object.entries(p.enemies).sort((x, y) => y[1] - x[1]).slice(0, 4).map(([f]) => f).join(', ');
+  return `<a class="card place" href="#place=${encodeURIComponent(p.name)}" data-place="${esc(p.name)}" style="${placeStyle(p.hue)}">
+    ${p.shot != null ? `<img loading="lazy" src="${shotUrl(p.shot)}" alt="">` : '<div class="noimg">no survey capture</div>'}
+    <div class="body"><b><i class="sw"></i>${esc(p.name)}</b>
+    <div class="meta">${p.areas.length} area${p.areas.length > 1 ? 's' : ''} · ${p.scenes} scene${p.scenes > 1 ? 's' : ''}</div>
+    ${top ? `<div class="meta">${esc(top)}</div>` : ''}</div></a>`;
+}
+function showWorld() {
+  sel = null; selScene = null; selPlace = null; drawWorld();
+  const q = $('q').value.trim().toUpperCase();
+  const places = PLACES.filter(p => !q || p.name.toUpperCase().includes(q) || p.areas.some(i => areaMatches(W.areas[i], q)));
+  const loose = W.areas.filter(a => !a.place && (!q || areaMatches(a, q)));
+  const scenes = Object.keys(W.scenes).length;
+  $('view').innerHTML = `
+    <h2>The world</h2>
+    <div class="ev">${scenes} scenes, grouped into ${W.areas.length} areas by the doors between them, and the areas into ${PLACES.length} places by their labels. Places are in story order. Hover a place to find it in the graph; click to open it.</div>
+    <div class="cards">${places.map(placeCard).join('')}</div>
+    ${loose.length ? `<h3>Unlabeled areas</h3><div class="chips">${loose.map(a => `<a class="chip" href="#area=${a.area}">${a.area} <small>${a.scenes.length} scene${a.scenes.length > 1 ? 's' : ''}</small></a>`).join('')}</div>` : ''}`;
+  wireHover();
+}
+function showPlace(name) {
+  const p = PLACES.find(x => x.name === name); if (!p) return showWorld();
+  sel = null; selScene = null; selPlace = name;
+  if (p.areas.some(i => !pos[i])) { $('lonely').checked = true; relayout(); }
+  drawWorld(); focusAreas(p.areas);
+  const fam = Object.entries(p.enemies).sort((x, y) => y[1] - x[1]).map(([f, k]) => `${esc(f)} ×${k}`).join(', ');
+  const areaCard = i => {
+    const a = W.areas[i], shot = a.scenes.find(s => W.scenes[s].shot);
+    return `<a class="card" href="#area=${i}">${shot != null ? `<img loading="lazy" src="${shotUrl(shot)}" alt="">` : '<div class="noimg">no survey capture</div>'}
+      <div class="body"><b>Area ${i}</b>${a.confidence ? `<span class="conf">${esc(a.confidence)}</span>` : ''}<span class="lbl">${esc(a.detail || a.label)}</span>
+      <div class="meta">${a.scenes.length} scene${a.scenes.length > 1 ? 's' : ''}${a.items ? ` · ${a.items} item${a.items > 1 ? 's' : ''}` : ''}${Object.keys(a.enemies).length ? ' · ' + esc(Object.keys(a.enemies).slice(0, 3).join(', ')) : ''}</div></div></a>`;
+  };
+  $('view').innerHTML = `
+    <div class="crumbs"><a href="#">World</a> ›</div>
+    <h2 style="${placeStyle(p.hue)}"><i class="sw"></i>${esc(p.name)}</h2>
+    <div class="meta">${p.areas.length} area${p.areas.length > 1 ? 's' : ''} · ${p.scenes} scenes${fam ? ' · enemies: ' + fam : ''}</div>
+    <h3>Areas</h3>
+    <div class="cards">${p.areas.map(areaCard).join('')}</div>`;
+}
+function wireHover() {
+  document.querySelectorAll('#view .card.place').forEach(c => {
+    c.onmouseenter = () => hoverPlace(c.dataset.place);
+    c.onmouseleave = () => hoverPlace(null);
+  });
 }
 
 // ---------- one area: its scenes as a door graph, then a card per scene ----------
 function showArea(n, scene) {
   const a = W.areas[n]; if (!a) return;
-  sel = n; selScene = scene ?? null;
+  sel = n; selScene = scene ?? null; selPlace = null;
+  if (!pos[n]) relayout();  // a room without links is laid out once it is open
   drawWorld();
+  if (!inView(n)) focusAreas(a.place ? PLACES.find(p => p.name === a.place).areas : [n]);
   const nb = [...new Set([...Object.keys(a.out), ...Object.keys(a.in)].map(Number))].sort((x, y) => x - y);
   const chip = b => `<a class="chip" href="#area=${b}" title="${esc(areaLabel(W.areas[b]))}">${b} · ${esc(short(W.areas[b].label, 30) || 'unlabeled')} <small>${a.out[b] || 0}→ ${a.in[b] || 0}←</small></a>`;
   const fam = Object.entries(a.enemies).map(([f, k]) => `${esc(f)} ×${k}`).join(', ');
   $('view').innerHTML = `
-    <h2>Area ${n}: ${esc(areaLabel(a))}${a.confidence ? `<span class="conf">${esc(a.confidence)}</span>` : ''}</h2>
+    <div class="crumbs"><a href="#">World</a> ›${a.place ? ` <a href="#place=${encodeURIComponent(a.place)}">${esc(a.place)}</a> ›` : ''}</div>
+    <h2>Area ${n}: ${esc(a.detail || areaLabel(a))}${a.confidence ? `<span class="conf">${esc(a.confidence)}</span>` : ''}</h2>
     ${a.evidence ? `<div class="ev">${esc(a.evidence)}</div>` : ''}
     <div class="meta">${a.scenes.length} scene${a.scenes.length > 1 ? 's' : ''} (${a.scenes[0]}${a.scenes.length > 1 ? '–' + a.scenes[a.scenes.length - 1] : ''}) · ${a.maps.length} map${a.maps.length !== 1 ? 's' : ''} · ${a.doors} doors, ${a.inner} inside · ${a.items} item${a.items !== 1 ? 's' : ''}${fam ? ' · enemies: ' + fam : ''}${a.scenes.length > 1 ? ` · <a href="/gfx#dungeon/${n}">stitched map</a>` : ''}</div>
     <h3>Linked areas</h3>
@@ -303,18 +460,19 @@ function card(s) {
 }
 
 function route() {
-  const m = location.hash.match(/area=(\d+)(?:\/scene=(\d+))?/);
+  const m = location.hash.match(/area=(\d+)(?:\/scene=(\d+))?/), pl = location.hash.match(/place=([^/]+)/);
   if (m) showArea(+m[1], m[2] != null ? +m[2] : null);
-  else { sel = null; drawWorld(); $('view').innerHTML = '<div class="empty">Click an area to see its rooms and doors. Scroll to zoom, drag to pan.</div>'; }
+  else if (pl) showPlace(decodeURIComponent(pl[1]));
+  else showWorld();
 }
 
 (async () => {
   [W] = await Promise.all([fetch('/api/areas').then(r => r.json()), loadNotes()]);
   W.areas.forEach(a => { a.id = a.area; a.r = 7 + 3 * Math.sqrt(a.scenes.length); });
-  const edges = W.links.map(l => [l.a, l.b, l.doors]);
-  pos = layout(W.areas, edges, 760, 560, 700, 3, 0.45);
-  $('q').oninput = drawWorld;
-  $('lonely').onchange = () => { drawWorld(); fitWorld(); };
+  PLACES = assignPlaces();
+  relayout();
+  $('q').oninput = () => { if (sel == null && !selPlace) showWorld(); else drawWorld(); };
+  $('lonely').onchange = () => { relayout(); drawWorld(); fitWorld(); };
   $('fit').onclick = fitWorld;
   window.onhashchange = route;
   route();
