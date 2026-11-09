@@ -156,6 +156,23 @@ no asm.
 * Next: a spelling that keeps key from inheriting the constant's REG_EQUIV set, or that adds
   2 refs to key.
 
+### sub_0803198C (0803198C, src/fn/sub_0803198C.c): message window open
+
+Draft: `notes/phase3-menus-link/sub_0803198C.c` (2 ROM / 2 draft: the callback constant in r0
+instead of r1). It has no pin; it keeps `(void)*(volatile u8 *)&p->mode;`.
+* The ROM keeps a dead `ldrb` of p->mode (0x182) before ScriptProc_Start. Only a volatile read
+  survives flow, so the original had volatile there too. A `vu8 mode` field changes the earlier
+  `p->mode = 0` store (it adds a load), so the cast stays local to the read.
+* `ldr r1, =MessageWindow_ClearTextCompletion; str r1, [r4]`: pseudo 261 is local to block 17,
+  born after the `strh` that kills r0 (0xFFFF) and r1 (the wait address). It has no copy
+  suggestion, so find_free_reg takes r0. `AGBCC_FORCE=261:1` matches. Spill rules out a reload
+  (the reload rotation goes r2 -> r3 across it).
+* Tried: a direct `p->fnDone =` store (worse: the fnSlot hoist is what gives the ROM's `r4`),
+  the store before `p->wait`, `p->wait = -1`, a callback local set before the if or in each arm
+  (global, gets r6), casts and `fnSlot[0]`, a `vu8` field with a bare `p->mode;`.
+* Next: find what makes r0 busy (or suggests r1) across the store in the original block, e.g. a
+  value that lives from the `strh` past the store.
+
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
 tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
