@@ -190,6 +190,18 @@ mostly register shifts). The inner loop counts down in the ROM (loop.c reversed 
 pass); the ROM keeps both `pool` (spilled, sp+0x10) and `g` (r6) and holds velocity in r8;
 `rng` is caller-saved r3 around sub_08217E40.
 
+### AnimatedParticleManager_Update (src/fn/sub_08015160.c, 08015160): deferred, priority tie
+
+Draft: `notes/phase3-drafts/field-effects/AnimatedParticleManager_Update.c` (32 ROM / 32 draft).
+The second flip test is now the union DisplaySequenceControl form its matched siblings in
+homing_effect.c use. Only allocation is left: `p` (48 refs over 245 insns, priority 9795) loses
+r5 to `entry` (12 refs over 36 insns, 10000). `AGBCC_PRI=p:+206` matches. `entry` needs 9 to 11
+refs: with its second set (the frame step's `entry = a->data + a->frame`) in a separate local it
+has 8 and falls under `o` (7531), which then takes r6 (27 / 27). A `command = *entry` local
+doesn't change the counts (cse). `scope.py why 35` lists the fact 91 levers (duplicate
+`p->timer++` or the vertical-scale test into the arms before it); neither looks like original
+code.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
