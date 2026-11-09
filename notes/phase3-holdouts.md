@@ -885,3 +885,18 @@ the ROM spills one more pseudo, probably the one the table pin displaces from r6
 `AGBCC_PRI=view:+400` swaps the pair but makes the rest worse. Next: fix the table/index ranking
 (fact 110's double-counted sampler use, or fewer &gRandomIndex refs), then find the ROM's extra
 spill.
+
+### Vanargand_UpdateCaptureSetup (src/fn/sub_081A8E08.c, 081A8E08): deferred
+
+Pin: `register s32 height asm("r4") = y;` in SetPositionAndGetHeight. The ROM has two zeros. One is
+the pending-store zero (`movs r0, #0; mov ip, r0`), which is also case 2's sixth argument (ip). The
+other is the position's y (`movs r4, #0` right after `movs r1, #0x80`), which is the sixth argument
+in cases 0 and 1 (r4). Draft with literal zeros:
+`notes/phase3-drafts/monsters-bosses/Vanargand_UpdateCaptureSetup.c`, 13 ROM / 9 draft. cse1 puts
+every zero (14 pseudos) in the class of const 0, whose first member is the pending zero (pseudo 47),
+so one register serves all of them (r4, 6 refs). Fact 85's lever does not apply: the zeros are
+equal through the constant class, not through a copy. Tried: `u32 zero` / `u8 zero` locals, a
+literal `p->pending = 0`, `animationFlags = 0` passed in as y, the inline returning `out->y`, and a
+separate `height` local (with or without the `zero` argument). Next: a second zero that cse1 cannot
+see as const 0 in SImode (a halfword-mode value, or a bitfield store's zero, as in fact 25), but
+that still folds to `movs r4, #0` later.
