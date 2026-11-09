@@ -557,7 +557,10 @@ views.maps = {
       if (firstScene[k] == null || x.scene < firstScene[k]) {
         firstScene[k] = x.scene;
         const a = W?.areas[W.scene_area[x.scene]];
-        const sl = W?.scenes[x.scene]?.label;  // the scene's own label is the most specific
+        // the scene's own label is the most specific, without the place it repeats
+        let sl = W?.scenes[x.scene]?.label;
+        const rest = sl && a?.place && sl.startsWith(a.place) ? sl.slice(a.place.length) : null;
+        if (rest != null && /^\s*([(:·-]|$)/.test(rest)) sl = rest.replace(/^\s*(\([^)]*\))?\s*[:·-]?\s*/, '') || rest.replace(/^\s*\(|\)\s*$/g, '');
         where[k] = a && { place: a.place || 'Unlabeled areas', detail: sl || a.detail || (a.place ? '' : `area ${a.area}`) };
       }
     }
