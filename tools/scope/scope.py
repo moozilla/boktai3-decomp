@@ -1038,6 +1038,11 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
               f" before its `break`, each arm of an if), cse followed the jumps from the earlier {k} into each"
               f" copy with it known in the same mode (a byte op's constant is QImode) and gave them its"
               f" register, and jump2 merged the identical copies into this tail (README fact 65)")
+    if untouched_r0_hint(rows_json):
+        print("the ROM never writes r0 and calls nothing, the draft does: the caller's r0 (the first argument)"
+              " stays live to the end. A non-void function with no return statement does that (its"
+              " implicit use of the return register); try dropping `return x;`, or a void function if no"
+              " caller reads the value (README fact 95)")
     for i, ln in flag_thread_hints(rows_json)[:3]:
         print(f"line {ln}: the ROM keeps a 0/1 flag (`{rows_json[i]['rom']}`, a jump, the other constant,"
               f" `cmp #0`) that the draft's jumps skip: jump.c threads a jump after a constant set past a"
@@ -2058,6 +2063,28 @@ def flag_thread_hints(rows):
                          if rows[j].get("line")), "?")
             out.append((i0, line))
     return out
+
+
+R0_NO_WRITE = ("str", "cmp", "cmn", "tst", "b", "push", "pop", "bx", "svc", "swi", ".")
+
+
+def writes_r0(text):
+    """True when the Thumb instruction TEXT writes r0 (its first operand, for an op that writes it)."""
+    op, _, rest = text.partition(" ")
+    if op.startswith(R0_NO_WRITE) or op == "movs" and rest == "r0, r0":
+        return op.startswith("pop") and "r0" in rest
+    return rest.split(",")[0].strip() == "r0"
+
+
+def untouched_r0_hint(rows):
+    """True when the ROM body reads r0, never writes it and calls nothing, while the draft writes r0:
+    a non-void function with no return statement keeps the incoming r0 live (README fact 95)."""
+    rom = [r["rom"] for r in rows if r.get("rom") and not r["rom"].startswith(".")]
+    draft = [r["draft"] for r in rows if r.get("draft") and not r["draft"].startswith(".")]
+    if not rom or any(t.partition(" ")[0] in ("bl", "blx") for t in rom):
+        return False
+    reads = any(re.search(r"\br0\b", t.partition(" ")[2]) for t in rom)
+    return reads and not any(writes_r0(t) for t in rom) and any(writes_r0(t) for t in draft)
 
 
 def statement_macros(text, reach, starts):
