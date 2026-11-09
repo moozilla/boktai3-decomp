@@ -129,7 +129,8 @@ and ROM data it loads, and the objects and script routines in the game that
 reach it. A RAM object's page lists every function that uses it; a struct
 type's page shows its definition with each member's offset, as agbcc lays it
 out, and the functions that use it. **Concessions left** lists every function
-still holding a pin, barrier or other concession, by kind. The index is
+still holding a pin, barrier or other concession, by kind, and the overview
+graphs progress over time from every committed `PROGRESS.md`. The index is
 `tools/studio/codemap.py`, built from `tools/progress.py` and
 `tools/concessions.py`. **ROM** (`/rom`) is the ROM as a treemap in address
 order, colored by kind or by how well each byte is understood.

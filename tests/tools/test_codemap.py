@@ -176,5 +176,28 @@ class CommittedProgressTests(unittest.TestCase):
         self.assertTrue(all(k == ['concession'] for k in kinds.values()))
 
 
+
+class HistoryTests(unittest.TestCase):
+    def test_history_reads_each_committed_progress_headline(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as d:
+            git = lambda *a: subprocess.run(['git', '-c', 'user.name=t', '-c', 'user.email=t@t', *a], cwd=d, check=True, capture_output=True)
+            git('init', '-q')
+            heads = ['**Code matched in C: 10.00%** (1 / 10 bytes) — **2 / 20 functions**\n',
+                     '**Code matched in C: 50.00%** (5 / 10 bytes) — **10 / 20 functions**\n\nWithout register pinning: **40.000%**.\n',
+                     '**Code matched in C: 100.00%** (10 / 10 bytes) — **20 / 20 functions**\n\nWithout concessions: **90.500%**.\n']
+            for n, text in enumerate(heads):
+                Path(d, 'PROGRESS.md').write_text('# Decompilation progress\n\n' + text)
+                git('add', 'PROGRESS.md')
+                git('commit', '-q', '-m', f'p{n}', '--date', f'2026-10-0{n + 1}T00:00:00')
+                subprocess.run(['git', 'commit', '-q', '--amend', '--no-edit'], cwd=d, check=True, capture_output=True,
+                               env={'GIT_COMMITTER_DATE': f'2026-10-0{n + 1}T00:00:00', 'PATH': '/usr/bin:/bin',
+                                    'GIT_AUTHOR_NAME': 't', 'GIT_AUTHOR_EMAIL': 't@t', 'GIT_COMMITTER_NAME': 't', 'GIT_COMMITTER_EMAIL': 't@t'})
+            with patch.object(codemap, 'ROOT', d), patch.dict(codemap._INDEX, clear=True):
+                h = codemap.history()
+        self.assertEqual([(p['matched'], p['clean'], p['clean_of'], p['functions']) for p in h],
+                         [(10.0, None, None, 2), (50.0, 40.0, 'pins', 10), (100.0, 90.5, 'all', 20)])
+        self.assertLess(h[0]['t'], h[1]['t'])
+
 if __name__ == '__main__':
     unittest.main()
