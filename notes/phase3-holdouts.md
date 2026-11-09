@@ -203,6 +203,17 @@ doesn't change the counts (cse). `scope.py why 35` lists the fact 91 levers (dup
 `p->timer++` or the vertical-scale test into the arms before it); neither looks like original
 code.
 
+### AnimatedParticle_PriorityFromFlags (src/fn/sub_080154D0.c, 080154D0): deferred, DEBUG_NOP
+
+Without the `DEBUG_NOP()` it is 7 ROM / 5 draft. regmove ties `flags & 0xf000` to the
+constant's register instead of to `flags` (`AGBCC_NOTIE=13` matches). The empty loop's notes
+after the AND make the AND's result live across a block boundary, which changes that tie.
+Tried with no change: the value or the constant first (fact 33), `flags &= 0xf000`, a separate
+`priority`, u32 parameter and casts, a ternary, `p >= 1 && p <= 4`, `p < 4`, a switch (worse),
+and `result = 2` before or after.
+Next idea: real code between the AND and the shift that ends the block (a test the original
+had), or evidence for `concession-ok(debug-nop)` from a twin with the same compiled-out check.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
