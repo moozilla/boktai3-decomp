@@ -322,6 +322,25 @@ into the join, which gives the ROM's `adds r2, r1, #0` there.
   (6, next in r1 vs r2; `AGBCC_FORCE=next:2` gives 4); `last` copies (cprop/cse fold them).
 * Next: C that makes the arm-1 temp global or keeps the constant alive past the add.
 
+### Wireless_ReceiveParentUniPackets (0803548C, src/fn/sub_0803548C.c)
+
+Draft: `notes/phase3-menus-link/Wireless_ReceiveParentUniPackets.c` (19 ROM / 19 draft, shape 6,
+no pins or barriers). Parked to revisit, not finished.
+
+- Struct: named per-slot arrays (`peers[4]` 4-byte packets at 0x80, `lastSequence`, `repeats`,
+  `behind`, `ahead` at 0xD0-0xDF, then `sendStalls`, `receiveStalls`, `received` and `sent` at
+  0xE4-0xE7).
+- Loop: a do-while with a packet pointer stepped by 4 and `offset = i << 2` for
+  gRfuSlotStatusUNI. These match the ROM through the loop, except which registers copy the held
+  zero for the two `flags = 0` stores (sb into r2/r3).
+- Tail: the ROM keeps two copies of `scratch[2]` (r3 for `& sent`, r1 for the full mask) and builds
+  the matched mask in r2. Single-set variables tie the and to the dying `received`. The original's
+  multi-set `got` (`got = received; ... got = expected;`, the old pinned form) or a separate `all`
+  variable lowers i's global priority below a 23-ref pseudo. The whole loop then allocates with one
+  high register fewer: the draft is 260 bytes against 272, at 55 / 49.
+- Next: find which pseudo the multi-set tail promotes (`why` on 22 says it is a doubled constant
+  register), or a tail form that keeps i ahead.
+
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
 tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
