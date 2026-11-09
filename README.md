@@ -142,7 +142,7 @@ order, colored by kind or by how well each byte is understood.
 | ![Browse](docs/img/studio-browse.png) | **Browse**: a monster with its family, every palette its sprites are drawn in, and the scenes that place it. |
 | ![Text](docs/img/studio-text.png) | **Text** (`/text`): every string with the fan translation and the scripts that show it, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
 | ![Sprites](docs/img/studio-sprites.png) | **Sprites**: sprite packages and large sprites with every frame and animation, in their in-game palettes. |
-| ![Maps](docs/img/studio-map.png) | **Maps**: stages with captured palettes, doors, entrances, items, enemies and patrol paths from the stage scripts. |
+| ![Maps](docs/img/studio-map.png) | **Maps**: stages grouped by place in story order, with captured palettes, doors, entrances, items, enemies and patrol paths from the stage scripts. |
 | ![World](docs/img/studio-world.png) | **World** (`/world`): how the rooms connect. Scenes grouped into areas by their doors, areas into places by their labels, each place with its rooms, captures and enemies. |
 | ![Scripts](docs/img/studio-scripts.png) | **Scripts**: procedures in a readable view with recovered names, the developers' debug messages and their translations. |
 | ![Actors](docs/img/studio-actors.png) | **Actors**: the script registry, every object a script can create, filterable by GCL name, sprite or use, each shown with its Browse page; plus the decoded command and parameter tables. |

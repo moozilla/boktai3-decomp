@@ -80,7 +80,7 @@ body.embed main { grid-template-columns: 1fr; }
     <div class="tools"><input id="q" type="search" placeholder="Filter by hash or note" autocomplete="off"><div class="count" id="count"></div></div>
     <div id="list"></div>
   </section>
-  <section id="view"></section>
+  <section id="view"><div class="empty">Loading graphics…</div></section>
 </main>
 <div id="tip"></div>
 <script src="/static/common.js"></script>
@@ -117,7 +117,7 @@ async function boot() {
   learned = await fetch('/api/learned').then(r => r.json()).catch(() => learned);
   tagList = await fetch('/api/tags').then(r => r.json()).catch(() => []);
   const ps = index.t92B3 || [];
-  palettes = await Promise.all(ps.map(async ([h]) => ({ hash: h, data: await res('t92B3', h) })));
+  palettes = (await pmap(ps, async ([h]) => ({ hash: h, data: await res('t92B3', h).catch(() => null) }))).filter(p => p.data);
   $('palSel').innerHTML = '<option value="">Greyscale</option>' + palettes.map((p, i) => `<option value="${i}">${p.hash}</option>`).join('');
   const saved = localStore('pal');
   $('palSel').value = saved ?? String(palettes.findIndex(p => p.hash === '081B'));
