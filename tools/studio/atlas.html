@@ -564,7 +564,7 @@ function route() {
       .then(d => { $('script').textContent = (d.lines || []).map(x => x[1]).join('\n'); });
     $('sen').onchange = load; load();
   }
-  pageTitle(e ? e.title : id.startsWith('node:') ? id.split('/').pop() : '', 'Browse');
+  pageTitle(e ? e.title : id.startsWith('node:') ? id.slice(5).split('/').pop() : '', 'Browse');
   renderTree();
 }
 // The Studio's front page: what this is, the numbers, the game's tree and the other views
