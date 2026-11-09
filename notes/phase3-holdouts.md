@@ -118,3 +118,108 @@ insertion before rangeB, raising or lowering the constants' priorities (AGBCC_PR
 Next: a first set without a note that ends up in sl alone. That could be the relative
 SceneActorReaction_BeginDefeatBurst's union reuse, if the ROM allows one more sl use, or
 another rangeB write form that keeps the masks out of cse.
+
+### Lun_HandlePlayerContact (src/fn/sub_0809AE0C.c, 0809AE0C): deferred
+
+The landed version uses two do/while(0) statement macros (LUN_FINISH_SPEED_CONTACT is used once).
+The ROM keeps two dead reads of `context->flags3D4 & phase` (`ldr; ldr; ands r0, r7` with the
+result unused) before each Lun_ApplyContactFlag, and Apply's mask is a fresh `movs r2, #2`.
+Drafts: `Lun_HandlePlayerContact.c` (no macros, `if (Lun_ReadContextFlags(actor, phase))
+DEBUG_PRINT();`, 29/25 differ) and `.macro.c` (only the two-use read macro, 4/4: the palette
+pointer copy `adds r3, r0, #0`). Without the macros, cse2 replaces Apply's mask (2) with phase,
+which is still known to be the constant 2 (`why 562`). phase's reassignments by the reads are gone
+before cse2, and phase's set sinks to its first use. In the macro version the do/while keeps the
+reassignment alive until flow. Tried: `phase = Read(...)` plain or inside the `if`, a separate
+`contact` variable, u32 phase, a u32 mask parameter for Read, Apply with `|= 2`, and u8/u16/s8 masks
+(those go to the stack). Next: a form where phase really changes (the read's result reused) or
+some other reason the ROM's mask is a separate constant.
+
+### Spider_UpdateWanderGoal (src/fn/sub_080A4018.c, 080A4018): deferred
+
+Draft: `Spider_UpdateWanderGoal.c` (the no-pin draft, 58/62 differ). The ROM's allocation is input r4,
+transform r5, table r6, heading r7, ctx r8, mask (0x3FF) sb, &gRandomIndex sl, with distance and
+&input->0x3D4 spilled to the stack. sb's 0x3FF comes from reload's move2add (`adds r1, #0x2f` on the
+r1 that held 0x3D0), so mask has to get sb. Two constant pointers have to be in registers with no
+REG_EQUIV, as in Bat_UpdateDefeat. `AGBCC_NOEQUIV=31,32` (table, indexAddress) gives 58/58 with
+shape 16, and the rest is the order of input, transform, table and heading. The halves union cannot
+help here either: the target packing reuses 0xFFFF0000. Next: a general way to set a constant pointer
+without a REG_EQUAL note at function entry; this is the same blocker as Bat.
+
+### TentacleActor_SelectWanderRoute (src/fn/sub_080A8904.c, 080A8904): deferred
+
+Draft: `TentacleActor_SelectWanderRoute.c`, every do/while(0) macro written out (46/48 differ, all
+allocation). The macros put their statements one loop level deeper, and flow weights REG_N_REFS by
+loop depth. So with them the scan mask constant has 21 refs (14 without), i 13 (11), n 9 (7) and
+currentCell 10 (8). That reorders global allocation: the ROM has facing r8, count sb, the 3 mask r6.
+The draft gives facing r6 and count r8. Next: C that really nests those statements (a loop the
+original had, for example the neighbor scan as an inner loop) or other refs that raise the mask
+and n by the same amount.
+
+### TentacleBody_RefreshDirectionalAnimations (src/fn/sub_080A8F38.c, 080A8F38): deferred
+
+Draft: `TentacleBody_RefreshDirectionalAnimations.c` (41/37 differ, against 83/79 for the plain
+no-pin draft). Step is written as the shared DisplaySequenceState playback, with the flip tests
+from SpriteEffectController_StepDrawable and ordinary `frame.profile[frame.kind * four]` /
+`++frame.i` in the body. Remaining: loop.c hoists the constant 1, because three equal sets
+(TestMask's `& 1`, the first flip bit and `duration = 1`) are combined in combine_movables;
+`AGBCC_NOMOVE=99` keeps it in the loop. The register order is the other part: the ROM puts body in
+sb, offset in sl and the segment pointer in r8 (seven saved registers); the draft uses r8/sb/r7.
+Next: find what holds r7 in the ROM (another long-lived value the draft lacks, maybe a kept
+`&body->speed` or a `four` constant), then split the 1s.
+
+### TentacleBody_ResetDirectionalAnimations (080A915C) and TentacleBody_RestartSegmentAnimations (080A93F4): deferred with Refresh
+
+Same family as TentacleBody_RefreshDirectionalAnimations: the same Step helper and the same
+`frame` stack struct and segment loop. With Refresh's draft Step and ordinary body C, Reset scores
+54/52 (`TentacleBody_ResetDirectionalAnimations.c`); Restart is not tried yet. Solve Refresh first,
+then move the shared Step into `include/tentacle_segment_animation.h` and port it to all three.
+
+### TentacleActor_RemoveSegmentColliders (src/fn/sub_080AA688.c, 080AA688): deferred
+
+Draft: `sub_080AA688.c` (`--trail->activeCount;`, 25/24 differ). The ROM rebuilds `trail + 0x8EA` in
+the loop; the draft hoists it. `hoist`: in loop pass 2 the address (insn 148) moves at 13 x 1 x 3 >=
+37, after pass 1 moved the mask 1 (as the ROM does too). Tried `--trail->activeCount`,
+`activeCount--`, a pointer local and `= activeCount - 1`; all are hoisted. Next: a form whose pass-2
+threshold or lifetime fails, or a count address that is not invariant (derived from the segment).
+
+### TentacleActor_AlignSegmentsToTerrain (src/fn/sub_080AA8C4.c, 080AA8C4): deferred
+
+Draft: `TentacleActor_AlignSegmentsToTerrain.c`, 36/38 differ, all of it allocation. It passes
+`&segment->position` to Height (the landed code passes `&trail->segments[i].position`, which costs
+recomputation). Left: the ROM copies Height's result (`adds r2, r1, #0` at the switch join) and
+keeps Height's `p` in r6 copied from r7 before the override call. The draft coalesces the result
+and strength-reduces the copy (insn 703, tagged loop). `why all`: 234 vs p allocation order
+(`AGBCC_PRI=234:+1636` gives 28/30).
+
+### Six-spark burst family: Bat_UpdateDefeat, TentacleActor_SpawnSparkBurst (080AB294), Vorn_UpdateDefeat
+
+All three spawn six sparks from `gRandomTable` kept in a callee-saved register. The ROM's table
+pseudo has no REG_EQUIV; the C pins it or uses an asm barrier. In SpawnSparkBurst the halves union
+(`TentacleActor_SpawnSparkBurst.c`) already gives the ROM's allocation (table in r7), 4/10 differ:
+only the half insertions are left unfolded. The `struct VAB v` bitfield writes before it leave
+0xFFFF0000 and 0xFFFF in cse-shared pseudos, so the insertions' `and` has a register operand and
+combine has no constant to simplify. Ruled out here: the two-statement offset form
+(`off = (u8 *)gRandomTable + k; table = (u16 *)(off - k);`, sub_08000430), where cse still
+records REG_EQUIV (const (plus sym k)) and the result is worse, and halves placed before the vector
+writes. Next: a table source that cse does not see as constant and combine folds, with no mask
+constant in common with a bitfield write in the same block.
+
+### TentacleActor_UpdateRetraction (src/fn/sub_080AB968.c, 080AB968): deferred
+
+The ROM computes |secondaryMotion.x| and |secondaryMotion.z| (`adds r3, r1, #0; ...; rsbs r3, r1, #0`)
+and never uses them. The landed C keeps them with a volatile asm. So in the original they fed
+something deleted after flow. Draft `TentacleActor_UpdateRetraction.c`: `if (ax > az) Advance(...);
+else Advance(...);` (7/12). The compare survives, because reload materializes 0x6400 differently in
+the two arms and jump2 cannot cross-jump them. Tried: an empty `if` with DEBUG_PRINT (flow deletes
+the abs, 20/2), branching inside Advance, and a `speed` variable set before the branch. Next: two
+arms that stay identical after reload (all arguments set before the branch), or a switch on the
+abs values.
+
+### TentacleActor_RecoverFromSegmentLoss (src/fn/sub_080ABB18.c, 080ABB18): deferred
+
+The ROM computes 15 field addresses of p before the segment-removal loop's first test and spills
+most of them to the stack. That looks like loop.c hoisting the invariants of a loop that contains
+the final stores. Draft `sub_080ABB18.c` (stores inside a `for (;;)` exit branch, 139/107) has
+loop.c hoist only a few of them (savings threshold). The landed C precomputes the pointers by hand,
+with 5 pins and 2 barriers (all removed: 107/107). Next: decide between the two shapes with
+`hoist` (which addresses the ROM's loop moved), then match the allocation.
