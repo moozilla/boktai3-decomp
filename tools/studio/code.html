@@ -400,8 +400,8 @@ function strip(fns, sel) {
   return `<div class="strip">${fns.map(f => `<a href="${fnHref(f.addr)}" class="${f.state}${f.addr === sel ? ' sel' : ''}" style="flex:${f.size / total}" title="${esc(f.name)} · ${f.size} B · ${STATE_TITLE[f.state]}${f.kinds.length ? ': ' + f.kinds.map(kindLabel).join(', ') : ''}"></a>`).join('')}</div>
     <div class="legend">Each function as wide as its code: <span style="color:var(--ok)">■</span> no concessions <span style="color:var(--warn)">■</span> with concessions <span style="color:var(--warn-bg);text-shadow:0 0 1px var(--warn)">■</span> not matched yet${fns.some(f => f.state === 'asm') ? ' <span class="muted">■</span> assembly' : ''}</div>`;
 }
-// the unit's block in the ROM view (rom.html), whose code groups name library units "Library: X"
-const romHref = u => '/rom#level/Code/' + encodeURIComponent((['Libraries', 'Intentional assembly'].includes(u.cat) ? 'Library: ' : '') + u.name);
+// the unit's block in the ROM view (rom.html groups code by the same units)
+const romHref = u => '/rom#level/Code/' + encodeURIComponent(u.name);
 function unitPage(key) {
   const u = UNIT[key];
   if (!u) return notFound(`No unit ${key}.`);

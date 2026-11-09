@@ -1020,13 +1020,9 @@ def rom_tree():
     and an understanding level."""
     seg = rom_load()
     N = notes()
-    ix = load()
-    unit_of = {}
-    for e in ix["entities"].values():
-        if e["kind"] == "unit":
-            for f in e["funcs"]:
-                unit_of[f] = e["key"]
-    an_rev = {fi["addr"]: name for name, fi in ix["funcs"].items()}
+    # code by translation unit, named as the Code view and the report name it
+    import codemap
+    unit_of = {a: unit.split("/", 1)[-1] for a, (_, _, _, unit) in codemap.progress_by_address().items()}
     note_kind = {"map": "map", "tCB05": "spr", "t92B3": "pal"}
 
     def leaf(start, size, kind, name, ref, level):
@@ -1036,10 +1032,10 @@ def rom_tree():
     code = collections.OrderedDict()
     for a, size, kind, name, ref, *held in seg["items"]:
         if kind in ("code", "asm"):
-            sub = unit_of.get(an_rev.get(f"{a:08X}", ""), "Unsorted")
+            sub = unit_of.get(a) or "Unsorted"
             level = "assembly" if kind == "asm" else "concession" if held and held[0] else "decompiled"
             code.setdefault(sub, []).append(leaf(a, size, kind, name, ref, level))
-    code_children = [{"s": fs[0]["s"], "n": sum(f["n"] for f in fs), "k": "code", "t": sub, "r": f"unit:{sub}", "c": fs}
+    code_children = [{"s": fs[0]["s"], "n": sum(f["n"] for f in fs), "k": "code", "t": sub, "c": fs}
                      for sub, fs in code.items()]
     code_children.sort(key=lambda x: x["s"])
     if code_children:
