@@ -1728,6 +1728,17 @@ Each was read from the compiler source and confirmed on a live draft.
    with `setup` set in each arm and `| (setup & 3)` on the v->z line, but its priority is 93
    against angle's 3000 (`AGBCC_PRI=setup:+2908` matches).
 
+95. **A non-void function with no return statement keeps the incoming r0 live to the end.**
+   expand_function_end emits a use of the return register, and nothing in the body sets it, so
+   flow sees the hard r0 (the first argument) live from entry to exit: the body never allocates
+   r0, and the parameter's pseudo is a copy out of it. In the ROM this looks like a function that
+   "returns its first argument" without a final move, and never touches r0. It also changes cse:
+   make_regs_eqv makes a newer register the class's canonical one when it outlives the current
+   first register and the cse block. With `return input;` the parameter outlives `p = input` and
+   cse rewrites p's uses to the parameter. Without the return the parameter dies at the copy,
+   so p wins and keeps its own register. BreakableBarrier_SetPosition (five pins and a barrier)
+   matched once its `return input;` was dropped. The caller ignores the value.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
