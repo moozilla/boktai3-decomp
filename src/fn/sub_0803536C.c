@@ -1,5 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+struct UniPacket {
+    u8 count, bits;
+    u16 flags;
+};
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -13,10 +16,13 @@ struct Engine {
     u8 flag42, flag43;
     u32 ticks;
     void *pointer;
-    u8 pad4c[0x58];
+    u8 pad4c[0x44];
+    struct UniPacket uni;
+    u8 recv[16];
     u32 number;
     u8 work[16];
-    u8 padb8[0x34];
+    u8 padb8[0x18];
+    u8 lastSequence, padd1[3], repeats, padd5[3], drops, padd9[0x13];
     u16 flags, backup, history[5];
     u8 changed, padfb[5];
     u16 diff[5];
@@ -43,68 +49,26 @@ int Wireless_ReceiveChildUniPacket(struct Engine *p)
 {
     u8 *scratch = p->scratch;
     int result = 0;
-    int slot;
-    {
-        struct RfuSlotStatusUNI **slots = gRfuSlotStatusUNI;
-        slot = p->index;
-        if (slots[slot]->recv.newDataFlag) {
-            u8 *packet = (u8 *)p + 0x90;
-            u8 *previous;
-            u8 *sequence;
-            register int last asm("r6");
-            int next;
-            int received;
-            int i;
-            u16 *flags;
-            u8 *changed;
-            rfu_UNI_clearRecvNewDataFlag(slot);
-            {
-                register u8 *initial asm("r0") = (u8 *)p + 0xD0;
-                u8 *incoming;
-                last = *initial;
-                next = last + 1;
-                incoming = (u8 *)p + 0x94;
-                next = (u8)next;
-                received = *incoming;
-                previous = initial;
-                sequence = incoming;
-            }
-            if (next == received) {
-                Wireless_EnqueuePacket(p->message, sequence);
-            } else {
-                register int old asm("r0") = (u8)last;
-                register u8 *counter asm("r1");
-                if (old == received)
-                    counter = (u8 *)p + 0xD4;
-                else
-                    counter = (u8 *)p + 0xD8;
-                (*counter)++;
-            }
-            {
-                int value = *sequence;
-                int zero = 0;
-                *previous = value;
-                (*packet)++;
-                packet[1] = zero;
-                i = zero;
-                flags = &p->flags;
-                changed = &p->changed;
-            }
-            do {
-                register u8 *read asm("r6") = scratch;
-                if ((read[2] >> i) & 1)
-                    packet[1]++;
-            } while (++i <= 4);
-            {
-                int value = *flags;
-                register int zero asm("r1") = 0;
-                *(u16 *)(packet + 2) = value;
-                value = 65535;
-                *flags = value;
-                *changed = zero;
-            }
-            result = 1;
-        }
+    if (gRfuSlotStatusUNI[p->index]->recv.newDataFlag) {
+        struct UniPacket *packet = &p->uni;
+        int i;
+        rfu_UNI_clearRecvNewDataFlag(p->index);
+        if ((u8)(p->lastSequence + 1) == p->recv[0])
+            Wireless_EnqueuePacket(p->message, p->recv);
+        else if (p->lastSequence == p->recv[0])
+            p->repeats++;
+        else
+            p->drops++;
+        p->lastSequence = p->recv[0];
+        packet->count++;
+        packet->bits = 0;
+        for (i = 0; i <= 4; i++)
+            if ((scratch[2] >> i) & 1)
+                packet->bits++;
+        packet->flags = p->flags;
+        p->flags = 0xFFFF;
+        p->changed = 0;
+        result = 1;
     }
     return result;
 }
