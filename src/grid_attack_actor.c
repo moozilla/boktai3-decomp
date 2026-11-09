@@ -329,8 +329,6 @@ done:
     return index + 4;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
 {
     struct ContactSwarmSprite *graphics = &p->drawable;
@@ -411,8 +409,6 @@ static inline void GridAttack_SetFacing(struct GridAttackActor *p, int angle)
     p->facing8 = value;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
 {
     if (!p->locked)
@@ -429,8 +425,6 @@ void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
         p->reset(p);
     }
 }
-
-// MATCHING_CONCESSION: register-pinning
 
 void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
 {
@@ -458,8 +452,6 @@ void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
@@ -473,14 +465,9 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
         GridAttackActor_ResetAttackAnimationHistory(p);
         Sound_PlaySongChecked(955);
     }
-    {
-        u16 *dst = (u16 *)&p->phaseTimer;
-        register int zero asm("r2") = 0;
-        int wordZero = 0;
-        *dst = 240;
-        p->damage = wordZero;
-        p->special = zero;
-    }
+    p->phaseTimer = 240;
+    p->damage = 0;
+    p->special = 0;
     {
         u32 mask = 12;
         p->flags |= mask;
@@ -552,8 +539,6 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
 }
 
 extern u16 gUnk_086141BC[];
-
-// MATCHING_CONCESSION: register-pinning
 
 void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
 {
