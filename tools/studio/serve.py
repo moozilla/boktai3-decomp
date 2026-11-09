@@ -45,7 +45,7 @@ log = logging.getLogger("studio")
 # Held while the startup preload builds an index; requests that use one wait
 # for it instead of building the same index alongside.
 WARM = threading.Lock()
-SLOW = ("/api/atlas", "/api/codemap", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
+SLOW = ("/api/atlas", "/api/codemap", "/api/search/", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
         "/api/code/", "/api/learned", "/api/stages", "/api/areas")
 # polled by the live view several times a second; logged only when slow or failing
 POLLED = ("/api/live", "/api/live/player")
@@ -414,6 +414,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
             lines = gclfiles.render(fid, inline="inline" in opts, readable="raw" not in opts, english="en" in opts)
             self.send(200 if lines is not None else 404,
                       {"lines": lines, "inlined": sorted(gclfiles.inlinable(fid))} if lines is not None else {"error": "no such file"})
+        elif self.path.startswith("/api/search/"):
+            import search  # the ⌘K palette on every page (common.js)
+            q = urllib.parse.unquote(self.path[len("/api/search/"):])
+            self.send(200, search.search(q, self.server.strings(), self.server.display_en))
         elif self.path == "/api/codemap":
             import codemap
             self.send(200, codemap.summary())
@@ -546,11 +550,25 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(404, {"error": "not found"})
 
 
+def default_trans():
+    """../boktai3trans beside the checkout, or beside the main checkout when this is a worktree."""
+    here = os.path.join(os.path.dirname(ROOT), "boktai3trans")
+    if os.path.isdir(here):
+        return here
+    try:
+        common = subprocess.run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=ROOT,
+                                capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return here
+    main = os.path.join(os.path.dirname(os.path.dirname(common)), "boktai3trans")
+    return main if os.path.isdir(main) else here
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8642)
     ap.add_argument("--link-port", type=int, default=8643, help="port Centaur connects to (its CENTAUR_LINK_PORT)")
-    ap.add_argument("--trans", default=os.path.join(os.path.dirname(ROOT), "boktai3trans"))
+    ap.add_argument("--trans", default=default_trans())
     ap.add_argument("--no-preload", action="store_true", help="build each index on first use instead of at startup")
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
@@ -560,6 +578,7 @@ def main():
     srv.live = live.Live(a.link_port)
     srv.trans = a.trans
     srv.display_jp, srv.display_en = display_strings(a.trans)
+    srv.strings = read_strings
     log.info("studio: http://localhost:%d (Centaur link on port %d)", a.port, a.link_port)
     if not a.no_preload:
         threading.Thread(target=preload, daemon=True).start()

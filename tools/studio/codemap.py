@@ -261,6 +261,8 @@ def summary():
     """The tree without per-function cross-references, for the explorer's sidebar,
     overview and search: [category -> [unit -> [function rows]]]."""
     ix = load()
+    if _INDEX.get("summary_of") is ix:
+        return _INDEX["summary"]
     cats = [{"name": c["name"], "measures": c["measures"], "units": [{"name": u, "functions": []} for u in c["units"]]}
             for c in ix["categories"]]
     for f in ix["functions"].values():
@@ -269,9 +271,12 @@ def summary():
     for c in cats:
         for u in c["units"]:
             u["functions"].sort(key=lambda r: r[1])
-    return {"measures": ix["measures"], "missing": ix.get("missing", []), "concession_kinds": ix["concession_kinds"], "categories": cats,
-            "ram": [{k: r.get(k) for k in ("addr", "name", "size", "header")} | {"users": len(ix["ram_users"].get(r["name"], []))}
-                    for r in ix["ram"]]}
+    out = {"measures": ix["measures"], "missing": ix.get("missing", []), "concession_kinds": ix["concession_kinds"],
+           "categories": cats,
+           "ram": [{k: r.get(k) for k in ("addr", "name", "size", "header")} | {"users": len(ix["ram_users"].get(r["name"], []))}
+                   for r in ix["ram"]]}
+    _INDEX.update(summary=out, summary_of=ix)
+    return out
 
 
 def _source(f):

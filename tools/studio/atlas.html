@@ -83,10 +83,6 @@ table.t td, table.t th { padding: 4px 12px 4px 0; text-align: left; border-botto
 table.t th { color: var(--muted); font-weight: 500; font-size: 12px; }
 .ok { color: var(--ok); }
 .muted { color: var(--muted); }
-#search { position: fixed; inset: 0; background: rgba(0,0,0,.25); display: none; align-items: flex-start; justify-content: center; padding-top: 12vh; z-index: 60; }
-#search.on { display: flex; }
-#search .box { width: min(640px, 92vw); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 16px 48px rgba(0,0,0,.25); overflow: hidden; }
-#search input { width: 100%; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 12px 14px; font-size: 16px; outline: none; }
 #sres { max-height: 56vh; overflow-y: auto; }
 #sres .r { display: flex; gap: 10px; align-items: baseline; padding: 7px 14px; cursor: pointer; }
 #sres .r.on { background: var(--sel); }
@@ -103,7 +99,6 @@ pre.script { background: var(--panel); border: 1px solid var(--line); border-rad
 .say { display: flex; gap: 10px; align-items: flex-start; margin: 2px 0 4px; }
 .say .sp { width: 40px; min-width: 40px; min-height: 40px; image-rendering: pixelated; }
 .say .en { white-space: normal; }
-.kbd { font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; color: var(--muted); }
 @media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } .page { padding: 14px 16px 40px; } }
 </style>
 </head>
@@ -116,13 +111,12 @@ pre.script { background: var(--panel); border: 1px solid var(--line); border-rad
   </section>
   <section id="view"><div class="page empty">Loading the game index…</div></section>
 </main>
-<div id="search"><div class="box"><input id="sq" placeholder="Search everything: a monster, place, item, sprite, script, function…" autocomplete="off"><div id="sres"></div></div></div>
 <script src="/static/common.js"></script>
 <script>
 // Browse: every kind of thing in the game as one tree (tools/studio/atlas.py),
 // each with a page of everything known about it. Links to the other Studio
 // views open in the side panel.
-studioHeader(`<button id="sbtn" title="Search everything">Search <span class="kbd">⌘K</span></button>`);
+studioHeader();
 let T = [], E = {}, F = null, open = new Set(), SEL = null;
 const nodes = {};                  // folder path -> node
 const ICON = { package: '▤', actor: '◆', monster: '☠', char: '☺', item: '◇', area: '▣', scene: '▫', file: '≡', sprite: '▤', unit: '{}', tileset: '▦', bgtiles: '▦', song: '♪', cut: '▶', beat: '★' };
@@ -177,7 +171,7 @@ $('q').oninput = renderTree;
 // arrow keys walk the tree (outside text fields): up/down move, right opens a
 // group, left closes it
 document.addEventListener('keydown', e => {
-  if (/INPUT|TEXTAREA/.test(document.activeElement.tagName) || $('search').classList.contains('on')) return;
+  if (/INPUT|TEXTAREA/.test(document.activeElement.tagName) || $('gsearchbox')?.classList.contains('on')) return;
   if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key) || e.metaKey || e.altKey) return;
   const rows = [...document.querySelectorAll('#tree .tn')], i = rows.findIndex(r => r.classList.contains('on'));
   const cur = rows[i];
@@ -545,43 +539,6 @@ function home() {
   return `<div class="page"><h1 class="t">Boktai 3</h1><div class="cards" style="margin-top:16px">${T.map(n => folderCard(n.title)).join('')}</div></div>`;
 }
 
-// ---------- search (⌘K) ----------
-let SR = [], SI = 0;
-function searchOpen() { $('search').classList.add('on'); $('sq').value = ''; doSearch(); $('sq').focus(); }
-function searchClose() { $('search').classList.remove('on'); }
-function doSearch() {
-  const q = $('sq').value.trim().toLowerCase();
-  const score = e => {
-    const t = (e.title || '').toLowerCase();
-    if (!q) return 0;
-    if (t === q || (e.key || '').toLowerCase() === q) return 100;
-    if (t.startsWith(q)) return 80;
-    if (t.includes(q)) return 60;
-    if ([e.jp, e.fname, e.key, ...(e.names || []).map(n => n.jp + ' ' + n.en)].some(x => (x || '').toLowerCase().includes(q))) return 40;
-    return 0;
-  };
-  const rank = { monster: 9, actor: 8, char: 8, item: 7, area: 6, scene: 5, sprite: 4, tileset: 3, bgtiles: 3, song: 3, cut: 4, beat: 5, file: 3, unit: 2 };
-  SR = q ? Object.values(E).map(e => [score(e), e]).filter(x => x[0] > 0).sort((a, b) => b[0] - a[0] || rank[b[1].kind] - rank[a[1].kind] || a[1].title.localeCompare(b[1].title)).slice(0, 60).map(x => x[1]) : [];
-  SI = 0; drawSearch();
-}
-function drawSearch() {
-  $('sres').innerHTML = SR.map((e, i) => `<div class="r${i === SI ? ' on' : ''}" data-i="${i}"><span class="k">${KIND[e.kind] || e.kind}</span><span>${esc(e.title)}${e.jp ? ` <span class="muted">${esc(e.jp)}</span>` : ''}</span><span class="p">${esc(e.path || E[e.area]?.title || '')}</span></div>`).join('') || `<div class="r muted">${$('sq').value ? 'No matches.' : 'Type to search monsters, places, items, sprites, scripts and code.'}</div>`;
-  document.querySelector('#sres .r.on')?.scrollIntoView({ block: 'nearest' });
-}
-$('sq').oninput = doSearch;
-$('sq').onkeydown = e => {
-  if (e.key === 'ArrowDown') { SI = Math.min(SR.length - 1, SI + 1); drawSearch(); e.preventDefault(); }
-  else if (e.key === 'ArrowUp') { SI = Math.max(0, SI - 1); drawSearch(); e.preventDefault(); }
-  else if (e.key === 'Enter' && SR[SI]) { location.hash = SR[SI].id; searchClose(); }
-  else if (e.key === 'Escape') searchClose();
-};
-$('sres').onclick = e => { const r = e.target.closest('.r[data-i]'); if (r) { location.hash = SR[+r.dataset.i].id; searchClose(); } };
-$('search').onclick = e => { if (e.target.id === 'search') searchClose(); };
-document.addEventListener('keydown', e => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); searchOpen(); }
-  else if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); searchOpen(); }
-});
-$('sbtn') && ($('sbtn').onclick = searchOpen);
 
 (async () => {
   const [ix] = await Promise.all([fetch('/api/atlas').then(r => r.json()), loadNotes()]);
