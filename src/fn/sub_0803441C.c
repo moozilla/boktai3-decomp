@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Engine {
     u8 pad0[0x18];
@@ -36,60 +35,35 @@ void Wireless_SetStatus(int);
 int WirelessController_UpdatePeerRosterSend(struct Engine *p)
 {
     int result = 0;
-    register int bits asm("r2") = p->mask;
-    if (bits & 2)
-        goto fail;
-    if (gRfuLinkStatus->linkLossSlotFlag)
-        goto fail;
-    if (bits & 0xA0)
-        goto fail;
-    goto run;
-fail:
-    return 0;
-run:
-    if (p->operation == 9 && !(bits & 0x210))
-        p->mask = 0x205 | bits;
-    {
-        u8 value = p->bits;
-        int previous = p->pad1a;
-        int current;
-        asm("" : "+r"(value), "+r"(previous));
-        current = value;
-        if (previous != current) {
-            {
-                int flags = p->mask;
-                int mask = 4;
-                int unusedZero = 0;
-                p->mask = flags | mask;
-            }
-            if (gRfuLinkStatus->connSlotFlag)
-                p->mask |= 1;
-        }
-        p->pad1a = current;
+    if ((p->mask & 2) || gRfuLinkStatus->linkLossSlotFlag || (p->mask & 0xA0))
+        return 0;
+    if (p->operation == 9 && !(p->mask & 0x210))
+        p->mask |= 0x205;
+    if (p->pad1a != p->bits) {
+        p->mask |= 4;
+        if (gRfuLinkStatus->connSlotFlag)
+            p->mask |= 1;
     }
+    p->pad1a = p->bits;
     if (p->mask & 4) {
         WirelessController_BuildPeerRosterPacket(p);
         p->mask &= ~4;
         result = 1;
     }
-    {
-        register int flags asm("r1") = p->mask;
-        int one = 1;
-        if (one & flags) {
-            if (!rfu_NI_setSendData(p->bits, 67, p->scratch, 64)) {
-                int slot = 0;
-                if (!(gRfuLinkStatus->connSlotFlag & one)) {
-                    do {
-                        slot++;
-                        if (slot > 3)
-                            break;
-                    } while (!((gRfuLinkStatus->connSlotFlag >> slot) & 1));
-                }
-                p->mode = slot;
-                p->mask = (p->mask & ~1) | 2;
-            } else
-                Wireless_SetStatus(2);
-        }
+    if (p->mask & 1) {
+        if (!rfu_NI_setSendData(p->bits, 67, p->scratch, 64)) {
+            int slot = 0;
+            if (!((gRfuLinkStatus->connSlotFlag >> slot) & 1)) {
+                do {
+                    slot++;
+                    if (slot > 3)
+                        break;
+                } while (!((gRfuLinkStatus->connSlotFlag >> slot) & 1));
+            }
+            p->mode = slot;
+            p->mask = (p->mask & ~1) | 2;
+        } else
+            Wireless_SetStatus(2);
     }
     return result;
 }
