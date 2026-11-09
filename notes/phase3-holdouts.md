@@ -89,6 +89,23 @@ Draft: `notes/phase3-menus-link/StatusScreen_FadeAndExit.c` (3 ROM / 1 draft ins
   the new register the class head when it lives past cse_basic_block_end), or the construct
   the three siblings share.
 
+### sub_0800F4EC (0800F4EC, src/numeric_overlay.c): StatusScreen_DrawClock's twin
+
+Draft: `notes/phase3-menus-link/sub_0800F4EC.c` (4 ROM / 4 draft insns, only `mov ip, sp` /
+`mov rN, ip` as sb). Same blocker as DrawClock: the pinned `values` (ip) must be allocated before
+the earlier blocks' sb pseudos, which takes priority of about 1250. Notes:
+* One `int *values = digits;` per block (each set once, so it is doubled only once) gives 652
+  and 600 (3 refs over 46 and 50). `AGBCC_PRI=values:+600,values#1:+600` matches.
+* Pointer form with `digit = digits` per row: loop.c doesn't hoist the frame address, which
+  gives `mov r6, sp` (4/2).
+* Indexed `digits[col]`: the giv base is hoisted into ip as in the ROM, but its init comes after
+  the `out = dst` copy, and the r3/r6 roles swap (8/8).
+* Indexed `dst[col]` and `digits[col]` in one statement: a stack slot spills.
+* Extra mentions of values in the row loop (end test `digit < values + 2`, `values[col]`)
+  change the loop (60+ insns).
+* Next: a fourth ref, or about 6 fewer live insns, for the per-block `values`; or a set that
+  doesn't get a REG_EQUIV note (3/23 = 1304 without the doubling).
+
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
 tools/concessions.py counts empty do/while(0) loops and single-use statement macros, but not an
