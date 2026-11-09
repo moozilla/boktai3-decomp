@@ -848,3 +848,16 @@ Trigger_RunScript's actor copy (field-effects). Tried: the body as an inline tak
 loop-scoped copy. None keeps two registers. Next: find a form where the copy's uses
 sit in a cse block that the copy does not reach and cprop leaves alone (cprop propagates a copy
 that dominates its uses), or a reason the original's p was not a plain pseudo.
+
+### Hresvelgr_UpdateBoundaryBarrage (src/fn/sub_081A0BC8.c, 081A0BC8): deferred
+
+Concession: `asm("" ::"r"(normalCollisionMask));` at the end, which keeps the 0x2f0 mask (sl) live
+through case 1. Draft without it: `notes/phase3-drafts/monsters-bosses/Hresvelgr_UpdateBoundaryBarrage.c`,
+2 ROM / 2 draft. Only the random index mask 0x3FF (pseudo 220) differs: ROM ip, draft sl. Global alloc
+first gives 220 r5, but reload needs r5 for spills and re-places it with retry_global_alloc. In pass 0,
+sl is in use and does not conflict with 220 (the mask's only use is in case 2, so it is dead in case 1),
+so 220 takes sl. The ROM's pass 0 found sl busy (a conflict, or a conflicting pseudo that prefers sl),
+and pass 1 took ip. Tried: the literal 0x2f0 in case 2 with no variable; `action` computed from
+the mask (the ROM shares the 0x2f0 constant between `&actor->action` and the mask); the case-2 store
+through SetCollisionMask. None changes it. Next: find a pseudo live in case 1's random block
+that prefers sl, or a reason the mask is live after the switch in the original.
