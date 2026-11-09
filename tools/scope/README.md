@@ -1631,6 +1631,19 @@ Each was read from the compiler source and confirmed on a live draft.
    `PARTICLE_RANDOM_READ_SAMPLE` do/while counts the table's use twice, gives it 4 refs (2000)
    and r3. Both draws through that sampler overshoot (gRandomIndex's 1818 loses r2); one is
    enough. `why all` names the shared macro when it flips an order.
+111. **A cross-jump strips the kept copy's REG_EQUAL/REG_EQUIV notes unless the deleted copy
+   carries the same rtx, so a later jump can no longer match it through the notes.**
+   find_cross_jump lets two sets with different sources match when both carry an equal constant
+   note (the "G++ cleanups" branch): reload's move2add `adds r1, #0xff` (REG_EQUIV 256, because r1
+   held 1) matches a plain `movs r1, #0x80; lsls r1, #1` (REG_EQUIV 256). But do_cross_jump then
+   removes every note of the kept insn that `find_reg_note` can't find on the deleted one, and
+   find_reg_note compares pointers. Only const_ints in -64..64 are shared rtx (MAX_SAVED_CONST_INT),
+   so a 256 note always goes. In ScenePool_StateLaunchArc (own Memory_Clear calls, case 3's state
+   1 ending in its own `return 0`, the final `return 0` after an if/else) case 1's plain
+   `r1 = 256` cross-jumps into case 3 state 2's call first and drops its note; case 2 state 1,
+   processed next, has the `adds r1, #0xff` form and keeps its call, where the ROM shares it. Its
+   jump2 dump shows the kept `(set r1 256)` without its note. So a ROM that shares a call between a
+   plain copy and a move2add copy did the move2add copy first, or shared that call in source.
 
 80. **A multi-set variable whose first set (in insn order) is a constant gets its live length
    doubled, even though the equivalence is dropped at the next set.** cse puts a REG_EQUAL note on
@@ -1713,6 +1726,88 @@ Each was read from the compiler source and confirmed on a live draft.
    add (`p + 726`, hoisted out of the noise loop), and with it the tie gives BASE_REGS and then
    LO_REGS: in the draft cse2 had turned that hoisted add into a copy of `amplitude = &p->amplitude`.
    `AGBCC_REGCLASS=1` and `AGBCC_REGCLASS_TRACE=N` show the votes.
+
+100. **A label before a constant load stops move2add from deriving it from a known register; a
+   then-arm with its own exit makes that label.** reload's move2add rewrites `movs r0, #K` as
+   `subs r0, #d` when r0 is known to hold K + d, but only after the last label. In
+   TextState_MeasureTextColumns, `if (code != 0xFFFF) { if (code & 0xFF00) ... }` falls straight
+   from `ldr r0, =0xFFFF; cmp` into the mask test and gives `subs r0, #0xff`. Written as
+   `if (code == 0xFFFF) { n++; goto next; }` followed by the mask test, the test starts after the
+   if's end label, and the ROM's `movs r0, #0xff; lsls r0, #8` comes back. Then
+   `if ((u16)(code & 0xFF00))` gave its two copies (the mask into r1, code into r0, `ands r0, r1`),
+   where `if (code & 0xFF00)` ties the and to the constant.
+
+101. **Tails cross-jumped into code before a label end on a new label that has no jump chain,
+   so they don't merge with each other; a jump to an existing user label lets them merge.**
+   jump2's cross-jumping first matches an unconditional jump's tail against the code just before
+   its target label (a 1-insn minimum). When that succeeds, do_cross_jump reuses the label right
+   before the matched code, or creates a new one. Later passes look for other jumps to the same
+   label only when `INSN_UID (label) < max_uid`, so jumps to a label created in this pass are
+   never compared. With a user label, the next pass compares `movs r0, #2; b L` against another
+   `movs r0, #2; b L`. That is only one insn, but the jump-around rule (the insn before is a
+   conditional jump around this one) lowers the minimum, and they merge. TextState_ProcessTag
+   went from 21 to 3 differing insns once each arm got its own `p->palette = N;
+   end = Text_FindChar(...)` and `goto done` instead of `paletteValue = N; goto palette;`.
+   `AGBCC_CROSS_TRACE=1` lists every merge (`jump J target T: share A with B`).
+
+102. **expand_end_loop rotates the loop's first part, through the last `break` it finds, to the
+   bottom; a `return` is not a loop exit, so it marks where rotation stops.** It scans from the
+   loop top and records each conditional jump to the loop's end label, stopping 30 counted insns
+   after the first one; everything up to the last recorded exit moves to the bottom test (calls
+   don't count). In TextState_RenderNextGlyph, `while (1) { classify; if (c == '<') { s++;
+   if (!*s) break; s = TextState_ProcessTag(p, s); if (p->padE) break; ... } }` rotated the
+   tag call to the bottom too. Writing the later exits as `return s;` kept the ROM's split: the
+   bottom test is only the classification, and the tag, plain and wide code follow in source order.
+   The old draft needed gotos and three memory barriers for the same layout.
+
+103. **An `orrs rX, rZero` between the or and the and of a u16 field update, with rZero a `movs #0`
+   from an earlier block, is two statements: `f |= A; f &= ~B;` (or `f = f | A; f = f & ~B;`).**
+   agbcc expands each store to a u16 struct field as a field insert, `f = (f & 0) | value`, with
+   the 0 a fresh HImode register. One combined `f = (f | A) & ~B;` keeps that insert in one block,
+   and combine folds it away. With two statements, cse carries the first stored value into the
+   second, folds `old & 0` to 0 and hands it the zero register held since the entry block. The or
+   reads it as a paradoxical subreg, which `equiv_constant` does not look through, so cse keeps it.
+   combine has no LOG_LINK back to the entry block, so the `orrs` survives. flow drops the first
+   store. WirelessController_BuildPeerRosterPacket (`mask |= 8; mask &= ~0x100;`, after a
+   `CpuFill16(0, ...)` that set the zero register) had needed an opaque `"+r"(zero)` barrier.
+   Hresvelgr_UpdateCollisionPresentation (`c->flags |= 4; c->flags &= ~8;`) and Ivy_UpdateDefeat
+   show the same `orr 8/4; orr zero; and` shape. A second update after a join (cse knows nothing
+   there) loses the zero: the same two statements give a plain `orr; and`.
+93. **A union local's initializer keeps its load inside a loop.**
+   `union U u = {x};` expands to `(clobber (reg u))` and then the set. loop.c's
+   count_loop_regs_set counts the clobber as a set, so the pseudo is set twice in the loop and
+   is marked may_not_optimize: it is never hoisted, however long it lives. A plain
+   `T *t = x;` with the same uses is a single set, and when its life is long enough
+   (threshold x savings x lifetime >= insns) loop.c moves it to the preheader. In
+   BoardPieces_StartConvergence the ROM loads gRandomTable in the loop and keeps it for two
+   samples; the plain local lived 25 insns and was hoisted at threshold 7, while
+   `union RandomTableView table = {gRandomTable};` (the matched sibling sub_08010298's form)
+   stayed in place and matched. `scope.py FILE.c FUNC hoist` reports it as `set 2 times in the
+   loop ... (may_not_optimize)`. Use it when a loop-invariant load must stay in the body and a
+   real union type exists for the value.
+
+94. **A dead constant load in the ROM can come from a use that combine folded after flow.**
+   flow deletes dead sets once, before combine. If a pseudo's only use sits in another basic
+   block in an expression that combine simplifies through nonzero_bits (`x & 3` when every set
+   of x is a constant with those bits clear, `x >> 27` when the top bits are clear), the use
+   disappears but the set stays and is still allocated a register: the ROM shows a literal
+   load into a register nothing reads. cse can't fold the use first when the value reaches it
+   over a join (sets in both arms of an if). Each constant set also gets REG_EQUIV, and
+   update_equiv_regs doubles the live length once per set (local-alloc.c), so such a pseudo has
+   a very low global priority. sub_08012B34's `ldr r3, =0x0403B714` in both arms comes back
+   with `setup` set in each arm and `| (setup & 3)` on the v->z line, but its priority is 93
+   against angle's 3000 (`AGBCC_PRI=setup:+2908` matches).
+
+95. **A non-void function with no return statement keeps the incoming r0 live to the end.**
+   expand_function_end emits a use of the return register, and nothing in the body sets it, so
+   flow sees the hard r0 (the first argument) live from entry to exit: the body never allocates
+   r0, and the parameter's pseudo is a copy out of it. In the ROM this looks like a function that
+   "returns its first argument" without a final move, and never touches r0. It also changes cse:
+   make_regs_eqv makes a newer register the class's canonical one when it outlives the current
+   first register and the cse block. With `return input;` the parameter outlives `p = input` and
+   cse rewrites p's uses to the parameter. Without the return the parameter dies at the copy,
+   so p wins and keeps its own register. BreakableBarrier_SetPosition (five pins and a barrier)
+   matched once its `return input;` was dropped. The caller ignores the value.
 
 ## Survey: random table as a literal address (2026-10-24)
 

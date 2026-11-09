@@ -111,6 +111,46 @@ Next idea: C in which amplitude's address and the loop's `p->amplitude` don't sh
 equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
 add survives.
 
+### sub_08010C10 (src/group_objects.c, 08010C10): deferred, reload rotation only
+
+Draft: `notes/phase3-drafts/field-effects/sub_08010C10.c` (2 ROM / 2 draft), the pinned
+source without the `d` pin and barrier. The only difference is the scratch for the first
+`ldrsh` of `-p->offset.x` (ROM r2, draft r1). `scope.py FILE.c sub_08010C10 spill` (fixed in
+ea1d04af5 to shift a function's first choice) matches with `AGBCC_SPILL=0:1`: the ldrsh's
+constant reload is the function's first reload choice, the spill set is {r1, r2}, and the ROM's
+rotation is one step on, so the original made an odd number of reload choices before line 679
+(or had r1 live there, which is what the pin imitated). The draft has none before it: m sits in
+r8, but `m->actor` reloads share r0. Tried with no change or worse (on top of the depin worker's
+~40 spellings): an `actor` local, no `active` local, `-offset->x` and mixes, `0 - x`, s32
+casts, x and z locals, `ZeroFill8(&p->offset)`, union RandomTableView, the else branch first,
+and `addPosition`/`addPositionN` for the offset step.
+
+Next idea: find C before line 679 whose RTL needs one reload choice and still emits the same
+code (a copy that jump2 merges after reload, fact 59), or that keeps a value live in r1 across
+the first ldrsh.
+
+### sub_08012B34 (src/debris_particles.c, 08012B34): deferred, the dead 0x0403B714 load
+
+Draft: `notes/phase3-drafts/field-effects/sub_08012B34.c` (20 ROM / 20 draft). The ROM loads
+0x0403B714 (PARTICLE_RANDOM_SAMPLE_ORIGIN) into r3 in both arms and never uses it. The same dead
+constant is pinned in sub_0804373C (`rngSetup`) and sub_08059C48 (`observed`).
+* How a dead load survives in plain C: set an ordinary local to the constant and use it in a
+  later basic block in an expression that combine folds through nonzero_bits, e.g.
+  `v->z = Debris_Scale(...) | (setup & 3);` (0x0403B714 & 3 is 0). flow has already run, so
+  the set is never deleted and still gets a register. With the use after the v->z line,
+  `AGBCC_PRI=setup:+2908` matches (GPT-6 Pro's knob, now without the barrier).
+* Why it doesn't get r3: global priority. setup has 3 refs over 80 insns, and each of its
+  two constant sets gets REG_EQUIV, and update_equiv_regs doubles the live length per set
+  (x4, local-alloc.c). That gives priority 93. angle (6 refs over 39 insns) is at 3000, so
+  angle is allocated first and takes r3, the head of the Thumb REG_ALLOC_ORDER (r3, r2, r1, r0, ...).
+  Beating 3000 at live 320 needs about 25 refs. Moving the use earlier shortens the life but
+  changes the v->y store order (the use must emit nothing).
+
+Next idea: the original probably had the constant inside the "first sample" random inline
+(all three functions load it just before a sample read from the literal table address). Find a
+form where the constant isn't a REG_EQUIV (so the live length isn't multiplied), or where angle's
+priority drops below setup's.
+
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
@@ -245,6 +285,42 @@ instead of r1). It has no pin; it keeps `(void)*(volatile u8 *)&p->mode;`.
   (global, gets r6), casts and `fnSlot[0]`, a `vu8` field with a bare `p->mode;`.
 * Next: find what makes r0 busy (or suggests r1) across the store in the original block, e.g. a
   value that lives from the `strh` past the store.
+
+### TextState_ProcessTag (0803232C, src/fn/sub_0803232C.c): one register copy left
+
+Draft: `notes/phase3-menus-link/TextState_ProcessTag.c` (3 ROM / 3 draft, from 21 / 14 once
+main's 3 pins and 3 barriers came out). It has no pins and no barriers.
+* What closed most of it: each arm has its own store, `Text_FindChar` and `goto done`
+  (or `goto findS`) instead of shared push/findAdvance/palette labels, and every close-path arm
+  has its own `p->palette = 0;`. jump2 then cross-jumps each tail into the code before a label.
+  do_cross_jump puts a new label there, and jumps to a new label are never searched in
+  jump_chain (`INSN_UID < max_uid`), so the ROM's `movs r0,#2; b L` pairs stay apart. Jumping to
+  an existing user label (`palette:`) let them merge, because of the jump-around rule that
+  lowers the minimum.
+* Left: the ROM copies `name` (r4) into r6 at 0x40C and uses r6 for the GARIGARIKUN (DDB8) and
+  FUTARI (DDC4) compares, then r4 again for PLAYER (DDCC). The draft uses r4 for all three.
+* Tried: `p->text` vs `name` for NONE, HATENA, DDB8, DDC4 and DDCC in all 32 combinations. With
+  `p->text` at DDB8, gcse PRE inserts its reaching register at the end of the NONE block (copy at
+  line 158, not 0x40C); `AGBCC_NOPRE=1` gives `adds r6, r5, #0x38` at 0x40C, the right place but
+  computed instead of copied. Also tried an alias local set before the hasValue checks, after
+  `name`, or in a scope before DDB8; an inline helper for the two tags; `name` assigned earlier.
+* Next: find what gives a fresh pseudo at 0x40C that is a copy of name, not a recomputation.
+  Reload's cse would copy r4 only within one block, so look for C that keeps 0x40C in name's
+  block, or for a PRE copy placed after name's set (pre_optimal there).
+
+### TextWindow_Destroy (08033778, src/fn/sub_08033778.c)
+
+Draft: `notes/phase3-menus-link/TextWindow_Destroy.c` (3 ROM / 5 draft, no pins or barriers).
+It reads `next = w->next; nextSlot = &w->next;` (the ROM's `adds r3, r0, #0` copy), and both arms
+end in `prevSlot = &w->previous;`. jump2 cross-jumps the arms' identical `prevSlot = temp` copies
+into the join, which gives the ROM's `adds r2, r1, #0` there.
+* Left: in the `next` arm, local-alloc ties the `w + 456` temp to the dying 456 constant (r0);
+  the ROM keeps the temp in r1, so its copy matches the other arm's and merges. `AGBCC_NOTIE=87`
+  matches.
+* Tried: natural `w->next->previous = w->previous` arms (13-16 differences); prevSlot set first
+  in each arm (9); a global prevSlot set directly in arm 1 plus a `last` copy at the join
+  (6, next in r1 vs r2; `AGBCC_FORCE=next:2` gives 4); `last` copies (cprop/cse fold them).
+* Next: C that makes the arm-1 temp global or keeps the constant alive past the add.
 
 ### Inline `do { ... } while (0)` fences (for phase 4)
 
@@ -393,6 +469,57 @@ timer and lift, swapped stores, `lift = timer`, chained `timer = lift = zero`, a
 `one` (`found = one`, `b3b + one`) or `zero` (`b3a = zero`). Next idea: keep the timer's HI zero
 out of the loop preheader (a different spelling of the timer member, or the slot struct the
 siblings ScriptRaise/Append use, written as one HI store), or find the source of the tie.
+
+### ScenePool_StateLaunchArc (src/fn/sub_0803E5F4.c, 0803E5F4): deferred
+
+Drafts: `notes/phase3-drafts/actors/ScenePool_StateLaunchArc_owncalls.c` (5 ROM / 2 draft: every
+state block written in full with its own Memory_Clear, break, `return 0` after the switch) and
+`notes/phase3-drafts/actors/ScenePool_StateLaunchArc.c` (13 / 7, but the ROM's layout: a
+`history` set in each case, one shared `Memory_Clear(history, 0x100)` after the switch, case 3's
+state 1 behind a goto after it). In both, the random read (`RANDOM_TABLE_ADDR` literal, fact 21)
+and the launch half match. The ROM: cases 0, 1 and case 2's state 1 keep their own stores
+(`strb r1, [r0]; adds r0, #8`) and jump to the `movs r1, #0x80` of case 3's state 2. Case 3's
+state 1 keeps its own call with `adds r1, #0xff` (reload's move2add). Two blockers:
+(1) With own calls, move2add (which runs before jump2) turns case 2 state 1's `r1 = 256` into
+`r1 += 255` because r1 = 1 there. Its tail then equals case 3's state 1, so jump2 can't share
+the call at 190 as the ROM does. Case 0 has the same problem once its 1 lands in r1. So at
+reload_cse time the ROM had no `r1 = 256` in those blocks, or a label before it: the call
+was shared before reload.
+(2) With a shared call, those three blocks end in identical `[strb r1, [r0]; adds r0, #8]`
+tails that jump to the same label, and jump2 merges them. The ROM keeps them apart, so their
+jumps must have targeted labels with separate jump chains. One idea, not yet built: two labels
+around the `r0 = history` copy, which delete_noop_moves removes only after mark_all_labels has
+canonicalized labels. Case 2 state 1's 1 lands in r0 because its block has exactly three local
+qtys (fact 38); `AGBCC_FORCE=151:1` on the shared draft shows the merges that follow.
+Later session: the label shape can't work, since reload already deletes the `r0 = history`
+noop copy (only move2add's own `(set r r)` noops reach jump2). Third draft,
+`notes/phase3-drafts/actors/ScenePool_StateLaunchArc_returnsplit.c` (16 / 2): own calls, case 3's
+state 1 ends in `return 0` while every other block breaks, and the function ends
+`} else entry->stateFrame++; return 0;`. With that split, case 3's state 1 is out of the break
+label's jump chain, so case 1 and case 2's state 2 now share exactly as the ROM does, and case 3
+keeps both blocks. Left: (a) case 0's 1 and address swap registers (fact 38), so case 0 merges
+8 insns into case 3 state 2; (b) case 2 state 1 keeps its call: its `adds r1, #0xff` can match
+case 3 state 2's `r1 = 256` only through the REG_EQUIV notes, and case 1's cross-jump has already
+stripped that note (scope README fact 111). In ROM order the plain copies go first, so the ROM
+had no move2add copy in case 2 state 1: its call was shared in source. But a source-shared call
+there is jumped to by the redirected case 0/1 jumps too (do_cross_jump reuses the label), and
+case 1 then merges into case 2 state 1. The pinned file's empty asm in case 1 is what separates
+them. Next: find what else besides an asm makes case 1's tail end differently at jump2 (a USE or
+CLOBBER insn stops the compare), or a helper that returns history (the pinned file's
+Prepare/PrepareFirst/PrepareZero inlines).
+
+### ScenePool_StateLaunchShortArc (src/fn/sub_0803E7B4.c, 0803E7B4): deferred
+
+Draft: `notes/phase3-drafts/actors/ScenePool_StateLaunchShortArc.c` (the LaunchArc own-calls
+form; kind in r8, the fire logic and the launch half match). Its switch tail is byte for byte
+the LaunchArc one and has the same residual (5 ROM / 2 draft). Solve LaunchArc first; then the
+return-split shape carries over.
+
+### ScenePool_StateEmitBursts (src/fn/sub_0803E998.c, 0803E998): deferred
+
+Not drafted separately: its kind switch ends in the same shared Memory_Clear tail as LaunchArc
+(cases 0, 1 and case 2's state 1 jump to case 3 state 2's `movs r1, #0x80`; case 3's state 1
+keeps `adds r1, #0xff`). The front half (the bursts) is ordinary. Do it after LaunchArc.
 
 ## monsters-bosses (Monsters, Bosses, Player, Engine core)
 

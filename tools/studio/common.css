@@ -69,3 +69,5 @@ body.embed main { height: 100vh !important; }
 .noteed .ns { font-size: 12px; color: var(--muted); }
 .more { display: block; margin: 8px auto; }
 .more[hidden], [hidden] { display: none !important; }
+/* placeholder text: loading, nothing selected, nothing found */
+.empty { color: var(--muted); }

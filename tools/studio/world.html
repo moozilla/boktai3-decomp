@@ -92,7 +92,6 @@ a.chip:hover { outline: 1px solid var(--accent); }
 .card .lbl { display: block; margin: 2px 0 4px; }
 .card ul { margin: 4px 0 0; padding-left: 16px; font-size: 12px; color: var(--muted); }
 .card li span { color: var(--ink); }
-.empty { color: var(--muted); }
 @media (max-width: 860px) {
   main { grid-template-columns: 1fr; height: auto; }
   #mapside { height: 60vh; border-right: 0; border-bottom: 1px solid var(--line); }
@@ -192,37 +191,7 @@ const bounds = (p, ids, pad) => {
   return [x0 - Math.max(0, mw - w) / 2, y0 - Math.max(0, mh - h) / 2, Math.max(w, mw), Math.max(h, mh)];
 };
 
-// ---------- places: what the areas' labels say they belong to ----------
-// An area labeled "Ancient Tree (candle-switch room)" belongs to the place
-// "Ancient Tree"; "Lifeless Town route transition / ..." too, to "Lifeless Town".
-const baseOf = l => (l || '').replace(/\s*\(.*$/, '').trim();
-function assignPlaces() {
-  const bases = [...new Set(W.areas.map(a => baseOf(a.label)).filter(Boolean))].sort((x, y) => x.length - y.length);
-  const placeOf = b => bases.find(m => b === m || (b.startsWith(m + ' ') && /^[a-z]/.test(b.slice(m.length + 1)))) || b;
-  const P = new Map();
-  for (const a of W.areas) {
-    const b = baseOf(a.label);
-    a.place = b ? placeOf(b) : null;
-    a.detail = !a.label ? '' : a.label.startsWith(a.place + ' (') ? a.label.slice(a.place.length + 2).replace(/\)$/, '')
-      : a.label === a.place ? '' : a.label.slice(a.place.length).replace(/^[\s/–-]+/, '');
-    if (!a.place) continue;
-    if (!P.has(a.place)) P.set(a.place, { name: a.place, areas: [], scenes: 0, enemies: {} });
-    const p = P.get(a.place);
-    p.areas.push(a.area); p.scenes += a.scenes.length;
-    for (const [f, k] of Object.entries(a.enemies)) p.enemies[f] = (p.enemies[f] || 0) + k;
-  }
-  // story order: by the lowest scene id, which follows the game's progression closely enough
-  const places = [...P.values()].sort((x, y) => Math.min(...x.areas.map(i => W.areas[i].scenes[0])) - Math.min(...y.areas.map(i => W.areas[i].scenes[0])));
-  // the big places get a hue each; one-area places stay neutral
-  let h = 0;
-  for (const p of places) {
-    p.hue = p.areas.length > 1 || p.scenes >= 10 ? (20 + 137.5 * h++) % 360 : null;
-    const best = p.areas.map(i => W.areas[i]).sort((x, y) => y.scenes.length - x.scenes.length);
-    p.shot = best.flatMap(a => a.scenes).find(i => W.scenes[i].shot) ?? null;
-    p.areas.forEach(i => { W.areas[i].hue = p.hue; });
-  }
-  return places;
-}
+// places (tools/studio/places.py): each area has place, detail and hue; W.places in story order
 const placeStyle = hue => hue == null ? '--h:0;--sat:0%' : `--h:${hue}`;
 
 // ---------- the area graph: each connected group laid out on its own, then packed ----------
@@ -469,7 +438,7 @@ function route() {
 (async () => {
   [W] = await Promise.all([fetch('/api/areas').then(r => r.json()), loadNotes()]);
   W.areas.forEach(a => { a.id = a.area; a.r = 7 + 3 * Math.sqrt(a.scenes.length); });
-  PLACES = assignPlaces();
+  PLACES = W.places;
   relayout();
   $('q').oninput = () => { if (sel == null && !selPlace) showWorld(); else drawWorld(); };
   $('lonely').onchange = () => { relayout(); drawWorld(); fitWorld(); };

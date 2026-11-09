@@ -129,7 +129,8 @@ and ROM data it loads, and the objects and script routines in the game that
 reach it. A RAM object's page lists every function that uses it; a struct
 type's page shows its definition with each member's offset, as agbcc lays it
 out, and the functions that use it. **Concessions left** lists every function
-still holding a pin, barrier or other concession, by kind. The index is
+still holding a pin, barrier or other concession, by kind, and the overview
+graphs progress over time from every committed `PROGRESS.md`. The index is
 `tools/studio/codemap.py`, built from `tools/progress.py` and
 `tools/concessions.py`. **ROM** (`/rom`) is the ROM as a treemap in address
 order, colored by kind or by how well each byte is understood.
@@ -137,18 +138,18 @@ order, colored by kind or by how well each byte is understood.
 | | |
 |---|---|
 | ![Code](docs/img/studio-code.png) | **Code**: a function's C and disassembly side by side, with its concessions, the RAM it touches and where the game reaches it. |
-| ![Code overview](docs/img/studio-code-overview.png) | **Code overview**: what matches, what is free of concessions, by category, and which concession kinds are left. |
+| ![Code overview](docs/img/studio-code-overview.png) | **Code overview**: what matches, what is free of concessions, by category, which concession kinds are left, and progress over time. |
 | ![Code type](docs/img/studio-code-type.png) | **Types**: a struct's definition with each member's offset as agbcc lays it out, and the functions that use it. |
 | ![Browse](docs/img/studio-browse.png) | **Browse**: a monster with its family, every palette its sprites are drawn in, and the scenes that place it. |
-| ![Text](docs/img/studio-text.png) | **Text** (`/text`): every string with the fan translation, previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
+| ![Text](docs/img/studio-text.png) | **Text** (`/text`): every string with the fan translation and the scripts that show it (and where they run), previewed in the game font at the game's line width; *Build mod ROM* writes a playable ROM. |
 | ![Sprites](docs/img/studio-sprites.png) | **Sprites**: sprite packages and large sprites with every frame and animation, in their in-game palettes. |
-| ![Maps](docs/img/studio-map.png) | **Maps**: stages with captured palettes, doors, entrances, items, enemies and patrol paths from the stage scripts. |
+| ![Maps](docs/img/studio-map.png) | **Maps**: stages grouped by place in story order, with captured palettes, doors, entrances, items, enemies and patrol paths from the stage scripts. |
 | ![World](docs/img/studio-world.png) | **World** (`/world`): how the rooms connect. Scenes grouped into areas by their doors, areas into places by their labels, each place with its rooms, captures and enemies. |
-| ![Scripts](docs/img/studio-scripts.png) | **Scripts**: procedures in a readable view with recovered names, the developers' debug messages and their translations. |
+| ![Scripts](docs/img/studio-scripts.png) | **Scripts**: script files and procedures in a readable view with recovered names, each scene file's place, the developers' debug messages and their translations. |
 | ![Actors](docs/img/studio-actors.png) | **Actors**: the script registry, every object a script can create, filterable by GCL name, sprite or use, each shown with its Browse page; plus the decoded command and parameter tables. |
 | ![Screen inspector](docs/img/studio-captures.png) | **Screen inspector** (Live and Captures): every sprite, text box, layer and palette on screen, matched to its resource. Live mode connects to mGBA through [Centaur](docs/CENTAUR.md). |
 
-Also: palette, font and tile viewers, and **Sound** (`/sound`): every song in
+Also: palette (with the places that load each), font and tile viewers, dungeons stitched from their rooms, and **Sound** (`/sound`): every song in
 the song table with its tracks, voices and the scripts, scenes and code that
 start it, played in the browser by a small MP2K player (`tools/studio/mp2k.js`)
 from the ROM's own sequence and sample data. `python3 tools/studio/shots.py`
