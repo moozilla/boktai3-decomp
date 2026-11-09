@@ -327,10 +327,10 @@ int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
             radius);
         *(struct PackedVec *)&p->target = origin;
         {
-            register const u16 *table asm("r2") = gRandomTable;
-            p->angle = randomWith(table);
+            union RandomTableView table = {gRandomTable};
+            p->angle = randomWith(table.samples);
             p->targetY = i * 16 + p->position.y;
-            p->speed = (randomWith(table) & 7) + 7;
+            p->speed = (randomWith(table.samples) & 7) + 7;
         }
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
@@ -351,7 +351,6 @@ static inline int BoardPieces_NextRandomValue(const u16 *table, u32 *index, u32 
     return *(const u16 *)(offset + (u32)table);
 }
 
-// MATCHING_CONCESSION: register-pinning
 int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupActor *actor;

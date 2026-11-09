@@ -111,25 +111,6 @@ Next idea: C in which amplitude's address and the loop's `p->amplitude` don't sh
 equivalence at the preheader (a separate EBB, or a constant cse can't merge), so the hoisted
 add survives.
 
-### sub_0801010C (BoardPieces_StartConvergence, src/group_objects.c): deferred
-
-Draft: `notes/phase3-drafts/field-effects/sub_0801010C.c` (4 ROM / 4 draft). It uses
-`randomValue()` for both samples and no table variable. The one difference is where the table is
-loaded: the ROM loads `gRandomTable` into r2 inside the loop, before the gRandomIndex load, and
-keeps it for both samples. The draft loads it at the first sample's add. `AGBCC_NOMOVE=<table
-set>` matches the pin-free `table = gRandomTable` form exactly, so the pin only stood in for
-"loop.c must not hoist the table". Why loop.c hoists it (`scope.py FILE.c sub_0801010C hoist`):
-* A table set ahead of the index update lives 25 insns through both samples. In pass 1 two
-  hoists have already lowered the threshold to 7, and 7 x 1 x 25 >= 109, so it moves. In pass
-  2, cse and the sine-table constant move first, so it moves at 7 again.
-* Set at the add, as `randomValue()` does it, it lives 16 and stays (4 x 1 x 16 < 109), but
-  then it is in the wrong place.
-* Separate table pseudos per sample (a table local inside an inline, or a table argument)
-  are merged by cse1, so the long life comes back.
-
-Next idea: C where the table set can't move, for example a second set of the same variable
-past a join label in the body, or uses in two blocks after a branch (maybe_never).
-
 ## menus-link (Menus, HUD and dialogue; Link and wireless)
 
 ### StatusScreen_DrawClock (0800E5B8, src/status_screen.c)
