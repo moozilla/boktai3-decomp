@@ -483,3 +483,12 @@ the final stores. Draft `sub_080ABB18.c` (stores inside a `for (;;)` exit branch
 loop.c hoist only a few of them (savings threshold). The landed C precomputes the pointers by hand,
 with 5 pins and 2 barriers (all removed: 107/107). Next: decide between the two shapes with
 `hoist` (which addresses the ROM's loop moved), then match the allocation.
+
+### Vorn_SelectReactionControl (src/fn/sub_080B197C.c, 080B197C): one barrier left
+
+Landed c725f2610: the value pin is gone (`mask &= value` in HasFlag). The `asm("" : : "r"(active))`
+remains. Without it (draft `sub_080B197C.c`, 26/26, an r4/r5 swap only) a (18 refs / 94 live, pri
+7659) outranks active (8 / 33, 7272). `AGBCC_PRI=active:+400` matches. Passing `active - 1` to
+SceneActor_DispatchContextAction fixes the allocation but changes the code. `!active` and
+`active == 0` fold before regclass counts. Next: a ninth natural ref of active, or two insns less
+of its life.

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // confidence=low: animation checkpoint emits aimed shots with rising speed and falling strength.
@@ -32,12 +31,13 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
     u8 *body = actor->context;
     struct ContactPackedVector source = *(struct ContactPackedVector *)&actor->body.position;
     struct ContactPosition delta;
+    struct ContactPosition *velocity;
     s32 divisor, facing, difference;
     s32 heightDifference;
     s32 speed;
-    register s32 count asm("r6");
+    s32 count, i;
     s32 direction;
-    register s32 strength asm("r8");
+    s32 strength;
     source.y += 200;
     heightDifference = source.y - actor->tracking.target->position.y;
     if (heightDifference <= 255)
@@ -57,17 +57,10 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
         z = delta.z;
         az = Abs(z);
         if (ax > az)
-            z = x;
-        speed = Div(z, divisor);
-        {
-            register s32 quotient asm("r4") = speed;
-            s32 absolute;
-            asm("" : "+r"(quotient));
-            absolute = quotient;
-            if (quotient < 0)
-                absolute = -quotient;
-            speed = absolute;
-        }
+            speed = Div(x, divisor);
+        else
+            speed = Div(z, divisor);
+        speed = Abs(speed);
     }
     if (speed <= 10)
         speed = 10;
@@ -95,12 +88,13 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
         direction = facing;
     else
         direction = actor->tracking.heading;
+    i = count;
     strength = *(u16 *)(body + 0x6ce);
-    for (; count != 0; count--) {
-        struct ContactPosition *deltaPointer = &delta;
-        deltaPointer->x = Scale(gUnk_086149C4[(direction + 64) & 255] * speed);
-        delta.y = 0;
-        delta.z = Scale(gUnk_086149C4[direction & 255] * speed);
+    for (; i != 0; i--) {
+        velocity = &delta;
+        velocity->x = Scale(gUnk_086149C4[(direction + 64) & 255] * speed);
+        velocity->y = 0;
+        velocity->z = Scale(gUnk_086149C4[direction & 255] * speed);
         {
             u32 shot = actor->attacks.first[2];
             u32 category = actor->attacks.second[2];
