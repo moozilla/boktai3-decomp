@@ -1588,6 +1588,16 @@ Each was read from the compiler source and confirmed on a live draft.
    r1 with no pin, since local-alloc prefers the argument register for a value copied into it.
    `calls` and `pins` now name every callee that reads more argument registers at its entry than
    the draft declares it with. A ROM-only scan of all pinned units found no other case.
+78. **Write a join's first statement in each branch to make its variable a global pseudo.**
+   local-alloc takes a pseudo used in one basic block and gives it the lowest free register
+   before global-alloc runs, so a long-lived global value that spans that block then conflicts with
+   r0/r1 and moves up. In sub_0802F298 (UpdateTargetFacing) `octant = value + 112;` after the
+   turn if/else was local (r0), pushing value to r2. Writing the store, zero-extend and
+   `octant = value + 112;` at the end of every branch (jump2 cross-jumps the copies back into one
+   tail) makes octant global: value takes r1 first, octant r2, as in the ROM. The extra
+   `*current = value;` mentions also raised current's refs (7 -> 8, priority 7368 -> 12631) above
+   diff. When `why` says a global pseudo conflicts with r0/r1 that only block-local pseudos hold,
+   try this.
 
 ## Survey: random table as a literal address (2026-10-24)
 
