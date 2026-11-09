@@ -233,6 +233,18 @@ function learnedPalette(c) {
 // 256 RGB triples from 512 bytes of GBA palette data at `off`.
 const palFromBytes = (b, off = 0) => Array.from({ length: 256 }, (_, i) => rgb(le(b, off + i * 2)));
 
+// Where a scene is in the world (/api/areas: World's places, tools/studio/places.py).
+// sceneWhere(n) -> {text, href} once loadWorld() has resolved: the scene's own
+// label led by its place, else its area's place and detail.
+let WORLD = null;
+async function loadWorld() { return WORLD ||= await fetch('/api/areas').then(r => r.json()).catch(() => null); }
+function sceneWhere(scene) {
+  const s = WORLD?.scenes[scene], a = WORLD && WORLD.areas[WORLD.scene_area[scene]];
+  if (!s || !a) return null;
+  const text = s.label ? (!a.place || s.label.startsWith(a.place) ? s.label : `${a.place} · ${s.label}`) : [a.place, a.detail].filter(Boolean).join(' · ');
+  return text ? { text, href: `/world#area=${a.area}/scene=${scene}` } : null;
+}
+
 const resCache = new Map();
 function res(label, hash) {
   const k = label + '/' + hash;

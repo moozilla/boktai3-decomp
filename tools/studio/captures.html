@@ -73,7 +73,7 @@ async function loadList() {
 function renderList() {
   const q = $('q').value.trim().toUpperCase(), scenes = $('showscenes').checked;
   const hits = caps.filter(c => (scenes || !c.name.startsWith('scene_') || c.name === sel) &&
-    (!q || [c.name, c.label, c.group, c.map, c.stage_map, String(c.scene ?? '')].some(x => (x || '').toUpperCase().includes(q))));
+    (!q || [c.name, c.label, c.group, c.map, c.stage_map, String(c.scene ?? ''), c.scene != null && sceneWhere(c.scene)?.text].some(x => (x || '').toUpperCase().includes(q))));
   $('count').textContent = `${hits.length} of ${caps.length} captures`;
   const groups = {};
   for (const c of hits) (groups[c.group || ''] ||= []).push(c);
@@ -85,7 +85,7 @@ function renderList() {
       const d = document.createElement('div'); d.className = 'cap' + (c.name === sel ? ' on' : ''); d.dataset.name = c.name;
       d.innerHTML = `<img loading="lazy" alt="" src="/api/live/file/captures/${encodeURIComponent(c.name)}/screen.png"><span><b></b><small></small></span>`;
       d.querySelector('b').textContent = c.label || c.name;
-      d.querySelector('small').textContent = [c.label ? c.name : '', c.map ? 'map ' + c.map : '', c.scene ? 'scene ' + c.scene : '', (c.time || '').slice(5, 16)].filter(Boolean).join(' · ');
+      d.querySelector('small').textContent = [c.label ? c.name : '', c.scene != null && sceneWhere(c.scene)?.text, c.map ? 'map ' + c.map : '', c.scene ? 'scene ' + c.scene : '', (c.time || '').slice(5, 16)].filter(Boolean).join(' · ');
       d.onclick = () => { location.hash = encodeURIComponent(c.name); };
       out.push(d);
     }
@@ -117,7 +117,7 @@ async function show(name) {
   await insp.load(name);
   const m = insp.an.meta || {}, an = insp.an;
   $('cmeta').innerHTML = [
-    c.label && esc(name), m.time && esc(m.time), m.frame != null && `frame ${m.frame}`, m.scene != null && `scene ${m.scene}`,
+    c.label && esc(name), m.time && esc(m.time), m.frame != null && `frame ${m.frame}`, m.scene != null && (sceneWhere(m.scene) ? `scene ${m.scene} in ${peekLink(sceneWhere(m.scene).href, esc(sceneWhere(m.scene).text))}` : `scene ${m.scene}`),
     (an.stage_map || m.map) && `map ${peekLink(gfxHref('map', an.stage_map || m.map), esc(an.stage_map || m.map))}${noteOf('map', an.stage_map || m.map)?.label ? ' (' + esc(noteOf('map', an.stage_map || m.map).label) + ')' : ''}`,
     m.tileset && `tiles ${esc(m.tileset)}`, m.pal && `pal ${peekLink(gfxHref('pal', m.pal), esc(m.pal))}`,
   ].filter(Boolean).join(' · ');
@@ -125,7 +125,7 @@ async function show(name) {
 
 window.onhashchange = () => { const n = decodeURIComponent(location.hash.slice(1)); if (n && n !== sel) show(n); };
 (async () => {
-  await loadNotes();
+  await Promise.all([loadNotes(), loadWorld()]);
   await loadList();
   const n = decodeURIComponent(location.hash.slice(1)) || caps.find(c => !c.name.startsWith('scene_'))?.name;
   if (n) { if (!location.hash) history.replaceState(null, '', '#' + encodeURIComponent(n)); show(n); }

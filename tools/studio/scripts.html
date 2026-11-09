@@ -106,15 +106,7 @@ function procRow(id) {
   d.onclick = e => { e.stopPropagation(); location.hash = id; };
   return d;
 }
-// where a scene is in the world (World's places, tools/studio/places.py): its own label, else its area's place
-let W = null;
-function whereOf(scene) {
-  const s = W?.scenes[scene], a = W && W.areas[W.scene_area[scene]];
-  if (!s || !a) return null;
-  // the scene's own label, led by its place unless it already names it
-  const text = s.label ? (!a.place || s.label.startsWith(a.place) ? s.label : `${a.place} · ${s.label}`) : [a.place, a.detail].filter(Boolean).join(' · ');
-  return text ? { text, href: `/world#area=${a.area}/scene=${scene}` } : null;
-}
+const whereOf = sceneWhere;
 // a scene file by its entry's name (gcl/names/proc.csv, else tools/assets/gclroles.py)
 const fileTitle = f => f.kind === 'scene' && procNames[f.entry] ? `${procNames[f.entry]}` : f.title;
 const hitFile = (f, q) => [f.id, f.title, fileTitle(f), f.description, f.category, whereOf(f.entry)?.text].some(x => (x || '').toUpperCase().includes(q));
@@ -283,8 +275,7 @@ function route() {
 window.onhashchange = route;
 (async () => {
   await loadNotes();
-  const [d, a, fl, w] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json()), fetch('/api/files').then(r => r.json()), fetch('/api/areas').then(r => r.json()).catch(() => null)]);
-  W = w;
+  const [d, a, fl] = await Promise.all([fetch('/api/procs').then(r => r.json()), fetch('/api/actors').then(r => r.json()), fetch('/api/files').then(r => r.json()), loadWorld()]);
   F = fl.files; fileOf = Object.fromEntries(F.flatMap(f => f.procs.map(c => [c, f.id])));
   P = d.procs; scenes = d.scenes; byId = Object.fromEntries(P.map(p => [p.id, p]));
   callees = d.callees || {}; procOfName = d.procnames || {};
