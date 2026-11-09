@@ -923,3 +923,14 @@ The ROM needs a table pseudo that cse never sees as constant in the first sample
 the preheader, and that gcse does not treat as redundant for the later samples.
 Next: a matchsearch store over where the table is set and what type it has (symbol vs integer
 address, the 512 offset applied at the call site or in the helper).
+
+### AreaEffect_AddSpriteFromScript (field-effects, open)
+Plain draft without concessions in notes/phase3-drafts/field-effects/AreaEffect_AddSpriteFromScript.c:
+19 insns differ, all register choice. Global alloc runs manager (priority 1604: 10 refs, live 187)
+before the 0xA8 stride constant (1600). manager needs a live length of 188+ insns, or the stride
+needs a 5th ref. With the item_container-style groundHeight/cellIndex inlines, the barrier is not
+needed, and gcse puts &manager->count in r8 without the pin.
+
+### TetherActor_UpdateBounceReturn (field-effects, partial)
+19 -> 4 pins. Left: the incremented frame is zero-extended twice in the ROM (in plain C cse shares
+the two; switch and mixed cast/memory forms don't help), and r6 holds 0x380 in the falling arm.
