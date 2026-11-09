@@ -220,10 +220,12 @@ def build():
     for ci, c in enumerate(tree["categories"]):
         for ui, u in enumerate(c["units"]):
             for row in u["functions"]:
+                # --list-pinned names a function as its C does (row[6], when that differs)
                 name, addr, size, pct, pinned, file = row[:6]
                 fns[addr] = {"name": name, "addr": addr, "size": size, "pct": pct, "cat": ci, "unit": ui,
                              "file": f"src/fn/sub_{addr}.c" if file == -1 else None if file == -2 else tree["files"][file],
-                             "defined": row[6] if len(row) > 6 else None, "kinds": (kinds.get(name) or ["concession"]) if pinned else []}
+                             "defined": row[6] if len(row) > 6 else None, "kinds": (kinds.get(name) or kinds.get(row[6] if len(row) > 6 else None)
+                                                 or ["concession"]) if pinned else []}
     ram_users, data_users, ptr_users = collections.defaultdict(list), collections.defaultdict(list), collections.defaultdict(list)
     for a, d in x.items():
         h = f"{a:08X}"
@@ -352,6 +354,64 @@ def summary():
                    for r in ix["ram"]]}
     _INDEX.update(summary=out, summary_of=ix)
     return dict(out, updating=updating())
+
+
+HEADLINE = re.compile(r"Code matched in C: ([\d.]+)%.*?(\d+) / (\d+) functions")
+CLEAN = re.compile(r"Without (concessions|register pinning): \*\*([\d.]+)%")
+
+
+def history():
+    """Progress over time, from every committed PROGRESS.md (decomp.dev's
+    history graph): [{t, matched, clean, functions, total}], oldest first.
+    matched is the share of code bytes in C; clean, from when PROGRESS.md
+    started reporting it, the share without concessions (clean_of "pins":
+    without register pins, before PROGRESS.md counted the other kinds)."""
+    try:
+        log = subprocess.run(["git", "log", "--format=%H %ct", "--", "PROGRESS.md"], cwd=ROOT,
+                             capture_output=True, text=True, timeout=30).stdout.split()
+    except (OSError, subprocess.SubprocessError):
+        return []
+    commits = list(zip(log[::2], map(int, log[1::2])))
+    if not commits:
+        return []
+    key = commits[0][0]
+    if _INDEX.get("history_of") == key:
+        return _INDEX["history"]
+    path = os.path.join(ROOT, "build", "cache", "progress_history.json")
+    cached = _read_json(path) if os.path.exists(path) else None
+    if cached and cached.get("head") == key:
+        out = cached["points"]
+    else:
+        blobs = "".join(f"{h}:PROGRESS.md\n" for h, _ in commits)
+        raw = subprocess.run(["git", "cat-file", "--batch"], cwd=ROOT, input=blobs.encode(),
+                             capture_output=True, timeout=120).stdout
+        out, pos = [], 0
+        for h, t in commits:
+            nl = raw.index(b"\n", pos)
+            head = raw[pos:nl].split()
+            if len(head) < 3 or head[1] != b"blob":
+                pos = nl + 1
+                continue
+            size = int(head[2])
+            text = raw[nl + 1:nl + 1 + min(size, 4000)].decode("utf-8", "replace")
+            pos = nl + 1 + size + 1
+            m = HEADLINE.search(text)
+            if not m:
+                continue
+            c = CLEAN.search(text)
+            out.append({"t": t, "matched": float(m.group(1)), "clean": float(c.group(2)) if c else None,
+                        "clean_of": ("pins" if c.group(1) == "register pinning" else "all") if c else None,
+                        "functions": int(m.group(2)), "total": int(m.group(3))})
+        out.sort(key=lambda p: p["t"])
+        try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path + ".tmp", "w") as f:
+                json.dump({"head": key, "points": out}, f)
+            os.replace(path + ".tmp", path)
+        except OSError:
+            pass
+    _INDEX.update(history=out, history_of=key)
+    return out
 
 
 def _source(f):

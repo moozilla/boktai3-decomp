@@ -1,5 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+struct PeerRosterPacket {
+    u8 pending, sent, bits, count;
+    u8 names[5][10];
+    u16 ids[5];
+};
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -24,7 +28,7 @@ struct Engine {
     u32 key;
     u16 input[5];
     u8 pad11a[0x1A];
-    u8 scratch[64];
+    struct PeerRosterPacket scratch;
     u8 message[0x204];
     void *head, *tail;
 };
@@ -34,59 +38,32 @@ void Memory_Clear(void *, int);
 void String_CopyPadded(const void *, void *, int);
 int WirelessController_BuildPeerRosterPacket(struct Engine *p)
 {
-    u8 *packet = p->scratch;
-    u16 fill;
-    u16 *fillPtr = &fill;
-    int zero = 0;
+    struct PeerRosterPacket *packet = &p->scratch;
     int i;
-    asm("" : "+r"(zero));
-    *fillPtr = zero;
-    CpuSet(fillPtr, packet, 0x01000020);
+    CpuFill16(0, packet, sizeof(*packet));
     if (p->mask & 0x100) {
-        packet[0] = 1;
-        {
-            int bits = p->mask;
-            bits |= 8;
-            bits |= zero;
-            {
-                int mask = 0xFEFF;
-                p->mask = bits & mask;
-            }
-        }
+        packet->pending = 1;
+        p->mask |= 8;
+        p->mask &= ~0x100;
     } else
-        packet[0] = zero;
-    {
-        u16 bits = p->mask & 0x200;
-        if (bits) {
-            packet[1] = 1;
-            {
-                int flags = p->mask | 16;
-                int mask = 0xFDFF;
-                p->mask = flags & mask;
-            }
-        } else
-            packet[1] = bits;
-    }
-    packet[3] = 1;
+        packet->pending = 0;
+    if (p->mask & 0x200) {
+        packet->sent = 1;
+        p->mask |= 16;
+        p->mask &= ~0x200;
+    } else
+        packet->sent = 0;
+    packet->count = 1;
     for (i = 0; i <= 3; i++)
         if ((p->bits >> i) & 1)
-            packet[3]++;
-    packet[2] = (p->bits << 1) | 1;
-    String_CopyPadded(gRfuLinkStatus->my.uname, packet + 4, 8);
-    *(u16 *)(packet + 0x36) = gRfuLinkStatus->my.id;
+            packet->count++;
+    packet->bits = (p->bits << 1) | 1;
+    String_CopyPadded(gRfuLinkStatus->my.uname, packet->names[0], 8);
+    packet->ids[0] = gRfuLinkStatus->my.id;
     for (i = 0; i <= 3; i++) {
-        int selected = (p->bits >> i) & 1;
-        int next = i + 1;
-        if (selected) {
-            String_CopyPadded(gRfuLinkStatus->partner[i].uname, packet + 14 + i * 10, 8);
-            {
-                int offset = next << 1;
-                u16 *ids;
-                asm("" : : "r"(offset));
-                ids = (u16 *)(packet + 0x36);
-                ids += next;
-                *ids = gRfuLinkStatus->partner[i].id;
-            }
+        if ((p->bits >> i) & 1) {
+            String_CopyPadded(gRfuLinkStatus->partner[i].uname, packet->names[i + 1], 8);
+            packet->ids[i + 1] = gRfuLinkStatus->partner[i].id;
         }
     }
 }

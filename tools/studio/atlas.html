@@ -52,7 +52,6 @@ h1.t { font-size: 24px; margin: 0; font-weight: 650; letter-spacing: -.01em; }
 h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 26px 0 10px; font-weight: 650; display: flex; align-items: baseline; gap: 8px; }
 h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
 .lede { font-size: 15px; margin: 12px 0 0; max-width: 760px; }
-.empty { color: var(--muted); }
 .mono, code { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
 .gcl { margin: 4px 0 8px; }
 .gcl.alt { opacity: .8; }
@@ -283,8 +282,11 @@ function nodePage(path) {
   const n = nodes[path]; if (!n) return `<div class="page empty">No such group.</div>`;
   const kids = n.children.map(c => folderCard(path + '/' + c.title)).join('');
   const items = n.items.map(cardFor).join('');
+  // a place: its map of rooms is on the World page
+  const world = /^Places\/[^/]+$/.test(path) && n.title !== 'Unlabeled areas'
+    ? `<div class="meta">${peekLink('/world#place=' + encodeURIComponent(n.title), 'how its rooms connect, on the World page')}</div>` : '';
   return `<div class="page">${crumbs(path.split('/').slice(0, -1).join('/'))}<h1 class="t">${esc(n.title)} <span class="muted" style="font-size:15px;font-weight:400">${n.count}</span></h1>
-    ${kids ? `<h3>Groups</h3><div class="cards">${kids}</div>` : ''}${items ? `<h3>${n.children.length ? 'Here' : 'Contents'} <span class="n">${n.items.length}</span></h3><div class="cards">${items}</div>` : ''}</div>`;
+    ${world}${kids ? `<h3>Groups</h3><div class="cards">${kids}</div>` : ''}${items ? `<h3>${n.children.length ? 'Here' : 'Contents'} <span class="n">${n.items.length}</span></h3><div class="cards">${items}</div>` : ''}</div>`;
 }
 
 // who loads a tileset or a map's tiles: stages (script proc_884 calls), areas, scenes
@@ -569,7 +571,7 @@ const VIEWS = [
   ['Scripts', '/scripts', 'The scene scripts (Konami GCL) in a readable form, with recovered names'],
   ['Sprites', '/gfx#sprites', 'Sprite packages and large sprites, every frame and animation'],
   ['Maps', '/gfx#maps', 'Stages with doors, items, enemies and patrol paths'],
-  ['World', '/world', 'How the rooms connect, area by area'],
+  ['World', '/world', 'How the rooms connect: places, their areas and the doors between them'],
   ['Sound', '/sound', 'Every song, played from the ROM\'s own sequences and samples'],
   ['Live', '/live', 'The game running in mGBA, every sprite and text box matched to its resource'],
   ['ROM', '/rom', 'The whole ROM as a treemap, by kind or by how well it is understood'],
@@ -601,7 +603,7 @@ async function homeStats() {
   if (!el) return;
   if (!s) { el.innerHTML = '<b>—</b><span>code index unavailable</span>'; return; }
   const m = s.measures;
-  el.outerHTML = `<a class="stat" href="/code"><b>${Number(m.total_functions).toLocaleString()}</b><span>functions, all matching</span></a>
+  el.outerHTML = `<a class="stat" href="/code"><b>${Number(m.total_functions - (s.drafts || 0)).toLocaleString()}</b><span>${s.drafts ? `of ${Number(m.total_functions).toLocaleString()} functions matching` : 'functions, all matching'}</span></a>
     <a class="stat" href="/code"><b>${m.complete_code_percent.toFixed(1)}%</b><span>of code without concessions</span></a>`;
 }
 
