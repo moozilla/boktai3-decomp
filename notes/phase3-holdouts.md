@@ -999,3 +999,18 @@ Tried:
 - a mask local
 - `!= 0`
 Next: find what the original kept live in r0 and r1 across that store. The pinned dummies stand in for it.
+
+### sub_08217430 (src/fn/sub_08217430.c, 08217430): deferred
+
+Landed: a `bank` pin in r3 and a barrier keeping `offset`/`base` live.
+Draft: `notes/phase3-drafts/monsters-bosses/sub_08217430.c`
+(`u8 *bank = gPaletteBankData + (gObjPaletteKeys[i] << 5);`, 8 ROM / 6 draft).
+The copy `r0 = bank` before CpuFastSet gives bank (pseudo 33) a copy suggestion of r0.
+Local-alloc's first pass hands it r0 ahead of the higher-priority `=gObjPaletteBuffer` temp (44), which then takes r2.
+The ROM has bank in r3, the temp in r0, and `adds r0, r3, #0` before the call.
+`AGBCC_FORCE=33:3` gives 2/2. What remains is the offset/base pair (global 39 in r1, ROM r0).
+Tried:
+- the expression inline in the call, `(u16 *)`, a separate dst local
+- `ObjectFade_SourceBank(i)`
+- inline copy wrappers (worse: the base address is no longer hoisted)
+Next: C where bank does not die in the r0 copy (or is not a plain copy), so it gets no suggestion.
