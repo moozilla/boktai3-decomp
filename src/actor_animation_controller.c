@@ -1191,21 +1191,21 @@ void Actor_BeginPositionedEffect(void)
             return;
     }
     if (Script_SeekToKeyword(0x70)) {
-        H(0xdf8) = Script_GetValue();
-        H(0xdfa) = Script_GetValue();
-        H(0xdfc) = Script_GetValue();
+        g->obj.x = Script_GetValue();
+        g->obj.y = Script_GetValue();
+        g->obj.z = Script_GetValue();
     } else {
         {
-            u32 value = OWNER_V(0x30);
-            H(0xdf8) = value;
+            u32 value = (u16)g->owner->position.x;
+            g->obj.x = value;
         }
         {
-            u32 value = OWNER_V(0x32) + 160;
-            H(0xdfa) = value;
+            u32 value = (u16)g->owner->position.y + 160;
+            g->obj.y = value;
         }
         {
-            u32 value = OWNER_V(0x34);
-            H(0xdfc) = value;
+            u32 value = (u16)g->owner->position.z;
+            g->obj.z = value;
         }
     }
     Actor_SetState(g, 2, 14);
