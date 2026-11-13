@@ -6,7 +6,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                                        s32 screenY)
 {
     if (gGameState->unk618 > 0) {
-        register u16 frame asm("r5") = panel->mode;
+        u32 frame = panel->mode;
         u32 shifted = (u32)frame << 16;
         u32 value;
         s32 alpha;
@@ -30,8 +30,11 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             } else
                 panel->shakeOffset = 5;
         } else {
+            u32 mask;
             alpha = shifted >> 17;
-            if (!(frame & 3) && panel->shakeOffset > 0)
+            mask = 3;
+            mask &= frame;
+            if (!mask && panel->shakeOffset > 0)
                 panel->shakeOffset--;
         }
         {
