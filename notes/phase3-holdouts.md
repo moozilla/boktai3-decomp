@@ -1388,3 +1388,37 @@ UpdateItemMerge, then identify the original reset interface or control-flow life
 that preserves the separate byte zero. Do not repeat initializer spelling variants.
 
 Scratch/evidence: `build/cx/work/WirelessGameItems_QueueLocalItem/`.
+
+### WirelessGameItems_QueueIncomingItem (0803A618, src/wireless_game_items_and_display.c)
+
+Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_QueueIncomingItem.c`
+(30 ROM / 28 draft, shape 4, 220 bytes). Fresh direct counter fields recover owner,
+target, current and pending-array allocation; the initial clean draft is 51/49,
+shape 4. Production is unchanged.
+
+All 119 proper removal subsets with two through six constraints removed were tested.
+None matches. Removing both one/value r0 pins gives 4/4, shape 0, exactly the inherited
+sum preference seen in UpdateIncomingItem. `AGBCC_FORCE=value:0` (pseudo 92) MATCHes.
+Removing both barriers gives 3/1, shape 2: the post-clamp r1 zero disappears and target
+count uses the later r0 zero. Removing all five pins while keeping both original
+barriers gives 25/25, shape 0. No useful partial can land yet.
+
+In the clean direct-field form, the counter-array bases take r2 and sums take r1
+instead of the reverse; the pending reset zero is hoisted before the timer store
+and gets r5 instead of the separate ROM r0/r1 zeros. Fifteen CSE/PRE probes do not
+improve it. The baseline allocation diagnostics show dest outranking owner, owner
+outranking target, and equal-priority current/second pseudos allocated in the wrong
+order; raising these independently helps but does not match.
+
+Tried direct fields, branch-local counts, narrow totals, explicit count pointers,
+reversed source reads, state-reset helpers (void and int with ignored missing return),
+clamp helpers with early returns, ternaries and labels, byte parameters, unsigned
+results, reused state/input/count temporaries, ADDRESSOF inputs/result, and struct/
+union sums. Ordinary int clamp helpers preserve the four-register partial difference;
+byte parameters and ADDRESSOF forms change shape. A narrow summed byte can overflow
+and is diagnostic only, not a valid candidate. Next: suppress the sum's inherited
+first-operand preference with a meaningful source lifetime, then solve the shared
+reset-zero class. Do not repeat the subset or initializer searches.
+
+Persistent evidence: `build/matchsearch/WirelessGameItems_QueueIncomingItem`;
+scratch: `build/cx/work/WirelessGameItems_QueueIncomingItem/`.
