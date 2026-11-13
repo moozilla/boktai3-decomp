@@ -67,7 +67,7 @@ void PauseMenu_ClearItemSlotValues(void)
 
 void PauseMenu_ClearEquippedItemState(void)
 {
-    s16 i = *(s16 *)((u8 *)gGameState + 0x50);
+    s16 i = (s16)gGameState->unk50;
     s16 v = *(s16 *)((u8 *)gGameState + 0x68 + i * 2);
     struct SceneValueEquipment *equipment = Inventory_GetEquipmentEntry(v);
     equipment->condition = 0;
