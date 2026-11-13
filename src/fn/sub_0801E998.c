@@ -1,12 +1,22 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_object_slot.h"
 void SceneObject_UpdateLowered(void);
+struct SceneObjPool {
+    u8 pad0[0x1a];
+    u16 count;
+    u8 pad1c[0x410];
+    struct SceneObjSlot *slots;
+};
+static inline u8 SceneObjects_GetVariantByte(int value)
+{
+    return value;
+}
 int SceneObjects_ScriptLower(void)
 {
-    u8 *p = ResourceRegistry_GetResource(0x85e6);
+    struct SceneObjPool *p = ResourceRegistry_GetResource(0x85e6);
     int found;
     int i;
     int id;
+    void (*fn)(void) = SceneObject_UpdateLowered;
     if (!p)
         return -1;
     found = 0;
@@ -14,43 +24,30 @@ int SceneObjects_ScriptLower(void)
         return -1;
     id = Script_GetValue();
     i = 0;
-    if (found < *(u16 *)(p + 0x1a)) {
-        u8 **base = (u8 **)(p + 0x42c);
-        int zero;
+    if (found < p->count) {
+        struct SceneObjSlot **slots = &p->slots;
         int one;
-        zero = 0;
-        one = 1;
+        u32 mask;
+        int zero = 0;
         do {
-            u8 *s;
-            s = *base + i * 140;
-            if (*(u16 *)(s + 0x34) == id) {
-                *(u16 *)(s + 0x82) = zero;
-                s[0x37] = one;
-                {
-                    register void *fn asm("r2") = SceneObject_UpdateLowered;
-                    *(void **)(s + 0x30) = fn;
-                }
-                {
-                    int pose = s[0x84];
-                    s[0x39] = pose;
-                }
-                {
-                    u8 *out = s + 0x3a;
-                    register int clear asm("r1");
-                    clear = 0;
-                    *out = clear;
-                }
-                ((struct SceneObjSlot *)s)->block->w6 &= ~2;
-                ((struct SceneObjSlot *)s)->block->w6 |= 3;
-                asm("" ::: "memory");
-                ((struct SceneObjSlot *)s)->block->b4 =
-                    (((struct SceneObjSlot *)s)->block->b4 & 0xf0) | (s[0x3b] + 1);
-                *(u16 *)(s + 0x80) = zero;
-                *(u16 *)(s + 0x1e) = *(u16 *)(s + 0x72);
+            struct SceneObjSlot *s = *slots + i;
+            if (s->id == id) {
+                s->timer = zero;
+                one = 1;
+                s->variant = SceneObjects_GetVariantByte(one);
+                s->callback = fn;
+                s->b39 = *(u8 *)&s->loweredPose;
+                s->b3a = 0;
+                mask = (u16)~2;
+                s->block->w6 &= mask;
+                s->block->w6 |= 3;
+                s->block->b4 = (s->block->b4 & 0xf0) | (s->b3b + 1);
+                s->lift = zero;
+                s->spritePos.position.y = s->q0.position.y;
                 found = 1;
             }
             i++;
-        } while (i < *(u16 *)(p + 0x1a));
+        } while (i < p->count);
     }
     return found;
 }
