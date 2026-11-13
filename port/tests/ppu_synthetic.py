@@ -8,7 +8,7 @@ import random
 import shlex
 import struct
 import subprocess
-from ppu_regression import ROOT, BUILD, run
+from ppu_regression import ROOT, BUILD, run, build_ppu
 
 
 def w16(data, offset, value):
@@ -252,17 +252,23 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--filter', default='')
     ap.add_argument('--sanitize', action='store_true')
+    ap.add_argument('--wasm', action='store_true', help='also compare linked WebAssembly with mGBA')
     args = ap.parse_args()
     directory = BUILD / 'synthetic'
     directory.mkdir(parents=True, exist_ok=True)
     build_oracle(args.sanitize)
+    if args.wasm:
+        build_ppu(BUILD)
     rows = []
     for name, scene in (*fixtures(), *edge_fixtures(), *affine_window_fixtures(), *priority_latch_fixtures()):
         if args.filter not in name:
             continue
         path = directory / (name + '.bin')
         scene.write(path)
-        result = subprocess.run([str(BUILD / 'ppu_oracle'), str(path)], capture_output=True, text=True)
+        command = [str(BUILD / 'ppu_oracle'), str(path)]
+        if args.wasm:
+            command.append(str(path.with_suffix('.ppm')))
+        result = subprocess.run(command, capture_output=True, text=True)
         if result.returncode not in (0, 1):
             raise RuntimeError(name + '\n' + result.stderr)
         count = int(result.stdout.strip())
@@ -274,6 +280,8 @@ def main():
         raise RuntimeError('no synthetic fixtures selected')
     (directory / 'results.json').write_text(json.dumps(rows, indent=2) + '\n')
     print(f'{sum(r["mismatches"] == 0 for r in rows)}/{len(rows)} fixtures exact')
+    if args.wasm:
+        run(['node', 'port/tests/ppu_synthetic_wasm.mjs', BUILD / 'ppu.wasm', directory])
     raise SystemExit(any(r['mismatches'] for r in rows))
 
 

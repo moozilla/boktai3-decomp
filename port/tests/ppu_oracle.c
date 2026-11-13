@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     PpuMemory m = {(uint8_t *)io, (uint8_t *)pal, (uint8_t *)vram, (uint8_t *)&oam};
     unsigned count = 0, next = 0, y, x, reg, mismatches = 0;
     FILE *in;
-    if (argc != 2) { fprintf(stderr, "usage: ppu_oracle fixture.bin\n"); return 2; }
+    if (argc < 2 || argc > 3) { fprintf(stderr, "usage: ppu_oracle fixture.bin [reference.ppm]\n"); return 2; }
     in = fopen(argv[1], "rb");
     if (!in) { perror(argv[1]); return 2; }
     if (fread(io, 1, sizeof(io), in) != sizeof(io) || fread(pal, 1, sizeof(pal), in) != sizeof(pal) ||
@@ -96,6 +96,16 @@ int main(int argc, char **argv)
             fputc(c & 255, out); fputc((c >> 8) & 255, out); fputc((c >> 16) & 255, out);
         }
         fclose(out);
+    }
+    if (argc == 3) {
+        FILE *out = fopen(argv[2], "wb");
+        if (!out) { perror(argv[2]); return 2; }
+        fprintf(out, "P6\n240 160\n255\n");
+        for (y = 0; y < PPU_HEIGHT; ++y) for (x = 0; x < PPU_WIDTH; ++x) {
+            uint32_t c = expected[y * PPU_WIDTH + x];
+            fputc(c & 255, out); fputc((c >> 8) & 255, out); fputc((c >> 16) & 255, out);
+        }
+        if (fclose(out)) return 2;
     }
     printf("%u\n", mismatches);
     oracle.d.deinit(&oracle.d);
