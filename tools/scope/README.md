@@ -1874,6 +1874,24 @@ Each was read from the compiler source and confirmed on a live draft.
    decode's constant, and normal allocation gives the ROM's registers. The existing per-case
    shift scopes plus this reuse removed both pins and matched the complete callback and unit.
 
+151. **A shared drawing pointer can preserve a random seed store that branch-local pointers lose.**
+   WirelessResultPanel_UpdateOutcomeReveal uses the same drawing in entry, shake, and reset
+   branches. With three scoped pointer variables, two ParticleRandom_ReadDirectSample calls
+   lose their first seed store in flow (insn 254); the reduced seed references also swap the
+   seed and 1023-mask registers. One function-scope drawing pointer assigned in all three
+   branches preserves the store and matches, removing four pins. Changing the drawing type
+   to the shared layout or a union does not fix it. Inspect pointer scope and flow before
+   assuming the sampler or field type is wrong. WirelessGameDisplay_UpdateShakeAnimation
+   additionally needs its display parameter used directly, rather than copied to a local.
+
+152. **A narrow keyframe temporary can restore argument-move order without extra instructions.**
+   In WirelessResultPanel_UpdateOutcomeReveal, removing the last call-setup barrier changes
+   `mov r2,icon; mov r0,drawing` to the reverse order. Inline wrapper parameter order does not
+   help. Writing `u16 keyframe = icon; Anim_LoadKeyframe(drawing, descriptor, keyframe, 0);`
+   restores the original order and matches without the barrier. A u8 or signed-short keyframe
+   also matches; changing only icon to u8/u16 does not. The chosen icons are 30, 31, and 32, so
+   narrowing preserves their values. Use the meaningful argument type, not an unrelated cast.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
