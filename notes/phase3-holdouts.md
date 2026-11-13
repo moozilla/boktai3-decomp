@@ -1370,9 +1370,21 @@ stores leaves 6/6. These do not change the saved best draft or the diagnosis:
 the late zero's r2 conflict gives the right earlier allocation but ties its own
 address to r3, preventing reuse of the x address in r0.
 
-### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): partial
+### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): resolved
 
 Tags: #matching #phase3 #presentation #081FDAF4
+
+Resolved on follow-up: initialize both s16 halves of a union containing an s32
+word, then assign the word to lowered. The partial writes keep the word live
+from entry through the initial argument/scale registers when flow runs;
+combine subsequently folds them into one zero set. Allocation chooses r4
+naturally. A scalar union assignment or initializer still gives 5/3, while
+the halfword form gives 1/1 if the function returns the union word (a move
+from r4 instead of the ROM's zero immediate). Keeping `return 0` matches all
+76 bytes in scope and the independent stock check, with zero concessions.
+The shared component pointer from the earlier partial remains. Persistent
+store: RisingActor_AdvanceHeight-resumed, node halfword-zero. Earlier evidence:
+
 
 Removed the state pointer pin by sharing a void component pointer between the
 volley and collider field views. The remaining zero pin still selects r4.
