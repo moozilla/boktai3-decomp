@@ -1325,7 +1325,7 @@ addr,name,mode,confidence,source,notes
 08036C54,Wireless_RequestDestroyController,thumb,low,src-alias,Sets the flag that makes the update task unlink and free the controller
 08036C88,Wireless_GetLocalSessionId,thumb,low,src-alias,Returns the generated sixteen-bit identifier displayed in the local peer row
 08036CA4,WirelessText_GetCharacterTable,thumb,low,src-alias,Returns the shared character conversion table at 0x0203FC00
-08036CAC,WirelessText_GetCharacterTableByte,thumb,low,src-alias,Reads one byte at the supplied index for wireless text decoding
+08036CAC,WirelessText_GetCharacterCode,thumb,low,src-alias,Returns the 16-bit character code at an eight-bit wireless text index
 08036CC4,WirelessText_FindCharacterIndex,thumb,low,src-alias,Finds a character code in the 256-entry table and returns zero when absent
 08036CF0,WirelessText_DecodeString,thumb,low,src-alias,Converts a fixed number of wireless name bytes into terminated display text
 08036D2C,WirelessText_EncodeString,thumb,low,src-alias,Maps display characters to wireless table indices and zero-pads the fixed-length result

@@ -67,3 +67,12 @@ indices, display control restoration, completion/skip procedures, and parallel
 Script keyword constants now read as characters; script failure gotos became
 ordinary early returns. ConsumeStateEntry returns u8 consistently with its callers,
 which retain the original return-width check. Exact MATCH: 1,068 bytes.
+
+## Wireless text: 08036CA4–08036E08
+
+Consolidated six functions into `src/wireless_text.c`. The API consistently uses
+u16 character codes and u8 encoded indices. GetCharacterCode replaces the misleading
+GetCharacterTableByte name. Named progress fields replace the initializer's two
+anonymous counters; its indexed table address keeps the original byte-address
+calculation. Fixed character-table storage remains at its existing cartridge RAM
+address pending centralized ownership of that region. All 356 bytes match.
