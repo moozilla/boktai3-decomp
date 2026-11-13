@@ -8,17 +8,19 @@ void SceneActorControl_OnIdle(u8 *);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **saved, u32 excluded)
 {
     u16 *flags = &actor->flags2D4;
-    register u32 value asm("r0") = *flags;
+    u32 value = *flags;
     register u32 mask asm("r2") = 0x40;
     value &= mask;
     *saved = flags;
     if (value)
         goto one;
-    value = actor->flags2D0;
-    mask = excluded;
-    value &= mask;
-    if (value)
-        goto one;
+    {
+        u32 value = actor->flags2D0;
+        mask = excluded;
+        value &= mask;
+        if (value)
+            goto one;
+    }
     if (actor->health > 0)
         goto zero;
 one:
