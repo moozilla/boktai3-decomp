@@ -145,3 +145,24 @@ projected-display types. Replaced the opaque task prefix and promoted the
 child-status alias to symbols/functions.csv. Creation now uses ordinary guard
 returns and sizeof the real object. Exact MATCH: 604 bytes; this is the only
 unit including its modified header.
+
+## Deferred countdown controller: 0804D620–0804D778
+
+A typed CountdownTask (frame/interval at 0018/001A), existing Player and
+GameState types match Tick, Destroy and Create. Initialize differs: the typed
+interval/frame stores move the constant-zero return setup before the interval
+store, requiring a copy of Script_GetValue's r0 result to r1 and four extra
+bytes. Direct ternary assignment and one/three parameter forms preserve that
+difference. The factory's initializer return contract must be signed to retain
+its negative failure check. Do not retain a function-pointer cast as a workaround.
+Clean typed attempt and header are in build/countdown_controller_attempt; all
+four original files remain unchanged. Next attempt should examine the store/
+return register lifetime with scope before changing the C shape again.
+
+## Shaking icon: 08056D70–08056F20
+
+Five functions share `src/shake_icon_display.c`, a real Task prefix and the
+existing resource/animation layout. Published the creator declaration. A direct
+symbolic random-table index changes the order of the address load and index
+shift, so its existing fixed-table expression remains. Exact MATCH: 432 bytes;
+only this unit includes the modified header.
