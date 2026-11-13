@@ -46,23 +46,69 @@ the repository. Replay needs only the portable renderer and Pillow. Reports
 include per-scene pixel mismatch counts and a JSON result; failures produce a
 visible difference image. Any mismatch makes the command fail.
 
-Three startup captures and twelve menu/field captures match with zero pixel
-differences. All twelve menu/field captures also match in Node WebAssembly.
-The checkpoint runner also matches 40 frames across eight saves, covering dialogue,
-dungeons, the sun gauge HUD and credits, in native and WebAssembly. Recreate them
-with the user's save bank (an explicit directory avoids worktree-relative paths):
+Ten startup/title/save-select frames and twelve menu/field frames match mGBA with
+zero pixel differences in native C and Node WebAssembly. The complete 83-save
+checkpoint bank produces 415 more exact frames in both native and WebAssembly, covering dialogue, dungeons, field scenes, the sun gauge
+HUD and credits. The menu/field sequence includes a live boss encounter. Recreate captures with the user's save bank (an explicit directory
+avoids worktree-relative paths):
 
 ```sh
 build/venv/bin/python port/tests/ppu_scenes.py --bank ../boktai3trans/saves --wasm
-build/venv/bin/python port/tests/ppu_synthetic.py
+# Sweep the whole bank; replay completed captures after an interruption.
+build/venv/bin/python port/tests/ppu_scenes.py \
+  --bank ../boktai3trans/saves --checkpoints all --resume \
+  --out build/ppu/full-bank --wasm
+build/venv/bin/python port/tests/ppu_synthetic.py --sanitize --wasm
+build/venv/bin/python port/tests/ppu_regression.py \
+  --out build/ppu/startup-delta --sanitize --unit --wasm
 ```
 
-The synthetic suite generates 150 cases without a ROM and compares directly with
+The synthetic suite generates 315 cases without a ROM and compares directly with
 mGBA's software renderer: all text sizes/depths/layers, affine and bitmap modes,
 transforms, sprite shapes/sizes/depths/flips, clipping, affine/double-size OBJ,
 windows, blending, brightness, mosaic, green swap and HBlank register changes.
-All 150 currently match exactly. The implemented feature list and these finite
-tests are not a claim of hardware-perfect behavior for every edge case. A
-snapshot taken after a frame cannot reproduce HBlank effects, which is why the
-suite captures the actual inputs of each scanline. Sub-scanline register effects
-and exact memory-bus timing are outside this renderer's interface.
+Boundary tests cover tile-bank wrapping, bitmap OBJ eligibility, invalid BG
+characters, transparent OBJ priority propagation, vertical window latches and
+sprite cycle budgets. All 315 match exactly under AddressSanitizer and
+UndefinedBehaviorSanitizer; all 315 also match in linked WebAssembly. Separate C
+contract tests cover RGB555 arithmetic,
+unaligned input, affine reference updates and sign/wrap behavior.
+
+`PPUDUMP2` stores an eight-byte magic, then 160 scanline records: four signed
+little-endian 32-bit affine origins (BG2 X/Y, BG3 X/Y), a byte of bank-change
+flags, and the changed banks in IO/palette/VRAM/OAM order. Bank lengths are
+0x400, 0x400, 0x18000 and 0x400 bytes. The first record must include every bank;
+subsequent records retain unchanged banks. Gzip compression produces roughly
+14–30 KiB per typical game frame. Replay also accepts the older `PPUDUMP1`
+format, which stores every bank on every line. Neither format includes pixels
+from mGBA as renderer input; references are separate PPM files.
+
+These finite tests establish agreement with mGBA 0.11 on the tested inputs,
+not hardware-perfect behavior for every edge case. A snapshot taken after a
+frame cannot reproduce HBlank effects, which is why the suite captures the
+actual inputs of each scanline. Sub-scanline register effects and exact
+memory-bus timing are outside this renderer's interface. Mid-VBlank window
+boundary writes are not modeled separately from the next frame's registers.
+
+### Try the browser demo
+
+Open `demo/index.html` directly. It runs the actual C renderer in WebAssembly,
+with a local capture picker, optional mGBA reference comparison and sequence
+playback. The bundled 7.3 KiB module contains only renderer code. No server,
+ROM, captured memory or game pixels are bundled. See `demo/README.md` for
+commands that regenerate the module, six side-by-side PNGs and a 60-frame APNG.
+Generated images and captures stay in `build/demo/`; its README lists each
+artifact. The browser bridge is tested in Node against captured frames; browser
+UI automation is a separate validation step.
+
+Build the standalone wasm slice with:
+
+```sh
+build/venv/bin/python port/build.py --ppu
+build/venv/bin/python port/demo/build.py
+```
+
+`WASM_LD` selects an executable linker and `WASM_CC` selects Clang. An invalid
+explicit linker override fails instead of silently using another toolchain.
+The platform port can reuse `find_wasm_ld()` and `build_ppu()` when combining
+subsystem builds. None of these tools modifies `src/` or the agbcc build.
