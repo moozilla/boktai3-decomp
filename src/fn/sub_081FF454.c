@@ -75,7 +75,7 @@ static inline void Aim(struct HomingSlot *p, struct HomingParams *params)
 
 static inline void SetRiseHeight(struct HomingSlot *p, u16 height)
 {
-    register s16 *dest asm("r2") = &p->sprite.position.y;
+    register s16 *dest = &p->sprite.position.y;
     *dest = height;
 }
 static inline void SpawnTrail(struct HomingSlot *p)
@@ -94,12 +94,14 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
     struct HomingParams *params = &p->params;
     s32 *state = &p->state;
     u32 sequence;
+    void *component;
     switch (*state) {
         case 0: {
             register u32 one;
             u32 time = p->lifetime;
-            one = 1;
-            asm("" : "+r"(one));
+            do {
+                one = 1;
+            } while (0);
             if (time & one)
                 SpawnTrail(p);
             p->sprite.flags |= 0x400;
@@ -115,10 +117,10 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
         }
 
         case 1: {
-            register u16 *delay = &p->params.delay;
-            s32 limit = (slot * 30) + 30;
-            asm("" : "+r"(delay));
-            if (p->lifetime > (limit + (*delay))) {
+            s32 limit;
+            component = &p->params.delay;
+            limit = (slot * 30) + 30;
+            if (p->lifetime > (limit + (*(u16 *)component))) {
                 Aim(p, params);
                 sequence = (params->variant == 0) ? (10) : (6);
                 p->sequence.flags |= 8;
@@ -195,7 +197,9 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
             {
                 s32 limit = slot * 30;
                 u32 elapsed = p->lifetime - 200;
-                SetRiseHeight(p, p->target.y - ((30 - (limit - elapsed)) * 2));
+                u16 height = p->target.y - ((30 - (limit - elapsed)) * 2);
+                component = &p->sprite.position.y;
+                *(s16 *)component = height;
             }
             if ((u8)Sprite_BlinkUntilExpired(&p->sprite.flags, p->blinkTimer, 0x2d, 0x5a))
                 return 1;
