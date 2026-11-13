@@ -1,13 +1,17 @@
 #ifndef GUARD_TILEMAP_PANEL_H
 #define GUARD_TILEMAP_PANEL_H
-#include "global.h"
+#include "engine.h"
 
+struct TilemapScrollSource {
+    s32 x;
+    u32 state[3];
+};
 struct TilemapScroll {
     s32 x, y, previousX, previousY, width, height;
 };
 struct TilemapPanel {
-    u8 task[0x18];
-    s32 *scrollSource;
+    struct Task task;
+    struct TilemapScrollSource *scrollSource;
     const u16 *tileData;
     u8 *mapScript;
     u8 *map;

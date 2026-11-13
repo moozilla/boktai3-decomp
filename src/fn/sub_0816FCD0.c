@@ -3,12 +3,12 @@
 
 /* tentative: action-grid input handler for a pause-menu item screen */
 
-void sub_0816618C(void *, s32, s32);
+void PauseMenu_ShowPromptSprite(void *, s32, s32);
 void Sound_PlaySong(s32);
 void Hud_SaveSecondaryGridSelection(void *);
 void SceneHud_GetActionIconPosition(void *, s32);
 void MenuDisplay_UpdateActionPrompt(void *, s32);
-void SceneHud_SetPairedIcons(void *, s32, s32);
+void PauseMenu_SetPairedIcons(void *, s32, s32);
 void PauseMenu_AddSpriteFlags(void *, s32, s32);
 void PauseMenu_OpenPrompt(s32, s32, s32);
 void PauseMenu_SetConfirmationIndicator(void *, s32);
@@ -81,13 +81,13 @@ static inline void PauseMenu_BeginSortConfirmation(u8 *p)
 }
 void PauseMenu_UpdateItemActions(u8 *p)
 {
-    sub_0816618C(p, 8, 32);
+    PauseMenu_ShowPromptSprite(p, 8, 32);
     p[0xa58] = 0;
     MenuDisplay_UpdateActionPrompt(p, 4);
     if (p[0x4387] == 0x27)
-        SceneHud_SetPairedIcons(p, 1, 5);
+        PauseMenu_SetPairedIcons(p, 1, 5);
     else
-        SceneHud_SetPairedIcons(p, 1, -1);
+        PauseMenu_SetPairedIcons(p, 1, -1);
     if (1 & gPadState[1]) {
         u8 *q;
         Sound_PlaySong(0xdd);

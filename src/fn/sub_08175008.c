@@ -17,10 +17,10 @@ struct AllocSprite {
     u32 pad[2];
     u32 flags;
 };
-void ResultPanel_DrawCappedCounters(void *, s32, s32, s32);
-void ResultPanel_DrawCappedSmallCounters(void *, s32, s32, s32);
+void Hud_DrawHealthRatio(void *, s32, s32, s32);
+void Hud_DrawEnergyRatio(void *, s32, s32, s32);
 void PauseMenu_HidePromptIcons(void *);
-u32 MenuInput_ReadDirectionRepeat(void *);
+u32 PauseMenu_ReadDirectionRepeat(void *);
 void Presentation_UpdateListCursor(void *);
 void Sound_PlaySong(u32);
 void Presentation_DrawEntryCount(void *);
@@ -31,7 +31,7 @@ void MenuSelection_ProcessConfirmation(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), u32);
 void Presentation_InitListValues(void *);
 void PauseMenu_SetPromptIconPositions(void *, u32, u32);
-void SceneHud_SetPairedIcons(void *, u32, s32);
+void PauseMenu_SetPairedIcons(void *, u32, s32);
 void Anim_Step(void *, void *);
 void InventoryGrid_UpdateStatPreview(void *);
 void SceneCatalog_SetDescription(void *, s32);
@@ -59,8 +59,8 @@ void Presentation_UpdateAllocationSelection(u8 *p)
         u8 *modifier = p + 0xa58;
         any = 1;
         *modifier = any;
-        ResultPanel_DrawCappedCounters(p, 1, 7, 8);
-        ResultPanel_DrawCappedSmallCounters(p, 1, 7, 10);
+        Hud_DrawHealthRatio(p, 1, 7, 8);
+        Hud_DrawEnergyRatio(p, 1, 7, 10);
         *(u32 *)(p + 0x3348) |= any;
         *(u32 *)(p + 0x33a8) |= any;
         *(u32 *)(p + 0x1608) |= any;
@@ -68,7 +68,7 @@ void Presentation_UpdateAllocationSelection(u8 *p)
         PauseMenu_HidePromptIcons(p);
         goto finish;
     }
-    key = MenuInput_ReadDirectionRepeat(p);
+    key = PauseMenu_ReadDirectionRepeat(p);
     if (key & 0x40) {
         if (!p[0x48aa]) {
             p[0x48aa] = 2;
@@ -156,11 +156,11 @@ void Presentation_UpdateAllocationSelection(u8 *p)
             *(u16 *)(p + 0x33c2) = 8;
             PauseMenu_HidePromptIcons(p);
             PauseMenu_SetPromptIconPositions(p, 0, 8);
-            SceneHud_SetPairedIcons(p, 1, -1);
+            PauseMenu_SetPairedIcons(p, 1, -1);
         } else {
             *(u32 *)(p + 0x33a8) |= 1;
             PauseMenu_SetPromptIconPositions(p, 0, 8);
-            SceneHud_SetPairedIcons(p, 1, -1);
+            PauseMenu_SetPairedIcons(p, 1, -1);
         }
         *(u32 *)(p + 0x1608) &= ~1;
         Anim_Step(p + 0x1600, p + 0x64);

@@ -1,0 +1,18 @@
+// MATCHING_CONCESSION: register-pinning
+#include "global.h"
+void Clock_BeginRtcAccess(void);
+u8 Rtc_CheckAndReset(void);
+void Clock_EndRtcAccess(void);
+s32 Clock_CheckRtcStatus(void)
+{
+    register u32 shifted;
+    register u32 status;
+    Clock_BeginRtcAccess();
+    shifted = (u32)Rtc_CheckAndReset() << 24;
+    status = shifted >> 24;
+    Clock_EndRtcAccess();
+    status &= 15;
+    if (status == 1)
+        return 1;
+    return -1;
+}

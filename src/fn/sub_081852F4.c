@@ -12,7 +12,7 @@ u32 ActorController_StartModeOneTurn(u8 *p, u32 v);
 s32 Terrain_ApplyBlocked(void *, void *, struct CP *);
 u32 NavMesh_ConsumeProbeEvent(u16 *p);
 s32 ActorController_IsNearTarget(u8 *);
-u32 sub_0821FB8C(void *, void *, u32, u32);
+u32 NavMesh_SteerCardinal(void *, void *, u32, u32);
 
 void ActorController_UpdateTargetMovement(u8 *p, s32 a, s32 b)
 {
@@ -35,7 +35,7 @@ void ActorController_UpdateTargetMovement(u8 *p, s32 a, s32 b)
     if (*q == 0) {
         DirectionalActor_TryBeginState(p, 0);
     } else if (*q == 1) {
-        u32 t = sub_0821FB8C(p + 0x18, p + 0x48, p[0xB39], 0x40);
+        u32 t = NavMesh_SteerCardinal(p + 0x18, p + 0x48, p[0xB39], 0x40);
         if (ActorController_IsNearTarget(p) != 0) {
             *q = 0;
             DirectionalActor_TryBeginState(p, 0);

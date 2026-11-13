@@ -16,6 +16,10 @@ static inline s32 optionalValue(void)
     return value;
 }
 
+static inline void BouncingObject_ClearVector(void *destination, const void *source)
+{
+    CpuSet(source, destination, 0x05000002);
+}
 // confidence=low: spawns a bouncing object from script keywords p (position), a (shot,
 // category), v (velocity), l and n, and sets flag 1 at 0x134.
 #define BouncingObject_SpawnFromScript sub_080697C8
@@ -64,9 +68,8 @@ void BouncingObject_SpawnFromScript(void)
         fill = 0;
         {
             const void *source = (const void *)(&fill);
-            register void *dest asm("r1") = out;
-            asm("" : : "r"(source), "r"(dest));
-            CpuSet(source, dest, 0x05000002);
+            void *dest = out;
+            BouncingObject_ClearVector(dest, source);
         }
     }
     object = BouncingObject_Spawn(&pos, &vel, out, a, b, l, n);

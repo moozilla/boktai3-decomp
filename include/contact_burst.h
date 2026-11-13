@@ -4,7 +4,7 @@
 #include "engine_globals.h"
 /* Tentative contact-triggered aura; source is a caller-owned world position. */
 struct ContactBurst {
-    u8 task[0x18];
+    struct Task task;
     u8 enabled, previousEnabled, contactTimer, contactDirection;
     u16 frame, unknown1E;
     u8 fade, contactFrame, unknown22[2];

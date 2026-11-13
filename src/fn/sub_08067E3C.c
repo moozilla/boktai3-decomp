@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_particle_burst.h"
 #include "engine.h"
 #include "ram.h"
@@ -9,14 +8,10 @@ struct SceneParticleBurstSlot *SceneParticleBurst_AllocateSlot(struct SceneParti
 s32 Mod(s32, s32);
 void ParticleSprite_Initialize(void *, const void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
-static inline u32 Random(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return table[gRandomIndex];
-}
+#include "monster_particle_random.h"
 static inline u8 SceneHasFlag(u32 mask)
 {
-    if (*(u32 *)((u8 *)gGameState + 0x868) & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }
@@ -30,7 +25,7 @@ s32 SceneParticleBurst_CreateWithRanges(const struct ContactPosition *position,
     struct SceneParticleBurstPool *pool;
     struct SceneParticleEffect *effect;
     s32 i;
-    register const u16 *table asm("r10");
+    register const u16 *table;
     if (!position)
         return -1;
     pool = gSceneParticleBurstPool;
@@ -51,11 +46,11 @@ s32 SceneParticleBurst_CreateWithRanges(const struct ContactPosition *position,
             effect = &pool->effects[p->index];
             p->position = *position;
             if (jitter->x)
-                p->position.x += Mod(Random(table), jitter->x * 2) - jitter->x;
+                p->position.x += Mod(ParticleRandom_ReadSample(table), jitter->x * 2) - jitter->x;
             if (jitter->y)
-                p->position.y += Mod(Random(table), jitter->y * 2) - jitter->y;
+                p->position.y += Mod(ParticleRandom_ReadSample(table), jitter->y * 2) - jitter->y;
             if (jitter->z)
-                p->position.z += Mod(Random(table), jitter->z * 2) - jitter->z;
+                p->position.z += Mod(ParticleRandom_ReadSample(table), jitter->z * 2) - jitter->z;
             if (!velocity0) {
                 p->velocity.x = 0;
                 p->velocity.y = 0;
@@ -65,23 +60,23 @@ s32 SceneParticleBurst_CreateWithRanges(const struct ContactPosition *position,
                 if (!velocity0->x)
                     value.x = 0;
                 else
-                    value.x = Mod(Random(table), velocity0->x);
+                    value.x = Mod(ParticleRandom_ReadSample(table), velocity0->x);
                 if (!velocity0->y)
                     value.y = 0;
                 else
-                    value.y = Mod(Random(table), velocity0->y);
+                    value.y = Mod(ParticleRandom_ReadSample(table), velocity0->y);
                 if (!velocity0->z)
                     value.z = 0;
                 else
-                    value.z = Mod(Random(table), velocity0->z);
+                    value.z = Mod(ParticleRandom_ReadSample(table), velocity0->z);
                 *((struct ContactPackedVector *)(&p->velocity)) = value;
             }
-            p->delay = Mod(Random(table), 16);
+            p->delay = Mod(ParticleRandom_ReadSample(table), 16);
             ParticleSprite_Initialize(effect, pool->graphicsResource, 0);
             Effect_SetOrigin(effect, -8, -8);
             sequence = SceneHasFlag(8) ? (14) : (13);
             Anim_SetSequence(&pool->sequences[p->index], pool->sequenceResource, sequence, 0,
-                             (u8)(Mod(Random(table), 2) | flip));
+                             (u8)(Mod(ParticleRandom_ReadSample(table), 2) | flip));
             effect->flags |= 0x201;
             effect->priority = priority;
             p->state = 1;

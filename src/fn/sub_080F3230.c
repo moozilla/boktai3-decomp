@@ -1,15 +1,17 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
+struct PhaseEntryPresentation {
+    s8 opacity;
+    u8 pad9[0x13];
+    s16 x, y, z, pad22;
+    u8 pad24[8];
+};
 struct PhaseEntryView {
     u32 flags;
     u8 pad4[2];
     u8 phase;
     u8 pad7;
-    s8 opacity;
-    u8 pad9[0x13];
-    s16 x, y, z, pad22;
-    u8 pad24[8];
+    struct PhaseEntryPresentation presentation;
 };
 struct PhasePoint {
     s16 x, y, z, pad;
@@ -60,11 +62,12 @@ void PhaseObject_ConvergeEntries(struct PhaseObjectView *p)
         struct PhaseObjectView *entry;
         s32 x = Div((p->target.x - p->saved[i].x) * p->delay, 15);
         entry = (void *)((u8 *)p + i * 0x2C);
-        entry->entries[0].x = p->target.x + x;
-        entry->entries[0].z = p->target.z + Div((p->target.z - p->saved[i].z) * p->delay, 15);
-        entry->entries[0].opacity += 3;
-        if (entry->entries[0].opacity > 63) {
-            entry->entries[0].opacity = 64;
+        entry->entries[0].presentation.x = p->target.x + x;
+        entry->entries[0].presentation.z =
+            p->target.z + Div((p->target.z - p->saved[i].z) * p->delay, 15);
+        entry->entries[0].presentation.opacity += 3;
+        if (entry->entries[0].presentation.opacity > 63) {
+            entry->entries[0].presentation.opacity = 64;
         }
     }
     if (!(p->flagsD80 & 1) && --p->delay == 0) {
@@ -73,26 +76,25 @@ void PhaseObject_ConvergeEntries(struct PhaseObjectView *p)
         u8 *flags8D = &p->flags8D;
         s16 *targetX = &p->target.x;
         s16 *targetZ = &p->target.z;
-        s8 *opacity = &p->entries[0].opacity;
+        struct PhaseEntryPresentation *entry = &p->entries[0].presentation;
         u32 offset = 0;
         u32 opacityValue = 64;
         u32 *flags = &p->entries[0].flags;
         u32 bit = 1;
         for (i = 3; i >= 0; i--) {
-            *(s16 *)(opacity + 0x14) = *targetX;
-            *(s16 *)(opacity + 0x18) = *targetZ;
-            *opacity = opacityValue;
+            entry->x = *targetX;
+            entry->z = *targetZ;
+            entry->opacity = opacityValue;
             *(u32 *)((u8 *)flags + offset) |= bit;
-            opacity += 0x2C;
+            entry = (void *)((u8 *)entry + sizeof(struct PhaseEntryView));
             offset += 0x2C;
         }
         p->mainFlags &= ~1;
         p->colliderFlagsA &= 0xFFFB;
         p->colliderFlagsB &= 0xFFFB;
         {
-            u32 one = 1;
+            u8 one = 1;
             u32 five = 5;
-            DEBUG_NOP();
             *enabled = one;
             *mode = five;
             *flags8D = one | *flags8D;

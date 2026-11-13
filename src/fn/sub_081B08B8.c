@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 
@@ -46,15 +45,11 @@ static inline u8 MotionEnded(struct PairedSceneHalf *p)
 static inline u32 PlayerNear(struct PairedSceneHalf *p)
 {
     struct ContactPosition *player = (struct ContactPosition *)Player_GetEffectivePosition(0);
-    register u32 scratch asm("r3");
     s32 x, dx;
     s32 dz;
     u32 result;
     s32 distance;
-    /* The opaque scratch value is used only by allocation constraints. */
-    asm("" : "=r"(scratch));
     x = player->x;
-    asm("" : : "r"(scratch));
     dx = x - p->sprite.position.x;
     dz = player->z - p->sprite.position.z;
     distance = dx * dx + dz * dz;
@@ -121,7 +116,10 @@ void ActorStatus_UpdatePlayerApproach(struct VanargandAttackPair *boss,
             }
             MotionTrack_Update((struct OrbitMotion *)&p->motion);
             if (Vanargand_GetComponentWithFlag10((u8 *)owner) >= 0) {
-                goto completed;
+                u32 next = 4;
+                p->actionCounters[0] = next;
+                p->actionCounters[1] = 0;
+                *enter = 1;
             } else if (PlayerNear(p)) {
                 {
                     u32 next = 2;
@@ -165,10 +163,10 @@ void ActorStatus_UpdatePlayerApproach(struct VanargandAttackPair *boss,
                 u32 *timer = &p->actionCounters[1];
                 if (++*timer > 30) {
                     SetAnimation(p, (void *)owner->effectResource, 9, 0);
-                completed: {
-                    u32 next = 4;
-                    p->actionCounters[0] = next;
-                }
+                    {
+                        u32 next = 4;
+                        p->actionCounters[0] = next;
+                    }
                     p->actionCounters[1] = 0;
                     *enter = 1;
                 }

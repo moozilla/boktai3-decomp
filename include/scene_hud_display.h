@@ -6,15 +6,12 @@
 #include "scene_input.h"
 #include "contact_actor.h"
 #include "scene_vec.h"
+#include "scene_value_equipment.h"
+#include "contact_swarm_sprite.h"
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
     u8 unknownC[0x14];
-};
-struct SceneHudDigitView {
-    u8 unknown0[0x20];
-    u8 resource[0x12E8];
-    struct SceneInputWidget label, digits[4];
 };
 struct SceneHudWidgetMotion {
     struct SceneVec from, to;
@@ -72,50 +69,66 @@ struct SceneHudState {
     u8 widgetResource[0x40];        /* 0x64 */
     u8 motionResource[0x20];        /* 0xA4: keyframe resource */
     u8 unknownC4[0x40];
-    u8 actionResultResources[2][0x20]; /* 0x104: normal and bonus keyframes */
-    u8 controlAnimationResource[0x20]; /* 0x144 */
-    u8 comparisonResource[0x20];       /* 0x164 */
-    u8 unknown184[0xA12 - 0x184];
+    u8 actionResultResources[2][0x20];      /* 0x104: normal and bonus keyframes */
+    u8 controlAnimationResource[0x20];      /* 0x144 */
+    u8 comparisonResource[0x20];            /* 0x164 */
+    struct ContactSwarmSprite promptSprite; /* 0x184 */
+    u8 unknown1B0[0x1C];
+    struct DisplaySequenceState promptSequence; /* 0x1CC */
+    const void *promptSequenceResource;         /* 0x1DC */
+    u8 unknown1E0[0xA12 - 0x1E0];
     u16 savedMenuMode; /* 0xA12: restored after page fade */
-    u8 unknownA14[0xA3F - 0xA14];
+    u8 unknownA14[4];
+    u16 blendedPalette[16]; /* 0xA18 */
+    u16 blendSourceBank, blendTargetBank;
+    u8 blendFrame, blendDuration, blendActive;
     u8 actionOwnerIndex;        /* 0xA3F: index into party actor pointers */
     struct Player *actionOwner; /* 0xA40 */
     u8 unknownA44[8];
-    u16 pageFadeTimer;       /* 0xA4C */
-    u16 actionTransferDelay; /* 0xA4E: frames after icon transfer */
-    u8 unknownA50[4];
-    void *pageCallback;      /* 0xA54 */
-    u8 comparisonModifier;   /* 0xA58: modifier-key comparison preview */
-    u8 auxiliaryToggle;      /* 0xA59: returned by panel toggle */
-    u16 creationParameter;   /* 0xA5A */
-    u16 initializationState; /* 0xA5C */
-    u8 controlMode;          /* 0xA5E: modes above two suppress controls */
-    s8 previousPage;         /* 0xA5F: initialized to -1 */
-    u8 unknownA60[2];
+    u16 pageFadeTimer;                              /* 0xA4C */
+    u16 actionTransferDelay;                        /* 0xA4E: frames after icon transfer */
+    void (*updateCallback)(struct SceneHudState *); /* 0xA50 */
+    void *pageCallback;                             /* 0xA54 */
+    u8 comparisonModifier;                          /* 0xA58: modifier-key comparison preview */
+    u8 auxiliaryToggle;                             /* 0xA59: returned by panel toggle */
+    u16 creationParameter;                          /* 0xA5A */
+    u16 initializationState;                        /* 0xA5C */
+    u8 controlMode;                                 /* 0xA5E: modes above two suppress controls */
+    s8 previousPage;                                /* 0xA5F: initialized to -1 */
+    u16 healthMeterBlinkTimer;                      /* 0xA60 */
     u16 energyMeterBlinkTimer; /* 0xA62: advances while the energy meter flashes */
-    u16 meterPulseFrame; /* 0xA64: 60-frame HUD meter pulse */
-    u8 unknownA66[8];
-    u16 timedStateParameter;            /* 0xA6E: sixth argument to 081781B4 */
-    u16 timedStateStart;                /* 0xA70: negative input clamps to zero */
-    u16 timedStateValue;                /* 0xA72 */
-    u16 timedStateTimer;                /* 0xA74: initialized to 300 */
-    u8 timedStateKind, timedStatePhase; /* 0xA76: phase zero or six */
-    u16 secondaryGaugeValue, secondaryGaugeMaximum; /* 0xA78 and 0xA7A */
-    u16 secondaryGaugeTimer; /* 0xA7C: frames left on the second gauge */
+    u16 meterPulseFrame;       /* 0xA64: 60-frame HUD meter pulse */
+    u8 unknownA66[6];
+    u8 playerValueEnabled, unknownA6D;
+    u16 timedStateParameter;                            /* 0xA6E: sixth argument to 081781B4 */
+    u16 timedStateStart;                                /* 0xA70: negative input clamps to zero */
+    u16 timedStateValue;                                /* 0xA72 */
+    u16 timedStateTimer;                                /* 0xA74: initialized to 300 */
+    u8 timedStateKind, timedStatePhase;                 /* 0xA76: phase zero or six */
+    u16 secondaryGaugeValue, secondaryGaugeMaximum;     /* 0xA78 and 0xA7A */
+    u16 secondaryGaugeTimer;                            /* 0xA7C: frames left on the second gauge */
     u8 secondaryGaugeFlashTimer, transientGaugeVisible; /* 0xA7E and 0xA7F */
-    u16 pulseFrame; /* 0xA80: wraps at 128 */
-    u8 unknownA82[0x12];
+    u16 pulseFrame;                                     /* 0xA80: wraps at 128 */
+    u8 unknownA82[4];
+    u16 warningBlinkTimer; /* 0xA86 */
+    s16 storedEnergy;
+    u16 storedEnergyTimer, storedEnergyFlash;
+    u8 unknownA8E[6];
     u8 panelInitialized; /* 0xA94: cleared during gameplay HUD resource setup (tentative) */
     u8 unknownA95[4];
     u8 energyTimerVisible; /* 0xA99: set after drawing the four energy timer digits */
     u8 unknownA9A[2];
     struct SceneHudControlAnimation controlAnimation; /* 0xA9C */
-    u8 unknownABC[0x41];
+    u8 unknownABC[0x40];
+    u8 timedStatusIconVisible;
     u8 actionRefreshRequested; /* 0xAFD */
-    u8 unknownAFE[2];
+    u8 timedEventLabelVisible, countdownEnabled;
     u8 actionCueInitialized, actionCueSuppressed; /* 0xB00 */
     u8 previousCueGroup, previousCueSelection;    /* 0xB02 */
-    u8 unknownB04[0x16C];
+    const u16 *countdownValue;
+    struct SceneInputWidget countdownDigits[3]; /* 0xB08 */
+    u32 selectorFlags;                          /* 0xC28 */
+    u8 unknownC2C[0x44];
     u8 primaryVisible;           /* 0xC70 */
     u8 primarySlideTimer;        /* 0xC71: remaining three-pixel slide steps */
     s8 primarySelection;         /* 0xC72 */
@@ -162,7 +175,7 @@ struct SceneHudState {
     struct SceneInputWidget motionWidgets[15]; /* 0x2AA0: extent bounded by valueWidgets */
     struct SceneInputWidget valueWidgets[2];   /* 0x3040, 0x30A0: widget indices 75 and 76 */
     u8 unknown3100[0xC0];
-    struct SceneInputWidget statusIcons[4]; /* 0x31C0 */
+    struct SceneInputWidget statusIcons[4];          /* 0x31C0 */
     struct SceneInputWidget comparisonIndicators[2]; /* 0x3340 */
     struct SceneInputWidget statMarkers[3][3];       /* 0x3400: base, bonus, delta */
     u8 unknown3760[0x300];
@@ -181,8 +194,14 @@ struct SceneHudState {
     u8 actionGridGroup; /* 0x4388: values above one select unlock confirmation */
     u8 unknown4389;
     u8 actionSelection; /* 0x438A: selected action lookup */
-    u8 unknown438B[0x5E];
-    u8 binaryChoice; /* 0x43E9: left/right toggles; A confirms, B cancels */
+    u8 unknown438B[2];
+    u8 savedActionSelection; /* 0x438D */
+    u8 unknown438E[0x26];
+    u16 overridePalette[16];  /* 0x43B4 */
+    u8 highlightPalettePhase; /* 0x43D4 */
+    u8 unknown43D5[0x13];
+    u8 directionRepeatTimer; /* 0x43E8 */
+    u8 binaryChoice;         /* 0x43E9: left/right toggles; A confirms, B cancels */
     u8 unknown43EA[2];
     struct SceneHudWidgetMotion widgetMotions[1]; /* 0x43EC: indexed, count unconfirmed */
     u8 unknown440C[0x20];
@@ -194,16 +213,22 @@ struct SceneHudState {
         appliedStatIncrease; /* 0x4862: base-stat bonus selection and clamped increase */
     u8 unknown4864[2];
     s16 appliedStatB; /* 0x4866: nonnegative stat B change */
-    u8 unknown4868[0x30];
-    s8 comparisonProfiles[0x14]; /* 0x4898: profile index per party member, extent tentative */
+    u8 unknown4868[0x1c];
+    struct SceneValueEquipment alternateEquipment; /* 0x4884 */
+    u8 unknown4894[4];
+    s8 comparisonProfiles[0x10]; /* 0x4898: profile index per party member, extent tentative */
+    u16 entryCount; /* 0x48A8: list-menu count */
+    u8 rowIndex, unknown48AB;
     u8 comparisonValues[3];      /* 0x48AC: capped combined stat values */
     u8 unknown48AF;
     s16 comparisonDeltas[3];  /* 0x48B0: signed bar adjustments after offsets */
     s16 comparisonOffsets[3]; /* 0x48B6: signed bar adjustments */
     u8 pageInputCooldown;     /* 0x48BC */
-    u8 unknown48BD[0xB];
-    s32 timedMessageWindow; /* 0x48C8 */
-    u8 unknown48CC[0x19];
+    u8 unknown48BD[7];
+    s32 primaryTextWindow;       /* 0x48C4 */
+    s32 timedMessageWindow;      /* 0x48C8 */
+    s32 auxiliaryTextWindows[6]; /* 0x48CC */
+    u8 unknown48E4;
     u8 pageReturnToParent; /* 0x48E5 */
     u8 selectedQuantity;   /* 0x48E6: multiplied by valueRate */
     u8 unknown48E7;
@@ -226,12 +251,10 @@ struct SceneHudState {
     struct SceneInputWidget ownerAuxWidgets[6]; /* 0x4A70 */
     u8 unknown4CB0[0x28];
     u8 initializationFlag; /* 0x4CD8: cleared by both initializers */
-    u8 unknown4CD9[0x4D90 - 0x4CD9];
-    u8 equippedIconSlots[8]; /* 0x4D90: inventory slot for each visible equipped icon */
-};
-struct SceneHudNumericView {
-    u8 unknown0[0x50C];
-    s32 value50C;
+    u8 unknown4CD9[0x4D80 - 0x4CD9];
+    s8 categoryEntrySlots[8];   /* 0x4D80 */
+    s8 unlockEntrySlots[8];     /* 0x4D88 */
+    s8 equippedIconSlots[8];    /* 0x4D90: inventory slot for each visible equipped icon */
 };
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);

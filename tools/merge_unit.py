@@ -7,14 +7,15 @@ Concatenates the inputs' top-level items. Identical repeats (prototypes,
 externs, struct definitions, static helpers, #defines) are kept once; items
 whose name repeats with a different body are reported as conflicts, which must
 be unified (usually into a shared header) before merging. With --write the
-output is written and the inputs are removed (git rm). Run make afterwards:
+output is written and the inputs are removed without changing the git index.
+Check the merged unit with tools/check.py afterwards:
 merging can change code generation only through such declarations.
 """
 import argparse
 import os
 import re
-import subprocess
 import sys
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from split import c_functions  # noqa: E402
@@ -116,6 +117,16 @@ def merge(paths):
     return "\n".join(includes) + "\n\n" + "\n\n".join(body) + "\n", conflicts
 
 
+def write_merge(output, inputs, text):
+    """Publish the merged source before removing inputs; leave staging to callers.
+    Relative paths are taken from the repository root; repeated inputs are removed once."""
+    output = Path(ROOT, output)
+    output.write_text(text)
+    for path in dict.fromkeys(Path(ROOT, p) for p in inputs):
+        if path.resolve() != output.resolve():
+            path.unlink()
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("out")
@@ -130,9 +141,8 @@ def main():
     names = [n for p in a.inputs for n in c_functions(os.path.join(ROOT, p))]
     print(f"{len(a.inputs)} files -> {a.out}: {len(names)} functions")
     if a.write:
-        subprocess.run(["git", "rm", "-q"] + [p for p in a.inputs if os.path.abspath(p) != os.path.abspath(a.out)],
-                       cwd=ROOT, check=True)
-        open(os.path.join(ROOT, a.out), "w").write(text)
+        write_merge(os.path.join(ROOT, a.out),
+                    [os.path.join(ROOT, p) for p in a.inputs], text)
 
 
 if __name__ == "__main__":

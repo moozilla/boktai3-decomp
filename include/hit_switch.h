@@ -1,18 +1,10 @@
 #ifndef GUARD_HIT_SWITCH_H
 #define GUARD_HIT_SWITCH_H
 #include "scene_object.h"
+#include "display_animation.h"
 /* Tentative identity: hit-counted switches that alter a terrain cell. */
-struct HitSwitchSprite {
-    u32 flags;
-    u8 unknown4[3], renderMode;
-    u8 unknown8[8];
-    u16 frame;
-    u8 unknown12[10];
-    struct SceneVec position;
-    u8 unknown24[8];
-};
 struct HitSwitchEntry {
-    struct HitSwitchSprite sprite;
+    struct DisplaySequenceSprite sprite;
     struct SceneAnimation animation;
     struct SceneCollider collider;
     struct SceneBody body;
@@ -27,10 +19,17 @@ struct HitSwitchEntry {
     u32 completedScriptId;
 };
 struct HitSwitchManager {
-    u8 task[0x18];
+    struct Task task;
     u8 count, hitPending, unknown1A, flash;
     u16 palette[16];
     struct HitSwitchEntry entries[8];
+};
+struct HitSwitchExtentHalf {
+    u32 lo : 16;
+    u32 hi : 16;
+};
+struct HitSwitchExtent {
+    struct HitSwitchExtentHalf a, b;
 };
 struct HitSwitchScriptArgs {
     u32 count : 16;

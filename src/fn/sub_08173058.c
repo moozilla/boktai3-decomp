@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
 void PauseMenu_SmoothPoint(void *, void *, s32);
-void PauseMenu_InterpolateActivePairPositions(void *, s32);
+void MenuDisplay_InterpolateActivePairPositions(void *, s32);
 void sub_0822EB14(u32, u32);
 void sub_0822E764(u32, u32);
 void PauseMenu_RefreshFruitAndUnlockIcons(void *);
@@ -20,7 +20,7 @@ void SceneHud_FinishActionTransfer(struct SceneHudState *p)
         s32 n = 12 - *timer;
         PauseMenu_SmoothPoint(&p->motionWidgets[0].position, &p->actionTargets[0], n);
         PauseMenu_SmoothPoint(&p->motionWidgets[1].position, &p->actionTargets[1], n);
-        PauseMenu_InterpolateActivePairPositions(p, n);
+        MenuDisplay_InterpolateActivePairPositions(p, n);
     } else {
         u32 *q = &p->motionWidgets[0].flags;
         u32 v = *q, m = 1;

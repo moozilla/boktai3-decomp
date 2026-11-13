@@ -5,7 +5,7 @@ void ScrollingDialogue_RequestHide(void);
 void SceneHud_GetActionIconPosition(void *, u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 s32 Selection_GetDisplayFrame(s32);
-void SceneHud_BeginIconMotion(u8 *, u32, s32, u32, void *, void *, u32, u32);
+void PauseMenu_BeginSpriteMotion(u8 *, u32, s32, u32, void *, void *, u32, u32);
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void MotionSequence_AdvanceAfterDelay(void);
@@ -45,7 +45,7 @@ void PauseMenu_BeginTypeFourteenItemUse(u8 *s)
     SceneHud_GetActionIconPosition(w, s[0x4387]);
     result = Selection_GetDisplayFrame(Inventory_GetQuantityByStorage(s[0x4860], *kind));
     later = (*kind) + 10;
-    SceneHud_BeginIconMotion(s, 0, result, ((struct S *)s)->elems[later].v, v, w, 0x18, 0x10);
+    PauseMenu_BeginSpriteMotion(s, 0, result, ((struct S *)s)->elems[later].v, v, w, 0x18, 0x10);
     Sound_PlaySong(0x38A);
     Hud_SetInteractionCallback(s, MotionSequence_AdvanceAfterDelay, 1);
 }

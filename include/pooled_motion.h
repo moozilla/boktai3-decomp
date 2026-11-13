@@ -41,7 +41,7 @@ struct MotionPool *MotionPool_Create(void);
 struct MotionPoolSlot *MotionPool_FindFreeSlot(struct MotionPool *, s32 *);
 s32 MotionPool_Spawn(const struct MotionPoolParams *, const struct ContactPosition *);
 void MotionPool_InitializeParams(struct MotionPoolParams *);
-void MotionPool_SetLifetimeAndVelocity(struct MotionPoolParams *, u16, u16, u8, s32);
+void MotionPool_SetLifetimeAndVelocity(struct MotionPoolParams *, u16, u16, u32, s32);
 void MotionPool_SetTracking(struct MotionPoolParams *, u16, u32, u8);
 void MotionPool_SetContact(struct MotionPoolParams *, u32, u32, u32, u32, u32);
 void MotionPool_SetBounds(struct MotionPoolParams *, u16, u16, u16);

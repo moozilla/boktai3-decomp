@@ -7,13 +7,13 @@ struct HudManager {
     u8 padA4E[0xA];
     u8 state;
 };
-void SceneHud_DrawSelectedClock(struct HudManager *);
+void Hud_DrawSelectedClock(struct HudManager *);
 void Hud_InitSelectionBounds(u32, u32);
 void Hud_SetUpdateCallback(struct HudManager *, void (*)(void));
 void SceneHud_UpdatePageInput(void);
 void Hud_UpdateBlendRamp(struct HudManager *p)
 {
-    SceneHud_DrawSelectedClock(p);
+    Hud_DrawSelectedClock(p);
     Hud_InitSelectionBounds(p->timer * 4, 0x1084);
     if (++p->timer > 16) {
         p->state = 0;

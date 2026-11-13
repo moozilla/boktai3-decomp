@@ -5,11 +5,11 @@ u32 SceneInput_NavigateGridKeys(void *, u32);
 void SceneHud_SetActionCursorPosition(void *, u32);
 void SceneHud_ShowSelectionDescription(void *);
 void MenuDisplay_UpdateActionPrompt(void *, u32);
-s32 PauseMenu_CanSwapCategoryEntries(void *, u32, u32, u32);
+s32 MenuDisplay_CanSwapCategoryEntries(void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 s32 SolarFruit_GetInventorySlot(u32);
 void SceneHud_LoadActionMotion(void *, u32, u32, u32, u32);
-void sub_0816676C(void *, u32);
+void MenuDisplay_BeginActionTransfer(void *, u32);
 u32 GameState_GetUnlockEntry(u32);
 void SceneHud_FinishActionTransfer(void);
 void SceneHud_UpdateActionChoice(void);
@@ -39,7 +39,7 @@ void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
         if (p->actionInput[1] <= 1) {
             current = *selected;
             source = &p->actionSelection;
-            if (!PauseMenu_CanSwapCategoryEntries(p, current, *source, 0)) {
+            if (!MenuDisplay_CanSwapCategoryEntries(p, current, *source, 0)) {
                 Sound_PlaySong(0x192);
                 return;
             }
@@ -50,12 +50,12 @@ void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
                     SceneHud_LoadActionMotion(p, 0, *source, *selected, 0);
                 if (SolarFruit_GetInventorySlot(*selected) != -1)
                     SceneHud_LoadActionMotion(p, 1, *selected, *source, 0);
-                sub_0816676C(p, 0);
+                MenuDisplay_BeginActionTransfer(p, 0);
             }
         } else {
             current = *selected;
             source = &p->actionSelection;
-            if (!PauseMenu_CanSwapCategoryEntries(p, current, *source, 1)) {
+            if (!MenuDisplay_CanSwapCategoryEntries(p, current, *source, 1)) {
                 Sound_PlaySong(0x192);
                 return;
             }
@@ -63,7 +63,7 @@ void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
                 SceneHud_LoadActionMotion(p, 0, *source, *selected, 1);
             if (GameState_GetUnlockEntry(*selected - 8))
                 SceneHud_LoadActionMotion(p, 1, *selected, *source, 1);
-            sub_0816676C(p, 1);
+            MenuDisplay_BeginActionTransfer(p, 1);
         }
         p->categoryWidgets[p->actionSelection + 10].flags |= 1;
         p->categoryWidgets[p->actionCursor + 10].flags |= 1;

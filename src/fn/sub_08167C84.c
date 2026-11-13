@@ -22,7 +22,7 @@ void *SpriteEffectController_Create(const struct SceneVec *, const struct SceneV
                                     u32, u32, u32, u32, u32, u32, u32, s32, s32, s32, s32, s32,
                                     s32);
 void Hud_DrawAlternateMeterLabel(struct SceneHudPrompt *, s32, s32);
-void StatDisplay_DrawGauge(struct SceneHudPrompt *, s32, s32);
+void Hud_DrawPlayerGauge(struct SceneHudPrompt *, s32, s32);
 void Hud_RefreshActivePanel(struct SceneHudPrompt *);
 s32 PauseMenu_TryBeginEquipmentSelection(struct SceneHudPrompt *);
 void Hud_BeginSavedBlend(struct SceneHudPrompt *);
@@ -72,7 +72,7 @@ void Hud_UpdateEquipmentPrompt(struct SceneHudPrompt *hud)
         }
         if (hud->effectCountdown <= 39) {
             Hud_DrawAlternateMeterLabel(hud, 0, 3);
-            StatDisplay_DrawGauge(hud, 3, 3);
+            Hud_DrawPlayerGauge(hud, 3, 3);
         }
         hud->effectCountdown--;
         if (!hud->effectCountdown)

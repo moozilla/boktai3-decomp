@@ -8,8 +8,9 @@ static inline u32 StepPlayback(struct DepartureDrawable *owner, struct DisplaySe
 }
 
 static inline u32 StepPlaybackOne(struct DepartureDrawable *owner,
-                                  struct DisplaySequenceState *state, u32 maskBit)
+                                  struct DisplaySequenceState *frames, u32 maskBit)
 {
+    struct DisplaySequenceState *state = frames;
     return PlayerCue_StepSequenceEndedWithFirstFlipMask(&owner->sprite, state, maskBit);
 }
 
@@ -50,7 +51,7 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                 struct DepartureDrawable *foreground;
                 struct DisplaySequenceState *state;
                 u32 *field = &screen->foreground.mode;
-                register u32 one asm("r5") = 1;
+                u32 one = 1;
                 *field = one;
                 screen->foreground.sequenceId = 3;
                 state = &screen->foreground.sequence;
@@ -130,7 +131,7 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                 struct DepartureDrawable *foreground;
                 struct DisplaySequenceState *state;
                 u32 *field = &screen->endingFinished;
-                register u32 one asm("r5") = 1;
+                u32 one = 1;
                 *field = one;
                 screen->foreground.sequenceId = 0;
                 state = &screen->foreground.sequence;

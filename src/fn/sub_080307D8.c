@@ -30,8 +30,8 @@ int Weather_GetType(void);
 int SunClock_GetBaseHour(void);
 int SunClock_GetBaseMinute(void);
 void Actor_RunCallbacks(void *, struct Actor *);
-void sub_0802E188(struct Manager *);
-void sub_0802E04C(void *);
+void Actor_UpdateInteractionCue(struct Manager *);
+void Actor_EmitTowardNearbyActors(void *);
 int Actor_Destroy(struct Actor *);
 int SceneActorManager_Destroy(struct Manager *m)
 {

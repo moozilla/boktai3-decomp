@@ -1,9 +1,14 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
 #include "display_sequence_inline.h"
 #include "projectile_pool.h"
+struct ProjectilePlaybackConfig {
+    u16 baseY;
+    s16 spriteFlag;
+    u32 script, sequence;
+    s16 persist;
+};
 extern u32 gUnk_02000560;
 u8 *TerrainModifiers_FindCellOverride(int, int);
 static inline s32 Truncate(s32 v)
@@ -59,12 +64,13 @@ s32 ProjectilePool_Update(struct TimedProjectilePool *pool)
     base = pool->slots;
     for (i = 0, cursor = base; i <= 15; i++, cursor = Next(cursor), base = Next(base)) {
         u32 live = pool->mask & (1 << i);
-        u16 *baseY = &base->params.baseY;
+        struct ProjectilePlaybackConfig *playback = (void *)&base->params.baseY;
         if (live) {
             struct DisplaySequenceSprite *o = &base->sprite;
             struct ContactCollider *c = &base->collider;
             struct ProjectileConfig *p = &base->params;
-            struct ContactPosition *v;
+            struct ContactPosition *position;
+            struct ContactPosition *velocity;
             struct DisplaySequenceSprite *spr;
             {
                 s32 r = cursor->params.callback(base, i);
@@ -72,31 +78,28 @@ s32 ProjectilePool_Update(struct TimedProjectilePool *pool)
                 if (r == 1)
                     goto release;
             }
-            asm("" ::"r"(o));
             {
                 u32 move = cursor->flags & 1;
-                v = &base->velocity;
-                /* Nine uses raise v's allocation priority above cursor. */
-                asm("" ::"r"(v), "r"(v), "r"(v), "r"(v), "r"(v), "r"(v), "r"(v), "r"(v), "r"(v));
+                velocity = &base->velocity;
                 if (move)
-                    Polar(v, p);
+                    Polar(velocity, p);
             }
             {
                 struct ContactPosition *pos = &o->position;
                 o->position.x = o->position.x + cursor->velocity.x;
-                pos->y = pos->y + v->y;
-                pos->z = pos->z + v->z;
+                pos->y = pos->y + velocity->y;
+                pos->z = pos->z + velocity->z;
                 p->velocity -= p->gravity;
                 p->height += p->velocity;
-                v = pos;
+                position = pos;
             }
             if (p->height < 0)
-                o->position.y = *baseY - ((~p->height + 1) >> 12);
+                o->position.y = playback->baseY - ((~p->height + 1) >> 12);
             else
-                o->position.y = (p->height >> 12) + *baseY;
+                o->position.y = (p->height >> 12) + playback->baseY;
             if (o->position.y >= 0) {
                 s32 x = o->position.x >> 8;
-                s32 z = v->z >> 8;
+                s32 z = position->z >> 8;
                 s32 index;
                 if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                     index = 0;
@@ -105,7 +108,7 @@ s32 ProjectilePool_Update(struct TimedProjectilePool *pool)
                 if ((u32)((*CellData(index) & 0xf) << 8) <= o->position.y)
                     goto alive;
             }
-            if (base->params.persist == 0) {
+            if (playback->persist == 0) {
             release:
                 ProjectilePool_ReleaseSlot(pool, base, i);
                 continue;
@@ -163,7 +166,7 @@ s32 ProjectilePool_Update(struct TimedProjectilePool *pool)
                 }
             }
             if ((cursor->flags & 2) || (cursor->timer & 1)) {
-                Collider_SetPosition(c, v, 0);
+                Collider_SetPosition(c, position, 0);
                 Collider_Refresh(c);
             }
             cursor->timer++;

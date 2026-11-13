@@ -3,6 +3,7 @@
 
 #include "paired_scene_actor.h"
 #include "scene_vec.h"
+#include "positioned_effect_coordinates.h"
 #include "vanargand_damage_part.h"
 
 struct Player;
@@ -15,7 +16,8 @@ struct VanargandBodyAnimation {
 };
 
 struct VanargandPairAttack {
-    u8 pad0[0x54];
+    u8 pad0[0x48];
+    u32 bodyHeader[3]; /* SceneBody header preceding the world position. */
     struct SceneVec position;
     u8 pad5C[0x90 - 0x5C];
     u32 actionTimer;
@@ -36,9 +38,12 @@ struct VanargandPairAttack {
     u8 (*callback)(struct VanargandPairAttack *);
     u8 pad108[4];
     struct Player *player;
-    u8 pad110[0x18C - 0x110];
+    u8 pad110[0x174 - 0x110];
+    struct PositionedEffectCoordinates coordinates;
     struct VanargandBodyAnimation animation;
-    u8 drawable[0x21C - 0x1EC];
+    u8 drawable[0x20C - 0x1EC];
+    struct ContactPosition effectOrigin;
+    u8 unknown214[8];
     u8 actionSequence[0x3FC - 0x21C];
     struct VanargandDamagePart part;
     struct MotionTrack track;
@@ -53,7 +58,7 @@ struct VanargandPairAttack {
     u16 thresholds[3];
     u32 hitFlags;
     s16 damage;
-    u8 pad5AA[2];
+    u16 hitDuration;
     s16 accumulatedDamage;
     u16 flashTimer;
     u16 delay;
@@ -63,9 +68,9 @@ struct VanargandPairAttack {
     u16 attackParameter5B8, attackParameter5BA;
     u8 pad5BC[0x5C2 - 0x5BC];
     s16 mode;
-    u8 unknown5C4[0x6C4 - 0x5C4];
-    struct DamageNumberSource damageSource;
-    u8 unknown6CC[0x718 - 0x6CC];
+    u8 unknown5C4[4];
+    struct ContactCollider attackCollider, radialColliders[2];
+    struct ContactCollider damageSource; /* Contact collider also identifies damage numbers. */
     u16 palettes[16][16];
     u8 fadeA[0xB18 - 0x918];
     u8 fadeB[0xD18 - 0xB18];

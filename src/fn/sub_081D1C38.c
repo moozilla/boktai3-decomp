@@ -1,4 +1,4 @@
-// confidence=low: SceneActorAnimation_UpdateWalkToPosition (sub_0802EA90) at a fixed speed of 8,
+// confidence=low: Actor_UpdateWalkToPosition (Actor_UpdateWalkToPosition) at a fixed speed of 8,
 // stopping within 10 units, for a tagged scene NPC.
 #include "global.h"
 #include "scene_facing.h"

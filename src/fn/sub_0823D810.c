@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player.h"
 
-u32 sub_08220204(struct Player *, void *);
+u32 Collision_CalculateElementalResponse(struct Player *, void *);
 s32 sub_08249244(void *, struct Player *, void *, void *);
 s32 PlayerLink_IsActionModeAllowed(void *);
 
@@ -23,7 +23,7 @@ void Player_ApplyContactCosts(struct Player *p, struct ContactCostTarget *t)
     s32 mask = 0x1F;
     if ((t->flagsA & mask) != 0) {
         m = *(struct Player **)((u8 *)p + 0x50);
-        sub_08220204(p, t);
+        Collision_CalculateElementalResponse(p, t);
         i = 0;
         do {
             void *cb = m->contactCostCallbacks[i];

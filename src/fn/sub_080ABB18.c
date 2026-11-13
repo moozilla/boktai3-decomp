@@ -37,10 +37,10 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
     u8 *initialCount;
     u32 *motionCounter;
     void **control;
+    u16 *motionTimer;
     u8 *direction, *state, *phase, *behavior;
     u32 *stateCounter;
     u8 *done, *savedDirection, *queued, *prepared, *kind;
-    u16 *motionTimer;
     register u32 *animationFlags asm("r9");
     if (p->reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
@@ -122,7 +122,6 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
         }
         {
             u32 behaviorCode = 5;
-            asm("" : : "r"(behaviorCode));
             *state = zero8;
             *phase = zero8;
             *behavior = behaviorCode;

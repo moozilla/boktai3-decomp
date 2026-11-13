@@ -1,7 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "vanargand_pair_attack.h"
 #include "vanargand_stage_colors.h"
-// MATCHING_CONCESSION: register-pinning
 void Sound_PlaySong(u32);
 void Vanargand_ResetPaletteTransition(struct VanargandPairAttack *);
 void CpuSet(const void *, void *, u32);
@@ -85,18 +85,17 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
     void *display = &p->damageSource;
     s32 damage = p->damage;
     u32 special = (p->hitFlags >> 6) & 1;
-    register s32 partDamage asm("sl");
+    s32 partDamage;
     u32 partSpecial;
     p->damage = 0;
     p->hitFlags = 0;
-    if (p->part.flags & 6) {
+    if ((u8)p->part.flags & 6) {
         partDamage = p->part.damage;
         partSpecial = (partFlags(p) >> 6) & 1;
     } else {
         partDamage = 0;
         partSpecial = 0;
     }
-    asm("" : "+r"(partDamage));
     if (damage > 0 || special) {
         p->health -= damage;
         self->accumulatedDamage += damage;

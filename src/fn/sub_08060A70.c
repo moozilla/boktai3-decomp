@@ -26,9 +26,9 @@ void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *pan
         u32 slot;
         s32 id, assigned;
         if (i == 0)
-            slot = *(u8 *)((u8 *)panel + 0x1BEA);
+            slot = panel->savedSelection;
         else
-            slot = *(u8 *)((u8 *)panel + 0x1BE7);
+            slot = panel->selection;
         ((struct SceneInventoryActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
         assigned = SceneInventory_FindConsumableAssignment(slot);
         if (assigned >= 0)

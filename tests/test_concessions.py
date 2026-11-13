@@ -43,6 +43,15 @@ class Kinds(unittest.TestCase):
         self.assertEqual(kinds("void f(s32 *p) { g(*(volatile s32 *)&p->x); }"), ["volatile"])
         self.assertEqual(kinds("void f(void) { volatile u16 *reg = (vu16 *)0x4000000; *(vu16 *)&REG_IE = 1; }"), [])
 
+    def test_volatile_typedef_locals(self):
+        for alias in ("vu8", "vu16", "vu32", "vs8", "vs16", "vs32"):
+            with self.subTest(alias=alias):
+                self.assertEqual(kinds("void f(void) { " + alias + " zero; }"), ["volatile"])
+                self.assertEqual(kinds("void f(void) { " + alias + " values[2] = {0}; }"), ["volatile"])
+                self.assertEqual(kinds("void f(void) { " + alias + " *reg = REG_ADDR; }"), [])
+        self.assertEqual(kinds("void f(vu32 *zero) { *zero = 0; }"), [])
+        self.assertEqual(kinds("// vu32 zero;\nvoid f(void) { u32 zero; }"), [])
+
     def test_comments_are_not_code(self):
         self.assertEqual(kinds('void f(void) { /* asm("") */ g(); } // DEBUG_NOP()'), [])
 

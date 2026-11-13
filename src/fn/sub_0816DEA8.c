@@ -14,7 +14,7 @@ struct InventoryGrid {
 };
 u32 PauseMenu_UpdateSpriteMotion(void *, u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-u32 PlayerPanel_GetStatusValue(void *);
+u32 PauseMenu_GetPlayerStatusValue(void *);
 void PauseMenu_StartPaletteTransition(void *, u32, u32, s32);
 void sub_0816D634(void *, u32);
 void InventoryGrid_ShowNumber(void *, s32, s16 *);
@@ -36,7 +36,7 @@ void InventoryGrid_BeginNumberPhase(struct InventoryGrid *s)
         if (++s->phaseCounter > 7) {
             s->flags2AA8 |= 1;
             sub_0816D634(s, s->selector438A);
-            PauseMenu_StartPaletteTransition(s, 0x16E, PlayerPanel_GetStatusValue(s), 16);
+            PauseMenu_StartPaletteTransition(s, 0x16E, PauseMenu_GetPlayerStatusValue(s), 16);
             SetVector(&vec, 32, 48, 0);
             InventoryGrid_ShowNumber(s, s->value4866, (s16 *)&vec);
             Sound_PlaySong(0x10D);

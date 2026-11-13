@@ -1,0 +1,289 @@
+#include "stacked_actor.h"
+#include "engine_globals.h"
+#include "player.h"
+struct ActorMapView {
+    u8 unknown0[4];
+    u8 *cells;
+    u8 unknown8[0x1C];
+    u16 rowOffsets[1];
+};
+s32 Script_SeekToKeyword(s32);
+s32 Script_GetValue(void);
+u8 *TerrainModifiers_FindCellOverride(u32, u32);
+void AnimData_Load(void *, u32);
+void Sprite_Init(void *, void *, u32);
+void AnimData_SelectPaletteBank(void *, u32);
+void StackedActor_InitParticles(struct StackedActor *);
+s32 SceneMessages_RegisterReceiver(void *, s32, s32);
+void Sound_PlaySong(u32);
+void ScriptUtility_SetControlFlag(u32);
+void Player_SetPositionAndSave(u8 *, struct StackedActorPosition *);
+void PlayerCue_Hide(u8 *);
+void StackedActor_TickDisabled(struct StackedActor *);
+void StackedActor_Appear(struct StackedActor *);
+void StackedActor_WaitForPlayerRelease(struct StackedActor *);
+s32 TetherActor_BeginKindFourStateTen(void);
+void TetherActor_SetPosition(struct StackedActorPosition *);
+s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
+{
+    struct InitCache {
+        s32 tag;
+        void *graphics;
+        struct StackedActorPosition *world;
+        struct StackedActorSprite *segments;
+        void *receiver;
+        u16 *proximity;
+    } cache;
+    u16 *baseFrame;
+    u32 present;
+    u32 mode;
+
+    cache.tag = tag;
+    present = Script_SeekToKeyword('p');
+    if (present) {
+        s32 x, z;
+        s32 index;
+        struct StackedActorPosition *world;
+        s16 *worldY;
+        u8 *cell;
+        u32 type;
+        s32 y;
+        u32 value = Script_GetValue();
+        world = &actor->world;
+        world->x = value;
+        value = Script_GetValue();
+        worldY = &actor->world.y;
+        *worldY = value;
+        actor->world.z = Script_GetValue();
+        x = world->x >> 8;
+        z = world->z >> 8;
+        cache.world = world;
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+            index = 0;
+        else {
+            u32 row = ((struct ActorMapView *)gTerrainMap)->rowOffsets[z];
+            index = row + x;
+        }
+        cell = TerrainModifiers_FindCellOverride(index, 1);
+        if (cell)
+            cell += 4;
+        else {
+            struct ActorMapView *map = ((struct ActorMapView *)gTerrainMap);
+            u32 offset = index * 4 + 12;
+            cell = map->cells + offset;
+        }
+        type = *cell >> 4;
+        y = (*cell & 15) << 8;
+        switch (type) {
+            case 1:
+                y -= (u8)world->z;
+                break;
+            case 2:
+                y -= (u8)world->x;
+                break;
+        }
+        *worldY = y;
+    } else {
+        actor->world.x = present;
+        actor->world.y = present;
+        actor->world.z = present;
+        cache.world = &actor->world;
+    }
+    if (Script_SeekToKeyword('C'))
+        actor->pendingScriptId = Script_GetValue();
+    else
+        actor->pendingScriptId = 0;
+    if (Script_SeekToKeyword('c'))
+        actor->acceptedScriptId = Script_GetValue();
+    else
+        actor->acceptedScriptId = 0;
+    if (Script_SeekToKeyword('i'))
+        actor->completedScriptId = Script_GetValue();
+    else
+        actor->completedScriptId = 0;
+    if (Script_SeekToKeyword('o'))
+        actor->particleScriptId = Script_GetValue();
+    else
+        actor->particleScriptId = 0;
+    if (Script_SeekToKeyword('d'))
+        actor->baseFrame = Script_GetValue();
+    else
+        actor->baseFrame = 6;
+    baseFrame = &actor->baseFrame;
+    if (Script_SeekToKeyword('a'))
+        actor->interactionEnabled = Script_GetValue();
+    else
+        actor->interactionEnabled = 0;
+    if (Script_SeekToKeyword('n'))
+        actor->particleScriptValue = Script_GetValue();
+    else
+        actor->particleScriptValue = 0;
+    if (Script_SeekToKeyword('P'))
+        mode = Script_GetValue();
+    else
+        mode = 3;
+    {
+        u16 *source = baseFrame;
+        actor->paletteBase = (*source >> 1) * 3 + 160;
+    }
+    {
+        void *graphics = actor->graphics;
+        u16 *tiles = &actor->paletteBase;
+        struct StackedActorSprite *sprite;
+        void *shadowGraphics;
+        struct StackedActorSprite *shadow;
+        struct StackedActorPosition *shadowPosition;
+        AnimData_Load(graphics, 0xBA8);
+        sprite = &actor->sprite;
+        Sprite_Init(sprite, graphics, 0);
+        {
+            u16 *source = baseFrame;
+            sprite->frame = *source;
+        }
+        AnimData_SelectPaletteBank(graphics, *tiles);
+        actor->sprite.flags |= 0x200;
+        {
+            u8 *destination = &actor->sprite.renderMode;
+            u32 renderMode = mode;
+            *destination = renderMode;
+        }
+        {
+            struct StackedActorPosition *source = cache.world;
+            actor->sprite.position = *source;
+        }
+        shadowGraphics = actor->shadowGraphics;
+        AnimData_Load(shadowGraphics, 0xBA8);
+        shadow = &actor->shadow;
+        Sprite_Init(shadow, shadowGraphics, 0);
+        {
+            u16 *source = baseFrame;
+            shadow->frame = *source;
+        }
+        AnimData_SelectPaletteBank(shadowGraphics, *tiles);
+        shadow->flags |= 0x400;
+        {
+            u8 *destination = &actor->shadow.renderMode;
+            u32 renderMode = mode;
+            *destination = renderMode;
+        }
+        shadowPosition = &actor->shadow.position;
+        {
+            struct StackedActorPosition *source = cache.world;
+            *shadowPosition = *source;
+        }
+        {
+            s32 i = 0;
+            s32 count;
+            u32 one;
+            struct StackedActorSprite *savedShadow;
+            u8 *segmentGraphics;
+            cache.graphics = graphics;
+            savedShadow = shadow;
+            cache.segments = actor->segments;
+            {
+                void *receiver = actor->trigger;
+                u16 *state;
+                cache.receiver = receiver;
+                state = &actor->proximityState;
+                cache.proximity = state;
+            }
+            segmentGraphics = actor->segmentGraphics[0];
+            do {
+                struct StackedActorSprite *current;
+                AnimData_Load(segmentGraphics, 0xBA8);
+                current = &actor->segments[i];
+                Sprite_Init(current, segmentGraphics, 0);
+                one = 1;
+                current->frame = (*baseFrame & 1) + 16;
+                AnimData_SelectPaletteBank(segmentGraphics, actor->paletteBase + 2);
+                cache.segments[i].flags |= 0x201;
+                actor->segments[i].renderMode = 1;
+                actor->segments[i].position = *cache.world;
+                segmentGraphics += 0x1C;
+                {
+                    u32 step = 1;
+                    i += step;
+                }
+                count = i;
+            } while (count <= 2);
+            StackedActor_InitParticles(actor);
+            SceneMessages_RegisterReceiver(cache.receiver, cache.tag, 10);
+            if (Script_SeekToKeyword('D')) {
+                u32 zeroByte = 0;
+                u32 zeroHalf = 0;
+                u16 *state = cache.proximity;
+                *state = zeroHalf;
+                actor->animationPhase = zeroHalf;
+                actor->interactionDelay = zeroHalf;
+                actor->lift = zeroByte;
+                StackedActor_SetUpdate(actor, StackedActor_TickDisabled);
+            } else {
+                s32 active = 0;
+                s32 appear;
+                if (Script_SeekToKeyword('f'))
+                    active = Script_GetValue();
+                appear = 0;
+                if (Script_SeekToKeyword('s'))
+                    appear = Script_GetValue();
+                if (active) {
+                    s32 tether;
+                    Sound_PlaySong(0x160);
+                    actor->unknown380 = one;
+                    ScriptUtility_SetControlFlag(0);
+                    Player_SetPositionAndSave((*(u8 **)gPlayers), cache.world);
+                    PlayerCue_Hide((*(u8 **)gPlayers));
+                    actor->sprite.flags &= ~1;
+                    {
+                        u32 tile = actor->paletteBase + 2;
+                        AnimData_SelectPaletteBank(cache.graphics, tile);
+                    }
+                    {
+                        struct StackedActorSprite *target = savedShadow;
+                        target->flags |= one;
+                    }
+                    { actor->height = 7; }
+                    StackedActor_UpdateSegments(actor);
+                    { actor->animationPhase = 8; }
+                    *cache.proximity = one;
+                    { actor->interactionDelay = 10; }
+                    { actor->lift = 24; }
+                    actor->removeAfterUse = appear;
+                    StackedActor_SetUpdate(actor, StackedActor_WaitForPlayerRelease);
+                    tether = 0;
+                    if (Script_SeekToKeyword('w'))
+                        tether = Script_GetValue();
+                    if (tether) {
+                        if (!TetherActor_BeginKindFourStateTen())
+                            return 0;
+                        TetherActor_SetPosition(cache.world);
+                    }
+                } else {
+                    {
+                        u32 zeroByte = 0;
+                        u16 *state = cache.proximity;
+                        *state = active;
+                        { actor->animationPhase = active; }
+                        { actor->interactionDelay = active; }
+                        { actor->lift = zeroByte; }
+                    }
+                    if (appear) {
+                        Sound_PlaySong(0x15E);
+                        actor->sprite.flags |= 2;
+                        {
+                            struct StackedActorSprite *target = savedShadow;
+                            target->flags |= 2;
+                        }
+                        actor->sprite.scaleX = one;
+                        actor->sprite.scaleY = one;
+                        actor->shadow.scaleX = one;
+                        actor->shadow.scaleY = one;
+                        StackedActor_SetUpdate(actor, StackedActor_Appear);
+                    } else
+                        StackedActor_SetUpdate(actor, StackedActor_TickIdle);
+                }
+            }
+        }
+    }
+    gStackedActor = actor;
+    return 0;
+}

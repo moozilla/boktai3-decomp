@@ -1,0 +1,9 @@
+trace off
+wait 300
+shot startup_logo
+tap START
+wait 60
+shot startup_logo_after_start
+tap A
+wait 150
+shot clock_setup

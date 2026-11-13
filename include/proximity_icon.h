@@ -4,9 +4,9 @@
 #include "scene_object.h"
 #include "player.h"
 struct ProximityIcon {
-    u8 task[0x18];
+    struct Task task;
     u16 type, radius;
-    struct ProjectedDisplayEntry animation;
+    struct SceneInputWidget animation;
     struct ContactPosition origin;
 };
 s32 ProximityIcon_IsPlayerNearby(struct ProximityIcon *);

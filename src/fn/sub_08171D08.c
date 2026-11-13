@@ -1,11 +1,11 @@
 #include "global.h"
-s32 SceneHud_UpdateBinaryChoice(void *);
+s32 PauseMenu_UpdateBinaryChoice(void *);
 void Sound_PlaySong(s32);
 void GameState_SortConsumableSlots(s32);
 void PauseInventory_ReturnToConsumableActions(void *);
 void PauseInventory_UpdateConsumableSortConfirmation(u8 *p)
 {
-    s32 r = SceneHud_UpdateBinaryChoice(p);
+    s32 r = PauseMenu_UpdateBinaryChoice(p);
     if (r == 0) {
         Sound_PlaySong(0xde);
         PauseInventory_ReturnToConsumableActions(p);

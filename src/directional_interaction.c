@@ -1,5 +1,4 @@
 #include "directional_interaction.h"
-// MATCHING_CONCESSION: register-pinning
 
 /* Sets the controller's state and flags it as newly entered. */
 u32 DirectionalController_SetState(struct DirectionalController *p, u32 state)
@@ -272,15 +271,7 @@ s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
             u32 distance = dx * dx + dz * dz;
-            register s32 angle asm("r0") = Math_Atan2(dx, dz);
-            u32 direction = ((({
-                                  s32 copy = angle;
-                                  asm("" : : "r"(copy));
-                                  (u16) copy;
-                              }) +
-                              112) >>
-                             5) &
-                            7;
+            u32 direction = (((u16)Math_Atan2(dx, dz) + 112) >> 5) & 7;
             if (distance < p->distance) {
                 s32 a, b, c;
                 if (p->orientation) {
@@ -295,7 +286,7 @@ s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
                 if (a == direction || b == direction || c == direction) {
                     u32 facing = manager->actor->facing;
                     if (facingAllowed(facing, a, b, c))
-                        return angle;
+                        return;
                 }
             }
         }

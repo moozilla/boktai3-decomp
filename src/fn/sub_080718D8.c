@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 #define ACTOR_OFFSET(member) ((u32) & ((struct SceneActorRegistryResetView *)0)->member)
@@ -21,63 +22,8 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
     u32 *flags;
     u32 noObject;
     SceneActorRegistry_ResetRouteAndColliders((void *)actor);
-    {
-        u32 state = 3;
-        u32 offset2 = ACTOR_OFFSET(state2A8);
-        u8 *byteAddress = (u8 *)actor + offset2;
-        u32 zero = 0;
-        register u32 offset4 asm("r4");
-        register u32 offset6 asm("r6");
-        u32 offset1;
-        register void *callback asm("r4");
-        actor->state2A8 = state;
-        offset4 = ACTOR_OFFSET(phase2A9);
-        asm("" : "+r"(offset4));
-        byteAddress = (u8 *)actor + offset4;
-        *byteAddress = zero;
-        offset6 = ACTOR_OFFSET(behavior2AA);
-        *((u8 *)actor + offset6) = zero;
-        offset1 = ACTOR_OFFSET(counter2AC);
-        asm("" : "+r"(offset1));
-        {
-            u32 *address = (u32 *)((u8 *)actor + offset1);
-            *address = zero;
-        }
-        offset2 += 9;
-        byteAddress = (u8 *)actor + offset2;
-        state = 1;
-        actor->field2B1 = state;
-        callback = SceneActorControl_OnIdle;
-        offset2 = 16;
-        offset6 += 8;
-        *((u8 *)actor + offset6) = state;
-        offset1 = ACTOR_OFFSET(field2B0);
-        *((u8 *)actor + offset1) = zero;
-        offset6 += 3;
-        byteAddress = (u8 *)actor + offset6;
-        *byteAddress = offset2;
-        offset1 -= 0x94;
-        actor->target = callback;
-        offset2 = ACTOR_OFFSET(field2C8);
-        asm("" : "+r"(offset2));
-        {
-            u16 *address = (u16 *)((u8 *)actor + offset2);
-            *address = zero;
-        }
-        offset4 = ACTOR_OFFSET(flags114);
-        asm("" : "+r"(offset4));
-        {
-            register u32 *flagsAddress asm("r2") = (u32 *)((u8 *)actor + offset4);
-            u32 mask = ~1;
-            *flagsAddress &= mask;
-        }
-        offset6 = ACTOR_OFFSET(word104);
-        asm("" : "+r"(offset6));
-        {
-            register u32 *address asm("r0") = (u32 *)((u8 *)actor + offset6);
-            *address = zero;
-        }
-    }
+    SceneActorTerrain_EnterState(actor, 3, 0, 0);
+    SceneActorTerrain_InstallControl(actor, SceneActorControl_OnIdle, 16);
     {
         u32 result = SceneActorRegistry_HasNoObject(actor);
         noObject = result;
@@ -394,8 +340,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             actor->group.common.control.mode = byteZero;
         }
         {
-            register u32 offset2 asm("r2") = ACTOR_OFFSET(group.motion5B8);
-            asm("" : "+r"(offset2));
+            register u32 offset2 = ACTOR_OFFSET(group.motion5B8);
             Memory_Clear((u8 *)actor + offset2, 8);
         }
         {
@@ -435,7 +380,6 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
                 *address = byteZero;
             }
             offset2 = ACTOR_OFFSET(group.turn.turnsRemaining);
-            asm("" : "+r"(offset2));
             {
                 u8 *byteAddress = (u8 *)actor + offset2;
                 *byteAddress = 255;
@@ -469,10 +413,9 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             SceneActorPalette_ClearCompletedTransitions();
         }
         {
-            register u32 offset2 asm("r2") = ACTOR_OFFSET(group.attachment);
+            register u32 offset2 = ACTOR_OFFSET(group.attachment);
             void **address;
             void *attachment;
-            asm("" : "+r"(offset2));
             address = (void **)((u8 *)actor + offset2);
             attachment = *address;
             attachment = ActorAttachment_ReleaseResource(attachment, 1, actor->body.id);

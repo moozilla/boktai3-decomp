@@ -1,15 +1,18 @@
-// MATCHING_CONCESSION: register-pinning
 #include "spark_particle.h"
 /* SparkParticle_CreateFromScript: Parses particle count and position plus optional spread and motion settings from script keywords and calls the particle creator */
-#define SparkParticle_CreateFromScript sub_0806A420
 #define SparkParticle_CreateFromScript sub_0806A420
 union SparkParticleVector {
     struct ContactPackedVector packed;
     struct ContactPosition position;
 };
+static inline void ClearVector(void *destination, u32 *zero)
+{
+    *zero = 0;
+    CpuSet(zero, destination, 0x05000002);
+}
 void SparkParticle_CreateFromScript(void)
 {
-    u32 zero;
+    u8 zero[4];
     union SparkParticleVector position, spread;
     union SparkParticleVector *positionVector;
     const struct ContactPosition *positionArg;
@@ -17,7 +20,6 @@ void SparkParticle_CreateFromScript(void)
     const struct ContactPosition *spreadArg;
     s32 angle, speed, kind, priority;
     u8 count;
-    asm("" : "=m"(zero));
     count = Script_GetKeywordValue('n', 0);
     if (count && Script_SeekToKeyword('p')) {
         position.packed.x = Script_GetValue();
@@ -36,13 +38,7 @@ void SparkParticle_CreateFromScript(void)
             spreadArg = &spread.position;
         } else {
             union SparkParticleVector *destination = &spread;
-            const void *source;
-            register void *target asm("r1");
-            zero = 0;
-            source = &zero;
-            target = destination;
-            asm("" : : "r"(source), "r"(target) : "r2");
-            CpuSet(source, target, 0x5000002);
+            ClearVector(destination, (u32 *)zero);
             spreadArg = &destination->position;
         }
         angle = Script_GetKeywordValue('d', 0);

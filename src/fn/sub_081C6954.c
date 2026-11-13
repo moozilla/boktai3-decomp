@@ -47,7 +47,7 @@ void StateActor_OnUpdateState(void);
 void StateActor_OnRender(void);
 void StateActor_OnUnregisterReceiver(void);
 void Actor_OnHiddenIdleUpdate(void);
-void sub_0802F298(void);
+void Actor_UpdateTargetFacing(void);
 
 // confidence=low: creates a state actor from script keywords (k variant, p position, d angle, b, i behavior).
 s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
@@ -132,7 +132,7 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
             npc->timer = 0;
             one = 1;
             npc->enterCommand = one;
-            fn = sub_0802F298;
+            fn = Actor_UpdateTargetFacing;
             npc->prevState = ten;
             npc->update = fn;
             npc->stateFrame = 0;

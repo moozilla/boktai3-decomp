@@ -130,8 +130,14 @@ int sub_0803198C(void *arg0, void *arg1)
         register void (*callback)(void) asm("r1") = MessageWindow_ClearTextCompletion;
         *fnSlot = callback;
     }
-    (void)*(volatile u8 *)&p->mode;
-    proc = ScriptProc_Start(0xCB05, 0x530D);
+    switch (p->mode) {
+        case 0:
+            proc = ScriptProc_Start(0xCB05, 0x530D);
+            break;
+        default:
+            proc = ScriptProc_Start(0xCB05, 0x530D);
+            break;
+    }
     if (!proc)
         return -1;
     *(struct MsgHdr *)p->hdr = *(struct MsgHdr *)proc;

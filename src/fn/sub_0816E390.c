@@ -11,7 +11,7 @@ struct SceneMenuPanel {
     u8 selection;
 };
 u32 SceneMenuPanel_UpdateMotion(struct SceneMenuPanel *, u32);
-u32 PlayerPanel_GetStatusValue(struct SceneMenuPanel *);
+u32 PauseMenu_GetPlayerStatusValue(struct SceneMenuPanel *);
 void SceneMenuPanel_StartPaletteTransition(struct SceneMenuPanel *, u16, u32, s32);
 void sub_0816D634(struct SceneMenuPanel *, u32);
 void Sound_PlaySong(u32);
@@ -25,7 +25,7 @@ void SceneMenuPanel_FinishMotionDelay(struct SceneMenuPanel *panel)
             panel->widgetFlags |= 1;
             sub_0816D634(panel, panel->selection);
             palette = 366;
-            SceneMenuPanel_StartPaletteTransition(panel, palette, PlayerPanel_GetStatusValue(panel),
+            SceneMenuPanel_StartPaletteTransition(panel, palette, PauseMenu_GetPlayerStatusValue(panel),
                                                   16);
             Sound_PlaySong(269);
             SceneMenuPanel_SetCallback(panel, PauseMenu_OnItemUseDelayUpdate, 1);

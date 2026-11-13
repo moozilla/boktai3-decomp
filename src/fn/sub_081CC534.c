@@ -1,8 +1,8 @@
 #include "global.h"
 
-void sub_0802F298(void);
+void Actor_UpdateTargetFacing(void);
 
 void SceneCharacter_FaceSceneTarget(void)
 {
-    sub_0802F298();
+    Actor_UpdateTargetFacing();
 }

@@ -1,12 +1,13 @@
 #include "global.h"
 #include "tentacle_segment_animation.h"
+#include "display_animation.h"
+#include "display_sequence_inline.h"
 // MATCHING_CONCESSION: register-pinning
 
 // confidence=low: refreshes segment animations from their direction.
 
 void *SceneActorProfiles_GetEntryAddress(u32, u32, s32);
 void TentacleBody_GetDirectionFrame(u16, s32 *, s32 *);
-void Anim_SetSequence(void *, void *, u32, u8, u8);
 void Anim_RestartSequence(void *, void *, u32, u8, u8);
 void Anim_SetDurationScale(void *, u32);
 static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
@@ -15,94 +16,6 @@ static inline u8 TestMask(struct TentacleSegmentAnimation *p, u32 mask)
     if (f & mask)
         return 1;
     return 0;
-}
-static inline void Step(struct TentacleSegmentAnimation *input,
-                        struct TentacleAnimationSegment *sprite)
-{
-    register struct TentacleAnimationSegment *sp asm("r8") = sprite;
-    register struct TentacleAnimationSegment *o asm("r6") = sp;
-    struct TentacleSegmentAnimation *a = input;
-    struct TentacleSegmentAnimation *b = input;
-    const volatile u16 *entry;
-    entry = a->sequence.commands + a->sequence.index;
-    o->frame = *entry >> 6;
-    {
-        u32 input = a->sequence.flags;
-        u32 left = 1;
-        u32 mask = 1;
-        left &= input;
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 4;
-        else {
-            u32 *fl = &sp->flags;
-            register u32 v asm("r0") = *fl;
-            v &= ~4;
-            *fl = v;
-        }
-    }
-    {
-        register u32 input asm("r0") = b->sequence.flags;
-        u32 mask = 2;
-        u32 left = (u8)(mask & input);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            o->flags |= 8;
-        else
-            o->flags &= ~8;
-    }
-    {
-        u32 elapsed = b->sequence.elapsed + 1;
-        u32 mask;
-        register u32 temp asm("r2");
-        register u32 savedDuration asm("r2");
-        u32 duration, flags;
-        b->sequence.elapsed = elapsed;
-        temp = 0xffff;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = b->sequence.duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            b->sequence.elapsed = 0;
-            flags = b->sequence.flags;
-            if (flags & 4) {
-                u32 index = b->sequence.index;
-                if (index == 0) {
-                    u32 f8 = 8;
-                    f8 &= flags;
-                    if (f8)
-                        b->sequence.elapsed = savedDuration;
-                    else
-                        b->sequence.index = b->sequence.frameCount - 1;
-                } else
-                    b->sequence.index = index - 1;
-            } else {
-                u32 index = b->sequence.index + 1;
-                u32 frameCount;
-                b->sequence.index = index;
-                frameCount = b->sequence.frameCount;
-                if ((index & mask) >= frameCount) {
-                    u32 endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    if ((u8)endFlag) {
-                        b->sequence.elapsed = duration;
-                        b->sequence.index = frameCount - 1;
-                    } else
-                        b->sequence.index = 0;
-                }
-            }
-            entry = b->sequence.commands + b->sequence.index;
-            b->sequence.frameWeight = *entry & 15;
-            {
-                u32 r = (b->sequence.frameWeight * b->sequence.speed) >> 6;
-                b->sequence.duration = r;
-                if (!(u8)r) {
-                    register u32 one asm("r0") = 1;
-                    b->sequence.duration = one;
-                }
-            }
-        }
-    }
 }
 void TentacleBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *input, s32 inputKind)
 {
@@ -130,8 +43,8 @@ void TentacleBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *i
             if (TentacleSegment_HasStatus(a, 4)) {
                 TentacleBody_GetDirectionFrame((a->direction + 128) & 255, &frame.row,
                                                &frame.flags);
-                Anim_SetSequence(a, TentacleSegment_ScriptAt(body, offset), 1, frame.row,
-                                 frame.flags);
+                Anim_SetSequence(a, TentacleSegment_ScriptAt(body, offset), 1, (u8)frame.row,
+                                 (u8)frame.flags);
             } else {
                 TentacleBody_GetDirectionFrame(a->direction, &frame.row, &frame.flags);
                 four = 4;
@@ -142,7 +55,7 @@ void TentacleBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *i
                                              x;
                                          }) +
                                          (u32)frame.profile),
-                                 frame.row, frame.flags);
+                                 (u8)frame.row, (u8)frame.flags);
                 {
                     register u8 *act asm("r1") = frame.actor;
                     register u16 *ad asm("r0");
@@ -150,7 +63,72 @@ void TentacleBody_ResetDirectionalAnimations(struct TentacleBodyAnimationView *i
                     Anim_SetDurationScale(a, *ad);
                 }
             }
-            Step(a, s);
+            {
+                register struct DisplaySequenceSprite *other asm("r6") = (void *)s;
+                struct DisplaySequenceState *state = &a->sequence;
+                const u16 *command;
+                u32 ended;
+                command = state->commands + state->index;
+                other->frame = *command >> 6;
+                {
+                    union DisplaySequenceControl control;
+                    u32 bit, first;
+                    control.raw = state->flags;
+                    bit = 1;
+                    first = (u8)(control.raw & bit);
+                    if (first != (((*command & 0x30) >> 4) & bit))
+                        other->flags |= 4;
+                    else {
+                        u32 *flags = &s->flags;
+                        register u32 value asm("r0") = *flags;
+                        value &= ~4;
+                        *flags = value;
+                    }
+                }
+                {
+                    union DisplaySequenceControl control;
+                    u32 bit, first;
+                    control.raw = state->flags;
+                    bit = 2;
+                    first = (u8)(control.raw & bit);
+                    if (first != (((*command & 0x30) >> 4) & bit))
+                        other->flags |= 8;
+                    else
+                        other->flags &= ~8;
+                }
+                if (++state->elapsed >= state->duration) {
+                    state->elapsed = 0;
+                    if (state->flags & 4) {
+                        if (state->index == 0) {
+                            if (state->flags & 8)
+                                state->elapsed = state->duration;
+                            else
+                                state->index = state->frameCount - 1;
+                            ended = 1;
+                        } else {
+                            state->index--;
+                            ended = 0;
+                        }
+                    } else if (++state->index >= state->frameCount) {
+                        if ((u8)(state->flags & 8)) {
+                            state->elapsed = state->duration;
+                            state->index = state->frameCount - 1;
+                            ended = 1;
+                        } else {
+                            state->index = 0;
+                            ended = 1;
+                        }
+                    } else
+                        ended = 0;
+                    command = state->commands + state->index;
+                    DisplaySequence_UpdateWeight(state, command);
+                    if (!state->duration) {
+                        u16 duration[] = {1};
+                        state->duration = duration[0];
+                    }
+                } else
+                    ended = 0;
+            }
         }
         {
             register u32 step asm("r1") = sizeof(struct TentacleAnimationSegment);

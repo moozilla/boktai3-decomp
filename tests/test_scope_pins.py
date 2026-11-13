@@ -87,6 +87,16 @@ int Target(int v)
         kinds = [k for _, k, _ in self.scope.concession_sites(source)]
         self.assertEqual(kinds, ["barrier"])
 
+    def test_memory_barrier_with_trailing_block_comment_is_a_site(self):
+        source = 'void Target(void)\n{\n    asm("" ::: "memory"); /* preserve the reload */\n}\n'
+        sites = self.scope.concession_sites(source)
+        self.assertEqual([(i, kind) for i, kind, _ in sites], [(2, "barrier")])
+        self.assertEqual(sites[0][2](source.split("\n")), ['void Target(void)', '{', '}', ''])
+
+    def test_barrier_trailing_comment_does_not_hide_following_code(self):
+        source = '    asm("" ::: "memory"); /* comment */ value++;\n'
+        self.assertEqual(self.scope.concession_sites(source), [])
+
     def test_each_pin_of_a_declaration_line_is_a_site(self):
         source = 'int F(void)\n{\n    register int a asm("r9"), b asm("r6"), c;\n    return a + b;\n}\n'
         sites = self.scope.concession_sites(source)
@@ -96,6 +106,31 @@ int Target(int v)
         self.assertEqual(sites[1][2](lines)[2].strip(), 'register int a asm("r9"), b, c;')
         both = sites[1][2](sites[0][2](lines))
         self.assertEqual(both[2].strip(), "register int a, b, c;")
+
+    def test_other_concessions_include_reached_volatile_locals(self):
+        source = SOURCE.replace('register int t asm("r1") = v;',
+                                'volatile int t = v;').replace(
+                                    'register int x asm("r4") = s->a;',
+                                    'struct S *volatile copy = s;\n    int x = copy->a;')
+        reach = self.scope.function_reach(source, "Target")
+        found = self.scope.unprobed_concessions(source, reach)
+        self.assertEqual([(kind, owner) for _, kind, owner in found],
+                         [("volatile", "Helper"), ("volatile", "Target")])
+        lines = source.splitlines()
+        self.assertIn('volatile int t', lines[found[0][0] - 1])
+        self.assertIn('*volatile copy', lines[found[1][0] - 1])
+
+    def test_other_concessions_exclude_unreached_helpers_and_comments(self):
+        source = SOURCE.replace('register int u asm("r2") = v;', 'volatile int u = v;')
+        source = source.replace('return Helper(x);',
+                                '/* volatile int ignored; */\n    return Helper(x);')
+        self.assertEqual(self.scope.unprobed_concessions(
+            source, self.scope.function_reach(source, "Target")), [])
+
+    def test_volatile_pointee_is_not_a_volatile_local(self):
+        source = 'int Target(volatile int *reg)\n{\n    volatile int *p = reg;\n    return *p;\n}\n'
+        self.assertEqual(self.scope.unprobed_concessions(
+            source, self.scope.function_reach(source, "Target")), [])
 
 
 if __name__ == "__main__":

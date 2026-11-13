@@ -10,7 +10,7 @@ void Sound_PlaySong(u32);
 void SceneHud_GetActionIconPosition(struct SceneVec *, s32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 s32 Selection_GetDisplayFrame(s32);
-void SceneHud_BeginIconMotion(struct SceneHudState *, u32, u32, u32, struct SceneVec *,
+void PauseMenu_BeginSpriteMotion(struct SceneHudState *, u32, u32, u32, struct SceneVec *,
                               struct SceneVec *, s32, u32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void PauseMenu_OnCharacterSelectionUpdate(void);
@@ -38,7 +38,7 @@ void sub_0816E570(void *owner)
     speed = Mod(NextRandom(), 10) + 5;
     if (NextRandom() & 1)
         speed = -speed;
-    SceneHud_BeginIconMotion(
+    PauseMenu_BeginSpriteMotion(
         owner, 0,
         Selection_GetDisplayFrame(Inventory_GetQuantityByStorage(ui->actionCategory, *kind)),
         ui->categoryWidgets[*kind + 10].paletteBank, &pos, &velocity, 0, 0);

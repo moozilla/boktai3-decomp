@@ -3,8 +3,8 @@
 #include "player.h"
 
 void Hud_DrawHealthMeter(struct SceneHudState *, s32, s32, s32, s32);
-void sub_08164480(struct SceneHudState *, s32, s32, s32, s32, s32, s32);
-void StatDisplay_DrawGauge(struct SceneHudState *, s32, s32);
+void Hud_DrawEnergyMeter(struct SceneHudState *, s32, s32, s32, s32, s32, s32);
+void Hud_DrawPlayerGauge(struct SceneHudState *, s32, s32);
 void StatusPanel_ClearLowerRows(struct SceneHudState *);
 void Hud_UpdateTimedStatusIcon(struct SceneHudState *);
 void Hud_DrawStoredEnergyGauge(struct SceneHudState *, s32);
@@ -21,8 +21,8 @@ void PauseMenu_RefreshStatusPanel(struct SceneHudState *p)
 
     if (p->actionOwner && p->controlMode <= 2) {
         Hud_DrawHealthMeter(p, 0, 4, 1, 1);
-        sub_08164480(p, 0, 4, 2, p->actionOwner->currentStatB, p->actionOwner->maximumStatB, 1);
-        StatDisplay_DrawGauge(p, 3, 3);
+        Hud_DrawEnergyMeter(p, 0, 4, 2, p->actionOwner->currentStatB, p->actionOwner->maximumStatB, 1);
+        Hud_DrawPlayerGauge(p, 3, 3);
         StatusPanel_ClearLowerRows(p);
         Hud_UpdateTimedStatusIcon(p);
         Hud_DrawStoredEnergyGauge(p, p->controlMode);

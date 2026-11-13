@@ -7,8 +7,9 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
     struct ScenePanelRig *owner = rig;
     s32 i = 0;
     u32 one = 1;
-    register u32 zero asm("r10") = i;
-    asm("" : "+r"(owner), "+r"(i), "+r"(one), "+r"(zero));
+    u32 zero;
+    asm("" : "+r"(owner), "+r"(i), "+r"(one));
+    zero = i;
     do {
         struct SceneRigSprite *sprite;
         struct SceneRigSprite *animated;
@@ -44,11 +45,11 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
             u32 mode;
             if (i == 0) {
                 mode = 2;
-                asm("" : "+r"(mode));
+                sprite->renderMode = mode;
             } else {
                 mode = one;
+                sprite->renderMode = mode;
             }
-            sprite->renderMode = mode;
         }
         sprite->position = owner->position;
         animated->phase = i << 5;

@@ -13,9 +13,9 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     struct ContactSwarmGraphics *secondaryGraphics;
     u8 *primaryPriority;
     struct ContactSwarmGraphics *graphics;
-    register struct ContactSwarmSprite *secondary asm("r10");
+    struct ContactSwarmSprite *secondary;
     u32 frame;
-    register u32 priority asm("r5");
+    u32 priority;
     u16 *paletteBase;
     u32 resourceId;
     u32 keyword;
@@ -80,70 +80,34 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     else
         marker->scriptId = 0;
     if (Script_SeekToKeyword('A')) {
-        {
-            u32 graphicsOffset = 0x94;
-            u8 *address0;
-            register u8 *address1 asm("r1");
-            u8 *address2;
-            graphicsOffset += (u32)marker;
-            {
-                u8 *spriteAddress = (void *)graphicsOffset;
-                graphics = (void *)spriteAddress;
-                address1 = (u8 *)&marker->primary.sprite;
-                primary = (void *)address1;
-                address2 = &marker->primary.sprite.priority;
-                primaryPriority = address2;
-                spriteAddress = (u8 *)&marker->primary.sprite.position;
-                primaryPosition = (void *)spriteAddress;
-                address1 += 0x7C;
-                secondaryGraphics = (void *)address1;
-                address2 = (u8 *)&marker->secondary.sprite;
-                secondary = (void *)address2;
-                spriteAddress += 0x3B;
-                secondaryPriority = spriteAddress;
-            }
-            address1 -= 0x10;
-            secondaryPosition = (void *)address1;
-        }
-        {
-            u32 offset = 0x108;
-            argument = (u16 *)((u8 *)marker + offset);
-        }
+        graphics = &marker->primary.graphics;
+        primary = &marker->primary.sprite;
+        primaryPriority = &marker->primary.sprite.priority;
+        primaryPosition = &marker->primary.sprite.position;
+        secondaryGraphics = &marker->secondary.graphics;
+        secondary = &marker->secondary.sprite;
+        secondaryPriority = &marker->secondary.sprite.priority;
+        secondaryPosition = &marker->secondary.sprite.position;
+        argument = marker->scriptArgs;
         i = 1;
         do {
             *argument++ = Script_GetValue();
         } while (--i >= 0);
     } else {
-        {
-            u32 graphicsOffset = 0x94;
-            u8 *address0;
-            register u8 *address1 asm("r1");
-            u8 *address2;
-            graphicsOffset += (u32)marker;
-            address0 = (void *)graphicsOffset;
-            graphics = (void *)address0;
-            address1 = (u8 *)&marker->primary.sprite;
-            primary = (void *)address1;
-            address2 = &marker->primary.sprite.priority;
-            primaryPriority = address2;
-            address0 = (u8 *)&marker->primary.sprite.position;
-            primaryPosition = (void *)address0;
-            address1 += 0x7C;
-            secondaryGraphics = (void *)address1;
-            address2 = (u8 *)&marker->secondary.sprite;
-            secondary = (void *)address2;
-            address0 += 0x3B;
-            secondaryPriority = address0;
-            address1 -= 0x10;
-            secondaryPosition = (void *)address1;
-        }
+        graphics = &marker->primary.graphics;
+        primary = &marker->primary.sprite;
+        primaryPriority = &marker->primary.sprite.priority;
+        primaryPosition = &marker->primary.sprite.position;
+        secondaryGraphics = &marker->secondary.graphics;
+        secondary = &marker->secondary.sprite;
+        secondaryPriority = &marker->secondary.sprite.priority;
+        secondaryPosition = &marker->secondary.sprite.position;
+
         {
             u32 zero = 0;
-            u32 offset;
             u16 *clear;
             i = 1;
-            offset = 0x10A;
-            clear = (void *)((u8 *)marker + offset);
+            clear = &marker->scriptArgs[1];
             do {
                 *clear-- = zero;
             } while (--i >= 0);
@@ -153,9 +117,9 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         u32 enabled;
         enabled = Script_SeekToKeyword('h');
         if (enabled)
-            enabled = Script_GetValue();
-        marker->bodyEnabled = enabled;
-        asm("" ::: "memory");
+            marker->bodyEnabled = Script_GetValue();
+        else
+            marker->bodyEnabled = enabled;
     }
     if (marker->bodyEnabled) {
         SceneBody_Init(marker->body, marker->id, position, 0, 7, marker);
@@ -164,8 +128,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     paletteBase = &marker->paletteBase;
     *paletteBase = 0xA9;
     {
-        register u32 value asm("r1") = 0xBA8;
-        asm("" : "+r"(value));
+        u32 value = 0xBA8;
         resourceId = value;
     }
     AnimData_Load(graphics, resourceId);
@@ -182,16 +145,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         u8 *write = primaryPriority;
         *write = priority;
     }
-    {
-        register u32 *source asm("r2") = (u32 *)position;
-        u32 lo, hi;
-        u32 *destination;
-        lo = source[0];
-        hi = source[1];
-        destination = (u32 *)primaryPosition;
-        destination[0] = lo;
-        destination[1] = hi;
-    }
+    *primaryPosition = *position;
     AnimData_Load(secondaryGraphics, resourceId);
     Sprite_Init(secondary, secondaryGraphics, 0);
     secondary->frame = frame;
@@ -200,11 +154,11 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         AnimData_SelectPaletteBank(secondaryGraphics, tile);
     }
     {
-        register struct ContactSwarmSprite *read asm("r1") = secondary;
+        struct ContactSwarmSprite *read = secondary;
         u32 flags;
         flags = read->flags | 0x400;
         {
-            register struct ContactSwarmSprite *write asm("r2") = secondary;
+            struct ContactSwarmSprite *write = secondary;
             write->flags = flags;
         }
     }
@@ -212,16 +166,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         u8 *write = secondaryPriority;
         *write = priority;
     }
-    {
-        register u32 *source asm("r2") = (u32 *)position;
-        u32 lo, hi;
-        u32 *destination;
-        lo = source[0];
-        hi = source[1];
-        destination = (u32 *)secondaryPosition;
-        destination[0] = lo;
-        destination[1] = hi;
-    }
+    *secondaryPosition = *position;
     InteractionMarker_SetState(marker, InteractionMarker_TickIdle);
     return 0;
 }

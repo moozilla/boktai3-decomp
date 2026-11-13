@@ -1,8 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
-/* SceneActorQuery_FindInBox: like sub_0806EFB8, but skips actors with flag 0x400 before
-   advancing the cursor and tests a center +/- radius box on all three axes.
-   The loop counter is pinned to r5 (rasolve: needs priority above the three pointers). */
 #include "scene_actor_registry.h"
+#include "scene_actor_components.h"
 struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableAfterId(u32);
 static inline u8 Inactive(struct SceneActorRegistryActor *a)
 {
@@ -25,6 +22,7 @@ struct SceneActorRegistryActor *sub_0806F06C(const struct ContactPosition *cente
 {
     s32 i = 0;
     do {
+    repeat: {
         struct SceneActorRegistryActor *a = SceneActorRegistry_FindAvailableAfterId(*cursor);
         if (!a) {
             return 0;
@@ -37,25 +35,27 @@ struct SceneActorRegistryActor *sub_0806F06C(const struct ContactPosition *cente
         }
         *cursor = a->id;
         {
-            u8 *base = (u8 *)a + 0x50;
+            struct SceneActorBody *body = (struct SceneActorBody *)&a->id;
             if (Inactive(a)) {
                 continue;
             }
-            if (center->x - radius->x > *(s16 *)(base + 12) ||
-                ((center->x + radius->x) < (*((s16 *)(base + 12))))) {
-                DEBUG_NOP();
+            if (center->x - radius->x > body->position.x ||
+                ((center->x + radius->x) < body->position.x)) {
+                if (++i <= 19)
+                    goto repeat;
+                return 0;
+            }
+            if (center->y - radius->y > body->position.y ||
+                ((center->y + radius->y) < body->position.y)) {
                 continue;
             }
-            if (center->y - radius->y > *(s16 *)(base + 14) ||
-                ((center->y + radius->y) < (*((s16 *)(base + 14))))) {
-                continue;
-            }
-            if (center->z - radius->z > *(s16 *)(base + 16) ||
-                ((center->z + radius->z) < (*((s16 *)(base + 16))))) {
+            if (center->z - radius->z > body->position.z ||
+                ((center->z + radius->z) < body->position.z)) {
                 continue;
             }
             return a;
         }
+    }
     } while (++i <= 19);
     return 0;
 }

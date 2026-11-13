@@ -8,7 +8,10 @@ what was tried, and the next idea.
 
 ## field-effects
 
-### Scene_SpawnDirectionalDust (src/scene_object.c, 08004B64): deferred
+### Scene_SpawnDirectionalDust (src/scene_object.c, 08004B64): resolved
+
+Resolved without concessions by the dp-field Codex pass; see
+[cx-dp-field_2026-11-13.md](cx-dp-field_2026-11-13.md). The earlier investigation follows.
 
 Draft: `notes/phase3-drafts/field-effects/Scene_SpawnDirectionalDust.c` (117 ROM / 93 draft
 insns differ; it relies on a local `u32 x:16` bitfield struct defined next to it in the unit copy).
@@ -58,7 +61,10 @@ the copy): an early `savedActor = 0`/`-1` or `index = 0` at the top, `savedActor
 extended block starts at function entry, so no mention can come before it; the copy needs a last
 use past the block end (the loop label at `active`), and that use would merge the r5 copy instead.
 
-### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): deferred
+### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): resolved
+
+Resolved by the dp-field Codex pass: the accepted branch returns without a value (fact 160), preserving the call result in hard r0. Both concessions are removed.
+
 
 Draft: `notes/phase3-drafts/field-effects/DirectionalController_CheckRemaining.c` (41 ROM / 43
 draft). In the ROM, Math_Atan2's result stays in hard r0 from the call to the `bne` that jumps
@@ -195,18 +201,14 @@ mostly register shifts). The inner loop counts down in the ROM (loop.c reversed 
 pass); the ROM keeps both `pool` (spilled, sp+0x10) and `g` (r6) and holds velocity in r8;
 `rng` is caller-saved r3 around sub_08217E40.
 
-### AnimatedParticleManager_Update (src/fn/sub_08015160.c, 08015160): deferred, priority tie
+### AnimatedParticleManager_Update (src/fn/sub_08015160.c, 08015160): resolved by dp-effects
 
-Draft: `notes/phase3-drafts/field-effects/AnimatedParticleManager_Update.c` (32 ROM / 32 draft),
-the whole unit on the shared types (DisplaySequenceSprite, DisplaySequenceState) and
-`DisplaySequence_StepSprite` from include/display_sequence_sprite.h. The helper's `command`
-plays the old `entry` role exactly, and indexed loop forms are worse (37-49 rows). Only allocation is left: `p` (48 refs over 245 insns, priority 9795) loses
-r5 to `entry` (12 refs over 36 insns, 10000). `AGBCC_PRI=p:+206` matches. `entry` needs 9 to 11
-refs: with its second set (the frame step's `entry = a->data + a->frame`) in a separate local it
-has 8 and falls under `o` (7531), which then takes r6 (27 / 27). A `command = *entry` local
-doesn't change the counts (cse). `scope.py why 35` lists the fact 91 levers (duplicate
-`p->timer++` or the vertical-scale test into the arms before it); neither looks like original
-code.
+The shared DisplaySequence_StepSprite draft now matches without concessions.
+Writing p->timer++ in each playback-result branch gives p the extra references
+needed to win r5 over the command pointer. jump2 shares the two increments into
+the ROM's single tail; no user label is needed. Stock whole-unit check: MATCH,
+540 bytes. The former diagnosis p:+206 was correct; the ordinary branch-tail form
+supplies its effect. The earlier field-effects draft remains as historical evidence.
 
 ### AnimatedParticle_PriorityFromFlags (src/fn/sub_080154D0.c, 080154D0): deferred, DEBUG_NOP
 
@@ -377,8 +379,9 @@ no asm.
 
 Draft: `notes/phase3-menus-link/sub_0803198C.c` (2 ROM / 2 draft: the callback constant in r0
 instead of r1). It has no pin; it keeps `(void)*(volatile u8 *)&p->mode;`.
-* The ROM keeps a dead `ldrb` of p->mode (0x182) before ScriptProc_Start. Only a volatile read
-  survives flow, so the original had volatile there too. A `vu8 mode` field changes the earlier
+* The ROM keeps a dead `ldrb` of p->mode (0x182) before ScriptProc_Start.
+  The later dp-menus investigation below disproves the original volatile-only conclusion: identical
+  dispatch arms preserve the read until jump2 removes their test. A `vu8 mode` field changes the earlier
   `p->mode = 0` store (it adds a load), so the cast stays local to the read.
 * `ldr r1, =MessageWindow_ClearTextCompletion; str r1, [r4]`: pseudo 261 is local to block 17,
   born after the `strh` that kills r0 (0xFFFF) and r1 (the wait address). It has no copy
@@ -1228,3 +1231,3022 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-bosses (Codex)
+
+Tags: #matching #phase3 #player #bosses
+
+### sub_0813D834 (0813D834): cse follow into a singleton case
+
+The original two pins remain. The best new pin-free draft is
+`notes/phase3-drafts/dp-bosses/sub_0813D834.c`: 0 ROM / 2 draft instructions
+(the extra initial `cmp kind, #1; beq bonus`), versus the old 17/15 draft.
+The entire body has the ROM's registers and instructions. Persistent search:
+`build/matchsearch/sub_0813D834`, nodes `second-entry` and `case-zero-fallthrough`.
+
+Confirmed `CSE_NOFOLLOW=2` gives MATCH. Read `cse_end_of_basic_block` in cse.c:
+a case label with one incoming branch and a preceding BARRIER admits the
+switch equality. Giving case 1 a second incoming branch blocks both passes;
+the duplicate comparison survives. Making case 0 conditionally fall through
+also blocks the follow, but its mode test survives (7/9). Repeating that test
+in both call/skip arms reduces it to 0/2 plus two moved branch targets.
+
+Tried direct and narrow parameter types, dispatch casts, union/array/address
+forms, precomputing the scaled offset, reordered cases, if/else and separate
+if dispatch, adjusted switch constants, default fallthrough and second entries
+from case zero/default. Dispatch narrowing/offsets preserve the body but add
+conversion/arithmetic instructions. Address-taking and ordinary inline readers
+do not hide the switch equality. No one-pin partial found: removing the scaled
+pin ties its shift to hard r3 and changes the earlier reload order.
+
+Next: a genuine shared path into case 1 whose second edge becomes redundant
+after cse, or an original helper/control-flow structure that puts a non-barrier
+predecessor before the case label. Scope `why all` does not attribute the dead
+argument copy and constant timer address to the switch equality; `probe` does.
+
+### PlayerAction_RefreshFlagState (0813EDDC): one moved argument copy
+
+The original seven concessions remain. New pin-free draft:
+`notes/phase3-drafts/dp-bosses/PlayerAction_RefreshFlagState.c`, 1 ROM / 1 draft
+plus one moved branch. The only difference is `mov r0, r8`: before the sign
+test rather than immediately before GameState_GetConsumableDescriptor in
+its nonnegative arm. All eight previous wrong registers are now correct.
+Persistent search: `build/matchsearch/PlayerAction_RefreshFlagState`, node
+`joined-choice` (baseline also retained).
+
+The original pin-free draft's AGBCC_SPILL=5:1 gives MATCH, reconfirmed. Read
+allocate_reload_reg in reload1.c and the R/X trace: four choices build the
+clear-loop addresses/mask, choice 4 reloads 0x418 into r2, choice 5 then
+chooses r0 for the alternate test; the ROM chooses r1. Assigning a `choice`
+local from alternate on both passing p/non-p guard paths creates the extra
+choice that starts the correct rotation, but its argument copy is too early.
+
+Tried sign-bit/shift comparisons, null-safe and plain inline mode/slot
+accessors, label and reversed conditional forms, duplicate full alternate
+selection, initialization before the guard, separate test edges, field vs
+pointer bonus stores, array and SI zeros, a separate bonus-loop counter,
+union/addressable/narrow choice, call wrappers and call-only/test-only choice
+uses. No exact subset of the existing choice/zero/current pins tested here
+matched, so no partial landed. The copies' order is not explained by `why`;
+it reports no supported causal summary, while the trace shows the source
+copy survives into reload. Next: keep that reload choice but delay or delete
+the copy after allocation, or recover the missing original access around the
+mode/slot guard. Do not add a fence to manufacture the choice.
+
+### sub_0815E034: direct defense addresses isolate the mask priority
+Tags: phase3, player, sub_0815E034, allocation
+
+The new pin-free draft is `notes/phase3-drafts/dp-bosses/sub_0815E034.c`:
+6 ROM / 4 draft instructions differ, 440 versus 444 bytes. All long-lived
+registers and all defense switch cases now match. It reuses `common` in the
+blocked-mask arm, then assigns it again for the vulnerability mask. The extra
+references raise its priority to 2500. Remaining differences are the first
+mask's register/order and regmove tying the final mask test to r6.
+
+A stronger diagnosis: starting with the old draft, replace each switch offset
+with `attribute = &player->cueDefenses[k]` and remove the post-switch pointer
+addition. `AGBCC_PRI=common:+1000` makes this direct-address draft **MATCH**.
+Player's nine references give priority 2231, source 2061, and common 1500;
+common must outrank both. Its REG_EQUIV constant doubles live length 10 to 20.
+This also fixes the offset/attribute register issue through natural reload and
+cross-jumping, so it is one allocation decision rather than two unrelated pins.
+
+Tried narrow/wide common and vulnerable types, masked load temporaries, inline
+mask helpers, union/array mask initializers, mask setup in both blocked arms,
+separate mask assignments and precomputed element tests. Narrow common types
+fold to the same RTL. Wide vulnerable types change allocation adversely.
+Repeated initialization in an identical branch gives 7/7 but moves the mask
+past the 0x40 test; it is not a good final form. The direct-address draft with
+all existing source pins removed still needs common's priority raised.
+Source-pin-only partials with typed offsets, helper reads, indexing and union
+pointer initialization remain 8/8; no source change landed.
+
+Next: give common a short-lived extra real reference that disappears after
+allocation, or prevent REG_EQUIV doubling without an artificial fence. A mask
+helper with the original aggregate representation may supply that reference.
+
+### PlayerContact_ApplyResponse: shared duration selection, 6/6
+Tags: phase3, player, PlayerContact_ApplyResponse, cross-jumping
+
+New draft: `notes/phase3-drafts/dp-bosses/PlayerContact_ApplyResponse.c`.
+Compute `duration = power + 60`, assign `power = duration` in the engine-flag
+arm and `power += 60` in the other arm, then make one shared reset call and
+counter store. This keeps the dead engine AND and reduces 13/22 to 6/6, with
+the original 1100-byte size. Only the duration section differs; later code is
+exact. The ROM keeps a dead r3 duration computation and computes power+60
+again into r1; the draft keeps the first computed value in r2 and copies it.
+
+`probe` tried all 16 canonical choices, 23 jump follows and one PRE replacement
+without improving the count. `why` forcing power to r2 improves to 5/3, but
+does not reproduce the second addition. Moving the counter store outside two
+calls still leaves the calls unmerged. Duration in either call arm, separate
+selected locals, redundant reassignment, inverse subtraction, a union duration
+and rereading source power all retain the same issue or collapse the dead test.
+The old source with only its pin removed is 8/6; u16/s32 power and declaration
+order do not improve it. Original source retains both concessions.
+
+Next: find the C form that lets the initial duration value die only after
+allocation while the argument still uses the original power. The key is the
+second addition, before considering reload rotation.
+
+### TargetRegistry_FindById: 5/5 allocation-only; duplicate compares still cross-jump backward
+Tags: phase3, dp-bosses, TargetRegistry_FindById
+
+Draft: notes/phase3-drafts/dp-bosses/TargetRegistry_FindById.c. AGBCC_PRI=requestedId:+2484 makes the single shared comparison MATCH. The earlier duplicate-comparison draft already allocates correctly but jump2 shares the collider tail into the actor tail. Explicit found/missing labels, returns versus breaks in each arm, and an actor block outside the loop do not reproduce the ROM layout. Narrow flag/mask types, boolean flag extraction, aggregate flag temporaries and inline comparison helpers do not solve allocation. Union/struct/array mask temporaries fold to the same RTL. Original source retains its one pin. Next: an ID reference that survives through flow while preserving the shared comparison, or a real flag accessor that prevents the constant mask tie and REG_EQUIV lifetime doubling.
+
+### sub_0819BB18: improved from 24/23 to 4/4; only invariant order remains
+Tags: phase3, dp-bosses, sub_0819BB18
+
+Draft: notes/phase3-drafts/dp-bosses/sub_0819BB18.c. Build the bank through ParticleRandomTableSource halfword stores before the loop, then read it through ParticleRandom_GetTable. This retains the 0x0203B000 base and computes the first rebased table in the preheader, leaving the later rebasing in the loop as the ROM does. CSE_NOCANON=229 removes an extra copied base in the second sample; ordinary C table++; table += 511; in the sampling inline reproduces that effect. The entire body is exact. Four differences remain: the gRandomIndex address is hoisted before the reduced counter initialization instead of after it, changing the two temporary reload registers. The result is the original 416-byte size. Symbol/union loop initializers, direct bank indexing, table temporaries, alternate shared readers, countdown/do/goto loops, early counter initialization and a seed argument do not reproduce the ordering. The source retains four barriers. Next: control the relative placement of the loop-invariant address and reduced counter initializer without changing the exact body.
+
+### Hresvelgr_EmitFacingMotion: origin survives naturally; remaining allocation is not isolated
+Tags: phase3, dp-bosses, Hresvelgr_EmitFacingMotion
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_EmitFacingMotion.c. Build the origin through ParticleRandomTableSource halfword writes and retrieve it with the shared accessor. This retains the otherwise folded origin and gives 44/44 differences versus the earlier 48/43; size is 368 bytes. Replacing either or both early direct reads by shared relative reads folds to exactly the earlier RTL; ReadDirectSample also does, while ReadSample changes allocation adversely. Union origin/quotient temporaries do not help. All 16 CSE canonical choices, five jump follows and five PRE choices fail to improve this draft. The original still has two pins and one barrier. Partial angle-pin removal with reordered Polar parameters, a mask local and a plain x pointer also fails. Next: isolate quotient lifetime before the origin copy and the saved actor copy; these affect global register pressure independently of the later polar-angle pin. Helpers shared with Hresvelgr_SetPartApproachMotion must be checked with the whole unit if changed.
+
+### Hresvelgr_UpdateTurningCharge: 10/8; PRE still reuses the first flags address
+Tags: phase3, dp-bosses, Hresvelgr_UpdateTurningCharge
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_UpdateTurningCharge.c. AGBCC_NOPRE=1 makes the original pin-free draft MATCH. Duplicating the first real flags update in both pending arms improves 16/14 to 10/8 but PRE still preserves the computed address across the callback. A separately assigned owner and an inline initialization helper with two real returns both fold to the original baseline. Reconstructing only the second owner pointer from its two halfwords defeats PRE and leaves 3 ROM / 9 draft, but adds six reconstruction instructions; it is scratch evidence rather than the preferred draft. The ordinary branch-local update draft is retained. Next: another real base representation that becomes the original pointer after gcse but before allocation, or the original owner reassignment. Original source retains the address pin.
+
+### Hresvelgr_PlayDescent: 11/5; actor/input copy still propagates away
+Tags: phase3, dp-bosses, Hresvelgr_PlayDescent
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_PlayDescent.c. The prior ordinary draft remains best at 11 ROM / 5 draft. Returning the actor from an inline descent body, either assigning or ignoring its result, does not preserve the copy: expansion drops the unused return. Putting the final refresh arm before the landing stores changes the branch layout and still merges input and actor. The ROM needs input in r7, actor in r6 and tick in r8. The source retains its one operand barrier. Next: find a real aggregate owner representation or control-flow join that survives copy propagation but folds before allocation; moving only the final use order is insufficient.
+
+### Hresvelgr_UpdateBoundaryBarrage: 2/2; random-mask retry allocation still selects sl
+Tags: phase3, dp-bosses, Hresvelgr_UpdateBoundaryBarrage
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_UpdateBoundaryBarrage.c. The prior pin-free 2/2 draft remains best. Shared ReadDirectSample produces the same RTL and difference; ReadSample increases register differences. Building the random mask through halfwords substantially changes the loop code, and rebuilding only the normal collision mask changes other allocations without fixing the retry choice. The source still retains its end-of-function mask operand. Next: expose why retry_global_alloc considers sl available despite the earlier collision/action mask using it, and find a genuine later use of that value or another pseudo that naturally conflicts with it in case 1. Keep this distinct from simple priority order: initial global allocation already chooses the intended low register before reload evicts it.
+
+### sub_081A14FC: improved 86/82 to 30/32 with one shared sampler draw
+Tags: phase3, dp-bosses, sub_081A14FC
+
+Draft: notes/phase3-drafts/dp-bosses/sub_081A14FC.c. Use ParticleRandom_ReadSample only for rawY, retaining the other direct draws. Its extra counted table reference raises the table above the random-index address, fixes the frame size/slots and improves the pin-free draft from 86/82 to 30/32. Using it for every draw overshoots badly; direct shared reads fold to the baseline. Each individual draw was checked against the table-priority hypothesis, and increasing the sampler count to two through five is worse. Keeping the sampleY/rawY pins and barrier while removing only the table pin reaches 11/13, but removal combinations of those three remaining concessions do not match. The principal remaining difference is a resident 0x3ff mask in ip, while the ROM reloads it and uses ip for oy; gcse also moves the index-address copy later. Original source retains all four concessions. Next: displace the index mask naturally while retaining the corrected table priority; then revisit sampleY/rawY lifetimes.
+
+### Vanargand_ApplyPendingDamage: partial landed, one mask pin remains
+Tags: phase3, dp-bosses, Vanargand_ApplyPendingDamage
+
+Removed the partDamage/sl pin and its operand barrier. The existing u8 narrowing
+of the part flags supplies the necessary live-range instruction, and retaining
+only the original r2 mask pin gives an exact whole-unit MATCH. The full pin-free
+draft is saved under dp-bosses and remains 7/7. Halfword/array mask construction,
+a shared return-mask local and count-label forms do not fix it. Splitting the
+real song call between the special/non-special arms changes the CSE path and
+gives 5/8, but leaves duplicated call/layout instructions. Next: reproduce that
+path break while restoring the shared song call.
+
+### sub_081D3620: 2/2; correct registers but bias addition attaches to random
+Tags: phase3, dp-bosses, sub_081D3620
+
+The unchanged source retains its single random pin. The old exact-shape draft allocates coordinate before random; AGBCC_PRI=random:+15000,random#1:+15000 confirms the allocation diagnosis. Applying bias to the masked random instead gives every ROM register naturally, but moves each bias addition from coordinate before the mask to random after it (2/2). Both signed and unsigned 16-bit random, unsigned coordinate, separated coordinate/bias statements, and an accumulator random retain or worsen allocation; 16-bit coordinate adds truncations. A union assembled from masked halfwords adds reconstruction instructions. Next: a real random-use form that increases its flow references while combine restores the coordinate-first bias addition. The draft changes no behavior: only the low halfword of the sum is stored.
+
+### Ratatosk_UpdateSunOrbRelocation: 8/8; reload choice 15 confirmed, failure-tail sharing fixes allocation
+Tags: phase3, dp-bosses, Ratatosk_UpdateSunOrbRelocation
+
+All three original concessions remain. Confirmed AGBCC_SPILL=15:1 matches: choice 14 loads the finished offset in r2; choice 15 consequently starts after r2 and takes r0 instead of ROM r2. Replacing the early fading failure store/return by goto fail removes choice 14 and fixes every later register, but jump2 removes four instructions that the ROM duplicates. Writing out the negative-slot failure adds two instructions without changing allocation. A shared terminal return label changes nothing; a common final finished store changes layout substantially. Using q for the early finished store adds one register difference. A halfword-built finished constant adds 14 instructions. Next: retain the early failure tail while changing its reload inheritance, or prevent jump2 from sharing the second failure tail after arranging the right reload rotation.
+
+### sub_08217430: 3/3; widened bank breaks the argument preference, base still coalesces
+Tags: phase3, dp-bosses, sub_08217430
+
+The original pin and operand barrier remain. Confirmed forcing baseline bank pseudo 33 to r3 gives only 2/2: the loaded base remains tied to bank instead of r1. Widening the completed address to u64 before truncating it for the call restores the missing argument copy naturally and gives a same-size 3/3 draft. This is diagnostic rather than a convincing original C form: the doubleword occupies r2/r3 and its low word coalesces the loaded base. Copy helpers returning source or destination, a source/control descriptor, union assignment and initializer, and a range-copy helper all collapse to the baseline. Splitting the offset changes shape; widening the offset or doing the addition in u64 worsens it. Integer-address addition and the retained-bank-pin variants did not match. Next: a source representation that prevents both the argument-copy preference and the base/result tie. Scope also failed to identify the doubleword holder of r3 because its holder search compared only the starting hard register.
+
+### GameState_SelectRamBase: 1/1; cse deliberately moves the known constant base to the second operand
+Tags: phase3, dp-bosses, GameState_SelectRamBase
+
+The single original base pin remains. Read fold_rtx in gcc/cse.c: after obtaining equiv_constant for each operand, it explicitly places a constant second in commutative operations. This is operand ordering, not the allocation conflict that scope why reports. Array-of-eight-byte slots and u64 slot pointers retain the 1/1 difference. A union initializer or one-element pointer array changes allocation to 15/15; widening the address gives 28/28. Reassembling a union pointer from two halfword reads hides the constant from CSE and fixes the add order and all downstream registers, but five reconstruction instructions plus alignment remain. Next: a nonconstant first definition that combine reduces after CSE without reconstruction instructions. Scope incorrectly printed cse replaced nothing by nothing and recommended swapping allocation for a pure commutation; this is a diagnostic bug to fix.
+
+## dp-effects (Codex)
+
+Tags: #matching #phase3 #effects
+
+### sub_08012B34 (08012B34, src/debris_particles.c): partial, origin pin remains
+
+Removed the operand barrier using `ParticleRandom_ReadRelativeSample(setup, gRandomTable)`
+for subsequent draws. The complete unit still matches; only the existing r3 origin pin
+remains. The sample origin is now named `PARTICLE_RANDOM_SAMPLE_ORIGIN`.
+
+Best ordinary-C source: `notes/phase3-drafts/dp-effects/sub_08012B34.c` (complete unit),
+20 ROM / 20 draft, shape 0. It follows DirectionalParticle_Spawn and
+FragmentEffect_SpawnRandomParticle: symbolic origin `(u32)&gHeapHead +
+RESOURCE_REGISTRY_ENTRIES_ADDR`, a saved copy after the x-product, and shared relative
+sampling for the vertical component. `AGBCC_PRI=setup:+2791` gives MATCH. The source's
+angle wins r3 first (priority 2926); setup is 136. The two constant sets multiply setup's
+flow live length by four in `update_equiv_regs`, as confirmed in local-alloc.c.
+
+The earlier `setup & 3` draft also remains 20 / 20 and matches with
+`AGBCC_PRI=setup:+2908`; the new draft uses real sampling arithmetic instead.
+All later draws through the relative sampler extend setup's life but cse shares its
+parameter copies, leaving only three counted refs. A first-sample-only relative use
+plus the saved origin shortens the life, but does not change the allocation order.
+Branch-local origins and the existing capture macro collapse into the same global
+pseudo. Duplicating the full tails gives separate origins, but gcse changes random
+cursor stores and jump2 leaves excess code. A split-half union keeps too much insert
+code; zero-initializing it lets cse2 rebuild the same constant and its equivalence.
+Constructing the origin within the first-sample helper, including union views, lets
+cse eliminate the dead load before flow. Byte and halfword angle forms add or reorder
+instructions without fixing the allocation.
+
+Persistent evidence: `build/matchsearch/sub_08012B34` (source hypotheses and compiled
+results); experiments: `build/cx/work/sub_08012B34/`. `why all` and the matching priority
+knob confirm that the other differences are consequences of origin/angle placement
+and reload rotation. Next idea: recover a first-sample helper whose short-lived origin
+use survives until combine, allowing local allocation to reserve r3 before the angle.
+No new concession or compiler override was landed.
+
+### sub_0801404C (0801404C, src/fn/sub_0801404C.c): partial, table barrier remains
+
+Removed three of four barriers. Reading coordinates through `CoordinateBits` keeps
+PRE from sharing the early signed x load with the later motion load. A local graphics
+struct names the resource tile field. Splitting the two presentation fallback paths,
+repeating their tails and jumping to one `age` label gives resource 10 references
+across two calls. GCC's caller-save profitability test is `4 * calls < refs`: the
+original ordinary form has only 8, so resource takes r8 instead of caller-saved r3.
+The repeated tails cross-jump after allocation. The complete unit matches with the
+original table barrier and direct sampler; no other barrier remains.
+
+Best pin-free unit: `notes/phase3-drafts/dp-effects/sub_0801404C.c`. Shared
+`ParticleRandom_ReadSample` retains the table but leaves only 7 ROM / 7 draft
+instructions different: sprite and table swap sb/sl. `AGBCC_PRI=sprite:+34` matches.
+At this point resource is r3 (10 refs, life 204, priority 1470), random-index address
+is r8 (13 refs, doubled life 570, priority 684), table is sb (10 refs, doubled life
+576, priority 520), and sprite is sl (7 refs, life 287, priority 487).
+
+Tried: direct/value coordinate helpers and by-value vectors; only the bit helper
+keeps the ROM load order. Duplicating presentation tails without the join label
+leaves extra tails. Sprite cursor derivation from the particle or indexed group
+changes induction/initialization. Typed records and a union cursor give the same
+7/7. Repeating cursor advancement in two or three arms raises it above random-index
+and leaves unmerged additions because reload rotates their scratch registers.
+Repeating particle advancement too changes loop control. A for loop is unchanged;
+a goto loop loses useful hoists. One direct sample reduces table references enough
+that the hoisted -256 mask beats it and the table is rematerialized. The barrier plus
+table-first samples over-prioritizes table; the barrier plus direct samples matches.
+
+Persistent evidence: `build/matchsearch/sub_0801404C`; all source experiments in
+`build/cx/work/sub_0801404C`. Next: add one sprite reference that disappears after
+flow, or reduce table density slightly while keeping the -256 mask below it. A
+sampler or cursor helper with a useful late-eliminated copy may supply that effect.
+
+### ParticleGroup_UpdateFrozen (08014330, src/fn/sub_08014330.c): deferred, combine removes byte extension
+
+Best complete ordinary unit: `notes/phase3-drafts/dp-effects/ParticleGroup_UpdateFrozen.c`,
+3 ROM / 1 draft, shape 2. It preserves the earlier field-effects result: PRE creates
+one QImode reaching register, with the initial r0-to-r3 copy and reloads after both
+terrain-call paths. Combine deletes the final unsigned-byte shift pair and compares
+r3 directly instead of converting to r0 first. Confirmed exact with
+`AGBCC_COMBKEEP=104`, the left-shift result. `why 268` formerly gave misleading
+allocation advice; the scope improvement in fact 172 identifies this deleted conversion.
+
+Read combine.c `set_nonzero_bits_and_sign_copies`, `nonzero_bits`, and the existing
+COMBKEEP instrumentation. A PRE byte loaded/copied in every arm has known-zero upper
+bits. The original barrier supplies an unknown upper-bit definition. Byte-return,
+narrowing, signed-byte-return, and union-byte helpers do not preserve the extension;
+a word-return helper also changes the initial compare. Header bitfields and a signed
+field with unsigned casts are unchanged. Explicit byte caches lose the initial copy.
+Explicit wide/signed caches retain the late extension but add a halfword/signed load
+before the top byte load (2/2 or 2/4). Word/byte union representations, partial union
+insertion, and halfword unions either lose PRE or add loads. Repeated helper returns
+add control flow. Explicit shift reuse changes the initial compare and still deletes
+the final conversion. Packing priority or the invalid cell into unused upper bits
+keeps unwanted arithmetic. These are compiler hypotheses, not candidates to land.
+
+Persistent source evidence: `build/matchsearch/ParticleGroup_UpdateFrozen`.
+Scratch: `build/cx/work/ParticleGroup_UpdateFrozen`. Next: a genuine header/cache
+representation that makes an SI-to-QI copy with unknown upper bits before combine,
+but whose wide producer becomes the same byte load after combine. No source changed.
+
+### sub_08014634 (08014634, src/fn/sub_08014634.c): partial, 11 pins and one barrier removed
+
+The stock compiler matches the complete 664-byte unit after removing eleven of
+fifteen pins and the entry-offset barrier. Reusing an ordinary option scalar for
+both masking and the later tile lookup first removed the mask, manager, and entry
+pins. Typed union views then reused that scalar for the count clamp, count header,
+and both position reads (five pins); reused the completed manager lookup for the
+options header (two pins); and reused priority/bound storage for the particle
+cursor (one pin). Keep initialization order when separating C89 declarations.
+These ordinary reuse forms carry phase-4 cleanup debt; no concession was added.
+
+Four pins remain: small/large resource selection, counter, and table; barriers
+remain on options memory, resource temporaries, and table/group. Removing both
+resource pins and barriers leaves 4/4, shape 0: small uses r0 instead of r2 and
+large uses r2 instead of r0. CSE2 substitutes the spilled resource for the reused
+option view. The spill sweep found no matching rotation; forcing resource to r2
+changes allocation throughout the function. Repeated post-join initialization in
+each branch either keeps the swap or introduces an outer-loop entry check. An
+explicit resource/pool struct becomes a multiword register value and changes the
+whole allocation.
+
+Removing only the counter pin leaves 19/19, shape 0. Exact diagnostic:
+`AGBCC_PRI=i:+864`. Its initial zero doubles the measured lifetime: 32 refs,
+flow life 190 (effective 380), priority 4210, versus group 26 refs/life 205,
+priority 5073. A nonconstant first definition or seven additional counted refs
+would reverse their order. Removing the group barrier makes i correct but swaps
+group/table and adds a table copy (14/14, shape 2). Repeating the particle tail
+changes unrelated allocation. Repeating inactive cleanup in both bound arms gets
+all registers correct, but the zero-count path simplifies differently and leaves
+an extra cleanup loop (1/13), so jump2 cannot share it.
+
+Best fully ordinary alternative: `notes/phase3-drafts/dp-effects/sub_08014634.c`
+(71/67, shape 58), based on the matched radial spawner sub_080148CC: inline wrapper,
+ReadScalar/ReadOrigin helpers, and a wide origin copy. Table priority +1400 improves
+it to 41/39 but is not an exact diagnosis. The table constant has doubled lifetime
+and loses r7 to velocity; table-first/shared samplers, halfword return, table-half
+construction, union initialization, count-up loops, scalar argument reordering,
+and struct argument views did not recover the full match. Removing all remaining
+concessions from the latest partial gives 90/86, shape 40; preserving the simpler
+relative-based rewrite is more useful than its extra unions.
+
+Persistent graph: `build/matchsearch/sub_08014634`; scratch candidates and compiler
+traces: `build/cx/work/sub_08014634`. Next: shorten the counter lifetime without an
+extra early set, or recover the resource helper whose separate branch destinations
+survive CSE2. Then solve table equivalence and the options/count reload boundaries.
+
+### sub_08014CA4 (08014CA4, src/fn/sub_08014CA4.c): partial, output pin and initialization barrier removed
+
+The complete 704-byte unit matches after removing the lifetime-output pointer pin
+and the three-operand initialization barrier. A shared output pointer in the fixed
+and randomized lifetime branches receives r1 naturally. Split-half random-table
+construction removes constant equivalence and recovers table allocation without
+its barrier. Its uninitialized old-input USE initially created an extra sp+0x20
+slot, shifting every stack parameter by four bytes. Reusing a typed union first
+for the loop-bound test and then for the table halves removes that extra slot.
+Facts 173/174 and the new scope frame explanation record this result.
+
+Four pins and two barrier statements remain. Removing the speed-range pin and
+barrier gives 17/17, shape 0; `AGBCC_SPILL=20:2` is exact on `spread_free.c`.
+CSE replaces the named spread with the incoming speedRange pseudo, and the first
+reload after the lifetime branches takes r0 instead of r2. Repeating the following
+range load in each arm (with and without a join label) is unchanged. Repeating the
+whole speed tail changes allocation and leaves duplicate code. A shared lifetime
+byte/spread scalar, and using spread in the modulo call, still canonicalize to the
+parameter. This remains a source-level reload-history problem.
+
+After the initialization fix, removing the lifetime cursor pin leaves 11/11,
+shape 0. The cursor naturally receives sl, but CSE replaces the low output copy
+with that high-register pseudo, changing reload choices in both lifetime arms.
+The spill search improves to 6 differences but is not exact. Reusing the output
+for the source-byte address makes lifetime address-taken and adds a stack copy;
+using it for a later tile-table view is unchanged. Advancing life from out changes
+loop allocation. Removing the fixed lifetime byte pin/barrier needs both its
+byte access and separate output allocation; direct byte, QI/SI, and union views
+retain either wrong local registers or unwanted shared tails.
+
+Removing the base pin enables PRE for base+32 and base+44 (initialized/enabled
+arrays). The isolated base-pin draft is 73/73 before the table fix. NOPRE=1,2
+improves it to 35/31; table:+50 fixes its table/base priority swap but does not fix
+PRE. Direct field-address unions do not prevent PRE; reconstructing the pointer
+through halves leaves shifts/ORs. An indexed-array rewrite gets the table into r7
+but loses the original outer cursor initialization. Shared table-first sampling
+raises the random-index address too far; direct sampling remains mismatched.
+
+Best complete ordinary draft: `notes/phase3-drafts/dp-effects/sub_08014CA4.c`,
+43/45, shape 46. It combines defined-input split-half table construction with a
+per-iteration group view. There is no exact full-draft knob yet. The table and g
+still compete closely, and two field expressions create extra frame values.
+Zero or aggregate table initialization restores constant equivalence. Reversing
+the half stores keeps the old-input spill. Reading the union directly for every
+sample prevents combine from folding its construction.
+
+Persistent hypotheses: `build/matchsearch/sub_08014CA4-v2`; scratch and exact
+partial candidates: `build/cx/work/sub_08014CA4`. Compiler source checked:
+combine.c distribute_notes preserves a lost REG_DEAD input with a USE at a label
+for caller-save tracking. Next: a low-register output copy that survives CSE
+without a cursor pin, or a legitimate field view whose address forms only after
+PRE. The fixed initialization and scope explanation are landed independently.
+
+## dp-menus (Codex)
+
+Tags: #menus #hud #dialogue #matching #compiler
+
+### Presentation_SetItemGraphic (08019ECC, src/selection_menu.c)
+
+Best ordinary-C draft: `notes/phase3-drafts/dp-menus/Presentation_SetItemGraphic.c`.
+It has the original 76-byte extent, 6 ROM / 6 draft differing instructions. The
+source match remains unchanged with two pins and two operand barriers.
+
+The ROM loads 0x121 into r0, copies it to r2, loads the graphic byte into r3,
+then adds r3 to r2. In the no-pin unit, cse1 rewrites insn 47 from
+`resource + tile` to `tile + base`; combine substitutes the 289 constant, and
+regmove/local allocation tie the result to the byte. `AGBCC_COMBKEEP=32` on
+`build/cx/work/Presentation_SetItemGraphic/base.c` preserves the constant load
+before the byte load (5 / 5), but not the ROM's copy. Adding `AGBCC_NOTIE=47`
+or `CSE_KEEP=33` does not match. No complete matching knob was found; the copy
+is a separate unresolved decision. `probe` finds only one cse jump follow,
+whose suppression does not help. Allocation force knobs do not override the
+block-local quantities involved.
+
+Tried typed table indexing; u8/u16/s16/u32 channel/index values; a one-element
+array and packed field; address-taking and inline readers; full-width and
+halfword union views; a base constructed from its two halves; initialization
+before the inventory call or before the existing test; separate inline helpers
+for the base, frame addition and keyframe call; and partial removal of each
+existing pin/barrier. None matches or removes a concession for free. This
+extends the earlier menus-link effort rather than restarting its variants.
+The half-constructed union adds a live incoming value and a high-register save,
+so it is worse and was not retained as the recommended source.
+
+Persistent proposals: `build/matchsearch/Presentation_SetItemGraphic-v2`,
+including the typed-table, address, aggregate, inline and lifetime hypotheses.
+The guarded statement-order/copy/temporary slate is empty for this source.
+Next: expose cse's constant-copy substitution as a separate diagnostic decision,
+then find a real frame-index representation whose base remains noncanonical
+through that substitution. A shared statement wrapper invented just to fence
+this one initialization would be a concession, so none was added.
+
+Tool result: scope now resolves names in COMBKEEP, NOEQUIV and canonical-register
+knobs. Previously `AGBCC_COMBKEEP=base` silently did nothing; it now reports that
+the optimized-away name is unavailable and requires its RTL pseudo number.
+
+
+### sub_0803198C (0803198C): volatile read removed, callback pin remains
+
+Tags: #menus #dialogue #matching #compiler
+
+Landed partial: replace the volatile mode read with a switch on `p->mode`, with
+both arms starting the same script. Jump2 merges the startup tails and removes
+the test after flow; the dead byte load remains. `tools/check.py` reports MATCH
+for the 948-byte unit. This corrects the earlier claim that only volatile can
+produce that load. The callback pin is the only remaining concession.
+
+Best completely ordinary draft: `notes/phase3-drafts/dp-menus/sub_0803198C.c`.
+Two instructions differ: callback literal and store use r0 instead of r1.
+`AGBCC_FORCE=261:1` matches on the mode-switch draft. Local allocation sees a
+short block-local callback with no suggestion after the wait store kills both
+r0 and r1, so it chooses r0. The desired address/store order already matches.
+
+Additional C experiments: initialize callback before the wait store (gets r1,
+but loads too early); move initialization across the value-list branch; duplicate
+completion statements in both branches; use a shared callback variable or union
+across the join; aggregate the wait and callback settings; reuse a union for the
+wait and callback; evaluate the wait address before that union; use a nested wait
+assignment; compare dispatch forms; and use direct or conditional callback stores.
+The full-width union gets the callback in r1 but also puts the wait constant in
+r1 before its address calculation (3 / 3). Address-first and nested-assignment
+forms restore the wait sequence but lose the callback register again. A halfword
+union creates partial-value preservation and extra instructions. No new partial
+removes the remaining pin.
+
+Read `update_equiv_regs` in local-alloc.c: it sinks a global constant's single
+initialization next to its use when replacement fails; a same-block local does
+not take that path. Across-branch spellings changed register pressure and code
+order instead of producing the needed r1 suggestion. Persistent store:
+`build/matchsearch/sub_0803198C`, with lifetime, join, aggregate and union proposals
+and the exact diagnostic force result. The guarded move slate offers field-store swaps and temporary rvalues,
+but none at the callback store; there is no useful move for that alias lifetime. Next: identify a real completion-state representation
+that keeps r0 live through the callback store without adding a surviving read,
+or introduces an r1 copy suggestion only at that store.
+
+
+### TextState_ProcessTag (0803232C): five concessions removed, speaker alias remains
+
+Tags: #menus #dialogue #matching #compiler
+
+The queue calls this TextVm_ProcessTag, but the current symbol inventory and
+source use TextState_ProcessTag. Landed the previous menus-link recovery with
+only the existing r6 speaker alias pin retained: two other pins and all three
+barriers are gone; the 1816-byte unit checks MATCH. Repeated complete per-arm
+actions preserve the original cross-jump labels. No new concessions were added.
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/TextState_ProcessTag.c`, still
+3 ROM / 3 draft, identical extent. Insn 1190 initially copies name (144) into
+alias (202), but cse replaces both alias uses by name at insns 1195 and 1219,
+then drops the copy. `why 1195` proves this is cse canonicalization, before
+allocation; raising name's priority would change all comparisons, not restore
+the local copy. CSE_KEEP=202 has no effect because 202 is never the class head.
+The retained alias pin is the exact diagnostic known to restore the copy.
+
+Extended the previous field/name combination and inline experiments with a
+pointer union, one-element pointer array, pointer-to-array view, separate
+PLAYER pointer, and SI/DI aggregate views. All scalar views canonicalize away;
+a DI initializer adds unrelated instructions. Identical late branch assignments
+from name produce the copy at the correct address, but leave a dead length load
+and the first call still uses r4. Identical field-address branches instead make
+PRE insert the copy after the early NONE comparison. Reusing the previous
+comparison result avoids a new load, but either folds the branch too soon or
+changes name/value live ranges throughout the comparisons. Bit-test joins have
+the same early PRE copy or substantially worse allocation. No complete knob
+match is known beyond the original register constraint.
+
+Persistent store: `build/matchsearch/TextState_ProcessTag`, with the baseline,
+aggregate/lifetime/join proposals and name allocation trace. A fresh probe also
+checks cse follow/canonical choices. Next: source that gives the alias a distinct
+value representation only for the two comparisons, or a PRE insertion whose
+latest placement is the 0x40C join; avoid revisiting simple scalar aliases.
+
+
+### TextWindow_Destroy (08033778): typed links landed, allocation tie remains
+
+Tags: #menus #dialogue #matching #compiler
+
+Landed a small cleanup: both raw 0x1C8 pointer calculations now use the existing
+`previous` field. The 132-byte unit matches; one pin and one barrier remain.
+The best ordinary draft is `notes/phase3-drafts/dp-menus/TextWindow_Destroy.c`
+(the previous menus-link recovery, 3 ROM / 5 draft, 136 bytes).
+
+Confirmed again: `AGBCC_NOTIE=87` exactly matches. Cse replaces source-address
+offset pseudo 44 with the destination's offset 41 (=456), then local allocation
+ties source address 45 to that dying r0 constant. The ROM needs address 45 in r1,
+which would let jump2 cross-jump the final slot copy with the other arm. `why`
+reports that the source-load result 46 occupies r1 in the current tie order.
+
+Tried typed previous-link accessors, a setter and getter, an inline unlink
+returning the previous slot, an output-pointer unlink helper, naming both link
+addresses, a nested assignment, source-first access, a globally shared source
+slot, and a real nested next/previous link structure. Setter/getter variants
+change allocation more broadly. Nested assignment and inline output forms have
+the correct instruction shape but different registers. The nested structure
+alone leaves the same tie; operating through link subobjects keeps additional
+address arithmetic. Retaining the old join barrier alone does not remove the
+pin for free. Unbound register declarations have no effect.
+
+Persistent store: `build/matchsearch/TextWindow_Destroy`, including the exact
+NOTIE counterfactual. Next: an ordinary source form that keeps the offset alive
+past the arm-1 source-address add, or makes that address global without moving
+its calculation ahead of the next-link address. Simple field accessor inlines
+have been ruled out.
+
+
+### ModifierMenu_SelectPendingSource (0803FCC4): separate scale, final sum allocation
+
+Tags: #menus #matching #compiler
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/ModifierMenu_SelectPendingSource.c`.
+Separate category and index inputs from the scaled intermediate. This keeps all
+instructions and the 160-byte extent; four instructions differ, the two sums and
+their halfword stores using r0 rather than r1. Source remains unchanged with two
+pins. The earlier draft's 4 / 4 result is reproduced.
+
+Exact diagnostic: on `build/cx/work/ModifierMenu_SelectPendingSource/base.c`,
+`AGBCC_NOTIE=166,220 AGBCC_FORCE=73:1,94:1` MATCH. Neither part alone suffices:
+NOTIE alone still allocates the now-separate output in lowest free r0; FORCE
+alone propagates the forced quantity backward through the multiply chain and
+changes byte loads/address registers. The combined knob identifies both the
+quantity split and its final choice. Local-alloc.c block_alloc first ties dying
+input/output pseudos, then allocates quantities by suggestions/lifetime.
+
+Tried signed/unsigned narrow result and displacement types, packed bitfields,
+full-word/halfword union result views with and without initialization, index-first
+compound sums, reusing category for the final result, separate tripled/scaled
+values, typed cursor-index and output-pointer inlines, a sum inline, and identical
+joins controlled by category/index bits. Plain narrow and union forms leave the
+4 / 4 allocation; unsigned narrow scaling adds instructions; result reuse ties
+backward and changes both multiply/load groups. Missing return keeps incoming r0
+live and changes dispatch/epilogue, so it does not match here.
+
+Persistent store: `build/matchsearch/ModifierMenu_SelectPendingSource`, including
+the exact combined counterfactual. Next: a meaningful result representation
+that both separates the final add quantity from the scale and prefers the old
+category register r1. A simple scalar assignment only achieves one side.
+
+
+### ModifierMenu_UpdateDescription (08041020): index pin removed, table arithmetic remains
+
+Tags: #menus #dialogue #matching #compiler
+
+Landed a partial: per-arm lookup sources and indexes remove the r4 index pin;
+complete repeated lookup tails cross-jump back to the original calls. The unit
+checks MATCH (264 bytes). One category pin and three barriers remain.
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/ModifierMenu_UpdateDescription.c`,
+5 ROM / 3 draft, 260 bytes. All differences are the mode-0 source table address:
+the ROM adds 7 to category, scales by 4, computes menu + 188 in r1, then adds the
+offset. Typed indexing instead combines 7*4 + 188 into 216 and computes the
+address in r0. All other arms, loads, multiplies and calls match. Insn 79 starts
+as category + 7; combine moves the constant through the shift and folds it with
+188. `AGBCC_COMBKEEP=40,47` preserves category + 7 but still computes the byte
+offset plus 188 before adding menu; it is not a complete matching knob.
+
+Tried separate lookup tails, block-local sources/indexes, direct typed indexing,
+local table without sharing sourceLocation, signed narrow index, commuted byte
+addition, a byte pointer, compound pointer increments, pointer-to-array and array
+address views, and typed slot/table accessors. Raw byte forms recover the ROM's
+arithmetic shape but change category/source allocation in the other arms (11-18
+register differences). Indexed forms fix those allocations but reassociate the
+address. Keeping only the old table barrier or category pin does not match;
+keeping all three old barriers plus category pin does, with the index pin gone.
+
+Persistent store: `build/matchsearch/ModifierMenu_UpdateDescription`. The cse/PRE
+probe finds no single decision improving the best draft. Next: preserve a typed
+table base as a distinct address through combine without extending its lifetime
+across other arms; inspect why the raw and indexed forms change category's
+local/global quantity split before revisiting scalar table casts.
+
+
+### ModifierMenu_LoadSavedSelection (08041C30): row address and call argument
+
+Tags: #menus #matching #compiler
+
+Landed typed modifierIdsBytes access in place of raw member-offset arithmetic;
+the unit remains MATCH at 224 bytes with its two existing pins.
+Best ordinary draft: `notes/phase3-drafts/dp-menus/ModifierMenu_LoadSavedSelection.c`,
+8 ROM / 6 draft instructions, 220 bytes. The ROM loads state in r0, shifts the
+index into r1, keeps the row address in r1, then loads the signed ID into r0 and
+copies it into call argument r1 before setting argument r0. The draft ties the
+row address to state in r0 and gives ID its call-preferred r1, deleting that copy.
+
+Allocation evidence: row-field insns 165 and 171 tie the row/address chain.
+`AGBCC_NOTIE=165,171 AGBCC_FORCE=83:0,87:1,85:1,91:1,88:0` reduces the difference
+to three instructions: commuted add operands and the argument-copy order. This
+is NOT an exact or semantically valid counterfactual: forcing ID into r0 leaves
+its argument copy after the pending argument overwrites r0. The existing hard
+pin influences expand_call early enough to protect that value; a late allocation
+force does not. No complete matching knob was found. The cse/PRE/loop probe has
+no improving decision. Read local-alloc.c's quantity tying/forced allocation and
+global.c's find_reg preference logic. Scope initially accepted abbreviated knob
+keys without applying them; those calls are discarded, and the tool now rejects
+such keys with the correct spelling.
+
+Tried direct indexed halfword access, state-relative typed rows, index-first and
+offset-first sums, narrow and unsigned ID variables, halfword arrays, full-word
+and halfword union views, a pointer union, repeated ID loads, typed getter and
+add-selection inlines, whole-loop inlines with void/nonvoid result, casts and a
+narrow parameter declaration, continue/goto/while/preincrement loops, and a
+nonvoid outer signature. None improves the best ordinary draft. Restoring either
+existing pin alone does not match. Keeping both pins allows the typed field
+cleanup. Explicit goto rotation changes code placement; narrow/union forms are
+optimized back to the same quantities.
+
+Persistent store: `build/matchsearch/ModifierMenu_LoadSavedSelection`. Next: a
+meaningful value boundary that makes expand_call precompute the signed ID before
+placing pending in r0, together with a row-address form that ties to the scaled
+index instead of state. A late forced register is insufficient evidence here.
+
+
+### LevelAdvanceDisplay_UpdateParticle (0805704C): four pins removed, retained counter conversion
+
+Tags: #menus #hud #matching #compiler
+
+Landed a partial removing four X/Z position pins. Direct sums with the player
+coordinate first, `player->position.world.x + particle->offsetX` (and Z), produce
+the original load order and register allocation. Complete unit MATCH at 112 bytes.
+Three counter pins remain: the loaded value, incremented frame and final phase.
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/LevelAdvanceDisplay_UpdateParticle.c`,
+6 / 6 differing instructions, same extent. Exact diagnostic on no-aliases.c:
+`CSE_NOFOLLOW=1` MATCH. Cse follows the frame-expiration branch and reuses
+`frame << 16` in the later phase calculation. The draft retains that shifted
+value in r4 and deletes the second shift. The ROM retains the incremented frame
+in r4 and shifts afresh at each test. Removing redundant input/resource aliases
+is necessary for the knob to match; otherwise disabling the follow also retains
+an extra particle copy and changes allocation. Cse.c's follow path requires a
+single-use target label preceded by a barrier.
+
+Tried direct and promoted increments, signed/narrow frame types, halfword/word
+union views and initializers, a halfword array snapshot, reload from the frame
+field, typed phase/expiration helpers, mask/shift comparisons, early returns,
+separate conditionals, a boolean switch, explicit active goto, reversed arms,
+and active/expired loop layouts. Most recover the same shared shift; the signed
+phase changes shift semantics, switch/helper forms add branches, and reversed
+arms preserve the wrong layout. Retaining only the frame/value pins leaves five
+phase-allocation differences; all three retained counter pins match. Scope's
+fresh pin audit confirms none of those three is free alone.
+
+Persistent store: `build/matchsearch/LevelAdvanceDisplay_UpdateParticle`, including
+the exact CSE_NOFOLLOW counterfactual. Next: an ordinary control-flow or value
+boundary that prevents the first cse follow while preserving the ROM arm order.
+The player-first direct sums should be kept; separately named coordinate values
+raise pressure and obscure this one remaining issue.
+
+
+### LevelAdvanceDisplay_UpdateAnimation (08057158): three pins removed, height copies and tail topology
+
+Tags: #menus #hud #matching #compiler
+
+Three partial commits remove the frame-sample, shared coordinate, and random-index
+pins. A mask-first local inside the successful frame-range check fixes the sample
+AND. Separate X/Y/Z coordinate locals fix their allocation. The matched staged
+effect sibling supplies an index pointer: `cursor = &index; value = table[*cursor]`.
+Taking the sample's address too leaves four X-axis differences; a normal sample
+assignment matches. Complete unit MATCH at 468 bytes; three pins and seven
+barriers remain.
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/LevelAdvanceDisplay_UpdateAnimation.c`,
+39 ROM / 25 draft instructions, 440 bytes. The solved sample and random regions
+are exact. Remaining differences include timer allocation, kind/frame address
+lifetimes, jump2 merging the two 30*frame tails, and constant-height copies.
+The ROM builds 400 in r1 then copies it to r0 before loading Y in r1. The ordinary
+draft folds that copy and changes load order. COMBKEEP=left does not recover it.
+The cse/PRE/loop probe gives no single improvement; there is no complete matching
+knob for the fully ordinary draft.
+
+Isolated right-operand barrier diagnosis: rise-return.c keeps other existing
+concessions and replaces that barrier/goto with a complete store and return.
+`AGBCC_CROSS_LIMIT=228:2 AGBCC_NOCROSS=473` MATCH. Jump2 first shares its two store
+tail instructions, then shares the multiply with the other rise arm. Limiting
+the first jump alone lets the reverse merge happen. Read jump.c's find_cross_jump:
+its source-jump UID and cumulative shared count explain both choices. This
+counterfactual proves only that isolated barrier, not all remaining concessions.
+
+Tried complete first/second-arm returns, duplicated rise tails, narrow signed and
+unsigned rise amounts, wider result casts, separate frame-pointer groups, direct
+global random draws, signed/narrow samples and coordinates, separate index loads,
+index arrays/unions, sample capture helper, typed height helpers, a repeated
+height-assignment macro, addressable height scalar, array and union initializers.
+The latter height forms all fold the constant copy. Narrow rise amounts prevent
+the tail merge but add two conversions. Full repeated rise code fails to merge
+the larger random region. The macro trial was not landed. Preserve the normal
+sample assignment and separate coordinates when revisiting the index pointer;
+the sibling's `*(&sample)` spelling is worse here.
+
+Persistent store: `build/matchsearch/LevelAdvanceDisplay_UpdateAnimation`, including
+the exact isolated cross-jump counterfactual. Next: recover the source-level
+height operation that materializes the constant copy, then reconstruct the rise
+arm label topology with both multiplies retained. Kind/frame pins should be
+retested together once the left/right scalar lifetimes are ordinary.
+
+
+### ScenePanel_UpdateTimePalette (08057E04): spill layout and reload rotation
+
+Tags: #menus #palette #matching #compiler
+
+No source change landed. Best indexed draft:
+`notes/phase3-drafts/dp-menus/ScenePanel_UpdateTimePalette.c`, 119 ROM / 129 draft
+instructions, shape distance 118. The original fully depinned form reproduces
+142 / 152, shape 116. Both are far from matching; no complete matching knob.
+The ordinary frame grows from 24 to 32 bytes because panel (pseudo 23) and the
+second target (175) spill into extra slots. Raising their priorities does not
+recover the ROM (136 / 154 and 744 bytes). CSE_NOCANON=22 improves the base to
+131 / 145 by preserving the panel copy; no single probe matches.
+
+An isolated exact diagnosis: oldframe.c removes only the last oldFrame pin and
+barrier. `AGBCC_SPILL=7:1` MATCH. Reload folds the frame load into the compare,
+then chooses r1 instead of r3 because the previous reload took r0. The ROM needs
+a preceding choice in r1/r2. Reversed comparison with the old pin retained gets
+the load right but emits cmp r3,r0 instead of cmp r0,r3. Direct scalar, narrow,
+array, union, addressed scalar, signed/unsigned comparison, XOR, negated operands,
+and a delta/store formulation do not match. This knob proves only the isolated
+pair, not the whole function.
+
+Other close isolated groups: removing the previous-pointer step pin/barrier costs
+two instructions (step in r0 instead of r5). Removing both channelMask pins costs
+four instructions elsewhere: the palette-base literal changes r3 to r5 and the
+second high-register pointer step changes r0 to r5. This is reload allocation,
+not a different channel result. The existing channel helper worsens those groups.
+Pointer-to-local source forms do not remove the high-register source constraints.
+
+Tried direct row/column output, a conventional shared color helper, an exact-stage
+pointer helper, addressable scratch pointer and one-element scratch array,
+source-pointer references, narrow/signed mask and step variables, scalar/array
+step storage, and frame/palette-base expression forms. Helpers and scratch
+pointers substantially change allocation or stack traffic; array scratch removes
+some barriers but still differs. Read the reload round-robin explanation and
+frame slot records; the next useful task is recovering the original loop value
+layout before chasing individual masks. Keep indexed output as an alternative,
+but retain the original depinned baseline in the persistent store too.
+
+Persistent store: `build/matchsearch/ScenePanel_UpdateTimePalette`, including the
+exact isolated reload-rotation counterfactual. Next: remove the input/panel copy
+class-head lifetime inflation in ordinary C, then eliminate the second target
+spill while preserving the six intended scratch slots.
+## dp-scene1-b (Codex)
+
+### SceneActorRegistry_TestNearestPlayerBounds (08070C24)
+
+Tags: `08070C24` `phase3` `register-allocation` `reload`
+
+Two redundant pins removed and checked MATCH. Seven pins and three barriers
+remain in the landed source. The saved pin-free draft uses existing route
+members and direct bounds expressions; it differs in 40 ROM / 39 draft
+instructions (shape 27), chiefly allocation and stack slots. Bounds spills,
+nearestIndex takes a high register, and bestDifference spills instead of
+occupying r6/r7. Moving vector subtraction to an inline helper and replacing
+the pointer loop with indexing did not resolve those lifetimes; a natural for
+loop worsened instruction shape.
+
+The closest broader partial replaces the two route offset temporaries with
+`SceneActorRegistryResetView.group.homeRoute` members and removes the initial
+player-table pin/barrier. Only the signed delta-x load differs: its zero index
+uses r1 instead of r2. Scope identifies reload choice 6; diagnostic
+`AGBCC_SPILL=6:1` makes that partial MATCH. The preceding player-table reload
+chooses r0. Early category returns, table-first declarations, and direct table
+assignment do not change the decisive rotation. This partial remains only in
+scratch because it is not a stock-compiler match.
+
+Removing the final limit pin swaps component and limit registers. Separate
+block locals, narrower types, and assigning the negated limit still swap them.
+Writing the lower test as `component + limit < 0` fixes allocation but emits
+an add and compare in place of cmn. The component is a multi-set global while
+the limit is local; increasing the limit priority alone did not resolve it.
+Next: recover the original aggregate/vector helper lifetime to keep bounds
+and bestDifference in registers, then revisit the signed bounds predicate.
+Scope's hunk matching also pairs unrelated same-form stack stores/moves in
+this function; investigate value-aware alignment before trusting those why
+messages as allocation evidence.
+
+### SceneActorRegistry_RestoreActorDefaults (080718D8)
+
+Tags: `080718D8` `phase3` `reload` `snapshot`
+
+Landed seven pin and eight barrier removals (47 to 32 concessions), checked
+MATCH. Shared terrain EnterState and InstallControl replace the initial reset
+block; removing the five offset2 bindings/barriers together restores the later
+0x5D9/0x5DA reload choices. Removing any one alone obscured that interaction.
+
+Best pin-free draft is now 15 ROM / 15 draft instructions different, shape 2
+(previous raw-offset draft was 158 / 156). The entire no-object branch becomes
+exact with direct member copies and stores. In the other branch, deleting an
+unused destination-address assignment before field2B5 restores its value load
+allocation, reducing 19 differences to 15. Fully converting the other branch
+or the tail to members shifts many preceding allocations and was worse.
+
+Remaining gate flags load uses r1 rather than r4; diagnostic
+`AGBCC_SPILL=55:3` fixes those five instructions, leaving ten differences.
+The hitReactionLatch, motion5B8, field5C4 and field5C2 addresses have subsequent
+reload rotation differences. ResetResponseState's unused index calculation
+moves before the destination copy, leaving the shape distance of 2. Wrappers
+with halfword index parameters and an argument expression do not change it.
+Keeping the existing gate and destination barriers reduces the draft to nine
+register-only differences, but is not concession-free. Keeping more original
+second-branch pins interferes with the now-exact first branch.
+
+Next: recover a snapshot/reset helper boundary that gives the gate and tail
+address constants independent reloads; examine the call's unused forwarded
+arguments and original helper signature. Keep the direct first branch intact.
+
+### SceneActorPalette_BeginTransition (08071E00)
+
+Tags: `08071E00` `phase3` `palette` `allocation`
+
+No stock-compiler removal landed. Saved pin-free member/index draft differs
+83 ROM / 81 draft instructions (shape 54), against 90 / 92 (shape 62) for the
+mechanical pin removal. Prior round11-c work already tried 95 removal groups
+and 24 search variants. This pass used the matched Axe initializer as a fresh
+array-loop model, pointer byte stores, natural do loops versus goto loops,
+member channel pointers, typed channel getters, channel-address helpers, and
+red work repeated in both sampling arms. None restored the original loop's
+allocation or its separate mask lifetimes. Narrowing the red scratch also
+failed to replace its existing barrier without instruction changes.
+
+Scope proves transition is allocated before base (3428 versus 2941 priority),
+taking r6 instead of r7. Diagnostic `AGBCC_PRI=base:+488` flips the ordering
+and improves to 75 / 73 differing instructions, but is not a full matching
+knob. Duplicating red work in both arms changes allocation but worsens the
+shape. global.c's allocno_compare uses refs * floor_log2(refs) / live length;
+source variables alone do not create independent channel-pointer lifetimes
+because CSE folds them. Halfword array indexing improves shape but joins the
+byte and halfword induction values; the ROM keeps independent i and 2*i.
+The color mask is cached across five uses where the ROM has separate masks.
+
+Persistent evidence: build/matchsearch/SceneActorPalette_BeginTransition;
+member/index root and arm-red hypothesis retained. Next: recover the original
+RGB extraction/update helper so independent masks and induction values arise
+from real types; then revisit transition/base density and final flag reloads.
+The full difference is not explained by one knob yet. Source remains matching
+with its original concessions.
+
+### SceneActorPalette_ApplyTransition (08071F50)
+
+Tags: `08071F50` `phase3` `palette` `allocation`
+
+Landed the flagSet barrier removal with the byte-valued Test helper in each
+category arm, retaining the original goto order. Check MATCH, 468 bytes.
+The source retains 18 pins and three barriers. The pin-free base with that
+helper has 102/104 differing instructions, shape 40. A do loop improves it
+to 88/90, shape 40. Repeating the manager flag write in each category arm
+further improves allocation (actor r7, manager r8 and category r9) but leaves
+duplicate tails: saved draft 80/86 differences, shape 30.
+
+Confirmed priority decisions: i loses to actor (1846 versus 2258);
+AGBCC_PRI=i:+413 improves the base to 98/100. manager loses r8 to category;
+AGBCC_PRI=manager:+160 also improves to 98/100. A real do loop and repeated
+arm writes reproduce parts of those changes. Remaining frame growth comes
+from colorCursor spilling; channel address construction and blueSum allocation
+remain wrong. The direct member loop, ordered pointer declarations, s16 index,
+and mask-first predicate did not recover the original allocation. Direct
+actorFlags member access alone differs in six register instructions. The full
+difference is not explained by a single matching knob.
+
+Persistent evidence: build/matchsearch/SceneActorPalette_ApplyTransition.
+Next: recover the channel pointer setup and signed-byte update helper; the
+ROM uses byte load/shift for red and green, indexed ldrsb for blue. Preserve
+the byte flag helper and category arm order that already remove a barrier.
+
+### sub_08072204 (08072204, active palette binding)
+
+Tags: `08072204` `phase3` `cse`
+
+One pin remains; no landing. Pin-free draft differs in four instructions,
+shape 2. CSE changes the manager load destination to transition, deleting the
+initial r1-to-r3 copy; category23 then adds from r3 instead of r1. All later
+instructions match. CSE_NOCANON=25 restores r1 but emits the copy only in the
+category10 arm (100-byte function versus 96); it is a diagnosis, not a match.
+
+Tried union/struct pointer initializers, reversed initialization/declaration
+order, separate reads of the same global, structured category branches, a
+transition-selection helper, and a u32 manager predicate. None preserves the
+original early copy. Selector helper additionally reads category before the
+manager null check, so it is not the saved candidate. The saved draft keeps
+original control flow and removes the duplicate local name alias.
+
+Next: inspect CSE copy elimination/REG_EQUIV and find the original ownership
+or view helper that keeps manager and transition independent until selection.
+
+### SceneActorContacts_ReleaseInvalidOwners (08072D34)
+
+Tags: `08072D34` `phase3` `loop` `regmove`
+
+No landing; best pin-free draft improves from 38/38 differences, shape 26,
+to 11/9 differences, shape 2. Reuse the clear-result variable for cooldown 120
+in each arm to prevent loop hoisting (goto-loop form independently produces
+the same improvement). Return the state-field address through Unavailable's
+output parameter to recover flags r4/state r1 allocation. This reproduces the
+improvement of diagnostic AGBCC_PRI=state:+8664 on the preceding draft.
+
+Remaining: regmove ties each clear AND to the dying flags input, losing the
+ROM's mask copy into r0. Zero/valid then use r0 rather than r1. Scope proves
+fixup_match_1 at insn196; AGBCC_NOTIE=196 restores the copy but changes later
+allocation (13/13 differences), so no full matching knob yet. Tried byte and
+halfword masks/results, union byte reads, shared clear/valid temporaries,
+reversed AND operands, clear-owner helper, and retaining subsets of original
+pins. None matched. Retaining final value/valid pins changes earlier allocation;
+removing the actor group alone does not independently match.
+
+Next: recover a typed flag-update helper that blocks the dying-input tie while
+keeping the final valid zero available for the owner store. Preserve the two
+ordinary-C lifetime fixes in the saved draft.
+## cdp-bosses (Codex)
+
+This pass rechecked all nine queue entries against the existing pin-free drafts and preserved the
+best ordinary-C state under `notes/phase3-drafts/cdp-bosses/`. The blocking decisions and next
+experiments are below; the detailed prior experiments remain in the `monsters-bosses` sections
+above.
+
+### Hresvelgr_PlayDescent
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Hresvelgr_PlayDescent.c` (11 ROM / 5 draft). CSE makes
+the input pointer the class head because its final use follows every use of the actor copy. The
+barrier is the only current way to retain both registers. Next: introduce a real control-flow block
+that prevents copy propagation without changing the final else-arm layout.
+
+### Hresvelgr_UpdateBoundaryBarrage
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Hresvelgr_UpdateBoundaryBarrage.c` (2 / 2). Removing the
+keep-alive lets retry global allocation put the random mask in `sl` rather than `ip`; the collision
+mask is no longer live in case 1. Next: recover a natural case-1 use or conflict for `sl`.
+
+### sub_081A14FC
+
+Best draft: `notes/phase3-drafts/cdp-bosses/sub_081A14FC.c` (86 / 82). The random-table view loses
+`r6` to `&gRandomIndex`, and the ROM has one additional spill and a four-byte-larger frame. Next:
+reduce index-address references using the shared sampler shape, then identify the displaced pseudo.
+
+### sub_081A8E08 (Vanargand_UpdateCaptureSetup)
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Vanargand_UpdateCaptureSetup.c` (13 / 9). CSE merges the
+pending-store zero and position-y zero into one constant class. Next: produce the y zero in a
+narrow mode or bitfield operation so it only folds to zero after CSE.
+
+### Vanargand_ApplyPendingDamage
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Vanargand_ApplyPendingDamage.c` (7 / 7). Narrowing the
+flags test fixes the damage/health-address allocation. The remaining constant-one mask is made
+canonical with the earlier display-call argument across CSE's extended path. Next: split that path
+with a natural return/branch form before the count-zero block.
+
+### sub_081D3620 (PlayerParticleCloud_ScatterAnchors)
+
+Best draft: `notes/phase3-drafts/cdp-bosses/PlayerParticleCloud_ScatterAnchors.c` (6 / 6). Narrowing
+the random sample to `u16` at the mask gives the ROM's `r0` sample allocation in both halves. The
+remaining first-half difference is only scheduling: the draft delays the sample load until after
+the coordinate load and bias; the second half additionally leaves the coordinate in `r2` rather
+than `r1`. Splitting the coordinate initialization, using a `u16` sample local, adding an
+intermediate narrowed local, and zero-valued dependencies did not move the load earlier. Next:
+find a natural sample-read helper shape that keeps the narrowing's priority effect but schedules
+the load at the address calculation, before the coordinate load.
+
+### Ratatosk_UpdateSunOrbRelocation
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Ratatosk_UpdateSunOrbRelocation.c` (8 / 8, register-only).
+`AGBCC_SPILL=15:1` matches: the ROM makes one additional reload choice between the fading copy and
+case 1's sequence store. Next: make either the stored one or the input address reach reload rather
+than global/local allocation.
+
+### sub_08217430
+
+Best draft: `notes/phase3-drafts/cdp-bosses/sub_08217430.c` (8 ROM / 6 draft). Local allocation gives
+the source bank the call-copy suggestion `r0`; the ROM retains it in `r3`, and forcing that leaves
+the offset/base pair. Next: keep the bank live beyond the call copy through a real subsequent use.
+
+### GameState_SelectRamBase
+
+Best draft: `notes/phase3-drafts/cdp-bosses/GameState_SelectRamBase.c` (1 / 1). CSE canonicalizes the
+addition as offset-plus-base, reversing the ROM's operand order. Next: form the storage base through
+a non-constant-equivalence initializer, potentially a union initializer whose clobber prevents the
+canonicalization.
+## cdp-effects (Codex)
+
+### BackgroundFlash_UpdateScrolling (src/fn/sub_08047770.c, 08047770): deferred, 6/6
+
+Draft: `notes/phase3-drafts/cdp-effects/BackgroundFlash_UpdateScrolling.c`. Removing the frame r1 pin leaves only a register swap: `frame` has 3 references across 18 insns (priority 1666), while the short-lived target-speed pseudo has 3 references across 4 (priority 7500) and takes r1 first. `AGBCC_PRI=frame:+5835` matches. An inline mask helper raised frame to 5 references but changed the second AND's tie/canonicalization; nested wrappers folded away. Next: a natural frame-test helper that supplies two more pre-flow references while retaining the constant-first `odd &= frame` form.
+
+### RepeatedEffect_TickUpperTransition (src/fn/sub_0804F9C4.c, 0804F9C4): deferred, 77/71
+
+Draft: `notes/phase3-drafts/cdp-effects/RepeatedEffect_TickUpperTransition.c`. The seven pins cover the repeated RNG-index, x/z sample, and result-value allocation in two symmetric transition arms. Removing them produces 77 ROM / 71 draft rows and one moved branch; the older recovery also found the first decisive mismatch at the halfword store after the upper-transition test. Next: factor the two arms through the table-first `ParticleRandom_ReadSample` form while preserving a separate post-join result value.
+
+### OrbitBackground_UpdateVisibility (src/fn/sub_08050910.c, 08050910): deferred, 26/22
+
+Draft: `notes/phase3-drafts/cdp-effects/OrbitBackground_UpdateVisibility.c`. Removing the background/selected pins and status barrier changes the ordering of the final special-mode load/test relative to the enabled test (seven moved branches overall). Direct ordinary condition spellings retained the wrong scheduling. Next: repeat the post-join status statement in each arm so jump2 cross-jumps the tails while keeping the special-mode load on the ROM side of the join.
+
+### OrbitBackground_UpdatePosition (src/fn/sub_080509E8.c, 080509E8): deferred, 53/53
+
+Draft: `notes/phase3-drafts/cdp-effects/OrbitBackground_UpdatePosition.c`. Ten constraints steer the angle correction, game-state reload, two symmetric signed approach blocks, and loaded blend frame. The unsigned-halfword blend-frame form removes its binding, but signed correction allocation and reload ordering remain; removing all constraints yields 53/53 and twelve moved branches. Next: unify the two approach arms behind a signed step helper, then duplicate the post-join store in each arm.
+
+### DisplayTrack_Update (src/fn/sub_08054EC0.c, 08054EC0): deferred, 31/31
+
+Draft: `notes/phase3-drafts/cdp-effects/DisplayTrack_Update.c`. The 27 constraints are concentrated in palette interpolation (period/divisor/frame pointers and color temporaries), the descending cleanup loop, and the sound-event tail. Despite their count, removing all leaves only 31/31 rows and one moved branch, indicating allocation rather than missing operations. Next: recover a typed palette-interpolation helper with the period pointer as its loop invariant and repeat the final packed-color store in the two interpolation arms.
+
+### DisplayTrack_AddFromScript (src/fn/sub_08055268.c, 08055268): deferred, 12/18
+
+Draft: `notes/phase3-drafts/cdp-effects/DisplayTrack_AddFromScript.c`. Four constraints steer the initial script value, zero halfword, event, and has-sequence result. Removing all changes 12 ROM / 18 draft rows and one branch; the extra draft instructions point to value lifetime/CSE rather than pure allocation. Next: use a union-zero initializer for the halfword state and return directly from the sequence-present arms so the result is not live across the join.
+
+### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): deferred, 46/34
+
+Draft: `notes/phase3-drafts/cdp-effects/Presentation_UpdateDropShakeBlink.c`. The three destination pins as a group cost only 6/6, while removing the long-lived table r6 pin causes most of the 46/34 difference and three moved branches. The typed departure-layer layout is retained. Next: index the input table directly in each state arm (rather than advancing a shared table pointer), then address `layers[1].position.y` through a single typed destination local.
+
+### SpriteTrail_CreateFixedEffect (src/fn/sub_081F28C4.c, 081F28C4): deferred, 4/4
+
+Draft: `notes/phase3-drafts/cdp-effects/SpriteTrail_CreateFixedEffect.c`. The pin-free code has identical instruction shape; reload keeps `pool` in sl and spills the render position, while the ROM spills `pool` at sp+4 and keeps the position in sl. Moving declarations and replacing the two position-x field expressions were tested; declaration order is neutral and the field rewrite worsens allocation. Next: find the original render-loop inline/helper boundary that raises the position pointer's density without changing the emitted body.
+
+### SpriteTrail_CreateMotionEffect (src/fn/sub_081F2A08.c, 081F2A08): deferred, 4/4
+
+Draft: `notes/phase3-drafts/cdp-effects/SpriteTrail_CreateMotionEffect.c`. As in the fixed twin, only the equal-live pointer placement differs: pool is in sl in the draft, while the ROM spills it and keeps renderOrigin in sl. The already-separated motion setup eliminated the earlier second binding. Declaration reordering is neutral; direct origin-x spelling perturbs loop allocation. Next: solve the fixed twin's shared render-loop pointer-density form and apply it here.
+
+### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): deferred, 5/3
+
+Draft: `notes/phase3-drafts/cdp-effects/RisingActor_AdvanceHeight.c`. Removing the zero r4 and state r2 pins together leaves five ROM / three draft rows in this 76-byte leaf. The verified Orbit Volley state/resource layout is retained. Next: express the height update as a returned value (including the missing-return lifetime lever) so zero remains live in r4 and the state destination naturally occupies r2.
+
+### sub_081FDCB0 (src/fn/sub_081FDCB0.c, 081FDCB0): deferred, 38/30
+
+Draft: `notes/phase3-drafts/cdp-effects/sub_081FDCB0.c`. The source r1 pin costs only 4/4; the zero-use barrier and especially the memory barrier control the steering-stage schedule and account for four moved branches. The resource and 0x38 trail record types agree with their callers. Next: split steering calculation from trail emission into an inline returning the updated position, so the real call/data dependency replaces the memory fence.
+
+### HomingProjectile_UpdateDefaultState (src/fn/sub_081FF454.c, 081FF454): deferred, 47/49
+
+Draft: `notes/phase3-drafts/cdp-effects/HomingProjectile_UpdateDefaultState.c`. Four constraints steer a saved r5 value, y destination r2, constant one, and delay. Removing them changes 47/49 with five moved branches; the typed projectile lifetime/state layout remains. Next: return the state-transition result directly from each arm and repeat the delay store before each return, shortening both constant lifetimes and eliminating the join allocation.
+
+### ProjectilePool_Update (src/fn/sub_08202730.c, 08202730): deferred, 20/20
+
+Draft: `notes/phase3-drafts/cdp-effects/ProjectilePool_Update.c`. Only two empty operand barriers remain, on the sprite object and velocity; removing both preserves length but rotates 20/20 allocation rows. The live slot (0x128), configuration (0x5c), shared command reader, signed motion, and collider layout are retained. Next: use the shared sprite-step helper with the object and velocity passed as distinct typed arguments, supplying genuine references across the command dispatch.
+
+### SpiralBurst_InitParticles (src/fn/sub_08234540.c, 08234540): deferred, 49/47
+
+Draft: `notes/phase3-drafts/cdp-effects/SpiralBurst_InitParticles.c`. The signed cosine-table/direct sine sampling already removed the old barrier. The remaining two pins keep separate effect-table and random-table aliases in r5/r6; removing the random-table pin dominates and introduces three moved branches. Next: convert all draws to the table-first `ParticleRandom_ReadSample`/`ReadDirectSample` helpers while keeping the effect table captured outside the loop.
+## cdp-field (Codex)
+
+### TetherActor_UpdateBounceReturn (partial)
+Dropped the destination pointer's `r1` pin: ordinary allocation already matches. The saved pin-free draft still differs by 23 ROM / 16 draft instructions plus two moved branches. The remaining costs isolate `frameValue` (4 rows), `incremented` (2 rows), and especially the `0x380` height offset (25 rows). Next: recover the original height-store expression so the constant is rematerialized in the ROM's allocation order.
+
+### AreaEffect_AddSpriteFromScript
+The pin-free draft differs by 38 ROM / 32 draft instructions plus eight moved branches. The count pointer's `r8` allocation is the largest isolated cause (30 rows), followed by the point pointer (19); removing the `first` barrier alone costs three rows. Earlier work identified the register allocation at entry and loop shape as the blocker. Next: compare the 55-instruction relative `sub_08063CAC` and duplicate the post-join point advance into its arms to adjust pointer density.
+
+### AreaEffect_UpdateLinkPlayerResources
+The pin-free draft differs by 40 ROM / 44 draft instructions plus 16 moved branches. Isolated costs show the loop counter pin/barrier pair changes 33 rows; the destination's previous value changes 41, the counter value 28, and the base pointer 40. Next: reconstruct the loop as the likely count-up source loop and let loop reversal create the ROM counter copy (scope facts 84 and 86).
+
+### AreaEffect_UpdateLinkVisibility
+The pin-free draft differs by 39 ROM / 37 draft instructions plus nine moved branches. The `~1` mask controls the largest allocation cascade (37 rows); the two count-pointer copies together cost 17 and the cursor barriers together cost six. Next: combine the two scans behind a shared typed helper and test whether repeated arm tails supply the missing references without barriers.
+
+### ResourceStation_CheckInteraction
+The pin-free draft differs by 36 instructions on each side. The trigger offset pin is the dominant isolated decision (31 rows); the offset/barrier group costs six and the nearby-offset group three. Next: replace constant byte offsets with a layout-preserving station struct and member addresses, so CSE and reload derive the constants naturally.
+
+### ResourceStation_UpdateDigits
+The pin-free draft differs by 32 ROM / 36 draft instructions plus one moved branch. The two loop-counter pins together cost 41 rows, while the read temporaries cost ten and field temporaries eight. The branch target shift points to loop source shape. Next: express both countdowns as count-up `for` loops and compare the 51-instruction relative `sub_08016C04`.
+
+### DirectionalForce_Tick
+The pin-free draft differs by 34 ROM / 30 draft instructions plus two moved branches. The random-table pin costs 14 rows, the countdown barrier 12, mask pin 11, and memory barrier eight. Next: use the shared table-first random-sample helper and rewrite the countdown as a count-up loop so loop reversal establishes the ROM lives.
+
+### DirectionalForce_InitializeFromScript
+The pin-free draft differs by 60 ROM / 61 draft instructions plus two moved branches. The status helper pin dominates the isolated result, while the random pointer/barriers form a 20-row group. Next: replace the private random reads with the shared table-first helpers, then revisit the value statement order that currently needs two barriers.
+
+### WoodenCrate_CreateFromScript
+The pin-free draft differs by 58 ROM / 46 draft instructions plus four moved branches. Fifteen of sixteen concessions are in the private `Step` helper; its group alone costs 50 ROM / 38 draft rows. Next: replace that private sequence stepper with `DisplaySequence_StepSprite`, then diagnose only the creator's remaining sprite allocation.
+
+### WoodenCrate_ReactToHit
+The pin-free draft differs by eight instructions on each side. The ROM preserves both the hit argument and a second crate copy; ordinary C reverses the first two copies, then uses the wrong saved copy after calls. Next: alter parameter-copy order with a plausible inline wrapper or callback-target view while retaining the helper's control flow.
+
+### FloorSwitch_SetOccupant
+The pin-free draft differs by eight ROM / six draft instructions. Priority instrumentation shows the `one` pseudo must be allocated before the function pointer so r6 is already occupied; `AGBCC_PRI=one:+11728` is the diagnostic. Pass 2 confirmed that duplicating `p->field10 = one` in both song-selection arms gives `one` the ROM's r6, but jump2 cannot merge the stores across the intervening calls and leaves two extra instructions. Duplicating the palette call with the store also gets r6 but leaves both four-instruction call sequences. Identity uses in the song argument (`+ one - 1`, `one & ~one`, shifted and remainder forms) fold before allocation and do not change the eight/six diff; XOR and OR identities survive but make the output worse. Reversing `one & f` does not affect allocation, while `f &= one` reduces the draft-only side to two instructions but increases shape distance. Next: find a real pre-call use of `one` that survives through global allocation and is removed by combine, or a branch layout whose duplicated stores are adjacent tails that jump2 can cross-jump.
+
+### NamedObject_RegisterFollowCells
+The pin-free draft differs by 17 instructions on each side. `AGBCC_PRI=object:+1027` matches exactly: the object pointer must outrank `w`; a smaller increase also fixes its order relative to the loop counter. Next: add natural object references by duplicating a post-join object-field statement into the registration branch arms, allowing jump2 to merge the emitted tails.
+
+### ActorGroup_CreateFromScript
+The pin-free draft differs by 79 ROM / 77 draft instructions plus six moved branches. All concessions are in the private `Step` helper, with the mask/barrier pair causing a 55-row cascade. Next: replace the helper with the subsystem's shared playback/sequence helper, preserving the setup pointer and embedded frame state.
+
+### Collectible_StartDeath
+The pin-free draft differs by 37 ROM / 33 draft instructions. Most concessions are a repeated private display-sequence stepper; the mask pin alone causes 52 differing rows. The output-only `d` barrier cannot simply be deleted because it is its only definition. Next: use `DisplaySequence_StepSprite` and write the actual duration value directly before removing the output barrier.
+
+### Collectible_UpdateEntry
+The pin-free draft differs by 46 ROM / 42 draft instructions plus one moved branch. The repeated private stepper accounts for most pins/barriers; the final duration and hit temporaries remain a separate allocation issue. Next: adopt `DisplaySequence_StepSprite`, then reconstruct the actual definition currently hidden by the output-only `d` barrier.
+
+### SpriteDrop_UpdateEntry
+The pin-free draft differs by 31 ROM / 29 draft instructions. Every concession is in the same private display-sequence pattern seen in the two collectible functions. Next: convert all three together to `DisplaySequence_StepSprite`; their shared C form should expose any caller-specific allocation difference.
+
+### sub_0817AEC8
+The pin-free draft differs by 53 ROM / 49 draft instructions plus three moved branches. Its single sine-table `r2` pin controls the entire allocation cascade. Older notes likewise identify allocation rather than instruction selection. Next: recover the angle/table expression from matched scene-volume relatives and test operand order and a typed sine lookup helper to generate the ROM preference naturally.
+## cdp-link (Codex)
+
+The 2026-11-13 pass recompiled every queue entry with all concessions removed. The best ordinary-C
+starting points are archived under `notes/phase3-drafts/cdp-link/`; the row counts below are aligned
+scope differences, not byte counts.
+
+- **WirelessGameDisplay_UpdateShakeAnimation** — Replacing the two manual random-index sequences
+  with table-first `ParticleRandom_ReadDirectSample` calls reduced the pin-free draft from 61 to 26
+  ROM rows / 34 draft rows. The remaining blocker is allocation of the display owner to r7 rather
+  than r6, which introduces the r8 save. Next try a shared display-step helper that shortens the
+  owner's live range across both random reads.
+- **WirelessResultPanel_UpdateOutcomeReveal** — 69 rows after removing eight pins. The first
+  blocker is the drawing cursor's allocation across the outcome branches; repeat its post-join
+  assignment in each arm before changing the result-counter loop.
+- **WirelessResultPanel_Init** — 95 rows after removing fourteen pins. Several independent
+  initialization phases are coupled by long-lived zero/one and object aliases; split the phases
+  with branch-local member stores and diagnose each pin-removal variant independently.
+- **EncodedRecord_XorRange** — 14 rows after removing two pins and one barrier. The current-value
+  barrier controls the byte XOR loop allocation; next compare a pointer-advancing loop with an
+  index loop and preserve the encoded byte in a narrow local.
+- **sub_08108C94** — 60 rows after removing two pins. The table base and raw halfword allocation
+  remain coupled; next use a typed table cursor and repeat the post-join raw assignment in both
+  arms.
+- **LinkMenu_WaitForReadyPeers** — 20 rows after removing the initialization pin and timer helper
+  barrier. The timer helper's memory operand controls its caller's allocation; next inline the
+  ordinary increment form into both timer branches.
+- **LinkMenu_WaitSelectionMode** — 16 rows after removing the pointer pin/barrier pair. Allocation
+  wants the pointer-to-pointer in r2 instead of r0; next test direct double indexing rather than a
+  saved alias.
+- **LinkSelection_WaitForEmptySlots** — One register-only row remains: cse1 canonicalizes the
+  initial `i` comparison to the equal zero-valued `count` pseudo. Casts, zero spellings, declaration
+  order, `i + 0`, and `i = count` do not change it; an explicit `0 < length` changes the compare
+  shape. A second pass confirmed with `why 81` that pseudo 24 (`i`) is initially allocated to the
+  ROM's r3, but cse1 substitutes pseudo 25 (`count`, r6) solely because both hold zero. Labels,
+  gotos, `count ^ count`, `count - count`, signed/unsigned and narrow types, alias locals, and reuse
+  of the session-ready result either leave that substitution intact or add instructions. Moving the
+  count initialization into both sides of the initial branch preserves the desired comparison but
+  adds two branches, so it is not a viable match. Next seek an ordinary expression whose zero is
+  only exposed after cse1, or a natural preceding nonconstant definition of `i` that does not alter
+  its otherwise-correct priority.
+- **LinkSelection_ExchangeParticipantInput** — 14 ROM / 10 draft rows after removing three
+  concessions. The initial 0x3c00 mask is built directly in r6 rather than in r1 then copied, and
+  that changes the later mode tests. Next derive the mask through the first slot predicate so the
+  copy remains live.
+- **LinkSelection_UpdateParticipantScores** — 89 rows after removing fifteen pins. This is a broad
+  allocation rewrite; isolate the zero aliases and participant cursor first, then retain only
+  variants that improve the register-blind shape.
+- **TimerDisplay_DrawRecord** — Eight rows after removing two pins and two barriers. The cell
+  pointer barrier controls three register-only differences. `why 36` identifies the exact cause:
+  each store block has three local quantities, triggering agbcc's small-set `qty_compare` ordering;
+  it assigns the returned cell to r0 and the halfword constant to r1, while the ROM has the cell
+  copy in r1 and the constant in r0. Typed return values, pointer/value aliases, wide or narrow
+  constants, increment-built constants, and an inline store helper do not create the required
+  fourth local quantity (the helper is instead emitted out of line). Next try a real fourth value
+  arising from direct row/column indexing, rather than a dead steering local.
+- **sub_0810FDDC** — 63 rows after removing two pins. The score-panel owner and tens digit compete
+  across the drawing calls; next repeat the digit-base computation in the two branches.
+- **LinkSession_UpdatePlayerValueAverage** — Ten rows after removing the `GetSelection` sum
+  barrier. The inline helper's accumulator lifetime is the blocker; next use a returned aggregate
+  or a caller-owned sum so the helper has no cross-iteration alias.
+- **sub_081384A0** — 45 rows after removing the loop-index barrier. The barrier prevents induction
+  canonicalization; next rotate the loop around its return/exit rather than using a while-form.
+- **PositionEffectDisplay_UpdateSources** — 69 rows after removing three pins. Source cursor,
+  flags input, and output object allocations are coupled; next duplicate the post-join source
+  update in each flag arm.
+- **Clock_CheckRtcStatus** — Five register-only rows (plus one moved branch) after removing two
+  pins. The shifted byte is allocated to r4 instead of r5; declaration order, delayed
+  initialization, scalarized two-word arrays/structs/unions, and zero-initialized aggregates did
+  not reproduce the allocation. Splitting the shift-assignment, narrowing the second assignment,
+  initializing `status` from the call before shifting it, and a one-member union all compile to the
+  same five-row difference. Next recover the SDK RTC result aggregate type rather than using two
+  independent u32 values.
+## cdp-monsters (Codex)
+
+The 2026-11-13 cloud pass rebuilt scope's instrumented compiler and ran `pins` on the complete
+17-function queue. The saved drafts below are the best ordinary forms from the prior
+monsters-bosses pass where those were closer, otherwise the newly regenerated all-concessions-removed
+form. The detailed compiler investigations remain in the earlier function sections in this file;
+this index records the complete queue and the current blocking decision after rechecking it.
+
+* `TentacleActor_UpdateRetraction` — 20 differing rows after both barriers are removed. The unused
+  absolute-value branch still needs identical post-reload arms so jump2 can delete the comparison.
+* `sub_080ABB18` — 116 rows after seven concessions are removed. Loop-invariant field addresses
+  still need to be produced by loop hoisting rather than manually pinned pointer temporaries.
+* `Vorn_UpdateDefeat` — no pins or barriers remain, but eight single-use statement macros retain
+  the loop-depth allocation effect. The next form must reproduce those reference weights with
+  ordinary repeated statements.
+* `sub_080B197C` — 26 rows after its barrier is removed; `AGBCC_PRI=active:+400` diagnoses the
+  remaining r4/r5 allocation swap. It needs one natural reference to `active` or a shorter life.
+* `Skeleton_TrySelectRetreatCell` — two rows after both map-slot barriers are removed. Reload
+  choice 18 must naturally select r2 for the south signed-width load.
+* `Skeleton_UpdateDefeat` — 273 rows after three pins are removed. The two `one` lifetimes and the
+  random table allocation interact across the large state machine and must be separated first.
+* `Golem_UpdateDefeat` — 92 rows after the random-table pin is removed. Use a table-first random
+  sample form that preserves the current six-particle loop's allocation.
+* `Mummy_ResumeSavedRouteAfterAnimation` — 22 rows after four concessions are removed. The saved
+  mask and reaction/flags operands still require the ROM's stack and low-register placement.
+* `Mummy_UpdateDefeat` — 110 rows after the table pin is removed. As with Golem, the next attempt
+  should use the shared table-first random draw without changing the loop allocation.
+* `Ivy_UpdateDefeat` — 14 rows after the table pin is removed. The helper form fixes allocation,
+  but the table literal must be loaded before the random index while retaining the shorter life.
+* `Axe_UpdateDamageSpin` — the closest ordinary draft has 11 differing rows; context and constant
+  one need their priority order reversed without extending the doubled REG_EQUIV lifetime.
+* `Terrain_ResolveActorMotion` — the closest ordinary draft has 10 differing rows. CSE must not
+  fold the negated shifted offset back to the shift pseudo, without an operand barrier.
+* `SpriteColliderGroup_ActivateParts` — six rows after both concessions are removed. The ROM saves
+  unused r8, implying an allocation whose uses disappear after allocation/reload cleanup.
+* `SpriteColliderGroup_ResetActiveParts` — two rows after the total pin is removed. Combine must
+  retain a real total pseudo so the first count load occupies r5 instead of reload choosing r6.
+* `VulcanCannon_UpdateFacingTurn` — the closest shared-step draft differs by five ROM rows versus
+  three draft rows. An equality test must not let CSE reuse `allowTurn` as the later zero argument.
+* `EnemyParticle_UpdatePool` — the closest shared-step draft differs by 12 ROM rows versus 16 draft
+  rows. The step needs r8 as the loop cursor while sprite/state remain derived from the base side.
+* `OrangeSpine_ApplyHitReaction` — the relative-based ordinary draft differs by 36 ROM rows versus
+  34 draft rows. A natural value live across the response copy must occupy r0/r1 and add r3 to the
+  later reload spill set.
+
+Drafts: `notes/phase3-drafts/cdp-monsters/`.
+
+### cdp-monsters pass 2 follow-up (2026-11-13)
+
+* `SpriteColliderGroup_ResetActiveParts`: stayed on the two-row reload holdout. Algebraic
+  second uses of `total`, duplicate identical arms, a copied total, and using `total` for the
+  loop latch are either removed before combine or perturb the loop; none keeps the initial
+  zero-extend pseudo alive. The original two-row diagnosis remains exact.
+* `Skeleton_TrySelectRetreatCell`: `why 447` confirms choice 18 sees r0 occupied and r1/r2
+  free after choice 17 selected r2. Expanding the successful south tail, the blocked south
+  tail, or both prevents jump2 from recreating the ROM control flow; the best expanded-tail
+  form is 8/10 rather than 2/2. The missing earlier reload must therefore come from another
+  source-level lifetime, not duplicated south tails.
+* `VulcanCannon_UpdateFacingTurn`: passing `p->allowTurn` as the final zero argument proves
+  the equality-CSE diagnosis: it restores the missing four-byte instruction and exact branch
+  layout, but reloads the byte through a retained offset base (4/4). Constant spellings,
+  signed/unsigned zero tests, and a separate zero local all reproduce the 5/3 draft.
+* `Ivy_UpdateDefeat`: the saved helper is closer than the prior index recorded (5/5). Reversing
+  the table/index addition and pointer spellings cannot change machine order. An explicit local
+  moves the literal early but returns the 14/14 allocation swap; duplicated-load arms inflate
+  every inlined call and are far worse. The remaining form must load the literal early without
+  creating a named table lifetime.
+
+Additional pass-2 allocation attempts:
+
+* `Vorn_SelectReactionControl`: duplicated boolean tests, zero expressions derived from `active`,
+  split result/call forms, and signed/unsigned copy locals all optimize before global allocation
+  or worsen control flow; they leave the exact r4/r5 swap unchanged. A source-level ninth use
+  must survive through global allocation rather than being propagated by combine.
+* `Axe_UpdateDamageSpin`: using the long-lived `context` as the branch-local `state`, or for any
+  single state access, lets CSE merge the two pointer quantities and is substantially worse
+  (34+ rows). The near match specifically requires two loads of the same actor context; the
+  remaining +20 priority cannot come from sharing those source locals.
+## cdp-scene2 (Codex)
+
+Queue audit on 2026-11-13 found that 21 of the 26 assigned functions no longer contain a
+concession on the current branch. Their queue scores predate the cleanup already present in
+`src/actor_animation_controller.c`. The five remaining functions are retained below as ordinary-C,
+pin-free drafts; `scope.py ... pins FUNC` verified the checked-in forms match and measured each
+removal independently.
+
+### Actor_UpdateBlinkBurstDisappearance: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateBlinkBurstDisappearance.c` (one missing
+`movs r7, #0`, plus compensating alignment padding). The child-flags r2 pin was removed by using
+the shared `DisplaySequenceControl` union form; this matched exactly and was committed separately.
+The remaining pin initializes r7 after the controller pointer's final use, and the emitted zero has
+no machine-level uses. Tried a scalar zero loop bound, reassigning the dead controller pointer,
+zero-initialized scalar/union/array/struct counters, and using the zero in the loop bound. Either
+GCC deletes the initialization or retains a compare and changes allocation. Next: find a natural
+multi-set union whose initial zero survives RTL generation but whose eventual use folds away.
+
+### Actor_UpdateFinishingAnimation: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateFinishingAnimation.c` (the same two-row zero
+initialization/alignment difference as the blink-burst twin). The child-flags r2 pin was removed by
+using `DisplaySequenceControl`; the ordinary union form matches exactly. The sole remaining pin is
+the dead r7 zero. The scalar, union-counter, pointer-reassignment and loop-bound forms tried on the
+twin either delete that zero or add a compare. Apply any natural surviving-zero form found for the
+twin here as well.
+
+### ActorDisplay_UpdateForegroundSprite: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/ActorDisplay_UpdateForegroundSprite.c` (78 differing rows:
+62 ROM / 65 draft, with 11 moved branches). The remaining pin is the accumulated horizontal
+coordinate in r1. The earlier typed-layout rewrite is already present and preserves the verified
+halfword fields. Removing the binding changes allocation through most of the function, rather than
+one isolated instruction. Next: split the horizontal and vertical sums into narrow typed helpers,
+and compare reference density and copy preferences against the sibling foreground/accent display
+updates.
+
+### SingletonSlot7_UpdateEndingScene: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/SingletonSlot7_UpdateEndingScene.c` (81 differing rows:
+73 ROM / 71 draft, with seven moved branches). Its four pins are two occurrences each of a constant
+one and a byte zero. Individually, the zero sites cost 8 and 3 rows; each one site costs 32 rows.
+Grouping equal-named locals does not recover allocation. Next: use a union/array initializer for
+the byte zero and repeat each constant-one operation within the branch arms so cse and jump2 see
+the same lifetimes as the ROM.
+
+### SingletonSlot7_InitDisplaySprites: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/SingletonSlot7_InitDisplaySprites.c` (95 differing rows:
+88 ROM / 80 draft, with two moved branches). Thirteen concessions remain: eight pins and five
+barriers, seven of them inside the private `StepPlayback` helper. Independent costs range from 4
+to 45 rows and the helper group costs 137 rows, showing that its C shape, rather than one caller
+allocation, is the blocker. Next: replace the private playback implementation with the shared
+display-sequence stepping form, preserving table-first packed-command reads; then retry the two
+caller-side constant-one/duration groups separately.
+## dp-field (Codex)
+
+Tags: #phase3 #field #matching #compiler
+
+### Scene_TryStepDown (08004CE4): one barrier removed, four concessions remain
+
+The matching partial moves the type calculation after the existing mask barrier.
+This removes the height-byte input barrier without changing any instruction.
+Stock `tools/check.py src/scene_object.c` matches all 37 functions (7,236 bytes).
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/Scene_TryStepDown.c`
+(18 ROM / 20 draft differing instructions, shape 6). It reads the cell byte into
+`mask`, copies it to `heightByte`, computes `type`, then sets `mask = 0xF0`.
+The nonconstant first set removes the constant-equivalence priority penalty:
+mask takes r4, cell r6, type r7, direction r8 as in ROM. It leaves an extra copy
+and shifts before setting 0xF0. Moving the mask assignment before the shift lets
+CSE delete the first mask set and restores the earlier allocation failure.
+
+The earlier field-effects draft remains useful as a second frontier. It matches
+under the combined diagnostic knobs `AGBCC_PRI=mask:+1400`,
+`AGBCC_FORCE=heightByte:1,current:2,referenceHeight:0`, and
+`AGBCC_NOTIE=231,485`. Thus the remaining blockers are mask priority, allocation
+of the two loaded bytes and two-address operand selection for both nibble ANDs.
+These are diagnostic overrides only; they are not used by any landed source.
+The saved draft also improves with `AGBCC_PRI=current:+544` (13/15 differing).
+
+Tried: reusing index or the override pointer for mask; initial mask copies before
+and after the shift; narrow mask and reference-byte types; union mask initializer;
+union byte references; swapping AND operands; decrement helper; assigning the
+low mask to remaining before the AND; and mutating lowMask directly. The latter
+removes the unwanted remaining copy but gives lowMask the long-lived r4 instead
+of ip. The helper/copy forms change CSE's canonical representative and spill
+layout. Narrow union byte reads prevent ties but perturb allocation substantially.
+Keeping the other original concessions while applying these forms did not remove
+a second site. Parameter/neighbor cleanup alone does not preserve the partial's
+allocation when the remaining pin is retained.
+
+Next: a height/nibble representation that retains the nonconstant mask priority
+without retaining its initial copy; or a shared nibble operation whose subreg
+operands prevent both regmove ties without making lowMask the canonical result.
+
+### Trigger_RunScript (08006F00): argument pointer pin/barrier removed
+
+The matching partial uses `argsPtr->values = values`, removes the redundant
+`argsPtr = &args` before Script_Call, and removes both the argsPtr input barrier
+and r2 pin. The single pointer definition survives GCC's PRE at the correct
+position, and its use for the values field gives the necessary allocation.
+Stock `tools/check.py src/item_container.c`: all 30 functions MATCH (7,024 bytes).
+One actor-output barrier and one actor-index pin remain.
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/Trigger_RunScript.c` (11/9,
+shape 6). As in the earlier field-effects notes, its pointer-based word RMW gives
+the right register but the wrong two memory operands. Direct `&args` for that RMW
+matches with `AGBCC_PRI=argsPtr:+2000` except the actor-copy region (9/7, shape 2).
+The matching partial's source becomes 23/23 when both remaining actor concessions
+are simply removed: CSE merging also changes pointer and saved-value allocation.
+
+New attempts: s8 union and array actor views; an inline active-player predicate;
+a validation while/break form; indexed copying, indexed source, descending copy,
+and destination-end loop. Union/array views compile like the baseline. The helper
+changes the return/control region; the validation loop changes loop-note priorities.
+The indexed and descending copies lower to the same loop as the baseline, so they
+do not fix the argument-pointer priority. The destination-end loop changes shape.
+The argsPtr partial is now resolved; the next pass should focus on a real boundary
+that preserves a short-lived actor-index copy before the saved r5 value, then
+reassess the fully pin-free pointer allocation with that corrected copy present.
+
+### DirectionalController_CheckRemaining (080098CC): resolved
+
+A value-less `return;` on the accepted branch, with `return 0` after SetState on
+failure, exactly matches the ROM with no pins or barriers. The angle is used
+only as `(u16)Math_Atan2(dx, dz)` for direction quantization. No angle pseudo
+needs to survive the later blocks; expand_function_end's hard-r0 USE retains
+the call result and makes local-alloc avoid r0 throughout the success path.
+Both the explicit value-less return and a goto to a fall-through function end
+match. The former reads more directly and is landed. This extends fact 95 to a
+function that has an explicit zero return on its other path (fact 160).
+Stock full-unit check: 21 functions MATCH (2,352 bytes).
+
+### sub_08010C10 (08010C10): still deferred, first reload scratch
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/sub_08010C10.c` (2/2, shape 0).
+Confirmed `AGBCC_SPILL=0:1`: MATCH. The first signed x load needs r2 for the
+constant offset where the stock default scan picks r1; all other bytes match.
+The newer why explanation corrects an inference in the earlier field-effects
+note: shifting the initial scan does not prove a prior ROM reload choice.
+Its spill set is r1/r2, both free, and there is no previous choice in this draft.
+
+Additional forms: duplicate the post-join Vec16_Lerp in both active arms (5/19,
+shape 20; jump2 does not fully merge the argument setup); signed-axis union
+(6/8, extra extensions); inline reverseAxis for both coordinates (same 2/2);
+zero-vector subtraction (same 2/2). These supplement the earlier documented
+40-plus spellings rather than repeating their offset/actor/else-first searches.
+No reduction landed. Next: a real shared vector operation that makes r1 live
+at the x load, or an earlier setup whose RTL consumes a scratch before later
+cross-jumping. A changed initial scan alone is not a C solution.
+
+### sub_08017510 / Weather_UpdateTilemapScroll (08017510): allocation-only frontier
+
+Best pin-free full-unit draft: `notes/phase3-drafts/dp-field/sub_08017510.c`
+(48/48, shape 0; exact size 372 bytes). Replace the private Random macro and
+literal table with `ParticleRandom_ReadDirectSample(gRandomTable)` through a
+local table pointer. This fixes table-first instruction order, repeated reloads,
+and cross-jump shape. ReadSample's statement macro instead changes shape (61/65
+with the named table); literal table plus direct helper retains late loads (56/57).
+
+Exact diagnostic: `AGBCC_FORCE=54:4,table:3` on this saved draft gives MATCH.
+The index-address pseudo 54 and table 52 take r3/r6 in ordinary C; ROM r4/r3.
+Those two decisions also put p in r6 as required. Raising index priority alone
+by 11714 still leaves p in r4, because index takes r2 instead; this is register
+preference/availability as well as ordering. p has 39 refs / 143 life (priority
+13636), index address 5/52 (1923), table 4/62 (1290).
+
+Additional attempts: make the existing Random cursor argument actually read and
+write its pointer (same 56/57 fully pin-free); initialize table/cursor before the
+scroll-delta call (54/54, shape 8); keep original pins but replace their barrier
+with real cursor usage (18/18, shape 14; hard pointer aliases stop index reuse);
+read only the first draw through cursor then write the global for subsequent
+reuse (10/10, shape 2, but the separate global address takes r5). No partial
+reduction landed. Next: a shared table/cursor capture whose real uses preserve
+the ROM allocation without aliasing away the cached random index.
+
+### TetherActor_BlendPalette (08048E0C): one moved copy remains
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_BlendPalette.c`
+(1/1, shape 2). Initialize i before weight: weight's shorter life puts it in ip
+and the component mask in r8 as ROM, but its `mov ip,r1` is then after the i=0
+initialization instead of before it. The baseline (weight before i) is 6/6;
+`AGBCC_PRI=weight:+26` gives MATCH. Priorities: componentMask 3068 (9/88),
+weight 3043 (7/46); losing one weight live insn or adding one mask live insn
+would flip their order without a large structural change.
+
+Tried after diagnosis: weight/mask declaration orders; s16 weight (1/3, correct
+allocation but extra sign extension); s16 inverse; u16/s32/u64 component mask;
+union mask and weight aggregates; array/union loop counter; weight=64-inverse;
+helper returning palette weight; direct channel extraction; indexed-vs-pointer
+output; multiply instead of shift for packed colors; for/while/goto loop forms.
+The aggregate counter keeps the one moved copy; while/for match the baseline;
+the goto form changes loop allocation. The pointer output materially changes
+subword stores. Next: shorten the baseline weight life by one pre-combine insn
+without moving its first copy, or lengthen the mask life by one without moving
+its emitted initialization. No reduction landed.
+
+### TetherActor_StartInteractionEffect (08049D4C): resolved
+
+Removed the r3 zero pin by repeating the final effectValue store and attachment
+call inside each accepted branch. Reload sees a single branch-local straight
+line and eliminates its redundant literal-zero argument load. jump2 subsequently
+cross-jumps the repeated tails back into the ROM's shared sequence (fact 91).
+Only duplicating the effectValue store did not suffice (17/25); the whole tail
+was needed. Arrays/unions retained the extra literal zero or added extensions;
+readback from effectValue folded back to the baseline. The original pin-free
+baseline was 1/1, shape 2 (a second movs r3,#0 before the call).
+Stock full tether-actor unit: 114 functions MATCH (20,516 bytes).
+
+### TetherActor_BeginDirectedState (0804A15C): resolved
+
+Removed the sample r0 pin by capturing the X difference with the existing
+ARMOR_CAPTURE_COMPONENT_DELTA helper. The saved actor initially wins allocation
+(5 refs / 36 live, priority 2777) over dx (3 / 11, 2727). Diagnostic
+`AGBCC_PRI=dx:+51` gives MATCH. The shared capture form raises the real reference
+density and produces the same allocation with the stock compiler. Applying it
+to both components changes allocation again (28/28); the Z difference remains
+a direct field expression. The heading now uses directedHeading instead of a
+raw offset. No shared header changed.
+
+Table-first random draws improved the baseline from 24/24 to 9/9 but moved the
+table and heading setup. Splitting the motion tail (8/24) or angle assignment
+(16/20) let CSE specialize the zero-delta path and did not fully cross-jump.
+Stock full tether-actor unit: 114 functions MATCH (20,516 bytes).
+
+### TetherActor_InitKindFromScript (0804A430): resolved
+
+The joined kind value lost r0 to the selected-kind address: 7/9 differing, shape
+2. Diagnostic `AGBCC_FORCE=selectedKind:1,36:3,38:2` gives MATCH; forcing kind
+alone overlaps the already allocated pointer and is not a valid diagnosis.
+Raising kind priority by 20000 does not evict the local address temporaries.
+
+Repeat both the selected-kind store and actor-kind reload in each branch, with
+a separately declared branch-local kind value. This prevents the early merge
+that a single outer kind variable permits. Each call result stays in r0 during
+allocation; jump2 then cross-jumps the identical tails. Stock unit MATCH.
+Repeating the store alone is 4/6 with branch locals; repeating both with an
+outer kind is still 7/9. Short/union values, union pointers, ternary selection,
+inline store helper and unsigned slot did not fix the baseline allocation.
+
+### TetherActor_InitDisplayFromScript (0804A600): resolved
+
+Removed the display barrier by repeating SetPriority and the following keyword
+read in both initialization branches. The baseline is 23/23, shape 0: display
+priority 4363 (8 refs / 55 live) loses r4 to actor at 4639. Diagnostic
+`AGBCC_PRI=display:+277` matches. Repeating SetPriority gives correct allocation
+but an extra three-instruction call: the fall-through arm ends in flow's USE 0
+which blocks cross-jumping. Including the keyword result assignment makes both
+tails shareable and gives stock MATCH (full unit, 20,516 bytes).
+Count-up palette copying and union display pointers retained 23/23. Hoisting
+the display pointer or removing source's distinct lifetime changed shape.
+Repeating the entire script/heading tail was too broad (23/35).
+
+### TetherActor_UpdateWorldPosition (0804AF80): three concessions removed
+
+Landed the typed ContactPosition x/y/z stores in place of u16 indexing: these
+member stores preserve the display-pointer reloads, removing both memory
+barriers. A u16 shake value removes its r0 pin while preserving the addition
+operand allocation; narrowing coordinate too breaks it (26/24), while a signed
+value leaves 7/9. The named displayOffsetY field also matches. Retain the
+existing offset-variable assignments for now: deleting all of them changes
+later move2add reuse and reload rotation (11/11). Eight pins and three barriers
+remain. Stock full tether-actor unit: MATCH (20,516 bytes).
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_UpdateWorldPosition.c`
+(25/24, shape 7), improved from the current simple removal's 43/38 and old
+field-effects draft's 67/64. Its display region now matches; remaining problems
+are terrain-store address reuse, previous-value registers and final copy scratch.
+
+The final copy alone becomes a plain targetPosition struct assignment plus
+named heading store with only 3/3 differing (offset scratch r3 versus ROM r0).
+`AGBCC_SPILL=13:2` gives MATCH on that isolated tail-struct candidate. A local
+pointer, pointer union, inline copy helper and u64 copy keep the same difference;
+a temporary struct/union changes load/store shape (5/5), builtin memcpy is 10/10.
+Removing the previous-height r2 pin alongside this tail is also just 3/3, so a
+corrected scratch decision could remove that pin too. Keeping only the old
+offset pin/barrier with the struct copy worsens to 10/10.
+
+The full clean draft still uses a subtract of two for height's address where
+ROM loads 0x129 in r4, then previousSlope/Height/Attributes need r0 destinations
+and r4/r2/r4 samples. No combined matching override was established. Next:
+change the terrain/previous-field C to make the needed reload rotation before
+the final struct copy, then remove its six remaining copy/heading concessions.
+
+### TetherActor_UpdateLockedShake (0804B43C): resolved
+
+Removed the table pin with the shared PARTICLE_RANDOM_SAVE_ORIGIN capture and
+ParticleRandom_ReadSample draws. The named-table sample-helper draft is 29/27,
+shape 12; `AGBCC_PRI=randomTable:+293` gives MATCH. Table priority 1320 loses
+to amplitude 1612 and index address 1400. The real table capture adds reference
+density so table takes r6, amplitude r7 and index address r8, fixing all downstream
+reload choices. The same origin helper already captures gRandomTable elsewhere.
+A union table initializer retains 29/27; constructing the halves changes shape
+(52/55). DirectSample is 31/29. No shared header edits. Full unit MATCH.
+
+### TetherActor_BlockPlayerAcrossTerrain (0804B6A4): pointer PRE frontier
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_BlockPlayerAcrossTerrain.c`
+(1/3, shape 2). Capture current=actor before the player-height call and use
+current for heightPosition. This avoids the unwanted PRE reaching register but
+leaves one actor copy into r6 plus padding; heightPosition then reads r6 instead
+of r7. CSE_NOCANON=73 does not remove that copy.
+
+Baseline without the barrier is 9/15, shape 14. `pre` proves that replacement 1
+hoists actor+80 across the player-height calculation into an extra sb pseudo;
+`AGBCC_NOPRE=1` gives MATCH. The gPlayers PRE replacements are required and
+disabling them worsens the result.
+
+Additional forms after the prior 24-variant pass: branch-local initial position
+(2/4, but its address moves after the test); compute position after the height
+join (13/15, shape 2, extra r4 copy and later allocation); no inner position
+assignment; late inner assignment; union actor, array position and inline
+position helper (same PRE as baseline); pointer copy before attributes or
+initial position (8/14), versus after the player-height call (baseline); shared
+surfaceHeight for actor (10/14 or 23/23); reusing position (5/3, removes ROM's
+recomputed address and copy).
+
+Restoring actor=current immediately after the player-height call removes the
+extra copy but swaps actor/position r6/r7 (13/13, exact size). Raising position
+priority by 181 corrects those registers but produces four extra instructions,
+so that is not a complete diagnosis. Restoring after height/difference changes
+shape; using position for final Z accesses removes needed address operations.
+Next: a natural actor/position lifetime that keeps actor+80 non-anticipatable
+through the height call and coalesces the saved actor copy. No reduction landed.
+
+### TetherActor_UpdateAuxiliaryTransition (0804C748): two pins removed
+
+Landed explicit low-nibble mask variables in both later frame branches, which
+prevent regmove from tying their results to rawFrame. This removes rawFrame's
+r2 pin. Capturing the display address with TETHER_CAPTURE_DISPLAY, used in both
+visibility arms, gives activeDisplay enough real references to take r4 before
+actor; frame can then reuse r4 without its pin. The capture performs the same
+field-address operation in both arms and has no selector. Stock full unit MATCH.
+One value pin remains at the hidden auxiliary-sprite flag update.
+
+Baseline all-pin removal is 45/45, shape 0. Exact diagnostic on base.c:
+`AGBCC_PRI=activeDisplay:+318 AGBCC_NOTIE=313,341 AGBCC_FORCE=240:2`.
+Actor priority 3846 beats activeDisplay 3529; raising activeDisplay alone leaves
+9/9. Raising frame instead worsens to 73/72. Moving display copies immediately
+after calls is 11/11, shape 4; before calls is 47/43. An inline display getter
+retains the allocation mismatch. The frame pointer cannot be reused for the
+final increment without changing the ROM's address lifetimes (61/62).
+
+Best fully pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_UpdateAuxiliaryTransition.c`
+(2/2, shape 2, exact size). An inline auxiliary-flag reader gets the ROM's r2
+address, r0 value and r1 mask, but leaves `adds r0,r2` then loads through r0;
+ROM loads r0 directly through r2. The extra copy consumes existing alignment
+padding. Pointer-taking, local-pointer, signed and wide return getters do not
+remove that copy; a one-word struct return is equivalent.
+
+Other flag attempts: direct RMW, value-before-address, signed word, value array,
+union word, union bitfield, complement/AND/complement (5/5); bitfield-pointer
+store changes access width; u64 value changes shape; moving display's copy
+earlier changes the register graph. Next: fold the helper's address-copy pseudo
+into the load while retaining its local allocation, or another real visibility
+helper that produces that load/store ordering.
+## dp-field-b (Codex)
+
+Tags: #phase3 #field-objects
+
+### ProximityEmitter_InitializeFromScript (08051EA8): two terrain pointer pins remain
+
+Landed a partial removing eight pins and four barriers. Independent graphics/sprite
+locals for the two draw packets shorten their lifetimes and reproduce the entire
+sprite initialization. Named script fields replace the constrained offset stores.
+The pin-free draft is `notes/phase3-drafts/dp-field-b/ProximityEmitter_InitializeFromScript.c`:
+16 ROM / 16 draft instructions, shape 0. Only point, yAddress and cell rotate among
+r4/r5/r6. The cell pseudo is allocated first (priority 3333), before point (1944)
+and yAddress (379). Its first constant set doubles its live length in local allocation.
+`AGBCC_FORCE=point:4,yAddress:5` confirms MATCH; priority on point alone removes
+half the differences. This is an allocation decision, not a missing instruction.
+
+Tried independent draw scopes (decisive), direct field calls (45/43), terrain inline
+helper (16/16 plus order), array/union pointer locals and a coordinate-array pointer
+(all 16/16), moving cell zero initialization earlier (13/11, shape 10), and putting
+the nonconstant cell arm first (22/22 with changed branches). Earlier pass tried
+24 variants. Next: recover a terrain-expression form whose cell lifetime spans
+more of position parsing, or whose pointer temporaries have the original priority.
+Do not undo the independent draw scopes: they removed twelve concessions.
+
+### StackedActor_Initialize (080532B0): independent allocation and loop holdouts
+
+No new partial landed. The saved pin-free draft uses named fields and indexed
+segment accesses: `notes/phase3-drafts/dp-field-b/StackedActor_Initialize.c`.
+It differs by 116 ROM / 118 draft instructions, shape 46, versus 120/124 for
+simple removal. The ordinary draft has a 28-byte frame rather than 24 bytes.
+The first terrain conflict is the same index/world/worldY rotation as the
+ProximityEmitter initializer (index priority 3333, world 1944, worldY 379).
+`AGBCC_PRI=world:+1390` removes eight differences in the baseline; no single
+matching knob for the whole function has been found. The position-copy source
+prefers r0 rather than r3, changing load order; force source#2 to r3 removes
+three more. Loop current/selected pseudos also differ, independently.
+
+Investigated loop hoisting: `one` has two equal invariant sets that loop.c
+combines and hoists. `AGBCC_NOMOVE=930` on the saved draft improves 116/118 to
+115/117, so this alone is not the main blocker. Tested direct frame field
+expressions, named/indexed segment accesses, goto loops (worse 152/152), normal
+and explicit-word copy helpers (best shape 40, 122/124), cell-index helpers
+with raw-coordinate halfword returns, literal byte stores, and fixed-field
+store replacements on the pinned original (none independently free). Earlier
+passes also tried 24 source forms. Next: separate the copy helper's source
+allocation from the loop current/selected allocation; recover the cache/frame
+layout before attempting global pin removal again. Do not sweep register pins.
+
+### InteractionMarker_InitializeFromScript (08053AEC): two terrain pointers remain
+
+Landed nine pin removals and both barrier removals. Named pointer fields and
+aggregate position copies restore the sprite setup; initializing the default
+argument-clear loop after the view assignments restores reload order. Moving
+the bodyEnabled store into each keyword arm makes the joined condition reload
+the byte, eliminating the memory barrier without volatile storage.
+
+The saved pin-free draft is `notes/phase3-drafts/dp-field-b/InteractionMarker_InitializeFromScript.c`:
+16/16, shape 0, entirely the familiar cell/point/yAddress r4-r6 rotation.
+Restoring only the original point:r4 and yAddress:r5 bindings is exact MATCH.
+The same priority conflict and next ideas as ProximityEmitter's initializer apply.
+Private word copies were 85/85; aggregate copies improved to 39/37; late clear-loop
+initialization reached 17/17; branch stores reached 16/16. A pointer store and a
+byte-returning bodyEnabled getter did not restore the byte reload.
+
+### SavedPositionMarker_InitializeFromScript (08054028)
+
+Tags: phase3, dp-field-b, SavedPositionMarker_InitializeFromScript
+
+Partial: removed the final copy barrier using a ContactPosition temporary;
+the unit still matches. Direct aggregate assignment alone changes the
+destination reload order by one instruction; the temporary preserves it.
+
+The best pin-free draft differs by 47 ROM / 41 draft instructions (shape 22).
+Its independent blockers are the terrain yAddress allocation, sprite-view
+reload order, palette-store cross-jumping, palette-source reload registers,
+and resourceId/priority allocation. Raising yAddress priority by 2955 on the
+52/46 baseline improves it to 38/34 but does not match.
+
+Tried named field preparations in each script arm, late default-loop setup,
+aggregate and temporary position copies, palette helper parameters, literal
+priority stores, early priority initialization, and repeating the graphics
+load after each palette store. The last form worsens cross-jumping; the
+helper does not change palette reloads. Named field preparation alone on the
+pinned original still differs by 30/30, so it cannot yet land as a partial.
+Next: separate the two graphics setup lifetimes and test a value-returning
+palette selector to hold its graphics argument live across the halfword load.
+
+### TerrainEdgeMarker_FindTerrainDirection (08056298)
+
+Tags: phase3, dp-field-b, TerrainEdgeMarker_FindTerrainDirection
+
+No partial landed. The genuinely concession-free draft removes the undefined
+allocation-only scratch left by the pins command as well as all 34 pins and
+nine barriers. It differs by 224 ROM / 190 draft (shape 96; draft 1380 bytes
+versus ROM 1448). Region allocation, shared mask priorities, and cross-jump
+merging affect all four probes. Raising insideCell priority by 686 improves
+the diagnostic baseline to 214/180; sourceHeight +1136 gives 223/189. No
+matching knob is known.
+
+Focused partial attempts: aggregate or array initialization of maxZ/minZ
+replaces the scratch block with only four register differences, but its
+removal also removes r4 from the reload spill set. Both signed loads then use
+r3 for offset 2 where ROM uses r4. A spill-rotation search cannot fix that
+spill-set difference. A narrow midpoint helper differs by seven registers;
+explicit unsigned loads add instructions.
+
+Replacing the two outside-Z pointer barriers by compound field updates has
+only six register differences: the pointer reload chooses r4 instead of r1.
+AGBCC_SPILL=5:1 diagnoses the first choice. Void and halfword-returning
+offset helpers do not change it. Duplicating compare_0 and compare_2 tails
+also leaves six differences; duplicating clear tails worsens branch shape.
+A halfword height-mask helper loses several required shared masks.
+Next: recover the natural extra spill pressure associated with the midpoint
+loads, then retry the pointer barriers with the restored spill set.
+
+### sub_08069788 / BouncingObject_IsActive (08069788)
+
+Tags: phase3, dp-field-b, sub_08069788
+
+No partial landed. Natural nested field tests give 9 ROM / 7 draft (shape 8).
+The ROM preserves two input-pointer copies, consuming r1/r2 and leaving r3
+for the index/timer offsets; the unpinned C coalesces the pointers and reloads
+constants in r2. CSE_NOCANON=input does not restore the copies.
+
+Boolean-return helpers split after the index or timer; narrow return modes
+add branches, while u32 helpers still lose the copies. A pointer-returning
+validator differs by 3/5 but adds branches. Direct conjunction/result-variable
+forms change branch structure.
+
+Focused partial: named index access removes the offset pin and barrier, but
+move2add derives 314 from 311 (adds #3) instead of materializing it. Returning
+early for a negative index restores the constant materialization, leaving
+three register differences at entry: the late copy, null test, and index
+address still use input r0 rather than copied slot r1. Retaining the original
+location pin or index-offset pin does not fix those three differences.
+Next: an inline wrapper boundary that gives the first slot copy a distinct
+lifetime while preserving the early-return label before the timer load.
+
+### sub_080697C8 / BouncingObject_SpawnFromScript (080697C8)
+
+Tags: phase3, dp-field-b, sub_080697C8
+
+Partial: inline vector-clear helper taking destination then source removes
+the CpuSet destination pin and barrier; unit MATCH. The argument boundary
+puts the destination copy ahead of the control constant.
+
+Pin-free draft now 10 ROM / 8 draft (shape 14). The category b gets r8
+before the position pointer, whereas ROM puts position in r8 and b in r9.
+Raising pseudo 130 priority by two on the baseline reverses this allocation
+and improves 11/9 to 7/5. The missing optional-category path reloads zero
+into r0 and cross-jumps with the value path; AGBCC_SPILL=2:1 restores its r1
+reload and improves baseline to 8/8. No combined matching knob yet tested.
+
+Union initialization for the initial category or its missing-value arm does
+not change allocation. A goto at the velocity join also changes nothing.
+Using Script_GetPc's result as b adds differences. The clear helper removes
+one independent instruction-order difference.
+Next: duplicate the next keyword test in the category arms to separate the
+zero reload from the value path before jump2; inspect b's first-set lifetime
+versus the position pointer to reverse their nearly tied allocation order.
+
+### WoodenCrate_ReactToHit (08100144)
+
+Tags: phase3, dp-field-b, WoodenCrate_ReactToHit
+
+One pin remains. The natural helper draft differs by 8/8 (shape 6): caller
+crate and helper target coalesce in r4; ROM keeps a second copy in r5 and
+therefore saves hit in r6. Raising hit priority above crate worsens to 10/10;
+CSE_NOCANON=26 does not restore the missing copy. No matching knob known.
+
+Tried direct helper argument (no target local), a byte result, taking script's
+address before the helper call and passing it separately, and struct/union
+handle arguments. Aggregate handles still coalesce. The early script pointer
+changes which pointer survives but differs 9/9 (shape 4); byte result adds
+branches. Next: inspect the inline formal's equivalence class rather than
+only caller crate, and seek a natural destructive pointer update inside the
+helper that preserves the caller's pointer across both paths.
+
+### FloorSwitch_SetOccupant (0810048C)
+
+Tags: phase3, dp-field-b, FloorSwitch_SetOccupant
+
+Both barriers remain. Consecutive named halfword updates `flags88 |= 2;` and
+`flags88 &= ~1;` recover the zero OR exactly (fact 103), producing a pin-free
+8/8 draft with shape zero. Remaining differences are operand ties: the first
+AND copies f rather than one, and the update OR/AND/store stays in r1 rather
+than r0. Forcing one:r6,f:r1 has no effect because those allocations already
+match. Raising one's priority worsens to 18/18. No exact knob yet.
+
+Constant-first local updates recover the final destination but lose the
+HImode zero OR, leaving 4/2; retaining the first barrier leaves only the two
+missing zero instructions. Direct fields, pointer fields and explicit OR
+assignments keep the HImode insertion but retain the wrong operand tie.
+Narrow one locals, narrow mask-return helpers, a flag union, pointer-based
+testing, a field-setting helper, and a halfword-returning setter do not solve
+both decisions. Next: preserve a HImode field insertion while giving the
+constant its own dying pseudo; inspect regmove's tied operand choice rather
+than only global allocation priority.
+## dp-monsters (Codex)
+
+Tags: #phase3 #monsters #matching
+
+### Spider_UpdateWanderGoal (080A4018): one pin removed, four pins and one barrier remain
+
+Landed the mask-pin removal: load the first u16 sample, then mask it in a separate
+statement. This prevents regmove from tying the mask to the sample output.
+The complete source unit still matches. The saved pin-free draft is
+`notes/phase3-drafts/dp-monsters/Spider_UpdateWanderGoal.c` (58/60 differing
+instructions, shape 26, 592 bytes against 584).
+
+The diagnostic `AGBCC_NOEQUIV=31,32 AGBCC_FORCE=22:4,29:5,31:6,32:10,35:9`
+matches that draft exactly: input r4, transform r5, table r6, cursor sl, mask sb.
+The original pin-free draft additionally needs `AGBCC_NOTIE=64`; the split sample
+load removes this requirement. NOEQUIV alone leaves 58/58, shape 16.
+
+Tried the offset/page/region table initializer that solved Bat, both pointer
+initializers, getter and initializer lifetimes, direct cursor accesses, shared
+ParticleRandom_ReadSample at each draw, real SceneActorBody fields, and duplicated
+routing tails. Encoded pointers produce separate source/copy pseudos: table source
+spills while its initial copy serves the first two reads. The cursor copy still
+gets an equivalence. The shared second read changes pressure but also shrinks
+the stack frame. These mechanisms and candidates are saved in
+`build/matchsearch/Spider_UpdateWanderGoal` and `build/cx/work/Spider_UpdateWanderGoal`.
+
+Removing only the transform pin differs at the later Chase result: r6 instead
+of r5 (3/3). During global allocation r5 is not yet marked ever-used; the table
+pin makes r6 available to the later result. Raising the goal pointer priority,
+changing result width, reading transform fields earlier, and using the goal
+field directly did not recover the allocation.
+
+Removing ReadCounter's pin and barrier together differs 5/5. `AGBCC_SPILL=7:1`
+matches, proving one reload-rotation step at the counter offset; u16/s16 masks
+do not alter it. The remaining pointer pins must be solved together with
+allocation and reload order. Next: recover a shared random-draw structure that
+keeps both constant pointers live without equivalent rematerializable copies;
+then use the result's allocation order to resolve transform and counter.
+
+Tool gap found: why attributed the sample-mask change to an unrelated later tie
+sharing only the mask. The scope fix now requires both changed registers in a
+fallback tie, avoiding the ineffective NOTIE suggestion.
+
+### TentacleActor_SelectWanderRoute (080A8904): priority diagnosis confirmed
+
+The saved ordinary-C draft remains 46/48, shape 46, 988 bytes versus 984.
+`AGBCC_PRI=157:+2100,42:+1757,43:+423,45:+10000` matches exactly. These
+restore the original priorities of the scan union, n, i, and currentCell.
+The key threshold is not linear: global.c uses floor_log2(refs) * refs / life.
+The scan union changes 21/200, priority 4200, to 14/200, priority 2100;
+its original priority narrowly outranks the first cell-center terrain pointer
+(4137). The remaining count changes 9/74 (3648) to 7/74 (1891).
+
+Each single-use macro removal was isolated. Removing the cardinal advance,
+outer cursor increment, or inner cursor increment alone gives a pure r6/r7
+swap (25/25). Removing the count macro gives 38/36. None is free alone.
+The count-up form reverses to exactly the same macro-free result. Post-decrement
+and pre-decrement conditions, signed narrow counters, a combined advance/count
+helper, and separate mask/cursor locals do not recover the required priorities.
+A direction derived from the scan induction variable adds instructions.
+Duplicating the update after both eligibility arms raises references, but the
+longer lives and extra control flow remain. Returning from a while around the
+unvisited-cell path makes loop.c hoist the cell-center addresses and is much
+worse. Pointer post-increment changes the memory accesses and also fails.
+
+Persistent sources and hypotheses: `build/matchsearch/TentacleActor_SelectWanderRoute`.
+The complete ordinary draft is `notes/phase3-drafts/dp-monsters/TentacleActor_SelectWanderRoute.c`.
+Next: find a natural candidate-iteration structure whose cursor has at least
+21 weighted references over this lifetime, or shorten that lifetime without
+changing its merge with the cardinal mask. The exact diagnostic now separates
+this from instruction-selection problems. No source changes landed.
+
+### Tentacle animation family (080A8F38, 080A915C, 080A93F4): partials landed
+
+Refresh loses three pins, a barrier, and volatile command reads. Reset loses
+five pins, two barriers, and volatile reads. Restart loses three pins and
+volatile reads. Every complete source unit checks MATCH.
+
+The shared DisplaySequence_StepSprite form was the starting point. Refresh
+needs a separate second-flip sprite view declared before the state pointer.
+A `u16 duration[] = {1}` in the zero-duration branch prevents loop.c from
+combining that one with the status/flip ones and hoisting them all. Without
+it the hoisted one consumes sl, spills offset, and changes the frame.
+Initializer-zero control unions did not help; a byte first-bit variable did
+not help. The duration array gives the ROM frame and allocation.
+
+Refresh and Reset's final completely pin-free drafts each differ 15/15, shape 0.
+Their remaining caller differences are the same: the profile index shift
+coalesces with its input in r2 instead of producing r0; speed's actor pointer
+loads into r0 instead of r1; the loop stride takes r0 instead of r1 and the
+frame counter takes r1 instead of r2. Shared profile helpers, array-row typing,
+operand order, a combined advance helper, and counter update placement were
+tried. Scope spill says this is not one reload rotation; local allocation
+preferences must change first. The full drafts preserve the caller's
+statement expressions but contain no pins or barriers.
+
+Reset's playback alone additionally needs its caller sprite for the first
+clear. Expanding the playback into the caller keeps that view separate from
+the copied sprite. The copied sprite beats command in global allocation
+(16 refs/58 live, 11034 versus command's 12/38, 9473). The diagnostic
+`AGBCC_PRI=command:+1562` fixes the swap; a pointer-local first clear then
+has its own local-allocation issue (value r1/address r0 instead of value
+r0/address r2). Sharing the second flip store across arms changes allocation
+and control flow rather than matching. The partial retains the original two
+playback pins; removing all caller pins changes pressure enough to leave only
+the same caller 15/15 as Refresh.
+
+Restart's ordinary playback reaches 2/2 with the remaining first-flip pins,
+matching under `AGBCC_SPILL=6:1`: the final signed-load zero takes r4 instead
+of r3. Keeping the original advance code restores the reload sequence. A
+plain final `*command & 15` narrows to ldrb; a DisplaySequence_ReadCommand
+into a u32 sample followed by a local mask gives ldrh and matches. Passing
+the raw read through MaskCommand instead swaps the sample/constant registers.
+One first-flip bit pin then becomes free. The best saved completely pin-free
+Restart draft differs 50/56; a separate ordinary-advance draft is in the
+workspace and is worth revisiting once the common caller form is solved.
+
+Drafts: `notes/phase3-drafts/dp-monsters/TentacleBody_*.c`. Workspaces are
+`build/cx/work/TentacleBody_*`. Next: solve the shared caller local preferences,
+then consolidate the playback with the original sprite view explicit.
+
+### sub_080AA688 (080AA688): count-address hoisting
+
+The best ordinary draft differs 25/24, shape 5, and is 152 bytes versus 156.
+The only concession is the active-count address return pin. Removing it lets
+loop.c hoist the address in its second pass. `AGBCC_NOMOVE=148` matches the
+instrumented `-g` output exactly; scope warns that debug information changes
+this function, so this is a diagnostic, not a stock-compiler match.
+
+In pass one the address has 10*1*3 < 45 and stays inside; after the mask
+invariant moves, pass two has 13*1*3 >= 37 and hoists it. The nearest relative,
+ActorTrail_RemoveAllSegments, has an additional spark call after decrementing
+activeCount. That longer loop naturally keeps the address inside.
+
+Tried a genuine goto loop, reverse post-decrement and return-terminated loops,
+initialized pointer unions and arrays, encoded offset construction, narrow
+mask locals, eight-bit and seven-bit fields, a removed-bit field store, and
+an inline count setter. Most canonicalize to the same hoist; changed loops
+lose other invariant motion or induction reduction. No safe partial exists.
+The saved draft uses the real activeCount field rather than the original
+raw-offset helper. Persistent hypotheses and compiler evidence are in
+build/matchsearch/sub_080AA688 and build/cx/work/sub_080AA688.
+
+Next: find an equivalent iteration shape that increases loop instruction
+count during invariant analysis while still reducing to the same final loop,
+or prevents this address from being recognized as invariant without changing
+its eventual instructions.
+
+### TentacleActor_AlignSegmentsToTerrain (080AA8C4): PRE copy removed
+
+The saved draft declares the segment position pointer before the flag tests.
+This eliminates PRE's extra reaching-value copy, improving the old draft from
+36/38, shape 4, to 36/36, shape 2, with the correct 460-byte size. No production
+change landed. The remaining differences include the Height position/y-output
+r5/r6 allocation, the joined height copy, and reload choices.
+
+On the old base, `CSE_NOCANON=160 AGBCC_NOPRE=5 AGBCC_PRI=234:+1636`
+gets 13/13, shape 0. This is not an exact diagnostic: height comparisons still
+use r1 instead of r2 and the position/y-output pointers remain swapped.
+NOPRE=5 isolates the redundant position copy, which the explicit earlier
+pointer declaration removes in ordinary C. The canonical-register change is
+in the duplicate Abs calculation; it changes the allocation and retains the
+height copy but does not reproduce the comparison operands.
+
+Tried direct field stores, an independently indexed y-field pointer, shared
+terrain height helper, separate cell calculation, switch-arm returns, signed
+narrow height, unsigned height arithmetic, initialized height arrays/unions,
+materialized and mutating absolute-value helpers, reversed sign tests, output
+parameters, and early continues for inactive/equal-height segments. Field
+stores collapse the independent y induction and lose target instructions;
+most other forms canonicalize to the same result. Narrow height adds shifts.
+The saved draft still has inherited raw field-address expressions, which must
+be replaced before a clean final landing. Persistent search retains the old
+base and the pointer-first improvement. Next: change the height copy's class
+membership independently of the upper-delta Abs class, then use giv ordering
+to allocate the independent y-output pointer before the saved position.
+
+### TentacleActor_UpdateRetraction (080AB968): threshold barrier removed
+
+The local `u16 threshold[] = {0x6400}` initializer prepares the third argument
+before actor/divisor, matching without the threshold barrier. Unit MATCH in
+0014. An initialized union also works; a scalar u16 does not. The remaining
+barrier preserves absolute values and their signed source values.
+
+Nested direction decisions (`ax > az`, then x/z sign) with identical Advance
+calls retain all ROM absolute-value instructions. They leave two copies of the
+call because flow inserts `(use (const_int 0))` after the last fallthrough call.
+Cross-jump tracing confirms the other three paths merge. Explicit gotos and
+returns, duplicated oscillation calls, and duplicated entire remaining tails
+do not remove this last mismatch.
+
+Assigning `next = s` after each call supplies a real post-call instruction,
+letting all four calls and all direction tests merge in jump2. This is the new
+best ordinary draft: 15/17, shape 2, 328 versus 324 bytes. The only structural
+issue is the surviving actor copy (plus padding); original s and next overlap
+because CSE uses s for the first post-join call and field test, and next later.
+Next has priority 13571 (19/56), s 8543 (22/103); the former gets r6 and the
+latter r5. Spill rotation does not help. CSE_NOCANON=23 gives 13/15 but still
+has the copy. Using next throughout the tail, using input instead, taking the
+completion-field address before oscillation, returning the actor from Advance,
+and a returning while completion branch did not coalesce the views.
+
+The saved draft preserves the successful post-call assignment and nested
+sign tests. Persistent search: build/matchsearch/TentacleActor_UpdateRetraction.
+Next: stop CSE from extending the original actor through the join while keeping
+the post-call assignment until flow; that should make its allocation disjoint
+from next and eliminate the final copy after allocation.
+
+### sub_080ABB18 (080ABB18): behavior barrier removed
+
+One barrier landed in 0016. Removing either original barrier makes direction
+and motionTimer tie at priority 476 (2 references / 42 live instructions).
+Declare motionTimer before direction to break that tie in favor of the ROM's
+sl timer; this also preserves all stack slots. No initializer trick is needed.
+Five pins and the motion-counter barrier remain.
+
+Removing both barriers with that declaration order gets 7/7, all caused by
+motionTimer spilling to sp+8 while direction takes sl. The exact diagnostic
+`AGBCC_PRI=motionTimer:+20` matches. The second removal shortens direction's
+life another instruction, giving it priority 487 versus timer's 476. Scalar,
+byte/halfword/word arrays, initialized unions, copied pointers, derived zero8,
+earlier timer copying, early heading loads, and a packed reset-state struct
+were tried. The struct improves register-blind shape but adds instructions;
+the other initializer forms do not change this lifetime threshold.
+
+The fully ordinary saved draft is 101/101 after the declaration change.
+Removing the other pins separately still costs: animationFlags 31/31, zero
+74/74, timer 17/17, animation cursor 39/36, motion-counter cursor 19/19.
+The alternative final-stores-inside-loop draft is 139/107. Hoist analysis
+shows only the zero, one, and animation-flags address moving: most individual
+addresses have 13*1*3 < 68, so that shape cannot explain all fifteen ROM
+precomputed pointers without a major change in lifetime/loop shape.
+
+Persistent evidence and proposals: build/matchsearch/sub_080ABB18. Next:
+lengthen direction's pre-allocation life by one real intermediate operation
+that folds later, or shorten motionTimer's life without moving its emitted
+address computation. This is now a precise small threshold rather than an
+unexplained stack-slot permutation.
+
+### Vorn_UpdateDefeat (080AEE08): statement-macro allocation
+
+Current source has eight statement macros, no hard pins or asm. Expanding all
+is 124/126, shape 46. Transferring the encoded table plus shared defeat-spark
+helper from Bat is 151/149, shape 44; retaining the other original macros with
+that helper also fails (126/123). The saved ordinary draft expands all eight.
+
+The clearest isolated blocker is capture-spread: removing it gives 17/17,
+shape 0. `AGBCC_PRI=spread:+81` matches exactly. Local spread priority falls
+from 1271 (10 refs) to 1144 (9), below position's 1224 (8 refs), swapping r5/r6.
+Adding the natural reference via `spread->bits.y = 60` before capture would
+otherwise match, but narrows the y update to a halfword store (7/2). Using the
+z bitfield, a returned spread from a depth setter, a separate depth view,
+two mask/set statements, first-count staging, and direct first origin/kind
+arguments do not reproduce both the references and instruction selection.
+
+Removing prepare-entry or reset-entry alone gives 8/8: one is materialized
+before the entry address, shared with the later entry store, and alters the
+zero register. No single CSE/PRE/loop probe fixes it. Byte-array initializers
+still canonicalize to that result. Other isolated expansions: complete-defeat
+127/124, route-fields 100/101, random read 100/101, origin 98/100, kind 118/121.
+No free partial landed. Persistent search retains the independent hypotheses.
+
+Next: preserve full-word range initialization while giving spread one extra
+ordinary reference (or shortening its local life), then solve the entry-one
+sharing independently before combining macro removals.
+
+### sub_080B197C (080B197C): active priority remains
+
+Reconfirmed the exact `AGBCC_PRI=active:+400` diagnostic on the clean draft,
+26/26, shape 0. Active is 8 refs/33 live, priority 7272; actor is 18/94,
+7659. Life inspection shows the active value also supplies the zero stores
+in both state and control resets, ending at word104.
+
+Early return with duplicated motion marking, switch(active), u8 active,
+initialized active byte array, nested active==0 decisions, and a separate
+state-actor view all canonicalize to the same result. Reversing arms,
+returning while, active==1 with active-1 dispatch argument, explicit state
+zero parameter, and actor/motion pointer views change instructions or add
+copies. A word-return flag predicate removes narrowing but changes shape.
+No additional production change. Saved ordinary draft and persistent search
+record these attempts. Next: reduce the actor's weighted references without
+introducing an overlapping pointer, or recover a ninth active reference that
+survives flow and disappears only in a later merge.
+
+### Skeleton_TrySelectRetreatCell (080B77D0): updated reload diagnosis
+
+Both barriers removed still give 2/2, shape 0: south exit's signed width load
+uses scratch r1 instead of r2. Removing only north's barrier gives 22/22;
+neither removal is free. The old single-knob claim needs updating with the
+current compiler instrumentation: `AGBCC_SPILL=18:2` gives 22/22, while
+`AGBCC_SPILL=18:2,19:2` matches exactly. The first correction fixes the width
+scratch; the second restores subsequent reload rotation. Scope's one-choice
+spill search finds no improvement, correctly reflecting this coupling.
+
+Previous choice 17 belongs to north's width load (insn 422), and uses r2.
+Wrote out south, north, and both failed/successful exit tails before jump2:
+10/12, 25/25, and 39/41 respectively. A local initialized width array and a
+real signed width field both preserve the original 2/2. The saved draft uses
+the width field. Prior signed-width, map-accessor, loop, and post-loop lifetime
+attempts remain applicable; they were not repeated wholesale.
+
+Persistent search records the exit-tail hypotheses. Next: a C form that keeps
+mapSlot live through the south load but dies before its exit, or two naturally
+duplicated reload sites that cancel after tail merging. No partial landed.
+
+### Skeleton_UpdateDefeat (080BD1F0): global register reservation
+
+Three pins remain: priority one in each burst, and the second burst's table.
+Their isolated removals cost 101/97, 83/77, and 28/28 respectively; all removed
+is 178/168, shape 96. Saved that ordinary draft. No partial landed.
+
+The encoded table removes the source-level pin but still gives 28/28. The
+main effect is not the table expression: PRE's shared actor+0x5c origin
+(pseudo 3169) takes sl when the pin stops reserving it. The frame shrinks
+0x9c to 0x98 and both burst paths use the register instead of sp+0x98.
+PRE replacements 3 and 4 share that insertion across script branches.
+AGBCC_NOREG=3169 is not exact (34/34), since other allocation changes follow.
+This distinguishes the global reservation problem from Bat's equivalence.
+
+The shared burst helper was tried separately in each burst and in both,
+using the real spark declaration: 70/74, 40/48, and 84/94 while retaining the
+table pin. Fully ordinary shared-helper form is 133/137, shape 110, retained
+in the workspace as a different structural candidate. An initialized encoded
+priority value does not recover the two saved constants (171/161 with table
+pin retained). Persistent search retains these alternatives.
+
+Next: an ordinary global lifetime that keeps the common origin spilled while
+allowing the second table in sl, then solve each priority-one lifetime. The
+origin's shared PRE definition is the useful starting point; changing only
+the table spelling cannot recreate a hard register's function-wide exclusion.
+## dp-scene1 (Codex)
+
+Tags: phase3, scene, contact-actor, 0804373C
+
+### ContactActor_UpdateRetreat (0804373C): deferred after allocation diagnosis
+
+The pin-free draft is `notes/phase3-drafts/dp-scene1/ContactActor_UpdateRetreat.c`.
+It uses the established random origin capture and relative final timer sample;
+788 bytes, 95 ROM / 95 draft differences, shape 16. The exact diagnostic is
+`AGBCC_FORCE=slot:7,position:6,origin:8,548:10,angleMask:6,149:1`.
+This reproduces all bytes; no override is part of the draft or landed source.
+The last four differences are the radius sample and its 127 mask. Removing only
+that pin from the landed source gives four differences, and `AGBCC_PRI=150:+1`
+matches exactly: the local sample and mask tie at priority 10000, and the mask
+must win. The sample needs r1 and mask r0.
+
+Tried relative reads for angle, radius, height, jitter, timer and combinations;
+byte/halfword helper returns; narrowed radius and sample locals; a union member;
+mask-before-sample and mask/radius reuse; pointer-based position reads to raise
+position's reference density. None gives a stock match or a partial concession
+removal. Raising position's diagnostic priority by 4000 reduces the pin-free
+baseline to 55/55 differences but still leaves origin and center allocation.
+
+An experimental origin use in the first truncated x computation, ORing its known
+zero low bits, reduces origin's lifetime and correctly gives origin r8 and the
+PRE center sl. With position/slot/mask forced it reaches four differences. That
+artificial zero operation is not the saved draft: find a genuine address or
+sample calculation that ends origin's lifetime there instead. Next ideas: use
+an original-style polar-vector helper to control the mask/sample tie, and shorten
+position's global lifetime rather than merely substituting field reads. The
+Roaming relative's reusable collider/random work pointer may also suppress the
+unwanted constant equivalence. Persistent evidence is in
+`build/matchsearch/ContactActor_UpdateRetreat`; experiments are under
+`build/cx/work/ContactActor_UpdateRetreat`.
+
+### sub_08066CB8 / ActorAttachment_ReleaseAll (08066CB8): deferred
+
+Draft: `notes/phase3-drafts/dp-scene1/sub_08066CB8.c` (47 ROM / 45 draft,
+shape 2, 252 bytes against 256). It uses typed indexing, an occupancy helper,
+an ordinary outer for loop and a goto part loop. The occupancy helper folds
+its large member offset in integrate.c and keeps its expression separate from
+the outer occupied-mask address. This reproduces the manager stack reload
+without the original memory barrier. The part-loop goto prevents hoisting its
+one, removing the extra spill word and loads.
+
+Diagnostic `AGBCC_FORCE=i:3,slot:6,part:4,j:5,occupied:10,id:8,sprite:5` leaves
+four differences, all lower-register copies: occupied-mask read uses r2 rather
+than r7; final ID store uses r1 rather than r7. `why 79` reports that the draft's
+spill set is only r0/r1/r2; r7 is absent, so no rotation can match it. Forcing
+scratch to r7 has no effect because combine folds those copies into their uses.
+The missing two instructions in the stock draft are a zero/store tail that
+jump2 merges because active and part-mask addresses get the same register.
+
+Tried: stripping all concessions; passing the manager by reference to an inline
+(extra stack pointer spill); occupancy-helper pretest; explicit next versus a
+normal for loop; goto part loop; typed slot indexing; pointer reuse for the
+occupied address. The helper on the otherwise pinned source removes the memory
+barrier's shape effect but leaves two base-register differences, so no partial
+match was landed. Probe found no single canonicalization/PRE/hoist fix. The
+explicit-next draft also gets an unwanted PRE copy of i+1.
+Next: reduce the shared scratch pointer's priority and reshape the slot/part/j
+lifetimes so the register order itself adds r7 to reload's spill set. An inline
+release-slot helper may provide the necessary parameter lifetime. Evidence is
+under `build/cx/work/sub_08066CB8`.
+
+### SceneActorControl_TickJitter — remaining timer pin
+
+Tags: phase3, dp-scene1, SceneActorControl_TickJitter, 0x08067018
+
+Four of five pins removed in the matching source. The saved pin-free draft is
+136 bytes, nine register-only differences, shape zero. Separate jitter locals
+let both Mod results stay in r0; reuse reset for the flags mask preserves the
+load/constant order. Table-first ParticleRandom_ReadSample supplies the draw order.
+
+The timer takes r6, evicting the local mask, while the random table stays in r5;
+the ROM needs timer r5 and table r6. Pinning only timer to r5 is exact. Allocation
+traces show timer can evict either table or mask but chooses the mask first.
+Moving table initialization before the branch changes its class and spills it;
+union table initialization and a displacement helper leave the same nine diffs.
+Duplicating timer decrement across jitter arms cross-jumps before allocation.
+Explicit signed timer reload adds an unwanted sign-extension instruction.
+Coordinate halfword/pointer forms and displacement return-width helpers did not
+improve the remaining allocation. Earlier forced full mapping was exact; the
+four-pin reduction is a cleaner diagnostic now. Next: alter the mask/table
+local allocation order through a natural random-draw helper boundary while
+retaining the table-first load. Work files remain under build/cx/work/.
+
+### SceneActorControl_TickActive — final zero barrier
+
+Tags: phase3, dp-scene1, SceneActorControl_TickActive, 0x08067258
+
+All four pins removed in the matching source. The saved pin-free/barrier-free
+draft has four ROM / four draft differences, shape eight, same 480 bytes.
+Short-lived constant-first mask locals fix initialFlags, the delta test and the
+0x40 branch; flags and ClearFlags allocate naturally. previousParameter is typed.
+
+Only the final zero-value barrier is needed for an exact match. Without it,
+constant folding makes the last clearMask minus three equal the earlier -3 tail;
+jump2 shares its load and constant, introducing a label before the constant.
+That label prevents move2add from using the zero in r0. ROM has a separate
+load/mov/neg tail in the earlier arm and a subtraction from zero in the final arm.
+Restoring only the original zero barrier is MATCH. Probe tried all four CSE
+canonical choices and nine jump follows; none changes the difference count.
+Individual returns / a separate last-arm return change allocation and still share
+the constant; duplicating zero and stateFrame stores across sprite-active arms
+also loses the retained kind value across the call. Next: retain an ordinary-C
+zero across a join without making it an equivalent constant until after jump2,
+or split the tails so move2add sees the original stateFrame zero.
+
+### sub_08067BA8 — unused r6 save/restore
+
+Tags: phase3, dp-scene1, sub_08067BA8, 0x08067BA8
+
+RequestAllDepartures pin-free draft matches the complete body; only push/pop
+omit r6. Same 100-byte size. Removing the original memory/r6 barrier lets PRE
+hoist p->used outside the loop (four differences). A union word/halfword view
+of the occupancy mask prevents that hoist in ordinary C, producing the same
+result as AGBCC_NOPRE=1: two differences, solely the register save lists.
+Typed slots and collider flags preserve all address arithmetic.
+
+Pointer-argument occupancy helper, union-initialized bit mask, early continue,
+do/while and goto loops tested. Union bit does not recover the unused save;
+goto also swaps manager/index registers; separate slot base introduces an
+unwanted loop invariant. The ROM never uses r6 in its body, so forcing a live
+value there cannot be a solution. Next: identify a natural late-eliminated
+allocation/copy that marks r6 live before final cleanup. Original source remains
+matching with its single barrier; no partial can remove only part of that site.
+
+### SceneSteeringActor_EmitRandomParticle — sine allocation
+
+Tags: phase3, dp-scene1, SceneSteeringActor_EmitRandomParticle, 0x0806BDB8
+
+Six pins and all four barriers removed in matching source. Saved pin-free draft
+is 200 bytes, 20 register-only differences, shape zero. AGBCC_FORCE=sine:1 is
+exact, as is retaining only the original sine pin. The symbolic sample origin
+(gRandomTable plus established bank displacement), copied before projection and
+used in the later relative sample, naturally retains both formerly opaque copies.
+Separate nextIndex and speed locals reproduce the index and magnitude copies;
+direct gRandomIndex accesses fix cursor allocation.
+
+Sine has three refs/live 42 (doubled for REG_EQUIV), priority 714. The first
+Truncate result has priority 6000 and takes r1, displacing sine and cascading
+through speed, velocity and angle. A projection helper with sine parameter,
+the shared route projection helper, narrow magnitude/Truncate results and
+direct per-arm x stores did not restore the allocation. Probe's five canonical
+choices, two jump follows and one PRE replacement do not change the count.
+Next: keep sine out of the constant equivalence class or alter the first
+Truncate result's allocation without changing its shared stores.
+
+### SceneSteeringActor_DestroySlot — dimension preferences and zero reloads
+
+Tags: phase3, dp-scene1, SceneSteeringActor_DestroySlot, 0x0806C708
+
+Saved typed no-concession draft has 20 ROM / 22 draft differences, 172 versus
+168 bytes, shape four. All raw field offsets have typed counterparts. Forcing
+field:1,result#1:2 fixes the complete dimension front half and the extra copy,
+leaving 12 register/order differences in the tail (same 168 bytes).
+
+The shared field pointer is global (four refs/live four, priority 20000), with
+no conflicts, but preference chooses r0 instead of incoming r1. Separate field
+variables, direct inline dimension bodies, pointer advancement, narrow helper
+return and an entry helper did not produce the preferred allocation. Taking the
+first field address at entry changes instruction order. Probe found no helpful
+CSE choice. The tail naturally keeps a zero in r8, but rematerializes the halfword
+store zero through a different reload rotation and orders the two zero loads
+differently. Byte zero does not change that. Spill 1:2,3:1,6:2 reduces the unforced
+draft to 14 differences, without fixing the front. Removing whole front or tail
+concession groups did not yield a partial match. Next: induce field's incoming-r1
+preference in C, then separate the two zero equivalence classes at frame reset.
+
+### RouteSpriteActor_TickEmitting — remaining animation body
+
+Tags: phase3, dp-scene1, RouteSpriteActor_TickEmitting, 0x0806DCE4
+
+Matching partial removes the RNG index pin and every volatile command pointer.
+Separate next and nextZ locals produce the random register chain. A local
+`value = *command; mask = 15; mask &= value; frameWeight = mask` retains the
+halfword read and ROM operand order without volatile. The shared ReadCommand /
+MaskCommand pair retained ldrh but swapped the two registers; the direct local
+form is exact. Typed sprite-resource and state accesses also match.
+
+Saved fully pin-free draft: 56 ROM / 52 draft differences, shape 18, 628 versus
+636 bytes. Union control-byte views improve the flag tests; split draw indices
+improve the random front. Shared StepSprite changes 134/122 instructions;
+extracting the custom animation body into an inline helper leaves 56/52.
+Probe's six CSE choices and fifteen jump follows do not change that count.
+The remaining instruction differences include reverse/forward sequence-end
+tails cross-jumped together and the elapsed mask copy. Most others are global
+allocation and reload rotation. Removing flagsOwner alone from the matching
+partial is four reload-register differences in the second flip update.
+Next: isolate the elapsed-counter mask from its source using the correct packed
+state type, then resolve the two sequence-end return paths before allocation.
+
+### RouteSpriteActor_Create — height constant copy
+
+Tags: phase3, dp-scene1, RouteSpriteActor_Create, 0x0806DFC8
+
+Matching partial removes ten pins and four barriers. Ordinary typed fields
+replace the offset-register chains, and pool/zero/one allocation matches.
+Only three pins and two barriers in the elevated-position height group remain.
+Saved fully pin-free draft is eight ROM / eight draft differences, same 360
+bytes, shape four. ROM materializes 712 in r2, copies it to r0, then loads y
+into r3 and adds. C folds height/result into the addition, loads y first, and
+loses the copy; two later reload choices consequently rotate.
+
+Keeping just the original height group is an exact diagnostic and yielded the
+partial. Probe's three canonical choices do not alter the count. Narrow height
+or result, signed height, union initializer and compound assignment give the
+same eight differences. A scalar raise helper changes address formation; a
+three-component offset introduces stack storage and many extra instructions.
+The height/result names are folded before allocation, so FORCE cannot address
+them in the plain draft. Next: find a genuine value/control-flow boundary for
+the constant copy without adding a barrier or unrelated arithmetic.
+## dp-effects-b (Codex)
+
+### SparkParticle_UpdatePool (src/fn/sub_08069FA4.c, 08069FA4): partial, remainder deferred
+
+Tags: #matching #phase3 #effects #08069FA4
+
+Landed three of seven pin removals, leaving four pins and seven barriers. Reading the
+flip flags through `union DisplaySequenceControl` and consuming `control.raw` directly
+in the narrowed AND removes both flip pins. A widened intermediate defeats that form
+(30/30 different instructions). An inline `DecrementCount` helper removes the count-offset
+pin and its raw offset; direct field decrement in the main body changes loop PRE.
+The unnecessary volatile command qualification was also removed. Stock unit check MATCH.
+
+Best pin-free draft: `notes/phase3-drafts/dp-effects-b/SparkParticle_UpdatePool.c`,
+34 ROM / 38 draft instructions, 412 bytes against 404. It uses the matched
+`SceneParticle_StepSprite` helper; essentially all playback instructions then agree.
+The remaining loop retains the original array pointer alongside a reduced particle
+pointer and a separate sprite address. These occupy registers needed by the constants
+one and two, which reload inside the loop. ROM keeps active in r6, particle in r4,
+one in sb, two in sl, eight in r8 and the countdown in ip.
+
+Evidence and attempts (local store: `build/matchsearch/SparkParticle_UpdatePool`;
+working files: `build/cx/work/SparkParticle_UpdatePool/`):
+* `helper.c` is the store root. `separate-active-countup` explicitly walks the active
+  byte and particle pointers: 37/39. Countdown, indexed and pointer loops, a sprite-first
+  wrapper, and a whole-particle wrapper do not eliminate the excess values.
+* `typed-particle-step` avoids the generic sprite pointer but changes command/address
+  CSE and pool allocation, 103/101. A separate state parameter does not repair it.
+  `AGBCC_FORCE=22:7` improves this variant to 93/95; a STACK_REGS preference hypothesis
+  was disproved by REGCLASS trace (LO_REGS cost 26 versus STACK_REGS 46).
+* `AGBCC_PRI=bit:+1000,bit#1:+1000` on the shared-helper draft keeps the constants but
+  displaces pool/counter and remains 40/42. Allocation alone is not the whole blocker.
+* `giv` identifies the sprite address at insn 110 as an unreduced induction value
+  (benefit 2, net zero), while memory addresses form a second stepped particle pointer.
+  `AGBCC_GIV=110` gives 34/40; `AGBCC_NOGIV=153,160,180` gives 43/47. Neither matches.
+  Read loop.c's elimination path and regmove.c's matching-operand rewrite.
+* `goto-countdown` and a return at loop termination both give 99/111. Copying the state
+  parameter and using the DisplaySequence helper's end-arm form gives 70/76.
+* `direct-body-count-helper` retains the original manual body with every concession
+  stripped, 69/69. Removing the backward hold barrier alone ties the AND to the dying
+  flags register; the forward barrier alone retains two otherwise removed byte-extension
+  instructions. Union locals, narrowed locals, split assignments and repeated ended
+  assignments do not solve those with the outer barrier still present.
+
+No combined diagnostic knob has produced a completely pin-free MATCH. The proved
+partial is retained rather than claiming the remaining allocation is solved. Next idea:
+split frame/flip application from sequence advance so the sprite address does not stay
+live across both flip branches, while preserving the shared helper's state reloads.
+
+Tool improvement discovered here: scope hoist suggestions used header line numbers
+as caller line numbers, crashing or editing unrelated caller statements. uid_locations
+now retains filenames, and hoist filters locations to the caller with bounds checks.
+Three regression tests cover this; both required test suites pass.
+
+### SpriteEffectController_QueueColliders (src/fn/sub_0806A60C.c, 0806A60C): deferred
+
+Tags: #matching #phase3 #effects #0806A60C
+
+Draft: `notes/phase3-drafts/dp-effects-b/SpriteEffectController_QueueColliders.c`,
+22 ROM / 18 draft instructions, 128 against 136 bytes. Six pins and three barriers
+remain in the matched source; none removed for free, alone or in the tested groups.
+Store: `build/matchsearch/SpriteEffectController_QueueColliders`; working evidence in
+`build/cx/work/SpriteEffectController_QueueColliders/`.
+
+The ROM reserves r7 for zero/mask/stride, first in sb, scheduled in r8, pool in r6,
+index in r5, readDelay in r3 and writeDelay in r4. Without the constraints, temporary
+is local, first gets r7, and cse initializes the second delay pointer by copying
+the first instead of recomputing pool+151. The flags load is tied to the OR output
+by regmove at insn 112: `AGBCC_NOTIE=112` confirms the tie (21/17), but does not retain
+the ROM's separate r7-to-r0 mask copy. Read regmove.c's matching-operand checks.
+`AGBCC_FORCE=first:9,readDelay:3,writeDelay:4,temporary:7` does not repair lifetimes
+and displaces pool/index (30/24); no complete matching knob was found.
+
+Fresh source with a QueueCollider inline returning the count gives 36/24 and removes
+more of the ROM's separate addresses. Direct field OR, a DelayAddress inline for one
+initial pointer, union/struct word temporaries, and an initialization label leave
+22/18. A halfword-array temporary initializer retains the separate zero and moves
+first to sb, but hoists the 0x100 mask to r8, displaces scheduled and gives 30/28.
+A union mask initializer blocks that hoist but returns to 22/18. Halfword and word
+union flag reads with the original remaining constraints give 11/18 and 6/6; neither
+removes the flag pin exactly. A label variant that skipped initialization warned of
+an uninitialized value and was rejected. No source changes landed.
+
+Next idea: recover the original helper's count/temporary return boundary. The hard
+r0 one-pin influences allocation outside its lexical block; a returning inline may
+produce the needed hard-return-register liveness without any pin, unlike the simple
+QueueCollider helper tried so far. Preserve the observed first-slot flags test.
+
+### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): partial
+
+Tags: #matching #phase3 #presentation #081E2910
+
+Removed the random-table pin; three destination pins remain. A separate do/while
+block around the index update raises mask references while the existing sample
+capture macro retains table-first evaluation. Stock unit check MATCH, 576 bytes.
+
+The pin-free draft in `notes/phase3-drafts/dp-effects-b/Presentation_UpdateDropShakeBlink.c`
+has six differing instructions, identical shape and size. Sharing dest across the
+three moving branches combines their conflicts (r0/r1), but global alloc takes r2
+where ROM uses r3. `AGBCC_FORCE=dest:3` gives MATCH. Read local-alloc.c's quantity
+priority calculation and global.c's used-register preference/conflict filtering.
+
+The shared random helper alone gave 30/30 differences: table priority 2272 versus
+mask 1000. `AGBCC_PRI=119:+1300,179:+1300,238:+1300,307:+1300` fixed all four swaps;
++1250 did not cross the threshold. The index update block produces this naturally.
+Mask argument, direct sample, shared table, union table, NextSample, and helper
+index variants changed CSE or retained the wrong priority. Plain setters and
+layer-address getters did not fix destination allocation. Shared y and shared
+y/dest altered argument allocation. Extending dest through the late zero store
+fixes every earlier store but makes that final address use r3 instead of reusing
+x's r0 address: 2 ROM/4 draft differences, 580 bytes. An inline store keeps that
+result. Using dest for all y stores changes cross-jumping and allocation broadly.
+
+Persistent search: `build/matchsearch/Presentation_UpdateDropShakeBlink`, node
+shared-destination. Evidence/candidates: `build/cx/work/Presentation_UpdateDropShakeBlink/`.
+Next: produce the r2 conflict without forcing the late zero store to retain the
+shared destination, perhaps by separating its caller value from the store helper's
+argument class. The knob proves the sole remaining decision on the saved draft.
+
+### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): partial
+
+Tags: #matching #phase3 #presentation #081FDAF4
+
+Removed the state pointer pin by sharing a void component pointer between the
+volley and collider field views. The remaining zero pin still selects r4.
+Pin-free draft: `notes/phase3-drafts/dp-effects-b/RisingActor_AdvanceHeight.c`,
+5 ROM/3 draft instructions, 72 versus 76 bytes. `AGBCC_FORCE=zero:4` now MATCH.
+Before sharing the component, forcing zero alone displaced state to r0 and broke
+reload's reuse of its address for collider; forcing both zero:4,state:2 matched.
+
+Zero is a two-reference local quantity, priority 10000, with r0 free. Its store
+ends its lifetime before the callback; the final return is a separate constant.
+Read local-alloc.c's quantity ordering and hard-register allocation. Returning
+zero, capturing it in a do block, returning through a do block, a union scalar,
+an inline clear helper with and without a return, and a separate collider helper
+do not make it cross the call. Union initialization at entry changes scheduling;
+byte/halfword array initialization adds stack operations and does not match.
+A helper for the collider alone also loses the state/collider reuse. Shared
+component is the structural partial; stock unit check MATCH.
+
+Store: `build/matchsearch/RisingActor_AdvanceHeight`, shared-component node.
+Next: identify a natural caller/helper return boundary that keeps zero live
+across the callback during allocation but rematerializes the final return.
+
+### sub_081FDCB0 / OrbitEffect_UpdateHomingTrail (081FDCB0): partial
+
+Tags: #matching #phase3 #presentation #081FDCB0
+
+Removed the source r1 pin and zero-use barrier. A do/while capture keeps zero
+in r5 at entry; clearing source after copying it to target prevents CSE from
+collapsing their two allocation classes. One memory barrier remains.
+
+Pin-free draft: `notes/phase3-drafts/dp-effects-b/sub_081FDCB0.c`, 4 ROM/8 draft
+instructions, 280 versus 272 bytes. IsFar inline restores all position/age
+reloads, but materializes a boolean with four extra instructions and loads
+target before the position. Its target lives in r3, blocking the ROM's initial
+zero-offset reload into r3; `why 67` shows no spill rotation can fix that.
+No single knob matches: probe tested eight canonical choices, five jump follows
+and one PRE decision without changing the count. Read jump.c's conditional
+assignment and branch simplification conditions.
+
+Original pin-free source gives 38/30. Steer helper and per-axis Distance helpers
+retain the missing reloads. Boolean helper plus scoped zero improves to 4/8.
+Early returns inside the predicate keep 4/8; explicit if/else returns undo the
+reload boundary (40/32). Passing preloaded dx changes neither the load order
+nor distance. Union age view, union zero, and mask-first AND do not help.
+A break/goto distance block, duplicate label jumps, and the source reset with
+the barrier removed still let CSE eliminate necessary reloads (36/30 or 39/31).
+Source copy in a do block gives 5/5 on the partial; a union pointer and identity
+helper give 4/4. The dead reset alone supplies the exact source/target separation.
+
+Store: `build/matchsearch/sub_081FDCB0`, distance-boundary. Next: preserve the
+inline distance-return join that prevents CSE following, while eliminating its
+boolean materialization; keep the source reset when recovering original load order.
+
+### HomingProjectile_UpdateDefaultState (081FF454): partial
+
+Tags: #matching #phase3 #presentation #081FF454
+
+Removed three of four concessions: one capture uses a do block; a shared void
+component pointer combines delay's r0/r6 conflicts with rise height's r1 conflict,
+so both choose r2. The FaceFinal saved-pointer/r5-clobber barrier remains.
+Stock check MATCH, 1256 bytes.
+
+Pin-free draft: `notes/phase3-drafts/dp-effects-b/HomingProjectile_UpdateDefaultState.c`,
+two register differences and identical shape/size. `AGBCC_FORCE=saved#2:7` MATCH.
+Saved is global priority 454, 2 refs, doubled life 44 because REG_EQUIV marks a
+constant. It conflicts with r0/r1/r2/r3/r4/r6, leaving r5 and r7; ordinary allocation
+takes r5. Read global.c's preferred-register filtering and selection. Original
+pin-free source had 47/49 differences; scoped one reduces to 18/18, component
+sharing to 2/2. The three-force diagnosis delay:2,dest:2,saved#2:7 also matched.
+
+Signed height leaves the result unchanged; widening height adds instructions.
+A delay capture block retains four differences; resetting delay after a separate
+load changes reload rotation broadly. Moving FaceFinal's saved capture to the
+end changes scheduling; wrapping its original capture leaves two differences.
+Manual inlining also leaves 2/2. Sharing saved with the target vector makes it
+r8 (21/23), with the from vector disturbs broad allocation (130/130), and with
+the delta gives 26/26. first+1 and first followed by increment leave 2/2.
+Resetting first or second changes stores, allocation and rotation, not a match.
+
+Store: `build/matchsearch/HomingProjectile_UpdateDefaultState`, shared-component.
+Next: find an existing short-lived pointer use with an r5 conflict to share with
+FaceFinal's saved flip address, without the call-crossing vector lifetimes.
+
+### SpiralBurst_InitParticles (08234540): deferred
+
+Tags: #matching #phase3 #effects #08234540
+
+Both table pins remain; no partial matched. Main pin-free draft in
+`notes/phase3-drafts/dp-effects-b/SpiralBurst_InitParticles.c` moves the loop table
+assignment into the loop: 25 ROM/23 draft instructions, shape 2, 424 versus 428
+bytes. The `.priority.c` companion preserves the decisive diagnosis: direct
+initial table capture, 48/44, and `AGBCC_PRI=randomTable:+3600` gives MATCH.
+`AGBCC_FORCE=table:5,randomTable:6` also matches that companion.
+
+Initial work.samples alias causes an unnecessary stack store when unpinned;
+direct table capture removes it. Loop randomTable has 11 refs, live length 146
+doubled to 292 by REG_EQUIV, priority 1130. Burst priority is 3878, sprite 4689,
+frame 11986. +2000 does not cross burst; +2800 fixes burst but swaps sprite and
+table (15/15); +3600 crosses sprite and matches. Read local-alloc.c's REG_EQUAL
+promotion and constant-register priority halving.
+
+A sample capture macro raises table refs to 16 (loop weighting x3), but constant
+equivalence still halves its priority to 2176. Direct/read-sample shared helpers
+change mask allocation to r6, shortening code to 416 bytes. Scalar union capture,
+end reset, source reset, literal address, capture blocks and typed sprite cursor
+do not produce the priority. Halfword-built table avoids some allocation issues
+but adds initialization instructions (26/36 with captured draws). Narrow mask
+changes mask lifetime and gives 41/35. Sprite initializer helper gives 51/47;
+whole-loop helper gives 57/49. Array indexing leaves the baseline unchanged.
+
+Retaining randomTable's r6 pin while removing the initial pin coalesces table
+into r6 too early (4/2); source resets and capture blocks do not preserve the
+ROM's r5-to-r6 copy. No verified partial was found. Store:
+`build/matchsearch/SpiralBurst_InitParticles`, table-priority and loop-table nodes.
+Next: prevent the loop table's constant-equivalence discount while retaining
+the mask parameter boundary and the initial table copy, or separate sprite/burst
+lifetimes enough to give the table the required allocation order.
+## dp-link (Codex)
+
+Tags: #matching #phase3 #link #compiler
+
+### WirelessGameMenu_InitEquipmentChoices (08038448, src/fn/sub_08038448.c)
+
+Best pin-free draft: `notes/phase3-drafts/dp-link/WirelessGameMenu_InitEquipmentChoices.c`.
+It uses the retained structured loops, typed save rows, and the numeric random-table address
+already used by its matched item-choice sibling. All body instructions match except the
+random-index pointer's initial reload register (r3 instead of r0). The other differences are
+the ROM's unused sl save/restore and resulting push grouping/alignment: 8 ROM / 8 draft,
+408 bytes each. The production function remains unchanged.
+
+- The symbolic-table draft is 3 ROM / 5 draft, but PRE creates a table literal at the inner
+  loop preheader and loop.c hoists it to sl. `pre` shows replacement 5 and `hoist` shows insn
+  401. `AGBCC_NOPRE=5` gives 9/9; `AGBCC_NOMOVE=401` gives 14/14. Removing only one decision
+  leaves another placement/allocation difference. A numeric table removes that PRE expression
+  and keeps the literal next to the sample, as in the ROM.
+- Diagnostic only: retaining the original inner-loop sl/ip clobbers with the numeric table
+  reduces the difference to the seed pointer's 2 instructions. `AGBCC_SPILL=11:1` then MATCHes.
+  It proves the seed reload rotation and unused save are sufficient; no such diagnostic was
+  landed. Reload 11 starts after r1, while the ROM needs it to start after r3, with spill set
+  r0/r1/r3. Its preceding span is the final equipment-mask update through Mod and the outer
+  loop's initialization.
+- Tried the shared direct sampler; both `ParticleRandomTableSource` and `RandomTableView`
+  initializer forms; numeric, symbolic, byte-address, and integer-address table expressions;
+  for/do and label/goto loops; typed slot setter/clearer inlines; a 12-iteration offset scan;
+  narrow index/counter types; explicit seed pointer before and after i's initialization;
+  and partial removals in the original source. None recovers the unused sl save in ordinary C.
+- Read reload1.c's `mark_home_live`: it marks every allocated pseudo's hard-register home
+  before subsequent reload decisions, so a late-dead or displaced sl home could explain the
+  save. A productive next step is tracing that home through reload, then finding the original
+  helper/type that creates it without code surviving in sl. Do not redo the table-hoist search.
+- Scope gap fixed: `probe` reported that no decision changed the count even though several
+  probes worsened it. It now reports the closest worsening probes and does not rule out
+  interacting compiler decisions.
+
+Persistent evidence: `build/matchsearch/WirelessGameMenu_InitEquipmentChoices-v2`;
+working sources: `build/cx/work/WirelessGameMenu_InitEquipmentChoices/`.
+
+### sub_080399F4 (080399F4, src/wireless_game_items_and_display.c)
+
+Best draft: `notes/phase3-drafts/dp-link/sub_080399F4.c` (22 ROM / 22 draft,
+shape 0, 560 bytes). Only this target and its private sampler are pin-free in the
+whole-unit draft; other functions retain their existing concessions. Production is unchanged.
+
+- Removing Item_NextRandom's r6 pin gives 61/59 differences and shape 50. The shared
+  ParticleRandom_ReadSample restores the complete instruction shape, leaving 30/30 register
+  differences in the two copies of the shake code. Using ReadDirectSample for the second
+  draw lowers that to 22/22 and gives the index pointer its correct r3.
+- In the symmetric ReadSample draft, local allocation gives the table pseudo 103 (and
+  inlined copy 213) priority 2500, the seed 2352, the 3 mask 1250, and the 1023 mask 1153.
+  The table takes r3; ROM needs it last in r6. `AGBCC_PRI=103:-1400,213:-1400` MATCHes,
+  as does `AGBCC_FORCE=103:6,213:6`. These are diagnostics only.
+- The sampler's capture macro leaves loop notes that weight each table use twice in flow:
+  five references versus four when the second draw is direct. Both direct draws lower the
+  weighting further but lose table-first placement and change the surrounding allocation.
+- Tried explicit shared table and index locals; table before the branch; parameterized seed
+  and mask; union initialization and union-by-value sampler; integer and pointer sample
+  addresses; advancing table pointers; narrowed sample/coordinate/return types; separate
+  result scopes; flattened two-draw code; direct and macro capture; numeric and symbolic
+  table constants. Separate sample scopes fix the global-result allocation seen when removing
+  an inline layer, but do not lower the table priority enough. Narrow coordinates add extensions.
+- `probe` tests 15 CSE/PRE decisions in the shape-correct draft; none improves it. The direct
+  baseline's PRE changes improve the count but retain shape differences. Next: recover
+  table-first placement with direct reads, or a legitimate sampler type/lifetime that puts
+  table below both masks. Do not repeat the table/seed parameter-order experiments.
+- Scope gap: `why` on the second late-split table literal chooses the first inlined copy,
+  because both have the same constant and C line. Use names.txt to identify both pseudos;
+  here they are 103 and 213. A future fix should disambiguate occurrences by instruction order.
+
+Persistent evidence: `build/matchsearch/sub_080399F4`; scratch: `build/cx/work/sub_080399F4/`.
+
+### WirelessGameItems_UpdateItemMerge (08039CB0, src/wireless_game_items_and_display.c)
+
+Best target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_UpdateItemMerge.c`
+(4 ROM / 4 draft, shape 2, 308 bytes). Other functions retain their existing concessions.
+The removed value pin and zero barrier interact: individually they cost 17 and 3 ROM
+instructions; removing both leaves the clamp correct and changes only four zero-store rows.
+Production is unchanged.
+
+`why 392` shows CSE replacing the target pendingFlag's byte zero (159) with zero#1 (143),
+which gets r1. ROM creates a new zero in r0 immediately after storing count. `why 445`
+shows the draft instead creating a new zero at the source timer store, and using it for
+source count/pendingFlag; ROM uses the earlier r1 zero there. This is CSE constant-class
+substitution, not allocation alone. No class-head takeover exists at that substitution;
+all five probe decisions fail to improve it. Scope lacks a diagnostic to suppress one
+particular source substitution, so there is no matching what-if knob yet.
+
+Tried direct literal stores; byte/halfword pointers; narrow zero and count types; shared
+outer zero; zero initialization after the count store; chained reset assignments; reloads
+from the just-cleared timer/state; clamp helpers with assignments or early returns; typed
+reset helpers; union initialization; direct item indexing; count-store repetition and full
+tail repetition in all clamp arms. Literal zeros and union initialization give 10/10;
+repeated count stores give 5/5; repeated whole tails give 21/21. Retaining only the existing
+barrier with clamp-helper forms did not yield a partial match. No diagnostic or new
+concession was landed. Next: identify the original typed reset/clamp interface that keeps
+the two zero classes distinct, or add a precise CSE substitution diagnostic before more C.
+
+Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateItemMerge`;
+scratch: `build/cx/work/WirelessGameItems_UpdateItemMerge/`.
+
+### WirelessGameItems_UpdateIncomingItem (08039EEC, src/wireless_game_items_and_display.c)
+
+Best target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_UpdateIncomingItem.c`
+(29 ROM / 29 draft, shape 8, 380 bytes). It uses direct array fields and separate first/second
+loads before the target head stores. Other functions retain existing concessions. Production
+is unchanged. The direct combined-count form is 27/27, shape 10; the inherited clean draft is
+45/41, shape 12, 372 bytes.
+
+- Seven constraints: pending pointer in ip, saturated total in r1, one and count result in r0,
+  and three operand barriers. All 119 proper subsets with two through six removals were tested;
+  none matches. Removing both r0 pins leaves only 4/4 register differences, shape 0. The sum
+  takes r3 instead of r0. `AGBCC_FORCE=value#1:0` (pseudo 188) MATCHes that partial draft.
+- `why 504` and global.c show the exact cause: find_reg initially finds free r0, then
+  hard_reg_preferences moves the sum to r3, inherited from the locally allocated first
+  operand. This is not insufficient r0 availability. Simple operand commutation is canonicalized
+  back. Assignment, ternary, repeated sum, narrow operand/result types, separate result,
+  clamp helper, input reuse for the cleared flag, and computing the sum earlier preserve the
+  preference. Clipping into first gives 3/5 (shape 2), so input/result splitting is worth revisiting.
+- In the fully clean source, pending's global priority is 1764 versus slot's 1794. Slot takes r4
+  rather than r7, leaving r7 for pending instead of ip. The array base is local in r1 rather
+  than r2. The shared zero remains live across the count clamp and becomes a low-priority global
+  constant (882) in r6 instead of r1. Literal field stores recover slot/ip but introduce a
+  PRE-generated current-array copy and leave the related zero-class differences.
+- Tried direct fields, separate counter loads, byte/halfword constants, reinitializing one,
+  and the focused partial clamp forms above. `probe` has no full-clean match; suppressing
+  pending's class-head takeover only changes 45/41 to 43/39. Next: make the sum result global
+  without inheriting the first operand's hard-register preference, then remove the remaining
+  pointer and zero constraints using the direct-field form. Do not repeat the subset search.
+
+Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateIncomingItem`;
+scratch: `build/cx/work/WirelessGameItems_UpdateIncomingItem/`.
+
+### WirelessGameItems_QueueLocalItem (0803A514, src/wireless_game_items_and_display.c)
+
+Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_QueueLocalItem.c`
+(11 ROM / 9 draft, shape 2, 256 bytes). Production is unchanged. Removing only the
+value pin gives 9/9; removing only flag gives 2/2 with an alignment nop replacing
+one missing zero. Both individual removals and the combined removal fail.
+
+`why 136`: clamp value (70) is global, priority 12000, but the local clear (71)
+already occupies r0. Value consequently gets r1. Forcing value into r0 is invalid
+as a diagnosis: it overlaps clear and deletes the clamp. The second block is a
+separate CSE issue: byte-zero 113 is substituted with zero#1 (96), so pendingFlag
+uses r1 rather than a fresh r0 zero. Eleven CSE probes do not improve the result;
+CSE_NOCANON=70 and CSE_NOFOLLOW=4 worsen it to 35/29.
+
+In addition to the older 24 recorded variants, tested fresh direct fields (36/30,
+shape 12), literal byte-pointer stores, union-initialized pending zero, union clear,
+bitfield zero, narrow clamp types, conditional clamp, repeated full clamp tails,
+wide zero and a timer reload. Union and bitfield initializers fold back to the same
+CSE class. Wide zero changes allocation to 10/8 but still misses both zero moves;
+it is not a suitable source form. Repeating tails creates additional branches.
+No matching knob yet. Next: a precise per-substitution CSE diagnostic shared with
+UpdateItemMerge, then identify the original reset interface or control-flow lifetime
+that preserves the separate byte zero. Do not repeat initializer spelling variants.
+
+Scratch/evidence: `build/cx/work/WirelessGameItems_QueueLocalItem/`.
+
+### WirelessGameItems_QueueIncomingItem (0803A618, src/wireless_game_items_and_display.c)
+
+Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_QueueIncomingItem.c`
+(30 ROM / 28 draft, shape 4, 220 bytes). Fresh direct counter fields recover owner,
+target, current and pending-array allocation; the initial clean draft is 51/49,
+shape 4. Production is unchanged.
+
+All 119 proper removal subsets with two through six constraints removed were tested.
+None matches. Removing both one/value r0 pins gives 4/4, shape 0, exactly the inherited
+sum preference seen in UpdateIncomingItem. `AGBCC_FORCE=value:0` (pseudo 92) MATCHes.
+Removing both barriers gives 3/1, shape 2: the post-clamp r1 zero disappears and target
+count uses the later r0 zero. Removing all five pins while keeping both original
+barriers gives 25/25, shape 0. No useful partial can land yet.
+
+In the clean direct-field form, the counter-array bases take r2 and sums take r1
+instead of the reverse; the pending reset zero is hoisted before the timer store
+and gets r5 instead of the separate ROM r0/r1 zeros. Fifteen CSE/PRE probes do not
+improve it. The baseline allocation diagnostics show dest outranking owner, owner
+outranking target, and equal-priority current/second pseudos allocated in the wrong
+order; raising these independently helps but does not match.
+
+Tried direct fields, branch-local counts, narrow totals, explicit count pointers,
+reversed source reads, state-reset helpers (void and int with ignored missing return),
+clamp helpers with early returns, ternaries and labels, byte parameters, unsigned
+results, reused state/input/count temporaries, ADDRESSOF inputs/result, and struct/
+union sums. Ordinary int clamp helpers preserve the four-register partial difference;
+byte parameters and ADDRESSOF forms change shape. A narrow summed byte can overflow
+and is diagnostic only, not a valid candidate. Next: suppress the sum's inherited
+first-operand preference with a meaningful source lifetime, then solve the shared
+reset-zero class. Do not repeat the subset or initializer searches.
+
+Persistent evidence: `build/matchsearch/WirelessGameItems_QueueIncomingItem`;
+scratch: `build/cx/work/WirelessGameItems_QueueIncomingItem/`.
+
+### WirelessGameDisplay_UpdateRoundAnnouncement (0803A844, src/wireless_game_items_and_display.c)
+
+Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameDisplay_UpdateRoundAnnouncement.c`
+(35 ROM / 33 draft, shape 10, 388 bytes). Shared ParticleRandom_ReadSample draws recover
+table-first ordering and the resource stack slot. The all-clean explicit sampler is
+44/38, shape 22; ReadDirectSample gives 31/27, shape 22. Production is unchanged.
+
+The original has eight pins, three barriers, and two volatile locals. Scope pins
+previously omitted the volatile locals from its report; this run fixes the report.
+Removing only resource volatility gives 13/11, only table volatility 9/5, both 17/9.
+The ROM allocates separate resource/table slots at sp and sp+4. The clean shared sampler
+spills resource normally but keeps table in r2; seed then takes r3. `why`/`spill` prove
+r3 is absent from the reload-register list, which explains the earlier mask and both
+352-offset reload differences. The ROM needs r3 for all three. No spill rotation or
+one of four CSE follow probes fixes this.
+
+Shared-sampler allocation: table pseudo 89 is local, priority 2777 (5 refs), seed 91
+is local priority 2666. Forcing table to memory with AGBCC_NOREG=89 plus
+AGBCC_NOEQUIV=89 frees r3 and repairs those earlier reloads, but resource then moves
+into r4, count into r5, and the frame remains four bytes. Forcing both resource 24
+and table 89 to memory produces an eight-byte frame but changes global allocation
+and drops the r8 save (99/91, shape 8). These are diagnoses, not matching overrides.
+AGBCC_PRI on the local table has no useful effect.
+
+Tried direct named drawing/resource fields, shared macro and direct samplers,
+union table source/GetTable, ADDRESSOF table, numeric table, separate sample result
+scopes, individual volatile removals, and interacting count/mask/limit pin removals
+with and without resource volatility. None yields a partial match. Next: recover
+both natural stack objects and the random mask/seed allocation together; a spill
+rotation alone cannot do it. Avoid adding artificial pressure or one-element arrays
+merely to force the stack. Named AGBCC_NOREG was silently ignored, like the earlier
+NOEQUIV bug; a separate tool fix resolves C names before invoking the compiler.
+
+Scratch/evidence: `build/cx/work/WirelessGameDisplay_UpdateRoundAnnouncement/`.
+
+### WirelessResultPanel_UpdateOutcomeReveal (0803B01C, src/fn/sub_0803B01C.c)
+
+Landed partials remove all four pins and one call-setup barrier. Production matches
+all 264 bytes with three saved-counter barriers left. Sharing one function-scope
+drawing pointer across entry/shake/reset branches, then using two direct shared
+samplers, keeps the first random seed store and restores its allocation. With
+separate branch-local drawing pointers flow deletes that store (insn 254), reducing
+the seed's references and reversing seed/mask registers. Replacing the local drawing
+layout with the shared layout or a union does not fix this: pointer scope does.
+A u16 keyframe local removes the call-setup barrier; its conversion orders the r2
+argument move before r0 and folds away. u8 and signed-short locals also match.
+
+Best fully clean draft: `notes/phase3-drafts/dp-link/WirelessResultPanel_UpdateOutcomeReveal.c`
+(14 ROM / 14 draft, shape 4, 264 bytes). It repeats `save = address` in both count-clamp
+arms and retains the u16 keyframe. This recovers a separate saved global-pointer
+pseudo, but the copy occurs after the clamp rather than before. Icon gets r4 instead
+of r5; the short-lived address gets r2 rather than r0; the maximum gets r0 rather
+than r2. Earlier fully clean forms were 60/56, then shared sampling 43/39, then shared
+pointer 25/27. Repeated save is the useful shape change, unlike repeated stores.
+
+All ten proper multi-barrier subsets after the four-pin removal fail. The prior
+repeat-save draft is 15/15, shape 4; CSE_NOFOLLOW=1 improves it to 11/11, but does not
+match. Narrow maximum types, ADDRESSOF address/save/maximum, an extra early save,
+shared maximum lifetime, typed counter/resource fields, repeated stores and clamp
+helpers do not recover the missing pre-clamp copy. The call-setup barrier alone was
+2/2 due to argument move order; helper parameter order had no effect, narrowing the
+keyframe local solved it. Next: preserve the address-to-save copy before the clamp
+without preventing CSE using a barrier. Do not repeat sampler/type/layout experiments.
+
+Scratch/evidence: `build/cx/work/WirelessResultPanel_UpdateOutcomeReveal/`.
+## dp-menus-b (Codex)
+
+### ScenePanelRig_TickApproachSubject (0805A044): two modulation pairs remain
+
+Partial landed: X pin and origin-offset barrier removed, and origin/distance reads use
+members. The target-distance/table work union prevents the table's constant-equivalence
+priority penalty; it gets the ROM's r6. Pin-free draft:
+`notes/phase3-drafts/dp-menus-b/ScenePanelRig_TickApproachSubject.c`.
+
+The draft differs by 18 ROM / 20 draft instructions (shape 4; 444 versus 440 bytes).
+Both remaining decisions are global allocation of scale24's anonymous return pseudos:
+X gets r1 rather than r2; Z prefers r2 rather than r1. On the saved draft,
+`AGBCC_FORCE=166:2,214:1` gives MATCH, including the offset increment and literal pool.
+No compiler override belongs in the source.
+
+Earlier raw-offset draft also tied originOffset to address pseudo 186 in local allocation;
+its G trace was misleading. Scope now recovers this tie (fact 210). Forcing that quantity
+head moves it, while priority or force on its non-head member did nothing. Real field reads
+and the work union remove this distraction and leave only the modulation results.
+
+Tried: coordinate conversion macros from Wandering; narrow modulation/position types;
+commuting both sums and products; direct expressions; separate X/Z product and wave locals;
+output-parameter scale24; product/result union; reusing wave or value for modulation;
+explicit scale24 statement macro; inline field getters; duplicating origin read, position
+sum, full sum or full store in the two rounding arms. Copies and output parameters collapse
+to the same return pseudo. Arm duplication changes control flow and does not cross-jump
+back to the ROM. Keep the work union: its table allocation is independently diagnosed.
+Next: find a C shape that changes the X return's preference to r2 and removes the Z return's
+r2 preference, possibly through the rounding helper's class head or a later matched sibling.
+
+### ScenePanelRig_TickSecondarySprites (0805A7E4): nine pins and three barriers remain
+
+Landed five pins and two barriers removed (19 original concessions, 12 remain). The ordinary
+sequence-advance helper form removes the duration/mask pins and barriers. Reusing the near
+interpolation weight for the wave-table pointer removes its pin; the table assignment must
+precede the random-phase pointer assignment. The second flip test's packed control union
+removes its bit and first pins. Every partial checked MATCH (740 bytes).
+
+Pin-free draft: `notes/phase3-drafts/dp-menus-b/ScenePanelRig_TickSecondarySprites.c`.
+It uses the local shared-style sequence helper with a byteMask parameter. 71 ROM / 71 draft,
+shape 46, same 740 bytes. Output has STACK_REG preference, initially gets r5, and reload's
+spill reservation displaces it to r1. The ROM has output in sb. `AGBCC_FORCE=output:9` fixes
+the prologue, counter spill and initial interpolation, leaving 52/50 and shape 4. No joint
+full-match knob found. Counter narrowing, direct ++i, counted for loop, a position-pointer
+output, explicit array indexing, and coordinate macros were tested. Narrow counters add
+extensions; the position pointer does not recover the original pointer allocation.
+
+The pin-retaining shared helper had only a first-flip reload difference: choice 23 takes r1
+instead of r2; `AGBCC_SPILL=23:4` MATCH on helper_pinned_localbit.c in scratch. Preserving
+original constrained flip stores fixes that while allowing the ordinary advancement form.
+A plain bit-2 test differs; the packed union reproduces the original separate mask register.
+
+Removing the final sample pin from the current partial changes table priority: phase's 6315
+beats the work union's 6260; `AGBCC_PRI=work:+56` removes all but the final sample/AND pair.
+Using SCALE3 at all three interpolation conversions raises work's refs naturally, also
+leaving only that pair while dropping the sample pin. A signed sample followed by unsigned
+cast likewise leaves only two register differences. Local allocation ties sample to the
+AND result in r0; ROM loads sample in r1 and masks in r0. u16/s16 angle, redundant casts,
+packed sample/angle unions, shared mask helper and commuted operands did not break the tie
+with the correct code. Direct signed sample gives ldrsh; masking to 255 gives ldrb. Macro
+conversion directly into the packed vector adds bitfield read-modify-write instructions;
+use an s32 coordinate local before storing it if revisiting this form.
+Next: solve the sample/result dying-operand tie, then retry the remaining pointer pins and
+loop increments; the fully unpinned draft also needs output's sb allocation.
+
+### ScenePanel_TickRig (0805AC3C): no removal landed
+
+Saved named-field draft: `notes/phase3-drafts/dp-menus-b/ScenePanel_TickRig.c`.
+It has no pins/barriers and preserves the original volatile timer member reads. 18 ROM /
+20 draft instructions, shape 2, 224 versus 220 bytes. Without the explicit halfword mask
+on the second frame read, combine preserves an intermediate left shift and later shifts
+right by 18 instead of 2. The redundant mask gives the correct shift and one extra move.
+`AGBCC_FORCE=frame:3,96:3` (frame is pseudo 95) coalesces the halfword load and wide copy:
+16/16, shape 0, 220 bytes. This is not a full matching probe.
+
+The other issue is reload's register set: ordinary fields use only r0/r1/r2 as spill
+registers, while the ROM uses r3 for the false-arm collider address and suppress-drain
+address. The frame/interval pointer allocation also differs. A single reload rotation
+cannot solve a register missing from the set. Generic probe tried the one canonical CSE
+choice and three jump follows; none changes the score. No full matching knob found.
+
+Tried all-pin stripping; direct named fields with loads ordered before mask constants;
+shared or split timer declarations; u16/s16/s32 frame types; frame-read inline helper;
+reusing the first frame/interval locals; early phase computation; commuted comparison;
+unsigned division/modulo; word/halfword unions and zero initializers; u16/u32 bitfield
+member views and local bitfield views; halfword pointer alias and redundant mask. The
+bitfield views change loads, and ordinary unions collapse back to the same widening.
+Partial removals of the first-arm value/mask pins and whole first arm were not exact;
+the original tail plus ordinary head still misses seven reload-register instructions.
+Next: get the halfword load and widened frame into one ordinary-C allocation quantity,
+and make reload reserve r3 without a pin. The C mask is worth retaining for that search.
+
+### ScenePanelRig_InitSecondarySprites (0805AF88)
+
+Two matching partials remove the render-mode barrier (repeat the store in both
+arms) and zero pin (copy initial i after the existing initialization barrier).
+Stock check MATCH, 272 bytes. Two barriers remain.
+
+Best pin-free draft: `phase3-drafts/dp-menus-b/ScenePanelRig_InitSecondarySprites.c`,
+1 ROM / 3 draft instructions, shape 4, 276 bytes. First parity uses `i & 255`
+before `& one`; this blocks PRE reuse at the final flag test and restores all
+registers, but leaves an extra mask and alignment padding. Ordinary array indexing
+is equivalent to the original offset construction. Without the redundant mask,
+PRE computes a shared parity (pseudo 128) and extends its lifetime across calls;
+`AGBCC_NOPRE=1` confirms the reuse, improving shape 28 to 4 but leaving 30/32
+differences. `CSE_NOCANON=128` alone gives 24/22; combined with NOPRE gives 30/32.
+No complete matching knob found.
+
+Tried separate branch stores, zero initializer lifetimes, union parity, byte/halfword
+parity, signed/unsigned casts, full-width and byte masks, masked bit operand, byte
+and halfword one, literal first/last parity masks, unsigned counter, scalar union
+constant, wide aggregate constants and packed one-bit control. Wide constants
+load a pool object; the one-bit control is hoisted and introduces a shift in mode
+selection. Narrow parity retains a shift after the AND. The best remaining lever
+is a redundant expression that blocks PRE yet folds at combine without adding
+a mask; the current draft documents the exact target. Scratch: build/cx/work/
+ScenePanelRig_InitSecondarySprites/.
+## dp-scene2 (Codex)
+
+### Actor_UpdateBlinkBurstDisappearance (081E7F80): one pin removed, unused zero open
+
+Draft: `notes/phase3-drafts/dp-scene2/Actor_UpdateBlinkBurstDisappearance.c` (snippet for the controller unit). The indexed child loop, byte reset mask and byte-union update match all useful instructions and registers. The sole difference is the ROM's unused `movs r7, #0` before its reversed loop counter; the draft instead has two-byte alignment padding later. The landed partial removes the r2 value pin and raw blink offsets, retaining only the original unused-zero r7 pin.
+
+Diagnosis: the initial free draft let regmove tie the OR result to the flags load. `AGBCC_NOTIE=1477` restores the copy but leaves the zero and constant allocation differences; it is not a full matching knob. A byte-union update with byte reset mask naturally restores that copy and allocation. Literal `control.raw |= 1` or a one-bit assignment generates the unused QImode zero through loop hoisting, and indexing real child slots gives the correct invariant order, but the OR operands and callback/reset r4/r5 allocation swap. Count-up reversal places the counter after these invariants.
+
+Tried: u8/u16 flags and result temporaries, direct memory OR, initialized byte unions, one-bit updates, byte/halfword reset masks, callback-view and real-slot indexed loops, postincrement and reversed loops, full-byte and halfword-container bitfields, shared reset helper. Persistent search: `build/matchsearch/Actor_UpdateBlinkBurstDisappearance`; sources and evidence under `build/cx/work/Actor_UpdateBlinkBurstDisappearance`.
+
+Next: retain the literal union update's hoisted zero while obtaining the byte-mask update's operand order; inspect the QImode insertion and invariant merging in cse/loop, or use the finishing-animation twin to identify the original control representation.
+
+### Actor_UpdateFinishingAnimation (081E9574): one pin removed, same unused zero
+
+Draft: `notes/phase3-drafts/dp-scene2/Actor_UpdateFinishingAnimation.c`. The byte reset mask and union update match all useful instructions and allocation. The missing `movs r7, #0` also removes final alignment padding (ROM 608 bytes, draft 604). The partial removes the r2 pin and names the release-control field, retaining the original unused-zero pin.
+
+The blink investigation above applies directly. A separate mask-first byte union also drops the zero and keeps its one constant inside the loop; initialized unions and reset helpers do not retain it. No complete matching knob is known. Next: use this smaller twin to trace the literal union OR's hoisted QImode zero and preserve it while restoring the byte-mask operand order.
+
+Follow-up in the smaller finishing twin: the literal update is now confirmed to have shape distance zero and only five differing register rows. RTL shows that the unused QImode zero comes from the final byte store's insertion sequence: `(oldByte & zeroQI) | newByte`. CSE retains that zero when the payload is the OR of two paradoxical QImode subregs; loop hoists it, and combine later drops the OR with zero. With a promoted scalar byte mask, CSE drops the insertion before loop. An outer byte-union reset restores the desired OR operand order but also loses the zero and swaps callback/reset allocation. Clearing then setting the bit, mask-clear/set, an explicit zero OR, and mask-first unions inside the branch or loop do not match. The literal alternative remains in the work directory for its five-row evidence; the committed draft still matches all useful instructions.
+
+
+### ActorDisplay_UpdateForegroundSprite (081EC7D8): horizontal allocation still open
+
+Draft: `notes/phase3-drafts/dp-scene2/ActorDisplay_UpdateForegroundSprite.c` (ROM 412 bytes, draft 420; 35 ROM / 38 draft instructions differ, shape 7). Separating the horizontal and vertical sums stops the original reused x pseudo from taking the drawable's r5. Distinct field pointers remove their accidental global lifetime. Playback then differs only in one mask reload, but coordinate allocation still prevents move2add from reusing the shake and displacement offsets.
+
+Diagnosis: local allocation gives the horizontal sum r0 (priority 12000, six references), and its live screen pointer r1 (priority 2500, two references). The ROM has the reverse. `AGBCC_PRI=screen:+10000` confirms the first placement and reduces shape distance to 4 (27 ROM / 29 draft instructions), but is not a complete matching knob. Forcing x alone does not model the original hard register's entire arithmetic chain. Full multi-value forcing also changes overlapping allocations and is not matching evidence.
+
+Tried: separate coordinate lifetimes, separate address lifetimes, direct named fields, signed/unsigned sums, reversed operand spelling, halfword sums and final-sum truncation, word-union sums, and a geometry inline helper. Halfword forms introduce unwanted extensions; direct fields also lose the required early screen address and signed layer load. The retained full-width draft preserves the observed operation and load order.
+
+Next: break the sum's local-allocation quantity tie without changing instruction order, or recover a source aggregate/accessor whose screen address gets the first local register. Keep the full 0x5E0/0x5E6/0x5E8 offsets and signed alternate-layer read. Return after the singleton tail of the queue.
+
+After the singleton matches, splitting only the address/result temporaries while retaining the reused coordinate accumulator reduces shape distance to 3 (39 ROM / 40 draft rows, 416 bytes). `why` confirms the remaining obstacle: the shared x is global (priority 6666), but the first sum's temporary and screen pointer are local and already occupy r0/r1. Splitting x itself ties its chain locally in r0 instead. Direct result stores and a geometry inline wrapper do not change this decision. The earlier retained draft has fewer register differences; neither version is a stock match.
+
+
+### SingletonSlot7_UpdateEndingScene (081EF914): two mask pins removed, transition zeros open
+
+Draft: `notes/phase3-drafts/dp-scene2/SingletonSlot7_UpdateEndingScene.c` (ROM 1392 bytes, draft 1388; 9 ROM / 7 draft instructions, shape 4). A local copy of the playback wrapper's state parameter restores both r4 state/r5 mask allocations. Both original r5 pins are removed in the checked source. `AGBCC_FORCE=one:5` confirmed one allocation region; the local-copy C fixes both regions, with the same result from the shared DisplaySequence_StepSprite helper.
+
+The two remaining byteZero pins keep separate zero loads before transition-duration stores. Without them, cse folds the byte store's source into the existing word zero, and the first transition's timer pointer moves from r4 to r3. The plain Slot7_TransitionTo helper and literal expanded stores have the same difference. `why` identifies the byte-source replacement by the earlier zero in cse1; no full matching knob is known.
+
+Tried: byte masks, longer-lived mask uses, byte-union masks, wrapper-local state copies, shared playback and transition helpers, initialized and assigned byte/word unions for zero, and a halfword duration bitfield. Assigned unions keep a zero live across unrelated control flow and add a saved register; initialized unions again merge the zero; duration bitfields add different zero loads. The retained draft uses the ordinary transition helper and has no concessions.
+
+Next: derive the separate narrow zero from the transition's original representation, without extending its life out of the case. The first timer pointer's displacement is a consequence of the missing local byte-zero allocation, not an independent pin requirement.

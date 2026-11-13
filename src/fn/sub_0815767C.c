@@ -12,7 +12,7 @@ struct Drawable {
 s32 Player_GetControlFlags(void *, u32);
 void CellObject_Init(void *, void *);
 void Obj_StepPosition(void *);
-void sub_0802E04C(void *);
+void Actor_EmitTowardNearbyActors(void *);
 void Collider_SetPosition(void *, void *, s32);
 void ActorShadow_Disable(void *);
 void ActorShadow_Enable(void *);
@@ -44,7 +44,7 @@ void Player_ApplyControlPresentation(u8 *p)
         }
     }
     Obj_StepPosition(p + 0x24);
-    sub_0802E04C(p + 0x24);
+    Actor_EmitTowardNearbyActors(p + 0x24);
     if (Player_GetControlFlags(p, 8)) {
         ((struct Player *)p)->collider.flags |= 4;
     } else {

@@ -4,7 +4,7 @@ s32 InventoryPanel_CreateEntry(s32 *, s32, s32, s32, s32);
 s32 InventoryPanel_UpdateSelectedUnlock(void *, s32, s32, s32, s32);
 s32 InventoryPanel_UpdateSelectedEquipment(void *, s32, s32, s32, s32);
 void InventoryPanel_SetEntryRow(void *, s32, s32, s32, s32, s32);
-void SceneHud_FillDigitCells(s32, s32, s32, s32);
+void Hud_FillDigitCells(s32, s32, s32, s32);
 static inline void DrawComparison(void *p, s32 x, s32 y, s32 value, s32 delta, s32 old)
 {
     if (delta > 0)
@@ -34,12 +34,12 @@ void InventoryPanel_DrawStatComparison(u8 *p, s32 unlock, s32 equipment, s32 sel
         } else if (kind == 0) {
             old = InventoryPanel_UpdateSelectedEquipment(p, 0, 0, 1, 0);
             delta = value - old;
-            SceneHud_FillDigitCells(3, 8, 3, 0);
+            Hud_FillDigitCells(3, 8, 3, 0);
             DrawComparison(p, 8, 4, value, delta, old);
         } else {
             old = InventoryPanel_UpdateSelectedUnlock(p, 0, 0, 1, 0);
             delta = value - old;
-            SceneHud_FillDigitCells(3, 8, 4, 0);
+            Hud_FillDigitCells(3, 8, 4, 0);
             DrawComparison(p, 8, 3, value, delta, old);
         }
     } else if (selected) {
@@ -58,12 +58,12 @@ void InventoryPanel_DrawStatComparison(u8 *p, s32 unlock, s32 equipment, s32 sel
         } else if (kind == 0) {
             old = InventoryPanel_UpdateSelectedEquipment(p, 0, 0, 1, 0);
             delta = value - old;
-            SceneHud_FillDigitCells(3, 8, 3, 0);
+            Hud_FillDigitCells(3, 8, 3, 0);
             DrawComparison(p, 8, 4, value, delta, old);
         } else {
             old = InventoryPanel_UpdateSelectedUnlock(p, 0, 0, 1, 0);
             delta = value - old;
-            SceneHud_FillDigitCells(3, 8, 4, 0);
+            Hud_FillDigitCells(3, 8, 4, 0);
             DrawComparison(p, 8, 3, value, delta, old);
         }
     } else if (equipment) {
@@ -73,7 +73,7 @@ void InventoryPanel_DrawStatComparison(u8 *p, s32 unlock, s32 equipment, s32 sel
         } else {
             old = InventoryPanel_UpdateSelectedEquipment(p, 0, 0, 1, 0);
             delta = value - old;
-            SceneHud_FillDigitCells(3, 8, 3, 0);
+            Hud_FillDigitCells(3, 8, 3, 0);
             DrawComparison(p, 8, 4, value, delta, old);
         }
     } else if (unlock) {

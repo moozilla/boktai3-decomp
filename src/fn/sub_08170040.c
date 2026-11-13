@@ -1,5 +1,5 @@
 #include "global.h"
-int SceneHud_UpdateBinaryChoice(void *);
+int PauseMenu_UpdateBinaryChoice(void *);
 void Sound_PlaySong(int);
 void SceneHud_ReturnToActionGrid(void *);
 void Inventory_SortConsumables(int);
@@ -12,7 +12,7 @@ struct S {
 };
 void PauseMenu_OnSortConfirmationUpdate(struct S *p)
 {
-    int r = SceneHud_UpdateBinaryChoice(p);
+    int r = PauseMenu_UpdateBinaryChoice(p);
     if (r == 0) {
         Sound_PlaySong(0xde);
         SceneHud_ReturnToActionGrid(p);

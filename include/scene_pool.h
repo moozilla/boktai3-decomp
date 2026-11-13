@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_POOL_H
 #define GUARD_SCENE_POOL_H
 #include "engine.h"
+#include "modifier_list.h"
 
 /* The copy helpers transfer 16 bytes; only x/y/z are interpreted.
  * The unnamed word is representation padding, not an uninitialized coordinate. */
@@ -37,36 +38,67 @@ struct ScenePoolEntry {
     u32 history[0x40]; /* per-state workspace; temporal history is not established */
     s32 settingA, delayA, settingB, delayB;
 };
+/* Drain dispatch prefix at +0xB0; accumulator shares forwardBias at +0xC0. */
+struct ActorDrainState {
+    u32 (*callback)(void *);
+    void *resource;
+    s16 timer, duration;
+    s8 effect;
+    u8 valueBase, entered, active;
+};
 /* Partial actor view established by the frame/state callbacks in this range. */
 struct ScenePoolActor {
-    u8 unknown0[0xc];
+    u32 inputFlags;
+    u32 unknown4;
+    u32 kind;
     u32 boundsFlags;
     struct ScenePoolVec32 position;
-    u8 unknown20[0x18];
+    u8 unknown20[8];
+    s32 motionDisplacement; /* +0x28: tween coordinate correction */
+    u8 unknown2c[0xc];
     s32 restrictionMetric;
-    u8 unknown3c[0x1c];
+    u8 unknown3c[0xc];
+    u8 bodyAnimation, faceAnimation, accessoryAnimation, paletteState, paletteMode;
+    u8 unknown4d[3];
+    u8 sourceIds[4];
+    u8 modifierCount;
+    u8 unknown55[3];
     u16 timerA, timerB;
-    u8 unknown5c[0xc];
+    s32 currentAmount, amountLimit, halfAmount;
     u32 unknown68;
-    u8 unknown6c[0x28];
+    u8 unknown6c[0x18];
+    s32 acceleration, turnAcceleration;
+    u8 unknown8c[4];
+    s32 drainIncrement;
     s32 minimumForwardSpeed, maximumForwardSpeed;
     s32 minimumLateralSpeed, maximumLateralSpeed;
     s32 minimumForwardBias, maximumForwardBias;
-    u8 unknownac[0x14];
+    u8 airborne;
+    u8 unknownad[3];
+    struct ActorDrainState drain;
     s32 forwardBias; /* +0xc0, added to forwardSpeed (tentative) */
-    u8 unknownc4[0x1f0];
+    u8 unknownc4[0xc];
+    struct StatModifier modifiers[24];
+    u8 unknown2b0[4];
     u8 emissionProfile[0xc]; /* observed descriptor prefix; full extent is unknown */
     u8 unknown2c0[0x48];
     u16 unknown308;
-    u8 unknown30a[0x32];
+    u8 unknown30a[0x30];
+    u16 drainQuarter;
     s32 biasClampMode;
-    u8 unknown340[0x22c];
+    u8 unknown340[0x1dc];
+    u16 baseAmount;
+    u8 unknown51e[6];
+    u16 requestedSound, playingSound;
+    u8 unknown528[0x44];
     u32 motionFlags;
     u8 unknown570[0xa];
     u8 unknown57a;
     u8 unknown57b[0x31];
     s32 forwardSpeed, verticalSpeed, lateralSpeed;
-    u8 unknown5b8[0x34];
+    u8 unknown5b8[0x24];
+    s32 steering;
+    u8 unknown5e0[0xc];
     s8 motionLock;
     u8 unknown5ed;
     u8 flags5ee;
@@ -109,7 +141,9 @@ struct ScenePoolPlayer {
     s32 position[3];
     u8 unknown34[0x5c0];
     s32 viewportOriginX; /* +0x5f4, rounded down to a pixel by 0811AB78 */
-    u8 unknown5f8[0x26c];
+    s32 viewportOriginY,
+        viewportOriginZ; /* +0x5f8/+0x5fc: copied with viewportOriginX by emitter */
+    u8 unknown600[0x264];
     u32 gloveTimer; /* +0x864, tentative Glove controller state */
     u8 gloveActive;
     u8 unknown869[3];

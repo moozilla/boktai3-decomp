@@ -1,22 +1,12 @@
-// MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 s32 ModifierMenu_GetHeaderFrame(struct ModifierMenu *menu)
 {
-    struct ModifierMenu *base = menu;
-    s32 frame = (s32)menu;
-    asm("" : "+r"(base));
-    switch (base->mode) {
+    switch (menu->mode) {
         case 0:
-            frame = base->choice.cursor.category + 19;
-            break;
+            return menu->choice.cursor.category + 19;
         case 1:
-            frame = base->choice.cursor.category + 23;
-            break;
+            return menu->choice.cursor.category + 23;
         case 2:
-            frame = base->choice.cursor.category + 27;
-            break;
+            return menu->choice.cursor.category + 27;
     }
-    asm("" : : "r"(base));
-    /* The original preserves the input register for an unrecognized mode. */
-    return frame;
 }

@@ -1,17 +1,16 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_manager.h"
-/* Unsupported kinds preserve the original slot on release frames and return
- * the final parts-release result on other frames. */
-struct ActorAttachmentSlotView *ActorAttachment_UpdateFromDescriptor(
-    struct ActorAttachmentSlotView *slot, struct ActorAttachmentFollowView *descriptor,
-    u8 inputKind, u32 inputFrame, s16 *volatile value, u32 inputCount, s32 z, s32 y)
+/* Unsupported kinds fall through without an explicit return, preserving the
+ * value left in r0 by the original routine. */
+struct ActorAttachmentSlotView *
+ActorAttachment_UpdateFromDescriptor(struct ActorAttachmentSlotView *slot,
+                                     struct ActorAttachmentFollowView *descriptor, u8 inputKind,
+                                     u32 inputFrame, s16 *value, u32 inputCount, s32 z, s32 y)
 {
     u32 kind;
     u32 frame;
     u32 count;
     u32 action;
-    register struct ActorAttachmentSlotView *result asm("r0") = slot;
     {
         {
             u32 rawCount = inputCount;
@@ -38,7 +37,7 @@ struct ActorAttachmentSlotView *ActorAttachment_UpdateFromDescriptor(
                 case 5:
                     return ActorAttachment_ReleaseResource(slot, 5, descriptor->identity);
                 default:
-                    return result;
+                    goto done;
             }
         }
     }
@@ -47,7 +46,7 @@ struct ActorAttachmentSlotView *ActorAttachment_UpdateFromDescriptor(
     slot = ActorAttachment_ReleaseResource(slot, 2, descriptor->identity);
     slot = ActorAttachment_ReleaseResource(slot, 4, descriptor->identity);
     slot = ActorAttachment_ReleaseResource(slot, 5, descriptor->identity);
-    result = ActorAttachment_ReleasePartsResource(slot, 3, descriptor->identity);
+    ActorAttachment_ReleasePartsResource(slot, 3, descriptor->identity);
     {
         u32 mask = 4;
         u32 bits;
@@ -63,12 +62,9 @@ struct ActorAttachmentSlotView *ActorAttachment_UpdateFromDescriptor(
                 return ActorAttachment_CreateSpriteSlot(
                     frame, &descriptor->anchor, descriptor->identity, y, z, action, 0, descriptor);
             case 1:
-                return ActorAttachment_CreateValueSpriteSlot(
-                    frame, &descriptor->anchor, descriptor->identity, y, z, action, ({
-                        register s16 *spriteValue asm("r3") = value;
-                        spriteValue;
-                    }),
-                    (s16)count, 0, 0, descriptor);
+                return ActorAttachment_CreateValueSpriteSlot(frame, &descriptor->anchor,
+                                                             descriptor->identity, y, z, action,
+                                                             value, (s16)count, 0, 0, descriptor);
             case 2:
                 return ActorAttachment_CreateSinglePartSlot(
                     1, &descriptor->anchor, descriptor->identity, z, action, descriptor);
@@ -85,7 +81,8 @@ struct ActorAttachmentSlotView *ActorAttachment_UpdateFromDescriptor(
                 return ActorAttachment_CreateAlternateSpriteSlot(
                     &descriptor->anchor, descriptor->identity, y, z, action, 0, descriptor);
             default:
-                return result;
+                goto done;
         }
     }
+done:;
 }

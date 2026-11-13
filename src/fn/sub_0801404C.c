@@ -24,10 +24,14 @@ struct Group {
     u8 active, count, type, priority;
     struct Particle particles[1];
 };
+struct ParticleGraphics {
+    u32 reserved;
+    u16 tileBase;
+};
 struct Manager {
     u8 pad[24];
     u32 timer;
-    u8 *small, *large;
+    struct ParticleGraphics *small, *large;
 };
 struct Cell {
     u8 height, tile;
@@ -42,9 +46,14 @@ struct Map {
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(int, int);
 void Effect_Remove(void *);
+static inline u32 CoordinateBits(const s16 *coordinate)
+{
+    return (u16)*coordinate;
+}
 static inline int CellIndex(struct Vec *p)
 {
-    int x = p->x >> 8, z = p->z >> 8;
+    int x = (s16)CoordinateBits(&p->x) >> 8;
+    int z = (s16)CoordinateBits(&p->z) >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0xffff;
     return gTerrainMap->rows[z] + x;
@@ -76,19 +85,16 @@ void ParticleGroup_UpdateBouncing(struct Manager *m, struct Group *g)
         u16 *table = gRandomTable;
         asm("" : "+r"(table));
         p = g->particles;
-        asm("" : "+r"(p));
         sprite = (u8 *)g + 20;
         do {
             if (p->active) {
                 u16 index = CellIndex(&p->position);
-                u8 *resource;
+                struct ParticleGraphics *resource;
                 int height;
                 if (g->type <= 20)
                     resource = m->small;
                 else
                     resource = m->large;
-                asm("" : "+r"(resource) : : "memory");
-                asm("" : "+r"(g));
                 p->position.x += p->velocity.x;
                 p->position.z += p->velocity.z;
                 p->height += p->velocity.y;
@@ -132,15 +138,22 @@ void ParticleGroup_UpdateBouncing(struct Manager *m, struct Group *g)
                 } else
                     height = 0xffff;
                 p->cell = index;
-                if ((m->timer & 1) == (i & 1) && height != 0xffff) {
-                    p->position.y = height;
-                    p->tile = *(u16 *)(resource + 4) + base;
-                    p->priority = 3;
-                } else {
+                if ((m->timer & 1) == (i & 1)) {
+                    if (height != 0xffff) {
+                        p->position.y = height;
+                        p->tile = resource->tileBase + base;
+                        p->priority = 3;
+                        goto age;
+                    }
                     p->position.y = p->height;
-                    p->tile = *(u16 *)(resource + 4) + gUnk_08604B90[g->type];
+                    p->tile = resource->tileBase + gUnk_08604B90[g->type];
                     p->priority = g->priority;
+                    goto age;
                 }
+                p->position.y = p->height;
+                p->tile = resource->tileBase + gUnk_08604B90[g->type];
+                p->priority = g->priority;
+            age:
                 if (p->timer++ >= p->lifetime) {
                     p->active = 0;
                     Effect_Remove(sprite);

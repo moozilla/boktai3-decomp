@@ -1,11 +1,11 @@
 #include "global.h"
-s32 SceneHud_UpdateBinaryChoice(void *);
+s32 PauseMenu_UpdateBinaryChoice(void *);
 void Sound_PlaySong(s32);
 void Inventory_SortEquipment(s32);
 void SceneHud_BeginEquipmentSelection(void *);
 void Hud_UpdateInventorySortConfirmation(u8 *p)
 {
-    s32 r = SceneHud_UpdateBinaryChoice(p);
+    s32 r = PauseMenu_UpdateBinaryChoice(p);
     if (r == 0) {
         Sound_PlaySong(0xde);
         SceneHud_BeginEquipmentSelection(p);

@@ -731,7 +731,6 @@ void SelectionMenu_RefreshItemPage(struct SelectionMenu *p)
         p, (u32)Text_LookupString(Script_ParseStringRef((void *)p->promptMessages)));
 }
 
-// MATCHING_CONCESSION: register-pinning
 int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
 {
     int index = p->selectedSlot;
@@ -753,11 +752,17 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
             else if (*held & 0x80)
                 direction = 2;
             /* Read held input again for horizontal navigation. */
-            asm("" ::: "memory");
-            if (held[0] & 0x20)
-                direction |= 4;
-            else if (held[0] & 0x10)
-                direction |= 8;
+            {
+                u32 keys = *held;
+                if (keys & 0x20)
+                    direction |= 4;
+                else {
+                    int left = 0x10;
+                    left &= keys;
+                    if (left)
+                        direction |= 8;
+                }
+            }
         } else if (gPadState[0] & 0xf0)
             p->repeatTicks++;
     }

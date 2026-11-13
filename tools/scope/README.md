@@ -326,6 +326,16 @@ jump cse follows), `CSE_NOFOLLOW=K` (refuse the K-th follow),
 `AGBCC_DUMPPRI`, `AGBCC_SPILL` (local-alloc / reload; see the sources for
 syntax). Added in this thread (in `tools/scope/agbcc.patch`):
 
+Pseudo knobs accept unambiguous C variable names as well as numbers:
+`AGBCC_PRI=table:+214`, `AGBCC_FORCE=table:ip`, `AGBCC_COMBKEEP=base,resource`,
+`AGBCC_NOEQUIV=table`, `CSE_KEEP=value`, and `CSE_NOCANON=value`.
+`AGBCC_COMBKEEP` prevents combine from substituting instructions that set the
+selected pseudos; it diagnoses a lost set or copy, rather than changing the
+ordinary build. A name optimized away or shared by several pseudos is an error;
+use the number from the relevant RTL dump in that case.
+Keep the full `AGBCC_` prefix: abbreviated keys such as `FORCE` or `NOTIE`
+are rejected because the compiler otherwise ignores them silently.
+
 * `AGBCC_REGCLASS=1`: regclass.c prints, for each pseudo and pass, its
   preferred and alternate class and the cost of every class
   (`R func pseudo passN pref=... alt=... mem=... LO_REGS=... STACK_REG=...`).
@@ -1864,6 +1874,150 @@ Each was read from the compiler source and confirmed on a live draft.
    so p wins and keeps its own register. BreakableBarrier_SetPosition (five pins and a barrier)
    matched once its `return input;` was dropped. The caller ignores the value.
 
+170. **Index the call argument and walk the field pointer to delay reversal without
+   reordering their increments.** EffectManager_UpdateAll uses a pointer walking
+   the six effects for field accesses, but passes `&manager->effects[i]` to the
+   update call in a count-up loop. In loop pass 1 the indexed call is a giv of i,
+   so check_dbra_loop cannot reverse i yet; strength reduction creates both the
+   call pointer and the field-access pointer. In pass 2 the index has no givs
+   left and becomes a countdown. Its initialization now follows both pointer
+   initializations. The field pointer's increment precedes the original walking
+   pointer's increment site, while the indexed call pointer steps at i's update,
+   preserving the ROM order. Indexing the fields while passing the walking
+   pointer also delays reversal, but swaps the two increments. Walking both
+   pointers explicitly instead shares their 328-byte stride in cse1, keeps it in
+   a register and changes reload rotation. The mixed call-index form removes
+   three pins and two operand barriers with no replacement concessions.
+120. **A byte-returning inline can move a constant on the first loop pass rather than the
+   second, fixing both hoist order and allocation without changing the body.** In
+   SceneObjects_ScriptLower (0801E998), the variant's `one = 1; s->variant = one;` has
+   first-pass lifetime 2 and moves only on pass 2, after the flag mask. Returning it through
+   `static inline u8 GetVariantByte(int value) { return value; }` makes that lifetime 3:
+   pass 1 moves the insertion zero, one, then the mask (thresholds 26, 23, 20; loop size 51).
+   The extra conversion vanishes later, leaving the ROM's one-before-mask loads. Declare
+   the mask before the hidden insertion zero's creation so it wins their allocation tie.
+   Both changes are required: `AGBCC_PRI=35:+20,44:-20` proved the earlier draft's desired
+   order, while `hoist` distinguishes the two passes. Explicit casts, pointer setters and
+   narrow scalar/array declarations alone did not cross this threshold.
+
+121. **An explicit default return can isolate one switch tail while a call after an inner
+   if/else gives the other arms a common clear call.** ScenePool_StateLaunchArc (0803E5F4),
+   LaunchShortArc (0803E7B4) and EmitBursts (0803E998) need case 3's state-one Memory_Clear
+   tail kept, while cases 0, 1 and case 2's state-one tail share case 3's state-two call.
+   Put `return 0` in case 3's state-one arm and the explicit default, then return inside
+   each outer if/else arm instead of after their join. The last return now has no existing
+   join label immediately before its zero set, so jump2 creates a new label and cannot
+   merge the isolated tail through the old jump chain. In case 2, compute `history` in
+   each inner arm and call Memory_Clear once after the join; the join stops move2add from
+   making 256 from the preceding 1. The state-one block then has exactly three local qtys
+   (fact 38): a shared `clear` local assigned in both arms leaves only two local qtys and
+   restores the ROM's registers (`AGBCC_FORCE=148:1` confirmed the prior allocation).
+   Removing the per-arm history assignments also loses the ROM's `adds r0, #8`.
+
+122. **Duplicating a post-join statement can fix PRE numbering as well as allocation.**
+   ActorAttachment_CreateValueSpriteSlot (08065FD0) had the right instructions but 15
+   spill-offset differences: its 258 insns into gcse gave T=129, while the desired hash
+   order needs T=127 or 133. Put `sprite->flags |= 1` in both action-offset arms (+4
+   insns before gcse), and `sprite->priority = 1` in both mode-test arms (+3). The
+   resulting T=133 orders all field-address spills correctly, and jump2 merges both
+   duplicated tails, so all 680 bytes match. Either duplication alone leaves the old
+   spill order. This is the same legitimate tail duplication as fact 91, but its
+   effect on the whole-function instruction count decides PRE's hash-bucket order.
+
+123. **A duplicated call followed by a duplicated read can stop CSE and still merge.**
+   ContactSwarm_UpdateTracking (08044290) reused an early mask 15 in its final random
+   sample, keeping it live across three calls. Put Collider_SetPosition and the following
+   `frame = slot->stateFrame` in both phase-test arms. CSE stops at their join, giving
+   the final mask a fresh load. The read after each call prevents flow's call-fallthrough
+   `(use 0)` from separating the tails; jump2 merges them back to the ROM's single call
+   and read. Duplicating only the call leaves eight extra instructions; writing gotos
+   after the calls does not remove that fallthrough distinction. All 236 bytes match.
+
+124. **Form later stack and field addresses at their uses to let PRE create the copies.**
+   SceneActorControl_TryActivateNearby (080674F0) retained an extra stack-address
+   register when `q = initial` preceded the range test. Assigning `q = &delta` after
+   the test removes that redundant PRE value, but leaves the saved-position copy
+   one instruction early. Move `position = &slot->savedPosition` after the test too:
+   PRE now creates both required copies in the ROM order. Keep x live through the
+   range test instead of testing its dx copy to select the right CSE class head.
+   The earlier diagnostic `AGBCC_NOPRE=1 AGBCC_FORCE=x:1` was exact; these C changes
+   match all 360 bytes without thirteen pins, a barrier or a volatile reload.
+
+125. **A structured search loop can preserve a repeated pointer load that a goto loop loses.**
+   SceneActorRegistry_UnlinkActor (0806FBC8) had a DEBUG_NOP between its removal and
+   scan labels. Removing it let CSE carry the bottom test's next pointer into the
+   next iteration, deleting the ROM's second load. A plain while loop preserved
+   both loads but put the removal block after the scan. Write `while (node->next)`
+   with `if (next->actor != actor) { node = next; continue; }`, followed by removal
+   and `return`. Rotation places removal before the scan while preserving both
+   loads, matching all 92 bytes. Goto and bottom-entry do/while forms did not.
+
+126. **An early continue with work can retain the label that a bare goto loses.**
+   SceneActorRegistry_SendToCategoryPaletteOffset (0806FCAC) reused the palette
+   offset in r2 to form the callback offset with `adds #0x66`; ROM loads the latter
+   independently. Bare negative guards with `goto next` still allow move2add.
+   Inside the category match, use `if (palette differs) { node = node->next;
+   continue; }`. The real advance keeps a join label before the callback through
+   reload, blocking constant reuse; jump2 then merges the duplicate advance.
+   This removes the r2-clobber barrier and matches all 92 bytes (fact 100).
+
+127. **A direct halfword OR can change an entire allocation cascade.** In
+   SceneActorRegistry_ScheduleAvailableActors (0806FE88), copying a u32 request
+   into a local then OR-ing a u32 flags load lets regmove tie the result to the
+   dying flags value. `*field = (u16)request | *field` keeps the halfword operation
+   and its operand copy. That alone restores the request, quota, delay, counter
+   and loop-constant allocation, matching all 236 bytes without two pins and a
+   barrier. Merely narrowing the request, mask or flags locals does not do it;
+   packed union variants add instructions. This extends fact 37 to the OR update.
+
+128. **A named constant-first mask can preserve a halfword read and its operand order.**
+   RouteSpriteActor_TickEmitting (0806DCE4) narrowed `frameWeight = *command & 15`
+   to ldrb when volatile was removed. The shared ReadCommand/MaskCommand pair
+   retains ldrh but swaps the load and constant registers. A direct block
+   `u32 value = *command; u32 mask = 15; mask &= value; frameWeight = mask;`
+   retains ldrh with the exact ROM registers. Together with separate first/second
+   random-index locals it removes one pin and all volatile command pointers from
+   the matching partial; the rest of this function remains a holdout.
+150. **Reuse a switch's mask variable for a case-local decode to make the mask global and leave
+   r0 for the decoded value.** In WirelessExchange_OnPacketReceived (08037DEC),
+   `u32 kind = payload.halves.high; kind &= 3;` had a block-local 3 and the following byte-store
+   zero in r0, so the cross-block kind got r1. The ROM has kind in r0 and both constants in r1.
+   `AGBCC_FORCE=89:1,93:1` confirmed the two conflicts in that draft. Writing
+   `mask = 3; kind &= mask;` with the same function-scope mask used for the packet's handshake
+   flags makes it a multi-set global pseudo. Local allocation no longer reserves r0 for the
+   decode's constant, and normal allocation gives the ROM's registers. The existing per-case
+   shift scopes plus this reuse removed both pins and matched the complete callback and unit.
+
+151. **A shared drawing pointer can preserve a random seed store that branch-local pointers lose.**
+   WirelessResultPanel_UpdateOutcomeReveal uses the same drawing in entry, shake, and reset
+   branches. With three scoped pointer variables, two ParticleRandom_ReadDirectSample calls
+   lose their first seed store in flow (insn 254); the reduced seed references also swap the
+   seed and 1023-mask registers. One function-scope drawing pointer assigned in all three
+   branches preserves the store and matches, removing four pins. Changing the drawing type
+   to the shared layout or a union does not fix it. Inspect pointer scope and flow before
+   assuming the sampler or field type is wrong. WirelessGameDisplay_UpdateShakeAnimation
+   additionally needs its display parameter used directly, rather than copied to a local.
+
+152. **A narrow keyframe temporary can restore argument-move order without extra instructions.**
+   In WirelessResultPanel_UpdateOutcomeReveal, removing the last call-setup barrier changes
+   `mov r2,icon; mov r0,drawing` to the reverse order. Inline wrapper parameter order does not
+   help. Writing `u16 keyframe = icon; Anim_LoadKeyframe(drawing, descriptor, keyframe, 0);`
+   restores the original order and matches without the barrier. A u8 or signed-short keyframe
+   also matches; changing only icon to u8/u16 does not. The chosen icons are 30, 31, and 32, so
+   narrowing preserves their values. Use the meaningful argument type, not an unrelated cast.
+130. **Separate setup tails need real joins to forget an old field address as well as stop
+   move2add.** VanargandEffect_Initialize's plain C derived its position pointer from the
+   lifetime pointer (`subs r1, #0x66`) where the ROM reloads the owner and adds 0x34. Writing
+   setup in two palette paths leaves a label through reload; jump2 later shares the stores,
+   so move2add no longer sees the lifetime address. But one path directly after `variant == 0`
+   lets cse follow from entry and reuse the old graphics pointer. That extends its lifetime,
+   makes it global, swaps owner/graphics r4/r5, and leaves an extra copy in that arm. Grouping
+   variants 0/1 into one setup join and 2/default into another gives both setups multiple
+   predecessors. cse forgets the old graphics address, its initial use stays local in r4,
+   and the owner stays in r5. The two tails then share exactly and remove the r1 clobber.
+   `why` now recognizes this address-reuse form from its pre/post-reload patterns and the
+   uninterrupted copy/add history, including labels, calls and intervening definitions.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
@@ -2147,3 +2301,126 @@ which is exactly `10:1`. Not tested.
   name; now they fall back to the only function in the dump), and a trailing
   FUNC argument to `life` was read as a variable name; a `sub_ADDR` name that
   the CSV has since renamed raised a KeyError.
+
+
+171. **Caller saving has a strict reference threshold; a repeated branch tail can cross it.**
+   In ParticleGroup_UpdateBouncing, a resource pointer with eight weighted references
+   crosses two calls. `CALLER_SAVE_PROFITABLE(REFS, CALLS)` is `4 * CALLS < REFS`, so
+   it cannot use caller-saved r3 and instead takes r8. Splitting the presentation
+   fallback into its two paths, repeating the resource-reading tail, and jumping to
+   one existing join label gives ten references. Allocation can then use r3, and
+   jump2 shares the repeated tails back into the ROM instructions. This removed
+   the resource barrier. A priority-only explanation misses this eligibility gate;
+   inspect both reference count and calls crossed before trying allocation order.
+
+
+172. **A changed consumer register can be a deleted conversion, not allocation.**
+   ParticleGroup_UpdateFrozen's PRE reaching byte is r3. The ROM converts it through
+   `lsl r0, r3, #24; lsr r0, r0, #24` before comparing r0 with 8. Combine removes
+   that pair in the ordinary draft and compares r3 directly. `AGBCC_COMBKEEP=104`
+   (the left-shift result in the saved draft) restores an exact match. `why` now
+   recognizes deleted SI left/logical-right shift pairs for byte/halfword conversion,
+   suggests COMBKEEP for that definition, and suppresses misleading allocation advice
+   for the original pseudo. This knob confirms the pass; the ordinary C form that
+   preserves this particular conversion remains open in the holdout notes.
+
+173. **A spill slot can belong only to a standalone USE, with no machine load or store.**
+   In the barrier-free split-half-table draft of sub_08014CA4, combine folds the
+   table construction but leaves `(use (reg 94))` for its old input (fact 48).
+   That input has no executable operation left in lreg, yet remains live across
+   earlier calls and gets sp+0x20. Every body instruction otherwise matches;
+   the frame grows from 0x20 to 0x24 and shifts the incoming stack arguments.
+   `scope frame` now compares flow and lreg and identifies such slots instead of
+   reporting only an unnamed spilled value. It requires a real earlier operation
+   and only standalone USEs afterward; surviving SETs, CLOBBERs, or operand uses
+   disqualify the diagnosis. Zero initialization removes this USE but restores
+   constant equivalence and changes allocation, so it is not automatically a fix.
+
+174. **Reuse a completed input for split-half table construction to avoid its unused spill.**
+   The extra USE-only slot in fact 173 disappeared when a typed union first held
+   the loop bound: `input.count = count; if (i < input.count) { ... }`. Inside that
+   arm, assign `input.random.halves[0]` and `[1]`, then read the table through
+   `ParticleRandom_GetTable(&input.random)`. The old input now comes from an
+   existing, defined count value instead of a new uninitialized pseudo. The half
+   stores still prevent the table's constant equivalence. This removed all three
+   initialization-barrier operands from sub_08014CA4 with a stock 704-byte match.
+   A zero or aggregate table initializer instead restored constant equivalence;
+   direct repeated reads of the union prevented the half stores from combining.
+160. **A value-less success return preserves the last call's hard r0 even when failure returns zero.**
+   In `DirectionalController_CheckRemaining`, `return angle` made Math_Atan2's result
+   a global pseudo, while local-alloc had already assigned later temporaries to r0.
+   `u32 direction = (((u16)Math_Atan2(dx, dz) + 112) >> 5) & 7;` followed by
+   `if (accepted) return;`, and a failure path that calls SetState and returns 0,
+   keeps the call's hard r0 live across the accepted path. Its narrowing copy and
+   every later temporary take r1-r5 as in ROM. Both the angle pin and copy barrier
+   disappear. A goto to a fall-through function end compiles identically. This is
+   fact 95 with mixed explicit and unspecified returns, rather than no return
+   statements anywhere in the function.
+220. **Separate cursor increment and masking to keep one local-alloc death.**
+   `index = (index + 1) & mask;` expands through a temporary, so flow marks
+   the old cursor dead before each reassignment. With four draws, the cursor
+   has four deaths and local-alloc rejects it even though it stays in one block.
+   `index += 1; index &= mask;` keeps one continuous life and one death. In
+   ProximityEmitter_EmitParticle (08051A8C), this moves the cursor from global
+   r7 to local r1 and restores the table, pointer and mask allocation: the
+   pin-free draft drops from 52/48 differing instructions to one missing copy.
+   Nine pins can be removed from the matching partial. `sp_split_masked_update`
+   offers the rewrite for unsigned word locals and independent masks.
+
+221. **A literal mask in a halfword field expression can retain a copy from a high register.**
+   In ProximityEmitter_EmitParticle (08051A8C), `sample &= mask; p->position.x = base + sample - 127;`
+   with a word `mask = 255` sets and reads the shared mask in SImode. Reload inherits the low
+   register used to set r8 and omits the ROM's `mov r6, r8`. Writing
+   `p->position.x = base + ((sample >> 4) & 255) - 127;` makes the constant HImode and uses it
+   through an SImode subreg. The mode mismatch prevents inheritance, and the copy survives.
+   This removes the final pin and both barriers after fact 220's cursor rewrite. A narrower
+   mask variable alone does not do it: promoted scalar locals still expand in SImode.
+   `why all` now recognizes the missing inverse copy from matching pre/post-reload RTL,
+   distinguishes it from a copy removed after reload, and records the mechanism in its JSON summary.
+
+222. **Keep a halfword preincrement inside its cadence test before introducing a helper.**
+   `if ((++object->particleFrame & 7) == 0)` retains the full halfword mask and
+   its copy to a second register. Separating the increment, store, return and
+   mask through a word-returning helper gives cse a different promoted value;
+   the constant copies fold, and reload uses a different spill register. In
+   ProximityEmitter_TickActive (08051BD8), the direct expression recovers both
+   mask copies and the entry-script address calculation, removing four pins
+   and five barriers. The same form removes two pins and three barriers in
+   ProximityEmitter_TickRise (08051CB4). TetherActor_UpdateLockedShake's direct
+   cadence test was the matched relative that identified the source form.
+
+223. **A halfword-returning arithmetic helper can keep an offset together before a later add.**
+   `destination->y = (limit - height) * 171 + offset + worldY` lets expansion
+   associate the narrow offset/world addition before adding the product.
+   `destination->y = SegmentOffset(limit, height, offset) + worldY`, with
+   `static inline u16 SegmentOffset(...)`, preserves the product/offset group
+   through inlining. StackedActor_UpdateSegments (08052418) also needs the
+   world-height pointer computed before the first helper call; that changes
+   reload's first choices and recovers every later arm, removing 41 concessions.
+   StackedActor_InitRisingParticle (080521DC) similarly matches with a u16
+   helper returning `768 + (u16)particle->position.y` before adding the random
+   byte. The u32/s32 return forms lose a constant copy; a direct field expression
+   has the correct shape but different local allocation. Helper return width
+   is a semantic expansion boundary even when the final store truncates too.
+180. **A local duration initializer can stop equal constant sets from hoisting together.**
+   TentacleBody_RefreshDirectionalAnimations has three ones: the status test, the
+   first flip test, and the zero-duration fallback. loop.c combines their
+   movables (13 x 3 x 13 >= 254), moves one outside the segment loop, and
+   consumes a high register needed by the offset. Writing the fallback as
+   `u16 duration[] = {1}; state->duration = duration[0];` keeps it local and
+   gives the ROM allocation and frame. With a separate second-flip sprite
+   view, the playback then matches without its three pins and barrier.
+   A zero initializer on the control unions does not have the same effect;
+   the initializer must separate the fallback one from the invariant group.
+210. **A locally tied pseudo may be logged only under its quantity head; its G record is not
+   evidence that global allocation chose its register.** In ScenePanelRig_TickApproachSubject
+   (0805A044), `originOffset` (pseudo 30) dies in the address add (pseudo 186), and local-alloc
+   puts both in r2. The L trace records only quantity head 186 (`address`), while G also lists
+   30 with a hypothetical global priority. Treating that G row as the decision suggested
+   ineffective `AGBCC_PRI=30`/`AGBCC_FORCE=30` probes: the local quantity's knobs use its head.
+   The lreg dump explicitly says `Register 30 in 2` and `Register 186 in 2`, and the address
+   add carries `REG_DEAD` for 30. Scope now joins these dying-operand ties only when the
+   connected component has one recorded local head, gives members that quantity's record,
+   and resolves named allocation knobs through the head. Two separately recorded quantities
+   or an operand without a death note are not merged. `AGBCC_FORCE=address:3` changes the
+   actual placement; it diagnoses the local tie but does not match the whole function.

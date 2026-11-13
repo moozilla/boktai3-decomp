@@ -1,5 +1,10 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
+static inline u8 IsInactive(struct SceneActorRegistryActor *actor, u32 mask40, u32 mask20000)
+{
+    if (actor->flags2D4 & mask40 || actor->flags2D0 & mask20000 || actor->health <= 0)
+        return 1;
+    return 0;
+}
 s32 SceneActorRegistry_CountAvailable(void)
 {
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
@@ -10,12 +15,7 @@ s32 SceneActorRegistry_CountAvailable(void)
         u32 mask20000 = 0x20000;
         u32 mask3 = 3;
         do {
-            u32 inactive;
-            if (actor->flags2D4 & mask40 || actor->flags2D0 & mask20000 || actor->health <= 0)
-                inactive = 1;
-            else
-                inactive = 0;
-            asm("" : "+r"(inactive));
+            u32 inactive = IsInactive(actor, mask40, mask20000);
             if (inactive || actor->flags2CC & mask3) {
                 node = node->next;
                 actor = node->actor;

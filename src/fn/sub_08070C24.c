@@ -16,7 +16,7 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
     if (actor->category == 10) {
         u32 mask = 0x4000000;
         u32 offset = 0x2d0;
-        register u32 *field asm("r0");
+        u32 *field;
         u32 value;
         field = (void *)((u8 *)actor + offset);
         value = *field;
@@ -26,7 +26,7 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
         goto failure;
     }
     {
-        register u32 firstOffset asm("r1") = 0x458;
+        u32 firstOffset = 0x458;
         register u32 offset asm("r3");
         u8 *field;
         u32 first;

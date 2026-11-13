@@ -1,10 +1,10 @@
+#include "palette_channel.h"
 #include "status_screen.h"
 #include "engine.h"
 #include "numeric_overlay.h"
 #include "ram.h"
 /* NumericOverlay_ClearActive: sets gNumericOverlay (the live NumericOverlay pointer, per numeric_overlay.h) back to NULL; twin of NumericOverlay_Destroy in numeric_overlay.c */
 #define NumericOverlay_ClearActive sub_0800F4B8
-// MATCHING_CONCESSION: register-pinning
 
 void StatusScreen_FadeAndExit(struct StatusScreen *p)
 {
@@ -19,10 +19,12 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
             {
                 u16 *out = &buffer[bank * 16 + i];
                 int color = *out;
-                int r = ((color & 31) * factor) & 0x7C0;
-                int g = ((color & 992) * factor) & 0xF800;
-                int blue = color & blueMask;
-                DEBUG_NOP();
+                int r, g, blue, red, green;
+                PALETTE_EXTRACT_CHANNEL(red, color, 31);
+                r = (red * factor) & 0x7C0;
+                PALETTE_EXTRACT_CHANNEL(green, color, 992);
+                g = (green * factor) & 0xF800;
+                PALETTE_EXTRACT_CHANNEL(blue, color, blueMask);
                 {
                     int b = (blue * factor) & 0x1F0000;
                     *out = (r | g | b) >> 6;
@@ -66,9 +68,9 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
         factor = 256;
     }
     other = 256 - factor;
-    red = p->blend & 31;
-    green = p->blend & 992;
-    blue = p->blend & 31744;
+    PALETTE_EXTRACT_CHANNEL(red, p->blend, 31);
+    PALETTE_EXTRACT_CHANNEL(green, p->blend, 992);
+    PALETTE_EXTRACT_CHANNEL(blue, p->blend, 31744);
     for (base = 0, bank = 0; bank < 2;) {
         i = p->start;
         {
@@ -81,11 +83,12 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
                 int r;
                 int g;
                 int b;
-                do {
-                    r = ((color & 31) * factor + other * red) & 0x1F00;
-                    g = ((color & 992) * factor + other * green) & 0x3E000;
-                    b = color & 31744;
-                } while (0);
+                int sourceRed, sourceGreen;
+                PALETTE_EXTRACT_CHANNEL(sourceRed, color, 31);
+                r = (sourceRed * factor + other * red) & 0x1F00;
+                PALETTE_EXTRACT_CHANNEL(sourceGreen, color, 992);
+                g = (sourceGreen * factor + other * green) & 0x3E000;
+                PALETTE_EXTRACT_CHANNEL(b, color, 31744);
                 b = (b * factor + other * blue) & 0x7C0000;
                 *dest = (r | g | b) >> 8;
             }

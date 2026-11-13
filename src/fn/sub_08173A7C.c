@@ -9,7 +9,7 @@ void PauseMenu_ClearSpriteFlags(void *, int, int);
 void PauseMenu_AddSpriteFlags(void *, int, int);
 void InventoryPanel_ShowStatusIcons(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
-void sub_08166534(void *, int, int);
+void MenuDisplay_DrawStatComparison(void *, int, int);
 void PauseMenu_RefreshEquipmentPanel(void *);
 void Hud_UpdateInventoryMenuInput(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -30,7 +30,7 @@ void SceneHud_BeginEquipmentSelection(struct SceneHudState *p)
     PauseMenu_AddSpriteFlags(p, 5, 1);
     InventoryPanel_ShowStatusIcons(p);
     MenuDisplay_UpdateActionPrompt(p, 2);
-    sub_08166534(p, 10, 6);
+    MenuDisplay_DrawStatComparison(p, 10, 6);
     PauseMenu_RefreshEquipmentPanel(p);
     Hud_SetInteractionCallback(p, Hud_UpdateInventoryMenuInput, 0);
     z = 0;

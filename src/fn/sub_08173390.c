@@ -4,7 +4,7 @@ void Hud_SetupBackgroundLayer(void *, u32, int, int, u32);
 void PauseMenu_HideAllSprites(void *);
 void PauseMenu_LoadSpriteKeyframe(void *, int, int);
 void PauseMenu_ClearSpriteFlags(void *, int, int);
-void sub_0816618C(void *, int, int);
+void PauseMenu_ShowPromptSprite(void *, int, int);
 void PauseInventory_EnterEquipmentSelection(void *);
 void Hud_DrawHeaderCounter(void);
 void SceneHud_LayoutActionGrid_08172950(void *);
@@ -15,7 +15,7 @@ void SceneHud_UpdateSecondaryActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void ScrollingDialogue_HideImmediately(void);
-void PlayerPanel_SnapshotValues(void *);
+void MenuDisplay_SnapshotValues(void *);
 void InventoryPanel_UpdateSelectedUnlock(void *, int, int, int, int);
 void PauseInventory_InitEquipmentSelectionPage(u8 *p)
 {
@@ -25,7 +25,7 @@ void PauseInventory_InitEquipmentSelectionPage(u8 *p)
     PauseMenu_HideAllSprites(p);
     PauseMenu_LoadSpriteKeyframe(p, 0, 0x54);
     PauseMenu_ClearSpriteFlags(p, 0x4d, 1);
-    sub_0816618C(p, 8, 0x20);
+    PauseMenu_ShowPromptSprite(p, 8, 0x20);
     PauseMenu_LoadSpriteKeyframe(p, 8, 0x71);
     PauseInventory_EnterEquipmentSelection(p);
     Hud_DrawHeaderCounter();
@@ -43,6 +43,6 @@ void PauseInventory_InitEquipmentSelectionPage(u8 *p)
     z = 0;
     MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, z);
     ScrollingDialogue_HideImmediately();
-    PlayerPanel_SnapshotValues(p);
+    MenuDisplay_SnapshotValues(p);
     InventoryPanel_UpdateSelectedUnlock(p, 3, 14, 0, z);
 }

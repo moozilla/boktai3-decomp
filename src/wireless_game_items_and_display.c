@@ -1,3 +1,4 @@
+#include "monster_particle_random.h"
 #include "wireless_game_items_and_display.h"
 #include "render.h"
 
@@ -960,7 +961,7 @@ void WirelessGameItems_DestroyItem(struct WirelessGameItems *a, struct WirelessG
 
 s32 SceneEffectQueue_QueueTypeZeroEffect(void);
 
-s32 sub_081998B0(void);
+s32 SceneEffectQueue_QueueTypeOneEffect(void);
 
 s32 SceneEffectQueue_QueueTypeTwoEffect(void);
 
@@ -973,7 +974,7 @@ void WirelessGameItems_PublishPendingEffects(struct WirelessGameItems *p)
             p->current[2]--;
     }
     if (p->current[1] != 0) {
-        if (sub_081998B0() != 0)
+        if (SceneEffectQueue_QueueTypeOneEffect() != 0)
             p->current[1]--;
     }
     if (p->current[3] != 0) {
@@ -1481,10 +1482,8 @@ void WirelessGameDisplay_UpdateRoundAnnouncement(struct WirelessGameDisplay *p)
         p->timer++;
 }
 
-// MATCHING_CONCESSION: register-pinning
-void WirelessGameDisplay_UpdateShakeAnimation(struct WirelessGameDisplay *arg)
+void WirelessGameDisplay_UpdateShakeAnimation(struct WirelessGameDisplay *p)
 {
-    register struct WirelessGameDisplay *p asm("r6") = arg;
     struct WirelessGameDrawing *q;
     if (p->entered) {
         p->entered = 0;
@@ -1494,29 +1493,9 @@ void WirelessGameDisplay_UpdateShakeAnimation(struct WirelessGameDisplay *arg)
         Sound_PlaySong(1452);
     }
     if (p->timer <= 7) {
-        u16 *table;
-        u32 *state;
-        u32 limit;
-        register u32 index asm("r0");
-        int value;
-        int mask;
         q = p->drawings;
-        table = gRandomTable;
-        state = &gRandomIndex;
-        index = *state + 1;
-        limit = 1023;
-        index &= limit;
-        *state = index;
-        value = table[index];
-        mask = 3;
-        value &= mask;
-        value -= 2;
-        q->position.coords.x = value;
-        index = (index + 1) & limit;
-        *state = index;
-        index = table[index] & mask;
-        index -= 2;
-        q->position.coords.y = index;
+        q->position.coords.x = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) - 2;
+        q->position.coords.y = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) - 2;
     }
     if (p->timer == 8) {
         q = p->drawings;

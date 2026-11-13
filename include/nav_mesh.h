@@ -21,6 +21,13 @@ struct NavMeshNode {
     u8 regions[6];
 };
 
+/* Current mesh and region tracked by a navigation query. */
+struct NavMeshQuery {
+    u8 pad0[4];
+    u16 mesh;
+    u16 region;
+};
+
 u32 NavMesh_IsPointInsideRegion(struct NavMeshRegion *, const struct ContactPosition *, u32);
 u16 PairTable_Lookup(u16 *, u16, s32, s32);
 

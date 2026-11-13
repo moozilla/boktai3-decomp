@@ -1056,6 +1056,58 @@ def sp_compound_assign(fn):
         yield f"{text(a.lvalue)[:24]} = {text(a.lvalue)[:24]} {op} ... written out", f2
 
 
+def sp_split_masked_update(fn):
+    """i = (i + K) & mask -> i += K; i &= mask (README fact 220).
+
+    The intermediate temporary in the combined expression gives i a death at
+    each update. Separate compound assignments keep it alive, allowing local
+    allocation even when the final instructions are otherwise identical.
+    Restrict this spelling to unique, unqualified unsigned word locals and
+    constant updates, with a constant or independent word-local mask.
+    """
+    declarations = {}
+    for n, _, _ in walk(fn):
+        if isinstance(n, ca.Decl) and n.name:
+            declarations.setdefault(n.name, []).append(n)
+
+    def word(name):
+        ds = declarations.get(name, [])
+        if len(ds) != 1:
+            return False
+        d = ds[0]
+        return (not d.quals and isinstance(d.type, ca.TypeDecl) and not d.type.quals
+                and isinstance(d.type.type, ca.IdentifierType)
+                and " ".join(d.type.type.names) in ("u32", "unsigned", "unsigned int"))
+
+    def integer(n):
+        return isinstance(n, ca.Constant) and n.type in ("int", "unsigned int", "long", "unsigned long")
+
+    def pred(n, p, slot):
+        if not (isinstance(p, ca.Compound) and isinstance(n, ca.Assignment) and n.op == "="
+                and isinstance(n.lvalue, ca.ID) and word(n.lvalue.name)):
+            return False
+        outer = n.rvalue
+        if not (isinstance(outer, ca.BinaryOp) and outer.op == "&"):
+            return False
+        inner, mask = outer.left, outer.right
+        return (isinstance(inner, ca.BinaryOp) and inner.op in ("+", "-")
+                and isinstance(inner.left, ca.ID) and inner.left.name == n.lvalue.name
+                and integer(inner.right)
+                and (integer(mask) or (isinstance(mask, ca.ID) and mask.name != n.lvalue.name
+                                       and word(mask.name))))
+
+    for k in range(sites(fn, pred)):
+        f2 = copy.deepcopy(fn)
+        n, parent, _ = nth(f2, pred, k)
+        inner, mask = n.rvalue.left, n.rvalue.right
+        i = parent.block_items.index(n)
+        parent.block_items[i:i + 1] = [
+            ca.Assignment(inner.op + "=", copy.deepcopy(n.lvalue), inner.right),
+            ca.Assignment("&=", n.lvalue, mask),
+        ]
+        yield f"split {text(n.lvalue)} increment and mask (one cursor death)", f2
+
+
 WORD_TYPES = {"u32", "s32", "int", "unsigned int", "vu32", "uintptr_t"}
 
 
@@ -1860,7 +1912,7 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_outline_setter, sp_loop_normal, sp_ptr_deinduct,
              sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy, sp_const_literal,
-             sp_param_alias, sp_compound_assign, sp_store_via_ptr, sp_member_index, sp_tail_into_branches]
+             sp_param_alias, sp_compound_assign, sp_split_masked_update, sp_store_via_ptr, sp_member_index, sp_tail_into_branches]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
@@ -1888,7 +1940,7 @@ DECISIONS = {
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "cross-jump": ["sp_param_alias", "rw_copy_var", "sp_copy_uses", "sp_tail_into_branches"],
     "regmove-copy": ["rw_commute", "sp_inline_decl", "sp_rmw_temp"],
-    "local-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
+    "local-alloc": ["sp_split_masked_update", "sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
     "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "sp_store_via_ptr", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
     "reload-mode": ["sp_corpus_helper", "sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],

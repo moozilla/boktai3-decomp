@@ -12,7 +12,7 @@ void Ivy_OnDestroy(void);
 void ColorPulse_ApplyContact(void);
 void ChildGroup_ProcessEvent(void);
 void sub_080F20AC(void);
-void sub_080F3B30(void);
+void ChildGroup_WaitForTrailingMembers(void);
 void Ivy_InitColorTransition(void);
 
 union SwordVector {
@@ -305,7 +305,7 @@ void Sword_InitTask(struct SwordTask *p)
     p->field92 = 1;
     p->field93 = 0;
     Sword_SetByteFlags(&p->flags8D, 1);
-    p->update = sub_080F3B30;
+    p->update = ChildGroup_WaitForTrailingMembers;
     p->colorUpdate = Ivy_InitColorTransition;
     p->fieldCEC = 0;
     p->duration = 0x14;

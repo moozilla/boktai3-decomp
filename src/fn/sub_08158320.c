@@ -5,7 +5,7 @@
 // confidence=low: varying height offset suggests hovering during interaction.
 void Player_ClampInteractionVelocity(struct Player *);
 void Obj_StepPosition(void *);
-void sub_0802E04C(void *);
+void Actor_EmitTowardNearbyActors(void *);
 u32 Player_GetControlFlags(struct Player *, u16);
 void Collider_SetPosition(void *, void *, u32);
 void ActorShadow_Disable(void *);
@@ -26,7 +26,7 @@ void Player_UpdateInteractionHoverDisplay(struct Player *p)
 {
     Player_ClampInteractionVelocity(p);
     Obj_StepPosition(&p->positionalEffectGroup);
-    sub_0802E04C(&p->positionalEffectGroup);
+    Actor_EmitTowardNearbyActors(&p->positionalEffectGroup);
     if (p->tetherMode <= 1) {
         u8 *timer = (u8 *)p + 0x468;
         if (!*timer) {

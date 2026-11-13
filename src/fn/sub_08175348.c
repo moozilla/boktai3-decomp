@@ -1,8 +1,8 @@
 #include "global.h"
 void Sound_PlaySong(u32);
-int SceneHud_UpdateBinaryChoice(void *);
+int PauseMenu_UpdateBinaryChoice(void *);
 void SceneCatalog_SetDescription(u8 *, s32);
-void SceneHud_SetPairedIcons(u8 *, u32, s32);
+void PauseMenu_SetPairedIcons(u8 *, u32, s32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void MenuDisplay_SetPaletteOverrides(u8 *, u32, u32, u32, u32);
 void Presentation_UpdateAllocationSelection(void);
@@ -15,11 +15,11 @@ void Hud_DrawDefaultHealthMeter(u8 *, u32, u32, u32);
 void Hud_DrawDefaultEnergyMeter(u8 *, u32, u32, u32, u32, u32);
 void MenuSelection_ProcessConfirmation(u8 *s)
 {
-    s32 state = SceneHud_UpdateBinaryChoice(s);
+    s32 state = PauseMenu_UpdateBinaryChoice(s);
     if (state == 0) {
         Sound_PlaySong(0xDE);
         SceneCatalog_SetDescription(s, s[0x48AA] + 20);
-        SceneHud_SetPairedIcons(s, 1, -1);
+        PauseMenu_SetPairedIcons(s, 1, -1);
         Hud_SetInteractionCallback(s, Presentation_UpdateAllocationSelection, 1);
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     } else if (state == 1) {
@@ -35,7 +35,7 @@ void MenuSelection_ProcessConfirmation(u8 *s)
         Hud_DrawDefaultHealthMeter(s, 1, 8, 8);
         Hud_DrawDefaultEnergyMeter(s, 1, 8, 10, *(u16 *)(*p + 0x428), *(u16 *)(*p + 0x42A));
         neg = -1;
-        SceneHud_SetPairedIcons(s, 1, neg);
+        PauseMenu_SetPairedIcons(s, 1, neg);
         count = *(u16 *)(s + 0x48A8);
         if (count == 0) {
             *(u32 *)(s + 0x1608) |= state;

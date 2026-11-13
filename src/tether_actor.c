@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "monster_particle_random.h"
+#include "armor_decision_ops.h"
 
 #define TetherActor_GetStatusTag sub_08049F54
 
@@ -748,7 +749,6 @@ void TetherActor_EmitRingEffects(struct TetherActor *actor)
     } while (index <= 7);
 }
 
-
 void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const void *config)
 {
     struct ContactPackedVector position = *source;
@@ -1065,8 +1065,6 @@ void TetherActor_SelectInteractionState(struct TetherActor *actor)
         TetherActor_SetState(gTetherActor, 4);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
 {
     struct TetherActor *actor = input;
@@ -1241,8 +1239,6 @@ void TetherActor_ClearInstance(void)
 {
     gTetherActor = 0;
 }
-
-// MATCHING_CONCESSION: register-pinning
 
 void TetherActor_ClearExternalStatus(void)
 {
@@ -1498,12 +1494,10 @@ u32 TetherActor_CanStartInteraction(void)
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_StartInteractionEffect(void)
 {
     struct TetherActor *actor = gTetherActor;
-    register u32 zero asm("r3");
+    register u32 zero;
     if (!actor)
         return;
     if (actor->state == 1) {
@@ -1514,9 +1508,14 @@ void TetherActor_StartInteractionEffect(void)
             *lock = 1;
         }
         actor->interactionCooldown = 300;
+        actor->effectValue = zero;
+        actor->pendingEffectHandle =
+            ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig, 1,
+                                                 zero, &actor->effectValue, 200, 250, 330);
+
     } else {
-        if (actor->state != 0 && actor->state != 2
-            && ((u8)(actor->state - 3) > 1 || !actor->chargeReady))
+        if (actor->state != 0 && actor->state != 2 &&
+            ((u8)(actor->state - 3) > 1 || !actor->chargeReady))
             return;
         TetherActor_UpdatePendingEffect(actor);
         TetherActor_SelectInteractionState(actor);
@@ -1526,12 +1525,12 @@ void TetherActor_StartInteractionEffect(void)
             zero = 0;
             delay = 600;
             *cooldown = delay;
+            actor->effectValue = zero;
+            actor->pendingEffectHandle =
+                ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
+                                                     1, zero, &actor->effectValue, 200, 250, 330);
         }
     }
-    actor->effectValue = zero;
-    actor->pendingEffectHandle =
-        ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig, 1,
-                                             zero, &actor->effectValue, 200, 250, 330);
 }
 
 u32 TetherActor_IsStateOne(void)
@@ -1736,8 +1735,6 @@ u8 TetherActor_GetRequestMode(void)
     return r;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 /* Keep the existing pinned offset calculations: direct member addresses change allocation. */
 
 void TetherActor_BeginDirectedState(struct ContactPosition *position)
@@ -1757,7 +1754,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
                 s32 playerX = player->position.x;
                 struct ContactPosition *targetPosition = &savedActor->directedTarget;
                 s16 actorX = targetPosition->x;
-                dx = playerX - actorX;
+                ARMOR_CAPTURE_COMPONENT_DELTA(dx, playerX, actorX);
             }
             dz = player->position.z - savedActor->directedTarget.z;
         }
@@ -1770,14 +1767,13 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
             {
                 u32 byteOffset = index << 1;
                 const u16 *table;
-                register u32 sample asm("r0");
+                register u32 sample;
                 u16 *heading;
                 table = (const u16 *)RANDOM_TABLE_ADDR;
                 sample = *(const u16 *)(byteOffset + (u32)table);
                 sample &= 7;
                 {
-                    u32 offset = 0x46C;
-                    heading = (u16 *)((u8 *)savedActor + offset);
+                    heading = &savedActor->directedHeading;
                 }
                 *heading = sample;
             }
@@ -1884,22 +1880,23 @@ s32 TetherActor_GetConfiguredKind(void)
 
 extern const u16 gUnk_086059F0[];
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_InitKindFromScript(struct TetherActor *actor, u32 entry)
 {
-    register s32 kind asm("r0");
     s32 value;
     actor->entry = entry;
-    if (Script_SeekToKeyword('k'))
-        kind = Script_GetValue();
-    else
-        kind = TetherActor_GetConfiguredKind();
-    {
-        s16 *selectedKind = &gGameState->unk5AA;
+    if (Script_SeekToKeyword('k')) {
+        s16 *selectedKind;
+        s32 kind = Script_GetValue();
+        selectedKind = &gGameState->unk5AA;
         *selectedKind = kind;
+        actor->kind = gGameState->unk5AA;
+    } else {
+        s16 *selectedKind;
+        s32 kind = TetherActor_GetConfiguredKind();
+        selectedKind = &gGameState->unk5AA;
+        *selectedKind = kind;
+        actor->kind = gGameState->unk5AA;
     }
-    actor->kind = gGameState->unk5AA;
     value = Script_SeekToKeyword('c');
     if (value)
         value = Script_GetValue();
@@ -1952,8 +1949,6 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
     actor->recoveryTimer = 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
 {
     struct DisplayPosition position;
@@ -1966,6 +1961,8 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
     if (actor->kind == 9) {
         display = &actor->display.animation;
         DisplayAnimation_InitializeKeyframes(display, 0x35E3, 0, initialPosition);
+        DisplayAnimation_SetPriority(display, 2);
+        value = Script_SeekToKeyword('d');
     } else {
         const u16 *palette;
         u16 *buffer;
@@ -1973,7 +1970,6 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
         u16 *destination;
         s32 i;
         display = &actor->display.animation;
-        asm("" : "+r"(display));
         DisplayAnimation_InitializeSequence(display, 0x2499, 0x3D95, 0, initialPosition);
         TetherActor_SetEntry(actor, 0);
         actor->appliedPalette = actor->paletteIndex;
@@ -1990,9 +1986,9 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
             *destination++ = *source++;
         } while (--i >= 0);
         DisplayAnimation_SetTileSource(display, (u32)buffer);
+        DisplayAnimation_SetPriority(display, 2);
+        value = Script_SeekToKeyword('d');
     }
-    DisplayAnimation_SetPriority(display, 2);
-    value = Script_SeekToKeyword('d');
     if (value)
         actor->heading = Script_GetValue();
     else
@@ -2400,32 +2396,30 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
     }
     {
         struct DisplayPosition **slot = &actor->display.animation.position;
-        u16 *display = (u16 *)*slot;
-        register u32 value asm("r0");
+        struct ContactPosition *display = (struct ContactPosition *)*slot;
+        u16 value;
         u32 coordinate;
         position = &actor->position;
         offset = 0x37E;
         value = (u16)actor->shakeX;
         coordinate = (u16)position->x;
-        display[0] = value + coordinate;
-        asm("" ::: "memory");
+        display->x = value + coordinate;
         {
-            u16 *worldDisplay = (u16 *)*slot;
+            struct ContactPosition *worldDisplay = (struct ContactPosition *)*slot;
             {
                 u16 *axis = (u16 *)&actor->position.y;
                 offset += 2;
-                value = *(u16 *)((u8 *)actor + offset);
+                value = (u16)actor->displayOffsetY;
                 coordinate = *axis;
-                worldDisplay[1] = value + coordinate;
+                worldDisplay->y = value + coordinate;
             }
-            asm("" ::: "memory");
-            worldDisplay = (u16 *)*slot;
+            worldDisplay = (struct ContactPosition *)*slot;
             {
                 u16 *axis = (u16 *)&actor->position.z;
                 value = (u16)actor->shakeZ;
                 {
                     u32 z = *axis;
-                    worldDisplay[2] = value + z;
+                    worldDisplay->z = value + z;
                 }
             }
         }
@@ -2518,8 +2512,6 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
         actor->targetPosition.pad = heading;
     }
 }
-
-// MATCHING_CONCESSION: register-pinning
 
 u32 TetherActor_TestTerrainTransition(struct TetherActor *actor)
 {
@@ -2630,12 +2622,10 @@ u32 TetherActor_SelectNextState(struct TetherActor *p)
     return p->state;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateLockedShake(struct TetherActor *actor)
 {
     s32 amplitude;
-    register const u16 *randomTable asm("r6");
+    const u16 *randomTable;
     if (gEngineFlags & 512)
         return;
     if (actor->lockFrame <= 63)
@@ -2644,15 +2634,12 @@ void TetherActor_UpdateLockedShake(struct TetherActor *actor)
         actor->glowMode = 2;
         amplitude = (actor->lockFrame >> 2) + 16;
     }
-    randomTable = (const u16 *)RANDOM_TABLE_ADDR;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    actor->shakeX = Mod(randomTable[gRandomIndex], amplitude) - (amplitude >> 1);
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    actor->shakeZ = Mod(randomTable[gRandomIndex], amplitude) - (amplitude >> 1);
+    PARTICLE_RANDOM_SAVE_ORIGIN(randomTable, gRandomTable);
+    actor->shakeX = Mod(ParticleRandom_ReadSample(randomTable), amplitude) - (amplitude >> 1);
+    actor->shakeZ = Mod(ParticleRandom_ReadSample(randomTable), amplitude) - (amplitude >> 1);
     if ((++actor->lockSoundFrame & 7) == 0) {
-        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 sample = randomTable[gRandomIndex];
+            u32 sample = ParticleRandom_ReadSample(randomTable);
             sample &= 1;
             if (sample)
                 Sound_PlaySong(0x2B9);
@@ -3015,8 +3002,6 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
     NavMesh_UpdateProbe(&actor->interactionProbe, &actor->position);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateWanderingState(struct TetherActor *actor)
 {
     if (actor->state != 4) {
@@ -3233,14 +3218,19 @@ void TetherActor_UpdateDisplayReturn(struct TetherActor *actor)
 
 // MATCHING_CONCESSION: register-pinning
 
+#define TETHER_CAPTURE_DISPLAY(out, actor)                                                         \
+    do {                                                                                           \
+        (out) = &(actor)->display.animation;                                                       \
+    } while (0)
+
 void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
 {
     u32 visible;
     u32 emit;
     struct DisplayAnimation *display;
     struct DisplayAnimation *activeDisplay;
-    register u16 *frame asm("r4");
-    register u32 rawFrame asm("r2");
+    u16 *frame;
+    u32 rawFrame;
     u32 highFrame;
     u32 current;
     if (actor->state != 5)
@@ -3276,17 +3266,25 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
     } else if (current <= 191) {
         if ((highFrame >> 17) & 3)
             visible = 1;
-        if ((rawFrame & 15) == 0)
-            emit = 1;
+        {
+            u32 mask = 15;
+            mask &= rawFrame;
+            if (!mask)
+                emit = 1;
+        }
     } else {
         if ((highFrame >> 17) & 1)
             visible = 1;
-        if ((rawFrame & 15) == 0)
-            emit = 1;
+        {
+            u32 mask = 15;
+            mask &= rawFrame;
+            if (!mask)
+                emit = 1;
+        }
     }
     if (visible) {
     show:
-        activeDisplay = &actor->display.animation;
+        TETHER_CAPTURE_DISPLAY(activeDisplay, actor);
         DisplayAnimation_ClearFlags(activeDisplay, 1);
         actor->auxiliarySprite.flags &= ~1;
         {
@@ -3312,7 +3310,7 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
             actor->auxiliarySprite.position.y = height;
         }
     } else {
-        activeDisplay = &actor->display.animation;
+        TETHER_CAPTURE_DISPLAY(activeDisplay, actor);
         DisplayAnimation_SetFlags(activeDisplay, 1);
         {
             u32 *flags = &actor->auxiliarySprite.flags;
@@ -3435,7 +3433,7 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
             else {
                 u32 height = (7 - incremented) << 4;
                 register u32 heightOffset asm("r6") = 0x380;
-                register u16 *destination asm("r1");
+                register u16 *destination;
                 destination = (u16 *)((u8 *)actor + heightOffset);
                 *destination = height;
             }
@@ -3455,12 +3453,12 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
             TetherActor_SetState(actor, 0);
             actor->chargeReady = 1;
             actor->charge = 287;
-            actor->pendingEffectHandle = ActorAttachment_UpdateFromDescriptor(
-                actor->pendingEffectHandle, &actor->bodyConfig, 1, 0, &actor->charge, 287, 250, 290);
+            actor->pendingEffectHandle =
+                ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
+                                                     1, 0, &actor->charge, 287, 250, 290);
         }
     }
 }
-
 
 void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
 {

@@ -321,6 +321,7 @@ def rom_name(src, func):
 def kref(wd, func, x):
     """How a what-if knob should name pseudo X: its C variable name when that is unique (names survive
     edits; numbers shift), else the number."""
+    x = local_quantity_owners(wd, func).get(x, x)
     pn = pseudo_names(wd, func)
     n = pn.get(x)
     if n and re.fullmatch(r"[A-Za-z_]\w*(#\d+)?", n) and list(pn.values()).count(n) == 1:
@@ -329,9 +330,13 @@ def kref(wd, func, x):
 
 
 def resolve_knobs(src, func, env):
-    """AGBCC_PRI / AGBCC_FORCE may name pseudos by C variable (`table:+214`): compile once without them to
-    learn the numbers, then substitute."""
+    """Resolve C variable names in pseudo knobs after one unknobbed compile."""
     env = dict(env or {})
+    # Unprefixed diagnostic names otherwise reach the compiler as unrelated
+    # environment variables, producing a plausible but unchanged comparison.
+    for key in ("FORCE", "PRI", "NOTIE", "COMBKEEP", "NOEQUIV", "NOREG", "MOVE"):
+        if key in env:
+            sys.exit(f"{key}: use AGBCC_{key}; unprefixed knobs have no effect")
     # A knob set in the environment (`AGBCC_NOEQUIV=36 scope.py FILE.c`) reaches the -g compile through
     # os.environ, but the fork server's compile only sees the knobs passed with each request: copy them all
     # into ENV, so the build's (no -g) bytes get them too. Without this the plain compile ran without the
@@ -357,7 +362,9 @@ def resolve_knobs(src, func, env):
                 sys.exit(f"AGBCC_FORCE: unknown register {reg!r}")
             entries.append(f"{pseudo}:{reg}")
         env["AGBCC_FORCE"] = ",".join(entries)
-    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
+    pseudo_knobs = ("AGBCC_PRI", "AGBCC_FORCE", "AGBCC_COMBKEEP", "AGBCC_NOEQUIV",
+                    "CSE_KEEP", "CSE_NOCANON", "AGBCC_NOREG")
+    keys = [k for k in pseudo_knobs if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
     if not keys:
         return env
     saved = {k: os.environ.pop(k) for k in keys if k in os.environ}
@@ -369,14 +376,16 @@ def resolve_knobs(src, func, env):
     rev = {}
     for p, n in pseudo_names(wd, func).items():
         rev.setdefault(n, []).append(p)
+    local_owners = local_quantity_owners(wd, func)
     def sub(tok):
-        name, rest = tok.split(":", 1)
+        name, separator, rest = tok.partition(":")
         if name.isdigit():
             return tok
         if len(rev.get(name, [])) != 1:
             sys.exit(f"{name}: " + (f"names pseudos {rev[name]}; use a number" if name in rev else
                                      f"no pseudo by that name (known: {', '.join(sorted(rev))[:300]})"))
-        return f"{rev[name][0]}:{rest}"
+        pseudo = rev[name][0]
+        return f"{local_owners.get(pseudo, pseudo)}{separator}{rest}"
     out = dict(env, **{k: ",".join(sub(t) for t in env[k].split(",")) for k in keys})
     print("  knobs: " + " ".join(f"{k}={out[k]}" for k in keys), file=sys.stderr)
     return out
@@ -1572,20 +1581,25 @@ def pseudo_names(wd, func):
 @by_dumps("*")
 def uid_lines(wd):
     """insn uid -> C line, from the line notes in the RTL dumps."""
+    return {uid: location[1] for uid, location in uid_locations(wd).items()}
+
+
+def uid_locations(wd):
+    """insn uid -> (source file, C line), preserving inlined header provenance."""
     out = {}
     for p in PASSES:
         path = os.path.join(wd, "u.i." + p)
         if not os.path.exists(path):
             continue
-        line = 0
+        file, line = None, 0
         for blk in re.split(r"\n\n", open(path).read()):
-            m = re.search(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
+            m = re.search(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("([^"]*)"\) (\d+)\)', blk)
             if m:
-                line = int(m.group(1))
+                file, line = m.group(1), int(m.group(2))
                 continue
             m = re.match(r"\((?:insn|jump_insn|call_insn|code_label|note)(?:/\w)* (\d+)", blk)
             if m:
-                out.setdefault(int(m.group(1)), line)
+                out.setdefault(int(m.group(1)), (file, line))
     return out
 
 
@@ -1706,6 +1720,53 @@ def equiv_constant_inherit(greg, lreg, uid, got):
     return None
 
 
+def missing_inherited_copies(rows, greg, lreg):
+    """Explain a ROM-only inverse copy that reload omitted by reusing its constant load.
+
+    Require the adjacent matching copy and consumer, and verify both against
+    the pre/post-reload RTL. This is compiler evidence about the candidate;
+    it does not assert which source spelling produced the ROM's extra copy.
+    """
+    after = {u: r for u, _, r in greg}
+    out = []
+    for i, row in enumerate(rows):
+        if row.get("tag") != "-":
+            continue
+        m = re.fullmatch(r"mov (r[0-7]), (r[89]|sl|sb|ip)", row.get("rom") or "")
+        if not m or i == 0 or i + 1 >= len(rows):
+            continue
+        low, high = m.groups()
+        prev, following = rows[i - 1], rows[i + 1]
+        if prev.get("tag") != "=" or prev.get("draft") != f"mov {high}, {low}":
+            continue
+        uid = following.get("uid")
+        if following.get("tag") != "=" or not uid:
+            continue
+        consumer = re.match(r"\(set \(reg[^)]*\) (.*)\)$", after.get(uid) or "")
+        if not consumer or int(low[1:]) not in regs_of(consumer.group(1)):
+            continue
+        evidence = equiv_constant_inherit(greg, lreg, uid, int(low[1:]))
+        if not evidence:
+            continue
+        pseudo, constant, load_uid, set_uid = evidence
+        hnum = {"sb": 9, "sl": 10, "ip": 12}.get(high, int(high[1:]) if high.startswith("r") else -1)
+        inverse = (rf"\(set \(reg(?:/\w)*:SI {hnum} \w+\) "
+                   rf"\(reg(?:/\w)*:SI {low[1:]} \w+\)\)")
+        if not re.fullmatch(inverse, after.get(set_uid) or ""):
+            continue
+        # A copy still present before jump2 was eliminated later, not inherited
+        # by reload. Do not mislabel that separate mechanism.
+        order = [u for u, _, _ in greg]
+        lo, hi = order.index(set_uid), order.index(uid)
+        copy_back = rf"\(set \(reg(?:/\w)*:\w+ {low[1:]} \w+\) \(reg(?:/\w)*:\w+ {hnum} \w+\)\)"
+        if any(re.fullmatch(copy_back, after[u] or "") for u in order[lo + 1:hi]):
+            continue
+        out.append({"rom_addr": row.get("rom_addr"), "copy": row["rom"], "pseudo": pseudo,
+                    "constant": constant, "load_uid": load_uid, "set_uid": set_uid,
+                    "consumer_uid": uid, "low": low, "high": high})
+    return out
+
+
 def hard_of(wd):
     """pseudo -> hard register, read off the insns: each operand before allocation (lreg) against the
     same operand after reload (greg). Covers local-alloc pseudos, which 'Register dispositions' omits."""
@@ -1741,7 +1802,66 @@ def alloc_records(wd, func, *, global_order=False):
         elif not global_order and p[0] == "L" and p[1] == func and int(p[10]) >= 0:
             # local alloc runs first; a pseudo it placed also shows up in the G list, so L wins
             out[int(p[3])] = ("L", int(p[2]), int(p[5]), int(p[6]), int(p[7]), int(p[8]), int(p[10]))
+    if not global_order:
+        for member, owner in local_quantity_owners(wd, func).items():
+            out[member] = out[owner]
     return out
+
+
+@by_dumps("u.i.lreg", "names.txt")
+def local_quantity_owners(wd, func):
+    """Recover tied local members omitted by the quantity-head-only L records.
+
+    lreg records every placed pseudo. A dying operand and its destination in
+    the same hard register connect members; accept only components with one
+    recorded quantity head. Separate recorded quantities are never merged.
+    """
+    path = os.path.join(wd, "u.i.lreg")
+    if not os.path.exists(path):
+        return {}
+    with open(path) as stream:
+        text = stream.read()
+    names_path = os.path.join(wd, "names.txt")
+    func = dump_func(wd, func)
+    recorded_heads = set()
+    names = []
+    if os.path.exists(names_path):
+        with open(names_path) as stream:
+            names = stream.readlines()
+    for line in names:
+        fields = line.split()
+        if len(fields) > 10 and fields[0] == "L" and fields[1] == func and int(fields[10]) >= 0:
+            recorded_heads.add(int(fields[3]))
+    placed = {int(p): int(h) for p, h in re.findall(r"^;; Register (\d+) in (\d+)\.", text, re.M)}
+    graph = {p: set() for p in placed}
+    for match in re.finditer(r"^\(insn(?:/\w)* \d+ .*?(?=^\(|\Z)", text, re.M | re.S):
+        block = match.group(0)
+        dest = re.match(r"\(set \(reg(?:/\w)*:\w+ (\d+)\)", one_line(block))
+        if not dest or int(dest.group(1)) not in placed:
+            continue
+        x = int(dest.group(1))
+        operands = regs_of(one_line(block))
+        for dead in re.findall(r"REG_DEAD \(reg(?:/\w)*:\w+ (\d+)\)", block):
+            y = int(dead)
+            if y != x and y in operands[1:] and y in placed and placed[x] == placed[y]:
+                graph[x].add(y)
+                graph[y].add(x)
+    owners, seen = {}, set()
+    for start in graph:
+        if start in seen:
+            continue
+        pending, component = [start], set()
+        while pending:
+            x = pending.pop()
+            if x in component:
+                continue
+            component.add(x)
+            pending.extend(graph[x] - component)
+        seen.update(component)
+        heads = list(component & recorded_heads)
+        if len(heads) == 1:
+            owners.update((x, heads[0]) for x in component if x != heads[0])
+    return owners
 
 
 def small_sort_order(pris):
@@ -2914,6 +3034,11 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
               f" it got {rname(got)}, the ROM has {rname(want)}.")
+        owner = local_quantity_owners(wd, func).get(pseudo)
+        if owner is not None:
+            print(f"    it shares the local quantity headed by {nm(owner)} (dying operands tied to their"
+                  " destinations in lreg). These refs and priority belong to the whole quantity;"
+                  f" allocation knobs must name its head, {kref(wd, func, owner)}.")
         if rec[6] != got:
             for owner, attempts in find_reg_view(wd, func).items():
                 if any(not f["retrying"] and f["first"] < 0 and f["final"] == rec[6] for f in attempts):
@@ -3000,6 +3125,12 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
     if rec and rec[0] == "G":
         for x in sorted(rivals, key=lambda x: -recs.get(x, (0, 0, 0))[2])[:2]:
             xr = recs.get(x)
+            if xr and xr[0] == "L":
+                print(f"    the ROM keeps {nm(x)} in {rname(got)}, but local allocation already placed its"
+                      f" quantity in {rname(hard.get(x, xr[6]))} before global allocation ran."
+                      " The first cause is that local quantity's placement or tie; changing this"
+                      " global pseudo's priority does not move the earlier local allocation.")
+                return
             if not xr or xr[0] != "G":
                 continue
             prefs = preferences(wd).get(pseudo, [])
@@ -3706,7 +3837,7 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
-BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?\\?\s*$')
+BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?:(?://[^\n]*|/\*[\s\S]*?\*/)\s*)*\\?\s*$')
 
 
 def concession_sites(text):
@@ -3826,12 +3957,27 @@ def site_variables(line):
     return out
 
 
+def unprobed_concessions(text, reach):
+    """Other tracked source concessions in the target and reached inline helpers.
+
+    The pins pass removes bindings and empty asm only. In particular, its no_pins
+    draft can still contain volatile locals that force stack storage.
+    """
+    from concessions import EXCUSABLE, sites
+    found = set()
+    for name, (start, end) in reach.items():
+        first_line = text.count("\n", 0, start)
+        for site in sites(text[start:end], kinds=EXCUSABLE):
+            found.add((first_line + site.line, site.kind, name))
+    return sorted(found)
+
+
 def cmd_pins(src, func, env):
     """Phase 3 helper: the concessions (register pins and empty asm barriers) that can change FUNC's
     code, i.e. those in FUNC's definition and in the inline helpers of the unit it reaches. Each is
     removed alone and in groups (all of FUNC's together, each helper's together, a pin with the
     barriers on the same variable), then a greedy pass removes every single or group that adds no
-    differences. Writes FUNC.no_pins.c (every reachable concession removed: the draft to work from)
+    differences. Writes FUNC.no_pins.c (reachable pins/barriers removed: the draft to work from)
     and FUNC.fewer_pins.c (the greedy result)."""
     pins_dir = os.path.join(ROOT, "build", "scope", "drafts", ".pins", os.environ.get("SCOPE_RUN", ""))
     out_dir = os.path.join(ROOT, "build", "scope", "drafts", os.environ.get("SCOPE_RUN", ""))
@@ -3859,6 +4005,11 @@ def cmd_pins(src, func, env):
                   open(os.path.join(ROOT, src)).read())
     lines = text.split("\n")
     reach = function_reach(text, func)
+    extra = unprobed_concessions(text, reach)
+    if extra:
+        print("  additional tracked concessions not removed by pins: "
+              + ", ".join(f"{kind} at line {line} ({name})" for line, kind, name in extra)
+              + ". The no_pins draft still needs these addressed.")
     starts = [0]
     for ln in lines:
         starts.append(starts[-1] + len(ln) + 1)
@@ -3885,7 +4036,7 @@ def cmd_pins(src, func, env):
                   " written in both failure branches)")
         return 0
     base = run(text, "base")
-    print(f"{func}: {show(base)} with all {len(sites)} concessions"
+    print(f"{func}: {show(base)} with all {len(sites)} pin/barrier sites"
           f" ({sum(k == 'pin' for _, k, _ in sites)} pins, {sum(k == 'barrier' for _, k, _ in sites)} barriers"
           f" in {', '.join(n for n in reach if any(owner(s[0]) == n for s in sites))}){note_others}")
     sole = {n: (sole_definitions(lines, i) if kind == "barrier" else []) for n, (i, kind, _) in enumerate(sites)}
@@ -3962,7 +4113,7 @@ def cmd_pins(src, func, env):
     open(out, "w").write(cur)
     left = len(sites) - len(keep_out)
     print(f"  greedy: removed {len(keep_out)} of {len(sites)} with no added differences -> {best} differ,"
-          f" {left} concessions left; written to {os.path.relpath(out, ROOT)}  [{compiles[0]} compiles;"
+          f" {left} pin/barrier sites left; written to {os.path.relpath(out, ROOT)}  [{compiles[0]} compiles;"
           f" {'every removal tried' if tryall else 'only removals free alone tried greedily; --all tries the rest'}]")
     print("  A removal that costs instructions shows where the C's shape still differs: ask `why` on the"
           f" first new difference in that variant ({os.path.relpath(pins_dir, ROOT)}/).")
@@ -4258,6 +4409,20 @@ def cmd_spill(src, func, env):
     return 0
 
 
+def probe_no_improvement(tried, regressions):
+    """Report negative probes without ruling out interacting compiler decisions."""
+    print(f"  {tried} compiles: no single tested cse/gcse/loop decision improves the count.")
+    if regressions:
+        print("  These probes changed the code but worsened the count; their mechanisms may still interact:")
+        for knob, val, counts in regressions[:4]:
+            print(f"    {knob}={val}: {counts}")
+        if len(regressions) > 4:
+            print(f"    ({len(regressions) - 4} more worsening probes)")
+    else:
+        print("  None of these probes changed the count; interacting decisions are still possible.")
+    print("  Next: why (allocation), spill (reload), pre or hoist (placement and interactions).")
+
+
 def cmd_probe(src, func, env):
     """Which cse / gcse / loop decision is the difference? One traced compile lists the decisions: pseudos
     make_regs_eqv makes a class's canonical register (CSE_NOCANON), jumps cse follows into their
@@ -4360,11 +4525,14 @@ def cmd_probe(src, func, env):
               " which exist only in the -g compile: they are scored against the -g count and marked"
               " [-g compile]; such a hit says what the -g compile does, not the build.")
     hits = []
+    regressions = []
     for knob, val, what in cands[:budget]:
         prev = env.get(knob)
         n, inf = score(src, func, dict(env, **{knob: f"{prev},{val}" if prev else val}))
         if n < (g_base if g_base is not None and knob in UID_KNOBS else base):
             hits.append((n, knob, val, what, inf.get("counts", "MATCH")))
+        elif n > (g_base if g_base is not None and knob in UID_KNOBS else base):
+            regressions.append((n, knob, val, inf.get("counts", str(n))))
     fix = {"CSE_NOCANON": "cse made this value the canonical register of a copy class (it lives longer"
                           " than the value it was copied from), so later tests and uses read it. In C make"
                           " the ROM-side value the longer-lived one (one shared variable, the copy kept"
@@ -4404,8 +4572,7 @@ def cmd_probe(src, func, env):
                            " threshold by 3, but loop runs twice, so luck rarely holds in both passes."}
     score(src, func, env, full=True)  # leave the workdir's dumps at the unmodified draft
     if not hits:
-        print(f"  {min(len(cands), budget)} compiles: no single cse/gcse/loop decision changes the count;"
-              " the difference is elsewhere (allocation: why; reload: spill).")
+        probe_no_improvement(min(len(cands), budget), [r[1:] for r in sorted(regressions)])
         return 0
     hits.sort()
     for n, knob, val, what, counts in hits[:8]:
@@ -4427,6 +4594,11 @@ def why_all_issues(text):
     knob = lambda s: next(iter(re.findall(r"(?:AGBCC_|CSE_)[A-Z_]+=[^\s;()]+", s)), None)
     # Move explanations precede the corresponding why header, so collect them independently.
     for line in text.splitlines():
+        missing = re.match(r"  reload inheritance for missing (.*?): pseudo (\d+), consumer (\d+); (.*)", line)
+        if missing:
+            issues.append((("reload inheritance", int(missing.group(2))),
+                           "reload inheritance: missing `" + missing.group(1) + "`; " + missing.group(4),
+                           None, int(missing.group(3))))
         m = re.match(r"   `([^`]+)` (.*)", line)
         if m:
             issues.append((('order', norm_insn(m.group(1)), m.group(2)),
@@ -4634,14 +4806,25 @@ def why_all_details(src, func, env, rng=None):
             print(f"{func}: {count_text(rows)} differ; only branch targets moved, so there is no insn for why."
                   " The plain scope run names both targets; `scope.py FILE.c probe` finds the cse decision")
             return 1
-        print(f"{func}: {count_text(rows)} differ; no differing draft insn has an RTL uid, so there is nothing"
-              " for why. The ROM has insns the draft does not produce at all:")
+        print(f"{func}: {count_text(rows)} differ; checking ROM-only instructions (no differing draft RTL uid)")
         for r in rom_only[:8]:
             print(f"  {r['rom_addr']} {r['rom']}")
+        inherited = missing_inherited_copies(rows, insn_list(info["wd"], "greg"),
+                                            insn_list(info["wd"], "lreg"))
+        for hit in inherited:
+            print(f"  reload inheritance for missing {hit['copy']}: pseudo {hit['pseudo']},"
+                  f" consumer {hit['consumer_uid']}; already absent in greg/reload. Reload reused {hit['low']},"
+                  f" loaded with {hit['constant']} by insn {hit['load_uid']}, for pseudo {hit['pseudo']}"
+                  f" at insn {hit['consumer_uid']}; insn {hit['set_uid']} copied that same constant"
+                  f" into {hit['high']}. This is constant reload inheritance, not a missing C operation"
+                  " or a cse/PRE replacement. `AGBCC_RTRACE=1` exposes reload's decisions. The C must"
+                  " change the value/mode available to inheritance; an extra plain copy is redundant."
+                  " For a mask in a narrow field assignment, a literal inside the field expression"
+                  " can supply an HImode constant read through an SImode subreg (fact 221).")
         if any(re.match(r"(svc|swi)\b", r["rom"]) for r in rom_only):
             print("  `svc`/`swi` is a BIOS call written inline (the SDK's SystemCall macro: an asm statement);"
                   " agbcc has no C construct that emits it. Not a register or order problem: no knob applies.")
-        else:
+        elif len(inherited) < len(rom_only):
             print("  Find the C that produces them (a missing statement, a different expression shape); a"
                   " draft-only row that is alignment padding follows from the size change. A load or"
                   " computation the draft lacks is often one cse or gcse removed as redundant (PRE, a"
@@ -4792,8 +4975,10 @@ def explain_regmove(wd, uid, gone, new, nm, at):
     pats = {u: r for u, _, r in insn_list(wd, "combine")}
     regs = set(gone) | set(new)
     hit = [f for f in fixes if f[1] == uid] or \
-          [f for f in fixes if any(re.search(r"\(reg(?:/\w)*:\w+ %d\)" % r, pats.get(f[1], "")) for r in regs)]
-    regs = regs  # noqa: keeps the search above readable
+          [f for f in fixes if regs and regs <= set(regs_of(pats.get(f[1], "")))]
+    # A shared input alone does not connect two ties. In Spider_UpdateWanderGoal,
+    # the mask participates in several independent operations; attributing the
+    # first operation's change to a later tie suggested an ineffective NOTIE.
     if not hit:
         copy = reg_copy_coalesce(wd, uid, gone, new)
         if copy:
@@ -4864,6 +5049,88 @@ def explain_regmove(wd, uid, gone, new, nm, at):
     print(f"    what-if: AGBCC_NOTIE={us} (forbids this tie" + (f", here and in {len(twins)} inlined cop"
           f"{'ies' if len(twins) > 1 else 'y'} of the same code" if twins else "") + "; the copy should come back."
           " What differs after that is a separate cause: ask `why` again with the knob set)")
+
+
+def move2add_address(lreg, greg, homes, uid):
+    """Find a same-base address changed into a relative add during reload.
+
+    Require the earlier physical copy/add and an uninterrupted register history;
+    matching immediate differences alone are not evidence of address reuse.
+    GREG includes labels/barriers as well as insns (jump2_input's sequence).
+    """
+    reg = r"\(reg(?:/\w)*:SI (\d+)(?: \w+)?\)"
+    plus = re.compile(r"\(set " + reg + r" \(plus:SI " + reg + r" \(const_int (-?\d+)\)\)\)")
+    copy = re.compile(r"\(set " + reg + " " + reg + r"\)")
+    before = {u: plus.match(r or "") for u, _, r in lreg}
+    original = before.get(uid)
+    order = {u: i for i, (u, _, _) in enumerate(greg)}
+    if not original or uid not in order:
+        return None
+    end = order[uid]
+    changed = plus.match(greg[end][2] or "")
+    if not changed:
+        return None
+    pseudo, base, offset = map(int, original.groups())
+    dst, src, delta = map(int, changed.groups())
+    hard_base = homes.get(base)
+    if dst != src or homes.get(pseudo) != dst or hard_base is None or delta == offset:
+        return None
+    writes = re.compile(r"\((?:set|clobber) \(reg(?:/\w)*:\w+ (\d+)(?: \w+)?\)")
+    implicit_write = re.compile(r"\((?:pre|post)_(?:inc|dec|modify)")
+    for i in range(end - 1, -1, -1):
+        old_uid, kind, text = greg[i]
+        if kind != "insn" or implicit_write.search(text or ""):
+            return None
+        defined = {int(m) for m in writes.findall(text or "")}
+        if hard_base in defined:
+            return None
+        if dst not in defined:
+            # A partial or complex register write cannot be safely interpreted here.
+            if re.search(r"\((?:set|clobber) \(subreg", text or ""):
+                return None
+            continue
+        old = before.get(old_uid)
+        physical = plus.match(text or "")
+        if not old or not physical:
+            return None
+        old_dst, old_base, old_offset = map(int, old.groups())
+        physical_dst, physical_src, physical_offset = map(int, physical.groups())
+        if (old_base != base or homes.get(old_dst) != dst or
+                (physical_dst, physical_src, physical_offset) != (dst, dst, old_offset) or
+                old_offset + delta != offset):
+            return None
+        for _, prev_kind, prev_text in reversed(greg[:i]):
+            if prev_kind != "insn" or implicit_write.search(prev_text or ""):
+                return None
+            defined = {int(m) for m in writes.findall(prev_text or "")}
+            if hard_base in defined:
+                return None
+            if dst not in defined:
+                if re.search(r"\((?:set|clobber) \(subreg", prev_text or ""):
+                    return None
+                continue
+            prior_copy = copy.match(prev_text or "")
+            if prior_copy and tuple(map(int, prior_copy.groups())) == (dst, hard_base):
+                return dst, hard_base, old_offset, offset, old_uid
+            return None
+        return None
+    return None
+
+
+def explain_address_move2add(wd, uid, at):
+    events = [(u, k, " ".join(r.split())) for u, k, r in jump2_input(wd, "")[2]]
+    found = move2add_address(insn_list(wd, "lreg"), events, hard_of(wd), uid)
+    if not found:
+        return
+    dst, base, old, new, previous = found
+    operation = f"+ {new - old:#x}" if new >= old else f"- {old - new:#x}"
+    print(f"  reload changed the address r{base} + {new:#x} into r{dst} {operation}:"
+          f" r{dst} already held r{base} + {old:#x} from {at(previous)}. The pre/post-reload"
+          " patterns and intervening register definitions identify same-base address reuse"
+          " (reload_cse_move2add, reload1.c), rather than a different field offset. A CODE_LABEL"
+          " makes move2add forget that address. A setup written in separate branches can keep"
+          " such a label through reload even when jump2 later merges its tails; each setup path"
+          " also needs a real join if cse must forget an earlier field address (README fact 130).")
 
 
 def explain_move2add(wd, uid, row, at):
@@ -4994,6 +5261,36 @@ def first_real_use(wd, uid):
     return None
 
 
+def removed_narrowing(before, after_uids, gone):
+    """Shift pairs removed by combine: (source pseudo, width, left uid, right uid).
+
+    Restrict this to an exact SI left/logical-right pair, both deleted. A surviving
+    shift or a different amount can be arithmetic rather than a removed conversion.
+    """
+    result = []
+    for g in gone:
+        right = [(u, re.fullmatch(
+            r"\(set \(reg(?:/\w)*:SI %d\) \(lshiftrt:SI "
+            r"\(reg(?:/\w)*:SI (\d+)\) \(const_int (\d+)\)\)\)" % g, r))
+                 for u, _, r in before]
+        right = [(u, m) for u, m in right if m]
+        if len(right) != 1:
+            continue
+        ru, rm = right[0]
+        shift = int(rm.group(2))
+        if ru in after_uids or shift not in (16, 24):
+            continue
+        left = [(u, re.fullmatch(
+            r"\(set \(reg(?:/\w)*:SI %s\) \(ashift:SI "
+            r"(?:\(subreg:SI )?\(reg(?:/\w)*:(?:SI|HI|QI) (\d+)\)"
+            r"(?: 0\))? \(const_int %d\)\)\)" % (rm.group(1), shift), r))
+                for u, _, r in before]
+        left = [(u, m) for u, m in left if m]
+        if len(left) == 1 and left[0][0] not in after_uids:
+            result.append((int(left[0][1].group(1)), 32 - shift, left[0][0], ru))
+    return result
+
+
 def explain_substitution(wd, p, uid, gone, nm, at, func=None):
     """A pass took pseudos out of insn UID: say what each one held (its set in the previous dump) and whether
     the pass folded that set into this insn."""
@@ -5017,6 +5314,17 @@ def explain_substitution(wd, p, uid, gone, nm, at, func=None):
               + (" (that insn is gone)." if folded else "."))
     if p == "gcse":
         explain_pre(wd, func, uid)
+    narrowed = removed_narrowing(before, after_uids, gone) if p == "combine" else []
+    for source, width, left, right in narrowed:
+        print(f"    combine removed an unsigned {width}-bit conversion of {nm(source)}:"
+              f" the left/right shift pair at {at(left)} and {at(right)} is gone.")
+        print("    inspect combine.c nonzero_bits: known-zero upper bits can make this conversion"
+              " redundant. The consumer then reads the original pseudo directly; a different"
+              " consumer register need not be an allocation error.")
+        left_dest = regs_of(next(r for u, _, r in before if u == left))[0]
+        print(f"    diagnostic: AGBCC_COMBKEEP={left_dest}"
+              " keeps the left-shift definition out of combinations; confirm before changing C.")
+    return {source for source, _, _, _ in narrowed}
 
 
 def explain_pre(wd, func, uid):
@@ -5354,6 +5662,8 @@ def cmd_why(src, func, uid, env, via=None):
                 changes.append((p, [r for r in last if r not in regs], [r for r in regs if r not in last]))
             trail.append(f"{PASS_NOTE.get(p, p)}: {', '.join(nm(r) for r in regs)}")
             last = regs
+    if row:
+        explain_address_move2add(wd, uid, at)
     if row and row["tag"] == "→":
         rows_all = json.load(open(os.path.join(wd, "diff.json")))
         if all(r["tag"] in "=→" for r in rows_all):
@@ -5377,6 +5687,7 @@ def cmd_why(src, func, uid, env, via=None):
         print("  gcse created this insn:")
         explain_pre(wd, info["obj_name"], uid)
     trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read(), info["obj_name"])
+    narrowed_sources = set()
     for p, gone, new in changes:
         if p not in ("cse", "cse2") or not new:
             if p == "regmove":
@@ -5384,7 +5695,7 @@ def cmd_why(src, func, uid, env, via=None):
                 explain_regmove(wd, uid, gone, new, nm, at)
             elif p not in ("greg", "lreg"):
                 print(f"  {p} replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new) or 'nothing'}.")
-                explain_substitution(wd, p, uid, gone, nm, at, info["obj_name"])
+                narrowed_sources.update(explain_substitution(wd, p, uid, gone, nm, at, info["obj_name"]))
             continue
         n = 1 if p == "cse" else 2
         t = trace.get(n, {"why": [], "eqv": []})
@@ -5433,6 +5744,10 @@ def cmd_why(src, func, uid, env, via=None):
         if not shown:
             print("    no class-head takeover found for these registers; see the raw trace")
     for ps, want, got in alloc_diffs:
+        if ps in narrowed_sources:
+            print(f"  allocation advice omitted for {nm(ps)}: combine removed the conversion result"
+                  " the ROM may read here; establish that shape decision first.")
+            continue
         # even when cse put this pseudo here, its register is allocation's choice: explain both
         if ps is None and got >= 8:
             ps = reload_move_pseudo(wd, uid, got)
@@ -6428,12 +6743,16 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
     EffectManager_SpawnParticlesAt matched this way)."""
     text = open(os.path.join(ROOT, src)).read()
     rows = text.split("\n")
+    locations = uid_locations(info["wd"])
     tried = set()
     for ps in passes:
         for cands in ps.values():
             for uid, c in cands.items():
                 name, ln = names.get(c["reg"], ""), lines.get(uid)
                 if not (c["move"] and c["move"][0] and re.fullmatch(r"[A-Za-z_]\w*", name) and ln) or name in tried:
+                    continue
+                file, _ = locations.get(uid, (None, 0))
+                if not 1 <= ln <= len(rows) or not file or os.path.abspath(os.path.join(ROOT, file)) != os.path.abspath(os.path.join(ROOT, src)):
                     continue
                 tried.add(name)
                 m = re.search(rf"\b{name}\s*=\s*([^;=][^;]*);", rows[ln - 1])
@@ -6943,6 +7262,29 @@ def cmd_preorder(src, func, env):
     return 1
 
 
+def use_only_pseudos(before, after):
+    """Pseudos whose real operations disappeared, leaving only standalone USEs.
+
+    A surviving SET, CLOBBER, subreg use, or executable operand disqualifies the
+    pseudo. Do not infer an eliminated value from an absent or incomplete dump.
+    """
+    reg = re.compile(r"\(reg(?:/[a-z]+)*:\w+ (\d+)\)")
+    direct_use = re.compile(r"^\(use \(reg(?:/[a-z]+)*:\w+ (\d+)\)\)$")
+    real_before = set()
+    for _, _, rtl in before:
+        if not direct_use.fullmatch(rtl or ""):
+            real_before.update(int(x) for x in reg.findall(rtl or ""))
+    uses, other = {}, set()
+    for uid, _, rtl in after:
+        match = direct_use.fullmatch(rtl or "")
+        if match:
+            uses.setdefault(int(match.group(1)), []).append(uid)
+        else:
+            other.update(int(x) for x in reg.findall(rtl or ""))
+    return {p: uids for p, uids in uses.items()
+            if p >= 22 and p in real_before and p not in other}
+
+
 def cmd_frame(src, func, env):
     """The stack frame side by side: each ROM stack slot, the corresponding draft slot, and the pseudo
     (C variable) reload put there, in the order reload gave the slots out. Use physical offsets when
@@ -6996,6 +7338,18 @@ def cmd_frame(src, func, env):
     for b in extra:
         ps, nm = who(b)
         print(f"+ {'':9} sp+{b:<#6x} {ps:>6}  {nm}  (the ROM has no slot for this)")
+    use_only = use_only_pseudos(insn_list(wd, "flow"), insn_list(wd, "lreg"))
+    for b in extra:
+        ps = slots[b][0]
+        if ps not in use_only or slots[b][2] == -1:
+            continue
+        print(f"  sp+{b:#x}: pseudo {ps} has no executable read or write before allocation;"
+              f" only standalone USE insns {', '.join(map(str, use_only[ps]))} remain.")
+        print("    Its real operations disappeared after flow. combine's distribute_notes can"
+              " preserve a deleted input this way, keeping it live and giving it an unused spill"
+              " slot. Compare flow/combine/lreg; split-half union construction is one known"
+              " source (README facts 48 and 173). Initializing the union can remove the USE but"
+              " also restore constant equivalence, changing allocation.")
     order = [pair[a] for a in sorted(pair) if pair[a] in slots and slots[pair[a]][2] > 0]
     want = [slots[b][0] for b in order]
     if want != sorted(want):
