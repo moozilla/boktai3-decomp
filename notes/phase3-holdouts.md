@@ -1487,3 +1487,39 @@ Persistent store: `build/matchsearch/ModifierMenu_LoadSavedSelection`. Next: a
 meaningful value boundary that makes expand_call precompute the signed ID before
 placing pending in r0, together with a row-address form that ties to the scaled
 index instead of state. A late forced register is insufficient evidence here.
+
+
+### LevelAdvanceDisplay_UpdateParticle (0805704C): four pins removed, retained counter conversion
+
+Tags: #menus #hud #matching #compiler
+
+Landed a partial removing four X/Z position pins. Direct sums with the player
+coordinate first, `player->position.world.x + particle->offsetX` (and Z), produce
+the original load order and register allocation. Complete unit MATCH at 112 bytes.
+Three counter pins remain: the loaded value, incremented frame and final phase.
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/LevelAdvanceDisplay_UpdateParticle.c`,
+6 / 6 differing instructions, same extent. Exact diagnostic on no-aliases.c:
+`CSE_NOFOLLOW=1` MATCH. Cse follows the frame-expiration branch and reuses
+`frame << 16` in the later phase calculation. The draft retains that shifted
+value in r4 and deletes the second shift. The ROM retains the incremented frame
+in r4 and shifts afresh at each test. Removing redundant input/resource aliases
+is necessary for the knob to match; otherwise disabling the follow also retains
+an extra particle copy and changes allocation. Cse.c's follow path requires a
+single-use target label preceded by a barrier.
+
+Tried direct and promoted increments, signed/narrow frame types, halfword/word
+union views and initializers, a halfword array snapshot, reload from the frame
+field, typed phase/expiration helpers, mask/shift comparisons, early returns,
+separate conditionals, a boolean switch, explicit active goto, reversed arms,
+and active/expired loop layouts. Most recover the same shared shift; the signed
+phase changes shift semantics, switch/helper forms add branches, and reversed
+arms preserve the wrong layout. Retaining only the frame/value pins leaves five
+phase-allocation differences; all three retained counter pins match. Scope's
+fresh pin audit confirms none of those three is free alone.
+
+Persistent store: `build/matchsearch/LevelAdvanceDisplay_UpdateParticle`, including
+the exact CSE_NOFOLLOW counterfactual. Next: an ordinary control-flow or value
+boundary that prevents the first cse follow while preserving the ROM arm order.
+The player-first direct sums should be kept; separately named coordinate values
+raise pressure and obscure this one remaining issue.
