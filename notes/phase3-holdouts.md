@@ -1349,3 +1349,35 @@ aggregate/lifetime/join proposals and name allocation trace. A fresh probe also
 checks cse follow/canonical choices. Next: source that gives the alias a distinct
 value representation only for the two comparisons, or a PRE insertion whose
 latest placement is the 0x40C join; avoid revisiting simple scalar aliases.
+
+
+### TextWindow_Destroy (08033778): typed links landed, allocation tie remains
+
+Tags: #menus #dialogue #matching #compiler
+
+Landed a small cleanup: both raw 0x1C8 pointer calculations now use the existing
+`previous` field. The 132-byte unit matches; one pin and one barrier remain.
+The best ordinary draft is `notes/phase3-drafts/dp-menus/TextWindow_Destroy.c`
+(the previous menus-link recovery, 3 ROM / 5 draft, 136 bytes).
+
+Confirmed again: `AGBCC_NOTIE=87` exactly matches. Cse replaces source-address
+offset pseudo 44 with the destination's offset 41 (=456), then local allocation
+ties source address 45 to that dying r0 constant. The ROM needs address 45 in r1,
+which would let jump2 cross-jump the final slot copy with the other arm. `why`
+reports that the source-load result 46 occupies r1 in the current tie order.
+
+Tried typed previous-link accessors, a setter and getter, an inline unlink
+returning the previous slot, an output-pointer unlink helper, naming both link
+addresses, a nested assignment, source-first access, a globally shared source
+slot, and a real nested next/previous link structure. Setter/getter variants
+change allocation more broadly. Nested assignment and inline output forms have
+the correct instruction shape but different registers. The nested structure
+alone leaves the same tie; operating through link subobjects keeps additional
+address arithmetic. Retaining the old join barrier alone does not remove the
+pin for free. Unbound register declarations have no effect.
+
+Persistent store: `build/matchsearch/TextWindow_Destroy`, including the exact
+NOTIE counterfactual. Next: an ordinary source form that keeps the offset alive
+past the arm-1 source-address add, or makes that address global without moving
+its calculation ahead of the next-link address. Simple field accessor inlines
+have been ruled out.
