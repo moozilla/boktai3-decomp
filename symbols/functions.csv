@@ -8170,7 +8170,8 @@ addr,name,mode,confidence,source,notes
 081DB474,Options_UpdateScreen,thumb,low,src-alias,
 081DB75C,Options_Destroy,thumb,low,src-alias,Options task destruction callback removes its five animation objects
 081DB794,Options_InitScreen,thumb,low,src-alias,
-081DBA54,ScreenParams2C0_SetFromScript,thumb,low,src-alias,
+081DBA54,Options_SetParametersFromScript,thumb,low,src-alias,Three-row options screen with secondary choice; shared widget resources; pulse palette and completion scripts.
+081DBB00,Options_GetSecondaryChoice,thumb,low,src-alias,Three-row options screen with secondary choice; shared widget resources; pulse palette and completion scripts.
 081DBB0C,Options_Create,thumb,medium,gcl-name,name from GCL key 96CD オプション (Options); registry callback
 081DBB4C,ScreenParams2E8_UpdateScreen,thumb,low,src-alias,
 081DBDC8,ScreenParams2E8_DestroyScreen,thumb,low,src-alias,Screen destruction callback clears display flags and removes its three animation objects
