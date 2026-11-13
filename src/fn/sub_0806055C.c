@@ -20,9 +20,9 @@ void SceneInventory_BeginEquipmentSwapPair(struct SceneInventoryActionView *pane
         u32 slot;
         s32 id, equipped;
         if (i == 0)
-            slot = *(u8 *)((u8 *)panel + 0x1BEA);
+            slot = panel->savedSelection;
         else
-            slot = *(u8 *)((u8 *)panel + 0x1BE7);
+            slot = panel->selection;
         ((struct SceneInventoryActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
         equipped = SceneInventory_FindEquippedSlot(slot);
         if (equipped >= 0)

@@ -16,9 +16,9 @@ void SceneInventory_BeginItemSwapPair(struct SceneInventoryActionView *panel)
         u32 slot;
         s32 id;
         if (i == 0)
-            slot = *(u8 *)((u8 *)panel + 0x1BEA);
+            slot = panel->savedSelection;
         else
-            slot = *(u8 *)((u8 *)panel + 0x1BE7);
+            slot = panel->selection;
         ((struct SceneInventoryActionFlagsView *)panel)->widgets[slot + 5].flags |= 1;
         id = Inventory_GetItemId(slot);
         if (id >= 0)
