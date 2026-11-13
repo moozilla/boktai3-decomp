@@ -6,7 +6,7 @@ void Hud_DrawHealthRatio(void *, s32, s32, s32);
 void Hud_DrawEnergyRatio(void *, s32, s32, s32);
 void PauseMenu_HidePromptIcons(void *);
 void Hud_DrawHealthMeter(void *, s32, s32, s32, s32);
-void sub_08164480(void *, s32, s32, s32, s32, s32, s32);
+void Hud_DrawEnergyMeter(void *, s32, s32, s32, s32, s32, s32);
 void SceneHud_SetPairedIcons(void *, s32, s32);
 void InventoryGrid_UpdateModifierPreview(struct SceneHudState *p)
 {
@@ -19,7 +19,7 @@ void InventoryGrid_UpdateModifierPreview(struct SceneHudState *p)
     } else {
         p->comparisonModifier = key;
         Hud_DrawHealthMeter(p, 1, 8, 8, 1);
-        sub_08164480(p, 1, 8, 10, p->actionOwner->currentStatB, p->actionOwner->maximumStatB, 1);
+        Hud_DrawEnergyMeter(p, 1, 8, 10, p->actionOwner->currentStatB, p->actionOwner->maximumStatB, 1);
         SceneHud_SetPairedIcons(p, 1, -1);
     }
     p->comparisonIndicators[0].flags |= 1;

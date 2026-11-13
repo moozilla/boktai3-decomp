@@ -5812,30 +5812,33 @@ addr,name,mode,confidence,source,notes
 081642CC,Hud_DrawHealthMeterCells,thumb,low,src-alias,
 08164438,Hud_DrawHealthMeter,thumb,low,src-alias,Draws a tentative health meter using the panel values at offsets 0x424 and 0x426
 0816446C,Hud_DrawDefaultHealthMeter,thumb,low,src-alias,Draws the panel health meter with the default rendering mode
+08164480,Hud_DrawEnergyMeter,thumb,low,src-alias,Draw energy meter cells and the timed energy bonus.
 0816471C,Hud_DrawDefaultEnergyMeter,thumb,low,src-alias,Draws a tentative energy meter from supplied values with the default rendering mode
 08164738,Hud_DrawHealthLabel,thumb,low,src-alias,Writes the three fixed label tiles preceding the tentative health meter
 0816475C,Hud_DrawEnergyLabel,thumb,low,src-alias,Writes the three fixed label tiles preceding the tentative energy meter
 08164780,Hud_DrawAlternateMeterLabel,thumb,low,src-alias,Writes an alternate three-tile meter label starting at tile 0xD08D
-081647A4,StatDisplay_DrawGauge,thumb,low,src-alias,
-08164B84,StatDisplay_DrawTwoDigitCounter,thumb,low,src-alias,
-08164C0C,ResultPanel_ClearFiveTiles,thumb,low,src-alias,
+081647A4,Hud_DrawPlayerGauge,thumb,low,src-alias,Draw the enabled player status gauge.
+08164B84,Hud_DrawTwoDigitCounter,thumb,low,src-alias,Draw the two-digit transient gauge counter.
+08164C0C,Hud_ClearCounterTiles,thumb,low,src-alias,Clear the five transient counter tiles.
 08164C40,Hud_DrawStoredEnergyGauge,thumb,low,src-alias,
 08164DC0,Hud_UpdateTransientStatGauge,thumb,low,src-alias,
 08165020,Hud_UpdateTimedStatusIcon,thumb,low,src-alias,
-081651B0,SceneHud_PlayActionChangeCue,thumb,low,src-alias,
+081651B0,Hud_PlayActionChangeCue,thumb,low,src-alias,Play the cue when displayed action digits change.
 08165254,Hud_UpdateCountdownDigits,thumb,low,src-alias,
-08165488,SceneHud_DrawDecimalDigits,thumb,low,src-alias,
-081654DC,SceneHud_FillDigitCells,thumb,low,src-alias,
-08165518,SceneHud_DrawActiveStatValue,thumb,low,src-alias,
+08165488,Hud_DrawDecimalDigits,thumb,low,src-alias,Draw decimal digits with the selected tile style.
+081654DC,Hud_FillDigitCells,thumb,low,src-alias,Fill a run of digit cells with the selected sign tile.
+08165518,Hud_DrawActiveStatValue,thumb,low,src-alias,Draw the currently active attack stat.
 08165594,Hud_DrawDefaultResourceCounts,thumb,low,src-alias,Draws paired resource counts through the shared renderer with its final option cleared
-081655AC,ResultPanel_FillTileRun,thumb,low,src-alias,
+081655AC,Hud_FillTileRun,thumb,low,src-alias,Fill a run of menu tiles.
 081655D8,Hud_DrawCounter7B0,thumb,low,src-alias,Clamps the state counter at offset 0x7B0 to 9999 and draws four digits
 08165634,Hud_DrawCounter50C,thumb,low,src-alias,Clamps the state counter at offset 0x50C to 9999 and draws it with alternate digit styling
 0816568C,Hud_DrawHeaderCounter,thumb,low,src-alias,Clamps the state counter at offset 0x77C and draws it at the fixed header position
+081656E0,Hud_DrawSelectedCounter,thumb,low,src-alias,Draw the counter selected by the clock mode.
 081657F0,Hud_DrawSunClockTimeB,thumb,low,src-alias,Draws the hour and minute fields of sun clock time B
 08165830,Hud_DrawSunClockTimeA,thumb,low,src-alias,Draws the hour and minute fields of sun clock time A
-08165870,ResultPanel_DrawClockLabel,thumb,low,src-alias,
-081658C8,SceneHud_DrawSelectedClock,thumb,low,src-alias,
+08165870,Hud_DrawClockLabelB,thumb,low,src-alias,Draw the label for secondary clock B.
+0816589C,Hud_DrawClockLabelA,thumb,low,src-alias,Draw the label for secondary clock A.
+081658C8,Hud_DrawSelectedClock,thumb,low,src-alias,Draw the clock selected for the current HUD mode.
 08165944,Hud_DrawStatusMetersAndCounts,thumb,low,src-alias,Draws the panel health and energy meters followed by paired resource counts
 0816599C,MenuInput_ReadDirectionRepeat,thumb,low,src-alias,
 081659F4,PauseMenu_SetConfirmationIndicator,thumb,low,src-alias,Shows sprite 7 at the origin and selects one of two indicator frames; confirmation role is tentative
