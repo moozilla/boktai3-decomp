@@ -357,7 +357,8 @@ def resolve_knobs(src, func, env):
                 sys.exit(f"AGBCC_FORCE: unknown register {reg!r}")
             entries.append(f"{pseudo}:{reg}")
         env["AGBCC_FORCE"] = ",".join(entries)
-    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE", "AGBCC_NOEQUIV") if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
+    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE", "AGBCC_NOEQUIV", "AGBCC_NOREG")
+            if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
     if not keys:
         return env
     saved = {k: os.environ.pop(k) for k in keys if k in os.environ}

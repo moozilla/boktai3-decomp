@@ -40,6 +40,16 @@ class NamedKnobs(unittest.TestCase):
         self.assertEqual(result, {"AGBCC_NOEQUIV": "24,44"})
         compiled.assert_not_called()
 
+    def test_noreg_resolves_names_without_leaking_them_to_baseline(self):
+        result, compiled = self.resolve({"AGBCC_NOREG": "key,44", "AGBCC_NOEQUIV": "key"})
+        self.assertEqual(result, {"AGBCC_NOREG": "24,44", "AGBCC_NOEQUIV": "24"})
+        compiled.assert_called_once_with("candidate.c", "Function", {})
+
+    def test_numeric_noreg_does_not_compile_a_baseline(self):
+        result, compiled = self.resolve({"AGBCC_NOREG": "24,44"})
+        self.assertEqual(result, {"AGBCC_NOREG": "24,44"})
+        compiled.assert_not_called()
+
     def test_unknown_name_is_an_error(self):
         with self.assertRaisesRegex(SystemExit, "no pseudo by that name"):
             self.resolve({"AGBCC_NOEQUIV": "missing"})
