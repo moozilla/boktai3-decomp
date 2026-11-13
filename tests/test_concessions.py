@@ -51,6 +51,40 @@ class Kinds(unittest.TestCase):
                 self.assertEqual(kinds("void f(void) { " + alias + " *reg = REG_ADDR; }"), [])
         self.assertEqual(kinds("void f(vu32 *zero) { *zero = 0; }"), [])
         self.assertEqual(kinds("// vu32 zero;\nvoid f(void) { u32 zero; }"), [])
+        for alias in ("vu8", "vu16", "vu32", "vu64", "vs8", "vs16", "vs32", "vs64",
+                      "vbool8", "vbool16", "vbool32"):
+            for declaration in (f"{alias} zero;", f"{alias} zero = 0;",
+                                f"const {alias} zero = 0;", f"{alias} const zero = 0;",
+                                f"{alias} buffer[4];", f"{alias} first, second;",
+                                f"volatile {alias} zero = 0;"):
+                with self.subTest(declaration=declaration):
+                    self.assertEqual(kinds(f"void f(void) {{ {declaration} }}"), ["volatile"])
+
+    def test_volatile_typedef_hardware_and_noncode(self):
+        source = '''typedef vu32 HardwareWord;
+extern vu16 gInterruptFlags;
+struct DmaRegisters { vu32 source, destination, control; };
+static inline void f(void)
+{
+    vu32 *dma = (vu32 *)0x040000D4;
+    const vu16 *status = (const vu16 *)0x04000004;
+    /* vu32 zero; */
+    Print("vu32 zero;");
+}
+'''
+        self.assertEqual(kinds(source), [])
+
+    def test_volatile_typedef_macro_and_line_numbers(self):
+        source = '#define CLEAR() do { vu32 zero = 0; Copy(&zero); } while (0)\n\nvoid f(void)\n{\n    vu16 value;\n}\n'
+        self.assertEqual(c.sites(source, kinds=("volatile",)),
+                         [c.Site(1, "volatile"), c.Site(5, "volatile")])
+        self.assertEqual(c.sites(source, kinds=("pin",)), [])
+
+    def test_volatile_typedef_allow_and_library_rules(self):
+        source = "void f(void) {\n    // concession-ok(volatile): the DMA fill source must be stored in memory\n    vu32 zero = 0;\n}\n"
+        self.assertEqual(c.sites(source), [c.Site(3, "volatile", True)])
+        self.assertEqual(c.lint(source), [])
+        self.assertEqual(kinds("void f(void) { vu32 zero; }", "src/lib/runtime.c"), [])
 
     def test_comments_are_not_code(self):
         self.assertEqual(kinds('void f(void) { /* asm("") */ g(); } // DEBUG_NOP()'), [])
