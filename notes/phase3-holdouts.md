@@ -1289,3 +1289,35 @@ it reports no supported causal summary, while the trace shows the source
 copy survives into reload. Next: keep that reload choice but delay or delete
 the copy after allocation, or recover the missing original access around the
 mode/slot guard. Do not add a fence to manufacture the choice.
+
+### sub_0815E034: direct defense addresses isolate the mask priority
+Tags: phase3, player, sub_0815E034, allocation
+
+The new pin-free draft is `notes/phase3-drafts/dp-bosses/sub_0815E034.c`:
+6 ROM / 4 draft instructions differ, 440 versus 444 bytes. All long-lived
+registers and all defense switch cases now match. It reuses `common` in the
+blocked-mask arm, then assigns it again for the vulnerability mask. The extra
+references raise its priority to 2500. Remaining differences are the first
+mask's register/order and regmove tying the final mask test to r6.
+
+A stronger diagnosis: starting with the old draft, replace each switch offset
+with `attribute = &player->cueDefenses[k]` and remove the post-switch pointer
+addition. `AGBCC_PRI=common:+1000` makes this direct-address draft **MATCH**.
+Player's nine references give priority 2231, source 2061, and common 1500;
+common must outrank both. Its REG_EQUIV constant doubles live length 10 to 20.
+This also fixes the offset/attribute register issue through natural reload and
+cross-jumping, so it is one allocation decision rather than two unrelated pins.
+
+Tried narrow/wide common and vulnerable types, masked load temporaries, inline
+mask helpers, union/array mask initializers, mask setup in both blocked arms,
+separate mask assignments and precomputed element tests. Narrow common types
+fold to the same RTL. Wide vulnerable types change allocation adversely.
+Repeated initialization in an identical branch gives 7/7 but moves the mask
+past the 0x40 test; it is not a good final form. The direct-address draft with
+all existing source pins removed still needs common's priority raised.
+Source-pin-only partials with typed offsets, helper reads, indexing and union
+pointer initialization remain 8/8; no source change landed.
+
+Next: give common a short-lived extra real reference that disappears after
+allocation, or prevent REG_EQUIV doubling without an artificial fence. A mask
+helper with the original aggregate representation may supply that reference.
