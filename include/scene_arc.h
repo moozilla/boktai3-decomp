@@ -57,9 +57,6 @@ struct SceneGroundManager {
     const u8 *resource;
     struct SceneGroundEffect *head;
 };
-struct SceneArcCamera {
-    u8 unknown0[0x44];
-    s32 x;
-};
+#include "scene_camera.h"
 extern struct SceneArcCamera *gSceneCamera;
 #endif

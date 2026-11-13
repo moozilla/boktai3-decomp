@@ -6,6 +6,7 @@
 #include "contact_actor.h"
 #include "scene_vec.h"
 #include "render.h"
+#include "field_hud_widgets.h"
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
@@ -98,7 +99,9 @@ struct SceneHudState {
     u8 unknownA60[2];
     u16 energyMeterBlinkTimer; /* 0xA62: advances while the energy meter flashes */
     u16 meterPulseFrame;       /* 0xA64: 60-frame HUD meter pulse */
-    u8 unknownA66[8];
+    u16 fieldValueMode;        /* 0xA66 */
+    u16 *fieldValueSource;     /* 0xA68 */
+    u8 unknownA6C[2];
     u16 timedStateParameter;                            /* 0xA6E: sixth argument to 081781B4 */
     u16 timedStateStart;                                /* 0xA70: negative input clamps to zero */
     u16 timedStateValue;                                /* 0xA72 */
@@ -238,12 +241,9 @@ struct SceneHudState {
     s8 navigationDestinations[4]; /* -1 when there is no displayed link. */
     u8 unknown490C[0x10];
     u16 currentMapPage; /* 0x491C */
-    u8 unknown491E[0x4988 - 0x491E];
-    struct SceneInputWidget ownerWidgets[2]; /* 0x4988: removed by owner destructor */
-    u8 unknown4A48[0x28];
-    struct SceneInputWidget ownerAuxWidgets[6]; /* 0x4A70 */
-    u8 unknown4CB0[0x28];
-    u8 initializationFlag; /* 0x4CD8: cleared by both initializers */
+    u8 unknown491E[0xE];
+    struct FieldHudWidgets fieldWidgets; /* 0x492C */
+    u8 initializationFlag;               /* 0x4CD8: cleared by both initializers */
     u8 unknown4CD9[0x4D90 - 0x4CD9];
     u8 equippedIconSlots[8]; /* 0x4D90: inventory slot for each visible equipped icon */
 };
