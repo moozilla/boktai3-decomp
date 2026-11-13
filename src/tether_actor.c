@@ -1880,22 +1880,23 @@ s32 TetherActor_GetConfiguredKind(void)
 
 extern const u16 gUnk_086059F0[];
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_InitKindFromScript(struct TetherActor *actor, u32 entry)
 {
-    register s32 kind asm("r0");
     s32 value;
     actor->entry = entry;
-    if (Script_SeekToKeyword('k'))
-        kind = Script_GetValue();
-    else
-        kind = TetherActor_GetConfiguredKind();
-    {
-        s16 *selectedKind = &gGameState->unk5AA;
+    if (Script_SeekToKeyword('k')) {
+        s16 *selectedKind;
+        s32 kind = Script_GetValue();
+        selectedKind = &gGameState->unk5AA;
         *selectedKind = kind;
+        actor->kind = gGameState->unk5AA;
+    } else {
+        s16 *selectedKind;
+        s32 kind = TetherActor_GetConfiguredKind();
+        selectedKind = &gGameState->unk5AA;
+        *selectedKind = kind;
+        actor->kind = gGameState->unk5AA;
     }
-    actor->kind = gGameState->unk5AA;
     value = Script_SeekToKeyword('c');
     if (value)
         value = Script_GetValue();

@@ -1405,3 +1405,18 @@ Table-first random draws improved the baseline from 24/24 to 9/9 but moved the
 table and heading setup. Splitting the motion tail (8/24) or angle assignment
 (16/20) let CSE specialize the zero-delta path and did not fully cross-jump.
 Stock full tether-actor unit: 114 functions MATCH (20,516 bytes).
+
+### TetherActor_InitKindFromScript (0804A430): resolved
+
+The joined kind value lost r0 to the selected-kind address: 7/9 differing, shape
+2. Diagnostic `AGBCC_FORCE=selectedKind:1,36:3,38:2` gives MATCH; forcing kind
+alone overlaps the already allocated pointer and is not a valid diagnosis.
+Raising kind priority by 20000 does not evict the local address temporaries.
+
+Repeat both the selected-kind store and actor-kind reload in each branch, with
+a separately declared branch-local kind value. This prevents the early merge
+that a single outer kind variable permits. Each call result stays in r0 during
+allocation; jump2 then cross-jumps the identical tails. Stock unit MATCH.
+Repeating the store alone is 4/6 with branch locals; repeating both with an
+outer kind is still 7/9. Short/union values, union pointers, ternary selection,
+inline store helper and unsigned slot did not fix the baseline allocation.
