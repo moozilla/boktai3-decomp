@@ -48,7 +48,7 @@ static inline void Actor_SetState(struct ActorAnimController *g, u32 mode, u32 p
 {
     g->oldMode = g->mode;
     g->mode = mode;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | (phase << 4);
+    g->phase = phase;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -2446,7 +2446,7 @@ static inline s16 SetApproachDirection(s16 angle, u8 *directionOut, u8 *flipOut)
 
 static inline void FinishApproach(struct ActorAnimController *p)
 {
-    *(u16 *)((u8 *)p + 0xF5A) &= 0xF;
+    p->phase = 0;
     if (p->oldMode == 3 && p->mode == 3) {
         p->savedFrame = p->anim.frame;
         p->savedTimer = p->anim.timer;
@@ -4164,7 +4164,7 @@ static inline void InteractionChild_SetMode(struct ActorAnimController *g, u32 m
 {
     *oldMode = g->mode;
     g->mode = mode;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 15) | (phase << 4);
+    g->phase = phase;
     if (*oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
