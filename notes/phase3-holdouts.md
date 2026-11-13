@@ -1284,6 +1284,22 @@ copy survives into reload. Next: keep that reload choice but delay or delete
 the copy after allocation, or recover the missing original access around the
 mode/slot guard. Do not add a fence to manufacture the choice.
 
+Resumed follow-up: the case-zero loop-end technique that resolved sub_0813D834
+was tested around this guard and around descriptor selection. The guard loop
+leaves 1/1 unchanged; selection-loop control flow gives 14/14. A full inline
+selector also leaves 1/1. Reassigning choice only in the positive arm restores
+the exact shape but the original 8/8 reload differences. Action-mode/slot switch
+forms, byte-narrowed subtraction, sign-word extraction through a union and an
+arithmetic shift all retain 8/8. Wide signed/unsigned choice temporaries alter
+branch layout without fixing the registers. A joined Boolean guard adds code.
+Reconfirmed `spill`: shifting choice 5 by one gives MATCH, across all 90 reload
+choices. Best saved draft remains 1/1; no source or concession change.
+
+Tool gap: `why 200` follows the early r0 copy through the descriptor call and
+incorrectly names the return-value copy into sl as its reader. The call consumes
+and overwrites r0; implicit call argument uses and call clobbers should terminate
+that reader walk. This is separate from the actual reload-rotation blocker.
+
 ### sub_0815E034: direct defense addresses isolate the mask priority
 Tags: phase3, player, sub_0815E034, allocation
 
