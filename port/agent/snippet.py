@@ -161,9 +161,19 @@ def _clean(stderr, path):
 
 
 if __name__ == '__main__':
-    code = sys.argv[1] if len(sys.argv) > 1 else sys.stdin.read()
+    import argparse
+    ap = argparse.ArgumentParser(description='compile a C snippet (from the argument or stdin)')
+    ap.add_argument('code', nargs='?')
+    ap.add_argument('-i', '--include', action='append', default=[])
+    ap.add_argument('--path', action='store_true', help='print the cached .wasm path (gameapi g.c uses this)')
+    a = ap.parse_args()
+    code = a.code if a.code is not None else sys.stdin.read()
     try:
-        data = compile_snippet(code)
+        data = compile_snippet(code, a.include)
     except SnippetError as e:
         sys.exit(str(e))
-    print(len(data), 'bytes')
+    if a.path:
+        source = wrap(code, a.include)
+        print(OUT / 'snippets' / (hashlib.sha256((source + json.dumps(FLAGS)).encode()).hexdigest()[:16] + '.wasm'))
+    else:
+        print(len(data), 'bytes')

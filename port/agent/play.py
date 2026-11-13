@@ -165,6 +165,8 @@ def cmd_start(a):
         if subprocess.run([sys.executable, str(ROOT / 'port/build_game.py')]).returncode:
             sys.exit('build failed')
     STATE.mkdir(parents=True, exist_ok=True)
+    import gametypes  # typed globals for js (cached; about 15 s after a header changes)
+    gametypes.build()
     if INFO.exists():
         INFO.unlink()
     args = ['node', str(ROOT / 'port/agent/daemon.mjs'), '--port', str(a.port), '--time', a.time,
@@ -296,6 +298,39 @@ def cmd_c(a):
     if r.get('result'):
         res = r['result']
         print(f'result = {res:#x} ({res if res < 0x80000000 else res - (1 << 32)})')
+
+
+def cmd_js(a):
+    if a.file:
+        code = Path(a.file).read_text()
+    elif a.code == ['-']:
+        code = sys.stdin.read()
+    else:
+        code = ' '.join(a.code)
+    r = request({'op': 'js', 'code': code, 'wait': not a.bg, 'max': a.max}, timeout=None)
+    for l in r.get('print', []) + r.get('log', []):
+        print(l)
+    if 'error' in r:
+        sys.exit('error: ' + r['error'])
+    if r.get('value'):
+        print(r['value'])
+    if a.status or a.shot:
+        show_status(r)
+    if a.shot:
+        shot()
+
+
+def cmd_hooks(a):
+    if a.off is not None:
+        r = request({'op': 'unhook', 'hook': None if a.off == 'all' else int(a.off), 'tasks': a.off == 'all'})
+    else:
+        r = request({'op': 'hooks'})
+    for h in r.get('hooks', []):
+        print(f"#{h['id']:<4} {h['kind']:5} {h['fn']} ({h['addr']})")
+    for t in r.get('tasks', []):
+        print(f"task {t['name']} waiting: {t['wait']}")
+    for l in r.get('print', []):
+        print(l)
 
 
 def cmd_p(a):
@@ -647,6 +682,15 @@ def main():
     p.add_argument('--trace', action='store_true', help='trace the game calls the snippet makes')
     p.add_argument('--trace-out')
     p.add_argument('--depth', type=int, default=12)
+    p = add('js', cmd_js, "run JavaScript in the game: js 'g.$.gPlayers[0].position' (port/agent/README.md)")
+    p.add_argument('code', nargs='*', help="code, or - to read stdin")
+    p.add_argument('-f', '--file')
+    p.add_argument('--bg', action='store_true', help='return at once; the script keeps running in the game')
+    p.add_argument('--max', type=int, default=72000, help='frames to wait for the script (default 72000)')
+    p.add_argument('--status', action='store_true', help='print the status line afterwards')
+    p.add_argument('--shot', action='store_true')
+    p = add('hooks', cmd_hooks, 'JS hooks and background scripts; hooks --off ID|all')
+    p.add_argument('--off')
     p = add('p', cmd_p, "print a C expression: p 'gMain.state' [--format '%%x']")
     p.add_argument('expr', nargs='+')
     p.add_argument('--format')

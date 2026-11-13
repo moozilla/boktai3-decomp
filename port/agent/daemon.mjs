@@ -15,6 +15,8 @@ import net from 'node:net';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { Worker, isMainThread, parentPort, workerData, receiveMessageOnPort, MessageChannel } from 'node:worker_threads';
+import { execFileSync } from 'node:child_process';
+import { createGame } from './gameapi.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const STATE_DIR = path.join(ROOT, 'build/port/agent');
@@ -198,6 +200,13 @@ function gameWorker() {
   class Restart extends Error {}
 
   let ex, mem, hookState, flags;
+  // JavaScript access (gameapi.mjs): typed globals, hooks, scripts that step frames.
+  let g = null;
+  const typesPath = path.join(STATE_DIR, 'types.json');
+  let types = fs.existsSync(typesPath) ? JSON.parse(fs.readFileSync(typesPath, 'utf8')) : { types: {}, globals: {}, functions: {}, data: {} };
+  const LIB = path.join(ROOT, 'port/agent/lib');
+  const sink = [];          // print() output, returned with the next reply
+  const RUNNING = Symbol('running');
   let frameNo = 0, lastPixels = 0, lastScreenPost = 0;
   let serving = false;
   let run = null;           // {steps: [[mask, frames]], index, left, untilBreak, reply}
@@ -241,7 +250,8 @@ function gameWorker() {
     for (const addr of actions.keys()) f[flags + flagIndex(addr)] |= 1;
     for (const addr of observers.keys()) f[flags + flagIndex(addr)] |= 1;
     if (link) f[flags + flagIndex(TEXT_LOOKUP)] |= 1;
-    hs('active', breaks.size || actions.size || observers.size || link || hs('tracing') ? 1 : 0);
+    const scripted = g ? g.armFlags() || g.hasHooks() : false;
+    hs('active', breaks.size || actions.size || observers.size || link || scripted || hs('tracing') ? 1 : 0);
   }
 
   function postScreen(force) {
@@ -270,6 +280,21 @@ function gameWorker() {
       frameNo = n + 1;
       lastPixels = ptr;
       if (serving) return keys; // a function called from a command waited for VBlank
+      const held = g.frame(frameNo);
+      if (run && run.script) {
+        const t = run.script;
+        if (Atomics.load(ctl, 1)) { Atomics.store(ctl, 1, 0); run.max = 0; }
+        if (t.done || --run.max <= 0) {
+          const r = run; run = null;
+          stop = { reason: t.done ? 'script' : 'script-timeout' };
+          reply(r.id, t.done ? scriptResult(t) : { ...status(), error: 'the script is still waiting (it keeps running in the background; js --max raises the limit)' });
+          postScreen(true);
+          serve();
+          return keys | g.currentKeys();
+        }
+        postScreen(false);
+        return held;
+      }
       if (link) linkFrame();
       if (Atomics.load(ctl, 1)) { Atomics.store(ctl, 1, 0); if (run) run.interrupted = true, run.left = 0, run.index = run.steps.length; }
       if (run) {
@@ -279,7 +304,7 @@ function gameWorker() {
           keys = liveKeys | (taps.length ? taps[0][0] : 0);
           if (taps.length && --taps[0][1] <= 0) taps.shift();
           postScreen(false);
-          return keys;
+          return keys | held;
         }
       }
       if (run) {
@@ -289,7 +314,7 @@ function gameWorker() {
         if (run.left > 0) {
           run.left--;
           postScreen(false);
-          return keys;
+          return keys | held;
         }
         const r = run; run = null; keys = 0;
         stop = { reason: r.interrupted ? 'interrupted' : 'frame' };
@@ -298,7 +323,7 @@ function gameWorker() {
       stop = stop || { reason: 'frame' };
       postScreen(true);
       serve();
-      return keys;
+      return keys | g.currentKeys();
     },
     hook(kind, address) {
       // Observation and the studio's text events also see game code that
@@ -315,6 +340,13 @@ function gameWorker() {
           return at >= 0x02000000 && at + len <= 0x0a000000 ? Buffer.from(u8().slice(at, at + len)).toString('hex') : null;
         });
         observed.push([frameNo, address, args, bytes]);
+      }
+      if (g.dispatch(kind, address) && !serving && !(run && run.script)) {
+        stop = { reason: 'hook', kind: kind === 1 ? 'enter' : 'exit', address, fn: g.name(address) };
+        if (run) { const r = run; run = null; keys = 0; reply(r.id, status()); }
+        postScreen(true);
+        serve();
+        return;
       }
       if (serving) return;
       const queued = actions.get(address);
@@ -362,6 +394,13 @@ function gameWorker() {
         continue;
       }
       if (cmd.op === 'run' || cmd.op === 'continue' || cmd.op === 'play') { reply(cmd.id, { error: 'running; pause first' }); continue; }
+      if (cmd.op === 'js') {
+        // during free play a script runs alongside; the reply comes when it ends
+        const r = startScript({ ...cmd, wait: false });
+        if (r.started) { const t = g.tasks[g.tasks.length - 1]; const id = cmd.id; t.onDone = (x) => reply(id, scriptResult(x)); }
+        else reply(cmd.id, r);
+        continue;
+      }
       reply(cmd.id, execute(cmd));
     }
   }
@@ -436,7 +475,10 @@ function gameWorker() {
   }
 
   function reply(id, result) {
-    if (id && !replaying) parentPort.postMessage({ type: 'reply', id, result });
+    if (id && !replaying) {
+      if (sink.length && result && typeof result === 'object') result.print = (result.print || []).concat(sink.splice(0));
+      parentPort.postMessage({ type: 'reply', id, result });
+    }
   }
 
   // Serve commands until one resumes the game (run / continue / restart).
@@ -446,6 +488,7 @@ function gameWorker() {
         const cmd = replayQueue.shift();
         if (!replayQueue.length) replayQueue = null;
         if (cmd.op === 'run' || cmd.op === 'continue') { startRun({ ...cmd, id: null }); return; }
+        if (cmd.op === 'js') { if (startScript({ ...cmd, id: null }) === RUNNING) return; continue; }
         execute(cmd);
         continue;
       }
@@ -477,9 +520,106 @@ function gameWorker() {
           return;
         }
         if (cmd.op === 'restart' || cmd.op === 'restore') throw new Restart(JSON.stringify(cmd));
+        if (cmd.op === 'js') {
+          const r = startScript(cmd);
+          if (r === RUNNING) return;
+          reply(cmd.id, r);
+          continue;
+        }
         reply(cmd.id, execute(cmd));
       }
     }
+  }
+
+  // A JS script (gameapi.mjs): runs now; if it yields frames, the game runs
+  // until it finishes (or --max frames) and the reply comes then. wait:false
+  // leaves it running in the background (free play, later runs).
+  function startScript(cmd) {
+    if (!replaying) log.push(cmd);
+    let task;
+    serving = true;
+    try {
+      reloadLib();
+      const fnc = g.compile(cmd.code);
+      task = g.spawn(fnc, { name: cmd.name || 'js' });
+    } catch (e) {
+      return { error: String(e && e.stack || e) };
+    } finally { serving = false; }
+    if (task.done) return scriptResult(task);
+    if (cmd.wait === false) return { started: true, frame: frameNo, tasks: g.tasks.length };
+    run = { id: cmd.id, steps: [], index: 0, left: 0, script: task, max: cmd.max ?? 72000 };
+    stop = null;
+    return RUNNING;
+  }
+
+  function scriptResult(t) {
+    if (t.error) return { ...status(), error: errorText(t.error) };
+    return { ...status(), value: g.format(t.result, 1) };
+  }
+
+  // An error with only the script's own frames: "at script (line 3)", "at walkTo (lib/walk.js:12)".
+  function errorText(e) {
+    const lines = String(e && e.stack || e).split('\n');
+    const keep = [lines[0]];
+    for (const l of lines.slice(1)) {
+      const m = l.match(/at (\S+) .*<anonymous>:(\d+):\d+\)?$/);
+      if (m) keep.push(`    at ${m[1]} (${m[1] === 'script' ? 'line ' + (Number(m[2]) - 4) : 'lib line ' + (Number(m[2]) - 2)})`);
+    }
+    return keep.join('\n');
+  }
+
+  let libStamp = '';
+  function reloadLib() {
+    if (!fs.existsSync(LIB)) return;
+    const files = fs.readdirSync(LIB).filter((f) => f.endsWith('.js')).sort();
+    const stamp = files.map((f) => f + fs.statSync(path.join(LIB, f)).mtimeMs).join();
+    if (stamp === libStamp && g.libLoaded) return;
+    libStamp = stamp;
+    for (const k of Object.keys(g.lib)) delete g.lib[k];
+    g.loadLib(Object.fromEntries(files.map((f) => [f, fs.readFileSync(path.join(LIB, f), 'utf8')])));
+    g.libLoaded = true;
+  }
+
+  function runSnippet(wasm) {
+    const text = [];
+    const mod = new WebAssembly.Module(wasm);
+    const env = { memory: mem, port_icall: ex.port_icall,
+      agent_print: (p, n) => text.push(Buffer.from(u8().slice(p, p + n)).toString('latin1')) };
+    for (const k of Object.keys(ex)) if (k.startsWith('port_bus_')) env[k] = ex[k];
+    const inst = new WebAssembly.Instance(mod, { env });
+    try {
+      return { output: text, result: inst.exports.snippet_main() >>> 0 };
+    } catch (e) {
+      throw new Error(String(e && e.message || e) + (text.length ? '\n' + text.join('') : ''));
+    }
+  }
+
+  // Host features for scripts in the daemon (the browser page has its own).
+  function extendGame() {
+    Object.assign(g, {
+      status,
+      story,
+      shot(file) {
+        const p = path.resolve(ROOT, file || path.join(STATE_DIR, 'shot.png'));
+        fs.writeFileSync(p, png(rgba555(new Uint16Array(mem.buffer, lastPixels, 240 * 160)), 240, 160));
+        return p;
+      },
+      // C in the game from JS: g.c('print("%d\\n", gMain.state);') -> r0 of snippet_main
+      c(code, includes = []) {
+        let out;
+        try {
+          out = execFileSync('python3', [path.join(ROOT, 'port/agent/snippet.py'), '--path',
+            ...includes.flatMap((h) => ['-i', h])], { input: code, cwd: ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+        } catch (e) {
+          throw new Error('C snippet: ' + String(e.stderr || e.message).trim());
+        }
+        const r = runSnippet(fs.readFileSync(out));
+        if (r.output.length) sink.push(r.output.join('').replace(/\n$/, ''));
+        return r.result;
+      },
+      callproc(id, ...args) { callproc(id, args); },
+      write_file(file, text) { const p = path.resolve(ROOT, file); fs.writeFileSync(p, text); return p; },
+    });
   }
 
   function startRun(cmd) {
@@ -538,19 +678,12 @@ function gameWorker() {
       }
       case 'snippet': {
         hs('suspend', cmd.trace ? 0 : 1);
-        const text = [];
-        const mod = new WebAssembly.Module(Buffer.from(cmd.wasm, 'base64'));
-        const env = { memory: mem, port_icall: ex.port_icall,
-          agent_print: (p, n) => text.push(Buffer.from(u8().slice(p, p + n)).toString('latin1')) };
-        for (const k of Object.keys(ex)) if (k.startsWith('port_bus_')) env[k] = ex[k];
-        const inst = new WebAssembly.Instance(mod, { env });
-        let result;
         try {
-          result = inst.exports.snippet_main() >>> 0;
+          const r = runSnippet(Buffer.from(cmd.wasm, 'base64'));
+          return { output: r.output.join(''), result: r.result };
         } catch (e) {
-          return { error: String(e && e.message || e), output: text.join('') };
+          return { error: String(e && e.message || e) };
         }
-        return { output: text.join(''), result };
       }
       case 'break': {
         const b = breaks.get(cmd.address) || { enter: false, exit: false };
@@ -642,6 +775,8 @@ function gameWorker() {
       case 'setvar': writeVar(cmd, cmd.value); return story();
       case 'story': return story();
       case 'pause': return status();
+      case 'hooks': return { hooks: g.hooks(), tasks: g.tasks.map((t) => ({ name: t.name, wait: t.wait && Object.keys(t.wait)[0] })) };
+      case 'unhook': g.off(cmd.hook); if (cmd.tasks) g.tasks.splice(0); return { hooks: g.hooks() };
       case 'checkpoints':
         return { checkpoints: [...checkpoints].map(([name, c]) => ({ name, frame: c.frame, commands: c.log.length })) };
       default:
@@ -660,6 +795,10 @@ function gameWorker() {
     ex.port_game_set_solar(solar);
     hookState = ex.port_hook_state();
     flags = ex.port_hook_flags();
+    if (fs.existsSync(typesPath)) types = JSON.parse(fs.readFileSync(typesPath, 'utf8'));
+    g = createGame({ memory: mem, exports: ex, types, print: (s) => { if (sink.length < 5000) sink.push(s); }, refresh: () => refreshFlags() });
+    extendGame();
+    libStamp = '';
     let saveSize = 0;
     if (currentSave) {
       u8().set(currentSave, ex.port_game_save_stage());

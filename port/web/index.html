@@ -33,6 +33,33 @@
   kbd { background: var(--panel); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px;
         padding: 0 6px; color: var(--text); font: 12px ui-monospace, monospace; }
   #log { margin-top: 14px; color: var(--muted); font: 12px ui-monospace, monospace; white-space: pre-wrap; }
+  .screen { container-type: inline-size; }
+  #boxes { position: absolute; inset: 0; pointer-events: none; }
+  #boxes.on { pointer-events: auto; cursor: crosshair; }
+  #subtitle { position: absolute; display: none; box-sizing: border-box; padding: .5cqw 1.6cqw;
+              background: rgb(14, 18, 40); border: .35cqw solid #8fa3d9; border-radius: 1cqw;
+              color: #f4f1ea; font: 500 3.1cqw/1.3 system-ui, sans-serif; white-space: pre-line; overflow: hidden;
+              text-shadow: 0 .2cqw 0 #000; }
+  #subtitle .speaker { color: var(--accent); font-weight: 650; }
+  #caption { min-height: 1.4em; margin-top: 8px; font-size: 17px; white-space: pre-line; text-align: center; }
+  #caption .speaker { color: var(--accent); font-weight: 650; }
+  #studio { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 14px; }
+  #studio[hidden] { display: none; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .tabs button { font: inherit; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 4px 12px; cursor: pointer; }
+  .tabs button.active { color: var(--text); background: var(--panel); border-color: var(--accent); }
+  .tabs .spacer { flex: 1; }
+  .pane { margin-top: 10px; }
+  .pane[hidden] { display: none; }
+  .mono { font: 12px/1.45 ui-monospace, monospace; }
+  #console-out { background: #0f1115; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; height: 280px;
+                 overflow: auto; white-space: pre-wrap; word-break: break-word; }
+  #console-out .in { color: var(--accent); }
+  #console-out .err { color: var(--bad); }
+  textarea { width: 100%; box-sizing: border-box; background: #0f1115; color: var(--text); border: 1px solid var(--line);
+             border-radius: 6px; padding: 8px 10px; resize: vertical; }
+  #watch-values div, #tasks-out div { padding: 2px 0; border-bottom: 1px solid #22252c; white-space: pre-wrap; }
+  .muted { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -43,6 +70,8 @@
   </header>
   <div class="screen">
     <canvas id="screen" width="240" height="160"></canvas>
+    <canvas id="boxes" width="960" height="640"></canvas>
+    <div id="subtitle"></div>
     <div id="overlay">
       <div>
         <p id="overlay-text">Loading the game…</p>
@@ -53,6 +82,7 @@
       </div>
     </div>
   </div>
+  <div id="caption"></div>
   <div class="controls">
     <label>Start from <select id="save-select"></select></label>
     <label>Sunlight <input type="range" id="sun" min="0" max="255" value="23"> <span id="sun-value"></span></label>
@@ -67,6 +97,39 @@
     <span><kbd>Backspace</kbd> Select</span><span><kbd>Space</kbd> fast-forward (hold)</span><span><kbd>P</kbd> pause</span>
   </div>
   <div id="log"></div>
+  <section id="studio" hidden>
+    <div class="tabs">
+      <button data-tab="console" class="active">Console</button>
+      <button data-tab="watch">Watch</button>
+      <button data-tab="tasks">Tasks</button>
+      <button data-tab="inspect">Inspect</button>
+      <span class="spacer"></span>
+      <label class="muted">Subtitles <select id="subs"><option value="overlay">over the text box</option><option value="below">below the game</option><option value="off">off</option></select></label>
+    </div>
+    <div class="pane" id="pane-console">
+      <div id="console-out" class="mono"><span class="muted">JavaScript in the running game (port/agent/README.md). Try:
+  $.gPlayers[0].position          typed views of every global
+  $.gPlayers[0].position.x += 64  writes go to the game
+  g.fn.Script_Call(945, 0)        call any game function
+  g.on('Text_LookupString', a => print(a[0]))   hook a function
+  yield* walkTo(1700, 2600)       skills from port/agent/lib
+  tasks()                         every running task
+Enter runs, Shift+Enter adds a line, ↑ recalls.</span>
+</div>
+      <textarea id="console-in" class="mono" rows="2" placeholder="where()"></textarea>
+    </div>
+    <div class="pane" id="pane-watch" hidden>
+      <textarea id="watch-in" class="mono" rows="4">where()
+$.gPlayers[0].statusFlags
+$.gOamCount</textarea>
+      <div class="mono" id="watch-values"></div>
+    </div>
+    <div class="pane" id="pane-tasks" hidden><div class="mono" id="tasks-out"></div></div>
+    <div class="pane" id="pane-inspect" hidden>
+      <label><input type="checkbox" id="inspect-on"> Outline sprites: blue = projected sprites (hover names the owner, click inspects), white = every OAM entry; Shift+click moves the player</label>
+      <pre class="mono" id="inspect-out"></pre>
+    </div>
+  </section>
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
@@ -149,7 +212,7 @@ async function boot(rom) {
     try { save = await fetchBytes('saves/' + encodeURIComponent(choice)); } catch (e) { save = null; }
   }
   const wasm = await fetchBytes('game.wasm');
-  worker = new Worker('worker.js');
+  worker = new Worker('worker.js', { type: 'module' });
   worker.onmessage = (e) => {
     const m = e.data;
     if (m.type === 'frame') {
@@ -168,13 +231,196 @@ async function boot(rom) {
       $('overlay').hidden = true;
     } else if (m.type === 'log') {
       log(m.text);
+    } else if (studioMessage(m)) {
+      // handled by the studio
     } else if (m.type === 'fatal') {
       status('Stopped: ' + m.text, true);
       log(m.text);
     }
   };
-  worker.postMessage({ wasm, rom, save, controlBuffer: control.buffer, audioBuffer }, [wasm]);
+  worker.postMessage({ wasm, rom, save, controlBuffer: control.buffer, audioBuffer, mailboxBuffer: mailboxBuffer }, [wasm]);
 }
+
+// ---- studio: the game's state from JavaScript (port/agent/gameapi.mjs) ----
+const mailboxBuffer = new SharedArrayBuffer(8 + 262144);
+const mailbox = new Int32Array(mailboxBuffer, 0, 2), mailBytes = new Uint8Array(mailboxBuffer, 8);
+const outbox = [], waiting = new Map();
+let requestId = 1, strings = { en: {}, jp: {} }, textBounds = [1, 13, 28, 6];
+function pump() {
+  while (outbox.length && !Atomics.load(mailbox, 0)) {
+    const data = new TextEncoder().encode(JSON.stringify(outbox.shift()));
+    mailBytes.set(data.subarray(0, mailBytes.length));
+    Atomics.store(mailbox, 1, data.length);
+    Atomics.store(mailbox, 0, 1);
+  }
+  if (outbox.length) setTimeout(pump, 4);
+}
+function request(req) {
+  return new Promise((resolve) => { req.id = requestId++; waiting.set(req.id, resolve); outbox.push(req); pump(); });
+}
+// window.game: the same API from DevTools or a browser-driving agent.
+window.game = {
+  js: async (code) => { const r = await request({ op: 'js', code }); return r.pending ? new Promise((res) => waiting.set(r.id, res)).then((x) => x.error || x.value) : (r.error || r.value); },
+  request,
+};
+
+function studioMessage(m) {
+  if (m.type === 'reply') {
+    const w = waiting.get(m.id);
+    if (w) { if (!m.pending) waiting.delete(m.id); else waiting.set(m.id, (x) => consoleResult(x)); w(m); }
+    return true;
+  }
+  if (m.type === 'studio') { $('studio').hidden = !m.ready; if (m.ready) { setSubtitles(); sendWatches(); } return true; }
+  if (m.type === 'print') { consoleLine(m.text); return true; }
+  if (m.type === 'watch') { $('watch-values').replaceChildren(...m.values.map((v, i) => Object.assign(document.createElement('div'), { textContent: `${watchExprs[i]}  →  ${v}` }))); return true; }
+  if (m.type === 'text') { showText(m.id); return true; }
+  if (m.type === 'text-clear') { showText(null); return true; }
+  if (m.type === 'text-bounds') { textBounds = m.bounds; return true; }
+  if (m.type === 'boxes') { drawBoxes(m); return true; }
+  return false;
+}
+
+// tabs
+let activeTab = 'console';
+for (const b of document.querySelectorAll('.tabs button[data-tab]')) {
+  b.onclick = () => {
+    activeTab = b.dataset.tab;
+    for (const x of document.querySelectorAll('.tabs button[data-tab]')) x.classList.toggle('active', x === b);
+    for (const p of document.querySelectorAll('.pane')) p.hidden = p.id !== 'pane-' + activeTab;
+  };
+}
+
+// console
+const cmdHistory = [];
+let historyAt = 0;
+function consoleLine(text, cls) {
+  const out = $('console-out');
+  const el = document.createElement('div');
+  if (cls) el.className = cls;
+  el.textContent = text;
+  out.append(el);
+  out.scrollTop = out.scrollHeight;
+}
+function consoleResult(r) {
+  if (r.pending) { consoleLine('… running (the reply comes when the script finishes)', 'muted'); return; }
+  if (r.error) consoleLine(r.error, 'err'); else if (r.value) consoleLine(r.value);
+}
+$('console-in').addEventListener('keydown', async (e) => {
+  e.stopPropagation(); // typing is not game input
+  const box = e.target;
+  if (e.key === 'ArrowUp' && !box.value.includes("\n") && cmdHistory.length) { historyAt = Math.max(0, historyAt - 1); box.value = cmdHistory[historyAt]; e.preventDefault(); return; }
+  if (e.key === 'ArrowDown' && !box.value.includes("\n") && cmdHistory.length) { historyAt = Math.min(cmdHistory.length, historyAt + 1); box.value = cmdHistory[historyAt] || ''; e.preventDefault(); return; }
+  if (e.key !== 'Enter' || e.shiftKey) return;
+  e.preventDefault();
+  const code = box.value.trim();
+  if (!code) return;
+  cmdHistory.push(code); historyAt = cmdHistory.length;
+  box.value = '';
+  consoleLine('> ' + code, 'in');
+  consoleResult(await request({ op: 'js', code }));
+});
+for (const id of ['watch-in']) $(id).addEventListener('keydown', (e) => e.stopPropagation());
+
+// watch
+let watchExprs = [];
+function sendWatches() {
+  watchExprs = $('watch-in').value.split('\n').map((x) => x.trim()).filter(Boolean);
+  request({ op: 'watch', exprs: watchExprs });
+}
+$('watch-in').addEventListener('change', sendWatches);
+
+// tasks
+setInterval(async () => {
+  if (activeTab !== 'tasks' || $('studio').hidden || Atomics.load(control, 2)) return;
+  const r = await request({ op: 'tasks' });
+  $('tasks-out').replaceChildren(...(r.tasks || []).map((t) => Object.assign(document.createElement('div'),
+    { textContent: `${String(t.list).padStart(2)}  ${t.task}  id ${String(t.id).padStart(4)}  ${t.dead ? 'dead ' : ''}${t.update}` })));
+}, 1000);
+
+// subtitles
+function setSubtitles() {
+  const mode = $('subs').value;
+  request({ op: 'subtitles', on: mode !== 'off' });
+  showText(null);
+  if (mode !== 'off' && !Object.keys(strings.en).length) {
+    fetch('strings.json').then((r) => r.ok ? r.json() : null).then((s) => { if (s) strings = s; }).catch(() => {});
+  }
+}
+$('subs').onchange = setSubtitles;
+function fillText(el, text) {
+  const m = text.match(/^([^\n"「]{1,24}):\n([\s\S]*)$/);
+  if (m) { const sp = document.createElement('span'); sp.className = 'speaker'; sp.textContent = m[1] + '\n'; el.replaceChildren(sp, m[2]); }
+  else el.textContent = text;
+}
+function showText(id) {
+  const box = $('subtitle'), cap = $('caption');
+  const mode = $('subs').value;
+  const text = id === null ? null : strings.en[id];
+  box.style.display = 'none';
+  cap.textContent = '';
+  if (!text || mode === 'off') return;
+  if (mode === 'overlay') {
+    const [x, y, w, h] = textBounds;
+    Object.assign(box.style, { display: 'block', left: (x * 8 / 2.4) + '%', top: (y * 8 / 1.6) + '%', width: (w * 8 / 2.4) + '%', height: (h * 8 / 1.6) + '%' });
+    fillText(box, text);
+  } else fillText(cap, text);
+}
+
+// inspect: projected sprites with their owner task, OAM entries, world under the cursor
+let lastBoxes = [], lastOam = [], hover = null, cursor = null;
+const boxCanvas = $('boxes'), bctx = boxCanvas.getContext('2d');
+$('inspect-on').onchange = (e) => {
+  request({ op: 'inspect', on: e.target.checked });
+  boxCanvas.classList.toggle('on', e.target.checked);
+  if (!e.target.checked) { lastBoxes = []; lastOam = []; drawBoxes({ boxes: [], oam: [] }); }
+};
+function drawBoxes(m) {
+  bctx.clearRect(0, 0, 960, 640);
+  if (!$('inspect-on').checked) return;
+  lastBoxes = m.boxes || []; lastOam = m.oam || [];
+  bctx.lineWidth = 1;
+  bctx.strokeStyle = 'rgba(255, 255, 255, .22)';
+  for (const [x, y, w, h] of lastOam) bctx.strokeRect(x * 4 + .5, y * 4 + .5, w * 4 - 1, h * 4 - 1);
+  bctx.lineWidth = 2;
+  for (const b of lastBoxes) {
+    const on = hover === b.addr;
+    bctx.strokeStyle = on ? '#f2a33a' : 'rgba(120, 220, 255, .85)';
+    bctx.strokeRect(b.x * 4 + 1, b.y * 4 + 1, b.w * 4 - 2, b.h * 4 - 2);
+    if (on) {
+      bctx.fillStyle = 'rgba(242, 163, 58, .18)'; bctx.fillRect(b.x * 4, b.y * 4, b.w * 4, b.h * 4);
+      bctx.font = '600 22px system-ui'; bctx.fillStyle = '#f2a33a';
+      bctx.fillText(b.owner.replace(/_Update.*|_Tick.*|_On.*$/, ''), b.x * 4, Math.max(22, b.y * 4 - 6));
+    }
+  }
+}
+function screenPoint(e) {
+  const r = boxCanvas.getBoundingClientRect();
+  return [(e.clientX - r.left) / r.width * 240, (e.clientY - r.top) / r.height * 160];
+}
+function boxesAt(px, py) {
+  return lastBoxes.filter((b) => px >= b.x && px < b.x + b.w && py >= b.y && py < b.y + b.h).sort((a, b) => a.w * a.h - b.w * b.h);
+}
+boxCanvas.addEventListener('mousemove', (e) => { const [x, y] = screenPoint(e); const b = boxesAt(x, y)[0]; hover = b ? b.addr : null; });
+boxCanvas.addEventListener('click', async (e) => {
+  const [px, py] = screenPoint(e);
+  const sx = Math.floor(px), sy = Math.floor(py);
+  if (e.altKey || e.shiftKey) {
+    // move the player to the ground point under the cursor
+    const r = await request({ op: 'js', code: `const w = unproject(${sx}, ${sy}); const p = $.gPlayers[0]; if (p) { p.position.x = w.x; p.position.z = w.z; } w` });
+    $('inspect-out').textContent = 'moved the player to ' + (r.error || r.value);
+    return;
+  }
+  const hits = boxesAt(px, py);
+  const world = await request({ op: 'js', code: `unproject(${sx}, ${sy})` });
+  let text = `screen ${sx}, ${sy} · ground under the cursor (at the player's height): ${world.value || world.error}\n` +
+    'Shift+click moves the player there.\n';
+  if (!hits.length) text += '\nno projected sprite here (white outlines are OAM entries drawn by other paths)';
+  for (const b of hits) {
+    const r = await request({ op: 'js', code: `g.at(${b.addr}, 'struct SpriteDrawable')`, depth: 1 });
+    text += `\n${b.owner} (task ${b.task}) · sprite ${b.addr} · world ${b.world ? b.world.join(', ') : 'screen-space'}\n` + (r.error || r.value) + '\n';
+  }
+  $('inspect-out').textContent = text;
+});
 
 let romBytes = null;
 $('reset').onclick = () => romBytes && boot(romBytes.slice(0));

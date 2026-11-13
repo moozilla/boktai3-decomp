@@ -17,6 +17,16 @@ $P status                                  # frame, scene, player position, life
 Needs `build/port/game/game.wasm` (`python3 port/build_game.py`, or
 `start --build`) and `baserom.gba`. State lives under `build/port/agent/`.
 
+For anything longer than one step, write JavaScript: `js` runs a script in the
+game with typed access to every global, game functions by name, hooks, and
+`yield` to run frames. A loop that walks, waits for a text box and reads a
+struct is one tool call:
+
+```sh
+$P js 'yield* walkTo(1664, 2600); yield g.press("up", 20); return where()'
+$P js -f probe.js            # a file; `js -` reads stdin
+```
+
 ## Commands
 
 | Command | Does |
@@ -35,9 +45,71 @@ Needs `build/port/game/game.wasm` (`python3 port/build_game.py`, or
 | `checkpoint NAME`, `restore NAME`, `restart [--save F]` | deterministic replay points |
 | `play`, `pause` | free play at 60 fps; the viewer page takes the keyboard |
 | `sym REGEX/ADDR` | look up functions and data |
+| `js CODE`, `js -f FILE [--bg] [--max N]` | run JavaScript in the game (below) |
+| `hooks [--off ID/all]` | JS hooks and background scripts still installed |
 
 While stopped at a breakpoint every command works (read the arguments, call
 functions, run snippets) and `run`/`continue` resume from the breakpoint.
+
+## JavaScript
+
+`js` runs inside the game's worker (`gameapi.mjs`), at a frame boundary.
+Without `yield` it is a console: the last expression is the result. With
+`yield` it is a script that runs the game (`--max` frames at most, default
+72000; `--bg` returns at once and leaves it running).
+
+| | |
+|---|---|
+| `$.gPlayers[0].position.x` | typed globals: structs, arrays and pointers follow the game's headers; assignments write |
+| `g.at(addr, 'struct Task')`, `view.$cast('struct X')` | a typed view of any address |
+| `view.$show(depth)`, `view.$get()`, `view.$addr` | layout dump, plain object, address |
+| `g.fn.Script_Call(945, 0)`, `g.call(name or addr, ...)` | call a game function (r0 back) |
+| `g.u8/u16/u32/s16(addr[, value])`, `g.hex(addr, n)`, `g.bytes` | raw memory |
+| `g.name(addr)`, `g.addr(name)`, `g.find(regex)` | symbols |
+| `g.on(fn, (args, info) => ..., {exit, once})`, `g.off(id)` | a callback at every entry (args r0..r3) or exit ([result]) of a game function; return `'stop'` to stop there |
+| `yield N`, `yield g.press('down+b', N)`, `yield g.tap('a')` | run frames, holding keys |
+| `yield g.until(() => cond, max)` | run until a condition (checked every frame); true if it happened |
+| `yield g.untilCall('Fn', {exit})` | run until a function is entered; returns `{args, frame}` |
+| `yield* skill(...)` | a generator from the library (below) |
+| `g.c('C statements', ['player.h'])` | compile and run a C snippet from JS |
+| `g.shot(file)`, `g.status()`, `g.callproc(id, ...args)`, `print(...)` | daemon helpers |
+
+Hooks and background scripts stay installed across commands until `g.off()`
+or `hooks --off all`. Every `js` command is logged, so checkpoints replay
+scripts exactly.
+
+### Library
+
+`port/agent/lib/*.js` are skills every script sees by name; a file is a plain
+script that adds functions to `exports` (it is reread when it changes, so an
+agent can add a skill and use it in the next command). `core.js` has:
+
+| | |
+|---|---|
+| `where()` | frame, scene, life, player x/y/z |
+| `tasks()`, `taskOf(addr)` | every scheduler task with its update function; the task whose memory holds an address |
+| `drawables()` | projected sprites: screen box, world position, owner task |
+| `project(x, y, z)`, `unproject(sx, sy[, y])` | world ↔ screen (`SpriteOam_ProjectPosition`) |
+| `yield* walkTo(x, z)` | walk there with the d-pad (learns directions, sidesteps, reports `blocked` with no map) |
+| `message()`, `yield* advanceText()` | message window state (open, string id); press A until it closes |
+| `yield* continueSave()` | power-on → title → file select → Continue |
+| `yield* sprites()` | one frame of `Sprite_QueueFramePieces` calls with their OAM boxes |
+
+Types come from `gametypes.py`: each prepared header compiled with debug info,
+DWARF folded into `build/port/agent/types.json` (about 1400 types and 560
+typed globals; `start` rebuilds it when headers change).
+
+## In the browser
+
+`python3 port/serve.py` runs the same module and API in the page's game
+worker. Below the game, the Studio panel has a Console (the same JavaScript,
+at 60 fps; scripts that yield run alongside play), Watch (expressions updated
+every 10 frames), Tasks, and Inspect (outlines of projected sprites named by
+their owner task and of every OAM entry; click for the struct, Shift+click to
+move the player to the ground under the cursor). Subtitles draw the English
+line of the string the message window shows over the game's own text box,
+using the fan translation beside the checkout (`../boktai3trans`, as the
+studio does). From DevTools or a browser-driving agent: `await game.js('where()')`.
 
 ## C snippets
 
