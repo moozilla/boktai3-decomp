@@ -1,6 +1,5 @@
 #include "status_screen.h"
 #include "render.h"
-// MATCHING_CONCESSION: register-pinning
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y)
 {
@@ -106,8 +105,6 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
     int digits[2];
     s16 *dst;
     int row, col, n, base;
-    register int *values asm(
-        "ip"); // pin: values must be allocated before hours/minutes (AGBCC_PRI=values:+600), so it lands in ip
     u32 hours, minutes;
     struct StatusGameState *c = &gSunClock;
     if (!c)
@@ -148,14 +145,11 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
     digits[1] = hours - digits[0] * 10;
     dst = (s16 *)StatusScreen_GetTilePtr(0, 16, 15);
     row = 0;
-    values = digits;
     for (; row < 2; row++) {
-        int shift = row << 4;
-        int *digit = values;
-        s16 *out = dst;
         for (col = 0; col < 2; col++) {
-            int tile = *digit++ + 0x60;
-            *out++ = shift + tile | -12288;
+            s16 *out = dst + col;
+            int tile = digits[col] + 0x60;
+            *out = (row << 4) + tile | -12288;
         }
         dst += gBgRecords[0].width * 2;
     }
@@ -164,15 +158,12 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
     digits[1] = minutes - digits[0] * 10;
     dst = (s16 *)StatusScreen_GetTilePtr(0, 22, 15);
     row = 0;
-    values = digits;
     for (; row < 2;) {
         int next = row + 1;
-        int shift = row << 4;
-        int *digit = values;
-        s16 *out = dst;
         for (col = 0; col < 2; col++) {
-            int tile = *digit++ + 0x60;
-            *out++ = shift + tile | -12288;
+            s16 *out = dst + col;
+            int tile = digits[col] + 0x60;
+            *out = (row << 4) + tile | -12288;
         }
         dst += gBgRecords[0].width * 2;
         row = next;

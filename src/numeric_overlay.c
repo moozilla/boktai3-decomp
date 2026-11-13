@@ -9,13 +9,11 @@ u16 *NumericOverlay_GetTileMapPtr(u32 bg, u32 x, s32 y)
     return p + (t->width << 1) * y;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void sub_0800F4EC(struct NumericOverlay *unused)
 {
     int digits[2];
     s16 *dst;
     int row, col, n, base;
-    register int *values asm("ip");
     u32 hours, minutes;
     struct StatusGameState *c = &gSunClock;
     if (!c)
@@ -56,14 +54,11 @@ void sub_0800F4EC(struct NumericOverlay *unused)
     digits[1] = hours - digits[0] * 10;
     dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 16, 15);
     row = 0;
-    values = digits;
     for (; row < 2; row++) {
-        int shift = row << 4;
-        int *digit = values;
-        s16 *out = dst;
         for (col = 0; col < 2; col++) {
-            int tile = *digit++ + 0x60;
-            *out++ = shift + tile | -12288;
+            s16 *out = dst + col;
+            int tile = digits[col] + 0x60;
+            *out = (row << 4) + tile | -12288;
         }
         dst += gBgRecords[0].width * 2;
     }
@@ -72,15 +67,12 @@ void sub_0800F4EC(struct NumericOverlay *unused)
     digits[1] = minutes - digits[0] * 10;
     dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 22, 15);
     row = 0;
-    values = digits;
     for (; row < 2;) {
         int next = row + 1;
-        int shift = row << 4;
-        int *digit = values;
-        s16 *out = dst;
         for (col = 0; col < 2; col++) {
-            int tile = *digit++ + 0x60;
-            *out++ = shift + tile | -12288;
+            s16 *out = dst + col;
+            int tile = digits[col] + 0x60;
+            *out = (row << 4) + tile | -12288;
         }
         dst += gBgRecords[0].width * 2;
         row = next;

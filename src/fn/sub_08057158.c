@@ -26,13 +26,17 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
             particle++;
         } while (--i >= 0);
         {
-            register u32 sample asm("r2") = *frame;
+            u32 sample = *frame;
             u32 shifted;
             shifted = sample << 16;
-            if ((shifted >> 16) <= 63 && !(sample & 3)) {
-                shifted >>= 18;
-                shifted &= 7;
-                LevelAdvanceDisplay_StartParticle(&manager->particles[shifted]);
+            if ((shifted >> 16) <= 63) {
+                u32 low = 3;
+                low &= sample;
+                if (!low) {
+                    shifted >>= 18;
+                    shifted &= 7;
+                    LevelAdvanceDisplay_StartParticle(&manager->particles[shifted]);
+                }
             }
         }
         {
@@ -103,22 +107,25 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
             if (timer <= 19) {
                 const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
                 u32 *randomIndex = &gRandomIndex;
-                register u32 index asm("r1") = *randomIndex + 1;
+                u32 index = *randomIndex + 1;
                 u32 mask = 1023;
                 u32 rangeMask;
+                u32 *cursor;
                 s32 value;
-                register u32 coordinate asm("r0");
                 index &= mask;
-                value = table[index];
-                coordinate = (u16)manager->sprite.position.world.x;
-                coordinate -= 15;
-                rangeMask = 31;
-                value &= rangeMask;
-                manager->sprite.position.world.x = coordinate + value;
+                cursor = &index;
+                value = table[*cursor];
+                {
+                    u32 coordinate = (u16)manager->sprite.position.world.x;
+                    coordinate -= 15;
+                    rangeMask = 31;
+                    value &= rangeMask;
+                    manager->sprite.position.world.x = coordinate + value;
+                }
                 index = (index + 1) & mask;
                 {
                     s32 verticalSample = table[index];
-                    coordinate = (u16)manager->sprite.position.world.y;
+                    u32 coordinate = (u16)manager->sprite.position.world.y;
                     coordinate -= 15;
                     verticalSample &= rangeMask;
                     manager->sprite.position.world.y = coordinate + verticalSample;
@@ -127,7 +134,7 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
                 *randomIndex = index;
                 {
                     s32 lastValue = table[index];
-                    coordinate = (u16)manager->sprite.position.world.z;
+                    u32 coordinate = (u16)manager->sprite.position.world.z;
                     coordinate -= 15;
                     lastValue &= rangeMask;
                     manager->sprite.position.world.z = coordinate + lastValue;

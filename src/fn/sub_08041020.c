@@ -6,18 +6,20 @@ extern const u8 gUnk_086058C8[];
 void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
 {
     const u8 *text = 0;
-    const u8 *source;
-    register s32 index asm("r4");
     register s32 categoryValue asm("r1");
     s32 itemValue;
     const u8 **sourceLocation;
     switch (menu->state) {
-        case 0:
-            source = menu->textSources[0];
-            index = menu->mode;
-            goto lookup;
+        case 0: {
+            const u8 *source = menu->textSources[0];
+            s32 index = menu->mode;
+            text = Text_LookupString(Script_ParseStringRef(source) + index);
+            break;
+        }
         case 1:
             if (menu->mode == 0) {
+                s32 index;
+                const u8 *source;
                 s8 *category = &menu->choice.cursor.category;
                 s8 *item;
                 s32 categoryArg = *category;
@@ -34,7 +36,8 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
                 sourceLocation = table;
                 index = *item;
                 source = *sourceLocation;
-                goto lookup;
+                text = Text_LookupString(Script_ParseStringRef(source) + index);
+                break;
             }
             if (menu->mode == 1) {
                 s8 *category = &menu->choice.cursor.category;
@@ -65,11 +68,11 @@ void ModifierMenu_UpdateDescription(struct ModifierMenu *menu)
                     categoryValue = *category;
                     itemValue = *item;
                     sourceLocation = &menu->textSources[12];
-                groupLookup:
-                    source = *sourceLocation;
-                    index = categoryValue * 3 * 2 + itemValue;
-                lookup:
+                groupLookup: {
+                    const u8 *source = *sourceLocation;
+                    s32 index = categoryValue * 3 * 2 + itemValue;
                     text = Text_LookupString(Script_ParseStringRef(source) + index);
+                }
                 } else
                     text = Text_LookupString(Script_ParseStringRef(menu->textSources[0]) + 6);
             }

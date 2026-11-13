@@ -30,7 +30,7 @@ void ModifierMenu_LoadSavedSelection(struct ModifierMenu *menu)
         s16 *row;
         register s32 id asm("r0");
         row = (s16 *)(i * 2 + (u32)state);
-        id = *(s16 *)((u8 *)row + (u32) & ((struct GameState *)0)->modifierIdsBytes);
+        id = ((s16 *)((struct GameState *)row)->modifierIdsBytes)[0];
         if (id >= 0) {
             s32 argument = id;
             Modifier_AddSelection(pending, argument);

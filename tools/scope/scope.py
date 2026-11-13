@@ -329,9 +329,13 @@ def kref(wd, func, x):
 
 
 def resolve_knobs(src, func, env):
-    """AGBCC_PRI / AGBCC_FORCE may name pseudos by C variable (`table:+214`): compile once without them to
-    learn the numbers, then substitute."""
+    """Resolve C variable names in pseudo knobs after one unknobbed compile."""
     env = dict(env or {})
+    # Unprefixed diagnostic names otherwise reach the compiler as unrelated
+    # environment variables, producing a plausible but unchanged comparison.
+    for key in ("FORCE", "PRI", "NOTIE", "COMBKEEP", "NOEQUIV", "NOREG", "MOVE"):
+        if key in env:
+            sys.exit(f"{key}: use AGBCC_{key}; unprefixed knobs have no effect")
     # A knob set in the environment (`AGBCC_NOEQUIV=36 scope.py FILE.c`) reaches the -g compile through
     # os.environ, but the fork server's compile only sees the knobs passed with each request: copy them all
     # into ENV, so the build's (no -g) bytes get them too. Without this the plain compile ran without the
@@ -357,7 +361,9 @@ def resolve_knobs(src, func, env):
                 sys.exit(f"AGBCC_FORCE: unknown register {reg!r}")
             entries.append(f"{pseudo}:{reg}")
         env["AGBCC_FORCE"] = ",".join(entries)
-    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
+    pseudo_knobs = ("AGBCC_PRI", "AGBCC_FORCE", "AGBCC_COMBKEEP", "AGBCC_NOEQUIV",
+                    "CSE_KEEP", "CSE_NOCANON")
+    keys = [k for k in pseudo_knobs if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
     if not keys:
         return env
     saved = {k: os.environ.pop(k) for k in keys if k in os.environ}
@@ -370,13 +376,13 @@ def resolve_knobs(src, func, env):
     for p, n in pseudo_names(wd, func).items():
         rev.setdefault(n, []).append(p)
     def sub(tok):
-        name, rest = tok.split(":", 1)
+        name, separator, rest = tok.partition(":")
         if name.isdigit():
             return tok
         if len(rev.get(name, [])) != 1:
             sys.exit(f"{name}: " + (f"names pseudos {rev[name]}; use a number" if name in rev else
                                      f"no pseudo by that name (known: {', '.join(sorted(rev))[:300]})"))
-        return f"{rev[name][0]}:{rest}"
+        return f"{rev[name][0]}{separator}{rest}"
     out = dict(env, **{k: ",".join(sub(t) for t in env[k].split(",")) for k in keys})
     print("  knobs: " + " ".join(f"{k}={out[k]}" for k in keys), file=sys.stderr)
     return out

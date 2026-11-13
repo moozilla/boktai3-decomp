@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct TextVm {
     u8 x, y, left, top, width, height, palette, style, entered, mode, skip, busy, previousMode,
@@ -92,30 +93,24 @@ extern const u8 gUnk_0824DE40[]; /* /UVMOJI */
 extern const u8 gUnk_0824DE48[]; /* /LABEL */
 extern const u8 gUnk_0824DE50[]; /* /PAREN */
 extern const u8 gUnk_0824DE58[]; /* /ALTER */
-// MATCHING_CONCESSION: register-pinning
 const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
 {
     const u8 *end = s;
     int value;
     int cmp;
-    int paletteValue;
-    const u8 *findPtr;
-    register struct TextVm *pushP asm("r0");
-    int pushStyle;
     if (*s == '/')
         goto close;
     if (!Text_ComparePrefix(s, gUnk_0824DC80, 6)) {
-        paletteValue = 1;
-        goto palette;
+        p->palette = 1;
+        goto findS;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DC88, 6)) {
-        paletteValue = 2;
-        goto palette;
+        p->palette = 2;
+        goto findS;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DC90, 6)) {
-        paletteValue = 2;
-        asm("" : "+r"(paletteValue));
-        goto palette;
+        p->palette = 2;
+        goto findS;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DC98, 4)) {
         end = TextState_ParseTagValue(p, s);
@@ -141,15 +136,16 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
     if (!Text_ComparePrefix(s, gUnk_0824DCA8, 4)) {
         p->streams[0] = PlayerName_GetBuffer();
         TextState_PushStream(p, 1);
-        findPtr = s;
-        goto findAdvanceCall;
+        end = Text_FindChar(s, '>');
+        p->advance = 1;
+        goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DCB0, 4)) {
         p->streams[3] = GameState_GetBikeName();
         TextState_PushStream(p, 4);
-        findPtr = s;
-        asm("" : "+r"(findPtr));
-        goto findAdvanceCall;
+        end = Text_FindChar(s, '>');
+        p->advance = 1;
+        goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DCB8, 5)) {
         const u8 *name;
@@ -299,8 +295,8 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
             p->previousMode = one;
             p->mode = zero;
         }
-        findPtr = end;
-        goto findEndCall;
+        end = Text_FindChar(end, '>');
+        goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DDD4, 7)) {
         p->selection = -1;
@@ -321,16 +317,11 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
             value = Text_ParseDecimal(p->text, p->length);
         else
             value = 0;
-        {
-            u32 index = value << 2;
-            register const u8 **slot asm("r0");
-            slot = p->strings;
-            slot = (const u8 **)((u8 *)slot + index);
-            p->streams[2] = *slot;
-        }
-        pushP = p;
-        pushStyle = 3;
-        goto push;
+        p->streams[2] = p->strings[value];
+        TextState_PushStream(p, 3);
+        end = Text_FindChar(end, '>');
+        p->advance = 1;
+        goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DDEC, 5)) {
         end = TextState_ParseTagValue(p, end);
@@ -350,22 +341,10 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
         else
             number = 0;
         buffer = p->numberText;
-        {
-            u32 index = number << 2;
-            s32 *slot;
-            slot = p->numbers;
-            slot = (s32 *)((u8 *)slot + index);
-            Text_FormatDecimal(buffer, *slot);
-        }
+        Text_FormatDecimal(buffer, p->numbers[number]);
         p->streams[1] = buffer;
-        pushP = p;
-        pushStyle = 2;
-    push:
-        TextState_PushStream(pushP, pushStyle);
-    findAdvance:
-        findPtr = end;
-    findAdvanceCall:
-        end = Text_FindChar(findPtr, '>');
+        TextState_PushStream(p, 2);
+        end = Text_FindChar(end, '>');
         p->advance = 1;
         goto done;
     }
@@ -395,26 +374,28 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
             TextState_PlayGlyphSound(p, 91);
             TextState_DrawNarrowGlyph(p, 59);
         }
-        findPtr = end;
-        asm("" : "+r"(findPtr));
-        goto findEndCall;
+        end = Text_FindChar(end, '>');
+        goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DE28, 5)) {
         p->palette = 1;
-        findPtr = end;
-        goto findEndCall;
+        end = Text_FindChar(end, '>');
+        goto done;
     }
     goto done;
 close:
-    value = Text_ComparePrefix(s, gUnk_0824DE30, 7);
-    if (!value)
-        goto paletteClose;
-    value = Text_ComparePrefix(s, gUnk_0824DE38, 7);
-    if (!value)
-        goto paletteClose;
-    value = Text_ComparePrefix(s, gUnk_0824DE40, 7);
-    if (!value)
-        goto paletteClose;
+    if (!Text_ComparePrefix(s, gUnk_0824DE30, 7)) {
+        p->palette = 0;
+        goto findS;
+    }
+    if (!Text_ComparePrefix(s, gUnk_0824DE38, 7)) {
+        p->palette = 0;
+        goto findS;
+    }
+    if (!Text_ComparePrefix(s, gUnk_0824DE40, 7)) {
+        p->palette = 0;
+        goto findS;
+    }
     if (!Text_ComparePrefix(s, gUnk_0824DE48, 6)) {
         p->busy = 0;
         p->mode = p->previousMode;
@@ -427,19 +408,11 @@ close:
         }
         goto findS;
     }
-    value = Text_ComparePrefix(s, gUnk_0824DE58, 6);
-    if (value)
+    if (Text_ComparePrefix(s, gUnk_0824DE58, 6))
         goto done;
-paletteClose:
-    p->palette = value;
-    goto findS;
-palette:
-    p->palette = paletteValue;
+    p->palette = 0;
 findS:
-    findPtr = s;
-    goto findEndCall;
-findEndCall:
-    end = Text_FindChar(findPtr, '>');
+    end = Text_FindChar(s, '>');
 done:
     if (!p->allowRun)
         p->advance = 1;

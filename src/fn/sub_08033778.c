@@ -73,10 +73,9 @@ found:
         nextSlot = initial;
     }
     if (next) {
-        u32 offset = 0x1C8;
         register struct TextWindow **link asm("r2");
-        link = (struct TextWindow **)((u8 *)next + offset);
-        prevSlot = (struct TextWindow **)((u8 *)w + offset);
+        link = &next->previous;
+        prevSlot = &w->previous;
         *link = *prevSlot;
     } else {
         prevSlot = &w->previous;
