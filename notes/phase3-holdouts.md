@@ -1447,3 +1447,43 @@ probe finds no single decision improving the best draft. Next: preserve a typed
 table base as a distinct address through combine without extending its lifetime
 across other arms; inspect why the raw and indexed forms change category's
 local/global quantity split before revisiting scalar table casts.
+
+
+### ModifierMenu_LoadSavedSelection (08041C30): row address and call argument
+
+Tags: #menus #matching #compiler
+
+Landed typed modifierIdsBytes access in place of raw member-offset arithmetic;
+the unit remains MATCH at 224 bytes with its two existing pins.
+Best ordinary draft: `notes/phase3-drafts/dp-menus/ModifierMenu_LoadSavedSelection.c`,
+8 ROM / 6 draft instructions, 220 bytes. The ROM loads state in r0, shifts the
+index into r1, keeps the row address in r1, then loads the signed ID into r0 and
+copies it into call argument r1 before setting argument r0. The draft ties the
+row address to state in r0 and gives ID its call-preferred r1, deleting that copy.
+
+Allocation evidence: row-field insns 165 and 171 tie the row/address chain.
+`AGBCC_NOTIE=165,171 AGBCC_FORCE=83:0,87:1,85:1,91:1,88:0` reduces the difference
+to three instructions: commuted add operands and the argument-copy order. This
+is NOT an exact or semantically valid counterfactual: forcing ID into r0 leaves
+its argument copy after the pending argument overwrites r0. The existing hard
+pin influences expand_call early enough to protect that value; a late allocation
+force does not. No complete matching knob was found. The cse/PRE/loop probe has
+no improving decision. Read local-alloc.c's quantity tying/forced allocation and
+global.c's find_reg preference logic. Scope initially accepted abbreviated knob
+keys without applying them; those calls are discarded, and the tool now rejects
+such keys with the correct spelling.
+
+Tried direct indexed halfword access, state-relative typed rows, index-first and
+offset-first sums, narrow and unsigned ID variables, halfword arrays, full-word
+and halfword union views, a pointer union, repeated ID loads, typed getter and
+add-selection inlines, whole-loop inlines with void/nonvoid result, casts and a
+narrow parameter declaration, continue/goto/while/preincrement loops, and a
+nonvoid outer signature. None improves the best ordinary draft. Restoring either
+existing pin alone does not match. Keeping both pins allows the typed field
+cleanup. Explicit goto rotation changes code placement; narrow/union forms are
+optimized back to the same quantities.
+
+Persistent store: `build/matchsearch/ModifierMenu_LoadSavedSelection`. Next: a
+meaningful value boundary that makes expand_call precompute the signed ID before
+placing pending in r0, together with a row-address form that ties to the scaled
+index instead of state. A late forced register is insufficient evidence here.
