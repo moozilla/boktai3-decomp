@@ -375,6 +375,54 @@ static int rtc_sdk_oracle(struct mCore *core)
     return 0;
 }
 
+static int bios_layout_oracle(struct mCore *core)
+{
+    struct ObjWire { struct ObjAffineSrcData transform; uint16_t reserved; } source[4];
+    static const unsigned strides[] = {2,8,32};
+    static const uint32_t offsets[] = {0,3,0x80000003};
+    uint8_t actual[520];
+    unsigned i, j, stride, source_bits, dest_bits, offset, cases = 0;
+    _Static_assert(sizeof(struct ObjWire) == 8, "BIOS object affine wire stride");
+    for (i = 0; i < 4; ++i) {
+        source[i].transform.xScale = (int16_t)(256 + i * 64);
+        source[i].transform.yScale = (int16_t)(512 - i * 32);
+        source[i].transform.rotation = (uint16_t)(i << 14);
+        source[i].reserved = 0x1234;
+    }
+    for (i = 0; i < sizeof(source); ++i) core->busWrite8(core, 0x02000000 + i, ((uint8_t *)source)[i]);
+    for (stride = 0; stride < 3; ++stride) {
+        for (i = 0; i < sizeof(actual); ++i) { actual[i] = 0xa5; core->busWrite8(core, 0x02001000 + i, 0xa5); }
+        ObjAffineSet(&source[0].transform, actual + 6, 4, (int32_t)strides[stride]);
+        swi(core, 15, 0x02000000, 0x02001006, 4, strides[stride]);
+        for (i = 0; i < sizeof(actual); ++i) if (actual[i] != core->busRead8(core, 0x02001000 + i)) {
+            fprintf(stderr, "Object affine stride %u byte %u differs\n", strides[stride], i); return 1;
+        }
+        ++cases;
+    }
+    for (source_bits = 1; source_bits <= 8; source_bits *= 2)
+    for (dest_bits = source_bits; dest_bits <= 32; dest_bits *= 2)
+    for (offset = 0; offset < 3; ++offset) {
+        uint8_t input[] = {0,1,2,3,0xa5,0x80,0xff,0x11};
+        uint8_t info[8] = {8,0,(uint8_t)source_bits,(uint8_t)dest_bits,0,0,0,0};
+        uintptr_t registers[] = {(uintptr_t)input, (uintptr_t)actual, (uintptr_t)info, 0};
+        for (j = 0; j < 4; ++j) info[4 + j] = (uint8_t)(offsets[offset] >> (j * 8));
+        for (i = 0; i < 8; ++i) {
+            core->busWrite8(core, 0x02000000 + i, input[i]);
+            core->busWrite8(core, 0x02000400 + i, info[i]);
+        }
+        for (i = 0; i < sizeof(actual); ++i) { actual[i] = 0xa5; core->busWrite8(core, 0x02001000 + i, 0xa5); }
+        if (hw_bios_call(16, registers)) return 1;
+        core->busWrite16(core, 0x0203e000, 0xdf10); core->busWrite16(core, 0x0203e002, 0x4770);
+        if (rom_call(core, 0x0203e000, 0x02000000, 0x02001000, 0x02000400)) return 1;
+        for (i = 0; i < sizeof(actual); ++i) if (actual[i] != core->busRead8(core, 0x02001000 + i)) {
+            fprintf(stderr, "BitUnPack %u to %u offset %08x byte %u differs\n", source_bits, dest_bits, offsets[offset], i); return 1;
+        }
+        ++cases;
+    }
+    printf("mGBA BIOS layouts: PASS (%u object-affine/BitUnPack cases, full buffers)\n", cases);
+    return 0;
+}
+
 static uint8_t dma_oracle_ram[0x20000];
 static uint8_t *dma_oracle_map(void *user, uint32_t address, size_t size)
 {
@@ -522,6 +570,7 @@ int main(int argc, char **argv)
     }
     if (wave_bank_oracle(core)) return 1;
     if (bios_memory_oracle(core)) return 1;
+    if (bios_layout_oracle(core)) return 1;
     if (mixer_oracle(core)) return 1;
     if (mixer_state_oracle(core)) return 1;
     if (mixer_reverb_oracle(core)) return 1;

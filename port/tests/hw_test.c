@@ -51,7 +51,7 @@ static int bios_tests(void)
     struct BgAffineSrcData affine_src = {10000, 20000, 10, 20, 256, 512, 0x4000};
     struct BgAffineDstData affine_dst;
     struct ObjAffineSrcData object_src = {256, 512, 0};
-    int16_t object_dst[16];
+    int16_t object_dst[32];
     for (i = 0; i < 16; ++i) { src[i] = i * 0x1020304; dst[i] = 0; }
     CpuSet(src, dst, 0x04000004);
     CHECK(dst[3] == src[3] && dst[4] == 0);
@@ -92,6 +92,25 @@ static int bios_tests(void)
     for (i = 0; i < 16; ++i) object_dst[i] = 99;
     ObjAffineSet(&object_src, object_dst, 1, 8);
     CHECK(object_dst[0] == 256 && object_dst[4] == 0 && object_dst[8] == 0 && object_dst[12] == 512 && object_dst[1] == 99);
+    {
+        struct ObjInput { struct ObjAffineSrcData transform; uint16_t padding; } inputs[2] = {
+            {{256,512,0},0xaaaa}, {{128,256,0x4000},0xbbbb}
+        };
+        for (i = 0; i < 32; ++i) object_dst[i] = 99;
+        ObjAffineSet(&inputs[0].transform, object_dst, 2, 8);
+        CHECK(object_dst[0] == 256 && object_dst[12] == 512 && object_dst[16] == 0);
+        CHECK(object_dst[20] == -128 && object_dst[24] == 256 && object_dst[28] == 0 && object_dst[31] == 99);
+    }
+    {
+        uint8_t input = 0xe4, info[] = {1,0,2,8,1,0,0,0};
+        uint32_t unpacked = 0xffffffff;
+        uintptr_t registers[] = {(uintptr_t)&input, (uintptr_t)&unpacked, (uintptr_t)info, 0};
+        CHECK(hw_bios_call(16, registers) == HW_OK && unpacked == 0x04030200);
+        info[7] = 0x80;
+        CHECK(hw_bios_call(16, registers) == HW_OK && unpacked == 0x04030201);
+        info[2] = 3;
+        CHECK(hw_bios_call(16, registers) == HW_BAD_DATA && unpacked == 0x04030201);
+    }
     return 0;
 }
 
