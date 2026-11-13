@@ -1263,3 +1263,33 @@ Roaming relative's reusable collider/random work pointer may also suppress the
 unwanted constant equivalence. Persistent evidence is in
 `build/matchsearch/ContactActor_UpdateRetreat`; experiments are under
 `build/cx/work/ContactActor_UpdateRetreat`.
+
+### sub_08066CB8 / ActorAttachment_ReleaseAll (08066CB8): deferred
+
+Draft: `notes/phase3-drafts/dp-scene1/sub_08066CB8.c` (47 ROM / 45 draft,
+shape 2, 252 bytes against 256). It uses typed indexing, an occupancy helper,
+an ordinary outer for loop and a goto part loop. The occupancy helper folds
+its large member offset in integrate.c and keeps its expression separate from
+the outer occupied-mask address. This reproduces the manager stack reload
+without the original memory barrier. The part-loop goto prevents hoisting its
+one, removing the extra spill word and loads.
+
+Diagnostic `AGBCC_FORCE=i:3,slot:6,part:4,j:5,occupied:10,id:8,sprite:5` leaves
+four differences, all lower-register copies: occupied-mask read uses r2 rather
+than r7; final ID store uses r1 rather than r7. `why 79` reports that the draft's
+spill set is only r0/r1/r2; r7 is absent, so no rotation can match it. Forcing
+scratch to r7 has no effect because combine folds those copies into their uses.
+The missing two instructions in the stock draft are a zero/store tail that
+jump2 merges because active and part-mask addresses get the same register.
+
+Tried: stripping all concessions; passing the manager by reference to an inline
+(extra stack pointer spill); occupancy-helper pretest; explicit next versus a
+normal for loop; goto part loop; typed slot indexing; pointer reuse for the
+occupied address. The helper on the otherwise pinned source removes the memory
+barrier's shape effect but leaves two base-register differences, so no partial
+match was landed. Probe found no single canonicalization/PRE/hoist fix. The
+explicit-next draft also gets an unwanted PRE copy of i+1.
+Next: reduce the shared scratch pointer's priority and reshape the slot/part/j
+lifetimes so the register order itself adds r7 to reload's spill set. An inline
+release-slot helper may provide the necessary parameter lifetime. Evidence is
+under `build/cx/work/sub_08066CB8`.
