@@ -135,6 +135,53 @@ def fixtures():
     yield 'greenswap', Scene().reg(0, 0x100).reg(2, 1)
 
 
+def edge_fixtures():
+    for mapping in (0, 64):
+        for tile in (1, 31, 63, 511, 1007, 1023):
+            for depth in (0, 0x2000):
+                s = Scene().reg(0, 0x1000 | mapping)
+                s.obj(0, 20 | depth, 40 | 0xc000, tile)
+                yield f'obj_tilewrap_{mapping}_{tile}_{depth}', s
+    for affine in (0, 0x100):
+        for hblank in (0, 32):
+            s = Scene().reg(0, 0x1040 | hblank).matrix(31, 256, 0, 0, 256)
+            for i in range(112):
+                s.obj(i, 20 | affine, (i * 19) % 220 | 0xc000 | (31 << 9 if affine else 0), (i * 16) & 1023)
+            yield f'obj_budget_{affine}_{hblank}', s
+    for depth in (0, 128):
+        s = Scene().reg(0, 0x100).reg(8, 0x1f0c | depth)
+        for i in range(1024):
+            w16(s.vram, 0xf800 + i * 2, 1023)
+        yield f'bg_tile_overflow_{depth}', s
+    for mode in (3, 4, 5):
+        s = Scene().reg(0, 0x1440 | mode)
+        for i in range(4):
+            s.obj(i, 20 + i * 32, 40 | 0x8000, (i % 2)*512 | (i << 10))
+        yield f'bitmap_obj_overlap_{mode}', s
+    for priority in range(4):
+        for semi in (0, 0x400):
+            s = Scene().reg(0, 0x1f40).reg(0x50, 0x3f7f).reg(0x52, 0x0808)
+            s.obj(0, 20 | semi, 30 | 0xc000, 0x20 | (priority << 10))
+            s.obj(1, 25, 35 | 0xc000, 0x120 | (priority << 10))
+            yield f'obj_priority_{priority}_{semi}', s
+    for flags in (0x300, 0x100, 0x200, 0):
+        s = Scene().reg(0, 0x100).reg(8, 0x1000).reg(0x50, 0x3f7f).reg(0x52, 0x0808)
+        for line in range(160):
+            s.events.append((line, 0x10, line * 2))
+        for i in range(40):
+            s.obj(i, 20 | flags, 30 | 0xc000, i*16).matrix(i%32, 256, 0, 0, 256)
+        yield f'obj_disabled_{flags}', s
+    for bgmask in (0x100, 0xf00):
+        for masks in (0x153a, 0x2a05, 0x3f00):
+            for semi in (0, 0x400):
+                s = Scene().reg(0, 0xf040 | bgmask).reg(0x40, 0x28c8).reg(0x42, 0x5090)
+                s.reg(0x44, 0x148c).reg(0x46, 0x3278).reg(0x48, masks).reg(0x4a, masks ^ 0x3f3f)
+                s.reg(0x50, 0x3f7f).reg(0x52, 0x0907)
+                s.obj(0, 0x800 | 50, 70 | 0xc000, 0x20)
+                s.obj(1, 40 | semi, 40 | 0xc000, 0x820)
+                yield f'objwin_blend_{bgmask}_{masks}_{semi}', s
+
+
 def build_oracle():
     result = subprocess.check_output(['make', '-Bn', '-C', 'tools/emu', 'harness'], cwd=ROOT, text=True)
     command = shlex.split(next(line for line in result.splitlines() if ' -o harness harness.c ' in line))
@@ -152,7 +199,7 @@ def main():
     directory.mkdir(parents=True, exist_ok=True)
     build_oracle()
     rows = []
-    for name, scene in fixtures():
+    for name, scene in (*fixtures(), *edge_fixtures()):
         if args.filter not in name:
             continue
         path = directory / (name + '.bin')

@@ -76,7 +76,7 @@ static uint8_t bg_byte(const PpuMemory *m, unsigned address)
     return m->vram[address & 0xffff];
 }
 
-static Pixel text_bg(const PpuMemory *m, unsigned bg, unsigned x, unsigned y)
+static Pixel text_bg(const PpuMemory *m, unsigned bg, unsigned x, unsigned y, unsigned presentation)
 {
     unsigned control = read16(m->io, 8 + bg * 2);
     unsigned size = control >> 14;
@@ -102,10 +102,20 @@ static Pixel text_bg(const PpuMemory *m, unsigned bg, unsigned x, unsigned y)
     tile = ((control >> 2) & 3) * 0x4000;
     if (control & 0x80) {
         tile += (entry & 1023) * 64 + ty * 8 + tx;
-        index = bg_byte(m, tile);
+        if (tile >= 0x10000) return p;
+        index = m->vram[tile];
     } else {
         tile += (entry & 1023) * 32 + ty * 4 + tx / 2;
-        index = (bg_byte(m, tile) >> ((tx & 1) * 4)) & 15;
+        if (tile >= 0x10000) {
+            unsigned scroll = read16(m->io, 0x10 + bg * 4) & 7;
+            unsigned prefix = (8 - scroll) & 7;
+            unsigned suffix = (PPU_WIDTH + scroll) & 7;
+            /* mGBA's RGB888 path fetches clipped 4bpp edge tiles from the
+             * adjoining OBJ bank, but rejects whole tiles outside BG VRAM. */
+            if (!presentation || (control & 0x40) ||
+                (x >= prefix && x < PPU_WIDTH - suffix)) return p;
+        }
+        index = (m->vram[tile] >> ((tx & 1) * 4)) & 15;
         if (index) index += (entry >> 12) * 16;
     }
     if (index) {
@@ -175,7 +185,7 @@ static Pixel affine_bg(const Ppu *ppu, const PpuMemory *m, unsigned bg,
         if (mode == 4) {
             if (read16(m->io, 0) & 16) address += 0xa000;
             index = m->vram[address];
-            /* Bitmap mode 4 palette index zero is opaque. */
+            if (!index) return p;
             p.color = palette(m, index);
         } else {
             address *= 2;
@@ -226,6 +236,8 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
         unsigned kind = (a >> 10) & 3;
         unsigned width, height, boxw, boxh, row, draw_width;
         int left, column, mosaic_origin, pa = 256, pb = 0, pc = 0, pd = 256;
+        cycles -= 2;
+        if (cycles <= 0) return;
         if (shape == 3 || kind == 3 || (!affine && (a & 0x200))) continue;
         width = sizes[shape][size][0];
         height = sizes[shape][size][1];
@@ -235,13 +247,16 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
         if (row >= boxh) continue;
         left = b & 511;
         if (left >= 256) left -= 512;
+        if (left >= PPU_WIDTH || left + (int)boxw <= 0) continue;
         if (affine) {
             unsigned matrix = ((b >> 9) & 31) * 32;
             pa = (int16_t)read16(m->oam, matrix + 6);
             pb = (int16_t)read16(m->oam, matrix + 14);
             pc = (int16_t)read16(m->oam, matrix + 22);
             pd = (int16_t)read16(m->oam, matrix + 30);
-            cycles -= 10;
+            cycles -= 8 + (int)boxw * 2 + (left < 0 ? left : 0);
+        } else {
+            cycles -= (int)boxw - 2 + (left < 0 ? floor256(left * 128) : 0);
         }
         mosaic_origin = left - 1;
         if (affine && (a & 0x1000)) {
@@ -270,8 +285,6 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
             int ox = column, oy = (int)row, sx, sy;
             unsigned tile, address, index, priority = (c >> 10) & 3;
             unsigned bpp8 = (a >> 13) & 1;
-            cycles -= affine ? 2 : 1;
-            if (cycles < 0) return;
             if (x < 0 || x >= PPU_WIDTH) continue;
             if (a & 0x1000) {
                 unsigned mosaic = read16(m->io, 0x4c);
@@ -296,13 +309,19 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
             }
             if (sx < 0 || sy < 0 || sx >= (int)width || sy >= (int)height) continue;
             tile = c & 1023;
-            if (bpp8) tile &= ~1u;
-            tile += (unsigned)(sy / 8) * ((display & 64) ? (width / 8) << bpp8 : 32);
-            tile += (unsigned)(sx / 8) << bpp8;
+            if (display & 64) {
+                tile += (unsigned)(sy / 8) * ((width / 8) << bpp8);
+                tile += (unsigned)(sx / 8) << bpp8;
+            } else {
+                if (bpp8) tile &= ~1u;
+                tile = (tile & ~31u) + (unsigned)(sy / 8) * 32 +
+                       ((tile + ((unsigned)(sx / 8) << bpp8)) & 31);
+            }
             tile &= 1023;
             if ((display & 7) >= 3 && tile < 512) continue;
             address = 0x10000 + tile * 32 + (sy & 7) * (bpp8 ? 8 : 4);
             address += bpp8 ? (sx & 7) : (sx & 7) / 2;
+            address = 0x10000 + ((address - 0x10000) & 0x7fff);
             index = m->vram[address];
             if (!bpp8) index = (index >> ((sx & 1) * 4)) & 15;
             if (!index) continue;
@@ -400,7 +419,7 @@ static void render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, void *out,
         for (bg = 0; bg < 4; ++bg) {
             Pixel p;
             if (!(display & (0x100 << bg)) || !(mask & (1 << bg))) continue;
-            if (mode == 0 || (mode == 1 && bg < 2)) p = text_bg(m, bg, x, y);
+            if (mode == 0 || (mode == 1 && bg < 2)) p = text_bg(m, bg, x, y, bits == 8);
             else if ((mode == 1 && bg == 2) || (mode == 2 && bg >= 2) ||
                      (mode >= 3 && mode <= 5 && bg == 2)) p = affine_bg(ppu, m, bg, mode, x, y, bits == 8);
             else continue;
