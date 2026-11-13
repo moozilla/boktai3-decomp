@@ -748,7 +748,6 @@ void TetherActor_EmitRingEffects(struct TetherActor *actor)
     } while (index <= 7);
 }
 
-
 void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const void *config)
 {
     struct ContactPackedVector position = *source;
@@ -1065,8 +1064,6 @@ void TetherActor_SelectInteractionState(struct TetherActor *actor)
         TetherActor_SetState(gTetherActor, 4);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
 {
     struct TetherActor *actor = input;
@@ -1241,8 +1238,6 @@ void TetherActor_ClearInstance(void)
 {
     gTetherActor = 0;
 }
-
-// MATCHING_CONCESSION: register-pinning
 
 void TetherActor_ClearExternalStatus(void)
 {
@@ -1498,12 +1493,10 @@ u32 TetherActor_CanStartInteraction(void)
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_StartInteractionEffect(void)
 {
     struct TetherActor *actor = gTetherActor;
-    register u32 zero asm("r3");
+    register u32 zero;
     if (!actor)
         return;
     if (actor->state == 1) {
@@ -1514,9 +1507,14 @@ void TetherActor_StartInteractionEffect(void)
             *lock = 1;
         }
         actor->interactionCooldown = 300;
+        actor->effectValue = zero;
+        actor->pendingEffectHandle =
+            ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig, 1,
+                                                 zero, &actor->effectValue, 200, 250, 330);
+
     } else {
-        if (actor->state != 0 && actor->state != 2
-            && ((u8)(actor->state - 3) > 1 || !actor->chargeReady))
+        if (actor->state != 0 && actor->state != 2 &&
+            ((u8)(actor->state - 3) > 1 || !actor->chargeReady))
             return;
         TetherActor_UpdatePendingEffect(actor);
         TetherActor_SelectInteractionState(actor);
@@ -1526,12 +1524,12 @@ void TetherActor_StartInteractionEffect(void)
             zero = 0;
             delay = 600;
             *cooldown = delay;
+            actor->effectValue = zero;
+            actor->pendingEffectHandle =
+                ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
+                                                     1, zero, &actor->effectValue, 200, 250, 330);
         }
     }
-    actor->effectValue = zero;
-    actor->pendingEffectHandle =
-        ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig, 1,
-                                             zero, &actor->effectValue, 200, 250, 330);
 }
 
 u32 TetherActor_IsStateOne(void)
@@ -2519,8 +2517,6 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 u32 TetherActor_TestTerrainTransition(struct TetherActor *actor)
 {
     s32 k2 = 1;
@@ -3015,8 +3011,6 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
     NavMesh_UpdateProbe(&actor->interactionProbe, &actor->position);
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateWanderingState(struct TetherActor *actor)
 {
     if (actor->state != 4) {
@@ -3455,12 +3449,12 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
             TetherActor_SetState(actor, 0);
             actor->chargeReady = 1;
             actor->charge = 287;
-            actor->pendingEffectHandle = ActorAttachment_UpdateFromDescriptor(
-                actor->pendingEffectHandle, &actor->bodyConfig, 1, 0, &actor->charge, 287, 250, 290);
+            actor->pendingEffectHandle =
+                ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
+                                                     1, 0, &actor->charge, 287, 250, 290);
         }
     }
 }
-
 
 void TetherActor_UpdateKindNineRecoil(struct TetherActor *actor)
 {

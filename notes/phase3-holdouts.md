@@ -1377,3 +1377,15 @@ the goto form changes loop allocation. The pointer output materially changes
 subword stores. Next: shorten the baseline weight life by one pre-combine insn
 without moving its first copy, or lengthen the mask life by one without moving
 its emitted initialization. No reduction landed.
+
+### TetherActor_StartInteractionEffect (08049D4C): resolved
+
+Removed the r3 zero pin by repeating the final effectValue store and attachment
+call inside each accepted branch. Reload sees a single branch-local straight
+line and eliminates its redundant literal-zero argument load. jump2 subsequently
+cross-jumps the repeated tails back into the ROM's shared sequence (fact 91).
+Only duplicating the effectValue store did not suffice (17/25); the whole tail
+was needed. Arrays/unions retained the extra literal zero or added extensions;
+readback from effectValue folded back to the baseline. The original pin-free
+baseline was 1/1, shape 2 (a second movs r3,#0 before the call).
+Stock full tether-actor unit: 114 functions MATCH (20,516 bytes).
