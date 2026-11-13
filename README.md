@@ -145,6 +145,20 @@ order, colored by kind or by how well each byte is understood (C, C with a
 concession, decoded data, data only located, assembly); its address names
 the block in view, and each Code unit links to its own.
 
+**Forge** (`/forge`, or **Edit in Forge** on a Code function) is a C workbench:
+edit a source unit in the browser, compile with its stock agbcc settings, and
+compare the linked instructions with the original ROM. Unchanged C says
+**MATCH**; source-line links, compiler passes and scope's `why` explain changes.
+**Build & play** runs an isolated modified ROM in headless mGBA from boot or a
+story checkpoint and returns screenshots. A bounded controller script selects
+what happens; optional text edits use string IDs from Text. Export an **IPS
+patch** and the exact compiled C snapshot. Experiments live under
+`build/studio/forge/`, with browser drafts saved locally; tracked source stays
+untouched. Playable builds currently require code to fit the original unit
+span and preserve public function addresses; text must fit its original string
+space. Edits requiring relocation still compile for inspection. Story checkpoint
+choices come from the translation save bank (`--trans`), plus the reference save.
+
 | | |
 |---|---|
 | ![Code](docs/img/studio-code.png) | **Code**: a function's C and disassembly side by side, with its concessions, the RAM it touches and where the game reaches it. |

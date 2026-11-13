@@ -523,6 +523,7 @@ async function functionPage(q) {
         : '<span class="badge ok">matches</span>' + status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}<span class="badge" id="fnhist" data-addr="${d.addr}" hidden></span></div>
     ${d.notes ? `<p class="lede" style="font-size:14px">${esc(d.notes)}</p>` : ''}
     ${u ? strip(u.functions.map(x => FN[x[1]]), d.addr) : ''}
+    ${d.c ? `<p><a class="badge" href="/forge#${d.addr}">Edit in Forge → compile, play, export a patch</a></p>` : ''}
     <div class="panes">${cPane}${asmPane}</div>
     ${game}
     <div class="xr">
