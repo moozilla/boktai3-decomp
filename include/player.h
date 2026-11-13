@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "scene_vec.h"
+#include "directional_sprite_state.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0
@@ -341,7 +342,7 @@ struct Player {
     u8 unk741[7];
     u8 visualEffects748[0x30], visualEffects778[0x28];
     u8 visualEffects7A0[0x30], visualEffects7D0[0x2C];
-    u8 directionalEffect[0x68];      /* 0x7FC */
+    struct DirectionalSpriteEffect directionalEffect[1];      /* 0x7FC */
     void *directionalEffectCallback; /* 0x864 */
     u8 unk868[0x218];
     struct SceneVec actionOrigin; /* 0xA80: offset copy of position (tentative) */
