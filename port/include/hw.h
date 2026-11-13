@@ -119,6 +119,7 @@ struct Hw {
     uint8_t fifo_read[2], fifo_count[2];
     struct SoundInfo *sound;
     HwPsgChannel psg[4];
+    uint8_t psg_wave[2][16];
     uint32_t psg_clock, psg_fraction;
     uint8_t psg_step;
     int16_t audio_buffer[1584 * 2];

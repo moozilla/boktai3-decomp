@@ -109,12 +109,20 @@ int hw_mp2k_mix(struct SoundInfo *sound, int16_t *stereo, size_t frames, uint32_
     if (sound->pcmDmaCounter > 1 && sound->pcmDmaCounter <= sound->pcmDmaPeriod)
         offset = (sound->pcmDmaPeriod - (sound->pcmDmaCounter - 1)) * frames;
     if (offset + frames > PCM_DMA_BUF_SIZE) return HW_BAD_DATA;
-    if (sound->reverb) for (i = 0; i < frames; ++i) {
-        size_t next = (offset + frames + i) % PCM_DMA_BUF_SIZE;
-        int32_t sum = sound->pcmBuffer[offset + i] + sound->pcmBuffer[offset + i + PCM_DMA_BUF_SIZE] +
-                      sound->pcmBuffer[next] + sound->pcmBuffer[next + PCM_DMA_BUF_SIZE];
-        int32_t feedback = sum * sound->reverb / 512;
-        mixed[i * 2] = mixed[i * 2 + 1] = feedback * 256;
+    if (sound->reverb) {
+        size_t next_offset = sound->pcmDmaCounter == 2 ? 0 : offset + frames;
+        if (next_offset + frames > PCM_DMA_BUF_SIZE) return HW_BAD_DATA;
+        for (i = 0; i < frames; ++i) {
+            size_t next = next_offset + i;
+            int32_t sum = sound->pcmBuffer[offset + i] + sound->pcmBuffer[offset + i + PCM_DMA_BUF_SIZE] +
+                          sound->pcmBuffer[next] + sound->pcmBuffer[next + PCM_DMA_BUF_SIZE];
+            int32_t product = sum * sound->reverb;
+            int32_t feedback = product >= 0 ? product / 512 : -((-product + 511) / 512);
+            /* The original adds one when bit 7 of the shifted feedback is set,
+             * even for an exact negative multiple of 512. */
+            if ((uint32_t)feedback & 0x80) ++feedback;
+            mixed[i * 2] = mixed[i * 2 + 1] = (int8_t)feedback * 256;
+        }
     }
     for (channel = 0; channel < channels; ++channel) {
         struct SoundChannel *c = sound->chans + channel;
@@ -143,6 +151,27 @@ int hw_mp2k_mix(struct SoundInfo *sound, int16_t *stereo, size_t frames, uint32_
     return HW_OK;
 }
 
+static void route_direct_sound(Hw *hw, int16_t *stereo, size_t frames)
+{
+    uint16_t control = hw_get16(hw->io + 0x82);
+    size_t i;
+    for (i = 0; i < frames; ++i) {
+        int32_t left = 0, right = 0;
+        if (hw->io[0x84] & 0x80) {
+            /* MP2K writes its right stream to FIFO A and left stream to B. */
+            int32_t a = stereo[i * 2 + 1], b = stereo[i * 2];
+            if (!(control & 4)) a = a >= 0 ? a / 2 : -((-a + 1) / 2);
+            if (!(control & 8)) b = b >= 0 ? b / 2 : -((-b + 1) / 2);
+            if (control & 0x0200) left += a;
+            if (control & 0x0100) right += a;
+            if (control & 0x2000) left += b;
+            if (control & 0x1000) right += b;
+        }
+        stereo[i * 2] = clip16(left);
+        stereo[i * 2 + 1] = clip16(right);
+    }
+}
+
 void hw_m4a_attach(Hw *hw, struct SoundInfo *sound) { hw->sound = sound; }
 
 void SoundMain(void)
@@ -157,12 +186,16 @@ void SoundMain(void)
     }
     if (!sound || sound->ident != ID_NUMBER || sound->pcmSamplesPerVBlank <= 0 || sound->pcmSamplesPerVBlank > PCM_DMA_BUF_SIZE || sound->pcmFreq <= 0) return;
     ++sound->ident;
+    /* Import SoundInit and frame-loop writes before callbacks issue their
+     * first PSG triggers. Import again below to collect callback writes. */
+    hw_sync_io(hw);
     if (sound->MPlayMainHead) sound->MPlayMainHead(sound->musicPlayerHead);
     if (sound->CgbSound) sound->CgbSound();
     hw_sync_io(hw);
     hw->audio_frames = (size_t)sound->pcmSamplesPerVBlank;
     hw->audio_rate = (uint32_t)sound->pcmFreq;
     if (hw_mp2k_mix(sound, hw->audio_buffer, hw->audio_frames, hw->audio_rate) != HW_OK) hw->audio_frames = 0;
+    route_direct_sound(hw, hw->audio_buffer, hw->audio_frames);
     hw_psg_render(hw, hw->audio_buffer, hw->audio_frames, hw->audio_rate, 1);
     sound->ident = ID_NUMBER;
     if (hw->host.audio && hw->audio_frames) hw->host.audio(hw->host.user, hw->audio_buffer, hw->audio_frames, hw->audio_rate);
