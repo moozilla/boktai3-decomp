@@ -2160,3 +2160,15 @@ which is exactly `10:1`. Not tested.
    and resolves named allocation knobs through the head. Two separately recorded quantities
    or an operand without a death note are not merged. `AGBCC_FORCE=address:3` changes the
    actual placement; it diagnoses the local tie but does not match the whole function.
+
+211. **An inserted two-address operand copy is not a logged dying-input tie.**
+   In SceneInput_TickChoice (0805E1D0), cse changes the first AND from
+   `accepted & keys` to `keys & confirm`, where confirm is the known constant 1.
+   Regmove inserts a new copy `accepted = keys` immediately before the AND.
+   A later logged tie at the cancel-key test mentions keys too, but does not
+   explain this copy: AGBCC_NOTIE on either AND leaves the first copy unchanged.
+   Scope now recognizes a newly inserted adjacent copy whose destination becomes
+   the operation's two-address input, before searching for logged ties involving
+   the same registers. Existing copies, label-separated copies and copies of a
+   different operand are not treated as this evidence. Inspect cse operand order
+   and narrowing modes here; a later tie's allocation advice is a false lead.
