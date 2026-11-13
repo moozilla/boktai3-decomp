@@ -1329,3 +1329,49 @@ Persistent source evidence: `build/matchsearch/ParticleGroup_UpdateFrozen`.
 Scratch: `build/cx/work/ParticleGroup_UpdateFrozen`. Next: a genuine header/cache
 representation that makes an SI-to-QI copy with unknown upper bits before combine,
 but whose wide producer becomes the same byte load after combine. No source changed.
+
+### sub_08014634 (08014634, src/fn/sub_08014634.c): partial, 11 pins and one barrier removed
+
+The stock compiler matches the complete 664-byte unit after removing eleven of
+fifteen pins and the entry-offset barrier. Reusing an ordinary option scalar for
+both masking and the later tile lookup first removed the mask, manager, and entry
+pins. Typed union views then reused that scalar for the count clamp, count header,
+and both position reads (five pins); reused the completed manager lookup for the
+options header (two pins); and reused priority/bound storage for the particle
+cursor (one pin). Keep initialization order when separating C89 declarations.
+These ordinary reuse forms carry phase-4 cleanup debt; no concession was added.
+
+Four pins remain: small/large resource selection, counter, and table; barriers
+remain on options memory, resource temporaries, and table/group. Removing both
+resource pins and barriers leaves 4/4, shape 0: small uses r0 instead of r2 and
+large uses r2 instead of r0. CSE2 substitutes the spilled resource for the reused
+option view. The spill sweep found no matching rotation; forcing resource to r2
+changes allocation throughout the function. Repeated post-join initialization in
+each branch either keeps the swap or introduces an outer-loop entry check. An
+explicit resource/pool struct becomes a multiword register value and changes the
+whole allocation.
+
+Removing only the counter pin leaves 19/19, shape 0. Exact diagnostic:
+`AGBCC_PRI=i:+864`. Its initial zero doubles the measured lifetime: 32 refs,
+flow life 190 (effective 380), priority 4210, versus group 26 refs/life 205,
+priority 5073. A nonconstant first definition or seven additional counted refs
+would reverse their order. Removing the group barrier makes i correct but swaps
+group/table and adds a table copy (14/14, shape 2). Repeating the particle tail
+changes unrelated allocation. Repeating inactive cleanup in both bound arms gets
+all registers correct, but the zero-count path simplifies differently and leaves
+an extra cleanup loop (1/13), so jump2 cannot share it.
+
+Best fully ordinary alternative: `notes/phase3-drafts/dp-effects/sub_08014634.c`
+(71/67, shape 58), based on the matched radial spawner sub_080148CC: inline wrapper,
+ReadScalar/ReadOrigin helpers, and a wide origin copy. Table priority +1400 improves
+it to 41/39 but is not an exact diagnosis. The table constant has doubled lifetime
+and loses r7 to velocity; table-first/shared samplers, halfword return, table-half
+construction, union initialization, count-up loops, scalar argument reordering,
+and struct argument views did not recover the full match. Removing all remaining
+concessions from the latest partial gives 90/86, shape 40; preserving the simpler
+relative-based rewrite is more useful than its extra unions.
+
+Persistent graph: `build/matchsearch/sub_08014634`; scratch candidates and compiler
+traces: `build/cx/work/sub_08014634`. Next: shorten the counter lifetime without an
+extra early set, or recover the resource helper whose separate branch destinations
+survive CSE2. Then solve table equivalence and the options/count reload boundaries.
