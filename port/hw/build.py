@@ -28,6 +28,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--native-only", action="store_true")
     parser.add_argument("--no-test", action="store_true")
+    parser.add_argument("--mgba-rom", type=Path, help="also compare BIOS results against system libmgba using this runtime ROM")
+    parser.add_argument("--song-rom", type=Path, help="render a runtime ROM song to build/port-hw/song-N.wav")
+    parser.add_argument("--song", type=int, default=1)
+    parser.add_argument("--seconds", type=int, default=10)
     args = parser.parse_args()
     if not Path("port/hw/bios.c").is_file():
         raise SystemExit("Run from the repository root")
@@ -43,6 +47,19 @@ def main():
     run([clang, *flags, "-g", "-fsanitize=address,undefined", *sources, "port/tests/hw_test.c", "port/tests/hw_native.c", "-o", out / "hw-test"])
     if not args.no_test:
         run([out / "hw-test"])
+    if args.mgba_rom:
+        prefix = Path(os.environ.get("MGBA_PREFIX", "/opt/homebrew"))
+        oracle = out / "hw-mgba"
+        oracle_flags = [f for f in flags if f != "-ffreestanding"]
+        run([clang, *oracle_flags, "-std=gnu11", "-I" + str(prefix / "include"), *sources, "port/tests/hw_mgba.c",
+             "-L" + str(prefix / "lib"), "-lmgba", "-o", oracle])
+        run([oracle, args.mgba_rom])
+    if args.song_rom:
+        player = out / "hw-song"
+        song_flags = [f for f in flags if f != "-ffreestanding"]
+        run([clang, *song_flags, "-g", "-fsanitize=address,undefined", *sources,
+             "port/tests/hw_song.c", "-lm", "-o", player])
+        run([player, args.song_rom, args.song, out / ("song-" + str(args.song) + ".wav"), args.seconds])
     if args.native_only:
         return
     objects = []
