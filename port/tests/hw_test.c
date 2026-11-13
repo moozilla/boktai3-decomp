@@ -1,5 +1,6 @@
 #include "hw.h"
 #include "gba/types.h"
+#include "gba/m4a_internal.h"
 #include <limits.h>
 
 #define CHECK(condition) do { if (!(condition)) return __LINE__; } while (0)
@@ -208,6 +209,54 @@ static int cartridge_tests(void)
     return 0;
 }
 
+static int audio_tests(void)
+{
+    static struct SoundInfo sound;
+    static const struct {
+        uint16_t type, status;
+        uint32_t frequency, loop, size;
+        int8_t data[4];
+    } wave = {0, 0x4000, 4000 * 1024, 0, 4, {0, 64, 0, -64}};
+    struct SoundChannel *c = sound.chans;
+    int16_t pcm[1024 * 2];
+    unsigned i;
+    int positive = 0, negative = 0;
+    sound.maxChans = 1; sound.masterVolume = 15;
+    c->wav = (struct WaveData *)&wave;
+    c->statusFlags = SOUND_CHANNEL_SF_START;
+    c->attack = 255; c->decay = 255; c->sustain = 128; c->release = 128;
+    c->leftVolume = c->rightVolume = 255; c->frequency = 4000;
+    CHECK(hw_mp2k_mix(&sound, pcm, 4, 8000) == 0);
+    CHECK(pcm[0] == 0 && pcm[2] == 8128 && pcm[4] == 16256 && pcm[6] == 8128);
+    CHECK(c->count == 2 && c->fw == 0 && c->envelopeVolume == 255);
+    CHECK(hw_mp2k_mix(&sound, pcm, 12, 8000) == 0 && c->count == 4);
+    c->statusFlags |= SOUND_CHANNEL_SF_STOP;
+    CHECK(hw_mp2k_mix(&sound, pcm, 4, 8000) == 0 && c->envelopeVolume == 127);
+    for (i = 0; i < 8; ++i) CHECK(hw_mp2k_mix(&sound, pcm, 4, 8000) == 0);
+    CHECK(!c->statusFlags);
+    hw_write16(&machine, HW_IO_BASE + 0x84, 0x80);
+    hw_write16(&machine, HW_IO_BASE + 0x80, 0x1177);
+    hw_write16(&machine, HW_IO_BASE + 0x82, 2);
+    hw_write16(&machine, HW_IO_BASE + 0x62, 0xf080);
+    hw_write16(&machine, HW_IO_BASE + 0x64, 0x8600);
+    CHECK(machine.psg[0].enabled && (hw_read16(&machine, HW_IO_BASE + 0x84) & 1));
+    hw_psg_render(&machine, pcm, 1024, 32768, 0);
+    for (i = 0; i < 1024; ++i) { positive |= pcm[2 * i] > 0; negative |= pcm[2 * i] < 0; }
+    CHECK(positive && negative);
+    hw_write16(&machine, HW_IO_BASE + 0x62, 0xf0bf); /* one length tick */
+    hw_write16(&machine, HW_IO_BASE + 0x64, 0xc600);
+    hw_psg_render(&machine, pcm, 1024, 32768, 0);
+    CHECK(!machine.psg[0].enabled);
+    hw_write16(&machine, HW_IO_BASE + 0x78, 0xf000);
+    hw_write16(&machine, HW_IO_BASE + 0x7c, 0x8009);
+    CHECK(machine.psg[3].enabled);
+    hw_psg_render(&machine, pcm, 32, 32768, 0);
+    CHECK(machine.psg[3].lfsr != 0x7fff);
+    hw_write16(&machine, HW_IO_BASE + 0x84, 0);
+    CHECK(!machine.psg[3].enabled);
+    return 0;
+}
+
 int hw_test_run(void)
 {
     HwHost host = {0};
@@ -217,5 +266,6 @@ int hw_test_run(void)
     hw_init(&machine, &host); hw_bind(&machine);
     result = bios_tests(); if (result) return result;
     result = device_tests(); if (result) return result;
-    return cartridge_tests();
+    result = cartridge_tests(); if (result) return result;
+    return audio_tests();
 }

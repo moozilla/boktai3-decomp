@@ -177,7 +177,7 @@ static void io_write16(Hw *hw, unsigned offset, uint16_t value)
     }
     if (offset == 0x132) hw_set_keys(hw, hw->keys);
     if ((offset == 0x200 || offset == 0x208) && value != old) hw_request_interrupt(hw, 0);
-    /* Audio triggers are consumed by the PSG module through the I/O shadow. */
+    if (offset >= 0x60 && offset <= 0x84) hw_audio_io_write(hw, offset, value);
 }
 
 void hw_write8(Hw *hw, uint32_t a, uint8_t value)

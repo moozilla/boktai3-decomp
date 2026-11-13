@@ -59,6 +59,7 @@ void SoundBiasReset(void);
 void SoundBiasSet(void);
 
 typedef struct Hw Hw;
+struct SoundInfo;
 typedef struct HwHost {
     void *user;
     /* Return a mapped range, or NULL for an unmapped address. Must not return
@@ -70,6 +71,7 @@ typedef struct HwHost {
     int64_t (*unix_time)(void *user);
     void (*save_dirty)(void *user);
     void (*bios_error)(void *user, unsigned swi, int result);
+    void (*audio)(void *user, const int16_t *stereo, size_t frames, uint32_t sample_rate);
 } HwHost;
 
 typedef struct HwDma {
@@ -82,6 +84,13 @@ typedef struct HwTimer {
     uint16_t reload, counter, control;
     uint32_t fraction;
 } HwTimer;
+
+typedef struct HwPsgChannel {
+    uint64_t phase;
+    uint32_t length, envelope_clock;
+    uint16_t lfsr, sweep_shadow;
+    uint8_t enabled, volume, envelope_period, envelope_up, sweep_clock;
+} HwPsgChannel;
 
 enum HwSaveKind { HW_SAVE_EEPROM_512, HW_SAVE_EEPROM_8K, HW_SAVE_FLASH_64K, HW_SAVE_FLASH_128K };
 
@@ -108,6 +117,13 @@ struct Hw {
     uint8_t eeprom_command, eeprom_buffer[8];
     int8_t fifo[2][32], fifo_sample[2];
     uint8_t fifo_read[2], fifo_count[2];
+    struct SoundInfo *sound;
+    HwPsgChannel psg[4];
+    uint32_t psg_clock, psg_fraction;
+    uint8_t psg_step;
+    int16_t audio_buffer[1584 * 2];
+    size_t audio_frames;
+    uint32_t audio_rate;
 };
 
 void hw_init(Hw *hw, const HwHost *host);
@@ -136,5 +152,14 @@ const uint8_t *hw_save_data(const Hw *hw, size_t *size);
 void hw_save_clean(Hw *hw);
 int hw_bios_call(unsigned swi, uintptr_t registers[4]);
 void hw_system_call(unsigned swi); /* argument-free inline SDK calls */
+
+/* The MP2K mixer uses the existing SDK structs (gba/m4a_internal.h). It updates
+ * channel envelopes once per call and sample positions across calls. Its PCM
+ * output is interleaved signed 16-bit left/right. No sequencer runs here. */
+int hw_mp2k_mix(struct SoundInfo *sound, int16_t *stereo, size_t frames, uint32_t sample_rate);
+void hw_m4a_attach(Hw *hw, struct SoundInfo *sound);
+void hw_psg_render(Hw *hw, int16_t *stereo, size_t frames, uint32_t sample_rate, int add);
+void SoundMain(void); /* SDK replacement: sequencer + envelopes + mixer */
+void SoundMainBTM(void);
 
 #endif
