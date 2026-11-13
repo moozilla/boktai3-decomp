@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_departure_display.h"
 #include "slot7_transition.h"
 
@@ -70,7 +69,7 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                 screen->targetX = 0xA0;
                 {
                     u16 *timer = &screen->targetMode;
-                    register u8 byteZero asm("r3") = 0;
+                    u16 phaseReset[1] = {0};
 
                     u16 duration = 0x1E;
                     *timer = duration;
@@ -80,7 +79,7 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                     motion->callbackEntered = 1;
                     {
                         u8 *phase = &motion->phase;
-                        *phase = byteZero;
+                        *phase = phaseReset[0];
                     }
                     motion->phaseTimer = zero;
                 }
@@ -108,7 +107,7 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                 screen->targetX = 0x3C;
                 {
                     u16 *timer = &screen->targetMode;
-                    register u8 byteZero asm("r2") = 0;
+                    u16 phaseReset[1] = {0};
 
                     u16 duration = 0xB4;
                     *timer = duration;
@@ -118,7 +117,7 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                     motion->callbackEntered = 1;
                     {
                         u8 *phase = &motion->phase;
-                        *phase = byteZero;
+                        *phase = phaseReset[0];
                     }
                     motion->phaseTimer = zero;
                 }

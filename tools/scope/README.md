@@ -195,6 +195,9 @@ integer address (see the literal survey below).
 unit with several functions and no FUNC named, the function `scope.py FILE FUNC` compiled
 last; before, it fell to the file's last definition and explained an unrelated insn):
 
+* the statement's source file and line, including inline headers. Header text comes
+  from the compiled preprocessor input; a header line number never selects an
+  unrelated line in the caller. Main-file text keeps the author's spelling;
 * the ROM and draft instruction, and which pseudo holds the differing register
   (operands matched by position between the lreg dump and the same insn after
   reload, so local-alloc pseudos are covered). When the listing shows a pure

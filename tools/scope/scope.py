@@ -1603,6 +1603,40 @@ def uid_locations(wd):
     return out
 
 
+uid_sources = uid_locations  # name used by source_statement
+
+
+def source_statement(wd, src, uid):
+    """Display location and source text for UID, never borrowing another file's line.
+
+    Main-file statements retain the author's spelling. Header statements come from
+    the compiled preprocessor input, so the explanation also works for saved dumps.
+    """
+    filename, line = uid_sources(wd).get(uid, (None, 0))
+    if not filename or not line:
+        return None, ""
+    if os.path.normpath(os.path.join(ROOT, filename)) == os.path.normpath(os.path.join(ROOT, src)):
+        with open(os.path.join(ROOT, src)) as stream:
+            lines = stream.read().splitlines()
+        return str(line), lines[line - 1].strip() if line <= len(lines) else ""
+    label = f"{line} ({filename})"
+    path = os.path.join(wd, "u.i")
+    if not os.path.exists(path):
+        return label, ""
+    current, number = None, 0
+    with open(path, errors="replace") as stream:
+        preprocessed = stream.read().splitlines()
+    for text in preprocessed:
+        marker = re.match(r'# (\d+) "([^"]*)"', text)
+        if marker:
+            number, current = int(marker.group(1)), marker.group(2)
+            continue
+        if current == filename and number == line:
+            return label, text.strip()
+        number += 1
+    return label, ""
+
+
 def dispositions(wd):
     """pseudo -> hard register, from global-alloc's 'Register dispositions'."""
     path = os.path.join(wd, "u.i.greg")
@@ -5721,9 +5755,8 @@ def cmd_why(src, func, uid, env, via=None):
         if re.match(r"ldr r\d+, =", row["draft"] or ""):
             print(f"insn {uid}: constant origin is unknown (no equal-valued pre-final SET found);"
                   " retaining the emitted insn rather than guessing from its register")
-    ln = lines.get(uid)
-    code = srclines[ln - 1].strip() if ln and ln <= len(srclines) else ""
-    print(f"why insn {uid}  line {ln}: {code}")
+    location, code = source_statement(wd, src, uid)
+    print(f"why insn {uid}  line {location}: {code}")
     if row:
         twin = register_twin(rows, row)
         rom_text = row["rom"] or (twin["rom"] if twin else None)
