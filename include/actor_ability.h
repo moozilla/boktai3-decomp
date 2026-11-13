@@ -13,7 +13,7 @@ struct ActorAbilityOwner {
     struct ActorStats stats;
     u8 unknown608[8];
     struct CharacterPreviewModel model;
-    u8 unknown860[0x84];
+    u8 unknown864[0x80]; /* the model ends at 0x864 with its appearance bytes */
     u32 effectFlags;
     u32 projectile;
     u8 unknown8EC[0xC];
