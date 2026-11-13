@@ -8649,6 +8649,7 @@ addr,name,mode,confidence,source,notes
 081FD01C,Projectile_SpawnAtPosition,thumb,low,src-alias,Allocates a projectile slot; configures behavior; velocity; colliders and animation; activates it; and plays its spawn sound.
 081FD3D8,Projectile_InitParameters,thumb,low,src-alias,
 081FD458,Projectile_SetLaunchParameters,thumb,low,src-alias,Sets type and lifetime plus heading and speed used to calculate initial velocity
+081FD46C,Projectile_SetTurnParameters,thumb,low,src-alias,Sets tracking duration; turn parameter and turn speed; interpretation tentative.
 081FD474,Projectile_SetHomingParameters,thumb,low,src-alias,Sets steering duration and target pointer plus turn rate; target use confirmed by steering code
 081FD47C,Projectile_SetCollisionParameters,thumb,low,src-alias,Stores five parameters subsequently passed into collider configuration
 081FD494,Projectile_SetCollisionExtents,thumb,low,src-alias,Sets three halfword dimensions copied into the collider; extent interpretation tentative
@@ -8657,6 +8658,7 @@ addr,name,mode,confidence,source,notes
 081FD4AC,Projectile_SetBehaviorCallback,thumb,low,src-alias,
 081FD4B0,Projectile_SetScriptProcedure,thumb,low,src-alias,Sets the procedure identifier passed to ScriptProc_Start and an associated argument
 081FD4B8,Projectile_SetBehaviorMode,thumb,low,src-alias,Sets the mode used to select the projectile update callback during creation
+081FD4C0,Projectile_AdjustHeading,thumb,low,src-alias,Turns toward the tracked target within the configured tracking duration.
 081FD530,Projectile_SetTrackingTarget,thumb,low,src-alias,Stores the target position pointer and enables target tracking
 081FD53C,OrbitEffect_SpawnInwardParticle,thumb,low,src-alias,Creates a sprite particle at a random X/Z offset; moving toward the orbit effect position.
 081FD664,OrbitEffect_AdjustHeading,thumb,low,src-alias,

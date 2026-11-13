@@ -14,7 +14,7 @@ struct SceneParticleLaunchParams {
 struct SceneProjectileLaunch {
     s32 speed;
     u8 mode, rotation;
-    u16 unknown6;
+    u16 lifetime;
     s16 contactCount;
     s16 scale;
 };
@@ -28,7 +28,8 @@ struct SceneProjectile {
     struct OrbitEffectSprite sprite;
     struct ContactCollider attack, body;
     struct SceneProjectileLaunch launch;
-    u8 unknown17C[0x44];
+    void *scriptProc;
+    u8 unknown180[0x40];
 };
 struct SceneProjectilePool {
     struct Task task;

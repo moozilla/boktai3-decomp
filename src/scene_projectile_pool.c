@@ -27,14 +27,14 @@ void SceneProjectile_UpdateSpriteRotation(struct SceneProjectile *projectile)
 
 s32 Mod(s32, s32);
 
-void sub_081FD4C0(void *);
+void Projectile_AdjustHeading(void *);
 
 s32 SceneProjectile_UpdatePulse(struct SceneProjectile *projectile)
 {
     if (projectile->age > projectile->params.lifetime)
         return 1;
     if (Mod(projectile->age, 2) == 0)
-        sub_081FD4C0(projectile);
+        Projectile_AdjustHeading(projectile);
     if (projectile->age == 1) {
         s32 v = projectile->params.turnSpeed >> 2;
         projectile->params.turnSpeed = v;
@@ -100,7 +100,7 @@ u32 SceneProjectile_UpdateHomingRotation(struct SceneProjectile *projectile)
 {
     u32 r;
     if (projectile->age <= projectile->params.lifetime) {
-        sub_081FD4C0(projectile);
+        Projectile_AdjustHeading(projectile);
         {
             u32 m = 2;
             projectile->flags = m | projectile->flags;
