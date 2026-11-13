@@ -3128,6 +3128,7 @@ addr,name,mode,confidence,source,notes
 080946D0,Bee_Destroy,thumb,low,src-alias,Destructor callback releases graphics and auxiliary resources then removes colliders and registry membership
 08094764,Bee_Init,thumb,high,gcl-name,name from GCL key E131 ビー (Bee); loader called by Bee_Create
 08095540,Bee_Create,thumb,high,gcl-name,name from GCL key E131 ビー (Bee); registry callback
+08095574,Ghost_NoOp,thumb,low,cleanup,Empty callback at the start of the Ghost unit; no known callers.
 08095578,Ghost_BeginContactReaction,thumb,low,src-alias,
 080956D4,SceneActorBehavior_OnContactForward,thumb,low,src-alias,
 08095740,Ghost_UpdateEnergyDrainAnimation,thumb,low,src-alias,
@@ -3147,28 +3148,31 @@ addr,name,mode,confidence,source,notes
 080972BC,SceneActor_BeginLinkedIdleReaction,thumb,low,src-alias,
 080973B4,Ghost_RequestVisibility,thumb,low,src-alias,
 080974F4,SceneActor_EasePlayerHeight,thumb,low,src-alias,
-080975C4,Bee_UpdateSway,thumb,low,src-alias,
+080975C4,Ghost_UpdateCurveSway,thumb,low,cleanup,Clamps the Ghost curve amplitude and advances it by its signed direction.
 08097624,Ghost_SelectRandomRouteEntry,thumb,low,src-alias,
 08097690,SceneActor_InitLinkedReactionColliders,thumb,low,src-alias,
 08097758,Ghost_GetBehaviorCode,thumb,low,src-alias,Ghost callback returning constant 4; behavior code interpretation is tentative
 0809775C,Ghost_SetMovementEndpoints,thumb,low,src-alias,Copies current and destination positions into the context and resets the movement counter
+08097798,Ghost_AdvanceMovementCurve,thumb,low,cleanup,Advances the timed Ghost movement curve and writes the saved motion subject position.
 0809794C,Ghost_InitActorProfile,thumb,low,src-alias,Finds or adds category 0x17 profile and stores it on the Ghost
 08097968,Ghost_ResetMovementState,thumb,low,src-alias,
 08097B18,SceneActor_EndLinkedReaction,thumb,low,src-alias,
 08097B98,Ghost_GetDirectionalFrame,thumb,low,src-alias,Converts heading into a five-frame direction index and horizontal flip flag
 08097BC0,Ghost_StartMovementToPosition,thumb,low,src-alias,Stores movement endpoints and resets behavior state while setting heading toward the destination
-08097C64,Bee_ClearActionFlags,thumb,low,src-alias,
+08097C64,Ghost_ClearActionFlags,thumb,low,cleanup,"Clears movement, tracking and private action flags and resets the route delay."
 08097CB4,Ghost_UpdateRandomDestination,thumb,low,src-alias,
 08097E38,Ghost_ReactToPlayerMovement,thumb,low,src-alias,
 08098038,Ghost_GetControlStatus,thumb,low,src-alias,Ghost control callback always returning zero; status interpretation is tentative
 0809803C,Ghost_OnControlCleanup,thumb,low,src-alias,Empty Ghost callback in the control lifecycle; cleanup interpretation is tentative
+08098040,Ghost_SetAfterimagePaletteWord,thumb,low,cleanup,Writes the word at animation resource offset 0xC for all four afterimages; palette interpretation tentative.
 08098064,SceneActor_InitLinkedSprites,thumb,low,src-alias,
 080980FC,Ghost_EmitAfterimage,thumb,low,src-alias,
 080982E4,ActorContact_TickAuxiliaryTimers,thumb,low,src-alias,
 08098324,Ghost_RemoveAuxiliarySprites,thumb,low,src-alias,Removes four consecutive sprites embedded in the Ghost actor
+08098344,Ghost_BuildMovementCurve,thumb,low,cleanup,Builds eight interpolated route samples and the final endpoint from the saved horizontal motion.
 0809852C,Ghost_TickVisibilityTransition,thumb,low,src-alias,
 08098660,ActorVisibility_TickRevealDelay,thumb,low,src-alias,
-080986DC,Bee_ConsumeFlag80,thumb,low,src-alias,
+080986DC,Ghost_EndPlayerSlowdown,thumb,low,cleanup,Consumes private flag 0x80 and removes the linked player movement-speed reduction.
 08098734,ActorTick_DecrementCounterAA,thumb,low,src-alias,
 08098788,Ghost_UpdateVisibility,thumb,low,src-alias,
 080989FC,ActorContact_UpdateColliderPositions,thumb,low,src-alias,
@@ -3180,6 +3184,7 @@ addr,name,mode,confidence,source,notes
 08099660,Ghost_ChooseMovementDestination,thumb,low,src-alias,
 080997E8,Ghost_InitReactionTable,thumb,low,src-alias,Installs the Ghost table at offset 0x288; reaction role is tentative
 080997F8,Ghost_UpdateFacingTrigger,thumb,low,src-alias,
+080999A0,Ghost_UpdateTriggerControl,thumb,low,cleanup,"Restores the saved control on entry, then consumes the pending trigger and advances its counter."
 08099A48,Ghost_InitEffectTable,thumb,low,src-alias,Installs the Ghost table at offset 0x29C; effect role is tentative
 08099A58,Ghost_OnBehaviorUpdate,thumb,low,src-alias,Ghost behavior callback dispatches the current state handler and runs supporting updates
 08099A90,Ghost_OnActorUpdate,thumb,low,src-alias,Ghost actor update callback binds the shared context and invokes the common update helper
