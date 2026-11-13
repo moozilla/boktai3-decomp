@@ -2443,3 +2443,25 @@ which is exactly `10:1`. Not tested.
    with a stock 1176-byte match. CSE canonicalization and PRE knobs do not diagnose
    this GCSE copy propagation; compare addressof and gcse dumps directly. The two
    independent call-tail barriers remained after this partial match.
+
+224. **Duplicate command loads across animation arms, but mask their result after the join.**
+   ActorGroup_CreateFromScript's ordinary playback helper first differed by 55/55,
+   mostly because its command pointer was allocated after the long-lived actor pointer.
+   Loading the next command in both the reverse and forward arms raises the command
+   pointer's reference count before jump2 merges the copies. Keeping the mask in those
+   arms left `ands r1,r0; strb r1`, where ROM uses r0. Assigning the loaded command to a
+   word local in each arm, then masking that joined value with
+   `DisplaySequence_MaskCommand(word, 15)`, restores the operand tie. The script-argument
+   loop also needed a normal do loop: its goto form swapped the index and destination
+   registers. Together these forms remove all five pins and the timer-mask barrier,
+   with no duplicated machine code or extra loads.
+
+225. **A byte cast at a call can move argument preparation before the stack argument.**
+   Collectible_StartDeath was two instruction-order differences from a match after
+   adopting DisplaySequence_StepSprite. `Anim_SetSequence(state, data, a, b, 0)` copied
+   a/b into r2/r3 after storing the fifth argument and moving state into r0; the ROM
+   copies them first. `(u8)a, (u8)b` at the call restores that order without extra
+   instructions. Both values come from a small switch (a = 0/3/5, b = 0/1), so narrowing
+   is exact. Declaring the locals as byte/halfword values alone did not do it; ordinary
+   wrapper helpers and a struct argument also left the two differences. Masks with
+   255 or 65535 added instructions, so do not substitute those for the cast blindly.

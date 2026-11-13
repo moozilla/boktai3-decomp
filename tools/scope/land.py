@@ -325,18 +325,28 @@ def stub_unit(text, asm_name, func, headers=()):
     return None
 
 
-def definition_span(text, name):
-    """(start, end) of NAME's definition in TEXT, comment lines directly above included, or None."""
+def definition_names(text, name):
+    """Spellings of NAME accepted in TEXT, including legacy ROM-label aliases."""
     names = [name]
     if re.fullmatch(r"sub_[0-9A-Fa-f]{8}", name):
         # Matching units may still spell the definition with a file-local ROM label alias.
         names.extend(re.findall(r"^[ \t]*#define[ \t]+(\w+)[ \t]+%s[ \t]*(?://[^\n]*)?$"
                                 % re.escape(name), text, re.M))
-    spellings = "|".join(map(re.escape, names))
+    return names
+
+
+def definition_match(text, name):
+    """Match NAME's definition header using the same aliases as definition_span."""
+    spellings = "|".join(map(re.escape, definition_names(text, name)))
     # clang-format can put a pointer return type on the preceding line. Only
     # declaration words and pointer stars may cross a line boundary here.
     head = r"^[A-Za-z_](?:[^\n;=()]*|[\w \t*]*\n[\w \t*\n]*)"
-    m = re.search(head + r"\b(?:%s)\s*\([^;{]*\)\s*\{" % spellings, text, re.M)
+    return re.search(head + r"\b(?P<name>%s)\s*\([^;{]*\)\s*\{" % spellings, text, re.M)
+
+
+def definition_span(text, name):
+    """(start, end) of NAME's definition in TEXT, comment lines directly above included, or None."""
+    m = definition_match(text, name)
     if not m:
         return None
     depth, i = 0, text.index("{", m.start())

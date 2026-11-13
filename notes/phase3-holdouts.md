@@ -4334,3 +4334,76 @@ hypotheses plus the landed partial root. Scratch and diagnostic evidence are in
 the special setup helpers' return/data flow that stops the three call tails
 from sharing, while keeping the new save/step topology and pointer definitions.
 The prototype and call arguments are unchanged; no new concession was added.
+
+### NamedObject_RegisterFollowCells (08101B1C)
+
+Tags: phase3, dp-field-b, NamedObject_RegisterFollowCells
+
+Run ended while this item was active. One existing object-pointer pin remains;
+no source change landed. Saved draft uses the named player tetherMode field
+and otherwise preserves the baseline pin-free shape (17/17 differences).
+
+Exact diagnosis: AGBCC_PRI=object:+1027 MATCHES. The local position pointer w
+has priority 2790 and is allocated before object (1764), taking r8; object
+then takes r10 rather than ROM r8. A smaller +1001 improvement leaves 12/12;
+raising i by 27 leaves 15/15. CSE_NOCANON=23 worsens to 18/18 with four moved
+branches. This is allocation order, not merely CSE canonicalization.
+
+Tried named player access (same), do-while form (same), explicit goto loop
+(31/35), direct object flag update (23/23), union-initialized local position
+pointer (same), and changing individual temporary position stores to direct
+fields. The Z form gives 15/17 with two moved branches; X is unchanged and Y
+is 16/18. Saved the cleaner baseline because the alternatives disturb local
+addressing without solving the exact allocation priority.
+Next: reduce w's effective priority or extend its meaningful lifetime while
+preserving its in-loop address materialization; alternatively recover another
+object reference that survives CSE. The exact priority knob is available to
+verify that a candidate addresses the right decision.
+
+### Collectible_UpdateEntry (08115674)
+
+Tags: phase3, dp-field-b, Collectible_UpdateEntry
+
+Partial landed: shared DisplaySequence_StepSprite removes the animation
+constraints and volatile reads; named camera, spatial-entry, and callback
+fields replace offsets. Only the original hit:r5 pin remains. Unit MATCH.
+
+The pin-free draft differs by 8/8, all the r5/r6 swap between hit and flagsPtr.
+AGBCC_PRI=hit:+100 MATCHES. Both have four references; flagsPtr lives 28
+insns (priority 2857), hit 29 (2758), so flagsPtr takes r5 first.
+CSE_NOCANON=hit does not change the result.
+
+Tried byte/halfword/signed hit locals, early palette pointer, several narrow
+damage calculations, an early-exit label, moving the flags-pointer assignment
+after the join (same code), and before the proximity test (worse). Taking
+callback/tick field addresses before the flag store changes addressing and
+loses instructions. Inline death-marking and callback helpers with byte and
+word arguments still give 8/8.
+Next: seek a natural extra live instruction for flagsPtr or a shorter hit
+lifetime; only a two-instruction difference is needed, but moves that change
+source order have also changed the ROM instruction order. Do not add dummy
+references or statement wrappers to adjust priority.
+
+### sub_0817AEC8 (0817AEC8)
+
+Tags: phase3, dp-field-b, sub_0817AEC8
+
+One existing sine-table pin remains. Removing it gives 53/49 with three moved
+branches. The second loop pass hoists the sine pointer (13 x 1 x 25 >= 92).
+A local union initializer prevents that hoist and gives 37/37, shape 2.
+AGBCC_PRI=sine:+13944 MATCHES on this draft; AGBCC_FORCE=sine:2 also matches.
+
+The sine pointer has three loop mentions (six weighted references), priority
+2857 after constant lifetime doubling to 42. Heading has fourteen weighted
+references, priority 16800, and takes r2 first. Speed then takes r3 instead
+of r4; the shared zero takes r4 instead of r5, changing RNG reload choices.
+This is a coupled hoist/allocation problem, not a remaining RNG mismatch.
+
+Projection helpers returning s32 or s16, an inline whole-vector polar helper,
+and direction-first addition all preserve the 37/37 result. Reconstructing
+the sine pointer from two halfwords adds instructions (37/45). Calculating
+speed before heading changes instruction order without fixing allocation.
+Prior round's narrow-heading/polar forms are recorded in round11-d-holdouts.
+Next: recover a natural short-lived sine operand or another table view whose
+allocation precedes heading; a one-use statement macro would only hide the
+priority knob and must not be used.
