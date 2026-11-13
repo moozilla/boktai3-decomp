@@ -4,7 +4,7 @@
 #include "actor_palette_fade.h"
 #include "contact_position.h"
 #include "actor_ability_types.h"
-struct ActorDrainState {
+struct ModifierDrainState {
     void (*update)(void);
     void *displayPosition;
     u16 counter, amount;
@@ -39,7 +39,7 @@ struct ActorStats {
     s32 parameter90, parameter94, scaledParameter98;
     s32 parameter9C, parameterA0, parameterA4, parameterA8;
     u8 grounded, unknownAD[3];
-    struct ActorDrainState drain;
+    struct ModifierDrainState drain;
     s32 boost;
     u8 unknownC4[0x250];
     struct ActorAbility ability;

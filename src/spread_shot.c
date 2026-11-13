@@ -374,7 +374,7 @@ void SceneTerrainProbe_NoopTrailHook(void)
 /* Keep the cell lookup and height calculation together here: sharing CellHeight
  * changes the step's register allocation and removes an original instruction. */
 
-void sub_08126AD4(struct ContactPosition *, u32, u32, u32, u32, u32, u32);
+void BurstSpark_Create(struct ContactPosition *, u32, u32, u32, u32, u32, u32);
 
 static inline u32 CellIndex(struct ContactPosition *position)
 {
@@ -472,10 +472,10 @@ void SpreadShot_Step(u32 unused, struct SpreadShot *shot)
     if (shot->kind == 2) {
         s32 i;
         for (i = 0; i <= 3; i++)
-            sub_08126AD4(&noticePosition, 1, 0, i << 6, 0x54, 1, 0);
+            BurstSpark_Create(&noticePosition, 1, 0, i << 6, 0x54, 1, 0);
         for (i = 0; i <= 1; i++) {
-            sub_08126AD4(&noticePosition, 1, 8, i << 6, 0x22, 1, 0);
-            sub_08126AD4(&noticePosition, 1, 14, i << 6, 0x40, 1, 0);
+            BurstSpark_Create(&noticePosition, 1, 8, i << 6, 0x22, 1, 0);
+            BurstSpark_Create(&noticePosition, 1, 14, i << 6, 0x40, 1, 0);
         }
         *timer = 8;
     } else {

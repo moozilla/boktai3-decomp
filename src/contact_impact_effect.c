@@ -704,7 +704,7 @@ struct ContactImpactEffect *RegistryF3E4_CreateHidden(s32 field3B, s32 mode)
         struct OrbitMotion *in = &p->motion;
         in->position = 0;
         in->state = 0;
-        in->unk28 = 0;
+        in->mode = 0;
         in->timer = 0;
     }
     RegistryF3E4_SetHidden(p);
@@ -755,7 +755,7 @@ struct ContactImpactEffect *RegistryF3E4_Create(u32 name)
         struct OrbitMotion *in = &p->motion;
         in->position = 0;
         in->state = 0;
-        in->unk28 = 0;
+        in->mode = 0;
         in->timer = 0;
     }
     SceneMessages_RegisterReceiver(&p->receiver, p->name, 10);

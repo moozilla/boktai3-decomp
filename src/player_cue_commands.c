@@ -602,7 +602,7 @@ void PlayerCue_Shoot(struct Player *player, s32 projectileParameter, u32 paramet
         Sound_PlaySong(0xCD);
         spriteId = 0x4B;
     }
-    MovingSprite_Create_082375FC(&position, spriteId, 0, player->facing, 0x20, 0,
+    MovingGlyph_Create(&position, spriteId, 0, player->facing, 0x20, 0,
                                  projectileParameter);
     player->cueParameter = parameter;
     Player_EnterKindTwo(player);

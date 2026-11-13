@@ -81,11 +81,11 @@ void Registry3F74_UpdateAnimations(struct RegistryChoiceMenu *menu)
     anim = &menu->animations[3];
     offset = MenuCursor_GetEntry(menu->cursor, menu->initialSelection);
     if (offset) {
-        anim->screenOffsetX = offset->x;
-        anim->screenOffsetY = offset->y;
+        anim->width = offset->x;
+        anim->height = offset->y;
     } else {
-        anim->screenOffsetX = 0;
-        anim->screenOffsetY = 0;
+        anim->width = 0;
+        anim->height = 0;
     }
     anim = &menu->animations[4];
     if (menu->selection == 1)

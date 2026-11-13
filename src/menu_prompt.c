@@ -1,6 +1,5 @@
 #include "global.h"
 #include "menu_prompt.h"
-#include "scene_panel.h"
 #include "game_state.h"
 #include "input.h"
 #include "render.h"
@@ -14,7 +13,7 @@ void Hud_SetupBackgroundLayer(void *, u32, s32, s32, u32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void MenuPrompt_UpdateSelectionSprites(struct MenuPrompt *);
-void ScenePanel_BeginAccountMenu(struct ScenePanel *);
+void ScenePanel_BeginAccountMenu(struct MenuPromptPanel *);
 
 void PauseMenu_HideAllSprites(void *);
 
@@ -85,7 +84,7 @@ void ScenePanel_BeginSelection(void *);
 
 void PauseMenu_UpdateQuantityInput(void *);
 
-void ScenePanel_UpdateDetail(struct ScenePanel *p)
+void ScenePanel_UpdateDetail(struct MenuPromptPanel *p)
 {
     Anim_Step(&p->mainSprite, p->keyframes);
     if (gPadState[1] & 1) {
@@ -287,11 +286,11 @@ s32 MessageWindow_SetDisplayMode(s32);
 
 void SceneSequence_UpdateRamp64(void);
 
-void ScenePanel_BeginAccountMenu(struct ScenePanel *p)
+void ScenePanel_BeginAccountMenu(struct MenuPromptPanel *p)
 {
     u32 zero;
     u16 *coord;
-    struct PanelSprite *anim;
+    struct MenuPromptSprite *anim;
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_RequestHide();

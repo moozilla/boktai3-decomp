@@ -1,6 +1,7 @@
 #include "scene_hud_map.h"
 #include "render.h"
 #include "scene_hud_display.h"
+#include "sun_clock.h"
 #include "scene_input_panel.h"
 
 u16 *SceneHud_GetMapCell(u32 layerIndex, u32 x, u32 y)

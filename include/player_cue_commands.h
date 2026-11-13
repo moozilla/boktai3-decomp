@@ -74,7 +74,7 @@ void PlayerCue_UpdateAimHoldB(struct Player *);
 
 void Player_UpdateSixPhaseAction(struct Player *);
 
-void MovingSprite_Create_082375FC(struct SceneVec *, s32, s32, s32, s32, s32, s32);
+void MovingGlyph_Create(struct SceneVec *, s32, s32, s32, s32, s32, s32);
 
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 
