@@ -1627,3 +1627,18 @@ not resolve the previous/gain allocation. No new concessions were introduced.
 Next: find a natural conversion-loop form that retains its address addition
 inside the loop, then a gain/previous lifetime with previous in r4. The partial
 removes four concessions and leaves the earlier script/player logic intact.
+
+### AreaEffect_UpdateLinkVisibility (0804EDD0): resolved
+
+All six pins and two barriers removed. Use ordinary indexed for loops in
+the two visibility arms, sharing one function-scope index (fact 45), and
+return u8 from the link-value reader. Named hasSprite/enabled/spriteFlags
+fields replace raw pointer arithmetic. Stock check MATCH (196 bytes).
+
+The u8 return alone removes the sample pin with no differences. The natural
+show/hide loops in separate inline helpers give 17/17, shape 2: the separate
+indices lose r4 to the PRE count address. First index has priority 3870 versus
+count-address 4117; AGBCC_PRI=i:+248 improves to 6/6, shape 0. Sharing the
+function-scope index across both direct loops gives the full match, including
+the second count-pointer copy. Passing an index pointer into both helpers
+changes shape badly (48/62); explicit pointer-loop helpers also fare worse.
