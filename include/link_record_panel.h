@@ -1,6 +1,6 @@
 #ifndef GUARD_LINK_RECORD_PANEL_H
 #define GUARD_LINK_RECORD_PANEL_H
-#include "modifier_list.h"
+#include "character_preview_actor.h"
 #include "scene_input.h"
 /* Two received records are a phase of the session's payload storage. */
 struct LinkTimeRecord {
@@ -20,13 +20,6 @@ struct LinkRecordIncomingStyle {
     u8 kind, variant, form, palette, extra;
     u8 unknown5[0x24 - 5];
 };
-struct LinkRecordPreview {
-    u8 unknown0[0x48];
-    u8 kind, variant, form, palette, extra;
-    u8 unknown4D[0x5F8 - 0x4D];
-    struct CharacterPreviewModel model;
-    u8 unknown848[2], player, unknown84B[5];
-};
 struct LinkRecordPaletteCycle {
     u16 colors[16], frame;
     u8 unknown22[2];
@@ -40,7 +33,7 @@ struct LinkRecordPanel {
     void *widgetScript;
     u8 unknown320[4];
     struct LinkRecordPaletteCycle paletteCycle;
-    struct LinkRecordPreview previews[2];
+    struct CharacterPreviewActor previews[2];
     void (*update)(struct LinkRecordPanel *);
     u32 sourceScript;
     const u8 *contextScript;

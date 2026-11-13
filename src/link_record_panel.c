@@ -255,7 +255,7 @@ void LinkRecordPanel_InitializePreviews(struct LinkRecordPanel *panel)
     for (i = 0; i <= 1; i++) {
         struct AreaEffectLinkState *link = gLinkSession;
         struct LinkRecordIncomingStyle *payload;
-        struct LinkRecordPreview *preview;
+        struct CharacterPreviewActor *preview;
         struct CharacterPreviewModel *model;
         s32 flags;
         s32 k;
