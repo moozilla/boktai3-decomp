@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
 void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmSlot *slot,
@@ -6,6 +5,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
 {
     struct ContactSwarmSprite *sprite = &slot->display.animation.draw.sprite;
     struct ContactPosition *position;
+    u32 frame;
     if (slot->enter) {
         struct ContactCollider *collider;
         s32 mask;
@@ -31,11 +31,14 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
             dz -= position->z;
             slot->direction = Math_Atan2(dx, dz);
             ContactSwarm_SetDirectionalSequence(pool, slot, 0);
+            Collider_SetPosition(&slot->display.healthCollider, position, 0);
+            frame = slot->stateFrame;
+        } else {
+            Collider_SetPosition(&slot->display.healthCollider, position, 0);
+            frame = slot->stateFrame;
         }
     }
-    Collider_SetPosition(&slot->display.healthCollider, position, 0);
     {
-        u32 frame = slot->stateFrame;
         u32 limit;
         limit = slot->trackingFrames;
         if (frame >= limit) {
@@ -49,7 +52,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
             u32 direction;
             u32 randomIndex;
             u32 jitter;
-            register u32 mask asm("r2");
+            u32 mask;
             target = (void *)((u8 *)pool + offset);
             dx = target->x;
             current = sprite;
