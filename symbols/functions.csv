@@ -4236,26 +4236,26 @@ addr,name,mode,confidence,source,notes
 081093FC,LinkSession_CallPositionScript,thumb,low,src-alias,
 08109464,Registry1745_GetSessionState,thumb,low,src-alias,Returns the session state byte at offset 0x1C or zero when absent
 08109480,LinkSession_GetSlotValues,thumb,low,src-alias,
-081094EC,LinkConnectionMenu_LoadBackground,thumb,low,src-alias,Loads background resources and copies the palette into shadow palette memory
-0810954C,LinkConnectionMenu_CreateTextWindow,thumb,low,src-alias,Creates the menu text window and displays its configured script
-08109578,LinkConnectionMenu_HideTextWindow,thumb,low,src-alias,Hides the stored text window during task cleanup
-08109584,LinkConnectionMenu_RunExitScript,thumb,low,src-alias,Clears all background tilemaps and invokes the optional exit script
-081095B4,ResultMessage_ShowOutcome,thumb,low,src-alias,
-0810963C,ResultMessage_RunOutcomeScript,thumb,low,src-alias,
-081096B0,LinkConnectionMenu_GetErrorMessageIndex,thumb,low,src-alias,Maps connection result codes 3 and 0x10 to distinct text entries with a fallback
-081096CC,TimedMessage_ShowNotice,thumb,low,src-alias,
-08109738,TimedMessage_ShowFollowup,thumb,low,src-alias,
-081097A8,TimedMessage_SelectNextState,thumb,low,src-alias,
+081094EC,MessagePanel_LoadBackground,thumb,low,src-alias,Shared link outcome and save-notice task.
+0810954C,MessagePanel_CreateTextWindow,thumb,low,src-alias,Shared link outcome and save-notice task.
+08109578,MessagePanel_HideTextWindow,thumb,low,src-alias,Shared link outcome and save-notice task.
+08109584,MessagePanel_RunExitScript,thumb,low,src-alias,Shared link outcome and save-notice task.
+081095B4,MessagePanel_ShowOutcome,thumb,low,src-alias,Shared link outcome and save-notice task.
+0810963C,MessagePanel_RunOutcomeScript,thumb,low,src-alias,Shared link outcome and save-notice task.
+081096B0,MessagePanel_GetErrorMessageIndex,thumb,low,src-alias,Shared link outcome and save-notice task.
+081096CC,MessagePanel_ShowNotice,thumb,low,src-alias,Shared link outcome and save-notice task.
+08109738,MessagePanel_ShowFollowup,thumb,low,src-alias,Shared link outcome and save-notice task.
+081097A8,MessagePanel_SelectNextState,thumb,low,src-alias,Shared link outcome and save-notice task.
 081097E0,MessagePanel_WaitForDismiss,thumb,low,src-alias,
 08109838,MessagePanel_WaitForInput,thumb,low,src-alias,
-08109890,LinkConnectionMenu_OnExitState,thumb,low,src-alias,State callback that runs exit cleanup once and clears the entry flag
+08109890,MessagePanel_OnExitState,thumb,low,src-alias,Shared link outcome and save-notice task.
 081098B0,MessagePanel_BeginDismiss,thumb,low,src-alias,
 0810990C,MessagePanel_DelayDismiss,thumb,low,src-alias,
 08109948,MessagePanel_ResetDisplay,thumb,low,src-alias,
 081099A4,MessagePanel_Update,thumb,low,src-alias,
-081099E4,LinkConnectionMenu_OnDestroy,thumb,low,src-alias,Task destruction callback that releases shared link UI state and hides the text window
+081099E4,MessagePanel_OnDestroy,thumb,low,src-alias,Shared link outcome and save-notice task.
 08109A04,MessagePanel_InitFromScript,thumb,low,src-alias,
-08109AB0,LinkConnectionMenu_CreateFromScript,thumb,low,src-alias,Creates the menu task and initializes it from script options with failure cleanup
+08109AB0,MessagePanel_CreateFromScript,thumb,low,src-alias,Shared link outcome and save-notice task.
 08109AEC,ClockPanel_CaptureSnapshot,thumb,low,src-alias,
 08109BD0,Registry1745_InitSessionSettings,thumb,low,src-alias,Loads saved settings and initializes two session bytes including a queried configuration value
 08109BF8,Registry1745_ResetTransferCounters,thumb,low,src-alias,Clears paired halfword and word fields plus their shared counter; transfer interpretation is tentative
