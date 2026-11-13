@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "render.h"
 #include "scene_panel_overlay.h"
-
-// MATCHING_CONCESSION: register-pinning
 
 static inline s32 scaleSceneOverlay(s32 value)
 {
@@ -213,10 +212,9 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                 {
                     void **mapSlot;
                     struct ScenePanel *mapPanel = panel;
-                    u32 mapOffset = 0x4DC;
                     struct SceneOverlayMapEntry *copied;
                     u32 relative;
-                    mapSlot = (void *)((u8 *)mapPanel + mapOffset);
+                    mapSlot = (void *)&mapPanel->overlayMap;
                     copied = entryPointer;
                     relative = (u32)copied->blocks;
                     {
