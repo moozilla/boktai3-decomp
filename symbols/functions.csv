@@ -9193,6 +9193,7 @@ addr,name,mode,confidence,source,notes
 08210654,PinkSpine_InitFromScript,thumb,low,src-alias,
 082109D8,PinkSpine_Create,thumb,low,src-alias,Creates and initializes the actor task; tentative prefix from its pink and pale-blue sprite palette
 08210A1C,Collection_GetPageEntryCount,thumb,low,src-alias,Returns the table value used to mask unused slots on a collection page
+08210A2C,Collection_SetEntryUnlocked,thumb,low,src-alias,Collection album: persistent 27-entry unlock mask; page counts; entry sprites; selection grid and description text.
 08210A48,Collection_IsEntryUnlocked,thumb,low,src-alias,Tests the indexed bit in the persistent collection unlock mask
 08210A60,Collection_UnlockEntryFromScript,thumb,low,src-alias,Reads script keyword i and sets the corresponding collection unlock bit
 08210A8C,Collection_CountUnlockedEntries,thumb,low,src-alias,Counts unlocked entries across the collection's 27 bits
@@ -9200,7 +9201,7 @@ addr,name,mode,confidence,source,notes
 08210AD4,Collection_UpdateEntryVisibility,thumb,low,src-alias,
 08210B50,Collection_UpdateCountDigits,thumb,low,src-alias,Loads digit keyframes displaying the unlocked count and total of 27
 08210BEC,Collection_UpdatePageIndicator,thumb,low,src-alias,Loads the page indicator keyframe using the current page index
-08210C14,SceneKeyframe_SetGridPosition,thumb,low,src-alias,
+08210C14,Collection_UpdateCursor,thumb,low,src-alias,Collection album: persistent 27-entry unlock mask; page counts; entry sprites; selection grid and description text.
 08210C5C,Collection_UpdateHighlightPulse,thumb,low,src-alias,Cycles a highlight value through a repeating 50-frame brightness pattern
 08210CB0,Collection_UpdateSelectedEntryText,thumb,low,src-alias,Refreshes the selected entry text using unlocked or locked scripts and string tables
 08210D60,Collection_LoadPageBackground,thumb,low,src-alias,Loads background resources and masks grid slots beyond the current page's entry count
