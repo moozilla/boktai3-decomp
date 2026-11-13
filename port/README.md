@@ -17,16 +17,24 @@ This builds `build/port/game/game.wasm` (cached; needs `build/boktai3.elf` from
 `make` or `tools/worktree.sh --here`), serves `port/web/` on
 `http://127.0.0.1:8765` and opens the page. The page loads `baserom.gba` from the
 repository root by itself; the file picker appears only when the server has no
-ROM. Keys: arrows, X = A, Z = B, A = L, S = R, Enter = Start, Backspace = Select,
-Space = fast-forward (hold), P = pause. The sunlight slider feeds the solar
-sensor. "Start from" picks your own save (`build/port/saves/boktai3.sav`, written
+ROM. Default keys: arrows, X = A, Z = B, A = L, S = R, Enter = Start,
+Backspace = Select, Space = fast-forward (hold), P = pause, F9 = screenshot,
+F10 = record a clip, F = fullscreen, T = subtitles on/off; a standard gamepad works
+too. Settings (the button under the game, docked beside it) rebinds every key and
+pad button, styles the subtitles, sets the screen colors (a GBA-screen color
+filter, an LCD grid, smooth scaling) and picks where sunlight comes from: the
+slider, your clock (the sun's height at this hour) or your camera. Settings stay
+in the browser's local storage. "Start from" picks your own save (`build/port/saves/boktai3.sav`, written
 as you play), a new game, `tests/saves/*.sav`, or the story checkpoints in
 `build/saves/` (`python3 tools/assets/saves.py bank --make`).
 
 Below the game, the Studio panel (when `build/boktai3.elf` and the headers are
 there) has a JavaScript console with typed views of every global, watches, the
-task list, and sprite outlines named by their owner; English subtitles draw over
-the game's own text box. Agents (and people at a terminal) drive and inspect the
+task list, and sprite outlines named by their owner. English subtitles of the
+line in the game's text box (the fan translation in `../boktai3trans`) sit just
+above or below the box so the original stays visible: box, glass, outline or
+shadow style, with size, background opacity, color, font, speaker names and an
+optional Japanese line set in Settings. Agents (and people at a terminal) drive and inspect the
 running game with [`port/agent/play.py`](agent/README.md): JavaScript scripts that
 run frames, frame stepping, breakpoints, call and script traces, C snippets run
 inside the game, warps, checkpoints, and a link to the studio's Live page.
