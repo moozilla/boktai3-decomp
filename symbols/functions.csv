@@ -8330,8 +8330,10 @@ addr,name,mode,confidence,source,notes
 081D7300,TextSequence_InitializeFromScript,thumb,low,src-alias,Scripted bestiary display sequence: 64 timing/position/entry records; fade phases and current-step state.
 081D73F0,TextSequence_CreateFromScript,thumb,low,src-alias,Creates a task that reads timed text and color records from script options; identity tentative
 081D7434,OptionMenu_Update,thumb,low,src-alias,
-081D7510,ScreenParams2A0_SetFromScript,thumb,low,src-alias,
-081D75AC,ScreenParams2A0_CreateSelector,thumb,low,src-alias,Creates an input task that selects among eight script callbacks configured through ScreenParams2A0
+081D7508,OptionMenu_OnDestroy,thumb,low,src-alias,Eight-choice scripted option selector: callback table; current selection; input and timeout.
+081D750C,OptionMenu_Initialize,thumb,low,src-alias,Eight-choice scripted option selector: callback table; current selection; input and timeout.
+081D7510,OptionMenu_SetScriptsFromScript,thumb,low,src-alias,Eight-choice scripted option selector: callback table; current selection; input and timeout.
+081D75AC,OptionMenu_Create,thumb,low,src-alias,Eight-choice scripted option selector: callback table; current selection; input and timeout.
 081D75E8,Task4E01_UpdateTrailSprites,thumb,low,src-alias,Updates four radial trail sprites with shrinking offsets and hides each after its fifteenth tick.
 081D76F4,Task4E01_SpawnTrailSprite,thumb,low,src-alias,
 081D7874,Task4E01_ClearTrailSprites,thumb,low,src-alias,Clears four active bytes and hides their corresponding sprites; trail identity tentative
