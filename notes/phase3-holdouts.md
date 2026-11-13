@@ -1308,7 +1308,44 @@ initialization next to its use when replacement fails; a same-block local does
 not take that path. Across-branch spellings changed register pressure and code
 order instead of producing the needed r1 suggestion. Persistent store:
 `build/matchsearch/sub_0803198C`, with lifetime, join, aggregate and union proposals
-and the exact diagnostic force result. The guarded move slate has no useful
-statement/copy candidates. Next: identify a real completion-state representation
+and the exact diagnostic force result. The guarded move slate offers field-store swaps and temporary rvalues,
+but none at the callback store; there is no useful move for that alias lifetime. Next: identify a real completion-state representation
 that keeps r0 live through the callback store without adding a surviving read,
 or introduces an r1 copy suggestion only at that store.
+
+
+### TextState_ProcessTag (0803232C): five concessions removed, speaker alias remains
+
+Tags: #menus #dialogue #matching #compiler
+
+The queue calls this TextVm_ProcessTag, but the current symbol inventory and
+source use TextState_ProcessTag. Landed the previous menus-link recovery with
+only the existing r6 speaker alias pin retained: two other pins and all three
+barriers are gone; the 1816-byte unit checks MATCH. Repeated complete per-arm
+actions preserve the original cross-jump labels. No new concessions were added.
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/TextState_ProcessTag.c`, still
+3 ROM / 3 draft, identical extent. Insn 1190 initially copies name (144) into
+alias (202), but cse replaces both alias uses by name at insns 1195 and 1219,
+then drops the copy. `why 1195` proves this is cse canonicalization, before
+allocation; raising name's priority would change all comparisons, not restore
+the local copy. CSE_KEEP=202 has no effect because 202 is never the class head.
+The retained alias pin is the exact diagnostic known to restore the copy.
+
+Extended the previous field/name combination and inline experiments with a
+pointer union, one-element pointer array, pointer-to-array view, separate
+PLAYER pointer, and SI/DI aggregate views. All scalar views canonicalize away;
+a DI initializer adds unrelated instructions. Identical late branch assignments
+from name produce the copy at the correct address, but leave a dead length load
+and the first call still uses r4. Identical field-address branches instead make
+PRE insert the copy after the early NONE comparison. Reusing the previous
+comparison result avoids a new load, but either folds the branch too soon or
+changes name/value live ranges throughout the comparisons. Bit-test joins have
+the same early PRE copy or substantially worse allocation. No complete knob
+match is known beyond the original register constraint.
+
+Persistent store: `build/matchsearch/TextState_ProcessTag`, with the baseline,
+aggregate/lifetime/join proposals and name allocation trace. A fresh probe also
+checks cse follow/canonical choices. Next: source that gives the alias a distinct
+value representation only for the two comparisons, or a PRE insertion whose
+latest placement is the 0x40C join; avoid revisiting simple scalar aliases.
