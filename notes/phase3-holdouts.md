@@ -1293,3 +1293,30 @@ conversion directly into the packed vector adds bitfield read-modify-write instr
 use an s32 coordinate local before storing it if revisiting this form.
 Next: solve the sample/result dying-operand tie, then retry the remaining pointer pins and
 loop increments; the fully unpinned draft also needs output's sb allocation.
+
+### ScenePanel_TickRig (0805AC3C): no removal landed
+
+Saved named-field draft: `notes/phase3-drafts/dp-menus-b/ScenePanel_TickRig.c`.
+It has no pins/barriers and preserves the original volatile timer member reads. 18 ROM /
+20 draft instructions, shape 2, 224 versus 220 bytes. Without the explicit halfword mask
+on the second frame read, combine preserves an intermediate left shift and later shifts
+right by 18 instead of 2. The redundant mask gives the correct shift and one extra move.
+`AGBCC_FORCE=frame:3,96:3` (frame is pseudo 95) coalesces the halfword load and wide copy:
+16/16, shape 0, 220 bytes. This is not a full matching probe.
+
+The other issue is reload's register set: ordinary fields use only r0/r1/r2 as spill
+registers, while the ROM uses r3 for the false-arm collider address and suppress-drain
+address. The frame/interval pointer allocation also differs. A single reload rotation
+cannot solve a register missing from the set. Generic probe tried the one canonical CSE
+choice and three jump follows; none changes the score. No full matching knob found.
+
+Tried all-pin stripping; direct named fields with loads ordered before mask constants;
+shared or split timer declarations; u16/s16/s32 frame types; frame-read inline helper;
+reusing the first frame/interval locals; early phase computation; commuted comparison;
+unsigned division/modulo; word/halfword unions and zero initializers; u16/u32 bitfield
+member views and local bitfield views; halfword pointer alias and redundant mask. The
+bitfield views change loads, and ordinary unions collapse back to the same widening.
+Partial removals of the first-arm value/mask pins and whole first arm were not exact;
+the original tail plus ordinary head still misses seven reload-register instructions.
+Next: get the halfword load and widened frame into one ordinary-C allocation quantity,
+and make reload reserve r3 without a pin. The C mask is worth retaining for that search.
