@@ -862,6 +862,12 @@ of its life.
 
 ### Ivy_UpdateDefeat (src/fn/sub_080EE1B0.c, 080EE1B0): table pin, one load position from a match
 
+Resolved by dp-monsters: encoded offset/page/region table source plus the shared
+SceneActorEffects_SpawnDefeatSparks helper match together. Encoding alone stays
+14/14; the helper alone gives 65/69. Also replaced the flags868 raw access with
+the existing GameState field and removed the unnecessary volatile CpuSet zero
+source. Complete unit MATCH with no concessions. Prior diagnosis follows.
+
 Six-spark family, but here the table is a local-alloc qty, not a REG_EQUIV spill. Block 24's
 call-saved qtys (AGBCC_DUMPPRI L records) in priority order: =gRandomIndex 2010 r4, a pointer
 1163 r5, =1#2 769 r6, size 760 r8, then the position `&actor->body.position` (7 refs, life
