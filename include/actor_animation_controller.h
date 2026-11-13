@@ -103,14 +103,16 @@ struct ActorAnimController {
     u8 last, next; /* 0xF6C */
     u8 unkF6E;
     u8 growFlag; /* 0xF6F: provisional, gates Actor_UpdateScaleGrowth */
-    u8 unkF70[7];
+    u8 unkF70[6];
+    u8 releaseControl; /* 0xF76: clear script control when the finishing animation ends */
     u8 variant8; /* 0xF77: provisional, not the same slot as .variant below */
     u8 unkF78[2];
     u16 savedY2; /* 0xF7A: provisional idle-restore save, distinct from sprite.y */
     u8 heightSettled;
     u8 interrupted; /* 0xF7D */
     u16 savedPhase; /* 0xF7E */
-    u8 unkF80[4];
+    u16 blinkTimer;   /* 0xF80 */
+    s16 blinkInterval; /* 0xF82: decreases as disappearance accelerates */
     u16 delay;                 /* 0xF84 */
     u8 savedFrame, savedTimer; /* 0xF86 */
     u8 delayCounter;           /* 0xF88: provisional, distinct from the delay/timer fields above */
