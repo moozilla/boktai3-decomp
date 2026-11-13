@@ -321,6 +321,7 @@ def rom_name(src, func):
 def kref(wd, func, x):
     """How a what-if knob should name pseudo X: its C variable name when that is unique (names survive
     edits; numbers shift), else the number."""
+    x = local_quantity_owners(wd, func).get(x, x)
     pn = pseudo_names(wd, func)
     n = pn.get(x)
     if n and re.fullmatch(r"[A-Za-z_]\w*(#\d+)?", n) and list(pn.values()).count(n) == 1:
@@ -369,6 +370,7 @@ def resolve_knobs(src, func, env):
     rev = {}
     for p, n in pseudo_names(wd, func).items():
         rev.setdefault(n, []).append(p)
+    local_owners = local_quantity_owners(wd, func)
     def sub(tok):
         name, rest = tok.split(":", 1)
         if name.isdigit():
@@ -376,7 +378,8 @@ def resolve_knobs(src, func, env):
         if len(rev.get(name, [])) != 1:
             sys.exit(f"{name}: " + (f"names pseudos {rev[name]}; use a number" if name in rev else
                                      f"no pseudo by that name (known: {', '.join(sorted(rev))[:300]})"))
-        return f"{rev[name][0]}:{rest}"
+        pseudo = rev[name][0]
+        return f"{local_owners.get(pseudo, pseudo)}:{rest}"
     out = dict(env, **{k: ",".join(sub(t) for t in env[k].split(",")) for k in keys})
     print("  knobs: " + " ".join(f"{k}={out[k]}" for k in keys), file=sys.stderr)
     return out
@@ -1741,7 +1744,66 @@ def alloc_records(wd, func, *, global_order=False):
         elif not global_order and p[0] == "L" and p[1] == func and int(p[10]) >= 0:
             # local alloc runs first; a pseudo it placed also shows up in the G list, so L wins
             out[int(p[3])] = ("L", int(p[2]), int(p[5]), int(p[6]), int(p[7]), int(p[8]), int(p[10]))
+    if not global_order:
+        for member, owner in local_quantity_owners(wd, func).items():
+            out[member] = out[owner]
     return out
+
+
+@by_dumps("u.i.lreg", "names.txt")
+def local_quantity_owners(wd, func):
+    """Recover tied local members omitted by the quantity-head-only L records.
+
+    lreg records every placed pseudo. A dying operand and its destination in
+    the same hard register connect members; accept only components with one
+    recorded quantity head. Separate recorded quantities are never merged.
+    """
+    path = os.path.join(wd, "u.i.lreg")
+    if not os.path.exists(path):
+        return {}
+    with open(path) as stream:
+        text = stream.read()
+    names_path = os.path.join(wd, "names.txt")
+    func = dump_func(wd, func)
+    recorded_heads = set()
+    names = []
+    if os.path.exists(names_path):
+        with open(names_path) as stream:
+            names = stream.readlines()
+    for line in names:
+        fields = line.split()
+        if len(fields) > 10 and fields[0] == "L" and fields[1] == func and int(fields[10]) >= 0:
+            recorded_heads.add(int(fields[3]))
+    placed = {int(p): int(h) for p, h in re.findall(r"^;; Register (\d+) in (\d+)\.", text, re.M)}
+    graph = {p: set() for p in placed}
+    for match in re.finditer(r"^\(insn(?:/\w)* \d+ .*?(?=^\(|\Z)", text, re.M | re.S):
+        block = match.group(0)
+        dest = re.match(r"\(set \(reg(?:/\w)*:\w+ (\d+)\)", one_line(block))
+        if not dest or int(dest.group(1)) not in placed:
+            continue
+        x = int(dest.group(1))
+        operands = regs_of(one_line(block))
+        for dead in re.findall(r"REG_DEAD \(reg(?:/\w)*:\w+ (\d+)\)", block):
+            y = int(dead)
+            if y != x and y in operands[1:] and y in placed and placed[x] == placed[y]:
+                graph[x].add(y)
+                graph[y].add(x)
+    owners, seen = {}, set()
+    for start in graph:
+        if start in seen:
+            continue
+        pending, component = [start], set()
+        while pending:
+            x = pending.pop()
+            if x in component:
+                continue
+            component.add(x)
+            pending.extend(graph[x] - component)
+        seen.update(component)
+        heads = list(component & recorded_heads)
+        if len(heads) == 1:
+            owners.update((x, heads[0]) for x in component if x != heads[0])
+    return owners
 
 
 def small_sort_order(pris):
@@ -2914,6 +2976,11 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         _, blk, pri, birth, death, refs, _ = rec
         print(f"    {nm(pseudo)} is a local-alloc pseudo (block {blk}, priority {pri}, {refs} refs);"
               f" it got {rname(got)}, the ROM has {rname(want)}.")
+        owner = local_quantity_owners(wd, func).get(pseudo)
+        if owner is not None:
+            print(f"    it shares the local quantity headed by {nm(owner)} (dying operands tied to their"
+                  " destinations in lreg). These refs and priority belong to the whole quantity;"
+                  f" allocation knobs must name its head, {kref(wd, func, owner)}.")
         if rec[6] != got:
             for owner, attempts in find_reg_view(wd, func).items():
                 if any(not f["retrying"] and f["first"] < 0 and f["final"] == rec[6] for f in attempts):
@@ -3000,6 +3067,12 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
     if rec and rec[0] == "G":
         for x in sorted(rivals, key=lambda x: -recs.get(x, (0, 0, 0))[2])[:2]:
             xr = recs.get(x)
+            if xr and xr[0] == "L":
+                print(f"    the ROM keeps {nm(x)} in {rname(got)}, but local allocation already placed its"
+                      f" quantity in {rname(hard.get(x, xr[6]))} before global allocation ran."
+                      " The first cause is that local quantity's placement or tie; changing this"
+                      " global pseudo's priority does not move the earlier local allocation.")
+                return
             if not xr or xr[0] != "G":
                 continue
             prefs = preferences(wd).get(pseudo, [])
