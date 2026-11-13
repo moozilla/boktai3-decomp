@@ -120,3 +120,23 @@ The build records every bound and unresolved external in `bindings.json`.
 `--link-game` attempts the complete game link with these bindings and the
 cooperative entry in `core/entry.c`; detailed linker diagnostics go in
 `build/port/wasm32-bound/link.log`. This broader path remains under development.
+
+The complete host compile sweep now also passes all 10,169 game units. Generated
+host inputs omit ABI assertion typedefs and shrink three padding arrays whose
+GBA gaps are consumed by wider host pointers. These objects still use the host's
+wider layouts; the full game remains a wasm32 target.
+
+The ARM soft-double library swaps its two 32-bit words around IEEE operations;
+wasm and current hosts use little-endian double words. Generated source removes
+those swaps, and the generated fdlibm header orders `lsw` before `msw`.
+`build/venv/bin/python port/tests/run_math.py` checks eight arithmetic, conversion,
+square-root and sine cases using the original library C on host and wasm.
+
+With `--slice --mmio`, volatile scalar game accesses go through typed C bus
+functions. This preserves immediate DMA transfers, GPIO and write-one-to-clear
+IRQ semantics. The test runs the original `InterruptsAndVideo_Initialize` and
+checks VRAM/palette clears, every OAM word, and both interrupt-table/code copies.
+Device mapping also accepts the wasm module's data/stack below EWRAM, because
+DMA sources can point at C locals. The plain address-validation API continues to
+accept only hardware regions. The pass removes optimizer side-effect assumptions
+that no longer hold after an access can trigger DMA or callbacks.
