@@ -8,7 +8,10 @@ what was tried, and the next idea.
 
 ## field-effects
 
-### Scene_SpawnDirectionalDust (src/scene_object.c, 08004B64): deferred
+### Scene_SpawnDirectionalDust (src/scene_object.c, 08004B64): resolved
+
+Resolved without concessions by the dp-field Codex pass; see
+[cx-dp-field_2026-11-13.md](cx-dp-field_2026-11-13.md). The earlier investigation follows.
 
 Draft: `notes/phase3-drafts/field-effects/Scene_SpawnDirectionalDust.c` (117 ROM / 93 draft
 insns differ; it relies on a local `u32 x:16` bitfield struct defined next to it in the unit copy).
@@ -58,7 +61,10 @@ the copy): an early `savedActor = 0`/`-1` or `index = 0` at the top, `savedActor
 extended block starts at function entry, so no mention can come before it; the copy needs a last
 use past the block end (the loop label at `active`), and that use would merge the r5 copy instead.
 
-### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): deferred
+### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): resolved
+
+Resolved by the dp-field Codex pass: the accepted branch returns without a value (fact 160), preserving the call result in hard r0. Both concessions are removed.
+
 
 Draft: `notes/phase3-drafts/field-effects/DirectionalController_CheckRemaining.c` (41 ROM / 43
 draft). In the ROM, Math_Atan2's result stays in hard r0 from the call to the `bne` that jumps
@@ -2543,3 +2549,305 @@ to 45 rows and the helper group costs 137 rows, showing that its C shape, rather
 allocation, is the blocker. Next: replace the private playback implementation with the shared
 display-sequence stepping form, preserving table-first packed-command reads; then retry the two
 caller-side constant-one/duration groups separately.
+## dp-field (Codex)
+
+Tags: #phase3 #field #matching #compiler
+
+### Scene_TryStepDown (08004CE4): one barrier removed, four concessions remain
+
+The matching partial moves the type calculation after the existing mask barrier.
+This removes the height-byte input barrier without changing any instruction.
+Stock `tools/check.py src/scene_object.c` matches all 37 functions (7,236 bytes).
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/Scene_TryStepDown.c`
+(18 ROM / 20 draft differing instructions, shape 6). It reads the cell byte into
+`mask`, copies it to `heightByte`, computes `type`, then sets `mask = 0xF0`.
+The nonconstant first set removes the constant-equivalence priority penalty:
+mask takes r4, cell r6, type r7, direction r8 as in ROM. It leaves an extra copy
+and shifts before setting 0xF0. Moving the mask assignment before the shift lets
+CSE delete the first mask set and restores the earlier allocation failure.
+
+The earlier field-effects draft remains useful as a second frontier. It matches
+under the combined diagnostic knobs `AGBCC_PRI=mask:+1400`,
+`AGBCC_FORCE=heightByte:1,current:2,referenceHeight:0`, and
+`AGBCC_NOTIE=231,485`. Thus the remaining blockers are mask priority, allocation
+of the two loaded bytes and two-address operand selection for both nibble ANDs.
+These are diagnostic overrides only; they are not used by any landed source.
+The saved draft also improves with `AGBCC_PRI=current:+544` (13/15 differing).
+
+Tried: reusing index or the override pointer for mask; initial mask copies before
+and after the shift; narrow mask and reference-byte types; union mask initializer;
+union byte references; swapping AND operands; decrement helper; assigning the
+low mask to remaining before the AND; and mutating lowMask directly. The latter
+removes the unwanted remaining copy but gives lowMask the long-lived r4 instead
+of ip. The helper/copy forms change CSE's canonical representative and spill
+layout. Narrow union byte reads prevent ties but perturb allocation substantially.
+Keeping the other original concessions while applying these forms did not remove
+a second site. Parameter/neighbor cleanup alone does not preserve the partial's
+allocation when the remaining pin is retained.
+
+Next: a height/nibble representation that retains the nonconstant mask priority
+without retaining its initial copy; or a shared nibble operation whose subreg
+operands prevent both regmove ties without making lowMask the canonical result.
+
+### Trigger_RunScript (08006F00): argument pointer pin/barrier removed
+
+The matching partial uses `argsPtr->values = values`, removes the redundant
+`argsPtr = &args` before Script_Call, and removes both the argsPtr input barrier
+and r2 pin. The single pointer definition survives GCC's PRE at the correct
+position, and its use for the values field gives the necessary allocation.
+Stock `tools/check.py src/item_container.c`: all 30 functions MATCH (7,024 bytes).
+One actor-output barrier and one actor-index pin remain.
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/Trigger_RunScript.c` (11/9,
+shape 6). As in the earlier field-effects notes, its pointer-based word RMW gives
+the right register but the wrong two memory operands. Direct `&args` for that RMW
+matches with `AGBCC_PRI=argsPtr:+2000` except the actor-copy region (9/7, shape 2).
+The matching partial's source becomes 23/23 when both remaining actor concessions
+are simply removed: CSE merging also changes pointer and saved-value allocation.
+
+New attempts: s8 union and array actor views; an inline active-player predicate;
+a validation while/break form; indexed copying, indexed source, descending copy,
+and destination-end loop. Union/array views compile like the baseline. The helper
+changes the return/control region; the validation loop changes loop-note priorities.
+The indexed and descending copies lower to the same loop as the baseline, so they
+do not fix the argument-pointer priority. The destination-end loop changes shape.
+The argsPtr partial is now resolved; the next pass should focus on a real boundary
+that preserves a short-lived actor-index copy before the saved r5 value, then
+reassess the fully pin-free pointer allocation with that corrected copy present.
+
+### DirectionalController_CheckRemaining (080098CC): resolved
+
+A value-less `return;` on the accepted branch, with `return 0` after SetState on
+failure, exactly matches the ROM with no pins or barriers. The angle is used
+only as `(u16)Math_Atan2(dx, dz)` for direction quantization. No angle pseudo
+needs to survive the later blocks; expand_function_end's hard-r0 USE retains
+the call result and makes local-alloc avoid r0 throughout the success path.
+Both the explicit value-less return and a goto to a fall-through function end
+match. The former reads more directly and is landed. This extends fact 95 to a
+function that has an explicit zero return on its other path (fact 160).
+Stock full-unit check: 21 functions MATCH (2,352 bytes).
+
+### sub_08010C10 (08010C10): still deferred, first reload scratch
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/sub_08010C10.c` (2/2, shape 0).
+Confirmed `AGBCC_SPILL=0:1`: MATCH. The first signed x load needs r2 for the
+constant offset where the stock default scan picks r1; all other bytes match.
+The newer why explanation corrects an inference in the earlier field-effects
+note: shifting the initial scan does not prove a prior ROM reload choice.
+Its spill set is r1/r2, both free, and there is no previous choice in this draft.
+
+Additional forms: duplicate the post-join Vec16_Lerp in both active arms (5/19,
+shape 20; jump2 does not fully merge the argument setup); signed-axis union
+(6/8, extra extensions); inline reverseAxis for both coordinates (same 2/2);
+zero-vector subtraction (same 2/2). These supplement the earlier documented
+40-plus spellings rather than repeating their offset/actor/else-first searches.
+No reduction landed. Next: a real shared vector operation that makes r1 live
+at the x load, or an earlier setup whose RTL consumes a scratch before later
+cross-jumping. A changed initial scan alone is not a C solution.
+
+### sub_08017510 / Weather_UpdateTilemapScroll (08017510): allocation-only frontier
+
+Best pin-free full-unit draft: `notes/phase3-drafts/dp-field/sub_08017510.c`
+(48/48, shape 0; exact size 372 bytes). Replace the private Random macro and
+literal table with `ParticleRandom_ReadDirectSample(gRandomTable)` through a
+local table pointer. This fixes table-first instruction order, repeated reloads,
+and cross-jump shape. ReadSample's statement macro instead changes shape (61/65
+with the named table); literal table plus direct helper retains late loads (56/57).
+
+Exact diagnostic: `AGBCC_FORCE=54:4,table:3` on this saved draft gives MATCH.
+The index-address pseudo 54 and table 52 take r3/r6 in ordinary C; ROM r4/r3.
+Those two decisions also put p in r6 as required. Raising index priority alone
+by 11714 still leaves p in r4, because index takes r2 instead; this is register
+preference/availability as well as ordering. p has 39 refs / 143 life (priority
+13636), index address 5/52 (1923), table 4/62 (1290).
+
+Additional attempts: make the existing Random cursor argument actually read and
+write its pointer (same 56/57 fully pin-free); initialize table/cursor before the
+scroll-delta call (54/54, shape 8); keep original pins but replace their barrier
+with real cursor usage (18/18, shape 14; hard pointer aliases stop index reuse);
+read only the first draw through cursor then write the global for subsequent
+reuse (10/10, shape 2, but the separate global address takes r5). No partial
+reduction landed. Next: a shared table/cursor capture whose real uses preserve
+the ROM allocation without aliasing away the cached random index.
+
+### TetherActor_BlendPalette (08048E0C): one moved copy remains
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_BlendPalette.c`
+(1/1, shape 2). Initialize i before weight: weight's shorter life puts it in ip
+and the component mask in r8 as ROM, but its `mov ip,r1` is then after the i=0
+initialization instead of before it. The baseline (weight before i) is 6/6;
+`AGBCC_PRI=weight:+26` gives MATCH. Priorities: componentMask 3068 (9/88),
+weight 3043 (7/46); losing one weight live insn or adding one mask live insn
+would flip their order without a large structural change.
+
+Tried after diagnosis: weight/mask declaration orders; s16 weight (1/3, correct
+allocation but extra sign extension); s16 inverse; u16/s32/u64 component mask;
+union mask and weight aggregates; array/union loop counter; weight=64-inverse;
+helper returning palette weight; direct channel extraction; indexed-vs-pointer
+output; multiply instead of shift for packed colors; for/while/goto loop forms.
+The aggregate counter keeps the one moved copy; while/for match the baseline;
+the goto form changes loop allocation. The pointer output materially changes
+subword stores. Next: shorten the baseline weight life by one pre-combine insn
+without moving its first copy, or lengthen the mask life by one without moving
+its emitted initialization. No reduction landed.
+
+### TetherActor_StartInteractionEffect (08049D4C): resolved
+
+Removed the r3 zero pin by repeating the final effectValue store and attachment
+call inside each accepted branch. Reload sees a single branch-local straight
+line and eliminates its redundant literal-zero argument load. jump2 subsequently
+cross-jumps the repeated tails back into the ROM's shared sequence (fact 91).
+Only duplicating the effectValue store did not suffice (17/25); the whole tail
+was needed. Arrays/unions retained the extra literal zero or added extensions;
+readback from effectValue folded back to the baseline. The original pin-free
+baseline was 1/1, shape 2 (a second movs r3,#0 before the call).
+Stock full tether-actor unit: 114 functions MATCH (20,516 bytes).
+
+### TetherActor_BeginDirectedState (0804A15C): resolved
+
+Removed the sample r0 pin by capturing the X difference with the existing
+ARMOR_CAPTURE_COMPONENT_DELTA helper. The saved actor initially wins allocation
+(5 refs / 36 live, priority 2777) over dx (3 / 11, 2727). Diagnostic
+`AGBCC_PRI=dx:+51` gives MATCH. The shared capture form raises the real reference
+density and produces the same allocation with the stock compiler. Applying it
+to both components changes allocation again (28/28); the Z difference remains
+a direct field expression. The heading now uses directedHeading instead of a
+raw offset. No shared header changed.
+
+Table-first random draws improved the baseline from 24/24 to 9/9 but moved the
+table and heading setup. Splitting the motion tail (8/24) or angle assignment
+(16/20) let CSE specialize the zero-delta path and did not fully cross-jump.
+Stock full tether-actor unit: 114 functions MATCH (20,516 bytes).
+
+### TetherActor_InitKindFromScript (0804A430): resolved
+
+The joined kind value lost r0 to the selected-kind address: 7/9 differing, shape
+2. Diagnostic `AGBCC_FORCE=selectedKind:1,36:3,38:2` gives MATCH; forcing kind
+alone overlaps the already allocated pointer and is not a valid diagnosis.
+Raising kind priority by 20000 does not evict the local address temporaries.
+
+Repeat both the selected-kind store and actor-kind reload in each branch, with
+a separately declared branch-local kind value. This prevents the early merge
+that a single outer kind variable permits. Each call result stays in r0 during
+allocation; jump2 then cross-jumps the identical tails. Stock unit MATCH.
+Repeating the store alone is 4/6 with branch locals; repeating both with an
+outer kind is still 7/9. Short/union values, union pointers, ternary selection,
+inline store helper and unsigned slot did not fix the baseline allocation.
+
+### TetherActor_InitDisplayFromScript (0804A600): resolved
+
+Removed the display barrier by repeating SetPriority and the following keyword
+read in both initialization branches. The baseline is 23/23, shape 0: display
+priority 4363 (8 refs / 55 live) loses r4 to actor at 4639. Diagnostic
+`AGBCC_PRI=display:+277` matches. Repeating SetPriority gives correct allocation
+but an extra three-instruction call: the fall-through arm ends in flow's USE 0
+which blocks cross-jumping. Including the keyword result assignment makes both
+tails shareable and gives stock MATCH (full unit, 20,516 bytes).
+Count-up palette copying and union display pointers retained 23/23. Hoisting
+the display pointer or removing source's distinct lifetime changed shape.
+Repeating the entire script/heading tail was too broad (23/35).
+
+### TetherActor_UpdateWorldPosition (0804AF80): three concessions removed
+
+Landed the typed ContactPosition x/y/z stores in place of u16 indexing: these
+member stores preserve the display-pointer reloads, removing both memory
+barriers. A u16 shake value removes its r0 pin while preserving the addition
+operand allocation; narrowing coordinate too breaks it (26/24), while a signed
+value leaves 7/9. The named displayOffsetY field also matches. Retain the
+existing offset-variable assignments for now: deleting all of them changes
+later move2add reuse and reload rotation (11/11). Eight pins and three barriers
+remain. Stock full tether-actor unit: MATCH (20,516 bytes).
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_UpdateWorldPosition.c`
+(25/24, shape 7), improved from the current simple removal's 43/38 and old
+field-effects draft's 67/64. Its display region now matches; remaining problems
+are terrain-store address reuse, previous-value registers and final copy scratch.
+
+The final copy alone becomes a plain targetPosition struct assignment plus
+named heading store with only 3/3 differing (offset scratch r3 versus ROM r0).
+`AGBCC_SPILL=13:2` gives MATCH on that isolated tail-struct candidate. A local
+pointer, pointer union, inline copy helper and u64 copy keep the same difference;
+a temporary struct/union changes load/store shape (5/5), builtin memcpy is 10/10.
+Removing the previous-height r2 pin alongside this tail is also just 3/3, so a
+corrected scratch decision could remove that pin too. Keeping only the old
+offset pin/barrier with the struct copy worsens to 10/10.
+
+The full clean draft still uses a subtract of two for height's address where
+ROM loads 0x129 in r4, then previousSlope/Height/Attributes need r0 destinations
+and r4/r2/r4 samples. No combined matching override was established. Next:
+change the terrain/previous-field C to make the needed reload rotation before
+the final struct copy, then remove its six remaining copy/heading concessions.
+
+### TetherActor_UpdateLockedShake (0804B43C): resolved
+
+Removed the table pin with the shared PARTICLE_RANDOM_SAVE_ORIGIN capture and
+ParticleRandom_ReadSample draws. The named-table sample-helper draft is 29/27,
+shape 12; `AGBCC_PRI=randomTable:+293` gives MATCH. Table priority 1320 loses
+to amplitude 1612 and index address 1400. The real table capture adds reference
+density so table takes r6, amplitude r7 and index address r8, fixing all downstream
+reload choices. The same origin helper already captures gRandomTable elsewhere.
+A union table initializer retains 29/27; constructing the halves changes shape
+(52/55). DirectSample is 31/29. No shared header edits. Full unit MATCH.
+
+### TetherActor_BlockPlayerAcrossTerrain (0804B6A4): pointer PRE frontier
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_BlockPlayerAcrossTerrain.c`
+(1/3, shape 2). Capture current=actor before the player-height call and use
+current for heightPosition. This avoids the unwanted PRE reaching register but
+leaves one actor copy into r6 plus padding; heightPosition then reads r6 instead
+of r7. CSE_NOCANON=73 does not remove that copy.
+
+Baseline without the barrier is 9/15, shape 14. `pre` proves that replacement 1
+hoists actor+80 across the player-height calculation into an extra sb pseudo;
+`AGBCC_NOPRE=1` gives MATCH. The gPlayers PRE replacements are required and
+disabling them worsens the result.
+
+Additional forms after the prior 24-variant pass: branch-local initial position
+(2/4, but its address moves after the test); compute position after the height
+join (13/15, shape 2, extra r4 copy and later allocation); no inner position
+assignment; late inner assignment; union actor, array position and inline
+position helper (same PRE as baseline); pointer copy before attributes or
+initial position (8/14), versus after the player-height call (baseline); shared
+surfaceHeight for actor (10/14 or 23/23); reusing position (5/3, removes ROM's
+recomputed address and copy).
+
+Restoring actor=current immediately after the player-height call removes the
+extra copy but swaps actor/position r6/r7 (13/13, exact size). Raising position
+priority by 181 corrects those registers but produces four extra instructions,
+so that is not a complete diagnosis. Restoring after height/difference changes
+shape; using position for final Z accesses removes needed address operations.
+Next: a natural actor/position lifetime that keeps actor+80 non-anticipatable
+through the height call and coalesces the saved actor copy. No reduction landed.
+
+### TetherActor_UpdateAuxiliaryTransition (0804C748): two pins removed
+
+Landed explicit low-nibble mask variables in both later frame branches, which
+prevent regmove from tying their results to rawFrame. This removes rawFrame's
+r2 pin. Capturing the display address with TETHER_CAPTURE_DISPLAY, used in both
+visibility arms, gives activeDisplay enough real references to take r4 before
+actor; frame can then reuse r4 without its pin. The capture performs the same
+field-address operation in both arms and has no selector. Stock full unit MATCH.
+One value pin remains at the hidden auxiliary-sprite flag update.
+
+Baseline all-pin removal is 45/45, shape 0. Exact diagnostic on base.c:
+`AGBCC_PRI=activeDisplay:+318 AGBCC_NOTIE=313,341 AGBCC_FORCE=240:2`.
+Actor priority 3846 beats activeDisplay 3529; raising activeDisplay alone leaves
+9/9. Raising frame instead worsens to 73/72. Moving display copies immediately
+after calls is 11/11, shape 4; before calls is 47/43. An inline display getter
+retains the allocation mismatch. The frame pointer cannot be reused for the
+final increment without changing the ROM's address lifetimes (61/62).
+
+Best fully pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_UpdateAuxiliaryTransition.c`
+(2/2, shape 2, exact size). An inline auxiliary-flag reader gets the ROM's r2
+address, r0 value and r1 mask, but leaves `adds r0,r2` then loads through r0;
+ROM loads r0 directly through r2. The extra copy consumes existing alignment
+padding. Pointer-taking, local-pointer, signed and wide return getters do not
+remove that copy; a one-word struct return is equivalent.
+
+Other flag attempts: direct RMW, value-before-address, signed word, value array,
+union word, union bitfield, complement/AND/complement (5/5); bitfield-pointer
+store changes access width; u64 value changes shape; moving display's copy
+earlier changes the register graph. Next: fold the helper's address-copy pseudo
+into the load while retaining its local allocation, or another real visibility
+helper that produces that load/store ordering.
