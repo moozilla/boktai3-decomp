@@ -1222,7 +1222,7 @@ void Actor_BeginRadialBurst(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0xf0;
+    g->phase = 15;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
