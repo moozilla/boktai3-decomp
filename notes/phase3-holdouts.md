@@ -1252,3 +1252,27 @@ the nonconstant cell arm first (22/22 with changed branches). Earlier pass tried
 24 variants. Next: recover a terrain-expression form whose cell lifetime spans
 more of position parsing, or whose pointer temporaries have the original priority.
 Do not undo the independent draw scopes: they removed twelve concessions.
+
+### StackedActor_Initialize (080532B0): independent allocation and loop holdouts
+
+No new partial landed. The saved pin-free draft uses named fields and indexed
+segment accesses: `notes/phase3-drafts/dp-field-b/StackedActor_Initialize.c`.
+It differs by 116 ROM / 118 draft instructions, shape 46, versus 120/124 for
+simple removal. The ordinary draft has a 28-byte frame rather than 24 bytes.
+The first terrain conflict is the same index/world/worldY rotation as the
+ProximityEmitter initializer (index priority 3333, world 1944, worldY 379).
+`AGBCC_PRI=world:+1390` removes eight differences in the baseline; no single
+matching knob for the whole function has been found. The position-copy source
+prefers r0 rather than r3, changing load order; force source#2 to r3 removes
+three more. Loop current/selected pseudos also differ, independently.
+
+Investigated loop hoisting: `one` has two equal invariant sets that loop.c
+combines and hoists. `AGBCC_NOMOVE=930` on the saved draft improves 116/118 to
+115/117, so this alone is not the main blocker. Tested direct frame field
+expressions, named/indexed segment accesses, goto loops (worse 152/152), normal
+and explicit-word copy helpers (best shape 40, 122/124), cell-index helpers
+with raw-coordinate halfword returns, literal byte stores, and fixed-field
+store replacements on the pinned original (none independently free). Earlier
+passes also tried 24 source forms. Next: separate the copy helper's source
+allocation from the loop current/selected allocation; recover the cache/frame
+layout before attempting global pin removal again. Do not sweep register pins.
