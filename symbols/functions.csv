@@ -7058,9 +7058,13 @@ addr,name,mode,confidence,source,notes
 081A55A4,Vanargand_ResetPaletteTransition,thumb,low,src-alias,Tentatively resets an active palette transition and restores its default palette selector
 081A55D4,Vanargand_BlendPaletteBanks,thumb,low,src-alias,Blends consecutive sixteen-color palette banks while advancing all three buffers by thirty-two bytes
 081A5614,Vanargand_UpdatePaletteTransition,thumb,low,src-alias,
+081A6104,PositionedEffect_OnAttackContact,thumb,low,src-alias,Empty callback used by the positioned attack colliders.
+081A6108,PositionedEffect_ReceiveContact,thumb,low,src-alias,Stores contact damage; reaction flags; and immunity duration on the Vanargand actor.
 081A6148,PositionedEffect_InitContactCollider,thumb,low,src-alias,
 081A61EC,PositionedEffect_InitAttackCollider,thumb,low,src-alias,
 081A6284,PositionedEffect_InitRadialAttackColliders,thumb,low,src-alias,Initializes two attack colliders at sine-table offsets of radius 416; separated by 96 angle units.
+081A6398,PositionedEffect_EmitParticles,thumb,low,src-alias,Emits four particles with random horizontal offsets around the actor.
+081A6458,Vanargand_RunUnusedHook,thumb,low,src-alias,Empty neighboring hook with no observed behavior.
 081A645C,Debug_TestIsometricProjection,thumb,low,src-alias,On a newly pressed R button; unprojects a local (0; 1; 0) vector and discards the result; tentative debug hook.
 081A64C8,ScreenPalette_ProjectPosition,thumb,low,src-alias,
 081A6568,ScreenPalette_ProjectPositionAt88,thumb,low,src-alias,
@@ -7294,6 +7298,7 @@ addr,name,mode,confidence,source,notes
 081B854C,DungeonProp_Destroy,thumb,low,src-alias,Task destruction callback removes the sprite and collider plus type-12 auxiliary resources
 081B8578,SceneScriptObject_ApplyHitFlash,thumb,low,src-alias,
 081B85E0,SceneScriptObject_InitHitCollider,thumb,low,src-alias,
+081B866C,SceneScriptObject_Initialize,thumb,low,src-alias,Initializes script options; sprite palette; collider; and optional shadow.
 081B897C,DungeonProp_CreateFromScript,thumb,low,src-alias,Creates a task initialized from script parameters for the dungeon prop sprite family
 081B89C0,SceneMover_SteerXZ,thumb,low,src-alias,
 081B8B38,SceneMover_SteerXY,thumb,low,src-alias,

@@ -11,7 +11,7 @@ void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32)
 u32 Player_GetCollisionData(void);
 void SceneActors_SetHealth(void *, s32);
 void DamageNumberDisplay_ShowWithDefaultScale(void *, s32, s32, void *, s32);
-void sub_081A6398(void *);
+void PositionedEffect_EmitParticles(void *);
 void Sound_PlaySongChecked(u32);
 void CpuSet(const void *, void *, u32);
 
@@ -107,7 +107,7 @@ void Vanargand_UpdatePlayerDrain(struct VanargandPairAttack *p)
                     if (health != self->health)
                         DamageNumberDisplay_ShowWithDefaultScale(&self->damageSource, amount, 1,
                                                                  &self->position, 1);
-                    sub_081A6398(self);
+                    PositionedEffect_EmitParticles(self);
                     Sound_PlaySongChecked(0x225);
                     {
                         u32 mask = 4;
