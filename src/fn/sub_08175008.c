@@ -17,8 +17,8 @@ struct AllocSprite {
     u32 pad[2];
     u32 flags;
 };
-void ResultPanel_DrawCappedCounters(void *, s32, s32, s32);
-void ResultPanel_DrawCappedSmallCounters(void *, s32, s32, s32);
+void Hud_DrawHealthRatio(void *, s32, s32, s32);
+void Hud_DrawEnergyRatio(void *, s32, s32, s32);
 void PauseMenu_HidePromptIcons(void *);
 u32 MenuInput_ReadDirectionRepeat(void *);
 void Presentation_UpdateListCursor(void *);
@@ -59,8 +59,8 @@ void Presentation_UpdateAllocationSelection(u8 *p)
         u8 *modifier = p + 0xa58;
         any = 1;
         *modifier = any;
-        ResultPanel_DrawCappedCounters(p, 1, 7, 8);
-        ResultPanel_DrawCappedSmallCounters(p, 1, 7, 10);
+        Hud_DrawHealthRatio(p, 1, 7, 8);
+        Hud_DrawEnergyRatio(p, 1, 7, 10);
         *(u32 *)(p + 0x3348) |= any;
         *(u32 *)(p + 0x33a8) |= any;
         *(u32 *)(p + 0x1608) |= any;

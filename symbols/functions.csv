@@ -5805,10 +5805,10 @@ addr,name,mode,confidence,source,notes
 08163F90,Hud_GetStyleTileIndex,thumb,low,src-alias,Adds the tile offset selected by one of three drawing styles
 08163FA8,Hud_InitSelectionBounds,thumb,low,src-alias,Initializes paired selection bounds and resets selection tracking
 08163FEC,Hud_GetMinimum,thumb,low,src-alias,Returns the smaller signed value for a HUD caller
-08163FFC,StatDisplay_DrawRatio,thumb,low,src-alias,
-08164158,ResultPanel_DrawCappedCounters,thumb,low,src-alias,
-081641C4,ResultPanel_DrawCappedSmallCounters,thumb,low,src-alias,
-08164224,StatDisplay_DrawPlayerValue,thumb,low,src-alias,
+08163FFC,Hud_DrawStatRatio,thumb,low,src-alias,Draw current and maximum stat digits separated by a slash.
+08164158,Hud_DrawHealthRatio,thumb,low,src-alias,Clamp health values to four decimal digits.
+081641C4,Hud_DrawEnergyRatio,thumb,low,src-alias,Clamp energy values to three decimal digits.
+08164224,Hud_DrawPlayerValue,thumb,low,src-alias,Draw the enabled player value according to the current form.
 081642CC,Hud_DrawHealthMeterCells,thumb,low,src-alias,
 08164438,Hud_DrawHealthMeter,thumb,low,src-alias,Draws a tentative health meter using the panel values at offsets 0x424 and 0x426
 0816446C,Hud_DrawDefaultHealthMeter,thumb,low,src-alias,Draws the panel health meter with the default rendering mode

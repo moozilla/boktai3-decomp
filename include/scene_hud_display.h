@@ -78,7 +78,7 @@ struct SceneHudState {
     u8 unknownA44[8];
     u16 pageFadeTimer;       /* 0xA4C */
     u16 actionTransferDelay; /* 0xA4E: frames after icon transfer */
-    u8 unknownA50[4];
+    void (*updateCallback)(struct SceneHudState *); /* 0xA50 */
     void *pageCallback;      /* 0xA54 */
     u8 comparisonModifier;   /* 0xA58: modifier-key comparison preview */
     u8 auxiliaryToggle;      /* 0xA59: returned by panel toggle */
@@ -86,10 +86,11 @@ struct SceneHudState {
     u16 initializationState; /* 0xA5C */
     u8 controlMode;          /* 0xA5E: modes above two suppress controls */
     s8 previousPage;         /* 0xA5F: initialized to -1 */
-    u8 unknownA60[2];
+    u16 healthMeterBlinkTimer; /* 0xA60 */
     u16 energyMeterBlinkTimer; /* 0xA62: advances while the energy meter flashes */
     u16 meterPulseFrame; /* 0xA64: 60-frame HUD meter pulse */
-    u8 unknownA66[8];
+    u8 unknownA66[6];
+    u8 playerValueEnabled, unknownA6D;
     u16 timedStateParameter;            /* 0xA6E: sixth argument to 081781B4 */
     u16 timedStateStart;                /* 0xA70: negative input clamps to zero */
     u16 timedStateValue;                /* 0xA72 */
@@ -99,18 +100,25 @@ struct SceneHudState {
     u16 secondaryGaugeTimer; /* 0xA7C: frames left on the second gauge */
     u8 secondaryGaugeFlashTimer, transientGaugeVisible; /* 0xA7E and 0xA7F */
     u16 pulseFrame; /* 0xA80: wraps at 128 */
-    u8 unknownA82[0x12];
+    u8 unknownA82[4];
+    u16 warningBlinkTimer; /* 0xA86 */
+    s16 storedEnergy;
+    u16 storedEnergyTimer, storedEnergyFlash;
+    u8 unknownA8E[6];
     u8 panelInitialized; /* 0xA94: cleared during gameplay HUD resource setup (tentative) */
     u8 unknownA95[4];
     u8 energyTimerVisible; /* 0xA99: set after drawing the four energy timer digits */
     u8 unknownA9A[2];
     struct SceneHudControlAnimation controlAnimation; /* 0xA9C */
-    u8 unknownABC[0x41];
+    u8 unknownABC[0x40];
+    u8 timedStatusIconVisible;
     u8 actionRefreshRequested; /* 0xAFD */
-    u8 unknownAFE[2];
+    u8 timedEventLabelVisible, countdownEnabled;
     u8 actionCueInitialized, actionCueSuppressed; /* 0xB00 */
     u8 previousCueGroup, previousCueSelection;    /* 0xB02 */
-    u8 unknownB04[0x16C];
+    const u16 *countdownValue;
+    struct SceneInputWidget countdownDigits[3]; /* 0xB08 */
+    u8 unknownC28[0x48];
     u8 primaryVisible;           /* 0xC70 */
     u8 primarySlideTimer;        /* 0xC71: remaining three-pixel slide steps */
     s8 primarySelection;         /* 0xC72 */

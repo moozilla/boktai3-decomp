@@ -2,8 +2,8 @@
 #include "scene_input.h"
 #include "scene_hud_display.h"
 #include "player.h"
-void ResultPanel_DrawCappedCounters(void *, s32, s32, s32);
-void ResultPanel_DrawCappedSmallCounters(void *, s32, s32, s32);
+void Hud_DrawHealthRatio(void *, s32, s32, s32);
+void Hud_DrawEnergyRatio(void *, s32, s32, s32);
 void PauseMenu_HidePromptIcons(void *);
 void Hud_DrawHealthMeter(void *, s32, s32, s32, s32);
 void sub_08164480(void *, s32, s32, s32, s32, s32, s32);
@@ -13,8 +13,8 @@ void InventoryGrid_UpdateModifierPreview(struct SceneHudState *p)
     u16 key = gPadState[0] & 4;
     if (key) {
         p->comparisonModifier = 1;
-        ResultPanel_DrawCappedCounters(p, 1, 7, 8);
-        ResultPanel_DrawCappedSmallCounters(p, 1, 7, 10);
+        Hud_DrawHealthRatio(p, 1, 7, 8);
+        Hud_DrawEnergyRatio(p, 1, 7, 10);
         PauseMenu_HidePromptIcons(p);
     } else {
         p->comparisonModifier = key;
