@@ -33,19 +33,19 @@ s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
 {
     void (*next)(void);
     u32 mode;
+    struct AreaEffectLinkState **address = &p;
     struct AreaEffectLinkState *pp;
     if (Registry1745_CheckSessionReady(p) < 0) {
         Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
-    if (IsMode9(*p->selection)) {
+    if (IsMode9(*(*address)->selection)) {
         RegistryF246_Close();
         next = LinkMenu_ExchangeChoices;
         pp = p;
         mode = 9;
         goto call;
     }
-    asm("" ::: "memory");
     if (IsMode4(*p->selection)) {
         next = LinkMenu_WaitForReadyPeers;
         pp = p;
