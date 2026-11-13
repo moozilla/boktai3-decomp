@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "route_sprite_actor.h"
 #include "player_cue_sequence.h"
@@ -34,8 +33,10 @@ void DriftingSprite_Update(struct DriftingSprite *s)
     u16 *counter;
     counter = &s->hidden;
     if (*counter) {
-        s->sprite.flags |= 1;
-        asm("" ::: "memory"); /* the original reloads the counter after the flag store */
+        union {
+            u32 raw;
+        } *flags = (void *)&s->sprite.flags;
+        flags->raw |= 1;
         (*counter)--;
         return;
     }

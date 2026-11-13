@@ -21,16 +21,19 @@ static inline void Polar(struct OrbitEffectPosition *p, u32 angle, s32 radius)
 void OrbitEffect_UpdateHomingTrail(struct OrbitTrailSprite *trail, void *resource)
 {
     u32 age = trail->age + 1;
-    u32 zero = 0;
-    asm("" : : "r"(zero));
+    u32 zero;
+    do {
+        zero = 0;
+    } while (0);
     trail->age = age;
     if ((u16)age <= 31) {
         s32 dx = trail->position.x;
-        register struct OrbitEffectPosition *source asm("r1") = trail->target;
+        struct OrbitEffectPosition *source = trail->target;
         struct OrbitEffectPosition *target;
         s32 dz;
         dx -= source->x;
         target = source;
+        source = 0;
         if (dx < 0)
             dx = -dx;
         dz = trail->position.z - target->z;

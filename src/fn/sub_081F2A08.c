@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "sprite_trail.h"
 #include "background_controller.h"
 struct Camera {
@@ -13,7 +12,7 @@ s32 SpriteTrail_CreateMotionEffect(struct SpriteTrailPool *pool, struct TrailVec
 {
     s32 index;
     struct SpriteTrail *p = MotionEffectPool_FindFreeEntry(pool, &index);
-    register struct TrailVector *renderOrigin asm("sl");
+    register struct TrailVector *renderOrigin;
     struct TrailVector *position;
     if (!p)
         return -1;
@@ -37,7 +36,9 @@ s32 SpriteTrail_CreateMotionEffect(struct SpriteTrailPool *pool, struct TrailVec
         struct TrailVector *history;
         head = p->head;
         tail = p->tail;
-        renderOrigin = origin;
+        do {
+            renderOrigin = origin;
+        } while (0);
         sprite = head;
         history = p->history;
         for (i = 3; i >= 0;) {

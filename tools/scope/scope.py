@@ -1578,20 +1578,25 @@ def pseudo_names(wd, func):
 @by_dumps("*")
 def uid_lines(wd):
     """insn uid -> C line, from the line notes in the RTL dumps."""
+    return {uid: location[1] for uid, location in uid_locations(wd).items()}
+
+
+def uid_locations(wd):
+    """insn uid -> (source file, C line), preserving inlined header provenance."""
     out = {}
     for p in PASSES:
         path = os.path.join(wd, "u.i." + p)
         if not os.path.exists(path):
             continue
-        line = 0
+        file, line = None, 0
         for blk in re.split(r"\n\n", open(path).read()):
-            m = re.search(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
+            m = re.search(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("([^"]*)"\) (\d+)\)', blk)
             if m:
-                line = int(m.group(1))
+                file, line = m.group(1), int(m.group(2))
                 continue
             m = re.match(r"\((?:insn|jump_insn|call_insn|code_label|note)(?:/\w)* (\d+)", blk)
             if m:
-                out.setdefault(int(m.group(1)), line)
+                out.setdefault(int(m.group(1)), (file, line))
     return out
 
 
@@ -3759,7 +3764,7 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
 
 
 PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
-BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?\\?\s*$')
+BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?:(?://[^\n]*|/\*[\s\S]*?\*/)\s*)*\\?\s*$')
 
 
 def concession_sites(text):
@@ -6545,12 +6550,16 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
     EffectManager_SpawnParticlesAt matched this way)."""
     text = open(os.path.join(ROOT, src)).read()
     rows = text.split("\n")
+    locations = uid_locations(info["wd"])
     tried = set()
     for ps in passes:
         for cands in ps.values():
             for uid, c in cands.items():
                 name, ln = names.get(c["reg"], ""), lines.get(uid)
                 if not (c["move"] and c["move"][0] and re.fullmatch(r"[A-Za-z_]\w*", name) and ln) or name in tried:
+                    continue
+                file, _ = locations.get(uid, (None, 0))
+                if not 1 <= ln <= len(rows) or not file or os.path.abspath(os.path.join(ROOT, file)) != os.path.abspath(os.path.join(ROOT, src)):
                     continue
                 tried.add(name)
                 m = re.search(rf"\b{name}\s*=\s*([^;=][^;]*);", rows[ln - 1])

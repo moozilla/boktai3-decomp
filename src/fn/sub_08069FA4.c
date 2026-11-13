@@ -1,5 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "spark_particle.h"
+#include "display_sequence_inline.h"
+static inline void DecrementCount(struct SparkParticlePool *pool)
+{
+    pool->activeCount--;
+}
 s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
 {
     if (pool->activeCount) {
@@ -17,7 +22,7 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
         do {
             if (*active) {
                 register struct DisplaySequenceState *state asm("r4") = &particle->sequence;
-                const volatile u16 *command;
+                const u16 *command;
                 const struct SparkParticleResource *resource;
                 s32 finished;
                 u32 elapsed, duration, flags;
@@ -31,7 +36,7 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
                 {
                     u32 offset = state->index << 1;
                     const u16 *table = state->commands;
-                    command = (const volatile u16 *)((u32)table + offset);
+                    command = (const u16 *)((u32)table + offset);
                 }
                 {
                     u32 frame = *command >> 6;
@@ -43,9 +48,10 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
                     particle->sprite.tile = height;
                 }
                 {
-                    u32 input = state->flags;
-                    register u32 first asm("r2") = one;
-                    first &= input;
+                    union DisplaySequenceControl control;
+                    u32 first;
+                    control.raw = state->flags;
+                    first = (u8)(control.raw & one);
                     if (first != (((*command & 0x30) >> 4) & one))
                         particle->sprite.flags |= 4;
                     else
@@ -53,10 +59,10 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
                 }
                 asm("" : "+r"(state));
                 {
-                    u32 input = state->flags;
-                    register u32 first asm("r1") = two;
-                    first &= input;
-                    first = (u8)first;
+                    union DisplaySequenceControl control;
+                    u32 first;
+                    control.raw = state->flags;
+                    first = (u8)(control.raw & two);
                     if (first != (((*command & 0x30) >> 4) & two))
                         particle->sprite.flags |= eight;
                     else
@@ -115,7 +121,7 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
                     {
                         u32 offset = state->index << 1;
                         const u16 *table = state->commands;
-                        command = (const volatile u16 *)((u32)table + offset);
+                        command = (const u16 *)((u32)table + offset);
                     }
                     state->duration = ((*command & 15) * (s32)state->speed) >> 6;
                 } else
@@ -128,13 +134,7 @@ s32 SparkParticle_UpdatePool(struct SparkParticlePool *pool)
                         asm("" : "+r"(flags), "+r"(mask));
                         particle->sprite.flags = flags | mask;
                     }
-                    {
-                        register u32 offset asm("r2") =
-                            (u32) & ((struct SparkParticlePool *)0)->activeCount;
-                        u32 *count;
-                        count = (u32 *)((u8 *)pool + offset);
-                        (*count)--;
-                    }
+                    DecrementCount(pool);
                 }
             }
             active += sizeof(*particle);

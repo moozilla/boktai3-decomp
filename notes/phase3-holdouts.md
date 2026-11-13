@@ -3592,3 +3592,242 @@ three-component offset introduces stack storage and many extra instructions.
 The height/result names are folded before allocation, so FORCE cannot address
 them in the plain draft. Next: find a genuine value/control-flow boundary for
 the constant copy without adding a barrier or unrelated arithmetic.
+## dp-effects-b (Codex)
+
+### SparkParticle_UpdatePool (src/fn/sub_08069FA4.c, 08069FA4): partial, remainder deferred
+
+Tags: #matching #phase3 #effects #08069FA4
+
+Landed three of seven pin removals, leaving four pins and seven barriers. Reading the
+flip flags through `union DisplaySequenceControl` and consuming `control.raw` directly
+in the narrowed AND removes both flip pins. A widened intermediate defeats that form
+(30/30 different instructions). An inline `DecrementCount` helper removes the count-offset
+pin and its raw offset; direct field decrement in the main body changes loop PRE.
+The unnecessary volatile command qualification was also removed. Stock unit check MATCH.
+
+Best pin-free draft: `notes/phase3-drafts/dp-effects-b/SparkParticle_UpdatePool.c`,
+34 ROM / 38 draft instructions, 412 bytes against 404. It uses the matched
+`SceneParticle_StepSprite` helper; essentially all playback instructions then agree.
+The remaining loop retains the original array pointer alongside a reduced particle
+pointer and a separate sprite address. These occupy registers needed by the constants
+one and two, which reload inside the loop. ROM keeps active in r6, particle in r4,
+one in sb, two in sl, eight in r8 and the countdown in ip.
+
+Evidence and attempts (local store: `build/matchsearch/SparkParticle_UpdatePool`;
+working files: `build/cx/work/SparkParticle_UpdatePool/`):
+* `helper.c` is the store root. `separate-active-countup` explicitly walks the active
+  byte and particle pointers: 37/39. Countdown, indexed and pointer loops, a sprite-first
+  wrapper, and a whole-particle wrapper do not eliminate the excess values.
+* `typed-particle-step` avoids the generic sprite pointer but changes command/address
+  CSE and pool allocation, 103/101. A separate state parameter does not repair it.
+  `AGBCC_FORCE=22:7` improves this variant to 93/95; a STACK_REGS preference hypothesis
+  was disproved by REGCLASS trace (LO_REGS cost 26 versus STACK_REGS 46).
+* `AGBCC_PRI=bit:+1000,bit#1:+1000` on the shared-helper draft keeps the constants but
+  displaces pool/counter and remains 40/42. Allocation alone is not the whole blocker.
+* `giv` identifies the sprite address at insn 110 as an unreduced induction value
+  (benefit 2, net zero), while memory addresses form a second stepped particle pointer.
+  `AGBCC_GIV=110` gives 34/40; `AGBCC_NOGIV=153,160,180` gives 43/47. Neither matches.
+  Read loop.c's elimination path and regmove.c's matching-operand rewrite.
+* `goto-countdown` and a return at loop termination both give 99/111. Copying the state
+  parameter and using the DisplaySequence helper's end-arm form gives 70/76.
+* `direct-body-count-helper` retains the original manual body with every concession
+  stripped, 69/69. Removing the backward hold barrier alone ties the AND to the dying
+  flags register; the forward barrier alone retains two otherwise removed byte-extension
+  instructions. Union locals, narrowed locals, split assignments and repeated ended
+  assignments do not solve those with the outer barrier still present.
+
+No combined diagnostic knob has produced a completely pin-free MATCH. The proved
+partial is retained rather than claiming the remaining allocation is solved. Next idea:
+split frame/flip application from sequence advance so the sprite address does not stay
+live across both flip branches, while preserving the shared helper's state reloads.
+
+Tool improvement discovered here: scope hoist suggestions used header line numbers
+as caller line numbers, crashing or editing unrelated caller statements. uid_locations
+now retains filenames, and hoist filters locations to the caller with bounds checks.
+Three regression tests cover this; both required test suites pass.
+
+### SpriteEffectController_QueueColliders (src/fn/sub_0806A60C.c, 0806A60C): deferred
+
+Tags: #matching #phase3 #effects #0806A60C
+
+Draft: `notes/phase3-drafts/dp-effects-b/SpriteEffectController_QueueColliders.c`,
+22 ROM / 18 draft instructions, 128 against 136 bytes. Six pins and three barriers
+remain in the matched source; none removed for free, alone or in the tested groups.
+Store: `build/matchsearch/SpriteEffectController_QueueColliders`; working evidence in
+`build/cx/work/SpriteEffectController_QueueColliders/`.
+
+The ROM reserves r7 for zero/mask/stride, first in sb, scheduled in r8, pool in r6,
+index in r5, readDelay in r3 and writeDelay in r4. Without the constraints, temporary
+is local, first gets r7, and cse initializes the second delay pointer by copying
+the first instead of recomputing pool+151. The flags load is tied to the OR output
+by regmove at insn 112: `AGBCC_NOTIE=112` confirms the tie (21/17), but does not retain
+the ROM's separate r7-to-r0 mask copy. Read regmove.c's matching-operand checks.
+`AGBCC_FORCE=first:9,readDelay:3,writeDelay:4,temporary:7` does not repair lifetimes
+and displaces pool/index (30/24); no complete matching knob was found.
+
+Fresh source with a QueueCollider inline returning the count gives 36/24 and removes
+more of the ROM's separate addresses. Direct field OR, a DelayAddress inline for one
+initial pointer, union/struct word temporaries, and an initialization label leave
+22/18. A halfword-array temporary initializer retains the separate zero and moves
+first to sb, but hoists the 0x100 mask to r8, displaces scheduled and gives 30/28.
+A union mask initializer blocks that hoist but returns to 22/18. Halfword and word
+union flag reads with the original remaining constraints give 11/18 and 6/6; neither
+removes the flag pin exactly. A label variant that skipped initialization warned of
+an uninitialized value and was rejected. No source changes landed.
+
+Next idea: recover the original helper's count/temporary return boundary. The hard
+r0 one-pin influences allocation outside its lexical block; a returning inline may
+produce the needed hard-return-register liveness without any pin, unlike the simple
+QueueCollider helper tried so far. Preserve the observed first-slot flags test.
+
+### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): partial
+
+Tags: #matching #phase3 #presentation #081E2910
+
+Removed the random-table pin; three destination pins remain. A separate do/while
+block around the index update raises mask references while the existing sample
+capture macro retains table-first evaluation. Stock unit check MATCH, 576 bytes.
+
+The pin-free draft in `notes/phase3-drafts/dp-effects-b/Presentation_UpdateDropShakeBlink.c`
+has six differing instructions, identical shape and size. Sharing dest across the
+three moving branches combines their conflicts (r0/r1), but global alloc takes r2
+where ROM uses r3. `AGBCC_FORCE=dest:3` gives MATCH. Read local-alloc.c's quantity
+priority calculation and global.c's used-register preference/conflict filtering.
+
+The shared random helper alone gave 30/30 differences: table priority 2272 versus
+mask 1000. `AGBCC_PRI=119:+1300,179:+1300,238:+1300,307:+1300` fixed all four swaps;
++1250 did not cross the threshold. The index update block produces this naturally.
+Mask argument, direct sample, shared table, union table, NextSample, and helper
+index variants changed CSE or retained the wrong priority. Plain setters and
+layer-address getters did not fix destination allocation. Shared y and shared
+y/dest altered argument allocation. Extending dest through the late zero store
+fixes every earlier store but makes that final address use r3 instead of reusing
+x's r0 address: 2 ROM/4 draft differences, 580 bytes. An inline store keeps that
+result. Using dest for all y stores changes cross-jumping and allocation broadly.
+
+Persistent search: `build/matchsearch/Presentation_UpdateDropShakeBlink`, node
+shared-destination. Evidence/candidates: `build/cx/work/Presentation_UpdateDropShakeBlink/`.
+Next: produce the r2 conflict without forcing the late zero store to retain the
+shared destination, perhaps by separating its caller value from the store helper's
+argument class. The knob proves the sole remaining decision on the saved draft.
+
+### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): partial
+
+Tags: #matching #phase3 #presentation #081FDAF4
+
+Removed the state pointer pin by sharing a void component pointer between the
+volley and collider field views. The remaining zero pin still selects r4.
+Pin-free draft: `notes/phase3-drafts/dp-effects-b/RisingActor_AdvanceHeight.c`,
+5 ROM/3 draft instructions, 72 versus 76 bytes. `AGBCC_FORCE=zero:4` now MATCH.
+Before sharing the component, forcing zero alone displaced state to r0 and broke
+reload's reuse of its address for collider; forcing both zero:4,state:2 matched.
+
+Zero is a two-reference local quantity, priority 10000, with r0 free. Its store
+ends its lifetime before the callback; the final return is a separate constant.
+Read local-alloc.c's quantity ordering and hard-register allocation. Returning
+zero, capturing it in a do block, returning through a do block, a union scalar,
+an inline clear helper with and without a return, and a separate collider helper
+do not make it cross the call. Union initialization at entry changes scheduling;
+byte/halfword array initialization adds stack operations and does not match.
+A helper for the collider alone also loses the state/collider reuse. Shared
+component is the structural partial; stock unit check MATCH.
+
+Store: `build/matchsearch/RisingActor_AdvanceHeight`, shared-component node.
+Next: identify a natural caller/helper return boundary that keeps zero live
+across the callback during allocation but rematerializes the final return.
+
+### sub_081FDCB0 / OrbitEffect_UpdateHomingTrail (081FDCB0): partial
+
+Tags: #matching #phase3 #presentation #081FDCB0
+
+Removed the source r1 pin and zero-use barrier. A do/while capture keeps zero
+in r5 at entry; clearing source after copying it to target prevents CSE from
+collapsing their two allocation classes. One memory barrier remains.
+
+Pin-free draft: `notes/phase3-drafts/dp-effects-b/sub_081FDCB0.c`, 4 ROM/8 draft
+instructions, 280 versus 272 bytes. IsFar inline restores all position/age
+reloads, but materializes a boolean with four extra instructions and loads
+target before the position. Its target lives in r3, blocking the ROM's initial
+zero-offset reload into r3; `why 67` shows no spill rotation can fix that.
+No single knob matches: probe tested eight canonical choices, five jump follows
+and one PRE decision without changing the count. Read jump.c's conditional
+assignment and branch simplification conditions.
+
+Original pin-free source gives 38/30. Steer helper and per-axis Distance helpers
+retain the missing reloads. Boolean helper plus scoped zero improves to 4/8.
+Early returns inside the predicate keep 4/8; explicit if/else returns undo the
+reload boundary (40/32). Passing preloaded dx changes neither the load order
+nor distance. Union age view, union zero, and mask-first AND do not help.
+A break/goto distance block, duplicate label jumps, and the source reset with
+the barrier removed still let CSE eliminate necessary reloads (36/30 or 39/31).
+Source copy in a do block gives 5/5 on the partial; a union pointer and identity
+helper give 4/4. The dead reset alone supplies the exact source/target separation.
+
+Store: `build/matchsearch/sub_081FDCB0`, distance-boundary. Next: preserve the
+inline distance-return join that prevents CSE following, while eliminating its
+boolean materialization; keep the source reset when recovering original load order.
+
+### HomingProjectile_UpdateDefaultState (081FF454): partial
+
+Tags: #matching #phase3 #presentation #081FF454
+
+Removed three of four concessions: one capture uses a do block; a shared void
+component pointer combines delay's r0/r6 conflicts with rise height's r1 conflict,
+so both choose r2. The FaceFinal saved-pointer/r5-clobber barrier remains.
+Stock check MATCH, 1256 bytes.
+
+Pin-free draft: `notes/phase3-drafts/dp-effects-b/HomingProjectile_UpdateDefaultState.c`,
+two register differences and identical shape/size. `AGBCC_FORCE=saved#2:7` MATCH.
+Saved is global priority 454, 2 refs, doubled life 44 because REG_EQUIV marks a
+constant. It conflicts with r0/r1/r2/r3/r4/r6, leaving r5 and r7; ordinary allocation
+takes r5. Read global.c's preferred-register filtering and selection. Original
+pin-free source had 47/49 differences; scoped one reduces to 18/18, component
+sharing to 2/2. The three-force diagnosis delay:2,dest:2,saved#2:7 also matched.
+
+Signed height leaves the result unchanged; widening height adds instructions.
+A delay capture block retains four differences; resetting delay after a separate
+load changes reload rotation broadly. Moving FaceFinal's saved capture to the
+end changes scheduling; wrapping its original capture leaves two differences.
+Manual inlining also leaves 2/2. Sharing saved with the target vector makes it
+r8 (21/23), with the from vector disturbs broad allocation (130/130), and with
+the delta gives 26/26. first+1 and first followed by increment leave 2/2.
+Resetting first or second changes stores, allocation and rotation, not a match.
+
+Store: `build/matchsearch/HomingProjectile_UpdateDefaultState`, shared-component.
+Next: find an existing short-lived pointer use with an r5 conflict to share with
+FaceFinal's saved flip address, without the call-crossing vector lifetimes.
+
+### SpiralBurst_InitParticles (08234540): deferred
+
+Tags: #matching #phase3 #effects #08234540
+
+Both table pins remain; no partial matched. Main pin-free draft in
+`notes/phase3-drafts/dp-effects-b/SpiralBurst_InitParticles.c` moves the loop table
+assignment into the loop: 25 ROM/23 draft instructions, shape 2, 424 versus 428
+bytes. The `.priority.c` companion preserves the decisive diagnosis: direct
+initial table capture, 48/44, and `AGBCC_PRI=randomTable:+3600` gives MATCH.
+`AGBCC_FORCE=table:5,randomTable:6` also matches that companion.
+
+Initial work.samples alias causes an unnecessary stack store when unpinned;
+direct table capture removes it. Loop randomTable has 11 refs, live length 146
+doubled to 292 by REG_EQUIV, priority 1130. Burst priority is 3878, sprite 4689,
+frame 11986. +2000 does not cross burst; +2800 fixes burst but swaps sprite and
+table (15/15); +3600 crosses sprite and matches. Read local-alloc.c's REG_EQUAL
+promotion and constant-register priority halving.
+
+A sample capture macro raises table refs to 16 (loop weighting x3), but constant
+equivalence still halves its priority to 2176. Direct/read-sample shared helpers
+change mask allocation to r6, shortening code to 416 bytes. Scalar union capture,
+end reset, source reset, literal address, capture blocks and typed sprite cursor
+do not produce the priority. Halfword-built table avoids some allocation issues
+but adds initialization instructions (26/36 with captured draws). Narrow mask
+changes mask lifetime and gives 41/35. Sprite initializer helper gives 51/47;
+whole-loop helper gives 57/49. Array indexing leaves the baseline unchanged.
+
+Retaining randomTable's r6 pin while removing the initial pin coalesces table
+into r6 too early (4/2); source resets and capture blocks do not preserve the
+ROM's r5-to-r6 copy. No verified partial was found. Store:
+`build/matchsearch/SpiralBurst_InitParticles`, table-priority and loop-table nodes.
+Next: prevent the loop table's constant-equivalence discount while retaining
+the mask parameter boundary and the initial table copy, or separate sprite/burst
+lifetimes enough to give the table the required allocation order.

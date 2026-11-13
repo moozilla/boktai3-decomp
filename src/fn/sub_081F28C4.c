@@ -2,7 +2,6 @@
 #include "background_controller.h"
 // confidence=low: SpriteTrail_CreateMotionEffect without the velocity: the end point goes to the
 // slot that function uses for velocity (0x54), and the trail sprites start at the start point.
-// MATCHING_CONCESSION: register-pinning
 struct Camera {
     u8 pad0[0x44];
     s32 x;
@@ -18,7 +17,7 @@ s32 SpriteTrail_CreateFixedEffect(struct SpriteTrailPool *pool, struct TrailVect
     register struct TrailVector *position;
     struct ContactSwarmSprite *head, *tail, *sprite;
     struct TrailVector *history;
-    register struct TrailVector *saved asm("sl");
+    register struct TrailVector *saved;
     if (!p)
         return -1;
     p->state = 0;
@@ -33,7 +32,9 @@ s32 SpriteTrail_CreateFixedEffect(struct SpriteTrailPool *pool, struct TrailVect
     p->historyIndex = 0;
     head = p->head;
     tail = p->tail;
-    saved = position;
+    do {
+        saved = position;
+    } while (0);
     sprite = head;
     history = p->history;
     for (i = 3; i >= 0;) {
