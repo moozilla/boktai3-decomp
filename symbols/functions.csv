@@ -764,6 +764,7 @@ addr,name,mode,confidence,source,notes
 08020DF0,SceneMessages_ScriptStart,thumb,low,src-alias,
 08020ED8,SceneMessages_Stop,thumb,low,src-alias,
 08020F1C,SceneMessages_ConsumeSignal,thumb,low,src-alias,
+08020F48,SceneMessages_IsActive,thumb,low,src-alias,
 08020F6C,SceneCommands_ClearEffect,thumb,low,src-alias,Destroys the effect handle via OrbitingParticles_Stop and zeroes the field when one is set; a command handler alongside SceneCommands_CreateEffect
 08020F84,SceneCommands_CreateEffect,thumb,low,src-alias,
 08020FE4,SceneCommands_CreateOrbitingParticles,thumb,low,src-alias,Looks up a resource with SceneBody_GetById and spawns orbiting particles via OrbitingParticles_Create from a command parameter struct

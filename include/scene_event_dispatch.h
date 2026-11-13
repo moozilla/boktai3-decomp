@@ -2,12 +2,16 @@
 #define GUARD_SCENE_EVENT_DISPATCH_H
 #include "global.h"
 struct SceneEventCommand {
-    u8 unknown0[6];
-    u8 kind, unknown7;
+    u16 id;
+    u8 receiverKind, trigger;
+    u16 unknown4;
+    u8 kind, argumentCount;
     s16 value;
 };
 struct SceneEventReceiver {
-    u8 unknown0[6];
+    u16 id;
+    u8 kind, trigger;
+    u16 unknown4;
     u8 count[2];
     struct SceneEventCommand *pending[2][4];
 };
@@ -21,7 +25,7 @@ struct SceneEventDispatchState {
 };
 /* 0x0200047C */
 extern struct SceneEventDispatchState *gSceneEventDispatchState;
-void SceneMessages_SetPendingTrigger(struct SceneEventReceiver *, struct SceneEventCommand *);
+u32 SceneMessages_SetPendingTrigger(struct SceneEventReceiver *, struct SceneEventCommand *);
 void SceneAudioEvent_PlaySong(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
                               struct SceneEventCommand *);
 void SceneAudioEvent_StartSongDirect(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
