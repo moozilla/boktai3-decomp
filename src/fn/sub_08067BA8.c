@@ -3,7 +3,6 @@
 #include "ram.h"
 /* SceneActorControl_RequestAllDepartures: Requests departure and sets collider flags for every occupied slot not already departing */
 #define SceneActorControl_RequestAllDepartures sub_08067BA8
-#define SceneActorControl_RequestAllDepartures sub_08067BA8
 static inline u8 IsUsed(struct SceneActorControlManager *p, u32 index)
 {
     u32 bit = 1U << index;
