@@ -1317,6 +1317,17 @@ r0 one-pin influences allocation outside its lexical block; a returning inline m
 produce the needed hard-return-register liveness without any pin, unlike the simple
 QueueCollider helper tried so far. Preserve the observed first-slot flags test.
 
+QueueColliders follow-up: the halfword union form that resolved RisingActor
+removes the initial barrier only at a cost of 4/4 register differences with the
+other concessions retained. Combine folds the initial word copy directly to
+scheduled = 0, and similarly folds the final stride; reload chooses r0 for both
+constants, while the ROM uses r7. The same form with all concessions removed
+gives 38/32. Initializing the index from the union word gives 8/8; initializing
+the stride through halves gives 1/9 with extra partial-write instructions, and
+doing the mask through halves as well gives 7/25. A one-halfword array gives
+12/14 and hoists the mask, reproducing the earlier loop obstacle. No further
+partial matched. Best saved pin-free draft remains unchanged.
+
 ### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): resolved
 
 Tags: #matching #phase3 #presentation #081E2910
