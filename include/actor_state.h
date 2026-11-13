@@ -5,13 +5,16 @@ struct ActorAnimationPair {
     u32 first, second;
 };
 struct ActorState {
-    u8 unknown0[0x94];
+    u8 unknown0[0x51];
+    u8 heading;
+    u8 unknown52[0x42];
     s16 vitality;
     u8 unknown96[4];
     u8 checking;
     u8 unknown9B;
     u32 flags;
-    u8 unknownA0[0xA];
+    u8 unknownA0[8];
+    u8 facing4, facing8;
     u8 state;
     u8 unknownAB;
     u8 active, phase, variant, pending, triggered;
