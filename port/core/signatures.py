@@ -20,7 +20,8 @@ def split_parameters(text):
 
 
 def abi_type(text):
-    match = re.match(r'(ptr|void|i\d+|float|double|\.\.\.)\b', text.strip())
+    if text.strip() == '...': return 'varargs'
+    match = re.match(r'(ptr|void|i\d+|float|double)\b', text.strip())
     if not match: return 'unmodeled:' + text.strip().split()[0]
     kind = match[1]
     if kind == 'ptr' or kind in {'i1', 'i8', 'i16', 'i32'}: return 'i32'
@@ -30,9 +31,18 @@ def abi_type(text):
 
 
 def signature(line):
-    match = re.match(r'(?:define|declare)\s+(.*?)@([\w.$]+)\((.*?)\)', line)
+    match = re.match(r'(?:define|declare)\s+(.*?)@([\w.$]+)\(', line)
     if not match: return None
-    before, name, args = match.groups()
+    before, name = match.groups()
+    start = match.end()
+    depth = 1
+    end = start
+    while end < len(line) and depth:
+        if line[end] == '(': depth += 1
+        elif line[end] == ')': depth -= 1
+        if depth: end += 1
+    if depth: return None
+    args = line[start:end]
     ret = before.strip().split()[-1]
     params = [abi_type(p) for p in split_parameters(args)]
     return name, {'return': abi_type(ret), 'arguments': params}
