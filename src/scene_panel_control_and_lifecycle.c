@@ -49,7 +49,6 @@ s32 ScenePanel_AreSubjectsSettled(struct ScenePanel *input)
     return 1;
 }
 
-// MATCHING_CONCESSION: register-pinning
 s32 ScenePanel_CanAcceptPlayer(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
@@ -85,13 +84,10 @@ void ScenePanel_WaitInitialTether(struct ScenePanel *input)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
+void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *panel)
 {
-    struct ScenePanel *panel = (void *)input;
     u16 *framePointer = &panel->effectFrame;
     u32 frame;
-    asm("" : "+r"(panel));
     {
         u32 value = *framePointer;
         value++;
@@ -114,8 +110,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         position.z = Div(gTetherActor->position.z * previousWeight + panel->center.z, divisor);
         direction = gTetherActor->heading;
         if (*framePointer & 1) {
-            u32 facing = direction;
-            asm("" : "+r"(facing));
+            u8 facing = direction;
             if (facing) {
                 if (facing > 4)
                     direction++;
@@ -274,7 +269,6 @@ void ScenePanel_AdvancePlayerArrival(struct ScenePanel *input)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *panel)
 {
     u32 frame;
