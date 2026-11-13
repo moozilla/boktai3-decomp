@@ -1606,12 +1606,12 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
     u32 flag;
     u8 done;
     if (take(p)) {
-        u16 *first = (u16 *)((u8 *)p + 0xed0);
+        u16 *first = (u16 *)&p->targetX;
         s32 zero;
         zero = 0;
         *first = 25;
-        *(u16 *)((u8 *)p + 0xed2) = 102;
-        *(u16 *)((u8 *)p + 0xed4) = zero;
+        p->targetY = 102;
+        p->targetZ = zero;
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
         p->obj.flags &= ~1;
