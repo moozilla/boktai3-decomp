@@ -3,6 +3,160 @@
 #include "scrolling_dialogue.h"
 #include "player_cue_sequence.h"
 
+u32 PauseMenu_ReadDirectionRepeat(struct SceneHudState *hud)
+{
+    u32 pressed = gPadState[1] & 0xf0;
+    if (pressed) {
+        hud->directionRepeatTimer = 0;
+        return gPadState[1];
+    }
+    if (gPadState[0] & 0xf0) {
+        if (++hud->directionRepeatTimer > 9) {
+            hud->directionRepeatTimer = pressed;
+            return gPadState[0];
+        }
+    }
+    return 0;
+}
+
+void PauseMenu_SetConfirmationIndicator(struct SceneHudState *hud, s32 choice)
+{
+    s32 keyframe;
+    PauseMenu_ClearSpriteFlags(hud, 7, 1);
+    PauseMenu_SetSpritePosition(hud, 7, 0, 0);
+    hud->binaryChoice = choice;
+    if ((u8)choice)
+        keyframe = 0x4b;
+    else
+        keyframe = 0x4c;
+    PauseMenu_LoadSpriteKeyframe(hud, 7, keyframe);
+}
+
+s32 PauseMenu_UpdateBinaryChoice(struct SceneHudState *hud)
+{
+    u32 changed;
+    if (gPadState[1] & 1) {
+        PauseMenu_AddSpriteFlags(hud, 7, 1);
+        return hud->binaryChoice;
+    }
+    if (gPadState[1] & 2) {
+        PauseMenu_AddSpriteFlags(hud, 7, 1);
+        return 0;
+    }
+    changed = 0;
+    if (hud->binaryChoice) {
+        u16 pressed = gPadState[1] & 0x10;
+        changed = pressed != 0;
+    } else {
+        if (gPadState[1] & 0x20)
+            changed = 1;
+    }
+    if (changed) {
+        Sound_PlaySong(0xDC);
+        hud->binaryChoice = 1 - hud->binaryChoice;
+        PauseMenu_LoadSpriteKeyframe(hud, 7, 0x4C - hud->binaryChoice);
+    }
+    return -1;
+}
+
+void PauseMenu_HideAllSprites(struct SceneHudState *hud)
+{
+    u32 hidden = 1;
+    s32 i;
+    u32 *flags = &hud->categoryWidgets[0].flags;
+    struct SceneInputWidget *widget;
+    for (i = 0x7b; i >= 0; i--) {
+        *flags |= hidden;
+        flags += sizeof(struct SceneInputWidget) / sizeof(*flags);
+    }
+    hud->selectorFlags |= 1;
+    widget = &hud->comparisonUnlockWidget;
+    widget->flags |= 1;
+    widget = &hud->comparisonActionWidget;
+    widget->flags |= 1;
+    hud->promptSprite.flags |= 1;
+}
+
+void PauseMenu_LoadSpriteKeyframe(struct SceneHudState *hud, s32 index, u32 keyframe)
+{
+    struct SceneInputWidget *widget =
+        &((struct SceneHudState *)(index * sizeof(struct SceneInputWidget) + (u32)hud))
+             ->categoryWidgets[0];
+    widget->flags &= ~1;
+    Anim_LoadKeyframe(&hud->categoryWidgets[index], hud->widgetResource, (u16)keyframe, 0);
+}
+
+void PauseMenu_SetSpritePosition(struct SceneHudState *hud, s32 index, u16 x, u16 y)
+{
+    struct ContactPosition *position =
+        &((struct SceneHudState *)(index * sizeof(struct SceneInputWidget) + (u32)hud))
+             ->categoryWidgets[0]
+             .position;
+    position->x = x;
+    position->y = y;
+    position->z = 0;
+    position->pad = 0;
+}
+
+void PauseMenu_AddSpriteFlags(struct SceneHudState *hud, s32 index, u32 mask)
+{
+    struct SceneInputWidget *widget =
+        &((struct SceneHudState *)(index * sizeof(struct SceneInputWidget) + (u32)hud))
+             ->categoryWidgets[0];
+    widget->flags |= mask;
+}
+
+void PauseMenu_ClearSpriteFlags(struct SceneHudState *hud, s32 index, u32 mask)
+{
+    struct SceneInputWidget *widget =
+        &((struct SceneHudState *)(index * sizeof(struct SceneInputWidget) + (u32)hud))
+             ->categoryWidgets[0];
+    widget->flags &= ~mask;
+}
+
+void PauseMenu_ClearTileRect(s32 x, s32 y, s32 width, s32 height)
+{
+    s32 row;
+    for (row = 0; row < height; row++) {
+        u16 *cell = Hud_GetTilemapCell(0, x, y + row);
+        s32 col;
+        for (col = 0; col < width; col++) {
+            *cell++ = 0xf001;
+        }
+    }
+}
+
+void PauseMenu_SetSpritePalette(struct SceneInputWidget *widget, u32 bank)
+{
+    widget->paletteBank = bank;
+    widget->palette = (u16 *)((u8 *)gPaletteBankData + (widget->paletteBank << 5));
+}
+
+void PauseMenu_SmoothPoint(s16 *position, s16 *target, s32 weight)
+{
+    s32 divisor;
+    position[0] = Div(position[0] * weight + target[0], divisor = weight + 1);
+    position[1] = Div(position[1] * weight + target[1], divisor);
+}
+
+u32 PauseMenu_GetPlayerStatusValue(struct SceneHudState *hud)
+{
+    s32 statusIndex;
+    s32 remainingTicks;
+    u32 eventSlot;
+    if (hud->actionOwner->scriptStatus[0]) {
+        statusIndex = 2;
+    } else {
+        eventSlot = hud->actionOwner->timedEventSlot;
+        remainingTicks =
+            ((struct GameState *)(eventSlot * sizeof(s32) + (u32)gGameState))->counters628[0];
+        statusIndex = 0;
+        if (remainingTicks > 0)
+            statusIndex = 6;
+    }
+    return hud->actionOwner->menuStatusValues[statusIndex];
+}
+
 void PauseMenu_StartPaletteTransition(struct SceneHudState *hud, u16 sourceBank, u16 targetBank,
                                       s32 duration)
 {
@@ -168,7 +322,7 @@ u32 PauseMenu_UpdateSpriteMotion(struct SceneHudState *hud, u32 index)
     return 0;
 }
 
-void PauseMenu_OpenPrompt(s32 messageTable, s32 message, s32 playSound)
+void PauseMenu_OpenPrompt(const void *messageTable, s32 message, s32 playSound)
 {
     if (playSound != 0)
         Sound_PlaySong(0x107);
