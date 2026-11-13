@@ -1119,10 +1119,10 @@ void Actor_BeginFadeAnimation(void)
         if (g == 0)
             return;
     }
-    *(u16 *)((u8 *)g + 0xf8a) = Script_GetValue();
+    g->resource = Script_GetValue();
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0xb0;
+    g->phase = 11;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -1131,7 +1131,7 @@ void Actor_BeginFadeAnimation(void)
         u8 one = 1;
         g->flags |= one;
     }
-    *(u32 *)((u8 *)g + 0xf54) = Script_GetKeywordValue(0x70, 0);
+    g->completionHandle = (void *)Script_GetKeywordValue(0x70, 0);
 }
 
 void Actor_BeginReverseFadeAnimation(void)
