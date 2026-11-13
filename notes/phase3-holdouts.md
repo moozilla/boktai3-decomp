@@ -1376,3 +1376,32 @@ Next: find an equivalent iteration shape that increases loop instruction
 count during invariant analysis while still reducing to the same final loop,
 or prevents this address from being recognized as invariant without changing
 its eventual instructions.
+
+### TentacleActor_AlignSegmentsToTerrain (080AA8C4): PRE copy removed
+
+The saved draft declares the segment position pointer before the flag tests.
+This eliminates PRE's extra reaching-value copy, improving the old draft from
+36/38, shape 4, to 36/36, shape 2, with the correct 460-byte size. No production
+change landed. The remaining differences include the Height position/y-output
+r5/r6 allocation, the joined height copy, and reload choices.
+
+On the old base, `CSE_NOCANON=160 AGBCC_NOPRE=5 AGBCC_PRI=234:+1636`
+gets 13/13, shape 0. This is not an exact diagnostic: height comparisons still
+use r1 instead of r2 and the position/y-output pointers remain swapped.
+NOPRE=5 isolates the redundant position copy, which the explicit earlier
+pointer declaration removes in ordinary C. The canonical-register change is
+in the duplicate Abs calculation; it changes the allocation and retains the
+height copy but does not reproduce the comparison operands.
+
+Tried direct field stores, an independently indexed y-field pointer, shared
+terrain height helper, separate cell calculation, switch-arm returns, signed
+narrow height, unsigned height arithmetic, initialized height arrays/unions,
+materialized and mutating absolute-value helpers, reversed sign tests, output
+parameters, and early continues for inactive/equal-height segments. Field
+stores collapse the independent y induction and lose target instructions;
+most other forms canonicalize to the same result. Narrow height adds shifts.
+The saved draft still has inherited raw field-address expressions, which must
+be replaced before a clean final landing. Persistent search retains the old
+base and the pointer-first improvement. Next: change the height copy's class
+membership independently of the upper-delta Abs class, then use giv ordering
+to allocate the independent y-output pointer before the saved position.
