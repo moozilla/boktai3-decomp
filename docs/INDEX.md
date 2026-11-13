@@ -231,7 +231,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-30.md](../docs/history/2026-10-30.md) | 2026-10-30: monster initializers and shared engine records | #bosses #compiler #cue #data #effects #hresvelgr #matching #monsters #player #presentation #ram #ratatosk #scene-actors #scope-gap #structs #studio #tooling #vanargand | 9 |
 | [docs/history/2026-10-31.md](../docs/history/2026-10-31.md) | 2026-10-31: finish-subsystem sessions | #bosses #cleanup #compiler #data #effects #hresvelgr #matching #player #presentation #process #ratatosk #register-pinning #scene-actors #structs #studio #tooling #vanargand | 7 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
-| [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #animation #cleanup #compiler #integration #matching #particles #phase3 #port #scene #structs #tooling | 3 |
+| [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #text #tooling #wireless | 9 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -292,7 +292,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-astra1.md](../notes/cx-astra1.md) | Campaign worker astra1 | #matching #monsters #register-pinning | 7 |
 | [notes/cx-astra2.md](../notes/cx-astra2.md) | Campaign worker astra2 | #matching #monsters #actors | 4 |
 | [notes/cx-astra3.md](../notes/cx-astra3.md) | Campaign worker astra3 | #matching #nonmatching #golem #scene-actors | 3 |
-| [notes/cx-cl-field-effects_2026-11-13.md](../notes/cx-cl-field-effects_2026-11-13.md) | Field objects and presentation cleanup | #matching #animation #particles #scene #assets #tooling | 8 |
+| [notes/cx-cl-bosses_cleanup_2026-11-13.md](../notes/cx-cl-bosses_cleanup_2026-11-13.md) | Bosses, Player and Engine core cleanup, 2026-11-13 | #matching #actors #tooling #process | 26 |
+| [notes/cx-cl-field-effects_2026-11-13.md](../notes/cx-cl-field-effects_2026-11-13.md) | Field objects and presentation cleanup | #matching #animation #particles #scene #assets #tooling | 14 |
 | [notes/cx-dp-field_2026-11-13.md](../notes/cx-dp-field_2026-11-13.md) | Field concession removal, 2026-11-13 | #matching #phase3 #field | 2 |
 | [notes/cx-sol01.md](../notes/cx-sol01.md) | cx-sol01 campaign | #player #matching | 19 |
 | [notes/cx-sol02.md](../notes/cx-sol02.md) | Campaign worker sol02 | #matching #vanargand | 23 |
@@ -319,9 +320,10 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/directional-force_2026-10-14.md](../notes/directional-force_2026-10-14.md) | Directional force controller, 080510B8–080515C0 |  | 2 |
 | [notes/display-track_2026-10-14.md](../notes/display-track_2026-10-14.md) | Script-controlled display tracks | *#scripts* | 4 |
 | [notes/dog-contact-response_2026-10-30.md](../notes/dog-contact-response_2026-10-30.md) | Dog contact response | #matching #monster #dog #080E25FC #compiler | 1 |
-| [notes/dp-link_2026-11-12.md](../notes/dp-link_2026-11-12.md) | Link, hardware, and minigame concession removal, 2026-11-12 | #matching #phase3 #link #compiler | 3 |
-| [notes/dp-menus-b_2026-11-13.md](../notes/dp-menus-b_2026-11-13.md) | Menus, HUD and dialogue phase 3: dp-menus-b | #matching #phase3 #scene-panel #scope | 2 |
-| [notes/dp-scene1_2026-11-13.md](../notes/dp-scene1_2026-11-13.md) | Scene actor concession removal: first batch | #matching #compiler #scene-actors #phase3 | 5 |
+| [notes/dog-unit-blocker_2026-11-13.md](../notes/dog-unit-blocker_2026-11-13.md) | Dog consolidation blocker | *#text* | 2 |
+| [notes/dp-link_2026-11-12.md](../notes/dp-link_2026-11-12.md) | Link, hardware, and minigame concession removal, 2026-11-12 | #matching #phase3 #link #compiler | 4 |
+| [notes/dp-menus-b_2026-11-13.md](../notes/dp-menus-b_2026-11-13.md) | Menus, HUD and dialogue phase 3: dp-menus-b | #matching #phase3 #scene-panel #scope | 4 |
+| [notes/dp-scene1_2026-11-13.md](../notes/dp-scene1_2026-11-13.md) | Scene actor concession removal: first batch | #matching #compiler #scene-actors #phase3 | 6 |
 | [notes/dp-scene2-phase3_2026-11-13.md](../notes/dp-scene2-phase3_2026-11-13.md) | Scene actors and NPCs: second-half concession removal | *#actors #scene* | 5 |
 | [notes/drawable-reset-playback.md](../notes/drawable-reset-playback.md) | Drawable playback in the monster reset callbacks | #monsters #matching | 1 |
 | [notes/effects-background-flash_2026-10-14.md](../notes/effects-background-flash_2026-10-14.md) | Transient sprite effects and BG1 flash controller, October 14 | *#assets* | 7 |
@@ -368,7 +370,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/matching-search-scale_2026-10-29.md](../notes/matching-search-scale_2026-10-29.md) | Matching search at the largest unmatched function | #matching #compiler #tooling #monsters | 19 |
 | [notes/matching-search_2026-10-29.md](../notes/matching-search_2026-10-29.md) | Matching search: implementation, evidence, and next steps | #matching #compiler #tooling #process | 18 |
 | [notes/matchsearch-interruption_2026-10-30.md](../notes/matchsearch-interruption_2026-10-30.md) | Formatter interruption regression | #tools #scope | 1 |
-| [notes/menus-link-cleanup_2026-11-12.md](../notes/menus-link-cleanup_2026-11-12.md) | Menus, link and hardware unit cleanup | #cleanup #menus #wireless #types | 21 |
+| [notes/menus-link-cleanup_2026-11-12.md](../notes/menus-link-cleanup_2026-11-12.md) | Menus, link and hardware unit cleanup | #cleanup #menus #wireless #types | 25 |
 | [notes/mgs-gcl-round1.md](../notes/mgs-gcl-round1.md) | MGS/GCL matching round 1 | *#scripts #matching* | 3 |
 | [notes/mgs-gcl-round2.md](../notes/mgs-gcl-round2.md) | MGS/GCL matching round 2 | *#scripts #matching* | 2 |
 | [notes/mgs-gcl-round3.md](../notes/mgs-gcl-round3.md) | MGS/GCL matching round 3 | *#scripts #matching* | 2 |
@@ -376,6 +378,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/mgs-gcl-round5.md](../notes/mgs-gcl-round5.md) | MGS/GCL matching round 5 | *#scripts #matching* | 1 |
 | [notes/mgs-gcl-round6.md](../notes/mgs-gcl-round6.md) | MGS/GCL matching round 6 | *#scripts #matching* | 2 |
 | [notes/mgs-gcl-round7.md](../notes/mgs-gcl-round7.md) | MGS/GCL matching round 7 | *#scripts #matching* | 1 |
+| [notes/mimic-cleanup_2026-11-13.md](../notes/mimic-cleanup_2026-11-13.md) | Mimic unit cleanup |  | 2 |
 | [notes/modifier-display_2026-10-14.md](../notes/modifier-display_2026-10-14.md) | Modifier menu graphics and input (tentative) | *#menu* | 4 |
 | [notes/modifier-menu_2026-10-14.md](../notes/modifier-menu_2026-10-14.md) | Modifier selection and stat previews (tentative) | *#menu #process* | 6 |
 | [notes/modifier-preview_2026-10-14.md](../notes/modifier-preview_2026-10-14.md) | Modifier menu preview and lifecycle (tentative) | *#actors #menu #process* | 6 |
@@ -415,7 +418,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/orbiting_particles_2026-10-18.md](../notes/orbiting_particles_2026-10-18.md) | Orbiting particles unit consolidation (2026-10-18) | #particles #types #matching | 3 |
 | [notes/palette-level-transitions_2026-10-18.md](../notes/palette-level-transitions_2026-10-18.md) | Palette level transitions unit (2026-10-18) | #palette #mosaic #unit-consolidation | 3 |
 | [notes/parameterized-motion-pool_2026-10-14.md](../notes/parameterized-motion-pool_2026-10-14.md) | Parameterized motion pool, 080454C0–08045A20 |  | 5 |
-| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 297 |
+| [notes/phase3-dp-bosses_2026-11-13.md](../notes/phase3-dp-bosses_2026-11-13.md) | Bosses, Player and Engine core phase 3 results | #matching #phase3 #bosses #player #tooling | 4 |
+| [notes/phase3-dp-field-b_2026-11-13.md](../notes/phase3-dp-field-b_2026-11-13.md) | Field objects and hazards: dp-field-b run | #phase3 #actors #particles #animation #tools | 4 |
+| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 364 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
 | [notes/player-clone-fill_2026-11-13.md](../notes/player-clone-fill_2026-11-13.md) | Player clone fill-local cleanup | #matching #actors #animation | 2 |
@@ -563,6 +568,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/shake-icon-display_2026-10-14.md](../notes/shake-icon-display_2026-10-14.md) | Short-lived shaking keyframe icon |  | 2 |
 | [notes/shared-monster-round4_2026-10-29.md](../notes/shared-monster-round4_2026-10-29.md) | Round 4: shared monster operations and five exact matches | #matching #scene-actor #monsters #golem #skeleton #ghoul #mummy #vanargand #compiler #tooling #080DA97C #0808B3EC #08078EE8 #081AE0C0 #080D2584 | 6 |
 | [notes/singleton-slot7-recovery_2026-11-01.md](../notes/singleton-slot7-recovery_2026-11-01.md) | Slot-seven presentation | *#assets* | 1 |
+| [notes/skeleton-cleanup_2026-11-13.md](../notes/skeleton-cleanup_2026-11-13.md) | Skeleton unit cleanup |  | 2 |
 | [notes/skeleton-knocked-flight-round9.md](../notes/skeleton-knocked-flight-round9.md) | Skeleton_BeginKnockedFlight |  | 0 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |
 | [notes/sol-family-push-3.md](../notes/sol-family-push-3.md) | Sol family push 3 |  | 8 |
@@ -573,6 +579,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/solo-family_2026-10-09.md](../notes/solo-family_2026-10-09.md) | Solo family tranche, October 9 |  | 5 |
 | [notes/sonnet-081EEECC-task.md](../notes/sonnet-081EEECC-task.md) | Task 081EEECC worker notes |  | 1 |
 | [notes/sonnet-from-end-08241504.md](../notes/sonnet-from-end-08241504.md) | sub_0824261C (Player update by kind) — unfinished |  | 1 |
+| [notes/spread_shot_cleanup_draft.md](../notes/spread_shot_cleanup_draft.md) | Spread-shot cleanup and matching evidence | #matching #scene #particles #structs #compiler | 3 |
 | [notes/sprite-unit-revisit_2026-11-13.md](../notes/sprite-unit-revisit_2026-11-13.md) | Sprite unit cleanup | #assets #animation #matching #process | 4 |
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |
 | [notes/staged-effect_2026-10-14.md](../notes/staged-effect_2026-10-14.md) | Contiguous staged effect subsection (Sol, 2026-10-14) | *#tooling* | 4 |
@@ -581,6 +588,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/subsystem-run_2026-10-25.md](../notes/subsystem-run_2026-10-25.md) | Subsystem scope run, 2026-10-25/26 | #process #tooling #matching | 4 |
 | [notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md) | Subsystem scope run, 2026-10-27 | #process #tooling #matching #ram | 1 |
 | [notes/sword-script-kind.md](../notes/sword-script-kind.md) | Sword script kind | #monsters #matching | 0 |
+| [notes/tentacle-body-cleanup_2026-11-13.md](../notes/tentacle-body-cleanup_2026-11-13.md) | Tentacle body unit cleanup |  | 2 |
 | [notes/terrain-footprint-round9.md](../notes/terrain-footprint-round9.md) | Terrain_MoveFootprint |  | 1 |
 | [notes/tether-emission-palette_2026-10-14.md](../notes/tether-emission-palette_2026-10-14.md) | Tether actor emissions, palette and movement effects, October 14 | *#actors #tether #assets* | 8 |
 | [notes/tether-initialization_2026-10-14.md](../notes/tether-initialization_2026-10-14.md) | Tether initialization, charge and flagged terrain | *#actors #tether* | 7 |
