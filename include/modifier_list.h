@@ -73,8 +73,12 @@ struct CharacterPreviewModel {
             u16 kind;
         } metadata;
     } view;
-    u8 unknown1E0[0x30];
+    struct ModifierGraphicsResource resource; /* +0x1E0 */
+    void *data;                               /* +0x200 */
+    u8 unknown204[0xC];
     u16 activePalette[16], normalPalette[16];
+    u8 primaryAppearance, secondaryAppearance;
+    s8 playerIndex;
 };
 struct CharacterPreviewPalette {
     u8 unknown0[0xC];

@@ -4646,6 +4646,7 @@ addr,name,mode,confidence,source,notes
 0811CD24,CharacterModel_SetAnimationFlags,thumb,low,src-alias,Sets the supplied flag bits on all five animation components
 0811CD40,CharacterModel_ClearAnimationFlags,thumb,low,src-alias,Clears the supplied flag bits on all five animation components
 0811CD5C,CharacterModel_SetComponentRenderMode,thumb,low,src-alias,Sets the render-control byte at offset 0x1A on all five components; field meaning is tentative
+0811CD70,ScenePool_ApplyMotionInput,thumb,low,src-cleanup,Tentative grounded motion input: acceleration; lateral steering; braking and drain flags
 0811CF34,CharacterModel_SetPrimaryAppearance,thumb,low,src-alias,Stores the primary appearance value resolved from the supplied selection; appearance meaning is tentative
 0811CF4C,CharacterModel_SetSecondaryAppearance,thumb,low,src-alias,Stores the secondary appearance value resolved from two selection arguments; appearance meaning is tentative
 0811CF68,ScenePool_ClampForwardBias,thumb,low,src-alias,
@@ -4660,9 +4661,12 @@ addr,name,mode,confidence,source,notes
 0811D16C,PaletteFade_CycleMenuColors,thumb,low,src-alias,Rotates colors 1 through 7 every third call and copies the palette to the shadow buffer
 0811D1B0,GameState_GetBikeName,thumb,low,src-alias,Returns the name buffer used by the BIKE text tag
 0811D1C0,GameState_SetNameFromScript,thumb,low,src-alias,
+0811D218,GameState_EnableAlternateHud,thumb,low,src-alias,Tentative alternate HUD selection flag 0x80
+0811D234,GameState_SetRuntimeFlag100,thumb,low,src-alias,Set runtime flag 0x100 used by palette refresh
 0811D250,Video_GetWrappedBackgroundMapEntry,thumb,low,src-alias,Returns a background tilemap entry with both coordinates wrapped to 32 tiles
 0811D270,PanelText_DrawDigits,thumb,low,src-alias,
 0811D2B8,Video_DrawBackgroundRowMarkers,thumb,low,src-alias,Writes tile 0x10 across six positions and tile 1 at the row end on background 3
+0811D2E4,CharacterModel_LoadActorAppearance,thumb,low,src-alias,Initialize actor body; face; accessory and palette selections from saved style
 0811D334,ModifierMenu_CountAppearanceModifiers,thumb,low,src-alias,Counts up to four consecutive nonnegative modifier IDs in an appearance descriptor
 0811D358,GameState_ClearSlots7A8FromScript,thumb,low,src-alias,
 0811D384,SceneActorStyle_InitializeFromGameState,thumb,low,src-alias,

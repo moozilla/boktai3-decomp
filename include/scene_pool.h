@@ -39,20 +39,27 @@ struct ScenePoolEntry {
 };
 /* Partial actor view established by the frame/state callbacks in this range. */
 struct ScenePoolActor {
-    u8 unknown0[0xc];
+    u32 inputFlags;
+    u32 unknown4;
+    u32 kind;
     u32 boundsFlags;
     struct ScenePoolVec32 position;
     u8 unknown20[0x18];
     s32 restrictionMetric;
-    u8 unknown3c[0x1c];
+    u8 unknown3c[0xc];
+    u8 bodyAnimation, faceAnimation, accessoryAnimation, paletteState, paletteMode;
+    u8 unknown4d[0xb];
     u16 timerA, timerB;
     u8 unknown5c[0xc];
     u32 unknown68;
-    u8 unknown6c[0x28];
+    u8 unknown6c[0x18];
+    s32 acceleration, turnAcceleration;
+    u8 unknown8c[8];
     s32 minimumForwardSpeed, maximumForwardSpeed;
     s32 minimumLateralSpeed, maximumLateralSpeed;
     s32 minimumForwardBias, maximumForwardBias;
-    u8 unknownac[0x14];
+    u8 airborne;
+    u8 unknownad[0x13];
     s32 forwardBias; /* +0xc0, added to forwardSpeed (tentative) */
     u8 unknownc4[0x1f0];
     u8 emissionProfile[0xc]; /* observed descriptor prefix; full extent is unknown */
@@ -60,13 +67,17 @@ struct ScenePoolActor {
     u16 unknown308;
     u8 unknown30a[0x32];
     s32 biasClampMode;
-    u8 unknown340[0x22c];
+    u8 unknown340[0x1e4];
+    u16 requestedSound, playingSound;
+    u8 unknown528[0x44];
     u32 motionFlags;
     u8 unknown570[0xa];
     u8 unknown57a;
     u8 unknown57b[0x31];
     s32 forwardSpeed, verticalSpeed, lateralSpeed;
-    u8 unknown5b8[0x34];
+    u8 unknown5b8[0x24];
+    s32 steering;
+    u8 unknown5e0[0xc];
     s8 motionLock;
     u8 unknown5ed;
     u8 flags5ee;
