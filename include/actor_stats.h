@@ -2,6 +2,7 @@
 #define GUARD_ACTOR_STATS_H
 #include "global.h"
 #include "actor_palette_fade.h"
+#include "contact_position.h"
 #include "actor_ability_types.h"
 struct ActorDrainState {
     void (*update)(void);
@@ -29,7 +30,8 @@ struct ActorStats {
     s32 amount, amountLimit;
     u8 unknown64[4];
     s32 pendingDamage;
-    u8 unknown6C[0x12];
+    s32 damageType;
+    u8 unknown70[0xE];
     u16 recoveryValue;
     struct CharacterPreviewModel *renderers;
     s32 rate84, limit88;
@@ -59,7 +61,11 @@ struct ActorStats {
     u8 collisionBody[0x40];
     u8 contactHeader[0xE];
     u8 damageTimer;
-    u8 unknown57B[0x31];
+    u8 unknown57B;
+    struct ContactPosition contactPosition;
+    u8 unknown584[8];
+    struct ContactPosition contactOffset;
+    u8 unknown594[0x18];
     struct ActorFixedMotion motion;
     s32 relativeOrigin[4];
     struct ActorFixedMotion knockback;
