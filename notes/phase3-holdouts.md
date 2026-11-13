@@ -1450,3 +1450,28 @@ Scratch variants are under build/cx/work/SceneActorContacts_SelectForActor/.
   share this animation helper family and may supply the missing form.
 - Evidence: `build/cx/work/SceneActorAnimation_SelectDirectionalEntry/`; persistent
   search `build/matchsearch/SceneActorAnimation_SelectDirectionalEntry`, `arm-loads`.
+
+### SceneActorAnimation_SelectDirectionalFlags (080766F8)
+
+- Two original pins remain; no source landing. Plain removal has 2/2 instruction
+  differences (one lost mirror-to-flags copy, plus alignment padding).
+  `AGBCC_NOTIE=115` alone gives a complete MATCH, the same OR-tie mechanism as
+  SelectDirectionalEntry above.
+- Saved draft moves mirror and entry-flag reads into each direction arm. jump2
+  shares the two loads and preserves the OR copy. Its entire instruction shape
+  matches, with 10 register differences: mirrorAddress gets r3 and quadrant r1,
+  opposite the ROM. `AGBCC_PRI=mirrorAddress:+4738` alone gives MATCH on this draft.
+  Pointer priority is 5263 (5 refs/live 19), quadrant 10000 (6 refs/live 12 after
+  regmove). Need pointer priority first, or a different register preference.
+- Tried: repeating only the mirror read; u8/u16/s16/s8 quadrant forms; separate
+  shift/mask; halfword angle; inline quadrant/mirror/store helpers; union-backed
+  quadrant; division/remainder; reuse of quadrant for reflected value or either
+  flag read; pointer initialization/order/class-head forms; scalar/union/array
+  output storage; u32 mirror/entry reads; and one-pin partials on both arm forms.
+  None match stock. A one-byte mirror array fixes registers but sinks/repeats
+  its frame address into both branches (2/4 differences); field output forms
+  remove the required address/store structure.
+- Next: recover a natural direction-decoding helper whose output pointer is
+  allocated before the quadrant, or preserve the OR copy in the plain draft
+  without introducing a separate flag-read definition in each direction arm.
+  Scratch: `build/cx/work/SceneActorAnimation_SelectDirectionalFlags/`.
