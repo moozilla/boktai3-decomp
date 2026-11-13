@@ -109,10 +109,10 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
                 do {
                     struct Sprite *p;
                     s32 direction;
+                    u8 *out;
                     p = &base->sprites[i];
                     base->initialized[i] = 1;
                     if (!lifetimeRange) {
-                        register u8 *out asm("r1");
                         register u8 value asm("r2") = lifetime;
                         asm("" : "+r"(value));
                         out = life;
@@ -125,7 +125,8 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
                         *seed = index;
                         random = table[index];
                         value = lifetime + Mod(random, lifetimeRange);
-                        *life = value;
+                        out = life;
+                        *out = value;
                     }
                     {
                         register s32 spread asm("r2") = speedRange;
