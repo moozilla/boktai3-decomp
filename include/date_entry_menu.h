@@ -18,8 +18,8 @@ struct DateMenu {
     u8 pulseState[4];
 };
 
-s32 Time_InitializeDateMenu(struct DateMenu *);
-void sub_081DE630(struct DateMenu *);
+s32 DateMenu_Initialize(struct DateMenu *);
+void DateMenu_InitializeDigitWidgets(struct DateMenu *);
 
 typedef char DateMenuSizeCheck[sizeof(struct DateMenu) == 0x740 ? 1 : -1];
 
