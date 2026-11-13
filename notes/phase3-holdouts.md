@@ -1457,3 +1457,34 @@ merely to force the stack. Named AGBCC_NOREG was silently ignored, like the earl
 NOEQUIV bug; a separate tool fix resolves C names before invoking the compiler.
 
 Scratch/evidence: `build/cx/work/WirelessGameDisplay_UpdateRoundAnnouncement/`.
+
+### WirelessResultPanel_UpdateOutcomeReveal (0803B01C, src/fn/sub_0803B01C.c)
+
+Landed partials remove all four pins and one call-setup barrier. Production matches
+all 264 bytes with three saved-counter barriers left. Sharing one function-scope
+drawing pointer across entry/shake/reset branches, then using two direct shared
+samplers, keeps the first random seed store and restores its allocation. With
+separate branch-local drawing pointers flow deletes that store (insn 254), reducing
+the seed's references and reversing seed/mask registers. Replacing the local drawing
+layout with the shared layout or a union does not fix this: pointer scope does.
+A u16 keyframe local removes the call-setup barrier; its conversion orders the r2
+argument move before r0 and folds away. u8 and signed-short locals also match.
+
+Best fully clean draft: `notes/phase3-drafts/dp-link/WirelessResultPanel_UpdateOutcomeReveal.c`
+(14 ROM / 14 draft, shape 4, 264 bytes). It repeats `save = address` in both count-clamp
+arms and retains the u16 keyframe. This recovers a separate saved global-pointer
+pseudo, but the copy occurs after the clamp rather than before. Icon gets r4 instead
+of r5; the short-lived address gets r2 rather than r0; the maximum gets r0 rather
+than r2. Earlier fully clean forms were 60/56, then shared sampling 43/39, then shared
+pointer 25/27. Repeated save is the useful shape change, unlike repeated stores.
+
+All ten proper multi-barrier subsets after the four-pin removal fail. The prior
+repeat-save draft is 15/15, shape 4; CSE_NOFOLLOW=1 improves it to 11/11, but does not
+match. Narrow maximum types, ADDRESSOF address/save/maximum, an extra early save,
+shared maximum lifetime, typed counter/resource fields, repeated stores and clamp
+helpers do not recover the missing pre-clamp copy. The call-setup barrier alone was
+2/2 due to argument move order; helper parameter order had no effect, narrowing the
+keyframe local solved it. Next: preserve the address-to-save copy before the clamp
+without preventing CSE using a barrier. Do not repeat sampler/type/layout experiments.
+
+Scratch/evidence: `build/cx/work/WirelessResultPanel_UpdateOutcomeReveal/`.
