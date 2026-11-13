@@ -1,5 +1,89 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
+static inline void stepSecondarySprite(struct SceneRigSprite *sprite, u32 byteMask)
+{
+    struct DisplaySequenceState *state = &sprite->sequence;
+    const u16 *command;
+    {
+        u32 offset = state->index << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    sprite->frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        {
+            register u32 flags asm("r0");
+            struct SceneRigSprite *out;
+            if (first != (((*command & 0x30) >> 4) & 1)) {
+                out = sprite;
+                asm("" : "+r"(out));
+                flags = out->flags | 4;
+            } else {
+                flags = sprite->flags & ~4;
+                out = sprite;
+            }
+            out->flags = flags;
+        }
+    }
+    {
+        u32 input = state->flags;
+        register u32 bit asm("r3");
+        register u32 first asm("r1");
+        bit = 2;
+        first = bit;
+        first &= input;
+        first = (u8)first;
+        if (first != (((*command & 0x30) >> 4) & bit)) {
+            register struct SceneRigSprite *out asm("r5") = sprite;
+            out->flags |= 8;
+        } else {
+            register struct SceneRigSprite *read asm("r1") = sprite;
+            u32 flags;
+            struct SceneRigSprite *out;
+            asm("" : "+r"(read));
+            flags = read->flags & ~8;
+            out = sprite;
+            out->flags = flags;
+        }
+    }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+            } else {
+                state->index--;
+            }
+        } else {
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+            }
+        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        {
+            s32 delay = (state->frameWeight * (s32)state->speed) >> 6;
+            state->duration = delay;
+            if (!(delay & byteMask))
+                state->duration = 1;
+        }
+    }
+}
+
 static inline s32 scale12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
@@ -105,140 +189,7 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
             }
             *randomPhase += 5;
         }
-        {
-            struct DisplaySequenceState *state = &sprite->sequence;
-            const volatile u16 *command;
-            u32 duration, flags, bit;
-            {
-                u32 offset = state->index << 1;
-                struct SceneRigSprite *frameSprite = sprite;
-                const volatile u16 *table;
-                table = frameSprite->sequence.commands;
-                command = (const volatile u16 *)((u32)table + offset);
-                frameSprite->frame = *command >> 6;
-            }
-            {
-                u32 input = state->flags;
-                u32 first = 1;
-                u32 encoded;
-                u32 value;
-                first &= input;
-                value = *command;
-                encoded = (value & 0x30) >> 4;
-                {
-                    u32 one = 1;
-                    encoded &= one;
-                }
-                {
-                    register u32 flags asm("r0");
-                    struct SceneRigSprite *out;
-                    if (first != encoded) {
-                        out = sprite;
-                        asm("" : "+r"(out));
-                        flags = out->flags | 4;
-                    } else {
-                        struct SceneRigSprite *read = sprite;
-                        flags = read->flags & ~4;
-                        out = sprite;
-                    }
-                    out->flags = flags;
-                }
-            }
-            {
-                u32 input = state->flags;
-                register u32 bit asm("r3");
-                register u32 first asm("r1");
-                bit = 2;
-                first = bit;
-                first &= input;
-                first = (u8)first;
-                if (first != (((*command & 0x30) >> 4) & bit)) {
-                    register struct SceneRigSprite *out asm("r5") = sprite;
-                    out->flags |= 8;
-                } else {
-                    register struct SceneRigSprite *read asm("r1") = sprite;
-                    u32 flags;
-                    struct SceneRigSprite *out;
-                    asm("" : "+r"(read));
-                    flags = read->flags & ~8;
-                    out = sprite;
-                    out->flags = flags;
-                }
-            }
-            {
-                u32 elapsed = state->elapsed + 1;
-                u32 mask;
-                register u32 temp asm("r2");
-                register u32 savedDuration asm("r2");
-                state->elapsed = elapsed;
-                temp = 0xFFFF;
-                asm("" : "+r"(temp));
-                mask = temp;
-                duration = state->duration;
-                elapsed = (u16)elapsed;
-                savedDuration = duration;
-                if (elapsed >= duration) {
-                    state->elapsed = 0;
-                    flags = state->flags;
-                    if (flags & 4) {
-                        u32 index = state->index;
-                        if (index == 0) {
-                            u32 hold = 8;
-                            hold &= flags;
-                            if (hold) {
-                                state->elapsed = savedDuration;
-                            } else {
-                                state->index = state->frameCount - 1;
-                            }
-                        } else {
-                            state->index = index - 1;
-                        }
-                    } else {
-                        u32 index = state->index + 1;
-                        u32 frameCount;
-                        u32 endFlag;
-                        state->index = index;
-                        frameCount = state->frameCount;
-                        if ((index & mask) >= frameCount) {
-                            endFlag = flags & 8;
-                            asm("" : "+r"(endFlag));
-                            endFlag = (u8)endFlag;
-                            if (endFlag) {
-                                state->elapsed = duration;
-                                {
-                                    u32 lastIndex = frameCount - 1;
-                                    state->index = lastIndex;
-                                }
-                            } else {
-                                state->index = 0;
-                            }
-                        } else {
-                        }
-                    }
-                    {
-                        u32 offset = state->index << 1;
-                        const volatile u16 *table;
-                        table = state->commands;
-                        command = (const volatile u16 *)((u32)table + offset);
-                    }
-                    state->frameWeight = *command & 15;
-                    {
-                        s32 weight = state->frameWeight;
-                        s32 speed;
-                        speed = state->speed;
-                        speed *= weight;
-                        speed >>= 6;
-                        state->duration = speed;
-                        {
-                            u32 mask = byteMask;
-                            speed &= mask;
-                            if (!speed)
-                                state->duration = 1;
-                        }
-                    }
-                }
-            }
-        }
+        stepSecondarySprite(sprite, byteMask);
         AnimData_SelectPaletteBank(sprite->graphics, palette);
         {
             register s32 next asm("r1") = amplitude;
