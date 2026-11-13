@@ -7,7 +7,7 @@
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 u8 sub_08123194(void *, s32, u32);
-void sub_08126AD4(struct ContactPosition *, u32, u32, u32, u32, u32, u32);
+void BurstSpark_Create(struct ContactPosition *, u32, u32, u32, u32, u32, u32);
 s32 SpriteNotice_Create(struct ContactPosition *, u32, u32);
 u8 SpriteNotice_CreateBetweenPositions(struct ContactPosition *, struct ContactPosition *, u32);
 s32 Mod(s32, s32);
@@ -123,10 +123,10 @@ void SpreadShot_Step(u32 unused, struct SpreadShot *s)
     if (s->kind == 2) {
         s32 i;
         for (i = 0; i <= 3; i++)
-            sub_08126AD4(&spot, 1, 0, i << 6, 0x54, 1, 0);
+            BurstSpark_Create(&spot, 1, 0, i << 6, 0x54, 1, 0);
         for (i = 0; i <= 1; i++) {
-            sub_08126AD4(&spot, 1, 8, i << 6, 0x22, 1, 0);
-            sub_08126AD4(&spot, 1, 14, i << 6, 0x40, 1, 0);
+            BurstSpark_Create(&spot, 1, 8, i << 6, 0x22, 1, 0);
+            BurstSpark_Create(&spot, 1, 14, i << 6, 0x40, 1, 0);
         }
         *timer = 8;
     } else {
