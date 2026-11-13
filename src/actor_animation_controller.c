@@ -4332,8 +4332,8 @@ void Actor_ConfigureFromScript(void)
     struct ActorSprite *obj;
     if (!g)
         g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
-    obj = (struct ActorSprite *)((u8 *)g + 0xddc);
-    AnimData_SelectPaletteBank((u8 *)g + 0xe08, 343);
+    obj = &g->obj;
+    AnimData_SelectPaletteBank(g->effect, 343);
     g->obj.priority = 0;
     g->last = 0;
     g->resource = Script_GetValue();
@@ -4356,26 +4356,26 @@ void Actor_ConfigureFromScript(void)
             obj->z = v;
         }
     } else {
-        u8 *owner;
-        owner = *(u8 **)((u8 *)g + 0x18);
-        g->savedX = *(u16 *)(owner + 0x30);
-        obj->x = *(u16 *)(owner + 0x30);
-        owner = *(u8 **)((u8 *)g + 0x18);
-        g->savedY = *(u16 *)(owner + 0x32);
-        obj->y = *(u16 *)(owner + 0x32);
-        owner = *(u8 **)((u8 *)g + 0x18);
-        g->savedZ = *(u16 *)(owner + 0x34);
-        obj->z = *(u16 *)(owner + 0x34);
+        struct Player *owner;
+        owner = g->owner;
+        g->savedX = (u16)owner->position.x;
+        obj->x = (u16)owner->position.x;
+        owner = g->owner;
+        g->savedY = (u16)owner->position.y;
+        obj->y = (u16)owner->position.y;
+        owner = g->owner;
+        g->savedZ = (u16)owner->position.z;
+        obj->z = (u16)owner->position.z;
     }
     if (Script_SeekToKeyword(0x63))
-        W(0xf50) = Script_GetValue();
+        g->handle = (void *)Script_GetValue();
     g->phaseSelect = Script_GetKeywordValue(0x73, 0);
     if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4)
         g->growFlag = 1;
     else
         g->growFlag = 0;
-    ActorShadow_Disable((u8 *)g + 0xe34);
-    *(u32 *)((u8 *)g + 0xddc) |= 1;
+    ActorShadow_Disable(g->p2);
+    g->obj.flags |= 1;
     switch (g->phaseSelect) {
         case 0:
             Actor_SetState(g, 0, 0);
