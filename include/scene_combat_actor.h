@@ -6,18 +6,27 @@ struct ParticleVector {
     s32 x : 16, y : 16, z : 16;
     u32 : 16;
 };
+union ParticleVectorStorage {
+    struct ParticleVector packed;
+    u16 components[4];
+    s16 signedComponents[4];
+};
+union SceneCombatPosition {
+    struct { u16 x, floor, z, padding; } values;
+    u16 components[4];
+};
 struct BouncingParticleSprite {
     u32 flags;
     u8 unknown4[2], phase, unknown7[9];
     u16 frame;
     u8 unknown12[0xA];
-    struct ParticleVector position;
+    union ParticleVectorStorage position;
     u8 unknown24[8];
 };
 struct BouncingSceneParticle {
     void (*update)(struct BouncingSceneParticle *), (*destroy)(struct BouncingSceneParticle *);
     struct BouncingParticleSprite sprite;
-    struct ParticleVector velocity;
+    union ParticleVectorStorage velocity;
     s16 floor;
     u8 bounced;
 };
@@ -35,8 +44,8 @@ struct SceneCombatState {
 /* One actor owns two loose particles, a facing marker, and nine fragments. */
 struct SceneCombatActor {
     u8 unknown0[0xD4];
-    u16 x, floor, z;
-    u8 unknownDA[0xB6];
+    union SceneCombatPosition position;
+    u8 unknownDC[0xB4];
     struct ContactCollider colliders[3];
     u8 unknown28C[0x54];
     struct ParticleAnimation fragmentAnimations[2];
@@ -56,7 +65,7 @@ struct SceneCombatActor {
 
 s32 Callback_InvokeActor(void *, void *);
 void Sprite_UnlinkFromList(void *, u32);
-void Sprite_Init(void *, void *, u32);
+void Sprite_Init(void *, void *, s32);
 void SceneParticle_UpdateBounce(struct BouncingSceneParticle *);
 void BouncingEffect_RemoveSprite(struct BouncingSceneParticle *);
 void ActorOverlay_InitSprite(struct SceneCombatActor *);
