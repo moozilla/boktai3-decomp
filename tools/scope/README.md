@@ -1864,6 +1864,32 @@ Each was read from the compiler source and confirmed on a live draft.
    so p wins and keeps its own register. BreakableBarrier_SetPosition (five pins and a barrier)
    matched once its `return input;` was dropped. The caller ignores the value.
 
+120. **A byte-returning inline can move a constant on the first loop pass rather than the
+   second, fixing both hoist order and allocation without changing the body.** In
+   SceneObjects_ScriptLower (0801E998), the variant's `one = 1; s->variant = one;` has
+   first-pass lifetime 2 and moves only on pass 2, after the flag mask. Returning it through
+   `static inline u8 GetVariantByte(int value) { return value; }` makes that lifetime 3:
+   pass 1 moves the insertion zero, one, then the mask (thresholds 26, 23, 20; loop size 51).
+   The extra conversion vanishes later, leaving the ROM's one-before-mask loads. Declare
+   the mask before the hidden insertion zero's creation so it wins their allocation tie.
+   Both changes are required: `AGBCC_PRI=35:+20,44:-20` proved the earlier draft's desired
+   order, while `hoist` distinguishes the two passes. Explicit casts, pointer setters and
+   narrow scalar/array declarations alone did not cross this threshold.
+
+121. **An explicit default return can isolate one switch tail while a call after an inner
+   if/else gives the other arms a common clear call.** ScenePool_StateLaunchArc (0803E5F4),
+   LaunchShortArc (0803E7B4) and EmitBursts (0803E998) need case 3's state-one Memory_Clear
+   tail kept, while cases 0, 1 and case 2's state-one tail share case 3's state-two call.
+   Put `return 0` in case 3's state-one arm and the explicit default, then return inside
+   each outer if/else arm instead of after their join. The last return now has no existing
+   join label immediately before its zero set, so jump2 creates a new label and cannot
+   merge the isolated tail through the old jump chain. In case 2, compute `history` in
+   each inner arm and call Memory_Clear once after the join; the join stops move2add from
+   making 256 from the preceding 1. The state-one block then has exactly three local qtys
+   (fact 38): a shared `clear` local assigned in both arms leaves only two local qtys and
+   restores the ROM's registers (`AGBCC_FORCE=148:1` confirmed the prior allocation).
+   Removing the per-arm history assignments also loses the ROM's `adds r0, #8`.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
