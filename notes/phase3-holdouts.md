@@ -218,10 +218,10 @@ after the AND make the AND's result live across a block boundary, which changes 
 Tried with no change: the value or the constant first (fact 33), `flags &= 0xf000`, a separate
 `priority`, u32 parameter and casts, a ternary, `p >= 1 && p <= 4`, `p < 4`, a switch (worse),
 and `result = 2` before or after.
-Next idea: real code between the AND and the shift that ends the block (a test the original
-had), or evidence for `concession-ok(debug-nop)` from a twin with the same compiled-out check.
+The dp-effects follow-up below preserves a narrow-view draft and further source hypotheses.
+No evidence was found to excuse the DEBUG_NOP concession.
 
-### AnimatedParticles_Create (src/fn/sub_080154EC.c, 080154EC): deferred
+### AnimatedParticles_Create (src/fn/sub_080154EC.c, 080154EC): partial, dp-effects follow-up below
 
 Draft: `notes/phase3-drafts/field-effects/AnimatedParticles_Create.c` (6 ROM / 2 draft, all four
 concessions removed). Two separate problems:
@@ -4250,3 +4250,87 @@ The two remaining byteZero pins keep separate zero loads before transition-durat
 Tried: byte masks, longer-lived mask uses, byte-union masks, wrapper-local state copies, shared playback and transition helpers, initialized and assigned byte/word unions for zero, and a halfword duration bitfield. Assigned unions keep a zero live across unrelated control flow and add a saved register; initialized unions again merge the zero; duration bitfields add different zero loads. The retained draft uses the ordinary transition helper and has no concessions.
 
 Next: derive the separate narrow zero from the transition's original representation, without extending its life out of the case. The first timer pointer's displacement is a consequence of the missing local byte-zero allocation, not an independent pin requirement.
+
+### AnimatedParticle_PriorityFromFlags (080154D0, src/fn/sub_080154D0.c): stopped at run end, DEBUG_NOP remains
+
+The production source is unchanged and still passes the stock 28-byte unit check.
+Removing DEBUG_NOP gives 7 ROM / 5 draft differences: regmove ties the AND result
+to the constant mask instead of flags. AGBCC_NOTIE=13 is an exact diagnostic match
+on the plain removal draft; it is not a source solution. The prior operand-order,
+cast, range-test, ternary, and switch investigations remain applicable.
+
+Best ordinary draft: `notes/phase3-drafts/dp-effects/AnimatedParticle_PriorityFromFlags.c`.
+It reads flags through the low unsigned half of a word union before masking. This
+keeps the AND result in r0 and recovers the shift, subtraction, conditional result
+copy, and final return copy. It is 28 bytes with 3 ROM / 3 draft differences,
+shape 2: the mask is constructed in r2 and copied to r1 rather than constructed
+directly in r1; the extra copy consumes the ROM's trailing padding instruction.
+A scalar low-half union member and a 16-bit unsigned bit field give the same code.
+
+Changing the union half to signed short instead gives every ROM instruction plus
+an unnecessary left-shift/arithmetic-right-shift pair by 16 before the mask
+(0 ROM / 2 draft differences, 32 bytes). The masked result is equivalent for all
+flag words, but combine does not remove that sign extension. A 31-bit unsigned
+field likewise leaves two extra shifts. These are useful alternate starting
+points because they recover the desired AND tie through typed extraction.
+
+A full-width signed/unsigned union, masking before the half read, and an inline
+word-mask helper all retain the original 7/5 mismatch. Updating the half member
+in place or through an inline helper gives 9/8; the inline halfword-argument
+boundary gives 4/2, shape 6. Recomputing the successful result from flags gives
+6/8, shape 6. Grouping priorities 1 through 4 in switch arms gives 8/8, shape 10,
+with different range checks. No source candidate is an exact match.
+
+Persistent graph: `build/matchsearch/AnimatedParticle_PriorityFromFlags` contains
+all 14 source hypotheses plus the production root. Scratch candidates and the
+exact regmove diagnosis are in `build/cx/work/AnimatedParticle_PriorityFromFlags`.
+Next: investigate why the unsigned half extraction retains a separate mask copy,
+or find a typed extraction whose extension combines away while preserving the
+flags-side AND destination. The owner's end-of-run instruction stopped this
+item; later queue entries were not started.
+
+
+### AnimatedParticles_Create (080154EC, src/fn/sub_080154EC.c): partial, saved-state pin and barrier removed
+
+The complete 1176-byte unit matches after removing the saved-state operand
+barrier and register pin. Type 5 saves a branch-local `first` pointer and jumps
+to stepAnimation. The other arms join at saveAnimation, save their common `a`,
+and fall into stepAnimation. The join preserves the ROM's r4-to-r8-to-r4 copies.
+The default call falls into saveAnimation and receives flow's USE 0, preventing
+it from absorbing the type-5 tail. Separate incoming pointer definitions are
+necessary: with one common `a`, GCSE copy propagation changes the step pointer
+back to `a` and removes the second copy. CSE/PRE knobs do not diagnose that
+copy propagation; the addressof-to-gcse dumps show it. Fact 175 records the form.
+
+Two call-tail barriers remain. Best complete ordinary draft:
+`notes/phase3-drafts/dp-effects/AnimatedParticles_Create.c`, 5 ROM / 1 draft
+instructions different, shape 6. The real differences are the type-5/type-6
+`movs r3, #0; bl Anim_SetSequence` tails merged into the type-7 call; alignment
+accounts for the other rows. On this exact draft,
+`AGBCC_CROSS_LIMIT=916:1,994:0,1071:0` is MATCH: allow the first saved-pointer
+copy merge but forbid the later call merges. This is diagnosis, not a landing.
+
+The initial full removal draft was 6/2, shape 8. An inline initializer returning
+its state pointer leaves that unchanged. Repeating saved assignments in every
+arm gives 12/9 and lets all three special calls merge into the default. Repeating
+the first command calculation gives 106/111; repeating the playback step gives
+146/328 and fails to share most of it. A local inline playback helper keeps the
+original pointer-copy issue; combined with repeated saves it gives 8/3. A single
+save/step join without distinct incoming pointer definitions gives 10/8; adding
+the type-5 local is the landed pointer fix. Both the direct body and inline step
+helper match when the two call barriers remain.
+
+Individual inline setup helpers for types 6 and 7, and a structured inner save
+join, retain the full ordinary 5/1 result. A paired type-5/type-6 save join also
+gives 5/1. Keeping just the type-7 barrier with that paired join improves to 2/1:
+the type-6 call still merges into the default. Reading jump.c find_cross_jump
+explains why: both falling-through calls carry identical USE 0 notes, so they
+can match each other after the saved-copy merge. A label protects a call against
+a jumping tail without that USE, but is not a universal cross-jump fence.
+
+Persistent graph: `build/matchsearch/AnimatedParticles_Create` contains 21 source
+hypotheses plus the landed partial root. Scratch and diagnostic evidence are in
+`build/cx/work/AnimatedParticles_Create`. Next: recover a genuine difference in
+the special setup helpers' return/data flow that stops the three call tails
+from sharing, while keeping the new save/step topology and pointer definitions.
+The prototype and call arguments are unchanged; no new concession was added.

@@ -2424,3 +2424,22 @@ which is exactly `10:1`. Not tested.
    and resolves named allocation knobs through the head. Two separately recorded quantities
    or an operand without a death note are not merged. `AGBCC_FORCE=address:3` changes the
    actual placement; it diagnoses the local tie but does not match the whole function.
+
+
+175. **A save/step join can preserve a round-trip pointer copy, but its incoming values
+   must not all be copies of one pseudo.** AnimatedParticles_Create has `saved = a;
+   a = saved` at animation setup: the ROM copies r4 to r8 and immediately back. With
+   ordinary locals, jump2's delete_noop_moves removes the second copy (fact 81).
+   Giving type 5 its own `saved = first; goto stepAnimation;` path, and letting the
+   other arms join at `saveAnimation: saved = a; stepAnimation: a = saved;`, creates
+   the needed join. The default call falls into saveAnimation, so flow's USE 0
+   also prevents it from absorbing the type-5 call tail (fact 39). This removed
+   the saved-state barrier while the old pin remained.
+   Removing that pin still needs the type-5 pointer `first` to be a separate
+   branch-local variable. If all arms use the same `a`, GCSE copy propagation
+   changes the step helper's `state = saved` back to `state = a` across the join;
+   the register copy disappears before allocation. Separate incoming pointer
+   definitions prevent that propagation, and the same join then removes the pin
+   with a stock 1176-byte match. CSE canonicalization and PRE knobs do not diagnose
+   this GCSE copy propagation; compare addressof and gcse dumps directly. The two
+   independent call-tail barriers remained after this partial match.

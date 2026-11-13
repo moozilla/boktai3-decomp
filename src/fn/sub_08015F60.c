@@ -2,6 +2,7 @@
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -55,7 +56,7 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
 {
     s32 i, j;
     u32 *rng;
-    register const u16 *table asm("r6");
+    const u16 *table;
     if ((*(struct Manager **)&gFadingParticleManager) == NULL &&
         FadingParticleManager_Create(0, 0) == NULL)
         return -1;
@@ -63,16 +64,23 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
         struct Group *g = &(*(struct Manager **)&gFadingParticleManager)->groups[i];
         rng = &gRandomIndex;
         if (g->active == 0) {
+            union {
+                struct Group *group;
+                union ParticleRandomTableSource random;
+            } input;
             g->active = 1;
             g->count = count;
             if ((u8)count > 8)
                 g->count = 8;
             j = 0;
-            if (j < g->count) {
+            input.group = g;
+            if (j < input.group->count) {
                 struct Anim *anim;
                 struct Sprite *sprite;
                 struct Particle *p;
-                table = gRandomTable;
+                input.random.halves[0] = 0xB400;
+                input.random.halves[1] = 0x0203;
+                table = ParticleRandom_GetTable(&input.random);
                 anim = &g->particles[0].motion.anim;
                 sprite = &g->particles[0].motion.sprite;
                 p = &g->particles[0];
