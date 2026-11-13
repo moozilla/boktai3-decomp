@@ -7607,6 +7607,7 @@ addr,name,mode,confidence,source,notes
 081C406C,RegistryF3E4_Hide,thumb,low,src-alias,Starts the singleton actor disappearance transition
 081C4080,RegistryF3E4_Create,thumb,low,src-alias,
 081C4194,SceneTransition_SpawnParticleBurst,thumb,low,src-alias,Emits sixteen sprite particles at the supplied coordinates with randomized polar velocities and increasing speed bands.
+081C42B0,SceneTransition_SpawnFlyingParticle,thumb,low,src-alias,Tentative: emits a particle with random direction and speed.
 081C439C,Registry6A37_UpdateBackgroundScroll,thumb,low,src-alias,Applies the object's coordinates as background layer 3 scroll offsets
 081C43B0,SceneTransition_BeginOffsetMove,thumb,low,src-alias,
 081C43F8,SceneTransition_BeginVectorTween,thumb,low,src-alias,
@@ -7617,11 +7618,14 @@ addr,name,mode,confidence,source,notes
 081C4558,Registry6A37_UpdateDisplayHold,thumb,low,src-alias,Updates background scrolling and starts fading out after 180 frames
 081C4578,Registry6A37_UpdateSecondScrollTransition,thumb,low,src-alias,Advances the second coordinate interpolation and starts the display hold when it finishes
 081C45AC,Registry6A37_UpdateFirstScrollTransition,thumb,low,src-alias,Advances the first coordinate interpolation and starts the second when it finishes
+081C45E0,SceneTransition_UpdateShakingBackground,thumb,low,src-alias,Tentative: shakes background before beginning first scroll.
 081C4668,Registry6A37_UpdateFadeOut,thumb,low,src-alias,Maintains scrolling during the fade then calls the completion script and destroys tasks or restarts
 081C46A0,Registry6A37_UpdateFadeIn,thumb,low,src-alias,Maintains scrolling for 64 frames before starting the sound phase
 081C46C0,Registry6A37_Update,thumb,low,src-alias,Task update callback that invokes the currently installed state handler
 081C46D0,Registry6A37_OnDestroy,thumb,low,src-alias,Empty destruction callback registered by the object's constructor
 081C46D4,SceneTransition_StartSunScript,thumb,low,src-alias,
+081C4708,SceneTransition_LoadBackground,thumb,low,src-alias,Loads scene layers; tiles and sun-phase palette.
+081C47A0,SceneTransition_Initialize,thumb,low,src-alias,Initializes background scroll; script and hidden contact-effect target.
 081C47EC,Registry6A37_Create,thumb,low,src-alias,Creates and initializes the task registered under actor key 0x6A37
 081C482C,ScenePanelSubject_SlideOpen,thumb,low,src-alias,
 081C49C0,ShipWheel_Update,thumb,low,src-alias,Processes incoming commands and invokes the current state handler for the tentative ship wheel object
