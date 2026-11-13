@@ -30,8 +30,41 @@ ROM = ROOT / 'baserom.gba'
 SAVES = ROOT / 'build/port/saves'
 WRITABLE = 'boktai3.sav'
 CHECKPOINTS = [ROOT / 'tests/saves', ROOT / 'build/saves']
-TYPES = {'.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.wasm': 'application/wasm',
+AGENT = ROOT / 'port/agent'
+STUDIO_CACHE = ROOT / 'build/port/agent'
+TYPES = {'.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript',
+         '.wasm': 'application/wasm',
          '.json': 'application/json', '.gba': 'application/octet-stream', '.sav': 'application/octet-stream'}
+
+
+def studio_types():
+    """build/port/agent/types.json: typed globals for the page's studio (port/agent/gametypes.py)."""
+    try:
+        sys.path.insert(0, str(AGENT))
+        import gametypes
+        return gametypes.build()
+    except Exception as e:  # no ELF or headers yet: the page runs without the studio
+        print('studio types unavailable:', e)
+        return None
+
+
+def studio_strings():
+    """{en: {id: text}, jp: {id: text}} for subtitles: the extracted text bank and the fan
+    translation beside the checkout (tools/studio/serve.py display_strings), cached."""
+    out = STUDIO_CACHE / 'strings.json'
+    bank = ROOT / 'build/text/bank.tsv'
+    if out.exists() and (not bank.exists() or out.stat().st_mtime >= bank.stat().st_mtime):
+        return out
+    try:
+        sys.path.insert(0, str(ROOT / 'tools/studio'))
+        import serve as studio
+        jp, en = studio.display_strings(studio.default_trans())
+    except Exception as e:
+        print('subtitle strings unavailable:', e)
+        jp, en = {}, {}
+    STUDIO_CACHE.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps({'en': en, 'jp': jp}, ensure_ascii=False))
+    return out
 
 
 def save_files():
@@ -77,6 +110,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self.file(WASM)
         if path == 'rom.gba':
             return self.file(ROM)
+        if path == 'types.json':
+            return self.file(studio_types())
+        if path == 'strings.json':
+            return self.file(studio_strings())
+        if path == 'agent/gameapi.mjs':
+            return self.file(AGENT / 'gameapi.mjs')
+        if path == 'agent/lib.json':
+            lib = {f.name: f.read_text() for f in sorted((AGENT / 'lib').glob('*.js'))}
+            return self.send(200, json.dumps(lib).encode(), TYPES['.json'])
         if path.startswith('saves/'):
             found = find_save(path[6:])
             return self.file(found) if found else self.send(404)

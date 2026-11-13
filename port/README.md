@@ -23,10 +23,13 @@ sensor. "Start from" picks your own save (`build/port/saves/boktai3.sav`, writte
 as you play), a new game, `tests/saves/*.sav`, or the story checkpoints in
 `build/saves/` (`python3 tools/assets/saves.py bank --make`).
 
-Agents (and people at a terminal) drive and inspect the running game with
-[`port/agent/play.py`](agent/README.md): frame stepping, breakpoints, call and
-script traces, C snippets run inside the game, warps, checkpoints, and a link to
-the studio's Live page.
+Below the game, the Studio panel (when `build/boktai3.elf` and the headers are
+there) has a JavaScript console with typed views of every global, watches, the
+task list, and sprite outlines named by their owner; English subtitles draw over
+the game's own text box. Agents (and people at a terminal) drive and inspect the
+running game with [`port/agent/play.py`](agent/README.md): JavaScript scripts that
+run frames, frame stepping, breakpoints, call and script traces, C snippets run
+inside the game, warps, checkpoints, and a link to the studio's Live page.
 
 Debugging: `python3 port/build_game.py --trace` records which GBA functions ran
 (compare with mGBA using `port/game/coverage.py`); `--watch FUNC,FUNC` logs those
