@@ -21,7 +21,9 @@ struct Task4E01Params {
     u8 unknown0C[8];
     u32 damage[5];
     struct Task4E01Bounds bounds;
-    u8 unknown30[0x3C - 0x30];
+    u8 unknown30[8];
+    s16 variant;
+    u8 unknown3A[2];
     u32 sprite[3];
     u32 type, element;
     u16 count;
