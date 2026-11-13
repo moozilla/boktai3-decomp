@@ -1375,3 +1375,56 @@ Persistent graph: `build/matchsearch/sub_08014634`; scratch candidates and compi
 traces: `build/cx/work/sub_08014634`. Next: shorten the counter lifetime without an
 extra early set, or recover the resource helper whose separate branch destinations
 survive CSE2. Then solve table equivalence and the options/count reload boundaries.
+
+### sub_08014CA4 (08014CA4, src/fn/sub_08014CA4.c): partial, output pin and initialization barrier removed
+
+The complete 704-byte unit matches after removing the lifetime-output pointer pin
+and the three-operand initialization barrier. A shared output pointer in the fixed
+and randomized lifetime branches receives r1 naturally. Split-half random-table
+construction removes constant equivalence and recovers table allocation without
+its barrier. Its uninitialized old-input USE initially created an extra sp+0x20
+slot, shifting every stack parameter by four bytes. Reusing a typed union first
+for the loop-bound test and then for the table halves removes that extra slot.
+Facts 173/174 and the new scope frame explanation record this result.
+
+Four pins and two barrier statements remain. Removing the speed-range pin and
+barrier gives 17/17, shape 0; `AGBCC_SPILL=20:2` is exact on `spread_free.c`.
+CSE replaces the named spread with the incoming speedRange pseudo, and the first
+reload after the lifetime branches takes r0 instead of r2. Repeating the following
+range load in each arm (with and without a join label) is unchanged. Repeating the
+whole speed tail changes allocation and leaves duplicate code. A shared lifetime
+byte/spread scalar, and using spread in the modulo call, still canonicalize to the
+parameter. This remains a source-level reload-history problem.
+
+After the initialization fix, removing the lifetime cursor pin leaves 11/11,
+shape 0. The cursor naturally receives sl, but CSE replaces the low output copy
+with that high-register pseudo, changing reload choices in both lifetime arms.
+The spill search improves to 6 differences but is not exact. Reusing the output
+for the source-byte address makes lifetime address-taken and adds a stack copy;
+using it for a later tile-table view is unchanged. Advancing life from out changes
+loop allocation. Removing the fixed lifetime byte pin/barrier needs both its
+byte access and separate output allocation; direct byte, QI/SI, and union views
+retain either wrong local registers or unwanted shared tails.
+
+Removing the base pin enables PRE for base+32 and base+44 (initialized/enabled
+arrays). The isolated base-pin draft is 73/73 before the table fix. NOPRE=1,2
+improves it to 35/31; table:+50 fixes its table/base priority swap but does not fix
+PRE. Direct field-address unions do not prevent PRE; reconstructing the pointer
+through halves leaves shifts/ORs. An indexed-array rewrite gets the table into r7
+but loses the original outer cursor initialization. Shared table-first sampling
+raises the random-index address too far; direct sampling remains mismatched.
+
+Best complete ordinary draft: `notes/phase3-drafts/dp-effects/sub_08014CA4.c`,
+43/45, shape 46. It combines defined-input split-half table construction with a
+per-iteration group view. There is no exact full-draft knob yet. The table and g
+still compete closely, and two field expressions create extra frame values.
+Zero or aggregate table initialization restores constant equivalence. Reversing
+the half stores keeps the old-input spill. Reading the union directly for every
+sample prevents combine from folding its construction.
+
+Persistent hypotheses: `build/matchsearch/sub_08014CA4-v2`; scratch and exact
+partial candidates: `build/cx/work/sub_08014CA4`. Compiler source checked:
+combine.c distribute_notes preserves a lost REG_DEAD input with a USE at a label
+for caller-save tracking. Next: a low-register output copy that survives CSE
+without a cursor pin, or a legitimate field view whose address forms only after
+PRE. The fixed initialization and scope explanation are landed independently.
