@@ -4511,3 +4511,35 @@ and comparison order while changing the matches/base flow lifetime by one insn;
 then preserve the load's HI identity through both comparisons and the mask.
 
 Scratch and compiler evidence: `build/cx/work/sub_08108C94/`.
+
+
+### ScenePanel_UpdateBackgroundEffect (08058700): resolved
+
+Tags: #menus #hud #matching #compiler
+
+Resumed the owner-stop checkpoint and removed all ten pins and both barriers.
+The complete unit matches all 1,012 bytes with the stock compiler. Four ordinary
+C forms decided it:
+
+- A word-sized frame removes the first load/copy. Load the mask after the alpha
+  shift and use mask-first AND to preserve the ROM's register preference.
+- Separate u16 results for X/Z coordinate truncation keep both shifts in the
+  coordinate register. Forcing the isolated shift temporary to r1 confirmed the
+  allocation diagnosis; the ordinary narrow result matches without the knob.
+- Share effectAlpha between the two effect-phase arms. Its multiple definitions
+  prevent regmove tying the shifted alpha to the frame input. The isolated
+  `AGBCC_NOTIE=1142` counterfactual matches exactly; sharing alpha across all three
+  outer paths does not, because it changes allocation in the first path.
+- Read `(u16)lowPosition->packed.x` and `.packed.z` instead of truncating the
+  corresponding word fields. This yields real halfword loads and leaves the
+  word loads until their later read/modify/write operations. That removes the
+  extra word temporaries and restores table/position/index lifetimes, eliminating
+  the remaining five pins and both barriers together.
+
+The previous best draft is replaced with the matching ordinary C. Persistent
+store: `build/matchsearch/ScenePanel_UpdateBackgroundEffect`, final node
+`packed-field-reads`; intermediate exact partials are also retained. Scratch
+variants cover narrow/word frame types, explicit truncations, union/array alpha
+views, reused frame/alpha tests and shared alpha lifetimes. The misleading first
+copy's cse trace was not the decisive mechanism; changing the frame type exposed
+the useful mask-preference difference. Queue item 20 is next.
