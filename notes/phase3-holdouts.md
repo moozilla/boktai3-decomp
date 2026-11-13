@@ -61,7 +61,10 @@ the copy): an early `savedActor = 0`/`-1` or `index = 0` at the top, `savedActor
 extended block starts at function entry, so no mention can come before it; the copy needs a last
 use past the block end (the loop label at `active`), and that use would merge the r5 copy instead.
 
-### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): deferred
+### DirectionalController_CheckRemaining (src/directional_interaction.c, 080098CC): resolved
+
+Resolved by the dp-field Codex pass: the accepted branch returns without a value (fact 160), preserving the call result in hard r0. Both concessions are removed.
+
 
 Draft: `notes/phase3-drafts/field-effects/DirectionalController_CheckRemaining.c` (41 ROM / 43
 draft). In the ROM, Math_Atan2's result stays in hard r0 from the call to the `bne` that jumps
@@ -1298,3 +1301,15 @@ do not fix the argument-pointer priority. The destination-end loop changes shape
 The argsPtr partial is now resolved; the next pass should focus on a real boundary
 that preserves a short-lived actor-index copy before the saved r5 value, then
 reassess the fully pin-free pointer allocation with that corrected copy present.
+
+### DirectionalController_CheckRemaining (080098CC): resolved
+
+A value-less `return;` on the accepted branch, with `return 0` after SetState on
+failure, exactly matches the ROM with no pins or barriers. The angle is used
+only as `(u16)Math_Atan2(dx, dz)` for direction quantization. No angle pseudo
+needs to survive the later blocks; expand_function_end's hard-r0 USE retains
+the call result and makes local-alloc avoid r0 throughout the success path.
+Both the explicit value-less return and a goto to a fall-through function end
+match. The former reads more directly and is landed. This extends fact 95 to a
+function that has an explicit zero return on its other path (fact 160).
+Stock full-unit check: 21 functions MATCH (2,352 bytes).

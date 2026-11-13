@@ -2147,3 +2147,14 @@ which is exactly `10:1`. Not tested.
   name; now they fall back to the only function in the dump), and a trailing
   FUNC argument to `life` was read as a variable name; a `sub_ADDR` name that
   the CSV has since renamed raised a KeyError.
+
+160. **A value-less success return preserves the last call's hard r0 even when failure returns zero.**
+   In `DirectionalController_CheckRemaining`, `return angle` made Math_Atan2's result
+   a global pseudo, while local-alloc had already assigned later temporaries to r0.
+   `u32 direction = (((u16)Math_Atan2(dx, dz) + 112) >> 5) & 7;` followed by
+   `if (accepted) return;`, and a failure path that calls SetState and returns 0,
+   keeps the call's hard r0 live across the accepted path. Its narrowing copy and
+   every later temporary take r1-r5 as in ROM. Both the angle pin and copy barrier
+   disappear. A goto to a fall-through function end compiles identically. This is
+   fact 95 with mixed explicit and unspecified returns, rather than no return
+   statements anywhere in the function.
