@@ -39,7 +39,9 @@ Mapping linear memory alone does not implement hardware side effects.
 The frame loop calls `hw_step_cycles` to advance timers and sound FIFOs,
 `hw_scanline_start` at each line start, `hw_hblank` at the start of HBlank,
 and `hw_vblank` once at line 160. Line-start updates clear HBlank and generate
-VCOUNT-match interrupts; HBlank does not repeat that match interrupt. DMA timing is
+VCOUNT-match interrupts; HBlank does not repeat that match interrupt.
+DISPSTAT writes preserve the current match flag until a scanline update,
+without raising a write-triggered IRQ, as checked against mGBA. DMA timing is
 functional, not cycle-accurate. HBlank DMA runs only on visible lines. Interrupt
 callbacks receive pending enabled bits when IME is set; the host dispatches the
 game's handlers and acknowledges IF through a bus write. The BIOS wait callback
@@ -110,7 +112,7 @@ executing its replacement BIOS for copy SWIs, including 77 overlapping fast
 copies. Native/wasm tests also check the maximum 21-bit CpuFastSet count after
 rounding to eight words. Another 57 cases verify multi-record object-affine
 strides and BitUnPack widths/offsets against complete mGBA output buffers.
-It checks signed ArcTan across its full input range, ArcTan2 across
+It samples ArcTan across the signed 16-bit range, checks ArcTan2 across
 quadrants, all 256 affine angle steps, and 128 bounded LZ77 candidates read
 from the runtime ROM. Integer arithmetic agrees exactly; affine coefficients
 allow one unit because mGBA HLE rounds negative products differently. It also
@@ -144,11 +146,9 @@ not a claim of bit-identical GBA audio.
 The SDK `SoundMain` replacement finds the sound state through the mapped
 `03007FF0` pointer, or `hw_m4a_attach` for a native host. It calls the existing
 sequencer and CGB callbacks, imports pending initialization writes before them
-and callback writes afterward, renders PCM and PSG, then
-applies Direct Sound master enable, FIFO A/B routing and half-volume controls
+and callback writes afterward, renders PCM, and applies Direct Sound master enable, FIFO A/B routing and half-volume controls
 before adding PSG and delivering `HwHost.audio(user, stereo, frames, rate)`.
-The callback must copy or
-consume the buffer before the next call. Sample-rate conversion to the host's
+The callback must copy or consume the buffer before the next call. Sample-rate conversion to the host's
 audio device belongs in the host. Do not also feed the same MP2K DMA FIFO to
 the output, which would duplicate Direct Sound.
 

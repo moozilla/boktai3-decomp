@@ -513,6 +513,31 @@ static int solar_oracle(struct mCore *core)
     return 0;
 }
 
+static int display_compare_oracle(struct mCore *core)
+{
+    static Hw hw;
+    unsigned line = core->busRead16(core, HW_IO_BASE + 6);
+    uint16_t mismatch = (uint16_t)(((line + 1) % 228) << 8 | 0x20);
+    uint16_t match = (uint16_t)(line << 8 | 0x20);
+    unsigned original_flag = core->busRead16(core, HW_IO_BASE + 4) & 4;
+    hw_init(&hw, NULL); hw_scanline_start(&hw, line);
+    {
+        uint16_t values[] = {mismatch, match, (uint16_t)(match | 7), (uint16_t)(mismatch | 7), match};
+        unsigned i;
+        core->busWrite16(core, HW_IO_BASE + 0x202, 0xffff); hw_write16(&hw, HW_IO_BASE + 0x202, 0xffff);
+        for (i = 0; i < sizeof(values) / sizeof(*values); ++i) {
+            core->busWrite16(core, HW_IO_BASE + 4, values[i]); hw_write16(&hw, HW_IO_BASE + 4, values[i]);
+            if ((core->busRead16(core, HW_IO_BASE + 4) & 4) != original_flag ||
+                (core->busRead16(core, HW_IO_BASE + 4) & 4) != (hw_read16(&hw, HW_IO_BASE + 4) & 4) ||
+                (core->busRead16(core, HW_IO_BASE + 0x202) & 4) != (hw_read16(&hw, HW_IO_BASE + 0x202) & 4)) {
+                fprintf(stderr, "VCOUNT compare write %u differs\n", i); return 1;
+            }
+        }
+    }
+    puts("mGBA display compare: PASS (deferred match flags, no write-triggered IRQ)");
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     struct mCore *core;
@@ -578,6 +603,7 @@ int main(int argc, char **argv)
     if (rtc_sdk_oracle(core)) return 1;
     if (dma_oracle(core)) return 1;
     if (solar_oracle(core)) return 1;
+    if (display_compare_oracle(core)) return 1;
     rom_file = fopen(argv[1], "rb");
     if (!rom_file || fseek(rom_file, 0, SEEK_END)) return 2;
     rom_size = ftell(rom_file); rewind(rom_file);
