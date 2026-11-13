@@ -5,9 +5,8 @@
 
 s32 Bestiary_GetCategoryFirstEntry(u32);
 s32 Bestiary_GetCategoryEntryCount(u32);
-void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
 
-static inline void Sprite_Show(struct BookSprite *s)
+static inline void Sprite_Show(struct SceneInputWidget *s)
 {
     s->flags &= ~1;
 }
@@ -34,8 +33,8 @@ static inline void DrawListNumbers(struct MonsterBook *p)
     for (i = 0; i < count; i++) {
         Anim_DrawDecimalDigits(p->s54C[i], p->animData, first + i, 2, 0, 0x18, i * 16 + 0x28, 8, 0);
         Sprite_Show(&p->s2AC[i]);
-        p->s2AC[i].x = 0x28;
-        p->s2AC[i].y = i * 16 + 0x28;
+        p->s2AC[i].position.x = 0x28;
+        p->s2AC[i].position.y = i * 16 + 0x28;
     }
 }
 
@@ -45,12 +44,11 @@ static inline void DrawDetailNumber(struct MonsterBook *p)
     Anim_DrawDecimalDigits(p->s54C[0], p->animData, p->entry + 1, 2, 0, 0x28, 0x18, 8, 0);
 }
 
-s32 ThresholdTrack_ClassifyPosition(u8);
+s32 Bestiary_GetEntryGroup(u8);
 s32 Bestiary_CountUnlockedGroupEntries(s32);
 s32 Bestiary_GetGroupEntryCount(s32);
-void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
 
-static inline void Sprite_Hide(struct BookSprite *s)
+static inline void Sprite_Hide(struct SceneInputWidget *s)
 {
     s->flags |= 1;
 }
@@ -71,17 +69,16 @@ static inline void DrawGroupCounts(struct MonsterBook *p)
     s32 group;
 
     MonsterBook_HideGroupDigits(p);
-    group = ThresholdTrack_ClassifyPosition(p->entry);
+    group = Bestiary_GetEntryGroup(p->entry);
     Anim_DrawDecimalDigits(p->sA8C, p->animData, Bestiary_CountUnlockedGroupEntries(group), 2, 0,
                            0x98, 0x16, 8, 0);
     Sprite_Show(&p->sB4C);
-    p->sB4C.x = 0xA8;
-    p->sB4C.y = 0x16;
+    p->sB4C.position.x = 0xA8;
+    p->sB4C.position.y = 0x16;
     Anim_DrawDecimalDigits(p->sBAC, p->animData, Bestiary_GetGroupEntryCount(group), 2, 0, 0xB0,
                            0x16, 8, 0);
 }
 
-s32 Anim_LoadKeyframe(void *, void *, u16, u32);
 
 static inline void MonsterBook_HideCategoryBadge(struct MonsterBook *p)
 {
@@ -140,24 +137,20 @@ static inline void DrawCategoryBadge(struct MonsterBook *p)
             value = 1;
             break;
     }
-    Anim_LoadKeyframe(&p->s18C, p->animData, frame + 0x41, 2);
+    Anim_LoadKeyframe(&p->s18C, p->animData, (u16)(frame + 0x41), 2);
     Sprite_Show(&p->s18C);
     if (value >= 0) {
-        Anim_LoadKeyframe(&p->s1EC, p->animData, value + 1, 2);
+        Anim_LoadKeyframe(&p->s1EC, p->animData, (u16)(value + 1), 2);
         Sprite_Show(&p->s1EC);
-        p->s1EC.x = x;
-        p->s1EC.y = y;
+        p->s1EC.position.x = x;
+        p->s1EC.position.y = y;
     }
 }
 
 void BackgroundPanel_ReleaseHandles(struct MonsterBook *);
 s32 Bestiary_GetCategoryFirstEntry(u32);
 s32 Bestiary_GetCategoryEntryCount(u32);
-s32 TextWindow_SetScript(s32, const u8 *);
-void TextWindow_SetBounds(s32, s32, s32, s32, s32);
-void TextWindow_Refresh(int, int);
-void TextWindow_StartPlayback(s32);
-s32 GameState_IsEventFlagSet(s32);
+s32 Bestiary_IsEntryUnlocked(s32);
 
 static inline void DrawListWindows(struct MonsterBook *p)
 {
@@ -172,7 +165,7 @@ static inline void DrawListWindows(struct MonsterBook *p)
         TextWindow_SetScript(p->windows[i], p->script);
         TextWindow_SetBounds(p->windows[i], 6, i * 2 + 5, 0x14, 2);
         e = first + i;
-        if (GameState_IsEventFlagSet(e))
+        if (Bestiary_IsEntryUnlocked(e))
             TextWindow_Refresh(p->windows[i], e);
         else
             TextWindow_Refresh(p->windows[i], 0x53);
@@ -184,12 +177,10 @@ void BestiaryDisplay_Hide(void *);
 void BestiaryDisplay_Show(void *);
 void BestiaryDisplay_SetEntry(void *, u32);
 void BestiaryDisplay_DrawEntryDetails(void *);
-void BestiaryFlags_Update(void *);
+void Bestiary_UpdateCompletionBadges(void *);
 
-void Sound_PlaySong(u32);
 void MonsterBook_SetPage(void *, u32);
-void Script_Call(void *, u32);
-void ThresholdTrack_SelectInterval(void *);
+void Bestiary_SelectCategoryForEntry(void *);
 void MonsterBook_UpdateHighlightPulse(void *);
 void ScrollingDialogue_Step(void *);
 
@@ -229,7 +220,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
                 DrawCategoryBadge(p);
                 DrawListNumbers(p);
                 DrawGroupCounts(p);
-                BestiaryFlags_Update(p);
+                Bestiary_UpdateCompletionBadges(p);
             }
             if ((gPadState[1] & DPAD_UP) && MonsterBook_CurrentEntry(p)) {
                 u8 *selection = &p->selectedRow;
@@ -257,11 +248,11 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
             }
             if (changed) {
             selectionChanged:
-                p->s6C.y = p->selectedRow << 4;
+                p->s6C.position.y = p->selectedRow << 4;
             }
             if (gPadState[1] & A_BUTTON) {
                 MonsterBook_SetPage(p, 1);
-                BestiaryFlags_Update(p);
+                Bestiary_UpdateCompletionBadges(p);
                 Sound_PlaySong(0xDD);
             }
             if (gPadState[1] & B_BUTTON) {
@@ -291,7 +282,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
             }
             if (changed) {
             tabChanged:
-                p->sCC.y = p->unk27 << 4;
+                p->sCC.position.y = p->unk27 << 4;
 
                 BestiaryDisplay_DrawEntryDetails(p);
             }
@@ -315,19 +306,19 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
                 BestiaryDisplay_DrawEntryDetails(p);
 
                 DrawDetailNumber(p);
-                if (GameState_IsEventFlagSet(MonsterBook_CurrentEntry(p))) {
+                if (Bestiary_IsEntryUnlocked(MonsterBook_CurrentEntry(p))) {
                     BestiaryDisplay_Show(p->display);
                     BestiaryDisplay_SetEntry(p->display, MonsterBook_CurrentEntry(p));
                 } else
                     BestiaryDisplay_Hide(p->display);
-                BestiaryFlags_Update(p);
+                Bestiary_UpdateCompletionBadges(p);
             }
             {
                 u8 *pending = &p->pendingExit;
                 switch (*pending) {
                     default:
                         MonsterBook_SetPage(p, 0);
-                        BestiaryFlags_Update(p);
+                        Bestiary_UpdateCompletionBadges(p);
                         Sound_PlaySong(0xDE);
                         break;
 
@@ -335,8 +326,8 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
                         if (gPadState[1] & B_BUTTON) {
                             u16 *flags = &p->transitionFlags;
                             *flags |= 1;
-                            ThresholdTrack_SelectInterval(p);
-                            p->s6C.y = p->selectedRow << 4;
+                            Bestiary_SelectCategoryForEntry(p);
+                            p->s6C.position.y = p->selectedRow << 4;
                             *pending = 1;
                         }
                         break;
@@ -348,7 +339,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
             return 0;
     }
 
-    BestiaryFlags_Update(p);
+    Bestiary_UpdateCompletionBadges(p);
     MonsterBook_UpdateHighlightPulse(p);
     ScrollingDialogue_Step(p);
     p->frame++;

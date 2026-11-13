@@ -8035,20 +8035,20 @@ addr,name,mode,confidence,source,notes
 081D4E3C,Bestiary_GetCategoryEntryCount,thumb,low,src-alias,Returns the category's entry count used to populate the menu list
 081D4E4C,Bestiary_GetGroupEntryCount,thumb,low,src-alias,Returns the number of entries in a completion group
 081D4E5C,Bestiary_GetGroupFirstEntry,thumb,low,src-alias,Sums preceding group sizes to obtain the group's first entry index
-081D4E80,ThresholdTrack_SelectInterval,thumb,low,src-alias,
-081D4EDC,ThresholdTrack_ClassifyPosition,thumb,low,src-alias,
-081D4F20,BestiaryDisplay_GetEntryForActor,thumb,low,src-alias,
-081D5188,GameState_SetPairFlag,thumb,low,src-alias,
-081D51B0,RegistryA76D_SetFromScript,thumb,low,src-alias,
-081D5204,GameState_SetEventFlag,thumb,low,src-alias,
-081D5260,GameState_SetEventFlagFromScript,thumb,low,src-alias,Reads keyword k with default minus one and forwards the result to the event flag setter
-081D5274,GameState_IsEventFlagSet,thumb,low,src-alias,Tests an indexed bit in the event flags at game state offset 0x6F0
-081D52B4,GameState_IsPairFlagSet,thumb,low,src-alias,Tests the flag indexed by twice the first argument plus the second with a word bounds check
+081D4E80,Bestiary_SelectCategoryForEntry,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
+081D4EDC,Bestiary_GetEntryGroup,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
+081D4F20,Bestiary_GetEntryForActor,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
+081D5188,Bestiary_UnlockReward,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
+081D51B0,Bestiary_UnlockRewardFromScript,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
+081D5204,Bestiary_UnlockEntry,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
+081D5260,Bestiary_UnlockEntryFromScript,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
+081D5274,Bestiary_IsEntryUnlocked,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
+081D52B4,Bestiary_IsRewardUnlocked,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
 081D52F0,Bestiary_IsGroupComplete,thumb,low,src-alias,Returns whether every entry flag in the selected completion group is set
 081D5324,Bestiary_CountUnlockedGroupEntries,thumb,low,src-alias,Counts set entry flags within the selected completion group
-081D5358,GameState_AreAllEventFlagsSet,thumb,low,src-alias,Checks that all 83 event flags are set while ignoring unused upper bits
+081D5358,Bestiary_AreAllEntriesUnlocked,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
 081D53A0,Script_ConsumeOptionalKeywordValue,thumb,low,src-alias,Consumes one value when keyword k is present; its intended command role remains uncertain
-081D53B4,BestiaryFlags_Update,thumb,low,src-alias,
+081D53B4,Bestiary_UpdateCompletionBadges,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
 081D5444,BackgroundPanel_ReleaseHandles,thumb,low,src-alias,
 081D5478,BestiaryDisplay_DrawEntryDetails,thumb,low,src-alias,
 081D581C,ScrollingDialogue_Step,thumb,low,src-alias,

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "monster_book.h"
 
-static inline void Sprite_Hide(struct BookSprite *s)
+static inline void Sprite_Hide(struct SceneInputWidget *s)
 {
     s->flags |= 1;
 }

@@ -2,8 +2,8 @@
 /* SceneActorControl_CompleteScriptedResponse_0809F368: SceneActorControl_CompleteScriptedResponse with other constants (ported by relatives.py, fixed by hand; provisional name) */
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);

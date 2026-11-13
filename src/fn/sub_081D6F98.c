@@ -1,14 +1,13 @@
 #include "global.h"
 #include "monster_book.h"
 
-s32 Anim_LoadKeyframe(void *, void *, u16, u32);
 
-static inline void Sprite_Hide(struct BookSprite *s)
+static inline void Sprite_Hide(struct SceneInputWidget *s)
 {
     s->flags |= 1;
 }
 
-static inline void Sprite_Show(struct BookSprite *s)
+static inline void Sprite_Show(struct SceneInputWidget *s)
 {
     s->flags &= ~1;
 }
@@ -70,12 +69,12 @@ void sub_081D6F98(struct MonsterBook *p)
             value = 1;
             break;
     }
-    Anim_LoadKeyframe(&p->s18C, p->animData, frame + 0x41, 2);
+    Anim_LoadKeyframe(&p->s18C, p->animData, (u16)(frame + 0x41), 2);
     Sprite_Show(&p->s18C);
     if (value >= 0) {
-        Anim_LoadKeyframe(&p->s1EC, p->animData, value + 1, 2);
+        Anim_LoadKeyframe(&p->s1EC, p->animData, (u16)(value + 1), 2);
         Sprite_Show(&p->s1EC);
-        p->s1EC.x = x;
-        p->s1EC.y = y;
+        p->s1EC.position.x = x;
+        p->s1EC.position.y = y;
     }
 }

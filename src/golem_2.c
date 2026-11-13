@@ -30,8 +30,8 @@ void SceneActorEffects_AdvanceSteps(void *, u32);
 void SceneActorTerrain_ClearCollisionTimers(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 void ActorShadow_Disable(void *);
 void ActorParticles_SpawnWideBurst(void *);
@@ -108,8 +108,8 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         Script_Call(script, &arguments);
     }
     if (!Flags16(actor, 0x4000) && (u32)(actor->category - 11) > 2)
-        GameState_SetEventFlag(
-            BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+        Bestiary_UnlockEntry(
+            Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
     if (!Flags32At(actor, 0x400)) {
         u8 category;
         rangeB.x = 80;
