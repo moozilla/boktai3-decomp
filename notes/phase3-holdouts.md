@@ -1276,3 +1276,19 @@ store replacements on the pinned original (none independently free). Earlier
 passes also tried 24 source forms. Next: separate the copy helper's source
 allocation from the loop current/selected allocation; recover the cache/frame
 layout before attempting global pin removal again. Do not sweep register pins.
+
+### InteractionMarker_InitializeFromScript (08053AEC): two terrain pointers remain
+
+Landed nine pin removals and both barrier removals. Named pointer fields and
+aggregate position copies restore the sprite setup; initializing the default
+argument-clear loop after the view assignments restores reload order. Moving
+the bodyEnabled store into each keyword arm makes the joined condition reload
+the byte, eliminating the memory barrier without volatile storage.
+
+The saved pin-free draft is `notes/phase3-drafts/dp-field-b/InteractionMarker_InitializeFromScript.c`:
+16/16, shape 0, entirely the familiar cell/point/yAddress r4-r6 rotation.
+Restoring only the original point:r4 and yAddress:r5 bindings is exact MATCH.
+The same priority conflict and next ideas as ProximityEmitter's initializer apply.
+Private word copies were 85/85; aggregate copies improved to 39/37; late clear-loop
+initialization reached 17/17; branch stores reached 16/16. A pointer store and a
+byte-returning bodyEnabled getter did not restore the byte reload.
