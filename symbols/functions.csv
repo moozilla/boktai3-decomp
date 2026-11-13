@@ -4156,6 +4156,7 @@ addr,name,mode,confidence,source,notes
 08104F08,CallbackPool_UpdateShake,thumb,low,src-alias,
 08104F98,CallbackPool_ApplyDamage,thumb,low,src-alias,
 081050BC,CallbackPool_SpawnHitParticles,thumb,low,src-alias,
+08105194,CallbackPool_InitializeCollider,thumb,low,cleanup,Initializes the four-slot health actor collider
 0810523C,ActorGroup_EmitRemovalDebris,thumb,low,src-alias,
 081055C0,ProximityActor_SetState,thumb,low,src-alias,
 081056A0,CallbackPool_RefreshHealthDisplay,thumb,low,src-alias,
