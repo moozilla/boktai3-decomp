@@ -82,12 +82,13 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
         entryPointer = &entry;
         do {
             s32 old;
+            s32 y, x;
             s32 target;
             register u8 *current asm("r2");
             register u8 *base asm("r0");
-            register s32 maxX asm("r12"), maxY;
+            s32 maxX, maxY;
             s32 minX;
-            register s32 minY asm("r2");
+            s32 minY;
             if (panel->paletteMode == 0 || (panel->effectState != 10 && panel->effectState != 14))
                 target = 5;
             else {
@@ -154,9 +155,10 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                     maxX = maxY;
                     break;
             }
-            asm("" : "+r"(maxX), "+r"(maxY), "+r"(minY), "+r"(slot) : "r"(target));
-            slot++;
-            next = slot;
+            {
+                s32 *cursor = &slot;
+                next = ++*cursor;
+            }
             if (maxX < 0 || maxY < 0 || minX > 31 || minY > 31)
                 goto nextSlot;
             {
@@ -164,9 +166,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                 blockStride = strideLayer->width >> 4;
             }
             if (target == 5) {
-                register s32 y asm("r6");
                 for (y = minY; y < maxY; y += 2) {
-                    register s32 x asm("r5");
                     for (x = minX; x < maxX; x++) {
                         register s32 dx = tileX + x, dy = tileY + y;
                         dx &= 31;
@@ -185,7 +185,6 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                     }
                 }
             } else {
-                register s32 y asm("r6");
                 u32 ringMask;
                 target++;
                 {
@@ -213,7 +212,6 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                     }
                 }
                 for (y = minY; y < maxY; y += 2) {
-                    s32 x;
                     for (x = minX; x < maxX; x++) {
                         s32 dx, dy;
                         u16 *secondOutput;
