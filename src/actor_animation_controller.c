@@ -1072,13 +1072,13 @@ void Actor_BeginScriptedCurve(void)
         if (g == 0)
             return;
     }
-    W(0xf50) = Script_GetKeywordValue(0x70, 0);
+    g->handle = (void *)Script_GetKeywordValue(0x70, 0);
     if (Script_SeekToKeyword(0x74)) {
-        H(0xed0) = Script_GetValue();
-        H(0xed2) = Script_GetValue();
+        g->targetX = Script_GetValue();
+        g->targetY = Script_GetValue();
     } else {
-        H(0xed2) = 0;
-        H(0xed0) = 0;
+        g->targetY = 0;
+        g->targetX = 0;
     }
     Actor_SetState(g, 2, 9);
 }
