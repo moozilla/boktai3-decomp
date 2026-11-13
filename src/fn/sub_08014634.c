@@ -69,7 +69,11 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
     struct SpawnArgs args = {count, options, position};
     const struct ContactPosition *velocityInput = velocityArg;
     const struct ContactPosition *velocity;
-    struct Manager *m;
+    union ManagerValue {
+        struct Manager *manager;
+        struct SpawnArgs *header;
+        u32 byte;
+    } managerValue;
     u8 *resource;
     struct Group *g;
     struct Group *pool;
@@ -85,10 +89,10 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
     register s32 i asm("r5");
 
     velocity = velocityInput;
-    m = gParticleGroupManager;
-    if (!m) {
-        m = ParticleManager_Create(0, 0);
-        if (!m)
+    managerValue.manager = gParticleGroupManager;
+    if (!managerValue.manager) {
+        managerValue.manager = ParticleManager_Create(0, 0);
+        if (!managerValue.manager)
             return -1;
     }
     priority = args.options >> 8;
@@ -103,27 +107,27 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
     }
 
     if (args.options <= 20) {
-        register u8 *small asm("r2") = m->small;
+        register u8 *small asm("r2") = managerValue.manager->small;
         asm("" : "+r"(small));
         resource = small;
     } else {
-        register u8 *large asm("r0") = m->large;
+        register u8 *large asm("r0") = managerValue.manager->large;
         asm("" : "+r"(large));
         resource = large;
     }
     j = 0;
 
     rng = &gRandomIndex;
-    pool = m->groups;
+    pool = managerValue.manager->groups;
     g = pool;
 
     for (; j < 6; g++, pool++, j++) {
         if (!g->active) {
             g->active = 1;
             {
-                register struct SpawnArgs *header asm("r1") = &args;
-                register u32 byte asm("r1") = *((u8 *)&header->options);
-                g->type = byte;
+                managerValue.header = &args;
+                managerValue.byte = *((u8 *)&managerValue.header->options);
+                g->type = managerValue.byte;
             }
             {
                 option.header = &args;
