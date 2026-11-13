@@ -5,6 +5,7 @@
 #include <mgba/internal/arm/arm.h>
 #include <mgba/internal/arm/isa-inlines.h>
 #include <mgba/internal/gba/bios.h>
+#include <mgba/internal/gba/gba.h>
 #undef UNUSED
 #include "gba/m4a_internal.h"
 #include <stdio.h>
@@ -25,6 +26,53 @@ static void swi(struct mCore *core, unsigned n, uint32_t a, uint32_t b, uint32_t
     cpu->gprs[0] = (int32_t)a; cpu->gprs[1] = (int32_t)b;
     cpu->gprs[2] = (int32_t)c; cpu->gprs[3] = (int32_t)d;
     GBASwi16(cpu, (int)n);
+}
+
+static int rom_call(struct mCore *core, uint32_t entry, uint32_t a, uint32_t b, uint32_t c)
+{
+    struct ARMCore *cpu = core->cpu;
+    unsigned instructions;
+    core->busWrite16(core, 0x0203f000, 0xe7fe);
+    cpu->cpsr.i = 1; cpu->halted = 0;
+    ARMSetPrivilegeMode(cpu, MODE_SYSTEM);
+    _ARMSetMode(cpu, MODE_THUMB);
+    cpu->gprs[0] = (int32_t)a; cpu->gprs[1] = (int32_t)b; cpu->gprs[2] = (int32_t)c;
+    cpu->gprs[ARM_SP] = 0x03007d00; cpu->gprs[ARM_LR] = 0x0203f001;
+    cpu->gprs[ARM_PC] = (int32_t)entry;
+    ThumbWritePC(cpu);
+    for (instructions = 0; instructions < 2000000; ++instructions) {
+        if ((uint32_t)cpu->gprs[ARM_PC] == 0x0203f002) return 0;
+        core->step(core);
+    }
+    fprintf(stderr, "ROM call %08X did not return (pc %08X)\n", entry, cpu->gprs[ARM_PC]);
+    return 1;
+}
+
+static int eeprom_oracle(struct mCore *core)
+{
+    struct GBA *gba = core->board;
+    static Hw hw;
+    uint16_t data[] = {0x1234,0x5678,0x9abc,0xdef0};
+    extern uint16_t Eeprom_WriteBlock(uint16_t, const uint16_t *, uint8_t);
+    unsigned i;
+    GBASavedataForceType(&gba->memory.savedata, SAVEDATA_EEPROM);
+    if (rom_call(core, 0x082485ec, 64, 0, 0) || ((struct ARMCore *)core->cpu)->gprs[0]) return 1;
+    for (i = 0; i < 4; ++i) core->busWrite16(core, 0x02003000 + i * 2, data[i]);
+    if (rom_call(core, 0x08248778, 17, 0x02003000, 0) || ((struct ARMCore *)core->cpu)->gprs[0]) {
+        fprintf(stderr,"Original EEPROM write failed\n"); return 1;
+    }
+    if (rom_call(core, 0x082486b4, 17, 0x02003020, 0) || ((struct ARMCore *)core->cpu)->gprs[0]) return 1;
+    for (i = 0; i < 4; ++i) if (core->busRead16(core, 0x02003020 + i * 2) != data[i]) {
+        fprintf(stderr, "Original EEPROM readback failed\n"); return 1;
+    }
+    hw_init(&hw, NULL); hw_bind(&hw);
+    if (Eeprom_WriteBlock(17, data, 0)) return 1;
+    for (i = 0; i < 8; ++i) if (hw.save[17 * 8 + i] != gba->memory.savedata.data[17 * 8 + i]) {
+        fprintf(stderr,"EEPROM backing byte %u: original %u / port %u\n", i, gba->memory.savedata.data[17 * 8 + i], hw.save[17 * 8 + i]); return 1;
+    }
+    hw_bind(NULL);
+    puts("Original EEPROM SDK: PASS (block readback and save-file bytes)");
+    return 0;
 }
 
 static int mixer_oracle(struct mCore *core)
@@ -72,13 +120,17 @@ static int mixer_oracle(struct mCore *core)
     }
     if (instructions == 100000) { fprintf(stderr, "Mixer call did not return (pc %08X)\n", cpu->gprs[ARM_PC]); return 1; }
     if (hw_mp2k_mix(&sound, pcm, 16, 8000)) return 1;
+    FILE *comparison = fopen("build/demo/mixer-comparison.csv", "w");
+    if (comparison) fputs("sample,original,portable\n", comparison);
     for (i = 0; i < 16; ++i) {
         int reference = (int8_t)core->busRead8(core, 0x02000350 + i);
         int actual = sound.pcmBuffer[i];
+        if (comparison) fprintf(comparison, "%u,%d,%d\n", i, reference, actual);
         if (abs(reference - actual) > 1) {
             fprintf(stderr, "Mixer sample %u: original %d / port %d\n", i, reference, actual); return 1;
         }
     }
+    if (comparison) fclose(comparison);
     if (core->busRead32(core, 0x0200006c) != sound.chans[0].fw || core->busRead32(core, 0x02000068) != sound.chans[0].count) {
         fprintf(stderr, "Mixer channel position differs\n"); return 1;
     }
@@ -142,6 +194,7 @@ int main(int argc, char **argv)
         ++tests;
     }
     if (mixer_oracle(core)) return 1;
+    if (eeprom_oracle(core)) return 1;
     rom_file = fopen(argv[1], "rb");
     if (!rom_file || fseek(rom_file, 0, SEEK_END)) return 2;
     rom_size = ftell(rom_file); rewind(rom_file);
