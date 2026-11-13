@@ -1812,21 +1812,21 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
     u32 flag;
     u8 done;
     if (take(p)) {
-        u16 *first = (u16 *)((u8 *)p + 0xed0);
+        u16 *first = (u16 *)&p->targetX;
         u16 initialPhase[] = {0};
         s32 zero = 0;
         *first = 25;
-        *(u16 *)((u8 *)p + 0xed2) = 102;
-        *(u16 *)((u8 *)p + 0xed4) = initialPhase[0];
+        p->targetY = 102;
+        p->targetZ = initialPhase[0];
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
-        *((u8 *)p + 0xf77) = zero;
+        p->variant8 = zero;
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
         Actor_ProjectAndClampToScreen(p);
         (*(u16 *)&p->obj.y) += 8;
-        *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
+        p->savedY = (*(u16 *)&p->obj.y);
         ActorShadow_Disable(p->p2);
         Actor_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
