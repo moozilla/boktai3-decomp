@@ -6,11 +6,11 @@ struct S {
     void (*cb)(void *);
     u32 n;
 };
-void sub_081C35EC(void *, u32, u32);
+void ContactImpactEffect_BeginTimedPosition(void *, u32, u32);
 void SceneActorSequence_UpdateCenterMotion(void *);
 void SceneActorSequence_BeginCenterMotion(struct S *p)
 {
-    sub_081C35EC(p->a, 0, 0x5a);
+    ContactImpactEffect_BeginTimedPosition(p->a, 0, 0x5a);
     p->cb = SceneActorSequence_UpdateCenterMotion;
     p->n = 0;
 }

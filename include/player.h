@@ -6,6 +6,8 @@
 #include "display_sequence.h"
 #include "contact_swarm_sprite.h"
 #include "scene_event_types.h"
+#include "directional_sprite_state.h"
+#include "converging_effect_state.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0
@@ -409,9 +411,10 @@ struct Player {
     struct PlayerEffectSprite visualEffects778[1];
     struct PlayerPairedEffectTail visualEffects7A0[1];
     struct PlayerOrbitingSpriteState visualEffects7D0[1];
-    u8 directionalEffect[0x68];      /* 0x7FC */
+    struct DirectionalSpriteEffect directionalEffect[1];      /* 0x7FC */
     void *directionalEffectCallback; /* 0x864 */
-    u8 unk868[0x218];
+    u8 unk868[0x140];
+    struct ConvergingEffectState convergingEffects; /* 0x9A8 */
     struct SceneVec actionOrigin; /* 0xA80: offset copy of position (tentative) */
     u32 unkA88[1];                /* cue particle pool handle; array keeps existing storage users */
     struct SceneVec movementStart, movementDestination; /* 0xA8C, 0xA94 */

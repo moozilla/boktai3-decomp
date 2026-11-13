@@ -141,7 +141,9 @@ struct ScenePoolPlayer {
     s32 position[3];
     u8 unknown34[0x5c0];
     s32 viewportOriginX; /* +0x5f4, rounded down to a pixel by 0811AB78 */
-    u8 unknown5f8[0x26c];
+    s32 viewportOriginY,
+        viewportOriginZ; /* +0x5f8/+0x5fc: copied with viewportOriginX by emitter */
+    u8 unknown600[0x264];
     u32 gloveTimer; /* +0x864, tentative Glove controller state */
     u8 gloveActive;
     u8 unknown869[3];

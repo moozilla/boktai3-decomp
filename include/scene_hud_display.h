@@ -6,6 +6,7 @@
 #include "scene_input.h"
 #include "contact_actor.h"
 #include "scene_vec.h"
+#include "scene_value_equipment.h"
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
@@ -194,8 +195,12 @@ struct SceneHudState {
         appliedStatIncrease; /* 0x4862: base-stat bonus selection and clamped increase */
     u8 unknown4864[2];
     s16 appliedStatB; /* 0x4866: nonnegative stat B change */
-    u8 unknown4868[0x30];
-    s8 comparisonProfiles[0x14]; /* 0x4898: profile index per party member, extent tentative */
+    u8 unknown4868[0x1c];
+    struct SceneValueEquipment alternateEquipment; /* 0x4884 */
+    u8 unknown4894[4];
+    s8 comparisonProfiles[0x10]; /* 0x4898: profile index per party member, extent tentative */
+    u16 entryCount; /* 0x48A8: list-menu count */
+    u8 rowIndex, unknown48AB;
     u8 comparisonValues[3];      /* 0x48AC: capped combined stat values */
     u8 unknown48AF;
     s16 comparisonDeltas[3];  /* 0x48B0: signed bar adjustments after offsets */
