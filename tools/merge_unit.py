@@ -7,13 +7,12 @@ Concatenates the inputs' top-level items. Identical repeats (prototypes,
 externs, struct definitions, static helpers, #defines) are kept once; items
 whose name repeats with a different body are reported as conflicts, which must
 be unified (usually into a shared header) before merging. With --write the
-output is written and the inputs are removed (git rm). Run make afterwards:
+output is written and the inputs are removed. Stage the changes separately:
 merging can change code generation only through such declarations.
 """
 import argparse
 import os
 import re
-import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -92,8 +91,10 @@ def merge(paths):
     """A pinned input's marker moves to just above its function definitions."""
     seen, conflicts, body, includes = {}, [], [], []
     for path in paths:
-        pinned = MARK in open(os.path.join(ROOT, path)).read()
-        for item in items(open(os.path.join(ROOT, path)).read()):
+        with open(os.path.join(ROOT, path)) as source:
+            contents = source.read()
+        pinned = MARK in contents
+        for item in items(contents):
             if item.startswith("#include"):
                 if item not in includes:
                     includes.append(item)
@@ -130,9 +131,11 @@ def main():
     names = [n for p in a.inputs for n in c_functions(os.path.join(ROOT, p))]
     print(f"{len(a.inputs)} files -> {a.out}: {len(names)} functions")
     if a.write:
-        subprocess.run(["git", "rm", "-q"] + [p for p in a.inputs if os.path.abspath(p) != os.path.abspath(a.out)],
-                       cwd=ROOT, check=True)
-        open(os.path.join(ROOT, a.out), "w").write(text)
+        with open(os.path.join(ROOT, a.out), "w") as output:
+            output.write(text)
+        for path in a.inputs:
+            if os.path.abspath(os.path.join(ROOT, path)) != os.path.abspath(os.path.join(ROOT, a.out)):
+                os.unlink(os.path.join(ROOT, path))
 
 
 if __name__ == "__main__":
