@@ -29,7 +29,7 @@ struct PairedSceneHalf {
     struct ContactPosition *origin;
     u8 unknown94[8];
     struct ContactPosition offset;
-    u8 unknownA4[8];
+    struct ContactPosition targetPosition;
     u16 heading, scale, fieldB0, fieldB2;
     struct ContactCollider bodyCollider, damageCollider;
     s32 mode;

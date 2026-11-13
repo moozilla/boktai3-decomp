@@ -7202,9 +7202,12 @@ addr,name,mode,confidence,source,notes
 081B512C,Vanargand_UpdatePartVerticalOscillation,thumb,low,src-alias,Moves a Vanargand part by alternating -256 and +256 Y displacements; pausing 31 updates after each motion.
 081B52E8,Vanargand_UpdatePartBobbing,thumb,low,src-alias,
 081B5454,Vanargand_UpdatePartRadialTravel,thumb,low,src-alias,
+081B562C,Vanargand_UpdatePartEmergence,thumb,low,decomp,Tentative: UpdatePartEmergence for the paired Vanargand parts
 081B5A98,Vanargand_UpdatePartRevealFade,thumb,low,src-alias,
 081B5CCC,Vanargand_UpdatePartFadeOut,thumb,low,src-alias,
 081B5D8C,PairedSceneActor_UpdateHalves,thumb,low,src-alias,
+081B5E38,Vanargand_DestroyPartController,thumb,low,decomp,Tentative: DestroyPartController for the paired Vanargand parts
+081B5EA4,Vanargand_InitializePartController,thumb,low,decomp,Tentative: InitializePartController for the paired Vanargand parts
 081B6180,Vanargand_CreatePartController,thumb,low,src-alias,Creates and registers a controller task that manages two animated boss parts
 081B61E0,PairedSceneActor_ApplyToHalf,thumb,low,src-alias,Applies a state to one indexed actor half; then updates its mode and clears its completion flag when active and unblocked.
 081B6244,PairedSceneActor_ApplyToSelectedHalves,thumb,low,src-alias,
