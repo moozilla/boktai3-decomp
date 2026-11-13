@@ -1315,3 +1315,31 @@ helper does not change palette reloads. Named field preparation alone on the
 pinned original still differs by 30/30, so it cannot yet land as a partial.
 Next: separate the two graphics setup lifetimes and test a value-returning
 palette selector to hold its graphics argument live across the halfword load.
+
+### TerrainEdgeMarker_FindTerrainDirection (08056298)
+
+Tags: phase3, dp-field-b, TerrainEdgeMarker_FindTerrainDirection
+
+No partial landed. The genuinely concession-free draft removes the undefined
+allocation-only scratch left by the pins command as well as all 34 pins and
+nine barriers. It differs by 224 ROM / 190 draft (shape 96; draft 1380 bytes
+versus ROM 1448). Region allocation, shared mask priorities, and cross-jump
+merging affect all four probes. Raising insideCell priority by 686 improves
+the diagnostic baseline to 214/180; sourceHeight +1136 gives 223/189. No
+matching knob is known.
+
+Focused partial attempts: aggregate or array initialization of maxZ/minZ
+replaces the scratch block with only four register differences, but its
+removal also removes r4 from the reload spill set. Both signed loads then use
+r3 for offset 2 where ROM uses r4. A spill-rotation search cannot fix that
+spill-set difference. A narrow midpoint helper differs by seven registers;
+explicit unsigned loads add instructions.
+
+Replacing the two outside-Z pointer barriers by compound field updates has
+only six register differences: the pointer reload chooses r4 instead of r1.
+AGBCC_SPILL=5:1 diagnoses the first choice. Void and halfword-returning
+offset helpers do not change it. Duplicating compare_0 and compare_2 tails
+also leaves six differences; duplicating clear tails worsens branch shape.
+A halfword height-mask helper loses several required shared masks.
+Next: recover the natural extra spill pressure associated with the midpoint
+loads, then retry the pointer barriers with the restored spill set.
