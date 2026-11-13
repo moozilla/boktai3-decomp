@@ -1261,7 +1261,14 @@ scope differences, not byte counts.
 - **LinkSelection_WaitForEmptySlots** — One register-only row remains: cse1 canonicalizes the
   initial `i` comparison to the equal zero-valued `count` pseudo. Casts, zero spellings, declaration
   order, `i + 0`, and `i = count` do not change it; an explicit `0 < length` changes the compare
-  shape. Next seek a natural nonzero-path definition of `i` that survives CSE.
+  shape. A second pass confirmed with `why 81` that pseudo 24 (`i`) is initially allocated to the
+  ROM's r3, but cse1 substitutes pseudo 25 (`count`, r6) solely because both hold zero. Labels,
+  gotos, `count ^ count`, `count - count`, signed/unsigned and narrow types, alias locals, and reuse
+  of the session-ready result either leave that substitution intact or add instructions. Moving the
+  count initialization into both sides of the initial branch preserves the desired comparison but
+  adds two branches, so it is not a viable match. Next seek an ordinary expression whose zero is
+  only exposed after cse1, or a natural preceding nonconstant definition of `i` that does not alter
+  its otherwise-correct priority.
 - **LinkSelection_ExchangeParticipantInput** — 14 ROM / 10 draft rows after removing three
   concessions. The initial 0x3c00 mask is built directly in r6 rather than in r1 then copied, and
   that changes the later mode tests. Next derive the mask through the first slot predicate so the
@@ -1270,8 +1277,13 @@ scope differences, not byte counts.
   allocation rewrite; isolate the zero aliases and participant cursor first, then retain only
   variants that improve the register-blind shape.
 - **TimerDisplay_DrawRecord** — Eight rows after removing two pins and two barriers. The cell
-  pointer barrier controls three register-only differences; next use direct row/column indexing
-  for each digit instead of carrying the cell cursor.
+  pointer barrier controls three register-only differences. `why 36` identifies the exact cause:
+  each store block has three local quantities, triggering agbcc's small-set `qty_compare` ordering;
+  it assigns the returned cell to r0 and the halfword constant to r1, while the ROM has the cell
+  copy in r1 and the constant in r0. Typed return values, pointer/value aliases, wide or narrow
+  constants, increment-built constants, and an inline store helper do not create the required
+  fourth local quantity (the helper is instead emitted out of line). Next try a real fourth value
+  arising from direct row/column indexing, rather than a dead steering local.
 - **sub_0810FDDC** — 63 rows after removing two pins. The score-panel owner and tens digit compete
   across the drawing calls; next repeat the digit-base computation in the two branches.
 - **LinkSession_UpdatePlayerValueAverage** — Ten rows after removing the `GetSelection` sum
@@ -1285,5 +1297,7 @@ scope differences, not byte counts.
 - **Clock_CheckRtcStatus** — Five register-only rows (plus one moved branch) after removing two
   pins. The shifted byte is allocated to r4 instead of r5; declaration order, delayed
   initialization, scalarized two-word arrays/structs/unions, and zero-initialized aggregates did
-  not reproduce the allocation. Next recover the SDK RTC result aggregate type rather than using
-  two independent u32 values.
+  not reproduce the allocation. Splitting the shift-assignment, narrowing the second assignment,
+  initializing `status` from the call before shifting it, and a one-member union all compile to the
+  same five-row difference. Next recover the SDK RTC result aggregate type rather than using two
+  independent u32 values.
