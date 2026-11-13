@@ -1,46 +1,88 @@
-#include "global.h"
-#include "game_state.h"
-#include "input.h"
-#include "engine_globals.h"
+#include "play_stats.h"
 #include "monster_particle_random.h"
 
-extern const u8 gUnk_0824F960[];
-extern const u8 gUnk_0824F968[];
-extern const u8 gUnk_0824F970[];
-extern const u8 gUnk_0824F978[];
-extern const u8 gUnk_0824F984[];
-extern const u8 gUnk_0824F990[];
+extern void (*const gUnk_0861215C[])(struct PlayStatsScreen *);
 
-struct PlayStatsEntry {
-    u8 unk0[8];
-    u32 flags;
-    u8 unkC[0x54];
-};
+extern const u8 gUnk_0824F934[], gUnk_0824F940[], gUnk_0824F948[], gUnk_0824F954[];
 
-struct PlayStatsScreen {
-    u8 unk00[0x18];
-    u8 keyframeData[0x40];
-    void *layerMap;
-    u8 unk5C[4];
+extern const u8 gUnk_0824F960[], gUnk_0824F968[], gUnk_0824F970[], gUnk_0824F978[], gUnk_0824F984[],
+    gUnk_0824F990[];
+
+void Menu_EraseRect(u32, u32, u32, u32);
+
+void Menu_DrawText(u32, u32, const u8 *);
+
+void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
+
+void Bg_SetLayerMap(u32, void *, u16);
+
+void GameState_UpdateCounterBalanceRank(void);
+
+void GameStats_SelectLeadingCounter(void);
+
+void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+
+s32 SceneActorManager_Exists(void)
+{
+    if (gSceneActorListManager)
+        return 1;
+    return 0;
+}
+
+void PlayStats_SetState(struct PlayStatsScreen *screen, u32 screenId)
+{
     u32 flags;
-    void *script;
-    u8 unk68[8];
-    s32 state;
-    s32 timer;
-    u32 mapId;
-    u8 digit7C;
-    u8 digit7D;
-    u8 unk7E;
-    u8 digit7F;
-    u8 digit80;
-    u8 unk81;
-    u8 digit82;
-    u8 digit83;
-    u8 unk84;
-    u8 label85[11];
-    struct PlayStatsEntry entries[10];
-    u32 soundCued;
-};
+    screen->screen = screenId;
+    screen->screenTimer = 0;
+    screen->callback = gUnk_0861215C[screenId];
+    {
+        u32 mask = 1;
+        flags = screen->flags;
+        flags |= mask;
+    }
+    screen->state = 0;
+    screen->timer = 0;
+    {
+        u32 mask = 2;
+        flags |= mask;
+    }
+    screen->flags = flags;
+}
+
+void PlayStats_RemoveAnimations(struct PlayStatsScreen *screen)
+{
+    s32 i;
+    struct SceneInputWidget *animation = screen->entries;
+    for (i = 7; i >= 0; i--) {
+        Anim_Remove(animation);
+        animation++;
+    }
+    Anim_Remove(&screen->entries[8]);
+    Anim_Remove(&screen->entries[9]);
+}
+
+void PlayStats_HideEntryAnimations(struct PlayStatsScreen *screen)
+{
+    s32 i;
+    u32 m = 1;
+    u32 *flags = &screen->entries[0].flags;
+    for (i = 7; i >= 0; i--) {
+        *flags |= m;
+        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
+    }
+}
+
+void PlayStats_DrawLabels(struct PlayStatsScreen *screen)
+{
+    Menu_EraseRect(2, 4, 10, 1);
+    Menu_DrawText(2, 4, gUnk_0824F934);
+    Menu_EraseRect(2, 7, 10, 1);
+    Menu_DrawText(2, 7, gUnk_0824F940);
+    Menu_EraseRect(2, 10, 10, 1);
+    Menu_DrawText(2, 10, gUnk_0824F948);
+    Menu_EraseRect(2, 13, 10, 1);
+    Menu_DrawText(2, 13, gUnk_0824F954);
+}
 
 static inline u32 PlayStats_TakeFlag(struct PlayStatsScreen *task, u32 mask)
 {
@@ -74,7 +116,6 @@ static inline s32 PlayStats_RandomDigit(const u16 *table, u32 *index)
     return Mod(sample, 10);
 }
 
-/* Reveal the elapsed time, counters and rankings in stages. */
 void PlayStats_UpdateResults(struct PlayStatsScreen *task)
 {
     u8 text[12];
@@ -130,8 +171,8 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
                 text[0] = PlayStats_RandomDigit(table, index) + '0';
                 text[1] = PlayStats_RandomDigit(table, index) + '0';
             } else {
-                text[0] = task->digit7C;
-                text[1] = task->digit7D;
+                text[0] = task->timeText[0];
+                text[1] = task->timeText[1];
             }
             if (task->timer <= 0x68) {
                 const u16 *table = gRandomTable;
@@ -139,8 +180,8 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
                 text[3] = PlayStats_RandomDigit(table, index) + '0';
                 text[4] = PlayStats_RandomDigit(table, index) + '0';
             } else {
-                text[3] = task->digit7F;
-                text[4] = task->digit80;
+                text[3] = task->timeText[3];
+                text[4] = task->timeText[4];
             }
             if (task->timer <= 0x95) {
                 const u16 *table = gRandomTable;
@@ -150,8 +191,8 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
                 if (task->timer & 1)
                     Sound_PlaySong(0x273);
             } else {
-                text[6] = task->digit82;
-                text[7] = task->digit83;
+                text[6] = task->timeText[6];
+                text[7] = task->timeText[7];
                 if (!task->soundCued) {
                     Sound_PlaySong(0x167);
                     task->soundCued = 1;
@@ -172,7 +213,7 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
             wasBit = PlayStats_TakeFlag(task, 2);
             if (wasBit) {
                 Menu_EraseRect(0x14, 4, 8, 2);
-                Menu_DrawText(0x14, 4, &task->digit7C);
+                Menu_DrawText(0x14, 4, task->timeText);
                 task->soundCued = 0;
                 blank[0] = ' ';
                 blank[1] = ' ';
@@ -189,9 +230,9 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
                 Menu_DrawText(0x12, 7, blank);
             }
             if (task->timer <= 0x3b) {
-                u8 *frames = task->keyframeData;
+                void *frames = task->resources;
                 const u16 *table = gRandomTable;
-                struct PlayStatsEntry *entry = task->entries;
+                struct SceneInputWidget *entry = task->entries;
                 u32 *cursor = &gRandomIndex;
                 for (i = 7; i >= 0; i--) {
                     u32 random;
@@ -206,7 +247,7 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
             } else {
                 PlayStats_HideEntryAnimations(task);
                 Menu_EraseRect(0x12, 7, 0xa, 2);
-                Menu_DrawText(0x12, 7, task->label85);
+                Menu_DrawText(0x12, 7, task->valueText);
                 if (!task->soundCued) {
                     Sound_PlaySong(0x167);
                     task->soundCued = 1;
@@ -226,7 +267,7 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
             if (wasBit) {
                 PlayStats_HideEntryAnimations(task);
                 Menu_EraseRect(0x12, 7, 0xa, 2);
-                Menu_DrawText(0x12, 7, task->label85);
+                Menu_DrawText(0x12, 7, task->valueText);
             }
             if (task->timer > 0x3c || (gPadState[1] & 1)) {
                 Menu_EraseRect(0x17, 0xa, 8, 2);
@@ -252,7 +293,7 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
             if (task->timer > 0x3c || (gPadState[1] & 1)) {
                 struct GameState **game = &gGameState;
                 Menu_EraseRect(0x13, 0xd, 0xc, 2);
-                v = *(s16 *)((u8 *)*game + 0x662);
+                v = (*game)->unk662;
                 switch (v) {
                     case 0:
                         Menu_DrawText(0x14, 0xd, gUnk_0824F978);
@@ -273,7 +314,7 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
             PlayStats_TakeFlag(task, 2);
             if (task->timer > 0x3c) {
                 {
-                    struct PlayStatsEntry *entry = &task->entries[9];
+                    struct SceneInputWidget *entry = &task->entries[9];
                     entry->flags &= ~1;
                 }
                 PlayStats_Enter(task, 6);
@@ -309,4 +350,14 @@ void PlayStats_UpdateResults(struct PlayStatsScreen *task)
         default:
             break;
     }
+}
+
+u32 PlayStats_Update(struct PlayStatsScreen *screen)
+{
+    if ((screen->flags & 1) == 0)
+        screen->screenTimer++;
+    if ((screen->flags & 2) == 0)
+        screen->timer++;
+    Callback_InvokeActor(screen, screen->callback);
+    return 0;
 }
