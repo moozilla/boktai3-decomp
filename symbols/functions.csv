@@ -3240,16 +3240,16 @@ addr,name,mode,confidence,source,notes
 0809DCE4,Lun_Destroy,thumb,low,src-alias,Removes graphics and collision resources then unlinks the actor from the registry
 0809DD78,Lun_Init,thumb,low,src-alias,Lun initializer: installs its callback table and state handlers; loader called by its Create function
 0809ECC8,Lun_Create,thumb,low,gcl-behavior,"registry 680E spawner for enemy kinds 26-28; its sprite D28E is a small flame in three variants, matching the -lun spirits クロロホルルン/モエルルン/ヒエルルン (KLOROFOLUN/BURRNUN/CHILLUN)"
-0809ED00,Vorn_OnContactEvent_0809ED00,thumb,low,src-alias,
+0809ED00,Crow_OnAttackContact,thumb,low,cleanup,Records type-one attack contact and clears the pending-hit status bit.
 0809ED70,Crow_OnBodyContact,thumb,low,src-alias,
 0809EE00,Crow_OnIdleAnimation,thumb,low,src-alias,Animation callback selects directional entry 1 and checks the frame-triggered crow sound
-0809EE2C,RouteActor_UpdatePeriodicAnimation,thumb,low,src-alias,
-0809EEBC,RouteActor_UpdateAnimationSequence,thumb,low,src-alias,
+0809EE2C,Crow_UpdatePeriodicAnimation,thumb,low,cleanup,Advances the Crow periodic animation phase and handles completion.
+0809EEBC,Crow_UpdateAnimationSequence,thumb,low,cleanup,Selects Crow animation entries from its private sequence phase.
 0809EF50,Crow_PlayEntry2,thumb,low,src-alias,
 0809F024,Crow_UpdateDirectionalPose,thumb,low,src-alias,
 0809F150,Crow_OnSpecialAnimation,thumb,low,src-alias,Special-state animation callback clears the entry flag and selects directional entry 14
 0809F174,Crow_RecoverFromDisplacement,thumb,low,src-alias,
-0809F368,SceneActorControl_CompleteScriptedResponse_0809F368,thumb,low,src-alias,
+0809F368,Crow_UpdateDefeat,thumb,low,cleanup,"Blinks the defeated Crow, runs its script and event updates, then installs idle control."
 0809F510,Crow_HopWithinHomeCell,thumb,low,src-alias,
 0809F84C,Crow_SteerAroundPlayer,thumb,low,src-alias,
 0809FC74,Crow_UpdateWanderTimer,thumb,low,src-alias,
@@ -3273,7 +3273,7 @@ addr,name,mode,confidence,source,notes
 080A0C10,Crow_UpdatePostAction,thumb,low,src-alias,Wraps the post-dispatch update helper and reports success
 080A0C1C,Crow_UpdateKnockback,thumb,low,src-alias,
 080A0E00,Crow_ApproachPlayerThenRecoil,thumb,low,src-alias,
-080A11F4,SceneActorControl_UpdateHeightReturn,thumb,low,src-alias,
+080A11F4,Crow_ReturnToGround,thumb,low,cleanup,Eases the Crow height offset back toward terrain and exits the return state.
 080A1348,Crow_SetBehaviorTable,thumb,low,src-alias,Installs the Crow-specific table at actor offset 0x28C
 080A1358,Crow_Update,thumb,low,src-alias,Main update callback runs preparation then the current action and shared processing
 080A1390,Crow_InitPlayerTarget,thumb,low,src-alias,Callback sets the target pointer to the player position and initializes target processing
