@@ -8,7 +8,10 @@ what was tried, and the next idea.
 
 ## field-effects
 
-### Scene_SpawnDirectionalDust (src/scene_object.c, 08004B64): deferred
+### Scene_SpawnDirectionalDust (src/scene_object.c, 08004B64): resolved
+
+Resolved without concessions by the dp-field Codex pass; see
+[cx-dp-field_2026-11-13.md](cx-dp-field_2026-11-13.md). The earlier investigation follows.
 
 Draft: `notes/phase3-drafts/field-effects/Scene_SpawnDirectionalDust.c` (117 ROM / 93 draft
 insns differ; it relies on a local `u32 x:16` bitfield struct defined next to it in the unit copy).
