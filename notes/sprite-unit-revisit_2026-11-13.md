@@ -1,70 +1,67 @@
-# Sprite unit cleanup handoff
+# Sprite unit cleanup
 
 Tags: #assets #animation #matching #process
 
-The weekly run ended during the revisit of Sprite, 082142DC–08215698 (37
-single-function files). This unit remains unchanged and unconsolidated. There is
-no candidate C draft or claimed match from this revisit. The observations below
-are the saved design work; the next worker should validate the proposed types
-against the stock compiler before merging the files.
+Sprite, 082142DC–08215698, now lives in `src/sprite.c`: 37 former one-function
+files, all 5052 bytes matching stock agbcc. This resolves the cleanup holdout
+recorded at the first weekly stop; work resumed on the subsequent continue
+instruction.
 
-## Shared layouts
+## Shared layouts and APIs
 
-`DisplaySequenceSprite` in `include/display_animation.h` is the existing sprite
-object. Its bytes at offsets 8 and 9 are called `palette` and `paletteVariant`,
-but the piece renderer at 08214600 and list renderers read them as signed X/Y
-scales. The layout observed across the unit is flags at 0, linked at 4, visible
-at 5, rotation at 6, priority at 7, scale X/Y at 8/9, list index at A, resource
-pointer at C, eight bytes of animation state at 10, attributes at 18,
-`ContactPosition` at 1C, and previous/next links at 24/28. Audit external field
-uses before renaming or changing signedness in the shared header.
+`DisplaySequenceSprite` moved from `include/display_animation.h` into
+`include/sprite.h`, with the same layout and typed previous/next links at 24/28.
+Legacy public field spellings remain compatible with external users: `palette`
+and `paletteVariant` hold signed X/Y scales in the piece renderer, `attribute`
+holds rotation, `unknown4` stores linked/visible, and `unknownA[0]` selects the
+list. The renderer casts the scale bytes to their signed interpretation.
 
-The effect list helpers at 082143CC and 082143F8 can use the complete
-`SpriteDrawable` from `include/sprite_oam.h`: linked at 4, list at 11, and
-previous/next at 20/24. The animation list helpers at 08214424 and 08214450 can
-use the now-expanded `SceneInputWidget`: linked in `unknown4[0]`, list at 1C,
-and previous/next at 58/5C. Those complete types were recovered and validated
-in the earlier Sprite OAM and Anim cleanup commits.
+The effect list helpers reuse `SpriteDrawable` from `include/sprite_oam.h`.
+The animation list helpers reuse `SceneInputWidget` from
+`include/scene_input_widget.h`. Private padded list views were removed.
 
-The resource views need a single shared definition. The renderers observe a
-palette key at 6, width/height at 8/9, signed offsets at A/B, palette pointer
-at C, and frame records through the pointer at 14. `AnimData_Load` at 082151E4
-also fills fields at 0–4 and a data pointer at 10. `Sprite_CopyRenderState` at
-0821452C copies a 28-byte resource block, so preserve the trailing word rather
-than adopting the shorter private view. The existing display resource wrappers
-must be audited for whether they represent this exact object or a larger owner.
+`SpriteRenderResource` unifies the resource views into a 28-byte record with
+palette key, bounds, palette/tile/frame pointers, and the trailing word copied
+by `Sprite_CopyRenderState`. Piece records, frame records, and the eight-byte
+animation state also have shared definitions. The public sprite keeps the
+animation fields flat for existing sequence consumers; the copy routine uses a
+shared animation-record view beginning at `frame`. Both this aggregate copy and
+the `ContactPosition` assignment match the original word-copy instructions.
 
-## Prototype and code-generation checks still needed
+`Sprite_Init` (082144A4) and `Sprite_InitUnlinked` (082144E4) now explicitly pass
+their resource argument to `Sprite_ApplyAnimation` (08214588). Both initializers
+matched individually before merging. The data header deliberately has no API
+prototypes: external callers still use several incompatible legacy pointer
+views and return declarations. Introducing a typed `Sprite_LinkToList` prototype
+there broke two consumers; removing that declaration restored compatibility.
+The unit itself uses consistent typed prototypes. A repository-wide engine API
+cleanup remains for integration rather than changing other workers' callers.
 
-`Sprite_Init` (082144A4) and `Sprite_InitUnlinked` (082144E4) currently declare
-and call `Sprite_ApplyAnimation` with one argument. The definition at 08214588
-reads a second argument, the resource pointer. Both initializers already receive
-a currently unused second parameter. Passing that parameter explicitly is the
-likely intended API, but this has not been compiled or proven byte-identical.
-Check both initializers first before undertaking the full merge.
+## Structure and names
 
-`include/engine.h` has generic `void *` sprite APIs and some differing signed
-parameter types. Including `display_animation.h` pulls those declarations in;
-reconcile them explicitly instead of leaving conflicting prototypes in the unit.
-A shared sprite data header separate from the broad engine API may help, but
-its consumers must all be checked.
+The four sprite list renderers now use `for` loops and `continue` in place of
+skip labels. All four still match. Identical projection helpers are shared. The existing one-iteration list-head
+wrappers in two renderers remain: flattening them, replacing them with plain
+blocks or a list helper, and moving the load into the for initializer each
+changed 47 instructions solely through register selection. Moving the resource
+variable to the outer scope did not resolve that allocation difference.
+The DMA paths reuse `VideoDmaRegisters` and named hardware constants.
+Three old compiler-override comments were removed from the list-head setters;
+the stock compiler matches those setters.
 
-`Sprite_CopyRenderState` copies the animation state as two words and copies the
-position words in a particular order. Try shared struct assignments and inspect
-the exact result before retaining any minimal word-access adaptation. The four
-list renderers repeat projection helpers; consolidate identical helpers only
-after their signedness and vector alignment agree. `ContactPosition` is explicitly
-four-byte aligned, while some old local vectors contain only three halfwords.
+Eight formerly unnamed functions now have descriptive CSV names, covering list
+head setters, resource replacement, frame-piece rendering, camera-relative list
+rendering, tile-slot allocation, and queued tile upload. Existing source aliases
+preserve linker references until the coordinator promotes names with all callers.
 
-## Adjacent completed work
+## Validation and integration
 
-Anim, 08219574–08219A94, is committed as `src/animation_widget.c`: all 1312 bytes
-match, and all 341 external direct/transitive widget-header consumers pass their
-per-unit checks. Its 160 bytes of Thumb/ARM call veneers are existing protected
-assembly already cataloged in `symbols/progress_asm.csv`; they remain in ROM
-order through `INCLUDE_ASM`. No new handwritten instructions were introduced.
+The complete unit matches and has no counted concessions. All 2173 external direct or transitive consumers of the shared sprite header
+match. Early consumers were checked again after the header
+prototypes and private type names were finalized.
 
-The scoped queue ended before Nav mesh, 0821F15C. Seventeen of its eighteen
-units were consolidated; Sprite is the remaining cleanup holdout. The coordinator
-owns the combined ROM build and integration. No new tooling work was started
-after the stop instruction.
+All eighteen units in the narrowed queue are now consolidated. The queue ends
+before Nav mesh, 0821F15C; later units belong to another worker. The coordinator
+owns the combined ROM build. Anim, 08219574–08219A94, retains only the existing
+protected Thumb/ARM veneers cataloged in `symbols/progress_asm.csv`, with all
+1312 bytes and 341 external widget-header consumers matching.

@@ -29,16 +29,5 @@ struct DisplayAnimation {
     struct DisplayPosition *position;
     u32 *displayFlags;
 };
-struct DisplaySequenceSprite {
-    u32 flags;
-    u8 unknown4[2];
-    u8 attribute, priority, palette, paletteVariant;
-    u8 unknownA[2];
-    const u8 *resource;
-    u16 frame;
-    u8 frameIndex, elapsed, width, height, offsetX, offsetY;
-    u32 attributes;
-    struct ContactPosition position;
-    u8 unknown24[8];
-};
+#include "sprite.h"
 #endif

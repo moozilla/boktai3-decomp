@@ -8974,6 +8974,9 @@ addr,name,mode,confidence,source,notes
 082141C0,InterruptsAndVideo_OnVideoUploadTask,thumb,low,src-alias,Task callback that waits for VBlank and uploads graphics and display state
 0821425C,InterruptsAndVideo_OnGraphicsUpdateTask,thumb,low,src-alias,Task callback that updates graphics resources and effects and advances the frame counter
 082142DC,Sprite_InitSystem,thumb,low,src-alias,Initializes sprite rendering state and clears the sprite animation and effect lists
+0821432C,Sprite_SetCurrentListHead,thumb,low,decomp,Set the selected sprite list head
+08214344,Effect_SetCurrentListHead,thumb,low,decomp,Set the selected effect list head
+0821435C,Anim_SetCurrentListHead,thumb,low,decomp,Set the selected widget list head
 08214374,Sprite_LinkToList,thumb,low,src-alias,Prepends a sprite to the indexed doubly linked list and marks it active.
 082143A0,Sprite_UnlinkFromList,thumb,low,src-alias,Unlinks a sprite from the indexed list and clears its active flag.
 082143CC,Effect_LinkToList,thumb,low,src-alias,Prepends an effect to the indexed list used by Effect_Remove.
@@ -8988,7 +8991,10 @@ addr,name,mode,confidence,source,notes
 0821456C,Sprite_ResetRenderDefaults,thumb,low,src-alias,Resets sprite flags and rendering defaults including both scale bytes.
 08214584,Sprite_SetOriginStub,thumb,low,src-alias,Empty helper called with a sprite and two offsets; intended origin setter is tentative.
 08214588,Sprite_ApplyAnimation,thumb,low,src-alias,
+082145F4,Sprite_SetAnimDataIfPresent,thumb,low,decomp,Replace sprite resource when the supplied pointer is nonnull
+08214600,Sprite_QueueFramePieces,thumb,low,decomp,Cull and queue sprite pieces with palette tile and affine allocation
 08214B44,Sprite_RenderScaledList,thumb,low,src-alias,
+08214D20,Sprite_RenderCameraRelativeList,thumb,low,decomp,Cull and render the active sprite list relative to the camera
 08214E3C,Sprite_RenderFlipAwareList,thumb,low,src-alias,
 08214FBC,Sprite_RenderUnflippedList,thumb,low,src-alias,
 08215114,Video_OnRenderNoOp,thumb,low,src-alias,Empty callback installed in the frame renderer callback set by menu setup.
@@ -8999,6 +9005,8 @@ addr,name,mode,confidence,source,notes
 082151E4,AnimData_Load,thumb,low,src-alias,
 08215284,AnimData_SelectPaletteBank,thumb,low,src-alias,
 082152AC,ObjGfx_ResetAllocationCounters,thumb,low,src-alias,Resets three graphics counters and preserves a resource baseline when present; allocation role is tentative.
+082152E4,ObjGfx_AllocateTileSlot,thumb,low,decomp,Find or reserve a tile upload slot by source pointer
+0821537C,ObjGfx_UploadQueuedTiles,thumb,low,decomp,Upload queued tile slots then upload row-based tile requests
 08215400,ObjGfx_LoadTiles,thumb,medium,coverage,"reads sprite tile graphics 0x08BF0000-0x08CDxxxx (menu titles, button labels, portraits)"
 08215490,SpriteOam_ResetQueue,thumb,low,src-alias,
 082154E4,SpriteOam_FinalizeQueue,thumb,low,src-alias,
