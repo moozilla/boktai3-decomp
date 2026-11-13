@@ -1,7 +1,9 @@
 import sys
+import tempfile
 import unittest
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from merge_unit import items, write_merge
@@ -9,6 +11,24 @@ from progress import _bodies
 
 
 class FunctionBoundaries(unittest.TestCase):
+    def test_write_keeps_destination_and_removes_inputs_without_git(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "first.c").write_text("first")
+            (root / "second.c").write_text("second")
+            with patch("merge_unit.ROOT", directory):
+                write_merge("first.c", ["first.c", "second.c", "second.c"], "merged")
+            self.assertEqual((root / "first.c").read_text(), "merged")
+            self.assertFalse((root / "second.c").exists())
+
+    def test_failed_destination_write_preserves_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "first.c").write_text("first")
+            with patch("merge_unit.ROOT", directory), self.assertRaises(OSError):
+                write_merge("missing/unit.c", ["first.c"], "merged")
+            self.assertEqual((root / "first.c").read_text(), "first")
+
     def test_punctuation_in_multiline_comments_stays_in_its_function(self):
         source = """void Startup(void)
 {

@@ -2,7 +2,7 @@
 #define TERRAIN_CELL_PROBE_H
 
 #include "global.h"
-#include "engine.h"
+#include "terrain_collision.h"
 
 /* 16-bit world position: x and z hold cell index in the high byte. */
 struct Pos16 {
@@ -24,8 +24,8 @@ static inline u8 *cellProps(s32 cell)
 {
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
-        return p + 4;
-    return gTerrainMap->cells + (cell * 4 + 12);
+        return (u8 *)&((struct TerrainCellOverride *)p)->cell;
+    return (u8 *)&((struct TerrainGrid *)gTerrainMap->cells)->cells[cell];
 }
 
 /* Sets pos->y to the terrain height under pos. */

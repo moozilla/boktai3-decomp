@@ -7234,9 +7234,12 @@ addr,name,mode,confidence,source,notes
 081B512C,Vanargand_UpdatePartVerticalOscillation,thumb,low,src-alias,Moves a Vanargand part by alternating -256 and +256 Y displacements; pausing 31 updates after each motion.
 081B52E8,Vanargand_UpdatePartBobbing,thumb,low,src-alias,
 081B5454,Vanargand_UpdatePartRadialTravel,thumb,low,src-alias,
+081B562C,Vanargand_UpdatePartEmergence,thumb,low,decomp,Tentative: UpdatePartEmergence for the paired Vanargand parts
 081B5A98,Vanargand_UpdatePartRevealFade,thumb,low,src-alias,
 081B5CCC,Vanargand_UpdatePartFadeOut,thumb,low,src-alias,
 081B5D8C,PairedSceneActor_UpdateHalves,thumb,low,src-alias,
+081B5E38,Vanargand_DestroyPartController,thumb,low,decomp,Tentative: DestroyPartController for the paired Vanargand parts
+081B5EA4,Vanargand_InitializePartController,thumb,low,decomp,Tentative: InitializePartController for the paired Vanargand parts
 081B6180,Vanargand_CreatePartController,thumb,low,src-alias,Creates and registers a controller task that manages two animated boss parts
 081B61E0,PairedSceneActor_ApplyToHalf,thumb,low,src-alias,Applies a state to one indexed actor half; then updates its mode and clears its completion flag when active and unblocked.
 081B6244,PairedSceneActor_ApplyToSelectedHalves,thumb,low,src-alias,
@@ -7258,25 +7261,27 @@ addr,name,mode,confidence,source,notes
 081B66E0,VanargandEffect_Initialize,thumb,low,src-alias,
 081B67B0,VanargandEffect_Create,thumb,low,src-alias,Creates a delayed sprite effect task with a thirty-frame active lifetime
 081B6810,VanargandProjectilePool_FindFreeSlot,thumb,low,src-alias,Finds an unused entry among eight slots and returns its index
-081B6844,ActorReaction_BeginOnContact,thumb,low,src-alias,
-081B6884,ActorReaction_Idle,thumb,low,src-alias,
-081B69F4,ActorEffect_RemoveSprites,thumb,low,src-alias,
-081B6A38,ActorEffect_UpdatePositionTrail,thumb,low,src-alias,
-081B6AB8,ActorEffect_UpdateRadialTrail,thumb,low,src-alias,
-081B6BC4,HomingEffect_TurnTowardTarget,thumb,low,src-alias,
-081B6C1C,ActorEffect_UpdateHomingFlight,thumb,low,src-alias,
-081B6D20,ActorEffect_UpdateApproachLaunch,thumb,low,src-alias,
-081B6E90,ActorEffect_UpdateRadialExpiry,thumb,low,src-alias,
-081B6F68,ActorEffect_UpdateExpiry,thumb,low,src-alias,
-081B6FA8,PooledController_UpdateAll,thumb,low,src-alias,
+081B6844,VanargandProjectile_OnContact,thumb,low,src-alias,Activates a projectile reaction after collider contact
+081B6884,VanargandProjectile_IgnoreContact,thumb,low,src-alias,Empty projectile attack-collider callback
+081B6888,VanargandProjectile_Initialize,thumb,low,src-alias,Initializes six trail sprites and two colliders
+081B69F4,VanargandProjectile_Release,thumb,low,src-alias,Removes trail sprites disables the body collider and releases the pool bit
+081B6A38,VanargandProjectile_UpdatePositionTrail,thumb,low,src-alias,Copies the six-position circular history into trail sprites
+081B6AB8,VanargandProjectile_UpdateRadialTrail,thumb,low,src-alias,Moves expired trail sprites outward from their stored positions
+081B6BC4,VanargandProjectile_TurnTowardTarget,thumb,low,src-alias,Clamps angular steering toward the target
+081B6C1C,VanargandProjectile_UpdateHomingFlight,thumb,low,src-alias,Steers advances colliders and updates the trail during flight
+081B6D20,VanargandProjectile_UpdateApproachLaunch,thumb,low,src-alias,Interpolates toward the source position before homing flight
+081B6E90,VanargandProjectile_UpdateRadialExpiry,thumb,low,src-alias,Scatters trail sprites then releases the projectile
+081B6F68,VanargandProjectile_UpdateExpiry,thumb,low,src-alias,Drains the position trail before releasing the projectile
+081B6FA8,VanargandProjectilePool_Update,thumb,low,src-alias,Dispatches the state callback for each active projectile
 081B6FFC,VanargandProjectilePool_Destroy,thumb,low,src-alias,Task destruction callback that releases active projectiles and removes slot colliders
 081B7038,VanargandProjectilePool_Init,thumb,low,src-alias,Stores the pool parameter and initializes all eight projectile slots
 081B7064,VanargandProjectilePool_Create,thumb,low,src-alias,Allocates the eight-slot sprite and collider pool used by Vanargand; projectile identity is tentative
 081B70A8,VanargandProjectile_Create,thumb,low,src-alias,
+081B71D4,VanargandProjectile_CreateWithSource,thumb,low,src-alias,Creates a projectile with an optional approach source
 081B7304,PooledController_ActivateIdleSlots,thumb,low,src-alias,
-081B7340,EffectPool_FindFreeSlot,thumb,low,src-alias,
+081B7340,VanargandAfterimagePool_FindFreeSlot,thumb,low,src-alias,Finds an afterimage with no remaining lifetime
 081B7378,VanargandAfterimagePool_ActivateSlot,thumb,low,src-alias,Starts an eight-tick sprite effect at the supplied position and clears visibility and flip flags
-081B7394,EffectPool_InitSlot,thumb,low,src-alias,
+081B7394,VanargandAfterimagePool_InitializeSlot,thumb,low,src-alias,Loads the afterimage sprite resource and clears its position
 081B73F8,VanargandAfterimagePool_ReleaseSlot,thumb,low,src-alias,Marks a slot inactive and hidden and decrements the active count
 081B740C,VanargandAfterimagePool_UpdateSlot,thumb,low,src-alias,Counts down a slot and applies alternating flip flags halfway through its lifetime
 081B744C,VanargandAfterimagePool_Update,thumb,low,src-alias,Task update callback that advances active slots once every eight frames
@@ -8716,7 +8721,8 @@ addr,name,mode,confidence,source,notes
 08200214,HomingProjectile_SetPrimaryColliderParams,thumb,low,src-alias,Sets the three parameters passed to primary collider configuration
 0820021C,HomingProjectile_SetSecondaryColliderParams,thumb,low,src-alias,Sets the corresponding three parameters for secondary collider configuration
 08200224,PlayerClone_GetActiveCount,thumb,low,src-alias,Returns the active count of the three-slot Django-sprite pool; clone identity is tentative
-08200244,DirectionalSprite_FoldFacing,thumb,low,src-alias,
+08200238,PlayerClone_IsSlotActive,thumb,low,src-alias,Tests a slot bit in the clone occupancy mask
+08200244,PlayerClone_FoldFacing,thumb,low,src-alias,Folds eight facing directions into mirrored animation rows
 08200288,PlayerClone_SetAnimation,thumb,low,src-alias,
 08200324,PlayerClone_OnBodyColliderContact,thumb,low,src-alias,
 082003B8,PlayerClone_OnPassiveColliderContact,thumb,low,src-alias,Empty contact callback installed on the clone's passive colliders
@@ -8725,9 +8731,10 @@ addr,name,mode,confidence,source,notes
 08200C40,PlayerClone_ReleaseSlot,thumb,low,src-alias,Stops instance effects and clears its occupancy bit while decrementing the active count
 08200C94,PlayerClone_UpdatePool,thumb,low,src-alias,Updates three active player clones; their movement; animation; colliders; palettes and expiration.
 08201024,PlayerClone_DestroyPool,thumb,low,src-alias,Removes all three slots' colliders and animation tasks and clears the singleton pointer
-0820107C,DirectionalSpritePool_Init,thumb,low,src-alias,
+0820107C,PlayerClone_InitializePool,thumb,low,src-alias,Initializes three clone slots and their shared palettes
 082010EC,PlayerClone_CreatePool,thumb,low,src-alias,Creates the singleton task managing three clone instances and installs its lifecycle callbacks
 0820112C,PlayerClone_FindFreeSlot,thumb,low,src-alias,Finds an unoccupied entry among three slots and returns its index
+08201160,PlayerClone_Spawn,thumb,low,src-alias,Copies a clone configuration and activates a free slot
 08201270,PlayerClone_SetBehaviorCallback,thumb,low,src-alias,Stores the behavior callback in the instance configuration
 08201274,PlayerClone_InitConfig,thumb,low,src-alias,Clears the configuration and assigns default behavior timing and collider dimensions
 082012B0,PlayerClone_SetLifetimeAndBehavior,thumb,low,src-alias,Sets the lifetime and two behavior parameters used when spawning an instance; parameter meanings are tentative
@@ -8991,6 +8998,10 @@ addr,name,mode,confidence,source,notes
 08213DCC,InterruptsAndVideo_InitRuntime,thumb,low,src-alias,Clears video memory and initializes interrupts and graphics tasks
 08213F80,InterruptsAndVideo_WaitForVBlank,thumb,low,src-alias,Waits for the flag set by the VBlank interrupt handler
 08213F98,InterruptsAndVideo_WaitFrames,thumb,low,src-alias,Enables interrupts while waiting for the requested number of VBlanks
+08213FD8,InterruptsAndVideo_OnVBlank,thumb,low,decomp,Latch display state; program scroll and HBlank DMA; tick link and solar clock
+08214144,InterruptsAndVideo_OnVCount,thumb,low,decomp,Alternate sound update and dialogue scroll at scanline interrupts
+082141B4,InterruptsAndVideo_RunIdleHook,thumb,low,decomp,Empty idle hook near frame callbacks; role tentative
+082141B8,InterruptsAndVideo_RunFrameHook,thumb,low,decomp,Empty frame hook near frame callbacks; role tentative
 082141BC,InterruptsAndVideo_OnUnusedInterrupt,thumb,low,src-alias,Empty fallback interrupt callback also installed when the solar timer stops
 082141C0,InterruptsAndVideo_OnVideoUploadTask,thumb,low,src-alias,Task callback that waits for VBlank and uploads graphics and display state
 0821425C,InterruptsAndVideo_OnGraphicsUpdateTask,thumb,low,src-alias,Task callback that updates graphics resources and effects and advances the frame counter
@@ -9026,14 +9037,22 @@ addr,name,mode,confidence,source,notes
 08215698,Video_GetBackgroundMap,thumb,high,raphaelr,(int bg) -> EWRAM buffer holding that BG's tilemap
 082156A4,Bg_ClearAllTilemaps,thumb,low,src-alias,Clears the entire 0x2000-byte buffer containing the four background tilemaps.
 082156B8,Bg_ClearTilemap,thumb,low,src-alias,
+082156D8,Bg_Initialize,thumb,low,decomp,Initialize background registers and affine/scroll state for the display mode
+082157EC,Bg_ResetDisplay,thumb,low,decomp,Clear maps and upload slots; reset blending and character blocks
 082158B0,Bg_UpdateScrollShadow,thumb,low,src-alias,masks the BG scroll records gUnk_03004C30[bg].x/y to 8 bits into the HOFS/VOFS shadow gUnk_03004C20
+08215964,Bg_UploadMapsAndTiles,thumb,low,decomp,Upload enabled layer maps and pending tile transfers
 08215A48,Bg_SetTileUpload,thumb,low,src-alias,Stores a background tile source with destination offset and size for later upload; upload role is tentative.
 08215A74,Bg_SetPriority,thumb,low,src-alias,Sets the priority bits in the selected background control register
+08215AC4,Bg_SetCharacterBase,thumb,low,decomp,Set character-base block bits in BG control register
 08215B18,Bg_SetAffineTransform,thumb,low,src-alias,Stores background position; angle and scales; then computes the signed fixed-point affine matrix and reference offsets.
 08215C8C,BgGfx_FindEntryById,thumb,low,src-alias,Finds a resource entry by ID for background tile loading
 08215CB8,Bg_CopyTiles,thumb,low,src-alias,
+08215D40,Bg_UploadTileEntries,thumb,low,decomp,Upload indexed resource tile sequences into background VRAM
 08215DF0,Bg_SetTilemapEntry,thumb,low,src-alias,Writes a tile index with flip flags and palette bank into a background map cell
+08215E24,Bg_CopyTilemapRectangle,thumb,low,decomp,Copy rectangle of tile IDs with palette and tile-base attributes
+08215EB4,Bg_FillTilemapRectangle,thumb,low,decomp,Fill a tilemap rectangle with one attributed tile
 08215F38,Text_DrawNumber,thumb,low,src-alias,
+0821607C,Bg_GetMapRow,thumb,low,decomp,Return an indexed row from the layer resource map data
 082160B8,Bg_SetupLayer,thumb,low,src-alias,
 082161B4,Bg_SetupLayers,thumb,low,src-alias,
 08216494,Bg_ResetScale,thumb,low,src-alias,Resets both background scale factors to fixed-point unity
@@ -9070,8 +9089,10 @@ addr,name,mode,confidence,source,notes
 08218B30,Video_OnFrameNoOp,thumb,low,src-alias,Empty callback installed in the video frame processing callback slot
 08218B34,Text_FlushTileUploads,thumb,low,src-alias,Uploads queued glyph tiles to background VRAM using DMA and clears the queue
 08218B8C,Text_QueueTileUpload,thumb,low,src-alias,Stages one glyph tile and records its destination tile index
+08218BC8,Text_ResetFontResource,thumb,low,decomp,Clear cached font resource pointer
 08218BD4,Text_GetFontResource,thumb,low,src-alias,Returns the current font resource header pointer
 08218BE0,Text_LoadFontResource,thumb,low,src-alias,Lazily allocates the font header and relocates its two glyph data pointers
+08218C40,Text_GetNarrowGlyphCount,thumb,low,decomp,Return narrow glyph count from loaded font header
 08218C5C,Text_GetWideGlyphCount,thumb,low,src-alias,Returns the second font header count used to validate wide glyph indices
 08218C78,Text_GetNarrowGlyphData,thumb,low,src-alias,Returns the font data used to draw two vertically stacked tiles per narrow glyph
 08218C94,Text_GetWideGlyphData,thumb,low,src-alias,Returns the font data used to draw four tiles per wide glyph
@@ -9086,19 +9107,25 @@ addr,name,mode,confidence,source,notes
 08218FB4,TextWindow_DrawWideGlyph,thumb,low,src-alias,
 08219054,TextWindow_InitializeGraphics,thumb,low,src-alias,Empty initialization hook called before text window tile graphics are filled; provisional role
 08219058,TextWindow_FillTileGraphics,thumb,low,src-alias,Fills 8 KiB of background VRAM with palette index 4 during text window setup
+0821907C,TextWindow_LoadFramePalette,thumb,low,decomp,Select a frame palette resource and copy two palette banks
 082190BC,Mosaic_Initialize,thumb,low,src-alias,Clears the pending update flag and cached mosaic parameters
 082190E0,Mosaic_SetParameters,thumb,low,src-alias,Stores packed mosaic sizes and target masks and requests a hardware update
 0821910C,Mosaic_ResetParameters,thumb,low,src-alias,Queues zero mosaic sizes and clears the background target mask
+08219134,Mosaic_UploadRegisters,thumb,low,decomp,Apply pending mosaic layer masks and mosaic size registers
 08219234,ScanlineEffect_Initialize,thumb,low,src-alias,Defaults the target to BG2 and clears the transfer mode and source
 08219254,ScanlineEffect_SetSource,thumb,low,src-alias,Sets the target background and transfer mode and scanline source pointer
 08219270,ScanlineEffect_GetBuffer,thumb,low,src-alias,Returns the fixed RAM buffer used to stage scanline transfers
 08219278,ScanlineEffect_GetHorizontalScrollRegister,thumb,low,src-alias,Returns the selected background horizontal scroll register
 082192B4,ScanlineEffect_GetVerticalScrollRegister,thumb,low,src-alias,Returns the selected background vertical scroll register
 082192F0,ScanlineEffect_StageTransfer,thumb,low,src-alias,
+082194D4,ScanlineEffect_StopTransfer,thumb,low,decomp,Clear scanline buffer and disable pending DMA mode
 08219574,Blend_SetAlpha,thumb,low,src-alias,Selects blend targets and enables alpha blending with the supplied coefficients
+082195AC,Blend_Disable,thumb,low,decomp,Disable blending and restore default alpha and brightness registers
 082195D0,Anim_ResetDefaultFlags,thumb,low,src-alias,Clears the global halfword copied into newly loaded animations; tentative flags interpretation
 082195E0,Anim_Remove,thumb,low,src-alias,
+082195F8,Anim_RemoveAllInCurrentList,thumb,low,decomp,Unlink every animation from the selected list
 082196C4,ResourceHeader_Relocate,thumb,low,src-alias,
+082196FC,Anim_FindGlyphEntryById,thumb,low,decomp,Find a glyph resource record by its ID
 08219728,Anim_SelectWidgetGlyph,thumb,low,src-alias,
 082197A4,Anim_InitPositionedWidget,thumb,low,src-alias,
 0821980C,Anim_LoadKeyframe,thumb,low,src-alias,
@@ -9109,13 +9136,16 @@ addr,name,mode,confidence,source,notes
 08219A80,Anim_SelectPaletteBank,thumb,low,src-alias,
 08219A94,TaskSystem_UpdateRoot,thumb,low,src-alias,Root task callback registered by TaskSystem_Initialize; polls input and flips the message buffer alongside other frame services
 08219AAC,TaskSystem_Initialize,thumb,low,src-alias,
+08219B24,Input_UpdatePadStates,thumb,low,decomp,Update held pressed and released keys from hardware or synchronized link inputs
 08219BD8,String_Hash,thumb,low,src-alias,Computes a 16-bit string hash by rotating left five bits and adding each byte; callers use it as a resource key
 08219C00,Random_Next15,thumb,low,src-alias,Advances the global linear congruential generator and returns its low 15 bits
 08219C20,Heap_Initialize,thumb,low,src-alias,Initializes the heap as one free block spanning the available memory region
 08219C40,Heap_Alloc,thumb,low,src-alias,
 08219CB4,Heap_AllocFromEnd,thumb,low,src-alias,Searches heap blocks backward and allocates aligned storage from the end of a free block
 08219D38,Heap_Free,thumb,low,src-alias,
+08219DB4,Memory_FillWords,thumb,low,decomp,Fill a word count with an unrolled four-word loop
 08219DD8,Memory_Clear,thumb,low,src-alias,
+08219E44,Memory_FillBytes,thumb,low,decomp,Fill an arbitrary byte range using aligned CpuSet words and edge bytes
 08219EBC,Memory_Copy,thumb,low,src-alias,
 08219F04,BgGfx_LoadTiles,thumb,medium,coverage,"reads BG tile graphics (0x0865xxxx-0x0875xxxx, menu BG 0x0870A230)"
 08219F50,TaskSystem_InitLists,thumb,low,src-alias,Copies the initial fourteen task list records from ROM into scheduler RAM using DMA.
@@ -9126,8 +9156,10 @@ addr,name,mode,confidence,source,notes
 0821A04C,Task_SetCallbacks,thumb,low,src-alias,
 0821A054,TaskSystem_RunFrame,thumb,low,src-alias,
 0821A0C0,Task_Kill,thumb,low,src-alias,
+0821A0CC,Task_TryDestroy,thumb,low,decomp,Invoke destroy callback and mark task for deletion only when callback succeeds
 0821A0F8,TaskSystem_KillBelowPersistenceLevel,thumb,low,src-alias,Marks tasks whose byte at offset 0x16 is below the threshold for destruction; persistence level is tentative.
 0821A130,Task_FindById,thumb,low,src-alias,Searches all fourteen priority lists for a task with the requested ID.
+0821A168,Task_KillById,thumb,low,decomp,Find a task by ID and mark it for deletion or return -1
 0821A184,ResourceRegistry_AllocateEntry,thumb,low,src-alias,Returns an inactive entry or extends the entry count within its limit
 0821A1C8,ResourceRegistry_FindEntry,thumb,low,src-alias,Finds the first active registry entry with the requested ID
 0821A20C,ResourceRegistry_Initialize,thumb,low,src-alias,Resets the registry entry count during task system initialization
@@ -9227,9 +9259,17 @@ addr,name,mode,confidence,source,notes
 0821BC1C,Terrain_LoadGridResource,thumb,low,src-alias,loads a grid from a type-AE1B resource (no such archive found; unused?)
 0821BC4C,Terrain_SetGrid,thumb,low,src-alias,"HP grid -> EngineMap+4, then neighbour offsets and size"
 0821BC68,CellObject_Init,thumb,low,src-alias,
+0821BCE4,Terrain_GetCardinalDirectionToCell,thumb,low,decomp,Find a target within four cells along a cardinal neighbor direction
 0821BD48,Terrain_GetHeightAt,thumb,low,src-alias,
+0821BDD8,Terrain_GetCellFlagsAt,thumb,low,decomp,Return flags from the grid cell containing a world position
+0821BE3C,Terrain_GetHeightDifference,thumb,low,decomp,Return absolute sampled terrain height difference between two positions
+0821BF5C,Terrain_AreCellsConnected,thumb,low,decomp,Test movement between cells against surface shapes and movement kind
+0821C254,Terrain_AdjustBlockedMovement,thumb,low,decomp,Clamp or slide a blocked destination at the current cell boundary
 0821C754,Terrain_SampleSurface,thumb,low,src-alias,
+0821C884,Terrain_MovePoint,thumb,low,decomp,Add a movement delta then resolve cell boundaries and sample the surface
 0821C8F8,Terrain_MoveFootprint,thumb,low,matching,Adjusts a moving footprint against terrain corners and samples the resulting surface
+0821D178,Terrain_StepTowardCellBoundary,thumb,low,decomp,Advance a segment toward its target through the next terrain-cell edge
+0821D4F0,Terrain_IsSegmentBelowHeightLimit,thumb,low,decomp,Walk a bounded number of cell steps and reject terrain rising above the height limit
 0821D630,TerrainModifiers_InitCell,thumb,low,src-alias,Initializes a cell override with packed tile and height data plus flags
 0821D64C,TerrainModifiers_FindCellOverride,thumb,low,src-alias,Finds the highest override for a cell while excluding masked flags
 0821D698,TerrainModifiers_RegisterCell,thumb,low,src-alias,Initializes a cell override and inserts it at the terrain override list head
@@ -9251,14 +9291,21 @@ addr,name,mode,confidence,source,notes
 0821E5B8,Terrain_SetPaths,thumb,low,src-alias,HP patrol paths -> EngineMap+0x10
 0821E5C4,Route_Start,thumb,low,src-alias,
 0821E618,Route_AdvancePoint,thumb,low,src-alias,Advances and wraps the route point index then resets point state and updates its data pointer
+0821E654,Route_GetNextPoint,thumb,low,decomp,Return the next point in the route with wraparound
+0821E67C,Route_GetMovementTowardCurrentPoint,thumb,low,decomp,Compute facing and movement toward the current point within X/Z arrival bounds
 0821E748,Path_GetDefinition,thumb,low,src-alias,Returns the indexed path definition after checking the path table count
 0821E76C,Path_GetPointData,thumb,low,src-alias,Resolves a path definition's point offset relative to the terrain path resource
 0821E780,Path_GetPointPosition,thumb,low,src-alias,Copies an indexed point's XZ coordinates and computes terrain height for Y
 0821E7A0,Path_GetPointFacing,thumb,low,src-alias,Returns the point parameter byte used to derive actor facing
 0821E7AC,Path_GetPointNodeId,thumb,low,src-alias,Returns the point parameter byte stored as the actor's node ID
+0821E7B4,Path_GetPointHeightOffset,thumb,low,decomp,Read low attribute nibble as fixed-point height offset
+0821E7C4,Path_GetPointActionKind,thumb,low,decomp,Read high attribute nibble selecting arrival behavior
+0821E7D0,Route_GetCurrentPointXZ,thumb,low,decomp,Copy current point X/Z coordinates
 0821E7DC,Route_GetCurrentPointFacing,thumb,low,src-alias,Reads the facing parameter from the route's current point
 0821E7E4,Route_GetCurrentPointNodeId,thumb,low,src-alias,Reads the node ID parameter from the route's current point
 0821E7EC,Path_GetPointPositionById,thumb,low,src-alias,Resolves a path ID and point index into XYZ or clears XYZ on failure
+0821E820,Path_GetPointFacingById,thumb,low,decomp,Resolve path and point IDs to facing
+0821E840,Path_GetPointNodeIdById,thumb,low,decomp,Resolve path and point IDs to node ID
 0821E860,Path_GetPointFromScript,thumb,low,gcl-behavior,"registry 3DB8; looks up point B of path A (sub_0821E748/E76C/E780) and stores x, y, z into three script variables"
 0821E8C8,SceneActorRoute_IsOutsidePointBounds,thumb,low,src-alias,
 0821E920,Path_PickRandomPoint,thumb,low,src-alias,
@@ -9267,6 +9314,7 @@ addr,name,mode,confidence,source,notes
 0821EC84,Path_FindNearestDistantPoint,thumb,low,src-alias,
 0821EDE0,Path_SnapToRandomFarPoint,thumb,low,src-alias,
 0821EF30,Path_SnapToRandomPointInBox,thumb,low,src-alias,
+0821F0C4,Path_SelectPoint,thumb,low,decomp,Select point by distance/random/bounds mode with random fallback
 0821F180,Terrain_SetNavMeshes,thumb,low,src-alias,HP nav meshes -> EngineMap+0x14
 0821F18C,NavMesh_IsPointInsideRegion,thumb,low,src-alias,Tests fixed-point coordinates against an indexed region's half-open bounds
 0821F1C4,PairTable_Lookup,thumb,low,src-alias,
