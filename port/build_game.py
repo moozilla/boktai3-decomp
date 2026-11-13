@@ -111,7 +111,10 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     headers = OUT / 'include'
     prepare_headers(ROOT, headers, 'wasm32')
-    flags = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-O2', '-funsigned-char', '-fno-strict-aliasing',
+    # Stage 1 emits unoptimized IR (-disable-llvm-passes keeps -O2's attributes):
+    # the hooks go in before inlining, so inlined copies keep them; stage 3 optimizes.
+    flags = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-O2', '-Xclang', '-disable-llvm-passes',
+             '-funsigned-char', '-fno-strict-aliasing',
              '-fwrapv', '-fno-builtin', '-Wno-everything', '-Iport/include', '-Iport/core',
              '-Iport/game', '-Iport/hw', '-I' + str(headers), '-iquote', '.',
              '-include', 'port/core/compat.h']

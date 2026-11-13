@@ -22,6 +22,16 @@ with Centaur. Keep the battery save next to the ROM (`baserom.sav`) as usual.
 Playing the **Japanese** ROM with subtitles keeps recordings and bookmarks valid
 for the matching build; the English ROM reads better but differs in timing.
 
+## The source port instead of mGBA
+
+`python3 port/agent/play.py start` runs the decompiled game itself (compiled
+to WebAssembly, `port/agent/README.md`) and connects to the studio's link port
+like Centaur: the Live page shows its player position, story state and the text
+it fetches, and its warp, procedure, keys, poke, setvar, capture and bookmark
+commands work (bookmarks are replayed checkpoints). `play.py play` keeps it
+running; its viewer page (http://127.0.0.1:8766/) takes the keyboard. Subtitle
+overlays and recordings are mGBA-only.
+
 ## In the game window
 
 * **Subtitles**: each string the game fetches (`Text_LookupString`, `0821ADD4`)

@@ -326,20 +326,36 @@ def cmd_continue(a):
 
 def cmd_callproc(a):
     """Run a script procedure: Script_Call(id, args) at the next TaskSystem_RunFrame entry."""
-    args = [value(x) for x in a.args]
-    words = [len(args), 0x0203FF08] + args
-    # {count, ptr} then the words, in a scratch area at the top of EWRAM (as Centaur does)
-    data = struct.pack(f'<{len(words)}I', *words)
-    request({'op': 'write', 'address': 0x0203FF00, 'data': base64.b64encode(data).decode()})
-    action = {'op': 'call', 'address': address('Script_Call') if 'Script_Call' in syms()['code'] else 0x0821AD08,
-              'args': [a.id, 0x0203FF00 if args else 0]}
-    r = request({'op': 'at', 'address': address('TaskSystem_RunFrame') if 'TaskSystem_RunFrame' in syms()['code'] else 0x0821A054,
-                 'action': action})
+    r = request({'op': 'callproc', 'proc': a.id, 'args': [value(x) for x in a.args]})
     if 'error' in r:
         sys.exit(r['error'])
     print(f'proc {a.id} queued; it runs during the next frame')
     if a.frames:
         run_steps([[0, a.frames]], False, a.shot)
+
+
+def cmd_play(a):
+    """Free play at 60 fps: keys from the viewer page (or the studio) until pause."""
+    r = request({'op': 'play'})
+    if 'error' in r:
+        sys.exit(r['error'])
+    print(f'playing from frame {r["frame"]}: http://127.0.0.1:{daemon_port()}/ takes the keyboard; '
+          'play.py pause stops')
+
+
+def cmd_pause(a):
+    show_status(request({'op': 'pause'}))
+
+
+def cmd_goto(a):
+    """Put the player at world x, z (and y) through struct Player (include/player.h)."""
+    y = '' if a.y is None else f'p->position.y = {a.y};'
+    r = run_snippet(f'struct Player *p = gPlayers[0]; p->position.x = {a.x}; p->position.z = {a.z}; {y} '
+                    'p->previousPosition = p->position; print("%d %d %d\\n", p->position.x, p->position.y, p->position.z);',
+                    ['player.h'])
+    if 'error' in r:
+        sys.exit(r['error'])
+    run_steps([[0, a.frames]], False, a.shot)
 
 
 def cmd_warp(a):
@@ -425,7 +441,25 @@ def gcl():
     starts = sorted((0x08000000 + img.body + (w & 0xFFFFFF), pid + 1) for pid, w in enumerate(img.procs) if w)
     procs = {int(r['proc']): r['name'] for r in gclnames.rows('proc') if r.get('proc', '').isdigit()}
     commands = {k: r['name'] for k, r in gclnames.best('command').items()}
-    return starts, procs, commands
+    keys = gclnames.best('chara')
+
+    def operands(pc, name, limit=4):
+        """The first operands of the command at pc, registry keys named (gcx.py)."""
+        b = rom
+        q, alen = gcx.arglist(b, pc - 0x08000000 + 2)
+        end, out = q + alen, []
+        while q < end and len(out) < limit:
+            if b[q] & 0xF0 == 0x80:
+                out.append('{...}')
+                break
+            t, q = gcx.operand(b, q)
+            if q is None:
+                break
+            if gcx.KEYED.get(name) == len(out) and t.startswith('0x') and int(t, 16) in keys:
+                t = keys[int(t, 16)]['name']
+            out.append(t)
+        return ' '.join(out)
+    return starts, procs, commands, operands
 
 
 def proc_label(pid, procs):
@@ -441,7 +475,7 @@ def cmd_script(a):
     r = request({'op': 'observe', 'on': False})
     if 'error' in r:
         sys.exit(r['error'])
-    starts, procs, commands = gcl()
+    starts, procs, commands, operands = gcl()
     kinds = {address(f): what for f, (what, _) in SCRIPT_POINTS.items()}
     keys = [s[0] for s in starts]
     lines, frame = [], None
@@ -461,16 +495,76 @@ def cmd_script(a):
                 key = key - 0x10000 if key is not None and key >= 0x8000 else key
                 line = f'  inline call proc {key} (from {where})'
             else:
-                line = f'  {commands.get(key, f"cmd_{key:04X}" if key is not None else "?")}  [{where}, pc {args[0]:#x}]'
+                name = commands.get(key, f'cmd_{key:04X}' if key is not None else '?')
+                try:
+                    ops = operands(args[0], name) if 0x08000000 <= args[0] < 0x0a000000 else ''
+                except Exception:
+                    ops = ''
+                line = f'  {name} {ops}  [{where}, pc {args[0]:#x}]'
         else:
             line = f'{name_of(addr)}{tuple(hex(x) for x in args)}'
-        counts[line.split('[')[0].strip()] += 1
+        counts[line.split('  [')[0].strip()] += 1
         lines.append(line)
     out = Path(a.out or STATE / 'script.txt')
     out.write_text('\n'.join(lines) + '\n')
     print(f"{len(r['records'])} script events{' (limit reached)' if r.get('full') else ''}: {out}")
     for text, n in counts.most_common(a.summary):
         print(f'{n:6d}  {text}')
+
+
+TASKS_C = r'''
+struct TaskList *list = gTaskLists; int i;
+for (i = 0; i < 14; i++, list++) {
+    struct Task *t;
+    for (t = list->head; t; t = t->next)
+        print("%d %08x %u %x %08x %08x\n", i, (unsigned)t, t->id, t->flags,
+              (unsigned)t->update, (unsigned)t->destroy);
+}
+'''
+
+
+def cmd_tasks(a):
+    """Every task the scheduler runs (gTaskLists), with its update function."""
+    r = run_snippet(TASKS_C, ['engine.h'])
+    if 'error' in r:
+        sys.exit(r['error'])
+    rows = [l.split() for l in r.get('output', '').splitlines() if l.strip()]
+    counts = collections.Counter()
+    for prio, task, tid, flags, update, destroy in rows:
+        name = name_of(int(update, 16) & ~1) if int(update, 16) else '-'
+        counts[name] += 1
+        if not a.summary:
+            print(f'{prio:>2} {task} id {tid:>5} {"dead " if int(flags, 16) & 1 else ""}{name}')
+    if a.summary:
+        for name, n in counts.most_common():
+            print(f'{n:4d}  {name}')
+    print(f'{len(rows)} tasks')
+
+
+def cmd_sprites(a):
+    """The sprites on screen: OAM entries matched to sprite resources (studio analysis)."""
+    r = request({'op': 'capture', 'name': a.name})
+    if 'error' in r:
+        sys.exit(r['error'])
+    sys.path.insert(0, str(ROOT / 'tools'))
+    sys.path.insert(0, str(ROOT / 'tools/studio'))
+    import live
+    d = live.analyse_capture(a.name)
+    for sp in d.get('sprites', []):
+        m = sp.get('match') or []
+        what = ' '.join(str(x) for x in m) if m else 'unmatched'
+        print(f"oam {sp['oam']:3d}  x {sp['x']:4d} y {sp['y']:4d}  {sp['w']}x{sp['h']}  {what}"
+              + (f" frame {sp['frame']}" if sp.get('frame') is not None else ''))
+    print(f"{len(d.get('sprites', []))} sprites; capture {r['dir']}")
+
+
+def cmd_capture(a):
+    """Palettes, VRAM, OAM, RAM and the screen in the studio's capture format."""
+    r = request({'op': 'capture', 'name': a.name})
+    if 'error' in r:
+        sys.exit(r['error'])
+    print(r['dir'])
+    print('studio: python3 tools/studio/serve.py, then http://localhost:8642/captures (sprites and text on screen)')
 
 
 def cmd_checkpoint(a):
@@ -492,7 +586,7 @@ def cmd_sym(a):
             v = int(t, 16)
             print(f'{v:08x} {name_of(v & ~1)}' + (f" / {syms()['data_by'][v]}" if v in syms()['data_by'] else ''))
         else:
-            hits = [n for n in list(syms()['code']) + list(syms()['data']) if re.search(t, n)]
+            hits = list(dict.fromkeys(n for n in list(syms()['code']) + list(syms()['data']) if re.search(t, n)))
             for n in hits[:40]:
                 v = syms()['code'].get(n, syms()['data'].get(n))
                 print(f'{v:08x} {n}')
@@ -575,6 +669,14 @@ def main():
     p.add_argument('args', nargs='*')
     p.add_argument('--frames', type=int, default=1)
     p.add_argument('--shot', action='store_true')
+    add('play', cmd_play, 'free play at 60 fps (keys from the viewer page or studio) until pause')
+    add('pause', cmd_pause, 'stop free play')
+    p = add('goto', cmd_goto, 'move the player to world x z [y] (GameState+0x30 shows where it is)')
+    p.add_argument('x', type=int)
+    p.add_argument('z', type=int)
+    p.add_argument('y', type=int, nargs='?')
+    p.add_argument('--frames', type=int, default=2)
+    p.add_argument('--shot', action='store_true')
     p = add('warp', cmd_warp, 'go to a scene the way a door does (proc 945)')
     p.add_argument('scene', type=int)
     p.add_argument('entrance', type=int, nargs='?')
@@ -584,6 +686,12 @@ def main():
     p.add_argument('action', choices=['start', 'stop'])
     p.add_argument('--out')
     p.add_argument('--summary', type=int, default=15)
+    p = add('tasks', cmd_tasks, 'every scheduler task with its update function')
+    p.add_argument('--summary', action='store_true', help='count tasks per update function')
+    p = add('sprites', cmd_sprites, 'sprites on screen matched to sprite resources')
+    p.add_argument('--name', default='agent')
+    p = add('capture', cmd_capture, 'save a studio capture (build/centaur/captures/NAME)')
+    p.add_argument('name', nargs='?')
     p = add('checkpoint', cmd_checkpoint, 'remember this point (replayed deterministically by restore)')
     p.add_argument('name')
     p = add('restore', cmd_restore, 'go back to a checkpoint')

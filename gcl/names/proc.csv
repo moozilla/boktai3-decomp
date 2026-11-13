@@ -277,6 +277,7 @@ proc,name,params,confidence,evidence
 1823,set_script_actor_mode,mode,high,only ScriptActor_SetMode
 2292,show_counter,"slot,value,max",low,sub_08030FFC; called with money (max 999999) and counters
 2591,sealed_prison_tile_animations,,low,TileAnimation_Configure 4C08-4C0A; used by 17 Sealed Prison scenes
+2896,trinity_count_gone_scene,,medium,"played in the source port (port/agent/play.py callproc 2896 in scene 3243): a step machine on r700[0x119]; step 0 starts scene messages (SceneMessages_ScriptStart -d 28), pans to the hall and spawns a bat (proc_1691); later calls show Trinity's lines text#6045-6053 (""The Count!? Where is he!?""); scene 3243's story-55 trap reaches it through proc_2933 when gs[0x85c] == 6"
 3263,load_ancient_tree_backdrop,,low,load_background_layer 0xE954 and spawn_background_layer 0x535B; used by 42 Ancient Tree scenes
 3264,ancient_tree_backdrop_2,,low,load_background_layer 0x8F62 and spawn_background_layer 0x878D; Ancient Tree scenes
 3266,ancient_tree_tile_animations,,low,TileAnimation_Configure x4; used by Ancient Tree (19) and Dark Castle scenes

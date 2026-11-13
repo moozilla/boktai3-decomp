@@ -177,7 +177,7 @@ async function poll() {
   try { d = await fetch('/api/live').then(r => r.json()); } catch (e) { $('conn').textContent = 'studio offline'; $('conn').className = 'pill'; return; }
   last = d;
   const st = d.state || {};
-  $('conn').textContent = d.connected ? `mGBA connected · frame ${st.frame ?? '?'}` : 'waiting for mGBA';
+  $('conn').textContent = d.connected ? `${d.hello?.port ? 'source port' : 'mGBA'} connected · frame ${st.frame ?? '?'}` : 'waiting for mGBA';
   $('conn').className = 'pill' + (d.connected ? ' on' : '');
   $('howto').hidden = d.connected;
   $('rec').hidden = !st.rec;

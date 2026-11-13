@@ -66,7 +66,9 @@ enemies, areas and the Studio World page) · [DATA](DATA.md) (decoded data
 formats) · `data/` (registry, charmap, items, notes).
 
 **Tools and infrastructure.** [CENTAUR](CENTAUR.md) (mGBA script, Studio link,
-stage survey) · [PROGRESS_CI](PROGRESS_CI.md) · `tools/studio/` · `tools/` docstrings
+stage survey) · [port/agent](../port/agent/README.md) (play and probe the source
+port: breakpoints, call and script traces, C snippets in the live game) ·
+[PROGRESS_CI](PROGRESS_CI.md) · `tools/studio/` · `tools/` docstrings
 (`python3 tools/X.py -h`).
 
 **History and process.** [history/](history/README.md) (dated handoff entries,

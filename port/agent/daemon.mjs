@@ -11,6 +11,7 @@
 //   node port/agent/daemon.mjs [--port 8766] [--save F.sav] [--time ISO] [--solar N]
 import fs from 'node:fs';
 import http from 'node:http';
+import net from 'node:net';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { Worker, isMainThread, parentPort, workerData, receiveMessageOnPort, MessageChannel } from 'node:worker_threads';
@@ -73,6 +74,7 @@ function main() {
   let lastStatus = {};
   worker.on('message', (m) => {
     if (m.type === 'screen') { screen = m.rgba; screenPng = null; return; }
+    if (m.type === 'link') { studioSend(m.event); return; }
     if (m.type === 'reply') {
       const p = pending.get(m.id);
       if (p) { pending.delete(m.id); p(m.result); }
@@ -88,6 +90,48 @@ function main() {
     Atomics.store(ctl, 0, 1);
     Atomics.notify(ctl, 0);
   });
+
+  // Studio link: connect to the studio's Centaur port (tools/studio/live.py)
+  // and speak its protocol, so the Live page works with the port.
+  const linkPort = Number(process.env.CENTAUR_LINK_PORT || args['link-port'] || 8643);
+  let studio = null, studioBuf = '';
+  function studioSend(e) { if (studio) studio.write(JSON.stringify(e) + '\n'); }
+  const fire = (cmd) => send(cmd).then((r) => { if (r && r.error) studioSend({ t: 'error', error: r.error }); return r; });
+  const BUTTON = { A: 0, B: 1, SELECT: 2, START: 3, RIGHT: 4, LEFT: 5, UP: 6, DOWN: 7, R: 8, L: 9 };
+  const STUDIO = {
+    warp: (c) => c.entrance === undefined ? studioSend({ t: 'error', error: 'port warp needs an entrance' })
+      : fire({ op: 'callproc', proc: 945, args: [c.scene, c.entrance, 0] }),
+    callproc: (c) => fire({ op: 'callproc', proc: c.id, args: c.args || [] }),
+    keys: (c) => fire({ op: 'tap', mask: String(c.keys || '').toUpperCase().split(/[+ ]/).reduce((m, k) => m | (k in BUTTON ? 1 << BUTTON[k] : 0), 0), frames: c.frames || 2 }),
+    poke: (c) => { const b = Buffer.alloc(c.size || 4); b.writeUIntLE(c.value >>> 0 & (2 ** (8 * (c.size || 4)) - 1), 0, c.size || 4); fire({ op: 'write', address: c.addr, data: b.toString('base64') }); },
+    vars: (c) => fire({ op: 'vars', list: c.list || [] }).then((r) => r && !r.error && studioSend(r)),
+    setvar: (c) => fire({ op: 'setvar', r: c.r, o: c.o, t: c.t, b: c.b, value: c.value }).then((r) => r && !r.error && studioSend(r)),
+    bookmarks: () => fire({ op: 'checkpoints' }).then((r) => studioSend({ t: 'bookmarks', list: (r.checkpoints || []).map((x) => ({ name: x.name, frame: x.frame })) })),
+    bookmark: (c) => fire({ op: 'checkpoint', name: c.name }),
+    load: (c) => fire({ op: 'restore', name: c.name }),
+    capture: (c) => fire({ op: 'capture', name: c.name }),
+    eval: () => studioSend({ t: 'eval', result: 'the port runs C, not Lua: python3 port/agent/play.py c ...' }),
+  };
+  function connectStudio() {
+    if (studio || args['no-link']) return;
+    const sock = net.connect(linkPort, '127.0.0.1');
+    sock.on('connect', () => {
+      studio = sock;
+      studioSend({ t: 'hello', title: 'BOKTAI3 source port', frame: lastStatus.frame || 0, bp: true, canvas: false, port: true });
+      fire({ op: 'link', on: true });
+    });
+    sock.on('data', (d) => {
+      studioBuf += d.toString();
+      let i;
+      while ((i = studioBuf.indexOf('\n')) >= 0) {
+        const line = studioBuf.slice(0, i); studioBuf = studioBuf.slice(i + 1);
+        try { const c = JSON.parse(line); if (STUDIO[c.c]) STUDIO[c.c](c); } catch (e) { /* ignore */ }
+      }
+    });
+    sock.on('error', () => {});
+    sock.on('close', () => { if (studio === sock) { studio = null; fire({ op: 'link', on: false }); } });
+  }
+  setInterval(connectStudio, 2000).unref();
 
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x');
@@ -131,7 +175,12 @@ const VIEWER = `<!doctype html><meta charset="utf-8"><title>Boktai 3 agent view<
 img{width:720px;max-width:100%;image-rendering:pixelated;display:block;background:#000;border-radius:4px}
 #s{margin-top:8px;white-space:pre-wrap;color:#9a9890}</style>
 <img id="i" alt="game screen"><div id="s"></div>
+<p>Keys (while playing: <code>play.py play</code>): arrows, X = A, Z = B, A = L, S = R, Enter = Start, Backspace = Select</p>
 <script>
+const K={KeyX:0,KeyZ:1,Backspace:2,Enter:3,ArrowRight:4,ArrowLeft:5,ArrowUp:6,ArrowDown:7,KeyS:8,KeyA:9};let mask=0;
+function sendKeys(){fetch('/cmd',{method:'POST',body:JSON.stringify({op:'setkeys',mask})})}
+addEventListener('keydown',e=>{if(e.code in K){mask|=1<<K[e.code];sendKeys();e.preventDefault()}});
+addEventListener('keyup',e=>{if(e.code in K){mask&=~(1<<K[e.code]);sendKeys();e.preventDefault()}});
 async function tick(){
   const i=new Image(); i.onload=()=>{document.getElementById('i').src=i.src}; i.src='/screen.png?'+Date.now();
   try{const s=await (await fetch('/status.json')).json(); document.getElementById('s').textContent=JSON.stringify(s,null,1)}catch(e){}
@@ -160,6 +209,12 @@ function gameWorker() {
   const observers = new Map(); // address -> [[arg, offset, length]...]: record each entry, keep going
   let observed = [];
   const OBSERVE_LIMIT = 200000;
+  // Free play (op 'play'): paced to 59.73 fps, keys from the viewer or studio.
+  let liveKeys = 0, playStart = 0, playFrame = 0, played = false;
+  const taps = [];          // [mask, frames] presses queued by the studio
+  // Studio link (Centaur protocol, docs/CENTAUR.md): events go to the main thread.
+  let link = false, storyVars = [];
+  const TEXT_LOOKUP = 0x0821ADD4, RUN_FRAME = 0x0821A054, SCRIPT_CALL = 0x0821AD08, SCRATCH = 0x0203FF00;
   let log = [];             // commands that change the game, for checkpoints
   const checkpoints = new Map();
   let currentSave = workerData.save ? fs.readFileSync(workerData.save) : null;
@@ -185,7 +240,8 @@ function gameWorker() {
     for (const [addr, b] of breaks) f[flags + flagIndex(addr)] = (b.enter ? 1 : 0) | (b.exit ? 2 : 0);
     for (const addr of actions.keys()) f[flags + flagIndex(addr)] |= 1;
     for (const addr of observers.keys()) f[flags + flagIndex(addr)] |= 1;
-    hs('active', breaks.size || actions.size || observers.size || hs('tracing') ? 1 : 0);
+    if (link) f[flags + flagIndex(TEXT_LOOKUP)] |= 1;
+    hs('active', breaks.size || actions.size || observers.size || link || hs('tracing') ? 1 : 0);
   }
 
   function postScreen(force) {
@@ -214,7 +270,18 @@ function gameWorker() {
       frameNo = n + 1;
       lastPixels = ptr;
       if (serving) return keys; // a function called from a command waited for VBlank
+      if (link) linkFrame();
       if (Atomics.load(ctl, 1)) { Atomics.store(ctl, 1, 0); if (run) run.interrupted = true, run.left = 0, run.index = run.steps.length; }
+      if (run) {
+        drainInline();
+        if (run && run.play) {
+          pace();
+          keys = liveKeys | (taps.length ? taps[0][0] : 0);
+          if (taps.length && --taps[0][1] <= 0) taps.shift();
+          postScreen(false);
+          return keys;
+        }
+      }
       if (run) {
         while (run.left === 0 && run.index < run.steps.length) {
           [keys, run.left] = run.steps[run.index++];
@@ -234,16 +301,10 @@ function gameWorker() {
       return keys;
     },
     hook(kind, address) {
-      if (serving) return;
-      const queued = actions.get(address);
-      if (kind === 1 && queued) {
-        actions.delete(address);
-        refreshFlags();
-        for (const cmd of queued) {
-          const result = execute(cmd);
-          if (cmd.id) reply(cmd.id, result);
-        }
-      }
+      // Observation and the studio's text events also see game code that
+      // commands run (callproc, traced snippets); stops and actions do not.
+      if (link && kind === 1 && address === TEXT_LOOKUP)
+        linkEvent({ t: 'text', id: dv().getUint32(hookState + 4 * S.args, true), frame: frameNo, scene: status().scene });
       const peeks = kind === 1 && observers.get(address);
       if (peeks && observed.length < OBSERVE_LIMIT) {
         const d = dv();
@@ -254,6 +315,16 @@ function gameWorker() {
           return at >= 0x02000000 && at + len <= 0x0a000000 ? Buffer.from(u8().slice(at, at + len)).toString('hex') : null;
         });
         observed.push([frameNo, address, args, bytes]);
+      }
+      if (serving) return;
+      const queued = actions.get(address);
+      if (kind === 1 && queued) {
+        actions.delete(address);
+        refreshFlags();
+        for (const cmd of queued) {
+          const result = execute(cmd);
+          if (cmd.id) reply(cmd.id, result);
+        }
       }
       const b = breaks.get(address);
       if (!b || !(kind === 1 ? b.enter : b.exit)) return;
@@ -270,6 +341,99 @@ function gameWorker() {
     fatal(msg, value) { output.push(`[fatal] ${cstr(msg)} 0x${(value >>> 0).toString(16)}`); },
   } };
   function cstr(p) { const b = u8(); let e = p; while (b[e]) e++; return Buffer.from(b.slice(p, e)).toString(); }
+
+  function pace() {
+    const FRAME_MS = 1000 / (16777216 / 280896);
+    const now = performance.now();
+    const due = playStart + (++playFrame) * FRAME_MS;
+    if (due - now > 100 || now - due > 100) { playStart = now; playFrame = 0; }
+    else if (due > now) Atomics.wait(ctl, 2, 0, due - now);
+  }
+
+  // Commands that arrive while the game runs are handled between frames.
+  function drainInline() {
+    let m;
+    while ((m = receiveMessageOnPort(commandPort))) {
+      const cmd = m.message;
+      if (cmd.op === 'restart' || cmd.op === 'restore') throw new Restart(JSON.stringify(cmd));
+      if (cmd.op === 'pause') {
+        if (run) { run.left = 0; run.index = run.steps.length; run.play = false; run.id = cmd.id; }
+        else reply(cmd.id, status());
+        continue;
+      }
+      if (cmd.op === 'run' || cmd.op === 'continue' || cmd.op === 'play') { reply(cmd.id, { error: 'running; pause first' }); continue; }
+      reply(cmd.id, execute(cmd));
+    }
+  }
+
+  function linkEvent(e) { parentPort.postMessage({ type: 'link', event: e }); }
+
+  function readVar(v) {
+    const base = { r700: 0x02000700, r708: 0x02000708, gs: 0x02000710 }[v.r];
+    const d = dv();
+    const p = base && d.getUint32(base, true);
+    if (!p || p < 0x02000000 || p >= 0x02040000) return null;
+    const a = p + v.o;
+    if (v.t === 4) return (d.getUint8(a + ((v.b || 0) >> 3)) >> ((v.b || 0) & 7)) & 1;
+    if (v.t === 2 || v.t === 3) return d.getUint8(a);
+    if (v.t === 8) return d.getUint32(a, true) & 0xffffff;
+    if (v.t === 9) return d.getUint32(a, true);
+    return v.t === 1 ? d.getInt16(a, true) : d.getUint16(a, true);
+  }
+
+  function writeVar(v, value) {
+    const base = { r700: 0x02000700, r708: 0x02000708, gs: 0x02000710 }[v.r];
+    const d = dv();
+    const p = base && d.getUint32(base, true);
+    if (!p || p < 0x02000000 || p >= 0x02040000) throw new Error('script variables not set up');
+    const a = p + v.o;
+    if (v.t === 4) {
+      const q = a + ((v.b || 0) >> 3), m = 1 << ((v.b || 0) & 7);
+      d.setUint8(q, value ? d.getUint8(q) | m : d.getUint8(q) & ~m);
+    } else if (v.t === 2 || v.t === 3) d.setUint8(a, value);
+    else if (v.t === 8) d.setUint32(a, (d.getUint32(a, true) & 0xff000000) | (value & 0xffffff), true);
+    else if (v.t === 9) d.setUint32(a, value >>> 0, true);
+    else d.setUint16(a, value & 0xffff, true);
+  }
+
+  function story() {
+    const m = { t: 'story', frame: frameNo, progress: readVar({ r: 'r708', o: 0x3c, t: 1 }),
+      entrance: readVar({ r: 'r708', o: 0x70, t: 1 }), scene: status().scene, flags: [], vars: [] };
+    for (let k = 0; k < 5; k++) m.flags.push(readVar({ r: 'gs', o: 0x720 + 4 * k, t: 9 }) ?? false);
+    for (const v of storyVars) m.vars.push(readVar(v) ?? false);
+    return m;
+  }
+
+  function linkFrame() {
+    if (frameNo % 6 === 0) {
+      const st = status();
+      const d = dv();
+      linkEvent({ t: 'player', frame: frameNo, scene: st.scene, ...(st.player || {}),
+        cx: d.getUint16(0x03004cb0, true), cy: d.getUint16(0x03004cb2, true) });
+    }
+    if (frameNo % 20 === 0) linkEvent(story());
+    if (frameNo % 30 === 0) {
+      const st = status();
+      linkEvent({ t: 'state', frame: frameNo, scene: st.scene, life: st.life, port: true,
+        running: !!(run && run.play), stop: st.stop });
+    }
+  }
+
+  // Script_Call(id, args) at the next TaskSystem_RunFrame entry (as Centaur's callproc).
+  function callproc(id, args) {
+    let argp = 0;
+    if (args && args.length) {
+      const d = dv();
+      d.setUint32(SCRATCH, args.length, true);
+      d.setUint32(SCRATCH + 4, SCRATCH + 8, true);
+      args.forEach((v, i) => d.setUint32(SCRATCH + 8 + 4 * i, v >>> 0, true));
+      argp = SCRATCH;
+    }
+    const list = actions.get(RUN_FRAME) || [];
+    list.push({ op: 'call', address: SCRIPT_CALL, args: [id, argp], trace: true, id: null });
+    actions.set(RUN_FRAME, list);
+    refreshFlags();
+  }
 
   function reply(id, result) {
     if (id && !replaying) parentPort.postMessage({ type: 'reply', id, result });
@@ -303,6 +467,15 @@ function gameWorker() {
           startRun(cmd); // commands sent after it wait for the next stop
           return;
         }
+        if (cmd.op === 'play') {
+          // runs until 'pause' or an interrupt; frames played are not replayable
+          played = true;
+          run = { id: null, steps: [], index: 0, left: 0, play: true };
+          playStart = performance.now(); playFrame = 0;
+          stop = null;
+          reply(cmd.id, { playing: true, frame: frameNo });
+          return;
+        }
         if (cmd.op === 'restart' || cmd.op === 'restore') throw new Restart(JSON.stringify(cmd));
         reply(cmd.id, execute(cmd));
       }
@@ -326,7 +499,7 @@ function gameWorker() {
   }
 
   // Commands that run while the game is stopped. Mutations are logged for checkpoints.
-  const MUTATING = new Set(['write', 'call', 'snippet', 'at', 'break', 'clear']);
+  const MUTATING = new Set(['write', 'call', 'snippet', 'at', 'break', 'clear', 'callproc', 'setvar']);
   function execute(cmd) {
     const saved = { suspend: hs('suspend') };
     serving = true;
@@ -427,6 +600,7 @@ function gameWorker() {
         return { path: cmd.path };
       }
       case 'checkpoint': {
+        if (played) throw new Error('free play since the last restart cannot be replayed; checkpoint before play');
         checkpoints.set(cmd.name, { log: log.slice(), save: currentSave, frame: frameNo });
         return { checkpoint: cmd.name, frame: frameNo, commands: log.length };
       }
@@ -445,6 +619,29 @@ function gameWorker() {
         observed = [];
         return { records, full: records.length >= OBSERVE_LIMIT };
       }
+      case 'callproc': callproc(cmd.proc, cmd.args || []); return { queued: true };
+      case 'capture': {
+        // Centaur's capture layout (docs/CENTAUR.md), read by the studio's Captures page
+        const name = String(cmd.name || 'cap' + frameNo).replace(/[^\w-]/g, '_');
+        const dir = path.join(ROOT, 'build/centaur/captures', name);
+        fs.mkdirSync(dir, { recursive: true });
+        const regions = { pal: [0x05000000, 0x400], vram: [0x06000000, 0x18000], oam: [0x07000000, 0x400],
+          io: [0x04000000, 0x60], ewram: [0x02000000, 0x40000], iwram: [0x03000000, 0x8000] };
+        for (const [k, [a, n]] of Object.entries(regions)) fs.writeFileSync(path.join(dir, k + '.bin'), u8().slice(a, a + n));
+        if (lastPixels) fs.writeFileSync(path.join(dir, 'screen.png'), png(rgba555(new Uint16Array(mem.buffer, lastPixels, 240 * 160)), 240, 160));
+        const st = status();
+        fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify({ frame: frameNo, scene: st.scene, onscreen: [],
+          source: 'port', time: new Date().toISOString().replace('T', ' ').slice(0, 19) }));
+        if (link) linkEvent({ t: 'capture', name, dir });
+        return { name, dir };
+      }
+      case 'setkeys': liveKeys = cmd.mask >>> 0; return { ok: true };
+      case 'tap': taps.push([cmd.mask >>> 0, cmd.frames || 2], [0, 8]); return { ok: true };
+      case 'link': link = !!cmd.on; refreshFlags(); return { link };
+      case 'vars': storyVars = cmd.list || []; return story();
+      case 'setvar': writeVar(cmd, cmd.value); return story();
+      case 'story': return story();
+      case 'pause': return status();
       case 'checkpoints':
         return { checkpoints: [...checkpoints].map(([name, c]) => ({ name, frame: c.frame, commands: c.log.length })) };
       default:
@@ -468,7 +665,7 @@ function gameWorker() {
       u8().set(currentSave, ex.port_game_save_stage());
       saveSize = currentSave.length;
     }
-    frameNo = 0; lastPixels = 0; keys = 0; run = null; stop = { reason: 'start' };
+    frameNo = 0; lastPixels = 0; keys = 0; run = null; stop = { reason: 'start' }; played = false;
     breaks.clear(); actions.clear();
     return saveSize;
   }
