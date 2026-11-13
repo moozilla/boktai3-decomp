@@ -6460,6 +6460,8 @@ addr,name,mode,confidence,source,notes
 081791E0,Hud_CreateStandardLayout,thumb,low,src-alias,Creates the singleton HUD task using the standard initializer
 0817923C,Hud_CreateAlternateLayout,thumb,low,src-alias,Creates the singleton HUD task using the alternate initializer
 08179298,Hud_Create,thumb,low,src-alias,
+081792F8,FieldHud_OnUnusedUpdate,thumb,low,src-alias,Tentative unused update hook following HUD creation
+081792FC,FieldHud_OnUnusedCleanup,thumb,low,src-alias,Tentative unused cleanup hook following HUD creation
 08179300,Background_GetWrappedTileEntry,thumb,low,src-alias,Returns a background tilemap entry with both coordinates wrapped to 32 tiles
 08179320,FieldHud_UpdateGaugePalette,thumb,low,src-alias,
 081793D0,FieldHud_RefreshGaugeIndex,thumb,low,src-alias,

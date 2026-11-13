@@ -8,6 +8,7 @@
 #include "scene_value_equipment.h"
 #include "contact_swarm_sprite.h"
 #include "render.h"
+#include "field_hud_widgets.h"
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
@@ -105,7 +106,8 @@ struct SceneHudState {
     u16 healthMeterBlinkTimer;                      /* 0xA60 */
     u16 energyMeterBlinkTimer; /* 0xA62: advances while the energy meter flashes */
     u16 meterPulseFrame;       /* 0xA64: 60-frame HUD meter pulse */
-    u8 unknownA66[6];
+    u16 fieldValueMode;    /* 0xA66 */
+    u16 *fieldValueSource; /* 0xA68 */
     u8 playerValueEnabled, unknownA6D;
     u16 timedStateParameter;                            /* 0xA6E: sixth argument to 081781B4 */
     u16 timedStateStart;                                /* 0xA70: negative input clamps to zero */
@@ -262,11 +264,8 @@ struct SceneHudState {
     s8 navigationDestinations[4]; /* -1 when there is no displayed link. */
     u8 unknown490C[0x10];
     u16 currentMapPage; /* 0x491C */
-    u8 unknown491E[0x4988 - 0x491E];
-    struct SceneInputWidget ownerWidgets[2]; /* 0x4988: removed by owner destructor */
-    u8 unknown4A48[0x28];
-    struct SceneInputWidget ownerAuxWidgets[6]; /* 0x4A70 */
-    u8 unknown4CB0[0x28];
+    u8 unknown491E[0xE];
+    struct FieldHudWidgets fieldWidgets; /* 0x492C */
     u8 initializationFlag; /* 0x4CD8: cleared by both initializers */
     u8 unknown4CD9[0x4D80 - 0x4CD9];
     s8 categoryEntrySlots[8]; /* 0x4D80 */

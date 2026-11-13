@@ -48,10 +48,7 @@ struct SceneGroundManager {
     const struct SpriteEffectTileResource *resource;
     struct SceneGroundEffect *head;
 };
-struct SceneArcCamera {
-    u8 unknown0[0x44];
-    s32 x;
-};
+#include "scene_camera.h"
 struct SceneArcPackedVector {
     s32 x : 16, y : 16, z : 16;
 };

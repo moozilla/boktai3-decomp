@@ -5,7 +5,6 @@
 struct AnimationHeader {
     u32 words[8];
 };
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 
 void sub_0813FE30(struct Player *p)
 {
