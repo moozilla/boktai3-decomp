@@ -5,4 +5,8 @@
  * The resolver supplied by the game link must return portable C IRQ handlers. */
 void port_devices_init(PortIrqHandler (*resolve)(void *, uint32_t), void *context);
 void port_devices_set_time(int64_t unix_seconds);
+/* Optional renderer receives visible lines before HBlank and register writes. */
+void port_devices_set_renderer(void (*line)(void *, unsigned),
+                               void (*write)(void *, unsigned, unsigned), void *context);
+void port_devices_notify_write(uint32_t address, unsigned width);
 #endif

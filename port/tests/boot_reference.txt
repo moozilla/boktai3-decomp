@@ -5,3 +5,4 @@ probe clock_clear 082284F4
 probe counter_init 08224EEC
 wait 1
 dump clock_frame1 03005430:24
+shot boot_frame1

@@ -154,3 +154,9 @@ veneers. The remaining full-link dependencies are MP2K's handwritten sequence
 routines (including `MPlayMain`, `TrackStop` and several event handlers), alongside
 the call-signature cleanup and ROM function-pointer translation still required
 for full execution. No fallback bodies are supplied for those routines.
+
+With `--ppu-root ../cx-port-ppu/port` and `--mmio`, the slice routes visible
+scanlines to the sibling C PPU. `run_boot.py --ppu-root ../cx-port-ppu/port`
+checks the first forced-blank frame against mGBA in RGB555. This is the initial
+white frame, not a gameplay boot. CPU MMIO writes notify the affine renderer;
+DMA writes to affine registers still need a device notification interface.

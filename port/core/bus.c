@@ -1,5 +1,6 @@
 #include "platform.h"
 #include "hw.h"
+#include "devices.h"
 
 static int is_device(uintptr_t address)
 {
@@ -39,6 +40,7 @@ void port_bus_store_i8(volatile void *p, uint8_t value)
     uintptr_t address = (uintptr_t)p;
     if (hw && is_device(address)) hw_write8(hw, (uint32_t)address, value);
     else *(volatile uint8_t *)p = value;
+    port_devices_notify_write((uint32_t)address, 1);
 }
 void port_bus_store_i16(volatile void *p, uint16_t value)
 {
@@ -46,6 +48,7 @@ void port_bus_store_i16(volatile void *p, uint16_t value)
     uintptr_t address = (uintptr_t)p;
     if (hw && is_device(address)) hw_write16(hw, (uint32_t)address, value);
     else *(volatile uint16_t *)p = value;
+    port_devices_notify_write((uint32_t)address, 2);
 }
 void port_bus_store_i32(volatile void *p, uint32_t value)
 {
@@ -53,6 +56,7 @@ void port_bus_store_i32(volatile void *p, uint32_t value)
     uintptr_t address = (uintptr_t)p;
     if (hw && is_device(address)) hw_write32(hw, (uint32_t)address, value);
     else *(volatile uint32_t *)p = value;
+    port_devices_notify_write((uint32_t)address, 4);
 }
 void port_bus_store_ptr(volatile void *p, const void *value)
 {

@@ -48,8 +48,20 @@ const assert = require('assert');
   }
   e.SceneLifecycle_InitFrameCounterPointer();
   assert.strictEqual(words.getUint32(0x030053f8, true), 0x030025c0);
+  if (e.port_video_init) {
+    assert.strictEqual(e.port_video_init(), 0);
+    words.setUint16(0x04000000, 0x80, true); // BIOS forced blank at frame 1.
+  }
   e.port_timing_reset();
   assert.strictEqual(e.port_run_frame(), 0);
   assert.strictEqual(e.port_frame_count(), 1n);
+  if (e.port_video_framebuffer) {
+    const address = e.port_video_framebuffer();
+    const frame = Buffer.from(bytes.slice(address, address + 240 * 160 * 2));
+    for (let offset = 0; offset < frame.length; offset += 2)
+      assert.strictEqual(frame.readUInt16LE(offset), 0x7fff);
+    fs.writeFileSync(dumpPath + '.rgb555', frame);
+    console.log('wasm PPU: 160 visible lines rendered through core/device hooks PASS');
+  }
   console.log('wasm boot: original game RTC/clock/memory C, IWRAM copy and full frame PASS');
 })().catch(error => { console.error(error); process.exit(1); });

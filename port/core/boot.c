@@ -16,6 +16,8 @@ int port_boot_early(void)
     cookie0 = *(uint32_t *)(uintptr_t)0x0201f400;
     cookie1 = *(uint32_t *)(uintptr_t)0x0201f404;
     *(uint16_t *)(uintptr_t)0x04000204 = 0x4014;
+    /* RegisterRamReset always enables forced blank, including flag 1. */
+    *(uint16_t *)(uintptr_t)0x04000000 = 0x80;
     ewram = (uint32_t *)(uintptr_t)PORT_EWRAM_BASE;
     for (i = 0; i < PORT_EWRAM_SIZE / 4; ++i) ewram[i] = 0;
     *(uint32_t *)(uintptr_t)0x0201f400 = cookie0;

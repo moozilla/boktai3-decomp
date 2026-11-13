@@ -58,6 +58,11 @@ def build_slice(root, args):
         units += ['port/core/bus.c', 'port/core/devices.c', 'src/fn/sub_08213D10.c']
         units += [str(p) for p in sorted((hardware / 'hw').glob('*.c')) if p != bios]
         exports += ['port_devices_init', 'InterruptsAndVideo_Initialize']
+    if args.ppu_root:
+        ppu = Path(args.ppu_root).resolve()
+        flags += ['-I' + str(ppu / 'include')]
+        units += ['port/core/video.c', str(ppu / 'ppu/ppu.c')]
+        exports += ['port_video_init', 'port_video_framebuffer']
     for name in units:
         source = root / name
         key = name.replace('/', '_').replace('\\', '_').lstrip('_')
@@ -66,7 +71,7 @@ def build_slice(root, args):
         ir = out / (key + '.ll')
         subprocess.run([args.cc, *flags, '-S', '-emit-llvm', str(prepared), '-o', str(ir)], check=True)
         text, resolved, unresolved = bind_ir(ir.read_text(), addresses)
-        bindings[name if not source.is_absolute() or source.is_relative_to(root) else 'port/hw/' + source.name] = {
+        bindings[name if not source.is_absolute() or source.is_relative_to(root) else 'port/external/' + source.name] = {
             'resolved': resolved, 'unresolved': unresolved}
         if args.mmio and name.startswith('src/'):
             text, metrics = instrument_mmio(text)

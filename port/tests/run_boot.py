@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--rom', default='baserom.gba')
     parser.add_argument('--hardware-root')
+    parser.add_argument('--ppu-root', help='also render and compare the first frame in RGB555')
     parser.add_argument('--no-reference', action='store_true', help='skip optional mGBA comparison')
     args = parser.parse_args()
     os.chdir(ROOT)
@@ -21,7 +22,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     extra = ['--hardware-root', args.hardware_root] if args.hardware_root else []
     for target in ('host', 'wasm32'):
-        subprocess.run([sys.executable, 'port/build.py', '--slice', '--target', target, *extra, *(['--mmio'] if target == 'wasm32' else [])], check=True)
+        subprocess.run([sys.executable, 'port/build.py', '--slice', '--target', target, *extra, *(['--mmio', *(['--ppu-root', args.ppu_root] if args.ppu_root else [])] if target == 'wasm32' else [])], check=True)
     subprocess.run(['build/port/slice-host/boot_test', args.rom, str(out / 'native_clock.bin')], check=True)
     subprocess.run(['node', 'port/tests/boot_wasm.js', 'build/port/slice-wasm32/boot.wasm',
                     args.rom, str(out / 'wasm_clock.bin')], check=True)
@@ -39,6 +40,13 @@ def main():
         trace = (reference / 'probes.tsv').read_text()
         assert '\tclock_clear\t082284F4\t' in trace
         reference_checked = True
+        if args.ppu_root:
+            ppm = (reference / 'boot_frame1.ppm').read_bytes().split(b'\n', 3)[3]
+            expected = bytearray()
+            for r, g, b in zip(ppm[0::3], ppm[1::3], ppm[2::3]):
+                expected += ((r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10)).to_bytes(2, 'little')
+            assert bytes(expected) == (out / 'wasm_clock.bin.rgb555').read_bytes()
+            print('mGBA frame 1: RGB555 framebuffer matches the integrated wasm PPU')
         print('mGBA frame 1: 03005430:24 matches native and wasm game C')
     (out / 'result.json').write_text(json.dumps({'native': 'pass', 'wasm32': 'pass',
         'mgba_frame_1': 'pass' if reference_checked else 'skipped',
