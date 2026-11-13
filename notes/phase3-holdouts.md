@@ -3769,9 +3769,32 @@ r0 one-pin influences allocation outside its lexical block; a returning inline m
 produce the needed hard-return-register liveness without any pin, unlike the simple
 QueueCollider helper tried so far. Preserve the observed first-slot flags test.
 
-### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): partial
+QueueColliders follow-up: the halfword union form that resolved RisingActor
+removes the initial barrier only at a cost of 4/4 register differences with the
+other concessions retained. Combine folds the initial word copy directly to
+scheduled = 0, and similarly folds the final stride; reload chooses r0 for both
+constants, while the ROM uses r7. The same form with all concessions removed
+gives 38/32. Initializing the index from the union word gives 8/8; initializing
+the stride through halves gives 1/9 with extra partial-write instructions, and
+doing the mask through halves as well gives 7/25. A one-halfword array gives
+12/14 and hoists the mask, reproducing the earlier loop obstacle. No further
+partial matched. Best saved pin-free draft remains unchanged.
+
+### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): resolved
 
 Tags: #matching #phase3 #presentation #081E2910
+
+Resolved on follow-up: a phase scratch union holds the destination pointer in
+the moving branches and the visibility mask in the blinking branch. Their
+combined conflicts select r3 for every required destination without a pin.
+The blink branch computes Div first, sets visibilityMask to 1, then uses that
+member for the parity test and flag sets. Its flag clears remain constant
+`&= ~1`: using the complement of the union member instead selects BIC and
+changes both local allocation and instruction shape (28/24). With constant
+clears, scope and independent stock check MATCH all 576 bytes. Removed unused
+function declarations. Persistent store: Presentation_UpdateDropShakeBlink-resumed,
+node phase-scratch. The following preserves the earlier partial and search.
+
 
 Removed the random-table pin; three destination pins remain. A separate do/while
 block around the index update raises mask references while the existing sample
@@ -3800,9 +3823,31 @@ Next: produce the r2 conflict without forcing the late zero store to retain the
 shared destination, perhaps by separating its caller value from the store helper's
 argument class. The knob proves the sole remaining decision on the saved draft.
 
-### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): partial
+Presentation follow-up: independent pin removal still fails for all three sites.
+Sharing the destination with the initial -30 store gives 11/16 differences;
+sharing it with the late zero store and expressing the address through x plus
+one element retains 2/4. A local target copy followed by clearing the shared
+pointer gives 12/14. Clearing the pointer after the late store, directly or
+through the inline setter, still gives 2/4; clearing it after the three moving
+stores leaves 6/6. These do not change the saved best draft or the diagnosis:
+the late zero's r2 conflict gives the right earlier allocation but ties its own
+address to r3, preventing reuse of the x address in r0.
+
+### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): resolved
 
 Tags: #matching #phase3 #presentation #081FDAF4
+
+Resolved on follow-up: initialize both s16 halves of a union containing an s32
+word, then assign the word to lowered. The partial writes keep the word live
+from entry through the initial argument/scale registers when flow runs;
+combine subsequently folds them into one zero set. Allocation chooses r4
+naturally. A scalar union assignment or initializer still gives 5/3, while
+the halfword form gives 1/1 if the function returns the union word (a move
+from r4 instead of the ROM's zero immediate). Keeping `return 0` matches all
+76 bytes in scope and the independent stock check, with zero concessions.
+The shared component pointer from the earlier partial remains. Persistent
+store: RisingActor_AdvanceHeight-resumed, node halfword-zero. Earlier evidence:
+
 
 Removed the state pointer pin by sharing a void component pointer between the
 volley and collider field views. The remaining zero pin still selects r4.
@@ -3856,9 +3901,40 @@ Store: `build/matchsearch/sub_081FDCB0`, distance-boundary. Next: preserve the
 inline distance-return join that prevents CSE following, while eliminating its
 boolean materialization; keep the source reset when recovering original load order.
 
-### HomingProjectile_UpdateDefaultState (081FF454): partial
+Homing-trail follow-up: a single-iteration guard loop restores all missing
+memory reloads without materializing the predicate, but frontend loop rotation
+moves the second half of the distance test to the function tail: 16/16, same
+272-byte extent, shape 28. Replacing breaks with gotos loses the reload boundary
+again (36/30); an early retirement return changes layout more (23/25). The
+negated near predicate gives 5/9 against the saved far predicate's 4/8. Initializing
+a velocity struct or union retains extra stack stores and gives 26/30; removing
+the initializer returns to 36/30. Union age access and clearing dx/dz do not
+recover the reloads; reusing dx/dz for steering arguments gives 38/36. A fresh
+probe of the plain guard form found no single CSE/PRE knob that changes the count.
+Next: preserve the guard loop's CSE boundary while stopping rotation at the right
+point, or remove boolean materialization from the existing inline predicate.
+
+### HomingProjectile_UpdateDefaultState (081FF454): resolved
 
 Tags: #matching #phase3 #presentation #081FF454
+
+Resolved on follow-up: sharing the saved flip pointer across all three facing
+blocks removes the final FaceFinal barrier. Each block's ROM uses r7; the first
+two already conflict with the live one in r5, while the final block alone did
+not. Manually placing the three blocks in the caller and declaring saved once
+combines those conflicts and selects r7 throughout. The scalar local adds no
+storage or instructions. Removed unused Face, FaceFinal and SetRiseHeight
+helpers. Scope and independent stock check MATCH all 1256 bytes, zero pins or
+barriers. Persistent store: HomingProjectile_UpdateDefaultState-resumed, node
+shared-facing-pointer.
+
+The matching knob diagnosed allocation, but raising saved's priority by 1000,
+4000 or 15000 gave 26/26 differences. Repeating the final call in both arms gave
+11/24; repeating its saved-pointer read gave 35/35 and moved a load. Passing a
+shared pointer by address to the existing inline helpers gave 36/46. Sharing
+with the other facing blocks succeeds where sharing with unrelated vectors
+failed. The following records the earlier partial and diagnosis.
+
 
 Removed three of four concessions: one capture uses a do block; a shared void
 component pointer combines delay's r0/r6 conflicts with rise height's r1 conflict,

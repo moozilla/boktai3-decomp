@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "homing_projectile.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -16,56 +15,6 @@ u16 Sqrt(u32);
 s32 Div(s32, s32);
 s32 Sprite_BlinkUntilExpired(u32 *, s32, s32, s32);
 
-static inline void Face(struct HomingSlot *p, struct HomingParams *params, u32 sequence, u32 one)
-{
-    u8 direction;
-    u8 flips[2];
-    u8 *first;
-    u8 *second;
-    u8 *saved;
-    u32 check;
-    direction = (((u16)params->angle + 0x60) >> 6) & 3;
-    first = &flips[0];
-    second = &flips[1];
-    check = (u8)(direction - 1);
-    saved = second;
-    if (check <= 1)
-        *first = one;
-    else
-        *first = 0;
-    if (direction > 1)
-        *second = 1;
-    else
-        *second = 0;
-    Anim_SetSequence(&p->sequence, p->graphics.resource, (u16)sequence, flips[0], *saved);
-}
-
-static inline void FaceFinal(struct HomingSlot *p, struct HomingParams *params, u32 sequence,
-                             u32 one)
-{
-    u8 direction;
-    u8 flips[2];
-    u8 *first;
-    u8 *second;
-    u8 *saved;
-    u32 check;
-    direction = (((u16)params->angle + 0x60) >> 6) & 3;
-    first = &flips[0];
-    second = &flips[1];
-    check = (u8)(direction - 1);
-    saved = second;
-    if (check <= 1)
-        *first = one;
-    else
-        *first = 0;
-    if (direction > 1)
-        *second = 1;
-    else
-        *second = 0;
-    asm("" : : "r"(saved) : "r5");
-    Anim_SetSequence(&p->sequence, p->graphics.resource, (u16)sequence, flips[0], *saved);
-}
-
 static inline void Aim(struct HomingSlot *p, struct HomingParams *params)
 {
     struct ContactPosition *player = Player_GetEffectivePosition(0);
@@ -73,11 +22,6 @@ static inline void Aim(struct HomingSlot *p, struct HomingParams *params)
     params->angle = Math_Atan2(player->x - position->x, player->z - position->z);
 }
 
-static inline void SetRiseHeight(struct HomingSlot *p, u16 height)
-{
-    register s16 *dest = &p->sprite.position.y;
-    *dest = height;
-}
 static inline void SpawnTrail(struct HomingSlot *p)
 {
     u32 seed;
@@ -95,6 +39,7 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
     s32 *state = &p->state;
     u32 sequence;
     void *component;
+    u8 *saved;
     switch (*state) {
         case 0: {
             register u32 one;
@@ -111,7 +56,28 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 p->sprite.flags &= ~0x400;
                 Aim(p, params);
                 sequence = (params->variant == 0) ? (7) : (0);
-                Face(p, params, sequence, one);
+                {
+                    u8 direction;
+                    u8 flips[2];
+                    u8 *first;
+                    u8 *second;
+                    u32 check;
+                    direction = (((u16)params->angle + 0x60) >> 6) & 3;
+                    first = &flips[0];
+                    second = &flips[1];
+                    check = (u8)(direction - 1);
+                    saved = second;
+                    if (check <= 1)
+                        *first = one;
+                    else
+                        *first = 0;
+                    if (direction > 1)
+                        *second = 1;
+                    else
+                        *second = 0;
+                    Anim_SetSequence(&p->sequence, p->graphics.resource, (u16)sequence, flips[0],
+                                     *saved);
+                }
             }
             break;
         }
@@ -124,7 +90,28 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 Aim(p, params);
                 sequence = (params->variant == 0) ? (10) : (6);
                 p->sequence.flags |= 8;
-                Face(p, params, sequence, 1);
+                {
+                    u8 direction;
+                    u8 flips[2];
+                    u8 *first;
+                    u8 *second;
+                    u32 check;
+                    direction = (((u16)params->angle + 0x60) >> 6) & 3;
+                    first = &flips[0];
+                    second = &flips[1];
+                    check = (u8)(direction - 1);
+                    saved = second;
+                    if (check <= 1)
+                        *first = 1;
+                    else
+                        *first = 0;
+                    if (direction > 1)
+                        *second = 1;
+                    else
+                        *second = 0;
+                    Anim_SetSequence(&p->sequence, p->graphics.resource, (u16)sequence, flips[0],
+                                     *saved);
+                }
                 p->state = 2;
             }
             break;
@@ -182,7 +169,29 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 }
             }
             sequence = (params->variant == 0) ? (7) : (0);
-            FaceFinal(p, params, sequence, 1);
+            {
+
+                u8 direction;
+                u8 flips[2];
+                u8 *first;
+                u8 *second;
+                u32 check;
+                direction = (((u16)params->angle + 0x60) >> 6) & 3;
+                first = &flips[0];
+                second = &flips[1];
+                check = (u8)(direction - 1);
+                saved = second;
+                if (check <= 1)
+                    *first = 1;
+                else
+                    *first = 0;
+                if (direction > 1)
+                    *second = 1;
+                else
+                    *second = 0;
+                Anim_SetSequence(&p->sequence, p->graphics.resource, (u16)sequence, flips[0],
+                                 *saved);
+            }
             p->state = 3;
             {
                 struct HomingCollider *collider = &p->primaryCollider;
