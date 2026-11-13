@@ -60,9 +60,8 @@ static inline s32 Abs(s32 x)
 static inline void Advance(void *p, s32 x, s32 z)
 {
 
-    s32 k = 0x6400;
-    asm("" : "+r"(k));
-    sub_080A9DB0(p, 4, k);
+    u16 k[] = {0x6400};
+    sub_080A9DB0(p, 4, k[0]);
 }
 void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
 {

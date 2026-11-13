@@ -4861,8 +4861,10 @@ def explain_regmove(wd, uid, gone, new, nm, at):
     pats = {u: r for u, _, r in insn_list(wd, "combine")}
     regs = set(gone) | set(new)
     hit = [f for f in fixes if f[1] == uid] or \
-          [f for f in fixes if any(re.search(r"\(reg(?:/\w)*:\w+ %d\)" % r, pats.get(f[1], "")) for r in regs)]
-    regs = regs  # noqa: keeps the search above readable
+          [f for f in fixes if regs and regs <= set(regs_of(pats.get(f[1], "")))]
+    # A shared input alone does not connect two ties. In Spider_UpdateWanderGoal,
+    # the mask participates in several independent operations; attributing the
+    # first operation's change to a later tie suggested an ineffective NOTIE.
     if not hit:
         copy = reg_copy_coalesce(wd, uid, gone, new)
         if copy:

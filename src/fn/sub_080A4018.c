@@ -66,11 +66,12 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     register const u16 *table asm("r6") = gRandomTable;
     register u32 *indexAddress asm("sl") = &gRandomIndex;
     u32 rawIndex = *indexAddress + 1;
-    register u32 mask asm("sb") = 1023;
+    u32 mask = 1023;
     u16 index = rawIndex & mask;
-    u16 distance = table[index] & mask;
+    u16 distance = table[index];
     u8 heading;
     u8 *field;
+    distance &= mask;
     distance += 256;
     index = (index + 1) & mask;
     field = (void *)indexAddress;

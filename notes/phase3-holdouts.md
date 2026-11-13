@@ -3049,3 +3049,333 @@ testing, a field-setting helper, and a halfword-returning setter do not solve
 both decisions. Next: preserve a HImode field insertion while giving the
 constant its own dying pseudo; inspect regmove's tied operand choice rather
 than only global allocation priority.
+## dp-monsters (Codex)
+
+Tags: #phase3 #monsters #matching
+
+### Spider_UpdateWanderGoal (080A4018): one pin removed, four pins and one barrier remain
+
+Landed the mask-pin removal: load the first u16 sample, then mask it in a separate
+statement. This prevents regmove from tying the mask to the sample output.
+The complete source unit still matches. The saved pin-free draft is
+`notes/phase3-drafts/dp-monsters/Spider_UpdateWanderGoal.c` (58/60 differing
+instructions, shape 26, 592 bytes against 584).
+
+The diagnostic `AGBCC_NOEQUIV=31,32 AGBCC_FORCE=22:4,29:5,31:6,32:10,35:9`
+matches that draft exactly: input r4, transform r5, table r6, cursor sl, mask sb.
+The original pin-free draft additionally needs `AGBCC_NOTIE=64`; the split sample
+load removes this requirement. NOEQUIV alone leaves 58/58, shape 16.
+
+Tried the offset/page/region table initializer that solved Bat, both pointer
+initializers, getter and initializer lifetimes, direct cursor accesses, shared
+ParticleRandom_ReadSample at each draw, real SceneActorBody fields, and duplicated
+routing tails. Encoded pointers produce separate source/copy pseudos: table source
+spills while its initial copy serves the first two reads. The cursor copy still
+gets an equivalence. The shared second read changes pressure but also shrinks
+the stack frame. These mechanisms and candidates are saved in
+`build/matchsearch/Spider_UpdateWanderGoal` and `build/cx/work/Spider_UpdateWanderGoal`.
+
+Removing only the transform pin differs at the later Chase result: r6 instead
+of r5 (3/3). During global allocation r5 is not yet marked ever-used; the table
+pin makes r6 available to the later result. Raising the goal pointer priority,
+changing result width, reading transform fields earlier, and using the goal
+field directly did not recover the allocation.
+
+Removing ReadCounter's pin and barrier together differs 5/5. `AGBCC_SPILL=7:1`
+matches, proving one reload-rotation step at the counter offset; u16/s16 masks
+do not alter it. The remaining pointer pins must be solved together with
+allocation and reload order. Next: recover a shared random-draw structure that
+keeps both constant pointers live without equivalent rematerializable copies;
+then use the result's allocation order to resolve transform and counter.
+
+Tool gap found: why attributed the sample-mask change to an unrelated later tie
+sharing only the mask. The scope fix now requires both changed registers in a
+fallback tie, avoiding the ineffective NOTIE suggestion.
+
+### TentacleActor_SelectWanderRoute (080A8904): priority diagnosis confirmed
+
+The saved ordinary-C draft remains 46/48, shape 46, 988 bytes versus 984.
+`AGBCC_PRI=157:+2100,42:+1757,43:+423,45:+10000` matches exactly. These
+restore the original priorities of the scan union, n, i, and currentCell.
+The key threshold is not linear: global.c uses floor_log2(refs) * refs / life.
+The scan union changes 21/200, priority 4200, to 14/200, priority 2100;
+its original priority narrowly outranks the first cell-center terrain pointer
+(4137). The remaining count changes 9/74 (3648) to 7/74 (1891).
+
+Each single-use macro removal was isolated. Removing the cardinal advance,
+outer cursor increment, or inner cursor increment alone gives a pure r6/r7
+swap (25/25). Removing the count macro gives 38/36. None is free alone.
+The count-up form reverses to exactly the same macro-free result. Post-decrement
+and pre-decrement conditions, signed narrow counters, a combined advance/count
+helper, and separate mask/cursor locals do not recover the required priorities.
+A direction derived from the scan induction variable adds instructions.
+Duplicating the update after both eligibility arms raises references, but the
+longer lives and extra control flow remain. Returning from a while around the
+unvisited-cell path makes loop.c hoist the cell-center addresses and is much
+worse. Pointer post-increment changes the memory accesses and also fails.
+
+Persistent sources and hypotheses: `build/matchsearch/TentacleActor_SelectWanderRoute`.
+The complete ordinary draft is `notes/phase3-drafts/dp-monsters/TentacleActor_SelectWanderRoute.c`.
+Next: find a natural candidate-iteration structure whose cursor has at least
+21 weighted references over this lifetime, or shorten that lifetime without
+changing its merge with the cardinal mask. The exact diagnostic now separates
+this from instruction-selection problems. No source changes landed.
+
+### Tentacle animation family (080A8F38, 080A915C, 080A93F4): partials landed
+
+Refresh loses three pins, a barrier, and volatile command reads. Reset loses
+five pins, two barriers, and volatile reads. Restart loses three pins and
+volatile reads. Every complete source unit checks MATCH.
+
+The shared DisplaySequence_StepSprite form was the starting point. Refresh
+needs a separate second-flip sprite view declared before the state pointer.
+A `u16 duration[] = {1}` in the zero-duration branch prevents loop.c from
+combining that one with the status/flip ones and hoisting them all. Without
+it the hoisted one consumes sl, spills offset, and changes the frame.
+Initializer-zero control unions did not help; a byte first-bit variable did
+not help. The duration array gives the ROM frame and allocation.
+
+Refresh and Reset's final completely pin-free drafts each differ 15/15, shape 0.
+Their remaining caller differences are the same: the profile index shift
+coalesces with its input in r2 instead of producing r0; speed's actor pointer
+loads into r0 instead of r1; the loop stride takes r0 instead of r1 and the
+frame counter takes r1 instead of r2. Shared profile helpers, array-row typing,
+operand order, a combined advance helper, and counter update placement were
+tried. Scope spill says this is not one reload rotation; local allocation
+preferences must change first. The full drafts preserve the caller's
+statement expressions but contain no pins or barriers.
+
+Reset's playback alone additionally needs its caller sprite for the first
+clear. Expanding the playback into the caller keeps that view separate from
+the copied sprite. The copied sprite beats command in global allocation
+(16 refs/58 live, 11034 versus command's 12/38, 9473). The diagnostic
+`AGBCC_PRI=command:+1562` fixes the swap; a pointer-local first clear then
+has its own local-allocation issue (value r1/address r0 instead of value
+r0/address r2). Sharing the second flip store across arms changes allocation
+and control flow rather than matching. The partial retains the original two
+playback pins; removing all caller pins changes pressure enough to leave only
+the same caller 15/15 as Refresh.
+
+Restart's ordinary playback reaches 2/2 with the remaining first-flip pins,
+matching under `AGBCC_SPILL=6:1`: the final signed-load zero takes r4 instead
+of r3. Keeping the original advance code restores the reload sequence. A
+plain final `*command & 15` narrows to ldrb; a DisplaySequence_ReadCommand
+into a u32 sample followed by a local mask gives ldrh and matches. Passing
+the raw read through MaskCommand instead swaps the sample/constant registers.
+One first-flip bit pin then becomes free. The best saved completely pin-free
+Restart draft differs 50/56; a separate ordinary-advance draft is in the
+workspace and is worth revisiting once the common caller form is solved.
+
+Drafts: `notes/phase3-drafts/dp-monsters/TentacleBody_*.c`. Workspaces are
+`build/cx/work/TentacleBody_*`. Next: solve the shared caller local preferences,
+then consolidate the playback with the original sprite view explicit.
+
+### sub_080AA688 (080AA688): count-address hoisting
+
+The best ordinary draft differs 25/24, shape 5, and is 152 bytes versus 156.
+The only concession is the active-count address return pin. Removing it lets
+loop.c hoist the address in its second pass. `AGBCC_NOMOVE=148` matches the
+instrumented `-g` output exactly; scope warns that debug information changes
+this function, so this is a diagnostic, not a stock-compiler match.
+
+In pass one the address has 10*1*3 < 45 and stays inside; after the mask
+invariant moves, pass two has 13*1*3 >= 37 and hoists it. The nearest relative,
+ActorTrail_RemoveAllSegments, has an additional spark call after decrementing
+activeCount. That longer loop naturally keeps the address inside.
+
+Tried a genuine goto loop, reverse post-decrement and return-terminated loops,
+initialized pointer unions and arrays, encoded offset construction, narrow
+mask locals, eight-bit and seven-bit fields, a removed-bit field store, and
+an inline count setter. Most canonicalize to the same hoist; changed loops
+lose other invariant motion or induction reduction. No safe partial exists.
+The saved draft uses the real activeCount field rather than the original
+raw-offset helper. Persistent hypotheses and compiler evidence are in
+build/matchsearch/sub_080AA688 and build/cx/work/sub_080AA688.
+
+Next: find an equivalent iteration shape that increases loop instruction
+count during invariant analysis while still reducing to the same final loop,
+or prevents this address from being recognized as invariant without changing
+its eventual instructions.
+
+### TentacleActor_AlignSegmentsToTerrain (080AA8C4): PRE copy removed
+
+The saved draft declares the segment position pointer before the flag tests.
+This eliminates PRE's extra reaching-value copy, improving the old draft from
+36/38, shape 4, to 36/36, shape 2, with the correct 460-byte size. No production
+change landed. The remaining differences include the Height position/y-output
+r5/r6 allocation, the joined height copy, and reload choices.
+
+On the old base, `CSE_NOCANON=160 AGBCC_NOPRE=5 AGBCC_PRI=234:+1636`
+gets 13/13, shape 0. This is not an exact diagnostic: height comparisons still
+use r1 instead of r2 and the position/y-output pointers remain swapped.
+NOPRE=5 isolates the redundant position copy, which the explicit earlier
+pointer declaration removes in ordinary C. The canonical-register change is
+in the duplicate Abs calculation; it changes the allocation and retains the
+height copy but does not reproduce the comparison operands.
+
+Tried direct field stores, an independently indexed y-field pointer, shared
+terrain height helper, separate cell calculation, switch-arm returns, signed
+narrow height, unsigned height arithmetic, initialized height arrays/unions,
+materialized and mutating absolute-value helpers, reversed sign tests, output
+parameters, and early continues for inactive/equal-height segments. Field
+stores collapse the independent y induction and lose target instructions;
+most other forms canonicalize to the same result. Narrow height adds shifts.
+The saved draft still has inherited raw field-address expressions, which must
+be replaced before a clean final landing. Persistent search retains the old
+base and the pointer-first improvement. Next: change the height copy's class
+membership independently of the upper-delta Abs class, then use giv ordering
+to allocate the independent y-output pointer before the saved position.
+
+### TentacleActor_UpdateRetraction (080AB968): threshold barrier removed
+
+The local `u16 threshold[] = {0x6400}` initializer prepares the third argument
+before actor/divisor, matching without the threshold barrier. Unit MATCH in
+0014. An initialized union also works; a scalar u16 does not. The remaining
+barrier preserves absolute values and their signed source values.
+
+Nested direction decisions (`ax > az`, then x/z sign) with identical Advance
+calls retain all ROM absolute-value instructions. They leave two copies of the
+call because flow inserts `(use (const_int 0))` after the last fallthrough call.
+Cross-jump tracing confirms the other three paths merge. Explicit gotos and
+returns, duplicated oscillation calls, and duplicated entire remaining tails
+do not remove this last mismatch.
+
+Assigning `next = s` after each call supplies a real post-call instruction,
+letting all four calls and all direction tests merge in jump2. This is the new
+best ordinary draft: 15/17, shape 2, 328 versus 324 bytes. The only structural
+issue is the surviving actor copy (plus padding); original s and next overlap
+because CSE uses s for the first post-join call and field test, and next later.
+Next has priority 13571 (19/56), s 8543 (22/103); the former gets r6 and the
+latter r5. Spill rotation does not help. CSE_NOCANON=23 gives 13/15 but still
+has the copy. Using next throughout the tail, using input instead, taking the
+completion-field address before oscillation, returning the actor from Advance,
+and a returning while completion branch did not coalesce the views.
+
+The saved draft preserves the successful post-call assignment and nested
+sign tests. Persistent search: build/matchsearch/TentacleActor_UpdateRetraction.
+Next: stop CSE from extending the original actor through the join while keeping
+the post-call assignment until flow; that should make its allocation disjoint
+from next and eliminate the final copy after allocation.
+
+### sub_080ABB18 (080ABB18): behavior barrier removed
+
+One barrier landed in 0016. Removing either original barrier makes direction
+and motionTimer tie at priority 476 (2 references / 42 live instructions).
+Declare motionTimer before direction to break that tie in favor of the ROM's
+sl timer; this also preserves all stack slots. No initializer trick is needed.
+Five pins and the motion-counter barrier remain.
+
+Removing both barriers with that declaration order gets 7/7, all caused by
+motionTimer spilling to sp+8 while direction takes sl. The exact diagnostic
+`AGBCC_PRI=motionTimer:+20` matches. The second removal shortens direction's
+life another instruction, giving it priority 487 versus timer's 476. Scalar,
+byte/halfword/word arrays, initialized unions, copied pointers, derived zero8,
+earlier timer copying, early heading loads, and a packed reset-state struct
+were tried. The struct improves register-blind shape but adds instructions;
+the other initializer forms do not change this lifetime threshold.
+
+The fully ordinary saved draft is 101/101 after the declaration change.
+Removing the other pins separately still costs: animationFlags 31/31, zero
+74/74, timer 17/17, animation cursor 39/36, motion-counter cursor 19/19.
+The alternative final-stores-inside-loop draft is 139/107. Hoist analysis
+shows only the zero, one, and animation-flags address moving: most individual
+addresses have 13*1*3 < 68, so that shape cannot explain all fifteen ROM
+precomputed pointers without a major change in lifetime/loop shape.
+
+Persistent evidence and proposals: build/matchsearch/sub_080ABB18. Next:
+lengthen direction's pre-allocation life by one real intermediate operation
+that folds later, or shorten motionTimer's life without moving its emitted
+address computation. This is now a precise small threshold rather than an
+unexplained stack-slot permutation.
+
+### Vorn_UpdateDefeat (080AEE08): statement-macro allocation
+
+Current source has eight statement macros, no hard pins or asm. Expanding all
+is 124/126, shape 46. Transferring the encoded table plus shared defeat-spark
+helper from Bat is 151/149, shape 44; retaining the other original macros with
+that helper also fails (126/123). The saved ordinary draft expands all eight.
+
+The clearest isolated blocker is capture-spread: removing it gives 17/17,
+shape 0. `AGBCC_PRI=spread:+81` matches exactly. Local spread priority falls
+from 1271 (10 refs) to 1144 (9), below position's 1224 (8 refs), swapping r5/r6.
+Adding the natural reference via `spread->bits.y = 60` before capture would
+otherwise match, but narrows the y update to a halfword store (7/2). Using the
+z bitfield, a returned spread from a depth setter, a separate depth view,
+two mask/set statements, first-count staging, and direct first origin/kind
+arguments do not reproduce both the references and instruction selection.
+
+Removing prepare-entry or reset-entry alone gives 8/8: one is materialized
+before the entry address, shared with the later entry store, and alters the
+zero register. No single CSE/PRE/loop probe fixes it. Byte-array initializers
+still canonicalize to that result. Other isolated expansions: complete-defeat
+127/124, route-fields 100/101, random read 100/101, origin 98/100, kind 118/121.
+No free partial landed. Persistent search retains the independent hypotheses.
+
+Next: preserve full-word range initialization while giving spread one extra
+ordinary reference (or shortening its local life), then solve the entry-one
+sharing independently before combining macro removals.
+
+### sub_080B197C (080B197C): active priority remains
+
+Reconfirmed the exact `AGBCC_PRI=active:+400` diagnostic on the clean draft,
+26/26, shape 0. Active is 8 refs/33 live, priority 7272; actor is 18/94,
+7659. Life inspection shows the active value also supplies the zero stores
+in both state and control resets, ending at word104.
+
+Early return with duplicated motion marking, switch(active), u8 active,
+initialized active byte array, nested active==0 decisions, and a separate
+state-actor view all canonicalize to the same result. Reversing arms,
+returning while, active==1 with active-1 dispatch argument, explicit state
+zero parameter, and actor/motion pointer views change instructions or add
+copies. A word-return flag predicate removes narrowing but changes shape.
+No additional production change. Saved ordinary draft and persistent search
+record these attempts. Next: reduce the actor's weighted references without
+introducing an overlapping pointer, or recover a ninth active reference that
+survives flow and disappears only in a later merge.
+
+### Skeleton_TrySelectRetreatCell (080B77D0): updated reload diagnosis
+
+Both barriers removed still give 2/2, shape 0: south exit's signed width load
+uses scratch r1 instead of r2. Removing only north's barrier gives 22/22;
+neither removal is free. The old single-knob claim needs updating with the
+current compiler instrumentation: `AGBCC_SPILL=18:2` gives 22/22, while
+`AGBCC_SPILL=18:2,19:2` matches exactly. The first correction fixes the width
+scratch; the second restores subsequent reload rotation. Scope's one-choice
+spill search finds no improvement, correctly reflecting this coupling.
+
+Previous choice 17 belongs to north's width load (insn 422), and uses r2.
+Wrote out south, north, and both failed/successful exit tails before jump2:
+10/12, 25/25, and 39/41 respectively. A local initialized width array and a
+real signed width field both preserve the original 2/2. The saved draft uses
+the width field. Prior signed-width, map-accessor, loop, and post-loop lifetime
+attempts remain applicable; they were not repeated wholesale.
+
+Persistent search records the exit-tail hypotheses. Next: a C form that keeps
+mapSlot live through the south load but dies before its exit, or two naturally
+duplicated reload sites that cancel after tail merging. No partial landed.
+
+### Skeleton_UpdateDefeat (080BD1F0): global register reservation
+
+Three pins remain: priority one in each burst, and the second burst's table.
+Their isolated removals cost 101/97, 83/77, and 28/28 respectively; all removed
+is 178/168, shape 96. Saved that ordinary draft. No partial landed.
+
+The encoded table removes the source-level pin but still gives 28/28. The
+main effect is not the table expression: PRE's shared actor+0x5c origin
+(pseudo 3169) takes sl when the pin stops reserving it. The frame shrinks
+0x9c to 0x98 and both burst paths use the register instead of sp+0x98.
+PRE replacements 3 and 4 share that insertion across script branches.
+AGBCC_NOREG=3169 is not exact (34/34), since other allocation changes follow.
+This distinguishes the global reservation problem from Bat's equivalence.
+
+The shared burst helper was tried separately in each burst and in both,
+using the real spark declaration: 70/74, 40/48, and 84/94 while retaining the
+table pin. Fully ordinary shared-helper form is 133/137, shape 110, retained
+in the workspace as a different structural candidate. An initialized encoded
+priority value does not recover the two saved constants (171/161 with table
+pin retained). Persistent search retains these alternatives.
+
+Next: an ordinary global lifetime that keeps the common origin spilled while
+allowing the second table in sl, then solve each priority-one lifetime. The
+origin's shared PRE definition is the useful starting point; changing only
+the table spelling cannot recreate a hard register's function-wide exclusion.
