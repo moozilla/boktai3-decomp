@@ -865,6 +865,12 @@ of its life.
 
 ### Ivy_UpdateDefeat (src/fn/sub_080EE1B0.c, 080EE1B0): table pin, one load position from a match
 
+Resolved by dp-monsters: encoded offset/page/region table source plus the shared
+SceneActorEffects_SpawnDefeatSparks helper match together. Encoding alone stays
+14/14; the helper alone gives 65/69. Also replaced the flags868 raw access with
+the existing GameState field and removed the unnecessary volatile CpuSet zero
+source. Complete unit MATCH with no concessions. Prior diagnosis follows.
+
 Six-spark family, but here the table is a local-alloc qty, not a REG_EQUIV spill. Block 24's
 call-saved qtys (AGBCC_DUMPPRI L records) in priority order: =gRandomIndex 2010 r4, a pointer
 1163 r5, =1#2 769 r6, size 760 r8, then the position `&actor->body.position` (7 refs, life
@@ -880,6 +886,15 @@ draft; the union RandomTableView forms are no better.
 
 ### Axe_UpdateDamageSpin (src/fn/sub_080F9974.c, 080F9974): pin and one barrier left
 
+Resolved by dp-monsters: use a static inline u8 HasAuxiliary(const u8 *state)
+returning state[0xA3C] != 0 for the entry-path test. The predicate adds four
+flow-time instructions inside the constant-one lifetime; context grows from
+170 to 174 (priority 823 to 804), while the doubled REG_EQUIV lifetime grows
+faster. Final bytes remain unchanged and allocation matches. Unit MATCH with
+no concessions. Plain field-AA zero forms and a ready-byte initializer do not
+change the baseline. The previous +20 context-priority knob still matches.
+Prior diagnosis follows.
+
 Landed: the flags2D6 `mask` barrier is gone (`OrStatus(0x20, &actor->flags2D6)`, an inline
 whose constant parameter is set before the address). Draft `Axe_UpdateDamageSpin.c` has no
 concessions: `state[0xED6] = 1; *(u16 *)(state + 0xED4) = 0;` gives the ROM's code, including
@@ -893,6 +908,14 @@ inline helpers for the ED6/ED4 stores (constant parameters are substituted), and
 mask forms (those change the code).
 
 ### Terrain_ResolveActorMotion (src/fn/sub_0811AE9C.c, 0811AE9C): 6 concessions, pin-free draft 10/10
+
+Resolved by dp-monsters: spell the offset as ~((difference << 12) - 1).
+CSE does not see the inner negation early enough to cancel Abs's negation;
+later simplification recovers the desired arithmetic. This also fixes the
+shape/flags allocation. Unsigned-shift form also matches; ~(difference << 12)
++ 1 leaves 1/3, and multiplication by -4096 remains 10/10. Removed unused
+Query and flag helpers. Both functions in the unit MATCH without concessions.
+Prior diagnosis follows.
 
 Draft `Terrain_ResolveActorMotion.c` (no concessions) rewrites the middle part:
 `clearance = Terrain_GetCellClearance(next.coordinates); y = next.coordinates[1];
@@ -1165,6 +1188,19 @@ Tried:
 Next: an EQ test whose operand cse cannot record, or a label in front of the not-allowed block (it starts a new EBB).
 
 ### EnemyParticle_UpdatePool (src/fn/sub_0820D2C4.c, 0820D2C4): deferred, StepSprite draft 12/16
+
+Resolved by dp-monsters: retain the distinct sprite/state/cursor accesses while
+writing the shared stepper's ordinary C directly in the caller. This matches
+with only the existing state barrier. A separate helper raises the sprite
+pointer's priority and spills ground instead; an extra sprite copy also fails.
+Remove the final barrier by initializing a word-sized animation offset union
+through its low halfword, using the anim field's offset, and forming the state
+pointer as base plus that invariant value. This prevents loop's reduced
+animation-pointer giv while preserving the per-iteration add. Direct field
+address without the barrier gives 46/46; pointer-union initialization does not
+help. Offset union matches. Removed unused ended-result bookkeeping and all
+volatile reads. Complete unit MATCH with no concessions. Prior diagnosis follows.
+
 
 Landed: 8 concessions in a hand-unrolled sequence step.
 Draft: `notes/phase3-drafts/monsters-bosses/EnemyParticle_UpdatePool.c` (12 ROM / 16 draft).
@@ -4601,3 +4637,126 @@ Union forms either compile identically or introduce extra operations.
 Next idea: keep the constant in operand one through cse using an original-like
 narrow expression whose mode survives until regmove. Scratch candidates:
 build/cx/work/SceneInput_TickChoice/.
+
+
+### Mummy_ResumeSavedRouteAfterAnimation (080D1784): PRE table-size ordering
+
+Tags: #matching #phase3 #monsters #compiler
+
+Saved the best ordinary draft with all three pins and the barrier removed.
+No production change. The original unsigned-mask draft is 20/20, shape 40;
+using a signed halfword mask for 0x200 recovers the ROM's target-address
+construction and improves to 18/18, shape 36. Remaining differences are PRE
+stack-slot permutations, with the same 788-byte size.
+
+The signed-mask draft matches exactly with diagnostic AGBCC_GCSE_T=145.
+Stock compilation reaches GCSE with N=283 real instructions and T=141 hash
+buckets. Scope's preorder model explains all 28 address expressions and the
+12 reaching pseudos. Ten modeled spilled pointers reveal the order changes;
+T=145 reproduces the ROM order. This requires N=288..291, five to eight more
+early RTL instructions, if expression indices and base numbering stay fixed.
+The unsigned draft still differs by two instructions with the same knob.
+The override is diagnostic only and is not part of the saved source.
+
+Tried narrow flag-clear and delay parameters, typed saved-control/reaction
+fields, a signed bitfield flag clear, split flag operations, mask arrays and
+unsigned halfword masks. Those either preserve the baseline permutation or
+change additional instructions. Starting from the signed-mask draft, local
+initialized delay bytes give 49/53; a delay-state struct gives 26/26;
+sequence zero initialization gives 46/53; a reaction-zero halfword array gives
+19/19. Aggregating route/mask/target gives 93/85, sharing failed-route cleanup
+34/28, and a returning route loop 20/20. Signed mask alone with the other
+original concessions retained gives 20/20, so there is no free partial.
+Persistent search retains the signed-mask and representative structural tests.
+
+Next: find a natural C initialization or duplicated post-join statement that
+adds five to eight pre-GCSE RTL instructions, then disappears in later passes.
+Recheck expression numbering as well as the table size after each structural
+change. The saved draft retains inherited raw offsets that should become real
+fields before a final clean landing. Work stopped here at the user's end-of-run
+instruction; later queue items were not started.
+
+
+### SpriteColliderGroup_ActivateParts (0818E9B8): unused saved register persists
+
+Reconfirmed the ordinary draft's complete body match: only four r8 save/restore
+instructions are missing (4/0, shape 4). Scope why/probe has no body mechanism
+left to explain; its seven CSE/PRE/loop interventions do not recover the save.
+No production change. Saved the ordinary draft and persistent hypotheses.
+
+New tests: a boolean IsActive predicate gives 9/7; initialized zero byte array
+5/9, with its zero in ip and stride in r8; explicit action &= 0 gives 10/6;
+returning directly from the requested-count exit and a parameterized activation
+inline give the same 4/0. Explicit goto iteration gives 18/16; calculating the
+iterator pointers before the initial guard gives 21/14; an initialized count
+union gives 16/18. None produces a register allocated and then rendered dead.
+A non-void missing final return changes the body extensively and is not a fix.
+
+Retaining the original r8 clobber but removing the stride pin leaves 2/2:
+stride pseudo 66, priority 681, takes r8 instead of ip. AGBCC_FORCE=66:12
+matches that partial diagnostic, but it still depends on the existing clobber.
+This is not an exact knob for the fully ordinary draft. No partial landed.
+
+Next: find a source-level value that gets r8 during allocation but whose final
+uses disappear after reload, while leaving stride's allocation in ip. The
+initialized-zero experiment confirms ordinary extra live data alone is not
+sufficient: it keeps visible instructions and changes stride placement.
+
+
+### SpriteColliderGroup_ResetActiveParts (0818EA3C): combine plus allocation
+
+Ordinary draft remains 2/2, shape 0: first count load/compare uses r6, ROM r5.
+Confirmed why: r5 is not in the reload spill set. In cse2, insn 22 sets pseudo
+33 to zero_extend of the count byte; combine deletes that set and substitutes
+the memory subreg into comparison insn 27. Keeping source variable total (29)
+has no effect because CSE has already replaced it.
+
+AGBCC_COMBKEEP=33 alone gives 15/19. Adding AGBCC_FORCE=33:5 gives 5/5:
+initial load is correct, but active/count exchange r4/r5. The full diagnostic
+AGBCC_COMBKEEP=33 AGBCC_FORCE=33:5,28:4,26:5 matches. Thus stopping combine is
+not sufficient; subsequent allocation must also preserve the body registers.
+No production change. Saved ordinary draft and persistent hypotheses.
+
+New C tests: count address before guard gives 12/12; initialized count union
+5/9, including an unused r8 save/restore; initialized struct gives the same.
+Byte array before i=0 gives 5/5 because the address calculation moves before
+the induction initializer. Byte array initialized after i=0 returns to 2/2.
+Late union variants (byte/halfword/word size) all give 10/14. HasParts boolean
+predicate gives 21/25; a reversed guard gives the baseline; unsigned-byte
+comparison gives 3/3, wide comparison 21/31, subtraction comparison 16/20.
+An additional nonempty guard retains visible code (12/14); updating total in
+the loop condition leaves 2/2.
+
+Next: preserve the count load through combine while allowing its short life
+to share r5 with the later count pointer, and retain active in r4. Aggregate
+initialization can create the unused saved register sought by activation,
+but reset itself needs a narrower change without that prologue effect.
+
+
+### VulcanCannon_UpdateFacingTurn (08207350): shared step landed, one pin remains
+
+Landed shared DisplaySequence_StepSprite plus the ordinary facing toggle.
+Only the original allowTurn r1 pin remains; removed the private playback,
+VC selector macros, volatile reads, six counted pins and five barriers.
+Complete unit MATCH. The ordinary draft remains 5/3, shape 2, saved here.
+
+Reconfirmed CSE's zero equivalence: the failed allowTurn test provides the
+fifth restart argument, keeping the loaded byte alive in r4. The ROM lets it
+die in r1 and materializes a new zero in r2. Scope's nineteen single-decision
+probe interventions do not match; no new exact ordinary diagnostic knob found.
+
+A returning while, nested returning while, switch case zero, word/halfword
+zero arrays, and word unions filled through halves or bytes preserve 5/3.
+A CanTurn boolean predicate keeps three extra boolean operations because its
+zero result is reused as the argument. The opposite TurnDisabled predicate
+fixes all original differences but leaves four visible condition instructions
+(0/4): initial zero, conditional one, compare and branch. Word return type,
+explicit comparison to one and positive test all retain those instructions.
+An initialized allowed-byte union or struct gives 5/7; assigning its byte
+without initialization returns to 5/3. Persistent search records these forms.
+
+Next: create a real extended-block boundary before the not-allowed restart
+without adding a surviving test, or make the positive disabled predicate
+collapse only after CSE's equality record is no longer available. The source's
+missing final return intentionally retains r0 as required by the original
+callback; adding a return value would change the already-matching playback.

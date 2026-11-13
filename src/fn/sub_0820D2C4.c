@@ -1,7 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "display_sequence_sprite.h"
 struct Pos {
     s16 x, y, z, pad;
 };
@@ -85,6 +85,11 @@ s32 EnemyParticle_UpdatePool(struct Pool *pool)
     struct Entry *base, *cursor;
     s32 i;
     u32 pause = 0x400;
+    union {
+        u32 value;
+        u16 half[2];
+    } animOffset = {0};
+    animOffset.half[0] = (u32) & ((struct Entry *)0)->anim;
     if ((gEngineFlags | gScenePauseFlags) & pause)
         return 0;
     {
@@ -143,101 +148,59 @@ s32 EnemyParticle_UpdatePool(struct Pool *pool)
                 }
             }
             if (cursor->params.script) {
-                struct Obj *s = sprite;
-                struct Anim *state = &base->anim;
-                const volatile u16 *command = cursor->anim.data + cursor->anim.frame;
-                u32 duration, flags;
-                asm("" : "+r"(state));
+
+                struct DisplaySequenceSprite *s = (void *)sprite;
+                struct DisplaySequenceState *state = (void *)((u8 *)base + animOffset.value);
+                const u16 *command;
+                command = cursor->anim.data + cursor->anim.frame;
                 s->frame = *command >> 6;
                 {
-                    u32 input = cursor->anim.flags;
-                    u32 left = 1;
-                    u32 mask = 1;
-                    left &= input;
-                    if (left != (((*command & 0x30) >> 4) & mask))
+                    union DisplaySequenceControl control;
+                    u32 bit, first;
+                    control.raw = cursor->anim.flags;
+                    bit = 1;
+                    first = (u8)(control.raw & bit);
+                    if (first != (((*command & 0x30) >> 4) & bit))
                         cursor->sprite.flags |= 4;
                     else
                         cursor->sprite.flags &= ~4;
                 }
                 {
-                    u32 input = state->flags;
-                    register u32 bit asm("r3");
-                    register u32 first asm("r1");
+                    union DisplaySequenceControl control;
+                    u32 bit, first;
+                    control.raw = state->flags;
                     bit = 2;
-                    first = bit;
-                    first &= input;
-                    first = (u8)first;
+                    first = (u8)(control.raw & bit);
                     if (first != (((*command & 0x30) >> 4) & bit))
                         s->flags |= 8;
                     else
                         s->flags &= ~8;
                 }
-                {
-                    u32 elapsed = state->timer + 1;
-                    u32 mask;
-                    register u32 temp asm("r2");
-                    register u32 savedDuration asm("r2");
-                    state->timer = elapsed;
-                    temp = 0xFFFF;
-                    asm("" : "+r"(temp));
-                    mask = temp;
-                    duration = state->rate;
-                    elapsed = (u16)elapsed;
-                    savedDuration = duration;
-                    if (elapsed >= duration) {
-                        state->timer = 0;
-                        flags = state->flags;
-                        if (flags & 4) {
-                            u32 index = state->frame;
-                            if (index == 0) {
-                                u32 hold = 8;
-                                hold &= flags;
-                                if (hold) {
-                                    state->timer = savedDuration;
-                                } else {
-                                    state->frame = state->count - 1;
-                                }
-                            } else {
-                                state->frame = index - 1;
-                            }
+                if (++state->elapsed >= state->duration) {
+                    state->elapsed = 0;
+                    if (state->flags & 4) {
+                        if (state->index == 0) {
+                            if (state->flags & 8)
+                                state->elapsed = state->duration;
+                            else
+                                state->index = state->frameCount - 1;
+
                         } else {
-                            u32 index = state->frame + 1;
-                            u32 frameCount;
-                            u32 endFlag;
-                            state->frame = index;
-                            frameCount = state->count;
-                            if ((index & mask) >= frameCount) {
-                                endFlag = flags & 8;
-                                asm("" : "+r"(endFlag));
-                                endFlag = (u8)endFlag;
-                                if (endFlag) {
-                                    state->timer = duration;
-                                    {
-                                        u32 lastIndex = frameCount - 1;
-                                        state->frame = lastIndex;
-                                    }
-                                } else {
-                                    state->frame = 0;
-                                }
-                            }
+                            state->index--;
                         }
-                        {
-                            u32 offset = state->frame << 1;
-                            const volatile u16 *table;
-                            table = state->data;
-                            command = (const volatile u16 *)((u32)table + offset);
-                        }
-                        state->factor = *command & 15;
-                        {
-                            register s32 weight asm("r1") = state->factor;
-                            s32 speed;
-                            speed = state->scale;
-                            speed = (speed * weight) >> 6;
-                            state->rate = speed;
-                            if (!(u8)speed)
-                                state->rate = 1;
+                    } else if (++state->index >= state->frameCount) {
+                        if ((u8)(state->flags & 8)) {
+                            state->elapsed = state->duration;
+                            state->index = state->frameCount - 1;
+
+                        } else {
+                            state->index = 0;
                         }
                     }
+                    command = state->commands + state->index;
+                    DisplaySequence_UpdateWeight(state, command);
+                    if (!state->duration)
+                        state->duration = 1;
                 }
             }
             cursor->timer++;
