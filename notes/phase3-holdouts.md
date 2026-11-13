@@ -1228,3 +1228,27 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-field-b (Codex)
+
+Tags: #phase3 #field-objects
+
+### ProximityEmitter_InitializeFromScript (08051EA8): two terrain pointer pins remain
+
+Landed a partial removing eight pins and four barriers. Independent graphics/sprite
+locals for the two draw packets shorten their lifetimes and reproduce the entire
+sprite initialization. Named script fields replace the constrained offset stores.
+The pin-free draft is `notes/phase3-drafts/dp-field-b/ProximityEmitter_InitializeFromScript.c`:
+16 ROM / 16 draft instructions, shape 0. Only point, yAddress and cell rotate among
+r4/r5/r6. The cell pseudo is allocated first (priority 3333), before point (1944)
+and yAddress (379). Its first constant set doubles its live length in local allocation.
+`AGBCC_FORCE=point:4,yAddress:5` confirms MATCH; priority on point alone removes
+half the differences. This is an allocation decision, not a missing instruction.
+
+Tried independent draw scopes (decisive), direct field calls (45/43), terrain inline
+helper (16/16 plus order), array/union pointer locals and a coordinate-array pointer
+(all 16/16), moving cell zero initialization earlier (13/11, shape 10), and putting
+the nonconstant cell arm first (22/22 with changed branches). Earlier pass tried
+24 variants. Next: recover a terrain-expression form whose cell lifetime spans
+more of position parsing, or whose pointer temporaries have the original priority.
+Do not undo the independent draw scopes: they removed twelve concessions.
