@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
 {
     struct ActorSprite *o;

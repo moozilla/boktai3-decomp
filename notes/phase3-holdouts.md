@@ -1247,6 +1247,9 @@ Draft: `notes/phase3-drafts/dp-scene2/Actor_UpdateFinishingAnimation.c`. The byt
 
 The blink investigation above applies directly. A separate mask-first byte union also drops the zero and keeps its one constant inside the loop; initialized unions and reset helpers do not retain it. No complete matching knob is known. Next: use this smaller twin to trace the literal union OR's hoisted QImode zero and preserve it while restoring the byte-mask operand order.
 
+Follow-up in the smaller finishing twin: the literal update is now confirmed to have shape distance zero and only five differing register rows. RTL shows that the unused QImode zero comes from the final byte store's insertion sequence: `(oldByte & zeroQI) | newByte`. CSE retains that zero when the payload is the OR of two paradoxical QImode subregs; loop hoists it, and combine later drops the OR with zero. With a promoted scalar byte mask, CSE drops the insertion before loop. An outer byte-union reset restores the desired OR operand order but also loses the zero and swaps callback/reset allocation. Clearing then setting the bit, mask-clear/set, an explicit zero OR, and mask-first unions inside the branch or loop do not match. The literal alternative remains in the work directory for its five-row evidence; the committed draft still matches all useful instructions.
+
+
 ### ActorDisplay_UpdateForegroundSprite (081EC7D8): horizontal allocation still open
 
 Draft: `notes/phase3-drafts/dp-scene2/ActorDisplay_UpdateForegroundSprite.c` (ROM 412 bytes, draft 420; 35 ROM / 38 draft instructions differ, shape 7). Separating the horizontal and vertical sums stops the original reused x pseudo from taking the drawable's r5. Distinct field pointers remove their accidental global lifetime. Playback then differs only in one mask reload, but coordinate allocation still prevents move2add from reusing the shake and displacement offsets.
@@ -1256,6 +1259,9 @@ Diagnosis: local allocation gives the horizontal sum r0 (priority 12000, six ref
 Tried: separate coordinate lifetimes, separate address lifetimes, direct named fields, signed/unsigned sums, reversed operand spelling, halfword sums and final-sum truncation, word-union sums, and a geometry inline helper. Halfword forms introduce unwanted extensions; direct fields also lose the required early screen address and signed layer load. The retained full-width draft preserves the observed operation and load order.
 
 Next: break the sum's local-allocation quantity tie without changing instruction order, or recover a source aggregate/accessor whose screen address gets the first local register. Keep the full 0x5E0/0x5E6/0x5E8 offsets and signed alternate-layer read. Return after the singleton tail of the queue.
+
+After the singleton matches, splitting only the address/result temporaries while retaining the reused coordinate accumulator reduces shape distance to 3 (39 ROM / 40 draft rows, 416 bytes). `why` confirms the remaining obstacle: the shared x is global (priority 6666), but the first sum's temporary and screen pointer are local and already occupy r0/r1. Splitting x itself ties its chain locally in r0 instead. Direct result stores and a geometry inline wrapper do not change this decision. The earlier retained draft has fewer register differences; neither version is a stock match.
+
 
 ### SingletonSlot7_UpdateEndingScene (081EF914): two mask pins removed, transition zeros open
 
