@@ -3,6 +3,10 @@
 #include "player.h"
 #include "ram.h"
 s32 Path_GetPointPositionById(u16 *, u32, u32);
+struct SceneActorBoundsRouteView {
+    u8 unknown0[0x458];
+    u8 pathId, unknown459, pointId;
+};
 u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *input,
                                                const struct ContactPosition *inputBounds)
 {
@@ -15,10 +19,9 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
     struct ContactPosition origin, difference, bestDifference;
     if (actor->category == 10) {
         u32 mask = 0x4000000;
-        u32 offset = 0x2d0;
-        register u32 *field asm("r0");
+        register u32 *field;
         u32 value;
-        field = (void *)((u8 *)actor + offset);
+        field = &actor->flags2D0;
         value = *field;
         value &= mask;
         if (value)
@@ -26,13 +29,13 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
         goto failure;
     }
     {
-        register u32 firstOffset asm("r1") = 0x458;
+        register u32 firstOffset = (u32) & ((struct SceneActorBoundsRouteView *)0)->pathId;
         register u32 offset asm("r3");
         u8 *field;
         u32 first;
         u8 *controlField = (u8 *)actor + firstOffset;
         first = *controlField;
-        offset = 0x45a;
+        offset = (u32) & ((struct SceneActorBoundsRouteView *)0)->pointId;
         asm("" : "+r"(offset));
         controlField = (u8 *)actor + offset;
         Path_GetPointPositionById((u16 *)&origin, first, *controlField);
