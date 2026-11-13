@@ -1,16 +1,19 @@
-// MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
+static inline u16 StackedParticle_GetRaisedHeight(const struct StackedActorParticle *particle)
+{
+    return 768 + (u16)particle->position.y;
+}
 void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
                                      struct StackedActorPosition *position)
 {
     particle->position = *position;
     {
         u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-        register u32 *rng asm("r9") = &gRandomIndex;
-        register u32 index asm("r2") = *rng + 1;
+        u32 *rng = &gRandomIndex;
+        u32 index = *rng + 1;
         u32 mask = 1023;
         u32 mask31;
-        register u32 zero asm("r8");
+        u32 zero;
         u32 sample;
         u32 coordinate;
         u32 scratch;
@@ -24,16 +27,12 @@ void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
         coordinate += sample;
         zero = 0;
         particle->position.x = coordinate;
-        index = (index + 1) & mask;
+        index += 1;
+        index &= mask;
         sampleAddress = (u16 *)(index * 2 + (u32)random);
-        scratch = 768;
-        asm("" : "+r"(scratch) : "r"(coordinate));
-        coordinate = scratch;
-        scratch = (u16)particle->position.y;
-        coordinate += scratch;
-        coordinate += *(u8 *)sampleAddress;
-        particle->position.y = coordinate;
-        index = (index + 1) & mask;
+        particle->position.y = StackedParticle_GetRaisedHeight(particle) + *(u8 *)sampleAddress;
+        index += 1;
+        index &= mask;
         sample = random[index];
         coordinate = (u16)particle->position.z;
         coordinate -= 15;
@@ -45,9 +44,10 @@ void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
             u32 zeroX = zero;
             particle->velocityX = zeroX;
         }
-        index = (index + 1) & mask;
+        index += 1;
+        index &= mask;
         {
-            register u32 *store asm("r3") = rng;
+            u32 *store = rng;
             *store = index;
         }
         {
