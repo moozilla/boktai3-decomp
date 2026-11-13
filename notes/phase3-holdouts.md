@@ -1559,3 +1559,41 @@ Next: an ordinary global lifetime that keeps the common origin spilled while
 allowing the second table in sl, then solve each priority-one lifetime. The
 origin's shared PRE definition is the useful starting point; changing only
 the table spelling cannot recreate a hard register's function-wide exclusion.
+
+
+### Mummy_ResumeSavedRouteAfterAnimation (080D1784): PRE table-size ordering
+
+Tags: #matching #phase3 #monsters #compiler
+
+Saved the best ordinary draft with all three pins and the barrier removed.
+No production change. The original unsigned-mask draft is 20/20, shape 40;
+using a signed halfword mask for 0x200 recovers the ROM's target-address
+construction and improves to 18/18, shape 36. Remaining differences are PRE
+stack-slot permutations, with the same 788-byte size.
+
+The signed-mask draft matches exactly with diagnostic AGBCC_GCSE_T=145.
+Stock compilation reaches GCSE with N=283 real instructions and T=141 hash
+buckets. Scope's preorder model explains all 28 address expressions and the
+12 reaching pseudos. Ten modeled spilled pointers reveal the order changes;
+T=145 reproduces the ROM order. This requires N=288..291, five to eight more
+early RTL instructions, if expression indices and base numbering stay fixed.
+The unsigned draft still differs by two instructions with the same knob.
+The override is diagnostic only and is not part of the saved source.
+
+Tried narrow flag-clear and delay parameters, typed saved-control/reaction
+fields, a signed bitfield flag clear, split flag operations, mask arrays and
+unsigned halfword masks. Those either preserve the baseline permutation or
+change additional instructions. Starting from the signed-mask draft, local
+initialized delay bytes give 49/53; a delay-state struct gives 26/26;
+sequence zero initialization gives 46/53; a reaction-zero halfword array gives
+19/19. Aggregating route/mask/target gives 93/85, sharing failed-route cleanup
+34/28, and a returning route loop 20/20. Signed mask alone with the other
+original concessions retained gives 20/20, so there is no free partial.
+Persistent search retains the signed-mask and representative structural tests.
+
+Next: find a natural C initialization or duplicated post-join statement that
+adds five to eight pre-GCSE RTL instructions, then disappears in later passes.
+Recheck expression numbering as well as the table size after each structural
+change. The saved draft retains inherited raw offsets that should become real
+fields before a final clean landing. Work stopped here at the user's end-of-run
+instruction; later queue items were not started.
