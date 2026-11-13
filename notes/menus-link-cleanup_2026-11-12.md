@@ -113,3 +113,27 @@ Four functions now share `src/wireless_exit.c` and a WirelessExit task containin
 a completion script key and shutdown state. The old generic Task and listener
 pointer views are gone. Creation uses the shared engine task API; all 256 bytes
 match. Existing function names retained.
+
+## Deferred wireless scene objects: 0803BAA0–0803CDF0
+
+This row uses the same ScenePoolActor already defined by include/scene_pool.h,
+not a separate wireless-object allocation. That header is consumed by 43 units,
+including several units on the concurrent depinning list. A canonical merge
+requires nesting the shared 44-byte scaled-parameter aggregate at actor+0084
+and player+009C, while preserving the existing direct min/max-speed fields used
+by the other family. It also needs shared model and spatial-index records at
+0600, 052C/056C/0860. A new local WirelessSceneActor would perpetuate the partial
+views explicitly forbidden by this assignment, and changing the shared actor's
+field API crosses the small-header-change limit. No files in this row changed.
+Coordinate a shared scene-pool type pass before consolidating it.
+
+## Floating numbers: 08046B34–0804732C
+
+Consolidated sixteen functions into `src/damage_number_display.c` and promoted
+the existing shared display/group/glyph API into its header. Replaced the opaque
+task prefix with Task. FindSource and Show now use structured return paths; the
+allocation helper's shared exit remains because splitting it changes branches.
+A shared projection wrapper also changed allocation in SetGroup, so the existing
+relative/global projection forms remain. The 2,040-byte unit and all three
+external header consumers (081A5360, 0820EE34, 0820F378) match. The old_agbcc
+resets at either edge remain separate compiler units.

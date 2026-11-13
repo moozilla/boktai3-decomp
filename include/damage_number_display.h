@@ -20,16 +20,14 @@ struct DamageNumberGroup {
     struct DamageNumberGlyph digits[4];
 };
 struct DamageNumberDisplay {
-    u8 task[0x18];
+    struct Task task;
     u32 activeMask;
     void *resource;
     struct DamageNumberGroup groups[4];
 };
 /* 0x02000074 */
 extern struct DamageNumberDisplay *gDamageNumberDisplay;
-s32 DamageNumberDisplay_Show(struct DamageNumberSource *source, u32 amount, u32 kind,
-                             const struct ContactPosition *position,
-                             const struct ContactPosition *offset, s32 priority);
+
 static inline s32 DamageNumber_ProjectScale(s32 value)
 {
     if (value >= 0)
@@ -53,4 +51,34 @@ static inline void DamageNumber_ProjectPosition(struct ContactPosition *screen,
     screen->y = y - gCameraOrigin[1] + 80;
     screen->z = depth - gCameraOrigin[2];
 }
+inline static void DamageNumber_ProjectRelativePosition(struct ContactPosition *screen,
+                                                        const struct ContactPosition *world,
+                                                        const u16 *camera);
+struct DamageNumberDisplay *DamageNumberDisplay_SetActiveBit(struct DamageNumberDisplay *display,
+                                                             u32 index);
+void DamageNumberDisplay_ClearActiveBit(struct DamageNumberDisplay *display, u32 index);
+u32 DamageNumberDisplay_GetActiveBit(struct DamageNumberDisplay *display, u32 index);
+s32 DamageNumberDisplay_FindSource(struct DamageNumberDisplay *display, u32 key);
+s32 DamageNumberDisplay_FindAvailableGroup(struct DamageNumberDisplay *display, s32 priority);
+u32 DamageNumberDisplay_RenderDigits(struct DamageNumberDisplay *display,
+                                     struct DamageNumberGroup *group, u32 amount, u32 glyphBase,
+                                     struct ContactPosition *initialScreen);
+struct DamageNumberDisplay *DamageNumberDisplay_SetGroup(struct DamageNumberDisplay *display,
+                                                         s32 index, u32 amount, u32 kind,
+                                                         const struct ContactPosition *position,
+                                                         const struct ContactPosition *offset,
+                                                         u32 key, u32 priority);
+void DamageNumberDisplay_RemoveGroup(struct DamageNumberDisplay *display, s32 index);
+void DamageNumberGroup_AdvancePhase(struct DamageNumberGroup *group);
+s32 DamageNumberDisplay_UpdateBouncing(struct DamageNumberDisplay *display,
+                                       struct DamageNumberGroup *group, u32 groupIndex);
+s32 DamageNumberDisplay_UpdateLeaving(struct DamageNumberDisplay *display,
+                                      struct DamageNumberGroup *group, s32 groupIndex);
+s32 DamageNumberDisplay_Update(struct DamageNumberDisplay *display);
+u32 DamageNumberDisplay_Destroy(struct DamageNumberDisplay *display);
+s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display);
+struct DamageNumberDisplay *DamageNumberDisplay_Create(void);
+s32 DamageNumberDisplay_Show(struct DamageNumberSource *source, u32 amount, u32 kind,
+                             const struct ContactPosition *position,
+                             const struct ContactPosition *offset, s32 priority);
 #endif
