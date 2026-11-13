@@ -2942,16 +2942,16 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
                 a->rate = 1;
         } else
             done = 0;
-        *(u16 *)((u8 *)p + 0xf80) = 0;
-        *(s16 *)((u8 *)p + 0xf82) = 15;
+        p->blinkTimer = 0;
+        p->blinkInterval = 15;
     }
-    if (Mod(++*(u16 *)((u8 *)p + 0xf80), *(s16 *)((u8 *)p + 0xf82)) == 0) {
-        *(u16 *)((u8 *)p + 0xf80) = 0;
+    if (Mod(++p->blinkTimer, p->blinkInterval) == 0) {
+        p->blinkTimer = 0;
         if (p->obj.flags & 1)
             p->obj.flags &= ~1;
         else
             p->obj.flags |= 1;
-        if (--*(u16 *)((u8 *)p + 0xf82) == 0) {
+        if (--(*(u16 *)&p->blinkInterval) == 0) {
             s32 duration = 10;
             AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
             AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
@@ -2971,20 +2971,19 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             {
                 u32 active = 4;
                 register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
-                u32 reset = 1;
+                u8 reset = 1;
                 struct ActorChildCallbackView *child =
-                    (struct ActorChildCallbackView
-                         *)((u8 *)p +
-                            0xc8); /* MATCHING_CONCESSION: retain the original unused zero-register initialization. */
+                    (struct ActorChildCallbackView *)&p->children[0].fn;
                 register s32 reserved asm("r7") = 0;
                 s32 i;
                 for (i = 15; i >= 0; i--) {
-                    register u32 v asm("r2") = child->flags;
-                    if (active & v) {
+                    union DisplaySequenceControl control;
+                    control.raw = child->flags;
+                    if (active & control.raw) {
                         u32 flags;
                         child->fn = fn;
-                        flags = reset | v;
-                        child->flags = flags;
+                        control.raw = reset | control.raw;
+                        child->flags = control.raw;
                     }
                     child++;
                 }
