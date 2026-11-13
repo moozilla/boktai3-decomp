@@ -26,13 +26,17 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
             particle++;
         } while (--i >= 0);
         {
-            register u32 sample asm("r2") = *frame;
+            u32 sample = *frame;
             u32 shifted;
             shifted = sample << 16;
-            if ((shifted >> 16) <= 63 && !(sample & 3)) {
-                shifted >>= 18;
-                shifted &= 7;
-                LevelAdvanceDisplay_StartParticle(&manager->particles[shifted]);
+            if ((shifted >> 16) <= 63) {
+                u32 low = 3;
+                low &= sample;
+                if (!low) {
+                    shifted >>= 18;
+                    shifted &= 7;
+                    LevelAdvanceDisplay_StartParticle(&manager->particles[shifted]);
+                }
             }
         }
         {
