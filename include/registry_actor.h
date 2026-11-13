@@ -62,5 +62,4 @@ void RegistryA8CB_RegisterMessageReceiver(struct RegistryActor *);
 void Modifier_InitDrainState(struct ActorDrainState *, void *, u16, u8);
 void ActorPhysics_UpdateFallMotion(struct RegistryActor *);
 void SceneMessages_RegisterReceiver(void *, u32, u32);
-void Anim_SetKeyframes(void *, void *, u16, u32, u32);
 #endif
