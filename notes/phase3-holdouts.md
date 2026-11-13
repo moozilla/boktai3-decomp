@@ -1488,3 +1488,40 @@ keyframe local solved it. Next: preserve the address-to-save copy before the cla
 without preventing CSE using a barrier. Do not repeat sampler/type/layout experiments.
 
 Scratch/evidence: `build/cx/work/WirelessResultPanel_UpdateOutcomeReveal/`.
+
+### WirelessResultPanel_Init (0803B40C, src/fn/sub_0803B40C.c)
+
+Stopped at the explicit end-of-run request. Production is unchanged and independently
+checks MATCH (684 bytes). All eleven pins and three barriers remain there. The clean
+saved draft is `notes/phase3-drafts/dp-link/WirelessResultPanel_Init.c`: 15 ROM / 13
+draft differences, shape 6, 680 bytes. The adjacent `.partial.c` preserves the useful
+four-concession intermediate (two resource barriers, visible-address and zero pins):
+4/4 differences, shape 4, 684 bytes. Neither is a matching implementation.
+
+The shared DisplaySequence_StepSprite logic removes the difficult sequence-step
+constraints. Calling the helper directly loses the saved sprite low-register copy;
+expanding its ordinary C locally and accessing the first flip through p->sprite,
+with the second through sprite, restores nearly all of the instruction structure.
+The fully unconstrained baseline was 79/73, shape 20; helper alone 27/27, shape 24;
+expanded parent-field form 17/15, shape 6. Moving the final one initializer before
+the state store gives the saved 15/13 clean result and 4/4 partial.
+
+The partial's first flip reload takes r1 instead of r3, forcing an additional parent
+reload for the store. Scope why identifies reload choice 19 (insn 417) and the round-
+robin spill list r0,r1,r3,r4,r5,r6: previous choice 18 took r0, whereas the ROM needs
+the rotation to start after r1. AGBCC_SPILL=19:1 on the saved partial reduces it to
+1/1, shape 2, but DOES NOT MATCH: the final movs r0,#1 is before the state store,
+whereas the ROM places it after. With the original final initializer order, that
+same knob leaves four differences. There is no matching diagnostic yet.
+
+Tried shared sprite/state types, helper calls and expanded local/parent forms,
+direct parameter instead of p=arg, final direct stores, narrow one, reordered one,
+first-flip value and constant locals, repeated command reload in both flip arms,
+and removal of the visible pin, zero pin, both pins, or both resource barriers.
+No partial matches. The clean form additionally loses the two resource-copy moves,
+reverses loop zero/count registers, and changes the saved visible-address register.
+Next: recover one natural reload before the first flip while retaining the final
+state/one order; then address resource copy and loop allocation independently.
+Do not claim the spill override as a match or land the diagnostic partial.
+
+Scratch/evidence: `build/cx/work/WirelessResultPanel_Init/`.
