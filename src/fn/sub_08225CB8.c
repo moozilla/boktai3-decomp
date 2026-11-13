@@ -13,7 +13,7 @@ void Terrain_LoadHP(s32 hp);
 void Terrain_LoadGridResource(u16);
 void Terrain_LoadBoxesResource(u16);
 void Terrain_LoadPathsResource(u16);
-void sub_0821F15C(u16);
+void NavMesh_LoadResource(u16);
 struct TerrainTask *ResourceRegistry_GetResource(u32);
 void Video_SetRenderCallbacks(s32, void *, void *, void *);
 void SpriteOam_QueueProjectedSprites(void);
@@ -46,7 +46,7 @@ void Terrain_LoadFromScript(void)
         if (r)
             Terrain_LoadPathsResource(r);
         if (z)
-            sub_0821F15C(z);
+            NavMesh_LoadResource(z);
     }
     g = ResourceRegistry_GetResource(0x56C2)->grid;
     if (Script_SeekToKeyword('v')) {

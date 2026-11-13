@@ -13,7 +13,7 @@ struct ArmorPackedPosition {
     u32 x : 16, y : 16, z : 16, unused : 16;
 };
 s32 Terrain_ApplyBlocked(void *, void *, struct ArmorPackedPosition *);
-u32 sub_0821FB8C(void *, void *, u32, u32);
+u32 NavMesh_SteerCardinal(void *, void *, u32, u32);
 s32 DirectionalActor_TryBeginState(struct Armor *, s32);
 void Armor_UpdateTargetFacing(struct Armor *p)
 {
@@ -25,7 +25,7 @@ void Armor_UpdateTargetFacing(struct Armor *p)
         pos.z = *(u16 *)(target + 0x34);
         Terrain_ApplyBlocked(p->navigation, p->position, &pos);
     }
-    sub_0821FB8C(p->navigation, p->position, p->direction, 0x40);
+    NavMesh_SteerCardinal(p->navigation, p->position, p->direction, 0x40);
     if (p->state == 0) {
         if (DirectionalActor_TryBeginState(p, 0x1c))
             p->state = 255;

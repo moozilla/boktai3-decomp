@@ -9235,16 +9235,21 @@ addr,name,mode,confidence,source,notes
 0821EC84,Path_FindNearestDistantPoint,thumb,low,src-alias,
 0821EDE0,Path_SnapToRandomFarPoint,thumb,low,src-alias,
 0821EF30,Path_SnapToRandomPointInBox,thumb,low,src-alias,
+0821F15C,NavMesh_LoadResource,thumb,low,src-alias,Loads the requested navigation archive into the current terrain map (tentative).
 0821F180,Terrain_SetNavMeshes,thumb,low,src-alias,HP nav meshes -> EngineMap+0x14
 0821F18C,NavMesh_IsPointInsideRegion,thumb,low,src-alias,Tests fixed-point coordinates against an indexed region's half-open bounds
 0821F1C4,PairTable_Lookup,thumb,low,src-alias,
 0821F204,Nav_IsPositionInMesh,thumb,low,src-alias,
 0821F2EC,NavMesh_FindRoute,thumb,low,matching,Selects a direct route or the nearest viable waypoint pair for two positions
 0821F7A8,Terrain_ApplyBlocked,thumb,low,src-alias,
+0821F838,NavMesh_ClearProbeFlags,thumb,low,src-alias,Clears the navigation probe flag word.
 0821F840,NavMesh_ConsumeProbeEvent,thumb,low,src-alias,Tests and clears probe flag bit one to consume a pending navigation event tentatively
+0821F864,NavMesh_UpdateContainingRegion,thumb,low,src-alias,Updates the probe mesh and region containing its position.
 0821F998,NavMesh_StepTowardTarget,thumb,low,src-alias,
 0821FAD0,NavMesh_UpdateProbe,thumb,low,src-alias,Updates a probe against the active navigation mesh and conditionally performs a secondary query
 0821FB04,Actor_MoveAlongAngle,thumb,low,src-alias,
+0821FB8C,NavMesh_SteerCardinal,thumb,low,src-alias,Chooses cardinal steering when navigation is blocked (tentative).
+0821FC34,NavMesh_SteerOctant,thumb,low,src-alias,Chooses eight-way steering when navigation is blocked (tentative).
 0821FCDC,Navigation_FindContainingRegion,thumb,low,src-alias,
 0821FD3C,ProximityVolume_TranslateBounds,thumb,low,src-alias,
 0821FDC8,Collider_Register,thumb,low,src-alias,Appends a collider to the manager's list unless already registered
