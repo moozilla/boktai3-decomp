@@ -1570,3 +1570,48 @@ the exact isolated cross-jump counterfactual. Next: recover the source-level
 height operation that materializes the constant copy, then reconstruct the rise
 arm label topology with both multiplies retained. Kind/frame pins should be
 retested together once the left/right scalar lifetimes are ordinary.
+
+
+### ScenePanel_UpdateTimePalette (08057E04): spill layout and reload rotation
+
+Tags: #menus #palette #matching #compiler
+
+No source change landed. Best indexed draft:
+`notes/phase3-drafts/dp-menus/ScenePanel_UpdateTimePalette.c`, 119 ROM / 129 draft
+instructions, shape distance 118. The original fully depinned form reproduces
+142 / 152, shape 116. Both are far from matching; no complete matching knob.
+The ordinary frame grows from 24 to 32 bytes because panel (pseudo 23) and the
+second target (175) spill into extra slots. Raising their priorities does not
+recover the ROM (136 / 154 and 744 bytes). CSE_NOCANON=22 improves the base to
+131 / 145 by preserving the panel copy; no single probe matches.
+
+An isolated exact diagnosis: oldframe.c removes only the last oldFrame pin and
+barrier. `AGBCC_SPILL=7:1` MATCH. Reload folds the frame load into the compare,
+then chooses r1 instead of r3 because the previous reload took r0. The ROM needs
+a preceding choice in r1/r2. Reversed comparison with the old pin retained gets
+the load right but emits cmp r3,r0 instead of cmp r0,r3. Direct scalar, narrow,
+array, union, addressed scalar, signed/unsigned comparison, XOR, negated operands,
+and a delta/store formulation do not match. This knob proves only the isolated
+pair, not the whole function.
+
+Other close isolated groups: removing the previous-pointer step pin/barrier costs
+two instructions (step in r0 instead of r5). Removing both channelMask pins costs
+four instructions elsewhere: the palette-base literal changes r3 to r5 and the
+second high-register pointer step changes r0 to r5. This is reload allocation,
+not a different channel result. The existing channel helper worsens those groups.
+Pointer-to-local source forms do not remove the high-register source constraints.
+
+Tried direct row/column output, a conventional shared color helper, an exact-stage
+pointer helper, addressable scratch pointer and one-element scratch array,
+source-pointer references, narrow/signed mask and step variables, scalar/array
+step storage, and frame/palette-base expression forms. Helpers and scratch
+pointers substantially change allocation or stack traffic; array scratch removes
+some barriers but still differs. Read the reload round-robin explanation and
+frame slot records; the next useful task is recovering the original loop value
+layout before chasing individual masks. Keep indexed output as an alternative,
+but retain the original depinned baseline in the persistent store too.
+
+Persistent store: `build/matchsearch/ScenePanel_UpdateTimePalette`, including the
+exact isolated reload-rotation counterfactual. Next: remove the input/panel copy
+class-head lifetime inflation in ordinary C, then eliminate the second target
+spill while preserving the six intended scratch slots.
