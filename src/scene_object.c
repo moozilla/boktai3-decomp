@@ -743,9 +743,9 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
     if (cell) {
         u32 heightByte = cell->height;
         u32 mask = 0xF0;
-        s32 type = heightByte >> 4;
-        asm("" : : "r"(heightByte));
+        s32 type;
         asm("" : "+r"(mask));
+        type = heightByte >> 4;
         switch (type) {
             case 0: {
                 u32 lowMask = 15;

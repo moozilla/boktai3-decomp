@@ -1231,3 +1231,44 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-field (Codex)
+
+Tags: #phase3 #field #matching #compiler
+
+### Scene_TryStepDown (08004CE4): one barrier removed, four concessions remain
+
+The matching partial moves the type calculation after the existing mask barrier.
+This removes the height-byte input barrier without changing any instruction.
+Stock `tools/check.py src/scene_object.c` matches all 37 functions (7,236 bytes).
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/Scene_TryStepDown.c`
+(18 ROM / 20 draft differing instructions, shape 6). It reads the cell byte into
+`mask`, copies it to `heightByte`, computes `type`, then sets `mask = 0xF0`.
+The nonconstant first set removes the constant-equivalence priority penalty:
+mask takes r4, cell r6, type r7, direction r8 as in ROM. It leaves an extra copy
+and shifts before setting 0xF0. Moving the mask assignment before the shift lets
+CSE delete the first mask set and restores the earlier allocation failure.
+
+The earlier field-effects draft remains useful as a second frontier. It matches
+under the combined diagnostic knobs `AGBCC_PRI=mask:+1400`,
+`AGBCC_FORCE=heightByte:1,current:2,referenceHeight:0`, and
+`AGBCC_NOTIE=231,485`. Thus the remaining blockers are mask priority, allocation
+of the two loaded bytes and two-address operand selection for both nibble ANDs.
+These are diagnostic overrides only; they are not used by any landed source.
+The saved draft also improves with `AGBCC_PRI=current:+544` (13/15 differing).
+
+Tried: reusing index or the override pointer for mask; initial mask copies before
+and after the shift; narrow mask and reference-byte types; union mask initializer;
+union byte references; swapping AND operands; decrement helper; assigning the
+low mask to remaining before the AND; and mutating lowMask directly. The latter
+removes the unwanted remaining copy but gives lowMask the long-lived r4 instead
+of ip. The helper/copy forms change CSE's canonical representative and spill
+layout. Narrow union byte reads prevent ties but perturb allocation substantially.
+Keeping the other original concessions while applying these forms did not remove
+a second site. Parameter/neighbor cleanup alone does not preserve the partial's
+allocation when the remaining pin is retained.
+
+Next: a height/nibble representation that retains the nonconstant mask priority
+without retaining its initial copy; or a shared nibble operation whose subreg
+operands prevent both regmove ties without making lowMask the canonical result.
