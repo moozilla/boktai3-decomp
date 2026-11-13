@@ -11,8 +11,8 @@ void SceneVolume_BeginPhase(struct ActorState *, s32);
 s32 SceneVolume_FindNearbyPosition(struct ActorState *);
 s32 ActorEffect_StepTurn(struct ActorState *, s32, s32, s32, s32);
 s32 Path_PickRandomPoint(void *, u32);
-void ActorImpact_FindNearbyPoint(struct ActorState *, struct ActorAnimationPair *, s32);
+void ActorImpact_FindNearbyPoint(struct ActorState *, struct ContactPosition *, s32);
 s32 SceneVolume_ConsumePendingEvent(struct ActorState *);
-void ActorVariation_SelectRandomPair(struct ActorState *, struct ActorAnimationPair *);
-s32 ActorPosition_TestPath(struct ActorState *, struct ActorAnimationPair *);
+void ActorVariation_SelectRandomPair(struct ActorState *, struct ContactPosition *);
+s32 ActorPosition_TestPath(struct ActorState *, struct ContactPosition *);
 #endif

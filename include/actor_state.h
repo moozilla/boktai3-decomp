@@ -10,9 +10,6 @@ struct ActorAnimationResource {
     u8 eventScripts[0x28];
 };
 /* Tentative actor state prefix shared by the adjacent state callbacks. */
-struct ActorAnimationPair {
-    u32 first, second;
-};
 struct ActorState {
     u8 unknown0[0x48];
     struct SceneActorBody body;
@@ -56,8 +53,8 @@ struct ActorState {
     u8 slowDown, direction, hitParameter, impactCount;
     u8 unknown474[3];
     u8 transitionBlocked;
-    struct ActorAnimationPair selectedAnimation;
-    struct ActorAnimationPair targetAnimation;
+    struct ContactPosition savedPosition;
+    struct ContactPosition nearbyPosition;
     u8 unknown488[0x58];
     u8 animationState, unknown4E1, animationPhase, animationIndex, animationDetail, mode;
     u16 decisionTimeout;
@@ -78,7 +75,7 @@ struct ActorState {
     struct ContactPosition offsetPoint;
     u8 unknown600[0x600];
     u16 paletteData[16];
-    struct ActorAnimationPair animation;
+    struct ContactPosition movementTarget;
 };
 /* The owner retains this actor prefix at offset zero. */
 struct ActorStateOwner {

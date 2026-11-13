@@ -30,7 +30,7 @@ void ActorDecision_UpdateTimedPhase(struct ActorState *actor)
     struct ActorState *stateData = actor;
     if (ActorDecision_ConsumeTrigger(actor)) {
         stateData->animationState = 3;
-        stateData->animation = stateData->targetAnimation;
+        stateData->movementTarget = stateData->nearbyPosition;
         {
             u32 phase = 5;
             actor->state = phase;
@@ -120,7 +120,7 @@ void ActorDecision_UpdateHazardPath(struct ActorState *actor)
         path->animationState = 3;
         path->animationIndex = (RandomValue() >> 8) & 3;
         path->animationDetail = Mod(RandomValue(), 5);
-        Path_GetPointPositionById(&path->animation, path->animationIndex, path->animationDetail);
+        Path_GetPointPositionById(&path->movementTarget, path->animationIndex, path->animationDetail);
         {
             u32 state = 4;
             actor->state = state;
@@ -141,7 +141,7 @@ void ActorDecision_UpdateHazardPath(struct ActorState *actor)
                 actor->requestPhase = 0;
             } else
                 AnimatedHazard_CreateProximity(&actor->body.position, path->hazardParameter, 800, 60);
-            Path_GetPointPositionById(&path->animation, path->animationIndex, path->animationDetail);
+            Path_GetPointPositionById(&path->movementTarget, path->animationIndex, path->animationDetail);
             path->animationState = 3;
             {
                 u32 state = 4;
@@ -215,7 +215,7 @@ void ActorDecision_UpdateThresholdPhase(struct ActorState *actor)
     struct ActorState *stateData = actor;
     if (ActorDecision_ConsumeTrigger(actor)) {
         stateData->animationState = 3;
-        ActorMovement_FindQuarterTurnPoint(stateData, &stateData->animation);
+        ActorMovement_FindQuarterTurnPoint(stateData, &stateData->movementTarget);
         {
             u32 phase = 4;
             actor->state = phase;
@@ -223,7 +223,7 @@ void ActorDecision_UpdateThresholdPhase(struct ActorState *actor)
     } else if (actor->timer < 60 && actor->threshold > 0x10000) {
         if (actor->pending == 1) {
             stateData->animationState = 3;
-            ActorMovement_FindQuarterTurnPoint(stateData, &stateData->animation);
+            ActorMovement_FindQuarterTurnPoint(stateData, &stateData->movementTarget);
             {
                 u32 phase = 4;
                 actor->state = phase;
