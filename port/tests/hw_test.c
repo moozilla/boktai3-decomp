@@ -293,6 +293,15 @@ static int audio_tests(void)
     CHECK(hw_mp2k_mix(&sound, pcm, 4, 8000) == 0 && c->envelopeVolume == 127);
     for (i = 0; i < 8; ++i) CHECK(hw_mp2k_mix(&sound, pcm, 4, 8000) == 0);
     CHECK(!c->statusFlags);
+    for (i = 0; i < PCM_DMA_BUF_SIZE * 2; ++i) sound.pcmBuffer[i] = 0;
+    sound.pcmDmaCounter = 2; sound.pcmDmaPeriod = 3; sound.reverb = 64;
+    sound.pcmBuffer[0] = sound.pcmBuffer[PCM_DMA_BUF_SIZE] = -2;
+    sound.pcmBuffer[8] = sound.pcmBuffer[PCM_DMA_BUF_SIZE + 8] = -2;
+    sound.pcmBuffer[1] = sound.pcmBuffer[PCM_DMA_BUF_SIZE + 1] = 50;
+    sound.pcmBuffer[9] = sound.pcmBuffer[PCM_DMA_BUF_SIZE + 9] = -2;
+    CHECK(hw_mp2k_mix(&sound, pcm, 4, 8000) == HW_OK);
+    CHECK(pcm[0] == 0 && pcm[1] == 0 && pcm[2] == 3072 && pcm[3] == 3072);
+    CHECK(sound.pcmBuffer[9] == 12 && sound.pcmBuffer[1] == 50);
     hw_write16(&machine, HW_IO_BASE + 0x84, 0x80);
     hw_write16(&machine, HW_IO_BASE + 0x80, 0x1177);
     hw_write16(&machine, HW_IO_BASE + 0x82, 2);

@@ -109,12 +109,20 @@ int hw_mp2k_mix(struct SoundInfo *sound, int16_t *stereo, size_t frames, uint32_
     if (sound->pcmDmaCounter > 1 && sound->pcmDmaCounter <= sound->pcmDmaPeriod)
         offset = (sound->pcmDmaPeriod - (sound->pcmDmaCounter - 1)) * frames;
     if (offset + frames > PCM_DMA_BUF_SIZE) return HW_BAD_DATA;
-    if (sound->reverb) for (i = 0; i < frames; ++i) {
-        size_t next = (offset + frames + i) % PCM_DMA_BUF_SIZE;
-        int32_t sum = sound->pcmBuffer[offset + i] + sound->pcmBuffer[offset + i + PCM_DMA_BUF_SIZE] +
-                      sound->pcmBuffer[next] + sound->pcmBuffer[next + PCM_DMA_BUF_SIZE];
-        int32_t feedback = sum * sound->reverb / 512;
-        mixed[i * 2] = mixed[i * 2 + 1] = feedback * 256;
+    if (sound->reverb) {
+        size_t next_offset = sound->pcmDmaCounter == 2 ? 0 : offset + frames;
+        if (next_offset + frames > PCM_DMA_BUF_SIZE) return HW_BAD_DATA;
+        for (i = 0; i < frames; ++i) {
+            size_t next = next_offset + i;
+            int32_t sum = sound->pcmBuffer[offset + i] + sound->pcmBuffer[offset + i + PCM_DMA_BUF_SIZE] +
+                          sound->pcmBuffer[next] + sound->pcmBuffer[next + PCM_DMA_BUF_SIZE];
+            int32_t product = sum * sound->reverb;
+            int32_t feedback = product >= 0 ? product / 512 : -((-product + 511) / 512);
+            /* The original adds one when bit 7 of the shifted feedback is set,
+             * even for an exact negative multiple of 512. */
+            if ((uint32_t)feedback & 0x80) ++feedback;
+            mixed[i * 2] = mixed[i * 2 + 1] = (int8_t)feedback * 256;
+        }
     }
     for (channel = 0; channel < channels; ++channel) {
         struct SoundChannel *c = sound->chans + channel;

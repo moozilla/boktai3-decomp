@@ -127,7 +127,8 @@ release and pseudo-echo envelopes once per call, applies channel/master volume,
 supports fixed and interpolated PCM playback and loops, and writes both a
 signed 16-bit stereo stream and the SDK's signed 8-bit DMA ring. It clamps the
 final stereo mix; original packed-byte overflow behavior is not reproduced.
-Reverb uses feedback from adjacent DMA-ring blocks. It is functional audio,
+Reverb wraps at the active DMA-ring boundary and preserves the original
+feedback rounding; 16 ring/level cases agree with the original full PCM buffer. It is functional audio,
 not a claim of bit-identical GBA audio.
 
 The SDK `SoundMain` replacement finds the sound state through the mapped

@@ -196,6 +196,37 @@ static int mixer_state_oracle(struct mCore *core)
     return 0;
 }
 
+static int mixer_reverb_oracle(struct mCore *core)
+{
+    static const unsigned reverbs[] = {1, 32, 64, 127};
+    unsigned counter, level, i, cases = 0;
+    for (counter = 0; counter <= 3; ++counter) for (level = 0; level < 4; ++level) {
+        struct SoundInfo sound = {0};
+        int16_t pcm[32];
+        for (i = 0; i < 0x350; ++i) core->busWrite8(core, 0x02000000 + i, 0);
+        sound.reverb = (uint8_t)reverbs[level];
+        sound.pcmDmaCounter = (uint8_t)counter;
+        sound.pcmDmaPeriod = 3;
+        for (i = 0; i < PCM_DMA_BUF_SIZE * 2; ++i) {
+            sound.pcmBuffer[i] = (int8_t)((i * 71 % 201) - 100);
+            core->busWrite8(core, 0x02000350 + i, (uint8_t)sound.pcmBuffer[i]);
+        }
+        core->busWrite32(core, 0x02000000, ID_NUMBER);
+        core->busWrite8(core, 0x02000004, sound.pcmDmaCounter);
+        core->busWrite8(core, 0x02000005, sound.reverb);
+        core->busWrite8(core, 0x0200000b, sound.pcmDmaPeriod);
+        core->busWrite32(core, 0x02000010, 16);
+        core->busWrite32(core, 0x02000028, 0x0822fe19);
+        if (rom_call(core, 0x0822f1c4, 0, 0, 0) || hw_mp2k_mix(&sound, pcm, 16, 8000)) return 1;
+        for (i = 0; i < PCM_DMA_BUF_SIZE * 2; ++i) if ((int8_t)core->busRead8(core, 0x02000350 + i) != sound.pcmBuffer[i]) {
+            fprintf(stderr, "Reverb counter %u level %u byte %u differs\n", counter, reverbs[level], i); return 1;
+        }
+        ++cases;
+    }
+    printf("Original mixer reverb: PASS (%u ring/feedback cases, exact full buffer)\n", cases);
+    return 0;
+}
+
 static int bios_memory_oracle(struct mCore *core)
 {
     struct ARMCore *cpu = core->cpu;
@@ -357,6 +388,7 @@ int main(int argc, char **argv)
     if (bios_memory_oracle(core)) return 1;
     if (mixer_oracle(core)) return 1;
     if (mixer_state_oracle(core)) return 1;
+    if (mixer_reverb_oracle(core)) return 1;
     if (eeprom_oracle(core)) return 1;
     rom_file = fopen(argv[1], "rb");
     if (!rom_file || fseek(rom_file, 0, SEEK_END)) return 2;
