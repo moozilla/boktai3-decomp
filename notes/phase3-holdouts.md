@@ -1321,3 +1321,27 @@ pointer initialization remain 8/8; no source change landed.
 Next: give common a short-lived extra real reference that disappears after
 allocation, or prevent REG_EQUIV doubling without an artificial fence. A mask
 helper with the original aggregate representation may supply that reference.
+
+### PlayerContact_ApplyResponse: shared duration selection, 6/6
+Tags: phase3, player, PlayerContact_ApplyResponse, cross-jumping
+
+New draft: `notes/phase3-drafts/dp-bosses/PlayerContact_ApplyResponse.c`.
+Compute `duration = power + 60`, assign `power = duration` in the engine-flag
+arm and `power += 60` in the other arm, then make one shared reset call and
+counter store. This keeps the dead engine AND and reduces 13/22 to 6/6, with
+the original 1100-byte size. Only the duration section differs; later code is
+exact. The ROM keeps a dead r3 duration computation and computes power+60
+again into r1; the draft keeps the first computed value in r2 and copies it.
+
+`probe` tried all 16 canonical choices, 23 jump follows and one PRE replacement
+without improving the count. `why` forcing power to r2 improves to 5/3, but
+does not reproduce the second addition. Moving the counter store outside two
+calls still leaves the calls unmerged. Duration in either call arm, separate
+selected locals, redundant reassignment, inverse subtraction, a union duration
+and rereading source power all retain the same issue or collapse the dead test.
+The old source with only its pin removed is 8/6; u16/s32 power and declaration
+order do not improve it. Original source retains both concessions.
+
+Next: find the C form that lets the initial duration value die only after
+allocation while the argument still uses the original power. The key is the
+second addition, before considering reload rotation.
