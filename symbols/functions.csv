@@ -5011,7 +5011,9 @@ addr,name,mode,confidence,source,notes
 0812DA5C,SceneActorTerrain_CheckNeighborHeight,thumb,low,src-alias,
 0812DC28,SceneActorTerrain_FindReachableCell,thumb,low,src-alias,Scans in a cardinal direction and returns the last cell before higher terrain or the scan limit
 0812DE38,SceneTerrain_IsPathBlocked,thumb,low,src-alias,
+0812DEB0,SceneActorMotion_AimTowardTarget,thumb,low,cleanup,Sets horizontal velocity and heading and tests rectangular target range
 0812DF40,Math_GetVectorLength,thumb,low,src-alias,
+0812DF94,SceneActorRoute_ClampTargetToAnchor,thumb,low,cleanup,Clamps target distance to current route point and applies navigation constraints
 0812E058,SceneActor_SetPositionXZ,thumb,low,src-alias,
 0812E084,SceneActorReaction_ResetResponseState,thumb,low,src-alias,Clears embedded response state bytes and control words used by actor restoration callers
 0812E094,SceneActorRoute_SelectRandomNextPoint,thumb,low,src-alias,Selects a route point avoiding the two recent indices with four random attempts and an increment-and-wrap fallback.
