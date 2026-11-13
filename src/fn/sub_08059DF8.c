@@ -29,7 +29,7 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
         register const u16 *table asm("r3") = gRandomTable;
         u32 *cursor = &gRandomIndex;
         u32 mask;
-        register u32 index asm("r1");
+        u16 index;
         s32 step;
         index = *cursor + 1;
         mask = 1023;
@@ -49,7 +49,7 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
         const u16 *table = gRandomTable;
         u32 *cursor = &gRandomIndex;
         u32 mask;
-        register u32 index asm("r0");
+        u16 index;
         index = *cursor + 1;
         mask = 1023;
         index &= mask;
