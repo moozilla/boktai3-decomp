@@ -3,6 +3,9 @@
 
 #include "global.h"
 #include "scene_vec.h"
+#include "display_sequence.h"
+#include "contact_swarm_sprite.h"
+#include "scene_event_types.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0
@@ -57,19 +60,19 @@ struct PlayerStatModifierContext {
     u16 contactParameter;                         /* owner + 0xBFE */
     u16 contactExtentA;                           /* owner + 0xC00 */
     u8 unknownBE[2];
-    u16 contactExtentB; /* owner + 0xC04 */
-    u16 contactExtentC; /* owner + 0xC06: third sweep extent, paired with contactExtentB */
+    u16 contactExtentB;  /* owner + 0xC04 */
+    u16 contactExtentC;  /* owner + 0xC06: third sweep extent, paired with contactExtentB */
     u16 contactCounter;  /* owner + 0xC08 */
     u16 contactTimer;    /* owner + 0xC0A */
     u8 contactHeading;   /* owner + 0xC0C */
     s8 savedActionIndex; /* owner + 0xC0D: snapshot from Player_GetActionIndex (tentative) */
     u8 unknownCA;
-    u8 chargeTier;     /* owner + 0xC0F: charge attacks select tiers zero through two */
+    u8 chargeTier;      /* owner + 0xC0F: charge attacks select tiers zero through two */
     u16 chargeDuration; /* owner + 0xC10: initialized to 60 by attached attack setup */
     u8 unknownCE[6];
-    u8 statBOverrideMode;  /* owner + 0xC18: seven selects GameState stat B */
-    u8 thresholdSatisfied; /* owner + 0xC19, tentative */
-    s16 previousAnimation; /* owner + 0xC1A: -1 requests a fresh attack animation */
+    u8 statBOverrideMode;            /* owner + 0xC18: seven selects GameState stat B */
+    u8 thresholdSatisfied;           /* owner + 0xC19, tentative */
+    s16 previousAnimation;           /* owner + 0xC1A: -1 requests a fresh attack animation */
     u8 actionSelectionDisplay[0x50]; /* owner +0xC1C: configured by 0814DE0C */
     u8 unknown128[8];
     s32 attachedEntry;              /* owner + 0xC74: negative means absent */
@@ -94,7 +97,9 @@ struct PlayerCueCollider {
     u8 unknown40[2];
     u8 direction; /* 0x42: quantized facing angle */
     u8 reaction;  /* 0x43: primary, secondary or default category */
-    u8 unknown44[0x2C];
+    u8 unknown44[0x10];
+    struct DisplaySequenceState sequence; /* player +0x3FC: alternate drawable playback */
+    const void *setupResource, *sideResource, *alternateResource;
 };
 
 struct PlayerAnimation {
@@ -109,6 +114,50 @@ struct PlayerVisualObject {
     u32 parameters;
 };
 
+struct PlayerEffectCoordinates {
+    u16 x, y, z, unused;
+};
+union PlayerEffectPosition {
+    struct SceneVec coordinates;
+    struct PlayerEffectCoordinates unsignedCoordinates;
+    u32 words[2];
+};
+
+/* Small effect drawable, used by all three player effect controllers. */
+struct PlayerEffectSprite {
+    u32 flags;
+    u8 unknown4[0xb];
+    u8 mode, size;
+    u8 unknown11[7];
+    union PlayerEffectPosition position;
+    u8 unknown20[8];
+};
+struct PlayerTimedEffect {
+    struct PlayerEffectSprite sprite;
+    u8 active, ticks, baseFrame, unknown2b;
+    void *pairedGraphics;
+};
+struct PlayerPairedEffectTail {
+    struct PlayerEffectSprite sprite;
+    u8 pending, ticks;
+    u8 unknown2a[2];
+    void *orbitGraphics;
+};
+struct PlayerOrbitingSpriteState {
+    struct PlayerEffectSprite sprite;
+    u8 active, ticks;
+    u8 unknown2a[2];
+};
+struct PlayerDirectionalEffect {
+    struct PlayerEffectSprite sprite;
+    u8 unknown28[0x3c];
+    u8 active;
+    u8 unknown65[3];
+};
+struct PlayerAuxiliaryDrawable {
+    struct ContactSwarmSprite sprite;
+    u8 unknown2C[0x14];
+};
 struct Player {
     u8 unk0[0x18];
     s32 slot;                  /* 0x18: compared with local link player index */
@@ -124,7 +173,8 @@ struct Player {
     u16 unk3A;
     s16 velocityZ;
     u8 unk3E[2];
-    void *followTarget; /* 0x40: active movement source, reset to the player's own contact object. */
+    void
+        *followTarget; /* 0x40: active movement source, reset to the player's own contact object. */
     u8 unk44[0x50 - 0x44];
     u32 visualState;
     struct PlayerAnimation *activeAnimation;
@@ -147,15 +197,25 @@ struct Player {
     struct PlayerAnimation secondaryAnimation; /* 0xEC: alternate keyframe channel */
     u8 unkF8[0x14];
     u16 alternatePosition[3]; /* 0x10C */
-    u8 unk112[0x3A];
+    u8 unk112[0x14];
+    u16 secondarySpriteResource;
+    u8 unk128[0xC];
+    u32 secondaryVariantResource;
+    u8 unk138[0x14];
     u32 secondaryDrawFlags; /* 0x14C: bit zero follows reset flag one */
-    u8 unk150[0x18];
+    u8 unk150[3];
+    u8 secondaryPriority;
+    u8 secondaryScaleX, secondaryScaleY; /* cue drawable scale channels */
+    u8 unk156[0x12];
     struct SceneVec colliderPosition; /* 0x168 */
     u8 unk170[8];
     struct PlayerVisualObject *visualObject; /* 0x178 */
     u8 unk17C[0x54];
-    u8 auxiliarySprite[0x40]; /* 0x1D0: removed by player destructor */
-    u8 unk210[0x20];
+    struct PlayerAuxiliaryDrawable auxiliarySprite[1]; /* 0x1D0: removed by player destructor */
+    u8 unk210[8];
+    struct DisplaySequenceState auxiliarySequence;
+    u32 auxiliarySequenceEnded;
+    const void *auxiliaryResource;
     struct PlayerCollider collider; /* 0x230: embedded collider, extent bounded by directionFrame */
     u16 directionFrame;             /* 0x270: reset by forced direction setup */
     u8 savedHeading;                /* 0x272: snapshot of GameState heading byte (tentative) */
@@ -172,19 +232,20 @@ struct Player {
     u8 unk28C[3];
     u8 velocityScaleAxis; /* 0x28F: asymmetric X/Z velocity scaling */
     u16 unk290;
-    u16 movementStatus; /* 0x292: tested before updating tether movement. */
+    u16 movementStatus;               /* 0x292: tested before updating tether movement. */
     u8 positionTracker[4];            /* 0x294: refreshed after player update */
     struct SceneVec *trackedPosition; /* 0x298 */
     u8 unk29C[0x4C];
     u8 contactListNode
         [0x10]; /* 0x2E8: a struct SceneActorContactNode (scene_actor_contacts.h; not included here, it pulls in engine.h) */
-    u8 unk2F8[0x34];
+    struct SceneEventReceiver cueReceiver; /* 0x2F8 */
+    u8 unk320[0xC];
     u8 actionFlagState[4];     /* 0x32C: refreshed after action modifiers */
     u16 movementLoadPercent;   /* 0x330: reduces base movement speed (tentative) */
     u16 menuSnapshotValues[3]; /* 0x332: copied to menu panel +0x48B0 (tentative) */
-    u32 bodyCollisionFlags; /* 0x338: combined with the current collision category. */
-    u8 thresholdMode; /* 0x33C: values 6 through 11 qualify for the scene threshold */
-    u8 actionEnabled; /* 0x33D: zero bypasses action mode filtering */
+    u32 bodyCollisionFlags;    /* 0x338: combined with the current collision category. */
+    u8 thresholdMode;          /* 0x33C: values 6 through 11 qualify for the scene threshold */
+    u8 actionEnabled;          /* 0x33D: zero bypasses action mode filtering */
     u8 actionSelectionStamp,
         actionModeValue;     /* 0x33E: cached selection and mode value (tentative) */
     u8 actionRequestBlocked; /* 0x340 */
@@ -211,7 +272,7 @@ struct Player {
     u16 currentStatA, maximumStatA;             /* 0x424: tentative health-like stat */
     u16 currentStatB, maximumStatB;             /* 0x428: tentative energy-like stat */
     u16 statHundredths, statWhole, statusValue; /* 0x42C */
-    u8 unk432[2]; /* 0x432: pending action mode and its valid flag, consumed by 08156FE0. */
+    u8 unk432[2];  /* 0x432: pending action mode and its valid flag, consumed by 08156FE0. */
     u16 statScale; /* 0x434: initialized to 64 by 0813B67C */
     u8 unk436[0xC];
     u16 particleEmissionCount; /* 0x442 */
@@ -247,11 +308,12 @@ struct Player {
     u8 unk48A[2];
     u8 movementVelocityLocked; /* 0x48C: suppresses velocity recalculation */
     u8 unk48D[0x498 - 0x48D];
-    struct SceneVec resourceStationPosition; /* 0x498: copied by Player_BeginResourceStationInteraction */
-    u16 resourceStationFacing; /* 0x4A0 */
-    u16 burstParameter; /* 0x4A2: passed to ActorBurst_Create. */
-    u8 actionFourEnabled; /* 0x4A4: permits action 4 in modes 0, 1 and 6 (tentative) */
-    u8 coordinateAxis;    /* 0x4A5: 1/5 select X, other values select Z (tentative) */
+    struct SceneVec
+        resourceStationPosition; /* 0x498: copied by Player_BeginResourceStationInteraction */
+    u16 resourceStationFacing;   /* 0x4A0 */
+    u16 burstParameter;          /* 0x4A2: passed to ActorBurst_Create. */
+    u8 actionFourEnabled;        /* 0x4A4: permits action 4 in modes 0, 1 and 6 (tentative) */
+    u8 coordinateAxis;           /* 0x4A5: 1/5 select X, other values select Z (tentative) */
     u8 unk4A6[2];
     struct SceneVec cameraTarget;                     /* 0x4A8: blended focus position */
     s16 cameraOffsetX, cameraOffsetY, cameraOffsetZ;  /* 0x4B0 */
@@ -264,7 +326,7 @@ struct Player {
     u8 unk4BF[3];
     u16 contactActionTag; /* 0x4C2: terrain recovery sets 0x191 */
     u8 unk4C4[2];
-    u16 terrainDamageTimer; /* 0x4C6: frames accumulated under a terrain modifier. */
+    u16 terrainDamageTimer;      /* 0x4C6: frames accumulated under a terrain modifier. */
     u16 actionAccumulator;       /* 0x4C8: wraps by 100 and triggers Player_EmitPeriodicEffect */
     u16 particleIntervalCounter; /* 0x4CA: periodic particle emission */
     u8 unk4CC[4];
@@ -275,11 +337,11 @@ struct Player {
     u8 unk4DC[4];
     u8 cueVariant; /* 0x4E0: copied by 0815B404, tentative */
     u8 unk4E1[5];
-    u16 formCueParameterA; /* 0x4E6: set to 6 for form two, cleared when its cue exits. */
-    u16 terrainRecoveryCounter; /* 0x4E8 */
-    u16 formCueParameterB; /* 0x4EA: paired with formCueParameterA. */
-    u16 actionCountdown;      /* 0x4EC: mode phase subtracts thirty per update */
-    u8 actionEighteenEnabled; /* 0x4EE: selects phase one and refreshes action parameters */
+    u16 formCueParameterA;      /* 0x4E6: set to 6 for form two, cleared when its cue exits. */
+    u16 terrainRecoveryCounter; /* 0x4E8: vertical scale during scripted cues */
+    u16 formCueParameterB;      /* 0x4EA: paired with formCueParameterA. */
+    u16 actionCountdown;        /* 0x4EC: mode phase subtracts thirty per update */
+    u8 actionEighteenEnabled;   /* 0x4EE: selects phase one and refreshes action parameters */
     u8 unk4EF[3];
     u8 movementRequestAnimated; /* 0x4F2: inverse of immediate movement flag */
     u8 movementAnimationState;  /* 0x4F3: negative byte resets animation (tentative) */
@@ -294,7 +356,8 @@ struct Player {
     u16 interactionPromptFlags; /* 0x520: bits OR'd in by ControlPanel based on interactionPromptCategory (tentative) */
     u16 displaySegmentCount; /* 0x522: input hits in the 32-frame history, clamped to seven for display. */
     u16 indicatorUpdateRate; /* 0x524: player input animation rate, used as the control panel phase divisor. */
-    u8 unk526[8];
+    u16 unk526;
+    u16 cueRemaining, cueElapsed, cueRequired;
     u16 actionAccumulatorBlocked; /* 0x52E: nonzero prevents accumulation */
     u16 scriptStatus[2];          /* 0x530: script keyword s selects a nonzero status */
     u16 sceneMode;                /* (guess) */
@@ -316,16 +379,18 @@ struct Player {
     u16 interactionPromptCategory; /* 0x578: selects which bit ControlPanel ORs into interactionPromptFlags (tentative) */
     u8 unk57A[0x58C - 0x57A];
     void (*triggerAnimationCallback)(struct Player *); /* 0x58C */
-    u8 unk590[8];
+    struct SceneVec cueDestination;
     u16 recoilSpeed;             /* 0x598: decays by three quarters per update */
     u8 animationBranchRequested; /* 0x59A: selects phase one in 081502AC */
     u8 cuePhase;                 /* 0x59B: reset by cue-seven mode two (tentative) */
     u8 kindTwoEntered;           /* 0x59C: set by 0815AD78, tentative */
     s8 targetFacing;             /* 0x59D: shortest-turn target in 0814FA10 */
-    u8 kindTwoState;             /* 0x59E: cleared by 0815AD78, tentative */
-    u8 unk59F[4];
+    u8 kindTwoState;             /* 0x59E: cue completion kind; also cleared by 0815AD78 */
+    u8 cueAcknowledgementPending;
+    u8 unk5A0;
+    u8 cueParticlesEnabled, cueParticleFrame;
     u8 pendingAnimationTrigger; /* 0x5A3: consumed by 0814F90C */
-    u32 cueParameter;           /* 0x5A4: forwarded cue parameter, tentative */
+    u32 cueParameter;           /* 0x5A4: forwarded cue parameter / completion script */
     u8 unk5A8[0x10];
     u8 effectGroup; /* 0x5B8: scene effect group context */
     u8 movementModifierKind, unknown5BA, movementModifierActive; /* 0x5B9: tentative */
@@ -338,17 +403,21 @@ struct Player {
     u8 unk6FE[2];
     u8 shadow[0x40];  /* 0x700: actor shadow state */
     u8 resetState740; /* 0x740: set to one by 0813B080 */
-    u8 unk741[7];
-    u8 visualEffects748[0x30], visualEffects778[0x28];
-    u8 visualEffects7A0[0x30], visualEffects7D0[0x2C];
+    u8 unk741[3];
+    void *timedEffectGraphics;
+    struct PlayerTimedEffect visualEffects748[1];
+    struct PlayerEffectSprite visualEffects778[1];
+    struct PlayerPairedEffectTail visualEffects7A0[1];
+    struct PlayerOrbitingSpriteState visualEffects7D0[1];
     u8 directionalEffect[0x68];      /* 0x7FC */
     void *directionalEffectCallback; /* 0x864 */
     u8 unk868[0x218];
     struct SceneVec actionOrigin; /* 0xA80: offset copy of position (tentative) */
-    u8 unkA88[4];
+    u32 unkA88[1];                /* cue particle pool handle; array keeps existing storage users */
     struct SceneVec movementStart, movementDestination; /* 0xA8C, 0xA94 */
     u16 movementDuration;                               /* 0xA9C */
-    u8 unkA9E[0x10];
+    u16 cueSpeed;                                       /* 0xA9E */
+    u8 unkAA0[0xE];
     u16 actionResetCounter;  /* 0xAAE: reset when starting a variant action (tentative) */
     u16 menuStatusValues[8]; /* 0xAB0: panel selects indices 0, 2 or 6 (tentative) */
     u8 unkAC0[2];
@@ -375,7 +444,10 @@ struct Player {
     u8 kindTwoAttachmentDescriptor; /* 0xB08 */
     u8 unkB09;
     u16 kindTwoAttachmentCounter; /* 0xB0A */
-    u8 unkB0C[0x30];
+    u8 unkB0C[0x28];
+    u16 eventFlags; /* +0xB34 */
+    u8 unkB36[2];
+    u32 completionProcedure;                              /* +0xB38 */
     s32 eventProcedure;                                   /* 0xB3C */
     void *actionRequestEffect;                            /* 0xB40 */
     struct PlayerStatModifierContext statModifierContext; /* 0xB44: callback context */
@@ -384,6 +456,7 @@ struct Player {
     void *flagCallbacks[3];        /* 0xC8C: callback results combined with OR (tentative) */
     void *contactCostCallbacks[3]; /* 0xC98: additional contact cost callbacks */
     void *updateCallback;          /* 0xCA4: called with the player each update */
+    void (*pendingCallback)(struct Player *); /* +0xCA8: consumed once */
 };
 
 /* 0x02000560 */
