@@ -4487,6 +4487,7 @@ addr,name,mode,confidence,source,notes
 081134B0,ActorEffect_SpawnAtActorPos,thumb,low,src-alias,
 08113534,ActorParticles_CreateAtOffset,thumb,low,src-alias,
 081135B8,SpriteEffect_CreateAtPosition,thumb,low,src-alias,
+08113638,SceneDebrisPool_ResetSingleton,thumb,low,cleanup,Clear debris pool singleton
 08113644,SceneGroundEffect_IsBelowGround,thumb,low,src-alias,Compares queried terrain height with the effect position plus a vertical offset; tentative ground-effect identity
 08113678,NativeEffect_SetState,thumb,low,src-alias,Stores the state callback and marks its entry pending
 08113684,NativeEffect_DestroyEntry,thumb,low,src-alias,Removes the active sprite and clears the entry state and activity flags
@@ -4503,6 +4504,7 @@ addr,name,mode,confidence,source,notes
 081144A8,EffectPool_CheckCapacity,thumb,low,src-alias,
 0811453C,NativeEffect_OnColliderExpire,thumb,low,src-alias,Collider callback that schedules entry destruction
 0811454C,NativeEffect_OnColliderImpact,thumb,low,src-alias,Collider callback that schedules destruction with a secondary effect and sound
+0811455C,NativeEffect_OnColliderIgnore,thumb,low,cleanup,Empty collider callback for persistent threshold effects
 08114560,NativeEffect_InitDefaultCollider,thumb,low,src-alias,Initializes the entry collider with fixed dimensions and depth eight
 081145DC,NativeEffect_InitColliderWithDepth,thumb,low,src-alias,Initializes the same collider with a caller supplied depth
 08114664,NativeEffect_InitTypeZeroSprite,thumb,low,src-alias,Loads shared graphics and initializes the sprite with animation five variant zero
