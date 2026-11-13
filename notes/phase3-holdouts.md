@@ -1371,3 +1371,27 @@ original control flow and removes the duplicate local name alias.
 
 Next: inspect CSE copy elimination/REG_EQUIV and find the original ownership
 or view helper that keeps manager and transition independent until selection.
+
+### SceneActorContacts_ReleaseInvalidOwners (08072D34)
+
+Tags: `08072D34` `phase3` `loop` `regmove`
+
+No landing; best pin-free draft improves from 38/38 differences, shape 26,
+to 11/9 differences, shape 2. Reuse the clear-result variable for cooldown 120
+in each arm to prevent loop hoisting (goto-loop form independently produces
+the same improvement). Return the state-field address through Unavailable's
+output parameter to recover flags r4/state r1 allocation. This reproduces the
+improvement of diagnostic AGBCC_PRI=state:+8664 on the preceding draft.
+
+Remaining: regmove ties each clear AND to the dying flags input, losing the
+ROM's mask copy into r0. Zero/valid then use r0 rather than r1. Scope proves
+fixup_match_1 at insn196; AGBCC_NOTIE=196 restores the copy but changes later
+allocation (13/13 differences), so no full matching knob yet. Tried byte and
+halfword masks/results, union byte reads, shared clear/valid temporaries,
+reversed AND operands, clear-owner helper, and retaining subsets of original
+pins. None matched. Retaining final value/valid pins changes earlier allocation;
+removing the actor group alone does not independently match.
+
+Next: recover a typed flag-update helper that blocks the dying-input tie while
+keeping the final valid zero available for the owner store. Preserve the two
+ordinary-C lifetime fixes in the saved draft.
