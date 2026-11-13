@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 Forge</title>
+<link rel="stylesheet" href="/static/common.css">
+<link rel="stylesheet" href="/static/forge.css">
+</head>
+<body>
+<header id="top"></header>
+<main>
+  <aside aria-label="Find code">
+    <div class="intro"><span class="eyebrow">SOURCE → SILICON → SCREEN</span><h1>Forge</h1><p>Edit the C that makes the game.<br>Compile it. See what changes. Play it.</p></div>
+    <label class="search-label" for="find">Open a function</label>
+    <input id="find" type="search" placeholder="Name, address or subsystem…" autocomplete="off">
+    <div id="functions" role="list" aria-label="Functions"><p class="muted">Loading functions…</p></div>
+    <div class="aside-foot"><a href="/code">Explore code & cross-references ↗</a><p>Experiments live under <code>build/studio/forge</code>. Your source files stay untouched.</p></div>
+  </aside>
+  <section id="workbench" aria-label="C workbench">
+    <div class="workhead"><div><span class="eyebrow" id="crumb">BOKTAI 3 / LIVE C WORKBENCH</span><h2 id="name">Open a function to begin</h2><div id="file" class="muted"></div></div><a id="explore" hidden>Explore ↗</a></div>
+    <div class="actions"><button id="compile" class="primary" disabled>Compile & compare <kbd>⌘↵</kbd></button><button id="play" disabled>Build & play ▶</button><button id="reset" disabled>Reset C</button><span id="dirty" class="muted"></span><span class="sp"></span><a id="download" hidden download="forge.ips">Export IPS ↓</a><a id="download-source" hidden download="experiment.c">Export C ↓</a></div>
+    <div id="status" role="status" aria-live="polite">Choose any function on the left, or open Forge from Code.</div>
+    <div class="workspace">
+      <section class="editor-pane"><div class="pane-title"><b>C source</b><span id="editor-note">Full translation unit · C89</span></div><div class="editor-wrap"><pre id="lines" aria-hidden="true">1</pre><textarea id="editor" aria-label="C source editor" spellcheck="false" autocapitalize="off" autocomplete="off" disabled></textarea></div></section>
+      <section class="result-pane"><div class="pane-title"><b>ROM ↔ your compile</b><label><input id="diff-only" type="checkbox"> Differences only</label></div><div id="comparison" class="empty"><div class="empty-mark">{ }</div><h3>The original game is your test.</h3><p>Compile unchanged C to see MATCH.<br>Change it to see the exact instructions you changed.</p></div></section>
+    </div>
+    <details id="explain"><summary>Why did the compiler do that?</summary><p class="muted">Scope follows instructions through agbcc's compiler passes. Source lines and pass names below are diagnostic evidence; MATCH always comes from the stock build.</p><pre id="why">Compile an experiment to inspect its compiler evidence.</pre></details>
+    <section class="playground"><div class="play-options"><h3>See it in the game</h3><label for="checkpoint">Story checkpoint</label><select id="checkpoint"><option value="boot">New game · boot</option></select><p class="muted">Story checkpoints start from battery saves. Use the controller script to continue from the title screen.</p><label for="replay">Controller script <span class="muted">(up to 7,200 frames)</span></label><textarea id="replay" spellcheck="false" aria-label="Preview controller script">wait 600
+shot result</textarea><div class="presets"><button id="boot-preset">Boot</button><button id="continue-preset">Continue save</button></div><details><summary>Optional text edits</summary><p class="muted">JSON array of string IDs and text, using the Text view's escapes. Strings must fit their original byte budget.</p><textarea id="text-edits" aria-label="Text edits JSON" spellcheck="false" placeholder='[{"id": 988, "text": "POTION"}]'>[]</textarea></details></div><div class="preview"><div id="shots" class="empty"><div class="empty-mark">▶</div><h3>Your experiment, on real game code.</h3><p>Build & play links an isolated ROM, runs headless mGBA, and returns screenshots. Export its IPS patch to apply to your own original ROM.</p></div></div></section>
+    <details class="limits"><summary>How builds and experiments work</summary><p>Forge compiles the whole source unit with its existing compiler settings, links it at the original address, and compares the resolved bytes with your ROM. Click an annotated instruction to jump to its C line. The compiler pass shows where agbcc first created it; the explanation follows differences through later decisions.</p><p>Playable builds currently use a fixed layout: code must fit the unit's original span, preserve public function addresses, and use text-section storage. Edits that need relocation can still be compiled and inspected. Text edits use existing string space. Each job exports one unit and its text edits; experiments are independent.</p><p>A screenshot demonstrates that the game ran; it does not establish that the edited function was reached. No ROM downloads are served. IPS and C files are exported from the exact compiled snapshot.</p></details>
+  </section>
+</main>
+<script src="/static/common.js"></script>
+<script src="/static/forge.js"></script>
+</body>
+</html>
