@@ -2622,12 +2622,10 @@ u32 TetherActor_SelectNextState(struct TetherActor *p)
     return p->state;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_UpdateLockedShake(struct TetherActor *actor)
 {
     s32 amplitude;
-    register const u16 *randomTable asm("r6");
+    const u16 *randomTable;
     if (gEngineFlags & 512)
         return;
     if (actor->lockFrame <= 63)
@@ -2636,15 +2634,12 @@ void TetherActor_UpdateLockedShake(struct TetherActor *actor)
         actor->glowMode = 2;
         amplitude = (actor->lockFrame >> 2) + 16;
     }
-    randomTable = (const u16 *)RANDOM_TABLE_ADDR;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    actor->shakeX = Mod(randomTable[gRandomIndex], amplitude) - (amplitude >> 1);
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    actor->shakeZ = Mod(randomTable[gRandomIndex], amplitude) - (amplitude >> 1);
+    PARTICLE_RANDOM_SAVE_ORIGIN(randomTable, gRandomTable);
+    actor->shakeX = Mod(ParticleRandom_ReadSample(randomTable), amplitude) - (amplitude >> 1);
+    actor->shakeZ = Mod(ParticleRandom_ReadSample(randomTable), amplitude) - (amplitude >> 1);
     if ((++actor->lockSoundFrame & 7) == 0) {
-        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 sample = randomTable[gRandomIndex];
+            u32 sample = ParticleRandom_ReadSample(randomTable);
             sample &= 1;
             if (sample)
                 Sound_PlaySong(0x2B9);

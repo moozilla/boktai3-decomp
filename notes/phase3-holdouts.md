@@ -1464,3 +1464,14 @@ ROM loads 0x129 in r4, then previousSlope/Height/Attributes need r0 destinations
 and r4/r2/r4 samples. No combined matching override was established. Next:
 change the terrain/previous-field C to make the needed reload rotation before
 the final struct copy, then remove its six remaining copy/heading concessions.
+
+### TetherActor_UpdateLockedShake (0804B43C): resolved
+
+Removed the table pin with the shared PARTICLE_RANDOM_SAVE_ORIGIN capture and
+ParticleRandom_ReadSample draws. The named-table sample-helper draft is 29/27,
+shape 12; `AGBCC_PRI=randomTable:+293` gives MATCH. Table priority 1320 loses
+to amplitude 1612 and index address 1400. The real table capture adds reference
+density so table takes r6, amplitude r7 and index address r8, fixing all downstream
+reload choices. The same origin helper already captures gRandomTable elsewhere.
+A union table initializer retains 29/27; constructing the halves changes shape
+(52/55). DirectSample is 31/29. No shared header edits. Full unit MATCH.
