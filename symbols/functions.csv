@@ -8686,7 +8686,8 @@ addr,name,mode,confidence,source,notes
 08200214,HomingProjectile_SetPrimaryColliderParams,thumb,low,src-alias,Sets the three parameters passed to primary collider configuration
 0820021C,HomingProjectile_SetSecondaryColliderParams,thumb,low,src-alias,Sets the corresponding three parameters for secondary collider configuration
 08200224,PlayerClone_GetActiveCount,thumb,low,src-alias,Returns the active count of the three-slot Django-sprite pool; clone identity is tentative
-08200244,DirectionalSprite_FoldFacing,thumb,low,src-alias,
+08200238,PlayerClone_IsSlotActive,thumb,low,src-alias,Tests a slot bit in the clone occupancy mask
+08200244,PlayerClone_FoldFacing,thumb,low,src-alias,Folds eight facing directions into mirrored animation rows
 08200288,PlayerClone_SetAnimation,thumb,low,src-alias,
 08200324,PlayerClone_OnBodyColliderContact,thumb,low,src-alias,
 082003B8,PlayerClone_OnPassiveColliderContact,thumb,low,src-alias,Empty contact callback installed on the clone's passive colliders
@@ -8695,9 +8696,10 @@ addr,name,mode,confidence,source,notes
 08200C40,PlayerClone_ReleaseSlot,thumb,low,src-alias,Stops instance effects and clears its occupancy bit while decrementing the active count
 08200C94,PlayerClone_UpdatePool,thumb,low,src-alias,Updates three active player clones; their movement; animation; colliders; palettes and expiration.
 08201024,PlayerClone_DestroyPool,thumb,low,src-alias,Removes all three slots' colliders and animation tasks and clears the singleton pointer
-0820107C,DirectionalSpritePool_Init,thumb,low,src-alias,
+0820107C,PlayerClone_InitializePool,thumb,low,src-alias,Initializes three clone slots and their shared palettes
 082010EC,PlayerClone_CreatePool,thumb,low,src-alias,Creates the singleton task managing three clone instances and installs its lifecycle callbacks
 0820112C,PlayerClone_FindFreeSlot,thumb,low,src-alias,Finds an unoccupied entry among three slots and returns its index
+08201160,PlayerClone_Spawn,thumb,low,src-alias,Copies a clone configuration and activates a free slot
 08201270,PlayerClone_SetBehaviorCallback,thumb,low,src-alias,Stores the behavior callback in the instance configuration
 08201274,PlayerClone_InitConfig,thumb,low,src-alias,Clears the configuration and assigns default behavior timing and collider dimensions
 082012B0,PlayerClone_SetLifetimeAndBehavior,thumb,low,src-alias,Sets the lifetime and two behavior parameters used when spawning an instance; parameter meanings are tentative
