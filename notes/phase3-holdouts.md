@@ -1414,3 +1414,36 @@ Persistent store: `build/matchsearch/ModifierMenu_SelectPendingSource`, includin
 the exact combined counterfactual. Next: a meaningful result representation
 that both separates the final add quantity from the scale and prefers the old
 category register r1. A simple scalar assignment only achieves one side.
+
+
+### ModifierMenu_UpdateDescription (08041020): index pin removed, table arithmetic remains
+
+Tags: #menus #dialogue #matching #compiler
+
+Landed a partial: per-arm lookup sources and indexes remove the r4 index pin;
+complete repeated lookup tails cross-jump back to the original calls. The unit
+checks MATCH (264 bytes). One category pin and three barriers remain.
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/ModifierMenu_UpdateDescription.c`,
+5 ROM / 3 draft, 260 bytes. All differences are the mode-0 source table address:
+the ROM adds 7 to category, scales by 4, computes menu + 188 in r1, then adds the
+offset. Typed indexing instead combines 7*4 + 188 into 216 and computes the
+address in r0. All other arms, loads, multiplies and calls match. Insn 79 starts
+as category + 7; combine moves the constant through the shift and folds it with
+188. `AGBCC_COMBKEEP=40,47` preserves category + 7 but still computes the byte
+offset plus 188 before adding menu; it is not a complete matching knob.
+
+Tried separate lookup tails, block-local sources/indexes, direct typed indexing,
+local table without sharing sourceLocation, signed narrow index, commuted byte
+addition, a byte pointer, compound pointer increments, pointer-to-array and array
+address views, and typed slot/table accessors. Raw byte forms recover the ROM's
+arithmetic shape but change category/source allocation in the other arms (11-18
+register differences). Indexed forms fix those allocations but reassociate the
+address. Keeping only the old table barrier or category pin does not match;
+keeping all three old barriers plus category pin does, with the index pin gone.
+
+Persistent store: `build/matchsearch/ModifierMenu_UpdateDescription`. The cse/PRE
+probe finds no single decision improving the best draft. Next: preserve a typed
+table base as a distinct address through combine without extending its lifetime
+across other arms; inspect why the raw and indexed forms change category's
+local/global quantity split before revisiting scalar table casts.
