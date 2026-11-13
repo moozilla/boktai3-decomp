@@ -1337,3 +1337,22 @@ the constant; duplicating zero and stateFrame stores across sprite-active arms
 also loses the retained kind value across the call. Next: retain an ordinary-C
 zero across a join without making it an equivalent constant until after jump2,
 or split the tails so move2add sees the original stateFrame zero.
+
+### sub_08067BA8 — unused r6 save/restore
+
+Tags: phase3, dp-scene1, sub_08067BA8, 0x08067BA8
+
+RequestAllDepartures pin-free draft matches the complete body; only push/pop
+omit r6. Same 100-byte size. Removing the original memory/r6 barrier lets PRE
+hoist p->used outside the loop (four differences). A union word/halfword view
+of the occupancy mask prevents that hoist in ordinary C, producing the same
+result as AGBCC_NOPRE=1: two differences, solely the register save lists.
+Typed slots and collider flags preserve all address arithmetic.
+
+Pointer-argument occupancy helper, union-initialized bit mask, early continue,
+do/while and goto loops tested. Union bit does not recover the unused save;
+goto also swaps manager/index registers; separate slot base introduces an
+unwanted loop invariant. The ROM never uses r6 in its body, so forcing a live
+value there cannot be a solution. Next: identify a natural late-eliminated
+allocation/copy that marks r6 live before final cleanup. Original source remains
+matching with its single barrier; no partial can remove only part of that site.
