@@ -3831,3 +3831,262 @@ ROM's r5-to-r6 copy. No verified partial was found. Store:
 Next: prevent the loop table's constant-equivalence discount while retaining
 the mask parameter boundary and the initial table copy, or separate sprite/burst
 lifetimes enough to give the table the required allocation order.
+## dp-link (Codex)
+
+Tags: #matching #phase3 #link #compiler
+
+### WirelessGameMenu_InitEquipmentChoices (08038448, src/fn/sub_08038448.c)
+
+Best pin-free draft: `notes/phase3-drafts/dp-link/WirelessGameMenu_InitEquipmentChoices.c`.
+It uses the retained structured loops, typed save rows, and the numeric random-table address
+already used by its matched item-choice sibling. All body instructions match except the
+random-index pointer's initial reload register (r3 instead of r0). The other differences are
+the ROM's unused sl save/restore and resulting push grouping/alignment: 8 ROM / 8 draft,
+408 bytes each. The production function remains unchanged.
+
+- The symbolic-table draft is 3 ROM / 5 draft, but PRE creates a table literal at the inner
+  loop preheader and loop.c hoists it to sl. `pre` shows replacement 5 and `hoist` shows insn
+  401. `AGBCC_NOPRE=5` gives 9/9; `AGBCC_NOMOVE=401` gives 14/14. Removing only one decision
+  leaves another placement/allocation difference. A numeric table removes that PRE expression
+  and keeps the literal next to the sample, as in the ROM.
+- Diagnostic only: retaining the original inner-loop sl/ip clobbers with the numeric table
+  reduces the difference to the seed pointer's 2 instructions. `AGBCC_SPILL=11:1` then MATCHes.
+  It proves the seed reload rotation and unused save are sufficient; no such diagnostic was
+  landed. Reload 11 starts after r1, while the ROM needs it to start after r3, with spill set
+  r0/r1/r3. Its preceding span is the final equipment-mask update through Mod and the outer
+  loop's initialization.
+- Tried the shared direct sampler; both `ParticleRandomTableSource` and `RandomTableView`
+  initializer forms; numeric, symbolic, byte-address, and integer-address table expressions;
+  for/do and label/goto loops; typed slot setter/clearer inlines; a 12-iteration offset scan;
+  narrow index/counter types; explicit seed pointer before and after i's initialization;
+  and partial removals in the original source. None recovers the unused sl save in ordinary C.
+- Read reload1.c's `mark_home_live`: it marks every allocated pseudo's hard-register home
+  before subsequent reload decisions, so a late-dead or displaced sl home could explain the
+  save. A productive next step is tracing that home through reload, then finding the original
+  helper/type that creates it without code surviving in sl. Do not redo the table-hoist search.
+- Scope gap fixed: `probe` reported that no decision changed the count even though several
+  probes worsened it. It now reports the closest worsening probes and does not rule out
+  interacting compiler decisions.
+
+Persistent evidence: `build/matchsearch/WirelessGameMenu_InitEquipmentChoices-v2`;
+working sources: `build/cx/work/WirelessGameMenu_InitEquipmentChoices/`.
+
+### sub_080399F4 (080399F4, src/wireless_game_items_and_display.c)
+
+Best draft: `notes/phase3-drafts/dp-link/sub_080399F4.c` (22 ROM / 22 draft,
+shape 0, 560 bytes). Only this target and its private sampler are pin-free in the
+whole-unit draft; other functions retain their existing concessions. Production is unchanged.
+
+- Removing Item_NextRandom's r6 pin gives 61/59 differences and shape 50. The shared
+  ParticleRandom_ReadSample restores the complete instruction shape, leaving 30/30 register
+  differences in the two copies of the shake code. Using ReadDirectSample for the second
+  draw lowers that to 22/22 and gives the index pointer its correct r3.
+- In the symmetric ReadSample draft, local allocation gives the table pseudo 103 (and
+  inlined copy 213) priority 2500, the seed 2352, the 3 mask 1250, and the 1023 mask 1153.
+  The table takes r3; ROM needs it last in r6. `AGBCC_PRI=103:-1400,213:-1400` MATCHes,
+  as does `AGBCC_FORCE=103:6,213:6`. These are diagnostics only.
+- The sampler's capture macro leaves loop notes that weight each table use twice in flow:
+  five references versus four when the second draw is direct. Both direct draws lower the
+  weighting further but lose table-first placement and change the surrounding allocation.
+- Tried explicit shared table and index locals; table before the branch; parameterized seed
+  and mask; union initialization and union-by-value sampler; integer and pointer sample
+  addresses; advancing table pointers; narrowed sample/coordinate/return types; separate
+  result scopes; flattened two-draw code; direct and macro capture; numeric and symbolic
+  table constants. Separate sample scopes fix the global-result allocation seen when removing
+  an inline layer, but do not lower the table priority enough. Narrow coordinates add extensions.
+- `probe` tests 15 CSE/PRE decisions in the shape-correct draft; none improves it. The direct
+  baseline's PRE changes improve the count but retain shape differences. Next: recover
+  table-first placement with direct reads, or a legitimate sampler type/lifetime that puts
+  table below both masks. Do not repeat the table/seed parameter-order experiments.
+- Scope gap: `why` on the second late-split table literal chooses the first inlined copy,
+  because both have the same constant and C line. Use names.txt to identify both pseudos;
+  here they are 103 and 213. A future fix should disambiguate occurrences by instruction order.
+
+Persistent evidence: `build/matchsearch/sub_080399F4`; scratch: `build/cx/work/sub_080399F4/`.
+
+### WirelessGameItems_UpdateItemMerge (08039CB0, src/wireless_game_items_and_display.c)
+
+Best target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_UpdateItemMerge.c`
+(4 ROM / 4 draft, shape 2, 308 bytes). Other functions retain their existing concessions.
+The removed value pin and zero barrier interact: individually they cost 17 and 3 ROM
+instructions; removing both leaves the clamp correct and changes only four zero-store rows.
+Production is unchanged.
+
+`why 392` shows CSE replacing the target pendingFlag's byte zero (159) with zero#1 (143),
+which gets r1. ROM creates a new zero in r0 immediately after storing count. `why 445`
+shows the draft instead creating a new zero at the source timer store, and using it for
+source count/pendingFlag; ROM uses the earlier r1 zero there. This is CSE constant-class
+substitution, not allocation alone. No class-head takeover exists at that substitution;
+all five probe decisions fail to improve it. Scope lacks a diagnostic to suppress one
+particular source substitution, so there is no matching what-if knob yet.
+
+Tried direct literal stores; byte/halfword pointers; narrow zero and count types; shared
+outer zero; zero initialization after the count store; chained reset assignments; reloads
+from the just-cleared timer/state; clamp helpers with assignments or early returns; typed
+reset helpers; union initialization; direct item indexing; count-store repetition and full
+tail repetition in all clamp arms. Literal zeros and union initialization give 10/10;
+repeated count stores give 5/5; repeated whole tails give 21/21. Retaining only the existing
+barrier with clamp-helper forms did not yield a partial match. No diagnostic or new
+concession was landed. Next: identify the original typed reset/clamp interface that keeps
+the two zero classes distinct, or add a precise CSE substitution diagnostic before more C.
+
+Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateItemMerge`;
+scratch: `build/cx/work/WirelessGameItems_UpdateItemMerge/`.
+
+### WirelessGameItems_UpdateIncomingItem (08039EEC, src/wireless_game_items_and_display.c)
+
+Best target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_UpdateIncomingItem.c`
+(29 ROM / 29 draft, shape 8, 380 bytes). It uses direct array fields and separate first/second
+loads before the target head stores. Other functions retain existing concessions. Production
+is unchanged. The direct combined-count form is 27/27, shape 10; the inherited clean draft is
+45/41, shape 12, 372 bytes.
+
+- Seven constraints: pending pointer in ip, saturated total in r1, one and count result in r0,
+  and three operand barriers. All 119 proper subsets with two through six removals were tested;
+  none matches. Removing both r0 pins leaves only 4/4 register differences, shape 0. The sum
+  takes r3 instead of r0. `AGBCC_FORCE=value#1:0` (pseudo 188) MATCHes that partial draft.
+- `why 504` and global.c show the exact cause: find_reg initially finds free r0, then
+  hard_reg_preferences moves the sum to r3, inherited from the locally allocated first
+  operand. This is not insufficient r0 availability. Simple operand commutation is canonicalized
+  back. Assignment, ternary, repeated sum, narrow operand/result types, separate result,
+  clamp helper, input reuse for the cleared flag, and computing the sum earlier preserve the
+  preference. Clipping into first gives 3/5 (shape 2), so input/result splitting is worth revisiting.
+- In the fully clean source, pending's global priority is 1764 versus slot's 1794. Slot takes r4
+  rather than r7, leaving r7 for pending instead of ip. The array base is local in r1 rather
+  than r2. The shared zero remains live across the count clamp and becomes a low-priority global
+  constant (882) in r6 instead of r1. Literal field stores recover slot/ip but introduce a
+  PRE-generated current-array copy and leave the related zero-class differences.
+- Tried direct fields, separate counter loads, byte/halfword constants, reinitializing one,
+  and the focused partial clamp forms above. `probe` has no full-clean match; suppressing
+  pending's class-head takeover only changes 45/41 to 43/39. Next: make the sum result global
+  without inheriting the first operand's hard-register preference, then remove the remaining
+  pointer and zero constraints using the direct-field form. Do not repeat the subset search.
+
+Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateIncomingItem`;
+scratch: `build/cx/work/WirelessGameItems_UpdateIncomingItem/`.
+
+### WirelessGameItems_QueueLocalItem (0803A514, src/wireless_game_items_and_display.c)
+
+Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_QueueLocalItem.c`
+(11 ROM / 9 draft, shape 2, 256 bytes). Production is unchanged. Removing only the
+value pin gives 9/9; removing only flag gives 2/2 with an alignment nop replacing
+one missing zero. Both individual removals and the combined removal fail.
+
+`why 136`: clamp value (70) is global, priority 12000, but the local clear (71)
+already occupies r0. Value consequently gets r1. Forcing value into r0 is invalid
+as a diagnosis: it overlaps clear and deletes the clamp. The second block is a
+separate CSE issue: byte-zero 113 is substituted with zero#1 (96), so pendingFlag
+uses r1 rather than a fresh r0 zero. Eleven CSE probes do not improve the result;
+CSE_NOCANON=70 and CSE_NOFOLLOW=4 worsen it to 35/29.
+
+In addition to the older 24 recorded variants, tested fresh direct fields (36/30,
+shape 12), literal byte-pointer stores, union-initialized pending zero, union clear,
+bitfield zero, narrow clamp types, conditional clamp, repeated full clamp tails,
+wide zero and a timer reload. Union and bitfield initializers fold back to the same
+CSE class. Wide zero changes allocation to 10/8 but still misses both zero moves;
+it is not a suitable source form. Repeating tails creates additional branches.
+No matching knob yet. Next: a precise per-substitution CSE diagnostic shared with
+UpdateItemMerge, then identify the original reset interface or control-flow lifetime
+that preserves the separate byte zero. Do not repeat initializer spelling variants.
+
+Scratch/evidence: `build/cx/work/WirelessGameItems_QueueLocalItem/`.
+
+### WirelessGameItems_QueueIncomingItem (0803A618, src/wireless_game_items_and_display.c)
+
+Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_QueueIncomingItem.c`
+(30 ROM / 28 draft, shape 4, 220 bytes). Fresh direct counter fields recover owner,
+target, current and pending-array allocation; the initial clean draft is 51/49,
+shape 4. Production is unchanged.
+
+All 119 proper removal subsets with two through six constraints removed were tested.
+None matches. Removing both one/value r0 pins gives 4/4, shape 0, exactly the inherited
+sum preference seen in UpdateIncomingItem. `AGBCC_FORCE=value:0` (pseudo 92) MATCHes.
+Removing both barriers gives 3/1, shape 2: the post-clamp r1 zero disappears and target
+count uses the later r0 zero. Removing all five pins while keeping both original
+barriers gives 25/25, shape 0. No useful partial can land yet.
+
+In the clean direct-field form, the counter-array bases take r2 and sums take r1
+instead of the reverse; the pending reset zero is hoisted before the timer store
+and gets r5 instead of the separate ROM r0/r1 zeros. Fifteen CSE/PRE probes do not
+improve it. The baseline allocation diagnostics show dest outranking owner, owner
+outranking target, and equal-priority current/second pseudos allocated in the wrong
+order; raising these independently helps but does not match.
+
+Tried direct fields, branch-local counts, narrow totals, explicit count pointers,
+reversed source reads, state-reset helpers (void and int with ignored missing return),
+clamp helpers with early returns, ternaries and labels, byte parameters, unsigned
+results, reused state/input/count temporaries, ADDRESSOF inputs/result, and struct/
+union sums. Ordinary int clamp helpers preserve the four-register partial difference;
+byte parameters and ADDRESSOF forms change shape. A narrow summed byte can overflow
+and is diagnostic only, not a valid candidate. Next: suppress the sum's inherited
+first-operand preference with a meaningful source lifetime, then solve the shared
+reset-zero class. Do not repeat the subset or initializer searches.
+
+Persistent evidence: `build/matchsearch/WirelessGameItems_QueueIncomingItem`;
+scratch: `build/cx/work/WirelessGameItems_QueueIncomingItem/`.
+
+### WirelessGameDisplay_UpdateRoundAnnouncement (0803A844, src/wireless_game_items_and_display.c)
+
+Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameDisplay_UpdateRoundAnnouncement.c`
+(35 ROM / 33 draft, shape 10, 388 bytes). Shared ParticleRandom_ReadSample draws recover
+table-first ordering and the resource stack slot. The all-clean explicit sampler is
+44/38, shape 22; ReadDirectSample gives 31/27, shape 22. Production is unchanged.
+
+The original has eight pins, three barriers, and two volatile locals. Scope pins
+previously omitted the volatile locals from its report; this run fixes the report.
+Removing only resource volatility gives 13/11, only table volatility 9/5, both 17/9.
+The ROM allocates separate resource/table slots at sp and sp+4. The clean shared sampler
+spills resource normally but keeps table in r2; seed then takes r3. `why`/`spill` prove
+r3 is absent from the reload-register list, which explains the earlier mask and both
+352-offset reload differences. The ROM needs r3 for all three. No spill rotation or
+one of four CSE follow probes fixes this.
+
+Shared-sampler allocation: table pseudo 89 is local, priority 2777 (5 refs), seed 91
+is local priority 2666. Forcing table to memory with AGBCC_NOREG=89 plus
+AGBCC_NOEQUIV=89 frees r3 and repairs those earlier reloads, but resource then moves
+into r4, count into r5, and the frame remains four bytes. Forcing both resource 24
+and table 89 to memory produces an eight-byte frame but changes global allocation
+and drops the r8 save (99/91, shape 8). These are diagnoses, not matching overrides.
+AGBCC_PRI on the local table has no useful effect.
+
+Tried direct named drawing/resource fields, shared macro and direct samplers,
+union table source/GetTable, ADDRESSOF table, numeric table, separate sample result
+scopes, individual volatile removals, and interacting count/mask/limit pin removals
+with and without resource volatility. None yields a partial match. Next: recover
+both natural stack objects and the random mask/seed allocation together; a spill
+rotation alone cannot do it. Avoid adding artificial pressure or one-element arrays
+merely to force the stack. Named AGBCC_NOREG was silently ignored, like the earlier
+NOEQUIV bug; a separate tool fix resolves C names before invoking the compiler.
+
+Scratch/evidence: `build/cx/work/WirelessGameDisplay_UpdateRoundAnnouncement/`.
+
+### WirelessResultPanel_UpdateOutcomeReveal (0803B01C, src/fn/sub_0803B01C.c)
+
+Landed partials remove all four pins and one call-setup barrier. Production matches
+all 264 bytes with three saved-counter barriers left. Sharing one function-scope
+drawing pointer across entry/shake/reset branches, then using two direct shared
+samplers, keeps the first random seed store and restores its allocation. With
+separate branch-local drawing pointers flow deletes that store (insn 254), reducing
+the seed's references and reversing seed/mask registers. Replacing the local drawing
+layout with the shared layout or a union does not fix this: pointer scope does.
+A u16 keyframe local removes the call-setup barrier; its conversion orders the r2
+argument move before r0 and folds away. u8 and signed-short locals also match.
+
+Best fully clean draft: `notes/phase3-drafts/dp-link/WirelessResultPanel_UpdateOutcomeReveal.c`
+(14 ROM / 14 draft, shape 4, 264 bytes). It repeats `save = address` in both count-clamp
+arms and retains the u16 keyframe. This recovers a separate saved global-pointer
+pseudo, but the copy occurs after the clamp rather than before. Icon gets r4 instead
+of r5; the short-lived address gets r2 rather than r0; the maximum gets r0 rather
+than r2. Earlier fully clean forms were 60/56, then shared sampling 43/39, then shared
+pointer 25/27. Repeated save is the useful shape change, unlike repeated stores.
+
+All ten proper multi-barrier subsets after the four-pin removal fail. The prior
+repeat-save draft is 15/15, shape 4; CSE_NOFOLLOW=1 improves it to 11/11, but does not
+match. Narrow maximum types, ADDRESSOF address/save/maximum, an extra early save,
+shared maximum lifetime, typed counter/resource fields, repeated stores and clamp
+helpers do not recover the missing pre-clamp copy. The call-setup barrier alone was
+2/2 due to argument move order; helper parameter order had no effect, narrowing the
+keyframe local solved it. Next: preserve the address-to-save copy before the clamp
+without preventing CSE using a barrier. Do not repeat sampler/type/layout experiments.
+
+Scratch/evidence: `build/cx/work/WirelessResultPanel_UpdateOutcomeReveal/`.

@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Entry {
     u8 bytes[4], a, b, flag, kind;
     u32 timer;
@@ -35,71 +34,65 @@ void WirelessExchange_OnPacketReceived(struct Packet *p)
 {
     struct P *s = WirelessExchange_Get();
     struct Entry *e;
-    int i;
-    register int shift asm("r5");
-    int value;
+    int i, value;
     u32 mask;
     if (!s)
         return;
     e = &s->entries[1];
     switch (p->type) {
-        case 0:
+        case 0: {
+            int shift;
             e->a = p->payload.word;
             e->b = (u32)p->payload.word >> 8;
             shift = 16;
             value = p->payload.word;
-            i = 0;
-            do {
+            for (i = 0; i <= 3; i++, shift += 4)
                 e->bytes[i] = (value >> shift) & 15;
-                i++;
-                shift += 4;
-            } while (i <= 3);
             WirelessExchange_ApplyReceivedCounts(s);
-            break;
+            return;
+        }
         case 1:
             mask = 2;
-            goto flags;
-        case 2:
-            shift = 0;
+            break;
+        case 2: {
+            int shift = 0;
             {
-                u32 v = p->payload.halves.high;
-                v &= 1;
-                e->flag = v;
+                u32 flag = p->payload.halves.high;
+                flag &= 1;
+                e->flag = flag;
             }
             value = p->payload.word;
-            i = 0;
-            do {
+            for (i = 0; i <= 3; i++, shift += 4)
                 e->bytes[i] = (value >> shift) & 15;
-                i++;
-                shift += 4;
-            } while (i <= 3);
             mask = 8;
-            goto flags;
+            break;
+        }
         case 3:
             mask = 32;
-            goto flags;
+            break;
         case 4:
-            e->timer = *(u16 *)&p->payload.word;
+            e->timer = p->payload.halves.low;
             {
-                register u32 v asm("r0") = (p->payload.halves.high) & 3;
-                u32 z;
-                e->kind = v;
-                z = 0;
-                if (v == 1)
-                    e->b = z;
-                else if (v == 2)
-                    e->a = z;
+                u32 kind = p->payload.halves.high;
+                mask = 3;
+                kind &= mask;
+                e->kind = kind;
+                if (kind == 1)
+                    e->b = 0;
+                else if (kind == 2)
+                    e->a = 0;
             }
             mask = 128;
-            goto flags;
+            break;
         case 5:
             if (!Wireless_IsSessionActive())
                 s->mode = p->payload.word & 3;
             mask = 512;
-        flags:
-            s->flags |= mask;
             break;
+        default:
+            return;
     }
+    s->flags |= mask;
 }
 void WirelessExchange_OnPacketSent(struct Packet *p)
 {

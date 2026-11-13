@@ -107,6 +107,31 @@ int Target(int v)
         both = sites[1][2](sites[0][2](lines))
         self.assertEqual(both[2].strip(), "register int a, b, c;")
 
+    def test_other_concessions_include_reached_volatile_locals(self):
+        source = SOURCE.replace('register int t asm("r1") = v;',
+                                'volatile int t = v;').replace(
+                                    'register int x asm("r4") = s->a;',
+                                    'struct S *volatile copy = s;\n    int x = copy->a;')
+        reach = self.scope.function_reach(source, "Target")
+        found = self.scope.unprobed_concessions(source, reach)
+        self.assertEqual([(kind, owner) for _, kind, owner in found],
+                         [("volatile", "Helper"), ("volatile", "Target")])
+        lines = source.splitlines()
+        self.assertIn('volatile int t', lines[found[0][0] - 1])
+        self.assertIn('*volatile copy', lines[found[1][0] - 1])
+
+    def test_other_concessions_exclude_unreached_helpers_and_comments(self):
+        source = SOURCE.replace('register int u asm("r2") = v;', 'volatile int u = v;')
+        source = source.replace('return Helper(x);',
+                                '/* volatile int ignored; */\n    return Helper(x);')
+        self.assertEqual(self.scope.unprobed_concessions(
+            source, self.scope.function_reach(source, "Target")), [])
+
+    def test_volatile_pointee_is_not_a_volatile_local(self):
+        source = 'int Target(volatile int *reg)\n{\n    volatile int *p = reg;\n    return *p;\n}\n'
+        self.assertEqual(self.scope.unprobed_concessions(
+            source, self.scope.function_reach(source, "Target")), [])
+
 
 if __name__ == "__main__":
     unittest.main()

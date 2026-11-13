@@ -1978,6 +1978,33 @@ Each was read from the compiler source and confirmed on a live draft.
    retains ldrh with the exact ROM registers. Together with separate first/second
    random-index locals it removes one pin and all volatile command pointers from
    the matching partial; the rest of this function remains a holdout.
+150. **Reuse a switch's mask variable for a case-local decode to make the mask global and leave
+   r0 for the decoded value.** In WirelessExchange_OnPacketReceived (08037DEC),
+   `u32 kind = payload.halves.high; kind &= 3;` had a block-local 3 and the following byte-store
+   zero in r0, so the cross-block kind got r1. The ROM has kind in r0 and both constants in r1.
+   `AGBCC_FORCE=89:1,93:1` confirmed the two conflicts in that draft. Writing
+   `mask = 3; kind &= mask;` with the same function-scope mask used for the packet's handshake
+   flags makes it a multi-set global pseudo. Local allocation no longer reserves r0 for the
+   decode's constant, and normal allocation gives the ROM's registers. The existing per-case
+   shift scopes plus this reuse removed both pins and matched the complete callback and unit.
+
+151. **A shared drawing pointer can preserve a random seed store that branch-local pointers lose.**
+   WirelessResultPanel_UpdateOutcomeReveal uses the same drawing in entry, shake, and reset
+   branches. With three scoped pointer variables, two ParticleRandom_ReadDirectSample calls
+   lose their first seed store in flow (insn 254); the reduced seed references also swap the
+   seed and 1023-mask registers. One function-scope drawing pointer assigned in all three
+   branches preserves the store and matches, removing four pins. Changing the drawing type
+   to the shared layout or a union does not fix it. Inspect pointer scope and flow before
+   assuming the sampler or field type is wrong. WirelessGameDisplay_UpdateShakeAnimation
+   additionally needs its display parameter used directly, rather than copied to a local.
+
+152. **A narrow keyframe temporary can restore argument-move order without extra instructions.**
+   In WirelessResultPanel_UpdateOutcomeReveal, removing the last call-setup barrier changes
+   `mov r2,icon; mov r0,drawing` to the reverse order. Inline wrapper parameter order does not
+   help. Writing `u16 keyframe = icon; Anim_LoadKeyframe(drawing, descriptor, keyframe, 0);`
+   restores the original order and matches without the barrier. A u8 or signed-short keyframe
+   also matches; changing only icon to u8/u16 does not. The chosen icons are 30, 31, and 32, so
+   narrowing preserves their values. Use the meaningful argument type, not an unrelated cast.
 
 ## Survey: random table as a literal address (2026-10-24)
 

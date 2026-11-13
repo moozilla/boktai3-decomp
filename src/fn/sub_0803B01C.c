@@ -1,3 +1,4 @@
+#include "monster_particle_random.h"
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "runtime.h"
@@ -25,10 +26,10 @@ void Anim_LoadKeyframe(void *, void *, int, int);
 
 void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
 {
+    struct Drawing *drawing;
     if (p->entered) {
         int icon;
         int count;
-        register struct Drawing *drawing asm("r6");
         u8 *result;
         u8 **save;
         p->entered = 0;
@@ -83,40 +84,18 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
         drawing->flags &= ~1;
         {
             u8 *descriptor = (u8 *)p + 0x50;
-            int resource = icon;
-            asm("" : "+r"(descriptor), "+r"(resource));
-            Anim_LoadKeyframe(drawing, descriptor, resource, 0);
+            u16 keyframe = icon;
+            Anim_LoadKeyframe(drawing, descriptor, keyframe, 0);
         }
         drawing->x = 0;
         drawing->y = 0;
     }
     if (p->timer <= 7) {
-        struct Drawing *drawing = &p->drawing;
-        u16 *table = gRandomTable;
-        register u32 *indexPointer asm("r2");
-        register u32 index asm("r0");
-        u32 mask;
-        int value;
-        int smallMask;
-        indexPointer = &gRandomIndex;
-        index = *indexPointer + 1;
-        mask = 1023;
-        index &= mask;
-        *indexPointer = index;
-        value = table[index];
-        smallMask = 3;
-        value &= smallMask;
-        value -= 2;
-        drawing->x = value;
-        index++;
-        index &= mask;
-        *indexPointer = index;
-        index = table[index];
-        index &= smallMask;
-        index -= 2;
-        drawing->y = index;
+        drawing = &p->drawing;
+        drawing->x = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) - 2;
+        drawing->y = (ParticleRandom_ReadDirectSample(gRandomTable) & 3) - 2;
     } else if (p->timer == 8) {
-        register struct Drawing *drawing asm("r6") = &p->drawing;
+        drawing = &p->drawing;
         drawing->x = 0;
         drawing->y = 0;
     }

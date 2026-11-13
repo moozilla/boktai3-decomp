@@ -362,7 +362,7 @@ def resolve_knobs(src, func, env):
             entries.append(f"{pseudo}:{reg}")
         env["AGBCC_FORCE"] = ",".join(entries)
     pseudo_knobs = ("AGBCC_PRI", "AGBCC_FORCE", "AGBCC_COMBKEEP", "AGBCC_NOEQUIV",
-                    "CSE_KEEP", "CSE_NOCANON")
+                    "CSE_KEEP", "CSE_NOCANON", "AGBCC_NOREG")
     keys = [k for k in pseudo_knobs if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
     if not keys:
         return env
