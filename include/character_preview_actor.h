@@ -1,6 +1,6 @@
 #ifndef GUARD_CHARACTER_PREVIEW_ACTOR_H
 #define GUARD_CHARACTER_PREVIEW_ACTOR_H
-#include "modifier_list.h"
+#include "character_preview_model.h"
 /* Actor setup plus its five-part preview model, shared by link menus. */
 struct CharacterPreviewActor {
     u8 unknown0[0x48];
