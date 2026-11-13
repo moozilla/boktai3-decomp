@@ -1,7 +1,39 @@
 #include "proximity_icon.h"
+
+s32 ProximityIcon_IsPlayerNearby(struct ProximityIcon *icon)
+{
+    s32 dx, dz;
+    if (!gPlayers[0])
+        return 0;
+    dx = gPlayers[0]->position.x - icon->origin.x;
+    if (dx < 0)
+        dx = -dx;
+    dz = gPlayers[0]->position.z - icon->origin.z;
+    if (dz < 0)
+        dz = -dz;
+    if (dx > icon->radius || dz > icon->radius)
+        return 0;
+    return 1;
+}
+
+s32 ProximityIcon_Update(struct ProximityIcon *icon)
+{
+    if (!(gEngineFlags & 0x200) && ProximityIcon_IsPlayerNearby(icon))
+        icon->animation.flags &= ~1;
+    else
+        icon->animation.flags |= 1;
+    return 0;
+}
+
+u32 ProximityIcon_Destroy(struct ProximityIcon *icon)
+{
+    Anim_Remove(&icon->animation);
+    return 0;
+}
+
 s32 ProximityIcon_InitFromScript(struct ProximityIcon *icon)
 {
-    struct ProjectedDisplayResource resource, *original = ScriptProc_Start(0xCB05, 0x82F1);
+    struct SceneInputResource resource, *original = ScriptProc_Start(0xCB05, 0x82F1);
     struct ContactPackedVector offset, position;
     u32 priority, frame;
     resource = *original;
@@ -70,4 +102,18 @@ s32 ProximityIcon_InitFromScript(struct ProximityIcon *icon)
     else
         icon->animation.flags |= 1;
     return 0;
+}
+
+struct ProximityIcon *ProximityIcon_CreateFromScript(void)
+{
+    struct ProximityIcon *icon = Task_Create(9, sizeof(struct ProximityIcon));
+    if (icon) {
+        Task_SetCallbacks(icon, (void (*)(void *))ProximityIcon_Update,
+                          (void (*)(void *))ProximityIcon_Destroy);
+        if (ProximityIcon_InitFromScript(icon) < 0) {
+            Task_Kill(icon);
+            return 0;
+        }
+    }
+    return icon;
 }
