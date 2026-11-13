@@ -1890,6 +1890,25 @@ Each was read from the compiler source and confirmed on a live draft.
    restores the ROM's registers (`AGBCC_FORCE=148:1` confirmed the prior allocation).
    Removing the per-arm history assignments also loses the ROM's `adds r0, #8`.
 
+122. **Duplicating a post-join statement can fix PRE numbering as well as allocation.**
+   ActorAttachment_CreateValueSpriteSlot (08065FD0) had the right instructions but 15
+   spill-offset differences: its 258 insns into gcse gave T=129, while the desired hash
+   order needs T=127 or 133. Put `sprite->flags |= 1` in both action-offset arms (+4
+   insns before gcse), and `sprite->priority = 1` in both mode-test arms (+3). The
+   resulting T=133 orders all field-address spills correctly, and jump2 merges both
+   duplicated tails, so all 680 bytes match. Either duplication alone leaves the old
+   spill order. This is the same legitimate tail duplication as fact 91, but its
+   effect on the whole-function instruction count decides PRE's hash-bucket order.
+
+123. **A duplicated call followed by a duplicated read can stop CSE and still merge.**
+   ContactSwarm_UpdateTracking (08044290) reused an early mask 15 in its final random
+   sample, keeping it live across three calls. Put Collider_SetPosition and the following
+   `frame = slot->stateFrame` in both phase-test arms. CSE stops at their join, giving
+   the final mask a fresh load. The read after each call prevents flow's call-fallthrough
+   `(use 0)` from separating the tails; jump2 merges them back to the ROM's single call
+   and read. Duplicating only the call leaves eight extra instructions; writing gotos
+   after the calls does not remove that fallthrough distinction. All 236 bytes match.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
