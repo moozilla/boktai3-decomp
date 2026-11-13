@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "vanargand_pair_attack.h"
 #include "player.h"
 
@@ -11,15 +10,18 @@ void CpuSet(const void *, void *, u32);
 s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s32, s32, s32, u32);
 static inline s32 SetPositionAndGetHeight(struct SceneVec *out, s32 x, s32 y, s32 z)
 {
-    // Preserve the initialized height separately from the pending-animation zero.
-    register s32 height asm("r4") = y;
+    union {
+        u32 value;
+        u16 halves[2];
+    } height;
+    height.halves[0] = y;
+    height.halves[1] = 0;
     out->x = x;
-    (&out->y)[0] = height;
+    (&out->y)[0] = height.value;
     out->z = z;
-    return height;
+    return height.value;
 }
-static inline void AddPosition(struct SceneVec *out, struct SceneVec *a,
-                               struct SceneVec *b)
+static inline void AddPosition(struct SceneVec *out, struct SceneVec *a, struct SceneVec *b)
 {
     out->x = b->x + a->x;
     out->y = b->y + a->y;
@@ -39,8 +41,7 @@ void Vanargand_UpdateCaptureSetup(struct VanargandPairAttack *p)
         struct SceneVec *base;
         u32 two;
         s32 animationFlags;
-        u32 zero = 0;
-        (&p->pending)[0] = zero;
+        p->pending = 0;
         animationFlags = SetPositionAndGetHeight(&position, 128, 0, 128);
         base = &position;
         AddPosition(&position, &p->position, base);
@@ -61,7 +62,7 @@ void Vanargand_UpdateCaptureSetup(struct VanargandPairAttack *p)
                 break;
 
             case 2:
-                SceneActors_StartUnmirroredAnimation(p, animation, drawable, 14, two, zero);
+                SceneActors_StartUnmirroredAnimation(p, animation, drawable, 14, two, 0);
                 CpuSet((const void *)Player_GetCollisionData(), p->palettes[7], 0x4000008);
                 break;
         }

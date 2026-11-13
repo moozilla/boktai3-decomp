@@ -1228,3 +1228,187 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-bosses (Codex)
+
+Tags: #matching #phase3 #player #bosses
+
+### sub_0813D834 (0813D834): cse follow into a singleton case
+
+The original two pins remain. The best new pin-free draft is
+`notes/phase3-drafts/dp-bosses/sub_0813D834.c`: 0 ROM / 2 draft instructions
+(the extra initial `cmp kind, #1; beq bonus`), versus the old 17/15 draft.
+The entire body has the ROM's registers and instructions. Persistent search:
+`build/matchsearch/sub_0813D834`, nodes `second-entry` and `case-zero-fallthrough`.
+
+Confirmed `CSE_NOFOLLOW=2` gives MATCH. Read `cse_end_of_basic_block` in cse.c:
+a case label with one incoming branch and a preceding BARRIER admits the
+switch equality. Giving case 1 a second incoming branch blocks both passes;
+the duplicate comparison survives. Making case 0 conditionally fall through
+also blocks the follow, but its mode test survives (7/9). Repeating that test
+in both call/skip arms reduces it to 0/2 plus two moved branch targets.
+
+Tried direct and narrow parameter types, dispatch casts, union/array/address
+forms, precomputing the scaled offset, reordered cases, if/else and separate
+if dispatch, adjusted switch constants, default fallthrough and second entries
+from case zero/default. Dispatch narrowing/offsets preserve the body but add
+conversion/arithmetic instructions. Address-taking and ordinary inline readers
+do not hide the switch equality. No one-pin partial found: removing the scaled
+pin ties its shift to hard r3 and changes the earlier reload order.
+
+Next: a genuine shared path into case 1 whose second edge becomes redundant
+after cse, or an original helper/control-flow structure that puts a non-barrier
+predecessor before the case label. Scope `why all` does not attribute the dead
+argument copy and constant timer address to the switch equality; `probe` does.
+
+### PlayerAction_RefreshFlagState (0813EDDC): one moved argument copy
+
+The original seven concessions remain. New pin-free draft:
+`notes/phase3-drafts/dp-bosses/PlayerAction_RefreshFlagState.c`, 1 ROM / 1 draft
+plus one moved branch. The only difference is `mov r0, r8`: before the sign
+test rather than immediately before GameState_GetConsumableDescriptor in
+its nonnegative arm. All eight previous wrong registers are now correct.
+Persistent search: `build/matchsearch/PlayerAction_RefreshFlagState`, node
+`joined-choice` (baseline also retained).
+
+The original pin-free draft's AGBCC_SPILL=5:1 gives MATCH, reconfirmed. Read
+allocate_reload_reg in reload1.c and the R/X trace: four choices build the
+clear-loop addresses/mask, choice 4 reloads 0x418 into r2, choice 5 then
+chooses r0 for the alternate test; the ROM chooses r1. Assigning a `choice`
+local from alternate on both passing p/non-p guard paths creates the extra
+choice that starts the correct rotation, but its argument copy is too early.
+
+Tried sign-bit/shift comparisons, null-safe and plain inline mode/slot
+accessors, label and reversed conditional forms, duplicate full alternate
+selection, initialization before the guard, separate test edges, field vs
+pointer bonus stores, array and SI zeros, a separate bonus-loop counter,
+union/addressable/narrow choice, call wrappers and call-only/test-only choice
+uses. No exact subset of the existing choice/zero/current pins tested here
+matched, so no partial landed. The copies' order is not explained by `why`;
+it reports no supported causal summary, while the trace shows the source
+copy survives into reload. Next: keep that reload choice but delay or delete
+the copy after allocation, or recover the missing original access around the
+mode/slot guard. Do not add a fence to manufacture the choice.
+
+### sub_0815E034: direct defense addresses isolate the mask priority
+Tags: phase3, player, sub_0815E034, allocation
+
+The new pin-free draft is `notes/phase3-drafts/dp-bosses/sub_0815E034.c`:
+6 ROM / 4 draft instructions differ, 440 versus 444 bytes. All long-lived
+registers and all defense switch cases now match. It reuses `common` in the
+blocked-mask arm, then assigns it again for the vulnerability mask. The extra
+references raise its priority to 2500. Remaining differences are the first
+mask's register/order and regmove tying the final mask test to r6.
+
+A stronger diagnosis: starting with the old draft, replace each switch offset
+with `attribute = &player->cueDefenses[k]` and remove the post-switch pointer
+addition. `AGBCC_PRI=common:+1000` makes this direct-address draft **MATCH**.
+Player's nine references give priority 2231, source 2061, and common 1500;
+common must outrank both. Its REG_EQUIV constant doubles live length 10 to 20.
+This also fixes the offset/attribute register issue through natural reload and
+cross-jumping, so it is one allocation decision rather than two unrelated pins.
+
+Tried narrow/wide common and vulnerable types, masked load temporaries, inline
+mask helpers, union/array mask initializers, mask setup in both blocked arms,
+separate mask assignments and precomputed element tests. Narrow common types
+fold to the same RTL. Wide vulnerable types change allocation adversely.
+Repeated initialization in an identical branch gives 7/7 but moves the mask
+past the 0x40 test; it is not a good final form. The direct-address draft with
+all existing source pins removed still needs common's priority raised.
+Source-pin-only partials with typed offsets, helper reads, indexing and union
+pointer initialization remain 8/8; no source change landed.
+
+Next: give common a short-lived extra real reference that disappears after
+allocation, or prevent REG_EQUIV doubling without an artificial fence. A mask
+helper with the original aggregate representation may supply that reference.
+
+### PlayerContact_ApplyResponse: shared duration selection, 6/6
+Tags: phase3, player, PlayerContact_ApplyResponse, cross-jumping
+
+New draft: `notes/phase3-drafts/dp-bosses/PlayerContact_ApplyResponse.c`.
+Compute `duration = power + 60`, assign `power = duration` in the engine-flag
+arm and `power += 60` in the other arm, then make one shared reset call and
+counter store. This keeps the dead engine AND and reduces 13/22 to 6/6, with
+the original 1100-byte size. Only the duration section differs; later code is
+exact. The ROM keeps a dead r3 duration computation and computes power+60
+again into r1; the draft keeps the first computed value in r2 and copies it.
+
+`probe` tried all 16 canonical choices, 23 jump follows and one PRE replacement
+without improving the count. `why` forcing power to r2 improves to 5/3, but
+does not reproduce the second addition. Moving the counter store outside two
+calls still leaves the calls unmerged. Duration in either call arm, separate
+selected locals, redundant reassignment, inverse subtraction, a union duration
+and rereading source power all retain the same issue or collapse the dead test.
+The old source with only its pin removed is 8/6; u16/s32 power and declaration
+order do not improve it. Original source retains both concessions.
+
+Next: find the C form that lets the initial duration value die only after
+allocation while the argument still uses the original power. The key is the
+second addition, before considering reload rotation.
+
+### TargetRegistry_FindById: 5/5 allocation-only; duplicate compares still cross-jump backward
+Tags: phase3, dp-bosses, TargetRegistry_FindById
+
+Draft: notes/phase3-drafts/dp-bosses/TargetRegistry_FindById.c. AGBCC_PRI=requestedId:+2484 makes the single shared comparison MATCH. The earlier duplicate-comparison draft already allocates correctly but jump2 shares the collider tail into the actor tail. Explicit found/missing labels, returns versus breaks in each arm, and an actor block outside the loop do not reproduce the ROM layout. Narrow flag/mask types, boolean flag extraction, aggregate flag temporaries and inline comparison helpers do not solve allocation. Union/struct/array mask temporaries fold to the same RTL. Original source retains its one pin. Next: an ID reference that survives through flow while preserving the shared comparison, or a real flag accessor that prevents the constant mask tie and REG_EQUIV lifetime doubling.
+
+### sub_0819BB18: improved from 24/23 to 4/4; only invariant order remains
+Tags: phase3, dp-bosses, sub_0819BB18
+
+Draft: notes/phase3-drafts/dp-bosses/sub_0819BB18.c. Build the bank through ParticleRandomTableSource halfword stores before the loop, then read it through ParticleRandom_GetTable. This retains the 0x0203B000 base and computes the first rebased table in the preheader, leaving the later rebasing in the loop as the ROM does. CSE_NOCANON=229 removes an extra copied base in the second sample; ordinary C table++; table += 511; in the sampling inline reproduces that effect. The entire body is exact. Four differences remain: the gRandomIndex address is hoisted before the reduced counter initialization instead of after it, changing the two temporary reload registers. The result is the original 416-byte size. Symbol/union loop initializers, direct bank indexing, table temporaries, alternate shared readers, countdown/do/goto loops, early counter initialization and a seed argument do not reproduce the ordering. The source retains four barriers. Next: control the relative placement of the loop-invariant address and reduced counter initializer without changing the exact body.
+
+### Hresvelgr_EmitFacingMotion: origin survives naturally; remaining allocation is not isolated
+Tags: phase3, dp-bosses, Hresvelgr_EmitFacingMotion
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_EmitFacingMotion.c. Build the origin through ParticleRandomTableSource halfword writes and retrieve it with the shared accessor. This retains the otherwise folded origin and gives 44/44 differences versus the earlier 48/43; size is 368 bytes. Replacing either or both early direct reads by shared relative reads folds to exactly the earlier RTL; ReadDirectSample also does, while ReadSample changes allocation adversely. Union origin/quotient temporaries do not help. All 16 CSE canonical choices, five jump follows and five PRE choices fail to improve this draft. The original still has two pins and one barrier. Partial angle-pin removal with reordered Polar parameters, a mask local and a plain x pointer also fails. Next: isolate quotient lifetime before the origin copy and the saved actor copy; these affect global register pressure independently of the later polar-angle pin. Helpers shared with Hresvelgr_SetPartApproachMotion must be checked with the whole unit if changed.
+
+### Hresvelgr_UpdateTurningCharge: 10/8; PRE still reuses the first flags address
+Tags: phase3, dp-bosses, Hresvelgr_UpdateTurningCharge
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_UpdateTurningCharge.c. AGBCC_NOPRE=1 makes the original pin-free draft MATCH. Duplicating the first real flags update in both pending arms improves 16/14 to 10/8 but PRE still preserves the computed address across the callback. A separately assigned owner and an inline initialization helper with two real returns both fold to the original baseline. Reconstructing only the second owner pointer from its two halfwords defeats PRE and leaves 3 ROM / 9 draft, but adds six reconstruction instructions; it is scratch evidence rather than the preferred draft. The ordinary branch-local update draft is retained. Next: another real base representation that becomes the original pointer after gcse but before allocation, or the original owner reassignment. Original source retains the address pin.
+
+### Hresvelgr_PlayDescent: 11/5; actor/input copy still propagates away
+Tags: phase3, dp-bosses, Hresvelgr_PlayDescent
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_PlayDescent.c. The prior ordinary draft remains best at 11 ROM / 5 draft. Returning the actor from an inline descent body, either assigning or ignoring its result, does not preserve the copy: expansion drops the unused return. Putting the final refresh arm before the landing stores changes the branch layout and still merges input and actor. The ROM needs input in r7, actor in r6 and tick in r8. The source retains its one operand barrier. Next: find a real aggregate owner representation or control-flow join that survives copy propagation but folds before allocation; moving only the final use order is insufficient.
+
+### Hresvelgr_UpdateBoundaryBarrage: 2/2; random-mask retry allocation still selects sl
+Tags: phase3, dp-bosses, Hresvelgr_UpdateBoundaryBarrage
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_UpdateBoundaryBarrage.c. The prior pin-free 2/2 draft remains best. Shared ReadDirectSample produces the same RTL and difference; ReadSample increases register differences. Building the random mask through halfwords substantially changes the loop code, and rebuilding only the normal collision mask changes other allocations without fixing the retry choice. The source still retains its end-of-function mask operand. Next: expose why retry_global_alloc considers sl available despite the earlier collision/action mask using it, and find a genuine later use of that value or another pseudo that naturally conflicts with it in case 1. Keep this distinct from simple priority order: initial global allocation already chooses the intended low register before reload evicts it.
+
+### sub_081A14FC: improved 86/82 to 30/32 with one shared sampler draw
+Tags: phase3, dp-bosses, sub_081A14FC
+
+Draft: notes/phase3-drafts/dp-bosses/sub_081A14FC.c. Use ParticleRandom_ReadSample only for rawY, retaining the other direct draws. Its extra counted table reference raises the table above the random-index address, fixes the frame size/slots and improves the pin-free draft from 86/82 to 30/32. Using it for every draw overshoots badly; direct shared reads fold to the baseline. Each individual draw was checked against the table-priority hypothesis, and increasing the sampler count to two through five is worse. Keeping the sampleY/rawY pins and barrier while removing only the table pin reaches 11/13, but removal combinations of those three remaining concessions do not match. The principal remaining difference is a resident 0x3ff mask in ip, while the ROM reloads it and uses ip for oy; gcse also moves the index-address copy later. Original source retains all four concessions. Next: displace the index mask naturally while retaining the corrected table priority; then revisit sampleY/rawY lifetimes.
+
+### Vanargand_ApplyPendingDamage: partial landed, one mask pin remains
+Tags: phase3, dp-bosses, Vanargand_ApplyPendingDamage
+
+Removed the partDamage/sl pin and its operand barrier. The existing u8 narrowing
+of the part flags supplies the necessary live-range instruction, and retaining
+only the original r2 mask pin gives an exact whole-unit MATCH. The full pin-free
+draft is saved under dp-bosses and remains 7/7. Halfword/array mask construction,
+a shared return-mask local and count-label forms do not fix it. Splitting the
+real song call between the special/non-special arms changes the CSE path and
+gives 5/8, but leaves duplicated call/layout instructions. Next: reproduce that
+path break while restoring the shared song call.
+
+### sub_081D3620: 2/2; correct registers but bias addition attaches to random
+Tags: phase3, dp-bosses, sub_081D3620
+
+The unchanged source retains its single random pin. The old exact-shape draft allocates coordinate before random; AGBCC_PRI=random:+15000,random#1:+15000 confirms the allocation diagnosis. Applying bias to the masked random instead gives every ROM register naturally, but moves each bias addition from coordinate before the mask to random after it (2/2). Both signed and unsigned 16-bit random, unsigned coordinate, separated coordinate/bias statements, and an accumulator random retain or worsen allocation; 16-bit coordinate adds truncations. A union assembled from masked halfwords adds reconstruction instructions. Next: a real random-use form that increases its flow references while combine restores the coordinate-first bias addition. The draft changes no behavior: only the low halfword of the sum is stored.
+
+### Ratatosk_UpdateSunOrbRelocation: 8/8; reload choice 15 confirmed, failure-tail sharing fixes allocation
+Tags: phase3, dp-bosses, Ratatosk_UpdateSunOrbRelocation
+
+All three original concessions remain. Confirmed AGBCC_SPILL=15:1 matches: choice 14 loads the finished offset in r2; choice 15 consequently starts after r2 and takes r0 instead of ROM r2. Replacing the early fading failure store/return by goto fail removes choice 14 and fixes every later register, but jump2 removes four instructions that the ROM duplicates. Writing out the negative-slot failure adds two instructions without changing allocation. A shared terminal return label changes nothing; a common final finished store changes layout substantially. Using q for the early finished store adds one register difference. A halfword-built finished constant adds 14 instructions. Next: retain the early failure tail while changing its reload inheritance, or prevent jump2 from sharing the second failure tail after arranging the right reload rotation.
+
+### sub_08217430: 3/3; widened bank breaks the argument preference, base still coalesces
+Tags: phase3, dp-bosses, sub_08217430
+
+The original pin and operand barrier remain. Confirmed forcing baseline bank pseudo 33 to r3 gives only 2/2: the loaded base remains tied to bank instead of r1. Widening the completed address to u64 before truncating it for the call restores the missing argument copy naturally and gives a same-size 3/3 draft. This is diagnostic rather than a convincing original C form: the doubleword occupies r2/r3 and its low word coalesces the loaded base. Copy helpers returning source or destination, a source/control descriptor, union assignment and initializer, and a range-copy helper all collapse to the baseline. Splitting the offset changes shape; widening the offset or doing the addition in u64 worsens it. Integer-address addition and the retained-bank-pin variants did not match. Next: a source representation that prevents both the argument-copy preference and the base/result tie. Scope also failed to identify the doubleword holder of r3 because its holder search compared only the starting hard register.
+
+### GameState_SelectRamBase: 1/1; cse deliberately moves the known constant base to the second operand
+Tags: phase3, dp-bosses, GameState_SelectRamBase
+
+The single original base pin remains. Read fold_rtx in gcc/cse.c: after obtaining equiv_constant for each operand, it explicitly places a constant second in commutative operations. This is operand ordering, not the allocation conflict that scope why reports. Array-of-eight-byte slots and u64 slot pointers retain the 1/1 difference. A union initializer or one-element pointer array changes allocation to 15/15; widening the address gives 28/28. Reassembling a union pointer from two halfword reads hides the constant from CSE and fixes the add order and all downstream registers, but five reconstruction instructions plus alignment remain. Next: a nonconstant first definition that combine reduces after CSE without reconstruction instructions. Scope incorrectly printed cse replaced nothing by nothing and recommended swapping allocation for a pure commutation; this is a diagnostic bug to fix.
