@@ -1406,3 +1406,24 @@ changes which pointer survives but differs 9/9 (shape 4); byte result adds
 branches. Next: inspect the inline formal's equivalence class rather than
 only caller crate, and seek a natural destructive pointer update inside the
 helper that preserves the caller's pointer across both paths.
+
+### FloorSwitch_SetOccupant (0810048C)
+
+Tags: phase3, dp-field-b, FloorSwitch_SetOccupant
+
+Both barriers remain. Consecutive named halfword updates `flags88 |= 2;` and
+`flags88 &= ~1;` recover the zero OR exactly (fact 103), producing a pin-free
+8/8 draft with shape zero. Remaining differences are operand ties: the first
+AND copies f rather than one, and the update OR/AND/store stays in r1 rather
+than r0. Forcing one:r6,f:r1 has no effect because those allocations already
+match. Raising one's priority worsens to 18/18. No exact knob yet.
+
+Constant-first local updates recover the final destination but lose the
+HImode zero OR, leaving 4/2; retaining the first barrier leaves only the two
+missing zero instructions. Direct fields, pointer fields and explicit OR
+assignments keep the HImode insertion but retain the wrong operand tie.
+Narrow one locals, narrow mask-return helpers, a flag union, pointer-based
+testing, a field-setting helper, and a halfword-returning setter do not solve
+both decisions. Next: preserve a HImode field insertion while giving the
+constant its own dying pseudo; inspect regmove's tied operand choice rather
+than only global allocation priority.
