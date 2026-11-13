@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "burst_emitter.h"
 void sub_08126AD4(const struct ContactPosition *, s32, s32, s32, s32, s32, u32);
 void SpriteParticle_CreateVariant4384(const struct ContactPosition *, s32, s32, s32, s32, s32, s32,
@@ -6,6 +5,7 @@ void SpriteParticle_CreateVariant4384(const struct ContactPosition *, s32, s32, 
 void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
 {
     s32 index;
+    struct ContactPosition *origin;
     switch (emitter->frame) {
         case 0:
             if (!emitter->context)
@@ -26,12 +26,10 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
             break;
         }
         case 2: {
-            struct ContactPosition *position;
             const u16 *table;
             u32 *current;
             index = 0;
-            position = &emitter->position;
-            asm("" : "+r"(position) : "r"(index) : "r0", "r1", "r2", "r3");
+            origin = &emitter->position;
             table = gRandomTable;
             current = &gRandomIndex;
             for (; index <= 5; index++) {
@@ -40,17 +38,15 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
                 *current = random;
                 value = *(u16 *)((random << 1) + (u32)table);
                 value &= 15;
-                sub_08126AD4(position, 1, value, index << 6, 150, 1, emitter->context);
+                sub_08126AD4(origin, 1, value, index << 6, 150, 1, emitter->context);
             }
             break;
         }
         case 3: {
-            struct ContactPosition *position;
             const u16 *table;
             u32 *current;
             index = 0;
-            position = &emitter->position;
-            asm("" : "+r"(position) : "r"(index) : "r0", "r1", "r2", "r3");
+            origin = &emitter->position;
             table = gRandomTable;
             current = &gRandomIndex;
             for (; index <= 7; index++) {
@@ -59,22 +55,21 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
                 *current = random;
                 value = *(u16 *)((random << 1) + (u32)table);
                 value &= 31;
-                sub_08126AD4(position, 1, value, index << 5, 100, 1, emitter->context);
+                sub_08126AD4(origin, 1, value, index << 5, 100, 1, emitter->context);
             }
             break;
         }
         case 4: {
-            register struct ContactPosition *position asm("r4");
             u32 *current;
             u32 mask;
             const u16 *table;
             index = 0;
-            position = &emitter->position;
+            origin = &emitter->position;
             current = &gRandomIndex;
             mask = 0x3FF;
             table = gRandomTable;
             for (; index <= 15; index++) {
-                register u32 random asm("r1") = *current;
+                u32 random = *current;
                 s32 value;
                 s32 duration;
                 random = (random + 1) & mask;
@@ -83,10 +78,12 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
                 value += 5;
                 random = (random + 1) & mask;
                 *current = random;
-                duration = *(u16 *)((random << 1) + (u32)table);
+                random <<= 1;
+                random += (u32)table;
+                duration = *(u16 *)random;
                 duration &= 63;
                 duration += 80;
-                sub_08126AD4(position, 1, value, index << 4, duration, 2, emitter->context);
+                sub_08126AD4(origin, 1, value, index << 4, duration, 2, emitter->context);
             }
             break;
         }
