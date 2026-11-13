@@ -1,6 +1,14 @@
 #ifndef FOUNDRY_ACTOR_STATE_H
 #define FOUNDRY_ACTOR_STATE_H
 #include "scene_actor_components.h"
+#include "converging_particles.h"
+struct ActorAnimationResource {
+    u8 id;
+    u8 unknown1[0x1C];
+    u8 eventFlags;
+    u8 unknown1E[2];
+    u8 eventScripts[0x28];
+};
 /* Tentative actor state prefix shared by the adjacent state callbacks. */
 struct ActorAnimationPair {
     u32 first, second;
@@ -37,11 +45,7 @@ struct ActorState {
     u8 bounds[0x1C];
     struct ContactPosition destination;
     u8 animationData[0x20];
-    u8 animationId;
-    u8 unknown2CD[0x1C];
-    u8 eventFlags;
-    u8 unknown2EA[2];
-    u8 eventScripts[0x28];
+    struct ActorAnimationResource graphics;
     void *palette;
     u8 unknown318[0x14];
     u8 effect[0xFC];
@@ -69,7 +73,8 @@ struct ActorState {
     u8 unknown508[8];
     s8 randomOffset;
     u8 jitterTicks;
-    u8 unknown512[0xE6];
+    u8 unknown512[0xE];
+    struct ConvergingParticleGroup convergingParticles;
     struct ContactPosition offsetPoint;
     u8 unknown600[0x600];
     u16 paletteData[16];
