@@ -2285,3 +2285,55 @@ Draft: `notes/phase3-drafts/cdp-effects/ProjectilePool_Update.c`. Only two empty
 ### SpiralBurst_InitParticles (src/fn/sub_08234540.c, 08234540): deferred, 49/47
 
 Draft: `notes/phase3-drafts/cdp-effects/SpiralBurst_InitParticles.c`. The signed cosine-table/direct sine sampling already removed the old barrier. The remaining two pins keep separate effect-table and random-table aliases in r5/r6; removing the random-table pin dominates and introduces three moved branches. Next: convert all draws to the table-first `ParticleRandom_ReadSample`/`ReadDirectSample` helpers while keeping the effect table captured outside the loop.
+## cdp-field (Codex)
+
+### TetherActor_UpdateBounceReturn (partial)
+Dropped the destination pointer's `r1` pin: ordinary allocation already matches. The saved pin-free draft still differs by 23 ROM / 16 draft instructions plus two moved branches. The remaining costs isolate `frameValue` (4 rows), `incremented` (2 rows), and especially the `0x380` height offset (25 rows). Next: recover the original height-store expression so the constant is rematerialized in the ROM's allocation order.
+
+### AreaEffect_AddSpriteFromScript
+The pin-free draft differs by 38 ROM / 32 draft instructions plus eight moved branches. The count pointer's `r8` allocation is the largest isolated cause (30 rows), followed by the point pointer (19); removing the `first` barrier alone costs three rows. Earlier work identified the register allocation at entry and loop shape as the blocker. Next: compare the 55-instruction relative `sub_08063CAC` and duplicate the post-join point advance into its arms to adjust pointer density.
+
+### AreaEffect_UpdateLinkPlayerResources
+The pin-free draft differs by 40 ROM / 44 draft instructions plus 16 moved branches. Isolated costs show the loop counter pin/barrier pair changes 33 rows; the destination's previous value changes 41, the counter value 28, and the base pointer 40. Next: reconstruct the loop as the likely count-up source loop and let loop reversal create the ROM counter copy (scope facts 84 and 86).
+
+### AreaEffect_UpdateLinkVisibility
+The pin-free draft differs by 39 ROM / 37 draft instructions plus nine moved branches. The `~1` mask controls the largest allocation cascade (37 rows); the two count-pointer copies together cost 17 and the cursor barriers together cost six. Next: combine the two scans behind a shared typed helper and test whether repeated arm tails supply the missing references without barriers.
+
+### ResourceStation_CheckInteraction
+The pin-free draft differs by 36 instructions on each side. The trigger offset pin is the dominant isolated decision (31 rows); the offset/barrier group costs six and the nearby-offset group three. Next: replace constant byte offsets with a layout-preserving station struct and member addresses, so CSE and reload derive the constants naturally.
+
+### ResourceStation_UpdateDigits
+The pin-free draft differs by 32 ROM / 36 draft instructions plus one moved branch. The two loop-counter pins together cost 41 rows, while the read temporaries cost ten and field temporaries eight. The branch target shift points to loop source shape. Next: express both countdowns as count-up `for` loops and compare the 51-instruction relative `sub_08016C04`.
+
+### DirectionalForce_Tick
+The pin-free draft differs by 34 ROM / 30 draft instructions plus two moved branches. The random-table pin costs 14 rows, the countdown barrier 12, mask pin 11, and memory barrier eight. Next: use the shared table-first random-sample helper and rewrite the countdown as a count-up loop so loop reversal establishes the ROM lives.
+
+### DirectionalForce_InitializeFromScript
+The pin-free draft differs by 60 ROM / 61 draft instructions plus two moved branches. The status helper pin dominates the isolated result, while the random pointer/barriers form a 20-row group. Next: replace the private random reads with the shared table-first helpers, then revisit the value statement order that currently needs two barriers.
+
+### WoodenCrate_CreateFromScript
+The pin-free draft differs by 58 ROM / 46 draft instructions plus four moved branches. Fifteen of sixteen concessions are in the private `Step` helper; its group alone costs 50 ROM / 38 draft rows. Next: replace that private sequence stepper with `DisplaySequence_StepSprite`, then diagnose only the creator's remaining sprite allocation.
+
+### WoodenCrate_ReactToHit
+The pin-free draft differs by eight instructions on each side. The ROM preserves both the hit argument and a second crate copy; ordinary C reverses the first two copies, then uses the wrong saved copy after calls. Next: alter parameter-copy order with a plausible inline wrapper or callback-target view while retaining the helper's control flow.
+
+### FloorSwitch_SetOccupant
+The pin-free draft differs by eight ROM / six draft instructions. Priority instrumentation shows the `one` pseudo must be allocated before the function pointer so r6 is already occupied; `AGBCC_PRI=one:+11728` is the diagnostic. Pass 2 confirmed that duplicating `p->field10 = one` in both song-selection arms gives `one` the ROM's r6, but jump2 cannot merge the stores across the intervening calls and leaves two extra instructions. Duplicating the palette call with the store also gets r6 but leaves both four-instruction call sequences. Identity uses in the song argument (`+ one - 1`, `one & ~one`, shifted and remainder forms) fold before allocation and do not change the eight/six diff; XOR and OR identities survive but make the output worse. Reversing `one & f` does not affect allocation, while `f &= one` reduces the draft-only side to two instructions but increases shape distance. Next: find a real pre-call use of `one` that survives through global allocation and is removed by combine, or a branch layout whose duplicated stores are adjacent tails that jump2 can cross-jump.
+
+### NamedObject_RegisterFollowCells
+The pin-free draft differs by 17 instructions on each side. `AGBCC_PRI=object:+1027` matches exactly: the object pointer must outrank `w`; a smaller increase also fixes its order relative to the loop counter. Next: add natural object references by duplicating a post-join object-field statement into the registration branch arms, allowing jump2 to merge the emitted tails.
+
+### ActorGroup_CreateFromScript
+The pin-free draft differs by 79 ROM / 77 draft instructions plus six moved branches. All concessions are in the private `Step` helper, with the mask/barrier pair causing a 55-row cascade. Next: replace the helper with the subsystem's shared playback/sequence helper, preserving the setup pointer and embedded frame state.
+
+### Collectible_StartDeath
+The pin-free draft differs by 37 ROM / 33 draft instructions. Most concessions are a repeated private display-sequence stepper; the mask pin alone causes 52 differing rows. The output-only `d` barrier cannot simply be deleted because it is its only definition. Next: use `DisplaySequence_StepSprite` and write the actual duration value directly before removing the output barrier.
+
+### Collectible_UpdateEntry
+The pin-free draft differs by 46 ROM / 42 draft instructions plus one moved branch. The repeated private stepper accounts for most pins/barriers; the final duration and hit temporaries remain a separate allocation issue. Next: adopt `DisplaySequence_StepSprite`, then reconstruct the actual definition currently hidden by the output-only `d` barrier.
+
+### SpriteDrop_UpdateEntry
+The pin-free draft differs by 31 ROM / 29 draft instructions. Every concession is in the same private display-sequence pattern seen in the two collectible functions. Next: convert all three together to `DisplaySequence_StepSprite`; their shared C form should expose any caller-specific allocation difference.
+
+### sub_0817AEC8
+The pin-free draft differs by 53 ROM / 49 draft instructions plus three moved branches. Its single sine-table `r2` pin controls the entire allocation cascade. Older notes likewise identify allocation rather than instruction selection. Next: recover the angle/table expression from matched scene-volume relatives and test operand order and a typed sine lookup helper to generate the ROM preference naturally.
