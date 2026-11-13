@@ -294,7 +294,10 @@ struct Player {
     u16 interactionPromptFlags; /* 0x520: bits OR'd in by ControlPanel based on interactionPromptCategory (tentative) */
     u16 displaySegmentCount; /* 0x522: input hits in the 32-frame history, clamped to seven for display. */
     u16 indicatorUpdateRate; /* 0x524: player input animation rate, used as the control panel phase divisor. */
-    u8 unk526[8];
+    u8 unk526[2];
+    u16 timedChargeTimer; /* 0x528: script t, registered with the HUD; tentative */
+    u16 timedChargePhase; /* 0x52A: reset when the timed charge starts; tentative */
+    u16 timedChargePeriod; /* 0x52C: script c, defaults to 720; tentative */
     u16 actionAccumulatorBlocked; /* 0x52E: nonzero prevents accumulation */
     u16 scriptStatus[2];          /* 0x530: script keyword s selects a nonzero status */
     u16 sceneMode;                /* (guess) */
