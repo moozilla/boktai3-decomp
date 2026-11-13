@@ -1949,8 +1949,6 @@ void TetherActor_InitInteractionFromScript(struct TetherActor *actor)
     actor->recoveryTimer = 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
 {
     struct DisplayPosition position;
@@ -1963,6 +1961,8 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
     if (actor->kind == 9) {
         display = &actor->display.animation;
         DisplayAnimation_InitializeKeyframes(display, 0x35E3, 0, initialPosition);
+        DisplayAnimation_SetPriority(display, 2);
+        value = Script_SeekToKeyword('d');
     } else {
         const u16 *palette;
         u16 *buffer;
@@ -1970,7 +1970,6 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
         u16 *destination;
         s32 i;
         display = &actor->display.animation;
-        asm("" : "+r"(display));
         DisplayAnimation_InitializeSequence(display, 0x2499, 0x3D95, 0, initialPosition);
         TetherActor_SetEntry(actor, 0);
         actor->appliedPalette = actor->paletteIndex;
@@ -1987,9 +1986,9 @@ void TetherActor_InitDisplayFromScript(struct TetherActor *actor)
             *destination++ = *source++;
         } while (--i >= 0);
         DisplayAnimation_SetTileSource(display, (u32)buffer);
+        DisplayAnimation_SetPriority(display, 2);
+        value = Script_SeekToKeyword('d');
     }
-    DisplayAnimation_SetPriority(display, 2);
-    value = Script_SeekToKeyword('d');
     if (value)
         actor->heading = Script_GetValue();
     else

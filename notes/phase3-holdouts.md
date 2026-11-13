@@ -1420,3 +1420,16 @@ allocation; jump2 then cross-jumps the identical tails. Stock unit MATCH.
 Repeating the store alone is 4/6 with branch locals; repeating both with an
 outer kind is still 7/9. Short/union values, union pointers, ternary selection,
 inline store helper and unsigned slot did not fix the baseline allocation.
+
+### TetherActor_InitDisplayFromScript (0804A600): resolved
+
+Removed the display barrier by repeating SetPriority and the following keyword
+read in both initialization branches. The baseline is 23/23, shape 0: display
+priority 4363 (8 refs / 55 live) loses r4 to actor at 4639. Diagnostic
+`AGBCC_PRI=display:+277` matches. Repeating SetPriority gives correct allocation
+but an extra three-instruction call: the fall-through arm ends in flow's USE 0
+which blocks cross-jumping. Including the keyword result assignment makes both
+tails shareable and gives stock MATCH (full unit, 20,516 bytes).
+Count-up palette copying and union display pointers retained 23/23. Hoisting
+the display pointer or removing source's distinct lifetime changed shape.
+Repeating the entire script/heading tail was too broad (23/35).
