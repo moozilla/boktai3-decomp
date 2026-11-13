@@ -6,21 +6,24 @@
 #include "tilemap_panel.h"
 #include "background_controller.h"
 
+struct SpatialEntry;
+typedef void (*SpatialContactCallback)(void *owner, struct SpatialEntry *other);
+
 struct SpatialEntry {
     u32 flags, mask, category; /* 0x00 */
     u16 kind;                  /* 0x0C */
-    u8 unknownE, registrationFlags;
+    u8 hit, registrationFlags;
     struct ContactPosition position; /* 0x10 */
     struct ContactPosition extents;  /* 0x18 */
     struct ContactPosition offset;   /* 0x20 */
     struct ContactPosition screen;   /* 0x28 */
     u8 unknown30;
     s8 bucket;
-    u16 unknown32;
+    s16 hitTimer;
     s16 updateDelay; /* 0x34 */
     u8 parameter, unknown37;
-    void *owner;            /* 0x38 */
-    void (*callback)(void); /* 0x3C: contact handler; signature provisional */
+    void *owner;                     /* 0x38 */
+    SpatialContactCallback callback; /* 0x3C: contact handler */
 };
 
 struct SpatialLink {
@@ -40,9 +43,10 @@ struct SpatialIndex {
     s32 bucketWidth; /* 0xBC */
 };
 
-void Collider_ScheduleUpdates(void *, struct SpatialBucket *);
-void Collider_OnContactDefault(void);
-void Collider_SetContactCallback(struct SpatialEntry *, void (*callback)(void), void *owner);
+void Collider_ScheduleUpdates(void *, struct SpatialBucket *, s32 bucketIndex);
+void Collider_OnContactDefault(void *, struct SpatialEntry *);
+void Collider_SetContactCallback(struct SpatialEntry *, SpatialContactCallback callback,
+                                 void *owner);
 void Collider_SetExtents(struct SpatialEntry *, s32 x, s32 y, s32 z);
 void SpatialIndex_SetPosition(struct SpatialEntry *, s32 x, s32 y, s32 z);
 void Collider_SetFixedPositionWithYOffset(struct SpatialEntry *, u32 position, u32 yOffset);
@@ -51,7 +55,7 @@ void Collider_SetCategory(struct SpatialEntry *, u32 mask);
 void Collider_SetContactParameter(struct SpatialEntry *, u32 kind);
 void SpatialIndex_InitEntry(struct SpatialEntry *, struct ContactPosition *,
                             struct ContactPosition *, struct ContactPosition *, u32 flags, u32 mask,
-                            u32 category, u32 kind, u32 parameter, void (*callback)(void),
+                            u32 category, u32 kind, u32 parameter, SpatialContactCallback callback,
                             void *owner);
 void SpatialIndex_InsertEntry(struct SpatialEntry *);
 u8 SpatialIndex_RemoveEntry(struct SpatialEntry *);

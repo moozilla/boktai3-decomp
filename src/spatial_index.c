@@ -1,6 +1,6 @@
 #include "spatial_index.h"
 
-void Collider_ScheduleUpdates(void *unused, struct SpatialBucket *bucket)
+void Collider_ScheduleUpdates(void *unused, struct SpatialBucket *bucket, s32 bucketIndex)
 {
     struct SpatialLink *link;
     s32 enabled, quota, count, divisor, delay;
@@ -52,11 +52,12 @@ void Collider_ScheduleUpdates(void *unused, struct SpatialBucket *bucket)
     }
 }
 
-void Collider_OnContactDefault(void)
+void Collider_OnContactDefault(void *owner, struct SpatialEntry *other)
 {
 }
 
-void Collider_SetContactCallback(struct SpatialEntry *entry, void (*callback)(void), void *owner)
+void Collider_SetContactCallback(struct SpatialEntry *entry, SpatialContactCallback callback,
+                                 void *owner)
 {
     entry->owner = owner;
     entry->callback = callback;
@@ -147,7 +148,7 @@ void Collider_SetContactParameter(struct SpatialEntry *entry, u32 kind)
 void SpatialIndex_InitEntry(struct SpatialEntry *entry, struct ContactPosition *position,
                             struct ContactPosition *bounds, struct ContactPosition *offset,
                             u32 flags, u32 mask, u32 category, u32 kind, u32 parameter,
-                            void (*callback)(void), void *owner)
+                            SpatialContactCallback callback, void *owner)
 {
     entry->bucket = -1;
     if (!callback)
