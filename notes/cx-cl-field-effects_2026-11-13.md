@@ -88,3 +88,9 @@ At the user's run-stop request, the current spread-shot item had only been inven
 Tags: #matching #particles #scene #structs #compiler
 
 The continuation completed the previously inspected spread-shot item as two contiguous units: sprite notices (11 files, 932 bytes) and spread shots (13 files, 10,704 bytes). Both match with the stock compiler, bringing this worker to thirty-two consolidated units. The notice task uses shared sprite and playback records; the two-slot shot task now uses the complete body, sprite, collider and position types. Terrain accesses use existing grid, cell and override fields. No existing shared header changed. The exact offset-before-buffer-load ordering preserves the large probe's match. The private height helper and interpolation failure label remain after structured/shared alternatives changed bytes. See the [updated spread-shot evidence](spread_shot_cleanup_draft.md). No moving-particle or reassigned status-indicator work was started.
+
+## Moving-particle continuation
+
+Tags: #matching #particles #scene #structs #compiler
+
+At the next continuation request, completed 08125B64–08126140 as `src/scene_moving_particle.c` (13 former files, 1500 bytes). The shared MovingParticlePool now uses Task and the complete particle record, including the common sprite, velocity, animation counters and lifetime. All functions match, as does the other header consumer at 0812D8EC. The allocator originally used a volatile mask pointer even though this range was in the concession-free queue. A direct indexed loop using the shared occupancy helper matches and removes that access. Pointer-cursor variations had retained or reordered loads; no concession is needed. This completes the assigned forward queue before 08126650; four earlier typed-cleanup blockers remain for another pass.
