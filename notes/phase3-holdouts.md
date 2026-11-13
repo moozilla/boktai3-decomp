@@ -1398,3 +1398,26 @@ differently. Byte zero does not change that. Spill 1:2,3:1,6:2 reduces the unfor
 draft to 14 differences, without fixing the front. Removing whole front or tail
 concession groups did not yield a partial match. Next: induce field's incoming-r1
 preference in C, then separate the two zero equivalence classes at frame reset.
+
+### RouteSpriteActor_TickEmitting — remaining animation body
+
+Tags: phase3, dp-scene1, RouteSpriteActor_TickEmitting, 0x0806DCE4
+
+Matching partial removes the RNG index pin and every volatile command pointer.
+Separate next and nextZ locals produce the random register chain. A local
+`value = *command; mask = 15; mask &= value; frameWeight = mask` retains the
+halfword read and ROM operand order without volatile. The shared ReadCommand /
+MaskCommand pair retained ldrh but swapped the two registers; the direct local
+form is exact. Typed sprite-resource and state accesses also match.
+
+Saved fully pin-free draft: 56 ROM / 52 draft differences, shape 18, 628 versus
+636 bytes. Union control-byte views improve the flag tests; split draw indices
+improve the random front. Shared StepSprite changes 134/122 instructions;
+extracting the custom animation body into an inline helper leaves 56/52.
+Probe's six CSE choices and fifteen jump follows do not change that count.
+The remaining instruction differences include reverse/forward sequence-end
+tails cross-jumped together and the elapsed mask copy. Most others are global
+allocation and reload rotation. Removing flagsOwner alone from the matching
+partial is four reload-register differences in the second flip update.
+Next: isolate the elapsed-counter mask from its source using the correct packed
+state type, then resolve the two sequence-end return paths before allocation.
