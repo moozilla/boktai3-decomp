@@ -8641,6 +8641,7 @@ addr,name,mode,confidence,source,notes
 081FC8BC,SlotActor_ResetOnFlags,thumb,low,src-alias,
 081FC900,SceneProjectile_InitSlot,thumb,low,src-alias,
 081FCA0C,SceneProjectile_ReleaseSlot,thumb,low,src-alias,Marks the collider inactive and removes the sprite before clearing the occupied slot bit
+081FCA44,SceneProjectile_UpdatePool,thumb,low,src-alias,Updates ten scripted projectile slots; contact responses; animation and launch delays.
 081FCF38,SceneProjectile_OnPoolDestroy,thumb,low,src-alias,Task destruction callback that releases all ten projectile slots and clears the singleton
 081FCF74,SceneProjectile_InitPool,thumb,low,src-alias,Publishes the projectile pool singleton and initializes its ten slots
 081FCFA8,SceneProjectile_CreatePool,thumb,low,src-alias,Allocates and initializes the projectile pool task with update and destruction callbacks
