@@ -8,7 +8,12 @@ llvm-dwarfdump's view of each object is folded into one table:
     {"types": {"struct Player": {"k": "struct", "size": 3244, "fields": [...]},
                "u8": {"k": "int", "size": 1, "signed": false}, ...},
      "globals": {"gPlayers": {"addr": 33599012, "type": {"k": "array", "of": ..., "n": 4}}, ...},
-     "functions": {"Script_Call": 136424713, ...}}
+     "functions": {"Script_Call": 136424713, ...},
+     "params": {"Time_HandleRegionKeypad": "struct RegionMenu", ...}}
+
+"params" names the struct a function's first parameter points to (from the
+definitions and prototypes in src/ and include/): a task's update function
+takes its own object, so it types the memory behind a task.
 
 A type reference is a name in "types" or an inline object: {"k": "ptr", "to":
 T}, {"k": "array", "of": T, "n": N}, {"k": "fn"}, an anonymous struct/union.
@@ -36,7 +41,7 @@ DWARFDUMP = str(LLVM / 'llvm-dwarfdump') if (LLVM / 'llvm-dwarfdump').exists() e
 FLAGS = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-funsigned-char', '-fno-builtin',
          '-Wno-everything', '-Iport/include', '-Iport/core', '-I' + str(GAME / 'include'),
          '-iquote', '.', '-include', 'port/core/compat.h', '-g', '-fno-eliminate-unused-debug-types']
-VERSION = '2:'  # bump when the output format changes
+VERSION = '3:'  # bump when the output format changes
 EXTERN = re.compile(r'^\s*extern\b([^;(]*?)\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*;', re.M)
 ENTRY = re.compile(r'^0x([0-9a-f]+):( +)(DW_TAG_\w+|NULL)')
 ATTR = re.compile(r'^\s+DW_AT_(\w+)\t\((.*)\)$')
@@ -199,12 +204,32 @@ def compile_header(header, names, work):
     return None, []
 
 
+FIRST_PARAM = re.compile(r'^[A-Za-z_][\w \t*]*?\b([A-Za-z_]\w*)\(\s*(?:const\s+)?struct\s+(\w+)\s*\*', re.M)
+
+
+def first_params(code, types):
+    """{function: 'struct X'} for functions whose first parameter is a struct
+    pointer of a known type; a definition in src/ wins over a prototype."""
+    out = {}
+    files = sorted(ROOT.glob('src/**/*.c')) + sorted((ROOT / 'include').glob('*.h'))
+    for path in files:
+        text = path.read_text(errors='replace')
+        if 'struct' not in text:
+            continue
+        for m in FIRST_PARAM.finditer(text):
+            name, tag = m[1], 'struct ' + m[2]
+            if name in code and tag in types and name not in out:
+                out[name] = tag
+    return out
+
+
 def build(force=False):
     include = GAME / 'include'
     headers = sorted(include.glob('*.h'))
     syms = symbols()
     data = syms['data']
-    stamp = VERSION + hashlib.sha256(''.join(f'{h.name}:{h.stat().st_mtime_ns};' for h in headers).encode()
+    sources = sorted(ROOT.glob('src/**/*.c'))
+    stamp = VERSION + hashlib.sha256(''.join(f'{h.name}:{h.stat().st_mtime_ns};' for h in headers + sources).encode()
                            + syms['stamp'].encode()).hexdigest()[:16]
     out = OUT / 'types.json'
     if out.exists() and not force:
@@ -251,6 +276,7 @@ def build(force=False):
                     globals_[gname] = {'addr': data[gname], 'type': t['to'] if isinstance(t, dict) else t}
     result = {'stamp': stamp, 'types': folder.types, 'globals': globals_,
               'functions': syms['code'],
+              'params': first_params(syms['code'], folder.types),
               'data': {k: v for k, v in data.items()
                        if k not in globals_ and k not in syms['code'] and not k.startswith(('_0', '$', '.'))
                        and not k.endswith('__addr')},
@@ -263,4 +289,5 @@ if __name__ == '__main__':
     path = build(force='--force' in sys.argv)
     d = json.loads(path.read_text())
     print(f"{path}: {len(d['types'])} types, {len(d['globals'])} typed globals, "
-          f"{len(d['functions'])} functions, {len(d['failed'])} headers failed")
+          f"{len(d['functions'])} functions ({len(d['params'])} with a struct parameter), "
+          f"{len(d['failed'])} headers failed")

@@ -19,13 +19,14 @@ This builds `build/port/game/game.wasm` (cached; needs `build/boktai3.elf` from
 repository root by itself; the file picker appears only when the server has no
 ROM. Default keys: arrows, X = A, Z = B, A = L, S = R, Enter = Start,
 Backspace = Select, Space = fast-forward (hold), P = pause, F9 = screenshot,
-F10 = record a clip, F = fullscreen, T = subtitles on/off; a standard gamepad works
-too. Settings (the button under the game, docked beside it) rebinds every key and
+F10 = record a clip, F = fullscreen, T = subtitles on/off, I = inspect; a standard
+gamepad works too. Settings (the button under the game, docked beside it) rebinds every key and
 pad button, styles the subtitles, sets the screen colors (a GBA-screen color
 filter, an LCD grid, smooth scaling) and picks where sunlight comes from: the
 slider, your clock (the sun's height at this hour) or your camera. Settings stay
 in the browser's local storage. "Start from" picks your own save (`build/port/saves/boktai3.sav`, written
-as you play), a new game, `tests/saves/*.sav`, or the story checkpoints in
+as you play; a checkpoint, or a new game beside an existing save, saves in memory
+only and leaves it alone), a new game, `tests/saves/*.sav`, or the story checkpoints in
 `build/saves/` (`python3 tools/assets/saves.py bank --make`).
 
 Below the game, the Studio panel (when `build/boktai3.elf` and the headers are
@@ -34,7 +35,16 @@ task list, and sprite outlines named by their owner. English subtitles of the
 line in the game's text box (the fan translation in `../boktai3trans`) sit just
 above or below the box so the original stays visible: box, glass, outline or
 shadow style, with size, background opacity, color, font, speaker names and an
-optional Japanese line set in Settings. Agents (and people at a terminal) drive and inspect the
+optional Japanese line set in Settings. Menu text (what `Menu_DrawText` draws:
+file select, region list, ...) is covered in place by its English, in the menu's
+own colors; hover the game to see the Japanese.
+
+Inspect (I) outlines every sprite with the task that drew it; click one and the
+actor panel docks beside the game: the task's object typed by its update
+function's parameter (`struct Player` for `Player_Update`), every field live
+and editable, its sprite, its world position over time, and a 3D view of the
+scene (three.js from jsDelivr) where each actor stands at its world position over
+the screen laid on the floor; drag to orbit, click another actor to follow it. Agents (and people at a terminal) drive and inspect the
 running game with [`port/agent/play.py`](agent/README.md): JavaScript scripts that
 run frames, frame stepping, breakpoints, call and script traces, C snippets run
 inside the game, warps, checkpoints, and a link to the studio's Live page.
@@ -69,14 +79,16 @@ ABI pass (`port/core/abi.py`) rewrites calls to the defining signature, gives
 function values their GBA code addresses (so ROM function tables work as data)
 and routes indirect calls through `port_code_table`. Arguments the original
 passed in registers without declaring them are modeled (result of the previous
-call, or the caller's own registers). Time advances cooperatively: at
+call, or the caller's own registers). r0 follows branches: after `a && f()` the
+edge taken on true carries f's result (the region menu's `Script_ReadValue()`
+reads the pointer `Script_GetPc()` left in r0; `port/tests/abi_test.py`). Time advances cooperatively: at
 `VBlankIntrWait`, and when the bus sees the same register polled three times
 (`port_bus_enable_spin`), the hardware model runs scanlines and raises
 interrupts; the frame is presented at line 160.
 
 What's left:
 
-* 16 register arguments the ABI pass could not determine
+* 15 register arguments the ABI pass could not determine
   (`build/port/game/unknown_registers.txt`) and 111 padded calls
   (`padded_calls.txt`): rarely run paths may read a wrong argument.
 * Timing is cooperative, not cycle-counted: the port has no lag frames, so it

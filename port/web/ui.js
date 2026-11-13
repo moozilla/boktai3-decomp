@@ -11,7 +11,7 @@ const UI = (() => {
     ['up', 'Up'], ['down', 'Down'], ['left', 'Left'], ['right', 'Right'],
     ['a', 'A'], ['b', 'B'], ['l', 'L'], ['r', 'R'], ['start', 'Start'], ['select', 'Select'],
     ['fast', 'Fast-forward (hold)'], ['pause', 'Pause'], ['shot', 'Screenshot'], ['record', 'Record a clip'],
-    ['fullscreen', 'Fullscreen'], ['subs', 'Subtitles on/off'],
+    ['fullscreen', 'Fullscreen'], ['subs', 'Subtitles on/off'], ['inspect', 'Inspect actors'],
   ];
   // Gamepad buttons in the browser's standard layout (0 = bottom face button).
   // Standard-mapping names, short enough for a bind slot (the title gives the long name).
@@ -21,11 +21,11 @@ const UI = (() => {
     'D-pad left', 'D-pad right', 'Home'];
   const DEFAULTS = {
     subs: { mode: 'auto', style: 'box', size: 100, opacity: 62, color: '#ffffff', speaker: 'color', font: 'sans',
-      reflow: true, jp: false, quotes: false },
+      reflow: true, jp: false, quotes: false, menus: 'cover' },
     keys: {
       up: ['ArrowUp'], down: ['ArrowDown'], left: ['ArrowLeft'], right: ['ArrowRight'],
       a: ['KeyX'], b: ['KeyZ'], l: ['KeyA'], r: ['KeyS'], start: ['Enter'], select: ['Backspace'],
-      fast: ['Space'], pause: ['KeyP'], shot: ['F9'], record: ['F10'], fullscreen: ['KeyF'], subs: ['KeyT'],
+      fast: ['Space'], pause: ['KeyP'], shot: ['F9'], record: ['F10'], fullscreen: ['KeyF'], subs: ['KeyT'], inspect: ['KeyI'],
     },
     pad: {
       up: [{ b: 12 }, { a: 1, d: -1 }], down: [{ b: 13 }, { a: 1, d: 1 }], left: [{ b: 14 }, { a: 0, d: -1 }],
@@ -88,6 +88,7 @@ const UI = (() => {
     box.style.setProperty('--sub-font', FONTS[s.font] || FONTS.sans);
   }
   function renderSubs() {
+    renderMenuLabels();
     const box = $('subtitle'), cap = $('caption');
     const s = S.subs;
     const text = subs.preview ? 'Trinity:\n"Don\'t tell me you...\nin my stead..."' : subs.id == null ? null : subs.strings.en[subs.id];
@@ -131,6 +132,59 @@ const UI = (() => {
     }
   }
   function showText(id) { subs.id = id; renderSubs(); }
+
+  // Menu labels: strings menus draw with Menu_DrawText (tile boxes on BG0).
+  // Each English label covers its Japanese text in the menu's own colors (the
+  // most common color in the box is the background, the next the ink); hover
+  // the screen to see the original.
+  let menuLabels = [];
+  let menuTimer = 0;
+  function setMenuLabels(list) {
+    menuLabels = list || [];
+    renderMenuLabels();
+    // the frame with the text may not be on the canvas yet, and menus fade: resample colors
+    clearInterval(menuTimer);
+    if (menuLabels.length) menuTimer = setInterval(renderMenuLabels, 250);
+  }
+  function menuColors(l) {
+    const ctx = env.canvas.getContext('2d');
+    let data;
+    try { data = ctx.getImageData(l.x * 8, l.y * 8, l.w * 8, l.h * 8).data; } catch (e) { return null; }
+    const count = new Map();
+    for (let i = 0; i < data.length; i += 4) {
+      const k = (data[i] << 16) | (data[i + 1] << 8) | data[i + 2];
+      count.set(k, (count.get(k) || 0) + 1);
+    }
+    const top = [...count.entries()].sort((a, b) => b[1] - a[1]);
+    const css = (k) => `rgb(${k >> 16}, ${(k >> 8) & 255}, ${k & 255})`;
+    const bg = top[0][0];
+    const lum = (k) => 0.3 * (k >> 16) + 0.59 * ((k >> 8) & 255) + 0.11 * (k & 255);
+    // ink: the most common color that differs clearly from the background
+    const ink = (top.find(([k]) => Math.abs(lum(k) - lum(bg)) > 60) || [lum(bg) > 128 ? 0x202020 : 0xf0f0f0])[0];
+    return { bg: css(bg), ink: css(ink) };
+  }
+  function renderMenuLabels() {
+    const layer = $('menu-labels');
+    if (!layer) return;
+    const s = S.subs;
+    if (s.mode === 'off' || s.menus === 'off') { layer.replaceChildren(); return; }
+    layer.style.setProperty('--sub-font', FONTS[s.font] || FONTS.sans);
+    layer.style.setProperty('--menu-scale', s.size / 100);
+    const kids = [];
+    for (const l of menuLabels) {
+      const text = subs.strings.en[l.id];
+      if (!text) continue;
+      const colors = menuColors(l) || { bg: 'rgba(8,10,18,.9)', ink: '#fff' };
+      const lines = text.split('\n').map((t) => t.trim()).filter(Boolean);
+      const div = el('div', { className: 'menu-label', title: subs.strings.jp[l.id] || '' },
+        ...lines.map((t) => el('span', { textContent: t })));
+      // 1px in from the cell edges: glyphs don't reach them, and cursor sprites sit there
+      div.style.cssText = `left:${l.x * 8 / 2.4}%;top:${(l.y * 8 + 1) / 1.6}%;min-width:${l.w * 8 / 2.4}%;` +
+        `height:${(l.h * 8 - 2) / 1.6}%;background:${colors.bg};color:${colors.ink}`;
+      kids.push(div);
+    }
+    layer.replaceChildren(...kids);
+  }
   function setBounds(b) { if (b && b[2] > 0) subs.bounds = b; }
   async function loadStrings() {
     if (Object.keys(subs.strings.en).length) return;
@@ -177,6 +231,7 @@ const UI = (() => {
     else if (act === 'shot') screenshot();
     else if (act === 'record') toggleRecord();
     else if (act === 'fullscreen') toggleFullscreen();
+    else if (act === 'inspect') env.toggleInspect && env.toggleInspect();
     else if (act === 'subs') { S.subs.mode = S.subs.mode === 'off' ? 'auto' : 'off'; save(); env.subtitlesChanged(); renderSubs(); refreshDialog(); }
   }
   function typing(e) { return e.target.closest && e.target.closest('input, textarea, select, [contenteditable]'); }
@@ -256,7 +311,7 @@ const UI = (() => {
     const show = (act) => (S.keys[act] || []).map(codeLabel).join(' / ') || '—';
     const items = [['D-pad', ['up', 'down', 'left', 'right'].map(show).join(' ')], ['A', show('a')], ['B', show('b')],
       ['L', show('l')], ['R', show('r')], ['Start', show('start')], ['Select', show('select')],
-      ['fast-forward (hold)', show('fast')], ['pause', show('pause')], ['screenshot', show('shot')], ['record', show('record')]];
+      ['fast-forward (hold)', show('fast')], ['pause', show('pause')], ['screenshot', show('shot')], ['record', show('record')], ['inspect', show('inspect')]];
     keys.replaceChildren(...items.map(([what, k]) => el('span', {}, el('kbd', { textContent: k }), ' ' + what)));
   }
 
@@ -446,6 +501,7 @@ const UI = (() => {
       control('Text color', swatches),
       control('Font', select(s, 'font', [['sans', 'Sans'], ['rounded', 'Rounded'], ['serif', 'Serif'], ['mono', 'Monospace']], re)),
       control('Speaker', select(s, 'speaker', [['color', 'Colored name above the line'], ['prefix', 'Name: before the line'], ['hide', 'Hidden']], re)),
+      control('Menu text', select(s, 'menus', [['cover', 'English over the Japanese (hover the game to peek)'], ['off', 'Leave in Japanese']], re)),
       control('Join lines', check(s, 'reflow', re), 'flow the translation as one sentence instead of the box\'s line breaks'),
       control('Japanese too', check(s, 'jp', re), 'the original line, smaller, under the English'),
       control('Keep quotes', check(s, 'quotes', re)),
@@ -511,6 +567,7 @@ const UI = (() => {
     renderSubs();
   }
   function openSettings(tab) {
+    if (window.ActorPanel) window.ActorPanel.close();
     if (!dialog) {
       dialog = el('dialog', { id: 'settings' },
         el('div', { className: 'set-top' }, el('strong', { textContent: 'Settings' }),
@@ -548,5 +605,5 @@ const UI = (() => {
     loadStrings();
   }
 
-  return { init, showText, setBounds, loadStrings, renderSubs, subtitlesOn: () => S.subs.mode !== 'off', openSettings, settings: () => S };
+  return { init, flash, showText, setBounds, setMenuLabels, loadStrings, renderSubs, subtitlesOn: () => S.subs.mode !== 'off', openSettings, settings: () => S };
 })();
