@@ -2492,3 +2492,14 @@ which is exactly `10:1`. Not tested.
    is exact. Declaring the locals as byte/halfword values alone did not do it; ordinary
    wrapper helpers and a struct argument also left the two differences. Masks with
    255 or 65535 added instructions, so do not substitute those for the cast blindly.
+211. **An inserted two-address operand copy is not a logged dying-input tie.**
+   In SceneInput_TickChoice (0805E1D0), cse changes the first AND from
+   `accepted & keys` to `keys & confirm`, where confirm is the known constant 1.
+   Regmove inserts a new copy `accepted = keys` immediately before the AND.
+   A later logged tie at the cancel-key test mentions keys too, but does not
+   explain this copy: AGBCC_NOTIE on either AND leaves the first copy unchanged.
+   Scope now recognizes a newly inserted adjacent copy whose destination becomes
+   the operation's two-address input, before searching for logged ties involving
+   the same registers. Existing copies, label-separated copies and copies of a
+   different operand are not treated as this evidence. Inspect cse operand order
+   and narrowing modes here; a later tie's allocation advice is a false lead.

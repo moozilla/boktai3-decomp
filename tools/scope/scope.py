@@ -4968,9 +4968,60 @@ def byte_constant_operand(insns, uid):
     return None
 
 
+def regmove_inserted_operand_copy(wd, uid):
+    """Find a new copy immediately before UID that satisfies its two-address operand.
+
+    This is not a logged dying-input tie. In particular, a later logged tie that
+    mentions the same register does not explain this copy.
+    """
+    before = {u: r for u, _, r in insn_list(wd, "combine")}
+    after = {u: r for u, _, r in insn_list(wd, "regmove")}
+    reg = r"\(reg(?:/\w)*:(\w+) (\d+)\)"
+    binary = r"\(set " + reg + r" \((and|ior|xor|plus|mult):\w+ " + reg + " " + reg + r"\)\)"
+    b = re.fullmatch(binary, before.get(uid, ""))
+    a = re.fullmatch(binary, after.get(uid, ""))
+    if not b or not a or b.group(1, 2, 3) != a.group(1, 2, 3):
+        return None
+    dest = int(b.group(2))
+    old = [int(b.group(5)), int(b.group(7))]
+    current = [int(a.group(5)), int(a.group(7))]
+    changes = [(x, y) for x, y in zip(old, current) if x != y]
+    if len(changes) != 1 or changes[0][1] != dest:
+        return None
+    source = changes[0][0]
+    path = os.path.join(wd, "u.i.regmove")
+    with open(path) as stream:
+        dump = stream.read()
+    forms = [(m.group(1), int(m.group(2)), one_line(m.group(0))) for m in re.finditer(
+        r"^\((insn|jump_insn|call_insn|code_label|barrier|note)(?:/\w)* (\d+) .*?(?=^\(|\Z)",
+        dump, re.S | re.M)]
+    previous = None
+    for kind, u, rtl in forms:
+        if u == uid:
+            break
+        if kind != "note":
+            previous = kind, u, rtl
+    if previous is None or previous[0] != "insn" or previous[1] in before:
+        return None
+    copy = re.fullmatch(r"\(set " + reg + " " + reg + r"\)", previous[2])
+    if copy and int(copy.group(2)) == dest and int(copy.group(4)) == source:
+        return previous[1], dest, source
+    return None
+
+
 def explain_regmove(wd, uid, gone, new, nm, at):
     """regmove merged one pseudo into another at or before insn UID: name the two-address tie that did it,
     what in the C would have kept the ROM's separate copy, and the knob that forbids the tie."""
+    inserted = regmove_inserted_operand_copy(wd, uid)
+    if inserted:
+        cu, dest, source = inserted
+        print(f"    regmove inserted {nm(dest)} = {nm(source)} at {at(cu)} immediately before"
+              f" {at(uid)} so the output also supplies its two-address input.")
+        print("    This is an inserted operand copy, not a logged dying-input tie; AGBCC_NOTIE"
+              " on a later instruction that mentions the same register does not control it."
+              " Inspect the operand order before regmove, including cse's ordering of a"
+              " known constant, and the C operand modes (README facts 37 and 54).")
+        return
     fixes = [f for f in regmove_fixes(wd) if f[0] != "could"]
     pats = {u: r for u, _, r in insn_list(wd, "combine")}
     regs = set(gone) | set(new)
