@@ -50,4 +50,17 @@ void Anim_Remove(void *);
 void SpatialIndex_RemoveEntry(void *);
 void SceneMessages_UnregisterReceiver(void *);
 s32 Callback_InvokeActor(void *, void *);
+RegistryActorManager *RegistryA8CB_EnsureManager(void);
+struct RegistryActor *RegistryA8CB_FindAvailableEntry(RegistryActorManager *);
+struct RegistryActor *RegistryA8CB_FindEntryByName(RegistryActorManager *, u32);
+void ActorScript_ParseParams(struct RegistryActor *);
+void ActorSprite_InitPartDrawings(struct RegistryActor *, void *, s32);
+void CharacterPreview_InitializePalette(void *, void *, u8);
+void SceneSlot_RegisterObject(void *);
+void ActorCollision_InitBounds(struct RegistryActor *);
+void RegistryA8CB_RegisterMessageReceiver(struct RegistryActor *);
+void Modifier_InitDrainState(struct ActorDrainState *, void *, u16, u8);
+void ActorPhysics_UpdateFallMotion(struct RegistryActor *);
+void SceneMessages_RegisterReceiver(void *, u32, u32);
+void Anim_SetKeyframes(void *, void *, u16, u32, u32);
 #endif
