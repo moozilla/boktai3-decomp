@@ -79,20 +79,12 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *input
     if (category != 23)
         goto success;
     transition = &manager->category23;
-    if (categoryFlags & 0x8000)
-        goto flagPresent;
-    goto flagAbsent;
+    flagSet = Test(categoryFlags, 0x8000);
+    goto selected;
 category10:
     transition = &manager->category10;
-    if (!(categoryFlags & 0x4000))
-        goto flagAbsent;
-flagPresent:
-    flagSet = 1;
-    goto selected;
-flagAbsent:
-    flagSet = 0;
+    flagSet = Test(categoryFlags, 0x4000);
 selected:
-    asm("" : "+r"(flagSet));
     if (flagSet)
         alreadyAdvanced = 1;
     if (!Remaining(transition)) {
