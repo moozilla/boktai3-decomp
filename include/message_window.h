@@ -5,6 +5,7 @@
 #include "scene_input_widget.h"
 #include "contact_swarm_sprite.h"
 #include "display_sequence.h"
+#include "palette_resource.h"
 
 /* Shared text interpreter storage embedded in the message-window task. */
 struct MessagePlaybackState {
@@ -21,12 +22,6 @@ struct MessagePlaybackState {
     const u8 *strings[16];
     u32 selectedCount;
     u8 selectedChoices[16];
-};
-
-/* Palette resources carry a 20-byte header followed by sixteen RGB15 banks. */
-struct MessagePaletteResource {
-    u8 unknownHeader[0x14];
-    u16 banks[16][16];
 };
 
 struct MessageWindow {
@@ -46,7 +41,7 @@ struct MessageWindow {
     void *messageTable;
     u16 messageFrame, messageCount;
     u16 messageFrames[32];
-    struct MessagePaletteResource *paletteData;
+    struct PaletteResource *paletteData;
     struct SceneInputResource resource;
     struct SceneInputWidget widget;
     u8 portraitGraphics[0x1C];
