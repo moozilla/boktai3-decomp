@@ -7,8 +7,9 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
     struct ScenePanelRig *owner = rig;
     s32 i = 0;
     u32 one = 1;
-    register u32 zero asm("r10") = i;
-    asm("" : "+r"(owner), "+r"(i), "+r"(one), "+r"(zero));
+    u32 zero;
+    asm("" : "+r"(owner), "+r"(i), "+r"(one));
+    zero = i;
     do {
         struct SceneRigSprite *sprite;
         struct SceneRigSprite *animated;
