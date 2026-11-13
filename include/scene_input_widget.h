@@ -21,8 +21,9 @@ struct SceneInputWidget {
     u8 attribute1A, attribute1B;
     u8 unknown1C[4];
     struct ContactPosition position;
-    u8 unknown28[0xE];
-    u16 rotation; /* 0x36: angle copied by the thrown HUD icon. */
+    u8 unknown28[0xC];
+    u8 scaleX, scaleY; /* 0x34: affine scale used by floating-item effects. */
+    u16 rotation;      /* 0x36: angle copied by the thrown HUD icon. */
     u8 unknown38[2];
     u16 paletteBank;
     u8 unknown3C[0xC];
