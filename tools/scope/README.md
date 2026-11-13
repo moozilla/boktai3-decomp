@@ -2173,3 +2173,14 @@ which is exactly `10:1`. Not tested.
    jump2 shares the repeated tails back into the ROM instructions. This removed
    the resource barrier. A priority-only explanation misses this eligibility gate;
    inspect both reference count and calls crossed before trying allocation order.
+
+
+172. **A changed consumer register can be a deleted conversion, not allocation.**
+   ParticleGroup_UpdateFrozen's PRE reaching byte is r3. The ROM converts it through
+   `lsl r0, r3, #24; lsr r0, r0, #24` before comparing r0 with 8. Combine removes
+   that pair in the ordinary draft and compares r3 directly. `AGBCC_COMBKEEP=104`
+   (the left-shift result in the saved draft) restores an exact match. `why` now
+   recognizes deleted SI left/logical-right shift pairs for byte/halfword conversion,
+   suggests COMBKEEP for that definition, and suppresses misleading allocation advice
+   for the original pseudo. This knob confirms the pass; the ordinary C form that
+   preserves this particular conversion remains open in the holdout notes.
