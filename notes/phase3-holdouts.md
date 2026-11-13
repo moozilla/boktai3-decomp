@@ -1263,3 +1263,33 @@ and bestDifference in registers, then revisit the signed bounds predicate.
 Scope's hunk matching also pairs unrelated same-form stack stores/moves in
 this function; investigate value-aware alignment before trusting those why
 messages as allocation evidence.
+
+### SceneActorRegistry_RestoreActorDefaults (080718D8)
+
+Tags: `080718D8` `phase3` `reload` `snapshot`
+
+Landed seven pin and eight barrier removals (47 to 32 concessions), checked
+MATCH. Shared terrain EnterState and InstallControl replace the initial reset
+block; removing the five offset2 bindings/barriers together restores the later
+0x5D9/0x5DA reload choices. Removing any one alone obscured that interaction.
+
+Best pin-free draft is now 15 ROM / 15 draft instructions different, shape 2
+(previous raw-offset draft was 158 / 156). The entire no-object branch becomes
+exact with direct member copies and stores. In the other branch, deleting an
+unused destination-address assignment before field2B5 restores its value load
+allocation, reducing 19 differences to 15. Fully converting the other branch
+or the tail to members shifts many preceding allocations and was worse.
+
+Remaining gate flags load uses r1 rather than r4; diagnostic
+`AGBCC_SPILL=55:3` fixes those five instructions, leaving ten differences.
+The hitReactionLatch, motion5B8, field5C4 and field5C2 addresses have subsequent
+reload rotation differences. ResetResponseState's unused index calculation
+moves before the destination copy, leaving the shape distance of 2. Wrappers
+with halfword index parameters and an argument expression do not change it.
+Keeping the existing gate and destination barriers reduces the draft to nine
+register-only differences, but is not concession-free. Keeping more original
+second-branch pins interferes with the now-exact first branch.
+
+Next: recover a snapshot/reset helper boundary that gives the gate and tail
+address constants independent reloads; examine the call's unused forwarded
+arguments and original helper signature. Keep the direct first branch intact.
