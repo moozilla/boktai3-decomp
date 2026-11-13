@@ -1315,3 +1315,25 @@ improve the remaining allocation. Earlier forced full mapping was exact; the
 four-pin reduction is a cleaner diagnostic now. Next: alter the mask/table
 local allocation order through a natural random-draw helper boundary while
 retaining the table-first load. Work files remain under build/cx/work/.
+
+### SceneActorControl_TickActive — final zero barrier
+
+Tags: phase3, dp-scene1, SceneActorControl_TickActive, 0x08067258
+
+All four pins removed in the matching source. The saved pin-free/barrier-free
+draft has four ROM / four draft differences, shape eight, same 480 bytes.
+Short-lived constant-first mask locals fix initialFlags, the delta test and the
+0x40 branch; flags and ClearFlags allocate naturally. previousParameter is typed.
+
+Only the final zero-value barrier is needed for an exact match. Without it,
+constant folding makes the last clearMask minus three equal the earlier -3 tail;
+jump2 shares its load and constant, introducing a label before the constant.
+That label prevents move2add from using the zero in r0. ROM has a separate
+load/mov/neg tail in the earlier arm and a subtraction from zero in the final arm.
+Restoring only the original zero barrier is MATCH. Probe tried all four CSE
+canonical choices and nine jump follows; none changes the difference count.
+Individual returns / a separate last-arm return change allocation and still share
+the constant; duplicating zero and stateFrame stores across sprite-active arms
+also loses the retained kind value across the call. Next: retain an ordinary-C
+zero across a join without making it an equivalent constant until after jump2,
+or split the tails so move2add sees the original stateFrame zero.
