@@ -4483,6 +4483,7 @@ addr,name,mode,confidence,source,notes
 08113310,SceneDebrisPool_Destroy,thumb,low,src-alias,Task destruction callback releases occupied debris visuals and clears the singleton
 08113340,SceneDebrisPool_Initialize,thumb,low,src-alias,Registers the newly created debris pool as the singleton
 0811334C,SceneDebrisPool_EnsureSingleton,thumb,low,src-alias,Returns the existing 64-slot debris task or creates it with update and destruction callbacks
+08113398,SceneDebris_Create,thumb,low,cleanup,Allocate a debris visual and select animated or bouncing motion
 081134B0,ActorEffect_SpawnAtActorPos,thumb,low,src-alias,
 08113534,ActorParticles_CreateAtOffset,thumb,low,src-alias,
 081135B8,SpriteEffect_CreateAtPosition,thumb,low,src-alias,
