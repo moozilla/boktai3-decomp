@@ -1007,30 +1007,30 @@ void Actor_BeginCurveToPosition(void)
         if (g == 0)
             return;
     }
-    H(0xf8a) = Script_GetValue();
+    g->resource = Script_GetValue();
     if (Script_SeekToKeyword(0x74)) {
-        H(0xed0) = Script_GetValue();
+        g->targetX = Script_GetValue();
         {
             u32 value = Script_GetValue() + 160;
-            H(0xed2) = value;
+            g->targetY = value;
         }
-        H(0xed4) = Script_GetValue();
+        g->targetZ = Script_GetValue();
     } else {
         {
-            u32 value = OWNER_V(0x30);
-            H(0xed0) = value;
+            u32 value = (u16)g->owner->position.x;
+            g->targetX = value;
         }
         {
-            u32 value = OWNER_V(0x32) + 160;
-            H(0xed2) = value;
+            u32 value = (u16)g->owner->position.y + 160;
+            g->targetY = value;
         }
         {
-            u32 value = OWNER_V(0x34);
-            H(0xed4) = value;
+            u32 value = (u16)g->owner->position.z;
+            g->targetZ = value;
         }
     }
-    B(0xf67) = Script_GetKeywordValue(0x64, -1);
-    W(0xf50) = Script_GetKeywordValue(0x70, 0);
+    g->targetFacing = Script_GetKeywordValue(0x64, -1);
+    g->handle = (void *)Script_GetKeywordValue(0x70, 0);
     Actor_SetState(g, 2, 10);
 }
 
