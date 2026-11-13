@@ -6482,6 +6482,7 @@ addr,name,mode,confidence,source,notes
 0817A57C,SceneActors_SpawnConvergingParticle,thumb,low,src-alias,Spawns a particle at a random radial offset every fourth call
 0817A6E4,ActorPosition_SetOffsetPoint,thumb,low,src-alias,
 0817A71C,SceneActors_EmitRandomBursts,thumb,low,src-alias,Emits two bursts with randomized direction and particle count and speed
+0817A7C8,ActorPosition_BeginReaction,thumb,low,cleanup,Tentative: selects damage reaction action and facing from reaction kind
 0817A8C8,ActorPosition_TestPath,thumb,low,src-alias,
 0817A900,SceneVolume_TestPlayerPosition,thumb,low,src-alias,
 0817AA14,SceneVolume_FindNearbyPosition,thumb,low,src-alias,
