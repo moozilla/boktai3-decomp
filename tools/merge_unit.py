@@ -118,12 +118,12 @@ def merge(paths):
 
 
 def write_merge(output, inputs, text):
-    """Publish the merged source before removing inputs; leave staging to callers."""
-    output = Path(output)
+    """Publish the merged source before removing inputs; leave staging to callers.
+    Relative paths are taken from the repository root; repeated inputs are removed once."""
+    output = Path(ROOT, output)
     output.write_text(text)
-    for path in inputs:
-        path = Path(path)
-        if path.absolute() != output.absolute():
+    for path in dict.fromkeys(Path(ROOT, p) for p in inputs):
+        if path.resolve() != output.resolve():
             path.unlink()
 
 

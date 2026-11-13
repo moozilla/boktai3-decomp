@@ -3957,12 +3957,27 @@ def site_variables(line):
     return out
 
 
+def unprobed_concessions(text, reach):
+    """Other tracked source concessions in the target and reached inline helpers.
+
+    The pins pass removes bindings and empty asm only. In particular, its no_pins
+    draft can still contain volatile locals that force stack storage.
+    """
+    from concessions import EXCUSABLE, sites
+    found = set()
+    for name, (start, end) in reach.items():
+        first_line = text.count("\n", 0, start)
+        for site in sites(text[start:end], kinds=EXCUSABLE):
+            found.add((first_line + site.line, site.kind, name))
+    return sorted(found)
+
+
 def cmd_pins(src, func, env):
     """Phase 3 helper: the concessions (register pins and empty asm barriers) that can change FUNC's
     code, i.e. those in FUNC's definition and in the inline helpers of the unit it reaches. Each is
     removed alone and in groups (all of FUNC's together, each helper's together, a pin with the
     barriers on the same variable), then a greedy pass removes every single or group that adds no
-    differences. Writes FUNC.no_pins.c (every reachable concession removed: the draft to work from)
+    differences. Writes FUNC.no_pins.c (reachable pins/barriers removed: the draft to work from)
     and FUNC.fewer_pins.c (the greedy result)."""
     pins_dir = os.path.join(ROOT, "build", "scope", "drafts", ".pins", os.environ.get("SCOPE_RUN", ""))
     out_dir = os.path.join(ROOT, "build", "scope", "drafts", os.environ.get("SCOPE_RUN", ""))
@@ -3990,6 +4005,11 @@ def cmd_pins(src, func, env):
                   open(os.path.join(ROOT, src)).read())
     lines = text.split("\n")
     reach = function_reach(text, func)
+    extra = unprobed_concessions(text, reach)
+    if extra:
+        print("  additional tracked concessions not removed by pins: "
+              + ", ".join(f"{kind} at line {line} ({name})" for line, kind, name in extra)
+              + ". The no_pins draft still needs these addressed.")
     starts = [0]
     for ln in lines:
         starts.append(starts[-1] + len(ln) + 1)
@@ -4016,7 +4036,7 @@ def cmd_pins(src, func, env):
                   " written in both failure branches)")
         return 0
     base = run(text, "base")
-    print(f"{func}: {show(base)} with all {len(sites)} concessions"
+    print(f"{func}: {show(base)} with all {len(sites)} pin/barrier sites"
           f" ({sum(k == 'pin' for _, k, _ in sites)} pins, {sum(k == 'barrier' for _, k, _ in sites)} barriers"
           f" in {', '.join(n for n in reach if any(owner(s[0]) == n for s in sites))}){note_others}")
     sole = {n: (sole_definitions(lines, i) if kind == "barrier" else []) for n, (i, kind, _) in enumerate(sites)}
@@ -4093,7 +4113,7 @@ def cmd_pins(src, func, env):
     open(out, "w").write(cur)
     left = len(sites) - len(keep_out)
     print(f"  greedy: removed {len(keep_out)} of {len(sites)} with no added differences -> {best} differ,"
-          f" {left} concessions left; written to {os.path.relpath(out, ROOT)}  [{compiles[0]} compiles;"
+          f" {left} pin/barrier sites left; written to {os.path.relpath(out, ROOT)}  [{compiles[0]} compiles;"
           f" {'every removal tried' if tryall else 'only removals free alone tried greedily; --all tries the rest'}]")
     print("  A removal that costs instructions shows where the C's shape still differs: ask `why` on the"
           f" first new difference in that variant ({os.path.relpath(pins_dir, ROOT)}/).")
@@ -4389,6 +4409,20 @@ def cmd_spill(src, func, env):
     return 0
 
 
+def probe_no_improvement(tried, regressions):
+    """Report negative probes without ruling out interacting compiler decisions."""
+    print(f"  {tried} compiles: no single tested cse/gcse/loop decision improves the count.")
+    if regressions:
+        print("  These probes changed the code but worsened the count; their mechanisms may still interact:")
+        for knob, val, counts in regressions[:4]:
+            print(f"    {knob}={val}: {counts}")
+        if len(regressions) > 4:
+            print(f"    ({len(regressions) - 4} more worsening probes)")
+    else:
+        print("  None of these probes changed the count; interacting decisions are still possible.")
+    print("  Next: why (allocation), spill (reload), pre or hoist (placement and interactions).")
+
+
 def cmd_probe(src, func, env):
     """Which cse / gcse / loop decision is the difference? One traced compile lists the decisions: pseudos
     make_regs_eqv makes a class's canonical register (CSE_NOCANON), jumps cse follows into their
@@ -4491,11 +4525,14 @@ def cmd_probe(src, func, env):
               " which exist only in the -g compile: they are scored against the -g count and marked"
               " [-g compile]; such a hit says what the -g compile does, not the build.")
     hits = []
+    regressions = []
     for knob, val, what in cands[:budget]:
         prev = env.get(knob)
         n, inf = score(src, func, dict(env, **{knob: f"{prev},{val}" if prev else val}))
         if n < (g_base if g_base is not None and knob in UID_KNOBS else base):
             hits.append((n, knob, val, what, inf.get("counts", "MATCH")))
+        elif n > (g_base if g_base is not None and knob in UID_KNOBS else base):
+            regressions.append((n, knob, val, inf.get("counts", str(n))))
     fix = {"CSE_NOCANON": "cse made this value the canonical register of a copy class (it lives longer"
                           " than the value it was copied from), so later tests and uses read it. In C make"
                           " the ROM-side value the longer-lived one (one shared variable, the copy kept"
@@ -4535,8 +4572,7 @@ def cmd_probe(src, func, env):
                            " threshold by 3, but loop runs twice, so luck rarely holds in both passes."}
     score(src, func, env, full=True)  # leave the workdir's dumps at the unmodified draft
     if not hits:
-        print(f"  {min(len(cands), budget)} compiles: no single cse/gcse/loop decision changes the count;"
-              " the difference is elsewhere (allocation: why; reload: spill).")
+        probe_no_improvement(min(len(cands), budget), [r[1:] for r in sorted(regressions)])
         return 0
     hits.sort()
     for n, knob, val, what, counts in hits[:8]:
