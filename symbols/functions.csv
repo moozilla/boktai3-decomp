@@ -6415,6 +6415,7 @@ addr,name,mode,confidence,source,notes
 08182624,Armor_EnterFacingAnimation,thumb,low,src-alias,
 081826C8,Armor_UpdateWalk,thumb,low,src-alias,
 0818287C,Armor_UpdateWalkNormal,thumb,low,src-alias,Updates facing-directed movement at speed 10 with animation rate 64
+0818288C,Armor_UpdateWalkHeavy,thumb,low,src-alias,
 081828A0,Armor_UpdateWalkFast,thumb,low,src-alias,Updates facing-directed movement at speed 15 with animation rate 42
 081828B0,Armor_UpdateWalkFaster,thumb,low,src-alias,Updates facing-directed movement at speed 18 with animation rate 35
 081828C0,Armor_UpdateWalkNormalWithScatterEffect,thumb,low,src-alias,Updates normal walking and periodically creates the randomized sprite effect
