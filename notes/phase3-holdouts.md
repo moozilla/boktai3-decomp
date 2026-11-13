@@ -1525,3 +1525,33 @@ state/one order; then address resource copy and loop allocation independently.
 Do not claim the spill override as a match or land the diagnostic partial.
 
 Scratch/evidence: `build/cx/work/WirelessResultPanel_Init/`.
+
+### EncodedRecord_XorRange (08044D6C, src/fn/sub_08044D6C.c)
+
+Landed removal of the volatile skip parameter: stock unit MATCH, 100 bytes. One
+current-pointer pin and two barriers remain. Fully clean draft is saved at
+`notes/phase3-drafts/dp-link/EncodedRecord_XorRange.c` (13 ROM / 11 draft, shape 2,
+96 bytes). The missing start-to-index copy reverses the current/remaining registers;
+the missing word-to-value copy lets the byte load and XOR result share r0.
+
+CSE substitutes index pseudo 31 with start 23. Allocation then gives current 37 r4
+and remaining r5 instead of the ROM's reverse assignment. Raising start priority
+by 14365 improves to 10/8 but does not restore the copy. For the XOR, cse substitutes
+word 28 for value 40, then regmove ties the loaded byte to the result (insn 84).
+AGBCC_NOTIE=84 has no effect; forcing value to r1 improves the clean draft to 11/9,
+not MATCH. CSE_KEEP=31,40, CSE_NOCANON=23 and COMBKEEP=40 do not solve it. The six
+single CSE/loop probes do not improve the clean draft. No matching knob was found.
+
+Tried natural index for/goto loops, reuse of the warmup count, countdown and goto
+warmup loops, index union and ADDRESSOF, narrow byte/value locals, byte/word unions
+and aggregate initializers, direct byte access, moving the word capture before the
+load, ADDRESSOF value, signed XOR, and a narrowed mask. Removing the value barrier
+alone remains 6/4. Explicitly updating and restoring the accumulator gives 2/2 with
+the other constraints retained, but emits an extra XOR and is not a match; do not
+mistake its smaller distance for restored ROM structure. Restoring by a saved local
+also fails. These extend the prior recovery and manual-depin experiments.
+
+Next: find a natural control-flow boundary that retains the two copies, or extend
+CSE diagnostics to isolate the copy substitution rather than the class-head probe.
+Scratch: `build/cx/work/EncodedRecord_XorRange/`; persistent search:
+`build/matchsearch/EncodedRecord_XorRange/`.
