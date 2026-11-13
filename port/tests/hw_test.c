@@ -515,6 +515,45 @@ static int sound_bridge_tests(void)
     return 0;
 }
 
+static int sound_routing_tests(void)
+{
+    static struct SoundInfo sound;
+    static const struct {
+        uint16_t type, status;
+        uint32_t frequency, loop, size;
+        int8_t data[4];
+    } wave = {0,0x4000,8000 * 1024,0,1,{64,0,0,0}};
+    static const struct { uint16_t control; int16_t left, right; } cases[] = {
+        {0x210c,8128,16256}, {0x120c,16256,8128}, {0x3300,12192,12192},
+        {0x0100,0,8128}, {0x200c,8128,0}, {0,0,0}
+    };
+    HwHost host = machine.host;
+    unsigned i, j;
+    host.audio = NULL;
+    hw_init(&machine, &host);
+    hw_m4a_attach(&machine, &sound);
+    sound.ident = ID_NUMBER; sound.pcmSamplesPerVBlank = 4; sound.pcmFreq = 8000;
+    sound.masterVolume = 15; sound.maxChans = 1;
+    sound.chans[0].wav = (struct WaveData *)&wave;
+    sound.chans[0].type = TONEDATA_TYPE_FIX;
+    sound.chans[0].attack = 255; sound.chans[0].leftVolume = 128; sound.chans[0].rightVolume = 255;
+    hw_write16(&machine, HW_IO_BASE + 0x84, 0x80);
+    for (i = 0; i < sizeof(cases) / sizeof(*cases); ++i) {
+        hw_write16(&machine, HW_IO_BASE + 0x82, cases[i].control);
+        sound.chans[0].statusFlags = SOUND_CHANNEL_SF_START;
+        SoundMain();
+        for (j = 0; j < 4; ++j) CHECK(machine.audio_buffer[j * 2] == cases[i].left && machine.audio_buffer[j * 2 + 1] == cases[i].right);
+    }
+    hw_write16(&machine, HW_IO_BASE + 0x82, 0x210c);
+    hw_write16(&machine, HW_IO_BASE + 0x84, 0);
+    sound.chans[0].statusFlags = SOUND_CHANNEL_SF_START;
+    SoundMain();
+    for (j = 0; j < 8; ++j) CHECK(machine.audio_buffer[j] == 0);
+    CHECK(sound.chans[0].statusFlags != 0); /* Muting output does not stop sequencing. */
+    hw_m4a_attach(&machine, NULL);
+    return 0;
+}
+
 int hw_test_run(void)
 {
     HwHost host = {0};
@@ -528,5 +567,6 @@ int hw_test_run(void)
     result = cartridge_tests(); if (result) return result;
     result = rtc_sdk_tests(); if (result) return result;
     result = audio_tests(); if (result) return result;
-    return sound_bridge_tests();
+    result = sound_bridge_tests(); if (result) return result;
+    return sound_routing_tests();
 }

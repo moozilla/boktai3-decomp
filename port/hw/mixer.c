@@ -151,6 +151,27 @@ int hw_mp2k_mix(struct SoundInfo *sound, int16_t *stereo, size_t frames, uint32_
     return HW_OK;
 }
 
+static void route_direct_sound(Hw *hw, int16_t *stereo, size_t frames)
+{
+    uint16_t control = hw_get16(hw->io + 0x82);
+    size_t i;
+    for (i = 0; i < frames; ++i) {
+        int32_t left = 0, right = 0;
+        if (hw->io[0x84] & 0x80) {
+            /* MP2K writes its right stream to FIFO A and left stream to B. */
+            int32_t a = stereo[i * 2 + 1], b = stereo[i * 2];
+            if (!(control & 4)) a = a >= 0 ? a / 2 : -((-a + 1) / 2);
+            if (!(control & 8)) b = b >= 0 ? b / 2 : -((-b + 1) / 2);
+            if (control & 0x0200) left += a;
+            if (control & 0x0100) right += a;
+            if (control & 0x2000) left += b;
+            if (control & 0x1000) right += b;
+        }
+        stereo[i * 2] = clip16(left);
+        stereo[i * 2 + 1] = clip16(right);
+    }
+}
+
 void hw_m4a_attach(Hw *hw, struct SoundInfo *sound) { hw->sound = sound; }
 
 void SoundMain(void)
@@ -174,6 +195,7 @@ void SoundMain(void)
     hw->audio_frames = (size_t)sound->pcmSamplesPerVBlank;
     hw->audio_rate = (uint32_t)sound->pcmFreq;
     if (hw_mp2k_mix(sound, hw->audio_buffer, hw->audio_frames, hw->audio_rate) != HW_OK) hw->audio_frames = 0;
+    route_direct_sound(hw, hw->audio_buffer, hw->audio_frames);
     hw_psg_render(hw, hw->audio_buffer, hw->audio_frames, hw->audio_rate, 1);
     sound->ident = ID_NUMBER;
     if (hw->host.audio && hw->audio_frames) hw->host.audio(hw->host.user, hw->audio_buffer, hw->audio_frames, hw->audio_rate);
