@@ -84,9 +84,8 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
         drawing->flags &= ~1;
         {
             u8 *descriptor = (u8 *)p + 0x50;
-            int resource = icon;
-            asm("" : "+r"(descriptor), "+r"(resource));
-            Anim_LoadKeyframe(drawing, descriptor, resource, 0);
+            u16 keyframe = icon;
+            Anim_LoadKeyframe(drawing, descriptor, keyframe, 0);
         }
         drawing->x = 0;
         drawing->y = 0;
