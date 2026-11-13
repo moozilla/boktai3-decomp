@@ -32,7 +32,11 @@ void ppu_begin_frame(Ppu *ppu, const PpuMemory *m)
     unsigned i;
     for (i = 0; i < 2; ++i) {
         ppu->affine_x[i] = reference(m->io, 0x28 + i * 16);
+        unsigned bounds = read16(m->io, 0x44 + i * 2);
+        unsigned start = bounds >> 8, end = bounds & 255;
         ppu->affine_y[i] = reference(m->io, 0x2c + i * 16);
+        /* Vertical window comparison runs through VBlank (228 lines). */
+        ppu->window_active[i] = start < 228 && (end < start || end >= 228);
     }
     ppu->next_line = 0;
 }
@@ -205,12 +209,12 @@ static int inside(unsigned position, unsigned bounds)
     return start <= end ? position >= start && position < end : position >= start || position < end;
 }
 
-static unsigned window_mask(const PpuMemory *m, unsigned display, unsigned x, unsigned y, unsigned objwin)
+static unsigned window_mask(const Ppu *ppu, const PpuMemory *m, unsigned display, unsigned x, unsigned objwin)
 {
     unsigned i;
     if (!(display & 0xe000)) return 63;
     for (i = 0; i < 2; ++i) {
-        if ((display & (0x2000 << i)) && inside(y, read16(m->io, 0x44 + i * 2)) &&
+        if ((display & (0x2000 << i)) && ppu->window_active[i] &&
             inside(x, read16(m->io, 0x40 + i * 2)))
             return m->io[0x48 + i] & 63;
     }
@@ -401,6 +405,11 @@ static void render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, void *out,
     if (y >= PPU_HEIGHT) return;
     display = read16(m->io, 0);
     mode = display & 7;
+    for (i = 0; i < 2; ++i) {
+        unsigned bounds = read16(m->io, 0x44 + i * 2);
+        if (y == (bounds >> 8)) ppu->window_active[i] = 1;
+        if (y == (bounds & 255)) ppu->window_active[i] = 0;
+    }
     for (x = 0; x < PPU_WIDTH; ++x) {
         objects[x] = empty_pixel();
         objwin[x] = 0;
@@ -415,7 +424,7 @@ static void render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, void *out,
             continue;
         }
         top.color = palette(m, 0);
-        mask = window_mask(m, display, x, y, objwin[x]);
+        mask = window_mask(ppu, m, display, x, objwin[x]);
         for (bg = 0; bg < 4; ++bg) {
             Pixel p;
             if (!(display & (0x100 << bg)) || !(mask & (1 << bg))) continue;

@@ -182,6 +182,38 @@ def edge_fixtures():
                 yield f'objwin_blend_{bgmask}_{masks}_{semi}', s
 
 
+def affine_window_fixtures():
+    for bg in (2, 3):
+        for size in range(4):
+            for wrap in (0, 0x2000):
+                s = Scene().reg(0, 2 | (0x100 << bg))
+                s.reg(8 + bg * 2, (20 << 8) | (size << 14) | wrap)
+                reg = 0x20 + (bg-2)*16
+                s.reg(reg, 381).reg(reg+2, -92).reg(reg+4, 172).reg(reg+6, 247)
+                w32(s.io, reg+8, -35 * 256)
+                w32(s.io, reg+12, 12 * 256)
+                yield f'affine_bg{bg}_size{size}_wrap{wrap}', s
+    for mapping in (0, 64):
+        for x in (0, 1, 230, 511):
+            for flip in (0, 0x3000):
+                s = Scene().reg(0, 0x1000 | mapping).reg(0x4c, 0x6500)
+                s.obj(0, 253 | 0x1000, x | 0x8000 | flip, 31)
+                yield f'obj_mosaic_clip_{mapping}_{x}_{flip}', s
+    for start, end in ((0, 0), (0, 240), (240, 255), (255, 20), (250, 249), (50, 50)):
+        for vertical in (False, True):
+            s = Scene().reg(0, 0x2f00).reg(0x48, 0x3f).reg(0x4a, 0)
+            s.reg(0x40, 0x00f0 if vertical else (start << 8) | end)
+            s.reg(0x44, (start << 8) | end if vertical else 0x00a0)
+            yield f'window_bounds_{start}_{end}_{vertical}', s
+    for equal in (False, True):
+        s = Scene().reg(0, 0x1f40).reg(0x50, 0x3f7f).reg(0x52, 0x0808)
+        s.obj(0, 20, 30 | 0xc000, 0x20)
+        s.obj(1, 20, 30 | 0xc000, 0x120 | (0 if equal else 0xc00))
+        # Transparent holes in a front OBJ must not erase an underlying OBJ.
+        for i in range(0x400): s.vram[0x10400+i] = 0 if i%3 else 0x55
+        yield f'obj_transparent_priority_{equal}', s
+
+
 def build_oracle():
     result = subprocess.check_output(['make', '-Bn', '-C', 'tools/emu', 'harness'], cwd=ROOT, text=True)
     command = shlex.split(next(line for line in result.splitlines() if ' -o harness harness.c ' in line))
@@ -199,7 +231,7 @@ def main():
     directory.mkdir(parents=True, exist_ok=True)
     build_oracle()
     rows = []
-    for name, scene in (*fixtures(), *edge_fixtures()):
+    for name, scene in (*fixtures(), *edge_fixtures(), *affine_window_fixtures()):
         if args.filter not in name:
             continue
         path = directory / (name + '.bin')
@@ -212,6 +244,8 @@ def main():
         print(f'{name}: {count} / 38400', flush=True)
         if count:
             print(result.stderr, end='')
+    if not rows:
+        raise RuntimeError('no synthetic fixtures selected')
     (directory / 'results.json').write_text(json.dumps(rows, indent=2) + '\n')
     print(f'{sum(r["mismatches"] == 0 for r in rows)}/{len(rows)} fixtures exact')
     raise SystemExit(any(r['mismatches'] for r in rows))

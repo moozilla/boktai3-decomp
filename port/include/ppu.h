@@ -27,6 +27,7 @@ typedef struct Ppu {
     int32_t affine_x[2];
     int32_t affine_y[2];
     unsigned next_line;
+    unsigned window_active[2];
 } Ppu;
 
 /* Call at the beginning of visible line 0, after VBlank register writes. */

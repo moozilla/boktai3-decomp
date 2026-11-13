@@ -91,7 +91,8 @@ int main(void)
     write16(m.io, 0x40, 0x1464);
     write16(m.io, 0x44, 0x00a0);
     write16(m.io, 0x48, 1);
-    ppu_render_scanline(&ppu, &m, 6, output);
+    ppu_begin_frame(&ppu, &m);
+    ppu_render_scanline(&ppu, &m, 0, output);
     assert(output[19] == 0 && output[20] == 31 && output[99] == 31 && output[100] == 0);
 
     reset();

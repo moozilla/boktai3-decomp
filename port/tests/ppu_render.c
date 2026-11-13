@@ -16,6 +16,7 @@ int main(int argc, char **argv)
     FILE *in = stdin, *out = stdout;
     char magic[8];
     unsigned y, x;
+    int delta;
     Ppu ppu;
     PpuMemory m = {record + 16, record + 16 + PPU_IO_SIZE,
                    record + 16 + PPU_IO_SIZE + PPU_PALETTE_SIZE,
@@ -23,15 +24,34 @@ int main(int argc, char **argv)
     if (argc > 3) { fprintf(stderr, "usage: ppu_render [dump.ppu [frame.ppm]]\n"); return 1; }
     if (argc > 1 && !(in = fopen(argv[1], "rb"))) { perror(argv[1]); return 1; }
     if (argc > 2 && !(out = fopen(argv[2], "wb"))) { perror(argv[2]); return 1; }
-    if (fread(magic, 1, 8, in) != 8 || memcmp(magic, "PPUDUMP1", 8)) {
+    if (fread(magic, 1, 8, in) != 8 ||
+        (memcmp(magic, "PPUDUMP1", 8) && memcmp(magic, "PPUDUMP2", 8))) {
         fprintf(stderr, "invalid PPU capture\n"); return 1;
     }
+    delta = !memcmp(magic, "PPUDUMP2", 8);
     fprintf(out, "P6\n240 160\n255\n");
     for (y = 0; y < PPU_HEIGHT; ++y) {
         uint32_t pixels[PPU_WIDTH];
-        if (fread(record, 1, sizeof(record), in) != sizeof(record)) {
-            fprintf(stderr, "short PPU capture at line %u\n", y); return 1;
+        if (!delta) {
+            if (fread(record, 1, sizeof(record), in) != sizeof(record)) {
+                fprintf(stderr, "short PPU capture at line %u\n", y); return 1;
+            }
+        } else {
+            static const unsigned sizes[4] = {PPU_IO_SIZE, PPU_PALETTE_SIZE, PPU_VRAM_SIZE, PPU_OAM_SIZE};
+            unsigned bank, offset = 16;
+            int mask;
+            if (fread(record, 1, 16, in) != 16 || (mask = fgetc(in)) < 0 ||
+                (mask & ~15) || (!y && mask != 15)) {
+                fprintf(stderr, "invalid scanline header at line %u\n", y); return 1;
+            }
+            for (bank = 0; bank < 4; ++bank) {
+                if ((mask & (1 << bank)) && fread(record + offset, 1, sizes[bank], in) != sizes[bank]) {
+                    fprintf(stderr, "short memory bank at line %u\n", y); return 1;
+                }
+                offset += sizes[bank];
+            }
         }
+        if (y == 0) ppu_begin_frame(&ppu, &m);
         ppu.affine_x[0] = read32(record);
         ppu.affine_y[0] = read32(record + 4);
         ppu.affine_x[1] = read32(record + 8);
