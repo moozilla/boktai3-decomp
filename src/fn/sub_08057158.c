@@ -107,12 +107,14 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
             if (timer <= 19) {
                 const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
                 u32 *randomIndex = &gRandomIndex;
-                register u32 index asm("r1") = *randomIndex + 1;
+                u32 index = *randomIndex + 1;
                 u32 mask = 1023;
                 u32 rangeMask;
+                u32 *cursor;
                 s32 value;
                 index &= mask;
-                value = table[index];
+                cursor = &index;
+                value = table[*cursor];
                 {
                     u32 coordinate = (u16)manager->sprite.position.world.x;
                     coordinate -= 15;
