@@ -109,7 +109,7 @@ void PlayerCue_Stand(struct Player *player, s32 facing)
     ActorSequence_Begin(player, 0, 0);
 }
 
-void PlayerCue_Face(struct Player *player, u8 targetFacing, u32 parameter)
+void PlayerCue_Face(struct Player *player, u32 targetFacing, u32 parameter)
 {
     player->targetFacing = targetFacing;
     player->cueParameter = parameter;
@@ -679,7 +679,7 @@ void PlayerCue_Run(struct Player *player, s32 facing)
     player->triggerAnimationCallback = PlayerCue_UpdateRunOverlay;
 }
 
-void PlayerCue_Motion17(struct Player *player)
+void PlayerCue_Motion17(struct Player *player, s32 unused)
 {
     Player_EnterKindTwo(player);
     player->facing = 1;
@@ -689,7 +689,7 @@ void PlayerCue_Motion17(struct Player *player)
     player->triggerAnimationCallback = Player_UpdateThreePhaseBaseAnimationAction;
 }
 
-void PlayerCue_Motion17Variant2(struct Player *player)
+void PlayerCue_Motion17Variant2(struct Player *player, s32 unused)
 {
     Player_EnterKindTwo(player);
     player->facing = 1;
