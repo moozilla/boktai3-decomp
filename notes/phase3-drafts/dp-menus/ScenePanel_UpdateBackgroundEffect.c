@@ -1,11 +1,11 @@
 #include "scene_panel.h"
 
-
 void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
                                        s32 screenY)
 {
+    s32 effectAlpha;
     if (gGameState->unk618 > 0) {
-        u16 frame = panel->mode;
+        u32 frame = panel->mode;
         u32 shifted = (u32)frame << 16;
         u32 value;
         s32 alpha;
@@ -29,8 +29,11 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             } else
                 panel->shakeOffset = 5;
         } else {
+            u32 mask;
             alpha = shifted >> 17;
-            if (!(frame & 3) && panel->shakeOffset > 0)
+            mask = 3;
+            mask &= frame;
+            if (!mask && panel->shakeOffset > 0)
                 panel->shakeOffset--;
         }
         {
@@ -43,7 +46,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
         CpuSet((u8 *)panel->palette + 32, (void *)0x03005140, 0x04000008);
         if (panel->effectPhase == 0) {
             s32 count;
-            s32 alpha;
+
             {
                 u32 mask = 0x200;
                 u16 *shadow = &gDispCntShadow;
@@ -55,10 +58,10 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 count = (64 - panel->mode) >> 3;
             else
                 count = panel->mode >> 3;
-            alpha = count + 12;
+            effectAlpha = count + 12;
             {
-                u32 blend = ((16 - alpha) >> 1) + 8;
-                *(vu16 *)0x04000052 = (blend << 8) | alpha;
+                u32 blend = ((16 - effectAlpha) >> 1) + 8;
+                *(vu16 *)0x04000052 = (blend << 8) | effectAlpha;
             }
             gRandomIndex = (gRandomIndex + 1) & 1023;
             {
@@ -114,10 +117,13 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                     {
                         union ScenePanelPackedVector *lowPosition = &position;
                         positionWords = lowPosition;
-                        coordinate = (u16)lowPosition->words.xy - 250;
+                        coordinate = (u16)lowPosition->packed.x - 250;
                     }
                     coordinate += offset;
-                    coordinate = (u16)coordinate;
+                    {
+                        u16 narrowed = coordinate;
+                        coordinate = narrowed;
+                    }
                     highMask = 0xFFFF0000;
                     position.words.xy = (position.words.xy & highMask) | coordinate;
                 }
@@ -139,9 +145,12 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                     s32 offset = Mod(table[gRandomIndex], 500);
                     union ScenePanelPackedVector *lowPosition = positionWords;
                     s32 coordinate;
-                    coordinate = (u16)lowPosition->words.zpad - 250;
+                    coordinate = (u16)lowPosition->packed.z - 250;
                     coordinate += offset;
-                    coordinate = (u16)coordinate;
+                    {
+                        u16 narrowed = coordinate;
+                        coordinate = narrowed;
+                    }
                     lowPosition->words.zpad = (lowPosition->words.zpad & highMask) | coordinate;
                 }
                 velocity.words.xy &= highMask;
@@ -175,12 +184,11 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             {
                 u16 *lowFrame = frame;
                 u32 frameValue;
-                s32 alpha;
                 frameValue = *lowFrame;
-                alpha = frameValue >> 2;
+                effectAlpha = frameValue >> 2;
                 {
-                    u32 blend = ((16 - alpha) >> 1) + 8;
-                    *(vu16 *)0x04000052 = (blend << 8) | alpha;
+                    u32 blend = ((16 - effectAlpha) >> 1) + 8;
+                    *(vu16 *)0x04000052 = (blend << 8) | effectAlpha;
                 }
             }
             {

@@ -1617,31 +1617,33 @@ class-head lifetime inflation in ordinary C, then eliminate the second target
 spill while preserving the six intended scratch slots.
 
 
-### ScenePanel_UpdateBackgroundEffect (08058700): owner-stop checkpoint
+### ScenePanel_UpdateBackgroundEffect (08058700): resolved
 
 Tags: #menus #hud #matching #compiler
 
-The owner ended the weekly run while this item was current. This is a resumable
-checkpoint, not a claim that an exhaustive matching search was completed.
-Landed typed shakeOffset access in place of raw 0x132A pointer arithmetic; the
-complete unit checks MATCH at 1,012 bytes. Ten pins and two barriers remain.
+Resumed the owner-stop checkpoint and removed all ten pins and both barriers.
+The complete unit matches all 1,012 bytes with the stock compiler. Four ordinary
+C forms decided it:
 
-Saved ordinary draft:
-`notes/phase3-drafts/dp-menus/ScenePanel_UpdateBackgroundEffect.c`, 38 ROM / 42 draft
-instructions, 1,020 bytes, shape distance 30. This reproduces the older round-11
-baseline, with the typed shake field included. The pin audit found no individually
-free concession. ROM/like/relatives and the per-pin audit were captured before
-stopping. No matching diagnostic knob has been established for this item.
+- A word-sized frame removes the first load/copy. Load the mask after the alpha
+  shift and use mask-first AND to preserve the ROM's register preference.
+- Separate u16 results for X/Z coordinate truncation keep both shifts in the
+  coordinate register. Forcing the isolated shift temporary to r1 confirmed the
+  allocation diagnosis; the ordinary narrow result matches without the knob.
+- Share effectAlpha between the two effect-phase arms. Its multiple definitions
+  prevent regmove tying the shifted alpha to the frame input. The isolated
+  `AGBCC_NOTIE=1142` counterfactual matches exactly; sharing alpha across all three
+  outer paths does not, because it changes allocation in the first path.
+- Read `(u16)lowPosition->packed.x` and `.packed.z` instead of truncating the
+  corresponding word fields. This yields real halfword loads and leaves the
+  word loads until their later read/modify/write operations. That removes the
+  extra word temporaries and restores table/position/index lifetimes, eliminating
+  the remaining five pins and both barriers together.
 
-First difference: the ROM loads panel->mode directly into r5; the draft loads r0
-then copies to r5. At insn 38, cse first substitutes frame (33) for load result 37,
-then cse2 substitutes 37 back for frame. Scope found no class-head takeover for
-that pair; inspect the extended-block paths and second-pass canonicalization
-before treating this as a simple local tie. Later differences remain in the
-random-table setup, packed position updates, and alpha calculation.
-
-Persistent store: `build/matchsearch/ScenePanel_UpdateBackgroundEffect`, node
-`stop-checkpoint`. Next: diagnose the first load/copy difference with a confirmed
-knob, then apply the matched random-table and per-axis local forms from the
-preceding animation item. Queue item 20 is ScenePanel_CycleOverlayPalette; no
-work on that item was started in this run.
+The previous best draft is replaced with the matching ordinary C. Persistent
+store: `build/matchsearch/ScenePanel_UpdateBackgroundEffect`, final node
+`packed-field-reads`; intermediate exact partials are also retained. Scratch
+variants cover narrow/word frame types, explicit truncations, union/array alpha
+views, reused frame/alpha tests and shared alpha lifetimes. The misleading first
+copy's cse trace was not the decisive mechanism; changing the frame type exposed
+the useful mask-preference difference. Queue item 20 is next.
