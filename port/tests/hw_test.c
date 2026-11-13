@@ -365,6 +365,11 @@ static int rtc_sdk_tests(void)
     Rtc_Initialize();
     CHECK(Rtc_Reset() == 1 && Rtc_ReadStatus(&readback) == 1 && readback.status == 0x40);
     CHECK(Rtc_ReadDateTime(NULL) == 0 && Rtc_WriteStatus(NULL) == 0);
+    hw_write16(&machine, 0x080000c4, 1); hw_write16(&machine, 0x080000c4, 5);
+    hw_write16(&machine, 0x080000c6, 7); Rtc_WriteCommandByte(0x60);
+    hw_write16(&machine, 0x080000c4, 1);
+    CHECK(Rtc_ReadStatus(&readback) == 1 && readback.status == 0);
+    CHECK(Rtc_CheckAndReset() == 0x11 && Rtc_ReadStatus(&readback) == 1 && readback.status == 0x40);
     return 0;
 }
 

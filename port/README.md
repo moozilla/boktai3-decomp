@@ -85,7 +85,9 @@ uses 24-hour BCD. `port/include/hw_rtc.h` declares portable SIIRTC SDK
 entry points, including protection, status translation, date/time reads and
 writes, reset and alarm storage. They preserve the game record layout and
 software-lock byte at `030035C6`, and drive the GPIO device through bus calls.
-Alarm interrupts and 12-hour wire conversion are not implemented. Solar GPIO counts clock pulses against a user-set threshold
+A raw reset clears status; the SDK reset/probe restores 24-hour mode and
+reports recovery, matching the original SDK in mGBA. Alarm interrupts and
+12-hour wire conversion are not implemented. Solar GPIO counts clock pulses against a user-set threshold
 (`hw_set_solar`, 0 bright through 255 dark); these values are not physical lux.
 
 ### Validation and remaining integration

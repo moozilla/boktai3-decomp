@@ -370,8 +370,18 @@ static int rtc_sdk_oracle(struct mCore *core)
     Rtc_Initialize();
     if (rom_call(core, 0x08248970, 0, 0, 0) || rom_call(core, 0x082489a0, 0, 0, 0) ||
         (uint8_t)((struct ARMCore *)core->cpu)->gprs[0] != Rtc_CheckAndReset()) return 1;
+    core->busWrite16(core, 0x080000c4, 1); core->busWrite16(core, 0x080000c4, 5);
+    core->busWrite16(core, 0x080000c6, 7);
+    if (rom_call(core, 0x08249040, 0x60, 0, 0)) return 1;
+    core->busWrite16(core, 0x080000c4, 1);
+    hw_write16(&hw, 0x080000c4, 1); hw_write16(&hw, 0x080000c4, 5);
+    hw_write16(&hw, 0x080000c6, 7); Rtc_WriteCommandByte(0x60); hw_write16(&hw, 0x080000c4, 1);
+    if (rom_call(core, 0x08248afc, 0x02003000, 0, 0) || !Rtc_ReadStatus(&record)) return 1;
+    if (record.status != 0 || core->busRead8(core, 0x02003007) != 0) return 1;
+    if (rom_call(core, 0x082489a0, 0, 0, 0) ||
+        (uint8_t)((struct ARMCore *)core->cpu)->gprs[0] != 0x11 || Rtc_CheckAndReset() != 0x11) return 1;
     hw_bind(NULL);
-    puts("Original RTC SDK: PASS (24 UTC hours, date/status reads, status write, protection, probe)");
+    puts("Original RTC SDK: PASS (24 UTC hours, date/status reads, status write, protection, reset/probe recovery)");
     return 0;
 }
 
