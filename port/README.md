@@ -176,3 +176,12 @@ committed. This is captured-state rendering, not full gameplay execution.
 The Node page-handler test covers loading the module, decompressing captures,
 comparing a reference, and running original early boot C. Browser visual testing
 was unavailable in this worker environment.
+
+The MMIO slice also includes the original `Solar_InitTimer` and
+`Solar_OnTimerInterrupt`. `node port/tests/solar_irq.cjs
+build/port/slice-wasm32/boot.wasm` checks that timer 3 invokes the game C 13 times
+during its first frame, updates the measurement counter, acknowledges IF and
+restores IME. The resolver accepts both the portable pointer installed by C and
+the original ROM address. This focused resolver is not a complete game callback
+registry. The slice keeps original RTC C and excludes port-hw's optional RTC SDK
+replacement, because generated MMIO instrumentation already routes its edges.

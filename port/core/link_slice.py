@@ -55,9 +55,11 @@ def build_slice(root, args):
     units = CORE + GAME + [str(bios)]
     exports = list(EXPORTS)
     if args.mmio:
-        units += ['port/core/bus.c', 'port/core/devices.c', 'src/fn/sub_08213D10.c']
-        units += [str(p) for p in sorted((hardware / 'hw').glob('*.c')) if p != bios]
-        exports += ['port_devices_init', 'InterruptsAndVideo_Initialize']
+        units += ['port/core/bus.c', 'port/core/devices.c', 'src/fn/sub_08213D10.c',
+                  'port/core/irq.c', 'src/fn/sub_08243C10.c', 'src/fn/sub_08243D28.c']
+        units += [str(p) for p in sorted((hardware / 'hw').glob('*.c')) if p != bios and p.name != 'rtc_sdk.c']
+        exports += ['port_devices_init', 'InterruptsAndVideo_Initialize',
+                    'port_solar_irq_init', 'port_solar_irq_calls', 'port_irq_raise', 'port_irq_dispatch']
     if args.ppu_root:
         ppu = Path(args.ppu_root).resolve()
         flags += ['-I' + str(ppu / 'include')]

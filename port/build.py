@@ -64,7 +64,8 @@ def main():
         units += [ROOT / 'port/core/bus.c', ROOT / 'port/core/devices.c']
         units += [ROOT / p for p in ['port/core/memory.c', 'port/core/timing.c', 'port/core/boot.c', 'port/core/entry.c', 'port/core/callback.c', 'port/core/veneers.c']]
         # Keep external worker paths out of committed code and serialized names.
-        units += sorted((hardware / 'hw').glob('*.c'))
+        # The MMIO pass retains the original RTC C and routes every GPIO edge.
+        units += [p for p in sorted((hardware / 'hw').glob('*.c')) if p.name != 'rtc_sdk.c']
     header_hash = hashlib.sha256()
     for p in sorted(ROOT.glob('include/**/*.h')) + sorted(ROOT.glob('port/**/*.h')):
         header_hash.update(str(p.relative_to(ROOT)).encode())
