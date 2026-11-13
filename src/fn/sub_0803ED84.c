@@ -22,7 +22,7 @@ s32 ScenePool_StateDepartForward(void *manager, struct ScenePoolActor *actor,
         mask &= *flags;
         zero = 0;
         *flags = mask;
-        actor->unknown57a = zero;
+        actor->bodyContact.contactState = zero;
         actor->unknown68 = zero;
         Or(0x2c, &actor->stateFlags);
         if ((actor->position.x - actor->savedPosition.x) >> 12 > 127) {

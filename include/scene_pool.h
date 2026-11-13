@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_POOL_H
 #define GUARD_SCENE_POOL_H
 #include "engine.h"
+#include "scene_vec.h"
 
 /* The copy helpers transfer 16 bytes; only x/y/z are interpreted.
  * The unnamed word is representation padding, not an uninitialized coordinate. */
@@ -37,7 +38,21 @@ struct ScenePoolEntry {
     u32 history[0x40]; /* per-state workspace; temporal history is not established */
     s32 settingA, delayA, settingB, delayB;
 };
-/* Partial actor view established by the frame/state callbacks in this range. */
+/* Contact volume used by the spatial index. The eight-byte vectors preserve
+ * the initialization and contact-message copy widths. */
+struct ScenePoolContact {
+    u32 flags, mask, kind;
+    u16 value;
+    s8 contactState;
+    u8 registrationFlags;
+    struct SceneVec position, bounds, offset;
+    u8 unknown28[9];
+    s8 bucket;
+    u8 unknown32[4], speed, unknown37;
+    void *owner;
+    void (*callback)(void);
+};
+/* Shared actor body, embedded after Task in the recoil actor. */
 struct ScenePoolActor {
     u8 unknown0[0xc];
     u32 boundsFlags;
@@ -48,25 +63,33 @@ struct ScenePoolActor {
     u16 timerA, timerB;
     u8 unknown5c[0xc];
     u32 unknown68;
-    u8 unknown6c[0x28];
+    s32 contactType;
+    u8 unknown70[0x24];
     s32 minimumForwardSpeed, maximumForwardSpeed;
     s32 minimumLateralSpeed, maximumLateralSpeed;
     s32 minimumForwardBias, maximumForwardBias;
-    u8 unknownac[0x14];
+    u8 contactActive, unknownAD[3];
+    void *contactCallback;
+    u8 unknownB4[0xC];
     s32 forwardBias; /* +0xc0, added to forwardSpeed (tentative) */
     u8 unknownc4[0x1f0];
     u8 emissionProfile[0xc]; /* observed descriptor prefix; full extent is unknown */
     u8 unknown2c0[0x48];
     u16 unknown308;
-    u8 unknown30a[0x32];
+    u8 unknown30a[0x2E];
+    u16 recoilResistance;
+    u8 unknown33A[2];
     s32 biasClampMode;
-    u8 unknown340[0x22c];
-    u32 motionFlags;
-    u8 unknown570[0xa];
-    u8 unknown57a;
-    u8 unknown57b[0x31];
+    u8 unknown340[0x1E4];
+    u16 stateSound, previousSound;
+    u16 contactValue;
+    u8 contactKind, contactPending;
+    struct ScenePoolContact attackContact;
+    struct ScenePoolContact bodyContact;
     s32 forwardSpeed, verticalSpeed, lateralSpeed;
-    u8 unknown5b8[0x34];
+    u8 unknown5b8[0x14];
+    s32 recoilX, recoilY, recoilZ;
+    u8 unknown5d8[0x14];
     s8 motionLock;
     u8 unknown5ed;
     u8 flags5ee;
@@ -74,7 +97,9 @@ struct ScenePoolActor {
     struct ScenePoolPlayer *linkedPlayer; /* +0x5f4, restriction flag consumer 0811628C */
     u8 unknown5f8[4];
     u32 stateFlags;
-    u8 unknown600[0x258];
+    u8 unknown600[0x18];
+    s16 collisionWidth, collisionHeight;
+    u8 unknown61C[0x23C];
     u32 controlFlags;
     u8 unknown85c[0x44];
     struct ScenePoolVec32 savedPosition;

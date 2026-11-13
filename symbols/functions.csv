@@ -4544,6 +4544,7 @@ addr,name,mode,confidence,source,notes
 08115FE0,ActorParticles_InitCompactPool,thumb,low,src-alias,
 0811606C,SpriteDrop_CreateManager,thumb,low,src-alias,Returns or creates the singleton task managing 16 sprite drop entries
 081160B8,SpriteDrop_OnExpire,thumb,low,src-alias,Expiration callback schedules sprite removal and marks the cleanup state for initialization
+08116280,CompactParticlePool_Clear,thumb,low,src-alias,Clears the compact particle pool singleton; adjacent to actor recoil helpers
 0811628C,ScenePool_CanAcceptControl,thumb,low,src-alias,
 081162D8,ActorRecoil_ReceiveBodyContact,thumb,low,src-alias,
 08116538,ActorRecoil_ApplyDirectionalImpulse,thumb,low,src-alias,
