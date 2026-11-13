@@ -29,6 +29,7 @@ static int64_t now(void *context) { (void)context; return unix_seconds; }
 static void step(void *context, uint32_t cycles)
 {
     (void)context;
+    port_devices_sync_timing();
     hw_step_cycles(&hardware, cycles);
 }
 static void wait_irq(void *context, uint16_t mask, int discard)
@@ -48,6 +49,7 @@ static void blank(void *context, unsigned line, int vblank)
     (void)context;
     /* Core raises VCount at the start of the line. hw_hblank additionally
      * performs HBlank DMA; suppress only its second VCount notification. */
+    port_devices_sync_timing();
     if (vblank) hw_vblank(&hardware);
     else {
         uint8_t enable = hardware.io[4] & 0x20;
@@ -97,4 +99,37 @@ void port_devices_notify_write(uint32_t address, unsigned width)
 {
     if (render_write && address >= PORT_IO_BASE && address < PORT_IO_BASE + PORT_IO_SIZE)
         render_write(render_context, address - PORT_IO_BASE, width);
+}
+
+/* The generated hardware input renames only the implementation, leaving its
+ * callers at this C boundary. Observe publications after the bytes are mapped;
+ * DMA can reload affine latches even when the register value did not change. */
+void port_hw_publish_io(Hw *hw, unsigned offset, unsigned size);
+void hw_publish_io(Hw *hw, unsigned offset, unsigned size)
+{
+    static const unsigned references[] = {0x28, 0x2c, 0x38, 0x3c};
+    unsigned i;
+    port_hw_publish_io(hw, offset, size);
+    if (hw != &hardware || !render_write || offset >= PORT_IO_SIZE) return;
+    if (size > PORT_IO_SIZE - offset) size = PORT_IO_SIZE - offset;
+    for (i = 0; i < sizeof(references) / sizeof(references[0]); ++i) {
+        unsigned start = references[i];
+        if (offset < start + 4 && offset + size > start)
+            render_write(render_context, start, 4);
+    }
+}
+
+void port_devices_sync_timing(void)
+{
+    static const unsigned ranges[][2] = {{4, 4}, {0x200, 4}, {0x208, 2}};
+    const volatile uint8_t *mapped;
+    unsigned range, i;
+    if (hw_bound() != &hardware) return;
+    mapped = port_memory_pointer(PORT_IO_BASE, PORT_IO_SIZE);
+    if (!mapped) return;
+    for (range = 0; range < sizeof(ranges) / sizeof(ranges[0]); ++range)
+        for (i = 0; i < ranges[range][1]; ++i) {
+            unsigned offset = ranges[range][0] + i;
+            hardware.io[offset] = mapped[offset];
+        }
 }
