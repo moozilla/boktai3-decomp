@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
+#include "display_sequence_inline.h"
+#include "display_animation.h"
 void RouteSpriteActor_RunEventScript(struct RouteSpriteActor *);
 void FragmentBurst_Create(struct ContactPosition *, u32, u32, u32, u32, u32, void *);
 union EmissionPosition {
@@ -40,7 +42,8 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
             if (*low <= 9) {
                 const u16 *table = gRandomTable;
                 u32 *index;
-                register u32 next asm("r1");
+                u32 next;
+                u32 nextZ;
                 u32 mask;
                 u32 random;
                 u32 value;
@@ -59,10 +62,10 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
                 value += random;
                 jitterDst = actor;
                 jitterDst->sprite.position.x = value;
-                next = (next + 1) & mask;
-                *index = next;
+                nextZ = (next + 1) & mask;
+                *index = nextZ;
                 {
-                    u32 random = table[next];
+                    u32 random = table[nextZ];
                     u32 value = (u16)actor->savedPosition.z;
                     value -= 48;
                     random &= spread;
@@ -78,28 +81,29 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
             union EmissionPosition position;
             {
                 struct RouteSpriteActor *low = actor;
-                AnimData_SelectPaletteBank(*(void **)&low->sprite.unknown8[4], 0x143);
+                AnimData_SelectPaletteBank((void *)((struct DisplaySequenceSprite *)low)->resource,
+                                           0x143);
             }
             {
                 struct RouteSpriteActor *low = actor;
                 position.position = low->sprite.position;
             }
             position.packed.y -= 60;
-            FragmentBurst_Create(&position.position, (u16)actor->amount, actor->kind, actor->parameter,
-                         actor->option, 20, actor->context);
+            FragmentBurst_Create(&position.position, (u16)actor->amount, actor->kind,
+                                 actor->parameter, actor->option, 20, actor->context);
             RouteSpriteActor_RunEventScript(actor);
         }
     }
     {
         struct RouteSpriteActor *primaryLow;
-        const volatile u16 *command; /* preserve observed packed-command reads */
+        const u16 *command;
         u32 coreEnded, duration, flags, bit;
         {
             u32 offset = sequence->index << 1;
-            const volatile u16 *table;
+            const u16 *table;
             primaryLow = actor;
             table = primaryLow->sequence.commands;
-            command = (const volatile u16 *)((u32)table + offset);
+            command = (const u16 *)((u32)table + offset);
         }
         primaryLow->sprite.frame = *command >> 6;
         {
@@ -213,11 +217,16 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
                 }
                 {
                     u32 offset = sequence->index << 1;
-                    const volatile u16 *table;
+                    const u16 *table;
                     table = sequence->commands;
-                    command = (const volatile u16 *)((u32)table + offset);
+                    command = (const u16 *)((u32)table + offset);
                 }
-                sequence->frameWeight = *command & 15;
+                {
+                    u32 value = *command;
+                    u32 mask = 15;
+                    mask &= value;
+                    sequence->frameWeight = mask;
+                }
                 {
                     register s32 weight asm("r1") = sequence->frameWeight;
                     s32 speed;
@@ -239,17 +248,18 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
         (*cycles)--;
         {
             register struct RouteSpriteActor *low asm("r2") = flagsOwner;
-            AnimData_SelectPaletteBank(*(void **)&low->sprite.unknown8[4], 0x140);
+            AnimData_SelectPaletteBank((void *)((struct DisplaySequenceSprite *)low)->resource,
+                                       0x140);
         }
         if (*cycles) {
             u32 offset = 0x152;
             u8 *state;
-            state = (void *)((u32)actor + offset);
+            state = &actor->state;
             *state = 2;
         } else {
             u32 offset = 0x152;
             u8 *state;
-            state = (void *)((u32)actor + offset);
+            state = &actor->state;
             *state = 5;
         }
         actor->entered = 1;
