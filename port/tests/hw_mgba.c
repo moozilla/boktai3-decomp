@@ -196,6 +196,67 @@ static int mixer_state_oracle(struct mCore *core)
     return 0;
 }
 
+static int bios_memory_oracle(struct mCore *core)
+{
+    struct ARMCore *cpu = core->cpu;
+    uint32_t random = 0x13579bdf, source[80], actual[80];
+    unsigned i, variant, count, cases = 0;
+    for (i = 0; i < 2048; ++i) {
+        int32_t numerator, denominator, remainder;
+        random = random * 1664525u + 1013904223u;
+        swi(core, 8, random, 0, 0, 0);
+        if ((uint32_t)cpu->gprs[0] != Sqrt(random)) return 1;
+        numerator = (int32_t)random;
+        random = random * 1664525u + 1013904223u;
+        denominator = (int32_t)(random | 1);
+        swi(core, 6, (uint32_t)numerator, (uint32_t)denominator, 0, 0);
+        if (cpu->gprs[0] != hw_bios_div(numerator, denominator, &remainder) || cpu->gprs[1] != remainder) return 1;
+        cases += 2;
+    }
+    for (i = 0; i < 80; ++i) source[i] = 0x01234567u + i * 0x01010101u;
+    for (variant = 0; variant < 6; ++variant) for (count = 1; count <= 65; ++count) {
+        unsigned swi_number = variant >= 4 ? 12 : 11;
+        uint32_t control = count | (variant & 1 ? 0x01000000 : 0) | (variant >= 2 ? 0x04000000 : 0);
+        for (i = 0; i < 80; ++i) {
+            actual[i] = 0xa5a5a5a5;
+            core->busWrite32(core, 0x02000000 + i * 4, source[i]);
+            core->busWrite32(core, 0x02001000 + i * 4, actual[i]);
+        }
+        if (swi_number == 12) CpuFastSet(source, actual, control);
+        else CpuSet(source, actual, control);
+        /* mGBA executes copy SWIs through its replacement BIOS, so run the
+         * Thumb caller through return instead of assuming immediate HLE. */
+        core->busWrite16(core, 0x0203e000, (uint16_t)(0xdf00 | swi_number));
+        core->busWrite16(core, 0x0203e002, 0x4770);
+        if (rom_call(core, 0x0203e000, 0x02000000, 0x02001000, control)) return 1;
+        for (i = 0; i < 80; ++i) if (actual[i] != core->busRead32(core, 0x02001000 + i * 4)) {
+            fprintf(stderr, "BIOS copy variant %u count %u word %u differs\n", variant, count, i); fprintf(stderr, "actual %08x expected %08x source %08x\n", actual[i], core->busRead32(core, 0x02001000 + i * 4), core->busRead32(core, 0x02000000 + i * 4)); return 1;
+        }
+        ++cases;
+    }
+    {
+        static const struct { unsigned swi, size; uint8_t bytes[16]; } streams[] = {
+            {0x13, 12, {0x28,4,0,0,1,0xc0,'A','B',0,0,0,0x60}},
+            {0x13, 12, {0x24,4,0,0,1,0xc0,3,12,0,0,0,0x66}},
+            {0x14, 9, {0x30,8,0,0,1,'a','b',0x83,'c'}},
+            {0x16, 8, {0x81,4,0,0,250,10,2,255}},
+            {0x18, 8, {0x82,4,0,0,255,255,2,0}}
+        };
+        for (variant = 0; variant < sizeof(streams) / sizeof(*streams); ++variant) {
+            uint8_t decoded[16]; size_t written;
+            for (i = 0; i < streams[variant].size; ++i) core->busWrite8(core, 0x02000000 + i, streams[variant].bytes[i]);
+            if (hw_bios_decompress(streams[variant].swi, streams[variant].bytes, streams[variant].size, decoded, sizeof(decoded), &written)) return 1;
+            swi(core, streams[variant].swi, 0x02000000, 0x02001000, 0, 0);
+            for (i = 0; i < written; ++i) if (decoded[i] != core->busRead8(core, 0x02001000 + i)) {
+                fprintf(stderr, "BIOS stream %u byte %u differs\n", variant, i); return 1;
+            }
+            ++cases;
+        }
+    }
+    printf("mGBA BIOS memory/arithmetic: PASS (%u cases: Sqrt, Div, copies, Huffman, RL, delta)\n", cases);
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     struct mCore *core;
@@ -251,6 +312,7 @@ int main(int argc, char **argv)
         }
         ++tests;
     }
+    if (bios_memory_oracle(core)) return 1;
     if (mixer_oracle(core)) return 1;
     if (mixer_state_oracle(core)) return 1;
     if (eeprom_oracle(core)) return 1;
