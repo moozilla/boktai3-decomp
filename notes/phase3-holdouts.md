@@ -1370,3 +1370,8 @@ Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_UpdateTurningCharge.c. AGBCC_NOPR
 Tags: phase3, dp-bosses, Hresvelgr_PlayDescent
 
 Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_PlayDescent.c. The prior ordinary draft remains best at 11 ROM / 5 draft. Returning the actor from an inline descent body, either assigning or ignoring its result, does not preserve the copy: expansion drops the unused return. Putting the final refresh arm before the landing stores changes the branch layout and still merges input and actor. The ROM needs input in r7, actor in r6 and tick in r8. The source retains its one operand barrier. Next: find a real aggregate owner representation or control-flow join that survives copy propagation but folds before allocation; moving only the final use order is insufficient.
+
+### Hresvelgr_UpdateBoundaryBarrage: 2/2; random-mask retry allocation still selects sl
+Tags: phase3, dp-bosses, Hresvelgr_UpdateBoundaryBarrage
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_UpdateBoundaryBarrage.c. The prior pin-free 2/2 draft remains best. Shared ReadDirectSample produces the same RTL and difference; ReadSample increases register differences. Building the random mask through halfwords substantially changes the loop code, and rebuilding only the normal collision mask changes other allocations without fixing the retry choice. The source still retains its end-of-function mask operand. Next: expose why retry_global_alloc considers sl available despite the earlier collision/action mask using it, and find a genuine later use of that value or another pseudo that naturally conflicts with it in case 1. Keep this distinct from simple priority order: initial global allocation already chooses the intended low register before reload evicts it.
