@@ -1,9 +1,11 @@
 import sys
 import unittest
+import tempfile
+from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from merge_unit import items
+from merge_unit import items, write_unit
 from progress import _bodies
 
 
@@ -32,3 +34,25 @@ void SelectBase(void)
     def test_a_comment_inside_a_declaration_does_not_end_it(self):
         structure = "struct Holder\n/* The payload contains ( values. */\n{ int value; };"
         self.assertEqual(items(structure), [structure])
+
+
+class FilesystemMerge(unittest.TestCase):
+    def test_no_git_preserves_output_input_and_never_invokes_git(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "old.c").write_text("old")
+            (root / "merged.c").write_text("previous")
+            with patch("merge_unit.ROOT", directory), patch("merge_unit.subprocess.run") as run:
+                write_unit("merged.c", ["old.c", "merged.c"], "merged", use_git=False)
+            run.assert_not_called()
+            self.assertFalse((root / "old.c").exists())
+            self.assertEqual((root / "merged.c").read_text(), "merged")
+
+    def test_failed_output_write_preserves_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "old.c").write_text("old")
+            with patch("merge_unit.ROOT", directory):
+                with self.assertRaises(OSError):
+                    write_unit("missing/merged.c", ["old.c"], "merged", use_git=False)
+            self.assertEqual((root / "old.c").read_text(), "old")
