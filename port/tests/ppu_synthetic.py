@@ -237,6 +237,27 @@ def priority_latch_fixtures():
         yield f'window_hblank_vertical_{win}', s
 
 
+def background_address_fixtures():
+    for base in (30, 31):
+        for size in (1, 2, 3):
+            for depth in (0, 128):
+                s = Scene().reg(0, 0x100).reg(8, (base << 8) | (size << 14) | depth)
+                s.reg(0x10, 257).reg(0x12, 251)
+                yield f'bg_map_wrap_text_{base}_{size}_{depth}', s
+        for size in range(4):
+            s = Scene().reg(0, 0x402).reg(12, (base << 8) | (size << 14) | 0x2000)
+            s.reg(0x20, 511).reg(0x22, 109).reg(0x24, -77).reg(0x26, 311)
+            w32(s.io, 0x28, 1000 * 256)
+            w32(s.io, 0x2c, 1000 * 256)
+            yield f'bg_map_wrap_affine_{base}_{size}', s
+    for scroll in range(8):
+        for mosaic in (0, 64):
+            s = Scene().reg(0, 0x100).reg(8, 0x1f0c | mosaic)
+            s.reg(0x10, scroll).reg(0x4c, 0x65)
+            for i in range(1024): w16(s.vram, 0xf800 + i*2, 1023)
+            yield f'bg_invalid_tile_scroll_{scroll}_{mosaic}', s
+
+
 def build_oracle(sanitize=False):
     result = subprocess.check_output(['make', '-Bn', '-C', 'tools/emu', 'harness'], cwd=ROOT, text=True)
     command = shlex.split(next(line for line in result.splitlines() if ' -o harness harness.c ' in line))
@@ -260,7 +281,7 @@ def main():
     if args.wasm:
         build_ppu(BUILD)
     rows = []
-    for name, scene in (*fixtures(), *edge_fixtures(), *affine_window_fixtures(), *priority_latch_fixtures()):
+    for name, scene in (*fixtures(), *edge_fixtures(), *affine_window_fixtures(), *priority_latch_fixtures(), *background_address_fixtures()):
         if args.filter not in name:
             continue
         path = directory / (name + '.bin')

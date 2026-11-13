@@ -74,12 +74,6 @@ static uint16_t palette(const PpuMemory *m, unsigned n)
     return (uint16_t)(read16(m->palette, n * 2) & 0x7fff);
 }
 
-static uint8_t bg_byte(const PpuMemory *m, unsigned address)
-{
-    /* Background tile fetches cannot reach OBJ VRAM. */
-    return m->vram[address & 0xffff];
-}
-
 static Pixel text_bg(const PpuMemory *m, unsigned bg, unsigned x, unsigned y, unsigned presentation)
 {
     unsigned control = read16(m->io, 8 + bg * 2);
@@ -98,7 +92,9 @@ static Pixel text_bg(const PpuMemory *m, unsigned bg, unsigned x, unsigned y, un
     block = sx / 256 + (sy / 256) * (width / 256);
     map = ((control >> 8) & 31) * 0x800 + block * 0x800;
     map += (((sy & 255) / 8) * 32 + (sx & 255) / 8) * 2;
-    entry = bg_byte(m, map) | ((unsigned)bg_byte(m, map + 1) << 8);
+    /* Screen-map addressing can extend into the adjoining OBJ bank. The
+     * largest text map ends below 0x11800; character fetch limits differ. */
+    entry = read16(m->vram, map);
     tx = sx & 7;
     ty = sy & 7;
     if (entry & 0x400) tx = 7 - tx;
@@ -175,9 +171,10 @@ static Pixel affine_bg(const Ppu *ppu, const PpuMemory *m, unsigned bg,
         sx &= size - 1;
         sy &= size - 1;
         address = ((control >> 8) & 31) * 0x800 + (unsigned)(sy / 8) * (size / 8) + (unsigned)sx / 8;
-        tile = bg_byte(m, address);
+        /* A 1024-square affine map can extend through address 0x137ff. */
+        tile = m->vram[address];
         address = ((control >> 2) & 3) * 0x4000 + tile * 64 + (sy & 7) * 8 + (sx & 7);
-        index = bg_byte(m, address);
+        index = m->vram[address];
         if (!index) return p;
         p.color = palette(m, index);
     } else {
