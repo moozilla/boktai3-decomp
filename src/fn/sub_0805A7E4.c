@@ -32,13 +32,11 @@ static inline void stepSecondarySprite(struct SceneRigSprite *sprite, u32 byteMa
         }
     }
     {
-        u32 input = state->flags;
-        register u32 bit asm("r3");
-        register u32 first asm("r1");
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
         bit = 2;
-        first = bit;
-        first &= input;
-        first = (u8)first;
+        first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit)) {
             register struct SceneRigSprite *out asm("r5") = sprite;
             out->flags |= 8;
