@@ -195,18 +195,14 @@ mostly register shifts). The inner loop counts down in the ROM (loop.c reversed 
 pass); the ROM keeps both `pool` (spilled, sp+0x10) and `g` (r6) and holds velocity in r8;
 `rng` is caller-saved r3 around sub_08217E40.
 
-### AnimatedParticleManager_Update (src/fn/sub_08015160.c, 08015160): deferred, priority tie
+### AnimatedParticleManager_Update (src/fn/sub_08015160.c, 08015160): resolved by dp-effects
 
-Draft: `notes/phase3-drafts/field-effects/AnimatedParticleManager_Update.c` (32 ROM / 32 draft),
-the whole unit on the shared types (DisplaySequenceSprite, DisplaySequenceState) and
-`DisplaySequence_StepSprite` from include/display_sequence_sprite.h. The helper's `command`
-plays the old `entry` role exactly, and indexed loop forms are worse (37-49 rows). Only allocation is left: `p` (48 refs over 245 insns, priority 9795) loses
-r5 to `entry` (12 refs over 36 insns, 10000). `AGBCC_PRI=p:+206` matches. `entry` needs 9 to 11
-refs: with its second set (the frame step's `entry = a->data + a->frame`) in a separate local it
-has 8 and falls under `o` (7531), which then takes r6 (27 / 27). A `command = *entry` local
-doesn't change the counts (cse). `scope.py why 35` lists the fact 91 levers (duplicate
-`p->timer++` or the vertical-scale test into the arms before it); neither looks like original
-code.
+The shared DisplaySequence_StepSprite draft now matches without concessions.
+Writing p->timer++ in each playback-result branch gives p the extra references
+needed to win r5 over the command pointer. jump2 shares the two increments into
+the ROM's single tail; no user label is needed. Stock whole-unit check: MATCH,
+540 bytes. The former diagnosis p:+206 was correct; the ordinary branch-tail form
+supplies its effect. The earlier field-effects draft remains as historical evidence.
 
 ### AnimatedParticle_PriorityFromFlags (src/fn/sub_080154D0.c, 080154D0): deferred, DEBUG_NOP
 
@@ -1412,3 +1408,202 @@ The original pin and operand barrier remain. Confirmed forcing baseline bank pse
 Tags: phase3, dp-bosses, GameState_SelectRamBase
 
 The single original base pin remains. Read fold_rtx in gcc/cse.c: after obtaining equiv_constant for each operand, it explicitly places a constant second in commutative operations. This is operand ordering, not the allocation conflict that scope why reports. Array-of-eight-byte slots and u64 slot pointers retain the 1/1 difference. A union initializer or one-element pointer array changes allocation to 15/15; widening the address gives 28/28. Reassembling a union pointer from two halfword reads hides the constant from CSE and fixes the add order and all downstream registers, but five reconstruction instructions plus alignment remain. Next: a nonconstant first definition that combine reduces after CSE without reconstruction instructions. Scope incorrectly printed cse replaced nothing by nothing and recommended swapping allocation for a pure commutation; this is a diagnostic bug to fix.
+
+## dp-effects (Codex)
+
+Tags: #matching #phase3 #effects
+
+### sub_08012B34 (08012B34, src/debris_particles.c): partial, origin pin remains
+
+Removed the operand barrier using `ParticleRandom_ReadRelativeSample(setup, gRandomTable)`
+for subsequent draws. The complete unit still matches; only the existing r3 origin pin
+remains. The sample origin is now named `PARTICLE_RANDOM_SAMPLE_ORIGIN`.
+
+Best ordinary-C source: `notes/phase3-drafts/dp-effects/sub_08012B34.c` (complete unit),
+20 ROM / 20 draft, shape 0. It follows DirectionalParticle_Spawn and
+FragmentEffect_SpawnRandomParticle: symbolic origin `(u32)&gHeapHead +
+RESOURCE_REGISTRY_ENTRIES_ADDR`, a saved copy after the x-product, and shared relative
+sampling for the vertical component. `AGBCC_PRI=setup:+2791` gives MATCH. The source's
+angle wins r3 first (priority 2926); setup is 136. The two constant sets multiply setup's
+flow live length by four in `update_equiv_regs`, as confirmed in local-alloc.c.
+
+The earlier `setup & 3` draft also remains 20 / 20 and matches with
+`AGBCC_PRI=setup:+2908`; the new draft uses real sampling arithmetic instead.
+All later draws through the relative sampler extend setup's life but cse shares its
+parameter copies, leaving only three counted refs. A first-sample-only relative use
+plus the saved origin shortens the life, but does not change the allocation order.
+Branch-local origins and the existing capture macro collapse into the same global
+pseudo. Duplicating the full tails gives separate origins, but gcse changes random
+cursor stores and jump2 leaves excess code. A split-half union keeps too much insert
+code; zero-initializing it lets cse2 rebuild the same constant and its equivalence.
+Constructing the origin within the first-sample helper, including union views, lets
+cse eliminate the dead load before flow. Byte and halfword angle forms add or reorder
+instructions without fixing the allocation.
+
+Persistent evidence: `build/matchsearch/sub_08012B34` (source hypotheses and compiled
+results); experiments: `build/cx/work/sub_08012B34/`. `why all` and the matching priority
+knob confirm that the other differences are consequences of origin/angle placement
+and reload rotation. Next idea: recover a first-sample helper whose short-lived origin
+use survives until combine, allowing local allocation to reserve r3 before the angle.
+No new concession or compiler override was landed.
+
+### sub_0801404C (0801404C, src/fn/sub_0801404C.c): partial, table barrier remains
+
+Removed three of four barriers. Reading coordinates through `CoordinateBits` keeps
+PRE from sharing the early signed x load with the later motion load. A local graphics
+struct names the resource tile field. Splitting the two presentation fallback paths,
+repeating their tails and jumping to one `age` label gives resource 10 references
+across two calls. GCC's caller-save profitability test is `4 * calls < refs`: the
+original ordinary form has only 8, so resource takes r8 instead of caller-saved r3.
+The repeated tails cross-jump after allocation. The complete unit matches with the
+original table barrier and direct sampler; no other barrier remains.
+
+Best pin-free unit: `notes/phase3-drafts/dp-effects/sub_0801404C.c`. Shared
+`ParticleRandom_ReadSample` retains the table but leaves only 7 ROM / 7 draft
+instructions different: sprite and table swap sb/sl. `AGBCC_PRI=sprite:+34` matches.
+At this point resource is r3 (10 refs, life 204, priority 1470), random-index address
+is r8 (13 refs, doubled life 570, priority 684), table is sb (10 refs, doubled life
+576, priority 520), and sprite is sl (7 refs, life 287, priority 487).
+
+Tried: direct/value coordinate helpers and by-value vectors; only the bit helper
+keeps the ROM load order. Duplicating presentation tails without the join label
+leaves extra tails. Sprite cursor derivation from the particle or indexed group
+changes induction/initialization. Typed records and a union cursor give the same
+7/7. Repeating cursor advancement in two or three arms raises it above random-index
+and leaves unmerged additions because reload rotates their scratch registers.
+Repeating particle advancement too changes loop control. A for loop is unchanged;
+a goto loop loses useful hoists. One direct sample reduces table references enough
+that the hoisted -256 mask beats it and the table is rematerialized. The barrier plus
+table-first samples over-prioritizes table; the barrier plus direct samples matches.
+
+Persistent evidence: `build/matchsearch/sub_0801404C`; all source experiments in
+`build/cx/work/sub_0801404C`. Next: add one sprite reference that disappears after
+flow, or reduce table density slightly while keeping the -256 mask below it. A
+sampler or cursor helper with a useful late-eliminated copy may supply that effect.
+
+### ParticleGroup_UpdateFrozen (08014330, src/fn/sub_08014330.c): deferred, combine removes byte extension
+
+Best complete ordinary unit: `notes/phase3-drafts/dp-effects/ParticleGroup_UpdateFrozen.c`,
+3 ROM / 1 draft, shape 2. It preserves the earlier field-effects result: PRE creates
+one QImode reaching register, with the initial r0-to-r3 copy and reloads after both
+terrain-call paths. Combine deletes the final unsigned-byte shift pair and compares
+r3 directly instead of converting to r0 first. Confirmed exact with
+`AGBCC_COMBKEEP=104`, the left-shift result. `why 268` formerly gave misleading
+allocation advice; the scope improvement in fact 172 identifies this deleted conversion.
+
+Read combine.c `set_nonzero_bits_and_sign_copies`, `nonzero_bits`, and the existing
+COMBKEEP instrumentation. A PRE byte loaded/copied in every arm has known-zero upper
+bits. The original barrier supplies an unknown upper-bit definition. Byte-return,
+narrowing, signed-byte-return, and union-byte helpers do not preserve the extension;
+a word-return helper also changes the initial compare. Header bitfields and a signed
+field with unsigned casts are unchanged. Explicit byte caches lose the initial copy.
+Explicit wide/signed caches retain the late extension but add a halfword/signed load
+before the top byte load (2/2 or 2/4). Word/byte union representations, partial union
+insertion, and halfword unions either lose PRE or add loads. Repeated helper returns
+add control flow. Explicit shift reuse changes the initial compare and still deletes
+the final conversion. Packing priority or the invalid cell into unused upper bits
+keeps unwanted arithmetic. These are compiler hypotheses, not candidates to land.
+
+Persistent source evidence: `build/matchsearch/ParticleGroup_UpdateFrozen`.
+Scratch: `build/cx/work/ParticleGroup_UpdateFrozen`. Next: a genuine header/cache
+representation that makes an SI-to-QI copy with unknown upper bits before combine,
+but whose wide producer becomes the same byte load after combine. No source changed.
+
+### sub_08014634 (08014634, src/fn/sub_08014634.c): partial, 11 pins and one barrier removed
+
+The stock compiler matches the complete 664-byte unit after removing eleven of
+fifteen pins and the entry-offset barrier. Reusing an ordinary option scalar for
+both masking and the later tile lookup first removed the mask, manager, and entry
+pins. Typed union views then reused that scalar for the count clamp, count header,
+and both position reads (five pins); reused the completed manager lookup for the
+options header (two pins); and reused priority/bound storage for the particle
+cursor (one pin). Keep initialization order when separating C89 declarations.
+These ordinary reuse forms carry phase-4 cleanup debt; no concession was added.
+
+Four pins remain: small/large resource selection, counter, and table; barriers
+remain on options memory, resource temporaries, and table/group. Removing both
+resource pins and barriers leaves 4/4, shape 0: small uses r0 instead of r2 and
+large uses r2 instead of r0. CSE2 substitutes the spilled resource for the reused
+option view. The spill sweep found no matching rotation; forcing resource to r2
+changes allocation throughout the function. Repeated post-join initialization in
+each branch either keeps the swap or introduces an outer-loop entry check. An
+explicit resource/pool struct becomes a multiword register value and changes the
+whole allocation.
+
+Removing only the counter pin leaves 19/19, shape 0. Exact diagnostic:
+`AGBCC_PRI=i:+864`. Its initial zero doubles the measured lifetime: 32 refs,
+flow life 190 (effective 380), priority 4210, versus group 26 refs/life 205,
+priority 5073. A nonconstant first definition or seven additional counted refs
+would reverse their order. Removing the group barrier makes i correct but swaps
+group/table and adds a table copy (14/14, shape 2). Repeating the particle tail
+changes unrelated allocation. Repeating inactive cleanup in both bound arms gets
+all registers correct, but the zero-count path simplifies differently and leaves
+an extra cleanup loop (1/13), so jump2 cannot share it.
+
+Best fully ordinary alternative: `notes/phase3-drafts/dp-effects/sub_08014634.c`
+(71/67, shape 58), based on the matched radial spawner sub_080148CC: inline wrapper,
+ReadScalar/ReadOrigin helpers, and a wide origin copy. Table priority +1400 improves
+it to 41/39 but is not an exact diagnosis. The table constant has doubled lifetime
+and loses r7 to velocity; table-first/shared samplers, halfword return, table-half
+construction, union initialization, count-up loops, scalar argument reordering,
+and struct argument views did not recover the full match. Removing all remaining
+concessions from the latest partial gives 90/86, shape 40; preserving the simpler
+relative-based rewrite is more useful than its extra unions.
+
+Persistent graph: `build/matchsearch/sub_08014634`; scratch candidates and compiler
+traces: `build/cx/work/sub_08014634`. Next: shorten the counter lifetime without an
+extra early set, or recover the resource helper whose separate branch destinations
+survive CSE2. Then solve table equivalence and the options/count reload boundaries.
+
+### sub_08014CA4 (08014CA4, src/fn/sub_08014CA4.c): partial, output pin and initialization barrier removed
+
+The complete 704-byte unit matches after removing the lifetime-output pointer pin
+and the three-operand initialization barrier. A shared output pointer in the fixed
+and randomized lifetime branches receives r1 naturally. Split-half random-table
+construction removes constant equivalence and recovers table allocation without
+its barrier. Its uninitialized old-input USE initially created an extra sp+0x20
+slot, shifting every stack parameter by four bytes. Reusing a typed union first
+for the loop-bound test and then for the table halves removes that extra slot.
+Facts 173/174 and the new scope frame explanation record this result.
+
+Four pins and two barrier statements remain. Removing the speed-range pin and
+barrier gives 17/17, shape 0; `AGBCC_SPILL=20:2` is exact on `spread_free.c`.
+CSE replaces the named spread with the incoming speedRange pseudo, and the first
+reload after the lifetime branches takes r0 instead of r2. Repeating the following
+range load in each arm (with and without a join label) is unchanged. Repeating the
+whole speed tail changes allocation and leaves duplicate code. A shared lifetime
+byte/spread scalar, and using spread in the modulo call, still canonicalize to the
+parameter. This remains a source-level reload-history problem.
+
+After the initialization fix, removing the lifetime cursor pin leaves 11/11,
+shape 0. The cursor naturally receives sl, but CSE replaces the low output copy
+with that high-register pseudo, changing reload choices in both lifetime arms.
+The spill search improves to 6 differences but is not exact. Reusing the output
+for the source-byte address makes lifetime address-taken and adds a stack copy;
+using it for a later tile-table view is unchanged. Advancing life from out changes
+loop allocation. Removing the fixed lifetime byte pin/barrier needs both its
+byte access and separate output allocation; direct byte, QI/SI, and union views
+retain either wrong local registers or unwanted shared tails.
+
+Removing the base pin enables PRE for base+32 and base+44 (initialized/enabled
+arrays). The isolated base-pin draft is 73/73 before the table fix. NOPRE=1,2
+improves it to 35/31; table:+50 fixes its table/base priority swap but does not fix
+PRE. Direct field-address unions do not prevent PRE; reconstructing the pointer
+through halves leaves shifts/ORs. An indexed-array rewrite gets the table into r7
+but loses the original outer cursor initialization. Shared table-first sampling
+raises the random-index address too far; direct sampling remains mismatched.
+
+Best complete ordinary draft: `notes/phase3-drafts/dp-effects/sub_08014CA4.c`,
+43/45, shape 46. It combines defined-input split-half table construction with a
+per-iteration group view. There is no exact full-draft knob yet. The table and g
+still compete closely, and two field expressions create extra frame values.
+Zero or aggregate table initialization restores constant equivalence. Reversing
+the half stores keeps the old-input spill. Reading the union directly for every
+sample prevents combine from folding its construction.
+
+Persistent hypotheses: `build/matchsearch/sub_08014CA4-v2`; scratch and exact
+partial candidates: `build/cx/work/sub_08014CA4`. Compiler source checked:
+combine.c distribute_notes preserves a lost REG_DEAD input with a USE at a label
+for caller-save tracking. Next: a low-register output copy that survives CSE
+without a cursor pin, or a legitimate field view whose address forms only after
+PRE. The fixed initialization and scope explanation are landed independently.

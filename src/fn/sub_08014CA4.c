@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "monster_particle_random.h"
 #include "ram.h"
 #include "engine_globals.h"
 // confidence=low: allocates a fragment group with randomized direction and lifetime.
@@ -36,13 +37,13 @@ s32 AnimData_Load(void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(struct Sprite *, void *, s32);
 s32 Mod(s32, s32);
-static inline s32 Random(u16 *table, u32 *rng)
+static inline s32 Random(const u16 *table, u32 *rng)
 {
     u32 r = (*rng + 1) & 0x3ff;
     *rng = r;
     return table[r];
 }
-static inline s32 RandomByte(u16 *table, u32 *rng)
+static inline s32 RandomByte(const u16 *table, u32 *rng)
 {
     u32 r = (*rng + 1) & 0x3ff;
     *rng = r;
@@ -95,81 +96,91 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
                 return -1;
             if ((g->type == 4) || (g->type == 8))
                 AnimData_SelectPaletteBank(animation, (*((u16 *)(g->animation + 6))) + 1);
-            i = 0;
-            if (i < count) {
-                u16 *table = (u16 *)0x0203B400;
-                struct Vec *velocity;
-                u16 *speedOut;
-                register u8 *life asm("sl");
-                cursor = (u8 *)base;
-                velocity = base->velocity;
-                speedOut = speeds;
-                life = lifetimes;
-                asm("" : "+r"(table), "+r"(velocity), "+r"(life));
-                do {
-                    struct Sprite *p;
-                    s32 direction;
-                    p = &base->sprites[i];
-                    base->initialized[i] = 1;
-                    if (!lifetimeRange) {
-                        register u8 *out asm("r1");
-                        register u8 value asm("r2") = lifetime;
-                        asm("" : "+r"(value));
-                        out = life;
-                        *out = value;
-                    } else {
-                        u32 *seed = rng;
-                        u32 index;
-                        s32 random, value;
-                        index = (*seed + 1) & 1023;
-                        *seed = index;
-                        random = table[index];
-                        value = lifetime + Mod(random, lifetimeRange);
-                        *life = value;
-                    }
-                    {
-                        register s32 spread asm("r2") = speedRange;
-                        asm("" : "+r"(spread));
-                        if (!spread) {
-                            u32 value = (u16)speed;
-                            *speedOut = value;
+            {
+                union SpawnInput {
+                    s32 count;
+                    union ParticleRandomTableSource random;
+                } input;
+                i = 0;
+                input.count = count;
+                if (i < input.count) {
+                    const u16 *table;
+                    struct Vec *velocity;
+                    u16 *speedOut;
+                    register u8 *life asm("sl");
+                    input.random.halves[0] = 0xB400;
+                    input.random.halves[1] = 0x0203;
+                    table = ParticleRandom_GetTable(&input.random);
+                    cursor = (u8 *)base;
+                    velocity = base->velocity;
+                    speedOut = speeds;
+                    life = lifetimes;
+                    do {
+                        struct Sprite *p;
+                        s32 direction;
+                        u8 *out;
+                        p = &base->sprites[i];
+                        base->initialized[i] = 1;
+                        if (!lifetimeRange) {
+                            register u8 value asm("r2") = lifetime;
+                            asm("" : "+r"(value));
+                            out = life;
+                            *out = value;
                         } else {
-                            s32 random = Random(table, rng);
-                            *speedOut = speed + Mod(random, speedRange);
+                            u32 *seed = rng;
+                            u32 index;
+                            s32 random, value;
+                            index = (*seed + 1) & 1023;
+                            *seed = index;
+                            random = table[index];
+                            value = lifetime + Mod(random, lifetimeRange);
+                            out = life;
+                            *out = value;
                         }
-                    }
-                    if (!angleRange)
-                        direction = angle;
-                    else {
-                        s32 random = Random(table, rng);
-                        direction = angle + Mod(random, angleRange);
-                    }
-                    velocity->x = gUnk_086149C4[(direction + 64) & 255];
-                    velocity->z = gUnk_086149C4[direction & 255];
-                    if (!verticalRange)
-                        velocity->y = vertical;
-                    else {
-                        s32 random = Random(table, rng);
-                        s32 value = vertical + Mod(random, verticalRange);
-                        ((struct Group *)cursor)->velocity[0].y = value;
-                    }
-                    p->flags &= ~1;
-                    p->position = *position;
-                    p->position.x += Scale(velocity->x, radius);
-                    p->position.z += Scale(velocity->z, radius);
-                    Sprite_Init(p, animation, 0x200);
-                    p->tile = gUnk_08604C30[g->type];
-                    if (RandomByte(table, rng) <= 128)
-                        p->flags |= 4;
-                    else
-                        p->flags &= ~4;
-                    base->enabled[i] = 1;
-                    cursor += 8;
-                    velocity++;
-                    speedOut++;
-                    life++;
-                    i++;
-                } while (i < count);
+                        {
+                            register s32 spread asm("r2") = speedRange;
+                            asm("" : "+r"(spread));
+                            if (!spread) {
+                                u32 value = (u16)speed;
+                                *speedOut = value;
+                            } else {
+                                s32 random = Random(table, rng);
+                                *speedOut = speed + Mod(random, speedRange);
+                            }
+                        }
+                        if (!angleRange)
+                            direction = angle;
+                        else {
+                            s32 random = Random(table, rng);
+                            direction = angle + Mod(random, angleRange);
+                        }
+                        velocity->x = gUnk_086149C4[(direction + 64) & 255];
+                        velocity->z = gUnk_086149C4[direction & 255];
+                        if (!verticalRange)
+                            velocity->y = vertical;
+                        else {
+                            s32 random = Random(table, rng);
+                            s32 value = vertical + Mod(random, verticalRange);
+                            ((struct Group *)cursor)->velocity[0].y = value;
+                        }
+                        p->flags &= ~1;
+                        p->position = *position;
+                        p->position.x += Scale(velocity->x, radius);
+                        p->position.z += Scale(velocity->z, radius);
+                        Sprite_Init(p, animation, 0x200);
+                        p->tile = gUnk_08604C30[g->type];
+                        if (RandomByte(table, rng) <= 128)
+                            p->flags |= 4;
+                        else
+                            p->flags &= ~4;
+                        base->enabled[i] = 1;
+                        cursor += 8;
+                        velocity++;
+                        speedOut++;
+                        life++;
+                        i++;
+                    } while (i < count);
+                }
             }
             g->active = 1;
             break;

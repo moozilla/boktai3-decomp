@@ -4994,6 +4994,36 @@ def first_real_use(wd, uid):
     return None
 
 
+def removed_narrowing(before, after_uids, gone):
+    """Shift pairs removed by combine: (source pseudo, width, left uid, right uid).
+
+    Restrict this to an exact SI left/logical-right pair, both deleted. A surviving
+    shift or a different amount can be arithmetic rather than a removed conversion.
+    """
+    result = []
+    for g in gone:
+        right = [(u, re.fullmatch(
+            r"\(set \(reg(?:/\w)*:SI %d\) \(lshiftrt:SI "
+            r"\(reg(?:/\w)*:SI (\d+)\) \(const_int (\d+)\)\)\)" % g, r))
+                 for u, _, r in before]
+        right = [(u, m) for u, m in right if m]
+        if len(right) != 1:
+            continue
+        ru, rm = right[0]
+        shift = int(rm.group(2))
+        if ru in after_uids or shift not in (16, 24):
+            continue
+        left = [(u, re.fullmatch(
+            r"\(set \(reg(?:/\w)*:SI %s\) \(ashift:SI "
+            r"(?:\(subreg:SI )?\(reg(?:/\w)*:(?:SI|HI|QI) (\d+)\)"
+            r"(?: 0\))? \(const_int %d\)\)\)" % (rm.group(1), shift), r))
+                for u, _, r in before]
+        left = [(u, m) for u, m in left if m]
+        if len(left) == 1 and left[0][0] not in after_uids:
+            result.append((int(left[0][1].group(1)), 32 - shift, left[0][0], ru))
+    return result
+
+
 def explain_substitution(wd, p, uid, gone, nm, at, func=None):
     """A pass took pseudos out of insn UID: say what each one held (its set in the previous dump) and whether
     the pass folded that set into this insn."""
@@ -5017,6 +5047,17 @@ def explain_substitution(wd, p, uid, gone, nm, at, func=None):
               + (" (that insn is gone)." if folded else "."))
     if p == "gcse":
         explain_pre(wd, func, uid)
+    narrowed = removed_narrowing(before, after_uids, gone) if p == "combine" else []
+    for source, width, left, right in narrowed:
+        print(f"    combine removed an unsigned {width}-bit conversion of {nm(source)}:"
+              f" the left/right shift pair at {at(left)} and {at(right)} is gone.")
+        print("    inspect combine.c nonzero_bits: known-zero upper bits can make this conversion"
+              " redundant. The consumer then reads the original pseudo directly; a different"
+              " consumer register need not be an allocation error.")
+        left_dest = regs_of(next(r for u, _, r in before if u == left))[0]
+        print(f"    diagnostic: AGBCC_COMBKEEP={left_dest}"
+              " keeps the left-shift definition out of combinations; confirm before changing C.")
+    return {source for source, _, _, _ in narrowed}
 
 
 def explain_pre(wd, func, uid):
@@ -5377,6 +5418,7 @@ def cmd_why(src, func, uid, env, via=None):
         print("  gcse created this insn:")
         explain_pre(wd, info["obj_name"], uid)
     trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read(), info["obj_name"])
+    narrowed_sources = set()
     for p, gone, new in changes:
         if p not in ("cse", "cse2") or not new:
             if p == "regmove":
@@ -5384,7 +5426,7 @@ def cmd_why(src, func, uid, env, via=None):
                 explain_regmove(wd, uid, gone, new, nm, at)
             elif p not in ("greg", "lreg"):
                 print(f"  {p} replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new) or 'nothing'}.")
-                explain_substitution(wd, p, uid, gone, nm, at, info["obj_name"])
+                narrowed_sources.update(explain_substitution(wd, p, uid, gone, nm, at, info["obj_name"]))
             continue
         n = 1 if p == "cse" else 2
         t = trace.get(n, {"why": [], "eqv": []})
@@ -5433,6 +5475,10 @@ def cmd_why(src, func, uid, env, via=None):
         if not shown:
             print("    no class-head takeover found for these registers; see the raw trace")
     for ps, want, got in alloc_diffs:
+        if ps in narrowed_sources:
+            print(f"  allocation advice omitted for {nm(ps)}: combine removed the conversion result"
+                  " the ROM may read here; establish that shape decision first.")
+            continue
         # even when cse put this pseudo here, its register is allocation's choice: explain both
         if ps is None and got >= 8:
             ps = reload_move_pseudo(wd, uid, got)
@@ -6943,6 +6989,29 @@ def cmd_preorder(src, func, env):
     return 1
 
 
+def use_only_pseudos(before, after):
+    """Pseudos whose real operations disappeared, leaving only standalone USEs.
+
+    A surviving SET, CLOBBER, subreg use, or executable operand disqualifies the
+    pseudo. Do not infer an eliminated value from an absent or incomplete dump.
+    """
+    reg = re.compile(r"\(reg(?:/[a-z]+)*:\w+ (\d+)\)")
+    direct_use = re.compile(r"^\(use \(reg(?:/[a-z]+)*:\w+ (\d+)\)\)$")
+    real_before = set()
+    for _, _, rtl in before:
+        if not direct_use.fullmatch(rtl or ""):
+            real_before.update(int(x) for x in reg.findall(rtl or ""))
+    uses, other = {}, set()
+    for uid, _, rtl in after:
+        match = direct_use.fullmatch(rtl or "")
+        if match:
+            uses.setdefault(int(match.group(1)), []).append(uid)
+        else:
+            other.update(int(x) for x in reg.findall(rtl or ""))
+    return {p: uids for p, uids in uses.items()
+            if p >= 22 and p in real_before and p not in other}
+
+
 def cmd_frame(src, func, env):
     """The stack frame side by side: each ROM stack slot, the corresponding draft slot, and the pseudo
     (C variable) reload put there, in the order reload gave the slots out. Use physical offsets when
@@ -6996,6 +7065,18 @@ def cmd_frame(src, func, env):
     for b in extra:
         ps, nm = who(b)
         print(f"+ {'':9} sp+{b:<#6x} {ps:>6}  {nm}  (the ROM has no slot for this)")
+    use_only = use_only_pseudos(insn_list(wd, "flow"), insn_list(wd, "lreg"))
+    for b in extra:
+        ps = slots[b][0]
+        if ps not in use_only or slots[b][2] == -1:
+            continue
+        print(f"  sp+{b:#x}: pseudo {ps} has no executable read or write before allocation;"
+              f" only standalone USE insns {', '.join(map(str, use_only[ps]))} remain.")
+        print("    Its real operations disappeared after flow. combine's distribute_notes can"
+              " preserve a deleted input this way, keeping it live and giving it an unused spill"
+              " slot. Compare flow/combine/lreg; split-half union construction is one known"
+              " source (README facts 48 and 173). Initializing the union can remove the USE but"
+              " also restore constant equivalence, changing allocation.")
     order = [pair[a] for a in sorted(pair) if pair[a] in slots and slots[pair[a]][2] > 0]
     want = [slots[b][0] for b in order]
     if want != sorted(want):

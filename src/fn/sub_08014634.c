@@ -62,130 +62,150 @@ static inline void ClearFlag(volatile u32 *p, u32 mask)
     *p = v;
 }
 s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosition *position,
-                                const struct ContactPosition *velocityArg, const struct ContactPosition *spread, s32 lifetime,
+                                const struct ContactPosition *velocityArg,
+                                const struct ContactPosition *spread, s32 lifetime,
                                 s32 lifetimeMask)
 {
     struct SpawnArgs args = {count, options, position};
     const struct ContactPosition *velocityInput = velocityArg;
     const struct ContactPosition *velocity;
-    register struct Manager *m asm("r1");
+    union ManagerValue {
+        struct Manager *manager;
+        struct SpawnArgs *header;
+        u32 byte;
+    } managerValue;
     u8 *resource;
     struct Group *g;
     struct Group *pool;
     u32 *rng;
-    s32 priority;
-    register s32 optionMask asm("r0");
+    union ParticleValue {
+        s32 priority;
+        struct Particle *particle;
+    } particleValue;
+    s32 optionMask;
+    union ArgumentValue {
+        s32 value;
+        struct SpawnArgs *header;
+        const struct ContactPosition *position;
+    } option;
     s32 j;
     register s32 i asm("r5");
 
     velocity = velocityInput;
-    m = gParticleGroupManager;
-    if (!m) {
-        m = ParticleManager_Create(0, 0);
-        if (!m)
+    managerValue.manager = gParticleGroupManager;
+    if (!managerValue.manager) {
+        managerValue.manager = ParticleManager_Create(0, 0);
+        if (!managerValue.manager)
             return -1;
     }
-    priority = args.options >> 8;
+    particleValue.priority = args.options >> 8;
     asm("" : "+m"(args.options));
     optionMask = 255;
-    args.options &= optionMask;
+    option.value = args.options;
+    option.value &= optionMask;
+    args.options = option.value;
     if (args.count > 8) {
-        register s32 limit asm("r2") = 8;
-        args.count = limit;
+        option.value = 8;
+        args.count = option.value;
     }
 
     if (args.options <= 20) {
-        register u8 *small asm("r2") = m->small;
+        register u8 *small asm("r2") = managerValue.manager->small;
         asm("" : "+r"(small));
         resource = small;
     } else {
-        register u8 *large asm("r0") = m->large;
+        register u8 *large asm("r0") = managerValue.manager->large;
         asm("" : "+r"(large));
         resource = large;
     }
     j = 0;
 
     rng = &gRandomIndex;
-    pool = m->groups;
+    pool = managerValue.manager->groups;
     g = pool;
 
     for (; j < 6; g++, pool++, j++) {
         if (!g->active) {
             g->active = 1;
             {
-                register struct SpawnArgs *header asm("r1") = &args;
-                register u32 byte asm("r1") = *((u8 *)&header->options);
-                g->type = byte;
+                managerValue.header = &args;
+                managerValue.byte = *((u8 *)&managerValue.header->options);
+                g->type = managerValue.byte;
             }
             {
-                register struct SpawnArgs *header asm("r2") = &args;
-                register u32 byte asm("r2") = *((u8 *)&header->count);
-                g->count = byte;
+                option.header = &args;
+                option.value = *((u8 *)&option.header->count);
+                g->count = option.value;
             }
-            if (priority > 0)
-                g->priority = priority - 1;
+            if (particleValue.priority > 0)
+                g->priority = particleValue.priority - 1;
             else
                 g->priority = 2;
             i = 0;
             {
-                register s32 bound asm("r4") = args.count;
-                if (i < bound) {
+                particleValue.priority = args.count;
+                if (i < particleValue.priority) {
                     u16 *table = (u16 *)0x0203B400;
                     register u16 *tableReg asm("r7") = table;
-                    struct Particle *p = pool->particles;
-                    u8 *sprite = ((u8 *)pool) + 20;
-                    u32 mask = 0x3ff;
 
+                    u8 *sprite;
+                    u32 mask;
+
+                    particleValue.particle = pool->particles;
+                    sprite = ((u8 *)pool) + 20;
+                    mask = 0x3ff;
                     asm("" : "+r"(tableReg), "+r"(g));
                     table = tableReg;
                     i = args.count;
 
                     do {
-                        p->active = 1;
-                        p->pad = 1;
-                        p->timer = 0;
-                        p->lifetime = lifetime + (Random(table, mask, rng) & lifetimeMask);
-                        p->cell = CellIndex(args.position);
+                        particleValue.particle->active = 1;
+                        particleValue.particle->pad = 1;
+                        particleValue.particle->timer = 0;
+                        particleValue.particle->lifetime =
+                            lifetime + (Random(table, mask, rng) & lifetimeMask);
+                        particleValue.particle->cell = CellIndex(args.position);
                         {
-                            register const struct ContactPosition *source asm("r2") = args.position;
-                            p->height = source->y;
+                            option.position = args.position;
+                            particleValue.particle->height = option.position->y;
                         }
                         if (spread->x) {
                             s32 r = Random(table, mask, rng);
-                            p->velocity.x = velocity->x + Mod(r, spread->x);
+                            particleValue.particle->velocity.x = velocity->x + Mod(r, spread->x);
                         } else
-                            p->velocity.x = velocity->x;
+                            particleValue.particle->velocity.x = velocity->x;
                         if (spread->y) {
                             s32 r = Random(table, mask, rng);
-                            p->velocity.y = velocity->y + Mod(r, spread->y);
+                            particleValue.particle->velocity.y = velocity->y + Mod(r, spread->y);
                         } else
-                            p->velocity.y = velocity->y;
+                            particleValue.particle->velocity.y = velocity->y;
                         if (spread->z) {
                             s32 r = Random(table, mask, rng);
-                            p->velocity.z = velocity->z + Mod(r, spread->z);
+                            particleValue.particle->velocity.z = velocity->z + Mod(r, spread->z);
                         } else
-                            p->velocity.z = velocity->z;
+                            particleValue.particle->velocity.z = velocity->z;
                         if ((Random(table, mask, rng) & 15) <= 7)
-                            p->flags |= 4;
+                            particleValue.particle->flags |= 4;
                         else
-                            p->flags &= ~4;
-                        ClearFlag(&p->flags, 1);
+                            particleValue.particle->flags &= ~4;
+                        ClearFlag(&particleValue.particle->flags, 1);
                         {
-                            register const struct ContactPosition *source asm("r2") = args.position;
-                            p->position = *source;
+                            option.position = args.position;
+                            particleValue.particle->position = *option.position;
                         }
                         {
-                            register u32 *entries asm("r1") = gUnk_08604B90;
+                            u32 *entries = gUnk_08604B90;
                             s32 type;
                             u32 offset;
-                            type = args.options;
+                            option.value = args.options;
+                            type = option.value;
                             offset = type * sizeof(*entries);
-                            asm("" : "+r"(offset) : "r"(type));
-                            p->tile = (*((u16 *)(resource + 4))) + *(u32 *)(offset + (u32)entries);
+                            particleValue.particle->tile =
+                                (*((u16 *)(resource + 4))) + *(u32 *)(offset + (u32)entries);
                         }
-                        p->priority = g->priority;
+                        particleValue.particle->priority = g->priority;
                         sub_08217E40(sprite, 0);
-                        p++;
+                        particleValue.particle++;
                         sprite += 56;
 
                     } while (--i);

@@ -1864,6 +1864,21 @@ Each was read from the compiler source and confirmed on a live draft.
    so p wins and keeps its own register. BreakableBarrier_SetPosition (five pins and a barrier)
    matched once its `return input;` was dropped. The caller ignores the value.
 
+170. **Index the call argument and walk the field pointer to delay reversal without
+   reordering their increments.** EffectManager_UpdateAll uses a pointer walking
+   the six effects for field accesses, but passes `&manager->effects[i]` to the
+   update call in a count-up loop. In loop pass 1 the indexed call is a giv of i,
+   so check_dbra_loop cannot reverse i yet; strength reduction creates both the
+   call pointer and the field-access pointer. In pass 2 the index has no givs
+   left and becomes a countdown. Its initialization now follows both pointer
+   initializations. The field pointer's increment precedes the original walking
+   pointer's increment site, while the indexed call pointer steps at i's update,
+   preserving the ROM order. Indexing the fields while passing the walking
+   pointer also delays reversal, but swaps the two increments. Walking both
+   pointers explicitly instead shares their 328-byte stride in cse1, keeps it in
+   a register and changes reload rotation. The mixed call-index form removes
+   three pins and two operand barriers with no replacement concessions.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
@@ -2147,3 +2162,48 @@ which is exactly `10:1`. Not tested.
   name; now they fall back to the only function in the dump), and a trailing
   FUNC argument to `life` was read as a variable name; a `sub_ADDR` name that
   the CSV has since renamed raised a KeyError.
+
+
+171. **Caller saving has a strict reference threshold; a repeated branch tail can cross it.**
+   In ParticleGroup_UpdateBouncing, a resource pointer with eight weighted references
+   crosses two calls. `CALLER_SAVE_PROFITABLE(REFS, CALLS)` is `4 * CALLS < REFS`, so
+   it cannot use caller-saved r3 and instead takes r8. Splitting the presentation
+   fallback into its two paths, repeating the resource-reading tail, and jumping to
+   one existing join label gives ten references. Allocation can then use r3, and
+   jump2 shares the repeated tails back into the ROM instructions. This removed
+   the resource barrier. A priority-only explanation misses this eligibility gate;
+   inspect both reference count and calls crossed before trying allocation order.
+
+
+172. **A changed consumer register can be a deleted conversion, not allocation.**
+   ParticleGroup_UpdateFrozen's PRE reaching byte is r3. The ROM converts it through
+   `lsl r0, r3, #24; lsr r0, r0, #24` before comparing r0 with 8. Combine removes
+   that pair in the ordinary draft and compares r3 directly. `AGBCC_COMBKEEP=104`
+   (the left-shift result in the saved draft) restores an exact match. `why` now
+   recognizes deleted SI left/logical-right shift pairs for byte/halfword conversion,
+   suggests COMBKEEP for that definition, and suppresses misleading allocation advice
+   for the original pseudo. This knob confirms the pass; the ordinary C form that
+   preserves this particular conversion remains open in the holdout notes.
+
+173. **A spill slot can belong only to a standalone USE, with no machine load or store.**
+   In the barrier-free split-half-table draft of sub_08014CA4, combine folds the
+   table construction but leaves `(use (reg 94))` for its old input (fact 48).
+   That input has no executable operation left in lreg, yet remains live across
+   earlier calls and gets sp+0x20. Every body instruction otherwise matches;
+   the frame grows from 0x20 to 0x24 and shifts the incoming stack arguments.
+   `scope frame` now compares flow and lreg and identifies such slots instead of
+   reporting only an unnamed spilled value. It requires a real earlier operation
+   and only standalone USEs afterward; surviving SETs, CLOBBERs, or operand uses
+   disqualify the diagnosis. Zero initialization removes this USE but restores
+   constant equivalence and changes allocation, so it is not automatically a fix.
+
+174. **Reuse a completed input for split-half table construction to avoid its unused spill.**
+   The extra USE-only slot in fact 173 disappeared when a typed union first held
+   the loop bound: `input.count = count; if (i < input.count) { ... }`. Inside that
+   arm, assign `input.random.halves[0]` and `[1]`, then read the table through
+   `ParticleRandom_GetTable(&input.random)`. The old input now comes from an
+   existing, defined count value instead of a new uninitialized pseudo. The half
+   stores still prevent the table's constant equivalence. This removed all three
+   initialization-barrier operands from sub_08014CA4 with a stock 704-byte match.
+   A zero or aggregate table initializer instead restored constant equivalence;
+   direct repeated reads of the union prevented the half stores from combining.
