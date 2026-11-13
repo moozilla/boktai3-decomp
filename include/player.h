@@ -3,6 +3,9 @@
 
 #include "global.h"
 #include "scene_vec.h"
+#include "display_sequence.h"
+#include "contact_swarm_sprite.h"
+#include "scene_event_types.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0
@@ -94,7 +97,9 @@ struct PlayerCueCollider {
     u8 unknown40[2];
     u8 direction; /* 0x42: quantized facing angle */
     u8 reaction;  /* 0x43: primary, secondary or default category */
-    u8 unknown44[0x2C];
+    u8 unknown44[0x10];
+    struct DisplaySequenceState sequence; /* player +0x3FC: alternate drawable playback */
+    const void *setupResource, *sideResource, *alternateResource;
 };
 
 struct PlayerAnimation {
@@ -149,6 +154,10 @@ struct PlayerDirectionalEffect {
     u8 active;
     u8 unknown65[3];
 };
+struct PlayerAuxiliaryDrawable {
+    struct ContactSwarmSprite sprite;
+    u8 unknown2C[0x14];
+};
 struct Player {
     u8 unk0[0x18];
     s32 slot;                  /* 0x18: compared with local link player index */
@@ -188,15 +197,25 @@ struct Player {
     struct PlayerAnimation secondaryAnimation; /* 0xEC: alternate keyframe channel */
     u8 unkF8[0x14];
     u16 alternatePosition[3]; /* 0x10C */
-    u8 unk112[0x3A];
+    u8 unk112[0x14];
+    u16 secondarySpriteResource;
+    u8 unk128[0xC];
+    u32 secondaryVariantResource;
+    u8 unk138[0x14];
     u32 secondaryDrawFlags; /* 0x14C: bit zero follows reset flag one */
-    u8 unk150[0x18];
+    u8 unk150[3];
+    u8 secondaryPriority;
+    u8 secondaryScaleX, secondaryScaleY; /* cue drawable scale channels */
+    u8 unk156[0x12];
     struct SceneVec colliderPosition; /* 0x168 */
     u8 unk170[8];
     struct PlayerVisualObject *visualObject; /* 0x178 */
     u8 unk17C[0x54];
-    u8 auxiliarySprite[0x40]; /* 0x1D0: removed by player destructor */
-    u8 unk210[0x20];
+    struct PlayerAuxiliaryDrawable auxiliarySprite[1]; /* 0x1D0: removed by player destructor */
+    u8 unk210[8];
+    struct DisplaySequenceState auxiliarySequence;
+    u32 auxiliarySequenceEnded;
+    const void *auxiliaryResource;
     struct PlayerCollider collider; /* 0x230: embedded collider, extent bounded by directionFrame */
     u16 directionFrame;             /* 0x270: reset by forced direction setup */
     u8 savedHeading;                /* 0x272: snapshot of GameState heading byte (tentative) */
@@ -219,7 +238,8 @@ struct Player {
     u8 unk29C[0x4C];
     u8 contactListNode
         [0x10]; /* 0x2E8: a struct SceneActorContactNode (scene_actor_contacts.h; not included here, it pulls in engine.h) */
-    u8 unk2F8[0x34];
+    struct SceneEventReceiver cueReceiver; /* 0x2F8 */
+    u8 unk320[0xC];
     u8 actionFlagState[4];     /* 0x32C: refreshed after action modifiers */
     u16 movementLoadPercent;   /* 0x330: reduces base movement speed (tentative) */
     u16 menuSnapshotValues[3]; /* 0x332: copied to menu panel +0x48B0 (tentative) */
@@ -318,7 +338,7 @@ struct Player {
     u8 cueVariant; /* 0x4E0: copied by 0815B404, tentative */
     u8 unk4E1[5];
     u16 formCueParameterA;      /* 0x4E6: set to 6 for form two, cleared when its cue exits. */
-    u16 terrainRecoveryCounter; /* 0x4E8 */
+    u16 terrainRecoveryCounter; /* 0x4E8: vertical scale during scripted cues */
     u16 formCueParameterB;      /* 0x4EA: paired with formCueParameterA. */
     u16 actionCountdown;        /* 0x4EC: mode phase subtracts thirty per update */
     u8 actionEighteenEnabled;   /* 0x4EE: selects phase one and refreshes action parameters */
@@ -336,7 +356,8 @@ struct Player {
     u16 interactionPromptFlags; /* 0x520: bits OR'd in by ControlPanel based on interactionPromptCategory (tentative) */
     u16 displaySegmentCount; /* 0x522: input hits in the 32-frame history, clamped to seven for display. */
     u16 indicatorUpdateRate; /* 0x524: player input animation rate, used as the control panel phase divisor. */
-    u8 unk526[8];
+    u16 unk526;
+    u16 cueRemaining, cueElapsed, cueRequired;
     u16 actionAccumulatorBlocked; /* 0x52E: nonzero prevents accumulation */
     u16 scriptStatus[2];          /* 0x530: script keyword s selects a nonzero status */
     u16 sceneMode;                /* (guess) */
@@ -358,16 +379,18 @@ struct Player {
     u16 interactionPromptCategory; /* 0x578: selects which bit ControlPanel ORs into interactionPromptFlags (tentative) */
     u8 unk57A[0x58C - 0x57A];
     void (*triggerAnimationCallback)(struct Player *); /* 0x58C */
-    u8 unk590[8];
+    struct SceneVec cueDestination;
     u16 recoilSpeed;             /* 0x598: decays by three quarters per update */
     u8 animationBranchRequested; /* 0x59A: selects phase one in 081502AC */
     u8 cuePhase;                 /* 0x59B: reset by cue-seven mode two (tentative) */
     u8 kindTwoEntered;           /* 0x59C: set by 0815AD78, tentative */
     s8 targetFacing;             /* 0x59D: shortest-turn target in 0814FA10 */
-    u8 kindTwoState;             /* 0x59E: cleared by 0815AD78, tentative */
-    u8 unk59F[4];
+    u8 kindTwoState;             /* 0x59E: cue completion kind; also cleared by 0815AD78 */
+    u8 cueAcknowledgementPending;
+    u8 unk5A0;
+    u8 cueParticlesEnabled, cueParticleFrame;
     u8 pendingAnimationTrigger; /* 0x5A3: consumed by 0814F90C */
-    u32 cueParameter;           /* 0x5A4: forwarded cue parameter, tentative */
+    u32 cueParameter;           /* 0x5A4: forwarded cue parameter / completion script */
     u8 unk5A8[0x10];
     u8 effectGroup; /* 0x5B8: scene effect group context */
     u8 movementModifierKind, unknown5BA, movementModifierActive; /* 0x5B9: tentative */
@@ -390,10 +413,11 @@ struct Player {
     void *directionalEffectCallback; /* 0x864 */
     u8 unk868[0x218];
     struct SceneVec actionOrigin; /* 0xA80: offset copy of position (tentative) */
-    u8 unkA88[4];
+    u32 unkA88[1];                /* cue particle pool handle; array keeps existing storage users */
     struct SceneVec movementStart, movementDestination; /* 0xA8C, 0xA94 */
     u16 movementDuration;                               /* 0xA9C */
-    u8 unkA9E[0x10];
+    u16 cueSpeed;                                       /* 0xA9E */
+    u8 unkAA0[0xE];
     u16 actionResetCounter;  /* 0xAAE: reset when starting a variant action (tentative) */
     u16 menuStatusValues[8]; /* 0xAB0: panel selects indices 0, 2 or 6 (tentative) */
     u8 unkAC0[2];

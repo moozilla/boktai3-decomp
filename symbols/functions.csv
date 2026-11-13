@@ -5434,9 +5434,9 @@ addr,name,mode,confidence,source,notes
 0814F804,PlayerCue_EnterStandUpdate,thumb,low,src-alias,Selects standing motion and installs the standard standing update callback
 0814F828,ScriptActor_EnableCompletionScript,thumb,low,src-alias,Selects completion mode 1 so finishing an action invokes its stored script
 0814F838,ScriptActor_CallCompletionScript,thumb,low,src-alias,Clears and calls the stored completion script when nonzero
-0814F858,PlayerCue_BeginAcknowledgement,thumb,low,src-alias,Selects trigger completion mode and marks a cutscene acknowledgement pending
-0814F874,PlayerCue_AcknowledgePendingTrigger,thumb,low,src-alias,Consumes the pending player trigger once and clears its acknowledgement flag
-0814F89C,PlayerCue_CompleteAction,thumb,low,src-alias,Dispatches action completion to the stored script or pending trigger acknowledgement
+0814F858,PlayerCue_BeginAcknowledgement,thumb,low,src-alias,Set cue completion kind two and mark its receiver acknowledgement pending
+0814F874,PlayerCue_AcknowledgePendingTrigger,thumb,low,src-alias,Consume receiver trigger one once and clear acknowledgement pending
+0814F89C,PlayerCue_CompleteAction,thumb,low,src-alias,Complete a cue by calling its script or acknowledging its receiver according to kind
 0814F8C8,PlayerCue_UpdateHidden,thumb,low,src-alias,Hidden cue update callback that repeatedly sets actor flag bits 0 and 2
 0814F8D4,PlayerCue_UpdatePeriodicParticles,thumb,low,src-alias,Emits a particle effect every eight updates while the cue effect flag is enabled; particle identity is tentative
 0814F90C,Player_UpdateTriggerAnimation,thumb,low,src-alias,
@@ -5465,7 +5465,7 @@ addr,name,mode,confidence,source,notes
 08151A14,PlayerCue_UpdateTurningPalette,thumb,low,src-alias,
 08151D90,Player_RestartAnimationFromSetup,thumb,low,src-alias,
 08151EB8,PlayerCue_UpdateWalkTarget,thumb,low,src-alias,
-08152174,PlayerCue_UpdateMotionFade,thumb,low,src-alias,
+08152174,PlayerCue_UpdateMotionFade,thumb,low,src-alias,Six-phase secondary drawable fade with shared sequence playback and scale channels
 08152A5C,PlayerCue_UpdateRecoilSlide,thumb,low,src-alias,
 08152C3C,PlayerCue_UpdateAlternateFormChange,thumb,low,src-alias,confidence=low: changes alternate form while advancing its auxiliary display
 08153224,PlayerCue_UpdateFormChange,thumb,low,src-alias,
@@ -5480,10 +5480,10 @@ addr,name,mode,confidence,source,notes
 08154EE4,PlayerCue_RestartAlternateAnimation,thumb,low,src-alias,
 08155008,PlayerCue_UpdateAlternateFade,thumb,low,src-alias,
 081556E0,Player_UpdateStateMotionCue,thumb,low,src-alias,
-081559A4,Player_UpdateTimedChargeAction,thumb,low,src-alias,
-08155D58,PlayerCue_UpdateTimedChargePulse,thumb,low,src-alias,confidence=low: timed held action with pulsing overlay and completion script
+081559A4,Player_UpdateTimedChargeAction,thumb,low,src-alias,Timed held charge state machine with near particles and completion script
+08155D58,PlayerCue_UpdateTimedChargePulse,thumb,low,src-alias,Timed held charge pulse with far particles and triangular effect duration
 081561A8,PlayerCue_UpdateStandDiagonalB,thumb,low,src-alias,Alternate diagonal standing callback that completes the cue after two animation completion checks
-081561EC,PlayerCue_UpdateTargetDash,thumb,low,src-alias,confidence=low: scripted alternate-position approach strike and return
+081561EC,PlayerCue_UpdateTargetDash,thumb,low,src-alias,Dash toward the scripted target with alternate position interpolation and particle trail
 08156BBC,Player_GetInputDirection,thumb,low,src-alias,
 08156C1C,Player_UpdateDirectionHistory,thumb,low,src-alias,Shifts ten direction samples and records the current input direction adjusted by the actor direction offset
 08156C68,Player_StopMovementEffects,thumb,low,src-alias,Stops form dependent movement sounds and clears an active auxiliary effect; movement ownership is tentative
