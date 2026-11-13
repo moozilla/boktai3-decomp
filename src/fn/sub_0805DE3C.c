@@ -1,4 +1,5 @@
 #include "scene_hud_display.h"
+#include "sun_clock.h"
 void SceneHud_DrawClock(u32 mode)
 {
     u16 *output = SceneHud_GetMapCell(0, 20, 0);
