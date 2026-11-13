@@ -2147,3 +2147,14 @@ which is exactly `10:1`. Not tested.
   name; now they fall back to the only function in the dump), and a trailing
   FUNC argument to `life` was read as a variable name; a `sub_ADDR` name that
   the CSV has since renamed raised a KeyError.
+
+220. **Separate cursor increment and masking to keep one local-alloc death.**
+   `index = (index + 1) & mask;` expands through a temporary, so flow marks
+   the old cursor dead before each reassignment. With four draws, the cursor
+   has four deaths and local-alloc rejects it even though it stays in one block.
+   `index += 1; index &= mask;` keeps one continuous life and one death. In
+   ProximityEmitter_EmitParticle (08051A8C), this moves the cursor from global
+   r7 to local r1 and restores the table, pointer and mask allocation: the
+   pin-free draft drops from 52/48 differing instructions to one missing copy.
+   Nine pins can be removed from the matching partial. `sp_split_masked_update`
+   offers the rewrite for unsigned word locals and independent masks.
