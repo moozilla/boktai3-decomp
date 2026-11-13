@@ -1452,3 +1452,27 @@ Next: reduce w's effective priority or extend its meaningful lifetime while
 preserving its in-loop address materialization; alternatively recover another
 object reference that survives CSE. The exact priority knob is available to
 verify that a candidate addresses the right decision.
+
+### Collectible_UpdateEntry (08115674)
+
+Tags: phase3, dp-field-b, Collectible_UpdateEntry
+
+Partial landed: shared DisplaySequence_StepSprite removes the animation
+constraints and volatile reads; named camera, spatial-entry, and callback
+fields replace offsets. Only the original hit:r5 pin remains. Unit MATCH.
+
+The pin-free draft differs by 8/8, all the r5/r6 swap between hit and flagsPtr.
+AGBCC_PRI=hit:+100 MATCHES. Both have four references; flagsPtr lives 28
+insns (priority 2857), hit 29 (2758), so flagsPtr takes r5 first.
+CSE_NOCANON=hit does not change the result.
+
+Tried byte/halfword/signed hit locals, early palette pointer, several narrow
+damage calculations, an early-exit label, moving the flags-pointer assignment
+after the join (same code), and before the proximity test (worse). Taking
+callback/tick field addresses before the flag store changes addressing and
+loses instructions. Inline death-marking and callback helpers with byte and
+word arguments still give 8/8.
+Next: seek a natural extra live instruction for flagsPtr or a shorter hit
+lifetime; only a two-instruction difference is needed, but moves that change
+source order have also changed the ROM instruction order. Do not add dummy
+references or statement wrappers to adjust priority.
