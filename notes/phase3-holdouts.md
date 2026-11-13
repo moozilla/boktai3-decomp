@@ -1993,3 +1993,169 @@ Persistent store: `build/matchsearch/ScenePanel_UpdateTimePalette`, including th
 exact isolated reload-rotation counterfactual. Next: remove the input/panel copy
 class-head lifetime inflation in ordinary C, then eliminate the second target
 spill while preserving the six intended scratch slots.
+## dp-scene1-b (Codex)
+
+### SceneActorRegistry_TestNearestPlayerBounds (08070C24)
+
+Tags: `08070C24` `phase3` `register-allocation` `reload`
+
+Two redundant pins removed and checked MATCH. Seven pins and three barriers
+remain in the landed source. The saved pin-free draft uses existing route
+members and direct bounds expressions; it differs in 40 ROM / 39 draft
+instructions (shape 27), chiefly allocation and stack slots. Bounds spills,
+nearestIndex takes a high register, and bestDifference spills instead of
+occupying r6/r7. Moving vector subtraction to an inline helper and replacing
+the pointer loop with indexing did not resolve those lifetimes; a natural for
+loop worsened instruction shape.
+
+The closest broader partial replaces the two route offset temporaries with
+`SceneActorRegistryResetView.group.homeRoute` members and removes the initial
+player-table pin/barrier. Only the signed delta-x load differs: its zero index
+uses r1 instead of r2. Scope identifies reload choice 6; diagnostic
+`AGBCC_SPILL=6:1` makes that partial MATCH. The preceding player-table reload
+chooses r0. Early category returns, table-first declarations, and direct table
+assignment do not change the decisive rotation. This partial remains only in
+scratch because it is not a stock-compiler match.
+
+Removing the final limit pin swaps component and limit registers. Separate
+block locals, narrower types, and assigning the negated limit still swap them.
+Writing the lower test as `component + limit < 0` fixes allocation but emits
+an add and compare in place of cmn. The component is a multi-set global while
+the limit is local; increasing the limit priority alone did not resolve it.
+Next: recover the original aggregate/vector helper lifetime to keep bounds
+and bestDifference in registers, then revisit the signed bounds predicate.
+Scope's hunk matching also pairs unrelated same-form stack stores/moves in
+this function; investigate value-aware alignment before trusting those why
+messages as allocation evidence.
+
+### SceneActorRegistry_RestoreActorDefaults (080718D8)
+
+Tags: `080718D8` `phase3` `reload` `snapshot`
+
+Landed seven pin and eight barrier removals (47 to 32 concessions), checked
+MATCH. Shared terrain EnterState and InstallControl replace the initial reset
+block; removing the five offset2 bindings/barriers together restores the later
+0x5D9/0x5DA reload choices. Removing any one alone obscured that interaction.
+
+Best pin-free draft is now 15 ROM / 15 draft instructions different, shape 2
+(previous raw-offset draft was 158 / 156). The entire no-object branch becomes
+exact with direct member copies and stores. In the other branch, deleting an
+unused destination-address assignment before field2B5 restores its value load
+allocation, reducing 19 differences to 15. Fully converting the other branch
+or the tail to members shifts many preceding allocations and was worse.
+
+Remaining gate flags load uses r1 rather than r4; diagnostic
+`AGBCC_SPILL=55:3` fixes those five instructions, leaving ten differences.
+The hitReactionLatch, motion5B8, field5C4 and field5C2 addresses have subsequent
+reload rotation differences. ResetResponseState's unused index calculation
+moves before the destination copy, leaving the shape distance of 2. Wrappers
+with halfword index parameters and an argument expression do not change it.
+Keeping the existing gate and destination barriers reduces the draft to nine
+register-only differences, but is not concession-free. Keeping more original
+second-branch pins interferes with the now-exact first branch.
+
+Next: recover a snapshot/reset helper boundary that gives the gate and tail
+address constants independent reloads; examine the call's unused forwarded
+arguments and original helper signature. Keep the direct first branch intact.
+
+### SceneActorPalette_BeginTransition (08071E00)
+
+Tags: `08071E00` `phase3` `palette` `allocation`
+
+No stock-compiler removal landed. Saved pin-free member/index draft differs
+83 ROM / 81 draft instructions (shape 54), against 90 / 92 (shape 62) for the
+mechanical pin removal. Prior round11-c work already tried 95 removal groups
+and 24 search variants. This pass used the matched Axe initializer as a fresh
+array-loop model, pointer byte stores, natural do loops versus goto loops,
+member channel pointers, typed channel getters, channel-address helpers, and
+red work repeated in both sampling arms. None restored the original loop's
+allocation or its separate mask lifetimes. Narrowing the red scratch also
+failed to replace its existing barrier without instruction changes.
+
+Scope proves transition is allocated before base (3428 versus 2941 priority),
+taking r6 instead of r7. Diagnostic `AGBCC_PRI=base:+488` flips the ordering
+and improves to 75 / 73 differing instructions, but is not a full matching
+knob. Duplicating red work in both arms changes allocation but worsens the
+shape. global.c's allocno_compare uses refs * floor_log2(refs) / live length;
+source variables alone do not create independent channel-pointer lifetimes
+because CSE folds them. Halfword array indexing improves shape but joins the
+byte and halfword induction values; the ROM keeps independent i and 2*i.
+The color mask is cached across five uses where the ROM has separate masks.
+
+Persistent evidence: build/matchsearch/SceneActorPalette_BeginTransition;
+member/index root and arm-red hypothesis retained. Next: recover the original
+RGB extraction/update helper so independent masks and induction values arise
+from real types; then revisit transition/base density and final flag reloads.
+The full difference is not explained by one knob yet. Source remains matching
+with its original concessions.
+
+### SceneActorPalette_ApplyTransition (08071F50)
+
+Tags: `08071F50` `phase3` `palette` `allocation`
+
+Landed the flagSet barrier removal with the byte-valued Test helper in each
+category arm, retaining the original goto order. Check MATCH, 468 bytes.
+The source retains 18 pins and three barriers. The pin-free base with that
+helper has 102/104 differing instructions, shape 40. A do loop improves it
+to 88/90, shape 40. Repeating the manager flag write in each category arm
+further improves allocation (actor r7, manager r8 and category r9) but leaves
+duplicate tails: saved draft 80/86 differences, shape 30.
+
+Confirmed priority decisions: i loses to actor (1846 versus 2258);
+AGBCC_PRI=i:+413 improves the base to 98/100. manager loses r8 to category;
+AGBCC_PRI=manager:+160 also improves to 98/100. A real do loop and repeated
+arm writes reproduce parts of those changes. Remaining frame growth comes
+from colorCursor spilling; channel address construction and blueSum allocation
+remain wrong. The direct member loop, ordered pointer declarations, s16 index,
+and mask-first predicate did not recover the original allocation. Direct
+actorFlags member access alone differs in six register instructions. The full
+difference is not explained by a single matching knob.
+
+Persistent evidence: build/matchsearch/SceneActorPalette_ApplyTransition.
+Next: recover the channel pointer setup and signed-byte update helper; the
+ROM uses byte load/shift for red and green, indexed ldrsb for blue. Preserve
+the byte flag helper and category arm order that already remove a barrier.
+
+### sub_08072204 (08072204, active palette binding)
+
+Tags: `08072204` `phase3` `cse`
+
+One pin remains; no landing. Pin-free draft differs in four instructions,
+shape 2. CSE changes the manager load destination to transition, deleting the
+initial r1-to-r3 copy; category23 then adds from r3 instead of r1. All later
+instructions match. CSE_NOCANON=25 restores r1 but emits the copy only in the
+category10 arm (100-byte function versus 96); it is a diagnosis, not a match.
+
+Tried union/struct pointer initializers, reversed initialization/declaration
+order, separate reads of the same global, structured category branches, a
+transition-selection helper, and a u32 manager predicate. None preserves the
+original early copy. Selector helper additionally reads category before the
+manager null check, so it is not the saved candidate. The saved draft keeps
+original control flow and removes the duplicate local name alias.
+
+Next: inspect CSE copy elimination/REG_EQUIV and find the original ownership
+or view helper that keeps manager and transition independent until selection.
+
+### SceneActorContacts_ReleaseInvalidOwners (08072D34)
+
+Tags: `08072D34` `phase3` `loop` `regmove`
+
+No landing; best pin-free draft improves from 38/38 differences, shape 26,
+to 11/9 differences, shape 2. Reuse the clear-result variable for cooldown 120
+in each arm to prevent loop hoisting (goto-loop form independently produces
+the same improvement). Return the state-field address through Unavailable's
+output parameter to recover flags r4/state r1 allocation. This reproduces the
+improvement of diagnostic AGBCC_PRI=state:+8664 on the preceding draft.
+
+Remaining: regmove ties each clear AND to the dying flags input, losing the
+ROM's mask copy into r0. Zero/valid then use r0 rather than r1. Scope proves
+fixup_match_1 at insn196; AGBCC_NOTIE=196 restores the copy but changes later
+allocation (13/13 differences), so no full matching knob yet. Tried byte and
+halfword masks/results, union byte reads, shared clear/valid temporaries,
+reversed AND operands, clear-owner helper, and retaining subsets of original
+pins. None matched. Retaining final value/valid pins changes earlier allocation;
+removing the actor group alone does not independently match.
+
+Next: recover a typed flag-update helper that blocks the dying-input tie while
+keeping the final valid zero available for the owner store. Preserve the two
+ordinary-C lifetime fixes in the saved draft.

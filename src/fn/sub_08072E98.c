@@ -1,10 +1,41 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
 #include "player.h"
 struct SceneActorContactObjectView {
     u8 unknown0[8];
     u8 playerSlot;
 };
+static inline u8 TestCondition(struct Player *input, u32 condition)
+{
+    struct Player *player = input;
+    u32 result;
+    if (input->active && input->sceneMode == condition) {
+        result = 1;
+        goto done;
+    }
+    if (!condition) {
+        if (player) {
+            u32 *field = &player->actionFlags;
+            u32 mask = 4;
+            if (*field & mask) {
+                result = 1;
+                goto done;
+            }
+        }
+        goto fail;
+    }
+    if (condition == 1 && player) {
+        u32 *field = &player->actionFlags;
+        u32 mask = 0x40;
+        u32 value = *field & mask;
+        result = 1;
+        if (value)
+            goto done;
+    }
+fail:
+    result = 0;
+done:
+    return result;
+}
 u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactObjectView *object, u32 mode,
                                           u32 condition)
 {
@@ -29,62 +60,12 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactObjectView *ob
     if (!player)
         return 0;
     if (!mode) {
-        struct Player *input = player;
-
-        struct Player *player = input;
-        u32 offset = 0x538;
-        u32 value;
-        u32 result;
-        value = *(u16 *)((u32)input + offset);
-        if (value) {
-            offset -= 4;
-            {
-                u16 *field = (void *)((u32)input + offset);
-                value = *field;
-            }
-            if (value == condition) {
-                register u32 one asm("r1") = 1;
-                asm("" : : "r"(one));
-                goto success;
-            }
-        }
-        if (!condition) {
-            if (player) {
-                u32 fieldOffset = 0x448;
-                u32 mask;
-                u32 *field;
-                field = (void *)((u32)player + fieldOffset);
-                mask = 4;
-                if (*field & mask) {
-                    register u32 one asm("r1") = 1;
-                    asm("" : : "r"(one));
-                    goto success;
-                }
-            }
-            goto fail;
-        }
-        if (condition == 1 && player) {
-            u32 fieldOffset = 0x448;
-            u32 mask;
-            u32 *field;
-            u32 value;
-            field = (void *)((u32)player + fieldOffset);
-            mask = 0x40;
-            value = *field & mask;
-            result = 1;
-            if (value)
-                goto finalResult;
-        }
-    fail:
-        result = 0;
-    finalResult:
-        if (!result)
-            goto failure;
-        goto success;
+        if (!TestCondition(player, condition))
+            return 0;
+        return 1;
     }
     if (mode != 1 || !(player->statusFlags & condition))
         goto failure;
-success:
     return 1;
 failure:
     return 0;
