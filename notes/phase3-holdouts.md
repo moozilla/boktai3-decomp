@@ -1267,3 +1267,37 @@ knob confirm that the other differences are consequences of origin/angle placeme
 and reload rotation. Next idea: recover a first-sample helper whose short-lived origin
 use survives until combine, allowing local allocation to reserve r3 before the angle.
 No new concession or compiler override was landed.
+
+### sub_0801404C (0801404C, src/fn/sub_0801404C.c): partial, table barrier remains
+
+Removed three of four barriers. Reading coordinates through `CoordinateBits` keeps
+PRE from sharing the early signed x load with the later motion load. A local graphics
+struct names the resource tile field. Splitting the two presentation fallback paths,
+repeating their tails and jumping to one `age` label gives resource 10 references
+across two calls. GCC's caller-save profitability test is `4 * calls < refs`: the
+original ordinary form has only 8, so resource takes r8 instead of caller-saved r3.
+The repeated tails cross-jump after allocation. The complete unit matches with the
+original table barrier and direct sampler; no other barrier remains.
+
+Best pin-free unit: `notes/phase3-drafts/dp-effects/sub_0801404C.c`. Shared
+`ParticleRandom_ReadSample` retains the table but leaves only 7 ROM / 7 draft
+instructions different: sprite and table swap sb/sl. `AGBCC_PRI=sprite:+34` matches.
+At this point resource is r3 (10 refs, life 204, priority 1470), random-index address
+is r8 (13 refs, doubled life 570, priority 684), table is sb (10 refs, doubled life
+576, priority 520), and sprite is sl (7 refs, life 287, priority 487).
+
+Tried: direct/value coordinate helpers and by-value vectors; only the bit helper
+keeps the ROM load order. Duplicating presentation tails without the join label
+leaves extra tails. Sprite cursor derivation from the particle or indexed group
+changes induction/initialization. Typed records and a union cursor give the same
+7/7. Repeating cursor advancement in two or three arms raises it above random-index
+and leaves unmerged additions because reload rotates their scratch registers.
+Repeating particle advancement too changes loop control. A for loop is unchanged;
+a goto loop loses useful hoists. One direct sample reduces table references enough
+that the hoisted -256 mask beats it and the table is rematerialized. The barrier plus
+table-first samples over-prioritizes table; the barrier plus direct samples matches.
+
+Persistent evidence: `build/matchsearch/sub_0801404C`; all source experiments in
+`build/cx/work/sub_0801404C`. Next: add one sprite reference that disappears after
+flow, or reduce table density slightly while keeping the -256 mask below it. A
+sampler or cursor helper with a useful late-eliminated copy may supply that effect.
