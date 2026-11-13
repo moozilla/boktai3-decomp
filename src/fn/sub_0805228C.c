@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
 void StackedActor_InitFallingParticle(struct StackedActorParticle *particle,
                                       struct StackedActorPosition *position)
@@ -7,11 +6,11 @@ void StackedActor_InitFallingParticle(struct StackedActorParticle *particle,
     {
         u16 *random = (u16 *)RANDOM_TABLE_ADDR;
         u32 *rng = &gRandomIndex;
-        register u32 index asm("r3") = *rng + 1;
+        u32 index = *rng + 1;
         u32 mask = 1023;
         u32 zero;
         u32 sample;
-        register u32 coordinate asm("r1");
+        u32 coordinate;
         u16 *sampleAddress;
         index &= mask;
         sample = random[index];
@@ -23,12 +22,12 @@ void StackedActor_InitFallingParticle(struct StackedActorParticle *particle,
             coordinate += sample;
             zero = 0;
             particle->position.x = coordinate;
-            index = (index + 1) & mask;
+            index += 1;
+            index &= mask;
             sampleAddress = (u16 *)(index * 2 + (u32)random);
-            coordinate = (u16)particle->position.y;
-            coordinate += *(u8 *)sampleAddress;
-            particle->position.y = coordinate;
-            index = (index + 1) & mask;
+            particle->position.y = (u16)particle->position.y + *(u8 *)sampleAddress;
+            index += 1;
+            index &= mask;
             sample = random[index];
             coordinate = (u16)particle->position.z;
             coordinate -= 15;
@@ -40,7 +39,8 @@ void StackedActor_InitFallingParticle(struct StackedActorParticle *particle,
                 u32 zeroX = zero;
                 particle->velocityX = zeroX;
             }
-            index = (index + 1) & mask;
+            index += 1;
+            index &= mask;
             {
                 u32 *store = rng;
                 *store = index;

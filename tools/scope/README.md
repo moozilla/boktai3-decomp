@@ -2227,3 +2227,49 @@ which is exactly `10:1`. Not tested.
    disappear. A goto to a fall-through function end compiles identically. This is
    fact 95 with mixed explicit and unspecified returns, rather than no return
    statements anywhere in the function.
+220. **Separate cursor increment and masking to keep one local-alloc death.**
+   `index = (index + 1) & mask;` expands through a temporary, so flow marks
+   the old cursor dead before each reassignment. With four draws, the cursor
+   has four deaths and local-alloc rejects it even though it stays in one block.
+   `index += 1; index &= mask;` keeps one continuous life and one death. In
+   ProximityEmitter_EmitParticle (08051A8C), this moves the cursor from global
+   r7 to local r1 and restores the table, pointer and mask allocation: the
+   pin-free draft drops from 52/48 differing instructions to one missing copy.
+   Nine pins can be removed from the matching partial. `sp_split_masked_update`
+   offers the rewrite for unsigned word locals and independent masks.
+
+221. **A literal mask in a halfword field expression can retain a copy from a high register.**
+   In ProximityEmitter_EmitParticle (08051A8C), `sample &= mask; p->position.x = base + sample - 127;`
+   with a word `mask = 255` sets and reads the shared mask in SImode. Reload inherits the low
+   register used to set r8 and omits the ROM's `mov r6, r8`. Writing
+   `p->position.x = base + ((sample >> 4) & 255) - 127;` makes the constant HImode and uses it
+   through an SImode subreg. The mode mismatch prevents inheritance, and the copy survives.
+   This removes the final pin and both barriers after fact 220's cursor rewrite. A narrower
+   mask variable alone does not do it: promoted scalar locals still expand in SImode.
+   `why all` now recognizes the missing inverse copy from matching pre/post-reload RTL,
+   distinguishes it from a copy removed after reload, and records the mechanism in its JSON summary.
+
+222. **Keep a halfword preincrement inside its cadence test before introducing a helper.**
+   `if ((++object->particleFrame & 7) == 0)` retains the full halfword mask and
+   its copy to a second register. Separating the increment, store, return and
+   mask through a word-returning helper gives cse a different promoted value;
+   the constant copies fold, and reload uses a different spill register. In
+   ProximityEmitter_TickActive (08051BD8), the direct expression recovers both
+   mask copies and the entry-script address calculation, removing four pins
+   and five barriers. The same form removes two pins and three barriers in
+   ProximityEmitter_TickRise (08051CB4). TetherActor_UpdateLockedShake's direct
+   cadence test was the matched relative that identified the source form.
+
+223. **A halfword-returning arithmetic helper can keep an offset together before a later add.**
+   `destination->y = (limit - height) * 171 + offset + worldY` lets expansion
+   associate the narrow offset/world addition before adding the product.
+   `destination->y = SegmentOffset(limit, height, offset) + worldY`, with
+   `static inline u16 SegmentOffset(...)`, preserves the product/offset group
+   through inlining. StackedActor_UpdateSegments (08052418) also needs the
+   world-height pointer computed before the first helper call; that changes
+   reload's first choices and recovers every later arm, removing 41 concessions.
+   StackedActor_InitRisingParticle (080521DC) similarly matches with a u16
+   helper returning `768 + (u16)particle->position.y` before adding the random
+   byte. The u32/s32 return forms lose a constant copy; a direct field expression
+   has the correct shape but different local allocation. Helper return width
+   is a semantic expansion boundary even when the final store truncates too.

@@ -2851,3 +2851,201 @@ store changes access width; u64 value changes shape; moving display's copy
 earlier changes the register graph. Next: fold the helper's address-copy pseudo
 into the load while retaining its local allocation, or another real visibility
 helper that produces that load/store ordering.
+## dp-field-b (Codex)
+
+Tags: #phase3 #field-objects
+
+### ProximityEmitter_InitializeFromScript (08051EA8): two terrain pointer pins remain
+
+Landed a partial removing eight pins and four barriers. Independent graphics/sprite
+locals for the two draw packets shorten their lifetimes and reproduce the entire
+sprite initialization. Named script fields replace the constrained offset stores.
+The pin-free draft is `notes/phase3-drafts/dp-field-b/ProximityEmitter_InitializeFromScript.c`:
+16 ROM / 16 draft instructions, shape 0. Only point, yAddress and cell rotate among
+r4/r5/r6. The cell pseudo is allocated first (priority 3333), before point (1944)
+and yAddress (379). Its first constant set doubles its live length in local allocation.
+`AGBCC_FORCE=point:4,yAddress:5` confirms MATCH; priority on point alone removes
+half the differences. This is an allocation decision, not a missing instruction.
+
+Tried independent draw scopes (decisive), direct field calls (45/43), terrain inline
+helper (16/16 plus order), array/union pointer locals and a coordinate-array pointer
+(all 16/16), moving cell zero initialization earlier (13/11, shape 10), and putting
+the nonconstant cell arm first (22/22 with changed branches). Earlier pass tried
+24 variants. Next: recover a terrain-expression form whose cell lifetime spans
+more of position parsing, or whose pointer temporaries have the original priority.
+Do not undo the independent draw scopes: they removed twelve concessions.
+
+### StackedActor_Initialize (080532B0): independent allocation and loop holdouts
+
+No new partial landed. The saved pin-free draft uses named fields and indexed
+segment accesses: `notes/phase3-drafts/dp-field-b/StackedActor_Initialize.c`.
+It differs by 116 ROM / 118 draft instructions, shape 46, versus 120/124 for
+simple removal. The ordinary draft has a 28-byte frame rather than 24 bytes.
+The first terrain conflict is the same index/world/worldY rotation as the
+ProximityEmitter initializer (index priority 3333, world 1944, worldY 379).
+`AGBCC_PRI=world:+1390` removes eight differences in the baseline; no single
+matching knob for the whole function has been found. The position-copy source
+prefers r0 rather than r3, changing load order; force source#2 to r3 removes
+three more. Loop current/selected pseudos also differ, independently.
+
+Investigated loop hoisting: `one` has two equal invariant sets that loop.c
+combines and hoists. `AGBCC_NOMOVE=930` on the saved draft improves 116/118 to
+115/117, so this alone is not the main blocker. Tested direct frame field
+expressions, named/indexed segment accesses, goto loops (worse 152/152), normal
+and explicit-word copy helpers (best shape 40, 122/124), cell-index helpers
+with raw-coordinate halfword returns, literal byte stores, and fixed-field
+store replacements on the pinned original (none independently free). Earlier
+passes also tried 24 source forms. Next: separate the copy helper's source
+allocation from the loop current/selected allocation; recover the cache/frame
+layout before attempting global pin removal again. Do not sweep register pins.
+
+### InteractionMarker_InitializeFromScript (08053AEC): two terrain pointers remain
+
+Landed nine pin removals and both barrier removals. Named pointer fields and
+aggregate position copies restore the sprite setup; initializing the default
+argument-clear loop after the view assignments restores reload order. Moving
+the bodyEnabled store into each keyword arm makes the joined condition reload
+the byte, eliminating the memory barrier without volatile storage.
+
+The saved pin-free draft is `notes/phase3-drafts/dp-field-b/InteractionMarker_InitializeFromScript.c`:
+16/16, shape 0, entirely the familiar cell/point/yAddress r4-r6 rotation.
+Restoring only the original point:r4 and yAddress:r5 bindings is exact MATCH.
+The same priority conflict and next ideas as ProximityEmitter's initializer apply.
+Private word copies were 85/85; aggregate copies improved to 39/37; late clear-loop
+initialization reached 17/17; branch stores reached 16/16. A pointer store and a
+byte-returning bodyEnabled getter did not restore the byte reload.
+
+### SavedPositionMarker_InitializeFromScript (08054028)
+
+Tags: phase3, dp-field-b, SavedPositionMarker_InitializeFromScript
+
+Partial: removed the final copy barrier using a ContactPosition temporary;
+the unit still matches. Direct aggregate assignment alone changes the
+destination reload order by one instruction; the temporary preserves it.
+
+The best pin-free draft differs by 47 ROM / 41 draft instructions (shape 22).
+Its independent blockers are the terrain yAddress allocation, sprite-view
+reload order, palette-store cross-jumping, palette-source reload registers,
+and resourceId/priority allocation. Raising yAddress priority by 2955 on the
+52/46 baseline improves it to 38/34 but does not match.
+
+Tried named field preparations in each script arm, late default-loop setup,
+aggregate and temporary position copies, palette helper parameters, literal
+priority stores, early priority initialization, and repeating the graphics
+load after each palette store. The last form worsens cross-jumping; the
+helper does not change palette reloads. Named field preparation alone on the
+pinned original still differs by 30/30, so it cannot yet land as a partial.
+Next: separate the two graphics setup lifetimes and test a value-returning
+palette selector to hold its graphics argument live across the halfword load.
+
+### TerrainEdgeMarker_FindTerrainDirection (08056298)
+
+Tags: phase3, dp-field-b, TerrainEdgeMarker_FindTerrainDirection
+
+No partial landed. The genuinely concession-free draft removes the undefined
+allocation-only scratch left by the pins command as well as all 34 pins and
+nine barriers. It differs by 224 ROM / 190 draft (shape 96; draft 1380 bytes
+versus ROM 1448). Region allocation, shared mask priorities, and cross-jump
+merging affect all four probes. Raising insideCell priority by 686 improves
+the diagnostic baseline to 214/180; sourceHeight +1136 gives 223/189. No
+matching knob is known.
+
+Focused partial attempts: aggregate or array initialization of maxZ/minZ
+replaces the scratch block with only four register differences, but its
+removal also removes r4 from the reload spill set. Both signed loads then use
+r3 for offset 2 where ROM uses r4. A spill-rotation search cannot fix that
+spill-set difference. A narrow midpoint helper differs by seven registers;
+explicit unsigned loads add instructions.
+
+Replacing the two outside-Z pointer barriers by compound field updates has
+only six register differences: the pointer reload chooses r4 instead of r1.
+AGBCC_SPILL=5:1 diagnoses the first choice. Void and halfword-returning
+offset helpers do not change it. Duplicating compare_0 and compare_2 tails
+also leaves six differences; duplicating clear tails worsens branch shape.
+A halfword height-mask helper loses several required shared masks.
+Next: recover the natural extra spill pressure associated with the midpoint
+loads, then retry the pointer barriers with the restored spill set.
+
+### sub_08069788 / BouncingObject_IsActive (08069788)
+
+Tags: phase3, dp-field-b, sub_08069788
+
+No partial landed. Natural nested field tests give 9 ROM / 7 draft (shape 8).
+The ROM preserves two input-pointer copies, consuming r1/r2 and leaving r3
+for the index/timer offsets; the unpinned C coalesces the pointers and reloads
+constants in r2. CSE_NOCANON=input does not restore the copies.
+
+Boolean-return helpers split after the index or timer; narrow return modes
+add branches, while u32 helpers still lose the copies. A pointer-returning
+validator differs by 3/5 but adds branches. Direct conjunction/result-variable
+forms change branch structure.
+
+Focused partial: named index access removes the offset pin and barrier, but
+move2add derives 314 from 311 (adds #3) instead of materializing it. Returning
+early for a negative index restores the constant materialization, leaving
+three register differences at entry: the late copy, null test, and index
+address still use input r0 rather than copied slot r1. Retaining the original
+location pin or index-offset pin does not fix those three differences.
+Next: an inline wrapper boundary that gives the first slot copy a distinct
+lifetime while preserving the early-return label before the timer load.
+
+### sub_080697C8 / BouncingObject_SpawnFromScript (080697C8)
+
+Tags: phase3, dp-field-b, sub_080697C8
+
+Partial: inline vector-clear helper taking destination then source removes
+the CpuSet destination pin and barrier; unit MATCH. The argument boundary
+puts the destination copy ahead of the control constant.
+
+Pin-free draft now 10 ROM / 8 draft (shape 14). The category b gets r8
+before the position pointer, whereas ROM puts position in r8 and b in r9.
+Raising pseudo 130 priority by two on the baseline reverses this allocation
+and improves 11/9 to 7/5. The missing optional-category path reloads zero
+into r0 and cross-jumps with the value path; AGBCC_SPILL=2:1 restores its r1
+reload and improves baseline to 8/8. No combined matching knob yet tested.
+
+Union initialization for the initial category or its missing-value arm does
+not change allocation. A goto at the velocity join also changes nothing.
+Using Script_GetPc's result as b adds differences. The clear helper removes
+one independent instruction-order difference.
+Next: duplicate the next keyword test in the category arms to separate the
+zero reload from the value path before jump2; inspect b's first-set lifetime
+versus the position pointer to reverse their nearly tied allocation order.
+
+### WoodenCrate_ReactToHit (08100144)
+
+Tags: phase3, dp-field-b, WoodenCrate_ReactToHit
+
+One pin remains. The natural helper draft differs by 8/8 (shape 6): caller
+crate and helper target coalesce in r4; ROM keeps a second copy in r5 and
+therefore saves hit in r6. Raising hit priority above crate worsens to 10/10;
+CSE_NOCANON=26 does not restore the missing copy. No matching knob known.
+
+Tried direct helper argument (no target local), a byte result, taking script's
+address before the helper call and passing it separately, and struct/union
+handle arguments. Aggregate handles still coalesce. The early script pointer
+changes which pointer survives but differs 9/9 (shape 4); byte result adds
+branches. Next: inspect the inline formal's equivalence class rather than
+only caller crate, and seek a natural destructive pointer update inside the
+helper that preserves the caller's pointer across both paths.
+
+### FloorSwitch_SetOccupant (0810048C)
+
+Tags: phase3, dp-field-b, FloorSwitch_SetOccupant
+
+Both barriers remain. Consecutive named halfword updates `flags88 |= 2;` and
+`flags88 &= ~1;` recover the zero OR exactly (fact 103), producing a pin-free
+8/8 draft with shape zero. Remaining differences are operand ties: the first
+AND copies f rather than one, and the update OR/AND/store stays in r1 rather
+than r0. Forcing one:r6,f:r1 has no effect because those allocations already
+match. Raising one's priority worsens to 18/18. No exact knob yet.
+
+Constant-first local updates recover the final destination but lose the
+HImode zero OR, leaving 4/2; retaining the first barrier leaves only the two
+missing zero instructions. Direct fields, pointer fields and explicit OR
+assignments keep the HImode insertion but retain the wrong operand tie.
+Narrow one locals, narrow mask-return helpers, a flag union, pointer-based
+testing, a field-setting helper, and a halfword-returning setter do not solve
+both decisions. Next: preserve a HImode field insertion while giving the
+constant its own dying pseudo; inspect regmove's tied operand choice rather
+than only global allocation priority.

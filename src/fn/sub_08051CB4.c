@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
 void ProximityEmitter_TickRise(struct ProximityEmitter *input)
 {
@@ -30,21 +29,6 @@ void ProximityEmitter_TickRise(struct ProximityEmitter *input)
             emitter->primary.sprite.position.y = rise;
         }
     }
-    {
-        u16 *address = &emitter->particleFrame;
-        u32 frame = *address + 1;
-        register u32 mask asm("r3");
-        *address = frame;
-        mask = 0xFFFF;
-        asm("" : "+r"(mask));
-        {
-            register u32 appliedMask asm("r1") = mask;
-            asm("" : "+r"(appliedMask));
-            frame &= appliedMask;
-        }
-        frame &= 1;
-        asm("" : "+r"(frame));
-        if (frame == 0)
-            ProximityEmitter_EmitParticle(emitter, emitter->particleResource);
-    }
+    if ((++emitter->particleFrame & 1) == 0)
+        ProximityEmitter_EmitParticle(emitter, emitter->particleResource);
 }

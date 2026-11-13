@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "breakable_prop.h"
+#include "monster_particle_random.h"
 void BreakableProp_EmitBreakParticles(struct BreakableProp *prop)
 {
     struct {
@@ -15,7 +15,6 @@ void BreakableProp_EmitBreakParticles(struct BreakableProp *prop)
     u32 mask;
     s32 range;
     u32 *indexAddress;
-    register const u16 *random asm("r4");
     local.config.type = 2;
     local.config.flags = 0;
     local.config.speed = 64;
@@ -43,38 +42,42 @@ void BreakableProp_EmitBreakParticles(struct BreakableProp *prop)
     positionProxy = positionCache;
     do {
         local.position.axes = prop->sprite.position;
-        random = (const u16 *)RANDOM_TABLE_ADDR;
-        *indexAddress = (*indexAddress + 1) & mask;
         {
-            s32 sample = Mod(random[*indexAddress], range);
-            register u32 x asm("r1") = (u16)positionCache->x;
-            x -= 150;
-            x += sample;
-            x = (u16)x;
-            local.position.words[0] = (local.position.words[0] & 0xFFFF0000) | x;
+            union ParticleRandomTableSource source = {gRandomTable};
+            *indexAddress = (*indexAddress + 1) & mask;
+            {
+                s32 sample = Mod(source.table[*indexAddress], range);
+                u32 x = (u16)positionCache->x;
+                x -= 150;
+                x += sample;
+                x <<= 16;
+                x >>= 16;
+                local.position.words[0] = (local.position.words[0] & 0xFFFF0000) | x;
+            }
+            *indexAddress = (*indexAddress + 1) & mask;
+            {
+                s32 sample = Mod(source.table[*indexAddress], range);
+                u32 packet = local.position.words[0];
+                s32 y = (s32)packet >> 16;
+                u32 lower;
+                y += sample;
+                y = (u32)y << 16;
+                lower = 0xFFFF;
+                lower &= packet;
+                lower |= y;
+                local.position.words[0] = lower;
+            }
+            *indexAddress = (*indexAddress + 1) & mask;
+            {
+                s32 sample = Mod(source.table[*indexAddress], range);
+                u32 z = (u16)positionProxy->z;
+                z -= 150;
+                z += sample;
+                z <<= 16;
+                z >>= 16;
+                ((u32 *)positionProxy)[1] = (((u32 *)positionProxy)[1] & 0xFFFF0000) | z;
+            }
+            AnimatedParticles_Create(1, positionProxy, &local.config);
         }
-        *indexAddress = (*indexAddress + 1) & mask;
-        {
-            s32 sample = Mod(random[*indexAddress], range);
-            u32 packet = local.position.words[0];
-            s32 y = (s32)packet >> 16;
-            u32 lower;
-            y += sample;
-            y = (u32)y << 16;
-            lower = 0xFFFF;
-            lower &= packet;
-            lower |= y;
-            local.position.words[0] = lower;
-        }
-        *indexAddress = (*indexAddress + 1) & mask;
-        {
-            s32 sample = Mod(random[*indexAddress], range);
-            register u32 z asm("r1") = (u16)positionProxy->z;
-            z -= 150;
-            z += sample;
-            z = (u16)z;
-            ((u32 *)positionProxy)[1] = (((u32 *)positionProxy)[1] & 0xFFFF0000) | z;
-        }
-        AnimatedParticles_Create(1, positionProxy, &local.config);
     } while (--i >= 0);
 }
