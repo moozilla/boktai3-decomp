@@ -1395,3 +1395,29 @@ removing the actor group alone does not independently match.
 Next: recover a typed flag-update helper that blocks the dying-input tie while
 keeping the final valid zero available for the owner store. Preserve the two
 ordinary-C lifetime fixes in the saved draft.
+
+### SceneActorContacts_SelectForActor (08073A3C)
+
+Tags: `08073A3C` `phase3` `allocation` `tracking`
+
+Stopped at the owner's end-of-run instruction. One pin remains in the matching
+source. Saved pin-free draft uses existing tracking/flags members and differs
+only in five instructions: owner and contactFlags swap r9/r10. Scope proves
+owner priority 405 (three refs/live74), contactFlags 410 (three refs/live73).
+Diagnostic `AGBCC_PRI=owner:+6` makes the whole function MATCH, 252 bytes.
+No ordinary-C equivalent has matched yet.
+
+Tried typed tracking access and direct flags2D0 member access, tracking getter,
+tracking-clear and finish-selection helpers, for/do/goto loop forms, using owner
+for the owner store, split switch cases with duplicated bodies and helper calls,
+and duplicated address assignments before a shared dispatch. Splitting cases
+changes dispatch branches and prevents the desired tail merge. Using owner for
+the owner store changes alias canonicalization. Earlier tracking initialization
+flips allocation correctly but moves three instructions, so it is not a match.
+The saved draft retains original instruction order and replaces raw field
+arithmetic with existing structs.
+
+Next: find a real helper or expression that shortens owner's measured lifetime
+by two insns, or lengthens contactFlags by two, without moving emitted code.
+The exact priority threshold and full matching knob isolate that remaining task.
+Scratch variants are under build/cx/work/SceneActorContacts_SelectForActor/.
