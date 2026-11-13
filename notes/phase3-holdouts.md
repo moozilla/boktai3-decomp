@@ -1228,3 +1228,38 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-scene1 (Codex)
+
+Tags: phase3, scene, contact-actor, 0804373C
+
+### ContactActor_UpdateRetreat (0804373C): deferred after allocation diagnosis
+
+The pin-free draft is `notes/phase3-drafts/dp-scene1/ContactActor_UpdateRetreat.c`.
+It uses the established random origin capture and relative final timer sample;
+788 bytes, 95 ROM / 95 draft differences, shape 16. The exact diagnostic is
+`AGBCC_FORCE=slot:7,position:6,origin:8,548:10,angleMask:6,149:1`.
+This reproduces all bytes; no override is part of the draft or landed source.
+The last four differences are the radius sample and its 127 mask. Removing only
+that pin from the landed source gives four differences, and `AGBCC_PRI=150:+1`
+matches exactly: the local sample and mask tie at priority 10000, and the mask
+must win. The sample needs r1 and mask r0.
+
+Tried relative reads for angle, radius, height, jitter, timer and combinations;
+byte/halfword helper returns; narrowed radius and sample locals; a union member;
+mask-before-sample and mask/radius reuse; pointer-based position reads to raise
+position's reference density. None gives a stock match or a partial concession
+removal. Raising position's diagnostic priority by 4000 reduces the pin-free
+baseline to 55/55 differences but still leaves origin and center allocation.
+
+An experimental origin use in the first truncated x computation, ORing its known
+zero low bits, reduces origin's lifetime and correctly gives origin r8 and the
+PRE center sl. With position/slot/mask forced it reaches four differences. That
+artificial zero operation is not the saved draft: find a genuine address or
+sample calculation that ends origin's lifetime there instead. Next ideas: use
+an original-style polar-vector helper to control the mask/sample tie, and shorten
+position's global lifetime rather than merely substituting field reads. The
+Roaming relative's reusable collider/random work pointer may also suppress the
+unwanted constant equivalence. Persistent evidence is in
+`build/matchsearch/ContactActor_UpdateRetreat`; experiments are under
+`build/cx/work/ContactActor_UpdateRetreat`.
