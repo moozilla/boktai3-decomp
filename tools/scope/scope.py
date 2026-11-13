@@ -3777,7 +3777,8 @@ def function_reach(text, func):
     """{name: (start, end)} of FUNC's definition in TEXT and of the inline helpers defined in TEXT that it
     reaches by calls, transitively. Only these can change FUNC's code: agbcc -O2 inlines only functions
     declared inline, and every other definition is compiled on its own. Definitions inside an
-    `#ifdef NONMATCHING` draft are left out (the build compiles the INCLUDE_ASM branch)."""
+    `#ifdef NONMATCHING` draft are left out (the build compiles the INCLUDE_ASM branch).
+    The first entry is FUNC's source spelling, which may be a file-local alias."""
     drafts = []
     for m in re.finditer(r"^#\s*ifdef\s+NONMATCHING\b.*?^#\s*endif\b", text, re.M | re.S):
         drafts.append((m.start(), m.end()))
@@ -3790,7 +3791,24 @@ def function_reach(text, func):
             continue
         inline = bool(re.search(r"\b(?:inline|__inline|__inline__)\b", head))
         defs[name] = (a, b, inline)
-    if func not in defs:
+    # Older units spell a definition with a descriptive, file-local alias while
+    # the symbol table still calls it sub_ADDR. Keep source names as owners, but
+    # resolve simple object-like aliases when looking up definitions and calls.
+    aliases = {}
+    for m in re.finditer(r"^#[ \t]*define[ \t]+(\w+)[ \t]+(\w+)[ \t]*(?://[^\n]*|/\*[^\n]*?\*/[ \t]*)?$", text, re.M):
+        if not any(x <= m.start() < y for x, y in drafts):
+            aliases[m.group(1)] = m.group(2)
+
+    def expanded(name):
+        seen = set()
+        while name in aliases and name not in seen:
+            seen.add(name)
+            name = aliases[name]
+        return name
+
+    by_symbol = {expanded(name): name for name in defs}
+    target = by_symbol.get(expanded(func))
+    if target is None:
         return {}
     # Function-like and object-like macros: a concession in a macro body changes the code of every
     # function that expands it, so a reached function's macros are reached too (keyed `#NAME`).
@@ -3798,7 +3816,7 @@ def function_reach(text, func):
     for m in re.finditer(r"^#\s*define\s+(\w+)(?:.*\\\n)*.*$", text, re.M):
         if not any(x <= m.start() < y for x, y in drafts):
             macros[m.group(1)] = (m.start(), m.end())
-    reach, todo = {}, [func]
+    reach, todo = {}, [target]
     while todo:
         n = todo.pop()
         if n in reach:
@@ -3813,6 +3831,7 @@ def function_reach(text, func):
             body = text[a:b]
             body = body[body.index("{"):]
         for c in set(re.findall(r"\b(\w+)\s*\(", body)):
+            c = by_symbol.get(expanded(c), c)
             if c in defs and defs[c][2] and c not in reach:
                 todo.append(c)
         for c in set(re.findall(r"\b(\w+)\b", body)):
@@ -3864,6 +3883,7 @@ def cmd_pins(src, func, env):
                   open(os.path.join(ROOT, src)).read())
     lines = text.split("\n")
     reach = function_reach(text, func)
+    source_func = next(iter(reach), func)
     starts = [0]
     for ln in lines:
         starts.append(starts[-1] + len(ln) + 1)
@@ -3904,7 +3924,7 @@ def cmd_pins(src, func, env):
     cost = {}
     for n, (i, kind, rm) in enumerate(sites):
         where = owner(i)
-        where = "" if where == func else f" [{where}]"
+        where = "" if where == source_func else f" [{where}]"
         if sole[n]:  # never offered: without it the variable is read with no value
             print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> kept: the only definition of"
                   f" {', '.join(sole[n])} (write the value it should hold, then remove it){where}")
@@ -3940,14 +3960,14 @@ def cmd_pins(src, func, env):
     open(no_pins, "w").write(without(allg))
     print(f"  all {len(allg)} removed: {show(r)}; written to {os.path.relpath(no_pins, ROOT)}"
           " (the draft to work from: `scope.py` on it gives the hunks, `why` their causes)")
-    if any(owner(sites[n][0]) != func for n in allg):
+    if any(owner(sites[n][0]) != source_func for n in allg):
         used = {}
         for n, (a, b) in function_reach_all(text).items():
             for h in reach:
-                if h != func and n != h and re.search(r"\b%s\s*\(" % re.escape(h), text[a:b]):
+                if h != source_func and n != h and re.search(r"\b%s\s*\(" % re.escape(h), text[a:b]):
                     used.setdefault(h, []).append(n)
         for h, users in sorted(used.items()):
-            users = [u for u in users if u != func]
+            users = [u for u in users if u != source_func]
             if users:
                 print(f"  helper {h} is also used by {', '.join(sorted(users))}: check those after changing it,"
                       " or give the pin-free spelling a new helper")
