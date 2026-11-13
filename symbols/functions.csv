@@ -4960,10 +4960,12 @@ addr,name,mode,confidence,source,notes
 0812B77C,SlashEffect_UpdateColliders,thumb,low,src-alias,Moves both colliders to the effect position and refreshes the first
 0812B7AC,SlashEffect_AllocateSlot,thumb,low,src-alias,Claims the first free slot in the eight-entry pool and records its index
 0812B7F8,PursuingActor_TurnTowardPlayer,thumb,low,src-alias,
+0812B918,PursuingActor_NoOp,thumb,low,cleanup,Empty callback in the tentative homing slash family
 0812B91C,PursuingActor_AdvanceChase,thumb,low,src-alias,
 0812BADC,PursuingActor_UpdateRecoil,thumb,low,src-alias,
 0812BCE0,PursuingActor_UpdateRetirement,thumb,low,src-alias,
 0812BDA8,PursuingActor_CreateHomingSlash,thumb,low,src-alias,
+0812BFBC,PursuingActor_UpdateManager,thumb,low,cleanup,Dispatches occupied homing slash slots through the state callback table
 0812C020,PursuingActors_ReleaseAll,thumb,low,src-alias,
 0812C0A4,SlashEffect_InitManager,thumb,low,src-alias,Clears the pool mask and loads animation resource 354D before publishing the singleton
 0812C0CC,SlashEffect_GetOrCreateManager,thumb,low,src-alias,Returns the singleton or creates its task and installs update and cleanup callbacks
