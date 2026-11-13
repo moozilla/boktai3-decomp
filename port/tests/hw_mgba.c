@@ -1,5 +1,6 @@
 /* Optional independent oracle. Reads the user's ROM; writes no ROM data. */
 #include "hw.h"
+#include "hw_rtc.h"
 #include "gba/types.h"
 #include <mgba/core/core.h>
 #include <mgba/internal/arm/arm.h>
@@ -329,6 +330,51 @@ static int wave_bank_oracle(struct mCore *core)
     return 0;
 }
 
+static int64_t rtc_oracle_seconds = INT64_C(1709251199);
+static int64_t rtc_oracle_now(void *user) { (void)user; return rtc_oracle_seconds; }
+static void rtc_oracle_sample(struct mRTCSource *source) { (void)source; }
+static time_t rtc_oracle_unix(struct mRTCSource *source) { (void)source; return (time_t)rtc_oracle_seconds; }
+static struct mRTCSource rtc_fixed_source = {rtc_oracle_sample, rtc_oracle_unix, NULL, NULL};
+
+static int rtc_sdk_oracle(struct mCore *core)
+{
+    struct GBA *gba = core->board;
+    static Hw hw;
+    HwHost host = {0};
+    HwRtcRecord record = {0};
+    unsigned i;
+    setenv("TZ", "UTC", 1); tzset();
+    gba->rtcSource = &rtc_fixed_source;
+    GBAHardwareInitRTC(&gba->memory.hw);
+    host.unix_time = rtc_oracle_now;
+    hw_init(&hw, &host); hw_bind(&hw); Rtc_Initialize();
+    if (rom_call(core, 0x08248970, 0, 0, 0) || rom_call(core, 0x08248a78, 0, 0, 0)) return 1;
+    if (rom_call(core, 0x08248c70, 0x02003000, 0, 0) || !Rtc_ReadDateTime(&record)) return 1;
+    for (i = 0; i < 7; ++i) if (((uint8_t *)&record)[i] != core->busRead8(core, 0x02003000 + i)) {
+        fprintf(stderr, "RTC SDK byte %u: original %u / port %u\n", i, core->busRead8(core, 0x02003000 + i), ((uint8_t *)&record)[i]); return 1;
+    }
+    if (rom_call(core, 0x08248afc, 0x02003000, 0, 0) || !Rtc_ReadStatus(&record) || record.status != core->busRead8(core, 0x02003007)) return 1;
+    for (i = 0; i < 24; ++i) {
+        rtc_oracle_seconds = INT64_C(1709164800) + i * 3600;
+        if (rom_call(core, 0x08248c70, 0x02003000, 0, 0) || !Rtc_ReadDateTime(&record) ||
+            record.hour != core->busRead8(core, 0x02003004) || hw.rtc_data[4] != gba->memory.hw.rtc.time[4]) return 1;
+    }
+    record.status = 7;
+    core->busWrite8(core, 0x02003007, 7);
+    if (rom_call(core, 0x08248bc8, 0x02003000, 0, 0) || !Rtc_WriteStatus(&record) ||
+        rom_call(core, 0x08248afc, 0x02003000, 0, 0) || !Rtc_ReadStatus(&record) ||
+        record.status != core->busRead8(core, 0x02003007)) return 1;
+    if (rom_call(core, 0x08248988, 0, 0, 0)) return 1;
+    Rtc_Protect();
+    if (rom_call(core, 0x08248c70, 0x02003000, 0, 0) || ((struct ARMCore *)core->cpu)->gprs[0] != 0 || Rtc_ReadDateTime(&record)) return 1;
+    Rtc_Initialize();
+    if (rom_call(core, 0x08248970, 0, 0, 0) || rom_call(core, 0x082489a0, 0, 0, 0) ||
+        (uint8_t)((struct ARMCore *)core->cpu)->gprs[0] != Rtc_CheckAndReset()) return 1;
+    hw_bind(NULL);
+    puts("Original RTC SDK: PASS (24 UTC hours, date/status reads, status write, protection, probe)");
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     struct mCore *core;
@@ -390,6 +436,7 @@ int main(int argc, char **argv)
     if (mixer_state_oracle(core)) return 1;
     if (mixer_reverb_oracle(core)) return 1;
     if (eeprom_oracle(core)) return 1;
+    if (rtc_sdk_oracle(core)) return 1;
     rom_file = fopen(argv[1], "rb");
     if (!rom_file || fseek(rom_file, 0, SEEK_END)) return 2;
     rom_size = ftell(rom_file); rewind(rom_file);
