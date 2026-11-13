@@ -1380,3 +1380,15 @@ Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_UpdateBoundaryBarrage.c. The prio
 Tags: phase3, dp-bosses, sub_081A14FC
 
 Draft: notes/phase3-drafts/dp-bosses/sub_081A14FC.c. Use ParticleRandom_ReadSample only for rawY, retaining the other direct draws. Its extra counted table reference raises the table above the random-index address, fixes the frame size/slots and improves the pin-free draft from 86/82 to 30/32. Using it for every draw overshoots badly; direct shared reads fold to the baseline. Each individual draw was checked against the table-priority hypothesis, and increasing the sampler count to two through five is worse. Keeping the sampleY/rawY pins and barrier while removing only the table pin reaches 11/13, but removal combinations of those three remaining concessions do not match. The principal remaining difference is a resident 0x3ff mask in ip, while the ROM reloads it and uses ip for oy; gcse also moves the index-address copy later. Original source retains all four concessions. Next: displace the index mask naturally while retaining the corrected table priority; then revisit sampleY/rawY lifetimes.
+
+### Vanargand_ApplyPendingDamage: partial landed, one mask pin remains
+Tags: phase3, dp-bosses, Vanargand_ApplyPendingDamage
+
+Removed the partDamage/sl pin and its operand barrier. The existing u8 narrowing
+of the part flags supplies the necessary live-range instruction, and retaining
+only the original r2 mask pin gives an exact whole-unit MATCH. The full pin-free
+draft is saved under dp-bosses and remains 7/7. Halfword/array mask construction,
+a shared return-mask local and count-label forms do not fix it. Splitting the
+real song call between the special/non-special arms changes the CSE path and
+gives 5/8, but leaves duplicated call/layout instructions. Next: reproduce that
+path break while restoring the shared song call.
