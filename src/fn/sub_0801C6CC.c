@@ -4,7 +4,16 @@ extern u16 gUnknown_03005260[];
 extern int gUnk_0824DB38[];
 extern u8 gUnk_0824DB64[], gUnk_0824DB6F[];
 void Sound_PlaySong(int);
-void ResultGame_UpdatePlayerMarker(u8 *p)
+struct ResultGamePlayerMarker {
+    u8 pad00[0x50];
+    u32 playerIndex;
+    u8 pad54[0x8c - 0x54];
+    s32 y;
+    s32 velocity;
+    u8 pad94[0xb2 - 0x94];
+    u8 fallDelay;
+};
+void ResultGame_UpdatePlayerMarker(struct ResultGamePlayerMarker *p)
 {
     int *velocity;
     u32 key;
@@ -17,30 +26,23 @@ void ResultGame_UpdatePlayerMarker(u8 *p)
         key = mask;
     }
     if (key) {
-        velocity = (int *)(p + 0x90);
-        *velocity = gUnk_0824DB38[*(u32 *)(p + 0x50)];
+        velocity = &p->velocity;
+        *velocity = gUnk_0824DB38[p->playerIndex];
         Sound_PlaySong(0x3ec);
     } else {
-        int v;
-        int *initial = (int *)(p + 0x90);
-        v = *initial;
+        int *initial = &p->velocity;
+        int v = *initial;
         velocity = initial;
         if (v > 0) {
             *velocity = key;
-            *((u8 *)initial + 0x22) = key;
+            p->fallDelay = key;
         } else {
-            u32 index;
-            u8 *counter = p + 0xb2;
+            u8 *counter = &p->fallDelay;
             u8 *table = gUnk_0824DB64;
-            asm("" : : "r"(counter), "r"(table));
-            {
-                u32 n;
-                n = *(u32 *)(p + 0x50);
-                index = n;
-            }
-            if (p[0xb2] < gUnk_0824DB64[index]) {
+            u32 index = p->playerIndex;
+            if (*counter < table[index]) {
                 *velocity = key;
-                ++p[0xb2];
+                ++*counter;
             } else {
                 *velocity = v - gUnk_0824DB6F[index];
                 if (*velocity < -22)
@@ -48,5 +50,5 @@ void ResultGame_UpdatePlayerMarker(u8 *p)
             }
         }
     }
-    *(int *)(p + 0x8c) += *velocity;
+    p->y += *velocity;
 }
