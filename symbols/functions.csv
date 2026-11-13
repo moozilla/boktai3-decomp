@@ -5763,6 +5763,7 @@ addr,name,mode,confidence,source,notes
 0816381C,Palette_UpdateHighlightPulse,thumb,low,src-alias,Cycles a highlight color through red intensity levels over a repeating 50-frame period
 0816385C,SpiralParticles_UpdateParticle,thumb,low,src-alias,
 08163990,ParticlePool_UpdateLinearParticle,thumb,low,src-alias,Adds particle velocity to position and changes its animation on frame five
+081639E4,ParticlePool_SpawnJitteredParticle,thumb,low,src-alias,Allocates one of sixteen drawable particles and assigns random position jitter and linear velocity
 08163B70,SpriteParticles_UpdateEntries,thumb,low,src-alias,
 08163BD4,ParticlePool_OnUpdate,thumb,low,src-alias,Task update callback advancing the pool particle simulation
 08163BE0,ParticlePool_OnDestroy,thumb,low,src-alias,Task destruction callback removing all sixteen particle effects
