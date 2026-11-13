@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_input_grid.h"
 void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enabledInput,
                                     const struct SceneInputPosition *startsInput,
@@ -14,10 +13,7 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enab
     const u32 *localFrames;
     s32 compare;
     u32 step;
-    {
-        targetsInput = (const struct SceneInputPosition *)frames;
-        localFrames = (const u32 *)targetsInput;
-    }
+    localFrames = frames;
     widget = pair->widgets;
     {
         step = 0;
@@ -29,7 +25,7 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enab
             widget->flags |= 1;
         else {
             struct SceneInputPosition *position;
-            register u32 targetOffset asm("r3");
+            u32 targetOffset;
             widget->flags &= ~1;
             Anim_LoadKeyframe(widget, pair, (u16)*localFrames, 1);
             position = (struct SceneInputPosition *)&pair->widgets[0].position;
@@ -40,18 +36,18 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enab
                 targetOffset = lowIndex * 8;
             }
             *position = *starts;
-            position = (void *)pair->targets;
-            position = (void *)((u8 *)position + targetOffset);
-            *position = *targets;
+            {
+                struct SceneInputPosition *targetPosition = (void *)pair->targets;
+                targetPosition = (void *)((u8 *)targetPosition + targetOffset);
+                *targetPosition = *targets;
+            }
         }
         {
             step = 8;
             targets = (void *)((const u8 *)targets + step);
         }
         starts++;
-        targetsInput = (const struct SceneInputPosition *)localFrames;
-        targetsInput = (const struct SceneInputPosition *)((const u32 *)targetsInput + 1);
-        localFrames = (const u32 *)targetsInput;
+        localFrames++;
         widget++;
         {
             step = widgetOffset;
