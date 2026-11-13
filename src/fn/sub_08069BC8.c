@@ -17,10 +17,7 @@ void BurstEmitter_InitCollider(struct BurstEmitter *emitter, s32 a, s32 b, s32 c
         Collider_SetAttackProperties(collider, a, b, 512, 0x240004, c);
     else
         Collider_SetAttackProperties(collider, a, b, 512, 0x40000, c);
-    {
-        u32 type = 0x3246;
-        *(u16 *)((u8 *)collider + 4) = type;
-    }
+    collider->collisionId = 0x3246;
     Collider_SetPosition(collider, &emitter->position, 0);
     Collider_SetCallback(collider, NULL, emitter);
 }
