@@ -5,6 +5,7 @@
 #include "scene_object.h"
 #include "contact_swarm_sprite.h"
 #include "display_sequence.h"
+#include "sprite_effect_controller.h"
 
 /* Eight 0x130-byte arc slots (0803EE58-0803F650), followed by their
  * projected ground-effect companions. Graphical shadow ownership is tentative. */
@@ -44,7 +45,7 @@ struct SceneArcManager {
 };
 struct SceneGroundManager {
     struct Task task;
-    const u8 *resource;
+    const struct SpriteEffectTileResource *resource;
     struct SceneGroundEffect *head;
 };
 struct SceneArcCamera {
@@ -65,5 +66,17 @@ s32 SceneArc_InitializeManager(struct SceneArcManager *);
 struct SceneArcManager *SceneArc_CreateManager(void);
 struct SceneArcSlot *SceneArc_FindFreeSlot(struct SceneArcManager *, s32 *);
 s32 SceneArc_Create(const struct ScenePoolVec32 *, const struct ScenePoolVec32 *, u32, u32, s32);
+s32 GroundEffect_Link(struct SceneGroundManager *, struct SceneGroundEffect *);
+s32 GroundEffect_Unlink(struct SceneGroundManager *, struct SceneGroundEffect *);
+void GroundEffect_EnableProjection(struct SceneGroundEffect *);
+void GroundEffect_DisableProjection(struct SceneGroundEffect *);
+void GroundEffect_IgnoreUpdate(struct SceneGroundEffect *);
+void GroundEffect_UpdateProjection(struct SceneGroundEffect *);
+u32 GroundEffect_UpdateManager(struct SceneGroundManager *);
+u32 GroundEffect_DestroyManager(void);
+s32 GroundEffect_InitializeManager(struct SceneGroundManager *, void *);
+struct SceneGroundManager *GroundEffect_CreateManager(void *, u32);
+s32 GroundEffect_Initialize(struct SceneGroundEffect *, const struct ScenePoolVec32 *, u32);
+u32 GroundEffect_Destroy(struct SceneGroundEffect *);
 extern struct SceneArcCamera *gSceneCamera;
 #endif
