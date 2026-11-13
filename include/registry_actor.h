@@ -18,11 +18,11 @@ struct RegistryActorControl {
     u8 messages[0x34];
     struct RegistryActorMotion motion;
     u8 unknown8A4[6];
-    s8 keyframe;
+    s8 boostEffect;
     u8 unknown8AB;
     s32 lastForwardSpeed;
     u32 ticks, active;
-    u16 unknown8B8, updateFlags;
+    u16 boostFrames, updateFlags;
     void *owner;
     u8 unknown8C0[0xC];
     u32 effectFlags, projectile;

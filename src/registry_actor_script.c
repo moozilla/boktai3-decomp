@@ -15,7 +15,7 @@ void RegistryA8CB_CreateFromScript(void)
     if (!actor)
         return;
     Memory_Clear(actor->stats.relativeOrigin, 16);
-    actor->control.keyframe = 0xFF;
+    actor->control.boostEffect = 0xFF;
     ActorScript_ParseParams(actor);
     animation = &actor->model;
     ActorSprite_InitPartDrawings(actor, animation, 0x3D99);
