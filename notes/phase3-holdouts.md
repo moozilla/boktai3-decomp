@@ -1436,3 +1436,34 @@ sign tests. Persistent search: build/matchsearch/TentacleActor_UpdateRetraction.
 Next: stop CSE from extending the original actor through the join while keeping
 the post-call assignment until flow; that should make its allocation disjoint
 from next and eliminate the final copy after allocation.
+
+### sub_080ABB18 (080ABB18): behavior barrier removed
+
+One barrier landed in 0016. Removing either original barrier makes direction
+and motionTimer tie at priority 476 (2 references / 42 live instructions).
+Declare motionTimer before direction to break that tie in favor of the ROM's
+sl timer; this also preserves all stack slots. No initializer trick is needed.
+Five pins and the motion-counter barrier remain.
+
+Removing both barriers with that declaration order gets 7/7, all caused by
+motionTimer spilling to sp+8 while direction takes sl. The exact diagnostic
+`AGBCC_PRI=motionTimer:+20` matches. The second removal shortens direction's
+life another instruction, giving it priority 487 versus timer's 476. Scalar,
+byte/halfword/word arrays, initialized unions, copied pointers, derived zero8,
+earlier timer copying, early heading loads, and a packed reset-state struct
+were tried. The struct improves register-blind shape but adds instructions;
+the other initializer forms do not change this lifetime threshold.
+
+The fully ordinary saved draft is 101/101 after the declaration change.
+Removing the other pins separately still costs: animationFlags 31/31, zero
+74/74, timer 17/17, animation cursor 39/36, motion-counter cursor 19/19.
+The alternative final-stores-inside-loop draft is 139/107. Hoist analysis
+shows only the zero, one, and animation-flags address moving: most individual
+addresses have 13*1*3 < 68, so that shape cannot explain all fifteen ROM
+precomputed pointers without a major change in lifetime/loop shape.
+
+Persistent evidence and proposals: build/matchsearch/sub_080ABB18. Next:
+lengthen direction's pre-allocation life by one real intermediate operation
+that folds later, or shorten motionTimer's life without moving its emitted
+address computation. This is now a precise small threshold rather than an
+unexplained stack-slot permutation.
