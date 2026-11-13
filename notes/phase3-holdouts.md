@@ -1228,3 +1228,33 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-menus-b (Codex)
+
+### ScenePanelRig_TickApproachSubject (0805A044): two modulation pairs remain
+
+Partial landed: X pin and origin-offset barrier removed, and origin/distance reads use
+members. The target-distance/table work union prevents the table's constant-equivalence
+priority penalty; it gets the ROM's r6. Pin-free draft:
+`notes/phase3-drafts/dp-menus-b/ScenePanelRig_TickApproachSubject.c`.
+
+The draft differs by 18 ROM / 20 draft instructions (shape 4; 444 versus 440 bytes).
+Both remaining decisions are global allocation of scale24's anonymous return pseudos:
+X gets r1 rather than r2; Z prefers r2 rather than r1. On the saved draft,
+`AGBCC_FORCE=166:2,214:1` gives MATCH, including the offset increment and literal pool.
+No compiler override belongs in the source.
+
+Earlier raw-offset draft also tied originOffset to address pseudo 186 in local allocation;
+its G trace was misleading. Scope now recovers this tie (fact 210). Forcing that quantity
+head moves it, while priority or force on its non-head member did nothing. Real field reads
+and the work union remove this distraction and leave only the modulation results.
+
+Tried: coordinate conversion macros from Wandering; narrow modulation/position types;
+commuting both sums and products; direct expressions; separate X/Z product and wave locals;
+output-parameter scale24; product/result union; reusing wave or value for modulation;
+explicit scale24 statement macro; inline field getters; duplicating origin read, position
+sum, full sum or full store in the two rounding arms. Copies and output parameters collapse
+to the same return pseudo. Arm duplication changes control flow and does not cross-jump
+back to the ROM. Keep the work union: its table allocation is independently diagnosed.
+Next: find a C shape that changes the X return's preference to r2 and removes the Z return's
+r2 preference, possibly through the rounding helper's class head or a later matched sibling.
