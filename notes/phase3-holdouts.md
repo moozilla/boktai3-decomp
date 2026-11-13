@@ -1240,3 +1240,9 @@ Diagnosis: the initial free draft let regmove tie the OR result to the flags loa
 Tried: u8/u16 flags and result temporaries, direct memory OR, initialized byte unions, one-bit updates, byte/halfword reset masks, callback-view and real-slot indexed loops, postincrement and reversed loops, full-byte and halfword-container bitfields, shared reset helper. Persistent search: `build/matchsearch/Actor_UpdateBlinkBurstDisappearance`; sources and evidence under `build/cx/work/Actor_UpdateBlinkBurstDisappearance`.
 
 Next: retain the literal union update's hoisted zero while obtaining the byte-mask update's operand order; inspect the QImode insertion and invariant merging in cse/loop, or use the finishing-animation twin to identify the original control representation.
+
+### Actor_UpdateFinishingAnimation (081E9574): one pin removed, same unused zero
+
+Draft: `notes/phase3-drafts/dp-scene2/Actor_UpdateFinishingAnimation.c`. The byte reset mask and union update match all useful instructions and allocation. The missing `movs r7, #0` also removes final alignment padding (ROM 608 bytes, draft 604). The partial removes the r2 pin and names the release-control field, retaining the original unused-zero pin.
+
+The blink investigation above applies directly. A separate mask-first byte union also drops the zero and keeps its one constant inside the loop; initialized unions and reset helpers do not retain it. No complete matching knob is known. Next: use this smaller twin to trace the literal union OR's hoisted QImode zero and preserve it while restoring the byte-mask operand order.
