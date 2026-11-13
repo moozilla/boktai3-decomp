@@ -1301,3 +1301,32 @@ whole-unit draft; other functions retain their existing concessions. Production 
   here they are 103 and 213. A future fix should disambiguate occurrences by instruction order.
 
 Persistent evidence: `build/matchsearch/sub_080399F4`; scratch: `build/cx/work/sub_080399F4/`.
+
+### WirelessGameItems_UpdateItemMerge (08039CB0, src/wireless_game_items_and_display.c)
+
+Best target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_UpdateItemMerge.c`
+(4 ROM / 4 draft, shape 2, 308 bytes). Other functions retain their existing concessions.
+The removed value pin and zero barrier interact: individually they cost 17 and 3 ROM
+instructions; removing both leaves the clamp correct and changes only four zero-store rows.
+Production is unchanged.
+
+`why 392` shows CSE replacing the target pendingFlag's byte zero (159) with zero#1 (143),
+which gets r1. ROM creates a new zero in r0 immediately after storing count. `why 445`
+shows the draft instead creating a new zero at the source timer store, and using it for
+source count/pendingFlag; ROM uses the earlier r1 zero there. This is CSE constant-class
+substitution, not allocation alone. No class-head takeover exists at that substitution;
+all five probe decisions fail to improve it. Scope lacks a diagnostic to suppress one
+particular source substitution, so there is no matching what-if knob yet.
+
+Tried direct literal stores; byte/halfword pointers; narrow zero and count types; shared
+outer zero; zero initialization after the count store; chained reset assignments; reloads
+from the just-cleared timer/state; clamp helpers with assignments or early returns; typed
+reset helpers; union initialization; direct item indexing; count-store repetition and full
+tail repetition in all clamp arms. Literal zeros and union initialization give 10/10;
+repeated count stores give 5/5; repeated whole tails give 21/21. Retaining only the existing
+barrier with clamp-helper forms did not yield a partial match. No diagnostic or new
+concession was landed. Next: identify the original typed reset/clamp interface that keeps
+the two zero classes distinct, or add a precise CSE substitution diagnostic before more C.
+
+Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateItemMerge`;
+scratch: `build/cx/work/WirelessGameItems_UpdateItemMerge/`.
