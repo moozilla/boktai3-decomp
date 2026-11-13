@@ -3007,6 +3007,7 @@ addr,name,mode,confidence,source,notes
 0808A430,SceneActorControl_RestartOrAdvance,thumb,low,src-alias,
 0808A538,Ghoul_WaitForRouteResult,thumb,low,src-alias,
 0808A654,Ghoul_SetActionHandlers,thumb,low,src-alias,Installs the shared and ghoul-specific action callback table at actor offset 0x284
+0808A664,Ghoul_UpdateAimedDiscControl,thumb,low,src-alias,Starts an aimed disc attack and restores pursuit after the configured recovery delay
 0808A870,Ghoul_SetSpecialHandlers,thumb,low,src-alias,Installs the single special behavior callback table at actor offset 0x28C
 0808A880,Ghoul_EnterIdleControl,thumb,low,src-alias,Installs the shared idle callback and resets action state and queued control fields
 0808A90C,SceneActorControl_RefreshMotionRoute_0808A90C,thumb,low,src-alias,
@@ -3017,6 +3018,8 @@ addr,name,mode,confidence,source,notes
 0808AE44,Ghoul_BindProfile,thumb,low,src-alias,Finds or adds actor profile category four and stores its handle
 0808AE60,Bat_LookupAnimationEntry,thumb,low,src-alias,
 0808AEB8,Ghoul_TickCooldown,thumb,low,src-alias,Decrements the owner context countdown at offset 0x63C without underflow; cooldown purpose is tentative
+0808AED8,Ghoul_SelectRandomRoutePoint,thumb,low,src-alias,Chooses a route point different from the current point and resets its progress
+0808AF38,Ghoul_SelectRetreatRoutePoint,thumb,low,src-alias,Selects a route point behind the tracked target or a random fallback and requests a path
 0808B264,Ghoul_BeginAlternateRoute,thumb,low,src-alias,Sets owner context flag bits and starts the route group alternate route in behavior 15
 0808B320,Vorn_ParseField624_0808B320,thumb,low,src-alias,
 0808B3A0,Bat_TickDelayedScript,thumb,low,src-alias,
