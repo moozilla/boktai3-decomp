@@ -1186,7 +1186,11 @@ addr,name,mode,confidence,source,notes
 0803343C,ScrollingDialogue_SetScript,thumb,low,src-alias,Assigns a text script and restarts playback after clearing the display
 08033468,ScrollingDialogue_ClearScript,thumb,low,src-alias,Loads the default empty script through the script setter
 08033478,ScrollingDialogue_SetNumberArgument,thumb,low,src-alias,Stores an indexed number argument in the embedded text interpreter
+080334A0,ScrollingDialogue_SetNumberArgumentFromScript,thumb,low,src-alias,Reads a numeric substitution index and value
 080334BC,ScrollingDialogue_SetStringArgument,thumb,low,src-alias,Stores an indexed string argument through the text interpreter string slot setter
+080334E0,ScrollingDialogue_SetStringFromScript,thumb,low,src-alias,Sets a string substitution from the text-source cursor
+080334FC,ScrollingDialogue_SetStringReferenceFromScript,thumb,low,src-alias,Sets a string substitution from the current string reference
+08033518,ScrollingDialogue_SetChoicesFromScript,thumb,low,src-alias,Reads choice procedure identifiers from keyword p
 08033568,ScrollingDialogue_RequestShow,thumb,low,src-alias,Sets the deferred show request consumed by the task update callback
 08033590,ScrollingDialogue_RequestHide,thumb,low,src-alias,Sets the deferred hide request consumed by the task update callback
 080335B4,ScrollingDialogue_HideImmediately,thumb,low,src-alias,Invokes the hide helper directly when the singleton exists

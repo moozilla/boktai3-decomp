@@ -42,3 +42,18 @@ function-pointer signature preserves that call contract; no engine.h edit was
 made. TextWindow_BlankRect's unused result assignment was removed. A signed
 character-delay helper preserves the original signed halfword load. No new
 concessions; exact-code coverage gain remains 0.0 percentage points.
+
+## Scrolling dialogue: 08032EDC–080335D4
+
+Consolidated 20 files into `src/scrolling_dialogue.c`, reusing the full message
+playback state and exposing the scrolling task's requests, counters, row/column
+and script fields. Four script wrappers gained ScrollingDialogue names. Five
+simple fail/done goto wrappers became ordinary if/else and still match. A while
+loop for the tag parser changed literal-pool placement and branches, so the
+existing main playback flow remains. The final unit matches all 1,784 bytes.
+
+The queue row ends at 080335F4, but 080335D4 is an old_agbcc singleton reset,
+followed by a normal-compiler query. They remain separate rather than introducing
+a new compiler override or compiling either with the wrong compiler. Neither
+holds object fields to unify. Generic ram.h Window declarations are converted
+at the task API boundary; shared headers remain unchanged.
