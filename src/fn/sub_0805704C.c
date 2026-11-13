@@ -22,20 +22,10 @@ void LevelAdvanceDisplay_UpdateParticle(struct LevelAdvanceParticle *input, void
             y = velocity + offset;
         }
         particle->offsetY = y;
-        {
-            register u32 x asm("r0");
-            register u32 playerX asm("r6");
-            player = gPlayers[0];
-            x = (u16)particle->offsetX;
-            playerX = (u16)player->position.world.x;
-            particle->position.world.x = x + playerX;
-        }
+        player = gPlayers[0];
+        particle->position.world.x = player->position.world.x + particle->offsetX;
         particle->position.world.y = player->position.world.y + y;
-        {
-            register u32 z asm("r0") = (u16)particle->offsetZ;
-            register u32 playerZ asm("r2") = (u16)player->position.world.z;
-            particle->position.world.z = z + playerZ;
-        }
+        particle->position.world.z = player->position.world.z + particle->offsetZ;
         {
             register u32 phase asm("r0") = (u16)frame >> 2;
             phase &= 1;
