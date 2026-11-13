@@ -512,6 +512,27 @@ def _clobbers(callee):
     return not (callee.startswith('@llvm.') or callee.startswith('@port_bus_'))
 
 
+PHI_I1_RE = re.compile(r'^\s+(%[-\w.$]+) = phi i1 (.*)$')
+PHI_IN_RE = re.compile(r'\[\s*([^,\]]+?)\s*,\s*(%[-\w.$]+)\s*\]')
+BR_I1_RE = re.compile(r'^\s+br i1 (%[-\w.$]+), label (%[-\w.$]+), label (%[-\w.$]+)')
+
+
+def _edge_end(state, pred, block):
+    """r0 on the edge pred -> block: the edge's own value when a branch on a
+    phi narrowed it, else whatever pred ended with ('unseen' if not yet)."""
+    if (pred, block) in state['edges']:
+        return state['edges'][(pred, block)]
+    return state['ends'].get(pred, 'unseen')
+
+
+def _common(values):
+    """The one r0 every edge agrees on, else None."""
+    values = list(values)
+    if values and all(v == values[0] for v in values) and values[0] != 'unseen':
+        return values[0]
+    return None
+
+
 def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, readers=()):
     """Return rewritten IR and adapter info for this module.
 
@@ -546,7 +567,8 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
             values[name] = addresses[name]
     out = []
     needed_decls = {}
-    state = {'params': [], 'name': None, 'calls': 0, 'last': None, 'snap': set(), 'define_at': 0}
+    state = {'params': [], 'name': None, 'calls': 0, 'last': None, 'snap': set(), 'define_at': 0,
+             'phis': {}, 'edges': {}, 'calls_at_label': 0, 'preds': [], 'label_at': 0}
 
     def fill(i, pty, emit):
         last = state['last']
@@ -576,7 +598,8 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
             parsed = parse_def(line)
             names = re.findall(r'(%[-\w.$]+)(?=\s*[,)])', line[line.index('(', line.index('@')):])
             state.update(name=parsed[1] if parsed else None, calls=0, last=None, snap=set(),
-                         define_at=len(out), block=f'%{len(names)}', ends={},
+                         define_at=len(out), block=f'%{len(names)}', ends={}, edges={}, phis={},
+                         calls_at_label=0,
                          params=[(p[0], n) for p, n in zip(parsed[2].params, names)] if parsed else [])
             out.append(line)
             continue
@@ -592,8 +615,33 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
             state['block'] = '%' + line.split(':')[0]
             pm = re.search(r'; preds = (.*)$', line)
             preds = [p.strip() for p in pm[1].split(',')] if pm else []
-            seen = [state['ends'].get(p, 'unseen') for p in preds]
-            state['last'] = seen[0] if seen and all(x == seen[0] for x in seen) and seen[0] != 'unseen' else None
+            state['last'] = _common(_edge_end(state, p, state['block']) for p in preds)
+            state['phis'] = {}
+            state['calls_at_label'] = state['calls']
+            state['preds'] = preds
+            state['label_at'] = len(out)
+        m = PHI_I1_RE.match(line)
+        if m:
+            state['phis'][m[1]] = PHI_IN_RE.findall(m[2])
+        m = BR_I1_RE.match(line)
+        if m and m[1] in state['phis'] and state['calls'] == state['calls_at_label']:
+            # `a && f()` ends in a phi of constant false (a failed) and f's
+            # result: the edge taken on true comes only from f's block, so r0
+            # there is f's result even though the merge block's r0 is mixed.
+            # The value is carried across the merge block by a phi of its own
+            # (poison from the edges that never take this branch).
+            incoming = state['phis'][m[1]]
+            for target, excluded in ((m[2], 'false'), (m[3], 'true')):
+                froms = [p for v, p in incoming if v.strip() != excluded]
+                if not froms or len(froms) == len(incoming):
+                    continue
+                value = _common(_edge_end(state, p, state['block']) for p in froms)
+                if value and value[1] not in ('void',) and value[1] in _SCALARS:
+                    name = fresh('r0.')
+                    arms = ', '.join(f'[ {value[0] if p in froms else "poison"}, {p} ]' for p in state['preds'])
+                    out.insert(state['label_at'] + 1, f'  {name} = phi {value[1]} {arms}')
+                    value = (name, value[1])
+                state['edges'][(state['block'], target)] = value
         if not line.startswith(' ') or ' call ' not in line:
             out.append(sub_values(line, values) if values else line)
             continue
