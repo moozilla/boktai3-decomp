@@ -1351,3 +1351,23 @@ Persistent evidence: build/matchsearch/SceneActorPalette_ApplyTransition.
 Next: recover the channel pointer setup and signed-byte update helper; the
 ROM uses byte load/shift for red and green, indexed ldrsb for blue. Preserve
 the byte flag helper and category arm order that already remove a barrier.
+
+### sub_08072204 (08072204, active palette binding)
+
+Tags: `08072204` `phase3` `cse`
+
+One pin remains; no landing. Pin-free draft differs in four instructions,
+shape 2. CSE changes the manager load destination to transition, deleting the
+initial r1-to-r3 copy; category23 then adds from r3 instead of r1. All later
+instructions match. CSE_NOCANON=25 restores r1 but emits the copy only in the
+category10 arm (100-byte function versus 96); it is a diagnosis, not a match.
+
+Tried union/struct pointer initializers, reversed initialization/declaration
+order, separate reads of the same global, structured category branches, a
+transition-selection helper, and a u32 manager predicate. None preserves the
+original early copy. Selector helper additionally reads category before the
+manager null check, so it is not the saved candidate. The saved draft keeps
+original control flow and removes the duplicate local name alias.
+
+Next: inspect CSE copy elimination/REG_EQUIV and find the original ownership
+or view helper that keeps manager and transition independent until selection.
