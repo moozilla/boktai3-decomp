@@ -9098,6 +9098,7 @@ addr,name,mode,confidence,source,notes
 08219A80,Anim_SelectPaletteBank,thumb,low,src-alias,
 08219A94,TaskSystem_UpdateRoot,thumb,low,src-alias,Root task callback registered by TaskSystem_Initialize; polls input and flips the message buffer alongside other frame services
 08219AAC,TaskSystem_Initialize,thumb,low,src-alias,
+08219B24,Input_UpdatePadStates,thumb,low,decomp,Update held pressed and released keys from hardware or synchronized link inputs
 08219BD8,String_Hash,thumb,low,src-alias,Computes a 16-bit string hash by rotating left five bits and adding each byte; callers use it as a resource key
 08219C00,Random_Next15,thumb,low,src-alias,Advances the global linear congruential generator and returns its low 15 bits
 08219C20,Heap_Initialize,thumb,low,src-alias,Initializes the heap as one free block spanning the available memory region
