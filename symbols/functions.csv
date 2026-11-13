@@ -4395,10 +4395,13 @@ addr,name,mode,confidence,source,notes
 08110834,SaveMenu_Update,thumb,low,src-alias,Task callback that checks menu lifetime and dispatches the current state callback
 0811086C,SaveMenu_Destroy,thumb,low,src-alias,Task destruction callback that releases menu resources and clears the singleton
 08110A40,SaveMenu_CreateFromScript,thumb,low,src-alias,Creates and initializes the singleton menu task using script parameters; tentative menu identity
+08110A8C,SaveMenu_ClearSingleton,thumb,low,src-alias,Clears the save-menu singleton; stock agbcc matches without the former old_agbcc annotation.
+08110A98,SaveMenu_Close,thumb,low,src-alias,Clears background layers and dialogue before killing the active save-menu task.
 08110AD4,SceneEffect_ExecuteCommandList,thumb,low,src-alias,
 08110B7C,SceneTilemap_IsActive,thumb,low,src-alias,Reports whether the scrolling tilemap controller singleton exists
 08110B98,TileRows_CopyPackedRows,thumb,low,src-alias,
 08110BF8,TilemapPanel_DrawRegion,thumb,low,src-alias,
+08110C84,SceneTilemap_WaitCopyDelay,thumb,low,src-alias,Tentative short busy-wait helper adjacent to the tilemap copy routines; no side effects observed.
 08110C9C,TilemapPanel_StreamColumns,thumb,low,src-alias,Draws newly exposed 8-pixel columns while the tilemap panel scrolls
 08110E14,SceneTilemap_Update,thumb,low,src-alias,Task callback that samples an external scroll position and streams visible tilemap columns
 08110E38,SceneTilemap_Destroy,thumb,low,src-alias,Task destruction callback that frees both allocated map buffers and clears the singleton
@@ -4411,6 +4414,7 @@ addr,name,mode,confidence,source,notes
 0811115C,SceneTilemap_GetScrollDelta,thumb,low,src-alias,Returns the current horizontal scroll position minus its previous frame value
 0811117C,SceneTilemap_SetScrollSource,thumb,low,src-alias,Sets the external position pointer sampled by the tilemap update callback
 0811119C,SceneTilemap_CopyScrollSourceState,thumb,low,src-alias,Copies four words from the tilemap controller's external scroll source into the destination
+081111C4,SceneTilemap_GetScrollLimit,thumb,low,src-alias,Returns the scene tilemap width minus twelve or -1 without an active panel; scroll-limit interpretation tentative.
 081111E8,ScanlineScroll_AdvancePhases,thumb,low,src-alias,
 0811129C,ScanlineScroll_Update,thumb,low,src-alias,
 08111398,BackgroundScroll_UpdateHorizontal,thumb,low,src-alias,Background effect callback that accumulates horizontal speed and writes the selected layer's scroll value
