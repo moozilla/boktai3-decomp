@@ -1,0 +1,23 @@
+'use strict';
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+(async () => {
+  const [modulePath, romPath, dumpPath] = process.argv.slice(2);
+  const module = await WebAssembly.compile(fs.readFileSync(modulePath));
+  assert.deepEqual(WebAssembly.Module.imports(module), []);
+  const e = (await WebAssembly.instantiate(module, {})).exports;
+  assert.equal(e.port_memory_init(), 0);
+  const bytes = new Uint8Array(e.memory.buffer), rom = fs.readFileSync(romPath);
+  bytes.set(rom, 0x08000000);
+  assert.equal(e.port_load_rom(0x08000000, rom.length), 0);
+  assert.equal(e.port_boot_early(), 0);
+  e.port_devices_init(0, 0);
+  e.Clock_CheckRtcDate();
+  assert.equal(bytes[0x03005439], 0, 'RTC access must succeed without fallback date');
+  const clock = Buffer.from(bytes.slice(0x03005430, 0x03005454));
+  const rtc = Buffer.from(bytes.slice(0x03005460, 0x03005468));
+  fs.writeFileSync(dumpPath, Buffer.concat([clock, rtc]));
+  assert.equal(clock.readUInt32LE(0), 0x20251113);
+  assert.equal(rtc.toString('hex'), '2511130400000000');
+  console.log('wasm RTC: original Clock_CheckRtcDate and GPIO protocol PASS');
+})().catch(error => { console.error(error); process.exitCode = 1; });

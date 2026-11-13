@@ -1,0 +1,8 @@
+# TZ=UTC is required: mGBA's RTC converts the fixed epoch with localtime().
+trace off
+rtc 1762992000
+probe clock_check 082290F4
+probe sound_init 0822FE60
+wait 3
+dump clock_frame3 03005430:24
+dump rtc_frame3 03005460:8
