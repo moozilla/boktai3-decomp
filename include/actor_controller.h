@@ -13,4 +13,9 @@ void ActorController_UpdateTargetMovement(struct SceneCombatActor *, s32, s32);
 s32 Terrain_ApplyBlocked(void *, void *, struct ContactPosition *);
 u32 NavMesh_ConsumeProbeEvent(u16 *);
 u32 sub_0821FB8C(void *, void *, u32, u32);
+void Armor_UpdatePositiveTurn(struct SceneCombatActor *, s32);
+void Armor_UpdateNegativeTurn(struct SceneCombatActor *, s32);
+void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
+void Armor_StartFullPaletteRestoreDelay(struct SceneCombatActor *);
+void ActorController_UpdateResetMotionTransition(struct SceneCombatActor *, s32);
 #endif
