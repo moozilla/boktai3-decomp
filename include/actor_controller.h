@@ -23,4 +23,19 @@ union ActorControllerPosition {
     s16 components[4];
 };
 void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *);
+static inline void ActorController_ClearColliderFlags(struct ContactCollider *collider, u32 flags)
+{
+    collider->flags &= ~flags;
+}
+
+static inline void ActorController_SetColliderFlags(struct ContactCollider *collider, u32 flags)
+{
+    collider->flags |= flags;
+}
+
+static inline void ActorController_ClearMotionFlags(struct ActorControllerMotion *motion, u32 flags)
+{
+    motion->flags &= ~flags;
+}
+
 #endif

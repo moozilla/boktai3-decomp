@@ -17,21 +17,6 @@ void ActorController_UpdateNegativeTurnSpeed32(struct SceneCombatActor *actor)
 
 extern const u32 gUnk_0824EBE4[];
 
-static inline void ActorController_ClearColliderFlags(struct ContactCollider *collider, u32 flags)
-{
-    collider->flags &= ~flags;
-}
-
-static inline void ActorController_SetColliderFlags(struct ContactCollider *collider, u32 flags)
-{
-    collider->flags |= flags;
-}
-
-static inline void ActorController_ClearMotionFlags(struct ActorControllerMotion *motion, u32 flags)
-{
-    motion->flags &= ~flags;
-}
-
 /* Tentative reset-motion transition; the optional argument sets speed to 120. */
 
 void ActorController_UpdateResetMotionTransition(struct SceneCombatActor *actor, s32 setSpeed)
