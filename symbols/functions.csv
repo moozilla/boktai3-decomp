@@ -7628,8 +7628,10 @@ addr,name,mode,confidence,source,notes
 081C47A0,SceneTransition_Initialize,thumb,low,src-alias,Initializes background scroll; script and hidden contact-effect target.
 081C47EC,Registry6A37_Create,thumb,low,src-alias,Creates and initializes the task registered under actor key 0x6A37
 081C482C,ScenePanelSubject_SlideOpen,thumb,low,src-alias,
+081C4950,ShipWheel_ProcessMessages,thumb,low,src-alias,Handles wheel slide-open messages.
 081C49C0,ShipWheel_Update,thumb,low,src-alias,Processes incoming commands and invokes the current state handler for the tentative ship wheel object
 081C49DC,ShipWheel_OnDestroy,thumb,low,src-alias,Removes the object's sprite and clears its singleton pointer
+081C49F4,ShipWheel_Initialize,thumb,low,src-alias,Loads wheel sprite; palette transition; sequence and event receiver.
 081C4BA8,ShipWheel_RequestStop,thumb,low,src-alias,Sets flag bit 0 on the active ship wheel object as a provisional stop request
 081C4BC4,ShipWheel_Create,thumb,low,src-alias,Creates the singleton whose graphics resource 0x2173 is provisionally identified as a ship wheel
 081C4C18,SceneTransition_Finish,thumb,low,src-alias,Calls the optional completion script and destroys the child task and transition controller
@@ -7649,6 +7651,7 @@ addr,name,mode,confidence,source,notes
 081C4EC0,RegistryC281_UpdateClosingFade,thumb,low,src-alias,Waits 65 frames before invoking the completion script and killing both tasks
 081C4EDC,RegistryC281_Update,thumb,low,src-alias,Task update callback that dispatches the current sequence state
 081C4EEC,RegistryC281_Destroy,thumb,low,src-alias,Empty destruction callback for the registry C281 sequence task
+081C4EF0,SceneFade_Initialize,thumb,low,src-alias,Reads movement endpoints; delays and exit script.
 081C5000,RegistryC281_Create,thumb,low,src-alias,Creates and initializes the registry C281 actor movement sequence from script options
 081C503C,Registry1909_UpdateVisibilityFlicker,thumb,low,src-alias,Toggles the animation visibility flag at shrinking intervals and reports completion
 081C5088,Registry1909_EnterHiddenState,thumb,low,src-alias,Installs the hidden-state callback and resets its timer
@@ -7659,8 +7662,10 @@ addr,name,mode,confidence,source,notes
 081C513C,Registry1909_UpdateLandingAnimation,thumb,low,src-alias,Steps the landing animation for 60 frames before starting visibility flicker
 081C5164,Registry1909_UpdateFlickerState,thumb,low,src-alias,Advances visibility flicker and enters the hidden state when it finishes
 081C5190,Registry1909_UpdateFalling,thumb,low,src-alias,
+081C5264,FallingSceneSprite_ProcessMessages,thumb,low,src-alias,Starts falling on the trigger command.
 081C52DC,Registry1909_Update,thumb,low,src-alias,Task update callback that processes scene messages and dispatches the current animation state
 081C52FC,Registry1909_Destroy,thumb,low,src-alias,Task destruction callback that removes the object's animation
+081C5308,FallingSceneSprite_Initialize,thumb,low,src-alias,Loads animation resource; position and event receiver.
 081C53EC,SceneMessageSprite_Create,thumb,low,src-alias,Creates an animated task registered as scene-message receiver type 10; provisional object name
 081C542C,GameState_GetPackedTripletValue,thumb,low,src-alias,
 081C5470,ChallengeMenu_SetStoredRank,thumb,low,src-alias,Stores a four-bit value indexed by group and option; rank interpretation is tentative

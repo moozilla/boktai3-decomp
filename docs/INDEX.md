@@ -319,6 +319,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/encoded-records_2026-10-14.md](../notes/encoded-records_2026-10-14.md) | Encoded records and password callers, 08044C80–080454C0 | *#menu #tooling* | 5 |
 | [notes/ewram-layout_2026-10-27.md](../notes/ewram-layout_2026-10-27.md) | EWRAM shared declarations and layouts (2026-10-27) | #matching #tooling | 11 |
 | [notes/far-branch-tails.md](../notes/far-branch-tails.md) | Far-branch tails: big functions that were split in pieces | #matching #tooling | 3 |
+| [notes/field_effects_b_cleanup_2026-11-13.md](../notes/field_effects_b_cleanup_2026-11-13.md) | Field effects B cleanup, 2026-11-13 | #actors #particles #animation #matching | 3 |
 | [notes/finish-bosses_2026-10-30.md](../notes/finish-bosses_2026-10-30.md) | Boss matching worker: Ratatosk, Vanargand and Hresvelgr | #matching #bosses #ratatosk #vanargand #hresvelgr #compiler | 9 |
 | [notes/finish-effects_2026-10-30.md](../notes/finish-effects_2026-10-30.md) | Finish effects and presentation — 2026-10-30 | #effects #presentation #matching #compiler | 22 |
 | [notes/finish-player-cue_2026-10-30.md](../notes/finish-player-cue_2026-10-30.md) | Player cue worker batch — 2026-10-30 | #matching #player #cue #compiler | 11 |
