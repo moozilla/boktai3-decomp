@@ -224,3 +224,37 @@ Countdown controller revisit: four files consolidate to 344 bytes. Real Task/Pla
 HUD completion: the warning-meter helper now reads counters628[0] through a GameState view advanced by slot * sizeof(s32). This preserves the original addition order without a fixed byte offset or partial struct. All 32 HUD functions now share src/hud.c (5840 bytes); the two earlier groups and the last one-function source were removed. Warning-meter name promoted; both external callers MATCH.
 
 Pause menu completion: the four sprite helpers now index a full SceneHudState view by widget sizeof, then access the named first category widget. The status query uses the same typed indexed-state approach for counters628 and now has structured if/else. This restores all 30 functions to one 2564-byte unit, removes three intermediate units/five original files, and gives every function the PauseMenu prefix. The prompt table parameter is typed as a pointer. All six header consumers and five renamed callers MATCH.
+
+
+## Final menu display: 081663A0–08166D74
+
+All fourteen functions now share src/menu_display.c (2516 bytes). The empty-entry
+predicate uses the canonical GameState fields through dynamically indexed owner
+views, preserving the original address-addition order. SceneHudActionGrid names
+its current and saved selection bytes without changing its layout. All public
+functions now use the MenuDisplay prefix.
+
+The action-prompt caller forwards the register result of the existing void
+PauseMenu_SetPairedIcons API. An explicit function-pointer signature conversion
+preserves this legacy interface; changing the setter to return s32 changes its
+epilogue, while an inline forwarding helper changes argument evaluation code.
+The coordinator should reconcile this return-value interface alongside the
+similar MessageWindow_SetBounds case. This change does not add an assembly
+barrier, register pin, compiler override, or fixed-offset field access.
+
+## End of weekly run
+
+The queue was worked through the coordinator's handoff boundary at 08166D74;
+Inventory panel and subsequent rows remain with the cloud worker. Deferred
+wireless peer, countdown initializer, HUD warning, pause-menu sprite/status, and
+menu-display functions were revisited and resolved. The remaining deferred
+families above need coordinated shared-layout changes or preserved compiler
+boundaries. No new item was started after the end-of-run instruction.
+
+The final source tree has 23 consolidated translation units from this worker.
+All have exact per-unit validation, and the final concession scan found no scored
+sites. Exact-code coverage gain is 0.0 percentage points because this batch
+improves types, naming, and organization of already matching functions. The
+coordinator must run the combined ROM build after integration.
+
+Final menu-display validation: all 14 functions MATCH (2516 bytes); all 106 transitive shared-header consumers MATCH. Final scan of the 23 consolidated units found no scored concession sites.

@@ -5878,7 +5878,7 @@ addr,name,mode,confidence,source,notes
 08166670,MenuDisplay_FindEntryIndex,thumb,low,src-alias,
 08166714,MenuDisplay_InterpolateActivePairPositions,thumb,low,src-alias,Smooth active action icons toward their target positions.
 0816676C,MenuDisplay_BeginActionTransfer,thumb,low,src-alias,Hide selected source icons and place the two transfer icons.
-081669E8,PauseMenu_IsCategoryEntryEmpty,thumb,low,src-alias,Tests category-specific entry storage for an empty or unavailable value
+081669E8,MenuDisplay_IsCategoryEntryEmpty,thumb,low,src-alias,Tentative: tests whether the selected category slot has an available entry
 08166A94,MenuDisplay_CanSwapCategoryEntries,thumb,low,src-alias,Allow unequal slots when at least one contains an entry.
 08166AC8,MenuDisplay_GetCategoryEntryValue,thumb,low,src-alias,Read the category-specific equipped or unlocked entry state.
 08166B14,MenuDisplay_CountAvailableEntries,thumb,low,src-alias,Count available entries in the requested menu category.

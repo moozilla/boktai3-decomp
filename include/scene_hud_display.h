@@ -22,7 +22,11 @@ struct SceneHudWidgetMotion {
 /* View of the input grid at SceneHudState + 0x4384; rows overlap auxiliary selectors. */
 struct SceneHudActionGrid {
     u8 flags;
-    u8 unknown1[0xB];
+    u8 unknown1[2];
+    u8 current;
+    u8 unknown4[5];
+    u8 saved;
+    u8 unknownA[2];
     u8 cells[9][4];
 };
 struct SceneHudTertiaryOption {
@@ -247,9 +251,9 @@ struct SceneHudState {
     u8 unknown4CB0[0x28];
     u8 initializationFlag; /* 0x4CD8: cleared by both initializers */
     u8 unknown4CD9[0x4D80 - 0x4CD9];
-    s8 categoryEntrySlots[8];   /* 0x4D80 */
-    s8 unlockEntrySlots[8];     /* 0x4D88 */
-    s8 equippedIconSlots[8];    /* 0x4D90: inventory slot for each visible equipped icon */
+    s8 categoryEntrySlots[8]; /* 0x4D80 */
+    s8 unlockEntrySlots[8];   /* 0x4D88 */
+    s8 equippedIconSlots[8];  /* 0x4D90: inventory slot for each visible equipped icon */
 };
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);

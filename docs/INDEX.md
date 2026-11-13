@@ -231,6 +231,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-30.md](../docs/history/2026-10-30.md) | 2026-10-30: monster initializers and shared engine records | #bosses #compiler #cue #data #effects #hresvelgr #matching #monsters #player #presentation #ram #ratatosk #scene-actors #scope-gap #structs #studio #tooling #vanargand | 9 |
 | [docs/history/2026-10-31.md](../docs/history/2026-10-31.md) | 2026-10-31: finish-subsystem sessions | #bosses #cleanup #compiler #data #effects #hresvelgr #matching #player #presentation #process #ratatosk #register-pinning #scene-actors #structs #studio #tooling #vanargand | 7 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
+| [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | Work history: 2026-11-13 | #hud #matching #menu #text #tooling #wireless | 1 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -357,6 +358,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/matching-search-scale_2026-10-29.md](../notes/matching-search-scale_2026-10-29.md) | Matching search at the largest unmatched function | #matching #compiler #tooling #monsters | 19 |
 | [notes/matching-search_2026-10-29.md](../notes/matching-search_2026-10-29.md) | Matching search: implementation, evidence, and next steps | #matching #compiler #tooling #process | 18 |
 | [notes/matchsearch-interruption_2026-10-30.md](../notes/matchsearch-interruption_2026-10-30.md) | Formatter interruption regression | #tools #scope | 1 |
+| [notes/menus-link-cleanup_2026-11-12.md](../notes/menus-link-cleanup_2026-11-12.md) | Menus, link and hardware unit cleanup | #cleanup #menus #wireless #types | 23 |
 | [notes/mgs-gcl-round1.md](../notes/mgs-gcl-round1.md) | MGS/GCL matching round 1 | *#scripts #matching* | 3 |
 | [notes/mgs-gcl-round2.md](../notes/mgs-gcl-round2.md) | MGS/GCL matching round 2 | *#scripts #matching* | 2 |
 | [notes/mgs-gcl-round3.md](../notes/mgs-gcl-round3.md) | MGS/GCL matching round 3 | *#scripts #matching* | 2 |
