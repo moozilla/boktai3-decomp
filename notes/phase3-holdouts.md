@@ -1379,3 +1379,28 @@ was rejected as a landing direction because it narrows the script value.
 Next idea: preserve the power-to-r1 argument path while obtaining the union's
 table priority, then address next's local-versus-global lifetime independently.
 Scratch candidates and probe logs remain under build/cx/work/ScenePanel_InitRig/.
+
+### SceneInput_TickChoice (0805E1D0)
+
+Source retains its one accepted-mask barrier. Saved pin-free draft is 2 ROM /
+2 draft instructions, shape 0, 160 bytes. The ROM copies confirm (r2) into r0
+and ANDs keys (r1); the draft copies keys and ANDs confirm. Both operands
+remain live, so allocation itself is already correct. Cse rewrites
+`accepted & keys` to `keys & confirm`, with confirm known to be 1; regmove
+then inserts the required operand copy at insn 201 before AND 27.
+
+No matching knob found: one canonical-choice and seven jump-follow probes,
+CSE_KEEP=29/30 and AGBCC_NOTIE=27/52 leave the 2/2 difference. Scope had
+misattributed the copy to a later logged tie at the cancel-key AND (52).
+The new inserted-copy diagnostic and regression tests correct that false lead.
+
+Tried byte/halfword confirm and accepted locals separately and together;
+halfword keys; direct masked pad reads; byte/halfword casts on the first key
+operand; redundant byte mask; signed byte input; word/halfword/byte union
+initializers; narrow union reads; a two-use typed inline key-test helper;
+confirm while-return and switch forms. Narrow casts can introduce a second
+byte load, and halfword keys keep an extra copy for the later selection branch.
+Union forms either compile identically or introduce extra operations.
+Next idea: keep the constant in operand one through cse using an original-like
+narrow expression whose mode survives until regmove. Scratch candidates:
+build/cx/work/SceneInput_TickChoice/.
