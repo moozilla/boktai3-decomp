@@ -17,6 +17,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 BUILD = ROOT / "build/ppu"
 LLVM = Path("/opt/homebrew/opt/llvm/bin/clang")
+sys.path.insert(0, str(ROOT))
+from port.build import build_ppu
 
 
 def run(args, **kwargs):
@@ -27,27 +29,13 @@ def compiler():
     return os.environ.get("CC", str(LLVM) if LLVM.exists() else "clang")
 
 
-def wasm_linker():
-    configured = os.environ.get("WASM_LD")
-    if configured:
-        return str(Path(configured).expanduser())
-    fallback = Path.home() / "git/boktai3-decomp/build/toolchain/wasm-ld"
-    return str(fallback) if fallback.exists() else shutil.which("wasm-ld")
-
-
 def build(capture=False, sanitize=False):
     BUILD.mkdir(parents=True, exist_ok=True)
     flags = ["-std=c99", "-O2", "-Wall", "-Wextra", "-Werror", "-Iport/include"]
     if sanitize:
         flags += ["-g", "-fsanitize=address,undefined", "-fno-omit-frame-pointer"]
     run([compiler(), *flags, "port/tests/ppu_render.c", "port/ppu/ppu.c", "-o", BUILD / "ppu_render"])
-    run([compiler(), "--target=wasm32", *flags[:6], "-Iport/include", "-ffreestanding", "-c",
-         "port/ppu/ppu.c", "-o", BUILD / "ppu.wasm.o"])
-    linker = wasm_linker()
-    if not linker:
-        raise RuntimeError("wasm-ld not found; set WASM_LD to its executable path")
-    run([compiler(), "--target=wasm32", "-nostdlib", "-fuse-ld=" + linker,
-         "-Wl,--no-entry", "-Wl,--export-all", BUILD / "ppu.wasm.o", "-o", BUILD / "ppu.wasm"])
+    build_ppu(BUILD)
     run(["node", "port/tests/ppu_wasm.mjs", BUILD / "ppu.wasm"])
     if not capture:
         return
