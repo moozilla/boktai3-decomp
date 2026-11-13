@@ -1260,3 +1260,32 @@ Next: a genuine shared path into case 1 whose second edge becomes redundant
 after cse, or an original helper/control-flow structure that puts a non-barrier
 predecessor before the case label. Scope `why all` does not attribute the dead
 argument copy and constant timer address to the switch equality; `probe` does.
+
+### PlayerAction_RefreshFlagState (0813EDDC): one moved argument copy
+
+The original seven concessions remain. New pin-free draft:
+`notes/phase3-drafts/dp-bosses/PlayerAction_RefreshFlagState.c`, 1 ROM / 1 draft
+plus one moved branch. The only difference is `mov r0, r8`: before the sign
+test rather than immediately before GameState_GetConsumableDescriptor in
+its nonnegative arm. All eight previous wrong registers are now correct.
+Persistent search: `build/matchsearch/PlayerAction_RefreshFlagState`, node
+`joined-choice` (baseline also retained).
+
+The original pin-free draft's AGBCC_SPILL=5:1 gives MATCH, reconfirmed. Read
+allocate_reload_reg in reload1.c and the R/X trace: four choices build the
+clear-loop addresses/mask, choice 4 reloads 0x418 into r2, choice 5 then
+chooses r0 for the alternate test; the ROM chooses r1. Assigning a `choice`
+local from alternate on both passing p/non-p guard paths creates the extra
+choice that starts the correct rotation, but its argument copy is too early.
+
+Tried sign-bit/shift comparisons, null-safe and plain inline mode/slot
+accessors, label and reversed conditional forms, duplicate full alternate
+selection, initialization before the guard, separate test edges, field vs
+pointer bonus stores, array and SI zeros, a separate bonus-loop counter,
+union/addressable/narrow choice, call wrappers and call-only/test-only choice
+uses. No exact subset of the existing choice/zero/current pins tested here
+matched, so no partial landed. The copies' order is not explained by `why`;
+it reports no supported causal summary, while the trace shows the source
+copy survives into reload. Next: keep that reload choice but delay or delete
+the copy after allocation, or recover the missing original access around the
+mode/slot guard. Do not add a fence to manufacture the choice.
