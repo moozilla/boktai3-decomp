@@ -3326,10 +3326,14 @@ addr,name,mode,confidence,source,notes
 080A5C50,TentacleBody_UpdateAttackWindup,thumb,low,src-alias,
 080A5E84,TentacleBody_ResetDirectionalPose,thumb,low,src-alias,selects the defeat-profile directional pose without entry flag then resets directional animations
 080A5FB8,TentacleBody_OnIdleState,thumb,low,src-alias,Empty callback installed by the tentacle body initializer; idle role is tentative
+080A5FBC,TentacleBody_UpdateInactiveState,thumb,low,decomp,Empty state handler; inactive role is tentative
+080A5FC0,TentacleBody_UpdateTimedAction,thumb,low,decomp,Starts animation 7 and advances action flags at frames 40 and 120
 080A6030,TentacleBody_UpdateHiddenTransition,thumb,low,src-alias,State callback that hides graphics and shadow before transitioning to animation 9 after frame 26
 080A60E0,ActorTrail_RestoreSavedState,thumb,low,src-alias,
+080A6294,TentacleBody_UpdateAnimationEleven,thumb,low,decomp,Starts directional animation 11 and completes when ready
 080A62DC,TentacleBody_UpdateSpreadWindup,thumb,low,src-alias,
 080A65A8,TentacleBody_UpdateSpreadRelease,thumb,low,src-alias,
+080A68B0,TentacleBody_UpdateSpreadPreparation,thumb,low,decomp,Winds up segment spread while backing away from target
 080A69F0,TentacleBody_UpdateChargeSpread,thumb,low,src-alias,
 080A6D18,TentacleBody_BeginDirectedAttack,thumb,low,src-alias,
 080A6F50,TentacleBody_UpdateAttackRecovery,thumb,low,src-alias,
