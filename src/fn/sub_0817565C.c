@@ -11,7 +11,7 @@ void Hud_DrawDefaultEnergyMeter(u8 *, u32, u32, u32, u32, u32);
 void Hud_DrawHeaderCounter(void);
 void InventoryPanel_UpdateSelectedUnlock(u8 *, u32, u32, u32, u32);
 void InventoryPanel_UpdateSelectedEquipment(u8 *, u32, u32, u32, u32);
-void PlayerPanel_SnapshotValues(u8 *);
+void MenuDisplay_SnapshotValues(u8 *);
 void InventoryPanel_ShowStatusIcons(u8 *);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void PauseMenu_SetPromptIconPositions(u8 *, u32, s32);
@@ -45,7 +45,7 @@ void Hud_InitStatusMenu(u8 *s)
     TextWindow_Clear(*(u32 *)(s + 0x48C4));
     TextWindow_Clear(*(u32 *)(s + 0x48C8));
     Hud_SetupBackgroundLayer(s, *(u32 *)(s + 0x18), 0, 9, *(u32 *)(s + 0x2C));
-    PlayerPanel_SnapshotValues(s);
+    MenuDisplay_SnapshotValues(s);
     Presentation_InitListValues(s);
     MenuSelection_DrawNumericSummary(s);
     Hud_DrawDefaultHealthMeter(s, 1, 8, 8);

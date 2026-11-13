@@ -68,13 +68,13 @@ struct SceneHudState {
     u8 widgetResource[0x40];        /* 0x64 */
     u8 motionResource[0x20];        /* 0xA4: keyframe resource */
     u8 unknownC4[0x40];
-    u8 actionResultResources[2][0x20]; /* 0x104: normal and bonus keyframes */
-    u8 controlAnimationResource[0x20]; /* 0x144 */
-    u8 comparisonResource[0x20];       /* 0x164 */
+    u8 actionResultResources[2][0x20];      /* 0x104: normal and bonus keyframes */
+    u8 controlAnimationResource[0x20];      /* 0x144 */
+    u8 comparisonResource[0x20];            /* 0x164 */
     struct ContactSwarmSprite promptSprite; /* 0x184 */
     u8 unknown1B0[0x1C];
     struct DisplaySequenceState promptSequence; /* 0x1CC */
-    const void *promptSequenceResource; /* 0x1DC */
+    const void *promptSequenceResource;         /* 0x1DC */
     u8 unknown1E0[0xA12 - 0x1E0];
     u16 savedMenuMode; /* 0xA12: restored after page fade */
     u8 unknownA14[4];
@@ -84,30 +84,30 @@ struct SceneHudState {
     u8 actionOwnerIndex;        /* 0xA3F: index into party actor pointers */
     struct Player *actionOwner; /* 0xA40 */
     u8 unknownA44[8];
-    u16 pageFadeTimer;       /* 0xA4C */
-    u16 actionTransferDelay; /* 0xA4E: frames after icon transfer */
+    u16 pageFadeTimer;                              /* 0xA4C */
+    u16 actionTransferDelay;                        /* 0xA4E: frames after icon transfer */
     void (*updateCallback)(struct SceneHudState *); /* 0xA50 */
-    void *pageCallback;      /* 0xA54 */
-    u8 comparisonModifier;   /* 0xA58: modifier-key comparison preview */
-    u8 auxiliaryToggle;      /* 0xA59: returned by panel toggle */
-    u16 creationParameter;   /* 0xA5A */
-    u16 initializationState; /* 0xA5C */
-    u8 controlMode;          /* 0xA5E: modes above two suppress controls */
-    s8 previousPage;         /* 0xA5F: initialized to -1 */
-    u16 healthMeterBlinkTimer; /* 0xA60 */
+    void *pageCallback;                             /* 0xA54 */
+    u8 comparisonModifier;                          /* 0xA58: modifier-key comparison preview */
+    u8 auxiliaryToggle;                             /* 0xA59: returned by panel toggle */
+    u16 creationParameter;                          /* 0xA5A */
+    u16 initializationState;                        /* 0xA5C */
+    u8 controlMode;                                 /* 0xA5E: modes above two suppress controls */
+    s8 previousPage;                                /* 0xA5F: initialized to -1 */
+    u16 healthMeterBlinkTimer;                      /* 0xA60 */
     u16 energyMeterBlinkTimer; /* 0xA62: advances while the energy meter flashes */
-    u16 meterPulseFrame; /* 0xA64: 60-frame HUD meter pulse */
+    u16 meterPulseFrame;       /* 0xA64: 60-frame HUD meter pulse */
     u8 unknownA66[6];
     u8 playerValueEnabled, unknownA6D;
-    u16 timedStateParameter;            /* 0xA6E: sixth argument to 081781B4 */
-    u16 timedStateStart;                /* 0xA70: negative input clamps to zero */
-    u16 timedStateValue;                /* 0xA72 */
-    u16 timedStateTimer;                /* 0xA74: initialized to 300 */
-    u8 timedStateKind, timedStatePhase; /* 0xA76: phase zero or six */
-    u16 secondaryGaugeValue, secondaryGaugeMaximum; /* 0xA78 and 0xA7A */
-    u16 secondaryGaugeTimer; /* 0xA7C: frames left on the second gauge */
+    u16 timedStateParameter;                            /* 0xA6E: sixth argument to 081781B4 */
+    u16 timedStateStart;                                /* 0xA70: negative input clamps to zero */
+    u16 timedStateValue;                                /* 0xA72 */
+    u16 timedStateTimer;                                /* 0xA74: initialized to 300 */
+    u8 timedStateKind, timedStatePhase;                 /* 0xA76: phase zero or six */
+    u16 secondaryGaugeValue, secondaryGaugeMaximum;     /* 0xA78 and 0xA7A */
+    u16 secondaryGaugeTimer;                            /* 0xA7C: frames left on the second gauge */
     u8 secondaryGaugeFlashTimer, transientGaugeVisible; /* 0xA7E and 0xA7F */
-    u16 pulseFrame; /* 0xA80: wraps at 128 */
+    u16 pulseFrame;                                     /* 0xA80: wraps at 128 */
     u8 unknownA82[4];
     u16 warningBlinkTimer; /* 0xA86 */
     s16 storedEnergy;
@@ -126,7 +126,7 @@ struct SceneHudState {
     u8 previousCueGroup, previousCueSelection;    /* 0xB02 */
     const u16 *countdownValue;
     struct SceneInputWidget countdownDigits[3]; /* 0xB08 */
-    u32 selectorFlags; /* 0xC28 */
+    u32 selectorFlags;                          /* 0xC28 */
     u8 unknownC2C[0x44];
     u8 primaryVisible;           /* 0xC70 */
     u8 primarySlideTimer;        /* 0xC71: remaining three-pixel slide steps */
@@ -174,7 +174,7 @@ struct SceneHudState {
     struct SceneInputWidget motionWidgets[15]; /* 0x2AA0: extent bounded by valueWidgets */
     struct SceneInputWidget valueWidgets[2];   /* 0x3040, 0x30A0: widget indices 75 and 76 */
     u8 unknown3100[0xC0];
-    struct SceneInputWidget statusIcons[4]; /* 0x31C0 */
+    struct SceneInputWidget statusIcons[4];          /* 0x31C0 */
     struct SceneInputWidget comparisonIndicators[2]; /* 0x3340 */
     struct SceneInputWidget statMarkers[3][3];       /* 0x3400: base, bonus, delta */
     u8 unknown3760[0x300];
@@ -196,11 +196,11 @@ struct SceneHudState {
     u8 unknown438B[2];
     u8 savedActionSelection; /* 0x438D */
     u8 unknown438E[0x26];
-    u16 overridePalette[16]; /* 0x43B4 */
+    u16 overridePalette[16];  /* 0x43B4 */
     u8 highlightPalettePhase; /* 0x43D4 */
     u8 unknown43D5[0x13];
     u8 directionRepeatTimer; /* 0x43E8 */
-    u8 binaryChoice; /* 0x43E9: left/right toggles; A confirms, B cancels */
+    u8 binaryChoice;         /* 0x43E9: left/right toggles; A confirms, B cancels */
     u8 unknown43EA[2];
     struct SceneHudWidgetMotion widgetMotions[1]; /* 0x43EC: indexed, count unconfirmed */
     u8 unknown440C[0x20];
@@ -220,8 +220,8 @@ struct SceneHudState {
     s16 comparisonOffsets[3]; /* 0x48B6: signed bar adjustments */
     u8 pageInputCooldown;     /* 0x48BC */
     u8 unknown48BD[7];
-    s32 primaryTextWindow; /* 0x48C4 */
-    s32 timedMessageWindow; /* 0x48C8 */
+    s32 primaryTextWindow;       /* 0x48C4 */
+    s32 timedMessageWindow;      /* 0x48C8 */
     s32 auxiliaryTextWindows[6]; /* 0x48CC */
     u8 unknown48E4;
     u8 pageReturnToParent; /* 0x48E5 */
@@ -247,11 +247,9 @@ struct SceneHudState {
     u8 unknown4CB0[0x28];
     u8 initializationFlag; /* 0x4CD8: cleared by both initializers */
     u8 unknown4CD9[0x4D80 - 0x4CD9];
-    s8 categoryEntrySlots[8]; /* 0x4D80 */
-    s8 unlockEntrySlots[8]; /* 0x4D88 */
-    u8 equippedIconSlots[8]; /* 0x4D90: inventory slot for each visible equipped icon */
-    s8 consumableEntrySlots[4]; /* 0x4D98 */
-    s16 activePairIndices[2]; /* 0x4D9C */
+    s8 categoryEntrySlots[8];   /* 0x4D80 */
+    s8 unlockEntrySlots[8];     /* 0x4D88 */
+    s8 equippedIconSlots[8];    /* 0x4D90: inventory slot for each visible equipped icon */
 };
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);

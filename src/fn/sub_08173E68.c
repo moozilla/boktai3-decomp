@@ -6,10 +6,10 @@ int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowEquipmentDetails(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
-u32 PauseMenu_CanSwapCategoryEntries(void *, u32, u32, u32);
+u32 MenuDisplay_CanSwapCategoryEntries(void *, u32, u32, u32);
 s32 Inventory_GetEquipmentId(u32);
 void SceneHud_InitEquipmentTransfer(void *, s32, s32, s32);
-void sub_0816676C(void *, int);
+void MenuDisplay_BeginActionTransfer(void *, int);
 void Hud_UpdateInventorySwapAnimation(void);
 void sub_08173D2C(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -28,7 +28,7 @@ void SceneHud_TickEquipmentSwap(struct SceneHudState *p)
         u8 *cursor = &p->actionCursor;
         u32 source = *cursor;
         u8 *selection = &p->actionSelection;
-        if (!PauseMenu_CanSwapCategoryEntries(p, source, *selection, 2))
+        if (!MenuDisplay_CanSwapCategoryEntries(p, source, *selection, 2))
             Sound_PlaySong(0x192);
         else {
             Sound_PlaySong(0x38a);
@@ -38,7 +38,7 @@ void SceneHud_TickEquipmentSwap(struct SceneHudState *p)
                 SceneHud_InitEquipmentTransfer(p, 1, *cursor, *selection);
             p->categoryWidgets[*selection + 10].flags |= 1;
             p->categoryWidgets[*cursor + 10].flags |= 1;
-            sub_0816676C(p, 2);
+            MenuDisplay_BeginActionTransfer(p, 2);
             Hud_SetInteractionCallback(p, Hud_UpdateInventorySwapAnimation, 1);
         }
     } else if (gPadState[1] & 2) {

@@ -5,7 +5,7 @@ int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowActionPreview(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
-u32 PauseMenu_CanSwapCategoryEntries(void *, u32, u32, u32);
+u32 MenuDisplay_CanSwapCategoryEntries(void *, u32, u32, u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 void SceneHud_BeginActionIconMotion(void *, int, int, int);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -25,7 +25,7 @@ void SceneHud_UpdateActionSwap(struct SceneHudState *p)
     MenuDisplay_UpdateActionPrompt(p, 4);
     if (gPadState[1] & 1) {
         cursor = &p->actionCursor;
-        if (!PauseMenu_CanSwapCategoryEntries(p, *cursor, *(selection = &p->actionSelection), 4)) {
+        if (!MenuDisplay_CanSwapCategoryEntries(p, *cursor, *(selection = &p->actionSelection), 4)) {
             Sound_PlaySong(0x192);
         } else {
             Sound_PlaySong(0x38A);

@@ -1,7 +1,7 @@
 #include "global.h"
 void Sound_PlaySong(s32);
 void PauseMenu_SmoothPoint(void *, void *, s32);
-void PauseMenu_InterpolateActivePairPositions(void *, s32);
+void MenuDisplay_InterpolateActivePairPositions(void *, s32);
 void Inventory_SwapEquipmentEntries(s32, s32);
 void PauseInventory_BeginItemSwapSelection(void *, s32);
 void Hud_UpdateInventorySwapAnimation(u8 *p)
@@ -14,7 +14,7 @@ void Hud_UpdateInventorySwapAnimation(u8 *p)
         s32 n = 12 - *timer;
         PauseMenu_SmoothPoint(p + 0x2ac0, p + 0x442c, n);
         PauseMenu_SmoothPoint(p + 0x2b20, p + 0x4434, n);
-        PauseMenu_InterpolateActivePairPositions(p, n);
+        MenuDisplay_InterpolateActivePairPositions(p, n);
     } else {
         u32 *q = (u32 *)(p + 0x2aa8);
         u32 v = *q, m = 1;

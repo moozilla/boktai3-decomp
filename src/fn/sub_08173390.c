@@ -15,7 +15,7 @@ void SceneHud_UpdateSecondaryActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void ScrollingDialogue_HideImmediately(void);
-void PlayerPanel_SnapshotValues(void *);
+void MenuDisplay_SnapshotValues(void *);
 void InventoryPanel_UpdateSelectedUnlock(void *, int, int, int, int);
 void PauseInventory_InitEquipmentSelectionPage(u8 *p)
 {
@@ -43,6 +43,6 @@ void PauseInventory_InitEquipmentSelectionPage(u8 *p)
     z = 0;
     MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, z);
     ScrollingDialogue_HideImmediately();
-    PlayerPanel_SnapshotValues(p);
+    MenuDisplay_SnapshotValues(p);
     InventoryPanel_UpdateSelectedUnlock(p, 3, 14, 0, z);
 }

@@ -5871,16 +5871,18 @@ addr,name,mode,confidence,source,notes
 0816636C,PauseMenu_LoadFixedIconKeyframe,thumb,low,src-alias,Loads keyframe 0xC8 into the supplied icon animation at offset 0xA4
 08166384,PauseMenu_LoadIndexedIconKeyframe,thumb,low,src-alias,Loads keyframe 0x90 plus the icon index into the animation at offset 0x64
 081663A0,MenuDisplay_SetPaletteOverrides,thumb,low,src-alias,
-08166490,PauseMenu_UpdateHighlightPalette,thumb,low,src-alias,Advances the cycling highlight color using the menu palette and phase fields
+08166490,MenuDisplay_UpdateHighlightPalette,thumb,low,src-alias,Pulse the final four colors of the menu override palette.
 081664A8,MenuDisplay_LoadAdjustedDigits,thumb,low,src-alias,
+08166534,MenuDisplay_DrawStatComparison,thumb,low,src-alias,Show three rows of adjusted player stat digits.
 08166670,MenuDisplay_FindEntryIndex,thumb,low,src-alias,
-08166714,PauseMenu_InterpolateActivePairPositions,thumb,low,src-alias,Interpolates each of two display positions toward its target when its entry is active
+08166714,MenuDisplay_InterpolateActivePairPositions,thumb,low,src-alias,Smooth active action icons toward their target positions.
+0816676C,MenuDisplay_BeginActionTransfer,thumb,low,src-alias,Hide selected source icons and place the two transfer icons.
 081669E8,PauseMenu_IsCategoryEntryEmpty,thumb,low,src-alias,Tests category-specific entry storage for an empty or unavailable value
-08166A94,PauseMenu_CanSwapCategoryEntries,thumb,low,src-alias,Allows distinct entries to swap unless both entries are empty
-08166AC8,PauseMenu_GetCategoryEntryValue,thumb,low,src-alias,Dispatches a bounded entry index to one of four category-specific value getters
-08166B14,MenuEntries_CountAvailable,thumb,low,src-alias,
+08166A94,MenuDisplay_CanSwapCategoryEntries,thumb,low,src-alias,Allow unequal slots when at least one contains an entry.
+08166AC8,MenuDisplay_GetCategoryEntryValue,thumb,low,src-alias,Read the category-specific equipped or unlocked entry state.
+08166B14,MenuDisplay_CountAvailableEntries,thumb,low,src-alias,Count available entries in the requested menu category.
 08166B7C,MenuDisplay_UpdateActionPrompt,thumb,low,src-alias,
-08166CD0,PlayerPanel_SnapshotValues,thumb,low,src-alias,
+08166CD0,MenuDisplay_SnapshotValues,thumb,low,src-alias,Copy the player menu stat snapshot into the comparison values.
 08166D04,MenuDisplay_LoadDecimalDigits,thumb,low,src-alias,
 08166D74,InventoryPanel_CreateEntry,thumb,low,src-alias,
 08166E14,InventoryPanel_SetEntryRow,thumb,low,src-alias,

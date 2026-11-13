@@ -16,10 +16,10 @@ struct MenuDisplay {
 };
 s32 PauseMenu_SetPairedIcons(void *, s32, s32);
 s32 PauseMenu_IsCategoryEntryEmpty(void *, u32, u32);
-s32 PauseMenu_GetCategoryEntryValue(u32, s32);
+s32 MenuDisplay_GetCategoryEntryValue(u32, s32);
 void Hud_SaveSecondaryGridSelection(void *);
 s32 Inventory_GetQuantityByStorage(u32, u32);
-s32 MenuEntries_CountAvailable(void *, s32);
+s32 MenuDisplay_CountAvailableEntries(void *, s32);
 s32 SceneHud_CanApplySelectedAction(s32);
 s32 ItemRecord_MeetsLevelRequirement(u32);
 s32 MenuDisplay_UpdateActionPrompt(struct MenuDisplay *p, s32 group)
@@ -40,12 +40,12 @@ s32 MenuDisplay_UpdateActionPrompt(struct MenuDisplay *p, s32 group)
                 if (SceneHud_CanApplySelectedAction(
                         Inventory_GetQuantityByStorage(p->page, selection->current)))
                     action = 1;
-            } else if (PauseMenu_GetCategoryEntryValue(selection->current, group)) {
-                if (MenuEntries_CountAvailable(p, group) > 1 || group == 3)
+            } else if (MenuDisplay_GetCategoryEntryValue(selection->current, group)) {
+                if (MenuDisplay_CountAvailableEntries(p, group) > 1 || group == 3)
                     action = 4;
             } else {
                 if (group != 2 || ItemRecord_MeetsLevelRequirement(selection->current)) {
-                    if (MenuEntries_CountAvailable(p, group) <= 7)
+                    if (MenuDisplay_CountAvailableEntries(p, group) <= 7)
                         action = 1;
                 }
             }

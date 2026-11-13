@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-u32 PauseMenu_CanSwapCategoryEntries(void *, u32, u32, u32);
+u32 MenuDisplay_CanSwapCategoryEntries(void *, u32, u32, u32);
 void MenuDisplay_UpdateActionPrompt(void *, int);
 int SceneInput_NavigateGridKeys(void *, int);
 void Hud_RestoreGridSelection(u8 *);
@@ -10,7 +10,7 @@ void SceneHud_GetActionIconPosition(void *, int);
 void PauseInventory_GetConsumableCursorPosition(void *, u8 *);
 void PauseInventory_RefreshConsumableDescription(void *);
 s32 Inventory_GetConsumableId(u32);
-void sub_0816676C(void *, s32);
+void MenuDisplay_BeginActionTransfer(void *, s32);
 void SceneHud_PrepareActionTransferToSlot(void *, s32, s32, s32);
 void PauseInventory_UpdateConsumableSwapAnimation(void);
 void PauseInventory_UpdateConsumableOptionSelection(void);
@@ -26,7 +26,7 @@ void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
         u8 *cursor = &p->actionCursor;
         u32 current = *cursor;
         u8 *selection = &p->actionSelection;
-        if (!PauseMenu_CanSwapCategoryEntries(p, current, *selection, 3)) {
+        if (!MenuDisplay_CanSwapCategoryEntries(p, current, *selection, 3)) {
             Sound_PlaySong(0x192);
             return;
         }
@@ -37,7 +37,7 @@ void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
             SceneHud_PrepareActionTransferToSlot(p, 1, *cursor, *selection);
         p->categoryWidgets[*selection + 10].flags |= 1;
         p->categoryWidgets[*cursor + 10].flags |= 1;
-        sub_0816676C(p, 3);
+        MenuDisplay_BeginActionTransfer(p, 3);
         Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableSwapAnimation, 1);
     } else if (gPadState[1] & 2) {
         Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableOptionSelection, 1);
