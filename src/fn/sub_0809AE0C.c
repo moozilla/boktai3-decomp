@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 #include "player.h"
 #include "ram.h"
@@ -123,16 +122,6 @@ static inline u32 Lun_CapturePalette(struct SceneActorRegistryResetView *actor, 
     return value;
 }
 
-/* Finishes the speed contact and returns from the collision callback. */
-#define LUN_FINISH_SPEED_CONTACT(actor_, phase_)                                                   \
-    do {                                                                                           \
-        LUN_READ_CONTACT_FLAG((phase_), (actor_), (phase_));                                       \
-        Player_IncrementActionSpeedBonus(gUnknown_02000580, 0);                                    \
-        Lun_ApplyContactFlag((actor_)->context);                                                   \
-        Sound_PlaySong(0x2AD);                                                                     \
-        return;                                                                                    \
-    } while (0)
-
 /* Applies the palette-dependent player effect after a vertical contact check. */
 void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *object)
 {
@@ -168,8 +157,12 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
     Lun_EnableCollider(&actor->colliderA);
     Lun_SetContactFlag(actor, 0x800);
     Lun_ClearReactionFlags(actor, 0x180);
-    if (Lun_CapturePalette(actor, &palette) == 0) {
-        LUN_FINISH_SPEED_CONTACT(actor, phase);
+    while (Lun_CapturePalette(actor, &palette) == 0) {
+        LUN_READ_CONTACT_FLAG(phase, actor, phase);
+        Player_IncrementActionSpeedBonus(gUnknown_02000580, 0);
+        Lun_ApplyContactFlag(actor->context);
+        Sound_PlaySong(0x2AD);
+        return;
     }
     LUN_READ_CONTACT_FLAG(phase, actor, phase);
     Lun_ApplyContactFlag(actor->context);
