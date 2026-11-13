@@ -1389,3 +1389,20 @@ one independent instruction-order difference.
 Next: duplicate the next keyword test in the category arms to separate the
 zero reload from the value path before jump2; inspect b's first-set lifetime
 versus the position pointer to reverse their nearly tied allocation order.
+
+### WoodenCrate_ReactToHit (08100144)
+
+Tags: phase3, dp-field-b, WoodenCrate_ReactToHit
+
+One pin remains. The natural helper draft differs by 8/8 (shape 6): caller
+crate and helper target coalesce in r4; ROM keeps a second copy in r5 and
+therefore saves hit in r6. Raising hit priority above crate worsens to 10/10;
+CSE_NOCANON=26 does not restore the missing copy. No matching knob known.
+
+Tried direct helper argument (no target local), a byte result, taking script's
+address before the helper call and passing it separately, and struct/union
+handle arguments. Aggregate handles still coalesce. The early script pointer
+changes which pointer survives but differs 9/9 (shape 4); byte result adds
+branches. Next: inspect the inline formal's equivalence class rather than
+only caller crate, and seek a natural destructive pointer update inside the
+helper that preserves the caller's pointer across both paths.
