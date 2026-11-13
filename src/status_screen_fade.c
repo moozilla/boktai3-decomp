@@ -1,3 +1,4 @@
+#include "palette_channel.h"
 #include "status_screen.h"
 #include "engine.h"
 #include "numeric_overlay.h"
@@ -66,9 +67,9 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
         factor = 256;
     }
     other = 256 - factor;
-    red = p->blend & 31;
-    green = p->blend & 992;
-    blue = p->blend & 31744;
+    PALETTE_EXTRACT_CHANNEL(red, p->blend, 31);
+    PALETTE_EXTRACT_CHANNEL(green, p->blend, 992);
+    PALETTE_EXTRACT_CHANNEL(blue, p->blend, 31744);
     for (base = 0, bank = 0; bank < 2;) {
         i = p->start;
         {
@@ -81,11 +82,12 @@ void StatusScreen_FadeInPalette(struct StatusScreen *p)
                 int r;
                 int g;
                 int b;
-                do {
-                    r = ((color & 31) * factor + other * red) & 0x1F00;
-                    g = ((color & 992) * factor + other * green) & 0x3E000;
-                    b = color & 31744;
-                } while (0);
+                int sourceRed, sourceGreen;
+                PALETTE_EXTRACT_CHANNEL(sourceRed, color, 31);
+                r = (sourceRed * factor + other * red) & 0x1F00;
+                PALETTE_EXTRACT_CHANNEL(sourceGreen, color, 992);
+                g = (sourceGreen * factor + other * green) & 0x3E000;
+                PALETTE_EXTRACT_CHANNEL(b, color, 31744);
                 b = (b * factor + other * blue) & 0x7C0000;
                 *dest = (r | g | b) >> 8;
             }
