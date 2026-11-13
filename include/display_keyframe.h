@@ -10,7 +10,9 @@ struct DisplayKeyframeState {
     u8 priority;
     u8 unknown1B[2];
     u8 status;
-    u8 unknown1E[0x16];
+    u8 unknown1E[0xA];
+    struct ContactPosition *positionSource;
+    u8 unknown2C[8];
     u8 palette, paletteVariant;
     u16 attribute;
     u8 unknown38[2];

@@ -4,7 +4,7 @@
 void SceneBody_AppendToRegistry(void *body);
 
 u32 SceneBody_Init(struct SceneActorBody *body, u32 id, const struct ContactPosition *position,
-                   u8 direction, u8 mode, void *owner)
+                   u32 direction, u8 mode, void *owner)
 {
     u32 zero;
     body->id = id;

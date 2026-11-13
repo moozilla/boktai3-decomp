@@ -73,7 +73,7 @@ static inline int height(struct Vec *pos)
         index = ((struct Map *)gTerrainMap)->rows[z] + x;
     return (*cell(index) & 15) << 8;
 }
-// confidence=low: SceneActorAnimation_UpdateWalkToPosition (sub_0802EA90) without the entry animation,
+// confidence=low: Actor_UpdateWalkToPosition (Actor_UpdateWalkToPosition) without the entry animation,
 // callback test or footsteps; it moves by the new velocity itself.
 void sub_081CBB1C(void *unused, struct Actor *arg)
 {
