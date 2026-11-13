@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_COMBAT_ACTOR_H
 #define GUARD_SCENE_COMBAT_ACTOR_H
 #include "contact_collider.h"
+#include "armor_palette_controller.h"
 
 struct ParticleVector {
     s32 x : 16, y : 16, z : 16;
@@ -31,7 +32,11 @@ struct BouncingSceneParticle {
     u8 bounced;
 };
 struct ParticleAnimation {
-    u8 data[0x1C];
+    u8 unknown0[6];
+    u16 paletteId;
+    u8 unknown8[4];
+    void *palette;
+    u8 unknown10[0xC];
 };
 struct SceneCombatSnapshot {
     u8 phase, mode;
@@ -53,7 +58,11 @@ struct SceneCombatActor {
     struct ActorControllerNavigation navigation;
     u8 unknown50[0x84];
     union SceneCombatPosition position;
-    u8 unknownDC[0xB4];
+    u8 unknownDC[0x12];
+    u16 paletteId;
+    u8 unknownF0[0xC];
+    void *palette;
+    u8 unknown100[0x90];
     struct ContactCollider colliders[3];
     u8 unknown28C[0x54];
     struct ParticleAnimation fragmentAnimations[2];
@@ -61,7 +70,8 @@ struct SceneCombatActor {
     struct BouncingSceneParticle looseParticles[2];
     struct BouncingSceneParticle facingMarker;
     struct BouncingSceneParticle fragments[9];
-    u8 unknown650[0x4D6];
+    struct ArmorPaletteController paletteController;
+    u8 unknownADC[0x4A];
     u16 attack, defense;
     u8 unknownB2A[8];
     u16 flags;

@@ -28,7 +28,7 @@ void ActorPalette_RestoreSelectedBanks(struct ArmorPaletteController *controller
     Palette_CopyBank(controller->working[controller->otherBank], controller->palettes[controller->otherBank]);
 }
 
-void ActorPalette_LoadScriptBanks(struct Armor *actor)
+void ActorPalette_LoadScriptBanks(struct SceneCombatActor *actor)
 {
     struct ArmorPaletteController *controller = &actor->paletteController;
     struct ActorPaletteSource *source = ScriptProc_Start(0x92B3, 0xCB8F);
@@ -51,7 +51,7 @@ extern const u8 gUnk_0824E8F8[];
 
 extern const u8 gUnk_0824E90C[];
 
-void Armor_BindPaletteBanks(struct Armor *actor)
+void Armor_BindPaletteBanks(struct SceneCombatActor *actor)
 {
     struct ArmorPaletteController *controller = &actor->paletteController;
     u32 index = actor->kind;
@@ -82,12 +82,12 @@ void Armor_BindPaletteBanks(struct Armor *actor)
     ArmorPalette_CopyKindBanks(controller, source, bank, otherBank);
     actor->paletteId = tag;
     actor->palette = controller->working;
-    actor->bankId0 = controller->bank + tag;
-    actor->bank0 = controller->working[controller->bank];
-    actor->bankId1 = controller->bank + tag + 1;
-    actor->bank1 = controller->working[controller->bank + 1];
-    actor->bankId2 = controller->bank + tag + 2;
-    actor->bank2 = controller->working[controller->bank + 2];
+    actor->fragmentAnimations[0].paletteId = controller->bank + tag;
+    actor->fragmentAnimations[0].palette = controller->working[controller->bank];
+    actor->fragmentAnimations[1].paletteId = controller->bank + tag + 1;
+    actor->fragmentAnimations[1].palette = controller->working[controller->bank + 1];
+    actor->particleAnimation.paletteId = controller->bank + tag + 2;
+    actor->particleAnimation.palette = controller->working[controller->bank + 2];
     switch (actor->kind) {
         case 3:
         case 5:
@@ -95,13 +95,184 @@ void Armor_BindPaletteBanks(struct Armor *actor)
         case 9:
         case 0xd:
         case 0xf:
-            actor->bankId3 = controller->otherBank + tag;
-            actor->bank3 = controller->working[controller->otherBank];
+            actor->markerAnimation.paletteId = controller->otherBank + tag;
+            actor->markerAnimation.palette = controller->working[controller->otherBank];
             break;
         default:
-            actor->bankId3 = controller->bank + tag;
-            actor->bank3 = controller->working[controller->bank];
+            actor->markerAnimation.paletteId = controller->bank + tag;
+            actor->markerAnimation.palette = controller->working[controller->bank];
             break;
     }
 }
 
+void Armor_InitPaletteController(struct SceneCombatActor *actor)
+{
+    struct ArmorPaletteController *controller;
+    Armor_BindPaletteBanks(actor);
+    switch (actor->kind) {
+        case 3:
+        case 5:
+        case 7:
+        case 9:
+        case 0xd:
+        case 0xf:
+            ActorPalette_LoadScriptBanks(actor);
+            break;
+        default:
+            break;
+    }
+    controller = &actor->paletteController;
+    ActorPalette_RestoreSelectedBanks(controller);
+    controller->update = 0;
+    controller->finish = 0;
+}
+
+void ActorPalette_Reset(struct SceneCombatActor *actor)
+{
+    struct ArmorPaletteController *palettes = &actor->paletteController;
+    palettes->update = 0;
+    if (palettes->finish) {
+        Callback_InvokeActor(palettes, palettes->finish);
+        palettes->finish = 0;
+    }
+    ActorPalette_RestoreSelectedBanks(palettes);
+}
+
+void ActorPalette_FadeWhiteFast(struct ArmorPaletteController *controller)
+{
+    if (controller->timer <= 8) {
+        void *source;
+        source = controller->palettes[controller->bank];
+        Palette_BlendBank(controller->working[controller->bank], source, 0x7FFF, controller->timer, 3);
+        source = controller->palettes[controller->bank + 1];
+        Palette_BlendBank(controller->working[controller->bank + 1], source, 0x7FFF, controller->timer, 3);
+        source = controller->palettes[controller->bank + 2];
+        Palette_BlendBank(controller->working[controller->bank + 2], source, 0x7FFF, controller->timer, 3);
+        source = controller->palettes[controller->otherBank];
+        Palette_BlendBank(controller->working[controller->otherBank], source, 0x7FFF, controller->timer, 3);
+    } else {
+        controller->update = 0;
+        if (controller->finish) {
+            Callback_InvokeActor(controller, controller->finish);
+            controller->finish = 0;
+        }
+    }
+    controller->timer++;
+}
+
+void Armor_StartFastWhiteFade(struct SceneCombatActor *actor)
+{
+    struct ArmorPaletteController *controller = &actor->paletteController;
+    void (*f)(struct ArmorPaletteController *) = ActorPalette_FadeWhiteFast;
+    u32 z = 0;
+    controller->update = f;
+    controller->finish = z;
+    actor->paletteController.timer = z;
+}
+
+void ActorPalette_FadeWhite(struct ArmorPaletteController *controller)
+{
+    if (controller->timer <= 16) {
+        void *source;
+        source = controller->palettes[controller->bank];
+        Palette_BlendBank(controller->working[controller->bank], source, 0x7FFF, controller->timer, 4);
+        source = controller->palettes[controller->bank + 1];
+        Palette_BlendBank(controller->working[controller->bank + 1], source, 0x7FFF, controller->timer, 4);
+        source = controller->palettes[controller->bank + 2];
+        Palette_BlendBank(controller->working[controller->bank + 2], source, 0x7FFF, controller->timer, 4);
+        source = controller->palettes[controller->otherBank];
+        Palette_BlendBank(controller->working[controller->otherBank], source, 0x7FFF, controller->timer, 4);
+    } else {
+        controller->update = 0;
+        if (controller->finish) {
+            Callback_InvokeActor(controller, controller->finish);
+            controller->finish = 0;
+        }
+    }
+    controller->timer++;
+}
+
+void Armor_StartSlowWhiteFade(struct SceneCombatActor *actor)
+{
+    struct ArmorPaletteController *controller = &actor->paletteController;
+    void (*f)(struct ArmorPaletteController *) = ActorPalette_FadeWhite;
+    u32 z = 0;
+    controller->update = f;
+    controller->finish = z;
+    actor->paletteController.timer = z;
+}
+
+void ActorPalette_BlendSavedBanks(struct ArmorPaletteController *controller)
+{
+    if (controller->timer <= 16) {
+        void *source;
+        void *saved;
+        saved = controller->saved[0];
+        source = controller->palettes[controller->bank];
+        Palette_InterpolateBanks(controller->working[controller->bank], saved, source, controller->timer, 4);
+        saved = controller->saved[1];
+        source = controller->palettes[controller->bank + 1];
+        Palette_InterpolateBanks(controller->working[controller->bank + 1], saved, source, controller->timer, 4);
+        saved = controller->saved[2];
+        source = controller->palettes[controller->bank + 2];
+        Palette_InterpolateBanks(controller->working[controller->bank + 2], saved, source, controller->timer, 4);
+        saved = controller->saved[3];
+        source = controller->palettes[controller->otherBank];
+        Palette_InterpolateBanks(controller->working[controller->otherBank], saved, source,
+                                 controller->timer, 4);
+    } else {
+        controller->update = 0;
+        if (controller->finish) {
+            Callback_InvokeActor(controller, controller->finish);
+            controller->finish = 0;
+        }
+    }
+    controller->timer++;
+}
+
+void ActorPalette_BlendSavedBanksSlow(struct ArmorPaletteController *controller)
+{
+    if (controller->timer <= 16) {
+        void *source;
+        void *saved;
+        saved = controller->saved[0];
+        source = controller->palettes[controller->bank];
+        Palette_InterpolateBanks(controller->working[controller->bank], saved, source, controller->timer, 5);
+        saved = controller->saved[1];
+        source = controller->palettes[controller->bank + 1];
+        Palette_InterpolateBanks(controller->working[controller->bank + 1], saved, source, controller->timer, 5);
+        saved = controller->saved[2];
+        source = controller->palettes[controller->bank + 2];
+        Palette_InterpolateBanks(controller->working[controller->bank + 2], saved, source, controller->timer, 5);
+        saved = controller->saved[3];
+        source = controller->palettes[controller->otherBank];
+        Palette_InterpolateBanks(controller->working[controller->otherBank], saved, source,
+                                 controller->timer, 5);
+    } else {
+        controller->update = 0;
+        if (controller->finish) {
+            Callback_InvokeActor(controller, controller->finish);
+            controller->finish = 0;
+        }
+    }
+    controller->timer++;
+}
+
+void Armor_StartPaletteTransition(struct SceneCombatActor *actor)
+{
+    struct ArmorPaletteController *callbacks = &actor->paletteController;
+    void (*update)(struct ArmorPaletteController *) = ActorPalette_BlendSavedBanks;
+    void (*complete)(struct ArmorPaletteController *) = ActorPalette_RestoreSelectedBanks;
+        u16 *source;
+    callbacks->update = update;
+    callbacks->finish = complete;
+    source = actor->paletteController.working[actor->paletteController.bank];
+    Palette_CopyBank(actor->paletteController.saved[0], source);
+    source = actor->paletteController.working[actor->paletteController.bank + 1];
+    Palette_CopyBank(actor->paletteController.saved[1], source);
+    source = actor->paletteController.working[actor->paletteController.bank + 2];
+    Palette_CopyBank(actor->paletteController.saved[2], source);
+    source = actor->paletteController.working[actor->paletteController.otherBank];
+    Palette_CopyBank(actor->paletteController.saved[3], source);
+    actor->paletteController.timer = 0;
+}
