@@ -1226,6 +1226,7 @@ addr,name,mode,confidence,source,notes
 08033E18,DialogueTransition_OnTaskUpdate,thumb,low,src-alias,Task update callback that dispatches state handlers and checks skip input
 08033E74,DialogueTransition_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that clears the singleton and restores saved display state
 08033EA4,DialogueTransition_LoadFromScript,thumb,low,src-alias,Loads entry timing and rectangle arrays from script parameters and starts playback
+08033FEC,DialogueTransition_Initialize,thumb,low,src-alias,Installs the singleton and optionally saves display control before loading script parameters
 08034030,DialogueTransition_CreateFromScript,thumb,low,src-alias,Reloads the existing transition or creates a task with update and destruction callbacks
 08034084,WirelessController_GetInstance,thumb,low,src-alias,Returns the wireless controller singleton
 08034090,WirelessController_IsCreated,thumb,low,src-alias,Tests whether the wireless controller singleton exists

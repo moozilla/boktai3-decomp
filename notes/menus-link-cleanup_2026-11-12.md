@@ -57,3 +57,13 @@ followed by a normal-compiler query. They remain separate rather than introducin
 a new compiler override or compiling either with the wrong compiler. Neither
 holds object fields to unify. Generic ram.h Window declarations are converted
 at the task API boundary; shared headers remain unchanged.
+
+## Scripted dialogue transitions: 08033C58–08034084
+
+Consolidated twelve functions into `src/dialogue_transition.c`. The shared
+DialogueTransition task exposes state-entry flags, the current and final message
+indices, display control restoration, completion/skip procedures, and parallel
+64-entry timing/bounds arrays. Initialize gained a provisional descriptive name.
+Script keyword constants now read as characters; script failure gotos became
+ordinary early returns. ConsumeStateEntry returns u8 consistently with its callers,
+which retain the original return-width check. Exact MATCH: 1,068 bytes.
