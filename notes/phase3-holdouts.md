@@ -1228,3 +1228,15 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-scene2 (Codex)
+
+### Actor_UpdateBlinkBurstDisappearance (081E7F80): one pin removed, unused zero open
+
+Draft: `notes/phase3-drafts/dp-scene2/Actor_UpdateBlinkBurstDisappearance.c` (snippet for the controller unit). The indexed child loop, byte reset mask and byte-union update match all useful instructions and registers. The sole difference is the ROM's unused `movs r7, #0` before its reversed loop counter; the draft instead has two-byte alignment padding later. The landed partial removes the r2 value pin and raw blink offsets, retaining only the original unused-zero r7 pin.
+
+Diagnosis: the initial free draft let regmove tie the OR result to the flags load. `AGBCC_NOTIE=1477` restores the copy but leaves the zero and constant allocation differences; it is not a full matching knob. A byte-union update with byte reset mask naturally restores that copy and allocation. Literal `control.raw |= 1` or a one-bit assignment generates the unused QImode zero through loop hoisting, and indexing real child slots gives the correct invariant order, but the OR operands and callback/reset r4/r5 allocation swap. Count-up reversal places the counter after these invariants.
+
+Tried: u8/u16 flags and result temporaries, direct memory OR, initialized byte unions, one-bit updates, byte/halfword reset masks, callback-view and real-slot indexed loops, postincrement and reversed loops, full-byte and halfword-container bitfields, shared reset helper. Persistent search: `build/matchsearch/Actor_UpdateBlinkBurstDisappearance`; sources and evidence under `build/cx/work/Actor_UpdateBlinkBurstDisappearance`.
+
+Next: retain the literal union update's hoisted zero while obtaining the byte-mask update's operand order; inspect the QImode insertion and invariant merging in cse/loop, or use the finishing-animation twin to identify the original control representation.
