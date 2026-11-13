@@ -1228,3 +1228,35 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-bosses (Codex)
+
+Tags: #matching #phase3 #player #bosses
+
+### sub_0813D834 (0813D834): cse follow into a singleton case
+
+The original two pins remain. The best new pin-free draft is
+`notes/phase3-drafts/dp-bosses/sub_0813D834.c`: 0 ROM / 2 draft instructions
+(the extra initial `cmp kind, #1; beq bonus`), versus the old 17/15 draft.
+The entire body has the ROM's registers and instructions. Persistent search:
+`build/matchsearch/sub_0813D834`, nodes `second-entry` and `case-zero-fallthrough`.
+
+Confirmed `CSE_NOFOLLOW=2` gives MATCH. Read `cse_end_of_basic_block` in cse.c:
+a case label with one incoming branch and a preceding BARRIER admits the
+switch equality. Giving case 1 a second incoming branch blocks both passes;
+the duplicate comparison survives. Making case 0 conditionally fall through
+also blocks the follow, but its mode test survives (7/9). Repeating that test
+in both call/skip arms reduces it to 0/2 plus two moved branch targets.
+
+Tried direct and narrow parameter types, dispatch casts, union/array/address
+forms, precomputing the scaled offset, reordered cases, if/else and separate
+if dispatch, adjusted switch constants, default fallthrough and second entries
+from case zero/default. Dispatch narrowing/offsets preserve the body but add
+conversion/arithmetic instructions. Address-taking and ordinary inline readers
+do not hide the switch equality. No one-pin partial found: removing the scaled
+pin ties its shift to hard r3 and changes the earlier reload order.
+
+Next: a genuine shared path into case 1 whose second edge becomes redundant
+after cse, or an original helper/control-flow structure that puts a non-barrier
+predecessor before the case label. Scope `why all` does not attribute the dead
+argument copy and constant timer address to the switch equality; `probe` does.
