@@ -8196,7 +8196,7 @@ addr,name,mode,confidence,source,notes
 081DC7A0,Time_HandleRegionKeypad,thumb,medium,raphaelr,
 081DCA6C,Time_DestroyRegionMenu,thumb,medium,raphaelr,
 081DCA9C,Time_LoadRegionList,thumb,medium,raphaelr,
-081DCD90,ScreenParams310_SetFromScript,thumb,low,src-alias,
+081DCD90,Time_SetRegionMenuParametersFromScript,thumb,low,src-alias,Region selection menu: group pages; latitude/longitude table and saved sunrise/sunset region.
 081DCDF4,Time_CreateRegionMenu,thumb,low,src-alias,Creates the region selection task using the existing Time callbacks
 081DCE34,Time_OnLoadSave,thumb,medium,raphaelr,
 081DCF20,TextEntry_CopyInitialName,thumb,low,src-alias,
