@@ -1304,9 +1304,9 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct Act
     if (child_take(c)) {
         p->timer = 10;
         if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4)
-            *((u8 *)p + 0xf6f) = 1;
+            p->growFlag = 1;
         else
-            *((u8 *)p + 0xf6f) = 0;
+            p->growFlag = 0;
         {
             u8 *variant = &c->variant;
             p->variant8 = *variant;
