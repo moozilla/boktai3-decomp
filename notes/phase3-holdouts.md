@@ -1349,3 +1349,30 @@ workspace and is worth revisiting once the common caller form is solved.
 Drafts: `notes/phase3-drafts/dp-monsters/TentacleBody_*.c`. Workspaces are
 `build/cx/work/TentacleBody_*`. Next: solve the shared caller local preferences,
 then consolidate the playback with the original sprite view explicit.
+
+### sub_080AA688 (080AA688): count-address hoisting
+
+The best ordinary draft differs 25/24, shape 5, and is 152 bytes versus 156.
+The only concession is the active-count address return pin. Removing it lets
+loop.c hoist the address in its second pass. `AGBCC_NOMOVE=148` matches the
+instrumented `-g` output exactly; scope warns that debug information changes
+this function, so this is a diagnostic, not a stock-compiler match.
+
+In pass one the address has 10*1*3 < 45 and stays inside; after the mask
+invariant moves, pass two has 13*1*3 >= 37 and hoists it. The nearest relative,
+ActorTrail_RemoveAllSegments, has an additional spark call after decrementing
+activeCount. That longer loop naturally keeps the address inside.
+
+Tried a genuine goto loop, reverse post-decrement and return-terminated loops,
+initialized pointer unions and arrays, encoded offset construction, narrow
+mask locals, eight-bit and seven-bit fields, a removed-bit field store, and
+an inline count setter. Most canonicalize to the same hoist; changed loops
+lose other invariant motion or induction reduction. No safe partial exists.
+The saved draft uses the real activeCount field rather than the original
+raw-offset helper. Persistent hypotheses and compiler evidence are in
+build/matchsearch/sub_080AA688 and build/cx/work/sub_080AA688.
+
+Next: find an equivalent iteration shape that increases loop instruction
+count during invariant analysis while still reducing to the same final loop,
+or prevents this address from being recognized as invariant without changing
+its eventual instructions.
