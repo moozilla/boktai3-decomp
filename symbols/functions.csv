@@ -7343,23 +7343,25 @@ addr,name,mode,confidence,source,notes
 081BAB7C,Registry3F74_CreateSelectionCursor,thumb,low,src-alias,Creates a tentative selection cursor child using eleven entries from a copied descriptor table
 081BABB0,Registry3F74_InitFromScript,thumb,low,src-alias,
 081BAC74,Registry3F74_Create,thumb,low,src-alias,Allocates and initializes the task registered under key 3F74 with update and destruction callbacks
-081BACB8,SelectionCursor_SetState,thumb,low,src-alias,Installs the tentative selection cursor state callback and resets its frame counter
+081BACB8,MenuCursor_SetUpdate,thumb,low,src-alias,Assign the cursor callback and reset its frame counter.
 081BACD0,MenuCursor_SetPositionFromSelection,thumb,low,src-alias,Positions the cursor at the selected entry with a ten-pixel upward offset
-081BAD08,SelectionList_SelectNearestEnabledEntry,thumb,low,src-alias,
-081BAD98,SelectionList_FindEntryAtCursor,thumb,low,src-alias,
-081BADFC,SelectionList_ProcessCursorInput,thumb,low,src-alias,
-081BAF10,SelectionList_TickCursorShake,thumb,low,src-alias,
+081BAD08,MenuCursor_SelectNearestEnabledEntry,thumb,low,src-alias,Find the nearest enabled menu entry to the sprite position.
+081BAD98,MenuCursor_FindEntryAtPosition,thumb,low,src-alias,Find the entry whose bounds contain the cursor position.
+081BADFC,MenuCursor_ProcessInput,thumb,low,src-alias,Move the cursor and navigate previous/next entry links on shoulder input.
+081BAF10,MenuCursor_TickShake,thumb,low,src-alias,Apply a brief horizontal selection shake before resuming input.
 081BAF7C,MenuCursor_OnSelectionFlag,thumb,low,src-alias,Callback that sets selection flag 2; its precise meaning is tentative
 081BAF8C,MenuCursor_OnHidden,thumb,low,src-alias,Callback that sets the flag copied into the cursor animation visibility
 081BAF9C,MenuCursor_UpdateInput,thumb,low,src-alias,Cursor state callback that finds the hovered entry and processes movement input
 081BAFD4,MenuCursor_UpdateState,thumb,low,src-alias,
 081BB054,MenuCursor_OnDestroy,thumb,low,src-alias,Task destruction callback that removes the cursor animation
-081BB060,ResourceSprite_CopyEntries,thumb,low,src-alias,
-081BB0A0,ResourceSprite_Initialize,thumb,low,src-alias,
+081BB060,MenuCursor_CopyEntries,thumb,low,src-alias,Copy at most sixteen menu entries into the cursor task.
+081BB0A0,MenuCursor_Initialize,thumb,low,src-alias,Load and relocate the cursor widget resource and initialize its selection.
+081BB114,MenuCursor_Destroy,thumb,low,src-alias,Kill a non-null cursor task.
+081BB124,MenuCursor_SetSelection,thumb,low,src-alias,Set a non-null cursor selection and update its saved position.
 081BB13C,MenuCursor_Hide,thumb,low,src-alias,Installs the cursor callback that marks its animation hidden
 081BB150,MenuCursor_EnableInput,thumb,low,src-alias,Installs the cursor input callback when the supplied cursor exists
 081BB164,MenuCursor_SetSelectionFlag,thumb,low,src-alias,Installs the cursor callback that sets selection flag 2
-081BB178,Registry3F74_FindFrameOffset,thumb,low,src-alias,
+081BB178,MenuCursor_GetEntry,thumb,low,src-alias,Return a validated menu entry; including its display point and hit bounds.
 081BB1A0,MenuCursor_Create,thumb,low,src-alias,
 081BB294,SolarBank_ApplyInterestFromScript,thumb,low,src-alias,
 081BB3A0,SolarBank_SetBalanceFromScript,thumb,low,src-alias,Reads script option a and stores the bank balance capped at 9999
