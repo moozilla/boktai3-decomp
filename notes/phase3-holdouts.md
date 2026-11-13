@@ -1316,3 +1316,34 @@ Next idea: recover the original helper's count/temporary return boundary. The ha
 r0 one-pin influences allocation outside its lexical block; a returning inline may
 produce the needed hard-return-register liveness without any pin, unlike the simple
 QueueCollider helper tried so far. Preserve the observed first-slot flags test.
+
+### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): partial
+
+Tags: #matching #phase3 #presentation #081E2910
+
+Removed the random-table pin; three destination pins remain. A separate do/while
+block around the index update raises mask references while the existing sample
+capture macro retains table-first evaluation. Stock unit check MATCH, 576 bytes.
+
+The pin-free draft in `notes/phase3-drafts/dp-effects-b/Presentation_UpdateDropShakeBlink.c`
+has six differing instructions, identical shape and size. Sharing dest across the
+three moving branches combines their conflicts (r0/r1), but global alloc takes r2
+where ROM uses r3. `AGBCC_FORCE=dest:3` gives MATCH. Read local-alloc.c's quantity
+priority calculation and global.c's used-register preference/conflict filtering.
+
+The shared random helper alone gave 30/30 differences: table priority 2272 versus
+mask 1000. `AGBCC_PRI=119:+1300,179:+1300,238:+1300,307:+1300` fixed all four swaps;
++1250 did not cross the threshold. The index update block produces this naturally.
+Mask argument, direct sample, shared table, union table, NextSample, and helper
+index variants changed CSE or retained the wrong priority. Plain setters and
+layer-address getters did not fix destination allocation. Shared y and shared
+y/dest altered argument allocation. Extending dest through the late zero store
+fixes every earlier store but makes that final address use r3 instead of reusing
+x's r0 address: 2 ROM/4 draft differences, 580 bytes. An inline store keeps that
+result. Using dest for all y stores changes cross-jumping and allocation broadly.
+
+Persistent search: `build/matchsearch/Presentation_UpdateDropShakeBlink`, node
+shared-destination. Evidence/candidates: `build/cx/work/Presentation_UpdateDropShakeBlink/`.
+Next: produce the r2 conflict without forcing the late zero store to retain the
+shared destination, perhaps by separating its caller value from the store helper's
+argument class. The knob proves the sole remaining decision on the saved draft.
