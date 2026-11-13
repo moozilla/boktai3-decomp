@@ -1494,3 +1494,21 @@ No free partial landed. Persistent search retains the independent hypotheses.
 Next: preserve full-word range initialization while giving spread one extra
 ordinary reference (or shortening its local life), then solve the entry-one
 sharing independently before combining macro removals.
+
+### sub_080B197C (080B197C): active priority remains
+
+Reconfirmed the exact `AGBCC_PRI=active:+400` diagnostic on the clean draft,
+26/26, shape 0. Active is 8 refs/33 live, priority 7272; actor is 18/94,
+7659. Life inspection shows the active value also supplies the zero stores
+in both state and control resets, ending at word104.
+
+Early return with duplicated motion marking, switch(active), u8 active,
+initialized active byte array, nested active==0 decisions, and a separate
+state-actor view all canonicalize to the same result. Reversing arms,
+returning while, active==1 with active-1 dispatch argument, explicit state
+zero parameter, and actor/motion pointer views change instructions or add
+copies. A word-return flag predicate removes narrowing but changes shape.
+No additional production change. Saved ordinary draft and persistent search
+record these attempts. Next: reduce the actor's weighted references without
+introducing an overlapping pointer, or recover a ninth active reference that
+survives flow and disappears only in a later merge.
