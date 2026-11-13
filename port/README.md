@@ -185,3 +185,13 @@ restores IME. The resolver accepts both the portable pointer installed by C and
 the original ROM address. This focused resolver is not a complete game callback
 registry. The slice keeps original RTC C and excludes port-hw's optional RTC SDK
 replacement, because generated MMIO instrumentation already routes its edges.
+
+The `--slice --rtc` extension runs original `Clock_CheckRtcDate`, including the
+GPIO protocol, date validation and sun-clock update. Run
+`python port/tests/run_rtc.py --hardware-root ../cx-port-hw/port`: all 44 bytes of
+clock and RTC RAM match native, wasm and mGBA frame 3. The harness uses `TZ=UTC`
+because mGBA converts its fixed epoch through local time. The slice links without
+warnings. Generated port source makes the incoming date arguments explicit at
+`SunClock_SetDateTime`'s `Clock_PackDate` call (the GBA prologue leaves r0/r1/r2
+unchanged) and corrects two discarded return declarations. The original source
+and GBA build are untouched. The demo now includes this RTC extension.

@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef PORT_TEST_RTC
+#include "devices.h"
+void Clock_CheckRtcDate(void);
+#endif
 int main(int argc, char **argv)
 {
     FILE *file;
@@ -34,8 +38,16 @@ int main(int argc, char **argv)
     assert(*(uint16_t *)(uintptr_t)0x080000c8 == 1);
     assert(*(uint8_t *)(uintptr_t)0x030035c6 == 0);
     for (i = 0; i < 0x24; ++i) assert(*(uint8_t *)(uintptr_t)(0x03005430 + i) == 0);
+#ifdef PORT_TEST_RTC
+    port_devices_init(NULL, NULL);
+    Clock_CheckRtcDate();
+#endif
     file = fopen(argv[2], "wb");
     assert(file && fwrite((void *)(uintptr_t)0x03005430, 1, 0x24, file) == 0x24);
+#ifdef PORT_TEST_RTC
+    assert(fwrite((void *)(uintptr_t)0x03005460, 1, 8, file) == 8);
+    puts("RTC: original Clock_CheckRtcDate and GPIO protocol executed");
+#endif
     fclose(file);
     assert(port_boot_copy_iwram() == 0);
     assert(memcmp((void *)(uintptr_t)0x03000000, (void *)(uintptr_t)0x08000350, 0x110c) == 0);

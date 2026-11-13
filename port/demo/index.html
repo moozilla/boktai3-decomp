@@ -26,7 +26,7 @@ figcaption{margin:9px 0;color:#a9c2cc}figure{margin:0}pre{white-space:pre-wrap;b
 <p><button id="play" disabled>Play captures</button><button id="next" disabled>Next frame</button><span id="frame"></span></p>
 <div class="screens"><figure><canvas id="port" width="240" height="160"></canvas><figcaption>Port · WebAssembly compiled from C</figcaption></figure><figure><canvas id="mgba" width="240" height="160"></canvas><figcaption>mGBA · user-selected reference</figcaption></figure></div>
 <pre id="status" role="status">Choose the compiled module to begin.</pre>
-<div class="control"><label for="rom">Run the original early boot C</label><input id="rom" type="file" accept=".gba"><p>Runs RTC initialization, clock-state clearing, the IWRAM copy and DMA video initialization. The initial forced-blank frame is white. This check does not enter gameplay.</p></div>
+<div class="control"><label for="rom">Run the original early boot C</label><input id="rom" type="file" accept=".gba"><p>Runs RTC initialization and date synchronization, clock-state clearing, the IWRAM copy and DMA video initialization. The initial forced-blank frame is white. This check does not enter gameplay.</p></div>
 <p><small>Build: <code>python port/demo/build_demo.py --hardware-root PATH/port --ppu-root PATH/port</code>. The generated build/demo/index.html also embeds the code module for offline use. No ROM or captured graphics are included in the source page.</small></p>
 <script src="replay.js"></script>
 <script src="viewer.js"></script>

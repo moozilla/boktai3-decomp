@@ -15,12 +15,12 @@ def main():
     parser.add_argument('--hardware-root')
     parser.add_argument('--ppu-root', default='port')
     args = parser.parse_args()
-    command = [sys.executable, 'port/build.py', '--slice', '--mmio', '--ppu-root', args.ppu_root]
+    command = [sys.executable, 'port/build.py', '--slice', '--rtc', '--mmio', '--ppu-root', args.ppu_root]
     if args.hardware_root: command += ['--hardware-root', args.hardware_root]
     subprocess.run(command, cwd=ROOT, check=True)
     out = ROOT / 'build/demo'
     out.mkdir(parents=True, exist_ok=True)
-    module = ROOT / 'build/port/slice-wasm32/boot.wasm'
+    module = ROOT / 'build/port/slice-wasm32-rtc/boot.wasm'
     shutil.copyfile(module, out / 'boot.wasm')
     html = (ROOT / 'port/demo/index.html').read_text()
     html = html.replace('<script src="replay.js"></script>',

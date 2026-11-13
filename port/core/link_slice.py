@@ -9,6 +9,7 @@ import sys
 from addresses import bind_ir, read_addresses
 from prepare import prepare_headers, prepare_source
 from mmio import instrument_mmio
+from rtc_slice import RTC_SOURCES
 
 GAME = ['src/fn/sub_08248970.c', 'src/fn/sub_08249210.c',
         'src/fn/sub_082284F4.c', 'src/fn/sub_08219DD8.c', 'src/fn/sub_08224EEC.c']
@@ -35,7 +36,9 @@ def find_linker():
 
 
 def build_slice(root, args):
-    out = root / 'build/port' / ('slice-' + args.target)
+    if args.ppu_root or args.rtc:
+        args.mmio = True
+    out = root / 'build/port' / ('slice-' + args.target + ('-rtc' if args.rtc else ''))
     out.mkdir(parents=True, exist_ok=True)
     headers = out / 'include'
     prepare_headers(root, headers, args.target)
@@ -65,6 +68,10 @@ def build_slice(root, args):
         flags += ['-I' + str(ppu / 'include')]
         units += ['port/core/video.c', str(ppu / 'ppu/ppu.c')]
         exports += ['port_video_init', 'port_video_framebuffer', 'port_video_capture_line', 'port_video_capture_framebuffer']
+    if args.rtc:
+        units += RTC_SOURCES
+        exports += ['Clock_CheckRtcDate', 'Clock_ReadValidatedRtcDateTime', 'Clock_CheckRtcStatus']
+    units = list(dict.fromkeys(units))
     for name in units:
         source = root / name
         key = name.replace('/', '_').replace('\\', '_').lstrip('_')
@@ -92,7 +99,7 @@ def build_slice(root, args):
     else:
         destination = out / 'boot_test'
         ldflags = ['-Wl,-no_pie,-pagezero_size,0x10000,-dead_strip'] if sys.platform == 'darwin' else ['-no-pie', '-Wl,--gc-sections']
-        command = [args.cc, *arch, '-Iport/include', '-Iport/core', 'port/tests/boot_test.c',
+        command = [args.cc, *arch, *(['-DPORT_TEST_RTC'] if args.rtc else []), '-Iport/include', '-Iport/core', 'port/tests/boot_test.c',
                    *objects, *ldflags, '-o', str(destination)]
     subprocess.run(command, check=True)
     print(destination.relative_to(root))

@@ -101,6 +101,8 @@
     bytes.set(new Uint8Array(await file.arrayBuffer()), 0x08000000);
     if (api.port_load_rom(0x08000000, file.size) || api.port_boot_early() || api.port_boot_copy_iwram()) throw Error('Early boot failed');
     api.port_devices_init(0, 0);
+    if (api.Clock_CheckRtcDate) api.Clock_CheckRtcDate();
+    const clockStamp = new DataView(api.memory.buffer).getUint32(0x03005430, true).toString(16);
     api.InterruptsAndVideo_Initialize();
     api.port_devices_init(0, 0);
     api.port_video_init();
@@ -113,7 +115,8 @@
     colors.forEach((c, i) => { for (let k = 0; k < 3; k++) { const v = (c >>> (k * 5)) & 31; rgba[i * 4 + k] = (v << 3) | (v >>> 2); } rgba[i * 4 + 3] = 255; });
     context.putImageData(new ImageData(rgba, 240, 160), 0, 0);
     $('frame').textContent = 'Early boot · forced blank';
-    status('Original game C executed: RTC initialization → clock clear → memory clear.\nIWRAM payload copied; original video initialization performed DMA clears.\n228 scanlines advanced; PPU rendered the initial white frame. Gameplay boot remains in development.');
+    status('Original game C executed: RTC initialization → clock clear → memory clear.\n' +
+      (api.Clock_CheckRtcDate ? `RTC synchronized through original GPIO code: ${clockStamp} (packed BCD, deterministic UTC clock).\n` : '') + 'IWRAM payload copied; original video initialization performed DMA clears.\n228 scanlines advanced; PPU rendered the initial white frame. Gameplay boot remains in development.');
   });
   if (globalThis.PORT_WASM_BASE64) guard(async () => {
     const bytes = Uint8Array.from(atob(globalThis.PORT_WASM_BASE64), c => c.charCodeAt(0));

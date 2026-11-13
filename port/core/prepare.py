@@ -13,6 +13,14 @@ def prepare_source(path, target):
     if path.name == 'golem_2.c':
         text = ('struct SceneActorAnimationView;\n'
                 'void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, int);\n' + text)
+    if path.name == 'sub_08228C40.c':
+        # The GBA call carries the incoming date in r0/r1/r2 unchanged.
+        # wasm needs explicit arguments; see the original 08228C40 prologue.
+        text = text.replace('u32 Clock_PackDate(void);', 'u32 Clock_PackDate(s32, s32, s32);')
+        text = text.replace('Clock_PackDate();', 'Clock_PackDate(a, b, c);')
+    if path.name in ('sub_082290F4.c', 'sub_08229380.c'):
+        # These callers discard the result, but wasm still checks the type.
+        text = text.replace('void SunClock_SetDateTime(', 's32 SunClock_SetDateTime(')
     if path.name == 'sub_08213D10.c':
         # The dispatcher copy is data; a wasm function pointer is not ROM bytes.
         text = text.replace('(u32)IntrMain', '(u32)0x080001f0')

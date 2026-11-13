@@ -35,6 +35,7 @@ def main():
     ap.add_argument('--force', action='store_true')
     ap.add_argument('--mmio', action='store_true', help='route volatile scalar accesses through port-hw in linked builds')
     ap.add_argument('--link-game', action='store_true', help='bind absolute data addresses and attempt the complete wasm game link')
+    ap.add_argument('--rtc', action='store_true', help='extend the boot slice through RTC date synchronization')
     ap.add_argument('--slice', action='store_true', help='link the tested early-boot vertical slice')
     ap.add_argument('--ppu-root', help='port-ppu port directory when testing before integration')
     ap.add_argument('--hardware-root', help='port-hw port directory when testing before integration')
@@ -67,9 +68,13 @@ def main():
         # The MMIO pass retains the original RTC C and routes every GPIO edge.
         units += [p for p in sorted((hardware / 'hw').glob('*.c')) if p.name != 'rtc_sdk.c']
     header_hash = hashlib.sha256()
-    for p in sorted(ROOT.glob('include/**/*.h')) + sorted(ROOT.glob('port/**/*.h')):
-        header_hash.update(str(p.relative_to(ROOT)).encode())
-        header_hash.update(p.read_bytes())
+    header_groups = [('game', ROOT / 'include'), ('port', ROOT / 'port')]
+    if args.link_game and hardware != ROOT / 'port':
+        header_groups.append(('hardware', hardware))
+    for label, directory in header_groups:
+        for p in sorted(directory.rglob('*.h')):
+            header_hash.update((label + '/' + str(p.relative_to(directory))).encode())
+            header_hash.update(p.read_bytes())
     identity = subprocess.check_output([args.cc, '--version'])
     context = identity + repr(flags).encode() + header_hash.digest()
     for helper in ('prepare.py', 'addresses.py', 'mmio.py'):
@@ -132,7 +137,7 @@ def main():
         objects = [r['object'] for r in results if r['source'] not in excluded]
         command = [find_linker(), '--no-entry', '--gc-sections', '--export-memory',
                    '--initial-memory=167772160', '--max-memory=167772160',
-                   '--global-base=1048576', '-z', 'stack-size=1048576', '--error-limit=0',
+                   '--global-base=1048576', '-z', 'stack-size=1048576', '--error-limit=0', '--fatal-warnings',
                    '--export=port_memory_init', '--export=port_load_rom',
                    '--export=port_game_initialize', '--export=port_game_step',
                    *objects, '-o', str(out / 'game.wasm')]

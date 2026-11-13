@@ -20,7 +20,9 @@ captures play in filename order at 15 fps; use captures spaced four GBA frames
 apart for approximately real-time playback. The optional reference picker accepts
 a 240×160 mGBA PNG or PPM and reports exact RGB pixel differences.
 
-The ROM picker runs the original early RTC, clock and video initialization C.
+The ROM picker runs the original early RTC, clock and video initialization C,
+including the GPIO protocol and date synchronization. Its deterministic device
+clock is 2025-11-13 00:00:00 UTC.
 Its result is the initial white forced-blank frame. Full gameplay boot remains
 in development; capture playback supplies recorded state rather than executing
 the game loop. No ROM, captures, screenshots or encoded assets are committed.
