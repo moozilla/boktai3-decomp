@@ -585,3 +585,64 @@ void ActorController_UpdatePaletteAnimationTransition(struct SceneCombatActor *a
             break;
     }
 }
+
+extern const u32 gUnk_0824EDA8[];
+
+extern const u32 gUnk_0824EDB8[];
+
+void ActorController_UpdateLayeredAnimationTransition(struct SceneCombatActor *actor)
+{
+    u8 *phase = &actor->actionPhase;
+    u8 initialPhase = *phase;
+    switch (initialPhase) {
+        case 0: {
+            u32 four = 4;
+            Armor_SetAnimationFromStart(
+                actor, &gUnk_0824EDA8[((actor->heading + 0x60) >> 6) & 3]);
+            (*phase)++;
+            actor->actionReady = initialPhase;
+            Sound_PlaySongChecked(0xc1);
+            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], four);
+            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
+            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
+            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            {
+                struct ActorControllerMotion *render = &actor->colliderGroup.motion;
+                u32 one = 1;
+                render->flags |= one;
+            }
+            actor->flags &= ~0x20;
+            break;
+        }
+        case 1:
+            if (actor->animationComplete) {
+                Armor_SetAnimationFromStart(
+                    actor, &gUnk_0824EDB8[((actor->heading + 0x60) >> 6) & 3]);
+                *phase = 0xff;
+                actor->actionReady = initialPhase;
+            }
+            break;
+    }
+}
+
+extern const u32 gUnk_0824EDC8[];
+
+void DirectionalActor_UpdateSequence(struct SceneCombatActor *actor)
+{
+    u8 *phase = &actor->actionPhase;
+    u8 initialPhase = *phase;
+    switch (initialPhase) {
+        case 0:
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EDC8[((actor->heading + 0x60) >> 6) & 3]);
+            (*phase)++;
+            actor->actionReady = initialPhase;
+            Armor_StartPaletteTransition(actor);
+            break;
+        case 1:
+            if (actor->animationComplete != 0) {
+                *phase = 0xff;
+                actor->actionReady = initialPhase;
+            }
+            break;
+    }
+}
