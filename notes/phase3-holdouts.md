@@ -1362,3 +1362,29 @@ is unchanged. The direct combined-count form is 27/27, shape 10; the inherited c
 
 Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateIncomingItem`;
 scratch: `build/cx/work/WirelessGameItems_UpdateIncomingItem/`.
+
+### WirelessGameItems_QueueLocalItem (0803A514, src/wireless_game_items_and_display.c)
+
+Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_QueueLocalItem.c`
+(11 ROM / 9 draft, shape 2, 256 bytes). Production is unchanged. Removing only the
+value pin gives 9/9; removing only flag gives 2/2 with an alignment nop replacing
+one missing zero. Both individual removals and the combined removal fail.
+
+`why 136`: clamp value (70) is global, priority 12000, but the local clear (71)
+already occupies r0. Value consequently gets r1. Forcing value into r0 is invalid
+as a diagnosis: it overlaps clear and deletes the clamp. The second block is a
+separate CSE issue: byte-zero 113 is substituted with zero#1 (96), so pendingFlag
+uses r1 rather than a fresh r0 zero. Eleven CSE probes do not improve the result;
+CSE_NOCANON=70 and CSE_NOFOLLOW=4 worsen it to 35/29.
+
+In addition to the older 24 recorded variants, tested fresh direct fields (36/30,
+shape 12), literal byte-pointer stores, union-initialized pending zero, union clear,
+bitfield zero, narrow clamp types, conditional clamp, repeated full clamp tails,
+wide zero and a timer reload. Union and bitfield initializers fold back to the same
+CSE class. Wide zero changes allocation to 10/8 but still misses both zero moves;
+it is not a suitable source form. Repeating tails creates additional branches.
+No matching knob yet. Next: a precise per-substitution CSE diagnostic shared with
+UpdateItemMerge, then identify the original reset interface or control-flow lifetime
+that preserves the separate byte zero. Do not repeat initializer spelling variants.
+
+Scratch/evidence: `build/cx/work/WirelessGameItems_QueueLocalItem/`.
