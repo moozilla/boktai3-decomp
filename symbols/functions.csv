@@ -8199,8 +8199,9 @@ addr,name,mode,confidence,source,notes
 081DCD90,Time_SetRegionMenuParametersFromScript,thumb,low,src-alias,Region selection menu: group pages; latitude/longitude table and saved sunrise/sunset region.
 081DCDF4,Time_CreateRegionMenu,thumb,low,src-alias,Creates the region selection task using the existing Time callbacks
 081DCE34,Time_OnLoadSave,thumb,medium,raphaelr,
-081DCF20,TextEntry_CopyInitialName,thumb,low,src-alias,
-081DCF84,TextEntry_DrawName,thumb,low,src-alias,
+081DCF20,NameEntry_CopyInitialName,thumb,low,src-alias,Name entry task: keyboard page; selected key; name cursor; repeat timing; six widgets and pulse palettes.
+081DCF78,NameEntry_CopyName,thumb,low,src-alias,Name entry task: keyboard page; selected key; name cursor; repeat timing; six widgets and pulse palettes.
+081DCF84,NameEntry_DrawName,thumb,low,src-alias,Name entry task: keyboard page; selected key; name cursor; repeat timing; six widgets and pulse palettes.
 081DCFE4,NameEntry_UpdateCursor,thumb,low,src-alias,
 081DD174,NameEntry_MoveCursorUp,thumb,low,src-alias,
 081DD3B8,NameEntry_MoveCursorDown,thumb,low,src-alias,
@@ -8208,10 +8209,11 @@ addr,name,mode,confidence,source,notes
 081DD80C,NameEntry_MoveCursorLeft,thumb,low,src-alias,
 081DDA78,NameEntry_AppendChar,thumb,low,src-alias,
 081DDAF0,NameEntry_ToggleCharacterPage,thumb,low,src-alias,Switches between two keyboard pages and refreshes the selection display
+081DDB44,NameEntry_EraseCharacter,thumb,low,src-alias,Name entry task: keyboard page; selected key; name cursor; repeat timing; six widgets and pulse palettes.
 081DDBC0,NameEntry_Update,thumb,low,src-alias,
 081DE078,NameEntry_Destroy,thumb,low,src-alias,Destruction callback clears display flags and removes six name entry animations
 081DE0CC,NameEntry_Initialize,thumb,low,src-alias,
-081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
+081DE520,NameEntry_SetParametersFromScript,thumb,low,src-alias,Name entry task: keyboard page; selected key; name cursor; repeat timing; six widgets and pulse palettes.
 081DE5A4,NameEntry_Create,thumb,high,gcl-name,name from GCL key 2687 名前入力 (Name Entry); registry callback
 081DE5E4,MenuSprites_SetFlagBits,thumb,low,src-alias,
 081DE6C4,Password_LoadDate,thumb,low,src-alias,
