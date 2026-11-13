@@ -1512,3 +1512,24 @@ No additional production change. Saved ordinary draft and persistent search
 record these attempts. Next: reduce the actor's weighted references without
 introducing an overlapping pointer, or recover a ninth active reference that
 survives flow and disappears only in a later merge.
+
+### Skeleton_TrySelectRetreatCell (080B77D0): updated reload diagnosis
+
+Both barriers removed still give 2/2, shape 0: south exit's signed width load
+uses scratch r1 instead of r2. Removing only north's barrier gives 22/22;
+neither removal is free. The old single-knob claim needs updating with the
+current compiler instrumentation: `AGBCC_SPILL=18:2` gives 22/22, while
+`AGBCC_SPILL=18:2,19:2` matches exactly. The first correction fixes the width
+scratch; the second restores subsequent reload rotation. Scope's one-choice
+spill search finds no improvement, correctly reflecting this coupling.
+
+Previous choice 17 belongs to north's width load (insn 422), and uses r2.
+Wrote out south, north, and both failed/successful exit tails before jump2:
+10/12, 25/25, and 39/41 respectively. A local initialized width array and a
+real signed width field both preserve the original 2/2. The saved draft uses
+the width field. Prior signed-width, map-accessor, loop, and post-loop lifetime
+attempts remain applicable; they were not repeated wholesale.
+
+Persistent search records the exit-tail hypotheses. Next: a C form that keeps
+mapSlot live through the south load but dies before its exit, or two naturally
+duplicated reload sites that cancel after tail merging. No partial landed.
