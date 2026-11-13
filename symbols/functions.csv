@@ -8320,12 +8320,14 @@ addr,name,mode,confidence,source,notes
 081D6984,MonsterBook_Init,thumb,low,src-alias,
 081D6BC0,MonsterBook_Create,thumb,medium,gcl-name,name from GCL key 34EA 魔物図鑑 (Monster Book); registry callback
 081D70C4,TextSequence_SetState,thumb,low,src-alias,Sets the sequence state and clears its frame counter; text sequence identity tentative
+081D70DC,TextSequence_UpdateFadeIn,thumb,low,src-alias,Scripted bestiary display sequence: 64 timing/position/entry records; fade phases and current-step state.
 081D71A0,TextSequence_UpdateHold,thumb,low,src-alias,Counts hold frames and switches to state two when the specified duration expires
-081D71CC,ScreenTransition_FadeBlendOut,thumb,low,src-alias,
-081D7240,ScreenTransition_WaitForCompletion,thumb,low,src-alias,
+081D71CC,TextSequence_UpdateFadeOut,thumb,low,src-alias,Scripted bestiary display sequence: 64 timing/position/entry records; fade phases and current-step state.
+081D7240,TextSequence_UpdateHiddenWait,thumb,low,src-alias,Scripted bestiary display sequence: 64 timing/position/entry records; fade phases and current-step state.
 081D7290,TextSequence_OnDestroy,thumb,low,src-alias,Hides the associated display object during the sequence destruction callback
-081D72A4,ScreenTransition_DispatchPhase,thumb,low,src-alias,
-081D72FC,ScreenTransition_ReturnZero,thumb,low,src-alias,
+081D72A4,TextSequence_Update,thumb,low,src-alias,Scripted bestiary display sequence: 64 timing/position/entry records; fade phases and current-step state.
+081D72FC,TextSequence_ReturnZero,thumb,low,src-alias,Scripted bestiary display sequence: 64 timing/position/entry records; fade phases and current-step state.
+081D7300,TextSequence_InitializeFromScript,thumb,low,src-alias,Scripted bestiary display sequence: 64 timing/position/entry records; fade phases and current-step state.
 081D73F0,TextSequence_CreateFromScript,thumb,low,src-alias,Creates a task that reads timed text and color records from script options; identity tentative
 081D7434,OptionMenu_Update,thumb,low,src-alias,
 081D7510,ScreenParams2A0_SetFromScript,thumb,low,src-alias,
