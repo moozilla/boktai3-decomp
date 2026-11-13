@@ -7676,22 +7676,27 @@ addr,name,mode,confidence,source,notes
 081C5E44,ChallengeMenu_CreateFromScript,thumb,low,src-alias,Creates the menu task with script-defined options and callbacks; challenge ownership is tentative
 081C5E84,ChallengeMenu_ResetStoredRanks,thumb,low,src-alias,Challenge selection menu: group icon; three available choices; packed rank values; description and script dispatch.
 081C5EA8,ChallengeMenu_GetRankKeyframe,thumb,low,src-alias,Maps ranks 1 through 5 to graphics keyframes and returns minus one otherwise
-081C5EF0,ChallengeResult_SetState,thumb,low,src-alias,Sets the timed result panel state callback and resets its frame counter
-081C5F08,ChallengeResult_LoadDigit,thumb,low,src-alias,Loads a digit keyframe only for values zero through nine into result display animations
+081C5EF0,TimeResult_SetState,thumb,low,src-alias,Challenge elapsed-time results: six rolling digits; rank category; background and script callback state.
+081C5F08,TimeResult_LoadDigit,thumb,low,src-alias,Challenge elapsed-time results: six rolling digits; rank category; background and script callback state.
 081C5F1C,TimeResult_BeginFadeIn,thumb,low,src-alias,Starts the opening screen transition and installs the fade-in wait callback; time-result ownership is tentative
 081C5F50,TimeResult_BeginFadeOut,thumb,low,src-alias,Resets display state and starts the closing transition before installing its wait callback
 081C5F90,TimeResult_BeginDigitReveal,thumb,low,src-alias,Clears flag bit zero on six digit animations and installs the randomized reveal callback
+081C5FC4,TimeResult_HandleInput,thumb,low,src-alias,Challenge elapsed-time results: six rolling digits; rank category; background and script callback state.
 081C603C,TimeResult_UpdateResultHold,thumb,low,src-alias,Waits for sixty frames or A input before playing a sound and advancing to the input callback
+081C6094,TimeResult_UpdateDigitReveal,thumb,low,src-alias,Challenge elapsed-time results: six rolling digits; rank category; background and script callback state.
 081C614C,TimeResult_UpdateFadeIn,thumb,low,src-alias,Opening transition callback that waits thirty-three frames before starting the digit reveal
 081C616C,TimeResult_UpdateFadeOut,thumb,low,src-alias,Closing transition callback that waits thirty-three frames then invokes the completion script and kills the task
 081C61A0,TimeResult_UpdateInput,thumb,low,src-alias,Post-reveal callback that delegates to the directional-input and exit handler
+081C61AC,TimeResult_ShowLabel,thumb,low,src-alias,Challenge elapsed-time results: six rolling digits; rank category; background and script callback state.
 081C61BC,TimeResult_UpdateBackground,thumb,low,src-alias,Calls the background display helper for layer two at zero offsets; interpretation is tentative
 081C61CC,TimeResult_Update,thumb,low,src-alias,Task update callback that refreshes the background and animations then invokes the current state callback
 081C61F4,TimeResult_Destroy,thumb,low,src-alias,Task destruction callback that removes six digit animations and two supporting animations
-081C6224,SceneObject_StartBackgroundScript,thumb,low,src-alias,
+081C6224,TimeResult_InitializeBackground,thumb,low,src-alias,Challenge elapsed-time results: six rolling digits; rank category; background and script callback state.
 081C6280,TimeResult_LoadPalette,thumb,low,src-alias,Loads resource 92B3:0204 and copies its payload into the shared palette buffer
+081C62B4,TimeResult_SetElapsedDigits,thumb,low,src-alias,Challenge elapsed-time results: six rolling digits; rank category; background and script callback state.
 081C6448,TimeResult_InitCategoryDisplay,thumb,low,src-alias,Selects a keyframe for category values one through five and initializes the supporting marker
 081C6498,TimeResult_InitAnimations,thumb,low,src-alias,Relocates two resource headers and initializes six digit animations plus two supporting animations
+081C6570,TimeResult_InitializeFromScript,thumb,low,src-alias,Challenge elapsed-time results: six rolling digits; rank category; background and script callback state.
 081C6614,TimeResult_Create,thumb,low,src-alias,Creates and initializes the scripted time-result task with update and destruction callbacks
 081C6654,Actor_UpdateStateTwo,thumb,low,src-alias,Primary-state callback that enters substate two and consumes pending trigger commands
 081C6678,Actor_UpdateStateThree,thumb,low,src-alias,Primary-state callback that enters substate three and returns to primary state one when complete
