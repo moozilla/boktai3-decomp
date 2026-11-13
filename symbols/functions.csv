@@ -5093,7 +5093,8 @@ addr,name,mode,confidence,source,notes
 081389E0,PositionEffectDisplay_Create,thumb,low,src-alias,Returns or creates the singleton task with four animated sprites and update and destruction callbacks
 08138A2C,SpriteSlots_AttachSource,thumb,low,src-alias,
 08138A8C,TimedSpriteEffect_RequestStop,thumb,low,src-alias,Requests termination of an active slot among four effects; effect identity is tentative
-08138AC8,HeightProbe_IsBelowLimit,thumb,low,src-alias,
+08138ABC,ParticleEmitter_ResetDisplay,thumb,low,src-alias,Clears the preceding four-slot display manager singleton; emitter grouping is tentative
+08138AC8,ParticleEmitter_IsBelowHeightLimit,thumb,low,src-alias,Compares terrain height with emitter position and height offset plus a 112-pixel margin
 08138AF8,ParticleEmitter_OnStop,thumb,low,src-alias,Clears the emitter callback and activity flags when entering its stop state; emitter identity is tentative
 08138B18,ParticleEmitter_UpdateScatterTrail,thumb,low,src-alias,
 08138CDC,ParticleEmitter_UpdateFlight,thumb,low,src-alias,
