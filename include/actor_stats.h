@@ -35,7 +35,8 @@ struct ActorStats {
     u8 unknown51B[0xD];
     u16 increment;
     u8 mode, pending;
-    u8 unknown52C[0x4E];
+    u8 collisionBody[0x40];
+    u8 contactHeader[0xE];
     u8 damageTimer;
     u8 unknown57B[0x73];
     u8 damageFlags;

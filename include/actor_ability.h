@@ -1,24 +1,14 @@
 #ifndef GUARD_ACTOR_ABILITY_H
 #define GUARD_ACTOR_ABILITY_H
 #include "engine.h"
-#include "actor_stats.h"
+#include "registry_actor.h"
 #include "modifier_list.h"
 enum ActorAbilitySourceIndex {
     ACTOR_ABILITY_BYTE_SOURCE = 5,
     ACTOR_ABILITY_FOURTH_SOURCE = 14,
     ACTOR_ABILITY_THIRD_SOURCE = 15
 };
-struct ActorAbilityOwner {
-    u8 unknown0[0x18];
-    struct ActorStats stats;
-    u8 unknown608[8];
-    struct CharacterPreviewModel model;
-    u8 unknown860[0x84];
-    u32 effectFlags;
-    u32 projectile;
-    u8 unknown8EC[0xC];
-    s8 direction;
-};
+
 struct ActorAbilityProjectileParameters {
     u32 projectile, y, z, flags;
 };
