@@ -8185,11 +8185,11 @@ addr,name,mode,confidence,source,notes
 081DC18C,Menu_SetBackgroundMap,thumb,low,src-alias,Selects a map for background layer 3 and reloads its tilemap
 081DC1B4,Menu_StartFadeIn,thumb,low,src-alias,Starts a mode-zero screen fade with the requested speed when nonzero; fade direction tentative
 081DC1DC,Menu_StartFadeOut,thumb,low,src-alias,Starts a mode-one screen fade when the supplied duration is nonzero
-081DC208,PairedFlags_SelectActive,thumb,low,src-alias,
+081DC208,ScreenMessage_UpdateChoiceHighlight,thumb,low,src-alias,Scripted message screen with optional yes/no choices; shared widget resources; text window and completion callbacks.
 081DC244,ScreenMessage_Update,thumb,low,src-alias,
 081DC448,ScreenMessage_Destroy,thumb,low,src-alias,Destruction callback removes the message indicator animations when enabled
 081DC470,ScreenMessage_Initialize,thumb,low,src-alias,Loads backgrounds and optional indicators then creates the scripted text window
-081DC618,ScreenParams_SetFromScript,thumb,low,src-alias,
+081DC618,ScreenMessage_SetParametersFromScript,thumb,low,src-alias,Scripted message screen with optional yes/no choices; shared widget resources; text window and completion callbacks.
 081DC690,ScreenMessage_Create,thumb,low,src-alias,Creates the message task and installs its update and destruction callbacks
 081DC6D0,Time_ShowRegionMenu,thumb,medium,raphaelr,region select screen; page number at menu+0x1C
 081DC754,Time_OnRegionListSelect,thumb,medium,raphaelr,
