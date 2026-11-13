@@ -1256,3 +1256,13 @@ Diagnosis: local allocation gives the horizontal sum r0 (priority 12000, six ref
 Tried: separate coordinate lifetimes, separate address lifetimes, direct named fields, signed/unsigned sums, reversed operand spelling, halfword sums and final-sum truncation, word-union sums, and a geometry inline helper. Halfword forms introduce unwanted extensions; direct fields also lose the required early screen address and signed layer load. The retained full-width draft preserves the observed operation and load order.
 
 Next: break the sum's local-allocation quantity tie without changing instruction order, or recover a source aggregate/accessor whose screen address gets the first local register. Keep the full 0x5E0/0x5E6/0x5E8 offsets and signed alternate-layer read. Return after the singleton tail of the queue.
+
+### SingletonSlot7_UpdateEndingScene (081EF914): two mask pins removed, transition zeros open
+
+Draft: `notes/phase3-drafts/dp-scene2/SingletonSlot7_UpdateEndingScene.c` (ROM 1392 bytes, draft 1388; 9 ROM / 7 draft instructions, shape 4). A local copy of the playback wrapper's state parameter restores both r4 state/r5 mask allocations. Both original r5 pins are removed in the checked source. `AGBCC_FORCE=one:5` confirmed one allocation region; the local-copy C fixes both regions, with the same result from the shared DisplaySequence_StepSprite helper.
+
+The two remaining byteZero pins keep separate zero loads before transition-duration stores. Without them, cse folds the byte store's source into the existing word zero, and the first transition's timer pointer moves from r4 to r3. The plain Slot7_TransitionTo helper and literal expanded stores have the same difference. `why` identifies the byte-source replacement by the earlier zero in cse1; no full matching knob is known.
+
+Tried: byte masks, longer-lived mask uses, byte-union masks, wrapper-local state copies, shared playback and transition helpers, initialized and assigned byte/word unions for zero, and a halfword duration bitfield. Assigned unions keep a zero live across unrelated control flow and add a saved register; initialized unions again merge the zero; duration bitfields add different zero loads. The retained draft uses the ordinary transition helper and has no concessions.
+
+Next: derive the separate narrow zero from the transition's original representation, without extending its life out of the case. The first timer pointer's displacement is a consequence of the missing local byte-zero allocation, not an independent pin requirement.
