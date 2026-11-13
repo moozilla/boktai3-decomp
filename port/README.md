@@ -195,3 +195,13 @@ warnings. Generated port source makes the incoming date arguments explicit at
 `SunClock_SetDateTime`'s `Clock_PackDate` call (the GBA prologue leaves r0/r1/r2
 unchanged) and corrects two discarded return declarations. The original source
 and GBA build are untouched. The demo now includes this RTC extension.
+
+The `--slice --rtc --video-irqs` extension resolves the original VBlank table
+entry to `sub_08213FD8` compiled from C. Build it with the hardware-root override,
+then run `node port/tests/video_irq.cjs
+build/port/slice-wasm32-rtc-video/boot.wasm baserom.gba`. Three frames verify the
+original handler's BG scroll uploads, dialogue latches, upload flag, clock ticks
+and BIOS VBlank latch, plus IF acknowledgement and IME restoration. The test
+uses valid inactive sound state and leaves wireless uncreated; active audio/RFU
+callbacks and the VCount sound handler are not covered. This focused resolver
+is a tested integration boundary, not the full game's callback registry.

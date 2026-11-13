@@ -35,6 +35,7 @@ def main():
     ap.add_argument('--force', action='store_true')
     ap.add_argument('--mmio', action='store_true', help='route volatile scalar accesses through port-hw in linked builds')
     ap.add_argument('--link-game', action='store_true', help='bind absolute data addresses and attempt the complete wasm game link')
+    ap.add_argument('--video-irqs', action='store_true', help='include the original VBlank handler in the boot slice')
     ap.add_argument('--rtc', action='store_true', help='extend the boot slice through RTC date synchronization')
     ap.add_argument('--slice', action='store_true', help='link the tested early-boot vertical slice')
     ap.add_argument('--ppu-root', help='port-ppu port directory when testing before integration')

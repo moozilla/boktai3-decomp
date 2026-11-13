@@ -10,6 +10,7 @@ from addresses import bind_ir, read_addresses
 from prepare import prepare_headers, prepare_source
 from mmio import instrument_mmio
 from rtc_slice import RTC_SOURCES
+from video_irq_slice import VIDEO_IRQ_SOURCES
 
 GAME = ['src/fn/sub_08248970.c', 'src/fn/sub_08249210.c',
         'src/fn/sub_082284F4.c', 'src/fn/sub_08219DD8.c', 'src/fn/sub_08224EEC.c']
@@ -36,9 +37,9 @@ def find_linker():
 
 
 def build_slice(root, args):
-    if args.ppu_root or args.rtc:
+    if args.ppu_root or args.rtc or args.video_irqs:
         args.mmio = True
-    out = root / 'build/port' / ('slice-' + args.target + ('-rtc' if args.rtc else ''))
+    out = root / 'build/port' / ('slice-' + args.target + ('-rtc' if args.rtc else '') + ('-video' if args.video_irqs else ''))
     out.mkdir(parents=True, exist_ok=True)
     headers = out / 'include'
     prepare_headers(root, headers, args.target)
@@ -71,6 +72,9 @@ def build_slice(root, args):
     if args.rtc:
         units += RTC_SOURCES
         exports += ['Clock_CheckRtcDate', 'Clock_ReadValidatedRtcDateTime', 'Clock_CheckRtcStatus']
+    if args.video_irqs:
+        units += VIDEO_IRQ_SOURCES + ['port/core/video_irq.c', 'port/core/callback.c']
+        exports += ['port_vblank_irq_init', 'port_vblank_irq_calls']
     units = list(dict.fromkeys(units))
     for name in units:
         source = root / name

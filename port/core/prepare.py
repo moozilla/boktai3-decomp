@@ -13,6 +13,9 @@ def prepare_source(path, target):
     if path.name == 'golem_2.c':
         text = ('struct SceneActorAnimationView;\n'
                 'void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, int);\n' + text)
+    if path.name == 'sub_08224980.c':
+        # The portable SDK call-via bridge returns a word; this caller ignores it.
+        text = text.replace('void sub_08249240(', 'int sub_08249240(')
     if path.name == 'sub_08228C40.c':
         # The GBA call carries the incoming date in r0/r1/r2 unchanged.
         # wasm needs explicit arguments; see the original 08228C40 prologue.
