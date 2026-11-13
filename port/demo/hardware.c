@@ -93,7 +93,7 @@ static void note(DemoTrack *t, unsigned command)
     uint32_t address = word(tone + 4), size = word(address + 12);
     if (!size || size > 0x400000 || address < 0x08000000 || (uint64_t)(address - 0x08000000) + 16 + size > rom_size || (address & 3)) { failed=1; return; }
     hw_zero(c, sizeof(*c));
-    c->wav = (struct WaveData *)(rom + address - 0x08000000); c->type = byte(tone);
+    c->wav = (struct WaveData *)(rom + (address - 0x08000000)); c->type = byte(tone);
     c->attack = byte(tone+8); c->decay = byte(tone+9); c->sustain = byte(tone+10); c->release = byte(tone+11);
     c->statusFlags = 0x80;
     v->track=t; v->gate=gate; v->key=t->key; v->pitch_key=pitch_key; v->pan=pan;
@@ -159,6 +159,7 @@ void demo_psg(unsigned kind, unsigned frequency)
     hw_write16(&hardware,HW_IO_BASE+0x82,2);
     if(kind==2) {
         hw_write16(&hardware,HW_IO_BASE+0x80,0x4477);
+        hw_write16(&hardware,HW_IO_BASE+0x70,0x40);
         for(i=0;i<16;++i) hw_write8(&hardware,HW_IO_BASE+0x90+i,(uint8_t)(((i<8?i*2:30-i*2)<<4)|(i<8?i*2+1:31-i*2)));
         hw_write16(&hardware,HW_IO_BASE+0x70,0x80);
         hw_write16(&hardware,HW_IO_BASE+0x72,0x2000);

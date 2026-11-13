@@ -137,12 +137,14 @@ audio device belongs in the host. Do not also feed the same MP2K DMA FIFO to
 the output, which would duplicate Direct Sound.
 
 PSG supports both pulse channels with duty/length/envelope and channel-1
-frequency sweep, 32-sample wave playback with volume control, and 7/15-bit
+frequency sweep, 32/64-sample wave playback with volume control, and 7/15-bit
 noise. The 512 Hz frame sequencer advances from the CPU clock. Explicit bus
-writes observe retrigger strobes and DAC power; wave RAM currently represents
-one audible 32-sample bank. 64-sample bank switching, analog filtering, exact
-sweep/length edge quirks, FIFO output resampling and master bias ramp timing
-remain work for hardware accuracy.
+writes observe retrigger strobes and DAC power. Wave RAM exposes the bank
+opposite the playing bank to the CPU; 64-sample mode switches banks every
+32 samples. Both CPU-visible banks agree with mGBA, and native/wasm tests
+check the output across bank boundaries. Analog filtering, exact sweep/length
+edge quirks, FIFO output resampling and master bias ramp timing remain work
+for hardware accuracy.
 
 The WAV test has a small, bounded MP2K test sequencer that feeds real song
 samples into this mixer. It exercises PCM notes, gates, tempo, patterns,

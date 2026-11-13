@@ -257,6 +257,33 @@ static int bios_memory_oracle(struct mCore *core)
     return 0;
 }
 
+static int wave_bank_oracle(struct mCore *core)
+{
+    static Hw hw;
+    unsigned bank, i;
+    hw_init(&hw, NULL);
+    hw_write16(&hw, HW_IO_BASE + 0x84, 0x80);
+    core->busWrite16(core, HW_IO_BASE + 0x84, 0x80);
+    for (bank = 0; bank < 2; ++bank) {
+        hw_write16(&hw, HW_IO_BASE + 0x70, (uint16_t)(bank << 6));
+        core->busWrite16(core, HW_IO_BASE + 0x70, (uint16_t)(bank << 6));
+        for (i = 0; i < 16; ++i) {
+            uint8_t value = (uint8_t)(bank * 100 + i * 3);
+            hw_write8(&hw, HW_IO_BASE + 0x90 + i, value);
+            core->busWrite8(core, HW_IO_BASE + 0x90 + i, value);
+        }
+    }
+    for (bank = 0; bank < 2; ++bank) {
+        hw_write16(&hw, HW_IO_BASE + 0x70, (uint16_t)(bank << 6));
+        core->busWrite16(core, HW_IO_BASE + 0x70, (uint16_t)(bank << 6));
+        for (i = 0; i < 16; ++i) if (hw_read8(&hw, HW_IO_BASE + 0x90 + i) != core->busRead8(core, HW_IO_BASE + 0x90 + i)) {
+            fprintf(stderr, "Wave bank %u byte %u differs\n", bank, i); return 1;
+        }
+    }
+    puts("mGBA wave RAM: PASS (both CPU-visible banks)");
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     struct mCore *core;
@@ -312,6 +339,7 @@ int main(int argc, char **argv)
         }
         ++tests;
     }
+    if (wave_bank_oracle(core)) return 1;
     if (bios_memory_oracle(core)) return 1;
     if (mixer_oracle(core)) return 1;
     if (mixer_state_oracle(core)) return 1;

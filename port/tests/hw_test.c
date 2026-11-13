@@ -317,6 +317,21 @@ static int audio_tests(void)
     CHECK(!machine.psg[3].enabled);
     hw_write16(&machine, HW_IO_BASE + 0x84, 0x8f);
     CHECK(hw_read16(&machine, HW_IO_BASE + 0x84) == 0x80);
+    hw_write16(&machine, HW_IO_BASE + 0x70, 0x40); /* CPU writes bank 0 */
+    for (i = 0; i < 16; ++i) hw_write8(&machine, HW_IO_BASE + 0x90 + i, 0x11);
+    hw_write16(&machine, HW_IO_BASE + 0x70, 0); /* CPU writes bank 1 */
+    CHECK(hw_read8(&machine, HW_IO_BASE + 0x90) == 0);
+    for (i = 0; i < 16; ++i) hw_write8(&machine, HW_IO_BASE + 0x90 + i, 0xee);
+    hw_write16(&machine, HW_IO_BASE + 0x70, 0x40);
+    CHECK(hw_read8(&machine, HW_IO_BASE + 0x90) == 0x11);
+    hw_write16(&machine, HW_IO_BASE + 0x80, 0x4477);
+    hw_write16(&machine, HW_IO_BASE + 0x82, 2);
+    hw_write16(&machine, HW_IO_BASE + 0x70, 0xa0); /* play both banks from 0 */
+    hw_write16(&machine, HW_IO_BASE + 0x72, 0x2000);
+    hw_write16(&machine, HW_IO_BASE + 0x74, 0x87ff);
+    hw_psg_render(&machine, pcm, 64, HW_CPU_HZ / 8, 0);
+    CHECK(pcm[0] < 0 && pcm[60] < 0 && pcm[62] > 0 && pcm[124] > 0 && pcm[126] < 0);
+    CHECK(hw_read8(&machine, HW_IO_BASE + 0x90) == 0xee);
     return 0;
 }
 
