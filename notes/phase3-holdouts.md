@@ -2487,3 +2487,59 @@ Additional pass-2 allocation attempts:
   single state access, lets CSE merge the two pointer quantities and is substantially worse
   (34+ rows). The near match specifically requires two loads of the same actor context; the
   remaining +20 priority cannot come from sharing those source locals.
+## cdp-scene2 (Codex)
+
+Queue audit on 2026-11-13 found that 21 of the 26 assigned functions no longer contain a
+concession on the current branch. Their queue scores predate the cleanup already present in
+`src/actor_animation_controller.c`. The five remaining functions are retained below as ordinary-C,
+pin-free drafts; `scope.py ... pins FUNC` verified the checked-in forms match and measured each
+removal independently.
+
+### Actor_UpdateBlinkBurstDisappearance: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateBlinkBurstDisappearance.c` (one missing
+`movs r7, #0`, plus compensating alignment padding). The child-flags r2 pin was removed by using
+the shared `DisplaySequenceControl` union form; this matched exactly and was committed separately.
+The remaining pin initializes r7 after the controller pointer's final use, and the emitted zero has
+no machine-level uses. Tried a scalar zero loop bound, reassigning the dead controller pointer,
+zero-initialized scalar/union/array/struct counters, and using the zero in the loop bound. Either
+GCC deletes the initialization or retains a compare and changes allocation. Next: find a natural
+multi-set union whose initial zero survives RTL generation but whose eventual use folds away.
+
+### Actor_UpdateFinishingAnimation: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateFinishingAnimation.c` (the same two-row zero
+initialization/alignment difference as the blink-burst twin). The child-flags r2 pin was removed by
+using `DisplaySequenceControl`; the ordinary union form matches exactly. The sole remaining pin is
+the dead r7 zero. The scalar, union-counter, pointer-reassignment and loop-bound forms tried on the
+twin either delete that zero or add a compare. Apply any natural surviving-zero form found for the
+twin here as well.
+
+### ActorDisplay_UpdateForegroundSprite: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/ActorDisplay_UpdateForegroundSprite.c` (78 differing rows:
+62 ROM / 65 draft, with 11 moved branches). The remaining pin is the accumulated horizontal
+coordinate in r1. The earlier typed-layout rewrite is already present and preserves the verified
+halfword fields. Removing the binding changes allocation through most of the function, rather than
+one isolated instruction. Next: split the horizontal and vertical sums into narrow typed helpers,
+and compare reference density and copy preferences against the sibling foreground/accent display
+updates.
+
+### SingletonSlot7_UpdateEndingScene: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/SingletonSlot7_UpdateEndingScene.c` (81 differing rows:
+73 ROM / 71 draft, with seven moved branches). Its four pins are two occurrences each of a constant
+one and a byte zero. Individually, the zero sites cost 8 and 3 rows; each one site costs 32 rows.
+Grouping equal-named locals does not recover allocation. Next: use a union/array initializer for
+the byte zero and repeat each constant-one operation within the branch arms so cse and jump2 see
+the same lifetimes as the ROM.
+
+### SingletonSlot7_InitDisplaySprites: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/SingletonSlot7_InitDisplaySprites.c` (95 differing rows:
+88 ROM / 80 draft, with two moved branches). Thirteen concessions remain: eight pins and five
+barriers, seven of them inside the private `StepPlayback` helper. Independent costs range from 4
+to 45 rows and the helper group costs 137 rows, showing that its C shape, rather than one caller
+allocation, is the blocker. Next: replace the private playback implementation with the shared
+display-sequence stepping form, preserving table-first packed-command reads; then retry the two
+caller-side constant-one/duration groups separately.
