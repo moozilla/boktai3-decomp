@@ -2169,3 +2169,28 @@ which is exactly `10:1`. Not tested.
    mask variable alone does not do it: promoted scalar locals still expand in SImode.
    `why all` now recognizes the missing inverse copy from matching pre/post-reload RTL,
    distinguishes it from a copy removed after reload, and records the mechanism in its JSON summary.
+
+222. **Keep a halfword preincrement inside its cadence test before introducing a helper.**
+   `if ((++object->particleFrame & 7) == 0)` retains the full halfword mask and
+   its copy to a second register. Separating the increment, store, return and
+   mask through a word-returning helper gives cse a different promoted value;
+   the constant copies fold, and reload uses a different spill register. In
+   ProximityEmitter_TickActive (08051BD8), the direct expression recovers both
+   mask copies and the entry-script address calculation, removing four pins
+   and five barriers. The same form removes two pins and three barriers in
+   ProximityEmitter_TickRise (08051CB4). TetherActor_UpdateLockedShake's direct
+   cadence test was the matched relative that identified the source form.
+
+223. **A halfword-returning arithmetic helper can keep an offset together before a later add.**
+   `destination->y = (limit - height) * 171 + offset + worldY` lets expansion
+   associate the narrow offset/world addition before adding the product.
+   `destination->y = SegmentOffset(limit, height, offset) + worldY`, with
+   `static inline u16 SegmentOffset(...)`, preserves the product/offset group
+   through inlining. StackedActor_UpdateSegments (08052418) also needs the
+   world-height pointer computed before the first helper call; that changes
+   reload's first choices and recovers every later arm, removing 41 concessions.
+   StackedActor_InitRisingParticle (080521DC) similarly matches with a u16
+   helper returning `768 + (u16)particle->position.y` before adding the random
+   byte. The u32/s32 return forms lose a constant copy; a direct field expression
+   has the correct shape but different local allocation. Helper return width
+   is a semantic expansion boundary even when the final store truncates too.
