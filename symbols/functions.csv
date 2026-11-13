@@ -5177,6 +5177,7 @@ addr,name,mode,confidence,source,notes
 0813AD48,SpriteParticle_LoadAnimationData,thumb,low,src-alias,caches animation resource 0x1C1E in the manager
 0813AD60,SpriteParticle_InitManager,thumb,low,src-alias,loads shared animation data and registers the singleton manager
 0813AD78,SpriteParticle_GetOrCreateManager,thumb,low,src-alias,returns the existing manager or creates its task and installs lifecycle callbacks
+0813ADC4,ScreenMote_ResetManager,thumb,low,src-alias,Clear the global screen mote manager pointer
 0813ADD0,Player_UpdateFacingSide,thumb,low,src-alias,
 0813AE18,Player_SetAnimation,thumb,low,src-alias,
 0813AEA0,PlayerAnimation_SelectSecondaryKeyframes,thumb,low,src-alias,
@@ -5194,7 +5195,9 @@ addr,name,mode,confidence,source,notes
 0813B1EC,Player_ApplyContactResponse,thumb,low,src-alias,
 0813B318,Player_IsActionBlocked,thumb,low,src-alias,tests a per-player counter and flag plus global modes; blocking interpretation is tentative
 0813B374,Player_CallEventScript,thumb,low,src-alias,calls the optional script at offset 0xB3C with one event argument
+0813B3AC,Player_AddEventFlags,thumb,low,src-alias,OR bits into the player event flags
 0813B3BC,Player_GetEventFlags,thumb,low,src-alias,Returns the masked bits of the flag word at offset B34
+0813B3CC,Player_CallCompletionScript,thumb,low,src-alias,Call the configured completion procedure when present
 0813B3E8,Player_GetSelectedSlotActionScale,thumb,low,src-alias,Returns 4 or 6 or 12 according to the selected slot value; action scale is tentative
 0813B418,ActorResponse_Apply,thumb,low,src-alias,
 0813B480,ActorFlags_SelectResponse,thumb,low,src-alias,
@@ -5203,13 +5206,16 @@ addr,name,mode,confidence,source,notes
 0813B5B8,Player_GetMaxEnergy,thumb,low,src-alias,Computes capped combined energy stat times five plus 100 with an override mode
 0813B5F8,Player_ClampStatsAndSyncStatus,thumb,low,src-alias,
 0813B67C,Player_InitializeStatsFromScript,thumb,low,src-alias,
+0813B7C4,Player_RefreshBodyCollision,thumb,low,src-cleanup,Refresh collider flags and reaction category from player mode and scene state
 0813B85C,Player_InitVitalsAndCollisionFromScript,thumb,low,src-alias,Loads initial vitals using script options and saved values then configures collision
 0813B870,Player_RefreshVitalsAndCollision,thumb,low,src-alias,Recomputes vital limits and clamps current values then configures collision
 0813B884,Player_RefreshStatsAndVitals,thumb,low,src-alias,Refreshes base stats then vital limits and collision followed by additional player state
 0813B8A4,SceneActor_SpawnModeParticles,thumb,low,src-alias,
+0813B950,Player_UpdateTimedEffect,thumb,low,src-alias,Advance and hide the short timed player effect
 0813B9B8,HiddenEffect_StartAtPosition,thumb,low,src-alias,
 0813BA24,Player_InitTimedEffect,thumb,low,src-alias,Initializes the hidden sprite whose neighboring updater advances a short timed effect
 0813BA88,Player_SetDirectionalEffectFrame,thumb,low,src-alias,Selects a frame and horizontal and vertical flips from an eight-direction table
+0813BAD8,Player_UpdateDirectionalEffectPair,thumb,low,src-alias,Project and position the two direction-dependent player effects
 0813BDA8,Player_InitDirectionalEffectPair,thumb,low,src-alias,Initializes two effect sprites used by the direction-dependent effect updater
 0813BE1C,Player_UpdateOrbitingEffect,thumb,low,src-alias,Starts or hides the effect based on player state and moves its sprite around an elliptical orbit
 0813BF7C,Player_InitOrbitingEffect,thumb,low,src-alias,Initializes the hidden frame-16 sprite and resets the orbit activity and timer
