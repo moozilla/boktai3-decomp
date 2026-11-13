@@ -1,0 +1,9 @@
+trace off
+wait 300
+shot boot
+tap START
+wait 60
+shot title
+tap A
+wait 150
+shot continue
