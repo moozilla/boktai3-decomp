@@ -1239,21 +1239,23 @@ removal independently.
 
 ### Actor_UpdateBlinkBurstDisappearance: deferred
 
-Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateBlinkBurstDisappearance.c` (11 differing rows:
-10 ROM / 8 draft, with one moved branch). Removing the otherwise-unused zero initialized in r7
-costs 2 rows; removing the child-flags value from r2 costs 10. Removing both does not compose
-cleanly. The zero initialization is still emitted by the ROM and therefore needs an ordinary
-source-level use that extends its lifetime without an artificial fence. Next: compare the twin
-`Actor_UpdateFinishingAnimation`, then express the child flag update through a shared typed helper
-while retaining the zero as the helper's result or argument.
+Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateBlinkBurstDisappearance.c` (one missing
+`movs r7, #0`, plus compensating alignment padding). The child-flags r2 pin was removed by using
+the shared `DisplaySequenceControl` union form; this matched exactly and was committed separately.
+The remaining pin initializes r7 after the controller pointer's final use, and the emitted zero has
+no machine-level uses. Tried a scalar zero loop bound, reassigning the dead controller pointer,
+zero-initialized scalar/union/array/struct counters, and using the zero in the loop bound. Either
+GCC deletes the initialization or retains a compare and changes allocation. Next: find a natural
+multi-set union whose initial zero survives RTL generation but whose eventual use folds away.
 
 ### Actor_UpdateFinishingAnimation: deferred
 
-Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateFinishingAnimation.c` (14 differing rows:
-12 ROM / 10 draft, with two moved branches). The unused r7 zero costs 2 rows and the child-flags
-r2 binding costs 13. This is the same source pattern as `Actor_UpdateBlinkBurstDisappearance`, but
-the different surrounding control flow changes the cross-jumps. Next: derive one shared helper for
-the child update and test repeating the post-join statement in both arms before extracting it.
+Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateFinishingAnimation.c` (the same two-row zero
+initialization/alignment difference as the blink-burst twin). The child-flags r2 pin was removed by
+using `DisplaySequenceControl`; the ordinary union form matches exactly. The sole remaining pin is
+the dead r7 zero. The scalar, union-counter, pointer-reassignment and loop-bound forms tried on the
+twin either delete that zero or add a compare. Apply any natural surviving-zero form found for the
+twin here as well.
 
 ### ActorDisplay_UpdateForegroundSprite: deferred
 

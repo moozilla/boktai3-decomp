@@ -2994,12 +2994,11 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
                 register s32 reserved asm("r7") = 0;
                 s32 i;
                 for (i = 15; i >= 0; i--) {
-                    register u32 v asm("r2") = child->flags;
-                    if (active & v) {
-                        u32 flags;
+                    union DisplaySequenceControl control;
+                    control.raw = child->flags;
+                    if (active & control.raw) {
                         child->fn = fn;
-                        flags = reset | v;
-                        child->flags = flags;
+                        child->flags = reset | control.raw;
                     }
                     child++;
                 }
@@ -3817,12 +3816,11 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
             register s32 reserved asm("r7") = 0;
             s32 i;
             for (i = 15; i >= 0; i--) {
-                register u32 v asm("r2") = child->flags;
-                if (active & v) {
-                    u32 flags;
+                union DisplaySequenceControl control;
+                control.raw = child->flags;
+                if (active & control.raw) {
                     child->fn = fn;
-                    flags = reset | v;
-                    child->flags = flags;
+                    child->flags = reset | control.raw;
                 }
                 child++;
             }
