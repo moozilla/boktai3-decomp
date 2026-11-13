@@ -895,10 +895,9 @@ void ScriptUtility_ClearControlFlag(void);
 
 void sub_081E4B0C(u32 phase)
 {
-    struct G *g = (struct G *)gScriptedActorController;
-    u32 three = 3;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0) {
-        g = (struct G *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -911,23 +910,10 @@ void sub_081E4B0C(u32 phase)
         return;
     }
     phase = (u16)phase;
-    g->b = g->xa;
-    g->xa = three;
+    Actor_SetState(g, 3, phase);
     {
-        u32 shifted = phase << 4;
-        *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | shifted;
-    }
-    if (g->b == 3 && g->xa == 3) {
-        g->d = g->e2c;
-        g->e = g->e32;
-    }
-    {
-        u8 one = 1;
-        g->c |= one;
-    }
-    {
-        u32 value = *(u16 *)((u8 *)g + 0xf5a) >> 4;
-        *(u16 *)((u8 *)g + 0xf7e) = value;
+        u32 value = g->phase;
+        g->savedPhase = value;
     }
 }
 
