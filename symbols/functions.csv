@@ -554,7 +554,9 @@ addr,name,mode,confidence,source,notes
 08018D84,OrbitingParticles_Stop,thumb,low,src-alias,"Sets duration=time on the manager so Update's end check fires on the next tick, triggering a graceful shutdown; called when an effect slot is being re"
 08018D94,BlendTransition_Update,thumb,low,src-alias,
 08018DFC,BlendTransition_Destroy,thumb,low,src-alias,"Trivial Task destroy callback (engine.h: ""called once after Task_Kill"") wired as the second arg of Task_SetCallbacks in BlendTransition_Create; no cleanup neede"
+08018E00,BlendTransition_InitializeFromScript,thumb,low,src-alias,Read blend mode; initial/final coefficients; target masks and duration
 08018EF0,BlendTransition_Create,thumb,low,src-alias,"Allocates a size-0x2C Task, wires BlendTransition_Update/Destroy as its callbacks, and runs sub_08018E00 to set up the blend params, killing the task "
+08018F2C,CircleWindow_InitManager,thumb,low,src-alias,Reset circle-window manager singleton
 08018F38,CircleWindow_GenerateScanlines,thumb,low,src-alias,
 0801901C,CircleWindow_ResetState,thumb,low,src-alias,Called only by CircleWindow_Destroy to zero/reset the circle window's static state variables
 08019044,CircleWindow_Update,thumb,low,src-alias,
