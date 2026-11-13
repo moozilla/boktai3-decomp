@@ -2971,7 +2971,9 @@ addr,name,mode,confidence,source,notes
 08084100,SceneActorControl_TryActivateProximityResponse,thumb,low,src-alias,Consumes status bit 2 and activates response flags when player height is within 512 and the actor F0 value is below F8; purpose is provisional.
 08084180,SceneActorControl_SetCollisionResponse,thumb,low,src-alias,
 08084210,SceneActorControl_TickHiddenResponse,thumb,low,src-alias,
+08084280,SceneActorControl_ReturnSuccess,thumb,low,src-alias,
 08084284,SceneActorControl_WanderAroundPlayer,thumb,low,src-alias,
+080844B8,SceneActorControl_UpdateStoredMotion,thumb,low,src-alias,
 0808483C,SceneActorControl_SetApproachCallbacks,thumb,low,src-alias,Installs the two callbacks that approach a target and choose nearby player positions
 0808484C,SceneActorControl_TickVisibility,thumb,low,src-alias,
 080849DC,SceneActorControl_StartStoredCurve,thumb,low,src-alias,
@@ -4519,6 +4521,7 @@ addr,name,mode,confidence,source,notes
 08115FE0,ActorParticles_InitCompactPool,thumb,low,src-alias,
 0811606C,SpriteDrop_CreateManager,thumb,low,src-alias,Returns or creates the singleton task managing 16 sprite drop entries
 081160B8,SpriteDrop_OnExpire,thumb,low,src-alias,Expiration callback schedules sprite removal and marks the cleanup state for initialization
+08116280,ActorRecoil_ReturnZero,thumb,low,src-alias,
 0811628C,ScenePool_CanAcceptControl,thumb,low,src-alias,
 081162D8,ActorRecoil_ReceiveBodyContact,thumb,low,src-alias,
 08116538,ActorRecoil_ApplyDirectionalImpulse,thumb,low,src-alias,
