@@ -1422,3 +1422,38 @@ reset-zero class. Do not repeat the subset or initializer searches.
 
 Persistent evidence: `build/matchsearch/WirelessGameItems_QueueIncomingItem`;
 scratch: `build/cx/work/WirelessGameItems_QueueIncomingItem/`.
+
+### WirelessGameDisplay_UpdateRoundAnnouncement (0803A844, src/wireless_game_items_and_display.c)
+
+Target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameDisplay_UpdateRoundAnnouncement.c`
+(35 ROM / 33 draft, shape 10, 388 bytes). Shared ParticleRandom_ReadSample draws recover
+table-first ordering and the resource stack slot. The all-clean explicit sampler is
+44/38, shape 22; ReadDirectSample gives 31/27, shape 22. Production is unchanged.
+
+The original has eight pins, three barriers, and two volatile locals. Scope pins
+previously omitted the volatile locals from its report; this run fixes the report.
+Removing only resource volatility gives 13/11, only table volatility 9/5, both 17/9.
+The ROM allocates separate resource/table slots at sp and sp+4. The clean shared sampler
+spills resource normally but keeps table in r2; seed then takes r3. `why`/`spill` prove
+r3 is absent from the reload-register list, which explains the earlier mask and both
+352-offset reload differences. The ROM needs r3 for all three. No spill rotation or
+one of four CSE follow probes fixes this.
+
+Shared-sampler allocation: table pseudo 89 is local, priority 2777 (5 refs), seed 91
+is local priority 2666. Forcing table to memory with AGBCC_NOREG=89 plus
+AGBCC_NOEQUIV=89 frees r3 and repairs those earlier reloads, but resource then moves
+into r4, count into r5, and the frame remains four bytes. Forcing both resource 24
+and table 89 to memory produces an eight-byte frame but changes global allocation
+and drops the r8 save (99/91, shape 8). These are diagnoses, not matching overrides.
+AGBCC_PRI on the local table has no useful effect.
+
+Tried direct named drawing/resource fields, shared macro and direct samplers,
+union table source/GetTable, ADDRESSOF table, numeric table, separate sample result
+scopes, individual volatile removals, and interacting count/mask/limit pin removals
+with and without resource volatility. None yields a partial match. Next: recover
+both natural stack objects and the random mask/seed allocation together; a spill
+rotation alone cannot do it. Avoid adding artificial pressure or one-element arrays
+merely to force the stack. Named AGBCC_NOREG was silently ignored, like the earlier
+NOEQUIV bug; a separate tool fix resolves C names before invoking the compiler.
+
+Scratch/evidence: `build/cx/work/WirelessGameDisplay_UpdateRoundAnnouncement/`.
