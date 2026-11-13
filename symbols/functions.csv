@@ -434,9 +434,13 @@ addr,name,mode,confidence,source,notes
 080139F4,ScaledShadow_InitializeDefault,thumb,low,src-alias,Thin wrapper calling ScaledShadow_Initialize with a fixed default parameter set (scale/height/shift constants).
 08013A24,ScaledShadow_InitializeDefaultSmall,thumb,low,src-alias,"Same default ScaledShadow_Initialize call, then reloads the shadow sprite's graphic with frame param 6 via ScaledShadow_SetGraphic."
 08013A6C,ScaledShadow_InitializeDefaultLarge,thumb,low,src-alias,"Same default ScaledShadow_Initialize call, then reloads the shadow sprite's graphic with frame param 7 via ScaledShadow_SetGraphic (sibling of the ""Small"" varian"
+08013AB4,ScaledShadow_InitializeRange,thumb,low,src-alias,Tentative: initialize or change the distance-dependent shadow scale range
+08013AE4,ScaledShadow_InitializeSmallRange,thumb,low,src-alias,Tentative: initialize or change the distance-dependent shadow scale range
+08013B2C,ScaledShadow_InitializeLargeRange,thumb,low,src-alias,Tentative: initialize or change the distance-dependent shadow scale range
 08013B74,ScaledShadow_Destroy,thumb,low,src-alias,"Removes the shadow's sprite and, if the manager exists, unlinks it from the manager's list; called from many actor teardown paths across the codebase."
 08013B98,ScaledShadow_SetGraphic,thumb,low,src-alias,"Reloads the shadow's anim resource and re-applies it to its sprite with a new frame/param value, same pattern used inline in ScaledShadow_Initialize."
 08013BBC,ScaledShadow_SetFlag,thumb,low,src-alias,"Sets or clears bit 2 of the shadow's status byte based on the ""on"" argument; exact consumer of the bit is outside this unit so semantics are a best gu"
+08013BDC,ScaledShadow_SetScaleRange,thumb,low,src-alias,Tentative: initialize or change the distance-dependent shadow scale range
 08013C14,ShadowRegistry_GetTask,thumb,low,src-alias,"cached accessor that returns the registry's task pointer, creating it via ShadowRegistry_CreateTask if unset"
 08013C2C,ShadowRegistry_FindEntry,thumb,low,src-alias,walks the registry task's linked list (offset 0x18) for a node matching the id key
 08013C4C,ShadowRegistry_LinkEntry,thumb,low,src-alias,"pushes a new entry onto the registry's list head, failing if already linked"
@@ -453,6 +457,7 @@ addr,name,mode,confidence,source,notes
 08013ED0,ShadowRegistry_SetModeFromScript,thumb,low,src-alias,reads id/mode keywords from script and calls ShadowRegistry_SetEntryMode
 08013EF4,ShadowRegistry_SetEntryPosition,thumb,low,src-alias,finds an entry by id and overwrites its position struct
 08013F24,ShadowRegistry_SetPositionFromScript,thumb,low,src-alias,reads id and x/y/z keywords from script and calls ShadowRegistry_SetEntryPosition
+08013F8C,ParticleManager_ClearTaskPtr,thumb,low,src-alias,Reset particle-group task singleton
 08013F98,ParticleGroup_Update,thumb,low,src-alias,
 08014330,ParticleGroup_UpdateFrozen,thumb,low,src-alias,
 08014498,ParticleManager_Update,thumb,low,src-alias,
