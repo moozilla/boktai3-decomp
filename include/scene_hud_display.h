@@ -1,7 +1,6 @@
 #ifndef GUARD_SCENE_HUD_DISPLAY_H
 #define GUARD_SCENE_HUD_DISPLAY_H
 #include "scene_hud_map.h"
-#include "sun_clock.h"
 #include "display_animation.h"
 #include "scene_input.h"
 #include "contact_actor.h"
@@ -222,13 +221,16 @@ struct SceneHudState {
     u8 unknown4894[4];
     s8 comparisonProfiles[0x10]; /* 0x4898: profile index per party member, extent tentative */
     u16 entryCount; /* 0x48A8: list-menu count */
-    u8 rowIndex, unknown48AB;
+    u8 rowIndex;
+    s8 allocationDescription; /* 0x48AB: -1 when no description update is pending */
     u8 comparisonValues[3];      /* 0x48AC: capped combined stat values */
     u8 unknown48AF;
     s16 comparisonDeltas[3];  /* 0x48B0: signed bar adjustments after offsets */
     s16 comparisonOffsets[3]; /* 0x48B6: signed bar adjustments */
     u8 pageInputCooldown;     /* 0x48BC */
-    u8 unknown48BD[7];
+    u8 unknown48BD[3];
+    u8 settingsRow;                                 /* 0x48C0: cursor in the three-setting panel */
+    u8 savedSettingA, savedSettingB, savedSettingC; /* 0x48C1 */
     s32 primaryTextWindow;       /* 0x48C4 */
     s32 timedMessageWindow;      /* 0x48C8 */
     s32 auxiliaryTextWindows[6]; /* 0x48CC */
