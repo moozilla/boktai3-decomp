@@ -1365,3 +1365,8 @@ Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_EmitFacingMotion.c. Build the ori
 Tags: phase3, dp-bosses, Hresvelgr_UpdateTurningCharge
 
 Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_UpdateTurningCharge.c. AGBCC_NOPRE=1 makes the original pin-free draft MATCH. Duplicating the first real flags update in both pending arms improves 16/14 to 10/8 but PRE still preserves the computed address across the callback. A separately assigned owner and an inline initialization helper with two real returns both fold to the original baseline. Reconstructing only the second owner pointer from its two halfwords defeats PRE and leaves 3 ROM / 9 draft, but adds six reconstruction instructions; it is scratch evidence rather than the preferred draft. The ordinary branch-local update draft is retained. Next: another real base representation that becomes the original pointer after gcse but before allocation, or the original owner reassignment. Original source retains the address pin.
+
+### Hresvelgr_PlayDescent: 11/5; actor/input copy still propagates away
+Tags: phase3, dp-bosses, Hresvelgr_PlayDescent
+
+Draft: notes/phase3-drafts/dp-bosses/Hresvelgr_PlayDescent.c. The prior ordinary draft remains best at 11 ROM / 5 draft. Returning the actor from an inline descent body, either assigning or ignoring its result, does not preserve the copy: expansion drops the unused return. Putting the final refresh arm before the landing stores changes the branch layout and still merges input and actor. The ROM needs input in r7, actor in r6 and tick in r8. The source retains its one operand barrier. Next: find a real aggregate owner representation or control-flow join that survives copy propagation but folds before allocation; moving only the final use order is insufficient.
