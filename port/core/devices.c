@@ -9,6 +9,8 @@ static void *resolver_context;
 static void (*render_line)(void *, unsigned);
 static void (*render_write)(void *, unsigned, unsigned);
 static void *render_context;
+static void (*frame_hook)(void);
+static struct PortPlatformHooks hooks;
 static void scanline(void *context, unsigned line)
 {
     (void)context;
@@ -50,7 +52,10 @@ static void blank(void *context, unsigned line, int vblank)
     /* Core raises VCount at the start of the line. hw_hblank additionally
      * performs HBlank DMA; suppress only its second VCount notification. */
     port_devices_sync_timing();
-    if (vblank) hw_vblank(&hardware);
+    if (vblank) {
+        if (frame_hook) frame_hook();
+        hw_vblank(&hardware);
+    }
     else {
         uint8_t enable = hardware.io[4] & 0x20;
         hardware.io[4] &= (uint8_t)~0x20;
@@ -70,7 +75,9 @@ static void acknowledge(void *context, uint16_t mask)
 void port_devices_init(PortIrqHandler (*resolver)(void *, uint32_t), void *context)
 {
     HwHost host = {0};
-    struct PortPlatformHooks hooks = {0};
+    struct PortPlatformHooks empty = {0};
+    hooks = empty;
+    frame_hook = NULL;
     code_resolver = resolver;
     resolver_context = context;
     host.map = map;
@@ -87,6 +94,16 @@ void port_devices_init(PortIrqHandler (*resolver)(void *, uint32_t), void *conte
     port_timing_reset();
 }
 void port_devices_set_time(int64_t seconds) { unix_seconds = seconds; }
+
+void port_devices_set_game(int (*invoke)(void *, uint32_t), void (*frame)(void),
+                           void (*audio)(void *, const int16_t *, size_t, uint32_t))
+{
+    hooks.invoke = invoke;
+    frame_hook = frame;
+    hardware.host.audio = audio;
+    port_set_hooks(&hooks);
+}
+Hw *port_devices_hardware(void) { return &hardware; }
 
 void port_devices_set_renderer(void (*line)(void *, unsigned),
                                void (*write)(void *, unsigned, unsigned), void *context)

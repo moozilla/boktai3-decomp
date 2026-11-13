@@ -7,16 +7,38 @@ No instruction body or matching compiler output is supplied by this pass.
 import re
 
 
+def _split(text):
+    """Operands at top level (constant expressions contain commas)."""
+    parts, depth, cur = [], 0, ''
+    for ch in text:
+        if ch in '([{<':
+            depth += 1
+        elif ch in ')]}>':
+            depth -= 1
+        if ch == ',' and depth == 0:
+            parts.append(cur.strip())
+            cur = ''
+        else:
+            cur += ch
+    parts.append(cur.strip())
+    return parts
+
+
 def instrument_mmio(text):
     used = set()
     loads = stores = 0
     result = []
-    load = re.compile(r'^(\s*)(%[\w.]+) = load volatile (i8|i16|i32|ptr), ptr (.*?), align \d+.*$')
-    store = re.compile(r'^(\s*)store volatile (i8|i16|i32|ptr) (.*?), ptr (.*?), align \d+.*$')
+    load = re.compile(r'^(\s*)(%[\w.]+) = load volatile (i8|i16|i32|ptr), (.*)$')
+    store = re.compile(r'^(\s*)store volatile (i8|i16|i32|ptr) (.*)$')
     for line in text.splitlines():
         match = load.match(line)
         if match:
-            indent, dest, kind, pointer = match.groups()
+            indent, dest, kind, rest = match.groups()
+            operands = _split(rest)
+            if not operands[0].startswith('ptr '):
+                result.append(line)
+                continue
+            pointer = operands[0][4:]
             name = 'port_bus_load_' + kind
             line = f'{indent}{dest} = call {kind} @{name}(ptr {pointer})'
             used.add((name, kind, 'ptr'))
@@ -24,7 +46,12 @@ def instrument_mmio(text):
         else:
             match = store.match(line)
             if match:
-                indent, kind, value, pointer = match.groups()
+                indent, kind, rest = match.groups()
+                operands = _split(rest)
+                if len(operands) < 2 or not operands[1].startswith('ptr '):
+                    result.append(line)
+                    continue
+                value, pointer = operands[0], operands[1][4:]
                 name = 'port_bus_store_' + kind
                 line = f'{indent}call void @{name}(ptr {pointer}, {kind} {value})'
                 used.add((name, 'void', 'ptr, ' + kind))

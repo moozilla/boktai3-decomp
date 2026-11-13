@@ -13,4 +13,10 @@ void port_devices_sync_timing(void);
 void port_devices_set_renderer(void (*line)(void *, unsigned),
                                void (*write)(void *, unsigned, unsigned), void *context);
 void port_devices_notify_write(uint32_t address, unsigned width);
+/* Full game: IRQ handlers are called by GBA address; frame runs at line 160
+ * after the visible lines are drawn, before the VBlank interrupt. */
+void port_devices_set_game(int (*invoke)(void *, uint32_t), void (*frame)(void),
+                           void (*audio)(void *, const int16_t *, size_t, uint32_t));
+struct Hw;
+struct Hw *port_devices_hardware(void);
 #endif

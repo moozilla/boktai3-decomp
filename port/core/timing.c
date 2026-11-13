@@ -4,6 +4,8 @@ static struct PortPlatformHooks platform;
 static unsigned current_line;
 static uint64_t frames;
 static unsigned dispatch_depth;
+static unsigned serviced_total;
+static unsigned running;
 
 void port_set_hooks(const struct PortPlatformHooks *hooks)
 {
@@ -43,8 +45,11 @@ int port_irq_dispatch(void)
             if (pending & order[slot]) break;
         if (slot == sizeof(order) / sizeof(order[0])) return -3; /* Game Pak halt */
         target = *(uint32_t *)(uintptr_t)(PORT_IWRAM_BASE + 0x3a10 + slot * 4);
-        handler = platform.resolve ? platform.resolve(platform.context, target) : NULL;
-        if (!handler) return -2;
+        handler = NULL;
+        if (!platform.invoke) {
+            handler = platform.resolve ? platform.resolve(platform.context, target) : NULL;
+            if (!handler) return -2;
+        }
         saved_ie = REG16(0x200);
         saved_ime = REG16(0x208);
         if (platform.acknowledge) platform.acknowledge(platform.context, order[slot]);
@@ -60,7 +65,12 @@ int port_irq_dispatch(void)
         REG16(0x208) = slot == 0 ? 0 : 1;
         if (platform.trace) platform.trace(platform.context, "irq", order[slot]);
         ++dispatch_depth;
-        handler();
+        ++serviced_total;
+        if (handler) handler();
+        else if (platform.invoke(platform.context, target) < 0) {
+            --dispatch_depth;
+            return -2;
+        }
         --dispatch_depth;
         REG16(0x200) = saved_ie;
         REG16(0x208) = saved_ime;
@@ -75,7 +85,25 @@ static int advance(uint32_t cycles)
     return port_irq_dispatch();
 }
 
+static int run_scanline(void);
 int port_run_scanline(void)
+{
+    int result;
+    ++running;
+    result = run_scanline();
+    --running;
+    return result;
+}
+
+/* Game code polls memory that only an interrupt or the display changes.
+ * Outside timing callbacks, let one scanline elapse. */
+int port_spin_advance(void)
+{
+    if (running || dispatch_depth) return 0;
+    return port_run_scanline();
+}
+
+static int run_scanline(void)
 {
     uint16_t status;
     int result;
@@ -129,3 +157,15 @@ int port_wait_vblank(void)
 }
 
 uint64_t port_frame_count(void) { return frames; }
+unsigned port_current_line(void) { return current_line; }
+
+int port_wait_interrupt(void)
+{
+    unsigned start = serviced_total, i;
+    for (i = 0; i < 2 * PORT_SCANLINES; ++i) {
+        int result = port_run_scanline();
+        if (result < 0) return result;
+        if (serviced_total != start) return 0;
+    }
+    return -1;
+}

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boktai 3 Source Port</title>
+<style>
+  :root {
+    --bg: #15171c; --panel: #1f2229; --text: #e8e6e1; --muted: #9a9890; --accent: #f2a33a;
+    --line: #2e323b; --bad: #ff7a6b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 40px; }
+  header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  h1 { font-size: 18px; margin: 0; font-weight: 650; }
+  #status { color: var(--muted); }
+  #status.bad { color: var(--bad); }
+  .screen { position: relative; background: #000; border-radius: 6px; overflow: hidden;
+            width: 100%; aspect-ratio: 3 / 2; max-width: 960px; }
+  canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+  #overlay { position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+             background: rgba(10, 11, 14, .82); color: var(--text); padding: 16px; }
+  #overlay[hidden] { display: none; }
+  #overlay button, .controls button, select { font: inherit; color: var(--text); background: var(--panel);
+             border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  #overlay button.primary { background: var(--accent); color: #1b1408; border-color: var(--accent); font-weight: 600;
+             padding: 10px 20px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-top: 14px; }
+  .controls label { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+  input[type=range] { width: 160px; accent-color: var(--accent); }
+  .keys { margin-top: 14px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  kbd { background: var(--panel); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px;
+        padding: 0 6px; color: var(--text); font: 12px ui-monospace, monospace; }
+  #log { margin-top: 14px; color: var(--muted); font: 12px ui-monospace, monospace; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Boktai 3 source port</h1>
+    <span id="status">Loading…</span>
+  </header>
+  <div class="screen">
+    <canvas id="screen" width="240" height="160"></canvas>
+    <div id="overlay">
+      <div>
+        <p id="overlay-text">Loading the game…</p>
+        <p id="picker" hidden>
+          Choose your Boktai 3 ROM (it stays on this computer):<br><br>
+          <input type="file" id="rom-file" accept=".gba">
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <label>Start from <select id="save-select"></select></label>
+    <label>Sunlight <input type="range" id="sun" min="0" max="255" value="23"> <span id="sun-value"></span></label>
+    <button id="pause">Pause</button>
+    <button id="reset">Restart</button>
+    <span id="fps"></span>
+    <span id="sound"></span>
+  </div>
+  <div class="keys">
+    <span><kbd>←↑→↓</kbd> D-pad</span><span><kbd>X</kbd> A</span><span><kbd>Z</kbd> B</span>
+    <span><kbd>A</kbd> L</span><span><kbd>S</kbd> R</span><span><kbd>Enter</kbd> Start</span>
+    <span><kbd>Backspace</kbd> Select</span><span><kbd>Space</kbd> fast-forward (hold)</span><span><kbd>P</kbd> pause</span>
+  </div>
+  <div id="log"></div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const canvas = $('screen');
+const ctx = canvas.getContext('2d');
+const image = ctx.createImageData(240, 160);
+const control = new Int32Array(new SharedArrayBuffer(32));
+const KEYS = { KeyX: 0, KeyZ: 1, Backspace: 2, Enter: 3, ArrowRight: 4, ArrowLeft: 5, ArrowUp: 6, ArrowDown: 7, KeyS: 8, KeyA: 9 };
+let worker, config, audioBuffer, audioContext, frames = 0, lastFps = performance.now(), saveName = null;
+
+function status(text, bad) { $('status').textContent = text; $('status').classList.toggle('bad', !!bad); }
+function log(text) { $('log').textContent += text + '\n'; }
+
+addEventListener('keydown', (e) => {
+  if (e.code in KEYS) {
+    Atomics.or(control, 0, 1 << KEYS[e.code]);
+    Atomics.or(control, 5, 1 << KEYS[e.code]); // latched until the game's next frame
+    e.preventDefault();
+  }
+  else if (e.code === 'Space') { Atomics.store(control, 1, 1); e.preventDefault(); }
+  else if (e.code === 'KeyP') togglePause();
+});
+addEventListener('keyup', (e) => {
+  if (e.code in KEYS) Atomics.and(control, 0, ~(1 << KEYS[e.code]));
+  else if (e.code === 'Space') Atomics.store(control, 1, 0);
+});
+addEventListener('blur', () => Atomics.store(control, 0, 0));
+
+const sun = $('sun');
+function updateSun() {
+  // The slider is sunlight (0 = none); the cartridge sensor reads 255 = dark.
+  const level = 255 - Number(sun.value);
+  Atomics.store(control, 3, level);
+  $('sun-value').textContent = sun.value < 40 ? 'none' : sun.value < 140 ? 'some' : 'strong';
+}
+sun.addEventListener('input', updateSun);
+updateSun();
+
+function togglePause() {
+  const paused = Atomics.load(control, 2) ^ 1;
+  Atomics.store(control, 2, paused);
+  $('pause').textContent = paused ? 'Resume' : 'Pause';
+}
+$('pause').onclick = togglePause;
+
+async function fetchBytes(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${url}: ${r.status}`);
+  return r.arrayBuffer();
+}
+
+async function startAudio() {
+  try {
+    audioBuffer = new SharedArrayBuffer(16 + 8 * 16384);
+    audioContext = new AudioContext();
+    // Browsers start audio only after a gesture: the first key or click.
+    const unlock = () => audioContext.resume().then(() => {
+      if (audioContext.state === 'running') $('sound').textContent = '';
+    });
+    addEventListener('keydown', unlock);
+    addEventListener('pointerdown', unlock);
+    if (audioContext.state !== 'running') $('sound').textContent = 'Press any key for sound';
+    await audioContext.audioWorklet.addModule('audio.js');
+    const node = new AudioWorkletNode(audioContext, 'game-audio', { outputChannelCount: [2] });
+    node.port.postMessage(audioBuffer);
+    node.connect(audioContext.destination);
+  } catch (e) {
+    audioBuffer = null;
+    log('audio unavailable: ' + e.message);
+  }
+}
+
+async function boot(rom) {
+  if (worker) worker.terminate();
+  frames = 0;
+  const choice = $('save-select').value;
+  saveName = choice === 'fresh' ? null : choice;
+  let save = null;
+  if (choice && choice !== 'fresh') {
+    try { save = await fetchBytes('saves/' + encodeURIComponent(choice)); } catch (e) { save = null; }
+  }
+  const wasm = await fetchBytes('game.wasm');
+  worker = new Worker('worker.js');
+  worker.onmessage = (e) => {
+    const m = e.data;
+    if (m.type === 'frame') {
+      image.data.set(new Uint8ClampedArray(m.pixels));
+      ctx.putImageData(image, 0, 0);
+      frames++;
+      const now = performance.now();
+      if (now - lastFps > 1000) {
+        $('fps').textContent = `${Math.round(frames * 1000 / (now - lastFps))} fps · frame ${m.n}`;
+        frames = 0; lastFps = now;
+      }
+    } else if (m.type === 'save') {
+      if (config && config.local) fetch('saves/' + encodeURIComponent(config.writable), { method: 'PUT', body: m.data });
+    } else if (m.type === 'started') {
+      status('Running the original game C, compiled to WebAssembly');
+      $('overlay').hidden = true;
+    } else if (m.type === 'log') {
+      log(m.text);
+    } else if (m.type === 'fatal') {
+      status('Stopped: ' + m.text, true);
+      log(m.text);
+    }
+  };
+  worker.postMessage({ wasm, rom, save, controlBuffer: control.buffer, audioBuffer }, [wasm]);
+}
+
+let romBytes = null;
+$('reset').onclick = () => romBytes && boot(romBytes.slice(0));
+$('save-select').onchange = () => romBytes && boot(romBytes.slice(0));
+
+async function main() {
+  if (!crossOriginIsolated) {
+    status('This page needs cross-origin isolation; start it with python3 port/serve.py', true);
+  }
+  try { config = await (await fetch('config.json')).json(); } catch (e) { config = { local: false, saves: [] }; }
+  const select = $('save-select');
+  const options = [['fresh', 'New game (no save)']];
+  if (config.local) options.unshift([config.writable, 'Your save (' + config.writable + ')']);
+  for (const s of config.saves || []) if (s !== config.writable) options.push([s, 'Checkpoint: ' + s]);
+  for (const [value, label] of options) select.add(new Option(label, value));
+  if (config.local && !config.hasWritable) select.value = 'fresh';
+
+  const ready = async (rom) => {
+    romBytes = rom;
+    $('picker').hidden = true;
+    $('overlay-text').textContent = 'Starting…';
+    await startAudio();
+    boot(romBytes.slice(0));
+  };
+  if (config.rom) {
+    ready(await fetchBytes('rom.gba'));
+  } else {
+    // Hosted copy: no ROM on the server; read the player's own file.
+    $('overlay-text').textContent = '';
+    $('picker').hidden = false;
+    status('Waiting for a ROM');
+    $('rom-file').onchange = async (e) => ready(await e.target.files[0].arrayBuffer());
+  }
+}
+main();
+</script>
+</body>
+</html>
