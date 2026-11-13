@@ -1570,23 +1570,61 @@ def pseudo_names(wd, func):
 
 
 @by_dumps("*")
-def uid_lines(wd):
-    """insn uid -> C line, from the line notes in the RTL dumps."""
+def uid_sources(wd):
+    """insn uid -> (source file, C line), preserving inline-header provenance."""
     out = {}
     for p in PASSES:
         path = os.path.join(wd, "u.i." + p)
         if not os.path.exists(path):
             continue
-        line = 0
-        for blk in re.split(r"\n\n", open(path).read()):
-            m = re.search(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
+        location = (None, 0)
+        with open(path) as stream:
+            dump = stream.read()
+        for blk in re.split(r"\n\n", dump):
+            m = re.search(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("([^"]*)"\) (\d+)\)', blk)
             if m:
-                line = int(m.group(1))
+                location = (m.group(1), int(m.group(2)))
                 continue
             m = re.match(r"\((?:insn|jump_insn|call_insn|code_label|note)(?:/\w)* (\d+)", blk)
             if m:
-                out.setdefault(int(m.group(1)), line)
+                out.setdefault(int(m.group(1)), location)
     return out
+
+
+def uid_lines(wd):
+    """insn uid -> C line; callers needing source text must also retain the file."""
+    return {uid: location[1] for uid, location in uid_sources(wd).items()}
+
+
+def source_statement(wd, src, uid):
+    """Display location and source text for UID, never borrowing another file's line.
+
+    Main-file statements retain the author's spelling. Header statements come from
+    the compiled preprocessor input, so the explanation also works for saved dumps.
+    """
+    filename, line = uid_sources(wd).get(uid, (None, 0))
+    if not filename or not line:
+        return None, ""
+    if os.path.normpath(os.path.join(ROOT, filename)) == os.path.normpath(os.path.join(ROOT, src)):
+        with open(os.path.join(ROOT, src)) as stream:
+            lines = stream.read().splitlines()
+        return str(line), lines[line - 1].strip() if line <= len(lines) else ""
+    label = f"{line} ({filename})"
+    path = os.path.join(wd, "u.i")
+    if not os.path.exists(path):
+        return label, ""
+    current, number = None, 0
+    with open(path, errors="replace") as stream:
+        preprocessed = stream.read().splitlines()
+    for text in preprocessed:
+        marker = re.match(r'# (\d+) "([^"]*)"', text)
+        if marker:
+            number, current = int(marker.group(1)), marker.group(2)
+            continue
+        if current == filename and number == line:
+            return label, text.strip()
+        number += 1
+    return label, ""
 
 
 def dispositions(wd):
@@ -5401,9 +5439,8 @@ def cmd_why(src, func, uid, env, via=None):
         if re.match(r"ldr r\d+, =", row["draft"] or ""):
             print(f"insn {uid}: constant origin is unknown (no equal-valued pre-final SET found);"
                   " retaining the emitted insn rather than guessing from its register")
-    ln = lines.get(uid)
-    code = srclines[ln - 1].strip() if ln and ln <= len(srclines) else ""
-    print(f"why insn {uid}  line {ln}: {code}")
+    location, code = source_statement(wd, src, uid)
+    print(f"why insn {uid}  line {location}: {code}")
     if row:
         twin = register_twin(rows, row)
         rom_text = row["rom"] or (twin["rom"] if twin else None)
