@@ -79,7 +79,7 @@ void Registry3F74_UpdateAnimations(struct RegistryChoiceMenu *menu)
         anim->flags |= 1;
     }
     anim = &menu->animations[3];
-    offset = Registry3F74_FindFrameOffset(menu->cursor, menu->initialSelection);
+    offset = MenuCursor_GetEntry(menu->cursor, menu->initialSelection);
     if (offset) {
         anim->screenOffsetX = offset->x;
         anim->screenOffsetY = offset->y;

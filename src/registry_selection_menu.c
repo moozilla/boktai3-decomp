@@ -47,7 +47,7 @@ static inline u32 Test(struct MenuCursor *cursor, u32 mask)
 
 static inline u32 Entry_TestFlags(struct MenuCursorEntry *entry, u32 mask)
 {
-    return entry->flags & mask;
+    return entry->bounds.flags & mask;
 }
 
 void PositionMotion_InitTimedInterpolation(struct PositionMotion *motion,
@@ -145,7 +145,7 @@ void RegistrySelection_UpdateIndicators(struct RegistrySelectionMenu *menu)
         (&menu->animations[12])->flags |= 1;
     } else {
         widgets = &menu->animations[11];
-        entry = Registry3F74_FindFrameOffset(menu->selectionCursor, menu->initialSelection);
+        entry = MenuCursor_GetEntry(menu->selectionCursor, menu->initialSelection);
         if (entry) {
             widgets->width = entry->x;
             widgets->height = entry->y;
@@ -157,7 +157,7 @@ void RegistrySelection_UpdateIndicators(struct RegistrySelectionMenu *menu)
         }
         if ((u16)menu->cancelSelection <= 8) {
             widgets = &menu->animations[12];
-            entry = Registry3F74_FindFrameOffset(menu->selectionCursor, menu->cancelSelection);
+            entry = MenuCursor_GetEntry(menu->selectionCursor, menu->cancelSelection);
             if (entry) {
                 widgets->width = entry->x + 16;
                 widgets->height = entry->y;
@@ -466,29 +466,29 @@ void RegistrySelection_CreateSelectionCursor(struct RegistrySelectionMenu *menu,
     available = menu->availableEntries;
     for (; i < 9; i++) {
         if ((available >> i) & 1)
-            entries[i].flags = 0;
+            entries[i].bounds.flags = 0;
         else if ((u32)(i - 6) <= 2)
-            entries[i].flags |= 3;
+            entries[i].bounds.flags |= 3;
         else
-            entries[i].flags |= 2;
+            entries[i].bounds.flags |= 2;
     }
     if (!Entry_TestFlags(entry8, 1)) {
-        entries[1].previous = 8;
-        entries[5].next = 8;
+        entries[1].bounds.previous = 8;
+        entries[5].bounds.next = 8;
     }
     if (!Entry_TestFlags(entry6, 1)) {
-        entries[2].next = 6;
+        entries[2].bounds.next = 6;
         if (!Entry_TestFlags(entry7, 1))
-            entries[6].next = 7;
+            entries[6].bounds.next = 7;
         else
-            entries[3].previous = 6;
+            entries[3].bounds.previous = 6;
     }
     if (!Entry_TestFlags(entry7, 1)) {
-        entries[3].previous = 7;
+        entries[3].bounds.previous = 7;
         if (!Entry_TestFlags(entry6, 1))
-            entries[7].previous = 6;
+            entries[7].bounds.previous = 6;
         else
-            entries[2].next = 7;
+            entries[2].bounds.next = 7;
     }
     menu->selectionCursor = MenuCursor_Create(1, selection, 9, entries);
 }
