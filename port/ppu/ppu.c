@@ -262,6 +262,8 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
         } else {
             cycles -= (int)boxw - 2 + (left < 0 ? floor256(left * 128) : 0);
         }
+        /* Bitmap modes admit OBJ by its base tile, before address wrapping. */
+        if ((display & 7) >= 3 && (c & 1023) < 512) continue;
         mosaic_origin = left - 1;
         if (affine && (a & 0x1000)) {
             unsigned mosaic = read16(m->io, 0x4c);
@@ -322,7 +324,6 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
                        ((tile + ((unsigned)(sx / 8) << bpp8)) & 31);
             }
             tile &= 1023;
-            if ((display & 7) >= 3 && tile < 512) continue;
             address = 0x10000 + tile * 32 + (sy & 7) * (bpp8 ? 8 : 4);
             address += bpp8 ? (sx & 7) : (sx & 7) / 2;
             address = 0x10000 + ((address - 0x10000) & 0x7fff);

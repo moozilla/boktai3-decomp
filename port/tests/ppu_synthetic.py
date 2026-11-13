@@ -158,6 +158,13 @@ def edge_fixtures():
         for i in range(4):
             s.obj(i, 20 + i * 32, 40 | 0x8000, (i % 2)*512 | (i << 10))
         yield f'bitmap_obj_overlap_{mode}', s
+    for mode in (3, 4, 5):
+        for mapping in (0, 64):
+            for tile in (511, 512, 1007, 1023):
+                for depth in (0, 0x2000):
+                    s = Scene().reg(0, 0x1400 | mode | mapping)
+                    s.obj(0, 20 | depth, 40 | 0xc000, tile)
+                    yield f'bitmap_obj_wrap_{mode}_{mapping}_{tile}_{depth}', s
     for priority in range(4):
         for semi in (0, 0x400):
             s = Scene().reg(0, 0x1f40).reg(0x50, 0x3f7f).reg(0x52, 0x0808)
