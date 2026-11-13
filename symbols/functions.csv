@@ -9088,9 +9088,12 @@ addr,name,mode,confidence,source,notes
 082192F0,ScanlineEffect_StageTransfer,thumb,low,src-alias,
 082194D4,ScanlineEffect_StopTransfer,thumb,low,decomp,Clear scanline buffer and disable pending DMA mode
 08219574,Blend_SetAlpha,thumb,low,src-alias,Selects blend targets and enables alpha blending with the supplied coefficients
+082195AC,Blend_Disable,thumb,low,decomp,Disable blending and restore default alpha and brightness registers
 082195D0,Anim_ResetDefaultFlags,thumb,low,src-alias,Clears the global halfword copied into newly loaded animations; tentative flags interpretation
 082195E0,Anim_Remove,thumb,low,src-alias,
+082195F8,Anim_RemoveAllInCurrentList,thumb,low,decomp,Unlink every animation from the selected list
 082196C4,ResourceHeader_Relocate,thumb,low,src-alias,
+082196FC,Anim_FindGlyphEntryById,thumb,low,decomp,Find a glyph resource record by its ID
 08219728,Anim_SelectWidgetGlyph,thumb,low,src-alias,
 082197A4,Anim_InitPositionedWidget,thumb,low,src-alias,
 0821980C,Anim_LoadKeyframe,thumb,low,src-alias,
