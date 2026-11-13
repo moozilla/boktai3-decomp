@@ -1442,3 +1442,44 @@ three-component offset introduces stack storage and many extra instructions.
 The height/result names are folded before allocation, so FORCE cannot address
 them in the plain draft. Next: find a genuine value/control-flow boundary for
 the constant copy without adding a barrier or unrelated arithmetic.
+
+### SceneActorRegistry_SetMovementMode — offset materialization and allocation
+
+Tags: phase3, dp-scene1, SceneActorRegistry_SetMovementMode, 0x08070070
+
+The saved fully pin-free draft is 186 ROM / 190 draft instruction differences,
+shape 12, 832 versus 824 bytes. The source has 38 pins and 13 barriers; individual
+and grouped removal found no free reduction. The original source remains unchanged
+and passed tools/check.py (MATCH, 824 bytes) at shutdown. No matching partial landed.
+
+Probe tested four CSE canonical-register choices and eleven jump follows; none
+changed the count. There are no PRE replacements or loop hoists in this draft.
+Keeping only the actor, mode and savedFlags pins reduces the count to 152/156,
+with the same shape 12. No single matching compiler knob was found. The earlier
+round11-c mode-priority observation does not resolve the remaining offsets.
+
+Typed field replacement with an extra actor view gives 219/217 differences,
+shape 52, at the correct size. Simplifying the mode-zero and mode-one initialization
+blocks and rooting a typed group view at unknown3D4 gives 175/183, shape 82,
+848 bytes. Replacing only the player-route-ready tail gives 51/54, shape 25,
+832 bytes: the change also affects reload allocation outside the replaced block.
+These larger structural changes did not produce a matching partial.
+
+Four isolated replacements in the otherwise original source expose smaller
+boundaries. Direct savedFlags = &actor->flags2D4 removes an offset pin/barrier,
+but its three address-materialization instructions use r0 instead of r2. Direct
+field2C2 = 64 leaves three register differences: offset r0 rather than r2 and
+address r5 rather than r1. The typed flags414 update leaves three differences,
+shape two: its offset uses r0 rather than r6 and its halfword read moves ahead
+of mask initialization. Direct field416-to-field418 assignment leaves nine
+register-only differences. These are allocation/lifetime boundaries, rather
+than evidence that the field layouts are wrong.
+
+Next: preserve the field-address lifetimes through a typed common base, and
+initialize the flags414 mask before the read. Establish a small matching partial
+around one of the three-difference groups before simplifying either full mode
+arm. The saved draft retains existing offset expressions as a diagnostic
+baseline; typed replacements still need the allocation mechanism above.
+
+The weekly-run stop arrived during this item. Work ends here; queue item 28
+(SceneActorRegistry_DefeatActorsFromScript) and later items were not started.
