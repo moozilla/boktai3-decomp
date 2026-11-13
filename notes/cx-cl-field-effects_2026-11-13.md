@@ -94,3 +94,9 @@ The continuation completed the previously inspected spread-shot item as two cont
 Tags: #matching #particles #scene #structs #compiler
 
 At the next continuation request, completed 08125B64–08126140 as `src/scene_moving_particle.c` (13 former files, 1500 bytes). The shared MovingParticlePool now uses Task and the complete particle record, including the common sprite, velocity, animation counters and lifetime. All functions match, as does the other header consumer at 0812D8EC. The allocator originally used a volatile mask pointer even though this range was in the concession-free queue. A direct indexed loop using the shared occupancy helper matches and removes that access. Pointer-cursor variations had retained or reordered loads; no concession is needed. This completes the assigned forward queue before 08126650; four earlier typed-cleanup blockers remain for another pass.
+
+## Scheduling-manager revisit
+
+Tags: #matching #scene #structs #compiler
+
+Resolved 0806F3A8–0806F7B0 and consolidated nine files into `src/scene_effect_schedule.c` (1032 bytes MATCH). The lookup walks a typed pool cursor and reads `cursor->entries[0].id` directly; materializing a separate entry pointer changes allocation, while direct access preserves the original setup and loop. Dynamic strides derive from the entry size, and Task replaces the raw task prefix. Script creation shares the complete schedule entry and the previously recovered scheduled effect. The signed slot-sentinel check remains. The changed header has no other consumer. Four additional pointer/array forms for CellGate_ClampPlayerEdge still remove its required player-pointer reload; its original matching source is restored.
