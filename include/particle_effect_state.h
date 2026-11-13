@@ -32,7 +32,8 @@ struct FollowingPosition {
 };
 struct FollowingEffect {
     void (*update)(struct FollowingEffect *);
-    u8 collider[0x5c];                /* 0x04 */
+    u8 collider[0x40];                /* 0x04 */
+    u8 resource[0x1c];                /* 0x44 */
     struct ContactSwarmSprite sprite; /* 0x60 */
     struct DisplaySequenceState anim; /* 0x8c */
     void *sequence;
@@ -43,6 +44,8 @@ struct FollowingEffect {
     u8 unk_C8[4];
     u16 duration;
     u8 active, entered;
+    u16 id;
+    u8 unknownD2[0xa];
 };
 
 #endif

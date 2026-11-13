@@ -5121,6 +5121,7 @@ addr,name,mode,confidence,source,notes
 08139D9C,SceneProcParticles_SubmitBounds,thumb,low,src-alias,
 08139E24,SpritePool_StartEntry,thumb,low,src-alias,
 08139F58,CallbackPool_RemoveEntry,thumb,low,src-alias,
+08139FA0,ParticleBurstEffect_ResetManager,thumb,low,src-alias,Clears the six-slot burst manager singleton
 08139FAC,FollowingSpriteEffect_SetStateCallback,thumb,low,src-alias,Stores the state callback and sets its entry flag for an effect that follows a position
 08139FB8,FollowingSpriteEffect_OnStop,thumb,low,src-alias,Hides the secondary sprite and clears the activity flag and callback on state entry
 08139FE0,FollowingSpriteEffect_UpdateFollowing,thumb,low,src-alias,Follows an anchor with adaptive X easing; projects and animates the sprite; refreshes its collider; and stops on expiry.
@@ -5134,19 +5135,23 @@ addr,name,mode,confidence,source,notes
 0813A41C,SpritePairEntry_CreateEffect,thumb,low,src-alias,
 0813A4C8,SpritePairPool_StartEntry,thumb,low,src-alias,
 0813A5B4,SpritePair_ReleaseSlot,thumb,low,src-alias,
+0813A614,FollowingSpriteEffect_ResetManager,thumb,low,src-alias,Clears the two-slot following effect manager singleton
 0813A620,SpritePair_UpdateAnimation,thumb,low,src-alias,
 0813A788,PositionLinkedSprite_DestroyManager,thumb,low,src-alias,Releases both position-linked sprite slots and clears the singleton pointer
 0813A7A8,CompactSpritePool_Initialize,thumb,low,src-alias,
 0813A860,PositionLinkedSprite_EnsureManager,thumb,low,src-alias,Returns or creates the manager whose sprites track external position and offset pointers
 0813A8A8,DisplaySlots_Reserve,thumb,low,src-alias,
 0813A91C,SpritePair_RemoveSlot,thumb,low,src-alias,
+0813A958,ActorMarker_ResetManager,thumb,low,src-alias,Clears the two-slot position-linked marker manager; identity tentative
 0813A964,ActorMarker_HideSlot,thumb,low,src-alias,sets the sprite hide bit for an occupied marker slot
 0813A99C,ActorMarker_ShowSlot,thumb,low,src-alias,clears the sprite hide bit for an occupied marker slot
+0813A9D4,SpriteParticle_InitSystem,thumb,low,src-alias,Empty initialization hook for the screen particle manager
 0813A9D8,ScreenMote_ApproachTarget,thumb,low,src-alias,
 0813AA9C,SpriteParticle_ReleaseSlot,thumb,low,src-alias,removes the slot effect and clears its record and slot index
 0813AACC,SpriteParticle_AllocateSlot,thumb,low,src-alias,reserves the first free record in the 32-slot particle pool
 0813AB04,ScreenMote_SpawnBatch,thumb,low,src-alias,
 0813AC38,SpriteParticle_SpawnSingleFrameBatch,thumb,low,src-alias,forwards spawn parameters with a lifetime of one; lifetime interpretation is tentative
+0813AC58,SpriteParticle_SpawnAnimatedBatch,thumb,low,src-alias,Spawns a screen particle batch with zero update options; visual identity tentative
 0813AC78,ScreenMote_UpdateManager,thumb,low,src-alias,
 0813AD08,EffectPool_Destroy,thumb,low,src-alias,
 0813AD48,SpriteParticle_LoadAnimationData,thumb,low,src-alias,caches animation resource 0x1C1E in the manager
