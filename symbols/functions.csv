@@ -4871,8 +4871,8 @@ addr,name,mode,confidence,source,notes
 0811F1A8,ActorEmitter_TryEmitAnimatedPair,thumb,low,src-alias,
 0811F29C,ActorEffect_EmitOffsetPair,thumb,low,src-alias,
 0811F338,ActorAction_InitializeMode,thumb,low,src-alias,
-0811F474,Modifier_IsFourthSourceReady,thumb,low,src-alias,Tests whether the fourth-source effect is enabled and its delay has expired
-0811F490,CallbackList_SubtractStateTenValue,thumb,low,src-alias,
+0811F474,Modifier_IsFourthSourceReady,thumb,low,src-alias,Fourth-source ability enabled and remaining-time readiness predicate
+0811F490,CallbackList_SubtractStateTenValue,thumb,low,src-alias,Subtracts a state-10 adjusted resource cost from ActorStats.value with zero clamp
 0811F4C4,CallbackStatus_ResetSelectorAndTest,thumb,low,src-alias,
 0811F4DC,ModifierAction_ActivateCost,thumb,low,src-alias,
 0811F538,ActorAbility_ActivatePaletteEffect,thumb,low,src-alias,
@@ -4880,13 +4880,13 @@ addr,name,mode,confidence,source,notes
 0811F6CC,ActorAbility_SpawnProjectile,thumb,low,src-alias,
 0811F75C,ActorAbility_SpawnAlternateProjectile,thumb,low,src-alias,
 0811F7EC,ActorAction_TrySpawn,thumb,low,src-alias,
-0811F874,Modifier_InitFourthSourceEffect,thumb,low,src-alias,Loads the selected fourth-source record and installs its kind-specific effect callback
+0811F874,Modifier_InitFourthSourceEffect,thumb,low,src-alias,Initializes fourth-source ability configuration and selects its callback by kind
 0811F918,ModifierAction_SpawnBurst,thumb,low,src-alias,
 0811F984,ActorAction_TickRecovery,thumb,low,src-alias,
 0811FA10,Modifier_EvaluateThirdSourceModeOne,thumb,low,src-alias,Third-source mode-one callback returns one when enabled and minus one otherwise
 0811FA24,Modifier_EvaluateThirdSourceModeTwo,thumb,low,src-alias,Third-source mode-two callback returns one when enabled and minus one otherwise
-0811FA38,ModifierAction_InitializeSecondary,thumb,low,src-alias,
-0811FA90,Modifier_InitSourceInfo,thumb,low,src-alias,Stores the owner value and loads modifier source information from the object's source ID.
+0811FA38,ModifierAction_InitializeSecondary,thumb,low,src-alias,Initializes third-source callback and configuration; shares bytes with stat factors
+0811FA90,Modifier_InitSourceInfo,thumb,low,src-alias,Initializes byte-source information; lookup fields share stat-factor storage
 0811FAB8,Actor_ApplyKnockback,thumb,low,src-alias,
 0811FCB4,ActorMotion_SetKnockback,thumb,low,src-alias,
 0811FDB4,ActorCollision_InitBounds,thumb,low,src-alias,
