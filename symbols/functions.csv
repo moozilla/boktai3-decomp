@@ -1104,9 +1104,11 @@ addr,name,mode,confidence,source,notes
 08030BF8,MessageWindow_Clear,thumb,low,src-alias,Blanks the text rectangle and stops processing while hiding the speaker graphic
 08030C78,MessageWindow_ClearFromScript,thumb,low,src-alias,Wraps the message window clear operation for a script command
 08030C84,MessageWindow_SetMessageTable,thumb,low,src-alias,Stores a message reference and initializes text playback at its first entry
+08030CEC,MessageWindow_SetTimedMessageTable,thumb,low,src-alias,Sets a bounded list of queued message indices and selects its current frame
 08030D9C,MessageWindow_SetMessageTableFromScript,thumb,low,src-alias,Gets a message reference from script arguments and installs it
 08030DBC,MessageWindow_ShowMessage,thumb,low,src-alias,Selects an indexed message and resets text bounds and processing callbacks
 08030EAC,MessageWindow_SetWaitFromScript,thumb,low,src-alias,Reads a script value into the active message window wait field
+08030EDC,MessageWindow_SetTextCursor,thumb,low,src-alias,Starts direct text playback without a message table
 08030F20,MessageWindow_SetBounds,thumb,low,src-alias,Blanks the previous rectangle and applies new text window bounds
 08030FA8,MessageWindow_SetBoundsFromScript,thumb,low,src-alias,Reads four script values and applies the text window rectangle
 08030FD4,MessageWindow_SetNumberArgument,thumb,low,src-alias,Stores an indexed numeric substitution value in the window text state
@@ -1114,6 +1116,7 @@ addr,name,mode,confidence,source,notes
 08031018,MessageWindow_SetStringArgument,thumb,low,src-alias,Stores an indexed string substitution pointer in the window text state
 0803103C,MessageWindow_SetStringArgumentFromScript,thumb,low,src-alias,Resolves a script string reference with an optional index offset and stores the substitution pointer
 0803107C,MessageWindow_SetStringReferenceFromScript,thumb,low,src-alias,Reads a substitution slot and stores the following script reference as its string pointer
+08031098,MessageWindow_SetStringFromPc,thumb,low,src-alias,Uses the current script pc as a string substitution reference
 080310D8,MessageWindow_SetArgumentFromScript,thumb,low,src-alias,Stores a script value in an indexed text substitution argument
 080310F4,MessageWindow_SetChoicesFromScript,thumb,low,src-alias,Reads the keyword p value list into the text state's choice array
 08031144,MessageWindow_SetAutoAdvance,thumb,low,src-alias,Sets automatic advance mode and timing while resetting its counter
@@ -1123,11 +1126,15 @@ addr,name,mode,confidence,source,notes
 080311F0,MessageWindow_OpenFromScript,thumb,low,src-alias,
 08031370,MessageWindow_SetPageAdvanceDelay,thumb,low,src-alias,Sets the page advance delay threshold and resets its counter; tentative timing interpretation
 0803139C,MessageWindow_SetPageAdvanceDelayFromScript,thumb,low,src-alias,Reads the page advance delay threshold from the script
+080313AC,MessageWindow_CheckExists,thumb,low,src-alias,Returns zero when the singleton exists and minus one otherwise
 080313C8,MessageWindow_GetStringAtOffset,thumb,low,src-alias,Resolves the window's stored script string reference plus an index through text lookup
+080313E4,MessageWindow_UpdatePageAdvance,thumb,low,src-alias,Waits for input or a page delay and selects the following message
 080315B8,MessageWindow_UpdateFastPlayback,thumb,low,src-alias,Fast playback callback processes text instantly and handles completion or return to timed playback
+080316A4,MessageWindow_UpdateNormalPlayback,thumb,low,src-alias,Steps delayed text playback and handles fast-forward input
 080317CC,MessageWindow_ClearTextCompletion,thumb,low,src-alias,Completion callback clears the text state's fresh flag
 080317D4,MessageWindow_UpdateIdle,thumb,low,src-alias,Empty callback leaves the message window idle after text processing finishes
 080317D8,MessageWindow_UpdateImmediatePlayback,thumb,low,src-alias,Immediate playback callback processes up to four text steps before selecting a completion callback
+08031840,MessageWindow_Update,thumb,low,src-alias,Runs text choice procedures and the active playback callback; updates portrait and window positions
 08031964,MessageWindow_OnDestroy,thumb,low,src-alias,Destruction callback removes animation and sprite resources and clears the singleton pointer
 08031D40,MessageWindow_Create,thumb,low,src-alias,Returns the existing singleton or creates and initializes its dialogue task with update and cleanup callbacks
 08031D90,MessageWindow_GetTextBounds,thumb,low,src-alias,Copies the text rectangle into four output values for choice menu placement
