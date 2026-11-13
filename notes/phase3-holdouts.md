@@ -1467,3 +1467,30 @@ lengthen direction's pre-allocation life by one real intermediate operation
 that folds later, or shorten motionTimer's life without moving its emitted
 address computation. This is now a precise small threshold rather than an
 unexplained stack-slot permutation.
+
+### Vorn_UpdateDefeat (080AEE08): statement-macro allocation
+
+Current source has eight statement macros, no hard pins or asm. Expanding all
+is 124/126, shape 46. Transferring the encoded table plus shared defeat-spark
+helper from Bat is 151/149, shape 44; retaining the other original macros with
+that helper also fails (126/123). The saved ordinary draft expands all eight.
+
+The clearest isolated blocker is capture-spread: removing it gives 17/17,
+shape 0. `AGBCC_PRI=spread:+81` matches exactly. Local spread priority falls
+from 1271 (10 refs) to 1144 (9), below position's 1224 (8 refs), swapping r5/r6.
+Adding the natural reference via `spread->bits.y = 60` before capture would
+otherwise match, but narrows the y update to a halfword store (7/2). Using the
+z bitfield, a returned spread from a depth setter, a separate depth view,
+two mask/set statements, first-count staging, and direct first origin/kind
+arguments do not reproduce both the references and instruction selection.
+
+Removing prepare-entry or reset-entry alone gives 8/8: one is materialized
+before the entry address, shared with the later entry store, and alters the
+zero register. No single CSE/PRE/loop probe fixes it. Byte-array initializers
+still canonicalize to that result. Other isolated expansions: complete-defeat
+127/124, route-fields 100/101, random read 100/101, origin 98/100, kind 118/121.
+No free partial landed. Persistent search retains the independent hypotheses.
+
+Next: preserve full-word range initialization while giving spread one extra
+ordinary reference (or shortening its local life), then solve the entry-one
+sharing independently before combining macro removals.
