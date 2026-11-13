@@ -62,7 +62,7 @@ def build_slice(root, args):
         ppu = Path(args.ppu_root).resolve()
         flags += ['-I' + str(ppu / 'include')]
         units += ['port/core/video.c', str(ppu / 'ppu/ppu.c')]
-        exports += ['port_video_init', 'port_video_framebuffer']
+        exports += ['port_video_init', 'port_video_framebuffer', 'port_video_capture_line', 'port_video_capture_framebuffer']
     for name in units:
         source = root / name
         key = name.replace('/', '_').replace('\\', '_').lstrip('_')

@@ -81,10 +81,10 @@ boundaries or generated MMIO instrumentation before it can run cooperatively.
 
 ## Current execution limits
 
-The full game has not linked or booted. Remaining work includes symbol binding
-for absolute RAM/ROM data, relocation of ROM function-pointer tables, strict wasm
-function signature mismatches, platform replacements for intentional assembly,
-and device side effects for direct register loads/stores. The portable runtime
+The full game has not linked or booted. Absolute RAM/ROM data binding and volatile scalar MMIO instrumentation are
+implemented. Remaining work includes relocation of ROM function-pointer tables,
+strict wasm function signature mismatches, remaining intentional assembly
+replacements, and validation of device behavior beyond the boot slice. The portable runtime
 and its tests are a foundation for that integration, not an emulator.
 
 ## Linked boot slice and repeatable tests
@@ -160,3 +160,19 @@ scanlines to the sibling C PPU. `run_boot.py --ppu-root ../cx-port-ppu/port`
 checks the first forced-blank frame against mGBA in RGB555. This is the initial
 white frame, not a gameplay boot. CPU MMIO writes notify the affine renderer;
 DMA writes to affine registers still need a device notification interface.
+
+## See the port
+
+[`demo/README.md`](demo/README.md) describes the offline browser viewer. Build it
+with `python port/demo/build_demo.py` (pass sibling hardware/PPU roots before
+integration), then open `build/demo/index.html`. The generated page embeds the
+compiled C module and accepts a ROM or PPU captures through local file pickers.
+No server is required. The source page also supports choosing the wasm file.
+
+Thirty moving checkpoint frames replayed through the demo module match all
+38,400 mGBA pixels per frame. Local PNG comparisons, a GIF and a lossless APNG
+are listed in `build/demo/README.md`; none of those ROM-derived artifacts are
+committed. This is captured-state rendering, not full gameplay execution.
+The Node page-handler test covers loading the module, decompressing captures,
+comparing a reference, and running original early boot C. Browser visual testing
+was unavailable in this worker environment.

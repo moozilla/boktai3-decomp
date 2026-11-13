@@ -27,3 +27,17 @@ int port_video_init(void)
     return 0;
 }
 const uint16_t *port_video_framebuffer(void) { return framebuffer; }
+
+/* Replay a captured line through the same C renderer. The caller supplies
+ * hardware banks at their normal addresses and the captured affine latches. */
+static uint32_t capture_frame[PPU_WIDTH * PPU_HEIGHT];
+int port_video_capture_line(unsigned line, int32_t x2, int32_t y2, int32_t x3, int32_t y3)
+{
+    if (line >= PPU_HEIGHT || !memory.io) return -1;
+    if (line == 0) ppu_begin_frame(&ppu, &memory);
+    ppu.affine_x[0] = x2; ppu.affine_y[0] = y2;
+    ppu.affine_x[1] = x3; ppu.affine_y[1] = y3;
+    ppu_render_scanline_rgb888(&ppu, &memory, line, capture_frame + line * PPU_WIDTH);
+    return 0;
+}
+const uint32_t *port_video_capture_framebuffer(void) { return capture_frame; }
