@@ -6,10 +6,10 @@ void Actor_RequestRemoval(struct PooledActor *actor)
     actor->flags |= m;
 }
 
-void Actor_InitEntity(struct PooledActor *actor, u32 id, u8 direction,
+void Actor_InitEntity(struct PooledActor *actor, u32 id, u32 direction,
                       const struct ContactPosition *position)
 {
-    SceneBody_Init(&actor->body, id, position, direction, 7, actor);
+    SceneBody_Init(&actor->body, id, position, (u8)direction, 7, actor);
 }
 
 void Actor_SetFacingAngle(struct PooledActor *actor, int angle)

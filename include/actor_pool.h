@@ -60,7 +60,7 @@ struct ActorPoolManager *ActorPool_CreateManager(void);
 struct PooledActor *ActorPool_AllocObject(int);
 
 void Actor_RequestRemoval(struct PooledActor *);
-void Actor_InitEntity(struct PooledActor *, u32, u8, const struct ContactPosition *);
+void Actor_InitEntity(struct PooledActor *, u32, u32, const struct ContactPosition *);
 void Actor_SetFacingAngle(struct PooledActor *, int);
 void Actor_SetLifecycleCallbacks(struct PooledActor *, void (*)(void *), void (*)(void *));
 void Actor_SetHealthLimits(struct PooledActor *, u32, u32);
