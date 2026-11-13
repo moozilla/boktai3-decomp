@@ -585,8 +585,10 @@ addr,name,mode,confidence,source,notes
 08019BE4,SpritePool_SetPalette,thumb,low,src-alias,
 08019C00,SpritePool_SetPosition,thumb,low,src-alias,Copies a position struct into the slot (+0x28) when the pool is active; called by DirectionalParticle_Spawn with the particle's spawn position
 08019C1C,SpritePool_StartAnimation,thumb,low,src-alias,Starts a script-driven animation on the slot via ScriptProc_Start and Anim_SetSequence; used by debris particle spawning (sub_08012B34)
+08019C64,SpritePool_SetAnimationFrame,thumb,low,src-alias,
 08019C9C,SpritePool_AdvanceAnimation,thumb,low,src-alias,
 08019DC0,SpritePool_Activate,thumb,low,src-alias,
+08019E2C,SpritePool_Remove,thumb,low,src-alias,
 08019E58,SelectionMenu_GetIconPalette,thumb,low,src-alias,Returns a pointer into the shared palette buffer (index base 0x373) selecting the highlighted vs. dimmed icon tint used by PopulateActors/PopulateItem
 08019E70,Presentation_SetActorIconFrame,thumb,low,src-alias,Loads an actor-icon keyframe (index+0xF0) into a Graphic and unhides it; shared by the grid icon setter and the single review/confirm icon in Selectio
 08019E98,SelectionMenu_SetActorIcon,thumb,low,src-alias,"Resolves an actor's icon resource via Inventory_GetEquipmentEntry and either sets its grid-icon frame or hides the slot when the resource is the 0xff ""no icon"" senti"
