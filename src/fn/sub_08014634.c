@@ -78,7 +78,10 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
     struct Group *g;
     struct Group *pool;
     u32 *rng;
-    s32 priority;
+    union ParticleValue {
+        s32 priority;
+        struct Particle *particle;
+    } particleValue;
     s32 optionMask;
     union ArgumentValue {
         s32 value;
@@ -95,7 +98,7 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
         if (!managerValue.manager)
             return -1;
     }
-    priority = args.options >> 8;
+    particleValue.priority = args.options >> 8;
     asm("" : "+m"(args.options));
     optionMask = 255;
     option.value = args.options;
@@ -134,57 +137,61 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
                 option.value = *((u8 *)&option.header->count);
                 g->count = option.value;
             }
-            if (priority > 0)
-                g->priority = priority - 1;
+            if (particleValue.priority > 0)
+                g->priority = particleValue.priority - 1;
             else
                 g->priority = 2;
             i = 0;
             {
-                register s32 bound asm("r4") = args.count;
-                if (i < bound) {
+                particleValue.priority = args.count;
+                if (i < particleValue.priority) {
                     u16 *table = (u16 *)0x0203B400;
                     register u16 *tableReg asm("r7") = table;
-                    struct Particle *p = pool->particles;
-                    u8 *sprite = ((u8 *)pool) + 20;
-                    u32 mask = 0x3ff;
 
+                    u8 *sprite;
+                    u32 mask;
+
+                    particleValue.particle = pool->particles;
+                    sprite = ((u8 *)pool) + 20;
+                    mask = 0x3ff;
                     asm("" : "+r"(tableReg), "+r"(g));
                     table = tableReg;
                     i = args.count;
 
                     do {
-                        p->active = 1;
-                        p->pad = 1;
-                        p->timer = 0;
-                        p->lifetime = lifetime + (Random(table, mask, rng) & lifetimeMask);
-                        p->cell = CellIndex(args.position);
+                        particleValue.particle->active = 1;
+                        particleValue.particle->pad = 1;
+                        particleValue.particle->timer = 0;
+                        particleValue.particle->lifetime =
+                            lifetime + (Random(table, mask, rng) & lifetimeMask);
+                        particleValue.particle->cell = CellIndex(args.position);
                         {
                             option.position = args.position;
-                            p->height = option.position->y;
+                            particleValue.particle->height = option.position->y;
                         }
                         if (spread->x) {
                             s32 r = Random(table, mask, rng);
-                            p->velocity.x = velocity->x + Mod(r, spread->x);
+                            particleValue.particle->velocity.x = velocity->x + Mod(r, spread->x);
                         } else
-                            p->velocity.x = velocity->x;
+                            particleValue.particle->velocity.x = velocity->x;
                         if (spread->y) {
                             s32 r = Random(table, mask, rng);
-                            p->velocity.y = velocity->y + Mod(r, spread->y);
+                            particleValue.particle->velocity.y = velocity->y + Mod(r, spread->y);
                         } else
-                            p->velocity.y = velocity->y;
+                            particleValue.particle->velocity.y = velocity->y;
                         if (spread->z) {
                             s32 r = Random(table, mask, rng);
-                            p->velocity.z = velocity->z + Mod(r, spread->z);
+                            particleValue.particle->velocity.z = velocity->z + Mod(r, spread->z);
                         } else
-                            p->velocity.z = velocity->z;
+                            particleValue.particle->velocity.z = velocity->z;
                         if ((Random(table, mask, rng) & 15) <= 7)
-                            p->flags |= 4;
+                            particleValue.particle->flags |= 4;
                         else
-                            p->flags &= ~4;
-                        ClearFlag(&p->flags, 1);
+                            particleValue.particle->flags &= ~4;
+                        ClearFlag(&particleValue.particle->flags, 1);
                         {
                             option.position = args.position;
-                            p->position = *option.position;
+                            particleValue.particle->position = *option.position;
                         }
                         {
                             u32 *entries = gUnk_08604B90;
@@ -193,11 +200,12 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
                             option.value = args.options;
                             type = option.value;
                             offset = type * sizeof(*entries);
-                            p->tile = (*((u16 *)(resource + 4))) + *(u32 *)(offset + (u32)entries);
+                            particleValue.particle->tile =
+                                (*((u16 *)(resource + 4))) + *(u32 *)(offset + (u32)entries);
                         }
-                        p->priority = g->priority;
+                        particleValue.particle->priority = g->priority;
                         sub_08217E40(sprite, 0);
-                        p++;
+                        particleValue.particle++;
                         sprite += 56;
 
                     } while (--i);
