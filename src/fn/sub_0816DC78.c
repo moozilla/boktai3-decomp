@@ -6,7 +6,7 @@ void SceneHud_GetActionIconPosition(void *, s32);
 u32 SceneItem_SelectRandomSpecialItem(void);
 void SceneItem_SetSlotItem(s32, s32);
 u32 Selection_GetDisplayFrame(s32);
-void SceneHud_BeginIconMotion(void *, u32, s32, u32, void *, void *, u32, u32);
+void PauseMenu_BeginSpriteMotion(void *, u32, s32, u32, void *, void *, u32, u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
 void SceneHud_FinishRandomActionReturn(void);
 void SceneHud_BeginRandomActionReturn(struct SceneHudState *s)
@@ -31,7 +31,7 @@ void SceneHud_BeginRandomActionReturn(struct SceneHudState *s)
     SceneItem_SetSlotItem(*selection, SceneItem_SelectRandomSpecialItem());
     keyframe = Selection_GetDisplayFrame(item);
     later = *selection + 10;
-    SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24,
+    PauseMenu_BeginSpriteMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24,
                              16);
     Sound_PlaySong(0x38a);
     Hud_SetInteractionCallback(s, SceneHud_FinishRandomActionReturn, 1);

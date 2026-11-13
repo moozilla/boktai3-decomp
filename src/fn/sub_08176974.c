@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_hud_display.h"
 void Hud_InitSelectionBounds(u32, u32);
-void SceneHud_DrawSelectedClock(void *);
-void PauseMenu_UpdateHighlightPalette(void *);
+void Hud_DrawSelectedClock(void *);
+void MenuDisplay_UpdateHighlightPalette(void *);
 void PauseMenu_LoadSpriteKeyframe(void *, int, int);
 s32 Callback_InvokeActor(void *, void *);
 void Sound_PlaySong(u32);
@@ -15,8 +15,8 @@ void SceneHud_UpdatePageInput(struct SceneHudState *p)
 {
     u32 direction;
     Hud_InitSelectionBounds(0x40, 0x1084);
-    SceneHud_DrawSelectedClock(p);
-    PauseMenu_UpdateHighlightPalette(p);
+    Hud_DrawSelectedClock(p);
+    MenuDisplay_UpdateHighlightPalette(p);
     if (p->statusRefreshRequested)
         goto close;
     if (p->comparisonModifier) {

@@ -4,9 +4,9 @@
 #include "player.h"
 #include "render.h"
 
-void ResultPanel_DrawCappedCounters(struct SceneHudState *, s32, s32, s32);
-void ResultPanel_DrawCappedSmallCounters(struct SceneHudState *, s32, s32, s32);
-void StatDisplay_DrawPlayerValue(struct SceneHudState *, s32, s32, s32);
+void Hud_DrawHealthRatio(struct SceneHudState *, s32, s32, s32);
+void Hud_DrawEnergyRatio(struct SceneHudState *, s32, s32, s32);
+void Hud_DrawPlayerValue(struct SceneHudState *, s32, s32, s32);
 void PauseMenu_FinishEquipmentSelection(struct SceneHudState *);
 s32 PauseMenu_GetSelectedListEntryType(struct SceneHudState *);
 void SelectionPanel_RefreshVisibleEntries(struct SceneHudState *);
@@ -45,9 +45,9 @@ one:
 
 void PauseMenu_UpdateEquipmentSelection(struct SceneHudState *p)
 {
-    ResultPanel_DrawCappedCounters(p, 0, 3, 1);
-    ResultPanel_DrawCappedSmallCounters(p, 0, 3, 2);
-    StatDisplay_DrawPlayerValue(p, 0, 3, 3);
+    Hud_DrawHealthRatio(p, 0, 3, 1);
+    Hud_DrawEnergyRatio(p, 0, 3, 2);
+    Hud_DrawPlayerValue(p, 0, 3, 3);
     if (!(gPadState[0] & 4) && !p->primarySlideTimer && !p->secondarySlideTimer &&
         !p->tertiarySlideTimer) {
         PauseMenu_FinishEquipmentSelection(p);

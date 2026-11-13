@@ -4,14 +4,14 @@ struct MotionSequence {
     u8 unknown0[0x4388];
     u8 selectionA, selectionB, selection;
 };
-int SceneHud_UpdateBinaryChoice(void *);
+int PauseMenu_UpdateBinaryChoice(void *);
 void Sound_PlaySong(u32);
 void PauseInventory_ReturnToEquipmentSelection(void *);
 void sub_0822E86C(u32);
 void SolarFruit_SortInventorySlots(void *);
 void MotionSequence_ConfirmReset(struct MotionSequence *p)
 {
-    s32 r = SceneHud_UpdateBinaryChoice(p);
+    s32 r = PauseMenu_UpdateBinaryChoice(p);
     if (r == 0) {
         Sound_PlaySong(0xDE);
         PauseInventory_ReturnToEquipmentSelection(p);

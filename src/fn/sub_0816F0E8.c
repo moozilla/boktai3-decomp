@@ -28,7 +28,7 @@ struct MenuFlickerView {
     u8 unknowna44[10];
     u16 timer;
 };
-s32 SceneHud_TickPaletteBlend(void *);
+s32 PauseMenu_TickPaletteBlend(void *);
 void sub_0816D634(void *, u32);
 void Hud_DrawDefaultHealthMeter(void *, u32, u32, u32);
 void Hud_DrawDefaultEnergyMeter(void *, s32, s32, s32, s32, s32);
@@ -37,7 +37,7 @@ void MenuTransition_UpdateWidgetFlicker(u8 *p)
     u32 r;
     u8 *q, *a;
     if (((struct MenuFlickerView *)p)->timer > 16)
-        SceneHud_TickPaletteBlend(p);
+        PauseMenu_TickPaletteBlend(p);
     if ((((struct MenuFlickerView *)p)->timer & 7) <
         7 - (((struct MenuFlickerView *)p)->timer >> 3)) {
         ((struct MenuFlickerView *)p)->target->x = *(u16 *)(p + 0x4868);

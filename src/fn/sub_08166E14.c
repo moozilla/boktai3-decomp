@@ -10,7 +10,7 @@ struct MenuDisplay {
     u8 unknown0[0x1420];
     struct MenuDigit digits[1];
 };
-void SceneHud_FillDigitCells(s32, s32, s32, s32);
+void Hud_FillDigitCells(s32, s32, s32, s32);
 void MenuDisplay_LoadDecimalDigits(struct MenuDisplay *, s32, s32, s32, s32);
 
 void InventoryPanel_SetEntryRow(struct MenuDisplay *p, s32 x, s32 y, s32 value, s32 frameBase,
@@ -20,9 +20,9 @@ void InventoryPanel_SetEntryRow(struct MenuDisplay *p, s32 x, s32 y, s32 value, 
     if (value < 0) {
         for (i = 0; i < 3; i++)
             p->digits[first + i].flags |= 1;
-        SceneHud_FillDigitCells(3, x, y, 0);
+        Hud_FillDigitCells(3, x, y, 0);
     } else {
-        SceneHud_FillDigitCells(3, x, y, -1);
+        Hud_FillDigitCells(3, x, y, -1);
         for (i = 0; i < 3; i++) {
             p->digits[first + i].x = x * 8 + i * 8;
             p->digits[first + i].y = y * 8;

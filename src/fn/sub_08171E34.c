@@ -5,7 +5,7 @@ struct MotionSequence {
     u8 unknown0[0x438A];
     u8 selection;
 };
-int SceneHud_UpdateBinaryChoice(void *);
+int PauseMenu_UpdateBinaryChoice(void *);
 void Sound_PlaySong(u32);
 void PauseInventory_BeginConsumableDiscardSelection(void *, int);
 void PauseMenu_AddSpriteFlags(void *, int, int);
@@ -17,7 +17,7 @@ void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void PauseInventory_UpdateConsumableDiscardAnimation(void);
 void MotionSequence_ResolveSelection(struct MotionSequence *p)
 {
-    int result = SceneHud_UpdateBinaryChoice(p);
+    int result = PauseMenu_UpdateBinaryChoice(p);
     if (result == 0) {
         Sound_PlaySong(0xDE);
         PauseInventory_BeginConsumableDiscardSelection(p, 0);

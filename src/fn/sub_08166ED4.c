@@ -11,7 +11,7 @@ struct InventoryPanel {
 };
 s32 InventoryPanel_CreateEntry(s32 *, s32, s32, s32, s32);
 void InventoryPanel_SetEntryRow(struct InventoryPanel *, s32, s32, s32, s32, s32);
-void SceneHud_FillDigitCells(s32, s32, s32, s32);
+void Hud_FillDigitCells(s32, s32, s32, s32);
 static inline void HideSelected(struct InventoryPanel *p, s32 x, s32 y)
 {
     u32 mask = 1;
@@ -21,7 +21,7 @@ static inline void HideSelected(struct InventoryPanel *p, s32 x, s32 y)
         e->flags |= mask;
         e++;
     } while (--i >= 0);
-    SceneHud_FillDigitCells(3, x, y, 0);
+    Hud_FillDigitCells(3, x, y, 0);
 }
 s32 InventoryPanel_UpdateSelectedUnlock(struct InventoryPanel *p, s32 x, s32 y, s32 query,
                                         s32 position)

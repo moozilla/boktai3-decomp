@@ -12,7 +12,7 @@ struct SelectionPanel {
 };
 void SceneCatalog_SelectDescription(u32);
 void TextWindow_Clear(u32);
-void SceneHud_SetPairedIcons(void *, s32, s32);
+void PauseMenu_SetPairedIcons(void *, s32, s32);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void PauseMenu_BeginSleepPrompt(void);
 void Power_EnterSleep(void);
@@ -22,7 +22,7 @@ void SelectionPanel_WaitThenSleep(struct SelectionPanel *p)
     if (++p->timer > 119) {
         SceneCatalog_SelectDescription(0x11);
         TextWindow_Clear(p->window);
-        SceneHud_SetPairedIcons(p, 1, -1);
+        PauseMenu_SetPairedIcons(p, 1, -1);
         Hud_SetInteractionCallback(p, PauseMenu_BeginSleepPrompt, 0);
         p->countdown = 30;
         Power_EnterSleep();

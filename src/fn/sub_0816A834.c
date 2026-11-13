@@ -9,7 +9,7 @@ struct MenuPrompt {
     u8 anim[4];
 };
 s32 Anim_Step(void *, void *);
-int SceneHud_UpdateBinaryChoice(struct MenuPrompt *);
+int PauseMenu_UpdateBinaryChoice(struct MenuPrompt *);
 void Sound_PlaySong(u32);
 void MenuPrompt_FadeChoice(struct MenuPrompt *);
 void ScenePanel_BeginDetail(struct MenuPrompt *);
@@ -18,7 +18,7 @@ void MenuPrompt_UpdateChoice(struct MenuPrompt *p)
 {
     int choice;
     Anim_Step(p->anim, p->animData);
-    choice = SceneHud_UpdateBinaryChoice(p);
+    choice = PauseMenu_UpdateBinaryChoice(p);
     if (choice == 0) {
         Sound_PlaySong(0xDE);
         Hud_SetUpdateCallback(p, MenuPrompt_FadeChoice);

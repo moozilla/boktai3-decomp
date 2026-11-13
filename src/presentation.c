@@ -129,9 +129,9 @@ s32 Player_GetEquipmentValue(const struct SceneInputItemDescriptor *);
 
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 
-void SceneHud_DrawDecimalDigits(s32, s32, s32, s32, s32);
+void Hud_DrawDecimalDigits(s32, s32, s32, s32, s32);
 
-void MenuTilemap_ClearRect(s32, s32, s32, s32);
+void PauseMenu_ClearTileRect(s32, s32, s32, s32);
 
 u32 Inventory_GetEquipmentId(u32);
 
@@ -199,7 +199,7 @@ void SceneHud_RefreshEquipmentValues(struct SceneHudState *p)
                     *cell++ = 0xF001;
             } else {
                 *cell = 0xF071;
-                SceneHud_DrawDecimalDigits(Player_GetEquipmentValue(0), 100, tileX + 2, tileY, 0);
+                Hud_DrawDecimalDigits(Player_GetEquipmentValue(0), 100, tileX + 2, tileY, 0);
             }
         }
     } else if (p->actionCursor > 15) {
@@ -220,7 +220,7 @@ void SceneHud_RefreshEquipmentValues(struct SceneHudState *p)
             value = Player_GetEquipmentValue(equippedDescriptor);
             x = (i & 1) * 6 + 7;
             y = (i >> 1) + 5;
-            SceneHud_DrawDecimalDigits(value, 100, x, y, 0);
+            Hud_DrawDecimalDigits(value, 100, x, y, 0);
             if (i == 3)
                 Hud_GetTilemapCell(0, 11, 6);
             changed = 0;
@@ -236,7 +236,7 @@ void SceneHud_RefreshEquipmentValues(struct SceneHudState *p)
                 s32 frameBase;
                 s32 *digit;
                 u32 *display;
-                MenuTilemap_ClearRect(x, y, 3, 1);
+                PauseMenu_ClearTileRect(x, y, 3, 1);
                 position.x = x << 3;
                 position.y = y << 3;
                 resource = p->widgetResource;
@@ -405,12 +405,12 @@ u32 SceneHud_GetEquipmentActionFlags(void *unused, s32 slot)
     return flags;
 }
 
-void sub_08166534(void *, s32, s32);
+void MenuDisplay_DrawStatComparison(void *, s32, s32);
 
 void Presentation_DrawEntryCount(struct SceneHudState *panel)
 {
-    SceneHud_DrawDecimalDigits(panel->entryCount, 100, 14, 12, 0);
-    sub_08166534(panel, 5, 13);
+    Hud_DrawDecimalDigits(panel->entryCount, 100, 14, 12, 0);
+    MenuDisplay_DrawStatComparison(panel, 5, 13);
 }
 
 void Presentation_SetAmountGlyphRows(struct SceneHudState *s)
@@ -432,7 +432,7 @@ void Presentation_SetAmountGlyphRows(struct SceneHudState *s)
 
 void Hud_DrawHealthMeterCells(void *, u32, u32, u32, u32, u32, u32);
 
-void sub_08164480(void *, s32, s32, s32, s32, s32, s32);
+void Hud_DrawEnergyMeter(void *, s32, s32, s32, s32, s32, s32);
 
 void InventoryPanel_UpdateSelectedUnlock(void *, s32, s32, s32, s32);
 
@@ -452,7 +452,7 @@ void InventoryGrid_UpdateStatPreview(struct SceneHudState *p)
     if (value > 120)
         value = 120;
     t[0] = value * 5 + 100;
-    sub_08164480(p, 1, 8, 10, p->actionOwner->currentStatB, t[0], 1);
+    Hud_DrawEnergyMeter(p, 1, 8, 10, p->actionOwner->currentStatB, t[0], 1);
     Inventory_GetEquippedDescriptor((s16)gGameState->unk50, &descriptor);
     t[1] = 7;
     InventoryPanel_UpdateSelectedUnlock(p, 20, t[1], 0, p->comparisonOffsets[2]);

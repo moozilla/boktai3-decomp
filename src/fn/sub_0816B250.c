@@ -13,7 +13,7 @@ struct SelectionMenu {
 s32 Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
 s32 MessageWindow_ShowMessage(s32);
-s32 SceneHud_UpdateBinaryChoice(struct SelectionMenu *);
+s32 PauseMenu_UpdateBinaryChoice(struct SelectionMenu *);
 void Hud_SetUpdateCallback(struct SelectionMenu *, void (*)(struct SelectionMenu *));
 void SelectionMenu_UpdateConfirmInput(struct SelectionMenu *);
 void ScenePanel_BeginAccountExit(struct SelectionMenu *);
@@ -21,7 +21,7 @@ void SelectionMenu_ApplyConfirmedReward(struct SelectionMenu *p)
 {
     s32 result;
     Anim_Step(p->primaryAnimation, p->animationData);
-    result = SceneHud_UpdateBinaryChoice(p);
+    result = PauseMenu_UpdateBinaryChoice(p);
     if (result == 0) {
         Sound_PlaySong(0xDE);
         MessageWindow_ShowMessage(7);

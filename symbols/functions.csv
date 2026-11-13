@@ -1118,9 +1118,11 @@ addr,name,mode,confidence,source,notes
 08030BF8,MessageWindow_Clear,thumb,low,src-alias,Blanks the text rectangle and stops processing while hiding the speaker graphic
 08030C78,MessageWindow_ClearFromScript,thumb,low,src-alias,Wraps the message window clear operation for a script command
 08030C84,MessageWindow_SetMessageTable,thumb,low,src-alias,Stores a message reference and initializes text playback at its first entry
+08030CEC,MessageWindow_SetTimedMessageTable,thumb,low,src-alias,Sets a bounded list of queued message indices and selects its current frame
 08030D9C,MessageWindow_SetMessageTableFromScript,thumb,low,src-alias,Gets a message reference from script arguments and installs it
 08030DBC,MessageWindow_ShowMessage,thumb,low,src-alias,Selects an indexed message and resets text bounds and processing callbacks
 08030EAC,MessageWindow_SetWaitFromScript,thumb,low,src-alias,Reads a script value into the active message window wait field
+08030EDC,MessageWindow_SetTextCursor,thumb,low,src-alias,Starts direct text playback without a message table
 08030F20,MessageWindow_SetBounds,thumb,low,src-alias,Blanks the previous rectangle and applies new text window bounds
 08030FA8,MessageWindow_SetBoundsFromScript,thumb,low,src-alias,Reads four script values and applies the text window rectangle
 08030FD4,MessageWindow_SetNumberArgument,thumb,low,src-alias,Stores an indexed numeric substitution value in the window text state
@@ -1128,6 +1130,7 @@ addr,name,mode,confidence,source,notes
 08031018,MessageWindow_SetStringArgument,thumb,low,src-alias,Stores an indexed string substitution pointer in the window text state
 0803103C,MessageWindow_SetStringArgumentFromScript,thumb,low,src-alias,Resolves a script string reference with an optional index offset and stores the substitution pointer
 0803107C,MessageWindow_SetStringReferenceFromScript,thumb,low,src-alias,Reads a substitution slot and stores the following script reference as its string pointer
+08031098,MessageWindow_SetStringFromPc,thumb,low,src-alias,Uses the current script pc as a string substitution reference
 080310D8,MessageWindow_SetArgumentFromScript,thumb,low,src-alias,Stores a script value in an indexed text substitution argument
 080310F4,MessageWindow_SetChoicesFromScript,thumb,low,src-alias,Reads the keyword p value list into the text state's choice array
 08031144,MessageWindow_SetAutoAdvance,thumb,low,src-alias,Sets automatic advance mode and timing while resetting its counter
@@ -1137,11 +1140,15 @@ addr,name,mode,confidence,source,notes
 080311F0,MessageWindow_OpenFromScript,thumb,low,src-alias,
 08031370,MessageWindow_SetPageAdvanceDelay,thumb,low,src-alias,Sets the page advance delay threshold and resets its counter; tentative timing interpretation
 0803139C,MessageWindow_SetPageAdvanceDelayFromScript,thumb,low,src-alias,Reads the page advance delay threshold from the script
+080313AC,MessageWindow_CheckExists,thumb,low,src-alias,Returns zero when the singleton exists and minus one otherwise
 080313C8,MessageWindow_GetStringAtOffset,thumb,low,src-alias,Resolves the window's stored script string reference plus an index through text lookup
+080313E4,MessageWindow_UpdatePageAdvance,thumb,low,src-alias,Waits for input or a page delay and selects the following message
 080315B8,MessageWindow_UpdateFastPlayback,thumb,low,src-alias,Fast playback callback processes text instantly and handles completion or return to timed playback
+080316A4,MessageWindow_UpdateNormalPlayback,thumb,low,src-alias,Steps delayed text playback and handles fast-forward input
 080317CC,MessageWindow_ClearTextCompletion,thumb,low,src-alias,Completion callback clears the text state's fresh flag
 080317D4,MessageWindow_UpdateIdle,thumb,low,src-alias,Empty callback leaves the message window idle after text processing finishes
 080317D8,MessageWindow_UpdateImmediatePlayback,thumb,low,src-alias,Immediate playback callback processes up to four text steps before selecting a completion callback
+08031840,MessageWindow_Update,thumb,low,src-alias,Runs text choice procedures and the active playback callback; updates portrait and window positions
 08031964,MessageWindow_OnDestroy,thumb,low,src-alias,Destruction callback removes animation and sprite resources and clears the singleton pointer
 08031D40,MessageWindow_Create,thumb,low,src-alias,Returns the existing singleton or creates and initializes its dialogue task with update and cleanup callbacks
 08031D90,MessageWindow_GetTextBounds,thumb,low,src-alias,Copies the text rectangle into four output values for choice menu placement
@@ -1193,7 +1200,11 @@ addr,name,mode,confidence,source,notes
 0803343C,ScrollingDialogue_SetScript,thumb,low,src-alias,Assigns a text script and restarts playback after clearing the display
 08033468,ScrollingDialogue_ClearScript,thumb,low,src-alias,Loads the default empty script through the script setter
 08033478,ScrollingDialogue_SetNumberArgument,thumb,low,src-alias,Stores an indexed number argument in the embedded text interpreter
+080334A0,ScrollingDialogue_SetNumberArgumentFromScript,thumb,low,src-alias,Reads a numeric substitution index and value
 080334BC,ScrollingDialogue_SetStringArgument,thumb,low,src-alias,Stores an indexed string argument through the text interpreter string slot setter
+080334E0,ScrollingDialogue_SetStringFromScript,thumb,low,src-alias,Sets a string substitution from the text-source cursor
+080334FC,ScrollingDialogue_SetStringReferenceFromScript,thumb,low,src-alias,Sets a string substitution from the current string reference
+08033518,ScrollingDialogue_SetChoicesFromScript,thumb,low,src-alias,Reads choice procedure identifiers from keyword p
 08033568,ScrollingDialogue_RequestShow,thumb,low,src-alias,Sets the deferred show request consumed by the task update callback
 08033590,ScrollingDialogue_RequestHide,thumb,low,src-alias,Sets the deferred hide request consumed by the task update callback
 080335B4,ScrollingDialogue_HideImmediately,thumb,low,src-alias,Invokes the hide helper directly when the singleton exists
@@ -1229,6 +1240,7 @@ addr,name,mode,confidence,source,notes
 08033E18,DialogueTransition_OnTaskUpdate,thumb,low,src-alias,Task update callback that dispatches state handlers and checks skip input
 08033E74,DialogueTransition_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that clears the singleton and restores saved display state
 08033EA4,DialogueTransition_LoadFromScript,thumb,low,src-alias,Loads entry timing and rectangle arrays from script parameters and starts playback
+08033FEC,DialogueTransition_Initialize,thumb,low,src-alias,Installs the singleton and optionally saves display control before loading script parameters
 08034030,DialogueTransition_CreateFromScript,thumb,low,src-alias,Reloads the existing transition or creates a task with update and destruction callbacks
 08034084,WirelessController_GetInstance,thumb,low,src-alias,Returns the wireless controller singleton
 08034090,WirelessController_IsCreated,thumb,low,src-alias,Tests whether the wireless controller singleton exists
@@ -1327,13 +1339,14 @@ addr,name,mode,confidence,source,notes
 08036C54,Wireless_RequestDestroyController,thumb,low,src-alias,Sets the flag that makes the update task unlink and free the controller
 08036C88,Wireless_GetLocalSessionId,thumb,low,src-alias,Returns the generated sixteen-bit identifier displayed in the local peer row
 08036CA4,WirelessText_GetCharacterTable,thumb,low,src-alias,Returns the shared character conversion table at 0x0203FC00
-08036CAC,WirelessText_GetCharacterTableByte,thumb,low,src-alias,Reads one byte at the supplied index for wireless text decoding
+08036CAC,WirelessText_GetCharacterCode,thumb,low,src-alias,Returns the 16-bit character code at an eight-bit wireless text index
 08036CC4,WirelessText_FindCharacterIndex,thumb,low,src-alias,Finds a character code in the 256-entry table and returns zero when absent
 08036CF0,WirelessText_DecodeString,thumb,low,src-alias,Converts a fixed number of wireless name bytes into terminated display text
 08036D2C,WirelessText_EncodeString,thumb,low,src-alias,Maps display characters to wireless table indices and zero-pads the fixed-length result
 08036D80,WirelessText_InitCharacterTableFromScript,thumb,low,src-alias,Builds the conversion table from five consecutive script-selected strings and reserves index zero
 08036E08,WirelessStatusMenu_Get,thumb,low,src-alias,Returns the wireless status menu singleton.
 08036E14,WirelessStatusMenu_InitDisplay,thumb,low,src-alias,Resets palettes and configures display callbacks and HUD mode for the menu.
+08036E60,WirelessStatusMenu_LoadPrimaryBackground,thumb,low,src-alias,Loads the selected BG0 map and its palette banks
 08036EC8,WirelessStatusMenu_LoadStatusBackground,thumb,low,src-alias,Loads the status screen background on BG2 and copies its palette.
 08036F30,WirelessStatusMenu_UpdateIdleState,thumb,low,src-alias,Clears the state entry flag and advances the idle state timer.
 08036F48,WirelessStatusMenu_UpdateDisconnectState,thumb,low,src-alias,Requests wireless shutdown on entry and opens the status message after four frames.
@@ -1805,6 +1818,7 @@ addr,name,mode,confidence,source,notes
 08048390,ContactBurst_GetEnabled,thumb,low,src-alias,
 080483A0,WirelessLinkIndicator_Get,thumb,low,src-alias,
 080483AC,WirelessLinkIndicator_SelectStrengthFrame,thumb,low,src-alias,
+08048438,WirelessLinkIndicator_UpdateChildStatus,thumb,low,src-alias,Shows child slot zero strength and hides the indicator in parent mode
 0804846C,WirelessLinkIndicator_UpdateLinkStatus,thumb,low,src-alias,
 080484FC,WirelessLinkIndicator_Update,thumb,low,src-alias,
 08048514,WirelessLinkIndicator_Destroy,thumb,low,src-alias,
@@ -2393,6 +2407,7 @@ addr,name,mode,confidence,source,notes
 0805DE3C,SceneHud_DrawClock,thumb,low,src-alias,
 0805DF08,SceneHud_DrawNumericStatus,thumb,low,src-alias,
 0805E000,SceneHud_SetKeyframePaletteBank,thumb,low,src-alias,
+0805E014,SceneHud_UpdateFeaturePalettes,thumb,low,src-alias,Selects widget palette banks from owner feature flags.
 0805E09C,SceneHud_ShowFourDigits,thumb,low,src-alias,
 0805E170,SceneHud_HideFourDigits,thumb,low,src-alias,
 0805E190,SceneInput_BeginChoice,thumb,low,src-alias,
@@ -4250,26 +4265,26 @@ addr,name,mode,confidence,source,notes
 081093FC,LinkSession_CallPositionScript,thumb,low,src-alias,
 08109464,Registry1745_GetSessionState,thumb,low,src-alias,Returns the session state byte at offset 0x1C or zero when absent
 08109480,LinkSession_GetSlotValues,thumb,low,src-alias,
-081094EC,LinkConnectionMenu_LoadBackground,thumb,low,src-alias,Loads background resources and copies the palette into shadow palette memory
-0810954C,LinkConnectionMenu_CreateTextWindow,thumb,low,src-alias,Creates the menu text window and displays its configured script
-08109578,LinkConnectionMenu_HideTextWindow,thumb,low,src-alias,Hides the stored text window during task cleanup
-08109584,LinkConnectionMenu_RunExitScript,thumb,low,src-alias,Clears all background tilemaps and invokes the optional exit script
-081095B4,ResultMessage_ShowOutcome,thumb,low,src-alias,
-0810963C,ResultMessage_RunOutcomeScript,thumb,low,src-alias,
-081096B0,LinkConnectionMenu_GetErrorMessageIndex,thumb,low,src-alias,Maps connection result codes 3 and 0x10 to distinct text entries with a fallback
-081096CC,TimedMessage_ShowNotice,thumb,low,src-alias,
-08109738,TimedMessage_ShowFollowup,thumb,low,src-alias,
-081097A8,TimedMessage_SelectNextState,thumb,low,src-alias,
+081094EC,MessagePanel_LoadBackground,thumb,low,src-alias,Shared link outcome and save-notice task.
+0810954C,MessagePanel_CreateTextWindow,thumb,low,src-alias,Shared link outcome and save-notice task.
+08109578,MessagePanel_HideTextWindow,thumb,low,src-alias,Shared link outcome and save-notice task.
+08109584,MessagePanel_RunExitScript,thumb,low,src-alias,Shared link outcome and save-notice task.
+081095B4,MessagePanel_ShowOutcome,thumb,low,src-alias,Shared link outcome and save-notice task.
+0810963C,MessagePanel_RunOutcomeScript,thumb,low,src-alias,Shared link outcome and save-notice task.
+081096B0,MessagePanel_GetErrorMessageIndex,thumb,low,src-alias,Shared link outcome and save-notice task.
+081096CC,MessagePanel_ShowNotice,thumb,low,src-alias,Shared link outcome and save-notice task.
+08109738,MessagePanel_ShowFollowup,thumb,low,src-alias,Shared link outcome and save-notice task.
+081097A8,MessagePanel_SelectNextState,thumb,low,src-alias,Shared link outcome and save-notice task.
 081097E0,MessagePanel_WaitForDismiss,thumb,low,src-alias,
 08109838,MessagePanel_WaitForInput,thumb,low,src-alias,
-08109890,LinkConnectionMenu_OnExitState,thumb,low,src-alias,State callback that runs exit cleanup once and clears the entry flag
+08109890,MessagePanel_OnExitState,thumb,low,src-alias,Shared link outcome and save-notice task.
 081098B0,MessagePanel_BeginDismiss,thumb,low,src-alias,
 0810990C,MessagePanel_DelayDismiss,thumb,low,src-alias,
 08109948,MessagePanel_ResetDisplay,thumb,low,src-alias,
 081099A4,MessagePanel_Update,thumb,low,src-alias,
-081099E4,LinkConnectionMenu_OnDestroy,thumb,low,src-alias,Task destruction callback that releases shared link UI state and hides the text window
+081099E4,MessagePanel_OnDestroy,thumb,low,src-alias,Shared link outcome and save-notice task.
 08109A04,MessagePanel_InitFromScript,thumb,low,src-alias,
-08109AB0,LinkConnectionMenu_CreateFromScript,thumb,low,src-alias,Creates the menu task and initializes it from script options with failure cleanup
+08109AB0,MessagePanel_CreateFromScript,thumb,low,src-alias,Shared link outcome and save-notice task.
 08109AEC,ClockPanel_CaptureSnapshot,thumb,low,src-alias,
 08109BD0,Registry1745_InitSessionSettings,thumb,low,src-alias,Loads saved settings and initializes two session bytes including a queried configuration value
 08109BF8,Registry1745_ResetTransferCounters,thumb,low,src-alias,Clears paired halfword and word fields plus their shared counter; transfer interpretation is tentative
@@ -4335,21 +4350,28 @@ addr,name,mode,confidence,source,notes
 0810CA34,LinkPanel_InitFromScript,thumb,low,src-alias,
 0810CB30,RegistryF246_Create,thumb,low,src-alias,Returns the existing singleton or creates and initializes its task from script options
 0810CB88,RegistryF246_Close,thumb,low,src-alias,Hides animations and clears message and background displays before killing the task
-0810CBC8,Registry30AC_InitBackgroundResources,thumb,low,src-alias,Loads script resources and configures background layers and palette data
-0810CC28,LinkPanel_DrawTime,thumb,low,src-alias,
-0810CCC8,LinkPanel_DrawPeerTimes,thumb,low,src-alias,
-0810CD4C,LinkPanel_CreateTextWindows,thumb,low,src-alias,
-0810CDD8,LinkPanel_StartDescriptions,thumb,low,src-alias,
-0810CEBC,SlotMenu_InitializeAlternateEntryValues,thumb,low,src-alias,
-0810CF08,PanelSequence_InitializeSprites,thumb,low,src-alias,
-0810D14C,Registry30AC_HideDisplay,thumb,low,src-alias,Sets hidden flags on seven animations and hides both embedded display panels
-0810D188,Registry30AC_RemoveAnimations,thumb,low,src-alias,Removes all seven embedded animations during cleanup
-0810D22C,PanelTransition_UpdateExit,thumb,low,src-alias,
-0810D290,PanelSequence_UpdateDelay,thumb,low,src-alias,
-0810D334,Registry30AC_Update,thumb,low,src-alias,Task update callback that dispatches the current handler while the parent controller remains active
-0810D36C,Registry30AC_Destroy,thumb,low,src-alias,Task destruction callback that removes animations and both embedded panels then clears the singleton
-0810D3A0,PanelSequence_InitializeFromScript,thumb,low,src-alias,
-0810D4FC,Registry30AC_Create,thumb,low,src-alias,Creates the singleton task for registry entry 30AC and installs its lifecycle callbacks
+0810CBC8,LinkRecordPanel_LoadBackground,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CC28,LinkRecordPanel_DrawTime,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CCC8,LinkRecordPanel_DrawPeerTimes,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CD4C,LinkRecordPanel_CreateTextWindows,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CDD8,LinkRecordPanel_StartDescriptions,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CE88,LinkRecordPanel_ClearTextWindows,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CEBC,LinkRecordPanel_InitializeEntryValues,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CF08,LinkRecordPanel_InitializeWidgets,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CF90,LinkRecordPanel_PositionWidgets,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CFF0,LinkRecordPanel_InitializePreviews,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D14C,LinkRecordPanel_HideDisplay,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D188,LinkRecordPanel_RemoveWidgets,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D1A4,LinkRecordPanel_ShowDialogue,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D1B4,LinkRecordPanel_OnIdle,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D1B8,LinkRecordPanel_RunExitScript,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D208,LinkRecordPanel_RunCompletionScript,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D22C,LinkRecordPanel_UpdateExit,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D290,LinkRecordPanel_UpdateDelay,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D334,LinkRecordPanel_Update,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D36C,LinkRecordPanel_Destroy,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D3A0,LinkRecordPanel_InitializeFromScript,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D4FC,LinkRecordPanel_Create,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
 0810D590,Registry3C9F_LoadBackground,thumb,low,src-alias,Loads the menu background resource and copies its palette into palette staging memory
 0810D5EC,Bg_GetWrappedTilemapEntry,thumb,low,src-alias,Returns a tilemap entry pointer with both coordinates wrapped to a 32 by 32 tile grid
 0810D60C,PanelText_DrawDecimal,thumb,low,src-alias,
@@ -4357,25 +4379,30 @@ addr,name,mode,confidence,source,notes
 0810D688,RecordPanel_DrawTime,thumb,low,src-alias,
 0810D8F4,RecordPanel_RefreshEntryLabels,thumb,low,src-alias,
 0810D9B0,RecordPanel_ShowName,thumb,low,src-alias,
-0810DA38,Registry3C9F_DestroyTextWindows,thumb,low,src-alias,Releases the main text window and six additional window handles
+0810DA38,SelectionPanel_ClearTextWindows,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810DA68,SelectionPanel_InitEntryIds,thumb,low,src-alias,
+0810DB0C,SelectionPanel_InitializeWidgets,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810DC7C,SelectionPanel_PositionWidgets,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810DD24,SelectionPanel_InitPreview,thumb,low,src-alias,
-0810DE3C,Registry3C9F_HideDisplayObjects,thumb,low,src-alias,Sets the hidden flag on ten animation objects and hides the embedded display controller
-0810DE6C,Registry3C9F_RemoveAnimations,thumb,low,src-alias,Removes ten animation objects stored consecutively in the task
-0810E110,Registry3C9F_InitTextState,thumb,low,src-alias,Initializes the text selection sentinel and resets shared text rendering state
+0810DE3C,SelectionPanel_HideDisplayObjects,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810DE6C,SelectionPanel_RemoveWidgets,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810DE88,SelectionPanel_HandleInput,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E110,SelectionPanel_InitializeTextState,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810E12C,SelectionPanel_UpdateDescription,thumb,low,src-alias,
 0810E1A0,SelectionPanel_GetSelection,thumb,low,src-alias,
-0810E1DC,Registry3C9F_Close,thumb,low,src-alias,Resets text and backgrounds then hides display objects and kills the menu task
+0810E1DC,SelectionPanel_Close,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810E218,SelectionPanel_CommitSelection,thumb,low,src-alias,
 0810E284,SelectionPanel_RunSelectionScript,thumb,low,src-alias,
 0810E30C,SelectionPanel_RunCancelScript,thumb,low,src-alias,
-0810E378,Registry3C9F_OnCloseRequested,thumb,low,src-alias,Handles the pending close flag by running close processing and shutting down the task
+0810E378,SelectionPanel_OnCloseRequested,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810E3A0,SelectionPanel_UpdateConfirmTransition,thumb,low,src-alias,
 0810E450,SelectionPanel_UpdateCancelTransition,thumb,low,src-alias,
-0810E4D8,Registry3C9F_OnTransitionIdle,thumb,low,src-alias,Empty callback installed by the menu transition routines
-0810E660,SceneTask_UpdateConditionalCallback,thumb,low,src-alias,
-0810E6B4,Registry3C9F_OnDestroy,thumb,low,src-alias,Destruction callback that releases windows and display objects and clears the singleton pointer
-0810E8D0,Registry3C9F_Create,thumb,low,src-alias,Creates the singleton task for registry entry 3C9F and initializes its menu state
+0810E4D8,SelectionPanel_OnTransitionIdle,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E4DC,SelectionPanel_UpdateInput,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E660,SelectionPanel_Update,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E6B4,SelectionPanel_OnDestroy,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E6E4,SelectionPanel_InitializeFromScript,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E8D0,SelectionPanel_Create,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810E964,Registry33FF_LoadBackground,thumb,low,src-alias,Loads two map resources and initializes the background layer and palette
 0810E9D4,TimerDisplay_DrawRecord,thumb,low,src-alias,
 0810EA90,RecordMenu_DrawRecords,thumb,low,src-alias,
@@ -4412,10 +4439,13 @@ addr,name,mode,confidence,source,notes
 0811024C,SaveMenu_UpdateSaveDelay,thumb,low,src-alias,Shows the saving message and waits sixty frames before attempting the save; tentative menu identity
 081102EC,SaveMenu_WaitForSaveTransition,thumb,low,src-alias,Waits for the companion menu controller to reach state 27 before continuing
 08110334,SaveMenu_UpdateSlotCommit,thumb,low,src-alias,Commits the alternate save slot and selects the success or failure callback
-08110378,LinkMenu_UpdateExitDelay,thumb,low,src-alias,
+08110378,SaveMenu_UpdateExitDelay,thumb,low,src-alias,Link score reveal; score transfer and coordinated save state machine.
 08110410,SaveMenu_UpdateSaveFailure,thumb,low,src-alias,Shows the apparent save failure message and accepts input after sixty frames; tentative failure interpretation
+0811048C,SaveMenu_UpdateScoreTransfer,thumb,low,src-alias,Link score reveal; score transfer and coordinated save state machine.
+08110650,SaveMenu_UpdateScoreReveal,thumb,low,src-alias,Link score reveal; score transfer and coordinated save state machine.
 08110834,SaveMenu_Update,thumb,low,src-alias,Task callback that checks menu lifetime and dispatches the current state callback
 0811086C,SaveMenu_Destroy,thumb,low,src-alias,Task destruction callback that releases menu resources and clears the singleton
+08110894,SaveMenu_InitializeFromScript,thumb,low,src-alias,Link score reveal; score transfer and coordinated save state machine.
 08110A40,SaveMenu_CreateFromScript,thumb,low,src-alias,Creates and initializes the singleton menu task using script parameters; tentative menu identity
 08110A8C,SaveMenu_ClearSingleton,thumb,low,src-alias,Clears the save-menu singleton; stock agbcc matches without the former old_agbcc annotation.
 08110A98,SaveMenu_Close,thumb,low,src-alias,Clears background layers and dialogue before killing the active save-menu task.
@@ -5803,27 +5833,29 @@ addr,name,mode,confidence,source,notes
 08162DAC,PlayerBarrier_BeginRecovery,thumb,low,src-alias,Switches the defensive effect to recovery state two and selects its transition palette
 08162DC8,PlayerBarrier_Hide,thumb,low,src-alias,Resets the defensive effect state and sets its hidden flag
 08162DE8,PlayerBarrier_IsActive,thumb,low,src-alias,Reports whether the defensive effect exists and has a nonzero state
-08162E00,PlayerBurstEffect_InitExpansion,thumb,low,src-alias,Starts sound playback and initializes two visual parameters and the first burst phase; effect identity tentative
-08162E40,PlayerBurstEffect_UpdateExpansion,thumb,low,src-alias,Increases the burst parameters and advances to phase two when the second reaches 127
+08162E00,GameOver_InitExpansion,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+08162E40,GameOver_UpdateExpansion,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 08162E7C,GameOver_UpdateLetterRebound,thumb,low,src-alias,Increases horizontal scale while reducing vertical scale to 96 before advancing the animation
 08162EB8,GameOver_UpdateLetterSettle,thumb,low,src-alias,Increases horizontal scale faster while reducing vertical scale to 64
 08162EF4,GameOver_UpdateLetterExpand,thumb,low,src-alias,Expands horizontal letter scale to 64 then starts the hold timer
 08162F2C,GameOver_UpdateLetterHold,thumb,low,src-alias,Waits 20 frames before advancing the letter animation
-08162F5C,TransitionPanel_UpdateOpening,thumb,low,src-alias,
+08162F5C,GameOver_UpdateOpening,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 08162FF4,GameOver_UpdateExitDelay,thumb,low,src-alias,Waits 90 frames before marking the presentation complete
+08163020,GameOver_UpdateLetterTransforms,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 081630BC,GameOver_StopPresentation,thumb,low,src-alias,Clears the game-over flag and stops song 2 before resetting the transition
 081630E0,GameOver_UpdateLetterAnimation,thumb,low,src-alias,Dispatches the current letter animation state then applies its scale and positioning
 0816310C,GameOver_ShowGraphics,thumb,low,src-alias,Registers eight GAME OVER letter sprites and the accompanying animation for display
-08163144,TransitionPanel_InitSprites,thumb,low,src-alias,
-081631F8,TransitionPanel_InitOverlay,thumb,low,src-alias,
+08163144,GameOver_InitSprites,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+081631F8,GameOver_InitOverlay,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 081632B4,GameOver_StartFromScript,thumb,low,src-alias,Shows the graphics and selects HUD mode 7 with an optional scripted fade
-08163310,TransitionPanel_TryBeginClose,thumb,low,src-alias,
-08163398,SceneTransition_FinishDelay,thumb,low,src-alias,
-081633F8,TransitionPanel_UpdateCostPrompt,thumb,low,src-alias,
-0816349C,TransitionPanel_UpdateCostSelection,thumb,low,src-alias,
+08163310,GameOver_TryBeginClose,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+08163398,GameOver_FinishDelay,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+081633F8,GameOver_UpdateCostPrompt,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+0816349C,GameOver_UpdateCostSelection,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 08163654,GameOver_UpdateExit,thumb,low,src-alias,Advances letter animation then restores transition state and kills the task when complete
 081636A0,GameOver_OnUpdate,thumb,low,src-alias,Task update callback dispatching the current game-over presentation state
 081636C0,GameOver_OnDestroy,thumb,low,src-alias,Task destruction callback removing registered graphics and clearing the singleton
+08163700,GameOver_Initialize,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 081637D0,GameOver_Create,thumb,low,src-alias,Returns the existing game-over task or creates and initializes one
 0816381C,Palette_UpdateHighlightPulse,thumb,low,src-alias,Cycles a highlight color through red intensity levels over a repeating 50-frame period
 0816385C,SpiralParticles_UpdateParticle,thumb,low,src-alias,
@@ -5845,60 +5877,65 @@ addr,name,mode,confidence,source,notes
 08163F90,Hud_GetStyleTileIndex,thumb,low,src-alias,Adds the tile offset selected by one of three drawing styles
 08163FA8,Hud_InitSelectionBounds,thumb,low,src-alias,Initializes paired selection bounds and resets selection tracking
 08163FEC,Hud_GetMinimum,thumb,low,src-alias,Returns the smaller signed value for a HUD caller
-08163FFC,StatDisplay_DrawRatio,thumb,low,src-alias,
-08164158,ResultPanel_DrawCappedCounters,thumb,low,src-alias,
-081641C4,ResultPanel_DrawCappedSmallCounters,thumb,low,src-alias,
-08164224,StatDisplay_DrawPlayerValue,thumb,low,src-alias,
+08163FFC,Hud_DrawStatRatio,thumb,low,src-alias,Draw current and maximum stat digits separated by a slash.
+08164158,Hud_DrawHealthRatio,thumb,low,src-alias,Clamp health values to four decimal digits.
+081641C4,Hud_DrawEnergyRatio,thumb,low,src-alias,Clamp energy values to three decimal digits.
+08164224,Hud_DrawPlayerValue,thumb,low,src-alias,Draw the enabled player value according to the current form.
 081642CC,Hud_DrawHealthMeterCells,thumb,low,src-alias,
 08164438,Hud_DrawHealthMeter,thumb,low,src-alias,Draws a tentative health meter using the panel values at offsets 0x424 and 0x426
 0816446C,Hud_DrawDefaultHealthMeter,thumb,low,src-alias,Draws the panel health meter with the default rendering mode
+08164480,Hud_DrawEnergyMeter,thumb,low,src-alias,Draw energy meter cells and the timed energy bonus.
 0816471C,Hud_DrawDefaultEnergyMeter,thumb,low,src-alias,Draws a tentative energy meter from supplied values with the default rendering mode
 08164738,Hud_DrawHealthLabel,thumb,low,src-alias,Writes the three fixed label tiles preceding the tentative health meter
 0816475C,Hud_DrawEnergyLabel,thumb,low,src-alias,Writes the three fixed label tiles preceding the tentative energy meter
 08164780,Hud_DrawAlternateMeterLabel,thumb,low,src-alias,Writes an alternate three-tile meter label starting at tile 0xD08D
-081647A4,StatDisplay_DrawGauge,thumb,low,src-alias,
-08164B84,StatDisplay_DrawTwoDigitCounter,thumb,low,src-alias,
-08164C0C,ResultPanel_ClearFiveTiles,thumb,low,src-alias,
+081647A4,Hud_DrawPlayerGauge,thumb,low,src-alias,Draw the enabled player status gauge.
+08164864,Hud_DrawWarningMeter,thumb,low,src-alias,Draw the warning meter with pulsing palette and timed-event label.
+08164B84,Hud_DrawTwoDigitCounter,thumb,low,src-alias,Draw the two-digit transient gauge counter.
+08164C0C,Hud_ClearCounterTiles,thumb,low,src-alias,Clear the five transient counter tiles.
 08164C40,Hud_DrawStoredEnergyGauge,thumb,low,src-alias,
 08164DC0,Hud_UpdateTransientStatGauge,thumb,low,src-alias,
 08165020,Hud_UpdateTimedStatusIcon,thumb,low,src-alias,
-081651B0,SceneHud_PlayActionChangeCue,thumb,low,src-alias,
+081651B0,Hud_PlayActionChangeCue,thumb,low,src-alias,Play the cue when displayed action digits change.
 08165254,Hud_UpdateCountdownDigits,thumb,low,src-alias,
-08165488,SceneHud_DrawDecimalDigits,thumb,low,src-alias,
-081654DC,SceneHud_FillDigitCells,thumb,low,src-alias,
-08165518,SceneHud_DrawActiveStatValue,thumb,low,src-alias,
+08165488,Hud_DrawDecimalDigits,thumb,low,src-alias,Draw decimal digits with the selected tile style.
+081654DC,Hud_FillDigitCells,thumb,low,src-alias,Fill a run of digit cells with the selected sign tile.
+08165518,Hud_DrawActiveStatValue,thumb,low,src-alias,Draw the currently active attack stat.
 08165594,Hud_DrawDefaultResourceCounts,thumb,low,src-alias,Draws paired resource counts through the shared renderer with its final option cleared
-081655AC,ResultPanel_FillTileRun,thumb,low,src-alias,
+081655AC,Hud_FillTileRun,thumb,low,src-alias,Fill a run of menu tiles.
 081655D8,Hud_DrawCounter7B0,thumb,low,src-alias,Clamps the state counter at offset 0x7B0 to 9999 and draws four digits
 08165634,Hud_DrawCounter50C,thumb,low,src-alias,Clamps the state counter at offset 0x50C to 9999 and draws it with alternate digit styling
 0816568C,Hud_DrawHeaderCounter,thumb,low,src-alias,Clamps the state counter at offset 0x77C and draws it at the fixed header position
+081656E0,Hud_DrawSelectedCounter,thumb,low,src-alias,Draw the counter selected by the clock mode.
 081657F0,Hud_DrawSunClockTimeB,thumb,low,src-alias,Draws the hour and minute fields of sun clock time B
 08165830,Hud_DrawSunClockTimeA,thumb,low,src-alias,Draws the hour and minute fields of sun clock time A
-08165870,ResultPanel_DrawClockLabel,thumb,low,src-alias,
-081658C8,SceneHud_DrawSelectedClock,thumb,low,src-alias,
+08165870,Hud_DrawClockLabelB,thumb,low,src-alias,Draw the label for secondary clock B.
+0816589C,Hud_DrawClockLabelA,thumb,low,src-alias,Draw the label for secondary clock A.
+081658C8,Hud_DrawSelectedClock,thumb,low,src-alias,Draw the clock selected for the current HUD mode.
 08165944,Hud_DrawStatusMetersAndCounts,thumb,low,src-alias,Draws the panel health and energy meters followed by paired resource counts
-0816599C,MenuInput_ReadDirectionRepeat,thumb,low,src-alias,
+0816599C,PauseMenu_ReadDirectionRepeat,thumb,low,src-alias,Read pressed directions and repeat held directions every ten frames.
 081659F4,PauseMenu_SetConfirmationIndicator,thumb,low,src-alias,Shows sprite 7 at the origin and selects one of two indicator frames; confirmation role is tentative
-08165A30,SceneHud_UpdateBinaryChoice,thumb,low,src-alias,
+08165A30,PauseMenu_UpdateBinaryChoice,thumb,low,src-alias,Update the confirmation choice and return the accepted result.
 08165ACC,PauseMenu_HideAllSprites,thumb,low,src-alias,Sets flag 1 on all 124 sprite slots and three auxiliary display objects
 08165B28,PauseMenu_LoadSpriteKeyframe,thumb,low,src-alias,Clears the indexed sprite hide flag and loads its keyframe from the primary animation data
 08165B5C,PauseMenu_SetSpritePosition,thumb,low,src-alias,Sets the indexed sprite coordinates and clears the remaining two position components
 08165B7C,PauseMenu_AddSpriteFlags,thumb,low,src-alias,Adds the supplied flag mask to an indexed sprite
 08165B94,PauseMenu_ClearSpriteFlags,thumb,low,src-alias,Clears the supplied flag mask from an indexed sprite
-08165BAC,MenuTilemap_ClearRect,thumb,low,src-alias,
+08165BAC,PauseMenu_ClearTileRect,thumb,low,src-alias,Fill a rectangular menu tile region with the empty tile.
 08165BF4,PauseMenu_SetSpritePalette,thumb,low,src-alias,Stores a palette index and points the sprite at its corresponding 16-color palette
 08165C08,PauseMenu_SmoothPoint,thumb,low,src-alias,Moves a two-component point toward a target using a weighted average
-08165C4C,PlayerPanel_GetStatusValue,thumb,low,src-alias,
+08165C4C,PauseMenu_GetPlayerStatusValue,thumb,low,src-alias,Select the player status value using script status and the timed-event counter.
 08165CA8,PauseMenu_StartPaletteTransition,thumb,low,src-alias,Copies the starting palette and initializes the target palette and transition state
-08165D10,SceneHud_TickPaletteBlend,thumb,low,src-alias,
-08165E78,SceneHud_BeginIconMotion,thumb,low,src-alias,
+08165D10,PauseMenu_TickPaletteBlend,thumb,low,src-alias,Blend selected palette channels toward the target bank.
+08165E78,PauseMenu_BeginSpriteMotion,thumb,low,src-alias,Begin curved sprite motion between two menu positions.
 08165F78,PauseMenu_UpdateSpriteMotion,thumb,low,src-alias,Advances timed sprite interpolation with an optional sinusoidal bend and reports completion
 08166054,PauseMenu_OpenPrompt,thumb,low,src-alias,Resets text presentation and configures a prompt with an optional opening sound
 08166094,PauseMenu_SetPromptIconPositions,thumb,low,src-alias,Positions two prompt sprites with the second eight units below the first
 081660C0,PauseMenu_GetPromptIconKeyframe,thumb,low,src-alias,Maps a prompt icon index to a keyframe while skipping frame 0x80
-081660D0,SceneHud_SetPairedIcons,thumb,low,src-alias,
+081660D0,PauseMenu_SetPairedIcons,thumb,low,src-alias,Show or hide the two action prompt icons.
 0816615C,PauseMenu_HidePromptIcons,thumb,low,src-alias,Passes negative indices to hide both prompt icon sprites
 0816616C,PauseMenu_CloseTextWindows,thumb,low,src-alias,Requests closure of all eight text windows stored in the menu
+0816618C,PauseMenu_ShowPromptSprite,thumb,low,src-alias,Position the sequence-driven prompt sprite and start playback.
 081662C4,PauseMenu_LoadCategoryIconFrame,thumb,low,src-alias,Loads an indexed frame from the secondary animation bank at 0xF0; category identity is tentative
 081662E0,PauseMenu_LoadEquipmentIconFrame,thumb,low,src-alias,Loads an indexed frame from the secondary animation bank at 0xD9; equipment identity is tentative
 081662FC,PauseMenu_LoadAttributeIconFrame,thumb,low,src-alias,Loads a mode-1 icon frame using separate ranges for indices below six and higher; attribute identity is tentative
@@ -5907,16 +5944,18 @@ addr,name,mode,confidence,source,notes
 0816636C,PauseMenu_LoadFixedIconKeyframe,thumb,low,src-alias,Loads keyframe 0xC8 into the supplied icon animation at offset 0xA4
 08166384,PauseMenu_LoadIndexedIconKeyframe,thumb,low,src-alias,Loads keyframe 0x90 plus the icon index into the animation at offset 0x64
 081663A0,MenuDisplay_SetPaletteOverrides,thumb,low,src-alias,
-08166490,PauseMenu_UpdateHighlightPalette,thumb,low,src-alias,Advances the cycling highlight color using the menu palette and phase fields
+08166490,MenuDisplay_UpdateHighlightPalette,thumb,low,src-alias,Pulse the final four colors of the menu override palette.
 081664A8,MenuDisplay_LoadAdjustedDigits,thumb,low,src-alias,
+08166534,MenuDisplay_DrawStatComparison,thumb,low,src-alias,Show three rows of adjusted player stat digits.
 08166670,MenuDisplay_FindEntryIndex,thumb,low,src-alias,
-08166714,PauseMenu_InterpolateActivePairPositions,thumb,low,src-alias,Interpolates each of two display positions toward its target when its entry is active
+08166714,MenuDisplay_InterpolateActivePairPositions,thumb,low,src-alias,Smooth active action icons toward their target positions.
+0816676C,MenuDisplay_BeginActionTransfer,thumb,low,src-alias,Hide selected source icons and place the two transfer icons.
 081669E8,PauseMenu_IsCategoryEntryEmpty,thumb,low,src-alias,Tests category-specific entry storage for an empty or unavailable value
-08166A94,PauseMenu_CanSwapCategoryEntries,thumb,low,src-alias,Allows distinct entries to swap unless both entries are empty
-08166AC8,PauseMenu_GetCategoryEntryValue,thumb,low,src-alias,Dispatches a bounded entry index to one of four category-specific value getters
-08166B14,MenuEntries_CountAvailable,thumb,low,src-alias,
+08166A94,MenuDisplay_CanSwapCategoryEntries,thumb,low,src-alias,Allow unequal slots when at least one contains an entry.
+08166AC8,MenuDisplay_GetCategoryEntryValue,thumb,low,src-alias,Read the category-specific equipped or unlocked entry state.
+08166B14,MenuDisplay_CountAvailableEntries,thumb,low,src-alias,Count available entries in the requested menu category.
 08166B7C,MenuDisplay_UpdateActionPrompt,thumb,low,src-alias,
-08166CD0,PlayerPanel_SnapshotValues,thumb,low,src-alias,
+08166CD0,MenuDisplay_SnapshotValues,thumb,low,src-alias,Copy the player menu stat snapshot into the comparison values.
 08166D04,MenuDisplay_LoadDecimalDigits,thumb,low,src-alias,
 08166D74,InventoryPanel_CreateEntry,thumb,low,src-alias,
 08166E14,InventoryPanel_SetEntryRow,thumb,low,src-alias,
