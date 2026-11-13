@@ -552,10 +552,10 @@ addr,name,mode,confidence,source,notes
 08019104,CircleWindow_Destroy,thumb,low,src-alias,
 08019130,CircleWindow_Initialize,thumb,low,src-alias,
 08019264,CircleWindow_Create,thumb,low,src-alias,"Creates a task for the circle window (choosing the task id via a script keyword), wires its update/destroy callbacks and initializes it, mirroring the"
-080192D0,ClockEvents_RunScript,thumb,low,src-alias,
-080192FC,ClockEvents_Update,thumb,low,src-alias,
+080192D0,ClockEvents_RunScript,thumb,low,src-alias,Calls the configured procedure with one event index argument.
+080192FC,ClockEvents_Update,thumb,low,src-alias,Updates clock samples and rearms three edge events: noon and solar times A/B; solar interpretations tentative.
 08019470,ClockEvents_Destroy,thumb,low,src-alias,No-op destroy callback registered via Task_SetCallbacks alongside ClockEvents_Update; matches the destroy-slot convention seen in GroupObjects_Destroy
-08019474,ClockEvents_Initialize,thumb,low,src-alias,
+08019474,ClockEvents_Initialize,thumb,low,src-alias,Reads event tolerance and procedure script options; initializes the four armed bytes.
 080194DC,ClockEvents_Create,thumb,low,src-alias,"Creates the clock-events task, wires Update/Destroy callbacks, and runs ClockEvents_Initialize, killing the task on failure; mirrors OrbitingParticles"
 08019518,PaletteFrames_CaptureColors,thumb,low,src-alias,"Copies the full 256-color live BG palette shadow (gUnk_03004FC0) into the task's colors[256] buffer; called when Update sees the palette marked dirty,"
 08019534,PaletteFrames_Update,thumb,low,src-alias,
