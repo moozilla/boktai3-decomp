@@ -55,6 +55,11 @@ struct ActorControllerNavigation {
 struct ActorControllerMotion {
     u32 unknown0, flags;
 };
+struct ActorControllerColliderGroup {
+    struct ActorControllerMotion motion;
+    u8 unknown8[8];
+    struct ContactCollider colliders[4];
+};
 /* One actor owns two loose particles, a facing marker, and nine fragments. */
 struct SceneCombatActor {
     u8 unknown0[0x18];
@@ -66,16 +71,16 @@ struct SceneCombatActor {
     u16 animationDuration;
     u8 unknownC6[2];
     u16 animationEvent;
-    u8 unknownCA[0xA];
+    u8 unknownCA[7];
+    u8 animationStatus;
+    u8 unknownD2[2];
     union SceneCombatPosition position;
     u8 unknownDC[0x12];
     u16 paletteId;
     u8 unknownF0[0xC];
     void *palette;
     u8 unknown100[0x80];
-    struct ActorControllerMotion motion;
-    u8 unknown188[8];
-    struct ContactCollider colliders[4];
+    struct ActorControllerColliderGroup colliderGroup;
     struct ParticleAnimation fragmentAnimations[2];
     struct ParticleAnimation particleAnimation, markerAnimation;
     struct BouncingSceneParticle looseParticles[2];

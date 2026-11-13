@@ -42,15 +42,15 @@ void SceneCombatActor_ResetAttackMode(struct SceneCombatActor *actor)
     actor->state.common.valueA = 0;
     actor->attack = actor->state.common.savedAttack;
     actor->defense = actor->state.common.savedDefense;
-    actor->colliders[2].unknown3C = actor->defense;
-    a = &actor->colliders[1];
+    actor->colliderGroup.colliders[2].unknown3C = actor->defense;
+    a = &actor->colliderGroup.colliders[1];
     {
         u32 mask = ~0x200004;
         a->reactionFlags &= mask;
-        b = &actor->colliders[0];
+        b = &actor->colliderGroup.colliders[0];
         b->reactionFlags &= mask;
     }
-    c = &actor->colliders[2];
+    c = &actor->colliderGroup.colliders[2];
     SetAttackCategories(c);
     b->reactionFlags |= 8;
     a->reactionFlags |= 8;
@@ -81,15 +81,15 @@ void SceneCombatActor_ResetDefenseMode(struct SceneCombatActor *actor)
     actor->state.common.value6 = 0;
     actor->attack = actor->state.common.savedAttack;
     actor->defense = actor->state.common.savedDefense;
-    actor->colliders[2].unknown3C = actor->defense;
-    a = &actor->colliders[1];
+    actor->colliderGroup.colliders[2].unknown3C = actor->defense;
+    a = &actor->colliderGroup.colliders[1];
     {
         u32 mask = ~0x400008;
         a->reactionFlags &= mask;
-        b = &actor->colliders[0];
+        b = &actor->colliderGroup.colliders[0];
         b->reactionFlags &= mask;
     }
-    c = &actor->colliders[2];
+    c = &actor->colliderGroup.colliders[2];
     SetDefenseCategories(c);
     b->reactionFlags |= 4;
     a->reactionFlags |= 4;
