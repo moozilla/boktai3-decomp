@@ -1258,3 +1258,38 @@ to the same return pseudo. Arm duplication changes control flow and does not cro
 back to the ROM. Keep the work union: its table allocation is independently diagnosed.
 Next: find a C shape that changes the X return's preference to r2 and removes the Z return's
 r2 preference, possibly through the rounding helper's class head or a later matched sibling.
+
+### ScenePanelRig_TickSecondarySprites (0805A7E4): nine pins and three barriers remain
+
+Landed five pins and two barriers removed (19 original concessions, 12 remain). The ordinary
+sequence-advance helper form removes the duration/mask pins and barriers. Reusing the near
+interpolation weight for the wave-table pointer removes its pin; the table assignment must
+precede the random-phase pointer assignment. The second flip test's packed control union
+removes its bit and first pins. Every partial checked MATCH (740 bytes).
+
+Pin-free draft: `notes/phase3-drafts/dp-menus-b/ScenePanelRig_TickSecondarySprites.c`.
+It uses the local shared-style sequence helper with a byteMask parameter. 71 ROM / 71 draft,
+shape 46, same 740 bytes. Output has STACK_REG preference, initially gets r5, and reload's
+spill reservation displaces it to r1. The ROM has output in sb. `AGBCC_FORCE=output:9` fixes
+the prologue, counter spill and initial interpolation, leaving 52/50 and shape 4. No joint
+full-match knob found. Counter narrowing, direct ++i, counted for loop, a position-pointer
+output, explicit array indexing, and coordinate macros were tested. Narrow counters add
+extensions; the position pointer does not recover the original pointer allocation.
+
+The pin-retaining shared helper had only a first-flip reload difference: choice 23 takes r1
+instead of r2; `AGBCC_SPILL=23:4` MATCH on helper_pinned_localbit.c in scratch. Preserving
+original constrained flip stores fixes that while allowing the ordinary advancement form.
+A plain bit-2 test differs; the packed union reproduces the original separate mask register.
+
+Removing the final sample pin from the current partial changes table priority: phase's 6315
+beats the work union's 6260; `AGBCC_PRI=work:+56` removes all but the final sample/AND pair.
+Using SCALE3 at all three interpolation conversions raises work's refs naturally, also
+leaving only that pair while dropping the sample pin. A signed sample followed by unsigned
+cast likewise leaves only two register differences. Local allocation ties sample to the
+AND result in r0; ROM loads sample in r1 and masks in r0. u16/s16 angle, redundant casts,
+packed sample/angle unions, shared mask helper and commuted operands did not break the tie
+with the correct code. Direct signed sample gives ldrsh; masking to 255 gives ldrb. Macro
+conversion directly into the packed vector adds bitfield read-modify-write instructions;
+use an s32 coordinate local before storing it if revisiting this form.
+Next: solve the sample/result dying-operand tie, then retry the remaining pointer pins and
+loop increments; the fully unpinned draft also needs output's sb allocation.
