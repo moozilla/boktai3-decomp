@@ -9,7 +9,9 @@ struct ProjectedDisplayEntry {
     u32 unknown0;
     u8 registered, unknown5[3];
     u32 flags;
-    u8 unknownC[0x14];
+    u8 unknownC[8];
+    u16 frame;
+    u8 unknown16[0xA];
     struct ContactPosition position;
     u8 unknown28[0x12];
     u16 paletteIndex;
