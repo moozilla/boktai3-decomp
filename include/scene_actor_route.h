@@ -9,7 +9,8 @@ struct SceneActorRouteDefinition {
 };
 struct SceneActorRoutePoint {
     s16 x, z;
-    u8 unknown4[2], attributes, unknown7;
+    u16 nodeAndFacing; /* low byte: node ID; high byte: facing */
+    u8 attributes, unknown7;
 };
 struct SceneActorRouteCursor {
     u8 unknown0[2], pointIndex, unknown3;

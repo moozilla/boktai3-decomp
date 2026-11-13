@@ -9253,14 +9253,21 @@ addr,name,mode,confidence,source,notes
 0821E5B8,Terrain_SetPaths,thumb,low,src-alias,HP patrol paths -> EngineMap+0x10
 0821E5C4,Route_Start,thumb,low,src-alias,
 0821E618,Route_AdvancePoint,thumb,low,src-alias,Advances and wraps the route point index then resets point state and updates its data pointer
+0821E654,Route_GetNextPoint,thumb,low,decomp,Return the next point in the route with wraparound
+0821E67C,Route_GetMovementTowardCurrentPoint,thumb,low,decomp,Compute facing and movement toward the current point within X/Z arrival bounds
 0821E748,Path_GetDefinition,thumb,low,src-alias,Returns the indexed path definition after checking the path table count
 0821E76C,Path_GetPointData,thumb,low,src-alias,Resolves a path definition's point offset relative to the terrain path resource
 0821E780,Path_GetPointPosition,thumb,low,src-alias,Copies an indexed point's XZ coordinates and computes terrain height for Y
 0821E7A0,Path_GetPointFacing,thumb,low,src-alias,Returns the point parameter byte used to derive actor facing
 0821E7AC,Path_GetPointNodeId,thumb,low,src-alias,Returns the point parameter byte stored as the actor's node ID
+0821E7B4,Path_GetPointHeightOffset,thumb,low,decomp,Read low attribute nibble as fixed-point height offset
+0821E7C4,Path_GetPointActionKind,thumb,low,decomp,Read high attribute nibble selecting arrival behavior
+0821E7D0,Route_GetCurrentPointXZ,thumb,low,decomp,Copy current point X/Z coordinates
 0821E7DC,Route_GetCurrentPointFacing,thumb,low,src-alias,Reads the facing parameter from the route's current point
 0821E7E4,Route_GetCurrentPointNodeId,thumb,low,src-alias,Reads the node ID parameter from the route's current point
 0821E7EC,Path_GetPointPositionById,thumb,low,src-alias,Resolves a path ID and point index into XYZ or clears XYZ on failure
+0821E820,Path_GetPointFacingById,thumb,low,decomp,Resolve path and point IDs to facing
+0821E840,Path_GetPointNodeIdById,thumb,low,decomp,Resolve path and point IDs to node ID
 0821E860,Path_GetPointFromScript,thumb,low,gcl-behavior,"registry 3DB8; looks up point B of path A (sub_0821E748/E76C/E780) and stores x, y, z into three script variables"
 0821E8C8,SceneActorRoute_IsOutsidePointBounds,thumb,low,src-alias,
 0821E920,Path_PickRandomPoint,thumb,low,src-alias,
@@ -9269,6 +9276,7 @@ addr,name,mode,confidence,source,notes
 0821EC84,Path_FindNearestDistantPoint,thumb,low,src-alias,
 0821EDE0,Path_SnapToRandomFarPoint,thumb,low,src-alias,
 0821EF30,Path_SnapToRandomPointInBox,thumb,low,src-alias,
+0821F0C4,Path_SelectPoint,thumb,low,decomp,Select point by distance/random/bounds mode with random fallback
 0821F180,Terrain_SetNavMeshes,thumb,low,src-alias,HP nav meshes -> EngineMap+0x14
 0821F18C,NavMesh_IsPointInsideRegion,thumb,low,src-alias,Tests fixed-point coordinates against an indexed region's half-open bounds
 0821F1C4,PairTable_Lookup,thumb,low,src-alias,
