@@ -173,3 +173,10 @@ that makes allocation independent of the tied GCSE pseudo numbers.
 - Named dispatcher positions by command purpose and locals by role. Preserved the guarded do/while: a plain for loop lets GCC share the controller load and removes four bytes. Attempts to share either all collider initialization or just the size/offset stores changed allocation; retained the matching direct form. No scored concessions.
 - Generic SceneEventCommand value-pointer traversal changes the sender's copy-loop base, so the outbound fixed-capacity packet retains a real argument array and uses the common command interface at send time. Receiver registration uses its complete enclosing type over the queue and existing bookkeeping storage.
 - Next: Player orbit effect (0815F7E0–0815FEB0), seven files.
+
+## Player orbit effect finished
+- 0024: seven files into src/player_orbit_effect.c (0815F7E0–0815FEB0), 1744 bytes MATCH after formatting. One complete 0x4C8 task replaces conflicting partial layouts: Task, owner, resource header, 0x60 drawable, existing ContactCollider, phase timer, stat-transfer fields, sixteen 0x3C particles, particle frame and typed callback.
+- Particle motion now has a shared record and signed/unsigned coordinate union. Both particle integrators use the same fields. State callback installation and drawable flags use real members instead of raw offsets; shared Q12 truncation is deduplicated. Constructor evidence from the adjacent assigned range supplies allocation size and remaining shared fields.
+- Corrected the drawable position to relative +0x20, distinguishing its state byte at +0x1A. Phase frame is at task +0xF2 while particle frame is at +0x4BC. All original functions match with stock agbcc; no existing shared header changed and no scored concessions.
+- Kept the random cursor's existing address-of/dereference expression and the parallel particle-motion pointer stride. Simplifying them changes allocation and loop size. Named particle/effect locals and refined three symbol interpretations.
+- Next: Player burst (0815FEB0–0816065C), eighteen files.

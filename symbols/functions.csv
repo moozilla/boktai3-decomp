@@ -5715,9 +5715,9 @@ addr,name,mode,confidence,source,notes
 0815F770,TargetRegistry_Destroy,thumb,low,src-alias,Task destruction callback that clears the global target registry pointer
 0815F77C,TargetRegistry_Init,thumb,low,src-alias,Clears the registry fields and publishes the singleton pointer
 0815F790,TargetRegistry_Create,thumb,low,src-alias,Creates the singleton registry task and installs its lifecycle callbacks
-0815F7E0,PlayerBurst_SetStateCallback,thumb,low,src-alias,Sets the burst task state callback and resets its frame counter; burst interpretation is tentative
-0815F7F4,PlayerOrbitEffect_UpdateParticle,thumb,low,src-alias,
-0815F8F8,PlayerBurst_UpdateParticle,thumb,low,src-alias,Advances particle coordinates and switches its effect after five updates; ownership is provisional
+0815F7E0,PlayerBurst_SetStateCallback,thumb,low,src-alias,Sets the orbit-transition task state callback at 4C4 and resets its phase frame at F2; the independent particle frame is at 4BC
+0815F7F4,PlayerOrbitEffect_UpdateParticle,thumb,low,src-alias,Updates a radial particle around the owner and expands its radius after the per-particle delay; alternates two tile frames
+0815F8F8,PlayerBurst_UpdateParticle,thumb,low,src-alias,Advances burst-particle horizontal coordinates with wrapping velocity increments and selects frame five on animation tick five
 0815F934,PlayerOrbitEffect_SpawnParticle,thumb,low,src-alias,
 0815FA78,PlayerOrbitEffect_UpdateParticles,thumb,low,src-alias,
 0815FAF4,PlayerOrbitEffect_UpdateIntro,thumb,low,src-alias,
