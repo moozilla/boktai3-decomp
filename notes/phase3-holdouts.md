@@ -1228,3 +1228,50 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## cdp-monsters (Codex)
+
+The 2026-11-13 cloud pass rebuilt scope's instrumented compiler and ran `pins` on the complete
+17-function queue. The saved drafts below are the best ordinary forms from the prior
+monsters-bosses pass where those were closer, otherwise the newly regenerated all-concessions-removed
+form. The detailed compiler investigations remain in the earlier function sections in this file;
+this index records the complete queue and the current blocking decision after rechecking it.
+
+* `TentacleActor_UpdateRetraction` — 20 differing rows after both barriers are removed. The unused
+  absolute-value branch still needs identical post-reload arms so jump2 can delete the comparison.
+* `sub_080ABB18` — 116 rows after seven concessions are removed. Loop-invariant field addresses
+  still need to be produced by loop hoisting rather than manually pinned pointer temporaries.
+* `Vorn_UpdateDefeat` — no pins or barriers remain, but eight single-use statement macros retain
+  the loop-depth allocation effect. The next form must reproduce those reference weights with
+  ordinary repeated statements.
+* `sub_080B197C` — 26 rows after its barrier is removed; `AGBCC_PRI=active:+400` diagnoses the
+  remaining r4/r5 allocation swap. It needs one natural reference to `active` or a shorter life.
+* `Skeleton_TrySelectRetreatCell` — two rows after both map-slot barriers are removed. Reload
+  choice 18 must naturally select r2 for the south signed-width load.
+* `Skeleton_UpdateDefeat` — 273 rows after three pins are removed. The two `one` lifetimes and the
+  random table allocation interact across the large state machine and must be separated first.
+* `Golem_UpdateDefeat` — 92 rows after the random-table pin is removed. Use a table-first random
+  sample form that preserves the current six-particle loop's allocation.
+* `Mummy_ResumeSavedRouteAfterAnimation` — 22 rows after four concessions are removed. The saved
+  mask and reaction/flags operands still require the ROM's stack and low-register placement.
+* `Mummy_UpdateDefeat` — 110 rows after the table pin is removed. As with Golem, the next attempt
+  should use the shared table-first random draw without changing the loop allocation.
+* `Ivy_UpdateDefeat` — 14 rows after the table pin is removed. The helper form fixes allocation,
+  but the table literal must be loaded before the random index while retaining the shorter life.
+* `Axe_UpdateDamageSpin` — the closest ordinary draft has 11 differing rows; context and constant
+  one need their priority order reversed without extending the doubled REG_EQUIV lifetime.
+* `Terrain_ResolveActorMotion` — the closest ordinary draft has 10 differing rows. CSE must not
+  fold the negated shifted offset back to the shift pseudo, without an operand barrier.
+* `SpriteColliderGroup_ActivateParts` — six rows after both concessions are removed. The ROM saves
+  unused r8, implying an allocation whose uses disappear after allocation/reload cleanup.
+* `SpriteColliderGroup_ResetActiveParts` — two rows after the total pin is removed. Combine must
+  retain a real total pseudo so the first count load occupies r5 instead of reload choosing r6.
+* `VulcanCannon_UpdateFacingTurn` — the closest shared-step draft differs by five ROM rows versus
+  three draft rows. An equality test must not let CSE reuse `allowTurn` as the later zero argument.
+* `EnemyParticle_UpdatePool` — the closest shared-step draft differs by 12 ROM rows versus 16 draft
+  rows. The step needs r8 as the loop cursor while sprite/state remain derived from the base side.
+* `OrangeSpine_ApplyHitReaction` — the relative-based ordinary draft differs by 36 ROM rows versus
+  34 draft rows. A natural value live across the response copy must occupy r0/r1 and add r3 to the
+  later reload spill set.
+
+Drafts: `notes/phase3-drafts/cdp-monsters/`.
