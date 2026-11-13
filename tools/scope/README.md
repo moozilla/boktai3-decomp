@@ -1906,6 +1906,19 @@ Each was read from the compiler source and confirmed on a live draft.
   Distinguish expression-index insertion order from hash-order pseudo/slot
   numbering: changing T alone did not fix the original fully clean draft.
 
+154. **Addressing a pointer only in one arm can preserve a call-argument copy.**
+  LinkMenu_WaitSelectionMode (0810A540) had a memory barrier between two mode
+  tests and a pointer barrier before the mode-4 state call. Reading the first
+  selection through `struct State **address = &p` prevents PRE from sharing
+  the selection-pointer load, removing the memory barrier. The clean draft
+  then has 2/2 differences: r0's state-pointer move is shared after the mode
+  argument, whereas the ROM copies it separately before each mode constant.
+  In the mode-4 arm, `struct State **slot = &pp; *slot = p;` preserves that
+  separate copy and fully matches. A branch-local addressed source pointer
+  and a pointer union initializer also match. Addressing pp at function
+  scope does not match; scope matters. Narrow mode arguments and reordered
+  inline-helper parameters do not fix the common tail.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
