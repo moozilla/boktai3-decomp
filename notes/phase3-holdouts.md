@@ -1228,3 +1228,43 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-link (Codex)
+
+Tags: #matching #phase3 #link #compiler
+
+### WirelessGameMenu_InitEquipmentChoices (08038448, src/fn/sub_08038448.c)
+
+Best pin-free draft: `notes/phase3-drafts/dp-link/WirelessGameMenu_InitEquipmentChoices.c`.
+It uses the retained structured loops, typed save rows, and the numeric random-table address
+already used by its matched item-choice sibling. All body instructions match except the
+random-index pointer's initial reload register (r3 instead of r0). The other differences are
+the ROM's unused sl save/restore and resulting push grouping/alignment: 8 ROM / 8 draft,
+408 bytes each. The production function remains unchanged.
+
+- The symbolic-table draft is 3 ROM / 5 draft, but PRE creates a table literal at the inner
+  loop preheader and loop.c hoists it to sl. `pre` shows replacement 5 and `hoist` shows insn
+  401. `AGBCC_NOPRE=5` gives 9/9; `AGBCC_NOMOVE=401` gives 14/14. Removing only one decision
+  leaves another placement/allocation difference. A numeric table removes that PRE expression
+  and keeps the literal next to the sample, as in the ROM.
+- Diagnostic only: retaining the original inner-loop sl/ip clobbers with the numeric table
+  reduces the difference to the seed pointer's 2 instructions. `AGBCC_SPILL=11:1` then MATCHes.
+  It proves the seed reload rotation and unused save are sufficient; no such diagnostic was
+  landed. Reload 11 starts after r1, while the ROM needs it to start after r3, with spill set
+  r0/r1/r3. Its preceding span is the final equipment-mask update through Mod and the outer
+  loop's initialization.
+- Tried the shared direct sampler; both `ParticleRandomTableSource` and `RandomTableView`
+  initializer forms; numeric, symbolic, byte-address, and integer-address table expressions;
+  for/do and label/goto loops; typed slot setter/clearer inlines; a 12-iteration offset scan;
+  narrow index/counter types; explicit seed pointer before and after i's initialization;
+  and partial removals in the original source. None recovers the unused sl save in ordinary C.
+- Read reload1.c's `mark_home_live`: it marks every allocated pseudo's hard-register home
+  before subsequent reload decisions, so a late-dead or displaced sl home could explain the
+  save. A productive next step is tracing that home through reload, then finding the original
+  helper/type that creates it without code surviving in sl. Do not redo the table-hoist search.
+- Scope gap fixed: `probe` reported that no decision changed the count even though several
+  probes worsened it. It now reports the closest worsening probes and does not rule out
+  interacting compiler decisions.
+
+Persistent evidence: `build/matchsearch/WirelessGameMenu_InitEquipmentChoices-v2`;
+working sources: `build/cx/work/WirelessGameMenu_InitEquipmentChoices/`.
