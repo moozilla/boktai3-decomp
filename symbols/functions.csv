@@ -5986,9 +5986,12 @@ addr,name,mode,confidence,source,notes
 0816CC88,MapScreen_InitAreaView,thumb,low,src-alias,Loads area-specific map resources and initializes the map screen display
 0816CD6C,Inventory_SetUsePermissionFlagsFromScript,thumb,low,src-alias,Builds four item-use permission bits from script values; interpretation tentative
 0816CDA4,Inventory_GetUsePermissionFlag,thumb,low,src-alias,Returns a permission bit tested when deciding whether an item can be used
+0816CDB8,Inventory_InitializeSelectionGrid,thumb,low,src-alias,
+0816CE8C,Inventory_GetItemCategory,thumb,low,src-alias,
 0816CEA0,Inventory_GetItemUseCondition,thumb,low,src-alias,Extracts the upper nibble used to select item usability checks
 0816CEB4,Inventory_GetQuantityByStorage,thumb,low,src-alias,Selects between the primary and alternate quantity tables according to the storage selector
 0816CECC,Inventory_RestoreLifePercent,thumb,low,src-alias,Adds a percentage of maximum life with clamping and starts recovery feedback; life interpretation tentative
+0816CF2C,Inventory_RestoreLifePercentTimed,thumb,low,src-alias,
 0816CFAC,SceneHud_ApplyStatBPercent,thumb,low,src-alias,
 0816D0AC,PlayerStatusPanel_ResetScriptCounters,thumb,low,src-alias,
 0816D114,SceneHud_ApplyTimedSceneMode,thumb,low,src-alias,

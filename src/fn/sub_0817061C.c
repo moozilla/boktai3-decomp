@@ -8,7 +8,7 @@ void PauseMenu_AddSpriteFlags(void *, int, int);
 void SceneHud_BlendPosition(void *, void *, s32);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void MenuDisplay_UpdateActionPrompt(void *, int);
-void sub_0816CDB8(void *, int, int);
+void Inventory_InitializeSelectionGrid(void *, int, int);
 void PauseMenu_SwapItemSlots(void *, u32, u32);
 void SceneHud_ShowActionPreview(void *);
 void SceneHud_GetActionIconPosition(void *, int);
@@ -45,7 +45,7 @@ void SceneHud_FinishActionSlide(struct SceneHudState *s)
             u8 *in;
             u8 *pp;
             in = (u8 *)s + o1;
-            sub_0816CDB8(in, 1, 0);
+            Inventory_InitializeSelectionGrid(in, 1, 0);
             {
                 u32 o3 = 0x1620;
                 pp = (u8 *)s + o3;

@@ -27,7 +27,7 @@ void MenuDisplay_UpdateActionPrompt(void *, int);
 void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 void InventoryPanel_ShowStatusIcons(void *);
 void Hud_SaveGridSelection(void *);
-void sub_0816CDB8(void *, int, int);
+void Inventory_InitializeSelectionGrid(void *, int, int);
 void SceneHud_ShowActionPreview(void *);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_RefreshActionIcons(void *);
@@ -56,7 +56,7 @@ void InventoryGrid_FinishNumberPhase(struct InventoryGrid *s)
         SceneHud_RefreshActionIcons(s);
         Hud_SetInteractionCallback(s, SceneHud_UpdateActionSelection, 1);
         selection = s->selectionState;
-        sub_0816CDB8(selection, 1, 0);
+        Inventory_InitializeSelectionGrid(selection, 1, 0);
         SceneHud_GetActionIconPosition(s->slotPosition, s->selectedSlot);
         SceneHud_ShowActionPreview(s);
         Hud_SaveGridSelection(selection);
