@@ -3,7 +3,7 @@
 #include "contact_swarm.h"
 /* Tentative identity: rotating resource-contact sprite, list-8 task size 0xC8. */
 struct OrbitContactActor {
-    u8 task[0x18];
+    struct Task task;
     s16 radius;
     u8 angle, state, stateFlag;
     u8 unknown1D[3];
