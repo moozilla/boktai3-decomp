@@ -95,6 +95,87 @@ static int bios_tests(void)
     return 0;
 }
 
+static uint32_t fuzz_next(uint32_t *state)
+{
+    *state = *state * 1664525u + 1013904223u;
+    return *state;
+}
+
+static int decoder_fuzz_tests(void)
+{
+    static const unsigned operations[] = {0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18};
+    static const uint8_t types[] = {0x10,0x10,0x28,0x30,0x30,0x81,0x81,0x82};
+    uint32_t random = 0x74657374;
+    unsigned trial, i, length, kind;
+    uint8_t encoded[96], expected[80], guarded[96];
+    size_t written;
+    for (length = 0; length <= sizeof(expected); ++length) {
+        for (i = 0; i < length; ++i) expected[i] = (uint8_t)fuzz_next(&random);
+        for (kind = 0; kind < 5; ++kind) {
+            size_t size = 4;
+            unsigned operation = kind == 0 ? 0x11 : kind == 1 ? 0x14 : kind == 2 ? 0x16 : 0x13;
+            encoded[0] = kind == 0 ? 0x10 : kind == 1 ? 0x30 : kind == 2 ? 0x81 : kind == 3 ? 0x28 : 0x24;
+            encoded[1] = (uint8_t)length; encoded[2] = encoded[3] = 0;
+            if (kind == 0) {
+                for (i = 0; i < length; ++i) {
+                    if (!(i & 7)) encoded[size++] = 0; /* all literal symbols */
+                    encoded[size++] = expected[i];
+                }
+            } else if (kind == 1) {
+                if (length) encoded[size++] = (uint8_t)(length - 1);
+                for (i = 0; i < length; ++i) encoded[size++] = expected[i];
+            } else if (kind == 2) {
+                for (i = 0; i < length; ++i) encoded[size++] = (uint8_t)(expected[i] - (i ? expected[i - 1] : 0));
+            } else {
+                unsigned symbols = kind == 3 ? length : length * 2;
+                unsigned symbol, bits_left = 0;
+                uint32_t bits = 0;
+                encoded[4] = 1; encoded[5] = 0xc0;
+                encoded[6] = kind == 3 ? 0x32 : 3; encoded[7] = kind == 3 ? 0xa7 : 12;
+                size = 8;
+                for (i = 0; i < length; ++i) expected[i] = 0;
+                for (symbol = 0; symbol < symbols; ++symbol) {
+                    uint8_t value;
+                    if (!bits_left) {
+                        bits = fuzz_next(&random); bits_left = 32;
+                        for (i = 0; i < 4; ++i) encoded[size++] = (uint8_t)(bits >> (i * 8));
+                    }
+                    value = encoded[6 + (bits >> 31)]; bits <<= 1; --bits_left;
+                    if (kind == 3) expected[symbol] = value;
+                    else expected[symbol / 2] |= (uint8_t)(value << ((symbol & 1) * 4));
+                }
+            }
+            for (i = 0; i < sizeof(guarded); ++i) guarded[i] = 0xa5;
+            CHECK(hw_bios_decompress(operation, encoded, size, guarded + 8, length, &written) == HW_OK && written == length);
+            for (i = 0; i < length; ++i) CHECK(guarded[8 + i] == expected[i]);
+            for (i = 0; i < 8; ++i) CHECK(guarded[i] == 0xa5);
+            for (i = 8 + length; i < sizeof(guarded); ++i) CHECK(guarded[i] == 0xa5);
+        }
+    }
+    for (trial = 0; trial < 20000; ++trial) {
+        size_t input_size = fuzz_next(&random) % (sizeof(encoded) + 1);
+        size_t capacity = fuzz_next(&random) % (sizeof(expected) + 1);
+        uint8_t *input = encoded + sizeof(encoded) - input_size;
+        int result;
+        kind = (fuzz_next(&random) >> 16) % 8;
+        for (i = 0; i < input_size; ++i) input[i] = (uint8_t)(fuzz_next(&random) >> 24);
+        if (input_size >= 4 && (trial & 1)) {
+            input[0] = types[kind]; input[1] = (uint8_t)(fuzz_next(&random) % 81);
+            input[2] = input[3] = 0;
+        }
+        for (i = 0; i < sizeof(guarded); ++i) guarded[i] = 0xa5;
+        result = hw_bios_decompress(operations[kind], input, input_size, guarded + 8, capacity, &written);
+        CHECK(result == HW_OK || result == HW_TRUNCATED || result == HW_BAD_DATA || result == HW_NO_SPACE);
+        CHECK(written <= capacity);
+        if (result == HW_OK) {
+            CHECK(input_size >= 4 && written == ((unsigned)input[1] | (unsigned)input[2] << 8 | (unsigned)input[3] << 16));
+        }
+        for (i = 0; i < 8; ++i) CHECK(guarded[i] == 0xa5);
+        for (i = 8 + (unsigned)capacity; i < sizeof(guarded); ++i) CHECK(guarded[i] == 0xa5);
+    }
+    return 0;
+}
+
 static void dma(unsigned channel, uint32_t source, uint32_t destination, uint16_t count, uint16_t control)
 {
     uint32_t address = HW_IO_BASE + 0xb0 + channel * 12;
@@ -423,6 +504,7 @@ int hw_test_run(void)
     host.map = map; host.interrupt = interrupt; host.wait = wait_irq; host.reset = reset; host.unix_time = now;
     hw_init(&machine, &host); hw_bind(&machine);
     result = bios_tests(); if (result) return result;
+    result = decoder_fuzz_tests(); if (result) return result;
     result = device_tests(); if (result) return result;
     result = cartridge_tests(); if (result) return result;
     result = rtc_sdk_tests(); if (result) return result;
