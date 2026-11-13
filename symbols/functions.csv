@@ -8963,6 +8963,10 @@ addr,name,mode,confidence,source,notes
 08213DCC,InterruptsAndVideo_InitRuntime,thumb,low,src-alias,Clears video memory and initializes interrupts and graphics tasks
 08213F80,InterruptsAndVideo_WaitForVBlank,thumb,low,src-alias,Waits for the flag set by the VBlank interrupt handler
 08213F98,InterruptsAndVideo_WaitFrames,thumb,low,src-alias,Enables interrupts while waiting for the requested number of VBlanks
+08213FD8,InterruptsAndVideo_OnVBlank,thumb,low,decomp,Latch display state; program scroll and HBlank DMA; tick link and solar clock
+08214144,InterruptsAndVideo_OnVCount,thumb,low,decomp,Alternate sound update and dialogue scroll at scanline interrupts
+082141B4,InterruptsAndVideo_RunIdleHook,thumb,low,decomp,Empty idle hook near frame callbacks; role tentative
+082141B8,InterruptsAndVideo_RunFrameHook,thumb,low,decomp,Empty frame hook near frame callbacks; role tentative
 082141BC,InterruptsAndVideo_OnUnusedInterrupt,thumb,low,src-alias,Empty fallback interrupt callback also installed when the solar timer stops
 082141C0,InterruptsAndVideo_OnVideoUploadTask,thumb,low,src-alias,Task callback that waits for VBlank and uploads graphics and display state
 0821425C,InterruptsAndVideo_OnGraphicsUpdateTask,thumb,low,src-alias,Task callback that updates graphics resources and effects and advances the frame counter
