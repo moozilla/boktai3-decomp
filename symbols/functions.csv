@@ -7226,25 +7226,27 @@ addr,name,mode,confidence,source,notes
 081B66E0,VanargandEffect_Initialize,thumb,low,src-alias,
 081B67B0,VanargandEffect_Create,thumb,low,src-alias,Creates a delayed sprite effect task with a thirty-frame active lifetime
 081B6810,VanargandProjectilePool_FindFreeSlot,thumb,low,src-alias,Finds an unused entry among eight slots and returns its index
-081B6844,ActorReaction_BeginOnContact,thumb,low,src-alias,
-081B6884,ActorReaction_Idle,thumb,low,src-alias,
-081B69F4,ActorEffect_RemoveSprites,thumb,low,src-alias,
-081B6A38,ActorEffect_UpdatePositionTrail,thumb,low,src-alias,
-081B6AB8,ActorEffect_UpdateRadialTrail,thumb,low,src-alias,
-081B6BC4,HomingEffect_TurnTowardTarget,thumb,low,src-alias,
-081B6C1C,ActorEffect_UpdateHomingFlight,thumb,low,src-alias,
-081B6D20,ActorEffect_UpdateApproachLaunch,thumb,low,src-alias,
-081B6E90,ActorEffect_UpdateRadialExpiry,thumb,low,src-alias,
-081B6F68,ActorEffect_UpdateExpiry,thumb,low,src-alias,
-081B6FA8,PooledController_UpdateAll,thumb,low,src-alias,
+081B6844,VanargandProjectile_OnContact,thumb,low,src-alias,Activates a projectile reaction after collider contact
+081B6884,VanargandProjectile_IgnoreContact,thumb,low,src-alias,Empty projectile attack-collider callback
+081B6888,VanargandProjectile_Initialize,thumb,low,src-alias,Initializes six trail sprites and two colliders
+081B69F4,VanargandProjectile_Release,thumb,low,src-alias,Removes trail sprites disables the body collider and releases the pool bit
+081B6A38,VanargandProjectile_UpdatePositionTrail,thumb,low,src-alias,Copies the six-position circular history into trail sprites
+081B6AB8,VanargandProjectile_UpdateRadialTrail,thumb,low,src-alias,Moves expired trail sprites outward from their stored positions
+081B6BC4,VanargandProjectile_TurnTowardTarget,thumb,low,src-alias,Clamps angular steering toward the target
+081B6C1C,VanargandProjectile_UpdateHomingFlight,thumb,low,src-alias,Steers advances colliders and updates the trail during flight
+081B6D20,VanargandProjectile_UpdateApproachLaunch,thumb,low,src-alias,Interpolates toward the source position before homing flight
+081B6E90,VanargandProjectile_UpdateRadialExpiry,thumb,low,src-alias,Scatters trail sprites then releases the projectile
+081B6F68,VanargandProjectile_UpdateExpiry,thumb,low,src-alias,Drains the position trail before releasing the projectile
+081B6FA8,VanargandProjectilePool_Update,thumb,low,src-alias,Dispatches the state callback for each active projectile
 081B6FFC,VanargandProjectilePool_Destroy,thumb,low,src-alias,Task destruction callback that releases active projectiles and removes slot colliders
 081B7038,VanargandProjectilePool_Init,thumb,low,src-alias,Stores the pool parameter and initializes all eight projectile slots
 081B7064,VanargandProjectilePool_Create,thumb,low,src-alias,Allocates the eight-slot sprite and collider pool used by Vanargand; projectile identity is tentative
 081B70A8,VanargandProjectile_Create,thumb,low,src-alias,
+081B71D4,VanargandProjectile_CreateWithSource,thumb,low,src-alias,Creates a projectile with an optional approach source
 081B7304,PooledController_ActivateIdleSlots,thumb,low,src-alias,
-081B7340,EffectPool_FindFreeSlot,thumb,low,src-alias,
+081B7340,VanargandAfterimagePool_FindFreeSlot,thumb,low,src-alias,Finds an afterimage with no remaining lifetime
 081B7378,VanargandAfterimagePool_ActivateSlot,thumb,low,src-alias,Starts an eight-tick sprite effect at the supplied position and clears visibility and flip flags
-081B7394,EffectPool_InitSlot,thumb,low,src-alias,
+081B7394,VanargandAfterimagePool_InitializeSlot,thumb,low,src-alias,Loads the afterimage sprite resource and clears its position
 081B73F8,VanargandAfterimagePool_ReleaseSlot,thumb,low,src-alias,Marks a slot inactive and hidden and decrements the active count
 081B740C,VanargandAfterimagePool_UpdateSlot,thumb,low,src-alias,Counts down a slot and applies alternating flip flags halfway through its lifetime
 081B744C,VanargandAfterimagePool_Update,thumb,low,src-alias,Task update callback that advances active slots once every eight frames
