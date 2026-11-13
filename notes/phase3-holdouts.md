@@ -1555,3 +1555,40 @@ Next: find a natural control-flow boundary that retains the two copies, or exten
 CSE diagnostics to isolate the copy substitution rather than the class-head probe.
 Scratch: `build/cx/work/EncodedRecord_XorRange/`; persistent search:
 `build/matchsearch/EncodedRecord_XorRange/`.
+
+### sub_08108C94 (08108C94, src/fn/sub_08108C94.c)
+
+Both original pins remain; no production change. Best clean draft saved at
+`notes/phase3-drafts/dp-link/sub_08108C94.c`: 7 ROM / 7 draft differences, shape 2.
+It compares matches first, then count against matches. This restores the counter
+allocation but reverses the two final comparisons and retains the packet-word
+copy/mask differences. Original fully clean form was 45/43, shape 20.
+
+Removing only matches' r6 pin produces 20/20 with shape 0. Its global priority is
+1724 (10 refs, 87 flow insns doubled to 174 at the initial constant definition);
+base has 1739 (4 refs, 46 insns), so base takes r6 and matches takes r7. The spill
+register set then contains r6 rather than r7 throughout. AGBCC_PRI=matches:+16
+MATCHES this partial. Moving matches initialization after ready restores allocation
+but moves one initialization instruction (1/1, shape 2). Reversing the final pair
+of comparisons also restores allocation, with 3/3, shape 2 before raw-pin removal.
+
+Removing only raw's r3 pin yields 4/4, shape 0. CSE puts the load in SI pseudo 53
+and its HI copy in raw 49; allocation gives the load r2 and copy r3, opposite the
+ROM. Regmove ties the mask result to raw rather than its constant. NOTIE=175 repairs
+the mask (2/2 remain). FORCE=53:3,49:2 plus NOTIE=175 fixes the load/copy order but
+uses the wrong equal-value pseudo for the comparisons and mask (3/3). CSE_NOCANON
+on either 49 or 53 worsens code to 47/39, shape 44. This is not a matching override.
+
+Tested approximately sixty focused forms: direct/union/wide-first packet reads,
+inline u16/u32/s32 readers and an output-parameter reader, narrow-mask helpers,
+base definition before tick update or before its store, direct first-peer byte,
+array pointer type, initialization order and shared zero, count/matches comparison
+forms, repeated count in the first/non-first arms, swapped ready/matches increments,
+aggregate counters, and narrow/signed/unsigned counter and sentinel types. The
+mask helpers and direct peer reloads disrupt placement; base movement changes
+instruction order. Narrow count/ready restores some allocation but adds narrowing
+instructions. No partial ordinary-C match. Next: retain the original initializer
+and comparison order while changing the matches/base flow lifetime by one insn;
+then preserve the load's HI identity through both comparisons and the mask.
+
+Scratch and compiler evidence: `build/cx/work/sub_08108C94/`.
