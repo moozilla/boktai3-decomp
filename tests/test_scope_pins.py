@@ -87,6 +87,16 @@ int Target(int v)
         kinds = [k for _, k, _ in self.scope.concession_sites(source)]
         self.assertEqual(kinds, ["barrier"])
 
+    def test_memory_barrier_with_trailing_block_comment_is_a_site(self):
+        source = 'void Target(void)\n{\n    asm("" ::: "memory"); /* preserve the reload */\n}\n'
+        sites = self.scope.concession_sites(source)
+        self.assertEqual([(i, kind) for i, kind, _ in sites], [(2, "barrier")])
+        self.assertEqual(sites[0][2](source.split("\n")), ['void Target(void)', '{', '}', ''])
+
+    def test_barrier_trailing_comment_does_not_hide_following_code(self):
+        source = '    asm("" ::: "memory"); /* comment */ value++;\n'
+        self.assertEqual(self.scope.concession_sites(source), [])
+
     def test_each_pin_of_a_declaration_line_is_a_site(self):
         source = 'int F(void)\n{\n    register int a asm("r9"), b asm("r6"), c;\n    return a + b;\n}\n'
         sites = self.scope.concession_sites(source)
