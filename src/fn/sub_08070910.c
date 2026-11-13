@@ -8,8 +8,8 @@ void SceneActorControl_OnIdle(u8 *);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **saved, u32 excluded)
 {
     u16 *flags = &actor->flags2D4;
-    u32 value = *flags;
-    register u32 mask asm("r2") = 0x40;
+    register u32 value = *flags;
+    register u32 mask = 0x40;
     value &= mask;
     *saved = flags;
     if (value)
@@ -24,9 +24,11 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **save
     if (actor->health > 0)
         goto zero;
 one:
-    return 1;
+    mask = 1;
+    return mask;
 zero:
-    return 0;
+    mask = 0;
+    return mask;
 }
 
 static inline u8 HasMovementFlag(struct SceneActorRegistryActor *actor, u32 mask)
