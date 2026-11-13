@@ -1414,9 +1414,26 @@ Store: `build/matchsearch/sub_081FDCB0`, distance-boundary. Next: preserve the
 inline distance-return join that prevents CSE following, while eliminating its
 boolean materialization; keep the source reset when recovering original load order.
 
-### HomingProjectile_UpdateDefaultState (081FF454): partial
+### HomingProjectile_UpdateDefaultState (081FF454): resolved
 
 Tags: #matching #phase3 #presentation #081FF454
+
+Resolved on follow-up: sharing the saved flip pointer across all three facing
+blocks removes the final FaceFinal barrier. Each block's ROM uses r7; the first
+two already conflict with the live one in r5, while the final block alone did
+not. Manually placing the three blocks in the caller and declaring saved once
+combines those conflicts and selects r7 throughout. The scalar local adds no
+storage or instructions. Removed unused Face, FaceFinal and SetRiseHeight
+helpers. Scope and independent stock check MATCH all 1256 bytes, zero pins or
+barriers. Persistent node: shared-facing-pointer.
+
+The matching knob diagnosed allocation, but raising saved's priority by 1000,
+4000 or 15000 gave 26/26 differences. Repeating the final call in both arms gave
+11/24; repeating its saved-pointer read gave 35/35 and moved a load. Passing a
+shared pointer by address to the existing inline helpers gave 36/46. Sharing
+with the other facing blocks succeeds where sharing with unrelated vectors
+failed. The following records the earlier partial and diagnosis.
+
 
 Removed three of four concessions: one capture uses a do block; a shared void
 component pointer combines delay's r0/r6 conflicts with rise height's r1 conflict,
