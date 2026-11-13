@@ -1268,3 +1268,36 @@ the ROM's unused sl save/restore and resulting push grouping/alignment: 8 ROM / 
 
 Persistent evidence: `build/matchsearch/WirelessGameMenu_InitEquipmentChoices-v2`;
 working sources: `build/cx/work/WirelessGameMenu_InitEquipmentChoices/`.
+
+### sub_080399F4 (080399F4, src/wireless_game_items_and_display.c)
+
+Best draft: `notes/phase3-drafts/dp-link/sub_080399F4.c` (22 ROM / 22 draft,
+shape 0, 560 bytes). Only this target and its private sampler are pin-free in the
+whole-unit draft; other functions retain their existing concessions. Production is unchanged.
+
+- Removing Item_NextRandom's r6 pin gives 61/59 differences and shape 50. The shared
+  ParticleRandom_ReadSample restores the complete instruction shape, leaving 30/30 register
+  differences in the two copies of the shake code. Using ReadDirectSample for the second
+  draw lowers that to 22/22 and gives the index pointer its correct r3.
+- In the symmetric ReadSample draft, local allocation gives the table pseudo 103 (and
+  inlined copy 213) priority 2500, the seed 2352, the 3 mask 1250, and the 1023 mask 1153.
+  The table takes r3; ROM needs it last in r6. `AGBCC_PRI=103:-1400,213:-1400` MATCHes,
+  as does `AGBCC_FORCE=103:6,213:6`. These are diagnostics only.
+- The sampler's capture macro leaves loop notes that weight each table use twice in flow:
+  five references versus four when the second draw is direct. Both direct draws lower the
+  weighting further but lose table-first placement and change the surrounding allocation.
+- Tried explicit shared table and index locals; table before the branch; parameterized seed
+  and mask; union initialization and union-by-value sampler; integer and pointer sample
+  addresses; advancing table pointers; narrowed sample/coordinate/return types; separate
+  result scopes; flattened two-draw code; direct and macro capture; numeric and symbolic
+  table constants. Separate sample scopes fix the global-result allocation seen when removing
+  an inline layer, but do not lower the table priority enough. Narrow coordinates add extensions.
+- `probe` tests 15 CSE/PRE decisions in the shape-correct draft; none improves it. The direct
+  baseline's PRE changes improve the count but retain shape differences. Next: recover
+  table-first placement with direct reads, or a legitimate sampler type/lifetime that puts
+  table below both masks. Do not repeat the table/seed parameter-order experiments.
+- Scope gap: `why` on the second late-split table literal chooses the first inlined copy,
+  because both have the same constant and C line. Use names.txt to identify both pseudos;
+  here they are 103 and 213. A future fix should disambiguate occurrences by instruction order.
+
+Persistent evidence: `build/matchsearch/sub_080399F4`; scratch: `build/cx/work/sub_080399F4/`.
