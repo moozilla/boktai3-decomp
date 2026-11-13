@@ -1,6 +1,7 @@
 #ifndef DIRECTIONAL_INTERACTION_H
 #define DIRECTIONAL_INTERACTION_H
 #include "global.h"
+#include "directional_script_args.h"
 #include "game_state.h"
 #include "player.h"
 #include "input.h"
@@ -58,10 +59,7 @@ struct DirectionalPackedVec {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
 
-struct DirectionalScriptArgs {
-    u32 count : 16, unused : 16;
-    s32 *values;
-};
+
 
 /* 0x02000038 */
 extern struct DirectionalManager *gDirectionalManager;

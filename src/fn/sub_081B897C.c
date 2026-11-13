@@ -1,7 +1,7 @@
 #include "global.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
-s32 sub_081B866C(void *, void *);
+s32 SceneScriptObject_Initialize(void *, void *);
 void Task_Kill(void *);
 void SceneScriptTask_Update(void);
 void DungeonProp_Destroy(void);
@@ -10,7 +10,7 @@ void *DungeonProp_CreateFromScript(void *a)
     void *p = Task_Create(8, 0x140);
     if (p) {
         Task_SetCallbacks(p, SceneScriptTask_Update, DungeonProp_Destroy);
-        if (sub_081B866C(p, a) < 0) {
+        if (SceneScriptObject_Initialize(p, a) < 0) {
             Task_Kill(p);
             return 0;
         }
