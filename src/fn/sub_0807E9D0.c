@@ -7,7 +7,7 @@
 #include "player.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
-void sub_08220204(void *, void *);
+void Collision_CalculateElementalResponse(void *, void *);
 void Collision_CalculateDamageResponse(void *, void *);
 void SceneActor_SetContactReactionDirection(void *, void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
@@ -227,7 +227,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
         }
     }
     if (Test(gEngineFlags, 0x4800))
-        sub_08220204(source, destination);
+        Collision_CalculateElementalResponse(source, destination);
     else
         Collision_CalculateDamageResponse(source, destination);
     destination->parameter44 = source->parameter44;

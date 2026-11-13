@@ -5,7 +5,7 @@
 
 struct PlayerSelection;
 
-void sub_08220204(struct ContactCollider *, struct ContactCollider *);
+void Collision_CalculateElementalResponse(struct ContactCollider *, struct ContactCollider *);
 void sub_08238580(struct Player *, struct ContactCollider *, struct ContactCollider *);
 s32 LinkSession_ClearFirstPlayerKind(void *, s32);
 void LinkPlayer_FlushPendingEffects(struct Player *);
@@ -60,7 +60,7 @@ u32 Player_ApplyContact(struct Player *p, struct ContactCollider *source,
     {
         s32 count = source->unknown3C;
         if (count > 0)
-            sub_08220204(source, target);
+            Collision_CalculateElementalResponse(source, target);
         else
             target->cost = 0;
     }
