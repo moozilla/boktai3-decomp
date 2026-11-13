@@ -2190,9 +2190,9 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
         p->state = 0;
         p->bend = (p->variant & 1) ? 1 : -1;
         ActorShadow_Disable(p->p2);
-        if (*((u8 *)p + 0xf6f) && p->obj.scaleX != 127 && (p->obj.flags & 16))
+        if (p->growFlag && p->obj.scaleX != 127 && (p->obj.flags & 16))
             p->scaleFn = Actor_UpdateScaleGrowth;
-        if (!*((u8 *)p + 0xf77)) {
+        if (!p->variant8) {
             p->targetX = 25;
             p->targetY = 102;
             p->targetZ = 0;
