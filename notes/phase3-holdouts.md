@@ -1292,3 +1292,26 @@ The same priority conflict and next ideas as ProximityEmitter's initializer appl
 Private word copies were 85/85; aggregate copies improved to 39/37; late clear-loop
 initialization reached 17/17; branch stores reached 16/16. A pointer store and a
 byte-returning bodyEnabled getter did not restore the byte reload.
+
+### SavedPositionMarker_InitializeFromScript (08054028)
+
+Tags: phase3, dp-field-b, SavedPositionMarker_InitializeFromScript
+
+Partial: removed the final copy barrier using a ContactPosition temporary;
+the unit still matches. Direct aggregate assignment alone changes the
+destination reload order by one instruction; the temporary preserves it.
+
+The best pin-free draft differs by 47 ROM / 41 draft instructions (shape 22).
+Its independent blockers are the terrain yAddress allocation, sprite-view
+reload order, palette-store cross-jumping, palette-source reload registers,
+and resourceId/priority allocation. Raising yAddress priority by 2955 on the
+52/46 baseline improves it to 38/34 but does not match.
+
+Tried named field preparations in each script arm, late default-loop setup,
+aggregate and temporary position copies, palette helper parameters, literal
+priority stores, early priority initialization, and repeating the graphics
+load after each palette store. The last form worsens cross-jumping; the
+helper does not change palette reloads. Named field preparation alone on the
+pinned original still differs by 30/30, so it cannot yet land as a partial.
+Next: separate the two graphics setup lifetimes and test a value-returning
+palette selector to hold its graphics argument live across the halfword load.
