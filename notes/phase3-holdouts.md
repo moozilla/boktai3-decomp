@@ -1228,3 +1228,61 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## cdp-effects (Codex)
+
+### BackgroundFlash_UpdateScrolling (src/fn/sub_08047770.c, 08047770): deferred, 6/6
+
+Draft: `notes/phase3-drafts/cdp-effects/BackgroundFlash_UpdateScrolling.c`. Removing the frame r1 pin leaves only a register swap: `frame` has 3 references across 18 insns (priority 1666), while the short-lived target-speed pseudo has 3 references across 4 (priority 7500) and takes r1 first. `AGBCC_PRI=frame:+5835` matches. An inline mask helper raised frame to 5 references but changed the second AND's tie/canonicalization; nested wrappers folded away. Next: a natural frame-test helper that supplies two more pre-flow references while retaining the constant-first `odd &= frame` form.
+
+### RepeatedEffect_TickUpperTransition (src/fn/sub_0804F9C4.c, 0804F9C4): deferred, 77/71
+
+Draft: `notes/phase3-drafts/cdp-effects/RepeatedEffect_TickUpperTransition.c`. The seven pins cover the repeated RNG-index, x/z sample, and result-value allocation in two symmetric transition arms. Removing them produces 77 ROM / 71 draft rows and one moved branch; the older recovery also found the first decisive mismatch at the halfword store after the upper-transition test. Next: factor the two arms through the table-first `ParticleRandom_ReadSample` form while preserving a separate post-join result value.
+
+### OrbitBackground_UpdateVisibility (src/fn/sub_08050910.c, 08050910): deferred, 26/22
+
+Draft: `notes/phase3-drafts/cdp-effects/OrbitBackground_UpdateVisibility.c`. Removing the background/selected pins and status barrier changes the ordering of the final special-mode load/test relative to the enabled test (seven moved branches overall). Direct ordinary condition spellings retained the wrong scheduling. Next: repeat the post-join status statement in each arm so jump2 cross-jumps the tails while keeping the special-mode load on the ROM side of the join.
+
+### OrbitBackground_UpdatePosition (src/fn/sub_080509E8.c, 080509E8): deferred, 53/53
+
+Draft: `notes/phase3-drafts/cdp-effects/OrbitBackground_UpdatePosition.c`. Ten constraints steer the angle correction, game-state reload, two symmetric signed approach blocks, and loaded blend frame. The unsigned-halfword blend-frame form removes its binding, but signed correction allocation and reload ordering remain; removing all constraints yields 53/53 and twelve moved branches. Next: unify the two approach arms behind a signed step helper, then duplicate the post-join store in each arm.
+
+### DisplayTrack_Update (src/fn/sub_08054EC0.c, 08054EC0): deferred, 31/31
+
+Draft: `notes/phase3-drafts/cdp-effects/DisplayTrack_Update.c`. The 27 constraints are concentrated in palette interpolation (period/divisor/frame pointers and color temporaries), the descending cleanup loop, and the sound-event tail. Despite their count, removing all leaves only 31/31 rows and one moved branch, indicating allocation rather than missing operations. Next: recover a typed palette-interpolation helper with the period pointer as its loop invariant and repeat the final packed-color store in the two interpolation arms.
+
+### DisplayTrack_AddFromScript (src/fn/sub_08055268.c, 08055268): deferred, 12/18
+
+Draft: `notes/phase3-drafts/cdp-effects/DisplayTrack_AddFromScript.c`. Four constraints steer the initial script value, zero halfword, event, and has-sequence result. Removing all changes 12 ROM / 18 draft rows and one branch; the extra draft instructions point to value lifetime/CSE rather than pure allocation. Next: use a union-zero initializer for the halfword state and return directly from the sequence-present arms so the result is not live across the join.
+
+### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): deferred, 46/34
+
+Draft: `notes/phase3-drafts/cdp-effects/Presentation_UpdateDropShakeBlink.c`. The three destination pins as a group cost only 6/6, while removing the long-lived table r6 pin causes most of the 46/34 difference and three moved branches. The typed departure-layer layout is retained. Next: index the input table directly in each state arm (rather than advancing a shared table pointer), then address `layers[1].position.y` through a single typed destination local.
+
+### SpriteTrail_CreateFixedEffect (src/fn/sub_081F28C4.c, 081F28C4): deferred, 4/4
+
+Draft: `notes/phase3-drafts/cdp-effects/SpriteTrail_CreateFixedEffect.c`. The pin-free code has identical instruction shape; reload keeps `pool` in sl and spills the render position, while the ROM spills `pool` at sp+4 and keeps the position in sl. Moving declarations and replacing the two position-x field expressions were tested; declaration order is neutral and the field rewrite worsens allocation. Next: find the original render-loop inline/helper boundary that raises the position pointer's density without changing the emitted body.
+
+### SpriteTrail_CreateMotionEffect (src/fn/sub_081F2A08.c, 081F2A08): deferred, 4/4
+
+Draft: `notes/phase3-drafts/cdp-effects/SpriteTrail_CreateMotionEffect.c`. As in the fixed twin, only the equal-live pointer placement differs: pool is in sl in the draft, while the ROM spills it and keeps renderOrigin in sl. The already-separated motion setup eliminated the earlier second binding. Declaration reordering is neutral; direct origin-x spelling perturbs loop allocation. Next: solve the fixed twin's shared render-loop pointer-density form and apply it here.
+
+### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): deferred, 5/3
+
+Draft: `notes/phase3-drafts/cdp-effects/RisingActor_AdvanceHeight.c`. Removing the zero r4 and state r2 pins together leaves five ROM / three draft rows in this 76-byte leaf. The verified Orbit Volley state/resource layout is retained. Next: express the height update as a returned value (including the missing-return lifetime lever) so zero remains live in r4 and the state destination naturally occupies r2.
+
+### sub_081FDCB0 (src/fn/sub_081FDCB0.c, 081FDCB0): deferred, 38/30
+
+Draft: `notes/phase3-drafts/cdp-effects/sub_081FDCB0.c`. The source r1 pin costs only 4/4; the zero-use barrier and especially the memory barrier control the steering-stage schedule and account for four moved branches. The resource and 0x38 trail record types agree with their callers. Next: split steering calculation from trail emission into an inline returning the updated position, so the real call/data dependency replaces the memory fence.
+
+### HomingProjectile_UpdateDefaultState (src/fn/sub_081FF454.c, 081FF454): deferred, 47/49
+
+Draft: `notes/phase3-drafts/cdp-effects/HomingProjectile_UpdateDefaultState.c`. Four constraints steer a saved r5 value, y destination r2, constant one, and delay. Removing them changes 47/49 with five moved branches; the typed projectile lifetime/state layout remains. Next: return the state-transition result directly from each arm and repeat the delay store before each return, shortening both constant lifetimes and eliminating the join allocation.
+
+### ProjectilePool_Update (src/fn/sub_08202730.c, 08202730): deferred, 20/20
+
+Draft: `notes/phase3-drafts/cdp-effects/ProjectilePool_Update.c`. Only two empty operand barriers remain, on the sprite object and velocity; removing both preserves length but rotates 20/20 allocation rows. The live slot (0x128), configuration (0x5c), shared command reader, signed motion, and collider layout are retained. Next: use the shared sprite-step helper with the object and velocity passed as distinct typed arguments, supplying genuine references across the command dispatch.
+
+### SpiralBurst_InitParticles (src/fn/sub_08234540.c, 08234540): deferred, 49/47
+
+Draft: `notes/phase3-drafts/cdp-effects/SpiralBurst_InitParticles.c`. The signed cosine-table/direct sine sampling already removed the old barrier. The remaining two pins keep separate effect-table and random-table aliases in r5/r6; removing the random-table pin dominates and introduces three moved branches. Next: convert all draws to the table-first `ParticleRandom_ReadSample`/`ReadDirectSample` helpers while keeping the effect table captured outside the loop.
