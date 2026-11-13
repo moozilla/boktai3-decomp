@@ -2184,3 +2184,15 @@ which is exactly `10:1`. Not tested.
    suggests COMBKEEP for that definition, and suppresses misleading allocation advice
    for the original pseudo. This knob confirms the pass; the ordinary C form that
    preserves this particular conversion remains open in the holdout notes.
+
+173. **A spill slot can belong only to a standalone USE, with no machine load or store.**
+   In the barrier-free split-half-table draft of sub_08014CA4, combine folds the
+   table construction but leaves `(use (reg 94))` for its old input (fact 48).
+   That input has no executable operation left in lreg, yet remains live across
+   earlier calls and gets sp+0x20. Every body instruction otherwise matches;
+   the frame grows from 0x20 to 0x24 and shifts the incoming stack arguments.
+   `scope frame` now compares flow and lreg and identifies such slots instead of
+   reporting only an unnamed spilled value. It requires a real earlier operation
+   and only standalone USEs afterward; surviving SETs, CLOBBERs, or operand uses
+   disqualify the diagnosis. Zero initialization removes this USE but restores
+   constant equivalence and changes allocation, so it is not automatically a fix.

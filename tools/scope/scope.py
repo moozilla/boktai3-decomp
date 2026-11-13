@@ -6989,6 +6989,29 @@ def cmd_preorder(src, func, env):
     return 1
 
 
+def use_only_pseudos(before, after):
+    """Pseudos whose real operations disappeared, leaving only standalone USEs.
+
+    A surviving SET, CLOBBER, subreg use, or executable operand disqualifies the
+    pseudo. Do not infer an eliminated value from an absent or incomplete dump.
+    """
+    reg = re.compile(r"\(reg(?:/[a-z]+)*:\w+ (\d+)\)")
+    direct_use = re.compile(r"^\(use \(reg(?:/[a-z]+)*:\w+ (\d+)\)\)$")
+    real_before = set()
+    for _, _, rtl in before:
+        if not direct_use.fullmatch(rtl or ""):
+            real_before.update(int(x) for x in reg.findall(rtl or ""))
+    uses, other = {}, set()
+    for uid, _, rtl in after:
+        match = direct_use.fullmatch(rtl or "")
+        if match:
+            uses.setdefault(int(match.group(1)), []).append(uid)
+        else:
+            other.update(int(x) for x in reg.findall(rtl or ""))
+    return {p: uids for p, uids in uses.items()
+            if p >= 22 and p in real_before and p not in other}
+
+
 def cmd_frame(src, func, env):
     """The stack frame side by side: each ROM stack slot, the corresponding draft slot, and the pseudo
     (C variable) reload put there, in the order reload gave the slots out. Use physical offsets when
@@ -7042,6 +7065,18 @@ def cmd_frame(src, func, env):
     for b in extra:
         ps, nm = who(b)
         print(f"+ {'':9} sp+{b:<#6x} {ps:>6}  {nm}  (the ROM has no slot for this)")
+    use_only = use_only_pseudos(insn_list(wd, "flow"), insn_list(wd, "lreg"))
+    for b in extra:
+        ps = slots[b][0]
+        if ps not in use_only or slots[b][2] == -1:
+            continue
+        print(f"  sp+{b:#x}: pseudo {ps} has no executable read or write before allocation;"
+              f" only standalone USE insns {', '.join(map(str, use_only[ps]))} remain.")
+        print("    Its real operations disappeared after flow. combine's distribute_notes can"
+              " preserve a deleted input this way, keeping it live and giving it an unused spill"
+              " slot. Compare flow/combine/lreg; split-half union construction is one known"
+              " source (README facts 48 and 173). Initializing the union can remove the USE but"
+              " also restore constant equivalence, changing allocation.")
     order = [pair[a] for a in sorted(pair) if pair[a] in slots and slots[pair[a]][2] > 0]
     want = [slots[b][0] for b in order]
     if want != sorted(want):
