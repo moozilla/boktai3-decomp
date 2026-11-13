@@ -1,122 +1,57 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_grid.h"
-extern const s8 gUnk_08605BC8[];
+/* The 10 x 8 board, placed at grid column 5, row 8. */
+extern const s8 gUnk_08605BC8[][8];
+
+static inline s32 SceneGrid_PreviousColumn(s32 column, s32 count)
+{
+    column++;
+    column -= count;
+    return column;
+}
+
+static inline s32 SceneGrid_NextColumn(s32 column, s32 count)
+{
+    column--;
+    column += count;
+    return column;
+}
 
 /* Negative results encode a cell two steps beyond a blocked candidate. */
-s32 SceneGrid_ScanColumns(s32 columnInput, s32 rowInput, s32 blockedInput, s32 kindInput, s32 steps)
+s32 SceneGrid_ScanColumns(s32 column, s32 row, s32 blocked, s32 kind, s32 steps)
 {
-    s32 column = columnInput;
-    s32 row = rowInput;
-    s32 blocked = blockedInput;
-    register s32 kind asm("r3") = kindInput;
-    register s32 count asm("r2");
-    s32 rowPlus;
+    s32 count;
     s32 cell;
-    asm("" : "+l"(steps));
-    if (steps)
-        goto haveSteps;
-noPosition:
-    return -255;
-haveSteps:
+    s32 width;
+    s32 gridRow, rowBase;
+    if (steps == 0) {
+    noCell:
+        return -255;
+    }
     if (steps < 0) {
-        s32 limit;
-        s32 beyond;
-        count = 1;
-        limit = -(u32)steps;
-        beyond = column + 1;
-        rowPlus = 8 + row;
-        if (count <= limit) {
-            s32 previous = column - 1;
-            if (previous >= 0) {
-                const s8 *table = gUnk_08605BC8;
-                register s32 offset asm("r0") = row * 8;
-                previous += offset;
-                previous += (u32)table;
-                if (*(const s8 *)previous == kind) {
-                    u32 read;
-                    offset = column + offset;
-                    offset += (u32)table;
-                    read = offset - 1;
-                    do {
-                        read--;
-                        count++;
-                    } while (count <= limit && column - count >= 0 && *(const s8 *)read == kind);
-                }
-            }
-        }
-        {
-            s32 next = beyond;
-            column = next - count;
-        }
+        for (count = 1;
+             count <= -steps && column - count >= 0 && gUnk_08605BC8[row][column - count] == kind;
+             count++)
+            ;
+        column = SceneGrid_PreviousColumn(column, count);
     } else {
-        register s32 before asm("ip");
-        count = 1;
-        before = column - 1;
-        rowPlus = 8 + row;
-        if (count <= steps) {
-            s32 next = column + 1;
-            if (next <= 7) {
-                register const s8 *table asm("r5") = gUnk_08605BC8;
-                register s32 offset asm("r0") = row * 8;
-                next += offset;
-                next += (u32)table;
-                if (*(const s8 *)next == kind) {
-                    u32 read;
-                    offset = column + offset;
-                    offset += (u32)table;
-                    read = offset + 1;
-                    do {
-                        read++;
-                        count++;
-                    } while (count <= steps && column + count <= 7 && *(const s8 *)read == kind);
-                }
-            }
-        }
-        {
-            s32 next = before;
-            column = next + count;
-        }
+        for (count = 1;
+             count <= steps && column + count <= 7 && gUnk_08605BC8[row][column + count] == kind;
+             count++)
+            ;
+        column = SceneGrid_NextColumn(column, count);
     }
-    {
-        s32 width = SceneGrid_Width();
-        s32 contribution = rowPlus;
-        contribution *= width;
-        {
-            s32 offset = contribution;
-            offset += 5;
-            cell = column + offset;
-        }
-    }
+    gridRow = row + 8;
+    width = SceneGrid_Width();
+    rowBase = gridRow * width + 5;
+    cell = column + rowBase;
     if (cell == blocked) {
         if (steps < 0) {
-            s32 next = column - 2;
-            if (next < 0)
-                goto noPosition;
-            {
-                const s8 *table = gUnk_08605BC8;
-                register u32 offset asm("r1");
-                offset = row * 8;
-                offset -= 2;
-                offset = column + offset;
-                offset += (u32)table;
-                if (*(const s8 *)offset != kind)
-                    goto noPosition;
-            }
+            if (column - 2 < 0 || gUnk_08605BC8[row][column - 2] != kind)
+                goto noCell;
             return 2 - cell;
         } else {
-            s32 next = column + 2;
-            if (next > 7)
-                goto noPosition;
-            {
-                const s8 *table = gUnk_08605BC8;
-                register u32 offset asm("r1");
-                offset = row * 8;
-                offset += 2;
-                offset = column + offset;
-                offset += (u32)table;
-                if (*(const s8 *)offset != kind)
-                    goto noPosition;
-            }
+            if (column + 2 > 7 || gUnk_08605BC8[row][column + 2] != kind)
+                goto noCell;
             return -(cell + 2);
         }
     }
