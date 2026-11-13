@@ -137,3 +137,26 @@ The draft is [a patch](drafts/player_actions_2026-11-13.patch) against the tree 
 - Remaining quality work in this draft: promote address names in functions.csv, improve local names, recover terrain-cell header/attribute fields, and evaluate shared helper/structured control-flow forms. None of those is claimed complete.
 - The next worker should resume this item, isolate which header declarations change reset allocation, then validate every shared-header consumer. Afterwards continue the untouched queue from Player cue (0815AD24–0815C9EC).
 - The run ended by explicit user instruction. No further items were started. Coordinator still owns combined ROM validation and report regeneration.
+
+## Resumed investigation: 08158C14 literal-pool hashing
+
+A renewed continuation resumed the queue after the weekly-end handoff. The
+original reset still matches; scope shows a specific source of the merged gap.
+The seven global-address pseudos have equal allocation priority (344), equal
+reference counts (2), and equal live lengths (58). GCC GCSE assigns pseudo
+numbers in expression-hash bucket order. Its constant expressions contain
+literal-pool labels, and those labels change from LC7–LC13 in the standalone
+function to LC24–LC30 in the merged function. This changes the hash order and
+therefore the pseudo-number tie break in global allocation. The ROM gives the
+first three global addresses high registers, but the merged form gives them
+low registers. It is not an effect of changed Player field offsets.
+
+Inlining the slot-clearing loop into the reset leaves 28 differing bytes.
+Grouping the three related interaction-state clears in an inline helper leaves
+39 differing bytes. Neither was retained. No artificial declarations, padding
+functions, compiler options or register constraints were added to manipulate
+literal numbering. The existing saved patch remains the direct-body draft.
+The subsystem is skipped under the worker brief's reasonable-time rule; the
+compiled tree retains the original matching files. Next is Player cue,
+0815AD24–0815C9EC. A future attempt should seek a meaningful C representation
+that makes allocation independent of the tied GCSE pseudo numbers.
