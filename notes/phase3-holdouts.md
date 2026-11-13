@@ -1228,3 +1228,47 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+
+## dp-menus (Codex)
+
+Tags: #menus #hud #dialogue #matching #compiler
+
+### Presentation_SetItemGraphic (08019ECC, src/selection_menu.c)
+
+Best ordinary-C draft: `notes/phase3-drafts/dp-menus/Presentation_SetItemGraphic.c`.
+It has the original 76-byte extent, 6 ROM / 6 draft differing instructions. The
+source match remains unchanged with two pins and two operand barriers.
+
+The ROM loads 0x121 into r0, copies it to r2, loads the graphic byte into r3,
+then adds r3 to r2. In the no-pin unit, cse1 rewrites insn 47 from
+`resource + tile` to `tile + base`; combine substitutes the 289 constant, and
+regmove/local allocation tie the result to the byte. `AGBCC_COMBKEEP=32` on
+`build/cx/work/Presentation_SetItemGraphic/base.c` preserves the constant load
+before the byte load (5 / 5), but not the ROM's copy. Adding `AGBCC_NOTIE=47`
+or `CSE_KEEP=33` does not match. No complete matching knob was found; the copy
+is a separate unresolved decision. `probe` finds only one cse jump follow,
+whose suppression does not help. Allocation force knobs do not override the
+block-local quantities involved.
+
+Tried typed table indexing; u8/u16/s16/u32 channel/index values; a one-element
+array and packed field; address-taking and inline readers; full-width and
+halfword union views; a base constructed from its two halves; initialization
+before the inventory call or before the existing test; separate inline helpers
+for the base, frame addition and keyframe call; and partial removal of each
+existing pin/barrier. None matches or removes a concession for free. This
+extends the earlier menus-link effort rather than restarting its variants.
+The half-constructed union adds a live incoming value and a high-register save,
+so it is worse and was not retained as the recommended source.
+
+Persistent proposals: `build/matchsearch/Presentation_SetItemGraphic-v2`,
+including the typed-table, address, aggregate, inline and lifetime hypotheses.
+The guarded statement-order/copy/temporary slate is empty for this source.
+Next: expose cse's constant-copy substitution as a separate diagnostic decision,
+then find a real frame-index representation whose base remains noncanonical
+through that substitution. A shared statement wrapper invented just to fence
+this one initialization would be a concession, so none was added.
+
+Tool result: scope now resolves names in COMBKEEP, NOEQUIV and canonical-register
+knobs. Previously `AGBCC_COMBKEEP=base` silently did nothing; it now reports that
+the optimized-away name is unavailable and requires its RTL pseudo number.
