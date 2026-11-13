@@ -1356,3 +1356,24 @@ unwanted loop invariant. The ROM never uses r6 in its body, so forcing a live
 value there cannot be a solution. Next: identify a natural late-eliminated
 allocation/copy that marks r6 live before final cleanup. Original source remains
 matching with its single barrier; no partial can remove only part of that site.
+
+### SceneSteeringActor_EmitRandomParticle — sine allocation
+
+Tags: phase3, dp-scene1, SceneSteeringActor_EmitRandomParticle, 0x0806BDB8
+
+Six pins and all four barriers removed in matching source. Saved pin-free draft
+is 200 bytes, 20 register-only differences, shape zero. AGBCC_FORCE=sine:1 is
+exact, as is retaining only the original sine pin. The symbolic sample origin
+(gRandomTable plus established bank displacement), copied before projection and
+used in the later relative sample, naturally retains both formerly opaque copies.
+Separate nextIndex and speed locals reproduce the index and magnitude copies;
+direct gRandomIndex accesses fix cursor allocation.
+
+Sine has three refs/live 42 (doubled for REG_EQUIV), priority 714. The first
+Truncate result has priority 6000 and takes r1, displacing sine and cascading
+through speed, velocity and angle. A projection helper with sine parameter,
+the shared route projection helper, narrow magnitude/Truncate results and
+direct per-arm x stores did not restore the allocation. Probe's five canonical
+choices, two jump follows and one PRE replacement do not change the count.
+Next: keep sine out of the constant equivalence class or alter the first
+Truncate result's allocation without changing its shared stores.
