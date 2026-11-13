@@ -7,7 +7,7 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
     struct ResourceStationPlayer *player = station->player;
     s32 x, z;
     u8 *destination;
-    register u32 value asm("r0");
+    u32 value;
     if (player->position.y != station->triggerPosition.y)
         goto outside;
     x = player->position.x - station->triggerPosition.x;
@@ -24,7 +24,9 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
             register u32 offset asm("r2") = 0x264;
             asm("" : "+r"(offset));
             destination = (u8 *)station + offset;
-            goto clear;
+            value = 0;
+            *destination = value;
+            return;
         } else {
             register u32 nearbyOffset asm("r5") = 0x264;
             u32 sample;
@@ -40,11 +42,9 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
                 blocked = 1;
             if (blocked == 0) {
                 u32 kind;
-                u32 playerOffset = 0x25C;
-                player = *(struct ResourceStationPlayer **)((u8 *)station + playerOffset);
+                player = station->player;
                 {
-                    u32 kindOffset = 0x418;
-                    kind = *((u8 *)player + kindOffset);
+                    kind = player->actionMode;
                     if (kind == 3)
                         goto done;
                     if (kind == 4)
@@ -52,23 +52,14 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
                     if (kind == 5)
                         goto done;
                     {
-                        u32 busyOffset = 0x464;
                         const u16 *input;
-                        if (*((u8 *)player + busyOffset))
+                        if (player->busy)
                             goto done;
-                        playerOffset += 0xEC;
-                        {
-                            const u16 **address = (void *)((u8 *)player + playerOffset);
-                            input = *address;
-                        }
+                        input = player->inputKeys;
                         if (!(input[1] & 1))
                             goto done;
-                        kindOffset += 0x3F;
-                        {
-                            u8 *address = (u8 *)player + kindOffset;
-                            if (*address != 7)
-                                goto done;
-                        }
+                        if (player->action != 7)
+                            goto done;
                     }
                     {
                         register u32 triggerOffset asm("r5") = 0x254;
@@ -79,7 +70,8 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
                         triggerOffset += 0xE;
                         destination = (u8 *)station + triggerOffset;
                         value = 1;
-                        goto store;
+                        *destination = value;
+                        return;
                     }
                 }
             }
@@ -92,8 +84,6 @@ outside: {
     asm("" : : "r"(offset));
     destination = (u8 *)station + offset;
 }
-clear:
     value = 0;
-store:
     *destination = value;
 }

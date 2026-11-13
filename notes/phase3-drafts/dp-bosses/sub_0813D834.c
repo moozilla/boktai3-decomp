@@ -25,17 +25,16 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
     u32 kind = inputKind;
     u32 duration = inputDuration;
     s32 offset;
-    if (kind == 1)
-        goto bonus;
     switch (kind) {
-        case 0: {
-            u32 count = p->movementModifierActive;
-            offset = 0;
-            if (count && p->movementModifierKind != 3)
-                Player_EmitQueuedEffects(p);
-        } break;
+        case 0:
+            do {
+                u32 count = p->movementModifierActive;
+                offset = 0;
+                if (count && p->movementModifierKind != 3)
+                    Player_EmitQueuedEffects(p);
+                goto store;
+            } while (0);
         case 1:
-        bonus:
             if (p) {
                 u32 flags = Player_ReadStatusBonusBits(&p->statBonusFlags, 0x20000000);
                 offset = 2;
@@ -62,6 +61,7 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
         default:
             return;
     }
+store:
     Player_StoreStatusTimer(p->scriptStatus, offset, duration);
 }
 

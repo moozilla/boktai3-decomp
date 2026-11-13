@@ -1,13 +1,27 @@
+// MATCHING_CONCESSION: register-pinning
 #include "render.h"
 #include "scene_panel_overlay.h"
 
-// MATCHING_CONCESSION: register-pinning
-
 static inline s32 scaleSceneOverlay(s32 value)
 {
+    s32 result;
     if (value >= 0)
-        return value >> 5;
-    return -((-value) >> 5);
+        result = value >> 5;
+    else
+        result = -((-value) >> 5);
+    return result;
+}
+static inline void projectSceneOverlay(struct ContactPosition *out,
+                                       const struct ContactPosition *origin)
+{
+    s32 x = origin->x;
+    s32 z = origin->z;
+    s32 sum, y;
+    out->x = scaleSceneOverlay((x - z) * 3);
+    sum = scaleSceneOverlay((x + z) * 3);
+    y = scaleSceneOverlay(origin->y * 3);
+    out->y = sum - y;
+    out->z = sum + y;
 }
 #define truncate5(value) ((value) >= 0 ? (value) >> 5 : -((-(value)) >> 5))
 #define truncate1(value) ((value) >= 0 ? (value) >> 1 : -((-(value)) >> 1))
@@ -17,8 +31,6 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
     struct SceneOverlayResource resource;
     struct SceneOverlayMapEntry entry;
     struct ContactPosition projected;
-    struct ContactPosition *projectedPointer;
-    struct ContactPosition *projectedRead;
     struct SceneOverlayMapEntry *entries;
     s32 width, height;
     u16 *blocks;
@@ -51,35 +63,8 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
         asm("" : : "r"(width), "r"(tx), "r"(reloadScratch), "r"(buffer));
         height = layer->height * 2;
     }
-    {
-        s32 x, z, sum;
-        s32 y;
-        const struct ContactPosition *origin;
-        projectedPointer = &projected;
-        asm("" : "+r"(projectedPointer));
-        origin = &panel->origin;
-        asm("" : "+r"(origin));
-        x = origin->x;
-        z = origin->z;
-        {
-            s32 value = 3 * (x - z);
-            projectedRead = projectedPointer;
-            projectedPointer->x = scaleSceneOverlay(value);
-        }
-        {
-            s32 subtotal = x + z;
-            s32 value;
-            value = scaleSceneOverlay(3 * subtotal);
-            sum = value;
-        }
-        y = scaleSceneOverlay(3 * origin->y);
-        projectedPointer->y = sum - y;
-        {
-            s32 projectedZ = sum + y;
-            projectedPointer->z = projectedZ;
-        }
-    }
-    centerX = projectedRead->x + gCamera.offsetX;
+    projectSceneOverlay(&projected, &panel->origin);
+    centerX = projected.x + gCamera.offsetX;
     centerY = projected.y + gCamera.offsetY;
     centerX = truncate3(centerX);
     centerY = truncate3(centerY) & ~1;
@@ -97,12 +82,13 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
         entryPointer = &entry;
         do {
             s32 old;
+            s32 y, x;
             s32 target;
             register u8 *current asm("r2");
             register u8 *base asm("r0");
-            register s32 maxX asm("r12"), maxY;
+            s32 maxX, maxY;
             s32 minX;
-            register s32 minY asm("r2");
+            s32 minY;
             if (panel->paletteMode == 0 || (panel->effectState != 10 && panel->effectState != 14))
                 target = 5;
             else {
@@ -169,9 +155,10 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                     maxX = maxY;
                     break;
             }
-            asm("" : "+r"(maxX), "+r"(maxY), "+r"(minY), "+r"(slot) : "r"(target));
-            slot++;
-            next = slot;
+            {
+                s32 *cursor = &slot;
+                next = ++*cursor;
+            }
             if (maxX < 0 || maxY < 0 || minX > 31 || minY > 31)
                 goto nextSlot;
             {
@@ -179,17 +166,16 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                 blockStride = strideLayer->width >> 4;
             }
             if (target == 5) {
-                register s32 y asm("r6");
                 for (y = minY; y < maxY; y += 2) {
-                    register s32 x asm("r5");
                     for (x = minX; x < maxX; x++) {
                         register s32 dx = tileX + x, dy = tileY + y;
                         dx &= 31;
                         dy &= 31;
                         {
-                            register s32 index asm("r0") = dy * 32;
-                            asm("" : "+r"(index));
-                            index = dx + index;
+                            s32 row = dy * 32;
+                            s32 index;
+
+                            index = dx + row;
                             output[index] = 0;
                         }
                         dy++;
@@ -199,7 +185,6 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                     }
                 }
             } else {
-                register s32 y asm("r6");
                 u32 ringMask;
                 target++;
                 {
@@ -213,10 +198,9 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                 {
                     void **mapSlot;
                     struct ScenePanel *mapPanel = panel;
-                    u32 mapOffset = 0x4DC;
                     struct SceneOverlayMapEntry *copied;
                     u32 relative;
-                    mapSlot = (void *)((u8 *)mapPanel + mapOffset);
+                    mapSlot = (void *)&mapPanel->overlayMap;
                     copied = entryPointer;
                     relative = (u32)copied->blocks;
                     {
@@ -228,7 +212,6 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                     }
                 }
                 for (y = minY; y < maxY; y += 2) {
-                    s32 x;
                     for (x = minX; x < maxX; x++) {
                         s32 dx, dy;
                         u16 *secondOutput;
@@ -243,18 +226,20 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                 dy &= mask;
                             }
                             {
-                                register s32 index asm("r0") = dy * 32;
-                                asm("" : "+r"(index));
-                                index = dx + index;
+                                s32 row = dy * 32;
+                                s32 index;
+
+                                index = dx + row;
                                 index = (u32)(output + index);
                                 secondValue = 0;
                                 *(u16 *)index = secondValue;
                             }
                             {
-                                register s32 index asm("r0") = dy + 1;
-                                index *= 32;
-                                asm("" : "+r"(index));
-                                index = dx + index;
+                                s32 row = dy + 1;
+                                s32 index;
+                                row *= 32;
+
+                                index = dx + row;
                                 secondOutput = output + index;
                             }
                         } else {
@@ -265,10 +250,12 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                 blockX = scaled;
                             }
                             {
-                                register s32 scaled asm("r0") = truncate5(dy);
+                                s32 scaled = truncate5(dy);
                                 scaled *= blockStride;
-                                scaled = blockX + scaled;
-                                block = scaled << 8;
+                                {
+                                    s32 sum = blockX + scaled;
+                                    block = sum << 8;
+                                }
                             }
                             dx &= ringMask;
                             dy &= ringMask;
@@ -309,9 +296,10 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                         *firstOutput = value;
                                     }
                                     {
-                                        register s32 index asm("r0") = dy + 1;
-                                        index *= 32;
-                                        index = dx + index;
+                                        s32 row = dy + 1;
+                                        s32 index;
+                                        row *= 32;
+                                        index = dx + row;
                                         secondOutput = output + index;
                                     }
                                     secondValue = pair[2];
@@ -334,9 +322,10 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                         *firstOutput = value;
                                     }
                                     {
-                                        register s32 index asm("r0") = dy + 1;
-                                        index *= 32;
-                                        index = dx + index;
+                                        s32 row = dy + 1;
+                                        s32 index;
+                                        row *= 32;
+                                        index = dx + row;
                                         secondOutput = output + index;
                                     }
                                     secondValue = pair[3];

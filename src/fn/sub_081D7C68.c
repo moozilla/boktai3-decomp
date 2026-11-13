@@ -37,13 +37,13 @@ s32 Task4E01_StartTerminalAnimation(struct Task4E01Projectile *p)
             break;
         case 3:
             if (config->flags & 0x10) {
-                p->animation = 1;
-                Anim_RestartSequence(&p->sequence, p->resource, 1, 0, 0);
-                PlayerCue_StepSequenceEnded(&p->sprite, &p->sequence);
+                p->runtime.animation = 1;
+                Anim_RestartSequence(&p->runtime.sequence, p->runtime.resource, 1, 0, 0);
+                PlayerCue_StepSequenceEnded(&p->sprite, &p->runtime.sequence);
             } else {
-                p->animation = 6;
-                Anim_RestartSequence(&p->sequence, p->resource, 6, 0, 0);
-                PlayerCue_StepSequenceEnded(&p->sprite, &p->sequence);
+                p->runtime.animation = 6;
+                Anim_RestartSequence(&p->runtime.sequence, p->runtime.resource, 6, 0, 0);
+                PlayerCue_StepSequenceEnded(&p->sprite, &p->runtime.sequence);
             }
             Projectile_SetUpdateCallback(config, Projectile_UpdateAnimation);
             break;

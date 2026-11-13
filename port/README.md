@@ -163,8 +163,8 @@ for full execution. No fallback bodies are supplied for those routines.
 With `--ppu-root ../cx-port-ppu/port` and `--mmio`, the slice routes visible
 scanlines to the sibling C PPU. `run_boot.py --ppu-root ../cx-port-ppu/port`
 checks the first forced-blank frame against mGBA in RGB555. This is the initial
-white frame, not a gameplay boot. CPU MMIO writes notify the affine renderer;
-DMA writes to affine registers still need a device notification interface.
+white frame, not a gameplay boot. CPU and DMA register publications notify the affine renderer, including
+identical-value writes that reload internal reference latches.
 
 ## See the port
 
@@ -230,7 +230,9 @@ Mapping linear memory alone does not implement hardware side effects.
 The frame loop calls `hw_step_cycles` to advance timers and sound FIFOs,
 `hw_scanline_start` at each line start, `hw_hblank` at the start of HBlank,
 and `hw_vblank` once at line 160. Line-start updates clear HBlank and generate
-VCOUNT-match interrupts; HBlank does not repeat that match interrupt. DMA timing is
+VCOUNT-match interrupts; HBlank does not repeat that match interrupt.
+DISPSTAT writes preserve the current match flag until a scanline update,
+without raising a write-triggered IRQ, as checked against mGBA. DMA timing is
 functional, not cycle-accurate. HBlank DMA runs only on visible lines. Interrupt
 callbacks receive pending enabled bits when IME is set; the host dispatches the
 game's handlers and acknowledges IF through a bus write. The BIOS wait callback
@@ -274,7 +276,9 @@ uses 24-hour BCD. `port/include/hw_rtc.h` declares portable SIIRTC SDK
 entry points, including protection, status translation, date/time reads and
 writes, reset and alarm storage. They preserve the game record layout and
 software-lock byte at `030035C6`, and drive the GPIO device through bus calls.
-Alarm interrupts and 12-hour wire conversion are not implemented. Solar GPIO counts clock pulses against a user-set threshold
+A raw reset clears status; the SDK reset/probe restores 24-hour mode and
+reports recovery, matching the original SDK in mGBA. Alarm interrupts and
+12-hour wire conversion are not implemented. Solar GPIO counts clock pulses against a user-set threshold
 (`hw_set_solar`, 0 bright through 255 dark); these values are not physical lux.
 
 ### Validation and remaining integration
@@ -282,7 +286,10 @@ Alarm interrupts and 12-hour wire conversion are not implemented. Solar GPIO cou
 The portable tests cover known decompression vectors, truncation, affine
 cardinals, division corner cases, DMA modes, cascade/IRQ timing, FIFO refill,
 keypad matching, flash, EEPROM wire reads, leap-day RTC rollover and solar
-thresholds. Full game boot, register-store instrumentation, and audio playback
+thresholds. Decoder robustness tests include 405 generated round trips and
+20,000 malformed/truncated inputs with output guards, on native and wasm.
+The mGBA oracle compares 3,640 solar GPIO edges at seven thresholds.
+Full game boot, register-store instrumentation, and audio playback
 are integration work; this test module does not claim to run the game.
 
 Optional runtime-ROM validation (system libmgba headers/library required for
@@ -293,8 +300,12 @@ build/venv/bin/python port/hw/build.py --mgba-rom baserom.gba
 build/venv/bin/python port/hw/build.py --song-rom baserom.gba --song 1 --seconds 10
 ```
 
-The oracle also checks 4,491 Div/Sqrt/copy/decompression vectors against mGBA,
-executing its replacement BIOS for copy SWIs. It checks signed ArcTan across its full input range, ArcTan2 across
+The oracle also checks 4,568 Div/Sqrt/copy/decompression vectors against mGBA,
+executing its replacement BIOS for copy SWIs, including 77 overlapping fast
+copies. Native/wasm tests also check the maximum 21-bit CpuFastSet count after
+rounding to eight words. Another 57 cases verify multi-record object-affine
+strides and BitUnPack widths/offsets against complete mGBA output buffers.
+It samples ArcTan across the signed 16-bit range, checks ArcTan2 across
 quadrants, all 256 affine angle steps, and 128 bounded LZ77 candidates read
 from the runtime ROM. Integer arithmetic agrees exactly; affine coefficients
 allow one unit because mGBA HLE rounds negative products differently. It also
@@ -304,7 +315,12 @@ count (exact). Another 96 original-mixer calls cover fixed/interpolated playback
 looping/sample end, ADSR and pseudo echo. The sample-end oracle supplies the
 explicit interpolation guard byte that the original reads beyond sample size;
 the port substitutes zero (or the loop start) to keep accesses bounded.
-It runs the original EEPROM write/read routines and checks both
+It runs 576 immediate DMA cases across all four channels, widths, address modes and
+repeat settings, comparing destination bytes and completion IRQs. It runs
+the original RTC SDK across all 24 hours, status translation, protection and
+probing with a fixed UTC source. The RTC 12-hour path remains unimplemented;
+mGBA wraps hours modulo 12 without an AM/PM distinction and cannot independently
+validate that distinction. It runs the original EEPROM write/read routines and checks both
 readback and backing-file byte order. All generated bytes remain under ignored
 `build/`.
 
@@ -316,24 +332,28 @@ release and pseudo-echo envelopes once per call, applies channel/master volume,
 supports fixed and interpolated PCM playback and loops, and writes both a
 signed 16-bit stereo stream and the SDK's signed 8-bit DMA ring. It clamps the
 final stereo mix; original packed-byte overflow behavior is not reproduced.
-Reverb uses feedback from adjacent DMA-ring blocks. It is functional audio,
+Reverb wraps at the active DMA-ring boundary and preserves the original
+feedback rounding; 16 ring/level cases agree with the original full PCM buffer. It is functional audio,
 not a claim of bit-identical GBA audio.
 
 The SDK `SoundMain` replacement finds the sound state through the mapped
 `03007FF0` pointer, or `hw_m4a_attach` for a native host. It calls the existing
-sequencer and CGB callbacks, imports register writes, renders PCM and PSG, then
-delivers `HwHost.audio(user, stereo, frames, rate)`. The callback must copy or
-consume the buffer before the next call. Sample-rate conversion to the host's
+sequencer and CGB callbacks, imports pending initialization writes before them
+and callback writes afterward, renders PCM, and applies Direct Sound master enable, FIFO A/B routing and half-volume controls
+before adding PSG and delivering `HwHost.audio(user, stereo, frames, rate)`.
+The callback must copy or consume the buffer before the next call. Sample-rate conversion to the host's
 audio device belongs in the host. Do not also feed the same MP2K DMA FIFO to
 the output, which would duplicate Direct Sound.
 
 PSG supports both pulse channels with duty/length/envelope and channel-1
-frequency sweep, 32-sample wave playback with volume control, and 7/15-bit
+frequency sweep, 32/64-sample wave playback with volume control, and 7/15-bit
 noise. The 512 Hz frame sequencer advances from the CPU clock. Explicit bus
-writes observe retrigger strobes and DAC power; wave RAM currently represents
-one audible 32-sample bank. 64-sample bank switching, analog filtering, exact
-sweep/length edge quirks, FIFO output resampling and master bias ramp timing
-remain work for hardware accuracy.
+writes observe retrigger strobes and DAC power. Wave RAM exposes the bank
+opposite the playing bank to the CPU; 64-sample mode switches banks every
+32 samples. Both CPU-visible banks agree with mGBA, and native/wasm tests
+check the output across bank boundaries. Analog filtering, exact sweep/length
+edge quirks, FIFO output resampling and master bias ramp timing remain work
+for hardware accuracy.
 
 The WAV test has a small, bounded MP2K test sequencer that feeds real song
 samples into this mixer. It exercises PCM notes, gates, tempo, patterns,
@@ -414,14 +434,14 @@ build/venv/bin/python port/tests/ppu_regression.py \
   --out build/ppu/startup-delta --sanitize --unit --wasm
 ```
 
-The synthetic suite generates 315 cases without a ROM and compares directly with
+The synthetic suite generates 351 cases without a ROM and compares directly with
 mGBA's software renderer: all text sizes/depths/layers, affine and bitmap modes,
 transforms, sprite shapes/sizes/depths/flips, clipping, affine/double-size OBJ,
 windows, blending, brightness, mosaic, green swap and HBlank register changes.
 Boundary tests cover tile-bank wrapping, bitmap OBJ eligibility, invalid BG
 characters, transparent OBJ priority propagation, vertical window latches and
-sprite cycle budgets. All 315 match exactly under AddressSanitizer and
-UndefinedBehaviorSanitizer; all 315 also match in linked WebAssembly. Separate C
+sprite cycle budgets and screen-map fetches across VRAM banks. All 351 match exactly under AddressSanitizer and
+UndefinedBehaviorSanitizer; all 351 also match in linked WebAssembly. Separate C
 contract tests cover RGB555 arithmetic,
 unaligned input, affine reference updates and sign/wrap behavior.
 
@@ -463,3 +483,70 @@ build/venv/bin/python port/demo/build.py
 explicit linker override fails instead of silently using another toolchain.
 The platform port can reuse `find_wasm_ld()` and `build_ppu()` when combining
 subsystem builds. None of these tools modifies `src/` or the agbcc build.
+
+The `--slice --rtc --video-irqs` extension resolves the original VBlank table
+entry to `sub_08213FD8` compiled from C. Build it with the hardware-root override,
+then run `node port/tests/video_irq.cjs
+build/port/slice-wasm32-rtc-video/boot.wasm baserom.gba`. Three frames verify the
+original handler's BG scroll uploads, dialogue latches, upload flag, clock ticks
+and BIOS VBlank latch, plus IF acknowledgement and IME restoration. The test
+uses valid inactive sound state and leaves wireless uncreated; active audio/RFU
+callbacks are not covered. This focused resolver
+is a tested integration boundary, not the full game's callback registry.
+
+## Discarded return declarations
+
+`core/returns.py` records the actual integer return types of 25 frequently called
+functions. Generated sources and mirrored headers correct explicit `void`
+declarations for those functions; arguments and call sites are unchanged. Each
+build verifies the recorded type against its original C definition and fails
+clearly if integration changes that evidence. Other return/argument conflicts
+and indirect callback signatures remain unresolved.
+
+`python port/tests/run_returns_slice.py` reproduces the original wasm link error
+for `ParticlePool_Destroy` calling `Task_Kill`, then executes the original C
+call chain on host and wasm after the repair. No ROM is needed for this test.
+`python port/tests/run_returns.py --hardware-root ../cx-port-hw/port` recompiles
+all affected units and audits an existing full-game object sweep: 1,894 game
+units plus 14 core/device units compile; distinct linker conflicts fall from
+823 to 804, with no new conflicts and the same seven missing MP2K routines.
+Six corrected functions retain other ABI mismatches.
+
+`--link-game --compile-only --source PATH` can rebuild selected bound/MMIO
+objects without attempting a partial final link. The audit collects fatal
+signature diagnostics separately from missing symbols because LLD stops early
+on fatal warnings. Any diagnostic wasm output is deleted; the normal build
+continues to reject signature warnings. Results live in `build/port/returns/`.
+
+The same video-IRQ slice includes the original two-phase VCount handler
+`sub_08214144`. Run `node port/tests/vcount_irq.cjs
+build/port/slice-wasm32-rtc-video/boot.wasm baserom.gba` to check the comparison
+change from scanline 64 to 144, the dialogue-scroll write, phase reset and IRQ
+mask restoration. It checks exactly two VCount calls per frame, avoiding a
+duplicate HBlank notification. Register setup uses the exported device bus,
+just like generated game C. Sound state remains inactive in this test.
+
+The generated port-hw input renames only `hw_publish_io`'s implementation; its
+callers use a core C wrapper that observes the completed mapped write. This
+keeps sibling hardware sources unchanged and delivers affine notifications for
+CPU, immediate DMA, HBlank DMA and VBlank DMA publications. The wrapper handles
+unchanged values and partial register writes, not just differences between
+snapshots. A signature check rejects a changed hardware publication boundary.
+
+`node port/tests/affine_dma.cjs build/port/slice-wasm32-rtc-video/boot.wasm`
+requires a slice built with `--ppu-root`. Its synthetic mode-3 image proves that
+repeated identical HBlank writes reset BG2Y each line, then normal affine row
+stepping resumes after DMA is disabled. Native/wasm boot and RTC comparisons
+and original VBlank/VCount/solar IRQ tests still pass.
+
+Core timing owns DISPSTAT/VCOUNT and the interrupt masks/flags in mapped memory.
+Before bus access, elapsed-device updates and blanking events, the bridge copies
+those specific registers into port-hw's shadow without treating them as writes.
+This prevents stale scanline reads and avoids losing pending flags or interpreting
+them as write-one-to-clear acknowledgements.
+
+`python port/tests/run_display_bus.py --hardware-root ../cx-port-hw/port` verifies
+that a line-64 IRQ reads line 64 and the active comparison bit, a timer preserves
+a core-raised interrupt, and selective IF acknowledgement preserves other flags.
+The pre-fix evidence read line 63 and lost both kinds of pending flags. Core,
+native/wasm RTC, original video/solar IRQ and affine DMA regressions pass.

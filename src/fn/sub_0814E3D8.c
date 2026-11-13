@@ -14,7 +14,7 @@ void Sound_PlaySong(u32);
 u8 *Player_GetSpecialAttackDescriptor(s32);
 s32 ActorResponse_Apply(void *, s32);
 s32 Player_SpawnSelectedAttackProjectile(void *);
-void sub_081DAD94(s32, s32);
+void Projectile_SetEntryDirection(s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
 s32 Player_GetAttackEffectType(u32);
 #define BYTE(o)    (*(u8 *)(p + (o)))
@@ -90,7 +90,7 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
                 Sound_PlaySong(0x1F8);
             if (!HELD)
                 goto release;
-            sub_081DAD94(*(s8 *)(p + 0x2D), *(s32 *)(p + 0xC74));
+            Projectile_SetEntryDirection(*(s8 *)(p + 0x2D), *(s32 *)(p + 0xC74));
             ANIMATE(0x24);
             if (++*t >= HALF(0xC10)) {
                 BYTE(0xC0F) = 1;

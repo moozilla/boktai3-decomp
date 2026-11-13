@@ -1,7 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
 /* SceneActorAnimation_SelectDirectionalExtraFlags: Selects a profile animation with variant zero and combines direction-derived mirroring with entry flags and caller-supplied playback flags */
-#define SceneActorAnimation_SelectDirectionalExtraFlags sub_080762A8
 #define SceneActorAnimation_SelectDirectionalExtraFlags sub_080762A8
 void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationView *actor,
                                                      s32 index, u32 extraFlags)
@@ -15,6 +13,7 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationV
     u32 flags;
     u32 entryFlags;
     u8 *variantReload;
+    u16 variant;
     u32 force;
     u8 *restart;
     {
@@ -30,6 +29,7 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationV
         }
     }
     variantReload = &directionVariant;
+    variant = 0;
     flags = *mirrorPointer | extraFlags;
     entryFlags = entry->flags;
     selection = entry->value;
@@ -47,11 +47,7 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationV
             void *sequence = drawable->sequence;
             void *resource = (void *)drawable->resource;
             u32 selected = (u16)selection;
-            register u32 variant asm("r3");
-            u32 narrowFlags;
-            variant = 0;
-            narrowFlags = (u8)flags;
-            Anim_SetSequence(sequence, resource, selected, variant, narrowFlags);
+            Anim_SetSequence(sequence, resource, selected, (u8)variant, (u8)flags);
         }
         restart = &actor->restart;
     } else {

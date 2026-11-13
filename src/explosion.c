@@ -1,87 +1,62 @@
-#include "global.h"
+#include "explosion.h"
 
-void Sound_PlaySong(u32);
-
-s32 Collider_Refresh(u8 *);
-
-void Task_Kill(u8 *);
-
-static inline void frame(u8 *p)
+static inline void UpdateFrame(struct Explosion *explosion)
 {
-    *(u16 *)(p + 0x28) = *(u16 *)(p + 0xb6) >> 2;
+    explosion->sprite.frame = explosion->age >> 2;
 }
 
-s32 Explosion_Update(u8 *p)
+s32 Explosion_Update(struct Explosion *explosion)
 {
-    u16 *delay = (u16 *)(p + 0xb4);
+    u16 *delay = &explosion->delay;
     if (*delay)
         (*delay)--;
     else {
         u16 *age;
         u32 value;
-        frame(p);
-        value = *(u16 *)(p + 0xb6);
-        age = (u16 *)(p + 0xb6);
+        UpdateFrame(explosion);
+        value = explosion->age;
+        age = &explosion->age;
         if (value == 0) {
-            *(u32 *)(p + 0x18) &= ~1;
-            if (*(s16 *)(p + 0xba) == 0)
+            explosion->sprite.flags &= ~1;
+            if (explosion->silent == 0)
                 Sound_PlaySong(0x195);
         }
-        if (*age <= 7 && *(s16 *)(p + 0xb8) == 0)
-            Collider_Refresh(p + 0x60);
+        if (*age <= 7 && explosion->collisionDisabled == 0)
+            Collider_Refresh(&explosion->collider);
         (*age)++;
         if (*age > 23)
-            Task_Kill(p);
+            Task_Kill(explosion);
     }
     return 0;
 }
 
-void Sprite_Remove(u8 *);
-
-u32 Explosion_Destroy(u8 *p)
+u32 Explosion_Destroy(struct Explosion *explosion)
 {
-    Sprite_Remove(p + 0x18);
+    Sprite_Remove(&explosion->sprite);
     return 0;
 }
 
-struct Pair {
-    u32 a, b;
-};
-
-void AnimData_Load(u8 *, u32);
-
-void Sprite_Init(u8 *, u8 *, u32);
-
-void AnimData_SelectPaletteBank(u8 *, u32);
-
-static inline void setFields(u8 *p, u32 bit)
+static inline void SetSpriteHidden(struct ContactSwarmSprite *sprite, u32 bit)
 {
-    p[7] = bit;
-    *(u32 *)p |= bit;
+    sprite->priority = bit;
+    sprite->flags |= bit;
 }
 
-void Explosion_InitSprite(u8 *sprite, u8 *resource, struct Pair *pos, s32 frame)
+void Explosion_InitSprite(struct ContactSwarmSprite *sprite, struct ContactSwarmGraphics *resource,
+                          struct ContactPosition *position, s32 palette)
 {
     AnimData_Load(resource, 0x8639);
     Sprite_Init(sprite, resource, 0);
-    *(u16 *)(sprite + 0x10) = 0;
-    frame += 0x116;
-    AnimData_SelectPaletteBank(resource, frame);
-    *(struct Pair *)(sprite + 0x1c) = *pos;
-    setFields(sprite, 1);
+    sprite->frame = 0;
+    palette += 0x116;
+    AnimData_SelectPaletteBank(resource, palette);
+    sprite->position = *position;
+    SetSpriteHidden(sprite, 1);
 }
 
-struct ExplosionSize {
-    u32 x : 16, y : 16, z : 16;
-};
-
-void Collider_Init(u8 *, u32, u32, u32, u32, void *, void *);
-
-void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
-
-void Collider_SetCallback(u8 *, u32, u8 *);
-
-void Explosion_InitCollider(u8 *obj, u8 *collider, u32 flag, s32 a3, s32 a4, s32 a5, s32 a6)
+void Explosion_InitCollider(struct Explosion *explosion, struct ContactCollider *collider,
+                            u32 contactFlags, s32 power, s32 force, s32 reactionFlags,
+                            s32 hitDuration)
 {
     struct ExplosionSize size, offset;
 
@@ -90,15 +65,16 @@ void Explosion_InitCollider(u8 *obj, u8 *collider, u32 flag, s32 a3, s32 a4, s32
     size.z = 120;
     *(u32 *)&offset = 0;
     ((u32 *)&offset)[1] &= 0xFFFF0000;
-    Collider_Init(collider, 0, 0x2001, 0, (u16)flag, &size, &offset);
-    Collider_SetAttackProperties(collider, a3, a4, 0x210, a5, a6);
-    Collider_SetCallback(collider, 0, obj);
-    if (a3 == 0 && a4 == 0)
-        *(u16 *)(obj + 0xb8) = 1;
+    Collider_Init(collider, 0, 0x2001, 0, (u16)contactFlags, &size, &offset);
+    Collider_SetAttackProperties(collider, power, force, 0x210, reactionFlags, hitDuration);
+    Collider_SetCallback(collider, 0, explosion);
+    if (power == 0 && force == 0)
+        explosion->collisionDisabled = 1;
 }
 
-void Explosion_InitColliderWithFlags(u8 *obj, u8 *collider, u32 flag, s32 a3, s32 a4, s32 a5,
-                                     s32 a6, s32 a7)
+void Explosion_InitColliderWithFlags(struct Explosion *explosion, struct ContactCollider *collider,
+                                     u32 contactFlags, s32 collisionProperties, s32 power,
+                                     s32 force, s32 reactionFlags, s32 hitDuration)
 {
     struct ExplosionSize size, offset;
 
@@ -107,131 +83,129 @@ void Explosion_InitColliderWithFlags(u8 *obj, u8 *collider, u32 flag, s32 a3, s3
     size.z = 120;
     *(u32 *)&offset = 0;
     ((u32 *)&offset)[1] &= 0xFFFF0000;
-    Collider_Init(collider, 0, 0x2001, 0, (u16)flag, &size, &offset);
-    Collider_SetAttackProperties(collider, a4, a5, 0x200 | a3, a6, a7);
-    Collider_SetCallback(collider, 0, obj);
-    if (a4 == 0 && a5 == 0)
-        *(u16 *)(obj + 0xb8) = 1;
+    Collider_Init(collider, 0, 0x2001, 0, (u16)contactFlags, &size, &offset);
+    Collider_SetAttackProperties(collider, power, force, 0x200 | collisionProperties, reactionFlags,
+                                 hitDuration);
+    Collider_SetCallback(collider, 0, explosion);
+    if (power == 0 && force == 0)
+        explosion->collisionDisabled = 1;
 }
 
-void Explosion_InitSprite(u8 *, u8 *, struct Pair *, s32);
-
-void Explosion_InitCollider(u8 *, u8 *, u32, s32, s32, s32, s32);
-
-void Collider_SetPosition(u8 *, u8 *, u32);
-
-static inline void init(u16 *dest, u32 zero, u32 value)
+static inline void InitializeDelay(u16 *dest, u32 zero, u32 value)
 {
     *dest++ = value;
     *dest = zero;
 }
 
-s32 Explosion_Init(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5, s32 arg6, s32 frame,
-                   u32 arg8)
+s32 Explosion_Init(struct Explosion *explosion, struct ContactPosition *position, u32 contactFlags,
+                   s32 power, s32 force, s32 reactionFlags, s32 hitDuration, s32 palette, u32 delay)
 {
-    u8 *emitter;
-    Explosion_InitSprite(p + 0x18, p + 0x44, pos, frame);
-    emitter = p + 0x60;
-    Explosion_InitCollider(p, emitter, flag, duration, arg4, arg5 | 0x40000, arg6);
-    Collider_SetPosition(emitter, pos, 0);
-    init((u16 *)(p + 0xb4), 0, arg8);
+    struct ContactCollider *collider;
+    Explosion_InitSprite(&explosion->sprite, &explosion->graphics, position, palette);
+    collider = &explosion->collider;
+    Explosion_InitCollider(explosion, collider, contactFlags, power, force, reactionFlags | 0x40000,
+                           hitDuration);
+    Collider_SetPosition(collider, position, 0);
+    InitializeDelay(&explosion->delay, 0, delay);
     return 0;
 }
 
-void Explosion_InitColliderWithFlags(u8 *, u8 *, u32, s32, s32, s32, s32, s32);
-
-s32 Explosion_InitWithCollisionFlags(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5,
-                                     s32 arg6, s32 arg7, s32 frame, u32 arg9)
+s32 Explosion_InitWithCollisionFlags(struct Explosion *explosion, struct ContactPosition *position,
+                                     u32 contactFlags, s32 collisionProperties, s32 power,
+                                     s32 force, s32 reactionFlags, s32 hitDuration, s32 palette,
+                                     u32 delay)
 {
-    u8 *emitter;
-    Explosion_InitSprite(p + 0x18, p + 0x44, pos, frame);
-    emitter = p + 0x60;
-    Explosion_InitColliderWithFlags(p, emitter, flag, duration, arg4, arg5, arg6 | 0x40000, arg7);
-    Collider_SetPosition(emitter, pos, 0);
-    init((u16 *)(p + 0xb4), 0, arg9);
+    struct ContactCollider *collider;
+    Explosion_InitSprite(&explosion->sprite, &explosion->graphics, position, palette);
+    collider = &explosion->collider;
+    Explosion_InitColliderWithFlags(explosion, collider, contactFlags, collisionProperties, power,
+                                    force, reactionFlags | 0x40000, hitDuration);
+    Collider_SetPosition(collider, position, 0);
+    InitializeDelay(&explosion->delay, 0, delay);
     return 0;
 }
 
 /* Explosion_CreateImmediate: Allocates an explosion with default collision parameters and zero activation delay */
 
-
-u8 *Task_Create(u32, u32);
-
-void Task_SetCallbacks(u8 *, void *, void *);
-
-s32 Explosion_Init(u8 *, u8 *, u32, s32, s32, s32, s32, s32, u32);
-
-u8 *Explosion_CreateImmediate(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4)
+struct Explosion *Explosion_CreateImmediate(struct ContactPosition *position, u32 contactFlags,
+                                            s32 power, s32 force, s32 palette)
 {
-    u8 *obj = Task_Create(10, 188);
-    if (obj) {
-        Task_SetCallbacks(obj, Explosion_Update, Explosion_Destroy);
-        if (Explosion_Init(obj, pos, flag, duration, arg3, 262144, 60, arg4, 0) < 0) {
-            Task_Kill(obj);
+    struct Explosion *explosion = Task_Create(10, 188);
+    if (explosion) {
+        Task_SetCallbacks(explosion, Explosion_Update, Explosion_Destroy);
+        if (Explosion_Init(explosion, position, contactFlags, power, force, 262144, 60, palette,
+                           0) < 0) {
+            Task_Kill(explosion);
             return 0;
         }
     }
-    return obj;
+    return explosion;
 }
 
 /* Explosion_CreateDelayed: Allocates an explosion with default collision parameters and a caller-supplied activation delay */
 
-
-u8 *Explosion_CreateDelayed(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, u32 arg5)
+struct Explosion *Explosion_CreateDelayed(struct ContactPosition *position, u32 contactFlags,
+                                          s32 power, s32 force, s32 palette, u32 delay)
 {
-    u8 *obj = Task_Create(10, 188);
-    if (obj) {
-        Task_SetCallbacks(obj, Explosion_Update, Explosion_Destroy);
-        if (Explosion_Init(obj, pos, flag, duration, arg3, 262144, 60, arg4, arg5) < 0) {
-            Task_Kill(obj);
+    struct Explosion *explosion = Task_Create(10, 188);
+    if (explosion) {
+        Task_SetCallbacks(explosion, Explosion_Update, Explosion_Destroy);
+        if (Explosion_Init(explosion, position, contactFlags, power, force, 262144, 60, palette,
+                           delay) < 0) {
+            Task_Kill(explosion);
             return 0;
         }
     }
-    return obj;
+    return explosion;
 }
 
-u8 *Explosion_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5, s32 arg6,
-                     u32 arg7)
+struct Explosion *Explosion_Create(struct ContactPosition *position, u32 contactFlags, s32 power,
+                                   s32 force, s32 reactionFlags, s32 hitDuration, s32 palette,
+                                   u32 delay)
 {
-    u8 *obj = Task_Create(10, 188);
-    if (obj) {
-        Task_SetCallbacks(obj, Explosion_Update, Explosion_Destroy);
-        if (Explosion_Init(obj, pos, flag, duration, arg3, arg4, arg5, arg6, arg7) < 0) {
-            Task_Kill(obj);
+    struct Explosion *explosion = Task_Create(10, 188);
+    if (explosion) {
+        Task_SetCallbacks(explosion, Explosion_Update, Explosion_Destroy);
+        if (Explosion_Init(explosion, position, contactFlags, power, force, reactionFlags,
+                           hitDuration, palette, delay) < 0) {
+            Task_Kill(explosion);
             return 0;
         }
     }
-    return obj;
+    return explosion;
 }
 
-u8 *Explosion_CreateAt(void *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5, s32 frame,
-                       u32 delay)
+struct Explosion *Explosion_CreateAt(struct ContactPosition *position, u32 contactFlags, s32 power,
+                                     s32 force, s32 reactionFlags, s32 hitDuration, s32 palette,
+                                     u32 delay)
 {
-    u8 *obj = Task_Create(10, 188);
-    if (obj) {
-        Task_SetCallbacks(obj, Explosion_Update, Explosion_Destroy);
-        if (Explosion_Init(obj, pos, flag, duration, arg3, arg4, arg5, frame, delay) < 0) {
-            Task_Kill(obj);
+    struct Explosion *explosion = Task_Create(10, 188);
+    if (explosion) {
+        Task_SetCallbacks(explosion, Explosion_Update, Explosion_Destroy);
+        if (Explosion_Init(explosion, position, contactFlags, power, force, reactionFlags,
+                           hitDuration, palette, delay) < 0) {
+            Task_Kill(explosion);
             return 0;
         }
     }
-    *(u16 *)(obj + 0xba) = 1;
-    return obj;
+    explosion->silent = 1;
+    return explosion;
 }
 
-s32 Explosion_InitWithCollisionFlags(u8 *, u8 *, u32, s32, s32, s32, s32, s32, s32, u32);
-
-u8 *Explosion_CreateWithCollisionFlags(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4,
-                                       s32 arg5, s32 arg6, s32 arg7, u32 arg8)
+struct Explosion *Explosion_CreateWithCollisionFlags(struct ContactPosition *position,
+                                                     u32 contactFlags, s32 collisionProperties,
+                                                     s32 power, s32 force, s32 reactionFlags,
+                                                     s32 hitDuration, s32 palette, u32 delay)
 {
-    u8 *obj = Task_Create(10, 188);
-    if (obj) {
-        Task_SetCallbacks(obj, Explosion_Update, Explosion_Destroy);
-        if (Explosion_InitWithCollisionFlags(obj, pos, flag, duration, arg3, arg4, arg5, arg6, arg7,
-                                             arg8) < 0) {
-            Task_Kill(obj);
+    struct Explosion *explosion = Task_Create(10, 188);
+    if (explosion) {
+        Task_SetCallbacks(explosion, Explosion_Update, Explosion_Destroy);
+        if (Explosion_InitWithCollisionFlags(explosion, position, contactFlags, collisionProperties,
+                                             power, force, reactionFlags, hitDuration, palette,
+                                             delay) < 0) {
+            Task_Kill(explosion);
             return 0;
         }
     }
-    return obj;
+    return explosion;
 }

@@ -544,7 +544,7 @@ extern const u8 gUnk_0824F004[];
 
 void sub_08159164(s32);
 
-void GameState_SetEventFlag(u32);
+void Bestiary_UnlockEntry(u32);
 
 void Script_Call(u32, void *);
 
@@ -576,7 +576,7 @@ void Armor_FinalizeDefeat(struct ArmorDefeatActor *p)
         else if (v < 0)
             v = 0;
         H(gGameState, 0x58c) = v;
-        GameState_SetEventFlag(gUnk_0824F004[p->variant]);
+        Bestiary_UnlockEntry(gUnk_0824F004[p->variant]);
         script = p->defeatScript;
         if (script) {
             args.count = 8;

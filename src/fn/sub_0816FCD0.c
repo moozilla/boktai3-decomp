@@ -16,7 +16,7 @@ void PauseMenu_HidePromptIcons(void *);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
 void MenuDisplay_SetPaletteOverrides(void *, s32, s32, s32, s32);
 void SceneHud_RefreshActionIcons(void *);
-void sub_0816CDB8(void *, s32, s32);
+void Inventory_InitializeSelectionGrid(void *, s32, s32);
 void PauseMenu_ResetItemCursor(void *);
 void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
@@ -34,7 +34,7 @@ static inline void PauseMenu_BeginActionSelection(u8 *p)
     SceneHud_RefreshActionIcons(p);
     Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
     g = p + 0x4384;
-    sub_0816CDB8(g, 1, 0);
+    Inventory_InitializeSelectionGrid(g, 1, 0);
     PauseMenu_ResetItemCursor(p);
     SceneHud_GetActionIconPosition(p + 0x1620, p[0x4387]);
     SceneHud_ShowActionPreview(p);
@@ -48,7 +48,7 @@ static inline void PauseMenu_BeginSwapSelection(u8 *p)
 {
     SceneHud_RefreshActionIcons(p);
     Hud_SetInteractionCallback(p, PauseMenu_OnSwapSelectionUpdate, 1);
-    sub_0816CDB8(p + 0x4384, 1, 0);
+    Inventory_InitializeSelectionGrid(p + 0x4384, 1, 0);
     PauseMenu_ResetItemCursor(p);
     SceneHud_GetActionIconPosition(p + 0x1620, p[0x4387]);
     SceneHud_ShowActionPreview(p);
@@ -61,7 +61,7 @@ static inline void PauseMenu_BeginItemUseSelection(u8 *p)
     if (p[0x1414] == 1) {
         SceneHud_RefreshActionIcons(p);
         Hud_SetInteractionCallback(p, PauseMenu_OnItemUseSelectionUpdate, 1);
-        sub_0816CDB8(p + 0x4384, 1, 0);
+        Inventory_InitializeSelectionGrid(p + 0x4384, 1, 0);
         PauseMenu_ResetItemCursor(p);
         SceneHud_GetActionIconPosition(p + 0x1620, p[0x4387]);
         SceneHud_ShowActionPreview(p);

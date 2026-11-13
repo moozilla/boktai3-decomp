@@ -78,8 +78,8 @@ void sub_08159164(u32);
 void Player_RefreshLifeState(void *, s32);
 void ScaledShadow_Disable(void *);
 s32 SparkParticle_Spawn(const void *, u8, const void *, s32, s32, s32, s32, u32);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 s32 Mod(s32, s32);
 static inline void Ivy_ClearStart(struct SwordPhase *control, u32 bits)
 {
@@ -225,7 +225,7 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
                 arguments.count = 8;
                 arguments.values = values;
                 Script_Call(actor->script, &arguments);
-                GameState_SetEventFlag(BestiaryDisplay_GetEntryForActor(11, actor->bestiaryIndex));
+                Bestiary_UnlockEntry(Bestiary_GetEntryForActor(11, actor->bestiaryIndex));
             }
         }
     } else {

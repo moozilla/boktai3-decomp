@@ -49,6 +49,30 @@ class PinsScope(unittest.TestCase):
     def test_drafts_are_left_out(self):
         self.assertEqual(self.scope.function_reach(SOURCE, "Draft"), {})
 
+    def test_symbol_reaches_a_file_local_alias_without_unrelated_functions(self):
+        source = '#define Target sub_081FDCB0 // provisional name\n' + SOURCE
+        reach = self.scope.function_reach(source, "sub_081FDCB0")
+        self.assertEqual(set(reach), {"Target", "Helper"})
+        self.assertEqual(reach, self.scope.function_reach(source, "Target"))
+        a, b = reach["Target"]
+        self.assertIn('asm("r4")', source[a:b])
+        self.assertNotIn('asm("r3")', source[a:b])
+
+    def test_alias_chains_and_inline_helper_calls_are_resolved(self):
+        source = ("#define Target Middle\n#define Middle sub_081FDCB0\n"
+                  "#define AliasHelper Helper /* shared inline */\n"
+                  + SOURCE.replace("return Helper(x);", "return AliasHelper(x);"))
+        self.assertEqual(set(self.scope.function_reach(source, "sub_081FDCB0")),
+                         {"Target", "Helper", "#AliasHelper"})
+
+    def test_aliases_in_nonmatching_drafts_are_ignored(self):
+        source = "#ifdef NONMATCHING\n#define Target sub_081FDCB0\n#endif\n" + SOURCE
+        self.assertEqual(self.scope.function_reach(source, "sub_081FDCB0"), {})
+
+    def test_cyclic_aliases_terminate(self):
+        source = "#define Missing Cycle\n#define Cycle Missing\n" + SOURCE
+        self.assertEqual(self.scope.function_reach(source, "Missing"), {})
+
     def test_sites_outside_the_reach_are_not_offered(self):
         reach = self.scope.function_reach(SOURCE, "Target")
         lines = SOURCE.split("\n")

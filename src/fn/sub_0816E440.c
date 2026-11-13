@@ -4,7 +4,7 @@
 void SceneHud_RefreshActionIcons(void *);
 void SceneHud_UpdateActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0816CDB8(void *, int, int);
+void Inventory_InitializeSelectionGrid(void *, int, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
@@ -46,7 +46,7 @@ void MenuTransition_UpdateTimedMessage(u8 *p)
         SceneHud_RefreshActionIcons(p);
         Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
         q = p + 0x4384;
-        sub_0816CDB8(q, 1, 0);
+        Inventory_InitializeSelectionGrid(q, 1, 0);
         a = p + 0x1620;
         SceneHud_GetActionIconPosition(a, p[0x4387]);
         SceneHud_ShowActionPreview(p);

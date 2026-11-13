@@ -15,7 +15,7 @@ void Presentation_ApplyIndexedGraphicData(s32, void *, void *);
 void SceneHud_RefreshActionIcons(void *);
 void SceneHud_UpdateActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0816CDB8(void *, int, int);
+void Inventory_InitializeSelectionGrid(void *, int, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
@@ -51,7 +51,7 @@ void SceneHud_UpdateTimedMessage(struct SceneHudState *p)
         SceneHud_RefreshActionIcons(p);
         Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
         q = (u8 *)p + 0x4384;
-        sub_0816CDB8(q, 1, 0);
+        Inventory_InitializeSelectionGrid(q, 1, 0);
         SceneHud_GetActionIconPosition((u8 *)p + 0x1620, ((u8 *)p)[0x4387]);
         SceneHud_ShowActionPreview(p);
         Hud_SaveGridSelection(q);

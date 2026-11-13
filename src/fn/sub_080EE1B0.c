@@ -1,4 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
+#include "game_state.h"
 #include "scene_actor_behavior.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -11,16 +11,29 @@
  * it revives (restores health, SceneActorReaction_PlayHiddenCue); otherwise the full defeat:
  * cue or six-spark burst, terrain and position scripts, event flag, kill counters per
  * category (saturating at 9999, plus one counter per collider reaction flag) and the reward.
- * Pin: the spark table. Kill counters are an if/else (its two stores raise the counter
+ * Kill counters are an if/else (its two stores raise the counter
  * pointer above the reaction flags; cross-jumping merges them). The random table is read through
  * its literal address (REGALLOC.md, "Reload rotation"); the CpuSet source shares a struct
  * with the script values so that it takes the first stack slot. */
 
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
+#include "scene_actor_part_burst.h"
+union HitSparkTable {
+    const u16 *table;
+    struct {
+        u16 offset;
+        u8 page;
+        u8 region;
+    } encoded;
+};
+static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
+{
+    return r->table;
+}
+
 void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 void sub_08159164(u32);
 void Player_RefreshLifeState(u32, u32);
@@ -96,16 +109,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
     actor->behavior2AA = b;
     actor->counter2AC = 0;
     actor->field2B1 = 1;
-}
-static inline u32 RandomFrom(const u16 *table, u32 wrap, u32 bits)
-{
-    u32 index = (gRandomIndex + 1) & wrap;
-    u32 v;
-    gRandomIndex = index;
-    index *= 2;
-    v = *(const u16 *)(index + (u32)table);
-    v &= bits;
-    return v + 1;
 }
 static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
@@ -248,11 +251,11 @@ void SceneActorReaction_PlayHiddenCue(void);
 static inline u8 SaveFlag(u32 maskInput)
 {
     u32 mask = maskInput;
-    if (*(u32 *)((u8 *)gGameState + 0x868) & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }
-static inline void ClearPos(void *dest, vu32 *zero)
+static inline void ClearPos(void *dest, u32 *zero)
 {
     *zero = 0;
     CpuSet((void *)zero, dest, 0x05000002);
@@ -308,7 +311,7 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             actor->flags2C0 = m | actor->flags2C0;
         }
         SceneActorPlacement_PlayCategoryEventSound(actor);
-        ClearPos(&vec, (vu32 *)&buf.zero);
+        ClearPos(&vec, &buf.zero);
         Polar(&vec, actor->field2B6, Rand() & 0x1F);
         vec.y = (Rand() & 0x1F) + 0x30;
         sub_08127590(&actor->body.position, &vec, 0xD638, 0x99DD, 10, 0x1E, 2, 0, 0x12A, 0, 0, 0, 0,
@@ -369,24 +372,21 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         categoryp = &actor->category;
     } else {
         struct ContactPackedVector range;
-        register const u16 *table asm("sb");
+        const u16 *table;
+        union HitSparkTable source = {0};
         u8 category;
         range.x = 80;
         range.y = 60;
         range.z = 60;
-        table = gRandomTable;
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x20,
-                            count, life, size = 2, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x40,
-                            count, life, size, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x5E,
-                            count, life, size, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x80,
-                            count, life, size, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xC4,
-                            count, life, size, 1);
-        SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xF0,
-                            count, life, size, 1);
+        source.encoded.offset = (u16)RANDOM_TABLE_ADDR;
+        source.encoded.page = (u8)(RANDOM_TABLE_ADDR >> 16);
+        source.encoded.region = (u8)(RANDOM_TABLE_ADDR >> 24);
+        table = ReadSparkTable(&source);
+        {
+            u8 firstCount = SceneActorEffects_NextSparkCount(table);
+            SceneActorEffects_SpawnDefeatSparks(actor, (const struct ContactPosition *)&range,
+                                                table, firstCount);
+        }
         category = actor->category;
         categoryp = &actor->category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
@@ -413,7 +413,7 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         }
     }
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(*categoryp - 11) > 2)
-        GameState_SetEventFlag(BestiaryDisplay_GetEntryForActor(*categoryp, actor->paletteOffset));
+        Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->paletteOffset));
     SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
     SetState(actor, 1, 0, 2);
     COUNT(0x87C);

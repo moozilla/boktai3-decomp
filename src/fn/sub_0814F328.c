@@ -12,7 +12,7 @@ void Sound_PlaySong(u32);
 u8 *Player_GetSpecialAttackDescriptor(s32);
 s32 ActorResponse_Apply(void *, s32);
 s32 Player_SpawnSelectedAttackProjectile(void *);
-void sub_081DAD94(s32, s32);
+void Projectile_SetEntryDirection(s32, s32);
 void ActorSequence_Begin(void *, s32, s32);
 s32 Player_GetAttackEffectType(u32);
 #define HELD       (p->inputKeys[0] & 2)

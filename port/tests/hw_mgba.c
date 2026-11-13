@@ -1,5 +1,6 @@
 /* Optional independent oracle. Reads the user's ROM; writes no ROM data. */
 #include "hw.h"
+#include "hw_rtc.h"
 #include "gba/types.h"
 #include <mgba/core/core.h>
 #include <mgba/internal/arm/arm.h>
@@ -196,6 +197,37 @@ static int mixer_state_oracle(struct mCore *core)
     return 0;
 }
 
+static int mixer_reverb_oracle(struct mCore *core)
+{
+    static const unsigned reverbs[] = {1, 32, 64, 127};
+    unsigned counter, level, i, cases = 0;
+    for (counter = 0; counter <= 3; ++counter) for (level = 0; level < 4; ++level) {
+        struct SoundInfo sound = {0};
+        int16_t pcm[32];
+        for (i = 0; i < 0x350; ++i) core->busWrite8(core, 0x02000000 + i, 0);
+        sound.reverb = (uint8_t)reverbs[level];
+        sound.pcmDmaCounter = (uint8_t)counter;
+        sound.pcmDmaPeriod = 3;
+        for (i = 0; i < PCM_DMA_BUF_SIZE * 2; ++i) {
+            sound.pcmBuffer[i] = (int8_t)((i * 71 % 201) - 100);
+            core->busWrite8(core, 0x02000350 + i, (uint8_t)sound.pcmBuffer[i]);
+        }
+        core->busWrite32(core, 0x02000000, ID_NUMBER);
+        core->busWrite8(core, 0x02000004, sound.pcmDmaCounter);
+        core->busWrite8(core, 0x02000005, sound.reverb);
+        core->busWrite8(core, 0x0200000b, sound.pcmDmaPeriod);
+        core->busWrite32(core, 0x02000010, 16);
+        core->busWrite32(core, 0x02000028, 0x0822fe19);
+        if (rom_call(core, 0x0822f1c4, 0, 0, 0) || hw_mp2k_mix(&sound, pcm, 16, 8000)) return 1;
+        for (i = 0; i < PCM_DMA_BUF_SIZE * 2; ++i) if ((int8_t)core->busRead8(core, 0x02000350 + i) != sound.pcmBuffer[i]) {
+            fprintf(stderr, "Reverb counter %u level %u byte %u differs\n", counter, reverbs[level], i); return 1;
+        }
+        ++cases;
+    }
+    printf("Original mixer reverb: PASS (%u ring/feedback cases, exact full buffer)\n", cases);
+    return 0;
+}
+
 static int bios_memory_oracle(struct mCore *core)
 {
     struct ARMCore *cpu = core->cpu;
@@ -234,6 +266,20 @@ static int bios_memory_oracle(struct mCore *core)
         }
         ++cases;
     }
+    for (variant = 1; variant <= 7; ++variant) for (count = 1; count <= 32; count += 3) {
+        for (i = 0; i < 80; ++i) {
+            actual[i] = source[i];
+            core->busWrite32(core, 0x02000000 + i * 4, source[i]);
+        }
+        CpuFastSet(actual + 16, actual + 16 + variant, count);
+        core->busWrite16(core, 0x0203e000, 0xdf0c);
+        core->busWrite16(core, 0x0203e002, 0x4770);
+        if (rom_call(core, 0x0203e000, 0x02000040, 0x02000040 + variant * 4, count)) return 1;
+        for (i = 0; i < 80; ++i) if (actual[i] != core->busRead32(core, 0x02000000 + i * 4)) {
+            fprintf(stderr, "CpuFastSet overlap %u count %u word %u differs\n", variant, count, i); return 1;
+        }
+        ++cases;
+    }
     {
         static const struct { unsigned swi, size; uint8_t bytes[16]; } streams[] = {
             {0x13, 12, {0x28,4,0,0,1,0xc0,'A','B',0,0,0,0x60}},
@@ -254,6 +300,251 @@ static int bios_memory_oracle(struct mCore *core)
         }
     }
     printf("mGBA BIOS memory/arithmetic: PASS (%u cases: Sqrt, Div, copies, Huffman, RL, delta)\n", cases);
+    return 0;
+}
+
+static int wave_bank_oracle(struct mCore *core)
+{
+    static Hw hw;
+    unsigned bank, i;
+    hw_init(&hw, NULL);
+    hw_write16(&hw, HW_IO_BASE + 0x84, 0x80);
+    core->busWrite16(core, HW_IO_BASE + 0x84, 0x80);
+    for (bank = 0; bank < 2; ++bank) {
+        hw_write16(&hw, HW_IO_BASE + 0x70, (uint16_t)(bank << 6));
+        core->busWrite16(core, HW_IO_BASE + 0x70, (uint16_t)(bank << 6));
+        for (i = 0; i < 16; ++i) {
+            uint8_t value = (uint8_t)(bank * 100 + i * 3);
+            hw_write8(&hw, HW_IO_BASE + 0x90 + i, value);
+            core->busWrite8(core, HW_IO_BASE + 0x90 + i, value);
+        }
+    }
+    for (bank = 0; bank < 2; ++bank) {
+        hw_write16(&hw, HW_IO_BASE + 0x70, (uint16_t)(bank << 6));
+        core->busWrite16(core, HW_IO_BASE + 0x70, (uint16_t)(bank << 6));
+        for (i = 0; i < 16; ++i) if (hw_read8(&hw, HW_IO_BASE + 0x90 + i) != core->busRead8(core, HW_IO_BASE + 0x90 + i)) {
+            fprintf(stderr, "Wave bank %u byte %u differs\n", bank, i); return 1;
+        }
+    }
+    puts("mGBA wave RAM: PASS (both CPU-visible banks)");
+    return 0;
+}
+
+static int64_t rtc_oracle_seconds = INT64_C(1709251199);
+static int64_t rtc_oracle_now(void *user) { (void)user; return rtc_oracle_seconds; }
+static void rtc_oracle_sample(struct mRTCSource *source) { (void)source; }
+static time_t rtc_oracle_unix(struct mRTCSource *source) { (void)source; return (time_t)rtc_oracle_seconds; }
+static struct mRTCSource rtc_fixed_source = {rtc_oracle_sample, rtc_oracle_unix, NULL, NULL};
+
+static int rtc_sdk_oracle(struct mCore *core)
+{
+    struct GBA *gba = core->board;
+    static Hw hw;
+    HwHost host = {0};
+    HwRtcRecord record = {0};
+    unsigned i;
+    setenv("TZ", "UTC", 1); tzset();
+    gba->rtcSource = &rtc_fixed_source;
+    GBAHardwareInitRTC(&gba->memory.hw);
+    host.unix_time = rtc_oracle_now;
+    hw_init(&hw, &host); hw_bind(&hw); Rtc_Initialize();
+    if (rom_call(core, 0x08248970, 0, 0, 0) || rom_call(core, 0x08248a78, 0, 0, 0)) return 1;
+    if (rom_call(core, 0x08248c70, 0x02003000, 0, 0) || !Rtc_ReadDateTime(&record)) return 1;
+    for (i = 0; i < 7; ++i) if (((uint8_t *)&record)[i] != core->busRead8(core, 0x02003000 + i)) {
+        fprintf(stderr, "RTC SDK byte %u: original %u / port %u\n", i, core->busRead8(core, 0x02003000 + i), ((uint8_t *)&record)[i]); return 1;
+    }
+    if (rom_call(core, 0x08248afc, 0x02003000, 0, 0) || !Rtc_ReadStatus(&record) || record.status != core->busRead8(core, 0x02003007)) return 1;
+    for (i = 0; i < 24; ++i) {
+        rtc_oracle_seconds = INT64_C(1709164800) + i * 3600;
+        if (rom_call(core, 0x08248c70, 0x02003000, 0, 0) || !Rtc_ReadDateTime(&record) ||
+            record.hour != core->busRead8(core, 0x02003004) || hw.rtc_data[4] != gba->memory.hw.rtc.time[4]) return 1;
+    }
+    record.status = 7;
+    core->busWrite8(core, 0x02003007, 7);
+    if (rom_call(core, 0x08248bc8, 0x02003000, 0, 0) || !Rtc_WriteStatus(&record) ||
+        rom_call(core, 0x08248afc, 0x02003000, 0, 0) || !Rtc_ReadStatus(&record) ||
+        record.status != core->busRead8(core, 0x02003007)) return 1;
+    if (rom_call(core, 0x08248988, 0, 0, 0)) return 1;
+    Rtc_Protect();
+    if (rom_call(core, 0x08248c70, 0x02003000, 0, 0) || ((struct ARMCore *)core->cpu)->gprs[0] != 0 || Rtc_ReadDateTime(&record)) return 1;
+    Rtc_Initialize();
+    if (rom_call(core, 0x08248970, 0, 0, 0) || rom_call(core, 0x082489a0, 0, 0, 0) ||
+        (uint8_t)((struct ARMCore *)core->cpu)->gprs[0] != Rtc_CheckAndReset()) return 1;
+    core->busWrite16(core, 0x080000c4, 1); core->busWrite16(core, 0x080000c4, 5);
+    core->busWrite16(core, 0x080000c6, 7);
+    if (rom_call(core, 0x08249040, 0x60, 0, 0)) return 1;
+    core->busWrite16(core, 0x080000c4, 1);
+    hw_write16(&hw, 0x080000c4, 1); hw_write16(&hw, 0x080000c4, 5);
+    hw_write16(&hw, 0x080000c6, 7); Rtc_WriteCommandByte(0x60); hw_write16(&hw, 0x080000c4, 1);
+    if (rom_call(core, 0x08248afc, 0x02003000, 0, 0) || !Rtc_ReadStatus(&record)) return 1;
+    if (record.status != 0 || core->busRead8(core, 0x02003007) != 0) return 1;
+    if (rom_call(core, 0x082489a0, 0, 0, 0) ||
+        (uint8_t)((struct ARMCore *)core->cpu)->gprs[0] != 0x11 || Rtc_CheckAndReset() != 0x11) return 1;
+    hw_bind(NULL);
+    puts("Original RTC SDK: PASS (24 UTC hours, date/status reads, status write, protection, reset/probe recovery)");
+    return 0;
+}
+
+static int bios_layout_oracle(struct mCore *core)
+{
+    struct ObjWire { struct ObjAffineSrcData transform; uint16_t reserved; } source[4];
+    static const unsigned strides[] = {2,8,32};
+    static const uint32_t offsets[] = {0,3,0x80000003};
+    uint8_t actual[520];
+    unsigned i, j, stride, source_bits, dest_bits, offset, cases = 0;
+    _Static_assert(sizeof(struct ObjWire) == 8, "BIOS object affine wire stride");
+    for (i = 0; i < 4; ++i) {
+        source[i].transform.xScale = (int16_t)(256 + i * 64);
+        source[i].transform.yScale = (int16_t)(512 - i * 32);
+        source[i].transform.rotation = (uint16_t)(i << 14);
+        source[i].reserved = 0x1234;
+    }
+    for (i = 0; i < sizeof(source); ++i) core->busWrite8(core, 0x02000000 + i, ((uint8_t *)source)[i]);
+    for (stride = 0; stride < 3; ++stride) {
+        for (i = 0; i < sizeof(actual); ++i) { actual[i] = 0xa5; core->busWrite8(core, 0x02001000 + i, 0xa5); }
+        ObjAffineSet(&source[0].transform, actual + 6, 4, (int32_t)strides[stride]);
+        swi(core, 15, 0x02000000, 0x02001006, 4, strides[stride]);
+        for (i = 0; i < sizeof(actual); ++i) if (actual[i] != core->busRead8(core, 0x02001000 + i)) {
+            fprintf(stderr, "Object affine stride %u byte %u differs\n", strides[stride], i); return 1;
+        }
+        ++cases;
+    }
+    for (source_bits = 1; source_bits <= 8; source_bits *= 2)
+    for (dest_bits = source_bits; dest_bits <= 32; dest_bits *= 2)
+    for (offset = 0; offset < 3; ++offset) {
+        uint8_t input[] = {0,1,2,3,0xa5,0x80,0xff,0x11};
+        uint8_t info[8] = {8,0,(uint8_t)source_bits,(uint8_t)dest_bits,0,0,0,0};
+        uintptr_t registers[] = {(uintptr_t)input, (uintptr_t)actual, (uintptr_t)info, 0};
+        for (j = 0; j < 4; ++j) info[4 + j] = (uint8_t)(offsets[offset] >> (j * 8));
+        for (i = 0; i < 8; ++i) {
+            core->busWrite8(core, 0x02000000 + i, input[i]);
+            core->busWrite8(core, 0x02000400 + i, info[i]);
+        }
+        for (i = 0; i < sizeof(actual); ++i) { actual[i] = 0xa5; core->busWrite8(core, 0x02001000 + i, 0xa5); }
+        if (hw_bios_call(16, registers)) return 1;
+        core->busWrite16(core, 0x0203e000, 0xdf10); core->busWrite16(core, 0x0203e002, 0x4770);
+        if (rom_call(core, 0x0203e000, 0x02000000, 0x02001000, 0x02000400)) return 1;
+        for (i = 0; i < sizeof(actual); ++i) if (actual[i] != core->busRead8(core, 0x02001000 + i)) {
+            fprintf(stderr, "BitUnPack %u to %u offset %08x byte %u differs\n", source_bits, dest_bits, offsets[offset], i); return 1;
+        }
+        ++cases;
+    }
+    printf("mGBA BIOS layouts: PASS (%u object-affine/BitUnPack cases, full buffers)\n", cases);
+    return 0;
+}
+
+static uint8_t dma_oracle_ram[0x20000];
+static uint8_t *dma_oracle_map(void *user, uint32_t address, size_t size)
+{
+    (void)user;
+    if (address < 0x02000000 || address - 0x02000000 > sizeof(dma_oracle_ram) ||
+        size > sizeof(dma_oracle_ram) - (address - 0x02000000)) return NULL;
+    return dma_oracle_ram + (address - 0x02000000);
+}
+
+static int dma_oracle(struct mCore *core)
+{
+    static const unsigned counts[] = {3,17,33};
+    static Hw hw;
+    HwHost host = {0};
+    unsigned channel, width, source_mode, dest_mode, repeat, n, i, cases = 0;
+    host.map = dma_oracle_map;
+    hw_init(&hw, &host);
+    for (channel = 0; channel < 4; ++channel) core->busWrite16(core, HW_IO_BASE + 0xba + channel * 12, 0);
+    for (channel = 0; channel < 4; ++channel) for (width = 2; width <= 4; width += 2)
+    for (source_mode = 0; source_mode < 3; ++source_mode) for (dest_mode = 0; dest_mode < 4; ++dest_mode)
+    for (repeat = 0; repeat < 2; ++repeat) for (n = 0; n < 3; ++n) {
+        uint32_t reg = HW_IO_BASE + 0xb0 + channel * 12;
+        uint32_t control = 0xc000 | (width == 4 ? 0x400 : 0) | source_mode << 7 | dest_mode << 5 | repeat << 9;
+        unsigned guard;
+        for (i = 0; i < 0x400; ++i) {
+            dma_oracle_ram[i] = (uint8_t)(i * 37);
+            dma_oracle_ram[0x10000 + i] = 0xa5;
+            core->busWrite8(core, 0x02000000 + i, dma_oracle_ram[i]);
+            core->busWrite8(core, 0x02010000 + i, 0xa5);
+        }
+        core->busWrite16(core, HW_IO_BASE + 0x202, 0xffff);
+        hw_write16(&hw, HW_IO_BASE + 0x202, 0xffff);
+        core->busWrite32(core, reg, 0x02000200);
+        core->busWrite32(core, reg + 4, 0x02010200);
+        hw_write32(&hw, reg, 0x02000200);
+        hw_write32(&hw, reg + 4, 0x02010200);
+        core->busWrite32(core, reg + 8, control << 16 | counts[n]);
+        hw_write32(&hw, reg + 8, control << 16 | counts[n]);
+        for (guard = 0; guard < 10000 && (core->busRead16(core, reg + 10) & 0x8000); ++guard) core->step(core);
+        if (guard == 10000 || hw_read16(&hw, reg + 10) & 0x8000) {
+            fprintf(stderr, "DMA %u did not finish\n", channel); return 1;
+        }
+        for (i = 0; i < 0x400; ++i) if (dma_oracle_ram[0x10000 + i] != core->busRead8(core, 0x02010000 + i)) {
+            fprintf(stderr, "DMA channel %u width %u source %u dest %u repeat %u count %u byte %u differs\n",
+                    channel, width, source_mode, dest_mode, repeat, counts[n], i); return 1;
+        }
+        if ((hw_read16(&hw, HW_IO_BASE + 0x202) & (0x100 << channel)) !=
+            (core->busRead16(core, HW_IO_BASE + 0x202) & (0x100 << channel))) return 1;
+        ++cases;
+    }
+    printf("mGBA DMA: PASS (%u immediate transfer cases, destination bytes and completion IRQ)\n", cases);
+    return 0;
+}
+
+static uint8_t solar_oracle_threshold;
+static void solar_oracle_sample(struct GBALuminanceSource *source) { (void)source; }
+static uint8_t solar_oracle_read(struct GBALuminanceSource *source) { (void)source; return solar_oracle_threshold; }
+static struct GBALuminanceSource solar_fixed_source = {solar_oracle_sample, solar_oracle_read};
+
+static int solar_oracle(struct mCore *core)
+{
+    static const uint8_t thresholds[] = {0,1,20,80,180,232,255};
+    struct GBA *gba = core->board;
+    static Hw hw;
+    unsigned setting, pulse, edge, cases = 0;
+    hw_init(&hw, NULL);
+    GBAHardwareInitLight(&gba->memory.hw);
+    gba->luminanceSource = &solar_fixed_source;
+    core->busWrite16(core, 0x080000c8, 1); hw_write16(&hw, 0x080000c8, 1);
+    core->busWrite16(core, 0x080000c6, 7); hw_write16(&hw, 0x080000c6, 7);
+    for (setting = 0; setting < sizeof(thresholds); ++setting) {
+        solar_oracle_threshold = thresholds[setting];
+        hw_set_solar(&hw, thresholds[setting]);
+        core->busWrite16(core, 0x080000c4, 2); hw_write16(&hw, 0x080000c4, 2);
+        for (pulse = 0; pulse < 260; ++pulse) for (edge = 0; edge < 2; ++edge) {
+            unsigned original, portable;
+            core->busWrite16(core, 0x080000c4, (uint16_t)edge);
+            hw_write16(&hw, 0x080000c4, (uint16_t)edge);
+            original = core->busRead16(core, 0x080000c4) & 8;
+            portable = hw_read16(&hw, 0x080000c4) & 8;
+            if (original != portable) {
+                fprintf(stderr, "Solar threshold %u pulse %u edge %u: mGBA %u / port %u\n", thresholds[setting], pulse, edge, original, portable); return 1;
+            }
+            ++cases;
+        }
+    }
+    printf("mGBA solar GPIO: PASS (%u edges at seven thresholds)\n", cases);
+    return 0;
+}
+
+static int display_compare_oracle(struct mCore *core)
+{
+    static Hw hw;
+    unsigned line = core->busRead16(core, HW_IO_BASE + 6);
+    uint16_t mismatch = (uint16_t)(((line + 1) % 228) << 8 | 0x20);
+    uint16_t match = (uint16_t)(line << 8 | 0x20);
+    unsigned original_flag = core->busRead16(core, HW_IO_BASE + 4) & 4;
+    hw_init(&hw, NULL); hw_scanline_start(&hw, line);
+    {
+        uint16_t values[] = {mismatch, match, (uint16_t)(match | 7), (uint16_t)(mismatch | 7), match};
+        unsigned i;
+        core->busWrite16(core, HW_IO_BASE + 0x202, 0xffff); hw_write16(&hw, HW_IO_BASE + 0x202, 0xffff);
+        for (i = 0; i < sizeof(values) / sizeof(*values); ++i) {
+            core->busWrite16(core, HW_IO_BASE + 4, values[i]); hw_write16(&hw, HW_IO_BASE + 4, values[i]);
+            if ((core->busRead16(core, HW_IO_BASE + 4) & 4) != original_flag ||
+                (core->busRead16(core, HW_IO_BASE + 4) & 4) != (hw_read16(&hw, HW_IO_BASE + 4) & 4) ||
+                (core->busRead16(core, HW_IO_BASE + 0x202) & 4) != (hw_read16(&hw, HW_IO_BASE + 0x202) & 4)) {
+                fprintf(stderr, "VCOUNT compare write %u differs\n", i); return 1;
+            }
+        }
+    }
+    puts("mGBA display compare: PASS (deferred match flags, no write-triggered IRQ)");
     return 0;
 }
 
@@ -312,10 +603,17 @@ int main(int argc, char **argv)
         }
         ++tests;
     }
+    if (wave_bank_oracle(core)) return 1;
     if (bios_memory_oracle(core)) return 1;
+    if (bios_layout_oracle(core)) return 1;
     if (mixer_oracle(core)) return 1;
     if (mixer_state_oracle(core)) return 1;
+    if (mixer_reverb_oracle(core)) return 1;
     if (eeprom_oracle(core)) return 1;
+    if (rtc_sdk_oracle(core)) return 1;
+    if (dma_oracle(core)) return 1;
+    if (solar_oracle(core)) return 1;
+    if (display_compare_oracle(core)) return 1;
     rom_file = fopen(argv[1], "rb");
     if (!rom_file || fseek(rom_file, 0, SEEK_END)) return 2;
     rom_size = ftell(rom_file); rewind(rom_file);

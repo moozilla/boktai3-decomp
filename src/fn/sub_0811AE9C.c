@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 struct PackedMotionPosition {
@@ -21,21 +20,11 @@ struct TerrainMotion {
 s32 Terrain_GetCellClearance(s16 *);
 s32 Terrain_GetCellHighByte(s16 *);
 void Memory_Clear(void *, u32);
-static inline u32 TerrainCell_FlagBits(u32 raw, u32 mask)
-{
-    return raw & mask;
-}
 static inline s32 Abs(s32 x)
 {
     if (x < 0)
         x = -x;
     return x;
-}
-static inline s32 Query(union MotionSample *p)
-{
-    register s32 result asm("r1") = Terrain_GetCellClearance(p->coordinates);
-    asm("" : "+r"(result));
-    return result;
 }
 static inline s32 Offset(s32 z)
 {
@@ -46,8 +35,7 @@ static inline s32 Offset(s32 z)
 void Terrain_ResolveActorMotion(struct TerrainMotion *p)
 {
     union MotionSample old, next;
-    s32 y, floor, difference;
-    u32 bits;
+    s32 y, floor, difference, clearance;
     u32 shape, flags;
     p->collision = 0;
     p->previousOffset = p->verticalOffset;
@@ -69,30 +57,22 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
         p->collision = 2;
     }
     Terrain_GetCellClearance(old.coordinates);
-    floor = Query(&next);
-    y = (s16)next.bits.y;
-    floor -= Offset((s16)next.bits.z);
+    clearance = Terrain_GetCellClearance(next.coordinates);
+    y = next.coordinates[1];
+    floor = clearance - Offset(next.coordinates[2]);
     if (floor - y < -8) {
         next.bits.z = p->z >> 12;
         p->deltaZ = 0;
         p->collision |= 2;
-        floor = Query(&next);
-        y = (s16)next.bits.y;
-        floor -= Offset((s16)next.bits.z);
+        clearance = Terrain_GetCellClearance(next.coordinates);
+        y = next.coordinates[1];
+        floor = clearance - Offset(next.coordinates[2]);
     }
-    bits = Terrain_GetCellHighByte(next.coordinates);
-    {
-        u32 source = bits;
-        register u32 mask asm("r3");
-        flags = source;
-        mask = 0xF00;
-        asm("" : "+r"(mask));
-        mask = TerrainCell_FlagBits(flags, mask);
-        asm("" : "+r"(mask));
-        shape = mask;
-        flags &= 0xF000;
-    }
-    difference = floor - (s16)y;
+    flags = Terrain_GetCellHighByte(next.coordinates);
+    shape = 0xF00;
+    shape &= flags;
+    flags &= 0xF000;
+    difference = floor - y;
     if (y >= floor) {
         p->y = floor << 12;
         if (Abs(p->verticalOffset >> 8) > 8)
@@ -103,11 +83,10 @@ void Terrain_ResolveActorMotion(struct TerrainMotion *p)
         if (p->deltaY > 0)
             p->deltaY = 0;
     } else {
-        s32 offset = -(difference << 12);
-        asm("" : "+r"(offset));
+        s32 offset = ~((difference << 12) - 1);
         p->verticalOffset = offset;
         p->y = floor << 12;
-        if ((y = p->deltaY >= 0) && (Abs(offset) >> 12) <= 3)
+        if (p->deltaY >= 0 && Abs(offset) >> 12 <= 3)
             p->verticalOffset = 0;
     }
     p->previousShape = p->cellFlags;

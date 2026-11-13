@@ -72,7 +72,7 @@ s32 Task4E01_SpawnImpactChildren(struct Task4E01Projectile *p)
             i++;
         } while (i <= 2);
     }
-    PlayerCue_StepSequenceEnded(&p->sprite, &p->sequence);
+    PlayerCue_StepSequenceEnded(&p->sprite, &p->runtime.sequence);
     Task4E01_BeginImpactAnimation(p);
     return 0;
 }

@@ -34,6 +34,12 @@ class LandPins(unittest.TestCase):
     def test_debug_nop_counts_as_a_barrier(self):
         self.assertEqual(land.added_concessions(DRAFT, "int F(void) { DEBUG_NOP(); return 0; }\n"), (0, 1))
 
+    def test_volatile_typedef_match_adds_a_concession(self):
+        ordinary = "int F(void) { u32 zero = 0; Copy(&zero); return 0; }\n"
+        volatile = ordinary.replace("u32 zero", "vu32 zero")
+        self.assertEqual(land.added_concessions(ordinary, volatile), (0, 1))
+        self.assertEqual(land.added_concessions(volatile, volatile), (0, 0))
+
     def test_an_empty_if_counts_unless_its_body_is_debug_print(self):
         self.assertEqual(land.added_concessions(DRAFT, "int F(void) { if (G(1)) { } return 0; }\n"), (0, 1))
         self.assertEqual(land.added_concessions(DRAFT, "int F(void) { if (G(1)) {\n DEBUG_PRINT();\n }\n"

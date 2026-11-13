@@ -23,7 +23,7 @@ struct OrbitEffectParams {
 };
 struct OrbitEffectSprite {
     u32 flags;
-    u8 unk_04[4];
+    u8 unk_04[2], rotation, priority;
     u8 scaleX, scaleY;
     u8 unk_0A[6];
     u16 frame;

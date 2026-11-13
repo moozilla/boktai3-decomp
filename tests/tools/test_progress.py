@@ -10,6 +10,19 @@ import progress
 
 
 class ProgressTests(unittest.TestCase):
+    def test_volatile_typedef_local_and_helper_affect_progress(self):
+        source = ("struct Hardware { vu32 source, destination, control; };\n"
+                  "static inline void Fill(void *destination) {\n"
+                  "    vu32 zero = 0;\n"
+                  "    Copy(&zero, destination);\n"
+                  "}\n"
+                  "void Direct(void) { vu16 value = 1; Send(&value); }\n"
+                  "void Wrapper(void *destination) { Fill(destination); }\n"
+                  "void HardwareOnly(vu32 *reg) { *reg = 1; }\n")
+        scores = progress.unit_scores(source, ["Direct", "Wrapper", "HardwareOnly"])
+        self.assertEqual(set(scores), {"Direct", "Wrapper"})
+        self.assertTrue(all(score < 100 for score in scores.values()))
+
     def test_inline_static_helper_concessions_reach_caller(self):
         for qualifiers in ("static inline", "inline static"):
             with self.subTest(qualifiers=qualifiers):

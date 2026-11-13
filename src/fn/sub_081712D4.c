@@ -3,7 +3,7 @@
 void sub_08170D78(void *);
 void SceneHud_UpdateStatComparison(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0816CDB8(void *, int, int);
+void Inventory_InitializeSelectionGrid(void *, int, int);
 void Hud_SetGridPosition(void *, int, int);
 void Hud_SaveGridSelection(void *);
 void PauseInventory_RefreshConsumableDescription(void *);
@@ -28,7 +28,7 @@ void SceneHud_OpenStatComparison(struct SceneHudState *p, s32 reset)
     sub_08170D78(p);
     Hud_SetInteractionCallback(p, SceneHud_UpdateStatComparison, 1);
     input = p->actionInput;
-    sub_0816CDB8(input, 1, 0);
+    Inventory_InitializeSelectionGrid(input, 1, 0);
     if (reset)
         Hud_SetGridPosition(input, 0, 0);
     Hud_SaveGridSelection(input);

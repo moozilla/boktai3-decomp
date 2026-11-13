@@ -4,7 +4,7 @@
 void SceneHud_RefreshActionIcons(void *);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void PauseMenu_OnItemUseSelectionUpdate(void);
-void sub_0816CDB8(void *, int, int);
+void Inventory_InitializeSelectionGrid(void *, int, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowActionPreview(void *);
 void PauseMenu_ClearSpriteFlags(void *, s32, u32);
@@ -23,7 +23,7 @@ void SceneHud_UpdateActionFeedback(struct SceneHudState *p)
     else {
         SceneHud_RefreshActionIcons(p);
         Hud_SetInteractionCallback(p, PauseMenu_OnItemUseSelectionUpdate, 1);
-        sub_0816CDB8(p->actionInput, 1, 0);
+        Inventory_InitializeSelectionGrid(p->actionInput, 1, 0);
         SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
         SceneHud_ShowActionPreview(p);
         PauseMenu_ClearSpriteFlags(p, 5, 1);

@@ -121,7 +121,6 @@ void PaletteFade_ApplyBrightenedPalette(struct Player *);
 void sub_0813C9B4(struct Player *, const u16 *, s32, s32, s32);
 s32 WirelessGame_GetSelectedEquipmentEffect(s32);
 s32 Player_GetUsableEnchantment(struct Player *);
-// MATCHING_CONCESSION: register-pinning
 
 static inline s32 Player_GetPalettePulseWeight(const u16 *timer)
 {
@@ -226,7 +225,6 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: alternate overlay ramp, pulse and fade modes.
 #define Player_UpdateAlternateVisualPalette sub_0813CE20
 
@@ -639,16 +637,18 @@ static inline void Player_StoreStatusTimer(u16 *timers, s32 offset, u32 duration
 }
 void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
 {
-    register s32 kind asm("r3") = inputKind;
+    u32 kind = inputKind;
     u32 duration = inputDuration;
     s32 offset;
     switch (kind) {
-        case 0: {
-            u32 count = p->movementModifierActive;
-            offset = 0;
-            if (count && p->movementModifierKind != 3)
-                Player_EmitQueuedEffects(p);
-        } break;
+        case 0:
+            do {
+                u32 count = p->movementModifierActive;
+                offset = 0;
+                if (count && p->movementModifierKind != 3)
+                    Player_EmitQueuedEffects(p);
+                goto store;
+            } while (0);
         case 1:
             if (p) {
                 u32 flags = Player_ReadStatusBonusBits(&p->statBonusFlags, 0x20000000);
@@ -657,7 +657,7 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
                     break;
             }
             {
-                register s32 scaled asm("r0") = kind * 2;
+                s32 scaled = kind * 2;
                 u16 *timers = p->scriptStatus;
                 u32 current = *(u16 *)((u8 *)timers + scaled);
                 offset = scaled;
@@ -676,6 +676,7 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
         default:
             return;
     }
+store:
     Player_StoreStatusTimer(p->scriptStatus, offset, duration);
 }
 
@@ -759,8 +760,6 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
     }
     return mode;
 }
-
-// MATCHING_CONCESSION: register-pinning
 
 s32 Player_SelectFlashingVisualMode(struct Player *p, s32 mode)
 {
@@ -2224,7 +2223,6 @@ static inline void SetModeFlag(struct Player *p)
 }
 
 // Preserved owner/request registers differ; one exit reloads the mode.
-// MATCHING_CONCESSION: register-pinning
 
 s32 Player_SelectRequestedActionMode(struct Player *p)
 {

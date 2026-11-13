@@ -2,7 +2,7 @@
 #include "engine.h"
 #include "scene_actor_terrain.h"
 
-/* TimedEffect_HandleCollision.c */
+/* TimedEffect_OnContact.c */
 struct TimedEffectCollision {
     u8 unknown00[0xA];
     u16 flags;
@@ -13,7 +13,7 @@ void Task4E01_SpawnImpactChildren(void);
 void Boss_FinalExplosions(void);
 void Task4E01_StartTerminalAnimation(void *);
 
-void TimedEffect_HandleCollision(struct TimedEffectCollision *self,
+void TimedEffect_OnContact(struct TimedEffectCollision *self,
                                  struct TimedEffectCollision *other, struct TimedEffect *entry)
 {
     struct TimedEffectConfig *config = &entry->config;
@@ -84,7 +84,7 @@ void TimedEffect_InitEntry(void *manager, struct TimedEffectInitView *entry, s32
         Collider_Init(collider, 0, 0x2101, 0, 16, (u8 *)entry + 0x40, (u8 *)entry + 0x48);
     else
         Collider_Init(collider, 0, 0x2101, 0, 1, (u8 *)entry + 0x40, (u8 *)entry + 0x48);
-    Collider_SetCallback(collider, TimedEffect_HandleCollision, entry);
+    Collider_SetCallback(collider, TimedEffect_OnContact, entry);
     Collider_SetAttackProperties(collider, config->resourceId, config->cost, config->mode,
                                  config->contactFlags, config->option);
 }

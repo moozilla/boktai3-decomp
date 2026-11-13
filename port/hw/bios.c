@@ -114,10 +114,27 @@ void CpuSet(const void *source, void *destination, uint32_t control)
     }
 }
 
-void CpuFastSet(const void *src, void *dst, uint32_t control)
+void CpuFastSet(const void *source, void *destination, uint32_t control)
 {
+    const uint8_t *src = (const uint8_t *)((uintptr_t)source & ~(uintptr_t)3);
+    uint8_t *dst = (uint8_t *)((uintptr_t)destination & ~(uintptr_t)3);
     uint32_t count = ((control & 0x1fffff) + 7) & ~7u;
-    CpuSet(src, dst, (control & 0x01000000) | 0x04000000 | count);
+    uint8_t block[32];
+    unsigned i;
+    if (!count) return;
+    if (control & 0x01000000)
+        for (i = 0; i < sizeof(block); ++i) block[i] = src[i & 3];
+    /* Keep the rounded count outside CpuSet's 21-bit mask. Each BIOS transfer
+     * loads all eight words before storing them, including overlapping ranges. */
+    while (count) {
+        if (!(control & 0x01000000)) {
+            for (i = 0; i < sizeof(block); ++i) block[i] = src[i];
+            src += sizeof(block);
+        }
+        for (i = 0; i < sizeof(block); ++i) dst[i] = block[i];
+        dst += sizeof(block);
+        count -= 8;
+    }
 }
 
 int hw_bios_decompress(unsigned swi, const void *source, size_t src_size,

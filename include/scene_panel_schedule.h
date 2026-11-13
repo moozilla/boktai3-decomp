@@ -24,7 +24,7 @@ void *ScenePanelEffect_Create(u16, s32);
 void *SceneEffect_CreateEntryTask(u16, const void *);
 void SceneBurstEmitter_RequestCleanup(void *);
 void SceneOrbitHazard_Activate(void *);
-void sub_08190B10(void *, const void *, const void *);
+void Nidhoggr_CreateOwnedSeekingEffect(void *, const void *, const void *);
 extern const u8 gUnk_0824DEA4[];
 void ScenePanel_TickHazardSpawner(struct ScenePanel *);
 void ScenePanel_TickAngleBurst(struct ScenePanel *);

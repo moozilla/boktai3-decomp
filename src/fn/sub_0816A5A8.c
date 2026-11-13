@@ -1,4 +1,3 @@
-#define ScenePanel_SetCallback Hud_SetUpdateCallback
 #include "global.h"
 struct PanelSprite {
     u8 anim[8];

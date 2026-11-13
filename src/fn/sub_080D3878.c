@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 // confidence=low: defeat control emits effects, runs scripts, and returns the actor to idle.
@@ -14,11 +13,24 @@ void SceneStimulus_AddUntagged(s32, s32, s32, s32, s32);
 /* Mummy defeat: hides the drawable, emits defeat effects, runs the script and returns to idle. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
+#include "scene_actor_part_burst.h"
+union HitSparkTable {
+    const u16 *table;
+    struct {
+        u16 offset;
+        u8 page;
+        u8 region;
+    } encoded;
+};
+static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
+{
+    return r->table;
+}
+
 struct MummyDefeatControl {
     u8 unknown0[8];
     u16 timer;
@@ -113,17 +125,6 @@ static inline u32 Random4(void)
     v &= 3;
     return v + 1;
 }
-/* The first spark's index arithmetic; the burst below passes the table explicitly. */
-static inline u32 RandomFrom(const u16 *table)
-{
-    u32 index = (gRandomIndex + 1) & 1023;
-    u32 v;
-    gRandomIndex = index;
-    index *= 2;
-    v = *(const u16 *)((u32)table + index);
-    v &= 3;
-    return v + 1;
-}
 static inline void StoreSpeed(struct MummyDefeatActor *a, u32 v)
 {
     a->field1EA = v;
@@ -201,21 +202,18 @@ void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
                 rangeB.y = 60;
                 rangeB.z = 60;
                 {
-                    register const u16 *table asm("sl") = gRandomTable;
-                    s32 duration;
-                    s32 scale;
-                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x20, 4,
-                                        duration = 20, scale = 2, 1);
-                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x40, 4,
-                                        duration, scale, 1);
-                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x5E, 4,
-                                        duration, scale, 1);
-                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x80, 4,
-                                        duration, scale, 1);
-                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0xC4, 4,
-                                        duration, scale, 1);
-                    SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0xF0, 4,
-                                        duration, scale, 1);
+                    union HitSparkTable source = {0};
+                    const u16 *table;
+                    source.encoded.offset = (u16)RANDOM_TABLE_ADDR;
+                    source.encoded.page = (u8)(RANDOM_TABLE_ADDR >> 16);
+                    source.encoded.region = (u8)(RANDOM_TABLE_ADDR >> 24);
+                    table = ReadSparkTable(&source);
+                    {
+                        u8 firstCount = SceneActorEffects_NextSparkCount(table);
+                        SceneActorEffects_SpawnDefeatSparks((void *)actor,
+                                                            (const struct ContactPosition *)&rangeB,
+                                                            table, firstCount);
+                    }
                 }
                 category = actor->category;
                 if (category == 4 || category == 1 || category == 5 || category == 7 ||
@@ -244,8 +242,8 @@ void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
         u32 zero;
         u32 test = (*motionFlags) & mask;
         if (!test && (u32)(actor->category - 11) > 2)
-            GameState_SetEventFlag(
-                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+            Bestiary_UnlockEntry(
+                Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
         actor->fieldAA = 0;
         zero = 0;
         {

@@ -1,16 +1,19 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 #include "sun_orb_effect.h"
 
 s32 RisingActor_AdvanceHeight(struct OrbitEffect *actor, s32 slot)
 {
-    register register s32 zero asm("r4");
+    union {
+        s32 value;
+        s16 halves[2];
+    } zero;
     void *state;
     actor->scale += 0x2000;
     state = &actor->volley;
-    zero = 0;
-    ((struct OrbitVolleyState *)state)->lowered = zero;
+    zero.halves[0] = 0;
+    zero.halves[1] = 0;
+    ((struct OrbitVolleyState *)state)->lowered = zero.value;
     if (actor->scale > 0x5ffff) {
         s32 mask;
         state = &actor->collider;

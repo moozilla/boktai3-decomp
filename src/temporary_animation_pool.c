@@ -23,7 +23,7 @@ s32 TemporaryAnimationPool_Destroy(struct TemporaryAnimationPool *pool)
     struct TemporaryAnimationSlot *slot = pool->slots;
     s32 remaining = 15;
     do {
-        if (slot->animation.unknown4[0])
+        if (slot->animation.active)
             Anim_Remove(&slot->animation);
         --remaining;
         ++slot;

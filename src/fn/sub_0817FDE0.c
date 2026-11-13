@@ -39,7 +39,7 @@ void ProximityVolume_InitializeCallbacks(void *);
 void ProximityVolume_SetParameter(void *, s32);
 void CameraFollow_Initialize(void *, u32, void *, s32);
 void SceneActors_SetDamageCallback(u8 *, void *, void *, s32);
-void sub_0817A7C8(void);
+void ActorPosition_BeginReaction(void);
 void ProximityVolume_TranslateBounds(void *, void *);
 void Task4E01_Destroy(void);
 void *TimedEffect_GetOrCreateManager(s32);
@@ -380,7 +380,7 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
         camera->timer = zero;
         camera->distance = distance;
     }
-    SceneActors_SetDamageCallback((u8 *)actor, boss->attackCollider, sub_0817A7C8, boss->damage);
+    SceneActors_SetDamageCallback((u8 *)actor, boss->attackCollider, ActorPosition_BeginReaction, boss->damage);
     ProximityVolume_TranslateBounds(boss->bounds, volumePosition);
     Task4E01_Destroy();
     TimedEffect_GetOrCreateManager(0x11);

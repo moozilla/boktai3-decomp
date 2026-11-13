@@ -14,11 +14,11 @@ void ScenePanel_BeginRandomTransition(void *);
 void PauseMenu_BeginTypeThirteenItemUse(void *);
 void PauseMenu_BeginTypeFourteenItemUse(void *);
 void SceneHud_BeginSelectedActionTransfer(void *);
-void sub_0816D634(void *, u32);
+void PauseMenu_ApplyItemSlot(void *, u32);
 void SceneHud_RefreshActionIcons(void *);
 void SceneHud_UpdateActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-void sub_0816CDB8(void *, int, int);
+void Inventory_InitializeSelectionGrid(void *, int, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowActionPreview(void *);
 void Hud_SaveGridSelection(void *);
@@ -48,13 +48,13 @@ void SceneHud_DispatchSelectedAction(struct SceneHudState *p)
                 Sound_PlaySong(0x182);
             goto apply;
         case 8:
-            if (gUnk_08E61280[index].unknown6 == 2)
+            if (gUnk_08E61280[index].effectValueA == 2)
                 sub_0816E570(p);
             else
-                PauseMenu_BeginCharacterItemUse(p, gUnk_08E61280[index].unknown6);
+                PauseMenu_BeginCharacterItemUse(p, gUnk_08E61280[index].effectValueA);
             break;
         case 10:
-            PauseMenu_BeginVitalRatioExchange(p, gUnk_08E61280[index].unknown6);
+            PauseMenu_BeginVitalRatioExchange(p, gUnk_08E61280[index].effectValueA);
             break;
         case 11:
             ScenePanel_BeginRandomTransition(p);
@@ -63,11 +63,11 @@ void SceneHud_DispatchSelectedAction(struct SceneHudState *p)
         case 12:
             Sound_PlaySong(0x10D);
         apply:
-            sub_0816D634(p, p->actionSelection);
+            PauseMenu_ApplyItemSlot(p, p->actionSelection);
             SceneHud_RefreshActionIcons(p);
             Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
             q = p->actionInput;
-            sub_0816CDB8(q, 1, 0);
+            Inventory_InitializeSelectionGrid(q, 1, 0);
             SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
             SceneHud_ShowActionPreview(p);
             Hud_SaveGridSelection(q);

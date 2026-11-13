@@ -195,6 +195,9 @@ integer address (see the literal survey below).
 unit with several functions and no FUNC named, the function `scope.py FILE FUNC` compiled
 last; before, it fell to the file's last definition and explained an unrelated insn):
 
+* the statement's source file and line, including inline headers. Header text comes
+  from the compiled preprocessor input; a header line number never selects an
+  unrelated line in the caller. Main-file text keeps the author's spelling;
 * the ROM and draft instruction, and which pseudo holds the differing register
   (operands matched by position between the lreg dump and the same insn after
   reload, so local-alloc pseudos are covered). When the listing shows a pure
@@ -2018,6 +2021,107 @@ Each was read from the compiler source and confirmed on a live draft.
    `why` now recognizes this address-reuse form from its pre/post-reload patterns and the
    uninterrupted copy/add history, including labels, calls and intervening definitions.
 
+153. **A final early return can fix PRE stack slots earlier in a function.**
+  LinkMenu_WaitForReadyPeers (08109F1C) needed two independent changes. Taking
+  the address of its local initialization-state pointer postpones the first
+  shared p+45 expression, restoring PRE insertion order (ready, presence,
+  countdown) without the r4 pin. Removing the timer barrier then leaves 11/11
+  differences: N=511 real insns gives T=255, whose reaching-register numbering
+  assigns the wrong stack slots. AGBCC_GCSE_T=257 MATCHES; preorder predicts
+  N=512..515 as the nearest natural interval. Writing the final event dispatch
+  as `if (*event != 2) return 0;` followed by its two calls restores the full
+  stock-compiler match. Repeating a return inside the original positive arm
+  does not match. Simple timer-expression rewrites do not change the result.
+  Distinguish expression-index insertion order from hash-order pseudo/slot
+  numbering: changing T alone did not fix the original fully clean draft.
+
+154. **Addressing a pointer only in one arm can preserve a call-argument copy.**
+  LinkMenu_WaitSelectionMode (0810A540) had a memory barrier between two mode
+  tests and a pointer barrier before the mode-4 state call. Reading the first
+  selection through `struct State **address = &p` prevents PRE from sharing
+  the selection-pointer load, removing the memory barrier. The clean draft
+  then has 2/2 differences: r0's state-pointer move is shared after the mode
+  argument, whereas the ROM copies it separately before each mode constant.
+  In the mode-4 arm, `struct State **slot = &pp; *slot = p;` preserves that
+  separate copy and fully matches. A branch-local addressed source pointer
+  and a pointer union initializer also match. Addressing pp at function
+  scope does not match; scope matters. Narrow mode arguments and reordered
+  inline-helper parameters do not fix the common tail.
+190. **Building an inline helper result from two halfword stores can keep equal zeros separate.**
+   In Vanargand_UpdateCaptureSetup (081A8E08), the pending-cue zero must remain in ip for
+   case 2, while the position height zero stays in r4 and supplies the other two cases.
+   `union { u32 value; u16 halves[2]; } height; height.halves[0] = y;
+   height.halves[1] = 0;` inside SetPositionAndGetHeight, followed by storing and returning
+   `height.value`, preserves that separation and removes the height pin. The only call passes
+   zero for y. A full-width union initializer folds back to the shared-zero draft; narrow
+   arrays and a union with a signed halfword result do not give the same code. The stock
+   compiler and whole-unit check match the 320-byte function without concessions.
+
+191. **Separate endpoint updates in inline helpers can keep a loop endpoint out of a long-lived
+   index's CSE class.** SceneGrid_ScanColumns (0806E7CC) matched after its post-loop endpoint
+   helpers used `column++; column -= count;` and `column--; column += count;` for the two
+   directions. CSE no longer makes the long-lived column canonical over the endpoint;
+   flow deletes the intermediate copies. Steps' measured life falls from 85 to 83 before
+   REG_EQUIV doubling, which moves its priority just above row without eight pins and a
+   barrier. `CSE_NOCANON=column` and `AGBCC_PRI=steps:+4` independently confirm the mechanism.
+   Reassociating the updates into one expression, or declaring the intermediate outside the
+   inline helper, loses the effect.
+
+192. **Repeat a real retry increment on one rejection edge to raise its counter's reference
+   density before jump2 merges the tail.** sub_0806F06C (0806F06C) needs its 20-attempt scan
+   counter in r5. Replacing the rejected-X `continue` with `if (++i <= 19) goto repeat;
+   return 0;`, retaining the loop's normal increment for its other rejection paths, adds
+   counted references before the duplicate retry tail disappears. This removes DEBUG_NOP;
+   `AGBCC_PRI=i:+920` confirms the baseline allocation diagnosis. Repeating only the Y or Z
+   rejection also matches, but repeating all three adds too many references. This is a
+   counter-specific instance of fact 91, with no extra final instructions.
+
+193. **A real case body that exits a loop through a shared tail leaves a loop-end boundary
+   before the next case, blocking CSE's singleton-edge follow.** sub_0813D834 (0813D834)
+   matched without its kind and scaled-offset pins with case zero written as
+   `do { ...; goto store; } while (0);`, and `store:` naming the common timer store
+   after the switch. cse_end_of_basic_block scans backward from case one's label;
+   NOTE_INSN_LOOP_END stops that scan before it reaches the preceding BARRIER.
+   CSE therefore cannot substitute the switch equality into case one's indexed
+   timer access. A plain braced case with `break` allows the substitution;
+   `CSE_NOFOLLOW=2` confirms the decision. A second entry edge also blocks it but
+   leaves a comparison in the final output. The nonempty do/while/for forms all
+   match; placing the timer store and return inside the loop changes the tail.
+230. **One local shared across disjoint phases combines their register conflicts.**
+   HomingProjectile_UpdateDefaultState (081FF454) had three copies of a facing inline,
+   each preserving the second flip-byte address. The first two naturally used r7 because
+   their live one value occupied r5; the last used r5, with two differing instructions.
+   `AGBCC_FORCE=saved#2:7` matched. Raising its priority did not. Writing the three facing
+   blocks in the caller with one shared saved pointer combines the conflicts and matches
+   all 1256 bytes without the final r5-clobber barrier. Sharing it with unrelated vector
+   pointers disturbed allocation broadly; share corresponding roles first. In
+   Presentation_UpdateDropShakeBlink (081E2910), the analogous phase scratch union holds
+   a destination pointer while moving and a visibility mask while blinking. The mask's
+   r2 conflict gives the moving stores r3 and removes three pins. Keep the flag clears
+   constant (`&= ~1`): complementing the union member selects BIC instead of the ROM's
+   AND and changes allocation. The union form with constant clears matches all 576 bytes.
+
+231. **Partial union writes can keep an early conflict after combine replaces them with zero.**
+   RisingActor_AdvanceHeight (081FDAF4) needs a zero store in r4 while ordinary scalar zero
+   takes r0. `AGBCC_FORCE=zero:4` diagnoses the last pin after sharing the component pointer.
+   With `union { s32 value; s16 halves[2]; } zero`, set both halves to zero and assign value
+   to the destination. Flow counts the word live from entry through the argument and scale
+   registers (15 insns); combine subsequently folds the partial writes into a single zero
+   set, and allocation chooses r4. Returning the word leaves one different instruction
+   (`mov r0,r4`); returning literal zero matches all 76 bytes. A whole-word assignment or
+   initializer does not preserve the early conflicts. Both halves are initialized before
+   the word is read; no uninitialized C value or volatile access is needed.
+
+232. **Split unrelated vector lifetimes, then retain a typed view for nearby configuration fields.**
+   ProjectilePool_Update (08202730) used one vector pointer for velocity and position; it
+   spilled despite both uses being short. The diagnostic `AGBCC_PRI=v:+4100,o:+600` matched.
+   Splitting velocity and position into separate locals removes the spill but leaves nine
+   address/reload differences. A local struct view beginning at params.baseY and containing
+   baseY, spriteFlag, script, sequence and persist lets the height and persistence reads
+   share their actual field base. Together the changes match all 796 bytes and remove both
+   barriers. Keep the complete intervening layout rather than expressing persist through
+   a raw offset; the view lives in the unit and needs no shared-header change.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
@@ -2424,3 +2528,55 @@ which is exactly `10:1`. Not tested.
    and resolves named allocation knobs through the head. Two separately recorded quantities
    or an operand without a death note are not merged. `AGBCC_FORCE=address:3` changes the
    actual placement; it diagnoses the local tie but does not match the whole function.
+
+
+175. **A save/step join can preserve a round-trip pointer copy, but its incoming values
+   must not all be copies of one pseudo.** AnimatedParticles_Create has `saved = a;
+   a = saved` at animation setup: the ROM copies r4 to r8 and immediately back. With
+   ordinary locals, jump2's delete_noop_moves removes the second copy (fact 81).
+   Giving type 5 its own `saved = first; goto stepAnimation;` path, and letting the
+   other arms join at `saveAnimation: saved = a; stepAnimation: a = saved;`, creates
+   the needed join. The default call falls into saveAnimation, so flow's USE 0
+   also prevents it from absorbing the type-5 call tail (fact 39). This removed
+   the saved-state barrier while the old pin remained.
+   Removing that pin still needs the type-5 pointer `first` to be a separate
+   branch-local variable. If all arms use the same `a`, GCSE copy propagation
+   changes the step helper's `state = saved` back to `state = a` across the join;
+   the register copy disappears before allocation. Separate incoming pointer
+   definitions prevent that propagation, and the same join then removes the pin
+   with a stock 1176-byte match. CSE canonicalization and PRE knobs do not diagnose
+   this GCSE copy propagation; compare addressof and gcse dumps directly. The two
+   independent call-tail barriers remained after this partial match.
+
+224. **Duplicate command loads across animation arms, but mask their result after the join.**
+   ActorGroup_CreateFromScript's ordinary playback helper first differed by 55/55,
+   mostly because its command pointer was allocated after the long-lived actor pointer.
+   Loading the next command in both the reverse and forward arms raises the command
+   pointer's reference count before jump2 merges the copies. Keeping the mask in those
+   arms left `ands r1,r0; strb r1`, where ROM uses r0. Assigning the loaded command to a
+   word local in each arm, then masking that joined value with
+   `DisplaySequence_MaskCommand(word, 15)`, restores the operand tie. The script-argument
+   loop also needed a normal do loop: its goto form swapped the index and destination
+   registers. Together these forms remove all five pins and the timer-mask barrier,
+   with no duplicated machine code or extra loads.
+
+225. **A byte cast at a call can move argument preparation before the stack argument.**
+   Collectible_StartDeath was two instruction-order differences from a match after
+   adopting DisplaySequence_StepSprite. `Anim_SetSequence(state, data, a, b, 0)` copied
+   a/b into r2/r3 after storing the fifth argument and moving state into r0; the ROM
+   copies them first. `(u8)a, (u8)b` at the call restores that order without extra
+   instructions. Both values come from a small switch (a = 0/3/5, b = 0/1), so narrowing
+   is exact. Declaring the locals as byte/halfword values alone did not do it; ordinary
+   wrapper helpers and a struct argument also left the two differences. Masks with
+   255 or 65535 added instructions, so do not substitute those for the cast blindly.
+211. **An inserted two-address operand copy is not a logged dying-input tie.**
+   In SceneInput_TickChoice (0805E1D0), cse changes the first AND from
+   `accepted & keys` to `keys & confirm`, where confirm is the known constant 1.
+   Regmove inserts a new copy `accepted = keys` immediately before the AND.
+   A later logged tie at the cancel-key test mentions keys too, but does not
+   explain this copy: AGBCC_NOTIE on either AND leaves the first copy unchanged.
+   Scope now recognizes a newly inserted adjacent copy whose destination becomes
+   the operation's two-address input, before searching for logged ties involving
+   the same registers. Existing copies, label-separated copies and copies of a
+   different operand are not treated as this evidence. Inspect cse operand order
+   and narrowing modes here; a later tie's allocation advice is a false lead.

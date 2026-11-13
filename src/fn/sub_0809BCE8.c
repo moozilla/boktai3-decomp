@@ -2,8 +2,8 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SceneActorControl_ConsumeLiftFlagPenalty(void *);
 static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *target)
 {
@@ -87,8 +87,8 @@ void Lun_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         {
             u32 m = 0x4000;
             if (!(actor->flags2D4 & m) && (u32)(actor->category - 11) > 2)
-                GameState_SetEventFlag(
-                    BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+                Bestiary_UnlockEntry(
+                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
         }
         SetControl(actor, 16, SceneActorControl_OnIdle);
         SetState(actor, 1, 0, 2);

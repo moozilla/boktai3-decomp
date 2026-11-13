@@ -6,8 +6,8 @@
 #include "scene_actor_terrain.h"
 #include "script_utility.h"
 /* SceneActorControl_CompleteBlinkOut: keeps terrain timers and height updated while the drawable blinks (shadow follows visibility); when the blink expires runs the context and defeat scripts, sets the defeat event flag, goes idle unless flags2D4 & 0x4000, and hides the drawable and shadow (provisional name) */
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 void SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *);
 void SceneActorMovement_UpdateHeight(struct SceneActorRegistryResetView *);
@@ -71,8 +71,8 @@ void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *acto
             u16 test = value & mask;
             flags = &actor->flags2D4;
             if (!test && (u32)(actor->category - 11) > 2)
-                GameState_SetEventFlag(
-                    BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+                Bestiary_UnlockEntry(
+                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
         }
         {
             u32 mask = 0x4000;

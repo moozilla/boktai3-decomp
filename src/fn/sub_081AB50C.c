@@ -68,7 +68,7 @@ u32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 s32 ScenePair_CountPositiveCounters(void *);
 void PositionMotion_InitParameterizedApproach(void *, void *, struct VanargandPoint *, u32, u32,
                                               u32, u32, u32);
-void GameState_SetEventFlag(u32);
+void Bestiary_UnlockEntry(u32);
 
 static inline void setOrigin(s16 *origin, s16 x, s16 y, s16 z)
 {
@@ -211,9 +211,9 @@ void Vanargand_RunDefeatSequence(struct Vanargand *p)
                 self->field5B8 = zero;
                 self->field5BA = zero;
                 advance(p, 8);
-                GameState_SetEventFlag(0x42);
-                GameState_SetEventFlag(0x43);
-                GameState_SetEventFlag(0x52);
+                Bestiary_UnlockEntry(0x42);
+                Bestiary_UnlockEntry(0x43);
+                Bestiary_UnlockEntry(0x52);
                 p->scriptId = p->script;
                 SceneActors_RunSecondEventScript(p, p->eventPosition);
                 p->finished = 1;
