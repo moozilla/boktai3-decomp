@@ -1,46 +1,32 @@
-// Tentative names: PalFade_Start sets up a timed fade between two 16-colour palette rows.
-#include "global.h"
+#include "actor_stats.h"
 #include "render.h"
 #include "modifier_list.h"
+
+// Tentative names: PalFade_Start sets up a timed fade between two 16-color palette rows.
+
 s32 Div(s32, s32);
+
 void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 flags, s32 mode);
-struct PalFade {
-    u16 out[32];
-    u16 timer, duration, p1, p2, p3, p4;
-    s16 acc[3][32];
-    s16 delta[3][32];
-    u32 flags;
-};
-struct PalFadeRenderer {
-    u8 unknown0[0x48];
-    struct PalFade *fade;
-    u8 unknown4C[0x60 - 0x4C];
-};
-struct PalFadeOwner {
-    u8 unknown0[0x7E];
-    u16 recoveryValue;
-    struct PalFadeRenderer *renderers;
-    u8 unknown84[0x348 - 0x84];
-    struct PalFade fade;
-};
+
 static inline s32 Trunc5(s32 v)
 {
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
+
 void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 flags, s32 mode)
 {
-    struct PalFade *f = &((struct PalFadeOwner *)self)->fade;
+    struct ActorPaletteFade *f = &((struct ActorStats *)self)->fade;
     u16 *src2;
     s32 j;
     s32 k;
     s16 *accrBase;
     s32 idx;
     s32 next;
-    struct PalFadeRenderer **slot;
-    f->p1 = p1;
-    f->p2 = p2;
-    f->p3 = p3;
-    f->p4 = p4;
+    struct CharacterPreviewModel **slot;
+    f->targetFirst = p1;
+    f->targetSecond = p2;
+    f->sourceFirst = p3;
+    f->sourceSecond = p4;
     for (j = 0; j < 2; j = next) {
         u16 *src1;
         u16 *out;
@@ -48,36 +34,36 @@ void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32
         s16 *accg;
         s16 *accb;
         s16 *greenBase, *blueBase;
-        accrBase = f->acc[0];
+        accrBase = f->channels[0];
         if (j == 0) {
             src1 = (u16 *)(gPaletteBankData + (p1 * 32));
             src2 = (u16 *)(gPaletteBankData + (p3 * 32));
-            slot = &((struct PalFadeOwner *)self)->renderers;
+            slot = &((struct ActorStats *)self)->renderers;
             if (mode == 1)
-                src2 = f->out;
+                src2 = f->output;
         } else {
             src1 = (u16 *)(gPaletteBankData + (p2 * 32));
             src2 = (u16 *)(gPaletteBankData + (p4 * 32));
-            slot = &((struct PalFadeOwner *)self)->renderers;
+            slot = &((struct ActorStats *)self)->renderers;
             if (mode == 1)
-                src2 = f->out + 16;
+                src2 = f->output + 16;
         }
         accr = (s16 *)(j * 32 + (u32)accrBase);
-        greenBase = f->acc[1];
+        greenBase = f->channels[1];
         accg = (s16 *)(j * 32 + (u32)greenBase);
-        blueBase = f->acc[2];
+        blueBase = f->channels[2];
         accb = (s16 *)(j * 32 + (u32)blueBase);
-        out = f->out;
+        out = f->output;
         next = j + 1;
         for (k = 0; k < 16; k++) {
             s32 n = (j * 16) + k;
             s32 c2 = src2[k];
-            f->delta[0][n] = ((src1[k] & 0x1F) - (c2 & 0x1F)) << 5;
-            f->delta[1][n] = (((src1[k] >> 5) & 0x1F) - ((c2 >> 5) & 0x1F)) << 5;
-            f->delta[2][n] = (((src1[k] >> 10) & 0x1F) - ((c2 >> 10) & 0x1F)) << 5;
-            f->delta[0][n] = Div(f->delta[0][n], duration);
-            f->delta[1][n] = Div(f->delta[1][n], duration);
-            f->delta[2][n] = Div(f->delta[2][n], duration);
+            f->increments[0][n] = ((src1[k] & 0x1F) - (c2 & 0x1F)) << 5;
+            f->increments[1][n] = (((src1[k] >> 5) & 0x1F) - ((c2 >> 5) & 0x1F)) << 5;
+            f->increments[2][n] = (((src1[k] >> 10) & 0x1F) - ((c2 >> 10) & 0x1F)) << 5;
+            f->increments[0][n] = Div(f->increments[0][n], duration);
+            f->increments[1][n] = Div(f->increments[1][n], duration);
+            f->increments[2][n] = Div(f->increments[2][n], duration);
             accr[k] = (c2 & 0x1F) << 5;
             accg[k] = ((c2 >> 5) & 0x1F) << 5;
             accb[k] = ((c2 >> 10) & 0x1F) << 5;
@@ -87,11 +73,11 @@ void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32
     }
 
     {
-        struct PalFadeRenderer *q = *slot;
+        struct ModifierDisplayObject *q = (*slot)->view.parts;
         k = 4;
         q += 4;
         for (; k >= 0; k--) {
-            q->fade = f;
+            q->palette = f->output;
             q--;
         }
     }
@@ -101,9 +87,10 @@ void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32
 }
 
 // PalFade_Update steps an active fade by one frame; returns 1 when the fade finishes or restarts.
+
 u32 PalFade_Update(void *self)
 {
-    struct PalFade *f = &((struct PalFadeOwner *)self)->fade;
+    struct ActorPaletteFade *f = &((struct ActorStats *)self)->fade;
     s32 j, k;
     u16 *out;
 
@@ -111,13 +98,14 @@ u32 PalFade_Update(void *self)
         return 0;
     if (f->timer == 0) {
         if (f->flags & 2) {
-            if ((f->flags & 8) && f->p4 == ((struct PalFadeOwner *)self)->recoveryValue)
+            if ((f->flags & 8) && f->sourceSecond == ((struct ActorStats *)self)->recoveryValue)
                 f->flags = 1;
-            PalFade_Start(self, f->p3, f->p4, f->p1, f->p2, f->duration, f->flags, 0);
+            PalFade_Start(self, f->sourceFirst, f->sourceSecond, f->targetFirst, f->targetSecond,
+                          f->duration, f->flags, 0);
         } else {
             if (!(f->flags & 4)) {
                 struct CharacterPreviewModel *model =
-                    (void *)((struct PalFadeOwner *)self)->renderers;
+                    (void *)((struct ActorStats *)self)->renderers;
                 struct ModifierDisplayObject *part = model->view.parts;
                 u16 *palette = model->activePalette;
                 for (k = 4; k >= 0; k--) {
@@ -133,11 +121,11 @@ u32 PalFade_Update(void *self)
         // Row base formed as offset + struct address, as in the ROM.
         out = (u16 *)(j * 32 + (u32)f);
         for (k = 0; k < 16; k++) {
-            f->acc[0][j * 16 + k] += f->delta[0][j * 16 + k];
-            f->acc[1][j * 16 + k] += f->delta[1][j * 16 + k];
-            f->acc[2][j * 16 + k] += f->delta[2][j * 16 + k];
-            out[k] = Trunc5(f->acc[0][j * 16 + k]) | Trunc5(f->acc[1][j * 16 + k]) << 5 |
-                     Trunc5(f->acc[2][j * 16 + k]) << 10;
+            f->channels[0][j * 16 + k] += f->increments[0][j * 16 + k];
+            f->channels[1][j * 16 + k] += f->increments[1][j * 16 + k];
+            f->channels[2][j * 16 + k] += f->increments[2][j * 16 + k];
+            out[k] = Trunc5(f->channels[0][j * 16 + k]) | Trunc5(f->channels[1][j * 16 + k]) << 5 |
+                     Trunc5(f->channels[2][j * 16 + k]) << 10;
         }
     }
     if (--f->timer == 0)
