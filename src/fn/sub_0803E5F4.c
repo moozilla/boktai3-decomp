@@ -90,12 +90,7 @@ s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
         u32 *index = &gRandomIndex;
         u32 next = (*index + 1) & 0x3ff;
         *index = next;
-        {
-            u32 offset = next << 1;
-            register const u8 *table asm("r3");
-            table = (const u8 *)gRandomTable;
-            random = *(const u8 *)(offset + (u32)table);
-        }
+        random = *(const u8 *)(RANDOM_TABLE_ADDR + (next << 1));
         kind = entry->kind;
         switch (kind) {
             case 0:
