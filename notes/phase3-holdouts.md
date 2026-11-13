@@ -4090,3 +4090,120 @@ keyframe local solved it. Next: preserve the address-to-save copy before the cla
 without preventing CSE using a barrier. Do not repeat sampler/type/layout experiments.
 
 Scratch/evidence: `build/cx/work/WirelessResultPanel_UpdateOutcomeReveal/`.
+## dp-menus-b (Codex)
+
+### ScenePanelRig_TickApproachSubject (0805A044): two modulation pairs remain
+
+Partial landed: X pin and origin-offset barrier removed, and origin/distance reads use
+members. The target-distance/table work union prevents the table's constant-equivalence
+priority penalty; it gets the ROM's r6. Pin-free draft:
+`notes/phase3-drafts/dp-menus-b/ScenePanelRig_TickApproachSubject.c`.
+
+The draft differs by 18 ROM / 20 draft instructions (shape 4; 444 versus 440 bytes).
+Both remaining decisions are global allocation of scale24's anonymous return pseudos:
+X gets r1 rather than r2; Z prefers r2 rather than r1. On the saved draft,
+`AGBCC_FORCE=166:2,214:1` gives MATCH, including the offset increment and literal pool.
+No compiler override belongs in the source.
+
+Earlier raw-offset draft also tied originOffset to address pseudo 186 in local allocation;
+its G trace was misleading. Scope now recovers this tie (fact 210). Forcing that quantity
+head moves it, while priority or force on its non-head member did nothing. Real field reads
+and the work union remove this distraction and leave only the modulation results.
+
+Tried: coordinate conversion macros from Wandering; narrow modulation/position types;
+commuting both sums and products; direct expressions; separate X/Z product and wave locals;
+output-parameter scale24; product/result union; reusing wave or value for modulation;
+explicit scale24 statement macro; inline field getters; duplicating origin read, position
+sum, full sum or full store in the two rounding arms. Copies and output parameters collapse
+to the same return pseudo. Arm duplication changes control flow and does not cross-jump
+back to the ROM. Keep the work union: its table allocation is independently diagnosed.
+Next: find a C shape that changes the X return's preference to r2 and removes the Z return's
+r2 preference, possibly through the rounding helper's class head or a later matched sibling.
+
+### ScenePanelRig_TickSecondarySprites (0805A7E4): nine pins and three barriers remain
+
+Landed five pins and two barriers removed (19 original concessions, 12 remain). The ordinary
+sequence-advance helper form removes the duration/mask pins and barriers. Reusing the near
+interpolation weight for the wave-table pointer removes its pin; the table assignment must
+precede the random-phase pointer assignment. The second flip test's packed control union
+removes its bit and first pins. Every partial checked MATCH (740 bytes).
+
+Pin-free draft: `notes/phase3-drafts/dp-menus-b/ScenePanelRig_TickSecondarySprites.c`.
+It uses the local shared-style sequence helper with a byteMask parameter. 71 ROM / 71 draft,
+shape 46, same 740 bytes. Output has STACK_REG preference, initially gets r5, and reload's
+spill reservation displaces it to r1. The ROM has output in sb. `AGBCC_FORCE=output:9` fixes
+the prologue, counter spill and initial interpolation, leaving 52/50 and shape 4. No joint
+full-match knob found. Counter narrowing, direct ++i, counted for loop, a position-pointer
+output, explicit array indexing, and coordinate macros were tested. Narrow counters add
+extensions; the position pointer does not recover the original pointer allocation.
+
+The pin-retaining shared helper had only a first-flip reload difference: choice 23 takes r1
+instead of r2; `AGBCC_SPILL=23:4` MATCH on helper_pinned_localbit.c in scratch. Preserving
+original constrained flip stores fixes that while allowing the ordinary advancement form.
+A plain bit-2 test differs; the packed union reproduces the original separate mask register.
+
+Removing the final sample pin from the current partial changes table priority: phase's 6315
+beats the work union's 6260; `AGBCC_PRI=work:+56` removes all but the final sample/AND pair.
+Using SCALE3 at all three interpolation conversions raises work's refs naturally, also
+leaving only that pair while dropping the sample pin. A signed sample followed by unsigned
+cast likewise leaves only two register differences. Local allocation ties sample to the
+AND result in r0; ROM loads sample in r1 and masks in r0. u16/s16 angle, redundant casts,
+packed sample/angle unions, shared mask helper and commuted operands did not break the tie
+with the correct code. Direct signed sample gives ldrsh; masking to 255 gives ldrb. Macro
+conversion directly into the packed vector adds bitfield read-modify-write instructions;
+use an s32 coordinate local before storing it if revisiting this form.
+Next: solve the sample/result dying-operand tie, then retry the remaining pointer pins and
+loop increments; the fully unpinned draft also needs output's sb allocation.
+
+### ScenePanel_TickRig (0805AC3C): no removal landed
+
+Saved named-field draft: `notes/phase3-drafts/dp-menus-b/ScenePanel_TickRig.c`.
+It has no pins/barriers and preserves the original volatile timer member reads. 18 ROM /
+20 draft instructions, shape 2, 224 versus 220 bytes. Without the explicit halfword mask
+on the second frame read, combine preserves an intermediate left shift and later shifts
+right by 18 instead of 2. The redundant mask gives the correct shift and one extra move.
+`AGBCC_FORCE=frame:3,96:3` (frame is pseudo 95) coalesces the halfword load and wide copy:
+16/16, shape 0, 220 bytes. This is not a full matching probe.
+
+The other issue is reload's register set: ordinary fields use only r0/r1/r2 as spill
+registers, while the ROM uses r3 for the false-arm collider address and suppress-drain
+address. The frame/interval pointer allocation also differs. A single reload rotation
+cannot solve a register missing from the set. Generic probe tried the one canonical CSE
+choice and three jump follows; none changes the score. No full matching knob found.
+
+Tried all-pin stripping; direct named fields with loads ordered before mask constants;
+shared or split timer declarations; u16/s16/s32 frame types; frame-read inline helper;
+reusing the first frame/interval locals; early phase computation; commuted comparison;
+unsigned division/modulo; word/halfword unions and zero initializers; u16/u32 bitfield
+member views and local bitfield views; halfword pointer alias and redundant mask. The
+bitfield views change loads, and ordinary unions collapse back to the same widening.
+Partial removals of the first-arm value/mask pins and whole first arm were not exact;
+the original tail plus ordinary head still misses seven reload-register instructions.
+Next: get the halfword load and widened frame into one ordinary-C allocation quantity,
+and make reload reserve r3 without a pin. The C mask is worth retaining for that search.
+
+### ScenePanelRig_InitSecondarySprites (0805AF88)
+
+Two matching partials remove the render-mode barrier (repeat the store in both
+arms) and zero pin (copy initial i after the existing initialization barrier).
+Stock check MATCH, 272 bytes. Two barriers remain.
+
+Best pin-free draft: `phase3-drafts/dp-menus-b/ScenePanelRig_InitSecondarySprites.c`,
+1 ROM / 3 draft instructions, shape 4, 276 bytes. First parity uses `i & 255`
+before `& one`; this blocks PRE reuse at the final flag test and restores all
+registers, but leaves an extra mask and alignment padding. Ordinary array indexing
+is equivalent to the original offset construction. Without the redundant mask,
+PRE computes a shared parity (pseudo 128) and extends its lifetime across calls;
+`AGBCC_NOPRE=1` confirms the reuse, improving shape 28 to 4 but leaving 30/32
+differences. `CSE_NOCANON=128` alone gives 24/22; combined with NOPRE gives 30/32.
+No complete matching knob found.
+
+Tried separate branch stores, zero initializer lifetimes, union parity, byte/halfword
+parity, signed/unsigned casts, full-width and byte masks, masked bit operand, byte
+and halfword one, literal first/last parity masks, unsigned counter, scalar union
+constant, wide aggregate constants and packed one-bit control. Wide constants
+load a pool object; the one-bit control is hoisted and introduces a shift in mode
+selection. Narrow parity retains a shift after the AND. The best remaining lever
+is a redundant expression that blocks PRE yet folds at combine without adding
+a mask; the current draft documents the exact target. Scratch: build/cx/work/
+ScenePanelRig_InitSecondarySprites/.

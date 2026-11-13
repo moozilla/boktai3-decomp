@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
 static inline s32 scale12(s32 value)
 {
@@ -12,35 +11,46 @@ static inline u32 readWord(const u16 *table, u32 index)
 {
     return table[index];
 }
+#define SCALE12(out, n)                                                                            \
+    do {                                                                                           \
+        (out) = scale12(n);                                                                        \
+    } while (0)
 void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
 {
     u32 angle;
+    union {
+        u32 turnStep;
+        const u16 *randomTable;
+    } work;
     s32 value;
     s32 wave;
-    register s32 x asm("r3");
+    s32 x;
     s32 z;
     u16 *timer;
+    work.turnStep = (u16)rig->turnStep;
     if (rig->turnStep < rig->turnRate)
-        rig->turnStep++;
+        rig->turnStep = work.turnStep + 1;
     else if (rig->turnStep > rig->turnRate)
-        rig->turnStep--;
+        rig->turnStep = work.turnStep - 1;
     timer = &rig->turnDuration;
     if (--*timer == 0) {
-        register const u16 *table asm("r3") = gRandomTable;
-        u32 *cursor = &gRandomIndex;
+
+        u32 *cursor;
         u32 mask;
-        register u32 index asm("r1");
+        u16 index;
         s32 step;
+        work.randomTable = gRandomTable;
+        cursor = &gRandomIndex;
         index = *cursor + 1;
         mask = 1023;
         index &= mask;
-        step = (readWord(table, index) & 7) + 12;
+        step = (readWord(work.randomTable, index) & 7) + 12;
         rig->turnRate = step;
         *cursor = index = (index + 1) & mask;
-        if (readWord(table, index) & 1)
+        if (readWord(work.randomTable, index) & 1)
             rig->turnRate = -step;
         *cursor = (*cursor + 1) & mask;
-        *timer = (readWord(table, *cursor) & 63) + 32;
+        *timer = (readWord(work.randomTable, *cursor) & 63) + 32;
     }
     rig->angle = (rig->angle + 4095 + (u16)rig->turnStep) & 4095;
     angle = rig->angle >> 4;
@@ -49,7 +59,7 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
         const u16 *table = gRandomTable;
         u32 *cursor = &gRandomIndex;
         u32 mask;
-        register u32 index asm("r0");
+        u16 index;
         index = *cursor + 1;
         mask = 1023;
         index &= mask;
@@ -66,9 +76,7 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
             value = gUnk_086149C4[(angle + 64) & 255] * radius;
         }
     }
-    value = scale12(value);
-    asm("" : "+r"(value));
-    x = value;
+    SCALE12(x, value);
     wave = gUnk_086149C4[rig->motionFlag];
     value = (gUnk_086149C4[(angle + 64) & 255] << 5) * wave;
     rig->position.x = rig->origin.x + x + scale24(value);
@@ -76,11 +84,9 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
         u32 radius = rig->distance;
         value = gUnk_086149C4[angle] * radius;
     }
-    value = scale12(value);
-    z = value;
-    asm("" : "+r"(angle));
+    SCALE12(z, value);
     wave = gUnk_086149C4[rig->motionFlag];
-    value = (gUnk_086149C4[angle] << 5) * wave;
+    value = (gUnk_086149C4[angle & 255] << 5) * wave;
     rig->position.z = rig->origin.z + z + scale24(value);
     if (rig->selectionTimer <= 2) {
         rig->selectionTimer = 600;

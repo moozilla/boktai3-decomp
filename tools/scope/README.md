@@ -2400,3 +2400,15 @@ which is exactly `10:1`. Not tested.
    view, the playback then matches without its three pins and barrier.
    A zero initializer on the control unions does not have the same effect;
    the initializer must separate the fallback one from the invariant group.
+210. **A locally tied pseudo may be logged only under its quantity head; its G record is not
+   evidence that global allocation chose its register.** In ScenePanelRig_TickApproachSubject
+   (0805A044), `originOffset` (pseudo 30) dies in the address add (pseudo 186), and local-alloc
+   puts both in r2. The L trace records only quantity head 186 (`address`), while G also lists
+   30 with a hypothetical global priority. Treating that G row as the decision suggested
+   ineffective `AGBCC_PRI=30`/`AGBCC_FORCE=30` probes: the local quantity's knobs use its head.
+   The lreg dump explicitly says `Register 30 in 2` and `Register 186 in 2`, and the address
+   add carries `REG_DEAD` for 30. Scope now joins these dying-operand ties only when the
+   connected component has one recorded local head, gives members that quantity's record,
+   and resolves named allocation knobs through the head. Two separately recorded quantities
+   or an operand without a death note are not merged. `AGBCC_FORCE=address:3` changes the
+   actual placement; it diagnoses the local tie but does not match the whole function.
