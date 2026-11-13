@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
 
@@ -48,8 +47,10 @@ s32 LinkMenu_WaitSelectionMode(struct AreaEffectLinkState *p)
     }
     if (IsMode4(*p->selection)) {
         next = LinkMenu_WaitForReadyPeers;
-        pp = p;
-        asm("" : "+r"(pp));
+        {
+            struct AreaEffectLinkState **slot = &pp;
+            *slot = p;
+        }
         mode = 4;
     call:
         Registry1745_SetState(pp, mode, next);
