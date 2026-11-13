@@ -4,9 +4,24 @@
 
 static inline s32 scaleSceneOverlay(s32 value)
 {
+    s32 result;
     if (value >= 0)
-        return value >> 5;
-    return -((-value) >> 5);
+        result = value >> 5;
+    else
+        result = -((-value) >> 5);
+    return result;
+}
+static inline void projectSceneOverlay(struct ContactPosition *out,
+                                       const struct ContactPosition *origin)
+{
+    s32 x = origin->x;
+    s32 z = origin->z;
+    s32 sum, y;
+    out->x = scaleSceneOverlay((x - z) * 3);
+    sum = scaleSceneOverlay((x + z) * 3);
+    y = scaleSceneOverlay(origin->y * 3);
+    out->y = sum - y;
+    out->z = sum + y;
 }
 #define truncate5(value) ((value) >= 0 ? (value) >> 5 : -((-(value)) >> 5))
 #define truncate1(value) ((value) >= 0 ? (value) >> 1 : -((-(value)) >> 1))
@@ -16,8 +31,6 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
     struct SceneOverlayResource resource;
     struct SceneOverlayMapEntry entry;
     struct ContactPosition projected;
-    struct ContactPosition *projectedPointer;
-    struct ContactPosition *projectedRead;
     struct SceneOverlayMapEntry *entries;
     s32 width, height;
     u16 *blocks;
@@ -50,35 +63,8 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
         asm("" : : "r"(width), "r"(tx), "r"(reloadScratch), "r"(buffer));
         height = layer->height * 2;
     }
-    {
-        s32 x, z, sum;
-        s32 y;
-        const struct ContactPosition *origin;
-        projectedPointer = &projected;
-        asm("" : "+r"(projectedPointer));
-        origin = &panel->origin;
-        asm("" : "+r"(origin));
-        x = origin->x;
-        z = origin->z;
-        {
-            s32 value = 3 * (x - z);
-            projectedRead = projectedPointer;
-            projectedPointer->x = scaleSceneOverlay(value);
-        }
-        {
-            s32 subtotal = x + z;
-            s32 value;
-            value = scaleSceneOverlay(3 * subtotal);
-            sum = value;
-        }
-        y = scaleSceneOverlay(3 * origin->y);
-        projectedPointer->y = sum - y;
-        {
-            s32 projectedZ = sum + y;
-            projectedPointer->z = projectedZ;
-        }
-    }
-    centerX = projectedRead->x + gCamera.offsetX;
+    projectSceneOverlay(&projected, &panel->origin);
+    centerX = projected.x + gCamera.offsetX;
     centerY = projected.y + gCamera.offsetY;
     centerX = truncate3(centerX);
     centerY = truncate3(centerY) & ~1;
