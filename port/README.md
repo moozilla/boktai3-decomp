@@ -91,7 +91,8 @@ Alarm interrupts and 12-hour wire conversion are not implemented. Solar GPIO cou
 The portable tests cover known decompression vectors, truncation, affine
 cardinals, division corner cases, DMA modes, cascade/IRQ timing, FIFO refill,
 keypad matching, flash, EEPROM wire reads, leap-day RTC rollover and solar
-thresholds. Full game boot, register-store instrumentation, and audio playback
+thresholds. The mGBA oracle compares 3,640 solar GPIO edges at seven thresholds.
+Full game boot, register-store instrumentation, and audio playback
 are integration work; this test module does not claim to run the game.
 
 Optional runtime-ROM validation (system libmgba headers/library required for

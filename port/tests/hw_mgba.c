@@ -429,6 +429,42 @@ static int dma_oracle(struct mCore *core)
     return 0;
 }
 
+static uint8_t solar_oracle_threshold;
+static void solar_oracle_sample(struct GBALuminanceSource *source) { (void)source; }
+static uint8_t solar_oracle_read(struct GBALuminanceSource *source) { (void)source; return solar_oracle_threshold; }
+static struct GBALuminanceSource solar_fixed_source = {solar_oracle_sample, solar_oracle_read};
+
+static int solar_oracle(struct mCore *core)
+{
+    static const uint8_t thresholds[] = {0,1,20,80,180,232,255};
+    struct GBA *gba = core->board;
+    static Hw hw;
+    unsigned setting, pulse, edge, cases = 0;
+    hw_init(&hw, NULL);
+    GBAHardwareInitLight(&gba->memory.hw);
+    gba->luminanceSource = &solar_fixed_source;
+    core->busWrite16(core, 0x080000c8, 1); hw_write16(&hw, 0x080000c8, 1);
+    core->busWrite16(core, 0x080000c6, 7); hw_write16(&hw, 0x080000c6, 7);
+    for (setting = 0; setting < sizeof(thresholds); ++setting) {
+        solar_oracle_threshold = thresholds[setting];
+        hw_set_solar(&hw, thresholds[setting]);
+        core->busWrite16(core, 0x080000c4, 2); hw_write16(&hw, 0x080000c4, 2);
+        for (pulse = 0; pulse < 260; ++pulse) for (edge = 0; edge < 2; ++edge) {
+            unsigned original, portable;
+            core->busWrite16(core, 0x080000c4, (uint16_t)edge);
+            hw_write16(&hw, 0x080000c4, (uint16_t)edge);
+            original = core->busRead16(core, 0x080000c4) & 8;
+            portable = hw_read16(&hw, 0x080000c4) & 8;
+            if (original != portable) {
+                fprintf(stderr, "Solar threshold %u pulse %u edge %u: mGBA %u / port %u\n", thresholds[setting], pulse, edge, original, portable); return 1;
+            }
+            ++cases;
+        }
+    }
+    printf("mGBA solar GPIO: PASS (%u edges at seven thresholds)\n", cases);
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     struct mCore *core;
@@ -492,6 +528,7 @@ int main(int argc, char **argv)
     if (eeprom_oracle(core)) return 1;
     if (rtc_sdk_oracle(core)) return 1;
     if (dma_oracle(core)) return 1;
+    if (solar_oracle(core)) return 1;
     rom_file = fopen(argv[1], "rb");
     if (!rom_file || fseek(rom_file, 0, SEEK_END)) return 2;
     rom_size = ftell(rom_file); rewind(rom_file);
