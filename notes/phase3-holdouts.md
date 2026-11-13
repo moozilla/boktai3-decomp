@@ -1343,3 +1343,26 @@ also leaves six differences; duplicating clear tails worsens branch shape.
 A halfword height-mask helper loses several required shared masks.
 Next: recover the natural extra spill pressure associated with the midpoint
 loads, then retry the pointer barriers with the restored spill set.
+
+### sub_08069788 / BouncingObject_IsActive (08069788)
+
+Tags: phase3, dp-field-b, sub_08069788
+
+No partial landed. Natural nested field tests give 9 ROM / 7 draft (shape 8).
+The ROM preserves two input-pointer copies, consuming r1/r2 and leaving r3
+for the index/timer offsets; the unpinned C coalesces the pointers and reloads
+constants in r2. CSE_NOCANON=input does not restore the copies.
+
+Boolean-return helpers split after the index or timer; narrow return modes
+add branches, while u32 helpers still lose the copies. A pointer-returning
+validator differs by 3/5 but adds branches. Direct conjunction/result-variable
+forms change branch structure.
+
+Focused partial: named index access removes the offset pin and barrier, but
+move2add derives 314 from 311 (adds #3) instead of materializing it. Returning
+early for a negative index restores the constant materialization, leaving
+three register differences at entry: the late copy, null test, and index
+address still use input r0 rather than copied slot r1. Retaining the original
+location pin or index-offset pin does not fix those three differences.
+Next: an inline wrapper boundary that gives the first slot copy a distinct
+lifetime while preserving the early-return label before the timer load.
