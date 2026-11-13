@@ -1301,3 +1301,31 @@ Persistent evidence: `build/matchsearch/sub_0801404C`; all source experiments in
 `build/cx/work/sub_0801404C`. Next: add one sprite reference that disappears after
 flow, or reduce table density slightly while keeping the -256 mask below it. A
 sampler or cursor helper with a useful late-eliminated copy may supply that effect.
+
+### ParticleGroup_UpdateFrozen (08014330, src/fn/sub_08014330.c): deferred, combine removes byte extension
+
+Best complete ordinary unit: `notes/phase3-drafts/dp-effects/ParticleGroup_UpdateFrozen.c`,
+3 ROM / 1 draft, shape 2. It preserves the earlier field-effects result: PRE creates
+one QImode reaching register, with the initial r0-to-r3 copy and reloads after both
+terrain-call paths. Combine deletes the final unsigned-byte shift pair and compares
+r3 directly instead of converting to r0 first. Confirmed exact with
+`AGBCC_COMBKEEP=104`, the left-shift result. `why 268` formerly gave misleading
+allocation advice; the scope improvement in fact 172 identifies this deleted conversion.
+
+Read combine.c `set_nonzero_bits_and_sign_copies`, `nonzero_bits`, and the existing
+COMBKEEP instrumentation. A PRE byte loaded/copied in every arm has known-zero upper
+bits. The original barrier supplies an unknown upper-bit definition. Byte-return,
+narrowing, signed-byte-return, and union-byte helpers do not preserve the extension;
+a word-return helper also changes the initial compare. Header bitfields and a signed
+field with unsigned casts are unchanged. Explicit byte caches lose the initial copy.
+Explicit wide/signed caches retain the late extension but add a halfword/signed load
+before the top byte load (2/2 or 2/4). Word/byte union representations, partial union
+insertion, and halfword unions either lose PRE or add loads. Repeated helper returns
+add control flow. Explicit shift reuse changes the initial compare and still deletes
+the final conversion. Packing priority or the invalid cell into unused upper bits
+keeps unwanted arithmetic. These are compiler hypotheses, not candidates to land.
+
+Persistent source evidence: `build/matchsearch/ParticleGroup_UpdateFrozen`.
+Scratch: `build/cx/work/ParticleGroup_UpdateFrozen`. Next: a genuine header/cache
+representation that makes an SI-to-QI copy with unknown upper bits before combine,
+but whose wide producer becomes the same byte load after combine. No source changed.
