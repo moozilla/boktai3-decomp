@@ -8139,8 +8139,10 @@ addr,name,mode,confidence,source,notes
 081DAC1C,Projectile_CreateForOwner,thumb,low,src-alias,Validates an owner slot from zero through three and forwards the configuration to projectile creation
 081DAC34,Projectile_InitializeParams,thumb,low,src-alias,
 081DACB0,Projectile_SetFlightParams,thumb,low,src-alias,Sets flags and lifetime together with heading and horizontal speed
+081DACC4,Projectile_SetVerticalMotion,thumb,low,src-alias,Sets secondary duration; turn parameter and turn speed.
 081DACCC,Projectile_SetDamageParams,thumb,low,src-alias,Stores five parameters forwarded to collider combat configuration; damage interpretation tentative
 081DACE4,Projectile_SetCollisionSize,thumb,low,src-alias,Sets the three dimensions passed to collider initialization
+081DACEC,Projectile_SetUniformCollisionSize,thumb,low,src-alias,Sets all three collision bounds to the same value.
 081DACF4,Projectile_SetCollisionOffset,thumb,low,src-alias,Sets the three offset components passed alongside collider dimensions
 081DACFC,Projectile_SetCollisionMask,thumb,low,src-alias,Sets the halfword passed as a collider initialization parameter; mask interpretation tentative
 081DAD04,Projectile_SetSpriteParams,thumb,low,src-alias,Sets the animation resource and initial sprite frame and palette selection
@@ -8148,6 +8150,7 @@ addr,name,mode,confidence,source,notes
 081DAD10,Projectile_SetTypeAndElement,thumb,low,src-alias,Sets the projectile type and clamps the secondary subtype to zero through six; element interpretation tentative
 081DAD24,Projectile_SetVariant,thumb,low,src-alias,Sets the auxiliary halfword variant field used by projectile configuration; exact meaning tentative
 081DAD28,Task4E01_RemoveEntry,thumb,low,src-alias,
+081DAD94,Projectile_SetEntryDirection,thumb,low,src-alias,Updates a live entry direction; terrain sector and velocity.
 081DAE64,Task4E01_GetEntryPosition,thumb,low,src-alias,Returns the position field of an indexed entry after checking task existence and bounds
 081DAEA0,Task4E01_GetKind7Value,thumb,low,src-alias,
 081DAEE8,SceneEntry_SetPosition,thumb,low,src-alias,
