@@ -48,8 +48,21 @@ visible difference image. Any mismatch makes the command fail.
 
 Three startup captures and twelve menu/field captures match with zero pixel
 differences. All twelve menu/field captures also match in Node WebAssembly.
-Gameplay coverage and synthetic tests are being expanded; the implemented feature
-list is not yet a claim of hardware-perfect behavior for every edge case. A
+The checkpoint runner also matches 40 frames across eight saves, covering dialogue,
+dungeons, the sun gauge HUD and credits, in native and WebAssembly. Recreate them
+with the user's save bank (an explicit directory avoids worktree-relative paths):
+
+```sh
+build/venv/bin/python port/tests/ppu_scenes.py --bank ../boktai3trans/saves --wasm
+build/venv/bin/python port/tests/ppu_synthetic.py
+```
+
+The synthetic suite generates 150 cases without a ROM and compares directly with
+mGBA's software renderer: all text sizes/depths/layers, affine and bitmap modes,
+transforms, sprite shapes/sizes/depths/flips, clipping, affine/double-size OBJ,
+windows, blending, brightness, mosaic, green swap and HBlank register changes.
+All 150 currently match exactly. The implemented feature list and these finite
+tests are not a claim of hardware-perfect behavior for every edge case. A
 snapshot taken after a frame cannot reproduce HBlank effects, which is why the
 suite captures the actual inputs of each scanline. Sub-scanline register effects
 and exact memory-bus timing are outside this renderer's interface.

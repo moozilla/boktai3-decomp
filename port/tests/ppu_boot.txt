@@ -1,9 +1,9 @@
 trace off
 wait 300
-shot boot
+shot startup_logo
 tap START
 wait 60
-shot title
+shot startup_logo_after_start
 tap A
 wait 150
-shot continue
+shot clock_setup

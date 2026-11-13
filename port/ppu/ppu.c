@@ -118,7 +118,7 @@ static Pixel text_bg(const PpuMemory *m, unsigned bg, unsigned x, unsigned y)
 }
 
 static Pixel affine_bg(const Ppu *ppu, const PpuMemory *m, unsigned bg,
-                       unsigned mode, unsigned x, unsigned y)
+                       unsigned mode, unsigned x, unsigned y, unsigned presentation)
 {
     unsigned control = read16(m->io, 8 + bg * 2);
     unsigned reg = 0x20 + (bg - 2) * 16;
@@ -131,9 +131,25 @@ static Pixel affine_bg(const Ppu *ppu, const PpuMemory *m, unsigned bg,
     if (control & 0x40) {
         unsigned mosaic = read16(m->io, 0x4c);
         unsigned back = y % (((mosaic >> 4) & 15) + 1);
-        x -= x % ((mosaic & 15) + 1);
+        unsigned horizontal = (mosaic & 15) + 1;
         rx -= (int16_t)read16(m->io, reg + 2) * (int)back;
         ry -= (int16_t)read16(m->io, reg + 6) * (int)back;
+        if (presentation && mode >= 3 && horizontal > 1) {
+            /* The software oracle starts a bitmap mosaic run at the first
+             * in-bounds sample, retaining that sample through its block. */
+            unsigned first = 0;
+            int width = mode == 5 ? 160 : 240, height = mode == 5 ? 128 : 160;
+            while (first <= x) {
+                int px = floor256(rx + dx * (int)first);
+                int py = floor256(ry + dy * (int)first);
+                if (px >= 0 && py >= 0 && px < width && py < height) break;
+                ++first;
+            }
+            if (first > x) return p;
+            x = first + (x - first) / horizontal * horizontal;
+        } else {
+            x -= x % horizontal;
+        }
     }
     sx = floor256(rx + dx * (int)x);
     sy = floor256(ry + dy * (int)x);
@@ -209,7 +225,7 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
         unsigned affine = a & 0x100, double_size = affine && (a & 0x200);
         unsigned kind = (a >> 10) & 3;
         unsigned width, height, boxw, boxh, row, draw_width;
-        int left, column, pa = 256, pb = 0, pc = 0, pd = 256;
+        int left, column, mosaic_origin, pa = 256, pb = 0, pc = 0, pd = 256;
         if (shape == 3 || kind == 3 || (!affine && (a & 0x200))) continue;
         width = sizes[shape][size][0];
         height = sizes[shape][size][1];
@@ -226,6 +242,20 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
             pc = (int16_t)read16(m->oam, matrix + 22);
             pd = (int16_t)read16(m->oam, matrix + 30);
             cycles -= 10;
+        }
+        mosaic_origin = left - 1;
+        if (affine && (a & 0x1000)) {
+            unsigned mosaic = read16(m->io, 0x4c);
+            int oy = (int)row - (int)(y % (((mosaic >> 12) & 15) + 1));
+            int first = left > 0 ? left : 0;
+            if (oy < 0) oy = 0;
+            for (; first < left + (int)boxw && first < PPU_WIDTH; ++first) {
+                int cx = first - left - (int)boxw / 2, cy = oy - (int)boxh / 2;
+                int sx = floor256(pa * cx + pb * cy + (int)width * 128);
+                int sy = floor256(pc * cx + pd * cy + (int)height * 128);
+                if (sx >= 0 && sy >= 0 && sx < (int)width && sy < (int)height) break;
+            }
+            mosaic_origin = first - 1;
         }
         draw_width = boxw;
         if (a & 0x1000) {
@@ -247,6 +277,8 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
                 unsigned mosaic = read16(m->io, 0x4c);
                 /* OBJ horizontal mosaic is aligned to screen coordinates. */
                 ox -= x % (((mosaic >> 8) & 15) + 1);
+                if (affine && ox + left < mosaic_origin) ox = mosaic_origin - left;
+                if (affine && x <= mosaic_origin) continue;
                 oy -= y % (((mosaic >> 12) & 15) + 1);
                 if (oy < 0) oy = 0;
                 if (!affine) {
@@ -370,7 +402,7 @@ static void render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, void *out,
             if (!(display & (0x100 << bg)) || !(mask & (1 << bg))) continue;
             if (mode == 0 || (mode == 1 && bg < 2)) p = text_bg(m, bg, x, y);
             else if ((mode == 1 && bg == 2) || (mode == 2 && bg >= 2) ||
-                     (mode >= 3 && mode <= 5 && bg == 2)) p = affine_bg(ppu, m, bg, mode, x, y);
+                     (mode >= 3 && mode <= 5 && bg == 2)) p = affine_bg(ppu, m, bg, mode, x, y, bits == 8);
             else continue;
             insert(p, &top, &second);
         }
