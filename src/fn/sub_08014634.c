@@ -62,7 +62,8 @@ static inline void ClearFlag(volatile u32 *p, u32 mask)
     *p = v;
 }
 s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosition *position,
-                                const struct ContactPosition *velocityArg, const struct ContactPosition *spread, s32 lifetime,
+                                const struct ContactPosition *velocityArg,
+                                const struct ContactPosition *spread, s32 lifetime,
                                 s32 lifetimeMask)
 {
     struct SpawnArgs args = {count, options, position};
@@ -74,7 +75,8 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
     struct Group *pool;
     u32 *rng;
     s32 priority;
-    register s32 optionMask asm("r0");
+    s32 optionMask;
+    s32 optionValue;
     s32 j;
     register s32 i asm("r5");
 
@@ -88,7 +90,9 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
     priority = args.options >> 8;
     asm("" : "+m"(args.options));
     optionMask = 255;
-    args.options &= optionMask;
+    optionValue = args.options;
+    optionValue &= optionMask;
+    args.options = optionValue;
     if (args.count > 8) {
         register s32 limit asm("r2") = 8;
         args.count = limit;
@@ -178,7 +182,8 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
                             register u32 *entries asm("r1") = gUnk_08604B90;
                             s32 type;
                             u32 offset;
-                            type = args.options;
+                            optionValue = args.options;
+                            type = optionValue;
                             offset = type * sizeof(*entries);
                             asm("" : "+r"(offset) : "r"(type));
                             p->tile = (*((u16 *)(resource + 4))) + *(u32 *)(offset + (u32)entries);
