@@ -11,11 +11,6 @@ struct SceneHudControlAnimation {
     u32 flags;
     u8 unknownC[0x14];
 };
-struct SceneHudDigitView {
-    u8 unknown0[0x20];
-    u8 resource[0x12E8];
-    struct SceneInputWidget label, digits[4];
-};
 struct SceneHudWidgetMotion {
     struct SceneVec from, to;
     s16 bendX, bendY;
@@ -228,10 +223,6 @@ struct SceneHudState {
     u8 initializationFlag; /* 0x4CD8: cleared by both initializers */
     u8 unknown4CD9[0x4D90 - 0x4CD9];
     u8 equippedIconSlots[8]; /* 0x4D90: inventory slot for each visible equipped icon */
-};
-struct SceneHudNumericView {
-    u8 unknown0[0x50C];
-    s32 value50C;
 };
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);

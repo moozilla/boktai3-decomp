@@ -3,7 +3,7 @@
 #include "scene_inventory_catalog.h"
 #include "scene_hud_display.h"
 void SceneInput_PositionCursor(struct SceneInputGridView *, struct SceneInputWidget *);
-void SceneHud_HideFourDigits(struct SceneHudDigitView *);
+void SceneHud_HideFourDigits(struct SceneInputPanel *);
 void SceneInputPanel_TickHighlight(struct SceneInputHighlight *);
 void SceneInputPanel_SetMeterGlyph(struct SceneInputPanel *, u32, u32);
 void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *);
@@ -44,7 +44,7 @@ void SceneInventory_UpdateDisplay(struct SceneInventoryTail *p)
     else
         p->display.category.flags |= 1;
     if (!(p->interactionFlags & 0x10))
-        SceneHud_HideFourDigits((struct SceneHudDigitView *)p);
+        SceneHud_HideFourDigits((struct SceneInputPanel *)p);
     if (p->interactionFlags & 0x40) {
         switch (p->category) {
             case 0:

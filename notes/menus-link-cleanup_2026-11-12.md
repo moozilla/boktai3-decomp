@@ -174,3 +174,7 @@ Task, remaining time, lock and completion script. The manual shifted-integer
 zero test became a direct check of the remaining halfword; the script-add
 conditions became a single guard. All 348 bytes match; no other unit includes
 the changed header.
+
+- Deferred inventory transactions (08061C3C–08063634): all 41 original units pass baseline. The range mixes ControlView, Tail, ScriptCatalog, LifecycleView, Lifecycle, Panel, and local swap/sale/cleanup views of one 0x1D24 controller. Their catalog at 0x1AB3 overlaps transition storage at 0x1AF0 and the grid at 0x1BE4; reconciling function signatures requires changing upstream inventory-control/action APIs outside this range. A concatenation would preserve precisely the partial views this cleanup must remove. Preserve originals pending a coordinated whole-controller type migration.
+
+HUD tilemaps: 11 functions consolidated. Four-digit display uses the canonical SceneInputPanel resource, label and smallDigits fields; numeric balance uses GameState.menuRewardBalance. Feature palette API named. The existing nonempty do/while(0) store grouping is retained because removing it changes register allocation. All 129 header consumers match.

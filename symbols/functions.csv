@@ -2388,6 +2388,7 @@ addr,name,mode,confidence,source,notes
 0805DE3C,SceneHud_DrawClock,thumb,low,src-alias,
 0805DF08,SceneHud_DrawNumericStatus,thumb,low,src-alias,
 0805E000,SceneHud_SetKeyframePaletteBank,thumb,low,src-alias,
+0805E014,SceneHud_UpdateFeaturePalettes,thumb,low,src-alias,Selects widget palette banks from owner feature flags.
 0805E09C,SceneHud_ShowFourDigits,thumb,low,src-alias,
 0805E170,SceneHud_HideFourDigits,thumb,low,src-alias,
 0805E190,SceneInput_BeginChoice,thumb,low,src-alias,
