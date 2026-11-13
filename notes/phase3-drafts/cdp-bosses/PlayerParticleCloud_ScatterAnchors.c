@@ -33,7 +33,7 @@ s32 PlayerParticleCloud_ScatterAnchors(void)
             const u16 *sample = ParticleRandom_SampleAddress(table, xIndex);
             u32 random = *sample;
             s32 coordinate = (u16)particle->origin.x + bias;
-            random &= mask;
+            random = (u16)random & mask;
             coordinate += random;
             particle->origin.x = coordinate;
         }
@@ -43,7 +43,7 @@ s32 PlayerParticleCloud_ScatterAnchors(void)
             const u16 *sample = ParticleRandom_SampleAddress(table, zIndex);
             u32 random = *sample;
             s32 coordinate = (u16)particle->origin.z + bias;
-            random &= mask;
+            random = (u16)random & mask;
             coordinate += random;
             particle->origin.z = coordinate;
         }

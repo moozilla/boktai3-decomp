@@ -1270,9 +1270,14 @@ with a natural return/branch form before the count-zero block.
 
 ### sub_081D3620 (PlayerParticleCloud_ScatterAnchors)
 
-Best draft: `notes/phase3-drafts/cdp-bosses/PlayerParticleCloud_ScatterAnchors.c` (12 / 12). Local
-allocation prioritizes the coordinate over the random sample; a priority tie matches. Next: find a
-sample spelling with two more random references that combine removes before output.
+Best draft: `notes/phase3-drafts/cdp-bosses/PlayerParticleCloud_ScatterAnchors.c` (6 / 6). Narrowing
+the random sample to `u16` at the mask gives the ROM's `r0` sample allocation in both halves. The
+remaining first-half difference is only scheduling: the draft delays the sample load until after
+the coordinate load and bias; the second half additionally leaves the coordinate in `r2` rather
+than `r1`. Splitting the coordinate initialization, using a `u16` sample local, adding an
+intermediate narrowed local, and zero-valued dependencies did not move the load earlier. Next:
+find a natural sample-read helper shape that keeps the narrowing's priority effect but schedules
+the load at the address calculation, before the coordinate load.
 
 ### Ratatosk_UpdateSunOrbRelocation
 
