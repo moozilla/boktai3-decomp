@@ -3218,14 +3218,19 @@ void TetherActor_UpdateDisplayReturn(struct TetherActor *actor)
 
 // MATCHING_CONCESSION: register-pinning
 
+#define TETHER_CAPTURE_DISPLAY(out, actor)                                                         \
+    do {                                                                                           \
+        (out) = &(actor)->display.animation;                                                       \
+    } while (0)
+
 void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
 {
     u32 visible;
     u32 emit;
     struct DisplayAnimation *display;
     struct DisplayAnimation *activeDisplay;
-    register u16 *frame asm("r4");
-    register u32 rawFrame asm("r2");
+    u16 *frame;
+    u32 rawFrame;
     u32 highFrame;
     u32 current;
     if (actor->state != 5)
@@ -3261,17 +3266,25 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
     } else if (current <= 191) {
         if ((highFrame >> 17) & 3)
             visible = 1;
-        if ((rawFrame & 15) == 0)
-            emit = 1;
+        {
+            u32 mask = 15;
+            mask &= rawFrame;
+            if (!mask)
+                emit = 1;
+        }
     } else {
         if ((highFrame >> 17) & 1)
             visible = 1;
-        if ((rawFrame & 15) == 0)
-            emit = 1;
+        {
+            u32 mask = 15;
+            mask &= rawFrame;
+            if (!mask)
+                emit = 1;
+        }
     }
     if (visible) {
     show:
-        activeDisplay = &actor->display.animation;
+        TETHER_CAPTURE_DISPLAY(activeDisplay, actor);
         DisplayAnimation_ClearFlags(activeDisplay, 1);
         actor->auxiliarySprite.flags &= ~1;
         {
@@ -3297,7 +3310,7 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
             actor->auxiliarySprite.position.y = height;
         }
     } else {
-        activeDisplay = &actor->display.animation;
+        TETHER_CAPTURE_DISPLAY(activeDisplay, actor);
         DisplayAnimation_SetFlags(activeDisplay, 1);
         {
             u32 *flags = &actor->auxiliarySprite.flags;

@@ -1505,3 +1505,35 @@ so that is not a complete diagnosis. Restoring after height/difference changes
 shape; using position for final Z accesses removes needed address operations.
 Next: a natural actor/position lifetime that keeps actor+80 non-anticipatable
 through the height call and coalesces the saved actor copy. No reduction landed.
+
+### TetherActor_UpdateAuxiliaryTransition (0804C748): two pins removed
+
+Landed explicit low-nibble mask variables in both later frame branches, which
+prevent regmove from tying their results to rawFrame. This removes rawFrame's
+r2 pin. Capturing the display address with TETHER_CAPTURE_DISPLAY, used in both
+visibility arms, gives activeDisplay enough real references to take r4 before
+actor; frame can then reuse r4 without its pin. The capture performs the same
+field-address operation in both arms and has no selector. Stock full unit MATCH.
+One value pin remains at the hidden auxiliary-sprite flag update.
+
+Baseline all-pin removal is 45/45, shape 0. Exact diagnostic on base.c:
+`AGBCC_PRI=activeDisplay:+318 AGBCC_NOTIE=313,341 AGBCC_FORCE=240:2`.
+Actor priority 3846 beats activeDisplay 3529; raising activeDisplay alone leaves
+9/9. Raising frame instead worsens to 73/72. Moving display copies immediately
+after calls is 11/11, shape 4; before calls is 47/43. An inline display getter
+retains the allocation mismatch. The frame pointer cannot be reused for the
+final increment without changing the ROM's address lifetimes (61/62).
+
+Best fully pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_UpdateAuxiliaryTransition.c`
+(2/2, shape 2, exact size). An inline auxiliary-flag reader gets the ROM's r2
+address, r0 value and r1 mask, but leaves `adds r0,r2` then loads through r0;
+ROM loads r0 directly through r2. The extra copy consumes existing alignment
+padding. Pointer-taking, local-pointer, signed and wide return getters do not
+remove that copy; a one-word struct return is equivalent.
+
+Other flag attempts: direct RMW, value-before-address, signed word, value array,
+union word, union bitfield, complement/AND/complement (5/5); bitfield-pointer
+store changes access width; u64 value changes shape; moving display's copy
+earlier changes the register graph. Next: fold the helper's address-copy pseudo
+into the load while retaining its local allocation, or another real visibility
+helper that produces that load/store ordering.
