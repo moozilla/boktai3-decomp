@@ -4845,6 +4845,7 @@ addr,name,mode,confidence,source,notes
 08122D58,SceneScheduledEffect_InitializeManager,thumb,low,cleanup,Load manager resources and mark slots unused
 08122DA0,SceneScheduledEffect_EnsureSingleton,thumb,low,src-alias,Creates the shared effect task when absent; called by scene effect schedule initialization
 08122DE4,SceneScheduledEffect_ResetSingleton,thumb,low,src-alias,Clears the shared effect manager pointer during scene reset
+08122DF0,SceneScheduledEffect_Shutdown,thumb,low,cleanup,Empty shutdown hook following the scheduled effect manager
 08122DF4,SequencedSprite_StepAnimation,thumb,low,src-alias,
 08122F38,SceneAnimatedEffect_ReleaseEntry,thumb,low,src-alias,Removes an effect and clears its occupancy bit and storage before marking its slot invalid
 08122F78,SpriteNotice_AllocateSlot,thumb,low,src-alias,
