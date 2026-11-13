@@ -1,0 +1,83 @@
+[
+ {
+  "name": "Scene actor sequence",
+  "start": "081C069C",
+  "end": "081C0BD4",
+  "fn_files": 21,
+  "functions": 21,
+  "bytes": 1336,
+  "pinned": false
+ },
+ {
+  "name": "State actor kind 086121C4 (tentative)",
+  "start": "081C66F8",
+  "end": "081CC690",
+  "fn_files": 96,
+  "functions": 96,
+  "bytes": 24472,
+  "pinned": false
+ },
+ {
+  "name": "Scene character",
+  "start": "081CD484",
+  "end": "081CE9A8",
+  "fn_files": 12,
+  "functions": 12,
+  "bytes": 5412,
+  "pinned": false
+ },
+ {
+  "name": "Scene NPC",
+  "start": "081CE9A8",
+  "end": "081D16EC",
+  "fn_files": 71,
+  "functions": 71,
+  "bytes": 11588,
+  "pinned": false
+ },
+ {
+  "name": "Tagged scene NPC",
+  "start": "081D16EC",
+  "end": "081D2D34",
+  "fn_files": 39,
+  "functions": 39,
+  "bytes": 5704,
+  "pinned": false
+ },
+ {
+  "name": "Task 4E01",
+  "start": "081D75E8",
+  "end": "081D9B6C",
+  "fn_files": 38,
+  "functions": 38,
+  "bytes": 9604,
+  "pinned": false
+ },
+ {
+  "name": "Script combat actor",
+  "start": "08201388",
+  "end": "0820264C",
+  "fn_files": 11,
+  "functions": 11,
+  "bytes": 4804,
+  "pinned": false
+ },
+ {
+  "name": "Actor glyph trail",
+  "start": "082373C8",
+  "end": "08237EC8",
+  "fn_files": 24,
+  "functions": 24,
+  "bytes": 2816,
+  "pinned": false
+ },
+ {
+  "name": "Keyframe actor",
+  "start": "0823AE5C",
+  "end": "0823B264",
+  "fn_files": 3,
+  "functions": 3,
+  "bytes": 1032,
+  "pinned": false
+ }
+]

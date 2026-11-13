@@ -1797,5 +1797,490 @@
     "pinned": false
    }
   ]
+ ],
+ "ccl-scene-tail": [
+  "cl",
+  "Scene actors and NPCs (tail of the first half)",
+  null,
+  [
+   {
+    "name": "Scene actor visibility and stored motion",
+    "start": "08084280",
+    "end": "08084F44",
+    "fn_files": 13,
+    "functions": 13,
+    "bytes": 3268,
+    "pinned": false
+   },
+   {
+    "name": "Scene actor approach",
+    "start": "080C0668",
+    "end": "080C12FC",
+    "fn_files": 6,
+    "functions": 6,
+    "bytes": 3220,
+    "pinned": false
+   },
+   {
+    "name": "Child group",
+    "start": "080F33BC",
+    "end": "080F421C",
+    "fn_files": 17,
+    "functions": 17,
+    "bytes": 3680,
+    "pinned": false
+   },
+   {
+    "name": "Actor phase",
+    "start": "080F8010",
+    "end": "080F85B0",
+    "fn_files": 6,
+    "functions": 6,
+    "bytes": 1440,
+    "pinned": false
+   },
+   {
+    "name": "Actor recoil",
+    "start": "08116280",
+    "end": "08116870",
+    "fn_files": 6,
+    "functions": 6,
+    "bytes": 1520,
+    "pinned": false
+   },
+   {
+    "name": "Actor particles",
+    "start": "0811BCBC",
+    "end": "0811C5F8",
+    "fn_files": 9,
+    "functions": 9,
+    "bytes": 2364,
+    "pinned": false
+   },
+   {
+    "name": "Actor emitter",
+    "start": "0811EE3C",
+    "end": "0811F474",
+    "fn_files": 9,
+    "functions": 9,
+    "bytes": 1592,
+    "pinned": false
+   }
+  ]
+ ],
+ "ccl-scene-b-tail": [
+  "cl",
+  "Scene actors and NPCs (tail of the second half)",
+  null,
+  [
+   {
+    "name": "Scene actor sequence",
+    "start": "081C069C",
+    "end": "081C0BD4",
+    "fn_files": 21,
+    "functions": 21,
+    "bytes": 1336,
+    "pinned": false
+   },
+   {
+    "name": "State actor kind 086121C4 (tentative)",
+    "start": "081C66F8",
+    "end": "081CC690",
+    "fn_files": 96,
+    "functions": 96,
+    "bytes": 24472,
+    "pinned": false
+   },
+   {
+    "name": "Scene character",
+    "start": "081CD484",
+    "end": "081CE9A8",
+    "fn_files": 12,
+    "functions": 12,
+    "bytes": 5412,
+    "pinned": false
+   },
+   {
+    "name": "Scene NPC",
+    "start": "081CE9A8",
+    "end": "081D16EC",
+    "fn_files": 71,
+    "functions": 71,
+    "bytes": 11588,
+    "pinned": false
+   },
+   {
+    "name": "Tagged scene NPC",
+    "start": "081D16EC",
+    "end": "081D2D34",
+    "fn_files": 39,
+    "functions": 39,
+    "bytes": 5704,
+    "pinned": false
+   },
+   {
+    "name": "Task 4E01",
+    "start": "081D75E8",
+    "end": "081D9B6C",
+    "fn_files": 38,
+    "functions": 38,
+    "bytes": 9604,
+    "pinned": false
+   },
+   {
+    "name": "Script combat actor",
+    "start": "08201388",
+    "end": "0820264C",
+    "fn_files": 11,
+    "functions": 11,
+    "bytes": 4804,
+    "pinned": false
+   },
+   {
+    "name": "Actor glyph trail",
+    "start": "082373C8",
+    "end": "08237EC8",
+    "fn_files": 24,
+    "functions": 24,
+    "bytes": 2816,
+    "pinned": false
+   },
+   {
+    "name": "Keyframe actor",
+    "start": "0823AE5C",
+    "end": "0823B264",
+    "fn_files": 3,
+    "functions": 3,
+    "bytes": 1032,
+    "pinned": false
+   }
+  ]
+ ],
+ "ccl-menus-link-tail": [
+  "cl",
+  "Menus, HUD, dialogue, Link and wireless (tail of the first half)",
+  null,
+  [
+   {
+    "name": "Inventory panel",
+    "start": "08166D74",
+    "end": "0816781C",
+    "fn_files": 11,
+    "functions": 11,
+    "bytes": 2728,
+    "pinned": false
+   },
+   {
+    "name": "Status panel",
+    "start": "08169868",
+    "end": "0816A770",
+    "fn_files": 21,
+    "functions": 21,
+    "bytes": 3848,
+    "pinned": false
+   },
+   {
+    "name": "Menu prompt",
+    "start": "0816A770",
+    "end": "0816AE38",
+    "fn_files": 15,
+    "functions": 15,
+    "bytes": 1736,
+    "pinned": false
+   },
+   {
+    "name": "Scene sequence",
+    "start": "0816AE38",
+    "end": "0816B70C",
+    "fn_files": 25,
+    "functions": 25,
+    "bytes": 2260,
+    "pinned": false
+   },
+   {
+    "name": "Map menu",
+    "start": "0816C230",
+    "end": "0816CD6C",
+    "fn_files": 12,
+    "functions": 12,
+    "bytes": 2876,
+    "pinned": false
+   },
+   {
+    "name": "Inventory",
+    "start": "0816CD6C",
+    "end": "0816D36C",
+    "fn_files": 14,
+    "functions": 14,
+    "bytes": 1536,
+    "pinned": false
+   },
+   {
+    "name": "Pause menu",
+    "start": "0816D36C",
+    "end": "0816D820",
+    "fn_files": 11,
+    "functions": 11,
+    "bytes": 1204,
+    "pinned": false
+   },
+   {
+    "name": "Scene HUD",
+    "start": "0816D820",
+    "end": "0816DE28",
+    "fn_files": 10,
+    "functions": 10,
+    "bytes": 1544,
+    "pinned": false
+   },
+   {
+    "name": "Inventory grid",
+    "start": "0816DE28",
+    "end": "0816E2C8",
+    "fn_files": 6,
+    "functions": 6,
+    "bytes": 1184,
+    "pinned": false
+   },
+   {
+    "name": "Scene HUD",
+    "start": "0816F240",
+    "end": "081708CC",
+    "fn_files": 25,
+    "functions": 25,
+    "bytes": 5772,
+    "pinned": false
+   },
+   {
+    "name": "Pause inventory",
+    "start": "081708CC",
+    "end": "08172BD0",
+    "fn_files": 45,
+    "functions": 45,
+    "bytes": 8964,
+    "pinned": false
+   },
+   {
+    "name": "Scene HUD",
+    "start": "08172BD0",
+    "end": "08173390",
+    "fn_files": 7,
+    "functions": 7,
+    "bytes": 1984,
+    "pinned": false
+   },
+   {
+    "name": "Pause inventory",
+    "start": "08173390",
+    "end": "081743F4",
+    "fn_files": 25,
+    "functions": 25,
+    "bytes": 4196,
+    "pinned": false
+   }
+  ]
+ ],
+ "ccl-field-effects-tail": [
+  "cl",
+  "Field objects, hazards, effects and presentation (tail of the first half)",
+  null,
+  [
+   {
+    "name": "Scene status indicator",
+    "start": "08126650",
+    "end": "08126D38",
+    "fn_files": 21,
+    "functions": 21,
+    "bytes": 1768,
+    "pinned": false
+   },
+   {
+    "name": "Sprite projectile",
+    "start": "08126D38",
+    "end": "08127994",
+    "fn_files": 13,
+    "functions": 13,
+    "bytes": 3164,
+    "pinned": false
+   },
+   {
+    "name": "Timed sprite",
+    "start": "08127994",
+    "end": "081281B4",
+    "fn_files": 14,
+    "functions": 14,
+    "bytes": 2080,
+    "pinned": false
+   },
+   {
+    "name": "Fragment burst",
+    "start": "081281B4",
+    "end": "08128B48",
+    "fn_files": 15,
+    "functions": 15,
+    "bytes": 2452,
+    "pinned": false
+   },
+   {
+    "name": "Feather effect pool",
+    "start": "08128B48",
+    "end": "08129834",
+    "fn_files": 13,
+    "functions": 13,
+    "bytes": 3308,
+    "pinned": false
+   },
+   {
+    "name": "Sun disc pool",
+    "start": "08129834",
+    "end": "0812A558",
+    "fn_files": 17,
+    "functions": 17,
+    "bytes": 3364,
+    "pinned": false
+   },
+   {
+    "name": "Linked effect",
+    "start": "0812A558",
+    "end": "0812B3A8",
+    "fn_files": 18,
+    "functions": 18,
+    "bytes": 3664,
+    "pinned": false
+   },
+   {
+    "name": "Large fragment effect",
+    "start": "0812CE30",
+    "end": "0812D58C",
+    "fn_files": 18,
+    "functions": 18,
+    "bytes": 1884,
+    "pinned": false
+   },
+   {
+    "name": "Particle effect pool",
+    "start": "0812D58C",
+    "end": "0812DA2C",
+    "fn_files": 13,
+    "functions": 16,
+    "bytes": 1184,
+    "pinned": false
+   }
+  ]
+ ],
+ "ccl-bosses-b-tail": [
+  "cl",
+  "Bosses, Player and Engine core (tail of the second half)",
+  null,
+  [
+   {
+    "name": "Nav mesh",
+    "start": "0821F15C",
+    "end": "0821FDC8",
+    "fn_files": 17,
+    "functions": 17,
+    "bytes": 3180,
+    "pinned": false
+   },
+   {
+    "name": "Collider",
+    "start": "0821FDC8",
+    "end": "08220B24",
+    "fn_files": 28,
+    "functions": 28,
+    "bytes": 3420,
+    "pinned": false
+   },
+   {
+    "name": "Anim",
+    "start": "08220B24",
+    "end": "08221774",
+    "fn_files": 28,
+    "functions": 28,
+    "bytes": 3152,
+    "pinned": false
+   },
+   {
+    "name": "Scalar and vector interpolation",
+    "start": "08221774",
+    "end": "0822223C",
+    "fn_files": 37,
+    "functions": 37,
+    "bytes": 2760,
+    "pinned": false
+   },
+   {
+    "name": "Scene lifecycle",
+    "start": "08224E54",
+    "end": "08225410",
+    "fn_files": 22,
+    "functions": 22,
+    "bytes": 1468,
+    "pinned": false
+   },
+   {
+    "name": "Script",
+    "start": "08225410",
+    "end": "082258A0",
+    "fn_files": 21,
+    "functions": 21,
+    "bytes": 1168,
+    "pinned": false
+   },
+   {
+    "name": "Scene body",
+    "start": "082258A0",
+    "end": "08225E1C",
+    "fn_files": 26,
+    "functions": 26,
+    "bytes": 1404,
+    "pinned": false
+   },
+   {
+    "name": "Camera",
+    "start": "08225E1C",
+    "end": "08227900",
+    "fn_files": 66,
+    "functions": 66,
+    "bytes": 6884,
+    "pinned": false
+   },
+   {
+    "name": "Music player slots (tentative)",
+    "start": "0822AE7C",
+    "end": "0822B5D0",
+    "fn_files": 40,
+    "functions": 40,
+    "bytes": 1876,
+    "pinned": false
+   },
+   {
+    "name": "Scene stimulus",
+    "start": "0822B5D0",
+    "end": "0822BAD0",
+    "fn_files": 21,
+    "functions": 21,
+    "bytes": 1280,
+    "pinned": false
+   },
+   {
+    "name": "Player",
+    "start": "08237EC8",
+    "end": "082389D8",
+    "fn_files": 25,
+    "functions": 25,
+    "bytes": 2832,
+    "pinned": false
+   },
+   {
+    "name": "Player",
+    "start": "0823B264",
+    "end": "08243C10",
+    "fn_files": 110,
+    "functions": 110,
+    "bytes": 35244,
+    "pinned": false
+   }
+  ]
  ]
 }

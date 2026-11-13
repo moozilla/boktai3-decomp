@@ -1,0 +1,65 @@
+[
+ {
+  "name": "Scene actor visibility and stored motion",
+  "start": "08084280",
+  "end": "08084F44",
+  "fn_files": 13,
+  "functions": 13,
+  "bytes": 3268,
+  "pinned": false
+ },
+ {
+  "name": "Scene actor approach",
+  "start": "080C0668",
+  "end": "080C12FC",
+  "fn_files": 6,
+  "functions": 6,
+  "bytes": 3220,
+  "pinned": false
+ },
+ {
+  "name": "Child group",
+  "start": "080F33BC",
+  "end": "080F421C",
+  "fn_files": 17,
+  "functions": 17,
+  "bytes": 3680,
+  "pinned": false
+ },
+ {
+  "name": "Actor phase",
+  "start": "080F8010",
+  "end": "080F85B0",
+  "fn_files": 6,
+  "functions": 6,
+  "bytes": 1440,
+  "pinned": false
+ },
+ {
+  "name": "Actor recoil",
+  "start": "08116280",
+  "end": "08116870",
+  "fn_files": 6,
+  "functions": 6,
+  "bytes": 1520,
+  "pinned": false
+ },
+ {
+  "name": "Actor particles",
+  "start": "0811BCBC",
+  "end": "0811C5F8",
+  "fn_files": 9,
+  "functions": 9,
+  "bytes": 2364,
+  "pinned": false
+ },
+ {
+  "name": "Actor emitter",
+  "start": "0811EE3C",
+  "end": "0811F474",
+  "fn_files": 9,
+  "functions": 9,
+  "bytes": 1592,
+  "pinned": false
+ }
+]

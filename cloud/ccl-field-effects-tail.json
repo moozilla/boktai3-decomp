@@ -1,0 +1,83 @@
+[
+ {
+  "name": "Scene status indicator",
+  "start": "08126650",
+  "end": "08126D38",
+  "fn_files": 21,
+  "functions": 21,
+  "bytes": 1768,
+  "pinned": false
+ },
+ {
+  "name": "Sprite projectile",
+  "start": "08126D38",
+  "end": "08127994",
+  "fn_files": 13,
+  "functions": 13,
+  "bytes": 3164,
+  "pinned": false
+ },
+ {
+  "name": "Timed sprite",
+  "start": "08127994",
+  "end": "081281B4",
+  "fn_files": 14,
+  "functions": 14,
+  "bytes": 2080,
+  "pinned": false
+ },
+ {
+  "name": "Fragment burst",
+  "start": "081281B4",
+  "end": "08128B48",
+  "fn_files": 15,
+  "functions": 15,
+  "bytes": 2452,
+  "pinned": false
+ },
+ {
+  "name": "Feather effect pool",
+  "start": "08128B48",
+  "end": "08129834",
+  "fn_files": 13,
+  "functions": 13,
+  "bytes": 3308,
+  "pinned": false
+ },
+ {
+  "name": "Sun disc pool",
+  "start": "08129834",
+  "end": "0812A558",
+  "fn_files": 17,
+  "functions": 17,
+  "bytes": 3364,
+  "pinned": false
+ },
+ {
+  "name": "Linked effect",
+  "start": "0812A558",
+  "end": "0812B3A8",
+  "fn_files": 18,
+  "functions": 18,
+  "bytes": 3664,
+  "pinned": false
+ },
+ {
+  "name": "Large fragment effect",
+  "start": "0812CE30",
+  "end": "0812D58C",
+  "fn_files": 18,
+  "functions": 18,
+  "bytes": 1884,
+  "pinned": false
+ },
+ {
+  "name": "Particle effect pool",
+  "start": "0812D58C",
+  "end": "0812DA2C",
+  "fn_files": 13,
+  "functions": 16,
+  "bytes": 1184,
+  "pinned": false
+ }
+]

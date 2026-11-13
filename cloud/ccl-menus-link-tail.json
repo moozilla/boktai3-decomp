@@ -1,0 +1,119 @@
+[
+ {
+  "name": "Inventory panel",
+  "start": "08166D74",
+  "end": "0816781C",
+  "fn_files": 11,
+  "functions": 11,
+  "bytes": 2728,
+  "pinned": false
+ },
+ {
+  "name": "Status panel",
+  "start": "08169868",
+  "end": "0816A770",
+  "fn_files": 21,
+  "functions": 21,
+  "bytes": 3848,
+  "pinned": false
+ },
+ {
+  "name": "Menu prompt",
+  "start": "0816A770",
+  "end": "0816AE38",
+  "fn_files": 15,
+  "functions": 15,
+  "bytes": 1736,
+  "pinned": false
+ },
+ {
+  "name": "Scene sequence",
+  "start": "0816AE38",
+  "end": "0816B70C",
+  "fn_files": 25,
+  "functions": 25,
+  "bytes": 2260,
+  "pinned": false
+ },
+ {
+  "name": "Map menu",
+  "start": "0816C230",
+  "end": "0816CD6C",
+  "fn_files": 12,
+  "functions": 12,
+  "bytes": 2876,
+  "pinned": false
+ },
+ {
+  "name": "Inventory",
+  "start": "0816CD6C",
+  "end": "0816D36C",
+  "fn_files": 14,
+  "functions": 14,
+  "bytes": 1536,
+  "pinned": false
+ },
+ {
+  "name": "Pause menu",
+  "start": "0816D36C",
+  "end": "0816D820",
+  "fn_files": 11,
+  "functions": 11,
+  "bytes": 1204,
+  "pinned": false
+ },
+ {
+  "name": "Scene HUD",
+  "start": "0816D820",
+  "end": "0816DE28",
+  "fn_files": 10,
+  "functions": 10,
+  "bytes": 1544,
+  "pinned": false
+ },
+ {
+  "name": "Inventory grid",
+  "start": "0816DE28",
+  "end": "0816E2C8",
+  "fn_files": 6,
+  "functions": 6,
+  "bytes": 1184,
+  "pinned": false
+ },
+ {
+  "name": "Scene HUD",
+  "start": "0816F240",
+  "end": "081708CC",
+  "fn_files": 25,
+  "functions": 25,
+  "bytes": 5772,
+  "pinned": false
+ },
+ {
+  "name": "Pause inventory",
+  "start": "081708CC",
+  "end": "08172BD0",
+  "fn_files": 45,
+  "functions": 45,
+  "bytes": 8964,
+  "pinned": false
+ },
+ {
+  "name": "Scene HUD",
+  "start": "08172BD0",
+  "end": "08173390",
+  "fn_files": 7,
+  "functions": 7,
+  "bytes": 1984,
+  "pinned": false
+ },
+ {
+  "name": "Pause inventory",
+  "start": "08173390",
+  "end": "081743F4",
+  "fn_files": 25,
+  "functions": 25,
+  "bytes": 4196,
+  "pinned": false
+ }
+]

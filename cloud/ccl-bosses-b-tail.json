@@ -1,0 +1,110 @@
+[
+ {
+  "name": "Nav mesh",
+  "start": "0821F15C",
+  "end": "0821FDC8",
+  "fn_files": 17,
+  "functions": 17,
+  "bytes": 3180,
+  "pinned": false
+ },
+ {
+  "name": "Collider",
+  "start": "0821FDC8",
+  "end": "08220B24",
+  "fn_files": 28,
+  "functions": 28,
+  "bytes": 3420,
+  "pinned": false
+ },
+ {
+  "name": "Anim",
+  "start": "08220B24",
+  "end": "08221774",
+  "fn_files": 28,
+  "functions": 28,
+  "bytes": 3152,
+  "pinned": false
+ },
+ {
+  "name": "Scalar and vector interpolation",
+  "start": "08221774",
+  "end": "0822223C",
+  "fn_files": 37,
+  "functions": 37,
+  "bytes": 2760,
+  "pinned": false
+ },
+ {
+  "name": "Scene lifecycle",
+  "start": "08224E54",
+  "end": "08225410",
+  "fn_files": 22,
+  "functions": 22,
+  "bytes": 1468,
+  "pinned": false
+ },
+ {
+  "name": "Script",
+  "start": "08225410",
+  "end": "082258A0",
+  "fn_files": 21,
+  "functions": 21,
+  "bytes": 1168,
+  "pinned": false
+ },
+ {
+  "name": "Scene body",
+  "start": "082258A0",
+  "end": "08225E1C",
+  "fn_files": 26,
+  "functions": 26,
+  "bytes": 1404,
+  "pinned": false
+ },
+ {
+  "name": "Camera",
+  "start": "08225E1C",
+  "end": "08227900",
+  "fn_files": 66,
+  "functions": 66,
+  "bytes": 6884,
+  "pinned": false
+ },
+ {
+  "name": "Music player slots (tentative)",
+  "start": "0822AE7C",
+  "end": "0822B5D0",
+  "fn_files": 40,
+  "functions": 40,
+  "bytes": 1876,
+  "pinned": false
+ },
+ {
+  "name": "Scene stimulus",
+  "start": "0822B5D0",
+  "end": "0822BAD0",
+  "fn_files": 21,
+  "functions": 21,
+  "bytes": 1280,
+  "pinned": false
+ },
+ {
+  "name": "Player",
+  "start": "08237EC8",
+  "end": "082389D8",
+  "fn_files": 25,
+  "functions": 25,
+  "bytes": 2832,
+  "pinned": false
+ },
+ {
+  "name": "Player",
+  "start": "0823B264",
+  "end": "08243C10",
+  "fn_files": 110,
+  "functions": 110,
+  "bytes": 35244,
+  "pinned": false
+ }
+]
