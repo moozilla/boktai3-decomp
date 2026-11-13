@@ -2192,6 +2192,7 @@ addr,name,mode,confidence,source,notes
 08056CC0,ScriptUtility_ClearControlFlag,thumb,low,src-alias,
 08056CF8,ScriptUtility_ClearControlFlagFromScript,thumb,low,src-alias,
 08056D04,ScriptUtility_IsControlFlagSet,thumb,low,src-alias,
+08056D24,ScriptUtility_SetFlag800,thumb,low,src-alias,
 08056D38,ScriptUtility_WriteFlag800ToReference,thumb,low,src-alias,
 08056D70,ShakeIconDisplay_TickShake,thumb,low,src-alias,
 08056DBC,ShakeIconDisplay_Tick,thumb,low,src-alias,
