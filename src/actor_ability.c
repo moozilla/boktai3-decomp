@@ -137,7 +137,7 @@ s32 ActorAbility_SpawnProjectile(struct ActorAbility *ability)
     args.y = 0;
     args.z = 0;
     height = stats->height - 0x12000;
-    if (SceneProcSprites_CreateEntry(stats->position, height, owner->actors[0].control.projectile, owner->actors[0].control.direction,
+    if (SceneProcSprites_CreateEntry(&stats->position, height, owner->actors[0].control.projectile, owner->actors[0].control.direction,
                                      &ability->id) < 0) {
     fail:
         return 0;
@@ -166,7 +166,7 @@ s32 ActorAbility_SpawnAlternateProjectile(struct ActorAbility *ability)
     args.y = 0;
     args.z = 0;
     height = stats->height - 0x1a000;
-    if (SpritePool_StartEntry(stats->position, height, 0, &ability->id, owner->actors[0].control.direction) < 0) {
+    if (SpritePool_StartEntry(&stats->position, height, 0, &ability->id, owner->actors[0].control.direction) < 0) {
     fail:
         return 0;
     }
@@ -191,7 +191,7 @@ s32 ActorAction_TrySpawn(struct ActorAbility *ability)
     args.projectile = owner->actors[0].control.projectile;
     args.y = 0;
     args.z = 0;
-    ability->request = SpritePairPool_StartEntry(stats->position, &stats->height, 0, &ability->id,
+    ability->request = SpritePairPool_StartEntry(&stats->position, &stats->height, 0, &ability->id,
                                                  owner->actors[0].control.direction);
     if ((s8)ability->request < 0) {
     fail:
