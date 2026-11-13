@@ -7,7 +7,8 @@
 struct RegistryActorMotion {
     s32 x, y, z;
     u8 unknownC[4];
-    u8 parameterB, parameterD, parameterA, parameterC;
+    u8 parameterB, parameterD;
+    u16 remaining;
     u8 unknown14[2];
     u16 flags;
 };
@@ -17,7 +18,9 @@ struct RegistryActorControl {
     u8 messages[0x34];
     struct RegistryActorMotion motion;
     u8 unknown8A4[6];
-    u8 keyframe, unknown8AB[5];
+    s8 keyframe;
+    u8 unknown8AB;
+    s32 lastForwardSpeed;
     u32 ticks, active;
     u16 unknown8B8, updateFlags;
     void *owner;
@@ -29,7 +32,8 @@ struct RegistryActorControl {
 };
 struct RegistryActor {
     struct ActorStats stats;
-    u8 unknown5F0[8];
+    u16 directionAngle;
+    u8 unknown5F2[6];
     struct CharacterPreviewModel model;
     u8 unknown848[4];
     u32 fallTimer;
@@ -63,4 +67,13 @@ void RegistryA8CB_RegisterMessageReceiver(struct RegistryActor *);
 void Modifier_InitDrainState(struct ActorDrainState *, void *, u16, u8);
 void ActorPhysics_UpdateFallMotion(struct RegistryActor *);
 void SceneMessages_RegisterReceiver(void *, u32, u32);
+void RegistryA8CB_SetKeyframes(struct RegistryActor *, u32);
+s32 MotionTween_Advance(struct RegistryActor *, void *);
+void Character_UpdateLoopingSound(struct RegistryActor *);
+s32 Div(s32, s32);
+void Terrain_ResolveActorMotion(struct RegistryActor *);
+void PalFade_Update(struct RegistryActor *);
+void Actor_UpdateShadowSpriteParts(struct RegistryActor *, void *);
+void ActorParticles_SpawnImpactBurst(struct RegistryActor *);
+void CharacterModel_UpdateAccessoryAnimations(void *);
 #endif

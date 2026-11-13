@@ -20,7 +20,7 @@ void RegistryA8CB_CreateFromScript(void)
     animation = &actor->model;
     ActorSprite_InitPartDrawings(actor, animation, 0x3D99);
     CharacterPreview_InitializePalette(&actor->stats.pendingDamage, animation, actor->stats.state48[3]);
-    SceneSlot_RegisterObject(actor->stats.position);
+    SceneSlot_RegisterObject(&actor->stats.position);
     ActorCollision_InitBounds(actor);
     {
         void (*update)(struct RegistryActor *) = ActorPhysics_UpdateFallMotion;
