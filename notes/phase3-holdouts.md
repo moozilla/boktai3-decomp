@@ -1275,3 +1275,35 @@ this index records the complete queue and the current blocking decision after re
   later reload spill set.
 
 Drafts: `notes/phase3-drafts/cdp-monsters/`.
+
+### cdp-monsters pass 2 follow-up (2026-11-13)
+
+* `SpriteColliderGroup_ResetActiveParts`: stayed on the two-row reload holdout. Algebraic
+  second uses of `total`, duplicate identical arms, a copied total, and using `total` for the
+  loop latch are either removed before combine or perturb the loop; none keeps the initial
+  zero-extend pseudo alive. The original two-row diagnosis remains exact.
+* `Skeleton_TrySelectRetreatCell`: `why 447` confirms choice 18 sees r0 occupied and r1/r2
+  free after choice 17 selected r2. Expanding the successful south tail, the blocked south
+  tail, or both prevents jump2 from recreating the ROM control flow; the best expanded-tail
+  form is 8/10 rather than 2/2. The missing earlier reload must therefore come from another
+  source-level lifetime, not duplicated south tails.
+* `VulcanCannon_UpdateFacingTurn`: passing `p->allowTurn` as the final zero argument proves
+  the equality-CSE diagnosis: it restores the missing four-byte instruction and exact branch
+  layout, but reloads the byte through a retained offset base (4/4). Constant spellings,
+  signed/unsigned zero tests, and a separate zero local all reproduce the 5/3 draft.
+* `Ivy_UpdateDefeat`: the saved helper is closer than the prior index recorded (5/5). Reversing
+  the table/index addition and pointer spellings cannot change machine order. An explicit local
+  moves the literal early but returns the 14/14 allocation swap; duplicated-load arms inflate
+  every inlined call and are far worse. The remaining form must load the literal early without
+  creating a named table lifetime.
+
+Additional pass-2 allocation attempts:
+
+* `Vorn_SelectReactionControl`: duplicated boolean tests, zero expressions derived from `active`,
+  split result/call forms, and signed/unsigned copy locals all optimize before global allocation
+  or worsen control flow; they leave the exact r4/r5 swap unchanged. A source-level ninth use
+  must survive through global allocation rather than being propagated by combine.
+* `Axe_UpdateDamageSpin`: using the long-lived `context` as the branch-local `state`, or for any
+  single state access, lets CSE merge the two pointer quantities and is substantially worse
+  (34+ rows). The near match specifically requires two loads of the same actor context; the
+  remaining +20 priority cannot come from sharing those source locals.
