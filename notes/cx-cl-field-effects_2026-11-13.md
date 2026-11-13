@@ -36,3 +36,35 @@ Range boundaries include a few singleton resets belonging to the following owner
 `merge_unit.py --write --no-git` writes the merged file and unlinks input files without staging. This supports the external sandbox committer. Tests verify that an output also listed as an input is preserved, git is never invoked in this mode, and an output-creation failure preserves inputs. The existing parser tests also pass (five tests total).
 
 No full ROM build, disassembly regeneration, regrouping or progress-report regeneration was run in the worker.
+
+## Second cleanup checkpoint
+
+Tags: #matching #animation #scene #structs #compiler
+
+| Range (end exclusive) | Unit | Former files | Main recovery |
+|---|---|---:|---|
+| 0803EE58–0803F5C4 | scene_arc | 11 | Shared sprite/sequence/graphics, common playback, structured flight ending |
+| 0803F5C4–0803F804 | ground_effect | 12 | Typed lifecycle and shared tile resource |
+| 08042320–080427FC | display_animation | 16 | Real sequence/keyframe union, shared widget and graphics |
+| 08045A20–08045D18 | projected_display | 11 | Shared projection helper, widget/resource/task records |
+| 08047BB4–08047DBC | temporary_animation_pool | 6 | Sixteen widget slots, lifetimes, shared resource and task |
+| 0804D778–0804DF40 | staged_effect | 17 | Task/message receiver/sprite/graphics ownership; typed saved position |
+| 08054294–08054B80 | hit_switch | 17 | Shared sprites, typed entry indexing, named player terrain-cell field |
+| 08057678–08057960 | proximity_icon | 5 | Shared widget/resource/task records |
+| 080638BC–080645D4 | roaming_object | 28 | Both variants share SceneActorBody, sprite, graphics, terrain and listener types |
+| 08103AD0–081041DC | named_actor_commands | 15 | Canonical named-object, manager, route and player types |
+| 08104F08–08105808 | callback_pool_feedback | 9 | Sprite/sequence/graphics/collider/shadow, health thresholds and distances |
+| 08105808–08106DAC | region_actor | 16 | One actor and pool layout, terrain override, structured damage path |
+| 08106DAC–081084E4 | tile_trigger | 24 | Body, sequence, script payload and twelve-slot pool; two terminal gotos removed |
+
+The proximity and region ranges straddle an object boundary at 08105808. Split there and combine the contiguous region prelude with its pool. Likewise, the tile-trigger handlers and adjacent Pool1B8 range form one object and one contiguous unit.
+
+The display-wrapper header audit covered 2,252 units. Its sole compatibility failure was an older HUD caller using the widget's `unknown4` array; retain that public array and document its registration byte. The affected HUD and pool units match after correction. The unchanged SceneAnimation and ScaledShadow layouts live in small type headers so consumers can reuse them without gaining conflicting legacy API declarations. Other affected headers received per-unit checks (69 for the projected display; four final shadow/health feedback consumers).
+
+Several typed changes clarify compiler-sensitive behavior without concessions. A signed initialization result preserves the scene-arc constructor's negative check. The hit-switch initializer is void, while its wrapper forwards an unused scalar result through a legacy function-pointer call adaptation. Unsigned views of the named object's signed flag field preserve halfword loads. Keeping relative pointers to a nested resource or target-list entry preserves the original base-plus-field addressing.
+
+Shared playback or random-shake inlining was tried in staged effects and the tile constructor. It changes register allocation or table-load placement, so matching local sequences remain. The region contact-damage early exits and tile activation/release terminal paths accept structured conditionals with unchanged bytes.
+
+Two ranges are set aside for a second pass. Cell gates: 13 of 14 typed functions match, but the canonical player-pointer array lets the compiler remove the ROM's reload after a coordinate store in ClampPlayerEdge. Scheduling manager: typed ID lookup reorders a cursor copy and bit constant; eight loop variants retain that two-instruction difference. Original sources were restored; drafts and evidence remain under `build/cx/`.
+
+The coordinator shortened this worker's queue to stop before Scene status indicator at 08126650. Work after that boundary belongs to the cloud worker. Code matching coverage remains unchanged by this cleanup; the combined ROM check remains with integration.
