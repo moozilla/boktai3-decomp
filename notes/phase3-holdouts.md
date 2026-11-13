@@ -1620,3 +1620,29 @@ Recheck expression numbering as well as the table size after each structural
 change. The saved draft retains inherited raw offsets that should become real
 fields before a final clean landing. Work stopped here at the user's end-of-run
 instruction; later queue items were not started.
+
+
+### SpriteColliderGroup_ActivateParts (0818E9B8): unused saved register persists
+
+Reconfirmed the ordinary draft's complete body match: only four r8 save/restore
+instructions are missing (4/0, shape 4). Scope why/probe has no body mechanism
+left to explain; its seven CSE/PRE/loop interventions do not recover the save.
+No production change. Saved the ordinary draft and persistent hypotheses.
+
+New tests: a boolean IsActive predicate gives 9/7; initialized zero byte array
+5/9, with its zero in ip and stride in r8; explicit action &= 0 gives 10/6;
+returning directly from the requested-count exit and a parameterized activation
+inline give the same 4/0. Explicit goto iteration gives 18/16; calculating the
+iterator pointers before the initial guard gives 21/14; an initialized count
+union gives 16/18. None produces a register allocated and then rendered dead.
+A non-void missing final return changes the body extensively and is not a fix.
+
+Retaining the original r8 clobber but removing the stride pin leaves 2/2:
+stride pseudo 66, priority 681, takes r8 instead of ip. AGBCC_FORCE=66:12
+matches that partial diagnostic, but it still depends on the existing clobber.
+This is not an exact knob for the fully ordinary draft. No partial landed.
+
+Next: find a source-level value that gets r8 during allocation but whose final
+uses disappear after reload, while leaving stride's allocation in ip. The
+initialized-zero experiment confirms ordinary extra live data alone is not
+sufficient: it keeps visible instructions and changes stride placement.
