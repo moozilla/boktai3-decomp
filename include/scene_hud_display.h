@@ -7,6 +7,7 @@
 #include "scene_vec.h"
 #include "scene_value_equipment.h"
 #include "contact_swarm_sprite.h"
+#include "render.h"
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
@@ -79,9 +80,12 @@ struct SceneHudState {
     u8 unknown1B0[0x1C];
     struct DisplaySequenceState promptSequence; /* 0x1CC */
     const void *promptSequenceResource;         /* 0x1DC */
-    u8 unknown1E0[0xA12 - 0x1E0];
-    u16 savedMenuMode; /* 0xA12: restored after page fade */
-    u8 unknownA14[4];
+    struct BackgroundLayer savedBackground;     /* 0x1E0: field BG1 state while pause menu is open */
+    u8 savedBackgroundMap[0x800];               /* 0x210: field BG1 tilemap */
+    u16 savedBlendControl;                      /* 0xA10 */
+    u16 savedMenuMode;                          /* 0xA12: restored after page fade */
+    u16 savedBackgroundControl;                 /* 0xA14: BG1CNT */
+    u8 unknownA16[2];
     u16 blendedPalette[16]; /* 0xA18 */
     u16 blendSourceBank, blendTargetBank;
     u8 blendFrame, blendDuration, blendActive;
@@ -120,7 +124,7 @@ struct SceneHudState {
     u8 panelInitialized; /* 0xA94: cleared during gameplay HUD resource setup (tentative) */
     u8 unknownA95[4];
     u8 energyTimerVisible; /* 0xA99: set after drawing the four energy timer digits */
-    u8 unknownA9A[2];
+    u8 pageTransitions[2]; /* 0xA9A: cleared when returning to the field HUD */
     struct SceneHudControlAnimation controlAnimation; /* 0xA9C */
     u8 unknownABC[0x40];
     u8 timedStatusIconVisible;
@@ -205,7 +209,11 @@ struct SceneHudState {
     u8 unknown438E[0x26];
     u16 overridePalette[16];  /* 0x43B4 */
     u8 highlightPalettePhase; /* 0x43D4 */
-    u8 unknown43D5[0x13];
+    u8 unknown43D5[3];
+    u16 savedDisplayControl;                        /* 0x43D8 */
+    u16 savedMosaicHalfword, savedMosaicParameter;  /* 0x43DA */
+    u8 savedSpriteMosaicAttribute, savedMosaicByte; /* 0x43DE */
+    u8 unknown43E0[8];
     u8 directionRepeatTimer; /* 0x43E8 */
     u8 binaryChoice;         /* 0x43E9: left/right toggles; A confirms, B cancels */
     u8 unknown43EA[2];
