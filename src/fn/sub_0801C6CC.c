@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern u16 gUnknown_03005260[];
 extern int gUnk_0824DB38[];
@@ -15,40 +14,20 @@ struct ResultGamePlayerMarker {
 };
 void ResultGame_UpdatePlayerMarker(struct ResultGamePlayerMarker *p)
 {
-    int *velocity;
-    u32 key;
-    {
-        u32 input = gUnknown_03005260[1];
-        register u32 mask asm("r2");
-        mask = 1;
-        mask &= input;
-        asm("" : "+r"(mask));
-        key = mask;
-    }
-    if (key) {
-        velocity = &p->velocity;
-        *velocity = gUnk_0824DB38[p->playerIndex];
+    u32 jump = gUnknown_03005260[1] & 1;
+    if (jump) {
+        p->velocity = gUnk_0824DB38[p->playerIndex];
         Sound_PlaySong(0x3ec);
+    } else if (p->velocity > 0) {
+        p->velocity = 0;
+        p->fallDelay = 0;
+    } else if (p->fallDelay < gUnk_0824DB64[p->playerIndex]) {
+        p->velocity = 0;
+        p->fallDelay++;
     } else {
-        int *initial = &p->velocity;
-        int v = *initial;
-        velocity = initial;
-        if (v > 0) {
-            *velocity = key;
-            p->fallDelay = key;
-        } else {
-            u8 *counter = &p->fallDelay;
-            u8 *table = gUnk_0824DB64;
-            u32 index = p->playerIndex;
-            if (*counter < table[index]) {
-                *velocity = key;
-                ++*counter;
-            } else {
-                *velocity = v - gUnk_0824DB6F[index];
-                if (*velocity < -22)
-                    *velocity = -22;
-            }
-        }
+        p->velocity -= gUnk_0824DB6F[p->playerIndex];
+        if (p->velocity < -22)
+            p->velocity = -22;
     }
-    p->y += *velocity;
+    p->y += p->velocity;
 }
