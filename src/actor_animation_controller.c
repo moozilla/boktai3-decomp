@@ -2131,7 +2131,7 @@ void Actor_HideAndResetChildren(struct ActorAnimController *p)
             void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
             u32 reset = 1;
             struct ActorChildCallbackView *child =
-                (struct ActorChildCallbackView *)((u8 *)p + 0xc8);
+                (struct ActorChildCallbackView *)&p->children[0].fn;
             s32 i = 15;
             do {
                 union DisplaySequenceControl control;
