@@ -7324,6 +7324,8 @@ addr,name,mode,confidence,source,notes
 081B9334,MotionTrack_Initialize,thumb,low,src-alias,
 081B939C,OrbitMotion_BeginDistanceWave,thumb,low,src-alias,
 081B9440,OrbitMotion_BeginArc,thumb,low,src-alias,
+081B94AC,OrbitMotion_BeginVerticalDistanceWave,thumb,low,cleanup,Tentative: initializes distance-scaled steering in the XY plane
+081B9550,OrbitMotion_BeginCrossedSines,thumb,low,cleanup,Tentative: initializes two sinusoidal radii and duration-derived angular speed
 081B9598,PositionMotion_InitParameterizedApproach,thumb,low,src-alias,Initializes motion mode 10 with a destination and three approach parameters; exact trajectory tentative
 081B95E4,MotionTrack_Update,thumb,low,src-alias,
 081B9818,PositionMotion_InitTimedInterpolation,thumb,low,src-alias,Stores start and end positions and a duration for mode 12 while resetting the output to the start
