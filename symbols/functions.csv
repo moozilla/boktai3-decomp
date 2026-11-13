@@ -5762,27 +5762,29 @@ addr,name,mode,confidence,source,notes
 08162DAC,PlayerBarrier_BeginRecovery,thumb,low,src-alias,Switches the defensive effect to recovery state two and selects its transition palette
 08162DC8,PlayerBarrier_Hide,thumb,low,src-alias,Resets the defensive effect state and sets its hidden flag
 08162DE8,PlayerBarrier_IsActive,thumb,low,src-alias,Reports whether the defensive effect exists and has a nonzero state
-08162E00,PlayerBurstEffect_InitExpansion,thumb,low,src-alias,Starts sound playback and initializes two visual parameters and the first burst phase; effect identity tentative
-08162E40,PlayerBurstEffect_UpdateExpansion,thumb,low,src-alias,Increases the burst parameters and advances to phase two when the second reaches 127
+08162E00,GameOver_InitExpansion,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+08162E40,GameOver_UpdateExpansion,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 08162E7C,GameOver_UpdateLetterRebound,thumb,low,src-alias,Increases horizontal scale while reducing vertical scale to 96 before advancing the animation
 08162EB8,GameOver_UpdateLetterSettle,thumb,low,src-alias,Increases horizontal scale faster while reducing vertical scale to 64
 08162EF4,GameOver_UpdateLetterExpand,thumb,low,src-alias,Expands horizontal letter scale to 64 then starts the hold timer
 08162F2C,GameOver_UpdateLetterHold,thumb,low,src-alias,Waits 20 frames before advancing the letter animation
-08162F5C,TransitionPanel_UpdateOpening,thumb,low,src-alias,
+08162F5C,GameOver_UpdateOpening,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 08162FF4,GameOver_UpdateExitDelay,thumb,low,src-alias,Waits 90 frames before marking the presentation complete
+08163020,GameOver_UpdateLetterTransforms,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 081630BC,GameOver_StopPresentation,thumb,low,src-alias,Clears the game-over flag and stops song 2 before resetting the transition
 081630E0,GameOver_UpdateLetterAnimation,thumb,low,src-alias,Dispatches the current letter animation state then applies its scale and positioning
 0816310C,GameOver_ShowGraphics,thumb,low,src-alias,Registers eight GAME OVER letter sprites and the accompanying animation for display
-08163144,TransitionPanel_InitSprites,thumb,low,src-alias,
-081631F8,TransitionPanel_InitOverlay,thumb,low,src-alias,
+08163144,GameOver_InitSprites,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+081631F8,GameOver_InitOverlay,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 081632B4,GameOver_StartFromScript,thumb,low,src-alias,Shows the graphics and selects HUD mode 7 with an optional scripted fade
-08163310,TransitionPanel_TryBeginClose,thumb,low,src-alias,
-08163398,SceneTransition_FinishDelay,thumb,low,src-alias,
-081633F8,TransitionPanel_UpdateCostPrompt,thumb,low,src-alias,
-0816349C,TransitionPanel_UpdateCostSelection,thumb,low,src-alias,
+08163310,GameOver_TryBeginClose,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+08163398,GameOver_FinishDelay,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+081633F8,GameOver_UpdateCostPrompt,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
+0816349C,GameOver_UpdateCostSelection,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 08163654,GameOver_UpdateExit,thumb,low,src-alias,Advances letter animation then restores transition state and kills the task when complete
 081636A0,GameOver_OnUpdate,thumb,low,src-alias,Task update callback dispatching the current game-over presentation state
 081636C0,GameOver_OnDestroy,thumb,low,src-alias,Task destruction callback removing registered graphics and clearing the singleton
+08163700,GameOver_Initialize,thumb,low,src-alias,Game-over letter presentation and cost/restart prompt task.
 081637D0,GameOver_Create,thumb,low,src-alias,Returns the existing game-over task or creates and initializes one
 0816381C,Palette_UpdateHighlightPulse,thumb,low,src-alias,Cycles a highlight color through red intensity levels over a repeating 50-frame period
 0816385C,SpiralParticles_UpdateParticle,thumb,low,src-alias,
