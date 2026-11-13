@@ -13,7 +13,7 @@ struct SceneEffectScheduleEntry {
     struct SceneScheduledEffect *effect;
 };
 struct SceneEffectSchedule {
-    u8 task[0x18];
+    struct Task task;
     struct SceneEffectScheduleEntry entries[12];
     u32 occupiedMask;
 };
@@ -25,6 +25,6 @@ s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *);
 void SceneEffectSchedule_Destroy(void *);
 s32 SceneEffectSchedule_Initialize(struct SceneEffectSchedule *, u32);
 struct SceneEffectSchedule *SceneEffectSchedule_Create(u32);
-struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPosition *, u32, s32, u32, u32, s32,
-                                          s32, s32, s32, s32, u32);
+struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPosition *, u32, s32,
+                                                         u32, u32, s32, s32, s32, s32, s32, u32);
 #endif

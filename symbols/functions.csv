@@ -4531,11 +4531,13 @@ addr,name,mode,confidence,source,notes
 08111410,PaletteFade_AdvanceColors,thumb,low,src-alias,
 081114E8,PaletteFade_UpdateTransition,thumb,low,src-alias,Advances an active fade and starts the next transition when its countdown expires
 0811153C,PaletteFade_SetTransitionParameters,thumb,low,src-alias,Stores palette slot and target and rate and duration while resetting transition state
+08111578,PaletteFade_BeginNextTarget,thumb,low,cleanup,Prepare fixed-point color deltas for the next target palette
 08111748,PaletteFade_LoadPaletteResources,thumb,low,src-alias,Loads two palette resources and copies the initial palette into the working buffer
 081117A0,PaletteFade_SetupBackground,thumb,low,src-alias,Loads a background resource and configures its layers and initial tilemap
 081117F0,PaletteFade_InitFromScript,thumb,low,src-alias,
 081119B8,PaletteFade_CreateFromScript,thumb,low,src-alias,Creates the palette fade task and installs its callbacks before script initialization
 081119F8,PaletteFade_SetScrollPosition,thumb,low,src-alias,Sets two fixed point background scroll coordinates used by the task updater
+08111A24,PaletteFade_SetWaveParameter,thumb,low,cleanup,Set one of four scanline wave parameters
 08111A48,PaletteFade_StartFromScript,thumb,low,src-alias,
 08111BC4,PaletteFade_StartScrollFromScript,thumb,low,src-alias,Tentatively starts a scroll transition using script target position and frame count
 08111C44,StageResults_LoadBackgroundResources,thumb,low,src-alias,Loads two background resources and the initial palette for the provisional stage results screen
@@ -4958,6 +4960,7 @@ addr,name,mode,confidence,source,notes
 08122D58,SceneScheduledEffect_InitializeManager,thumb,low,cleanup,Load manager resources and mark slots unused
 08122DA0,SceneScheduledEffect_EnsureSingleton,thumb,low,src-alias,Creates the shared effect task when absent; called by scene effect schedule initialization
 08122DE4,SceneScheduledEffect_ResetSingleton,thumb,low,src-alias,Clears the shared effect manager pointer during scene reset
+08122DF0,SceneScheduledEffect_Shutdown,thumb,low,cleanup,Empty shutdown hook following the scheduled effect manager
 08122DF4,SequencedSprite_StepAnimation,thumb,low,src-alias,
 08122F38,SceneAnimatedEffect_ReleaseEntry,thumb,low,src-alias,Removes an effect and clears its occupancy bit and storage before marking its slot invalid
 08122F78,SpriteNotice_AllocateSlot,thumb,low,src-alias,
@@ -4968,7 +4971,10 @@ addr,name,mode,confidence,source,notes
 08123124,SceneTrailEffect_InitPool,thumb,low,src-alias,Loads animation and script resources then publishes the pool singleton; trail identity is tentative
 0812313C,SceneTrailEffect_EnsurePool,thumb,low,src-alias,Returns the existing singleton or creates and initializes its 32-slot effect task
 08123188,SceneTrailEffect_ResetPool,thumb,low,src-alias,Clears the pool singleton during scene subsystem reset
+08123194,SpreadShot_ResolveTerrain,thumb,low,cleanup,Resolve terrain entry and redirect a spread shot along walls or slopes
+08125498,SceneTerrainProbe_NoopCollisionHook,thumb,low,cleanup,Empty spread-shot collider callback
 0812549C,SpriteNotice_CreateBetweenPositions,thumb,low,src-alias,
+08125524,SceneTerrainProbe_NoopTrailHook,thumb,low,cleanup,Empty trail hook after notice interpolation
 08125528,SpreadShot_Step,thumb,low,src-alias,
 08125898,SceneTerrainProbe_DestroyEntry,thumb,low,src-alias,Clears the slot mask and releases entry resources before clearing the record; terrain probe identity is tentative
 081258DC,PairSlotPool_Allocate,thumb,low,src-alias,
@@ -4978,6 +4984,7 @@ addr,name,mode,confidence,source,notes
 08125B00,SceneTerrainProbe_InitPool,thumb,low,src-alias,Publishes the newly allocated pool as the singleton
 08125B0C,SceneTerrainProbe_EnsurePool,thumb,low,src-alias,Returns the existing singleton or creates its two-entry task and installs callbacks
 08125B58,SceneTerrainProbe_ResetPool,thumb,low,src-alias,Clears the singleton during scene subsystem reset
+08125B64,SceneTerrainProbe_NoopHook,thumb,low,cleanup,Empty trailing spread-shot hook
 08125B68,SceneMovingParticle_AllocateEntry,thumb,low,src-alias,Claims the first unused bit among 26 slots and stores the particle slot index
 08125BBC,SceneMovingParticle_UpdateAnimation,thumb,low,src-alias,Counts down a timer and alternates between two frames every four updates
 08125BF8,SceneMovingParticle_Update,thumb,low,src-alias,Applies particle gravity; damped terrain bounces and raised-floor reflection; then advances animation and lifetime.
@@ -4985,6 +4992,7 @@ addr,name,mode,confidence,source,notes
 08125EC4,SceneMovingParticle_Create,thumb,low,src-alias,Creates a particle from position velocity lifetime and variant with the fifth option fixed to one
 08125ED8,SceneMovingParticle_CreateWithOptions,thumb,low,src-alias,Forwards all five arguments to the particle constructor
 08125EEC,SpriteBurst_Create,thumb,low,src-alias,
+08126000,SceneMovingParticle_UpdatePool,thumb,low,cleanup,Dispatch active moving particles by state
 08126074,SceneMovingParticle_OnPoolDestroy,thumb,low,src-alias,Task destruction callback that removes occupied particle effects and clears the singleton
 081260BC,SceneMovingParticle_InitPool,thumb,low,src-alias,Loads animation resource 1C1E and clears occupancy before publishing the pool
 081260E8,SceneMovingParticle_EnsurePool,thumb,low,src-alias,Returns the existing singleton or creates and initializes the 26-slot particle task
