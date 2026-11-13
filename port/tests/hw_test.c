@@ -353,6 +353,68 @@ static int audio_tests(void)
     return 0;
 }
 
+static struct SoundInfo bridge_sound;
+static struct MusicPlayerInfo bridge_player;
+static unsigned bridge_order, bridge_error, bridge_samples;
+
+static void bridge_sequence(struct MusicPlayerInfo *player)
+{
+    if (bridge_order != 0 || player != &bridge_player || bridge_sound.ident != ID_NUMBER + 1) bridge_error = 1;
+    bridge_order = 1;
+    SoundMain(); /* The SDK lock must reject reentry before another callback. */
+    if (bridge_order != 1) bridge_error = 1;
+}
+
+static void bridge_cgb(void)
+{
+    if (bridge_order != 1 || bridge_sound.ident != ID_NUMBER + 1) bridge_error = 1;
+    bridge_order = 2;
+    /* Simulate the game's direct register stores after SoundInit powered on. */
+    io[0x62] = 0x80; io[0x63] = 0xf0;
+    io[0x64] = 0x00; io[0x65] = 0x86;
+    io[0x80] = 0x77; io[0x81] = 0x11; io[0x82] = 2;
+}
+
+static void bridge_audio(void *user, const int16_t *stereo, size_t frames, uint32_t rate)
+{
+    size_t i;
+    unsigned audible = 0;
+    (void)user;
+    if (bridge_order != 2 || bridge_sound.ident != ID_NUMBER || frames != 16 || rate != 8000) bridge_error = 1;
+    for (i = 0; i < frames * 2; ++i) audible |= stereo[i] != 0;
+    if (!audible) bridge_error = 1;
+    bridge_samples += (unsigned)frames;
+    bridge_order = 3;
+}
+
+static int sound_bridge_tests(void)
+{
+    HwHost host = machine.host;
+    host.audio = bridge_audio;
+    hw_init(&machine, &host);
+    hw_m4a_attach(&machine, &bridge_sound);
+    bridge_sound.ident = ID_NUMBER;
+    bridge_sound.pcmSamplesPerVBlank = 16;
+    bridge_sound.pcmFreq = 8000;
+    bridge_sound.MPlayMainHead = bridge_sequence;
+    bridge_sound.musicPlayerHead = &bridge_player;
+    bridge_sound.CgbSound = bridge_cgb;
+    bridge_order = bridge_error = bridge_samples = 0;
+    io[0x84] = 0x80; /* SoundInit's direct store, pending import. */
+    SoundMain();
+    CHECK(!bridge_error && bridge_order == 3 && bridge_samples == 16 && machine.psg[0].enabled);
+    CHECK(!(io[0x65] & 0x80) && bridge_sound.ident == ID_NUMBER);
+    bridge_sound.ident = ID_NUMBER + 1;
+    SoundMain();
+    CHECK(bridge_samples == 16 && bridge_order == 3);
+    bridge_sound.ident = ID_NUMBER;
+    bridge_sound.pcmSamplesPerVBlank = PCM_DMA_BUF_SIZE + 1;
+    SoundMain();
+    CHECK(bridge_samples == 16);
+    hw_m4a_attach(&machine, NULL);
+    return 0;
+}
+
 int hw_test_run(void)
 {
     HwHost host = {0};
@@ -364,5 +426,6 @@ int hw_test_run(void)
     result = device_tests(); if (result) return result;
     result = cartridge_tests(); if (result) return result;
     result = rtc_sdk_tests(); if (result) return result;
-    return audio_tests();
+    result = audio_tests(); if (result) return result;
+    return sound_bridge_tests();
 }

@@ -136,7 +136,8 @@ not a claim of bit-identical GBA audio.
 
 The SDK `SoundMain` replacement finds the sound state through the mapped
 `03007FF0` pointer, or `hw_m4a_attach` for a native host. It calls the existing
-sequencer and CGB callbacks, imports register writes, renders PCM and PSG, then
+sequencer and CGB callbacks, imports pending initialization writes before them
+and callback writes afterward, renders PCM and PSG, then
 delivers `HwHost.audio(user, stereo, frames, rate)`. The callback must copy or
 consume the buffer before the next call. Sample-rate conversion to the host's
 audio device belongs in the host. Do not also feed the same MP2K DMA FIFO to

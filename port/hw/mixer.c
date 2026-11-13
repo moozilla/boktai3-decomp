@@ -165,6 +165,9 @@ void SoundMain(void)
     }
     if (!sound || sound->ident != ID_NUMBER || sound->pcmSamplesPerVBlank <= 0 || sound->pcmSamplesPerVBlank > PCM_DMA_BUF_SIZE || sound->pcmFreq <= 0) return;
     ++sound->ident;
+    /* Import SoundInit and frame-loop writes before callbacks issue their
+     * first PSG triggers. Import again below to collect callback writes. */
+    hw_sync_io(hw);
     if (sound->MPlayMainHead) sound->MPlayMainHead(sound->musicPlayerHead);
     if (sound->CgbSound) sound->CgbSound();
     hw_sync_io(hw);
