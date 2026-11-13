@@ -2,7 +2,6 @@
 #include "input.h"
 #include "area_effect_link.h"
 
-// MATCHING_CONCESSION: register-pinning
 struct LinkReadySessionFlags {
     u8 pad0[0x2c];
     u8 startRequested;
@@ -79,8 +78,6 @@ static inline void LinkReady_ClearReady(struct LinkReadyState *p)
 static inline u16 LinkReady_AdvanceTimer(u16 *timer)
 {
     ++*timer;
-    /* Temporary: preserves the ROM's GCSE expression-table and spill order. */
-    asm("" : : "m"(*timer));
     return *timer;
 }
 s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
@@ -93,8 +90,9 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
         p->timer = 0;
         p->requested = 0;
         {
-            register struct LinkReadyState *initState asm("r4") = p;
-            initState->countdown = 40;
+            struct LinkReadyState *state = p;
+            struct LinkReadyState **initial = &state;
+            (*initial)->countdown = 40;
         }
         if (gLinkSession)
             ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 0;
@@ -234,9 +232,9 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
         }
     }
     event = &p->event;
-    if ((*event) == 2) {
-        SerialLink_InitMultiplayer();
-        Registry1745_SetState(p, 1, ScriptPanel_ConfirmSelection);
-    }
+    if (*event != 2)
+        return 0;
+    SerialLink_InitMultiplayer();
+    Registry1745_SetState(p, 1, ScriptPanel_ConfirmSelection);
     return 0;
 }

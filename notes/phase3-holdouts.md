@@ -4407,3 +4407,107 @@ Prior round's narrow-heading/polar forms are recorded in round11-d-holdouts.
 Next: recover a natural short-lived sine operand or another table view whose
 allocation precedes heading; a one-use statement macro would only hide the
 priority knob and must not be used.
+
+### WirelessResultPanel_Init (0803B40C, src/fn/sub_0803B40C.c)
+
+Stopped at the explicit end-of-run request. Production is unchanged and independently
+checks MATCH (684 bytes). All eleven pins and three barriers remain there. The clean
+saved draft is `notes/phase3-drafts/dp-link/WirelessResultPanel_Init.c`: 15 ROM / 13
+draft differences, shape 6, 680 bytes. The adjacent `.partial.c` preserves the useful
+four-concession intermediate (two resource barriers, visible-address and zero pins):
+4/4 differences, shape 4, 684 bytes. Neither is a matching implementation.
+
+The shared DisplaySequence_StepSprite logic removes the difficult sequence-step
+constraints. Calling the helper directly loses the saved sprite low-register copy;
+expanding its ordinary C locally and accessing the first flip through p->sprite,
+with the second through sprite, restores nearly all of the instruction structure.
+The fully unconstrained baseline was 79/73, shape 20; helper alone 27/27, shape 24;
+expanded parent-field form 17/15, shape 6. Moving the final one initializer before
+the state store gives the saved 15/13 clean result and 4/4 partial.
+
+The partial's first flip reload takes r1 instead of r3, forcing an additional parent
+reload for the store. Scope why identifies reload choice 19 (insn 417) and the round-
+robin spill list r0,r1,r3,r4,r5,r6: previous choice 18 took r0, whereas the ROM needs
+the rotation to start after r1. AGBCC_SPILL=19:1 on the saved partial reduces it to
+1/1, shape 2, but DOES NOT MATCH: the final movs r0,#1 is before the state store,
+whereas the ROM places it after. With the original final initializer order, that
+same knob leaves four differences. There is no matching diagnostic yet.
+
+Tried shared sprite/state types, helper calls and expanded local/parent forms,
+direct parameter instead of p=arg, final direct stores, narrow one, reordered one,
+first-flip value and constant locals, repeated command reload in both flip arms,
+and removal of the visible pin, zero pin, both pins, or both resource barriers.
+No partial matches. The clean form additionally loses the two resource-copy moves,
+reverses loop zero/count registers, and changes the saved visible-address register.
+Next: recover one natural reload before the first flip while retaining the final
+state/one order; then address resource copy and loop allocation independently.
+Do not claim the spill override as a match or land the diagnostic partial.
+
+Scratch/evidence: `build/cx/work/WirelessResultPanel_Init/`.
+
+### EncodedRecord_XorRange (08044D6C, src/fn/sub_08044D6C.c)
+
+Landed removal of the volatile skip parameter: stock unit MATCH, 100 bytes. One
+current-pointer pin and two barriers remain. Fully clean draft is saved at
+`notes/phase3-drafts/dp-link/EncodedRecord_XorRange.c` (13 ROM / 11 draft, shape 2,
+96 bytes). The missing start-to-index copy reverses the current/remaining registers;
+the missing word-to-value copy lets the byte load and XOR result share r0.
+
+CSE substitutes index pseudo 31 with start 23. Allocation then gives current 37 r4
+and remaining r5 instead of the ROM's reverse assignment. Raising start priority
+by 14365 improves to 10/8 but does not restore the copy. For the XOR, cse substitutes
+word 28 for value 40, then regmove ties the loaded byte to the result (insn 84).
+AGBCC_NOTIE=84 has no effect; forcing value to r1 improves the clean draft to 11/9,
+not MATCH. CSE_KEEP=31,40, CSE_NOCANON=23 and COMBKEEP=40 do not solve it. The six
+single CSE/loop probes do not improve the clean draft. No matching knob was found.
+
+Tried natural index for/goto loops, reuse of the warmup count, countdown and goto
+warmup loops, index union and ADDRESSOF, narrow byte/value locals, byte/word unions
+and aggregate initializers, direct byte access, moving the word capture before the
+load, ADDRESSOF value, signed XOR, and a narrowed mask. Removing the value barrier
+alone remains 6/4. Explicitly updating and restoring the accumulator gives 2/2 with
+the other constraints retained, but emits an extra XOR and is not a match; do not
+mistake its smaller distance for restored ROM structure. Restoring by a saved local
+also fails. These extend the prior recovery and manual-depin experiments.
+
+Next: find a natural control-flow boundary that retains the two copies, or extend
+CSE diagnostics to isolate the copy substitution rather than the class-head probe.
+Scratch: `build/cx/work/EncodedRecord_XorRange/`; persistent search:
+`build/matchsearch/EncodedRecord_XorRange/`.
+
+### sub_08108C94 (08108C94, src/fn/sub_08108C94.c)
+
+Both original pins remain; no production change. Best clean draft saved at
+`notes/phase3-drafts/dp-link/sub_08108C94.c`: 7 ROM / 7 draft differences, shape 2.
+It compares matches first, then count against matches. This restores the counter
+allocation but reverses the two final comparisons and retains the packet-word
+copy/mask differences. Original fully clean form was 45/43, shape 20.
+
+Removing only matches' r6 pin produces 20/20 with shape 0. Its global priority is
+1724 (10 refs, 87 flow insns doubled to 174 at the initial constant definition);
+base has 1739 (4 refs, 46 insns), so base takes r6 and matches takes r7. The spill
+register set then contains r6 rather than r7 throughout. AGBCC_PRI=matches:+16
+MATCHES this partial. Moving matches initialization after ready restores allocation
+but moves one initialization instruction (1/1, shape 2). Reversing the final pair
+of comparisons also restores allocation, with 3/3, shape 2 before raw-pin removal.
+
+Removing only raw's r3 pin yields 4/4, shape 0. CSE puts the load in SI pseudo 53
+and its HI copy in raw 49; allocation gives the load r2 and copy r3, opposite the
+ROM. Regmove ties the mask result to raw rather than its constant. NOTIE=175 repairs
+the mask (2/2 remain). FORCE=53:3,49:2 plus NOTIE=175 fixes the load/copy order but
+uses the wrong equal-value pseudo for the comparisons and mask (3/3). CSE_NOCANON
+on either 49 or 53 worsens code to 47/39, shape 44. This is not a matching override.
+
+Tested approximately sixty focused forms: direct/union/wide-first packet reads,
+inline u16/u32/s32 readers and an output-parameter reader, narrow-mask helpers,
+base definition before tick update or before its store, direct first-peer byte,
+array pointer type, initialization order and shared zero, count/matches comparison
+forms, repeated count in the first/non-first arms, swapped ready/matches increments,
+aggregate counters, and narrow/signed/unsigned counter and sentinel types. The
+mask helpers and direct peer reloads disrupt placement; base movement changes
+instruction order. Narrow count/ready restores some allocation but adds narrowing
+instructions. No partial ordinary-C match. Next: retain the original initializer
+and comparison order while changing the matches/base flow lifetime by one insn;
+then preserve the load's HI identity through both comparisons and the mask.
+
+Scratch and compiler evidence: `build/cx/work/sub_08108C94/`.

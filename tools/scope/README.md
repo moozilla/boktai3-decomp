@@ -2018,6 +2018,33 @@ Each was read from the compiler source and confirmed on a live draft.
    `why` now recognizes this address-reuse form from its pre/post-reload patterns and the
    uninterrupted copy/add history, including labels, calls and intervening definitions.
 
+153. **A final early return can fix PRE stack slots earlier in a function.**
+  LinkMenu_WaitForReadyPeers (08109F1C) needed two independent changes. Taking
+  the address of its local initialization-state pointer postpones the first
+  shared p+45 expression, restoring PRE insertion order (ready, presence,
+  countdown) without the r4 pin. Removing the timer barrier then leaves 11/11
+  differences: N=511 real insns gives T=255, whose reaching-register numbering
+  assigns the wrong stack slots. AGBCC_GCSE_T=257 MATCHES; preorder predicts
+  N=512..515 as the nearest natural interval. Writing the final event dispatch
+  as `if (*event != 2) return 0;` followed by its two calls restores the full
+  stock-compiler match. Repeating a return inside the original positive arm
+  does not match. Simple timer-expression rewrites do not change the result.
+  Distinguish expression-index insertion order from hash-order pseudo/slot
+  numbering: changing T alone did not fix the original fully clean draft.
+
+154. **Addressing a pointer only in one arm can preserve a call-argument copy.**
+  LinkMenu_WaitSelectionMode (0810A540) had a memory barrier between two mode
+  tests and a pointer barrier before the mode-4 state call. Reading the first
+  selection through `struct State **address = &p` prevents PRE from sharing
+  the selection-pointer load, removing the memory barrier. The clean draft
+  then has 2/2 differences: r0's state-pointer move is shared after the mode
+  argument, whereas the ROM copies it separately before each mode constant.
+  In the mode-4 arm, `struct State **slot = &pp; *slot = p;` preserves that
+  separate copy and fully matches. A branch-local addressed source pointer
+  and a pointer union initializer also match. Addressing pp at function
+  scope does not match; scope matters. Narrow mode arguments and reordered
+  inline-helper parameters do not fix the common tail.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
