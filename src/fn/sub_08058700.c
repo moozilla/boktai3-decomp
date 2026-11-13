@@ -189,9 +189,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             {
                 u16 *conditionFrame = frame;
                 if (!(*conditionFrame & 7)) {
-                    u32 shakeOffset = 0x132A;
-                    s16 *shake;
-                    shake = (void *)((u8 *)panel + shakeOffset);
+                    s16 *shake = &panel->shakeOffset;
                     if (*shake <= 6)
                         (*shake)++;
                 }
