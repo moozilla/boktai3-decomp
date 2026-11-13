@@ -163,8 +163,8 @@ for full execution. No fallback bodies are supplied for those routines.
 With `--ppu-root ../cx-port-ppu/port` and `--mmio`, the slice routes visible
 scanlines to the sibling C PPU. `run_boot.py --ppu-root ../cx-port-ppu/port`
 checks the first forced-blank frame against mGBA in RGB555. This is the initial
-white frame, not a gameplay boot. CPU MMIO writes notify the affine renderer;
-DMA writes to affine registers still need a device notification interface.
+white frame, not a gameplay boot. CPU and DMA register publications notify the affine renderer, including
+identical-value writes that reload internal reference latches.
 
 ## See the port
 
@@ -463,3 +463,70 @@ build/venv/bin/python port/demo/build.py
 explicit linker override fails instead of silently using another toolchain.
 The platform port can reuse `find_wasm_ld()` and `build_ppu()` when combining
 subsystem builds. None of these tools modifies `src/` or the agbcc build.
+
+The `--slice --rtc --video-irqs` extension resolves the original VBlank table
+entry to `sub_08213FD8` compiled from C. Build it with the hardware-root override,
+then run `node port/tests/video_irq.cjs
+build/port/slice-wasm32-rtc-video/boot.wasm baserom.gba`. Three frames verify the
+original handler's BG scroll uploads, dialogue latches, upload flag, clock ticks
+and BIOS VBlank latch, plus IF acknowledgement and IME restoration. The test
+uses valid inactive sound state and leaves wireless uncreated; active audio/RFU
+callbacks are not covered. This focused resolver
+is a tested integration boundary, not the full game's callback registry.
+
+## Discarded return declarations
+
+`core/returns.py` records the actual integer return types of 25 frequently called
+functions. Generated sources and mirrored headers correct explicit `void`
+declarations for those functions; arguments and call sites are unchanged. Each
+build verifies the recorded type against its original C definition and fails
+clearly if integration changes that evidence. Other return/argument conflicts
+and indirect callback signatures remain unresolved.
+
+`python port/tests/run_returns_slice.py` reproduces the original wasm link error
+for `ParticlePool_Destroy` calling `Task_Kill`, then executes the original C
+call chain on host and wasm after the repair. No ROM is needed for this test.
+`python port/tests/run_returns.py --hardware-root ../cx-port-hw/port` recompiles
+all affected units and audits an existing full-game object sweep: 1,894 game
+units plus 14 core/device units compile; distinct linker conflicts fall from
+823 to 804, with no new conflicts and the same seven missing MP2K routines.
+Six corrected functions retain other ABI mismatches.
+
+`--link-game --compile-only --source PATH` can rebuild selected bound/MMIO
+objects without attempting a partial final link. The audit collects fatal
+signature diagnostics separately from missing symbols because LLD stops early
+on fatal warnings. Any diagnostic wasm output is deleted; the normal build
+continues to reject signature warnings. Results live in `build/port/returns/`.
+
+The same video-IRQ slice includes the original two-phase VCount handler
+`sub_08214144`. Run `node port/tests/vcount_irq.cjs
+build/port/slice-wasm32-rtc-video/boot.wasm baserom.gba` to check the comparison
+change from scanline 64 to 144, the dialogue-scroll write, phase reset and IRQ
+mask restoration. It checks exactly two VCount calls per frame, avoiding a
+duplicate HBlank notification. Register setup uses the exported device bus,
+just like generated game C. Sound state remains inactive in this test.
+
+The generated port-hw input renames only `hw_publish_io`'s implementation; its
+callers use a core C wrapper that observes the completed mapped write. This
+keeps sibling hardware sources unchanged and delivers affine notifications for
+CPU, immediate DMA, HBlank DMA and VBlank DMA publications. The wrapper handles
+unchanged values and partial register writes, not just differences between
+snapshots. A signature check rejects a changed hardware publication boundary.
+
+`node port/tests/affine_dma.cjs build/port/slice-wasm32-rtc-video/boot.wasm`
+requires a slice built with `--ppu-root`. Its synthetic mode-3 image proves that
+repeated identical HBlank writes reset BG2Y each line, then normal affine row
+stepping resumes after DMA is disabled. Native/wasm boot and RTC comparisons
+and original VBlank/VCount/solar IRQ tests still pass.
+
+Core timing owns DISPSTAT/VCOUNT and the interrupt masks/flags in mapped memory.
+Before bus access, elapsed-device updates and blanking events, the bridge copies
+those specific registers into port-hw's shadow without treating them as writes.
+This prevents stale scanline reads and avoids losing pending flags or interpreting
+them as write-one-to-clear acknowledgements.
+
+`python port/tests/run_display_bus.py --hardware-root ../cx-port-hw/port` verifies
+that a line-64 IRQ reads line 64 and the active comparison bit, a timer preserves
+a core-raised interrupt, and selective IF acknowledgement preserves other flags.
+The pre-fix evidence read line 63 and lost both kinds of pending flags. Core,
+native/wasm RTC, original video/solar IRQ and affine DMA regressions pass.

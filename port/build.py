@@ -33,8 +33,10 @@ def main():
     ap.add_argument('-j', '--jobs', type=int, default=4)
     ap.add_argument('--source', action='append', help='repo-relative source (repeatable); default: every game C unit')
     ap.add_argument('--force', action='store_true')
+    ap.add_argument('--compile-only', action='store_true', help='skip final linking after a bound-object compile')
     ap.add_argument('--mmio', action='store_true', help='route volatile scalar accesses through port-hw in linked builds')
     ap.add_argument('--link-game', action='store_true', help='bind absolute data addresses and attempt the complete wasm game link')
+    ap.add_argument('--video-irqs', action='store_true', help='include the original VBlank handler in the boot slice')
     ap.add_argument('--rtc', action='store_true', help='extend the boot slice through RTC date synchronization')
     ap.add_argument('--slice', action='store_true', help='link the tested early-boot vertical slice')
     ap.add_argument('--ppu-root', help='port-ppu port directory when testing before integration')
@@ -77,7 +79,7 @@ def main():
             header_hash.update(p.read_bytes())
     identity = subprocess.check_output([args.cc, '--version'])
     context = identity + repr(flags).encode() + header_hash.digest()
-    for helper in ('prepare.py', 'addresses.py', 'mmio.py'):
+    for helper in ('prepare.py', 'returns.py', 'addresses.py', 'mmio.py'):
         context += (ROOT / 'port/core' / helper).read_bytes()
     context += json.dumps(address_map, sort_keys=True).encode() + str(args.mmio).encode()
 
@@ -130,7 +132,7 @@ def main():
               'seconds': round(time.monotonic() - start, 2), 'results': results}
     (out / 'compile.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f"{args.target}: {len(results) - len(failed)}/{len(results)} compiled; {len(failed)} failed")
-    if args.link_game and not failed:
+    if args.link_game and not failed and not args.compile_only:
         excluded = {'src/fn/AgbMain.c', 'src/fn/sub_08213F80.c',
                     'src/fn/sub_082485EC.c', 'src/fn/sub_082486B4.c', 'src/fn/sub_08248778.c',
                     'src/fn/sub_082488D8.c', 'src/fn/sub_08248764.c'}

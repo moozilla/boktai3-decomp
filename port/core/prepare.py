@@ -1,11 +1,19 @@
 """Small, audited source adaptations for clang, confined to generated build files."""
 import re
 from pathlib import Path
+from returns import repair_returns, verify_returns
 
 
 def prepare_source(path, target):
-    text = path.read_text()
+    text = repair_returns(path.read_text())
     text = text.replace('asm("swi 0x2A")', 'port_system_call(0x2a)')
+    if path.name == 'devices.c' and path.parent.name == 'hw':
+        # Leave callers at the public boundary so core can observe every IO
+        # publication, including identical-value writes performed by DMA.
+        before = 'void hw_publish_io(Hw *hw, unsigned offset, unsigned size)'
+        if text.count(before) != 1:
+            raise RuntimeError('port-hw IO publication boundary changed')
+        text = text.replace(before, 'void port_hw_publish_io(Hw *hw, unsigned offset, unsigned size)')
     # The compatibility macro erases matching hints. Keep MMIO volatile intact.
     text = re.sub(r'\basm\s+(?:volatile|__volatile__)\s*\(', 'asm(', text)
     if path.name == 'actor_animation_controller.c':
@@ -13,6 +21,9 @@ def prepare_source(path, target):
     if path.name == 'golem_2.c':
         text = ('struct SceneActorAnimationView;\n'
                 'void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, int);\n' + text)
+    if path.name == 'sub_08224980.c':
+        # The portable SDK call-via bridge returns a word; this caller ignores it.
+        text = text.replace('void sub_08249240(', 'int sub_08249240(')
     if path.name == 'sub_08228C40.c':
         # The GBA call carries the incoming date in r0/r1/r2 unchanged.
         # wasm needs explicit arguments; see the original 08228C40 prologue.
@@ -39,8 +50,9 @@ def prepare_source(path, target):
 
 def prepare_headers(root, output, target):
     """Mirror headers so nested quoted includes use the same portable versions."""
+    verify_returns(root)
     for path in sorted((root / 'include').rglob('*.h')):
-        text = path.read_text()
+        text = repair_returns(path.read_text())
         if path.name == 'player_cue.h':
             # agbcc rounds all record sizes to a word. LLVM uses member alignment.
             text = text.replace('struct PlayerCueTimers {',
