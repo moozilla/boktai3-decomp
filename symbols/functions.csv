@@ -8502,7 +8502,8 @@ addr,name,mode,confidence,source,notes
 081E07D8,ScriptMessage_Create,thumb,low,src-alias,Creates the task configured by ScriptMessage_SetFromScript
 081E0818,ScriptPrompt_ResetDisplay,thumb,low,src-alias,
 081E092C,ScriptPrompt_DrawFooterText,thumb,low,src-alias,Clears the footer rectangle and draws string ten from the configured text group
-081E095C,AnimPanel_SelectActiveAnimation,thumb,low,src-alias,
+081E095C,ScriptPrompt_UpdateSelection,thumb,low,src-alias,Script confirmation prompt with player name; optional description; accept/cancel selection and three widgets.
+081E09A8,ScriptPrompt_Update,thumb,low,src-alias,Script confirmation prompt with player name; optional description; accept/cancel selection and three widgets.
 081E0B28,ScriptPrompt_Destroy,thumb,low,src-alias,Destruction callback removes the prompt and its two indicator animations
 081E0B4C,ScriptPrompt_Initialize,thumb,low,src-alias,Loads prompt backgrounds and three animations then initializes the selection display
 081E0CB4,ScriptPrompt_SetFromScript,thumb,low,src-alias,
