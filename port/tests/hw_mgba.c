@@ -1,0 +1,168 @@
+/* Optional independent oracle. Reads the user's ROM; writes no ROM data. */
+#include "hw.h"
+#include "gba/types.h"
+#include <mgba/core/core.h>
+#include <mgba/internal/arm/arm.h>
+#include <mgba/internal/arm/isa-inlines.h>
+#include <mgba/internal/gba/bios.h>
+#undef UNUSED
+#include "gba/m4a_internal.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+
+static void quiet_log(struct mLogger *logger, int category, enum mLogLevel level, const char *format, va_list args)
+{
+    (void)logger; (void)category;
+    if (level & (mLOG_FATAL | mLOG_ERROR)) vfprintf(stderr, format, args);
+}
+static struct mLogger logger = {quiet_log, NULL};
+
+static void swi(struct mCore *core, unsigned n, uint32_t a, uint32_t b, uint32_t c, uint32_t d)
+{
+    struct ARMCore *cpu = core->cpu;
+    cpu->gprs[0] = (int32_t)a; cpu->gprs[1] = (int32_t)b;
+    cpu->gprs[2] = (int32_t)c; cpu->gprs[3] = (int32_t)d;
+    GBASwi16(cpu, (int)n);
+}
+
+static int mixer_oracle(struct mCore *core)
+{
+    struct ARMCore *cpu = core->cpu;
+    struct SoundInfo sound = {0};
+    struct { uint16_t type, status; uint32_t freq, loop, size; int8_t data[20]; } wave =
+        {0, 0x4000, 4000 * 1024, 0, 16, {0,32,64,96,127,96,64,32,0,-32,-64,-96,-128,-96,-64,-32,0,0,0,0}};
+    unsigned i, instructions;
+    int16_t pcm[32];
+    for (i = 0; i < 0x1c00; ++i) core->busWrite8(core, 0x02000000 + i, 0);
+    for (i = 0; i < 0x400; ++i) core->busWrite8(core, 0x030035f0 + i, core->busRead8(core, 0x0822f248 + i));
+    for (i = 0; i < sizeof(wave); ++i) core->busWrite8(core, 0x02002000 + i, ((uint8_t *)&wave)[i]);
+    core->busWrite32(core, 0x03007ff0, 0x02000000);
+    core->busWrite32(core, 0x02000000, ID_NUMBER);
+    core->busWrite8(core, 0x02000006, 1);
+    core->busWrite8(core, 0x02000007, 15);
+    core->busWrite8(core, 0x0200000b, 1);
+    core->busWrite32(core, 0x02000010, 16);
+    core->busWrite32(core, 0x02000018, 1049);
+    core->busWrite32(core, 0x02000028, 0x0822fe19); /* existing bx lr */
+    core->busWrite8(core, 0x02000050, 0x80);
+    core->busWrite8(core, 0x02000052, 255); core->busWrite8(core, 0x02000053, 255);
+    core->busWrite8(core, 0x02000054, 255); core->busWrite8(core, 0x02000055, 255);
+    core->busWrite8(core, 0x02000056, 128); core->busWrite8(core, 0x02000057, 128);
+    core->busWrite32(core, 0x02000070, 4000); core->busWrite32(core, 0x02000074, 0x02002000);
+    sound.maxChans = 1; sound.masterVolume = 15; sound.pcmDmaPeriod = 1;
+    sound.pcmFreq = 8000; sound.divFreq = 1049;
+    sound.chans[0].wav = (struct WaveData *)&wave;
+    sound.chans[0].statusFlags = 0x80;
+    sound.chans[0].leftVolume = sound.chans[0].rightVolume = 255;
+    sound.chans[0].attack = sound.chans[0].decay = 255;
+    sound.chans[0].sustain = sound.chans[0].release = 128;
+    sound.chans[0].frequency = 4000;
+    core->busWrite16(core, 0x0203f000, 0xe7fe);
+    cpu->cpsr.i = 1; cpu->halted = 0;
+    ARMSetPrivilegeMode(cpu, MODE_SYSTEM);
+    _ARMSetMode(cpu, MODE_THUMB);
+    cpu->gprs[ARM_SP] = 0x03007d00; cpu->gprs[ARM_LR] = 0x0203f001;
+    cpu->gprs[ARM_PC] = 0x0822f1c4;
+    ThumbWritePC(cpu);
+    for (instructions = 0; instructions < 100000; ++instructions) {
+        if ((uint32_t)cpu->gprs[ARM_PC] == 0x0203f002) break;
+        core->step(core);
+    }
+    if (instructions == 100000) { fprintf(stderr, "Mixer call did not return (pc %08X)\n", cpu->gprs[ARM_PC]); return 1; }
+    if (hw_mp2k_mix(&sound, pcm, 16, 8000)) return 1;
+    for (i = 0; i < 16; ++i) {
+        int reference = (int8_t)core->busRead8(core, 0x02000350 + i);
+        int actual = sound.pcmBuffer[i];
+        if (abs(reference - actual) > 1) {
+            fprintf(stderr, "Mixer sample %u: original %d / port %d\n", i, reference, actual); return 1;
+        }
+    }
+    if (core->busRead32(core, 0x0200006c) != sound.chans[0].fw || core->busRead32(core, 0x02000068) != sound.chans[0].count) {
+        fprintf(stderr, "Mixer channel position differs\n"); return 1;
+    }
+    puts("Original ROM mixer: PASS (PCM within one 8-bit unit, exact phase/count)");
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    struct mCore *core;
+    struct ARMCore *cpu;
+    FILE *rom_file;
+    uint8_t *rom, decoded[65536];
+    long rom_size;
+    unsigned tests = 0, assets = 0;
+    int x, y;
+    if (argc != 2) { fprintf(stderr, "usage: hw-mgba ROM\n"); return 2; }
+    mLogSetDefaultLogger(&logger);
+    core = mCoreFind(argv[1]);
+    if (!core || !core->init(core)) return 2;
+    mCoreInitConfig(core, NULL);
+    if (!mCoreLoadFile(core, argv[1])) return 2;
+    core->reset(core); cpu = core->cpu;
+    for (x = -32768; x <= 32767; x += 17) {
+        swi(core, 9, (uint32_t)x, 0, 0, 0);
+        if ((int16_t)cpu->gprs[0] != ArcTan((int16_t)x)) {
+            fprintf(stderr, "ArcTan(%d): mGBA %d / port %d\n", x, (int16_t)cpu->gprs[0], ArcTan((int16_t)x)); return 1;
+        }
+        ++tests;
+    }
+    for (x = -32768; x <= 32767; x += 997) for (y = -32768; y <= 32767; y += 991) {
+        swi(core, 10, (uint32_t)x, (uint32_t)y, 0, 0);
+        if ((uint16_t)cpu->gprs[0] != ArcTan2((int16_t)x, (int16_t)y)) {
+            fprintf(stderr, "ArcTan2(%d,%d): mGBA %u / port %u\n", x, y, (uint16_t)cpu->gprs[0], ArcTan2((int16_t)x, (int16_t)y)); return 1;
+        }
+        ++tests;
+    }
+    for (x = 0; x < 256; ++x) {
+        struct BgAffineSrcData src = {10000, -20000, -50, 70, 311, -529, (uint16_t)(x << 8)};
+        struct BgAffineDstData dest;
+        const uint8_t *bytes = (const uint8_t *)&src;
+        unsigned j;
+        for (j = 0; j < sizeof(src); ++j) core->busWrite8(core, 0x02000000 + j, bytes[j]);
+        swi(core, 14, 0x02000000, 0x02000100, 1, 0);
+        BgAffineSet(&src, &dest, 1);
+        /* mGBA's HLE affine coefficients round differently from BIOS integer
+         * shifts for negative products. Allow one coefficient unit, and the
+         * propagated reference-coordinate error. Cardinal cases are exact in
+         * the portable suite. */
+        bytes = (const uint8_t *)&dest;
+        for (j = 0; j < 4; ++j) {
+            int a = (int16_t)core->busRead16(core, 0x02000100 + j * 2);
+            int b = (int16_t)(bytes[j * 2] | bytes[j * 2 + 1] << 8);
+            if (abs(a - b) > 1) { fprintf(stderr, "Affine coefficient angle %d differs: %d / %d\n", x, a, b); return 1; }
+        }
+        for (j = 0; j < 2; ++j) {
+            int32_t a = (int32_t)core->busRead32(core, 0x02000108 + j * 4);
+            int32_t b = j ? dest.dy : dest.dx;
+            if (abs(a - b) > 120) { fprintf(stderr, "Affine reference angle %d differs: %d / %d\n", x, a, b); return 1; }
+        }
+        ++tests;
+    }
+    if (mixer_oracle(core)) return 1;
+    rom_file = fopen(argv[1], "rb");
+    if (!rom_file || fseek(rom_file, 0, SEEK_END)) return 2;
+    rom_size = ftell(rom_file); rewind(rom_file);
+    if (rom_size <= 0) return 2;
+    rom = malloc((size_t)rom_size);
+    if (!rom || fread(rom, 1, (size_t)rom_size, rom_file) != (size_t)rom_size) return 2;
+    fclose(rom_file);
+    for (size_t off = 0; off + 8 < (size_t)rom_size && assets < 128; off += 4) {
+        size_t size, written;
+        if (rom[off] != 0x10) continue;
+        size = (size_t)rom[off + 1] | (size_t)rom[off + 2] << 8 | (size_t)rom[off + 3] << 16;
+        if (size < 32 || size > sizeof(decoded) || (size & 3)) continue;
+        if (hw_bios_decompress(0x11, rom + off, (size_t)rom_size - off, decoded, sizeof(decoded), &written)) continue;
+        swi(core, 0x11, 0x08000000 + (uint32_t)off, 0x02000000, 0, 0);
+        for (size_t j = 0; j < size; ++j) if (decoded[j] != core->busRead8(core, 0x02000000 + (uint32_t)j)) {
+            fprintf(stderr, "LZ77 at %08X byte %zu differs\n", 0x08000000 + (unsigned)off, j); return 1;
+        }
+        ++assets;
+    }
+    free(rom); core->deinit(core);
+    if (!assets) { fprintf(stderr, "No compressed assets tested\n"); return 1; }
+    printf("mGBA oracle: PASS (%u arithmetic/affine cases, %u runtime ROM LZ77 candidates)\n", tests, assets);
+    return 0;
+}

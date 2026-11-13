@@ -21,6 +21,11 @@ static int32_t asr(int32_t v, unsigned n)
     return (int32_t)~((uint32_t)~v >> n);
 }
 
+static int32_t mul32(int32_t a, int32_t b)
+{
+    return (int32_t)((uint32_t)a * (uint32_t)b);
+}
+
 int32_t hw_bios_div(int32_t n, int32_t d, int32_t *remainder)
 {
     int32_t q;
@@ -58,13 +63,13 @@ int16_t hw_bios_arctan(int16_t tangent)
     int32_t x = tangent;
     int32_t a = -asr(x * x, 14);
     int32_t b = asr(0xa9 * a, 14) + 0x390;
-    b = asr(b * a, 14) + 0x91c;
-    b = asr(b * a, 14) + 0xfb6;
-    b = asr(b * a, 14) + 0x16aa;
-    b = asr(b * a, 14) + 0x2081;
-    b = asr(b * a, 14) + 0x3651;
-    b = asr(b * a, 14) + 0xa2f9;
-    return (int16_t)asr(x * b, 16);
+    b = asr(mul32(b, a), 14) + 0x91c;
+    b = asr(mul32(b, a), 14) + 0xfb6;
+    b = asr(mul32(b, a), 14) + 0x16aa;
+    b = asr(mul32(b, a), 14) + 0x2081;
+    b = asr(mul32(b, a), 14) + 0x3651;
+    b = asr(mul32(b, a), 14) + 0xa2f9;
+    return (int16_t)asr(mul32(x, b), 16);
 }
 
 uint16_t hw_bios_arctan2(int16_t x, int16_t y)
@@ -267,7 +272,7 @@ static void affine(int16_t sx, int16_t sy, uint16_t alpha, int16_t out[4])
 {
     int32_t sn = sine(alpha >> 8), cs = sine((alpha >> 8) + 64);
     out[0] = (int16_t)asr(sx * cs, 14);
-    out[1] = (int16_t)asr(-sx * sn, 14);
+    out[1] = (int16_t)-asr(sx * sn, 14);
     out[2] = (int16_t)asr(sy * sn, 14);
     out[3] = (int16_t)asr(sy * cs, 14);
 }
@@ -295,6 +300,8 @@ void ObjAffineSet(struct ObjAffineSrcData *src, void *destination, int32_t count
             store16(dst, (uint16_t)m[i]);
             dst += stride;
         }
-        ++src;
+        /* The BIOS source record has a reserved halfword after rotation. The
+         * reconstructed SDK declaration omits it, so use the wire stride. */
+        src = (struct ObjAffineSrcData *)((uint8_t *)src + 8);
     }
 }
