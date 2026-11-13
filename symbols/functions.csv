@@ -779,8 +779,8 @@ addr,name,mode,confidence,source,notes
 08021044,SceneCommands_Fade,thumb,low,src-alias,"screen cutscene cmd 3 (on, speed, r, g, b, bg, obj, other, last): sub_082279A8 mode 3 (on) or 2"
 080210B0,SceneCommands_FadePalette,thumb,low,src-alias,
 0802113C,SceneCommands_BlendPalette,thumb,low,src-alias,
-080211B0,SceneCommands_SetPosition,thumb,low,src-alias,"Copies two fields from the command's parameter struct into the target struct, used as a Dispatch command handler"
-080211C0,SceneCommands_ClearPosition,thumb,low,src-alias,"Zeroes the same two fields SceneCommands_SetPosition writes, used as a Dispatch command handler"
+080211B0,SceneCommands_SetShake,thumb,low,src-alias,Set camera shake duration and strength from presentation message
+080211C0,SceneCommands_StopShake,thumb,low,src-alias,Clear camera shake duration and strength
 080211C8,SceneCommands_ConfigureBlendWindow,thumb,low,src-alias,"Builds a layer mask from a mode selector and a color/coefficient value then writes both through ColorFade_SetImmediate, matching blend/window register setup"
 0802123C,SceneCommands_Dispatch,thumb,low,src-alias,kind 7 (screen) cutscene receiver: switch on the command byte (10 cases)
 08021360,SceneCommands_TaskUpdate,thumb,low,src-alias,Task update callback that runs SceneCommands_Dispatch each tick and counts down p->a before invoking Camera_RequestShake
