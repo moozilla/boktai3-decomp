@@ -2,7 +2,7 @@
 
 Tags: #actors #particles #animation #matching
 
-The worker consolidated twenty units in ROM order and repaired the unit-merging
+The worker consolidated twenty-one units in ROM order and repaired the unit-merging
 writer so it does not stage files through Git. Each source unit matches the stock
 compiler. This is source cleanup: exact-match coverage has zero percentage-point
 gain. The coordinator must run the combined ROM build at integration.
@@ -41,6 +41,11 @@ reservation; palette blending's inner do-while(0); and contact-impact growth's
 gotos. No new concession was introduced. Contact-impact projection's statement
 expression and sparkle allocation's gotos were removed successfully.
 
-The run ended at the user's stop instruction. No frost-emitter source changes
-were started. Continue at 081D2D34–081D31D8, then follow the remaining ROM-ordered
-queue in `build/cx/units.json`; revisit the large scene-animation unit afterward.
+The run paused at the user's stop instruction, then resumed on a later continue.
+The frost emitter (081D2D34–081D31D8) now combines eleven files and matches
+1,188 bytes. Its complete task uses typed graphics, particle slots and callback
+state; the script helper reuses the scene-NPC transition layout with mode fields
+recovered from padding. All three affected NPC-header consumers match. The existing
+random-origin macro remains because a plain assignment removes eight bytes.
+Continue at 081D374C–081D4E2C, then follow the remaining ROM-ordered queue; revisit
+the large scene-animation unit afterward.

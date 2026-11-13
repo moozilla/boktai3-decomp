@@ -13,11 +13,13 @@ struct SceneNpcPaletteBinding {
 };
 
 struct SceneNpcTransitionActor {
-    u8 pad0[7];
+    u8 active, unknown1;
+    u8 phase, step, mode, unknown5, state;
     u8 done, changed, entered;
     u8 padA[4];
     u16 flags;
-    u8 pad10[0x10];
+    u32 stateTimer, modeTimer;
+    u8 unknown18[8];
     void *effect;
     u8 pad24[0x68 - 0x24];
     struct SceneNpcTransitionPosition pos;
@@ -25,7 +27,9 @@ struct SceneNpcTransitionActor {
     struct SceneNpcPaletteBinding binding;
     u8 padF0[0x1CC - 0xF0];
     u8 palette[0x20];
-    u8 pad1EC[0x2E4 - 0x1EC];
+    u8 unknown1EC[0x21B - 0x1EC];
+    u8 scriptedMode;
+    u8 unknown21C[0x2E4 - 0x21C];
     u8 (*callback)(struct SceneNpcTransitionActor *);
 };
 
