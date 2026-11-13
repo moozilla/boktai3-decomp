@@ -7,6 +7,13 @@ from returns import repair_returns, verify_returns
 def prepare_source(path, target):
     text = repair_returns(path.read_text())
     text = text.replace('asm("swi 0x2A")', 'port_system_call(0x2a)')
+    if path.name == 'devices.c' and path.parent.name == 'hw':
+        # Leave callers at the public boundary so core can observe every IO
+        # publication, including identical-value writes performed by DMA.
+        before = 'void hw_publish_io(Hw *hw, unsigned offset, unsigned size)'
+        if text.count(before) != 1:
+            raise RuntimeError('port-hw IO publication boundary changed')
+        text = text.replace(before, 'void port_hw_publish_io(Hw *hw, unsigned offset, unsigned size)')
     # The compatibility macro erases matching hints. Keep MMIO volatile intact.
     text = re.sub(r'\basm\s+(?:volatile|__volatile__)\s*\(', 'asm(', text)
     if path.name == 'actor_animation_controller.c':

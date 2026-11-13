@@ -158,8 +158,8 @@ for full execution. No fallback bodies are supplied for those routines.
 With `--ppu-root ../cx-port-ppu/port` and `--mmio`, the slice routes visible
 scanlines to the sibling C PPU. `run_boot.py --ppu-root ../cx-port-ppu/port`
 checks the first forced-blank frame against mGBA in RGB555. This is the initial
-white frame, not a gameplay boot. CPU MMIO writes notify the affine renderer;
-DMA writes to affine registers still need a device notification interface.
+white frame, not a gameplay boot. CPU and DMA register publications notify the affine renderer, including
+identical-value writes that reload internal reference latches.
 
 ## See the port
 
@@ -237,3 +237,16 @@ change from scanline 64 to 144, the dialogue-scroll write, phase reset and IRQ
 mask restoration. It checks exactly two VCount calls per frame, avoiding a
 duplicate HBlank notification. Register setup uses the exported device bus,
 just like generated game C. Sound state remains inactive in this test.
+
+The generated port-hw input renames only `hw_publish_io`'s implementation; its
+callers use a core C wrapper that observes the completed mapped write. This
+keeps sibling hardware sources unchanged and delivers affine notifications for
+CPU, immediate DMA, HBlank DMA and VBlank DMA publications. The wrapper handles
+unchanged values and partial register writes, not just differences between
+snapshots. A signature check rejects a changed hardware publication boundary.
+
+`node port/tests/affine_dma.cjs build/port/slice-wasm32-rtc-video/boot.wasm`
+requires a slice built with `--ppu-root`. Its synthetic mode-3 image proves that
+repeated identical HBlank writes reset BG2Y each line, then normal affine row
+stepping resumes after DMA is disabled. Native/wasm boot and RTC comparisons
+and original VBlank/VCount/solar IRQ tests still pass.

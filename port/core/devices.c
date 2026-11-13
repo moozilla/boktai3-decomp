@@ -98,3 +98,21 @@ void port_devices_notify_write(uint32_t address, unsigned width)
     if (render_write && address >= PORT_IO_BASE && address < PORT_IO_BASE + PORT_IO_SIZE)
         render_write(render_context, address - PORT_IO_BASE, width);
 }
+
+/* The generated hardware input renames only the implementation, leaving its
+ * callers at this C boundary. Observe publications after the bytes are mapped;
+ * DMA can reload affine latches even when the register value did not change. */
+void port_hw_publish_io(Hw *hw, unsigned offset, unsigned size);
+void hw_publish_io(Hw *hw, unsigned offset, unsigned size)
+{
+    static const unsigned references[] = {0x28, 0x2c, 0x38, 0x3c};
+    unsigned i;
+    port_hw_publish_io(hw, offset, size);
+    if (hw != &hardware || !render_write || offset >= PORT_IO_SIZE) return;
+    if (size > PORT_IO_SIZE - offset) size = PORT_IO_SIZE - offset;
+    for (i = 0; i < sizeof(references) / sizeof(references[0]); ++i) {
+        unsigned start = references[i];
+        if (offset < start + 4 && offset + size > start)
+            render_write(render_context, start, 4);
+    }
+}
