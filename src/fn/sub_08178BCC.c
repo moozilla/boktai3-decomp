@@ -30,14 +30,14 @@ s32 SceneHud_DestroyOwner(struct SceneHudState *s)
         widget = s->fieldWidgets.meterWidgets;
         count = 1;
         do {
-            if (widget->unknown4[0])
+            if (widget->active)
                 Anim_Remove(widget);
             widget++;
         } while (--count >= 0);
         widget = s->fieldWidgets.timeDigits;
         count = 5;
         do {
-            if (widget->unknown4[0])
+            if (widget->active)
                 Anim_Remove(widget);
             widget++;
         } while (--count >= 0);

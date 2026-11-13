@@ -7544,30 +7544,32 @@ addr,name,mode,confidence,source,notes
 081B9598,PositionMotion_InitParameterizedApproach,thumb,low,src-alias,Initializes motion mode 10 with a destination and three approach parameters; exact trajectory tentative
 081B95E4,MotionTrack_Update,thumb,low,src-alias,
 081B9818,PositionMotion_InitTimedInterpolation,thumb,low,src-alias,Stores start and end positions and a duration for mode 12 while resetting the output to the start
-081B984C,Registry2388_SetUpdate,thumb,low,src-alias,Replaces the registry object's state callback and resets its elapsed counter
-081B98D8,Registry2388_UpdateIndicators,thumb,low,src-alias,
-081B9BC0,Registry2388_BlendPaletteBanks,thumb,low,src-alias,Applies the shared color interpolation routine across consecutive 32-byte palette banks
-081B9C00,Registry2388_ApplyPalettePhase,thumb,low,src-alias,
-081B9D54,Registry2388_BlendTimedPalettes,thumb,low,src-alias,
-081B9E58,SelectionPanel_ProcessConfirm,thumb,low,src-alias,
-081B9ED0,Registry2388_InitializeAnimations,thumb,low,src-alias,
-081B9FD4,Registry2388_InitializeBackground,thumb,low,src-alias,
-081BA064,Registry2388_ConfigureDisplay,thumb,low,src-alias,Configures three display layers and selects HUD mode 7 for the object's update
-081BA090,Registry2388_BeginFadeIn,thumb,low,src-alias,Starts fade mode 2 and installs the callback that waits before enabling selection; fade direction tentative
-081BA0C8,Registry2388_BeginFadeOut,thumb,low,src-alias,Starts fade mode 3 and installs the callback that delays execution of the selected script
-081BA0FC,Registry2388_BeginSelection,thumb,low,src-alias,Conditionally activates the child selector then installs the selection polling callback
-081BA12C,Registry2388_StartTimedEffect,thumb,low,src-alias,Configures a power-of-two duration and effect parameter then hides the child and installs the effect callback
-081BA19C,Registry2388_UpdateTimedEffect,thumb,low,src-alias,Advances the effect and clears its callback after the configured duration
-081BA1D4,Registry2388_UpdateSelection,thumb,low,src-alias,Reads the child selection index and runs the selection handler
-081BA204,Registry2388_UpdateOpeningDelay,thumb,low,src-alias,Tracks the child selection while waiting sixty frames before activating selection handling
-081BA244,Registry2388_UpdateScriptDelay,thumb,low,src-alias,Waits sixty frames then invokes the script associated with the selected entry
-081BA27C,Registry2388_OnUpdate,thumb,low,src-alias,Task update callback that configures display state and updates animations before dispatching the current state
-081BA2A4,SelectionPanel_Destroy,thumb,low,src-alias,
-081BA2E4,Registry2388_CreateSelectionCursor,thumb,low,src-alias,
-081BA3D4,Registry2388_InitializeFromScript,thumb,low,src-alias,
-081BA544,Registry2388_StartTimedEffectFromScript,thumb,low,src-alias,Reads the effect parameter and optional duration keyword for the active registry object
-081BA57C,Registry2388_SetVisibleFromScript,thumb,low,src-alias,
-081BA5D0,Registry2388_Create,thumb,low,src-alias,
+081B984C,RegistrySelection_SetUpdate,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081B9864,RegistrySelection_ShowIndicators,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081B98D8,RegistrySelection_UpdateIndicators,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081B9BC0,RegistrySelection_BlendPaletteBanks,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081B9C00,RegistrySelection_ApplyPalettePhase,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081B9D54,RegistrySelection_BlendTimedPalettes,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081B9E58,RegistrySelection_ProcessConfirm,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081B9ECC,RegistrySelection_OnUnusedTransition,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081B9ED0,RegistrySelection_InitializeAnimations,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081B9FD4,RegistrySelection_InitializeBackground,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA064,RegistrySelection_ConfigureDisplay,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA090,RegistrySelection_BeginFadeIn,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA0C8,RegistrySelection_BeginFadeOut,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA0FC,RegistrySelection_BeginSelection,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA12C,RegistrySelection_StartTimedEffect,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA19C,RegistrySelection_UpdateTimedEffect,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA1D4,RegistrySelection_UpdateSelection,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA204,RegistrySelection_UpdateOpeningDelay,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA244,RegistrySelection_UpdateScriptDelay,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA27C,RegistrySelection_OnUpdate,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA2A4,RegistrySelection_Destroy,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA2E4,RegistrySelection_CreateSelectionCursor,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA3D4,RegistrySelection_InitializeFromScript,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA544,RegistrySelection_StartTimedEffectFromScript,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA57C,RegistrySelection_SetVisibleFromScript,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
+081BA5D0,RegistrySelection_Create,thumb,low,src-alias,Tentative registry selection menu: animated indicators; palette phases; nine script entries and cursor.
 081BA62C,Registry3F74_SetState,thumb,low,src-alias,Installs a state callback and resets its frame counter
 081BA644,Registry3F74_ApplyPaletteStep,thumb,low,src-alias,
 081BA6F8,Registry3F74_UpdateAnimations,thumb,low,src-alias,
