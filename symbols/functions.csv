@@ -4682,6 +4682,7 @@ addr,name,mode,confidence,source,notes
 0811D358,GameState_ClearSlots7A8FromScript,thumb,low,src-alias,
 0811D384,SceneActorStyle_InitializeFromGameState,thumb,low,src-alias,
 0811D428,SceneActorStyle_Initialize,thumb,low,src-alias,
+0811D47C,ActorStats_SetChoices,thumb,low,cleanup,Copy up to four byte-sized parameter choices
 0811D4AC,ActorStats_ConfigureScaledParameters,thumb,low,src-alias,
 0811D524,GameState_GetChallengeBestRank,thumb,low,src-alias,Returns the indexed rank record from the twelve-entry table; challenge interpretation tentative
 0811D54C,GameState_ResetChallengeRecords,thumb,low,src-alias,Initializes all twelve paired score and rank records to -1
