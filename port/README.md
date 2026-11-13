@@ -19,8 +19,9 @@ This builds `build/port/game/game.wasm` (cached; needs `build/boktai3.elf` from
 repository root by itself; the file picker appears only when the server has no
 ROM. Default keys: arrows, X = A, Z = B, A = L, S = R, Enter = Start,
 Backspace = Select, Space = fast-forward (hold), P = pause, F9 = screenshot,
-F10 = record a clip, F = fullscreen, T = subtitles on/off, I = inspect; a standard
-gamepad works too. Settings (the button under the game, docked beside it) rebinds every key and
+F10 = record a clip, F = fullscreen, T = subtitles on/off, M = mute, I = inspect; a
+standard gamepad works too. The speaker button and slider beside Sunlight set the
+volume (clips record the game's sound even when muted). Settings (the button under the game, docked beside it) rebinds every key and
 pad button, styles the subtitles, sets the screen colors (a GBA-screen color
 filter, an LCD grid, smooth scaling) and picks where sunlight comes from: the
 slider, your clock (the sun's height at this hour) or your camera. Settings stay

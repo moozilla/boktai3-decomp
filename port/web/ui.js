@@ -11,7 +11,7 @@ const UI = (() => {
     ['up', 'Up'], ['down', 'Down'], ['left', 'Left'], ['right', 'Right'],
     ['a', 'A'], ['b', 'B'], ['l', 'L'], ['r', 'R'], ['start', 'Start'], ['select', 'Select'],
     ['fast', 'Fast-forward (hold)'], ['pause', 'Pause'], ['shot', 'Screenshot'], ['record', 'Record a clip'],
-    ['fullscreen', 'Fullscreen'], ['subs', 'Subtitles on/off'], ['inspect', 'Inspect actors'],
+    ['fullscreen', 'Fullscreen'], ['subs', 'Subtitles on/off'], ['mute', 'Mute'], ['inspect', 'Inspect actors'],
   ];
   // Gamepad buttons in the browser's standard layout (0 = bottom face button).
   // Standard-mapping names, short enough for a bind slot (the title gives the long name).
@@ -25,7 +25,7 @@ const UI = (() => {
     keys: {
       up: ['ArrowUp'], down: ['ArrowDown'], left: ['ArrowLeft'], right: ['ArrowRight'],
       a: ['KeyX'], b: ['KeyZ'], l: ['KeyA'], r: ['KeyS'], start: ['Enter'], select: ['Backspace'],
-      fast: ['Space'], pause: ['KeyP'], shot: ['F9'], record: ['F10'], fullscreen: ['KeyF'], subs: ['KeyT'], inspect: ['KeyI'],
+      fast: ['Space'], pause: ['KeyP'], shot: ['F9'], record: ['F10'], fullscreen: ['KeyF'], subs: ['KeyT'], mute: ['KeyM'], inspect: ['KeyI'],
     },
     pad: {
       up: [{ b: 12 }, { a: 1, d: -1 }], down: [{ b: 13 }, { a: 1, d: 1 }], left: [{ b: 14 }, { a: 0, d: -1 }],
@@ -34,6 +34,7 @@ const UI = (() => {
     },
     display: { color: 'raw', lcd: 0, smooth: false },
     sun: { mode: 'slider', camera: 1 },
+    audio: { volume: 80, muted: false },
   };
   let S = load();
   let env = null;
@@ -232,6 +233,7 @@ const UI = (() => {
     else if (act === 'record') toggleRecord();
     else if (act === 'fullscreen') toggleFullscreen();
     else if (act === 'inspect') env.toggleInspect && env.toggleInspect();
+    else if (act === 'mute') setMuted(!S.audio.muted);
     else if (act === 'subs') { S.subs.mode = S.subs.mode === 'off' ? 'auto' : 'off'; save(); env.subtitlesChanged(); renderSubs(); refreshDialog(); }
   }
   function typing(e) { return e.target.closest && e.target.closest('input, textarea, select, [contenteditable]'); }
@@ -311,8 +313,51 @@ const UI = (() => {
     const show = (act) => (S.keys[act] || []).map(codeLabel).join(' / ') || '—';
     const items = [['D-pad', ['up', 'down', 'left', 'right'].map(show).join(' ')], ['A', show('a')], ['B', show('b')],
       ['L', show('l')], ['R', show('r')], ['Start', show('start')], ['Select', show('select')],
-      ['fast-forward (hold)', show('fast')], ['pause', show('pause')], ['screenshot', show('shot')], ['record', show('record')], ['inspect', show('inspect')]];
+      ['fast-forward (hold)', show('fast')], ['pause', show('pause')], ['screenshot', show('shot')], ['record', show('record')], ['mute', show('mute')], ['inspect', show('inspect')]];
     keys.replaceChildren(...items.map(([what, k]) => el('span', {}, el('kbd', { textContent: k }), ' ' + what)));
+  }
+
+  // ---- volume -------------------------------------------------------------
+  // game audio -> gain -> speakers; clips record the game before the gain, so a
+  // muted clip still has sound
+  let gain = null;
+  function connectAudio(context, node) {
+    gain = context.createGain();
+    node.connect(gain).connect(context.destination);
+    applyVolume(true);
+  }
+  function applyVolume(now) {
+    const a = S.audio, v = a.muted ? 0 : Math.pow(a.volume / 100, 2);
+    if (gain) {
+      if (now) gain.gain.value = v;
+      else gain.gain.setTargetAtTime(v, gain.context.currentTime, 0.03);
+    }
+    const btn = $('mute'), slider = $('volume');
+    if (btn) {
+      const level = a.muted || !a.volume ? 0 : a.volume < 34 ? 1 : a.volume < 67 ? 2 : 3;
+      btn.innerHTML = speakerIcon(level);
+      btn.title = (a.muted ? 'Unmute' : 'Mute') + ' (' + ((S.keys.mute || [])[0] ? codeLabel(S.keys.mute[0]) : 'unbound') + ')';
+      btn.setAttribute('aria-pressed', a.muted ? 'true' : 'false');
+      btn.classList.toggle('muted', a.muted);
+    }
+    if (slider) {
+      slider.value = a.volume;
+      slider.style.setProperty('--fill', (a.muted ? 0 : a.volume) + '%');
+      slider.classList.toggle('muted', a.muted);
+    }
+  }
+  function speakerIcon(level) {
+    const waves = ['', '<path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/>',
+      '<path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/>',
+      '<path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/><path d="M20.5 4.5a10.5 10.5 0 0 1 0 15"/>'][level];
+    const cross = level ? '' : '<path d="M16 9.5l5 5M21 9.5l-5 5"/>';
+    return `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/>${waves}${cross}</svg>`;
+  }
+  function setMuted(m) {
+    S.audio.muted = m;
+    if (!m && !S.audio.volume) S.audio.volume = 50;
+    save(); applyVolume();
+    flash(m ? 'Muted' : 'Sound on');
   }
 
   // ---- display ------------------------------------------------------------
@@ -599,11 +644,19 @@ const UI = (() => {
     $('shot').onclick = screenshot;
     $('record').onclick = toggleRecord;
     $('fullscreen').onclick = toggleFullscreen;
+    $('mute').onclick = () => setMuted(!S.audio.muted);
+    $('volume').oninput = (e) => { S.audio.volume = Number(e.target.value); S.audio.muted = S.audio.volume === 0; save(); applyVolume(); };
+    $('volume').addEventListener('wheel', (e) => {
+      e.preventDefault();
+      S.audio.volume = Math.max(0, Math.min(100, S.audio.volume - Math.sign(e.deltaY) * 5));
+      S.audio.muted = S.audio.volume === 0; save(); applyVolume();
+    }, { passive: false });
     legend();
+    applyVolume();
     applyDisplay();
     applySun();
     loadStrings();
   }
 
-  return { init, flash, showText, setBounds, setMenuLabels, loadStrings, renderSubs, subtitlesOn: () => S.subs.mode !== 'off', openSettings, settings: () => S };
+  return { init, connectAudio, flash, showText, setBounds, setMenuLabels, loadStrings, renderSubs, subtitlesOn: () => S.subs.mode !== 'off', openSettings, settings: () => S };
 })();

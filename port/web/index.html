@@ -151,6 +151,16 @@
   .ap-gap, .ap-note { color: var(--muted); }
   .ap-raw { margin: 0; color: #b9bfcc; font: 11.5px/1.5 ui-monospace, monospace; }
   .ap-note { margin: 0 0 8px; font: 12px/1.45 system-ui, sans-serif; }
+  /* volume: a speaker button and a slim slider that fills with the accent color */
+  .volume { display: inline-flex; align-items: center; gap: 2px; }
+  #mute { display: inline-grid; place-items: center; padding: 4px 7px; line-height: 0; }
+  #mute.muted { color: var(--muted); }
+  #volume { -webkit-appearance: none; appearance: none; width: 92px; height: 4px; border-radius: 99px; cursor: pointer;
+          background: linear-gradient(to right, var(--accent) var(--fill, 80%), #3a3f4b var(--fill, 80%)); }
+  #volume.muted { background: linear-gradient(to right, #6b6f7a var(--fill, 0%), #3a3f4b var(--fill, 0%)); }
+  #volume::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #fff;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
+  #volume::-moz-range-thumb { width: 13px; height: 13px; border: 0; border-radius: 50%; background: #fff; }
   #inspect-toggle.on { color: #1a1206; background: var(--accent); border-color: var(--accent); }
   .set-top { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap;
           position: sticky; top: 0; background: var(--panel); z-index: 1; }
@@ -235,6 +245,7 @@
   <div class="controls">
     <label>Start from <select id="save-select"></select></label>
     <label>Sunlight <input type="range" id="sun" min="0" max="255" value="23"> <span id="sun-value"></span></label>
+    <span class="volume"><button id="mute" aria-label="Mute"></button><input type="range" id="volume" min="0" max="100" step="1" aria-label="Volume"></span>
     <button id="pause">Pause</button>
     <button id="reset">Restart</button>
     <button id="shot" title="Save a screenshot (F9)">Screenshot</button>
@@ -329,7 +340,7 @@ async function startAudio() {
     await audioContext.audioWorklet.addModule('audio.js');
     const node = audioNode = new AudioWorkletNode(audioContext, 'game-audio', { outputChannelCount: [2] });
     node.port.postMessage(audioBuffer);
-    node.connect(audioContext.destination);
+    UI.connectAudio(audioContext, node);
   } catch (e) {
     audioBuffer = null;
     log('audio unavailable: ' + e.message);
