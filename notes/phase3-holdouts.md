@@ -1392,3 +1392,8 @@ a shared return-mask local and count-label forms do not fix it. Splitting the
 real song call between the special/non-special arms changes the CSE path and
 gives 5/8, but leaves duplicated call/layout instructions. Next: reproduce that
 path break while restoring the shared song call.
+
+### sub_081D3620: 2/2; correct registers but bias addition attaches to random
+Tags: phase3, dp-bosses, sub_081D3620
+
+The unchanged source retains its single random pin. The old exact-shape draft allocates coordinate before random; AGBCC_PRI=random:+15000,random#1:+15000 confirms the allocation diagnosis. Applying bias to the masked random instead gives every ROM register naturally, but moves each bias addition from coordinate before the mask to random after it (2/2). Both signed and unsigned 16-bit random, unsigned coordinate, separated coordinate/bias statements, and an accumulator random retain or worsen allocation; 16-bit coordinate adds truncations. A union assembled from masked halfwords adds reconstruction instructions. Next: a real random-use form that increases its flow references while combine restores the coordinate-first bias addition. The draft changes no behavior: only the low halfword of the sum is stored.
