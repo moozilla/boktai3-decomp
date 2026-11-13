@@ -1186,6 +1186,19 @@ Next: an EQ test whose operand cse cannot record, or a label in front of the not
 
 ### EnemyParticle_UpdatePool (src/fn/sub_0820D2C4.c, 0820D2C4): deferred, StepSprite draft 12/16
 
+Resolved by dp-monsters: retain the distinct sprite/state/cursor accesses while
+writing the shared stepper's ordinary C directly in the caller. This matches
+with only the existing state barrier. A separate helper raises the sprite
+pointer's priority and spills ground instead; an extra sprite copy also fails.
+Remove the final barrier by initializing a word-sized animation offset union
+through its low halfword, using the anim field's offset, and forming the state
+pointer as base plus that invariant value. This prevents loop's reduced
+animation-pointer giv while preserving the per-iteration add. Direct field
+address without the barrier gives 46/46; pointer-union initialization does not
+help. Offset union matches. Removed unused ended-result bookkeeping and all
+volatile reads. Complete unit MATCH with no concessions. Prior diagnosis follows.
+
+
 Landed: 8 concessions in a hand-unrolled sequence step.
 Draft: `notes/phase3-drafts/monsters-bosses/EnemyParticle_UpdatePool.c` (12 ROM / 16 draft).
 It calls `DisplaySequence_StepSprite(&cursor->sprite, &cursor->anim)` and has no concessions in the step.
