@@ -290,7 +290,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-astra1.md](../notes/cx-astra1.md) | Campaign worker astra1 | #matching #monsters #register-pinning | 7 |
 | [notes/cx-astra2.md](../notes/cx-astra2.md) | Campaign worker astra2 | #matching #monsters #actors | 4 |
 | [notes/cx-astra3.md](../notes/cx-astra3.md) | Campaign worker astra3 | #matching #nonmatching #golem #scene-actors | 3 |
-| [notes/cx-cl-field-effects_2026-11-13.md](../notes/cx-cl-field-effects_2026-11-13.md) | Field objects and presentation cleanup | #matching #animation #particles #scene #assets #tooling | 13 |
+| [notes/cx-cl-field-effects_2026-11-13.md](../notes/cx-cl-field-effects_2026-11-13.md) | Field objects and presentation cleanup | #matching #animation #particles #scene #assets #tooling | 14 |
 | [notes/cx-sol01.md](../notes/cx-sol01.md) | cx-sol01 campaign | #player #matching | 19 |
 | [notes/cx-sol02.md](../notes/cx-sol02.md) | Campaign worker sol02 | #matching #vanargand | 23 |
 | [notes/cx-sol03.md](../notes/cx-sol03.md) | cx-sol03 campaign | #matching #armor #campaign | 19 |

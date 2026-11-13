@@ -100,3 +100,9 @@ At the next continuation request, completed 08125B64–08126140 as `src/scene_mo
 Tags: #matching #scene #structs #compiler
 
 Resolved 0806F3A8–0806F7B0 and consolidated nine files into `src/scene_effect_schedule.c` (1032 bytes MATCH). The lookup walks a typed pool cursor and reads `cursor->entries[0].id` directly; materializing a separate entry pointer changes allocation, while direct access preserves the original setup and loop. Dynamic strides derive from the entry size, and Task replaces the raw task prefix. Script creation shares the complete schedule entry and the previously recovered scheduled effect. The signed slot-sentinel check remains. The changed header has no other consumer. Four additional pointer/array forms for CellGate_ClampPlayerEdge still remove its required player-pointer reload; its original matching source is restored.
+
+## Palette-fade revisit
+
+Tags: #matching #palette #scene #structs #compiler
+
+Resolved 081111E8–08111C44 and consolidated seventeen files into `src/palette_fade.c` (2652 bytes MATCH). One shared task now describes color channels and deltas, palette resources, scanline phases, scrolling and transition state. Resource colors follow their five-word asset header. The task calls its typed scroll callback directly. AdvanceColors computes its destination byte offset in three explicit statements: color index, palette slot, then palette-buffer base. Scope identified the outstanding difference as the slot load moving before the index shift (RTL UID 229); calculating the complete integer destination preserves the ROM order with the canonical flat buffer declaration. The loader remains void, with its unused scalar result forwarded by the legacy caller adaptation. Other scalar and resource names were clarified; concession lint is clear. No existing header changed.

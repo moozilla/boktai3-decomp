@@ -4434,11 +4434,13 @@ addr,name,mode,confidence,source,notes
 08111410,PaletteFade_AdvanceColors,thumb,low,src-alias,
 081114E8,PaletteFade_UpdateTransition,thumb,low,src-alias,Advances an active fade and starts the next transition when its countdown expires
 0811153C,PaletteFade_SetTransitionParameters,thumb,low,src-alias,Stores palette slot and target and rate and duration while resetting transition state
+08111578,PaletteFade_BeginNextTarget,thumb,low,cleanup,Prepare fixed-point color deltas for the next target palette
 08111748,PaletteFade_LoadPaletteResources,thumb,low,src-alias,Loads two palette resources and copies the initial palette into the working buffer
 081117A0,PaletteFade_SetupBackground,thumb,low,src-alias,Loads a background resource and configures its layers and initial tilemap
 081117F0,PaletteFade_InitFromScript,thumb,low,src-alias,
 081119B8,PaletteFade_CreateFromScript,thumb,low,src-alias,Creates the palette fade task and installs its callbacks before script initialization
 081119F8,PaletteFade_SetScrollPosition,thumb,low,src-alias,Sets two fixed point background scroll coordinates used by the task updater
+08111A24,PaletteFade_SetWaveParameter,thumb,low,cleanup,Set one of four scanline wave parameters
 08111A48,PaletteFade_StartFromScript,thumb,low,src-alias,
 08111BC4,PaletteFade_StartScrollFromScript,thumb,low,src-alias,Tentatively starts a scroll transition using script target position and frame count
 08111C44,StageResults_LoadBackgroundResources,thumb,low,src-alias,Loads two background resources and the initial palette for the provisional stage results screen
