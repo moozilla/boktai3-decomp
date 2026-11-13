@@ -115,7 +115,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 }
                 {
                     s32 offset = Mod(table[gRandomIndex], 500);
-                    register s32 coordinate asm("r1");
+                    s32 coordinate;
                     {
                         union ScenePanelPackedVector *lowPosition = &position;
                         asm("" : "+r"(lowPosition));
@@ -123,7 +123,10 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                         coordinate = (u16)lowPosition->words.xy - 250;
                     }
                     coordinate += offset;
-                    coordinate = (u16)coordinate;
+                    {
+                        u16 narrowed = coordinate;
+                        coordinate = narrowed;
+                    }
                     highMask = 0xFFFF0000;
                     position.words.xy = (position.words.xy & highMask) | coordinate;
                 }
@@ -144,10 +147,13 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 {
                     s32 offset = Mod(table[gRandomIndex], 500);
                     register union ScenePanelPackedVector *lowPosition asm("r2") = positionWords;
-                    register s32 coordinate asm("r1");
+                    s32 coordinate;
                     coordinate = (u16)lowPosition->words.zpad - 250;
                     coordinate += offset;
-                    coordinate = (u16)coordinate;
+                    {
+                        u16 narrowed = coordinate;
+                        coordinate = narrowed;
+                    }
                     lowPosition->words.zpad = (lowPosition->words.zpad & highMask) | coordinate;
                 }
                 velocity.words.xy &= highMask;
