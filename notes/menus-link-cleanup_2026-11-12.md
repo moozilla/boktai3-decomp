@@ -202,3 +202,9 @@ Stat display: 11 files consolidated (1068 bytes). All functions use the Hud pref
 HUD meters: nine files become one 1432-byte unit. Canonical health/energy fields replace partial player structs. Label functions explicitly forward their incoming coordinates. The warning-meter function at 08164864 remains separate: typed array access changes address-addition order; no raw-offset workaround added.
 
 HUD counters: 22 files become one 3608-byte unit, using shared countdown widget, timer, game-state and sun-clock fields. Animation keyframes retain explicit u16 narrowing. A small typed widget helper preserves the final countdown digit address; the owner word is read through its existing u32 representation to preserve reloads across shared animation flag writes. All functions use the Hud prefix. No concession added.
+
+Pause menu input: four files into a 396-byte unit. The direction-repeat reader now has structured early returns. Shared HUD fields describe palette blending, prompt playback, direction repeat and text-window handles without changing layout. All 108 header consumers and 54 renamed callers match.
+
+Pause menu tiles: three files into a 160-byte unit. Widget palette fields use the shared sprite type; palette arguments remain word-sized at the API boundary, preserving existing callers.
+
+Pause menu presentation: 18 files into a 1784-byte unit. Shared HUD and widget types replace local partial structs; duplicate bend scaling is one inline helper. Five preceding functions remain separate: four generic widget-index helpers and the status-value accessor change address addition order with canonical field indexing. Best typed attempts are in build/pause_menu_best.c. The paired-icon setter must stay void: changing it to s32 changes its return register, so its following value-returning caller remains a separate cleanup issue.

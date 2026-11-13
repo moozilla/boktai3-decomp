@@ -4,7 +4,7 @@
 void SceneHud_GetActionIconPosition(void *, u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
 s32 Selection_GetDisplayFrame(s32);
-void SceneHud_BeginIconMotion(u8 *, u32, s32, u32, void *, void *, u32, u32);
+void PauseMenu_BeginSpriteMotion(u8 *, u32, s32, u32, void *, void *, u32, u32);
 s32 Div(s32, s32);
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
@@ -40,7 +40,7 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
     SceneHud_GetActionIconPosition(to, s[0x4387]);
     result = Selection_GetDisplayFrame(Inventory_GetQuantityByStorage(s[0x4860], *kind));
     later = *kind + 10;
-    SceneHud_BeginIconMotion(s, 0, result,
+    PauseMenu_BeginSpriteMotion(s, 0, result,
                              ((struct SceneHudState *)s)->categoryWidgets[later].paletteBank, from,
                              to, 24, 16);
     if (mode == 0) {

@@ -1,6 +1,6 @@
 #include "global.h"
 #include "input.h"
-void sub_0816618C(void *, s32, s32);
+void PauseMenu_ShowPromptSprite(void *, s32, s32);
 void Sound_PlaySong(s32);
 void Hud_SaveSecondaryGridSelection(void *);
 void SceneHud_GetActionIconPosition(void *, s32);
@@ -15,7 +15,7 @@ void SceneHud_ShowEquipmentDetails(void *);
 void MenuDisplay_UpdateActionPrompt(void *, s32);
 void Hud_UpdateInventoryMenuInput(u8 *p)
 {
-    sub_0816618C(p, 8, 32);
+    PauseMenu_ShowPromptSprite(p, 8, 32);
     p[0xa58] = 0;
     if (1 & gPadState[1]) {
         u8 *q;

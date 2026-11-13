@@ -40,7 +40,7 @@ void Inventory_GetEquippedDescriptor(u32, struct SceneHudEquipmentDescriptor *);
 s32 Player_GetEquipmentValue(const struct SceneHudEquipmentDescriptor *);
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 void Hud_DrawDecimalDigits(s32, s32, s32, s32, s32);
-void MenuTilemap_ClearRect(s32, s32, s32, s32);
+void PauseMenu_ClearTileRect(s32, s32, s32, s32);
 u32 Inventory_GetEquipmentId(u32);
 void Inventory_GetEquipmentDescriptor(u32, struct SceneHudEquipmentDescriptor *);
 s32 Div(s32, s32);
@@ -140,7 +140,7 @@ void SceneHud_RefreshEquipmentValues(struct SceneHudState *p)
                 s32 frameBase;
                 s32 *digit;
                 struct SceneHudDigitDisplay *display;
-                MenuTilemap_ClearRect(x, y, 3, 1);
+                PauseMenu_ClearTileRect(x, y, 3, 1);
                 position.x = x << 3;
                 position.y = y << 3;
                 resource = p->widgetResource;

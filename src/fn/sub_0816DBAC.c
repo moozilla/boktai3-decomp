@@ -4,7 +4,7 @@
 void SceneHud_GetActionIconPosition(void *, s32);
 s32 SceneHud_FindCategoryAction(u32, u32);
 u32 Selection_GetDisplayFrame(s32);
-void SceneHud_BeginIconMotion(void *, u32, s32, u32, void *, void *, u32, u32);
+void PauseMenu_BeginSpriteMotion(void *, u32, s32, u32, void *, void *, u32, u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
 void InventoryGrid_BeginNumberPhase(void);
 void SceneHud_BeginSelectedActionTransfer(struct SceneHudState *s)
@@ -26,7 +26,7 @@ void SceneHud_BeginSelectedActionTransfer(struct SceneHudState *s)
     keyframe =
         Selection_GetDisplayFrame(SceneHud_FindCategoryAction(s->actionCategory, *selection));
     later = *selection + 10;
-    SceneHud_BeginIconMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24,
+    PauseMenu_BeginSpriteMotion(s, 0, keyframe, s->categoryWidgets[later].paletteBank, &from, &to, 24,
                              16);
     Sound_PlaySong(0x38a);
     Hud_SetInteractionCallback(s, InventoryGrid_BeginNumberPhase, 1);

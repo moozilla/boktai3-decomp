@@ -18,7 +18,7 @@ void MessageWindow_SetMessageTable(u32);
 void MessageWindow_SetPalette(u32);
 void SceneCatalog_SelectDescription(u32);
 void PauseMenu_SetPromptIconPositions(u8 *, u32, s32);
-void SceneHud_SetPairedIcons(u8 *, u32, s32);
+void PauseMenu_SetPairedIcons(u8 *, u32, s32);
 void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void SelectionPanel_ConfirmSettings(void);
 void Hud_InitConfigMenu(u8 *s)
@@ -61,6 +61,6 @@ void Hud_InitConfigMenu(u8 *s)
     MessageWindow_SetPalette(0xEFDA);
     SceneCatalog_SelectDescription(5);
     PauseMenu_SetPromptIconPositions(s, 0, -12);
-    SceneHud_SetPairedIcons(s, 1, -1);
+    PauseMenu_SetPairedIcons(s, 1, -1);
     Hud_SetInteractionCallback(s, SelectionPanel_ConfirmSettings, 0);
 }

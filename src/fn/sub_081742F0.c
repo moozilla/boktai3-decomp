@@ -4,7 +4,7 @@ void Hud_SetupBackgroundLayer(u8 *, u32, u32, u32, u32);
 void PauseMenu_HideAllSprites(u8 *);
 void PauseMenu_LoadSpriteKeyframe(u8 *, u32, u32);
 void PauseMenu_ClearSpriteFlags(u8 *, u32, u32);
-void sub_0816618C(u8 *, u32, u32);
+void PauseMenu_ShowPromptSprite(u8 *, u32, u32);
 void Hud_DrawDefaultHealthMeter(u8 *, u32, u32, u32);
 void Hud_DrawDefaultEnergyMeter(u8 *, u32, u32, u32, u32, u32);
 void Hud_DrawHeaderCounter(void);
@@ -32,7 +32,7 @@ void Hud_InitInventoryMenu(u8 *s)
     PauseMenu_LoadSpriteKeyframe(s, 0, 0x55);
     PauseMenu_ClearSpriteFlags(s, 0x4D, 1);
     PauseMenu_LoadSpriteKeyframe(s, 8, 0x65);
-    sub_0816618C(s, 8, 0x20);
+    PauseMenu_ShowPromptSprite(s, 8, 0x20);
     Hud_DrawDefaultHealthMeter(s, 1, 2, 12);
     p = *(u8 **)(s + 0xA40);
     Hud_DrawDefaultEnergyMeter(s, 1, 2, 14, *(u16 *)(p + 0x428), *(u16 *)(p + 0x42A));

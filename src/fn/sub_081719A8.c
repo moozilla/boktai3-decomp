@@ -4,7 +4,7 @@ int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void PauseInventory_RefreshConsumableDescription(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
-void SceneHud_SetPairedIcons(void *, int, int);
+void PauseMenu_SetPairedIcons(void *, int, int);
 void PauseInventory_ReturnToConsumableActions(void *);
 void Hud_SaveGridSelection(void *);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -20,7 +20,7 @@ void PauseInventory_UpdateConsumableOptionSelection(struct SceneHudState *p)
         PauseInventory_RefreshConsumableDescription(p);
         MenuDisplay_UpdateActionPrompt(p, 3);
     }
-    SceneHud_SetPairedIcons(p, 1, 4);
+    PauseMenu_SetPairedIcons(p, 1, 4);
     keys = gPadState[1];
     if (keys & 2) {
         Sound_PlaySong(0xDE);

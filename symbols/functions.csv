@@ -5840,28 +5840,29 @@ addr,name,mode,confidence,source,notes
 0816589C,Hud_DrawClockLabelA,thumb,low,src-alias,Draw the label for secondary clock A.
 081658C8,Hud_DrawSelectedClock,thumb,low,src-alias,Draw the clock selected for the current HUD mode.
 08165944,Hud_DrawStatusMetersAndCounts,thumb,low,src-alias,Draws the panel health and energy meters followed by paired resource counts
-0816599C,MenuInput_ReadDirectionRepeat,thumb,low,src-alias,
+0816599C,PauseMenu_ReadDirectionRepeat,thumb,low,src-alias,Read pressed directions and repeat held directions every ten frames.
 081659F4,PauseMenu_SetConfirmationIndicator,thumb,low,src-alias,Shows sprite 7 at the origin and selects one of two indicator frames; confirmation role is tentative
-08165A30,SceneHud_UpdateBinaryChoice,thumb,low,src-alias,
+08165A30,PauseMenu_UpdateBinaryChoice,thumb,low,src-alias,Update the confirmation choice and return the accepted result.
 08165ACC,PauseMenu_HideAllSprites,thumb,low,src-alias,Sets flag 1 on all 124 sprite slots and three auxiliary display objects
 08165B28,PauseMenu_LoadSpriteKeyframe,thumb,low,src-alias,Clears the indexed sprite hide flag and loads its keyframe from the primary animation data
 08165B5C,PauseMenu_SetSpritePosition,thumb,low,src-alias,Sets the indexed sprite coordinates and clears the remaining two position components
 08165B7C,PauseMenu_AddSpriteFlags,thumb,low,src-alias,Adds the supplied flag mask to an indexed sprite
 08165B94,PauseMenu_ClearSpriteFlags,thumb,low,src-alias,Clears the supplied flag mask from an indexed sprite
-08165BAC,MenuTilemap_ClearRect,thumb,low,src-alias,
+08165BAC,PauseMenu_ClearTileRect,thumb,low,src-alias,Fill a rectangular menu tile region with the empty tile.
 08165BF4,PauseMenu_SetSpritePalette,thumb,low,src-alias,Stores a palette index and points the sprite at its corresponding 16-color palette
 08165C08,PauseMenu_SmoothPoint,thumb,low,src-alias,Moves a two-component point toward a target using a weighted average
 08165C4C,PlayerPanel_GetStatusValue,thumb,low,src-alias,
 08165CA8,PauseMenu_StartPaletteTransition,thumb,low,src-alias,Copies the starting palette and initializes the target palette and transition state
-08165D10,SceneHud_TickPaletteBlend,thumb,low,src-alias,
-08165E78,SceneHud_BeginIconMotion,thumb,low,src-alias,
+08165D10,PauseMenu_TickPaletteBlend,thumb,low,src-alias,Blend selected palette channels toward the target bank.
+08165E78,PauseMenu_BeginSpriteMotion,thumb,low,src-alias,Begin curved sprite motion between two menu positions.
 08165F78,PauseMenu_UpdateSpriteMotion,thumb,low,src-alias,Advances timed sprite interpolation with an optional sinusoidal bend and reports completion
 08166054,PauseMenu_OpenPrompt,thumb,low,src-alias,Resets text presentation and configures a prompt with an optional opening sound
 08166094,PauseMenu_SetPromptIconPositions,thumb,low,src-alias,Positions two prompt sprites with the second eight units below the first
 081660C0,PauseMenu_GetPromptIconKeyframe,thumb,low,src-alias,Maps a prompt icon index to a keyframe while skipping frame 0x80
-081660D0,SceneHud_SetPairedIcons,thumb,low,src-alias,
+081660D0,PauseMenu_SetPairedIcons,thumb,low,src-alias,Show or hide the two action prompt icons.
 0816615C,PauseMenu_HidePromptIcons,thumb,low,src-alias,Passes negative indices to hide both prompt icon sprites
 0816616C,PauseMenu_CloseTextWindows,thumb,low,src-alias,Requests closure of all eight text windows stored in the menu
+0816618C,PauseMenu_ShowPromptSprite,thumb,low,src-alias,Position the sequence-driven prompt sprite and start playback.
 081662C4,PauseMenu_LoadCategoryIconFrame,thumb,low,src-alias,Loads an indexed frame from the secondary animation bank at 0xF0; category identity is tentative
 081662E0,PauseMenu_LoadEquipmentIconFrame,thumb,low,src-alias,Loads an indexed frame from the secondary animation bank at 0xD9; equipment identity is tentative
 081662FC,PauseMenu_LoadAttributeIconFrame,thumb,low,src-alias,Loads a mode-1 icon frame using separate ranges for indices below six and higher; attribute identity is tentative

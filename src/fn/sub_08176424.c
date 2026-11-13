@@ -11,7 +11,7 @@ struct SceneDialog {
 void Sound_PlaySong(u32);
 void TextWindow_Clear(u32);
 void SceneCatalog_SelectDescription(u32);
-void SceneHud_SetPairedIcons(void *, s32, s32);
+void PauseMenu_SetPairedIcons(void *, s32, s32);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void SelectionPanel_ConfirmTransition(void);
 void SceneDialog_FinishSuccessfulResult(struct SceneDialog *p)
@@ -23,7 +23,7 @@ void SceneDialog_FinishSuccessfulResult(struct SceneDialog *p)
     }
     if (++p->timer > 119) {
         SceneCatalog_SelectDescription(8);
-        SceneHud_SetPairedIcons(p, 1, -1);
+        PauseMenu_SetPairedIcons(p, 1, -1);
         Hud_SetInteractionCallback(p, SelectionPanel_ConfirmTransition, 0);
     }
 }

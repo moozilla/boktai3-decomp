@@ -25,7 +25,7 @@ void MessageWindow_SetMessageTable(const void *);
 void MessageWindow_SetPalette(s32);
 void SceneCatalog_SelectDescription(u32);
 void PauseMenu_SetPromptIconPositions(void *, s32, s32);
-void SceneHud_SetPairedIcons(void *, s32, s32);
+void PauseMenu_SetPairedIcons(void *, s32, s32);
 void Hud_SetInteractionCallback(void *, void (*)(void), s32);
 void PauseMenu_BeginSleepPrompt(void);
 void PauseMenu_InitSleepTab(struct PauseMenuSleep *s)
@@ -45,6 +45,6 @@ void PauseMenu_InitSleepTab(struct PauseMenuSleep *s)
     SceneCatalog_SelectDescription(0x11);
     s->sleepState = 0;
     PauseMenu_SetPromptIconPositions(s, 0, -12);
-    SceneHud_SetPairedIcons(s, 1, -1);
+    PauseMenu_SetPairedIcons(s, 1, -1);
     Hud_SetInteractionCallback(s, PauseMenu_BeginSleepPrompt, 0);
 }

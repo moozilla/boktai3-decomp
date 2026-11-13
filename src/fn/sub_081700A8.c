@@ -1,5 +1,5 @@
 #include "global.h"
-int SceneHud_UpdateBinaryChoice(void *);
+int PauseMenu_UpdateBinaryChoice(void *);
 void Sound_PlaySong(int);
 void SceneHud_RefreshActionIcons(void *);
 void SceneHud_UpdateActionSelection(void);
@@ -16,7 +16,7 @@ void MessageWindow_Clear(void);
 void SceneHud_DispatchSelectedAction(void *);
 void PauseMenu_OnItemUseConfirmationUpdate(u8 *p)
 {
-    int r = SceneHud_UpdateBinaryChoice(p);
+    int r = PauseMenu_UpdateBinaryChoice(p);
     u8 *q, *a;
     if (r == 0) {
         Sound_PlaySong(0xde);

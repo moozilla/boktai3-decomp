@@ -6,6 +6,7 @@
 #include "scene_input.h"
 #include "contact_actor.h"
 #include "scene_vec.h"
+#include "contact_swarm_sprite.h"
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
@@ -70,9 +71,16 @@ struct SceneHudState {
     u8 actionResultResources[2][0x20]; /* 0x104: normal and bonus keyframes */
     u8 controlAnimationResource[0x20]; /* 0x144 */
     u8 comparisonResource[0x20];       /* 0x164 */
-    u8 unknown184[0xA12 - 0x184];
+    struct ContactSwarmSprite promptSprite; /* 0x184 */
+    u8 unknown1B0[0x1C];
+    struct DisplaySequenceState promptSequence; /* 0x1CC */
+    const void *promptSequenceResource; /* 0x1DC */
+    u8 unknown1E0[0xA12 - 0x1E0];
     u16 savedMenuMode; /* 0xA12: restored after page fade */
-    u8 unknownA14[0xA3F - 0xA14];
+    u8 unknownA14[4];
+    u16 blendedPalette[16]; /* 0xA18 */
+    u16 blendSourceBank, blendTargetBank;
+    u8 blendFrame, blendDuration, blendActive;
     u8 actionOwnerIndex;        /* 0xA3F: index into party actor pointers */
     struct Player *actionOwner; /* 0xA40 */
     u8 unknownA44[8];
@@ -118,7 +126,8 @@ struct SceneHudState {
     u8 previousCueGroup, previousCueSelection;    /* 0xB02 */
     const u16 *countdownValue;
     struct SceneInputWidget countdownDigits[3]; /* 0xB08 */
-    u8 unknownC28[0x48];
+    u32 selectorFlags; /* 0xC28 */
+    u8 unknownC2C[0x44];
     u8 primaryVisible;           /* 0xC70 */
     u8 primarySlideTimer;        /* 0xC71: remaining three-pixel slide steps */
     s8 primarySelection;         /* 0xC72 */
@@ -184,7 +193,13 @@ struct SceneHudState {
     u8 actionGridGroup; /* 0x4388: values above one select unlock confirmation */
     u8 unknown4389;
     u8 actionSelection; /* 0x438A: selected action lookup */
-    u8 unknown438B[0x5E];
+    u8 unknown438B[2];
+    u8 savedActionSelection; /* 0x438D */
+    u8 unknown438E[0x26];
+    u16 overridePalette[16]; /* 0x43B4 */
+    u8 highlightPalettePhase; /* 0x43D4 */
+    u8 unknown43D5[0x13];
+    u8 directionRepeatTimer; /* 0x43E8 */
     u8 binaryChoice; /* 0x43E9: left/right toggles; A confirms, B cancels */
     u8 unknown43EA[2];
     struct SceneHudWidgetMotion widgetMotions[1]; /* 0x43EC: indexed, count unconfirmed */
@@ -204,9 +219,11 @@ struct SceneHudState {
     s16 comparisonDeltas[3];  /* 0x48B0: signed bar adjustments after offsets */
     s16 comparisonOffsets[3]; /* 0x48B6: signed bar adjustments */
     u8 pageInputCooldown;     /* 0x48BC */
-    u8 unknown48BD[0xB];
+    u8 unknown48BD[7];
+    s32 primaryTextWindow; /* 0x48C4 */
     s32 timedMessageWindow; /* 0x48C8 */
-    u8 unknown48CC[0x19];
+    s32 auxiliaryTextWindows[6]; /* 0x48CC */
+    u8 unknown48E4;
     u8 pageReturnToParent; /* 0x48E5 */
     u8 selectedQuantity;   /* 0x48E6: multiplied by valueRate */
     u8 unknown48E7;
@@ -229,8 +246,12 @@ struct SceneHudState {
     struct SceneInputWidget ownerAuxWidgets[6]; /* 0x4A70 */
     u8 unknown4CB0[0x28];
     u8 initializationFlag; /* 0x4CD8: cleared by both initializers */
-    u8 unknown4CD9[0x4D90 - 0x4CD9];
+    u8 unknown4CD9[0x4D80 - 0x4CD9];
+    s8 categoryEntrySlots[8]; /* 0x4D80 */
+    s8 unlockEntrySlots[8]; /* 0x4D88 */
     u8 equippedIconSlots[8]; /* 0x4D90: inventory slot for each visible equipped icon */
+    s8 consumableEntrySlots[4]; /* 0x4D98 */
+    s16 activePairIndices[2]; /* 0x4D9C */
 };
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);

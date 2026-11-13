@@ -1,7 +1,7 @@
 
 #include "global.h"
 #include "scene_hud_display.h"
-int SceneHud_UpdateBinaryChoice(void *);
+int PauseMenu_UpdateBinaryChoice(void *);
 void SceneHud_RefreshActionIcons(void *);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void PauseMenu_OnItemUseSelectionUpdate(void);
@@ -17,7 +17,7 @@ void SceneHud_BeginActionIconMotion(void *, int, int, int);
 void PauseMenu_ClearItemSlot(void *, u32);
 void SceneHud_ResolveActionConfirmation(struct SceneHudState *p)
 {
-    int r = SceneHud_UpdateBinaryChoice(p);
+    int r = PauseMenu_UpdateBinaryChoice(p);
     u8 *selection;
     if (r == 0) {
         Sound_PlaySong(222);

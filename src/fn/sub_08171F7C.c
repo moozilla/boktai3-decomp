@@ -6,7 +6,7 @@ void PauseMenu_HideAllSprites(void *);
 void Hud_DrawHeaderCounter(void);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void PauseMenu_ClearSpriteFlags(void *, s32, u32);
-void sub_0816618C(void *, s32, s32);
+void PauseMenu_ShowPromptSprite(void *, s32, s32);
 void Hud_DrawDefaultResourceCounts(s32, s32, s32, s32, s32);
 void InventoryPanel_UpdateSelectedUnlock(void *, int, int, int, int);
 void InventoryPanel_UpdateSelectedEquipment(void *, int, int, int, int);
@@ -35,7 +35,7 @@ void sub_08171F7C(u8 *p)
     ((struct HudObj *)(p + 0x1420))->flags &= ~1;
     Anim_LoadKeyframe(p + 0x1420, p + 0x64, 0x56, 0);
     PauseMenu_ClearSpriteFlags(p, 0x4D, 1);
-    sub_0816618C(p, 8, 0x20);
+    PauseMenu_ShowPromptSprite(p, 8, 0x20);
     Hud_DrawDefaultResourceCounts(8, 4, 8, 3, 0);
     InventoryPanel_UpdateSelectedUnlock(p, 8, 3, 0, 0);
     InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, 0);

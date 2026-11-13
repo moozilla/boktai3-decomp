@@ -13,7 +13,7 @@ void SelectionPanel_CaptureSettings(struct PauseMenuConfig *);
 void sub_0817597C(struct PauseMenuConfig *, u32);
 void SceneCatalog_SelectDescription(u32);
 void Hud_SetInteractionCallback(struct PauseMenuConfig *, void (*)(void), u32);
-void SceneHud_SetPairedIcons(struct PauseMenuConfig *, u32, s32);
+void PauseMenu_SetPairedIcons(struct PauseMenuConfig *, u32, s32);
 void MenuSelection_RefreshAllOptionText(struct PauseMenuConfig *);
 s32 MenuSelection_ProcessOptionInput(struct PauseMenuConfig *);
 void SelectionPanel_WaitConfirmDelay(void);
@@ -31,7 +31,7 @@ void PauseMenu_UpdateConfigChoice(struct PauseMenuConfig *s)
         SelectionPanel_CaptureSettings(s);
         sub_0817597C(s, 0);
         SceneCatalog_SelectDescription(5);
-        SceneHud_SetPairedIcons(s, 1, -1);
+        PauseMenu_SetPairedIcons(s, 1, -1);
         MenuSelection_RefreshAllOptionText(s);
         Hud_SetInteractionCallback(s, SelectionPanel_ConfirmSettings, 0);
     } else {

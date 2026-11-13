@@ -8,7 +8,7 @@ void Hud_DrawHeaderCounter(void);
 void PauseMenu_HideAllSprites(void *);
 void PauseMenu_ClearSpriteFlags(void *, s32, s32);
 void Anim_LoadKeyframe(void *, void *, u16, s32);
-void sub_0816618C(void *, s32, s32);
+void PauseMenu_ShowPromptSprite(void *, s32, s32);
 void PauseMenu_LoadSpriteKeyframe(void *, s32, s32);
 void PlayerPanel_SnapshotValues(void *);
 void sub_08166534(void *, s32, s32);
@@ -42,7 +42,7 @@ void PauseInventory_InitEquipmentPage(u8 *p)
         u8 *a = p + 0x1420;
         Anim_LoadKeyframe(a, p + 0x64, 0x52, 0);
     }
-    sub_0816618C(p, 8, 32);
+    PauseMenu_ShowPromptSprite(p, 8, 32);
     PauseMenu_ClearSpriteFlags(p, 0x4d, 1);
     PauseMenu_ClearSpriteFlags(p, 8, 1);
     PauseMenu_LoadSpriteKeyframe(p, 8, 99);

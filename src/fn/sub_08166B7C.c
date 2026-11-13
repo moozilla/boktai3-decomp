@@ -14,7 +14,7 @@ struct MenuDisplay {
     u8 unknown4390[0x4D0];
     u8 page;
 };
-s32 SceneHud_SetPairedIcons(void *, s32, s32);
+s32 PauseMenu_SetPairedIcons(void *, s32, s32);
 s32 PauseMenu_IsCategoryEntryEmpty(void *, u32, u32);
 s32 PauseMenu_GetCategoryEntryValue(u32, s32);
 void Hud_SaveSecondaryGridSelection(void *);
@@ -64,25 +64,25 @@ s32 MenuDisplay_UpdateActionPrompt(struct MenuDisplay *p, s32 group)
     switch (action) {
         case 1:
             if (group == 4)
-                result = SceneHud_SetPairedIcons(p, 1, 2);
+                result = PauseMenu_SetPairedIcons(p, 1, 2);
             else
-                result = SceneHud_SetPairedIcons(p, 1, 6);
+                result = PauseMenu_SetPairedIcons(p, 1, 6);
             break;
         case 4:
-            result = SceneHud_SetPairedIcons(p, 1, 3);
+            result = PauseMenu_SetPairedIcons(p, 1, 3);
             break;
         case 3:
-            result = SceneHud_SetPairedIcons(p, 1, 4);
+            result = PauseMenu_SetPairedIcons(p, 1, 4);
             break;
         case 0:
         case 2:
-            result = SceneHud_SetPairedIcons(p, 1, -1);
+            result = PauseMenu_SetPairedIcons(p, 1, -1);
             break;
         case 5:
-            result = SceneHud_SetPairedIcons(p, 1, 5);
+            result = PauseMenu_SetPairedIcons(p, 1, 5);
             break;
         default:
-            result = SceneHud_SetPairedIcons(p, -1, -1);
+            result = PauseMenu_SetPairedIcons(p, -1, -1);
     }
     return result;
 }
