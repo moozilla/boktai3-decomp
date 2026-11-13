@@ -3,10 +3,7 @@
 #include "engine.h"
 #include "contact_actor.h"
 #include "ram.h"
-struct SceneScheduledEffect {
-    u8 unknown0[0x13e];
-    s16 state;
-};
+#include "scene_scheduled_effect.h"
 struct SceneEffectScheduleEntry {
     struct ContactPosition position, offset;
     s16 randomValue, scaleValue;
