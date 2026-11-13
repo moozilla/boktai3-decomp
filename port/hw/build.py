@@ -44,7 +44,7 @@ def main():
         raise SystemExit("Set CLANG to a clang with the wasm32 target")
     sources = sorted(Path("port/hw").glob("*.c"))
     flags = ["-std=c11", "-O2", "-Wall", "-Wextra", "-Werror", "-ffreestanding", "-fno-builtin", "-Iport/include", "-Iinclude"]
-    run([clang, *flags, "-g", "-fsanitize=address,undefined", *sources, "port/tests/hw_test.c", "port/tests/hw_native.c", "-o", out / "hw-test"])
+    run([clang, *flags, "-g", "-fsanitize=address,undefined", "-fno-sanitize-recover=all", *sources, "port/tests/hw_test.c", "port/tests/hw_native.c", "-o", out / "hw-test"])
     if not args.no_test:
         run([out / "hw-test"])
     if args.mgba_rom:
@@ -57,7 +57,7 @@ def main():
     if args.song_rom:
         player = out / "hw-song"
         song_flags = [f for f in flags if f != "-ffreestanding"]
-        run([clang, *song_flags, "-g", "-fsanitize=address,undefined", *sources,
+        run([clang, *song_flags, "-g", "-fsanitize=address,undefined", "-fno-sanitize-recover=all", *sources,
              "port/tests/hw_song.c", "-lm", "-o", player])
         run([player, args.song_rom, args.song, out / ("song-" + str(args.song) + ".wav"), args.seconds])
     if args.native_only:

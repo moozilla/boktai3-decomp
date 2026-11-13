@@ -83,7 +83,7 @@ static void note(Track *t, unsigned command)
     free(v->wave);
     v->wave = malloc(16 + size + 1);
     if (!v->wave) exit(2);
-    memcpy(v->wave, rom + address - 0x08000000, 16 + size);
+    memcpy(v->wave, rom + (address - 0x08000000), 16 + size);
     v->wave->data[size] = 0;
     memset(c, 0, sizeof(*c));
     c->wav = v->wave; c->type = byte(tone);
