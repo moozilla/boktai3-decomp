@@ -2196,3 +2196,14 @@ which is exactly `10:1`. Not tested.
    and only standalone USEs afterward; surviving SETs, CLOBBERs, or operand uses
    disqualify the diagnosis. Zero initialization removes this USE but restores
    constant equivalence and changes allocation, so it is not automatically a fix.
+
+174. **Reuse a completed input for split-half table construction to avoid its unused spill.**
+   The extra USE-only slot in fact 173 disappeared when a typed union first held
+   the loop bound: `input.count = count; if (i < input.count) { ... }`. Inside that
+   arm, assign `input.random.halves[0]` and `[1]`, then read the table through
+   `ParticleRandom_GetTable(&input.random)`. The old input now comes from an
+   existing, defined count value instead of a new uninitialized pseudo. The half
+   stores still prevent the table's constant equivalence. This removed all three
+   initialization-barrier operands from sub_08014CA4 with a stock 704-byte match.
+   A zero or aggregate table initializer instead restored constant equivalence;
+   direct repeated reads of the union prevented the half stores from combining.
