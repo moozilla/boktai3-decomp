@@ -36,10 +36,10 @@ def find_linker():
     raise RuntimeError('wasm-ld not found; set WASM_LD')
 
 
-def build_slice(root, args):
+def build_slice(root, args, extra_units=(), extra_exports=(), suffix=""):
     if args.ppu_root or args.rtc or args.video_irqs:
         args.mmio = True
-    out = root / 'build/port' / ('slice-' + args.target + ('-rtc' if args.rtc else '') + ('-video' if args.video_irqs else ''))
+    out = root / 'build/port' / ('slice-' + args.target + ('-rtc' if args.rtc else '') + ('-video' if args.video_irqs else '') + suffix)
     out.mkdir(parents=True, exist_ok=True)
     headers = out / 'include'
     prepare_headers(root, headers, args.target)
@@ -56,8 +56,8 @@ def build_slice(root, args):
     addresses = read_addresses(root)
     objects = []
     bindings = {}
-    units = CORE + GAME + [str(bios)]
-    exports = list(EXPORTS)
+    units = CORE + GAME + [str(bios)] + list(extra_units)
+    exports = list(EXPORTS) + list(extra_exports)
     if args.mmio:
         units += ['port/core/bus.c', 'port/core/devices.c', 'src/fn/sub_08213D10.c',
                   'port/core/irq.c', 'src/fn/sub_08243C10.c', 'src/fn/sub_08243D28.c']

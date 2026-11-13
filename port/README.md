@@ -250,3 +250,15 @@ requires a slice built with `--ppu-root`. Its synthetic mode-3 image proves that
 repeated identical HBlank writes reset BG2Y each line, then normal affine row
 stepping resumes after DMA is disabled. Native/wasm boot and RTC comparisons
 and original VBlank/VCount/solar IRQ tests still pass.
+
+Core timing owns DISPSTAT/VCOUNT and the interrupt masks/flags in mapped memory.
+Before bus access, elapsed-device updates and blanking events, the bridge copies
+those specific registers into port-hw's shadow without treating them as writes.
+This prevents stale scanline reads and avoids losing pending flags or interpreting
+them as write-one-to-clear acknowledgements.
+
+`python port/tests/run_display_bus.py --hardware-root ../cx-port-hw/port` verifies
+that a line-64 IRQ reads line 64 and the active comparison bit, a timer preserves
+a core-raised interrupt, and selective IF acknowledgement preserves other flags.
+The pre-fix evidence read line 63 and lost both kinds of pending flags. Core,
+native/wasm RTC, original video/solar IRQ and affine DMA regressions pass.
