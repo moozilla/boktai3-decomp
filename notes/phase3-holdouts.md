@@ -1330,3 +1330,35 @@ the two zero classes distinct, or add a precise CSE substitution diagnostic befo
 
 Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateItemMerge`;
 scratch: `build/cx/work/WirelessGameItems_UpdateItemMerge/`.
+
+### WirelessGameItems_UpdateIncomingItem (08039EEC, src/wireless_game_items_and_display.c)
+
+Best target-clean draft: `notes/phase3-drafts/dp-link/WirelessGameItems_UpdateIncomingItem.c`
+(29 ROM / 29 draft, shape 8, 380 bytes). It uses direct array fields and separate first/second
+loads before the target head stores. Other functions retain existing concessions. Production
+is unchanged. The direct combined-count form is 27/27, shape 10; the inherited clean draft is
+45/41, shape 12, 372 bytes.
+
+- Seven constraints: pending pointer in ip, saturated total in r1, one and count result in r0,
+  and three operand barriers. All 119 proper subsets with two through six removals were tested;
+  none matches. Removing both r0 pins leaves only 4/4 register differences, shape 0. The sum
+  takes r3 instead of r0. `AGBCC_FORCE=value#1:0` (pseudo 188) MATCHes that partial draft.
+- `why 504` and global.c show the exact cause: find_reg initially finds free r0, then
+  hard_reg_preferences moves the sum to r3, inherited from the locally allocated first
+  operand. This is not insufficient r0 availability. Simple operand commutation is canonicalized
+  back. Assignment, ternary, repeated sum, narrow operand/result types, separate result,
+  clamp helper, input reuse for the cleared flag, and computing the sum earlier preserve the
+  preference. Clipping into first gives 3/5 (shape 2), so input/result splitting is worth revisiting.
+- In the fully clean source, pending's global priority is 1764 versus slot's 1794. Slot takes r4
+  rather than r7, leaving r7 for pending instead of ip. The array base is local in r1 rather
+  than r2. The shared zero remains live across the count clamp and becomes a low-priority global
+  constant (882) in r6 instead of r1. Literal field stores recover slot/ip but introduce a
+  PRE-generated current-array copy and leave the related zero-class differences.
+- Tried direct fields, separate counter loads, byte/halfword constants, reinitializing one,
+  and the focused partial clamp forms above. `probe` has no full-clean match; suppressing
+  pending's class-head takeover only changes 45/41 to 43/39. Next: make the sum result global
+  without inheriting the first operand's hard-register preference, then remove the remaining
+  pointer and zero constraints using the direct-field form. Do not repeat the subset search.
+
+Persistent evidence: `build/matchsearch/WirelessGameItems_UpdateIncomingItem`;
+scratch: `build/cx/work/WirelessGameItems_UpdateIncomingItem/`.
