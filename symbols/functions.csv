@@ -3030,7 +3030,9 @@ addr,name,mode,confidence,source,notes
 08084100,SceneActorControl_TryActivateProximityResponse,thumb,low,src-alias,Consumes status bit 2 and activates response flags when player height is within 512 and the actor F0 value is below F8; purpose is provisional.
 08084180,SceneActorControl_SetCollisionResponse,thumb,low,src-alias,
 08084210,SceneActorControl_TickHiddenResponse,thumb,low,src-alias,
+08084280,SceneActorControl_ReturnSuccess,thumb,low,src-alias,
 08084284,SceneActorControl_WanderAroundPlayer,thumb,low,src-alias,
+080844B8,SceneActorControl_UpdateStoredMotion,thumb,low,src-alias,
 0808483C,SceneActorControl_SetApproachCallbacks,thumb,low,src-alias,Installs the two callbacks that approach a target and choose nearby player positions
 0808484C,SceneActorControl_TickVisibility,thumb,low,src-alias,
 080849DC,SceneActorControl_StartStoredCurve,thumb,low,src-alias,
@@ -3953,15 +3955,19 @@ addr,name,mode,confidence,source,notes
 080F2F7C,PhaseObject_UpdateEntryScatter,thumb,low,src-alias,Tentative: fades four entries then chooses a target-relative scatter origin
 080F31AC,PhaseObject_BeginEntryMotion,thumb,low,src-alias,
 080F3230,PhaseObject_ConvergeEntries,thumb,low,src-alias,
+080F33BC,ChildGroup_AdvanceLaunchCycle,thumb,low,src-alias,
 080F3420,ChildGroup_LaunchNextInactiveMember,thumb,low,src-alias,Tentative: launches one inactive member per delay interval; then waits for completion
 080F34C8,ChildGroup_WaitForInactiveMembers,thumb,low,src-alias,
 080F3560,ChildGroup_ShowDamageNumber,thumb,low,src-alias,
 080F360C,Ivy_InitPaletteBuffers,thumb,low,src-alias,Clears sixteen working colors and copies sixteen source colors into the adjacent buffer
+080F3638,Ivy_SetSegmentFlags,thumb,low,src-alias,
 080F3650,Ivy_SetSegmentProperties,thumb,low,src-alias,Assigns the same halfword and word properties to each of four segment records
 080F3674,ChildGroup_ReadScriptParameters,thumb,low,src-alias,
 080F3728,ChildGroup_ProcessEvent,thumb,low,src-alias,
 080F3848,ChildGroup_UpdateTimedOscillation,thumb,low,src-alias,
+080F38E0,ChildGroup_UpdateTransitionJitter,thumb,low,src-alias,
 080F3ABC,ChildGroup_BeginInactiveState,thumb,low,src-alias,
+080F3B30,ChildGroup_WaitForTrailingMembers,thumb,low,src-alias,
 080F3B60,ChildGroup_UpdateTrailingMembers,thumb,low,src-alias,
 080F3CC4,ChildGroup_UpdateOrbitingMembers,thumb,low,src-alias,
 080F3F48,ChildGroup_UpdateLandingState,thumb,low,src-alias,
@@ -4630,6 +4636,7 @@ addr,name,mode,confidence,source,notes
 08115FE0,ActorParticles_InitCompactPool,thumb,low,src-alias,
 0811606C,SpriteDrop_CreateManager,thumb,low,src-alias,Returns or creates the singleton task managing 16 sprite drop entries
 081160B8,SpriteDrop_OnExpire,thumb,low,src-alias,Expiration callback schedules sprite removal and marks the cleanup state for initialization
+08116280,ActorRecoil_ReturnZero,thumb,low,src-alias,
 0811628C,ScenePool_CanAcceptControl,thumb,low,src-alias,
 081162D8,ActorRecoil_ReceiveBodyContact,thumb,low,src-alias,
 08116538,ActorRecoil_ApplyDirectionalImpulse,thumb,low,src-alias,
