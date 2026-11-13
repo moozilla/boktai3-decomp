@@ -1345,3 +1345,8 @@ order do not improve it. Original source retains both concessions.
 Next: find the C form that lets the initial duration value die only after
 allocation while the argument still uses the original power. The key is the
 second addition, before considering reload rotation.
+
+### TargetRegistry_FindById: 5/5 allocation-only; duplicate compares still cross-jump backward
+Tags: phase3, dp-bosses, TargetRegistry_FindById
+
+Draft: notes/phase3-drafts/dp-bosses/TargetRegistry_FindById.c. AGBCC_PRI=requestedId:+2484 makes the single shared comparison MATCH. The earlier duplicate-comparison draft already allocates correctly but jump2 shares the collider tail into the actor tail. Explicit found/missing labels, returns versus breaks in each arm, and an actor block outside the loop do not reproduce the ROM layout. Narrow flag/mask types, boolean flag extraction, aggregate flag temporaries and inline comparison helpers do not solve allocation. Union/struct/array mask temporaries fold to the same RTL. Original source retains its one pin. Next: an ID reference that survives through flow while preserving the shared comparison, or a real flag accessor that prevents the constant mask tie and REG_EQUIV lifetime doubling.
