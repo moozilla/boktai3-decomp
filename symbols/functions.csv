@@ -9977,7 +9977,9 @@ addr,name,mode,confidence,source,notes
 08237664,MovingGlyph_InitializeFromScript,thumb,low,src-alias,
 08237764,MovingGlyph_CreateFromScript,thumb,low,src-alias,
 082377A8,ActorGlyphTrail_SetState,thumb,low,src-alias,Stores the actor-linked effect state callback and resets its timer
+082377B8,ActorGlyphTrail_UpdateAnchor,thumb,low,src-alias,
 08237938,ActorGlyphTrail_UpdateParticles,thumb,low,src-alias,Advances four orbiting glyph positions and hides expired slots
+08237A28,ActorGlyphTrail_EmitParticle,thumb,low,src-alias,
 08237BAC,ActorGlyphTrail_HideParticles,thumb,low,src-alias,Clears active markers and sets the hidden flag on all four trail particles
 08237BD4,ActorGlyphTrail_Update,thumb,low,src-alias,
 08237C9C,TimedSprite_UpdateMotion,thumb,low,src-alias,
