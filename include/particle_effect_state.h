@@ -8,7 +8,8 @@ struct BurstPos {
 };
 struct BurstEntry {
     void (*update)(struct BurstEntry *);
-    u8 collider[0x5c];
+    u8 collider[0x40];
+    u8 resource[0x1c];
     struct ContactSwarmSprite sprite;
     struct DisplaySequenceState anim;
     void *data;
@@ -23,6 +24,7 @@ struct BurstEntry {
     u8 timer;
     u8 state;
     u32 value;
+    u8 unknownD4[4];
 };
 
 struct FollowingPosition {
