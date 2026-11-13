@@ -1356,3 +1356,24 @@ read only the first draw through cursor then write the global for subsequent
 reuse (10/10, shape 2, but the separate global address takes r5). No partial
 reduction landed. Next: a shared table/cursor capture whose real uses preserve
 the ROM allocation without aliasing away the cached random index.
+
+### TetherActor_BlendPalette (08048E0C): one moved copy remains
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_BlendPalette.c`
+(1/1, shape 2). Initialize i before weight: weight's shorter life puts it in ip
+and the component mask in r8 as ROM, but its `mov ip,r1` is then after the i=0
+initialization instead of before it. The baseline (weight before i) is 6/6;
+`AGBCC_PRI=weight:+26` gives MATCH. Priorities: componentMask 3068 (9/88),
+weight 3043 (7/46); losing one weight live insn or adding one mask live insn
+would flip their order without a large structural change.
+
+Tried after diagnosis: weight/mask declaration orders; s16 weight (1/3, correct
+allocation but extra sign extension); s16 inverse; u16/s32/u64 component mask;
+union mask and weight aggregates; array/union loop counter; weight=64-inverse;
+helper returning palette weight; direct channel extraction; indexed-vs-pointer
+output; multiply instead of shift for packed colors; for/while/goto loop forms.
+The aggregate counter keeps the one moved copy; while/for match the baseline;
+the goto form changes loop allocation. The pointer output materially changes
+subword stores. Next: shorten the baseline weight life by one pre-combine insn
+without moving its first copy, or lengthen the mask life by one without moving
+its emitted initialization. No reduction landed.
