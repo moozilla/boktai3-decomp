@@ -3785,8 +3785,11 @@ addr,name,mode,confidence,source,notes
 080E7D9C,Mimic_ResetExpiredTarget,thumb,low,src-alias,
 080E7EC8,SceneActor_InitializeReactionColliders,thumb,low,src-alias,
 080E7F54,SceneActor_FindNearbyActivePlayer,thumb,low,src-alias,
+080E7FF4,Mimic_TryTargetRoute,thumb,low,decomp,Tests the tracked target and attempts navigation toward it
 080E80BC,Mimic_TryPursuitRoute,thumb,low,src-alias,
+080E8158,Mimic_BeginTargetResponse,thumb,low,decomp,Faces the tracked heading and starts the attachment response and action script
 080E81CC,SceneActor_GetDirectionFlags,thumb,low,src-alias,
+080E81FC,Mimic_UpdateIdleState,thumb,low,decomp,Empty idle-state callback; role is tentative
 080E8200,SceneActor_AcquireCollisionTarget,thumb,low,src-alias,
 080E8340,SceneActor_PrepareStationaryReaction,thumb,low,src-alias,
 080E8444,SceneActor_IsCollisionTargetUnavailable,thumb,low,src-alias,
