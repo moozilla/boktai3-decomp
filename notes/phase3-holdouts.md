@@ -1421,3 +1421,24 @@ allocation and reload rotation. Removing flagsOwner alone from the matching
 partial is four reload-register differences in the second flip update.
 Next: isolate the elapsed-counter mask from its source using the correct packed
 state type, then resolve the two sequence-end return paths before allocation.
+
+### RouteSpriteActor_Create — height constant copy
+
+Tags: phase3, dp-scene1, RouteSpriteActor_Create, 0x0806DFC8
+
+Matching partial removes ten pins and four barriers. Ordinary typed fields
+replace the offset-register chains, and pool/zero/one allocation matches.
+Only three pins and two barriers in the elevated-position height group remain.
+Saved fully pin-free draft is eight ROM / eight draft differences, same 360
+bytes, shape four. ROM materializes 712 in r2, copies it to r0, then loads y
+into r3 and adds. C folds height/result into the addition, loads y first, and
+loses the copy; two later reload choices consequently rotate.
+
+Keeping just the original height group is an exact diagnostic and yielded the
+partial. Probe's three canonical choices do not alter the count. Narrow height
+or result, signed height, union initializer and compound assignment give the
+same eight differences. A scalar raise helper changes address formation; a
+three-component offset introduces stack storage and many extra instructions.
+The height/result names are folded before allocation, so FORCE cannot address
+them in the plain draft. Next: find a genuine value/control-flow boundary for
+the constant copy without adding a barrier or unrelated arithmetic.
