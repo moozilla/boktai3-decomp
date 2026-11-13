@@ -1537,3 +1537,39 @@ store changes access width; u64 value changes shape; moving display's copy
 earlier changes the register graph. Next: fold the helper's address-copy pseudo
 into the load while retaining its local allocation, or another real visibility
 helper that produces that load/store ordering.
+
+### TetherActor_UpdateBounceReturn (0804CB4C): one pin removed
+
+Removed the destination r1 pin; its ordinary pointer already receives the ROM
+register. Three pins remain: initial frame value, incremented value and falling
+height offset. Stock full-unit check: MATCH (20,516 bytes, 114 functions).
+The weekly stop request ended work on this item.
+
+Best fully pin-free draft:
+`notes/phase3-drafts/dp-field/TetherActor_UpdateBounceReturn.c`
+(23 ROM / 16 draft differing instructions, shape 11, 340 versus 356 bytes).
+It uses the named displayOffsetY field instead of the raw height address.
+Two independent decisions remain: a repeated halfword zero extension is removed,
+and the later counter pointer takes r6 instead of r8. On the all-pin-free
+baseline, `AGBCC_FORCE=counter:8` fixes all allocation differences and leaves
+only the missing two-instruction zero extension (2/0). This is a partial
+diagnosis, not an exact matching override.
+
+Removing both frame-value pins while retaining the height-offset pin also
+leaves only that zero extension (2/0). Removing the initial frame pin alone,
+with u16 or u32, is 3/3: the initial load takes r1 rather than r0 and changes
+the increment. No single probed CSE canonicalization or jump-follow decision
+restores the repeated extension (one canonicalization and ten follows tested).
+
+Further C attempts after the older field-effects and round-24 passes:
+union halfword extraction and inline u16/u32/s32 narrowing helpers retain 2/0;
+a second memory read gives 2/2 but different instructions; signed narrowing
+is 7/7; an explicit mask or union high-half clearing gives 2/5; normalizing
+incremented in place is 3/3. A nonempty single-pass loop changes shape (11/9).
+Representing counter as an integer leaves the same allocation; shared sample
+and origin capture forms worsen to 34/29. None was landed.
+
+Next: establish which pass removes the second zero extension and find a real
+frame-update helper or lifetime split that preserves it, then find a counter
+load form whose class/lifetime naturally takes r8. Scratch variants and compiler
+evidence remain in build/cx/work/TetherActor_UpdateBounceReturn and build/scope.
