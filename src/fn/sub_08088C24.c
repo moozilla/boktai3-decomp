@@ -1,6 +1,6 @@
 #include "scene_actor_chase.h"
 // confidence=low: reacts to the context probe flag and enters behavior 15 after clearing it.
-void sub_0808AF38(struct SceneActorRegistryResetView *);
+void Ghoul_SelectRetreatRoutePoint(struct SceneActorRegistryResetView *);
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
 {
     if (a->field2B2) {
@@ -34,7 +34,7 @@ void Bat_UpdateProbeReaction(struct SceneActorRegistryResetView *a)
     if (Test(context, 2, &flags)) {
         if (a->tracking.distance > 0xFFFF)
             SceneActorAnimation_SelectDirectionalEntry(a, 0);
-        sub_0808AF38(a);
+        Ghoul_SelectRetreatRoutePoint(a);
         Clear(flags, ~2);
         Chase_SetBehavior(a, 15);
     } else

@@ -55,6 +55,7 @@ _REGEX = {
     "empty-if": re.compile(r"\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{\s*\}|;)"),
     "volatile": re.compile(
         r"(?<![(*\w])volatile\s+(?:const\s+)?(?:unsigned\s+|signed\s+|struct\s+)?\w+\s+(?:const\s+)?\w+\s*[=;,\[]"
+        r"|\bv[us](?:8|16|32)\s+(?:const\s+)?\w+\s*[=;,\[]"
         r"|\*\s*volatile\b"
         r"|\(\s*(?:volatile\s+(?:const\s+)?\w+|v[us](?:8|16|32))\s*\*\s*\)\s*&\s*(?!REG_)"),
     "goto": re.compile(r"\bgoto\b"),

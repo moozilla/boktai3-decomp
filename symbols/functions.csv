@@ -3020,10 +3020,10 @@ addr,name,mode,confidence,source,notes
 08085D20,Bat_Create,thumb,high,gcl-name,name from GCL key F8BE バット (Bat); registry callback
 08085D58,Ghoul_OnAttackCollision,thumb,low,src-alias,Attack collider callback records the contact identifier and clears a response flag when unblocked; Ghoul identity is tentative
 08085DC4,Ghoul_OnBodyCollision,thumb,low,src-alias,Body collider callback delegates to the shared actor collision response
-08085DD0,Ghoul_UpdateAimedDiscThrow,thumb,low,src-alias,
+08085DD0,Ghoul_UpdateAimedDiscThrow,thumb,low,src-alias,Captures two target positions in the Ghoul context and launches a sun disc on animation frame five; species tentative
 080863C4,Ghoul_UpdateIdleState,thumb,low,src-alias,Idle state callback consumes the pending state entry flag
 080863DC,Ghoul_UpdateStandingState,thumb,low,src-alias,Standing state callback clears the entry flag and selects directional animation zero
-08086400,Ghoul_TurnTowardRoute,thumb,low,src-alias,
+08086400,Ghoul_TurnTowardRoute,thumb,low,src-alias,Turns in octants toward the current route facing then resumes waiting control
 08086A2C,Ghoul_UpdateDyingState,thumb,low,src-alias,Plays animation eight and periodic effects before entering the final death state when its timer expires
 08086AFC,Ghoul_UpdateDeathAnimation,thumb,low,src-alias,Death state callback selects animation seven and marks completion after the animation and delay
 08086B6C,Ghoul_UpdateHiddenRecovery,thumb,low,src-alias,Recovery callback hides the drawable and shadow before switching to animation nine after a delay
@@ -3041,6 +3041,7 @@ addr,name,mode,confidence,source,notes
 0808A430,SceneActorControl_RestartOrAdvance,thumb,low,src-alias,
 0808A538,Ghoul_WaitForRouteResult,thumb,low,src-alias,
 0808A654,Ghoul_SetActionHandlers,thumb,low,src-alias,Installs the shared and ghoul-specific action callback table at actor offset 0x284
+0808A664,Ghoul_UpdateAimedDiscControl,thumb,low,src-alias,Starts an aimed disc attack and restores pursuit after the configured recovery delay
 0808A870,Ghoul_SetSpecialHandlers,thumb,low,src-alias,Installs the single special behavior callback table at actor offset 0x28C
 0808A880,Ghoul_EnterIdleControl,thumb,low,src-alias,Installs the shared idle callback and resets action state and queued control fields
 0808A90C,SceneActorControl_RefreshMotionRoute_0808A90C,thumb,low,src-alias,
@@ -3051,6 +3052,8 @@ addr,name,mode,confidence,source,notes
 0808AE44,Ghoul_BindProfile,thumb,low,src-alias,Finds or adds actor profile category four and stores its handle
 0808AE60,Bat_LookupAnimationEntry,thumb,low,src-alias,
 0808AEB8,Ghoul_TickCooldown,thumb,low,src-alias,Decrements the owner context countdown at offset 0x63C without underflow; cooldown purpose is tentative
+0808AED8,Ghoul_SelectRandomRoutePoint,thumb,low,src-alias,Chooses a route point different from the current point and resets its progress
+0808AF38,Ghoul_SelectRetreatRoutePoint,thumb,low,src-alias,Selects a route point behind the tracked target or a random fallback and requests a path
 0808B264,Ghoul_BeginAlternateRoute,thumb,low,src-alias,Sets owner context flag bits and starts the route group alternate route in behavior 15
 0808B320,Vorn_ParseField624_0808B320,thumb,low,src-alias,
 0808B3A0,Bat_TickDelayedScript,thumb,low,src-alias,
@@ -3072,9 +3075,12 @@ addr,name,mode,confidence,source,notes
 0808E570,Slime_StartWalkChoice,thumb,low,src-alias,
 0808E660,Slime_RollMoveFlag,thumb,low,src-alias,Clears the prepared flag then randomly sets bit 0x10 or 0x20 in the 2D6 flags
 0808E6E4,Slime_StartRandomWait,thumb,low,src-alias,
+0808E780,Slime_UpdateReturnToIdle,thumb,low,src-alias,Plays transition profile 18 then returns to idle.
 0808E838,Slime_UpdateRandomWait,thumb,low,src-alias,
 0808E9A0,Slime_PlayWaitAnimation,thumb,low,src-alias,Plays profile animation 15 then enters the wait-timer control; tentative
 0808EACC,Slime_TickWaitTimer,thumb,low,src-alias,
+0808EB98,Slime_UpdateWalkTransition,thumb,low,src-alias,Plays profile 14 then chooses roll or walk control.
+0808EC7C,Slime_OnUnusedControlEvent,thumb,low,src-alias,Empty callback adjacent to the movement controls; exact event role tentative.
 0808EC80,Slime_ConvergeReactionMotion,thumb,low,src-alias,
 0808EF58,Slime_UpdateShake,thumb,low,src-alias,
 0808F03C,Slime_UpdateLaunch,thumb,low,src-alias,"Sets a heading-based launch velocity and plays sound 0x3C1, then enters Slime_UpdateStill when flag 0x10 sets; tentative"
@@ -3088,6 +3094,7 @@ addr,name,mode,confidence,source,notes
 0808F830,Slime_SetPrimaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x284 during initialization; table role is tentative
 0808F840,Slime_InitColliders,thumb,low,src-alias,Initializes body and attack collision volumes with their respective callbacks
 0808F8C8,Slime_ResetIdlePlayback,thumb,low,src-alias,
+0808F9E4,Slime_OnUnusedEvent,thumb,low,src-alias,Empty callback adjacent to the behavior initialization; exact event role tentative.
 0808F9E8,Slime_InitProfile,thumb,low,src-alias,Finds or adds profile 0x16 and stores its handle
 0808FA04,Slime_GetAnimationMovePulse,thumb,low,src-alias,
 0808FA40,Slime_SelectWanderTarget,thumb,low,src-alias,
@@ -3111,6 +3118,7 @@ addr,name,mode,confidence,source,notes
 08090FEC,Slime_Init,thumb,high,gcl-name,name from GCL key C3BC スライム (Slime); loader called by Slime_Create
 08091E1C,Slime_Create,thumb,high,gcl-name,name from GCL key C3BC スライム (Slime); registry callback
 08091E54,Bee_OnAttackCollision,thumb,low,src-alias,Empty callback installed on the Bee attack collider
+08091E58,Bee_ApplyContactReaction,thumb,low,src-alias,Forwards body contact reaction and randomizes its power with a floor of 20.
 08091F04,Bee_UpdateTurnAnimation,thumb,low,src-alias,
 080921B0,Bee_ResetIdleAnimation,thumb,low,src-alias,Animation callback clearing the transition flag and selecting directional entry 0; idle role is tentative
 080921D4,Bee_ResetReactionAnimation,thumb,low,src-alias,State animation callback clearing the transition flag and selecting directional entry 14; reaction role is tentative
@@ -3124,6 +3132,7 @@ addr,name,mode,confidence,source,notes
 08092BD4,Bee_ResetRoute,thumb,low,src-alias,
 08092E30,Bee_UpdateFlightHeight,thumb,low,src-alias,
 08093000,Bee_InitColliders,thumb,low,src-alias,Initializes the Bee body and attack colliders with their dimensions and callbacks
+08093094,Bee_GetMovementAnimationCode,thumb,low,src-alias,Selects a movement code from curve time and adds six for attack mode.
 08093100,Bee_SetMovementEndpoints,thumb,low,src-alias,Stores the current and destination positions in movement state and resets progress
 08093138,Bee_AdvanceMovementCurve,thumb,low,src-alias,
 08093314,Bee_InitProfile,thumb,low,src-alias,Finds or adds actor profile type 0x14 and stores its handle
@@ -3131,6 +3140,7 @@ addr,name,mode,confidence,source,notes
 08093370,Bee_BeginMoveToPosition,thumb,low,src-alias,Initializes movement endpoints and trajectory then resets action state and faces the destination
 08093414,Bee_GetDirectionalFrameAndFlip,thumb,low,src-alias,Maps an eight-way heading to a mirrored five-frame direction index and flip flag
 0809343C,Bee_TickBehaviorCooldown,thumb,low,src-alias,Decrements the saturating cooldown byte in the Bee behavior state
+0809345C,Bee_BuildMovementCurve,thumb,low,src-alias,Interpolates eight route points and stores a ninth endpoint.
 08093644,Bee_SubVector,thumb,low,src-alias,
 0809366C,SceneActorCollision_FireSecondaryAttack,thumb,low,src-alias,
 08093718,Bee_OnDetectionCheck,thumb,low,src-alias,Detection callback consumes a detection flag and accepts targets within height and distance limits
@@ -3144,6 +3154,7 @@ addr,name,mode,confidence,source,notes
 08093E04,Bee_UpdateReactionPhase,thumb,low,src-alias,
 08093EE4,Bee_ApproachSavedPlayerPosition,thumb,low,src-alias,
 080940A0,Bee_UpdateWanderPause,thumb,low,src-alias,
+080941F4,Bee_FollowAnchorRoute,thumb,low,src-alias,Follows a nine-point curve toward an anchor and retargets at its end.
 0809465C,Bee_InitBehaviorHandlers,thumb,low,src-alias,Installs the Bee behavior state handler table at actor offset 0x28C
 0809466C,Bee_InitReactionHandlers,thumb,low,src-alias,Tentatively installs the shared reaction handler table with a Bee-specific final handler
 0809467C,Bee_OnUpdate,thumb,low,src-alias,Actor update callback adjusts height then dispatches behavior and updates shared state and timers
@@ -3151,6 +3162,7 @@ addr,name,mode,confidence,source,notes
 080946D0,Bee_Destroy,thumb,low,src-alias,Destructor callback releases graphics and auxiliary resources then removes colliders and registry membership
 08094764,Bee_Init,thumb,high,gcl-name,name from GCL key E131 ビー (Bee); loader called by Bee_Create
 08095540,Bee_Create,thumb,high,gcl-name,name from GCL key E131 ビー (Bee); registry callback
+08095574,Ghost_NoOp,thumb,low,cleanup,Empty callback at the start of the Ghost unit; no known callers.
 08095578,Ghost_BeginContactReaction,thumb,low,src-alias,
 080956D4,SceneActorBehavior_OnContactForward,thumb,low,src-alias,
 08095740,Ghost_UpdateEnergyDrainAnimation,thumb,low,src-alias,
@@ -3170,28 +3182,31 @@ addr,name,mode,confidence,source,notes
 080972BC,SceneActor_BeginLinkedIdleReaction,thumb,low,src-alias,
 080973B4,Ghost_RequestVisibility,thumb,low,src-alias,
 080974F4,SceneActor_EasePlayerHeight,thumb,low,src-alias,
-080975C4,Bee_UpdateSway,thumb,low,src-alias,
+080975C4,Ghost_UpdateCurveSway,thumb,low,cleanup,Clamps the Ghost curve amplitude and advances it by its signed direction.
 08097624,Ghost_SelectRandomRouteEntry,thumb,low,src-alias,
 08097690,SceneActor_InitLinkedReactionColliders,thumb,low,src-alias,
 08097758,Ghost_GetBehaviorCode,thumb,low,src-alias,Ghost callback returning constant 4; behavior code interpretation is tentative
 0809775C,Ghost_SetMovementEndpoints,thumb,low,src-alias,Copies current and destination positions into the context and resets the movement counter
+08097798,Ghost_AdvanceMovementCurve,thumb,low,cleanup,Advances the timed Ghost movement curve and writes the saved motion subject position.
 0809794C,Ghost_InitActorProfile,thumb,low,src-alias,Finds or adds category 0x17 profile and stores it on the Ghost
 08097968,Ghost_ResetMovementState,thumb,low,src-alias,
 08097B18,SceneActor_EndLinkedReaction,thumb,low,src-alias,
 08097B98,Ghost_GetDirectionalFrame,thumb,low,src-alias,Converts heading into a five-frame direction index and horizontal flip flag
 08097BC0,Ghost_StartMovementToPosition,thumb,low,src-alias,Stores movement endpoints and resets behavior state while setting heading toward the destination
-08097C64,Bee_ClearActionFlags,thumb,low,src-alias,
+08097C64,Ghost_ClearActionFlags,thumb,low,cleanup,"Clears movement, tracking and private action flags and resets the route delay."
 08097CB4,Ghost_UpdateRandomDestination,thumb,low,src-alias,
 08097E38,Ghost_ReactToPlayerMovement,thumb,low,src-alias,
 08098038,Ghost_GetControlStatus,thumb,low,src-alias,Ghost control callback always returning zero; status interpretation is tentative
 0809803C,Ghost_OnControlCleanup,thumb,low,src-alias,Empty Ghost callback in the control lifecycle; cleanup interpretation is tentative
+08098040,Ghost_SetAfterimagePaletteWord,thumb,low,cleanup,Writes the word at animation resource offset 0xC for all four afterimages; palette interpretation tentative.
 08098064,SceneActor_InitLinkedSprites,thumb,low,src-alias,
 080980FC,Ghost_EmitAfterimage,thumb,low,src-alias,
 080982E4,ActorContact_TickAuxiliaryTimers,thumb,low,src-alias,
 08098324,Ghost_RemoveAuxiliarySprites,thumb,low,src-alias,Removes four consecutive sprites embedded in the Ghost actor
+08098344,Ghost_BuildMovementCurve,thumb,low,cleanup,Builds eight interpolated route samples and the final endpoint from the saved horizontal motion.
 0809852C,Ghost_TickVisibilityTransition,thumb,low,src-alias,
 08098660,ActorVisibility_TickRevealDelay,thumb,low,src-alias,
-080986DC,Bee_ConsumeFlag80,thumb,low,src-alias,
+080986DC,Ghost_EndPlayerSlowdown,thumb,low,cleanup,Consumes private flag 0x80 and removes the linked player movement-speed reduction.
 08098734,ActorTick_DecrementCounterAA,thumb,low,src-alias,
 08098788,Ghost_UpdateVisibility,thumb,low,src-alias,
 080989FC,ActorContact_UpdateColliderPositions,thumb,low,src-alias,
@@ -3203,6 +3218,7 @@ addr,name,mode,confidence,source,notes
 08099660,Ghost_ChooseMovementDestination,thumb,low,src-alias,
 080997E8,Ghost_InitReactionTable,thumb,low,src-alias,Installs the Ghost table at offset 0x288; reaction role is tentative
 080997F8,Ghost_UpdateFacingTrigger,thumb,low,src-alias,
+080999A0,Ghost_UpdateTriggerControl,thumb,low,cleanup,"Restores the saved control on entry, then consumes the pending trigger and advances its counter."
 08099A48,Ghost_InitEffectTable,thumb,low,src-alias,Installs the Ghost table at offset 0x29C; effect role is tentative
 08099A58,Ghost_OnBehaviorUpdate,thumb,low,src-alias,Ghost behavior callback dispatches the current state handler and runs supporting updates
 08099A90,Ghost_OnActorUpdate,thumb,low,src-alias,Ghost actor update callback binds the shared context and invokes the common update helper
@@ -3258,16 +3274,16 @@ addr,name,mode,confidence,source,notes
 0809DCE4,Lun_Destroy,thumb,low,src-alias,Removes graphics and collision resources then unlinks the actor from the registry
 0809DD78,Lun_Init,thumb,low,src-alias,Lun initializer: installs its callback table and state handlers; loader called by its Create function
 0809ECC8,Lun_Create,thumb,low,gcl-behavior,"registry 680E spawner for enemy kinds 26-28; its sprite D28E is a small flame in three variants, matching the -lun spirits クロロホルルン/モエルルン/ヒエルルン (KLOROFOLUN/BURRNUN/CHILLUN)"
-0809ED00,Vorn_OnContactEvent_0809ED00,thumb,low,src-alias,
+0809ED00,Crow_OnAttackContact,thumb,low,cleanup,Records type-one attack contact and clears the pending-hit status bit.
 0809ED70,Crow_OnBodyContact,thumb,low,src-alias,
 0809EE00,Crow_OnIdleAnimation,thumb,low,src-alias,Animation callback selects directional entry 1 and checks the frame-triggered crow sound
-0809EE2C,RouteActor_UpdatePeriodicAnimation,thumb,low,src-alias,
-0809EEBC,RouteActor_UpdateAnimationSequence,thumb,low,src-alias,
+0809EE2C,Crow_UpdatePeriodicAnimation,thumb,low,cleanup,Advances the Crow periodic animation phase and handles completion.
+0809EEBC,Crow_UpdateAnimationSequence,thumb,low,cleanup,Selects Crow animation entries from its private sequence phase.
 0809EF50,Crow_PlayEntry2,thumb,low,src-alias,
 0809F024,Crow_UpdateDirectionalPose,thumb,low,src-alias,
 0809F150,Crow_OnSpecialAnimation,thumb,low,src-alias,Special-state animation callback clears the entry flag and selects directional entry 14
 0809F174,Crow_RecoverFromDisplacement,thumb,low,src-alias,
-0809F368,SceneActorControl_CompleteScriptedResponse_0809F368,thumb,low,src-alias,
+0809F368,Crow_UpdateDefeat,thumb,low,cleanup,"Blinks the defeated Crow, runs its script and event updates, then installs idle control."
 0809F510,Crow_HopWithinHomeCell,thumb,low,src-alias,
 0809F84C,Crow_SteerAroundPlayer,thumb,low,src-alias,
 0809FC74,Crow_UpdateWanderTimer,thumb,low,src-alias,
@@ -3291,7 +3307,7 @@ addr,name,mode,confidence,source,notes
 080A0C10,Crow_UpdatePostAction,thumb,low,src-alias,Wraps the post-dispatch update helper and reports success
 080A0C1C,Crow_UpdateKnockback,thumb,low,src-alias,
 080A0E00,Crow_ApproachPlayerThenRecoil,thumb,low,src-alias,
-080A11F4,SceneActorControl_UpdateHeightReturn,thumb,low,src-alias,
+080A11F4,Crow_ReturnToGround,thumb,low,cleanup,Eases the Crow height offset back toward terrain and exits the return state.
 080A1348,Crow_SetBehaviorTable,thumb,low,src-alias,Installs the Crow-specific table at actor offset 0x28C
 080A1358,Crow_Update,thumb,low,src-alias,Main update callback runs preparation then the current action and shared processing
 080A1390,Crow_InitPlayerTarget,thumb,low,src-alias,Callback sets the target pointer to the player position and initializes target processing
