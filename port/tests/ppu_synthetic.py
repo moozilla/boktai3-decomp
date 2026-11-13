@@ -214,24 +214,43 @@ def affine_window_fixtures():
         yield f'obj_transparent_priority_{equal}', s
 
 
-def build_oracle():
+def priority_latch_fixtures():
+    for effect in (0, 1, 2, 3):
+        for kind in (0, 0x400, 0x800):
+            s = Scene().reg(0, 0x9f40).reg(0x50, 0x3f3f | (effect << 6)).reg(0x52, 0x0808).reg(0x54, 9)
+            s.reg(0x4a, 0x3f3f)
+            s.obj(0, 20, 30 | 0xc000, 0x120 | 0xc00)
+            s.obj(1, 20 | kind, 30 | 0xc000, 0x20)
+            for i in range(0x400): s.vram[0x10400+i] = 0 if i%3 else 0x55
+            yield f'obj_transparent_late_{effect}_{kind}', s
+    for win in range(2):
+        s = Scene().reg(0, (0x2000 << win) | 0xf00).reg(0x40+win*2, 0x14dc)
+        s.reg(0x44+win*2, 0x1450).reg(0x48, 0x3f3f).reg(0x4a, 0)
+        s.events = [(50, 0x44+win*2, 0x645a), (120, 0x44+win*2, 0x7896)]
+        yield f'window_hblank_vertical_{win}', s
+
+
+def build_oracle(sanitize=False):
     result = subprocess.check_output(['make', '-Bn', '-C', 'tools/emu', 'harness'], cwd=ROOT, text=True)
     command = shlex.split(next(line for line in result.splitlines() if ' -o harness harness.c ' in line))
     command[command.index('harness.c')] = 'port/tests/ppu_oracle.c'
     command[command.index('-o') + 1] = str(BUILD / 'ppu_oracle')
     command += ['-Iport/include', 'port/ppu/ppu.c']
+    if sanitize:
+        command += ['-g', '-fsanitize=address,undefined', '-fno-omit-frame-pointer']
     run(command)
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--filter', default='')
+    ap.add_argument('--sanitize', action='store_true')
     args = ap.parse_args()
     directory = BUILD / 'synthetic'
     directory.mkdir(parents=True, exist_ok=True)
-    build_oracle()
+    build_oracle(args.sanitize)
     rows = []
-    for name, scene in (*fixtures(), *edge_fixtures(), *affine_window_fixtures()):
+    for name, scene in (*fixtures(), *edge_fixtures(), *affine_window_fixtures(), *priority_latch_fixtures()):
         if args.filter not in name:
             continue
         path = directory / (name + '.bin')

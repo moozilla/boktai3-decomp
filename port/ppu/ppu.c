@@ -328,7 +328,15 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
             address = 0x10000 + ((address - 0x10000) & 0x7fff);
             index = m->vram[address];
             if (!bpp8) index = (index >> ((sx & 1) * 4)) & 15;
-            if (!index) continue;
+            if (!index) {
+                /* A transparent higher-priority OBJ still supplies priority
+                 * and blend attributes for an earlier OBJ pixel underneath. */
+                if (pixels[x].visible && pixels[x].priority > priority) {
+                    pixels[x].priority = (uint8_t)priority;
+                    pixels[x].semi = kind == 1;
+                }
+                continue;
+            }
             if (kind == 2) {
                 objwin[x] = 1;
                 continue;
