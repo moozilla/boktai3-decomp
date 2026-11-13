@@ -1228,3 +1228,62 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## cdp-link (Codex)
+
+The 2026-11-13 pass recompiled every queue entry with all concessions removed. The best ordinary-C
+starting points are archived under `notes/phase3-drafts/cdp-link/`; the row counts below are aligned
+scope differences, not byte counts.
+
+- **WirelessGameDisplay_UpdateShakeAnimation** — Replacing the two manual random-index sequences
+  with table-first `ParticleRandom_ReadDirectSample` calls reduced the pin-free draft from 61 to 26
+  ROM rows / 34 draft rows. The remaining blocker is allocation of the display owner to r7 rather
+  than r6, which introduces the r8 save. Next try a shared display-step helper that shortens the
+  owner's live range across both random reads.
+- **WirelessResultPanel_UpdateOutcomeReveal** — 69 rows after removing eight pins. The first
+  blocker is the drawing cursor's allocation across the outcome branches; repeat its post-join
+  assignment in each arm before changing the result-counter loop.
+- **WirelessResultPanel_Init** — 95 rows after removing fourteen pins. Several independent
+  initialization phases are coupled by long-lived zero/one and object aliases; split the phases
+  with branch-local member stores and diagnose each pin-removal variant independently.
+- **EncodedRecord_XorRange** — 14 rows after removing two pins and one barrier. The current-value
+  barrier controls the byte XOR loop allocation; next compare a pointer-advancing loop with an
+  index loop and preserve the encoded byte in a narrow local.
+- **sub_08108C94** — 60 rows after removing two pins. The table base and raw halfword allocation
+  remain coupled; next use a typed table cursor and repeat the post-join raw assignment in both
+  arms.
+- **LinkMenu_WaitForReadyPeers** — 20 rows after removing the initialization pin and timer helper
+  barrier. The timer helper's memory operand controls its caller's allocation; next inline the
+  ordinary increment form into both timer branches.
+- **LinkMenu_WaitSelectionMode** — 16 rows after removing the pointer pin/barrier pair. Allocation
+  wants the pointer-to-pointer in r2 instead of r0; next test direct double indexing rather than a
+  saved alias.
+- **LinkSelection_WaitForEmptySlots** — One register-only row remains: cse1 canonicalizes the
+  initial `i` comparison to the equal zero-valued `count` pseudo. Casts, zero spellings, declaration
+  order, `i + 0`, and `i = count` do not change it; an explicit `0 < length` changes the compare
+  shape. Next seek a natural nonzero-path definition of `i` that survives CSE.
+- **LinkSelection_ExchangeParticipantInput** — 14 ROM / 10 draft rows after removing three
+  concessions. The initial 0x3c00 mask is built directly in r6 rather than in r1 then copied, and
+  that changes the later mode tests. Next derive the mask through the first slot predicate so the
+  copy remains live.
+- **LinkSelection_UpdateParticipantScores** — 89 rows after removing fifteen pins. This is a broad
+  allocation rewrite; isolate the zero aliases and participant cursor first, then retain only
+  variants that improve the register-blind shape.
+- **TimerDisplay_DrawRecord** — Eight rows after removing two pins and two barriers. The cell
+  pointer barrier controls three register-only differences; next use direct row/column indexing
+  for each digit instead of carrying the cell cursor.
+- **sub_0810FDDC** — 63 rows after removing two pins. The score-panel owner and tens digit compete
+  across the drawing calls; next repeat the digit-base computation in the two branches.
+- **LinkSession_UpdatePlayerValueAverage** — Ten rows after removing the `GetSelection` sum
+  barrier. The inline helper's accumulator lifetime is the blocker; next use a returned aggregate
+  or a caller-owned sum so the helper has no cross-iteration alias.
+- **sub_081384A0** — 45 rows after removing the loop-index barrier. The barrier prevents induction
+  canonicalization; next rotate the loop around its return/exit rather than using a while-form.
+- **PositionEffectDisplay_UpdateSources** — 69 rows after removing three pins. Source cursor,
+  flags input, and output object allocations are coupled; next duplicate the post-join source
+  update in each flag arm.
+- **Clock_CheckRtcStatus** — Five register-only rows (plus one moved branch) after removing two
+  pins. The shifted byte is allocated to r4 instead of r5; declaration order, delayed
+  initialization, scalarized two-word arrays/structs/unions, and zero-initialized aggregates did
+  not reproduce the allocation. Next recover the SDK RTC result aggregate type rather than using
+  two independent u32 values.
