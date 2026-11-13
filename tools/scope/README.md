@@ -2147,3 +2147,14 @@ which is exactly `10:1`. Not tested.
   name; now they fall back to the only function in the dump), and a trailing
   FUNC argument to `life` was read as a variable name; a `sub_ADDR` name that
   the CSV has since renamed raised a KeyError.
+
+180. **A local duration initializer can stop equal constant sets from hoisting together.**
+   TentacleBody_RefreshDirectionalAnimations has three ones: the status test, the
+   first flip test, and the zero-duration fallback. loop.c combines their
+   movables (13 x 3 x 13 >= 254), moves one outside the segment loop, and
+   consumes a high register needed by the offset. Writing the fallback as
+   `u16 duration[] = {1}; state->duration = duration[0];` keeps it local and
+   gives the ROM allocation and frame. With a separate second-flip sprite
+   view, the playback then matches without its three pins and barrier.
+   A zero initializer on the control unions does not have the same effect;
+   the initializer must separate the fallback one from the invariant group.

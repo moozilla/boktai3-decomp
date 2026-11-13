@@ -1300,3 +1300,52 @@ Next: find a natural candidate-iteration structure whose cursor has at least
 21 weighted references over this lifetime, or shorten that lifetime without
 changing its merge with the cardinal mask. The exact diagnostic now separates
 this from instruction-selection problems. No source changes landed.
+
+### Tentacle animation family (080A8F38, 080A915C, 080A93F4): partials landed
+
+Refresh loses three pins, a barrier, and volatile command reads. Reset loses
+five pins, two barriers, and volatile reads. Restart loses three pins and
+volatile reads. Every complete source unit checks MATCH.
+
+The shared DisplaySequence_StepSprite form was the starting point. Refresh
+needs a separate second-flip sprite view declared before the state pointer.
+A `u16 duration[] = {1}` in the zero-duration branch prevents loop.c from
+combining that one with the status/flip ones and hoisting them all. Without
+it the hoisted one consumes sl, spills offset, and changes the frame.
+Initializer-zero control unions did not help; a byte first-bit variable did
+not help. The duration array gives the ROM frame and allocation.
+
+Refresh and Reset's final completely pin-free drafts each differ 15/15, shape 0.
+Their remaining caller differences are the same: the profile index shift
+coalesces with its input in r2 instead of producing r0; speed's actor pointer
+loads into r0 instead of r1; the loop stride takes r0 instead of r1 and the
+frame counter takes r1 instead of r2. Shared profile helpers, array-row typing,
+operand order, a combined advance helper, and counter update placement were
+tried. Scope spill says this is not one reload rotation; local allocation
+preferences must change first. The full drafts preserve the caller's
+statement expressions but contain no pins or barriers.
+
+Reset's playback alone additionally needs its caller sprite for the first
+clear. Expanding the playback into the caller keeps that view separate from
+the copied sprite. The copied sprite beats command in global allocation
+(16 refs/58 live, 11034 versus command's 12/38, 9473). The diagnostic
+`AGBCC_PRI=command:+1562` fixes the swap; a pointer-local first clear then
+has its own local-allocation issue (value r1/address r0 instead of value
+r0/address r2). Sharing the second flip store across arms changes allocation
+and control flow rather than matching. The partial retains the original two
+playback pins; removing all caller pins changes pressure enough to leave only
+the same caller 15/15 as Refresh.
+
+Restart's ordinary playback reaches 2/2 with the remaining first-flip pins,
+matching under `AGBCC_SPILL=6:1`: the final signed-load zero takes r4 instead
+of r3. Keeping the original advance code restores the reload sequence. A
+plain final `*command & 15` narrows to ldrb; a DisplaySequence_ReadCommand
+into a u32 sample followed by a local mask gives ldrh and matches. Passing
+the raw read through MaskCommand instead swaps the sample/constant registers.
+One first-flip bit pin then becomes free. The best saved completely pin-free
+Restart draft differs 50/56; a separate ordinary-advance draft is in the
+workspace and is worth revisiting once the common caller form is solved.
+
+Drafts: `notes/phase3-drafts/dp-monsters/TentacleBody_*.c`. Workspaces are
+`build/cx/work/TentacleBody_*`. Next: solve the shared caller local preferences,
+then consolidate the playback with the original sprite view explicit.
