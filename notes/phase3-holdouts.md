@@ -1389,3 +1389,19 @@ was needed. Arrays/unions retained the extra literal zero or added extensions;
 readback from effectValue folded back to the baseline. The original pin-free
 baseline was 1/1, shape 2 (a second movs r3,#0 before the call).
 Stock full tether-actor unit: 114 functions MATCH (20,516 bytes).
+
+### TetherActor_BeginDirectedState (0804A15C): resolved
+
+Removed the sample r0 pin by capturing the X difference with the existing
+ARMOR_CAPTURE_COMPONENT_DELTA helper. The saved actor initially wins allocation
+(5 refs / 36 live, priority 2777) over dx (3 / 11, 2727). Diagnostic
+`AGBCC_PRI=dx:+51` gives MATCH. The shared capture form raises the real reference
+density and produces the same allocation with the stock compiler. Applying it
+to both components changes allocation again (28/28); the Z difference remains
+a direct field expression. The heading now uses directedHeading instead of a
+raw offset. No shared header changed.
+
+Table-first random draws improved the baseline from 24/24 to 9/9 but moved the
+table and heading setup. Splitting the motion tail (8/24) or angle assignment
+(16/20) let CSE specialize the zero-delta path and did not fully cross-jump.
+Stock full tether-actor unit: 114 functions MATCH (20,516 bytes).

@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "monster_particle_random.h"
+#include "armor_decision_ops.h"
 
 #define TetherActor_GetStatusTag sub_08049F54
 
@@ -1734,8 +1735,6 @@ u8 TetherActor_GetRequestMode(void)
     return r;
 }
 
-// MATCHING_CONCESSION: register-pinning
-
 /* Keep the existing pinned offset calculations: direct member addresses change allocation. */
 
 void TetherActor_BeginDirectedState(struct ContactPosition *position)
@@ -1755,7 +1754,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
                 s32 playerX = player->position.x;
                 struct ContactPosition *targetPosition = &savedActor->directedTarget;
                 s16 actorX = targetPosition->x;
-                dx = playerX - actorX;
+                ARMOR_CAPTURE_COMPONENT_DELTA(dx, playerX, actorX);
             }
             dz = player->position.z - savedActor->directedTarget.z;
         }
@@ -1768,14 +1767,13 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
             {
                 u32 byteOffset = index << 1;
                 const u16 *table;
-                register u32 sample asm("r0");
+                register u32 sample;
                 u16 *heading;
                 table = (const u16 *)RANDOM_TABLE_ADDR;
                 sample = *(const u16 *)(byteOffset + (u32)table);
                 sample &= 7;
                 {
-                    u32 offset = 0x46C;
-                    heading = (u16 *)((u8 *)savedActor + offset);
+                    heading = &savedActor->directedHeading;
                 }
                 *heading = sample;
             }
