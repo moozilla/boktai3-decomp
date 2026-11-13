@@ -558,6 +558,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/solo-family_2026-10-09.md](../notes/solo-family_2026-10-09.md) | Solo family tranche, October 9 |  | 5 |
 | [notes/sonnet-081EEECC-task.md](../notes/sonnet-081EEECC-task.md) | Task 081EEECC worker notes |  | 1 |
 | [notes/sonnet-from-end-08241504.md](../notes/sonnet-from-end-08241504.md) | sub_0824261C (Player update by kind) — unfinished |  | 1 |
+| [notes/sprite-unit-revisit_2026-11-13.md](../notes/sprite-unit-revisit_2026-11-13.md) | Sprite unit cleanup handoff | #assets #animation #matching #process | 4 |
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |
 | [notes/staged-effect_2026-10-14.md](../notes/staged-effect_2026-10-14.md) | Contiguous staged effect subsection (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/storage-equipment-slots-round9.md](../notes/storage-equipment-slots-round9.md) | Storage_RefreshEquipmentSlots |  | 1 |
