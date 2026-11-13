@@ -1,0 +1,7 @@
+# First video frame: Clock_ClearState has run, Clock_CheckRtcDate has not finished.
+trace off
+rtc 1762992000
+probe clock_clear 082284F4
+probe counter_init 08224EEC
+wait 1
+dump clock_frame1 03005430:24

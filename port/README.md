@@ -86,3 +86,37 @@ for absolute RAM/ROM data, relocation of ROM function-pointer tables, strict was
 function signature mismatches, platform replacements for intentional assembly,
 and device side effects for direct register loads/stores. The portable runtime
 and its tests are a foundation for that integration, not an emulator.
+
+## Linked boot slice and repeatable tests
+
+The early boot slice now links with LLD and runs in Node with **zero imports**.
+It executes the original `Rtc_Initialize`, `Rtc_EnableGpioReads`,
+`Clock_ClearState` and `Memory_Clear`, using port-hw's `CpuSet`. It preserves the
+two EWRAM boot words and the IWRAM stack tail. A separate check copies and verifies
+the complete 0x110C-byte IWRAM code payload. The clock RAM at `03005430:24` matches
+mGBA's first video-frame snapshot on both the native host and wasm.
+
+```sh
+build/venv/bin/python port/tests/run_core.py
+build/venv/bin/python port/tests/run_boot.py
+build/venv/bin/python port/build.py --slice
+```
+
+Before the port-hw branch is integrated, append
+`--hardware-root ../cx-port-hw/port` to the boot test/build commands. Set `WASM_LD`
+to select a linker. Discovery also checks `~/git/boktai3-decomp/build/toolchain/wasm-ld`
+and then `PATH`. The wasm output is `build/port/slice-wasm32/boot.wasm`.
+`run_boot.py` runs the native executable, Node, then the mGBA harness and compares
+the 36-byte dump. `--no-reference` skips mGBA when its harness is unavailable.
+All dumps, probe logs and result JSON stay under `build/port/`.
+
+`core/addresses.py` binds external data declarations to the existing GBA symbol
+addresses before compiling LLVM IR to objects. wasm does not support the GBA
+linker's absolute data symbols. This changes address relocation only: C function
+bodies and callable function symbols remain compiled by stock clang. Function
+addresses declared as byte arrays remain ROM-byte references for copy operations.
+The build records every bound and unresolved external in `bindings.json`.
+
+`--link-game` attempts the complete game link with these bindings and the
+cooperative entry in `core/entry.c`; detailed linker diagnostics go in
+`build/port/wasm32-bound/link.log`. This broader path remains under development.

@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 LLVM = Path('/opt/homebrew/opt/llvm/bin')
 sys.path.insert(0, str(ROOT / 'port/core'))
 from prepare import prepare_headers, prepare_source
+from link_slice import build_slice, find_linker
+from addresses import read_addresses, bind_ir
 
 
 def sources():
@@ -29,9 +31,14 @@ def main():
     ap.add_argument('-j', '--jobs', type=int, default=4)
     ap.add_argument('--source', action='append', help='repo-relative source (repeatable); default: every game C unit')
     ap.add_argument('--force', action='store_true')
+    ap.add_argument('--link-game', action='store_true', help='bind absolute data addresses and attempt the complete wasm game link')
+    ap.add_argument('--slice', action='store_true', help='link the tested early-boot vertical slice')
+    ap.add_argument('--hardware-root', help='port-hw port directory when testing before integration')
     args = ap.parse_args()
     os.chdir(ROOT)
-    out = Path('build/port') / args.target
+    if args.slice:
+        return build_slice(ROOT, args)
+    out = Path('build/port') / (args.target + ('-bound' if args.link_game else ''))
     out.mkdir(parents=True, exist_ok=True)
     headers = out / 'include'
     prepare_headers(ROOT, headers, args.target)
@@ -42,6 +49,15 @@ def main():
     if args.target == 'wasm32':
         flags += ['--target=wasm32', '-ffreestanding']
     units = [ROOT / p for p in args.source] if args.source else sources()
+    address_map = read_addresses(ROOT) if args.link_game else {}
+    if args.link_game:
+        if args.target != 'wasm32':
+            ap.error('--link-game requires wasm32')
+        hardware = Path(args.hardware_root).resolve() if args.hardware_root else ROOT / 'port'
+        flags += ['-I' + str(hardware / 'include')]
+        units += [ROOT / p for p in ['port/core/memory.c', 'port/core/timing.c', 'port/core/boot.c', 'port/core/entry.c']]
+        # Keep external worker paths out of committed code and serialized names.
+        units += sorted((hardware / 'hw').glob('*.c'))
     header_hash = hashlib.sha256()
     for p in sorted(ROOT.glob('include/**/*.h')) + sorted(ROOT.glob('port/**/*.h')):
         header_hash.update(str(p.relative_to(ROOT)).encode())
@@ -50,7 +66,7 @@ def main():
     context = identity + repr(flags).encode() + header_hash.digest() + (ROOT / 'port/core/prepare.py').read_bytes()
 
     def compile_one(src):
-        name = str(src.relative_to(ROOT))
+        name = str(src.relative_to(ROOT)) if src.is_relative_to(ROOT) else 'port/hw/' + src.name
         obj = out / (name + '.o')
         obj.parent.mkdir(parents=True, exist_ok=True)
         stamp = obj.with_suffix('.sha256')
@@ -61,7 +77,17 @@ def main():
         prepared.parent.mkdir(parents=True, exist_ok=True)
         prepared.write_text('#line 1 "' + name + '"\n' + prepare_source(src, args.target))
         command = [args.cc, *flags, '-c', str(prepared), '-o', str(obj)]
-        result = subprocess.run(command, text=True, capture_output=True)
+        if args.link_game:
+            ir = obj.with_suffix('.ll')
+            result = subprocess.run([args.cc, *flags, '-S', '-emit-llvm', str(prepared), '-o', str(ir)], text=True, capture_output=True)
+            if result.returncode == 0:
+                bound, resolved, unresolved = bind_ir(ir.read_text(), address_map)
+                ir.write_text(bound)
+                obj.with_suffix('.bindings.json').write_text(json.dumps({'resolved': resolved, 'unresolved': unresolved}, indent=2))
+                command = [args.cc, '--target=wasm32', '-O2', '-c', str(ir), '-o', str(obj)]
+                result = subprocess.run(command, text=True, capture_output=True)
+        else:
+            result = subprocess.run(command, text=True, capture_output=True)
         log = obj.with_suffix('.log')
         log.write_text(result.stdout + result.stderr)
         if result.returncode == 0:
@@ -85,6 +111,22 @@ def main():
               'seconds': round(time.monotonic() - start, 2), 'results': results}
     (out / 'compile.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f"{args.target}: {len(results) - len(failed)}/{len(results)} compiled; {len(failed)} failed")
+    if args.link_game and not failed:
+        excluded = {'src/fn/AgbMain.c', 'src/fn/sub_08213F80.c'}
+        objects = [r['object'] for r in results if r['source'] not in excluded]
+        command = [find_linker(), '--no-entry', '--gc-sections', '--export-memory',
+                   '--initial-memory=167772160', '--max-memory=167772160',
+                   '--global-base=1048576', '-z', 'stack-size=1048576', '--error-limit=0',
+                   '--export=port_memory_init', '--export=port_load_rom',
+                   '--export=port_game_initialize', '--export=port_game_step',
+                   *objects, '-o', str(out / 'game.wasm')]
+        response = out / 'link.rsp'
+        import shlex
+        response.write_text('\n'.join(shlex.quote(part) for part in command[1:]) + '\n')
+        linked = subprocess.run([command[0], '@' + str(response)], text=True, capture_output=True)
+        (out / 'link.log').write_text(linked.stdout + linked.stderr)
+        print('game link: ' + ('PASS' if linked.returncode == 0 else 'FAIL (see ' + str(out / 'link.log') + ')'))
+        return linked.returncode
     return bool(failed)
 
 
