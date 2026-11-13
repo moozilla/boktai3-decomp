@@ -469,6 +469,7 @@ addr,name,mode,confidence,source,notes
 08015074,FragmentManager_Destroy,thumb,low,src-alias,"Task destroy callback (2nd arg to Task_SetCallbacks) for the FragmentManager: removes sprites of all active fragment pieces and zeroes gUnk_02000064, "
 080150D0,FragmentManager_Initialize,thumb,low,src-alias,
 08015110,FragmentManager_Create,thumb,low,src-alias,"Creates the FragmentManager task, wires FragmentManager_Update/FragmentManager_Destroy as its callbacks, and calls FragmentManager_Initialize, matchin"
+08015154,AnimatedParticleManager_ClearSingleton,thumb,low,src-alias,Reset animated-particle manager singleton
 08015160,AnimatedParticleManager_Update,thumb,low,src-alias,
 0801537C,AnimatedParticleManager_Destroy,thumb,low,src-alias,Task kill callback paired with AnimatedParticleManager_Update; releases the 32 active particle sprites and clears gUnk_02000068
 080153B0,AnimatedParticleManager_Initialize,thumb,low,src-alias,
