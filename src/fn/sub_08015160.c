@@ -1,21 +1,7 @@
 #include "global.h"
-#include "display_sequence_inline.h"
-// MATCHING_CONCESSION: register-pinning
+#include "display_sequence_sprite.h"
 struct Vec {
     s16 x, y, z, pad;
-};
-struct Obj {
-    u32 flags;
-    u8 pad[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Anim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
 };
 struct Piece {
     u8 active, pad1;
@@ -24,8 +10,8 @@ struct Piece {
     u16 verticalStart, verticalDecay, horizontalStart, horizontalDecay;
     struct Vec direction, velocity;
     u8 resource[28];
-    struct Obj sprite;
-    struct Anim anim;
+    struct DisplaySequenceSprite sprite;
+    struct DisplaySequenceState anim;
 };
 struct Manager {
     u8 pad[32];
@@ -47,22 +33,15 @@ static inline int scale12(int a, int b)
         return x >> 12;
     return -((-x) >> 12);
 }
-static inline u32 frame_factor(u16 v)
-{
-    return DisplaySequence_MaskCommand(v, 15);
-}
 int AnimatedParticleManager_Update(struct Manager *m)
 {
-    struct Obj *sprites = &m->pieces[0].sprite;
+    struct DisplaySequenceSprite *sprites = &m->pieces[0].sprite;
     struct Piece *cursor = m->pieces, *base = cursor;
     int i;
     for (i = 31; i >= 0; sprites = (void *)((u8 *)sprites + 120), base++, cursor++, i--) {
         if (cursor->active) {
             struct Piece *p = base;
-            struct Obj *o = sprites;
-            struct Anim *a;
-            const u16 *entry;
-            int done;
+            struct DisplaySequenceSprite *o = sprites;
             if (cursor->timer >= cursor->horizontalStart) {
                 p->horizontalScale = scale8(cursor->horizontalScale, cursor->horizontalDecay);
                 p->velocity.x = scale12(p->direction.x, p->horizontalScale);
@@ -76,67 +55,13 @@ int AnimatedParticleManager_Update(struct Manager *m)
             o->position.y += p->velocity.y;
             if (!(o->flags & 16))
                 o->position.z += p->velocity.z;
-            a = &p->anim;
-            entry = a->data + a->frame;
-            o->frame = *entry >> 6;
-            {
-                union DisplaySequenceControl control;
-                u32 bit, first;
-                control.raw = a->flags;
-                bit = 1;
-                first = (u8)(control.raw & bit);
-                if (first != (((*entry & 0x30) >> 4) & bit))
-                    o->flags |= 4;
-                else
-                    o->flags &= ~4;
-            }
-            {
-                register u32 input asm("r0") = a->flags;
-                u32 mask = 2;
-                u32 left = (u8)(mask & input);
-                if (left != (((*entry & 0x30) >> 4) & mask))
-                    o->flags |= 8;
-                else
-                    o->flags &= ~8;
-            }
-            if (++a->timer >= a->rate) {
-                a->timer = 0;
-                if (a->flags & 4) {
-                    if (a->frame == 0) {
-                        if (a->flags & 8) {
-                            a->timer = a->rate;
-                        } else {
-                            a->frame = a->count - 1;
-                        }
-                        done = 1;
-                    } else {
-                        a->frame--;
-                        done = 0;
-                    }
-                } else {
-                    if (++a->frame >= a->count) {
-                        if ((u8)(a->flags & 8)) {
-                            a->timer = a->rate;
-                            a->frame = a->count - 1;
-                        } else {
-                            a->frame = 0;
-                        }
-                        done = 1;
-                    } else
-                        done = 0;
-                }
-                entry = a->data + a->frame;
-                a->factor = frame_factor(*entry);
-                a->rate = (a->factor * a->scale) >> 6;
-                if (!a->rate)
-                    a->rate = 1;
-            } else
-                done = 0;
-            if (done) {
+            if (DisplaySequence_StepSprite(o, &p->anim)) {
                 p->active = 0;
                 Sprite_Remove(o);
+                p->timer++;
+            } else {
+                p->timer++;
             }
-            p->timer++;
         }
     }
     m->timer++;
