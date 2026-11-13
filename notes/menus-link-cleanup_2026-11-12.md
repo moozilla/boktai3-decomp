@@ -76,3 +76,13 @@ GetCharacterTableByte name. Named progress fields replace the initializer's two
 anonymous counters; its indexed table address keeps the original byte-address
 calculation. Fixed character-table storage remains at its existing cartridge RAM
 address pending centralized ownership of that region. All 356 bytes match.
+
+## Wireless status menu: 08036E08–08037228
+
+Consolidated twelve functions into `src/wireless_status_menu.c`. A shared task
+layout uses the real 0x60-byte widget and 32-byte resource header. The exit
+procedure is an integer script key rather than a generic resource pointer.
+Primary-background loading gained a descriptive name. Replaced the create and
+script-loader goto branches with ordinary guards and returns. Shared palette
+resources now live in `include/palette_resource.h`; all three previously landed
+dependents passed their unit checks. This unit matches all 1,056 bytes.

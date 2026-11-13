@@ -1332,6 +1332,7 @@ addr,name,mode,confidence,source,notes
 08036D80,WirelessText_InitCharacterTableFromScript,thumb,low,src-alias,Builds the conversion table from five consecutive script-selected strings and reserves index zero
 08036E08,WirelessStatusMenu_Get,thumb,low,src-alias,Returns the wireless status menu singleton.
 08036E14,WirelessStatusMenu_InitDisplay,thumb,low,src-alias,Resets palettes and configures display callbacks and HUD mode for the menu.
+08036E60,WirelessStatusMenu_LoadPrimaryBackground,thumb,low,src-alias,Loads the selected BG0 map and its palette banks
 08036EC8,WirelessStatusMenu_LoadStatusBackground,thumb,low,src-alias,Loads the status screen background on BG2 and copies its palette.
 08036F30,WirelessStatusMenu_UpdateIdleState,thumb,low,src-alias,Clears the state entry flag and advances the idle state timer.
 08036F48,WirelessStatusMenu_UpdateDisconnectState,thumb,low,src-alias,Requests wireless shutdown on entry and opens the status message after four frames.
