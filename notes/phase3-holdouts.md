@@ -1347,3 +1347,28 @@ shared-destination. Evidence/candidates: `build/cx/work/Presentation_UpdateDropS
 Next: produce the r2 conflict without forcing the late zero store to retain the
 shared destination, perhaps by separating its caller value from the store helper's
 argument class. The knob proves the sole remaining decision on the saved draft.
+
+### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): partial
+
+Tags: #matching #phase3 #presentation #081FDAF4
+
+Removed the state pointer pin by sharing a void component pointer between the
+volley and collider field views. The remaining zero pin still selects r4.
+Pin-free draft: `notes/phase3-drafts/dp-effects-b/RisingActor_AdvanceHeight.c`,
+5 ROM/3 draft instructions, 72 versus 76 bytes. `AGBCC_FORCE=zero:4` now MATCH.
+Before sharing the component, forcing zero alone displaced state to r0 and broke
+reload's reuse of its address for collider; forcing both zero:4,state:2 matched.
+
+Zero is a two-reference local quantity, priority 10000, with r0 free. Its store
+ends its lifetime before the callback; the final return is a separate constant.
+Read local-alloc.c's quantity ordering and hard-register allocation. Returning
+zero, capturing it in a do block, returning through a do block, a union scalar,
+an inline clear helper with and without a return, and a separate collider helper
+do not make it cross the call. Union initialization at entry changes scheduling;
+byte/halfword array initialization adds stack operations and does not match.
+A helper for the collider alone also loses the state/collider reuse. Shared
+component is the structural partial; stock unit check MATCH.
+
+Store: `build/matchsearch/RisingActor_AdvanceHeight`, shared-component node.
+Next: identify a natural caller/helper return boundary that keeps zero live
+across the callback during allocation but rematerializes the final return.
