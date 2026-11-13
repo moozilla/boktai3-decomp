@@ -42,6 +42,16 @@ touch must pass `tools/check.py` at every point you might be stopped.
 * No PII in anything you write (real names, usernames, home-directory paths; write `~`). Never add
   the ROM or anything under build/. US spelling.
 
+## Depth over breadth (read this twice)
+
+This is a long task: you have until **10:10 UTC**, about an hour, and you should use all of it.
+Ending early is a failure, and so is a list of shallow notes. The goal is landed matches:
+work through your list in order and **stay on each function until it matches** (land with
+`scope.py land FUNC`, or the unit with `tools/check.py`). A holdout note is only for a function you
+spent at least 20 minutes of real C attempts on, with the scope evidence that blocked it. Never
+write drafts or notes for functions you haven't seriously attempted. Before you end, check
+`date -u`: if it's before 10:00 UTC, you are not done; go back to the next function.
+
 ## Time and reporting
 
 Work until **10:10 UTC** (check `date -u` between items), then make sure everything is committed and
