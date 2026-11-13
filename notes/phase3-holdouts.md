@@ -2337,3 +2337,75 @@ The pin-free draft differs by 31 ROM / 29 draft instructions. Every concession i
 
 ### sub_0817AEC8
 The pin-free draft differs by 53 ROM / 49 draft instructions plus three moved branches. Its single sine-table `r2` pin controls the entire allocation cascade. Older notes likewise identify allocation rather than instruction selection. Next: recover the angle/table expression from matched scene-volume relatives and test operand order and a typed sine lookup helper to generate the ROM preference naturally.
+## cdp-link (Codex)
+
+The 2026-11-13 pass recompiled every queue entry with all concessions removed. The best ordinary-C
+starting points are archived under `notes/phase3-drafts/cdp-link/`; the row counts below are aligned
+scope differences, not byte counts.
+
+- **WirelessGameDisplay_UpdateShakeAnimation** — Replacing the two manual random-index sequences
+  with table-first `ParticleRandom_ReadDirectSample` calls reduced the pin-free draft from 61 to 26
+  ROM rows / 34 draft rows. The remaining blocker is allocation of the display owner to r7 rather
+  than r6, which introduces the r8 save. Next try a shared display-step helper that shortens the
+  owner's live range across both random reads.
+- **WirelessResultPanel_UpdateOutcomeReveal** — 69 rows after removing eight pins. The first
+  blocker is the drawing cursor's allocation across the outcome branches; repeat its post-join
+  assignment in each arm before changing the result-counter loop.
+- **WirelessResultPanel_Init** — 95 rows after removing fourteen pins. Several independent
+  initialization phases are coupled by long-lived zero/one and object aliases; split the phases
+  with branch-local member stores and diagnose each pin-removal variant independently.
+- **EncodedRecord_XorRange** — 14 rows after removing two pins and one barrier. The current-value
+  barrier controls the byte XOR loop allocation; next compare a pointer-advancing loop with an
+  index loop and preserve the encoded byte in a narrow local.
+- **sub_08108C94** — 60 rows after removing two pins. The table base and raw halfword allocation
+  remain coupled; next use a typed table cursor and repeat the post-join raw assignment in both
+  arms.
+- **LinkMenu_WaitForReadyPeers** — 20 rows after removing the initialization pin and timer helper
+  barrier. The timer helper's memory operand controls its caller's allocation; next inline the
+  ordinary increment form into both timer branches.
+- **LinkMenu_WaitSelectionMode** — 16 rows after removing the pointer pin/barrier pair. Allocation
+  wants the pointer-to-pointer in r2 instead of r0; next test direct double indexing rather than a
+  saved alias.
+- **LinkSelection_WaitForEmptySlots** — One register-only row remains: cse1 canonicalizes the
+  initial `i` comparison to the equal zero-valued `count` pseudo. Casts, zero spellings, declaration
+  order, `i + 0`, and `i = count` do not change it; an explicit `0 < length` changes the compare
+  shape. A second pass confirmed with `why 81` that pseudo 24 (`i`) is initially allocated to the
+  ROM's r3, but cse1 substitutes pseudo 25 (`count`, r6) solely because both hold zero. Labels,
+  gotos, `count ^ count`, `count - count`, signed/unsigned and narrow types, alias locals, and reuse
+  of the session-ready result either leave that substitution intact or add instructions. Moving the
+  count initialization into both sides of the initial branch preserves the desired comparison but
+  adds two branches, so it is not a viable match. Next seek an ordinary expression whose zero is
+  only exposed after cse1, or a natural preceding nonconstant definition of `i` that does not alter
+  its otherwise-correct priority.
+- **LinkSelection_ExchangeParticipantInput** — 14 ROM / 10 draft rows after removing three
+  concessions. The initial 0x3c00 mask is built directly in r6 rather than in r1 then copied, and
+  that changes the later mode tests. Next derive the mask through the first slot predicate so the
+  copy remains live.
+- **LinkSelection_UpdateParticipantScores** — 89 rows after removing fifteen pins. This is a broad
+  allocation rewrite; isolate the zero aliases and participant cursor first, then retain only
+  variants that improve the register-blind shape.
+- **TimerDisplay_DrawRecord** — Eight rows after removing two pins and two barriers. The cell
+  pointer barrier controls three register-only differences. `why 36` identifies the exact cause:
+  each store block has three local quantities, triggering agbcc's small-set `qty_compare` ordering;
+  it assigns the returned cell to r0 and the halfword constant to r1, while the ROM has the cell
+  copy in r1 and the constant in r0. Typed return values, pointer/value aliases, wide or narrow
+  constants, increment-built constants, and an inline store helper do not create the required
+  fourth local quantity (the helper is instead emitted out of line). Next try a real fourth value
+  arising from direct row/column indexing, rather than a dead steering local.
+- **sub_0810FDDC** — 63 rows after removing two pins. The score-panel owner and tens digit compete
+  across the drawing calls; next repeat the digit-base computation in the two branches.
+- **LinkSession_UpdatePlayerValueAverage** — Ten rows after removing the `GetSelection` sum
+  barrier. The inline helper's accumulator lifetime is the blocker; next use a returned aggregate
+  or a caller-owned sum so the helper has no cross-iteration alias.
+- **sub_081384A0** — 45 rows after removing the loop-index barrier. The barrier prevents induction
+  canonicalization; next rotate the loop around its return/exit rather than using a while-form.
+- **PositionEffectDisplay_UpdateSources** — 69 rows after removing three pins. Source cursor,
+  flags input, and output object allocations are coupled; next duplicate the post-join source
+  update in each flag arm.
+- **Clock_CheckRtcStatus** — Five register-only rows (plus one moved branch) after removing two
+  pins. The shifted byte is allocated to r4 instead of r5; declaration order, delayed
+  initialization, scalarized two-word arrays/structs/unions, and zero-initialized aggregates did
+  not reproduce the allocation. Splitting the shift-assignment, narrowing the second assignment,
+  initializing `status` from the call before shifting it, and a one-member union all compile to the
+  same five-row difference. Next recover the SDK RTC result aggregate type rather than using two
+  independent u32 values.
