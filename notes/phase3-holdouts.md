@@ -1676,3 +1676,32 @@ Next: preserve the count load through combine while allowing its short life
 to share r5 with the later count pointer, and retain active in r4. Aggregate
 initialization can create the unused saved register sought by activation,
 but reset itself needs a narrower change without that prologue effect.
+
+
+### VulcanCannon_UpdateFacingTurn (08207350): shared step landed, one pin remains
+
+Landed shared DisplaySequence_StepSprite plus the ordinary facing toggle.
+Only the original allowTurn r1 pin remains; removed the private playback,
+VC selector macros, volatile reads, six counted pins and five barriers.
+Complete unit MATCH. The ordinary draft remains 5/3, shape 2, saved here.
+
+Reconfirmed CSE's zero equivalence: the failed allowTurn test provides the
+fifth restart argument, keeping the loaded byte alive in r4. The ROM lets it
+die in r1 and materializes a new zero in r2. Scope's nineteen single-decision
+probe interventions do not match; no new exact ordinary diagnostic knob found.
+
+A returning while, nested returning while, switch case zero, word/halfword
+zero arrays, and word unions filled through halves or bytes preserve 5/3.
+A CanTurn boolean predicate keeps three extra boolean operations because its
+zero result is reused as the argument. The opposite TurnDisabled predicate
+fixes all original differences but leaves four visible condition instructions
+(0/4): initial zero, conditional one, compare and branch. Word return type,
+explicit comparison to one and positive test all retain those instructions.
+An initialized allowed-byte union or struct gives 5/7; assigning its byte
+without initialization returns to 5/3. Persistent search records these forms.
+
+Next: create a real extended-block boundary before the not-allowed restart
+without adding a surviving test, or make the positive disabled predicate
+collapse only after CSE's equality record is no longer available. The source's
+missing final return intentionally retains r0 as required by the original
+callback; adding a return value would change the already-matching playback.
