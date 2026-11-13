@@ -4,15 +4,15 @@ void PauseMenu_AddSpriteFlags(void *, int, int);
 void PauseMenu_ClearSpriteFlags(void *, s32, u32);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
 void Hud_SetGridPosition(void *, int, int);
-void sub_0816CDB8(void *, int, int);
+void Inventory_InitializeSelectionGrid(void *, int, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_InitializeActionInput(struct SceneHudState *s)
 {
     u8 *r, *v, *a;
     if (s->actionCategory == 0)
-        sub_0816CDB8(s->actionInput, 1, 0xe1);
+        Inventory_InitializeSelectionGrid(s->actionInput, 1, 0xe1);
     else
-        sub_0816CDB8(s->actionInput, 1, 0x61);
+        Inventory_InitializeSelectionGrid(s->actionInput, 1, 0x61);
     Hud_SetGridPosition(s->actionInput, 8, 0);
     a = (u8 *)s + 0x15c0;
     r = &s->actionCursor;

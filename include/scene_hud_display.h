@@ -274,7 +274,8 @@ struct SceneHudState {
 };
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);
-u32 SceneInput_TestGridFlags(const void *, u32);
+struct SceneInputGrid;
+u32 SceneInput_TestGridFlags(struct SceneInputGrid *, u32);
 void SceneHud_SetKeyframePaletteBank(struct SceneInputWidget *, u32);
 void SceneHud_SetTimedState(u32 unused, s32 start, u32 value, u32 kind, u32 phaseEnabled,
                             u32 parameter);
