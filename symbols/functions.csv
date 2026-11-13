@@ -6537,6 +6537,8 @@ addr,name,mode,confidence,source,notes
 0817DDC8,SceneVolume_UpdateImpactSlide,thumb,low,src-alias,
 0817DF74,ActorEffect_UpdateTimedSequence,thumb,low,src-alias,
 0817E040,SceneVolume_UpdateKnockbackLanding,thumb,low,src-alias,
+0817E378,SceneEventActor_UpdateJitter,thumb,low,cleanup,Starts the hit animation and short random jitter then invokes the actor callback; tentative.
+0817E424,SceneEventActor_UpdateRecoil,thumb,low,cleanup,Decays recoil velocity and advances the settling animation to completion; tentative.
 0817E5B0,SceneEventActor_UpdateRemovalSequence,thumb,low,src-alias,
 0817E6E0,BossSlot2_UpdateLungeApproach,thumb,low,src-alias,Tentative boss lunge: tracks a destination; checks projected terrain height; and snaps or advances during a sixteen-tick window.
 0817EA70,SceneEventActor_UpdateTimedAnimation,thumb,low,src-alias,
