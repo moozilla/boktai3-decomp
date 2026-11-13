@@ -1228,3 +1228,57 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-effects-b (Codex)
+
+### SparkParticle_UpdatePool (src/fn/sub_08069FA4.c, 08069FA4): partial, remainder deferred
+
+Tags: #matching #phase3 #effects #08069FA4
+
+Landed three of seven pin removals, leaving four pins and seven barriers. Reading the
+flip flags through `union DisplaySequenceControl` and consuming `control.raw` directly
+in the narrowed AND removes both flip pins. A widened intermediate defeats that form
+(30/30 different instructions). An inline `DecrementCount` helper removes the count-offset
+pin and its raw offset; direct field decrement in the main body changes loop PRE.
+The unnecessary volatile command qualification was also removed. Stock unit check MATCH.
+
+Best pin-free draft: `notes/phase3-drafts/dp-effects-b/SparkParticle_UpdatePool.c`,
+34 ROM / 38 draft instructions, 412 bytes against 404. It uses the matched
+`SceneParticle_StepSprite` helper; essentially all playback instructions then agree.
+The remaining loop retains the original array pointer alongside a reduced particle
+pointer and a separate sprite address. These occupy registers needed by the constants
+one and two, which reload inside the loop. ROM keeps active in r6, particle in r4,
+one in sb, two in sl, eight in r8 and the countdown in ip.
+
+Evidence and attempts (local store: `build/matchsearch/SparkParticle_UpdatePool`;
+working files: `build/cx/work/SparkParticle_UpdatePool/`):
+* `helper.c` is the store root. `separate-active-countup` explicitly walks the active
+  byte and particle pointers: 37/39. Countdown, indexed and pointer loops, a sprite-first
+  wrapper, and a whole-particle wrapper do not eliminate the excess values.
+* `typed-particle-step` avoids the generic sprite pointer but changes command/address
+  CSE and pool allocation, 103/101. A separate state parameter does not repair it.
+  `AGBCC_FORCE=22:7` improves this variant to 93/95; a STACK_REGS preference hypothesis
+  was disproved by REGCLASS trace (LO_REGS cost 26 versus STACK_REGS 46).
+* `AGBCC_PRI=bit:+1000,bit#1:+1000` on the shared-helper draft keeps the constants but
+  displaces pool/counter and remains 40/42. Allocation alone is not the whole blocker.
+* `giv` identifies the sprite address at insn 110 as an unreduced induction value
+  (benefit 2, net zero), while memory addresses form a second stepped particle pointer.
+  `AGBCC_GIV=110` gives 34/40; `AGBCC_NOGIV=153,160,180` gives 43/47. Neither matches.
+  Read loop.c's elimination path and regmove.c's matching-operand rewrite.
+* `goto-countdown` and a return at loop termination both give 99/111. Copying the state
+  parameter and using the DisplaySequence helper's end-arm form gives 70/76.
+* `direct-body-count-helper` retains the original manual body with every concession
+  stripped, 69/69. Removing the backward hold barrier alone ties the AND to the dying
+  flags register; the forward barrier alone retains two otherwise removed byte-extension
+  instructions. Union locals, narrowed locals, split assignments and repeated ended
+  assignments do not solve those with the outer barrier still present.
+
+No combined diagnostic knob has produced a completely pin-free MATCH. The proved
+partial is retained rather than claiming the remaining allocation is solved. Next idea:
+split frame/flip application from sequence advance so the sprite address does not stay
+live across both flip branches, while preserving the shared helper's state reloads.
+
+Tool improvement discovered here: scope hoist suggestions used header line numbers
+as caller line numbers, crashing or editing unrelated caller statements. uid_locations
+now retains filenames, and hoist filters locations to the caller with bounds checks.
+Three regression tests cover this; both required test suites pass.
