@@ -4350,25 +4350,30 @@ addr,name,mode,confidence,source,notes
 0810D688,RecordPanel_DrawTime,thumb,low,src-alias,
 0810D8F4,RecordPanel_RefreshEntryLabels,thumb,low,src-alias,
 0810D9B0,RecordPanel_ShowName,thumb,low,src-alias,
-0810DA38,Registry3C9F_DestroyTextWindows,thumb,low,src-alias,Releases the main text window and six additional window handles
+0810DA38,SelectionPanel_ClearTextWindows,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810DA68,SelectionPanel_InitEntryIds,thumb,low,src-alias,
+0810DB0C,SelectionPanel_InitializeWidgets,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810DC7C,SelectionPanel_PositionWidgets,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810DD24,SelectionPanel_InitPreview,thumb,low,src-alias,
-0810DE3C,Registry3C9F_HideDisplayObjects,thumb,low,src-alias,Sets the hidden flag on ten animation objects and hides the embedded display controller
-0810DE6C,Registry3C9F_RemoveAnimations,thumb,low,src-alias,Removes ten animation objects stored consecutively in the task
-0810E110,Registry3C9F_InitTextState,thumb,low,src-alias,Initializes the text selection sentinel and resets shared text rendering state
+0810DE3C,SelectionPanel_HideDisplayObjects,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810DE6C,SelectionPanel_RemoveWidgets,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810DE88,SelectionPanel_HandleInput,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E110,SelectionPanel_InitializeTextState,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810E12C,SelectionPanel_UpdateDescription,thumb,low,src-alias,
 0810E1A0,SelectionPanel_GetSelection,thumb,low,src-alias,
-0810E1DC,Registry3C9F_Close,thumb,low,src-alias,Resets text and backgrounds then hides display objects and kills the menu task
+0810E1DC,SelectionPanel_Close,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810E218,SelectionPanel_CommitSelection,thumb,low,src-alias,
 0810E284,SelectionPanel_RunSelectionScript,thumb,low,src-alias,
 0810E30C,SelectionPanel_RunCancelScript,thumb,low,src-alias,
-0810E378,Registry3C9F_OnCloseRequested,thumb,low,src-alias,Handles the pending close flag by running close processing and shutting down the task
+0810E378,SelectionPanel_OnCloseRequested,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810E3A0,SelectionPanel_UpdateConfirmTransition,thumb,low,src-alias,
 0810E450,SelectionPanel_UpdateCancelTransition,thumb,low,src-alias,
-0810E4D8,Registry3C9F_OnTransitionIdle,thumb,low,src-alias,Empty callback installed by the menu transition routines
-0810E660,SceneTask_UpdateConditionalCallback,thumb,low,src-alias,
-0810E6B4,Registry3C9F_OnDestroy,thumb,low,src-alias,Destruction callback that releases windows and display objects and clears the singleton pointer
-0810E8D0,Registry3C9F_Create,thumb,low,src-alias,Creates the singleton task for registry entry 3C9F and initializes its menu state
+0810E4D8,SelectionPanel_OnTransitionIdle,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E4DC,SelectionPanel_UpdateInput,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E660,SelectionPanel_Update,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E6B4,SelectionPanel_OnDestroy,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E6E4,SelectionPanel_InitializeFromScript,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
+0810E8D0,SelectionPanel_Create,thumb,low,src-alias,Record selection menu with preview; two pages and confirm/cancel scripts.
 0810E964,Registry33FF_LoadBackground,thumb,low,src-alias,Loads two map resources and initializes the background layer and palette
 0810E9D4,TimerDisplay_DrawRecord,thumb,low,src-alias,
 0810EA90,RecordMenu_DrawRecords,thumb,low,src-alias,
