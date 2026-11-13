@@ -906,6 +906,14 @@ mask forms (those change the code).
 
 ### Terrain_ResolveActorMotion (src/fn/sub_0811AE9C.c, 0811AE9C): 6 concessions, pin-free draft 10/10
 
+Resolved by dp-monsters: spell the offset as ~((difference << 12) - 1).
+CSE does not see the inner negation early enough to cancel Abs's negation;
+later simplification recovers the desired arithmetic. This also fixes the
+shape/flags allocation. Unsigned-shift form also matches; ~(difference << 12)
++ 1 leaves 1/3, and multiplication by -4096 remains 10/10. Removed unused
+Query and flag helpers. Both functions in the unit MATCH without concessions.
+Prior diagnosis follows.
+
 Draft `Terrain_ResolveActorMotion.c` (no concessions) rewrites the middle part:
 `clearance = Terrain_GetCellClearance(next.coordinates); y = next.coordinates[1];
 floor = clearance - Offset(next.coordinates[2]);` (the Offset inline keeps `z + 96` from being
