@@ -1317,9 +1317,21 @@ r0 one-pin influences allocation outside its lexical block; a returning inline m
 produce the needed hard-return-register liveness without any pin, unlike the simple
 QueueCollider helper tried so far. Preserve the observed first-slot flags test.
 
-### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): partial
+### Presentation_UpdateDropShakeBlink (src/fn/sub_081E2910.c, 081E2910): resolved
 
 Tags: #matching #phase3 #presentation #081E2910
+
+Resolved on follow-up: a phase scratch union holds the destination pointer in
+the moving branches and the visibility mask in the blinking branch. Their
+combined conflicts select r3 for every required destination without a pin.
+The blink branch computes Div first, sets visibilityMask to 1, then uses that
+member for the parity test and flag sets. Its flag clears remain constant
+`&= ~1`: using the complement of the union member instead selects BIC and
+changes both local allocation and instruction shape (28/24). With constant
+clears, scope and independent stock check MATCH all 576 bytes. Removed unused
+function declarations. Persistent store: Presentation_UpdateDropShakeBlink-resumed,
+node phase-scratch. The following preserves the earlier partial and search.
+
 
 Removed the random-table pin; three destination pins remain. A separate do/while
 block around the index update raises mask references while the existing sample
@@ -1425,7 +1437,8 @@ not. Manually placing the three blocks in the caller and declaring saved once
 combines those conflicts and selects r7 throughout. The scalar local adds no
 storage or instructions. Removed unused Face, FaceFinal and SetRiseHeight
 helpers. Scope and independent stock check MATCH all 1256 bytes, zero pins or
-barriers. Persistent node: shared-facing-pointer.
+barriers. Persistent store: HomingProjectile_UpdateDefaultState-resumed, node
+shared-facing-pointer.
 
 The matching knob diagnosed allocation, but raising saved's priority by 1000,
 4000 or 15000 gave 26/26 differences. Repeating the final call in both arms gave
