@@ -4856,7 +4856,10 @@ addr,name,mode,confidence,source,notes
 08123124,SceneTrailEffect_InitPool,thumb,low,src-alias,Loads animation and script resources then publishes the pool singleton; trail identity is tentative
 0812313C,SceneTrailEffect_EnsurePool,thumb,low,src-alias,Returns the existing singleton or creates and initializes its 32-slot effect task
 08123188,SceneTrailEffect_ResetPool,thumb,low,src-alias,Clears the pool singleton during scene subsystem reset
+08123194,SpreadShot_ResolveTerrain,thumb,low,cleanup,Resolve terrain entry and redirect a spread shot along walls or slopes
+08125498,SceneTerrainProbe_NoopCollisionHook,thumb,low,cleanup,Empty spread-shot collider callback
 0812549C,SpriteNotice_CreateBetweenPositions,thumb,low,src-alias,
+08125524,SceneTerrainProbe_NoopTrailHook,thumb,low,cleanup,Empty trail hook after notice interpolation
 08125528,SpreadShot_Step,thumb,low,src-alias,
 08125898,SceneTerrainProbe_DestroyEntry,thumb,low,src-alias,Clears the slot mask and releases entry resources before clearing the record; terrain probe identity is tentative
 081258DC,PairSlotPool_Allocate,thumb,low,src-alias,

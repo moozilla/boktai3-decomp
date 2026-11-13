@@ -231,7 +231,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-30.md](../docs/history/2026-10-30.md) | 2026-10-30: monster initializers and shared engine records | #bosses #compiler #cue #data #effects #hresvelgr #matching #monsters #player #presentation #ram #ratatosk #scene-actors #scope-gap #structs #studio #tooling #vanargand | 9 |
 | [docs/history/2026-10-31.md](../docs/history/2026-10-31.md) | 2026-10-31: finish-subsystem sessions | #bosses #cleanup #compiler #data #effects #hresvelgr #matching #player #presentation #process #ratatosk #register-pinning #scene-actors #structs #studio #tooling #vanargand | 7 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
-| [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #animation #compiler #matching #particles #scene #structs #tooling | 2 |
+| [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #animation #compiler #matching #particles #scene #structs #tooling | 3 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -560,7 +560,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/solo-family_2026-10-09.md](../notes/solo-family_2026-10-09.md) | Solo family tranche, October 9 |  | 5 |
 | [notes/sonnet-081EEECC-task.md](../notes/sonnet-081EEECC-task.md) | Task 081EEECC worker notes |  | 1 |
 | [notes/sonnet-from-end-08241504.md](../notes/sonnet-from-end-08241504.md) | sub_0824261C (Player update by kind) — unfinished |  | 1 |
-| [notes/spread_shot_cleanup_draft.md](../notes/spread_shot_cleanup_draft.md) | Spread-shot cleanup draft | #matching #scene #particles #structs #compiler | 3 |
+| [notes/spread_shot_cleanup_draft.md](../notes/spread_shot_cleanup_draft.md) | Spread-shot cleanup and matching evidence | #matching #scene #particles #structs #compiler | 3 |
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |
 | [notes/staged-effect_2026-10-14.md](../notes/staged-effect_2026-10-14.md) | Contiguous staged effect subsection (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/storage-equipment-slots-round9.md](../notes/storage-equipment-slots-round9.md) | Storage_RefreshEquipmentSlots |  | 1 |
