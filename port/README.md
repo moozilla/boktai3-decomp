@@ -115,7 +115,9 @@ count (exact). Another 96 original-mixer calls cover fixed/interpolated playback
 looping/sample end, ADSR and pseudo echo. The sample-end oracle supplies the
 explicit interpolation guard byte that the original reads beyond sample size;
 the port substitutes zero (or the loop start) to keep accesses bounded.
-It runs the original RTC SDK across all 24 hours, status translation, protection and
+It runs 576 immediate DMA cases across all four channels, widths, address modes and
+repeat settings, comparing destination bytes and completion IRQs. It runs
+the original RTC SDK across all 24 hours, status translation, protection and
 probing with a fixed UTC source. The RTC 12-hour path remains unimplemented;
 mGBA wraps hours modulo 12 without an AM/PM distinction and cannot independently
 validate that distinction. It runs the original EEPROM write/read routines and checks both

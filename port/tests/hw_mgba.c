@@ -375,6 +375,60 @@ static int rtc_sdk_oracle(struct mCore *core)
     return 0;
 }
 
+static uint8_t dma_oracle_ram[0x20000];
+static uint8_t *dma_oracle_map(void *user, uint32_t address, size_t size)
+{
+    (void)user;
+    if (address < 0x02000000 || address - 0x02000000 > sizeof(dma_oracle_ram) ||
+        size > sizeof(dma_oracle_ram) - (address - 0x02000000)) return NULL;
+    return dma_oracle_ram + (address - 0x02000000);
+}
+
+static int dma_oracle(struct mCore *core)
+{
+    static const unsigned counts[] = {3,17,33};
+    static Hw hw;
+    HwHost host = {0};
+    unsigned channel, width, source_mode, dest_mode, repeat, n, i, cases = 0;
+    host.map = dma_oracle_map;
+    hw_init(&hw, &host);
+    for (channel = 0; channel < 4; ++channel) core->busWrite16(core, HW_IO_BASE + 0xba + channel * 12, 0);
+    for (channel = 0; channel < 4; ++channel) for (width = 2; width <= 4; width += 2)
+    for (source_mode = 0; source_mode < 3; ++source_mode) for (dest_mode = 0; dest_mode < 4; ++dest_mode)
+    for (repeat = 0; repeat < 2; ++repeat) for (n = 0; n < 3; ++n) {
+        uint32_t reg = HW_IO_BASE + 0xb0 + channel * 12;
+        uint32_t control = 0xc000 | (width == 4 ? 0x400 : 0) | source_mode << 7 | dest_mode << 5 | repeat << 9;
+        unsigned guard;
+        for (i = 0; i < 0x400; ++i) {
+            dma_oracle_ram[i] = (uint8_t)(i * 37);
+            dma_oracle_ram[0x10000 + i] = 0xa5;
+            core->busWrite8(core, 0x02000000 + i, dma_oracle_ram[i]);
+            core->busWrite8(core, 0x02010000 + i, 0xa5);
+        }
+        core->busWrite16(core, HW_IO_BASE + 0x202, 0xffff);
+        hw_write16(&hw, HW_IO_BASE + 0x202, 0xffff);
+        core->busWrite32(core, reg, 0x02000200);
+        core->busWrite32(core, reg + 4, 0x02010200);
+        hw_write32(&hw, reg, 0x02000200);
+        hw_write32(&hw, reg + 4, 0x02010200);
+        core->busWrite32(core, reg + 8, control << 16 | counts[n]);
+        hw_write32(&hw, reg + 8, control << 16 | counts[n]);
+        for (guard = 0; guard < 10000 && (core->busRead16(core, reg + 10) & 0x8000); ++guard) core->step(core);
+        if (guard == 10000 || hw_read16(&hw, reg + 10) & 0x8000) {
+            fprintf(stderr, "DMA %u did not finish\n", channel); return 1;
+        }
+        for (i = 0; i < 0x400; ++i) if (dma_oracle_ram[0x10000 + i] != core->busRead8(core, 0x02010000 + i)) {
+            fprintf(stderr, "DMA channel %u width %u source %u dest %u repeat %u count %u byte %u differs\n",
+                    channel, width, source_mode, dest_mode, repeat, counts[n], i); return 1;
+        }
+        if ((hw_read16(&hw, HW_IO_BASE + 0x202) & (0x100 << channel)) !=
+            (core->busRead16(core, HW_IO_BASE + 0x202) & (0x100 << channel))) return 1;
+        ++cases;
+    }
+    printf("mGBA DMA: PASS (%u immediate transfer cases, destination bytes and completion IRQ)\n", cases);
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     struct mCore *core;
@@ -437,6 +491,7 @@ int main(int argc, char **argv)
     if (mixer_reverb_oracle(core)) return 1;
     if (eeprom_oracle(core)) return 1;
     if (rtc_sdk_oracle(core)) return 1;
+    if (dma_oracle(core)) return 1;
     rom_file = fopen(argv[1], "rb");
     if (!rom_file || fseek(rom_file, 0, SEEK_END)) return 2;
     rom_size = ftell(rom_file); rewind(rom_file);
