@@ -8,7 +8,8 @@ externs, struct definitions, static helpers, #defines) are kept once; items
 whose name repeats with a different body are reported as conflicts, which must
 be unified (usually into a shared header) before merging. Inputs must also use
 the same compiler and effective flags; mixed settings cannot share one unit. With --write the
-output is written and the inputs are removed from disk. Run make afterwards:
+output is written and the inputs are removed from disk. An existing output must
+be listed among the inputs, and inputs must name distinct files. Run make afterwards:
 merging can change code generation only through such declarations.
 """
 import argparse
@@ -132,11 +133,17 @@ def merge(paths):
 def write_merge(out, inputs, text):
     """Write the complete output before removing inputs; leave Git to the caller."""
     output = os.path.abspath(os.path.join(ROOT, out))
+    sources = [os.path.abspath(os.path.join(ROOT, path)) for path in inputs]
+    output_identity = os.path.realpath(output)
+    identities = [os.path.realpath(source) for source in sources]
+    if len(identities) != len(set(identities)):
+        raise ValueError("merge inputs must name distinct files")
+    if os.path.exists(output) and output_identity not in identities:
+        raise ValueError("existing output must be included among merge inputs: " + out)
     with open(output, "w") as stream:
         stream.write(text)
-    for path in inputs:
-        source = os.path.abspath(os.path.join(ROOT, path))
-        if source != output:
+    for source, identity in zip(sources, identities):
+        if identity != output_identity:
             os.unlink(source)
 
 
@@ -154,7 +161,10 @@ def main():
     names = [n for p in a.inputs for n in c_functions(os.path.join(ROOT, p))]
     print(f"{len(a.inputs)} files -> {a.out}: {len(names)} functions")
     if a.write:
-        write_merge(a.out, a.inputs, text)
+        try:
+            write_merge(a.out, a.inputs, text)
+        except ValueError as error:
+            ap.error(str(error))
 
 
 if __name__ == "__main__":

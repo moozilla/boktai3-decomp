@@ -57,6 +57,41 @@ class MergeWrites(unittest.TestCase):
                 write_merge(str(Path(directory, "absent", "unit.c")), [str(source)], "merged")
             self.assertEqual(source.read_text(), "input")
 
+    def test_unlisted_existing_output_is_not_overwritten(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory, "unit.c")
+            source = Path(directory, "single.c")
+            output.write_text("unrelated unit")
+            source.write_text("input")
+            with self.assertRaisesRegex(ValueError, "existing output"):
+                write_merge(str(output), [str(source)], "merged")
+            self.assertEqual(output.read_text(), "unrelated unit")
+            self.assertEqual(source.read_text(), "input")
+
+    def test_duplicate_input_paths_are_rejected_before_writing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory, "unit.c")
+            source = Path(directory, "single.c")
+            source.write_text("input")
+            alias = str(source.parent) + "/./single.c"
+            with self.assertRaisesRegex(ValueError, "distinct files"):
+                write_merge(str(output), [str(source), alias], "merged")
+            self.assertFalse(output.exists())
+            self.assertEqual(source.read_text(), "input")
+
+    def test_output_alias_of_input_is_preserved(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory, "unit.c")
+            alias = Path(directory, "alias.c")
+            source = Path(directory, "single.c")
+            output.write_text("old")
+            alias.symlink_to(output)
+            source.write_text("input")
+            write_merge(str(alias), [str(output), str(source)], "merged")
+            self.assertEqual(output.read_text(), "merged")
+            self.assertTrue(alias.is_symlink())
+            self.assertFalse(source.exists())
+
 
 class MergeCompilerSettings(unittest.TestCase):
     def merge_sources(self, first, second):
