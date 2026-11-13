@@ -4760,3 +4760,83 @@ without adding a surviving test, or make the positive disabled predicate
 collapse only after CSE's equality record is no longer available. The source's
 missing final return intentionally retains r0 as required by the original
 callback; adding a return value would change the already-matching playback.
+
+### SceneActorContacts_SelectForActor (08073A3C)
+
+Tags: `08073A3C` `phase3` `allocation` `tracking`
+
+Stopped at the owner's end-of-run instruction. One pin remains in the matching
+source. Saved pin-free draft uses existing tracking/flags members and differs
+only in five instructions: owner and contactFlags swap r9/r10. Scope proves
+owner priority 405 (three refs/live74), contactFlags 410 (three refs/live73).
+Diagnostic `AGBCC_PRI=owner:+6` makes the whole function MATCH, 252 bytes.
+No ordinary-C equivalent has matched yet.
+
+Tried typed tracking access and direct flags2D0 member access, tracking getter,
+tracking-clear and finish-selection helpers, for/do/goto loop forms, using owner
+for the owner store, split switch cases with duplicated bodies and helper calls,
+and duplicated address assignments before a shared dispatch. Splitting cases
+changes dispatch branches and prevents the desired tail merge. Using owner for
+the owner store changes alias canonicalization. Earlier tracking initialization
+flips allocation correctly but moves three instructions, so it is not a match.
+The saved draft retains original instruction order and replaces raw field
+arithmetic with existing structs.
+
+Next: find a real helper or expression that shortens owner's measured lifetime
+by two insns, or lengthens contactFlags by two, without moving emitted code.
+The exact priority threshold and full matching knob isolate that remaining task.
+Scratch variants are under build/cx/work/SceneActorContacts_SelectForActor/.
+
+### SceneActorAnimation_SelectDirectionalEntry (08076034)
+
+- Remaining concession: one `DEBUG_NOP()` between the entry flags and value reads.
+  Source is unchanged. Removing it gives 42 ROM / 32 draft differences, shape 18.
+- Confirmed mechanism: regmove ties `flags = index | entryFlags` to the dying
+  mirror input (`index`, insn 113 in the plain draft). `AGBCC_NOTIE=113` alone
+  gives a complete 320-byte MATCH. The apparent entry/variant-pointer priority
+  inversion is downstream: raising entry priority as well makes the result worse.
+- Saved pin-free draft repeats the variant-address, mirror-value, and entry-flag
+  reads in the two direction arms. This prevents the OR tie; jump2 shares the
+  reads. It leaves 9/9 differences, shape 2: the mirror pointer loses its early
+  r1-to-r2 copy, and the variant address is copied in one arm instead of rebuilt
+  at the join. CSE chooses the existing frame-address class; raising variantReload
+  priority worsens it. A probe of both this draft and the plain draft found no
+  single CSE/PRE/loop decision that fixes the remaining differences.
+- Tried: matched siblings' direction and selection helpers; entry-based selector
+  helper; byte/halfword read helpers; returning the mirror from the direction
+  helper; flags/entry/mirror narrowing; full/narrow union views, initialized unions,
+  aggregate entry copy; switch and goto direction forms; two through five repeated
+  tail statements; splitting force detection and flag assignment between arms.
+  The flag-arm rewrite reaches shape 2 but moves the copy into the force branch.
+  Union forms either retain the tie or introduce masks/reordered byte loads.
+- Next: find a natural helper/control-flow boundary between the mirror load and OR
+  that survives through regmove but disappears at jump2, or repair the direction
+  pointer class/allocation in the saved arm-read draft. The next two selectors
+  share this animation helper family and may supply the missing form.
+- Evidence: `build/cx/work/SceneActorAnimation_SelectDirectionalEntry/`; persistent
+  search `build/matchsearch/SceneActorAnimation_SelectDirectionalEntry`, `arm-loads`.
+
+### SceneActorAnimation_SelectDirectionalFlags (080766F8)
+
+- Two original pins remain; no source landing. Plain removal has 2/2 instruction
+  differences (one lost mirror-to-flags copy, plus alignment padding).
+  `AGBCC_NOTIE=115` alone gives a complete MATCH, the same OR-tie mechanism as
+  SelectDirectionalEntry above.
+- Saved draft moves mirror and entry-flag reads into each direction arm. jump2
+  shares the two loads and preserves the OR copy. Its entire instruction shape
+  matches, with 10 register differences: mirrorAddress gets r3 and quadrant r1,
+  opposite the ROM. `AGBCC_PRI=mirrorAddress:+4738` alone gives MATCH on this draft.
+  Pointer priority is 5263 (5 refs/live 19), quadrant 10000 (6 refs/live 12 after
+  regmove). Need pointer priority first, or a different register preference.
+- Tried: repeating only the mirror read; u8/u16/s16/s8 quadrant forms; separate
+  shift/mask; halfword angle; inline quadrant/mirror/store helpers; union-backed
+  quadrant; division/remainder; reuse of quadrant for reflected value or either
+  flag read; pointer initialization/order/class-head forms; scalar/union/array
+  output storage; u32 mirror/entry reads; and one-pin partials on both arm forms.
+  None match stock. A one-byte mirror array fixes registers but sinks/repeats
+  its frame address into both branches (2/4 differences); field output forms
+  remove the required address/store structure.
+- Next: recover a natural direction-decoding helper whose output pointer is
+  allocated before the quadrant, or preserve the OR copy in the plain draft
+  without introducing a separate flag-read definition in each direction arm.
+  Scratch: `build/cx/work/SceneActorAnimation_SelectDirectionalFlags/`.
