@@ -46,9 +46,17 @@ struct SceneCombatState {
     struct SceneCombatSnapshot common;
     u16 value10, value12;
 };
+struct ActorControllerNavigation {
+    u16 probe[6];
+    struct ContactPosition position;
+    u8 unknown14[0x1C];
+    struct ContactPosition referencePosition;
+};
 /* One actor owns two loose particles, a facing marker, and nine fragments. */
 struct SceneCombatActor {
-    u8 unknown0[0xD4];
+    u8 unknown0[0x18];
+    struct ActorControllerNavigation navigation;
+    u8 unknown50[0x84];
     union SceneCombatPosition position;
     u8 unknownDC[0x12];
     u16 paletteId;
@@ -69,7 +77,10 @@ struct SceneCombatActor {
     u16 flags;
     u8 unknownB34[4];
     u8 kind, heading;
-    u8 unknownB3A[0x5E6];
+    u8 targetHeading, unknownB3B;
+    u8 behavior, behaviorPhase, behaviorCounter;
+    u8 action, actionPhase, actionReady, actionCounter, animationComplete;
+    u8 unknownB44[0x5DC];
     struct SceneCombatState state;
 };
 
