@@ -4124,6 +4124,7 @@ addr,name,mode,confidence,source,notes
 0810399C,ActorGroup_Destroy,thumb,low,src-alias,
 08103A54,NamedObject_InitManager,thumb,low,src-alias,Starts the manager's script procedure and initializes its allocation mask
 08103A84,NamedObject_CreateManager,thumb,low,src-alias,Creates the singleton named object task and installs its callbacks
+08103AD0,NamedObject_ResetManager,thumb,low,cleanup,Tentative named actor helper recovered from manager and body fields
 08103ADC,NamedActor_SetFlag20FromScript,thumb,low,src-alias,
 08103B14,ActorGroup_GetSelectedMemberId,thumb,low,src-alias,
 08103B94,NamedActor_SetMoveModeFromScript,thumb,low,src-alias,
@@ -4136,6 +4137,7 @@ addr,name,mode,confidence,source,notes
 08103E60,NamedActor_SetRangeFromScript,thumb,low,src-alias,
 08103EBC,NamedActor_ClearFlag1000FromScript,thumb,low,src-alias,Clears flag 0x1000 on the actor selected by script option n
 08103EF4,NamedObject_GetPositionByName,thumb,low,src-alias,Returns the named object's embedded position vector used by following objects
+08103F24,NamedObject_GetPosition,thumb,low,cleanup,Tentative named actor helper recovered from manager and body fields
 08103F44,NamedObject_PlayAdjacentExitSound,thumb,low,src-alias,
 081041DC,Pool184_AddStatusFlags,thumb,low,src-alias,Adds bits to the status flags of a 0x184-byte pooled object
 08104204,Pool184_TestStatusFlags,thumb,low,src-alias,Tests whether any requested status bits are set on a pooled object
