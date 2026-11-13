@@ -1403,3 +1403,33 @@ helper give 4/4. The dead reset alone supplies the exact source/target separatio
 Store: `build/matchsearch/sub_081FDCB0`, distance-boundary. Next: preserve the
 inline distance-return join that prevents CSE following, while eliminating its
 boolean materialization; keep the source reset when recovering original load order.
+
+### HomingProjectile_UpdateDefaultState (081FF454): partial
+
+Tags: #matching #phase3 #presentation #081FF454
+
+Removed three of four concessions: one capture uses a do block; a shared void
+component pointer combines delay's r0/r6 conflicts with rise height's r1 conflict,
+so both choose r2. The FaceFinal saved-pointer/r5-clobber barrier remains.
+Stock check MATCH, 1256 bytes.
+
+Pin-free draft: `notes/phase3-drafts/dp-effects-b/HomingProjectile_UpdateDefaultState.c`,
+two register differences and identical shape/size. `AGBCC_FORCE=saved#2:7` MATCH.
+Saved is global priority 454, 2 refs, doubled life 44 because REG_EQUIV marks a
+constant. It conflicts with r0/r1/r2/r3/r4/r6, leaving r5 and r7; ordinary allocation
+takes r5. Read global.c's preferred-register filtering and selection. Original
+pin-free source had 47/49 differences; scoped one reduces to 18/18, component
+sharing to 2/2. The three-force diagnosis delay:2,dest:2,saved#2:7 also matched.
+
+Signed height leaves the result unchanged; widening height adds instructions.
+A delay capture block retains four differences; resetting delay after a separate
+load changes reload rotation broadly. Moving FaceFinal's saved capture to the
+end changes scheduling; wrapping its original capture leaves two differences.
+Manual inlining also leaves 2/2. Sharing saved with the target vector makes it
+r8 (21/23), with the from vector disturbs broad allocation (130/130), and with
+the delta gives 26/26. first+1 and first followed by increment leave 2/2.
+Resetting first or second changes stores, allocation and rotation, not a match.
+
+Store: `build/matchsearch/HomingProjectile_UpdateDefaultState`, shared-component.
+Next: find an existing short-lived pointer use with an r5 conflict to share with
+FaceFinal's saved flip address, without the call-crossing vector lifetimes.
