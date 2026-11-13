@@ -6,8 +6,6 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
     struct ContactPosition *position;
     u32 graphicsId;
     u32 priority;
-    register struct ContactSwarmGraphics *graphics asm("r4");
-    register struct ContactSwarmSprite *sprite asm("r5");
     u16 *nearby;
     u32 script;
     u32 zero;
@@ -63,48 +61,54 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         emitter->position.z = 0;
         position = &emitter->position;
     }
-    graphics = &emitter->primary.graphics;
-    graphicsId = 0xBA8;
-    AnimData_Load(graphics, graphicsId);
-    sprite = &emitter->primary.sprite;
-    Sprite_Init(sprite, graphics, 0);
-    zero = 0;
-    sprite->frame = zero;
-    AnimData_SelectPaletteBank(graphics, 0xA2);
-    emitter->primary.sprite.flags |= 0x200;
     {
-        u32 value = 3;
-        priority = value;
+        struct ContactSwarmGraphics *graphics;
+        struct ContactSwarmSprite *sprite;
+        graphics = &emitter->primary.graphics;
+        graphicsId = 0xBA8;
+        AnimData_Load(graphics, graphicsId);
+        sprite = &emitter->primary.sprite;
+        Sprite_Init(sprite, graphics, 0);
+        zero = 0;
+        sprite->frame = zero;
+        AnimData_SelectPaletteBank(graphics, 0xA2);
+        emitter->primary.sprite.flags |= 0x200;
+        {
+            u32 value = 3;
+            priority = value;
+        }
+        {
+            u32 value = priority;
+            emitter->primary.sprite.priority = value;
+        }
+        {
+            struct ContactPosition *source = position;
+            emitter->primary.sprite.position = *source;
+        }
+        emitter->primary.sprite.position.y += 30;
     }
     {
-        u32 value = priority;
-        emitter->primary.sprite.priority = value;
-    }
-    {
-        register struct ContactPosition *source asm("r3") = position;
-        asm("" : "+r"(source));
-        emitter->primary.sprite.position = *source;
-    }
-    emitter->primary.sprite.position.y += 30;
-    graphics = &emitter->secondary.graphics;
-    AnimData_Load(graphics, graphicsId);
-    sprite = &emitter->secondary.sprite;
-    Sprite_Init(sprite, graphics, 0);
-    sprite->frame = zero;
-    AnimData_SelectPaletteBank(graphics, 0xA0);
-    emitter->secondary.sprite.flags |= 0x400;
-    {
-        u8 *destination = &emitter->secondary.sprite.priority;
-        u32 value;
-        value = priority;
-        *destination = value;
-    }
-    {
-        struct ContactPosition *destination = &emitter->secondary.sprite.position;
-        register struct ContactPosition *source asm("r3");
-        source = position;
-        asm("" : "+r"(source));
-        *destination = *source;
+        struct ContactSwarmGraphics *graphics;
+        struct ContactSwarmSprite *sprite;
+        graphics = &emitter->secondary.graphics;
+        AnimData_Load(graphics, graphicsId);
+        sprite = &emitter->secondary.sprite;
+        Sprite_Init(sprite, graphics, 0);
+        sprite->frame = zero;
+        AnimData_SelectPaletteBank(graphics, 0xA0);
+        emitter->secondary.sprite.flags |= 0x400;
+        {
+            u8 *destination = &emitter->secondary.sprite.priority;
+            u32 value;
+            value = priority;
+            *destination = value;
+        }
+        {
+            struct ContactPosition *destination = &emitter->secondary.sprite.position;
+            struct ContactPosition *source;
+            source = position;
+            *destination = *source;
+        }
     }
     ProximityEmitter_InitializeParticles(emitter);
     if (Script_SeekToKeyword('m') && Script_GetValue()) {
@@ -125,23 +129,13 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
     script = Script_SeekToKeyword('i');
     if (script)
         emitter->enterScriptId = Script_GetValue();
-    else {
-        register u32 offset asm("r3") = 0x260;
-        register u32 *destination asm("r0");
-        asm("" : "+r"(offset));
-        destination = (u32 *)((u8 *)emitter + offset);
-        *destination = script;
-    }
+    else
+        emitter->enterScriptId = script;
     script = Script_SeekToKeyword('o');
     if (script)
         emitter->leaveScriptId = Script_GetValue();
-    else {
-        register u32 offset asm("r3") = 0x264;
-        register u32 *destination asm("r0");
-        asm("" : "+r"(offset));
-        destination = (u32 *)((u8 *)emitter + offset);
-        *destination = script;
-    }
+    else
+        emitter->leaveScriptId = script;
     if (ProximityEmitter_IsTetherNearby(emitter)) {
         u32 value = 1;
         *nearby = value;
