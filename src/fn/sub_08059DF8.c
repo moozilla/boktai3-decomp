@@ -12,12 +12,16 @@ static inline u32 readWord(const u16 *table, u32 index)
 {
     return table[index];
 }
+#define SCALE12(out, n)                                                                            \
+    do {                                                                                           \
+        (out) = scale12(n);                                                                        \
+    } while (0)
 void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
 {
     u32 angle;
     s32 value;
     s32 wave;
-    register s32 x asm("r3");
+    s32 x;
     s32 z;
     u16 *timer;
     if (rig->turnStep < rig->turnRate)
@@ -66,9 +70,7 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
             value = gUnk_086149C4[(angle + 64) & 255] * radius;
         }
     }
-    value = scale12(value);
-    asm("" : "+r"(value));
-    x = value;
+    SCALE12(x, value);
     wave = gUnk_086149C4[rig->motionFlag];
     value = (gUnk_086149C4[(angle + 64) & 255] << 5) * wave;
     rig->position.x = rig->origin.x + x + scale24(value);
@@ -76,8 +78,7 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
         u32 radius = rig->distance;
         value = gUnk_086149C4[angle] * radius;
     }
-    value = scale12(value);
-    z = value;
+    SCALE12(z, value);
     asm("" : "+r"(angle));
     wave = gUnk_086149C4[rig->motionFlag];
     value = (gUnk_086149C4[angle] << 5) * wave;
