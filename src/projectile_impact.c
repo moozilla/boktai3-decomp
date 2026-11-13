@@ -7,7 +7,7 @@ s32 Projectile_UpdateAnimation(struct Task4E01Projectile *projectile)
 {
     struct Task4E01Params *config = &projectile->params;
     struct ContactSwarmSprite *first = &projectile->sprite;
-    PlayerCue_StepSequenceEnded(first, &projectile->sequence);
+    PlayerCue_StepSequenceEnded(first, &projectile->runtime.sequence);
     if (projectile->frame > 4 || (projectile->frame > 2 && (projectile->params.flags & 0x10))) {
         if (config->flags & 0x10) {
             u16 *counter = &config->parent->count;
@@ -131,7 +131,7 @@ s32 Projectile_SpawnImpactPair(struct Task4E01Projectile *entry)
                 s32 turn;
                 s32 random = (ReadSample(table, rng, mask) & jitterMask) - 0x80;
                 first = (u8)source->direction + random - 0x20;
-                turn = Task4E01_SelectTerrainTurn(childPosition, &entry->previousPosition,
+                turn = Task4E01_SelectTerrainTurn(childPosition, &entry->runtime.previousPosition,
                                                   DirectionSector(source->direction, sectorMask));
                 {
                     s32 random = ReadSample(table, rng, mask);
