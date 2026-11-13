@@ -1063,6 +1063,8 @@ addr,name,mode,confidence,source,notes
 0802D96C,Actor_Destroy,thumb,low,src-alias,Unlinks the active actor and releases motion animation shadow and heap storage
 0802D9C0,Actor_RunCallbacks,thumb,low,src-alias,Invokes each populated slot in the active actor's four-entry callback array
 0802D9F8,Actor_UpdateMovementAnimationAndEffects,thumb,low,src-alias,Updates body movement and terrain height then advances animation and attachment timers
+0802DB14,Actor_NoopUpdate,thumb,low,src-alias,Empty scene actor update callback
+0802DB18,Actor_NoopRender,thumb,low,src-alias,Empty scene actor render callback
 0802DB1C,Actor_UpdateVisibilityAndShadow,thumb,low,src-alias,Refreshes position linkage and applies drawable visibility and shadow enablement flags
 0802DB78,Actor_SetMirroredFourWayAnimation,thumb,low,src-alias,Selects animation direction from four-way facing with mirrored opposite directions
 0802DBD4,Actor_SetFourWayAnimation,thumb,low,src-alias,Uses four-way facing directly for directional drawables and applies horizontal flipping
@@ -1071,19 +1073,29 @@ addr,name,mode,confidence,source,notes
 0802DCB8,Actor_SetUndirectedAnimation,thumb,low,src-alias,Sets an animation with direction zero and no flipping
 0802DCD8,Actor_PlayAnimationEntry,thumb,low,src-alias,
 0802DD6C,Actor_PlayFootstepSound,thumb,low,src-alias,
+0802DDEC,Actor_IsWithinHorizontalRange,thumb,low,src-alias,Tests horizontal axis distances and a fixed vertical tolerance
 0802DE3C,Actor_SetAttachmentEffect,thumb,low,src-alias,Selects or stops an attached effect and configures its timer and associated sound
+0802E04C,Actor_EmitTowardNearbyActors,thumb,low,src-alias,Emits toward flagged nearby actors using an outward radial offset
+0802E188,Actor_UpdateInteractionCue,thumb,low,src-alias,Highlights nearest eligible actor and invokes its script on input
 0802E3BC,Packet_QueueFromScript,thumb,low,src-alias,
 0802E468,Actor_BeginScriptControl,thumb,low,src-alias,Reads scripted movement and animation settings then enters controlled behavior
 0802E5E8,Actor_EndScriptControl,thumb,low,src-alias,Clears script control and optionally resets the actor to an idle or hidden state
+0802E654,Actor_IsInReactionStateFromScript,thumb,low,src-alias,Tests selected actor saved state for reaction codes thirteen through fifteen
 0802E698,Actor_InitBehaviorFromScript,thumb,low,src-alias,Loads path destination animation turning and proximity settings with defaults
 0802EA08,Actor_OnHiddenIdleUpdate,thumb,low,src-alias,Hidden idle callback that starts the idle animation and sets the hide flag before invoking the actor callback
 0802EA4C,Actor_OnIdleUpdate,thumb,low,src-alias,Idle callback that initializes the idle animation and sets the idle update flag
+0802EA90,Actor_UpdateWalkToPosition,thumb,low,src-alias,Walks toward a target position with the walking animation
+0802EBD0,Actor_UpdateTurnToAngle,thumb,low,src-alias,Turns toward scripted angle and marks completion when aligned
 0802EC90,Actor_OnDescendingFadeUpdate,thumb,low,src-alias,
 0802EEA8,Actor_OnRisingFadeUpdate,thumb,low,src-alias,
 0802F0C0,Actor_OnConfiguredAnimationUpdate,thumb,low,src-alias,Animation state callback that starts the configured animation and invokes the actor callback
 0802F110,Actor_OnPathFollowUpdate,thumb,low,src-alias,
+0802F298,Actor_UpdateTargetFacing,thumb,low,src-alias,Turns toward nearby target and enables interaction when angles agree
 0802F524,Actor_OnTimedIdleUpdate,thumb,low,src-alias,Timed idle callback that finishes after eight ticks when the actor callback permits completion
+0802F584,Actor_UpdateNavigationWalk,thumb,low,src-alias,Advances navigation probe at animation frame boundaries
+0802F760,Actor_UpdateNavigationStep,thumb,low,src-alias,Walks toward navigation target while animation permits a fixed step
 0802F92C,SceneActorAnimation_UpdateRouteWalk,thumb,low,src-alias,
+0802FB68,Actor_UpdateRunToPosition,thumb,low,src-alias,Moves toward target position using the running animation
 0802FCA8,Actor_SelectPathNodeAction,thumb,low,src-alias,Records the path node identifier and selects a wait turn or movement action from node flags
 0802FD14,SceneCharacter_GetPathNodeState,thumb,low,src-alias,Returns the current node action state within 40 units on both axes or movement state 9 otherwise
 0802FD60,SceneCharacter_UpdateIdleState,thumb,low,src-alias,Selects action 1 and consumes the pending trigger on state entry; idle interpretation is tentative

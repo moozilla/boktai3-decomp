@@ -2,7 +2,7 @@
 #include "global.h"
 #include "player.h"
 void Obj_StepPosition(void *);
-void sub_0802E04C(void *);
+void Actor_EmitTowardNearbyActors(void *);
 u32 Player_GetControlFlags(struct Player *, u16);
 void Collider_SetPosition(void *, void *, u32);
 void ActorShadow_Disable(void *);
@@ -10,7 +10,7 @@ void ActorShadow_Enable(void *);
 void Player_SynchronizeInteractionDisplay(struct Player *p)
 {
     Obj_StepPosition(&p->positionalEffectGroup);
-    sub_0802E04C(&p->positionalEffectGroup);
+    Actor_EmitTowardNearbyActors(&p->positionalEffectGroup);
     if (Player_GetControlFlags(p, 8))
         p->collider.flags |= 4;
     else {

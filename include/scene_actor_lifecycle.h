@@ -6,11 +6,15 @@
 #include "scene_actor_components.h"
 #include "scene_body_api.h"
 #include "display_animation_api.h"
+#include "scene_actor_route.h"
 
 struct SceneActorResourceEntry {
     u16 type;
-    u8 variant, unknown3;
-    void *data;
+    u8 variant, sound;
+    union {
+        void *data;
+        s8 footstepFrames[4];
+    } payload;
 };
 struct SceneActorAnimationEntry {
     u8 kind;
@@ -58,29 +62,83 @@ union SceneActorDisplay {
 struct SceneActorShadow {
     u8 state[0x6C];
 };
+struct SceneActorPositionLink {
+    u16 id, unknown2;
+    struct ContactPosition *position;
+};
+struct SceneActorParameters {
+    u32 values[4];
+};
+struct SceneActorNavigationProbe {
+    u8 unknown0[0xC];
+    struct ContactPosition current;
+    u8 unknown14[8];
+    struct ContactPosition target;
+    u8 unknown24[0x20];
+};
+union SceneActorInteraction {
+    s8 cues[4];
+    struct {
+        u8 firstDirection, secondDirection, turnRate, turnState;
+    } turning;
+};
+struct SceneActorPacket {
+    u16 id;
+    u8 kind, zero;
+    u16 reserved;
+    u8 command, count;
+    u16 args[8];
+    u8 unknown18[0x28];
+};
 struct SceneActor {
-    u8 active, variant;
-    u8 unknown2[0x19];
-    u8 direction;
+    u8 active, variant, stage, phase, state, action, unknown6, finished;
+    u8 commandEntered, animationEntered, flashing, enabled;
+    u8 unknownC[2];
+    u16 flags;
+    u8 unknown10[4];
+    u32 ticks;
+    u8 animationPhase, facing4, facing8, direction;
     u16 defaultPaletteBank, paletteBank;
-    u8 unknown20[0x3C];
+    u8 unknown20[0x20];
+    u32 script;
+    struct SceneActorParameters parameters;
+    struct ContactPosition target;
     struct SceneActorBody body;
-    struct ContactPosition positionOffset;
+    struct SceneActorPositionLink positionLink;
     u8 unknownAC[0x28];
     union SceneActorDisplay drawable;
-    u8 unknown168[0x8A];
-    u8 motionRegistered;
-    u8 unknown1F3[0x25];
-    u8 shadowKind;
-    u8 unknown219[0x2B];
+    u8 messageReceiver[0x34];
+    struct SceneActorRouteCursor route;
+    struct SceneActorNavigationProbe probe;
+    u8 modeA, modeB;
+    u16 modeValue;
+    u8 routeProgress, hasDestination, motionRegistered;
+    s8 routeId;
+    s16 radiusA, radiusB;
+    int radiusA32, radiusB32, radiusASquared, radiusBSquared;
+    int distance, distanceSquared;
+    u16 routeMode, nodeId, routePoint;
+    u8 soundEnabled, routeStepFinished, shadowKind, savedAngle;
+    u8 registered, controlled;
+    int rateA, rateB;
+    u8 probeReady, savedAnimationAngle, nodeFacing, savedState;
+    int rateC;
+    u8 unknown22C[4];
+    u8 hasParameters, paramA, paramB, paramC, paramD, unknown235;
+    u16 cooldown;
+    union SceneActorInteraction interaction;
+    struct ContactPosition destination;
     struct SceneActorShadow shadow;
     u8 unknown2B0[8];
     const struct SceneActorAnimationEntry *animationEntries;
     const struct SceneActorResourceEntry *resourceEntry;
-    u8 unknown2C0[0x10];
+    void *attachment;
+    u32 effectKind;
+    s16 timer, duration;
+    u8 unknown2CC[4];
     void (*callbacks[4])(void *, struct SceneActor *);
     void (*destroy)(void *, struct SceneActor *);
-    u8 unknown2E4[4];
+    int (*query)(struct SceneActor *);
     struct SceneActor *next, *previous;
     u8 unknown2F0[0x94];
 };
@@ -91,7 +149,7 @@ struct SceneActorManager {
     u8 minuteChanged, previousMinute, hour, minute, weather;
     u8 unknown25[3];
     u32 buffer, count[2];
-    u8 unknown34[0x400];
+    struct SceneActorPacket packets[2][8];
     struct ContactPosition *target;
     struct Player *player;
 };

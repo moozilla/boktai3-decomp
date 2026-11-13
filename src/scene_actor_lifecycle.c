@@ -6,7 +6,7 @@ void *Actor_FindResourceData(int type, int variant)
     const struct SceneActorResourceEntry *entry = gUnk_086053D4;
     for (; i < 32; entry++, i++)
         if (entry->type == type && entry->variant == variant)
-            return entry->data;
+            return entry->payload.data;
     return 0;
 }
 
@@ -84,7 +84,7 @@ int Actor_InitMotion(struct SceneActor *actor, int id, const struct ContactPosit
     actor->direction = direction;
     body = &actor->body;
     SceneBody_Init(body, id, position, (u8)direction, 7, actor);
-    result = SceneBody_SetPositionTarget(body, &actor->positionOffset);
+    result = SceneBody_SetPositionTarget(body, &actor->positionLink);
     {
         u32 mask = 4;
         body->flags |= mask;

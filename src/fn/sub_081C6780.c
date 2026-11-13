@@ -8,7 +8,7 @@ struct DirectionCommand {
     struct StateActorPos target;
 };
 s32 Math_Atan2(s32, s32);
-void sub_0802EA90(void);
+void Actor_UpdateWalkToPosition(void);
 
 static inline s32 TargetAngle(struct StateActorPos *target, struct StateActorPos *position)
 {
@@ -78,7 +78,7 @@ void StateActor_ProcessDirectionMessages(struct StateActor *actor)
             actor->enterCommand = 1;
         }
         {
-            void (*update)(void) = sub_0802EA90;
+            void (*update)(void) = Actor_UpdateWalkToPosition;
             actor->prevState = 3;
             actor->stateCallback = update;
         }
