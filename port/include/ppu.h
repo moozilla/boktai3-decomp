@@ -43,6 +43,13 @@ void ppu_render_scanline(Ppu *ppu, const PpuMemory *memory, unsigned y,
 /* Convenience for a frame with constant memory/registers (no raster effects). */
 void ppu_render_frame(Ppu *ppu, const PpuMemory *memory,
                       uint16_t pixels[PPU_WIDTH * PPU_HEIGHT]);
+/* mGBA software-renderer presentation: 0x00BBGGRR pixels. This path expands
+ * palette channels before color effects, matching mGBA 0.11 screenshots.
+ * RGB555 above retains the GBA's 5-bit color-effect arithmetic. */
+void ppu_render_scanline_rgb888(Ppu *ppu, const PpuMemory *memory, unsigned y,
+                                uint32_t pixels[PPU_WIDTH]);
+void ppu_render_frame_rgb888(Ppu *ppu, const PpuMemory *memory,
+                             uint32_t pixels[PPU_WIDTH * PPU_HEIGHT]);
 /* Expand each 5-bit channel to 8 bits, replicating its high bits (mGBA 0.11). */
 uint32_t ppu_rgb888(uint16_t color);
 

@@ -8,7 +8,7 @@
 static void (*ppu_original_draw)(struct GBAVideoRenderer *, int);
 static uint16_t (*ppu_original_write)(struct GBAVideoRenderer *, uint32_t, uint16_t);
 static Ppu ppu_capture_state;
-static uint16_t ppu_capture_frame[PPU_WIDTH * PPU_HEIGHT];
+static uint32_t ppu_capture_frame[PPU_WIDTH * PPU_HEIGHT];
 static unsigned ppu_capture_lines;
 #define PPU_RECORD_SIZE (16 + PPU_IO_SIZE + PPU_PALETTE_SIZE + PPU_VRAM_SIZE + PPU_OAM_SIZE)
 static uint8_t ppu_capture_records[PPU_RECORD_SIZE * PPU_HEIGHT];
@@ -46,7 +46,7 @@ static void ppu_capture_draw(struct GBAVideoRenderer *renderer, int y)
     memcpy(record, m.palette, PPU_PALETTE_SIZE); record += PPU_PALETTE_SIZE;
     memcpy(record, m.vram, PPU_VRAM_SIZE); record += PPU_VRAM_SIZE;
     memcpy(record, m.oam, PPU_OAM_SIZE);
-    ppu_render_scanline(&ppu_capture_state, &m, (unsigned)y, ppu_capture_frame + y * PPU_WIDTH);
+    ppu_render_scanline_rgb888(&ppu_capture_state, &m, (unsigned)y, ppu_capture_frame + y * PPU_WIDTH);
     ++ppu_capture_lines;
     ppu_original_draw(renderer, y);
 }
@@ -99,7 +99,7 @@ static void ppu_capture_shot(const char *name)
     if (!out) { perror(path); exit(1); }
     fprintf(out, "P6\n240 160\n255\n");
     for (i = 0; i < PPU_WIDTH * PPU_HEIGHT; ++i) {
-        uint32_t color = ppu_rgb888(ppu_capture_frame[i]);
+        uint32_t color = ppu_capture_frame[i];
         uint8_t rgb[3] = {color, color >> 8, color >> 16};
         if ((fb[i] & 0xffffff) != color) ++mismatches;
         fwrite(rgb, 1, 3, out);

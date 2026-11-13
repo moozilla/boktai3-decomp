@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     }
     fprintf(out, "P6\n240 160\n255\n");
     for (y = 0; y < PPU_HEIGHT; ++y) {
-        uint16_t pixels[PPU_WIDTH];
+        uint32_t pixels[PPU_WIDTH];
         if (fread(record, 1, sizeof(record), in) != sizeof(record)) {
             fprintf(stderr, "short PPU capture at line %u\n", y); return 1;
         }
@@ -36,9 +36,9 @@ int main(int argc, char **argv)
         ppu.affine_y[0] = read32(record + 4);
         ppu.affine_x[1] = read32(record + 8);
         ppu.affine_y[1] = read32(record + 12);
-        ppu_render_scanline(&ppu, &m, y, pixels);
+        ppu_render_scanline_rgb888(&ppu, &m, y, pixels);
         for (x = 0; x < PPU_WIDTH; ++x) {
-            uint32_t color = ppu_rgb888(pixels[x]);
+            uint32_t color = pixels[x];
             uint8_t rgb[3] = {color, color >> 8, color >> 16};
             fwrite(rgb, 1, 3, out);
         }

@@ -27,6 +27,14 @@ def compiler():
     return os.environ.get("CC", str(LLVM) if LLVM.exists() else "clang")
 
 
+def wasm_linker():
+    configured = os.environ.get("WASM_LD")
+    if configured:
+        return str(Path(configured).expanduser())
+    fallback = Path.home() / "git/boktai3-decomp/build/toolchain/wasm-ld"
+    return str(fallback) if fallback.exists() else shutil.which("wasm-ld")
+
+
 def build(capture=False, sanitize=False):
     BUILD.mkdir(parents=True, exist_ok=True)
     flags = ["-std=c99", "-O2", "-Wall", "-Wextra", "-Werror", "-Iport/include"]
@@ -35,6 +43,12 @@ def build(capture=False, sanitize=False):
     run([compiler(), *flags, "port/tests/ppu_render.c", "port/ppu/ppu.c", "-o", BUILD / "ppu_render"])
     run([compiler(), "--target=wasm32", *flags[:6], "-Iport/include", "-ffreestanding", "-c",
          "port/ppu/ppu.c", "-o", BUILD / "ppu.wasm.o"])
+    linker = wasm_linker()
+    if not linker:
+        raise RuntimeError("wasm-ld not found; set WASM_LD to its executable path")
+    run([compiler(), "--target=wasm32", "-nostdlib", "-fuse-ld=" + linker,
+         "-Wl,--no-entry", "-Wl,--export-all", BUILD / "ppu.wasm.o", "-o", BUILD / "ppu.wasm"])
+    run(["node", "port/tests/ppu_wasm.mjs", BUILD / "ppu.wasm"])
     if not capture:
         return
     source = (ROOT / "tools/emu/harness.c").read_text()
@@ -67,8 +81,12 @@ def build(capture=False, sanitize=False):
 def compare(directory):
     from PIL import Image, ImageChops
     rows = []
-    for dump in sorted(directory.glob("*.ppu*")):
-        name = dump.name.split(".ppu")[0]
+    names = {p.name.split(".ppu")[0] for p in directory.glob("*.ppu*")
+             if p.name.endswith((".ppu", ".ppu.gz"))}
+    for name in sorted(names):
+        dump = directory / (name + ".ppu")
+        if not dump.exists():
+            dump = directory / (name + ".ppu.gz")
         reference = directory / f"{name}.ppm"
         output = directory / f"{name}.port.ppm"
         opener = gzip.open if dump.suffix == ".gz" else open
@@ -79,7 +97,7 @@ def compare(directory):
         if expected.size != (240, 160) or actual.size != expected.size:
             raise RuntimeError(f"bad frame size: {name}")
         diff = ImageChops.difference(expected, actual)
-        count = sum(pixel != (0, 0, 0) for pixel in diff.getdata())
+        count = sum(any(p) for p in zip(*[iter(diff.tobytes())] * 3))
         if count:
             diff.point(lambda c: 255 if c else 0).save(directory / f"{name}.diff.png")
         rows.append(dict(scene=name, mismatches=count, pixels=38400))
@@ -97,6 +115,7 @@ def main():
     parser.add_argument("--rom", type=Path, default=Path("baserom.gba"))
     parser.add_argument("--save", type=Path, help="battery save (copied by harness)")
     parser.add_argument("--sanitize", action="store_true")
+    parser.add_argument("--wasm", action="store_true", help="also replay every capture in Node")
     parser.add_argument("--build-only", action="store_true")
     args = parser.parse_args()
     build(capture=bool(args.capture), sanitize=args.sanitize)
@@ -111,10 +130,14 @@ def main():
         run([BUILD / "ppu_capture", args.rom.resolve(), args.capture.resolve(), directory], env=env,
             stdout=subprocess.DEVNULL)
         for path in directory.glob("*.ppu"):
-            with path.open("rb") as src, gzip.open(str(path) + ".gz", "wb") as dst:
+            with path.open("rb") as src, gzip.open(str(path) + ".gz.tmp", "wb", compresslevel=1) as dst:
                 shutil.copyfileobj(src, dst)
+            Path(str(path) + ".gz.tmp").replace(str(path) + ".gz")
             path.unlink()
-    sys.exit(bool(compare(directory)))
+    mismatches = compare(directory)
+    if args.wasm:
+        run(["node", "port/tests/ppu_wasm.mjs", BUILD / "ppu.wasm", directory])
+    sys.exit(bool(mismatches))
 
 
 if __name__ == "__main__":

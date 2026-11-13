@@ -208,7 +208,7 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
         unsigned shape = a >> 14, size = b >> 14;
         unsigned affine = a & 0x100, double_size = affine && (a & 0x200);
         unsigned kind = (a >> 10) & 3;
-        unsigned width, height, boxw, boxh, row;
+        unsigned width, height, boxw, boxh, row, draw_width;
         int left, column, pa = 256, pb = 0, pc = 0, pd = 256;
         if (shape == 3 || kind == 3 || (!affine && (a & 0x200))) continue;
         width = sizes[shape][size][0];
@@ -227,7 +227,15 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
             pd = (int16_t)read16(m->oam, matrix + 30);
             cycles -= 10;
         }
-        for (column = 0; column < (int)boxw; ++column) {
+        draw_width = boxw;
+        if (a & 0x1000) {
+            unsigned mosaic = read16(m->io, 0x4c);
+            unsigned horizontal = ((mosaic >> 8) & 15) + 1;
+            int right = left + (int)boxw;
+            if (right > 0 && right < PPU_WIDTH && right % (int)horizontal)
+                draw_width += horizontal - right % (int)horizontal;
+        }
+        for (column = 0; column < (int)draw_width; ++column) {
             int x = left + column;
             int ox = column, oy = (int)row, sx, sy;
             unsigned tile, address, index, priority = (c >> 10) & 3;
@@ -240,6 +248,11 @@ static void sprites(const PpuMemory *m, unsigned display, unsigned y,
                 /* OBJ horizontal mosaic is aligned to screen coordinates. */
                 ox -= x % (((mosaic >> 8) & 15) + 1);
                 oy -= y % (((mosaic >> 12) & 15) + 1);
+                if (oy < 0) oy = 0;
+                if (!affine) {
+                    if (ox < 0) ox = 0;
+                    if (ox >= (int)width) ox = (int)width - 1;
+                }
             }
             if (affine) {
                 int cx = ox - (int)boxw / 2, cy = oy - (int)boxh / 2;
@@ -297,30 +310,39 @@ static void insert(Pixel p, Pixel *top, Pixel *second)
     }
 }
 
-static uint16_t blend(uint16_t a, uint16_t b, unsigned eva, unsigned evb)
+static uint32_t blend(uint32_t a, uint32_t b, unsigned eva, unsigned evb, unsigned bits)
 {
     unsigned channel, out = 0;
-    for (channel = 0; channel < 15; channel += 5) {
-        unsigned value = (((a >> channel) & 31) * eva + ((b >> channel) & 31) * evb) >> 4;
-        if (value > 31) value = 31;
+    for (channel = 0; channel < bits * 3; channel += bits) {
+        unsigned maximum = (1u << bits) - 1;
+        unsigned value = (((a >> channel) & maximum) * eva + ((b >> channel) & maximum) * evb) >> 4;
+        if (value > maximum) value = maximum;
         out |= value << channel;
     }
-    return (uint16_t)out;
+    return out;
 }
 
-static uint16_t brightness(uint16_t color, unsigned amount, unsigned effect)
+static uint32_t brightness(uint32_t color, unsigned amount, unsigned effect, unsigned bits)
 {
     unsigned channel, out = 0;
-    for (channel = 0; channel < 15; channel += 5) {
-        unsigned value = (color >> channel) & 31;
-        if (effect == 2) value += ((31 - value) * amount) >> 4;
+    for (channel = 0; channel < bits * 3; channel += bits) {
+        unsigned maximum = (1u << bits) - 1;
+        unsigned value = (color >> channel) & maximum;
+        if (effect == 2) value += ((maximum - value) * amount) >> 4;
+        else if (bits == 8 && channel != 0) value = (value * (16 - amount)) >> 4;
         else value -= (value * amount) >> 4;
         out |= value << channel;
     }
-    return (uint16_t)out;
+    return out;
 }
 
-void ppu_render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, uint16_t *out)
+static void store_pixel(void *out, unsigned x, uint32_t color, unsigned bits)
+{
+    if (bits == 8) ((uint32_t *)out)[x] = color;
+    else ((uint16_t *)out)[x] = (uint16_t)color;
+}
+
+static void render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, void *out, unsigned bits)
 {
     unsigned display, mode, x, bg, i;
     Pixel objects[PPU_WIDTH];
@@ -336,8 +358,9 @@ void ppu_render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, uint16_t *out
     for (x = 0; x < PPU_WIDTH; ++x) {
         Pixel top = {0, 5, 4, 0, 1}, second = {0, 5, 4, 0, 0};
         unsigned mask, control, effect, eva, evb, evy;
+        uint32_t color, below;
         if (display & 0x80) {
-            out[x] = 0x7fff;
+            store_pixel(out, x, bits == 8 ? 0xffffff : 0x7fff, bits);
             continue;
         }
         top.color = palette(m, 0);
@@ -360,19 +383,27 @@ void ppu_render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, uint16_t *out
         if (eva > 16) eva = 16;
         if (evb > 16) evb = 16;
         if (evy > 16) evy = 16;
-        out[x] = top.color;
-        if (!(mask & 32)) continue;
-        if ((top.semi || (effect == 1 && (control & (1 << top.layer)))) &&
-            second.visible && (control & (0x100 << second.layer)))
-            out[x] = blend(top.color, second.color, eva, evb);
-        else if ((effect == 2 || effect == 3) && (control & (1 << top.layer)))
-            out[x] = brightness(top.color, evy, effect);
+        color = bits == 8 ? ppu_rgb888(top.color) : top.color;
+        below = bits == 8 ? ppu_rgb888(second.color) : second.color;
+        if (mask & 32) {
+            if ((top.semi || (effect == 1 && (control & (1 << top.layer)))) &&
+                second.visible && (control & (0x100 << second.layer)))
+                color = blend(color, below, eva, evb, bits);
+            else if ((effect == 2 || effect == 3) &&
+                     ((control & (1 << top.layer)) ||
+                      (bits == 8 && top.semi &&
+                       (control & (0x2000 | (display & 0x0f00))))))
+                color = brightness(color, evy, effect, bits);
+        }
+        store_pixel(out, x, color, bits);
     }
     if (read16(m->io, 2) & 1) {
         for (x = 0; x < PPU_WIDTH; x += 2) {
-            uint16_t a = out[x], b = out[x + 1];
-            out[x] = (a & ~0x3e0) | (b & 0x3e0);
-            out[x + 1] = (b & ~0x3e0) | (a & 0x3e0);
+            unsigned mask = bits == 8 ? 0xff00 : 0x3e0;
+            uint32_t a = bits == 8 ? ((uint32_t *)out)[x] : ((uint16_t *)out)[x];
+            uint32_t b = bits == 8 ? ((uint32_t *)out)[x + 1] : ((uint16_t *)out)[x + 1];
+            store_pixel(out, x, (a & ~mask) | (b & mask), bits);
+            store_pixel(out, x + 1, (b & ~mask) | (a & mask), bits);
         }
     }
     for (i = 0; i < 2; ++i) {
@@ -380,6 +411,23 @@ void ppu_render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, uint16_t *out
         ppu->affine_y[i] = wrap_reference((int64_t)ppu->affine_y[i] + (int16_t)read16(m->io, 0x26 + i * 16));
     }
     ppu->next_line = y + 1;
+}
+
+void ppu_render_scanline(Ppu *ppu, const PpuMemory *m, unsigned y, uint16_t *out)
+{
+    render_scanline(ppu, m, y, out, 5);
+}
+
+void ppu_render_scanline_rgb888(Ppu *ppu, const PpuMemory *m, unsigned y, uint32_t *out)
+{
+    render_scanline(ppu, m, y, out, 8);
+}
+
+void ppu_render_frame_rgb888(Ppu *ppu, const PpuMemory *m, uint32_t *out)
+{
+    unsigned y;
+    ppu_begin_frame(ppu, m);
+    for (y = 0; y < PPU_HEIGHT; ++y) ppu_render_scanline_rgb888(ppu, m, y, out + y * PPU_WIDTH);
 }
 
 void ppu_render_frame(Ppu *ppu, const PpuMemory *m, uint16_t *out)

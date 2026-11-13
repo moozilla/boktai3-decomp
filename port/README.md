@@ -4,9 +4,15 @@
 
 `ppu/ppu.c` is a portable C99 scanline renderer. `include/ppu.h` defines its public
 interface. It has no mGBA, libc, ROM, host-pointer-width or platform dependency.
-Both native and freestanding wasm32 objects compile with Clang. All input arrays
+Native and freestanding wasm32 objects compile with Clang, and the suite links
+a real WebAssembly module and runs it in Node. Set `WASM_LD` to override the
+linker; the fallback is `~/git/boktai3-decomp/build/toolchain/wasm-ld`. All input arrays
 use GBA little-endian byte order and may be unaligned. The output is 240 by 160
-RGB555 pixels, with an optional RGB888 conversion helper.
+RGB555 pixels. The `*_rgb888` functions instead return `0x00BBGGRR`
+pixels using mGBA software-renderer presentation arithmetic: colors expand
+before blending, and darkening rounds the green/blue channels down. RGB555
+retains 5-bit GBA color arithmetic. The regression suite explicitly uses RGB888
+when comparing against mGBA 0.11 screenshots.
 
 The renderer implements text backgrounds in every size and both depths, affine
 backgrounds, bitmap modes 3/4/5, regular and affine sprites, sprite priorities,
@@ -27,7 +33,7 @@ build/venv/bin/python port/tests/ppu_regression.py --build-only
 build/venv/bin/python port/tests/ppu_regression.py \
   --capture port/tests/ppu_boot.txt --save tests/saves/ShinBok2.sav \
   --out build/ppu/boot
-build/venv/bin/python port/tests/ppu_regression.py --out build/ppu/boot
+build/venv/bin/python port/tests/ppu_regression.py --out build/ppu/boot --wasm
 ```
 
 The capture command builds a private instrumented copy of the existing headless
@@ -40,7 +46,8 @@ the repository. Replay needs only the portable renderer and Pillow. Reports
 include per-scene pixel mismatch counts and a JSON result; failures produce a
 visible difference image. Any mismatch makes the command fail.
 
-The first vertical slice matches three startup captures (zero pixel differences).
+Three startup captures and twelve menu/field captures match with zero pixel
+differences. All twelve menu/field captures also match in Node WebAssembly.
 Gameplay coverage and synthetic tests are being expanded; the implemented feature
 list is not yet a claim of hardware-perfect behavior for every edge case. A
 snapshot taken after a frame cannot reproduce HBlank effects, which is why the
