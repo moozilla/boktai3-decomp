@@ -1421,3 +1421,32 @@ Next: find a real helper or expression that shortens owner's measured lifetime
 by two insns, or lengthens contactFlags by two, without moving emitted code.
 The exact priority threshold and full matching knob isolate that remaining task.
 Scratch variants are under build/cx/work/SceneActorContacts_SelectForActor/.
+
+### SceneActorAnimation_SelectDirectionalEntry (08076034)
+
+- Remaining concession: one `DEBUG_NOP()` between the entry flags and value reads.
+  Source is unchanged. Removing it gives 42 ROM / 32 draft differences, shape 18.
+- Confirmed mechanism: regmove ties `flags = index | entryFlags` to the dying
+  mirror input (`index`, insn 113 in the plain draft). `AGBCC_NOTIE=113` alone
+  gives a complete 320-byte MATCH. The apparent entry/variant-pointer priority
+  inversion is downstream: raising entry priority as well makes the result worse.
+- Saved pin-free draft repeats the variant-address, mirror-value, and entry-flag
+  reads in the two direction arms. This prevents the OR tie; jump2 shares the
+  reads. It leaves 9/9 differences, shape 2: the mirror pointer loses its early
+  r1-to-r2 copy, and the variant address is copied in one arm instead of rebuilt
+  at the join. CSE chooses the existing frame-address class; raising variantReload
+  priority worsens it. A probe of both this draft and the plain draft found no
+  single CSE/PRE/loop decision that fixes the remaining differences.
+- Tried: matched siblings' direction and selection helpers; entry-based selector
+  helper; byte/halfword read helpers; returning the mirror from the direction
+  helper; flags/entry/mirror narrowing; full/narrow union views, initialized unions,
+  aggregate entry copy; switch and goto direction forms; two through five repeated
+  tail statements; splitting force detection and flag assignment between arms.
+  The flag-arm rewrite reaches shape 2 but moves the copy into the force branch.
+  Union forms either retain the tie or introduce masks/reordered byte loads.
+- Next: find a natural helper/control-flow boundary between the mirror load and OR
+  that survives through regmove but disappears at jump2, or repair the direction
+  pointer class/allocation in the saved arm-read draft. The next two selectors
+  share this animation helper family and may supply the missing form.
+- Evidence: `build/cx/work/SceneActorAnimation_SelectDirectionalEntry/`; persistent
+  search `build/matchsearch/SceneActorAnimation_SelectDirectionalEntry`, `arm-loads`.
