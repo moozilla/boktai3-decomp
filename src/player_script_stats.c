@@ -1,4 +1,5 @@
 #include "player_script.h"
+#include "game_state.h"
 
 s32 Script_GetActorIndex(void)
 {
@@ -296,3 +297,30 @@ void ScriptActor_ClearSlotsFromScript(void)
     }
 }
 
+u32 ScriptActor_TestCounter628FromScript(void)
+{
+    struct Player *player;
+    s32 actorIndex = Script_GetActorIndex();
+    player = gPlayers[actorIndex];
+    if (player != 0) {
+        u32 slot = player->timedEventSlot;
+        struct GameState *state = gGameState;
+        if (slot[state->counters628] > 0)
+            goto positiveCounter;
+    }
+    return 0;
+positiveCounter:
+    return 1;
+}
+
+void ScriptActor_ClearCounter628FromScript(void)
+{
+    struct Player *player;
+    s32 actorIndex = Script_GetActorIndex();
+    player = gPlayers[actorIndex];
+    if (player) {
+        u32 slot = player->timedEventSlot;
+        struct GameState *state = gGameState;
+        slot[state->counters628] = 0;
+    }
+}
