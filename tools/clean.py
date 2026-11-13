@@ -20,9 +20,13 @@ these go:
                                     linked ROMs (make, make mod, make shifttest)
   build/permute/FUNC/               permuter folders of functions now matched in C
   with --runs: cov-*.{read,exec,word32,ewram_exec,iwram_exec} and total.* of the
-               same kinds anywhere under build/ (re-run the harness to remake them)
+               same kinds anywhere under build/ (re-run the harness to remake them),
+               and every folder directly under build/text/ (harness run output:
+               screenshots and RAM dumps from text checks; removed from the main
+               checkout even while it is in use, since no build writes them)
 
-Never touched: build/text/ (Studio text edits), build/venv/ and build/tools/,
+Never touched: build/text/'s own files (bank.tsv holds Studio text edits),
+build/venv/ and build/tools/,
 the tool state folders (namer, foundry, unitize, showcase, research...), every
 .c/.diff/.txt/.log/.json/.md/.tsv/.csv/.py/.sh file outside the folders above,
 savestates and saves, wip/, gen/ (regenerated, but slow), and anything
@@ -75,11 +79,13 @@ def busy_dirs():
     """Current directories of running processes that do work (not idle shells or agent sessions,
     whose folders stay open while they wait)."""
     r = subprocess.run(["lsof", "-a", "-d", "cwd", "-Fpcn"], capture_output=True, text=True)
-    out, cmd = [], ""
+    out, cmd, pid = [], "", 0
     for l in r.stdout.split("\n"):
-        if l.startswith("c"):
+        if l.startswith("p"):
+            pid = int(l[1:])
+        elif l.startswith("c"):
             cmd = l[1:]
-        elif l.startswith("n/") and cmd not in IDLE and not cmd.startswith("Claude"):
+        elif l.startswith("n/") and pid != os.getpid() and cmd not in IDLE and not cmd.startswith("Claude"):
             out.append((cmd, l[1:]))
     return out
 
@@ -120,6 +126,15 @@ def matched_functions(wt):
     return names
 
 
+def text_runs(wt):
+    """Harness run folders directly under build/text/ (screenshots, RAM dumps)."""
+    text = os.path.join(wt, "build", "text")
+    if not os.path.isdir(text) or os.path.islink(text):
+        return []
+    return [os.path.join(text, d) for d in sorted(os.listdir(text))
+            if os.path.isdir(os.path.join(text, d)) and not os.path.islink(os.path.join(text, d))]
+
+
 def targets(wt, runs):
     b = os.path.join(wt, "build")
     if not os.path.isdir(b) or os.path.islink(b):
@@ -132,6 +147,7 @@ def targets(wt, runs):
         done = matched_functions(wt)
         out += [os.path.join(perm, f) for f in os.listdir(perm) if f in done]
     if runs:
+        out += text_runs(wt)
         for dp, dn, fn in os.walk(b):
             dn[:] = [d for d in dn if not os.path.islink(os.path.join(dp, d)) and d not in ("venv", "tools", "text")]
             out += [os.path.join(dp, f) for f in fn if RUN_FILE.match(f)]
@@ -187,7 +203,16 @@ def main():
             continue
         using = in_use(wt, busy)
         if using:
-            print(f"{name}: in use ({', '.join(using)}), skipped")
+            # No build writes build/text/'s run folders, so in the main checkout (where long-lived
+            # helpers like loadguard keep a cwd) they go even while it is in use.
+            ts = text_runs(wt) if a.runs and os.path.realpath(wt) == os.path.realpath(ROOT) else []
+            n = sum(size(t) for t in ts)
+            print(f"{name}: in use ({', '.join(using)}), skipped"
+                  + (f" except {len(ts)} build/text run folders, {n / 1e9:.2f} GB" if n else ""))
+            if n and a.yes:
+                for t in ts:
+                    remove(t)
+            freed += n
             continue
         removable = False
         if a.worktrees and os.path.realpath(wt) != os.path.realpath(ROOT) and \

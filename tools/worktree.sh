@@ -41,7 +41,9 @@ mkdir -p "$DIR/build/scope"
 link "$MAIN/build/scope/agbcc" "$DIR/build/scope/agbcc"  # scope's compiler: tools/scope/build_agbcc.sh
 clone "$SHARED/gen" "$DIR/gen"
 clone "$SHARED/build/res" "$DIR/build/res"
-clone "$SHARED/build/text" "$DIR/build/text"
+# build/text: only its files (bank.tsv, english.tsv...); its folders are harness run output
+mkdir -p "$DIR/build/text"
+for f in "$SHARED"/build/text/*; do [ -f "$f" ] && clone "$f" "$DIR/build/text/${f##*/}"; done
 clone "$SHARED/build/boktai3.elf" "$DIR/build/boktai3.elf"
 # compiled objects with their content-hash stamps: a build here recompiles only what changed
 clone "$SHARED/build/src" "$DIR/build/src"
