@@ -3084,6 +3084,7 @@ addr,name,mode,confidence,source,notes
 08090FEC,Slime_Init,thumb,high,gcl-name,name from GCL key C3BC スライム (Slime); loader called by Slime_Create
 08091E1C,Slime_Create,thumb,high,gcl-name,name from GCL key C3BC スライム (Slime); registry callback
 08091E54,Bee_OnAttackCollision,thumb,low,src-alias,Empty callback installed on the Bee attack collider
+08091E58,Bee_ApplyContactReaction,thumb,low,src-alias,Forwards body contact reaction and randomizes its power with a floor of 20.
 08091F04,Bee_UpdateTurnAnimation,thumb,low,src-alias,
 080921B0,Bee_ResetIdleAnimation,thumb,low,src-alias,Animation callback clearing the transition flag and selecting directional entry 0; idle role is tentative
 080921D4,Bee_ResetReactionAnimation,thumb,low,src-alias,State animation callback clearing the transition flag and selecting directional entry 14; reaction role is tentative
@@ -3097,6 +3098,7 @@ addr,name,mode,confidence,source,notes
 08092BD4,Bee_ResetRoute,thumb,low,src-alias,
 08092E30,Bee_UpdateFlightHeight,thumb,low,src-alias,
 08093000,Bee_InitColliders,thumb,low,src-alias,Initializes the Bee body and attack colliders with their dimensions and callbacks
+08093094,Bee_GetMovementAnimationCode,thumb,low,src-alias,Selects a movement code from curve time and adds six for attack mode.
 08093100,Bee_SetMovementEndpoints,thumb,low,src-alias,Stores the current and destination positions in movement state and resets progress
 08093138,Bee_AdvanceMovementCurve,thumb,low,src-alias,
 08093314,Bee_InitProfile,thumb,low,src-alias,Finds or adds actor profile type 0x14 and stores its handle
@@ -3104,6 +3106,7 @@ addr,name,mode,confidence,source,notes
 08093370,Bee_BeginMoveToPosition,thumb,low,src-alias,Initializes movement endpoints and trajectory then resets action state and faces the destination
 08093414,Bee_GetDirectionalFrameAndFlip,thumb,low,src-alias,Maps an eight-way heading to a mirrored five-frame direction index and flip flag
 0809343C,Bee_TickBehaviorCooldown,thumb,low,src-alias,Decrements the saturating cooldown byte in the Bee behavior state
+0809345C,Bee_BuildMovementCurve,thumb,low,src-alias,Interpolates eight route points and stores a ninth endpoint.
 08093644,Bee_SubVector,thumb,low,src-alias,
 0809366C,SceneActorCollision_FireSecondaryAttack,thumb,low,src-alias,
 08093718,Bee_OnDetectionCheck,thumb,low,src-alias,Detection callback consumes a detection flag and accepts targets within height and distance limits
@@ -3117,6 +3120,7 @@ addr,name,mode,confidence,source,notes
 08093E04,Bee_UpdateReactionPhase,thumb,low,src-alias,
 08093EE4,Bee_ApproachSavedPlayerPosition,thumb,low,src-alias,
 080940A0,Bee_UpdateWanderPause,thumb,low,src-alias,
+080941F4,Bee_FollowAnchorRoute,thumb,low,src-alias,Follows a nine-point curve toward an anchor and retargets at its end.
 0809465C,Bee_InitBehaviorHandlers,thumb,low,src-alias,Installs the Bee behavior state handler table at actor offset 0x28C
 0809466C,Bee_InitReactionHandlers,thumb,low,src-alias,Tentatively installs the shared reaction handler table with a Bee-specific final handler
 0809467C,Bee_OnUpdate,thumb,low,src-alias,Actor update callback adjusts height then dispatches behavior and updates shared state and timers
