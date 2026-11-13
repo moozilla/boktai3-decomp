@@ -377,8 +377,9 @@ no asm.
 
 Draft: `notes/phase3-menus-link/sub_0803198C.c` (2 ROM / 2 draft: the callback constant in r0
 instead of r1). It has no pin; it keeps `(void)*(volatile u8 *)&p->mode;`.
-* The ROM keeps a dead `ldrb` of p->mode (0x182) before ScriptProc_Start. Only a volatile read
-  survives flow, so the original had volatile there too. A `vu8 mode` field changes the earlier
+* The ROM keeps a dead `ldrb` of p->mode (0x182) before ScriptProc_Start.
+  The later dp-menus investigation below disproves the original volatile-only conclusion: identical
+  dispatch arms preserve the read until jump2 removes their test. A `vu8 mode` field changes the earlier
   `p->mode = 0` store (it adds a load), so the cast stays local to the read.
 * `ldr r1, =MessageWindow_ClearTextCompletion; str r1, [r4]`: pseudo 261 is local to block 17,
   born after the `strh` that kills r0 (0xFFFF) and r1 (the wait address). It has no copy
@@ -1272,3 +1273,42 @@ this one initialization would be a concession, so none was added.
 Tool result: scope now resolves names in COMBKEEP, NOEQUIV and canonical-register
 knobs. Previously `AGBCC_COMBKEEP=base` silently did nothing; it now reports that
 the optimized-away name is unavailable and requires its RTL pseudo number.
+
+
+### sub_0803198C (0803198C): volatile read removed, callback pin remains
+
+Tags: #menus #dialogue #matching #compiler
+
+Landed partial: replace the volatile mode read with a switch on `p->mode`, with
+both arms starting the same script. Jump2 merges the startup tails and removes
+the test after flow; the dead byte load remains. `tools/check.py` reports MATCH
+for the 948-byte unit. This corrects the earlier claim that only volatile can
+produce that load. The callback pin is the only remaining concession.
+
+Best completely ordinary draft: `notes/phase3-drafts/dp-menus/sub_0803198C.c`.
+Two instructions differ: callback literal and store use r0 instead of r1.
+`AGBCC_FORCE=261:1` matches on the mode-switch draft. Local allocation sees a
+short block-local callback with no suggestion after the wait store kills both
+r0 and r1, so it chooses r0. The desired address/store order already matches.
+
+Additional C experiments: initialize callback before the wait store (gets r1,
+but loads too early); move initialization across the value-list branch; duplicate
+completion statements in both branches; use a shared callback variable or union
+across the join; aggregate the wait and callback settings; reuse a union for the
+wait and callback; evaluate the wait address before that union; use a nested wait
+assignment; compare dispatch forms; and use direct or conditional callback stores.
+The full-width union gets the callback in r1 but also puts the wait constant in
+r1 before its address calculation (3 / 3). Address-first and nested-assignment
+forms restore the wait sequence but lose the callback register again. A halfword
+union creates partial-value preservation and extra instructions. No new partial
+removes the remaining pin.
+
+Read `update_equiv_regs` in local-alloc.c: it sinks a global constant's single
+initialization next to its use when replacement fails; a same-block local does
+not take that path. Across-branch spellings changed register pressure and code
+order instead of producing the needed r1 suggestion. Persistent store:
+`build/matchsearch/sub_0803198C`, with lifetime, join, aggregate and union proposals
+and the exact diagnostic force result. The guarded move slate has no useful
+statement/copy candidates. Next: identify a real completion-state representation
+that keeps r0 live through the callback store without adding a surviving read,
+or introduces an r1 copy suggestion only at that store.
