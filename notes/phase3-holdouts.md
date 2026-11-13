@@ -1228,3 +1228,38 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-scene1-b (Codex)
+
+### SceneActorRegistry_TestNearestPlayerBounds (08070C24)
+
+Tags: `08070C24` `phase3` `register-allocation` `reload`
+
+Two redundant pins removed and checked MATCH. Seven pins and three barriers
+remain in the landed source. The saved pin-free draft uses existing route
+members and direct bounds expressions; it differs in 40 ROM / 39 draft
+instructions (shape 27), chiefly allocation and stack slots. Bounds spills,
+nearestIndex takes a high register, and bestDifference spills instead of
+occupying r6/r7. Moving vector subtraction to an inline helper and replacing
+the pointer loop with indexing did not resolve those lifetimes; a natural for
+loop worsened instruction shape.
+
+The closest broader partial replaces the two route offset temporaries with
+`SceneActorRegistryResetView.group.homeRoute` members and removes the initial
+player-table pin/barrier. Only the signed delta-x load differs: its zero index
+uses r1 instead of r2. Scope identifies reload choice 6; diagnostic
+`AGBCC_SPILL=6:1` makes that partial MATCH. The preceding player-table reload
+chooses r0. Early category returns, table-first declarations, and direct table
+assignment do not change the decisive rotation. This partial remains only in
+scratch because it is not a stock-compiler match.
+
+Removing the final limit pin swaps component and limit registers. Separate
+block locals, narrower types, and assigning the negated limit still swap them.
+Writing the lower test as `component + limit < 0` fixes allocation but emits
+an add and compare in place of cmn. The component is a multi-set global while
+the limit is local; increasing the limit priority alone did not resolve it.
+Next: recover the original aggregate/vector helper lifetime to keep bounds
+and bestDifference in registers, then revisit the signed bounds predicate.
+Scope's hunk matching also pairs unrelated same-form stack stores/moves in
+this function; investigate value-aware alignment before trusting those why
+messages as allocation evidence.
