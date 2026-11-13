@@ -1228,3 +1228,46 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## dp-monsters (Codex)
+
+Tags: #phase3 #monsters #matching
+
+### Spider_UpdateWanderGoal (080A4018): one pin removed, four pins and one barrier remain
+
+Landed the mask-pin removal: load the first u16 sample, then mask it in a separate
+statement. This prevents regmove from tying the mask to the sample output.
+The complete source unit still matches. The saved pin-free draft is
+`notes/phase3-drafts/dp-monsters/Spider_UpdateWanderGoal.c` (58/60 differing
+instructions, shape 26, 592 bytes against 584).
+
+The diagnostic `AGBCC_NOEQUIV=31,32 AGBCC_FORCE=22:4,29:5,31:6,32:10,35:9`
+matches that draft exactly: input r4, transform r5, table r6, cursor sl, mask sb.
+The original pin-free draft additionally needs `AGBCC_NOTIE=64`; the split sample
+load removes this requirement. NOEQUIV alone leaves 58/58, shape 16.
+
+Tried the offset/page/region table initializer that solved Bat, both pointer
+initializers, getter and initializer lifetimes, direct cursor accesses, shared
+ParticleRandom_ReadSample at each draw, real SceneActorBody fields, and duplicated
+routing tails. Encoded pointers produce separate source/copy pseudos: table source
+spills while its initial copy serves the first two reads. The cursor copy still
+gets an equivalence. The shared second read changes pressure but also shrinks
+the stack frame. These mechanisms and candidates are saved in
+`build/matchsearch/Spider_UpdateWanderGoal` and `build/cx/work/Spider_UpdateWanderGoal`.
+
+Removing only the transform pin differs at the later Chase result: r6 instead
+of r5 (3/3). During global allocation r5 is not yet marked ever-used; the table
+pin makes r6 available to the later result. Raising the goal pointer priority,
+changing result width, reading transform fields earlier, and using the goal
+field directly did not recover the allocation.
+
+Removing ReadCounter's pin and barrier together differs 5/5. `AGBCC_SPILL=7:1`
+matches, proving one reload-rotation step at the counter offset; u16/s16 masks
+do not alter it. The remaining pointer pins must be solved together with
+allocation and reload order. Next: recover a shared random-draw structure that
+keeps both constant pointers live without equivalent rematerializable copies;
+then use the result's allocation order to resolve transform and counter.
+
+Tool gap found: why attributed the sample-mask change to an unrelated later tie
+sharing only the mask. The scope fix now requires both changed registers in a
+fallback tie, avoiding the ineffective NOTIE suggestion.
