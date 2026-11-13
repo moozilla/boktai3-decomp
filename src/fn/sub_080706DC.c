@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u32 disabled, u32 excluded)
@@ -49,45 +48,17 @@ void SceneActorRegistry_ResetCategoryControl(void)
                         value &= mask;
                         *flags = value;
                     }
+                    actor->field104 = zero;
+                    actor->state2A8 = zero;
+                    actor->phase2A9 = zero;
+                    actor->behavior2AA = three;
+                    actor->counter2AC = zero;
+                    actor->field2B1 = one;
                     {
-                        u32 offset = 0x104;
-                        u32 *field;
-                        field = (void *)((u8 *)actor + offset);
-                        *field = zero;
-                    }
-                    {
-                        u32 offset = 0x2a8;
-                        register u8 *field asm("r0");
-                        field = (u8 *)actor + offset;
-                        *field = zero;
-                        {
-                            u32 phaseOffset = 0x2a9;
-                            field = (u8 *)actor + phaseOffset;
-                            *field = zero;
-                        }
-                        offset += 2;
-                        field = (u8 *)actor + offset;
-                        {
-                            u32 state = three;
-                            *field = state;
-                        }
-                        offset += 2;
-                        field = (u8 *)actor + offset;
-                        *(u32 *)field = zero;
-                        {
-                            register u32 enterOffset asm("r1") = 0x2b1;
-                            asm("" : "+r"(enterOffset));
-                            field = (u8 *)actor + enterOffset;
-                            *field = one;
-                        }
-                        offset += 0x24;
-                        {
-                            register u32 *flags asm("r1") = (void *)((u8 *)actor + offset);
-                            u32 value;
-                            value = *flags;
-                            value |= status;
-                            *flags = value;
-                        }
+                        u32 *flags = &actor->flags2D0;
+                        u32 value = *flags;
+                        value |= status;
+                        *flags = value;
                     }
                 }
             }
