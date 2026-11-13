@@ -1228,3 +1228,68 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## cdp-bosses (Codex)
+
+This pass rechecked all nine queue entries against the existing pin-free drafts and preserved the
+best ordinary-C state under `notes/phase3-drafts/cdp-bosses/`. The blocking decisions and next
+experiments are below; the detailed prior experiments remain in the `monsters-bosses` sections
+above.
+
+### Hresvelgr_PlayDescent
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Hresvelgr_PlayDescent.c` (11 ROM / 5 draft). CSE makes
+the input pointer the class head because its final use follows every use of the actor copy. The
+barrier is the only current way to retain both registers. Next: introduce a real control-flow block
+that prevents copy propagation without changing the final else-arm layout.
+
+### Hresvelgr_UpdateBoundaryBarrage
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Hresvelgr_UpdateBoundaryBarrage.c` (2 / 2). Removing the
+keep-alive lets retry global allocation put the random mask in `sl` rather than `ip`; the collision
+mask is no longer live in case 1. Next: recover a natural case-1 use or conflict for `sl`.
+
+### sub_081A14FC
+
+Best draft: `notes/phase3-drafts/cdp-bosses/sub_081A14FC.c` (86 / 82). The random-table view loses
+`r6` to `&gRandomIndex`, and the ROM has one additional spill and a four-byte-larger frame. Next:
+reduce index-address references using the shared sampler shape, then identify the displaced pseudo.
+
+### sub_081A8E08 (Vanargand_UpdateCaptureSetup)
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Vanargand_UpdateCaptureSetup.c` (13 / 9). CSE merges the
+pending-store zero and position-y zero into one constant class. Next: produce the y zero in a
+narrow mode or bitfield operation so it only folds to zero after CSE.
+
+### Vanargand_ApplyPendingDamage
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Vanargand_ApplyPendingDamage.c` (7 / 7). Narrowing the
+flags test fixes the damage/health-address allocation. The remaining constant-one mask is made
+canonical with the earlier display-call argument across CSE's extended path. Next: split that path
+with a natural return/branch form before the count-zero block.
+
+### sub_081D3620 (PlayerParticleCloud_ScatterAnchors)
+
+Best draft: `notes/phase3-drafts/cdp-bosses/PlayerParticleCloud_ScatterAnchors.c` (12 / 12). Local
+allocation prioritizes the coordinate over the random sample; a priority tie matches. Next: find a
+sample spelling with two more random references that combine removes before output.
+
+### Ratatosk_UpdateSunOrbRelocation
+
+Best draft: `notes/phase3-drafts/cdp-bosses/Ratatosk_UpdateSunOrbRelocation.c` (8 / 8, register-only).
+`AGBCC_SPILL=15:1` matches: the ROM makes one additional reload choice between the fading copy and
+case 1's sequence store. Next: make either the stored one or the input address reach reload rather
+than global/local allocation.
+
+### sub_08217430
+
+Best draft: `notes/phase3-drafts/cdp-bosses/sub_08217430.c` (8 ROM / 6 draft). Local allocation gives
+the source bank the call-copy suggestion `r0`; the ROM retains it in `r3`, and forcing that leaves
+the offset/base pair. Next: keep the bank live beyond the call copy through a real subsequent use.
+
+### GameState_SelectRamBase
+
+Best draft: `notes/phase3-drafts/cdp-bosses/GameState_SelectRamBase.c` (1 / 1). CSE canonicalizes the
+addition as offset-plus-base, reversing the ROM's operand order. Next: form the storage base through
+a non-constant-equivalence initializer, potentially a union initializer whose clobber prevents the
+canonicalization.
