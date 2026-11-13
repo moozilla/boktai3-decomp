@@ -7,13 +7,12 @@ Concatenates the inputs' top-level items. Identical repeats (prototypes,
 externs, struct definitions, static helpers, #defines) are kept once; items
 whose name repeats with a different body are reported as conflicts, which must
 be unified (usually into a shared header) before merging. With --write the
-output is written and the inputs are removed (git rm). Run make afterwards:
+output is written and the inputs are removed without changing Git's index. Run the unit check afterwards:
 merging can change code generation only through such declarations.
 """
 import argparse
 import os
 import re
-import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -130,9 +129,18 @@ def main():
     names = [n for p in a.inputs for n in c_functions(os.path.join(ROOT, p))]
     print(f"{len(a.inputs)} files -> {a.out}: {len(names)} functions")
     if a.write:
-        subprocess.run(["git", "rm", "-q"] + [p for p in a.inputs if os.path.abspath(p) != os.path.abspath(a.out)],
-                       cwd=ROOT, check=True)
-        open(os.path.join(ROOT, a.out), "w").write(text)
+        write_merge(a.out, a.inputs, text)
+
+
+def write_merge(output, inputs, text):
+    """Publish the merged source before removing inputs; leave staging to the caller."""
+    destination = os.path.abspath(os.path.join(ROOT, output))
+    with open(destination, "w") as stream:
+        stream.write(text)
+    for path in inputs:
+        source = os.path.abspath(os.path.join(ROOT, path))
+        if source != destination:
+            os.unlink(source)
 
 
 if __name__ == "__main__":

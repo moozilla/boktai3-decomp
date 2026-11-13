@@ -1,13 +1,25 @@
 import sys
 import unittest
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from merge_unit import items
+from merge_unit import items, write_merge
 from progress import _bodies
 
 
 class FunctionBoundaries(unittest.TestCase):
+    def test_write_merge_preserves_output_input_and_needs_no_git_repository(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "unit.c"
+            other = Path(directory) / "other.c"
+            output.write_text("void First(void) {}")
+            other.write_text("void Second(void) {}")
+            merged = output.read_text() + "\n" + other.read_text()
+            write_merge(str(output), [str(output), str(other)], merged)
+            self.assertEqual(output.read_text(), merged)
+            self.assertFalse(other.exists())
+
     def test_punctuation_in_multiline_comments_stays_in_its_function(self):
         source = """void Startup(void)
 {
