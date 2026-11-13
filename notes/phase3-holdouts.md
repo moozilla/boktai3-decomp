@@ -1433,3 +1433,34 @@ tails shareable and gives stock MATCH (full unit, 20,516 bytes).
 Count-up palette copying and union display pointers retained 23/23. Hoisting
 the display pointer or removing source's distinct lifetime changed shape.
 Repeating the entire script/heading tail was too broad (23/35).
+
+### TetherActor_UpdateWorldPosition (0804AF80): three concessions removed
+
+Landed the typed ContactPosition x/y/z stores in place of u16 indexing: these
+member stores preserve the display-pointer reloads, removing both memory
+barriers. A u16 shake value removes its r0 pin while preserving the addition
+operand allocation; narrowing coordinate too breaks it (26/24), while a signed
+value leaves 7/9. The named displayOffsetY field also matches. Retain the
+existing offset-variable assignments for now: deleting all of them changes
+later move2add reuse and reload rotation (11/11). Eight pins and three barriers
+remain. Stock full tether-actor unit: MATCH (20,516 bytes).
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_UpdateWorldPosition.c`
+(25/24, shape 7), improved from the current simple removal's 43/38 and old
+field-effects draft's 67/64. Its display region now matches; remaining problems
+are terrain-store address reuse, previous-value registers and final copy scratch.
+
+The final copy alone becomes a plain targetPosition struct assignment plus
+named heading store with only 3/3 differing (offset scratch r3 versus ROM r0).
+`AGBCC_SPILL=13:2` gives MATCH on that isolated tail-struct candidate. A local
+pointer, pointer union, inline copy helper and u64 copy keep the same difference;
+a temporary struct/union changes load/store shape (5/5), builtin memcpy is 10/10.
+Removing the previous-height r2 pin alongside this tail is also just 3/3, so a
+corrected scratch decision could remove that pin too. Keeping only the old
+offset pin/barrier with the struct copy worsens to 10/10.
+
+The full clean draft still uses a subtract of two for height's address where
+ROM loads 0x129 in r4, then previousSlope/Height/Attributes need r0 destinations
+and r4/r2/r4 samples. No combined matching override was established. Next:
+change the terrain/previous-field C to make the needed reload rotation before
+the final struct copy, then remove its six remaining copy/heading concessions.
