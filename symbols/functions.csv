@@ -4933,12 +4933,14 @@ addr,name,mode,confidence,source,notes
 08121EE0,SceneEffect863A_LoadResources,thumb,low,src-alias,Loads animation data resource 863A and stores the shared script sequence resource.
 08121F0C,SceneSpriteBurst_InitManager,thumb,low,src-alias,Loads shared sprite and animation resources and publishes the singleton; burst identity is tentative
 08121F24,SceneSpriteBurst_EnsureSingleton,thumb,low,src-alias,Returns the existing burst manager or creates and initializes its task
+08121F7C,SceneSpriteBurst_Shutdown,thumb,low,cleanup,Tentative empty shutdown hook following the burst manager reset
 08121F80,SceneActor14_OnColliderContact,thumb,low,src-alias,Empty contact callback installed on category 14 actor colliders
 08121F84,SpriteEffect_InitCollider,thumb,low,src-alias,
 08122020,SpriteEffectPool_AllocateSlot,thumb,low,src-alias,
 08122068,SpriteEffect_UpdateFallingShard,thumb,low,src-alias,
 0812224C,SpriteEffect_UpdateBlinkAndExpire,thumb,low,src-alias,
 081222F4,SceneActor14_GetFacingAndFlip,thumb,low,src-alias,Quantizes the actor angle into two facing variants and a mirrored-half flag
+0812231C,SpriteEffect_Spawn,thumb,low,cleanup,Forwards explicit motion and attack properties to the effect pool
 08122338,SpriteEffect_SpawnTowardObject,thumb,low,src-alias,
 0812247C,SpriteEffect_SpawnWithMotion,thumb,low,src-alias,
 0812254C,SpriteEffectPool_Update,thumb,low,src-alias,
@@ -4946,6 +4948,7 @@ addr,name,mode,confidence,source,notes
 081225F0,SceneActor14_InitManager,thumb,low,src-alias,Clears the occupied-slot mask and loads shared animation data for category 14 actors
 08122610,SceneActor14_EnsureSingleton,thumb,low,src-alias,Returns or creates the shared task used by registry category 14 actors
 0812265C,SceneActor14_ResetSingleton,thumb,low,src-alias,Clears the category 14 manager pointer during scene reset
+08122668,SceneActor14_Shutdown,thumb,low,cleanup,Tentative empty shutdown hook following the singleton reset
 0812266C,SceneActor14_UpdateAnimState,thumb,low,src-alias,
 08122824,SceneScheduledEffect_UpdateEntry,thumb,low,src-alias,Processes an effect entry then refreshes its active collider and advances its frame counter
 08122868,SceneScheduledEffect_FinalizeEntry,thumb,low,cleanup,Empty finalization hook
