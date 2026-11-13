@@ -1864,6 +1864,16 @@ Each was read from the compiler source and confirmed on a live draft.
    so p wins and keeps its own register. BreakableBarrier_SetPosition (five pins and a barrier)
    matched once its `return input;` was dropped. The caller ignores the value.
 
+150. **Reuse a switch's mask variable for a case-local decode to make the mask global and leave
+   r0 for the decoded value.** In WirelessExchange_OnPacketReceived (08037DEC),
+   `u32 kind = payload.halves.high; kind &= 3;` had a block-local 3 and the following byte-store
+   zero in r0, so the cross-block kind got r1. The ROM has kind in r0 and both constants in r1.
+   `AGBCC_FORCE=89:1,93:1` confirmed the two conflicts in that draft. Writing
+   `mask = 3; kind &= mask;` with the same function-scope mask used for the packet's handshake
+   flags makes it a multi-set global pseudo. Local allocation no longer reserves r0 for the
+   decode's constant, and normal allocation gives the ROM's registers. The existing per-case
+   shift scopes plus this reuse removed both pins and matched the complete callback and unit.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

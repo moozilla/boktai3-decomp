@@ -314,6 +314,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/directional-force_2026-10-14.md](../notes/directional-force_2026-10-14.md) | Directional force controller, 080510B8–080515C0 |  | 2 |
 | [notes/display-track_2026-10-14.md](../notes/display-track_2026-10-14.md) | Script-controlled display tracks | *#scripts* | 4 |
 | [notes/dog-contact-response_2026-10-30.md](../notes/dog-contact-response_2026-10-30.md) | Dog contact response | #matching #monster #dog #080E25FC #compiler | 1 |
+| [notes/dp-link_2026-11-12.md](../notes/dp-link_2026-11-12.md) | Link, hardware, and minigame concession removal, 2026-11-12 | #matching #phase3 #link #compiler | 3 |
 | [notes/drawable-reset-playback.md](../notes/drawable-reset-playback.md) | Drawable playback in the monster reset callbacks | #monsters #matching | 1 |
 | [notes/effects-background-flash_2026-10-14.md](../notes/effects-background-flash_2026-10-14.md) | Transient sprite effects and BG1 flash controller, October 14 | *#assets* | 7 |
 | [notes/encoded-records_2026-10-14.md](../notes/encoded-records_2026-10-14.md) | Encoded records and password callers, 08044C80–080454C0 | *#menu #tooling* | 5 |
@@ -402,7 +403,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/orbiting_particles_2026-10-18.md](../notes/orbiting_particles_2026-10-18.md) | Orbiting particles unit consolidation (2026-10-18) | #particles #types #matching | 3 |
 | [notes/palette-level-transitions_2026-10-18.md](../notes/palette-level-transitions_2026-10-18.md) | Palette level transitions unit (2026-10-18) | #palette #mosaic #unit-consolidation | 3 |
 | [notes/parameterized-motion-pool_2026-10-14.md](../notes/parameterized-motion-pool_2026-10-14.md) | Parameterized motion pool, 080454C0–08045A20 |  | 5 |
-| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 87 |
+| [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 90 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
 | [notes/player-cue-cleanup_2026-10-30.md](../notes/player-cue-cleanup_2026-10-30.md) | Player cue cleanup — 2026-10-30 | #matching #player #cue #structs #compiler #data #studio | 12 |
