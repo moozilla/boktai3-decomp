@@ -1864,6 +1864,21 @@ Each was read from the compiler source and confirmed on a live draft.
    so p wins and keeps its own register. BreakableBarrier_SetPosition (five pins and a barrier)
    matched once its `return input;` was dropped. The caller ignores the value.
 
+170. **Index the call argument and walk the field pointer to delay reversal without
+   reordering their increments.** EffectManager_UpdateAll uses a pointer walking
+   the six effects for field accesses, but passes `&manager->effects[i]` to the
+   update call in a count-up loop. In loop pass 1 the indexed call is a giv of i,
+   so check_dbra_loop cannot reverse i yet; strength reduction creates both the
+   call pointer and the field-access pointer. In pass 2 the index has no givs
+   left and becomes a countdown. Its initialization now follows both pointer
+   initializations. The field pointer's increment precedes the original walking
+   pointer's increment site, while the indexed call pointer steps at i's update,
+   preserving the ROM order. Indexing the fields while passing the walking
+   pointer also delays reversal, but swaps the two increments. Walking both
+   pointers explicitly instead shares their 328-byte stride in cse1, keeps it in
+   a register and changes reload rotation. The mixed call-index form removes
+   three pins and two operand barriers with no replacement concessions.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
