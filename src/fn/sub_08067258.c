@@ -1,4 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
+// MATCHING_CONCESSION: asm-barrier
 #include "scene_actor_control.h"
 #include "player.h"
 struct SceneActorControlPlayerView {
@@ -27,7 +28,7 @@ static inline u8 PlayerHasControlFlag(void)
 }
 static inline void ClearFlags(u16 *address, s32 clear)
 {
-    register u16 *shared asm("r5") = address;
+    u16 *shared = address;
     u32 flags = *shared;
     s32 mask = ~clear;
     mask &= flags;
@@ -39,14 +40,18 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
     struct SceneActorControlSlot *slot = input;
     struct SceneActorControlSprite *sprite = (void *)slot;
     s32 delta;
-    register u16 *flags asm("r5");
-    register u32 initialFlags asm("r1");
+    u16 *flags;
+    u32 initialFlags;
     s32 clearMask;
     u32 clearValue;
     slot->position = slot->savedPosition;
     flags = &slot->flags;
     initialFlags = *flags;
-    delta = (s16)(initialFlags & 0x10);
+    {
+        u32 mask = 0x10;
+        mask &= initialFlags;
+        delta = (s16)mask;
+    }
     if (delta) {
         s32 parameter = slot->parameter;
         s32 current = ((struct SceneActorControlPlayerView **)gPlayers)[0]->parameter;
@@ -60,14 +65,14 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
             u16 *address;
             u16 *previous;
             u32 stored;
-            address = (void *)slot;
-            address = (u16 *)((u8 *)address + 0x4E);
+            u32 changed;
+            address = &slot->previousParameter;
             stored = *address;
             flags = &slot->flags;
             previous = address;
-            if (stored != delta && (delta & 4)) {
+            if (stored != delta && ((changed = 4), (changed &= delta))) {
                 u32 value = *flags;
-                register u32 mask asm("r0") = 4;
+                u32 mask = 4;
                 mask |= value;
                 *flags = mask;
             }
@@ -92,7 +97,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
             clearMask = ~0x12;
             goto applyMask;
         }
-    } else if (initialFlags & 0x40) {
+    } else if (((clearMask = 0x40), (clearMask &= initialFlags))) {
         if (!slot->active)
             Sprite_LinkToList(slot, 0);
         if (*flags & 4) {
@@ -121,10 +126,10 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
         if (*flags & 2) {
             if (!sprite->active)
                 Sprite_LinkToList(sprite, 0);
-            slot->stateFrame = 0;
+            clearMask = 0;
+            slot->stateFrame = clearMask;
             slot->kind = 2;
             clearValue = *flags;
-            clearMask = 0;
             asm("" : "+r"(clearMask));
             clearMask -= 3;
             goto applyMask;

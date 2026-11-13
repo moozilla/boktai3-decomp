@@ -2,6 +2,7 @@
 #include "scene_actor_control.h"
 #include "engine.h"
 #include "ram.h"
+#include "monster_particle_random.h"
 void SceneActorControl_TickJitter(void *unused, struct SceneActorControlSlot *slot)
 {
     register s16 *timer asm("r5") = &slot->timer;
@@ -12,30 +13,25 @@ void SceneActorControl_TickJitter(void *unused, struct SceneActorControlSlot *sl
         *timer = reset;
         {
             u16 *flags = &slot->flags;
-            register u32 old asm("r1") = *flags;
-            *flags = old & (reset - 25);
+            u32 old = *flags;
+            reset -= 25;
+            reset &= old;
+            *flags = reset;
         }
     } else {
         if (remaining > 10) {
             const u16 *table = gRandomTable;
-            u32 mask;
             s32 jitter;
-            u32 index;
-            register u32 lowMask asm("r1");
-            index = gRandomIndex + 1;
-            lowMask = 1023;
-            mask = lowMask;
-            gRandomIndex = index & lowMask;
-            jitter = Mod(*(const u16 *)((gRandomIndex << 1) + (u32)table), 40);
+            s32 secondJitter;
+            jitter = Mod(ParticleRandom_ReadSample(table), 40);
             {
-                register u32 x asm("r1") = (u16)slot->position.x - 20;
+                u32 x = (u16)slot->position.x - 20;
                 slot->position.x = x + jitter;
             }
-            gRandomIndex = (gRandomIndex + 1) & mask;
-            jitter = Mod(*(const u16 *)((gRandomIndex << 1) + (u32)table), 40);
+            secondJitter = Mod(ParticleRandom_ReadSample(table), 40);
             {
-                register u32 z asm("r1") = (u16)slot->position.z - 20;
-                slot->position.z = z + jitter;
+                u32 z = (u16)slot->position.z - 20;
+                slot->position.z = z + secondJitter;
             }
         }
         (*timer)--;

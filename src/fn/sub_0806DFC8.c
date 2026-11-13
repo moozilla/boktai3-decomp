@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
+#include "display_animation.h"
 u8 Route_Start(void *, s32, s32, s32);
 s32 ScaledShadow_Initialize(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 initialTimer,
@@ -9,7 +10,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
     struct ContactPosition *savedAnchor = anchor;
     s32 savedTimer = initialTimer;
     s32 savedCycles = cycles;
-    register struct RouteSpritePool *pool asm("r6");
+    struct RouteSpritePool *pool;
     struct RouteSpriteActor *actor;
     u32 zero;
     u32 one;
@@ -23,56 +24,23 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
     actor = RouteSpritePool_TryAllocateSlot(pool);
     if (!actor)
         return;
-    /* Offset temporaries preserve allocation lifetimes for the typed fields
-     * listed in RouteSpriteActor; they do not encode instruction bodies. */
     {
-        register u32 stateOffset asm("r1") = 0x152;
-        register u8 *state asm("r0");
-        register u32 zeroLow asm("r2");
-        u32 initialOne = 1;
-        register u32 offsetA asm("r3");
-        register u32 offsetB asm("r2");
-        asm("" : "+r"(stateOffset));
-        state = (void *)((u32)actor + stateOffset);
-        zeroLow = 0;
-        asm("" : "+r"(zeroLow));
-        zero = zeroLow;
-        one = initialOne;
-        asm("" : "+r"(one));
+        u8 *state = &actor->state;
+        zero = 0;
+        one = 1;
         *state = one;
-        offsetA = 0x150;
-        *(u16 *)((u32)actor + offsetA) = zero;
-        offsetB = 0x154;
-        *(u16 *)((u32)actor + offsetB) = zero;
-        offsetA += 0x18;
-        *(s16 *)((u32)actor + offsetA) = savedCycles;
+        actor->flags150 = zero;
+        actor->frames = zero;
+        actor->cyclesRemaining = savedCycles;
         actor->variant = variant;
-        offsetB += 0x10;
-        *(s16 *)((u32)actor + offsetB) = amount;
-        offsetA -= 0xB;
-        *(u8 *)((u32)actor + offsetA) = kind;
+        actor->amount = amount;
+        actor->kind = kind;
         actor->parameter = parameter;
-        offsetB -= 6;
-        *(u8 *)((u32)actor + offsetB) = option;
-        offsetA += 0xD;
-        *(s16 *)((u32)actor + offsetA) = savedTimer;
-        offsetB -= 8;
-        {
-            register u8 *dst asm("r0") = (void *)((u32)actor + offsetB);
-            *dst = one;
-        }
-        offsetA += 6;
-        {
-            register u32 *dst asm("r1") = (void *)((u32)actor + offsetA);
-            *dst = script;
-        }
-        {
-            register u32 offset asm("r0") = 0x174;
-            register void **dst asm("r1");
-            asm("" : "+r"(offset));
-            dst = (void *)((u32)actor + offset);
-            *dst = context;
-        }
+        actor->option = option;
+        actor->initialTimer = savedTimer;
+        actor->entered = one;
+        actor->script = script;
+        actor->context = context;
     }
     Route_Start(&actor->route, route, 0, 0);
     {
@@ -82,7 +50,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
         {
             u32 offset = 0x15B;
             s8 *dst;
-            dst = (void *)((u32)actor + offset);
+            dst = &actor->shadowAbsent;
             *dst = shadowResult;
         }
     }
@@ -111,7 +79,8 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
         Sprite_Init(&actor->sprite, graphics, 0);
         actor->sprite.flags |= one;
         Anim_SetSequence(&actor->sequence, pool->sequenceResource, 0x17, 0, zero);
-        AnimData_SelectPaletteBank(*(void **)&actor->sprite.unknown8[4], 0x140);
+        AnimData_SelectPaletteBank((void *)((struct DisplaySequenceSprite *)actor)->resource,
+                                   0x140);
         {
             struct ContactPosition *low = savedAnchor;
             struct ContactPosition position;

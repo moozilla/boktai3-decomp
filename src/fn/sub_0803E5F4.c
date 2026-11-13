@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
                                 const struct ScenePoolSpeedBounds *);
@@ -7,35 +6,6 @@ void Player_GetWorldPosition(s32, struct ScenePoolVec32 *);
 s32 Player_GetHorizontalVelocity(s32);
 s32 Terrain_GetHeightAtFixedPosition(struct ScenePoolVec32 *);
 s32 SceneArc_Create(struct ScenePoolVec32 *, struct ScenePoolVec32 *, s32, s32, s32);
-static inline u32 *Prepare(struct ScenePoolEntry *entry, u32 state)
-{
-    entry->state = state;
-    entry->stateFrame = 0;
-    entry->stateEntered = 1;
-    return entry->history;
-}
-static inline u32 *PrepareZero(struct ScenePoolEntry *entry, u32 zero, u32 one)
-{
-    entry->state = zero;
-    entry->stateFrame = zero;
-    {
-        u8 *entered = &entry->stateEntered;
-        u32 setOne = one;
-        asm("" : : "r"(entered), "r"(setOne));
-        *entered = setOne;
-        return (u32 *)(entered + 8);
-    }
-}
-static inline u32 *PrepareFirst(struct ScenePoolEntry *entry)
-{
-    u32 one = 1;
-    register u8 *entered asm("r0");
-    entry->state = one;
-    entry->stateFrame = 0;
-    entered = &entry->stateEntered;
-    *entered = one;
-    return (u32 *)(entered + 8);
-}
 s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
                              struct ScenePoolEntry *entry)
 {
@@ -59,9 +29,8 @@ s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
     fire = 0;
     switch (entry->mode) {
         case 0:
-            if (entry->stateFrame != 45)
-                break;
-            goto launch;
+            if (entry->stateFrame == 45)
+                fire = 1;
             break;
         case 1:
             if (entry->stateFrame == 45 || entry->stateFrame == 135)
@@ -70,7 +39,6 @@ s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
     }
     if (fire) {
         s32 speed;
-    launch:
         Player_GetWorldPosition(entry->motionPhase, &path);
         from = entry->position;
         from.y += actor->restrictionMetric;
@@ -85,54 +53,64 @@ s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
     }
     if (entry->stateFrame > 149) {
         s32 random;
-        register s32 kind asm("r1");
-        u32 *arg;
-        u32 *index = &gRandomIndex;
-        u32 next = (*index + 1) & 0x3ff;
-        *index = next;
-        {
-            u32 offset = next << 1;
-            register const u8 *table asm("r3");
-            table = (const u8 *)gRandomTable;
-            random = *(const u8 *)(offset + (u32)table);
-        }
+        s32 kind;
+        u32 *history;
+        u32 clear;
+        gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+        random = *(const u8 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
         kind = entry->kind;
         switch (kind) {
-            case 0:
-                arg = PrepareZero(entry, kind, 1);
-                goto clear;
-            case 1:
-                arg = PrepareZero(entry, 0, kind);
-                asm("" : "+r"(arg));
-                goto clear;
-            case 2:
-                if (random > 63)
-                    goto first;
+            case 0: {
+                u8 *entered;
                 entry->state = kind;
-                goto second;
-            first:
-                arg = PrepareFirst(entry);
-                asm("" : "+r"(arg));
-                goto clear;
-            case 3:
-                if (random > 63)
-                    goto isolatedFirst;
-                entry->state = 2;
-            second:
+                entry->stateFrame = kind;
+                entered = &entry->stateEntered;
+                kind = 1;
+                *entered = kind;
+                Memory_Clear((u32 *)(entered + 8), 0x100);
+                break;
+            }
+            case 1:
+                entry->state = 0;
                 entry->stateFrame = 0;
                 entry->stateEntered = 1;
-                arg = entry->history;
-            clear:
-                Memory_Clear(arg, 0x100);
-                goto done;
-            isolatedFirst:
-                arg = PrepareFirst(entry);
-                Memory_Clear(arg, 0x100);
-                asm volatile("");
-                goto done;
+                Memory_Clear(entry->history, 0x100);
+                break;
+            case 2:
+                if (random <= 63) {
+                    entry->state = 2;
+                    clear = 0;
+                    entry->stateFrame = clear;
+                    entry->stateEntered = 1;
+                    history = entry->history;
+                } else {
+                    entry->state = 1;
+                    clear = 0;
+                    entry->stateFrame = clear;
+                    entry->stateEntered = 1;
+                    history = entry->history;
+                }
+                Memory_Clear(history, 0x100);
+                break;
+            case 3:
+                if (random <= 63) {
+                    entry->state = 2;
+                    entry->stateFrame = 0;
+                    entry->stateEntered = 1;
+                    Memory_Clear(entry->history, 0x100);
+                    break;
+                }
+                entry->state = 1;
+                entry->stateFrame = 0;
+                entry->stateEntered = 1;
+                Memory_Clear(entry->history, 0x100);
+                return 0;
+            default:
+                return 0;
         }
-    } else
+        return 0;
+    } else {
         entry->stateFrame++;
-done:
-    return 0;
+        return 0;
+    }
 }

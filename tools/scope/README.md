@@ -1888,6 +1888,96 @@ Each was read from the compiler source and confirmed on a live draft.
    pointers explicitly instead shares their 328-byte stride in cse1, keeps it in
    a register and changes reload rotation. The mixed call-index form removes
    three pins and two operand barriers with no replacement concessions.
+120. **A byte-returning inline can move a constant on the first loop pass rather than the
+   second, fixing both hoist order and allocation without changing the body.** In
+   SceneObjects_ScriptLower (0801E998), the variant's `one = 1; s->variant = one;` has
+   first-pass lifetime 2 and moves only on pass 2, after the flag mask. Returning it through
+   `static inline u8 GetVariantByte(int value) { return value; }` makes that lifetime 3:
+   pass 1 moves the insertion zero, one, then the mask (thresholds 26, 23, 20; loop size 51).
+   The extra conversion vanishes later, leaving the ROM's one-before-mask loads. Declare
+   the mask before the hidden insertion zero's creation so it wins their allocation tie.
+   Both changes are required: `AGBCC_PRI=35:+20,44:-20` proved the earlier draft's desired
+   order, while `hoist` distinguishes the two passes. Explicit casts, pointer setters and
+   narrow scalar/array declarations alone did not cross this threshold.
+
+121. **An explicit default return can isolate one switch tail while a call after an inner
+   if/else gives the other arms a common clear call.** ScenePool_StateLaunchArc (0803E5F4),
+   LaunchShortArc (0803E7B4) and EmitBursts (0803E998) need case 3's state-one Memory_Clear
+   tail kept, while cases 0, 1 and case 2's state-one tail share case 3's state-two call.
+   Put `return 0` in case 3's state-one arm and the explicit default, then return inside
+   each outer if/else arm instead of after their join. The last return now has no existing
+   join label immediately before its zero set, so jump2 creates a new label and cannot
+   merge the isolated tail through the old jump chain. In case 2, compute `history` in
+   each inner arm and call Memory_Clear once after the join; the join stops move2add from
+   making 256 from the preceding 1. The state-one block then has exactly three local qtys
+   (fact 38): a shared `clear` local assigned in both arms leaves only two local qtys and
+   restores the ROM's registers (`AGBCC_FORCE=148:1` confirmed the prior allocation).
+   Removing the per-arm history assignments also loses the ROM's `adds r0, #8`.
+
+122. **Duplicating a post-join statement can fix PRE numbering as well as allocation.**
+   ActorAttachment_CreateValueSpriteSlot (08065FD0) had the right instructions but 15
+   spill-offset differences: its 258 insns into gcse gave T=129, while the desired hash
+   order needs T=127 or 133. Put `sprite->flags |= 1` in both action-offset arms (+4
+   insns before gcse), and `sprite->priority = 1` in both mode-test arms (+3). The
+   resulting T=133 orders all field-address spills correctly, and jump2 merges both
+   duplicated tails, so all 680 bytes match. Either duplication alone leaves the old
+   spill order. This is the same legitimate tail duplication as fact 91, but its
+   effect on the whole-function instruction count decides PRE's hash-bucket order.
+
+123. **A duplicated call followed by a duplicated read can stop CSE and still merge.**
+   ContactSwarm_UpdateTracking (08044290) reused an early mask 15 in its final random
+   sample, keeping it live across three calls. Put Collider_SetPosition and the following
+   `frame = slot->stateFrame` in both phase-test arms. CSE stops at their join, giving
+   the final mask a fresh load. The read after each call prevents flow's call-fallthrough
+   `(use 0)` from separating the tails; jump2 merges them back to the ROM's single call
+   and read. Duplicating only the call leaves eight extra instructions; writing gotos
+   after the calls does not remove that fallthrough distinction. All 236 bytes match.
+
+124. **Form later stack and field addresses at their uses to let PRE create the copies.**
+   SceneActorControl_TryActivateNearby (080674F0) retained an extra stack-address
+   register when `q = initial` preceded the range test. Assigning `q = &delta` after
+   the test removes that redundant PRE value, but leaves the saved-position copy
+   one instruction early. Move `position = &slot->savedPosition` after the test too:
+   PRE now creates both required copies in the ROM order. Keep x live through the
+   range test instead of testing its dx copy to select the right CSE class head.
+   The earlier diagnostic `AGBCC_NOPRE=1 AGBCC_FORCE=x:1` was exact; these C changes
+   match all 360 bytes without thirteen pins, a barrier or a volatile reload.
+
+125. **A structured search loop can preserve a repeated pointer load that a goto loop loses.**
+   SceneActorRegistry_UnlinkActor (0806FBC8) had a DEBUG_NOP between its removal and
+   scan labels. Removing it let CSE carry the bottom test's next pointer into the
+   next iteration, deleting the ROM's second load. A plain while loop preserved
+   both loads but put the removal block after the scan. Write `while (node->next)`
+   with `if (next->actor != actor) { node = next; continue; }`, followed by removal
+   and `return`. Rotation places removal before the scan while preserving both
+   loads, matching all 92 bytes. Goto and bottom-entry do/while forms did not.
+
+126. **An early continue with work can retain the label that a bare goto loses.**
+   SceneActorRegistry_SendToCategoryPaletteOffset (0806FCAC) reused the palette
+   offset in r2 to form the callback offset with `adds #0x66`; ROM loads the latter
+   independently. Bare negative guards with `goto next` still allow move2add.
+   Inside the category match, use `if (palette differs) { node = node->next;
+   continue; }`. The real advance keeps a join label before the callback through
+   reload, blocking constant reuse; jump2 then merges the duplicate advance.
+   This removes the r2-clobber barrier and matches all 92 bytes (fact 100).
+
+127. **A direct halfword OR can change an entire allocation cascade.** In
+   SceneActorRegistry_ScheduleAvailableActors (0806FE88), copying a u32 request
+   into a local then OR-ing a u32 flags load lets regmove tie the result to the
+   dying flags value. `*field = (u16)request | *field` keeps the halfword operation
+   and its operand copy. That alone restores the request, quota, delay, counter
+   and loop-constant allocation, matching all 236 bytes without two pins and a
+   barrier. Merely narrowing the request, mask or flags locals does not do it;
+   packed union variants add instructions. This extends fact 37 to the OR update.
+
+128. **A named constant-first mask can preserve a halfword read and its operand order.**
+   RouteSpriteActor_TickEmitting (0806DCE4) narrowed `frameWeight = *command & 15`
+   to ldrb when volatile was removed. The shared ReadCommand/MaskCommand pair
+   retains ldrh but swaps the load and constant registers. A direct block
+   `u32 value = *command; u32 mask = 15; mask &= value; frameWeight = mask;`
+   retains ldrh with the exact ROM registers. Together with separate first/second
+   random-index locals it removes one pin and all volatile command pointers from
+   the matching partial; the rest of this function remains a holdout.
 
 ## Survey: random table as a literal address (2026-10-24)
 

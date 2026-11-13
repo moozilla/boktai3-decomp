@@ -1,5 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
+struct SceneActorScheduleView {
+    u8 unknown0[0x3CC];
+    u8 ticks;
+};
 s32 SceneActorRegistry_CountAvailable(void);
 s32 Div(s32, s32);
 static inline u8 Inactive(struct SceneActorRegistryActor *actor)
@@ -45,12 +48,12 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
             u32 blocked;
             u32 tickOffset;
             u32 zero;
-            register u32 request asm("r9");
+            u32 request;
             {
                 u32 low = 3;
                 blocked = low;
             }
-            tickOffset = 0x3CC;
+            tickOffset = (u32) & ((struct SceneActorScheduleView *)0)->ticks;
             {
                 u32 low = 0;
                 zero = low;
@@ -71,12 +74,7 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
                         *ticks = delay;
                         {
                             u16 *field = &actor->flags2D6;
-                            u32 flags = *field;
-                            register u32 mask asm("r0");
-                            mask = request;
-                            asm("" : "+r"(mask));
-                            mask |= flags;
-                            *field = mask;
+                            *field = (u16)request | *field;
                         }
                         selected++;
                     }
