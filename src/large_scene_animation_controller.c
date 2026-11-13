@@ -3554,7 +3554,7 @@ void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
 
 void sub_08159164(u32);
 
-void GameState_SetEventFlag(u32);
+void Bestiary_UnlockEntry(u32);
 
 void Nidhoggr_UpdateDepartureTransition(struct Nidhoggr *t)
 {
@@ -3605,7 +3605,7 @@ void Nidhoggr_UpdateDepartureTransition(struct Nidhoggr *t)
         }
         case 3:
             sub_08159164(t->optionE);
-            GameState_SetEventFlag(0x41);
+            Bestiary_UnlockEntry(0x41);
             if (t->script)
                 Script_Call(t->script, 0);
             Task_Kill(t);

@@ -4,8 +4,8 @@
 #include "runtime.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SceneActorRecord_RecordPair(u16, u16);
 static inline u8 IsPrimary(struct SceneActorRegistryResetView *actor)
 {
@@ -116,8 +116,8 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
         Script_Call(script, &arguments);
     }
     if ((!Flag(actor, 0x4000, 0x2D4)) && (((u32)(actor->category - 11)) > 2)) {
-        GameState_SetEventFlag(
-            BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+        Bestiary_UnlockEntry(
+            Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
     }
     actor->fieldAA = 0;
     SetControl(actor);

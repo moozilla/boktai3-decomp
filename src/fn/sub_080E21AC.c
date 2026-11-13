@@ -4,8 +4,8 @@
 #include "scene_actor_terrain.h"
 #include "script_utility.h"
 /* SceneActorControl_BeginHiddenDefeat: on entry faces forward, releases attachments, plays the category sound and clears the defeat flags; once field2B3 is set either completes the defeat at once (flags2CC & 0x400: scripts, event flag, idle, hide) or hands over to the blink-out (SceneActorControl_CompleteBlinkOut, kind 0x27) (provisional name) */
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
@@ -95,8 +95,8 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
                 u16 test = value & mask;
                 flags = &actor->flags2D4;
                 if (!test && (u32)(actor->category - 11) > 2)
-                    GameState_SetEventFlag(
-                        BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+                    Bestiary_UnlockEntry(
+                        Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
             }
             {
                 u32 mask = 0x4000;

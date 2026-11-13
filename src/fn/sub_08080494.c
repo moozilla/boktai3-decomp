@@ -9,8 +9,8 @@
 #include "runtime.h"
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void ActorParticles_SpawnWideBurst(void *);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -189,8 +189,8 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     }
     source.category = &actor->category;
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(*source.category - 11) > 2)
-        GameState_SetEventFlag(
-            BestiaryDisplay_GetEntryForActor(*source.category, actor->paletteOffset));
+        Bestiary_UnlockEntry(
+            Bestiary_GetEntryForActor(*source.category, actor->paletteOffset));
     InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
     SelectState(actor, completedState, 0, 2);
     ResetStateEntry(actor, completedState);

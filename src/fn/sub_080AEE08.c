@@ -7,8 +7,8 @@
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SceneActor_CallContextScriptB(void *);
 void Vorn_SendMessage(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
@@ -204,8 +204,8 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         Script_Call(script, &arguments);
     }
     if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x4000) && (u32)(actor->category - 11) > 2)
-        GameState_SetEventFlag(
-            BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+        Bestiary_UnlockEntry(
+            Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
     actor->fieldAA = 0;
     {
         u32 mask = 1;

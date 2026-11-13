@@ -322,9 +322,9 @@ void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32
 
 /* Defeat lifecycle: blink, script and event completion, then idle. */
 
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
+void *Bestiary_GetEntryForActor(u32, u32);
 
-void GameState_SetEventFlag(void *);
+void Bestiary_UnlockEntry(void *);
 
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 
@@ -381,8 +381,8 @@ void Crow_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     {
         u32 mask = 0x4000;
         if (!(actor->flags2D4 & mask) && (u32)(actor->category - 11) > 2)
-            GameState_SetEventFlag(
-                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+            Bestiary_UnlockEntry(
+                Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
     }
     {
         u32 mask = 0x400;

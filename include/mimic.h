@@ -238,8 +238,8 @@ u8 SceneActor_IsCollisionTargetUnavailable(struct SceneActorRegistryResetView *a
 s32 ActorAttachment_IsUnavailable(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 void SparkParticle_Spawn(void *, u32, void *, s32, s32, s32, s32, s32);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 u8 SceneActorTarget_TrySelectNearestParticipant(struct SceneActorRegistryResetView *);
 void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *actor);
 void SceneActorReaction_HandleColliderContact(void *, s32);

@@ -13,8 +13,8 @@ void SceneStimulus_AddUntagged(s32, s32, s32, s32, s32);
 /* Mummy defeat: hides the drawable, emits defeat effects, runs the script and returns to idle. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 #include "scene_actor_part_burst.h"
@@ -242,8 +242,8 @@ void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
         u32 zero;
         u32 test = (*motionFlags) & mask;
         if (!test && (u32)(actor->category - 11) > 2)
-            GameState_SetEventFlag(
-                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+            Bestiary_UnlockEntry(
+                Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
         actor->fieldAA = 0;
         zero = 0;
         {

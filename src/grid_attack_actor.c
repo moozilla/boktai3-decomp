@@ -38,7 +38,7 @@ void ContactSequencePool_BeginAllDeaths(void *);
 
 void SceneActors_RunFirstEventScript(void *, void *);
 
-void GameState_SetEventFlag(int);
+void Bestiary_UnlockEntry(int);
 
 void SceneActors_RunSecondEventScript(void *, void *);
 
@@ -653,7 +653,7 @@ void GridAttack_UpdateDeathState(struct GridAttackActor *p)
         Sound_PlaySongChecked(958);
     }
     if (p->animationEnded && !base->stage) {
-        GameState_SetEventFlag(80);
+        Bestiary_UnlockEntry(80);
         SceneActors_RunSecondEventScript(p, &base->drawable.position);
         base->stage++;
     }

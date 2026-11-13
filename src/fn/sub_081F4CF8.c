@@ -104,7 +104,7 @@ void SceneActors_RunSecondEventScript(void *, void *);
 void PlayerClone_BeginActiveReactions(void);
 void SunOrb_FadeOutAll(void *);
 void sub_08159164(u16);
-void GameState_SetEventFlag(s32);
+void Bestiary_UnlockEntry(s32);
 s32 Mod(s32, s32);
 static inline s32 cellAt(struct ContactPosition *v)
 {
@@ -224,7 +224,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
             s32 count;
             SceneActors_RunSecondEventScript(p, &p2->anchor);
             sub_08159164(*((u16 *)(((u8 *)p2) + 0xed2)));
-            GameState_SetEventFlag(0x51);
+            Bestiary_UnlockEntry(0x51);
             increment((u16 *)(gGameState + 0x87c));
             increment((u16 *)(gGameState + 0x538));
             increment((u16 *)(gGameState + 0x55e));

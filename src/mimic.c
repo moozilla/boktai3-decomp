@@ -482,8 +482,8 @@ void Mimic_UpdateDefeatBlink(struct SceneActorRegistryResetView *actor, s32 fram
         {
             u32 m = 0x4000;
             if (!(actor->flags2D4 & m) && (u32)(actor->category - 11) > 2)
-                GameState_SetEventFlag(
-                    BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+                Bestiary_UnlockEntry(
+                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
         }
     } else if (DrawableVisible(actor))
         ActorShadow_Disable(actor->shadow);

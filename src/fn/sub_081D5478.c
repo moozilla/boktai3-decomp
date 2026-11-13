@@ -12,9 +12,9 @@ struct BestiaryDetails {
     const u8 *rewardScript, *labelScript, *emptyScript, *nameScript, *itemScript, *countScript,
         *dialogueScript, *rankScript;
 };
-s32 GameState_IsEventFlagSet(s32);
-s32 GameState_IsPairFlagSet(s32, s32);
-s32 ThresholdTrack_ClassifyPosition(s32);
+s32 Bestiary_IsEntryUnlocked(s32);
+s32 Bestiary_IsRewardUnlocked(s32, s32);
+s32 Bestiary_GetEntryGroup(s32);
 void BackgroundPanel_ReleaseHandles(void *);
 void TextWindow_SetScript(s32, const u8 *);
 void TextWindow_SetBounds(s32, s32, s32, s32, s32);
@@ -24,14 +24,14 @@ void TextWindow_SetString(s32, s32, const u8 *);
 void ScrollingDialogue_ClearScript(void);
 void BestiaryDisplay_DrawEntryDetails(struct BestiaryDetails *p)
 {
-    s32 unlocked = GameState_IsEventFlagSet(p->entry);
+    s32 unlocked = Bestiary_IsEntryUnlocked(p->entry);
     s32 rank;
     u8 *reward;
     s32 y;
     BackgroundPanel_ReleaseHandles(p);
     TextWindow_SetScript(p->title, p->titleScript);
     TextWindow_SetBounds(p->title, 8, 3, 20, 2);
-    if (GameState_IsEventFlagSet(p->entry))
+    if (Bestiary_IsEntryUnlocked(p->entry))
         TextWindow_Refresh(p->title, p->entry);
     else
         TextWindow_Refresh(p->title, 83);
@@ -39,7 +39,7 @@ void BestiaryDisplay_DrawEntryDetails(struct BestiaryDetails *p)
     switch (p->page) {
         case 0:
             if (unlocked) {
-                rank = ThresholdTrack_ClassifyPosition(p->entry);
+                rank = Bestiary_GetEntryGroup(p->entry);
                 TextWindow_SetScript(p->rank, p->rankScript);
                 TextWindow_SetBounds(p->rank, 1, 16, 30, 4);
                 TextWindow_Refresh(p->rank, rank);
@@ -76,7 +76,7 @@ void BestiaryDisplay_DrawEntryDetails(struct BestiaryDetails *p)
                 TextWindow_SetBounds(p->reward[0], 6, y, 20, 2);
                 TextWindow_Refresh(p->reward[0], 0);
                 TextWindow_StartPlayback(p->reward[0]);
-            } else if (GameState_IsPairFlagSet(p->entry, 0)) {
+            } else if (Bestiary_IsRewardUnlocked(p->entry, 0)) {
                 if (reward[1] <= 254) {
                     switch (reward[0]) {
                         case 0:
@@ -116,7 +116,7 @@ void BestiaryDisplay_DrawEntryDetails(struct BestiaryDetails *p)
                 TextWindow_SetBounds(p->reward[1], 6, y, 30, 2);
                 TextWindow_Refresh(p->reward[1], 0);
                 TextWindow_StartPlayback(p->reward[1]);
-            } else if (GameState_IsPairFlagSet(p->entry, 1)) {
+            } else if (Bestiary_IsRewardUnlocked(p->entry, 1)) {
                 if (reward[3] <= 254) {
                     switch (reward[2]) {
                         case 0:

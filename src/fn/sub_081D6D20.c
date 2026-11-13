@@ -1,7 +1,6 @@
 #include "global.h"
 #include "monster_book.h"
 
-void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
 
 static inline void MonsterBook_HideRows(struct MonsterBook *p)
 {

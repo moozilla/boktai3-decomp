@@ -12,7 +12,7 @@ void RouteSpritePool_RequestFinishAll(void);
 void WirelessGame_NotifyOpponentDefeated(void);
 void sub_08022790(void *, s32);
 void sub_08022878(void *);
-void GameState_SetEventFlag(s32);
+void Bestiary_UnlockEntry(s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 struct __attribute__((packed)) DeathState {
@@ -284,7 +284,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
                     base->state.value = nextState;
                 }
                 base->elapsed = 0;
-                GameState_SetEventFlag(0x4D);
+                Bestiary_UnlockEntry(0x4D);
                 SceneActors_RunSecondEventScript(base, (u8 *)p + 0x260);
             }
             break;

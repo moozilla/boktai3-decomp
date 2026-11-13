@@ -42,7 +42,7 @@ void SceneActors_StartUnmirroredAnimation(void *, void *, void *, u32, u32, u32)
 void SceneActors_RunSecondEventScript(void *, void *);
 void Anim_SetFrameDurationScale(void *, u16);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
-void GameState_SetEventFlag(u32);
+void Bestiary_UnlockEntry(u32);
 void AnimatedParticles_EmitBurst(void *, u32, u32, u32, u32, u32, u32, u32);
 void MotionEntry_CreateWithDelta(void *, void *, s32, u32);
 s32 sub_08249420(u32, u32);
@@ -235,9 +235,9 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
             action->frame++;
             if (action->frame > 8) {
                 ActionState_AdvanceState(action);
-                GameState_SetEventFlag(0);
-                GameState_SetEventFlag(3);
-                GameState_SetEventFlag(78);
+                Bestiary_UnlockEntry(0);
+                Bestiary_UnlockEntry(3);
+                Bestiary_UnlockEntry(78);
                 SceneActors_RunSecondEventScript(saved, &saved->renderPosition);
             }
             break;

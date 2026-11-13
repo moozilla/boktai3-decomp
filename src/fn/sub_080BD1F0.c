@@ -16,8 +16,8 @@
  * live in function-scope variables, which the ROM rematerialises at each call. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
@@ -342,8 +342,8 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             u32 t = *flags2D4 & mask;
             categoryp = &actor->category;
             if (!t && (u32)(*categoryp - 11) > 2)
-                GameState_SetEventFlag(
-                    BestiaryDisplay_GetEntryForActor(*categoryp, actor->paletteOffset));
+                Bestiary_UnlockEntry(
+                    Bestiary_GetEntryForActor(*categoryp, actor->paletteOffset));
         }
         {
             struct ContactPackedVector range;
@@ -447,8 +447,8 @@ notHidden:
                 Script_Call(script, &arguments);
             }
             if (!Masked16(flags2D4, 0x4000) && (u32)(actor->category - 11) > 2)
-                GameState_SetEventFlag(
-                    BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+                Bestiary_UnlockEntry(
+                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
             sub_08159164(context->rewardHigh);
             Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
         } else {
@@ -488,8 +488,8 @@ notHidden:
             }
         }
         if (!Masked16(flags2D4, 0x4000) && (u32)(*categoryp - 11) > 2)
-            GameState_SetEventFlag(
-                BestiaryDisplay_GetEntryForActor(*categoryp, actor->paletteOffset));
+            Bestiary_UnlockEntry(
+                Bestiary_GetEntryForActor(*categoryp, actor->paletteOffset));
         sub_08159164(context->rewardHigh);
         Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
         COUNT(0x87C);
