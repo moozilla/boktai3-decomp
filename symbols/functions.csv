@@ -7683,11 +7683,11 @@ addr,name,mode,confidence,source,notes
 081C069C,SceneActorSequence_UpdateBackgroundScroll,thumb,low,src-alias,Applies stored scroll coordinates to background layers 1 and 3
 081C06C4,SceneActorSequence_BeginFadeIn,thumb,low,src-alias,Starts the opening fade and installs the initial sequence callback
 081C06F8,SceneActorSequence_UpdateFadeIn,thumb,low,src-alias,
-081C0780,ScreenTransition_BeginDownwardMotion,thumb,low,src-alias,
+081C0780,SceneActorSequence_BeginDownwardMotion,thumb,low,src-alias,
 081C07C8,SceneActorSequence_UpdateFadeInHold,thumb,low,src-alias,
 081C0854,SceneActorSequence_BeginCenterMotion,thumb,low,src-alias,Tentatively starts a 90-frame actor motion toward the default center position
 081C0874,SceneActorSequence_UpdateCenterMotion,thumb,low,src-alias,State callback counts frames and starts the next motion when the actor signals completion
-081C0894,ScreenTransition_BeginCornerMotion,thumb,low,src-alias,
+081C0894,SceneActorSequence_BeginCornerMotion,thumb,low,src-alias,
 081C08D8,SceneActorSequence_UpdateFirstWaypointMotion,thumb,low,src-alias,State callback waits for the first waypoint motion before starting the second
 081C08F4,SceneActorSequence_BeginSecondWaypointMotion,thumb,low,src-alias,Commands actor motion toward screen position 112 by 72 and installs its wait callback
 081C093C,SceneActorSequence_UpdateSecondWaypointMotion,thumb,low,src-alias,State callback waits for the second waypoint motion before starting the final motion
@@ -7695,9 +7695,10 @@ addr,name,mode,confidence,source,notes
 081C09A0,SceneActorSequence_UpdateFinalWaypointMotion,thumb,low,src-alias,State callback waits for the final actor motion before beginning fade-out
 081C09BC,SceneActorSequence_BeginFadeOut,thumb,low,src-alias,Clears actor motion state and starts the closing fade
 081C09F8,SceneActorSequence_UpdateCompletionDelay,thumb,low,src-alias,Completion callback waits 64 frames then invokes the configured script and kills both tasks
+081C0A24,SceneActorSequence_UpdateActorAnimation,thumb,low,src-alias,
 081C0A80,SceneActorSequence_Update,thumb,low,src-alias,Task update callback applies background scroll and dispatches the current sequence state
 081C0A9C,SceneActorSequence_OnDestroy,thumb,low,src-alias,Empty destruction callback registered by the sequence task constructor
-081C0AA0,PaletteScreen_InitDisplayResources,thumb,low,src-alias,
+081C0AA0,SceneActorSequence_InitDisplayResources,thumb,low,src-alias,
 081C0B24,SceneActorSequence_InitFromScript,thumb,low,src-alias,Initializes backgrounds and actor state then reads the completion script and begins fading in
 081C0B94,SceneActorSequence_CreateFromScript,thumb,low,src-alias,Creates the sequence task and registers its update and destruction callbacks
 081C0BD4,SceneActorManager_Exists,thumb,low,src-alias,
@@ -10220,14 +10221,19 @@ addr,name,mode,confidence,source,notes
 0823731C,RisingPuffPool_GetOrCreate,thumb,low,src-alias,Returns the existing singleton or creates and initializes its task
 08237368,RisingSprite_Spawn,thumb,low,src-alias,
 082373C8,MovingGlyph_SetState,thumb,low,src-alias,Stores the movement state callback and resets its frame timer; glyph identity is tentative
+082373D4,MovingGlyph_UpdateFlash,thumb,low,src-alias,
 08237450,MovingSprite_UpdateMotion,thumb,low,src-alias,
 082374A0,MovingSprite_UpdateDelay,thumb,low,src-alias,
 082374D4,MovingGlyph_UpdateTask,thumb,low,src-alias,Task update callback dispatches the current movement state
 082374E4,MovingGlyph_DestroyTask,thumb,low,src-alias,Task destruction callback removes the moving glyph sprite
 082374F4,MovingSprite_Initialize,thumb,low,src-alias,
-082375FC,MovingSprite_Create_082375FC,thumb,low,src-alias,
+082375FC,MovingGlyph_Create,thumb,low,src-alias,
+08237664,MovingGlyph_InitializeFromScript,thumb,low,src-alias,
+08237764,MovingGlyph_CreateFromScript,thumb,low,src-alias,
 082377A8,ActorGlyphTrail_SetState,thumb,low,src-alias,Stores the actor-linked effect state callback and resets its timer
+082377B8,ActorGlyphTrail_UpdateAnchor,thumb,low,src-alias,
 08237938,ActorGlyphTrail_UpdateParticles,thumb,low,src-alias,Advances four orbiting glyph positions and hides expired slots
+08237A28,ActorGlyphTrail_EmitParticle,thumb,low,src-alias,
 08237BAC,ActorGlyphTrail_HideParticles,thumb,low,src-alias,Clears active markers and sets the hidden flag on all four trail particles
 08237BD4,ActorGlyphTrail_Update,thumb,low,src-alias,
 08237C9C,TimedSprite_UpdateMotion,thumb,low,src-alias,
@@ -10305,6 +10311,7 @@ addr,name,mode,confidence,source,notes
 0823AD18,LinkPlayer_InitHealth,thumb,low,src-alias,Sets current and maximum health to ten times the base stat at offset 0x41C; health interpretation tentative
 0823AD40,LinkPlayer_InitEnergy,thumb,low,src-alias,Sets current and maximum energy to five times the base stat plus 100; energy interpretation tentative
 0823AD64,Player_InitializeInputHistory,thumb,low,src-alias,
+0823AE5C,KeyframeActor_InitKeyframeDisplay,thumb,low,src-alias,
 0823AF44,KeyframeActor_InitAuxiliarySprite,thumb,low,src-alias,
 0823B0D4,KeyframeActor_InitBodyFromScript,thumb,low,src-alias,
 0823B264,Player_InitConfiguredAction,thumb,low,src-alias,Initializes action parameters and selects a handler from the actor configuration at offset 0x344 plus 0x1C
