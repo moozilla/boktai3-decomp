@@ -1800,6 +1800,7 @@ addr,name,mode,confidence,source,notes
 08048390,ContactBurst_GetEnabled,thumb,low,src-alias,
 080483A0,WirelessLinkIndicator_Get,thumb,low,src-alias,
 080483AC,WirelessLinkIndicator_SelectStrengthFrame,thumb,low,src-alias,
+08048438,WirelessLinkIndicator_UpdateChildStatus,thumb,low,src-alias,Shows child slot zero strength and hides the indicator in parent mode
 0804846C,WirelessLinkIndicator_UpdateLinkStatus,thumb,low,src-alias,
 080484FC,WirelessLinkIndicator_Update,thumb,low,src-alias,
 08048514,WirelessLinkIndicator_Destroy,thumb,low,src-alias,

@@ -3,7 +3,7 @@
 #include "projected_display.h"
 #include "rfu_compat.h"
 struct WirelessLinkIndicator {
-    u8 task[0x18];
+    struct Task task;
     u32 frame, animationTick, selectedFrame;
     struct ProjectedDisplayResource resource;
     struct ProjectedDisplayEntry animation;
@@ -20,4 +20,6 @@ struct WirelessLinkIndicator *WirelessLinkIndicator_Create(void);
 u32 Wireless_GetStatus(void);
 s32 Wireless_IsSessionConnected(void);
 s32 Wireless_GetConnectedParentSlot(void);
+void WirelessLinkIndicator_UpdateChildStatus(struct WirelessLinkIndicator *);
+void WirelessLinkIndicator_SetPosition(u32, u32);
 #endif

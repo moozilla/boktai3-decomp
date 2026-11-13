@@ -137,3 +137,11 @@ A shared projection wrapper also changed allocation in SetGroup, so the existing
 relative/global projection forms remain. The 2,040-byte unit and all three
 external header consumers (081A5360, 0820EE34, 0820F378) match. The old_agbcc
 resets at either edge remain separate compiler units.
+
+## Wireless link indicator: 080483A0–080485FC
+
+Nine functions share `src/wireless_link_indicator.c` and the existing resource/
+projected-display types. Replaced the opaque task prefix and promoted the
+child-status alias to symbols/functions.csv. Creation now uses ordinary guard
+returns and sizeof the real object. Exact MATCH: 604 bytes; this is the only
+unit including its modified header.
