@@ -2409,3 +2409,81 @@ scope differences, not byte counts.
   initializing `status` from the call before shifting it, and a one-member union all compile to the
   same five-row difference. Next recover the SDK RTC result aggregate type rather than using two
   independent u32 values.
+## cdp-monsters (Codex)
+
+The 2026-11-13 cloud pass rebuilt scope's instrumented compiler and ran `pins` on the complete
+17-function queue. The saved drafts below are the best ordinary forms from the prior
+monsters-bosses pass where those were closer, otherwise the newly regenerated all-concessions-removed
+form. The detailed compiler investigations remain in the earlier function sections in this file;
+this index records the complete queue and the current blocking decision after rechecking it.
+
+* `TentacleActor_UpdateRetraction` — 20 differing rows after both barriers are removed. The unused
+  absolute-value branch still needs identical post-reload arms so jump2 can delete the comparison.
+* `sub_080ABB18` — 116 rows after seven concessions are removed. Loop-invariant field addresses
+  still need to be produced by loop hoisting rather than manually pinned pointer temporaries.
+* `Vorn_UpdateDefeat` — no pins or barriers remain, but eight single-use statement macros retain
+  the loop-depth allocation effect. The next form must reproduce those reference weights with
+  ordinary repeated statements.
+* `sub_080B197C` — 26 rows after its barrier is removed; `AGBCC_PRI=active:+400` diagnoses the
+  remaining r4/r5 allocation swap. It needs one natural reference to `active` or a shorter life.
+* `Skeleton_TrySelectRetreatCell` — two rows after both map-slot barriers are removed. Reload
+  choice 18 must naturally select r2 for the south signed-width load.
+* `Skeleton_UpdateDefeat` — 273 rows after three pins are removed. The two `one` lifetimes and the
+  random table allocation interact across the large state machine and must be separated first.
+* `Golem_UpdateDefeat` — 92 rows after the random-table pin is removed. Use a table-first random
+  sample form that preserves the current six-particle loop's allocation.
+* `Mummy_ResumeSavedRouteAfterAnimation` — 22 rows after four concessions are removed. The saved
+  mask and reaction/flags operands still require the ROM's stack and low-register placement.
+* `Mummy_UpdateDefeat` — 110 rows after the table pin is removed. As with Golem, the next attempt
+  should use the shared table-first random draw without changing the loop allocation.
+* `Ivy_UpdateDefeat` — 14 rows after the table pin is removed. The helper form fixes allocation,
+  but the table literal must be loaded before the random index while retaining the shorter life.
+* `Axe_UpdateDamageSpin` — the closest ordinary draft has 11 differing rows; context and constant
+  one need their priority order reversed without extending the doubled REG_EQUIV lifetime.
+* `Terrain_ResolveActorMotion` — the closest ordinary draft has 10 differing rows. CSE must not
+  fold the negated shifted offset back to the shift pseudo, without an operand barrier.
+* `SpriteColliderGroup_ActivateParts` — six rows after both concessions are removed. The ROM saves
+  unused r8, implying an allocation whose uses disappear after allocation/reload cleanup.
+* `SpriteColliderGroup_ResetActiveParts` — two rows after the total pin is removed. Combine must
+  retain a real total pseudo so the first count load occupies r5 instead of reload choosing r6.
+* `VulcanCannon_UpdateFacingTurn` — the closest shared-step draft differs by five ROM rows versus
+  three draft rows. An equality test must not let CSE reuse `allowTurn` as the later zero argument.
+* `EnemyParticle_UpdatePool` — the closest shared-step draft differs by 12 ROM rows versus 16 draft
+  rows. The step needs r8 as the loop cursor while sprite/state remain derived from the base side.
+* `OrangeSpine_ApplyHitReaction` — the relative-based ordinary draft differs by 36 ROM rows versus
+  34 draft rows. A natural value live across the response copy must occupy r0/r1 and add r3 to the
+  later reload spill set.
+
+Drafts: `notes/phase3-drafts/cdp-monsters/`.
+
+### cdp-monsters pass 2 follow-up (2026-11-13)
+
+* `SpriteColliderGroup_ResetActiveParts`: stayed on the two-row reload holdout. Algebraic
+  second uses of `total`, duplicate identical arms, a copied total, and using `total` for the
+  loop latch are either removed before combine or perturb the loop; none keeps the initial
+  zero-extend pseudo alive. The original two-row diagnosis remains exact.
+* `Skeleton_TrySelectRetreatCell`: `why 447` confirms choice 18 sees r0 occupied and r1/r2
+  free after choice 17 selected r2. Expanding the successful south tail, the blocked south
+  tail, or both prevents jump2 from recreating the ROM control flow; the best expanded-tail
+  form is 8/10 rather than 2/2. The missing earlier reload must therefore come from another
+  source-level lifetime, not duplicated south tails.
+* `VulcanCannon_UpdateFacingTurn`: passing `p->allowTurn` as the final zero argument proves
+  the equality-CSE diagnosis: it restores the missing four-byte instruction and exact branch
+  layout, but reloads the byte through a retained offset base (4/4). Constant spellings,
+  signed/unsigned zero tests, and a separate zero local all reproduce the 5/3 draft.
+* `Ivy_UpdateDefeat`: the saved helper is closer than the prior index recorded (5/5). Reversing
+  the table/index addition and pointer spellings cannot change machine order. An explicit local
+  moves the literal early but returns the 14/14 allocation swap; duplicated-load arms inflate
+  every inlined call and are far worse. The remaining form must load the literal early without
+  creating a named table lifetime.
+
+Additional pass-2 allocation attempts:
+
+* `Vorn_SelectReactionControl`: duplicated boolean tests, zero expressions derived from `active`,
+  split result/call forms, and signed/unsigned copy locals all optimize before global allocation
+  or worsen control flow; they leave the exact r4/r5 swap unchanged. A source-level ninth use
+  must survive through global allocation rather than being propagated by combine.
+* `Axe_UpdateDamageSpin`: using the long-lived `context` as the branch-local `state`, or for any
+  single state access, lets CSE merge the two pointer quantities and is substantially worse
+  (34+ rows). The near match specifically requires two loads of the same actor context; the
+  remaining +20 priority cannot come from sharing those source locals.
