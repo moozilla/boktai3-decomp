@@ -258,7 +258,7 @@ void BossSlot2_UpdateLungeApproach(struct ActorState *eventActor)
     if (actor->animationState == 1)
         SceneVolume_TestPlayerPosition(actor);
     else if (actor->animationState == 3)
-        ActorPosition_TestPath(actor, &actor->animation);
+        ActorPosition_TestPath(actor, &actor->movementTarget);
     {
         u32 mask = 0x480004;
         eventActor->flags |= mask;

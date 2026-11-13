@@ -155,7 +155,7 @@ void ActorState_UpdateRandomAnimation(struct ActorStateOwner *owner)
     s32 result;
     if (ActorState_ConsumeTrigger(actor)) {
         actor->animationIndex = (RandomValue() >> 8) & 3;
-        if (Path_PickRandomPoint(&actor->animation, actor->animationIndex) >= 0)
+        if (Path_PickRandomPoint(&actor->movementTarget, actor->animationIndex) >= 0)
             actor->animationState = 3;
         {
             u32 state = 4;
@@ -186,7 +186,7 @@ void ActorState_UpdateSelectedAnimation(struct ActorStateOwner *owner)
     struct ActorState *actor = &owner->actor;
     s32 result;
     if (ActorState_ConsumeTrigger(&owner->actor)) {
-        if (!ActorPosition_TestPath(actor, &actor->selectedAnimation)) {
+        if (!ActorPosition_TestPath(actor, &actor->savedPosition)) {
             owner->actor.requestedVariant = owner->actor.variant;
             owner->actor.request = 1;
             owner->actor.requestPhase = 0;
@@ -194,7 +194,7 @@ void ActorState_UpdateSelectedAnimation(struct ActorStateOwner *owner)
             return;
         }
         actor->animationState = 3;
-        actor->animation = actor->selectedAnimation;
+        actor->movementTarget = actor->savedPosition;
         {
             u32 state = 4;
             owner->actor.state = state;
@@ -223,7 +223,7 @@ void ActorState_BeginReverseAnimation(struct ActorStateOwner *owner)
     struct ActorState *actor = &owner->actor;
     if (ActorState_ConsumeTrigger(&owner->actor)) {
         actor->animationState = 3;
-        ActorImpact_FindNearbyPoint(actor, &actor->animation, (actor->direction + 128) & 255);
+        ActorImpact_FindNearbyPoint(actor, &actor->movementTarget, (actor->direction + 128) & 255);
         {
             u32 state = 4;
             owner->actor.state = state;
@@ -248,7 +248,7 @@ void ActorState_UpdateRestartableAnimation(struct ActorStateOwner *owner)
     u32 nextState;
     if (ActorState_ConsumeTrigger(&owner->actor)) {
         actor->animationState = 3;
-        ActorVariation_SelectRandomPair(actor, &actor->animation);
+        ActorVariation_SelectRandomPair(actor, &actor->movementTarget);
         actor->animationPhase = 0;
         {
             u32 state = 4;

@@ -13,7 +13,7 @@ void Path_GetPointPositionById(void *, int, int);
 void AnimatedHazard_CreateProximity(void *, int, int, int);
 
 void ActorMovement_FindQuarterTurnPoint(struct ActorState *,
-                                        struct ActorAnimationPair *);
+                                        struct ContactPosition *);
 
 void ActorExtension_ResetState(struct ActorState *);
 
