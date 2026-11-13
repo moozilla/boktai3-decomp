@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 #include "scene_vec.h"
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
@@ -11,15 +10,15 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
     struct SceneVec *originPointer;
     struct ModifierDisplayObject *object;
     struct ModifierGraphicsResource *graphics;
-    register s32 remaining asm("r5");
+    s32 remaining;
     resource = ScriptProc_Start(0xcb05, 0x530d);
     menu->graphicsA = *resource;
     ResourceHeader_Relocate(&menu->graphicsA, resource);
     resource = ScriptProc_Start(0xcb05, 0x1289);
     menu->graphicsB = *resource;
     ResourceHeader_Relocate(&menu->graphicsB, resource);
+    ZeroFill8(&origin);
     originPointer = &origin;
-    ZeroFill8(originPointer);
     object = menu->displays;
     remaining = 17;
     do {
