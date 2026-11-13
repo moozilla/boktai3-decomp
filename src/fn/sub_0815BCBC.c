@@ -5,7 +5,7 @@ extern const s16 gUnk_086149C4[];
 void Player_EnterKindTwo(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Sound_PlaySong(s32);
-void MovingSprite_Create_082375FC(struct SceneVec *, s32, s32, s32, s32, s32, s32);
+void MovingGlyph_Create(struct SceneVec *, s32, s32, s32, s32, s32, s32);
 void Player_UpdateSixPhaseAction(struct Player *);
 
 static inline int trunc12(int x)
@@ -31,7 +31,7 @@ void PlayerCue_Shoot(struct Player *p, s32 a, u32 c)
         Sound_PlaySong(0xCD);
         id = 0x4B;
     }
-    MovingSprite_Create_082375FC(&v, id, 0, p->facing, 0x20, 0, a);
+    MovingGlyph_Create(&v, id, 0, p->facing, 0x20, 0, a);
     p->cueParameter = c;
     Player_EnterKindTwo(p);
     ActorSequence_Begin(p, 3, 2);
