@@ -1923,7 +1923,7 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
         (*(u16 *)&p->obj.y) += 160;
-        *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
+        p->savedY = (*(u16 *)&p->obj.y);
         ActorShadow_Enable(p->p2);
         Actor_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
