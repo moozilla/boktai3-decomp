@@ -4706,10 +4706,15 @@ addr,name,mode,confidence,source,notes
 0811E318,Modifier_InitTableTask,thumb,low,src-alias,Loads modifier tables and registers their owning task as the singleton
 0811E330,Modifier_CreateTableTask,thumb,low,src-alias,Creates and initializes the modifier table task or returns the existing instance
 0811E37C,ScriptRecord_FindModifierRecord,thumb,low,src-alias,
+0811E3DC,ScriptRecord_GetEntryOption,thumb,low,src-alias,Read the option word loaded by the uppercase O operand; not the table count
 0811E3F8,ScriptRecord_FindModifier,thumb,low,src-alias,
+0811E470,ScriptRecord_GetTargetOption,thumb,low,src-alias,Read target-table option loaded by uppercase T
 0811E48C,ScriptRecord_FindExtendedModifier,thumb,low,src-alias,
+0811E514,ScriptRecord_GetWideOption,thumb,low,src-alias,Read wide-table option loaded by uppercase W
 0811E534,ScriptRecord_FindAttributeModifier,thumb,low,src-alias,
+0811E5B0,ScriptRecord_GetShortOption,thumb,low,src-alias,Read short-table option loaded by uppercase S
 0811E5D0,ScriptRecord_FindByteModifier,thumb,low,src-alias,
+0811E644,ScriptRecord_GetByteOption,thumb,low,src-alias,Read byte-table option loaded by uppercase B
 0811E660,Modifier_ScaleDefaultStat,thumb,low,src-alias,Default modifier callback scales an enabled stat by its amount divided by ten
 0811E684,Modifier_ScaleKindEightToTenStat,thumb,low,src-alias,Scaling callback selected for modifier kinds eight through ten
 0811E6A8,Modifier_ScaleKindFourStat,thumb,low,src-alias,Scaling callback selected for modifier kind four
@@ -4721,12 +4726,15 @@ addr,name,mode,confidence,source,notes
 0811E7C8,StatModifier_AddForOwnerMode,thumb,low,src-alias,
 0811E814,StatModifier_ScaleAtOwnerThreshold,thumb,low,src-alias,
 0811E844,Actor_RecomputeScriptedValue,thumb,low,src-alias,
+0811E8B0,ModifierStats_ApplyKind0,thumb,low,src-alias,Fold the value through enabled callbacks of modifier kind zero
 0811E8F0,ModifierStats_ApplyKind12,thumb,low,src-alias,
 0811E930,ModifierStats_ApplyKind15,thumb,low,src-alias,
 0811E970,ModifierStats_ApplyKind7,thumb,low,src-alias,
 0811E9B0,ModifierStats_ApplyKind11,thumb,low,src-alias,
 0811E9F0,ModifierStats_ApplyKinds4And14,thumb,low,src-alias,
 0811EA34,ModifierStats_ApplyKinds2And5,thumb,low,src-alias,
+0811EA78,ModifierStats_ApplyKind1,thumb,low,src-alias,Fold the value through callbacks of modifier kind one
+0811EAB8,ModifierStats_ApplyKind3,thumb,low,src-cleanup,Fold the value through callbacks of modifier kind three; C address symbol retained for external caller
 0811EAF8,CallbackList_RunMatchingState,thumb,low,src-alias,
 0811EB44,StatModifier_InitializeCallbacks,thumb,low,src-alias,
 0811ECCC,CallbackList_RunStateEight,thumb,low,src-alias,

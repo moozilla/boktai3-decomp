@@ -26,7 +26,7 @@ s32 ModifierMenu_CountAppearanceModifiers(struct SceneActorStyle *);
 void Character_SetLowResourceColorEffect(void *, void *);
 s32 ModifierStats_ApplyKinds4And14(void *, s32);
 void Modifier_StartDrainIfAboveThreshold(void *);
-s32 sub_0811E8B0(void *, s32);
+s32 ModifierStats_ApplyKind0(void *, s32);
 void Actor_SetSpriteDepthOffsets(void *, s32);
 u32 GameState_HasEquippedConsumable(s32);
 u8 SceneSlot_RegisterObject(u32);

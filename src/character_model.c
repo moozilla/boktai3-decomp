@@ -477,7 +477,7 @@ s32 sub_0811CD70(struct ScenePoolActor *actor, u32 input)
     }
     if (input & 0x100) {
         if (!braking) {
-            actor->forwardSpeed += sub_0811E8B0(actor, actor->acceleration);
+            actor->forwardSpeed += ModifierStats_ApplyKind0(actor, actor->acceleration);
             accelerating = 1;
         }
         actor->requestedSound = 0x89;
@@ -523,7 +523,7 @@ void ScenePool_ClampForwardBias(struct ScenePoolActor *s)
 
 void ScenePool_ClampMotionSpeeds(struct ScenePoolActor *s)
 {
-    s32 maximum = sub_0811EA78(s, s->maximumForwardSpeed);
+    s32 maximum = ModifierStats_ApplyKind1(s, s->maximumForwardSpeed);
     if (s->forwardSpeed > maximum)
         s->forwardSpeed = maximum;
     if (s->forwardSpeed < s->minimumForwardSpeed)

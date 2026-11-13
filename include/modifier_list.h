@@ -29,15 +29,15 @@ struct StatModifierOwner {
     u8 unknown80[0x879];
     u8 mode;
 };
-struct StatModifier {
-    s32 (*callback)(u8 *, s32);
-    u8 order, kind;
-    u16 amount;
-    u8 extra;
-    u8 unknown9[3];
+struct StatModifierState {
+    struct ModifierRecord record;
     u8 enabled;
-    u8 unknownD[3];
+    u8 unknown9[3];
     struct StatModifierOwner *owner;
+};
+struct StatModifier {
+    s32 (*callback)(struct StatModifier *, s32);
+    struct StatModifierState state;
 };
 /* Current/pending stat snapshot, 0x28 bytes. Numeric kind names are tentative. */
 struct ModifierSelection {
