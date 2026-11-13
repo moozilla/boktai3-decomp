@@ -449,6 +449,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.timed("POST", self.post)
 
     def get(self):
+        import forge
+        if forge.route(self, "GET"):
+            return
         if self.path in ("/", "/index.html", "/text"):
             self.send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/strings":
@@ -661,6 +664,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(404, {"error": "not found"})
 
     def post(self):
+        import forge
+        if forge.route(self, "POST"):
+            return
         n = int(self.headers.get("Content-Length", 0))
         try:
             req = json.loads(self.rfile.read(n) or b"{}")

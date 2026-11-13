@@ -13,6 +13,7 @@ function localStore(k, v) { try { if (v === undefined) return localStorage.getIt
 const NAV = [
   ['Browse', '/atlas', 'Everything in the game as one tree'],
   ['Code', '/code', 'Every function: C, disassembly, concessions, cross-references'],
+  ['Forge', '/forge', 'Edit C, compile against the ROM, build and play experiments'],
   ['ROM', '/rom', 'The ROM as a treemap'],
   ['Text', '/text', 'Every string, with the fan translation'],
   ['Scripts', '/scripts', 'Script procedures and files (GCL)'],

@@ -16,3 +16,8 @@ LDFLAGS += -L$(MGBA_PREFIX)/lib
 endif
 harness: harness.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DM_CORE_GBA -DENABLE_VFS -o $@ $< $(LDFLAGS) -lmgba
+
+# Run from the repository root. Separate output: never replace the shared harness.
+build/studio/play-host: tools/emu/play.c
+	@mkdir -p build/studio
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DM_CORE_GBA -DENABLE_VFS -o $@ $< $(LDFLAGS) -lmgba
