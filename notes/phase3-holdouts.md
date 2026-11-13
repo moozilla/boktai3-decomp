@@ -215,7 +215,7 @@ and `result = 2` before or after.
 The dp-effects follow-up below preserves a narrow-view draft and further source hypotheses.
 No evidence was found to excuse the DEBUG_NOP concession.
 
-### AnimatedParticles_Create (src/fn/sub_080154EC.c, 080154EC): deferred
+### AnimatedParticles_Create (src/fn/sub_080154EC.c, 080154EC): partial, dp-effects follow-up below
 
 Draft: `notes/phase3-drafts/field-effects/AnimatedParticles_Create.c` (6 ROM / 2 draft, all four
 concessions removed). Two separate problems:
@@ -1463,3 +1463,49 @@ Next: investigate why the unsigned half extraction retains a separate mask copy,
 or find a typed extraction whose extension combines away while preserving the
 flags-side AND destination. The owner's end-of-run instruction stopped this
 item; later queue entries were not started.
+
+
+### AnimatedParticles_Create (080154EC, src/fn/sub_080154EC.c): partial, saved-state pin and barrier removed
+
+The complete 1176-byte unit matches after removing the saved-state operand
+barrier and register pin. Type 5 saves a branch-local `first` pointer and jumps
+to stepAnimation. The other arms join at saveAnimation, save their common `a`,
+and fall into stepAnimation. The join preserves the ROM's r4-to-r8-to-r4 copies.
+The default call falls into saveAnimation and receives flow's USE 0, preventing
+it from absorbing the type-5 tail. Separate incoming pointer definitions are
+necessary: with one common `a`, GCSE copy propagation changes the step pointer
+back to `a` and removes the second copy. CSE/PRE knobs do not diagnose that
+copy propagation; the addressof-to-gcse dumps show it. Fact 175 records the form.
+
+Two call-tail barriers remain. Best complete ordinary draft:
+`notes/phase3-drafts/dp-effects/AnimatedParticles_Create.c`, 5 ROM / 1 draft
+instructions different, shape 6. The real differences are the type-5/type-6
+`movs r3, #0; bl Anim_SetSequence` tails merged into the type-7 call; alignment
+accounts for the other rows. On this exact draft,
+`AGBCC_CROSS_LIMIT=916:1,994:0,1071:0` is MATCH: allow the first saved-pointer
+copy merge but forbid the later call merges. This is diagnosis, not a landing.
+
+The initial full removal draft was 6/2, shape 8. An inline initializer returning
+its state pointer leaves that unchanged. Repeating saved assignments in every
+arm gives 12/9 and lets all three special calls merge into the default. Repeating
+the first command calculation gives 106/111; repeating the playback step gives
+146/328 and fails to share most of it. A local inline playback helper keeps the
+original pointer-copy issue; combined with repeated saves it gives 8/3. A single
+save/step join without distinct incoming pointer definitions gives 10/8; adding
+the type-5 local is the landed pointer fix. Both the direct body and inline step
+helper match when the two call barriers remain.
+
+Individual inline setup helpers for types 6 and 7, and a structured inner save
+join, retain the full ordinary 5/1 result. A paired type-5/type-6 save join also
+gives 5/1. Keeping just the type-7 barrier with that paired join improves to 2/1:
+the type-6 call still merges into the default. Reading jump.c find_cross_jump
+explains why: both falling-through calls carry identical USE 0 notes, so they
+can match each other after the saved-copy merge. A label protects a call against
+a jumping tail without that USE, but is not a universal cross-jump fence.
+
+Persistent graph: `build/matchsearch/AnimatedParticles_Create` contains 21 source
+hypotheses plus the landed partial root. Scratch and diagnostic evidence are in
+`build/cx/work/AnimatedParticles_Create`. Next: recover a genuine difference in
+the special setup helpers' return/data flow that stops the three call tails
+from sharing, while keeping the new save/step topology and pointer definitions.
+The prototype and call arguments are unchanged; no new concession was added.
