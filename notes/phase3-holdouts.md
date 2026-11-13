@@ -1475,3 +1475,33 @@ density so table takes r6, amplitude r7 and index address r8, fixing all downstr
 reload choices. The same origin helper already captures gRandomTable elsewhere.
 A union table initializer retains 29/27; constructing the halves changes shape
 (52/55). DirectSample is 31/29. No shared header edits. Full unit MATCH.
+
+### TetherActor_BlockPlayerAcrossTerrain (0804B6A4): pointer PRE frontier
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/TetherActor_BlockPlayerAcrossTerrain.c`
+(1/3, shape 2). Capture current=actor before the player-height call and use
+current for heightPosition. This avoids the unwanted PRE reaching register but
+leaves one actor copy into r6 plus padding; heightPosition then reads r6 instead
+of r7. CSE_NOCANON=73 does not remove that copy.
+
+Baseline without the barrier is 9/15, shape 14. `pre` proves that replacement 1
+hoists actor+80 across the player-height calculation into an extra sb pseudo;
+`AGBCC_NOPRE=1` gives MATCH. The gPlayers PRE replacements are required and
+disabling them worsens the result.
+
+Additional forms after the prior 24-variant pass: branch-local initial position
+(2/4, but its address moves after the test); compute position after the height
+join (13/15, shape 2, extra r4 copy and later allocation); no inner position
+assignment; late inner assignment; union actor, array position and inline
+position helper (same PRE as baseline); pointer copy before attributes or
+initial position (8/14), versus after the player-height call (baseline); shared
+surfaceHeight for actor (10/14 or 23/23); reusing position (5/3, removes ROM's
+recomputed address and copy).
+
+Restoring actor=current immediately after the player-height call removes the
+extra copy but swaps actor/position r6/r7 (13/13, exact size). Raising position
+priority by 181 corrects those registers but produces four extra instructions,
+so that is not a complete diagnosis. Restoring after height/difference changes
+shape; using position for final Z accesses removes needed address operations.
+Next: a natural actor/position lifetime that keeps actor+80 non-anticipatable
+through the height call and coalesces the saved actor copy. No reduction landed.
