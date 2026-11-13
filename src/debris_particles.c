@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "debris_particles.h"
 #include "engine.h"
+#include "monster_particle_random.h"
 
 static inline void add(struct SceneVec *d, struct SceneVec *v)
 {
@@ -32,12 +33,6 @@ static inline u16 Debris_EarlyRandom(void)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
-static inline u16 Debris_NextRandom(void)
-{
-    const u16 *table = gRandomTable;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return table[gRandomIndex];
-}
 static inline int Debris_Scale(int n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
@@ -56,40 +51,40 @@ s32 sub_08012B34(void *arg0, struct BreakableBarrier *b)
         return -1;
     v = &p->velocity;
     if (b->sprite.flags & 4) {
-        setup = 0x0403B714;
+        setup = PARTICLE_RANDOM_SAMPLE_ORIGIN;
         angle = (Debris_EarlyRandom() & 0x7F) + 0x40;
     } else {
-        setup = 0x0403B714;
+        setup = PARTICLE_RANDOM_SAMPLE_ORIGIN;
         angle = (Debris_EarlyRandom() & 0x7F) - 0x40;
     }
     speed = (Debris_EarlyRandom() & 7) + 8;
     v->x = Debris_Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
     v->y = 0;
     v->z = Debris_Scale(gUnk_086149C4[angle & 255] * speed);
-    asm volatile("" ::"r"(setup));
-    v->y = (Debris_NextRandom() & 31) + 16;
+    v->y = (ParticleRandom_ReadRelativeSample(setup, gRandomTable) & 31) + 16;
     position = &pos;
     pos = b->sprite.position;
     {
-        s32 sample = Debris_NextRandom();
+        s32 sample = ParticleRandom_ReadRelativeSample(setup, gRandomTable);
         s32 coordinate = (u16)position->x - 32;
         sample &= 63;
         position->x = coordinate + sample;
     }
     {
-        s32 sample = Debris_NextRandom();
+        s32 sample = ParticleRandom_ReadRelativeSample(setup, gRandomTable);
         s32 coordinate = (u16)position->y - 32;
         sample &= 63;
         position->y = coordinate + sample;
     }
     {
-        s32 sample = Debris_NextRandom();
+        s32 sample = ParticleRandom_ReadRelativeSample(setup, gRandomTable);
         s32 coordinate = (u16)position->z - 32;
         sample &= 63;
         position->z = coordinate + sample;
     }
     SpritePool_SetResource(p, 0xDA6D);
-    SpritePool_StartAnimation(p, 0x5BB7, 1, 0, Debris_NextRandom() & 1);
+    SpritePool_StartAnimation(p, 0x5BB7, 1, 0,
+                              ParticleRandom_ReadRelativeSample(setup, gRandomTable) & 1);
     SpritePool_SetPosition(p, &pos);
     SpritePool_Activate(p, Debris_Update, b);
     return 0;
