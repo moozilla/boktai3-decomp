@@ -1246,3 +1246,13 @@ Next: retain the literal union update's hoisted zero while obtaining the byte-ma
 Draft: `notes/phase3-drafts/dp-scene2/Actor_UpdateFinishingAnimation.c`. The byte reset mask and union update match all useful instructions and allocation. The missing `movs r7, #0` also removes final alignment padding (ROM 608 bytes, draft 604). The partial removes the r2 pin and names the release-control field, retaining the original unused-zero pin.
 
 The blink investigation above applies directly. A separate mask-first byte union also drops the zero and keeps its one constant inside the loop; initialized unions and reset helpers do not retain it. No complete matching knob is known. Next: use this smaller twin to trace the literal union OR's hoisted QImode zero and preserve it while restoring the byte-mask operand order.
+
+### ActorDisplay_UpdateForegroundSprite (081EC7D8): horizontal allocation still open
+
+Draft: `notes/phase3-drafts/dp-scene2/ActorDisplay_UpdateForegroundSprite.c` (ROM 412 bytes, draft 420; 35 ROM / 38 draft instructions differ, shape 7). Separating the horizontal and vertical sums stops the original reused x pseudo from taking the drawable's r5. Distinct field pointers remove their accidental global lifetime. Playback then differs only in one mask reload, but coordinate allocation still prevents move2add from reusing the shake and displacement offsets.
+
+Diagnosis: local allocation gives the horizontal sum r0 (priority 12000, six references), and its live screen pointer r1 (priority 2500, two references). The ROM has the reverse. `AGBCC_PRI=screen:+10000` confirms the first placement and reduces shape distance to 4 (27 ROM / 29 draft instructions), but is not a complete matching knob. Forcing x alone does not model the original hard register's entire arithmetic chain. Full multi-value forcing also changes overlapping allocations and is not matching evidence.
+
+Tried: separate coordinate lifetimes, separate address lifetimes, direct named fields, signed/unsigned sums, reversed operand spelling, halfword sums and final-sum truncation, word-union sums, and a geometry inline helper. Halfword forms introduce unwanted extensions; direct fields also lose the required early screen address and signed layer load. The retained full-width draft preserves the observed operation and load order.
+
+Next: break the sum's local-allocation quantity tie without changing instruction order, or recover a source aggregate/accessor whose screen address gets the first local register. Keep the full 0x5E0/0x5E6/0x5E8 offsets and signed alternate-layer read. Return after the singleton tail of the queue.
