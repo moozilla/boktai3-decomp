@@ -9221,9 +9221,17 @@ addr,name,mode,confidence,source,notes
 0821BC1C,Terrain_LoadGridResource,thumb,low,src-alias,loads a grid from a type-AE1B resource (no such archive found; unused?)
 0821BC4C,Terrain_SetGrid,thumb,low,src-alias,"HP grid -> EngineMap+4, then neighbour offsets and size"
 0821BC68,CellObject_Init,thumb,low,src-alias,
+0821BCE4,Terrain_GetCardinalDirectionToCell,thumb,low,decomp,Find a target within four cells along a cardinal neighbor direction
 0821BD48,Terrain_GetHeightAt,thumb,low,src-alias,
+0821BDD8,Terrain_GetCellFlagsAt,thumb,low,decomp,Return flags from the grid cell containing a world position
+0821BE3C,Terrain_GetHeightDifference,thumb,low,decomp,Return absolute sampled terrain height difference between two positions
+0821BF5C,Terrain_AreCellsConnected,thumb,low,decomp,Test movement between cells against surface shapes and movement kind
+0821C254,Terrain_AdjustBlockedMovement,thumb,low,decomp,Clamp or slide a blocked destination at the current cell boundary
 0821C754,Terrain_SampleSurface,thumb,low,src-alias,
+0821C884,Terrain_MovePoint,thumb,low,decomp,Add a movement delta then resolve cell boundaries and sample the surface
 0821C8F8,Terrain_MoveFootprint,thumb,low,matching,Adjusts a moving footprint against terrain corners and samples the resulting surface
+0821D178,Terrain_StepTowardCellBoundary,thumb,low,decomp,Advance a segment toward its target through the next terrain-cell edge
+0821D4F0,Terrain_IsSegmentBelowHeightLimit,thumb,low,decomp,Walk a bounded number of cell steps and reject terrain rising above the height limit
 0821D630,TerrainModifiers_InitCell,thumb,low,src-alias,Initializes a cell override with packed tile and height data plus flags
 0821D64C,TerrainModifiers_FindCellOverride,thumb,low,src-alias,Finds the highest override for a cell while excluding masked flags
 0821D698,TerrainModifiers_RegisterCell,thumb,low,src-alias,Initializes a cell override and inserts it at the terrain override list head
