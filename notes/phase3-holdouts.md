@@ -1293,3 +1293,34 @@ second-branch pins interferes with the now-exact first branch.
 Next: recover a snapshot/reset helper boundary that gives the gate and tail
 address constants independent reloads; examine the call's unused forwarded
 arguments and original helper signature. Keep the direct first branch intact.
+
+### SceneActorPalette_BeginTransition (08071E00)
+
+Tags: `08071E00` `phase3` `palette` `allocation`
+
+No stock-compiler removal landed. Saved pin-free member/index draft differs
+83 ROM / 81 draft instructions (shape 54), against 90 / 92 (shape 62) for the
+mechanical pin removal. Prior round11-c work already tried 95 removal groups
+and 24 search variants. This pass used the matched Axe initializer as a fresh
+array-loop model, pointer byte stores, natural do loops versus goto loops,
+member channel pointers, typed channel getters, channel-address helpers, and
+red work repeated in both sampling arms. None restored the original loop's
+allocation or its separate mask lifetimes. Narrowing the red scratch also
+failed to replace its existing barrier without instruction changes.
+
+Scope proves transition is allocated before base (3428 versus 2941 priority),
+taking r6 instead of r7. Diagnostic `AGBCC_PRI=base:+488` flips the ordering
+and improves to 75 / 73 differing instructions, but is not a full matching
+knob. Duplicating red work in both arms changes allocation but worsens the
+shape. global.c's allocno_compare uses refs * floor_log2(refs) / live length;
+source variables alone do not create independent channel-pointer lifetimes
+because CSE folds them. Halfword array indexing improves shape but joins the
+byte and halfword induction values; the ROM keeps independent i and 2*i.
+The color mask is cached across five uses where the ROM has separate masks.
+
+Persistent evidence: build/matchsearch/SceneActorPalette_BeginTransition;
+member/index root and arm-red hypothesis retained. Next: recover the original
+RGB extraction/update helper so independent masks and induction values arise
+from real types; then revisit transition/base density and final flag reloads.
+The full difference is not explained by one knob yet. Source remains matching
+with its original concessions.
