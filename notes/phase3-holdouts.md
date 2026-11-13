@@ -212,8 +212,8 @@ after the AND make the AND's result live across a block boundary, which changes 
 Tried with no change: the value or the constant first (fact 33), `flags &= 0xf000`, a separate
 `priority`, u32 parameter and casts, a ternary, `p >= 1 && p <= 4`, `p < 4`, a switch (worse),
 and `result = 2` before or after.
-Next idea: real code between the AND and the shift that ends the block (a test the original
-had), or evidence for `concession-ok(debug-nop)` from a twin with the same compiled-out check.
+The dp-effects follow-up below preserves a narrow-view draft and further source hypotheses.
+No evidence was found to excuse the DEBUG_NOP concession.
 
 ### AnimatedParticles_Create (src/fn/sub_080154EC.c, 080154EC): deferred
 
@@ -1424,3 +1424,42 @@ combine.c distribute_notes preserves a lost REG_DEAD input with a USE at a label
 for caller-save tracking. Next: a low-register output copy that survives CSE
 without a cursor pin, or a legitimate field view whose address forms only after
 PRE. The fixed initialization and scope explanation are landed independently.
+
+
+### AnimatedParticle_PriorityFromFlags (080154D0, src/fn/sub_080154D0.c): stopped at run end, DEBUG_NOP remains
+
+The production source is unchanged and still passes the stock 28-byte unit check.
+Removing DEBUG_NOP gives 7 ROM / 5 draft differences: regmove ties the AND result
+to the constant mask instead of flags. AGBCC_NOTIE=13 is an exact diagnostic match
+on the plain removal draft; it is not a source solution. The prior operand-order,
+cast, range-test, ternary, and switch investigations remain applicable.
+
+Best ordinary draft: `notes/phase3-drafts/dp-effects/AnimatedParticle_PriorityFromFlags.c`.
+It reads flags through the low unsigned half of a word union before masking. This
+keeps the AND result in r0 and recovers the shift, subtraction, conditional result
+copy, and final return copy. It is 28 bytes with 3 ROM / 3 draft differences,
+shape 2: the mask is constructed in r2 and copied to r1 rather than constructed
+directly in r1; the extra copy consumes the ROM's trailing padding instruction.
+A scalar low-half union member and a 16-bit unsigned bit field give the same code.
+
+Changing the union half to signed short instead gives every ROM instruction plus
+an unnecessary left-shift/arithmetic-right-shift pair by 16 before the mask
+(0 ROM / 2 draft differences, 32 bytes). The masked result is equivalent for all
+flag words, but combine does not remove that sign extension. A 31-bit unsigned
+field likewise leaves two extra shifts. These are useful alternate starting
+points because they recover the desired AND tie through typed extraction.
+
+A full-width signed/unsigned union, masking before the half read, and an inline
+word-mask helper all retain the original 7/5 mismatch. Updating the half member
+in place or through an inline helper gives 9/8; the inline halfword-argument
+boundary gives 4/2, shape 6. Recomputing the successful result from flags gives
+6/8, shape 6. Grouping priorities 1 through 4 in switch arms gives 8/8, shape 10,
+with different range checks. No source candidate is an exact match.
+
+Persistent graph: `build/matchsearch/AnimatedParticle_PriorityFromFlags` contains
+all 14 source hypotheses plus the production root. Scratch candidates and the
+exact regmove diagnosis are in `build/cx/work/AnimatedParticle_PriorityFromFlags`.
+Next: investigate why the unsigned half extraction retains a separate mask copy,
+or find a typed extraction whose extension combines away while preserving the
+flags-side AND destination. The owner's end-of-run instruction stopped this
+item; later queue entries were not started.
