@@ -1324,3 +1324,30 @@ RGB extraction/update helper so independent masks and induction values arise
 from real types; then revisit transition/base density and final flag reloads.
 The full difference is not explained by one knob yet. Source remains matching
 with its original concessions.
+
+### SceneActorPalette_ApplyTransition (08071F50)
+
+Tags: `08071F50` `phase3` `palette` `allocation`
+
+Landed the flagSet barrier removal with the byte-valued Test helper in each
+category arm, retaining the original goto order. Check MATCH, 468 bytes.
+The source retains 18 pins and three barriers. The pin-free base with that
+helper has 102/104 differing instructions, shape 40. A do loop improves it
+to 88/90, shape 40. Repeating the manager flag write in each category arm
+further improves allocation (actor r7, manager r8 and category r9) but leaves
+duplicate tails: saved draft 80/86 differences, shape 30.
+
+Confirmed priority decisions: i loses to actor (1846 versus 2258);
+AGBCC_PRI=i:+413 improves the base to 98/100. manager loses r8 to category;
+AGBCC_PRI=manager:+160 also improves to 98/100. A real do loop and repeated
+arm writes reproduce parts of those changes. Remaining frame growth comes
+from colorCursor spilling; channel address construction and blueSum allocation
+remain wrong. The direct member loop, ordered pointer declarations, s16 index,
+and mask-first predicate did not recover the original allocation. Direct
+actorFlags member access alone differs in six register instructions. The full
+difference is not explained by a single matching knob.
+
+Persistent evidence: build/matchsearch/SceneActorPalette_ApplyTransition.
+Next: recover the channel pointer setup and signed-byte update helper; the
+ROM uses byte load/shift for red and green, indexed ldrsb for blue. Preserve
+the byte flag helper and category arm order that already remove a barrier.
