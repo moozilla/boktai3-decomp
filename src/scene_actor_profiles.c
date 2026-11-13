@@ -1,23 +1,89 @@
 #include "scene_actor_profile.h"
-/* The cursor stays within the 128-byte record; bytes8..10 are each entry's payload. */
+
+void SceneActorProfiles_FreeAll(void)
+{
+    struct SceneActorProfileList *list = (void *)gSceneActorRegistryManager->subsystem;
+    struct SceneActorProfile *profile = list->head;
+    while (profile) {
+        struct SceneActorProfile *next = profile->next;
+        Heap_Free(profile);
+        profile = next;
+    }
+}
+
+s32 SceneActorProfiles_FindDefaultIndex(u32 category)
+{
+    struct SceneActorProfileList *list = (void *)gSceneActorRegistryManager->subsystem;
+    struct SceneActorProfile *head = list->head;
+    struct SceneActorProfile *profile;
+    s32 count;
+    if (head)
+        goto initialize;
+    goto missing;
+found:
+    return profile->id;
+initialize:
+    profile = head;
+    count = 0;
+scan:
+    if (profile->category == category && profile->mode == 0)
+        goto found;
+    profile = profile->next;
+    count++;
+    if (count > 11)
+        goto missing;
+    if (profile)
+        goto scan;
+missing:
+    return -1;
+}
+
+struct SceneActorProfile *SceneActorProfiles_Find(u32 id, u32 mode)
+{
+    struct SceneActorProfileList *list = (void *)gSceneActorRegistryManager->subsystem;
+    struct SceneActorProfile *profile = list->head;
+    s32 count = 0;
+    if (profile) {
+        do {
+            if (profile->id == id && profile->mode == mode)
+                return profile;
+            profile = profile->next;
+            count++;
+            if (count > 11)
+                break;
+        } while (profile);
+    }
+    return 0;
+}
+
+/* Integer address arithmetic preserves the lookup miss result without forming a null-derived pointer. */
+
+u32 SceneActorProfiles_GetEntryAddress(u32 id, u32 mode, s32 index)
+{
+    u32 profile = (u32)SceneActorProfiles_Find(id, mode);
+    u32 offset = (u32)index * sizeof(struct SceneActorProfileEntry);
+    offset += sizeof(struct SceneActorProfile) - sizeof(((struct SceneActorProfile *)0)->entries);
+    return profile + offset;
+}
+
 static inline void SceneActorProfile_SetEntry(struct SceneActorProfile *profile, u32 index,
                                               u32 value, u32 flags, u32 state)
 {
-    u8 *cursor = (u8 *)profile + index * 4;
-    cursor[8] = value;
-    cursor[9] = flags;
-    cursor[10] = state;
+    profile->entries[index].value = value;
+    profile->entries[index].flags = flags;
+    profile->entries[index].state = state;
 }
+
 s32 SceneActorProfiles_Add(u32 category, u32 mode)
 {
     struct SceneActorProfileList *registry = (void *)gSceneActorRegistryManager->subsystem;
     struct SceneActorProfile *profile;
     if (registry->count > 11)
         return -1;
-    profile = Heap_Alloc(0x80);
+    profile = Heap_Alloc(sizeof(*profile));
     if (!profile)
         return -1;
-    Memory_Clear(profile, 0x80);
+    Memory_Clear(profile, sizeof(*profile));
     profile->next = registry->head;
     registry->head = profile;
     registry->count++;
@@ -310,4 +376,17 @@ s32 SceneActorProfiles_Add(u32 category, u32 mode)
             return -1;
     }
     return profile->id;
+}
+
+s32 SceneActorProfiles_FindOrAdd(u32 category, u32 mode)
+{
+    s32 index;
+    if (mode) {
+        index = SceneActorProfiles_Add(category, mode);
+    } else {
+        index = SceneActorProfiles_FindDefaultIndex(category);
+        if (index == -1)
+            index = SceneActorProfiles_Add(category, 0);
+    }
+    return index;
 }
