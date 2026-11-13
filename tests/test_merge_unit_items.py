@@ -1,9 +1,10 @@
 import sys
 import unittest
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from merge_unit import items
+from merge_unit import items, write_merge
 from progress import _bodies
 
 
@@ -32,3 +33,23 @@ void SelectBase(void)
     def test_a_comment_inside_a_declaration_does_not_end_it(self):
         structure = "struct Holder\n/* The payload contains ( values. */\n{ int value; };"
         self.assertEqual(items(structure), [structure])
+
+
+class MergeWrites(unittest.TestCase):
+    def test_write_preserves_output_that_is_also_an_input(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory, "unit.c")
+            source = Path(directory, "single.c")
+            output.write_text("old")
+            source.write_text("input")
+            write_merge(str(output), [str(output), str(source)], "merged")
+            self.assertEqual(output.read_text(), "merged")
+            self.assertFalse(source.exists())
+
+    def test_failed_output_write_keeps_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "single.c")
+            source.write_text("input")
+            with self.assertRaises(OSError):
+                write_merge(str(Path(directory, "absent", "unit.c")), [str(source)], "merged")
+            self.assertEqual(source.read_text(), "input")
