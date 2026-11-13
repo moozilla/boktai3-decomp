@@ -91,12 +91,12 @@ s32 Div(s32, s32);
 static inline void Step(struct Member *m, struct Render *owner, struct Frames *state)
 {
     register struct Frames *f asm("r4") = state;
-    const volatile u16 *word;
+    const u16 *word;
 
     {
         u32 offset = f->index << 1;
-        const volatile u16 *table = m->frames.data;
-        word = (const volatile u16 *)((u32)table + offset);
+        const u16 *table = m->frames.data;
+        word = (const u16 *)((u32)table + offset);
     }
     owner->tile = *word >> 6;
     {
@@ -169,8 +169,8 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
             f->index = index;
         update: {
             u32 offset = f->index << 1;
-            const volatile u16 *table = f->data;
-            word = (const volatile u16 *)((u32)table + offset);
+            const u16 *table = f->data;
+            word = (const u16 *)((u32)table + offset);
         }
             {
                 u32 value = *word;
