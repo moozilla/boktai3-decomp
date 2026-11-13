@@ -198,6 +198,7 @@ static void rtc_command(Hw *hw)
         hw->rtc_count = 3;
         break;
     }
+    case 8: hw_copy(hw->rtc_data, hw->rtc_alarm, 2); hw->rtc_count = 2; break;
     default: hw->rtc_active = 0; break;
     }
     if (!hw->rtc_read) hw_zero(hw->rtc_data, sizeof(hw->rtc_data));
@@ -207,6 +208,7 @@ static void rtc_finish_write(Hw *hw)
 {
     switch (hw->rtc_command & 0x0e) {
     case 2: hw->rtc_status = hw->rtc_data[0]; break;
+    case 8: hw_copy(hw->rtc_alarm, hw->rtc_data, 2); break;
     case 4: (void)hw_rtc_set_datetime(hw, hw->rtc_data); break;
     case 6: {
         uint8_t date[7];

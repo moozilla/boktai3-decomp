@@ -111,7 +111,7 @@ struct Hw {
     uint16_t solar_threshold, solar_clocks;
     uint8_t solar_output;
     uint8_t rtc_command, rtc_bits, rtc_data[8], rtc_count, rtc_read;
-    uint8_t rtc_status, rtc_active;
+    uint8_t rtc_status, rtc_active, rtc_protected, rtc_alarm[2];
     int64_t rtc_offset;
     uint16_t eeprom_bits, eeprom_address, eeprom_read_bit;
     uint8_t eeprom_command, eeprom_buffer[8];

@@ -1,4 +1,5 @@
 #include "hw.h"
+#include "hw_rtc.h"
 #include "gba/types.h"
 #include "gba/m4a_internal.h"
 #include <limits.h>
@@ -209,6 +210,36 @@ static int cartridge_tests(void)
     return 0;
 }
 
+static int rtc_sdk_tests(void)
+{
+    HwRtcRecord record = {0x24, 0x12, 0x31, 2, 0x23, 0x59, 0x58, 0, 0x15, 0x42};
+    HwRtcRecord readback = {0};
+    Rtc_Initialize();
+    CHECK(machine.gpio_enable && !iwram[0x35c6]);
+    CHECK(Rtc_CheckAndReset() == 1);
+    CHECK(Rtc_WriteDateTime(&record) == 1);
+    CHECK(Rtc_ReadDateTime(&readback) == 1);
+    CHECK(readback.year == 0x24 && readback.month == 0x12 && readback.day == 0x31);
+    CHECK(readback.hour == 0x23 && readback.minute == 0x59 && readback.second == 0x58);
+    clock_seconds += 2;
+    CHECK(Rtc_ReadDateTime(&readback) == 1);
+    CHECK(readback.year == 0x25 && readback.month == 1 && readback.day == 1 && readback.hour == 0 && readback.second == 0);
+    record.hour = 0x12; record.minute = 0x34; record.second = 0x56;
+    CHECK(sub_08248E70(&record) == 1 && Rtc_ReadTime(&readback) == 1);
+    CHECK(readback.hour == 0x12 && readback.minute == 0x34 && readback.second == 0x56 && readback.year == 0x25);
+    record.status = 7;
+    CHECK(Rtc_WriteStatus(&record) == 1 && Rtc_ReadStatus(&readback) == 1);
+    CHECK(readback.status == 0x47 && machine.rtc_status == 0x6a);
+    CHECK(sub_08248F0C(&record) == 1 && machine.rtc_alarm[0] == 0x95 && machine.rtc_alarm[1] == 0x42);
+    Rtc_Protect();
+    CHECK(!machine.gpio_enable && iwram[0x35c6] == 1);
+    CHECK(Rtc_ReadDateTime(&readback) == 0 && Rtc_WriteDateTime(&record) == 0 && Rtc_Reset() == 0);
+    Rtc_Initialize();
+    CHECK(Rtc_Reset() == 1 && Rtc_ReadStatus(&readback) == 1 && readback.status == 0x40);
+    CHECK(Rtc_ReadDateTime(NULL) == 0 && Rtc_WriteStatus(NULL) == 0);
+    return 0;
+}
+
 static int audio_tests(void)
 {
     static struct SoundInfo sound;
@@ -267,5 +298,6 @@ int hw_test_run(void)
     result = bios_tests(); if (result) return result;
     result = device_tests(); if (result) return result;
     result = cartridge_tests(); if (result) return result;
+    result = rtc_sdk_tests(); if (result) return result;
     return audio_tests();
 }
