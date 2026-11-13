@@ -190,13 +190,8 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
     marker->secondary.sprite.flags |= 0x400;
     *views.secondaryPriority = priority;
     {
-        u32 lo = *(u32 *)&marker->position;
-        u32 hi = ((u32 *)&marker->position)[1];
-        u32 *destination;
-        asm("" : "+r"(lo), "+r"(hi));
-        destination = (u32 *)views.secondaryPosition;
-        destination[0] = lo;
-        destination[1] = hi;
+        struct ContactPosition saved = marker->position;
+        *views.secondaryPosition = saved;
     }
     SavedPositionMarker_SetState(marker, SavedPositionMarker_TickIdle);
     return 0;
