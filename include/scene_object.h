@@ -2,6 +2,7 @@
 #define SCENE_OBJECT_H
 #include "engine.h"
 #include "scene_vec.h"
+#include "scene_animation.h"
 
 /*
  * Scene objects: pushable/breakable blocks and similar props (types 0-6) that live in a fixed
@@ -38,13 +39,7 @@ struct SceneBody {
     u8 tail[46];
 };
 
-struct SceneAnimation {
-    u8 pad0[6];
-    u16 paletteIndex; /* selected bank of sixteen RGB15 colors */
-    u8 pad8[4];
-    void *palette; /* palette override used by type 6 objects */
-    u8 tail[12];
-};
+
 
 struct SceneDraw {
     u32 flags; /* bit 0: hidden (owner is not the current one) */

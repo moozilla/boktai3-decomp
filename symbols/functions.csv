@@ -1632,6 +1632,7 @@ addr,name,mode,confidence,source,notes
 080426B0,DisplayAnimation_SetPosition,thumb,low,src-alias,
 080426D4,DisplayAnimation_SetFlags,thumb,low,src-alias,
 080426F8,DisplayAnimation_ClearFlags,thumb,low,src-alias,
+0804271C,DisplayAnimation_TestFlags,thumb,low,src-alias,Return selected drawable flags; zero for an inactive wrapper
 08042738,DisplayAnimation_SetPriority,thumb,low,src-alias,
 0804275C,DisplayAnimation_SetPalette,thumb,low,src-alias,
 08042798,DisplayAnimation_SelectPaletteBank,thumb,low,src-alias,

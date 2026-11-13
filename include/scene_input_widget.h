@@ -14,12 +14,14 @@ struct SceneInputResource {
 struct SceneInputWidget {
     u8 unknown0[2];
     u16 stamp; /* Copied from 03005238 on initialization; meaning tentative. */
-    u8 unknown4[4];
+    u8 unknown4[4]; /* Byte zero is the animation-list registration flag. */
     u32 flags;
     u16 fieldC, attributeE, scale;
-    u8 unknown12[8];
+    u8 unknown12[2];
+    u16 frame;
+    u8 unknown16[4];
     u8 attribute1A, attribute1B;
-    u8 unknown1C[4];
+    u8 unknown1C, status, unknown1E[2];
     struct ContactPosition position;
     u8 unknown28[0xC];
     u8 scaleX, scaleY; /* 0x34: affine scale used by floating-item effects. */
