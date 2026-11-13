@@ -107,7 +107,10 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
         struct SceneRigSprite *sprite;
         struct SceneRigSprite *output;
         struct ContactPackedVector base;
-        s32 near;
+        union {
+            s32 near;
+            const s16 *wave;
+        } work;
         s32 far;
         s32 lift;
         s32 radius;
@@ -119,11 +122,11 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
         }
         sprite = (void *)((u8 *)rig + product);
         output = sprite;
-        near = index;
-        near += 2;
+        work.near = index;
+        work.near += 2;
         {
             s32 total = 8;
-            far = total - near;
+            far = total - work.near;
         }
         {
             s32 difference = rig->position.y;
@@ -131,13 +134,14 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
             difference *= far;
             lift = scale5(3 * difference);
         }
-        base.x = scale3(rig->position.x * near + rig->origin.x * far) + lift;
-        base.y = scale3(rig->position.y * near + rig->origin.y * far);
-        base.z = scale3(rig->position.z * near + rig->origin.z * far) + lift;
+        base.x = scale3(rig->position.x * work.near + rig->origin.x * far) + lift;
+        base.y = scale3(rig->position.y * work.near + rig->origin.y * far);
+        base.z = scale3(rig->position.z * work.near + rig->origin.z * far) + lift;
         {
-            register const s16 *wave asm("r2") = gUnk_086149C4;
-            register u16 *randomPhase asm("r3") = &sprite->randomPhase;
+            register u16 *randomPhase asm("r3");
             u16 *phase;
+            work.wave = gUnk_086149C4;
+            randomPhase = &sprite->randomPhase;
             {
                 register u32 sample asm("r1") = *randomPhase;
                 u32 angle = byteMask;
@@ -147,7 +151,7 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
                     u32 mask = byteMask;
                     angle &= mask;
                 }
-                radius = scale12(wave[angle] * amplitude);
+                radius = scale12(work.wave[angle] * amplitude);
             }
             {
                 s32 horizontal;
@@ -158,7 +162,7 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
                         u32 mask = byteMask;
                         product &= mask;
                     }
-                    product = wave[product] * radius;
+                    product = work.wave[product] * radius;
                     phase = anglePtr;
                     horizontal = product;
                 }
@@ -174,7 +178,7 @@ void ScenePanelRig_TickSecondarySprites(struct ScenePanelRig *rig, u32 palette)
                 u32 angle = byteMask;
                 s32 offset;
                 angle &= sample;
-                offset = scale12(wave[angle] * radius);
+                offset = scale12(work.wave[angle] * radius);
                 {
                     u16 z = base.z + offset;
                     struct SceneRigSprite *store = output;
