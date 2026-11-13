@@ -1642,3 +1642,41 @@ count-address 4117; AGBCC_PRI=i:+248 improves to 6/6, shape 0. Sharing the
 function-scope index across both direct loops gives the full match, including
 the second count-pointer copy. Passing an index pointer into both helpers
 changes shape badly (48/62); explicit pointer-loop helpers also fare worse.
+
+### ResourceStation_CheckInteraction (0804EFB4): one pin removed
+
+Repeating the final store/return in the nonplayer and accepted-interaction
+branches removes the value r0 pin. Named player/action/inputKeys fields replace
+the old raw accesses, with no byte changes. inputKeys at 0x348 was added to
+the local player view in a separate layout-preserving header change; all three
+including units match. Four pins and three barriers remain. Stock interaction
+unit check MATCH (256 bytes).
+
+Best pin-free draft:
+`notes/phase3-drafts/dp-field/ResourceStation_CheckInteraction.c`
+(33/33, shape 0, exact size), improved from baseline 36/36. Remaining registers
+include station versus triggerOffset, the nearby address scratch and terminal
+stores. Station has priority 3428 but triggerOffset is locally allocated r4
+first; raising station priority by 10000 has no effect. Forcing station to r4
+reduces the baseline to 17/17. Value's baseline priority is 3750 versus its
+destination's 10000; duplicated terminal stores remove that pin naturally.
+
+An isolated named nearby-field store removes nearbyOffset's pin/barrier and
+the nearby pointer pin, leaving only 3/3. `AGBCC_SPILL=10:2` on
+partial-nearby-field.c gives MATCH: reload 10 needs r5 instead of r2 on the
+spill list r1,r2,r5. Clear-offset removal collapses a needed separate address
+calculation (4/2, shape 2). Removing the outside barrier alone is 3/3.
+A direct setter helper retains the nearby scratch difference; separate clear
+and address-returning helpers give 7/5 to 12/12 and do not restore all copies.
+
+Other attempts: u8 value, early trigger-offset declaration, reuse of x/z or
+playerKind for the trigger offset (unchanged allocation); named trigger/state
+fields (20/15, shape 13); named player fields alone (unchanged); deleting their
+now-unused offset calculations and old labels works for the landed partial
+but worsens full pin removal to 43/42, shape 7. Retained the better shape-zero
+draft for the next pass. Prior round-11 work already tried 24 source variants.
+
+Next: use a natural branch/helper structure to account for two more reload
+choices before the nearby store, then move the trigger-offset value out of
+local allocation without introducing an early address computation. No complete
+combined override was established for the full pin-free draft.
