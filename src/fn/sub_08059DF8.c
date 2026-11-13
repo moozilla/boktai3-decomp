@@ -79,9 +79,8 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
         value = gUnk_086149C4[angle] * radius;
     }
     SCALE12(z, value);
-    asm("" : "+r"(angle));
     wave = gUnk_086149C4[rig->motionFlag];
-    value = (gUnk_086149C4[angle] << 5) * wave;
+    value = (gUnk_086149C4[angle & 255] << 5) * wave;
     rig->position.z = rig->origin.z + z + scale24(value);
     if (rig->selectionTimer <= 2) {
         rig->selectionTimer = 600;
