@@ -102,8 +102,10 @@ build/venv/bin/python port/hw/build.py --mgba-rom baserom.gba
 build/venv/bin/python port/hw/build.py --song-rom baserom.gba --song 1 --seconds 10
 ```
 
-The oracle also checks 4,491 Div/Sqrt/copy/decompression vectors against mGBA,
-executing its replacement BIOS for copy SWIs. It checks signed ArcTan across its full input range, ArcTan2 across
+The oracle also checks 4,568 Div/Sqrt/copy/decompression vectors against mGBA,
+executing its replacement BIOS for copy SWIs, including 77 overlapping fast
+copies. Native/wasm tests also check the maximum 21-bit CpuFastSet count after
+rounding to eight words. It checks signed ArcTan across its full input range, ArcTan2 across
 quadrants, all 256 affine angle steps, and 128 bounded LZ77 candidates read
 from the runtime ROM. Integer arithmetic agrees exactly; affine coefficients
 allow one unit because mGBA HLE rounds negative products differently. It also

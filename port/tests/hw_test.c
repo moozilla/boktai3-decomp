@@ -37,6 +37,7 @@ static int64_t now(void *user) { (void)user; return clock_seconds; }
 static int bios_tests(void)
 {
     uint32_t src[16], dst[16];
+    static uint32_t maximum_copy[0x200001];
     unsigned i;
     int32_t rem;
     uint8_t result[64];
@@ -56,6 +57,14 @@ static int bios_tests(void)
     CHECK(dst[3] == src[3] && dst[4] == 0);
     CpuFastSet(src + 1, dst, 0x01000001);
     CHECK(dst[0] == src[1] && dst[7] == src[1] && dst[8] == 0);
+    for (i = 0; i < 16; ++i) dst[i] = i;
+    CpuFastSet(dst, dst + 1, 1);
+    CHECK(dst[0] == 0 && dst[1] == 0 && dst[8] == 7 && dst[9] == 9);
+    src[0] = 0x76543210;
+    maximum_copy[0x200000] = 0x13579bdf;
+    CpuFastSet(src, maximum_copy, 0x011fffff);
+    for (i = 0; i < 0x200000; ++i) CHECK(maximum_copy[i] == 0x76543210);
+    CHECK(maximum_copy[0x200000] == 0x13579bdf);
     CHECK(hw_bios_div(-11, 3, &rem) == -3 && rem == -2);
     CHECK(hw_bios_div(INT_MIN, -1, &rem) == INT_MIN && rem == 0);
     CHECK(hw_bios_div(5, 0, &rem) == -1 && rem == 5);

@@ -234,6 +234,20 @@ static int bios_memory_oracle(struct mCore *core)
         }
         ++cases;
     }
+    for (variant = 1; variant <= 7; ++variant) for (count = 1; count <= 32; count += 3) {
+        for (i = 0; i < 80; ++i) {
+            actual[i] = source[i];
+            core->busWrite32(core, 0x02000000 + i * 4, source[i]);
+        }
+        CpuFastSet(actual + 16, actual + 16 + variant, count);
+        core->busWrite16(core, 0x0203e000, 0xdf0c);
+        core->busWrite16(core, 0x0203e002, 0x4770);
+        if (rom_call(core, 0x0203e000, 0x02000040, 0x02000040 + variant * 4, count)) return 1;
+        for (i = 0; i < 80; ++i) if (actual[i] != core->busRead32(core, 0x02000000 + i * 4)) {
+            fprintf(stderr, "CpuFastSet overlap %u count %u word %u differs\n", variant, count, i); return 1;
+        }
+        ++cases;
+    }
     {
         static const struct { unsigned swi, size; uint8_t bytes[16]; } streams[] = {
             {0x13, 12, {0x28,4,0,0,1,0xc0,'A','B',0,0,0,0x60}},
