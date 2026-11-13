@@ -1293,3 +1293,25 @@ Next: reduce the shared scratch pointer's priority and reshape the slot/part/j
 lifetimes so the register order itself adds r7 to reload's spill set. An inline
 release-slot helper may provide the necessary parameter lifetime. Evidence is
 under `build/cx/work/sub_08066CB8`.
+
+### SceneActorControl_TickJitter — remaining timer pin
+
+Tags: phase3, dp-scene1, SceneActorControl_TickJitter, 0x08067018
+
+Four of five pins removed in the matching source. The saved pin-free draft is
+136 bytes, nine register-only differences, shape zero. Separate jitter locals
+let both Mod results stay in r0; reuse reset for the flags mask preserves the
+load/constant order. Table-first ParticleRandom_ReadSample supplies the draw order.
+
+The timer takes r6, evicting the local mask, while the random table stays in r5;
+the ROM needs timer r5 and table r6. Pinning only timer to r5 is exact. Allocation
+traces show timer can evict either table or mask but chooses the mask first.
+Moving table initialization before the branch changes its class and spills it;
+union table initialization and a displacement helper leave the same nine diffs.
+Duplicating timer decrement across jitter arms cross-jumps before allocation.
+Explicit signed timer reload adds an unwanted sign-extension instruction.
+Coordinate halfword/pointer forms and displacement return-width helpers did not
+improve the remaining allocation. Earlier forced full mapping was exact; the
+four-pin reduction is a cleaner diagnostic now. Next: alter the mask/table
+local allocation order through a natural random-draw helper boundary while
+retaining the table-first load. Work files remain under build/cx/work/.
