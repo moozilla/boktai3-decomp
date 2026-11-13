@@ -8266,6 +8266,7 @@ addr,name,mode,confidence,source,notes
 081D9D14,Projectile_UpdateResetDelay,thumb,low,src-alias,Delay callback that sets flag 2 and restarts projectile state after the lifetime threshold
 081D9D3C,Projectile_SpawnImpactPair,thumb,low,src-alias,Tentatively: on eligible projectile impact; spawn two randomized child projectiles and register their stimuli.
 081D9F18,Projectile_InitFromType,thumb,low,src-alias,
+081DA048,TimedEffect_HandleCollision,thumb,low,src-alias,
 081DA0B4,TimedEffect_InitEntry,thumb,low,src-alias,
 081DA178,TimedEffect_RemoveFromManager,thumb,low,src-alias,
 081DA1DC,TimedEffect_UpdateTerrainTurn,thumb,low,src-alias,
@@ -8300,6 +8301,8 @@ addr,name,mode,confidence,source,notes
 081DB0C4,Explosion_InitColliderWithFlags,thumb,low,src-alias,
 081DB168,Explosion_Init,thumb,low,src-alias,Initializes the effect sprite and standard collider with position and activation delay
 081DB1D8,Explosion_InitWithCollisionFlags,thumb,low,src-alias,Initializes the same effect with an additional configurable collider flag argument
+081DB24C,Explosion_CreateImmediate,thumb,low,src-alias,
+081DB2B8,Explosion_CreateDelayed,thumb,low,src-alias,
 081DB324,Explosion_Create,thumb,low,src-alias,Allocates an explosion with caller-supplied collision parameters and activation delay
 081DB390,Explosion_CreateAt,thumb,low,src-alias,
 081DB404,Explosion_CreateWithCollisionFlags,thumb,low,src-alias,Allocates an explosion using the initializer that accepts additional collider flags

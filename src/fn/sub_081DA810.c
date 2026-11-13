@@ -48,7 +48,7 @@ void Projectile_SetUpdateCallback(void *, void (*)(void));
 void Projectile_InitFromType(void *);
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Collider_SetCallback(void *, void *, void *);
-void sub_081DA048(void);
+void TimedEffect_HandleCollision(void);
 void Sprite_LinkToList(void *, s32);
 static inline s32 Scale(s32 value)
 {
@@ -116,12 +116,12 @@ s32 TimedEffect_SpawnProjectile(struct Manager *manager, struct Config *config,
         Collider_Init(collider, 0, 0x2002, 0, config->collisionFlags, &size, &offset);
         Collider_SetAttackProperties(collider, 0, 0, config->mode, config->contactFlags, 0);
         Collider_SetPosition(collider, &entry->sprite.position, 0);
-        Collider_SetCallback(collider, sub_081DA048, manager);
+        Collider_SetCallback(collider, TimedEffect_HandleCollision, manager);
     } else {
         collider = saved;
         Collider_SetAttackProperties(collider, config->resourceId, config->cost, config->mode,
                                      config->contactFlags, config->option);
-        Collider_SetCallback(collider, sub_081DA048, entry);
+        Collider_SetCallback(collider, TimedEffect_HandleCollision, entry);
         {
             s32 heading = config->direction;
             *((s8 *)entry + 0xFA) = heading;
