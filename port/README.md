@@ -60,8 +60,8 @@ interrupts; the frame is presented at line 160.
 
 What's left:
 
-* 17 register arguments the ABI pass could not determine
-  (`build/port/game/unknown_registers.txt`) and 134 padded calls
+* 16 register arguments the ABI pass could not determine
+  (`build/port/game/unknown_registers.txt`) and 111 padded calls
   (`padded_calls.txt`): rarely run paths may read a wrong argument.
 * Timing is cooperative, not cycle-counted: the port has no lag frames, so it
   runs ahead of mGBA by frame number; compare screens, not frame counts.
