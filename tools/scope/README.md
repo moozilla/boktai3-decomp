@@ -1909,6 +1909,52 @@ Each was read from the compiler source and confirmed on a live draft.
    and read. Duplicating only the call leaves eight extra instructions; writing gotos
    after the calls does not remove that fallthrough distinction. All 236 bytes match.
 
+124. **Form later stack and field addresses at their uses to let PRE create the copies.**
+   SceneActorControl_TryActivateNearby (080674F0) retained an extra stack-address
+   register when `q = initial` preceded the range test. Assigning `q = &delta` after
+   the test removes that redundant PRE value, but leaves the saved-position copy
+   one instruction early. Move `position = &slot->savedPosition` after the test too:
+   PRE now creates both required copies in the ROM order. Keep x live through the
+   range test instead of testing its dx copy to select the right CSE class head.
+   The earlier diagnostic `AGBCC_NOPRE=1 AGBCC_FORCE=x:1` was exact; these C changes
+   match all 360 bytes without thirteen pins, a barrier or a volatile reload.
+
+125. **A structured search loop can preserve a repeated pointer load that a goto loop loses.**
+   SceneActorRegistry_UnlinkActor (0806FBC8) had a DEBUG_NOP between its removal and
+   scan labels. Removing it let CSE carry the bottom test's next pointer into the
+   next iteration, deleting the ROM's second load. A plain while loop preserved
+   both loads but put the removal block after the scan. Write `while (node->next)`
+   with `if (next->actor != actor) { node = next; continue; }`, followed by removal
+   and `return`. Rotation places removal before the scan while preserving both
+   loads, matching all 92 bytes. Goto and bottom-entry do/while forms did not.
+
+126. **An early continue with work can retain the label that a bare goto loses.**
+   SceneActorRegistry_SendToCategoryPaletteOffset (0806FCAC) reused the palette
+   offset in r2 to form the callback offset with `adds #0x66`; ROM loads the latter
+   independently. Bare negative guards with `goto next` still allow move2add.
+   Inside the category match, use `if (palette differs) { node = node->next;
+   continue; }`. The real advance keeps a join label before the callback through
+   reload, blocking constant reuse; jump2 then merges the duplicate advance.
+   This removes the r2-clobber barrier and matches all 92 bytes (fact 100).
+
+127. **A direct halfword OR can change an entire allocation cascade.** In
+   SceneActorRegistry_ScheduleAvailableActors (0806FE88), copying a u32 request
+   into a local then OR-ing a u32 flags load lets regmove tie the result to the
+   dying flags value. `*field = (u16)request | *field` keeps the halfword operation
+   and its operand copy. That alone restores the request, quota, delay, counter
+   and loop-constant allocation, matching all 236 bytes without two pins and a
+   barrier. Merely narrowing the request, mask or flags locals does not do it;
+   packed union variants add instructions. This extends fact 37 to the OR update.
+
+128. **A named constant-first mask can preserve a halfword read and its operand order.**
+   RouteSpriteActor_TickEmitting (0806DCE4) narrowed `frameWeight = *command & 15`
+   to ldrb when volatile was removed. The shared ReadCommand/MaskCommand pair
+   retains ldrh but swaps the load and constant registers. A direct block
+   `u32 value = *command; u32 mask = 15; mask &= value; frameWeight = mask;`
+   retains ldrh with the exact ROM registers. Together with separate first/second
+   random-index locals it removes one pin and all volatile command pointers from
+   the matching partial; the rest of this function remains a holdout.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
