@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "homing_effect.h"
 #include "display_sequence.h"
 /* EffectManager_ClearGlobal: sets the global EffectManager pointer to 0; matches an existing vetted proposal and the body's single store */
@@ -96,12 +95,6 @@ static inline void projectActorToScreen(struct EffectVec *out, struct EffectVec 
     out->y = h - y;
     out->z = h + y;
 }
-static inline s32 continuing(s32 i)
-{
-    register s32 v asm("r0") = i;
-    asm("" : : "r"(v));
-    return v >= 0;
-}
 s32 EffectManager_UpdateAll(struct EffectManager *manager)
 {
     struct EffectContext context;
@@ -125,9 +118,9 @@ s32 EffectManager_UpdateAll(struct EffectManager *manager)
     projectActorToScreen(&actorScreen, (struct EffectVec *)&actorWorld);
     ctx = &context;
     p = manager->effects;
-    view = p;
-    i = 5;
+    i = 0;
     do {
+        view = p;
         if (view->active) {
             if (view->type == 2) {
                 ctx->world.x = ((struct EffectVec *)&actorWorld)->x;
@@ -154,7 +147,7 @@ s32 EffectManager_UpdateAll(struct EffectManager *manager)
             ctx->actorLower.y -= 20;
             ctx->actorUpper.x += 8;
             ctx->actorUpper.y += 20;
-            EffectManager_UpdateParticles(manager, p, &context);
+            EffectManager_UpdateParticles(manager, &manager->effects[i], &context);
             if (view->soundDelay) {
                 view->soundDelay--;
                 if (!view->soundDelay) {
@@ -165,16 +158,8 @@ s32 EffectManager_UpdateAll(struct EffectManager *manager)
             if (view->timer)
                 view->timer--;
         }
-        {
-            register u32 stride asm("r1") = sizeof(*p);
-            register s32 step asm("r2");
-            view = (struct Effect *)((u8 *)view + stride);
-            p = (struct Effect *)((u8 *)p + stride);
-            step = -1;
-            asm("" : : "r"(step));
-            i += step;
-        }
-    } while (continuing(i));
+        p++;
+    } while (++i < 6);
     {
         struct EffectManager *end = manager;
         end->counter++;
