@@ -62,6 +62,7 @@ def build(capture=False, sanitize=False):
         if source.count(before) != 1:
             raise RuntimeError(f"harness adapter needs updating: {before}")
         source = source.replace(before, after)
+    source = source.replace('write_cov("total", rom_reader, rom_exec);', 'if (tracing) write_cov("total", rom_reader, rom_exec);')
     adapter = BUILD / "capture_harness.c"
     adapter.write_text(source)
     # Ask the existing Makefile for the exact headers, ABI defines and library.
@@ -74,7 +75,7 @@ def build(capture=False, sanitize=False):
     command[command.index("harness.c")] = str(adapter)
     command[command.index("-o") + 1] = str(BUILD / "ppu_capture")
     command += ["-I" + str(ROOT / "port/include"), "-I" + str(ROOT / "port/tests"),
-                str(ROOT / "port/ppu/ppu.c")]
+                str(ROOT / "port/ppu/ppu.c"), "-lz"]
     run(command)
 
 
@@ -117,8 +118,15 @@ def main():
     parser.add_argument("--sanitize", action="store_true")
     parser.add_argument("--wasm", action="store_true", help="also replay every capture in Node")
     parser.add_argument("--build-only", action="store_true")
+    parser.add_argument("--unit", action="store_true", help="run RGB555/state contract tests")
     args = parser.parse_args()
     build(capture=bool(args.capture), sanitize=args.sanitize)
+    if args.unit:
+        flags = ["-std=c99", "-O1", "-g", "-Wall", "-Wextra", "-Werror", "-Iport/include"]
+        if args.sanitize:
+            flags += ["-fsanitize=address,undefined", "-fno-omit-frame-pointer"]
+        run([compiler(), *flags, "port/tests/ppu_unit.c", "port/ppu/ppu.c", "-o", BUILD / "ppu_unit"])
+        run([BUILD / "ppu_unit"])
     if args.build_only:
         return
     directory = args.out.resolve()

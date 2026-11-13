@@ -4,6 +4,7 @@
  * writes, then forward to mGBA's original software renderer. */
 #include <mgba/internal/gba/gba.h>
 #include "ppu.h"
+#include <zlib.h>
 
 static void (*ppu_original_draw)(struct GBAVideoRenderer *, int);
 static uint16_t (*ppu_original_write)(struct GBAVideoRenderer *, uint32_t, uint16_t);
@@ -81,19 +82,22 @@ static void ppu_capture_shot(const char *name)
 {
     char path[1024];
     FILE *out;
+    gzFile compressed;
+    char final_path[1024];
     unsigned i, mismatches = 0;
     if (ppu_capture_lines != PPU_HEIGHT) {
         fprintf(stderr, "PPU capture %s is incomplete (%u lines)\n", name, ppu_capture_lines);
         exit(1);
     }
-    snprintf(path, sizeof(path), "%s/%s.ppu", outdir, name);
-    out = fopen(path, "wb");
-    if (!out) { perror(path); exit(1); }
-    if (fwrite("PPUDUMP1", 1, 8, out) != 8 ||
-        fwrite(ppu_capture_records, 1, sizeof(ppu_capture_records), out) != sizeof(ppu_capture_records)) {
-        perror(path); exit(1);
+    snprintf(path, sizeof(path), "%s/%s.ppu.gz.tmp", outdir, name);
+    snprintf(final_path, sizeof(final_path), "%s/%s.ppu.gz", outdir, name);
+    compressed = gzopen(path, "wb1");
+    if (!compressed) { perror(path); exit(1); }
+    if (gzwrite(compressed, "PPUDUMP1", 8) != 8 ||
+        gzwrite(compressed, ppu_capture_records, sizeof(ppu_capture_records)) != sizeof(ppu_capture_records) ||
+        gzclose(compressed) != Z_OK || rename(path, final_path)) {
+        fprintf(stderr, "PPU compressed capture failed: %s\n", path); exit(1);
     }
-    fclose(out);
     snprintf(path, sizeof(path), "%s/%s.port.ppm", outdir, name);
     out = fopen(path, "wb");
     if (!out) { perror(path); exit(1); }
