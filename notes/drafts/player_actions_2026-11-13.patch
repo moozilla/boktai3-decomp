@@ -1,0 +1,5852 @@
+diff --git a/include/player.h b/include/player.h
+index d01acac94..cd0ffbf64 100644
+--- a/include/player.h
++++ b/include/player.h
+@@ -293,7 +293,8 @@ struct Player {
+     u8 unk461[3];
+     u8 actionLatch464, actionLatch465;
+     u8 colliderHeightOffset; /* 0x466: added to the spiral collider Y position. */
+-    u8 unk467[4];
++    u8 hoverTargetHeight, hoverHeightTimer;
++    u8 unk469[2];
+     u8 movementMode46B;
+     u8 unk46C[6];
+     u8 timedEventSlot; /* 0x472: index into GameState counters620/counters628 */
+@@ -307,7 +308,8 @@ struct Player {
+     u8 actionPhase488, actionActive489;
+     u8 unk48A[2];
+     u8 movementVelocityLocked; /* 0x48C: suppresses velocity recalculation */
+-    u8 unk48D[0x498 - 0x48D];
++    u8 unk48D[3];
++    struct SceneVec lockedVelocity; /* 0x490: restored while movement is locked */
+     struct SceneVec
+         resourceStationPosition; /* 0x498: copied by Player_BeginResourceStationInteraction */
+     u16 resourceStationFacing;   /* 0x4A0 */
+diff --git a/src/fn/sub_08156BBC.c b/src/fn/sub_08156BBC.c
+deleted file mode 100644
+index fe275d31d..000000000
+--- a/src/fn/sub_08156BBC.c
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-#define gPlayerDirectionByKeys gUnk_08610B50
+-extern const s16 gUnk_08610B50[];
+-static inline u16 MaskKeys(u16 keys, u16 mask)
+-{
+-    return keys & mask;
+-}
+-s32 Player_GetInputDirection(struct Player *p)
+-{
+-    s32 keys = *p->inputKeys;
+-    s16 direction = MaskKeys(keys, 0x40) != 0;
+-    if (keys & 0x80)
+-        direction |= 2;
+-    if (keys & 0x20)
+-        direction |= 4;
+-    {
+-        u32 m = 0x10;
+-        m &= keys;
+-        if (m)
+-            direction |= 8;
+-    }
+-    return gUnk_08610B50[direction];
+-}
+diff --git a/src/fn/sub_08156C1C.c b/src/fn/sub_08156C1C.c
+deleted file mode 100644
+index ebbf1362b..000000000
+--- a/src/fn/sub_08156C1C.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include "global.h"
+-
+-struct P08156C1C {
+-    u8 f0[0x34C];
+-    s16 a[10];
+-    u8 f360[0x54A - 0x360];
+-    s8 f54A;
+-};
+-s32 Player_GetInputDirection(void *);
+-
+-void Player_UpdateDirectionHistory(struct P08156C1C *p)
+-{
+-    s32 i;
+-    s32 r;
+-    for (i = 9; i > 0; i--)
+-        p->a[i] = p->a[i - 1];
+-    r = Player_GetInputDirection(p);
+-    p->a[0] = r;
+-    if ((s16)r >= 0) {
+-        s32 t = r;
+-        t += p->f54A;
+-        p->a[0] = (t + 7) & 7;
+-    }
+-}
+diff --git a/src/fn/sub_08156C68.c b/src/fn/sub_08156C68.c
+deleted file mode 100644
+index 514465039..000000000
+--- a/src/fn/sub_08156C68.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-
+-void Player_StopActionSounds(u8 *);
+-void Player_RestoreCameraFollow(u8 *);
+-
+-void Player_StopMovementEffects(u8 *p)
+-{
+-    Player_StopActionSounds(p);
+-    if (*(s16 *)(p + 0x4B6) != 0) {
+-        Player_RestoreCameraFollow(p);
+-    }
+-}
+diff --git a/src/fn/sub_08156C8C.c b/src/fn/sub_08156C8C.c
+deleted file mode 100644
+index 580e45246..000000000
+--- a/src/fn/sub_08156C8C.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-void Player_RestoreCameraFollow(u8 *);
+-
+-void sub_08156C8C(u8 *player)
+-{
+-    if (*(s16 *)(player + 0x4b6) != 0)
+-        Player_RestoreCameraFollow(player);
+-}
+diff --git a/src/fn/sub_08156CAC.c b/src/fn/sub_08156CAC.c
+deleted file mode 100644
+index d1deea86e..000000000
+--- a/src/fn/sub_08156CAC.c
++++ /dev/null
+@@ -1,31 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-#include "game_state.h"
+-#include "contact_actor.h"
+-void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
+-void Player_EmitPeriodicParticles(struct Player *p)
+-{
+-    struct ContactPackedVector spread, position;
+-    if (gGameState->playerParticleRate) {
+-        if (gGameState->playerParticleRate <= 2499)
+-            p->particleCadenceCounter++;
+-        else
+-            p->particleCadenceCounter += 2;
+-        if (p->particleCadenceCounter > 15) {
+-            if ((u8)(p->actionMode - 3) <= 1) {
+-                position = *(struct ContactPackedVector *)&p->colliderPosition;
+-                spread.x = 32;
+-                spread.y = 32;
+-                spread.z = 32;
+-            } else {
+-                position = *(struct ContactPackedVector *)&p->position;
+-                position.y += 360;
+-                spread.x = 32;
+-                spread.y = 32;
+-                spread.z = 32;
+-            }
+-            SparkParticle_Spawn(&position, 1, &spread, 0, 0, 6, 3, 2);
+-            p->particleCadenceCounter = 0;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_08156DAC.c b/src/fn/sub_08156DAC.c
+deleted file mode 100644
+index 7c64cef11..000000000
+--- a/src/fn/sub_08156DAC.c
++++ /dev/null
+@@ -1,81 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-#include "player.h"
+-u8 *TerrainModifiers_FindCellOverride(s32, s32);
+-void Player_UpdateFacingSide(struct Player *);
+-void ActorSequence_Begin(void *, s32, s32);
+-extern const s16 gUnk_086149C4[];
+-
+-struct FloorPoint {
+-    s16 x, y, z, pad;
+-};
+-struct PackedVec {
+-    u32 x : 16, y : 16, z : 16, pad : 16;
+-};
+-static inline s32 Scale(int x)
+-{
+-    if (x >= 0)
+-        return x >> 12;
+-    return -(-x >> 12);
+-}
+-static inline s32 cellIndex(struct FloorPoint *pos)
+-{
+-    s32 x = pos->x >> 8, z = pos->z >> 8;
+-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+-        return 0;
+-    return gTerrainMap->rows[z] + x;
+-}
+-static inline u32 groundHeight(struct FloorPoint *position)
+-{
+-    s32 index = cellIndex(position), height;
+-    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
+-    u32 kind;
+-    if (cell)
+-        cell += 4;
+-    else
+-        cell = gTerrainMap->cells + 12 + index * 4;
+-    kind = *cell >> 4;
+-    height = (*cell & 15) << 8;
+-    switch (kind) {
+-        case 1:
+-            height -= (u8)position->z;
+-            break;
+-        case 2:
+-            height -= (u8)position->x;
+-            break;
+-    }
+-    return height;
+-}
+-
+-// confidence=low: compares nearby terrain height and input heading before reversing facing;
+-// Player_TryStepForward (sub_08242120) with a facing update and sequence restart at the end.
+-#define Player_CheckFacingTerrainClearance sub_08156DAC
+-s32 Player_CheckFacingTerrainClearance(struct Player *p)
+-{
+-    u32 zero = *((u8 *)p + 0x4E3);
+-    if (zero != 0)
+-        return 1;
+-    {
+-        u8 axis = p->coordinateAxis;
+-        u32 a = (axis + 7) & 7;
+-        u32 b = (axis + 9) & 7;
+-        s32 h = (s16)p->directionHistory[0];
+-        if (h == axis || h == a || h == b) {
+-            struct PackedVec pt;
+-            u32 ang = ((p->coordinateAxis + 1) & 7) << 5;
+-            u32 height;
+-            pt = *(struct PackedVec *)&p->position;
+-            pt.x += -Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * 0x32);
+-            pt.z += -Scale(gUnk_086149C4[ang] * 0x32);
+-            height = groundHeight((struct FloorPoint *)&pt);
+-            if (height >= (u32)(p->position.y + 0xc8))
+-                return 1;
+-            p->facing = (p->coordinateAxis + 4) & 7;
+-        } else {
+-            p->facing = (axis + 4) & 7;
+-        }
+-    }
+-    Player_UpdateFacingSide(p);
+-    ActorSequence_Begin(p, 0, 0);
+-    return 0;
+-}
+diff --git a/src/fn/sub_08156F54.c b/src/fn/sub_08156F54.c
+deleted file mode 100644
+index 7f0740a89..000000000
+--- a/src/fn/sub_08156F54.c
++++ /dev/null
+@@ -1,27 +0,0 @@
+-#include "tether_actor.h"
+-
+-s32 TetherActor_TestMatchingStatus(u32, u32, u32, u32);
+-
+-static inline u32 TetherAcceptsActionInput(void)
+-{
+-    if (!gTetherActor)
+-        return 0;
+-    switch (gTetherActor->state) {
+-        case 1:
+-        case 0x11:
+-            return 1;
+-    }
+-    return 0;
+-}
+-
+-s32 Player_TestTetherActionInput(struct Player *p)
+-{
+-    if (*p->inputKeys & 1) {
+-        if (!TetherAcceptsActionInput())
+-            return 0;
+-        if (TetherActor_TestMatchingStatus(p->tetherStatusTag, p->tetherStatusFlags,
+-                                           gTetherActor->statusTag, gTetherActor->statusFlags))
+-            return 1;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_08156FC0.c b/src/fn/sub_08156FC0.c
+deleted file mode 100644
+index e16d7dc57..000000000
+--- a/src/fn/sub_08156FC0.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-
+-s32 TetherActor_TestNearbyInteraction(u8 *, s32, s32);
+-
+-s32 Player_TestNearbyInteraction(u8 *p)
+-{
+-    return TetherActor_TestNearbyInteraction(p + 0x30, *(u16 *)(p + 0x476), *(u16 *)(p + 0x474));
+-}
+diff --git a/src/fn/sub_08156FE0.c b/src/fn/sub_08156FE0.c
+deleted file mode 100644
+index 0bd2d127a..000000000
+--- a/src/fn/sub_08156FE0.c
++++ /dev/null
+@@ -1,282 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-#include "engine.h"
+-#include "ram.h"
+-// confidence=low: action-mode gates and input select the player's next sequence.
+-struct PlayerPendingNotification {
+-    void *receiver;
+-    u32 flags;
+-    void *payload;
+-};
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void Player_BeginDirectionSequence(struct Player *, u32);
+-void Player_StopMovementEffects(struct Player *);
+-void Player_SubtractGauge430(struct Player *, s32);
+-void sub_08249244(void *, s32, s32, void *);
+-s32 Player_TestTetherActionInput(struct Player *);
+-void Sound_PlaySong(u32);
+-s32 Trigger_TryOpenNearby(void *);
+-s32 PlayerBarrier_IsActive(void *);
+-void PlayerBarrier_Hide(void *);
+-s32 Player_SelectRequestedActionMode(struct Player *);
+-s32 Player_GetEventFlags(struct Player *, u32);
+-void sub_0813B3CC(struct Player *);
+-s32 Player_TestNearbyInteraction(struct Player *);
+-static inline u32 HasActionFlag(struct Player *p, u32 mask)
+-{
+-    if (!p)
+-        return 0;
+-    {
+-        u32 *flags = &p->actionFlags;
+-        u32 bits = mask;
+-        return *flags & bits;
+-    }
+-}
+-static inline const u16 *InitialInput(struct Player *p)
+-{
+-    s16 offset = (u32) & ((struct Player *)0)->inputKeys;
+-    const u16 **field;
+-    field = (const u16 **)((u8 *)p + offset);
+-    return *field;
+-}
+-static inline const u16 *ReloadInput(struct Player *p)
+-{
+-    return p->inputKeys;
+-}
+-static inline u32 IsSceneFive(struct Player *p)
+-{
+-    u32 active = p->active;
+-    u32 result = 0;
+-    if (active && p->sceneMode == 5)
+-        result = 1;
+-    return result;
+-}
+-s32 Player_SelectActionSequence(struct Player *p)
+-{
+-    u32 mode;
+-    const u16 *keys;
+-    if ((gEngineFlags & 0x1000) && (u8)(p->tetherMode - 10) <= 1)
+-        return p->tetherMode;
+-    if (p->tetherMode != 0x17 && (s8)p->movementAnimationState >= 0 && p->tetherMode != 0x26) {
+-        p->interactionResetCounter = 0;
+-        p->directionFrame = 0;
+-        p->terrainRecoveryCounter = 0;
+-        ActorSequence_Begin(p, 0x17, 0);
+-    }
+-    if (p->tetherMode != 4 && p->unk4E1[2])
+-        Player_BeginDirectionSequence(p, p->coordinateAxis);
+-    mode = p->tetherMode;
+-    if (!p->statGaugeFull && (u8)(p->actionMode - 1) <= 1) {
+-        if (!p->statusValue) {
+-            if (p->contactSpecial && mode != 0x1E)
+-                ActorSequence_Begin(p, 0x1E, 0);
+-            Player_StopMovementEffects(p);
+-            switch (p->tetherMode) {
+-                default:
+-                    if (p->actionMode == 2) {
+-                        if (p->tetherMode != 11)
+-                            ActorSequence_Begin(p, 11, 0);
+-                    } else if (p->actionMode == 1) {
+-                        if (p->tetherMode != 10)
+-                            ActorSequence_Begin(p, 10, 0);
+-                    }
+-                case 4:
+-                case 12:
+-                case 21:
+-                case 24:
+-                case 25:
+-                case 26:
+-                case 28:
+-                case 38:
+-                    break;
+-            }
+-            p->statusValue = 0;
+-            p->unk432[0] = 0;
+-            p->unk432[1] = 1;
+-            return p->tetherMode;
+-        }
+-        if ((HasActionFlag(p, 0x8000) && p->actionMode == 1) ||
+-            (HasActionFlag(p, 0x10000) && p->actionMode == 2))
+-            Player_SubtractGauge430(p, 3);
+-        else
+-            Player_SubtractGauge430(p, 4);
+-    } else {
+-        if (p->statGaugeFull == 1)
+-            p->statusValue = 4000;
+-        else
+-            p->statusValue = 0;
+-    }
+-    if (p->tetherMode == 0x26)
+-        goto end;
+-    if (p->directionFrame) {
+-        if (p->unk432[1]) {
+-            p->actionLatch464 = 1;
+-            p->actionLatch465 = p->unk432[0];
+-            p->unk432[1] = 0;
+-        }
+-        if (p->contactSpecial) {
+-            if (p->tetherMode != 0x1E)
+-                ActorSequence_Begin(p, 0x1E, 0);
+-        } else
+-            ActorSequence_Begin(p, 0x1D, 0);
+-        if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor) &&
+-            gPlayerNotificationPending) {
+-            if (!((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 1)) {
+-                if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 0x10)
+-                    sub_08249244(
+-                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
+-                        60, (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->payload);
+-                else
+-                    sub_08249244(
+-                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
+-                        60, (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->payload);
+-            }
+-            (*(struct PlayerPendingNotification **)&gPlayerPendingActor) = 0;
+-            gPlayerNotificationPending = 0;
+-        }
+-        Player_StopMovementEffects(p);
+-        goto end;
+-    }
+-    if (mode - 0x1D > 1 && mode != 0x1B && mode != 0x1C && mode != 0x18 && mode != 0x17 &&
+-        mode != 0x16 && mode != 0x15 && mode != 0x1A && p->positionResetTimer) {
+-        ActorSequence_Begin(p, 0x15, 0);
+-        goto end;
+-    }
+-    switch (mode) {
+-        case 6:
+-            if (Player_TestTetherActionInput(p))
+-                goto end;
+-            Sound_PlaySong(218);
+-            goto idle;
+-        default:
+-            if (p && IsSceneFive(p)) {
+-                if ((InitialInput(p)[1] & 1) &&
+-                    (u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
+-                    goto idle;
+-                if (((s16)p->directionHistory[0]) == -1)
+-                    goto idle;
+-                if (ReloadInput(p)[0] & 0x100)
+-                    goto idle;
+-                ActorSequence_Begin(p, 1, 0);
+-                goto end;
+-            }
+-            keys = p->inputKeys;
+-            if (keys[1] & 0x200) {
+-                u32 am;
+-                u32 sg;
+-                am = p->actionMode;
+-                if (am == 6) {
+-                    ActorSequence_Begin(p, 2, 0);
+-                    goto end;
+-                }
+-                sg = p->statGaugeFull;
+-                if (sg && (u8)(am - 1) <= 1) {
+-                    Sound_PlaySong(402);
+-                    goto end;
+-                }
+-                if (PlayerBarrier_IsActive(p->actionRequestEffect) && p->actionMode == 0) {
+-                    PlayerBarrier_Hide(p->actionRequestEffect);
+-                    goto end;
+-                }
+-                mode = Player_SelectRequestedActionMode(p);
+-                ActorSequence_Begin(p, mode, 0);
+-                goto end;
+-            }
+-            if (keys[1] & 2) {
+-                if (p->actionMode == 2) {
+-                    ActorSequence_Begin(p, 38, 0);
+-                    goto end;
+-                }
+-                if (p->actionMode == 1) {
+-                    ActorSequence_Begin(p, 12, 0);
+-                    goto end;
+-                }
+-                if (Player_GetEventFlags(p, 0x4000))
+-                    goto cancel;
+-                if (Player_GetEventFlags(p, 1)) {
+-                    if (p->statModifierContext.statBOverrideEnabled == 3)
+-                        goto primary;
+-                cancel:
+-                    ActorSequence_Begin(p, 0, 0);
+-                    sub_0813B3CC(p);
+-                    goto end;
+-                }
+-                goto normalAttack;
+-            primary:
+-                ActorSequence_Begin(p, 3, 0);
+-                goto end;
+-            normalAttack:
+-                ActorSequence_Begin(p, 3, 0);
+-                goto end;
+-            }
+-            if (keys[1] & 1) {
+-                if (p->actionMode == 2) {
+-                    if (p->historyDirectionMode == 1)
+-                        ActorSequence_Begin(p, 38, 0);
+-                    else
+-                        ActorSequence_Begin(p, 38, 3);
+-                    goto end;
+-                }
+-                if (p->actionMode == 1) {
+-                    if (p->historyDirectionMode == 1)
+-                        ActorSequence_Begin(p, 12, 0);
+-                    else
+-                        ActorSequence_Begin(p, 12, 3);
+-                    goto end;
+-                }
+-                if (p->actionMode == 0 && Player_TestNearbyInteraction(p)) {
+-                    Sound_PlaySong(218);
+-                    ActorSequence_Begin(p, 6, 0);
+-                    goto end;
+-                }
+-                if ((u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
+-                    goto idle;
+-                if (!p->actionMode && PlayerBarrier_IsActive(p->actionRequestEffect)) {
+-                    ActorSequence_Begin(p, 20, 0);
+-                    goto end;
+-                }
+-                ActorSequence_Begin(p, 7, 0);
+-                goto end;
+-            }
+-            if ((s16)p->directionHistory[0] == -1 || (keys[0] & 0x100) ||
+-                p->historyDirectionMode == 1) {
+-            idle:
+-                ActorSequence_Begin(p, 0, 0);
+-            } else
+-                ActorSequence_Begin(p, 1, 0);
+-            break;
+-        case 2:
+-        case 3:
+-        case 4:
+-        case 5:
+-        case 7:
+-        case 8:
+-        case 9:
+-        case 10:
+-        case 11:
+-        case 12:
+-        case 13:
+-        case 14:
+-        case 15:
+-        case 16:
+-        case 17:
+-        case 18:
+-        case 19:
+-        case 20:
+-        case 21:
+-        case 22:
+-        case 23:
+-        case 24:
+-        case 25:
+-        case 26:
+-        case 27:
+-        case 28:
+-        case 29:
+-        case 30:
+-        case 37:
+-        case 38:
+-            break;
+-    }
+-end:
+-    return 0;
+-}
+diff --git a/src/fn/sub_0815767C.c b/src/fn/sub_0815767C.c
+deleted file mode 100644
+index 9c6ae1f11..000000000
+--- a/src/fn/sub_0815767C.c
++++ /dev/null
+@@ -1,92 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-#include "engine_globals.h"
+-#include "ram.h"
+-
+-struct Drawable {
+-    u32 a, b, flags;
+-};
+-#define H(o) (*(u16 *)(p + (o)))
+-#define W(o) (*(u32 *)(p + (o)))
+-#define B(o) (*(u8 *)(p + (o)))
+-s32 Player_GetControlFlags(void *, u32);
+-void CellObject_Init(void *, void *);
+-void Obj_StepPosition(void *);
+-void sub_0802E04C(void *);
+-void Collider_SetPosition(void *, void *, s32);
+-void ActorShadow_Disable(void *);
+-void ActorShadow_Enable(void *);
+-void ActorDebris_Show(void *);
+-void ActorDebris_Hide(void *);
+-void PlayerEffect_SetPaletteSource(void *, u32, u32);
+-
+-static inline u8 *offsetR1(u8 *p, u32 off)
+-{
+-    u32 offset = off;
+-    return p + offset;
+-}
+-static inline u8 *offsetR2(u8 *p, u32 off)
+-{
+-    u32 offset = off;
+-    return p + offset;
+-}
+-void Player_ApplyControlPresentation(u8 *p)
+-{
+-
+-    u32 value = H(0x474);
+-    if (value == 0) {
+-        if (Player_GetControlFlags(p, 16))
+-            W(0x40) = value;
+-        else if (!W(0x40)) {
+-            void *position = p + 0x284;
+-            CellObject_Init(position, p + 0x30);
+-            W(0x40) = (u32)position;
+-        }
+-    }
+-    Obj_StepPosition(p + 0x24);
+-    sub_0802E04C(p + 0x24);
+-    if (Player_GetControlFlags(p, 8)) {
+-        ((struct Player *)p)->collider.flags |= 4;
+-    } else {
+-        ((struct Player *)p)->collider.flags &= ~4;
+-        Collider_SetPosition(&((struct Player *)p)->collider, &((struct Player *)p)->position, 0);
+-    }
+-    if (Player_GetControlFlags(p, 1))
+-        ((struct Drawable *)(p + 0x8C))->flags |= 1;
+-    else
+-        ((struct Drawable *)(p + 0x8C))->flags &= ~1;
+-    if (Player_GetControlFlags(p, 2))
+-        W(0x94) |= 0x200;
+-    else
+-        W(0x94) &= ~0x200;
+-    if (Player_GetControlFlags(p, 64))
+-        *(u32 *)offsetR1(p, 0x14C) &= ~1;
+-    else
+-        *(u32 *)offsetR2(p, 0x14C) |= 1;
+-    if (Player_GetControlFlags(p, 4) || !*offsetR1(p, 0x740))
+-        ActorShadow_Disable(offsetR2(p, 0x700));
+-    else
+-        ActorShadow_Enable(offsetR1(p, 0x700));
+-    if (Player_GetControlFlags(p, 256) && !Player_GetControlFlags(p, 1)) {
+-        ActorDebris_Show((void *)W(0xC84));
+-        PlayerEffect_SetPaletteSource((void *)W(0xC84), H(0xC6), W(0xD4));
+-    } else
+-        ActorDebris_Hide((void *)W(0xC84));
+-    H(0x32) += H(0x4EC);
+-    *(u64 *)(p + 0xAC) = *(u64 *)(p + 0x30);
+-    H(0xAC) += H(0x4E6);
+-    H(0xAE) += H(0x4E8);
+-    H(0xB0) += H(0x4EA);
+-    if (B(0x53D)) {
+-        s32 jitter;
+-        u32 random;
+-        u32 mask;
+-        gRandomIndex = (gRandomIndex + 1) & 1023;
+-        random = *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
+-        mask = 15;
+-        jitter = (random & mask) - 7;
+-        H(0xAC) += jitter;
+-        H(0xB0) -= jitter;
+-        B(0x53D)--;
+-    }
+-}
+diff --git a/src/fn/sub_0815788C.c b/src/fn/sub_0815788C.c
+deleted file mode 100644
+index c410d6095..000000000
+--- a/src/fn/sub_0815788C.c
++++ /dev/null
+@@ -1,181 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-#include "player.h"
+-// confidence=low: action callback table and nearby interaction routines establish the family.
+-void Player_AccumulateAction(struct Player *, s32);
+-s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
+-void Player_TickModeParticles(struct Player *);
+-void Player_RequestNearbyEffectTarget(struct Player *);
+-void Player_ClampAlternateTerrainPosition(struct Player *);
+-void Player_EmitPeriodicParticles(struct Player *);
+-s32 Player_CanUseSceneFeature(struct Player *);
+-void Player_UpdateTimedScriptEvent(struct Player *);
+-void Player_UpdateDirectionHistory(struct Player *);
+-void Player_SelectActionSequence(struct Player *);
+-void Player_UpdateCameraInput(struct Player *, s32);
+-void Player_RunPendingCallback(struct Player *);
+-void Player_ApplyDirectionalForce(struct Player *);
+-void Player_ApplyControlPresentation(struct Player *);
+-void Player_BlendCameraTarget(struct Player *);
+-void Player_ClampPositionToStoredTerrainCell(struct Player *);
+-void Player_UpdateLockedMovement(struct Player *);
+-s32 Player_IsStatusBit3ActionActive(u16);
+-void Player_AddControlFlags(struct Player *, u16);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void PlayerCue_UpdatePeriodicParticles(struct Player *);
+-u8 *TerrainModifiers_FindCellOverride(s32, s32);
+-extern void *const gUnk_08610B70[];
+-extern const s16 gUnk_086149C4[];
+-union ProbePosition {
+-    struct SceneVec point;
+-    struct {
+-        u32 x : 16, y : 16, z : 16;
+-    } words;
+-};
+-static inline s32 cellIndex(struct SceneVec *pos)
+-{
+-    s32 x = pos->x >> 8, z = pos->z >> 8;
+-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+-        return 0;
+-    return gTerrainMap->rows[z] + x;
+-}
+-static inline u8 *cellProperties(s32 index)
+-{
+-    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
+-    if (cell)
+-        return cell + 4;
+-    return gTerrainMap->cells + 12 + index * 4;
+-}
+-static inline s32 groundHeight(struct SceneVec *position)
+-{
+-    s32 index = cellIndex(position), height;
+-    u8 *cell = cellProperties(index);
+-    u32 kind = *cell >> 4;
+-    height = (*cell & 15) << 8;
+-    switch (kind) {
+-        case 1:
+-            height -= (u8)position->z;
+-            break;
+-        case 2:
+-            height -= (u8)position->x;
+-            break;
+-    }
+-    return height;
+-}
+-static inline s32 scale(s32 v)
+-{
+-    if (v >= 0)
+-        return v >> 12;
+-    return -((-v) >> 12);
+-}
+-static inline u32 specialState(struct Player *p)
+-{
+-    u32 active = p->active;
+-    u32 result = 0;
+-    if (active && p->sceneMode == 5)
+-        result = 1;
+-    return result;
+-}
+-static inline u32 nonzero(u32 value)
+-{
+-    return (-value | value) >> 31;
+-}
+-static inline u32 terrainFlag(struct SceneVec *pos)
+-{
+-    u32 flags = *(u16 *)(cellProperties(cellIndex(pos)) + 2);
+-    return flags & 4;
+-}
+-void Player_UpdateActionModeMovement(struct Player *p)
+-{
+-    union ProbePosition pos;
+-    u32 mask = 0x4000;
+-    p->statusFlags |= mask;
+-    switch (p->kind) {
+-        case 1:
+-            Player_EmitPeriodicParticles(p);
+-            if (p->actionMode == 0 || p->actionMode == 2) {
+-                if (Player_CanUseSceneFeature(p))
+-                    Player_UpdateTimedScriptEvent(p);
+-            } else if (p->actionMode == 1 && !Player_IsSlotInActionTwelveOrThirtyEight(0)) {
+-                if (p->statusFlags & 0x10)
+-                    Player_AccumulateAction(p, gGameState->unk876);
+-                if (Player_CanUseSceneFeature(p)) {
+-                    Player_UpdateTimedScriptEvent(p);
+-                    Player_TickModeParticles(p);
+-                }
+-            }
+-            Player_UpdateDirectionHistory(p);
+-            Player_SelectActionSequence(p);
+-            Player_UpdateCameraInput(p, p->tetherMode);
+-            if (p->unk45C == 1)
+-                Player_RunPendingCallback(p);
+-            Callback_InvokeActor(p, gUnk_08610B70[p->tetherMode]);
+-            if (p->movementVelocityLocked)
+-                *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)((u8 *)p + 0x490);
+-            else
+-                Player_ApplyDirectionalForce(p);
+-            Player_ApplyControlPresentation(p);
+-            if (p->cameraOffsetActive)
+-                Player_BlendCameraTarget(p);
+-            Player_ClampPositionToStoredTerrainCell(p);
+-            if (p->actionMode == 1)
+-                Player_RequestNearbyEffectTarget(p);
+-            Player_ClampAlternateTerrainPosition(p);
+-            Player_UpdateLockedMovement(p);
+-            if (p && specialState(p))
+-                break;
+-            if (p->actionMode == 2)
+-                break;
+-            if (p->actionMode == 1)
+-                break;
+-            {
+-                u32 enabled = 0;
+-                if (!Player_IsStatusBit3ActionActive(p->movementStatus) && p->tetherMode == 1 &&
+-                    (p->movementContactFlags & 1))
+-                    enabled = nonzero(p->facing & 1);
+-                if (enabled) {
+-                    if (++*(u16 *)p->unk4A6 == 5) {
+-                        s32 angle;
+-                        u32 flags;
+-                        pos.point = p->position;
+-                        angle = ((p->facing + 5) & 7) << 5;
+-                        pos.words.x += scale(gUnk_086149C4[(angle + 64) & 255] * 50);
+-                        pos.words.z += scale(gUnk_086149C4[angle] * 50);
+-                        if ((u32)groundHeight(&pos.point) < (u32)(p->position.y + 200))
+-                            break;
+-                        flags = terrainFlag(&pos.point);
+-                        if (flags)
+-                            break;
+-                        p->coordinateAxis = p->facing;
+-                        p->actionFourEnabled = flags;
+-                        ActorSequence_Begin(p, 4, 0);
+-                    }
+-                } else
+-                    *(u16 *)p->unk4A6 = enabled;
+-            }
+-            break;
+-        case 4:
+-            p->statusFlags |= 0x40000;
+-            Player_AddControlFlags(p, 8);
+-            if ((u8)(p->tetherMode - 0x1F) > 5) {
+-                if (p->contactSpecial)
+-                    ActorSequence_Begin(p, 0x20, 0);
+-                else
+-                    ActorSequence_Begin(p, 0x1F, 0);
+-            }
+-            if (p->unk45C == 1)
+-                Player_RunPendingCallback(p);
+-            Callback_InvokeActor(p, gUnk_08610B70[p->tetherMode]);
+-            Player_ApplyControlPresentation(p);
+-            break;
+-        case 2:
+-            p->statusFlags |= 0x40000;
+-            Player_AddControlFlags(p, 8);
+-            if (p->unk45C == 1)
+-                Player_RunPendingCallback(p);
+-            Callback_InvokeActor(p, p->triggerAnimationCallback);
+-            Player_ApplyControlPresentation(p);
+-            PlayerCue_UpdatePeriodicParticles(p);
+-            break;
+-    }
+-}
+diff --git a/src/fn/sub_08157CFC.c b/src/fn/sub_08157CFC.c
+deleted file mode 100644
+index 8987aada5..000000000
+--- a/src/fn/sub_08157CFC.c
++++ /dev/null
+@@ -1,160 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-#include "player.h"
+-// confidence=low: action callback table and nearby interaction routines establish the family.
+-void Player_EmitPeriodicParticles(struct Player *);
+-s32 Player_CanUseSceneFeature(struct Player *);
+-void Player_UpdateTimedScriptEvent(struct Player *);
+-void Player_UpdateDirectionHistory(struct Player *);
+-void Player_SelectActionSequence(struct Player *);
+-void Player_UpdateCameraInput(struct Player *, s32);
+-void Player_RunPendingCallback(struct Player *);
+-void Player_ApplyDirectionalForce(struct Player *);
+-void Player_ApplyControlPresentation(struct Player *);
+-void Player_BlendCameraTarget(struct Player *);
+-void Player_ClampPositionToStoredTerrainCell(struct Player *);
+-void Player_UpdateLockedMovement(struct Player *);
+-s32 Player_IsStatusBit3ActionActive(u16);
+-void Player_AddControlFlags(struct Player *, u16);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void PlayerCue_UpdatePeriodicParticles(struct Player *);
+-u8 *TerrainModifiers_FindCellOverride(s32, s32);
+-extern void *const gUnk_08610C0C[];
+-extern const s16 gUnk_086149C4[];
+-union ProbePosition {
+-    struct SceneVec point;
+-    struct {
+-        u32 x : 16, y : 16, z : 16;
+-    } words;
+-};
+-static inline s32 cellIndex(struct SceneVec *pos)
+-{
+-    s32 x = pos->x >> 8, z = pos->z >> 8;
+-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+-        return 0;
+-    return gTerrainMap->rows[z] + x;
+-}
+-static inline u8 *cellProperties(s32 index)
+-{
+-    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
+-    if (cell)
+-        return cell + 4;
+-    return gTerrainMap->cells + 12 + index * 4;
+-}
+-static inline s32 groundHeight(struct SceneVec *position)
+-{
+-    s32 index = cellIndex(position), height;
+-    u8 *cell = cellProperties(index);
+-    u32 kind = *cell >> 4;
+-    height = (*cell & 15) << 8;
+-    switch (kind) {
+-        case 1:
+-            height -= (u8)position->z;
+-            break;
+-        case 2:
+-            height -= (u8)position->x;
+-            break;
+-    }
+-    return height;
+-}
+-static inline s32 scale(s32 v)
+-{
+-    if (v >= 0)
+-        return v >> 12;
+-    return -((-v) >> 12);
+-}
+-static inline u32 specialState(struct Player *p)
+-{
+-    u32 active = p->active;
+-    u32 result = 0;
+-    if (active && p->sceneMode == 5)
+-        result = 1;
+-    return result;
+-}
+-static inline u32 nonzero(u32 value)
+-{
+-    return (-value | value) >> 31;
+-}
+-static inline u32 terrainFlag(struct SceneVec *pos)
+-{
+-    u32 flags = *(u16 *)(cellProperties(cellIndex(pos)) + 2);
+-    return flags & 4;
+-}
+-void Player_UpdateInteractionMovement(struct Player *p)
+-{
+-    union ProbePosition pos;
+-    u32 mask = 0x4000;
+-    p->statusFlags |= mask;
+-    switch (p->kind) {
+-        case 1:
+-            Player_EmitPeriodicParticles(p);
+-            if (Player_CanUseSceneFeature(p))
+-                Player_UpdateTimedScriptEvent(p);
+-            Player_UpdateDirectionHistory(p);
+-            Player_SelectActionSequence(p);
+-            Player_UpdateCameraInput(p, p->tetherMode);
+-            if (p->unk45C == 1)
+-                Player_RunPendingCallback(p);
+-            Callback_InvokeActor(p, gUnk_08610C0C[p->tetherMode]);
+-            if (p->movementVelocityLocked)
+-                *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)((u8 *)p + 0x490);
+-            else
+-                Player_ApplyDirectionalForce(p);
+-            Player_ApplyControlPresentation(p);
+-            if (p->cameraOffsetActive)
+-                Player_BlendCameraTarget(p);
+-            Player_ClampPositionToStoredTerrainCell(p);
+-            Player_UpdateLockedMovement(p);
+-            if (p && specialState(p))
+-                break;
+-            {
+-                u32 enabled = 0;
+-                if (!Player_IsStatusBit3ActionActive(p->movementStatus) && p->tetherMode == 1 &&
+-                    (p->movementContactFlags & 1))
+-                    enabled = nonzero(p->facing & 1);
+-                if (enabled) {
+-                    if (++*(u16 *)p->unk4A6 == 5) {
+-                        s32 angle;
+-                        u32 flags;
+-                        pos.point = p->position;
+-                        angle = ((p->facing + 5) & 7) << 5;
+-                        pos.words.x += scale(gUnk_086149C4[(angle + 64) & 255] * 50);
+-                        pos.words.z += scale(gUnk_086149C4[angle] * 50);
+-                        if ((u32)groundHeight(&pos.point) < (u32)(p->position.y + 200))
+-                            break;
+-                        flags = terrainFlag(&pos.point);
+-                        if (flags)
+-                            break;
+-                        p->coordinateAxis = p->facing;
+-                        p->actionFourEnabled = flags;
+-                        ActorSequence_Begin(p, 4, 0);
+-                    }
+-                } else
+-                    *(u16 *)p->unk4A6 = enabled;
+-            }
+-            break;
+-        case 4:
+-            p->statusFlags |= 0x40000;
+-            Player_AddControlFlags(p, 8);
+-            if ((u8)(p->tetherMode - 0x1F) > 5) {
+-                if (p->contactSpecial)
+-                    ActorSequence_Begin(p, 0x20, 0);
+-                else
+-                    ActorSequence_Begin(p, 0x1F, 0);
+-            }
+-            if (p->unk45C == 1)
+-                Player_RunPendingCallback(p);
+-            Callback_InvokeActor(p, gUnk_08610C0C[p->tetherMode]);
+-            Player_ApplyControlPresentation(p);
+-            break;
+-        case 2:
+-            p->statusFlags |= 0x40000;
+-            Player_AddControlFlags(p, 8);
+-            if (p->unk45C == 1)
+-                Player_RunPendingCallback(p);
+-            Callback_InvokeActor(p, p->triggerAnimationCallback);
+-            Player_ApplyControlPresentation(p);
+-            PlayerCue_UpdatePeriodicParticles(p);
+-            break;
+-    }
+-}
+diff --git a/src/fn/sub_081580EC.c b/src/fn/sub_081580EC.c
+deleted file mode 100644
+index cbf2c2432..000000000
+--- a/src/fn/sub_081580EC.c
++++ /dev/null
+@@ -1,28 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-struct TriggerOpener;
+-s32 Trigger_TryOpenNearby(struct TriggerOpener *);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-s32 Player_SelectInteractionMode(struct Player *p)
+-{
+-    s32 mode;
+-    if (p->tetherMode != 0x17 && (s8)p->movementAnimationState >= 0) {
+-        p->interactionResetCounter = 0;
+-        p->directionFrame = 0;
+-        p->terrainRecoveryCounter = 0;
+-        ActorSequence_Begin(p, 0x17, 0);
+-    }
+-    mode = p->tetherMode;
+-    if (p->directionFrame != 0)
+-        mode = 0x1D;
+-    else if (mode != 0x1D && mode != 0x17 && mode != 0x16 && mode != 0xD) {
+-        if ((p->inputKeys[1] & 1) &&
+-            (u8)Trigger_TryOpenNearby((struct TriggerOpener *)((u8 *)p + 0x24)))
+-            mode = 0;
+-        else if ((s16)p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
+-            mode = 0;
+-        else
+-            mode = 1;
+-    }
+-    return mode;
+-}
+diff --git a/src/fn/sub_081581AC.c b/src/fn/sub_081581AC.c
+deleted file mode 100644
+index e148ab794..000000000
+--- a/src/fn/sub_081581AC.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-#include "player.h"
+-
+-u8 *TerrainModifiers_FindCellOverride(s32, s32);
+-u32 Player_IsStatusBit4ActionActive(u32);
+-
+-s32 Player_TestMovementPosition(struct PlayerColliderVector *v)
+-{
+-    s32 x = (s16)v->x >> 8;
+-    s32 z = (s16)v->z >> 8;
+-    s32 cell;
+-    u8 *data;
+-    u32 flags;
+-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+-        cell = 0;
+-    else
+-        cell = gTerrainMap->rows[z] + x;
+-    data = TerrainModifiers_FindCellOverride(cell, 1);
+-    if (data)
+-        data += 4;
+-    else
+-        data = gTerrainMap->cells + (cell * 4 + 12);
+-    flags = *(u16 *)(data + 2);
+-    if (flags & 0x40)
+-        return 1;
+-    if (Player_IsStatusBit4ActionActive(flags))
+-        return 1;
+-    return 0;
+-}
+diff --git a/src/fn/sub_08158234.c b/src/fn/sub_08158234.c
+deleted file mode 100644
+index 4d45d19c8..000000000
+--- a/src/fn/sub_08158234.c
++++ /dev/null
+@@ -1,28 +0,0 @@
+-#define PooledInteractable_GetPosition NamedObject_GetPositionByName
+-#include "global.h"
+-#include "player.h"
+-struct SceneVec *NamedObject_GetPositionByName(s32);
+-s32 Player_TestMovementPosition(struct PlayerColliderVector *);
+-void Player_ClampInteractionVelocity(struct Player *p)
+-{
+-    struct PlayerColliderVector v;
+-    struct SceneVec *target;
+-    v.x = p->position.x + p->velocityX;
+-    v.z = p->position.z + p->velocityZ;
+-    if (p->tetherStatusFlags & 4) {
+-        target = NamedObject_GetPositionByName(p->tetherStatusTag);
+-        if ((s16)v.x <= target->x - 100)
+-            v.x = (u16)target->x - 100;
+-        else if ((s16)v.x >= target->x + 100)
+-            v.x = (u16)target->x + 100;
+-        if ((s16)v.z <= target->z - 100)
+-            v.z = (u16)target->z - 100;
+-        else if ((s16)v.z >= target->z + 100)
+-            v.z = (u16)target->z + 100;
+-        p->velocityX = v.x - p->position.x;
+-        p->velocityZ = v.z - p->position.z;
+-    } else if (Player_TestMovementPosition(&v)) {
+-        p->velocityX = 0;
+-        p->velocityZ = 0;
+-    }
+-}
+diff --git a/src/fn/sub_08158320.c b/src/fn/sub_08158320.c
+deleted file mode 100644
+index 108c15780..000000000
+--- a/src/fn/sub_08158320.c
++++ /dev/null
+@@ -1,72 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-#include "engine_globals.h"
+-#include "ram.h"
+-// confidence=low: varying height offset suggests hovering during interaction.
+-void Player_ClampInteractionVelocity(struct Player *);
+-void Obj_StepPosition(void *);
+-void sub_0802E04C(void *);
+-u32 Player_GetControlFlags(struct Player *, u16);
+-void Collider_SetPosition(void *, void *, u32);
+-void ActorShadow_Disable(void *);
+-void ActorShadow_Enable(void *);
+-s32 Mod(s32, s32);
+-static inline s32 randomValue(void)
+-{
+-    u32 offset;
+-    gRandomIndex = (gRandomIndex + 1) & 1023;
+-    offset = gRandomIndex * 2;
+-    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
+-}
+-static inline s32 hoverTarget(void)
+-{
+-    return Mod(randomValue() >> 3, 100) - 116;
+-}
+-void Player_UpdateInteractionHoverDisplay(struct Player *p)
+-{
+-    Player_ClampInteractionVelocity(p);
+-    Obj_StepPosition(&p->positionalEffectGroup);
+-    sub_0802E04C(&p->positionalEffectGroup);
+-    if (p->tetherMode <= 1) {
+-        u8 *timer = (u8 *)p + 0x468;
+-        if (!*timer) {
+-            s32 value = hoverTarget();
+-            u32 offset = 0x467;
+-            u8 *target;
+-            target = (u8 *)p + offset;
+-            *target = value;
+-            *timer = 16;
+-        } else
+-            --*timer;
+-        {
+-            u8 *height = (u8 *)p + 0x466;
+-            u32 current = *height;
+-            u32 target = *((u8 *)p + 0x467);
+-            if ((s32)current <= (s32)target - 4)
+-                *height = current + 4;
+-            else if ((s32)current >= (s32)target + 8)
+-                *height = current - 8;
+-            else
+-                *height = target;
+-        }
+-    }
+-    p->colliderPosition.y = (u16)p->position.y + *((u8 *)p + 0x466) + p->terrainRecoveryCounter;
+-    if (Player_GetControlFlags(p, 8))
+-        p->collider.flags |= 4;
+-    else {
+-        p->collider.flags &= ~4;
+-        Collider_SetPosition(&p->collider, &p->position, 0);
+-    }
+-    if (Player_GetControlFlags(p, 1))
+-        p->secondaryDrawFlags |= 1;
+-    else
+-        p->secondaryDrawFlags &= ~1;
+-    if (Player_GetControlFlags(p, 0x40))
+-        p->animation.flags &= ~1;
+-    else
+-        p->animation.flags |= 1;
+-    if (Player_GetControlFlags(p, 4))
+-        ActorShadow_Disable(p->shadow);
+-    else
+-        ActorShadow_Enable(p->shadow);
+-}
+diff --git a/src/fn/sub_0815849C.c b/src/fn/sub_0815849C.c
+deleted file mode 100644
+index fea531f46..000000000
+--- a/src/fn/sub_0815849C.c
++++ /dev/null
+@@ -1,58 +0,0 @@
+-#include "global.h"
+-extern u8 *gGameState;
+-extern void *gUnk_08610CA8[];
+-void Player_AccumulateAction(u8 *, s32);
+-bool32 Player_CanUseSceneFeature(u8 *);
+-void Player_UpdateTimedScriptEvent(u8 *);
+-void Player_TickModeParticles(u8 *);
+-void Player_UpdateDirectionHistory(u8 *);
+-s32 Player_SelectInteractionMode(u8 *);
+-void Player_UpdateCameraInput(u8 *, s32);
+-void Callback_InvokeActor(u8 *, void *);
+-void Player_ApplyDirectionalForce(u8 *);
+-void Player_UpdateInteractionHoverDisplay(u8 *);
+-void Player_BlendCameraTarget(u8 *);
+-void Player_UpdateLockedMovement(u8 *);
+-void Player_AddControlFlags(u8 *, u32);
+-void PlayerCue_UpdatePeriodicParticles(u8 *);
+-struct Vec2 {
+-    s32 x, y;
+-};
+-
+-void sub_0815849C(u8 *p)
+-{
+-    u32 flags;
+-    u32 bit = 0x40000;
+-    flags = *(u32 *)(p + 0x20);
+-    flags |= bit;
+-    *(u32 *)(p + 0x20) = flags;
+-    switch (*(s32 *)(p + 0x1c)) {
+-        case 1: {
+-            s32 mode;
+-            if (flags & 0x10)
+-                Player_AccumulateAction(p, *(s16 *)(gGameState + 0x876));
+-            if (Player_CanUseSceneFeature(p)) {
+-                Player_UpdateTimedScriptEvent(p);
+-                Player_TickModeParticles(p);
+-            }
+-            Player_UpdateDirectionHistory(p);
+-            mode = Player_SelectInteractionMode(p);
+-            Player_UpdateCameraInput(p, mode);
+-            Callback_InvokeActor(p, gUnk_08610CA8[mode]);
+-            if (p[0x48c])
+-                *(struct Vec2 *)(p + 0x38) = *(struct Vec2 *)(p + 0x490);
+-            Player_ApplyDirectionalForce(p);
+-            Player_UpdateInteractionHoverDisplay(p);
+-            if (*(s16 *)(p + 0x4b6))
+-                Player_BlendCameraTarget(p);
+-            Player_UpdateLockedMovement(p);
+-            break;
+-        }
+-        case 2:
+-            Player_AddControlFlags(p, 8);
+-            Callback_InvokeActor(p, *(void **)(p + 0x58c));
+-            Player_UpdateInteractionHoverDisplay(p);
+-            PlayerCue_UpdatePeriodicParticles(p);
+-            break;
+-    }
+-}
+diff --git a/src/fn/sub_08158588.c b/src/fn/sub_08158588.c
+deleted file mode 100644
+index 3a283b95c..000000000
+--- a/src/fn/sub_08158588.c
++++ /dev/null
+@@ -1,31 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-struct TriggerOpener;
+-s32 Trigger_TryOpenNearby(struct TriggerOpener *);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-s32 Player_SelectAlternateInteractionMode(struct Player *p)
+-{
+-    s32 mode;
+-    if (p->tetherMode != 0x17 && (s8)p->movementAnimationState >= 0) {
+-        p->interactionResetCounter = 0;
+-        p->directionFrame = 0;
+-        p->terrainRecoveryCounter = 0;
+-        ActorSequence_Begin(p, 0x17, 0);
+-    }
+-    mode = p->tetherMode;
+-    if (p->directionFrame != 0)
+-        mode = 0x1D;
+-    else if (mode != 0x1D && mode != 0x17 && mode != 0x16 && mode != 0x1C && mode != 4 &&
+-             mode != 0xE) {
+-        if (p->inputKeys[1] & 1) {
+-            if ((u8)Trigger_TryOpenNearby((struct TriggerOpener *)((u8 *)p + 0x24)))
+-                mode = 0;
+-            else
+-                mode = 4;
+-        } else if ((s16)p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
+-            mode = 0;
+-        else
+-            mode = 1;
+-    }
+-    return mode;
+-}
+diff --git a/src/fn/sub_08158650.c b/src/fn/sub_08158650.c
+deleted file mode 100644
+index 92fbf7a8c..000000000
+--- a/src/fn/sub_08158650.c
++++ /dev/null
+@@ -1,35 +0,0 @@
+-#define Player_TestResetFlags Player_GetControlFlags
+-#include "global.h"
+-#include "player.h"
+-void Obj_StepPosition(void *);
+-void sub_0802E04C(void *);
+-u32 Player_GetControlFlags(struct Player *, u16);
+-void Collider_SetPosition(void *, void *, u32);
+-void ActorShadow_Disable(void *);
+-void ActorShadow_Enable(void *);
+-void Player_SynchronizeInteractionDisplay(struct Player *p)
+-{
+-    Obj_StepPosition(&p->positionalEffectGroup);
+-    sub_0802E04C(&p->positionalEffectGroup);
+-    if (Player_GetControlFlags(p, 8))
+-        p->collider.flags |= 4;
+-    else {
+-        p->collider.flags &= ~4;
+-        Collider_SetPosition(&p->collider, &p->position, 0);
+-    }
+-    if (Player_GetControlFlags(p, 1))
+-        p->secondaryDrawFlags |= 1;
+-    else
+-        p->secondaryDrawFlags &= ~1;
+-    if (Player_GetControlFlags(p, 0x40))
+-        p->animation.flags &= ~1;
+-    else
+-        p->animation.flags |= 1;
+-    if (Player_GetControlFlags(p, 4))
+-        ActorShadow_Disable(p->shadow);
+-    else
+-        ActorShadow_Enable(p->shadow);
+-    p->position.y += p->actionCountdown;
+-    p->colliderPosition = p->position;
+-    p->colliderPosition.y += p->terrainRecoveryCounter;
+-}
+diff --git a/src/fn/sub_08158754.c b/src/fn/sub_08158754.c
+deleted file mode 100644
+index 4b3083dc3..000000000
+--- a/src/fn/sub_08158754.c
++++ /dev/null
+@@ -1,61 +0,0 @@
+-#include "global.h"
+-extern u8 *gGameState;
+-extern void *gUnk_08610D18[];
+-void Player_AccumulateAction(u8 *, s32);
+-bool32 Player_CanUseSceneFeature(u8 *);
+-void Player_UpdateTimedScriptEvent(u8 *);
+-void Player_TickModeParticles(u8 *);
+-void Player_UpdateDirectionHistory(u8 *);
+-s32 Player_SelectAlternateInteractionMode(u8 *);
+-void Player_UpdateCameraInput(u8 *, s32);
+-void Callback_InvokeActor(u8 *, void *);
+-void Player_SynchronizeInteractionDisplay(u8 *);
+-void Player_ClampPositionToStoredTerrainCell(u8 *);
+-void Player_RequestNearbyEffectTarget(u8 *);
+-void Player_UpdateInteractionHoverDisplay(u8 *);
+-void Player_BlendCameraTarget(u8 *);
+-void Player_UpdateLockedMovement(u8 *);
+-void Player_AddControlFlags(u8 *, u32);
+-void PlayerCue_UpdatePeriodicParticles(u8 *);
+-struct Vec2 {
+-    s32 x, y;
+-};
+-
+-void sub_08158754(u8 *p)
+-{
+-    u32 flags;
+-    u32 bit = 0x54000;
+-    flags = *(u32 *)(p + 0x20);
+-    flags |= bit;
+-    *(u32 *)(p + 0x20) = flags;
+-    switch (*(s32 *)(p + 0x1c)) {
+-        case 1: {
+-            s32 mode;
+-            if (flags & 0x10)
+-                Player_AccumulateAction(p, *(s16 *)(gGameState + 0x876));
+-            if (Player_CanUseSceneFeature(p)) {
+-                Player_UpdateTimedScriptEvent(p);
+-                Player_TickModeParticles(p);
+-            }
+-            Player_UpdateDirectionHistory(p);
+-            mode = Player_SelectAlternateInteractionMode(p);
+-            Player_UpdateCameraInput(p, mode);
+-            Callback_InvokeActor(p, gUnk_08610D18[mode]);
+-            if (p[0x48c])
+-                *(struct Vec2 *)(p + 0x38) = *(struct Vec2 *)(p + 0x490);
+-            Player_SynchronizeInteractionDisplay(p);
+-            if (*(s16 *)(p + 0x4b6))
+-                Player_BlendCameraTarget(p);
+-            Player_ClampPositionToStoredTerrainCell(p);
+-            Player_RequestNearbyEffectTarget(p);
+-            Player_UpdateLockedMovement(p);
+-            break;
+-        }
+-        case 2:
+-            Player_AddControlFlags(p, 8);
+-            Callback_InvokeActor(p, *(void **)(p + 0x58c));
+-            Player_SynchronizeInteractionDisplay(p);
+-            PlayerCue_UpdatePeriodicParticles(p);
+-            break;
+-    }
+-}
+diff --git a/src/fn/sub_08158848.c b/src/fn/sub_08158848.c
+deleted file mode 100644
+index 3fcf5284a..000000000
+--- a/src/fn/sub_08158848.c
++++ /dev/null
+@@ -1,155 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-#include "player.h"
+-// confidence=low: action callback table and nearby interaction routines establish the family.
+-void Player_EmitPeriodicParticles(struct Player *);
+-s32 Player_CanUseSceneFeature(struct Player *);
+-void Player_UpdateTimedScriptEvent(struct Player *);
+-void Player_UpdateDirectionHistory(struct Player *);
+-void Player_SelectActionSequence(struct Player *);
+-void Player_UpdateCameraInput(struct Player *, s32);
+-void Player_RunPendingCallback(struct Player *);
+-void Player_ApplyDirectionalForce(struct Player *);
+-void Player_ApplyControlPresentation(struct Player *);
+-void Player_BlendCameraTarget(struct Player *);
+-void Player_ClampPositionToStoredTerrainCell(struct Player *);
+-void Player_UpdateLockedMovement(struct Player *);
+-s32 Player_IsStatusBit3ActionActive(u16);
+-void Player_AddControlFlags(struct Player *, u16);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void PlayerCue_UpdatePeriodicParticles(struct Player *);
+-u8 *TerrainModifiers_FindCellOverride(s32, s32);
+-extern void *const gUnk_08610D88[];
+-extern const s16 gUnk_086149C4[];
+-union ProbePosition {
+-    struct SceneVec point;
+-    struct {
+-        u32 x : 16, y : 16, z : 16;
+-    } words;
+-};
+-static inline s32 cellIndex(struct SceneVec *pos)
+-{
+-    s32 x = pos->x >> 8, z = pos->z >> 8;
+-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+-        return 0;
+-    return gTerrainMap->rows[z] + x;
+-}
+-static inline u8 *cellProperties(s32 index)
+-{
+-    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
+-    if (cell)
+-        return cell + 4;
+-    return gTerrainMap->cells + 12 + index * 4;
+-}
+-static inline s32 groundHeight(struct SceneVec *position)
+-{
+-    s32 index = cellIndex(position), height;
+-    u8 *cell = cellProperties(index);
+-    u32 kind = *cell >> 4;
+-    height = (*cell & 15) << 8;
+-    switch (kind) {
+-        case 1:
+-            height -= (u8)position->z;
+-            break;
+-        case 2:
+-            height -= (u8)position->x;
+-            break;
+-    }
+-    return height;
+-}
+-static inline s32 scale(s32 v)
+-{
+-    if (v >= 0)
+-        return v >> 12;
+-    return -((-v) >> 12);
+-}
+-static inline u32 specialState(struct Player *p)
+-{
+-    u32 active = p->active;
+-    u32 result = 0;
+-    if (active && p->sceneMode == 5)
+-        result = 1;
+-    return result;
+-}
+-static inline u32 nonzero(u32 value)
+-{
+-    return (-value | value) >> 31;
+-}
+-static inline u32 terrainFlag(struct SceneVec *pos)
+-{
+-    u32 flags = *(u16 *)(cellProperties(cellIndex(pos)) + 2);
+-    return flags & 4;
+-}
+-void Player_UpdateLinkModeMovement(struct Player *p)
+-{
+-    union ProbePosition pos;
+-    u32 mask = 0x4000;
+-    p->statusFlags |= mask;
+-    switch (p->kind) {
+-        case 1:
+-            Player_UpdateDirectionHistory(p);
+-            Player_SelectActionSequence(p);
+-            Player_UpdateCameraInput(p, p->tetherMode);
+-            if (p->unk45C == 1)
+-                Player_RunPendingCallback(p);
+-            Callback_InvokeActor(p, gUnk_08610D88[p->tetherMode]);
+-            if (p->movementVelocityLocked)
+-                *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)((u8 *)p + 0x490);
+-            else
+-                Player_ApplyDirectionalForce(p);
+-            Player_ApplyControlPresentation(p);
+-            if (p->cameraOffsetActive)
+-                Player_BlendCameraTarget(p);
+-            Player_ClampPositionToStoredTerrainCell(p);
+-            Player_UpdateLockedMovement(p);
+-            if (p && specialState(p))
+-                break;
+-            {
+-                u32 enabled = 0;
+-                if (!Player_IsStatusBit3ActionActive(p->movementStatus) && p->tetherMode == 1 &&
+-                    (p->movementContactFlags & 1))
+-                    enabled = nonzero(p->facing & 1);
+-                if (enabled) {
+-                    if (++*(u16 *)p->unk4A6 == 5) {
+-                        s32 angle;
+-                        u32 flags;
+-                        pos.point = p->position;
+-                        angle = ((p->facing + 5) & 7) << 5;
+-                        pos.words.x += scale(gUnk_086149C4[(angle + 64) & 255] * 50);
+-                        pos.words.z += scale(gUnk_086149C4[angle] * 50);
+-                        if ((u32)groundHeight(&pos.point) < (u32)(p->position.y + 200))
+-                            break;
+-                        flags = terrainFlag(&pos.point);
+-                        if (flags)
+-                            break;
+-                        p->coordinateAxis = p->facing;
+-                        p->actionFourEnabled = flags;
+-                        ActorSequence_Begin(p, 4, 0);
+-                    }
+-                } else
+-                    *(u16 *)p->unk4A6 = enabled;
+-            }
+-            break;
+-        case 4:
+-            p->statusFlags |= 0x40000;
+-            Player_AddControlFlags(p, 8);
+-            if ((u8)(p->tetherMode - 0x1F) > 4) {
+-                if (p->contactSpecial)
+-                    ActorSequence_Begin(p, 0x20, 0);
+-                else
+-                    ActorSequence_Begin(p, 0x1F, 0);
+-            }
+-            if (p->unk45C == 1)
+-                Player_RunPendingCallback(p);
+-            Callback_InvokeActor(p, gUnk_08610D88[p->tetherMode]);
+-            Player_ApplyControlPresentation(p);
+-            break;
+-        case 2:
+-            Player_AddControlFlags(p, 8);
+-            if (p->unk45C == 1)
+-                Player_RunPendingCallback(p);
+-            Callback_InvokeActor(p, p->triggerAnimationCallback);
+-            Player_ApplyControlPresentation(p);
+-            break;
+-    }
+-}
+diff --git a/src/fn/sub_08158C14.c b/src/fn/sub_08158C14.c
+deleted file mode 100644
+index 76c0394c9..000000000
+--- a/src/fn/sub_08158C14.c
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#include "global.h"
+-#include "ram.h"
+-#include "player.h"
+-
+-static inline void Player_ClearRegisteredSlots(void)
+-{
+-    s32 i;
+-
+-    for (i = 0; i < 4; i++) {
+-        gPlayers[i] = NULL;
+-        gTrackedPlayerId[i] = 0;
+-        gPlayerSlotStatus[i] = 0;
+-    }
+-}
+-
+-#define Player_ResetLinkState sub_08158C14
+-void Player_ResetLinkState(void)
+-{
+-    s32 i;
+-
+-    gPlayerCount = 0;
+-    Player_ClearRegisteredSlots();
+-    gPlayerInteractionMode = 0;
+-    gPlayerScriptState = 0;
+-    gPlayerPassageState = 0;
+-    gPlayerEffectPendingCount = 0;
+-    gPlayerSolarActionPending = 0;
+-    gPlayerActionPending = 0;
+-    gPlayerCueTimer = 0;
+-    for (i = 0; i < 2; i++)
+-        gPlayerInitialSlotValues[i] = 0;
+-    gPlayerDirectionLatch = 0;
+-    gPlayerBackgroundState = 0;
+-    gPlayerBackgroundMode = 0;
+-    gPlayerAbilityLatched = 0;
+-}
+diff --git a/src/fn/sub_08158CD8.c b/src/fn/sub_08158CD8.c
+deleted file mode 100644
+index 3750baf25..000000000
+--- a/src/fn/sub_08158CD8.c
++++ /dev/null
+@@ -1,57 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-#include "engine.h"
+-u8 *TerrainModifiers_FindCellOverride(s32, s32);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-static inline s32 cellIndex(s32 x, s32 z)
+-{
+-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+-        return 0;
+-    return gTerrainMap->rows[z] + x;
+-}
+-static inline u8 *cellProperties(s32 cell)
+-{
+-    u8 *properties = TerrainModifiers_FindCellOverride(cell, 1);
+-    if (properties)
+-        properties += 4;
+-    else {
+-        struct EngineMap *map = gTerrainMap;
+-        u32 offset = cell * 4 + 12;
+-        properties = map->cells + offset;
+-    }
+-    return properties;
+-}
+-void Player_BeginTerrainInteraction(struct Player *p)
+-{
+-    struct SceneVec *position;
+-    u8 *properties;
+-    u32 surface;
+-    s32 height;
+-    if (p->actionMode == 5) {
+-        p->actionLatch464 = 1;
+-        p->actionLatch465 = 1;
+-    }
+-    ActorSequence_Begin(p, 0x1C, 0);
+-    p->terrainRecoveryCounter = 0;
+-    position = &p->position;
+-    properties = cellProperties(cellIndex(position->x >> 8, position->z >> 8));
+-    surface = *properties >> 4;
+-    height = (*properties & 15) << 8;
+-    switch (surface) {
+-        case 1:
+-            height -= (u8)position->z;
+-            break;
+-        case 2:
+-            height -= (u8)position->x;
+-            break;
+-    }
+-    p->actionCountdown = p->position.y - height;
+-    if (p->facing > 4) {
+-        p->heading = 8 - p->facing;
+-        p->side = 1;
+-    } else {
+-        p->heading = p->facing;
+-        p->side = 0;
+-    }
+-    p->directionFrame = 0;
+-}
+diff --git a/src/fn/sub_08158DF0.c b/src/fn/sub_08158DF0.c
+deleted file mode 100644
+index d3a24a2b5..000000000
+--- a/src/fn/sub_08158DF0.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-
+-void Player_BeginDirectionSequence(struct Player *p, u32 axis)
+-{
+-    ActorSequence_Begin(p, 4, 1);
+-    p->coordinateAxis = axis;
+-    p->facing = (axis + 4) & 7;
+-    if (p->coordinateAxis > 4) {
+-        p->heading = (8 - p->coordinateAxis) >> 1;
+-        p->side = 1;
+-    } else {
+-        p->heading = p->coordinateAxis >> 1;
+-        p->side = 0;
+-    }
+-    p->directionFrame = 0;
+-}
+diff --git a/src/fn/sub_08158E68.c b/src/fn/sub_08158E68.c
+deleted file mode 100644
+index 8e70dc4b0..000000000
+--- a/src/fn/sub_08158E68.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-#include "player.h"
+-struct MapInfo {
+-    u8 pad[0x24];
+-    u16 rows[1];
+-};
+-
+-s32 sub_08158E68(s32 i)
+-{
+-    u8 *actor = gPlayers[i];
+-    u8 *q = *(u8 **)(actor + 0x40);
+-    s32 x, y;
+-    if (q != NULL)
+-        return *(u16 *)(q + 6);
+-    x = *(s16 *)(actor + 0x30) >> 8;
+-    y = *(s16 *)(actor + 0x34) >> 8;
+-    if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
+-        return 0;
+-    return gTerrainMap->rows[y] + x;
+-}
+\ No newline at end of file
+diff --git a/src/fn/sub_08158EC8.c b/src/fn/sub_08158EC8.c
+deleted file mode 100644
+index 478ed46c2..000000000
+--- a/src/fn/sub_08158EC8.c
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#include "global.h"
+-
+-void SceneActorControl_OnJitterPosition(void)
+-{
+-}
+diff --git a/src/fn/sub_08158ECC.c b/src/fn/sub_08158ECC.c
+deleted file mode 100644
+index 5fd92ead8..000000000
+--- a/src/fn/sub_08158ECC.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-
+-void ActorSequence_Begin(u8 *, s32, s32);
+-
+-void Player_BeginResourceStationInteraction(u8 *p, s32 *a, s32 b)
+-{
+-    s32 *d;
+-    s32 x;
+-    s32 y;
+-
+-    ActorSequence_Begin(p, 8, 0);
+-    *(u16 *)(p + 0x4E8) = 0;
+-    d = (s32 *)(p + 0x498);
+-    x = a[0];
+-    y = a[1];
+-    d[0] = x;
+-    d[1] = y;
+-    *(u16 *)(p + 0x4A0) = b;
+-}
+diff --git a/src/fn/sub_08158F04.c b/src/fn/sub_08158F04.c
+deleted file mode 100644
+index 6b287c014..000000000
+--- a/src/fn/sub_08158F04.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#define gPlayerCueFlags gEngineFlags
+-#include "global.h"
+-#include "player.h"
+-#include "engine.h"
+-void LinkPlayer_ResetToIdleState(struct Player *);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void PlayerCue_BeginMode27(struct Player *, s32, s32, s32);
+-s32 Player_BeginDirectionalCue(struct Player *p, s32 mode)
+-{
+-    s32 result;
+-    if (gEngineFlags & 0x800) {
+-        LinkPlayer_ResetToIdleState(p);
+-        ActorSequence_Begin(p, 0x21, 0);
+-        return 0;
+-    }
+-    if (p->tetherMode == 6) {
+-        result = 1;
+-        PlayerCue_BeginMode27(p, p->facing, 1, 0);
+-    } else {
+-        result = 0;
+-        PlayerCue_BeginMode27(p, p->facing, mode, 0);
+-    }
+-    return result;
+-}
+diff --git a/src/fn/sub_08158F70.c b/src/fn/sub_08158F70.c
+deleted file mode 100644
+index 463f0fe7c..000000000
+--- a/src/fn/sub_08158F70.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#include "global.h"
+-#include "ram.h"
+-
+-struct O08158F70 {
+-    u32 f0;
+-    u32 f4;
+-    u32 f8;
+-};
+-void sub_08249244(u32, u32, u32, u32);
+-
+-void Player_NotifyActionInterruption(u8 *p)
+-{
+-    struct O08158F70 *o = gPlayerPendingActor;
+-    if (o != 0 && p[0x458] == 2 && p[0x457] == 0xc) {
+-        if (o->f4 & 0x10)
+-            sub_08249244(o->f0, 1, 0x3c, o->f8);
+-        else
+-            sub_08249244(o->f0, 1, 0x3c, o->f8);
+-    }
+-}
+diff --git a/src/fn/sub_08158FC0.c b/src/fn/sub_08158FC0.c
+deleted file mode 100644
+index 431a12067..000000000
+--- a/src/fn/sub_08158FC0.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-void Player_NotifyActionInterruption(u8 *);
+-void ActorSequence_Begin(u8 *, s32, s32);
+-
+-s32 Player_EnterStateEleven(void)
+-{
+-    u8 *g = (*(u8 **)gPlayers);
+-
+-    if (g != 0) {
+-        Player_NotifyActionInterruption(g);
+-        ActorSequence_Begin(g, 0xB, 0);
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_08158FE8.c b/src/fn/sub_08158FE8.c
+deleted file mode 100644
+index d7ea37705..000000000
+--- a/src/fn/sub_08158FE8.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-void Player_NotifyActionInterruption(u8 *);
+-void ActorSequence_Begin(u8 *, s32, s32);
+-
+-s32 Player_EnterStateTen(void)
+-{
+-    u8 *g = (*(u8 **)gPlayers);
+-
+-    if (g != 0) {
+-        Player_NotifyActionInterruption(g);
+-        ActorSequence_Begin(g, 0xA, 0);
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_08159010.c b/src/fn/sub_08159010.c
+deleted file mode 100644
+index 2cd20c806..000000000
+--- a/src/fn/sub_08159010.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-void Player_SetTransitionMode(s32 v)
+-{
+-    u8 *g = (*(u8 **)gPlayers);
+-
+-    if (g != 0) {
+-        g[0xAC9] = v;
+-    }
+-}
+diff --git a/src/fn/sub_08159030.c b/src/fn/sub_08159030.c
+deleted file mode 100644
+index 664673c10..000000000
+--- a/src/fn/sub_08159030.c
++++ /dev/null
+@@ -1,54 +0,0 @@
+-#define Player_ComputeIndexedStatA Player_GetSpecialAttackPower
+-#include "global.h"
+-#include "player.h"
+-#include "game_state.h"
+-struct PlayerEquipmentReference {
+-    u8 index;
+-    u8 unknown1[11];
+-    u8 slot;
+-};
+-void PlayerAction_RefreshFlagState(u32, void *, s32);
+-s32 Player_CalculateActionStat(s32, struct PlayerStatModifierContext *, s32);
+-s32 Player_GetSpecialAttackPower(s32, s32);
+-void ActionRecord_CopyFromEntry(const void *, void *);
+-void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
+-s32 Player_EvaluateItemStatA(struct PlayerActionEntry *item,
+-                             struct PlayerEquipmentReference *reference)
+-{
+-    s32 equipment[4];
+-    s16 stats[8];
+-    struct PlayerStatModifierContext context;
+-    struct PlayerActionDescriptor descriptor;
+-    s32 index;
+-    s32 *dst;
+-    s16 *src;
+-    s32 i;
+-    s32 value;
+-    s16 *statValues;
+-    struct PlayerStatModifierContext *modifiers;
+-    struct PlayerActionEntry **entry;
+-    u8 *override;
+-    if (item->kind == 0x30)
+-        return Player_GetSpecialAttackPower(0, 0x30);
+-    index = reference->index;
+-    statValues = stats;
+-    modifiers = &context;
+-    override = &context.statBOverrideEnabled;
+-    entry = &context.actionEntry;
+-    src = gGameState->party;
+-    dst = equipment;
+-    for (i = 3; i >= 0; i--)
+-        *dst++ = *src++;
+-    if (reference)
+-        equipment[reference->slot] = index;
+-    PlayerAction_RefreshFlagState(0, statValues, index);
+-    ActionRecord_CopyFromEntry(item, &descriptor);
+-    Player_BuildActionModifiers(0, modifiers, &descriptor);
+-    value = (s16)gGameState->baseStats[2] + (s16)gGameState->statBonuses[2] + statValues[5];
+-    {
+-        u8 zero = 0;
+-        *override = zero;
+-        *entry = item;
+-        return Player_CalculateActionStat(zero, modifiers, value);
+-    }
+-}
+diff --git a/src/fn/sub_081590E4.c b/src/fn/sub_081590E4.c
+deleted file mode 100644
+index a7f68aad1..000000000
+--- a/src/fn/sub_081590E4.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-
+-void Inventory_InitEquipmentEntryFromDescriptor(s32, s32 *);
+-s32 Player_EvaluateItemStatA(s32 *, s32);
+-
+-s32 Player_GetEquipmentValue(s32 a)
+-{
+-    s32 buf[4];
+-
+-    Inventory_InitEquipmentEntryFromDescriptor(a, buf);
+-    return Player_EvaluateItemStatA(buf, 0);
+-}
+diff --git a/src/fn/sub_081590FC.c b/src/fn/sub_081590FC.c
+deleted file mode 100644
+index 850375b2d..000000000
+--- a/src/fn/sub_081590FC.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_GetSpecialAttackPower(s32, s32);
+-
+-s32 Player_GetEquipmentLevelBonus(u8 *p)
+-{
+-    return Player_GetSpecialAttackPower(0, p[0] - 1);
+-}
+diff --git a/src/fn/sub_0815910C.c b/src/fn/sub_0815910C.c
+deleted file mode 100644
+index 5f5fd0013..000000000
+--- a/src/fn/sub_0815910C.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-#include "ram.h"
+-extern u8 *gGameState;
+-s32 sub_0815910C(u8 *item)
+-{
+-    s32 bonus;
+-    s16 *level;
+-    if (*(s16 *)(gGameState + 0x5a8) == 6)
+-        return gPlayerLinkAttackBonus;
+-    bonus = 0;
+-    if (item == NULL)
+-        return (bonus + *(s16 *)(gGameState + 0x40)) >> 1;
+-    if (item[1] == 0x55)
+-        bonus = item[2];
+-    if (bonus > 120)
+-        bonus = 120;
+-    bonus = (bonus + *(s16 *)(gGameState + 0x40)) >> 1;
+-    return bonus;
+-}
+diff --git a/src/fn/sub_08159164.c b/src/fn/sub_08159164.c
+deleted file mode 100644
+index d3b979fc8..000000000
+--- a/src/fn/sub_08159164.c
++++ /dev/null
+@@ -1,52 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-#include "game_state.h"
+-s32 Div(s32, s32);
+-static inline u32 Bonus(struct Player *p, u32 mask)
+-{
+-    u32 *field;
+-    u32 bits;
+-    if (!p)
+-        return 0;
+-    field = &p->statBonusFlags;
+-    bits = mask;
+-    return *field & bits;
+-}
+-static inline u32 Both(struct Player *p)
+-{
+-    u32 *field;
+-    u32 bits;
+-    u32 value;
+-    if (!p)
+-        return 1;
+-    field = &p->statBonusFlags;
+-    bits = 0x8000;
+-    value = *field;
+-    if (!(bits & value))
+-        return 0;
+-    if (!(value & 0x10000))
+-        return 0;
+-    return 1;
+-}
+-// confidence=low: enemy and script rewards add capped experience with opposing player bonuses.
+-#define Player_AddExperience sub_08159164
+-void Player_AddExperience(s32 input)
+-{
+-    s32 amount = input;
+-    struct GameState *save = gGameState;
+-    if (save->form == 6)
+-        return;
+-    if (!Both(gPlayers[0])) {
+-        if (Bonus(gPlayers[0], 0x8000))
+-            amount = (amount * 3) >> 1;
+-        else if (Bonus(gPlayers[0], 0x10000))
+-            amount = Div(amount, 2);
+-    }
+-    {
+-        s32 *reward = &gGameState->rewardTotal;
+-        s32 total = *reward + amount;
+-        *reward = total;
+-        if (total > 999998)
+-            gGameState->rewardTotal = 999999;
+-    }
+-}
+diff --git a/src/fn/sub_08159210.c b/src/fn/sub_08159210.c
+deleted file mode 100644
+index 5be4e6baa..000000000
+--- a/src/fn/sub_08159210.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-void Player_ApplyPeriodicStatChanges(u8 *);
+-
+-void Player_RefreshLifeState(void)
+-{
+-    if ((*(u8 **)gPlayers) != 0) {
+-        Player_ApplyPeriodicStatChanges((*(u8 **)gPlayers));
+-    }
+-}
+diff --git a/src/fn/sub_08159228.c b/src/fn/sub_08159228.c
+deleted file mode 100644
+index 45d5cff26..000000000
+--- a/src/fn/sub_08159228.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-/* Player_ClearSlotTimer: Clears the game-state timer entry selected by the player's slot index */
+-#define Player_ClearSlotTimer sub_08159228
+-
+-extern u8 *gGameState;
+-
+-void sub_08159228(u8 *p)
+-{
+-    *(u32 *)(gGameState + p[0x472] * 4 + 0x628) = 0;
+-}
+diff --git a/src/fn/sub_0815924C.c b/src/fn/sub_0815924C.c
+deleted file mode 100644
+index 608ec1528..000000000
+--- a/src/fn/sub_0815924C.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_IsInActionTwelveOrThirtyEight(u8 *p)
+-{
+-    u8 v = p[0x457];
+-
+-    if (v == 0xC || v == 0x26) {
+-        return 1;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0815926C.c b/src/fn/sub_0815926C.c
+deleted file mode 100644
+index 626aed71e..000000000
+--- a/src/fn/sub_0815926C.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-s32 Player_IsInActionTwelveOrThirtyEight(u8 *);
+-
+-s32 Player_IsSlotInActionTwelveOrThirtyEight(s32 idx)
+-{
+-    return Player_IsInActionTwelveOrThirtyEight((u8 *)gPlayers[idx]);
+-}
+diff --git a/src/fn/sub_08159284.c b/src/fn/sub_08159284.c
+deleted file mode 100644
+index 68417e6f1..000000000
+--- a/src/fn/sub_08159284.c
++++ /dev/null
+@@ -1,39 +0,0 @@
+-#define gDirectionSineTable gUnk_086149C4
+-#include "global.h"
+-#include "player.h"
+-extern const s16 gUnk_086149C4[];
+-static inline void SetPosition(struct SceneVec *v, s32 x, s32 y, s32 z)
+-{
+-    v->x = x;
+-    v->y = y;
+-    v->z = z;
+-    v->pad = 0;
+-}
+-static inline s32 Scale(s32 value)
+-{
+-    value = 180 * value;
+-    if (value >= 0)
+-        return value >> 12;
+-    return -((-value) >> 12);
+-}
+-void PlayerContact_GetOffsetPosition(s32 slot, struct SceneVec *out)
+-{
+-    struct SceneVec pos;
+-    struct Player *p = gPlayers[slot];
+-    s32 angle, x, z;
+-    if (!p->statModifierContext.statBOverrideEnabled)
+-        SetPosition(&pos, p->position.x, p->position.y + 200, p->position.z);
+-    else
+-        SetPosition(&pos, p->position.x, p->position.y + 230, p->position.z);
+-    angle = ((p->facing + 5) & 7) * 32;
+-    x = gDirectionSineTable[(angle + 64) & 255];
+-    z = gDirectionSineTable[angle & 255];
+-    if (p->side) {
+-        pos.x += Scale(x);
+-        pos.z += Scale(z);
+-    } else {
+-        pos.x += Scale(x);
+-        pos.z += Scale(z);
+-    }
+-    *out = pos;
+-}
+diff --git a/src/fn/sub_08159388.c b/src/fn/sub_08159388.c
+deleted file mode 100644
+index 19bfaea3f..000000000
+--- a/src/fn/sub_08159388.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-
+-void Player_IncrementActionSpeedBonus(u8 *p, s32 a)
+-{
+-    if (a == 0) {
+-        p[0x4F6]++;
+-    }
+-}
+diff --git a/src/fn/sub_081593A0.c b/src/fn/sub_081593A0.c
+deleted file mode 100644
+index bb6571baf..000000000
+--- a/src/fn/sub_081593A0.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#include "global.h"
+-
+-struct V081593A0 {
+-    u32 a;
+-    u32 b;
+-};
+-struct P081593A0 {
+-    u8 f0[0x30];
+-    struct V081593A0 f30;
+-    u8 f38[0xAC - 0x38];
+-    struct V081593A0 fAC;
+-    u8 fB4[0x168 - 0xB4];
+-    struct V081593A0 f168;
+-};
+-struct H081593A0 {
+-    u16 a;
+-    u16 b;
+-    u16 c;
+-};
+-extern u8 *gGameState;
+-
+-void Player_SetPositionAndSave(struct P081593A0 *p, struct H081593A0 *h)
+-{
+-    struct V081593A0 *v = (struct V081593A0 *)h;
+-    struct V081593A0 t = *v;
+-    p->f30 = t;
+-    p->f168 = t;
+-    p->fAC = t;
+-    *(u16 *)(gGameState + 0x30) = h->a;
+-    *(u16 *)(gGameState + 0x32) = h->b;
+-    *(u16 *)(gGameState + 0x34) = h->c;
+-}
+diff --git a/src/fn/sub_081593D8.c b/src/fn/sub_081593D8.c
+deleted file mode 100644
+index bd03652f1..000000000
+--- a/src/fn/sub_081593D8.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_TestAttachmentFlags(u8 *p, s32 mask)
+-{
+-    if ((*(u16 *)(p + 0x474) & mask) != 0) {
+-        return 1;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_081593F8.c b/src/fn/sub_081593F8.c
+deleted file mode 100644
+index 9e88b779e..000000000
+--- a/src/fn/sub_081593F8.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-// COMPILER: old_agbcc
+-#include "global.h"
+-/* Player_GetAttachmentId: Returns the identifier stored alongside the named-object attachment flags */
+-#define Player_GetAttachmentId sub_081593F8
+-
+-u16 sub_081593F8(u8 *p)
+-{
+-    return *(u16 *)(p + 0x476);
+-}
+diff --git a/src/fn/sub_08159404.c b/src/fn/sub_08159404.c
+deleted file mode 100644
+index a235dfbe2..000000000
+--- a/src/fn/sub_08159404.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-
+-struct P08159404 {
+-    u8 f0[0x474];
+-    u16 f474;
+-    u16 f476;
+-};
+-
+-void Player_AddAttachmentFlags(struct P08159404 *p, u32 a, u16 b)
+-{
+-    p->f474 |= a;
+-    p->f476 = b;
+-}
+diff --git a/src/fn/sub_08159424.c b/src/fn/sub_08159424.c
+deleted file mode 100644
+index 07487a88b..000000000
+--- a/src/fn/sub_08159424.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-
+-struct P08159424 {
+-    u8 f0[0x474];
+-    u16 f474;
+-    u16 f476;
+-};
+-
+-void Player_ClearAttachmentFlags(struct P08159424 *p, u32 a)
+-{
+-    p->f474 &= ~a;
+-    p->f476 = 0;
+-}
+diff --git a/src/fn/sub_08159440.c b/src/fn/sub_08159440.c
+deleted file mode 100644
+index fa4e9e7d9..000000000
+--- a/src/fn/sub_08159440.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-void Player_SetPendingObject(u8 *p, u32 v)
+-{
+-    *(u32 *)(p + 0x47c) = v;
+-    p[0x478] = 1;
+-}
+diff --git a/src/fn/sub_08159458.c b/src/fn/sub_08159458.c
+deleted file mode 100644
+index 90c545450..000000000
+--- a/src/fn/sub_08159458.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-
+-struct P08159458 {
+-    u8 f0[0x1c];
+-    u32 f1c;
+-    u8 f20[0x457 - 0x20];
+-    u8 f457;
+-    u8 f458;
+-};
+-
+-s32 Player_IsActiveInLocomotionState(struct P08159458 *p)
+-{
+-    u8 k;
+-    if (!(p->f1c & 1))
+-        return 0;
+-    k = p->f457;
+-    if (k <= 1)
+-        goto one;
+-    if (k == 3)
+-        goto one;
+-    if (k == 7 && p->f458 == 0)
+-        goto one;
+-    return 0;
+-one:
+-    return 1;
+-}
+diff --git a/src/fn/sub_08159494.c b/src/fn/sub_08159494.c
+deleted file mode 100644
+index 2e09a4b50..000000000
+--- a/src/fn/sub_08159494.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-
+-struct P08159494 {
+-    u8 f0[0x1c];
+-    s32 f1c;
+-    u8 f20[0x424 - 0x20];
+-    u16 f424;
+-    u16 f426;
+-};
+-
+-void Player_IncreaseLifeTowardLimit(struct P08159494 *p, u32 d)
+-{
+-    if (p->f1c == 1) {
+-        p->f424 += d;
+-        if (p->f424 >= p->f426)
+-            p->f424 = p->f426;
+-    }
+-}
+diff --git a/src/fn/sub_081594C8.c b/src/fn/sub_081594C8.c
+deleted file mode 100644
+index 540dd3971..000000000
+--- a/src/fn/sub_081594C8.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-
+-struct P081594C8 {
+-    u8 f0[0x1c];
+-    s32 f1c;
+-    u8 f20[0x424 - 0x20];
+-    u16 f424;
+-};
+-
+-void Player_SubtractLifeNonlethal(struct P081594C8 *p, s32 d)
+-{
+-    if (p->f1c == 1) {
+-        if (p->f424 < d + 1)
+-            p->f424 = p->f1c;
+-        else
+-            p->f424 -= d;
+-    }
+-}
+diff --git a/src/fn/sub_081594F4.c b/src/fn/sub_081594F4.c
+deleted file mode 100644
+index a08508995..000000000
+--- a/src/fn/sub_081594F4.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-
+-struct P081594F4 {
+-    u8 f0[0x1c];
+-    s32 f1c;
+-    u8 f20[0x428 - 0x20];
+-    u16 f428;
+-    u16 f42A;
+-};
+-
+-void Player_AddEnergy(struct P081594F4 *p, u32 d)
+-{
+-    if (p->f1c == 1) {
+-        p->f428 += d;
+-        if (p->f428 >= p->f42A)
+-            p->f428 = p->f42A;
+-    }
+-}
+diff --git a/src/fn/sub_08159524.c b/src/fn/sub_08159524.c
+deleted file mode 100644
+index c16483dd2..000000000
+--- a/src/fn/sub_08159524.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-
+-struct P08159524 {
+-    u8 f0[0x1c];
+-    s32 f1c;
+-    u8 f20[0x428 - 0x20];
+-    u16 f428;
+-};
+-
+-void Player_SubtractEnergy(struct P08159524 *p, s32 d)
+-{
+-    if (p->f1c == 1) {
+-        if (p->f428 < d)
+-            p->f428 = 0;
+-        else
+-            p->f428 -= d;
+-    }
+-}
+diff --git a/src/fn/sub_08159548.c b/src/fn/sub_08159548.c
+deleted file mode 100644
+index 550a4331d..000000000
+--- a/src/fn/sub_08159548.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-
+-void Player_SetResistance(u8 *p, s32 i, u8 v)
+-{
+-    u8 *q = p + 0x450;
+-
+-    q[i] = v;
+-}
+diff --git a/src/fn/sub_08159554.c b/src/fn/sub_08159554.c
+deleted file mode 100644
+index 974b638d9..000000000
+--- a/src/fn/sub_08159554.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "global.h"
+-
+-void Player_AddResistance(u8 *p, s32 i, s32 add)
+-{
+-    u8 *q;
+-    s32 v;
+-
+-    if (p != 0) {
+-        p += 0x450;
+-        q = p + i;
+-        v = *q + add;
+-        if (v > 9) {
+-            v = 10;
+-        }
+-        *q = v;
+-    }
+-}
+diff --git a/src/fn/sub_08159574.c b/src/fn/sub_08159574.c
+deleted file mode 100644
+index 522ac8ff3..000000000
+--- a/src/fn/sub_08159574.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-
+-void Player_SubtractResistance(u8 *p, s32 i, s32 d)
+-{
+-    if (p != 0) {
+-        u8 *e;
+-        p += 0x450;
+-        e = p + i;
+-        if (*e <= d)
+-            *e = 0;
+-        else
+-            *e -= d;
+-    }
+-}
+diff --git a/src/fn/sub_08159594.c b/src/fn/sub_08159594.c
+deleted file mode 100644
+index e6fcfb8a8..000000000
+--- a/src/fn/sub_08159594.c
++++ /dev/null
+@@ -1,66 +0,0 @@
+-#define PlayerAction_SetResponseValue Player_SetResistance
+-#define gActionRecords                gUnk_08E6092C
+-#include "global.h"
+-#include "player.h"
+-struct PlayerActionRecord {
+-    u32 words[8];
+-};
+-extern const struct PlayerActionRecord gUnk_08E6092C[];
+-void Player_SetResistance(struct Player *, s32, u8);
+-void ActionRecord_CopyFromEntry(struct PlayerActionEntry *, struct PlayerActionRecord *);
+-void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *,
+-                                 struct PlayerActionRecord *);
+-void PlayerAction_RefreshFlagState(struct Player *, void *, s32);
+-void PlayerAction_RefreshModifiers(struct Player *p)
+-{
+-    struct PlayerActionRecord record;
+-    switch (p->actionMode) {
+-        case 0:
+-            Player_SetResistance(p, 0, 5);
+-            Player_SetResistance(p, 1, 3);
+-            Player_SetResistance(p, 2, 4);
+-            Player_SetResistance(p, 3, 4);
+-            Player_SetResistance(p, 4, 4);
+-            Player_SetResistance(p, 5, 4);
+-            Player_SetResistance(p, 6, 4);
+-            break;
+-        case 1:
+-            Player_SetResistance(p, 0, 2);
+-            Player_SetResistance(p, 1, 10);
+-            Player_SetResistance(p, 2, 4);
+-            Player_SetResistance(p, 3, 4);
+-            Player_SetResistance(p, 4, 4);
+-            Player_SetResistance(p, 5, 4);
+-            Player_SetResistance(p, 6, 4);
+-            break;
+-        case 2:
+-            Player_SetResistance(p, 0, 10);
+-            Player_SetResistance(p, 1, 2);
+-            Player_SetResistance(p, 2, 4);
+-            Player_SetResistance(p, 3, 4);
+-            Player_SetResistance(p, 4, 4);
+-            Player_SetResistance(p, 5, 4);
+-            Player_SetResistance(p, 6, 4);
+-            break;
+-        case 3:
+-        case 4:
+-        case 5:
+-        default:
+-            break;
+-        case 6:
+-            Player_SetResistance(p, 0, 4);
+-            Player_SetResistance(p, 1, 4);
+-            Player_SetResistance(p, 2, 4);
+-            Player_SetResistance(p, 3, 4);
+-            Player_SetResistance(p, 4, 4);
+-            Player_SetResistance(p, 5, 4);
+-            Player_SetResistance(p, 6, 4);
+-            break;
+-    }
+-    if (p->actionMode != 6)
+-        ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &record);
+-    else
+-        record = gActionRecords[47];
+-    Player_BuildActionModifiers(p, &p->statModifierContext, &record);
+-    PlayerAction_RefreshFlagState(p, p->actionFlagState, -1);
+-}
+diff --git a/src/fn/sub_081596E0.c b/src/fn/sub_081596E0.c
+deleted file mode 100644
+index a22548a73..000000000
+--- a/src/fn/sub_081596E0.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-void Player_IncreaseLifeTowardLimit(u8 *, u32);
+-static inline u32 tst(u32 *a, u32 m)
+-{
+-    return *a & m;
+-}
+-void Player_RestoreLifeWithModifier(u8 *p, u32 n)
+-{
+-    if (p != 0 && tst((u32 *)(p + 0x444), 0x1000))
+-        Player_IncreaseLifeTowardLimit(p, n << 1);
+-    else
+-        Player_IncreaseLifeTowardLimit(p, n);
+-}
+diff --git a/src/fn/sub_08159714.c b/src/fn/sub_08159714.c
+deleted file mode 100644
+index 0a21c442a..000000000
+--- a/src/fn/sub_08159714.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-void Player_AddEnergy(u8 *, u32);
+-static inline u32 tst(u32 *a, u32 m)
+-{
+-    return *a & m;
+-}
+-void Player_RestoreEnergyWithModifier(u8 *p, u32 n)
+-{
+-    if (p != 0 && tst((u32 *)(p + 0x444), 0x1000))
+-        Player_AddEnergy(p, n << 1);
+-    else
+-        Player_AddEnergy(p, n);
+-}
+diff --git a/src/fn/sub_08159748.c b/src/fn/sub_08159748.c
+deleted file mode 100644
+index aeab162e7..000000000
+--- a/src/fn/sub_08159748.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-void Player_SubtractEnergy(u8 *, u32);
+-static inline u32 tst(u32 *a, u32 m)
+-{
+-    return *a & m;
+-}
+-void Player_ConsumeEnergyWithModifier(u8 *p, u32 n)
+-{
+-    if (p != 0 && tst((u32 *)(p + 0x444), 0x1000))
+-        Player_SubtractEnergy(p, n << 1);
+-    else
+-        Player_SubtractEnergy(p, n);
+-}
+diff --git a/src/fn/sub_0815977C.c b/src/fn/sub_0815977C.c
+deleted file mode 100644
+index 9e0a62762..000000000
+--- a/src/fn/sub_0815977C.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-s32 Div(s32, s32);
+-static inline s32 HasFlag(struct Player *p, u32 mask)
+-{
+-    u32 offset;
+-    u32 *flags;
+-    if (!p)
+-        return 0;
+-    offset = (u32) & ((struct Player *)0)->actionFlags;
+-    flags = (void *)((u8 *)p + offset);
+-    {
+-        u32 bits = mask;
+-        return *flags & bits;
+-    }
+-}
+-
+-void PlayerStats_AddHundredths(struct Player *p, s32 amount)
+-{
+-    if (p->kind == 1 && p->actionMode == 0) {
+-        if (!(HasFlag(p, 0x2000) && HasFlag(p, 0x4000))) {
+-            if (HasFlag(p, 0x2000))
+-                amount *= 2;
+-            else if (HasFlag(p, 0x4000))
+-                amount = Div(amount, 2);
+-        }
+-        p->statHundredths += amount;
+-        if (p->statHundredths > 999)
+-            p->statHundredths = 1000;
+-    }
+-}
+\ No newline at end of file
+diff --git a/src/fn/sub_08159814.c b/src/fn/sub_08159814.c
+deleted file mode 100644
+index 3837d4b89..000000000
+--- a/src/fn/sub_08159814.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-
+-void sub_08159814(u8 *player, s32 amount)
+-{
+-    if (*(s32 *)(player + 0x1c) == 1) {
+-        u32 flag = player[0x418];
+-        if (flag == 0) {
+-            u16 *p = (u16 *)(player + 0x42c);
+-            if (*p <= amount)
+-                *p = flag;
+-            else
+-                *p -= amount;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_08159844.c b/src/fn/sub_08159844.c
+deleted file mode 100644
+index 99ef55975..000000000
+--- a/src/fn/sub_08159844.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-
+-struct P08159844 {
+-    u8 f0[0x430];
+-    u16 f430;
+-};
+-
+-void Player_SubtractGauge430(struct P08159844 *p, s32 d)
+-{
+-    if (p->f430 <= d)
+-        p->f430 = 0;
+-    else
+-        p->f430 -= d;
+-}
+diff --git a/src/fn/sub_08159860.c b/src/fn/sub_08159860.c
+deleted file mode 100644
+index d30186172..000000000
+--- a/src/fn/sub_08159860.c
++++ /dev/null
+@@ -1,37 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-#include "contact_actor.h"
+-void PlayerStats_AddHundredths(struct Player *, s32);
+-void PlayerStats_AddContactHundredths(struct ContactCollider *source, struct ContactCollider *other,
+-                                      s32 amount)
+-{
+-    struct Player *player = gPlayers[0];
+-    s32 gain, product;
+-    if (player) {
+-        gain = 0;
+-        if (source->contactFlags == 1 && !(source->reactionFlags & 0x40)) {
+-            if (source->statRewardFlags & 0x10) {
+-                if (source->statRewardFlags & 0x20)
+-                    gain = 10;
+-                else if (source->statRewardFlags & 0x40)
+-                    gain = 20;
+-                else if (source->statRewardFlags & 0x80)
+-                    gain = 50;
+-            } else {
+-                if (source->statRewardFlags & 1)
+-                    gain = 10;
+-                else if (source->statRewardFlags & 2)
+-                    gain = 40;
+-                else if (source->statRewardFlags & 4)
+-                    gain = 20;
+-            }
+-        }
+-        product = player->statScale * gain;
+-        if (product >= 0)
+-            gain = product >> 6;
+-        else
+-            gain = -((-product) >> 6);
+-        PlayerStats_AddHundredths(player, gain);
+-        source->cost += amount;
+-    }
+-}
+diff --git a/src/fn/sub_081598F8.c b/src/fn/sub_081598F8.c
+deleted file mode 100644
+index 1c22502ee..000000000
+--- a/src/fn/sub_081598F8.c
++++ /dev/null
+@@ -1,27 +0,0 @@
+-#define PlayerMovement_ClearModifiers Player_EmitQueuedEffects
+-#include "global.h"
+-#include "player.h"
+-#include "ram.h"
+-void Player_EmitQueuedEffects(struct Player *);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-static inline void SetFlags(u32 *flags, u32 mask)
+-{
+-    *flags |= mask;
+-}
+-void PlayerAction_BeginMode24(struct Player *p)
+-{
+-    SetFlags(&p->statusFlags, 0x1000);
+-    p->actionLatch464 = 0;
+-    p->heading = 0;
+-    Player_EmitQueuedEffects(p);
+-    p->collider.flags |= 4;
+-    p->directionFrame = 0;
+-    p->positionResetValue = 0;
+-    p->positionResetTimer = 0;
+-    p->positionResetCounter = 0;
+-    p->positionResetState = 0;
+-    p->particleEmissionCount = 0;
+-    gPlayerPendingActor = 0;
+-    gPlayerNotificationPending = 0;
+-    ActorSequence_Begin(p, 0x18, 0);
+-}
+diff --git a/src/fn/sub_08159978.c b/src/fn/sub_08159978.c
+deleted file mode 100644
+index 0121eec8b..000000000
+--- a/src/fn/sub_08159978.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-void PlayerAction_BeginMode24(struct Player *);
+-s32 ActorVariant_GetTableValue(u32, s32);
+-s32 Player_SetAnimation(struct Player *, s32, s32, s32);
+-s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
+-static inline u32 requestBlocked(u32 *flags, u32 mask)
+-{
+-    return *flags & mask;
+-}
+-s32 Player_BeginPositionRequest(struct Player *p, struct SceneVec *position,
+-                                struct SceneVec *target, s32 animationOffset, s32 side,
+-                                s32 parameter, s32 immediate, s32 request, u32 option)
+-{
+-    s32 result;
+-    if (p->kind != 1 || requestBlocked(&p->statusFlags, 0x40000))
+-        return -1;
+-    if (p->tetherMode != 0x18)
+-        PlayerAction_BeginMode24(p);
+-    p->position = *position;
+-    p->previousPosition = p->position;
+-    if (immediate) {
+-        p->animation.flags |= 1;
+-        p->movementRequestAnimated = 0;
+-    } else {
+-        p->animation.flags &= ~1;
+-        p->movementRequestAnimated = 1;
+-        p->side = side;
+-        Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x14) + animationOffset,
+-                            0x40, 1);
+-    }
+-    if (parameter > 0) {
+-        p->movementRequestParameter = parameter;
+-        p->movementRequestScale = 0x40;
+-    }
+-    if (request > 0) {
+-        result = PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
+-        if (!p->movementRequestBlocked && target)
+-            p->movementRequestTarget = *target;
+-        return result;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_08159A90.c b/src/fn/sub_08159A90.c
+deleted file mode 100644
+index 4b817dfe8..000000000
+--- a/src/fn/sub_08159A90.c
++++ /dev/null
+@@ -1,44 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-void Sound_PlaySong(u32);
+-s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
+-s32 Player_ApplyPositionRequest(struct Player *p, struct SceneVec *position, s32 frame,
+-                                u32 direction, s32 resetValue, s32 parameter, s32 request,
+-                                u32 option)
+-{
+-    s32 result;
+-    if (p->kind != 1 || p->tetherMode != 0x18)
+-        return -1;
+-    if (parameter > 0) {
+-        p->movementRequestParameter = parameter;
+-        p->movementRequestScale = 0x40;
+-    }
+-    p->position = *position;
+-    direction = ((s32)((direction + 0xE0) & 0xFF) >> 6) * 2 + 1;
+-    p->facing = direction;
+-    if (direction > 4) {
+-        p->heading = 8 - direction;
+-        p->side = 1;
+-    } else {
+-        p->heading = direction;
+-        p->side = 0;
+-    }
+-    p->directionFrame = frame;
+-    p->contactSpecial = 1;
+-    Sound_PlaySong(0xE6);
+-    if (p->positionResetTimer)
+-        p->positionResetTimer = 0;
+-    p->terrainClampApplied = 0;
+-    p->actionPhase488 = 0;
+-    p->terrainRecoveryPhase = 0;
+-    p->terrainClampBlocked = 0;
+-    p->actionActive489 = 0;
+-    p->terrainRecoveryActive = 0;
+-    if (request > 0)
+-        result = PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
+-    else
+-        result = 0;
+-    if (resetValue > 0)
+-        p->positionResetValue = resetValue;
+-    return result;
+-}
+diff --git a/src/fn/sub_08159BB8.c b/src/fn/sub_08159BB8.c
+deleted file mode 100644
+index 25dab8095..000000000
+--- a/src/fn/sub_08159BB8.c
++++ /dev/null
+@@ -1,34 +0,0 @@
+-#include "global.h"
+-
+-struct P08159BB8 {
+-    u8 f0[0x20];
+-    u32 f20;
+-    u8 f24[0x236 - 0x24];
+-    u16 f236;
+-    u8 f238[0x270 - 0x238];
+-    u16 f270;
+-    u16 f272;
+-    u16 f274;
+-    u8 f276[0x3A2 - 0x276];
+-    u8 f3A2;
+-    u8 f3A3[0x464 - 0x3A3];
+-    u8 f464;
+-};
+-static inline void orr(u32 *a, u32 m)
+-{
+-    *a |= m;
+-}
+-void Player_EmitQueuedEffects(void *);
+-void ActorSequence_Begin(void *, u32, u32);
+-
+-void Player_InitState25(struct P08159BB8 *p)
+-{
+-    orr(&p->f20, 0x1000);
+-    p->f464 = 0;
+-    p->f3A2 = 0;
+-    Player_EmitQueuedEffects(p);
+-    p->f236 |= 4;
+-    p->f270 = 0;
+-    p->f274 = 0;
+-    ActorSequence_Begin(p, 0x19, 0);
+-}
+diff --git a/src/fn/sub_08159C0C.c b/src/fn/sub_08159C0C.c
+deleted file mode 100644
+index e413e3753..000000000
+--- a/src/fn/sub_08159C0C.c
++++ /dev/null
+@@ -1,38 +0,0 @@
+-#define Player_PrepareInterpolatedMovement Player_InitState25
+-#include "global.h"
+-#include "player.h"
+-void Player_InitState25(struct Player *);
+-s32 ActorVariant_GetTableValue(u32, s32);
+-s32 Player_SetAnimation(struct Player *, s32, s32, s32);
+-s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
+-static inline u32 requestBlocked(u32 *flags, u32 mask)
+-{
+-    return *flags & mask;
+-}
+-static inline void enableAnimation(struct PlayerAnimation *a)
+-{
+-    a->flags &= ~1;
+-}
+-s32 Player_BeginInterpolatedMovement(struct Player *p, struct SceneVec *destination, s32 duration,
+-                                     struct SceneVec *target, u32 unused, s32 request, u32 option)
+-{
+-    s32 result;
+-    if (p->kind != 1 || requestBlocked(&p->statusFlags, 0x40000))
+-        return -1;
+-    if (p->tetherMode != 0x18)
+-        Player_InitState25(p);
+-    p->movementDestination = *destination;
+-    p->movementDuration = duration;
+-    p->movementStart = p->position;
+-    enableAnimation(&p->animation);
+-    Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x31), 0x40, 1);
+-    p->actionEighteenParameter = 500;
+-    p->movementRequestScale = 0x40;
+-    if (request > 0) {
+-        result = PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
+-        if (!p->movementRequestBlocked && target)
+-            p->movementRequestTarget = *target;
+-        return result;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_08159D00.c b/src/fn/sub_08159D00.c
+deleted file mode 100644
+index 7a651a60c..000000000
+--- a/src/fn/sub_08159D00.c
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-void Sound_PlaySong(u32);
+-s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
+-s32 Player_ApplyInterpolatedMovement(struct Player *p, struct SceneVec *position, s32 frame,
+-                                     u32 direction, s32 resetValue, s32 parameter, s32 request,
+-                                     u32 option)
+-{
+-    s32 result;
+-    if (p->kind != 1 || p->tetherMode != 0x19)
+-        return -1;
+-    p->actionEighteenParameter = 42;
+-    p->movementRequestScale = 0x40;
+-    p->position = *position;
+-    direction = ((s32)((direction + 0xE0) & 0xFF) >> 6) * 2 + 1;
+-    p->facing = direction;
+-    if (direction > 4) {
+-        p->heading = 8 - direction;
+-        p->side = 1;
+-    } else {
+-        p->heading = direction;
+-        p->side = 0;
+-    }
+-    p->directionFrame = frame;
+-    p->contactSpecial = 1;
+-    Sound_PlaySong(0xE6);
+-    if (p->positionResetTimer)
+-        p->positionResetTimer = 0;
+-    if (request > 0)
+-        result = PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
+-    else
+-        result = 0;
+-    if (resetValue > 0)
+-        p->positionResetValue = resetValue;
+-    return result;
+-}
+diff --git a/src/fn/sub_08159DF8.c b/src/fn/sub_08159DF8.c
+deleted file mode 100644
+index 56354287e..000000000
+--- a/src/fn/sub_08159DF8.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-
+-struct P08159DF8 {
+-    u8 f0[0x1c];
+-    s32 f1c;
+-    u8 f20[0x457 - 0x20];
+-    u8 f457;
+-};
+-s32 ActorSequence_Begin(void *, u32, u32);
+-
+-s32 Player_EndState25(struct P08159DF8 *p)
+-{
+-    if (p->f1c != 1 || p->f457 != 0x19)
+-        return -1;
+-    return ActorSequence_Begin(p, 0, 0);
+-}
+diff --git a/src/fn/sub_08159E28.c b/src/fn/sub_08159E28.c
+deleted file mode 100644
+index 77dcebda9..000000000
+--- a/src/fn/sub_08159E28.c
++++ /dev/null
+@@ -1,28 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-#include "ram.h"
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void Player_AddControlFlags(struct Player *, s32);
+-static inline u32 requestBlocked(u32 *flags, u32 mask)
+-{
+-    return *flags & mask;
+-}
+-s32 Player_ResetPositionState(struct Player *p, struct SceneVec *position)
+-{
+-    if (p->kind != 1 || requestBlocked(&p->statusFlags, 0x40000))
+-        return 0;
+-    if (p->tetherMode != 0x1A)
+-        ActorSequence_Begin(p, 0x1A, 0);
+-    p->position = *position;
+-    Player_AddControlFlags(p, 8);
+-    p->collider.flags |= 4;
+-    p->directionFrame = 0;
+-    p->contactSpecial = 0;
+-    p->positionResetTimer = 0;
+-    p->positionResetCounter = 0;
+-    p->positionResetState = 0;
+-    p->particleEmissionCount = 0;
+-    gPlayerPendingActor = 0;
+-    gPlayerNotificationPending = 0;
+-    return 1;
+-}
+diff --git a/src/fn/sub_08159EC0.c b/src/fn/sub_08159EC0.c
+deleted file mode 100644
+index eb24ca33a..000000000
+--- a/src/fn/sub_08159EC0.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-void Player_SetActionPhase(struct Player *, u8);
+-s32 Player_ResetModePosition(struct Player *p, const struct SceneVec *position, s32 value)
+-{
+-    if (p->kind == 1 && p->tetherMode == 0x1A) {
+-        p->position = *position;
+-        Player_SetActionPhase(p, 2);
+-        p->positionResetValue = value;
+-        p->positionResetTimer = 0;
+-        p->positionResetCounter = 0;
+-        p->positionResetState = 0;
+-        return 0;
+-    }
+-    return -1;
+-}
+diff --git a/src/fn/sub_08159F20.c b/src/fn/sub_08159F20.c
+deleted file mode 100644
+index 86da6bfcb..000000000
+--- a/src/fn/sub_08159F20.c
++++ /dev/null
+@@ -1,38 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-void Sound_PlaySong(u32);
+-s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
+-static inline void lockPositionRequests(u32 *flags, u32 mask)
+-{
+-    *flags |= mask;
+-}
+-s32 Player_ApplyForcedFacing(struct Player *p, s32 frame, u32 direction, s32 resetValue,
+-                             s32 request, u32 option)
+-{
+-    if (p->tetherMode == 0x1A)
+-        goto noRequest;
+-    if (resetValue > 0)
+-        p->positionResetValue = resetValue;
+-    direction = ((s32)((direction + 0xE0) & 0xFF) >> 6) * 2 + 1;
+-    p->facing = direction;
+-    if (direction > 4) {
+-        p->heading = 8 - direction;
+-        p->side = 1;
+-    } else {
+-        p->heading = direction;
+-        p->side = 0;
+-    }
+-    p->directionFrame = frame;
+-    p->contactSpecial = 1;
+-    if (p->tetherMode != 0x1E)
+-        Sound_PlaySong(0xE6);
+-    if (p->positionResetTimer)
+-        p->positionResetTimer = 0;
+-    lockPositionRequests(&p->statusFlags, 0x40000);
+-    if (request > 0)
+-        goto startRequest;
+-noRequest:
+-    return 0;
+-startRequest:
+-    return PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
+-}
+diff --git a/src/fn/sub_08159FF4.c b/src/fn/sub_08159FF4.c
+deleted file mode 100644
+index 245ae0298..000000000
+--- a/src/fn/sub_08159FF4.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-s32 Player_RequestTimedReset(struct Player *p, u32 timer)
+-{
+-    if (p->kind != 1)
+-        return 0;
+-    if (p->positionResetTimer && p->tetherMode == 0x15 && p->positionResetCounter == 1) {
+-        p->positionResetRequested = 1;
+-        return 0;
+-    }
+-    p->positionResetTimer = timer;
+-    p->positionResetRequested = 1;
+-    return 1;
+-}
+diff --git a/src/fn/sub_0815A048.c b/src/fn/sub_0815A048.c
+deleted file mode 100644
+index d8f3ead76..000000000
+--- a/src/fn/sub_0815A048.c
++++ /dev/null
+@@ -1,39 +0,0 @@
+-#include "global.h"
+-#include "ram.h"
+-#include "player.h"
+-void Player_AddControlFlags(void *, u32);
+-void Sound_PlaySong(u32);
+-// confidence=low: forced variant clears movement state before starting or refreshing stun.
+-#define Player_TryStartStun sub_0815A048
+-s32 Player_TryStartStun(struct Player *p, s32 duration, s32 force)
+-{
+-    if (force == 1) {
+-        s32 guard = p->positionResetValue;
+-        if (guard > 0)
+-            return 0;
+-        Player_AddControlFlags(p, 8);
+-        p->collider.flags |= 4;
+-        p->directionFrame = 0;
+-        p->contactSpecial = 0;
+-        p->positionResetTimer = 0;
+-        p->positionResetCounter = 0;
+-        p->positionResetState = 0;
+-        p->particleEmissionCount = 0;
+-        gPlayerPendingActor = 0;
+-        gPlayerNotificationPending = 0;
+-    }
+-    {
+-        u32 kind = p->kind;
+-        if (kind == 1 && p->tetherMode != 0x1A) {
+-            if (!p->positionResetTimer) {
+-                p->positionResetTimer = duration;
+-                p->positionResetRequested = kind;
+-                p->positionResetCounter = kind;
+-                Sound_PlaySong(0xE6);
+-                return 1;
+-            }
+-            p->positionResetRequested = kind;
+-        }
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0815A104.c b/src/fn/sub_0815A104.c
+deleted file mode 100644
+index 47dd76377..000000000
+--- a/src/fn/sub_0815A104.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-s32 sub_0815A048(u8 *, s32, s32);
+-
+-s32 sub_0815A104(u8 *a, s32 b)
+-{
+-    return sub_0815A048(a, b, 0);
+-}
+diff --git a/src/fn/sub_0815A110.c b/src/fn/sub_0815A110.c
+deleted file mode 100644
+index 82ce0b614..000000000
+--- a/src/fn/sub_0815A110.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-
+-s32 sub_0815A048(u8 *, s32, s32);
+-
+-s32 Player_StartForcedStun(u8 *a, s32 b)
+-{
+-    return sub_0815A048(a, b, 1);
+-}
+diff --git a/src/fn/sub_0815A11C.c b/src/fn/sub_0815A11C.c
+deleted file mode 100644
+index b65dc426c..000000000
+--- a/src/fn/sub_0815A11C.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#define Player_SetTetherPhase Player_SetActionPhase
+-#include "global.h"
+-#include "player.h"
+-void Player_SetActionPhase(struct Player *, u8);
+-void Player_AdvanceTetherPhase(struct Player *p)
+-{
+-    if (p->tetherMode == 0x1F) {
+-        if (p->tetherPhase == 3)
+-            Player_SetActionPhase(p, 4);
+-    } else if (p->tetherMode == 0x20) {
+-        if (p->tetherPhase == 4)
+-            Player_SetActionPhase(p, 5);
+-    } else if (p->tetherMode == 0x24) {
+-        if (p->actionMode == 6) {
+-            if (p->tetherPhase == 3)
+-                Player_SetActionPhase(p, 4);
+-        } else {
+-            if (p->tetherPhase == 1)
+-                Player_SetActionPhase(p, 2);
+-        }
+-    } else if (p->kind == 2 && p->tetherMode == 0x15 && p->tetherPhase == 1) {
+-        Player_SetActionPhase(p, 4);
+-    }
+-}
+diff --git a/src/fn/sub_0815A1AC.c b/src/fn/sub_0815A1AC.c
+deleted file mode 100644
+index c65d4277e..000000000
+--- a/src/fn/sub_0815A1AC.c
++++ /dev/null
+@@ -1,71 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-#include "ram.h"
+-struct SpawnOffset {
+-    u32 x : 16;
+-    u32 y : 16;
+-    u32 z : 16;
+-};
+-void Player_FlushQueuedEffects(u8 *);
+-s32 EffectGroup_Spawn(void *, u32, u32, struct SpawnOffset *);
+-void Sound_PlaySong(u32);
+-
+-void sub_0815A1AC(u8 *p, u32 kind, s32 count)
+-{
+-    struct SpawnOffset off;
+-    s32 i, spawned;
+-    if (!(gEngineFlags & 0x1000))
+-        return;
+-    if (p[0x5bb] != 0) {
+-        u8 cur = p[0x5b9];
+-        if (cur != kind) {
+-            if (cur == 3)
+-                return;
+-            Player_FlushQueuedEffects(p);
+-        }
+-    }
+-    if (p[0x5bb] == 0) {
+-        u8 t = p[0x4f4];
+-        u8 *dst = p + 0x4f5;
+-        u16 zero = 0;
+-        *dst = t;
+-        *(u16 *)(p + 0x4c6) = zero;
+-    }
+-    {
+-        u16 index;
+-        u32 mask;
+-        u32 *indexPtr;
+-        const u16 *table;
+-        table = gRandomTable;
+-        indexPtr = &gRandomIndex;
+-        index = *indexPtr + 1;
+-        mask = 0x3ff;
+-        index &= mask;
+-        off.x = (table[index] % 16) - 7;
+-        index = (index + 1) & mask;
+-        *indexPtr = index;
+-        off.y = -(table[index] % 32);
+-        off.z = 0;
+-    }
+-
+-    spawned = 0;
+-    for (i = 0; i < count; i++) {
+-        if (EffectGroup_Spawn(p + 0x5b8, kind, 0xe10, &off) >= 0)
+-            spawned = 1;
+-    }
+-    if (spawned) {
+-        if (p[0x5b9] == 1)
+-            Sound_PlaySong(0x191);
+-        else if (p[0x5b9] == 2) {
+-            *(u16 *)(p + 0x442) += 10;
+-            Sound_PlaySong(0x133);
+-        } else if (p[0x5b9] == 3) {
+-            Sound_PlaySong(0x133);
+-            *(u16 *)(p + 0x270) = 10;
+-            if (*(u16 *)(p + 0x274) == 0)
+-                *(u16 *)(p + 0x274) = 1;
+-            p[0x4ba] = 0;
+-        }
+-    }
+-    *(u16 *)(p + 0x530) = 0;
+-}
+diff --git a/src/fn/sub_0815A324.c b/src/fn/sub_0815A324.c
+deleted file mode 100644
+index 5e70243c6..000000000
+--- a/src/fn/sub_0815A324.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-void Player_ClearFlag740(void)
+-{
+-    u8 *g = (*(u8 **)gPlayers);
+-
+-    if (g != 0) {
+-        g[0x740] = 0;
+-    }
+-}
+diff --git a/src/fn/sub_0815A340.c b/src/fn/sub_0815A340.c
+deleted file mode 100644
+index 9b696535d..000000000
+--- a/src/fn/sub_0815A340.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-
+-void Player_SetFlag740(void)
+-{
+-    u8 *g = (*(u8 **)gPlayers);
+-
+-    if (g != 0) {
+-        g[0x740] = 1;
+-    }
+-}
+diff --git a/src/fn/sub_0815A35C.c b/src/fn/sub_0815A35C.c
+deleted file mode 100644
+index 8da1ec857..000000000
+--- a/src/fn/sub_0815A35C.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-#include "render.h"
+-#include "player.h"
+-
+-u32 Player_GetCollisionData(void)
+-{
+-    if (gPlayers[0] == 0)
+-        return (u32)(gPaletteBankData + 0x540);
+-    return gPlayers[0]->actionVariantResource;
+-}
+diff --git a/src/fn/sub_0815A384.c b/src/fn/sub_0815A384.c
+deleted file mode 100644
+index 3d442b666..000000000
+--- a/src/fn/sub_0815A384.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-#include "game_state.h"
+-
+-void PlayerAction_RefreshFlagState(u32, void *, s32);
+-
+-s32 Player_GetCurrentAttribute(s32 i)
+-{
+-    u8 buf[16];
+-    s32 r;
+-    u8 *q;
+-    u8 *g = gGameState;
+-    i <<= 1;
+-    q = (u8 *)i;
+-    q += (s32)g;
+-    r = *(s16 *)(q + 0x18) + *(s16 *)(q + 0x20);
+-    PlayerAction_RefreshFlagState(0, buf, -1);
+-    {
+-        u8 *e = buf + 6;
+-        e += i;
+-        r += *(s16 *)e;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_0815A3C4.c b/src/fn/sub_0815A3C4.c
+deleted file mode 100644
+index 49fd46dae..000000000
+--- a/src/fn/sub_0815A3C4.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-#include "game_state.h"
+-
+-void PlayerAction_RefreshFlagState(u32, void *, s32);
+-
+-s32 Player_GetCandidateAttribute(s32 i, s32 d)
+-{
+-    u8 buf[16];
+-    s32 r;
+-    u8 *q;
+-    u8 *g = gGameState;
+-    i <<= 1;
+-    q = (u8 *)i;
+-    q += (s32)g;
+-    r = *(s16 *)(q + 0x18) + *(s16 *)(q + 0x20);
+-    PlayerAction_RefreshFlagState(0, buf, d);
+-    {
+-        u8 *e = buf + 6;
+-        e += i;
+-        r += *(s16 *)e;
+-    }
+-    return r;
+-}
+diff --git a/include/player_actions.h b/include/player_actions.h
+new file mode 100644
+--- /dev/null
++++ b/include/player_actions.h
+@@ -0,0 +1,111 @@
++#ifndef GUARD_PLAYER_ACTIONS_H
++#define GUARD_PLAYER_ACTIONS_H
++#include "player.h"
++#include "game_state.h"
++#include "engine.h"
++
++struct PlayerPendingNotification {
++    void *receiver;
++    u32 flags;
++    void *payload;
++};
++
++union ProbePosition {
++    struct SceneVec point;
++    struct {
++        u32 x : 16, y : 16, z : 16;
++    } words;
++};
++
++struct PlayerEquipmentReference {
++    u8 index;
++    u8 unknown1[11];
++    u8 slot;
++};
++
++s32 Player_GetInputDirection(struct Player *p);
++void Player_StopActionSounds(u8 *);
++void Player_RestoreCameraFollow(u8 *);
++void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
++u8 *TerrainModifiers_FindCellOverride(s32, s32);
++void Player_UpdateFacingSide(struct Player *);
++s32 ActorSequence_Begin(struct Player *, s32, s32);
++s32 TetherActor_TestMatchingStatus(u32, u32, u32, u32);
++s32 TetherActor_TestNearbyInteraction(u8 *, s32, s32);
++void Player_BeginDirectionSequence(struct Player *p, u32 axis);
++void Player_StopMovementEffects(struct Player *p);
++void Player_SubtractGauge430(struct Player *p, s32 d);
++void sub_08249244(void *, s32, s32, void *);
++s32 Player_TestTetherActionInput(struct Player *p);
++s32 Trigger_TryOpenNearby(void *);
++s32 PlayerBarrier_IsActive(void *);
++void PlayerBarrier_Hide(void *);
++s32 Player_SelectRequestedActionMode(struct Player *);
++s32 Player_GetEventFlags(struct Player *, u32);
++void sub_0813B3CC(struct Player *);
++s32 Player_TestNearbyInteraction(struct Player *p);
++s32 Player_GetControlFlags(void *, u32);
++void CellObject_Init(void *, void *);
++void Obj_StepPosition(void *);
++void sub_0802E04C(void *);
++void ActorDebris_Show(void *);
++void ActorDebris_Hide(void *);
++void PlayerEffect_SetPaletteSource(void *, u32, u32);
++void Player_AccumulateAction(struct Player *, s32);
++s32 Player_IsSlotInActionTwelveOrThirtyEight(s32 idx);
++void Player_TickModeParticles(struct Player *);
++void Player_RequestNearbyEffectTarget(struct Player *);
++void Player_ClampAlternateTerrainPosition(struct Player *);
++void Player_EmitPeriodicParticles(struct Player *p);
++s32 Player_CanUseSceneFeature(struct Player *);
++void Player_UpdateTimedScriptEvent(struct Player *);
++void Player_UpdateDirectionHistory(struct Player *p);
++s32 Player_SelectActionSequence(struct Player *p);
++void Player_UpdateCameraInput(struct Player *, s32);
++void Player_RunPendingCallback(struct Player *);
++void Player_ApplyDirectionalForce(struct Player *);
++void Player_ApplyControlPresentation(struct Player *p);
++void Player_BlendCameraTarget(struct Player *);
++void Player_ClampPositionToStoredTerrainCell(struct Player *);
++void Player_UpdateLockedMovement(struct Player *);
++s32 Player_IsStatusBit3ActionActive(u16);
++void Player_AddControlFlags(struct Player *, u32);
++void PlayerCue_UpdatePeriodicParticles(struct Player *);
++u32 Player_IsStatusBit4ActionActive(u32);
++s32 Player_TestMovementPosition(struct PlayerColliderVector *v);
++void Player_ClampInteractionVelocity(struct Player *p);
++s32 Mod(s32, s32);
++s32 Player_SelectInteractionMode(struct Player *p);
++void Player_UpdateInteractionHoverDisplay(struct Player *p);
++s32 Player_SelectAlternateInteractionMode(struct Player *p);
++void Player_SynchronizeInteractionDisplay(struct Player *p);
++void LinkPlayer_ResetToIdleState(struct Player *);
++void PlayerCue_BeginMode27(struct Player *, s32, s32, s32);
++void Player_NotifyActionInterruption(struct Player *p);
++void PlayerAction_RefreshFlagState(u32, void *, s32);
++s32 Player_CalculateActionStat(s32, struct PlayerStatModifierContext *, s32);
++s32 Player_GetSpecialAttackPower(s32, s32);
++void ActionRecord_CopyFromEntry(const void *, void *);
++void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
++void Inventory_InitEquipmentEntryFromDescriptor(s32, s32 *);
++s32 Player_EvaluateItemStatA(struct PlayerActionEntry *item,
++                             struct PlayerEquipmentReference *reference);
++s32 Div(s32, s32);
++void Player_ApplyPeriodicStatChanges(u8 *);
++s32 Player_IsInActionTwelveOrThirtyEight(struct Player *p);
++void Player_SetResistance(struct Player *p, s32 i, u8 v);
++void Player_IncreaseLifeTowardLimit(struct Player *p, u32 d);
++void Player_AddEnergy(struct Player *p, u32 d);
++void Player_SubtractEnergy(struct Player *p, s32 d);
++void PlayerStats_AddHundredths(struct Player *p, s32 amount);
++void Player_EmitQueuedEffects(struct Player *);
++void PlayerAction_BeginMode24(struct Player *p);
++s32 ActorVariant_GetTableValue(u32, s32);
++s32 Player_SetAnimation(struct Player *, s32, s32, s32);
++s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
++void Player_InitState25(struct Player *p);
++void Player_SetActionPhase(struct Player *, u8);
++s32 sub_0815A048(struct Player *, s32, s32);
++void Player_FlushQueuedEffects(u8 *);
++s32 EffectGroup_Spawn(void *, u32, u32, struct PlayerColliderVector *);
++#endif
+diff --git a/src/player_actions.c b/src/player_actions.c
+new file mode 100644
+--- /dev/null
++++ b/src/player_actions.c
+@@ -0,0 +1,2299 @@
++#include "player_actions.h"
++#include "global.h"
++#include "player.h"
++#include "game_state.h"
++#include "contact_actor.h"
++#include "engine.h"
++#include "tether_actor.h"
++#include "ram.h"
++#include "engine_globals.h"
++#include "render.h"
++
++#define gPlayerDirectionByKeys gUnk_08610B50
++
++extern const s16 gUnk_08610B50[];
++
++static inline u16 MaskKeys(u16 keys, u16 mask)
++{
++    return keys & mask;
++}
++
++s32 Player_GetInputDirection(struct Player *p)
++{
++    s32 keys = *p->inputKeys;
++    s16 direction = MaskKeys(keys, 0x40) != 0;
++    if (keys & 0x80)
++        direction |= 2;
++    if (keys & 0x20)
++        direction |= 4;
++    {
++        u32 m = 0x10;
++        m &= keys;
++        if (m)
++            direction |= 8;
++    }
++    return gUnk_08610B50[direction];
++}
++
++void Player_UpdateDirectionHistory(struct Player *p)
++{
++    s32 i;
++    s32 r;
++    for (i = 9; i > 0; i--)
++        p->directionHistory[i] = p->directionHistory[i - 1];
++    r = Player_GetInputDirection(p);
++    p->directionHistory[0] = r;
++    if ((s16)r >= 0) {
++        s32 t = r;
++        t += (*(s8 *)&p->catalogSavedOption);
++        p->directionHistory[0] = (t + 7) & 7;
++    }
++}
++
++void Player_StopMovementEffects(struct Player *p)
++{
++    Player_StopActionSounds(p);
++    if (p->cameraOffsetActive != 0) {
++        Player_RestoreCameraFollow(p);
++    }
++}
++
++void sub_08156C8C(struct Player *player)
++{
++    if (player->cameraOffsetActive != 0)
++        Player_RestoreCameraFollow(player);
++}
++
++void Player_EmitPeriodicParticles(struct Player *p)
++{
++    struct ContactPackedVector spread, position;
++    if (gGameState->playerParticleRate) {
++        if (gGameState->playerParticleRate <= 2499)
++            p->particleCadenceCounter++;
++        else
++            p->particleCadenceCounter += 2;
++        if (p->particleCadenceCounter > 15) {
++            if ((u8)(p->actionMode - 3) <= 1) {
++                position = *(struct ContactPackedVector *)&p->colliderPosition;
++                spread.x = 32;
++                spread.y = 32;
++                spread.z = 32;
++            } else {
++                position = *(struct ContactPackedVector *)&p->position;
++                position.y += 360;
++                spread.x = 32;
++                spread.y = 32;
++                spread.z = 32;
++            }
++            SparkParticle_Spawn(&position, 1, &spread, 0, 0, 6, 3, 2);
++            p->particleCadenceCounter = 0;
++        }
++    }
++}
++
++extern const s16 gUnk_086149C4[];
++
++static inline s32 TruncateQ12(int x)
++{
++    if (x >= 0)
++        return x >> 12;
++    return -(-x >> 12);
++}
++
++static inline s32 cellIndex(struct SceneVec *pos)
++{
++    s32 x = pos->x >> 8, z = pos->z >> 8;
++    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
++        return 0;
++    return gTerrainMap->rows[z] + x;
++}
++
++static inline u32 ForwardGroundHeight(struct SceneVec *position)
++{
++    s32 index = cellIndex(position), height;
++    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
++    u32 kind;
++    if (cell)
++        cell += 4;
++    else
++        cell = gTerrainMap->cells + 12 + index * 4;
++    kind = *cell >> 4;
++    height = (*cell & 15) << 8;
++    switch (kind) {
++        case 1:
++            height -= (u8)position->z;
++            break;
++        case 2:
++            height -= (u8)position->x;
++            break;
++    }
++    return height;
++}
++
++// confidence=low: compares nearby terrain height and input heading before reversing facing;
++
++// Player_TryStepForward (sub_08242120) with a facing update and sequence restart at the end.
++
++#define Player_CheckFacingTerrainClearance sub_08156DAC
++
++s32 Player_CheckFacingTerrainClearance(struct Player *p)
++{
++    u32 zero = p->unk4E1[2];
++    if (zero != 0)
++        return 1;
++    {
++        u8 axis = p->coordinateAxis;
++        u32 a = (axis + 7) & 7;
++        u32 b = (axis + 9) & 7;
++        s32 h = (s16)p->directionHistory[0];
++        if (h == axis || h == a || h == b) {
++            struct PlayerColliderVector pt;
++            u32 ang = ((p->coordinateAxis + 1) & 7) << 5;
++            u32 height;
++            pt = *(struct PlayerColliderVector *)&p->position;
++            pt.x += -TruncateQ12(gUnk_086149C4[(ang + 0x40) & 0xff] * 0x32);
++            pt.z += -TruncateQ12(gUnk_086149C4[ang] * 0x32);
++            height = ForwardGroundHeight((struct SceneVec *)&pt);
++            if (height >= (u32)(p->position.y + 0xc8))
++                return 1;
++            p->facing = (p->coordinateAxis + 4) & 7;
++        } else {
++            p->facing = (axis + 4) & 7;
++        }
++    }
++    Player_UpdateFacingSide(p);
++    ActorSequence_Begin(p, 0, 0);
++    return 0;
++}
++
++static inline u32 TetherAcceptsActionInput(void)
++{
++    if (!gTetherActor)
++        return 0;
++    switch (gTetherActor->state) {
++        case 1:
++        case 0x11:
++            return 1;
++    }
++    return 0;
++}
++
++s32 Player_TestTetherActionInput(struct Player *p)
++{
++    if (*p->inputKeys & 1) {
++        if (!TetherAcceptsActionInput())
++            return 0;
++        if (TetherActor_TestMatchingStatus(p->tetherStatusTag, p->tetherStatusFlags,
++                                           gTetherActor->statusTag, gTetherActor->statusFlags))
++            return 1;
++    }
++    return 0;
++}
++
++s32 Player_TestNearbyInteraction(struct Player *p)
++{
++    return TetherActor_TestNearbyInteraction(&p->position, p->tetherStatusTag, p->tetherStatusFlags);
++}
++
++// confidence=low: action-mode gates and input select the player's next sequence.
++
++static inline u32 HasActionFlag(struct Player *p, u32 mask)
++{
++    if (!p)
++        return 0;
++    {
++        u32 *flags = &p->actionFlags;
++        u32 bits = mask;
++        return *flags & bits;
++    }
++}
++
++static inline const u16 *InitialInput(struct Player *p)
++{
++    s16 offset = (u32) & ((struct Player *)0)->inputKeys;
++    const u16 **field;
++    field = (const u16 **)((u8 *)p + offset);
++    return *field;
++}
++
++static inline const u16 *ReloadInput(struct Player *p)
++{
++    return p->inputKeys;
++}
++
++static inline u32 IsSceneFive(struct Player *p)
++{
++    u32 active = p->active;
++    u32 result = 0;
++    if (active && p->sceneMode == 5)
++        result = 1;
++    return result;
++}
++
++s32 Player_SelectActionSequence(struct Player *p)
++{
++    u32 mode;
++    const u16 *keys;
++    if ((gEngineFlags & 0x1000) && (u8)(p->tetherMode - 10) <= 1)
++        return p->tetherMode;
++    if (p->tetherMode != 0x17 && (s8)p->movementAnimationState >= 0 && p->tetherMode != 0x26) {
++        p->interactionResetCounter = 0;
++        p->directionFrame = 0;
++        p->terrainRecoveryCounter = 0;
++        ActorSequence_Begin(p, 0x17, 0);
++    }
++    if (p->tetherMode != 4 && p->unk4E1[2])
++        Player_BeginDirectionSequence(p, p->coordinateAxis);
++    mode = p->tetherMode;
++    if (!p->statGaugeFull && (u8)(p->actionMode - 1) <= 1) {
++        if (!p->statusValue) {
++            if (p->contactSpecial && mode != 0x1E)
++                ActorSequence_Begin(p, 0x1E, 0);
++            Player_StopMovementEffects(p);
++            switch (p->tetherMode) {
++                default:
++                    if (p->actionMode == 2) {
++                        if (p->tetherMode != 11)
++                            ActorSequence_Begin(p, 11, 0);
++                    } else if (p->actionMode == 1) {
++                        if (p->tetherMode != 10)
++                            ActorSequence_Begin(p, 10, 0);
++                    }
++                case 4:
++                case 12:
++                case 21:
++                case 24:
++                case 25:
++                case 26:
++                case 28:
++                case 38:
++                    break;
++            }
++            p->statusValue = 0;
++            p->unk432[0] = 0;
++            p->unk432[1] = 1;
++            return p->tetherMode;
++        }
++        if ((HasActionFlag(p, 0x8000) && p->actionMode == 1) ||
++            (HasActionFlag(p, 0x10000) && p->actionMode == 2))
++            Player_SubtractGauge430(p, 3);
++        else
++            Player_SubtractGauge430(p, 4);
++    } else {
++        if (p->statGaugeFull == 1)
++            p->statusValue = 4000;
++        else
++            p->statusValue = 0;
++    }
++    if (p->tetherMode == 0x26)
++        goto end;
++    if (p->directionFrame) {
++        if (p->unk432[1]) {
++            p->actionLatch464 = 1;
++            p->actionLatch465 = p->unk432[0];
++            p->unk432[1] = 0;
++        }
++        if (p->contactSpecial) {
++            if (p->tetherMode != 0x1E)
++                ActorSequence_Begin(p, 0x1E, 0);
++        } else
++            ActorSequence_Begin(p, 0x1D, 0);
++        if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor) &&
++            gPlayerNotificationPending) {
++            if (!((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 1)) {
++                if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 0x10)
++                    sub_08249244(
++                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
++                        60, (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->payload);
++                else
++                    sub_08249244(
++                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
++                        60, (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->payload);
++            }
++            (*(struct PlayerPendingNotification **)&gPlayerPendingActor) = 0;
++            gPlayerNotificationPending = 0;
++        }
++        Player_StopMovementEffects(p);
++        goto end;
++    }
++    if (mode - 0x1D > 1 && mode != 0x1B && mode != 0x1C && mode != 0x18 && mode != 0x17 &&
++        mode != 0x16 && mode != 0x15 && mode != 0x1A && p->positionResetTimer) {
++        ActorSequence_Begin(p, 0x15, 0);
++        goto end;
++    }
++    switch (mode) {
++        case 6:
++            if (Player_TestTetherActionInput(p))
++                goto end;
++            Sound_PlaySong(218);
++            goto idle;
++        default:
++            if (p && IsSceneFive(p)) {
++                if ((InitialInput(p)[1] & 1) &&
++                    (u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
++                    goto idle;
++                if (((s16)p->directionHistory[0]) == -1)
++                    goto idle;
++                if (ReloadInput(p)[0] & 0x100)
++                    goto idle;
++                ActorSequence_Begin(p, 1, 0);
++                goto end;
++            }
++            keys = p->inputKeys;
++            if (keys[1] & 0x200) {
++                u32 am;
++                u32 sg;
++                am = p->actionMode;
++                if (am == 6) {
++                    ActorSequence_Begin(p, 2, 0);
++                    goto end;
++                }
++                sg = p->statGaugeFull;
++                if (sg && (u8)(am - 1) <= 1) {
++                    Sound_PlaySong(402);
++                    goto end;
++                }
++                if (PlayerBarrier_IsActive(p->actionRequestEffect) && p->actionMode == 0) {
++                    PlayerBarrier_Hide(p->actionRequestEffect);
++                    goto end;
++                }
++                mode = Player_SelectRequestedActionMode(p);
++                ActorSequence_Begin(p, mode, 0);
++                goto end;
++            }
++            if (keys[1] & 2) {
++                if (p->actionMode == 2) {
++                    ActorSequence_Begin(p, 38, 0);
++                    goto end;
++                }
++                if (p->actionMode == 1) {
++                    ActorSequence_Begin(p, 12, 0);
++                    goto end;
++                }
++                if (Player_GetEventFlags(p, 0x4000))
++                    goto cancel;
++                if (Player_GetEventFlags(p, 1)) {
++                    if (p->statModifierContext.statBOverrideEnabled == 3)
++                        goto primary;
++                cancel:
++                    ActorSequence_Begin(p, 0, 0);
++                    sub_0813B3CC(p);
++                    goto end;
++                }
++                goto normalAttack;
++            primary:
++                ActorSequence_Begin(p, 3, 0);
++                goto end;
++            normalAttack:
++                ActorSequence_Begin(p, 3, 0);
++                goto end;
++            }
++            if (keys[1] & 1) {
++                if (p->actionMode == 2) {
++                    if (p->historyDirectionMode == 1)
++                        ActorSequence_Begin(p, 38, 0);
++                    else
++                        ActorSequence_Begin(p, 38, 3);
++                    goto end;
++                }
++                if (p->actionMode == 1) {
++                    if (p->historyDirectionMode == 1)
++                        ActorSequence_Begin(p, 12, 0);
++                    else
++                        ActorSequence_Begin(p, 12, 3);
++                    goto end;
++                }
++                if (p->actionMode == 0 && Player_TestNearbyInteraction(p)) {
++                    Sound_PlaySong(218);
++                    ActorSequence_Begin(p, 6, 0);
++                    goto end;
++                }
++                if ((u8)Trigger_TryOpenNearby(&p->positionalEffectGroup))
++                    goto idle;
++                if (!p->actionMode && PlayerBarrier_IsActive(p->actionRequestEffect)) {
++                    ActorSequence_Begin(p, 20, 0);
++                    goto end;
++                }
++                ActorSequence_Begin(p, 7, 0);
++                goto end;
++            }
++            if ((s16)p->directionHistory[0] == -1 || (keys[0] & 0x100) ||
++                p->historyDirectionMode == 1) {
++            idle:
++                ActorSequence_Begin(p, 0, 0);
++            } else
++                ActorSequence_Begin(p, 1, 0);
++            break;
++        case 2:
++        case 3:
++        case 4:
++        case 5:
++        case 7:
++        case 8:
++        case 9:
++        case 10:
++        case 11:
++        case 12:
++        case 13:
++        case 14:
++        case 15:
++        case 16:
++        case 17:
++        case 18:
++        case 19:
++        case 20:
++        case 21:
++        case 22:
++        case 23:
++        case 24:
++        case 25:
++        case 26:
++        case 27:
++        case 28:
++        case 29:
++        case 30:
++        case 37:
++        case 38:
++            break;
++    }
++end:
++    return 0;
++}
++
++void Player_ApplyControlPresentation(struct Player *p)
++{
++
++    u32 value = p->tetherStatusFlags;
++    if (value == 0) {
++        if (Player_GetControlFlags(p, 16))
++            *(u32 *)&p->followTarget = value;
++        else if (!*(u32 *)&p->followTarget) {
++            void *position = &p->movementContactFlags;
++            CellObject_Init(position, &p->position);
++            *(u32 *)&p->followTarget = (u32)position;
++        }
++    }
++    Obj_StepPosition(&p->positionalEffectGroup);
++    sub_0802E04C(&p->positionalEffectGroup);
++    if (Player_GetControlFlags(p, 8)) {
++        p->collider.flags |= 4;
++    } else {
++        p->collider.flags &= ~4;
++        Collider_SetPosition(&p->collider, &p->position, 0);
++    }
++    if (Player_GetControlFlags(p, 1))
++        ((struct PlayerAnimation *)(u32)&p->animation)->flags |= 1;
++    else
++        ((struct PlayerAnimation *)(u32)&p->animation)->flags &= ~1;
++    if (Player_GetControlFlags(p, 2))
++        p->animation.flags |= 0x200;
++    else
++        p->animation.flags &= ~0x200;
++    if (Player_GetControlFlags(p, 64))
++        p->secondaryDrawFlags &= ~1;
++    else
++        p->secondaryDrawFlags |= 1;
++    if (Player_GetControlFlags(p, 4) || !p->resetState740)
++        ActorShadow_Disable(p->shadow);
++    else
++        ActorShadow_Enable(p->shadow);
++    if (Player_GetControlFlags(p, 256) && !Player_GetControlFlags(p, 1)) {
++        ActorDebris_Show((void *)p->actionDisplay);
++        PlayerEffect_SetPaletteSource((void *)p->actionDisplay, p->spriteResource, p->actionVariantResource);
++    } else
++        ActorDebris_Hide((void *)p->actionDisplay);
++    p->position.y += p->actionCountdown;
++    *(u64 *)&p->previousPosition = *(u64 *)&p->position;
++    p->previousPosition.x += p->formCueParameterA;
++    p->previousPosition.y += p->terrainRecoveryCounter;
++    p->previousPosition.z += p->formCueParameterB;
++    if (p->contactCueDuration) {
++        s32 jitter;
++        u32 random;
++        u32 mask;
++        gRandomIndex = (gRandomIndex + 1) & 1023;
++        random = *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
++        mask = 15;
++        jitter = (random & mask) - 7;
++        p->previousPosition.x += jitter;
++        p->previousPosition.z -= jitter;
++        p->contactCueDuration--;
++    }
++}
++
++// confidence=low: action callback table and nearby interaction routines establish the family.
++
++extern void *const gUnk_08610B70[];
++
++static inline u8 *cellProperties(s32 index)
++{
++    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
++    if (cell)
++        return cell + 4;
++    return gTerrainMap->cells + 12 + index * 4;
++}
++
++static inline s32 groundHeight(struct SceneVec *position)
++{
++    s32 index = cellIndex(position), height;
++    u8 *cell = cellProperties(index);
++    u32 kind = *cell >> 4;
++    height = (*cell & 15) << 8;
++    switch (kind) {
++        case 1:
++            height -= (u8)position->z;
++            break;
++        case 2:
++            height -= (u8)position->x;
++            break;
++    }
++    return height;
++}
++
++static inline s32 scale(s32 v)
++{
++    if (v >= 0)
++        return v >> 12;
++    return -((-v) >> 12);
++}
++
++static inline u32 specialState(struct Player *p)
++{
++    u32 active = p->active;
++    u32 result = 0;
++    if (active && p->sceneMode == 5)
++        result = 1;
++    return result;
++}
++
++static inline u32 nonzero(u32 value)
++{
++    return (-value | value) >> 31;
++}
++
++static inline u32 terrainFlag(struct SceneVec *pos)
++{
++    u32 flags = *(u16 *)(cellProperties(cellIndex(pos)) + 2);
++    return flags & 4;
++}
++
++void Player_UpdateActionModeMovement(struct Player *p)
++{
++    union ProbePosition pos;
++    u32 mask = 0x4000;
++    p->statusFlags |= mask;
++    switch (p->kind) {
++        case 1:
++            Player_EmitPeriodicParticles(p);
++            if (p->actionMode == 0 || p->actionMode == 2) {
++                if (Player_CanUseSceneFeature(p))
++                    Player_UpdateTimedScriptEvent(p);
++            } else if (p->actionMode == 1 && !Player_IsSlotInActionTwelveOrThirtyEight(0)) {
++                if (p->statusFlags & 0x10)
++                    Player_AccumulateAction(p, gGameState->unk876);
++                if (Player_CanUseSceneFeature(p)) {
++                    Player_UpdateTimedScriptEvent(p);
++                    Player_TickModeParticles(p);
++                }
++            }
++            Player_UpdateDirectionHistory(p);
++            Player_SelectActionSequence(p);
++            Player_UpdateCameraInput(p, p->tetherMode);
++            if (p->unk45C == 1)
++                Player_RunPendingCallback(p);
++            Callback_InvokeActor(p, gUnk_08610B70[p->tetherMode]);
++            if (p->movementVelocityLocked)
++                *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)(&p->lockedVelocity);
++            else
++                Player_ApplyDirectionalForce(p);
++            Player_ApplyControlPresentation(p);
++            if (p->cameraOffsetActive)
++                Player_BlendCameraTarget(p);
++            Player_ClampPositionToStoredTerrainCell(p);
++            if (p->actionMode == 1)
++                Player_RequestNearbyEffectTarget(p);
++            Player_ClampAlternateTerrainPosition(p);
++            Player_UpdateLockedMovement(p);
++            if (p && specialState(p))
++                break;
++            if (p->actionMode == 2)
++                break;
++            if (p->actionMode == 1)
++                break;
++            {
++                u32 enabled = 0;
++                if (!Player_IsStatusBit3ActionActive(p->movementStatus) && p->tetherMode == 1 &&
++                    (p->movementContactFlags & 1))
++                    enabled = nonzero(p->facing & 1);
++                if (enabled) {
++                    if (++*(u16 *)p->unk4A6 == 5) {
++                        s32 angle;
++                        u32 flags;
++                        pos.point = p->position;
++                        angle = ((p->facing + 5) & 7) << 5;
++                        pos.words.x += scale(gUnk_086149C4[(angle + 64) & 255] * 50);
++                        pos.words.z += scale(gUnk_086149C4[angle] * 50);
++                        if ((u32)groundHeight(&pos.point) < (u32)(p->position.y + 200))
++                            break;
++                        flags = terrainFlag(&pos.point);
++                        if (flags)
++                            break;
++                        p->coordinateAxis = p->facing;
++                        p->actionFourEnabled = flags;
++                        ActorSequence_Begin(p, 4, 0);
++                    }
++                } else
++                    *(u16 *)p->unk4A6 = enabled;
++            }
++            break;
++        case 4:
++            p->statusFlags |= 0x40000;
++            Player_AddControlFlags(p, 8);
++            if ((u8)(p->tetherMode - 0x1F) > 5) {
++                if (p->contactSpecial)
++                    ActorSequence_Begin(p, 0x20, 0);
++                else
++                    ActorSequence_Begin(p, 0x1F, 0);
++            }
++            if (p->unk45C == 1)
++                Player_RunPendingCallback(p);
++            Callback_InvokeActor(p, gUnk_08610B70[p->tetherMode]);
++            Player_ApplyControlPresentation(p);
++            break;
++        case 2:
++            p->statusFlags |= 0x40000;
++            Player_AddControlFlags(p, 8);
++            if (p->unk45C == 1)
++                Player_RunPendingCallback(p);
++            Callback_InvokeActor(p, p->triggerAnimationCallback);
++            Player_ApplyControlPresentation(p);
++            PlayerCue_UpdatePeriodicParticles(p);
++            break;
++    }
++}
++
++// confidence=low: action callback table and nearby interaction routines establish the family.
++
++extern void *const gUnk_08610C0C[];
++
++void Player_UpdateInteractionMovement(struct Player *p)
++{
++    union ProbePosition pos;
++    u32 mask = 0x4000;
++    p->statusFlags |= mask;
++    switch (p->kind) {
++        case 1:
++            Player_EmitPeriodicParticles(p);
++            if (Player_CanUseSceneFeature(p))
++                Player_UpdateTimedScriptEvent(p);
++            Player_UpdateDirectionHistory(p);
++            Player_SelectActionSequence(p);
++            Player_UpdateCameraInput(p, p->tetherMode);
++            if (p->unk45C == 1)
++                Player_RunPendingCallback(p);
++            Callback_InvokeActor(p, gUnk_08610C0C[p->tetherMode]);
++            if (p->movementVelocityLocked)
++                *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)(&p->lockedVelocity);
++            else
++                Player_ApplyDirectionalForce(p);
++            Player_ApplyControlPresentation(p);
++            if (p->cameraOffsetActive)
++                Player_BlendCameraTarget(p);
++            Player_ClampPositionToStoredTerrainCell(p);
++            Player_UpdateLockedMovement(p);
++            if (p && specialState(p))
++                break;
++            {
++                u32 enabled = 0;
++                if (!Player_IsStatusBit3ActionActive(p->movementStatus) && p->tetherMode == 1 &&
++                    (p->movementContactFlags & 1))
++                    enabled = nonzero(p->facing & 1);
++                if (enabled) {
++                    if (++*(u16 *)p->unk4A6 == 5) {
++                        s32 angle;
++                        u32 flags;
++                        pos.point = p->position;
++                        angle = ((p->facing + 5) & 7) << 5;
++                        pos.words.x += scale(gUnk_086149C4[(angle + 64) & 255] * 50);
++                        pos.words.z += scale(gUnk_086149C4[angle] * 50);
++                        if ((u32)groundHeight(&pos.point) < (u32)(p->position.y + 200))
++                            break;
++                        flags = terrainFlag(&pos.point);
++                        if (flags)
++                            break;
++                        p->coordinateAxis = p->facing;
++                        p->actionFourEnabled = flags;
++                        ActorSequence_Begin(p, 4, 0);
++                    }
++                } else
++                    *(u16 *)p->unk4A6 = enabled;
++            }
++            break;
++        case 4:
++            p->statusFlags |= 0x40000;
++            Player_AddControlFlags(p, 8);
++            if ((u8)(p->tetherMode - 0x1F) > 5) {
++                if (p->contactSpecial)
++                    ActorSequence_Begin(p, 0x20, 0);
++                else
++                    ActorSequence_Begin(p, 0x1F, 0);
++            }
++            if (p->unk45C == 1)
++                Player_RunPendingCallback(p);
++            Callback_InvokeActor(p, gUnk_08610C0C[p->tetherMode]);
++            Player_ApplyControlPresentation(p);
++            break;
++        case 2:
++            p->statusFlags |= 0x40000;
++            Player_AddControlFlags(p, 8);
++            if (p->unk45C == 1)
++                Player_RunPendingCallback(p);
++            Callback_InvokeActor(p, p->triggerAnimationCallback);
++            Player_ApplyControlPresentation(p);
++            PlayerCue_UpdatePeriodicParticles(p);
++            break;
++    }
++}
++
++struct TriggerOpener;
++
++s32 Player_SelectInteractionMode(struct Player *p)
++{
++    s32 mode;
++    if (p->tetherMode != 0x17 && (s8)p->movementAnimationState >= 0) {
++        p->interactionResetCounter = 0;
++        p->directionFrame = 0;
++        p->terrainRecoveryCounter = 0;
++        ActorSequence_Begin(p, 0x17, 0);
++    }
++    mode = p->tetherMode;
++    if (p->directionFrame != 0)
++        mode = 0x1D;
++    else if (mode != 0x1D && mode != 0x17 && mode != 0x16 && mode != 0xD) {
++        if ((p->inputKeys[1] & 1) &&
++            (u8)Trigger_TryOpenNearby((struct TriggerOpener *)(&p->positionalEffectGroup)))
++            mode = 0;
++        else if ((s16)p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
++            mode = 0;
++        else
++            mode = 1;
++    }
++    return mode;
++}
++
++s32 Player_TestMovementPosition(struct PlayerColliderVector *v)
++{
++    s32 x = (s16)v->x >> 8;
++    s32 z = (s16)v->z >> 8;
++    s32 cell;
++    u8 *data;
++    u32 flags;
++    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
++        cell = 0;
++    else
++        cell = gTerrainMap->rows[z] + x;
++    data = TerrainModifiers_FindCellOverride(cell, 1);
++    if (data)
++        data += 4;
++    else
++        data = gTerrainMap->cells + (cell * 4 + 12);
++    flags = *(u16 *)(data + 2);
++    if (flags & 0x40)
++        return 1;
++    if (Player_IsStatusBit4ActionActive(flags))
++        return 1;
++    return 0;
++}
++
++#define PooledInteractable_GetPosition NamedObject_GetPositionByName
++
++struct SceneVec *NamedObject_GetPositionByName(s32);
++
++void Player_ClampInteractionVelocity(struct Player *p)
++{
++    struct PlayerColliderVector v;
++    struct SceneVec *target;
++    v.x = p->position.x + p->velocityX;
++    v.z = p->position.z + p->velocityZ;
++    if (p->tetherStatusFlags & 4) {
++        target = NamedObject_GetPositionByName(p->tetherStatusTag);
++        if ((s16)v.x <= target->x - 100)
++            v.x = (u16)target->x - 100;
++        else if ((s16)v.x >= target->x + 100)
++            v.x = (u16)target->x + 100;
++        if ((s16)v.z <= target->z - 100)
++            v.z = (u16)target->z - 100;
++        else if ((s16)v.z >= target->z + 100)
++            v.z = (u16)target->z + 100;
++        p->velocityX = v.x - p->position.x;
++        p->velocityZ = v.z - p->position.z;
++    } else if (Player_TestMovementPosition(&v)) {
++        p->velocityX = 0;
++        p->velocityZ = 0;
++    }
++}
++
++// confidence=low: varying height offset suggests hovering during interaction.
++
++static inline s32 randomValue(void)
++{
++    u32 offset;
++    gRandomIndex = (gRandomIndex + 1) & 1023;
++    offset = gRandomIndex * 2;
++    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
++}
++
++static inline s32 hoverTarget(void)
++{
++    return Mod(randomValue() >> 3, 100) - 116;
++}
++
++void Player_UpdateInteractionHoverDisplay(struct Player *p)
++{
++    Player_ClampInteractionVelocity(p);
++    Obj_StepPosition(&p->positionalEffectGroup);
++    sub_0802E04C(&p->positionalEffectGroup);
++    if (p->tetherMode <= 1) {
++        u8 *timer = &p->hoverHeightTimer;
++        if (!*timer) {
++            s32 value = hoverTarget();
++            u32 offset = 0x467;
++            u8 *target;
++            target = (u8 *)p + offset;
++            *target = value;
++            *timer = 16;
++        } else
++            --*timer;
++        {
++            u8 *height = &p->colliderHeightOffset;
++            u32 current = *height;
++            u32 target = *(&p->hoverTargetHeight);
++            if ((s32)current <= (s32)target - 4)
++                *height = current + 4;
++            else if ((s32)current >= (s32)target + 8)
++                *height = current - 8;
++            else
++                *height = target;
++        }
++    }
++    p->colliderPosition.y = (u16)p->position.y + *(&p->colliderHeightOffset) + p->terrainRecoveryCounter;
++    if (Player_GetControlFlags(p, 8))
++        p->collider.flags |= 4;
++    else {
++        p->collider.flags &= ~4;
++        Collider_SetPosition(&p->collider, &p->position, 0);
++    }
++    if (Player_GetControlFlags(p, 1))
++        p->secondaryDrawFlags |= 1;
++    else
++        p->secondaryDrawFlags &= ~1;
++    if (Player_GetControlFlags(p, 0x40))
++        p->animation.flags &= ~1;
++    else
++        p->animation.flags |= 1;
++    if (Player_GetControlFlags(p, 4))
++        ActorShadow_Disable(p->shadow);
++    else
++        ActorShadow_Enable(p->shadow);
++}
++
++extern void *gUnk_08610CA8[];
++
++void sub_0815849C(struct Player *p)
++{
++    u32 flags;
++    u32 bit = 0x40000;
++    flags = p->statusFlags;
++    flags |= bit;
++    p->statusFlags = flags;
++    switch (p->kind) {
++        case 1: {
++            s32 mode;
++            if (flags & 0x10)
++                Player_AccumulateAction(p, gGameState->unk876);
++            if (Player_CanUseSceneFeature(p)) {
++                Player_UpdateTimedScriptEvent(p);
++                Player_TickModeParticles(p);
++            }
++            Player_UpdateDirectionHistory(p);
++            mode = Player_SelectInteractionMode(p);
++            Player_UpdateCameraInput(p, mode);
++            Callback_InvokeActor(p, gUnk_08610CA8[mode]);
++            if (p->movementVelocityLocked)
++                *(union PlayerEffectPosition *)(&p->velocityX) = *(union PlayerEffectPosition *)(&p->lockedVelocity);
++            Player_ApplyDirectionalForce(p);
++            Player_UpdateInteractionHoverDisplay(p);
++            if (p->cameraOffsetActive)
++                Player_BlendCameraTarget(p);
++            Player_UpdateLockedMovement(p);
++            break;
++        }
++        case 2:
++            Player_AddControlFlags(p, 8);
++            Callback_InvokeActor(p, p->triggerAnimationCallback);
++            Player_UpdateInteractionHoverDisplay(p);
++            PlayerCue_UpdatePeriodicParticles(p);
++            break;
++    }
++}
++
++s32 Player_SelectAlternateInteractionMode(struct Player *p)
++{
++    s32 mode;
++    if (p->tetherMode != 0x17 && (s8)p->movementAnimationState >= 0) {
++        p->interactionResetCounter = 0;
++        p->directionFrame = 0;
++        p->terrainRecoveryCounter = 0;
++        ActorSequence_Begin(p, 0x17, 0);
++    }
++    mode = p->tetherMode;
++    if (p->directionFrame != 0)
++        mode = 0x1D;
++    else if (mode != 0x1D && mode != 0x17 && mode != 0x16 && mode != 0x1C && mode != 4 &&
++             mode != 0xE) {
++        if (p->inputKeys[1] & 1) {
++            if ((u8)Trigger_TryOpenNearby((struct TriggerOpener *)(&p->positionalEffectGroup)))
++                mode = 0;
++            else
++                mode = 4;
++        } else if ((s16)p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
++            mode = 0;
++        else
++            mode = 1;
++    }
++    return mode;
++}
++
++#define Player_TestResetFlags Player_GetControlFlags
++
++void Player_SynchronizeInteractionDisplay(struct Player *p)
++{
++    Obj_StepPosition(&p->positionalEffectGroup);
++    sub_0802E04C(&p->positionalEffectGroup);
++    if (Player_GetControlFlags(p, 8))
++        p->collider.flags |= 4;
++    else {
++        p->collider.flags &= ~4;
++        Collider_SetPosition(&p->collider, &p->position, 0);
++    }
++    if (Player_GetControlFlags(p, 1))
++        p->secondaryDrawFlags |= 1;
++    else
++        p->secondaryDrawFlags &= ~1;
++    if (Player_GetControlFlags(p, 0x40))
++        p->animation.flags &= ~1;
++    else
++        p->animation.flags |= 1;
++    if (Player_GetControlFlags(p, 4))
++        ActorShadow_Disable(p->shadow);
++    else
++        ActorShadow_Enable(p->shadow);
++    p->position.y += p->actionCountdown;
++    p->colliderPosition = p->position;
++    p->colliderPosition.y += p->terrainRecoveryCounter;
++}
++
++extern void *gUnk_08610D18[];
++
++void sub_08158754(struct Player *p)
++{
++    u32 flags;
++    u32 bit = 0x54000;
++    flags = p->statusFlags;
++    flags |= bit;
++    p->statusFlags = flags;
++    switch (p->kind) {
++        case 1: {
++            s32 mode;
++            if (flags & 0x10)
++                Player_AccumulateAction(p, gGameState->unk876);
++            if (Player_CanUseSceneFeature(p)) {
++                Player_UpdateTimedScriptEvent(p);
++                Player_TickModeParticles(p);
++            }
++            Player_UpdateDirectionHistory(p);
++            mode = Player_SelectAlternateInteractionMode(p);
++            Player_UpdateCameraInput(p, mode);
++            Callback_InvokeActor(p, gUnk_08610D18[mode]);
++            if (p->movementVelocityLocked)
++                *(union PlayerEffectPosition *)(&p->velocityX) = *(union PlayerEffectPosition *)(&p->lockedVelocity);
++            Player_SynchronizeInteractionDisplay(p);
++            if (p->cameraOffsetActive)
++                Player_BlendCameraTarget(p);
++            Player_ClampPositionToStoredTerrainCell(p);
++            Player_RequestNearbyEffectTarget(p);
++            Player_UpdateLockedMovement(p);
++            break;
++        }
++        case 2:
++            Player_AddControlFlags(p, 8);
++            Callback_InvokeActor(p, p->triggerAnimationCallback);
++            Player_SynchronizeInteractionDisplay(p);
++            PlayerCue_UpdatePeriodicParticles(p);
++            break;
++    }
++}
++
++// confidence=low: action callback table and nearby interaction routines establish the family.
++
++extern void *const gUnk_08610D88[];
++
++void Player_UpdateLinkModeMovement(struct Player *p)
++{
++    union ProbePosition pos;
++    u32 mask = 0x4000;
++    p->statusFlags |= mask;
++    switch (p->kind) {
++        case 1:
++            Player_UpdateDirectionHistory(p);
++            Player_SelectActionSequence(p);
++            Player_UpdateCameraInput(p, p->tetherMode);
++            if (p->unk45C == 1)
++                Player_RunPendingCallback(p);
++            Callback_InvokeActor(p, gUnk_08610D88[p->tetherMode]);
++            if (p->movementVelocityLocked)
++                *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)(&p->lockedVelocity);
++            else
++                Player_ApplyDirectionalForce(p);
++            Player_ApplyControlPresentation(p);
++            if (p->cameraOffsetActive)
++                Player_BlendCameraTarget(p);
++            Player_ClampPositionToStoredTerrainCell(p);
++            Player_UpdateLockedMovement(p);
++            if (p && specialState(p))
++                break;
++            {
++                u32 enabled = 0;
++                if (!Player_IsStatusBit3ActionActive(p->movementStatus) && p->tetherMode == 1 &&
++                    (p->movementContactFlags & 1))
++                    enabled = nonzero(p->facing & 1);
++                if (enabled) {
++                    if (++*(u16 *)p->unk4A6 == 5) {
++                        s32 angle;
++                        u32 flags;
++                        pos.point = p->position;
++                        angle = ((p->facing + 5) & 7) << 5;
++                        pos.words.x += scale(gUnk_086149C4[(angle + 64) & 255] * 50);
++                        pos.words.z += scale(gUnk_086149C4[angle] * 50);
++                        if ((u32)groundHeight(&pos.point) < (u32)(p->position.y + 200))
++                            break;
++                        flags = terrainFlag(&pos.point);
++                        if (flags)
++                            break;
++                        p->coordinateAxis = p->facing;
++                        p->actionFourEnabled = flags;
++                        ActorSequence_Begin(p, 4, 0);
++                    }
++                } else
++                    *(u16 *)p->unk4A6 = enabled;
++            }
++            break;
++        case 4:
++            p->statusFlags |= 0x40000;
++            Player_AddControlFlags(p, 8);
++            if ((u8)(p->tetherMode - 0x1F) > 4) {
++                if (p->contactSpecial)
++                    ActorSequence_Begin(p, 0x20, 0);
++                else
++                    ActorSequence_Begin(p, 0x1F, 0);
++            }
++            if (p->unk45C == 1)
++                Player_RunPendingCallback(p);
++            Callback_InvokeActor(p, gUnk_08610D88[p->tetherMode]);
++            Player_ApplyControlPresentation(p);
++            break;
++        case 2:
++            Player_AddControlFlags(p, 8);
++            if (p->unk45C == 1)
++                Player_RunPendingCallback(p);
++            Callback_InvokeActor(p, p->triggerAnimationCallback);
++            Player_ApplyControlPresentation(p);
++            break;
++    }
++}
++
++static inline void Player_ClearRegisteredSlots(void)
++{
++    s32 i;
++
++    for (i = 0; i < 4; i++) {
++        gPlayers[i] = NULL;
++        gTrackedPlayerId[i] = 0;
++        gPlayerSlotStatus[i] = 0;
++    }
++}
++
++#define Player_ResetLinkState sub_08158C14
++
++void Player_ResetLinkState(void)
++{
++    s32 i;
++
++    gPlayerCount = 0;
++    Player_ClearRegisteredSlots();
++    gPlayerInteractionMode = 0;
++    gPlayerScriptState = 0;
++    gPlayerPassageState = 0;
++    gPlayerEffectPendingCount = 0;
++    gPlayerSolarActionPending = 0;
++    gPlayerActionPending = 0;
++    gPlayerCueTimer = 0;
++    for (i = 0; i < 2; i++)
++        gPlayerInitialSlotValues[i] = 0;
++    gPlayerDirectionLatch = 0;
++    gPlayerBackgroundState = 0;
++    gPlayerBackgroundMode = 0;
++    gPlayerAbilityLatched = 0;
++}
++
++static inline s32 TerrainCellIndex(s32 x, s32 z)
++{
++    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
++        return 0;
++    return gTerrainMap->rows[z] + x;
++}
++
++static inline u8 *TerrainCellProperties(s32 cell)
++{
++    u8 *properties = TerrainModifiers_FindCellOverride(cell, 1);
++    if (properties)
++        properties += 4;
++    else {
++        struct EngineMap *map = gTerrainMap;
++        u32 offset = cell * 4 + 12;
++        properties = map->cells + offset;
++    }
++    return properties;
++}
++
++void Player_BeginTerrainInteraction(struct Player *p)
++{
++    struct SceneVec *position;
++    u8 *properties;
++    u32 surface;
++    s32 height;
++    if (p->actionMode == 5) {
++        p->actionLatch464 = 1;
++        p->actionLatch465 = 1;
++    }
++    ActorSequence_Begin(p, 0x1C, 0);
++    p->terrainRecoveryCounter = 0;
++    position = &p->position;
++    properties = TerrainCellProperties(TerrainCellIndex(position->x >> 8, position->z >> 8));
++    surface = *properties >> 4;
++    height = (*properties & 15) << 8;
++    switch (surface) {
++        case 1:
++            height -= (u8)position->z;
++            break;
++        case 2:
++            height -= (u8)position->x;
++            break;
++    }
++    p->actionCountdown = p->position.y - height;
++    if (p->facing > 4) {
++        p->heading = 8 - p->facing;
++        p->side = 1;
++    } else {
++        p->heading = p->facing;
++        p->side = 0;
++    }
++    p->directionFrame = 0;
++}
++
++void Player_BeginDirectionSequence(struct Player *p, u32 axis)
++{
++    ActorSequence_Begin(p, 4, 1);
++    p->coordinateAxis = axis;
++    p->facing = (axis + 4) & 7;
++    if (p->coordinateAxis > 4) {
++        p->heading = (8 - p->coordinateAxis) >> 1;
++        p->side = 1;
++    } else {
++        p->heading = p->coordinateAxis >> 1;
++        p->side = 0;
++    }
++    p->directionFrame = 0;
++}
++
++s32 sub_08158E68(s32 i)
++{
++    struct Player *actor = gPlayers[i];
++    struct TetherMovementProbe *q = actor->followTarget;
++    s32 x, y;
++    if (q != NULL)
++        return q->cell;
++    x = actor->position.x >> 8;
++    y = actor->position.z >> 8;
++    if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
++        return 0;
++    return gTerrainMap->rows[y] + x;
++}
++
++void SceneActorControl_OnJitterPosition(void)
++{
++}
++
++void Player_BeginResourceStationInteraction(struct Player *p, s32 *a, s32 b)
++{
++    s32 *d;
++    s32 x;
++    s32 y;
++
++    ActorSequence_Begin(p, 8, 0);
++    p->terrainRecoveryCounter = 0;
++    d = (s32 *)(&p->resourceStationPosition);
++    x = a[0];
++    y = a[1];
++    d[0] = x;
++    d[1] = y;
++    p->resourceStationFacing = b;
++}
++
++#define gPlayerCueFlags gEngineFlags
++
++s32 Player_BeginDirectionalCue(struct Player *p, s32 mode)
++{
++    s32 result;
++    if (gEngineFlags & 0x800) {
++        LinkPlayer_ResetToIdleState(p);
++        ActorSequence_Begin(p, 0x21, 0);
++        return 0;
++    }
++    if (p->tetherMode == 6) {
++        result = 1;
++        PlayerCue_BeginMode27(p, p->facing, 1, 0);
++    } else {
++        result = 0;
++        PlayerCue_BeginMode27(p, p->facing, mode, 0);
++    }
++    return result;
++}
++
++void Player_NotifyActionInterruption(struct Player *p)
++{
++    struct PlayerPendingNotification *o = gPlayerPendingActor;
++    if (o != 0 && p->tetherPhase == 2 && p->tetherMode == 0xc) {
++        if (o->flags & 0x10)
++            sub_08249244(o->receiver, 1, 0x3c, o->payload);
++        else
++            sub_08249244(o->receiver, 1, 0x3c, o->payload);
++    }
++}
++
++s32 Player_EnterStateEleven(void)
++{
++    struct Player *g = *gPlayers;
++
++    if (g != 0) {
++        Player_NotifyActionInterruption(g);
++        ActorSequence_Begin(g, 0xB, 0);
++    }
++    return 0;
++}
++
++s32 Player_EnterStateTen(void)
++{
++    struct Player *g = *gPlayers;
++
++    if (g != 0) {
++        Player_NotifyActionInterruption(g);
++        ActorSequence_Begin(g, 0xA, 0);
++    }
++    return 0;
++}
++
++void Player_SetTransitionMode(s32 v)
++{
++    struct Player *g = *gPlayers;
++
++    if (g != 0) {
++        g->actionVariant = v;
++    }
++}
++
++#define Player_ComputeIndexedStatA Player_GetSpecialAttackPower
++
++s32 Player_EvaluateItemStatA(struct PlayerActionEntry *item,
++                             struct PlayerEquipmentReference *reference)
++{
++    s32 equipment[4];
++    s16 stats[8];
++    struct PlayerStatModifierContext context;
++    struct PlayerActionDescriptor descriptor;
++    s32 index;
++    s32 *dst;
++    s16 *src;
++    s32 i;
++    s32 value;
++    s16 *statValues;
++    struct PlayerStatModifierContext *modifiers;
++    struct PlayerActionEntry **entry;
++    u8 *override;
++    if (item->kind == 0x30)
++        return Player_GetSpecialAttackPower(0, 0x30);
++    index = reference->index;
++    statValues = stats;
++    modifiers = &context;
++    override = &context.statBOverrideEnabled;
++    entry = &context.actionEntry;
++    src = gGameState->party;
++    dst = equipment;
++    for (i = 3; i >= 0; i--)
++        *dst++ = *src++;
++    if (reference)
++        equipment[reference->slot] = index;
++    PlayerAction_RefreshFlagState(0, statValues, index);
++    ActionRecord_CopyFromEntry(item, &descriptor);
++    Player_BuildActionModifiers(0, modifiers, &descriptor);
++    value = (s16)gGameState->baseStats[2] + (s16)gGameState->statBonuses[2] + statValues[5];
++    {
++        u8 zero = 0;
++        *override = zero;
++        *entry = item;
++        return Player_CalculateActionStat(zero, modifiers, value);
++    }
++}
++
++s32 Player_GetEquipmentValue(s32 a)
++{
++    s32 buf[4];
++
++    Inventory_InitEquipmentEntryFromDescriptor(a, buf);
++    return Player_EvaluateItemStatA(buf, 0);
++}
++
++s32 Player_GetEquipmentLevelBonus(struct PlayerActionEntry *item)
++{
++    return Player_GetSpecialAttackPower(0, item->kind - 1);
++}
++
++s32 sub_0815910C(u8 *item)
++{
++    s32 bonus;
++    s16 *level;
++    if (gGameState->form == 6)
++        return gPlayerLinkAttackBonus;
++    bonus = 0;
++    if (item == NULL)
++        return (bonus + gGameState->level) >> 1;
++    if (item[1] == 0x55)
++        bonus = item[2];
++    if (bonus > 120)
++        bonus = 120;
++    bonus = (bonus + gGameState->level) >> 1;
++    return bonus;
++}
++
++static inline u32 Bonus(struct Player *p, u32 mask)
++{
++    u32 *field;
++    u32 bits;
++    if (!p)
++        return 0;
++    field = &p->statBonusFlags;
++    bits = mask;
++    return *field & bits;
++}
++
++static inline u32 Both(struct Player *p)
++{
++    u32 *field;
++    u32 bits;
++    u32 value;
++    if (!p)
++        return 1;
++    field = &p->statBonusFlags;
++    bits = 0x8000;
++    value = *field;
++    if (!(bits & value))
++        return 0;
++    if (!(value & 0x10000))
++        return 0;
++    return 1;
++}
++
++// confidence=low: enemy and script rewards add capped experience with opposing player bonuses.
++
++#define Player_AddExperience sub_08159164
++
++void Player_AddExperience(s32 input)
++{
++    s32 amount = input;
++    struct GameState *save = gGameState;
++    if (save->form == 6)
++        return;
++    if (!Both(gPlayers[0])) {
++        if (Bonus(gPlayers[0], 0x8000))
++            amount = (amount * 3) >> 1;
++        else if (Bonus(gPlayers[0], 0x10000))
++            amount = Div(amount, 2);
++    }
++    {
++        s32 *reward = &gGameState->rewardTotal;
++        s32 total = *reward + amount;
++        *reward = total;
++        if (total > 999998)
++            gGameState->rewardTotal = 999999;
++    }
++}
++
++void Player_RefreshLifeState(void)
++{
++    if ((*(u8 **)gPlayers) != 0) {
++        Player_ApplyPeriodicStatChanges((*(u8 **)gPlayers));
++    }
++}
++
++/* Player_ClearSlotTimer: Clears the game-state timer entry selected by the player's slot index */
++
++#define Player_ClearSlotTimer sub_08159228
++
++void sub_08159228(struct Player *p)
++{
++    ((struct GameState *)(p->timedEventSlot * sizeof(s32) + (u32)gGameState))->counters628[0] = 0;
++}
++
++s32 Player_IsInActionTwelveOrThirtyEight(struct Player *p)
++{
++    u8 v = p->tetherMode;
++
++    if (v == 0xC || v == 0x26) {
++        return 1;
++    }
++    return 0;
++}
++
++s32 Player_IsSlotInActionTwelveOrThirtyEight(s32 idx)
++{
++    return Player_IsInActionTwelveOrThirtyEight((u8 *)gPlayers[idx]);
++}
++
++#define gDirectionSineTable gUnk_086149C4
++
++static inline void SetPosition(struct SceneVec *v, s32 x, s32 y, s32 z)
++{
++    v->x = x;
++    v->y = y;
++    v->z = z;
++    v->pad = 0;
++}
++
++static inline s32 ScaleContactOffset(s32 value)
++{
++    value = 180 * value;
++    if (value >= 0)
++        return value >> 12;
++    return -((-value) >> 12);
++}
++
++void PlayerContact_GetOffsetPosition(s32 slot, struct SceneVec *out)
++{
++    struct SceneVec pos;
++    struct Player *p = gPlayers[slot];
++    s32 angle, x, z;
++    if (!p->statModifierContext.statBOverrideEnabled)
++        SetPosition(&pos, p->position.x, p->position.y + 200, p->position.z);
++    else
++        SetPosition(&pos, p->position.x, p->position.y + 230, p->position.z);
++    angle = ((p->facing + 5) & 7) * 32;
++    x = gDirectionSineTable[(angle + 64) & 255];
++    z = gDirectionSineTable[angle & 255];
++    if (p->side) {
++        pos.x += ScaleContactOffset(x);
++        pos.z += ScaleContactOffset(z);
++    } else {
++        pos.x += ScaleContactOffset(x);
++        pos.z += ScaleContactOffset(z);
++    }
++    *out = pos;
++}
++
++void Player_IncrementActionSpeedBonus(struct Player *p, s32 a)
++{
++    if (a == 0) {
++        p->movementSpeedReduction++;
++    }
++}
++
++void Player_SetPositionAndSave(struct Player *p, struct SceneVec *h)
++{
++    union PlayerEffectPosition *v = (union PlayerEffectPosition *)h;
++    union PlayerEffectPosition t = *v;
++    *(union PlayerEffectPosition *)&p->position = t;
++    *(union PlayerEffectPosition *)&p->colliderPosition = t;
++    *(union PlayerEffectPosition *)&p->previousPosition = t;
++    *(u16 *)(u32)&gGameState->positionX = h->x;
++    *(u16 *)(u32)&gGameState->positionY = h->y;
++    *(u16 *)(u32)&gGameState->positionZ = h->z;
++}
++
++s32 Player_TestAttachmentFlags(struct Player *p, s32 mask)
++{
++    if ((p->tetherStatusFlags & mask) != 0) {
++        return 1;
++    }
++    return 0;
++}
++
++
++/* Player_GetAttachmentId: Returns the identifier stored alongside the named-object attachment flags */
++
++#define Player_GetAttachmentId sub_081593F8
++
++u16 sub_081593F8(struct Player *p)
++{
++    return p->tetherStatusTag;
++}
++
++void Player_AddAttachmentFlags(struct Player *p, u32 a, u16 b)
++{
++    p->tetherStatusFlags |= a;
++    p->tetherStatusTag = b;
++}
++
++void Player_ClearAttachmentFlags(struct Player *p, u32 a)
++{
++    p->tetherStatusFlags &= ~a;
++    p->tetherStatusTag = 0;
++}
++
++void Player_SetPendingObject(struct Player *p, u32 v)
++{
++    *(u32 *)&p->terrainTarget = v;
++    p->terrainClampApplied = 1;
++}
++
++s32 Player_IsActiveInLocomotionState(struct Player *p)
++{
++    u8 k;
++    if (!(p->kind & 1))
++        return 0;
++    k = p->tetherMode;
++    if (k <= 1)
++        goto one;
++    if (k == 3)
++        goto one;
++    if (k == 7 && p->tetherPhase == 0)
++        goto one;
++    return 0;
++one:
++    return 1;
++}
++
++void Player_IncreaseLifeTowardLimit(struct Player *p, u32 d)
++{
++    if (p->kind == 1) {
++        p->currentStatA += d;
++        if (p->currentStatA >= p->maximumStatA)
++            p->currentStatA = p->maximumStatA;
++    }
++}
++
++void Player_SubtractLifeNonlethal(struct Player *p, s32 d)
++{
++    if (p->kind == 1) {
++        if (p->currentStatA < d + 1)
++            p->currentStatA = p->kind;
++        else
++            p->currentStatA -= d;
++    }
++}
++
++void Player_AddEnergy(struct Player *p, u32 d)
++{
++    if (p->kind == 1) {
++        p->currentStatB += d;
++        if (p->currentStatB >= p->maximumStatB)
++            p->currentStatB = p->maximumStatB;
++    }
++}
++
++void Player_SubtractEnergy(struct Player *p, s32 d)
++{
++    if (p->kind == 1) {
++        if (p->currentStatB < d)
++            p->currentStatB = 0;
++        else
++            p->currentStatB -= d;
++    }
++}
++
++void Player_SetResistance(struct Player *p, s32 i, u8 v)
++{
++    u8 *q = &p->cueDefenses;
++
++    q[i] = v;
++}
++
++void Player_AddResistance(struct Player *p, s32 i, s32 add)
++{
++    u8 *q;
++    s32 v;
++
++    if (p != 0) {
++        u8 *resistances = p->cueDefenses;
++        q = resistances + i;
++        v = *q + add;
++        if (v > 9) {
++            v = 10;
++        }
++        *q = v;
++    }
++}
++
++void Player_SubtractResistance(struct Player *p, s32 i, s32 d)
++{
++    if (p != 0) {
++        u8 *e;
++        u8 *resistances = p->cueDefenses;
++        e = resistances + i;
++        if (*e <= d)
++            *e = 0;
++        else
++            *e -= d;
++    }
++}
++
++#define PlayerAction_SetResponseValue Player_SetResistance
++
++#define gActionRecords                gUnk_08E6092C
++
++extern const struct PlayerActionDescriptor gUnk_08E6092C[];
++
++void PlayerAction_RefreshModifiers(struct Player *p)
++{
++    struct PlayerActionDescriptor record;
++    switch (p->actionMode) {
++        case 0:
++            Player_SetResistance(p, 0, 5);
++            Player_SetResistance(p, 1, 3);
++            Player_SetResistance(p, 2, 4);
++            Player_SetResistance(p, 3, 4);
++            Player_SetResistance(p, 4, 4);
++            Player_SetResistance(p, 5, 4);
++            Player_SetResistance(p, 6, 4);
++            break;
++        case 1:
++            Player_SetResistance(p, 0, 2);
++            Player_SetResistance(p, 1, 10);
++            Player_SetResistance(p, 2, 4);
++            Player_SetResistance(p, 3, 4);
++            Player_SetResistance(p, 4, 4);
++            Player_SetResistance(p, 5, 4);
++            Player_SetResistance(p, 6, 4);
++            break;
++        case 2:
++            Player_SetResistance(p, 0, 10);
++            Player_SetResistance(p, 1, 2);
++            Player_SetResistance(p, 2, 4);
++            Player_SetResistance(p, 3, 4);
++            Player_SetResistance(p, 4, 4);
++            Player_SetResistance(p, 5, 4);
++            Player_SetResistance(p, 6, 4);
++            break;
++        case 3:
++        case 4:
++        case 5:
++        default:
++            break;
++        case 6:
++            Player_SetResistance(p, 0, 4);
++            Player_SetResistance(p, 1, 4);
++            Player_SetResistance(p, 2, 4);
++            Player_SetResistance(p, 3, 4);
++            Player_SetResistance(p, 4, 4);
++            Player_SetResistance(p, 5, 4);
++            Player_SetResistance(p, 6, 4);
++            break;
++    }
++    if (p->actionMode != 6)
++        ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &record);
++    else
++        record = gActionRecords[47];
++    Player_BuildActionModifiers(p, &p->statModifierContext, &record);
++    PlayerAction_RefreshFlagState(p, p->actionFlagState, -1);
++}
++
++static inline u32 tst(u32 *a, u32 m)
++{
++    return *a & m;
++}
++
++void Player_RestoreLifeWithModifier(struct Player *p, u32 n)
++{
++    if (p != 0 && tst((u32 *)(&p->statBonusFlags), 0x1000))
++        Player_IncreaseLifeTowardLimit(p, n << 1);
++    else
++        Player_IncreaseLifeTowardLimit(p, n);
++}
++
++void Player_RestoreEnergyWithModifier(struct Player *p, u32 n)
++{
++    if (p != 0 && tst((u32 *)(&p->statBonusFlags), 0x1000))
++        Player_AddEnergy(p, n << 1);
++    else
++        Player_AddEnergy(p, n);
++}
++
++void Player_ConsumeEnergyWithModifier(struct Player *p, u32 n)
++{
++    if (p != 0 && tst((u32 *)(&p->statBonusFlags), 0x1000))
++        Player_SubtractEnergy(p, n << 1);
++    else
++        Player_SubtractEnergy(p, n);
++}
++
++static inline s32 HasFlag(struct Player *p, u32 mask)
++{
++    u32 offset;
++    u32 *flags;
++    if (!p)
++        return 0;
++    offset = (u32) & ((struct Player *)0)->actionFlags;
++    flags = (void *)((u8 *)p + offset);
++    {
++        u32 bits = mask;
++        return *flags & bits;
++    }
++}
++
++void PlayerStats_AddHundredths(struct Player *p, s32 amount)
++{
++    if (p->kind == 1 && p->actionMode == 0) {
++        if (!(HasFlag(p, 0x2000) && HasFlag(p, 0x4000))) {
++            if (HasFlag(p, 0x2000))
++                amount *= 2;
++            else if (HasFlag(p, 0x4000))
++                amount = Div(amount, 2);
++        }
++        p->statHundredths += amount;
++        if (p->statHundredths > 999)
++            p->statHundredths = 1000;
++    }
++}
++
++void sub_08159814(struct Player *player, s32 amount)
++{
++    if (player->kind == 1) {
++        u32 flag = player->actionMode;
++        if (flag == 0) {
++            u16 *p = (u16 *)(&player->statHundredths);
++            if (*p <= amount)
++                *p = flag;
++            else
++                *p -= amount;
++        }
++    }
++}
++
++void Player_SubtractGauge430(struct Player *p, s32 d)
++{
++    if (p->statusValue <= d)
++        p->statusValue = 0;
++    else
++        p->statusValue -= d;
++}
++
++void PlayerStats_AddContactHundredths(struct ContactCollider *source, struct ContactCollider *other,
++                                      s32 amount)
++{
++    struct Player *player = gPlayers[0];
++    s32 gain, product;
++    if (player) {
++        gain = 0;
++        if (source->contactFlags == 1 && !(source->reactionFlags & 0x40)) {
++            if (source->statRewardFlags & 0x10) {
++                if (source->statRewardFlags & 0x20)
++                    gain = 10;
++                else if (source->statRewardFlags & 0x40)
++                    gain = 20;
++                else if (source->statRewardFlags & 0x80)
++                    gain = 50;
++            } else {
++                if (source->statRewardFlags & 1)
++                    gain = 10;
++                else if (source->statRewardFlags & 2)
++                    gain = 40;
++                else if (source->statRewardFlags & 4)
++                    gain = 20;
++            }
++        }
++        product = player->statScale * gain;
++        if (product >= 0)
++            gain = product >> 6;
++        else
++            gain = -((-product) >> 6);
++        PlayerStats_AddHundredths(player, gain);
++        source->cost += amount;
++    }
++}
++
++#define PlayerMovement_ClearModifiers Player_EmitQueuedEffects
++
++static inline void SetFlags(u32 *flags, u32 mask)
++{
++    *flags |= mask;
++}
++
++void PlayerAction_BeginMode24(struct Player *p)
++{
++    SetFlags(&p->statusFlags, 0x1000);
++    p->actionLatch464 = 0;
++    p->heading = 0;
++    Player_EmitQueuedEffects(p);
++    p->collider.flags |= 4;
++    p->directionFrame = 0;
++    p->positionResetValue = 0;
++    p->positionResetTimer = 0;
++    p->positionResetCounter = 0;
++    p->positionResetState = 0;
++    p->particleEmissionCount = 0;
++    gPlayerPendingActor = 0;
++    gPlayerNotificationPending = 0;
++    ActorSequence_Begin(p, 0x18, 0);
++}
++
++static inline u32 requestBlocked(u32 *flags, u32 mask)
++{
++    return *flags & mask;
++}
++
++s32 Player_BeginPositionRequest(struct Player *p, struct SceneVec *position,
++                                struct SceneVec *target, s32 animationOffset, s32 side,
++                                s32 parameter, s32 immediate, s32 request, u32 option)
++{
++    s32 result;
++    if (p->kind != 1 || requestBlocked(&p->statusFlags, 0x40000))
++        return -1;
++    if (p->tetherMode != 0x18)
++        PlayerAction_BeginMode24(p);
++    p->position = *position;
++    p->previousPosition = p->position;
++    if (immediate) {
++        p->animation.flags |= 1;
++        p->movementRequestAnimated = 0;
++    } else {
++        p->animation.flags &= ~1;
++        p->movementRequestAnimated = 1;
++        p->side = side;
++        Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x14) + animationOffset,
++                            0x40, 1);
++    }
++    if (parameter > 0) {
++        p->movementRequestParameter = parameter;
++        p->movementRequestScale = 0x40;
++    }
++    if (request > 0) {
++        result = PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
++        if (!p->movementRequestBlocked && target)
++            p->movementRequestTarget = *target;
++        return result;
++    }
++    return 0;
++}
++
++s32 Player_ApplyPositionRequest(struct Player *p, struct SceneVec *position, s32 frame,
++                                u32 direction, s32 resetValue, s32 parameter, s32 request,
++                                u32 option)
++{
++    s32 result;
++    if (p->kind != 1 || p->tetherMode != 0x18)
++        return -1;
++    if (parameter > 0) {
++        p->movementRequestParameter = parameter;
++        p->movementRequestScale = 0x40;
++    }
++    p->position = *position;
++    direction = ((s32)((direction + 0xE0) & 0xFF) >> 6) * 2 + 1;
++    p->facing = direction;
++    if (direction > 4) {
++        p->heading = 8 - direction;
++        p->side = 1;
++    } else {
++        p->heading = direction;
++        p->side = 0;
++    }
++    p->directionFrame = frame;
++    p->contactSpecial = 1;
++    Sound_PlaySong(0xE6);
++    if (p->positionResetTimer)
++        p->positionResetTimer = 0;
++    p->terrainClampApplied = 0;
++    p->actionPhase488 = 0;
++    p->terrainRecoveryPhase = 0;
++    p->terrainClampBlocked = 0;
++    p->actionActive489 = 0;
++    p->terrainRecoveryActive = 0;
++    if (request > 0)
++        result = PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
++    else
++        result = 0;
++    if (resetValue > 0)
++        p->positionResetValue = resetValue;
++    return result;
++}
++
++static inline void orr(u32 *a, u32 m)
++{
++    *a |= m;
++}
++
++void Player_InitState25(struct Player *p)
++{
++    orr(&p->statusFlags, 0x1000);
++    p->actionLatch464 = 0;
++    p->heading = 0;
++    Player_EmitQueuedEffects(p);
++    p->collider.flags |= 4;
++    p->directionFrame = 0;
++    p->positionResetValue = 0;
++    ActorSequence_Begin(p, 0x19, 0);
++}
++
++#define Player_PrepareInterpolatedMovement Player_InitState25
++
++static inline void enableAnimation(struct PlayerAnimation *a)
++{
++    a->flags &= ~1;
++}
++
++s32 Player_BeginInterpolatedMovement(struct Player *p, struct SceneVec *destination, s32 duration,
++                                     struct SceneVec *target, u32 unused, s32 request, u32 option)
++{
++    s32 result;
++    if (p->kind != 1 || requestBlocked(&p->statusFlags, 0x40000))
++        return -1;
++    if (p->tetherMode != 0x18)
++        Player_InitState25(p);
++    p->movementDestination = *destination;
++    p->movementDuration = duration;
++    p->movementStart = p->position;
++    enableAnimation(&p->animation);
++    Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x31), 0x40, 1);
++    p->actionEighteenParameter = 500;
++    p->movementRequestScale = 0x40;
++    if (request > 0) {
++        result = PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
++        if (!p->movementRequestBlocked && target)
++            p->movementRequestTarget = *target;
++        return result;
++    }
++    return 0;
++}
++
++s32 Player_ApplyInterpolatedMovement(struct Player *p, struct SceneVec *position, s32 frame,
++                                     u32 direction, s32 resetValue, s32 parameter, s32 request,
++                                     u32 option)
++{
++    s32 result;
++    if (p->kind != 1 || p->tetherMode != 0x19)
++        return -1;
++    p->actionEighteenParameter = 42;
++    p->movementRequestScale = 0x40;
++    p->position = *position;
++    direction = ((s32)((direction + 0xE0) & 0xFF) >> 6) * 2 + 1;
++    p->facing = direction;
++    if (direction > 4) {
++        p->heading = 8 - direction;
++        p->side = 1;
++    } else {
++        p->heading = direction;
++        p->side = 0;
++    }
++    p->directionFrame = frame;
++    p->contactSpecial = 1;
++    Sound_PlaySong(0xE6);
++    if (p->positionResetTimer)
++        p->positionResetTimer = 0;
++    if (request > 0)
++        result = PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
++    else
++        result = 0;
++    if (resetValue > 0)
++        p->positionResetValue = resetValue;
++    return result;
++}
++
++s32 Player_EndState25(struct Player *p)
++{
++    if (p->kind != 1 || p->tetherMode != 0x19)
++        return -1;
++    return ActorSequence_Begin(p, 0, 0);
++}
++
++s32 Player_ResetPositionState(struct Player *p, struct SceneVec *position)
++{
++    if (p->kind != 1 || requestBlocked(&p->statusFlags, 0x40000))
++        return 0;
++    if (p->tetherMode != 0x1A)
++        ActorSequence_Begin(p, 0x1A, 0);
++    p->position = *position;
++    Player_AddControlFlags(p, 8);
++    p->collider.flags |= 4;
++    p->directionFrame = 0;
++    p->contactSpecial = 0;
++    p->positionResetTimer = 0;
++    p->positionResetCounter = 0;
++    p->positionResetState = 0;
++    p->particleEmissionCount = 0;
++    gPlayerPendingActor = 0;
++    gPlayerNotificationPending = 0;
++    return 1;
++}
++
++s32 Player_ResetModePosition(struct Player *p, const struct SceneVec *position, s32 value)
++{
++    if (p->kind == 1 && p->tetherMode == 0x1A) {
++        p->position = *position;
++        Player_SetActionPhase(p, 2);
++        p->positionResetValue = value;
++        p->positionResetTimer = 0;
++        p->positionResetCounter = 0;
++        p->positionResetState = 0;
++        return 0;
++    }
++    return -1;
++}
++
++static inline void lockPositionRequests(u32 *flags, u32 mask)
++{
++    *flags |= mask;
++}
++
++s32 Player_ApplyForcedFacing(struct Player *p, s32 frame, u32 direction, s32 resetValue,
++                             s32 request, u32 option)
++{
++    if (p->tetherMode == 0x1A)
++        goto noRequest;
++    if (resetValue > 0)
++        p->positionResetValue = resetValue;
++    direction = ((s32)((direction + 0xE0) & 0xFF) >> 6) * 2 + 1;
++    p->facing = direction;
++    if (direction > 4) {
++        p->heading = 8 - direction;
++        p->side = 1;
++    } else {
++        p->heading = direction;
++        p->side = 0;
++    }
++    p->directionFrame = frame;
++    p->contactSpecial = 1;
++    if (p->tetherMode != 0x1E)
++        Sound_PlaySong(0xE6);
++    if (p->positionResetTimer)
++        p->positionResetTimer = 0;
++    lockPositionRequests(&p->statusFlags, 0x40000);
++    if (request > 0)
++        goto startRequest;
++noRequest:
++    return 0;
++startRequest:
++    return PlayerContact_ApplySyntheticContact(p, request, 0, 0, 0, option);
++}
++
++s32 Player_RequestTimedReset(struct Player *p, u32 timer)
++{
++    if (p->kind != 1)
++        return 0;
++    if (p->positionResetTimer && p->tetherMode == 0x15 && p->positionResetCounter == 1) {
++        p->positionResetRequested = 1;
++        return 0;
++    }
++    p->positionResetTimer = timer;
++    p->positionResetRequested = 1;
++    return 1;
++}
++
++// confidence=low: forced variant clears movement state before starting or refreshing stun.
++
++#define Player_TryStartStun sub_0815A048
++
++s32 Player_TryStartStun(struct Player *p, s32 duration, s32 force)
++{
++    if (force == 1) {
++        s32 guard = p->positionResetValue;
++        if (guard > 0)
++            return 0;
++        Player_AddControlFlags(p, 8);
++        p->collider.flags |= 4;
++        p->directionFrame = 0;
++        p->contactSpecial = 0;
++        p->positionResetTimer = 0;
++        p->positionResetCounter = 0;
++        p->positionResetState = 0;
++        p->particleEmissionCount = 0;
++        gPlayerPendingActor = 0;
++        gPlayerNotificationPending = 0;
++    }
++    {
++        u32 kind = p->kind;
++        if (kind == 1 && p->tetherMode != 0x1A) {
++            if (!p->positionResetTimer) {
++                p->positionResetTimer = duration;
++                p->positionResetRequested = kind;
++                p->positionResetCounter = kind;
++                Sound_PlaySong(0xE6);
++                return 1;
++            }
++            p->positionResetRequested = kind;
++        }
++    }
++    return 0;
++}
++
++s32 sub_0815A104(u8 *a, s32 b)
++{
++    return sub_0815A048(a, b, 0);
++}
++
++s32 Player_StartForcedStun(u8 *a, s32 b)
++{
++    return sub_0815A048(a, b, 1);
++}
++
++#define Player_SetTetherPhase Player_SetActionPhase
++
++void Player_AdvanceTetherPhase(struct Player *p)
++{
++    if (p->tetherMode == 0x1F) {
++        if (p->tetherPhase == 3)
++            Player_SetActionPhase(p, 4);
++    } else if (p->tetherMode == 0x20) {
++        if (p->tetherPhase == 4)
++            Player_SetActionPhase(p, 5);
++    } else if (p->tetherMode == 0x24) {
++        if (p->actionMode == 6) {
++            if (p->tetherPhase == 3)
++                Player_SetActionPhase(p, 4);
++        } else {
++            if (p->tetherPhase == 1)
++                Player_SetActionPhase(p, 2);
++        }
++    } else if (p->kind == 2 && p->tetherMode == 0x15 && p->tetherPhase == 1) {
++        Player_SetActionPhase(p, 4);
++    }
++}
++
++void sub_0815A1AC(struct Player *p, u32 kind, s32 count)
++{
++    struct PlayerColliderVector off;
++    s32 i, spawned;
++    if (!(gEngineFlags & 0x1000))
++        return;
++    if (p->movementModifierActive != 0) {
++        u8 cur = p->movementModifierKind;
++        if (cur != kind) {
++            if (cur == 3)
++                return;
++            Player_FlushQueuedEffects(p);
++        }
++    }
++    if (p->movementModifierActive == 0) {
++        u8 t = p->facingChangeEffects;
++        u8 *dst = &p->savedEffectTick;
++        u16 zero = 0;
++        *dst = t;
++        p->terrainDamageTimer = zero;
++    }
++    {
++        u16 index;
++        u32 mask;
++        u32 *indexPtr;
++        const u16 *table;
++        table = gRandomTable;
++        indexPtr = &gRandomIndex;
++        index = *indexPtr + 1;
++        mask = 0x3ff;
++        index &= mask;
++        off.x = (table[index] % 16) - 7;
++        index = (index + 1) & mask;
++        *indexPtr = index;
++        off.y = -(table[index] % 32);
++        off.z = 0;
++    }
++
++    spawned = 0;
++    for (i = 0; i < count; i++) {
++        if (EffectGroup_Spawn(&p->effectGroup, kind, 0xe10, &off) >= 0)
++            spawned = 1;
++    }
++    if (spawned) {
++        if (p->movementModifierKind == 1)
++            Sound_PlaySong(0x191);
++        else if (p->movementModifierKind == 2) {
++            p->particleEmissionCount += 10;
++            Sound_PlaySong(0x133);
++        } else if (p->movementModifierKind == 3) {
++            Sound_PlaySong(0x133);
++            p->directionFrame = 10;
++            if (p->positionResetValue == 0)
++                p->positionResetValue = 1;
++            p->contactSpecial = 0;
++        }
++    }
++    p->scriptStatus[0] = 0;
++}
++
++void Player_ClearFlag740(void)
++{
++    struct Player *g = *gPlayers;
++
++    if (g != 0) {
++        g->resetState740 = 0;
++    }
++}
++
++void Player_SetFlag740(void)
++{
++    struct Player *g = *gPlayers;
++
++    if (g != 0) {
++        g->resetState740 = 1;
++    }
++}
++
++u32 Player_GetCollisionData(void)
++{
++    if (gPlayers[0] == 0)
++        return (u32)(gPaletteBankData + 0x540);
++    return gPlayers[0]->actionVariantResource;
++}
++
++s32 Player_GetCurrentAttribute(s32 i)
++{
++    u8 buf[16];
++    s32 r;
++    u8 *q;
++    u8 *g = (u8 *)gGameState;
++    i <<= 1;
++    q = (u8 *)i;
++    q += (s32)g;
++    r = (s16)((struct GameState *)q)->baseStats[0] + (s16)((struct GameState *)q)->statBonuses[0];
++    PlayerAction_RefreshFlagState(0, buf, -1);
++    {
++        u8 *e = buf + 6;
++        e += i;
++        r += *(s16 *)e;
++    }
++    return r;
++}
++
++s32 Player_GetCandidateAttribute(s32 i, s32 d)
++{
++    u8 buf[16];
++    s32 r;
++    u8 *q;
++    u8 *g = (u8 *)gGameState;
++    i <<= 1;
++    q = (u8 *)i;
++    q += (s32)g;
++    r = (s16)((struct GameState *)q)->baseStats[0] + (s16)((struct GameState *)q)->statBonuses[0];
++    PlayerAction_RefreshFlagState(0, buf, d);
++    {
++        u8 *e = buf + 6;
++        e += i;
++        r += *(s16 *)e;
++    }
++    return r;
++}
