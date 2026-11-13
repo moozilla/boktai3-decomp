@@ -626,7 +626,8 @@ def run_probe(body, probes, bitfields):
                            stdin=subprocess.DEVNULL)
         if not os.path.exists(spath):
             return [None] * len(probes), [None] * len(bitfields)
-        asm = open(spath).read()
+        with open(spath) as assembly:
+            asm = assembly.read()
     bad = set()
     for m in re.finditer(r"^__probe__:(\d+):", r.stderr, re.M):
         ln = int(m.group(1))
