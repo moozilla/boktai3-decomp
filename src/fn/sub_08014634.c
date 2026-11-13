@@ -76,7 +76,11 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
     u32 *rng;
     s32 priority;
     s32 optionMask;
-    s32 optionValue;
+    union ArgumentValue {
+        s32 value;
+        struct SpawnArgs *header;
+        const struct ContactPosition *position;
+    } option;
     s32 j;
     register s32 i asm("r5");
 
@@ -90,12 +94,12 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
     priority = args.options >> 8;
     asm("" : "+m"(args.options));
     optionMask = 255;
-    optionValue = args.options;
-    optionValue &= optionMask;
-    args.options = optionValue;
+    option.value = args.options;
+    option.value &= optionMask;
+    args.options = option.value;
     if (args.count > 8) {
-        register s32 limit asm("r2") = 8;
-        args.count = limit;
+        option.value = 8;
+        args.count = option.value;
     }
 
     if (args.options <= 20) {
@@ -122,9 +126,9 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
                 g->type = byte;
             }
             {
-                register struct SpawnArgs *header asm("r2") = &args;
-                register u32 byte asm("r2") = *((u8 *)&header->count);
-                g->count = byte;
+                option.header = &args;
+                option.value = *((u8 *)&option.header->count);
+                g->count = option.value;
             }
             if (priority > 0)
                 g->priority = priority - 1;
@@ -151,8 +155,8 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
                         p->lifetime = lifetime + (Random(table, mask, rng) & lifetimeMask);
                         p->cell = CellIndex(args.position);
                         {
-                            register const struct ContactPosition *source asm("r2") = args.position;
-                            p->height = source->y;
+                            option.position = args.position;
+                            p->height = option.position->y;
                         }
                         if (spread->x) {
                             s32 r = Random(table, mask, rng);
@@ -175,15 +179,15 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
                             p->flags &= ~4;
                         ClearFlag(&p->flags, 1);
                         {
-                            register const struct ContactPosition *source asm("r2") = args.position;
-                            p->position = *source;
+                            option.position = args.position;
+                            p->position = *option.position;
                         }
                         {
                             u32 *entries = gUnk_08604B90;
                             s32 type;
                             u32 offset;
-                            optionValue = args.options;
-                            type = optionValue;
+                            option.value = args.options;
+                            type = option.value;
                             offset = type * sizeof(*entries);
                             p->tile = (*((u16 *)(resource + 4))) + *(u32 *)(offset + (u32)entries);
                         }
