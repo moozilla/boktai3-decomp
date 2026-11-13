@@ -9002,14 +9002,22 @@ addr,name,mode,confidence,source,notes
 08215698,Video_GetBackgroundMap,thumb,high,raphaelr,(int bg) -> EWRAM buffer holding that BG's tilemap
 082156A4,Bg_ClearAllTilemaps,thumb,low,src-alias,Clears the entire 0x2000-byte buffer containing the four background tilemaps.
 082156B8,Bg_ClearTilemap,thumb,low,src-alias,
+082156D8,Bg_Initialize,thumb,low,decomp,Initialize background registers and affine/scroll state for the display mode
+082157EC,Bg_ResetDisplay,thumb,low,decomp,Clear maps and upload slots; reset blending and character blocks
 082158B0,Bg_UpdateScrollShadow,thumb,low,src-alias,masks the BG scroll records gUnk_03004C30[bg].x/y to 8 bits into the HOFS/VOFS shadow gUnk_03004C20
+08215964,Bg_UploadMapsAndTiles,thumb,low,decomp,Upload enabled layer maps and pending tile transfers
 08215A48,Bg_SetTileUpload,thumb,low,src-alias,Stores a background tile source with destination offset and size for later upload; upload role is tentative.
 08215A74,Bg_SetPriority,thumb,low,src-alias,Sets the priority bits in the selected background control register
+08215AC4,Bg_SetCharacterBase,thumb,low,decomp,Set character-base block bits in BG control register
 08215B18,Bg_SetAffineTransform,thumb,low,src-alias,Stores background position; angle and scales; then computes the signed fixed-point affine matrix and reference offsets.
 08215C8C,BgGfx_FindEntryById,thumb,low,src-alias,Finds a resource entry by ID for background tile loading
 08215CB8,Bg_CopyTiles,thumb,low,src-alias,
+08215D40,Bg_UploadTileEntries,thumb,low,decomp,Upload indexed resource tile sequences into background VRAM
 08215DF0,Bg_SetTilemapEntry,thumb,low,src-alias,Writes a tile index with flip flags and palette bank into a background map cell
+08215E24,Bg_CopyTilemapRectangle,thumb,low,decomp,Copy rectangle of tile IDs with palette and tile-base attributes
+08215EB4,Bg_FillTilemapRectangle,thumb,low,decomp,Fill a tilemap rectangle with one attributed tile
 08215F38,Text_DrawNumber,thumb,low,src-alias,
+0821607C,Bg_GetMapRow,thumb,low,decomp,Return an indexed row from the layer resource map data
 082160B8,Bg_SetupLayer,thumb,low,src-alias,
 082161B4,Bg_SetupLayers,thumb,low,src-alias,
 08216494,Bg_ResetScale,thumb,low,src-alias,Resets both background scale factors to fixed-point unity
