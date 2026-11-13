@@ -6340,6 +6340,8 @@ addr,name,mode,confidence,source,notes
 0817BFA4,SceneActorState_UpdateAnimationRequest,thumb,low,src-alias,
 0817C00C,ActorDecision_UpdatePendingPhase,thumb,low,src-alias,
 0817C08C,ActorDecision_UpdateThresholdPhase,thumb,low,src-alias,
+0817C19C,ActorDecision_ClearTrigger,thumb,low,cleanup,Clears the entry trigger and pending completion byte; tentative.
+0817C1B8,ActorDecision_UpdateFlaggedWait,thumb,low,cleanup,Waits in state twelve while flag one is present then queues variant fourteen; tentative.
 0817C21C,ActorState_UpdateTrigger,thumb,low,src-alias,
 0817C29C,ActorState_UpdateConditionalTrigger,thumb,low,src-alias,
 0817C358,BossSlot2_UpdateFlaggedRecovery,thumb,low,src-alias,Consumes a pending flag to enter state 11 and increments the state timer; recovery identity is tentative

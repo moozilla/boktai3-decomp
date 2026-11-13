@@ -49,7 +49,7 @@ s32 ActorEffect_StepTurn(struct ActorState *actor, s32 frame, s32 start, s32 per
             if (step > 4)
                 return 0;
             if ((step == 0) || (step == 3)) {
-                direction = &actor->heading;
+                direction = &actor->body.direction;
                 *direction += 32;
             } else
                 goto subtract;
@@ -65,7 +65,7 @@ s32 ActorEffect_StepTurn(struct ActorState *actor, s32 frame, s32 start, s32 per
             if (step > 4)
                 return 0;
             if ((step == 0) || (step == 3)) {
-                direction = &actor->heading;
+                direction = &actor->body.direction;
                 *direction += 32;
             } else
                 goto subtract;
@@ -77,7 +77,7 @@ s32 ActorEffect_StepTurn(struct ActorState *actor, s32 frame, s32 start, s32 per
 
     goto facing;
 subtract:
-    direction = &actor->heading;
+    direction = &actor->body.direction;
     *direction -= 32;
 
 facing:
