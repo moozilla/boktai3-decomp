@@ -1303,8 +1303,8 @@ that reader walk. This is separate from the actual reload-rotation blocker.
 ### sub_0815E034: direct defense addresses isolate the mask priority
 Tags: phase3, player, sub_0815E034, allocation
 
-The new pin-free draft is `notes/phase3-drafts/dp-bosses/sub_0815E034.c`:
-6 ROM / 4 draft instructions differ, 440 versus 444 bytes. All long-lived
+The first-pass pin-free draft had 6 ROM / 4 draft instructions differing,
+440 versus 444 bytes. The resumed draft below supersedes it. All long-lived
 registers and all defense switch cases now match. It reuses `common` in the
 blocked-mask arm, then assigns it again for the vulnerability mask. The extra
 references raise its priority to 2500. Remaining differences are the first
@@ -1331,6 +1331,37 @@ pointer initialization remain 8/8; no source change landed.
 Next: give common a short-lived extra real reference that disappears after
 allocation, or prevent REG_EQUIV doubling without an artificial fence. A mask
 helper with the original aggregate representation may supply that reference.
+
+Resumed investigation: the saved draft now differs in **2 ROM / 2 draft
+instructions**, with the same 444-byte size and no moved targets. Construct
+`common` as a u32/u16 union, write the high half zero before the low half 63,
+and keep `vulnerable` as s32. With a full-word final test, this gives 4/2:
+every allocation matches, but regmove ties the final AND into dying common r6,
+omitting the flags-to-r0 copy and its later alignment padding. The union raises
+common to priority 2352 (6 references / 51 live instructions), above player's
+2268 and source's 2093. Unlike the earlier remask form, both initial mask loads
+and their order match. Narrowing the final test to
+`(u16)(flags & common.halves[0])` restores size and all later offsets; it still
+emits `ands r6,r1; lsls r0,r6,16` instead of `adds r0,r1,0; ands r0,r6`.
+
+This is evidence for the allocation mechanism, not a source match. Source
+retains its three original pins and still passes the stock 444-byte check.
+The un-narrowed draft is reproducible by replacing that final test with
+`flags & common.value`. `AGBCC_NOTIE=167` on it confirms the tie is responsible
+for the missing copy, but also changes allocation (21/17); it does not match.
+The original direct-address draft still has the complete matching diagnosis
+`AGBCC_PRI=common:+1000`.
+
+Also tried: loading reward flags through common first (15/19); low-half-first
+construction (17/25), byte construction (21/35), and bitfields (23/27 or worse);
+returning the high-half-first mask from an inline helper (16/16); deriving the
+switch mask as `common.value | 64` (keeps an OR and changes blocked allocation);
+reusing common in the vulnerability test; resetting it for the switch; and a
+union result or explicitly clamped test. None closes the remaining tie. The
+narrow s8 vulnerability also kept an unnecessary sign extension, removed by
+s32. Next: preserve the six-reference mask allocation while representing the
+last AND through a subregister that regmove cannot tie, without leaving a
+narrowing shift. No new source change or compiler override was landed.
 
 ### PlayerContact_ApplyResponse: shared duration selection, 6/6
 Tags: phase3, player, PlayerContact_ApplyResponse, cross-jumping

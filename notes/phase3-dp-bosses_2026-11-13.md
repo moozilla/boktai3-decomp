@@ -37,6 +37,9 @@ No ROM build, progress regeneration, shared-header change, or new concession was
 
 - PlayerAction_RefreshFlagState (0813EDDC): one argument copy is placed before
   the sign test instead of inside its nonnegative arm; all other instructions match.
+- sub_0815E034 (0815E034): resumed draft 2/2, same size and all later offsets.
+  Halfword mask construction fixes allocation; regmove still ties the final AND
+  into the dying mask, and a narrowed test leaves a shift instead of the ROM copy.
 - sub_0819BB18 (0819BB18): 4/4 after fixing the random-table class head; only
   invariant order and the associated reload temporaries differ.
 - Hresvelgr_UpdateBoundaryBarrage (081A0BC8): 2/2, the random mask's retry
@@ -49,7 +52,8 @@ No ROM build, progress regeneration, shared-header change, or new concession was
   leaves five reconstruction instructions and alignment padding.
 
 The remaining entries have their confirmed knobs, attempted C forms and next
-hypotheses in the holdout notes. The first run stopped on request; the later explicit continuation resumed holdout work.
+hypotheses in the holdout notes. The first run stopped on request; the later explicit continuation resumed holdout work. The current contact-cost
+item was saved and committed before closing the resumed run.
 
 ## Scope diagnostics
 
