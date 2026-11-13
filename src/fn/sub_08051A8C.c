@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
 void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resource)
 {
@@ -7,7 +6,6 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
     const u16 *random;
     u32 *indexAddress;
     u32 index, mask;
-    register u32 xzMask asm("r8");
     SpriteDrawable_SelectTileFrame(particle, resource, 2);
     particle->flags &= ~1;
     random = (const u16 *)RANDOM_TABLE_ADDR;
@@ -21,26 +19,16 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
     {
         s32 sample = random[index];
         u16 *address = (u16 *)&emitter->position.x;
-        u32 applied;
-        sample >>= 4;
-        applied = 255;
-        xzMask = applied;
-        asm("" : "+r"(xzMask));
-        applied = xzMask;
-        sample &= applied;
-        particle->position.x = *address + sample - 127;
+        particle->position.x = *address + ((sample >> 4) & 255) - 127;
     }
     index += 1;
     index &= mask;
     {
         s32 sample = random[index];
         u16 *address;
-        u16 *lowAddress;
         u32 yMask;
         u32 base;
-        lowAddress = (u16 *)&emitter->position.y;
-        address = lowAddress;
-        asm("" : "+r"(address));
+        address = (u16 *)&emitter->position.y;
         yMask = 63;
         sample &= yMask;
         {
@@ -54,11 +42,7 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
     {
         s32 sample = random[index];
         u16 *address = (u16 *)&emitter->position.z;
-        u32 applied;
-        sample >>= 4;
-        applied = xzMask;
-        sample &= applied;
-        particle->position.z = *address + sample - 127;
+        particle->position.z = *address + ((sample >> 4) & 255) - 127;
     }
     {
         u32 zero = 0;
