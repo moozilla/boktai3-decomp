@@ -443,7 +443,7 @@ void RegistrySelection_Destroy(struct RegistrySelectionMenu *menu)
     struct SceneInputWidget *animation = menu->animations;
     s32 i = 12;
     do {
-        if (animation->unknown4[0])
+        if (animation->active)
             Anim_Remove(animation);
         ++animation;
     } while (--i >= 0);

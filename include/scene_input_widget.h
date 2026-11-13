@@ -14,7 +14,7 @@ struct SceneInputResource {
 struct SceneInputWidget {
     u16 glyphKind;
     u16 stamp; /* Copied from 03005238 on initialization; meaning tentative. */
-    u8 unknown4[2]; /* first byte: linked to an animation list */
+    u8 active, unknown5; /* active: linked to an animation list */
     u16 value6;
     u32 flags;
     u16 fieldC, attributeE, scale;

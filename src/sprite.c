@@ -129,7 +129,7 @@ s32 Anim_LinkToList(struct SceneInputWidget *entry, u32 list)
 {
     struct SceneInputWidget *head;
     entry->list = list;
-    entry->unknown4[0] = 1;
+    entry->active = 1;
     entry->previous = 0;
     head = gMainSpriteListHeads[list];
     entry->next = head;
@@ -143,7 +143,7 @@ void Anim_UnlinkFromList(struct SceneInputWidget *entry, u32 list)
 {
     struct SceneInputWidget *previous = entry->previous;
     struct SceneInputWidget *next = entry->next;
-    entry->unknown4[0] = 0;
+    entry->active = 0;
     if (previous)
         previous->next = next;
     else

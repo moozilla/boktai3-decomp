@@ -83,7 +83,7 @@ void Anim_Remove(void *);
 void SceneDebris_ReleaseAnimation(struct SceneDebris *debris)
 {
     union SceneDebrisVisual *visual = debris->visual;
-    if (visual->keyframes.widget.unknown4[0] != 0) {
+    if (visual->keyframes.widget.active != 0) {
         Anim_Remove(&visual->keyframes.widget);
         Heap_Free(debris->visual);
         debris->active = 0;
