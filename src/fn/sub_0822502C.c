@@ -3,7 +3,7 @@
 void sub_082157EC(void);
 void Engine_ClearControlFlags(void);
 void Terrain_ResetMap(void);
-void sub_08220ADC(void);
+void Collider_EnsureManager(void);
 void SceneLifecycle_InitSceneState(void)
 {
     u32 m;
@@ -11,7 +11,7 @@ void SceneLifecycle_InitSceneState(void)
     sub_082157EC();
     Engine_ClearControlFlags();
     Terrain_ResetMap();
-    sub_08220ADC();
+    Collider_EnsureManager();
     m = 0x100;
     gDispCntShadow = m | gDispCntShadow;
 }

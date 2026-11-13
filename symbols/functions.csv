@@ -9258,21 +9258,27 @@ addr,name,mode,confidence,source,notes
 0821FE6C,Collider_Remove,thumb,low,src-alias,
 0821FEB4,Collider_Init,thumb,low,src-alias,
 0821FF24,Collider_SetPosition,thumb,low,src-alias,
+0821FF34,Collider_SetSegment,thumb,low,src-alias,
 0821FF50,Collider_SetAttackPowerAndForce,thumb,low,src-alias,Sets the two attack values interpreted as power and force by falling objects
 0821FF58,Collider_SetAttackProperties,thumb,low,src-alias,Sets attack power and force together with flags and a timing parameter
 0821FF74,Collider_SetContactMode,thumb,low,src-alias,Sets the collider's byte-sized contact mode at offset 0x48 tentatively
 0821FF7C,Collider_SetBodyProperties,thumb,low,src-alias,Sets the body collider's primary value and two property flag words
 0821FF84,Collider_SetCallback,thumb,low,src-alias,
 0821FF8C,Collision_CalculateDamageResponse,thumb,low,src-alias,
+08220204,Collision_CalculateElementalResponse,thumb,low,src-alias,
+0822032C,Collider_CalculateFacingSeparation,thumb,low,src-alias,
+082203A8,Collider_BuildSegmentBounds,thumb,low,src-alias,
 08220498,Collider_TestSegmentXAxis,thumb,low,src-alias,
 08220590,Collider_TestSegmentYAxis,thumb,low,src-alias,
 08220688,Collider_TestSegmentZAxis,thumb,low,src-alias,
 08220780,Collider_TestSegmentBounds,thumb,low,src-alias,
+082207DC,Collider_TestSegmentCollision,thumb,low,src-alias,
 082208D4,PositionList_UpdateTranslatedCoordinates,thumb,low,src-alias,
 08220938,Collision_ProcessPairs,thumb,low,src-alias,
 08220A58,PositionQueue_FlushPending,thumb,low,src-alias,
 08220AA0,Collider_OnManagerDestroy,thumb,low,src-alias,Clears the global manager pointer when its task is destroyed
 08220AAC,Collider_ResetManagerLists,thumb,low,src-alias,Resets both manager list sentinels and tails and clears their counters
+08220ADC,Collider_EnsureManager,thumb,low,src-alias,
 08220B18,Collider_GetManager,thumb,low,src-alias,Returns the singleton collider manager pointer
 08220B24,Collision_AccumulateNearbyResponse,thumb,low,src-alias,
 08220B78,Anim_ApplyDurationScales,thumb,low,src-alias,
