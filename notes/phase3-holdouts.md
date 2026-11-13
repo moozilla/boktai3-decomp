@@ -1331,3 +1331,28 @@ zero-vector subtraction (same 2/2). These supplement the earlier documented
 No reduction landed. Next: a real shared vector operation that makes r1 live
 at the x load, or an earlier setup whose RTL consumes a scratch before later
 cross-jumping. A changed initial scan alone is not a C solution.
+
+### sub_08017510 / Weather_UpdateTilemapScroll (08017510): allocation-only frontier
+
+Best pin-free full-unit draft: `notes/phase3-drafts/dp-field/sub_08017510.c`
+(48/48, shape 0; exact size 372 bytes). Replace the private Random macro and
+literal table with `ParticleRandom_ReadDirectSample(gRandomTable)` through a
+local table pointer. This fixes table-first instruction order, repeated reloads,
+and cross-jump shape. ReadSample's statement macro instead changes shape (61/65
+with the named table); literal table plus direct helper retains late loads (56/57).
+
+Exact diagnostic: `AGBCC_FORCE=54:4,table:3` on this saved draft gives MATCH.
+The index-address pseudo 54 and table 52 take r3/r6 in ordinary C; ROM r4/r3.
+Those two decisions also put p in r6 as required. Raising index priority alone
+by 11714 still leaves p in r4, because index takes r2 instead; this is register
+preference/availability as well as ordering. p has 39 refs / 143 life (priority
+13636), index address 5/52 (1923), table 4/62 (1290).
+
+Additional attempts: make the existing Random cursor argument actually read and
+write its pointer (same 56/57 fully pin-free); initialize table/cursor before the
+scroll-delta call (54/54, shape 8); keep original pins but replace their barrier
+with real cursor usage (18/18, shape 14; hard pointer aliases stop index reuse);
+read only the first draw through cursor then write the global for subsequent
+reuse (10/10, shape 2, but the separate global address takes r5). No partial
+reduction landed. Next: a shared table/cursor capture whose real uses preserve
+the ROM allocation without aliasing away the cached random index.
