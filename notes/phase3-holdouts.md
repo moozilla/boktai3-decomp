@@ -1346,3 +1346,36 @@ selection. Narrow parity retains a shift after the AND. The best remaining lever
 is a redundant expression that blocks PRE yet folds at combine without adding
 a mask; the current draft documents the exact target. Scratch: build/cx/work/
 ScenePanelRig_InitSecondarySprites/.
+
+### ScenePanel_InitRig (0805B0F0)
+
+Weekly run ended during this item. Source remains unchanged with one next-index
+pin and one table barrier; no ordinary-C partial matched. Pin-free draft saved
+in `phase3-drafts/dp-menus-b/ScenePanel_InitRig.c`: power/table work union,
+58 ROM / 66 draft instructions, shape 36. The plain pin-free baseline was
+62/64, shape 42, 416 bytes versus the 412-byte ROM.
+
+The table barrier alone is understood: removing it leaves 12/12 differences,
+shape 0. Mask has priority 1000 (6 refs / 120 live), table 845 (6 / 142), so
+mask takes r4 and table r5 instead of the reverse. `AGBCC_PRI=table:+1000`
+MATCHes that one-barrier-removal candidate with the original next pin retained.
+A power/table work union fixes the table placement but makes the earlier power
+branches write r4 and adds an argument copy: 3/3, shape 2, with the pin retained.
+That is a promising partial target, but not a match.
+
+Removing next's pin changes allocation and reload availability throughout the
+function. Next occupies global r3 (priority 20000, live 50), denying reload a
+register the ROM uses. Baseline spill set is r0/r1/r2/r4; 32 rotation probes
+only improve 85 to 76 differences by spill's count. Forcing next to r1 plus
+table priority does not reproduce the pin: 50/50, shape 26, and prologue changes.
+Three canonical choices and one jump-follow probe do not improve the baseline.
+
+Tried power/table and early-cursor/table unions, union table initializer,
+inline table getter and indexed sample helper, halfword masks and indices,
+narrowed loads, explicit separate load/increment/mask statements, separate
+next locals before and after the sign branch, later mask/table initialization,
+and literal advance masks. None matched. Halfword power was only a probe and
+was rejected as a landing direction because it narrows the script value.
+Next idea: preserve the power-to-r1 argument path while obtaining the union's
+table priority, then address next's local-versus-global lifetime independently.
+Scratch candidates and probe logs remain under build/cx/work/ScenePanel_InitRig/.
