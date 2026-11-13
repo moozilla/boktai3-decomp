@@ -5015,6 +5015,88 @@ def explain_regmove(wd, uid, gone, new, nm, at):
           " What differs after that is a separate cause: ask `why` again with the knob set)")
 
 
+def move2add_address(lreg, greg, homes, uid):
+    """Find a same-base address changed into a relative add during reload.
+
+    Require the earlier physical copy/add and an uninterrupted register history;
+    matching immediate differences alone are not evidence of address reuse.
+    GREG includes labels/barriers as well as insns (jump2_input's sequence).
+    """
+    reg = r"\(reg(?:/\w)*:SI (\d+)(?: \w+)?\)"
+    plus = re.compile(r"\(set " + reg + r" \(plus:SI " + reg + r" \(const_int (-?\d+)\)\)\)")
+    copy = re.compile(r"\(set " + reg + " " + reg + r"\)")
+    before = {u: plus.match(r or "") for u, _, r in lreg}
+    original = before.get(uid)
+    order = {u: i for i, (u, _, _) in enumerate(greg)}
+    if not original or uid not in order:
+        return None
+    end = order[uid]
+    changed = plus.match(greg[end][2] or "")
+    if not changed:
+        return None
+    pseudo, base, offset = map(int, original.groups())
+    dst, src, delta = map(int, changed.groups())
+    hard_base = homes.get(base)
+    if dst != src or homes.get(pseudo) != dst or hard_base is None or delta == offset:
+        return None
+    writes = re.compile(r"\((?:set|clobber) \(reg(?:/\w)*:\w+ (\d+)(?: \w+)?\)")
+    implicit_write = re.compile(r"\((?:pre|post)_(?:inc|dec|modify)")
+    for i in range(end - 1, -1, -1):
+        old_uid, kind, text = greg[i]
+        if kind != "insn" or implicit_write.search(text or ""):
+            return None
+        defined = {int(m) for m in writes.findall(text or "")}
+        if hard_base in defined:
+            return None
+        if dst not in defined:
+            # A partial or complex register write cannot be safely interpreted here.
+            if re.search(r"\((?:set|clobber) \(subreg", text or ""):
+                return None
+            continue
+        old = before.get(old_uid)
+        physical = plus.match(text or "")
+        if not old or not physical:
+            return None
+        old_dst, old_base, old_offset = map(int, old.groups())
+        physical_dst, physical_src, physical_offset = map(int, physical.groups())
+        if (old_base != base or homes.get(old_dst) != dst or
+                (physical_dst, physical_src, physical_offset) != (dst, dst, old_offset) or
+                old_offset + delta != offset):
+            return None
+        for _, prev_kind, prev_text in reversed(greg[:i]):
+            if prev_kind != "insn" or implicit_write.search(prev_text or ""):
+                return None
+            defined = {int(m) for m in writes.findall(prev_text or "")}
+            if hard_base in defined:
+                return None
+            if dst not in defined:
+                if re.search(r"\((?:set|clobber) \(subreg", prev_text or ""):
+                    return None
+                continue
+            prior_copy = copy.match(prev_text or "")
+            if prior_copy and tuple(map(int, prior_copy.groups())) == (dst, hard_base):
+                return dst, hard_base, old_offset, offset, old_uid
+            return None
+        return None
+    return None
+
+
+def explain_address_move2add(wd, uid, at):
+    events = [(u, k, " ".join(r.split())) for u, k, r in jump2_input(wd, "")[2]]
+    found = move2add_address(insn_list(wd, "lreg"), events, hard_of(wd), uid)
+    if not found:
+        return
+    dst, base, old, new, previous = found
+    operation = f"+ {new - old:#x}" if new >= old else f"- {old - new:#x}"
+    print(f"  reload changed the address r{base} + {new:#x} into r{dst} {operation}:"
+          f" r{dst} already held r{base} + {old:#x} from {at(previous)}. The pre/post-reload"
+          " patterns and intervening register definitions identify same-base address reuse"
+          " (reload_cse_move2add, reload1.c), rather than a different field offset. A CODE_LABEL"
+          " makes move2add forget that address. A setup written in separate branches can keep"
+          " such a label through reload even when jump2 later merges its tails; each setup path"
+          " also needs a real join if cse must forget an earlier field address (README fact 130).")
+
+
 def explain_move2add(wd, uid, row, at):
     """ROM loads a constant where the draft adds to a register: reload's move2add (reload1.c)."""
     md = re.match(r"(?:adds|subs) r(\d+), #(0x[0-9a-f]+|\d+)$", row["draft"] or "")
@@ -5544,6 +5626,8 @@ def cmd_why(src, func, uid, env, via=None):
                 changes.append((p, [r for r in last if r not in regs], [r for r in regs if r not in last]))
             trail.append(f"{PASS_NOTE.get(p, p)}: {', '.join(nm(r) for r in regs)}")
             last = regs
+    if row:
+        explain_address_move2add(wd, uid, at)
     if row and row["tag"] == "→":
         rows_all = json.load(open(os.path.join(wd, "diff.json")))
         if all(r["tag"] in "=→" for r in rows_all):

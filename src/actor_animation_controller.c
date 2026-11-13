@@ -23,8 +23,7 @@ void ActorPalette_BeginFade(struct ActorAnimController *p)
     AnimData_SelectPaletteBank(p->effect, 344);
     p->savedPalette = p->palette;
     p->palette = p->output;
-    /* local adaptation: mode is a bitfield, whose address can't be taken */
-    if ((*(u8 *)((u8 *)p + 0xf5a) & 15) == 2)
+    if (p->mode == 2)
         p->previous = ActorPalette_UpdateFadeAndNotify;
     else
         p->previous = ActorPalette_UpdateFade;
@@ -49,7 +48,7 @@ static inline void Actor_SetState(struct ActorAnimController *g, u32 mode, u32 p
 {
     g->oldMode = g->mode;
     g->mode = mode;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | (phase << 4);
+    g->phase = phase;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -181,9 +180,9 @@ void ActorPalette_UpdateReverseFade(struct ActorAnimController *p)
             u32 mode = 2;
             p->mode = mode;
         }
-        *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0xd0;
+        p->phase = 13;
         if (p->oldMode == 3) {
-            if ((*((u8 *)p + 0xf5a) & 15) == 3) {
+            if (p->mode == 3) {
                 p->savedFrame = p->anim.frame;
                 p->savedTimer = p->anim.timer;
             }
@@ -243,7 +242,8 @@ void Actor_ProjectAndClampToScreen(struct ActorAnimController *p)
 
 // Provisional name: Actor_TryInteraction
 
-extern u8 *gGameState;
+#include "game_state.h"
+#include "player.h"
 
 u8 Math_Atan2(s32, s32);
 
@@ -265,7 +265,7 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
     u32 a;
     u32 b, c;
     u32 sector;
-    u8 *owner;
+    struct Player *owner;
     if (q->group != p->group)
         return;
     if (q->orientation == 0) {
@@ -275,9 +275,9 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
         xOffset = 128;
         zOffset = 0;
     }
-    owner = *(u8 **)((u8 *)p + 0x18);
-    dx = *(s16 *)(owner + 0x30) - q->worldX - xOffset;
-    dz = *(s16 *)(owner + 0x34) - q->worldZ - zOffset;
+    owner = p->owner;
+    dx = owner->position.x - q->worldX - xOffset;
+    dz = owner->position.z - q->worldZ - zOffset;
     length = dx * dx + dz * dz;
     radius = p->speed;
     if (length >= (s32)(radius * radius))
@@ -301,12 +301,11 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             a = 255;
         }
     }
-    if ((s8)a != *(s16 *)(gGameState + 0x85e) && (s8)b != *(s16 *)(gGameState + 0x85e) &&
-        (s8)c != *(s16 *)(gGameState + 0x85e))
+    if ((s8)a != gGameState->unk85E && (s8)b != gGameState->unk85E && (s8)c != gGameState->unk85E)
         return;
     height = q->worldY;
-    owner = *(u8 **)((u8 *)p + 0x18);
-    height -= *(s16 *)(owner + 0x32);
+    owner = p->owner;
+    height -= owner->position.y;
     if (height < 0)
         height = -height;
     if (height > 119)
@@ -315,7 +314,7 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
         return;
     if (gEnginePauseFlags & 4)
         return;
-    if (*(u32 *)(owner + 0x1c) == 4)
+    if (owner->kind == 4)
         return;
     if (q->request)
         Script_Call(q->request, 0);
@@ -331,9 +330,9 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             p->mode = mode;
         }
         {
-            *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0x30;
+            p->phase = 3;
             if (p->oldMode == 3) {
-                if ((*((u8 *)p + 0xf5a) & 15) == 3) {
+                if (p->mode == 3) {
                     p->savedFrame = p->anim.frame;
                     p->savedTimer = p->anim.timer;
                 }
@@ -356,9 +355,9 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             p->mode = mode;
         }
         {
-            *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0x20;
+            p->phase = 2;
             if (p->oldMode == 3) {
-                if ((*((u8 *)p + 0xf5a) & 15) == 3) {
+                if (p->mode == 3) {
                     p->savedFrame = p->anim.frame;
                     p->savedTimer = p->anim.timer;
                 }
@@ -430,8 +429,8 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
                 a = 255;
             }
         }
-        if ((s8)a != *(s16 *)(gGameState + 0x85e) && (s8)b != *(s16 *)(gGameState + 0x85e) &&
-            (s8)c != *(s16 *)(gGameState + 0x85e))
+        if ((s8)a != gGameState->unk85E && (s8)b != gGameState->unk85E &&
+            (s8)c != gGameState->unk85E)
             continue;
         {
             s32 y = q->worldY;
@@ -679,7 +678,7 @@ void Actor_BeginAnimationPhaseOne(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x10;
+    g->phase = 1;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -701,7 +700,7 @@ void Actor_BeginAnimationPhaseTwo(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x20;
+    g->phase = 2;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -723,7 +722,7 @@ void Actor_BeginAnimationPhaseThree(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x30;
+    g->phase = 3;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -745,7 +744,7 @@ void Actor_BeginAnimationPhaseFour(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x40;
+    g->phase = 4;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -767,7 +766,7 @@ void Actor_BeginAnimationPhaseFive(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x50;
+    g->phase = 5;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -789,7 +788,7 @@ void Actor_BeginAnimationPhaseSix(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x60;
+    g->phase = 6;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -811,7 +810,7 @@ void Actor_BeginAnimationPhaseSeven(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x70;
+    g->phase = 7;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -833,7 +832,7 @@ void Actor_BeginAnimationPhaseEight(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x80;
+    g->phase = 8;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -865,8 +864,8 @@ void Actor_BeginScriptedAnimationPhaseNine(void)
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0)
         return;
-    B(0xf76) = Script_GetKeywordValue(0x70, 0);
-    if (W(0xddc) & 1)
+    g->releaseControl = Script_GetKeywordValue(0x70, 0);
+    if (g->obj.flags & 1)
         return;
     Actor_SetState(g, 3, 9);
 }
@@ -896,10 +895,9 @@ void ScriptUtility_ClearControlFlag(void);
 
 void sub_081E4B0C(u32 phase)
 {
-    struct G *g = (struct G *)gScriptedActorController;
-    u32 three = 3;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0) {
-        g = (struct G *)Actor_EnsureController(0xBB34, 0);
+        g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
         if (g == 0)
             return;
     }
@@ -912,23 +910,10 @@ void sub_081E4B0C(u32 phase)
         return;
     }
     phase = (u16)phase;
-    g->b = g->xa;
-    g->xa = three;
+    Actor_SetState(g, 3, phase);
     {
-        u32 shifted = phase << 4;
-        *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | shifted;
-    }
-    if (g->b == 3 && g->xa == 3) {
-        g->d = g->e2c;
-        g->e = g->e32;
-    }
-    {
-        u8 one = 1;
-        g->c |= one;
-    }
-    {
-        u32 value = *(u16 *)((u8 *)g + 0xf5a) >> 4;
-        *(u16 *)((u8 *)g + 0xf7e) = value;
+        u32 value = g->phase;
+        g->savedPhase = value;
     }
 }
 
@@ -947,7 +932,7 @@ void sub_081E4BD4(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0xa0;
+    g->phase = 10;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -973,7 +958,7 @@ void sub_081E4C74(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0xb0;
+    g->phase = 11;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -999,7 +984,7 @@ void sub_081E4D14(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0xd0;
+    g->phase = 13;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -1022,30 +1007,30 @@ void Actor_BeginCurveToPosition(void)
         if (g == 0)
             return;
     }
-    H(0xf8a) = Script_GetValue();
+    g->resource = Script_GetValue();
     if (Script_SeekToKeyword(0x74)) {
-        H(0xed0) = Script_GetValue();
+        g->targetX = Script_GetValue();
         {
             u32 value = Script_GetValue() + 160;
-            H(0xed2) = value;
+            g->targetY = value;
         }
-        H(0xed4) = Script_GetValue();
+        g->targetZ = Script_GetValue();
     } else {
         {
-            u32 value = OWNER_V(0x30);
-            H(0xed0) = value;
+            u32 value = (u16)g->owner->position.x;
+            g->targetX = value;
         }
         {
-            u32 value = OWNER_V(0x32) + 160;
-            H(0xed2) = value;
+            u32 value = (u16)g->owner->position.y + 160;
+            g->targetY = value;
         }
         {
-            u32 value = OWNER_V(0x34);
-            H(0xed4) = value;
+            u32 value = (u16)g->owner->position.z;
+            g->targetZ = value;
         }
     }
-    B(0xf67) = Script_GetKeywordValue(0x64, -1);
-    W(0xf50) = Script_GetKeywordValue(0x70, 0);
+    g->targetFacing = Script_GetKeywordValue(0x64, -1);
+    g->handle = (void *)Script_GetKeywordValue(0x70, 0);
     Actor_SetState(g, 2, 10);
 }
 
@@ -1060,13 +1045,13 @@ void Actor_BeginCurveToRest(void)
         if (g == 0)
             return;
     }
-    H(0xf8a) = Script_GetValue();
-    B(0xf77) = Script_GetKeywordValue(0x75, 0);
-    W(0xf50) = Script_GetKeywordValue(0x70, 0);
+    g->resource = Script_GetValue();
+    g->variant8 = Script_GetKeywordValue(0x75, 0);
+    g->handle = (void *)Script_GetKeywordValue(0x70, 0);
     Actor_ProjectAndClampToScreen(g);
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x80;
+    g->phase = 8;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -1087,13 +1072,13 @@ void Actor_BeginScriptedCurve(void)
         if (g == 0)
             return;
     }
-    W(0xf50) = Script_GetKeywordValue(0x70, 0);
+    g->handle = (void *)Script_GetKeywordValue(0x70, 0);
     if (Script_SeekToKeyword(0x74)) {
-        H(0xed0) = Script_GetValue();
-        H(0xed2) = Script_GetValue();
+        g->targetX = Script_GetValue();
+        g->targetY = Script_GetValue();
     } else {
-        H(0xed2) = 0;
-        H(0xed0) = 0;
+        g->targetY = 0;
+        g->targetX = 0;
     }
     Actor_SetState(g, 2, 9);
 }
@@ -1108,20 +1093,20 @@ void Actor_SetFacingAndIdle(void)
         if (g == 0)
             return;
     }
-    H(0xf8a) = Script_GetValue();
+    g->resource = Script_GetValue();
     {
         u8 direction = Script_GetKeywordValue(0x64, 0);
         u32 flip = 0;
         direction &= 7;
-        B(0xf68) = direction;
+        g->facing = direction;
         if (direction > 4) {
             direction = 8 - direction;
             flip = 1;
         }
-        B(0xf66) = direction;
-        B(0xf6b) = flip;
+        g->direction = direction;
+        g->flip = flip;
     }
-    Anim_SetSequence((u8 *)g + 0xe24, W(0xe74), 0, B(0xf66), B(0xf6b));
+    Anim_SetSequence(&g->anim, g->arg, 0, g->direction, g->flip);
     Actor_SetState(g, 2, 0);
 }
 
@@ -1134,10 +1119,10 @@ void Actor_BeginFadeAnimation(void)
         if (g == 0)
             return;
     }
-    *(u16 *)((u8 *)g + 0xf8a) = Script_GetValue();
+    g->resource = Script_GetValue();
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0xb0;
+    g->phase = 11;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -1146,7 +1131,7 @@ void Actor_BeginFadeAnimation(void)
         u8 one = 1;
         g->flags |= one;
     }
-    *(u32 *)((u8 *)g + 0xf54) = Script_GetKeywordValue(0x70, 0);
+    g->completionHandle = (void *)Script_GetKeywordValue(0x70, 0);
 }
 
 void Actor_BeginReverseFadeAnimation(void)
@@ -1158,10 +1143,10 @@ void Actor_BeginReverseFadeAnimation(void)
         if (g == 0)
             return;
     }
-    *(u16 *)((u8 *)g + 0xf8a) = Script_GetValue();
+    g->resource = Script_GetValue();
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0xC0;
+    g->phase = 12;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -1170,7 +1155,7 @@ void Actor_BeginReverseFadeAnimation(void)
         u8 one = 1;
         g->flags |= one;
     }
-    *(u32 *)((u8 *)g + 0xf54) = Script_GetKeywordValue(0x70, 0);
+    g->completionHandle = (void *)Script_GetKeywordValue(0x70, 0);
 }
 
 void Actor_BeginHide(void)
@@ -1184,7 +1169,7 @@ void Actor_BeginHide(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x70;
+    g->phase = 7;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -1206,21 +1191,21 @@ void Actor_BeginPositionedEffect(void)
             return;
     }
     if (Script_SeekToKeyword(0x70)) {
-        H(0xdf8) = Script_GetValue();
-        H(0xdfa) = Script_GetValue();
-        H(0xdfc) = Script_GetValue();
+        g->obj.x = Script_GetValue();
+        g->obj.y = Script_GetValue();
+        g->obj.z = Script_GetValue();
     } else {
         {
-            u32 value = OWNER_V(0x30);
-            H(0xdf8) = value;
+            u32 value = (u16)g->owner->position.x;
+            g->obj.x = value;
         }
         {
-            u32 value = OWNER_V(0x32) + 160;
-            H(0xdfa) = value;
+            u32 value = (u16)g->owner->position.y + 160;
+            g->obj.y = value;
         }
         {
-            u32 value = OWNER_V(0x34);
-            H(0xdfc) = value;
+            u32 value = (u16)g->owner->position.z;
+            g->obj.z = value;
         }
     }
     Actor_SetState(g, 2, 14);
@@ -1237,7 +1222,7 @@ void Actor_BeginRadialBurst(void)
     }
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0xf0;
+    g->phase = 15;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -1319,9 +1304,9 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct Act
     if (child_take(c)) {
         p->timer = 10;
         if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4)
-            *((u8 *)p + 0xf6f) = 1;
+            p->growFlag = 1;
         else
-            *((u8 *)p + 0xf6f) = 0;
+            p->growFlag = 0;
         {
             u8 *variant = &c->variant;
             p->variant8 = *variant;
@@ -1522,7 +1507,7 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
         (*(u16 *)&p->obj.y) += 160;
-        *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
+        p->savedY = (*(u16 *)&p->obj.y);
         Sound_PlaySong(286);
         Actor_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -1621,12 +1606,12 @@ void Actor_UpdateCompactEntryAnimation(struct ActorAnimController *p)
     u32 flag;
     u8 done;
     if (take(p)) {
-        u16 *first = (u16 *)((u8 *)p + 0xed0);
+        u16 *first = (u16 *)&p->targetX;
         s32 zero;
         zero = 0;
         *first = 25;
-        *(u16 *)((u8 *)p + 0xed2) = 102;
-        *(u16 *)((u8 *)p + 0xed4) = zero;
+        p->targetY = 102;
+        p->targetZ = zero;
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
         p->obj.flags &= ~1;
@@ -1722,21 +1707,21 @@ void Actor_UpdateProjectedEntryAnimation(struct ActorAnimController *p)
     u32 flag;
     u8 done;
     if (take(p)) {
-        u16 *first = (u16 *)((u8 *)p + 0xed0);
+        u16 *first = (u16 *)&p->targetX;
         u16 initialPhase[] = {0};
         s32 zero = 0;
         *first = 25;
-        *(u16 *)((u8 *)p + 0xed2) = 102;
-        *(u16 *)((u8 *)p + 0xed4) = initialPhase[0];
+        p->targetY = 102;
+        p->targetZ = initialPhase[0];
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
-        *((u8 *)p + 0xf77) = zero;
+        p->variant8 = zero;
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
         Actor_ProjectAndClampToScreen(p);
         (*(u16 *)&p->obj.y) += 8;
-        *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
+        p->savedY = (*(u16 *)&p->obj.y);
         ActorShadow_Disable(p->p2);
         Sound_PlaySong(286);
         Actor_SetInteractionControlFlag(p);
@@ -1827,21 +1812,21 @@ void Actor_UpdateSilentProjectedEntryAnimation(struct ActorAnimController *p)
     u32 flag;
     u8 done;
     if (take(p)) {
-        u16 *first = (u16 *)((u8 *)p + 0xed0);
+        u16 *first = (u16 *)&p->targetX;
         u16 initialPhase[] = {0};
         s32 zero = 0;
         *first = 25;
-        *(u16 *)((u8 *)p + 0xed2) = 102;
-        *(u16 *)((u8 *)p + 0xed4) = initialPhase[0];
+        p->targetY = 102;
+        p->targetZ = initialPhase[0];
         p->state = 1;
         Anim_SetSequence(&p->anim, p->arg, 1, 0, p->next);
-        *((u8 *)p + 0xf77) = zero;
+        p->variant8 = zero;
         p->obj.flags &= ~1;
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
         Actor_ProjectAndClampToScreen(p);
         (*(u16 *)&p->obj.y) += 8;
-        *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
+        p->savedY = (*(u16 *)&p->obj.y);
         ActorShadow_Disable(p->p2);
         Actor_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -1938,7 +1923,7 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
         p->obj.scaleY = 64;
         p->obj.scaleX = 64;
         (*(u16 *)&p->obj.y) += 160;
-        *(u16 *)((u8 *)p + 0xee2) = (*(u16 *)&p->obj.y);
+        p->savedY = (*(u16 *)&p->obj.y);
         ActorShadow_Enable(p->p2);
         Actor_SetInteractionControlFlag(p);
         AnimData_SelectPaletteBank(p->effect, 343);
@@ -2146,7 +2131,7 @@ void Actor_HideAndResetChildren(struct ActorAnimController *p)
             void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
             u32 reset = 1;
             struct ActorChildCallbackView *child =
-                (struct ActorChildCallbackView *)((u8 *)p + 0xc8);
+                (struct ActorChildCallbackView *)&p->children[0].fn;
             s32 i = 15;
             do {
                 union DisplaySequenceControl control;
@@ -2205,9 +2190,9 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
         p->state = 0;
         p->bend = (p->variant & 1) ? 1 : -1;
         ActorShadow_Disable(p->p2);
-        if (*((u8 *)p + 0xf6f) && p->obj.scaleX != 127 && (p->obj.flags & 16))
+        if (p->growFlag && p->obj.scaleX != 127 && (p->obj.flags & 16))
             p->scaleFn = Actor_UpdateScaleGrowth;
-        if (!*((u8 *)p + 0xf77)) {
+        if (!p->variant8) {
             p->targetX = 25;
             p->targetY = 102;
             p->targetZ = 0;
@@ -2447,7 +2432,7 @@ static inline s16 SetApproachDirection(s16 angle, u8 *directionOut, u8 *flipOut)
 
 static inline void FinishApproach(struct ActorAnimController *p)
 {
-    *(u16 *)((u8 *)p + 0xF5A) &= 0xF;
+    p->phase = 0;
     if (p->oldMode == 3 && p->mode == 3) {
         p->savedFrame = p->anim.frame;
         p->savedTimer = p->anim.timer;
@@ -2957,16 +2942,16 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
                 a->rate = 1;
         } else
             done = 0;
-        *(u16 *)((u8 *)p + 0xf80) = 0;
-        *(s16 *)((u8 *)p + 0xf82) = 15;
+        p->blinkTimer = 0;
+        p->blinkInterval = 15;
     }
-    if (Mod(++*(u16 *)((u8 *)p + 0xf80), *(s16 *)((u8 *)p + 0xf82)) == 0) {
-        *(u16 *)((u8 *)p + 0xf80) = 0;
+    if (Mod(++p->blinkTimer, p->blinkInterval) == 0) {
+        p->blinkTimer = 0;
         if (p->obj.flags & 1)
             p->obj.flags &= ~1;
         else
             p->obj.flags |= 1;
-        if (--*(u16 *)((u8 *)p + 0xf82) == 0) {
+        if (--(*(u16 *)&p->blinkInterval) == 0) {
             s32 duration = 10;
             AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
             AnimatedParticles_EmitBurst((u8 *)p + 0xdf8, 1, 512, 48, 8, 8, 8, 4);
@@ -2986,11 +2971,9 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
             {
                 u32 active = 4;
                 register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
-                u32 reset = 1;
+                u8 reset = 1;
                 struct ActorChildCallbackView *child =
-                    (struct ActorChildCallbackView
-                         *)((u8 *)p +
-                            0xc8); /* MATCHING_CONCESSION: retain the original unused zero-register initialization. */
+                    (struct ActorChildCallbackView *)&p->children[0].fn;
                 register s32 reserved asm("r7") = 0;
                 s32 i;
                 for (i = 15; i >= 0; i--) {
@@ -3801,18 +3784,16 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     if (done) {
-        if (*((u8 *)p + 0xf76))
+        if (p->releaseControl)
             ScriptUtility_ClearControlFlag();
         p->obj.flags |= 1;
         Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
             register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
-            u32 reset = 1;
+            u8 reset = 1;
             struct ActorChildCallbackView *child =
-                (struct ActorChildCallbackView
-                     *)((u8 *)p +
-                        0xc8); /* MATCHING_CONCESSION: retain the original unused zero-register initialization. */
+                (struct ActorChildCallbackView *)&p->children[0].fn;
             register s32 reserved asm("r7") = 0;
             s32 i;
             for (i = 15; i >= 0; i--) {
@@ -4068,7 +4049,7 @@ void Task_Kill(void *);
 void Actor_CheckResourceLifetime(struct ActorAnimController *p)
 {
     struct Entry *e;
-    s32 n = MessageQueue_GetMessagesById(*(u16 *)((u8 *)p + 0xf8a), &e);
+    s32 n = MessageQueue_GetMessagesById(p->resource, &e);
     e += n - 1;
     while (--n >= 0) {
         if (!*e->value)
@@ -4113,7 +4094,7 @@ s32 Actor_DestroyController(struct ActorAnimController *p)
         Sprite_Remove(c);
         c += 0xdc;
     }
-    if (SceneBody_GetById(*(u16 *)((u8 *)p + 0xf8a)))
+    if (SceneBody_GetById(p->resource))
         SceneBody_Unregister((u8 *)p + 0xe80);
     gScriptedActorController = 0;
 }
@@ -4163,7 +4144,7 @@ static inline void InteractionChild_SetMode(struct ActorAnimController *g, u32 m
 {
     *oldMode = g->mode;
     g->mode = mode;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 15) | (phase << 4);
+    g->phase = phase;
     if (*oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
@@ -4347,8 +4328,8 @@ void Actor_ConfigureFromScript(void)
     struct ActorSprite *obj;
     if (!g)
         g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
-    obj = (struct ActorSprite *)((u8 *)g + 0xddc);
-    AnimData_SelectPaletteBank((u8 *)g + 0xe08, 343);
+    obj = &g->obj;
+    AnimData_SelectPaletteBank(g->effect, 343);
     g->obj.priority = 0;
     g->last = 0;
     g->resource = Script_GetValue();
@@ -4371,26 +4352,26 @@ void Actor_ConfigureFromScript(void)
             obj->z = v;
         }
     } else {
-        u8 *owner;
-        owner = *(u8 **)((u8 *)g + 0x18);
-        g->savedX = *(u16 *)(owner + 0x30);
-        obj->x = *(u16 *)(owner + 0x30);
-        owner = *(u8 **)((u8 *)g + 0x18);
-        g->savedY = *(u16 *)(owner + 0x32);
-        obj->y = *(u16 *)(owner + 0x32);
-        owner = *(u8 **)((u8 *)g + 0x18);
-        g->savedZ = *(u16 *)(owner + 0x34);
-        obj->z = *(u16 *)(owner + 0x34);
+        struct Player *owner;
+        owner = g->owner;
+        g->savedX = (u16)owner->position.x;
+        obj->x = (u16)owner->position.x;
+        owner = g->owner;
+        g->savedY = (u16)owner->position.y;
+        obj->y = (u16)owner->position.y;
+        owner = g->owner;
+        g->savedZ = (u16)owner->position.z;
+        obj->z = (u16)owner->position.z;
     }
     if (Script_SeekToKeyword(0x63))
-        W(0xf50) = Script_GetValue();
+        g->handle = (void *)Script_GetValue();
     g->phaseSelect = Script_GetKeywordValue(0x73, 0);
     if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4)
         g->growFlag = 1;
     else
         g->growFlag = 0;
-    ActorShadow_Disable((u8 *)g + 0xe34);
-    *(u32 *)((u8 *)g + 0xddc) |= 1;
+    ActorShadow_Disable(g->p2);
+    g->obj.flags |= 1;
     switch (g->phaseSelect) {
         case 0:
             Actor_SetState(g, 0, 0);

@@ -4207,3 +4207,46 @@ selection. Narrow parity retains a shift after the AND. The best remaining lever
 is a redundant expression that blocks PRE yet folds at combine without adding
 a mask; the current draft documents the exact target. Scratch: build/cx/work/
 ScenePanelRig_InitSecondarySprites/.
+## dp-scene2 (Codex)
+
+### Actor_UpdateBlinkBurstDisappearance (081E7F80): one pin removed, unused zero open
+
+Draft: `notes/phase3-drafts/dp-scene2/Actor_UpdateBlinkBurstDisappearance.c` (snippet for the controller unit). The indexed child loop, byte reset mask and byte-union update match all useful instructions and registers. The sole difference is the ROM's unused `movs r7, #0` before its reversed loop counter; the draft instead has two-byte alignment padding later. The landed partial removes the r2 value pin and raw blink offsets, retaining only the original unused-zero r7 pin.
+
+Diagnosis: the initial free draft let regmove tie the OR result to the flags load. `AGBCC_NOTIE=1477` restores the copy but leaves the zero and constant allocation differences; it is not a full matching knob. A byte-union update with byte reset mask naturally restores that copy and allocation. Literal `control.raw |= 1` or a one-bit assignment generates the unused QImode zero through loop hoisting, and indexing real child slots gives the correct invariant order, but the OR operands and callback/reset r4/r5 allocation swap. Count-up reversal places the counter after these invariants.
+
+Tried: u8/u16 flags and result temporaries, direct memory OR, initialized byte unions, one-bit updates, byte/halfword reset masks, callback-view and real-slot indexed loops, postincrement and reversed loops, full-byte and halfword-container bitfields, shared reset helper. Persistent search: `build/matchsearch/Actor_UpdateBlinkBurstDisappearance`; sources and evidence under `build/cx/work/Actor_UpdateBlinkBurstDisappearance`.
+
+Next: retain the literal union update's hoisted zero while obtaining the byte-mask update's operand order; inspect the QImode insertion and invariant merging in cse/loop, or use the finishing-animation twin to identify the original control representation.
+
+### Actor_UpdateFinishingAnimation (081E9574): one pin removed, same unused zero
+
+Draft: `notes/phase3-drafts/dp-scene2/Actor_UpdateFinishingAnimation.c`. The byte reset mask and union update match all useful instructions and allocation. The missing `movs r7, #0` also removes final alignment padding (ROM 608 bytes, draft 604). The partial removes the r2 pin and names the release-control field, retaining the original unused-zero pin.
+
+The blink investigation above applies directly. A separate mask-first byte union also drops the zero and keeps its one constant inside the loop; initialized unions and reset helpers do not retain it. No complete matching knob is known. Next: use this smaller twin to trace the literal union OR's hoisted QImode zero and preserve it while restoring the byte-mask operand order.
+
+Follow-up in the smaller finishing twin: the literal update is now confirmed to have shape distance zero and only five differing register rows. RTL shows that the unused QImode zero comes from the final byte store's insertion sequence: `(oldByte & zeroQI) | newByte`. CSE retains that zero when the payload is the OR of two paradoxical QImode subregs; loop hoists it, and combine later drops the OR with zero. With a promoted scalar byte mask, CSE drops the insertion before loop. An outer byte-union reset restores the desired OR operand order but also loses the zero and swaps callback/reset allocation. Clearing then setting the bit, mask-clear/set, an explicit zero OR, and mask-first unions inside the branch or loop do not match. The literal alternative remains in the work directory for its five-row evidence; the committed draft still matches all useful instructions.
+
+
+### ActorDisplay_UpdateForegroundSprite (081EC7D8): horizontal allocation still open
+
+Draft: `notes/phase3-drafts/dp-scene2/ActorDisplay_UpdateForegroundSprite.c` (ROM 412 bytes, draft 420; 35 ROM / 38 draft instructions differ, shape 7). Separating the horizontal and vertical sums stops the original reused x pseudo from taking the drawable's r5. Distinct field pointers remove their accidental global lifetime. Playback then differs only in one mask reload, but coordinate allocation still prevents move2add from reusing the shake and displacement offsets.
+
+Diagnosis: local allocation gives the horizontal sum r0 (priority 12000, six references), and its live screen pointer r1 (priority 2500, two references). The ROM has the reverse. `AGBCC_PRI=screen:+10000` confirms the first placement and reduces shape distance to 4 (27 ROM / 29 draft instructions), but is not a complete matching knob. Forcing x alone does not model the original hard register's entire arithmetic chain. Full multi-value forcing also changes overlapping allocations and is not matching evidence.
+
+Tried: separate coordinate lifetimes, separate address lifetimes, direct named fields, signed/unsigned sums, reversed operand spelling, halfword sums and final-sum truncation, word-union sums, and a geometry inline helper. Halfword forms introduce unwanted extensions; direct fields also lose the required early screen address and signed layer load. The retained full-width draft preserves the observed operation and load order.
+
+Next: break the sum's local-allocation quantity tie without changing instruction order, or recover a source aggregate/accessor whose screen address gets the first local register. Keep the full 0x5E0/0x5E6/0x5E8 offsets and signed alternate-layer read. Return after the singleton tail of the queue.
+
+After the singleton matches, splitting only the address/result temporaries while retaining the reused coordinate accumulator reduces shape distance to 3 (39 ROM / 40 draft rows, 416 bytes). `why` confirms the remaining obstacle: the shared x is global (priority 6666), but the first sum's temporary and screen pointer are local and already occupy r0/r1. Splitting x itself ties its chain locally in r0 instead. Direct result stores and a geometry inline wrapper do not change this decision. The earlier retained draft has fewer register differences; neither version is a stock match.
+
+
+### SingletonSlot7_UpdateEndingScene (081EF914): two mask pins removed, transition zeros open
+
+Draft: `notes/phase3-drafts/dp-scene2/SingletonSlot7_UpdateEndingScene.c` (ROM 1392 bytes, draft 1388; 9 ROM / 7 draft instructions, shape 4). A local copy of the playback wrapper's state parameter restores both r4 state/r5 mask allocations. Both original r5 pins are removed in the checked source. `AGBCC_FORCE=one:5` confirmed one allocation region; the local-copy C fixes both regions, with the same result from the shared DisplaySequence_StepSprite helper.
+
+The two remaining byteZero pins keep separate zero loads before transition-duration stores. Without them, cse folds the byte store's source into the existing word zero, and the first transition's timer pointer moves from r4 to r3. The plain Slot7_TransitionTo helper and literal expanded stores have the same difference. `why` identifies the byte-source replacement by the earlier zero in cse1; no full matching knob is known.
+
+Tried: byte masks, longer-lived mask uses, byte-union masks, wrapper-local state copies, shared playback and transition helpers, initialized and assigned byte/word unions for zero, and a halfword duration bitfield. Assigned unions keep a zero live across unrelated control flow and add a saved register; initialized unions again merge the zero; duration bitfields add different zero loads. The retained draft uses the ordinary transition helper and has no concessions.
+
+Next: derive the separate narrow zero from the transition's original representation, without extending its life out of the case. The first timer pointer's displacement is a consequence of the missing local byte-zero allocation, not an independent pin requirement.

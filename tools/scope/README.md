@@ -2005,6 +2005,18 @@ Each was read from the compiler source and confirmed on a live draft.
    restores the original order and matches without the barrier. A u8 or signed-short keyframe
    also matches; changing only icon to u8/u16 does not. The chosen icons are 30, 31, and 32, so
    narrowing preserves their values. Use the meaningful argument type, not an unrelated cast.
+130. **Separate setup tails need real joins to forget an old field address as well as stop
+   move2add.** VanargandEffect_Initialize's plain C derived its position pointer from the
+   lifetime pointer (`subs r1, #0x66`) where the ROM reloads the owner and adds 0x34. Writing
+   setup in two palette paths leaves a label through reload; jump2 later shares the stores,
+   so move2add no longer sees the lifetime address. But one path directly after `variant == 0`
+   lets cse follow from entry and reuse the old graphics pointer. That extends its lifetime,
+   makes it global, swaps owner/graphics r4/r5, and leaves an extra copy in that arm. Grouping
+   variants 0/1 into one setup join and 2/default into another gives both setups multiple
+   predecessors. cse forgets the old graphics address, its initial use stays local in r4,
+   and the owner stays in r5. The two tails then share exactly and remove the r1 clobber.
+   `why` now recognizes this address-reuse form from its pre/post-reload patterns and the
+   uninterrupted copy/add history, including labels, calls and intervening definitions.
 
 ## Survey: random table as a literal address (2026-10-24)
 
