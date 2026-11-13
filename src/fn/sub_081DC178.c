@@ -1,9 +1,0 @@
-#include "global.h"
-
-void Menu_SetTextRect(u8 *p, u8 *s)
-{
-    *(u16 *)(p + 0x20) = *(u16 *)(s + 0);
-    *(u16 *)(p + 0x22) = *(u16 *)(s + 2);
-    *(u16 *)(p + 0x24) = *(u16 *)(s + 4);
-    *(u16 *)(p + 0x26) = *(u16 *)(s + 6);
-}

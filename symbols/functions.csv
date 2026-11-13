@@ -8446,11 +8446,11 @@ addr,name,mode,confidence,source,notes
 081DBA54,Options_SetParametersFromScript,thumb,low,src-alias,Three-row options screen with secondary choice; shared widget resources; pulse palette and completion scripts.
 081DBB00,Options_GetSecondaryChoice,thumb,low,src-alias,Three-row options screen with secondary choice; shared widget resources; pulse palette and completion scripts.
 081DBB0C,Options_Create,thumb,medium,gcl-name,name from GCL key 96CD オプション (Options); registry callback
-081DBB4C,ScreenParams2E8_UpdateScreen,thumb,low,src-alias,
-081DBDC8,ScreenParams2E8_DestroyScreen,thumb,low,src-alias,Screen destruction callback clears display flags and removes its three animation objects
-081DBE04,ScreenParams2E8_InitScreen,thumb,low,src-alias,Initializes backgrounds and three animations using the scripted screen parameters
-081DBF98,ScreenParams2E8_SetFromScript,thumb,low,src-alias,
-081DBFEC,ScreenParams2E8_CreateScreen,thumb,low,src-alias,Allocates the screen task and installs its update and destruction callbacks
+081DBB4C,SolarCalibration_Update,thumb,low,src-alias,Solar calibration menu: alternating prompts; baseline capture; optional save header write; result message and fade state.
+081DBDC8,SolarCalibration_Destroy,thumb,low,src-alias,Solar calibration menu: alternating prompts; baseline capture; optional save header write; result message and fade state.
+081DBE04,SolarCalibration_Initialize,thumb,low,src-alias,Solar calibration menu: alternating prompts; baseline capture; optional save header write; result message and fade state.
+081DBF98,SolarCalibration_SetParametersFromScript,thumb,low,src-alias,Solar calibration menu: alternating prompts; baseline capture; optional save header write; result message and fade state.
+081DBFEC,SolarCalibration_Create,thumb,low,src-alias,Solar calibration menu: alternating prompts; baseline capture; optional save header write; result message and fade state.
 081DC02C,Menu_EraseRect,thumb,high,raphaelr,"(x, y, w, h) clear UI text area; must be called before overdrawing text"
 081DC054,Menu_DrawText,thumb,high,raphaelr,"(x, y, char *text) draw text in the UI"
 081DC154,Menu_DrawStringRef,thumb,low,src-alias,Resolves a script string reference plus an index and draws the resulting text
