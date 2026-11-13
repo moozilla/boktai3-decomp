@@ -14,7 +14,7 @@ struct Hud {
 void Hud_DrawHealthMeter(struct Hud *, s32, s32, s32, s32);
 void Hud_DrawEnergyMeter(struct Hud *, s32, s32, s32, s32, s32, s32);
 void Hud_DrawPlayerGauge(struct Hud *, s32, s32);
-void sub_08164864(struct Hud *, s32, s32, s32);
+void Hud_DrawWarningMeter(struct Hud *, s32, s32, s32);
 void Hud_UpdateTimedStatusIcon(struct Hud *);
 void Hud_UpdateTransientStatGauge(struct Hud *);
 void Hud_DrawStoredEnergyGauge(struct Hud *, s32);
@@ -28,7 +28,7 @@ void Hud_RefreshActivePanel(struct Hud *hud)
         Hud_DrawHealthMeter(hud, 0, 4, 1, one);
         Hud_DrawEnergyMeter(hud, 0, 4, 2, hud->panel->a, hud->panel->b, one);
         Hud_DrawPlayerGauge(hud, 3, 3);
-        sub_08164864(hud, 0, 9, 0x12);
+        Hud_DrawWarningMeter(hud, 0, 9, 0x12);
         Hud_UpdateTimedStatusIcon(hud);
         if (hud->mode == 0)
             Hud_UpdateTransientStatGauge(hud);
