@@ -1551,3 +1551,38 @@ it. The typed state-store partial is therefore the verified reduction.
 Next: reduce the first value's live interval without changing the pointer class
 or the second word test. This is the same initial availability-mask boundary as
 sub_08070910, with a complete exact allocation diagnosis here.
+
+### SceneActorRegistry_TestNearestPlayerBounds — vector and bounds allocation
+
+Tags: phase3, dp-scene1, SceneActorRegistry_TestNearestPlayerBounds, 0x08070C24
+
+Matching partial removes the category-field and first-path-offset pins. Category
+flags use the existing typed field; a local route view supplies the path/point
+layout offsets. Remaining seven pins and three barriers are unchanged. Source
+check: MATCH, 256 bytes. Using direct typed path/point reads additionally removes
+the second offset pin/barrier, but changes the signed x-load's zero scratch
+register from r2 to r1: two register-only differences, so that form was not landed.
+
+Saved fully pin-free goto-loop draft: 36 ROM / 38 draft differences, shape 24.
+The ordinary do-loop draft has 47/49, shape 34. Bounds spills rather than taking
+r8, nearest index takes a high register rather than its ROM stack slot, and the
+best-difference aggregate spills rather than occupying r6/r7. The origin pointer
+competes with the loop index, and player-slot allocation changes as well.
+
+The do-loop probe's GIV=135 improves to 36/36; GIV=233 gives 43/49. Neither is an
+exact diagnosis. An indexed gPlayers[index] loop generates the same 47/49 form.
+The goto loop improves the ordinary C shape, but allocation remains. why reports
+index priority 1500 versus left priority 1212; a playerSlot priority increase
+improves the goto draft to 33/35. FORCE=bestDifference:6 improves to 31/27 while
+introducing other differences. No complete exact knob combination was found.
+
+Bounds declaration order, direct input-parameter use, a pointer union, and a
+named subtraction helper all retain 36/38. For the close typed-path partial,
+removing current/player/limit pins adds differences; direct player loads, explicit
+sign extension of x, for and goto loops do not repair its scratch rotation.
+The existing path offset lifetime remains necessary for the verified partial.
+
+Next: restore the origin and saved-vector allocation before addressing the
+bounds check. The closest siblings are RetargetNearestPlayer and the actor
+proximity tests; the latter avoid the best-difference aggregate entirely, so
+their simple pointer loops do not settle this function's register pressure.
