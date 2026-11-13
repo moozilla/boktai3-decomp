@@ -6398,6 +6398,7 @@ addr,name,mode,confidence,source,notes
 08180858,ProximityVolume_ClearLatch,thumb,low,src-alias,
 08180860,ProximityVolume_SetPosition,thumb,low,src-alias,
 0818088C,ProximityVolume_SetParameter,thumb,low,src-alias,
+08180898,ArmorEffect_Stop,thumb,low,cleanup,Clears the particle update callback and invokes then clears its destructor; tentative effect identity.
 081808B4,SceneCombatActor_ResetAttackMode,thumb,low,src-alias,
 081809A8,SceneCombatActor_ResetDefenseMode,thumb,low,src-alias,
 08180A88,SceneParticle_UpdateBounce,thumb,low,src-alias,
