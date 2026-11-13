@@ -37,6 +37,7 @@ PORT_UNITS = {
     'port/game/m4a_seq.c': True, 'port/game/libgcc.c': True, 'port/ppu/ppu.c': False,
     'port/hw/bios.c': False, 'port/hw/bios_runtime.c': False, 'port/hw/cartridge.c': False,
     'port/hw/devices.c': False, 'port/hw/mixer.c': True, 'port/hw/psg.c': False,
+    'port/game/hooks.c': False,
 }
 # Port C functions standing in for ROM assembly without a symbol in the ELF
 # (MP2K jump-table targets, see port/game/m4a_seq.c). Thumb code words.
@@ -51,7 +52,11 @@ PORT_CODE = {
 }
 EXPORTS = ['port_trace_map', 'port_memory_init', 'port_load_rom', 'port_game_run', 'port_game_set_solar',
            'port_game_set_time', 'port_frame_count', 'port_game_save_stage', 'port_game_save_dirty',
-           'port_game_save_data', 'port_game_save_size']
+           'port_game_save_data', 'port_game_save_size',
+           # agent harness (port/agent/): hooks, calls into the game, C snippets
+           'port_hook_state', 'port_hook_flags', 'port_hook_ring', 'port_icall', 'port_code_known',
+           'port_bus_load_i8', 'port_bus_load_i16', 'port_bus_load_i32', 'port_bus_load_ptr',
+           'port_bus_store_i8', 'port_bus_store_i16', 'port_bus_store_i32', 'port_bus_store_ptr']
 
 
 def game_sources():
@@ -106,7 +111,10 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     headers = OUT / 'include'
     prepare_headers(ROOT, headers, 'wasm32')
-    flags = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-O2', '-funsigned-char', '-fno-strict-aliasing',
+    # Stage 1 emits unoptimized IR (-disable-llvm-passes keeps -O2's attributes):
+    # the hooks go in before inlining, so inlined copies keep them; stage 3 optimizes.
+    flags = ['--target=wasm32', '-ffreestanding', '-std=gnu89', '-O2', '-Xclang', '-disable-llvm-passes',
+             '-funsigned-char', '-fno-strict-aliasing',
              '-fwrapv', '-fno-builtin', '-Wno-everything', '-Iport/include', '-Iport/core',
              '-Iport/game', '-Iport/hw', '-I' + str(headers), '-iquote', '.',
              '-include', 'port/core/compat.h']
@@ -248,6 +256,8 @@ def main():
                 table.append((synthetic[key], symbol))
         if args.trace and name.startswith('src/'):
             text = add_trace(text, addresses)
+        if name.startswith('src/'):
+            text = add_hooks(text, addresses, owner, name)
         if args.watch and name.startswith('src/'):
             text = add_watch(text, set(args.watch.split(',')), addresses)
         text = text + ''.join(extra)
@@ -323,6 +333,56 @@ def main():
         print('imports:', ', '.join(imports))
         print(f'{OUT / "game.wasm"}: {(OUT / "game.wasm").stat().st_size // 1024} KiB')
     return r.returncode
+
+
+_HOOK_ARG = {'ptr': 'ptrtoint ptr {v} to i32', 'i8': 'zext i8 {v} to i32', 'i16': 'zext i16 {v} to i32',
+             'i1': 'zext i1 {v} to i32', 'i64': 'trunc i64 {v} to i32', 'float': 'bitcast float {v} to i32',
+             'double': 'fptosi double {v} to i32'}
+
+
+def add_hooks(text, addresses, owner, unit):
+    """port_hook_enter(address, r0..r3) at entry, port_hook_exit(address, r0)
+    before every return, in each function with a GBA address (port/game/hooks.c)."""
+    out = []
+    current = None
+    n = 0
+
+    def as_i32(kind, value):
+        nonlocal n
+        if kind == 'i32':
+            return value
+        if kind not in _HOOK_ARG:
+            return '0'
+        n += 1
+        out.append(f'  %__hook{n} = ' + _HOOK_ARG[kind].format(v=value))
+        return f'%__hook{n}'
+
+    for line in text.splitlines():
+        if line.startswith('define '):
+            out.append(line)
+            m = re.match(r'define [^@]*@([-\w.$]+)\((.*)\)[^(]*\{$', line)
+            current = None
+            if m and m[1] in addresses and owner.get(m[1]) == unit and ' internal ' not in line.split('@')[0] + ' ':
+                current = addresses[m[1]] & ~1
+                values = []
+                for param in (abi.split_top(m[2]) if m[2].strip() else []):
+                    words = param.split()
+                    if words and words[-1].startswith('%'):
+                        values.append(as_i32(words[0], words[-1]))
+                values = (values + ['0'] * 4)[:4]
+                out.append(f'  call void @port_hook_enter(i32 {current}, ' +
+                           ', '.join(f'i32 {v}' for v in values) + ')')
+            continue
+        if line == '}':
+            current = None
+        elif current is not None:
+            m = re.match(r'\s+ret (void|\S+) ?(.*)$', line)
+            if m:
+                value = '0' if m[1] == 'void' else as_i32(m[1], m[2].strip())
+                out.append(f'  call void @port_hook_exit(i32 {current}, i32 {value})')
+        out.append(line)
+    return ('\n'.join(out) + '\ndeclare void @port_hook_enter(i32, i32, i32, i32, i32)\n'
+            'declare void @port_hook_exit(i32, i32)\n')
 
 
 def add_watch(text, names, addresses):

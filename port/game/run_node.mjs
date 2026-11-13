@@ -92,6 +92,7 @@ const imports = { env: {
     return keys;
   },
   audio(ptr, frames, rate) { audioFrames += frames; },
+  hook() {}, // agent breakpoints (port/agent/); never armed here
   log(msg, value) { fs.writeSync(2, `[game] ${cstr(msg)} 0x${(value >>> 0).toString(16)}\n`); },
   fatal(msg, value) { fs.writeSync(2, `[fatal] ${cstr(msg)} 0x${(value >>> 0).toString(16)}\n`); },
 } };

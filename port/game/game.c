@@ -29,6 +29,7 @@ static int invoke(void *context, uint32_t address)
 void port_bus_frame_elapsed(void);
 void port_watchdog(const char *what, uint32_t value) { port_host_log(what, value); }
 
+void port_hook_frame(uint32_t frame);
 static void frame(void)
 {
     Hw *hw = port_devices_hardware();
@@ -38,6 +39,7 @@ static void frame(void)
         port_host_audio(hw->audio_buffer, (uint32_t)hw->audio_frames, hw->audio_rate);
         hw->audio_frames = 0;
     }
+    port_hook_frame(frames);
     uint32_t keys = port_host_frame(port_video_framebuffer(), frames++);
     hw_set_keys(port_devices_hardware(), (uint16_t)(keys & 0x3ff));
 }

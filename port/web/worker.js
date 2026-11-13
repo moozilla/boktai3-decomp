@@ -66,6 +66,7 @@ const imports = { env: {
     }
     Atomics.store(audioHead, 0, write);
   },
+  hook() {}, // agent breakpoints (port/agent/); never armed here
   log(msg, value) { postMessage({ type: 'log', text: `${cstr(msg)} 0x${(value >>> 0).toString(16)}` }); },
   fatal(msg, value) { postMessage({ type: 'fatal', text: `${cstr(msg)} 0x${(value >>> 0).toString(16)}` }); },
 } };

@@ -500,6 +500,14 @@ PORT_REGS_DECL = '@port_regs = external global [4 x i32]'
 LABEL_RE = re.compile(r'^[-\w.$]+:')
 
 
+def inline_functions(text):
+    """Internal functions marked inline: still calls in unoptimized IR, but
+    inlined in the ROM, so they leave r0..r3 alone as far as callers see."""
+    groups = {m[1] for m in re.finditer(r'^attributes (#\d+) = \{[^}]*\b(?:inlinehint|alwaysinline)\b', text, re.M)}
+    return {m[1] for m in re.finditer(r'^define internal [^@]*@([-\w.$]+)\(.*\)[^{]*?(#\d+)', text, re.M)
+            if m[2] in groups}
+
+
 def _clobbers(callee):
     return not (callee.startswith('@llvm.') or callee.startswith('@port_bus_'))
 
@@ -523,6 +531,7 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
     found_readers = set()
     unknown = []
     defs, decls, internals = scan_module(text)
+    inline = inline_functions(text)
     funcs = set(defs) | set(decls) | set(internals)
     values = {}
     for name in (value_refs(text, funcs) if game else ()):
@@ -607,7 +616,7 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
             out.append(sub_values(line, values) if values else line)
         else:
             out += [sub_values(x, values) if values else x for x in lines]
-        if _clobbers(callee):
+        if _clobbers(callee) and callee[1:] not in inline:
             state['calls'] += 1
             state['last'] = (call['dest'], call['ret']) if call['dest'] else (RESULT[0] if RESULT else None)
     result = '\n'.join(out) + '\n'
