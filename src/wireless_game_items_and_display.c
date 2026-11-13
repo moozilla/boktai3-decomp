@@ -960,7 +960,7 @@ void WirelessGameItems_DestroyItem(struct WirelessGameItems *a, struct WirelessG
 
 s32 SceneEffectQueue_QueueTypeZeroEffect(void);
 
-s32 sub_081998B0(void);
+s32 SceneEffectQueue_QueueTypeOneEffect(void);
 
 s32 SceneEffectQueue_QueueTypeTwoEffect(void);
 
@@ -973,7 +973,7 @@ void WirelessGameItems_PublishPendingEffects(struct WirelessGameItems *p)
             p->current[2]--;
     }
     if (p->current[1] != 0) {
-        if (sub_081998B0() != 0)
+        if (SceneEffectQueue_QueueTypeOneEffect() != 0)
             p->current[1]--;
     }
     if (p->current[3] != 0) {
