@@ -1045,13 +1045,13 @@ void Actor_BeginCurveToRest(void)
         if (g == 0)
             return;
     }
-    H(0xf8a) = Script_GetValue();
-    B(0xf77) = Script_GetKeywordValue(0x75, 0);
-    W(0xf50) = Script_GetKeywordValue(0x70, 0);
+    g->resource = Script_GetValue();
+    g->variant8 = Script_GetKeywordValue(0x75, 0);
+    g->handle = (void *)Script_GetKeywordValue(0x70, 0);
     Actor_ProjectAndClampToScreen(g);
     g->oldMode = g->mode;
     g->mode = three;
-    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 0xF) | 0x80;
+    g->phase = 8;
     if (g->oldMode == 3 && g->mode == 3) {
         g->savedFrame = g->anim.frame;
         g->savedTimer = g->anim.timer;
