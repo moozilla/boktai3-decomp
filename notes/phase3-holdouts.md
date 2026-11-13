@@ -1348,6 +1348,16 @@ Next: produce the r2 conflict without forcing the late zero store to retain the
 shared destination, perhaps by separating its caller value from the store helper's
 argument class. The knob proves the sole remaining decision on the saved draft.
 
+Presentation follow-up: independent pin removal still fails for all three sites.
+Sharing the destination with the initial -30 store gives 11/16 differences;
+sharing it with the late zero store and expressing the address through x plus
+one element retains 2/4. A local target copy followed by clearing the shared
+pointer gives 12/14. Clearing the pointer after the late store, directly or
+through the inline setter, still gives 2/4; clearing it after the three moving
+stores leaves 6/6. These do not change the saved best draft or the diagnosis:
+the late zero's r2 conflict gives the right earlier allocation but ties its own
+address to r3, preventing reuse of the x address in r0.
+
 ### RisingActor_AdvanceHeight (src/fn/sub_081FDAF4.c, 081FDAF4): partial
 
 Tags: #matching #phase3 #presentation #081FDAF4
