@@ -1282,3 +1282,37 @@ Tool improvement discovered here: scope hoist suggestions used header line numbe
 as caller line numbers, crashing or editing unrelated caller statements. uid_locations
 now retains filenames, and hoist filters locations to the caller with bounds checks.
 Three regression tests cover this; both required test suites pass.
+
+### SpriteEffectController_QueueColliders (src/fn/sub_0806A60C.c, 0806A60C): deferred
+
+Tags: #matching #phase3 #effects #0806A60C
+
+Draft: `notes/phase3-drafts/dp-effects-b/SpriteEffectController_QueueColliders.c`,
+22 ROM / 18 draft instructions, 128 against 136 bytes. Six pins and three barriers
+remain in the matched source; none removed for free, alone or in the tested groups.
+Store: `build/matchsearch/SpriteEffectController_QueueColliders`; working evidence in
+`build/cx/work/SpriteEffectController_QueueColliders/`.
+
+The ROM reserves r7 for zero/mask/stride, first in sb, scheduled in r8, pool in r6,
+index in r5, readDelay in r3 and writeDelay in r4. Without the constraints, temporary
+is local, first gets r7, and cse initializes the second delay pointer by copying
+the first instead of recomputing pool+151. The flags load is tied to the OR output
+by regmove at insn 112: `AGBCC_NOTIE=112` confirms the tie (21/17), but does not retain
+the ROM's separate r7-to-r0 mask copy. Read regmove.c's matching-operand checks.
+`AGBCC_FORCE=first:9,readDelay:3,writeDelay:4,temporary:7` does not repair lifetimes
+and displaces pool/index (30/24); no complete matching knob was found.
+
+Fresh source with a QueueCollider inline returning the count gives 36/24 and removes
+more of the ROM's separate addresses. Direct field OR, a DelayAddress inline for one
+initial pointer, union/struct word temporaries, and an initialization label leave
+22/18. A halfword-array temporary initializer retains the separate zero and moves
+first to sb, but hoists the 0x100 mask to r8, displaces scheduled and gives 30/28.
+A union mask initializer blocks that hoist but returns to 22/18. Halfword and word
+union flag reads with the original remaining constraints give 11/18 and 6/6; neither
+removes the flag pin exactly. A label variant that skipped initialization warned of
+an uninitialized value and was rejected. No source changes landed.
+
+Next idea: recover the original helper's count/temporary return boundary. The hard
+r0 one-pin influences allocation outside its lexical block; a returning inline may
+produce the needed hard-return-register liveness without any pin, unlike the simple
+QueueCollider helper tried so far. Preserve the observed first-slot flags test.
