@@ -1433,3 +1433,38 @@ Resetting first or second changes stores, allocation and rotation, not a match.
 Store: `build/matchsearch/HomingProjectile_UpdateDefaultState`, shared-component.
 Next: find an existing short-lived pointer use with an r5 conflict to share with
 FaceFinal's saved flip address, without the call-crossing vector lifetimes.
+
+### SpiralBurst_InitParticles (08234540): deferred
+
+Tags: #matching #phase3 #effects #08234540
+
+Both table pins remain; no partial matched. Main pin-free draft in
+`notes/phase3-drafts/dp-effects-b/SpiralBurst_InitParticles.c` moves the loop table
+assignment into the loop: 25 ROM/23 draft instructions, shape 2, 424 versus 428
+bytes. The `.priority.c` companion preserves the decisive diagnosis: direct
+initial table capture, 48/44, and `AGBCC_PRI=randomTable:+3600` gives MATCH.
+`AGBCC_FORCE=table:5,randomTable:6` also matches that companion.
+
+Initial work.samples alias causes an unnecessary stack store when unpinned;
+direct table capture removes it. Loop randomTable has 11 refs, live length 146
+doubled to 292 by REG_EQUIV, priority 1130. Burst priority is 3878, sprite 4689,
+frame 11986. +2000 does not cross burst; +2800 fixes burst but swaps sprite and
+table (15/15); +3600 crosses sprite and matches. Read local-alloc.c's REG_EQUAL
+promotion and constant-register priority halving.
+
+A sample capture macro raises table refs to 16 (loop weighting x3), but constant
+equivalence still halves its priority to 2176. Direct/read-sample shared helpers
+change mask allocation to r6, shortening code to 416 bytes. Scalar union capture,
+end reset, source reset, literal address, capture blocks and typed sprite cursor
+do not produce the priority. Halfword-built table avoids some allocation issues
+but adds initialization instructions (26/36 with captured draws). Narrow mask
+changes mask lifetime and gives 41/35. Sprite initializer helper gives 51/47;
+whole-loop helper gives 57/49. Array indexing leaves the baseline unchanged.
+
+Retaining randomTable's r6 pin while removing the initial pin coalesces table
+into r6 too early (4/2); source resets and capture blocks do not preserve the
+ROM's r5-to-r6 copy. No verified partial was found. Store:
+`build/matchsearch/SpiralBurst_InitParticles`, table-priority and loop-table nodes.
+Next: prevent the loop table's constant-equivalence discount while retaining
+the mask parameter boundary and the initial table copy, or separate sprite/burst
+lifetimes enough to give the table the required allocation order.
