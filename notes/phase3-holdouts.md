@@ -1366,3 +1366,26 @@ address still use input r0 rather than copied slot r1. Retaining the original
 location pin or index-offset pin does not fix those three differences.
 Next: an inline wrapper boundary that gives the first slot copy a distinct
 lifetime while preserving the early-return label before the timer load.
+
+### sub_080697C8 / BouncingObject_SpawnFromScript (080697C8)
+
+Tags: phase3, dp-field-b, sub_080697C8
+
+Partial: inline vector-clear helper taking destination then source removes
+the CpuSet destination pin and barrier; unit MATCH. The argument boundary
+puts the destination copy ahead of the control constant.
+
+Pin-free draft now 10 ROM / 8 draft (shape 14). The category b gets r8
+before the position pointer, whereas ROM puts position in r8 and b in r9.
+Raising pseudo 130 priority by two on the baseline reverses this allocation
+and improves 11/9 to 7/5. The missing optional-category path reloads zero
+into r0 and cross-jumps with the value path; AGBCC_SPILL=2:1 restores its r1
+reload and improves baseline to 8/8. No combined matching knob yet tested.
+
+Union initialization for the initial category or its missing-value arm does
+not change allocation. A goto at the velocity join also changes nothing.
+Using Script_GetPc's result as b adds differences. The clear helper removes
+one independent instruction-order difference.
+Next: duplicate the next keyword test in the category arms to separate the
+zero reload from the value path before jump2; inspect b's first-set lifetime
+versus the position pointer to reverse their nearly tied allocation order.
