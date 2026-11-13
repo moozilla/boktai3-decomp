@@ -79,8 +79,8 @@ static inline void LinkReady_ClearReady(struct LinkReadyState *p)
 static inline u16 LinkReady_AdvanceTimer(u16 *timer)
 {
     ++*timer;
-    /* Temporary: preserves the ROM's GCSE expression-table and spill order. */
     asm("" : : "m"(*timer));
+    /* Temporary: preserves the ROM's GCSE expression-table and spill order. */
     return *timer;
 }
 s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
@@ -93,8 +93,9 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
         p->timer = 0;
         p->requested = 0;
         {
-            register struct LinkReadyState *initState asm("r4") = p;
-            initState->countdown = 40;
+            struct LinkReadyState *state = p;
+            struct LinkReadyState **initial = &state;
+            (*initial)->countdown = 40;
         }
         if (gLinkSession)
             ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 0;
