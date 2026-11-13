@@ -1449,6 +1449,19 @@ Store: `build/matchsearch/sub_081FDCB0`, distance-boundary. Next: preserve the
 inline distance-return join that prevents CSE following, while eliminating its
 boolean materialization; keep the source reset when recovering original load order.
 
+Homing-trail follow-up: a single-iteration guard loop restores all missing
+memory reloads without materializing the predicate, but frontend loop rotation
+moves the second half of the distance test to the function tail: 16/16, same
+272-byte extent, shape 28. Replacing breaks with gotos loses the reload boundary
+again (36/30); an early retirement return changes layout more (23/25). The
+negated near predicate gives 5/9 against the saved far predicate's 4/8. Initializing
+a velocity struct or union retains extra stack stores and gives 26/30; removing
+the initializer returns to 36/30. Union age access and clearing dx/dz do not
+recover the reloads; reusing dx/dz for steering arguments gives 38/36. A fresh
+probe of the plain guard form found no single CSE/PRE knob that changes the count.
+Next: preserve the guard loop's CSE boundary while stopping rotation at the right
+point, or remove boolean materialization from the existing inline predicate.
+
 ### HomingProjectile_UpdateDefaultState (081FF454): resolved
 
 Tags: #matching #phase3 #presentation #081FF454
