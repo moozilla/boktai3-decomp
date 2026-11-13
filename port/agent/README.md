@@ -106,10 +106,12 @@ worker. Below the game, the Studio panel has a Console (the same JavaScript,
 at 60 fps; scripts that yield run alongside play), Watch (expressions updated
 every 10 frames), Tasks, and Inspect (outlines of projected sprites named by
 their owner task and of every OAM entry; click for the struct, Shift+click to
-move the player to the ground under the cursor). Subtitles draw the English
-line of the string the message window shows over the game's own text box,
+move the player to the ground under the cursor). Subtitles show the English
+line of the string the message window shows, beside the game's own text box,
 using the fan translation beside the checkout (`../boktai3trans`, as the
-studio does). From DevTools or a browser-driving agent: `await game.js('where()')`.
+studio does); the worker hooks `Text_LookupString` and posts the id when
+`MessageWindow_GetStringAtOffset` returns, so menus don't trigger them. Their
+style, the keybinds and the display options live in `port/web/ui.js`. From DevTools or a browser-driving agent: `await game.js('where()')`.
 
 ## C snippets
 

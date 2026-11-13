@@ -209,7 +209,13 @@ function setSubtitles(on) {
   studio.subtitles = on;
   if (!on) return;
   const has = (n) => n in g.types.functions;
-  if (has('Text_LookupString')) studio.subtitleHooks.push(g.on('Text_LookupString', (a) => postMessage({ type: 'text', id: a[0], frame: g.frameNo })));
+  // Menus look strings up too; only the ones the message window fetches a page from are dialogue.
+  let last = null;
+  if (has('Text_LookupString')) studio.subtitleHooks.push(g.on('Text_LookupString', (a) => { last = a[0]; }));
+  if (has('MessageWindow_GetStringAtOffset')) studio.subtitleHooks.push(g.on('MessageWindow_GetStringAtOffset', () => {
+    if (last !== null) postMessage({ type: 'text', id: last, frame: g.frameNo });
+    last = null;
+  }, { exit: true }));
   if (has('MessageWindow_Clear')) studio.subtitleHooks.push(g.on('MessageWindow_Clear', () => postMessage({ type: 'text-clear', frame: g.frameNo })));
   if (has('MessageWindow_SetBounds')) studio.subtitleHooks.push(g.on('MessageWindow_SetBounds', (a) => postMessage({ type: 'text-bounds', bounds: a.map((x) => x | 0) })));
 }
