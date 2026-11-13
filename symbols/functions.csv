@@ -8499,26 +8499,30 @@ addr,name,mode,confidence,source,notes
 081DEE38,DateMenu_Initialize,thumb,low,src-alias,
 081DF06C,DateMenu_SetParametersFromScript,thumb,low,src-alias,Reads three script options into the date menu configuration block
 081DF0AC,DateMenu_Create,thumb,low,src-alias,Creates the date and time editing task whose confirmation updates the clock
-081DF0EC,AnimPanel_SaveSelections,thumb,low,src-alias,
-081DF124,AnimPanel_LoadSelections,thumb,low,src-alias,
-081DF160,AnimPanel_ResetSelections,thumb,low,src-alias,
-081DF1A0,AnimPanel_JoinTextRows,thumb,low,src-alias,
-081DF32C,Password_MoveCursorUp,thumb,low,src-alias,Moves the password keyboard selection upward with wrapping and cursor feedback
-081DF510,Password_MoveCursorDown,thumb,low,src-alias,
-081DF694,Password_MoveCursorLeft,thumb,low,src-alias,Moves the password keyboard selection left with special edge wrapping
-081DF878,Password_MoveCursorRight,thumb,low,src-alias,
-081DFA50,Password_BuildLabels,thumb,low,src-alias,
-081DFC1C,AnimPanel_AppendSelection,thumb,low,src-alias,
-081DFC60,AnimPanel_EraseSelection,thumb,low,src-alias,
-081DFCB4,Password_UpdateEntryMenu,thumb,low,src-alias,
-081E00E8,Password_DestroyEntryMenu,thumb,low,src-alias,Destruction callback clears display flags and removes six password entry animations
-081E013C,Password_InitializeEntryMenu,thumb,low,src-alias,
-081E03F4,ScreenParams358_SetFromScript,thumb,low,src-alias,
-081E0474,Password_CreateEntryMenu,thumb,low,src-alias,Creates the password keyboard task and installs its lifecycle callbacks
-081E04B4,StartPrompt_Update,thumb,low,src-alias,
-081E0560,ScriptMessage_Destroy,thumb,low,src-alias,Destruction callback removes the message task animation
-081E078C,ScriptMessage_SetFromScript,thumb,low,src-alias,
-081E07D8,ScriptMessage_Create,thumb,low,src-alias,Creates the task configured by ScriptMessage_SetFromScript
+081DF0EC,PasswordMenu_SaveSelections,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DF124,PasswordMenu_LoadSelections,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DF160,PasswordMenu_ResetSelections,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DF1A0,PasswordMenu_JoinTextRows,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DF1D8,PasswordMenu_UpdateKeyboardCursor,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DF32C,PasswordMenu_MoveCursorUp,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DF510,PasswordMenu_MoveCursorDown,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DF694,PasswordMenu_MoveCursorLeft,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DF878,PasswordMenu_MoveCursorRight,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DFA50,PasswordMenu_BuildLabels,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DFB18,PasswordMenu_RedrawSelection,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DFB9C,PasswordMenu_UpdateEntryCursor,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DFC1C,PasswordMenu_AppendSelection,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DFC60,PasswordMenu_EraseSelection,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081DFCB4,PasswordMenu_Update,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081E00E8,PasswordMenu_Destroy,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081E013C,PasswordMenu_Initialize,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081E03F4,PasswordMenu_SetParametersFromScript,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081E0474,PasswordMenu_Create,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081E04B4,PasswordDisplay_Update,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081E0560,PasswordDisplay_Destroy,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081E056C,PasswordDisplay_Initialize,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081E078C,PasswordDisplay_SetParametersFromScript,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
+081E07D8,PasswordDisplay_Create,thumb,low,src-alias,Password entry or encoded-password display task; widgets; four text rows; saved selections; repeat timing and script callbacks.
 081E0818,ScriptPrompt_ResetDisplay,thumb,low,src-alias,
 081E092C,ScriptPrompt_DrawFooterText,thumb,low,src-alias,Clears the footer rectangle and draws string ten from the configured text group
 081E095C,ScriptPrompt_UpdateSelection,thumb,low,src-alias,Script confirmation prompt with player name; optional description; accept/cancel selection and three widgets.
