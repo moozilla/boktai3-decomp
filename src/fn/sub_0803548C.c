@@ -1,5 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+struct UniPeerPacket {
+    u8 sequence, pad1;
+    u16 flags;
+};
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -13,10 +16,14 @@ struct Engine {
     u8 flag42, flag43;
     u32 ticks;
     void *pointer;
-    u8 pad4c[0x58];
+    u8 pad4c[0x34];
+    struct UniPeerPacket peers[4];
+    u8 pad90[0x14];
     u32 number;
     u8 work[16];
-    u8 padb8[0x34];
+    u8 padb8[0x18];
+    u8 lastSequence[4], repeats[4], behind[4], ahead[4], pade0[4];
+    u8 sendStalls, receiveStalls, received, sent, pade8[4];
     u16 flags, backup, history[5];
     u8 changed, padfb[5];
     u16 diff[5];
@@ -38,133 +45,37 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-void Wireless_ReceiveParentUniPackets(struct Engine *argument)
+void Wireless_ReceiveParentUniPackets(struct Engine *p)
 {
-    struct Engine *p = argument;
     u8 *scratch = p->scratch;
     int i;
-    u8 *packet;
-    register u8 *seen asm("r8");
+    struct UniPeerPacket *packet;
     p->flag3e = 0;
     i = 0;
-    packet = (u8 *)p + 0x80;
+    packet = p->peers;
     do {
         int offset = i << 2;
         int bit = 2 << i;
-        int test;
-        u8 *initialSeen;
-        {
-            u8 *read = scratch;
-            test = read[2] & bit;
-        }
-        {
-            register int offset asm("r3") = 0xE6;
-            asm("" : "+r"(offset));
-            initialSeen = (u8 *)(offset + (u32)p);
-        }
-        seen = initialSeen;
-        if (test) {
-            {
-                struct RfuSlotStatusUNI **entry =
-                    (struct RfuSlotStatusUNI **)(offset + (u32)gRfuSlotStatusUNI);
-                if ((*entry)->recv.newDataFlag) {
-                    u8 *previous;
-                    int old;
-                    int incoming;
-                    int next;
-                    register int zero asm("r9");
-                    bit |= *initialSeen;
-                    zero = 0;
-                    *initialSeen = bit;
-                    rfu_UNI_clearRecvNewDataFlag(i);
-                    {
-                        register u8 *initial asm("r1") = (u8 *)p + 0xD0;
-                        old = initial[i];
-                        next = (u8)(old + 1);
-                        incoming = packet[0];
-                        previous = initial;
-                    }
-                    if (next != incoming) {
-                        {
-                            int previousValue = old;
-                            asm("" : "+r"(previousValue));
-                            if (previousValue == incoming) {
-                                {
-                                    u8 *counter = (u8 *)p + 0xD4;
-                                    counter += i;
-                                    (*counter)++;
-                                }
-                                {
-                                    register int value asm("r2") = zero;
-                                    *(u16 *)(packet + 2) = value;
-                                }
-                            } else if ((u32)previousValue < (u32)incoming) {
-                                {
-                                    u8 *counter = (u8 *)p + 0xDC;
-                                    counter += i;
-                                    (*counter)++;
-                                }
-                                {
-                                    register int value asm("r3") = zero;
-                                    *(u16 *)(packet + 2) = value;
-                                }
-                            } else {
-                                {
-                                    u8 *counter = (u8 *)p + 0xD8;
-                                    counter += i;
-                                    (*counter)++;
-                                }
-                            }
-                        }
-                    }
-                    previous[i] = *packet;
-                }
+        if ((scratch[2] & bit) &&
+            (*(struct RfuSlotStatusUNI **)((u8 *)gRfuSlotStatusUNI + offset))->recv.newDataFlag) {
+            p->received |= bit;
+            rfu_UNI_clearRecvNewDataFlag(i);
+            if ((u8)(p->lastSequence[i] + 1) != packet->sequence) {
+                if (p->lastSequence[i] == packet->sequence) {
+                    p->repeats[i]++;
+                    packet->flags = 0;
+                } else if (p->lastSequence[i] < packet->sequence) {
+                    p->ahead[i]++;
+                    packet->flags = 0;
+                } else
+                    p->behind[i]++;
             }
+            p->lastSequence[i] = packet->sequence;
         }
-        packet += 4;
+        packet++;
     } while (++i <= 3);
-    {
-        int got = *seen;
-        int expected;
-        register int saved asm("r3");
-        register int matched asm("r2");
-        u8 *sent;
-        {
-            u8 *read = scratch;
-            expected = read[2];
-        }
-        saved = expected;
-        matched = saved;
-        matched &= got;
-        got = expected;
-        sent = (u8 *)p + 0xE7;
-        if (matched == got) {
-            saved &= *sent;
-            if (saved == matched)
-                goto checkSent;
-            {
-                u8 *counter = (u8 *)p + 0xE4;
-                (*counter)++;
-            }
-        }
-        {
-            u8 *read;
-            int value = *sent;
-            read = scratch;
-            got = read[2];
-            value &= got;
-            if (value != got)
-                return;
-        }
-    checkSent: {
-        register u8 *read asm("r2") = seen;
-        int value;
-        value = *read;
-        value &= got;
-        if (value != got) {
-            u8 *counter = (u8 *)p + 0xE5;
-            (*counter)++;
-        }
-    }
-    }
+    if ((p->received & scratch[2]) == scratch[2] && (p->sent & scratch[2]) != scratch[2])
+        p->sendStalls++;
+    if ((p->sent & scratch[2]) == scratch[2] && (p->received & scratch[2]) != scratch[2])
+        p->receiveStalls++;
 }
