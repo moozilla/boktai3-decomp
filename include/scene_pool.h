@@ -44,7 +44,9 @@ struct ScenePoolActor {
     u32 kind;
     u32 boundsFlags;
     struct ScenePoolVec32 position;
-    u8 unknown20[0x18];
+    u8 unknown20[8];
+    s32 motionDisplacement; /* +0x28: tween coordinate correction */
+    u8 unknown2c[0xc];
     s32 restrictionMetric;
     u8 unknown3c[0xc];
     u8 bodyAnimation, faceAnimation, accessoryAnimation, paletteState, paletteMode;
