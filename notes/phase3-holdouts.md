@@ -1377,3 +1377,24 @@ direct per-arm x stores did not restore the allocation. Probe's five canonical
 choices, two jump follows and one PRE replacement do not change the count.
 Next: keep sine out of the constant equivalence class or alter the first
 Truncate result's allocation without changing its shared stores.
+
+### SceneSteeringActor_DestroySlot — dimension preferences and zero reloads
+
+Tags: phase3, dp-scene1, SceneSteeringActor_DestroySlot, 0x0806C708
+
+Saved typed no-concession draft has 20 ROM / 22 draft differences, 172 versus
+168 bytes, shape four. All raw field offsets have typed counterparts. Forcing
+field:1,result#1:2 fixes the complete dimension front half and the extra copy,
+leaving 12 register/order differences in the tail (same 168 bytes).
+
+The shared field pointer is global (four refs/live four, priority 20000), with
+no conflicts, but preference chooses r0 instead of incoming r1. Separate field
+variables, direct inline dimension bodies, pointer advancement, narrow helper
+return and an entry helper did not produce the preferred allocation. Taking the
+first field address at entry changes instruction order. Probe found no helpful
+CSE choice. The tail naturally keeps a zero in r8, but rematerializes the halfword
+store zero through a different reload rotation and orders the two zero loads
+differently. Byte zero does not change that. Spill 1:2,3:1,6:2 reduces the unforced
+draft to 14 differences, without fixing the front. Removing whole front or tail
+concession groups did not yield a partial match. Next: induce field's incoming-r1
+preference in C, then separate the two zero equivalence classes at frame reset.
