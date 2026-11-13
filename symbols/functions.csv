@@ -3041,9 +3041,12 @@ addr,name,mode,confidence,source,notes
 0808E570,Slime_StartWalkChoice,thumb,low,src-alias,
 0808E660,Slime_RollMoveFlag,thumb,low,src-alias,Clears the prepared flag then randomly sets bit 0x10 or 0x20 in the 2D6 flags
 0808E6E4,Slime_StartRandomWait,thumb,low,src-alias,
+0808E780,Slime_UpdateReturnToIdle,thumb,low,src-alias,Plays transition profile 18 then returns to idle.
 0808E838,Slime_UpdateRandomWait,thumb,low,src-alias,
 0808E9A0,Slime_PlayWaitAnimation,thumb,low,src-alias,Plays profile animation 15 then enters the wait-timer control; tentative
 0808EACC,Slime_TickWaitTimer,thumb,low,src-alias,
+0808EB98,Slime_UpdateWalkTransition,thumb,low,src-alias,Plays profile 14 then chooses roll or walk control.
+0808EC7C,Slime_OnUnusedControlEvent,thumb,low,src-alias,Empty callback adjacent to the movement controls; exact event role tentative.
 0808EC80,Slime_ConvergeReactionMotion,thumb,low,src-alias,
 0808EF58,Slime_UpdateShake,thumb,low,src-alias,
 0808F03C,Slime_UpdateLaunch,thumb,low,src-alias,"Sets a heading-based launch velocity and plays sound 0x3C1, then enters Slime_UpdateStill when flag 0x10 sets; tentative"
@@ -3057,6 +3060,7 @@ addr,name,mode,confidence,source,notes
 0808F830,Slime_SetPrimaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x284 during initialization; table role is tentative
 0808F840,Slime_InitColliders,thumb,low,src-alias,Initializes body and attack collision volumes with their respective callbacks
 0808F8C8,Slime_ResetIdlePlayback,thumb,low,src-alias,
+0808F9E4,Slime_OnUnusedEvent,thumb,low,src-alias,Empty callback adjacent to the behavior initialization; exact event role tentative.
 0808F9E8,Slime_InitProfile,thumb,low,src-alias,Finds or adds profile 0x16 and stores its handle
 0808FA04,Slime_GetAnimationMovePulse,thumb,low,src-alias,
 0808FA40,Slime_SelectWanderTarget,thumb,low,src-alias,
