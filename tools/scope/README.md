@@ -2162,3 +2162,14 @@ which is exactly `10:1`. Not tested.
   name; now they fall back to the only function in the dump), and a trailing
   FUNC argument to `life` was read as a variable name; a `sub_ADDR` name that
   the CSV has since renamed raised a KeyError.
+
+
+171. **Caller saving has a strict reference threshold; a repeated branch tail can cross it.**
+   In ParticleGroup_UpdateBouncing, a resource pointer with eight weighted references
+   crosses two calls. `CALLER_SAVE_PROFITABLE(REFS, CALLS)` is `4 * CALLS < REFS`, so
+   it cannot use caller-saved r3 and instead takes r8. Splitting the presentation
+   fallback into its two paths, repeating the resource-reading tail, and jumping to
+   one existing join label gives ten references. Allocation can then use r3, and
+   jump2 shares the repeated tails back into the ROM instructions. This removed
+   the resource barrier. A priority-only explanation misses this eligibility gate;
+   inspect both reference count and calls crossed before trying allocation order.
