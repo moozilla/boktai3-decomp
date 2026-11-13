@@ -44,11 +44,11 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
             u32 mode;
             if (i == 0) {
                 mode = 2;
-                asm("" : "+r"(mode));
+                sprite->renderMode = mode;
             } else {
                 mode = one;
+                sprite->renderMode = mode;
             }
-            sprite->renderMode = mode;
         }
         sprite->position = owner->position;
         animated->phase = i << 5;
