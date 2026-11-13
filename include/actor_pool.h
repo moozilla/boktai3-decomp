@@ -2,6 +2,8 @@
 #define GUARD_ACTOR_POOL_H
 
 #include "engine.h"
+#include "scene_body_api.h"
+#include "scene_facing.h"
 #include "player.h"
 #include "scene_actor_components.h"
 #include "contact_collider.h"
@@ -56,5 +58,26 @@ int ActorPool_DestroyCallback(struct ActorPoolManager *);
 int ActorPool_InitManager(struct ActorPoolManager *);
 struct ActorPoolManager *ActorPool_CreateManager(void);
 struct PooledActor *ActorPool_AllocObject(int);
+
+void Actor_RequestRemoval(struct PooledActor *);
+void Actor_InitEntity(struct PooledActor *, u32, u8, const struct ContactPosition *);
+void Actor_SetFacingAngle(struct PooledActor *, int);
+void Actor_SetLifecycleCallbacks(struct PooledActor *, void (*)(void *), void (*)(void *));
+void Actor_SetHealthLimits(struct PooledActor *, u32, u32);
+void Actor_SetHealth(struct PooledActor *, int);
+void Actor_SubtractHealth(struct PooledActor *, s32);
+void Actor_CapturePendingHit(struct PooledActor *, struct ContactCollider *,
+                             struct ContactCollider *);
+void Actor_ClearPendingHit(struct PooledActor *);
+void Actor_InitHitSensor(struct PooledActor *, void *, void *, void *);
+void Actor_InitBodyCollider(struct PooledActor *, void *, void *, void *);
+struct SceneActorBody *Actor_GetPartyTarget(u32);
+int Actor_FindTargetInFacingArc(struct PooledActor *);
+void Actor_RefreshTarget(struct PooledActor *);
+void Actor_UpdateSelectedTarget(struct PooledActor *);
+void Actor_StepFacingAngle(struct PooledActor *);
+void Actor_SetActionParameters(struct PooledActor *, u32, s32, u32 *);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
+void Collider_SetBodyProperties(void *, u32, u32, u32);
 
 #endif

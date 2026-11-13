@@ -1013,6 +1013,7 @@ addr,name,mode,confidence,source,notes
 0802CB94,Actor_RefreshTarget,thumb,low,src-alias,Updates target angle delta and distance or clears the target when invalid or out of range
 0802CC4C,Actor_UpdateSelectedTarget,thumb,low,src-alias,Refreshes or acquires a target only for the manager-selected actor slot
 0802CC94,Actor_StepFacingAngle,thumb,low,src-alias,Adjusts facing by at most four angle units using the stored target delta
+0802CCE0,Actor_SetActionParameters,thumb,low,src-alias,Sets the pooled actor action selector and copies its parameter words
 0802CD04,Actor_InitControllerFromScript,thumb,low,src-alias,Initializes actor identity position health targeting parameters and controller defaults from script keywords
 0802CF10,Actor_UpdateDrawable,thumb,low,src-alias,Refreshes target direction and drawable position then advances enabled animation playback
 0802CF40,Actor_PrepareStateUpdate,thumb,low,src-alias,Empty preparation hook called before state dispatch; purpose tentative
