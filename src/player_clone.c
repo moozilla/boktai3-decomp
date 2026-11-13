@@ -199,8 +199,10 @@ static inline void Clone_MaskColliderFlags(u32 mask, struct ContactCollider *col
 s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
 {
     struct PlayerCloneConfiguration *params = &clone->configuration;
-    vu32 zero;
-    u8 particleMotion[0x18];
+    struct {
+        u32 fillWord;
+        u8 particleMotion[0x18];
+    } work;
     struct ContactPosition offset;
     struct ContactPosition delta;
     struct ContactPosition particlePosition;
@@ -226,8 +228,8 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 clone->flags &= ~1;
                 {
                     void *destination = &clone->velocity;
-                    zero = 0;
-                    Clone_ClearVector((void *)(&zero), destination, 0x05000002);
+                    work.fillWord = 0;
+                    Clone_ClearVector((void *)(&work.fillWord), destination, 0x05000002);
                 }
             }
             break;
@@ -332,8 +334,8 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                     Clone_SubtractVectors(&delta, Ratatosk_GetPosition(),
                                           &clone->animation.position);
                     if (r == 0) {
-                        zero = r;
-                        Clone_ClearVector((void *)(&zero), &delta, 0x05000002);
+                        work.fillWord = r;
+                        Clone_ClearVector((void *)(&work.fillWord), &delta, 0x05000002);
                     } else {
                         delta.x = Div(delta.x * r, 0x20);
                         delta.y = 0;
@@ -341,9 +343,9 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                     }
                     Clone_AddVectors(&particlePosition, &delta, &clone->animation.position);
                     particlePosition.y += 0x60;
-                    SlotMotion_Initialize(particleMotion);
-                    Ratatosk_ConfigureParticle(particleMotion, 10, 0, 0, 0, 0);
-                    SceneParticles_SpawnAtPosition(particleMotion, &particlePosition);
+                    SlotMotion_Initialize(work.particleMotion);
+                    Ratatosk_ConfigureParticle(work.particleMotion, 10, 0, 0, 0, 0);
+                    SceneParticles_SpawnAtPosition(work.particleMotion, &particlePosition);
                     clone->particleCount--;
                 }
             }

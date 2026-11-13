@@ -211,7 +211,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SPRITE_EFFECT_STEERING_ACTORS.md](../docs/SPRITE_EFFECT_STEERING_ACTORS.md) | Sprite/effect controllers and steering actors (0806B2C4–0806CA3C) | *#actors #assets* | 13 |
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
-| [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 4 |
+| [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 5 |
 | [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 14 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
@@ -405,6 +405,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/phase3-holdouts.md](../notes/phase3-holdouts.md) | Phase 3 holdouts | #matching #phase3 #holdouts | 87 |
 | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
 | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
+| [notes/player-clone-fill_2026-11-13.md](../notes/player-clone-fill_2026-11-13.md) | Player clone fill-local cleanup | #matching #actors #animation | 2 |
 | [notes/player-cue-cleanup_2026-10-30.md](../notes/player-cue-cleanup_2026-10-30.md) | Player cue cleanup — 2026-10-30 | #matching #player #cue #structs #compiler #data #studio | 12 |
 | [notes/player_3.md](../notes/player_3.md) | Player 3 unit consolidation | #player #matching #types | 7 |
 | [notes/projected-display_2026-10-14.md](../notes/projected-display_2026-10-14.md) | Five-entry projected display, 08045A20–08045D18 | *#animation #assets* | 4 |
