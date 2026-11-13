@@ -1533,3 +1533,29 @@ attempts remain applicable; they were not repeated wholesale.
 Persistent search records the exit-tail hypotheses. Next: a C form that keeps
 mapSlot live through the south load but dies before its exit, or two naturally
 duplicated reload sites that cancel after tail merging. No partial landed.
+
+### Skeleton_UpdateDefeat (080BD1F0): global register reservation
+
+Three pins remain: priority one in each burst, and the second burst's table.
+Their isolated removals cost 101/97, 83/77, and 28/28 respectively; all removed
+is 178/168, shape 96. Saved that ordinary draft. No partial landed.
+
+The encoded table removes the source-level pin but still gives 28/28. The
+main effect is not the table expression: PRE's shared actor+0x5c origin
+(pseudo 3169) takes sl when the pin stops reserving it. The frame shrinks
+0x9c to 0x98 and both burst paths use the register instead of sp+0x98.
+PRE replacements 3 and 4 share that insertion across script branches.
+AGBCC_NOREG=3169 is not exact (34/34), since other allocation changes follow.
+This distinguishes the global reservation problem from Bat's equivalence.
+
+The shared burst helper was tried separately in each burst and in both,
+using the real spark declaration: 70/74, 40/48, and 84/94 while retaining the
+table pin. Fully ordinary shared-helper form is 133/137, shape 110, retained
+in the workspace as a different structural candidate. An initialized encoded
+priority value does not recover the two saved constants (171/161 with table
+pin retained). Persistent search retains these alternatives.
+
+Next: an ordinary global lifetime that keeps the common origin spilled while
+allowing the second table in sl, then solve each priority-one lifetime. The
+origin's shared PRE definition is the useful starting point; changing only
+the table spelling cannot recreate a hard register's function-wide exclusion.
