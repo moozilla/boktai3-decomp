@@ -3786,27 +3786,26 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     if (done) {
-        if (*((u8 *)p + 0xf76))
+        if (p->releaseControl)
             ScriptUtility_ClearControlFlag();
         p->obj.flags |= 1;
         Actor_SetState(p, 1, 2);
         {
             u32 active = 4;
             register void (*fn)(void *, void *) = Actor_OnInteractionChildUpdate;
-            u32 reset = 1;
+            u8 reset = 1;
             struct ActorChildCallbackView *child =
-                (struct ActorChildCallbackView
-                     *)((u8 *)p +
-                        0xc8); /* MATCHING_CONCESSION: retain the original unused zero-register initialization. */
+                (struct ActorChildCallbackView *)&p->children[0].fn;
             register s32 reserved asm("r7") = 0;
             s32 i;
             for (i = 15; i >= 0; i--) {
-                register u32 v asm("r2") = child->flags;
-                if (active & v) {
+                union DisplaySequenceControl control;
+                control.raw = child->flags;
+                if (active & control.raw) {
                     u32 flags;
                     child->fn = fn;
-                    flags = reset | v;
-                    child->flags = flags;
+                    control.raw = reset | control.raw;
+                    child->flags = control.raw;
                 }
                 child++;
             }
