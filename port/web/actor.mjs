@@ -73,6 +73,7 @@ export function createActorTools(g, memory) {
         const node = { n: f.name, t: g.typeName(f.type), o: offset + f.off };
         if (PADDING.test(f.name)) node.pad = 1;
         const fr = g.resolve(f.type);
+        if (fr.k === 'enum' && fr.values && budget.enums) budget.enums[node.t] = fr.values;
         if (f.bits || fr.k === 'int' || fr.k === 'enum' || fr.k === 'float' || fr.k === 'ptr') Object.assign(node, scalar(a + f.off, f.type, f));
         else if (depth > 0) node.c = tree(a + f.off, f.type, depth - 1, budget, offset + f.off);
         else node.more = 1;
@@ -290,7 +291,9 @@ export function createActorTools(g, memory) {
     out.world = positionOf(sel.task, type);
     if (type) {
       out.size = g.sizeof(type);
-      out.fields = tree(sel.task, type, 3, { n: 1500 });
+      const budget = { n: 1500, enums: {} };
+      out.fields = tree(sel.task, type, 3, budget);
+      out.enums = budget.enums; // enum type name -> {NAME: value}, for menus
     } else {
       out.raw = g.hex(sel.task, 64);
     }

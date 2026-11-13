@@ -1,9 +1,10 @@
 // Actor panel: Inspect (I), then click a sprite in the game. A panel docks on
-// the right with the actor's own struct (typed by its task's update function,
-// editable live), its sprite, its world position over time, and a 3D diorama
-// of the scene: every projected sprite stands at its world position as a
-// billboard of its real pixels, over the screen projected onto the floor.
-// The worker side is port/web/actor.mjs.
+// the right with the actor's sprite, a 3D diorama of the scene (every projected
+// sprite stands at its world position as a billboard of its real pixels, over
+// the screen projected onto the floor) and its own struct, typed by its task's
+// update function and editable live. Overview sorts the struct into sections
+// with widgets (actor-overview.js); All fields is the whole tree. In the game,
+// a reticle follows the actor. The worker side is port/web/actor.mjs.
 (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
@@ -14,9 +15,14 @@
   }
   const hex = (n) => '0x' + (n >>> 0).toString(16).padStart(8, '0');
   const SCALE = 1 / 16; // world units -> three.js units
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private window */ } },
+  };
 
-  let env = null, panel = null, sel = null, last = null, refs = {}, history = [], view = null;
+  let env = null, panel = null, sel = null, last = null, refs = {}, view = null, overview = null;
   let showPad = false, filter = '', structureKey = '', valueEls = new Map(), prevValues = new Map();
+  let tab = store.get('boktai3.actorTab', 'overview'), tinted = 0;
 
   // "TerrainEdgeMarker_UpdateVisibility" -> "Terrain Edge Marker"
   function pretty(update) {
@@ -25,19 +31,36 @@
     return head.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
   }
 
+  // pinned fields, per struct type
+  const typeOf = () => (last && last.info && last.info.owner && last.info.owner.type) || '';
+  function pins() { return (store.get('boktai3.actorPins', {})[typeOf()]) || []; }
+  function togglePin(key) {
+    const all = store.get('boktai3.actorPins', {}), t = typeOf();
+    const list = all[t] || [];
+    const i = list.indexOf(key);
+    if (i >= 0) list.splice(i, 1); else list.push(key);
+    if (list.length) all[t] = list; else delete all[t];
+    store.set('boktai3.actorPins', all);
+    env.flash(i >= 0 ? 'Unpinned ' + key : 'Pinned ' + key + ' to the top of Overview');
+    structureKey = '';
+    render();
+  }
+
   function init(e) { env = e; }
 
   function open(hit) {
     if (!hit.task) { env.flash('No task owns this sprite'); return; }
     sel = Number(hit.task);
-    last = null; history = []; structureKey = ''; prevValues.clear();
+    last = null; structureKey = ''; prevValues.clear(); tinted = 0;
     build();
+    overview.reset();
     const settings = $('settings');
     if (settings && settings.open) settings.close();
     panel.hidden = false;
     document.body.classList.add('actor-open');
     refs.title.textContent = pretty(hit.owner);
-    refs.sub.textContent = 'loading…';
+    refs.chips.replaceChildren(el('span', { textContent: 'loading…' }));
+    refs.ov.replaceChildren();
     env.request({ op: 'actor', task: sel });
     start3d();
   }
@@ -47,6 +70,7 @@
     document.body.classList.remove('actor-open');
     if (sel) env.request({ op: 'actor', task: 0 });
     sel = null;
+    if (refs.ret) refs.ret.hidden = true;
     stop3d();
   }
   function isOpen() { return !!(panel && !panel.hidden); }
@@ -54,9 +78,26 @@
   // ---- layout ----------------------------------------------------------------
   function build() {
     if (panel) return;
-    refs.thumb = el('canvas', { className: 'ap-thumb', width: 64, height: 64 });
+    overview = window.ActorOverview({
+      set: (path, value) => env.request({ op: 'actor-set', path, value }),
+      flash: (t) => env.flash(t),
+      isPinned: (key) => pins().includes(key),
+      togglePin,
+      reveal: (name) => { showTab('fields'); refs.filter.value = name; filter = name.toLowerCase(); applyFilter(); },
+      follow: async (addr) => {
+        // a pointer into another task's object: open that actor
+        const r = await env.request({ op: 'js', code: `JSON.stringify(taskOf(${addr}))` });
+        let t = null;
+        try { t = JSON.parse(r.value); if (typeof t === 'string') t = JSON.parse(t); } catch (e) { t = null; }
+        if (!t || Number(t.task) === sel) return false;
+        open({ task: t.task, owner: t.update });
+        env.flash('Followed the pointer to ' + pretty(t.update));
+        return true;
+      },
+    });
+    refs.thumb = el('canvas', { className: 'ap-thumb', width: 84, height: 84 });
     refs.title = el('strong', { className: 'ap-title' });
-    refs.sub = el('div', { className: 'ap-sub' });
+    refs.chips = el('div', { className: 'ap-chips' });
     refs.badge = el('span', { className: 'ap-badge' });
     const closeBtn = el('button', { className: 'ap-close', title: 'Close (Esc)', textContent: '×', onclick: close });
     refs.view = el('div', { className: 'ap-view' });
@@ -65,74 +106,63 @@
     const angle = el('button', { textContent: 'Game angle', title: 'Look from where the game\'s camera looks', onclick: () => view && view.reset() });
     const spin = el('button', { textContent: 'Turntable', title: 'Swing slowly around the actor', onclick: () => view && view.turntable() });
     refs.view.append(refs.gl, refs.viewNote, el('div', { className: 'ap-view-tools' }, angle, spin),
-      el('div', { className: 'ap-view-hint', textContent: 'drag to orbit · scroll to zoom' }));
-    refs.stats = el('div', { className: 'ap-stats' });
-    refs.coord = {};
-    for (const axis of ['x', 'y', 'z']) {
-      const value = el('span', { className: 'ap-num' });
-      const spark = el('canvas', { className: 'ap-spark', width: 120, height: 28 });
-      refs.coord[axis] = { value, spark };
-      refs.stats.append(el('div', { className: 'ap-coord' }, el('span', { className: 'ap-axis', textContent: axis }), value, spark));
-    }
+      el('div', { className: 'ap-view-hint', textContent: 'drag to orbit · scroll to zoom · click an actor' }));
     refs.meta = el('div', { className: 'ap-meta' });
     refs.actions = el('div', { className: 'ap-actions' },
-      el('button', { textContent: 'Move player here', onclick: movePlayerHere }),
-      refs.bring = el('button', { textContent: 'Bring to player', onclick: bringToPlayer }),
-      el('button', { textContent: 'Copy JS', title: 'A typed view for the console or port/agent/play.py js', onclick: copyJs }));
+      el('button', { textContent: '⇢ Move player here', onclick: movePlayerHere }),
+      refs.bring = el('button', { textContent: '⇠ Bring to player', onclick: bringToPlayer }),
+      el('button', { textContent: '{ } Copy JS', title: 'A typed view for the console or port/agent/play.py js', onclick: copyJs }));
+    refs.tabOverview = el('button', { textContent: 'Overview', onclick: () => showTab('overview') });
+    refs.tabFields = el('button', { textContent: 'All fields', onclick: () => showTab('fields') });
+    refs.tabs = el('div', { className: 'ap-tabs', role: 'tablist' }, refs.tabOverview, refs.tabFields);
+    refs.ov = overview.root;
     refs.filter = el('input', { className: 'ap-filter', placeholder: 'Filter fields', type: 'search' });
     refs.filter.oninput = () => { filter = refs.filter.value.trim().toLowerCase(); applyFilter(); };
     const pad = el('label', { className: 'ap-pad' }, el('input', { type: 'checkbox', onchange: (e) => { showPad = e.target.checked; structureKey = ''; render(); } }), ' padding');
     refs.fields = el('div', { className: 'ap-fields' });
+    refs.fieldsPane = el('div', { className: 'ap-fields-pane' }, el('div', { className: 'ap-fields-head' }, refs.filter, pad), refs.fields);
     panel = el('aside', { id: 'actor-panel', hidden: true },
-      el('header', { className: 'ap-head' }, refs.thumb, el('div', { className: 'ap-titles' }, el('div', {}, refs.title, refs.badge), refs.sub), closeBtn),
-      refs.view, refs.stats, refs.meta, refs.actions,
-      el('div', { className: 'ap-fields-head' }, refs.filter, pad), refs.fields);
-    panel.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.target.closest('input')) close(); });
+      el('header', { className: 'ap-head' }, el('div', { className: 'ap-thumbwrap' }, refs.thumb),
+        el('div', { className: 'ap-titles' }, el('div', { className: 'ap-titleline' }, refs.title, refs.badge), refs.chips), closeBtn),
+      refs.view, refs.meta, refs.actions, refs.tabs, refs.ov, refs.fieldsPane);
+    panel.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.target.closest('input, select')) close(); });
     document.body.append(panel);
+    showTab(tab);
+  }
+  function showTab(t) {
+    tab = t;
+    store.set('boktai3.actorTab', t);
+    refs.tabOverview.classList.toggle('on', t === 'overview');
+    refs.tabFields.classList.toggle('on', t === 'fields');
+    refs.ov.hidden = t !== 'overview';
+    refs.fieldsPane.hidden = t !== 'fields';
   }
 
   // ---- updates from the worker ------------------------------------------------
   function onMessage(m) {
     if (!sel || !panel) return;
-    if (m.error) { refs.sub.textContent = m.error.split('\n')[0]; return; }
+    if (m.error) { refs.chips.replaceChildren(el('span', { textContent: m.error.split('\n')[0] })); return; }
     last = m;
     const info = m.info;
     const own = info.owner;
     refs.title.textContent = pretty(own && own.update);
-    refs.sub.textContent = own
-      ? `${own.type || 'untyped'} · task ${hex(own.task)}${info.size ? ' · ' + info.size.toLocaleString() + ' bytes' : ''} · ${own.update}`
-      : `task ${hex(sel)} · ended`;
+    const chips = own
+      ? [own.type || 'untyped', `task ${hex(own.task)}`, info.size ? info.size.toLocaleString() + ' bytes' : null, own.update]
+      : [`task ${hex(sel)}`, 'ended'];
+    const text = chips.filter(Boolean).join('|');
+    if (refs.chips.dataset.text !== text) {
+      refs.chips.dataset.text = text;
+      refs.chips.replaceChildren(...chips.filter(Boolean).map((c, i) => el('span', { textContent: c, className: i === 0 && own && own.type ? 'type' : '' })));
+    }
     refs.badge.textContent = info.alive ? (info.hidden ? 'hidden' : 'live') : 'gone';
     refs.badge.className = 'ap-badge ' + (info.alive ? (info.hidden ? 'dim' : 'live') : 'gone');
-    if (info.world) {
-      history.push(info.world.slice());
-      if (history.length > 150) history.shift();
-    }
-    ['x', 'y', 'z'].forEach((axis, i) => {
-      refs.coord[axis].value.textContent = info.world ? info.world[i] : '—';
-      spark(refs.coord[axis].spark, history.map((w) => w[i]));
-    });
-    refs.meta.textContent = (info.box ? `screen ${info.box[0]}, ${info.box[1]} · ${info.box[2]}×${info.box[3]} px · ${info.pieces} OAM ${info.pieces === 1 ? 'entry' : 'entries'}` : 'no sprites this frame') + ` · frame ${info.frame}`;
+    refs.meta.textContent = (info.box ? `on screen at ${info.box[0]}, ${info.box[1]} · ${info.box[2]}×${info.box[3]} px · ${info.pieces} OAM ${info.pieces === 1 ? 'entry' : 'entries'}` : 'not drawn this frame') + ` · frame ${info.frame}`;
     refs.bring.hidden = !positionPath();
     const layer = m.layer ? new Uint8ClampedArray(m.layer) : null;
     if (layer && info.box) thumb(layer, info.box);
     render();
+    reticle(info);
     if (view) view.update(m.scene, info, layer);
-  }
-
-  function spark(c, values) {
-    const x = c.getContext('2d');
-    const w = c.width, h = c.height;
-    x.clearRect(0, 0, w, h);
-    if (values.length < 2) return;
-    let lo = Math.min(...values), hi = Math.max(...values);
-    if (hi - lo < 8) { const mid = (hi + lo) / 2; lo = mid - 4; hi = mid + 4; }
-    x.beginPath();
-    values.forEach((v, i) => {
-      const px = (i / (150 - 1)) * w, py = h - 3 - ((v - lo) / (hi - lo)) * (h - 6);
-      if (i) x.lineTo(px, py); else x.moveTo(px, py);
-    });
-    x.strokeStyle = '#f2a33a'; x.lineWidth = 1.5; x.stroke();
   }
 
   const crop = el('canvas', { width: 64, height: 64 });
@@ -156,12 +186,61 @@
     const img = cropLayer(layer, box);
     crop.width = img.width; crop.height = img.height;
     crop.getContext('2d').putImageData(img, 0, 0);
-    const t = refs.thumb.getContext('2d');
-    t.clearRect(0, 0, 64, 64);
+    const t = refs.thumb.getContext('2d'), S = refs.thumb.width;
+    t.clearRect(0, 0, S, S);
     t.imageSmoothingEnabled = false;
-    const k = Math.max(1, Math.floor(60 / Math.max(img.width, img.height)));
+    const k = Math.max(1, Math.floor((S - 6) / Math.max(img.width, img.height)));
     const w = img.width * k, h = img.height * k;
-    t.drawImage(crop, (64 - w) >> 1, (64 - h) >> 1, w, h);
+    t.drawImage(crop, (S - w) >> 1, (S - h) >> 1, w, h);
+    if (tinted++ % 30 === 0) tint(img);
+  }
+  // the panel's accent: the sprite's most vivid color
+  function tint(img) {
+    let sx = 0, sy = 0, wsum = 0, light = 0;
+    for (let i = 0; i < img.data.length; i += 4) {
+      if (!img.data[i + 3]) continue;
+      const r = img.data[i] / 255, g = img.data[i + 1] / 255, b = img.data[i + 2] / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b), c = max - min;
+      if (c < 0.12) continue;
+      let h = max === r ? ((g - b) / c) % 6 : max === g ? (b - r) / c + 2 : (r - g) / c + 4;
+      h *= Math.PI / 3;
+      const w = c * c;
+      sx += Math.cos(h) * w; sy += Math.sin(h) * w; wsum += w; light += max * w;
+    }
+    if (!wsum) { panel.style.removeProperty('--actor'); return; }
+    const hue = ((Math.atan2(sy, sx) * 180 / Math.PI) + 360) % 360;
+    panel.style.setProperty('--actor', `hsl(${hue.toFixed(0)} 85% 64%)`);
+    if (refs.ret) refs.ret.style.setProperty('--actor', `hsl(${hue.toFixed(0)} 85% 64%)`);
+  }
+
+  // corner brackets around the actor in the game, with its name and a life bar
+  function reticle(info) {
+    if (!refs.ret) {
+      const screen = env.canvas && env.canvas.parentElement;
+      if (!screen) return;
+      refs.retName = el('span');
+      refs.retFill = el('i');
+      refs.retBar = el('b', { className: 'ap-ret-bar' }, refs.retFill);
+      refs.ret = el('div', { className: 'ap-reticle', hidden: true },
+        el('i', { className: 'c tl' }), el('i', { className: 'c tr' }), el('i', { className: 'c bl' }), el('i', { className: 'c br' }),
+        el('div', { className: 'ap-ret-label' }, refs.retName, refs.retBar));
+      screen.append(refs.ret);
+      const accent = panel.style.getPropertyValue('--actor');
+      if (accent) refs.ret.style.setProperty('--actor', accent);
+    }
+    const b = info.box;
+    if (!b || !isOpen()) { refs.ret.hidden = true; return; }
+    const pad = 3;
+    Object.assign(refs.ret.style, {
+      left: ((b[0] - pad) / 240 * 100) + '%', top: ((b[1] - pad) / 160 * 100) + '%',
+      width: ((b[2] + 2 * pad) / 240 * 100) + '%', height: ((b[3] + 2 * pad) / 160 * 100) + '%',
+    });
+    refs.ret.classList.toggle('below', b[1] < 22);
+    refs.ret.hidden = false;
+    refs.retName.textContent = pretty(info.owner && info.owner.update);
+    const r = overview.vital();
+    refs.retBar.hidden = r == null;
+    if (r != null) { refs.retFill.style.width = (r * 100).toFixed(1) + '%'; refs.retFill.style.setProperty('--h', Math.round(r * 125)); }
   }
 
   // ---- fields -----------------------------------------------------------------
@@ -182,7 +261,7 @@
     if (!info) return;
     const nodes = info.fields || [];
     const typed = !!info.fields;
-    const key = (typed ? 'T' : 'R') + nodesKey(nodes) + showPad;
+    const key = (typed ? 'T' : 'R') + nodesKey(nodes) + showPad + typeOf();
     if (key !== structureKey) {
       structureKey = key;
       valueEls.clear();
@@ -196,6 +275,12 @@
       tree(root, nodes, [], 0, typed);
       refs.fields.replaceChildren(root);
       applyFilter();
+      overview.build(typed ? nodes : [], info, info.enums || {}, pins());
+      if (!typed) {
+        refs.ov.prepend(el('p', { className: 'ap-note ov-untyped', textContent: info.owner
+          ? `${info.owner.update} has no struct type yet, so there is nothing to sort: give its first parameter a struct type in src/.`
+          : 'This task has ended.' }));
+      }
     }
     // values: update in place, flash the ones that changed
     const walk = (list, path) => {
@@ -214,8 +299,10 @@
       }
     };
     walk(nodes, []);
+    overview.update(nodes, info);
   }
   function tree(container, nodes, path, depth, editable) {
+    const pinned = pins();
     for (const n of nodes || []) {
       if (n.pad && !showPad) continue;
       const p = path.concat(n.n);
@@ -239,7 +326,9 @@
         value.onclick = () => edit(value, p, n);
       }
       valueEls.set(p.join('.'), value);
-      const row = el('div', { className: 'ap-row' }, label, type, value);
+      const key = p.join('.'), on = pinned.includes(key);
+      const star = editable ? el('button', { className: 'ap-star' + (on ? ' on' : ''), textContent: on ? '★' : '☆', title: on ? 'Unpin' : 'Pin to Overview', onclick: () => togglePin(key) }) : null;
+      const row = el('div', { className: 'ap-row' }, label, type, value, star);
       row.dataset.search = p.join('.').toLowerCase();
       container.append(row);
     }

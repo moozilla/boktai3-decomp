@@ -41,11 +41,16 @@ file select, region list, ...) is covered in place by its English, in the menu's
 own colors; hover the game to see the Japanese.
 
 Inspect (I) outlines every sprite with the task that drew it; click one and the
-actor panel docks beside the game: the task's object typed by its update
-function's parameter (`struct Player` for `Player_Update`), every field live
-and editable, its sprite, its world position over time, and a 3D view of the
-scene (three.js from jsDelivr) where each actor stands at its world position over
-the screen laid on the floor; drag to orbit, click another actor to follow it. Agents (and people at a terminal) drive and inspect the
+actor panel docks beside the game and brackets the actor in the picture. It
+shows the task's object typed by its update function's parameter (`struct Player`
+for `Player_Update`), live and editable, and a 3D view of the scene (three.js
+from jsDelivr) where each actor stands at its world position over the screen
+laid on the floor; drag to orbit, click another actor to follow it. Overview
+sorts the fields into Vitals, Motion, State, Timers, Look and Links: a
+current/maximum pair is a bar you drag, a heading a compass dial, a flag word lit
+bits you click, a timer a ticking trace, a pointer into another actor a chip
+that opens it. Drag a number sideways to change it or click to type; a star pins
+a field to the top for that struct type. All fields is the whole tree. Agents (and people at a terminal) drive and inspect the
 running game with [`port/agent/play.py`](agent/README.md): JavaScript scripts that
 run frames, frame stepping, breakpoints, call and script traces, C snippets run
 inside the game, warps, checkpoints, and a link to the studio's Live page.

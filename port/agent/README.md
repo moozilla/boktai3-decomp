@@ -116,7 +116,8 @@ Their style, the keybinds and the display options live in `port/web/ui.js`.
 Inspect names each sprite's task by hooking the render pass's OAM emitters
 (`sub_08000430`, `Sprite_QueueFramePieces`) and the actor panel types the task's
 object with `types.json` `params` (each function's first struct parameter);
-`port/web/actor.mjs` is the worker side, `port/web/actor-panel.js` the page. From DevTools or a browser-driving agent: `await game.js('where()')`.
+`port/web/actor.mjs` is the worker side, `port/web/actor-panel.js` the page and
+`port/web/actor-overview.js` its Overview (fields sorted by name and type into widgets). From DevTools or a browser-driving agent: `await game.js('where()')`.
 
 ## C snippets
 
