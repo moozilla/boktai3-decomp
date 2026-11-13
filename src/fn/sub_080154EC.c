@@ -155,6 +155,8 @@ start:
                 a = &p->anim;
                 Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
                                  6, 0, 0);
+                saved = a;
+                goto stepAnimation;
             } else if (p->pad1 == 6) {
                 AnimData_Load(p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(p->resource, 0x2a7);
@@ -163,6 +165,7 @@ start:
                 Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
                                  6, 0, 0);
                 asm("" : : "r"(a), "i"(6));
+                goto saveAnimation;
             } else if (p->pad1 == 7) {
                 AnimData_Load(p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(p->resource, 0x2a6);
@@ -171,6 +174,7 @@ start:
                 Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
                                  8, 0, 0);
                 asm("" : : "r"(a), "i"(7));
+                goto saveAnimation;
             } else {
                 AnimData_Load(p->resource, 0x4384);
                 AnimData_SelectPaletteBank(p->resource, p->pad1 + 182);
@@ -178,8 +182,9 @@ start:
                 Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[0],
                                  0, 0, 0);
             }
+        saveAnimation:
             saved = a;
-            asm("" : "+r"(saved));
+        stepAnimation:
             a = saved;
             entry = p->anim.data + a->frame;
             DisplaySequence_ApplyFrame((void *)o, (void *)a, entry);
