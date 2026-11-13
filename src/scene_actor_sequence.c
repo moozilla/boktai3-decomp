@@ -160,13 +160,13 @@ void SceneActorSequence_UpdateFadeInHold(struct SceneActorSequence *p)
     }
 }
 
-void sub_081C35EC(void *, u32, u32);
+void ContactImpactEffect_BeginTimedPosition(void *, u32, u32);
 
 void SceneActorSequence_UpdateCenterMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_BeginCenterMotion(struct SceneActorSequence *p)
 {
-    sub_081C35EC(p->actor, 0, 0x5a);
+    ContactImpactEffect_BeginTimedPosition(p->actor, 0, 0x5a);
     p->updateState = SceneActorSequence_UpdateCenterMotion;
     p->timer = 0;
 }
