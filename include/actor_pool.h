@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "scene_body_api.h"
 #include "scene_facing.h"
+#include "display_animation.h"
 #include "player.h"
 #include "scene_actor_components.h"
 #include "contact_collider.h"
@@ -14,16 +15,22 @@ struct PooledActor {
     u8 unknown48[4];
     s32 health;
     u32 flags;
-    u8 unknown54[4];
+    u32 frameFlags;
     s32 pendingDamage;
     u32 damageSource, attackFlags;
-    u8 unknown64[2];
+    u16 effectTimer;
     u16 reaction;
-    u8 unknown68[4];
+    u32 paletteBank;
     struct ContactCollider hitSensor, bodyCollider;
     void (*update)(void *);
     void (*destroy)(void *);
-    u8 unknown11C[0x1C];
+    void (*actionCallback)(void *, int);
+    s32 (*selectAction)(void *);
+    s32 (*handleDamage)(void *);
+    u16 state, currentAction;
+    u8 stateChanged, actionChanged;
+    u16 pendingAction;
+    u32 stateTicks, actionTicks;
     u32 targetRangeSquared;
     u8 targetArc;
     u8 unknown13D[3];
@@ -38,7 +45,8 @@ struct PooledActor {
     u32 action;
     u32 actionParameters[4];
     u8 facing4, facing8;
-    u8 unknown182[0x96];
+    u8 unknown182[2];
+    struct DisplayAnimation drawable;
     struct PooledActor *next, *previous;
 };
 

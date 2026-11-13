@@ -1015,18 +1015,25 @@ addr,name,mode,confidence,source,notes
 0802CC94,Actor_StepFacingAngle,thumb,low,src-alias,Adjusts facing by at most four angle units using the stored target delta
 0802CCE0,Actor_SetActionParameters,thumb,low,src-alias,Sets the pooled actor action selector and copies its parameter words
 0802CD04,Actor_InitControllerFromScript,thumb,low,src-alias,Initializes actor identity position health targeting parameters and controller defaults from script keywords
+0802CED0,Actor_InitializeSequenceDrawable,thumb,low,src-alias,Tentative pooled actor controller helper: InitializeSequenceDrawable
+0802CEF8,Actor_InitializeKeyframeDrawable,thumb,low,src-alias,Tentative pooled actor controller helper: InitializeKeyframeDrawable
 0802CF10,Actor_UpdateDrawable,thumb,low,src-alias,Refreshes target direction and drawable position then advances enabled animation playback
 0802CF40,Actor_PrepareStateUpdate,thumb,low,src-alias,Empty preparation hook called before state dispatch; purpose tentative
 0802CF44,Actor_DispatchActionCallback,thumb,low,src-alias,Clears transient flags and advances the action timer before invoking the action callback
 0802CF74,Actor_UpdateCollisionAndEffectTimers,thumb,low,src-alias,Refreshes scheduled collision sensing and updates collision flags and palette effect expiration
+0802D014,Actor_RequestAction,thumb,low,src-alias,Tentative pooled actor controller helper: RequestAction
 0802D020,Actor_ShowDamageNumber,thumb,low,src-alias,Shows a damage number through the actor embedded display at its position
 0802D040,Actor_StartDamageFlash,thumb,low,src-alias,Selects the damage palette and starts a ten-tick restoration timer
+0802D05C,Actor_SetAnimationEntry,thumb,low,src-alias,Tentative pooled actor controller helper: SetAnimationEntry
 0802D080,Actor_SetFacingAnimationEntry,thumb,low,src-alias,Selects the directional animation entry and horizontal flip from actor facing
+0802D0F4,Actor_SetFourDirectionAnimationEntry,thumb,low,src-alias,Tentative pooled actor controller helper: SetFourDirectionAnimationEntry
+0802D15C,Actor_SetMirroredAnimationEntry,thumb,low,src-alias,Tentative pooled actor controller helper: SetMirroredAnimationEntry
 0802D1B0,Actor_OnHitboxContact,thumb,low,src-alias,Hitbox callback forwards both colliders to the actor damage-recording helper
 0802D1C8,Actor_OnColliderContact,thumb,low,src-alias,Empty collider contact callback installed by the actor initializer
 0802D1CC,Actor_ClearStateChanged,thumb,low,src-alias,Clears the state-change marker at offset 0x12C
 0802D1E4,Actor_DispatchStateHandler,thumb,low,src-alias,Advances the state timer and invokes the handler indexed by current state
 0802D218,Actor_OnTrackingAction,thumb,low,src-alias,Action callback turns toward the selected target and intermittently spawns player-tracking motion effects
+0802D334,Actor_TryStartPendingAction,thumb,low,src-alias,Tentative pooled actor controller helper: TryStartPendingAction
 0802D380,Actor_OnDamage,thumb,low,src-alias,Damage callback displays and applies pending damage then flashes or spawns a death effect
 0802D3F0,Actor_UpdateAction,thumb,low,src-alias,Delegates the action update phase to the timed action callback dispatcher
 0802D3FC,Actor_UpdateDrawableAndTarget,thumb,low,src-alias,Updates the drawable then performs the scheduled target refresh or acquisition
