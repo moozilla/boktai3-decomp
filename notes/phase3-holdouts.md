@@ -1573,3 +1573,20 @@ Next: establish which pass removes the second zero extension and find a real
 frame-update helper or lifetime split that preserves it, then find a counter
 load form whose class/lifetime naturally takes r8. Scratch variants and compiler
 evidence remain in build/cx/work/TetherActor_UpdateBounceReturn and build/scope.
+
+### AreaEffect_AddSpriteFromScript (0804E388): resolved
+
+Removed both pins and the pointer barrier. Started from the field-effects
+ground-height/cell-index helper draft, which already removes the count and
+point constraints except for 19/19 allocation differences. Added a small
+AreaEffect_IsVisible reader; all 428 bytes match with the stock compiler.
+Named entry fields replace the old enabled/flags raw offsets.
+
+The confirmed diagnostic is AGBCC_PRI=175:+5 on the baseline: the stride
+constant has priority 1600, just below manager at 1604. The visibility helper
+shortens the stride's measured lifetime from 25 to 23 (doubled to 46 for
+REG_EQUIV), raising its priority to 1739. Manager's lifetime also shortens
+from 187 to 185, raising its priority only to 1621. Stride therefore takes r5
+first and manager r6, fixing every difference. This is a lifetime reduction,
+not an increase in manager lifetime. An increment-count helper has no effect;
+a current-entry helper changes the shape and does not match.
