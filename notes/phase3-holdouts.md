@@ -1476,3 +1476,27 @@ Next: seek a natural extra live instruction for flagsPtr or a shorter hit
 lifetime; only a two-instruction difference is needed, but moves that change
 source order have also changed the ROM instruction order. Do not add dummy
 references or statement wrappers to adjust priority.
+
+### sub_0817AEC8 (0817AEC8)
+
+Tags: phase3, dp-field-b, sub_0817AEC8
+
+One existing sine-table pin remains. Removing it gives 53/49 with three moved
+branches. The second loop pass hoists the sine pointer (13 x 1 x 25 >= 92).
+A local union initializer prevents that hoist and gives 37/37, shape 2.
+AGBCC_PRI=sine:+13944 MATCHES on this draft; AGBCC_FORCE=sine:2 also matches.
+
+The sine pointer has three loop mentions (six weighted references), priority
+2857 after constant lifetime doubling to 42. Heading has fourteen weighted
+references, priority 16800, and takes r2 first. Speed then takes r3 instead
+of r4; the shared zero takes r4 instead of r5, changing RNG reload choices.
+This is a coupled hoist/allocation problem, not a remaining RNG mismatch.
+
+Projection helpers returning s32 or s16, an inline whole-vector polar helper,
+and direction-first addition all preserve the 37/37 result. Reconstructing
+the sine pointer from two halfwords adds instructions (37/45). Calculating
+speed before heading changes instruction order without fixing allocation.
+Prior round's narrow-heading/polar forms are recorded in round11-d-holdouts.
+Next: recover a natural short-lived sine operand or another table view whose
+allocation precedes heading; a one-use statement macro would only hide the
+priority knob and must not be used.
