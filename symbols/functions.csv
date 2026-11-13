@@ -4515,10 +4515,14 @@ addr,name,mode,confidence,source,notes
 081148A8,NativeEffect_InitDirectionalTypeThreeSprite,thumb,low,src-alias,Uses animation eight and initializes opposite angle and rotation values for type three
 08114928,NativeEffect_CreateFromProfile,thumb,low,src-alias,
 08114C50,SlotRegistry_RemoveSprite,thumb,low,src-alias,
+08114CA0,NativeEffect_ResetManager,thumb,low,cleanup,Clear native effect singleton
+08114CAC,NativeEffect_IgnoreUpdate,thumb,low,cleanup,Empty lifecycle hook
 08114CB0,NativeParticle_UpdateAnimatedMotion,thumb,low,src-alias,
 08114E04,NativeParticle_ReleaseEntry,thumb,low,src-alias,Removes the indexed effect and clears the particle entry before invalidating its index
 08114E34,NativeParticle_AllocateEntry,thumb,low,src-alias,Reserves the first available entry in the thirty two slot particle pool
+08114E68,NativeParticle_CreateBatch,thumb,low,cleanup,Emit a batch of animated particles with randomized spread and velocity
 081150C4,NativeParticle_CreateWithFlag,thumb,low,src-alias,Forwards particle creation arguments with the final effect flag fixed to one
+081150E4,NativeParticle_CreateWithoutFlag,thumb,low,cleanup,Emit particles without the pause flag
 08115104,EffectPool_UpdateEntries,thumb,low,src-alias,
 08115190,NativeParticle_DestroyManager,thumb,low,src-alias,Task destruction callback that removes active particle effects and clears the singleton
 081151D0,NativeParticle_LoadResources,thumb,low,src-alias,Loads the particle animation resource and shared graphics entry into the manager
