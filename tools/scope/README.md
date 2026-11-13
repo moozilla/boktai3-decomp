@@ -326,6 +326,14 @@ jump cse follows), `CSE_NOFOLLOW=K` (refuse the K-th follow),
 `AGBCC_DUMPPRI`, `AGBCC_SPILL` (local-alloc / reload; see the sources for
 syntax). Added in this thread (in `tools/scope/agbcc.patch`):
 
+Pseudo knobs accept unambiguous C variable names as well as numbers:
+`AGBCC_PRI=table:+214`, `AGBCC_FORCE=table:ip`, `AGBCC_COMBKEEP=base,resource`,
+`AGBCC_NOEQUIV=table`, `CSE_KEEP=value`, and `CSE_NOCANON=value`.
+`AGBCC_COMBKEEP` prevents combine from substituting instructions that set the
+selected pseudos; it diagnoses a lost set or copy, rather than changing the
+ordinary build. A name optimized away or shared by several pseudos is an error;
+use the number from the relevant RTL dump in that case.
+
 * `AGBCC_REGCLASS=1`: regclass.c prints, for each pseudo and pass, its
   preferred and alternate class and the cost of every class
   (`R func pseudo passN pref=... alt=... mem=... LO_REGS=... STACK_REG=...`).
