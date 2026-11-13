@@ -5,7 +5,6 @@
 #include "ram.h"
 /* NumericOverlay_ClearActive: sets gNumericOverlay (the live NumericOverlay pointer, per numeric_overlay.h) back to NULL; twin of NumericOverlay_Destroy in numeric_overlay.c */
 #define NumericOverlay_ClearActive sub_0800F4B8
-// MATCHING_CONCESSION: register-pinning
 
 void StatusScreen_FadeAndExit(struct StatusScreen *p)
 {
@@ -20,10 +19,12 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
             {
                 u16 *out = &buffer[bank * 16 + i];
                 int color = *out;
-                int r = ((color & 31) * factor) & 0x7C0;
-                int g = ((color & 992) * factor) & 0xF800;
-                int blue = color & blueMask;
-                DEBUG_NOP();
+                int r, g, blue, red, green;
+                PALETTE_EXTRACT_CHANNEL(red, color, 31);
+                r = (red * factor) & 0x7C0;
+                PALETTE_EXTRACT_CHANNEL(green, color, 992);
+                g = (green * factor) & 0xF800;
+                PALETTE_EXTRACT_CHANNEL(blue, color, blueMask);
                 {
                     int b = (blue * factor) & 0x1F0000;
                     *out = (r | g | b) >> 6;
