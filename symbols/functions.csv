@@ -1726,12 +1726,14 @@ addr,name,mode,confidence,source,notes
 08045CF4,ProjectedDisplay_GetHeight,thumb,low,src-alias,
 08045D04,ProjectedDisplay_SetHeight,thumb,low,src-alias,
 08045D18,ContactSequenceActor_SetFlags,thumb,low,src-alias,
+08045D20,ContactSequenceActor_ClearFlags,thumb,low,src-alias,Clears the selected bits in the actor flags
 08045D28,ContactSequenceActor_GetFlags,thumb,low,src-alias,
 08045D30,ContactSequenceActor_SetState,thumb,low,src-alias,
 08045D3C,ContactSequenceActor_TakeEntryFlag,thumb,low,src-alias,
 08045D54,ContactSequenceActor_ApplyHealthContact,thumb,low,src-alias,
 08045E08,ContactSequenceActor_Initialize,thumb,low,src-alias,
 08045F14,ContactSequenceActor_Deactivate,thumb,low,src-alias,
+08045F44,ContactSequenceActor_UpdateInactive,thumb,low,src-alias,Empty inactive-state update callback
 08045F48,ContactSequenceActor_UpdateAppearing,thumb,low,src-alias,
 080460C8,ContactSequenceActor_UpdateActive,thumb,low,src-alias,
 080461D0,ContactSequenceActor_UpdateDying,thumb,low,src-alias,
