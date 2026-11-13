@@ -4321,21 +4321,28 @@ addr,name,mode,confidence,source,notes
 0810CA34,LinkPanel_InitFromScript,thumb,low,src-alias,
 0810CB30,RegistryF246_Create,thumb,low,src-alias,Returns the existing singleton or creates and initializes its task from script options
 0810CB88,RegistryF246_Close,thumb,low,src-alias,Hides animations and clears message and background displays before killing the task
-0810CBC8,Registry30AC_InitBackgroundResources,thumb,low,src-alias,Loads script resources and configures background layers and palette data
-0810CC28,LinkPanel_DrawTime,thumb,low,src-alias,
-0810CCC8,LinkPanel_DrawPeerTimes,thumb,low,src-alias,
-0810CD4C,LinkPanel_CreateTextWindows,thumb,low,src-alias,
-0810CDD8,LinkPanel_StartDescriptions,thumb,low,src-alias,
-0810CEBC,SlotMenu_InitializeAlternateEntryValues,thumb,low,src-alias,
-0810CF08,PanelSequence_InitializeSprites,thumb,low,src-alias,
-0810D14C,Registry30AC_HideDisplay,thumb,low,src-alias,Sets hidden flags on seven animations and hides both embedded display panels
-0810D188,Registry30AC_RemoveAnimations,thumb,low,src-alias,Removes all seven embedded animations during cleanup
-0810D22C,PanelTransition_UpdateExit,thumb,low,src-alias,
-0810D290,PanelSequence_UpdateDelay,thumb,low,src-alias,
-0810D334,Registry30AC_Update,thumb,low,src-alias,Task update callback that dispatches the current handler while the parent controller remains active
-0810D36C,Registry30AC_Destroy,thumb,low,src-alias,Task destruction callback that removes animations and both embedded panels then clears the singleton
-0810D3A0,PanelSequence_InitializeFromScript,thumb,low,src-alias,
-0810D4FC,Registry30AC_Create,thumb,low,src-alias,Creates the singleton task for registry entry 30AC and installs its lifecycle callbacks
+0810CBC8,LinkRecordPanel_LoadBackground,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CC28,LinkRecordPanel_DrawTime,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CCC8,LinkRecordPanel_DrawPeerTimes,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CD4C,LinkRecordPanel_CreateTextWindows,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CDD8,LinkRecordPanel_StartDescriptions,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CE88,LinkRecordPanel_ClearTextWindows,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CEBC,LinkRecordPanel_InitializeEntryValues,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CF08,LinkRecordPanel_InitializeWidgets,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CF90,LinkRecordPanel_PositionWidgets,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810CFF0,LinkRecordPanel_InitializePreviews,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D14C,LinkRecordPanel_HideDisplay,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D188,LinkRecordPanel_RemoveWidgets,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D1A4,LinkRecordPanel_ShowDialogue,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D1B4,LinkRecordPanel_OnIdle,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D1B8,LinkRecordPanel_RunExitScript,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D208,LinkRecordPanel_RunCompletionScript,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D22C,LinkRecordPanel_UpdateExit,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D290,LinkRecordPanel_UpdateDelay,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D334,LinkRecordPanel_Update,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D36C,LinkRecordPanel_Destroy,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D3A0,LinkRecordPanel_InitializeFromScript,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
+0810D4FC,LinkRecordPanel_Create,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
 0810D590,Registry3C9F_LoadBackground,thumb,low,src-alias,Loads the menu background resource and copies its palette into palette staging memory
 0810D5EC,Bg_GetWrappedTilemapEntry,thumb,low,src-alias,Returns a tilemap entry pointer with both coordinates wrapped to a 32 by 32 tile grid
 0810D60C,PanelText_DrawDecimal,thumb,low,src-alias,
