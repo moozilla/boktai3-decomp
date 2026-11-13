@@ -4258,6 +4258,20 @@ def cmd_spill(src, func, env):
     return 0
 
 
+def probe_no_improvement(tried, regressions):
+    """Report negative probes without ruling out interacting compiler decisions."""
+    print(f"  {tried} compiles: no single tested cse/gcse/loop decision improves the count.")
+    if regressions:
+        print("  These probes changed the code but worsened the count; their mechanisms may still interact:")
+        for knob, val, counts in regressions[:4]:
+            print(f"    {knob}={val}: {counts}")
+        if len(regressions) > 4:
+            print(f"    ({len(regressions) - 4} more worsening probes)")
+    else:
+        print("  None of these probes changed the count; interacting decisions are still possible.")
+    print("  Next: why (allocation), spill (reload), pre or hoist (placement and interactions).")
+
+
 def cmd_probe(src, func, env):
     """Which cse / gcse / loop decision is the difference? One traced compile lists the decisions: pseudos
     make_regs_eqv makes a class's canonical register (CSE_NOCANON), jumps cse follows into their
@@ -4360,11 +4374,14 @@ def cmd_probe(src, func, env):
               " which exist only in the -g compile: they are scored against the -g count and marked"
               " [-g compile]; such a hit says what the -g compile does, not the build.")
     hits = []
+    regressions = []
     for knob, val, what in cands[:budget]:
         prev = env.get(knob)
         n, inf = score(src, func, dict(env, **{knob: f"{prev},{val}" if prev else val}))
         if n < (g_base if g_base is not None and knob in UID_KNOBS else base):
             hits.append((n, knob, val, what, inf.get("counts", "MATCH")))
+        elif n > (g_base if g_base is not None and knob in UID_KNOBS else base):
+            regressions.append((n, knob, val, inf.get("counts", str(n))))
     fix = {"CSE_NOCANON": "cse made this value the canonical register of a copy class (it lives longer"
                           " than the value it was copied from), so later tests and uses read it. In C make"
                           " the ROM-side value the longer-lived one (one shared variable, the copy kept"
@@ -4404,8 +4421,7 @@ def cmd_probe(src, func, env):
                            " threshold by 3, but loop runs twice, so luck rarely holds in both passes."}
     score(src, func, env, full=True)  # leave the workdir's dumps at the unmodified draft
     if not hits:
-        print(f"  {min(len(cands), budget)} compiles: no single cse/gcse/loop decision changes the count;"
-              " the difference is elsewhere (allocation: why; reload: spill).")
+        probe_no_improvement(min(len(cands), budget), [r[1:] for r in sorted(regressions)])
         return 0
     hits.sort()
     for n, knob, val, what, counts in hits[:8]:
