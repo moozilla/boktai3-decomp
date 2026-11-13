@@ -8049,16 +8049,28 @@ addr,name,mode,confidence,source,notes
 081D5358,Bestiary_AreAllEntriesUnlocked,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
 081D53A0,Script_ConsumeOptionalKeywordValue,thumb,low,src-alias,Consumes one value when keyword k is present; its intended command role remains uncertain
 081D53B4,Bestiary_UpdateCompletionBadges,thumb,low,src-alias,Bestiary catalog: entry categories/groups; actor-kind mapping; unlocked entries and two reward flags per entry.
-081D5444,BackgroundPanel_ReleaseHandles,thumb,low,src-alias,
-081D5478,BestiaryDisplay_DrawEntryDetails,thumb,low,src-alias,
-081D581C,ScrollingDialogue_Step,thumb,low,src-alias,
+081D5444,MonsterBook_ClearWindows,thumb,low,src-alias,Monster book task: shared list/detail navigation; text windows; reward records; widget groups and palette pulse.
+081D5478,MonsterBook_DrawEntryDetails,thumb,low,src-alias,Monster book task: shared list/detail navigation; text windows; reward records; widget groups and palette pulse.
+081D581C,MonsterBook_UpdateDescription,thumb,low,src-alias,Monster book task: shared list/detail navigation; text windows; reward records; widget groups and palette pulse.
 081D58B4,MonsterBook_UpdateHighlightPulse,thumb,low,src-alias,Advances a looping 50-tick sequence and writes the highlight intensity; visual role tentative
 081D5908,MonsterBook_InitWidgets,thumb,low,src-alias,
 081D5C08,MonsterBook_SetupPageBackgrounds,thumb,low,src-alias,Loads page graphics and palettes and configures background layers
+081D5CE0,MonsterBook_RefreshPage,thumb,low,src-alias,Monster book task: shared list/detail navigation; text windows; reward records; widget groups and palette pulse.
 081D6194,MonsterBook_SetPage,thumb,low,src-alias,Stores the page index and resets its state before rebuilding page graphics
+081D61C0,MonsterBook_UpdateNavigation,thumb,low,src-alias,Monster book task: shared list/detail navigation; text windows; reward records; widget groups and palette pulse.
 081D6898,MonsterBook_RemoveActiveAnimation,thumb,low,src-alias,Removes a book animation only when its active byte is set
+081D68AC,MonsterBook_Destroy,thumb,low,src-alias,Monster book task: shared list/detail navigation; text windows; reward records; widget groups and palette pulse.
 081D6984,MonsterBook_Init,thumb,low,src-alias,
 081D6BC0,MonsterBook_Create,thumb,medium,gcl-name,name from GCL key 34EA 魔物図鑑 (Monster Book); registry callback
+081D6C04,MonsterBook_HideEntryRows,thumb,low,src-alias,Monster book drawing helpers: list/detail digits; selected row; completion counts and category widgets.
+081D6C4C,MonsterBook_DrawListNumbers,thumb,low,src-alias,Monster book drawing helpers: list/detail digits; selected row; completion counts and category widgets.
+081D6D20,MonsterBook_DrawDetailNumber,thumb,low,src-alias,Monster book drawing helpers: list/detail digits; selected row; completion counts and category widgets.
+081D6DB8,MonsterBook_HideCompletionCounts,thumb,low,src-alias,Monster book drawing helpers: list/detail digits; selected row; completion counts and category widgets.
+081D6DFC,MonsterBook_UpdateSelectionCursor,thumb,low,src-alias,Monster book drawing helpers: list/detail digits; selected row; completion counts and category widgets.
+081D6E0C,MonsterBook_DrawCompletionCounts,thumb,low,src-alias,Monster book drawing helpers: list/detail digits; selected row; completion counts and category widgets.
+081D6EE4,MonsterBook_DrawListWindows,thumb,low,src-alias,Monster book drawing helpers: list/detail digits; selected row; completion counts and category widgets.
+081D6F78,MonsterBook_HideCategoryWidgets,thumb,low,src-alias,Monster book drawing helpers: list/detail digits; selected row; completion counts and category widgets.
+081D6F98,MonsterBook_DrawCategoryWidgets,thumb,low,src-alias,Monster book drawing helpers: list/detail digits; selected row; completion counts and category widgets.
 081D70C4,TextSequence_SetState,thumb,low,src-alias,Sets the sequence state and clears its frame counter; text sequence identity tentative
 081D71A0,TextSequence_UpdateHold,thumb,low,src-alias,Counts hold frames and switches to state two when the specified duration expires
 081D71CC,ScreenTransition_FadeBlendOut,thumb,low,src-alias,
