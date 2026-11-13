@@ -333,6 +333,8 @@ Pseudo knobs accept unambiguous C variable names as well as numbers:
 selected pseudos; it diagnoses a lost set or copy, rather than changing the
 ordinary build. A name optimized away or shared by several pseudos is an error;
 use the number from the relevant RTL dump in that case.
+Keep the full `AGBCC_` prefix: abbreviated keys such as `FORCE` or `NOTIE`
+are rejected because the compiler otherwise ignores them silently.
 
 * `AGBCC_REGCLASS=1`: regclass.c prints, for each pseudo and pass, its
   preferred and alternate class and the cost of every class

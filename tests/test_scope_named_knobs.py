@@ -23,6 +23,12 @@ class NamedKnobs(unittest.TestCase):
             result = self.scope.resolve_knobs("draft.c", "Draw", knobs)
         return result, compile_draft
 
+    def test_unprefixed_knob_is_rejected_before_compiling(self):
+        for key in ("FORCE", "PRI", "NOTIE", "COMBKEEP", "NOEQUIV", "NOREG", "MOVE"):
+            with self.subTest(key=key):
+                with self.assertRaisesRegex(SystemExit, f"use AGBCC_{key}"):
+                    self.resolve({key: "32"})
+
     def test_combine_keep_resolves_mixed_list(self):
         result, compile_draft = self.resolve({"AGBCC_COMBKEEP": "base,33", "AGBCC_LOOP_TRACE": "1"})
         self.assertEqual(result["AGBCC_COMBKEEP"], "32,33")

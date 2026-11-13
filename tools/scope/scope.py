@@ -331,6 +331,11 @@ def kref(wd, func, x):
 def resolve_knobs(src, func, env):
     """Resolve C variable names in pseudo knobs after one unknobbed compile."""
     env = dict(env or {})
+    # Unprefixed diagnostic names otherwise reach the compiler as unrelated
+    # environment variables, producing a plausible but unchanged comparison.
+    for key in ("FORCE", "PRI", "NOTIE", "COMBKEEP", "NOEQUIV", "NOREG", "MOVE"):
+        if key in env:
+            sys.exit(f"{key}: use AGBCC_{key}; unprefixed knobs have no effect")
     # A knob set in the environment (`AGBCC_NOEQUIV=36 scope.py FILE.c`) reaches the -g compile through
     # os.environ, but the fork server's compile only sees the knobs passed with each request: copy them all
     # into ENV, so the build's (no -g) bytes get them too. Without this the plain compile ran without the
