@@ -8394,16 +8394,18 @@ addr,name,mode,confidence,source,notes
 081EB5A8,Params3D0_InitDisplay,thumb,low,src-alias,
 081EB724,Params3D0_SetFromScript,thumb,low,src-alias,
 081EB7DC,Params3D0_CreateDisplay,thumb,low,src-alias,Creates and initializes the display task configured through Params3D0
-081EB81C,ScreenText_ShowIndexedString,thumb,low,src-alias,
-081EB864,ScreenParams3F8_SelectValidDataBank,thumb,low,src-alias,Tentatively validates the current data bank or selects its alternate and records availability
-081EBCF4,ScreenParams3F8_DestroyDisplay,thumb,low,src-alias,Display task destructor removes its two embedded animations
-081EC0A8,ScreenParams3F8_SetFromScript,thumb,low,src-alias,
-081EC168,ScreenParams3F8_CreateDisplay,thumb,low,src-alias,Creates the display task initialized from ScreenParams3F8 settings
-081EC1A8,ScreenScript_UpdateDelay,thumb,low,src-alias,
-081EC1F8,Results_Destroy,thumb,low,src-alias,Results task destructor removes its embedded animation
-081EC204,Results_Initialize,thumb,low,src-alias,Loads results backgrounds and palette resources and initializes display animations
-081EC310,Results_SetFromScript,thumb,low,src-alias,Stores script options r and e in the settings block preceding Results_Create
-081EC340,Results_Create,thumb,medium,gcl-name,name from GCL key 1C82 リザルト (Results); registry callback
+081EB81C,ModeMenu_ShowDescription,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EB864,ModeMenu_LoadAvailableSave,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EB8E0,ModeMenu_Update,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EBCF4,ModeMenu_Destroy,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EBD0C,ModeMenu_Initialize,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EC0A8,ModeMenu_SetParametersFromScript,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EC168,ModeMenu_Create,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EC1A8,ResultScreen_Update,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EC1F8,ResultScreen_Destroy,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EC204,ResultScreen_Initialize,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EC310,ResultScreen_SetParametersFromScript,thumb,low,src-alias,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
+081EC340,ResultScreen_Create,thumb,medium,gcl-name,Mode selection screen with saved choice; description; timed unlock-key history and save validation; trailing result-delay screen.
 081EC380,SceneActors_InitResources,thumb,low,src-alias,Actor initialization hook currently returns success without performing work
 081EC388,ActorEffect_SpawnRandomizedBurst,thumb,low,src-alias,
 081EC4AC,ActorEffect_SpawnBurstAtAnchor,thumb,low,src-alias,
