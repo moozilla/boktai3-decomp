@@ -62,7 +62,8 @@ def build(capture=False, sanitize=False):
         if source.count(before) != 1:
             raise RuntimeError(f"harness adapter needs updating: {before}")
         source = source.replace(before, after)
-    source = source.replace('write_cov("total", rom_reader, rom_exec);', 'if (tracing) write_cov("total", rom_reader, rom_exec);')
+    source = source.replace('write_cov("total", rom_reader, rom_exec);',
+                            'if (!tracing) { core->deinit(core); return 0; }\n\twrite_cov("total", rom_reader, rom_exec);')
     adapter = BUILD / "capture_harness.c"
     adapter.write_text(source)
     # Ask the existing Makefile for the exact headers, ABI defines and library.

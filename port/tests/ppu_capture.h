@@ -93,9 +93,32 @@ static void ppu_capture_shot(const char *name)
     snprintf(final_path, sizeof(final_path), "%s/%s.ppu.gz", outdir, name);
     compressed = gzopen(path, "wb1");
     if (!compressed) { perror(path); exit(1); }
-    if (gzwrite(compressed, "PPUDUMP1", 8) != 8 ||
-        gzwrite(compressed, ppu_capture_records, sizeof(ppu_capture_records)) != sizeof(ppu_capture_records) ||
-        gzclose(compressed) != Z_OK || rename(path, final_path)) {
+    if (gzwrite(compressed, "PPUDUMP2", 8) != 8) {
+        fprintf(stderr, "PPU capture header failed\n"); exit(1);
+    }
+    for (i = 0; i < PPU_HEIGHT; ++i) {
+        static const unsigned sizes[4] = {PPU_IO_SIZE, PPU_PALETTE_SIZE, PPU_VRAM_SIZE, PPU_OAM_SIZE};
+        uint8_t *current = ppu_capture_records + i * PPU_RECORD_SIZE;
+        unsigned bank, offset = 16, mask = 0;
+        uint8_t packed;
+        for (bank = 0; bank < 4; ++bank) {
+            if (!i || memcmp(current + offset, current + offset - PPU_RECORD_SIZE, sizes[bank]))
+                mask |= 1u << bank;
+            offset += sizes[bank];
+        }
+        packed = mask;
+        if (gzwrite(compressed, current, 16) != 16 || gzwrite(compressed, &packed, 1) != 1) {
+            fprintf(stderr, "PPU scanline header failed\n"); exit(1);
+        }
+        offset = 16;
+        for (bank = 0; bank < 4; ++bank) {
+            if ((mask & (1u << bank)) && gzwrite(compressed, current + offset, sizes[bank]) != sizes[bank]) {
+                fprintf(stderr, "PPU memory bank failed\n"); exit(1);
+            }
+            offset += sizes[bank];
+        }
+    }
+    if (gzclose(compressed) != Z_OK || rename(path, final_path)) {
         fprintf(stderr, "PPU compressed capture failed: %s\n", path); exit(1);
     }
     snprintf(path, sizeof(path), "%s/%s.port.ppm", outdir, name);
