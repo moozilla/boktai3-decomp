@@ -23,16 +23,17 @@ struct ParticleEmitterDisplay {
 /* Tentative flying emitter: fixed-point world coordinates, then a scatter trail. */
 struct ParticleEmitter {
     void (*update)(struct ParticleEmitter *);
-    u8 unknown04[0x1c];
+    u8 resource[0x1c];
     struct ContactSwarmSprite sprite;         /* 0x20 */
     struct DisplaySequenceState animation;    /* 0x4c */
     u8 spatialEntry[0x40];                    /* 0x5c: spatial-index collision record */
     struct ScenePoolVec32 position, velocity; /* 0x9c, 0xac */
-    u8 unknownBC[0x10];
-    s32 heightOffset, initialVelocity; /* 0xcc, 0xd0 */
+    struct ScenePoolVec32 origin;             /* 0xbc */
+    s32 heightOffset, initialVelocity;        /* 0xcc, 0xd0 */
     u8 entered, active, phase, unknownD7;
     u16 timer;
     u8 owner;
+    u8 unknownDB[5];
 };
 
 void TimedSpriteEffect_RequestStop(u32 slot);
