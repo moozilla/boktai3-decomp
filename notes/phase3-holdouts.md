@@ -1646,3 +1646,33 @@ Next: find a source-level value that gets r8 during allocation but whose final
 uses disappear after reload, while leaving stride's allocation in ip. The
 initialized-zero experiment confirms ordinary extra live data alone is not
 sufficient: it keeps visible instructions and changes stride placement.
+
+
+### SpriteColliderGroup_ResetActiveParts (0818EA3C): combine plus allocation
+
+Ordinary draft remains 2/2, shape 0: first count load/compare uses r6, ROM r5.
+Confirmed why: r5 is not in the reload spill set. In cse2, insn 22 sets pseudo
+33 to zero_extend of the count byte; combine deletes that set and substitutes
+the memory subreg into comparison insn 27. Keeping source variable total (29)
+has no effect because CSE has already replaced it.
+
+AGBCC_COMBKEEP=33 alone gives 15/19. Adding AGBCC_FORCE=33:5 gives 5/5:
+initial load is correct, but active/count exchange r4/r5. The full diagnostic
+AGBCC_COMBKEEP=33 AGBCC_FORCE=33:5,28:4,26:5 matches. Thus stopping combine is
+not sufficient; subsequent allocation must also preserve the body registers.
+No production change. Saved ordinary draft and persistent hypotheses.
+
+New C tests: count address before guard gives 12/12; initialized count union
+5/9, including an unused r8 save/restore; initialized struct gives the same.
+Byte array before i=0 gives 5/5 because the address calculation moves before
+the induction initializer. Byte array initialized after i=0 returns to 2/2.
+Late union variants (byte/halfword/word size) all give 10/14. HasParts boolean
+predicate gives 21/25; a reversed guard gives the baseline; unsigned-byte
+comparison gives 3/3, wide comparison 21/31, subtraction comparison 16/20.
+An additional nonempty guard retains visible code (12/14); updating total in
+the loop condition leaves 2/2.
+
+Next: preserve the count load through combine while allowing its short life
+to share r5 with the later count pointer, and retain active in r4. Aggregate
+initialization can create the unused saved register sought by activation,
+but reset itself needs a narrower change without that prologue effect.
