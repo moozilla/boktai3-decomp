@@ -6794,9 +6794,14 @@ addr,name,mode,confidence,source,notes
 081979B4,PaletteEffect_ApplyBufferedPalette,thumb,low,src-alias,Redirects the target palette to the task buffer with an offset for the starting palette bank
 08197A0C,PaletteEffect_Destroy,thumb,low,src-alias,Destruction callback restores the target palette identifier and source pointer
 08197A50,PaletteEffect_UpdateSharedOverride,thumb,low,src-alias,Update callback maintains the shared palette override until its hold timer expires
+08197AE0,PaletteEffect_StartAnimationOverride,thumb,low,src-alias,Timed palette override or buffered blend wrapper; provisional interpretation.
 08197B2C,PaletteEffect_StartSpriteOverride,thumb,low,src-alias,Creates a timed shared palette override for a sprite with a starting bank offset
 08197B7C,PaletteEffect_UpdateRedPulse,thumb,low,src-alias,Update callback repeatedly blends buffered palette banks toward red and back until the timer expires
+08197C20,PaletteEffect_StartAnimationRedPulse,thumb,low,src-alias,Timed palette override or buffered blend wrapper; provisional interpretation.
+08197C58,PaletteEffect_StartSpriteRedPulse,thumb,low,src-alias,Timed palette override or buffered blend wrapper; provisional interpretation.
 08197C98,PaletteEffect_UpdateWhiteFlash,thumb,low,src-alias,Update callback blends palettes toward white then restores their original colors before ending the task
+08197D5C,PaletteEffect_StartAnimationWhiteFlash,thumb,low,src-alias,Timed palette override or buffered blend wrapper; provisional interpretation.
+08197D94,PaletteEffect_StartSpriteWhiteFlash,thumb,low,src-alias,Timed palette override or buffered blend wrapper; provisional interpretation.
 08197DD0,TimePalette_GetSourceIndex,thumb,low,src-alias,Maps the sun clock phase to one of three palette source indices; time-based ownership is tentative
 08197E0C,TimePalette_UpdateTransition,thumb,low,src-alias,Palette controller callback that detects sun clock phase changes and blends between selected sources over 64 ticks
 08197E74,TimePalette_InitTransition,thumb,low,src-alias,Stores three palette sources and copies the current phase selection into the output before installing the transition callback
