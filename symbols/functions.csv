@@ -8118,6 +8118,8 @@ addr,name,mode,confidence,source,notes
 081DB0C4,Explosion_InitColliderWithFlags,thumb,low,src-alias,
 081DB168,Explosion_Init,thumb,low,src-alias,Initializes the effect sprite and standard collider with position and activation delay
 081DB1D8,Explosion_InitWithCollisionFlags,thumb,low,src-alias,Initializes the same effect with an additional configurable collider flag argument
+081DB24C,Explosion_CreateImmediate,thumb,low,src-alias,
+081DB2B8,Explosion_CreateDelayed,thumb,low,src-alias,
 081DB324,Explosion_Create,thumb,low,src-alias,Allocates an explosion with caller-supplied collision parameters and activation delay
 081DB390,Explosion_CreateAt,thumb,low,src-alias,
 081DB404,Explosion_CreateWithCollisionFlags,thumb,low,src-alias,Allocates an explosion using the initializer that accepts additional collider flags
