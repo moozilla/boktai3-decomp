@@ -3,13 +3,7 @@
 #include "engine.h"
 #include "scene_consumable_definition.h"
 /* Tentative inventory-value family: the callers select equipment/item slots. */
-struct SceneValueEquipment {
-    u8 kind, unknown1;
-    u16 condition;
-    u8 modifierA, unknown5[3];
-    u8 modifierB, unknown9[3];
-    u8 grade, unknownD[3];
-};
+#include "scene_value_equipment.h"
 struct SceneValueEquipmentDefinition {
     u8 descriptionTitle, unknown1, descriptionStyleA, descriptionStyleB;
     u8 unknown4[2];
