@@ -6031,18 +6031,23 @@ def put_definition(src, snippet, func):
     import land
     path = os.path.join(ROOT, src)
     text, new = open(path).read(), open(os.path.expanduser(snippet)).read()
-    pat = re.compile(r"^[A-Za-z_][^\n;=()]*\b%s\s*\([^;{]*\)\s*\{" % re.escape(func), re.M)
-    if not pat.search(new):
+    new_match = land.definition_match(new, func)
+    if not new_match:
         sys.exit(f"{func}: {snippet} has no definition of it")
     sp = land.definition_span(text, func)
     if not sp:
         sys.exit(f"{func}: no definition in {src} to replace (`new` writes one)")
     # every prototype of FUNC in the unit (before or after it) takes the definition's signature
-    header = re.sub(r"\s+", " ", new[pat.search(new).start():new.index("{", pat.search(new).start())]).strip()
-    proto = re.compile(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*\b%s\s*\([^;{}]*\)\s*;" % re.escape(func), re.M)
+    # A snippet's alias macro may follow the unit's prototypes. Declare the
+    # canonical symbol there so those declarations do not depend on macro order.
+    header = (new[new_match.start():new_match.start("name")] + func
+              + new[new_match.end("name"):new.index("{", new_match.start())])
+    header = re.sub(r"\s+", " ", header).strip()
+    spellings = "|".join(map(re.escape, land.definition_names(text, func)))
+    proto = re.compile(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*\b(?:%s)\s*\([^;{}]*\)\s*;" % spellings, re.M)
     text = proto.sub(lambda m: re.sub(r"^static\s+", "", header) + ";", text)
     sp = land.definition_span(text, func)
-    start = pat.search(text, sp[0]).start()
+    start = land.definition_match(text, func).start()
     # what a put inserts sits between these markers, and the next put replaces exactly that
     begin, end = f"// scope: put {func} begin\n", f"// scope: put {func} end\n"
     a = text.find(begin)
@@ -6068,7 +6073,7 @@ def put_definition(src, snippet, func):
         t = head[a:b]
         if t.rstrip().endswith("}") and not re.match(r"static\b", t) and re.search(r"\)\s*\{", t):
             prev_end = b
-    names = {n for n, _ in item_names(new[:pat.search(new).start()])} - {None}
+    names = {n for n, _ in item_names(new[:land.definition_match(new, func).start()])} - {None}
     kept, dropped = [], []
     gap = text[prev_end:start]
     pos = 0
