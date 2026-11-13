@@ -202,7 +202,7 @@ void MenuPrompt_PulseDisplay(struct MenuPrompt *p)
 
 s32 Hud_GetScaledRetryCount(void)
 {
-    s16 v = *(s16 *)((u8 *)gGameState + 0x876);
+    s16 v = gGameState->unk876;
     s32 r;
     if (v <= 1)
         r = 9;
