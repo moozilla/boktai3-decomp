@@ -203,7 +203,7 @@ build/port/slice-wasm32-rtc-video/boot.wasm baserom.gba`. Three frames verify th
 original handler's BG scroll uploads, dialogue latches, upload flag, clock ticks
 and BIOS VBlank latch, plus IF acknowledgement and IME restoration. The test
 uses valid inactive sound state and leaves wireless uncreated; active audio/RFU
-callbacks and the VCount sound handler are not covered. This focused resolver
+callbacks are not covered. This focused resolver
 is a tested integration boundary, not the full game's callback registry.
 
 ## Discarded return declarations
@@ -229,3 +229,11 @@ objects without attempting a partial final link. The audit collects fatal
 signature diagnostics separately from missing symbols because LLD stops early
 on fatal warnings. Any diagnostic wasm output is deleted; the normal build
 continues to reject signature warnings. Results live in `build/port/returns/`.
+
+The same video-IRQ slice includes the original two-phase VCount handler
+`sub_08214144`. Run `node port/tests/vcount_irq.cjs
+build/port/slice-wasm32-rtc-video/boot.wasm baserom.gba` to check the comparison
+change from scanline 64 to 144, the dialogue-scroll write, phase reset and IRQ
+mask restoration. It checks exactly two VCount calls per frame, avoiding a
+duplicate HBlank notification. Register setup uses the exported device bus,
+just like generated game C. Sound state remains inactive in this test.

@@ -2,6 +2,7 @@
 VIDEO_IRQ_SOURCES = [
     'src/fn/sub_08034090.c',
     'src/fn/sub_08213FD8.c',
+    'src/fn/sub_08214144.c',
     'src/fn/sub_08223BA4.c',
     'src/fn/sub_08224980.c',
     'src/fn/sub_08224C84.c',

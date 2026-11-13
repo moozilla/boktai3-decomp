@@ -63,7 +63,8 @@ def build_slice(root, args):
                   'port/core/irq.c', 'src/fn/sub_08243C10.c', 'src/fn/sub_08243D28.c']
         units += [str(p) for p in sorted((hardware / 'hw').glob('*.c')) if p != bios and p.name != 'rtc_sdk.c']
         exports += ['port_devices_init', 'InterruptsAndVideo_Initialize',
-                    'port_solar_irq_init', 'port_solar_irq_calls', 'port_irq_raise', 'port_irq_dispatch']
+                    'port_solar_irq_init', 'port_solar_irq_calls', 'port_irq_raise', 'port_irq_dispatch',
+                    'port_bus_load_i16', 'port_bus_store_i16']
     if args.ppu_root:
         ppu = Path(args.ppu_root).resolve()
         flags += ['-I' + str(ppu / 'include')]
@@ -74,7 +75,7 @@ def build_slice(root, args):
         exports += ['Clock_CheckRtcDate', 'Clock_ReadValidatedRtcDateTime', 'Clock_CheckRtcStatus']
     if args.video_irqs:
         units += VIDEO_IRQ_SOURCES + ['port/core/video_irq.c', 'port/core/callback.c']
-        exports += ['port_vblank_irq_init', 'port_vblank_irq_calls']
+        exports += ['port_vblank_irq_init', 'port_vblank_irq_calls', 'port_vcount_irq_calls', 'port_run_scanline']
     units = list(dict.fromkeys(units))
     for name in units:
         source = root / name
