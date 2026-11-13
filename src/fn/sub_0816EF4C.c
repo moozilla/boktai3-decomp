@@ -16,7 +16,7 @@ void InventoryPanel_ShowStatusIcons(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
 void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
-void sub_0816D634(void *, u32);
+void PauseMenu_ApplyItemSlot(void *, u32);
 void Hud_DrawDefaultHealthMeter(void *, u32, u32, u32);
 void Hud_DrawDefaultEnergyMeter(void *, s32, s32, s32, s32, s32);
 struct MenuFlickerTarget {
@@ -76,7 +76,7 @@ void MenuTransition_AnimateMetersToTarget(u8 *p)
                                ((struct MenuFlickerView *)p)->target->yMax);
     if (done > 1) {
         Sound_StopSong(0x259);
-        sub_0816D634(p, p[0x438a]);
+        PauseMenu_ApplyItemSlot(p, p[0x438a]);
         SceneHud_RefreshActionIcons(p);
         Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
         q = p + 0x4384;
