@@ -81,7 +81,11 @@ function status(text, bad) { $('status').textContent = text; $('status').classLi
 function log(text) { $('log').textContent += text + '\n'; }
 
 addEventListener('keydown', (e) => {
-  if (e.code in KEYS) { Atomics.or(control, 0, 1 << KEYS[e.code]); e.preventDefault(); }
+  if (e.code in KEYS) {
+    Atomics.or(control, 0, 1 << KEYS[e.code]);
+    Atomics.or(control, 5, 1 << KEYS[e.code]); // latched until the game's next frame
+    e.preventDefault();
+  }
   else if (e.code === 'Space') { Atomics.store(control, 1, 1); e.preventDefault(); }
   else if (e.code === 'KeyP') togglePause();
 });

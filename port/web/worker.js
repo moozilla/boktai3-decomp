@@ -5,6 +5,7 @@
 // Shared control words (Int32Array over `control`):
 //   0 keys (KEYINPUT order, 1 = pressed)   1 fast-forward   2 pause
 //   3 solar level 0 (sun) .. 255 (dark)    4 sleep slot (always 0)
+//   5 keys pressed since the last frame (a tap shorter than a frame still counts)
 // Audio ring (`audio`): Int32 [write, read, rate], then Float32 stereo data.
 const FRAME_MS = 1000 / (16777216 / 280896);
 let ex, memory, control, audioHead, audioData, audioFrames;
@@ -49,7 +50,7 @@ const imports = { env: {
       if (due - now > 100 || now - due > 100) started = now - n * FRAME_MS; // resync after stalls
       else if (due > now) Atomics.wait(control, 4, 0, due - now);
     }
-    return Atomics.load(control, 0);
+    return Atomics.load(control, 0) | Atomics.exchange(control, 5, 0);
   },
   audio(ptr, frames, rate) {
     if (!audioData || Atomics.load(control, 1)) return;

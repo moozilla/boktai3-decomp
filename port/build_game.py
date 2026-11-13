@@ -92,11 +92,15 @@ def main():
     ap.add_argument('--force', action='store_true')
     ap.add_argument('--trace', action='store_true',
                     help='record each GBA function\'s first call (build/port/game-trace/)')
+    ap.add_argument('--watch', metavar='FUNC[,FUNC]',
+                    help='log these functions\' first three arguments at every entry (build/port/game-watch/)')
     args = ap.parse_args()
     os.chdir(ROOT)
     global OUT
     if args.trace:
         OUT = ROOT / 'build/port/game-trace'
+    elif args.watch:
+        OUT = ROOT / 'build/port/game-watch'
     if not (ROOT / 'build/boktai3.elf').exists():
         sys.exit('build/boktai3.elf is missing: run make (or tools/worktree.sh --here) first')
     OUT.mkdir(parents=True, exist_ok=True)
@@ -244,6 +248,8 @@ def main():
                 table.append((synthetic[key], symbol))
         if args.trace and name.startswith('src/'):
             text = add_trace(text, addresses)
+        if args.watch and name.startswith('src/'):
+            text = add_watch(text, set(args.watch.split(',')), addresses)
         text = text + ''.join(extra)
         if '@port_regs' in text and not re.search(r'^@port_regs\b', text, re.M):
             text += abi.PORT_REGS_DECL + '\n'
@@ -317,6 +323,34 @@ def main():
         print('imports:', ', '.join(imports))
         print(f'{OUT / "game.wasm"}: {(OUT / "game.wasm").stat().st_size // 1024} KiB')
     return r.returncode
+
+
+def add_watch(text, names, addresses):
+    """Call port_watch(address, a0, a1, a2) at the entry of each named function."""
+    out = []
+    used = False
+    for line in text.splitlines():
+        out.append(line)
+        m = re.match(r'define [^@]*@([-\w.$]+)\((.*)\)[^(]*\{$', line)
+        if not m or m[1] not in names:
+            continue
+        values = []
+        for param in abi.split_top(m[2]) if m[2].strip() else []:
+            words = param.split()
+            kind, reg = words[0], words[-1]
+            if kind == 'ptr':
+                out.append(f'  %__watch{len(values)} = ptrtoint ptr {reg} to i32')
+                values.append(f'%__watch{len(values)}')
+            elif kind in ('i8', 'i16'):
+                out.append(f'  %__watch{len(values)} = zext {kind} {reg} to i32')
+                values.append(f'%__watch{len(values)}')
+            elif kind == 'i32':
+                values.append(reg)
+        values = (values + ['0', '0', '0'])[:3]
+        address = addresses.get(m[1], 0) & ~1
+        out.append(f'  call void @port_watch(i32 {address}, ' + ', '.join(f'i32 {v}' for v in values) + ')')
+        used = True
+    return '\n'.join(out) + ('\ndeclare void @port_watch(i32, i32, i32, i32)\n' if used else '\n')
 
 
 def add_trace(text, addresses):

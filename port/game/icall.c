@@ -3,6 +3,7 @@
  * of canonical adapters is generated at link time from the ROM ELF symbols. */
 #include <stdint.h>
 #include "host.h"
+#include "platform.h"
 
 typedef int64_t (*PortThunk)(uint32_t, uint32_t, uint32_t, uint32_t,
                              uint32_t, uint32_t, uint32_t, uint32_t,
@@ -66,3 +67,18 @@ void port_trace(uint32_t address)
     if (i < sizeof(trace_map)) trace_map[i] = 1;
 }
 uint8_t *port_trace_map(void) { return trace_map; }
+
+/* --watch builds: log a function's address and first three arguments. */
+void port_watch(uint32_t address, uint32_t a0, uint32_t a1, uint32_t a2)
+{
+    static const char hex[] = "0123456789abcdef";
+    uint32_t words[4] = {address, a0, a1, a2};
+    char text[48], *p = text;
+    int i, k;
+    for (i = 0; i < 4; i++) {
+        *p++ = i ? ' ' : 'w';
+        for (k = 28; k >= 0; k -= 4) *p++ = hex[(words[i] >> k) & 15];
+    }
+    *p = 0;
+    port_host_log(text, (uint32_t)port_frame_count());
+}

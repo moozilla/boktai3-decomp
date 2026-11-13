@@ -7,6 +7,73 @@ memory can hold the GBA regions at their original addresses. The user supplies a
 ROM at runtime. No ROM bytes or generated assets belong in the port source.
 The original agbcc build does not include anything under `port/`.
 
+## Play it
+
+```sh
+python3 port/serve.py        # or: make port-demo
+```
+
+This builds `build/port/game/game.wasm` (cached; needs `build/boktai3.elf` from
+`make` or `tools/worktree.sh --here`), serves `port/web/` on
+`http://127.0.0.1:8765` and opens the page. The page loads `baserom.gba` from the
+repository root by itself; the file picker appears only when the server has no
+ROM. Keys: arrows, X = A, Z = B, A = L, S = R, Enter = Start, Backspace = Select,
+Space = fast-forward (hold), P = pause. The sunlight slider feeds the solar
+sensor. "Start from" picks your own save (`build/port/saves/boktai3.sav`, written
+as you play), a new game, `tests/saves/*.sav`, or the story checkpoints in
+`build/saves/` (`python3 tools/assets/saves.py bank --make`).
+
+Debugging: `python3 port/build_game.py --trace` records which GBA functions ran
+(compare with mGBA using `port/game/coverage.py`); `--watch FUNC,FUNC` logs those
+functions' first three arguments at every entry. A hang shows up in
+`node --prof port/game/run_node.mjs ...` followed by `node --prof-process`.
+
+Headless: `node port/game/run_node.mjs --frames 2400 --shots 900,2400
+--keys "950:a,1100:start,1250:a" [--save tests/saves/ShinBok2.sav]` writes PNGs
+to `build/port/game/frames/`.
+
+### Status
+
+What runs: the whole game. `port/build_game.py` compiles every `src/` unit (and
+the `INCLUDE_ASM` bodies' C replacements under `port/`) to one wasm module with
+no undefined symbols and no signature mismatches. `AgbMain` runs in a Web Worker
+at 59.7 fps with sound (the C MP2K sequencer and mixer through an
+AudioWorklet), keyboard input, the solar sensor, the RTC and an EEPROM save.
+Boot is pixel-identical to mGBA at frame 900 (health warning, logos); the region
+setup, sensor calibration, KONAMI logo, caution screen, title and GAME START menu
+all run from the original C. With `tests/saves/ShinBok2.sav` (Start from:
+Checkpoint) the file select shows the save, Continue loads the field, and Django
+walks, opens doors and changes rooms under keyboard control; the room matches
+mGBA's (apart from the time-of-day tint, which follows each one's clock).
+
+How: GBA addresses are wasm addresses (160 MiB fixed memory); the ROM is copied
+to 0x08000000 and its FPA-order `double` tables are swapped after loading.
+Every struct gets agbcc's 4-byte alignment and size rounding. A whole-program
+ABI pass (`port/core/abi.py`) rewrites calls to the defining signature, gives
+function values their GBA code addresses (so ROM function tables work as data)
+and routes indirect calls through `port_code_table`. Arguments the original
+passed in registers without declaring them are modeled (result of the previous
+call, or the caller's own registers). Time advances cooperatively: at
+`VBlankIntrWait`, and when the bus sees the same register polled three times
+(`port_bus_enable_spin`), the hardware model runs scanlines and raises
+interrupts; the frame is presented at line 160.
+
+What's left:
+
+* 17 register arguments the ABI pass could not determine
+  (`build/port/game/unknown_registers.txt`) and 134 padded calls
+  (`padded_calls.txt`): rarely run paths may read a wrong argument.
+* Timing is cooperative, not cycle-counted: the port has no lag frames, so it
+  runs ahead of mGBA by frame number; compare screens, not frame counts.
+* The C MP2K sequencer (`port/game/m4a_seq.c`) stands in for `m4a_1.s`; it has
+  not been compared sample-for-sample with mGBA.
+* Wireless (RFU) link play is stubbed.
+* Soft-float and EEPROM SDK routines are port replacements, not the original C.
+* The older slice builds (`port/build.py --slice`, `run_boot.py`, `run_rtc.py`,
+  `run_returns_slice.py`, `run_display_bus.py`) name `src/fn/*.c` files that main
+  has since folded into units, so they fail on main too; the full-game build
+  replaces them.
+
 ## Build the C
 ## Hardware slice
 
@@ -86,11 +153,8 @@ boundaries or generated MMIO instrumentation before it can run cooperatively.
 
 ## Current execution limits
 
-The full game has not linked or booted. Absolute RAM/ROM data binding and volatile scalar MMIO instrumentation are
-implemented. Remaining work includes relocation of ROM function-pointer tables,
-strict wasm function signature mismatches, remaining intentional assembly
-replacements, and validation of device behavior beyond the boot slice. The portable runtime
-and its tests are a foundation for that integration, not an emulator.
+The full game links and runs; see [Status](#status). The slice builds below
+remain the focused, repeatable tests for single subsystems.
 
 ## Linked boot slice and repeatable tests
 

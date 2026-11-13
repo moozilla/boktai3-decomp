@@ -318,6 +318,7 @@ def emit_call(indent, dest, cc, ret, callee, args, trailer='', fresh=None):
 
 
 PADDED = []  # (callee, given, wanted) for calls passing fewer arguments
+RESULT = []  # the discarded result adapt_direct just named, if any
 
 
 def adapt_direct(call, sig, fresh, fill=None, publish=False):
@@ -348,8 +349,11 @@ def adapt_direct(call, sig, fresh, fill=None, publish=False):
             v = fill(i, pty, out) if fill and pty in _SCALARS else None
             args.append((pty, v if v is not None else zero(pty)))
     if publish:
+        # The registers hold what the call site passed, including arguments
+        # beyond the definition's parameters (a (void) wrapper forwards them).
+        passed = args + [(t, v) for t, v, at in have[len(args):]]
         slots = []
-        for t, v in args:
+        for t, v in passed:
             if t in _SCALARS and t != 'void':
                 slots += to_slots(v, t, out, fresh, False)
         for i, v in enumerate(slots[:4]):
@@ -374,6 +378,12 @@ def adapt_direct(call, sig, fresh, fill=None, publish=False):
                 v = zero(want)
             lines += [ind + x for x in conv]
             lines.append(f'{ind}{dest} = {identity(want, v)}')
+    elif sig.ret in _SCALARS and sig.ret != 'void':
+        # The call site discards a result the callee returns: name it, since
+        # the next call may read it as r0 (RESULT tells the caller).
+        tmp = fresh()
+        lines.append(emit_call(ind, tmp, sig.cc, sig.ret, call['callee'], args))
+        RESULT[:] = [(tmp, sig.ret)]
     else:
         lines.append(emit_call(ind, None, sig.cc, sig.ret, call['callee'], args, fresh=fresh))
     return lines
@@ -584,6 +594,7 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
             continue
         callee = call['callee']
         lines = None
+        RESULT.clear()
         if callee.startswith('@'):
             name = callee[1:]
             if name in defs_global and name not in internals:
@@ -598,7 +609,7 @@ def rewrite_module(text, defs_global, addresses, module_id, game, synthetic, rea
             out += [sub_values(x, values) if values else x for x in lines]
         if _clobbers(callee):
             state['calls'] += 1
-            state['last'] = (call['dest'], call['ret']) if call['dest'] else None
+            state['last'] = (call['dest'], call['ret']) if call['dest'] else (RESULT[0] if RESULT else None)
     result = '\n'.join(out) + '\n'
     if game:
         # Indirect calls can reach any function; drop optimizer guarantees.
