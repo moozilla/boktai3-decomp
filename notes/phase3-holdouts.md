@@ -1427,3 +1427,28 @@ testing, a field-setting helper, and a halfword-returning setter do not solve
 both decisions. Next: preserve a HImode field insertion while giving the
 constant its own dying pseudo; inspect regmove's tied operand choice rather
 than only global allocation priority.
+
+### NamedObject_RegisterFollowCells (08101B1C)
+
+Tags: phase3, dp-field-b, NamedObject_RegisterFollowCells
+
+Run ended while this item was active. One existing object-pointer pin remains;
+no source change landed. Saved draft uses the named player tetherMode field
+and otherwise preserves the baseline pin-free shape (17/17 differences).
+
+Exact diagnosis: AGBCC_PRI=object:+1027 MATCHES. The local position pointer w
+has priority 2790 and is allocated before object (1764), taking r8; object
+then takes r10 rather than ROM r8. A smaller +1001 improvement leaves 12/12;
+raising i by 27 leaves 15/15. CSE_NOCANON=23 worsens to 18/18 with four moved
+branches. This is allocation order, not merely CSE canonicalization.
+
+Tried named player access (same), do-while form (same), explicit goto loop
+(31/35), direct object flag update (23/23), union-initialized local position
+pointer (same), and changing individual temporary position stores to direct
+fields. The Z form gives 15/17 with two moved branches; X is unchanged and Y
+is 16/18. Saved the cleaner baseline because the alternatives disturb local
+addressing without solving the exact allocation priority.
+Next: reduce w's effective priority or extend its meaningful lifetime while
+preserving its in-loop address materialization; alternatively recover another
+object reference that survives CSE. The exact priority knob is available to
+verify that a candidate addresses the right decision.
