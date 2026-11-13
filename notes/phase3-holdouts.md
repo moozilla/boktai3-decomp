@@ -1228,3 +1228,42 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+
+## dp-effects (Codex)
+
+Tags: #matching #phase3 #effects
+
+### sub_08012B34 (08012B34, src/debris_particles.c): partial, origin pin remains
+
+Removed the operand barrier using `ParticleRandom_ReadRelativeSample(setup, gRandomTable)`
+for subsequent draws. The complete unit still matches; only the existing r3 origin pin
+remains. The sample origin is now named `PARTICLE_RANDOM_SAMPLE_ORIGIN`.
+
+Best ordinary-C source: `notes/phase3-drafts/dp-effects/sub_08012B34.c` (complete unit),
+20 ROM / 20 draft, shape 0. It follows DirectionalParticle_Spawn and
+FragmentEffect_SpawnRandomParticle: symbolic origin `(u32)&gHeapHead +
+RESOURCE_REGISTRY_ENTRIES_ADDR`, a saved copy after the x-product, and shared relative
+sampling for the vertical component. `AGBCC_PRI=setup:+2791` gives MATCH. The source's
+angle wins r3 first (priority 2926); setup is 136. The two constant sets multiply setup's
+flow live length by four in `update_equiv_regs`, as confirmed in local-alloc.c.
+
+The earlier `setup & 3` draft also remains 20 / 20 and matches with
+`AGBCC_PRI=setup:+2908`; the new draft uses real sampling arithmetic instead.
+All later draws through the relative sampler extend setup's life but cse shares its
+parameter copies, leaving only three counted refs. A first-sample-only relative use
+plus the saved origin shortens the life, but does not change the allocation order.
+Branch-local origins and the existing capture macro collapse into the same global
+pseudo. Duplicating the full tails gives separate origins, but gcse changes random
+cursor stores and jump2 leaves excess code. A split-half union keeps too much insert
+code; zero-initializing it lets cse2 rebuild the same constant and its equivalence.
+Constructing the origin within the first-sample helper, including union views, lets
+cse eliminate the dead load before flow. Byte and halfword angle forms add or reorder
+instructions without fixing the allocation.
+
+Persistent evidence: `build/matchsearch/sub_08012B34` (source hypotheses and compiled
+results); experiments: `build/cx/work/sub_08012B34/`. `why all` and the matching priority
+knob confirm that the other differences are consequences of origin/angle placement
+and reload rotation. Next idea: recover a first-sample helper whose short-lived origin
+use survives until combine, allowing local allocation to reserve r3 before the angle.
+No new concession or compiler override was landed.
