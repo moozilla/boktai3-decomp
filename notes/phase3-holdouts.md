@@ -1483,3 +1483,39 @@ baseline; typed replacements still need the allocation mechanism above.
 
 The weekly-run stop arrived during this item. Work ends here; queue item 28
 (SceneActorRegistry_DefeatActorsFromScript) and later items were not started.
+
+### sub_08070910 — flag-result allocation
+
+Tags: phase3, dp-scene1, sub_08070910, 0x08070910
+
+Saved pin-free draft has eight ROM / eight draft register-only differences,
+shape zero, same 304 bytes. Expressing the second availability check directly
+as value = actor->flags2D0 & excluded fixes four of the original twelve differences.
+The original three-pin source remains unchanged; no matching partial was found.
+
+The first availability value is a global pseudo with 16 loop-weighted refs,
+live ten, priority 64000. Its first mask is local, priority 40000, and takes r0;
+the second field address also conflicts in r0. Raising the value priority by
+100000 does not fix allocation. Forced value r0 alone aliases the mask and
+loses the load; forcing both value/mask additionally rotates field-address and
+reload allocation. These forced results are diagnostic only and are not valid
+matching drafts. No exact single-knob match was found. The canonical-register
+and jump-follow probe changes none of the original twelve differences.
+
+The final halfword OR is canonicalized to loaded-value | changeMask, then
+regmove ties the result to the loaded value. ROM instead keeps the constant in
+r0 and loads the halfword in r1. why identifies that tie at insn 333 in the saved
+C form. NOTIE combined with the forced availability registers did not reverse it.
+Separate change masks, direct stores, load-first forms and u16 locals alter
+allocation or hoisting without matching. A typed inline flag setter, union and
+array read views, duplicated post-control tails, separate availability-result
+locals, and a u16 mask parameter also failed. A split availability value gives
+24 register-only differences; reload rotation 3:1 reduces that to fifteen,
+so reload rotation is not the whole cause. Keeping either original helper pin
+with the direct second check leaves nineteen differences; keeping both removed
+with the final OR pin leaves four. No pin is removable by itself.
+
+Next: give the initial halfword value a natural r0 preference without retaining
+it through the second field address, then keep the OR constant as operand one
+through CSE. The exact instruction shape already exists; avoid introducing
+extra tests or barriers to fix allocation.
