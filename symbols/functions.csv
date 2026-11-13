@@ -9054,8 +9054,10 @@ addr,name,mode,confidence,source,notes
 08218B30,Video_OnFrameNoOp,thumb,low,src-alias,Empty callback installed in the video frame processing callback slot
 08218B34,Text_FlushTileUploads,thumb,low,src-alias,Uploads queued glyph tiles to background VRAM using DMA and clears the queue
 08218B8C,Text_QueueTileUpload,thumb,low,src-alias,Stages one glyph tile and records its destination tile index
+08218BC8,Text_ResetFontResource,thumb,low,decomp,Clear cached font resource pointer
 08218BD4,Text_GetFontResource,thumb,low,src-alias,Returns the current font resource header pointer
 08218BE0,Text_LoadFontResource,thumb,low,src-alias,Lazily allocates the font header and relocates its two glyph data pointers
+08218C40,Text_GetNarrowGlyphCount,thumb,low,decomp,Return narrow glyph count from loaded font header
 08218C5C,Text_GetWideGlyphCount,thumb,low,src-alias,Returns the second font header count used to validate wide glyph indices
 08218C78,Text_GetNarrowGlyphData,thumb,low,src-alias,Returns the font data used to draw two vertically stacked tiles per narrow glyph
 08218C94,Text_GetWideGlyphData,thumb,low,src-alias,Returns the font data used to draw four tiles per wide glyph
