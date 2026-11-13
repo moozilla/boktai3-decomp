@@ -6,18 +6,18 @@ s32 Task4E01_UpdateGrowingImpact(struct Task4E01Projectile *p)
     u8 ended;
     u32 draw;
     if (p->frame <= 11) {
-        p->radius += 10;
-        Projectile_SetCollisionSize(params, p->radius, 80, p->radius);
+        p->runtime.radius += 10;
+        Projectile_SetCollisionSize(params, p->runtime.radius, 80, p->runtime.radius);
         {
-            struct Task4E01Collider *collider = &p->collider;
+            struct ContactCollider *collider = &p->colliders[0];
             collider->bounds = p->params.bounds;
         }
     }
-    ended = PlayerCue_StepSequenceEnded(&p->sprite, &p->sequence);
-    if (ended == 1 && !p->restarted) {
-        Anim_RestartSequence(&p->sequence, p->resource, 8, 0, 0);
-        PlayerCue_StepSequenceEndedWithFirstFlipMask(&p->sprite, &p->sequence, ended);
-        p->restarted++;
+    ended = PlayerCue_StepSequenceEnded(&p->sprite, &p->runtime.sequence);
+    if (ended == 1 && !p->runtime.restarted) {
+        Anim_RestartSequence(&p->runtime.sequence, p->runtime.resource, 8, 0, 0);
+        PlayerCue_StepSequenceEndedWithFirstFlipMask(&p->sprite, &p->runtime.sequence, ended);
+        p->runtime.restarted++;
     }
     draw = 2;
     p->flags |= draw;

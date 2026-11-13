@@ -408,7 +408,7 @@ s32 SceneTransition_Initialize(struct SceneTransition *transition, void *scriptA
         u32 zero = 0;
         transition->motion.position = zero;
         transition->motion.state = zero;
-        transition->motion.unk28 = zero;
+        transition->motion.mode = zero;
         transition->motion.timer = zero;
     }
     transition->target = RegistryF3E4_CreateHidden(2);

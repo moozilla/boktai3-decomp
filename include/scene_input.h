@@ -19,7 +19,7 @@ struct SceneInputPair {
 };
 
 s32 Anim_SelectWidgetGlyph(void *, void *, u32);
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void SceneInput_BeginChoice(struct SceneInputWidget *, void *, u8 *, u32, u8 *);
 s32 SceneInput_TickChoice(struct SceneInputWidget *, void *, u8 *, u8 *);

@@ -7,8 +7,8 @@
 void SpriteParticle_SpawnBatch(void *, u32, u32, u32, u32);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
-void GameState_SetEventFlag(void *);
+void *Bestiary_GetEntryForActor(u32, u32);
+void Bestiary_UnlockEntry(void *);
 void SceneActorRegistry_SendToActorId(u8, void *, u16);
 s32 Mod(s32, s32);
 extern const s16 gUnk_086149C4[];
@@ -160,8 +160,8 @@ void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
                 }
             }
             if ((!Octopus_MotionBits(0x4000, flags)) && (((u32)(actor->category - 11)) > 2))
-                GameState_SetEventFlag(
-                    BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+                Bestiary_UnlockEntry(
+                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
             SceneActorChase_SetTypedControl(actor, (void *)SceneActorControl_OnIdle, 0x10);
             SceneActorChase_SetTypedState(actor, 1, 0, 2);
             {

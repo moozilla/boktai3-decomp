@@ -1603,6 +1603,40 @@ def uid_locations(wd):
     return out
 
 
+uid_sources = uid_locations  # name used by source_statement
+
+
+def source_statement(wd, src, uid):
+    """Display location and source text for UID, never borrowing another file's line.
+
+    Main-file statements retain the author's spelling. Header statements come from
+    the compiled preprocessor input, so the explanation also works for saved dumps.
+    """
+    filename, line = uid_sources(wd).get(uid, (None, 0))
+    if not filename or not line:
+        return None, ""
+    if os.path.normpath(os.path.join(ROOT, filename)) == os.path.normpath(os.path.join(ROOT, src)):
+        with open(os.path.join(ROOT, src)) as stream:
+            lines = stream.read().splitlines()
+        return str(line), lines[line - 1].strip() if line <= len(lines) else ""
+    label = f"{line} ({filename})"
+    path = os.path.join(wd, "u.i")
+    if not os.path.exists(path):
+        return label, ""
+    current, number = None, 0
+    with open(path, errors="replace") as stream:
+        preprocessed = stream.read().splitlines()
+    for text in preprocessed:
+        marker = re.match(r'# (\d+) "([^"]*)"', text)
+        if marker:
+            number, current = int(marker.group(1)), marker.group(2)
+            continue
+        if current == filename and number == line:
+            return label, text.strip()
+        number += 1
+    return label, ""
+
+
 def dispositions(wd):
     """pseudo -> hard register, from global-alloc's 'Register dispositions'."""
     path = os.path.join(wd, "u.i.greg")
@@ -1618,6 +1652,27 @@ def dispositions(wd):
 
 def regs_of(rtl):
     return [int(n) for n in re.findall(r"\(reg(?:/[a-z]+)*:\w+ (\d+)", rtl or "")]
+
+
+def register_widths(insns):
+    """Pseudo/hard-register widths in 32-bit ARM words, including enclosing SUBREGs.
+
+    A DI value allocated at r2 also occupies r3; looking only at its first
+    hard register misses that conflict. Narrow uses must not shrink its width.
+    """
+    words = {"PDI": 2, "DI": 2, "DF": 2, "CSI": 2, "CDI": 4, "CTI": 8,
+             "COI": 16, "SC": 2, "DC": 4, "XC": 6, "TC": 8}
+    out = {}
+    for _, _, rtl in insns:
+        for mode, number in re.findall(r"\(reg(?:/[a-z]+)*:(\w+) (\d+)", rtl):
+            reg = int(number)
+            out[reg] = max(out.get(reg, 1), words.get(mode, 1))
+    return out
+
+
+def occupies_hard_register(reg, want, hard, widths):
+    first = reg if reg < 16 else hard.get(reg, -1)
+    return 0 <= first < 16 and first <= want < min(16, first + widths.get(reg, 1))
 
 
 def function_trace(text, func):
@@ -1931,6 +1986,25 @@ def reg_nums(text):
     for m in re.finditer(r"\b(?:r(\d+)|(sb|sl|fp|ip|sp|lr|pc))\b", (text or "").split(None, 1)[-1] if text else ""):
         out.append(int(m.group(1)) if m.group(1) else REG_ALIASES[m.group(2)])
     return out
+
+
+def commuted_register_operands(rom, draft):
+    """Same three-register commutative instruction with only its inputs exchanged.
+
+    Do not turn this into two allocation diagnoses: changing register assignments
+    would disturb the surrounding instructions without addressing operand order.
+    """
+    pattern = r"(adds?|muls?|ands?|orrs?|eors?)\s+((?:r\d+|sb|sl|fp|ip|sp|lr|pc)\s*,\s*(?:r\d+|sb|sl|fp|ip|sp|lr|pc)\s*,\s*(?:r\d+|sb|sl|fp|ip|sp|lr|pc))"
+    a, b = re.fullmatch(pattern, rom or ""), re.fullmatch(pattern, draft or "")
+    if not a or not b or a[1] != b[1]:
+        return False
+    rr, dr = reg_nums(rom), reg_nums(draft)
+    return rr[0] == dr[0] and rr[1] != rr[2] and rr[1:] == dr[:0:-1]
+
+
+def register_permutation(before, after):
+    """An order change preserving every register occurrence, including repeats."""
+    return before != after and sorted(before) == sorted(after)
 
 
 REG_TOKEN = re.compile(r"\b(?:r\d+|sb|sl|fp|ip|sp|lr|pc)\b")
@@ -3078,15 +3152,16 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         return
     pc, hc = conf.get(pseudo, (set(), set()))
     holders, calls = {}, []
+    seq = insn_list(wd, "lreg")
+    widths = register_widths(seq)
     if want in hc:
-        seq = insn_list(wd, "lreg")
         idx = [i for i, (_, _, r) in enumerate(seq) if pseudo in regs_of(r)]
         if idx:
             for u, kind, r in seq[idx[0]:idx[-1] + 1]:
                 if kind == "call_insn" and want < 4:
                     calls.append(u)
                 for x in regs_of(r):
-                    if x != pseudo and (x == want or hard.get(x) == want):
+                    if x != pseudo and occupies_hard_register(x, want, hard, widths):
                         holders.setdefault(x, u)
     if want in hc and not later_holders_only(holders, calls, rec, recs):
         what = [f"{nm(x) if x >= 16 else 'hard r%d' % x} (from {at(u)})" for x, u in list(holders.items())[:5]]
@@ -3097,7 +3172,9 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         print(f"    lever: shorten {nm(pseudo)}'s life or move the other value's, so they don't overlap in"
               f" {rname(want)}; or make the other value land elsewhere")
         return
-    takers = [x for x in pc if hard.get(x, recs.get(x, (0,) * 7)[6]) == want and x != pseudo]
+    placed = {x: recs[x][6] for x in recs}
+    placed.update(hard)
+    takers = [x for x in pc if x != pseudo and occupies_hard_register(x, want, placed, widths)]
     before = [x for x in takers if recs.get(x, ("L",))[0] == "L" or
               (recs.get(x) and rec and rec[0] == "G" and recs[x][1] < rec[1])]
     if before:
@@ -3903,7 +3980,8 @@ def function_reach(text, func):
     """{name: (start, end)} of FUNC's definition in TEXT and of the inline helpers defined in TEXT that it
     reaches by calls, transitively. Only these can change FUNC's code: agbcc -O2 inlines only functions
     declared inline, and every other definition is compiled on its own. Definitions inside an
-    `#ifdef NONMATCHING` draft are left out (the build compiles the INCLUDE_ASM branch)."""
+    `#ifdef NONMATCHING` draft are left out (the build compiles the INCLUDE_ASM branch).
+    The first entry is FUNC's source spelling, which may be a file-local alias."""
     drafts = []
     for m in re.finditer(r"^#\s*ifdef\s+NONMATCHING\b.*?^#\s*endif\b", text, re.M | re.S):
         drafts.append((m.start(), m.end()))
@@ -3916,7 +3994,24 @@ def function_reach(text, func):
             continue
         inline = bool(re.search(r"\b(?:inline|__inline|__inline__)\b", head))
         defs[name] = (a, b, inline)
-    if func not in defs:
+    # Older units spell a definition with a descriptive, file-local alias while
+    # the symbol table still calls it sub_ADDR. Keep source names as owners, but
+    # resolve simple object-like aliases when looking up definitions and calls.
+    aliases = {}
+    for m in re.finditer(r"^#[ \t]*define[ \t]+(\w+)[ \t]+(\w+)[ \t]*(?://[^\n]*|/\*[^\n]*?\*/[ \t]*)?$", text, re.M):
+        if not any(x <= m.start() < y for x, y in drafts):
+            aliases[m.group(1)] = m.group(2)
+
+    def expanded(name):
+        seen = set()
+        while name in aliases and name not in seen:
+            seen.add(name)
+            name = aliases[name]
+        return name
+
+    by_symbol = {expanded(name): name for name in defs}
+    target = by_symbol.get(expanded(func))
+    if target is None:
         return {}
     # Function-like and object-like macros: a concession in a macro body changes the code of every
     # function that expands it, so a reached function's macros are reached too (keyed `#NAME`).
@@ -3924,7 +4019,7 @@ def function_reach(text, func):
     for m in re.finditer(r"^#\s*define\s+(\w+)(?:.*\\\n)*.*$", text, re.M):
         if not any(x <= m.start() < y for x, y in drafts):
             macros[m.group(1)] = (m.start(), m.end())
-    reach, todo = {}, [func]
+    reach, todo = {}, [target]
     while todo:
         n = todo.pop()
         if n in reach:
@@ -3939,6 +4034,7 @@ def function_reach(text, func):
             body = text[a:b]
             body = body[body.index("{"):]
         for c in set(re.findall(r"\b(\w+)\s*\(", body)):
+            c = by_symbol.get(expanded(c), c)
             if c in defs and defs[c][2] and c not in reach:
                 todo.append(c)
         for c in set(re.findall(r"\b(\w+)\b", body)):
@@ -4010,6 +4106,7 @@ def cmd_pins(src, func, env):
         print("  additional tracked concessions not removed by pins: "
               + ", ".join(f"{kind} at line {line} ({name})" for line, kind, name in extra)
               + ". The no_pins draft still needs these addressed.")
+    source_func = next(iter(reach), func)
     starts = [0]
     for ln in lines:
         starts.append(starts[-1] + len(ln) + 1)
@@ -4050,7 +4147,7 @@ def cmd_pins(src, func, env):
     cost = {}
     for n, (i, kind, rm) in enumerate(sites):
         where = owner(i)
-        where = "" if where == func else f" [{where}]"
+        where = "" if where == source_func else f" [{where}]"
         if sole[n]:  # never offered: without it the variable is read with no value
             print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> kept: the only definition of"
                   f" {', '.join(sole[n])} (write the value it should hold, then remove it){where}")
@@ -4086,14 +4183,14 @@ def cmd_pins(src, func, env):
     open(no_pins, "w").write(without(allg))
     print(f"  all {len(allg)} removed: {show(r)}; written to {os.path.relpath(no_pins, ROOT)}"
           " (the draft to work from: `scope.py` on it gives the hunks, `why` their causes)")
-    if any(owner(sites[n][0]) != func for n in allg):
+    if any(owner(sites[n][0]) != source_func for n in allg):
         used = {}
         for n, (a, b) in function_reach_all(text).items():
             for h in reach:
-                if h != func and n != h and re.search(r"\b%s\s*\(" % re.escape(h), text[a:b]):
+                if h != source_func and n != h and re.search(r"\b%s\s*\(" % re.escape(h), text[a:b]):
                     used.setdefault(h, []).append(n)
         for h, users in sorted(used.items()):
-            users = [u for u in users if u != func]
+            users = [u for u in users if u != source_func]
             if users:
                 print(f"  helper {h} is also used by {', '.join(sorted(users))}: check those after changing it,"
                       " or give the pin-free spelling a new helper")
@@ -4968,9 +5065,60 @@ def byte_constant_operand(insns, uid):
     return None
 
 
+def regmove_inserted_operand_copy(wd, uid):
+    """Find a new copy immediately before UID that satisfies its two-address operand.
+
+    This is not a logged dying-input tie. In particular, a later logged tie that
+    mentions the same register does not explain this copy.
+    """
+    before = {u: r for u, _, r in insn_list(wd, "combine")}
+    after = {u: r for u, _, r in insn_list(wd, "regmove")}
+    reg = r"\(reg(?:/\w)*:(\w+) (\d+)\)"
+    binary = r"\(set " + reg + r" \((and|ior|xor|plus|mult):\w+ " + reg + " " + reg + r"\)\)"
+    b = re.fullmatch(binary, before.get(uid, ""))
+    a = re.fullmatch(binary, after.get(uid, ""))
+    if not b or not a or b.group(1, 2, 3) != a.group(1, 2, 3):
+        return None
+    dest = int(b.group(2))
+    old = [int(b.group(5)), int(b.group(7))]
+    current = [int(a.group(5)), int(a.group(7))]
+    changes = [(x, y) for x, y in zip(old, current) if x != y]
+    if len(changes) != 1 or changes[0][1] != dest:
+        return None
+    source = changes[0][0]
+    path = os.path.join(wd, "u.i.regmove")
+    with open(path) as stream:
+        dump = stream.read()
+    forms = [(m.group(1), int(m.group(2)), one_line(m.group(0))) for m in re.finditer(
+        r"^\((insn|jump_insn|call_insn|code_label|barrier|note)(?:/\w)* (\d+) .*?(?=^\(|\Z)",
+        dump, re.S | re.M)]
+    previous = None
+    for kind, u, rtl in forms:
+        if u == uid:
+            break
+        if kind != "note":
+            previous = kind, u, rtl
+    if previous is None or previous[0] != "insn" or previous[1] in before:
+        return None
+    copy = re.fullmatch(r"\(set " + reg + " " + reg + r"\)", previous[2])
+    if copy and int(copy.group(2)) == dest and int(copy.group(4)) == source:
+        return previous[1], dest, source
+    return None
+
+
 def explain_regmove(wd, uid, gone, new, nm, at):
     """regmove merged one pseudo into another at or before insn UID: name the two-address tie that did it,
     what in the C would have kept the ROM's separate copy, and the knob that forbids the tie."""
+    inserted = regmove_inserted_operand_copy(wd, uid)
+    if inserted:
+        cu, dest, source = inserted
+        print(f"    regmove inserted {nm(dest)} = {nm(source)} at {at(cu)} immediately before"
+              f" {at(uid)} so the output also supplies its two-address input.")
+        print("    This is an inserted operand copy, not a logged dying-input tie; AGBCC_NOTIE"
+              " on a later instruction that mentions the same register does not control it."
+              " Inspect the operand order before regmove, including cse's ordering of a"
+              " known constant, and the C operand modes (README facts 37 and 54).")
+        return
     fixes = [f for f in regmove_fixes(wd) if f[0] != "could"]
     pats = {u: r for u, _, r in insn_list(wd, "combine")}
     regs = set(gone) | set(new)
@@ -5627,9 +5775,8 @@ def cmd_why(src, func, uid, env, via=None):
         if re.match(r"ldr r\d+, =", row["draft"] or ""):
             print(f"insn {uid}: constant origin is unknown (no equal-valued pre-final SET found);"
                   " retaining the emitted insn rather than guessing from its register")
-    ln = lines.get(uid)
-    code = srclines[ln - 1].strip() if ln and ln <= len(srclines) else ""
-    print(f"why insn {uid}  line {ln}: {code}")
+    location, code = source_statement(wd, src, uid)
+    print(f"why insn {uid}  line {location}: {code}")
     if row:
         twin = register_twin(rows, row)
         rom_text = row["rom"] or (twin["rom"] if twin else None)
@@ -5640,7 +5787,12 @@ def cmd_why(src, func, uid, env, via=None):
         rr, dr = reg_nums(rom_text), reg_nums(row["draft"])
         hmap = hard_of(wd)
         pre = next((r for u, _, r in insn_list(wd, "lreg") if u == uid), None)
-        for a, b in zip(rr, dr):
+        commuted = commuted_register_operands(rom_text, row["draft"])
+        if commuted:
+            print("  only the two commutative inputs exchanged places; the destination is unchanged."
+                  " Follow operand order through the passes below; this does not call for swapping"
+                  " the values' register allocations.")
+        for a, b in ([] if commuted else zip(rr, dr)):
             if a == b:
                 continue
             ps = [x for x in regs_of(pre) if hmap.get(x, x) == int(b)]
@@ -5659,7 +5811,8 @@ def cmd_why(src, func, uid, env, via=None):
         regs = regs_of(rtl)
         if rtl and regs != last:
             if last is not None:
-                changes.append((p, [r for r in last if r not in regs], [r for r in regs if r not in last]))
+                changes.append((p, [r for r in last if r not in regs], [r for r in regs if r not in last],
+                                register_permutation(last, regs)))
             trail.append(f"{PASS_NOTE.get(p, p)}: {', '.join(nm(r) for r in regs)}")
             last = regs
     if row:
@@ -5688,7 +5841,15 @@ def cmd_why(src, func, uid, env, via=None):
         explain_pre(wd, info["obj_name"], uid)
     trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read(), info["obj_name"])
     narrowed_sources = set()
-    for p, gone, new in changes:
+    for p, gone, new, permuted in changes:
+        if permuted:
+            print(f"  {p} reordered the register operands; no pseudo was replaced.")
+            if p in ("cse", "cse2"):
+                print("    fold_rtx (cse.c) puts a known constant second in a commutative operation,"
+                      " even when the operand is a register holding that constant. Check its earlier"
+                      " definition; a source expression that becomes constant only after CSE can"
+                      " preserve the other order. This is separate from class-head selection.")
+            continue
         if p not in ("cse", "cse2") or not new:
             if p == "regmove":
                 print(f"  regmove replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new)}.")
@@ -6283,18 +6444,23 @@ def put_definition(src, snippet, func):
     import land
     path = os.path.join(ROOT, src)
     text, new = open(path).read(), open(os.path.expanduser(snippet)).read()
-    pat = re.compile(r"^[A-Za-z_][^\n;=()]*\b%s\s*\([^;{]*\)\s*\{" % re.escape(func), re.M)
-    if not pat.search(new):
+    new_match = land.definition_match(new, func)
+    if not new_match:
         sys.exit(f"{func}: {snippet} has no definition of it")
     sp = land.definition_span(text, func)
     if not sp:
         sys.exit(f"{func}: no definition in {src} to replace (`new` writes one)")
     # every prototype of FUNC in the unit (before or after it) takes the definition's signature
-    header = re.sub(r"\s+", " ", new[pat.search(new).start():new.index("{", pat.search(new).start())]).strip()
-    proto = re.compile(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*\b%s\s*\([^;{}]*\)\s*;" % re.escape(func), re.M)
+    # A snippet's alias macro may follow the unit's prototypes. Declare the
+    # canonical symbol there so those declarations do not depend on macro order.
+    header = (new[new_match.start():new_match.start("name")] + func
+              + new[new_match.end("name"):new.index("{", new_match.start())])
+    header = re.sub(r"\s+", " ", header).strip()
+    spellings = "|".join(map(re.escape, land.definition_names(text, func)))
+    proto = re.compile(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*\b(?:%s)\s*\([^;{}]*\)\s*;" % spellings, re.M)
     text = proto.sub(lambda m: re.sub(r"^static\s+", "", header) + ";", text)
     sp = land.definition_span(text, func)
-    start = pat.search(text, sp[0]).start()
+    start = land.definition_match(text, func).start()
     # what a put inserts sits between these markers, and the next put replaces exactly that
     begin, end = f"// scope: put {func} begin\n", f"// scope: put {func} end\n"
     a = text.find(begin)
@@ -6320,7 +6486,7 @@ def put_definition(src, snippet, func):
         t = head[a:b]
         if t.rstrip().endswith("}") and not re.match(r"static\b", t) and re.search(r"\)\s*\{", t):
             prev_end = b
-    names = {n for n, _ in item_names(new[:pat.search(new).start()])} - {None}
+    names = {n for n, _ in item_names(new[:land.definition_match(new, func).start()])} - {None}
     kept, dropped = [], []
     gap = text[prev_end:start]
     pos = 0

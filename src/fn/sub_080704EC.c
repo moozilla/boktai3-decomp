@@ -1,6 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "runtime.h"
+#include "scene_actor_animation.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorControl_OnIdle(u8 *);
 void SceneActorTerrain_DisableCollision(struct SceneActorRegistryActor *);
@@ -12,19 +12,15 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *input)
         goto zero;
     {
         u32 mask;
-        u32 offset;
         u32 *field;
         u32 value;
         mask = 0x40;
-        offset = 0x2d4;
-        field = (void *)((u8 *)actor + offset);
-        value = *(u16 *)field;
+        value = actor->flags2D4;
         value &= mask;
         if (value)
             goto one;
         mask = 0x20000;
-        offset -= 4;
-        field = (void *)((u8 *)actor + offset);
+        field = &actor->flags2D0;
         value = *field;
         value &= mask;
         if (value)
@@ -46,10 +42,9 @@ static inline u8 IsScenePaused(void)
 static inline u32 ReadSuppressionFlag(struct SceneActorRegistryActor *actor)
 {
     u32 mask = 0x800;
-    u32 offset = 0x2d0;
     u32 *field;
     u32 value;
-    field = (void *)((u8 *)actor + offset);
+    field = &actor->flags2D0;
     value = *field;
     value &= mask;
     return value;
@@ -75,10 +70,9 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
             u32 primary;
             {
                 u32 mask = 2;
-                u32 offset = 0x2cc;
                 u32 *field;
                 u32 value;
-                field = (void *)((u8 *)actor + offset);
+                field = &actor->flags2CC;
                 value = *field;
                 value &= mask;
                 flags = field;
@@ -105,79 +99,38 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                         value |= mask;
                         drawable->flags = value;
                     } else {
-                        u8 *drawable = (u8 *)actor->drawable + 0x20;
-                        u32 value = *(u32 *)(drawable + 8);
+                        struct SceneActorAnimationTile *drawable =
+                            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
+                        u32 value = drawable->flags;
                         value |= mask;
-                        *(u32 *)(drawable + 8) = value;
+                        drawable->flags = value;
                     }
                 }
 
                 {
                     u32 code = 16;
-                    u32 offset = 0x2b2;
-                    u32 substateOffset;
-                    u8 *field;
-                    field = (u8 *)actor + offset;
+                    actor->field2B2 = one;
+                    actor->field2B0 = zero;
+                    actor->unknown2B5[0] = code;
+                    actor->control = defaultControl;
+                    actor->field2C8 = zero;
                     {
-                        u32 entry = one;
-                        *field = entry;
+                        u32 *flags114 = &actor->flags114;
+                        u32 mask = ~1;
+                        u32 value = *flags114;
+                        value &= mask;
+                        *flags114 = value;
                     }
-                    offset -= 2;
+                    actor->field104 = zero;
                     {
-                        u8 *controlField = (u8 *)actor + offset;
-                        *controlField = zero;
-                        substateOffset = 0x2b5;
-                        controlField = (u8 *)actor + substateOffset;
-                        *controlField = code;
-                        {
-                            u32 controlOffset = 0x21c;
-                            controlField = (u8 *)actor + controlOffset;
-                            {
-                                const void *control = defaultControl;
-                                *(const void **)controlField = control;
-                            }
-                        }
-                        substateOffset += 0x13;
-                        controlField = (u8 *)actor + substateOffset;
-                        *(u16 *)controlField = zero;
-                        {
-                            u32 *flags114 = &actor->flags114;
-                            u32 mask = ~1;
-                            u32 value;
-                            value = *flags114;
-                            value &= mask;
-                            *flags114 = value;
-                        }
-                        {
-                            u32 fieldOffset = 0x104;
-                            controlField = (u8 *)actor + fieldOffset;
-                            *(u32 *)controlField = zero;
-                        }
-                        {
-                            register u32 state asm("r1") = 3;
-                            offset = 0x2a8;
-                            controlField = (u8 *)actor + offset;
-                            *controlField = state;
-                        }
-                        substateOffset -= 0x1f;
-                        controlField = (u8 *)actor + substateOffset;
-                        *controlField = zero;
-                        {
-                            register u32 behaviorOffset asm("r1") = 0x2aa;
-                            asm("" : "+r"(behaviorOffset));
-                            controlField = (u8 *)actor + behaviorOffset;
-                            *controlField = zero;
-                        }
-                        offset += 4;
-                        controlField = (u8 *)actor + offset;
-                        *(u32 *)controlField = zero;
-                        substateOffset += 8;
-                        controlField = (u8 *)actor + substateOffset;
-                        {
-                            register u32 entry asm("r1") = one;
-                            *controlField = entry;
-                        }
+                        u32 state = 3;
+                        u8 *field = &actor->state2A8;
+                        *field = state;
                     }
+                    actor->phase2A9 = zero;
+                    actor->behavior2AA = zero;
+                    actor->counter2AC = zero;
+                    actor->field2B1 = one;
                 }
                 SceneActorTerrain_DisableCollision(actor);
                 if (!IsScenePaused() && !ReadSuppressionFlag(actor))
@@ -199,12 +152,10 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                 {
                     u32 specialCopy = special;
                     if (specialCopy) {
-                        u32 offset;
                         u32 *field;
                         u32 value;
                         specialCopy = 0x400000;
-                        offset = 0x2d0;
-                        field = (void *)((u8 *)actor + offset);
+                        field = &actor->flags2D0;
                         value = *field;
                         value |= specialCopy;
                         *field = value;

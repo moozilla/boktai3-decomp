@@ -1,4 +1,3 @@
-#define ScenePanel_SetCallback Hud_SetUpdateCallback
 #include "global.h"
 struct PanelAccount {
     u8 unk0[0x418];

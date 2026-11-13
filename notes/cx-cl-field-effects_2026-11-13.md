@@ -68,3 +68,41 @@ Shared playback or random-shake inlining was tried in staged effects and the til
 Two ranges are set aside for a second pass. Cell gates: 13 of 14 typed functions match, but the canonical player-pointer array lets the compiler remove the ROM's reload after a coordinate store in ClampPlayerEdge. Scheduling manager: typed ID lookup reorders a cursor copy and bit constant; eight loop variants retain that two-instruction difference. Original sources were restored; drafts and evidence remain under `build/cx/`.
 
 The coordinator shortened this worker's queue to stop before Scene status indicator at 08126650. Work after that boundary belongs to the cloud worker. Code matching coverage remains unchanged by this cleanup; the combined ROM check remains with integration.
+
+## Final cleanup checkpoint
+
+Tags: #matching #animation #particles #scene #structs #compiler
+
+The final seven completed units are animated tiles (14 former files), scene debris (13), native effects (29 files / 31 functions), native particles (13), actor palette fade (one file / two functions), actor-stat configuration (two), and scheduled effects (13). Every complete unit matches with the stock compiler. This brings the run to thirty consolidated units; matching coverage is unchanged.
+
+Animated tiles reuse the shared playback helper and a structured name lookup. Scene debris uses a union of the existing sequence/keyframe visuals; its callback loop needs a signed byte stride to retain the original induction-variable choices. Native effects separate the old collider/graphics byte block into a 0x40-byte spatial collider and a 0x1C-byte graphics record, and use an embedded slot-key cursor to preserve registry addressing. The unsequenced sprite initializer retains its unused direction argument because the profile caller passes it in the ROM. Native particles use the canonical night flag and a structured pause dispatcher; the allocator's common exit remains because early return changes block ordering.
+
+Actor palette fade now lives in the shared ActorStats record at 0x348 and uses CharacterPreviewModel renderers. All five affected units match. Its data header deliberately omits API prototypes because an older external caller has a different legacy signedness declaration. Scheduled effects now have one complete record shared with the earlier scheduling manager; all nine dependent units match. Its slot index is unsigned for the initializing halfword OR, with a signed cast for the scheduler's negative sentinel test. The destructor retains separate typed cursors for terrain removal and body unregistering.
+
+Two additional ranges were set aside with original matching sources restored. Palette fade at 081111E8: sixteen of seventeen typed routines match, but AdvanceColors schedules the flat palette-buffer address differently from the old two-dimensional declaration. Challenge records at 0811D524–0811D6C8: canonical GameState arrays change index/base addition order, and the reset's halfword assignment changes to a read/OR sequence. Typed experiments and logs remain under `build/cx/palette_typed_draft` and `build/cx/challenge_typed_draft`. The earlier cell-gate and scheduling-manager blockers also remain; the scheduled effect type itself is now recovered and landed.
+
+At the user's run-stop request, the current spread-shot item had only been inventoried. Its source remains untouched. A durable [layout and boundary draft](spread_shot_cleanup_draft.md) records the recovery so far. Scene moving particles were not started. No work at or after the reassigned Scene status indicator boundary was performed. All code commits through request 0034 were confirmed by the external runner. Final notes are the last commit request. No full ROM build or progress regeneration was run; combined validation remains with the coordinator.
+
+## Spread-shot item completed after continuation
+
+Tags: #matching #particles #scene #structs #compiler
+
+The continuation completed the previously inspected spread-shot item as two contiguous units: sprite notices (11 files, 932 bytes) and spread shots (13 files, 10,704 bytes). Both match with the stock compiler, bringing this worker to thirty-two consolidated units. The notice task uses shared sprite and playback records; the two-slot shot task now uses the complete body, sprite, collider and position types. Terrain accesses use existing grid, cell and override fields. No existing shared header changed. The exact offset-before-buffer-load ordering preserves the large probe's match. The private height helper and interpolation failure label remain after structured/shared alternatives changed bytes. See the [updated spread-shot evidence](spread_shot_cleanup_draft.md). No moving-particle or reassigned status-indicator work was started.
+
+## Moving-particle continuation
+
+Tags: #matching #particles #scene #structs #compiler
+
+At the next continuation request, completed 08125B64–08126140 as `src/scene_moving_particle.c` (13 former files, 1500 bytes). The shared MovingParticlePool now uses Task and the complete particle record, including the common sprite, velocity, animation counters and lifetime. All functions match, as does the other header consumer at 0812D8EC. The allocator originally used a volatile mask pointer even though this range was in the concession-free queue. A direct indexed loop using the shared occupancy helper matches and removes that access. Pointer-cursor variations had retained or reordered loads; no concession is needed. This completes the assigned forward queue before 08126650; four earlier typed-cleanup blockers remain for another pass.
+
+## Scheduling-manager revisit
+
+Tags: #matching #scene #structs #compiler
+
+Resolved 0806F3A8–0806F7B0 and consolidated nine files into `src/scene_effect_schedule.c` (1032 bytes MATCH). The lookup walks a typed pool cursor and reads `cursor->entries[0].id` directly; materializing a separate entry pointer changes allocation, while direct access preserves the original setup and loop. Dynamic strides derive from the entry size, and Task replaces the raw task prefix. Script creation shares the complete schedule entry and the previously recovered scheduled effect. The signed slot-sentinel check remains. The changed header has no other consumer. Four additional pointer/array forms for CellGate_ClampPlayerEdge still remove its required player-pointer reload; its original matching source is restored.
+
+## Palette-fade revisit
+
+Tags: #matching #palette #scene #structs #compiler
+
+Resolved 081111E8–08111C44 and consolidated seventeen files into `src/palette_fade.c` (2652 bytes MATCH). One shared task now describes color channels and deltas, palette resources, scanline phases, scrolling and transition state. Resource colors follow their five-word asset header. The task calls its typed scroll callback directly. AdvanceColors computes its destination byte offset in three explicit statements: color index, palette slot, then palette-buffer base. Scope identified the outstanding difference as the slot load moving before the index shift (RTL UID 229); calculating the complete integer destination preserves the ROM order with the canonical flat buffer declaration. The loader remains void, with its unused scalar result forwarded by the legacy caller adaptation. Other scalar and resource names were clarified; concession lint is clear. No existing header changed.

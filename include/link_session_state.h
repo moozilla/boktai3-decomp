@@ -20,7 +20,9 @@ struct AreaEffectLinkState {
     u8 unknown22;
     u8 menuEvent;  /* 0x23; session menu callbacks */
     s8 menuChoice; /* 0x24 */
-    u8 unknown25[11];
+    u8 unknown25[7];
+    u8 menuInputLocked; /* 0x2C: link panel disables exit input when set */
+    u8 unknown2D[3];
     u32 menuElapsed;   /* 0x30 */
     u16 menuSelection; /* 0x34 */
     u8 unknown36[8];

@@ -1,13 +1,16 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_panel_subject_playback.h"
 void ScenePanelSubject_TickActivating(struct ScenePanelSubject *owner)
 {
+    union {
+        u32 first;
+        const void *resource;
+    } work;
     if (owner->kind) {
-        const volatile u16 *source = &owner->sequence.index;
-        register u32 first asm("r1") = *source;
-        const volatile u16 *index = source;
-        asm("" ::"r"(first), "r"(index));
-        if (first == 5) {
+        const u16 *source = &owner->sequence.index;
+        const u16 *index;
+        work.first = *source;
+        index = source;
+        if (work.first == 5) {
             source = &owner->sequence.elapsed;
             if (*source == 0)
                 goto activationPalette;
@@ -22,8 +25,11 @@ void ScenePanelSubject_TickActivating(struct ScenePanelSubject *owner)
     activationPalette:
         owner->paletteBank = 0x24D;
     }
-    Anim_SetSequence(&owner->sequence, owner->sequenceResource, 2, owner->sequenceRow,
-                     owner->sequenceVariant);
+    {
+        struct DisplaySequenceState *sequence = &owner->sequence;
+        work.resource = owner->sequenceResource;
+        Anim_SetSequence(sequence, work.resource, 2, owner->sequenceRow, owner->sequenceVariant);
+    }
     if (ScenePanelSubject_StepPlayback(owner)) {
         owner->changed = 1;
         ScenePanelSubject_SetState((void *)owner, 4);

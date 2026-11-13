@@ -1,12 +1,11 @@
 #include "scene_panel.h"
 
-// MATCHING_CONCESSION: register-pinning
-
 void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
                                        s32 screenY)
 {
+    s32 effectAlpha;
     if (gGameState->unk618 > 0) {
-        register u16 frame asm("r5") = panel->mode;
+        u32 frame = panel->mode;
         u32 shifted = (u32)frame << 16;
         u32 value;
         s32 alpha;
@@ -30,8 +29,11 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             } else
                 panel->shakeOffset = 5;
         } else {
+            u32 mask;
             alpha = shifted >> 17;
-            if (!(frame & 3) && panel->shakeOffset > 0)
+            mask = 3;
+            mask &= frame;
+            if (!mask && panel->shakeOffset > 0)
                 panel->shakeOffset--;
         }
         {
@@ -44,7 +46,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
         CpuSet((u8 *)panel->palette + 32, (void *)0x03005140, 0x04000008);
         if (panel->effectPhase == 0) {
             s32 count;
-            s32 alpha;
+
             {
                 u32 mask = 0x200;
                 u16 *shadow = &gDispCntShadow;
@@ -56,10 +58,10 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 count = (64 - panel->mode) >> 3;
             else
                 count = panel->mode >> 3;
-            alpha = count + 12;
+            effectAlpha = count + 12;
             {
-                u32 blend = ((16 - alpha) >> 1) + 8;
-                *(vu16 *)0x04000052 = (blend << 8) | alpha;
+                u32 blend = ((16 - effectAlpha) >> 1) + 8;
+                *(vu16 *)0x04000052 = (blend << 8) | effectAlpha;
             }
             gRandomIndex = (gRandomIndex + 1) & 1023;
             {
@@ -94,33 +96,34 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                     } words;
                 } position, velocity;
                 const u16 *table;
-                register u32 indexMask asm("r8");
+                u32 indexMask;
                 u32 highMask;
-                register union ScenePanelPackedVector *positionWords asm("r9");
+                union ScenePanelPackedVector *positionWords;
                 u32 next;
                 position.packed = (*(struct ContactPackedVector *)&panel->center);
                 {
-                    register const u16 *load asm("r2") = (const u16 *)RANDOM_TABLE_ADDR;
-                    asm("" : "+r"(load));
+                    const u16 *load = (const u16 *)RANDOM_TABLE_ADDR;
                     table = load;
                 }
                 {
                     u32 nextIndex = gRandomIndex + 1;
-                    register u32 lowMask asm("r3") = 1023;
+                    u32 lowMask = 1023;
                     indexMask = lowMask;
                     gRandomIndex = nextIndex & lowMask;
                 }
                 {
                     s32 offset = Mod(table[gRandomIndex], 500);
-                    register s32 coordinate asm("r1");
+                    s32 coordinate;
                     {
                         union ScenePanelPackedVector *lowPosition = &position;
-                        asm("" : "+r"(lowPosition));
                         positionWords = lowPosition;
-                        coordinate = (u16)lowPosition->words.xy - 250;
+                        coordinate = (u16)lowPosition->packed.x - 250;
                     }
                     coordinate += offset;
-                    coordinate = (u16)coordinate;
+                    {
+                        u16 narrowed = coordinate;
+                        coordinate = narrowed;
+                    }
                     highMask = 0xFFFF0000;
                     position.words.xy = (position.words.xy & highMask) | coordinate;
                 }
@@ -140,11 +143,14 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 gRandomIndex = (gRandomIndex + 1) & indexMask;
                 {
                     s32 offset = Mod(table[gRandomIndex], 500);
-                    register union ScenePanelPackedVector *lowPosition asm("r2") = positionWords;
-                    register s32 coordinate asm("r1");
-                    coordinate = (u16)lowPosition->words.zpad - 250;
+                    union ScenePanelPackedVector *lowPosition = positionWords;
+                    s32 coordinate;
+                    coordinate = (u16)lowPosition->packed.z - 250;
                     coordinate += offset;
-                    coordinate = (u16)coordinate;
+                    {
+                        u16 narrowed = coordinate;
+                        coordinate = narrowed;
+                    }
                     lowPosition->words.zpad = (lowPosition->words.zpad & highMask) | coordinate;
                 }
                 velocity.words.xy &= highMask;
@@ -177,21 +183,18 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             }
             {
                 u16 *lowFrame = frame;
-                register u32 frameValue asm("r0");
-                register s32 alpha asm("r2");
+                u32 frameValue;
                 frameValue = *lowFrame;
-                alpha = frameValue >> 2;
+                effectAlpha = frameValue >> 2;
                 {
-                    u32 blend = ((16 - alpha) >> 1) + 8;
-                    *(vu16 *)0x04000052 = (blend << 8) | alpha;
+                    u32 blend = ((16 - effectAlpha) >> 1) + 8;
+                    *(vu16 *)0x04000052 = (blend << 8) | effectAlpha;
                 }
             }
             {
                 u16 *conditionFrame = frame;
                 if (!(*conditionFrame & 7)) {
-                    u32 shakeOffset = 0x132A;
-                    s16 *shake;
-                    shake = (void *)((u8 *)panel + shakeOffset);
+                    s16 *shake = &panel->shakeOffset;
                     if (*shake <= 6)
                         (*shake)++;
                 }

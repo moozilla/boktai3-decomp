@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_sprite_playback.h"
 #include "ram.h"
@@ -88,24 +87,21 @@ static inline s32 ReadOptional(void)
 }
 void Anim_SetSequence(struct Frames *, void *, u16, int, int);
 s32 Div(s32, s32);
-static inline void Step(struct Member *m, struct Render *owner, struct Frames *state)
+static inline u32 ActorGroup_StepAnimation(struct Member *m, struct Render *owner,
+                                           struct Frames *state)
 {
-    register struct Frames *f asm("r4") = state;
-    const volatile u16 *word;
-
-    {
-        u32 offset = f->index << 1;
-        const volatile u16 *table = m->frames.data;
-        word = (const volatile u16 *)((u32)table + offset);
-    }
-    owner->tile = *word >> 6;
+    struct Frames *f = state;
+    const u16 *command;
+    u32 ended;
+    command = m->frames.data + f->index;
+    owner->tile = *command >> 6;
     {
         union DisplaySequenceControl control;
         u32 bit, first;
         control.raw = f->flags;
         bit = 1;
         first = (u8)(control.raw & bit);
-        if (first != (((*word & 0x30) >> 4) & bit))
+        if (first != (((*command & 0x30) >> 4) & bit))
             owner->flags |= 4;
         else
             owner->flags &= ~4;
@@ -116,76 +112,49 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
         control.raw = f->flags;
         bit = 2;
         first = (u8)(control.raw & bit);
-        if (first != (((*word & 0x30) >> 4) & bit))
+        if (first != (((*command & 0x30) >> 4) & bit))
             owner->flags |= 8;
         else
             owner->flags &= ~8;
     }
-    {
-        register u32 mask asm("r5");
-        int duration;
-        register int savedDuration asm("r3");
-        u32 timer = f->timer + 1;
-        f->timer = timer;
-        {
-            register u32 initialMask asm("r3") = 65535;
-            mask = initialMask;
-            asm("" : "+&r"(mask) : "r"(initialMask));
-        }
-        duration = f->duration;
-        timer = (u16)timer;
-        savedDuration = duration;
-        if (timer >= (u32)duration) {
-            register u32 flags asm("r1");
-            int index;
-            f->timer = 0;
-            flags = f->flags;
-            if (flags & 4) {
-                index = f->index;
-                if (!index) {
-                    if (flags & 8) {
-                        f->timer = savedDuration;
-                        goto update;
-                    }
-                    index = f->count;
-                }
-                index--;
-                goto storeIndex;
+    if (++f->timer >= f->duration) {
+        u32 commandWord;
+        f->timer = 0;
+        if (f->flags & 4) {
+            if (f->index == 0) {
+                if (f->flags & 8)
+                    f->timer = f->duration;
+                else
+                    f->index = f->count - 1;
+                ended = 1;
             } else {
-                int count;
-                index = f->index + 1;
-                f->index = index;
-                count = f->count;
-                if ((index & mask) < count)
-                    goto update;
-                index = flags & 8;
-                index = (u8)index;
-                if (index) {
-                    f->timer = duration;
-                    index = count - 1;
+                f->index--;
+                ended = 0;
+            }
+            command = f->data + f->index;
+            commandWord = *command;
+        } else {
+            if (++f->index >= f->count) {
+                if ((u8)(f->flags & 8)) {
+                    f->timer = f->duration;
+                    f->index = f->count - 1;
+                    ended = 1;
+                } else {
+                    f->index = 0;
+                    ended = 1;
                 }
-            }
-        storeIndex:
-            f->index = index;
-        update: {
-            u32 offset = f->index << 1;
-            const volatile u16 *table = f->data;
-            word = (const volatile u16 *)((u32)table + offset);
+            } else
+                ended = 0;
+            command = f->data + f->index;
+            commandWord = *command;
         }
-            {
-                u32 value = *word;
-                u32 low = 15;
-                low &= value;
-                f->multiplier = low;
-            }
-            {
-                s32 speed = (f->multiplier * f->rate) >> 6;
-                f->duration = speed;
-                if (!(u8)speed)
-                    f->duration = 1;
-            }
-        }
-    }
+        f->multiplier = DisplaySequence_MaskCommand(commandWord, 15);
+        f->duration = (f->multiplier * (s32)f->rate) >> 6;
+        if (!f->duration)
+            f->duration = 1;
+    } else
+        ended = 0;
+    return ended;
 }
 // confidence=low: script options initialize a member of Pool184's actor group.
 void ActorGroup_CreateFromScript(void)
@@ -233,7 +202,7 @@ void ActorGroup_CreateFromScript(void)
         render->y = Script_GetValue();
         render->z = Script_GetValue();
     }
-    p->origin = *(struct Position *)((u8 *)render + 0x1C);
+    p->origin = *(struct Position *)&render->x;
     p->animationFlags = Script_GetKeywordValue('r', 0);
     p->scriptN = Script_GetKeywordValue('n', 0);
     value = Script_GetKeywordValue('a', 256);
@@ -275,18 +244,16 @@ void ActorGroup_CreateFromScript(void)
         Memory_Clear((u8 *)&p->arguments, 32);
         if (Script_SeekToKeyword('G')) {
             i = 0;
-        next: {
-            u32 offset = i * 4;
-            u32 *base = p->arguments;
-            u32 *dest = (u32 *)((u32)base + offset);
-            *dest = ReadOptional();
-        }
-            if (++i <= 2)
-                goto next;
+            do {
+                u32 offset = i * 4;
+                u32 *base = p->arguments;
+                u32 *dest = (u32 *)((u32)base + offset);
+                *dest = ReadOptional();
+            } while (++i <= 2);
         }
     }
     Anim_SetSequence(sequence, pool->resource, 0, 0, p->animationFlags);
 
-    Step(p, render, sequence);
+    ActorGroup_StepAnimation(p, render, sequence);
     sub_08105194(p, a, b, c);
 }

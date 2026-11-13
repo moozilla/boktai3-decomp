@@ -56,7 +56,7 @@ struct Actor {
     u32 savedPhase, savedTime, savedState, savedExtra;
 };
 #define W(o) (*(u32 *)((u8 *)p2 + (o)))
-void GameState_SetEventFlag(s32);
+void Bestiary_UnlockEntry(s32);
 extern const struct Vec gUnk_0824FDF0;
 struct Vec *Ratatosk_GetRandomMovementPoint(void *);
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
@@ -147,7 +147,7 @@ s32 Ratatosk_ApplyQueuedDamage(struct Actor *p)
                 p->mode = 0;
                 p->modeTime = zero;
             }
-            GameState_SetEventFlag(1);
+            Bestiary_UnlockEntry(1);
             return 1;
         }
         if (damage > 0)

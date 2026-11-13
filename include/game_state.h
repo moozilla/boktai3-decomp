@@ -111,7 +111,10 @@ struct GameState {
     s32 counters640[5]; /* 08228090: compared after division by 54000; meaning tentative. */
     u8 unk654[0xC];
     s16 unk660, unk662, unk664; /* encoded record fields; meanings tentative */
-    u8 unk666[0xBA];
+    u8 unk666[0x8A];
+    u32 bestiaryUnlocked[3];
+    u32 unknown6FC;
+    u32 bestiaryPairFlags[8];
     u32 flags720; /* (guess) event flag words: bits 0-31 */
     u32 flags724; /* (guess) bits 32-63 */
     u32 flags728;

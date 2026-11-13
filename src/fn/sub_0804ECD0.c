@@ -1,7 +1,7 @@
 #include "area_effect_link.h"
 // MATCHING_CONCESSION: register-pinning
 void Player_AddEnergy(struct AreaEffectPlayer *, s32);
-static inline u32 playerMode(struct AreaEffectPlayer *player)
+static inline u32 AreaEffect_GetPlayerMode(struct AreaEffectPlayer *player)
 {
     u32 mask = 32;
     u32 flags = player->flags;
@@ -14,9 +14,9 @@ static inline u32 playerMode(struct AreaEffectPlayer *player)
     }
     return mode;
 }
-static inline u32 linkValue(s32 index)
+static inline u32 AreaEffect_GetLinkValue(s32 *index)
 {
-    register s32 selected asm("r3") = index;
+    s32 selected = *index;
     struct AreaEffectLinkState *link = gLinkSession;
     if (!link || selected < 0)
         return 0;
@@ -25,13 +25,13 @@ static inline u32 linkValue(s32 index)
 void AreaEffect_UpdateLinkPlayerResources(struct AreaEffectManager *manager)
 {
     struct AreaEffectManager *object = manager;
-    register s32 i asm("r3") = 0;
+    s32 i = 0;
     u16 *fractions = object->resourceFractions;
     do {
         struct AreaEffectPlayer *player = gPlayers[i];
         s32 next = i + 1;
         if (player && player->stateTag == 1) {
-            u32 mode = playerMode(player);
+            u32 mode = AreaEffect_GetPlayerMode(player);
             u32 offset;
             {
                 u32 gain;
@@ -51,7 +51,7 @@ void AreaEffect_UpdateLinkPlayerResources(struct AreaEffectManager *manager)
                     goto storeFraction;
                 }
                 if (mode == 2) {
-                    gain = linkValue(i);
+                    gain = AreaEffect_GetLinkValue(&i);
                     offset = i * 2;
                     destination = (u16 *)((u8 *)fractions + offset);
                     gain <<= 3;
@@ -60,7 +60,7 @@ void AreaEffect_UpdateLinkPlayerResources(struct AreaEffectManager *manager)
                 offset = i * 2;
                 if (mode != 1)
                     goto convertResources;
-                gain = linkValue(i);
+                gain = AreaEffect_GetLinkValue(&i);
                 offset = i * 2;
                 destination = (u16 *)((u8 *)fractions + offset);
             addLinkFraction: {
@@ -73,17 +73,17 @@ void AreaEffect_UpdateLinkPlayerResources(struct AreaEffectManager *manager)
         convertResources: {
             s32 amount = 0;
             u16 *counter = (u16 *)((u8 *)fractions + offset);
-            register u32 value asm("r0") = *counter;
-            asm("" : "+r"(i));
+            u16 value = *counter;
+
             next = i + 1;
             if (value > 119) {
-                register u8 *base asm("r3") = (u8 *)object + 0xAAC;
+                register u8 *base asm("r3") = (u8 *)object->resourceFractions;
                 do {
                     u16 *counter = (u16 *)(base + offset);
-                    value = *counter;
-                    value -= 120;
-                    *counter = value;
+                    u32 remaining = *counter - 120;
+                    *counter = remaining;
                     amount++;
+                    value = remaining;
                 } while ((u16)value > 119);
             }
             if (amount > 0)

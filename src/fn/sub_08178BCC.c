@@ -27,17 +27,17 @@ s32 SceneHud_DestroyOwner(struct SceneHudState *s)
     Hud_RemoveMenuGraphics(s);
     PauseMenu_RemoveEquipmentSlotAnimations(s);
     if (OwnerWidgetsEnabled(0x80) && s->initializationFlag) {
-        widget = s->ownerWidgets;
+        widget = s->fieldWidgets.meterWidgets;
         count = 1;
         do {
-            if (widget->unknown4[0])
+            if (widget->active)
                 Anim_Remove(widget);
             widget++;
         } while (--count >= 0);
-        widget = s->ownerAuxWidgets;
+        widget = s->fieldWidgets.timeDigits;
         count = 5;
         do {
-            if (widget->unknown4[0])
+            if (widget->active)
                 Anim_Remove(widget);
             widget++;
         } while (--count >= 0);

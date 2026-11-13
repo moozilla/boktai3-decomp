@@ -15,8 +15,11 @@ struct SceneValueEquipmentDefinition {
 struct SceneValueItemDefinition {
     u16 unknown0;
     u16 actionKind; /* 0x2: selected-action dispatch kind */
-    u16 conditionKey, unknown6;
-    u32 unknown8, baseValue;
+    u16 conditionKey;
+    u16 effectValueA; /* 0x6: amount, duration, or effect selector according to actionKind */
+    u16 effectValueB; /* 0x8: secondary amount or duration */
+    u16 unknownA;
+    u32 baseValue;
 };
 u32 Inventory_GetEquipmentId(u32 slot);
 u32 Inventory_CanAssignEquipment(u32 slot);

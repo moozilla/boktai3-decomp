@@ -18,6 +18,7 @@ struct ResourceStationDigitsState {
 };
 void ResourceStation_UpdateDigits(struct ResourceStation *station)
 {
+    s32 i;
     register struct ResourceStation *object asm("r8") = station;
     if (*(u16 *)&object->nearby) {
         struct ResourceStationDigitsState local;
@@ -29,7 +30,6 @@ void ResourceStation_UpdateDigits(struct ResourceStation *station)
         struct ResourceStationDigit *animation;
         struct ResourceStationPosition *destination;
         s32 *digit;
-        register s32 i asm("r5");
         if (gGameState->unk77C > 9999)
             gGameState->unk77C = 9999;
         local.digits[0] = Div(gGameState->unk77C, 1000);
@@ -111,7 +111,7 @@ void ResourceStation_UpdateDigits(struct ResourceStation *station)
     } else {
         u32 mask = 1;
         u32 *flags = &object->digits[0].flags;
-        register s32 i asm("r5") = 3;
+        i = 3;
         do {
             *flags |= mask;
             flags = (void *)((u8 *)flags + 0x60);

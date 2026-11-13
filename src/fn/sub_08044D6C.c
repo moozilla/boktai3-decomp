@@ -1,8 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 u32 EncodedRecord_NextMaskWord(u32 *);
-void EncodedRecord_XorRange(u8 *buffer, s32 start, s32 end, u32 seed, volatile s32 skipInput,
-                            u32 mask)
+void EncodedRecord_XorRange(u8 *buffer, s32 start, s32 end, u32 seed, s32 skipInput, u32 mask)
 {
     u32 word;
     s32 count;

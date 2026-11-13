@@ -33,7 +33,7 @@ void Anim_UnlinkFromList(struct SceneInputWidget *, u32);
 
 void Anim_Remove(struct SceneInputWidget *widget)
 {
-    if (widget->unknown4[0] != 0)
+    if (widget->active != 0)
         Anim_UnlinkFromList(widget, widget->list);
 }
 
@@ -159,7 +159,7 @@ s32 Widget_InitLinked(struct SceneInputWidget *widget, void *resource, u16 glyph
         initialPosition.z = 0;
     } else
         initialPosition = *position;
-    zero = widget->unknown4[0];
+    zero = widget->active;
     if (zero == 0) {
         widget->glyphKind = zero;
         widget->value6 = zero;
@@ -200,7 +200,7 @@ s32 Widget_InitLinked(struct SceneInputWidget *widget, void *resource, u16 glyph
 s32 Widget_InitCleared(struct SceneInputWidget *widget, void *resource, u16 glyph, u32 flags,
                        u8 attributeA, u8 attributeB, u8 attributeC, void *position)
 {
-    u32 zero = widget->unknown4[0];
+    u32 zero = widget->active;
     if (zero != 0)
         return -1;
     else {

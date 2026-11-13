@@ -14,7 +14,17 @@ build/venv/bin/python tools/unit_files.py 080036F8 08003B44
 ```
 
 It prints each file with its functions and flags ROM functions in the range that
-have no C at all (gaps).
+have no C at all (gaps). Handwritten assembly already reviewed in
+`symbols/progress_asm.csv` appears separately as `protected assembly`; retain
+those fragments at their ROM positions.
+
+For a merge input list or commit manifest, use `--paths-only`. It prints one
+path per line and sends gap diagnostics to stderr, so function names and gap
+labels cannot accidentally become file paths:
+
+```sh
+build/venv/bin/python tools/unit_files.py 080036F8 08003B44 --paths-only > build/unit-files.txt
+```
 
 ## End state
 

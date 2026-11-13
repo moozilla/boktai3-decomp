@@ -85,50 +85,26 @@ void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *act
             *flags = value & ~3;
             SceneActorRegistry_ResetRouteAndColliders((void *)actor);
             {
-                register u32 state asm("r1") = 3;
-                register u32 stateOffset asm("r2") = 0x2A8;
-                u32 phaseOffset;
-                u32 behaviorOffset;
-                void *control;
-                *((u8 *)actor + stateOffset) = state;
-                phaseOffset = 0x2A9;
-                *((u8 *)actor + phaseOffset) = zero;
-                behaviorOffset = 0x2AA;
-                *((u8 *)actor + behaviorOffset) = zero;
-                stateOffset += 4;
-                asm("" : "+r"(stateOffset));
+                u32 state = 3;
+                actor->state2A8 = state;
+                actor->phase2A9 = zero;
+                actor->behavior2AA = zero;
+                actor->counter2AC = mode;
+                actor->field2B1 = prior;
                 {
-                    register u32 *field asm("r0") = (void *)((u8 *)actor + stateOffset);
-                    *field = mode;
-                }
-                phaseOffset += 8;
-                *((u8 *)actor + phaseOffset) = prior;
-                behaviorOffset -= 0x8A;
-                {
-                    void **field = (void *)((u8 *)actor + behaviorOffset);
-                    control = *field;
-                }
-                state = 12;
-                phaseOffset++;
-                *((u8 *)actor + phaseOffset) = prior;
-                phaseOffset -= 2;
-                {
-                    register u8 *field asm("r0") = (u8 *)actor + phaseOffset;
-                    *field = zero;
-                }
-                {
-                    register u32 kindOffset asm("r6") = 0x2B5;
-                    asm("" : "+r"(kindOffset));
+                    void *control = actor->field220;
+                    u32 kind = 12;
+                    actor->field2B2 = prior;
+                    actor->field2B0 = zero;
                     {
-                        register u8 *field asm("r0") = (u8 *)actor + kindOffset;
-                        *field = state;
+                        register u32 kindOffset asm("r6") = 0x2B5;
+                        asm("" : "+r"(kindOffset));
+                        {
+                            register u8 *field asm("r0") = (u8 *)actor + kindOffset;
+                            *field = kind;
+                        }
                     }
-                }
-                behaviorOffset = 0x21C;
-                asm("" : "+r"(behaviorOffset));
-                {
-                    void **field = (void *)((u8 *)actor + behaviorOffset);
-                    *field = control;
+                    actor->target = control;
                 }
             }
             break;

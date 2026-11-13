@@ -574,9 +574,9 @@ void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick)
     }
 }
 
-void *BestiaryDisplay_GetEntryForActor(u32, u32);
+void *Bestiary_GetEntryForActor(u32, u32);
 
-void GameState_SetEventFlag(void *);
+void Bestiary_UnlockEntry(void *);
 
 void SceneActorBehavior_CallTerrainScript(void *);
 
@@ -667,8 +667,8 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         u32 test = actor->flags2D4 & mask;
         flags = &actor->flags2D4;
         if ((!test) && (((u32)(actor->category - 11)) > 2))
-            GameState_SetEventFlag(
-                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+            Bestiary_UnlockEntry(
+                Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
         {
             u32 mask2 = 0x4000;
             u32 value = *flags;

@@ -1,28 +1,22 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_input_grid.h"
-void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 *enabledInput,
+void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enabledInput,
                                     const struct SceneInputPosition *startsInput,
                                     const struct SceneInputPosition *targetsInput,
-                                    const u32 *volatile frames, const u32 *unused, u32 duration)
+                                    const u32 *frames, const u32 *unused, u32 duration)
 {
-    register struct SceneInputPair *pair asm("r5") = pairInput;
-    register s32 i asm("r10") = 0;
+    s32 i = 0;
     const struct SceneInputPosition *targets = targetsInput;
     const struct SceneInputPosition *starts = startsInput;
-    register struct SceneInputWidget *widget asm("r4");
+    struct SceneInputWidget *widget;
     const u32 *enabled;
-    volatile u32 widgetOffset;
-    const u32 *volatile localFrames;
+    u32 widgetOffset;
+    const u32 *localFrames;
     s32 compare;
     u32 step;
-    {
-        targetsInput = (const struct SceneInputPosition *)frames;
-        localFrames = (const u32 *)targetsInput;
-    }
+    localFrames = frames;
     widget = pair->widgets;
     {
         step = 0;
-        asm("" : "+l"(step) : : "r0", "r2", "r3", "r6", "ip");
         widgetOffset = step;
     }
     enabled = enabledInput;
@@ -31,7 +25,7 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
             widget->flags |= 1;
         else {
             struct SceneInputPosition *position;
-            register u32 targetOffset asm("r3");
+            u32 targetOffset;
             widget->flags &= ~1;
             Anim_LoadKeyframe(widget, pair, (u16)*localFrames, 1);
             position = (struct SceneInputPosition *)&pair->widgets[0].position;
@@ -42,18 +36,18 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
                 targetOffset = lowIndex * 8;
             }
             *position = *starts;
-            position = (void *)pair->targets;
-            position = (void *)((u8 *)position + targetOffset);
-            *position = *targets;
+            {
+                struct SceneInputPosition *targetPosition = (void *)pair->targets;
+                targetPosition = (void *)((u8 *)targetPosition + targetOffset);
+                *targetPosition = *targets;
+            }
         }
         {
             step = 8;
             targets = (void *)((const u8 *)targets + step);
         }
         starts++;
-        targetsInput = (const struct SceneInputPosition *)localFrames;
-        targetsInput = (const struct SceneInputPosition *)((const u32 *)targetsInput + 1);
-        localFrames = (const u32 *)targetsInput;
+        localFrames++;
         widget++;
         {
             step = widgetOffset;
@@ -62,8 +56,7 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
         }
         enabled++;
         {
-            register u32 step asm("r0") = 1;
-            asm("" : : "r"(step));
+            u32 step = 1;
             i += step;
         }
         {
@@ -73,11 +66,11 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
     } while (compare <= 1);
     {
         u32 zero = 0;
-        register u16 *frame asm("r0") = &pair->frame;
+        u16 *frame = &pair->frame;
         *frame = zero;
     }
     {
-        register u16 *field asm("r1") = &pair->duration;
+        u16 *field = &pair->duration;
         *field = duration;
     }
 }

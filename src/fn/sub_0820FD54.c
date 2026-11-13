@@ -9,7 +9,7 @@ struct Message {
 };
 extern u8 *gGameState;
 void Script_Call(u32, struct Message *);
-void GameState_SetEventFlag(s32);
+void Bestiary_UnlockEntry(s32);
 void sub_08159164(s32);
 #define H(p, n) (*(s16 *)((p) + (n)))
 #define W(p, n) (*(u32 *)((p) + (n)))
@@ -40,7 +40,7 @@ void PinkSpine_RecordDefeat(u8 *p)
         m.args = &a;
         Script_Call(q, &m);
     }
-    GameState_SetEventFlag(2);
+    Bestiary_UnlockEntry(2);
     if (W(p, 0x144) & 1) {
         sub_08159164(H(p, 0x13C));
         H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
