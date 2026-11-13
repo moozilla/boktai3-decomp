@@ -138,6 +138,64 @@ static int mixer_oracle(struct mCore *core)
     return 0;
 }
 
+static int mixer_state_oracle(struct mCore *core)
+{
+    unsigned variant, frame, i, cases = 0;
+    for (variant = 0; variant < 8; ++variant) {
+        struct SoundInfo sound = {0};
+        struct { uint16_t type, status; uint32_t freq, loop, size; int8_t data[36]; } wave =
+            {0, 0x4000, 4000 * 1024, 0, 32, {0}};
+        struct SoundChannel *c = sound.chans;
+        int16_t pcm[32];
+        for (i = 0; i < 32; ++i) wave.data[i] = (int8_t)((i < 16 ? i : 32 - i) * 7 - 56);
+        wave.data[32] = wave.data[0]; /* interpolation guard agrees with loop */
+        if (variant & 4) { wave.status = 0; wave.data[32] = 0; }
+        for (i = 0; i < 0x1c00; ++i) core->busWrite8(core, 0x02000000 + i, 0);
+        for (i = 0; i < sizeof(wave); ++i) core->busWrite8(core, 0x02002000 + i, ((uint8_t *)&wave)[i]);
+        sound.maxChans = 1; sound.masterVolume = 11; sound.pcmDmaPeriod = 1;
+        sound.pcmFreq = 8000; sound.divFreq = 1049;
+        c->wav = (struct WaveData *)&wave; c->statusFlags = 0x80;
+        c->type = variant & 1 ? TONEDATA_TYPE_FIX : 0;
+        c->leftVolume = 230; c->rightVolume = 130;
+        c->attack = variant & 2 ? 64 : 255; c->decay = 180;
+        c->sustain = 70; c->release = 128; c->frequency = 4000;
+        c->pseudoEchoVolume = 12; c->pseudoEchoLength = 3;
+        core->busWrite32(core, 0x02000000, ID_NUMBER);
+        core->busWrite8(core, 0x02000006, sound.maxChans);
+        core->busWrite8(core, 0x02000007, sound.masterVolume);
+        core->busWrite8(core, 0x0200000b, 1);
+        core->busWrite32(core, 0x02000010, 16);
+        core->busWrite32(core, 0x02000018, 1049);
+        core->busWrite32(core, 0x02000028, 0x0822fe19);
+        for (i = 0; i < 36; ++i) core->busWrite8(core, 0x02000050 + i, ((uint8_t *)c)[i]);
+        core->busWrite32(core, 0x02000074, 0x02002000);
+        for (frame = 0; frame < 12; ++frame) {
+            if (frame == 5 && c->statusFlags) {
+                c->statusFlags |= 0x40;
+                core->busWrite8(core, 0x02000050, core->busRead8(core, 0x02000050) | 0x40);
+            }
+            if (rom_call(core, 0x0822f1c4, 0, 0, 0) || hw_mp2k_mix(&sound, pcm, 16, 8000)) return 1;
+            for (i = 0; i < 16; ++i) {
+                int ref_right = (int8_t)core->busRead8(core, 0x02000350 + i);
+                int ref_left = (int8_t)core->busRead8(core, 0x02000980 + i);
+                if (abs(ref_right - sound.pcmBuffer[i]) > 1 || abs(ref_left - sound.pcmBuffer[PCM_DMA_BUF_SIZE + i]) > 1) {
+                    fprintf(stderr, "Mixer case %u frame %u sample %u: original %d/%d port %d/%d\n", variant, frame, i, ref_left, ref_right, sound.pcmBuffer[PCM_DMA_BUF_SIZE + i], sound.pcmBuffer[i]); return 1;
+                }
+            }
+            if (core->busRead8(core, 0x02000050) != c->statusFlags ||
+                (c->statusFlags && (core->busRead8(core, 0x02000059) != c->envelopeVolume ||
+                 core->busRead32(core, 0x02000068) != c->count || core->busRead32(core, 0x0200006c) != c->fw))) {
+                fprintf(stderr, "Mixer state case %u frame %u: flags %u/%u env %u/%u count %u/%u phase %u/%u\n", variant, frame,
+                    core->busRead8(core, 0x02000050), c->statusFlags, core->busRead8(core, 0x02000059), c->envelopeVolume,
+                    core->busRead32(core, 0x02000068), c->count, core->busRead32(core, 0x0200006c), c->fw); return 1;
+            }
+            ++cases;
+        }
+    }
+    printf("Original mixer state: PASS (%u frames: fixed/interpolated, loop/end, ADSR and pseudo echo)\n", cases);
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     struct mCore *core;
@@ -194,6 +252,7 @@ int main(int argc, char **argv)
         ++tests;
     }
     if (mixer_oracle(core)) return 1;
+    if (mixer_state_oracle(core)) return 1;
     if (eeprom_oracle(core)) return 1;
     rom_file = fopen(argv[1], "rb");
     if (!rom_file || fseek(rom_file, 0, SEEK_END)) return 2;
