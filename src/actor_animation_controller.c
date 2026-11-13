@@ -864,8 +864,8 @@ void Actor_BeginScriptedAnimationPhaseNine(void)
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     if (g == 0)
         return;
-    B(0xf76) = Script_GetKeywordValue(0x70, 0);
-    if (W(0xddc) & 1)
+    g->releaseControl = Script_GetKeywordValue(0x70, 0);
+    if (g->obj.flags & 1)
         return;
     Actor_SetState(g, 3, 9);
 }
