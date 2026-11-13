@@ -166,3 +166,11 @@ existing resource/animation layout. Published the creator declaration. A direct
 symbolic random-table index changes the order of the address load and index
 shift, so its existing fixed-table expression remains. Exact MATCH: 432 bytes;
 only this unit includes the modified header.
+
+## Countdown timer: 0805751C–08057678
+
+Eight functions now share `src/countdown_timer.c` and a complete timer API with
+Task, remaining time, lock and completion script. The manual shifted-integer
+zero test became a direct check of the remaining halfword; the script-add
+conditions became a single guard. All 348 bytes match; no other unit includes
+the changed header.

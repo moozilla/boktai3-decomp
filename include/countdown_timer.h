@@ -2,7 +2,7 @@
 #define GUARD_COUNTDOWN_TIMER_H
 #include "engine.h"
 struct CountdownTimer {
-    u8 task[0x18];
+    struct Task task;
     u16 remaining, locked;
     u32 completionScriptId;
 };
@@ -14,4 +14,8 @@ void CountdownTimer_Stop(void);
 s32 CountdownTimer_Update(struct CountdownTimer *);
 void CountdownTimer_Destroy(void);
 s32 CountdownTimer_InitFromScript(struct CountdownTimer *, void *, void *);
+u16 CountdownTimer_GetRemaining(void);
+void CountdownTimer_StopFromScript(void);
+struct CountdownTimer *CountdownTimer_CreateFromScript(void *, void *);
+void CountdownTimer_AddFromScript(void);
 #endif
