@@ -1320,3 +1320,29 @@ Partial removals of the first-arm value/mask pins and whole first arm were not e
 the original tail plus ordinary head still misses seven reload-register instructions.
 Next: get the halfword load and widened frame into one ordinary-C allocation quantity,
 and make reload reserve r3 without a pin. The C mask is worth retaining for that search.
+
+### ScenePanelRig_InitSecondarySprites (0805AF88)
+
+Two matching partials remove the render-mode barrier (repeat the store in both
+arms) and zero pin (copy initial i after the existing initialization barrier).
+Stock check MATCH, 272 bytes. Two barriers remain.
+
+Best pin-free draft: `phase3-drafts/dp-menus-b/ScenePanelRig_InitSecondarySprites.c`,
+1 ROM / 3 draft instructions, shape 4, 276 bytes. First parity uses `i & 255`
+before `& one`; this blocks PRE reuse at the final flag test and restores all
+registers, but leaves an extra mask and alignment padding. Ordinary array indexing
+is equivalent to the original offset construction. Without the redundant mask,
+PRE computes a shared parity (pseudo 128) and extends its lifetime across calls;
+`AGBCC_NOPRE=1` confirms the reuse, improving shape 28 to 4 but leaving 30/32
+differences. `CSE_NOCANON=128` alone gives 24/22; combined with NOPRE gives 30/32.
+No complete matching knob found.
+
+Tried separate branch stores, zero initializer lifetimes, union parity, byte/halfword
+parity, signed/unsigned casts, full-width and byte masks, masked bit operand, byte
+and halfword one, literal first/last parity masks, unsigned counter, scalar union
+constant, wide aggregate constants and packed one-bit control. Wide constants
+load a pool object; the one-bit control is hoisted and introduces a shift in mode
+selection. Narrow parity retains a shift after the AND. The best remaining lever
+is a redundant expression that blocks PRE yet folds at combine without adding
+a mask; the current draft documents the exact target. Scratch: build/cx/work/
+ScenePanelRig_InitSecondarySprites/.
