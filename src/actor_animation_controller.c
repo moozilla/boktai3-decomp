@@ -265,7 +265,7 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
     u32 a;
     u32 b, c;
     u32 sector;
-    u8 *owner;
+    struct Player *owner;
     if (q->group != p->group)
         return;
     if (q->orientation == 0) {
@@ -275,9 +275,9 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
         xOffset = 128;
         zOffset = 0;
     }
-    owner = *(u8 **)((u8 *)p + 0x18);
-    dx = *(s16 *)(owner + 0x30) - q->worldX - xOffset;
-    dz = *(s16 *)(owner + 0x34) - q->worldZ - zOffset;
+    owner = p->owner;
+    dx = owner->position.x - q->worldX - xOffset;
+    dz = owner->position.z - q->worldZ - zOffset;
     length = dx * dx + dz * dz;
     radius = p->speed;
     if (length >= (s32)(radius * radius))
@@ -301,12 +301,11 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             a = 255;
         }
     }
-    if ((s8)a != gGameState->unk85E && (s8)b != gGameState->unk85E &&
-        (s8)c != gGameState->unk85E)
+    if ((s8)a != gGameState->unk85E && (s8)b != gGameState->unk85E && (s8)c != gGameState->unk85E)
         return;
     height = q->worldY;
-    owner = *(u8 **)((u8 *)p + 0x18);
-    height -= *(s16 *)(owner + 0x32);
+    owner = p->owner;
+    height -= owner->position.y;
     if (height < 0)
         height = -height;
     if (height > 119)
@@ -315,7 +314,7 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
         return;
     if (gEnginePauseFlags & 4)
         return;
-    if (*(u32 *)(owner + 0x1c) == 4)
+    if (owner->kind == 4)
         return;
     if (q->request)
         Script_Call(q->request, 0);
@@ -331,9 +330,9 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             p->mode = mode;
         }
         {
-            *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0x30;
+            p->phase = 3;
             if (p->oldMode == 3) {
-                if ((*((u8 *)p + 0xf5a) & 15) == 3) {
+                if (p->mode == 3) {
                     p->savedFrame = p->anim.frame;
                     p->savedTimer = p->anim.timer;
                 }
@@ -356,9 +355,9 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             p->mode = mode;
         }
         {
-            *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0x20;
+            p->phase = 2;
             if (p->oldMode == 3) {
-                if ((*((u8 *)p + 0xf5a) & 15) == 3) {
+                if (p->mode == 3) {
                     p->savedFrame = p->anim.frame;
                     p->savedTimer = p->anim.timer;
                 }
