@@ -8215,16 +8215,17 @@ addr,name,mode,confidence,source,notes
 081DE0CC,NameEntry_Initialize,thumb,low,src-alias,
 081DE520,NameEntry_SetParametersFromScript,thumb,low,src-alias,Name entry task: keyboard page; selected key; name cursor; repeat timing; six widgets and pulse palettes.
 081DE5A4,NameEntry_Create,thumb,high,gcl-name,name from GCL key 2687 名前入力 (Name Entry); registry callback
-081DE5E4,MenuSprites_SetFlagBits,thumb,low,src-alias,
-081DE6C4,Password_LoadDate,thumb,low,src-alias,
-081DE780,Password_UpdateCursorPanel,thumb,low,src-alias,
-081DE84C,AnimPanel_UpdateDigits,thumb,low,src-alias,
-081DEA60,AnimPanel_HandleClockInput,thumb,low,src-alias,
-081DEC2C,Time_UpdateDateMenu,thumb,low,src-alias,
-081DEDF4,AnimPanel_RemoveAnimations,thumb,low,src-alias,
-081DEE38,Time_InitializeDateMenu,thumb,low,src-alias,
-081DF06C,Time_SetDateMenuFromScript,thumb,low,src-alias,Reads three script options into the date menu configuration block
-081DF0AC,Time_CreateDateMenu,thumb,low,src-alias,Creates the date and time editing task whose confirmation updates the clock
+081DE5E4,DateMenu_HideWidgets,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DE630,DateMenu_InitializeDigits,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DE6C4,DateMenu_LoadCurrentDate,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DE780,DateMenu_UpdateCursor,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DE84C,DateMenu_UpdateDigits,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DEA60,DateMenu_HandleInput,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DEC2C,DateMenu_Update,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DEDF4,DateMenu_Destroy,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DEE38,DateMenu_Initialize,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DF06C,DateMenu_SetParametersFromScript,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
+081DF0AC,DateMenu_Create,thumb,low,src-alias,Date/time editor: four main widgets; twelve digits; date values; repeat timing and cursor feedback.
 081DF0EC,AnimPanel_SaveSelections,thumb,low,src-alias,
 081DF124,AnimPanel_LoadSelections,thumb,low,src-alias,
 081DF160,AnimPanel_ResetSelections,thumb,low,src-alias,
