@@ -1313,3 +1313,21 @@ Both the explicit value-less return and a goto to a fall-through function end
 match. The former reads more directly and is landed. This extends fact 95 to a
 function that has an explicit zero return on its other path (fact 160).
 Stock full-unit check: 21 functions MATCH (2,352 bytes).
+
+### sub_08010C10 (08010C10): still deferred, first reload scratch
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/sub_08010C10.c` (2/2, shape 0).
+Confirmed `AGBCC_SPILL=0:1`: MATCH. The first signed x load needs r2 for the
+constant offset where the stock default scan picks r1; all other bytes match.
+The newer why explanation corrects an inference in the earlier field-effects
+note: shifting the initial scan does not prove a prior ROM reload choice.
+Its spill set is r1/r2, both free, and there is no previous choice in this draft.
+
+Additional forms: duplicate the post-join Vec16_Lerp in both active arms (5/19,
+shape 20; jump2 does not fully merge the argument setup); signed-axis union
+(6/8, extra extensions); inline reverseAxis for both coordinates (same 2/2);
+zero-vector subtraction (same 2/2). These supplement the earlier documented
+40-plus spellings rather than repeating their offset/actor/else-first searches.
+No reduction landed. Next: a real shared vector operation that makes r1 live
+at the x load, or an earlier setup whose RTL consumes a scratch before later
+cross-jumping. A changed initial scan alone is not a C solution.
