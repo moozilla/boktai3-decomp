@@ -140,3 +140,17 @@ Device mapping also accepts the wasm module's data/stack below EWRAM, because
 DMA sources can point at C locals. The plain address-validation API continues to
 accept only hardware regions. The pass removes optimizer side-effect assumptions
 that no longer hold after an access can trigger DMA or callbacks.
+
+The first complete link audit exposes hundreds of cross-unit ABI declarations
+that agbcc/ARM tolerated but wasm rejects or replaces with traps. The build
+preserves warnings in `link.log` and summarizes them in `link-audit.json`.
+`build/venv/bin/python port/core/signatures.py` compares compiled declarations to
+actual C definitions and separates return-type, argument-count and argument-type
+conflicts. This is an inventory, not automatic argument repair: inventing missing
+arguments or return values would change the game's behavior.
+
+The core supplies C equivalents of the SDK call-via and IWRAM interworking
+veneers. The remaining full-link dependencies are MP2K's handwritten sequence
+routines (including `MPlayMain`, `TrackStop` and several event handlers), alongside
+the call-signature cleanup and ROM function-pointer translation still required
+for full execution. No fallback bodies are supplied for those routines.

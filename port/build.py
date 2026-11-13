@@ -19,6 +19,7 @@ from prepare import prepare_headers, prepare_source
 from link_slice import build_slice, find_linker
 from addresses import read_addresses, bind_ir
 from mmio import instrument_mmio
+from audit import audit_link
 
 
 def sources():
@@ -35,6 +36,7 @@ def main():
     ap.add_argument('--mmio', action='store_true', help='route volatile scalar accesses through port-hw in linked builds')
     ap.add_argument('--link-game', action='store_true', help='bind absolute data addresses and attempt the complete wasm game link')
     ap.add_argument('--slice', action='store_true', help='link the tested early-boot vertical slice')
+    ap.add_argument('--ppu-root', help='port-ppu port directory when testing before integration')
     ap.add_argument('--hardware-root', help='port-hw port directory when testing before integration')
     args = ap.parse_args()
     os.chdir(ROOT)
@@ -138,6 +140,8 @@ def main():
         response.write_text('\n'.join(shlex.quote(part) for part in command[1:]) + '\n')
         linked = subprocess.run([command[0], '@' + str(response)], text=True, capture_output=True)
         (out / 'link.log').write_text(linked.stdout + linked.stderr)
+        audit = audit_link(out / 'link.log', out / 'link-audit.json')
+        print(f"link boundaries: {len(audit['signature_conflicts'])} signature conflicts, {len(audit['undefined_symbols'])} undefined symbols")
         print('game link: ' + ('PASS' if linked.returncode == 0 else 'FAIL (see ' + str(out / 'link.log') + ')'))
         return linked.returncode
     return bool(failed)
