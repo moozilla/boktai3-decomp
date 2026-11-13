@@ -36,7 +36,7 @@ s32 ModifierAction_ActivateCost(struct ActorAbility *ability)
     ability->request = 0xff;
     if (Modifier_IsFourthSourceReady(ability)) {
         owner = ability->owner;
-        stats = &owner->stats;
+        stats = &owner->actors[0].stats;
         if (!ability->cooldown) {
             cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
             if (stats->value >= cost) {
@@ -59,7 +59,7 @@ s32 ActorAbility_ActivatePaletteEffect(struct ActorAbility *ability)
     ability->request = 255;
     if (Modifier_IsFourthSourceReady(ability)) {
         owner = ability->owner;
-        stats = &owner->stats;
+        stats = &owner->actors[0].stats;
         zero = ability->cooldown;
         if (zero == 0) {
             cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
@@ -67,7 +67,7 @@ s32 ActorAbility_ActivatePaletteEffect(struct ActorAbility *ability)
                 s32 palette;
                 ability->cooldown = ability->interval;
                 CallbackList_SubtractStateTenValue(stats, ability, cost);
-                palette = CharacterModel_GetPrimaryPaletteIndex(&owner->model);
+                palette = CharacterModel_GetPrimaryPaletteIndex(&owner->actors[0].model);
                 PalFade_Start(stats, 0x385, 0x385, palette, stats->recoveryValue, 16, 4, zero);
                 ability->remaining = ability->duration;
                 Sound_PlaySong(0x3e3);
@@ -87,7 +87,7 @@ s32 ActorAbility_UpdateRecovery(struct ActorAbility *ability)
     if (!Modifier_IsFourthSourceReady(ability))
         return 0;
     owner = ability->owner;
-    stats = &owner->stats;
+    stats = &owner->actors[0].stats;
     if (stats->amount >= stats->amountLimit)
         return 0;
     if (!ability->started && stats->value <= 15)
@@ -99,12 +99,12 @@ s32 ActorAbility_UpdateRecovery(struct ActorAbility *ability)
     stats->amount++;
     if (stats->amount > stats->amountLimit)
         stats->amount = stats->amountLimit;
-    palette = CharacterModel_GetPrimaryPaletteIndex(&owner->model);
+    palette = CharacterModel_GetPrimaryPaletteIndex(&owner->actors[0].model);
     started = ability->started;
     if (started == 0) {
         PalFade_Start(stats, 0x386, 0x386, palette, stats->recoveryValue, 15, 4, started);
         ability->started = 1;
-    } else if (!(owner->effectFlags & 1)) {
+    } else if (!(owner->actors[0].control.effectFlags & 1)) {
         PalFade_Start(stats, 0x386, 0x386, palette, stats->recoveryValue, 15, 4, 1);
     }
     if (ability->soundTimer == 0)
@@ -129,15 +129,15 @@ s32 ActorAbility_SpawnProjectile(struct ActorAbility *ability)
     if (!Modifier_IsFourthSourceReady(ability))
         goto fail;
     owner = ability->owner;
-    stats = &owner->stats;
+    stats = &owner->actors[0].stats;
     cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
     if (stats->value < cost)
         goto fail;
-    args.projectile = owner->projectile;
+    args.projectile = owner->actors[0].control.projectile;
     args.y = 0;
     args.z = 0;
     height = stats->height - 0x12000;
-    if (SceneProcSprites_CreateEntry(stats->position, height, owner->projectile, owner->direction,
+    if (SceneProcSprites_CreateEntry(stats->position, height, owner->actors[0].control.projectile, owner->actors[0].control.direction,
                                      &ability->id) < 0) {
     fail:
         return 0;
@@ -158,15 +158,15 @@ s32 ActorAbility_SpawnAlternateProjectile(struct ActorAbility *ability)
     if (!Modifier_IsFourthSourceReady(ability))
         goto fail;
     owner = ability->owner;
-    stats = &owner->stats;
+    stats = &owner->actors[0].stats;
     cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
     if (stats->value < cost)
         goto fail;
-    args.projectile = owner->projectile;
+    args.projectile = owner->actors[0].control.projectile;
     args.y = 0;
     args.z = 0;
     height = stats->height - 0x1a000;
-    if (SpritePool_StartEntry(stats->position, height, 0, &ability->id, owner->direction) < 0) {
+    if (SpritePool_StartEntry(stats->position, height, 0, &ability->id, owner->actors[0].control.direction) < 0) {
     fail:
         return 0;
     }
@@ -184,15 +184,15 @@ s32 ActorAction_TrySpawn(struct ActorAbility *ability)
     if (!Modifier_IsFourthSourceReady(ability))
         goto fail;
     owner = ability->owner;
-    stats = &owner->stats;
+    stats = &owner->actors[0].stats;
     cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
     if (stats->value < cost)
         goto fail;
-    args.projectile = owner->projectile;
+    args.projectile = owner->actors[0].control.projectile;
     args.y = 0;
     args.z = 0;
     ability->request = SpritePairPool_StartEntry(stats->position, &stats->height, 0, &ability->id,
-                                                 owner->direction);
+                                                 owner->actors[0].control.direction);
     if ((s8)ability->request < 0) {
     fail:
         return 0;
