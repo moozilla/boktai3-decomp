@@ -130,6 +130,7 @@ async function startStudio() {
   if (!types || !createGame) { postMessage({ type: 'studio', ready: false }); return; }
   g = createGame({ memory, exports: ex, types, print: (text) => postMessage({ type: 'print', text }) });
   g.loadLib(lib);
+  try { studio.actorTools = (await import('./actor.mjs')).createActorTools(g, memory); } catch (e) { studio.actorTools = null; }
   postMessage({ type: 'studio', ready: true, globals: Object.keys(types.globals).length, functions: Object.keys(types.functions).length, lib: Object.keys(g.lib) });
 }
 
@@ -160,7 +161,21 @@ function handle(req) {
         return reply(req.id, { tasks: g.lib.tasks ? g.lib.tasks() : [] });
       case 'inspect': setInspect(!!req.on); return reply(req.id, { ok: true });
       case 'subtitles': setSubtitles(!!req.on); return reply(req.id, { ok: true });
-      case 'stop': g.off(); g.tasks.splice(0); setInspect(studio.inspect); setSubtitles(studio.subtitles); return reply(req.id, { ok: true });
+      case 'actor': {
+        // the panel follows one task (an actor's object) until closed
+        studio.actor = req.task ? { task: Number(req.task) } : null;
+        attributionNeeded();
+        if (studio.actor) actorFrame(0, true);
+        return reply(req.id, { ok: true });
+      }
+      case 'actor-set': {
+        const t = studio.actorTools, info = t && studio.actor && t.info(studio.actor);
+        if (!info || !info.owner || !info.owner.type) return reply(req.id, { error: 'no typed actor' });
+        t.set(studio.actor.task, info.owner.type, req.path, req.value);
+        actorFrame(0, true);
+        return reply(req.id, { ok: true });
+      }
+      case 'stop': if (studio.actorTools) studio.actorTools.attributionOff(); g.off(); g.tasks.splice(0); setInspect(studio.inspect); setSubtitles(studio.subtitles); return reply(req.id, { ok: true });
       default: return reply(req.id, { error: 'unknown op ' + req.op });
     }
   } catch (e) {
@@ -169,6 +184,7 @@ function handle(req) {
 }
 
 function studioFrame(n) {
+  if (studio.actorTools && (studio.inspect || studio.actor)) studio.actorTools.attributionFrame();
   if (studio.watches.length && n % studio.watchEvery === 0) {
     const values = studio.watches.map((w) => {
       if (w.err) return w.err;
@@ -177,6 +193,23 @@ function studioFrame(n) {
     postMessage({ type: 'watch', values });
   }
   if (studio.inspect && n % 2 === 0) postMessage({ type: 'boxes', ...inspectFrame() });
+  if (studio.subtitles) menuFrame(n);
+  if (studio.actor) actorFrame(n);
+}
+
+// Actor panel: the followed sprite's struct, the scene in world space, and the
+// sprite layer (transparent RGBA) for the 3D view, 10 times a second.
+function actorFrame(n, now) {
+  const t = studio.actorTools;
+  if (!t || (!now && n % 6)) return;
+  try {
+    const info = t.info(studio.actor);
+    const scene = t.scene();
+    const layer = t.spriteLayer().slice();
+    postMessage({ type: 'actor', info, scene, layer: layer.buffer }, [layer.buffer]);
+  } catch (e) {
+    postMessage({ type: 'actor', error: String(e && e.stack || e) });
+  }
 }
 
 const OBJ_SIZE = [[[8, 8], [16, 16], [32, 32], [64, 64]], [[16, 8], [32, 8], [32, 16], [64, 32]], [[8, 16], [8, 32], [16, 32], [32, 64]]];
@@ -193,25 +226,105 @@ function oamBox(word) {
 
 // Inspect: projected sprites (lib drawables(): screen box, owner task) and
 // every OAM entry the PPU shows this frame.
-function setInspect(on) { studio.inspect = on; }
+function setInspect(on) { studio.inspect = on; attributionNeeded(); }
+// Which task drew each sprite (actor.mjs): hooks only while Inspect or the panel needs them.
+function attributionNeeded() {
+  const t = studio.actorTools;
+  if (t && !studio.inspect && !studio.actor) t.attributionOff();
+}
 function inspectFrame() {
   let boxes = [];
   try { boxes = g.lib.drawables ? g.lib.drawables().filter((d) => !d.hidden) : []; } catch (e) { boxes = []; }
   const oam = [];
   for (let i = 0; i < 128; i++) { const b = oamBox(g.u32(0x07000000 + 8 * i)); if (b) oam.push(b); }
+  // sprites drawn during a task's update, named by that task (actor.mjs)
+  let owned = [];
+  try { owned = studio.actorTools ? studio.actorTools.owned() : []; } catch (e) { owned = []; }
+  boxes = boxes.concat(owned);
   return { boxes, oam };
 }
 
 // Subtitles: the string the message window shows, and the window's bounds (tiles).
+// Menu labels: strings menus draw on BG0, with the map cells they covered.
+const menu = { recent: [], labels: [], drawing: null, dirty: false, shown: '' };
+function cString(addr) {
+  let s = '';
+  for (let i = 0; i < 256; i++) { const c = g.u8(addr + i); if (!c) break; s += String.fromCharCode(c); }
+  return s;
+}
+function menuStringId(ptr) {
+  for (let i = menu.recent.length - 1; i >= 0; i--) if (menu.recent[i][0] === ptr) return menu.recent[i][1];
+  // Some menus copy the string to a buffer first (the title's file line).
+  const text = cString(ptr);
+  if (!text) return null;
+  for (let i = menu.recent.length - 1; i >= 0; i--) if (cString(menu.recent[i][0]) === text) return menu.recent[i][1];
+  return null;
+}
+function menuCells(l) {
+  const map = g.fn.Video_GetBackgroundMap(0) >>> 0;
+  const out = [];
+  for (let y = l.y; y < l.y + l.h; y++) for (let x = l.x; x < l.x + l.w; x++) out.push(g.u16(map + 2 * (((y & 31) << 5) + (x & 31))));
+  return out.join(',');
+}
+function menuFrame(n) {
+  if (n % 4) return;
+  if (menu.labels.length) {
+    const kept = menu.labels.filter((l) => menuCells(l) === l.cells);
+    if (kept.length !== menu.labels.length) { menu.labels = kept; menu.dirty = true; }
+  }
+  // BG0 off (DISPCNT bit 8) hides them; so does a full fade to black or white.
+  const bld = g.u16(0x04000050);
+  const visible = !!(g.u16(0x04000000) & 0x100) && !((bld & 1) && (bld & 0xc0) >= 0x80 && (g.u16(0x04000054) & 0x1f) >= 16);
+  const key = visible ? menu.labels.map((l) => `${l.id}@${l.x},${l.y}`).join(';') : '';
+  if (menu.dirty || key !== menu.shown) {
+    menu.dirty = false;
+    menu.shown = key;
+    postMessage({ type: 'menu-labels', labels: visible ? menu.labels.map(({ id, x, y, w, h }) => ({ id, x, y, w, h })) : [] });
+  }
+}
+
 function setSubtitles(on) {
   for (const id of studio.subtitleHooks) g.off(id);
   studio.subtitleHooks = [];
   studio.subtitles = on;
+  menu.labels = []; menu.recent = []; menu.drawing = null; menu.shown = '';
+  postMessage({ type: 'menu-labels', labels: [] });
   if (!on) return;
   const has = (n) => n in g.types.functions;
   // Menus look strings up too; only the ones the message window fetches a page from are dialogue.
   let last = null;
   if (has('Text_LookupString')) studio.subtitleHooks.push(g.on('Text_LookupString', (a) => { last = a[0]; }));
+  if (has('Text_LookupString')) studio.subtitleHooks.push(g.on('Text_LookupString', (r) => {
+    menu.recent.push([r[0] >>> 0, last]);
+    if (menu.recent.length > 16) menu.recent.shift();
+  }, { exit: true }));
+  // Menu text: Menu_DrawText(column, row, string) on BG0. A label remembers the
+  // map cells it drew and goes away when they change (erased or redrawn).
+  if (has('Menu_DrawText')) {
+    studio.subtitleHooks.push(g.on('Menu_DrawText', (a) => {
+      const id = menuStringId(a[2] >>> 0);
+      menu.drawing = id === null ? null : { id, col: a[0] | 0, row: a[1] | 0, x0: 99, y0: 99, x1: -1, y1: -1 };
+    }));
+    const glyph = (w) => (a) => {
+      const d = menu.drawing;
+      if (!d) return;
+      const x = a[1] | 0, y = a[2] | 0;
+      d.x0 = Math.min(d.x0, x); d.y0 = Math.min(d.y0, y); d.x1 = Math.max(d.x1, x + w - 1); d.y1 = Math.max(d.y1, y + 1);
+    };
+    for (const [fn, w] of [['TextWindow_DrawWideGlyph', 2], ['TextWindow_DrawNarrowGlyph', 1]]) {
+      if (has(fn)) studio.subtitleHooks.push(g.on(fn, glyph(w)));
+    }
+    studio.subtitleHooks.push(g.on('Menu_DrawText', () => {
+      const d = menu.drawing;
+      menu.drawing = null;
+      if (!d || d.x1 < 0) return;
+      const label = { id: d.id, x: d.x0, y: d.y0, w: d.x1 - d.x0 + 1, h: d.y1 - d.y0 + 1 };
+      label.cells = menuCells(label);
+      menu.labels = menu.labels.filter((l) => l.x + l.w <= label.x || label.x + label.w <= l.x || l.y + l.h <= label.y || label.y + label.h <= l.y);
+      menu.labels.push(label);
+      menu.dirty = true;
+    }, { exit: true }));
+  }
   if (has('MessageWindow_GetStringAtOffset')) studio.subtitleHooks.push(g.on('MessageWindow_GetStringAtOffset', () => {
     if (last !== null) postMessage({ type: 'text', id: last, frame: g.frameNo });
     last = null;

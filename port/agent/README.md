@@ -110,8 +110,13 @@ move the player to the ground under the cursor). Subtitles show the English
 line of the string the message window shows, beside the game's own text box,
 using the fan translation beside the checkout (`../boktai3trans`, as the
 studio does); the worker hooks `Text_LookupString` and posts the id when
-`MessageWindow_GetStringAtOffset` returns, so menus don't trigger them. Their
-style, the keybinds and the display options live in `port/web/ui.js`. From DevTools or a browser-driving agent: `await game.js('where()')`.
+`MessageWindow_GetStringAtOffset` returns, so menus don't trigger them; menu
+labels come from `Menu_DrawText` and stay while the BG0 cells they drew do.
+Their style, the keybinds and the display options live in `port/web/ui.js`.
+Inspect names each sprite's task by hooking the render pass's OAM emitters
+(`sub_08000430`, `Sprite_QueueFramePieces`) and the actor panel types the task's
+object with `types.json` `params` (each function's first struct parameter);
+`port/web/actor.mjs` is the worker side, `port/web/actor-panel.js` the page. From DevTools or a browser-driving agent: `await game.js('where()')`.
 
 ## C snippets
 
