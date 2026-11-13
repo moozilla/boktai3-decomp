@@ -7772,10 +7772,11 @@ addr,name,mode,confidence,source,notes
 081C1510,PlayStats_LoadResources,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
 081C1578,PlayStats_Initialize,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
 081C1788,PlayStats_Create,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
+081C17C8,ControlPanel_ClearActivePanel,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
 081C17D4,ControlPanel_SetUpdate,thumb,low,src-alias,Sets the panel state callback and resets its frame counter
 081C17EC,ControlPanel_ClearPlayerInputHistory,thumb,low,src-alias,Clears the player's 32 input history entries and accumulated input count
 081C1820,ControlPanel_ResetPlayerForInteractionPrompt,thumb,low,src-alias,
-081C18E8,AnimatedObject_AdvanceThreeFrameCycle,thumb,low,src-alias,
+081C18E8,ControlPanel_UpdateAmbientIndicator,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
 081C1918,ControlPanel_UpdateGaugeIndicator,thumb,low,src-alias,
 081C19D4,ControlPanel_ShowRewardBalanceDigits,thumb,low,src-alias,
 081C1A58,ControlPanel_ShowValueDisplay,thumb,low,src-alias,Clears the hidden flag on five animations including the numeric value display
@@ -7785,20 +7786,25 @@ addr,name,mode,confidence,source,notes
 081C1B20,ControlPanel_ApplyMultiplierMode,thumb,low,src-alias,
 081C1BC4,ControlPanel_TickMultiplierTimer,thumb,low,src-alias,
 081C1C6C,ControlPanel_HideMultiplierSprites,thumb,low,src-alias,Sets the hidden flag on six sprites used by the multiplier presentation
-081C1C8C,SegmentDisplay_UpdatePlayerSegments,thumb,low,src-alias,
+081C1C8C,ControlPanel_UpdatePlayerSegments,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
 081C1CEC,ControlPanel_ShowInputGauge,thumb,low,src-alias,Clears the hidden flag on seven sprites representing the player's input count
 081C1D0C,ControlPanel_HideInputGauge,thumb,low,src-alias,Sets the hidden flag on all seven input gauge sprites
 081C1D2C,ControlPanel_ShowInteractionDisplay,thumb,low,src-alias,Shows the value animations and input gauge when interaction begins
 081C1D40,ControlPanel_HideInteractionDisplay,thumb,low,src-alias,Hides the value animations and both sprite groups
 081C1D5C,ControlPanel_OnStartPromptComplete,thumb,low,src-alias,Stage icon completion callback that initializes interaction and installs its active update
-081C1D88,SegmentDisplay_CallSelectionScript,thumb,low,src-alias,
+081C1D88,ControlPanel_CallEndScript,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
+081C1DCC,ControlPanel_CallLimitScript,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
 081C1E00,ControlPanel_BeginInteraction,thumb,low,src-alias,Creates the start prompt for the active panel and positions the player for interaction
+081C1E48,ControlPanel_AccumulateInput,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
 081C1F1C,ControlPanel_UpdateIdle,thumb,low,src-alias,Empty state callback installed while the panel is inactive
 081C1F20,ControlPanel_BeginIdle,thumb,low,src-alias,
-081C2240,SegmentDisplay_UpdateScreenBrightness,thumb,low,src-alias,
+081C1FC0,ControlPanel_UpdateInteraction,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
+081C2240,ControlPanel_UpdateScreenBrightness,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
 081C2294,ControlPanel_OnTaskUpdate,thumb,low,src-alias,Dispatches the current state callback then updates the panel components; object identity is tentative
-081C22BC,SegmentDisplay_Destroy,thumb,low,src-alias,
-081C2444,IconRow_Init,thumb,low,src-alias,
+081C22BC,ControlPanel_Destroy,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
+081C2334,ControlPanel_InitializeValueWidgets,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
+081C2444,ControlPanel_InitializeMultiplierIcons,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
+081C24D0,ControlPanel_InitializeSegments,thumb,low,src-alias,Control panel interaction task: input segments; sustained-input multiplier; reward balance and script callbacks; tentative interpretation.
 081C2570,ControlPanel_InitializeFromScript,thumb,low,src-alias,
 081C27EC,ControlPanel_CreateFromScript,thumb,low,src-alias,Creates the singleton task and initializes its C046 panel sprites from script parameters
 081C2838,SparkleEmitter_UpdateParticles,thumb,low,src-alias,Advances 32 sparkle particles; animates and projects them; and retires particles outside padded screen bounds.
