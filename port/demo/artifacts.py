@@ -66,6 +66,8 @@ def main():
         frames[0].save(args.out / 'motion.apng', save_all=True, append_images=frames[1:], duration=67, loop=0)
         rows.append(f'- `motion.apng`: {len(frames)} native C frames beside their mGBA references, approximately 15 fps; all exact.')
         rows.append('- `motion/`: numbered capture files and reference PPMs; select these together in the browser demo to run the same sequence in WebAssembly.')
+    if (args.out / 'performance.json').exists():
+        rows.append('- `performance.json`: local Node/wasm replay timing, including capture parsing and memory copies; excludes canvas display and depends on machine load.')
     (args.out / 'README.md').write_text('# PPU demo artifacts\n\n' + '\n'.join(rows) + '\n\n'
         'Open `port/demo/index.html` directly in a browser. Select `.ppu.gz` files and matching `.ppm` references from `motion/` or `build/ppu/`. The browser executes the C renderer compiled to WebAssembly; no server is needed.\n\n'
         'Recreate the moving captures with:\n\n```sh\nbuild/venv/bin/python port/tests/ppu_regression.py --capture port/tests/ppu_motion.txt --save build/ppu/story/0032/input.sav --out build/demo/motion --wasm\nbuild/venv/bin/python port/demo/artifacts.py\n```\n\n'

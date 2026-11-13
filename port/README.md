@@ -434,14 +434,14 @@ build/venv/bin/python port/tests/ppu_regression.py \
   --out build/ppu/startup-delta --sanitize --unit --wasm
 ```
 
-The synthetic suite generates 315 cases without a ROM and compares directly with
+The synthetic suite generates 351 cases without a ROM and compares directly with
 mGBA's software renderer: all text sizes/depths/layers, affine and bitmap modes,
 transforms, sprite shapes/sizes/depths/flips, clipping, affine/double-size OBJ,
 windows, blending, brightness, mosaic, green swap and HBlank register changes.
 Boundary tests cover tile-bank wrapping, bitmap OBJ eligibility, invalid BG
 characters, transparent OBJ priority propagation, vertical window latches and
-sprite cycle budgets. All 315 match exactly under AddressSanitizer and
-UndefinedBehaviorSanitizer; all 315 also match in linked WebAssembly. Separate C
+sprite cycle budgets and screen-map fetches across VRAM banks. All 351 match exactly under AddressSanitizer and
+UndefinedBehaviorSanitizer; all 351 also match in linked WebAssembly. Separate C
 contract tests cover RGB555 arithmetic,
 unaligned input, affine reference updates and sign/wrap behavior.
 
