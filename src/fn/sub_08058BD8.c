@@ -174,7 +174,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                         {
                             s32 row = dy * 32;
                             s32 index;
-                            asm("" : "+r"(row));
+
                             index = dx + row;
                             output[index] = 0;
                         }
@@ -230,7 +230,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                             {
                                 s32 row = dy * 32;
                                 s32 index;
-                                asm("" : "+r"(row));
+
                                 index = dx + row;
                                 index = (u32)(output + index);
                                 secondValue = 0;
@@ -240,7 +240,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                 s32 row = dy + 1;
                                 s32 index;
                                 row *= 32;
-                                asm("" : "+r"(row));
+
                                 index = dx + row;
                                 secondOutput = output + index;
                             }
