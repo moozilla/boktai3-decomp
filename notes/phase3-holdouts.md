@@ -1372,3 +1372,34 @@ component is the structural partial; stock unit check MATCH.
 Store: `build/matchsearch/RisingActor_AdvanceHeight`, shared-component node.
 Next: identify a natural caller/helper return boundary that keeps zero live
 across the callback during allocation but rematerializes the final return.
+
+### sub_081FDCB0 / OrbitEffect_UpdateHomingTrail (081FDCB0): partial
+
+Tags: #matching #phase3 #presentation #081FDCB0
+
+Removed the source r1 pin and zero-use barrier. A do/while capture keeps zero
+in r5 at entry; clearing source after copying it to target prevents CSE from
+collapsing their two allocation classes. One memory barrier remains.
+
+Pin-free draft: `notes/phase3-drafts/dp-effects-b/sub_081FDCB0.c`, 4 ROM/8 draft
+instructions, 280 versus 272 bytes. IsFar inline restores all position/age
+reloads, but materializes a boolean with four extra instructions and loads
+target before the position. Its target lives in r3, blocking the ROM's initial
+zero-offset reload into r3; `why 67` shows no spill rotation can fix that.
+No single knob matches: probe tested eight canonical choices, five jump follows
+and one PRE decision without changing the count. Read jump.c's conditional
+assignment and branch simplification conditions.
+
+Original pin-free source gives 38/30. Steer helper and per-axis Distance helpers
+retain the missing reloads. Boolean helper plus scoped zero improves to 4/8.
+Early returns inside the predicate keep 4/8; explicit if/else returns undo the
+reload boundary (40/32). Passing preloaded dx changes neither the load order
+nor distance. Union age view, union zero, and mask-first AND do not help.
+A break/goto distance block, duplicate label jumps, and the source reset with
+the barrier removed still let CSE eliminate necessary reloads (36/30 or 39/31).
+Source copy in a do block gives 5/5 on the partial; a union pointer and identity
+helper give 4/4. The dead reset alone supplies the exact source/target separation.
+
+Store: `build/matchsearch/sub_081FDCB0`, distance-boundary. Next: preserve the
+inline distance-return join that prevents CSE following, while eliminating its
+boolean materialization; keep the source reset when recovering original load order.
