@@ -7487,6 +7487,7 @@ addr,name,mode,confidence,source,notes
 081BFF88,Storage_Create,thumb,medium,gcl-name,name from GCL key E02E 倉庫 (Storage); registry callback
 081BFFC8,DirectionMarker_GetAnimation,thumb,low,src-alias,
 081BFFD8,DirectionMarker_Update,thumb,low,src-alias,
+081C0048,TetherActor_IsNearRequestTerrain,thumb,low,src-alias,Tentative: tests current and cardinal neighbor terrain cells for flag 0x80.
 081C01D8,TetherActor_PositionRequestIndicator,thumb,low,src-alias,
 081C0344,TetherActor_UpdateRequestIndicator,thumb,low,src-alias,Updates the request indicator from tether actor state or hides it during a global override
 081C0378,TetherActor_DestroyRequestIndicator,thumb,low,src-alias,Removes the request indicator animation when initialized
@@ -7573,6 +7574,7 @@ addr,name,mode,confidence,source,notes
 081C2BB8,SparkleEmitter_OnUpdateHook,thumb,low,src-alias,Empty hook called by the sparkle emitter task update
 081C2BBC,SparkleEmitter_UpdateEmitting,thumb,low,src-alias,Spawns particles every other frame then updates existing particles and advances the frame counter
 081C2BE8,SparkleEmitter_UpdateDraining,thumb,low,src-alias,Updates existing particles without spawning more and advances the frame counter
+081C2C04,SparkleEmitter_ProcessMessages,thumb,low,src-alias,Consumes cutscene messages to start emission or drain particles.
 081C2D0C,SparkleEmitter_OnTaskUpdate,thumb,low,src-alias,Processes scene messages and dispatches the emitter state callback
 081C2D34,SparkleEmitter_OnTaskDestroy,thumb,low,src-alias,Removes all 32 particle sprites and releases the receiver and singleton
 081C2D68,SparkleEmitter_Initialize,thumb,low,src-alias,Initializes 32 sparkle sprites; registers scene messages; and applies script options to start emitting or draining.
