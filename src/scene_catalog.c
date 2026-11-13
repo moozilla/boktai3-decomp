@@ -438,15 +438,15 @@ void SceneCatalog_SaveOptions(struct SceneHudState *s)
 {
     struct Player *player;
     s32 mapped;
-    gGameState->values08[4] = s->savedSettingA;
-    mapped = SceneCatalog_MapSelectionMask(s->savedSettingB);
+    gGameState->values08[4] = s->savedSettings[0];
+    mapped = SceneCatalog_MapSelectionMask(s->savedSettings[1]);
     {
         u16 *option = &gGameState->unk12;
         *option = mapped;
     }
     {
         s16 *option = &gGameState->unk14;
-        *option = s->savedSettingC;
+        *option = s->savedSettings[2];
     }
     GameState_BackupRegionRange(&gGameState->values08[4], 2);
     GameState_BackupRegionRange(&gGameState->unk12, 2);
@@ -459,7 +459,7 @@ void SceneCatalog_SaveOptions(struct SceneHudState *s)
 void SelectionPanel_CaptureSettings(struct SceneHudState *p)
 {
     p->settingsRow = 0;
-    p->savedSettingA = gGameState->values08[4];
-    p->savedSettingB = SceneCatalog_GetMappedState();
-    p->savedSettingC = gGameState->unk14;
+    p->savedSettings[0] = gGameState->values08[4];
+    p->savedSettings[1] = SceneCatalog_GetMappedState();
+    p->savedSettings[2] = gGameState->unk14;
 }
