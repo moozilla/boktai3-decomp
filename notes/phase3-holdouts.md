@@ -1523,3 +1523,50 @@ the exact CSE_NOFOLLOW counterfactual. Next: an ordinary control-flow or value
 boundary that prevents the first cse follow while preserving the ROM arm order.
 The player-first direct sums should be kept; separately named coordinate values
 raise pressure and obscure this one remaining issue.
+
+
+### LevelAdvanceDisplay_UpdateAnimation (08057158): three pins removed, height copies and tail topology
+
+Tags: #menus #hud #matching #compiler
+
+Three partial commits remove the frame-sample, shared coordinate, and random-index
+pins. A mask-first local inside the successful frame-range check fixes the sample
+AND. Separate X/Y/Z coordinate locals fix their allocation. The matched staged
+effect sibling supplies an index pointer: `cursor = &index; value = table[*cursor]`.
+Taking the sample's address too leaves four X-axis differences; a normal sample
+assignment matches. Complete unit MATCH at 468 bytes; three pins and seven
+barriers remain.
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/LevelAdvanceDisplay_UpdateAnimation.c`,
+39 ROM / 25 draft instructions, 440 bytes. The solved sample and random regions
+are exact. Remaining differences include timer allocation, kind/frame address
+lifetimes, jump2 merging the two 30*frame tails, and constant-height copies.
+The ROM builds 400 in r1 then copies it to r0 before loading Y in r1. The ordinary
+draft folds that copy and changes load order. COMBKEEP=left does not recover it.
+The cse/PRE/loop probe gives no single improvement; there is no complete matching
+knob for the fully ordinary draft.
+
+Isolated right-operand barrier diagnosis: rise-return.c keeps other existing
+concessions and replaces that barrier/goto with a complete store and return.
+`AGBCC_CROSS_LIMIT=228:2 AGBCC_NOCROSS=473` MATCH. Jump2 first shares its two store
+tail instructions, then shares the multiply with the other rise arm. Limiting
+the first jump alone lets the reverse merge happen. Read jump.c's find_cross_jump:
+its source-jump UID and cumulative shared count explain both choices. This
+counterfactual proves only that isolated barrier, not all remaining concessions.
+
+Tried complete first/second-arm returns, duplicated rise tails, narrow signed and
+unsigned rise amounts, wider result casts, separate frame-pointer groups, direct
+global random draws, signed/narrow samples and coordinates, separate index loads,
+index arrays/unions, sample capture helper, typed height helpers, a repeated
+height-assignment macro, addressable height scalar, array and union initializers.
+The latter height forms all fold the constant copy. Narrow rise amounts prevent
+the tail merge but add two conversions. Full repeated rise code fails to merge
+the larger random region. The macro trial was not landed. Preserve the normal
+sample assignment and separate coordinates when revisiting the index pointer;
+the sibling's `*(&sample)` spelling is worse here.
+
+Persistent store: `build/matchsearch/LevelAdvanceDisplay_UpdateAnimation`, including
+the exact isolated cross-jump counterfactual. Next: recover the source-level
+height operation that materializes the constant copy, then reconstruct the rise
+arm label topology with both multiplies retained. Kind/frame pins should be
+retested together once the left/right scalar lifetimes are ordinary.
