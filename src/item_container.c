@@ -130,7 +130,7 @@ s32 Trigger_RunScript(struct Trigger *input, u32 scriptInput, s32 eventInput)
     s32 savedActor;
     u32 *source;
     s32 *out;
-    register struct TriggerScriptArgs *argsPtr asm("r2");
+    struct TriggerScriptArgs *argsPtr;
     {
         s32 arg = eventInput;
         event = arg;
@@ -170,7 +170,6 @@ active:
     values[3] = p->id;
     values[4] = p->kind;
     argsPtr = &args;
-    asm("" : : "r"(argsPtr));
     source = p->arguments;
     out = values + 5;
     i = 2;
@@ -187,8 +186,7 @@ active:
             *(u32 *)&args = word;
         }
     }
-    args.values = values;
-    argsPtr = &args;
+    argsPtr->values = values;
     return Script_Call(script, argsPtr);
 }
 

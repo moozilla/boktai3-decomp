@@ -1272,3 +1272,29 @@ allocation when the remaining pin is retained.
 Next: a height/nibble representation that retains the nonconstant mask priority
 without retaining its initial copy; or a shared nibble operation whose subreg
 operands prevent both regmove ties without making lowMask the canonical result.
+
+### Trigger_RunScript (08006F00): argument pointer pin/barrier removed
+
+The matching partial uses `argsPtr->values = values`, removes the redundant
+`argsPtr = &args` before Script_Call, and removes both the argsPtr input barrier
+and r2 pin. The single pointer definition survives GCC's PRE at the correct
+position, and its use for the values field gives the necessary allocation.
+Stock `tools/check.py src/item_container.c`: all 30 functions MATCH (7,024 bytes).
+One actor-output barrier and one actor-index pin remain.
+
+Best pin-free draft: `notes/phase3-drafts/dp-field/Trigger_RunScript.c` (11/9,
+shape 6). As in the earlier field-effects notes, its pointer-based word RMW gives
+the right register but the wrong two memory operands. Direct `&args` for that RMW
+matches with `AGBCC_PRI=argsPtr:+2000` except the actor-copy region (9/7, shape 2).
+The matching partial's source becomes 23/23 when both remaining actor concessions
+are simply removed: CSE merging also changes pointer and saved-value allocation.
+
+New attempts: s8 union and array actor views; an inline active-player predicate;
+a validation while/break form; indexed copying, indexed source, descending copy,
+and destination-end loop. Union/array views compile like the baseline. The helper
+changes the return/control region; the validation loop changes loop-note priorities.
+The indexed and descending copies lower to the same loop as the baseline, so they
+do not fix the argument-pointer priority. The destination-end loop changes shape.
+The argsPtr partial is now resolved; the next pass should focus on a real boundary
+that preserves a short-lived actor-index copy before the saved r5 value, then
+reassess the fully pin-free pointer allocation with that corrected copy present.
