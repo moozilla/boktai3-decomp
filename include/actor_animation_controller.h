@@ -51,8 +51,11 @@ struct ActorAnim {
     u16 frame, unused, scale, timer;
 };
 
+struct Player;
+
 struct ActorAnimController {
-    u8 unk00[0x1c];
+    u8 unk00[0x18];
+    struct Player *owner; /* 0x18: player linked to this controller */
     struct ActorChildSlot children[16]; /* 0x1C, stride 0xDC */
     struct ActorSprite obj;             /* 0xDDC; agbcc tail-pads this to 0x24 bytes */
     u8 unkE00[8];

@@ -242,7 +242,8 @@ void Actor_ProjectAndClampToScreen(struct ActorAnimController *p)
 
 // Provisional name: Actor_TryInteraction
 
-extern u8 *gGameState;
+#include "game_state.h"
+#include "player.h"
 
 u8 Math_Atan2(s32, s32);
 
@@ -300,8 +301,8 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             a = 255;
         }
     }
-    if ((s8)a != *(s16 *)(gGameState + 0x85e) && (s8)b != *(s16 *)(gGameState + 0x85e) &&
-        (s8)c != *(s16 *)(gGameState + 0x85e))
+    if ((s8)a != gGameState->unk85E && (s8)b != gGameState->unk85E &&
+        (s8)c != gGameState->unk85E)
         return;
     height = q->worldY;
     owner = *(u8 **)((u8 *)p + 0x18);
@@ -429,8 +430,8 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
                 a = 255;
             }
         }
-        if ((s8)a != *(s16 *)(gGameState + 0x85e) && (s8)b != *(s16 *)(gGameState + 0x85e) &&
-            (s8)c != *(s16 *)(gGameState + 0x85e))
+        if ((s8)a != gGameState->unk85E && (s8)b != gGameState->unk85E &&
+            (s8)c != gGameState->unk85E)
             continue;
         {
             s32 y = q->worldY;
