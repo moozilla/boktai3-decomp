@@ -1,6 +1,28 @@
-#include "global.h"
-
+#include "background_tilemap.h"
 #include "render.h"
+
+static inline s32 truncateTile(s32 value)
+{
+    s32 result;
+    if (value >= 0)
+        result = value >> 3;
+    else
+        result = -((-value) >> 3);
+    return result;
+}
+
+void BgGfx_LoadTilemapAtPosition(u32 layer, s32 x, s32 y)
+{
+    s32 bottom = y + 80;
+    s32 tileX = truncateTile(x - 8);
+    s32 tileY = truncateTile(bottom - 128) & ~1;
+    BgGfx_LoadTilemap(layer, tileX, tileY, x, y, 0);
+}
+
+void BgGfx_LoadTilemapSimple(u32 layer, s32 tileX, s32 tileY, s32 screenX, s32 screenY)
+{
+    BgGfx_LoadTilemap(layer, tileX, tileY, screenX, screenY, 0);
+}
 
 s32 Mod(s32, s32);
 
@@ -10,6 +32,7 @@ static inline s32 ScreenBlock(s32 tile)
 }
 
 /* Expand the left or right column of a 2x2 metatile into two tilemap rows. */
+
 #define WRITE_METATILE_COLUMN(dst, definitions, id, column, upperRow, lowerRow)                    \
     {                                                                                              \
         u16 metatile = (id);                                                                       \
