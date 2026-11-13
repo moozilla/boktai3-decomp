@@ -2,6 +2,7 @@
 #define GUARD_STATE_ACTOR_H
 
 #include "global.h"
+#include "scene_actor_components.h"
 
 /* Actors driven by a per-kind state table (gUnk_086121C4, gUnk_08612344,
  * gUnk_086124D4, ...). Each table's first 16 states are shared handlers
@@ -70,25 +71,32 @@ struct StateActor {
     u8 facing4, facing8, targetAngle; /* 0x19-0x1B */
     u8 unk1C[0x20 - 0x1C];
     struct StateActorTag tag; /* 0x20 */
-    u8 unk40[0x54 - 0x40];
-    struct StateActorPos target; /* 0x54: position the actor walks to */
-    u8 motion[0x65 - 0x5C];      /* Descriptor prefix, 081D2544. */
-    u8 angle;                    /* 0x65, initialized from targetAngle by 081D1A44. */
+    u8 unk40[8];
+    u32 bodyId, bodyFlags;
+    u8 bodyMode, bodyDirection;
+    u8 unk52[2];
+    struct StateActorPos target; /* 0x54: body position. */
+    u8 motion[0x65 - 0x5C];
+    u8 angle;
     u8 unk66[2];
     struct StateActorPos position; /* 0x68 */
-    u8 unk70[0x20];                /* 0x70-0x8F: still unknown. */
+    u8 unk70[0x20];
     /* 0x90-0x167: a second, nested command/recovery pipeline (actor graphics
      * and basic states, 08021EA8-08024F2C), parallel to the primary state
      * machine above but with its own offsets. Field names are provisional
      * (confidence=low); several bytes are only pinned by neighbouring
      * confirmed fields and are not independently read anywhere yet. */
-    u8 unk90[4];
+    u32 callbackFrame;
     s16 health, maxHealth; /* 0x94: SceneActors_AddHealthCost, _TryStartDeathOrFlaggedAction. */
-    u8 unk98[2];
+    u16 extraHealth;
     u8 vulnerable; /* 0x9A: set 1 by recovery states; the death/flag check clears it. */
-    u8 unk9B;
+    u8 registrySlot;
     u32 actionFlags; /* 0x9C: per-frame bits; meaning differs by caller (busy/pending/variant). */
-    u8 unkA0[0xA];
+    u8 lowHealth;
+    u8 unkA1[2];
+    u8 animationCompletions;
+    u8 unkA4[4];
+    u8 animationFacing4, animationFacing8;
     u8 actionAnimation; /* 0xAA: requested sub-animation id for the recovery pipeline. */
     u8 actionState;     /* 0xAB: checked for value 3 by the variant-recovery handlers. */
     u8 actionMode;      /* 0xAC: index into SceneActorState_UpdateActionController's table. */
@@ -97,29 +105,44 @@ struct StateActor {
     u8 actionFinished;  /* 0xAF */
     u8 actionEnter;     /* 0xB0 */
     u8 actionChanged;   /* 0xB1: unconfirmed, position only. */
-    u8 unkB2;
+    u8 animationFinished;
     u8 locked; /* 0xB3: SceneActorAnimation_Update{Directional,EightDirection}Callback. */
     u8 shakeFrames, shakeStrength;
-    u8 unkB6[0xE];
+    u8 animationOffset, animationMirrored;
+    u16 animationSequence, previousAnimationSequence;
+    u8 unkBC[8];
     u32 actionTimer; /* 0xC4: reset to 0 on transition, incremented each call otherwise. */
     u8 unkC8[4];
     u8 requestedAngle; /* 0xCC */
-    u8 unkCD[0x17];
+    u8 unkCD[3];
+    struct StateActorPos targetPosition;
+    s32 targetDistanceSquared, targetHeading;
+    u8 targetMetricsValid, healthRatio;
+    u8 unkE2[2];
     u32 effectTimer;
     u32 firstEventScript, secondEventScript;
     s32 eventArguments[4];
-    u8 unk100[4];
+    void (*actionCallback)(void *, int);
     u8 (*actionTryUpdate)(void *); /* 0x104 */
     void (*actionReset)(void *);   /* 0x108 */
-    u8 unk10C[0xC];
+    u8 unk10C[8];
+    s8 savedFacing;
+    u8 unk115[3];
     u8 receiver2[0x10]; /* 0x118: a second scene message receiver (size tentative). */
-    u8 unk128[0x2C];
+    u8 unk128[0x24];
+    void *attachmentEffect;
+    u16 effectParameter;
+    s16 effectDuration;
     u8 ambientParticle, intermittentEffect, continuousEffect;
-    u8 unk157[5];
+    u8 unk157;
+    s32 defense;
     struct StateActorDamageEffect damageEffect;
     u8 unk164[4];
-    u8 receiver[0x10];                 /* 0x168: scene message receiver (size tentative). */
-    u8 bodyDrawable[0x1CC - 0x178];    /* 0x178: SceneActorGraphics_InitializeBody. */
+    u8 receiver[4]; /* 0x168: message header; payload overlaps damage registration. */
+    s32 damageKind;
+    int (*damageCallback)(void *, int, int);
+    u32 unk174;
+    u8 bodyDrawable[0x1CC - 0x178];              /* 0x178: SceneActorGraphics_InitializeBody. */
     struct StateActorOverlay overlayDrawable[1]; /* 0x1CC: SceneActorGraphics_InitializeOverlay. */
     struct StateActorPos
         worldPosition; /* 0x260: render/collider position (distinct from `position`). */

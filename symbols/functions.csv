@@ -786,6 +786,7 @@ addr,name,mode,confidence,source,notes
 080215AC,SceneActors_SetHealthLimits,thumb,low,src-alias,
 08021630,SceneActors_SetHealth,thumb,low,src-alias,
 080216A4,SceneActors_SetDamageCallback,thumb,low,src-alias,
+080216D8,SceneActors_SetShake,thumb,low,src-alias,Sets camera-shake duration and strength bytes
 080216E8,SceneActors_StartAnimation,thumb,low,src-alias,
 0802175C,SceneActors_StartDirectionalAnimation,thumb,low,src-alias,
 080217F4,SceneActors_StartEightDirectionAnimation,thumb,low,src-alias,
@@ -797,6 +798,7 @@ addr,name,mode,confidence,source,notes
 08021ADC,SceneActors_SetEventScripts,thumb,low,src-alias,Sets the script IDs consumed by the first and second event script runners
 08021AE8,SceneActors_RunFirstEventScript,thumb,low,src-alias,
 08021B54,SceneActors_RunSecondEventScript,thumb,low,src-alias,
+08021BC0,SceneActors_CopyAvailablePosition,thumb,low,src-alias,Copies the available actor body position and returns -1 when absent
 08021BE4,SceneActors_GetAvailablePosition,thumb,low,src-alias,Returns a pointer to the available actor's position or null if absent
 08021BF8,SceneActors_ConfigureEffect,thumb,low,src-alias,
 08021D8C,SceneActors_SpawnAmbientParticle,thumb,low,src-alias,
