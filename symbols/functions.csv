@@ -4597,6 +4597,8 @@ addr,name,mode,confidence,source,notes
 0811B6C8,Collider_InitManagerBuckets,thumb,low,src-alias,Clears ten collision buckets and derives their horizontal span from the scene width
 0811B714,Collider_InitManager,thumb,low,src-alias,Initializes collision manager buckets and publishes the global manager pointer
 0811B72C,Collider_CreateManager,thumb,low,src-alias,Returns the existing collision manager or creates and initializes its singleton task
+0811B774,RegistryE7BC_SetFlags,thumb,low,src-alias,Sets bits in a flag word; registry ownership remains tentative.
+0811B77C,RegistryE7BC_ClearFlags,thumb,low,src-alias,Clears bits in a flag word; registry ownership remains tentative.
 0811B784,RegistryE7BC_OnObjectComplete,thumb,low,src-alias,Completion callback invokes the object's script procedure and clears its active flag
 0811B7A0,RegistryE7BC_QueueActiveObjects,thumb,low,src-alias,
 0811B7D0,RegistryE7BC_OnManagerDestroy,thumb,low,src-alias,Manager destruction callback clears the global manager pointer
@@ -4611,6 +4613,7 @@ addr,name,mode,confidence,source,notes
 0811BAD8,GameState_SetActionCount894,thumb,low,src-alias,Sets the counter at offset 894 and clamps it to zero through 999; action meaning is tentative
 0811BB1C,GameState_GetResultIndex,thumb,low,src-alias,Clamps and returns the index used for result tables and script arguments
 0811BB58,GameState_GetResultTimer,thumb,low,src-alias,Clamps and returns the timing value used in result scoring; timer interpretation is tentative
+0811BB98,GameState_GetActionCount892,thumb,low,src-alias,Clamps the signed action counter at GameState offset 892 to 0..999 and returns it.
 0811BBE0,GameState_GetActionCount894,thumb,low,src-alias,Clamps and returns the counter at offset 894 used in result scoring
 0811BC28,GameState_AddActionCount892,thumb,low,src-alias,Adds to the counter at offset 892 with saturation between zero and 999
 0811BC68,GameState_AddActionCount894,thumb,low,src-alias,Adds to the counter at offset 894 with saturation between zero and 999
