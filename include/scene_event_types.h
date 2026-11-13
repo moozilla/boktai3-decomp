@@ -8,6 +8,7 @@ struct SceneEventCommand {
     u16 unknown4;
     u8 kind, argumentCount;
     s16 value;
+    u8 parameterA, parameterB; /* command-specific bytes in the tail padding */
 };
 struct SceneEventReceiver {
     u16 id;

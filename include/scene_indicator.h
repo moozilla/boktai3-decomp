@@ -4,6 +4,10 @@
 #include "global.h"
 #include "scene_vec.h"
 
+struct Vec {
+    s16 x, y, z, pad;
+};
+
 struct SceneStatusIndicator {
     u32 flags;
     u8 unknown04[11];

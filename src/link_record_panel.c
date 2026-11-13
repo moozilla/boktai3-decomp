@@ -270,7 +270,7 @@ void LinkRecordPanel_InitializePreviews(struct LinkRecordPanel *panel)
         preview->variant = payload->variant;
         preview->extra = payload->extra;
         preview->palette = payload->palette;
-        preview->player = i;
+        preview->model.playerIndex = i;
         switch (i) {
             case 0:
                 flags = 0;

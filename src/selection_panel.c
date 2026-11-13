@@ -196,12 +196,12 @@ void SelectionPanel_InitPreview(struct SelectionPanel *panel)
         panel->preview.extra = values[4];
         panel->preview.palette = values[3];
         frame = values[3];
-        panel->preview.player = 0;
+        panel->preview.model.playerIndex = 0;
     } else {
         base = ((u8 *)&panel->preview);
         SceneActorStyle_InitializeFromGameState(&panel->preview.kind);
         frame = panel->preview.palette;
-        panel->preview.player = flags;
+        panel->preview.model.playerIndex = flags;
     }
     pos.x = 0x30;
     pos.y = 0x50;

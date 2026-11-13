@@ -7,6 +7,17 @@
 #include "contact_position.h"
 #include "scene_animation.h"
 #include "scene_input_widget.h"
+/* Resource header read through a sequence sprite (palette index and data). */
+struct DisplayAnimationResource {
+    u8 unknown0[6];
+    u16 paletteIndex;
+    u8 unknown8[4];
+    const void *paletteData;
+    u8 unknown10[0x18];
+    u32 flags;
+    u8 unknown2C[0x2C];
+    void *sequence;
+};
 struct DisplayPosition {
     u32 words[2]; /* observed word-aligned copy; packed coordinates remain untyped */
 };

@@ -69,7 +69,7 @@ s32 DisplayAnimation_GetFrameBoundary(struct DisplayAnimation *display, u32 *out
     if (display->kind == 2) {
         struct SceneInputWidget *state = &display->resource.keyframes.widget;
         if (state->status & 4) {
-            *out = state->frame;
+            *out = state->frameTimer;
             return 1;
         }
     } else {
