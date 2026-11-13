@@ -4854,7 +4854,10 @@ addr,name,mode,confidence,source,notes
 081265A4,ScriptedParticle_DestroyPool,thumb,low,src-alias,Task destruction callback removing allocated sprites and clearing the singleton
 081265DC,ScriptedParticle_InitPool,thumb,low,src-alias,Registers the singleton and marks all 48 particle slots free
 08126604,ScriptedParticle_EnsurePool,thumb,low,src-alias,Returns the existing pool or creates and initializes its task
+08126650,ScriptedParticle_ResetSingleton,thumb,low,src-alias,
+0812665C,ScriptedParticle_RunIdleHook,thumb,low,src-alias,
 08126660,SceneStatusIndicator_Allocate,thumb,low,src-alias,
+081266B4,SceneStatusIndicator_UpdateBlink,thumb,low,src-alias,
 081267D4,EffectPool_ReleaseSlot,thumb,low,src-alias,
 0812681C,SceneStatusIndicator_Create,thumb,low,src-alias,
 081268A4,SceneStatusIndicator_UpdateManager,thumb,low,src-alias,
@@ -4862,9 +4865,11 @@ addr,name,mode,confidence,source,notes
 0812695C,BlinkingEffect_InitPool,thumb,low,src-alias,Finds animation resource 0x1C1A and initializes the twelve-slot pool; blinking identity is tentative
 08126988,BlinkingEffect_EnsurePool,thumb,low,src-alias,Returns the existing effect pool or creates its task with update and destruction callbacks
 081269D4,BlinkingEffect_ResetSingleton,thumb,low,src-alias,Clears the effect pool pointer during scene subsystem reset
+081269E0,BlinkingEffect_RunIdleHook,thumb,low,src-alias,
 081269E4,BouncingParticle_Update,thumb,low,src-alias,
 08126A7C,BurstSpark_ReleaseSlot,thumb,low,src-alias,Slot release callback removing any registered sprite and clearing the entire entry; spark identity is tentative
 08126AA4,BurstSpark_AllocateSlot,thumb,low,src-alias,Claims the first available entry in the 128-slot pool and records its index
+08126AD4,BurstSpark_Create,thumb,low,src-alias,
 08126C3C,EffectPool_UpdateActive,thumb,low,src-alias,
 08126C84,BurstSpark_DestroyPool,thumb,low,src-alias,Task destruction callback removing registered sprites from occupied slots and clearing the singleton
 08126CC0,BurstSpark_InitPool,thumb,low,src-alias,Loads shared animation resource 0x8639 and registers the spark pool singleton
@@ -4996,10 +5001,16 @@ addr,name,mode,confidence,source,notes
 0812D50C,FragmentSpritePool_Init,thumb,low,src-alias,Clears the slot mask and loads fragment animation resource F422 before publishing the singleton
 0812D534,FragmentSpritePool_GetOrCreate,thumb,low,src-alias,Returns the existing singleton or creates and initializes its task
 0812D580,FragmentSpritePool_ResetSingleton,thumb,low,src-alias,Clears the singleton pointer during scene subsystem reset
+0812D58C,ScriptedColliderPool_HasActorAtPosition,thumb,low,src-alias,
+0812D5F0,ScriptedColliderPool_StopAll,thumb,low,src-alias,
+0812D624,ScriptedColliderActor_SpawnFixed,thumb,low,src-alias,
+0812D66C,ScriptedColliderPool_RunIdleHook,thumb,low,src-alias,
 0812D670,SceneMovingParticle_AllocateEntry_0812D670,thumb,low,src-alias,
 0812D6C4,SceneParticle_UpdateAlternatingFrame,thumb,low,src-alias,
 0812D704,SceneParticle_UpdateMotion,thumb,low,src-alias,
 0812D758,SceneParticle_Remove,thumb,low,src-alias,
+0812D7A8,SceneParticle_CreateDefaultMode,thumb,low,src-alias,
+0812D7BC,SceneParticle_CreateWithMode,thumb,low,src-alias,
 0812D7D0,SceneParticle_Create,thumb,low,src-alias,
 0812D8EC,ParticleEffectPool_Update,thumb,low,src-alias,
 0812D960,ParticleEffectPool_DestroyTask,thumb,low,src-alias,Task cleanup callback removes active effects from 26 slots and clears the singleton
