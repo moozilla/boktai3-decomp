@@ -1,10 +1,13 @@
 import sys
 import unittest
 import tempfile
+import contextlib
+import io
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from merge_unit import items, write_merge
+from merge_unit import items, merge, main, write_merge
 from progress import _bodies
 
 
@@ -53,3 +56,55 @@ class MergeWrites(unittest.TestCase):
             with self.assertRaises(OSError):
                 write_merge(str(Path(directory, "absent", "unit.c")), [str(source)], "merged")
             self.assertEqual(source.read_text(), "input")
+
+
+class MergeCompilerSettings(unittest.TestCase):
+    def merge_sources(self, first, second):
+        with tempfile.TemporaryDirectory() as directory:
+            paths = [Path(directory, "first.c"), Path(directory, "second.c")]
+            paths[0].write_text(first + "\nvoid First(void) {}\n")
+            paths[1].write_text(second + "\nvoid Second(void) {}\n")
+            return merge([str(path) for path in paths])
+
+    def test_mixed_compilers_are_reported_in_either_order(self):
+        for first, second in [("", "// COMPILER: old_agbcc"),
+                              ("// COMPILER: old_agbcc", "")]:
+            with self.subTest(first=first):
+                _, conflicts = self.merge_sources(first, second)
+                self.assertEqual(conflicts[0][0][0], "compiler")
+
+    def test_implicit_and_explicit_default_compiler_agree(self):
+        _, conflicts = self.merge_sources("", "// COMPILER: agbcc")
+        self.assertEqual(conflicts, [])
+
+    def test_matching_legacy_compilers_remain_supported(self):
+        text, conflicts = self.merge_sources("// COMPILER: old_agbcc",
+                                             "// COMPILER: old_agbcc")
+        self.assertEqual(conflicts, [])
+        self.assertIn("// COMPILER: old_agbcc", text)
+        self.assertIn("void First", text)
+        self.assertIn("void Second", text)
+
+    def test_effective_flags_must_agree(self):
+        _, conflicts = self.merge_sources("", "// CFLAGS: -O1 -mthumb-interwork")
+        self.assertEqual(conflicts[0][0][0], "compiler flags")
+        _, conflicts = self.merge_sources("", "// CFLAGS: -O2 -mthumb-interwork")
+        self.assertEqual(conflicts, [])
+
+    def test_conflict_does_not_write_output_or_remove_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            first = Path(directory, "first.c")
+            second = Path(directory, "second.c")
+            output = Path(directory, "merged.c")
+            first_text = "void First(void) {}\n"
+            second_text = "// COMPILER: old_agbcc\nvoid Second(void) {}\n"
+            first.write_text(first_text)
+            second.write_text(second_text)
+            argv = ["merge_unit.py", str(output), str(first), str(second), "--write"]
+            with mock.patch.object(sys, "argv", argv), contextlib.redirect_stdout(io.StringIO()):
+                with self.assertRaises(SystemExit) as result:
+                    main()
+            self.assertEqual(result.exception.code, 1)
+            self.assertFalse(output.exists())
+            self.assertEqual(first.read_text(), first_text)
+            self.assertEqual(second.read_text(), second_text)

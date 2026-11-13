@@ -6,7 +6,8 @@
 Concatenates the inputs' top-level items. Identical repeats (prototypes,
 externs, struct definitions, static helpers, #defines) are kept once; items
 whose name repeats with a different body are reported as conflicts, which must
-be unified (usually into a shared header) before merging. With --write the
+be unified (usually into a shared header) before merging. Inputs must also use
+the same compiler and effective flags; mixed settings cannot share one unit. With --write the
 output is written and the inputs are removed from disk. Run make afterwards:
 merging can change code generation only through such declarations.
 """
@@ -17,6 +18,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from split import c_functions  # noqa: E402
+from build import cflags_for, compiler_for  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -90,9 +92,21 @@ def is_function(item):
 def merge(paths):
     """A pinned input's marker moves to just above its function definitions."""
     seen, conflicts, body, includes = {}, [], [], []
+    settings = None
+    settings_path = None
     for path in paths:
-        pinned = MARK in open(os.path.join(ROOT, path)).read()
-        for item in items(open(os.path.join(ROOT, path)).read()):
+        current = (compiler_for(path), tuple(cflags_for(path)))
+        if settings is None:
+            settings, settings_path = current, path
+        elif current[0] != settings[0]:
+            names = f"{os.path.basename(settings[0])} / {os.path.basename(current[0])}"
+            conflicts.append((("compiler", names), settings_path, path))
+        elif current[1] != settings[1]:
+            conflicts.append((("compiler flags", "different effective options"), settings_path, path))
+        with open(os.path.join(ROOT, path)) as source:
+            text = source.read()
+        pinned = MARK in text
+        for item in items(text):
             if item.startswith("#include"):
                 if item not in includes:
                     includes.append(item)
