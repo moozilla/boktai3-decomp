@@ -4206,9 +4206,11 @@ addr,name,mode,confidence,source,notes
 081084E4,AnimatedTile_Allocate,thumb,low,src-alias,Claims and clears the first free tile slot and records its index
 0810853C,Pool1BC_FindByName,thumb,low,src-alias,
 0810858C,AnimatedTile_CreateFromScript,thumb,low,src-alias,
+0810874C,AnimatedTile_UpdateIdleState,thumb,low,cleanup,Empty idle-state hook
 08108750,AnimatedTile_TickAlternateAnimation,thumb,low,src-alias,
 0810889C,Pool1BC_UpdateDelay,thumb,low,src-alias,
 081088DC,AnimatedTile_TickFadeOut,thumb,low,src-alias,
+08108968,AnimatedTile_OnStateComplete,thumb,low,cleanup,Empty completed-state hook
 0810896C,CallbackSlots_DispatchActive,thumb,low,src-alias,
 081089D8,AnimatedTile_OnManagerDestroy,thumb,low,src-alias,Manager destruction callback that removes every allocated tile sprite and clears the singleton
 08108A1C,AnimatedTile_InitManager,thumb,low,src-alias,Loads shared sequence resources and initializes the manager singleton and allocation mask
