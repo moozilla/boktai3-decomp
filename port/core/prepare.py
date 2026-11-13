@@ -1,10 +1,11 @@
 """Small, audited source adaptations for clang, confined to generated build files."""
 import re
 from pathlib import Path
+from returns import repair_returns, verify_returns
 
 
 def prepare_source(path, target):
-    text = path.read_text()
+    text = repair_returns(path.read_text())
     text = text.replace('asm("swi 0x2A")', 'port_system_call(0x2a)')
     # The compatibility macro erases matching hints. Keep MMIO volatile intact.
     text = re.sub(r'\basm\s+(?:volatile|__volatile__)\s*\(', 'asm(', text)
@@ -42,8 +43,9 @@ def prepare_source(path, target):
 
 def prepare_headers(root, output, target):
     """Mirror headers so nested quoted includes use the same portable versions."""
+    verify_returns(root)
     for path in sorted((root / 'include').rglob('*.h')):
-        text = path.read_text()
+        text = repair_returns(path.read_text())
         if path.name == 'player_cue.h':
             # agbcc rounds all record sizes to a word. LLVM uses member alignment.
             text = text.replace('struct PlayerCueTimers {',

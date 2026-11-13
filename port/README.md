@@ -205,3 +205,27 @@ and BIOS VBlank latch, plus IF acknowledgement and IME restoration. The test
 uses valid inactive sound state and leaves wireless uncreated; active audio/RFU
 callbacks and the VCount sound handler are not covered. This focused resolver
 is a tested integration boundary, not the full game's callback registry.
+
+## Discarded return declarations
+
+`core/returns.py` records the actual integer return types of 25 frequently called
+functions. Generated sources and mirrored headers correct explicit `void`
+declarations for those functions; arguments and call sites are unchanged. Each
+build verifies the recorded type against its original C definition and fails
+clearly if integration changes that evidence. Other return/argument conflicts
+and indirect callback signatures remain unresolved.
+
+`python port/tests/run_returns_slice.py` reproduces the original wasm link error
+for `ParticlePool_Destroy` calling `Task_Kill`, then executes the original C
+call chain on host and wasm after the repair. No ROM is needed for this test.
+`python port/tests/run_returns.py --hardware-root ../cx-port-hw/port` recompiles
+all affected units and audits an existing full-game object sweep: 1,894 game
+units plus 14 core/device units compile; distinct linker conflicts fall from
+823 to 804, with no new conflicts and the same seven missing MP2K routines.
+Six corrected functions retain other ABI mismatches.
+
+`--link-game --compile-only --source PATH` can rebuild selected bound/MMIO
+objects without attempting a partial final link. The audit collects fatal
+signature diagnostics separately from missing symbols because LLD stops early
+on fatal warnings. Any diagnostic wasm output is deleted; the normal build
+continues to reject signature warnings. Results live in `build/port/returns/`.
