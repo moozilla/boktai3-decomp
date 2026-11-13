@@ -1,13 +1,31 @@
 import sys
 import unittest
+import tempfile
+from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from merge_unit import items
+import merge_unit
 from progress import _bodies
 
 
 class FunctionBoundaries(unittest.TestCase):
+    def test_write_works_without_git_and_keeps_output_when_also_an_input(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            first = root / "first.c"
+            second = root / "second.c"
+            first.write_text("void First(void) {}\n")
+            second.write_text("void Second(void) {}\n")
+            with patch.object(merge_unit, "ROOT", directory), patch.object(
+                sys, "argv", ["merge_unit.py", "first.c", "first.c", "second.c", "--write"]
+            ):
+                merge_unit.main()
+            self.assertIn("void First(void)", first.read_text())
+            self.assertIn("void Second(void)", first.read_text())
+            self.assertFalse(second.exists())
+
     def test_punctuation_in_multiline_comments_stays_in_its_function(self):
         source = """void Startup(void)
 {
