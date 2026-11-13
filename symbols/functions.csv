@@ -9105,7 +9105,9 @@ addr,name,mode,confidence,source,notes
 08219C40,Heap_Alloc,thumb,low,src-alias,
 08219CB4,Heap_AllocFromEnd,thumb,low,src-alias,Searches heap blocks backward and allocates aligned storage from the end of a free block
 08219D38,Heap_Free,thumb,low,src-alias,
+08219DB4,Memory_FillWords,thumb,low,decomp,Fill a word count with an unrolled four-word loop
 08219DD8,Memory_Clear,thumb,low,src-alias,
+08219E44,Memory_FillBytes,thumb,low,decomp,Fill an arbitrary byte range using aligned CpuSet words and edge bytes
 08219EBC,Memory_Copy,thumb,low,src-alias,
 08219F04,BgGfx_LoadTiles,thumb,medium,coverage,"reads BG tile graphics (0x0865xxxx-0x0875xxxx, menu BG 0x0870A230)"
 08219F50,TaskSystem_InitLists,thumb,low,src-alias,Copies the initial fourteen task list records from ROM into scheduler RAM using DMA.
