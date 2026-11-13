@@ -4,6 +4,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "directional_sprite_state.h"
+#include "converging_effect_state.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0
@@ -344,7 +345,8 @@ struct Player {
     u8 visualEffects7A0[0x30], visualEffects7D0[0x2C];
     struct DirectionalSpriteEffect directionalEffect[1];      /* 0x7FC */
     void *directionalEffectCallback; /* 0x864 */
-    u8 unk868[0x218];
+    u8 unk868[0x140];
+    struct ConvergingEffectState convergingEffects; /* 0x9A8 */
     struct SceneVec actionOrigin; /* 0xA80: offset copy of position (tentative) */
     u8 unkA88[4];
     struct SceneVec movementStart, movementDestination; /* 0xA8C, 0xA94 */
