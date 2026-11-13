@@ -375,7 +375,8 @@ struct Player {
     u8 kindTwoAttachmentDescriptor; /* 0xB08 */
     u8 unkB09;
     u16 kindTwoAttachmentCounter; /* 0xB0A */
-    u8 unkB0C[0x30];
+    u8 unkB0C[0x2C];
+    s32 scriptActionParameter; /* 0xB38: optional script action parameter (tentative). */
     s32 eventProcedure;                                   /* 0xB3C */
     void *actionRequestEffect;                            /* 0xB40 */
     struct PlayerStatModifierContext statModifierContext; /* 0xB44: callback context */

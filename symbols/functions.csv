@@ -5533,7 +5533,10 @@ addr,name,mode,confidence,source,notes
 0815A3C4,Player_GetCandidateAttribute,thumb,low,src-alias,Computes an attribute using modifiers from a candidate equipment selection
 0815A400,Script_GetActorIndex,thumb,low,src-alias,Reads the optional i keyword used to select scripted actors and defaults to zero
 0815A418,Script_ReadPositionOption,thumb,low,src-alias,Reads three coordinates from the optional p keyword and reports whether it was present
+0815A444,ScriptActor_SetPositionFromScript,thumb,low,cleanup,Sets player position and optional facing then resets movement and action state; tentative.
+0815A4D8,ScriptActor_GetFacingFromScript,thumb,low,cleanup,Returns selected player facing with alternate tether orientation; tentative.
 0815A534,PlayerCue_IsStateFour,thumb,low,src-alias,"reads player (slot 0) cue struct's state field ""st"" at +0x1c and returns 1 if it equals 4, else 0; likely a script wait/condition predicate"
+0815A554,ScriptActor_IsLocomotionActiveFromScript,thumb,low,cleanup,Queries locomotion activity for the selected player; tentative.
 0815A578,ScriptActor_SetLifeEnergyFromScript,thumb,low,src-alias,
 0815A5E8,ScriptActor_SetLevelFromScript,thumb,low,src-alias,
 0815A628,ScriptActor_SetEnergyMaxFromScript,thumb,low,src-alias,"script cmd: via index i=Script_GetActorIndex(), sets scripted actor's energyMax (+0x428) from keyword 'e' (default = current energy +0x42a), mirrors into game"
@@ -5541,8 +5544,11 @@ addr,name,mode,confidence,source,notes
 0815A680,ScriptActor_TestFlagFromScript,thumb,low,src-alias,
 0815A6F4,Player_InitField42C,thumb,low,src-alias,"unconditionally stores constant 1000 into player (slot 0) actor's u16 field at +0x42c, right after the life/energy block; no script or index lookup, l"
 0815A714,Player_SetField434FromScript,thumb,low,src-alias,"stores Script_GetKeywordValue('p', 0) into player (slot 0) actor's +0x434; field purpose unclear (named by offset per project convention, cf. ScriptAc"
+0815A73C,ScriptActor_ApplyItemFromScript,thumb,low,cleanup,Applies a timed item effect or restores life for the selected player; tentative.
 0815A838,ScriptActor_GetField534FromScript,thumb,low,src-alias,
 0815A86C,ScriptActor_ClearField534FromScript,thumb,low,src-alias,"via index i=Script_GetActorIndex(), zeroes scripted actor's +0x534/+0x536/+0x538, which is exactly the field triple read by the existing ScriptActor_GetField5"
+0815A8A0,ScriptActor_SetActionFlagsFromScript,thumb,low,cleanup,Sets selected player action flags and optional action parameter; tentative.
+0815A918,ScriptActor_EmitEffectsFromScript,thumb,low,cleanup,Emits queued effects for the selected player; tentative.
 0815A938,Player_TestScriptStatus,thumb,low,src-alias,
 0815A97C,Player_SetSlotValueFromScript,thumb,low,src-alias,
 0815A9D8,ScriptActor_ClearSlotFromScript,thumb,low,src-alias,"via index i=Script_GetActorIndex(), on keyword 's' calls Player_ClearStateTimer(actor, slotIndex) which zeroes one of the two u16 ""slot"" entries at actor+0x530 (same sl"
