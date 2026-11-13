@@ -1,0 +1,1801 @@
+{
+ "cdp-scene1": [
+  "dp",
+  "Scene actors and NPCs (first half by bytes)",
+  "270-279",
+  [
+   {
+    "func": "SceneActorControl_TickActive",
+    "addr": "08067258",
+    "size": 480,
+    "score": 93.4,
+    "src": "src/fn/sub_08067258.c",
+    "unit": "Scene actor slot controller"
+   },
+   {
+    "func": "SceneActorControl_TryActivateNearby",
+    "addr": "080674F0",
+    "size": 360,
+    "score": 76.5,
+    "src": "src/fn/sub_080674F0.c",
+    "unit": "Scene actor slot controller"
+   },
+   {
+    "func": "sub_08067BA8",
+    "addr": "08067BA8",
+    "size": 100,
+    "score": 91.7,
+    "src": "src/fn/sub_08067BA8.c",
+    "unit": "Scene actor slot controller"
+   },
+   {
+    "func": "SceneSteeringActor_EmitRandomParticle",
+    "addr": "0806BDB8",
+    "size": 200,
+    "score": 75.0,
+    "src": "src/fn/sub_0806BDB8.c",
+    "unit": "Steering actor pool (tentative)"
+   },
+   {
+    "func": "SceneSteeringActor_DestroySlot",
+    "addr": "0806C708",
+    "size": 168,
+    "score": 76.5,
+    "src": "src/fn/sub_0806C708.c",
+    "unit": "Steering actor pool (tentative)"
+   },
+   {
+    "func": "RouteSpriteActor_TickEmitting",
+    "addr": "0806DCE4",
+    "size": 636,
+    "score": 88.5,
+    "src": "src/fn/sub_0806DCE4.c",
+    "unit": "Route sprite actor pool"
+   },
+   {
+    "func": "RouteSpriteActor_Create",
+    "addr": "0806DFC8",
+    "size": 360,
+    "score": 80.0,
+    "src": "src/fn/sub_0806DFC8.c",
+    "unit": "Route sprite actor pool"
+   },
+   {
+    "func": "SceneActorRegistry_UnlinkActor",
+    "addr": "0806FBC8",
+    "size": 92,
+    "score": 96.7,
+    "src": "src/fn/sub_0806FBC8.c",
+    "unit": "Scene actor registry lifecycle"
+   },
+   {
+    "func": "SceneActorRegistry_SendToCategoryPaletteOffset",
+    "addr": "0806FCAC",
+    "size": 92,
+    "score": 91.7,
+    "src": "src/fn/sub_0806FCAC.c",
+    "unit": "Scene actor registry lifecycle"
+   },
+   {
+    "func": "SceneActorRegistry_CountAvailable",
+    "addr": "0806FE18",
+    "size": 112,
+    "score": 95.8,
+    "src": "src/fn/sub_0806FE18.c",
+    "unit": "Scene actor registry lifecycle"
+   },
+   {
+    "func": "SceneActorRegistry_ScheduleAvailableActors",
+    "addr": "0806FE88",
+    "size": 236,
+    "score": 94.2,
+    "src": "src/fn/sub_0806FE88.c",
+    "unit": "Scene actor registry lifecycle"
+   },
+   {
+    "func": "SceneActorRegistry_SetMovementMode",
+    "addr": "08070070",
+    "size": 824,
+    "score": 85.0,
+    "src": "src/fn/sub_08070070.c",
+    "unit": "Scene actor registry queries"
+   },
+   {
+    "func": "SceneActorRegistry_DefeatActorsFromScript",
+    "addr": "080704EC",
+    "size": 496,
+    "score": 96.8,
+    "src": "src/fn/sub_080704EC.c",
+    "unit": "Scene actor registry queries"
+   },
+   {
+    "func": "SceneActorAnimation_SelectDirectionalFlags",
+    "addr": "080766F8",
+    "size": 288,
+    "score": 97.1,
+    "src": "src/fn/sub_080766F8.c",
+    "unit": "Scene actor animation selection"
+   },
+   {
+    "func": "SceneActorPlacement_ResetActorState",
+    "addr": "080772C0",
+    "size": 388,
+    "score": 83.1,
+    "src": "src/fn/sub_080772C0.c",
+    "unit": "Scene actor placement and feedback"
+   },
+   {
+    "func": "SceneActorPlacement_EmitTimedParticles",
+    "addr": "08077C48",
+    "size": 1072,
+    "score": 94.4,
+    "src": "src/fn/sub_08077C48.c",
+    "unit": "Scene actor placement and feedback"
+   },
+   {
+    "func": "SceneActorBehavior_AccelerateTowardDescriptor",
+    "addr": "08078430",
+    "size": 288,
+    "score": 96.9,
+    "src": "src/fn/sub_08078430.c",
+    "unit": "Scene actor behavior dispatch"
+   },
+   {
+    "func": "SceneActorBehavior_UpdateColliders",
+    "addr": "08078700",
+    "size": 340,
+    "score": 97.3,
+    "src": "src/fn/sub_08078700.c",
+    "unit": "Scene actor behavior dispatch"
+   },
+   {
+    "func": "SceneActorBehavior_DispatchPendingFlags",
+    "addr": "0807A714",
+    "size": 440,
+    "score": 86.6,
+    "src": "src/fn/sub_0807A714.c",
+    "unit": "Scene actor motion and updates"
+   },
+   {
+    "func": "SceneActorMotion_Update",
+    "addr": "0807A8CC",
+    "size": 1736,
+    "score": 82.7,
+    "src": "src/fn/sub_0807A8CC.c",
+    "unit": "Scene actor motion and updates"
+   },
+   {
+    "func": "SceneActorTarget_ResetContactResponse",
+    "addr": "0807F4B8",
+    "size": 600,
+    "score": 94.1,
+    "src": "src/fn/sub_0807F4B8.c",
+    "unit": "Scene actor target and contact control"
+   },
+   {
+    "func": "SceneActorTarget_ApplyResetCommand",
+    "addr": "0807FAD8",
+    "size": 388,
+    "score": 83.1,
+    "src": "src/fn/sub_0807FAD8.c",
+    "unit": "Scene actor target and contact control"
+   },
+   {
+    "func": "SceneActorReaction_UpdateAnimationGate",
+    "addr": "08080008",
+    "size": 84,
+    "score": 82.4,
+    "src": "src/fn/sub_08080008.c",
+    "unit": "Scene actor target and contact control"
+   },
+   {
+    "func": "SceneActorReaction_PlayStaggerBurst",
+    "addr": "0808148C",
+    "size": 640,
+    "score": 88.5,
+    "src": "src/fn/sub_0808148C.c",
+    "unit": "Scene actor reaction callbacks"
+   },
+   {
+    "func": "SceneActorControl_ConvergeSavedMotion",
+    "addr": "08082D80",
+    "size": 496,
+    "score": 90.1,
+    "src": "src/fn/sub_08082D80.c",
+    "unit": "Scene actor control phases"
+   },
+   {
+    "func": "SceneActorControl_ConsumeLiftFlag",
+    "addr": "080837D4",
+    "size": 216,
+    "score": 91.7,
+    "src": "src/fn/sub_080837D4.c",
+    "unit": "Scene actor control phases"
+   },
+   {
+    "func": "SceneActorControl_RestartPositionCurve",
+    "addr": "08084044",
+    "size": 188,
+    "score": 85.5,
+    "src": "src/fn/sub_08084044.c",
+    "unit": "Scene actor control phases"
+   }
+  ]
+ ],
+ "cdp-scene2": [
+  "dp",
+  "Scene actors and NPCs (second half)",
+  "280-289",
+  [
+   {
+    "func": "Actor_BeginScriptedCurve",
+    "addr": "081E4FB0",
+    "size": 232,
+    "score": 92.9,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_SetFacingAndIdle",
+    "addr": "081E5098",
+    "size": 268,
+    "score": 94.4,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_BeginFadeAnimation",
+    "addr": "081E51A4",
+    "size": 192,
+    "score": 82.4,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_BeginReverseFadeAnimation",
+    "addr": "081E5264",
+    "size": 192,
+    "score": 82.4,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_BeginHide",
+    "addr": "081E5324",
+    "size": 160,
+    "score": 93.3,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_BeginPositionedEffect",
+    "addr": "081E53C4",
+    "size": 252,
+    "score": 77.8,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_BeginRadialBurst",
+    "addr": "081E54C0",
+    "size": 160,
+    "score": 93.3,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_OnInteractionChildDelay",
+    "addr": "081E5648",
+    "size": 260,
+    "score": 92.3,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_UpdateAppearanceAnimation",
+    "addr": "081E59CC",
+    "size": 640,
+    "score": 98.9,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_UpdateCompactEntryAnimation",
+    "addr": "081E5C4C",
+    "size": 648,
+    "score": 96.3,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_UpdateProjectedEntryAnimation",
+    "addr": "081E5ED4",
+    "size": 636,
+    "score": 96.5,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_UpdateSilentProjectedEntryAnimation",
+    "addr": "081E6150",
+    "size": 628,
+    "score": 96.5,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_UpdateShadowedRestAnimation",
+    "addr": "081E63C4",
+    "size": 576,
+    "score": 98.8,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_HideAndResetChildren",
+    "addr": "081E682C",
+    "size": 256,
+    "score": 96.2,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_MoveAlongCurveToRest",
+    "addr": "081E692C",
+    "size": 1248,
+    "score": 99.0,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_MoveAlongScriptedCurve",
+    "addr": "081E6E0C",
+    "size": 1152,
+    "score": 98.9,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_MoveTowardTarget",
+    "addr": "081E728C",
+    "size": 1640,
+    "score": 98.3,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_UpdateBlinkBurstDisappearance",
+    "addr": "081E7F80",
+    "size": 1008,
+    "score": 92.3,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_UpdateFinishingAnimation",
+    "addr": "081E9574",
+    "size": 608,
+    "score": 96.5,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_CheckResourceLifetime",
+    "addr": "081E9D3C",
+    "size": 72,
+    "score": 87.5,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_DestroyController",
+    "addr": "081E9DE4",
+    "size": 96,
+    "score": 91.7,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_ConfigureInteractionChildFromScript",
+    "addr": "081E9E44",
+    "size": 892,
+    "score": 97.7,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "Actor_ConfigureFromScript",
+    "addr": "081EA1C0",
+    "size": 796,
+    "score": 88.5,
+    "src": "src/actor_animation_controller.c",
+    "unit": "Actor animation controller (tentative)"
+   },
+   {
+    "func": "ActorDisplay_UpdateForegroundSprite",
+    "addr": "081EC7D8",
+    "size": 412,
+    "score": 97.1,
+    "src": "src/fn/sub_081EC7D8.c",
+    "unit": "Actor display"
+   },
+   {
+    "func": "SingletonSlot7_UpdateEndingScene",
+    "addr": "081EF914",
+    "size": 1392,
+    "score": 95.9,
+    "src": "src/fn/sub_081EF914.c",
+    "unit": "Singleton slot 7"
+   },
+   {
+    "func": "SingletonSlot7_InitDisplaySprites",
+    "addr": "081F0F68",
+    "size": 728,
+    "score": 82.2,
+    "src": "src/fn/sub_081F0F68.c",
+    "unit": "Singleton slot 7"
+   }
+  ]
+ ],
+ "cdp-menus": [
+  "dp",
+  "Menus, HUD and dialogue",
+  "290-299",
+  [
+   {
+    "func": "LevelAdvanceDisplay_UpdateParticle",
+    "addr": "0805704C",
+    "size": 112,
+    "score": 78.8,
+    "src": "src/fn/sub_0805704C.c",
+    "unit": "Level advance display (tentative)"
+   },
+   {
+    "func": "LevelAdvanceDisplay_UpdateAnimation",
+    "addr": "08057158",
+    "size": 468,
+    "score": 90.6,
+    "src": "src/fn/sub_08057158.c",
+    "unit": "Level advance display (tentative)"
+   },
+   {
+    "func": "ScenePanel_UpdateTimePalette",
+    "addr": "08057E04",
+    "size": 708,
+    "score": 86.8,
+    "src": "src/fn/sub_08057E04.c",
+    "unit": "Scene panel presentation (tentative)"
+   },
+   {
+    "func": "ScenePanel_UpdateBackgroundEffect",
+    "addr": "08058700",
+    "size": 1012,
+    "score": 92.3,
+    "src": "src/fn/sub_08058700.c",
+    "unit": "Scene panel presentation (tentative)"
+   },
+   {
+    "func": "ScenePanel_CycleOverlayPalette",
+    "addr": "08058B88",
+    "size": 80,
+    "score": 77.8,
+    "src": "src/fn/sub_08058B88.c",
+    "unit": "Scene panel presentation (tentative)"
+   },
+   {
+    "func": "ScenePanel_DrawOverlay",
+    "addr": "08058BD8",
+    "size": 1056,
+    "score": 89.6,
+    "src": "src/fn/sub_08058BD8.c",
+    "unit": "Scene panel presentation (tentative)"
+   },
+   {
+    "func": "ScenePanel_InitScheduledAction",
+    "addr": "080592F4",
+    "size": 308,
+    "score": 92.0,
+    "src": "src/fn/sub_080592F4.c",
+    "unit": "Scene panel presentation (tentative)"
+   },
+   {
+    "func": "ScenePanelRig_RandomizeMovement",
+    "addr": "080597E0",
+    "size": 260,
+    "score": 91.7,
+    "src": "src/fn/sub_080597E0.c",
+    "unit": "Scene panel sprite rig"
+   },
+   {
+    "func": "ScenePanelRig_TickResourceDrain",
+    "addr": "080598E4",
+    "size": 464,
+    "score": 86.3,
+    "src": "src/fn/sub_080598E4.c",
+    "unit": "Scene panel sprite rig"
+   },
+   {
+    "func": "ScenePanelRig_TickRise",
+    "addr": "08059AC4",
+    "size": 224,
+    "score": 92.6,
+    "src": "src/fn/sub_08059AC4.c",
+    "unit": "Scene panel sprite rig"
+   },
+   {
+    "func": "ScenePanelRig_TickHoverSelection",
+    "addr": "08059C48",
+    "size": 432,
+    "score": 86.8,
+    "src": "src/fn/sub_08059C48.c",
+    "unit": "Scene panel sprite rig"
+   },
+   {
+    "func": "SceneInputPanel_ShowAttributeComparison",
+    "addr": "0805F63C",
+    "size": 284,
+    "score": 85.3,
+    "src": "src/fn/sub_0805F63C.c",
+    "unit": "Inventory values and display"
+   },
+   {
+    "func": "SceneItemValue_CalculateEquipment",
+    "addr": "0805F7E0",
+    "size": 140,
+    "score": 97.2,
+    "src": "src/fn/sub_0805F7E0.c",
+    "unit": "Inventory values and display"
+   },
+   {
+    "func": "SceneInventory_BeginEquipmentSwapPair",
+    "addr": "0806055C",
+    "size": 260,
+    "score": 95.1,
+    "src": "src/fn/sub_0806055C.c",
+    "unit": "Inventory action transitions"
+   },
+   {
+    "func": "SceneInventory_BeginConsumableSwapPair",
+    "addr": "08060A70",
+    "size": 292,
+    "score": 95.7,
+    "src": "src/fn/sub_08060A70.c",
+    "unit": "Inventory action transitions"
+   },
+   {
+    "func": "SceneInventory_BeginItemSwapPair",
+    "addr": "08060DB4",
+    "size": 240,
+    "score": 93.8,
+    "src": "src/fn/sub_08060DB4.c",
+    "unit": "Inventory action transitions"
+   },
+   {
+    "func": "RecordPanel_RefreshEntryLabels",
+    "addr": "0810D8F4",
+    "size": 188,
+    "score": 97.2,
+    "src": "src/fn/sub_0810D8F4.c",
+    "unit": "Record panel"
+   },
+   {
+    "func": "ActorMarkerPool_UpdateMarkers",
+    "addr": "081128F8",
+    "size": 376,
+    "score": 88.4,
+    "src": "src/fn/sub_081128F8.c",
+    "unit": "Stage results"
+   },
+   {
+    "func": "SceneHud_RebuildPrimaryOptions",
+    "addr": "08168A0C",
+    "size": 480,
+    "score": 97.0,
+    "src": "src/fn/sub_08168A0C.c",
+    "unit": "Pause menu"
+   },
+   {
+    "func": "sub_0816BC54",
+    "addr": "0816BC54",
+    "size": 1360,
+    "score": 96.9,
+    "src": "src/fn/sub_0816BC54.c",
+    "unit": "Map screen"
+   },
+   {
+    "func": "sub_0816E570",
+    "addr": "0816E570",
+    "size": 384,
+    "score": 96.8,
+    "src": "src/fn/sub_0816E570.c",
+    "unit": "Menu transition"
+   },
+   {
+    "func": "sub_08176F70",
+    "addr": "08176F70",
+    "size": 2680,
+    "score": 96.6,
+    "src": "src/fn/sub_08176F70.c",
+    "unit": "HUD"
+   },
+   {
+    "func": "sub_081BB904",
+    "addr": "081BB904",
+    "size": 1020,
+    "score": 97.7,
+    "src": "src/fn/sub_081BB904.c",
+    "unit": "Solar bank"
+   },
+   {
+    "func": "Storage_BeginSwapTransition",
+    "addr": "081BDE94",
+    "size": 536,
+    "score": 95.6,
+    "src": "src/fn/sub_081BDE94.c",
+    "unit": "Storage"
+   }
+  ]
+ ],
+ "cdp-link": [
+  "dp",
+  "Link and wireless; Hardware, time and save; Minigames",
+  "300-309",
+  [
+   {
+    "func": "LinkDisplay_ShakeResult",
+    "addr": "0803A9CC",
+    "size": 168,
+    "score": 95.5,
+    "src": "src/wireless_game_items_and_display.c",
+    "unit": "Wireless game items and display (tentative)"
+   },
+   {
+    "func": "LinkResultPanel_UpdateGameCounters",
+    "addr": "0803B01C",
+    "size": 264,
+    "score": 90.7,
+    "src": "src/fn/sub_0803B01C.c",
+    "unit": "Wireless result panel (tentative)"
+   },
+   {
+    "func": "LinkResultPanel_InitializeTask",
+    "addr": "0803B40C",
+    "size": 684,
+    "score": 92.3,
+    "src": "src/fn/sub_0803B40C.c",
+    "unit": "Wireless result panel (tentative)"
+   },
+   {
+    "func": "EncodedRecord_XorRange",
+    "addr": "08044D6C",
+    "size": 100,
+    "score": 86.7,
+    "src": "src/fn/sub_08044D6C.c",
+    "unit": "Encoded records and password payloads"
+   },
+   {
+    "func": "sub_08108C94",
+    "addr": "08108C94",
+    "size": 456,
+    "score": 97.3,
+    "src": "src/fn/sub_08108C94.c",
+    "unit": "Link handshake"
+   },
+   {
+    "func": "LinkMenu_WaitForReadyPeers",
+    "addr": "08109F1C",
+    "size": 1000,
+    "score": 98.4,
+    "src": "src/fn/sub_08109F1C.c",
+    "unit": "Link menu"
+   },
+   {
+    "func": "LinkMenu_WaitSelectionMode",
+    "addr": "0810A540",
+    "size": 128,
+    "score": 90.9,
+    "src": "src/fn/sub_0810A540.c",
+    "unit": "Link menu"
+   },
+   {
+    "func": "LinkSelection_WaitForEmptySlots",
+    "addr": "0810A9D0",
+    "size": 252,
+    "score": 97.5,
+    "src": "src/fn/sub_0810A9D0.c",
+    "unit": "Link selection"
+   },
+   {
+    "func": "LinkSelection_ExchangeParticipantInput",
+    "addr": "0810AD50",
+    "size": 608,
+    "score": 95.2,
+    "src": "src/fn/sub_0810AD50.c",
+    "unit": "Link selection"
+   },
+   {
+    "func": "LinkSelection_UpdateParticipantScores",
+    "addr": "0810BBD4",
+    "size": 352,
+    "score": 79.7,
+    "src": "src/fn/sub_0810BBD4.c",
+    "unit": "Registry F246"
+   },
+   {
+    "func": "TimerDisplay_DrawRecord",
+    "addr": "0810E9D4",
+    "size": 188,
+    "score": 85.7,
+    "src": "src/fn/sub_0810E9D4.c",
+    "unit": "Registry 33FF"
+   },
+   {
+    "func": "sub_0810FDDC",
+    "addr": "0810FDDC",
+    "size": 256,
+    "score": 93.3,
+    "src": "src/fn/sub_0810FDDC.c",
+    "unit": "Link score panel"
+   },
+   {
+    "func": "LinkSession_UpdatePlayerValueAverage",
+    "addr": "081381CC",
+    "size": 124,
+    "score": 91.7,
+    "src": "src/fn/sub_081381CC.c",
+    "unit": "Registry 1745"
+   },
+   {
+    "func": "sub_081384A0",
+    "addr": "081384A0",
+    "size": 400,
+    "score": 98.0,
+    "src": "src/fn/sub_081383E0.c",
+    "unit": "Registry 1745"
+   },
+   {
+    "func": "PositionEffectDisplay_UpdateSources",
+    "addr": "08138778",
+    "size": 380,
+    "score": 96.7,
+    "src": "src/fn/sub_08138778.c",
+    "unit": "Registry 1745"
+   },
+   {
+    "func": "Clock_CheckRtcStatus",
+    "addr": "08229440",
+    "size": 40,
+    "score": 81.8,
+    "src": "src/fn/sub_08229440.c",
+    "unit": "Clock and sun schedule (tentative)"
+   }
+  ]
+ ],
+ "cdp-field": [
+  "dp",
+  "Field objects and hazards",
+  "310-319",
+  [
+   {
+    "func": "TetherActor_UpdateBounceReturn",
+    "addr": "0804CB4C",
+    "size": 356,
+    "score": 92.3,
+    "src": "src/tether_actor.c",
+    "unit": "Tether actor (tentative)"
+   },
+   {
+    "func": "AreaEffect_AddSpriteFromScript",
+    "addr": "0804E388",
+    "size": 428,
+    "score": 95.8,
+    "src": "src/fn/sub_0804E388.c",
+    "unit": "Rectangular area effects"
+   },
+   {
+    "func": "AreaEffect_UpdateLinkPlayerResources",
+    "addr": "0804ECD0",
+    "size": 252,
+    "score": 88.3,
+    "src": "src/fn/sub_0804ECD0.c",
+    "unit": "Rectangular area effects"
+   },
+   {
+    "func": "AreaEffect_UpdateLinkVisibility",
+    "addr": "0804EDD0",
+    "size": 196,
+    "score": 84.9,
+    "src": "src/fn/sub_0804EDD0.c",
+    "unit": "Rectangular area effects"
+   },
+   {
+    "func": "ResourceStation_CheckInteraction",
+    "addr": "0804EFB4",
+    "size": 256,
+    "score": 89.5,
+    "src": "src/fn/sub_0804EFB4.c",
+    "unit": "Stored-resource station (tentative)"
+   },
+   {
+    "func": "ResourceStation_UpdateDigits",
+    "addr": "0804F1FC",
+    "size": 392,
+    "score": 86.4,
+    "src": "src/fn/sub_0804F1FC.c",
+    "unit": "Stored-resource station (tentative)"
+   },
+   {
+    "func": "DirectionalForce_Tick",
+    "addr": "08051224",
+    "size": 364,
+    "score": 95.6,
+    "src": "src/fn/sub_08051224.c",
+    "unit": "Directional force controller"
+   },
+   {
+    "func": "DirectionalForce_InitializeFromScript",
+    "addr": "080513B8",
+    "size": 444,
+    "score": 89.7,
+    "src": "src/fn/sub_080513B8.c",
+    "unit": "Directional force controller"
+   },
+   {
+    "func": "WoodenCrate_CreateFromScript",
+    "addr": "080FF87C",
+    "size": 636,
+    "score": 95.7,
+    "src": "src/fn/sub_080FF87C.c",
+    "unit": "Wooden crate"
+   },
+   {
+    "func": "WoodenCrate_ReactToHit",
+    "addr": "08100144",
+    "size": 128,
+    "score": 85.7,
+    "src": "src/fn/sub_08100144.c",
+    "unit": "Wooden crate"
+   },
+   {
+    "func": "FloorSwitch_SetOccupant",
+    "addr": "0810048C",
+    "size": 108,
+    "score": 92.9,
+    "src": "src/fn/sub_0810048C.c",
+    "unit": "Floor switch"
+   },
+   {
+    "func": "NamedObject_RegisterFollowCells",
+    "addr": "08101B1C",
+    "size": 528,
+    "score": 97.9,
+    "src": "src/fn/sub_08101B1C.c",
+    "unit": "Named object"
+   },
+   {
+    "func": "ActorGroup_CreateFromScript",
+    "addr": "08104350",
+    "size": 1016,
+    "score": 98.8,
+    "src": "src/fn/sub_08104350.c",
+    "unit": "Actor group"
+   },
+   {
+    "func": "Collectible_StartDeath",
+    "addr": "081153B4",
+    "size": 584,
+    "score": 89.5,
+    "src": "src/fn/sub_081153B4.c",
+    "unit": "Collectible"
+   },
+   {
+    "func": "Collectible_UpdateEntry",
+    "addr": "08115674",
+    "size": 580,
+    "score": 89.6,
+    "src": "src/fn/sub_08115674.c",
+    "unit": "Collectible"
+   },
+   {
+    "func": "SpriteDrop_UpdateEntry",
+    "addr": "08115E00",
+    "size": 372,
+    "score": 89.4,
+    "src": "src/fn/sub_08115E00.c",
+    "unit": "Sprite drop"
+   },
+   {
+    "func": "sub_0817AEC8",
+    "addr": "0817AEC8",
+    "size": 288,
+    "score": 96.9,
+    "src": "src/fn/sub_0817AEC8.c",
+    "unit": "Scene volume"
+   }
+  ]
+ ],
+ "cdp-effects": [
+  "dp",
+  "Effects and presentation",
+  "320-329",
+  [
+   {
+    "func": "BackgroundFlash_UpdateScrolling",
+    "addr": "08047770",
+    "size": 276,
+    "score": 96.7,
+    "src": "src/fn/sub_08047770.c",
+    "unit": "BG1 flash and scrolling controller (tentative)"
+   },
+   {
+    "func": "RepeatedEffect_TickUpperTransition",
+    "addr": "0804F9C4",
+    "size": 328,
+    "score": 89.4,
+    "src": "src/fn/sub_0804F9C4.c",
+    "unit": "Repeated effects (tentative)"
+   },
+   {
+    "func": "OrbitBackground_UpdateVisibility",
+    "addr": "08050910",
+    "size": 216,
+    "score": 94.4,
+    "src": "src/fn/sub_08050910.c",
+    "unit": "Orbit background controller"
+   },
+   {
+    "func": "OrbitBackground_UpdatePosition",
+    "addr": "080509E8",
+    "size": 980,
+    "score": 92.4,
+    "src": "src/fn/sub_080509E8.c",
+    "unit": "Orbit background controller"
+   },
+   {
+    "func": "DisplayTrack_Update",
+    "addr": "08054EC0",
+    "size": 936,
+    "score": 81.0,
+    "src": "src/fn/sub_08054EC0.c",
+    "unit": "Scripted display tracks"
+   },
+   {
+    "func": "DisplayTrack_AddFromScript",
+    "addr": "08055268",
+    "size": 784,
+    "score": 95.7,
+    "src": "src/fn/sub_08055268.c",
+    "unit": "Scripted display tracks"
+   },
+   {
+    "func": "Presentation_UpdateDropShakeBlink",
+    "addr": "081E2910",
+    "size": 576,
+    "score": 73.8,
+    "src": "src/fn/sub_081E2910.c",
+    "unit": "Scripted presentation"
+   },
+   {
+    "func": "SpriteTrail_CreateFixedEffect",
+    "addr": "081F28C4",
+    "size": 324,
+    "score": 98.2,
+    "src": "src/fn/sub_081F28C4.c",
+    "unit": "Sprite trail"
+   },
+   {
+    "func": "SpriteTrail_CreateMotionEffect",
+    "addr": "081F2A08",
+    "size": 360,
+    "score": 98.4,
+    "src": "src/fn/sub_081F2A08.c",
+    "unit": "Sprite trail"
+   },
+   {
+    "func": "RisingActor_AdvanceHeight",
+    "addr": "081FDAF4",
+    "size": 76,
+    "score": 84.6,
+    "src": "src/fn/sub_081FDAF4.c",
+    "unit": "Orbit effect"
+   },
+   {
+    "func": "sub_081FDCB0",
+    "addr": "081FDCB0",
+    "size": 272,
+    "score": 92.5,
+    "src": "src/fn/sub_081FDCB0.c",
+    "unit": "Orbit effect"
+   },
+   {
+    "func": "HomingProjectile_UpdateDefaultState",
+    "addr": "081FF454",
+    "size": 1256,
+    "score": 95.8,
+    "src": "src/fn/sub_081FF454.c",
+    "unit": "Homing projectile"
+   },
+   {
+    "func": "ProjectilePool_Update",
+    "addr": "08202730",
+    "size": 796,
+    "score": 98.0,
+    "src": "src/fn/sub_08202730.c",
+    "unit": "Projectile pool"
+   },
+   {
+    "func": "SpiralBurst_InitParticles",
+    "addr": "08234540",
+    "size": 428,
+    "score": 96.4,
+    "src": "src/fn/sub_08234540.c",
+    "unit": "Spiral burst"
+   }
+  ]
+ ],
+ "cdp-monsters": [
+  "dp",
+  "Monsters",
+  "330-339",
+  [
+   {
+    "func": "TentacleActor_UpdateRetraction",
+    "addr": "080AB968",
+    "size": 324,
+    "score": 91.7,
+    "src": "src/fn/sub_080AB968.c",
+    "unit": "Tentacle actor"
+   },
+   {
+    "func": "sub_080ABB18",
+    "addr": "080ABB18",
+    "size": 452,
+    "score": 92.0,
+    "src": "src/fn/sub_080ABB18.c",
+    "unit": "Tentacle actor"
+   },
+   {
+    "func": "Vorn_UpdateDefeat",
+    "addr": "080AEE08",
+    "size": 984,
+    "score": 82.4,
+    "src": "src/fn/sub_080AEE08.c",
+    "unit": "Vorn"
+   },
+   {
+    "func": "sub_080B197C",
+    "addr": "080B197C",
+    "size": 284,
+    "score": 95.0,
+    "src": "src/fn/sub_080B197C.c",
+    "unit": "Vorn"
+   },
+   {
+    "func": "Skeleton_TrySelectRetreatCell",
+    "addr": "080B77D0",
+    "size": 704,
+    "score": 50.0,
+    "src": "src/fn/sub_080B77D0.c",
+    "unit": "Skeleton"
+   },
+   {
+    "func": "Skeleton_UpdateDefeat",
+    "addr": "080BD1F0",
+    "size": 7924,
+    "score": 98.6,
+    "src": "src/fn/sub_080BD1F0.c",
+    "unit": "Skeleton"
+   },
+   {
+    "func": "Golem_UpdateDefeat",
+    "addr": "080C9848",
+    "size": 956,
+    "score": 99.1,
+    "src": "src/golem_2.c",
+    "unit": "Golem"
+   },
+   {
+    "func": "Mummy_ResumeSavedRouteAfterAnimation",
+    "addr": "080D1784",
+    "size": 788,
+    "score": 89.2,
+    "src": "src/fn/sub_080D1784.c",
+    "unit": "Mummy"
+   },
+   {
+    "func": "Mummy_UpdateDefeat",
+    "addr": "080D3878",
+    "size": 1256,
+    "score": 99.2,
+    "src": "src/fn/sub_080D3878.c",
+    "unit": "Mummy"
+   },
+   {
+    "func": "Ivy_UpdateDefeat",
+    "addr": "080EE1B0",
+    "size": 6780,
+    "score": 97.6,
+    "src": "src/fn/sub_080EE1B0.c",
+    "unit": "Ivy"
+   },
+   {
+    "func": "Axe_UpdateDamageSpin",
+    "addr": "080F9974",
+    "size": 492,
+    "score": 96.7,
+    "src": "src/fn/sub_080F9974.c",
+    "unit": "Axe"
+   },
+   {
+    "func": "Terrain_ResolveActorMotion",
+    "addr": "0811AE9C",
+    "size": 428,
+    "score": 91.3,
+    "src": "src/fn/sub_0811AE9C.c",
+    "unit": "Glove"
+   },
+   {
+    "func": "SpriteColliderGroup_ActivateParts",
+    "addr": "0818E9B8",
+    "size": 100,
+    "score": 90.0,
+    "src": "src/fn/sub_0818E9B8.c",
+    "unit": "Armor"
+   },
+   {
+    "func": "SpriteColliderGroup_ResetActiveParts",
+    "addr": "0818EA3C",
+    "size": 84,
+    "score": 96.0,
+    "src": "src/fn/sub_0818EA3C.c",
+    "unit": "Armor"
+   },
+   {
+    "func": "VulcanCannon_UpdateFacingTurn",
+    "addr": "08207350",
+    "size": 416,
+    "score": 82.6,
+    "src": "src/fn/sub_08207350.c",
+    "unit": "Vulcan cannon"
+   },
+   {
+    "func": "EnemyParticle_UpdatePool",
+    "addr": "0820D2C4",
+    "size": 744,
+    "score": 94.1,
+    "src": "src/fn/sub_0820D2C4.c",
+    "unit": "Enemy particle"
+   },
+   {
+    "func": "OrangeSpine_ApplyHitReaction",
+    "addr": "0820EE34",
+    "size": 424,
+    "score": 93.0,
+    "src": "src/fn/sub_0820EE34.c",
+    "unit": "Orange spine"
+   }
+  ]
+ ],
+ "cdp-bosses": [
+  "dp",
+  "Bosses, Player and Engine core",
+  "340-349",
+  [
+   {
+    "func": "Hresvelgr_PlayDescent",
+    "addr": "081A09C4",
+    "size": 196,
+    "score": 95.2,
+    "src": "src/fn/sub_081A09C4.c",
+    "unit": "Hresvelgr"
+   },
+   {
+    "func": "Hresvelgr_UpdateBoundaryBarrage",
+    "addr": "081A0BC8",
+    "size": 732,
+    "score": 98.5,
+    "src": "src/fn/sub_081A0BC8.c",
+    "unit": "Hresvelgr"
+   },
+   {
+    "func": "sub_081A14FC",
+    "addr": "081A14FC",
+    "size": 1764,
+    "score": 96.7,
+    "src": "src/fn/sub_081A14FC.c",
+    "unit": "Hresvelgr"
+   },
+   {
+    "func": "sub_081A8E08",
+    "addr": "081A8E08",
+    "size": 320,
+    "score": 97.4,
+    "src": "src/fn/sub_081A8E08.c",
+    "unit": "Vanargand"
+   },
+   {
+    "func": "Vanargand_ApplyPendingDamage",
+    "addr": "081ACC24",
+    "size": 1196,
+    "score": 95.2,
+    "src": "src/fn/sub_081ACC24.c",
+    "unit": "Vanargand"
+   },
+   {
+    "func": "sub_081D3620",
+    "addr": "081D3620",
+    "size": 132,
+    "score": 97.7,
+    "src": "src/fn/sub_081D3620.c",
+    "unit": "Player particle cloud"
+   },
+   {
+    "func": "Ratatosk_UpdateSunOrbRelocation",
+    "addr": "081F8988",
+    "size": 740,
+    "score": 97.0,
+    "src": "src/fn/sub_081F8988.c",
+    "unit": "Ratatosk"
+   },
+   {
+    "func": "sub_08217430",
+    "addr": "08217430",
+    "size": 1328,
+    "score": 97.5,
+    "src": "src/fn/sub_08217430.c",
+    "unit": "Palette"
+   },
+   {
+    "func": "GameState_SelectRamBase",
+    "addr": "0821B084",
+    "size": 88,
+    "score": 88.9,
+    "src": "src/script_virtual_machine.c",
+    "unit": "Script virtual machine"
+   }
+  ]
+ ],
+ "ccl-monsters-b": [
+  "cl",
+  "Monsters (second half of the list)",
+  null,
+  [
+   {
+    "name": "Armor",
+    "start": "08182454",
+    "end": "08182F60",
+    "fn_files": 30,
+    "functions": 30,
+    "bytes": 2828,
+    "pinned": false
+   },
+   {
+    "name": "Armor",
+    "start": "081854DC",
+    "end": "0818D754",
+    "fn_files": 102,
+    "functions": 102,
+    "bytes": 33400,
+    "pinned": false
+   },
+   {
+    "name": "Cannon battery",
+    "start": "08199AEC",
+    "end": "0819A698",
+    "fn_files": 28,
+    "functions": 28,
+    "bytes": 2988,
+    "pinned": false
+   },
+   {
+    "name": "Growth hazard",
+    "start": "081B7538",
+    "end": "081B817C",
+    "fn_files": 24,
+    "functions": 24,
+    "bytes": 3140,
+    "pinned": false
+   },
+   {
+    "name": "Cannon emitter",
+    "start": "08203200",
+    "end": "08203660",
+    "fn_files": 5,
+    "functions": 5,
+    "bytes": 1120,
+    "pinned": false
+   },
+   {
+    "name": "Enemy F426",
+    "start": "08203660",
+    "end": "08204748",
+    "fn_files": 12,
+    "functions": 12,
+    "bytes": 4328,
+    "pinned": false
+   },
+   {
+    "name": "Enemy D459",
+    "start": "08204748",
+    "end": "08205944",
+    "fn_files": 12,
+    "functions": 12,
+    "bytes": 4604,
+    "pinned": false
+   },
+   {
+    "name": "Ooze",
+    "start": "08205944",
+    "end": "082064B4",
+    "fn_files": 10,
+    "functions": 10,
+    "bytes": 2928,
+    "pinned": false
+   },
+   {
+    "name": "Cannon turret",
+    "start": "08207FAC",
+    "end": "0820901C",
+    "fn_files": 10,
+    "functions": 10,
+    "bytes": 4208,
+    "pinned": false
+   },
+   {
+    "name": "Fan cannon",
+    "start": "0820901C",
+    "end": "0820A2C8",
+    "fn_files": 13,
+    "functions": 13,
+    "bytes": 4780,
+    "pinned": false
+   },
+   {
+    "name": "Fan cannon manager",
+    "start": "0820A2C8",
+    "end": "0820AB3C",
+    "fn_files": 10,
+    "functions": 10,
+    "bytes": 2164,
+    "pinned": false
+   },
+   {
+    "name": "Dragon puppy",
+    "start": "0820AB3C",
+    "end": "0820BD24",
+    "fn_files": 12,
+    "functions": 12,
+    "bytes": 4584,
+    "pinned": false
+   },
+   {
+    "name": "Screamer",
+    "start": "0820BD24",
+    "end": "0820D23C",
+    "fn_files": 11,
+    "functions": 11,
+    "bytes": 5400,
+    "pinned": false
+   },
+   {
+    "name": "Poison hand",
+    "start": "0820D9D0",
+    "end": "0820EBEC",
+    "fn_files": 10,
+    "functions": 10,
+    "bytes": 4636,
+    "pinned": false
+   },
+   {
+    "name": "Pink spine",
+    "start": "0820FD54",
+    "end": "08210A1C",
+    "fn_files": 11,
+    "functions": 11,
+    "bytes": 3272,
+    "pinned": false
+   }
+  ]
+ ],
+ "ccl-menus-link-c": [
+  "cl",
+  "Menus, HUD, dialogue, Link and wireless (last quarter of the list)",
+  null,
+  [
+   {
+    "name": "Time",
+    "start": "081DC6D0",
+    "end": "081DCF20",
+    "fn_files": 8,
+    "functions": 8,
+    "bytes": 2128,
+    "pinned": false
+   },
+   {
+    "name": "Name entry",
+    "start": "081DCF20",
+    "end": "081DE5E4",
+    "fn_files": 16,
+    "functions": 16,
+    "bytes": 5828,
+    "pinned": false
+   },
+   {
+    "name": "Time",
+    "start": "081DE5E4",
+    "end": "081DF0EC",
+    "fn_files": 11,
+    "functions": 11,
+    "bytes": 2824,
+    "pinned": false
+   },
+   {
+    "name": "Password",
+    "start": "081DF0EC",
+    "end": "081E0818",
+    "fn_files": 24,
+    "functions": 24,
+    "bytes": 5932,
+    "pinned": false
+   },
+   {
+    "name": "Script prompt",
+    "start": "081E0818",
+    "end": "081E0D58",
+    "fn_files": 8,
+    "functions": 8,
+    "bytes": 1344,
+    "pinned": false
+   },
+   {
+    "name": "Game start",
+    "start": "081E0D58",
+    "end": "081E1AF4",
+    "fn_files": 9,
+    "functions": 9,
+    "bytes": 3484,
+    "pinned": false
+   },
+   {
+    "name": "Sound-test menu",
+    "start": "081E1AF4",
+    "end": "081E270C",
+    "fn_files": 16,
+    "functions": 16,
+    "bytes": 3096,
+    "pinned": false
+   },
+   {
+    "name": "Screen params 3F8",
+    "start": "081EB81C",
+    "end": "081EC380",
+    "fn_files": 12,
+    "functions": 12,
+    "bytes": 2916,
+    "pinned": false
+   },
+   {
+    "name": "Collection",
+    "start": "08210A1C",
+    "end": "08210ED0",
+    "fn_files": 15,
+    "functions": 15,
+    "bytes": 1204,
+    "pinned": false
+   },
+   {
+    "name": "Collection menu",
+    "start": "08210ED0",
+    "end": "082116EC",
+    "fn_files": 8,
+    "functions": 8,
+    "bytes": 2076,
+    "pinned": false
+   },
+   {
+    "name": "Forging book",
+    "start": "082116EC",
+    "end": "08213D10",
+    "fn_files": 62,
+    "functions": 62,
+    "bytes": 9764,
+    "pinned": false
+   },
+   {
+    "name": "Serial",
+    "start": "0822223C",
+    "end": "08223534",
+    "fn_files": 52,
+    "functions": 52,
+    "bytes": 4856,
+    "pinned": false
+   },
+   {
+    "name": "RFU manager",
+    "start": "08223534",
+    "end": "08224E54",
+    "fn_files": 39,
+    "functions": 39,
+    "bytes": 6432,
+    "pinned": false
+   },
+   {
+    "name": "Save data",
+    "start": "08227900",
+    "end": "082284F4",
+    "fn_files": 52,
+    "functions": 52,
+    "bytes": 3060,
+    "pinned": false
+   },
+   {
+    "name": "Save",
+    "start": "0822BAD0",
+    "end": "0822C110",
+    "fn_files": 31,
+    "functions": 31,
+    "bytes": 1600,
+    "pinned": false
+   },
+   {
+    "name": "Solar",
+    "start": "0822C110",
+    "end": "0822CCC8",
+    "fn_files": 27,
+    "functions": 27,
+    "bytes": 3000,
+    "pinned": false
+   },
+   {
+    "name": "Inventory",
+    "start": "0822CCC8",
+    "end": "0822E224",
+    "fn_files": 82,
+    "functions": 82,
+    "bytes": 5468,
+    "pinned": false
+   },
+   {
+    "name": "Game state",
+    "start": "0822E224",
+    "end": "0822ED64",
+    "fn_files": 39,
+    "functions": 39,
+    "bytes": 2880,
+    "pinned": false
+   },
+   {
+    "name": "Save",
+    "start": "0822ED64",
+    "end": "0822F1B4",
+    "fn_files": 9,
+    "functions": 9,
+    "bytes": 1104,
+    "pinned": false
+   },
+   {
+    "name": "Link player",
+    "start": "08239130",
+    "end": "0823AE5C",
+    "fn_files": 51,
+    "functions": 51,
+    "bytes": 7468,
+    "pinned": false
+   },
+   {
+    "name": "Cartridge solar sensor",
+    "start": "08243C10",
+    "end": "08243EFC",
+    "fn_files": 11,
+    "functions": 11,
+    "bytes": 748,
+    "pinned": false
+   }
+  ]
+ ],
+ "ccl-field-effects-c": [
+  "cl",
+  "Field objects, hazards, effects and presentation (last quarter of the list)",
+  null,
+  [
+   {
+    "name": "Palette transition",
+    "start": "081D374C",
+    "end": "081D4E2C",
+    "fn_files": 39,
+    "functions": 39,
+    "bytes": 5856,
+    "pinned": false
+   },
+   {
+    "name": "Projectile",
+    "start": "081D9B6C",
+    "end": "081DA048",
+    "fn_files": 6,
+    "functions": 6,
+    "bytes": 1244,
+    "pinned": false
+   },
+   {
+    "name": "Timed effect",
+    "start": "081DA048",
+    "end": "081DA810",
+    "fn_files": 10,
+    "functions": 10,
+    "bytes": 1992,
+    "pinned": false
+   },
+   {
+    "name": "Projectile",
+    "start": "081DA810",
+    "end": "081DAF50",
+    "fn_files": 21,
+    "functions": 21,
+    "bytes": 1856,
+    "pinned": false
+   },
+   {
+    "name": "Explosion",
+    "start": "081DAF50",
+    "end": "081DB474",
+    "fn_files": 12,
+    "functions": 12,
+    "bytes": 1316,
+    "pinned": false
+   },
+   {
+    "name": "Timed presentation",
+    "start": "081E270C",
+    "end": "081E2898",
+    "fn_files": 3,
+    "functions": 3,
+    "bytes": 396,
+    "pinned": false
+   },
+   {
+    "name": "Scene projectile",
+    "start": "081FC66C",
+    "end": "081FCFE8",
+    "fn_files": 13,
+    "functions": 13,
+    "bytes": 2428,
+    "pinned": false
+   },
+   {
+    "name": "Projectile",
+    "start": "081FCFE8",
+    "end": "081FD53C",
+    "fn_files": 15,
+    "functions": 15,
+    "bytes": 1364,
+    "pinned": false
+   },
+   {
+    "name": "Sun orb",
+    "start": "081FE68C",
+    "end": "081FED9C",
+    "fn_files": 27,
+    "functions": 27,
+    "bytes": 1808,
+    "pinned": false
+   },
+   {
+    "name": "Sprite particle",
+    "start": "081FED9C",
+    "end": "081FF388",
+    "fn_files": 15,
+    "functions": 15,
+    "bytes": 1516,
+    "pinned": false
+   },
+   {
+    "name": "Trap",
+    "start": "0821DDBC",
+    "end": "0821E654",
+    "fn_files": 20,
+    "functions": 20,
+    "bytes": 2200,
+    "pinned": false
+   },
+   {
+    "name": "Effect part",
+    "start": "08231448",
+    "end": "08232370",
+    "fn_files": 25,
+    "functions": 25,
+    "bytes": 3880,
+    "pinned": false
+   },
+   {
+    "name": "Timed hazard",
+    "start": "08232370",
+    "end": "082329C8",
+    "fn_files": 13,
+    "functions": 14,
+    "bytes": 1624,
+    "pinned": false
+   },
+   {
+    "name": "Screen orbit effect",
+    "start": "082329C8",
+    "end": "082334F4",
+    "fn_files": 26,
+    "functions": 26,
+    "bytes": 2860,
+    "pinned": false
+   },
+   {
+    "name": "Charged burst",
+    "start": "082334F4",
+    "end": "08233B60",
+    "fn_files": 12,
+    "functions": 12,
+    "bytes": 1644,
+    "pinned": false
+   },
+   {
+    "name": "Solar bomb",
+    "start": "08233B60",
+    "end": "082343A0",
+    "fn_files": 10,
+    "functions": 10,
+    "bytes": 2112,
+    "pinned": false
+   },
+   {
+    "name": "Health restore effect",
+    "start": "08234810",
+    "end": "0823511C",
+    "fn_files": 17,
+    "functions": 17,
+    "bytes": 2316,
+    "pinned": false
+   },
+   {
+    "name": "Health burst effect",
+    "start": "0823511C",
+    "end": "08235DB0",
+    "fn_files": 18,
+    "functions": 18,
+    "bytes": 3220,
+    "pinned": false
+   },
+   {
+    "name": "Radial burst effect",
+    "start": "08235DB0",
+    "end": "0823669C",
+    "fn_files": 14,
+    "functions": 14,
+    "bytes": 2284,
+    "pinned": false
+   },
+   {
+    "name": "Particle effect",
+    "start": "0823669C",
+    "end": "08236B30",
+    "fn_files": 11,
+    "functions": 11,
+    "bytes": 1172,
+    "pinned": false
+   },
+   {
+    "name": "Particle burst",
+    "start": "08236B30",
+    "end": "082373C8",
+    "fn_files": 24,
+    "functions": 24,
+    "bytes": 2200,
+    "pinned": false
+   },
+   {
+    "name": "Directional effect",
+    "start": "082389D8",
+    "end": "08239130",
+    "fn_files": 12,
+    "functions": 12,
+    "bytes": 1880,
+    "pinned": false
+   }
+  ]
+ ]
+}

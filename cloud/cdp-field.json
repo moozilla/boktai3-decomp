@@ -1,0 +1,138 @@
+[
+ {
+  "func": "TetherActor_UpdateBounceReturn",
+  "addr": "0804CB4C",
+  "size": 356,
+  "score": 92.3,
+  "src": "src/tether_actor.c",
+  "unit": "Tether actor (tentative)"
+ },
+ {
+  "func": "AreaEffect_AddSpriteFromScript",
+  "addr": "0804E388",
+  "size": 428,
+  "score": 95.8,
+  "src": "src/fn/sub_0804E388.c",
+  "unit": "Rectangular area effects"
+ },
+ {
+  "func": "AreaEffect_UpdateLinkPlayerResources",
+  "addr": "0804ECD0",
+  "size": 252,
+  "score": 88.3,
+  "src": "src/fn/sub_0804ECD0.c",
+  "unit": "Rectangular area effects"
+ },
+ {
+  "func": "AreaEffect_UpdateLinkVisibility",
+  "addr": "0804EDD0",
+  "size": 196,
+  "score": 84.9,
+  "src": "src/fn/sub_0804EDD0.c",
+  "unit": "Rectangular area effects"
+ },
+ {
+  "func": "ResourceStation_CheckInteraction",
+  "addr": "0804EFB4",
+  "size": 256,
+  "score": 89.5,
+  "src": "src/fn/sub_0804EFB4.c",
+  "unit": "Stored-resource station (tentative)"
+ },
+ {
+  "func": "ResourceStation_UpdateDigits",
+  "addr": "0804F1FC",
+  "size": 392,
+  "score": 86.4,
+  "src": "src/fn/sub_0804F1FC.c",
+  "unit": "Stored-resource station (tentative)"
+ },
+ {
+  "func": "DirectionalForce_Tick",
+  "addr": "08051224",
+  "size": 364,
+  "score": 95.6,
+  "src": "src/fn/sub_08051224.c",
+  "unit": "Directional force controller"
+ },
+ {
+  "func": "DirectionalForce_InitializeFromScript",
+  "addr": "080513B8",
+  "size": 444,
+  "score": 89.7,
+  "src": "src/fn/sub_080513B8.c",
+  "unit": "Directional force controller"
+ },
+ {
+  "func": "WoodenCrate_CreateFromScript",
+  "addr": "080FF87C",
+  "size": 636,
+  "score": 95.7,
+  "src": "src/fn/sub_080FF87C.c",
+  "unit": "Wooden crate"
+ },
+ {
+  "func": "WoodenCrate_ReactToHit",
+  "addr": "08100144",
+  "size": 128,
+  "score": 85.7,
+  "src": "src/fn/sub_08100144.c",
+  "unit": "Wooden crate"
+ },
+ {
+  "func": "FloorSwitch_SetOccupant",
+  "addr": "0810048C",
+  "size": 108,
+  "score": 92.9,
+  "src": "src/fn/sub_0810048C.c",
+  "unit": "Floor switch"
+ },
+ {
+  "func": "NamedObject_RegisterFollowCells",
+  "addr": "08101B1C",
+  "size": 528,
+  "score": 97.9,
+  "src": "src/fn/sub_08101B1C.c",
+  "unit": "Named object"
+ },
+ {
+  "func": "ActorGroup_CreateFromScript",
+  "addr": "08104350",
+  "size": 1016,
+  "score": 98.8,
+  "src": "src/fn/sub_08104350.c",
+  "unit": "Actor group"
+ },
+ {
+  "func": "Collectible_StartDeath",
+  "addr": "081153B4",
+  "size": 584,
+  "score": 89.5,
+  "src": "src/fn/sub_081153B4.c",
+  "unit": "Collectible"
+ },
+ {
+  "func": "Collectible_UpdateEntry",
+  "addr": "08115674",
+  "size": 580,
+  "score": 89.6,
+  "src": "src/fn/sub_08115674.c",
+  "unit": "Collectible"
+ },
+ {
+  "func": "SpriteDrop_UpdateEntry",
+  "addr": "08115E00",
+  "size": 372,
+  "score": 89.4,
+  "src": "src/fn/sub_08115E00.c",
+  "unit": "Sprite drop"
+ },
+ {
+  "func": "sub_0817AEC8",
+  "addr": "0817AEC8",
+  "size": 288,
+  "score": 96.9,
+  "src": "src/fn/sub_0817AEC8.c",
+  "unit": "Scene volume"
+ }
+]

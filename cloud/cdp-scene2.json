@@ -1,0 +1,210 @@
+[
+ {
+  "func": "Actor_BeginScriptedCurve",
+  "addr": "081E4FB0",
+  "size": 232,
+  "score": 92.9,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_SetFacingAndIdle",
+  "addr": "081E5098",
+  "size": 268,
+  "score": 94.4,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_BeginFadeAnimation",
+  "addr": "081E51A4",
+  "size": 192,
+  "score": 82.4,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_BeginReverseFadeAnimation",
+  "addr": "081E5264",
+  "size": 192,
+  "score": 82.4,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_BeginHide",
+  "addr": "081E5324",
+  "size": 160,
+  "score": 93.3,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_BeginPositionedEffect",
+  "addr": "081E53C4",
+  "size": 252,
+  "score": 77.8,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_BeginRadialBurst",
+  "addr": "081E54C0",
+  "size": 160,
+  "score": 93.3,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_OnInteractionChildDelay",
+  "addr": "081E5648",
+  "size": 260,
+  "score": 92.3,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_UpdateAppearanceAnimation",
+  "addr": "081E59CC",
+  "size": 640,
+  "score": 98.9,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_UpdateCompactEntryAnimation",
+  "addr": "081E5C4C",
+  "size": 648,
+  "score": 96.3,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_UpdateProjectedEntryAnimation",
+  "addr": "081E5ED4",
+  "size": 636,
+  "score": 96.5,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_UpdateSilentProjectedEntryAnimation",
+  "addr": "081E6150",
+  "size": 628,
+  "score": 96.5,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_UpdateShadowedRestAnimation",
+  "addr": "081E63C4",
+  "size": 576,
+  "score": 98.8,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_HideAndResetChildren",
+  "addr": "081E682C",
+  "size": 256,
+  "score": 96.2,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_MoveAlongCurveToRest",
+  "addr": "081E692C",
+  "size": 1248,
+  "score": 99.0,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_MoveAlongScriptedCurve",
+  "addr": "081E6E0C",
+  "size": 1152,
+  "score": 98.9,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_MoveTowardTarget",
+  "addr": "081E728C",
+  "size": 1640,
+  "score": 98.3,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_UpdateBlinkBurstDisappearance",
+  "addr": "081E7F80",
+  "size": 1008,
+  "score": 92.3,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_UpdateFinishingAnimation",
+  "addr": "081E9574",
+  "size": 608,
+  "score": 96.5,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_CheckResourceLifetime",
+  "addr": "081E9D3C",
+  "size": 72,
+  "score": 87.5,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_DestroyController",
+  "addr": "081E9DE4",
+  "size": 96,
+  "score": 91.7,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_ConfigureInteractionChildFromScript",
+  "addr": "081E9E44",
+  "size": 892,
+  "score": 97.7,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "Actor_ConfigureFromScript",
+  "addr": "081EA1C0",
+  "size": 796,
+  "score": 88.5,
+  "src": "src/actor_animation_controller.c",
+  "unit": "Actor animation controller (tentative)"
+ },
+ {
+  "func": "ActorDisplay_UpdateForegroundSprite",
+  "addr": "081EC7D8",
+  "size": 412,
+  "score": 97.1,
+  "src": "src/fn/sub_081EC7D8.c",
+  "unit": "Actor display"
+ },
+ {
+  "func": "SingletonSlot7_UpdateEndingScene",
+  "addr": "081EF914",
+  "size": 1392,
+  "score": 95.9,
+  "src": "src/fn/sub_081EF914.c",
+  "unit": "Singleton slot 7"
+ },
+ {
+  "func": "SingletonSlot7_InitDisplaySprites",
+  "addr": "081F0F68",
+  "size": 728,
+  "score": 82.2,
+  "src": "src/fn/sub_081F0F68.c",
+  "unit": "Singleton slot 7"
+ }
+]

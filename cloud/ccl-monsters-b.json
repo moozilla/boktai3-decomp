@@ -1,0 +1,137 @@
+[
+ {
+  "name": "Armor",
+  "start": "08182454",
+  "end": "08182F60",
+  "fn_files": 30,
+  "functions": 30,
+  "bytes": 2828,
+  "pinned": false
+ },
+ {
+  "name": "Armor",
+  "start": "081854DC",
+  "end": "0818D754",
+  "fn_files": 102,
+  "functions": 102,
+  "bytes": 33400,
+  "pinned": false
+ },
+ {
+  "name": "Cannon battery",
+  "start": "08199AEC",
+  "end": "0819A698",
+  "fn_files": 28,
+  "functions": 28,
+  "bytes": 2988,
+  "pinned": false
+ },
+ {
+  "name": "Growth hazard",
+  "start": "081B7538",
+  "end": "081B817C",
+  "fn_files": 24,
+  "functions": 24,
+  "bytes": 3140,
+  "pinned": false
+ },
+ {
+  "name": "Cannon emitter",
+  "start": "08203200",
+  "end": "08203660",
+  "fn_files": 5,
+  "functions": 5,
+  "bytes": 1120,
+  "pinned": false
+ },
+ {
+  "name": "Enemy F426",
+  "start": "08203660",
+  "end": "08204748",
+  "fn_files": 12,
+  "functions": 12,
+  "bytes": 4328,
+  "pinned": false
+ },
+ {
+  "name": "Enemy D459",
+  "start": "08204748",
+  "end": "08205944",
+  "fn_files": 12,
+  "functions": 12,
+  "bytes": 4604,
+  "pinned": false
+ },
+ {
+  "name": "Ooze",
+  "start": "08205944",
+  "end": "082064B4",
+  "fn_files": 10,
+  "functions": 10,
+  "bytes": 2928,
+  "pinned": false
+ },
+ {
+  "name": "Cannon turret",
+  "start": "08207FAC",
+  "end": "0820901C",
+  "fn_files": 10,
+  "functions": 10,
+  "bytes": 4208,
+  "pinned": false
+ },
+ {
+  "name": "Fan cannon",
+  "start": "0820901C",
+  "end": "0820A2C8",
+  "fn_files": 13,
+  "functions": 13,
+  "bytes": 4780,
+  "pinned": false
+ },
+ {
+  "name": "Fan cannon manager",
+  "start": "0820A2C8",
+  "end": "0820AB3C",
+  "fn_files": 10,
+  "functions": 10,
+  "bytes": 2164,
+  "pinned": false
+ },
+ {
+  "name": "Dragon puppy",
+  "start": "0820AB3C",
+  "end": "0820BD24",
+  "fn_files": 12,
+  "functions": 12,
+  "bytes": 4584,
+  "pinned": false
+ },
+ {
+  "name": "Screamer",
+  "start": "0820BD24",
+  "end": "0820D23C",
+  "fn_files": 11,
+  "functions": 11,
+  "bytes": 5400,
+  "pinned": false
+ },
+ {
+  "name": "Poison hand",
+  "start": "0820D9D0",
+  "end": "0820EBEC",
+  "fn_files": 10,
+  "functions": 10,
+  "bytes": 4636,
+  "pinned": false
+ },
+ {
+  "name": "Pink spine",
+  "start": "0820FD54",
+  "end": "08210A1C",
+  "fn_files": 11,
+  "functions": 11,
+  "bytes": 3272,
+  "pinned": false
+ }
+]

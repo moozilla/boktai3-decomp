@@ -1,0 +1,200 @@
+[
+ {
+  "name": "Palette transition",
+  "start": "081D374C",
+  "end": "081D4E2C",
+  "fn_files": 39,
+  "functions": 39,
+  "bytes": 5856,
+  "pinned": false
+ },
+ {
+  "name": "Projectile",
+  "start": "081D9B6C",
+  "end": "081DA048",
+  "fn_files": 6,
+  "functions": 6,
+  "bytes": 1244,
+  "pinned": false
+ },
+ {
+  "name": "Timed effect",
+  "start": "081DA048",
+  "end": "081DA810",
+  "fn_files": 10,
+  "functions": 10,
+  "bytes": 1992,
+  "pinned": false
+ },
+ {
+  "name": "Projectile",
+  "start": "081DA810",
+  "end": "081DAF50",
+  "fn_files": 21,
+  "functions": 21,
+  "bytes": 1856,
+  "pinned": false
+ },
+ {
+  "name": "Explosion",
+  "start": "081DAF50",
+  "end": "081DB474",
+  "fn_files": 12,
+  "functions": 12,
+  "bytes": 1316,
+  "pinned": false
+ },
+ {
+  "name": "Timed presentation",
+  "start": "081E270C",
+  "end": "081E2898",
+  "fn_files": 3,
+  "functions": 3,
+  "bytes": 396,
+  "pinned": false
+ },
+ {
+  "name": "Scene projectile",
+  "start": "081FC66C",
+  "end": "081FCFE8",
+  "fn_files": 13,
+  "functions": 13,
+  "bytes": 2428,
+  "pinned": false
+ },
+ {
+  "name": "Projectile",
+  "start": "081FCFE8",
+  "end": "081FD53C",
+  "fn_files": 15,
+  "functions": 15,
+  "bytes": 1364,
+  "pinned": false
+ },
+ {
+  "name": "Sun orb",
+  "start": "081FE68C",
+  "end": "081FED9C",
+  "fn_files": 27,
+  "functions": 27,
+  "bytes": 1808,
+  "pinned": false
+ },
+ {
+  "name": "Sprite particle",
+  "start": "081FED9C",
+  "end": "081FF388",
+  "fn_files": 15,
+  "functions": 15,
+  "bytes": 1516,
+  "pinned": false
+ },
+ {
+  "name": "Trap",
+  "start": "0821DDBC",
+  "end": "0821E654",
+  "fn_files": 20,
+  "functions": 20,
+  "bytes": 2200,
+  "pinned": false
+ },
+ {
+  "name": "Effect part",
+  "start": "08231448",
+  "end": "08232370",
+  "fn_files": 25,
+  "functions": 25,
+  "bytes": 3880,
+  "pinned": false
+ },
+ {
+  "name": "Timed hazard",
+  "start": "08232370",
+  "end": "082329C8",
+  "fn_files": 13,
+  "functions": 14,
+  "bytes": 1624,
+  "pinned": false
+ },
+ {
+  "name": "Screen orbit effect",
+  "start": "082329C8",
+  "end": "082334F4",
+  "fn_files": 26,
+  "functions": 26,
+  "bytes": 2860,
+  "pinned": false
+ },
+ {
+  "name": "Charged burst",
+  "start": "082334F4",
+  "end": "08233B60",
+  "fn_files": 12,
+  "functions": 12,
+  "bytes": 1644,
+  "pinned": false
+ },
+ {
+  "name": "Solar bomb",
+  "start": "08233B60",
+  "end": "082343A0",
+  "fn_files": 10,
+  "functions": 10,
+  "bytes": 2112,
+  "pinned": false
+ },
+ {
+  "name": "Health restore effect",
+  "start": "08234810",
+  "end": "0823511C",
+  "fn_files": 17,
+  "functions": 17,
+  "bytes": 2316,
+  "pinned": false
+ },
+ {
+  "name": "Health burst effect",
+  "start": "0823511C",
+  "end": "08235DB0",
+  "fn_files": 18,
+  "functions": 18,
+  "bytes": 3220,
+  "pinned": false
+ },
+ {
+  "name": "Radial burst effect",
+  "start": "08235DB0",
+  "end": "0823669C",
+  "fn_files": 14,
+  "functions": 14,
+  "bytes": 2284,
+  "pinned": false
+ },
+ {
+  "name": "Particle effect",
+  "start": "0823669C",
+  "end": "08236B30",
+  "fn_files": 11,
+  "functions": 11,
+  "bytes": 1172,
+  "pinned": false
+ },
+ {
+  "name": "Particle burst",
+  "start": "08236B30",
+  "end": "082373C8",
+  "fn_files": 24,
+  "functions": 24,
+  "bytes": 2200,
+  "pinned": false
+ },
+ {
+  "name": "Directional effect",
+  "start": "082389D8",
+  "end": "08239130",
+  "fn_files": 12,
+  "functions": 12,
+  "bytes": 1880,
+  "pinned": false
+ }
+]

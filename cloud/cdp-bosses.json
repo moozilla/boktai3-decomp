@@ -1,0 +1,74 @@
+[
+ {
+  "func": "Hresvelgr_PlayDescent",
+  "addr": "081A09C4",
+  "size": 196,
+  "score": 95.2,
+  "src": "src/fn/sub_081A09C4.c",
+  "unit": "Hresvelgr"
+ },
+ {
+  "func": "Hresvelgr_UpdateBoundaryBarrage",
+  "addr": "081A0BC8",
+  "size": 732,
+  "score": 98.5,
+  "src": "src/fn/sub_081A0BC8.c",
+  "unit": "Hresvelgr"
+ },
+ {
+  "func": "sub_081A14FC",
+  "addr": "081A14FC",
+  "size": 1764,
+  "score": 96.7,
+  "src": "src/fn/sub_081A14FC.c",
+  "unit": "Hresvelgr"
+ },
+ {
+  "func": "sub_081A8E08",
+  "addr": "081A8E08",
+  "size": 320,
+  "score": 97.4,
+  "src": "src/fn/sub_081A8E08.c",
+  "unit": "Vanargand"
+ },
+ {
+  "func": "Vanargand_ApplyPendingDamage",
+  "addr": "081ACC24",
+  "size": 1196,
+  "score": 95.2,
+  "src": "src/fn/sub_081ACC24.c",
+  "unit": "Vanargand"
+ },
+ {
+  "func": "sub_081D3620",
+  "addr": "081D3620",
+  "size": 132,
+  "score": 97.7,
+  "src": "src/fn/sub_081D3620.c",
+  "unit": "Player particle cloud"
+ },
+ {
+  "func": "Ratatosk_UpdateSunOrbRelocation",
+  "addr": "081F8988",
+  "size": 740,
+  "score": 97.0,
+  "src": "src/fn/sub_081F8988.c",
+  "unit": "Ratatosk"
+ },
+ {
+  "func": "sub_08217430",
+  "addr": "08217430",
+  "size": 1328,
+  "score": 97.5,
+  "src": "src/fn/sub_08217430.c",
+  "unit": "Palette"
+ },
+ {
+  "func": "GameState_SelectRamBase",
+  "addr": "0821B084",
+  "size": 88,
+  "score": 88.9,
+  "src": "src/script_virtual_machine.c",
+  "unit": "Script virtual machine"
+ }
+]

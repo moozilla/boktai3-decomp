@@ -1,0 +1,191 @@
+[
+ {
+  "name": "Time",
+  "start": "081DC6D0",
+  "end": "081DCF20",
+  "fn_files": 8,
+  "functions": 8,
+  "bytes": 2128,
+  "pinned": false
+ },
+ {
+  "name": "Name entry",
+  "start": "081DCF20",
+  "end": "081DE5E4",
+  "fn_files": 16,
+  "functions": 16,
+  "bytes": 5828,
+  "pinned": false
+ },
+ {
+  "name": "Time",
+  "start": "081DE5E4",
+  "end": "081DF0EC",
+  "fn_files": 11,
+  "functions": 11,
+  "bytes": 2824,
+  "pinned": false
+ },
+ {
+  "name": "Password",
+  "start": "081DF0EC",
+  "end": "081E0818",
+  "fn_files": 24,
+  "functions": 24,
+  "bytes": 5932,
+  "pinned": false
+ },
+ {
+  "name": "Script prompt",
+  "start": "081E0818",
+  "end": "081E0D58",
+  "fn_files": 8,
+  "functions": 8,
+  "bytes": 1344,
+  "pinned": false
+ },
+ {
+  "name": "Game start",
+  "start": "081E0D58",
+  "end": "081E1AF4",
+  "fn_files": 9,
+  "functions": 9,
+  "bytes": 3484,
+  "pinned": false
+ },
+ {
+  "name": "Sound-test menu",
+  "start": "081E1AF4",
+  "end": "081E270C",
+  "fn_files": 16,
+  "functions": 16,
+  "bytes": 3096,
+  "pinned": false
+ },
+ {
+  "name": "Screen params 3F8",
+  "start": "081EB81C",
+  "end": "081EC380",
+  "fn_files": 12,
+  "functions": 12,
+  "bytes": 2916,
+  "pinned": false
+ },
+ {
+  "name": "Collection",
+  "start": "08210A1C",
+  "end": "08210ED0",
+  "fn_files": 15,
+  "functions": 15,
+  "bytes": 1204,
+  "pinned": false
+ },
+ {
+  "name": "Collection menu",
+  "start": "08210ED0",
+  "end": "082116EC",
+  "fn_files": 8,
+  "functions": 8,
+  "bytes": 2076,
+  "pinned": false
+ },
+ {
+  "name": "Forging book",
+  "start": "082116EC",
+  "end": "08213D10",
+  "fn_files": 62,
+  "functions": 62,
+  "bytes": 9764,
+  "pinned": false
+ },
+ {
+  "name": "Serial",
+  "start": "0822223C",
+  "end": "08223534",
+  "fn_files": 52,
+  "functions": 52,
+  "bytes": 4856,
+  "pinned": false
+ },
+ {
+  "name": "RFU manager",
+  "start": "08223534",
+  "end": "08224E54",
+  "fn_files": 39,
+  "functions": 39,
+  "bytes": 6432,
+  "pinned": false
+ },
+ {
+  "name": "Save data",
+  "start": "08227900",
+  "end": "082284F4",
+  "fn_files": 52,
+  "functions": 52,
+  "bytes": 3060,
+  "pinned": false
+ },
+ {
+  "name": "Save",
+  "start": "0822BAD0",
+  "end": "0822C110",
+  "fn_files": 31,
+  "functions": 31,
+  "bytes": 1600,
+  "pinned": false
+ },
+ {
+  "name": "Solar",
+  "start": "0822C110",
+  "end": "0822CCC8",
+  "fn_files": 27,
+  "functions": 27,
+  "bytes": 3000,
+  "pinned": false
+ },
+ {
+  "name": "Inventory",
+  "start": "0822CCC8",
+  "end": "0822E224",
+  "fn_files": 82,
+  "functions": 82,
+  "bytes": 5468,
+  "pinned": false
+ },
+ {
+  "name": "Game state",
+  "start": "0822E224",
+  "end": "0822ED64",
+  "fn_files": 39,
+  "functions": 39,
+  "bytes": 2880,
+  "pinned": false
+ },
+ {
+  "name": "Save",
+  "start": "0822ED64",
+  "end": "0822F1B4",
+  "fn_files": 9,
+  "functions": 9,
+  "bytes": 1104,
+  "pinned": false
+ },
+ {
+  "name": "Link player",
+  "start": "08239130",
+  "end": "0823AE5C",
+  "fn_files": 51,
+  "functions": 51,
+  "bytes": 7468,
+  "pinned": false
+ },
+ {
+  "name": "Cartridge solar sensor",
+  "start": "08243C10",
+  "end": "08243EFC",
+  "fn_files": 11,
+  "functions": 11,
+  "bytes": 748,
+  "pinned": false
+ }
+]

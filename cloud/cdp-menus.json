@@ -1,0 +1,194 @@
+[
+ {
+  "func": "LevelAdvanceDisplay_UpdateParticle",
+  "addr": "0805704C",
+  "size": 112,
+  "score": 78.8,
+  "src": "src/fn/sub_0805704C.c",
+  "unit": "Level advance display (tentative)"
+ },
+ {
+  "func": "LevelAdvanceDisplay_UpdateAnimation",
+  "addr": "08057158",
+  "size": 468,
+  "score": 90.6,
+  "src": "src/fn/sub_08057158.c",
+  "unit": "Level advance display (tentative)"
+ },
+ {
+  "func": "ScenePanel_UpdateTimePalette",
+  "addr": "08057E04",
+  "size": 708,
+  "score": 86.8,
+  "src": "src/fn/sub_08057E04.c",
+  "unit": "Scene panel presentation (tentative)"
+ },
+ {
+  "func": "ScenePanel_UpdateBackgroundEffect",
+  "addr": "08058700",
+  "size": 1012,
+  "score": 92.3,
+  "src": "src/fn/sub_08058700.c",
+  "unit": "Scene panel presentation (tentative)"
+ },
+ {
+  "func": "ScenePanel_CycleOverlayPalette",
+  "addr": "08058B88",
+  "size": 80,
+  "score": 77.8,
+  "src": "src/fn/sub_08058B88.c",
+  "unit": "Scene panel presentation (tentative)"
+ },
+ {
+  "func": "ScenePanel_DrawOverlay",
+  "addr": "08058BD8",
+  "size": 1056,
+  "score": 89.6,
+  "src": "src/fn/sub_08058BD8.c",
+  "unit": "Scene panel presentation (tentative)"
+ },
+ {
+  "func": "ScenePanel_InitScheduledAction",
+  "addr": "080592F4",
+  "size": 308,
+  "score": 92.0,
+  "src": "src/fn/sub_080592F4.c",
+  "unit": "Scene panel presentation (tentative)"
+ },
+ {
+  "func": "ScenePanelRig_RandomizeMovement",
+  "addr": "080597E0",
+  "size": 260,
+  "score": 91.7,
+  "src": "src/fn/sub_080597E0.c",
+  "unit": "Scene panel sprite rig"
+ },
+ {
+  "func": "ScenePanelRig_TickResourceDrain",
+  "addr": "080598E4",
+  "size": 464,
+  "score": 86.3,
+  "src": "src/fn/sub_080598E4.c",
+  "unit": "Scene panel sprite rig"
+ },
+ {
+  "func": "ScenePanelRig_TickRise",
+  "addr": "08059AC4",
+  "size": 224,
+  "score": 92.6,
+  "src": "src/fn/sub_08059AC4.c",
+  "unit": "Scene panel sprite rig"
+ },
+ {
+  "func": "ScenePanelRig_TickHoverSelection",
+  "addr": "08059C48",
+  "size": 432,
+  "score": 86.8,
+  "src": "src/fn/sub_08059C48.c",
+  "unit": "Scene panel sprite rig"
+ },
+ {
+  "func": "SceneInputPanel_ShowAttributeComparison",
+  "addr": "0805F63C",
+  "size": 284,
+  "score": 85.3,
+  "src": "src/fn/sub_0805F63C.c",
+  "unit": "Inventory values and display"
+ },
+ {
+  "func": "SceneItemValue_CalculateEquipment",
+  "addr": "0805F7E0",
+  "size": 140,
+  "score": 97.2,
+  "src": "src/fn/sub_0805F7E0.c",
+  "unit": "Inventory values and display"
+ },
+ {
+  "func": "SceneInventory_BeginEquipmentSwapPair",
+  "addr": "0806055C",
+  "size": 260,
+  "score": 95.1,
+  "src": "src/fn/sub_0806055C.c",
+  "unit": "Inventory action transitions"
+ },
+ {
+  "func": "SceneInventory_BeginConsumableSwapPair",
+  "addr": "08060A70",
+  "size": 292,
+  "score": 95.7,
+  "src": "src/fn/sub_08060A70.c",
+  "unit": "Inventory action transitions"
+ },
+ {
+  "func": "SceneInventory_BeginItemSwapPair",
+  "addr": "08060DB4",
+  "size": 240,
+  "score": 93.8,
+  "src": "src/fn/sub_08060DB4.c",
+  "unit": "Inventory action transitions"
+ },
+ {
+  "func": "RecordPanel_RefreshEntryLabels",
+  "addr": "0810D8F4",
+  "size": 188,
+  "score": 97.2,
+  "src": "src/fn/sub_0810D8F4.c",
+  "unit": "Record panel"
+ },
+ {
+  "func": "ActorMarkerPool_UpdateMarkers",
+  "addr": "081128F8",
+  "size": 376,
+  "score": 88.4,
+  "src": "src/fn/sub_081128F8.c",
+  "unit": "Stage results"
+ },
+ {
+  "func": "SceneHud_RebuildPrimaryOptions",
+  "addr": "08168A0C",
+  "size": 480,
+  "score": 97.0,
+  "src": "src/fn/sub_08168A0C.c",
+  "unit": "Pause menu"
+ },
+ {
+  "func": "sub_0816BC54",
+  "addr": "0816BC54",
+  "size": 1360,
+  "score": 96.9,
+  "src": "src/fn/sub_0816BC54.c",
+  "unit": "Map screen"
+ },
+ {
+  "func": "sub_0816E570",
+  "addr": "0816E570",
+  "size": 384,
+  "score": 96.8,
+  "src": "src/fn/sub_0816E570.c",
+  "unit": "Menu transition"
+ },
+ {
+  "func": "sub_08176F70",
+  "addr": "08176F70",
+  "size": 2680,
+  "score": 96.6,
+  "src": "src/fn/sub_08176F70.c",
+  "unit": "HUD"
+ },
+ {
+  "func": "sub_081BB904",
+  "addr": "081BB904",
+  "size": 1020,
+  "score": 97.7,
+  "src": "src/fn/sub_081BB904.c",
+  "unit": "Solar bank"
+ },
+ {
+  "func": "Storage_BeginSwapTransition",
+  "addr": "081BDE94",
+  "size": 536,
+  "score": 95.6,
+  "src": "src/fn/sub_081BDE94.c",
+  "unit": "Storage"
+ }
+]

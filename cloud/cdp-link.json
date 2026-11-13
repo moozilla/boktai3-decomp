@@ -1,0 +1,130 @@
+[
+ {
+  "func": "LinkDisplay_ShakeResult",
+  "addr": "0803A9CC",
+  "size": 168,
+  "score": 95.5,
+  "src": "src/wireless_game_items_and_display.c",
+  "unit": "Wireless game items and display (tentative)"
+ },
+ {
+  "func": "LinkResultPanel_UpdateGameCounters",
+  "addr": "0803B01C",
+  "size": 264,
+  "score": 90.7,
+  "src": "src/fn/sub_0803B01C.c",
+  "unit": "Wireless result panel (tentative)"
+ },
+ {
+  "func": "LinkResultPanel_InitializeTask",
+  "addr": "0803B40C",
+  "size": 684,
+  "score": 92.3,
+  "src": "src/fn/sub_0803B40C.c",
+  "unit": "Wireless result panel (tentative)"
+ },
+ {
+  "func": "EncodedRecord_XorRange",
+  "addr": "08044D6C",
+  "size": 100,
+  "score": 86.7,
+  "src": "src/fn/sub_08044D6C.c",
+  "unit": "Encoded records and password payloads"
+ },
+ {
+  "func": "sub_08108C94",
+  "addr": "08108C94",
+  "size": 456,
+  "score": 97.3,
+  "src": "src/fn/sub_08108C94.c",
+  "unit": "Link handshake"
+ },
+ {
+  "func": "LinkMenu_WaitForReadyPeers",
+  "addr": "08109F1C",
+  "size": 1000,
+  "score": 98.4,
+  "src": "src/fn/sub_08109F1C.c",
+  "unit": "Link menu"
+ },
+ {
+  "func": "LinkMenu_WaitSelectionMode",
+  "addr": "0810A540",
+  "size": 128,
+  "score": 90.9,
+  "src": "src/fn/sub_0810A540.c",
+  "unit": "Link menu"
+ },
+ {
+  "func": "LinkSelection_WaitForEmptySlots",
+  "addr": "0810A9D0",
+  "size": 252,
+  "score": 97.5,
+  "src": "src/fn/sub_0810A9D0.c",
+  "unit": "Link selection"
+ },
+ {
+  "func": "LinkSelection_ExchangeParticipantInput",
+  "addr": "0810AD50",
+  "size": 608,
+  "score": 95.2,
+  "src": "src/fn/sub_0810AD50.c",
+  "unit": "Link selection"
+ },
+ {
+  "func": "LinkSelection_UpdateParticipantScores",
+  "addr": "0810BBD4",
+  "size": 352,
+  "score": 79.7,
+  "src": "src/fn/sub_0810BBD4.c",
+  "unit": "Registry F246"
+ },
+ {
+  "func": "TimerDisplay_DrawRecord",
+  "addr": "0810E9D4",
+  "size": 188,
+  "score": 85.7,
+  "src": "src/fn/sub_0810E9D4.c",
+  "unit": "Registry 33FF"
+ },
+ {
+  "func": "sub_0810FDDC",
+  "addr": "0810FDDC",
+  "size": 256,
+  "score": 93.3,
+  "src": "src/fn/sub_0810FDDC.c",
+  "unit": "Link score panel"
+ },
+ {
+  "func": "LinkSession_UpdatePlayerValueAverage",
+  "addr": "081381CC",
+  "size": 124,
+  "score": 91.7,
+  "src": "src/fn/sub_081381CC.c",
+  "unit": "Registry 1745"
+ },
+ {
+  "func": "sub_081384A0",
+  "addr": "081384A0",
+  "size": 400,
+  "score": 98.0,
+  "src": "src/fn/sub_081383E0.c",
+  "unit": "Registry 1745"
+ },
+ {
+  "func": "PositionEffectDisplay_UpdateSources",
+  "addr": "08138778",
+  "size": 380,
+  "score": 96.7,
+  "src": "src/fn/sub_08138778.c",
+  "unit": "Registry 1745"
+ },
+ {
+  "func": "Clock_CheckRtcStatus",
+  "addr": "08229440",
+  "size": 40,
+  "score": 81.8,
+  "src": "src/fn/sub_08229440.c",
+  "unit": "Clock and sun schedule (tentative)"
+ }
+]

@@ -1,0 +1,114 @@
+[
+ {
+  "func": "BackgroundFlash_UpdateScrolling",
+  "addr": "08047770",
+  "size": 276,
+  "score": 96.7,
+  "src": "src/fn/sub_08047770.c",
+  "unit": "BG1 flash and scrolling controller (tentative)"
+ },
+ {
+  "func": "RepeatedEffect_TickUpperTransition",
+  "addr": "0804F9C4",
+  "size": 328,
+  "score": 89.4,
+  "src": "src/fn/sub_0804F9C4.c",
+  "unit": "Repeated effects (tentative)"
+ },
+ {
+  "func": "OrbitBackground_UpdateVisibility",
+  "addr": "08050910",
+  "size": 216,
+  "score": 94.4,
+  "src": "src/fn/sub_08050910.c",
+  "unit": "Orbit background controller"
+ },
+ {
+  "func": "OrbitBackground_UpdatePosition",
+  "addr": "080509E8",
+  "size": 980,
+  "score": 92.4,
+  "src": "src/fn/sub_080509E8.c",
+  "unit": "Orbit background controller"
+ },
+ {
+  "func": "DisplayTrack_Update",
+  "addr": "08054EC0",
+  "size": 936,
+  "score": 81.0,
+  "src": "src/fn/sub_08054EC0.c",
+  "unit": "Scripted display tracks"
+ },
+ {
+  "func": "DisplayTrack_AddFromScript",
+  "addr": "08055268",
+  "size": 784,
+  "score": 95.7,
+  "src": "src/fn/sub_08055268.c",
+  "unit": "Scripted display tracks"
+ },
+ {
+  "func": "Presentation_UpdateDropShakeBlink",
+  "addr": "081E2910",
+  "size": 576,
+  "score": 73.8,
+  "src": "src/fn/sub_081E2910.c",
+  "unit": "Scripted presentation"
+ },
+ {
+  "func": "SpriteTrail_CreateFixedEffect",
+  "addr": "081F28C4",
+  "size": 324,
+  "score": 98.2,
+  "src": "src/fn/sub_081F28C4.c",
+  "unit": "Sprite trail"
+ },
+ {
+  "func": "SpriteTrail_CreateMotionEffect",
+  "addr": "081F2A08",
+  "size": 360,
+  "score": 98.4,
+  "src": "src/fn/sub_081F2A08.c",
+  "unit": "Sprite trail"
+ },
+ {
+  "func": "RisingActor_AdvanceHeight",
+  "addr": "081FDAF4",
+  "size": 76,
+  "score": 84.6,
+  "src": "src/fn/sub_081FDAF4.c",
+  "unit": "Orbit effect"
+ },
+ {
+  "func": "sub_081FDCB0",
+  "addr": "081FDCB0",
+  "size": 272,
+  "score": 92.5,
+  "src": "src/fn/sub_081FDCB0.c",
+  "unit": "Orbit effect"
+ },
+ {
+  "func": "HomingProjectile_UpdateDefaultState",
+  "addr": "081FF454",
+  "size": 1256,
+  "score": 95.8,
+  "src": "src/fn/sub_081FF454.c",
+  "unit": "Homing projectile"
+ },
+ {
+  "func": "ProjectilePool_Update",
+  "addr": "08202730",
+  "size": 796,
+  "score": 98.0,
+  "src": "src/fn/sub_08202730.c",
+  "unit": "Projectile pool"
+ },
+ {
+  "func": "SpiralBurst_InitParticles",
+  "addr": "08234540",
+  "size": 428,
+  "score": 96.4,
+  "src": "src/fn/sub_08234540.c",
+  "unit": "Spiral burst"
+ }
+]

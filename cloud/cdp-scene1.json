@@ -1,0 +1,218 @@
+[
+ {
+  "func": "SceneActorControl_TickActive",
+  "addr": "08067258",
+  "size": 480,
+  "score": 93.4,
+  "src": "src/fn/sub_08067258.c",
+  "unit": "Scene actor slot controller"
+ },
+ {
+  "func": "SceneActorControl_TryActivateNearby",
+  "addr": "080674F0",
+  "size": 360,
+  "score": 76.5,
+  "src": "src/fn/sub_080674F0.c",
+  "unit": "Scene actor slot controller"
+ },
+ {
+  "func": "sub_08067BA8",
+  "addr": "08067BA8",
+  "size": 100,
+  "score": 91.7,
+  "src": "src/fn/sub_08067BA8.c",
+  "unit": "Scene actor slot controller"
+ },
+ {
+  "func": "SceneSteeringActor_EmitRandomParticle",
+  "addr": "0806BDB8",
+  "size": 200,
+  "score": 75.0,
+  "src": "src/fn/sub_0806BDB8.c",
+  "unit": "Steering actor pool (tentative)"
+ },
+ {
+  "func": "SceneSteeringActor_DestroySlot",
+  "addr": "0806C708",
+  "size": 168,
+  "score": 76.5,
+  "src": "src/fn/sub_0806C708.c",
+  "unit": "Steering actor pool (tentative)"
+ },
+ {
+  "func": "RouteSpriteActor_TickEmitting",
+  "addr": "0806DCE4",
+  "size": 636,
+  "score": 88.5,
+  "src": "src/fn/sub_0806DCE4.c",
+  "unit": "Route sprite actor pool"
+ },
+ {
+  "func": "RouteSpriteActor_Create",
+  "addr": "0806DFC8",
+  "size": 360,
+  "score": 80.0,
+  "src": "src/fn/sub_0806DFC8.c",
+  "unit": "Route sprite actor pool"
+ },
+ {
+  "func": "SceneActorRegistry_UnlinkActor",
+  "addr": "0806FBC8",
+  "size": 92,
+  "score": 96.7,
+  "src": "src/fn/sub_0806FBC8.c",
+  "unit": "Scene actor registry lifecycle"
+ },
+ {
+  "func": "SceneActorRegistry_SendToCategoryPaletteOffset",
+  "addr": "0806FCAC",
+  "size": 92,
+  "score": 91.7,
+  "src": "src/fn/sub_0806FCAC.c",
+  "unit": "Scene actor registry lifecycle"
+ },
+ {
+  "func": "SceneActorRegistry_CountAvailable",
+  "addr": "0806FE18",
+  "size": 112,
+  "score": 95.8,
+  "src": "src/fn/sub_0806FE18.c",
+  "unit": "Scene actor registry lifecycle"
+ },
+ {
+  "func": "SceneActorRegistry_ScheduleAvailableActors",
+  "addr": "0806FE88",
+  "size": 236,
+  "score": 94.2,
+  "src": "src/fn/sub_0806FE88.c",
+  "unit": "Scene actor registry lifecycle"
+ },
+ {
+  "func": "SceneActorRegistry_SetMovementMode",
+  "addr": "08070070",
+  "size": 824,
+  "score": 85.0,
+  "src": "src/fn/sub_08070070.c",
+  "unit": "Scene actor registry queries"
+ },
+ {
+  "func": "SceneActorRegistry_DefeatActorsFromScript",
+  "addr": "080704EC",
+  "size": 496,
+  "score": 96.8,
+  "src": "src/fn/sub_080704EC.c",
+  "unit": "Scene actor registry queries"
+ },
+ {
+  "func": "SceneActorAnimation_SelectDirectionalFlags",
+  "addr": "080766F8",
+  "size": 288,
+  "score": 97.1,
+  "src": "src/fn/sub_080766F8.c",
+  "unit": "Scene actor animation selection"
+ },
+ {
+  "func": "SceneActorPlacement_ResetActorState",
+  "addr": "080772C0",
+  "size": 388,
+  "score": 83.1,
+  "src": "src/fn/sub_080772C0.c",
+  "unit": "Scene actor placement and feedback"
+ },
+ {
+  "func": "SceneActorPlacement_EmitTimedParticles",
+  "addr": "08077C48",
+  "size": 1072,
+  "score": 94.4,
+  "src": "src/fn/sub_08077C48.c",
+  "unit": "Scene actor placement and feedback"
+ },
+ {
+  "func": "SceneActorBehavior_AccelerateTowardDescriptor",
+  "addr": "08078430",
+  "size": 288,
+  "score": 96.9,
+  "src": "src/fn/sub_08078430.c",
+  "unit": "Scene actor behavior dispatch"
+ },
+ {
+  "func": "SceneActorBehavior_UpdateColliders",
+  "addr": "08078700",
+  "size": 340,
+  "score": 97.3,
+  "src": "src/fn/sub_08078700.c",
+  "unit": "Scene actor behavior dispatch"
+ },
+ {
+  "func": "SceneActorBehavior_DispatchPendingFlags",
+  "addr": "0807A714",
+  "size": 440,
+  "score": 86.6,
+  "src": "src/fn/sub_0807A714.c",
+  "unit": "Scene actor motion and updates"
+ },
+ {
+  "func": "SceneActorMotion_Update",
+  "addr": "0807A8CC",
+  "size": 1736,
+  "score": 82.7,
+  "src": "src/fn/sub_0807A8CC.c",
+  "unit": "Scene actor motion and updates"
+ },
+ {
+  "func": "SceneActorTarget_ResetContactResponse",
+  "addr": "0807F4B8",
+  "size": 600,
+  "score": 94.1,
+  "src": "src/fn/sub_0807F4B8.c",
+  "unit": "Scene actor target and contact control"
+ },
+ {
+  "func": "SceneActorTarget_ApplyResetCommand",
+  "addr": "0807FAD8",
+  "size": 388,
+  "score": 83.1,
+  "src": "src/fn/sub_0807FAD8.c",
+  "unit": "Scene actor target and contact control"
+ },
+ {
+  "func": "SceneActorReaction_UpdateAnimationGate",
+  "addr": "08080008",
+  "size": 84,
+  "score": 82.4,
+  "src": "src/fn/sub_08080008.c",
+  "unit": "Scene actor target and contact control"
+ },
+ {
+  "func": "SceneActorReaction_PlayStaggerBurst",
+  "addr": "0808148C",
+  "size": 640,
+  "score": 88.5,
+  "src": "src/fn/sub_0808148C.c",
+  "unit": "Scene actor reaction callbacks"
+ },
+ {
+  "func": "SceneActorControl_ConvergeSavedMotion",
+  "addr": "08082D80",
+  "size": 496,
+  "score": 90.1,
+  "src": "src/fn/sub_08082D80.c",
+  "unit": "Scene actor control phases"
+ },
+ {
+  "func": "SceneActorControl_ConsumeLiftFlag",
+  "addr": "080837D4",
+  "size": 216,
+  "score": 91.7,
+  "src": "src/fn/sub_080837D4.c",
+  "unit": "Scene actor control phases"
+ },
+ {
+  "func": "SceneActorControl_RestartPositionCurve",
+  "addr": "08084044",
+  "size": 188,
+  "score": 85.5,
+  "src": "src/fn/sub_08084044.c",
+  "unit": "Scene actor control phases"
+ }
+]

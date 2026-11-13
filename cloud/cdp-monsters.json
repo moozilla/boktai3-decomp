@@ -1,0 +1,138 @@
+[
+ {
+  "func": "TentacleActor_UpdateRetraction",
+  "addr": "080AB968",
+  "size": 324,
+  "score": 91.7,
+  "src": "src/fn/sub_080AB968.c",
+  "unit": "Tentacle actor"
+ },
+ {
+  "func": "sub_080ABB18",
+  "addr": "080ABB18",
+  "size": 452,
+  "score": 92.0,
+  "src": "src/fn/sub_080ABB18.c",
+  "unit": "Tentacle actor"
+ },
+ {
+  "func": "Vorn_UpdateDefeat",
+  "addr": "080AEE08",
+  "size": 984,
+  "score": 82.4,
+  "src": "src/fn/sub_080AEE08.c",
+  "unit": "Vorn"
+ },
+ {
+  "func": "sub_080B197C",
+  "addr": "080B197C",
+  "size": 284,
+  "score": 95.0,
+  "src": "src/fn/sub_080B197C.c",
+  "unit": "Vorn"
+ },
+ {
+  "func": "Skeleton_TrySelectRetreatCell",
+  "addr": "080B77D0",
+  "size": 704,
+  "score": 50.0,
+  "src": "src/fn/sub_080B77D0.c",
+  "unit": "Skeleton"
+ },
+ {
+  "func": "Skeleton_UpdateDefeat",
+  "addr": "080BD1F0",
+  "size": 7924,
+  "score": 98.6,
+  "src": "src/fn/sub_080BD1F0.c",
+  "unit": "Skeleton"
+ },
+ {
+  "func": "Golem_UpdateDefeat",
+  "addr": "080C9848",
+  "size": 956,
+  "score": 99.1,
+  "src": "src/golem_2.c",
+  "unit": "Golem"
+ },
+ {
+  "func": "Mummy_ResumeSavedRouteAfterAnimation",
+  "addr": "080D1784",
+  "size": 788,
+  "score": 89.2,
+  "src": "src/fn/sub_080D1784.c",
+  "unit": "Mummy"
+ },
+ {
+  "func": "Mummy_UpdateDefeat",
+  "addr": "080D3878",
+  "size": 1256,
+  "score": 99.2,
+  "src": "src/fn/sub_080D3878.c",
+  "unit": "Mummy"
+ },
+ {
+  "func": "Ivy_UpdateDefeat",
+  "addr": "080EE1B0",
+  "size": 6780,
+  "score": 97.6,
+  "src": "src/fn/sub_080EE1B0.c",
+  "unit": "Ivy"
+ },
+ {
+  "func": "Axe_UpdateDamageSpin",
+  "addr": "080F9974",
+  "size": 492,
+  "score": 96.7,
+  "src": "src/fn/sub_080F9974.c",
+  "unit": "Axe"
+ },
+ {
+  "func": "Terrain_ResolveActorMotion",
+  "addr": "0811AE9C",
+  "size": 428,
+  "score": 91.3,
+  "src": "src/fn/sub_0811AE9C.c",
+  "unit": "Glove"
+ },
+ {
+  "func": "SpriteColliderGroup_ActivateParts",
+  "addr": "0818E9B8",
+  "size": 100,
+  "score": 90.0,
+  "src": "src/fn/sub_0818E9B8.c",
+  "unit": "Armor"
+ },
+ {
+  "func": "SpriteColliderGroup_ResetActiveParts",
+  "addr": "0818EA3C",
+  "size": 84,
+  "score": 96.0,
+  "src": "src/fn/sub_0818EA3C.c",
+  "unit": "Armor"
+ },
+ {
+  "func": "VulcanCannon_UpdateFacingTurn",
+  "addr": "08207350",
+  "size": 416,
+  "score": 82.6,
+  "src": "src/fn/sub_08207350.c",
+  "unit": "Vulcan cannon"
+ },
+ {
+  "func": "EnemyParticle_UpdatePool",
+  "addr": "0820D2C4",
+  "size": 744,
+  "score": 94.1,
+  "src": "src/fn/sub_0820D2C4.c",
+  "unit": "Enemy particle"
+ },
+ {
+  "func": "OrangeSpine_ApplyHitReaction",
+  "addr": "0820EE34",
+  "size": 424,
+  "score": 93.0,
+  "src": "src/fn/sub_0820EE34.c",
+  "unit": "Orange spine"
+ }
+]
