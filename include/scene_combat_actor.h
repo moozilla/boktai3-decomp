@@ -59,7 +59,8 @@ struct ActorControllerMotion {
 struct SceneCombatActor {
     u8 unknown0[0x18];
     struct ActorControllerNavigation navigation;
-    u8 unknown50[0x70];
+    s16 velocity[3];
+    u8 unknown56[0x6A];
     u16 animationFrame;
     u8 unknownC2[2];
     u16 animationDuration;
@@ -90,7 +91,8 @@ struct SceneCombatActor {
     u8 targetHeading, unknownB3B;
     u8 behavior, behaviorPhase, behaviorCounter;
     u8 action, actionPhase, actionReady, actionCounter, animationComplete;
-    u8 unknownB44[0x5DC];
+    u8 shakeStrength;
+    u8 unknownB45[0x5DB];
     struct SceneCombatState state;
 };
 

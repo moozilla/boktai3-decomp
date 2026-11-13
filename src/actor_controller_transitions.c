@@ -165,3 +165,169 @@ void ActorController_UpdateAttackCollider(struct SceneCombatActor *actor)
         }
     }
 }
+
+extern const u32 gUnk_0824EC84[];
+
+extern const struct ContactPosition gUnk_0824ECB4, gUnk_0824EC94[];
+
+extern const u8 gUnk_0824ECBC[];
+
+void Camera_RequestShake(u32);
+
+void SceneParticleBurst_CreateWithPause(void *, u32, const void *, u32, u32, u32);
+
+static inline s32 ActorController_TruncateFixed(s32 value)
+{
+    return value >= 0 ? value >> 12 : -((-value) >> 12);
+}
+
+void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *actor)
+{
+    u8 *phase = &actor->actionPhase;
+    u8 initialPhase = *phase;
+    switch (initialPhase) {
+        case 0: {
+            u32 four = 4;
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EC84[((actor->heading + 0x60) >> 6) & 3]);
+            (*phase)++;
+            actor->actionReady = initialPhase;
+            Sound_PlaySongChecked(0xb9);
+            ActorController_ClearColliderFlags(&actor->colliders[2], four);
+            ActorController_ClearColliderFlags(&actor->colliders[1], four);
+            ActorController_ClearColliderFlags(&actor->colliders[3], four);
+            ActorController_SetColliderFlags(&actor->colliders[0], four);
+            {
+                u32 one = 1;
+                ActorController_ClearMotionFlags(&actor->motion, one);
+            }
+            actor->flags &= ~0x20;
+            break;
+        }
+        case 1:
+            if (actor->animationComplete) {
+                *phase = 255;
+                actor->actionReady = initialPhase;
+            }
+            break;
+    }
+    switch (actor->animationEvent) {
+        case 9: {
+            struct ContactCollider *collider;
+            const struct ContactPosition *offset;
+            union ActorControllerPosition out;
+            u8 *facing;
+            u32 tableOffset, zero;
+            actor->shakeStrength = 0x3f;
+            actor->colliders[0].flags &= ~4;
+            {
+                struct ContactCollider *attackCollider = &actor->colliders[0];
+                u32 mask = 0x60000;
+                attackCollider->reactionFlags |= mask;
+            }
+            Collider_SetAttackPowerAndForce(&actor->colliders[0], (u16)ActorController_TruncateFixed((s16)actor->attack << 12), 100);
+            collider = &actor->colliders[0];
+            collider->bounds = gUnk_0824ECB4;
+            facing = &actor->heading;
+            tableOffset = ((*facing + 0x60) >> 6) & 3;
+            tableOffset *= sizeof(struct ContactPosition);
+            collider->offset = *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC94);
+            {
+                u8 heading = *facing;
+                u8 *dest = &actor->colliders[0].direction;
+                zero = 0;
+                *dest = heading;
+            }
+            offset = (const void *)(tableOffset + (const u8 *)gUnk_0824EC94);
+            {
+                s16 *dest = out.components;
+                const struct ContactPosition *left = offset;
+                const struct ContactPosition *right = &actor->navigation.referencePosition;
+                dest[0] = right->x + left->x;
+                dest[1] = right->y + left->y;
+                dest[2] = right->z + left->z;
+            }
+            SceneParticleBurst_CreateWithPause(&out, 0, gUnk_0824ECBC, 15, 1, zero);
+            if (actor->animationFrame == 0)
+                Sound_PlaySongChecked(0xba);
+            break;
+        }
+        case 11: {
+            struct ContactCollider *attackCollider = &actor->colliders[0];
+            u32 mask = 0xfff9ffff;
+            attackCollider->reactionFlags &= mask;
+        }
+            Collider_SetAttackPowerAndForce(&actor->colliders[0], (u16)ActorController_TruncateFixed((s16)actor->attack << 11), 50);
+            break;
+        case 14: {
+            u16 *flags = &actor->colliders[0].flags;
+            u32 value = *flags;
+            u32 four = 4;
+            four |= value;
+            *flags = four;
+            break;
+        }
+    }
+    {
+        u8 *strength = &actor->shakeStrength;
+        if (*strength) {
+            Camera_RequestShake(*strength);
+            (*strength)--;
+        }
+    }
+}
+
+void ActorController_UpdateMovementVelocity(struct SceneCombatActor *actor)
+{
+    ActorController_UpdateMovingAttackCollider(actor);
+    if ((u16)(actor->animationEvent - 7) <= 4) {
+        s16 *velocity;
+        u8 *heading;
+        int angle, speed;
+        actor->flags |= 0x20;
+        heading = &actor->heading;
+        velocity = actor->velocity;
+        angle = *heading;
+        speed = 25;
+        {
+            int x = ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed);
+            int zero = 0;
+            velocity[0] = x;
+            velocity[1] = zero;
+        }
+        velocity[2] = ActorController_TruncateFixed(gUnk_086149C4[angle] * speed);
+    } else
+        actor->flags &= ~0x20;
+}
+
+void ActorController_UpdateDecayingVelocity(struct SceneCombatActor *actor)
+{
+    ActorController_UpdateMovingAttackCollider(actor);
+    {
+        u8 *heading = &actor->heading;
+        int shift = actor->actionCounter >> 1;
+        int speed = 20;
+        s16 *velocity = actor->velocity;
+        int angle = *heading;
+        speed >>= shift;
+        {
+            int x = ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed);
+            int zero = 0;
+            velocity[0] = x;
+            velocity[1] = zero;
+        }
+        {
+            const s16 *table = gUnk_086149C4;
+            const s16 *entry = (const void *)((angle * sizeof(*table)) + (const u8 *)table);
+            velocity[2] = ActorController_TruncateFixed(*entry * speed);
+        }
+    }
+    if (actor->velocity[0] || actor->velocity[2]) {
+        u16 *flags = &actor->flags;
+        u32 value = *flags;
+        u32 mask = 0x20;
+        value |= mask;
+        *flags = value;
+        return;
+    }
+    actor->flags &= ~0x20;
+}

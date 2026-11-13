@@ -18,4 +18,9 @@ void Armor_UpdateNegativeTurn(struct SceneCombatActor *, s32);
 void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
 void Armor_StartFullPaletteRestoreDelay(struct SceneCombatActor *);
 void ActorController_UpdateResetMotionTransition(struct SceneCombatActor *, s32);
+union ActorControllerPosition {
+    struct ContactPosition position;
+    s16 components[4];
+};
+void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *);
 #endif
