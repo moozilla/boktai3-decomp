@@ -1519,3 +1519,35 @@ Next: give the initial halfword value a natural r0 preference without retaining
 it through the second field address, then keep the OR constant as operand one
 through CSE. The exact instruction shape already exists; avoid introducing
 extra tests or barriers to fix allocation.
+
+### SceneActorRegistry_ResetEligibleCategoryState — availability allocation
+
+Tags: phase3, dp-scene1, SceneActorRegistry_ResetEligibleCategoryState, 0x08070B1C
+
+A matching partial removes the two state-store pins and replaces the complete
+control/state offset chain with typed fields. Three original pins remain:
+excluded in caller and helper, plus the helper's loaded value. Source check:
+MATCH, 264 bytes. No remaining pin is individually removable in this form.
+
+Saved fully pin-free draft is four register-only differences, same 264 bytes.
+Typed stores reduce the original 42 differences to eight. Expressing the second
+flag test directly as value = *field & excluded removes four more. The first
+halfword load uses r2 rather than r0, and the local mask takes r0 rather than r2.
+The value is global, priority 34285 (eight refs, live seven); the mask occupies
+r0 before global allocation. Diagnostic AGBCC_FORCE=value:0,mask:2,field:1
+(pseudos 43,44,42) matches exactly. All three are necessary to preserve the
+field-address allocation while changing the conflicting values.
+
+Direct predicates, narrowing the first test, early/late saved-pointer writes,
+separate first halfword locals and inline mask helpers change allocation across
+the body without matching. Using the mask as the first result leaves six
+differences. A goto loop keeps four differences but moves a branch. Probe's five
+canonical-register choices, one jump follow and two invariant-hoist choices do
+not improve the best draft. Moving the saved-pointer write before the load gives
+39/40 differences; probing that form also finds no single improving choice.
+Retaining only the value pin does not match; both excluded pins are needed with
+it. The typed state-store partial is therefore the verified reduction.
+
+Next: reduce the first value's live interval without changing the pointer class
+or the second word test. This is the same initial availability-mask boundary as
+sub_08070910, with a complete exact allocation diagnosis here.
