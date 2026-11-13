@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "scene_actor_registry.h"
@@ -8,8 +7,8 @@ void SceneActorControl_OnIdle(u8 *);
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **saved, u32 excluded)
 {
     u16 *flags = &actor->flags2D4;
-    register u32 value = *flags;
-    register u32 mask = 0x40;
+    u32 value = *flags;
+    u32 mask = 0x40;
     value &= mask;
     *saved = flags;
     if (value)
@@ -65,7 +64,6 @@ static inline void ResetControl(struct SceneActorRegistryActor *actor, const voi
     actor->field104 = zero;
 }
 
-// scope shape 67 (differences once low registers are set aside)
 // confidence=low: walks the scene actor list and, for available actors with flag 0x100 in flags2C0, resets their script state.
 void sub_08070910(void)
 {
@@ -88,7 +86,7 @@ void sub_08070910(void)
         u32 excluded = 0x20000;
         do {
             u16 *flags;
-            u32 changeMask;
+            u16 bits;
             u32 unavailable = IsUnavailable(actor, &flags, excluded);
             if (!unavailable) {
                 if (HasMovementFlag(actor, movementMask)) {
@@ -97,17 +95,14 @@ void sub_08070910(void)
                         ResetControl(actor, callback, substate, keyword);
                     }
                     {
-                        changeMask = 0x4000;
-                        {
-                            register u32 mask asm("r0") = changeMask;
-                            u32 value = *flags;
-                            mask |= value;
-                            *flags = mask;
-                        }
+                        u32 mask = 0x4000;
+                        bits = *flags;
+                        mask |= bits;
+                        *flags = mask;
                     }
                     {
-                        changeMask = 8;
-                        actor->flags2D0 = actor->flags2D0 | changeMask;
+                        bits = 8;
+                        actor->flags2D0 = actor->flags2D0 | bits;
                     }
                 }
             }
