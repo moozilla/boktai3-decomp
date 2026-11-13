@@ -98,7 +98,7 @@ start:
         if (!p->active) {
             int pitch, yaw;
             struct Anim *a;
-            register struct Anim *saved asm("r8");
+            struct Anim *saved;
             const u16 *entry;
             int done;
             p->active = 1;
@@ -149,13 +149,14 @@ start:
             p->velocity.y = scale12(p->direction.y, p->verticalScale);
             p->velocity.z = scale12(p->direction.z, p->horizontalScale);
             if (p->pad1 == 5) {
+                struct Anim *first;
                 AnimData_Load(p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(p->resource, 0x29f);
                 setFrame(&p->sprite, 32);
-                a = &p->anim;
-                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
-                                 6, 0, 0);
-                saved = a;
+                first = &p->anim;
+                Anim_SetSequence(
+                    first, (*(struct Manager **)&gAnimatedParticleManager)->resources[1], 6, 0, 0);
+                saved = first;
                 goto stepAnimation;
             } else if (p->pad1 == 6) {
                 AnimData_Load(p->resource, 0x61f9);
