@@ -7649,26 +7649,32 @@ addr,name,mode,confidence,source,notes
 081C52DC,Registry1909_Update,thumb,low,src-alias,Task update callback that processes scene messages and dispatches the current animation state
 081C52FC,Registry1909_Destroy,thumb,low,src-alias,Task destruction callback that removes the object's animation
 081C53EC,SceneMessageSprite_Create,thumb,low,src-alias,Creates an animated task registered as scene-message receiver type 10; provisional object name
-081C542C,GameState_GetPackedTripletValue,thumb,low,src-alias,
+081C542C,ChallengeMenu_GetStoredRank,thumb,low,src-alias,Challenge selection menu: group icon; three available choices; packed rank values; description and script dispatch.
 081C5470,ChallengeMenu_SetStoredRank,thumb,low,src-alias,Stores a four-bit value indexed by group and option; rank interpretation is tentative
 081C54B8,ChallengeMenu_DrawOptions,thumb,low,src-alias,
-081C554C,SceneTextSelector_UpdatePanel,thumb,low,src-alias,
+081C554C,ChallengeMenu_UpdateDescription,thumb,low,src-alias,Challenge selection menu: group icon; three available choices; packed rank values; description and script dispatch.
 081C55B8,ChallengeMenu_ConsumeStateEntry,thumb,low,src-alias,Returns and clears the flag marking first execution of a new menu state
 081C55D8,ChallengeMenu_SetState,thumb,low,src-alias,Installs the state callback and resets its timer while marking state entry
 081C55F4,ChallengeMenu_StartFadeIn,thumb,low,src-alias,Starts the opening screen transition and installs its wait callback
 081C5628,ChallengeMenu_StartFadeOut,thumb,low,src-alias,Starts the closing screen transition and installs its wait callback
+081C5660,ChallengeMenu_HideWidgets,thumb,low,src-alias,Challenge selection menu: group icon; three available choices; packed rank values; description and script dispatch.
+081C569C,ChallengeMenu_HandleInput,thumb,low,src-alias,Challenge selection menu: group icon; three available choices; packed rank values; description and script dispatch.
 081C57E8,ChallengeMenu_UpdateFadeIn,thumb,low,src-alias,Opening transition callback that waits 33 ticks before enabling menu input
 081C580C,ChallengeMenu_UpdateFadeOut,thumb,low,src-alias,Closing transition callback that waits 33 ticks and clears text before dispatch
 081C583C,ChallengeMenu_DispatchSelection,thumb,low,src-alias,State callback that invokes the selected script and kills the menu task
 081C5894,ChallengeMenu_UpdateSelection,thumb,low,src-alias,Selection state callback that resets an entry flag and processes menu input
+081C58BC,ChallengeMenu_UpdateWidgets,thumb,low,src-alias,Challenge selection menu: group icon; three available choices; packed rank values; description and script dispatch.
 081C5984,ChallengeMenu_EnableBackground,thumb,low,src-alias,Enables BG0 in the display shadow and resets BG1 scroll for menu rendering
 081C59A4,ChallengeMenu_Update,thumb,low,src-alias,Task update callback that refreshes selection graphics and invokes the current state
 081C59C4,ChallengeMenu_Destroy,thumb,low,src-alias,Task cleanup callback that removes six animations and clears all background tilemaps
 081C5A10,ChallengeMenu_InitBackgrounds,thumb,low,src-alias,
 081C5ABC,ChallengeMenu_LoadPalette,thumb,low,src-alias,Loads the menu palette resource and copies 40 words into palette staging memory
+081C5AF0,ChallengeMenu_SetGroupIcon,thumb,low,src-alias,Challenge selection menu: group icon; three available choices; packed rank values; description and script dispatch.
+081C5B6C,ChallengeMenu_InitializeKeyframes,thumb,low,src-alias,Challenge selection menu: group icon; three available choices; packed rank values; description and script dispatch.
 081C5C2C,ChallengeMenu_InitAnimations,thumb,low,src-alias,Relocates three graphics resources and initializes six menu animation objects
 081C5D40,ChallengeMenu_ScriptOpen,thumb,low,src-alias,
 081C5E44,ChallengeMenu_CreateFromScript,thumb,low,src-alias,Creates the menu task with script-defined options and callbacks; challenge ownership is tentative
+081C5E84,ChallengeMenu_ResetStoredRanks,thumb,low,src-alias,Challenge selection menu: group icon; three available choices; packed rank values; description and script dispatch.
 081C5EA8,ChallengeMenu_GetRankKeyframe,thumb,low,src-alias,Maps ranks 1 through 5 to graphics keyframes and returns minus one otherwise
 081C5EF0,ChallengeResult_SetState,thumb,low,src-alias,Sets the timed result panel state callback and resets its frame counter
 081C5F08,ChallengeResult_LoadDigit,thumb,low,src-alias,Loads a digit keyframe only for values zero through nine into result display animations
