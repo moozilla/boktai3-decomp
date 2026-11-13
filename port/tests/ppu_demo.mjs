@@ -19,7 +19,13 @@ for (const folder of process.argv.slice(2)) {
       for (let c = 0; c < 3; ++c)
         if (rgba[i * 4 + c] !== expected[header.length + i * 3 + c]) throw Error(`${name}: pixel ${i} differs`);
     // The browser accepts untrusted local captures: malformed input must fail.
-    for (const bad of [dump.subarray(0, 7), dump.subarray(0, dump.length - 1), Buffer.concat([dump, Buffer.from([0])])]) {
+    const invalid = [dump.subarray(0, 7), dump.subarray(0, dump.length - 1), Buffer.concat([dump, Buffer.from([0])])];
+    if (dump.subarray(0, 8).toString() === 'PPUDUMP2') {
+      for (const mask of [0, 16, 255]) {
+        const bad = Buffer.from(dump); bad[24] = mask; invalid.push(bad);
+      }
+    }
+    for (const bad of invalid) {
       let rejected = false;
       try { renderer.render(bad); } catch { rejected = true; }
       if (!rejected) throw Error('Malformed capture accepted');
