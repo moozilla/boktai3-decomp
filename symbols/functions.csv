@@ -5721,7 +5721,7 @@ addr,name,mode,confidence,source,notes
 0815AD24,Player_EnableStatGaugeFromScript,thumb,low,src-alias,
 0815AD3C,Player_EnableStatGaugeAndHistoryFromScript,thumb,low,src-alias,
 0815AD60,Player_RestrictActionRequestsFromScript,thumb,low,src-alias,
-0815AD78,Player_EnterKindTwo,thumb,low,src-alias,
+0815AD78,Player_EnterKindTwo,thumb,low,src-alias,Enters script-controlled kind two; refreshes attachment and invokes pending notification callback before stopping movement sounds
 0815AE94,PlayerCue_OverlaySet,thumb,low,src-alias,"player cutscene cmds 48 (n) and 50: +0xAE4 = 1, +0xAD6 = n + 366 (cmd 50: 378)"
 0815AEAC,PlayerCue_OverlayOn,thumb,low,src-alias,"player cutscene cmd 47 (n): +0xAE4 = 2, +0xAD6 = n + 366"
 0815AEC4,PlayerCue_OverlayOff,thumb,low,src-alias,player cutscene cmd 49: +0xAE4 = 0
@@ -5749,7 +5749,7 @@ addr,name,mode,confidence,source,notes
 0815B6DC,PlayerCue_Motion29B,thumb,low,src-alias,"player cutscene cmd 19 (dir, n): 4-way facing, motion 0x1D/0, update sub_08151078"
 0815B774,PlayerCue_BeginOddDirection,thumb,low,src-alias,
 0815B858,PlayerCue_Motion7Turn,thumb,low,src-alias,"player cutscene cmd 20 (dir): motion 7/0, facing by state (+0x418 3: diagonal)"
-0815B968,PlayerCue_Motion7Variant7,thumb,low,src-alias,player cutscene cmd 21 (dir): motion 7/7
+0815B968,PlayerCue_Motion7Variant7,thumb,low,src-alias,Starts motion 7 phase 7; forwards the original cue parameter to the preliminary mode-specific turn command
 0815B9CC,PlayerCue_Motion7Variant3,thumb,low,src-alias,player cutscene cmd 22 (dir): motion 7/3 (7/4 in states other than 3-5)
 0815BAC4,PlayerCue_AimDraw,thumb,low,src-alias,"player cue setter in the Aim motion group (motion 3/0, like PlayerCue_Aim) but updates a different tick routine (sub_081511E0 vs Aim's sub_08151310); "
 0815BB0C,PlayerCue_AimDrawVariant2,thumb,low,src-alias,"same cue as PlayerCue_AimDraw but motion 3/2 (dir variant) while sharing the same update routine sub_081511E0, matching the project's VariantN-by-dir "
@@ -5764,7 +5764,7 @@ addr,name,mode,confidence,source,notes
 0815BE5C,PlayerCue_BeginModeSeven,thumb,low,src-alias,
 0815BF18,PlayerCue_RunTo,thumb,low,src-alias,"player cutscene cmd 33 (x, y, z): target +0x590, motion 2/0, update sub_081516C0; guess: run"
 0815BF60,PlayerCue_Run,thumb,low,src-alias,"player cutscene cmd 34 (dir): motion 2/0 with sub_0813AE18 effect, update sub_0815196C"
-0815BFB8,PlayerCue_Motion17,thumb,low,src-alias,"player cutscene cmd 41: faces 1, motion 0x11, update sub_08151988"
+0815BFB8,PlayerCue_Motion17,thumb,low,src-alias,Faces direction one and starts motion 17 at phase zero; the zero is already live in r2 at the sequence call
 0815BFFC,PlayerCue_Motion17Variant2,thumb,low,src-alias,"player cutscene cmd 42: faces 1, motion 0x11/2, update sub_08151988"
 0815C040,PlayerCue_Windblown,thumb,low,src-alias,"player cutscene cmd 35 (side): motion 0/0 with update sub_0814FAE8, the scarf-in-the-wind stance (prologue shots)"
 0815C0BC,PlayerCue_WindblownVariant3,thumb,low,src-alias,player cutscene cmd 37 (dir): motion 0/3 with update sub_0814FAE8
@@ -5824,8 +5824,8 @@ addr,name,mode,confidence,source,notes
 0815D590,ScriptActor_ResetActionStateFromScript,thumb,low,src-alias,Resets action fields and returns the selected actor to state 1 while preserving mode 6
 0815D688,Player_RegisterSceneMessageReceiver,thumb,low,src-alias,Registers the embedded receiver with the player identifier and receiver kind 2
 0815D6A0,Player_UnregisterSceneMessageReceiver,thumb,low,src-alias,Passes the embedded scene message receiver to the removal helper
-0815D6B0,PlayerCue_Dispatch,thumb,low,src-alias,kind 2 (player) cutscene receiver: switch on the command byte (52 cases); acknowledges with sub_0814F858/sub_0814F874
-0815DBF4,Player_SendSceneMessage,thumb,low,src-alias,
+0815D6B0,PlayerCue_Dispatch,thumb,low,src-alias,Dispatches kind-2 scene commands through shared cue APIs; immediate commands acknowledge at once and animated commands leave acknowledgement pending
+0815DBF4,Player_SendSceneMessage,thumb,low,src-alias,Builds receiver-kind-2 commands in the actor message buffer; the full buffer holds a command header and sixteen halfword arguments
 0815DC48,PlayerCue_InitCollider,thumb,low,src-alias,
 0815DD14,Player_OnStateOneEvent,thumb,low,src-alias,Event callback that adds four to the global counter at offset 0x600 when player state is 1
 0815DD3C,Player_ScaleLevelValue,thumb,low,src-alias,
@@ -5856,9 +5856,9 @@ addr,name,mode,confidence,source,notes
 0815F770,TargetRegistry_Destroy,thumb,low,src-alias,Task destruction callback that clears the global target registry pointer
 0815F77C,TargetRegistry_Init,thumb,low,src-alias,Clears the registry fields and publishes the singleton pointer
 0815F790,TargetRegistry_Create,thumb,low,src-alias,Creates the singleton registry task and installs its lifecycle callbacks
-0815F7E0,PlayerBurst_SetStateCallback,thumb,low,src-alias,Sets the burst task state callback and resets its frame counter; burst interpretation is tentative
-0815F7F4,PlayerOrbitEffect_UpdateParticle,thumb,low,src-alias,
-0815F8F8,PlayerBurst_UpdateParticle,thumb,low,src-alias,Advances particle coordinates and switches its effect after five updates; ownership is provisional
+0815F7E0,PlayerBurst_SetStateCallback,thumb,low,src-alias,Sets the orbit-transition task state callback at 4C4 and resets its phase frame at F2; the independent particle frame is at 4BC
+0815F7F4,PlayerOrbitEffect_UpdateParticle,thumb,low,src-alias,Updates a radial particle around the owner and expands its radius after the per-particle delay; alternates two tile frames
+0815F8F8,PlayerBurst_UpdateParticle,thumb,low,src-alias,Advances burst-particle horizontal coordinates with wrapping velocity increments and selects frame five on animation tick five
 0815F934,PlayerOrbitEffect_SpawnParticle,thumb,low,src-alias,
 0815FA78,PlayerOrbitEffect_UpdateParticles,thumb,low,src-alias,
 0815FAF4,PlayerOrbitEffect_UpdateIntro,thumb,low,src-alias,
