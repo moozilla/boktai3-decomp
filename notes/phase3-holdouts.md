@@ -1680,3 +1680,43 @@ Next: use a natural branch/helper structure to account for two more reload
 choices before the nearby store, then move the trigger-offset value out of
 local allocation without introducing an early address computation. No complete
 combined override was established for the full pin-free draft.
+
+### ResourceStation_UpdateDigits (0804F1FC): two counter pins removed
+
+A single function-scope i shared by the visible and hidden loops removes both
+counter pins (fact 45). Stock unit MATCH, 392 bytes. Five pins and four barriers
+remain. Best fully pin-free draft is
+`notes/phase3-drafts/dp-field/ResourceStation_UpdateDigits.c` (16/18, shape 16),
+using direct screen fields, ordinary digit postincrement and named digitGraphics.
+The baseline with all pins simply removed is 32/36, shape 26.
+
+Allocation evidence: removing only object from the shared-index partial is
+12/12; object goes to r9 because digit takes r8 first (priorities 2213 vs 2777,
+object 9 refs/122 live; digit 5 refs/36 live). Raising object priority by 565
+is not an exact diagnosis: it worsens to 34/34. Moving digit initialization
+ahead of projection fixes every register but moves mov r9,sp earlier (2/2
+including shifted padding, exact size). Before the divisions it is 6/6.
+Next useful allocation form should lengthen digit lifetime without moving its
+initialization instruction.
+
+Screen-address evidence: plain pointer fields introduce two PRE replacements
+for frame+16, carrying the address through a high register. Disabling PRE 1
+or 2 alone gives 24/24 or 26/26, not MATCH. Direct local.screen fields avoid
+that PRE and give 16/18 but expand separate frame pointers and a hoisted frame
+base. Probe confirms an invariant hoist at UID 489 in postincrement.c; disabling
+it leaves the count 16/18, changing where the frame-base copy occurs. There is
+no exact combined override for the full clean draft.
+
+C attempts: private projection helper (same shared-index-clean result 25/25);
+shared damage-number projector requires reconciling its Anim_LoadKeyframe
+prototype before evaluating; direct screen setter with u16/u32 parameter
+(25/27); full-state screen getter with u16/u32 return (isolated two read pins
+remain 4/4); keeping the postincrement read alive by assigning digit=read
+removes needed operations (3/1); pointer-taking digit reader (13/13). Ordinary
+postincrement improves the full draft's shape from 18 to 16 but still lacks
+the ROM's preincrement/rewind/ldm sequence. Prior round-11 pass tried 20 forms.
+
+Next: a screen-access helper that naturally uses a frame-relative read followed
+by a screen-relative write, and a digit cursor form preserving the live
+postincrement without a barrier. The object-only frontier may yield another
+small reduction independently.
