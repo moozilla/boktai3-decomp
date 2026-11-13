@@ -5580,7 +5580,7 @@ addr,name,mode,confidence,source,notes
 0815AD24,Player_EnableStatGaugeFromScript,thumb,low,src-alias,
 0815AD3C,Player_EnableStatGaugeAndHistoryFromScript,thumb,low,src-alias,
 0815AD60,Player_RestrictActionRequestsFromScript,thumb,low,src-alias,
-0815AD78,Player_EnterKindTwo,thumb,low,src-alias,
+0815AD78,Player_EnterKindTwo,thumb,low,src-alias,Enters script-controlled kind two; refreshes attachment and invokes pending notification callback before stopping movement sounds
 0815AE94,PlayerCue_OverlaySet,thumb,low,src-alias,"player cutscene cmds 48 (n) and 50: +0xAE4 = 1, +0xAD6 = n + 366 (cmd 50: 378)"
 0815AEAC,PlayerCue_OverlayOn,thumb,low,src-alias,"player cutscene cmd 47 (n): +0xAE4 = 2, +0xAD6 = n + 366"
 0815AEC4,PlayerCue_OverlayOff,thumb,low,src-alias,player cutscene cmd 49: +0xAE4 = 0
@@ -5608,7 +5608,7 @@ addr,name,mode,confidence,source,notes
 0815B6DC,PlayerCue_Motion29B,thumb,low,src-alias,"player cutscene cmd 19 (dir, n): 4-way facing, motion 0x1D/0, update sub_08151078"
 0815B774,PlayerCue_BeginOddDirection,thumb,low,src-alias,
 0815B858,PlayerCue_Motion7Turn,thumb,low,src-alias,"player cutscene cmd 20 (dir): motion 7/0, facing by state (+0x418 3: diagonal)"
-0815B968,PlayerCue_Motion7Variant7,thumb,low,src-alias,player cutscene cmd 21 (dir): motion 7/7
+0815B968,PlayerCue_Motion7Variant7,thumb,low,src-alias,Starts motion 7 phase 7; forwards the original cue parameter to the preliminary mode-specific turn command
 0815B9CC,PlayerCue_Motion7Variant3,thumb,low,src-alias,player cutscene cmd 22 (dir): motion 7/3 (7/4 in states other than 3-5)
 0815BAC4,PlayerCue_AimDraw,thumb,low,src-alias,"player cue setter in the Aim motion group (motion 3/0, like PlayerCue_Aim) but updates a different tick routine (sub_081511E0 vs Aim's sub_08151310); "
 0815BB0C,PlayerCue_AimDrawVariant2,thumb,low,src-alias,"same cue as PlayerCue_AimDraw but motion 3/2 (dir variant) while sharing the same update routine sub_081511E0, matching the project's VariantN-by-dir "
@@ -5623,7 +5623,7 @@ addr,name,mode,confidence,source,notes
 0815BE5C,PlayerCue_BeginModeSeven,thumb,low,src-alias,
 0815BF18,PlayerCue_RunTo,thumb,low,src-alias,"player cutscene cmd 33 (x, y, z): target +0x590, motion 2/0, update sub_081516C0; guess: run"
 0815BF60,PlayerCue_Run,thumb,low,src-alias,"player cutscene cmd 34 (dir): motion 2/0 with sub_0813AE18 effect, update sub_0815196C"
-0815BFB8,PlayerCue_Motion17,thumb,low,src-alias,"player cutscene cmd 41: faces 1, motion 0x11, update sub_08151988"
+0815BFB8,PlayerCue_Motion17,thumb,low,src-alias,Faces direction one and starts motion 17 at phase zero; the zero is already live in r2 at the sequence call
 0815BFFC,PlayerCue_Motion17Variant2,thumb,low,src-alias,"player cutscene cmd 42: faces 1, motion 0x11/2, update sub_08151988"
 0815C040,PlayerCue_Windblown,thumb,low,src-alias,"player cutscene cmd 35 (side): motion 0/0 with update sub_0814FAE8, the scarf-in-the-wind stance (prologue shots)"
 0815C0BC,PlayerCue_WindblownVariant3,thumb,low,src-alias,player cutscene cmd 37 (dir): motion 0/3 with update sub_0814FAE8

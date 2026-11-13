@@ -160,3 +160,9 @@ The subsystem is skipped under the worker brief's reasonable-time rule; the
 compiled tree retains the original matching files. Next is Player cue,
 0815AD24–0815C9EC. A future attempt should seek a meaningful C representation
 that makes allocation independent of the tied GCSE pseudo numbers.
+
+## Player cue commands finished
+- 0022: 64 files into src/player_cue_commands.c (0815AD24–0815C9EC), 7368 bytes MATCH after formatting. The new header contains the real pending-notification callback record and unified APIs; no existing header was changed. All actor view macros were replaced with existing Player fields and complete coordinate objects.
+- Corrected missing third arguments in Motion7Variant7 (forward its cue parameter) and Motion17 (phase zero); both match without new moves. Preserved all existing useful symbol names and refined three CSV interpretations. Parameters now describe facing, target, variant, phase, speed and completion parameter.
+- Replaced the callback trampoline with typed calls and shared six odd-facing folds. The facing-bit update must be inside the helper alongside the fold; placing it outside adds a load. Kept the two pending-notification branches: merging identical calls changes ROM branch/literal placement. Kept four wind-facing bodies after helper extraction changed 148 bytes despite identical total size. No new scored concessions.
+- Next: Player cue (0815D688–0815E034), ten files.
