@@ -92,7 +92,12 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
         }
         if ((contactFlag(source, 0x80000)) && !(playerFlag(p, 0x20000000))) {
             u32 power = source->unknown3C;
-            u32 duration = power + 60;
+            u32 duration;
+            do {
+                duration = power + 60;
+                goto select_duration;
+            } while (0);
+        select_duration:;
             if (gEngineFlags & 0x1000) power = duration;
             else power += 60;
             Player_RequestTimedReset(p, power);

@@ -1272,33 +1272,27 @@ Not worked on further this session.
 
 Tags: #matching #phase3 #player #bosses
 
-### sub_0813D834 (0813D834): cse follow into a singleton case
+### sub_0813D834 (0813D834): resolved on the resumed pass
 
-The original two pins remain. The best new pin-free draft is
-`notes/phase3-drafts/dp-bosses/sub_0813D834.c`: 0 ROM / 2 draft instructions
-(the extra initial `cmp kind, #1; beq bonus`), versus the old 17/15 draft.
-The entire body has the ROM's registers and instructions. Persistent search:
-`build/matchsearch/sub_0813D834`, nodes `second-entry` and `case-zero-fallthrough`.
+Both pins are removed; the stock whole-player-unit check is MATCH (13128 bytes).
+The matching C is retained at `notes/phase3-drafts/dp-bosses/sub_0813D834.c`.
+Case zero executes its real body in a nonempty do block and exits with
+`goto store;`; the common timer store stays after the switch. The loop-end
+note between the case-zero exit and case one stops cse_end_of_basic_block
+from following the singleton switch edge. No extra comparison or instructions
+remain. Equivalent while/for bodies also match; copying the timer store into
+the loop and returning instead leaves 2/6 differences.
 
-Confirmed `CSE_NOFOLLOW=2` gives MATCH. Read `cse_end_of_basic_block` in cse.c:
-a case label with one incoming branch and a preceding BARRIER admits the
-switch equality. Giving case 1 a second incoming branch blocks both passes;
-the duplicate comparison survives. Making case 0 conditionally fall through
-also blocks the follow, but its mode test survives (7/9). Repeating that test
-in both call/skip arms reduces it to 0/2 plus two moved branch targets.
+This resolves the earlier 0/2 second-entry draft. Its diagnosis was correct:
+`CSE_NOFOLLOW=2` matched, but adding a second runtime edge retained a compare
+and branch. The loop-end note supplies the boundary without that edge. See
+scope README fact 193. Persistent exact candidate: resumed matchsearch session
+`build/matchsearch/sub_0813D834-resumed`, node `case-zero-loop-end`.
 
-Tried direct and narrow parameter types, dispatch casts, union/array/address
-forms, precomputing the scaled offset, reordered cases, if/else and separate
-if dispatch, adjusted switch constants, default fallthrough and second entries
-from case zero/default. Dispatch narrowing/offsets preserve the body but add
-conversion/arithmetic instructions. Address-taking and ordinary inline readers
-do not hide the switch equality. No one-pin partial found: removing the scaled
-pin ties its shift to hard r3 and changes the earlier reload order.
-
-Next: a genuine shared path into case 1 whose second edge becomes redundant
-after cse, or an original helper/control-flow structure that puts a non-barrier
-predecessor before the case label. Scope `why all` does not attribute the dead
-argument copy and constant timer address to the switch equality; `probe` does.
+The earlier attempts covered direct/narrow parameters, dispatch casts,
+union/array/address forms, offset precomputation, reordered cases, if/else,
+separate dispatch, default fallthrough and second entries from case zero.
+They either preserved the switch equality or left conversions/extra edges.
 
 ### PlayerAction_RefreshFlagState (0813EDDC): one moved argument copy
 
@@ -1329,11 +1323,27 @@ copy survives into reload. Next: keep that reload choice but delay or delete
 the copy after allocation, or recover the missing original access around the
 mode/slot guard. Do not add a fence to manufacture the choice.
 
+Resumed follow-up: the case-zero loop-end technique that resolved sub_0813D834
+was tested around this guard and around descriptor selection. The guard loop
+leaves 1/1 unchanged; selection-loop control flow gives 14/14. A full inline
+selector also leaves 1/1. Reassigning choice only in the positive arm restores
+the exact shape but the original 8/8 reload differences. Action-mode/slot switch
+forms, byte-narrowed subtraction, sign-word extraction through a union and an
+arithmetic shift all retain 8/8. Wide signed/unsigned choice temporaries alter
+branch layout without fixing the registers. A joined Boolean guard adds code.
+Reconfirmed `spill`: shifting choice 5 by one gives MATCH, across all 90 reload
+choices. Best saved draft remains 1/1; no source or concession change.
+
+Tool gap: `why 200` follows the early r0 copy through the descriptor call and
+incorrectly names the return-value copy into sl as its reader. The call consumes
+and overwrites r0; implicit call argument uses and call clobbers should terminate
+that reader walk. This is separate from the actual reload-rotation blocker.
+
 ### sub_0815E034: direct defense addresses isolate the mask priority
 Tags: phase3, player, sub_0815E034, allocation
 
-The new pin-free draft is `notes/phase3-drafts/dp-bosses/sub_0815E034.c`:
-6 ROM / 4 draft instructions differ, 440 versus 444 bytes. All long-lived
+The first-pass pin-free draft had 6 ROM / 4 draft instructions differing,
+440 versus 444 bytes. The resumed draft below supersedes it. All long-lived
 registers and all defense switch cases now match. It reuses `common` in the
 blocked-mask arm, then assigns it again for the vulnerability mask. The extra
 references raise its priority to 2500. Remaining differences are the first
@@ -1361,6 +1371,37 @@ Next: give common a short-lived extra real reference that disappears after
 allocation, or prevent REG_EQUIV doubling without an artificial fence. A mask
 helper with the original aggregate representation may supply that reference.
 
+Resumed investigation: the saved draft now differs in **2 ROM / 2 draft
+instructions**, with the same 444-byte size and no moved targets. Construct
+`common` as a u32/u16 union, write the high half zero before the low half 63,
+and keep `vulnerable` as s32. With a full-word final test, this gives 4/2:
+every allocation matches, but regmove ties the final AND into dying common r6,
+omitting the flags-to-r0 copy and its later alignment padding. The union raises
+common to priority 2352 (6 references / 51 live instructions), above player's
+2268 and source's 2093. Unlike the earlier remask form, both initial mask loads
+and their order match. Narrowing the final test to
+`(u16)(flags & common.halves[0])` restores size and all later offsets; it still
+emits `ands r6,r1; lsls r0,r6,16` instead of `adds r0,r1,0; ands r0,r6`.
+
+This is evidence for the allocation mechanism, not a source match. Source
+retains its three original pins and still passes the stock 444-byte check.
+The un-narrowed draft is reproducible by replacing that final test with
+`flags & common.value`. `AGBCC_NOTIE=167` on it confirms the tie is responsible
+for the missing copy, but also changes allocation (21/17); it does not match.
+The original direct-address draft still has the complete matching diagnosis
+`AGBCC_PRI=common:+1000`.
+
+Also tried: loading reward flags through common first (15/19); low-half-first
+construction (17/25), byte construction (21/35), and bitfields (23/27 or worse);
+returning the high-half-first mask from an inline helper (16/16); deriving the
+switch mask as `common.value | 64` (keeps an OR and changes blocked allocation);
+reusing common in the vulnerability test; resetting it for the switch; and a
+union result or explicitly clamped test. None closes the remaining tie. The
+narrow s8 vulnerability also kept an unnecessary sign extension, removed by
+s32. Next: preserve the six-reference mask allocation while representing the
+last AND through a subregister that regmove cannot tie, without leaving a
+narrowing shift. No new source change or compiler override was landed.
+
 ### PlayerContact_ApplyResponse: shared duration selection, 6/6
 Tags: phase3, player, PlayerContact_ApplyResponse, cross-jumping
 
@@ -1384,6 +1425,18 @@ order do not improve it. Original source retains both concessions.
 Next: find the C form that lets the initial duration value die only after
 allocation while the argument still uses the original power. The key is the
 second addition, before considering reload rotation.
+
+Resumed loop-boundary experiment: a nonempty do/goto block around the first
+duration assignment improves this to **4/4**, still 1100 bytes. The saved draft
+now uses that form. CSE pass 1 no longer reuses the duration in the second arm,
+but CSE pass 2 substitutes it at insn 477 (the else addition), following jump
+470 and then processing the arm independently. Scope's 40 single-decision
+probes found no improvement. Putting the loop boundary in either selection
+arm or around the first call instead leaves 6/6 or unmerged branch/call code
+(8/13 and 10/18). The remaining problem is therefore after-loop CSE, not only
+the first CSE traversal. Next: a genuine aggregate duration representation
+that becomes equivalent after CSE2 but before the final branch merge. Source
+still retains both original concessions; no source change was made.
 
 ### TargetRegistry_FindById: 5/5 allocation-only; duplicate compares still cross-jump backward
 Tags: phase3, dp-bosses, TargetRegistry_FindById

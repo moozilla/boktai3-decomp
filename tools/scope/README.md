@@ -2044,6 +2044,46 @@ Each was read from the compiler source and confirmed on a live draft.
   and a pointer union initializer also match. Addressing pp at function
   scope does not match; scope matters. Narrow mode arguments and reordered
   inline-helper parameters do not fix the common tail.
+190. **Building an inline helper result from two halfword stores can keep equal zeros separate.**
+   In Vanargand_UpdateCaptureSetup (081A8E08), the pending-cue zero must remain in ip for
+   case 2, while the position height zero stays in r4 and supplies the other two cases.
+   `union { u32 value; u16 halves[2]; } height; height.halves[0] = y;
+   height.halves[1] = 0;` inside SetPositionAndGetHeight, followed by storing and returning
+   `height.value`, preserves that separation and removes the height pin. The only call passes
+   zero for y. A full-width union initializer folds back to the shared-zero draft; narrow
+   arrays and a union with a signed halfword result do not give the same code. The stock
+   compiler and whole-unit check match the 320-byte function without concessions.
+
+191. **Separate endpoint updates in inline helpers can keep a loop endpoint out of a long-lived
+   index's CSE class.** SceneGrid_ScanColumns (0806E7CC) matched after its post-loop endpoint
+   helpers used `column++; column -= count;` and `column--; column += count;` for the two
+   directions. CSE no longer makes the long-lived column canonical over the endpoint;
+   flow deletes the intermediate copies. Steps' measured life falls from 85 to 83 before
+   REG_EQUIV doubling, which moves its priority just above row without eight pins and a
+   barrier. `CSE_NOCANON=column` and `AGBCC_PRI=steps:+4` independently confirm the mechanism.
+   Reassociating the updates into one expression, or declaring the intermediate outside the
+   inline helper, loses the effect.
+
+192. **Repeat a real retry increment on one rejection edge to raise its counter's reference
+   density before jump2 merges the tail.** sub_0806F06C (0806F06C) needs its 20-attempt scan
+   counter in r5. Replacing the rejected-X `continue` with `if (++i <= 19) goto repeat;
+   return 0;`, retaining the loop's normal increment for its other rejection paths, adds
+   counted references before the duplicate retry tail disappears. This removes DEBUG_NOP;
+   `AGBCC_PRI=i:+920` confirms the baseline allocation diagnosis. Repeating only the Y or Z
+   rejection also matches, but repeating all three adds too many references. This is a
+   counter-specific instance of fact 91, with no extra final instructions.
+
+193. **A real case body that exits a loop through a shared tail leaves a loop-end boundary
+   before the next case, blocking CSE's singleton-edge follow.** sub_0813D834 (0813D834)
+   matched without its kind and scaled-offset pins with case zero written as
+   `do { ...; goto store; } while (0);`, and `store:` naming the common timer store
+   after the switch. cse_end_of_basic_block scans backward from case one's label;
+   NOTE_INSN_LOOP_END stops that scan before it reaches the preceding BARRIER.
+   CSE therefore cannot substitute the switch equality into case one's indexed
+   timer access. A plain braced case with `break` allows the substitution;
+   `CSE_NOFOLLOW=2` confirms the decision. A second entry edge also blocks it but
+   leaves a comparison in the final output. The nonempty do/while/for forms all
+   match; placing the timer store and return inside the loop changes the tail.
 
 ## Survey: random table as a literal address (2026-10-24)
 

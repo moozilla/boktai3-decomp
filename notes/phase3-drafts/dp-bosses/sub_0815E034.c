@@ -13,8 +13,9 @@ void PlayerContact_ComputeCost(struct Player *player, struct ContactCollider *in
     struct ContactCollider *target = inputTarget;
     u32 damage;
     u32 flags;
-    s8 blocked, vulnerable;
-    u32 common;
+    s8 blocked;
+    s32 vulnerable;
+    union { u32 value; u16 halves[2]; } common;
     if (target->cost)
         return;
     {
@@ -29,20 +30,19 @@ void PlayerContact_ComputeCost(struct Player *player, struct ContactCollider *in
     flags = input->reactionFlags;
     if (flags & 0x2000)
         blocked = 0;
-    else {
-        common = 63;
-        blocked = target->reactionFlags & common;
-    }
+    else
+        blocked = target->reactionFlags & 63;
     vulnerable = target->statRewardFlags;
-    common = 63;
-    vulnerable &= common;
+    common.halves[1] = 0;
+    common.halves[0] = 63;
+    vulnerable &= common.value;
     if (flags & 64) {
         target->cost = 0;
         target->costFlags = 1;
         Collision_AccumulateNearbyResponse(source, target, target->cost);
         return;
     }
-    if (flags & common) {
+    if ((u16)(flags & common.halves[0])) {
         u8 *attribute;
         if (vulnerable & flags)
             target->costFlags = 4;

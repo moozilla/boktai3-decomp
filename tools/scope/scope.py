@@ -1620,6 +1620,27 @@ def regs_of(rtl):
     return [int(n) for n in re.findall(r"\(reg(?:/[a-z]+)*:\w+ (\d+)", rtl or "")]
 
 
+def register_widths(insns):
+    """Pseudo/hard-register widths in 32-bit ARM words, including enclosing SUBREGs.
+
+    A DI value allocated at r2 also occupies r3; looking only at its first
+    hard register misses that conflict. Narrow uses must not shrink its width.
+    """
+    words = {"PDI": 2, "DI": 2, "DF": 2, "CSI": 2, "CDI": 4, "CTI": 8,
+             "COI": 16, "SC": 2, "DC": 4, "XC": 6, "TC": 8}
+    out = {}
+    for _, _, rtl in insns:
+        for mode, number in re.findall(r"\(reg(?:/[a-z]+)*:(\w+) (\d+)", rtl):
+            reg = int(number)
+            out[reg] = max(out.get(reg, 1), words.get(mode, 1))
+    return out
+
+
+def occupies_hard_register(reg, want, hard, widths):
+    first = reg if reg < 16 else hard.get(reg, -1)
+    return 0 <= first < 16 and first <= want < min(16, first + widths.get(reg, 1))
+
+
 def function_trace(text, func):
     """Only FUNC's trace records. UIDs and decision indices restart in each function.
     PRE runs after cse1, so its unlabelled records belong to that cse marker;
@@ -1931,6 +1952,25 @@ def reg_nums(text):
     for m in re.finditer(r"\b(?:r(\d+)|(sb|sl|fp|ip|sp|lr|pc))\b", (text or "").split(None, 1)[-1] if text else ""):
         out.append(int(m.group(1)) if m.group(1) else REG_ALIASES[m.group(2)])
     return out
+
+
+def commuted_register_operands(rom, draft):
+    """Same three-register commutative instruction with only its inputs exchanged.
+
+    Do not turn this into two allocation diagnoses: changing register assignments
+    would disturb the surrounding instructions without addressing operand order.
+    """
+    pattern = r"(adds?|muls?|ands?|orrs?|eors?)\s+((?:r\d+|sb|sl|fp|ip|sp|lr|pc)\s*,\s*(?:r\d+|sb|sl|fp|ip|sp|lr|pc)\s*,\s*(?:r\d+|sb|sl|fp|ip|sp|lr|pc))"
+    a, b = re.fullmatch(pattern, rom or ""), re.fullmatch(pattern, draft or "")
+    if not a or not b or a[1] != b[1]:
+        return False
+    rr, dr = reg_nums(rom), reg_nums(draft)
+    return rr[0] == dr[0] and rr[1] != rr[2] and rr[1:] == dr[:0:-1]
+
+
+def register_permutation(before, after):
+    """An order change preserving every register occurrence, including repeats."""
+    return before != after and sorted(before) == sorted(after)
 
 
 REG_TOKEN = re.compile(r"\b(?:r\d+|sb|sl|fp|ip|sp|lr|pc)\b")
@@ -3078,15 +3118,16 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         return
     pc, hc = conf.get(pseudo, (set(), set()))
     holders, calls = {}, []
+    seq = insn_list(wd, "lreg")
+    widths = register_widths(seq)
     if want in hc:
-        seq = insn_list(wd, "lreg")
         idx = [i for i, (_, _, r) in enumerate(seq) if pseudo in regs_of(r)]
         if idx:
             for u, kind, r in seq[idx[0]:idx[-1] + 1]:
                 if kind == "call_insn" and want < 4:
                     calls.append(u)
                 for x in regs_of(r):
-                    if x != pseudo and (x == want or hard.get(x) == want):
+                    if x != pseudo and occupies_hard_register(x, want, hard, widths):
                         holders.setdefault(x, u)
     if want in hc and not later_holders_only(holders, calls, rec, recs):
         what = [f"{nm(x) if x >= 16 else 'hard r%d' % x} (from {at(u)})" for x, u in list(holders.items())[:5]]
@@ -3097,7 +3138,9 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         print(f"    lever: shorten {nm(pseudo)}'s life or move the other value's, so they don't overlap in"
               f" {rname(want)}; or make the other value land elsewhere")
         return
-    takers = [x for x in pc if hard.get(x, recs.get(x, (0,) * 7)[6]) == want and x != pseudo]
+    placed = {x: recs[x][6] for x in recs}
+    placed.update(hard)
+    takers = [x for x in pc if x != pseudo and occupies_hard_register(x, want, placed, widths)]
     before = [x for x in takers if recs.get(x, ("L",))[0] == "L" or
               (recs.get(x) and rec and rec[0] == "G" and recs[x][1] < rec[1])]
     if before:
@@ -5691,7 +5734,12 @@ def cmd_why(src, func, uid, env, via=None):
         rr, dr = reg_nums(rom_text), reg_nums(row["draft"])
         hmap = hard_of(wd)
         pre = next((r for u, _, r in insn_list(wd, "lreg") if u == uid), None)
-        for a, b in zip(rr, dr):
+        commuted = commuted_register_operands(rom_text, row["draft"])
+        if commuted:
+            print("  only the two commutative inputs exchanged places; the destination is unchanged."
+                  " Follow operand order through the passes below; this does not call for swapping"
+                  " the values' register allocations.")
+        for a, b in ([] if commuted else zip(rr, dr)):
             if a == b:
                 continue
             ps = [x for x in regs_of(pre) if hmap.get(x, x) == int(b)]
@@ -5710,7 +5758,8 @@ def cmd_why(src, func, uid, env, via=None):
         regs = regs_of(rtl)
         if rtl and regs != last:
             if last is not None:
-                changes.append((p, [r for r in last if r not in regs], [r for r in regs if r not in last]))
+                changes.append((p, [r for r in last if r not in regs], [r for r in regs if r not in last],
+                                register_permutation(last, regs)))
             trail.append(f"{PASS_NOTE.get(p, p)}: {', '.join(nm(r) for r in regs)}")
             last = regs
     if row:
@@ -5739,7 +5788,15 @@ def cmd_why(src, func, uid, env, via=None):
         explain_pre(wd, info["obj_name"], uid)
     trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read(), info["obj_name"])
     narrowed_sources = set()
-    for p, gone, new in changes:
+    for p, gone, new, permuted in changes:
+        if permuted:
+            print(f"  {p} reordered the register operands; no pseudo was replaced.")
+            if p in ("cse", "cse2"):
+                print("    fold_rtx (cse.c) puts a known constant second in a commutative operation,"
+                      " even when the operand is a register holding that constant. Check its earlier"
+                      " definition; a source expression that becomes constant only after CSE can"
+                      " preserve the other order. This is separate from class-head selection.")
+            continue
         if p not in ("cse", "cse2") or not new:
             if p == "regmove":
                 print(f"  regmove replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new)}.")
