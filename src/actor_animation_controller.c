@@ -4098,7 +4098,7 @@ s32 Actor_DestroyController(struct ActorAnimController *p)
         Sprite_Remove(c);
         c += 0xdc;
     }
-    if (SceneBody_GetById(*(u16 *)((u8 *)p + 0xf8a)))
+    if (SceneBody_GetById(p->resource))
         SceneBody_Unregister((u8 *)p + 0xe80);
     gScriptedActorController = 0;
 }
