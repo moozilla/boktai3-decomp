@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "scene_actor_control_phase.h"
@@ -19,6 +18,10 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 
 static inline void OrStatus(u16 status, u16 *flags)
 {
     *flags |= status;
+}
+static inline u8 HasAuxiliary(const u8 *state)
+{
+    return state[0xA3C] != 0;
 }
 // confidence=low: spins the auxiliary axe after damage and releases it after 30 frames.
 void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
@@ -48,7 +51,7 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
         }
         SetState(actor, 3, 0, 0);
         actor->fieldAA = 0;
-        if (state[0xA3C]) {
+        if (HasAuxiliary(state)) {
             u32 *flags = (void *)(state + 0xA38);
             *flags |= 2;
             state[0xCAB] = 0;
@@ -62,16 +65,8 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
             ActorShadow_Disable(state + 0xCAC);
             *flags = 1;
         }
-        {
-            u32 off = 0xED6;
-            register u8 *q asm("r0");
-            asm("" : "+r"(off));
-            q = state + off;
-            *q = 1;
-            off -= 2;
-            q = state + off;
-            *(u16 *)q = 0;
-        }
+        state[0xED6] = 1;
+        *(u16 *)(state + 0xED4) = 0;
     }
     if (*(u16 *)(context + 0xED4)) {
         --*(u16 *)(context + 0xED4);

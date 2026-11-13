@@ -883,6 +883,15 @@ draft; the union RandomTableView forms are no better.
 
 ### Axe_UpdateDamageSpin (src/fn/sub_080F9974.c, 080F9974): pin and one barrier left
 
+Resolved by dp-monsters: use a static inline u8 HasAuxiliary(const u8 *state)
+returning state[0xA3C] != 0 for the entry-path test. The predicate adds four
+flow-time instructions inside the constant-one lifetime; context grows from
+170 to 174 (priority 823 to 804), while the doubled REG_EQUIV lifetime grows
+faster. Final bytes remain unchanged and allocation matches. Unit MATCH with
+no concessions. Plain field-AA zero forms and a ready-byte initializer do not
+change the baseline. The previous +20 context-priority knob still matches.
+Prior diagnosis follows.
+
 Landed: the flags2D6 `mask` barrier is gone (`OrStatus(0x20, &actor->flags2D6)`, an inline
 whose constant parameter is set before the address). Draft `Axe_UpdateDamageSpin.c` has no
 concessions: `state[0xED6] = 1; *(u16 *)(state + 0xED4) = 0;` gives the ROM's code, including
