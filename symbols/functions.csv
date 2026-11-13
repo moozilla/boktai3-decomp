@@ -1059,6 +1059,7 @@ addr,name,mode,confidence,source,notes
 0802D914,Actor_UnregisterMotion,thumb,low,src-alias,Unregisters the embedded motion object and clears its registration flag
 0802D93C,Actor_SetPaletteBank,thumb,low,src-alias,Stores the current palette bank and applies it to the drawable
 0802D950,Actor_SetDefaultPaletteBank,thumb,low,src-alias,Stores a default palette bank separately and applies it as the current bank
+0802D960,Actor_ResetPaletteBank,thumb,low,src-alias,Restores the scene actor palette bank saved during drawable setup
 0802D96C,Actor_Destroy,thumb,low,src-alias,Unlinks the active actor and releases motion animation shadow and heap storage
 0802D9C0,Actor_RunCallbacks,thumb,low,src-alias,Invokes each populated slot in the active actor's four-entry callback array
 0802D9F8,Actor_UpdateMovementAnimationAndEffects,thumb,low,src-alias,Updates body movement and terrain height then advances animation and attachment timers
