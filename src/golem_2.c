@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 #include "golem_2.h"
 #include "script_utility.h"
@@ -32,7 +31,7 @@ void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
-void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
+#include "scene_actor_part_burst.h"
 void ActorShadow_Disable(void *);
 void ActorParticles_SpawnWideBurst(void *);
 void SceneActorControl_OnIdle(void);
@@ -44,16 +43,19 @@ static inline u32 Flags32At(struct SceneActorRegistryResetView *a, u32 mask)
 {
     return a->flags2CC & mask;
 }
-static inline u32 RandomFrom(const u16 *table)
+union HitSparkTable {
+    const u16 *table;
+    struct {
+        u16 offset;
+        u8 page;
+        u8 region;
+    } encoded;
+};
+static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
 {
-    u32 index = (gRandomIndex + 1) & 1023;
-    u32 v;
-    gRandomIndex = index;
-    index *= 2;
-    v = *(const u16 *)((u32)table + index);
-    v &= 3;
-    return v + 1;
+    return r->table;
 }
+
 
 /* Releases the defeated golem, runs its script, and emits the defeat burst. */
 void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
@@ -116,21 +118,17 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         rangeB.y = 60;
         rangeB.z = 60;
         {
-            register const u16 *table asm("sl") = gRandomTable;
-            s32 duration;
-            s32 scale;
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x20, 4,
-                                duration = 20, scale = 2, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x40, 4,
-                                duration, scale, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x5E, 4,
-                                duration, scale, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0x80, 4,
-                                duration, scale, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0xC4, 4,
-                                duration, scale, 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table), &rangeB, 0xF0, 4,
-                                duration, scale, 1);
+            union HitSparkTable source = {0};
+            const u16 *table;
+            source.encoded.offset = (u16)RANDOM_TABLE_ADDR;
+            source.encoded.page = (u8)(RANDOM_TABLE_ADDR >> 16);
+            source.encoded.region = (u8)(RANDOM_TABLE_ADDR >> 24);
+            table = ReadSparkTable(&source);
+            {
+                u8 firstCount = SceneActorEffects_NextSparkCount(table);
+                SceneActorEffects_SpawnDefeatSparks(actor, (const struct ContactPosition *)&rangeB,
+                                                   table, firstCount);
+            }
         }
         category = actor->category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
