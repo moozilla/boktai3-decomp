@@ -1706,6 +1706,53 @@ def equiv_constant_inherit(greg, lreg, uid, got):
     return None
 
 
+def missing_inherited_copies(rows, greg, lreg):
+    """Explain a ROM-only inverse copy that reload omitted by reusing its constant load.
+
+    Require the adjacent matching copy and consumer, and verify both against
+    the pre/post-reload RTL. This is compiler evidence about the candidate;
+    it does not assert which source spelling produced the ROM's extra copy.
+    """
+    after = {u: r for u, _, r in greg}
+    out = []
+    for i, row in enumerate(rows):
+        if row.get("tag") != "-":
+            continue
+        m = re.fullmatch(r"mov (r[0-7]), (r[89]|sl|sb|ip)", row.get("rom") or "")
+        if not m or i == 0 or i + 1 >= len(rows):
+            continue
+        low, high = m.groups()
+        prev, following = rows[i - 1], rows[i + 1]
+        if prev.get("tag") != "=" or prev.get("draft") != f"mov {high}, {low}":
+            continue
+        uid = following.get("uid")
+        if following.get("tag") != "=" or not uid:
+            continue
+        consumer = re.match(r"\(set \(reg[^)]*\) (.*)\)$", after.get(uid) or "")
+        if not consumer or int(low[1:]) not in regs_of(consumer.group(1)):
+            continue
+        evidence = equiv_constant_inherit(greg, lreg, uid, int(low[1:]))
+        if not evidence:
+            continue
+        pseudo, constant, load_uid, set_uid = evidence
+        hnum = {"sb": 9, "sl": 10, "ip": 12}.get(high, int(high[1:]) if high.startswith("r") else -1)
+        inverse = (rf"\(set \(reg(?:/\w)*:SI {hnum} \w+\) "
+                   rf"\(reg(?:/\w)*:SI {low[1:]} \w+\)\)")
+        if not re.fullmatch(inverse, after.get(set_uid) or ""):
+            continue
+        # A copy still present before jump2 was eliminated later, not inherited
+        # by reload. Do not mislabel that separate mechanism.
+        order = [u for u, _, _ in greg]
+        lo, hi = order.index(set_uid), order.index(uid)
+        copy_back = rf"\(set \(reg(?:/\w)*:\w+ {low[1:]} \w+\) \(reg(?:/\w)*:\w+ {hnum} \w+\)\)"
+        if any(re.fullmatch(copy_back, after[u] or "") for u in order[lo + 1:hi]):
+            continue
+        out.append({"rom_addr": row.get("rom_addr"), "copy": row["rom"], "pseudo": pseudo,
+                    "constant": constant, "load_uid": load_uid, "set_uid": set_uid,
+                    "consumer_uid": uid, "low": low, "high": high})
+    return out
+
+
 def hard_of(wd):
     """pseudo -> hard register, read off the insns: each operand before allocation (lreg) against the
     same operand after reload (greg). Covers local-alloc pseudos, which 'Register dispositions' omits."""
@@ -4427,6 +4474,11 @@ def why_all_issues(text):
     knob = lambda s: next(iter(re.findall(r"(?:AGBCC_|CSE_)[A-Z_]+=[^\s;()]+", s)), None)
     # Move explanations precede the corresponding why header, so collect them independently.
     for line in text.splitlines():
+        missing = re.match(r"  reload inheritance for missing (.*?): pseudo (\d+), consumer (\d+); (.*)", line)
+        if missing:
+            issues.append((("reload inheritance", int(missing.group(2))),
+                           "reload inheritance: missing `" + missing.group(1) + "`; " + missing.group(4),
+                           None, int(missing.group(3))))
         m = re.match(r"   `([^`]+)` (.*)", line)
         if m:
             issues.append((('order', norm_insn(m.group(1)), m.group(2)),
@@ -4634,14 +4686,25 @@ def why_all_details(src, func, env, rng=None):
             print(f"{func}: {count_text(rows)} differ; only branch targets moved, so there is no insn for why."
                   " The plain scope run names both targets; `scope.py FILE.c probe` finds the cse decision")
             return 1
-        print(f"{func}: {count_text(rows)} differ; no differing draft insn has an RTL uid, so there is nothing"
-              " for why. The ROM has insns the draft does not produce at all:")
+        print(f"{func}: {count_text(rows)} differ; checking ROM-only instructions (no differing draft RTL uid)")
         for r in rom_only[:8]:
             print(f"  {r['rom_addr']} {r['rom']}")
+        inherited = missing_inherited_copies(rows, insn_list(info["wd"], "greg"),
+                                            insn_list(info["wd"], "lreg"))
+        for hit in inherited:
+            print(f"  reload inheritance for missing {hit['copy']}: pseudo {hit['pseudo']},"
+                  f" consumer {hit['consumer_uid']}; already absent in greg/reload. Reload reused {hit['low']},"
+                  f" loaded with {hit['constant']} by insn {hit['load_uid']}, for pseudo {hit['pseudo']}"
+                  f" at insn {hit['consumer_uid']}; insn {hit['set_uid']} copied that same constant"
+                  f" into {hit['high']}. This is constant reload inheritance, not a missing C operation"
+                  " or a cse/PRE replacement. `AGBCC_RTRACE=1` exposes reload's decisions. The C must"
+                  " change the value/mode available to inheritance; an extra plain copy is redundant."
+                  " For a mask in a narrow field assignment, a literal inside the field expression"
+                  " can supply an HImode constant read through an SImode subreg (fact 221).")
         if any(re.match(r"(svc|swi)\b", r["rom"]) for r in rom_only):
             print("  `svc`/`swi` is a BIOS call written inline (the SDK's SystemCall macro: an asm statement);"
                   " agbcc has no C construct that emits it. Not a register or order problem: no knob applies.")
-        else:
+        elif len(inherited) < len(rom_only):
             print("  Find the C that produces them (a missing statement, a different expression shape); a"
                   " draft-only row that is alignment padding follows from the size change. A load or"
                   " computation the draft lacks is often one cse or gcse removed as redundant (PRE, a"

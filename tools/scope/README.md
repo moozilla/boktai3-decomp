@@ -2158,3 +2158,14 @@ which is exactly `10:1`. Not tested.
    pin-free draft drops from 52/48 differing instructions to one missing copy.
    Nine pins can be removed from the matching partial. `sp_split_masked_update`
    offers the rewrite for unsigned word locals and independent masks.
+
+221. **A literal mask in a halfword field expression can retain a copy from a high register.**
+   In ProximityEmitter_EmitParticle (08051A8C), `sample &= mask; p->position.x = base + sample - 127;`
+   with a word `mask = 255` sets and reads the shared mask in SImode. Reload inherits the low
+   register used to set r8 and omits the ROM's `mov r6, r8`. Writing
+   `p->position.x = base + ((sample >> 4) & 255) - 127;` makes the constant HImode and uses it
+   through an SImode subreg. The mode mismatch prevents inheritance, and the copy survives.
+   This removes the final pin and both barriers after fact 220's cursor rewrite. A narrower
+   mask variable alone does not do it: promoted scalar locals still expand in SImode.
+   `why all` now recognizes the missing inverse copy from matching pre/post-reload RTL,
+   distinguishes it from a copy removed after reload, and records the mechanism in its JSON summary.
