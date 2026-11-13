@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -14,16 +13,32 @@ static inline u32 rnd(u8 *tbl, s32 *idx)
 {
     return *(u16 *)(((*idx = (*idx + 1) & 0x3ff) << 1) + (u32)tbl);
 }
+union HitSparkTable {
+    const u16 *table;
+    struct {
+        u16 offset;
+        u8 page;
+        u8 region;
+    } encoded;
+};
+static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
+{
+    return r->table;
+}
+
 void TentacleActor_SpawnSparkBurst(u8 *p)
 {
     struct VAB v;
     u8 *tbl;
     s32 *idx;
+    union HitSparkTable source = {0};
     v.x = 0x50;
     v.y = 0x3c;
     v.z = 0x3c;
-    tbl = gRandomTable;
-    asm("" : "+r"(tbl));
+    source.encoded.offset = (u16)RANDOM_TABLE_ADDR;
+    source.encoded.page = (u8)(RANDOM_TABLE_ADDR >> 16);
+    source.encoded.region = (u8)(RANDOM_TABLE_ADDR >> 24);
+    tbl = (u8 *)ReadSparkTable(&source);
     idx = &gRandomIndex;
     SparkParticle_Spawn(p, (rnd(tbl, idx) & 3) + 1, &v, 0x20, 4, 20, 2, 1);
     SparkParticle_Spawn(p, (rnd(tbl, idx) & 1) + 1, &v, 0x40, 4, 20, 2, 1);
