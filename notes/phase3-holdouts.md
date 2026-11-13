@@ -4976,3 +4976,186 @@ Scratch variants are under build/cx/work/SceneActorContacts_SelectForActor/.
   allocated before the quadrant, or preserve the OR copy in the plain draft
   without introducing a separate flag-read definition in each direction arm.
   Scratch: `build/cx/work/SceneActorAnimation_SelectDirectionalFlags/`.
+
+### TetherActor_UpdateBounceReturn (0804CB4C): one pin removed
+
+Removed the destination r1 pin; its ordinary pointer already receives the ROM
+register. Three pins remain: initial frame value, incremented value and falling
+height offset. Stock full-unit check: MATCH (20,516 bytes, 114 functions).
+The weekly stop request ended work on this item.
+
+Best fully pin-free draft:
+`notes/phase3-drafts/dp-field/TetherActor_UpdateBounceReturn.c`
+(23 ROM / 16 draft differing instructions, shape 11, 340 versus 356 bytes).
+It uses the named displayOffsetY field instead of the raw height address.
+Two independent decisions remain: a repeated halfword zero extension is removed,
+and the later counter pointer takes r6 instead of r8. On the all-pin-free
+baseline, `AGBCC_FORCE=counter:8` fixes all allocation differences and leaves
+only the missing two-instruction zero extension (2/0). This is a partial
+diagnosis, not an exact matching override.
+
+Removing both frame-value pins while retaining the height-offset pin also
+leaves only that zero extension (2/0). Removing the initial frame pin alone,
+with u16 or u32, is 3/3: the initial load takes r1 rather than r0 and changes
+the increment. No single probed CSE canonicalization or jump-follow decision
+restores the repeated extension (one canonicalization and ten follows tested).
+
+Further C attempts after the older field-effects and round-24 passes:
+union halfword extraction and inline u16/u32/s32 narrowing helpers retain 2/0;
+a second memory read gives 2/2 but different instructions; signed narrowing
+is 7/7; an explicit mask or union high-half clearing gives 2/5; normalizing
+incremented in place is 3/3. A nonempty single-pass loop changes shape (11/9).
+Representing counter as an integer leaves the same allocation; shared sample
+and origin capture forms worsen to 34/29. None was landed.
+
+Next: establish which pass removes the second zero extension and find a real
+frame-update helper or lifetime split that preserves it, then find a counter
+load form whose class/lifetime naturally takes r8. Scratch variants and compiler
+evidence remain in build/cx/work/TetherActor_UpdateBounceReturn and build/scope.
+
+### AreaEffect_AddSpriteFromScript (0804E388): resolved
+
+Removed both pins and the pointer barrier. Started from the field-effects
+ground-height/cell-index helper draft, which already removes the count and
+point constraints except for 19/19 allocation differences. Added a small
+AreaEffect_IsVisible reader; all 428 bytes match with the stock compiler.
+Named entry fields replace the old enabled/flags raw offsets.
+
+The confirmed diagnostic is AGBCC_PRI=175:+5 on the baseline: the stride
+constant has priority 1600, just below manager at 1604. The visibility helper
+shortens the stride's measured lifetime from 25 to 23 (doubled to 46 for
+REG_EQUIV), raising its priority to 1739. Manager's lifetime also shortens
+from 187 to 185, raising its priority only to 1621. Stride therefore takes r5
+first and manager r6, fixing every difference. This is a lifetime reduction,
+not an increase in manager lifetime. An increment-count helper has no effect;
+a current-entry helper changes the shape and does not match.
+
+### AreaEffect_UpdateLinkPlayerResources (0804ECD0): three pins and barrier removed
+
+Passing the loop index by pointer to the inline link-value reader removes the
+selected-index pin, loop-index pin and loop-index barrier. The address-taken
+local preserves the repeated index/offset calculations without PRE replacement.
+Reading the conversion counter as u16 removes its value pin; the subtraction
+uses a separate u32 remaining value, stored before assigning back to the u16
+loop value. This leaves narrowing after the store and amount increment, exactly
+as in ROM. A direct u16 subtraction narrows two instructions too early (2/2).
+The base now uses the named resourceFractions field. Two pins remain, previous
+and the inner-loop base.
+
+Saved fully pin-free draft:
+`notes/phase3-drafts/dp-field/AreaEffect_UpdateLinkPlayerResources.c`
+(40/40, shape 6, exact 252-byte size). Exact diagnostic on that draft:
+`AGBCC_FORCE=previous:4,base:3 AGBCC_NOMOVE=314`. The force names resolve to
+pseudos 85 and 92. The hoist is the inner counter address: loop threshold
+26 x savings 1 x lifetime 3 exceeds 9 instructions. Forcing the two registers
+without preventing this hoist gives 31/25, shape 12. No single CSE/PRE/loop
+probe changes the clean draft's count (18 decisions tested).
+
+Baseline simple pin removal is 40/44, shape 14. PRE shares both offset=i*2 and
+next=i+1 across branches; disabling either improves only two instructions.
+Inlining the link read directly also matches while removing its selected pin,
+but passing the index by pointer removes the index pin and barrier as well.
+
+Further attempts: previous as u16, s32 or union (25/27, shape 4); splitting
+the add and store tails across mode branches (25/29, shape 6); inner goto loop
+(52/62), with u16 counter (48/58); pointer-union initializer, direct union member
+uses, fraction-address getter and conversion helper all retain the unwanted
+hoist (30/24 on the isolated base-pin removal). Raising offset priority does
+not resolve the previous/gain allocation. No new concessions were introduced.
+
+Next: find a natural conversion-loop form that retains its address addition
+inside the loop, then a gain/previous lifetime with previous in r4. The partial
+removes four concessions and leaves the earlier script/player logic intact.
+
+### AreaEffect_UpdateLinkVisibility (0804EDD0): resolved
+
+All six pins and two barriers removed. Use ordinary indexed for loops in
+the two visibility arms, sharing one function-scope index (fact 45), and
+return u8 from the link-value reader. Named hasSprite/enabled/spriteFlags
+fields replace raw pointer arithmetic. Stock check MATCH (196 bytes).
+
+The u8 return alone removes the sample pin with no differences. The natural
+show/hide loops in separate inline helpers give 17/17, shape 2: the separate
+indices lose r4 to the PRE count address. First index has priority 3870 versus
+count-address 4117; AGBCC_PRI=i:+248 improves to 6/6, shape 0. Sharing the
+function-scope index across both direct loops gives the full match, including
+the second count-pointer copy. Passing an index pointer into both helpers
+changes shape badly (48/62); explicit pointer-loop helpers also fare worse.
+
+### ResourceStation_CheckInteraction (0804EFB4): one pin removed
+
+Repeating the final store/return in the nonplayer and accepted-interaction
+branches removes the value r0 pin. Named player/action/inputKeys fields replace
+the old raw accesses, with no byte changes. inputKeys at 0x348 was added to
+the local player view in a separate layout-preserving header change; all three
+including units match. Four pins and three barriers remain. Stock interaction
+unit check MATCH (256 bytes).
+
+Best pin-free draft:
+`notes/phase3-drafts/dp-field/ResourceStation_CheckInteraction.c`
+(33/33, shape 0, exact size), improved from baseline 36/36. Remaining registers
+include station versus triggerOffset, the nearby address scratch and terminal
+stores. Station has priority 3428 but triggerOffset is locally allocated r4
+first; raising station priority by 10000 has no effect. Forcing station to r4
+reduces the baseline to 17/17. Value's baseline priority is 3750 versus its
+destination's 10000; duplicated terminal stores remove that pin naturally.
+
+An isolated named nearby-field store removes nearbyOffset's pin/barrier and
+the nearby pointer pin, leaving only 3/3. `AGBCC_SPILL=10:2` on
+partial-nearby-field.c gives MATCH: reload 10 needs r5 instead of r2 on the
+spill list r1,r2,r5. Clear-offset removal collapses a needed separate address
+calculation (4/2, shape 2). Removing the outside barrier alone is 3/3.
+A direct setter helper retains the nearby scratch difference; separate clear
+and address-returning helpers give 7/5 to 12/12 and do not restore all copies.
+
+Other attempts: u8 value, early trigger-offset declaration, reuse of x/z or
+playerKind for the trigger offset (unchanged allocation); named trigger/state
+fields (20/15, shape 13); named player fields alone (unchanged); deleting their
+now-unused offset calculations and old labels works for the landed partial
+but worsens full pin removal to 43/42, shape 7. Retained the better shape-zero
+draft for the next pass. Prior round-11 work already tried 24 source variants.
+
+Next: use a natural branch/helper structure to account for two more reload
+choices before the nearby store, then move the trigger-offset value out of
+local allocation without introducing an early address computation. No complete
+combined override was established for the full pin-free draft.
+
+### ResourceStation_UpdateDigits (0804F1FC): two counter pins removed
+
+A single function-scope i shared by the visible and hidden loops removes both
+counter pins (fact 45). Stock unit MATCH, 392 bytes. Five pins and four barriers
+remain. Best fully pin-free draft is
+`notes/phase3-drafts/dp-field/ResourceStation_UpdateDigits.c` (16/18, shape 16),
+using direct screen fields, ordinary digit postincrement and named digitGraphics.
+The baseline with all pins simply removed is 32/36, shape 26.
+
+Allocation evidence: removing only object from the shared-index partial is
+12/12; object goes to r9 because digit takes r8 first (priorities 2213 vs 2777,
+object 9 refs/122 live; digit 5 refs/36 live). Raising object priority by 565
+is not an exact diagnosis: it worsens to 34/34. Moving digit initialization
+ahead of projection fixes every register but moves mov r9,sp earlier (2/2
+including shifted padding, exact size). Before the divisions it is 6/6.
+Next useful allocation form should lengthen digit lifetime without moving its
+initialization instruction.
+
+Screen-address evidence: plain pointer fields introduce two PRE replacements
+for frame+16, carrying the address through a high register. Disabling PRE 1
+or 2 alone gives 24/24 or 26/26, not MATCH. Direct local.screen fields avoid
+that PRE and give 16/18 but expand separate frame pointers and a hoisted frame
+base. Probe confirms an invariant hoist at UID 489 in postincrement.c; disabling
+it leaves the count 16/18, changing where the frame-base copy occurs. There is
+no exact combined override for the full clean draft.
+
+C attempts: private projection helper (same shared-index-clean result 25/25);
+shared damage-number projector requires reconciling its Anim_LoadKeyframe
+prototype before evaluating; direct screen setter with u16/u32 parameter
+(25/27); full-state screen getter with u16/u32 return (isolated two read pins
+remain 4/4); keeping the postincrement read alive by assigning digit=read
+removes needed operations (3/1); pointer-taking digit reader (13/13). Ordinary
+postincrement improves the full draft's shape from 18 to 16 but still lacks
+the ROM's preincrement/rewind/ldm sequence. Prior round-11 pass tried 20 forms.
+
+Next: a screen-access helper that naturally uses a frame-relative read followed
+by a screen-relative write, and a digit cursor form preserving the live
+postincrement without a barrier. The object-only frontier may yield another
+small reduction independently.

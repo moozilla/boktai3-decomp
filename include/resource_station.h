@@ -24,7 +24,9 @@ struct ResourceStationPlayer {
     u32 stateTag, flags; /* stateTag interpretation is tentative; active value is1 */
     u8 unknown24[12];
     struct ResourceStationPosition position;
-    u8 unknown38[0x3E0];
+    u8 unknown38[0x310];
+    const u16 *inputKeys; /* 0x348, same input view as Player.inputKeys. */
+    u8 unknown34C[0xCC];
     u8 actionMode;
     u8 unknown419[0xF];
     u16 resource, resourceMaximum;

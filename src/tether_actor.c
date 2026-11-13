@@ -3433,7 +3433,7 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
             else {
                 u32 height = (7 - incremented) << 4;
                 register u32 heightOffset asm("r6") = 0x380;
-                register u16 *destination;
+                u16 *destination;
                 destination = (u16 *)((u8 *)actor + heightOffset);
                 *destination = height;
             }
