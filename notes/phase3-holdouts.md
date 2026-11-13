@@ -1381,3 +1381,36 @@ NOTIE counterfactual. Next: an ordinary source form that keeps the offset alive
 past the arm-1 source-address add, or makes that address global without moving
 its calculation ahead of the next-link address. Simple field accessor inlines
 have been ruled out.
+
+
+### ModifierMenu_SelectPendingSource (0803FCC4): separate scale, final sum allocation
+
+Tags: #menus #matching #compiler
+
+Best ordinary draft: `notes/phase3-drafts/dp-menus/ModifierMenu_SelectPendingSource.c`.
+Separate category and index inputs from the scaled intermediate. This keeps all
+instructions and the 160-byte extent; four instructions differ, the two sums and
+their halfword stores using r0 rather than r1. Source remains unchanged with two
+pins. The earlier draft's 4 / 4 result is reproduced.
+
+Exact diagnostic: on `build/cx/work/ModifierMenu_SelectPendingSource/base.c`,
+`AGBCC_NOTIE=166,220 AGBCC_FORCE=73:1,94:1` MATCH. Neither part alone suffices:
+NOTIE alone still allocates the now-separate output in lowest free r0; FORCE
+alone propagates the forced quantity backward through the multiply chain and
+changes byte loads/address registers. The combined knob identifies both the
+quantity split and its final choice. Local-alloc.c block_alloc first ties dying
+input/output pseudos, then allocates quantities by suggestions/lifetime.
+
+Tried signed/unsigned narrow result and displacement types, packed bitfields,
+full-word/halfword union result views with and without initialization, index-first
+compound sums, reusing category for the final result, separate tripled/scaled
+values, typed cursor-index and output-pointer inlines, a sum inline, and identical
+joins controlled by category/index bits. Plain narrow and union forms leave the
+4 / 4 allocation; unsigned narrow scaling adds instructions; result reuse ties
+backward and changes both multiply/load groups. Missing return keeps incoming r0
+live and changes dispatch/epilogue, so it does not match here.
+
+Persistent store: `build/matchsearch/ModifierMenu_SelectPendingSource`, including
+the exact combined counterfactual. Next: a meaningful result representation
+that both separates the final add quantity from the scale and prefers the old
+category register r1. A simple scalar assignment only achieves one side.
