@@ -5,14 +5,14 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
     u8 *next = &emitter->nextParticle;
     struct ProximityEmitterParticle *particle = &emitter->particles[*next];
     const u16 *random;
-    register u32 *indexAddress asm("r9");
-    register u32 index asm("r1"), mask;
+    u32 *indexAddress;
+    u32 index, mask;
     register u32 xzMask asm("r8");
     SpriteDrawable_SelectTileFrame(particle, resource, 2);
     particle->flags &= ~1;
     random = (const u16 *)RANDOM_TABLE_ADDR;
     {
-        register u32 *address asm("r1") = &gRandomIndex;
+        u32 *address = &gRandomIndex;
         indexAddress = address;
         index = *address + 1;
     }
@@ -30,27 +30,27 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
         sample &= applied;
         particle->position.x = *address + sample - 127;
     }
-    index = (index + 1) & mask;
+    index += 1;
+    index &= mask;
     {
-        register s32 sample asm("r0") = random[index];
-        register u16 *address asm("r12");
-        u32 yOffset = 0xAE;
+        s32 sample = random[index];
+        u16 *address;
         u16 *lowAddress;
         u32 yMask;
-        register u32 base asm("r6");
-        yOffset += (u32)emitter;
-        lowAddress = (u16 *)yOffset;
+        u32 base;
+        lowAddress = (u16 *)&emitter->position.y;
         address = lowAddress;
         asm("" : "+r"(address));
         yMask = 63;
         sample &= yMask;
         {
-            register u16 *loadAddress asm("r6") = address;
+            u16 *loadAddress = address;
             base = *loadAddress;
         }
         particle->position.y = sample + base;
     }
-    index = (index + 1) & mask;
+    index += 1;
+    index &= mask;
     {
         s32 sample = random[index];
         u16 *address = (u16 *)&emitter->position.z;
@@ -64,9 +64,10 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
         u32 zero = 0;
         particle->velocityX = zero;
     }
-    index = (index + 1) & mask;
+    index += 1;
+    index &= mask;
     {
-        register u32 *address asm("r2") = indexAddress;
+        u32 *address = indexAddress;
         *address = index;
     }
     {
@@ -76,7 +77,7 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
         particle->velocityY = sample;
     }
     {
-        register u32 zero asm("r6") = 0;
+        u32 zero = 0;
         particle->velocityZ = zero;
         particle->frame = zero;
     }
