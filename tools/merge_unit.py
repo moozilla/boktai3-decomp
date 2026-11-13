@@ -8,6 +8,7 @@ externs, struct definitions, static helpers, #defines) are kept once; items
 whose name repeats with a different body are reported as conflicts, which must
 be unified (usually into a shared header) before merging. With --write the
 output is written and the inputs are removed without changing the git index.
+Each input must be listed once; an existing output must itself be an input.
 Check the merged translation unit afterwards:
 merging can change code generation only through such declarations.
 """
@@ -87,10 +88,17 @@ MARK = "// MATCHING_CONCESSION: register-pinning"
 def write_merge(out, paths, text):
     """Write the complete result before removing inputs; leave staging to callers."""
     target = os.path.abspath(os.path.join(ROOT, out))
+    sources = [os.path.abspath(os.path.join(ROOT, path)) for path in paths]
+    if len(sources) != len(set(sources)):
+        raise ValueError("merge inputs must name each source file only once")
+    if os.path.exists(target) and target not in sources:
+        raise FileExistsError(f"existing output must also be listed as an input: {out}")
+    for source in sources:
+        if not os.path.isfile(source):
+            raise FileNotFoundError("merge input is not a source file: " + source)
     with open(target, "w") as stream:
         stream.write(text)
-    for path in paths:
-        source = os.path.abspath(os.path.join(ROOT, path))
+    for source in sources:
         if source != target:
             os.unlink(source)
 
@@ -141,7 +149,10 @@ def main():
     names = [n for p in a.inputs for n in c_functions(os.path.join(ROOT, p))]
     print(f"{len(a.inputs)} files -> {a.out}: {len(names)} functions")
     if a.write:
-        write_merge(a.out, a.inputs, text)
+        try:
+            write_merge(a.out, a.inputs, text)
+        except (OSError, ValueError) as error:
+            ap.error(str(error))
 
 
 if __name__ == "__main__":

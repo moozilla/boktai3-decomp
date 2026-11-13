@@ -262,3 +262,24 @@ Final menu-display validation: all 14 functions MATCH (2516 bytes); all 106 tran
 Link panel revisit after the run was reopened: 0810C238–0810C724 now matches as a five-function unit (1260 bytes). The earlier mismatch came from placing two whole 0x5FC slots at their status-byte offset 0x940. The tentative full slots begin at 0x348, with their last four-byte records at 0x940/F3C; the second slot ends at the callback at 0xF40, preserving allocation size 0xF78. Earlier slot contents remain unknown. Canonical task/widget/resource/palette types replace partial local views. Both renamed callers MATCH. Structured connection-status returns changed branch placement; retain the matched shared exits. The existing session-payload pointer guard still affects generated code and now refers to the canonical sessionData field.
 
 Link-panel controller revisit: 0810C724–0810CB7C now joins the preceding five helpers in src/link_panel.c, giving thirteen contiguous functions and 2372 matching bytes. A four-byte LinkPanelStatus sits at the end of each tentative 0x5FC slot; advancing its cursor by sizeof(LinkPanelEntry) preserves the original register allocation. The message initializer retains its unused incoming panel parameter because its caller explicitly passes it. Direct state-callback dispatch matches. Scripts, text-window handles, selection bytes and task state use the complete layout; the session's exit-input-lock byte is named without changing any offsets. All 121 transitive header consumers MATCH; no scored concession sites. The following old_agbcc reset remains separate.
+
+
+## Reopened-run handoff
+
+After the later Continue instruction reopened work, the deferred link panel and
+its controller were resolved as one 13-function unit. The final tree now has 24
+consolidated translation units, incorporating 394 original one-function files.
+All 121 consumers of the last shared session-header change MATCH, and the final
+24-unit concession scan has no scored sites. Coverage gain remains 0.0 percentage
+points: this is cleanup of existing matches.
+
+The merge writer now checks duplicate normalized input paths, missing inputs and
+an existing output omitted from the input list before writing or deleting any
+file. Four regression cases verify that rejected operations preserve both source
+and existing output contents. All nine merge tests and five range tests pass.
+
+A fresh queue audit leaves only the previously documented wireless scene,
+inventory-controller, session/snapshot, and record-menu layout migrations, plus
+small compiler-boundary fragments around the consolidated dialogue/display/link
+units. Inventory panel and later rows remain outside this worker's scope. The
+coordinator performs the combined ROM build and resolves the shared-layout work.

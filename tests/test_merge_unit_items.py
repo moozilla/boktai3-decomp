@@ -9,6 +9,45 @@ from progress import _bodies
 
 
 class FunctionBoundaries(unittest.TestCase):
+    def test_duplicate_inputs_preserve_every_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "input.c")
+            output = Path(directory, "unit.c")
+            source.write_text("original")
+            with self.assertRaisesRegex(ValueError, "only once"):
+                write_merge(str(output), [str(source), str(source)], "merged")
+            self.assertEqual(source.read_text(), "original")
+            self.assertFalse(output.exists())
+
+    def test_normalized_duplicate_inputs_are_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "input.c")
+            source.write_text("original")
+            alias = directory + "/./input.c"
+            with self.assertRaises(ValueError):
+                write_merge(str(source), [str(source), alias], "merged")
+            self.assertEqual(source.read_text(), "original")
+
+    def test_unlisted_existing_output_is_preserved(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "input.c")
+            output = Path(directory, "unit.c")
+            source.write_text("original")
+            output.write_text("unrelated unit")
+            with self.assertRaises(FileExistsError):
+                write_merge(str(output), [str(source)], "merged")
+            self.assertEqual(source.read_text(), "original")
+            self.assertEqual(output.read_text(), "unrelated unit")
+
+    def test_missing_input_preserves_existing_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory, "unit.c")
+            missing = Path(directory, "missing.c")
+            output.write_text("original")
+            with self.assertRaises(FileNotFoundError):
+                write_merge(str(output), [str(output), str(missing)], "merged")
+            self.assertEqual(output.read_text(), "original")
+
     def test_write_replaces_output_input_without_staging(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory, "unit.c")
