@@ -69,7 +69,7 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
     struct SpawnArgs args = {count, options, position};
     const struct ContactPosition *velocityInput = velocityArg;
     const struct ContactPosition *velocity;
-    register struct Manager *m asm("r1");
+    struct Manager *m;
     u8 *resource;
     struct Group *g;
     struct Group *pool;
@@ -179,13 +179,12 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, const struct ContactPosi
                             p->position = *source;
                         }
                         {
-                            register u32 *entries asm("r1") = gUnk_08604B90;
+                            u32 *entries = gUnk_08604B90;
                             s32 type;
                             u32 offset;
                             optionValue = args.options;
                             type = optionValue;
                             offset = type * sizeof(*entries);
-                            asm("" : "+r"(offset) : "r"(type));
                             p->tile = (*((u16 *)(resource + 4))) + *(u32 *)(offset + (u32)entries);
                         }
                         p->priority = g->priority;
