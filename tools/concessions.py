@@ -11,7 +11,8 @@ Scored kinds, in two groups:
   `asm("" ::: "memory")`).
 * Judgment calls: `debug-nop` (DEBUG_NOP()), `empty-loop` (`do { } while (0)`), `empty-if`
   (an `if` with nothing in its body), `single-use-macro` (a statement macro used at one site,
-  tools/statement_macros.py), `volatile` (a volatile local, a `T *volatile` or a
+  tools/statement_macros.py), `volatile` (a volatile local, including the `vu32`/`vs16`
+  family of typedefs, a `T *volatile` or a
   `(volatile T *)&x` cast), `alias` (an `extern ... asm("Symbol")` declaration that gives a
   function a second prototype), `cflags` (a `// CFLAGS:` line other than the default flags,
   outside src/lib) and `raw-offset` (`*(u16 *)((u8 *)p + 0x172)`: a constant byte offset where
@@ -65,6 +66,10 @@ _ALIAS = re.compile(r'^[^\n#]*\b(\w+)\s*\([^;{}]*\)\s*(?:asm|__asm__)\s*\(\s*"[A
 _CFLAGS = re.compile(r"^// CFLAGS: (.*)$", re.M)
 _ALLOW = re.compile(r"concession-ok\(([\w,\s-]*)\)\s*:?\s*(.*?)\s*(?:\*/|$)", re.M)
 _COMMENTS = re.compile(r'"(?:\\.|[^"\\\n])*"|/\*.*?\*/|//[^\n]*', re.S)
+_VOLATILE_TYPEDEF = re.compile(
+    r"\bv(?:[us](?:8|16|32|64)|bool(?:8|16|32))\s+(?:const\s+)?[A-Za-z_]\w*\s*[=;,\[]")
+_FUNCTION_BODY = re.compile(r"[A-Za-z_][\w\s\*]*?\b\w+\s*\([^;{]*\)\s*\{", re.S)
+_FUNCTION_MACRO = re.compile(r"#\s*define\s+\w+\(")
 
 
 @dataclass(frozen=True)
@@ -118,6 +123,28 @@ def asm_kind(rest: str) -> str:
     return "barrier"
 
 
+def _volatile_typedef_locals(code: str):
+    """Offsets of scalar volatile-typedef declarations in functions and macros.
+
+    Top-level register layouts, globals and typedefs are not automatic locals.
+    Pointer declarations are intentionally excluded, just as for volatile T *reg.
+    """
+    if not _VOLATILE_TYPEDEF.search(code):
+        return
+    from merge_unit import items
+
+    offset = 0
+    for item in items(code):
+        start = code.find(item, offset)
+        offset = start + len(item)
+        if not (_FUNCTION_BODY.match(item.lstrip()) or _FUNCTION_MACRO.match(item.lstrip())):
+            continue
+        # String contents are data even when they spell a declaration.
+        declarations = _COMMENTS.sub(lambda m: re.sub(r"[^\n]", " ", m[0]), item)
+        for match in _VOLATILE_TYPEDEF.finditer(declarations):
+            yield start + match.start()
+
+
 def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + TRACKED) -> list[Site]:
     """Every concession in TEXT (a function body, a unit or a header), excused or not.
     SINGLE_USE names the statement macros used at only one site in the tree."""
@@ -125,6 +152,7 @@ def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + TRACKE
     ok = allows(text)
     library = is_library(path)
     found: list[Site] = []
+    volatile_spans = []
 
     def add(pos, kind):
         line = _line(code, pos)
@@ -139,6 +167,12 @@ def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + TRACKE
         if kind in kinds:
             for m in rx.finditer(code):
                 add(m.start(), kind)
+                if kind == "volatile":
+                    volatile_spans.append(m.span())
+    if "volatile" in kinds:
+        for pos in _volatile_typedef_locals(code):
+            if not any(start <= pos < end for start, end in volatile_spans):
+                add(pos, "volatile")
     if "single-use-macro" in kinds and single_use:
         rx = re.compile(r"\b(" + "|".join(map(re.escape, sorted(single_use))) + r")\s*\(")
         for m in rx.finditer(code):
