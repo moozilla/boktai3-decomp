@@ -9072,15 +9072,18 @@ addr,name,mode,confidence,source,notes
 08218FB4,TextWindow_DrawWideGlyph,thumb,low,src-alias,
 08219054,TextWindow_InitializeGraphics,thumb,low,src-alias,Empty initialization hook called before text window tile graphics are filled; provisional role
 08219058,TextWindow_FillTileGraphics,thumb,low,src-alias,Fills 8 KiB of background VRAM with palette index 4 during text window setup
+0821907C,TextWindow_LoadFramePalette,thumb,low,decomp,Select a frame palette resource and copy two palette banks
 082190BC,Mosaic_Initialize,thumb,low,src-alias,Clears the pending update flag and cached mosaic parameters
 082190E0,Mosaic_SetParameters,thumb,low,src-alias,Stores packed mosaic sizes and target masks and requests a hardware update
 0821910C,Mosaic_ResetParameters,thumb,low,src-alias,Queues zero mosaic sizes and clears the background target mask
+08219134,Mosaic_UploadRegisters,thumb,low,decomp,Apply pending mosaic layer masks and mosaic size registers
 08219234,ScanlineEffect_Initialize,thumb,low,src-alias,Defaults the target to BG2 and clears the transfer mode and source
 08219254,ScanlineEffect_SetSource,thumb,low,src-alias,Sets the target background and transfer mode and scanline source pointer
 08219270,ScanlineEffect_GetBuffer,thumb,low,src-alias,Returns the fixed RAM buffer used to stage scanline transfers
 08219278,ScanlineEffect_GetHorizontalScrollRegister,thumb,low,src-alias,Returns the selected background horizontal scroll register
 082192B4,ScanlineEffect_GetVerticalScrollRegister,thumb,low,src-alias,Returns the selected background vertical scroll register
 082192F0,ScanlineEffect_StageTransfer,thumb,low,src-alias,
+082194D4,ScanlineEffect_StopTransfer,thumb,low,decomp,Clear scanline buffer and disable pending DMA mode
 08219574,Blend_SetAlpha,thumb,low,src-alias,Selects blend targets and enables alpha blending with the supplied coefficients
 082195D0,Anim_ResetDefaultFlags,thumb,low,src-alias,Clears the global halfword copied into newly loaded animations; tentative flags interpretation
 082195E0,Anim_Remove,thumb,low,src-alias,
