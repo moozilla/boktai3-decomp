@@ -14,13 +14,28 @@ struct OrbitWavePair {
 
 /* Steering uses base as its target, offset as velocity, speed as the turn
  * limit, and radius as movement speed. Orbit modes reuse those fields. */
+enum OrbitMotionMode {
+    ORBIT_MOTION_OFFSET = 0,
+    ORBIT_MOTION_HALF = 1,
+    ORBIT_MOTION_QUARTER = 2,
+    ORBIT_MOTION_EIGHTH = 3,
+    ORBIT_MOTION_SIXTEENTH = 4,
+    ORBIT_MOTION_STEP = 5,
+    ORBIT_MOTION_STEER_XZ = 6,
+    ORBIT_MOTION_STEER_XY = 7,
+    ORBIT_MOTION_ARC = 8,
+    ORBIT_MOTION_CROSSED_SINES = 9,
+    ORBIT_MOTION_WAVE_APPROACH = 10,
+    ORBIT_MOTION_INTERPOLATE = 12,
+};
+
 struct OrbitMotion {
     struct OrbitVector *position;
     struct OrbitVector start;
     struct OrbitVector base, offset;
     struct OrbitVector center;
     s16 startAngle, endAngle;
-    u8 unk28, state, angle, speed;
+    u8 mode, state, angle, speed;
     s16 radius;
     s16 radius2;
     s16 radius3;
