@@ -38,3 +38,13 @@ capture-generation commands are documented in `port/README.md`.
 This demo replays graphics input. It does not run game logic, emulate the CPU,
 or load a ROM directly. Captures preserve HBlank changes; a single end-of-frame
 memory dump would lose those effects.
+
+Measure local replay cost (including capture parsing and output allocation):
+
+```sh
+node port/tests/ppu_benchmark.mjs build/demo/motion/motion_030.ppu.gz 300 \
+  > build/demo/performance.json
+```
+
+The report records median, p95 and mean time after warm-up. It excludes canvas
+display and depends on host load; it is not a browser frame-rate guarantee.
