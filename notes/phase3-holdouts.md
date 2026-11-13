@@ -5159,3 +5159,147 @@ Next: a screen-access helper that naturally uses a frame-relative read followed
 by a screen-relative write, and a digit cursor form preserving the live
 postincrement without a barrier. The object-only frontier may yield another
 small reduction independently.
+
+### SceneActorRegistry_SetMovementMode — offset materialization and allocation
+
+Tags: phase3, dp-scene1, SceneActorRegistry_SetMovementMode, 0x08070070
+
+The saved fully pin-free draft is 186 ROM / 190 draft instruction differences,
+shape 12, 832 versus 824 bytes. The source has 38 pins and 13 barriers; individual
+and grouped removal found no free reduction. The original source remains unchanged
+and passed tools/check.py (MATCH, 824 bytes) at shutdown. No matching partial landed.
+
+Probe tested four CSE canonical-register choices and eleven jump follows; none
+changed the count. There are no PRE replacements or loop hoists in this draft.
+Keeping only the actor, mode and savedFlags pins reduces the count to 152/156,
+with the same shape 12. No single matching compiler knob was found. The earlier
+round11-c mode-priority observation does not resolve the remaining offsets.
+
+Typed field replacement with an extra actor view gives 219/217 differences,
+shape 52, at the correct size. Simplifying the mode-zero and mode-one initialization
+blocks and rooting a typed group view at unknown3D4 gives 175/183, shape 82,
+848 bytes. Replacing only the player-route-ready tail gives 51/54, shape 25,
+832 bytes: the change also affects reload allocation outside the replaced block.
+These larger structural changes did not produce a matching partial.
+
+Four isolated replacements in the otherwise original source expose smaller
+boundaries. Direct savedFlags = &actor->flags2D4 removes an offset pin/barrier,
+but its three address-materialization instructions use r0 instead of r2. Direct
+field2C2 = 64 leaves three register differences: offset r0 rather than r2 and
+address r5 rather than r1. The typed flags414 update leaves three differences,
+shape two: its offset uses r0 rather than r6 and its halfword read moves ahead
+of mask initialization. Direct field416-to-field418 assignment leaves nine
+register-only differences. These are allocation/lifetime boundaries, rather
+than evidence that the field layouts are wrong.
+
+Next: preserve the field-address lifetimes through a typed common base, and
+initialize the flags414 mask before the read. Establish a small matching partial
+around one of the three-difference groups before simplifying either full mode
+arm. The saved draft retains existing offset expressions as a diagnostic
+baseline; typed replacements still need the allocation mechanism above.
+
+The weekly-run stop arrived during this item. Work ends here; queue item 28
+(SceneActorRegistry_DefeatActorsFromScript) and later items were not started.
+
+### sub_08070910 — flag-result allocation
+
+Tags: phase3, dp-scene1, sub_08070910, 0x08070910
+
+Saved pin-free draft has eight ROM / eight draft register-only differences,
+shape zero, same 304 bytes. Expressing the second availability check directly
+as value = actor->flags2D0 & excluded fixes four of the original twelve differences.
+The original three-pin source remains unchanged; no matching partial was found.
+
+The first availability value is a global pseudo with 16 loop-weighted refs,
+live ten, priority 64000. Its first mask is local, priority 40000, and takes r0;
+the second field address also conflicts in r0. Raising the value priority by
+100000 does not fix allocation. Forced value r0 alone aliases the mask and
+loses the load; forcing both value/mask additionally rotates field-address and
+reload allocation. These forced results are diagnostic only and are not valid
+matching drafts. No exact single-knob match was found. The canonical-register
+and jump-follow probe changes none of the original twelve differences.
+
+The final halfword OR is canonicalized to loaded-value | changeMask, then
+regmove ties the result to the loaded value. ROM instead keeps the constant in
+r0 and loads the halfword in r1. why identifies that tie at insn 333 in the saved
+C form. NOTIE combined with the forced availability registers did not reverse it.
+Separate change masks, direct stores, load-first forms and u16 locals alter
+allocation or hoisting without matching. A typed inline flag setter, union and
+array read views, duplicated post-control tails, separate availability-result
+locals, and a u16 mask parameter also failed. A split availability value gives
+24 register-only differences; reload rotation 3:1 reduces that to fifteen,
+so reload rotation is not the whole cause. Keeping either original helper pin
+with the direct second check leaves nineteen differences; keeping both removed
+with the final OR pin leaves four. No pin is removable by itself.
+
+Next: give the initial halfword value a natural r0 preference without retaining
+it through the second field address, then keep the OR constant as operand one
+through CSE. The exact instruction shape already exists; avoid introducing
+extra tests or barriers to fix allocation.
+
+### SceneActorRegistry_ResetEligibleCategoryState — availability allocation
+
+Tags: phase3, dp-scene1, SceneActorRegistry_ResetEligibleCategoryState, 0x08070B1C
+
+A matching partial removes the two state-store pins and replaces the complete
+control/state offset chain with typed fields. Three original pins remain:
+excluded in caller and helper, plus the helper's loaded value. Source check:
+MATCH, 264 bytes. No remaining pin is individually removable in this form.
+
+Saved fully pin-free draft is four register-only differences, same 264 bytes.
+Typed stores reduce the original 42 differences to eight. Expressing the second
+flag test directly as value = *field & excluded removes four more. The first
+halfword load uses r2 rather than r0, and the local mask takes r0 rather than r2.
+The value is global, priority 34285 (eight refs, live seven); the mask occupies
+r0 before global allocation. Diagnostic AGBCC_FORCE=value:0,mask:2,field:1
+(pseudos 43,44,42) matches exactly. All three are necessary to preserve the
+field-address allocation while changing the conflicting values.
+
+Direct predicates, narrowing the first test, early/late saved-pointer writes,
+separate first halfword locals and inline mask helpers change allocation across
+the body without matching. Using the mask as the first result leaves six
+differences. A goto loop keeps four differences but moves a branch. Probe's five
+canonical-register choices, one jump follow and two invariant-hoist choices do
+not improve the best draft. Moving the saved-pointer write before the load gives
+39/40 differences; probing that form also finds no single improving choice.
+Retaining only the value pin does not match; both excluded pins are needed with
+it. The typed state-store partial is therefore the verified reduction.
+
+Next: reduce the first value's live interval without changing the pointer class
+or the second word test. This is the same initial availability-mask boundary as
+sub_08070910, with a complete exact allocation diagnosis here.
+
+### SceneActorRegistry_TestNearestPlayerBounds — vector and bounds allocation
+
+Tags: phase3, dp-scene1, SceneActorRegistry_TestNearestPlayerBounds, 0x08070C24
+
+Matching partial removes the category-field and first-path-offset pins. Category
+flags use the existing typed field; a local route view supplies the path/point
+layout offsets. Remaining seven pins and three barriers are unchanged. Source
+check: MATCH, 256 bytes. Using direct typed path/point reads additionally removes
+the second offset pin/barrier, but changes the signed x-load's zero scratch
+register from r2 to r1: two register-only differences, so that form was not landed.
+
+Saved fully pin-free goto-loop draft: 36 ROM / 38 draft differences, shape 24.
+The ordinary do-loop draft has 47/49, shape 34. Bounds spills rather than taking
+r8, nearest index takes a high register rather than its ROM stack slot, and the
+best-difference aggregate spills rather than occupying r6/r7. The origin pointer
+competes with the loop index, and player-slot allocation changes as well.
+
+The do-loop probe's GIV=135 improves to 36/36; GIV=233 gives 43/49. Neither is an
+exact diagnosis. An indexed gPlayers[index] loop generates the same 47/49 form.
+The goto loop improves the ordinary C shape, but allocation remains. why reports
+index priority 1500 versus left priority 1212; a playerSlot priority increase
+improves the goto draft to 33/35. FORCE=bestDifference:6 improves to 31/27 while
+introducing other differences. No complete exact knob combination was found.
+
+Bounds declaration order, direct input-parameter use, a pointer union, and a
+named subtraction helper all retain 36/38. For the close typed-path partial,
+removing current/player/limit pins adds differences; direct player loads, explicit
+sign extension of x, for and goto loops do not repair its scratch rotation.
+The existing path offset lifetime remains necessary for the verified partial.
+
+Next: restore the origin and saved-vector allocation before addressing the
+bounds check. The closest siblings are RetargetNearestPlayer and the actor
+proximity tests; the latter avoid the best-difference aggregate entirely, so
+their simple pointer loops do not settle this function's register pressure.
