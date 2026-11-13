@@ -443,10 +443,9 @@ s32 ModifierMenu_CommitFourthSource(struct ModifierMenu *p)
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 struct ModifierMenu *ModifierMenu_CommitSelection(struct ModifierMenu *menu)
 {
-    register struct ModifierMenu *base asm("r2") = menu;
+    struct ModifierMenu *base = menu;
     struct ModifierSelection *pending;
     struct ModifierSelection *current;
     pending = &base->pending;
@@ -454,7 +453,6 @@ struct ModifierMenu *ModifierMenu_CommitSelection(struct ModifierMenu *menu)
     current->selectedId = pending->selectedId;
     current->count = pending->count;
     current->mask = pending->mask;
-    return menu;
 }
 
 s32 ModifierMenu_ToggleSelection(struct ModifierMenu *menu)
@@ -666,7 +664,6 @@ void ModifierMenu_DrawFirstSourceStats(struct ModifierMenu *menu)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *menu)
 {
     struct ModifierSelection *pending = &menu->pending;
