@@ -36,7 +36,7 @@ s32 Script_ParseStringRef(u32);
 const u8 *Text_LookupString(s32);
 void ScrollingDialogue_SetScript(const u8 *);
 s32 Serial_GetRole(void);
-void SlotMenu_UpdateLastEntry(struct LinkPanel *);
+void LinkPanel_UpdateLastEntry(struct LinkPanel *);
 void LinkPanel_UpdateAnimations(struct LinkPanel *);
 void PaletteFade_CycleMenuColors(void *);
 void LinkPanel_UpdateStatusMessage(struct LinkPanel *);
@@ -115,7 +115,7 @@ void sub_0810C7F4(struct LinkPanel *p)
                 ((struct LinkPanel *)(i * sizeof(struct LinkSlot) + (u32)p))->slotData[2] = zero2;
         }
     }
-    SlotMenu_UpdateLastEntry(p);
+    LinkPanel_UpdateLastEntry(p);
     LinkPanel_UpdateAnimations(p);
     PaletteFade_CycleMenuColors(p->palette);
     LinkPanel_UpdateStatusMessage(p);

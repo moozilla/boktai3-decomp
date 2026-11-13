@@ -25,7 +25,7 @@ void SceneMenu_InitializeDisplay(struct LinkPanel *);
 void sub_0810C0BC(struct LinkPanel *);
 void ModifierMenu_InitSelectionSnapshot(void *, void *);
 void SlotMenu_CreateTextWindows(struct LinkPanel *);
-void RegistryF246_InitMessageDisplay(struct LinkPanel *);
+void LinkPanel_InitMessageDisplay(struct LinkPanel *);
 void sub_0810C7F4(void);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 s32 LinkPanel_InitFromScript(struct LinkPanel *p)
@@ -51,7 +51,7 @@ s32 LinkPanel_InitFromScript(struct LinkPanel *p)
     sub_0810C0BC(p);
     ModifierMenu_InitSelectionSnapshot(p->widget, p->resource);
     SlotMenu_CreateTextWindows(p);
-    RegistryF246_InitMessageDisplay(p);
+    LinkPanel_InitMessageDisplay(p);
     {
         void (*update)(void) = sub_0810C7F4;
         u32 zero = 0;

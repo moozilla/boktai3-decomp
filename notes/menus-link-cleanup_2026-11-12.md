@@ -258,3 +258,5 @@ improves types, naming, and organization of already matching functions. The
 coordinator must run the combined ROM build after integration.
 
 Final menu-display validation: all 14 functions MATCH (2516 bytes); all 106 transitive shared-header consumers MATCH. Final scan of the 23 consolidated units found no scored concession sites.
+
+Link panel revisit after the run was reopened: 0810C238–0810C724 now matches as a five-function unit (1260 bytes). The earlier mismatch came from placing two whole 0x5FC slots at their status-byte offset 0x940. The tentative full slots begin at 0x348, with their last four-byte records at 0x940/F3C; the second slot ends at the callback at 0xF40, preserving allocation size 0xF78. Earlier slot contents remain unknown. Canonical task/widget/resource/palette types replace partial local views. Both renamed callers MATCH. Structured connection-status returns changed branch placement; retain the matched shared exits. The existing session-payload pointer guard still affects generated code and now refers to the canonical sessionData field.

@@ -4310,8 +4310,8 @@ addr,name,mode,confidence,source,notes
 0810C1E8,RegistryF246_ShowSlotReadyFrame,thumb,low,src-alias,Tentatively displays a ready slot by clearing its hidden flag and selecting frame 44
 0810C210,RegistryF246_ShowSlotDefaultFrame,thumb,low,src-alias,Shows the indexed slot and selects its default frame 42
 0810C238,LinkPanel_UpdateAnimations,thumb,low,src-alias,
-0810C334,SlotMenu_UpdateLastEntry,thumb,low,src-alias,
-0810C388,RegistryF246_InitMessageDisplay,thumb,low,src-alias,Resets the shared message text and enables its display mode
+0810C334,LinkPanel_UpdateLastEntry,thumb,low,src-alias,Updates the final entry glyph from the first link slot status
+0810C388,LinkPanel_InitMessageDisplay,thumb,low,src-alias,Clears and shows the scrolling link status message
 0810C398,LinkPanel_GetConnectionStatus,thumb,low,src-alias,
 0810C420,LinkPanel_UpdateStatusMessage,thumb,low,src-alias,
 0810C724,SlotMenu_Destroy,thumb,low,src-alias,
