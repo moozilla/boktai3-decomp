@@ -8353,6 +8353,7 @@ addr,name,mode,confidence,source,notes
 081DCDF4,Time_CreateRegionMenu,thumb,low,src-alias,Creates the region selection task using the existing Time callbacks
 081DCE34,Time_OnLoadSave,thumb,medium,raphaelr,
 081DCF20,TextEntry_CopyInitialName,thumb,low,src-alias,
+081DCF78,NameEntry_CopyNameBuffer,thumb,low,src-alias,
 081DCF84,TextEntry_DrawName,thumb,low,src-alias,
 081DCFE4,NameEntry_UpdateCursor,thumb,low,src-alias,
 081DD174,NameEntry_MoveCursorUp,thumb,low,src-alias,
@@ -8361,21 +8362,23 @@ addr,name,mode,confidence,source,notes
 081DD80C,NameEntry_MoveCursorLeft,thumb,low,src-alias,
 081DDA78,NameEntry_AppendChar,thumb,low,src-alias,
 081DDAF0,NameEntry_ToggleCharacterPage,thumb,low,src-alias,Switches between two keyboard pages and refreshes the selection display
+081DDB44,NameEntry_EraseCharacter,thumb,low,src-alias,
 081DDBC0,NameEntry_Update,thumb,low,src-alias,
 081DE078,NameEntry_Destroy,thumb,low,src-alias,Destruction callback clears display flags and removes six name entry animations
 081DE0CC,NameEntry_Initialize,thumb,low,src-alias,
 081DE520,ScreenParams328_SetFromScript,thumb,low,src-alias,
 081DE5A4,NameEntry_Create,thumb,high,gcl-name,name from GCL key 2687 名前入力 (Name Entry); registry callback
-081DE5E4,MenuSprites_SetFlagBits,thumb,low,src-alias,
-081DE6C4,Password_LoadDate,thumb,low,src-alias,
-081DE780,Password_UpdateCursorPanel,thumb,low,src-alias,
-081DE84C,AnimPanel_UpdateDigits,thumb,low,src-alias,
-081DEA60,AnimPanel_HandleClockInput,thumb,low,src-alias,
-081DEC2C,Time_UpdateDateMenu,thumb,low,src-alias,
-081DEDF4,AnimPanel_RemoveAnimations,thumb,low,src-alias,
-081DEE38,Time_InitializeDateMenu,thumb,low,src-alias,
-081DF06C,Time_SetDateMenuFromScript,thumb,low,src-alias,Reads three script options into the date menu configuration block
-081DF0AC,Time_CreateDateMenu,thumb,low,src-alias,Creates the date and time editing task whose confirmation updates the clock
+081DE5E4,DateMenu_HideAnimations,thumb,low,src-alias,
+081DE630,DateMenu_InitializeDigitWidgets,thumb,low,src-alias,
+081DE6C4,DateMenu_LoadCurrentDate,thumb,low,src-alias,
+081DE780,DateMenu_UpdateCursor,thumb,low,src-alias,
+081DE84C,DateMenu_UpdateDigits,thumb,low,src-alias,
+081DEA60,DateMenu_HandleClockInput,thumb,low,src-alias,
+081DEC2C,DateMenu_Update,thumb,low,src-alias,
+081DEDF4,DateMenu_Destroy,thumb,low,src-alias,
+081DEE38,DateMenu_Initialize,thumb,low,src-alias,
+081DF06C,DateMenu_SetParametersFromScript,thumb,low,src-alias,Reads three script options into the date menu configuration block
+081DF0AC,DateMenu_Create,thumb,low,src-alias,Creates the date and time editing task whose confirmation updates the clock
 081DF0EC,AnimPanel_SaveSelections,thumb,low,src-alias,
 081DF124,AnimPanel_LoadSelections,thumb,low,src-alias,
 081DF160,AnimPanel_ResetSelections,thumb,low,src-alias,
