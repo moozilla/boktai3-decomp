@@ -15,10 +15,7 @@ struct SceneEventReceiver {
     u8 count[2];
     struct SceneEventCommand *pending[2][4];
 };
-struct SceneEventDispatchTask {
-    u8 task[0x1C];
-    struct SceneEventReceiver receiver;
-};
+struct SceneEventDispatchTask;
 struct SceneEventDispatchState {
     u8 unknown0[0x24];
     u8 phase;
