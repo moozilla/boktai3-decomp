@@ -1892,6 +1892,20 @@ Each was read from the compiler source and confirmed on a live draft.
    also matches; changing only icon to u8/u16 does not. The chosen icons are 30, 31, and 32, so
    narrowing preserves their values. Use the meaningful argument type, not an unrelated cast.
 
+153. **A final early return can fix PRE stack slots earlier in a function.**
+  LinkMenu_WaitForReadyPeers (08109F1C) needed two independent changes. Taking
+  the address of its local initialization-state pointer postpones the first
+  shared p+45 expression, restoring PRE insertion order (ready, presence,
+  countdown) without the r4 pin. Removing the timer barrier then leaves 11/11
+  differences: N=511 real insns gives T=255, whose reaching-register numbering
+  assigns the wrong stack slots. AGBCC_GCSE_T=257 MATCHES; preorder predicts
+  N=512..515 as the nearest natural interval. Writing the final event dispatch
+  as `if (*event != 2) return 0;` followed by its two calls restores the full
+  stock-compiler match. Repeating a return inside the original positive arm
+  does not match. Simple timer-expression rewrites do not change the result.
+  Distinguish expression-index insertion order from hash-order pseudo/slot
+  numbering: changing T alone did not fix the original fully clean draft.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
