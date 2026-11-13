@@ -6,7 +6,7 @@ struct SceneTransition {
     void (*callback)(void);
     s32 timer;
 };
-void sub_081C371C(void *, s16 *, s16 *, s32, s32, s32);
+void ContactImpactEffect_BeginInterpolatedPosition(void *, s16 *, s16 *, s32, s32, s32);
 void Registry6A37_UpdateDisplayHold(void);
 void SceneTransition_BeginOffsetMove(struct SceneTransition *p)
 {
@@ -24,7 +24,7 @@ void SceneTransition_BeginOffsetMove(struct SceneTransition *p)
         r[1] = y;
         r[2] = zero;
     }
-    sub_081C371C(p->target, (s16 *)&a, (s16 *)&b, 0x18, 1, 0x78);
+    ContactImpactEffect_BeginInterpolatedPosition(p->target, (s16 *)&a, (s16 *)&b, 0x18, 1, 0x78);
     p->callback = Registry6A37_UpdateDisplayHold;
     p->timer = zero;
 }

@@ -7599,6 +7599,7 @@ addr,name,mode,confidence,source,notes
 081C3C1C,ContactImpactEffect_UpdateInterpolatedPosition,thumb,low,src-alias,
 081C3E04,ContactImpactEffect_UpdateContact,thumb,low,src-alias,
 081C3EEC,ContactImpactEffect_OnUnusedHook,thumb,low,src-alias,Tentative contact-impact presentation controller; name describes observed motion or state behavior.
+081C3EF0,ContactImpactEffect_ProcessMessages,thumb,low,src-alias,Tentative contact-impact presentation controller; name describes observed motion or state behavior.
 081C3F7C,RegistryF3E4_OnTaskUpdate,thumb,low,src-alias,Processes scene messages then updates the sprite and dispatches its state callback
 081C3FA4,RegistryF3E4_OnTaskDestroy,thumb,low,src-alias,Removes the actor sprite and clears its singleton pointer
 081C3FBC,RegistryF3E4_CreateHidden,thumb,low,src-alias,

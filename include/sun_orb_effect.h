@@ -25,7 +25,9 @@ struct OrbitEffectSprite {
     u32 flags;
     u8 unk_04[4];
     u8 scaleX, scaleY;
-    u8 unk_0A[0x1C - 0x0A];
+    u8 unk_0A[6];
+    u16 frame;
+    u8 unk_12[0xA];
     struct OrbitEffectPosition position;
     u8 unk_24[8];
 };
