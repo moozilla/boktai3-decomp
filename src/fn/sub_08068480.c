@@ -1,28 +1,18 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_particle_pool.h"
-static inline u8 IsUsed(u32 *used, u32 index, u32 one)
+static inline u8 IsUsed(u32 *used, s32 index)
 {
-    if (*used & (one << index))
+    if (*used & (1 << index))
         return 1;
     return 0;
 }
-struct SceneParticleSlot *SceneParticle_AllocateSlot(struct SceneParticlePool *input)
+struct SceneParticleSlot *SceneParticle_AllocateSlot(struct SceneParticlePool *p)
 {
-    struct SceneParticlePool *p = input;
-    s32 i = 0;
-    u32 *used = &p->used;
-    u32 one = 1;
-    u32 offset = i;
-    for (; i < 8; offset += sizeof(struct SceneParticleSlot), i++) {
-        if (!IsUsed(used, i, one)) {
-            struct SceneParticleSlot *slot = (void *)((u8 *)p->slots + offset);
+    s32 i;
+    for (i = 0; i < 8; i++) {
+        if (!IsUsed(&p->used, i)) {
+            struct SceneParticleSlot *slot = &p->slots[i];
             slot->index = i;
-            {
-                u32 mask = one;
-                DEBUG_NOP();
-                mask <<= i;
-                *used |= mask;
-            }
+            p->used |= 1 << i;
             return slot;
         }
     }
