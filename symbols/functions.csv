@@ -5821,6 +5821,7 @@ addr,name,mode,confidence,source,notes
 0815CB88,ScriptActor_StandVariant2FromScript,thumb,low,src-alias,Invokes PlayerCue_StandVariant2 with script direction and cue option
 0815CBC0,ScriptActor_StandDiagonalBFromScript,thumb,low,src-alias,Invokes PlayerCue_StandDiagonalB with script direction and cue option
 0815CBF8,ScriptActor_MoveToFromScript,thumb,low,src-alias,
+0815CC78,ScriptActor_RunToFromScript,thumb,low,cleanup,Reads destination and direction options then starts the player run cue; tentative.
 0815CCF8,ScriptActor_TurnFromScript,thumb,low,src-alias,
 0815CDAC,ScriptActor_EnterStateFourFromScript,thumb,low,src-alias,
 0815CE24,ScriptActor_EndMotion7FromScript,thumb,low,src-alias,Invokes PlayerCue_Motion7End using the script cue option
@@ -5846,9 +5847,15 @@ addr,name,mode,confidence,source,notes
 0815D2DC,ScriptActor_AimFromScript,thumb,low,src-alias,Invokes PlayerCue_Aim with the parsed direction and cue parameter
 0815D314,ScriptActor_ShootFromScript,thumb,low,src-alias,Invokes PlayerCue_Shoot with optional l parameter defaulting to 32
 0815D358,ScriptActor_StartFormMotionFromScript,thumb,low,src-alias,Starts the form-dependent cue and handles its unsupported-form return
+0815D394,ScriptActor_WindblownFromScript,thumb,low,cleanup,Starts the windblown cue with script r and e options; tentative.
+0815D3D8,ScriptActor_WindblownVariant3FromScript,thumb,low,cleanup,Starts windblown variant three with script r and e options; tentative.
+0815D41C,ScriptActor_WindblownVariant4FromScript,thumb,low,cleanup,Starts windblown variant four with script r and e options; tentative.
+0815D460,ScriptActor_WindblownVariant2FromScript,thumb,low,cleanup,Starts windblown variant two with script r and e options; tentative.
+0815D4A4,ScriptActor_StandDiagonalFromScript,thumb,low,cleanup,Starts the diagonal standing cue with direction and cue options; tentative.
 0815D4E8,ScriptActor_FaceSideFromScript,thumb,low,src-alias,Invokes PlayerCue_FaceSide with optional r parameter defaulting to zero
 0815D524,ScriptActor_SetModeFromScript,thumb,low,src-alias,
 0815D590,ScriptActor_ResetActionStateFromScript,thumb,low,src-alias,Resets action fields and returns the selected actor to state 1 while preserving mode 6
+0815D5B0,ScriptActor_StartTimedChargeFromScript,thumb,low,cleanup,Initializes HUD timer and charge period then starts the mode-specific charge callback; tentative.
 0815D688,Player_RegisterSceneMessageReceiver,thumb,low,src-alias,Registers the embedded receiver with the player identifier and receiver kind 2
 0815D6A0,Player_UnregisterSceneMessageReceiver,thumb,low,src-alias,Passes the embedded scene message receiver to the removal helper
 0815D6B0,PlayerCue_Dispatch,thumb,low,src-alias,Dispatches kind-2 scene commands through shared cue APIs; immediate commands acknowledge at once and animated commands leave acknowledgement pending
