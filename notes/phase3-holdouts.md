@@ -1590,3 +1590,40 @@ from 187 to 185, raising its priority only to 1621. Stride therefore takes r5
 first and manager r6, fixing every difference. This is a lifetime reduction,
 not an increase in manager lifetime. An increment-count helper has no effect;
 a current-entry helper changes the shape and does not match.
+
+### AreaEffect_UpdateLinkPlayerResources (0804ECD0): three pins and barrier removed
+
+Passing the loop index by pointer to the inline link-value reader removes the
+selected-index pin, loop-index pin and loop-index barrier. The address-taken
+local preserves the repeated index/offset calculations without PRE replacement.
+Reading the conversion counter as u16 removes its value pin; the subtraction
+uses a separate u32 remaining value, stored before assigning back to the u16
+loop value. This leaves narrowing after the store and amount increment, exactly
+as in ROM. A direct u16 subtraction narrows two instructions too early (2/2).
+The base now uses the named resourceFractions field. Two pins remain, previous
+and the inner-loop base.
+
+Saved fully pin-free draft:
+`notes/phase3-drafts/dp-field/AreaEffect_UpdateLinkPlayerResources.c`
+(40/40, shape 6, exact 252-byte size). Exact diagnostic on that draft:
+`AGBCC_FORCE=previous:4,base:3 AGBCC_NOMOVE=314`. The force names resolve to
+pseudos 85 and 92. The hoist is the inner counter address: loop threshold
+26 x savings 1 x lifetime 3 exceeds 9 instructions. Forcing the two registers
+without preventing this hoist gives 31/25, shape 12. No single CSE/PRE/loop
+probe changes the clean draft's count (18 decisions tested).
+
+Baseline simple pin removal is 40/44, shape 14. PRE shares both offset=i*2 and
+next=i+1 across branches; disabling either improves only two instructions.
+Inlining the link read directly also matches while removing its selected pin,
+but passing the index by pointer removes the index pin and barrier as well.
+
+Further attempts: previous as u16, s32 or union (25/27, shape 4); splitting
+the add and store tails across mode branches (25/29, shape 6); inner goto loop
+(52/62), with u16 counter (48/58); pointer-union initializer, direct union member
+uses, fraction-address getter and conversion helper all retain the unwanted
+hoist (30/24 on the isolated base-pin removal). Raising offset priority does
+not resolve the previous/gain allocation. No new concessions were introduced.
+
+Next: find a natural conversion-loop form that retains its address addition
+inside the loop, then a gain/previous lifetime with previous in r4. The partial
+removes four concessions and leaves the earlier script/player logic intact.
