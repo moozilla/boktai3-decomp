@@ -1271,3 +1271,32 @@ then use the result's allocation order to resolve transform and counter.
 Tool gap found: why attributed the sample-mask change to an unrelated later tie
 sharing only the mask. The scope fix now requires both changed registers in a
 fallback tie, avoiding the ineffective NOTIE suggestion.
+
+### TentacleActor_SelectWanderRoute (080A8904): priority diagnosis confirmed
+
+The saved ordinary-C draft remains 46/48, shape 46, 988 bytes versus 984.
+`AGBCC_PRI=157:+2100,42:+1757,43:+423,45:+10000` matches exactly. These
+restore the original priorities of the scan union, n, i, and currentCell.
+The key threshold is not linear: global.c uses floor_log2(refs) * refs / life.
+The scan union changes 21/200, priority 4200, to 14/200, priority 2100;
+its original priority narrowly outranks the first cell-center terrain pointer
+(4137). The remaining count changes 9/74 (3648) to 7/74 (1891).
+
+Each single-use macro removal was isolated. Removing the cardinal advance,
+outer cursor increment, or inner cursor increment alone gives a pure r6/r7
+swap (25/25). Removing the count macro gives 38/36. None is free alone.
+The count-up form reverses to exactly the same macro-free result. Post-decrement
+and pre-decrement conditions, signed narrow counters, a combined advance/count
+helper, and separate mask/cursor locals do not recover the required priorities.
+A direction derived from the scan induction variable adds instructions.
+Duplicating the update after both eligibility arms raises references, but the
+longer lives and extra control flow remain. Returning from a while around the
+unvisited-cell path makes loop.c hoist the cell-center addresses and is much
+worse. Pointer post-increment changes the memory accesses and also fails.
+
+Persistent sources and hypotheses: `build/matchsearch/TentacleActor_SelectWanderRoute`.
+The complete ordinary draft is `notes/phase3-drafts/dp-monsters/TentacleActor_SelectWanderRoute.c`.
+Next: find a natural candidate-iteration structure whose cursor has at least
+21 weighted references over this lifetime, or shorten that lifetime without
+changing its merge with the cardinal mask. The exact diagnostic now separates
+this from instruction-selection problems. No source changes landed.
