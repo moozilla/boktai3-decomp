@@ -1228,3 +1228,58 @@ A natural rewrite is much worse (70): `(rnd >> 3) % 2`, `% 1024`, `MotionPolar`,
 The ROM keeps the relative-sample origin (0x0403B714) live across the first two samples,
 and the third sample reads relative to it. The landed C reproduces that with `origin`/`savedOrigin`.
 Not worked on further this session.
+
+## cdp-scene2 (Codex)
+
+Queue audit on 2026-11-13 found that 21 of the 26 assigned functions no longer contain a
+concession on the current branch. Their queue scores predate the cleanup already present in
+`src/actor_animation_controller.c`. The five remaining functions are retained below as ordinary-C,
+pin-free drafts; `scope.py ... pins FUNC` verified the checked-in forms match and measured each
+removal independently.
+
+### Actor_UpdateBlinkBurstDisappearance: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateBlinkBurstDisappearance.c` (11 differing rows:
+10 ROM / 8 draft, with one moved branch). Removing the otherwise-unused zero initialized in r7
+costs 2 rows; removing the child-flags value from r2 costs 10. Removing both does not compose
+cleanly. The zero initialization is still emitted by the ROM and therefore needs an ordinary
+source-level use that extends its lifetime without an artificial fence. Next: compare the twin
+`Actor_UpdateFinishingAnimation`, then express the child flag update through a shared typed helper
+while retaining the zero as the helper's result or argument.
+
+### Actor_UpdateFinishingAnimation: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/Actor_UpdateFinishingAnimation.c` (14 differing rows:
+12 ROM / 10 draft, with two moved branches). The unused r7 zero costs 2 rows and the child-flags
+r2 binding costs 13. This is the same source pattern as `Actor_UpdateBlinkBurstDisappearance`, but
+the different surrounding control flow changes the cross-jumps. Next: derive one shared helper for
+the child update and test repeating the post-join statement in both arms before extracting it.
+
+### ActorDisplay_UpdateForegroundSprite: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/ActorDisplay_UpdateForegroundSprite.c` (78 differing rows:
+62 ROM / 65 draft, with 11 moved branches). The remaining pin is the accumulated horizontal
+coordinate in r1. The earlier typed-layout rewrite is already present and preserves the verified
+halfword fields. Removing the binding changes allocation through most of the function, rather than
+one isolated instruction. Next: split the horizontal and vertical sums into narrow typed helpers,
+and compare reference density and copy preferences against the sibling foreground/accent display
+updates.
+
+### SingletonSlot7_UpdateEndingScene: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/SingletonSlot7_UpdateEndingScene.c` (81 differing rows:
+73 ROM / 71 draft, with seven moved branches). Its four pins are two occurrences each of a constant
+one and a byte zero. Individually, the zero sites cost 8 and 3 rows; each one site costs 32 rows.
+Grouping equal-named locals does not recover allocation. Next: use a union/array initializer for
+the byte zero and repeat each constant-one operation within the branch arms so cse and jump2 see
+the same lifetimes as the ROM.
+
+### SingletonSlot7_InitDisplaySprites: deferred
+
+Draft: `notes/phase3-drafts/cdp-scene2/SingletonSlot7_InitDisplaySprites.c` (95 differing rows:
+88 ROM / 80 draft, with two moved branches). Thirteen concessions remain: eight pins and five
+barriers, seven of them inside the private `StepPlayback` helper. Independent costs range from 4
+to 45 rows and the helper group costs 137 rows, showing that its C shape, rather than one caller
+allocation, is the blocker. Next: replace the private playback implementation with the shared
+display-sequence stepping form, preserving table-first packed-command reads; then retry the two
+caller-side constant-one/duration groups separately.
