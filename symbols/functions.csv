@@ -4410,10 +4410,13 @@ addr,name,mode,confidence,source,notes
 0811024C,SaveMenu_UpdateSaveDelay,thumb,low,src-alias,Shows the saving message and waits sixty frames before attempting the save; tentative menu identity
 081102EC,SaveMenu_WaitForSaveTransition,thumb,low,src-alias,Waits for the companion menu controller to reach state 27 before continuing
 08110334,SaveMenu_UpdateSlotCommit,thumb,low,src-alias,Commits the alternate save slot and selects the success or failure callback
-08110378,LinkMenu_UpdateExitDelay,thumb,low,src-alias,
+08110378,SaveMenu_UpdateExitDelay,thumb,low,src-alias,Link score reveal; score transfer and coordinated save state machine.
 08110410,SaveMenu_UpdateSaveFailure,thumb,low,src-alias,Shows the apparent save failure message and accepts input after sixty frames; tentative failure interpretation
+0811048C,SaveMenu_UpdateScoreTransfer,thumb,low,src-alias,Link score reveal; score transfer and coordinated save state machine.
+08110650,SaveMenu_UpdateScoreReveal,thumb,low,src-alias,Link score reveal; score transfer and coordinated save state machine.
 08110834,SaveMenu_Update,thumb,low,src-alias,Task callback that checks menu lifetime and dispatches the current state callback
 0811086C,SaveMenu_Destroy,thumb,low,src-alias,Task destruction callback that releases menu resources and clears the singleton
+08110894,SaveMenu_InitializeFromScript,thumb,low,src-alias,Link score reveal; score transfer and coordinated save state machine.
 08110A40,SaveMenu_CreateFromScript,thumb,low,src-alias,Creates and initializes the singleton menu task using script parameters; tentative menu identity
 08110AD4,SceneEffect_ExecuteCommandList,thumb,low,src-alias,
 08110B7C,SceneTilemap_IsActive,thumb,low,src-alias,Reports whether the scrolling tilemap controller singleton exists
