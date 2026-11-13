@@ -73,7 +73,7 @@ struct CharacterPreviewModel {
             u16 kind;
         } metadata;
     } view;
-    u8 unknown1E0[0x30];
+    u8 keyframeData[0x30];
     u16 activePalette[16], normalPalette[16];
 };
 struct CharacterPreviewPalette {
