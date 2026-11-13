@@ -3387,10 +3387,14 @@ addr,name,mode,confidence,source,notes
 080A5C50,TentacleBody_UpdateAttackWindup,thumb,low,src-alias,
 080A5E84,TentacleBody_ResetDirectionalPose,thumb,low,src-alias,selects the defeat-profile directional pose without entry flag then resets directional animations
 080A5FB8,TentacleBody_OnIdleState,thumb,low,src-alias,Empty callback installed by the tentacle body initializer; idle role is tentative
+080A5FBC,TentacleBody_UpdateInactiveState,thumb,low,decomp,Empty state handler; inactive role is tentative
+080A5FC0,TentacleBody_UpdateTimedAction,thumb,low,decomp,Starts animation 7 and advances action flags at frames 40 and 120
 080A6030,TentacleBody_UpdateHiddenTransition,thumb,low,src-alias,State callback that hides graphics and shadow before transitioning to animation 9 after frame 26
 080A60E0,ActorTrail_RestoreSavedState,thumb,low,src-alias,
+080A6294,TentacleBody_UpdateAnimationEleven,thumb,low,decomp,Starts directional animation 11 and completes when ready
 080A62DC,TentacleBody_UpdateSpreadWindup,thumb,low,src-alias,
 080A65A8,TentacleBody_UpdateSpreadRelease,thumb,low,src-alias,
+080A68B0,TentacleBody_UpdateSpreadPreparation,thumb,low,decomp,Winds up segment spread while backing away from target
 080A69F0,TentacleBody_UpdateChargeSpread,thumb,low,src-alias,
 080A6D18,TentacleBody_BeginDirectedAttack,thumb,low,src-alias,
 080A6F50,TentacleBody_UpdateAttackRecovery,thumb,low,src-alias,
@@ -3623,9 +3627,9 @@ addr,name,mode,confidence,source,notes
 080C09F0,Skeleton_UpdateTargetApproach,thumb,low,src-alias,Tentative: approaches partner cell or steers within configured distance bands
 080C12EC,Skeleton_SetReactionControlTable,thumb,low,src-alias,Installs the table at actor offset 0x28C during initialization; reaction role tentative
 080C12FC,Skeleton_ReactToContact,thumb,low,src-alias,Skeleton_Init installs this callback at +0x268; AD03 registry and GCL name identify Skeleton. ReactToContact is a descriptive reconstruction.
-080C2BE0,SceneActorControl_UpdateProbeApproach,thumb,low,src-alias,
-080C2E14,SceneActorControl_UpdateEntryPhase,thumb,low,src-alias,
-080C2F3C,SceneActorControl_UpdateEntryRecoveryPhase,thumb,low,src-alias,
+080C2BE0,Skeleton_UpdateProbeApproach,thumb,low,src-alias,Approaches the navigation descriptor and changes control on arrival
+080C2E14,Skeleton_UpdateEntryPhase,thumb,low,src-alias,Runs entry control then returns to behavior 15
+080C2F3C,Skeleton_UpdateEntryRecoveryPhase,thumb,low,src-alias,Runs entry control then enters range recovery
 080C3068,Skeleton_SetMovementControlPreset,thumb,low,src-alias,Installs the preset pointer at actor offset 0x284; movement role tentative
 080C3078,Skeleton_Update,thumb,low,src-alias,Main update callback that runs shared processing and conditionally dispatches the current state handler
 080C30CC,Skeleton_UpdateBehaviorCallbacks,thumb,low,src-alias,
@@ -3842,8 +3846,11 @@ addr,name,mode,confidence,source,notes
 080E7D9C,Mimic_ResetExpiredTarget,thumb,low,src-alias,
 080E7EC8,SceneActor_InitializeReactionColliders,thumb,low,src-alias,
 080E7F54,SceneActor_FindNearbyActivePlayer,thumb,low,src-alias,
+080E7FF4,Mimic_TryTargetRoute,thumb,low,decomp,Tests the tracked target and attempts navigation toward it
 080E80BC,Mimic_TryPursuitRoute,thumb,low,src-alias,
+080E8158,Mimic_BeginTargetResponse,thumb,low,decomp,Faces the tracked heading and starts the attachment response and action script
 080E81CC,SceneActor_GetDirectionFlags,thumb,low,src-alias,
+080E81FC,Mimic_UpdateIdleState,thumb,low,decomp,Empty idle-state callback; role is tentative
 080E8200,SceneActor_AcquireCollisionTarget,thumb,low,src-alias,
 080E8340,SceneActor_PrepareStationaryReaction,thumb,low,src-alias,
 080E8444,SceneActor_IsCollisionTargetUnavailable,thumb,low,src-alias,
