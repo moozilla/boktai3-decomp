@@ -6158,6 +6158,7 @@ addr,name,mode,confidence,source,notes
 0817589C,SceneCatalog_MapSelectionMask,thumb,low,src-alias,
 081758B4,SceneCatalog_SaveOptions,thumb,low,src-alias,
 08175934,SelectionPanel_CaptureSettings,thumb,low,src-alias,
+0817597C,SelectionPanel_UpdateCursor,thumb,low,src-alias,Tentative settings panel: hide or position the row cursor and arrows; then refresh three setting glyphs
 08175A8C,Hud_SetConfigFirstValueBounds,thumb,low,src-alias,Sets the first configuration value window to its row-three display rectangle
 08175AB0,Hud_SetConfigSecondValueBounds,thumb,low,src-alias,Sets the second configuration value window to its row-five display rectangle
 08175AD4,Hud_SetConfigThirdValueBounds,thumb,low,src-alias,Sets the third configuration value window to its row-seven display rectangle

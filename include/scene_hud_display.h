@@ -155,7 +155,9 @@ struct SceneHudState {
     struct SceneInputWidget actionPanelWidgets[3]; /* 0x2560 */
     u8 unknown2680[0x22];
     u16 actionFeedbackY; /* 0x26A2: transient action feedback animation */
-    u8 unknown26A4[0x39C];
+    u8 unknown26A4[0x3C];
+    struct SceneInputWidget settingsValues[3]; /* 0x26E0: glyphs for the three settings */
+    u8 unknown2800[0x240];
     struct SceneHudControlAnimation actionAnimation; /* 0x2A40 */
     u8 unknown2A60[0x40];
     struct SceneInputWidget motionWidgets[15]; /* 0x2AA0: extent bounded by valueWidgets */
@@ -164,7 +166,8 @@ struct SceneHudState {
     struct SceneInputWidget statusIcons[4];          /* 0x31C0 */
     struct SceneInputWidget comparisonIndicators[2]; /* 0x3340 */
     struct SceneInputWidget statMarkers[3][3];       /* 0x3400: base, bonus, delta */
-    u8 unknown3760[0x300];
+    struct SceneInputWidget settingsArrows[2];       /* 0x3760: left and right */
+    u8 unknown3820[0x240];
     struct SceneInputWidget navigationArrows[4]; /* 0x3A60: up, down, left, right. */
     u8 unknown3BE0[0x600];
     struct SceneInputWidget transferWidgets[2]; /* 0x41E0: hidden after action transfer */
@@ -204,11 +207,12 @@ struct SceneHudState {
     s16 comparisonOffsets[3]; /* 0x48B6: signed bar adjustments */
     u8 pageInputCooldown;     /* 0x48BC */
     u8 unknown48BD[3];
-    u8 settingsRow;                                 /* 0x48C0: cursor in the three-setting panel */
-    u8 savedSettingA, savedSettingB, savedSettingC; /* 0x48C1 */
-    s32 catalogTextWindow;                          /* 0x48C4: status description text */
-    s32 timedMessageWindow;                         /* 0x48C8 */
-    u8 unknown48CC[0x19];
+    u8 settingsRow;            /* 0x48C0: cursor in the three-setting panel */
+    u8 savedSettings[3];       /* 0x48C1: pending values of the three settings */
+    s32 catalogTextWindow;     /* 0x48C4: status description text */
+    s32 timedMessageWindow;    /* 0x48C8 */
+    s32 settingsWindows[3][2]; /* 0x48CC: label and value window IDs per row */
+    u8 unknown48E4;
     u8 pageReturnToParent; /* 0x48E5 */
     u8 selectedQuantity;   /* 0x48E6: multiplied by valueRate */
     u8 unknown48E7;
