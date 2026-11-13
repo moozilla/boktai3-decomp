@@ -47,6 +47,9 @@ struct PortPlatformHooks {
     void (*trace)(void *context, const char *event, uint32_t value);
     void (*blank)(void *context, unsigned line, int vblank);
     void (*acknowledge)(void *context, uint16_t mask);
+    /* Optional: call a handler by its GBA code address (full-game link).
+     * Takes precedence over resolve; returns 0 on success. */
+    int (*invoke)(void *context, uint32_t gba_address);
 };
 void port_set_hooks(const struct PortPlatformHooks *hooks);
 void port_irq_raise(uint16_t mask);
@@ -58,5 +61,10 @@ uint64_t port_frame_count(void);
  * returns an error if interrupts cannot deliver it. Does not spin forever. */
 int port_wait_vblank(void);
 void port_timing_reset(void);
+/* Advance scanlines until at least one interrupt has been serviced (a Halt),
+ * at most two frames. Used when game code spins on memory an IRQ changes. */
+int port_wait_interrupt(void);
+unsigned port_current_line(void);
+int port_spin_advance(void);
 
 #endif

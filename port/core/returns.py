@@ -44,7 +44,12 @@ def verify_returns(root):
     for name, (result, source) in RETURNS.items():
         pattern = (r'^' + re.escape(result) + r'\s+' + re.escape(name) +
                    r'\s*\([^;{}]*\)\s*\{')
-        if not re.search(pattern, (root / source).read_text(), re.M):
+        path = root / source
+        if path.exists() and re.search(pattern, path.read_text(), re.M):
+            continue
+        # Units move as the decomp is reorganized; the definition is the evidence.
+        if not any(re.search(pattern, p.read_text(), re.M)
+                   for p in root.glob('src/**/*.c') if name in p.read_text()):
             raise RuntimeError('Port return-type evidence changed: ' + name + ' in ' + source)
 
 

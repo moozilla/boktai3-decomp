@@ -3,6 +3,8 @@ import re
 from pathlib import Path
 from returns import repair_returns, verify_returns
 
+ROOT_SRC = Path(__file__).resolve().parents[2] / 'src'
+
 
 def prepare_source(path, target):
     text = repair_returns(path.read_text())
@@ -18,6 +20,14 @@ def prepare_source(path, target):
     text = re.sub(r'\basm\s+(?:volatile|__volatile__)\s*\(', 'asm(', text)
     if path.name == 'actor_animation_controller.c':
         text = 'void *ScriptProc_Start(unsigned int, unsigned int);\n' + text
+    if path.name == 'script_virtual_machine.c':
+        # ScriptProc_Start's result stays in r0 as Script_LoadScript's argument.
+        text = text.replace('    ScriptProc_Start(0xA8D9, 0x49BC);\n', '')
+        text = text.replace('((s32(*)())Script_LoadScript)();',
+                            '((s32(*)())Script_LoadScript)(ScriptProc_Start(0xA8D9, 0x49BC));')
+    if path.name == 'ghost.c':
+        # Called before its prototype; agbcc accepts the implicit int, clang does not.
+        text = 'void Anim_SetDurationScale(void *, unsigned int);\n' + text
     if path.name == 'golem_2.c':
         text = ('struct SceneActorAnimationView;\n'
                 'void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, int);\n' + text)
@@ -45,6 +55,8 @@ def prepare_source(path, target):
         text = text.replace('  FLO_union_type swapped;\n  swapped.words[0] = src->words[1];\n  swapped.words[1] = src->words[0];\n  src = &swapped;', '')
     if target == 'host':
         text = host_layout(text)
+    elif path.is_relative_to(ROOT_SRC):
+        text = agbcc_records(text)
     return text
 
 
@@ -65,10 +77,42 @@ def prepare_headers(root, output, target):
         if target == 'host':
             # Host objects are for selected subsystem tests, not GBA ABI execution.
             text = host_layout(text)
+        else:
+            text = agbcc_records(text)
         destination = output / path.relative_to(root / 'include')
         destination.parent.mkdir(parents=True, exist_ok=True)
         if not destination.exists() or destination.read_text() != text:
             destination.write_text(text)
+
+
+_RECORD = re.compile(r'\b(struct|union)(\s+__attribute__\s*\(\([^)]*\)\))?(\s+\w+)?\s*\{')
+
+
+def agbcc_records(text):
+    """agbcc (APCS) aligns every struct and union to 4 bytes and rounds its size
+    to a multiple of 4: struct { u8 a, b; } is 4 bytes, alignment 4. Records the
+    source marks packed keep their explicit layout."""
+    out, pos = [], 0
+    for m in _RECORD.finditer(text):
+        if m.start() < pos:
+            continue
+        depth, i = 0, m.end() - 1
+        while i < len(text):
+            if text[i] == '{':
+                depth += 1
+            elif text[i] == '}':
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        tail = text[i:i + 200].split(';', 1)[0]
+        if 'packed' in tail or (m[2] and 'packed' in m[2]):
+            continue
+        out.append(text[pos:m.start()])
+        out.append(m[1] + ' __attribute__((aligned(4)))' + text[m.start() + len(m[1]):m.end()])
+        pos = m.end()
+    out.append(text[pos:])
+    return ''.join(out)
 
 
 def host_layout(text):
