@@ -1387,6 +1387,18 @@ Next: find the C form that lets the initial duration value die only after
 allocation while the argument still uses the original power. The key is the
 second addition, before considering reload rotation.
 
+Resumed loop-boundary experiment: a nonempty do/goto block around the first
+duration assignment improves this to **4/4**, still 1100 bytes. The saved draft
+now uses that form. CSE pass 1 no longer reuses the duration in the second arm,
+but CSE pass 2 substitutes it at insn 477 (the else addition), following jump
+470 and then processing the arm independently. Scope's 40 single-decision
+probes found no improvement. Putting the loop boundary in either selection
+arm or around the first call instead leaves 6/6 or unmerged branch/call code
+(8/13 and 10/18). The remaining problem is therefore after-loop CSE, not only
+the first CSE traversal. Next: a genuine aggregate duration representation
+that becomes equivalent after CSE2 but before the final branch merge. Source
+still retains both original concessions; no source change was made.
+
 ### TargetRegistry_FindById: 5/5 allocation-only; duplicate compares still cross-jump backward
 Tags: phase3, dp-bosses, TargetRegistry_FindById
 
