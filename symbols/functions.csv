@@ -7525,11 +7525,13 @@ addr,name,mode,confidence,source,notes
 081C0C74,PlayStats_DrawLabels,thumb,low,src-alias,Draws the PLAY TIME and ENERGY and PLAY SIDE and PLAY STYLE labels
 081C0CE4,PlayStats_UpdateResults,thumb,low,src-alias,
 081C1384,PlayStats_Update,thumb,low,src-alias,Task update callback advances enabled counters and dispatches the current statistics screen state
-081C13C0,RecordDisplay_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the display animations
-081C13CC,RecordDisplay_LoadBackground,thumb,low,src-alias,Loads the background resource and configures its BG layer
-081C1408,RecordDisplay_LoadPalette,thumb,low,src-alias,Loads palette data and copies 160 bytes into palette staging memory
-081C1510,RecordDisplay_LoadAnimationResources,thumb,low,src-alias,Copies and relocates two resource headers then creates display animations
-081C1788,RecordDisplay_Create,thumb,low,src-alias,Creates and initializes the task displaying play time and a numeric record
+081C13C0,PlayStats_OnTaskDestroy,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
+081C13CC,PlayStats_LoadBackground,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
+081C1408,PlayStats_LoadPalette,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
+081C1434,PlayStats_InitializeWidgets,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
+081C1510,PlayStats_LoadResources,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
+081C1578,PlayStats_Initialize,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
+081C1788,PlayStats_Create,thumb,low,src-alias,Results screen shared with PlayStats: resources; formatted time/value text; widgets and script initialization.
 081C17D4,ControlPanel_SetUpdate,thumb,low,src-alias,Sets the panel state callback and resets its frame counter
 081C17EC,ControlPanel_ClearPlayerInputHistory,thumb,low,src-alias,Clears the player's 32 input history entries and accumulated input count
 081C1820,ControlPanel_ResetPlayerForInteractionPrompt,thumb,low,src-alias,
