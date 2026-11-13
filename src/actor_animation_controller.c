@@ -4053,7 +4053,7 @@ void Task_Kill(void *);
 void Actor_CheckResourceLifetime(struct ActorAnimController *p)
 {
     struct Entry *e;
-    s32 n = MessageQueue_GetMessagesById(*(u16 *)((u8 *)p + 0xf8a), &e);
+    s32 n = MessageQueue_GetMessagesById(p->resource, &e);
     e += n - 1;
     while (--n >= 0) {
         if (!*e->value)
