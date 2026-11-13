@@ -419,6 +419,7 @@ addr,name,mode,confidence,source,notes
 080135A8,ShadowTask_Create,thumb,low,src-alias,"Creates and configures the shadow-management task (Task_Create + Task_SetCallbacks with ShadowTask_Update/Destroy), rolling back via Task_Kill if Shad"
 080135E8,Shadow_Initialize,thumb,low,src-alias,
 08013684,Shadow_Destroy,thumb,low,src-alias,"Removes a shadow node's embedded effect and, if the shadow task is active, unlinks it from the shadow list via ShadowList_Remove; called from many act"
+080136A8,ScaledShadowTask_Destroy,thumb,low,src-alias,Clears scaled-shadow task singleton; callback ownership tentative
 080136B4,ScaledShadowManager_AddShadow,thumb,low,src-alias,Inserts a shadow node into the manager's doubly-linked list (head at manager+0x1C); only caller is ScaledShadow_Initialize.
 080136DC,ScaledShadowManager_RemoveShadow,thumb,low,src-alias,Unlinks a shadow node from the manager's list; called from the shadow teardown helper ScaledShadow_Destroy.
 0801370C,ScaledShadow_Enable,thumb,low,src-alias,Mirrors ActorShadow_Enable: clears the sprite's hidden bit and points the shadow's callback slot at ScaledShadow_Update to resume terrain-following.
