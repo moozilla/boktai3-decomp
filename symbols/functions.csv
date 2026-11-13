@@ -9118,8 +9118,10 @@ addr,name,mode,confidence,source,notes
 0821A04C,Task_SetCallbacks,thumb,low,src-alias,
 0821A054,TaskSystem_RunFrame,thumb,low,src-alias,
 0821A0C0,Task_Kill,thumb,low,src-alias,
+0821A0CC,Task_TryDestroy,thumb,low,decomp,Invoke destroy callback and mark task for deletion only when callback succeeds
 0821A0F8,TaskSystem_KillBelowPersistenceLevel,thumb,low,src-alias,Marks tasks whose byte at offset 0x16 is below the threshold for destruction; persistence level is tentative.
 0821A130,Task_FindById,thumb,low,src-alias,Searches all fourteen priority lists for a task with the requested ID.
+0821A168,Task_KillById,thumb,low,decomp,Find a task by ID and mark it for deletion or return -1
 0821A184,ResourceRegistry_AllocateEntry,thumb,low,src-alias,Returns an inactive entry or extends the entry count within its limit
 0821A1C8,ResourceRegistry_FindEntry,thumb,low,src-alias,Finds the first active registry entry with the requested ID
 0821A20C,ResourceRegistry_Initialize,thumb,low,src-alias,Resets the registry entry count during task system initialization
