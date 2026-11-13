@@ -5,6 +5,7 @@ struct SceneEventCommand {
     u8 unknown0[6];
     u8 kind, unknown7;
     s16 value;
+    u8 parameterA, parameterB; /* command-specific bytes in the existing tail padding */
 };
 struct SceneEventReceiver {
     u8 unknown0[6];

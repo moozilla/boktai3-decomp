@@ -7582,8 +7582,12 @@ addr,name,mode,confidence,source,notes
 081C2F8C,SparkleEmitter_StopEmitting,thumb,low,src-alias,Switches the singleton to its particle update callback without further spawning
 081C2FC0,SparkleEmitter_CreateFromScript,thumb,low,src-alias,Creates the singleton particle task with CC88 sparkle sprites and script configuration
 081C3010,RegistryF3E4_GetStateResult,thumb,low,src-alias,Returns the actor state result at offset D8 or zero for a null actor
+081C3024,ContactImpactEffect_BeginMotion,thumb,low,src-alias,Tentative contact-impact presentation controller; name describes observed motion or state behavior.
 081C32C8,SceneTarget_BeginMove,thumb,low,src-alias,
+081C35EC,ContactImpactEffect_BeginTimedPosition,thumb,low,src-alias,Tentative contact-impact presentation controller; name describes observed motion or state behavior.
 081C3700,RegistryF3E4_ClearState,thumb,low,src-alias,Clears the state callback and its frame counter and result
+081C371C,ContactImpactEffect_BeginInterpolatedPosition,thumb,low,src-alias,Tentative contact-impact presentation controller; name describes observed motion or state behavior.
+081C3950,ContactImpactEffect_UpdateBlinkFrame,thumb,low,src-alias,Tentative contact-impact presentation controller; name describes observed motion or state behavior.
 081C39BC,RegistryF3E4_StartAppearing,thumb,low,src-alias,Clears the sprite hidden flag and starts scaling from 38 to 64 over eight frames
 081C39E0,RegistryF3E4_StartDisappearing,thumb,low,src-alias,Starts scaling from 64 to 38 before entering the hidden state
 081C39F8,RegistryF3E4_SetHidden,thumb,low,src-alias,Sets the sprite hidden flag and installs the hidden idle callback
@@ -7591,8 +7595,10 @@ addr,name,mode,confidence,source,notes
 081C3A20,SpriteController_AnimateGrowing,thumb,low,src-alias,
 081C3A98,SpriteController_AnimateShrinking,thumb,low,src-alias,
 081C3AF8,RegistryF3E4_UpdateVisibleIdle,thumb,low,src-alias,Advances the state frame counter while the visible actor idles
+081C3B04,ContactImpactEffect_UpdateShakingPosition,thumb,low,src-alias,Tentative contact-impact presentation controller; name describes observed motion or state behavior.
 081C3C1C,ContactImpactEffect_UpdateInterpolatedPosition,thumb,low,src-alias,
 081C3E04,ContactImpactEffect_UpdateContact,thumb,low,src-alias,
+081C3EEC,ContactImpactEffect_OnUnusedHook,thumb,low,src-alias,Tentative contact-impact presentation controller; name describes observed motion or state behavior.
 081C3F7C,RegistryF3E4_OnTaskUpdate,thumb,low,src-alias,Processes scene messages then updates the sprite and dispatches its state callback
 081C3FA4,RegistryF3E4_OnTaskDestroy,thumb,low,src-alias,Removes the actor sprite and clears its singleton pointer
 081C3FBC,RegistryF3E4_CreateHidden,thumb,low,src-alias,
