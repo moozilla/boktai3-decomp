@@ -186,9 +186,10 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                         dx &= 31;
                         dy &= 31;
                         {
-                            register s32 index asm("r0") = dy * 32;
-                            asm("" : "+r"(index));
-                            index = dx + index;
+                            s32 row = dy * 32;
+                            s32 index;
+                            asm("" : "+r"(row));
+                            index = dx + row;
                             output[index] = 0;
                         }
                         dy++;
@@ -241,18 +242,20 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                 dy &= mask;
                             }
                             {
-                                register s32 index asm("r0") = dy * 32;
-                                asm("" : "+r"(index));
-                                index = dx + index;
+                                s32 row = dy * 32;
+                                s32 index;
+                                asm("" : "+r"(row));
+                                index = dx + row;
                                 index = (u32)(output + index);
                                 secondValue = 0;
                                 *(u16 *)index = secondValue;
                             }
                             {
-                                register s32 index asm("r0") = dy + 1;
-                                index *= 32;
-                                asm("" : "+r"(index));
-                                index = dx + index;
+                                s32 row = dy + 1;
+                                s32 index;
+                                row *= 32;
+                                asm("" : "+r"(row));
+                                index = dx + row;
                                 secondOutput = output + index;
                             }
                         } else {
@@ -263,10 +266,12 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                 blockX = scaled;
                             }
                             {
-                                register s32 scaled asm("r0") = truncate5(dy);
+                                s32 scaled = truncate5(dy);
                                 scaled *= blockStride;
-                                scaled = blockX + scaled;
-                                block = scaled << 8;
+                                {
+                                    s32 sum = blockX + scaled;
+                                    block = sum << 8;
+                                }
                             }
                             dx &= ringMask;
                             dy &= ringMask;
@@ -307,9 +312,10 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                         *firstOutput = value;
                                     }
                                     {
-                                        register s32 index asm("r0") = dy + 1;
-                                        index *= 32;
-                                        index = dx + index;
+                                        s32 row = dy + 1;
+                                        s32 index;
+                                        row *= 32;
+                                        index = dx + row;
                                         secondOutput = output + index;
                                     }
                                     secondValue = pair[2];
@@ -332,9 +338,10 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                         *firstOutput = value;
                                     }
                                     {
-                                        register s32 index asm("r0") = dy + 1;
-                                        index *= 32;
-                                        index = dx + index;
+                                        s32 row = dy + 1;
+                                        s32 index;
+                                        row *= 32;
+                                        index = dx + row;
                                         secondOutput = output + index;
                                     }
                                     secondValue = pair[3];
