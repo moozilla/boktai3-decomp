@@ -86,3 +86,30 @@ Primary-background loading gained a descriptive name. Replaced the create and
 script-loader goto branches with ordinary guards and returns. Shared palette
 resources now live in `include/palette_resource.h`; all three previously landed
 dependents passed their unit checks. This unit matches all 1,056 bytes.
+
+## Deferred peer panel: 08037228–08037B20
+
+The recovered menu has two 0x25C-byte panels beginning at 002C, window IDs at
+04E4, a completion key at 04F0, scratch at 04F4, resources at 05F4/0614, and
+an icon widget at 0634 (task size 0694). Each panel has a sprite at 0008,
+graphics at 0034, five 0x60-byte digit widgets at 0050, name at 0230,
+and a 24-byte confirmation-name buffer at 0244. The former changed byte at
+0244 is the first byte of that name buffer, not an independent boolean.
+
+Original baseline checks all pass. The first eleven typed functions through
+08037730 match. The remaining problem is 08037788 and 08037960: their old
+shifted Row view addresses a widget flag at panel+0058 and advances by 0060.
+Real widget pointers instead anchor at panel+0050 and load/store at +0008;
+indexed real-array loops anchor at the flags themselves (+0058). This changes
+register allocation, stack size and instruction selection. Keep the real
+panel layout, do not recreate the overlapping Row padding view. Typed attempts
+and original sources remain under build/peer_panel_attempt and
+build/peer_panel_original for the next pass. No source changes landed for this
+row; continue in ROM order per the cleanup brief's resistant-type rule.
+
+## Wireless exit task: 080394D4–080395D4
+
+Four functions now share `src/wireless_exit.c` and a WirelessExit task containing
+a completion script key and shutdown state. The old generic Task and listener
+pointer views are gone. Creation uses the shared engine task API; all 256 bytes
+match. Existing function names retained.
