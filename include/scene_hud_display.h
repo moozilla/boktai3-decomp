@@ -194,7 +194,17 @@ struct SceneHudState {
         appliedStatIncrease; /* 0x4862: base-stat bonus selection and clamped increase */
     u8 unknown4864[2];
     s16 appliedStatB; /* 0x4866: nonnegative stat B change */
-    u8 unknown4868[0x30];
+    u8 unknown4868[2];
+    u16 savedStatA; /* 0x486A: restored after a previewed item effect */
+    u8 unknown486C[2];
+    u16 savedStatB; /* 0x486E: restored after a previewed item effect */
+    u8 unknown4870[4];
+    u8 primaryEffectRequested, primaryEffectMode; /* 0x4874 */
+    u8 unknown4876[6];
+    u8 secondaryEffectRequested, secondaryEffectMode; /* 0x487C */
+    u8 unknown487E;
+    u8 effectActive; /* 0x487F: cleared when previewed stats are restored */
+    u8 unknown4880[0x18];
     s8 comparisonProfiles[0x14]; /* 0x4898: profile index per party member, extent tentative */
     u8 comparisonValues[3];      /* 0x48AC: capped combined stat values */
     u8 unknown48AF;

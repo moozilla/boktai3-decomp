@@ -3,7 +3,7 @@
 void Sound_PlaySong(u32);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void Hud_InitSelectionBounds(u32, u32);
-void sub_0816D634(void *, u32);
+void PauseMenu_ApplyItemSlot(void *, u32);
 void MenuTransition_FinishSelectionMessage(void);
 struct MenuFadeView {
     u8 unknown0[0xa4e];
@@ -12,7 +12,7 @@ struct MenuFadeView {
 void MenuTransition_UpdateSelectionFade(u8 *p)
 {
     if (((struct MenuFadeView *)p)->timer == 0) {
-        sub_0816D634(p, p[0x438a]);
+        PauseMenu_ApplyItemSlot(p, p[0x438a]);
         *(u32 *)(p + 0x2aa8) |= 1;
         if (p[0x4861])
             Sound_PlaySong(0x27f);

@@ -10,7 +10,7 @@ struct SceneMenuPanel {
     u8 selection;
 };
 u32 SceneMenuPanel_UpdateMotion(struct SceneMenuPanel *, u32);
-void sub_0816D634(struct SceneMenuPanel *, u32);
+void PauseMenu_ApplyItemSlot(struct SceneMenuPanel *, u32);
 void Sound_PlaySong(u32);
 void SceneMenuPanel_SetCallback(struct SceneMenuPanel *, void (*)(void), s32);
 void SceneHud_ShowActionResultText(void);
@@ -20,7 +20,7 @@ void SceneMenuPanel_AdvanceAfterMotion(struct SceneMenuPanel *panel)
         if (++panel->delay > 7) {
             Sound_PlaySong(269);
             panel->widgetFlags |= 1;
-            sub_0816D634(panel, panel->selection);
+            PauseMenu_ApplyItemSlot(panel, panel->selection);
             SceneMenuPanel_SetCallback(panel, SceneHud_ShowActionResultText, 1);
         }
     }

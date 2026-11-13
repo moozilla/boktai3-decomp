@@ -5915,11 +5915,13 @@ addr,name,mode,confidence,source,notes
 0816A4EC,ScenePanel_BeginSelection,thumb,low,src-alias,
 0816A5A8,ScenePanel_BeginDetail,thumb,low,src-alias,
 0816A700,StatusPanel_BeginAnimatedTransition,thumb,low,src-alias,
+0816A770,MenuPrompt_BeginPulseDisplay,thumb,low,src-alias,
 0816A7D8,MenuPrompt_RampDisplay,thumb,low,src-alias,
 0816A834,MenuPrompt_UpdateChoice,thumb,low,src-alias,
 0816A880,MenuPrompt_FadeChoice,thumb,low,src-alias,
 0816A8E0,ScenePanel_UpdateDetail,thumb,low,src-alias,
 0816A9A8,MenuPrompt_FinishDelayedChoice,thumb,low,src-alias,
+0816AA28,MenuPrompt_UpdatePageExit,thumb,low,src-alias,
 0816AAB0,MenuPrompt_WaitForChildPhase,thumb,low,src-alias,
 0816AAF4,Hud_UpdateFirstPostScriptWait,thumb,low,src-alias,Steps the HUD animation until frame 150 then enters the shared fade transition; first callback variant
 0816AB30,MenuPrompt_PulseDisplay,thumb,low,src-alias,
@@ -6000,12 +6002,14 @@ addr,name,mode,confidence,source,notes
 0816D308,Inventory_BeginItemEffect,thumb,low,src-alias,Stores item-effect parameters and activates two effect states with a mode-six variant swap; interpretation tentative
 0816D36C,PauseMenu_RequestEffectMode,thumb,low,src-alias,Queues a mode byte at 0x4875 and marks the menu for refresh; effect identity is tentative
 0816D394,PauseMenu_ApplyCharacterSelection,thumb,low,src-alias,Sets complementary game-state flags according to the selected character byte; character interpretation is tentative
+0816D3E8,PauseMenu_RequestRecoveryRefresh,thumb,low,src-alias,
 0816D40C,PlayerStatusPanel_RestoreStats,thumb,low,src-alias,
 0816D47C,PauseMenu_RequestSecondaryEffectMode,thumb,low,src-alias,Queues a secondary mode byte at 0x487D and marks the menu for refresh; effect identity is tentative
 0816D4A4,PauseMenu_ClearItemSlotValues,thumb,low,src-alias,Clears the low fifteen bits of all sixteen item-slot values while preserving their high flags
 0816D4BC,PauseMenu_ClearEquippedItemState,thumb,low,src-alias,Clears the second halfword of the currently equipped inventory record; field meaning is tentative
 0816D4E4,SceneHud_CanApplySelectedAction,thumb,low,src-alias,
 0816D618,PauseMenu_ClearItemSlot,thumb,low,src-alias,Empties an item slot and clears its associated value when using the primary inventory
+0816D634,PauseMenu_ApplyItemSlot,thumb,low,src-alias,
 0816D7F8,PauseMenu_SwapItemSlots,thumb,low,src-alias,Swaps two slots through the appropriate helper for the active inventory
 0816D820,SceneInventory_GetItemConditionFrame,thumb,low,src-alias,
 0816D868,SceneHud_ShowActionPreview,thumb,low,src-alias,

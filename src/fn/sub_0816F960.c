@@ -11,7 +11,7 @@ struct MotionSequence {
     u8 selection;
 };
 u32 PauseMenu_UpdateSpriteMotion(struct MotionSequence *, u32);
-void sub_0816D634(struct MotionSequence *, u32);
+void PauseMenu_ApplyItemSlot(struct MotionSequence *, u32);
 void SceneHud_UpdateTimedMessage(void);
 void Hud_SetInteractionCallback(struct MotionSequence *, void (*)(void), int);
 void Sound_PlaySong(u32);
@@ -20,7 +20,7 @@ void MotionSequence_AdvanceAfterDelay(struct MotionSequence *p)
     if (PauseMenu_UpdateSpriteMotion(p, 0)) {
         if (++p->delay > 7) {
             p->flags |= 1;
-            sub_0816D634(p, p->selection);
+            PauseMenu_ApplyItemSlot(p, p->selection);
             Hud_SetInteractionCallback(p, SceneHud_UpdateTimedMessage, 1);
             Sound_PlaySong(0x10D);
         }
