@@ -5,6 +5,7 @@
 #include "scene_input.h"
 #include "contact_actor.h"
 #include "scene_vec.h"
+#include "render.h"
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
@@ -74,9 +75,13 @@ struct SceneHudState {
     u8 actionResultResources[2][0x20]; /* 0x104: normal and bonus keyframes */
     u8 controlAnimationResource[0x20]; /* 0x144 */
     u8 comparisonResource[0x20];       /* 0x164 */
-    u8 unknown184[0xA12 - 0x184];
-    u16 savedMenuMode; /* 0xA12: restored after page fade */
-    u8 unknownA14[0xA3F - 0xA14];
+    u8 unknown184[0x5C];
+    struct BackgroundLayer savedBackground; /* 0x1E0: field BG1 state while pause menu is open */
+    u8 savedBackgroundMap[0x800];           /* 0x210: field BG1 tilemap */
+    u16 savedBlendControl;                  /* 0xA10 */
+    u16 savedMenuMode;                      /* 0xA12: restored after page fade */
+    u16 savedBackgroundControl;             /* 0xA14: BG1CNT */
+    u8 unknownA16[0x29];
     u8 actionOwnerIndex;        /* 0xA3F: index into party actor pointers */
     struct Player *actionOwner; /* 0xA40 */
     u8 unknownA44[8];
@@ -107,7 +112,7 @@ struct SceneHudState {
     u8 panelInitialized; /* 0xA94: cleared during gameplay HUD resource setup (tentative) */
     u8 unknownA95[4];
     u8 energyTimerVisible; /* 0xA99: set after drawing the four energy timer digits */
-    u8 unknownA9A[2];
+    u8 pageTransitions[2]; /* 0xA9A: cleared when returning to the field HUD */
     struct SceneHudControlAnimation controlAnimation; /* 0xA9C */
     u8 unknownABC[0x41];
     u8 actionRefreshRequested; /* 0xAFD */
@@ -183,7 +188,11 @@ struct SceneHudState {
     u8 actionGridGroup; /* 0x4388: values above one select unlock confirmation */
     u8 unknown4389;
     u8 actionSelection; /* 0x438A: selected action lookup */
-    u8 unknown438B[0x5E];
+    u8 unknown438B[0x4D];
+    u16 savedDisplayControl;                        /* 0x43D8 */
+    u16 savedMosaicHalfword, savedMosaicParameter;  /* 0x43DA */
+    u8 savedSpriteMosaicAttribute, savedMosaicByte; /* 0x43DE */
+    u8 unknown43E0[9];
     u8 binaryChoice; /* 0x43E9: left/right toggles; A confirms, B cancels */
     u8 unknown43EA[2];
     struct SceneHudWidgetMotion widgetMotions[1]; /* 0x43EC: indexed, count unconfirmed */
