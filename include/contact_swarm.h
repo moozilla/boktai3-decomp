@@ -4,7 +4,9 @@
 #include "contact_actor.h"
 #include "contact_swarm_sprite.h"
 struct ContactSwarmGraphics {
-    u8 unknown0[0xC];
+    u8 unknown0[6];
+    u16 paletteIndex;
+    u8 unknown8[4];
     const void *paletteData;
     u8 unknown10[0xC];
 };

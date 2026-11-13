@@ -7819,8 +7819,10 @@ addr,name,mode,confidence,source,notes
 081C47A0,SceneTransition_Initialize,thumb,low,src-alias,Initializes background scroll; script and hidden contact-effect target.
 081C47EC,Registry6A37_Create,thumb,low,src-alias,Creates and initializes the task registered under actor key 0x6A37
 081C482C,ScenePanelSubject_SlideOpen,thumb,low,src-alias,
+081C4950,ShipWheel_ProcessMessages,thumb,low,src-alias,Handles wheel slide-open messages.
 081C49C0,ShipWheel_Update,thumb,low,src-alias,Processes incoming commands and invokes the current state handler for the tentative ship wheel object
 081C49DC,ShipWheel_OnDestroy,thumb,low,src-alias,Removes the object's sprite and clears its singleton pointer
+081C49F4,ShipWheel_Initialize,thumb,low,src-alias,Loads wheel sprite; palette transition; sequence and event receiver.
 081C4BA8,ShipWheel_RequestStop,thumb,low,src-alias,Sets flag bit 0 on the active ship wheel object as a provisional stop request
 081C4BC4,ShipWheel_Create,thumb,low,src-alias,Creates the singleton whose graphics resource 0x2173 is provisionally identified as a ship wheel
 081C4C18,SceneTransition_Finish,thumb,low,src-alias,Calls the optional completion script and destroys the child task and transition controller
@@ -7840,6 +7842,7 @@ addr,name,mode,confidence,source,notes
 081C4EC0,RegistryC281_UpdateClosingFade,thumb,low,src-alias,Waits 65 frames before invoking the completion script and killing both tasks
 081C4EDC,RegistryC281_Update,thumb,low,src-alias,Task update callback that dispatches the current sequence state
 081C4EEC,RegistryC281_Destroy,thumb,low,src-alias,Empty destruction callback for the registry C281 sequence task
+081C4EF0,SceneFade_Initialize,thumb,low,src-alias,Reads movement endpoints; delays and exit script.
 081C5000,RegistryC281_Create,thumb,low,src-alias,Creates and initializes the registry C281 actor movement sequence from script options
 081C503C,Registry1909_UpdateVisibilityFlicker,thumb,low,src-alias,Toggles the animation visibility flag at shrinking intervals and reports completion
 081C5088,Registry1909_EnterHiddenState,thumb,low,src-alias,Installs the hidden-state callback and resets its timer
@@ -7850,8 +7853,10 @@ addr,name,mode,confidence,source,notes
 081C513C,Registry1909_UpdateLandingAnimation,thumb,low,src-alias,Steps the landing animation for 60 frames before starting visibility flicker
 081C5164,Registry1909_UpdateFlickerState,thumb,low,src-alias,Advances visibility flicker and enters the hidden state when it finishes
 081C5190,Registry1909_UpdateFalling,thumb,low,src-alias,
+081C5264,FallingSceneSprite_ProcessMessages,thumb,low,src-alias,Starts falling on the trigger command.
 081C52DC,Registry1909_Update,thumb,low,src-alias,Task update callback that processes scene messages and dispatches the current animation state
 081C52FC,Registry1909_Destroy,thumb,low,src-alias,Task destruction callback that removes the object's animation
+081C5308,FallingSceneSprite_Initialize,thumb,low,src-alias,Loads animation resource; position and event receiver.
 081C53EC,SceneMessageSprite_Create,thumb,low,src-alias,Creates an animated task registered as scene-message receiver type 10; provisional object name
 081C542C,GameState_GetPackedTripletValue,thumb,low,src-alias,
 081C5470,ChallengeMenu_SetStoredRank,thumb,low,src-alias,Stores a four-bit value indexed by group and option; rank interpretation is tentative
@@ -8181,9 +8186,12 @@ addr,name,mode,confidence,source,notes
 081D2D1C,TaggedSceneNpc_CreateTagZeroFromScript,thumb,low,src-alias,Creates a script-configured NPC with tag zero
 081D2D28,TaggedSceneNpc_CreateTagOneFromScript,thumb,low,src-alias,Creates a script-configured NPC with tag one
 081D2D34,SceneNpc_SetSpecialModeFromScript,thumb,low,src-alias,
+081D2D78,FrostEmitter_SpawnParticle,thumb,low,src-alias,Allocates and initializes one frost particle with randomized velocity.
+081D2EA4,FrostEmitter_UpdateParticle,thumb,low,src-alias,Moves one frost particle; advances playback and hides it on expiry.
 081D2FE8,FrostEmitter_Step,thumb,low,src-alias,
 081D305C,FrostEmitter_Update,thumb,low,src-alias,Task update callback that invokes the active frost particle routine
 081D3078,FrostEmitter_Destroy,thumb,low,src-alias,Task destruction callback that removes all twelve particle sprites
+081D3094,FrostEmitter_Initialize,thumb,low,src-alias,Loads frost graphics and initializes twelve inactive particle slots.
 081D313C,FrostEmitter_CreateTask,thumb,low,src-alias,Allocates the particle task and initializes its sprites and animation resources
 081D317C,FrostEmitter_Create,thumb,low,src-alias,Creates an idle frost emitter with its source and emission state cleared
 081D319C,FrostEmitter_StartEmission,thumb,low,src-alias,Sets the position source and enables periodic particle emission
@@ -8307,7 +8315,7 @@ addr,name,mode,confidence,source,notes
 081D9D14,Projectile_UpdateResetDelay,thumb,low,src-alias,Delay callback that sets flag 2 and restarts projectile state after the lifetime threshold
 081D9D3C,Projectile_SpawnImpactPair,thumb,low,src-alias,Tentatively: on eligible projectile impact; spawn two randomized child projectiles and register their stimuli.
 081D9F18,Projectile_InitFromType,thumb,low,src-alias,
-081DA048,TimedEffect_HandleCollision,thumb,low,src-alias,
+081DA048,TimedEffect_OnContact,thumb,low,src-alias,Selects the projectile terminal or impact callback after collider contact.
 081DA0B4,TimedEffect_InitEntry,thumb,low,src-alias,
 081DA178,TimedEffect_RemoveFromManager,thumb,low,src-alias,
 081DA1DC,TimedEffect_UpdateTerrainTurn,thumb,low,src-alias,
@@ -8322,8 +8330,10 @@ addr,name,mode,confidence,source,notes
 081DAC1C,Projectile_CreateForOwner,thumb,low,src-alias,Validates an owner slot from zero through three and forwards the configuration to projectile creation
 081DAC34,Projectile_InitializeParams,thumb,low,src-alias,
 081DACB0,Projectile_SetFlightParams,thumb,low,src-alias,Sets flags and lifetime together with heading and horizontal speed
+081DACC4,Projectile_SetVerticalMotion,thumb,low,src-alias,Sets secondary duration; turn parameter and turn speed.
 081DACCC,Projectile_SetDamageParams,thumb,low,src-alias,Stores five parameters forwarded to collider combat configuration; damage interpretation tentative
 081DACE4,Projectile_SetCollisionSize,thumb,low,src-alias,Sets the three dimensions passed to collider initialization
+081DACEC,Projectile_SetUniformCollisionSize,thumb,low,src-alias,Sets all three collision bounds to the same value.
 081DACF4,Projectile_SetCollisionOffset,thumb,low,src-alias,Sets the three offset components passed alongside collider dimensions
 081DACFC,Projectile_SetCollisionMask,thumb,low,src-alias,Sets the halfword passed as a collider initialization parameter; mask interpretation tentative
 081DAD04,Projectile_SetSpriteParams,thumb,low,src-alias,Sets the animation resource and initial sprite frame and palette selection
@@ -8331,6 +8341,7 @@ addr,name,mode,confidence,source,notes
 081DAD10,Projectile_SetTypeAndElement,thumb,low,src-alias,Sets the projectile type and clamps the secondary subtype to zero through six; element interpretation tentative
 081DAD24,Projectile_SetVariant,thumb,low,src-alias,Sets the auxiliary halfword variant field used by projectile configuration; exact meaning tentative
 081DAD28,Task4E01_RemoveEntry,thumb,low,src-alias,
+081DAD94,Projectile_SetEntryDirection,thumb,low,src-alias,Updates a live entry direction; terrain sector and velocity.
 081DAE64,Task4E01_GetEntryPosition,thumb,low,src-alias,Returns the position field of an indexed entry after checking task existence and bounds
 081DAEA0,Task4E01_GetKind7Value,thumb,low,src-alias,
 081DAEE8,SceneEntry_SetPosition,thumb,low,src-alias,
@@ -8342,8 +8353,8 @@ addr,name,mode,confidence,source,notes
 081DB0C4,Explosion_InitColliderWithFlags,thumb,low,src-alias,
 081DB168,Explosion_Init,thumb,low,src-alias,Initializes the effect sprite and standard collider with position and activation delay
 081DB1D8,Explosion_InitWithCollisionFlags,thumb,low,src-alias,Initializes the same effect with an additional configurable collider flag argument
-081DB24C,Explosion_CreateImmediate,thumb,low,src-alias,
-081DB2B8,Explosion_CreateDelayed,thumb,low,src-alias,
+081DB24C,Explosion_CreateImmediate,thumb,low,src-alias,Allocates an explosion with default contact parameters and no delay.
+081DB2B8,Explosion_CreateDelayed,thumb,low,src-alias,Allocates an explosion with default contact parameters and an activation delay.
 081DB324,Explosion_Create,thumb,low,src-alias,Allocates an explosion with caller-supplied collision parameters and activation delay
 081DB390,Explosion_CreateAt,thumb,low,src-alias,
 081DB404,Explosion_CreateWithCollisionFlags,thumb,low,src-alias,Allocates an explosion using the initializer that accepts additional collider flags
@@ -8824,6 +8835,7 @@ addr,name,mode,confidence,source,notes
 081FC8BC,SlotActor_ResetOnFlags,thumb,low,src-alias,
 081FC900,SceneProjectile_InitSlot,thumb,low,src-alias,
 081FCA0C,SceneProjectile_ReleaseSlot,thumb,low,src-alias,Marks the collider inactive and removes the sprite before clearing the occupied slot bit
+081FCA44,SceneProjectile_UpdatePool,thumb,low,src-alias,Updates ten scripted projectile slots; contact responses; animation and launch delays.
 081FCF38,SceneProjectile_OnPoolDestroy,thumb,low,src-alias,Task destruction callback that releases all ten projectile slots and clears the singleton
 081FCF74,SceneProjectile_InitPool,thumb,low,src-alias,Publishes the projectile pool singleton and initializes its ten slots
 081FCFA8,SceneProjectile_CreatePool,thumb,low,src-alias,Allocates and initializes the projectile pool task with update and destruction callbacks
@@ -8831,6 +8843,7 @@ addr,name,mode,confidence,source,notes
 081FD01C,Projectile_SpawnAtPosition,thumb,low,src-alias,Allocates a projectile slot; configures behavior; velocity; colliders and animation; activates it; and plays its spawn sound.
 081FD3D8,Projectile_InitParameters,thumb,low,src-alias,
 081FD458,Projectile_SetLaunchParameters,thumb,low,src-alias,Sets type and lifetime plus heading and speed used to calculate initial velocity
+081FD46C,Projectile_SetTurnParameters,thumb,low,src-alias,Sets tracking duration; turn parameter and turn speed; interpretation tentative.
 081FD474,Projectile_SetHomingParameters,thumb,low,src-alias,Sets steering duration and target pointer plus turn rate; target use confirmed by steering code
 081FD47C,Projectile_SetCollisionParameters,thumb,low,src-alias,Stores five parameters subsequently passed into collider configuration
 081FD494,Projectile_SetCollisionExtents,thumb,low,src-alias,Sets three halfword dimensions copied into the collider; extent interpretation tentative
@@ -8839,6 +8852,7 @@ addr,name,mode,confidence,source,notes
 081FD4AC,Projectile_SetBehaviorCallback,thumb,low,src-alias,
 081FD4B0,Projectile_SetScriptProcedure,thumb,low,src-alias,Sets the procedure identifier passed to ScriptProc_Start and an associated argument
 081FD4B8,Projectile_SetBehaviorMode,thumb,low,src-alias,Sets the mode used to select the projectile update callback during creation
+081FD4C0,Projectile_AdjustHeading,thumb,low,src-alias,Turns toward the tracked target within the configured tracking duration.
 081FD530,Projectile_SetTrackingTarget,thumb,low,src-alias,Stores the target position pointer and enables target tracking
 081FD53C,OrbitEffect_SpawnInwardParticle,thumb,low,src-alias,Creates a sprite particle at a random X/Z offset; moving toward the orbit effect position.
 081FD664,OrbitEffect_AdjustHeading,thumb,low,src-alias,

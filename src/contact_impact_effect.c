@@ -696,7 +696,7 @@ struct ContactImpactEffect *RegistryF3E4_CreateHidden(s32 field3B, s32 mode)
     p->coordinateMode = mode;
     AnimData_Load(p->animation, 0x3641);
     Sprite_Init(&p->sprite, p->animation, 0x12);
-    p->sprite.unk_04[3] = field3B;
+    p->sprite.priority = field3B;
     fill32(&p->sprite.position.x, &zero, 0x05000002);
     p->blinkTimer = 0;
     p->blinkState = 0;
@@ -739,7 +739,7 @@ struct ContactImpactEffect *RegistryF3E4_Create(u32 name)
     p->name = name;
     AnimData_Load(p->animation, 0x3641);
     Sprite_Init(&p->sprite, p->animation, 2);
-    p->sprite.unk_04[3] = 2;
+    p->sprite.priority = 2;
     if (Script_SeekToKeyword('p')) {
         p->sprite.position.x = Script_GetValue();
         p->sprite.position.y = Script_GetValue();

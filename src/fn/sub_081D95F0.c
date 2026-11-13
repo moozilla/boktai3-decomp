@@ -22,20 +22,20 @@ s32 Task4E01_UpdateExpandingImpact(struct Task4E01Projectile *p)
         p->flags |= two;
     }
     sprite = &p->sprite;
-    ended = PlayerCue_StepSequenceEnded(sprite, &p->sequence);
-    if (ended == 1 && !(params->flags & 0x10) && !p->restarted) {
-        p->animation = 4;
-        state = &p->sequence;
-        Anim_RestartSequence(state, p->resource, 4, 0, 0);
+    ended = PlayerCue_StepSequenceEnded(sprite, &p->runtime.sequence);
+    if (ended == 1 && !(params->flags & 0x10) && !p->runtime.restarted) {
+        p->runtime.animation = 4;
+        state = &p->runtime.sequence;
+        Anim_RestartSequence(state, p->runtime.resource, 4, 0, 0);
         PlayerCue_StepSequenceEndedWithFirstFlipMask(&p->sprite, state, ended);
-        p->restarted++;
+        p->runtime.restarted++;
     }
     tick = p->frame;
     if (sub_08249498(tick, 15) == 14 && tick <= 44) {
-        s32 radius = p->radius += 16;
+        s32 radius = p->runtime.radius += 16;
         Projectile_SetCollisionSize(params, radius, 80, radius);
         {
-            struct Task4E01Collider *collider = &p->collider;
+            struct ContactCollider *collider = &p->colliders[0];
             collider->bounds = params->bounds;
         }
     }
