@@ -37,7 +37,9 @@ route those accesses through the bus or replace the relevant SDK functions.
 Mapping linear memory alone does not implement hardware side effects.
 
 The frame loop calls `hw_step_cycles` to advance timers and sound FIFOs,
-`hw_hblank` once per scanline and `hw_vblank` at line 160. DMA timing is
+`hw_scanline_start` at each line start, `hw_hblank` at the start of HBlank,
+and `hw_vblank` once at line 160. Line-start updates clear HBlank and generate
+VCOUNT-match interrupts; HBlank does not repeat that match interrupt. DMA timing is
 functional, not cycle-accurate. HBlank DMA runs only on visible lines. Interrupt
 callbacks receive pending enabled bits when IME is set; the host dispatches the
 game's handlers and acknowledges IF through a bus write. The BIOS wait callback
@@ -64,7 +66,9 @@ the sound jump-table replacement when that library is integrated.
 DMA supports all four channels, immediate/VBlank/HBlank triggers, increment,
 decrement, fixed/reload addresses, repeat, completion interrupts, and sound FIFO
 requests on channels 1/2. Timers support prescalers, reload, cascade and IRQ;
-keypad input is active-low with OR/AND keypad interrupts.
+keypad input is active-low with OR/AND keypad interrupts. Byte writes preserve
+timer reload values and PSG length counters; display/sound status bits remain
+read-only.
 
 Boktai 3 uses **8 KB EEPROM**, as confirmed by `docs/EEPROM.md`. The layer offers
 512-byte/8 KB EEPROM serial transfers and SDK `Eeprom_*` block replacements,

@@ -139,11 +139,13 @@ static void dma_control(Hw *hw, unsigned channel, uint16_t value)
     }
 }
 
-static void io_write16(Hw *hw, unsigned offset, uint16_t value)
+static void io_write16(Hw *hw, unsigned offset, uint16_t value, uint16_t mask)
 {
     uint16_t old = hw_get16(hw->io + offset);
     if (offset == 0x006 || offset == 0x130) return;
     if (offset == 0x202) value = old & ~value;
+    if (offset == 0x004) value = (value & ~7u) | (old & 7);
+    if (offset == 0x084) value = (value & 0x80) | (old & 15);
     if (offset >= 0x100 && offset < 0x110 && !(offset & 2)) {
         HwTimer *timer = hw->timers + ((offset - 0x100) / 4);
         timer->reload = value;
@@ -177,7 +179,7 @@ static void io_write16(Hw *hw, unsigned offset, uint16_t value)
     }
     if (offset == 0x132) hw_set_keys(hw, hw->keys);
     if ((offset == 0x200 || offset == 0x208) && value != old) hw_request_interrupt(hw, 0);
-    if (offset >= 0x60 && offset <= 0x84) hw_audio_io_write(hw, offset, value);
+    if (offset >= 0x60 && offset <= 0x84) hw_audio_io_write(hw, offset, value, mask);
 }
 
 void hw_write8(Hw *hw, uint32_t a, uint8_t value)
@@ -191,12 +193,14 @@ void hw_write8(Hw *hw, uint32_t a, uint8_t value)
             return;
         }
         if ((offset & ~1u) == 0x202) {
-            io_write16(hw, 0x202, (uint16_t)value << ((offset & 1) * 8));
+            io_write16(hw, 0x202, (uint16_t)value << ((offset & 1) * 8), 0xffff);
             return;
         }
         word = hw_get16(hw->io + (offset & ~1u));
+        if (offset >= 0x100 && offset < 0x110 && !(offset & 2))
+            word = hw->timers[(offset - 0x100) / 4].reload;
         word = (uint16_t)((word & (offset & 1 ? 0xff : 0xff00)) | (uint16_t)value << ((offset & 1) * 8));
-        io_write16(hw, offset & ~1u, word);
+        io_write16(hw, offset & ~1u, word, offset & 1 ? 0xff00 : 0x00ff);
         return;
     }
     if ((a >> 24) == 0x0e || (a >> 24) == 0x0f) { hw_flash_write(hw, (uint16_t)a, value); return; }
@@ -223,7 +227,7 @@ void hw_write16(Hw *hw, uint32_t a, uint16_t value)
 {
     uint8_t *p;
     a &= ~1u;
-    if (a >= HW_IO_BASE && a < HW_IO_BASE + sizeof(hw->io)) { io_write16(hw, a - HW_IO_BASE, value); return; }
+    if (a >= HW_IO_BASE && a < HW_IO_BASE + sizeof(hw->io)) { io_write16(hw, a - HW_IO_BASE, value, 0xffff); return; }
     if (a >= 0x080000c4 && a <= 0x080000c8) { hw_cartridge_write(hw, a, value); return; }
     if (is_eeprom(a)) { hw_eeprom_write(hw, value); return; }
     if ((a >> 24) == 0x0e || (a >> 24) == 0x0f) { hw_flash_write(hw, (uint16_t)a, (uint8_t)value); return; }
@@ -249,7 +253,7 @@ void hw_sync_io(Hw *hw)
     hw_copy(snapshot, mapped, sizeof(snapshot));
     for (offset = 0; offset < sizeof(snapshot); offset += 2) {
         uint16_t value = hw_get16(snapshot + offset);
-        if (value != hw_get16(hw->io + offset)) io_write16(hw, offset, value);
+        if (value != hw_get16(hw->io + offset)) io_write16(hw, offset, value, 0xffff);
     }
 }
 
@@ -324,19 +328,29 @@ void hw_step_cycles(Hw *hw, uint32_t cycles)
     }
 }
 
+static void display_status(Hw *hw, unsigned scanline, int hblank)
+{
+    uint16_t old = hw_get16(hw->io + 4), status;
+    hw->scanline = (uint16_t)(scanline % HW_LINES_PER_FRAME);
+    status = (uint16_t)((old & ~7u) | (hblank ? 2 : 0) |
+                       (hw->scanline >= 160 && hw->scanline < 227));
+    if (hw->scanline == status >> 8) status |= 4;
+    hw_put16(hw->io + 4, status);
+    hw_put16(hw->io + 6, hw->scanline);
+    hw_publish_io(hw, 4, 4);
+    if ((status & 0x24) == 0x24 && !(old & 4)) hw_request_interrupt(hw, 4);
+}
+
+void hw_scanline_start(Hw *hw, unsigned scanline)
+{
+    display_status(hw, scanline, 0);
+}
+
 void hw_hblank(Hw *hw, unsigned scanline)
 {
     unsigned channel;
-    uint16_t status;
-    hw->scanline = (uint16_t)(scanline % HW_LINES_PER_FRAME);
-    hw_put16(hw->io + 6, hw->scanline);
-    status = hw_get16(hw->io + 4);
-    status = (uint16_t)((status & ~7u) | 2 | (hw->scanline >= 160 && hw->scanline < 227));
-    if (hw->scanline == status >> 8) status |= 4;
-    hw_put16(hw->io + 4, status);
-    hw_publish_io(hw, 4, 4);
-    if (status & 0x10) hw_request_interrupt(hw, 2);
-    if ((status & 0x24) == 0x24) hw_request_interrupt(hw, 4);
+    display_status(hw, scanline, 1);
+    if (hw_get16(hw->io + 4) & 0x10) hw_request_interrupt(hw, 2);
     if (hw->scanline >= 160) return;
     for (channel = 0; channel < 4; ++channel)
         if (hw->dma[channel].enabled && (hw->dma[channel].control & 0x3000) == 0x2000)
@@ -346,10 +360,7 @@ void hw_hblank(Hw *hw, unsigned scanline)
 void hw_vblank(Hw *hw)
 {
     unsigned channel;
-    hw->scanline = 160;
-    hw_put16(hw->io + 6, 160);
-    hw_put16(hw->io + 4, (hw_get16(hw->io + 4) & ~2u) | 1);
-    hw_publish_io(hw, 4, 4);
+    display_status(hw, 160, 0);
     if (hw_get16(hw->io + 4) & 8) hw_request_interrupt(hw, 1);
     for (channel = 0; channel < 4; ++channel)
         if (hw->dma[channel].enabled && (hw->dma[channel].control & 0x3000) == 0x1000)

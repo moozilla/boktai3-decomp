@@ -139,6 +139,7 @@ void hw_write32(Hw *hw, uint32_t address, uint32_t value);
  * required for write-one-to-clear flags, FIFO/trigger writes and polling. */
 void hw_sync_io(Hw *hw);
 void hw_step_cycles(Hw *hw, uint32_t cycles);
+void hw_scanline_start(Hw *hw, unsigned scanline);
 void hw_hblank(Hw *hw, unsigned scanline);
 void hw_vblank(Hw *hw);
 void hw_set_keys(Hw *hw, uint16_t pressed);

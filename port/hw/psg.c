@@ -12,7 +12,7 @@ static void publish_status(Hw *hw)
     hw_publish_io(hw, 0x84, 2);
 }
 
-void hw_audio_io_write(Hw *hw, unsigned offset, uint16_t value)
+void hw_audio_io_write(Hw *hw, unsigned offset, uint16_t value, uint16_t mask)
 {
     unsigned i;
     if (offset == 0x84) {
@@ -30,11 +30,11 @@ void hw_audio_io_write(Hw *hw, unsigned offset, uint16_t value)
         HwPsgChannel *channel = hw->psg + i;
         uint8_t env = hw->io[envelope_register[i]];
         if (offset == length_register[i]) {
-            channel->length = (i == 2 ? 256 : 64) - (hw->io[offset] & (i == 2 ? 255 : 63));
-            if (i != 2 && !(env & 0xf8)) channel->enabled = 0;
+            if (mask & 0xff) channel->length = (i == 2 ? 256 : 64) - (hw->io[offset] & (i == 2 ? 255 : 63));
+            if ((mask & 0xff00) && i != 2 && !(env & 0xf8)) channel->enabled = 0;
         }
         if (i == 2 && offset == 0x70 && !(value & 0x80)) channel->enabled = 0;
-        if (offset != frequency_register[i] || !(value & 0x8000)) continue;
+        if (offset != frequency_register[i] || !(mask & 0xff00) || !(value & 0x8000)) continue;
         channel->enabled = (uint8_t)(i == 2 ? (hw->io[0x70] & 0x80) != 0 : (env & 0xf8) != 0);
         channel->phase = 0;
         channel->lfsr = 0x7fff;

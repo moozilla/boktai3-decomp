@@ -128,6 +128,8 @@ static int device_tests(void)
     hw_step_cycles(hw, 9);
     CHECK(hw->timers[0].counter == 0xfffd && hw->timers[1].counter == 0xfffe);
     CHECK((interrupts & 0x18) == 0x18);
+    hw_write8(hw, HW_IO_BASE + 0x101, 0x80);
+    CHECK(hw->timers[0].reload == 0x80fc && hw->timers[0].counter == 0xfffd);
     hw_write16(hw, HW_IO_BASE + 0x102, 0);
     hw_write16(hw, HW_IO_BASE + 0x106, 0);
     hw_write16(hw, HW_IO_BASE + 0x82, 0x0800);
@@ -141,6 +143,23 @@ static int device_tests(void)
     CHECK(hw_read16(hw, 0x05000000) == 0x3737);
     hw_write8(hw, 0x07000000, 0xff);
     CHECK(hw_read16(hw, 0x07000000) == 0);
+    hw_scanline_start(hw, 3);
+    hw_write16(hw, HW_IO_BASE + 4, 0x0438);
+    hw_write16(hw, HW_IO_BASE + 0x202, 0xffff);
+    hw_scanline_start(hw, 4);
+    CHECK((hw_read16(hw, HW_IO_BASE + 4) & 7) == 4 && hw_read16(hw, HW_IO_BASE + 6) == 4);
+    CHECK(hw_read16(hw, HW_IO_BASE + 0x202) == 4);
+    hw_write16(hw, HW_IO_BASE + 0x202, 0xffff);
+    hw_hblank(hw, 4);
+    CHECK((hw_read16(hw, HW_IO_BASE + 4) & 7) == 6 && hw_read16(hw, HW_IO_BASE + 0x202) == 2);
+    hw_scanline_start(hw, 5);
+    CHECK(!(hw_read16(hw, HW_IO_BASE + 4) & 7));
+    hw_write16(hw, HW_IO_BASE + 4, 0x043f); /* software cannot set status bits */
+    CHECK(!(hw_read16(hw, HW_IO_BASE + 4) & 7));
+    hw_vblank(hw);
+    CHECK((hw_read16(hw, HW_IO_BASE + 4) & 7) == 1);
+    hw_scanline_start(hw, 227);
+    CHECK(!(hw_read16(hw, HW_IO_BASE + 4) & 3));
     VBlankIntrWait(); CHECK(waits == 2);
     hw_system_call(3); CHECK(waits == 2 + 0x3080);
     iwram[0x7e00] = 0x55; iwram[0] = 0xff;
@@ -283,8 +302,21 @@ static int audio_tests(void)
     CHECK(machine.psg[3].enabled);
     hw_psg_render(&machine, pcm, 32, 32768, 0);
     CHECK(machine.psg[3].lfsr != 0x7fff);
+    hw_write16(&machine, HW_IO_BASE + 0x62, 0xf03d); /* three length ticks */
+    hw_write16(&machine, HW_IO_BASE + 0x64, 0xc600);
+    hw_psg_render(&machine, pcm, 128, 32768, 0);
+    {
+        uint32_t length = machine.psg[0].length;
+        CHECK(length < 3);
+        hw_write8(&machine, HW_IO_BASE + 0x63, 0xe0);
+        CHECK(machine.psg[0].length == length); /* envelope byte is not length */
+        hw_write8(&machine, HW_IO_BASE + 0x63, 0);
+        CHECK(!machine.psg[0].enabled);
+    }
     hw_write16(&machine, HW_IO_BASE + 0x84, 0);
     CHECK(!machine.psg[3].enabled);
+    hw_write16(&machine, HW_IO_BASE + 0x84, 0x8f);
+    CHECK(hw_read16(&machine, HW_IO_BASE + 0x84) == 0x80);
     return 0;
 }
 

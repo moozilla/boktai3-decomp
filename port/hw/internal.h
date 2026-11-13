@@ -37,6 +37,6 @@ void hw_flash_write(Hw *hw, uint16_t address, uint8_t value);
 uint8_t hw_flash_read(Hw *hw, uint16_t address);
 void hw_eeprom_write(Hw *hw, uint16_t bit);
 uint16_t hw_eeprom_read(Hw *hw);
-void hw_audio_io_write(Hw *hw, unsigned offset, uint16_t value);
+void hw_audio_io_write(Hw *hw, unsigned offset, uint16_t value, uint16_t mask);
 
 #endif
