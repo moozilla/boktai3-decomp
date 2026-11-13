@@ -1864,6 +1864,41 @@ Each was read from the compiler source and confirmed on a live draft.
    so p wins and keeps its own register. BreakableBarrier_SetPosition (five pins and a barrier)
    matched once its `return input;` was dropped. The caller ignores the value.
 
+230. **One local shared across disjoint phases combines their register conflicts.**
+   HomingProjectile_UpdateDefaultState (081FF454) had three copies of a facing inline,
+   each preserving the second flip-byte address. The first two naturally used r7 because
+   their live one value occupied r5; the last used r5, with two differing instructions.
+   `AGBCC_FORCE=saved#2:7` matched. Raising its priority did not. Writing the three facing
+   blocks in the caller with one shared saved pointer combines the conflicts and matches
+   all 1256 bytes without the final r5-clobber barrier. Sharing it with unrelated vector
+   pointers disturbed allocation broadly; share corresponding roles first. In
+   Presentation_UpdateDropShakeBlink (081E2910), the analogous phase scratch union holds
+   a destination pointer while moving and a visibility mask while blinking. The mask's
+   r2 conflict gives the moving stores r3 and removes three pins. Keep the flag clears
+   constant (`&= ~1`): complementing the union member selects BIC instead of the ROM's
+   AND and changes allocation. The union form with constant clears matches all 576 bytes.
+
+231. **Partial union writes can keep an early conflict after combine replaces them with zero.**
+   RisingActor_AdvanceHeight (081FDAF4) needs a zero store in r4 while ordinary scalar zero
+   takes r0. `AGBCC_FORCE=zero:4` diagnoses the last pin after sharing the component pointer.
+   With `union { s32 value; s16 halves[2]; } zero`, set both halves to zero and assign value
+   to the destination. Flow counts the word live from entry through the argument and scale
+   registers (15 insns); combine subsequently folds the partial writes into a single zero
+   set, and allocation chooses r4. Returning the word leaves one different instruction
+   (`mov r0,r4`); returning literal zero matches all 76 bytes. A whole-word assignment or
+   initializer does not preserve the early conflicts. Both halves are initialized before
+   the word is read; no uninitialized C value or volatile access is needed.
+
+232. **Split unrelated vector lifetimes, then retain a typed view for nearby configuration fields.**
+   ProjectilePool_Update (08202730) used one vector pointer for velocity and position; it
+   spilled despite both uses being short. The diagnostic `AGBCC_PRI=v:+4100,o:+600` matched.
+   Splitting velocity and position into separate locals removes the spill but leaves nine
+   address/reload differences. A local struct view beginning at params.baseY and containing
+   baseY, spriteFlag, script, sequence and persist lets the height and persistence reads
+   share their actual field base. Together the changes match all 796 bytes and remove both
+   barriers. Keep the complete intervening layout rather than expressing persist through
+   a raw offset; the view lives in the unit and needs no shared-header change.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
