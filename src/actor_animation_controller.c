@@ -1093,20 +1093,20 @@ void Actor_SetFacingAndIdle(void)
         if (g == 0)
             return;
     }
-    H(0xf8a) = Script_GetValue();
+    g->resource = Script_GetValue();
     {
         u8 direction = Script_GetKeywordValue(0x64, 0);
         u32 flip = 0;
         direction &= 7;
-        B(0xf68) = direction;
+        g->facing = direction;
         if (direction > 4) {
             direction = 8 - direction;
             flip = 1;
         }
-        B(0xf66) = direction;
-        B(0xf6b) = flip;
+        g->direction = direction;
+        g->flip = flip;
     }
-    Anim_SetSequence((u8 *)g + 0xe24, W(0xe74), 0, B(0xf66), B(0xf6b));
+    Anim_SetSequence(&g->anim, g->arg, 0, g->direction, g->flip);
     Actor_SetState(g, 2, 0);
 }
 
