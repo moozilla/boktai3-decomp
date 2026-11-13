@@ -7,8 +7,7 @@ struct ArmorPaletteController {
     void (*update)(void *);
     void (*finish)(void *);
     u16 palettes[16][16]; /* 0x008 */
-    u16 banks[3][2][16];  /* 0x208 */
-    u8 unknown2c8[0x408 - 0x2c8];
+    u16 working[16][16]; /* 0x208 */
     u16 saved[4][16]; /* 0x408 */
     u16 timer;        /* 0x488 */
     u8 bank;          /* 0x48a */
