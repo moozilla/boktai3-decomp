@@ -93,7 +93,7 @@ struct SceneCombatActor {
     u16 flags;
     u8 unknownB34[4];
     u8 kind, heading;
-    u8 targetHeading, unknownB3B;
+    u8 targetHeading, motionHeading;
     u8 behavior, behaviorPhase, behaviorCounter;
     u8 action, actionPhase, actionReady, actionCounter, animationComplete;
     u8 shakeStrength;
