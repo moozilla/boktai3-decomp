@@ -1405,3 +1405,34 @@ be replaced before a clean final landing. Persistent search retains the old
 base and the pointer-first improvement. Next: change the height copy's class
 membership independently of the upper-delta Abs class, then use giv ordering
 to allocate the independent y-output pointer before the saved position.
+
+### TentacleActor_UpdateRetraction (080AB968): threshold barrier removed
+
+The local `u16 threshold[] = {0x6400}` initializer prepares the third argument
+before actor/divisor, matching without the threshold barrier. Unit MATCH in
+0014. An initialized union also works; a scalar u16 does not. The remaining
+barrier preserves absolute values and their signed source values.
+
+Nested direction decisions (`ax > az`, then x/z sign) with identical Advance
+calls retain all ROM absolute-value instructions. They leave two copies of the
+call because flow inserts `(use (const_int 0))` after the last fallthrough call.
+Cross-jump tracing confirms the other three paths merge. Explicit gotos and
+returns, duplicated oscillation calls, and duplicated entire remaining tails
+do not remove this last mismatch.
+
+Assigning `next = s` after each call supplies a real post-call instruction,
+letting all four calls and all direction tests merge in jump2. This is the new
+best ordinary draft: 15/17, shape 2, 328 versus 324 bytes. The only structural
+issue is the surviving actor copy (plus padding); original s and next overlap
+because CSE uses s for the first post-join call and field test, and next later.
+Next has priority 13571 (19/56), s 8543 (22/103); the former gets r6 and the
+latter r5. Spill rotation does not help. CSE_NOCANON=23 gives 13/15 but still
+has the copy. Using next throughout the tail, using input instead, taking the
+completion-field address before oscillation, returning the actor from Advance,
+and a returning while completion branch did not coalesce the views.
+
+The saved draft preserves the successful post-call assignment and nested
+sign tests. Persistent search: build/matchsearch/TentacleActor_UpdateRetraction.
+Next: stop CSE from extending the original actor through the join while keeping
+the post-call assignment until flow; that should make its allocation disjoint
+from next and eliminate the final copy after allocation.
