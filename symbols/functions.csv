@@ -4978,11 +4978,15 @@ addr,name,mode,confidence,source,notes
 0812CDB0,FragmentEffect_InitManager,thumb,low,src-alias,Clears the pool mask and loads fragment animation resource F422 before publishing the singleton
 0812CDD8,FragmentEffect_GetOrCreateManager,thumb,low,src-alias,Returns the singleton or creates its task with update and cleanup callbacks
 0812CE24,FragmentEffect_ResetManagerReference,thumb,low,src-alias,Clears the fragment manager pointer during scene subsystem reset
+0812CE30,LargeFragmentEffect_IsActive,thumb,low,src-alias,Tests whether any of the eight large-fragment slots is active.
+0812CE64,LargeFragmentEffect_StopAll,thumb,low,src-alias,Moves every active large-fragment slot into its stopping state.
+0812CE90,LargeFragmentEffect_OnCollision,thumb,low,src-alias,No-op collider callback used by the large-fragment effect.
 0812CE94,LargeFragmentEffect_InitCollider,thumb,low,src-alias,Initializes the adjacent F422 effect family's collider with larger 64-unit horizontal extents
 0812CF30,LargeFragmentEffect_UpdateCollider,thumb,low,src-alias,Moves the larger fragment effect collider to its current position and refreshes it
 0812CF50,SceneSlot_Allocate,thumb,low,src-alias,
 0812CF9C,SceneSlot_EmitPulse,thumb,low,src-alias,
 0812D064,LargeFragmentEffect_SpawnRandomParticle,thumb,low,src-alias,Emits a sprite particle at the supplied position with random radial velocity; vertical velocity; and lifetime.
+0812D17C,LargeFragmentEffect_RunIdleHook,thumb,low,src-alias,No-op lifecycle hook in the large-fragment effect family.
 0812D180,SceneSlot_UpdateTimedPulse,thumb,low,src-alias,
 0812D1D8,LargeFragmentEffect_UpdateAnimation,thumb,low,src-alias,
 0812D34C,SceneSlot_Remove,thumb,low,src-alias,
