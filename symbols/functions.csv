@@ -4386,16 +4386,18 @@ addr,name,mode,confidence,source,notes
 0810C1E8,RegistryF246_ShowSlotReadyFrame,thumb,low,src-alias,Tentatively displays a ready slot by clearing its hidden flag and selecting frame 44
 0810C210,RegistryF246_ShowSlotDefaultFrame,thumb,low,src-alias,Shows the indexed slot and selects its default frame 42
 0810C238,LinkPanel_UpdateAnimations,thumb,low,src-alias,
-0810C334,SlotMenu_UpdateLastEntry,thumb,low,src-alias,
-0810C388,RegistryF246_InitMessageDisplay,thumb,low,src-alias,Resets the shared message text and enables its display mode
+0810C334,LinkPanel_UpdateLastEntry,thumb,low,src-alias,Updates the final entry glyph from the first link slot status
+0810C388,LinkPanel_InitMessageDisplay,thumb,low,src-alias,Clears and shows the scrolling link status message
 0810C398,LinkPanel_GetConnectionStatus,thumb,low,src-alias,
 0810C420,LinkPanel_UpdateStatusMessage,thumb,low,src-alias,
-0810C724,SlotMenu_Destroy,thumb,low,src-alias,
-0810C798,SlotMenu_UpdateExitTransition,thumb,low,src-alias,
-0810C9E4,RegistryF246_Update,thumb,low,src-alias,Task update callback that dispatches the current handler while the parent controller remains active
-0810CA1C,RegistryF246_Destroy,thumb,low,src-alias,Task destruction callback that removes animations and clears the singleton
+0810C724,LinkPanel_Close,thumb,low,src-alias,Clears the display and runs the exit script before killing the task
+0810C774,LinkPanel_RunCompletionScript,thumb,low,src-alias,Runs the completion script and kills the task when a script is configured
+0810C798,LinkPanel_UpdateExitTransition,thumb,low,src-alias,Starts the exit transition and closes the panel after ten frames
+0810C7F4,LinkPanel_UpdateConnection,thumb,low,src-alias,Updates peer statuses and animations and handles exit input
+0810C9E4,LinkPanel_Update,thumb,low,src-alias,Dispatches the active panel state while the link session exists
+0810CA1C,LinkPanel_Destroy,thumb,low,src-alias,Removes panel animations and clears its singleton
 0810CA34,LinkPanel_InitFromScript,thumb,low,src-alias,
-0810CB30,RegistryF246_Create,thumb,low,src-alias,Returns the existing singleton or creates and initializes its task from script options
+0810CB30,LinkPanel_Create,thumb,low,src-alias,Creates the singleton link panel task from script options
 0810CB88,RegistryF246_Close,thumb,low,src-alias,Hides animations and clears message and background displays before killing the task
 0810CBC8,LinkRecordPanel_LoadBackground,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
 0810CC28,LinkRecordPanel_DrawTime,thumb,low,src-alias,Two-player record panel with shared preview models and a delayed exit.
@@ -6013,7 +6015,7 @@ addr,name,mode,confidence,source,notes
 08166670,MenuDisplay_FindEntryIndex,thumb,low,src-alias,
 08166714,MenuDisplay_InterpolateActivePairPositions,thumb,low,src-alias,Smooth active action icons toward their target positions.
 0816676C,MenuDisplay_BeginActionTransfer,thumb,low,src-alias,Hide selected source icons and place the two transfer icons.
-081669E8,PauseMenu_IsCategoryEntryEmpty,thumb,low,src-alias,Tests category-specific entry storage for an empty or unavailable value
+081669E8,MenuDisplay_IsCategoryEntryEmpty,thumb,low,src-alias,Tentative: tests whether the selected category slot has an available entry
 08166A94,MenuDisplay_CanSwapCategoryEntries,thumb,low,src-alias,Allow unequal slots when at least one contains an entry.
 08166AC8,MenuDisplay_GetCategoryEntryValue,thumb,low,src-alias,Read the category-specific equipped or unlocked entry state.
 08166B14,MenuDisplay_CountAvailableEntries,thumb,low,src-alias,Count available entries in the requested menu category.
