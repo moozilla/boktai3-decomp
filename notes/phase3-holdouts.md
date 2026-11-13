@@ -1233,33 +1233,27 @@ Not worked on further this session.
 
 Tags: #matching #phase3 #player #bosses
 
-### sub_0813D834 (0813D834): cse follow into a singleton case
+### sub_0813D834 (0813D834): resolved on the resumed pass
 
-The original two pins remain. The best new pin-free draft is
-`notes/phase3-drafts/dp-bosses/sub_0813D834.c`: 0 ROM / 2 draft instructions
-(the extra initial `cmp kind, #1; beq bonus`), versus the old 17/15 draft.
-The entire body has the ROM's registers and instructions. Persistent search:
-`build/matchsearch/sub_0813D834`, nodes `second-entry` and `case-zero-fallthrough`.
+Both pins are removed; the stock whole-player-unit check is MATCH (13128 bytes).
+The matching C is retained at `notes/phase3-drafts/dp-bosses/sub_0813D834.c`.
+Case zero executes its real body in a nonempty do block and exits with
+`goto store;`; the common timer store stays after the switch. The loop-end
+note between the case-zero exit and case one stops cse_end_of_basic_block
+from following the singleton switch edge. No extra comparison or instructions
+remain. Equivalent while/for bodies also match; copying the timer store into
+the loop and returning instead leaves 2/6 differences.
 
-Confirmed `CSE_NOFOLLOW=2` gives MATCH. Read `cse_end_of_basic_block` in cse.c:
-a case label with one incoming branch and a preceding BARRIER admits the
-switch equality. Giving case 1 a second incoming branch blocks both passes;
-the duplicate comparison survives. Making case 0 conditionally fall through
-also blocks the follow, but its mode test survives (7/9). Repeating that test
-in both call/skip arms reduces it to 0/2 plus two moved branch targets.
+This resolves the earlier 0/2 second-entry draft. Its diagnosis was correct:
+`CSE_NOFOLLOW=2` matched, but adding a second runtime edge retained a compare
+and branch. The loop-end note supplies the boundary without that edge. See
+scope README fact 193. Persistent exact candidate: resumed matchsearch session
+`build/matchsearch/sub_0813D834-resumed`, node `case-zero-loop-end`.
 
-Tried direct and narrow parameter types, dispatch casts, union/array/address
-forms, precomputing the scaled offset, reordered cases, if/else and separate
-if dispatch, adjusted switch constants, default fallthrough and second entries
-from case zero/default. Dispatch narrowing/offsets preserve the body but add
-conversion/arithmetic instructions. Address-taking and ordinary inline readers
-do not hide the switch equality. No one-pin partial found: removing the scaled
-pin ties its shift to hard r3 and changes the earlier reload order.
-
-Next: a genuine shared path into case 1 whose second edge becomes redundant
-after cse, or an original helper/control-flow structure that puts a non-barrier
-predecessor before the case label. Scope `why all` does not attribute the dead
-argument copy and constant timer address to the switch equality; `probe` does.
+The earlier attempts covered direct/narrow parameters, dispatch casts,
+union/array/address forms, offset precomputation, reordered cases, if/else,
+separate dispatch, default fallthrough and second entries from case zero.
+They either preserved the switch equality or left conversions/extra edges.
 
 ### PlayerAction_RefreshFlagState (0813EDDC): one moved argument copy
 

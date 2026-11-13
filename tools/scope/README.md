@@ -1893,6 +1893,18 @@ Each was read from the compiler source and confirmed on a live draft.
    rejection also matches, but repeating all three adds too many references. This is a
    counter-specific instance of fact 91, with no extra final instructions.
 
+193. **A real case body that exits a loop through a shared tail leaves a loop-end boundary
+   before the next case, blocking CSE's singleton-edge follow.** sub_0813D834 (0813D834)
+   matched without its kind and scaled-offset pins with case zero written as
+   `do { ...; goto store; } while (0);`, and `store:` naming the common timer store
+   after the switch. cse_end_of_basic_block scans backward from case one's label;
+   NOTE_INSN_LOOP_END stops that scan before it reaches the preceding BARRIER.
+   CSE therefore cannot substitute the switch equality into case one's indexed
+   timer access. A plain braced case with `break` allows the substitution;
+   `CSE_NOFOLLOW=2` confirms the decision. A second entry edge also blocks it but
+   leaves a comparison in the final output. The nonempty do/while/for forms all
+   match; placing the timer store and return inside the loop changes the tail.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every

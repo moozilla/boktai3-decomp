@@ -2,13 +2,17 @@
 
 Tags: #matching #phase3 #bosses #player #tooling
 
-All 19 assigned queue entries were worked in ROM order. Three are now free of
-concessions: 15.8% of this queue, a gain of 15.8 percentage points. One additional
-function has an exact partial removal. The other 15 retain their original source;
+All 19 assigned queue entries were worked in ROM order. After the requested resumption, four are free of
+concessions: 21.1% of this queue, a gain of 21.1 percentage points. One additional
+function has an exact partial removal. The other 14 retain their original source;
 their concession-free drafts and blocking decisions are saved under the dp-bosses
 section of `notes/phase3-holdouts.md` and `notes/phase3-drafts/dp-bosses/`.
 
 ## Matched changes
+
+- sub_0813D834 (0813D834), resumed pass: both pins removed. A nonempty case-zero
+  loop exits through the shared timer store; its loop-end note prevents CSE from
+  following the case-one switch edge. Stock whole-player-unit MATCH. Fact 193.
 
 - SceneGrid_ScanColumns (0806E7CC), commit `2ec452b56`: eight pins and one operand
   barrier removed. Inline endpoint helpers prevent the long-lived column from
@@ -26,14 +30,11 @@ section of `notes/phase3-holdouts.md` and `notes/phase3-drafts/dp-bosses/`.
   read changes flow's relative lifetimes for damage and the health address.
   Stock unit MATCH. The fully pin-free 7/7 draft remains available for follow-up.
 
-These three full removals cover 840 bytes; the partial is a 1196-byte function.
+These four full removals cover 1032 bytes; the partial is a 1196-byte function.
 No ROM build, progress regeneration, shared-header change, or new concession was made.
 
 ## Nearest remaining decisions
 
-- sub_0813D834 (0813D834): the body is exact; a second case entry adds only an
-  initial compare/branch. CSE_NOFOLLOW=2 matches the old baseline. The extra edge
-  blocks CSE's switch equality but must disappear later.
 - PlayerAction_RefreshFlagState (0813EDDC): one argument copy is placed before
   the sign test instead of inside its nonnegative arm; all other instructions match.
 - sub_0819BB18 (0819BB18): 4/4 after fixing the random-table class head; only
@@ -48,7 +49,7 @@ No ROM build, progress regeneration, shared-header change, or new concession was
   leaves five reconstruction instructions and alignment padding.
 
 The remaining entries have their confirmed knobs, attempted C forms and next
-hypotheses in the holdout notes. No search was started after the stop instruction.
+hypotheses in the holdout notes. The first run stopped on request; the later explicit continuation resumed holdout work.
 
 ## Scope diagnostics
 
@@ -65,4 +66,4 @@ This run fixes two misleading `why` reports encountered in the queue:
 Seven focused tests cover these cases and their false-positive boundaries.
 Both required suites pass: 407 tests in `tests` (two skipped) and 127 tests in
 `tests/tools`. Real-draft checks confirm both corrected explanations. New matched
-C-form evidence is recorded as README facts 190–192.
+C-form evidence is recorded as README facts 190–193.
