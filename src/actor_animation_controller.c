@@ -180,9 +180,9 @@ void ActorPalette_UpdateReverseFade(struct ActorAnimController *p)
             u32 mode = 2;
             p->mode = mode;
         }
-        *(u16 *)((u8 *)p + 0xf5a) = (*(u16 *)((u8 *)p + 0xf5a) & 15) | 0xd0;
+        p->phase = 13;
         if (p->oldMode == 3) {
-            if ((*((u8 *)p + 0xf5a) & 15) == 3) {
+            if (p->mode == 3) {
                 p->savedFrame = p->anim.frame;
                 p->savedTimer = p->anim.timer;
             }
